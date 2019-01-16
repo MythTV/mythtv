@@ -203,7 +203,7 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
 {
     if (realRender)
         realRender->DrawBitmap(GetTextureFromCache(im), target,
-                               &src, &r, 0, alpha);
+                               &src, &r, nullptr, alpha);
 }
 
 void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,

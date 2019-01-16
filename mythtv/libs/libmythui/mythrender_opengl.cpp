@@ -32,7 +32,6 @@ static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
 
 static const QString kDefaultVertexShader =
-"GLSL_DEFINES"
 "attribute vec2 a_position;\n"
 "attribute vec4 a_color;\n"
 "attribute vec2 a_texcoord0;\n"
@@ -47,7 +46,6 @@ static const QString kDefaultVertexShader =
 "}\n";
 
 static const QString kDefaultFragmentShader =
-"GLSL_DEFINES"
 "uniform sampler2D s_texture0;\n"
 "varying vec4 v_color;\n"
 "varying vec2 v_texcoord0;\n"
@@ -57,7 +55,6 @@ static const QString kDefaultFragmentShader =
 "}\n";
 
 static const QString kSimpleVertexShader =
-"GLSL_DEFINES"
 "attribute vec2 a_position;\n"
 "attribute vec4 a_color;\n"
 "varying   vec4 v_color;\n"
@@ -69,7 +66,6 @@ static const QString kSimpleVertexShader =
 "}\n";
 
 static const QString kSimpleFragmentShader =
-"GLSL_DEFINES"
 "varying vec4 v_color;\n"
 "void main(void)\n"
 "{\n"
@@ -77,7 +73,6 @@ static const QString kSimpleFragmentShader =
 "}\n";
 
 static const QString kDrawVertexShader =
-"GLSL_DEFINES"
 "attribute vec2 a_position;\n"
 "attribute vec4 a_color;\n"
 "varying   vec4 v_color;\n"
@@ -91,7 +86,6 @@ static const QString kDrawVertexShader =
 "}\n";
 
 static const QString kCircleFragmentShader =
-"GLSL_DEFINES"
 "varying vec4 v_color;\n"
 "varying vec2 v_position;\n"
 "uniform mat4 u_parameters;\n"
@@ -103,7 +97,6 @@ static const QString kCircleFragmentShader =
 "}\n";
 
 static const QString kCircleEdgeFragmentShader =
-"GLSL_DEFINES"
 "varying vec4 v_color;\n"
 "varying vec2 v_position;\n"
 "uniform mat4 u_parameters;\n"
@@ -117,7 +110,6 @@ static const QString kCircleEdgeFragmentShader =
 "}\n";
 
 static const QString kVertLineFragmentShader =
-"GLSL_DEFINES"
 "varying vec4 v_color;\n"
 "varying vec2 v_position;\n"
 "uniform mat4 u_parameters;\n"
@@ -130,7 +122,6 @@ static const QString kVertLineFragmentShader =
 "}\n";
 
 static const QString kHorizLineFragmentShader =
-"GLSL_DEFINES"
 "varying vec4 v_color;\n"
 "varying vec2 v_position;\n"
 "uniform mat4 u_parameters;\n"
@@ -167,20 +158,6 @@ OpenGLLocker::~OpenGLLocker()
     if (m_render)
         m_render->doneCurrent();
 }
-
-class MythGLShaderObject
-{
-  public:
-    MythGLShaderObject(uint vert, uint frag)
-      : m_vertex_shader(vert),
-        m_fragment_shader(frag)
-    {
-    }
-    MythGLShaderObject() = default;
-
-    GLuint m_vertex_shader;
-    GLuint m_fragment_shader;
-};
 
 MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
 {
@@ -239,29 +216,17 @@ MythRenderOpenGL::~MythRenderOpenGL()
     doneCurrent();
 }
 
-void MythRenderOpenGL::Init(void)
+bool MythRenderOpenGL::Init(void)
 {
     if (!isValid())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "MythRenderOpenGL is not a valid OpenGL rendering context");
-        return;
+        return false;
     }
 
     OpenGLLocker locker(this);
     initializeOpenGLFunctions();
     m_features = openGLFeatures();
-
-    // GLSL defines
-    m_GLSLVersion = "#version 110\n";
-    m_qualifiers = QString();
-    if(isOpenGLES())
-    {
-        m_GLSLVersion = "#version 100\n";
-        // GLSL ES precision qualifiers
-        m_qualifiers = "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
-                       "precision highp float;\n"
-                       "#endif\n";
-    }
 
     InitProcs();
     Init2DState();
@@ -317,10 +282,14 @@ void MythRenderOpenGL::Init(void)
     DebugFeatures();
 
     m_extraFeaturesUsed = m_extraFeatures;
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Initialised MythRenderOpenGL");
+    if (!CreateDefaultShaders())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create default shaders");
+        return false;
+    }
 
-    DeleteDefaultShaders();
-    CreateDefaultShaders();
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Initialised MythRenderOpenGL");
+    return true;
 }
 
 #define GLYesNo(arg) (arg ? "Yes" : "No")
@@ -964,8 +933,8 @@ void MythRenderOpenGL::ClearFramebuffer(void)
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
-                                  const QRect *dst, uint prog, int alpha,
+void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src, const QRect *dst,
+                                  QOpenGLShaderProgram *Program, int alpha,
                                   int red, int green, int blue)
 {
     if (!tex || !m_textures.contains(tex))
@@ -976,13 +945,13 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
 
     makeCurrent();
     BindFramebuffer(target);
-    DrawBitmapPriv(tex, src, dst, prog, alpha, red, green, blue);
+    DrawBitmapPriv(tex, src, dst, Program, alpha, red, green, blue);
     doneCurrent();
 }
 
 void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
-                                  uint target, const QRectF *src,
-                                  const QRectF *dst, uint prog)
+                                  uint target, const QRectF *src, const QRectF *dst,
+                                  QOpenGLShaderProgram *Program)
 {
     if (!textures || !texture_count)
         return;
@@ -992,7 +961,7 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
 
     makeCurrent();
     BindFramebuffer(target);
-    DrawBitmapPriv(textures, texture_count, src, dst, prog);
+    DrawBitmapPriv(textures, texture_count, src, dst, Program);
     doneCurrent();
 }
 
@@ -1026,25 +995,22 @@ inline void MythRenderOpenGL::glVertexAttribPointerI(
 #pragma GCC diagnostic pop
 }
 
-void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src,
-                                       const QRect *dst, uint prog, int alpha,
-                                       int red, int green, int blue)
+void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
+                                      QOpenGLShaderProgram *Program, int alpha,
+                                     int red, int green, int blue)
 {
-    if (prog && !m_shader_objects.contains(prog))
-        prog = 0;
-    if (prog == 0)
-        prog = m_shaders[kShaderDefault];
+    if (Program && !m_programs.contains(Program))
+        Program = nullptr;
+    if (Program == nullptr)
+        Program = m_defaultPrograms[kShaderDefault];
 
-    SetShaderParams(prog, m_projection, "u_projection");
-    SetShaderParams(prog, m_transforms.top(), "u_transform");
+    SetShaderProgramParams(Program, m_projection, "u_projection");
+    SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
     SetBlend(true);
 
     EnableTextures(tex);
 
-    GLint loc = glGetUniformLocation(prog, "s_texture0");
-    if (loc != -1)
-        glUniform1i(loc, 0);
-
+    Program->setUniformValue("s_texture0", 0);
     ActiveTexture(GL_TEXTURE0);
     glBindTexture(m_textures[tex].m_type, tex);
 
@@ -1083,18 +1049,18 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src,
 }
 
 void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
-                                       const QRectF *src, const QRectF *dst,
-                                       uint prog)
+                                      const QRectF *src, const QRectF *dst,
+                                      QOpenGLShaderProgram *Program)
 {
-    if (prog && !m_shader_objects.contains(prog))
-        prog = 0;
-    if (prog == 0)
-        prog = m_shaders[kShaderDefault];
+    if (Program && !m_programs.contains(Program))
+        Program = nullptr;
+    if (Program == nullptr)
+        Program = m_defaultPrograms[kShaderDefault];
 
     uint first = textures[0];
 
-    SetShaderParams(prog, m_projection, "u_projection");
-    SetShaderParams(prog, m_transforms.top(), "u_transform");
+    SetShaderProgramParams(Program, m_projection, "u_projection");
+    SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
     SetBlend(false);
 
     EnableTextures(first);
@@ -1104,10 +1070,7 @@ void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
         if (m_textures.contains(textures[i]))
         {
             QString uniform = QString("s_texture%1").arg(active_tex);
-            GLint loc = glGetUniformLocation(prog, qPrintable(uniform));
-            if (loc != -1)
-                glUniform1i(loc, active_tex);
-
+            Program->setUniformValue(qPrintable(uniform), active_tex);
             ActiveTexture(GL_TEXTURE0 + active_tex++);
             glBindTexture(m_textures[textures[i]].m_type, textures[i]);
         }
@@ -1182,8 +1145,8 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
     if (fillBrush.style() != Qt::NoBrush)
     {
         // Get the shaders
-        int elip = m_shaders[kShaderCircle];
-        int fill = m_shaders[kShaderSimple];
+        QOpenGLShaderProgram* elip = m_defaultPrograms[kShaderCircle];
+        QOpenGLShaderProgram* fill = m_defaultPrograms[kShaderSimple];
 
         // Set the fill color
         glVertexAttrib4f(COLOR_INDEX,
@@ -1197,14 +1160,14 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(3,0) = rad - 1.0;
 
         // Enable the Circle shader
-        SetShaderParams(elip, m_projection, "u_projection");
-        SetShaderParams(elip, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(elip, m_projection, "u_projection");
+        SetShaderProgramParams(elip, m_transforms.top(), "u_transform");
 
         // Draw the top left segment
         m_parameters(0,0) = tl.left() + rad;
         m_parameters(1,0) = tl.top() + rad;
 
-        SetShaderParams(elip, m_parameters, "u_parameters");
+        SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1214,7 +1177,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the top right segment
         m_parameters(0,0) = tr.left();
         m_parameters(1,0) = tr.top() + rad;
-        SetShaderParams(elip, m_parameters, "u_parameters");
+        SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tr);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1224,7 +1187,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the bottom left segment
         m_parameters(0,0) = bl.left() + rad;
         m_parameters(1,0) = bl.top();
-        SetShaderParams(elip, m_parameters, "u_parameters");
+        SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, bl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1234,7 +1197,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the bottom right segment
         m_parameters(0,0) = br.left();
         m_parameters(1,0) = br.top();
-        SetShaderParams(elip, m_parameters, "u_parameters");
+        SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, br);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1246,8 +1209,8 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         QRect left(r.left(), r.top() + rad, rad, r.height() - dia);
         QRect right(r.left() + r.width() - rad, r.top() + rad, rad, r.height() - dia);
 
-        SetShaderParams(fill, m_projection, "u_projection");
-        SetShaderParams(fill, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(fill, m_projection, "u_projection");
+        SetShaderProgramParams(fill, m_transforms.top(), "u_transform");
 
         GetCachedVBO(GL_TRIANGLE_STRIP, main);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
@@ -1270,9 +1233,9 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
     if (linePen.style() != Qt::NoPen)
     {
         // Get the shaders
-        int edge = m_shaders[kShaderCircleEdge];
-        int vline = m_shaders[kShaderVertLine];
-        int hline = m_shaders[kShaderHorizLine];
+        QOpenGLShaderProgram* edge = m_defaultPrograms[kShaderCircleEdge];
+        QOpenGLShaderProgram* vline = m_defaultPrograms[kShaderVertLine];
+        QOpenGLShaderProgram* hline = m_defaultPrograms[kShaderHorizLine];
 
         // Set the line color
         glVertexAttrib4f(COLOR_INDEX,
@@ -1286,13 +1249,13 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(3,0) = lineWidth / 2.0;
 
         // Enable the edge shader
-        SetShaderParams(edge, m_projection, "u_projection");
-        SetShaderParams(edge, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(edge, m_projection, "u_projection");
+        SetShaderProgramParams(edge, m_transforms.top(), "u_transform");
 
         // Draw the top left edge segment
         m_parameters(0,0) = tl.left() + rad;
         m_parameters(1,0) = tl.top() + rad;
-        SetShaderParams(edge, m_parameters, "u_parameters");
+        SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1302,7 +1265,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the top right edge segment
         m_parameters(0,0) = tr.left();
         m_parameters(1,0) = tr.top() + rad;
-        SetShaderParams(edge, m_parameters, "u_parameters");
+        SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tr);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1312,7 +1275,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the bottom left edge segment
         m_parameters(0,0) = bl.left() + rad;
         m_parameters(1,0) = bl.top();
-        SetShaderParams(edge, m_parameters, "u_parameters");
+        SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, bl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1322,7 +1285,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the bottom right edge segment
         m_parameters(0,0) = br.left();
         m_parameters(1,0) = br.top();
-        SetShaderParams(edge, m_parameters, "u_parameters");
+        SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, br);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1330,8 +1293,8 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Vertical lines
-        SetShaderParams(vline, m_projection, "u_projection");
-        SetShaderParams(vline, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(vline, m_projection, "u_projection");
+        SetShaderProgramParams(vline, m_transforms.top(), "u_transform");
 
         m_parameters(1,0) = lineWidth / 2.0;
         QRect vl(r.left(), r.top() + rad,
@@ -1339,7 +1302,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Draw the left line segment
         m_parameters(0,0) = vl.left() + lineWidth;
-        SetShaderParams(vline, m_parameters, "u_parameters");
+        SetShaderProgramParams(vline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1349,7 +1312,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the right line segment
         vl.translate(r.width() - lineWidth, 0);
         m_parameters(0,0) = vl.left();
-        SetShaderParams(vline, m_parameters, "u_parameters");
+        SetShaderProgramParams(vline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1357,14 +1320,14 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Horizontal lines
-        SetShaderParams(hline, m_projection, "u_projection");
-        SetShaderParams(hline, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(hline, m_projection, "u_projection");
+        SetShaderProgramParams(hline, m_transforms.top(), "u_transform");
         QRect hl(r.left() + rad, r.top(),
                  r.width() - dia, lineWidth);
 
         // Draw the top line segment
         m_parameters(0,0) = hl.top() + lineWidth;
-        SetShaderParams(hline, m_parameters, "u_parameters");
+        SetShaderProgramParams(hline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1374,7 +1337,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         // Draw the bottom line segment
         hl.translate(0, r.height() - lineWidth);
         m_parameters(0,0) = hl.top();
-        SetShaderParams(hline, m_parameters, "u_parameters");
+        SetShaderProgramParams(hline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
@@ -1451,8 +1414,8 @@ void MythRenderOpenGL::ResetVars(void)
     m_flushEnabled    = true;
     m_projection.fill(0);
     m_parameters.fill(0);
-    memset(m_shaders, 0, sizeof(m_shaders));
-    m_active_obj = 0;
+    memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
+    m_activeProgram = nullptr;
     m_transforms.clear();
     m_transforms.push(QMatrix4x4());
     m_map.clear();
@@ -1519,7 +1482,7 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     DeleteTextures();
     DeleteFrameBuffers();
     DeleteDefaultShaders();
-    DeleteShaders();
+    DeleteShaderPrograms();
     Flush(true);
 
     if (m_fence)
@@ -1839,231 +1802,129 @@ void MythRenderOpenGL::PopTransformation(void)
     m_transforms.pop();
 }
 
-uint MythRenderOpenGL::CreateShaderObject(const QString &vertex,
-                                          const QString &fragment)
+inline QOpenGLShaderProgram* ShaderError(QOpenGLShaderProgram *Shader, const QString &Source)
 {
-    if (!(m_extraFeatures & kGLSL))
-        return 0;
-
-    OpenGLLocker locker(this);
-
-    uint result = 0;
-    QString vert_shader = vertex.isEmpty() ? kDefaultVertexShader : vertex;
-    QString frag_shader = fragment.isEmpty() ? kDefaultFragmentShader: fragment;
-
-    OptimiseShaderSource(vert_shader);
-    OptimiseShaderSource(frag_shader);
-
-    result = glCreateProgram();
-    if (!result)
-        return 0;
-
-    MythGLShaderObject object(CreateShader(GL_VERTEX_SHADER, vert_shader),
-                              CreateShader(GL_FRAGMENT_SHADER, frag_shader));
-    m_shader_objects.insert(result, object);
-
-    if (!ValidateShaderObject(result))
+    QString type = Source.isEmpty() ? "Shader link" : "Shader compile";
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("%1 error").arg(type));
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Log:"));
+    LOG(VB_GENERAL, LOG_ERR, Shader->log());
+    if (!Source.isEmpty())
     {
-        DeleteShaderObject(result);
-        return 0;
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Source:"));
+        LOG(VB_GENERAL, LOG_ERR, Source);
     }
-
-    return result;
+    delete Shader;
+    return nullptr;
 }
 
-void MythRenderOpenGL::DeleteShaderObject(uint obj)
-{
-    OpenGLLocker locker(this);
-
-    if (!m_shader_objects.contains(obj))
-        return;
-
-    GLuint vertex   = m_shader_objects[obj].m_vertex_shader;
-    GLuint fragment = m_shader_objects[obj].m_fragment_shader;
-    glDetachShader(obj, vertex);
-    glDetachShader(obj, fragment);
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
-    glDeleteProgram(obj);
-    m_shader_objects.remove(obj);
-    m_map.clear();
-
-    Flush(true);
-}
-
-void MythRenderOpenGL::EnableShaderObject(uint obj)
-{
-    OpenGLLocker locker(this);
-
-    if (obj == m_active_obj)
-        return;
-
-    if (!obj && m_active_obj)
-    {
-        glUseProgram(0);
-        m_active_obj = 0;
-        return;
-    }
-
-    if (!m_shader_objects.contains(obj))
-        return;
-
-    glUseProgram(obj);
-    m_active_obj = obj;
-}
-
-void MythRenderOpenGL::SetShaderParams(uint obj, const QMatrix4x4 &m,
-                                        const char* uniform)
+QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Vertex, const QString &Fragment)
 {
     if (!(m_features & Shaders))
-        return;
+        return nullptr;
 
     OpenGLLocker locker(this);
-
-    EnableShaderObject(obj);
-
-    QString tag = QString("%1-%2").arg(obj).arg(uniform);
-    map_t::iterator it = m_map.find(tag);
-    if (it == m_map.end())
-        m_map.insert(tag, m);
-    else if (!qFuzzyCompare(m, it.value()))
-        it.value() = m;
-    else
-        return;
-    GLint loc = glGetUniformLocation(obj, uniform);
-    if (loc != -1)
-        glUniformMatrix4fv(loc, 1, GL_FALSE, GLMatrix4x4(m));
+    QString vertex   = Vertex.isEmpty()   ? kDefaultVertexShader  : Vertex;
+    QString fragment = Fragment.isEmpty() ? kDefaultFragmentShader: Fragment;
+    QOpenGLShaderProgram *program = new QOpenGLShaderProgram();
+    if (!program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex))
+        return ShaderError(program, vertex);
+    if (!program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment))
+        return ShaderError(program, fragment);
+    if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
+    {
+        QList<QOpenGLShader*> shaders = program->shaders();
+        foreach (QOpenGLShader* shader, shaders)
+            LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
+    }
+    program->bindAttributeLocation("a_position",  VERTEX_INDEX);
+    program->bindAttributeLocation("a_color",     COLOR_INDEX);
+    program->bindAttributeLocation("a_texcoord0", TEXTURE_INDEX);
+    if (!program->link())
+        return ShaderError(program, "");
+    m_programs.append(program);
+    return program;
 }
 
-void MythRenderOpenGL::CreateDefaultShaders(void)
+void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
 {
-    m_shaders[kShaderSimple]  = CreateShaderObject(kSimpleVertexShader,
-                                                   kSimpleFragmentShader);
-    m_shaders[kShaderDefault] = CreateShaderObject(kDefaultVertexShader,
-                                                   kDefaultFragmentShader);
-    m_shaders[kShaderCircle]  = CreateShaderObject(kDrawVertexShader,
-                                                   kCircleFragmentShader);
-    m_shaders[kShaderCircleEdge] = CreateShaderObject(kDrawVertexShader,
-                                                   kCircleEdgeFragmentShader);
-    m_shaders[kShaderVertLine]   = CreateShaderObject(kDrawVertexShader,
-                                                   kVertLineFragmentShader);
-    m_shaders[kShaderHorizLine]  = CreateShaderObject(kDrawVertexShader,
-                                                   kHorizLineFragmentShader);
+    if (!m_programs.contains(Program))
+        return;
+    {
+        OpenGLLocker locker(this);
+        m_programs.removeAll(Program);
+        delete Program;
+        m_map.clear();
+    }
+}
+
+void MythRenderOpenGL::DeleteShaderPrograms(void)
+{
+    OpenGLLocker locker(this);
+    foreach (QOpenGLShaderProgram *program, m_programs)
+        delete program;
+    m_programs.clear();
+    m_map.clear();
+}
+
+bool MythRenderOpenGL::EnableShaderProgram(QOpenGLShaderProgram* Program)
+{
+    if (!Program || !m_programs.contains(Program))
+        return false;
+    if (m_activeProgram == Program)
+        return true;
+    {
+        OpenGLLocker locker(this);
+        Program->bind();
+        m_activeProgram = Program;
+        return true;
+    }
+}
+
+void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, const QMatrix4x4 &Value, const char *Uniform)
+{
+    OpenGLLocker locker(this);
+    if (!Program || !Uniform || !EnableShaderProgram(Program))
+        return;
+
+    // Uniform cacheing
+    QString tag = QStringLiteral("%1-%2").arg(Program->programId()).arg(Uniform);
+    map_t::iterator it = m_map.find(tag);
+    if (it == m_map.end())
+        m_map.insert(tag, Value);
+    else if (!qFuzzyCompare(Value, it.value()))
+        it.value() = Value;
+    else
+        return;
+
+    Program->setUniformValue(Uniform, Value);
+}
+
+bool MythRenderOpenGL::CreateDefaultShaders(void)
+{
+    m_defaultPrograms[kShaderSimple]     = CreateShaderProgram(kSimpleVertexShader, kSimpleFragmentShader);
+    m_defaultPrograms[kShaderDefault]    = CreateShaderProgram(kDefaultVertexShader, kDefaultFragmentShader);
+    m_defaultPrograms[kShaderCircle]     = CreateShaderProgram(kDrawVertexShader, kCircleFragmentShader);
+    m_defaultPrograms[kShaderCircleEdge] = CreateShaderProgram(kDrawVertexShader, kCircleEdgeFragmentShader);
+    m_defaultPrograms[kShaderVertLine]   = CreateShaderProgram(kDrawVertexShader, kVertLineFragmentShader);
+    m_defaultPrograms[kShaderHorizLine]  = CreateShaderProgram(kDrawVertexShader, kHorizLineFragmentShader);
+    return m_defaultPrograms[kShaderSimple] && m_defaultPrograms[kShaderDefault] &&
+           m_defaultPrograms[kShaderCircle] && m_defaultPrograms[kShaderCircleEdge] &&
+           m_defaultPrograms[kShaderVertLine] &&m_defaultPrograms[kShaderHorizLine];
 }
 
 void MythRenderOpenGL::DeleteDefaultShaders(void)
 {
     for (int i = 0; i < kShaderCount; i++)
     {
-        DeleteShaderObject(m_shaders[i]);
-        m_shaders[i] = 0;
+        DeleteShaderProgram(m_defaultPrograms[i]);
+        m_defaultPrograms[i] = nullptr;
     }
-}
-
-uint MythRenderOpenGL::CreateShader(int type, const QString &source)
-{
-    uint result = glCreateShader(type);
-    QByteArray src = source.toLatin1();
-    const char* tmp[1] = { src.constData() };
-    glShaderSource(result, 1, tmp, nullptr);
-    glCompileShader(result);
-    GLint compiled;
-    glGetShaderiv(result, GL_COMPILE_STATUS, &compiled);
-    if (!compiled)
-    {
-        GLint length = 0;
-        glGetShaderiv(result, GL_INFO_LOG_LENGTH, &length);
-        if (length > 1)
-        {
-            char *log = (char*)malloc(sizeof(char) * length);
-            glGetShaderInfoLog(result, length, nullptr, log);
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to compile shader.");
-            LOG(VB_GENERAL, LOG_ERR, log);
-            LOG(VB_GENERAL, LOG_ERR, source);
-            free(log);
-        }
-        glDeleteShader(result);
-        result = 0;
-    }
-    return result;
-}
-
-bool MythRenderOpenGL::ValidateShaderObject(uint obj)
-{
-    if (!m_shader_objects.contains(obj))
-        return false;
-    if (!m_shader_objects[obj].m_fragment_shader ||
-        !m_shader_objects[obj].m_vertex_shader)
-        return false;
-
-    glAttachShader(obj, m_shader_objects[obj].m_fragment_shader);
-    glAttachShader(obj, m_shader_objects[obj].m_vertex_shader);
-    glBindAttribLocation(obj, VERTEX_INDEX,  "a_position");
-    glBindAttribLocation(obj, COLOR_INDEX,   "a_color");
-    glBindAttribLocation(obj, TEXTURE_INDEX, "a_texcoord0");
-    glLinkProgram(obj);
-    return CheckObjectStatus(obj);
-}
-
-bool MythRenderOpenGL::CheckObjectStatus(uint obj)
-{
-    int ok;
-#ifdef GL_LINK_STATUS
-    glGetProgramiv(obj, GL_LINK_STATUS, &ok);
-#else
-    m_glGetProgramiv(obj, GL_OBJECT_LINK_STATUS, &ok);
-#endif
-    if (ok > 0)
-        return true;
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to link shader object.");
-    int infologLength = 0;
-    int charsWritten  = 0;
-    char *infoLog;
-#ifdef GL_INFO_LOG_LENGTH
-    glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
-#else
-    m_glGetProgramiv(obj, GL_OBJECT_INFO_LOG_LENGTH, &infologLength);
-#endif
-    if (infologLength > 0)
-    {
-        infoLog = (char *)malloc(infologLength);
-        glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
-        LOG(VB_GENERAL, LOG_ERR, QString("\n\n%1").arg(infoLog));
-        free(infoLog);
-    }
-    return false;
-}
-
-void MythRenderOpenGL::OptimiseShaderSource(QString &source)
-{
-    source.replace("GLSL_DEFINES", m_GLSLVersion + m_qualifiers);
-    LOG(VB_GENERAL, LOG_DEBUG, "\n" + source);
 }
 
 void MythRenderOpenGL::SetMatrixView(void)
 {
     m_projection.setToIdentity();
     m_projection.ortho(m_viewport);
-}
-
-void MythRenderOpenGL::DeleteShaders(void)
-{
-    QHash<GLuint, MythGLShaderObject>::iterator it;
-    for (it = m_shader_objects.begin(); it != m_shader_objects.end(); ++it)
-    {
-        GLuint object   = it.key();
-        GLuint vertex   = it.value().m_vertex_shader;
-        GLuint fragment = it.value().m_fragment_shader;
-        glDetachShader(object, vertex);
-        glDetachShader(object, fragment);
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-        glDeleteProgram(object);
-    }
-    m_shader_objects.clear();
-    m_map.clear();
-    Flush(true);
 }
 
 /*! \brief GLMatrix4x4 is a helper class to convert between QT and GT 4x4 matrices.

@@ -185,7 +185,7 @@ using_opengl {
     using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER
     SOURCES += mythpainter_ogl.cpp  mythrender_opengl.cpp
     HEADERS += mythpainter_ogl.h    mythrender_opengl.h
-    HEADERS += mythrender_opengl_defs.h mythrender_opengl_defs2.h
+    HEADERS += mythrender_opengl_defs.h
     using_opengles {
         DEFINES += USING_OPENGLES
         # For raspberry Pi Raspbian

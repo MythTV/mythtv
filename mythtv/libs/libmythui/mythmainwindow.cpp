@@ -1061,11 +1061,10 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
             d->painter = new MythOpenGLPainter(gl);
             // NB MythPainterWindowGL takes ownership of gl
             d->paintwin = new MythPainterWindowGL(this, d, gl);
-            gl->Init();
 
             // we need to initialise MythRenderOpenGL before checking
             // IsRecommendedRenderer
-            if (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer())
+            if (!gl->Init() || (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer()))
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     "OpenGL painter not recommended with this system's "

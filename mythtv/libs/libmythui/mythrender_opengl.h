@@ -8,6 +8,7 @@
 #include <QtGlobal>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>
@@ -18,7 +19,6 @@
 #include "mythlogging.h"
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
-#include "mythrender_opengl_defs2.h"
 #include "mythuianimation.h"
 
 typedef enum
@@ -97,7 +97,6 @@ typedef enum
 
 class QWindow;
 class QPaintDevice;
-class MythGLShaderObject;
 
 class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunctions, public MythRender
 {
@@ -117,14 +116,10 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void swapBuffers();
     void setWidget(QWidget *Widget);
     bool IsDirectRendering() const;
-
-    void  Init(void);
-
+    bool  Init(void);
     int   GetMaxTextureSize(void)    { return m_max_tex_size; }
     uint  GetFeatures(void)          { return m_extraFeaturesUsed;    }
-
     bool  IsRecommendedRenderer(void);
-
     void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QRect &rect, bool viewportonly = false);
     QRect GetViewPort(void) { return m_viewport; }
@@ -155,16 +150,17 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void BindFramebuffer(uint fb);
     void ClearFramebuffer(void);
 
-    uint CreateShaderObject(const QString &vert, const QString &frag);
-    void DeleteShaderObject(uint obj);
-    void EnableShaderObject(uint obj);
-    void SetShaderParams(uint prog, const QMatrix4x4 &m, const char* uniform);
+    QOpenGLShaderProgram* CreateShaderProgram(const QString &Vertex, const QString &Fragment);
+    void   DeleteShaderProgram(QOpenGLShaderProgram* Program);
+    bool   EnableShaderProgram(QOpenGLShaderProgram* Program);
+    void   SetShaderProgramParams(QOpenGLShaderProgram* Program, const QMatrix4x4 &Value, const char* Uniform);
 
-    void DrawBitmap(uint tex, uint target, const QRect *src,
-                    const QRect *dst, uint prog, int alpha = 255,
+    void DrawBitmap(uint tex, uint target, const QRect *src, const QRect *dst,
+                    QOpenGLShaderProgram *Program, int alpha = 255,
                     int red = 255, int green = 255, int blue = 255);
     void DrawBitmap(uint *textures, uint texture_count, uint target,
-                    const QRectF *src, const QRectF *dst, uint prog);
+                    const QRectF *src, const QRectF *dst,
+                    QOpenGLShaderProgram *Program);
     void DrawRect(const QRect &area, const QBrush &fillBrush,
                   const QPen &linePen, int alpha);
     void DrawRoundRect(const QRect &area, int cornerRadius,
@@ -175,9 +171,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
   protected:
     ~MythRenderOpenGL();
     void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
-                       uint prog, int alpha, int red, int green, int blue);
+                        QOpenGLShaderProgram *Program, int alpha, int red,
+                        int green, int blue);
     void DrawBitmapPriv(uint *textures, uint texture_count,
-                        const QRectF *src, const QRectF *dst, uint prog);
+                        const QRectF *src, const QRectF *dst,
+                        QOpenGLShaderProgram *Program);
     void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
                       const QPen &linePen, int alpha);
     void DrawRoundRectPriv(const QRect &area, int cornerRadius,
@@ -194,7 +192,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     uint CreateVBO(void);
     void DeleteOpenGLResources(void);
     void DeleteTextures(void);
-    void DeleteShaders(void);
     void DeleteFrameBuffers(void);
 
     bool UpdateTextureVertices(uint tex, const QRect *src, const QRect *dst);
@@ -206,22 +203,28 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
 
-    uint CreateShader(int type, const QString &source);
-    bool ValidateShaderObject(uint obj);
-    bool CheckObjectStatus(uint obj);
-    void OptimiseShaderSource(QString &source);
-    void CreateDefaultShaders(void);
+    void DeleteShaderPrograms(void);
+    bool CreateDefaultShaders(void);
     void DeleteDefaultShaders(void);
 
     static void StoreBicubicWeights(float x, float *dst);
 
   protected:
-    // Resources
+    // Textures
     QHash<GLuint, MythGLTexture> m_textures;
+
+    // Framebuffers
     QVector<GLuint>              m_framebuffers;
+
+    // Synchronisation
     GLuint                       m_fence;
-    QHash<GLuint, MythGLShaderObject> m_shader_objects;
-    uint                         m_shaders[kShaderCount];
+
+    // Shaders
+    QVector<QOpenGLShaderProgram*> m_programs;
+    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount];
+    QOpenGLShaderProgram*        m_activeProgram;
+
+    // Vertices
     QMap<uint64_t,GLfloat*>      m_cachedVertices;
     QList<uint64_t>              m_vertexExpiry;
     QMap<uint64_t,GLuint>        m_cachedVBOS;
@@ -246,9 +249,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     uint       m_active_fb;
     bool       m_blend;
     uint32_t   m_background;
-    QString    m_qualifiers;
-    QString    m_GLSLVersion;
-    uint       m_active_obj;
     QMatrix4x4 m_projection;
     QStack<QMatrix4x4> m_transforms;
     QMatrix4x4 m_parameters;

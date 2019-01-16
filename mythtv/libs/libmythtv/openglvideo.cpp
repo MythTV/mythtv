@@ -18,7 +18,7 @@ enum DisplayBuffer
 class OpenGLFilter
 {
     public:
-        vector<GLuint> fragmentPrograms;
+        vector<QOpenGLShaderProgram*> fragmentPrograms;
         uint           numInputs;
         vector<GLuint> frameBuffers;
         vector<GLuint> frameBufferTextures;
@@ -471,7 +471,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     OpenGLFilter *temp = new OpenGLFilter();
 
     temp->numInputs = 1;
-    GLuint program = 0;
+    QOpenGLShaderProgram *program = nullptr;
 
     if (filter == kGLFilterBicubic)
     {
@@ -522,17 +522,14 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Removing %1 filter")
             .arg(FilterToString(filter)));
 
-    vector<GLuint> temp;
-    vector<GLuint>::iterator it;
-
-    temp = filters[filter]->fragmentPrograms;
-    for (it = temp.begin(); it != temp.end(); ++it)
-        gl_context->DeleteShaderObject(*it);
+    vector<QOpenGLShaderProgram*>::const_iterator it = filters[filter]->fragmentPrograms.cbegin();
+    for ( ; it != filters[filter]->fragmentPrograms.cend(); ++it)
+        gl_context->DeleteShaderProgram(*it);
     filters[filter]->fragmentPrograms.clear();
 
-    temp = filters[filter]->frameBuffers;
-    for (it = temp.begin(); it != temp.end(); ++it)
-        gl_context->DeleteFrameBuffer(*it);
+    vector<GLuint>::const_iterator it2 = filters[filter]->frameBuffers.cbegin();
+    for ( ; it2 != filters[filter]->frameBuffers.cend(); ++it2)
+        gl_context->DeleteFrameBuffer(*it2);
     filters[filter]->frameBuffers.clear();
 
     DeleteTextures(&(filters[filter]->frameBufferTextures));
@@ -553,7 +550,7 @@ void OpenGLVideo::TearDownDeinterlacer(void)
         OpenGLFilter *tmp = it->second;
         while (tmp->fragmentPrograms.size() > 1)
         {
-            gl_context->DeleteShaderObject(tmp->fragmentPrograms.back());
+            gl_context->DeleteShaderProgram(tmp->fragmentPrograms.back());
             tmp->fragmentPrograms.pop_back();
         }
     }
@@ -624,8 +621,8 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 
     OpenGLFilterType type = (kGLYV12 == videoType) ? kGLFilterYV12RGB : kGLFilterYUV2RGB;
 
-    uint prog1 = AddFragmentProgram(type, deinterlacer, kScan_Interlaced);
-    uint prog2 = AddFragmentProgram(type, deinterlacer, kScan_Intr2ndField);
+    QOpenGLShaderProgram *prog1 = AddFragmentProgram(type, deinterlacer, kScan_Interlaced);
+    QOpenGLShaderProgram *prog2 = AddFragmentProgram(type, deinterlacer, kScan_Intr2ndField);
 
     if (prog1 && prog2)
     {
@@ -654,11 +651,11 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
  *  Create the correct fragment program for the given filter type
  */
 
-uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
+QOpenGLShaderProgram* OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
                                      QString deint, FrameScanType field)
 {
     if (!gl_context)
-        return 0;
+        return nullptr;
 
     QString vertex, fragment;
     if (gl_features & kGLSL)
@@ -668,10 +665,10 @@ uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
     else
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL GLSL support");
-        return 0;
+        return nullptr;
     }
 
-    return gl_context->CreateShaderObject(vertex, fragment);
+    return gl_context->CreateShaderProgram(vertex, fragment);
 }
 
 /**
@@ -1023,7 +1020,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             textures[texture_count++] = helperTexture;
 
         // enable fragment program and set any environment variables
-        GLuint program = 0;
+        QOpenGLShaderProgram *program = nullptr;
         if (((type != kGLFilterNone) && (type != kGLFilterResize)) ||
             ((gl_features & kGLSL) && (type == kGLFilterResize)))
         {
@@ -1046,7 +1043,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
         if (type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB)
         {
-            gl_context->SetShaderParams(program,
+            gl_context->SetShaderProgramParams(program,
                 GLMatrix4x4(reinterpret_cast<float*>(colourSpace->GetMatrix())),
                 COLOUR_UNIFORM);
         }
@@ -1197,7 +1194,6 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
 }
 
 static const QString YUV2RGBVertexShader =
-"GLSL_DEFINES"
 "attribute vec2 a_position;\n"
 "attribute vec2 a_texcoord0;\n"
 "varying   vec2 v_texcoord0;\n"
@@ -1212,7 +1208,6 @@ static const QString SelectColumn =
 "        yuva = yuva.rabg;\n";
 
 static const QString YUV2RGBFragmentShader =
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1224,7 +1219,6 @@ static const QString YUV2RGBFragmentShader =
 "}\n";
 
 static const QString OneFieldShader[2] = {
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1237,7 +1231,6 @@ static const QString OneFieldShader[2] = {
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1251,7 +1244,6 @@ static const QString OneFieldShader[2] = {
 };
 
 static const QString LinearBlendShader[2] = {
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1266,7 +1258,6 @@ static const QString LinearBlendShader[2] = {
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1283,7 +1274,6 @@ static const QString LinearBlendShader[2] = {
 };
 
 static const QString KernelShader[2] = {
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture1;\n"
 "uniform GLSL_SAMPLER s_texture2;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
@@ -1317,7 +1307,6 @@ static const QString KernelShader[2] = {
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform GLSL_SAMPLER s_texture1;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
@@ -1353,7 +1342,6 @@ static const QString KernelShader[2] = {
 };
 
 static const QString BicubicShader =
-"GLSL_DEFINES"
 "uniform sampler2D s_texture0;\n"
 "uniform sampler2D s_texture1;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1380,7 +1368,6 @@ static const QString BicubicShader =
 "}\n";
 
 static const QString DefaultFragmentShader =
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
@@ -1391,7 +1378,6 @@ static const QString DefaultFragmentShader =
 
 static const QString YV12RGBVertexShader =
 "//YV12RGBVertexShader\n"
-"GLSL_DEFINES"
 "attribute vec2 a_position;\n"
 "attribute vec2 a_texcoord0;\n"
 "varying   vec2 v_texcoord0;\n"
@@ -1421,7 +1407,6 @@ vec3 sampleYVU(in GLSL_SAMPLER texture, vec2 texcoordY)\n\
 
 static const QString YV12RGBFragmentShader =
 "//YV12RGBFragmentShader\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1434,7 +1419,6 @@ SAMPLEYVU
 
 static const QString YV12RGBOneFieldFragmentShader[2] = {
 "//YV12RGBOneFieldFragmentShader 1\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1447,7 +1431,6 @@ SAMPLEYVU
 "}\n",
 
 "//YV12RGBOneFieldFragmentShader 2\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1462,7 +1445,6 @@ SAMPLEYVU
 
 static const QString YV12RGBLinearBlendFragmentShader[2] = {
 "// YV12RGBLinearBlendFragmentShader - Top\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1480,7 +1462,6 @@ SAMPLEYVU
 "}\n",
 
 "// YV12RGBLinearBlendFragmentShader - Bottom\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1525,7 +1506,6 @@ vec3 kernelYVU(in vec3 yvu, GLSL_SAMPLER texture1, GLSL_SAMPLER texture2)\n\
 
 static const QString YV12RGBKernelShader[2] = {
 "//YV12RGBKernelShader 1\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture1, s_texture2; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1540,7 +1520,6 @@ KERNELYVU
 "}\n",
 
 "//YV12RGBKernelShader 2\n"
-"GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0, s_texture1; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
@@ -1561,41 +1540,42 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
 {
     uint bottom = field == kScan_Intr2ndField;
     vertex = YUV2RGBVertexShader;
+    fragment = gl_context->isOpenGLES() ? "precision highp float;\n" : "";
     switch (filter)
     {
         case kGLFilterYUV2RGB:
         {
             if (deint == "openglonefield" || deint == "openglbobdeint")
-                fragment = OneFieldShader[bottom];
+                fragment += OneFieldShader[bottom];
             else if (deint == "opengllinearblend" ||
                      deint == "opengldoubleratelinearblend")
-                fragment = LinearBlendShader[bottom];
+                fragment += LinearBlendShader[bottom];
             else if (deint == "openglkerneldeint" ||
                      deint == "opengldoubleratekerneldeint")
-                fragment = KernelShader[bottom];
+                fragment += KernelShader[bottom];
             else
-                fragment = YUV2RGBFragmentShader;
+                fragment += YUV2RGBFragmentShader;
             fragment.replace("SELECT_COLUMN", (kGLUYVY == videoType) ? SelectColumn : "");
             break;
         }
         case kGLFilterYV12RGB:
             vertex = YV12RGBVertexShader;
             if (deint == "openglonefield" || deint == "openglbobdeint")
-                fragment = YV12RGBOneFieldFragmentShader[bottom];
+                fragment += YV12RGBOneFieldFragmentShader[bottom];
             else if (deint == "opengllinearblend" || deint == "opengldoubleratelinearblend")
-                fragment = YV12RGBLinearBlendFragmentShader[bottom];
+                fragment += YV12RGBLinearBlendFragmentShader[bottom];
             else if (deint == "openglkerneldeint" || deint == "opengldoubleratekerneldeint")
-                fragment = YV12RGBKernelShader[bottom];
+                fragment += YV12RGBKernelShader[bottom];
             else
-                fragment = YV12RGBFragmentShader;
+                fragment += YV12RGBFragmentShader;
             break;
         case kGLFilterNone:
             break;
         case kGLFilterResize:
-            fragment = DefaultFragmentShader;
+            fragment += DefaultFragmentShader;
             break;
         case kGLFilterBicubic:
-            fragment = BicubicShader;
+            fragment += BicubicShader;
             break;
         default:
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown filter");
