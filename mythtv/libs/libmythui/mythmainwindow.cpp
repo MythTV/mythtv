@@ -1056,19 +1056,23 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL render.");
         }
-        else if (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer())
-        {
-            LOG(VB_GENERAL, LOG_WARNING,
-                "OpenGL painter not recommended with this system's "
-                "hardware/drivers. Falling back to Qt painter.");
-            d->render->DecrRef(), d->render = nullptr;
-        }
         else
         {
             d->painter = new MythOpenGLPainter(gl);
             // NB MythPainterWindowGL takes ownership of gl
             d->paintwin = new MythPainterWindowGL(this, d, gl);
             gl->Init();
+
+            // we need to initialise MythRenderOpenGL before checking
+            // IsRecommendedRenderer
+            if (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer())
+            {
+                LOG(VB_GENERAL, LOG_WARNING,
+                    "OpenGL painter not recommended with this system's "
+                    "hardware/drivers. Falling back to Qt painter.");
+                d->render->DecrRef();
+                d->render = nullptr;
+            }
         }
     }
 #endif

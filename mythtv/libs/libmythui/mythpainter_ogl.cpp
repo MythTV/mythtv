@@ -25,10 +25,6 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render, QWidget *parent)
     target(0),
     swapControl(true)
 {
-    if (realRender)
-        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing OpenGL context.");
-    if (realParent)
-        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QWidget.");
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
@@ -106,7 +102,6 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
         realRender->BindFramebuffer(target);
         if (realParent)
             realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
-        realRender->SetColor(255, 255, 255, 255);
         realRender->SetBackground(0, 0, 0, 0);
         realRender->ClearFramebuffer();
     }

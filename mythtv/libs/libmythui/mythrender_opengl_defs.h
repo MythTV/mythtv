@@ -33,18 +33,6 @@
 #define GL_TEXTURE0 0x84C0
 #endif
 
-#ifndef GL_TEXTURE_RECTANGLE_ARB
-#define GL_TEXTURE_RECTANGLE_ARB 0x84F5
-#endif
-
-#ifndef GL_TEXTURE_RECTANGLE_EXT
-#define GL_TEXTURE_RECTANGLE_EXT 0x84F5
-#endif
-
-#ifndef GL_TEXTURE_RECTANGLE_NV
-#define GL_TEXTURE_RECTANGLE_NV 0x84F5
-#endif
-
 #ifndef GL_FRAMEBUFFER
 #define GL_FRAMEBUFFER          0x8D40
 #endif
@@ -113,33 +101,11 @@
 #define APIENTRY
 #endif
 
-typedef void (APIENTRY * MYTH_GLACTIVETEXTUREPROC)
-    (GLenum texture);
-
 typedef ptrdiff_t MYTH_GLsizeiptr;
 typedef GLvoid* (APIENTRY * MYTH_GLMAPBUFFERPROC)
     (GLenum target, GLenum access);
-typedef void (APIENTRY * MYTH_GLBINDBUFFERPROC)
-    (GLenum target, GLuint buffer);
-typedef void (APIENTRY * MYTH_GLGENBUFFERSPROC)
-    (GLsizei n, GLuint *buffers);
-typedef void (APIENTRY * MYTH_GLBUFFERDATAPROC)
-    (GLenum target, MYTH_GLsizeiptr size, const GLvoid *data, GLenum usage);
 typedef GLboolean (APIENTRY * MYTH_GLUNMAPBUFFERPROC)
     (GLenum target);
-typedef void (APIENTRY * MYTH_GLDELETEBUFFERSPROC)
-    (GLsizei n, const GLuint *buffers);
-typedef void (APIENTRY * MYTH_GLGENFRAMEBUFFERSPROC)
-    (GLsizei n, GLuint *framebuffers);
-typedef void (APIENTRY * MYTH_GLBINDFRAMEBUFFERPROC)
-    (GLenum target, GLuint framebuffer);
-typedef void (APIENTRY * MYTH_GLFRAMEBUFFERTEXTURE2DPROC)
-    (GLenum target, GLenum attachment,
-     GLenum textarget, GLuint texture, GLint level);
-typedef GLenum (APIENTRY * MYTH_GLCHECKFRAMEBUFFERSTATUSPROC)
-    (GLenum target);
-typedef void (APIENTRY * MYTH_GLDELETEFRAMEBUFFERSPROC)
-    (GLsizei n, const GLuint *framebuffers);
 typedef void (APIENTRY * MYTH_GLDELETEFENCESNVPROC)
     (GLsizei n, const GLuint *fences);
 typedef void (APIENTRY * MYTH_GLGENFENCESNVPROC)

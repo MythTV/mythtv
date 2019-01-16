@@ -54,7 +54,6 @@ class OpenGLVideo
 
     uint GetInputTexture(void) const;
     uint GetTextureType(void) const;
-    void SetInputUpdated(void);
     void UpdateInputFrame(const VideoFrame *frame, bool soft_bob = false);
 
     /// \brief Public interface to AddFilter(OpenGLFilterType filter)
@@ -101,7 +100,6 @@ class OpenGLVideo
     void CustomiseProgramString(QString &string);
     static QString FilterToString(OpenGLFilterType filter);
     static OpenGLFilterType StringToFilter(const QString &filter);
-    QSize GetTextureSize(const QSize &size);
     void SetFiltering(void);
 
     void RotateTextures(void);
@@ -128,8 +126,6 @@ class OpenGLVideo
     vector<GLuint> inputTextures;        ///< Textures with raw video data
     QSize          inputTextureSize;     ///< Actual size of input texture(s)
     glfilt_map_t   filters;              ///< Filter stages to be applied to frame
-    long long      currentFrameNum;      ///< Can be removed
-    bool           inputUpdated;         ///< Input texture has been refreshed with new data
     int            refsNeeded;           ///< Number of reference textures expected
     bool           textureRects;         ///< OpenGLVideo is using rectangular textures
     uint           textureType;          ///< Texture type (e.g. GL_TEXTURE_2D or GL_TEXTURE_RECT)

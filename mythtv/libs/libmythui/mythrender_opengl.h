@@ -7,22 +7,24 @@
 // Qt
 #include <QtGlobal>
 #include <QOpenGLContext>
+#include <QOpenGLFunctions>
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>
+#include <QStack>
 
 // MythTV
 #include "mythuiexp.h"
 #include "mythlogging.h"
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
+#include "mythrender_opengl_defs2.h"
 #include "mythuianimation.h"
 
 typedef enum
 {
     kGLFeatNone    = 0x0000,
-    kGLMultiTex    = 0x0001,
-    kGLExtRect     = 0x0002,
+    kGLFeatNPOT    = 0x0001,
     kGLExtFBufObj  = 0x0004,
     kGLExtPBufObj  = 0x0008,
     kGLNVFence     = 0x0010,
@@ -82,15 +84,26 @@ class MUI_PUBLIC OpenGLLocker
     MythRenderOpenGL *m_render;
 };
 
+typedef enum
+{
+    kShaderSimple  = 0,
+    kShaderDefault,
+    kShaderCircle,
+    kShaderCircleEdge,
+    kShaderVertLine,
+    kShaderHorizLine,
+    kShaderCount,
+} DefaultShaders;
+
 class QWindow;
 class QPaintDevice;
+class MythGLShaderObject;
 
-class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
+class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunctions, public MythRender
 {
   public:
     static MythRenderOpenGL* Create(const QString &painter, QPaintDevice* device = nullptr);
     MythRenderOpenGL(const QSurfaceFormat &format, QPaintDevice* device, RenderType type = kRenderUnknown);
-    MythRenderOpenGL(const QSurfaceFormat &format, RenderType type = kRenderUnknown);
 
     // MythRender
     void Release(void) override;
@@ -98,42 +111,38 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     // These functions are not virtual in the base QOpenGLContext
     // class, so these are not overrides but new functions.
     // TODO remove
-    virtual void makeCurrent();
-    virtual void doneCurrent();
+    void makeCurrent();
+    void doneCurrent();
 
-    virtual void swapBuffers();
+    void swapBuffers();
     void setWidget(QWidget *Widget);
     bool IsDirectRendering() const;
 
     void  Init(void);
 
     int   GetMaxTextureSize(void)    { return m_max_tex_size; }
-    uint  GetFeatures(void)          { return m_exts_used;    }
+    uint  GetFeatures(void)          { return m_extraFeaturesUsed;    }
 
     bool  IsRecommendedRenderer(void);
 
     void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QRect &rect, bool viewportonly = false);
     QRect GetViewPort(void) { return m_viewport; }
-    virtual void  PushTransformation(const UIEffects &fx, QPointF &center) = 0;
-    virtual void  PopTransformation(void) = 0;
+    void  PushTransformation(const UIEffects &fx, QPointF &center);
+    void  PopTransformation(void);
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
-    virtual void SetColor(int /*r*/, int /*g*/, int /*b*/, int /*a*/) { }
     void  SetBackground(int r, int g, int b, int a);
     void  SetFence(void);
 
     void* GetTextureBuffer(uint tex, bool create_buffer = true);
     void  UpdateTexture(uint tex, void *buf);
-    int   GetTextureType(bool &rect);
-    bool  IsRectTexture(uint type);
     uint  CreateHelperTexture(void);
     uint  CreateTexture(QSize act_size, bool use_pbo, uint type,
                         uint data_type = GL_UNSIGNED_BYTE,
                         uint data_fmt = GL_RGBA, uint internal_fmt = GL_RGBA8,
                         uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
-    QSize GetTextureSize(uint type, const QSize &size);
-    QSize GetTextureSize(uint tex);
+    QSize GetTextureSize(const QSize &size);
     int   GetTextureDataSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
@@ -146,10 +155,10 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     void BindFramebuffer(uint fb);
     void ClearFramebuffer(void);
 
-    virtual uint CreateShaderObject(const QString &vert, const QString &frag) = 0;
-    virtual void DeleteShaderObject(uint obj) = 0;
-    virtual void EnableShaderObject(uint obj) = 0;
-    virtual void SetShaderParams(uint prog, const QMatrix4x4 &m, const char* uniform) = 0;
+    uint CreateShaderObject(const QString &vert, const QString &frag);
+    void DeleteShaderObject(uint obj);
+    void EnableShaderObject(uint obj);
+    void SetShaderParams(uint prog, const QMatrix4x4 &m, const char* uniform);
 
     void DrawBitmap(uint tex, uint target, const QRect *src,
                     const QRect *dst, uint prog, int alpha = 255,
@@ -161,35 +170,31 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     void DrawRoundRect(const QRect &area, int cornerRadius,
                        const QBrush &fillBrush, const QPen &linePen,
                        int alpha);
-    virtual bool RectanglesAreAccelerated(void) { return false; }
+    bool RectanglesAreAccelerated(void) { return true; }
 
   protected:
-    virtual ~MythRenderOpenGL() = default;
-    virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
-                                uint prog, int alpha,
-                                int red, int green, int blue) = 0;
-    virtual void DrawBitmapPriv(uint *textures, uint texture_count,
-                                const QRectF *src, const QRectF *dst,
-                                uint prog) = 0;
-    virtual void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
-                              const QPen &linePen, int alpha) = 0;
-    virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
-                                   const QBrush &fillBrush, const QPen &linePen,
-                                   int alpha) = 0;
+    ~MythRenderOpenGL();
+    void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
+                       uint prog, int alpha, int red, int green, int blue);
+    void DrawBitmapPriv(uint *textures, uint texture_count,
+                        const QRectF *src, const QRectF *dst, uint prog);
+    void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                      const QPen &linePen, int alpha);
+    void DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                           const QBrush &fillBrush, const QPen &linePen, int alpha);
 
-    virtual void Init2DState(void);
-    virtual void InitProcs(void);
-    void* GetProcAddress(const QString &proc) const;
-    virtual bool InitFeatures(void);
-    virtual void ResetVars(void);
-    virtual void ResetProcs(void);
-    virtual void SetMatrixView(void) = 0;
+    void Init2DState(void);
+    void InitProcs(void);
+    QFunctionPointer GetProcAddress(const QString &proc) const;
+    void ResetVars(void);
+    void ResetProcs(void);
+    void SetMatrixView(void);
 
     uint CreatePBO(uint tex);
     uint CreateVBO(void);
-    virtual void DeleteOpenGLResources(void);
+    void DeleteOpenGLResources(void);
     void DeleteTextures(void);
-    virtual void DeleteShaders(void) = 0;
+    void DeleteShaders(void);
     void DeleteFrameBuffers(void);
 
     bool UpdateTextureVertices(uint tex, const QRect *src, const QRect *dst);
@@ -201,6 +206,13 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
 
+    uint CreateShader(int type, const QString &source);
+    bool ValidateShaderObject(uint obj);
+    bool CheckObjectStatus(uint obj);
+    void OptimiseShaderSource(QString &source);
+    void CreateDefaultShaders(void);
+    void DeleteDefaultShaders(void);
+
     static void StoreBicubicWeights(float x, float *dst);
 
   protected:
@@ -208,53 +220,48 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     QHash<GLuint, MythGLTexture> m_textures;
     QVector<GLuint>              m_framebuffers;
     GLuint                       m_fence;
+    QHash<GLuint, MythGLShaderObject> m_shader_objects;
+    uint                         m_shaders[kShaderCount];
+    QMap<uint64_t,GLfloat*>      m_cachedVertices;
+    QList<uint64_t>              m_vertexExpiry;
+    QMap<uint64_t,GLuint>        m_cachedVBOS;
+    QList<uint64_t>              m_vboExpiry;
 
     // Locking
     QMutex   m_lock;
     int      m_lock_level;
 
     // profile
-    QString  m_extensions;
-    uint     m_exts_supported;
-    uint     m_exts_used;
+    QOpenGLFunctions::OpenGLFeatures m_features;
+    uint     m_extraFeatures;
+    uint     m_extraFeaturesUsed;
     int      m_max_tex_size;
     int      m_max_units;
     int      m_default_texture_type;
 
     // State
-    QRect    m_viewport;
-    int      m_active_tex;
-    int      m_active_tex_type;
-    int      m_active_fb;
-    bool     m_blend;
-    uint32_t m_background;
-
-    // vertex cache
-    QMap<uint64_t,GLfloat*> m_cachedVertices;
-    QList<uint64_t>         m_vertexExpiry;
-    QMap<uint64_t,GLuint>   m_cachedVBOS;
-    QList<uint64_t>         m_vboExpiry;
+    QRect      m_viewport;
+    int        m_active_tex;
+    int        m_active_tex_type;
+    uint       m_active_fb;
+    bool       m_blend;
+    uint32_t   m_background;
+    QString    m_qualifiers;
+    QString    m_GLSLVersion;
+    uint       m_active_obj;
+    QMatrix4x4 m_projection;
+    QStack<QMatrix4x4> m_transforms;
+    QMatrix4x4 m_parameters;
+    typedef QHash<QString,QMatrix4x4> map_t;
+    map_t      m_map;
 
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
     bool    m_flushEnabled;
 
-    // Multi-texturing
-    MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;
-
     // PixelBuffer Objects
     MYTH_GLMAPBUFFERPROC                 m_glMapBuffer;
-    MYTH_GLBINDBUFFERPROC                m_glBindBuffer;
-    MYTH_GLGENBUFFERSPROC                m_glGenBuffers;
-    MYTH_GLBUFFERDATAPROC                m_glBufferData;
     MYTH_GLUNMAPBUFFERPROC               m_glUnmapBuffer;
-    MYTH_GLDELETEBUFFERSPROC             m_glDeleteBuffers;
-    // FrameBuffer Objects
-    MYTH_GLGENFRAMEBUFFERSPROC           m_glGenFramebuffers;
-    MYTH_GLBINDFRAMEBUFFERPROC           m_glBindFramebuffer;
-    MYTH_GLFRAMEBUFFERTEXTURE2DPROC      m_glFramebufferTexture2D;
-    MYTH_GLCHECKFRAMEBUFFERSTATUSPROC    m_glCheckFramebufferStatus;
-    MYTH_GLDELETEFRAMEBUFFERSPROC        m_glDeleteFramebuffers;
     // NV_fence
     MYTH_GLGENFENCESNVPROC               m_glGenFencesNV;
     MYTH_GLDELETEFENCESNVPROC            m_glDeleteFencesNV;
@@ -266,52 +273,23 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
 
+    // Prevent compiler complaints about using 0 as a null pointer.
+    inline void glVertexAttribPointerI(GLuint index, GLint size, GLenum type,
+                                  GLboolean normalize, GLsizei stride,
+                                  const GLuint value);
+
   private:
+    void DebugFeatures (void);
     QWindow *m_window;
 };
 
-/**
- * GLMatrix4x4 is a helper class to convert between QT and GT 4x4 matrices.
- *
- * Actually the conversion is a noop according to the QT 5 documentation.
- * From http://doc.qt.io/qt-5/qmatrix4x4.html#details :
- *
- * Internally the data is stored as column-major format, so as to be
- * optimal for passing to OpenGL functions, which expect column-major
- * data.
- *
- * When using these functions be aware that they return data in
- * column-major format: data(), constData()
- */
-class GLMatrix4x4
+class MUI_PUBLIC GLMatrix4x4
 {
   public:
-    explicit GLMatrix4x4(const QMatrix4x4 &m)
-    {
-        // Convert from Qt's row-major to GL's column-major order
-        for (int c = 0, i = 0; c < 4; ++c)
-            for (int r = 0; r < 4; ++r)
-                m_v[i++] = m(r, c);
-    }
-
-    explicit GLMatrix4x4(const GLfloat v[16])
-    {
-        for (int i = 0; i < 16; ++i)
-            m_v[i] = v[i];
-    }
-
-    operator const GLfloat*() const { return m_v; }
-
-    operator QMatrix4x4() const
-    {
-        // Convert from GL's column-major order to Qt's row-major
-        QMatrix4x4 m;
-        for (int c = 0, i = 0; c < 4; ++c)
-            for (int r = 0; r < 4; ++r)
-                m(r, c) = m_v[i++];
-        return m;
-    }
-
+    explicit GLMatrix4x4(const QMatrix4x4 &m);
+    explicit GLMatrix4x4(const GLfloat v[16]);
+    operator const GLfloat*() const;
+    operator QMatrix4x4() const;
   private:
     GLfloat m_v[4*4];
 };

@@ -31,7 +31,7 @@
 // MythTV
 #ifdef OSD_EGL
 # define LOC QString("EGL: ")
-# include "mythrender_opengl2es.h"
+# include "mythrender_opengl.h"
 # undef LOC
 # if 0 /* moved to top so it goes before X11/Xlib.h which is included via EGL/egl.h on Raspbian */
 #  include "mythpainter_ogl.h"
@@ -78,7 +78,7 @@ using namespace omxcontext;
  * Types
  */
 #ifdef OSD_EGL
-class MythRenderEGL : public MythRenderOpenGL2ES
+class MythRenderEGL : public MythRenderOpenGL
 {
     // No copying
     MythRenderEGL(MythRenderEGL&);
@@ -92,7 +92,7 @@ class MythRenderEGL : public MythRenderOpenGL2ES
     void swapBuffers() override; // MythRenderOpenGL
 
   protected:
-    virtual ~MythRenderEGL(); // Use MythRenderOpenGL2ES::DecrRef to delete
+    virtual ~MythRenderEGL(); // Use MythRenderOpenGL::DecrRef to delete
 
     EGLNativeWindowType createNativeWindow();
     void destroyNativeWindow();
@@ -1425,7 +1425,7 @@ OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 
 #ifdef OSD_EGL
 MythRenderEGL::MythRenderEGL() :
-    MythRenderOpenGL2ES(MythRenderFormat()),
+    MythRenderOpenGL(QSurfaceFormat(), nullptr),
     m_display(EGL_NO_DISPLAY),
     m_context(EGL_NO_CONTEXT),
     m_window(nullptr),

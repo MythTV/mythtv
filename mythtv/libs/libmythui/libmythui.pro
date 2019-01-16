@@ -184,13 +184,10 @@ mingw | win32-msvc*{
 using_opengl {
     using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER
     SOURCES += mythpainter_ogl.cpp  mythrender_opengl.cpp
-    SOURCES += mythrender_opengl2.cpp
-    HEADERS += mythpainter_ogl.h    mythrender_opengl.h mythrender_opengl_defs.h
-    HEADERS += mythrender_opengl2.h mythrender_opengl_defs2.h
+    HEADERS += mythpainter_ogl.h    mythrender_opengl.h
+    HEADERS += mythrender_opengl_defs.h mythrender_opengl_defs2.h
     using_opengles {
         DEFINES += USING_OPENGLES
-        HEADERS += mythrender_opengl2es.h
-        SOURCES += mythrender_opengl2es.cpp
         # For raspberry Pi Raspbian
         exists(/opt/vc/lib/libbrcmEGL.so) {
             LIBS += -L/opt/vc/include -lbrcmGLESv2 -lbrcmEGL

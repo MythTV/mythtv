@@ -71,9 +71,8 @@ OpenGLVideo::OpenGLVideo() :
     display_video_rect(0,0,0,0), video_rect(0,0,0,0),
     frameBufferRect(0,0,0,0), hardwareDeinterlacing(false),
     colourSpace(nullptr),     viewportControl(false),
-    inputTextureSize(0,0),    currentFrameNum(0),
-    inputUpdated(false),      refsNeeded(0),
-    textureRects(false),      textureType(GL_TEXTURE_2D),
+    inputTextureSize(0,0),    refsNeeded(0),
+    textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
     gl_features(0),           forceResize(false)
 {
@@ -143,8 +142,6 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     colourSpace           = colourspace;
     viewportControl       = viewport_control;
     inputTextureSize      = QSize(0,0);
-    currentFrameNum       = -1;
-    inputUpdated          = false;
     videoType             = Type;
 
     // Set OpenGL feature support
@@ -186,15 +183,6 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
             defaultUpsize = kGLFilterBicubic;
         else
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL feature support for Bicubic filter.");
-    }
-
-    // decide on best input texture type - GLX surfaces (for VAAPI) and the
-    // bicubic filter do not work with rectangular textures. YV12 now supports
-    // rectangular textures but POT textures are retained for the time being.
-    if ((gl_features & kGLExtRect) && (kGLGPU != videoType) &&
-        (kGLYV12 != videoType) && (kGLFilterBicubic != defaultUpsize))
-    {
-        textureType = gl_context->GetTextureType(textureRects);
     }
 
     // Create initial input texture and associated filter stage
@@ -758,29 +746,8 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType);
     }
 
-    tex_size = gl_context->GetTextureSize(textureType, size);
+    tex_size = gl_context->GetTextureSize(size);
     return tmp_tex;
-}
-
-QSize OpenGLVideo::GetTextureSize(const QSize &size)
-{
-    if (textureRects)
-        return size;
-
-    int w = 64;
-    int h = 64;
-
-    while (w < size.width())
-    {
-        w *= 2;
-    }
-
-    while (h < size.height())
-    {
-        h *= 2;
-    }
-
-    return QSize(w, h);
 }
 
 uint OpenGLVideo::GetInputTexture(void) const
@@ -791,11 +758,6 @@ uint OpenGLVideo::GetInputTexture(void) const
 uint OpenGLVideo::GetTextureType(void) const
 {
     return textureType;
-}
-
-void OpenGLVideo::SetInputUpdated(void)
-{
-    inputUpdated = true;
 }
 
 /**
@@ -863,7 +825,6 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     }
 
     gl_context->UpdateTexture(inputTextures[0], buf);
-    inputUpdated = true;
 }
 
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
@@ -900,7 +861,7 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 
 void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                bool softwareDeinterlacing,
-                               long long frame, StereoscopicMode stereo,
+                               long long, StereoscopicMode stereo,
                                bool draw_border)
 {
     if (inputTextures.empty() || filters.empty())
@@ -914,7 +875,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
     vector<GLuint> inputs = inputTextures;
     QSize inputsize = inputTextureSize;
-    QSize realsize  = GetTextureSize(video_disp_dim);
+    QSize realsize  = gl_context->GetTextureSize(video_disp_dim);
 
     glfilt_map_t::iterator it;
     for (it = filters.begin(); it != filters.end(); ++it)
@@ -939,7 +900,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                             video_rect.left() + video_rect.width(),
                             video_rect.top()  + video_rect.height());
 
-        if (!textureRects && (inputsize.height() > 0))
+        if (inputsize.height() > 0)
             trueheight /= inputsize.height();
 
         // software bobdeint
@@ -1096,9 +1057,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         inputs = filter->frameBufferTextures;
         inputsize = realsize;
     }
-
-    currentFrameNum = frame;
-    inputUpdated = false;
 }
 
 void OpenGLVideo::RotateTextures(void)
@@ -1200,13 +1158,8 @@ QString OpenGLVideo::TypeToString(VideoType Type)
 
 void OpenGLVideo::CustomiseProgramString(QString &string)
 {
-    string.replace("%1", textureRects ? "RECT" : "2D");
-
-    if (!textureRects)
-    {
-        string.replace("GLSL_SAMPLER", "sampler2D");
-        string.replace("GLSL_TEXTURE", "texture2D");
-    }
+    string.replace("GLSL_SAMPLER", "sampler2D");
+    string.replace("GLSL_TEXTURE", "texture2D");
 
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
@@ -1214,9 +1167,9 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     float maxwidth   = inputTextureSize.width();
     float maxheight  = inputTextureSize.height();
     float yv12height = video_dim.height();
-    QSize fb_size = GetTextureSize(video_disp_dim);
+    QSize fb_size    = gl_context->GetTextureSize(video_disp_dim);
 
-    if (!textureRects && (inputTextureSize.height() > 0) && (inputTextureSize.width() > 0))
+    if ((inputTextureSize.height() > 0) && (inputTextureSize.width() > 0))
     {
         lineHeight /= inputTextureSize.height();
         colWidth   /= inputTextureSize.width();

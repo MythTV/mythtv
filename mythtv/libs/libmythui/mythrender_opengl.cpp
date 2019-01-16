@@ -7,6 +7,7 @@ using std::min;
 #include <QPainter>
 #include <QWindow>
 #include <QGLFormat>
+#include <QGuiApplication>
 
 // MythTV
 #include "mythrender_opengl.h"
@@ -14,17 +15,132 @@ using std::min;
 #include "mythuitype.h"
 #include "mythxdisplay.h"
 #define LOC QString("OpenGL: ")
-#include "mythrender_opengl2.h"
-#ifdef USING_OPENGLES
-#include "mythrender_opengl2es.h"
-#endif
 
 #ifdef Q_OS_ANDROID
 #include <android/log.h>
 #include <QWindow>
 #endif
 
+#define VERTEX_INDEX  0
+#define COLOR_INDEX   1
+#define TEXTURE_INDEX 2
+#define VERTEX_SIZE   2
+#define TEXTURE_SIZE  2
+
+static const GLuint kVertexOffset  = 0;
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
+static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
+
+static const QString kDefaultVertexShader =
+"GLSL_DEFINES"
+"attribute vec2 a_position;\n"
+"attribute vec4 a_color;\n"
+"attribute vec2 a_texcoord0;\n"
+"varying   vec4 v_color;\n"
+"varying   vec2 v_texcoord0;\n"
+"uniform   mat4 u_projection;\n"
+"uniform   mat4 u_transform;\n"
+"void main() {\n"
+"    gl_Position = u_projection * u_transform * vec4(a_position, 0.0, 1.0);\n"
+"    v_texcoord0 = a_texcoord0;\n"
+"    v_color     = a_color;\n"
+"}\n";
+
+static const QString kDefaultFragmentShader =
+"GLSL_DEFINES"
+"uniform sampler2D s_texture0;\n"
+"varying vec4 v_color;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    gl_FragColor = texture2D(s_texture0, v_texcoord0) * v_color;\n"
+"}\n";
+
+static const QString kSimpleVertexShader =
+"GLSL_DEFINES"
+"attribute vec2 a_position;\n"
+"attribute vec4 a_color;\n"
+"varying   vec4 v_color;\n"
+"uniform   mat4 u_projection;\n"
+"uniform   mat4 u_transform;\n"
+"void main() {\n"
+"    gl_Position = u_projection * u_transform * vec4(a_position, 0.0, 1.0);\n"
+"    v_color     = a_color;\n"
+"}\n";
+
+static const QString kSimpleFragmentShader =
+"GLSL_DEFINES"
+"varying vec4 v_color;\n"
+"void main(void)\n"
+"{\n"
+"    gl_FragColor = v_color;\n"
+"}\n";
+
+static const QString kDrawVertexShader =
+"GLSL_DEFINES"
+"attribute vec2 a_position;\n"
+"attribute vec4 a_color;\n"
+"varying   vec4 v_color;\n"
+"varying   vec2 v_position;\n"
+"uniform   mat4 u_projection;\n"
+"uniform   mat4 u_transform;\n"
+"void main() {\n"
+"    gl_Position = u_projection * u_transform * vec4(a_position, 0.0, 1.0);\n"
+"    v_color     = a_color;\n"
+"    v_position  = a_position;\n"
+"}\n";
+
+static const QString kCircleFragmentShader =
+"GLSL_DEFINES"
+"varying vec4 v_color;\n"
+"varying vec2 v_position;\n"
+"uniform mat4 u_parameters;\n"
+"void main(void)\n"
+"{\n"
+"    float dis = distance(v_position.xy, u_parameters[0].xy);\n"
+"    float mult = smoothstep(u_parameters[0].z, u_parameters[0].w, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
+"}\n";
+
+static const QString kCircleEdgeFragmentShader =
+"GLSL_DEFINES"
+"varying vec4 v_color;\n"
+"varying vec2 v_position;\n"
+"uniform mat4 u_parameters;\n"
+"void main(void)\n"
+"{\n"
+"    float dis = distance(v_position.xy, u_parameters[0].xy);\n"
+"    float rad = u_parameters[0].z;\n"
+"    float wid = u_parameters[0].w;\n"
+"    float mult = smoothstep(rad + wid, rad + (wid - 1.0), dis) * smoothstep(rad - (wid + 1.0), rad - wid, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
+"}\n";
+
+static const QString kVertLineFragmentShader =
+"GLSL_DEFINES"
+"varying vec4 v_color;\n"
+"varying vec2 v_position;\n"
+"uniform mat4 u_parameters;\n"
+"void main(void)\n"
+"{\n"
+"    float dis = abs(u_parameters[0].x - v_position.x);\n"
+"    float y = u_parameters[0].y * 2.0;\n"
+"    float mult = smoothstep(y, y - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
+"}\n";
+
+static const QString kHorizLineFragmentShader =
+"GLSL_DEFINES"
+"varying vec4 v_color;\n"
+"varying vec2 v_position;\n"
+"uniform mat4 u_parameters;\n"
+"void main(void)\n"
+"{\n"
+"    float dis = abs(u_parameters[0].x - v_position.y);\n"
+"    float x = u_parameters[0].y * 2.0;\n"
+"    float mult = smoothstep(x, x - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
+"}\n";
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 {
@@ -51,6 +167,20 @@ OpenGLLocker::~OpenGLLocker()
     if (m_render)
         m_render->doneCurrent();
 }
+
+class MythGLShaderObject
+{
+  public:
+    MythGLShaderObject(uint vert, uint frag)
+      : m_vertex_shader(vert),
+        m_fragment_shader(frag)
+    {
+    }
+    MythGLShaderObject() = default;
+
+    GLuint m_vertex_shader;
+    GLuint m_fragment_shader;
+};
 
 MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
 {
@@ -80,14 +210,18 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
     format.setSwapInterval(1);
 #ifdef USING_OPENGLES
     format.setRenderableType(QSurfaceFormat::OpenGLES);
-    return new MythRenderOpenGL2ES(format, device);
 #endif
-    return new MythRenderOpenGL2(format, device);
+    if (qApp->platformName().contains("egl"))
+        format.setRenderableType(QSurfaceFormat::OpenGLES);
+    return new MythRenderOpenGL(format, device);
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, QPaintDevice* device,
                                    RenderType type)
-  : MythRender(type), m_lock(QMutex::Recursive)
+  : QOpenGLContext(),
+    QOpenGLFunctions(),
+    MythRender(type),
+    m_lock(QMutex::Recursive)
 {
     QWidget *w = dynamic_cast<QWidget*>(device);
     m_window = (w) ? w->windowHandle() : nullptr;
@@ -96,39 +230,154 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, QPaintDevice* d
     setFormat(format);
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, RenderType type)
-  : MythRender(type), m_lock(QMutex::Recursive), m_window(nullptr)
+MythRenderOpenGL::~MythRenderOpenGL()
 {
-    ResetVars();
-    ResetProcs();
-    setFormat(format);
+    if (!isValid())
+        return;
+    makeCurrent();
+    DeleteOpenGLResources();
+    doneCurrent();
 }
-
 
 void MythRenderOpenGL::Init(void)
 {
     if (!isValid())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Init an invalid context."
-                            " Missing call to setWidget or create?");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "MythRenderOpenGL is not a valid OpenGL rendering context");
         return;
     }
 
     OpenGLLocker locker(this);
+    initializeOpenGLFunctions();
+    m_features = openGLFeatures();
+
+    // GLSL defines
+    m_GLSLVersion = "#version 110\n";
+    m_qualifiers = QString();
+    if(isOpenGLES())
+    {
+        m_GLSLVersion = "#version 100\n";
+        // GLSL ES precision qualifiers
+        m_qualifiers = "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
+                       "precision highp float;\n"
+                       "#endif\n";
+    }
+
     InitProcs();
     Init2DState();
-    InitFeatures();
 
+    // basic features
+    GLint maxtexsz = 0;
+    GLint maxunits = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxunits);
+    m_max_units = maxunits;
+    m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
+
+    // RGBA16 - available on ES via extension
+    m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
+
+    // Pixel buffer objects
+    bool buffer_procs = m_glMapBuffer && m_glUnmapBuffer;
+    if (hasExtension("GL_ARB_pixel_buffer_object") && buffer_procs)
+        m_extraFeatures += kGLExtPBufObj;
+
+    // Vertex buffer objects
+    if ((isOpenGLES() && hasExtension("GL_OES_mapbuffer") && buffer_procs) ||
+        (hasExtension("GL_ARB_vertex_buffer_object") && buffer_procs))
+        m_extraFeatures += kGLExtVBO;
+
+    // TODO combine fence functionality
+    // NVidia fence
+    if(hasExtension("GL_NV_fence") && m_glGenFencesNV && m_glDeleteFencesNV &&
+        m_glSetFenceNV  && m_glFinishFenceNV)
+        m_extraFeatures += kGLNVFence;
+
+    // Apple fence
+    if(hasExtension("GL_APPLE_fence") && m_glGenFencesAPPLE && m_glDeleteFencesAPPLE &&
+        m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
+        m_extraFeatures += kGLAppleFence;
+
+    // MESA YCbCr
+    if (hasExtension("GL_MESA_ycbcr_texture"))
+        m_extraFeatures += kGLMesaYCbCr;
+
+    // Apple YCbCr
+    if (hasExtension("GL_APPLE_ycbcr_422"))
+        m_extraFeatures += kGLAppleYCbCr;
+
+    // Mipmapping - is this available by default on ES?
+    if (hasExtension("GL_SGIS_generate_mipmap"))
+        m_extraFeatures += kGLMipMaps;
+
+    m_extraFeatures += (m_features & NPOTTextures) ? kGLFeatNPOT : kGLFeatNone;
+    m_extraFeatures += (m_features & Framebuffers) ? kGLExtFBufObj : kGLFeatNone;
+    m_extraFeatures += (m_features & Shaders) ? kGLSL : kGLFeatNone;
+
+    DebugFeatures();
+
+    m_extraFeaturesUsed = m_extraFeatures;
     LOG(VB_GENERAL, LOG_INFO, LOC + "Initialised MythRenderOpenGL");
+
+    DeleteDefaultShaders();
+    CreateDefaultShaders();
+}
+
+#define GLYesNo(arg) (arg ? "Yes" : "No")
+
+void MythRenderOpenGL::DebugFeatures(void)
+{
+    static bool debugged = false;
+    if (debugged)
+        return;
+    debugged = true;
+    QSurfaceFormat fmt = format();
+    QString qtglversion = QString("OpenGL%1 %2.%3")
+            .arg(fmt.renderableType() == QSurfaceFormat::OpenGLES ? "ES" : "")
+            .arg(fmt.majorVersion()).arg(fmt.minorVersion());
+    QString qtglsurface = QString("RGBA: %1%2%3%4 Depth: %5 Stencil: %6")
+            .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
+            .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
+            .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg((const char*)glGetString(GL_VENDOR)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg((const char*)glGetString(GL_RENDERER)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg((const char*)glGetString(GL_VERSION)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering     : %1").arg(GLYesNo(IsDirectRendering())));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(qApp->platformName()));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_max_tex_size));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_max_units));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(GLYesNo(m_features & Shaders)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vertex arrays        : implicit"));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vertex buffer objects: %1").arg(GLYesNo(m_extraFeatures & kGLExtVBO)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("YCbCr textures       : %1")
+        .arg(GLYesNo((m_extraFeatures & kGLMesaYCbCr) || (m_extraFeatures & kGLAppleYCbCr))));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
+        .arg(GLYesNo((m_extraFeatures & kGLAppleFence) || (m_extraFeatures & kGLNVFence))));
+
+    // warnings
+    if (m_max_units < 3)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning: Insufficient texture units for some features.");
 }
 
 bool MythRenderOpenGL::IsRecommendedRenderer(void)
 {
     bool recommended = true;
     OpenGLLocker locker(this);
-    QString renderer = (const char*) glGetString(GL_RENDERER);
+    QString renderer = (const char*)glGetString(GL_RENDERER);
 
-    if (!IsDirectRendering())
+    if (!(openGLFeatures() & Shaders))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL has no shader support");
+        recommended = false;
+    }
+    else if (!IsDirectRendering())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is using software rendering.");
         recommended = false;
@@ -237,13 +486,13 @@ void MythRenderOpenGL::Flush(bool use_fence)
 
     makeCurrent();
 
-    if ((m_exts_used & kGLAppleFence) &&
+    if ((m_extraFeaturesUsed & kGLAppleFence) &&
         (m_fence && use_fence))
     {
         m_glSetFenceAPPLE(m_fence);
         m_glFinishFenceAPPLE(m_fence);
     }
-    else if ((m_exts_used & kGLNVFence) &&
+    else if ((m_extraFeaturesUsed & kGLNVFence) &&
              (m_fence && use_fence))
     {
         m_glSetFenceNV(m_fence, GL_ALL_COMPLETED_NV);
@@ -286,13 +535,13 @@ void MythRenderOpenGL::SetFence(void)
         return;
 
     makeCurrent();
-    if (m_exts_used & kGLAppleFence)
+    if (m_extraFeaturesUsed & kGLAppleFence)
     {
         m_glGenFencesAPPLE(1, &m_fence);
         if (m_fence)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using GL_APPLE_fence");
     }
-    else if (m_exts_used & kGLNVFence)
+    else if (m_extraFeaturesUsed & kGLNVFence)
     {
         m_glGenFencesNV(1, &m_fence);
         if (m_fence)
@@ -316,8 +565,8 @@ void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
 
     if (m_textures[tex].m_pbo)
     {
-        m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_pbo);
-        m_glBufferData(GL_PIXEL_UNPACK_BUFFER,
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_pbo);
+        glBufferData(GL_PIXEL_UNPACK_BUFFER,
                              m_textures[tex].m_data_size, nullptr, GL_STREAM_DRAW);
         return m_glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
     }
@@ -348,7 +597,7 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
         glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
                         size.height(), m_textures[tex].m_data_fmt,
                         m_textures[tex].m_data_type, nullptr);
-        m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
     else
     {
@@ -360,57 +609,19 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
     doneCurrent();
 }
 
-int MythRenderOpenGL::GetTextureType(bool &rect)
-{
-    static bool rects = true;
-    static bool check = true;
-    if (check)
-    {
-        check = false;
-        rects = !getenv("OPENGL_NORECT");
-        if (!rects)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling NPOT textures.");
-    }
-
-    int ret = GL_TEXTURE_2D;
-
-    if (m_extensions.contains("GL_NV_texture_rectangle") && rects)
-        ret = GL_TEXTURE_RECTANGLE_NV;
-    else if (m_extensions.contains("GL_ARB_texture_rectangle") && rects)
-        ret = GL_TEXTURE_RECTANGLE_ARB;
-    else if (m_extensions.contains("GL_EXT_texture_rectangle") && rects)
-        ret = GL_TEXTURE_RECTANGLE_EXT;
-
-    rect = (ret != GL_TEXTURE_2D);
-    return ret;
-}
-
-bool MythRenderOpenGL::IsRectTexture(uint type)
-{
-    if (type == GL_TEXTURE_RECTANGLE_NV)
-        return true;
-    if (type == GL_TEXTURE_RECTANGLE_ARB)
-        return true;
-    if (type == GL_TEXTURE_RECTANGLE_EXT)
-        return true;
-    return false;
-}
-
 uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
                                      uint type, uint data_type,
                                      uint data_fmt, uint internal_fmt,
                                      uint filter, uint wrap)
 {
-#ifdef USING_OPENGLES
-    //OPENGLES requires same formats for internal and external.
-    internal_fmt = data_fmt;
-    glCheck();
-#endif
+    // OpenGLES requires same formats for internal and external.
+    if (isOpenGLES())
+        internal_fmt = data_fmt;
 
     if (!type)
         type = m_default_texture_type;
 
-    QSize tot_size = GetTextureSize(type, act_size);
+    QSize tot_size = GetTextureSize(act_size);
 
     makeCurrent();
 
@@ -437,7 +648,7 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
             SetTextureFilters(tex, filter, wrap);
             if (use_pbo)
                 m_textures[tex].m_pbo = CreatePBO(tex);
-            if (m_exts_used & kGLExtVBO)
+            if (m_extraFeaturesUsed & kGLExtVBO)
                 m_textures[tex].m_vbo = CreateVBO();
         }
         else
@@ -492,32 +703,18 @@ uint MythRenderOpenGL::CreateHelperTexture(void)
     return tmp_tex;
 }
 
-QSize MythRenderOpenGL::GetTextureSize(uint type, const QSize &size)
+QSize MythRenderOpenGL::GetTextureSize(const QSize &size)
 {
-    if (IsRectTexture(type))
+    if (m_features & NPOTTextures)
         return size;
 
     int w = 64;
     int h = 64;
-
     while (w < size.width())
-    {
         w *= 2;
-    }
-
     while (h < size.height())
-    {
         h *= 2;
-    }
-
     return QSize(w, h);
-}
-
-QSize MythRenderOpenGL::GetTextureSize(uint tex)
-{
-    if (!m_textures.contains(tex))
-        return QSize();
-    return m_textures[tex].m_size;
 }
 
 int MythRenderOpenGL::GetTextureDataSize(uint tex)
@@ -532,9 +729,7 @@ void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
     if (!m_textures.contains(tex))
         return;
 
-    bool mipmaps = (m_exts_used & kGLMipMaps) &&
-                   !IsRectTexture(m_textures[tex].m_type);
-    if (filt == GL_LINEAR_MIPMAP_LINEAR && !mipmaps)
+    if (filt == GL_LINEAR_MIPMAP_LINEAR && !(m_extraFeaturesUsed & kGLMipMaps))
         filt = GL_LINEAR;
 
     makeCurrent();
@@ -563,13 +758,13 @@ void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
 
 void MythRenderOpenGL::ActiveTexture(int active_tex)
 {
-    if (!(m_exts_used & kGLMultiTex))
+    if (!(m_features & Multitexture))
         return;
 
     makeCurrent();
     if (m_active_tex != active_tex)
     {
-        m_glActiveTexture(active_tex);
+        glActiveTexture(active_tex);
         m_active_tex = active_tex;
     }
     doneCurrent();
@@ -589,6 +784,8 @@ void MythRenderOpenGL::StoreBicubicWeights(float x, float *dst)
 
 void MythRenderOpenGL::EnableTextures(uint tex, uint tex_type)
 {
+    if (isOpenGLES())
+        return;
     if (tex && !m_textures.contains(tex))
         return;
 
@@ -596,11 +793,9 @@ void MythRenderOpenGL::EnableTextures(uint tex, uint tex_type)
     int type = tex ? m_textures[tex].m_type : tex_type;
     if (type != m_active_tex_type)
     {
-#ifndef USING_OPENGLES
         if (m_active_tex_type)
             glDisable(m_active_tex_type);
         glEnable(type);
-#endif
         m_active_tex_type = type;
     }
     doneCurrent();
@@ -608,12 +803,12 @@ void MythRenderOpenGL::EnableTextures(uint tex, uint tex_type)
 
 void MythRenderOpenGL::DisableTextures(void)
 {
+    if (isOpenGLES())
+        return;
     if (!m_active_tex_type)
         return;
     makeCurrent();
-#ifndef USING_OPENGLES
     glDisable(m_active_tex_type);
-#endif
     m_active_tex_type = 0;
     doneCurrent();
 }
@@ -630,9 +825,9 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
     if (m_textures[tex].m_data)
         delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
-        m_glDeleteBuffers(1, &(m_textures[tex].m_pbo));
+        glDeleteBuffers(1, &(m_textures[tex].m_pbo));
     if (m_textures[tex].m_vbo)
-        m_glDeleteBuffers(1, &(m_textures[tex].m_vbo));
+        glDeleteBuffers(1, &(m_textures[tex].m_vbo));
     m_textures.remove(tex);
 
     Flush(true);
@@ -641,7 +836,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
 
 bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
 {
-    if (!(m_exts_used & kGLExtFBufObj))
+    if (!(m_extraFeaturesUsed & kGLExtFBufObj))
         return false;
 
     if (!m_textures.contains(tex))
@@ -656,18 +851,18 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     EnableTextures(tex);
     QRect tmp_viewport = m_viewport;
     glViewport(0, 0, size.width(), size.height());
-    m_glGenFramebuffers(1, &glfb);
-    m_glBindFramebuffer(GL_FRAMEBUFFER, glfb);
+    glGenFramebuffers(1, &glfb);
+    glBindFramebuffer(GL_FRAMEBUFFER, glfb);
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  size.width(), size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
-    m_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                              m_textures[tex].m_type, tex, 0);
 
     GLenum status;
-    status = m_glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    m_glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(tmp_viewport.left(), tmp_viewport.top(),
                tmp_viewport.width(), tmp_viewport.height());
 
@@ -718,7 +913,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     if (success)
         m_framebuffers.push_back(glfb);
     else
-        m_glDeleteFramebuffers(1, &glfb);
+        glDeleteFramebuffers(1, &glfb);
 
     Flush(true);
     glCheck();
@@ -738,7 +933,7 @@ void MythRenderOpenGL::DeleteFrameBuffer(uint fb)
     {
         if (*it == fb)
         {
-            m_glDeleteFramebuffers(1, &(*it));
+            glDeleteFramebuffers(1, &(*it));
             m_framebuffers.erase(it);
             break;
         }
@@ -750,14 +945,14 @@ void MythRenderOpenGL::DeleteFrameBuffer(uint fb)
 
 void MythRenderOpenGL::BindFramebuffer(uint fb)
 {
-    if (fb && !m_framebuffers.contains(fb))
-        return;
+    if (fb == 0)
+        fb = defaultFramebufferObject();
 
-    if (fb == (uint)m_active_fb)
+    if (fb == m_active_fb)
         return;
 
     makeCurrent();
-    m_glBindFramebuffer(GL_FRAMEBUFFER, fb);
+    glBindFramebuffer(GL_FRAMEBUFFER, fb);
     doneCurrent();
     m_active_fb = fb;
 }
@@ -820,6 +1015,378 @@ void MythRenderOpenGL::DrawRoundRect(const QRect &area, int cornerRadius,
     doneCurrent();
 }
 
+inline void MythRenderOpenGL::glVertexAttribPointerI(
+    GLuint index, GLint size, GLenum type, GLboolean normalize,
+    GLsizei stride, const GLuint value)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+    glVertexAttribPointer(index, size, type, normalize,
+                            stride, (const char *)value);
+#pragma GCC diagnostic pop
+}
+
+void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src,
+                                       const QRect *dst, uint prog, int alpha,
+                                       int red, int green, int blue)
+{
+    if (prog && !m_shader_objects.contains(prog))
+        prog = 0;
+    if (prog == 0)
+        prog = m_shaders[kShaderDefault];
+
+    SetShaderParams(prog, m_projection, "u_projection");
+    SetShaderParams(prog, m_transforms.top(), "u_transform");
+    SetBlend(true);
+
+    EnableTextures(tex);
+
+    GLint loc = glGetUniformLocation(prog, "s_texture0");
+    if (loc != -1)
+        glUniform1i(loc, 0);
+
+    ActiveTexture(GL_TEXTURE0);
+    glBindTexture(m_textures[tex].m_type, tex);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
+    UpdateTextureVertices(tex, src, dst);
+    if (m_extraFeaturesUsed & kGLExtPBufObj)
+    {
+        glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
+        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        if (target)
+            memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
+        m_glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+    else
+    {
+        glBufferData(GL_ARRAY_BUFFER, kVertexSize, m_textures[tex].m_vertex_data, GL_STREAM_DRAW);
+    }
+
+    glEnableVertexAttribArray(VERTEX_INDEX);
+    glEnableVertexAttribArray(TEXTURE_INDEX);
+
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                            VERTEX_SIZE * sizeof(GLfloat),
+                            kVertexOffset);
+    glVertexAttrib4f(COLOR_INDEX, red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
+    glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
+                            TEXTURE_SIZE * sizeof(GLfloat),
+                            kTextureOffset);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glCheck();
+
+    glDisableVertexAttribArray(TEXTURE_INDEX);
+    glDisableVertexAttribArray(VERTEX_INDEX);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
+                                       const QRectF *src, const QRectF *dst,
+                                       uint prog)
+{
+    if (prog && !m_shader_objects.contains(prog))
+        prog = 0;
+    if (prog == 0)
+        prog = m_shaders[kShaderDefault];
+
+    uint first = textures[0];
+
+    SetShaderParams(prog, m_projection, "u_projection");
+    SetShaderParams(prog, m_transforms.top(), "u_transform");
+    SetBlend(false);
+
+    EnableTextures(first);
+    uint active_tex = 0;
+    for (uint i = 0; i < texture_count; i++)
+    {
+        if (m_textures.contains(textures[i]))
+        {
+            QString uniform = QString("s_texture%1").arg(active_tex);
+            GLint loc = glGetUniformLocation(prog, qPrintable(uniform));
+            if (loc != -1)
+                glUniform1i(loc, active_tex);
+
+            ActiveTexture(GL_TEXTURE0 + active_tex++);
+            glBindTexture(m_textures[textures[i]].m_type, textures[i]);
+        }
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_textures[first].m_vbo);
+    UpdateTextureVertices(first, src, dst);
+    if (m_extraFeaturesUsed & kGLExtPBufObj)
+    {
+        glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
+        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        if (target)
+            memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
+        m_glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+    else
+    {
+        glBufferData(GL_ARRAY_BUFFER, kVertexSize, m_textures[first].m_vertex_data, GL_STREAM_DRAW);
+    }
+
+    glEnableVertexAttribArray(VERTEX_INDEX);
+    glEnableVertexAttribArray(TEXTURE_INDEX);
+
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                            VERTEX_SIZE * sizeof(GLfloat),
+                            kVertexOffset);
+    glVertexAttrib4f(COLOR_INDEX, 1.0, 1.0, 1.0, 1.0);
+    glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
+                            TEXTURE_SIZE * sizeof(GLfloat),
+                            kTextureOffset);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glDisableVertexAttribArray(TEXTURE_INDEX);
+    glDisableVertexAttribArray(VERTEX_INDEX);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MythRenderOpenGL::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                                     const QPen &linePen, int alpha)
+{
+    DrawRoundRectPriv(area, 1, fillBrush, linePen, alpha);
+}
+
+void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                                          const QBrush &fillBrush,
+                                          const QPen &linePen, int alpha)
+{
+    int lineWidth = linePen.width();
+    int halfline  = lineWidth / 2;
+    int rad = cornerRadius - halfline;
+
+    if ((area.width() / 2) < rad)
+        rad = area.width() / 2;
+
+    if ((area.height() / 2) < rad)
+        rad = area.height() / 2;
+    int dia = rad * 2;
+
+    QRect r(area.left(), area.top(), area.width(), area.height());
+
+    QRect tl(r.left(),  r.top(), rad, rad);
+    QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
+    QRect bl(r.left(),  r.top() + r.height() - rad, rad, rad);
+    QRect br(r.left() + r.width() - rad, r.top() + r.height() - rad, rad, rad);
+
+    SetBlend(true);
+    DisableTextures();
+
+    glEnableVertexAttribArray(VERTEX_INDEX);
+
+    if (fillBrush.style() != Qt::NoBrush)
+    {
+        // Get the shaders
+        int elip = m_shaders[kShaderCircle];
+        int fill = m_shaders[kShaderSimple];
+
+        // Set the fill color
+        glVertexAttrib4f(COLOR_INDEX,
+                           fillBrush.color().red() / 255.0,
+                           fillBrush.color().green() / 255.0,
+                           fillBrush.color().blue() / 255.0,
+                          (fillBrush.color().alpha() / 255.0) * (alpha / 255.0));
+
+        // Set the radius
+        m_parameters(2,0) = rad;
+        m_parameters(3,0) = rad - 1.0;
+
+        // Enable the Circle shader
+        SetShaderParams(elip, m_projection, "u_projection");
+        SetShaderParams(elip, m_transforms.top(), "u_transform");
+
+        // Draw the top left segment
+        m_parameters(0,0) = tl.left() + rad;
+        m_parameters(1,0) = tl.top() + rad;
+
+        SetShaderParams(elip, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, tl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the top right segment
+        m_parameters(0,0) = tr.left();
+        m_parameters(1,0) = tr.top() + rad;
+        SetShaderParams(elip, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, tr);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the bottom left segment
+        m_parameters(0,0) = bl.left() + rad;
+        m_parameters(1,0) = bl.top();
+        SetShaderParams(elip, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, bl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the bottom right segment
+        m_parameters(0,0) = br.left();
+        m_parameters(1,0) = br.top();
+        SetShaderParams(elip, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, br);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Fill the remaining areas
+        QRect main(r.left() + rad, r.top(), r.width() - dia, r.height());
+        QRect left(r.left(), r.top() + rad, rad, r.height() - dia);
+        QRect right(r.left() + r.width() - rad, r.top() + rad, rad, r.height() - dia);
+
+        SetShaderParams(fill, m_projection, "u_projection");
+        SetShaderParams(fill, m_transforms.top(), "u_transform");
+
+        GetCachedVBO(GL_TRIANGLE_STRIP, main);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        GetCachedVBO(GL_TRIANGLE_STRIP, left);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        GetCachedVBO(GL_TRIANGLE_STRIP, right);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    if (linePen.style() != Qt::NoPen)
+    {
+        // Get the shaders
+        int edge = m_shaders[kShaderCircleEdge];
+        int vline = m_shaders[kShaderVertLine];
+        int hline = m_shaders[kShaderHorizLine];
+
+        // Set the line color
+        glVertexAttrib4f(COLOR_INDEX,
+                           linePen.color().red() / 255.0,
+                           linePen.color().green() / 255.0,
+                           linePen.color().blue() / 255.0,
+                          (linePen.color().alpha() / 255.0) * (alpha / 255.0));
+
+        // Set the radius and width
+        m_parameters(2,0) = rad - lineWidth / 2.0;
+        m_parameters(3,0) = lineWidth / 2.0;
+
+        // Enable the edge shader
+        SetShaderParams(edge, m_projection, "u_projection");
+        SetShaderParams(edge, m_transforms.top(), "u_transform");
+
+        // Draw the top left edge segment
+        m_parameters(0,0) = tl.left() + rad;
+        m_parameters(1,0) = tl.top() + rad;
+        SetShaderParams(edge, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, tl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the top right edge segment
+        m_parameters(0,0) = tr.left();
+        m_parameters(1,0) = tr.top() + rad;
+        SetShaderParams(edge, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, tr);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the bottom left edge segment
+        m_parameters(0,0) = bl.left() + rad;
+        m_parameters(1,0) = bl.top();
+        SetShaderParams(edge, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, bl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the bottom right edge segment
+        m_parameters(0,0) = br.left();
+        m_parameters(1,0) = br.top();
+        SetShaderParams(edge, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, br);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Vertical lines
+        SetShaderParams(vline, m_projection, "u_projection");
+        SetShaderParams(vline, m_transforms.top(), "u_transform");
+
+        m_parameters(1,0) = lineWidth / 2.0;
+        QRect vl(r.left(), r.top() + rad,
+                 lineWidth, r.height() - dia);
+
+        // Draw the left line segment
+        m_parameters(0,0) = vl.left() + lineWidth;
+        SetShaderParams(vline, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, vl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the right line segment
+        vl.translate(r.width() - lineWidth, 0);
+        m_parameters(0,0) = vl.left();
+        SetShaderParams(vline, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, vl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Horizontal lines
+        SetShaderParams(hline, m_projection, "u_projection");
+        SetShaderParams(hline, m_transforms.top(), "u_transform");
+        QRect hl(r.left() + rad, r.top(),
+                 r.width() - dia, lineWidth);
+
+        // Draw the top line segment
+        m_parameters(0,0) = hl.top() + lineWidth;
+        SetShaderParams(hline, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, hl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // Draw the bottom line segment
+        hl.translate(0, r.height() - lineWidth);
+        m_parameters(0,0) = hl.top();
+        SetShaderParams(hline, m_parameters, "u_parameters");
+        GetCachedVBO(GL_TRIANGLE_STRIP, hl);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               kVertexOffset);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    glDisableVertexAttribArray(VERTEX_INDEX);
+}
+
 void MythRenderOpenGL::Init2DState(void)
 {
     SetBlend(false);
@@ -835,228 +1402,31 @@ void MythRenderOpenGL::Init2DState(void)
 
 void MythRenderOpenGL::InitProcs(void)
 {
-    m_extensions = (reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
-
-    m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
-        GetProcAddress("glActiveTexture");
-    m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)
-        GetProcAddress("glMapBuffer");
-    m_glBindBuffer = (MYTH_GLBINDBUFFERPROC)
-        GetProcAddress("glBindBuffer");
-    m_glGenBuffers = (MYTH_GLGENBUFFERSPROC)
-        GetProcAddress("glGenBuffers");
-    m_glBufferData = (MYTH_GLBUFFERDATAPROC)
-        GetProcAddress("glBufferData");
-    m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)
-        GetProcAddress("glUnmapBuffer");
-    m_glDeleteBuffers = (MYTH_GLDELETEBUFFERSPROC)
-        GetProcAddress("glDeleteBuffers");
-    m_glGenFramebuffers = (MYTH_GLGENFRAMEBUFFERSPROC)
-        GetProcAddress("glGenFramebuffers");
-    m_glBindFramebuffer = (MYTH_GLBINDFRAMEBUFFERPROC)
-        GetProcAddress("glBindFramebuffer");
-    m_glFramebufferTexture2D = (MYTH_GLFRAMEBUFFERTEXTURE2DPROC)
-        GetProcAddress("glFramebufferTexture2D");
-    m_glCheckFramebufferStatus = (MYTH_GLCHECKFRAMEBUFFERSTATUSPROC)
-        GetProcAddress("glCheckFramebufferStatus");
-    m_glDeleteFramebuffers = (MYTH_GLDELETEFRAMEBUFFERSPROC)
-        GetProcAddress("glDeleteFramebuffers");
-    m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)
-        GetProcAddress("glGenFencesNV");
-    m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)
-        GetProcAddress("glDeleteFencesNV");
-    m_glSetFenceNV = (MYTH_GLSETFENCENVPROC)
-        GetProcAddress("glSetFenceNV");
-    m_glFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)
-        GetProcAddress("glFinishFenceNV");
-    m_glGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)
-        GetProcAddress("glGenFencesAPPLE");
-    m_glDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)
-        GetProcAddress("glDeleteFencesAPPLE");
-    m_glSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)
-        GetProcAddress("glSetFenceAPPLE");
-    m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
-        GetProcAddress("glFinishFenceAPPLE");
+    m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer");
+    m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
+    m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)GetProcAddress("glGenFencesNV");
+    m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)GetProcAddress("glDeleteFencesNV");
+    m_glSetFenceNV = (MYTH_GLSETFENCENVPROC)GetProcAddress("glSetFenceNV");
+    m_glFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)GetProcAddress("glFinishFenceNV");
+    m_glGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)GetProcAddress("glGenFencesAPPLE");
+    m_glDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)GetProcAddress("glDeleteFencesAPPLE");
+    m_glSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)GetProcAddress("glSetFenceAPPLE");
+    m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)GetProcAddress("glFinishFenceAPPLE");
 }
 
-void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
+QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &proc) const
 {
-    // TODO FIXME - this should really return a void(*) not void*
     static const QString exts[4] = { "", "ARB", "EXT", "OES" };
-    void *result;
+    QFunctionPointer result = nullptr;
     for (int i = 0; i < 4; i++)
     {
-#ifdef USING_OPENGLES
-        result = reinterpret_cast<void*>(
-            QLibrary::resolve("libGLESv2", (proc + exts[i]).toLatin1().data()));
+        result = getProcAddress((proc + exts[i]).toLocal8Bit().constData());
         if (result)
             break;
-#else
-        result = reinterpret_cast<void*>(getProcAddress(qPrintable(proc + exts[i])));
-        if (result)
-            break;
-#endif
     }
     if (result == nullptr)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC +
-            QString("Extension not found: %1").arg(proc));
-
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Extension not found: %1").arg(proc));
     return result;
-}
-
-bool MythRenderOpenGL::InitFeatures(void)
-{
-    static bool multitexture  = true;
-    static bool vertexarrays  = true;
-    static bool framebuffers  = true;
-    static bool pixelbuffers  = true;
-    static bool vertexbuffers = true;
-    static bool fences        = true;
-    static bool ycbcrtextures = true;
-    static bool mipmapping    = true;
-    static bool rgba16        = true;
-    static bool check         = true;
-
-    if (check)
-    {
-        check = false;
-        multitexture  = !getenv("OPENGL_NOMULTITEX");
-        vertexarrays  = !getenv("OPENGL_NOVERTARRAY");
-        framebuffers  = !getenv("OPENGL_NOFBO");
-        pixelbuffers  = !getenv("OPENGL_NOPBO");
-        vertexbuffers = !getenv("OPENGL_NOVBO");
-        fences        = !getenv("OPENGL_NOFENCE");
-        ycbcrtextures = !getenv("OPENGL_NOYCBCR");
-        mipmapping    = !getenv("OPENGL_NOMIPMAP");
-        rgba16        = !getenv("OPENGL_NORGBA16");
-        if (!multitexture)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling multi-texturing.");
-        if (!vertexarrays)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Vertex Arrays.");
-        if (!framebuffers)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Framebuffer Objects.");
-        if (!pixelbuffers)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Pixel Buffer Objects.");
-        if (!vertexbuffers)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Vertex Buffer Objects.");
-        if (!fences)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling fences.");
-        if (!ycbcrtextures)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling YCbCr textures.");
-        if (!mipmapping)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling mipmapping.");
-        if (!rgba16)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling RGBA16 textures");
-    }
-
-    GLint maxtexsz = 0;
-    GLint maxunits = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
-    m_max_units = maxunits;
-    m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
-
-    m_extensions = (const char*) glGetString(GL_EXTENSIONS);
-    bool rects;
-    m_default_texture_type = GetTextureType(rects);
-    if (rects)
-        m_exts_supported += kGLExtRect;
-
-    // GL 1.1
-    if (rgba16)
-        m_exts_supported += kGLExtRGBA16;
-
-    if (m_extensions.contains("GL_ARB_multitexture") &&
-        m_glActiveTexture && multitexture)
-    {
-        m_exts_supported += kGLMultiTex;
-        if (m_max_units < 3)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Insufficient texture units for advanced OpenGL features.");
-        }
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Multi-texturing not supported. Certain "
-                                       "OpenGL features will not work");
-    }
-
-    if (m_extensions.contains("GL_EXT_vertex_array") && vertexarrays)
-    {
-        m_exts_supported += kGLVertexArray;
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "GL_EXT_vertex_array extension not supported. This may not work");
-    }
-
-    if (m_extensions.contains("GL_EXT_framebuffer_object") &&
-        m_glGenFramebuffers        && m_glBindFramebuffer &&
-        m_glFramebufferTexture2D   && m_glDeleteFramebuffers &&
-        m_glCheckFramebufferStatus && framebuffers)
-        m_exts_supported += kGLExtFBufObj;
-
-    bool buffer_procs = m_glMapBuffer  && m_glBindBuffer &&
-                        m_glGenBuffers && m_glDeleteBuffers &&
-                        m_glBufferData && m_glUnmapBuffer;
-
-    if(m_extensions.contains("GL_ARB_pixel_buffer_object")
-       && buffer_procs && pixelbuffers)
-        m_exts_supported += kGLExtPBufObj;
-
-    if (m_extensions.contains("GL_ARB_vertex_buffer_object")
-        && buffer_procs && vertexbuffers)
-        m_exts_supported += kGLExtVBO;
-
-    if(m_extensions.contains("GL_NV_fence") &&
-        m_glGenFencesNV && m_glDeleteFencesNV &&
-        m_glSetFenceNV  && m_glFinishFenceNV && fences)
-        m_exts_supported += kGLNVFence;
-
-    if(m_extensions.contains("GL_APPLE_fence") &&
-        m_glGenFencesAPPLE && m_glDeleteFencesAPPLE &&
-        m_glSetFenceAPPLE  && m_glFinishFenceAPPLE && fences)
-        m_exts_supported += kGLAppleFence;
-
-    if (m_extensions.contains("GL_MESA_ycbcr_texture") && ycbcrtextures)
-        m_exts_supported += kGLMesaYCbCr;
-
-    if (m_extensions.contains("GL_APPLE_ycbcr_422") && ycbcrtextures)
-        m_exts_supported += kGLAppleYCbCr;
-
-    if (m_extensions.contains("GL_SGIS_generate_mipmap") && mipmapping)
-        m_exts_supported += kGLMipMaps;
-
-    static bool debugged = false;
-    if (!debugged)
-    {
-        debugged = true;
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor  : %1")
-                .arg((const char*) glGetString(GL_VENDOR)));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer: %1")
-                .arg((const char*) glGetString(GL_RENDERER)));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version : %1")
-                .arg((const char*) glGetString(GL_VERSION)));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size: %1 x %2")
-                .arg(m_max_tex_size).arg(m_max_tex_size));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units: %1")
-                .arg(m_max_units));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
-                .arg(IsDirectRendering() ? "Yes" : "No"));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
-                .arg(m_exts_supported, 0, 16));
-    }
-
-    m_exts_used = m_exts_supported;
-
-    if (m_exts_used & kGLExtPBufObj)
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "PixelBufferObject support available");
-    }
-
-    return true;
 }
 
 void MythRenderOpenGL::ResetVars(void)
@@ -1065,9 +1435,9 @@ void MythRenderOpenGL::ResetVars(void)
 
     m_lock_level      = 0;
 
-    m_extensions      = QString();
-    m_exts_supported  = kGLFeatNone;
-    m_exts_used       = kGLFeatNone;
+    m_features        = Multitexture;
+    m_extraFeatures   = kGLFeatNone;
+    m_extraFeaturesUsed = kGLFeatNone;
     m_max_tex_size    = 0;
     m_max_units       = 0;
     m_default_texture_type = GL_TEXTURE_2D;
@@ -1079,24 +1449,19 @@ void MythRenderOpenGL::ResetVars(void)
     m_blend           = false;
     m_background      = 0x00000000;
     m_flushEnabled    = true;
+    m_projection.fill(0);
+    m_parameters.fill(0);
+    memset(m_shaders, 0, sizeof(m_shaders));
+    m_active_obj = 0;
+    m_transforms.clear();
+    m_transforms.push(QMatrix4x4());
+    m_map.clear();
 }
 
 void MythRenderOpenGL::ResetProcs(void)
 {
-    m_extensions = QString();
-
-    m_glActiveTexture = nullptr;
     m_glMapBuffer = nullptr;
-    m_glBindBuffer = nullptr;
-    m_glGenBuffers = nullptr;
-    m_glBufferData = nullptr;
     m_glUnmapBuffer = nullptr;
-    m_glDeleteBuffers = nullptr;
-    m_glGenFramebuffers = nullptr;
-    m_glBindFramebuffer = nullptr;
-    m_glFramebufferTexture2D = nullptr;
-    m_glCheckFramebufferStatus = nullptr;
-    m_glDeleteFramebuffers = nullptr;
     m_glGenFencesNV = nullptr;
     m_glDeleteFencesNV = nullptr;
     m_glSetFenceNV = nullptr;
@@ -1109,20 +1474,20 @@ void MythRenderOpenGL::ResetProcs(void)
 
 uint MythRenderOpenGL::CreatePBO(uint tex)
 {
-    if (!(m_exts_used & kGLExtPBufObj))
+    if (!(m_extraFeaturesUsed & kGLExtPBufObj))
         return 0;
 
     if (!m_textures.contains(tex))
         return 0;
 
-    m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     if (glCheck())
     {
         // looks like we dont support PBOs so dont bother doing the rest
         // and stop using it in the future
         LOG(VB_GENERAL, LOG_INFO, LOC + "Pixel Buffer Objects unusable, disabling");
-        m_exts_supported &= ~kGLExtPBufObj;
-        m_exts_used &= ~kGLExtPBufObj;
+        m_extraFeatures &= ~kGLExtPBufObj;
+        m_extraFeaturesUsed &= ~kGLExtPBufObj;
         return 0;
     }
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
@@ -1131,8 +1496,8 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
 
     GLuint tmp_pbo;
-    m_glGenBuffers(1, &tmp_pbo);
-    m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    glGenBuffers(1, &tmp_pbo);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     Flush(true);
     return tmp_pbo;
@@ -1140,11 +1505,11 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
 
 uint MythRenderOpenGL::CreateVBO(void)
 {
-    if (!(m_exts_used & kGLExtVBO))
+    if (!(m_extraFeaturesUsed & kGLExtVBO))
         return 0;
 
     GLuint tmp_vbo;
-    m_glGenBuffers(1, &tmp_vbo);
+    glGenBuffers(1, &tmp_vbo);
     return tmp_vbo;
 }
 
@@ -1153,13 +1518,15 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
     DeleteTextures();
     DeleteFrameBuffers();
+    DeleteDefaultShaders();
+    DeleteShaders();
     Flush(true);
 
     if (m_fence)
     {
-        if (m_exts_supported & kGLAppleFence)
+        if (m_extraFeatures & kGLAppleFence)
             m_glDeleteFencesAPPLE(1, &m_fence);
-        else if(m_exts_supported & kGLNVFence)
+        else if(m_extraFeatures & kGLNVFence)
             m_glDeleteFencesNV(1, &m_fence);
         m_fence = 0;
     }
@@ -1191,7 +1558,9 @@ void MythRenderOpenGL::DeleteTextures(void)
         if (it.value().m_data)
             delete it.value().m_data;
         if (it.value().m_pbo)
-            m_glDeleteBuffers(1, &(it.value().m_pbo));
+            glDeleteBuffers(1, &(it.value().m_pbo));
+        if (it.value().m_vbo)
+            glDeleteBuffers(1, &(it.value().m_vbo));
     }
     m_textures.clear();
     Flush(true);
@@ -1201,7 +1570,7 @@ void MythRenderOpenGL::DeleteFrameBuffers(void)
 {
     QVector<GLuint>::iterator it;
     for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
-        m_glDeleteFramebuffers(1, &(*(it)));
+        glDeleteFramebuffers(1, &(*(it)));
     m_framebuffers.clear();
     Flush(true);
 }
@@ -1214,23 +1583,16 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
 
     GLfloat *data = m_textures[tex].m_vertex_data;
     QSize    size = m_textures[tex].m_size;
+    if (size.isEmpty())
+        return false;
 
     int width  = min(src->width(),  size.width());
     int height = min(src->height(), size.height());
 
-    data[0 + TEX_OFFSET] = src->left();
-    data[1 + TEX_OFFSET] = src->top() + height;
-
-    data[6 + TEX_OFFSET] = src->left() + width;
-    data[7 + TEX_OFFSET] = src->top();
-
-    if (!IsRectTexture(m_textures[tex].m_type))
-    {
-        data[0 + TEX_OFFSET] /= (float)size.width();
-        data[6 + TEX_OFFSET] /= (float)size.width();
-        data[1 + TEX_OFFSET] /= (float)size.height();
-        data[7 + TEX_OFFSET] /= (float)size.height();
-    }
+    data[0 + TEX_OFFSET] = src->left() / (float)size.width();
+    data[1 + TEX_OFFSET] = (src->top() + height) / (float)size.height();
+    data[6 + TEX_OFFSET] = (src->left() + width) / (float)size.width();
+    data[7 + TEX_OFFSET] = src->top() / (float)size.height();
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
     data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
@@ -1241,7 +1603,6 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
     data[5] = data[1] = dst->top();
     data[4] = data[6] = dst->left() + min(width, dst->width());
     data[3] = data[7] = dst->top()  + min(height, dst->height());
-
     return true;
 }
 
@@ -1252,20 +1613,14 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
         return false;
 
     GLfloat *data = m_textures[tex].m_vertex_data;
+    QSize    size = m_textures[tex].m_size;
+    if (size.isEmpty())
+        return false;
 
-    data[0 + TEX_OFFSET] = src->left();
-    data[1 + TEX_OFFSET] = src->top() + src->height();
-
-    data[6 + TEX_OFFSET] = src->left() + src->width();
-    data[7 + TEX_OFFSET] = src->top();
-
-    if (!IsRectTexture(m_textures[tex].m_type))
-    {
-        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-    }
+    data[0 + TEX_OFFSET] = src->left() / (qreal)size.width();
+    data[1 + TEX_OFFSET] = (src->top() + src->height()) / (qreal)size.height();
+    data[6 + TEX_OFFSET] = (src->left() + src->width()) / (qreal)size.width();
+    data[7 + TEX_OFFSET] = src->top() / (qreal)size.height();
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
     data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
@@ -1276,7 +1631,6 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
     data[5] = data[1] = dst->top();
     data[4] = data[6] = dst->left() + dst->width();
     data[3] = data[7] = dst->top() + dst->height();
-
     return true;
 }
 
@@ -1349,10 +1703,10 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_cachedVBOS.insert(ref, vbo);
         m_vboExpiry.append(ref);
 
-        m_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        if (m_exts_used & kGLExtPBufObj)
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        if (m_extraFeaturesUsed & kGLExtVBO)
         {
-            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, nullptr, GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, kTextureOffset, nullptr, GL_STREAM_DRAW);
             void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
             if (target)
                 memcpy(target, vertices, kTextureOffset);
@@ -1360,13 +1714,13 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         }
         else
         {
-            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, vertices, GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, kTextureOffset, vertices, GL_STREAM_DRAW);
         }
         ExpireVBOS(MAX_VERTEX_CACHE);
         return;
     }
 
-    m_glBindBuffer(GL_ARRAY_BUFFER, m_cachedVBOS.value(ref));
+    glBindBuffer(GL_ARRAY_BUFFER, m_cachedVBOS.value(ref));
 }
 
 void MythRenderOpenGL::ExpireVBOS(uint max)
@@ -1378,7 +1732,7 @@ void MythRenderOpenGL::ExpireVBOS(uint max)
         if (m_cachedVBOS.contains(ref))
         {
             GLuint vbo = m_cachedVBOS.value(ref);
-            m_glDeleteBuffers(1, &vbo);
+            glDeleteBuffers(1, &vbo);
             m_cachedVBOS.remove(ref);
         }
     }
@@ -1466,3 +1820,290 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
 
     return size.width() * size.height() * bpp * bytes;
 }
+
+void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
+{
+    QMatrix4x4 newtop = m_transforms.top();
+    if (fx.hzoom != 1.0f || fx.vzoom != 1.0f || fx.angle != 0.0f)
+    {
+        newtop.translate(center.x(), center.y());
+        newtop.scale(fx.hzoom, fx.vzoom);
+        newtop.rotate(fx.angle, 0, 0, 1);
+        newtop.translate(-center.x(), -center.y());
+    }
+    m_transforms.push(newtop);
+}
+
+void MythRenderOpenGL::PopTransformation(void)
+{
+    m_transforms.pop();
+}
+
+uint MythRenderOpenGL::CreateShaderObject(const QString &vertex,
+                                          const QString &fragment)
+{
+    if (!(m_extraFeatures & kGLSL))
+        return 0;
+
+    OpenGLLocker locker(this);
+
+    uint result = 0;
+    QString vert_shader = vertex.isEmpty() ? kDefaultVertexShader : vertex;
+    QString frag_shader = fragment.isEmpty() ? kDefaultFragmentShader: fragment;
+
+    OptimiseShaderSource(vert_shader);
+    OptimiseShaderSource(frag_shader);
+
+    result = glCreateProgram();
+    if (!result)
+        return 0;
+
+    MythGLShaderObject object(CreateShader(GL_VERTEX_SHADER, vert_shader),
+                              CreateShader(GL_FRAGMENT_SHADER, frag_shader));
+    m_shader_objects.insert(result, object);
+
+    if (!ValidateShaderObject(result))
+    {
+        DeleteShaderObject(result);
+        return 0;
+    }
+
+    return result;
+}
+
+void MythRenderOpenGL::DeleteShaderObject(uint obj)
+{
+    OpenGLLocker locker(this);
+
+    if (!m_shader_objects.contains(obj))
+        return;
+
+    GLuint vertex   = m_shader_objects[obj].m_vertex_shader;
+    GLuint fragment = m_shader_objects[obj].m_fragment_shader;
+    glDetachShader(obj, vertex);
+    glDetachShader(obj, fragment);
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+    glDeleteProgram(obj);
+    m_shader_objects.remove(obj);
+    m_map.clear();
+
+    Flush(true);
+}
+
+void MythRenderOpenGL::EnableShaderObject(uint obj)
+{
+    OpenGLLocker locker(this);
+
+    if (obj == m_active_obj)
+        return;
+
+    if (!obj && m_active_obj)
+    {
+        glUseProgram(0);
+        m_active_obj = 0;
+        return;
+    }
+
+    if (!m_shader_objects.contains(obj))
+        return;
+
+    glUseProgram(obj);
+    m_active_obj = obj;
+}
+
+void MythRenderOpenGL::SetShaderParams(uint obj, const QMatrix4x4 &m,
+                                        const char* uniform)
+{
+    if (!(m_features & Shaders))
+        return;
+
+    OpenGLLocker locker(this);
+
+    EnableShaderObject(obj);
+
+    QString tag = QString("%1-%2").arg(obj).arg(uniform);
+    map_t::iterator it = m_map.find(tag);
+    if (it == m_map.end())
+        m_map.insert(tag, m);
+    else if (!qFuzzyCompare(m, it.value()))
+        it.value() = m;
+    else
+        return;
+    GLint loc = glGetUniformLocation(obj, uniform);
+    if (loc != -1)
+        glUniformMatrix4fv(loc, 1, GL_FALSE, GLMatrix4x4(m));
+}
+
+void MythRenderOpenGL::CreateDefaultShaders(void)
+{
+    m_shaders[kShaderSimple]  = CreateShaderObject(kSimpleVertexShader,
+                                                   kSimpleFragmentShader);
+    m_shaders[kShaderDefault] = CreateShaderObject(kDefaultVertexShader,
+                                                   kDefaultFragmentShader);
+    m_shaders[kShaderCircle]  = CreateShaderObject(kDrawVertexShader,
+                                                   kCircleFragmentShader);
+    m_shaders[kShaderCircleEdge] = CreateShaderObject(kDrawVertexShader,
+                                                   kCircleEdgeFragmentShader);
+    m_shaders[kShaderVertLine]   = CreateShaderObject(kDrawVertexShader,
+                                                   kVertLineFragmentShader);
+    m_shaders[kShaderHorizLine]  = CreateShaderObject(kDrawVertexShader,
+                                                   kHorizLineFragmentShader);
+}
+
+void MythRenderOpenGL::DeleteDefaultShaders(void)
+{
+    for (int i = 0; i < kShaderCount; i++)
+    {
+        DeleteShaderObject(m_shaders[i]);
+        m_shaders[i] = 0;
+    }
+}
+
+uint MythRenderOpenGL::CreateShader(int type, const QString &source)
+{
+    uint result = glCreateShader(type);
+    QByteArray src = source.toLatin1();
+    const char* tmp[1] = { src.constData() };
+    glShaderSource(result, 1, tmp, nullptr);
+    glCompileShader(result);
+    GLint compiled;
+    glGetShaderiv(result, GL_COMPILE_STATUS, &compiled);
+    if (!compiled)
+    {
+        GLint length = 0;
+        glGetShaderiv(result, GL_INFO_LOG_LENGTH, &length);
+        if (length > 1)
+        {
+            char *log = (char*)malloc(sizeof(char) * length);
+            glGetShaderInfoLog(result, length, nullptr, log);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to compile shader.");
+            LOG(VB_GENERAL, LOG_ERR, log);
+            LOG(VB_GENERAL, LOG_ERR, source);
+            free(log);
+        }
+        glDeleteShader(result);
+        result = 0;
+    }
+    return result;
+}
+
+bool MythRenderOpenGL::ValidateShaderObject(uint obj)
+{
+    if (!m_shader_objects.contains(obj))
+        return false;
+    if (!m_shader_objects[obj].m_fragment_shader ||
+        !m_shader_objects[obj].m_vertex_shader)
+        return false;
+
+    glAttachShader(obj, m_shader_objects[obj].m_fragment_shader);
+    glAttachShader(obj, m_shader_objects[obj].m_vertex_shader);
+    glBindAttribLocation(obj, VERTEX_INDEX,  "a_position");
+    glBindAttribLocation(obj, COLOR_INDEX,   "a_color");
+    glBindAttribLocation(obj, TEXTURE_INDEX, "a_texcoord0");
+    glLinkProgram(obj);
+    return CheckObjectStatus(obj);
+}
+
+bool MythRenderOpenGL::CheckObjectStatus(uint obj)
+{
+    int ok;
+#ifdef GL_LINK_STATUS
+    glGetProgramiv(obj, GL_LINK_STATUS, &ok);
+#else
+    m_glGetProgramiv(obj, GL_OBJECT_LINK_STATUS, &ok);
+#endif
+    if (ok > 0)
+        return true;
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to link shader object.");
+    int infologLength = 0;
+    int charsWritten  = 0;
+    char *infoLog;
+#ifdef GL_INFO_LOG_LENGTH
+    glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+#else
+    m_glGetProgramiv(obj, GL_OBJECT_INFO_LOG_LENGTH, &infologLength);
+#endif
+    if (infologLength > 0)
+    {
+        infoLog = (char *)malloc(infologLength);
+        glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+        LOG(VB_GENERAL, LOG_ERR, QString("\n\n%1").arg(infoLog));
+        free(infoLog);
+    }
+    return false;
+}
+
+void MythRenderOpenGL::OptimiseShaderSource(QString &source)
+{
+    source.replace("GLSL_DEFINES", m_GLSLVersion + m_qualifiers);
+    LOG(VB_GENERAL, LOG_DEBUG, "\n" + source);
+}
+
+void MythRenderOpenGL::SetMatrixView(void)
+{
+    m_projection.setToIdentity();
+    m_projection.ortho(m_viewport);
+}
+
+void MythRenderOpenGL::DeleteShaders(void)
+{
+    QHash<GLuint, MythGLShaderObject>::iterator it;
+    for (it = m_shader_objects.begin(); it != m_shader_objects.end(); ++it)
+    {
+        GLuint object   = it.key();
+        GLuint vertex   = it.value().m_vertex_shader;
+        GLuint fragment = it.value().m_fragment_shader;
+        glDetachShader(object, vertex);
+        glDetachShader(object, fragment);
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
+        glDeleteProgram(object);
+    }
+    m_shader_objects.clear();
+    m_map.clear();
+    Flush(true);
+}
+
+/*! \brief GLMatrix4x4 is a helper class to convert between QT and GT 4x4 matrices.
+ *
+ * Actually the conversion is a noop according to the QT 5 documentation.
+ * From http://doc.qt.io/qt-5/qmatrix4x4.html#details :
+ *
+ * Internally the data is stored as column-major format, so as to be
+ * optimal for passing to OpenGL functions, which expect column-major
+ * data.
+ *
+ * When using these functions be aware that they return data in
+ * column-major format: data(), constData()
+ */
+GLMatrix4x4::GLMatrix4x4(const QMatrix4x4 &m)
+{
+    // Convert from Qt's row-major to GL's column-major order
+    for (int c = 0, i = 0; c < 4; ++c)
+        for (int r = 0; r < 4; ++r)
+            m_v[i++] = m(r, c);
+}
+
+GLMatrix4x4::GLMatrix4x4(const GLfloat v[16])
+{
+    for (int i = 0; i < 16; ++i)
+        m_v[i] = v[i];
+}
+
+GLMatrix4x4::operator const GLfloat *() const
+{
+    return m_v;
+}
+
+GLMatrix4x4::operator QMatrix4x4() const
+{
+    // Convert from GL's column-major order to Qt's row-major
+    QMatrix4x4 m;
+    for (int c = 0, i = 0; c < 4; ++c)
+        for (int r = 0; r < 4; ++r)
+            m(r, c) = m_v[i++];
+    return m;
+}
+

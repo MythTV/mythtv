@@ -288,7 +288,6 @@ void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
                                         gl_videochain->GetInputTexture(),
                                         gl_videochain->GetTextureType(), scan);
-            gl_videochain->SetInputUpdated();
             gl_context->doneCurrent();
         }
     }
