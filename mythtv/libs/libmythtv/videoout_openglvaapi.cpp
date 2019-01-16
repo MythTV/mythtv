@@ -3,10 +3,7 @@
 #include "openglvideo.h"
 #include "vaapicontext.h"
 #include "mythpainter.h"
-#ifdef USING_OPENGLES
-#include "mythrender_opengl2es.h"
 #include "mythmainwindow.h"
-#endif
 #include <QGuiApplication>
 
 #define LOC QString("VidOutGLVAAPI: ")
@@ -340,17 +337,15 @@ bool VideoOutputOpenGLVAAPI::AllowVAAPIDisplay()
         return false;
     }
 
-#ifdef USING_OPENGLES
     MythMainWindow* win = MythMainWindow::getMainWindow();
     if (win)
     {
-        MythRender *render = win->GetRenderDevice();
-        if (static_cast<MythRenderOpenGL2ES*>(render))
+        MythRenderOpenGL *render = static_cast<MythRenderOpenGL*>(win->GetRenderDevice());
+        if (!render || (render && render->isOpenGLES()))
         {
-            LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI display with OpenGLES");
+            LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI - incompatible with current render device");
             return false;
         }
     }
-#endif
     return true;
 }
