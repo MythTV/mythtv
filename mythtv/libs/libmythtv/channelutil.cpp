@@ -2409,7 +2409,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         cond << "channel.sourceid = :SOURCEID ";
 
     if (liveTVOnly)
-        cond << "channel.livetvorder > 0 ";
+        cond << "capturecard.livetvorder > 0 ";
 
     if (!cond.isEmpty())
         sql += QString("WHERE %1").arg(cond.join("AND "));
@@ -2429,7 +2429,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
     }
     else // kChanOrderByLiveTV
     {
-        sql += "ORDER BY callsign = :CALLSIGN1 AND channum = :CHANNUM, "
+        sql += "ORDER BY callsign = :CALLSIGN1 AND channum = :CHANNUM DESC, "
                "         callsign = :CALLSIGN2 DESC, "
                "         livetvorder, "
                "         channel.recpriority DESC, "
