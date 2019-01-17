@@ -1159,25 +1159,25 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     if (inputTextureSize.isEmpty())
         return;
 
-    float lineHeight = 1.0f / inputTextureSize.height();
-    float colWidth   = 1.0f / inputTextureSize.width();
-    float yselect    = (float)inputTextureSize.width();
-    float maxwidth   = video_dim.width()  / (float)inputTextureSize.width();
-    float maxheight  = video_dim.height() / (float)inputTextureSize.height();
-    float yv12height = maxheight;
+    qreal lineHeight = 1.0 / inputTextureSize.height();
+    qreal colWidth   = 1.0 / inputTextureSize.width();
+    qreal yselect    = (qreal)inputTextureSize.width();
+    qreal maxwidth   = video_dim.width()  / (qreal)inputTextureSize.width();
+    qreal maxheight  = video_dim.height() / (qreal)inputTextureSize.height();
+    qreal yv12height = maxheight;
     QSize fb_size    = gl_context->GetTextureSize(video_disp_dim);
-    float fieldSize  = inputTextureSize.height() / 2.0f;
+    qreal fieldSize  = inputTextureSize.height() / 2.0;
 
-    string.replace("%FIELDHEIGHT%",   QString::number(fieldSize, 'f', 8));
-    string.replace("%LINEHEIGHT%",    QString::number(lineHeight, 'f', 8));
-    string.replace("%2LINEHEIGHT%",   QString::number(lineHeight * 2.0f, 'f', 8));
-    string.replace("%BICUBICCWIDTH%", QString::number(colWidth, 'f', 8));
-    string.replace("%BICUBICWIDTH%",  QString::number((float)fb_size.width(), 'f', 1));
-    string.replace("%BICUBICHEIGHT%", QString::number((float)fb_size.height(), 'f', 1));
-    string.replace("%SELECTCOL%",     QString::number(yselect, 'f', 8));
-    string.replace("%MAXHEIGHT%",     QString::number(maxheight - lineHeight, 'f', 8));
-    string.replace("%WIDTH%",         QString::number(maxwidth, 'f', 8));
-    string.replace("%HEIGHT%",        QString::number(yv12height, 'f', 8));
+    string.replace("%FIELDHEIGHT%",   QString::number(fieldSize, 'f', 16));
+    string.replace("%LINEHEIGHT%",    QString::number(lineHeight, 'f', 16));
+    string.replace("%2LINEHEIGHT%",   QString::number(lineHeight * 2.0, 'f', 16));
+    string.replace("%BICUBICCWIDTH%", QString::number(colWidth, 'f', 16));
+    string.replace("%BICUBICWIDTH%",  QString::number((qreal)fb_size.width(), 'f', 8));
+    string.replace("%BICUBICHEIGHT%", QString::number((qreal)fb_size.height(), 'f', 8));
+    string.replace("%SELECTCOL%",     QString::number(yselect, 'f', 16));
+    string.replace("%MAXHEIGHT%",     QString::number(maxheight - lineHeight, 'f', 16));
+    string.replace("%WIDTH%",         QString::number(maxwidth, 'f', 16));
+    string.replace("%HEIGHT%",        QString::number(yv12height, 'f', 16));
     string.replace("COLOUR_UNIFORM",  COLOUR_UNIFORM);
     // TODO fix alternative swizzling by changing the YUVA packing code
     string.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
