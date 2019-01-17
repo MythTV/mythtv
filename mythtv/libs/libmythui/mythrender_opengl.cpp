@@ -143,13 +143,14 @@ bool MythRenderOpenGL::Init(void)
 
     // Pixel buffer objects
     bool buffer_procs = m_glMapBuffer && m_glUnmapBuffer;
-    if (hasExtension("GL_ARB_pixel_buffer_object") && buffer_procs)
+    if (!isOpenGLES() && hasExtension("GL_ARB_pixel_buffer_object") && buffer_procs)
         m_extraFeatures += kGLExtPBufObj;
 
-    // Vertex buffer objects
+    // Buffers are available by default (GL and GLES).
+    // Buffer mapping is available by extension
     if ((isOpenGLES() && hasExtension("GL_OES_mapbuffer") && buffer_procs) ||
         (hasExtension("GL_ARB_vertex_buffer_object") && buffer_procs))
-        m_extraFeatures += kGLExtVBO;
+        m_extraFeatures += kGLBufferMap;
 
     // TODO combine fence functionality
     // NVidia fence
@@ -220,10 +221,9 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vertex arrays        : implicit"));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_features & Buffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vertex buffer objects: %1").arg(GLYesNo(m_extraFeatures & kGLExtVBO)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("YCbCr textures       : %1")
         .arg(GLYesNo((m_extraFeatures & kGLMesaYCbCr) || (m_extraFeatures & kGLAppleYCbCr))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
@@ -424,19 +424,17 @@ void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
         return nullptr;
 
     makeCurrent(); // associated doneCurrent() in UpdateTexture
-
     EnableTextures(tex);
     glBindTexture(m_textures[tex].m_type, tex);
-
-    if (!create_buffer)
-        return nullptr;
-
     if (m_textures[tex].m_pbo)
     {
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_pbo);
-        glBufferData(GL_PIXEL_UNPACK_BUFFER,
-                             m_textures[tex].m_data_size, nullptr, GL_STREAM_DRAW);
+        glBufferData(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_data_size, nullptr, GL_STREAM_DRAW);
         return m_glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+    }
+    else if (!create_buffer)
+    {
+        return nullptr;
     }
 
     if (m_textures[tex].m_data)
@@ -514,10 +512,9 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
         if (ClearTexture(tex) && m_textures[tex].m_data_size)
         {
             SetTextureFilters(tex, filter, wrap);
+            m_textures[tex].m_vbo = CreateVBO();
             if (use_pbo)
                 m_textures[tex].m_pbo = CreatePBO(tex);
-            if (m_extraFeaturesUsed & kGLExtVBO)
-                m_textures[tex].m_vbo = CreateVBO();
         }
         else
         {
@@ -915,7 +912,7 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
 
     glBindBuffer(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
     UpdateTextureVertices(tex, src, dst);
-    if (m_extraFeaturesUsed & kGLExtPBufObj)
+    if (m_extraFeaturesUsed & kGLBufferMap)
     {
         glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
         void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -977,7 +974,7 @@ void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
 
     glBindBuffer(GL_ARRAY_BUFFER, m_textures[first].m_vbo);
     UpdateTextureVertices(first, src, dst);
-    if (m_extraFeaturesUsed & kGLExtPBufObj)
+    if (m_extraFeaturesUsed & kGLBufferMap)
     {
         glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
         void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -1367,9 +1364,6 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
 
 uint MythRenderOpenGL::CreateVBO(void)
 {
-    if (!(m_extraFeaturesUsed & kGLExtVBO))
-        return 0;
-
     GLuint tmp_vbo;
     glGenBuffers(1, &tmp_vbo);
     return tmp_vbo;
@@ -1566,7 +1560,7 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_vboExpiry.append(ref);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        if (m_extraFeaturesUsed & kGLExtVBO)
+        if (m_extraFeaturesUsed & kGLBufferMap)
         {
             glBufferData(GL_ARRAY_BUFFER, kTextureOffset, nullptr, GL_STREAM_DRAW);
             void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);

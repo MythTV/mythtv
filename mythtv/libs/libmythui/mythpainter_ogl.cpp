@@ -181,7 +181,9 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 
     CheckFormatImage(im);
     m_HardwareCacheSize += realRender->GetTextureDataSize(tx_id);
-    realRender->GetTextureBuffer(tx_id, false);
+    void* buffer = realRender->GetTextureBuffer(tx_id, false);
+    if (buffer) // just in case...
+        memcpy(buffer, tx.bits(), realRender->GetTextureDataSize(tx_id));
     realRender->UpdateTexture(tx_id, tx.bits());
 
     m_ImageIntMap[im] = tx_id;

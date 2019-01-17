@@ -35,13 +35,9 @@ VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd
 VideoVisualGoom::~VideoVisualGoom()
 {
 #ifdef USING_OPENGL
-    if (m_surface && m_render &&
-       (m_render->Type() == kRenderOpenGL1 ||
-        m_render->Type() == kRenderOpenGL2 ||
-        m_render->Type() == kRenderOpenGL2ES))
+    if (m_surface && m_render && (m_render->Type() == kRenderOpenGL))
     {
-        MythRenderOpenGL *glrender =
-                    static_cast<MythRenderOpenGL*>(m_render);
+        MythRenderOpenGL *glrender = static_cast<MythRenderOpenGL*>(m_render);
         if (glrender)
             glrender->DeleteTexture(m_surface);
         m_surface = 0;
@@ -96,16 +92,12 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
     }
 
 #ifdef USING_OPENGL
-    if ((m_render->Type() == kRenderOpenGL1) ||
-        (m_render->Type() == kRenderOpenGL2) ||
-        (m_render->Type() == kRenderOpenGL2ES))
+    if ((m_render->Type() == kRenderOpenGL))
     {
-        MythRenderOpenGL *glrender =
-                    static_cast<MythRenderOpenGL*>(m_render);
+        MythRenderOpenGL *glrender = static_cast<MythRenderOpenGL*>(m_render);
         if (!m_surface && glrender && m_buffer)
         {
-            m_surface = glrender->CreateTexture(m_area.size(),
-                                  glrender->GetFeatures() & kGLExtPBufObj, 0,
+            m_surface = glrender->CreateTexture(m_area.size(), true, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
         }
@@ -114,15 +106,14 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         {
             if (m_buffer != last)
             {
-                bool copy = glrender->GetFeatures() & kGLExtPBufObj;
-                void* buf = glrender->GetTextureBuffer(m_surface, copy);
-                if (copy)
+                void* buf = glrender->GetTextureBuffer(m_surface, false);
+                if (buf)
                     memcpy(buf, m_buffer, m_area.width() * m_area.height() * 4);
                 glrender->UpdateTexture(m_surface, (void*)m_buffer);
             }
             QRectF src(m_area);
             QRectF dst(area);
-            glrender->DrawBitmap(&m_surface, 1, 0, &src, &dst, 0);
+            glrender->DrawBitmap(&m_surface, 1, 0, &src, &dst, nullptr);
         }
         return;
     }
@@ -169,10 +160,8 @@ static class VideoVisualGoomFactory : public VideoVisualFactory
 
     bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
-        return (type == kRenderVDPAU   ||
-                type == kRenderOpenGL1 ||
-                type == kRenderOpenGL2 ||
-                type == kRenderOpenGL2ES);
+        return (type == kRenderVDPAU ||
+                type == kRenderOpenGL);
     }
 } VideoVisualGoomFactory;
 
@@ -193,9 +182,7 @@ static class VideoVisualGoomHDFactory : public VideoVisualFactory
 
     bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
-        return (type == kRenderVDPAU   ||
-                type == kRenderOpenGL1 ||
-                type == kRenderOpenGL2 ||
-                type == kRenderOpenGL2ES);
+        return (type == kRenderVDPAU ||
+                type == kRenderOpenGL);
     }
 } VideoVisualGoomHDFactory;

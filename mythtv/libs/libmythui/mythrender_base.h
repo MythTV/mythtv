@@ -14,9 +14,7 @@ typedef enum
     kRenderUnknown = 0,
     kRenderDirect3D9,
     kRenderVDPAU,
-    kRenderOpenGL1,
-    kRenderOpenGL2,
-    kRenderOpenGL2ES,
+    kRenderOpenGL
 } RenderType;
 
 class MUI_PUBLIC MythRender : public ReferenceCounter

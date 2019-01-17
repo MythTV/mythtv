@@ -33,8 +33,7 @@ typedef enum
     kGLAppleYCbCr  = 0x0080,
     kGLMipMaps     = 0x0100,
     kGLSL          = 0x0200,
-    kGLVertexArray = 0x0400,
-    kGLExtVBO      = 0x0800,
+    kGLBufferMap   = 0x0800,
     kGLExtRGBA16   = 0x1000,
     kGLMaxFeat     = 0x2000,
 } GLFeatures;
@@ -102,7 +101,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
 {
   public:
     static MythRenderOpenGL* Create(const QString &painter, QPaintDevice* device = nullptr);
-    MythRenderOpenGL(const QSurfaceFormat &format, QPaintDevice* device, RenderType type = kRenderUnknown);
+    MythRenderOpenGL(const QSurfaceFormat &format, QPaintDevice* device, RenderType type = kRenderOpenGL);
 
     // MythRender
     void Release(void) override;
@@ -130,7 +129,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void  SetBackground(int r, int g, int b, int a);
     void  SetFence(void);
 
-    void* GetTextureBuffer(uint tex, bool create_buffer = true);
+    void* GetTextureBuffer(uint tex, bool create_buffer);
     void  UpdateTexture(uint tex, void *buf);
     uint  CreateHelperTexture(void);
     uint  CreateTexture(QSize act_size, bool use_pbo, uint type,

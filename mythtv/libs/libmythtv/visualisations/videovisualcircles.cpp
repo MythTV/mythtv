@@ -63,7 +63,6 @@ static class VideoVisualCirclesFactory : public VideoVisualFactory
 
     bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
-        return (type == kRenderOpenGL2 ||
-                type == kRenderOpenGL2ES);
+        return (type == kRenderOpenGL);
     }
 } VideoVisualCirclesFactory;

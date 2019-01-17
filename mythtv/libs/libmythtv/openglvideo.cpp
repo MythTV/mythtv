@@ -249,9 +249,8 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 #endif
 
     CheckResize(false);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 NEON: %2 PBO: %3 ForceResize: %4 Rects: %5")
-            .arg(mmx).arg(neon).arg((gl_features & kGLExtPBufObj) > 0)
-            .arg(forceResize).arg(textureType != GL_TEXTURE_2D));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 NEON: %2 ForceResize: %3 Rects: %4")
+            .arg(mmx).arg(neon).arg(forceResize).arg(textureType != GL_TEXTURE_2D));
     return true;
 }
 
@@ -716,18 +715,17 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     uint tmp_tex = 0;
-    bool use_pbo = gl_features & kGLExtPBufObj;
     if (kGLYCbCr == videoType)
     {
         uint type = (gl_features & kGLMesaYCbCr) ? GL_YCBCR_MESA : GL_YCBCR_422_APPLE;
-        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+        tmp_tex = gl_context->CreateTexture(size, true, textureType,
                                             GL_UNSIGNED_SHORT_8_8_MESA,
                                             type, GL_RGBA);
     }
     else if (kGLYV12 == videoType)
     {
         size.setHeight((3 * size.height() + 1) / 2);
-        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+        tmp_tex = gl_context->CreateTexture(size, true, textureType,
                                             GL_UNSIGNED_BYTE,   // data_type
                                             GL_LUMINANCE,       // data_fmt
                                             GL_LUMINANCE        // internal_fmt
@@ -736,12 +734,12 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
     else if (kGLUYVY == videoType)
     {
         size.setWidth(size.width() >> 1);
-        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+        tmp_tex = gl_context->CreateTexture(size, true, textureType,
                                             GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA);
     }
     else if ((kGLHQUYV == videoType) || (kGLGPU == videoType) || (kGLRGBA == videoType))
     {
-        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType);
+        tmp_tex = gl_context->CreateTexture(size, true, textureType);
     }
 
     tex_size = gl_context->GetTextureSize(size);
@@ -776,27 +774,19 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
         RotateTextures();
 
     // We need to convert frames here to avoid dependencies in MythRenderOpenGL
-    void* buf = gl_context->GetTextureBuffer(inputTextures[0]);
-    if (!buf)
-        return;
 
-    if (kGLYV12 == videoType)
+    // A buffer is not needed if we are transferring a YV12 frame directly without
+    // any conversion. If a Pixel Buffer Object is being used - that will however
+    // be returned and will need to be copied to.
+    bool usebuffer = !((kGLYV12 == videoType) && (video_dim.width() == frame->pitches[0]));
+    void* buf = gl_context->GetTextureBuffer(inputTextures[0], usebuffer);
+    if (!buf)
     {
-        if (gl_features & kGLExtPBufObj)
-        {
-            // Copy the frame to the pixel buffer which updates the texture
-            copybuffer((uint8_t*)buf, frame, video_dim.width());
-        }
-        else if (video_dim.width() != frame->pitches[0])
-        {
-            // Re-packing is needed
-            copybuffer((uint8_t*)buf, frame, video_dim.width());
-        }
-        else
-        {
-            // UpdateTexture will copy the frame to the texture
-            buf = frame->buf;
-        }
+        buf = frame->buf;
+    }
+    else if (kGLYV12 == videoType)
+    {
+        copybuffer((uint8_t*)buf, frame, video_dim.width());
     }
     else if ((kGLYCbCr == videoType) || (kGLUYVY == videoType))
     {
