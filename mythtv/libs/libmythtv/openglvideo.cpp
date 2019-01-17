@@ -1166,7 +1166,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     float maxheight  = video_dim.height() / (float)inputTextureSize.height();
     float yv12height = maxheight;
     QSize fb_size    = gl_context->GetTextureSize(video_disp_dim);
-    float fieldSize  = 1.0f / (lineHeight * 2.0f);
+    float fieldSize  = inputTextureSize.height() / 2.0f;
 
     string.replace("%FIELDHEIGHT%",   QString::number(fieldSize, 'f', 8));
     string.replace("%LINEHEIGHT%",    QString::number(lineHeight, 'f', 8));
