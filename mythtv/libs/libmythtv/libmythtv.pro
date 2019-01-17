@@ -495,6 +495,7 @@ using_frontend {
 
     using_opengl_video:DEFINES += USING_OPENGL_VIDEO
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
+    using_opengl_video:HEADERS += openglvideoshaders.h
     using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
 
     using_vaapi {
