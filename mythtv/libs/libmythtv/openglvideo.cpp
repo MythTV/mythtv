@@ -1156,37 +1156,29 @@ QString OpenGLVideo::TypeToString(VideoType Type)
 
 void OpenGLVideo::CustomiseProgramString(QString &string)
 {
-    float lineHeight = 1.0f;
-    float colWidth   = 1.0f;
-    float yselect    = 1.0f;
-    float maxwidth   = inputTextureSize.width();
-    float maxheight  = inputTextureSize.height();
-    float yv12height = video_dim.height();
+    if (inputTextureSize.isEmpty())
+        return;
+
+    float lineHeight = 1.0f / inputTextureSize.height();
+    float colWidth   = 1.0f / inputTextureSize.width();
+    float yselect    = (float)inputTextureSize.width();
+    float maxwidth   = video_dim.width()  / (float)inputTextureSize.width();
+    float maxheight  = video_dim.height() / (float)inputTextureSize.height();
+    float yv12height = maxheight;
     QSize fb_size    = gl_context->GetTextureSize(video_disp_dim);
+    float fieldSize  = 1.0f / (lineHeight * 2.0f);
 
-    if ((inputTextureSize.height() > 0) && (inputTextureSize.width() > 0))
-    {
-        lineHeight /= inputTextureSize.height();
-        colWidth   /= inputTextureSize.width();
-        yselect     = (float)inputTextureSize.width();
-        maxwidth    = video_dim.width()  / (float)inputTextureSize.width();
-        maxheight   = video_dim.height() / (float)inputTextureSize.height();
-        yv12height  = maxheight;
-    }
-
-    float fieldSize = 1.0f / (lineHeight * 2.0f);
-
-    string.replace("%2", QString::number(fieldSize, 'f', 8));
-    string.replace("%3", QString::number(lineHeight, 'f', 8));
-    string.replace("%4", QString::number(lineHeight * 2.0f, 'f', 8));
-    string.replace("%5", QString::number(colWidth, 'f', 8));
-    string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
-    string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
-    string.replace("%8", QString::number(yselect, 'f', 8));
-    string.replace("%9", QString::number(maxheight - lineHeight, 'f', 8));
-    string.replace("%WIDTH%", QString::number(maxwidth, 'f', 8));
-    string.replace("%HEIGHT%", QString::number(yv12height, 'f', 8));
-    string.replace("COLOUR_UNIFORM", COLOUR_UNIFORM);
+    string.replace("%FIELDHEIGHT%",   QString::number(fieldSize, 'f', 8));
+    string.replace("%LINEHEIGHT%",    QString::number(lineHeight, 'f', 8));
+    string.replace("%2LINEHEIGHT%",   QString::number(lineHeight * 2.0f, 'f', 8));
+    string.replace("%BICUBICCWIDTH%", QString::number(colWidth, 'f', 8));
+    string.replace("%BICUBICWIDTH%",  QString::number((float)fb_size.width(), 'f', 1));
+    string.replace("%BICUBICHEIGHT%", QString::number((float)fb_size.height(), 'f', 1));
+    string.replace("%SELECTCOL%",     QString::number(yselect, 'f', 8));
+    string.replace("%MAXHEIGHT%",     QString::number(maxheight - lineHeight, 'f', 8));
+    string.replace("%WIDTH%",         QString::number(maxwidth, 'f', 8));
+    string.replace("%HEIGHT%",        QString::number(yv12height, 'f', 8));
+    string.replace("COLOUR_UNIFORM",  COLOUR_UNIFORM);
     // TODO fix alternative swizzling by changing the YUVA packing code
     string.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
 }
