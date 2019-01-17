@@ -1155,9 +1155,6 @@ QString OpenGLVideo::TypeToString(VideoType Type)
 
 void OpenGLVideo::CustomiseProgramString(QString &string)
 {
-    string.replace("GLSL_SAMPLER", "sampler2D");
-    string.replace("GLSL_TEXTURE", "texture2D");
-
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
     float yselect    = 1.0f;
@@ -1208,64 +1205,64 @@ static const QString SelectColumn =
 "        yuva = yuva.rabg;\n";
 
 static const QString YUV2RGBFragmentShader =
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    highp vec4 yuva = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
+"    highp vec4 yuva = texture2D(s_texture0, v_texcoord0);\n"
 "SELECT_COLUMN"
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n";
 
 static const QString OneFieldShader[2] = {
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
 "    highp float field = v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
 "    field = clamp(field, 0.0, %9);\n"
-"    highp vec4 yuva = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, field));\n"
+"    highp vec4 yuva = texture2D(s_texture0, vec2(v_texcoord0.x, field));\n"
 "SELECT_COLUMN"
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
 "    highp vec2 field = vec2(0.0, step(0.5, 1.0 - fract(v_texcoord0.y * %2)) * %3);\n"
-"    highp vec4 yuva  = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
+"    highp vec4 yuva  = texture2D(s_texture0, v_texcoord0 + field);\n"
 "SELECT_COLUMN"
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
 static const QString LinearBlendShader[2] = {
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    highp vec4 yuva  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    highp vec4 above = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9)));\n"
-"    highp vec4 below = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
+"    highp vec4 yuva  = texture2D(s_texture0, v_texcoord0);\n"
+"    highp vec4 above = texture2D(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9)));\n"
+"    highp vec4 below = texture2D(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
 "SELECT_COLUMN"
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    highp vec4 yuva  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    highp vec4 above = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9)));\n"
-"    highp vec4 below = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
+"    highp vec4 yuva  = texture2D(s_texture0, v_texcoord0);\n"
+"    highp vec4 above = texture2D(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9)));\n"
+"    highp vec4 below = texture2D(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
 "SELECT_COLUMN"
@@ -1274,26 +1271,26 @@ static const QString LinearBlendShader[2] = {
 };
 
 static const QString KernelShader[2] = {
-"uniform GLSL_SAMPLER s_texture1;\n"
-"uniform GLSL_SAMPLER s_texture2;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform sampler2D s_texture2;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    highp vec4 yuva = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
+"    highp vec4 yuva = texture2D(s_texture1, v_texcoord0);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "    {\n"
 "        highp vec2 oneup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3));\n"
 "        highp vec2 twoup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %4, %3));\n"
 "        highp vec2 onedown = vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9));\n"
 "        highp vec2 twodown = vec2(v_texcoord0.x, min(v_texcoord0.y + %4, %9));\n"
-"        highp vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
-"        highp vec4 line1   = GLSL_TEXTURE(s_texture1, oneup);\n"
-"        highp vec4 line3   = GLSL_TEXTURE(s_texture1, onedown);\n"
-"        highp vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
-"        highp vec4 line00  = GLSL_TEXTURE(s_texture2, twoup);\n"
-"        highp vec4 line20  = GLSL_TEXTURE(s_texture2, v_texcoord0);\n"
-"        highp vec4 line40  = GLSL_TEXTURE(s_texture2, twodown);\n"
+"        highp vec4 line0   = texture2D(s_texture1, twoup);\n"
+"        highp vec4 line1   = texture2D(s_texture1, oneup);\n"
+"        highp vec4 line3   = texture2D(s_texture1, onedown);\n"
+"        highp vec4 line4   = texture2D(s_texture1, twodown);\n"
+"        highp vec4 line00  = texture2D(s_texture2, twoup);\n"
+"        highp vec4 line20  = texture2D(s_texture2, v_texcoord0);\n"
+"        highp vec4 line40  = texture2D(s_texture2, twodown);\n"
 "        yuva = (yuva   * 0.125);\n"
 "        yuva = (line20 * 0.125) + yuva;\n"
 "        yuva = (line1  * 0.5) + yuva;\n"
@@ -1307,26 +1304,26 @@ static const QString KernelShader[2] = {
 "    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"uniform GLSL_SAMPLER s_texture0;\n"
-"uniform GLSL_SAMPLER s_texture1;\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    highp vec4 yuva = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
+"    highp vec4 yuva = texture2D(s_texture1, v_texcoord0);\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "    {\n"
 "        highp vec2 oneup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3));\n"
 "        highp vec2 twoup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %4, %3));\n"
 "        highp vec2 onedown = vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9));\n"
 "        highp vec2 twodown = vec2(v_texcoord0.x, min(v_texcoord0.y + %4, %9));\n"
-"        highp vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
-"        highp vec4 line1   = GLSL_TEXTURE(s_texture1, oneup);\n"
-"        highp vec4 line3   = GLSL_TEXTURE(s_texture1, onedown);\n"
-"        highp vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
-"        highp vec4 line00  = GLSL_TEXTURE(s_texture0, twoup);\n"
-"        highp vec4 line20  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"        highp vec4 line40  = GLSL_TEXTURE(s_texture0, twodown);\n"
+"        highp vec4 line0   = texture2D(s_texture1, twoup);\n"
+"        highp vec4 line1   = texture2D(s_texture1, oneup);\n"
+"        highp vec4 line3   = texture2D(s_texture1, onedown);\n"
+"        highp vec4 line4   = texture2D(s_texture1, twodown);\n"
+"        highp vec4 line00  = texture2D(s_texture0, twoup);\n"
+"        highp vec4 line20  = texture2D(s_texture0, v_texcoord0);\n"
+"        highp vec4 line40  = texture2D(s_texture0, twodown);\n"
 "        yuva = (yuva   * 0.125);\n"
 "        yuva = (line20 * 0.125) + yuva;\n"
 "        yuva = (line1  * 0.5) + yuva;\n"
@@ -1368,11 +1365,11 @@ static const QString BicubicShader =
 "}\n";
 
 static const QString DefaultFragmentShader =
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    highp vec4 color = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
+"    highp vec4 color = texture2D(s_texture0, v_texcoord0);\n"
 "    gl_FragColor = vec4(color.xyz, 1.0);\n"
 "}\n";
 
@@ -1388,7 +1385,7 @@ static const QString YV12RGBVertexShader =
 "}\n";
 
 #define SAMPLEYVU "\
-vec3 sampleYVU(in GLSL_SAMPLER texture, highp vec2 texcoordY)\n\
+vec3 sampleYVU(in sampler2D texture, highp vec2 texcoordY)\n\
 {\n\
     highp vec2 texcoordV = vec2(texcoordY.s / 2.0, %HEIGHT% + texcoordY.t / 4.0);\n\
     highp vec2 texcoordU = vec2(texcoordV.s, texcoordV.t + %HEIGHT% / 4.0);\n\
@@ -1398,15 +1395,15 @@ vec3 sampleYVU(in GLSL_SAMPLER texture, highp vec2 texcoordY)\n\
         texcoordU.s += %WIDTH% / 2.0;\n\
     }\n\
     highp vec3 yvu;\n\
-    yvu.r = GLSL_TEXTURE(texture, texcoordY).r;\n\
-    yvu.g = GLSL_TEXTURE(texture, texcoordV).r;\n\
-    yvu.b = GLSL_TEXTURE(texture, texcoordU).r;\n\
+    yvu.r = texture2D(texture, texcoordY).r;\n\
+    yvu.g = texture2D(texture, texcoordV).r;\n\
+    yvu.b = texture2D(texture, texcoordU).r;\n\
     return yvu;\n\
 }\n"
 
 static const QString YV12RGBFragmentShader =
 "//YV12RGBFragmentShader\n"
-"uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
+"uniform sampler2D s_texture0; // 4:1:1 YVU planar\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
@@ -1418,7 +1415,7 @@ SAMPLEYVU
 
 static const QString YV12RGBOneFieldFragmentShader[2] = {
 "//YV12RGBOneFieldFragmentShader 1\n"
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
@@ -1430,7 +1427,7 @@ SAMPLEYVU
 "}\n",
 
 "//YV12RGBOneFieldFragmentShader 2\n"
-"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform sampler2D s_texture0;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
@@ -1444,7 +1441,7 @@ SAMPLEYVU
 
 static const QString YV12RGBLinearBlendFragmentShader[2] = {
 "// YV12RGBLinearBlendFragmentShader - Top\n"
-"uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
+"uniform sampler2D s_texture0; // 4:1:1 YVU planar\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
@@ -1461,7 +1458,7 @@ SAMPLEYVU
 "}\n",
 
 "// YV12RGBLinearBlendFragmentShader - Bottom\n"
-"uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
+"uniform sampler2D s_texture0; // 4:1:1 YVU planar\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
@@ -1478,7 +1475,7 @@ SAMPLEYVU
 "}\n"};
 
 #define KERNELYVU "\
-vec3 kernelYVU(in highp vec3 yvu, GLSL_SAMPLER texture1, GLSL_SAMPLER texture2)\n\
+vec3 kernelYVU(in highp vec3 yvu, sampler2D texture1, sampler2D texture2)\n\
 {\n\
     highp vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n\
     highp vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n\
@@ -1505,7 +1502,7 @@ vec3 kernelYVU(in highp vec3 yvu, GLSL_SAMPLER texture1, GLSL_SAMPLER texture2)\
 
 static const QString YV12RGBKernelShader[2] = {
 "//YV12RGBKernelShader 1\n"
-"uniform GLSL_SAMPLER s_texture1, s_texture2;\n"
+"uniform sampler2D s_texture1, s_texture2;\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
@@ -1519,7 +1516,7 @@ KERNELYVU
 "}\n",
 
 "//YV12RGBKernelShader 2\n"
-"uniform GLSL_SAMPLER s_texture0, s_texture1; // 4:1:1 YVU planar\n"
+"uniform sampler2D s_texture0, s_texture1; // 4:1:1 YVU planar\n"
 "uniform highp mat4 COLOUR_UNIFORM;\n"
 "varying highp vec2 v_texcoord0;\n"
 SAMPLEYVU
