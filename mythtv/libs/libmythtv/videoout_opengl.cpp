@@ -53,28 +53,24 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     // OpenGL UYVY
     opts.renderers->append("opengl");
     opts.deints->insert("opengl", cpudeints + gldeints);
-    (*opts.deints)["opengl"].append("bobdeint");
     (*opts.osds)["opengl"].append("opengl2");
     opts.priorities->insert("opengl", 65);
 
     // OpenGL HQ UYV
     opts.renderers->append("opengl-hquyv");
     opts.deints->insert("opengl-hquyv", cpudeints + gldeints);
-    (*opts.deints)["opengl-hquyv"].append("bobdeint");
     (*opts.osds)["opengl-hquyv"].append("opengl2");
     opts.priorities->insert("opengl-hquyv", 60);
 
     // OpenGL YV12
     opts.renderers->append("opengl-yv12");
     opts.deints->insert("opengl-yv12", cpudeints + gldeints);
-    (*opts.deints)["opengl-yv12"].append("bobdeint");
     (*opts.osds)["opengl-yv12"].append("opengl2");
     opts.priorities->insert("opengl-yv12", 65);
 
     // lite (YCbCr) profile - no colourspace control, GPU deinterlacing
     opts.renderers->append("opengl-lite");
     opts.deints->insert("opengl-lite", cpudeints);
-    (*opts.deints)["opengl-lite"].append("bobdeint");
     (*opts.osds)["opengl-lite"].append("opengl2");
     opts.priorities->insert("opengl-lite", 50);
 
@@ -512,12 +508,8 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
     if (filterList && sw_frame && !dummy)
         filterList->ProcessFrame(frame);
 
-    bool safepauseframe = pauseframe && !IsBobDeint();
-    if (sw_frame && deint_proc && m_deinterlaceBeforeOSD &&
-       (!pauseframe || safepauseframe) && !dummy)
-    {
+    if (sw_frame && deint_proc && m_deinterlaceBeforeOSD && !pauseframe && !dummy)
         m_deintFilter->ProcessFrame(frame, scan);
-    }
 
     if (!window.IsEmbedding())
     {
@@ -525,17 +517,11 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
         ShowPIPs(frame, pipPlayers);
     }
 
-    if (sw_frame && (!pauseframe || safepauseframe) &&
-        deint_proc && !m_deinterlaceBeforeOSD && !dummy)
-    {
+    if (sw_frame && deint_proc && !m_deinterlaceBeforeOSD && !pauseframe && !dummy)
         m_deintFilter->ProcessFrame(frame, scan);
-    }
 
     if (gl_videochain && sw_frame && !dummy)
-    {
-        bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");
-        gl_videochain->UpdateInputFrame(frame, soft_bob);
-    }
+        gl_videochain->UpdateInputFrame(frame);
 }
 
 void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
@@ -549,7 +535,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     if (!buffer)
     {
         buffer = vbuffers.GetScratchFrame();
-        if (m_deinterlacing && !IsBobDeint())
+        if (m_deinterlacing)
             t = kScan_Interlaced;
     }
 
@@ -613,8 +599,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
-        gl_videochain->PrepareFrame(buffer->top_field_first, t,
-                                    m_deinterlacing, framesPlayed, m_stereo);
+        gl_videochain->PrepareFrame(buffer->top_field_first, t, framesPlayed, m_stereo);
     }
 
     // PiPs/PBPs
@@ -628,14 +613,12 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                 bool active = gl_pipchain_active == *it;
                 if (twopass)
                     gl_context->SetViewPort(first, true);
-                (*it)->PrepareFrame(buffer->top_field_first, t,
-                                    m_deinterlacing, framesPlayed,
+                (*it)->PrepareFrame(buffer->top_field_first, t, framesPlayed,
                                     kStereoscopicModeNone, active);
                 if (twopass)
                 {
                     gl_context->SetViewPort(second, true);
-                    (*it)->PrepareFrame(buffer->top_field_first, t,
-                                    m_deinterlacing, framesPlayed,
+                    (*it)->PrepareFrame(buffer->top_field_first, t, framesPlayed,
                                     kStereoscopicModeNone, active);
                     gl_context->SetViewPort(main);
                 }

@@ -259,15 +259,15 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
  *   Determine if the output is to be scaled at all and create or destroy
  *   the appropriate filter as necessary.
  */
-void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
+void OpenGLVideo::CheckResize(bool deinterlacing)
 {
     // to improve performance on slower cards when deinterlacing
     bool resize_up = ((video_disp_dim.height() < display_video_rect.height()) ||
-                     (video_disp_dim.width() < display_video_rect.width())) && allow;
+                     (video_disp_dim.width() < display_video_rect.width()));
 
     // to ensure deinterlacing works correctly
     bool resize_down = (video_disp_dim.height() > display_video_rect.height()) &&
-                        deinterlacing && allow;
+                        deinterlacing;
 
     // UYVY packed pixels must be sampled exactly and any overscan settings will
     // break sampling - so always force an extra stage
@@ -310,7 +310,7 @@ void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
     display_video_rect = dispvidrect;
     video_rect = vidrect;
     gl_context->makeCurrent();
-    CheckResize(hardwareDeinterlacing, softwareDeinterlacer.isEmpty() ? true : softwareDeinterlacer != "bobdeint");
+    CheckResize(hardwareDeinterlacing);
     gl_context->doneCurrent();
 }
 
@@ -758,13 +758,10 @@ uint OpenGLVideo::GetTextureType(void) const
     return textureType;
 }
 
-/**
- *  Update the current input texture using the data from the given YV12 video
- *  frame. If the required hardware support is not available, fall back to
- *  software YUV->RGB conversion.
+/*! \brief Update the current input texture using the data from the given YV12 video
+ *  frame.
  */
-
-void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
+void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
 {
     OpenGLLocker ctx_lock(gl_context);
 
@@ -811,7 +808,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         AVFrame img_out;
         m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_RGBA);
     }
-    else if (kGLHQUYV == videoType && frame->interlaced_frame && !soft_bob)
+    else if (kGLHQUYV == videoType && frame->interlaced_frame)
     {
         pack_yv12interlaced(frame->buf, (unsigned char*)buf, frame->offsets,
                             frame->pitches, video_dim);
@@ -837,7 +834,7 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
     if (softwareDeinterlacer != filter)
     {
         gl_context->makeCurrent();
-        CheckResize(false, filter != "bobdeint");
+        CheckResize(false);
         gl_context->doneCurrent();
     }
     softwareDeinterlacer = filter;
@@ -858,7 +855,6 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
  */
 
 void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
-                               bool softwareDeinterlacing,
                                long long, StereoscopicMode stereo,
                                bool draw_border)
 {
@@ -866,10 +862,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         return;
 
     OpenGLLocker ctx_lock(gl_context);
-
-    // we need to special case software bobdeint for 1080i
-    bool softwarebob = softwareDeinterlacer == "bobdeint" &&
-                       softwareDeinterlacing;
 
     vector<GLuint> inputs = inputTextures;
     QSize inputsize = inputTextureSize;
@@ -881,48 +873,17 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         OpenGLFilterType type = it->first;
         OpenGLFilter *filter = it->second;
 
-        bool actual = softwarebob && (filter->outputBuffer == kDefaultBuffer);
-
         // texture coordinates
-        float trueheight = (float)(actual ? video_dim.height() :
-                                            video_disp_dim.height());
         float width = video_disp_dim.width();
         if (kGLUYVY == videoType)
             width /= 2.0f;
-
-        QRectF trect(QPoint(0, 0), QSize(width, trueheight));
+        QRectF trect(QPoint(0, 0), QSize(width, video_disp_dim.height()));
 
         // only apply overscan on last filter
         if (filter->outputBuffer == kDefaultBuffer)
             trect.setCoords(video_rect.left(),  video_rect.top(),
                             video_rect.left() + video_rect.width(),
                             video_rect.top()  + video_rect.height());
-
-        if (inputsize.height() > 0)
-            trueheight /= inputsize.height();
-
-        // software bobdeint
-        if (actual)
-        {
-            bool top = (scan == kScan_Intr2ndField && topfieldfirst) ||
-                       (scan == kScan_Interlaced && !topfieldfirst);
-            bool bot = (scan == kScan_Interlaced && topfieldfirst) ||
-                       (scan == kScan_Intr2ndField && !topfieldfirst);
-            bool first = filters.size() < 2;
-            float bob = (trueheight / (float)video_disp_dim.height()) / 4.0f;
-            if ((top && !first) || (bot && first))
-            {
-                trect.setBottom(trect.bottom() / 2);
-                trect.setTop(trect.top() / 2);
-                trect.adjust(0, bob, 0, bob);
-            }
-            if ((bot && !first) || (top && first))
-            {
-                trect.setTop(static_cast<qreal>(trueheight / 2) + (trect.top() / 2));
-                trect.setBottom(static_cast<qreal>(trueheight / 2) + (trect.bottom() / 2));
-                trect.adjust(0, -bob, 0, -bob);
-            }
-        }
 
         // discard stereoscopic fields
         if (filter->outputBuffer == kDefaultBuffer)

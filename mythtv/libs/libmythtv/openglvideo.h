@@ -54,7 +54,7 @@ class OpenGLVideo
 
     uint GetInputTexture(void) const;
     uint GetTextureType(void) const;
-    void UpdateInputFrame(const VideoFrame *frame, bool soft_bob = false);
+    void UpdateInputFrame(const VideoFrame *frame);
 
     /// \brief Public interface to AddFilter(OpenGLFilterType filter)
     bool AddFilter(const QString &filter)
@@ -69,7 +69,6 @@ class OpenGLVideo
     void SetSoftwareDeinterlacer(const QString &filter);
 
     void PrepareFrame(bool topfieldfirst, FrameScanType scan,
-                      bool softwareDeinterlacing,
                       long long frame, StereoscopicMode stereo,
                       bool draw_border = false);
 
@@ -86,7 +85,7 @@ class OpenGLVideo
     void SetViewPort(const QSize &new_viewport_size);
     bool AddFilter(OpenGLFilterType filter);
     bool RemoveFilter(OpenGLFilterType filter);
-    void CheckResize(bool deinterlacing, bool allow = true);
+    void CheckResize(bool deinterlacing);
     bool OptimiseFilters(void);
     bool AddFrameBuffer(uint &framebuffer, uint &texture, QSize vid_size);
     QOpenGLShaderProgram* AddFragmentProgram(OpenGLFilterType name,
