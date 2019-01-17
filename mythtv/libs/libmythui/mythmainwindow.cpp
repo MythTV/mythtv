@@ -1071,6 +1071,10 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
                     "hardware/drivers. Falling back to Qt painter.");
                 d->render->DecrRef();
                 d->render = nullptr;
+                delete d->painter;
+                delete d->paintwin;
+                d->painter = nullptr;
+                d->paintwin = nullptr;
             }
         }
     }
