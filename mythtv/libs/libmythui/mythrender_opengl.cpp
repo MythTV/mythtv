@@ -47,8 +47,8 @@ static const QString kDefaultVertexShader =
 
 static const QString kDefaultFragmentShader =
 "uniform sampler2D s_texture0;\n"
-"varying vec4 v_color;\n"
-"varying vec2 v_texcoord0;\n"
+"varying highp vec4 v_color;\n"
+"varying highp vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
 "    gl_FragColor = texture2D(s_texture0, v_texcoord0) * v_color;\n"
@@ -66,7 +66,7 @@ static const QString kSimpleVertexShader =
 "}\n";
 
 static const QString kSimpleFragmentShader =
-"varying vec4 v_color;\n"
+"varying highp vec4 v_color;\n"
 "void main(void)\n"
 "{\n"
 "    gl_FragColor = v_color;\n"
@@ -86,50 +86,50 @@ static const QString kDrawVertexShader =
 "}\n";
 
 static const QString kCircleFragmentShader =
-"varying vec4 v_color;\n"
-"varying vec2 v_position;\n"
-"uniform mat4 u_parameters;\n"
+"varying highp vec4 v_color;\n"
+"varying highp vec2 v_position;\n"
+"uniform highp mat4 u_parameters;\n"
 "void main(void)\n"
 "{\n"
-"    float dis = distance(v_position.xy, u_parameters[0].xy);\n"
-"    float mult = smoothstep(u_parameters[0].z, u_parameters[0].w, dis);\n"
+"    highp float dis = distance(v_position.xy, u_parameters[0].xy);\n"
+"    highp float mult = smoothstep(u_parameters[0].z, u_parameters[0].w, dis);\n"
 "    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 static const QString kCircleEdgeFragmentShader =
-"varying vec4 v_color;\n"
-"varying vec2 v_position;\n"
-"uniform mat4 u_parameters;\n"
+"varying highp vec4 v_color;\n"
+"varying highp vec2 v_position;\n"
+"uniform highp mat4 u_parameters;\n"
 "void main(void)\n"
 "{\n"
-"    float dis = distance(v_position.xy, u_parameters[0].xy);\n"
-"    float rad = u_parameters[0].z;\n"
-"    float wid = u_parameters[0].w;\n"
-"    float mult = smoothstep(rad + wid, rad + (wid - 1.0), dis) * smoothstep(rad - (wid + 1.0), rad - wid, dis);\n"
+"    highp float dis = distance(v_position.xy, u_parameters[0].xy);\n"
+"    highp float rad = u_parameters[0].z;\n"
+"    highp float wid = u_parameters[0].w;\n"
+"    highp float mult = smoothstep(rad + wid, rad + (wid - 1.0), dis) * smoothstep(rad - (wid + 1.0), rad - wid, dis);\n"
 "    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 static const QString kVertLineFragmentShader =
-"varying vec4 v_color;\n"
-"varying vec2 v_position;\n"
-"uniform mat4 u_parameters;\n"
+"varying highp vec4 v_color;\n"
+"varying highp vec2 v_position;\n"
+"uniform highp mat4 u_parameters;\n"
 "void main(void)\n"
 "{\n"
-"    float dis = abs(u_parameters[0].x - v_position.x);\n"
-"    float y = u_parameters[0].y * 2.0;\n"
-"    float mult = smoothstep(y, y - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
+"    highp float dis = abs(u_parameters[0].x - v_position.x);\n"
+"    highp float y = u_parameters[0].y * 2.0;\n"
+"    highp float mult = smoothstep(y, y - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
 "    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 static const QString kHorizLineFragmentShader =
-"varying vec4 v_color;\n"
-"varying vec2 v_position;\n"
-"uniform mat4 u_parameters;\n"
+"varying highp vec4 v_color;\n"
+"varying highp vec2 v_position;\n"
+"uniform highp mat4 u_parameters;\n"
 "void main(void)\n"
 "{\n"
-"    float dis = abs(u_parameters[0].x - v_position.y);\n"
-"    float x = u_parameters[0].y * 2.0;\n"
-"    float mult = smoothstep(x, x - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
+"    highp float dis = abs(u_parameters[0].x - v_position.y);\n"
+"    highp float x = u_parameters[0].y * 2.0;\n"
+"    highp float mult = smoothstep(x, x - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
 "    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
@@ -1807,11 +1807,11 @@ inline QOpenGLShaderProgram* ShaderError(QOpenGLShaderProgram *Shader, const QSt
     QString type = Source.isEmpty() ? "Shader link" : "Shader compile";
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("%1 error").arg(type));
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("Log:"));
-    LOG(VB_GENERAL, LOG_ERR, Shader->log());
+    LOG(VB_GENERAL, LOG_ERR, "\n" + Shader->log());
     if (!Source.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Source:"));
-        LOG(VB_GENERAL, LOG_ERR, Source);
+        LOG(VB_GENERAL, LOG_ERR, "\n" + Source);
     }
     delete Shader;
     return nullptr;
