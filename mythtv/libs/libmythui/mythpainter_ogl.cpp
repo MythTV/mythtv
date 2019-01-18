@@ -217,7 +217,7 @@ void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
     if ((fillBrush.style() == Qt::SolidPattern ||
          fillBrush.style() == Qt::NoBrush) && realRender)
     {
-        realRender->DrawRect(area, fillBrush, linePen, alpha);
+        realRender->DrawRect(target, area, fillBrush, linePen, alpha);
         return;
     }
     MythPainter::DrawRect(area, fillBrush, linePen, alpha);
@@ -232,7 +232,7 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int cornerRadius,
         if (fillBrush.style() == Qt::SolidPattern ||
             fillBrush.style() == Qt::NoBrush)
         {
-            realRender->DrawRoundRect(area, cornerRadius, fillBrush,
+            realRender->DrawRoundRect(target, area, cornerRadius, fillBrush,
                                       linePen, alpha);
             return;
         }

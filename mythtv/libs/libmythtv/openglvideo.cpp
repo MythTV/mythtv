@@ -925,7 +925,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                            piprectf.width(), piprectf.height());
             static const QPen nopen(Qt::NoPen);
             static const QBrush redbrush(QBrush(QColor(127, 0, 0, 255)));
-            gl_context->DrawRect(piprect, redbrush, nopen, 255);
+            gl_context->DrawRect(target, piprect, redbrush, nopen, 255);
         }
 
         // bind correct textures

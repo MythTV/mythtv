@@ -849,21 +849,23 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRect(const QRect &area, const QBrush &fillBrush,
+void MythRenderOpenGL::DrawRect(QOpenGLFramebufferObject *target,
+                                const QRect &area, const QBrush &fillBrush,
                                 const QPen &linePen, int alpha)
 {
     makeCurrent();
-    BindFramebuffer(nullptr);
+    BindFramebuffer(target);
     DrawRectPriv(area, fillBrush, linePen, alpha);
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRoundRect(const QRect &area, int cornerRadius,
+void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *target,
+                                     const QRect &area, int cornerRadius,
                                      const QBrush &fillBrush,
                                      const QPen &linePen, int alpha)
 {
     makeCurrent();
-    BindFramebuffer(nullptr);
+    BindFramebuffer(target);
     DrawRoundRectPriv(area, cornerRadius, fillBrush, linePen, alpha);
     doneCurrent();
 }

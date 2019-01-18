@@ -169,9 +169,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
                     QOpenGLFramebufferObject *target,
                     const QRectF *src, const QRectF *dst,
                     QOpenGLShaderProgram *Program);
-    void DrawRect(const QRect &area, const QBrush &fillBrush,
+    void DrawRect(QOpenGLFramebufferObject *target,
+                  const QRect &area, const QBrush &fillBrush,
                   const QPen &linePen, int alpha);
-    void DrawRoundRect(const QRect &area, int cornerRadius,
+    void DrawRoundRect(QOpenGLFramebufferObject *target,
+                       const QRect &area, int cornerRadius,
                        const QBrush &fillBrush, const QPen &linePen,
                        int alpha);
     bool RectanglesAreAccelerated(void) { return true; }
