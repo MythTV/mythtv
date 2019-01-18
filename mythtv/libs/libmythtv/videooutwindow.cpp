@@ -952,7 +952,9 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
 {
     if (bottomline)
     {
+        mz_move.setX(0);
         mz_move.setY(0);
+        mz_scale_h = 1.0;
         mz_scale_v = 1.0;
         bottomline = false;
     }
@@ -960,11 +962,21 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
     {
         const float zf = 0.02;
 
-        int y = gCoreContext->GetNumSetting("OSDMoveBottomLine", 4);
+        int x = gCoreContext->GetNumSetting("OSDMoveXBottomLine", 0);
+        mz_move.setX(x);
+
+        int y = gCoreContext->GetNumSetting("OSDMoveYBottomLine", 5);
         mz_move.setY(y);
-        double z = static_cast<double>
-                   (gCoreContext->GetNumSetting("OSDZoomBottomLine", 112)) / 100.0;
-        mz_scale_v = snap(z, 1.0f, zf / 2);
+
+        double h = static_cast<double>
+                   (gCoreContext->GetNumSetting("OSDScaleHBottomLine", 100)) /
+                   100.0;
+        mz_scale_h = snap(h, 1.0f, zf / 2);
+
+        double v = static_cast<double>
+                   (gCoreContext->GetNumSetting("OSDScaleVBottomLine", 112)) /
+                   100.0;
+        mz_scale_v = snap(v, 1.0f, zf / 2);
 
         bottomline = true;
     }
@@ -974,8 +986,11 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
 
 void VideoOutWindow::SaveBottomLine(void)
 {
-    gCoreContext->SaveSetting("OSDMoveBottomLine", GetMzMove().y());
-    gCoreContext->SaveSetting("OSDZoomBottomLine", GetMzScaleV() * 100.0f);
+    gCoreContext->SaveSetting("OSDMoveXBottomLine", GetMzMove().x());
+    gCoreContext->SaveSetting("OSDMoveYBottomLine", GetMzMove().y());
+
+    gCoreContext->SaveSetting("OSDScaleHBottomLine", GetMzScaleH() * 100.0f);
+    gCoreContext->SaveSetting("OSDScaleVBottomLine", GetMzScaleV() * 100.0f);
 }
 
 QString VideoOutWindow::GetZoomString(void) const
