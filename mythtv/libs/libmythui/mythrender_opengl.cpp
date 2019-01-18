@@ -34,12 +34,9 @@ static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 {
-    int error = glGetError();
-    if (error)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1: %2 @ %3, %4")
-            .arg(loc).arg(error).arg(fileName).arg(n));
-    }
+    GLenum error;
+    while((error = glGetError()) != GL_NO_ERROR)
+        LOG(VB_GENERAL, LOG_ERR, QString("%1: %2 @ %3, %4").arg(loc).arg(error).arg(fileName).arg(n));
     return error;
 }
 
@@ -928,7 +925,6 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
                             kTextureOffset);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glCheck();
 
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
