@@ -21,8 +21,7 @@ class OpenGLFilter
     public:
         vector<QOpenGLShaderProgram*> fragmentPrograms;
         uint           numInputs;
-        vector<GLuint> frameBuffers;
-        vector<GLuint> frameBufferTextures;
+        vector<QOpenGLFramebufferObject*> frameBuffers;
         DisplayBuffer  outputBuffer;
 };
 
@@ -335,16 +334,13 @@ bool OpenGLVideo::OptimiseFilters(void)
             int buffers_diff = buffers_needed - buffers_have;
             if (buffers_diff > 0)
             {
-                uint tmp_buf, tmp_tex;
                 for (int i = 0; i < buffers_diff; i++)
                 {
-                    if (!AddFrameBuffer(tmp_buf, tmp_tex, video_disp_dim))
-                        return false;
+                    QOpenGLFramebufferObject *tmp = gl_context->CreateFramebuffer(video_disp_dim);
+                    if (tmp)
+                        it->second->frameBuffers.push_back(tmp);
                     else
-                    {
-                        it->second->frameBuffers.push_back(tmp_buf);
-                        it->second->frameBufferTextures.push_back(tmp_tex);
-                    }
+                        return false;
                 }
             }
             else if (buffers_diff < 0)
@@ -352,14 +348,8 @@ bool OpenGLVideo::OptimiseFilters(void)
                 for (int i = 0; i > buffers_diff; i--)
                 {
                     OpenGLFilter *filt = it->second;
-
-                    gl_context->DeleteFrameBuffer(
-                        filt->frameBuffers.back());
-                    gl_context->DeleteTexture(
-                        filt->frameBufferTextures.back());
-
+                    gl_context->DeleteFramebuffer(filt->frameBuffers.back());
                     filt->frameBuffers.pop_back();
-                    filt->frameBufferTextures.pop_back();
                 }
             }
         }
@@ -372,7 +362,6 @@ bool OpenGLVideo::OptimiseFilters(void)
     }
 
     SetFiltering();
-
     return true;
 }
 
@@ -399,13 +388,13 @@ void OpenGLVideo::SetFiltering(void)
     {
         if (last_filter == 1)
         {
-            SetTextureFilters(&(rit->second->frameBufferTextures),
-                              GL_LINEAR, GL_CLAMP_TO_EDGE);
+            foreach (QOpenGLFramebufferObject* fb, rit->second->frameBuffers)
+                gl_context->SetTextureFilters(fb->texture(), GL_LINEAR, GL_CLAMP_TO_EDGE);
         }
         else if (last_filter > 1)
         {
-            SetTextureFilters(&(rit->second->frameBufferTextures),
-                              GL_NEAREST, GL_CLAMP_TO_EDGE);
+            foreach (QOpenGLFramebufferObject* fb, rit->second->frameBuffers)
+                gl_context->SetTextureFilters(fb->texture(), GL_NEAREST, GL_CLAMP_TO_EDGE);
         }
         ++last_filter;
     }
@@ -498,7 +487,6 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     {
         temp->outputBuffer = kDefaultBuffer;
         temp->frameBuffers.clear();
-        temp->frameBufferTextures.clear();
         filters[filter] = temp;
         temp = nullptr;
         success &= OptimiseFilters();
@@ -527,12 +515,10 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
         gl_context->DeleteShaderProgram(*it);
     filters[filter]->fragmentPrograms.clear();
 
-    vector<GLuint>::const_iterator it2 = filters[filter]->frameBuffers.cbegin();
+    vector<QOpenGLFramebufferObject*>::const_iterator it2 = filters[filter]->frameBuffers.cbegin();
     for ( ; it2 != filters[filter]->frameBuffers.cend(); ++it2)
-        gl_context->DeleteFrameBuffer(*it2);
+        gl_context->DeleteFramebuffer(*it2);
     filters[filter]->frameBuffers.clear();
-
-    DeleteTextures(&(filters[filter]->frameBufferTextures));
 
     delete filters[filter];
     filters.erase(filter);
@@ -669,29 +655,6 @@ QOpenGLShaderProgram* OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
     }
 
     return gl_context->CreateShaderProgram(vertex, fragment);
-}
-
-/**
- *  Add a FrameBuffer object of the correct size to the given texture.
- */
-
-bool OpenGLVideo::AddFrameBuffer(uint &framebuffer,
-                                 uint &texture, QSize vid_size)
-{
-    if (!(gl_features & kGLExtFBufObj))
-    {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Framebuffer binding not supported.");
-        return false;
-    }
-
-    texture = gl_context->CreateTexture(vid_size, false, textureType);
-
-    bool ok = gl_context->CreateFrameBuffer(framebuffer, texture);
-
-    if (!ok)
-        gl_context->DeleteTexture(texture);
-
-    return ok;
 }
 
 void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
@@ -920,12 +883,12 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             vrect.adjust(0, bob, 0, bob);
         }
 
-        uint target = 0;
+        QOpenGLFramebufferObject *target = nullptr;
         // bind correct frame buffer (default onscreen) and set viewport
         switch (filter->outputBuffer)
         {
             case kDefaultBuffer:
-                gl_context->BindFramebuffer(0);
+                gl_context->BindFramebuffer(target);
                 if (viewportControl)
                     gl_context->SetViewPort(QRect(QPoint(), display_visible_rect.size()));
                 else
@@ -934,12 +897,11 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             case kFrameBufferObject:
                 if (!filter->frameBuffers.empty())
                 {
-                    gl_context->BindFramebuffer(filter->frameBuffers[0]);
-                    gl_context->SetViewPort(QRect(QPoint(), frameBufferRect.size()));
                     target = filter->frameBuffers[0];
+                    gl_context->BindFramebuffer(target);
+                    gl_context->SetViewPort(QRect(QPoint(), frameBufferRect.size()));
                 }
                 break;
-
             default:
                 continue;
         }
@@ -1003,7 +965,10 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         gl_context->DrawBitmap(textures, texture_count, target, &trect, &vrect,
                                program);
 
-        inputs = filter->frameBufferTextures;
+
+        inputs.clear();
+        foreach (QOpenGLFramebufferObject* fb, filter->frameBuffers)
+            inputs.push_back(fb->texture());
         inputsize = realsize;
     }
 }

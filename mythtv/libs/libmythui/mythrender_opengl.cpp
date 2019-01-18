@@ -223,6 +223,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_features & Buffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer blitting : %1").arg(GLYesNo(QOpenGLFramebufferObject::hasOpenGLFramebufferBlit())));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("YCbCr textures       : %1")
         .arg(GLYesNo((m_extraFeatures & kGLMesaYCbCr) || (m_extraFeatures & kGLAppleYCbCr))));
@@ -685,8 +686,11 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
 
     makeCurrent();
 
-    GLuint gltex = tex;
-    glDeleteTextures(1, &gltex);
+    if (!m_textures[tex].m_external)
+    {
+        GLuint gltex = tex;
+        glDeleteTextures(1, &gltex);
+    }
     if (m_textures[tex].m_data)
         delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
@@ -699,127 +703,71 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
     doneCurrent();
 }
 
-bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
+QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size)
 {
-    if (!(m_extraFeaturesUsed & kGLExtFBufObj))
-        return false;
+    if (!(m_features & Framebuffers))
+        return nullptr;
 
-    if (!m_textures.contains(tex))
-        return false;
-
-    QSize size = m_textures[tex].m_size;
-    GLuint glfb;
-
-    makeCurrent();
-    glCheck();
-
-    EnableTextures(tex);
-    QRect tmp_viewport = m_viewport;
-    glViewport(0, 0, size.width(), size.height());
-    glGenFramebuffers(1, &glfb);
-    glBindFramebuffer(GL_FRAMEBUFFER, glfb);
-    glBindTexture(m_textures[tex].m_type, tex);
-    glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                 size.width(), size.height(), 0,
-                 m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                             m_textures[tex].m_type, tex, 0);
-
-    GLenum status;
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(tmp_viewport.left(), tmp_viewport.top(),
-               tmp_viewport.width(), tmp_viewport.height());
-
-    bool success = false;
-    switch (status)
+    OpenGLLocker locker(this);
+    QOpenGLFramebufferObject *framebuffer = new QOpenGLFramebufferObject(Size);
+    if (framebuffer->isValid())
     {
-        case GL_FRAMEBUFFER_COMPLETE:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Created frame buffer object (%1x%2).")
-                    .arg(size.width()).arg(size.height()));
-            success = true;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Frame buffer incomplete_ATTACHMENT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Frame buffer incomplete_MISSING_ATTACHMENT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Frame buffer incomplete_DUPLICATE_ATTACHMENT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Frame buffer incomplete_DIMENSIONS");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Frame buffer incomplete_FORMATS");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Frame buffer incomplete_DRAW_BUFFER");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Frame buffer incomplete_READ_BUFFER");
-            break;
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Frame buffer unsupported.");
-            break;
-        default:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Unknown frame buffer error %1.").arg(status));
-    }
-
-    if (success)
-        m_framebuffers.push_back(glfb);
-    else
-        glDeleteFramebuffers(1, &glfb);
-
-    Flush(true);
-    glCheck();
-    doneCurrent();
-    fb = glfb;
-    return success;
-}
-
-void MythRenderOpenGL::DeleteFrameBuffer(uint fb)
-{
-    if (!m_framebuffers.contains(fb))
-        return;
-
-    makeCurrent();
-    QVector<GLuint>::iterator it;
-    for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
-    {
-        if (*it == fb)
+        LOG(VB_GENERAL, LOG_INFO, QString("Created FBO: %1x%2 id %3 texture %4 attach %5 bound %6")
+            .arg(framebuffer->width()).arg(framebuffer->height())
+            .arg(framebuffer->handle()).arg(framebuffer->texture())
+            .arg(framebuffer->attachment()).arg(framebuffer->isBound()));
+        if (framebuffer->isBound())
         {
-            glDeleteFramebuffers(1, &(*it));
-            m_framebuffers.erase(it);
-            break;
+            m_activeFramebuffer = framebuffer;
+            BindFramebuffer(nullptr);
         }
-    }
 
-    Flush(true);
-    doneCurrent();
+        // Add the texture to our known list. This is probably temporary code
+        // but we need a VBO to render the texture. We should not be attempting
+        // to create any PBOs or texture memory so data size should not be
+        // critical.
+        MythGLTexture texture(true /*external - don't delete!*/);
+        GLuint textureid    = framebuffer->texture();
+        texture.m_type      = framebuffer->format().textureTarget();
+        texture.m_size      = texture.m_act_size = framebuffer->size();
+        texture.m_data_type = GL_UNSIGNED_BYTE; // NB Guess!
+        texture.m_data_fmt  = texture.m_internal_fmt = framebuffer->format().internalTextureFormat();
+        texture.m_data_size = GetBufferSize(texture.m_size, texture.m_data_fmt, texture.m_data_type);
+        texture.m_vbo       = CreateVBO();
+        m_textures.insert(textureid, texture);
+        Flush(true);
+        m_framebuffers.append(framebuffer);
+        return framebuffer;
+    }
+    LOG(VB_GENERAL, LOG_ERR, "Failed to create framebuffer object");
+    delete framebuffer;
+    return nullptr;
 }
 
-void MythRenderOpenGL::BindFramebuffer(uint fb)
+void MythRenderOpenGL::DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 {
-    if (fb == 0)
-        fb = defaultFramebufferObject();
-
-    if (fb == m_active_fb)
+    if (!m_framebuffers.contains(Framebuffer))
         return;
 
     makeCurrent();
-    glBindFramebuffer(GL_FRAMEBUFFER, fb);
+    m_framebuffers.removeAll(Framebuffer);
+    DeleteTexture(Framebuffer->texture());
+    delete Framebuffer;
     doneCurrent();
-    m_active_fb = fb;
+}
+
+void MythRenderOpenGL::BindFramebuffer(QOpenGLFramebufferObject *Framebuffer)
+{
+    if (Framebuffer == m_activeFramebuffer)
+        return;
+
+    makeCurrent();
+    if (Framebuffer == nullptr)
+        QOpenGLFramebufferObject::bindDefault();
+    else
+        Framebuffer->bind();
+    doneCurrent();
+    m_activeFramebuffer = Framebuffer;
 }
 
 void MythRenderOpenGL::ClearFramebuffer(void)
@@ -829,15 +777,13 @@ void MythRenderOpenGL::ClearFramebuffer(void)
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src, const QRect *dst,
+void MythRenderOpenGL::DrawBitmap(uint tex, QOpenGLFramebufferObject *target,
+                                  const QRect *src, const QRect *dst,
                                   QOpenGLShaderProgram *Program, int alpha,
                                   int red, int green, int blue)
 {
     if (!tex || !m_textures.contains(tex))
         return;
-
-    if (target && !m_framebuffers.contains(target))
-        target = 0;
 
     makeCurrent();
     BindFramebuffer(target);
@@ -846,14 +792,12 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src, const
 }
 
 void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
-                                  uint target, const QRectF *src, const QRectF *dst,
+                                  QOpenGLFramebufferObject *target,
+                                  const QRectF *src, const QRectF *dst,
                                   QOpenGLShaderProgram *Program)
 {
     if (!textures || !texture_count)
         return;
-
-    if (target && !m_framebuffers.contains(target))
-        target = 0;
 
     makeCurrent();
     BindFramebuffer(target);
@@ -865,7 +809,7 @@ void MythRenderOpenGL::DrawRect(const QRect &area, const QBrush &fillBrush,
                                 const QPen &linePen, int alpha)
 {
     makeCurrent();
-    BindFramebuffer(0);
+    BindFramebuffer(nullptr);
     DrawRectPriv(area, fillBrush, linePen, alpha);
     doneCurrent();
 }
@@ -875,7 +819,7 @@ void MythRenderOpenGL::DrawRoundRect(const QRect &area, int cornerRadius,
                                      const QPen &linePen, int alpha)
 {
     makeCurrent();
-    BindFramebuffer(0);
+    BindFramebuffer(nullptr);
     DrawRoundRectPriv(area, cornerRadius, fillBrush, linePen, alpha);
     doneCurrent();
 }
@@ -1304,7 +1248,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_viewport        = QRect();
     m_active_tex      = 0;
     m_active_tex_type = 0;
-    m_active_fb       = 0;
+    m_activeFramebuffer = nullptr;
     m_blend           = false;
     m_background      = 0x00000000;
     m_flushEnabled    = true;
@@ -1372,8 +1316,8 @@ uint MythRenderOpenGL::CreateVBO(void)
 void MythRenderOpenGL::DeleteOpenGLResources(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
+    DeleteFramebuffers();
     DeleteTextures();
-    DeleteFrameBuffers();
     DeleteDefaultShaders();
     DeleteShaderPrograms();
     Flush(true);
@@ -1410,7 +1354,8 @@ void MythRenderOpenGL::DeleteTextures(void)
     QHash<GLuint, MythGLTexture>::iterator it;
     for (it = m_textures.begin(); it !=m_textures.end(); ++it)
     {
-        glDeleteTextures(1, &(it.key()));
+        if (!it.value().m_external)
+            glDeleteTextures(1, &(it.key()));
         if (it.value().m_data)
             delete it.value().m_data;
         if (it.value().m_pbo)
@@ -1422,11 +1367,13 @@ void MythRenderOpenGL::DeleteTextures(void)
     Flush(true);
 }
 
-void MythRenderOpenGL::DeleteFrameBuffers(void)
+void MythRenderOpenGL::DeleteFramebuffers(void)
 {
-    QVector<GLuint>::iterator it;
-    for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
-        glDeleteFramebuffers(1, &(*(it)));
+    foreach (QOpenGLFramebufferObject *framebuffer, m_framebuffers)
+    {
+        DeleteTexture(framebuffer->texture());
+        delete framebuffer;
+    }
     m_framebuffers.clear();
     Flush(true);
 }

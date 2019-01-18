@@ -10,6 +10,7 @@
 
 class QWidget;
 class MythRenderOpenGL;
+class QOpenGLFramebufferObject;
 
 class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 {
@@ -18,7 +19,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     MythOpenGLPainter(MythRenderOpenGL *render =  nullptr, QWidget *parent = nullptr);
    ~MythOpenGLPainter();
 
-    void SetTarget(int new_target)       { target = new_target;      }
+    void SetTarget(QOpenGLFramebufferObject* new_target) { target = new_target; }
     void SetSwapControl(bool swap)       { swapControl = swap;       } 
     QString GetName(void) override // MythPainter
         { return QString("OpenGL"); }
@@ -54,7 +55,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 
     QWidget          *realParent;
     MythRenderOpenGL *realRender;
-    int               target;
+    QOpenGLFramebufferObject* target;
     bool              swapControl;
 
     QMap<MythImage *, uint>    m_ImageIntMap;

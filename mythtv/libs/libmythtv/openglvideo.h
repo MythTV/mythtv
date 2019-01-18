@@ -87,7 +87,6 @@ class OpenGLVideo
     bool RemoveFilter(OpenGLFilterType filter);
     void CheckResize(bool deinterlacing);
     bool OptimiseFilters(void);
-    bool AddFrameBuffer(uint &framebuffer, uint &texture, QSize vid_size);
     QOpenGLShaderProgram* AddFragmentProgram(OpenGLFilterType name,
                             QString deint = QString(),
                             FrameScanType field = kScan_Progressive);

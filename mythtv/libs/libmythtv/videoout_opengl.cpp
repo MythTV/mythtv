@@ -543,7 +543,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     framesPlayed = buffer->frameNumber + 1;
     gl_context_lock.unlock();
 
-    gl_context->BindFramebuffer(0);
+    gl_context->BindFramebuffer(nullptr);
     if (db_letterbox_colour == kLetterBoxColour_Gray25)
         gl_context->SetBackground(127, 127, 127, 255);
     else

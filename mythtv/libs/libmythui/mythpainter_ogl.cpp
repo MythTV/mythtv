@@ -22,7 +22,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render, QWidget *parent)
   : MythPainter(),
     realParent(parent),
     realRender(render),
-    target(0),
+    target(nullptr),
     swapControl(true)
 {
 }
@@ -117,7 +117,7 @@ void MythOpenGLPainter::End(void)
     else
     {
         realRender->Flush(false);
-        if (target == 0 && swapControl)
+        if (target == nullptr && swapControl)
             realRender->swapBuffers();
         realRender->doneCurrent();
     }
