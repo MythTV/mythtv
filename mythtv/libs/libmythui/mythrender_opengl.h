@@ -11,6 +11,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLDebugLogger>
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>
@@ -175,6 +176,10 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
                        int alpha);
     bool RectanglesAreAccelerated(void) { return true; }
 
+  public slots:
+    void messageLogged  (const QOpenGLDebugMessage &Message);
+    void logDebugMarker (const QString &Message);
+
   protected:
     ~MythRenderOpenGL();
     void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
@@ -287,6 +292,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
 
   private:
     void DebugFeatures (void);
+    QOpenGLDebugLogger *m_openglDebugger;
     QWindow *m_window;
 };
 

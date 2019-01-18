@@ -89,6 +89,10 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
 #endif
     if (qApp->platformName().contains("egl"))
         format.setRenderableType(QSurfaceFormat::OpenGLES);
+
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        format.setOption(QSurfaceFormat::DebugContext);
+
     return new MythRenderOpenGL(format, device);
 }
 
@@ -97,7 +101,8 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, QPaintDevice* d
   : QOpenGLContext(),
     QOpenGLFunctions(),
     MythRender(type),
-    m_lock(QMutex::Recursive)
+    m_lock(QMutex::Recursive),
+    m_openglDebugger(nullptr)
 {
     QWidget *w = dynamic_cast<QWidget*>(device);
     m_window = (w) ? w->windowHandle() : nullptr;
@@ -112,7 +117,26 @@ MythRenderOpenGL::~MythRenderOpenGL()
         return;
     makeCurrent();
     DeleteOpenGLResources();
+    if (m_openglDebugger)
+        delete m_openglDebugger;
     doneCurrent();
+}
+
+void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
+{
+    // filter out our own messages
+    if (Message.source() != QOpenGLDebugMessage::ApplicationSource)
+        LOG(VB_GPU, LOG_INFO, LOC + Message.message());
+}
+
+void MythRenderOpenGL::logDebugMarker(const QString &Message)
+{
+    if (m_openglDebugger)
+    {
+        QOpenGLDebugMessage message = QOpenGLDebugMessage::createApplicationMessage(
+            Message, 0, QOpenGLDebugMessage::NotificationSeverity, QOpenGLDebugMessage::MarkerType);
+        m_openglDebugger->logMessage(message);
+    }
 }
 
 bool MythRenderOpenGL::Init(void)
@@ -126,6 +150,29 @@ bool MythRenderOpenGL::Init(void)
     OpenGLLocker locker(this);
     initializeOpenGLFunctions();
     m_features = openGLFeatures();
+
+    // don't enable this by default - it can generate a lot of detail
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+    {
+        m_openglDebugger = new QOpenGLDebugLogger();
+        if (m_openglDebugger->initialize())
+        {
+            connect(m_openglDebugger, SIGNAL(messageLogged(QOpenGLDebugMessage)), this, SLOT(messageLogged(QOpenGLDebugMessage)));
+            QOpenGLDebugLogger::LoggingMode mode = QOpenGLDebugLogger::AsynchronousLogging;
+#if 0
+            // this will impact performance but can be very useful
+            mode = QOpenGLDebugLogger::SynchronousLogging;
+#endif
+            m_openglDebugger->startLogging(mode);
+            LOG(VB_GENERAL, LOG_INFO, LOC + "GPU debug logging started");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to initialise OpenGL logging");
+            delete m_openglDebugger;
+            m_openglDebugger = nullptr;
+        }
+    }
 
     InitProcs();
     Init2DState();

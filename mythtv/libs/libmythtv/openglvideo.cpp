@@ -726,6 +726,9 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
 {
     OpenGLLocker ctx_lock(gl_context);
 
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "UPDATE_FRAME_START");
+
     if (frame->width  != video_dim.width()  ||
         frame->height != video_dim.height() ||
         frame->width  < 1 || frame->height < 1 ||
@@ -773,6 +776,9 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
     }
 
     gl_context->UpdateTexture(inputTextures[0], buf);
+
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "UPDATE_FRAME_END");
 }
 
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
@@ -816,6 +822,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
     OpenGLLocker ctx_lock(gl_context);
 
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "PREP_FRAME_START");
+
     vector<GLuint> inputs = inputTextures;
     QSize inputsize = inputTextureSize;
     QSize realsize  = gl_context->GetTextureSize(video_disp_dim);
@@ -825,6 +834,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
     {
         OpenGLFilterType type = it->first;
         OpenGLFilter *filter = it->second;
+
+        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+            gl_context->logDebugMarker(LOC + QString("FILTER_START_%1").arg(FilterToString(type)));
 
         // texture coordinates
         float width = video_disp_dim.width();
@@ -971,6 +983,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             inputs.push_back(fb->texture());
         inputsize = realsize;
     }
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "PREP_FRAME_END");
 }
 
 void OpenGLVideo::RotateTextures(void)
@@ -1014,7 +1028,7 @@ OpenGLVideo::OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
 {
     OpenGLFilterType ret = kGLFilterNone;
 
-    if (filter.contains("master"))
+    if (filter.contains("yuv2rgb"))
         ret = kGLFilterYUV2RGB;
     else if (filter.contains("resize"))
         ret = kGLFilterResize;
@@ -1033,7 +1047,7 @@ QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
         case kGLFilterNone:
             break;
         case kGLFilterYUV2RGB:
-            return "master";
+            return "yuv2rgb";
         case kGLFilterResize:
             return "resize";
         case kGLFilterBicubic:

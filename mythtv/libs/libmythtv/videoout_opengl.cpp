@@ -491,6 +491,9 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
     bool deint_proc = m_deinterlacing && (m_deintFilter != nullptr);
     OpenGLLocker ctx_lock(gl_context);
 
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "PROCESS_FRAME_START");
+
     bool pauseframe = false;
     if (!frame)
     {
@@ -522,6 +525,9 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
 
     if (gl_videochain && sw_frame && !dummy)
         gl_videochain->UpdateInputFrame(frame);
+
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "PROCESS_FRAME_END");
 }
 
 void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
@@ -531,6 +537,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         return;
 
     OpenGLLocker ctx_lock(gl_context);
+
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "PREPARE_FRAME_START");
 
     if (!buffer)
     {
@@ -658,6 +667,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
 
     if (vbuffers.GetScratchFrame() == buffer)
         vbuffers.SetLastShownFrameToScratch();
+
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "PREPARE_FRAME_END");
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
@@ -669,6 +681,8 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
         return;
     }
 
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        gl_context->logDebugMarker(LOC + "SHOW");
     if (gl_context)
         gl_context->swapBuffers();
 }

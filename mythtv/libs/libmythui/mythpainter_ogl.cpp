@@ -94,6 +94,9 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
         }
     }
 
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        realRender->logDebugMarker("PAINTER_FRAME_START");
+
     DeleteTextures();
     realRender->makeCurrent();
 
@@ -114,13 +117,13 @@ void MythOpenGLPainter::End(void)
         LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'End'");
         return;
     }
-    else
-    {
-        realRender->Flush(false);
-        if (target == nullptr && swapControl)
-            realRender->swapBuffers();
-        realRender->doneCurrent();
-    }
+
+    realRender->Flush(false);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        realRender->logDebugMarker("PAINTER_FRAME_END");
+    if (target == nullptr && swapControl)
+        realRender->swapBuffers();
+    realRender->doneCurrent();
 
     MythPainter::End();
 }
