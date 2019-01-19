@@ -122,8 +122,24 @@ MythRenderOpenGL::~MythRenderOpenGL()
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
 {
     // filter out our own messages
-    if (Message.source() != QOpenGLDebugMessage::ApplicationSource)
-        LOG(VB_GPU, LOG_INFO, LOC + Message.message());
+    if (Message.source() == QOpenGLDebugMessage::ApplicationSource)
+        return;
+
+    QString type("Unknown");
+    switch (Message.type())
+    {
+        case QOpenGLDebugMessage::ErrorType: type = "Error"; break;
+        case QOpenGLDebugMessage::DeprecatedBehaviorType: type = "Deprecated"; break;
+        case QOpenGLDebugMessage::UndefinedBehaviorType: type = "Undef behaviour"; break;
+        case QOpenGLDebugMessage::PortabilityType: type = "Portability"; break;
+        case QOpenGLDebugMessage::PerformanceType: type = "Performance"; break;
+        case QOpenGLDebugMessage::OtherType: type = "Other"; break;
+        case QOpenGLDebugMessage::MarkerType: type = "Marker"; break;
+        case QOpenGLDebugMessage::GroupPushType: type = "GroupPush"; break;
+        case QOpenGLDebugMessage::GroupPopType: type = "GroupPop"; break;
+        default: break;
+    }
+    LOG(VB_GPU, LOG_INFO, QString("%1 %2: %3").arg(LOC).arg(type).arg(Message.message()));
 }
 
 void MythRenderOpenGL::logDebugMarker(const QString &Message)
