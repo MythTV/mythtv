@@ -297,6 +297,7 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     {
         RemoveFilter(kGLFilterResize);
         AddFilter(kGLFilterBicubic);
+        SetFiltering();
         return;
     }
 
@@ -304,6 +305,7 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     {
         RemoveFilter(kGLFilterBicubic);
         AddFilter(kGLFilterResize);
+        SetFiltering();
         return;
     }
 
