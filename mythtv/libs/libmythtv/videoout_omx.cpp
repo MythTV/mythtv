@@ -160,7 +160,7 @@ class GlOsdThread : public MThread
                     rectsChanged = false;
                 }
                 m_EGLRender->makeCurrent();
-                m_EGLRender->BindFramebuffer(0);
+                m_EGLRender->BindFramebuffer(nullptr);
                 m_Painter->DrawImage(m_bounds, m_osdImage,
                                   m_bounds, 255);
                 m_EGLRender->swapBuffers();
@@ -938,7 +938,7 @@ bool VideoOutputOMX::DisplayOSD(VideoFrame *frame, OSD *osd)
         && m_context && m_osdpainter)
     {
         m_context->makeCurrent();
-        m_context->BindFramebuffer(0);
+        m_context->BindFramebuffer(nullptr);
 
         QRect bounds = GetTotalOSDBounds();
         bool redraw = false;

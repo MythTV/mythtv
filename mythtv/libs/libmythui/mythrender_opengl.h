@@ -115,11 +115,10 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
 
     // These functions are not virtual in the base QOpenGLContext
     // class, so these are not overrides but new functions.
-    // TODO remove
-    void makeCurrent();
-    void doneCurrent();
+    virtual void makeCurrent();
+    virtual void doneCurrent();
+    virtual void swapBuffers();
 
-    void swapBuffers();
     void setWidget(QWidget *Widget);
     bool IsDirectRendering() const;
     bool  Init(void);
