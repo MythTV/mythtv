@@ -849,7 +849,7 @@ void MythRenderOpenGL::DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 
     makeCurrent();
     static const GLenum fbdiscards[] = { GL_COLOR_ATTACHMENT0 };
-    static const GLenum dfdiscards[] = { GL_COLOR };
+    static const GLenum dfdiscards[] = { GL_COLOR_EXT };
     BindFramebuffer(Framebuffer);
     m_glDiscardFramebuffer(GL_FRAMEBUFFER, 1, (Framebuffer ? true : defaultFramebufferObject()) ? fbdiscards : dfdiscards);
     doneCurrent();

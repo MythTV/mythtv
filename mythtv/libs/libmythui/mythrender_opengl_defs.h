@@ -17,6 +17,10 @@
 #endif
 // end workarounds
 
+#ifndef GL_COLOR_EXT
+#define GL_COLOR_EXT 0x1800
+#endif
+
 #ifndef GL_GENERATE_MIPMAP_SGIS
 #define GL_GENERATE_MIPMAP_SGIS 0x8191
 #endif
