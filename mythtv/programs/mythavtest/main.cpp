@@ -33,10 +33,15 @@ using namespace std;
 class VideoPerformanceTest
 {
   public:
-    VideoPerformanceTest(const QString &filename, bool novsync, bool onlydecode,
+    VideoPerformanceTest(const QString &filename, bool decodeno, bool onlydecode,
                          int runfor, bool deint, bool gpu)
-      : file(filename), novideosync(novsync), decodeonly(onlydecode),
-        secondstorun(runfor), deinterlace(deint), allowgpu(gpu), ctx(nullptr)
+      : file(filename),
+        nodecode(decodeno),
+        decodeonly(onlydecode),
+        secondstorun(runfor),
+        deinterlace(deint),
+        allowgpu(gpu),
+        ctx(nullptr)
     {
         if (secondstorun < 1)
             secondstorun = 1;
@@ -52,12 +57,9 @@ class VideoPerformanceTest
     void Test(void)
     {
         PIPMap dummy;
-
-        if (novideosync) // TODO
-            LOG(VB_GENERAL, LOG_INFO, "Will attempt to disable sync-to-vblank.");
-
         RingBuffer *rb  = RingBuffer::Create(file, false, true, 2000);
-        MythPlayer  *mp  = new MythPlayer((PlayerFlags)(kAudioMuted | (allowgpu ? kDecodeAllowGPU : kNoFlags)));
+        MythPlayer  *mp  = new MythPlayer(
+            (PlayerFlags)(kAudioMuted | (allowgpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         ctx = new PlayerContext("VideoPerformanceTest");
@@ -89,7 +91,9 @@ class VideoPerformanceTest
         LOG(VB_GENERAL, LOG_INFO, QString("Test will run for %1 seconds.")
             .arg(secondstorun));
 
-        if (decodeonly)
+        if (nodecode)
+            LOG(VB_GENERAL, LOG_INFO, "No decode after startup - checking display performance");
+        else if (decodeonly)
             LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
 
         bool doublerate = vo->NeedsDoubleFramerate();
@@ -113,6 +117,7 @@ class VideoPerformanceTest
 
         int ms = secondstorun * 1000;
         QTime start = QTime::currentTime();
+        VideoFrame *frame = nullptr;
         while (true)
         {
             int duration = start.msecsTo(QTime::currentTime());
@@ -139,7 +144,8 @@ class VideoPerformanceTest
 
             mp->SetBuffering(false);
             vo->StartDisplayingFrame();
-            VideoFrame *frame = vo->GetLastShownFrame();
+            if ((nodecode && !frame) || !nodecode)
+                frame = vo->GetLastShownFrame();
             mp->CheckAspectRatio(frame);
 
             if (!decodeonly)
@@ -154,7 +160,8 @@ class VideoPerformanceTest
                     vo->Show(scan);
                 }
             }
-            vo->DoneDisplayingFrame(frame);
+            if (!nodecode)
+                vo->DoneDisplayingFrame(frame);
             jitter->RecordCycleTime();
         }
         LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
@@ -163,7 +170,7 @@ class VideoPerformanceTest
 
   private:
     QString file;
-    bool    novideosync;
+    bool    nodecode;
     bool    decodeonly;
     int     secondstorun;
     bool    deinterlace;
@@ -280,7 +287,8 @@ int main(int argc, char *argv[])
         int seconds = 5;
         if (!cmdline.toString("seconds").isEmpty())
             seconds = cmdline.toInt("seconds");
-        VideoPerformanceTest *test = new VideoPerformanceTest(filename, false,
+        VideoPerformanceTest *test = new VideoPerformanceTest(filename,
+                    cmdline.toBool("nodecode"),
                     cmdline.toBool("decodeonly"), seconds,
                     cmdline.toBool("deinterlace"),
                     cmdline.toBool("gpu"));

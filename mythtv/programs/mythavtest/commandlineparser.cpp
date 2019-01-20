@@ -27,17 +27,21 @@ void MythAVTestCommandLineParser::LoadArguments(void)
     add(QStringList{"-t", "--test"}, "test", false,
                     "Test video performance.",
                     "Test and debug video playback performance."
-                    "Audio, captions, deinterlacing and the On Screen Display will all "
+                    "Audio, captions and the On Screen Display will all "
                     "be disabled and video will be displayed at the fastest possible rate. ")
                     ->SetGroup("Video Performance Testing")
                     ->SetRequiredChild("infile");
+    add(QStringList{"--nodecode"}, "nodecode", false, "After decoding a small nuber of frames, "
+                    "the last presented frame will be displayed repeatedly to test "
+                    "rendering speed.", "")
+                    ->SetGroup("Video Performance Testing")
+                    ->SetChildOf("test");
     add(QStringList{"-d", "--decodeonly"},
-                    "decodeonly", false,
-                    "Decode video frames but do not display them.",
+                    "decodeonly", false, "Decode video frames but do not display them.",
                     "")
                     ->SetGroup("Video Performance Testing")
                     ->SetChildOf("test");
-    add(QStringList{"-gpu"}, "gpu", false, "Allow GPU video decoders", "")
+    add(QStringList{"-gpu"}, "gpu", false, "Allow hardware accelerated video decoders", "")
                     ->SetGroup("Video Performance Testing")
                     ->SetChildOf("test");
     add(QStringList{"--deinterlace"},
