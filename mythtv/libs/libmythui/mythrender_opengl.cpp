@@ -235,6 +235,10 @@ bool MythRenderOpenGL::Init(void)
     if (hasExtension("GL_SGIS_generate_mipmap"))
         m_extraFeatures += kGLMipMaps;
 
+    // Framebuffer discard
+    if (isOpenGLES() && hasExtension("GL_EXT_discard_framebuffer") && m_glDiscardFramebuffer)
+        m_extraFeatures += kGLExtFBDiscard;
+
     m_extraFeatures += (m_features & NPOTTextures) ? kGLFeatNPOT : kGLFeatNone;
     m_extraFeatures += (m_features & Framebuffers) ? kGLExtFBufObj : kGLFeatNone;
     m_extraFeatures += (m_features & Shaders) ? kGLSL : kGLFeatNone;
@@ -284,6 +288,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_features & Buffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer blitting : %1").arg(GLYesNo(QOpenGLFramebufferObject::hasOpenGLFramebufferBlit())));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer discard  : %1").arg(GLYesNo(m_extraFeatures & kGLExtFBDiscard)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("YCbCr textures       : %1")
         .arg(GLYesNo((m_extraFeatures & kGLMesaYCbCr) || (m_extraFeatures & kGLAppleYCbCr))));
@@ -837,6 +842,19 @@ void MythRenderOpenGL::ClearFramebuffer(void)
     doneCurrent();
 }
 
+void MythRenderOpenGL::DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer)
+{
+    if (!(m_extraFeatures & kGLExtFBDiscard))
+        return;
+
+    makeCurrent();
+    static const GLenum fbdiscards[] = { GL_COLOR_ATTACHMENT0 };
+    static const GLenum dfdiscards[] = { GL_COLOR };
+    BindFramebuffer(Framebuffer);
+    m_glDiscardFramebuffer(GL_FRAMEBUFFER, 1, (Framebuffer ? true : defaultFramebufferObject()) ? fbdiscards : dfdiscards);
+    doneCurrent();
+}
+
 void MythRenderOpenGL::DrawBitmap(uint tex, QOpenGLFramebufferObject *target,
                                   const QRect *src, const QRect *dst,
                                   QOpenGLShaderProgram *Program, int alpha,
@@ -1276,6 +1294,7 @@ void MythRenderOpenGL::InitProcs(void)
     m_glDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)GetProcAddress("glDeleteFencesAPPLE");
     m_glSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)GetProcAddress("glSetFenceAPPLE");
     m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)GetProcAddress("glFinishFenceAPPLE");
+    m_glDiscardFramebuffer = (MYTH_GLDISCARDFRAMEBUFFER)GetProcAddress("glDiscardFramebufferEXT");
 }
 
 QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &proc) const
@@ -1334,6 +1353,7 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glDeleteFencesAPPLE = nullptr;
     m_glSetFenceAPPLE = nullptr;
     m_glFinishFenceAPPLE = nullptr;
+    m_glDiscardFramebuffer = nullptr;
 }
 
 uint MythRenderOpenGL::CreatePBO(uint tex)

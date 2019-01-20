@@ -88,4 +88,6 @@ typedef void ( * MYTH_GLSETFENCEAPPLEPROC)
     (GLuint fence);
 typedef void ( * MYTH_GLFINISHFENCEAPPLEPROC)
     (GLuint fence);
+typedef void (APIENTRY * MYTH_GLDISCARDFRAMEBUFFER)
+    (GLenum target, GLsizei numAttachments, const GLenum *attachments);
 #endif

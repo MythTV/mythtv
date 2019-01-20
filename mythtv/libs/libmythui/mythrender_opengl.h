@@ -28,6 +28,7 @@ typedef enum
 {
     kGLFeatNone    = 0x0000,
     kGLFeatNPOT    = 0x0001,
+    kGLExtFBDiscard= 0x0002,
     kGLExtFBufObj  = 0x0004,
     kGLExtPBufObj  = 0x0008,
     kGLNVFence     = 0x0010,
@@ -154,6 +155,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void BindFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void ClearFramebuffer(void);
+    void DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer);
 
     QOpenGLShaderProgram* CreateShaderProgram(const QString &Vertex, const QString &Fragment);
     void   DeleteShaderProgram(QOpenGLShaderProgram* Program);
@@ -285,6 +287,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
+    // Framebuffer discard
+    MYTH_GLDISCARDFRAMEBUFFER            m_glDiscardFramebuffer;
 
     // Prevent compiler complaints about using 0 as a null pointer.
     inline void glVertexAttribPointerI(GLuint index, GLint size, GLenum type,
