@@ -676,10 +676,12 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
         return;
     }
 
-    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        gl_context->logDebugMarker(LOC + "SHOW");
     if (gl_context)
+    {
+        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+            gl_context->logDebugMarker(LOC + "SHOW");
         gl_context->swapBuffers();
+    }
 }
 
 /*! \brief Generate a list of supported OpenGL profiles.
