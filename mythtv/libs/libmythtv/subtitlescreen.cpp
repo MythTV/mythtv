@@ -2405,7 +2405,17 @@ bool SubtitleScreen::InitialiseAssLibrary(void)
         if (!m_assRenderer)
             return false;
 
-        ass_set_fonts(m_assRenderer, nullptr, "sans-serif", 1, nullptr, 1);
+#ifdef Q_OS_ANDROID
+        // fontconfig doesn't yet work for us on Android.  For the
+        // time being, more explicitly set a font we know should
+        // exist.  This was adapted from VLC master as of 2019-01-21.
+        const char *psz_font = "/system/fonts/DroidSans.ttf";
+        const char *psz_font_family = "Droid Sans";
+#else
+        const char *psz_font = nullptr;
+        const char *psz_font_family = "sans-serif";
+#endif
+        ass_set_fonts(m_assRenderer, psz_font, psz_font_family, 1, nullptr, 1);
         ass_set_hinting(m_assRenderer, ASS_HINTING_LIGHT);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialised libass renderer.");
     }
