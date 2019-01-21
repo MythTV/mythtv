@@ -1094,8 +1094,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     qreal lineHeight = 1.0 / inputTextureSize.height();
     qreal colWidth   = 1.0 / inputTextureSize.width();
     qreal yselect    = (qreal)inputTextureSize.width();
-    qreal maxheight  = video_dim.height() / (qreal)inputTextureSize.height();
-    qreal yv12height = maxheight;
+    qreal maxheight  = video_disp_dim.height() / (qreal)inputTextureSize.height();
     QSize fb_size    = gl_context->GetTextureSize(video_disp_dim);
     qreal fieldSize  = inputTextureSize.height() / 2.0;
 
@@ -1107,7 +1106,6 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%BICUBICHEIGHT%", QString::number((qreal)fb_size.height(), 'f', 8));
     string.replace("%SELECTCOL%",     QString::number(yselect, 'f', 16));
     string.replace("%MAXHEIGHT%",     QString::number(maxheight - lineHeight, 'f', 16));
-    string.replace("%HEIGHT%",        QString::number(yv12height, 'f', 16));
     string.replace("COLOUR_UNIFORM",  COLOUR_UNIFORM);
     // TODO fix alternative swizzling by changing the YUVA packing code
     string.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");

@@ -227,7 +227,7 @@ static const QString YV12RGBOneFieldFragmentShader[2] = {
 SAMPLEYVU
 "void main(void)\n"
 "{\n"
-"    highp float field  = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %FIELDHEIGHT%))) * %LINEHEIGHT%, %HEIGHT% - %LINEHEIGHT%);\n"
+"    highp float field  = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %FIELDHEIGHT%))) * %LINEHEIGHT%, %MAXHEIGHT%);\n"
 "    highp vec3 yvu     = sampleYVU(s_texture0, vec2(v_texcoord0.x, field));\n"
 "    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
@@ -256,7 +256,7 @@ SAMPLEYVU
 "    highp vec3 current = sampleYVU(s_texture0, v_texcoord0);\n"
 "    if (fract(v_texcoord0.y * %FIELDHEIGHT%) >= 0.5)\n"
 "    {\n"
-"        highp vec3 above = sampleYVU(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %LINEHEIGHT%, %HEIGHT% - %LINEHEIGHT%)));\n"
+"        highp vec3 above = sampleYVU(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %LINEHEIGHT%, %MAXHEIGHT%)));\n"
 "        highp vec3 below = sampleYVU(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %LINEHEIGHT%, 0.0)));\n"
 "        current = mix(above, below, 0.5);\n"
 "    }\n"
@@ -273,7 +273,7 @@ SAMPLEYVU
 "    highp vec3 current = sampleYVU(s_texture0, v_texcoord0);\n"
 "    if (fract(v_texcoord0.y * %FIELDHEIGHT%) < 0.5)\n"
 "    {\n"
-"        highp vec3 above = sampleYVU(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %LINEHEIGHT%, %HEIGHT% - %LINEHEIGHT%)));\n"
+"        highp vec3 above = sampleYVU(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %LINEHEIGHT%, %MAXHEIGHT%)));\n"
 "        highp vec3 below = sampleYVU(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %LINEHEIGHT%, 0.0)));\n"
 "        current = mix(above, below, 0.5);\n"
 "    }\n"
@@ -285,9 +285,9 @@ vec3 kernelYVU(in highp vec3 yvu, sampler2D texture1, sampler2D texture2)\n\
 {\n\
     highp vec2 twoup   = v_texcoord0 - vec2(0.0, %2LINEHEIGHT%);\n\
     highp vec2 twodown = v_texcoord0 + vec2(0.0, %2LINEHEIGHT%);\n\
-    twodown.t = min(twodown.t, %HEIGHT% - %LINEHEIGHT%);\n\
+    twodown.t = min(twodown.t, %MAXHEIGHT%);\n\
     highp vec2 onedown = v_texcoord0 + vec2(0.0, %LINEHEIGHT%);\n\
-    onedown.t = min(onedown.t, %HEIGHT% - %LINEHEIGHT%);\n\
+    onedown.t = min(onedown.t, %MAXHEIGHT%);\n\
     highp vec3 line0   = sampleYVU(texture1, twoup);\n\
     highp vec3 line1   = sampleYVU(texture1, v_texcoord0 - vec2(0.0, %LINEHEIGHT%));\n\
     highp vec3 line3   = sampleYVU(texture1, onedown);\n\
