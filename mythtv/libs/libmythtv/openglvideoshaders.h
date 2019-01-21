@@ -198,13 +198,8 @@ static const QString YV12RGBVertexShader =
 #define SAMPLEYVU "\
 vec3 sampleYVU(in sampler2D texture, highp vec2 texcoordY)\n\
 {\n\
-    highp vec2 texcoordV = vec2(texcoordY.s / 2.0, %HEIGHT% + texcoordY.t / 4.0);\n\
-    highp vec2 texcoordU = vec2(texcoordV.s, texcoordV.t + %HEIGHT% / 4.0);\n\
-    if (fract(texcoordY.t * %FIELDHEIGHT%) >= 0.5)\n\
-    {\n\
-        texcoordV.s += %WIDTH% / 2.0;\n\
-        texcoordU.s += %WIDTH% / 2.0;\n\
-    }\n\
+    highp vec2 texcoordV = vec2(texcoordY.s / 2.0, 0.6666666666666666 + texcoordY.t / 4.0);\n\
+    highp vec2 texcoordU = vec2(texcoordV.s, texcoordV.t + 0.6666666666666666 / 4.0);\n\
     highp vec3 yvu;\n\
     yvu.r = texture2D(texture, texcoordY).r;\n\
     yvu.g = texture2D(texture, texcoordV).r;\n\
