@@ -6,7 +6,6 @@
 
 // QT headers
 #include <QCoreApplication>
-#include <QOpenGLWidget>
 #include <QPainter>
 #include <QGLWidget>
 
@@ -14,6 +13,7 @@
 #include "mythlogging.h"
 
 // Mythui headers
+#include "mythmainwindow_internal.h"
 #include "mythrender_opengl.h"
 
 using namespace std;
@@ -79,14 +79,15 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
 
     if (!realRender)
     {
-        QOpenGLWidget *glw = qobject_cast<QOpenGLWidget *>(realParent);
-        if (!glw)
+        MythPainterWindowGL* glwin = static_cast<MythPainterWindowGL*>(realParent);
+        if (!glwin)
         {
-            LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to QOpenGLWidget");
+            LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to MythPainterWindowGL");
             return;
         }
 
-        realRender = (MythRenderOpenGL*)(glw->context());
+        if (glwin)
+            realRender = glwin->render;
         if (!realRender)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to get MythRenderOpenGL");
