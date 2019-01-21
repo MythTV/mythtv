@@ -2335,9 +2335,6 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
 #ifdef USING_LIBASS
 static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*/)
 {
-    static QString full_line("libass:");
-    static const int msg_len = 255;
-    static QMutex string_lock;
     uint64_t verbose_mask = VB_GENERAL;
     LogLevel_t verbose_level = LOG_INFO;
 
@@ -2366,25 +2363,21 @@ static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*
     if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
+    static QMutex string_lock;
     string_lock.lock();
 
-    char str[msg_len+1];
-    int bytes = vsnprintf(str, msg_len+1, fmt, vl);
+    char str[1024];
+    int bytes = vsnprintf(str, sizeof str, fmt, vl);
     // check for truncated messages and fix them
-    if (bytes > msg_len)
+    int truncated = bytes - ((sizeof str)-1);
+    if (truncated > 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("libASS log output truncated %1 of %2 bytes written")
-                .arg(msg_len).arg(bytes));
-        str[msg_len-1] = '\n';
+            .arg(truncated).arg(bytes));
     }
 
-    full_line += QString(str);
-    if (full_line.endsWith("\n"))
-    {
-        LOG(verbose_mask, verbose_level, full_line.trimmed());
-        full_line.truncate(0);
-    }
+    LOG(verbose_mask, verbose_level, QString("libass: %s").arg(str));
     string_lock.unlock();
 }
 
