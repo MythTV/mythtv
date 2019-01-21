@@ -52,7 +52,7 @@ class MythGLTexture
         m_external(External),
         m_type(GL_TEXTURE_2D), m_data(nullptr), m_data_size(0),
         m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_RGBA),
-        m_internal_fmt(GL_RGBA8), m_pbo(nullptr), m_vbo(0),
+        m_internal_fmt(GL_RGBA8), m_pbo(nullptr), m_vbo(nullptr),
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
         m_size(0,0), m_act_size(0,0)
     {
@@ -71,7 +71,7 @@ class MythGLTexture
     GLuint  m_data_fmt;
     GLuint  m_internal_fmt;
     QOpenGLBuffer *m_pbo;
-    GLuint  m_vbo;
+    QOpenGLBuffer *m_vbo;
     GLuint  m_filter;
     GLuint  m_wrap;
     QSize   m_size;
@@ -205,7 +205,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void SetMatrixView(void);
 
     QOpenGLBuffer* CreatePBO(uint tex);
-    uint CreateVBO(void);
+    QOpenGLBuffer* CreateVBO(bool Release = true);
     void DeleteOpenGLResources(void);
     void DeleteTextures(void);
     void DeleteFramebuffers(void);
@@ -244,7 +244,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     // Vertices
     QMap<uint64_t,GLfloat*>      m_cachedVertices;
     QList<uint64_t>              m_vertexExpiry;
-    QMap<uint64_t,GLuint>        m_cachedVBOS;
+    QMap<uint64_t,QOpenGLBuffer*> m_cachedVBOS;
     QList<uint64_t>              m_vboExpiry;
 
     // Locking
@@ -275,9 +275,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     // Needed for Raspberry pi
     bool    m_flushEnabled;
 
-    // PixelBuffer Objects
-    MYTH_GLMAPBUFFERPROC                 m_glMapBuffer;
-    MYTH_GLUNMAPBUFFERPROC               m_glUnmapBuffer;
     // NV_fence
     MYTH_GLGENFENCESNVPROC               m_glGenFencesNV;
     MYTH_GLDELETEFENCESNVPROC            m_glDeleteFencesNV;

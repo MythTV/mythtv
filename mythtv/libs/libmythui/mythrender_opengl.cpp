@@ -202,7 +202,8 @@ bool MythRenderOpenGL::Init(void)
     m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
 
     // Pixel buffer objects
-    bool buffer_procs = m_glMapBuffer && m_glUnmapBuffer;
+    bool buffer_procs = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer") &&
+                        (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
     if (!isOpenGLES() && hasExtension("GL_ARB_pixel_buffer_object") && buffer_procs)
         m_extraFeatures += kGLExtPBufObj;
 
@@ -285,7 +286,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_features & Buffers)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer blitting : %1").arg(GLYesNo(QOpenGLFramebufferObject::hasOpenGLFramebufferBlit())));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer discard  : %1").arg(GLYesNo(m_extraFeatures & kGLExtFBDiscard)));
@@ -760,7 +761,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
     if (m_textures[tex].m_pbo)
         delete m_textures[tex].m_pbo;
     if (m_textures[tex].m_vbo)
-        glDeleteBuffers(1, &(m_textures[tex].m_vbo));
+        delete m_textures[tex].m_vbo;
     m_textures.remove(tex);
 
     Flush(true);
@@ -918,6 +919,10 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
                                       QOpenGLShaderProgram *Program, int alpha,
                                      int red, int green, int blue)
 {
+    if (!m_textures.contains(tex))
+        return;
+    if (!m_textures[tex].m_vbo)
+        return;
     if (Program && !m_programs.contains(Program))
         Program = nullptr;
     if (Program == nullptr)
@@ -933,19 +938,19 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
     ActiveTexture(GL_TEXTURE0);
     glBindTexture(m_textures[tex].m_type, tex);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
+    QOpenGLBuffer* buffer = m_textures[tex].m_vbo;
+    buffer->bind();
     UpdateTextureVertices(tex, src, dst);
     if (m_extraFeaturesUsed & kGLBufferMap)
     {
-        glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
-        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        void* target = buffer->map(QOpenGLBuffer::WriteOnly);
         if (target)
             memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
-        m_glUnmapBuffer(GL_ARRAY_BUFFER);
+        buffer->unmap();
     }
     else
     {
-        glBufferData(GL_ARRAY_BUFFER, kVertexSize, m_textures[tex].m_vertex_data, GL_STREAM_DRAW);
+        buffer->write(0, m_textures[tex].m_vertex_data, kVertexSize);
     }
 
     glEnableVertexAttribArray(VERTEX_INDEX);
@@ -963,7 +968,7 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
 
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    buffer->release(QOpenGLBuffer::VertexBuffer);
 }
 
 void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
@@ -976,6 +981,10 @@ void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
         Program = m_defaultPrograms[kShaderDefault];
 
     uint first = textures[0];
+    if (!m_textures.contains(first))
+        return;
+    if (!m_textures[first].m_vbo)
+        return;
 
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
@@ -994,19 +1003,19 @@ void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
         }
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_textures[first].m_vbo);
+    QOpenGLBuffer* buffer = m_textures[first].m_vbo;
+    buffer->bind();
     UpdateTextureVertices(first, src, dst);
     if (m_extraFeaturesUsed & kGLBufferMap)
     {
-        glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
-        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        void* target = buffer->map(QOpenGLBuffer::WriteOnly);
         if (target)
             memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
-        m_glUnmapBuffer(GL_ARRAY_BUFFER);
+        buffer->unmap();
     }
     else
     {
-        glBufferData(GL_ARRAY_BUFFER, kVertexSize, m_textures[first].m_vertex_data, GL_STREAM_DRAW);
+        buffer->write(0, m_textures[first].m_vertex_data, kVertexSize);
     }
 
     glEnableVertexAttribArray(VERTEX_INDEX);
@@ -1024,7 +1033,7 @@ void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
 
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    buffer->release(QOpenGLBuffer::VertexBuffer);
 }
 
 void MythRenderOpenGL::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
@@ -1145,7 +1154,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                                 VERTEX_SIZE * sizeof(GLfloat),
                                kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     }
 
     if (linePen.style() != Qt::NoPen)
@@ -1261,8 +1270,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                                 VERTEX_SIZE * sizeof(GLfloat),
                                kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     }
 
     glDisableVertexAttribArray(VERTEX_INDEX);
@@ -1283,8 +1291,6 @@ void MythRenderOpenGL::Init2DState(void)
 
 void MythRenderOpenGL::InitProcs(void)
 {
-    m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer");
-    m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
     m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)GetProcAddress("glGenFencesNV");
     m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)GetProcAddress("glDeleteFencesNV");
     m_glSetFenceNV = (MYTH_GLSETFENCENVPROC)GetProcAddress("glSetFenceNV");
@@ -1342,8 +1348,6 @@ void MythRenderOpenGL::ResetVars(void)
 
 void MythRenderOpenGL::ResetProcs(void)
 {
-    m_glMapBuffer = nullptr;
-    m_glUnmapBuffer = nullptr;
     m_glGenFencesNV = nullptr;
     m_glDeleteFencesNV = nullptr;
     m_glSetFenceNV = nullptr;
@@ -1369,7 +1373,7 @@ QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint tex)
         buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
         buffer->bind();
         buffer->allocate(m_textures[tex].m_data_size);
-        buffer->release();
+        buffer->release(QOpenGLBuffer::PixelUnpackBuffer);
         return buffer;
     }
     else
@@ -1387,11 +1391,21 @@ QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint tex)
     return buffer;
 }
 
-uint MythRenderOpenGL::CreateVBO(void)
+QOpenGLBuffer* MythRenderOpenGL::CreateVBO(bool Release /*=true*/)
 {
-    GLuint tmp_vbo;
-    glGenBuffers(1, &tmp_vbo);
-    return tmp_vbo;
+    OpenGLLocker locker(this);
+    QOpenGLBuffer* buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    if (buffer->create())
+    {
+        buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
+        buffer->bind();
+        buffer->allocate(kVertexSize);
+        if (Release)
+            buffer->release(QOpenGLBuffer::VertexBuffer);
+        return buffer;
+    }
+    delete buffer;
+    return nullptr;
 }
 
 void MythRenderOpenGL::DeleteOpenGLResources(void)
@@ -1442,7 +1456,7 @@ void MythRenderOpenGL::DeleteTextures(void)
         if (it.value().m_pbo)
             delete it.value().m_pbo;
         if (it.value().m_vbo)
-            glDeleteBuffers(1, &(it.value().m_vbo));
+            delete it.value().m_vbo;
     }
     m_textures.clear();
     Flush(true);
@@ -1579,32 +1593,28 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
     {
         m_vboExpiry.removeOne(ref);
         m_vboExpiry.append(ref);
-    }
-    else
-    {
-        GLfloat *vertices = GetCachedVertices(type, area);
-        GLuint vbo = CreateVBO();
-        m_cachedVBOS.insert(ref, vbo);
-        m_vboExpiry.append(ref);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        if (m_extraFeaturesUsed & kGLBufferMap)
-        {
-            glBufferData(GL_ARRAY_BUFFER, kTextureOffset, nullptr, GL_STREAM_DRAW);
-            void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-            if (target)
-                memcpy(target, vertices, kTextureOffset);
-            m_glUnmapBuffer(GL_ARRAY_BUFFER);
-        }
-        else
-        {
-            glBufferData(GL_ARRAY_BUFFER, kTextureOffset, vertices, GL_STREAM_DRAW);
-        }
-        ExpireVBOS(MAX_VERTEX_CACHE);
+        m_cachedVBOS.value(ref)->bind();
         return;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_cachedVBOS.value(ref));
+    GLfloat *vertices = GetCachedVertices(type, area);
+    QOpenGLBuffer *vbo = CreateVBO(false);
+    m_cachedVBOS.insert(ref, vbo);
+    m_vboExpiry.append(ref);
+
+    if (m_extraFeaturesUsed & kGLBufferMap)
+    {
+        void* target = vbo->map(QOpenGLBuffer::WriteOnly);
+        if (target)
+            memcpy(target, vertices, kTextureOffset);
+        vbo->unmap();
+    }
+    else
+    {
+        vbo->write(0, vertices, kTextureOffset);
+    }
+    ExpireVBOS(MAX_VERTEX_CACHE);
+    return;
 }
 
 void MythRenderOpenGL::ExpireVBOS(uint max)
@@ -1615,8 +1625,8 @@ void MythRenderOpenGL::ExpireVBOS(uint max)
         m_vboExpiry.removeFirst();
         if (m_cachedVBOS.contains(ref))
         {
-            GLuint vbo = m_cachedVBOS.value(ref);
-            glDeleteBuffers(1, &vbo);
+            QOpenGLBuffer *vbo = m_cachedVBOS.value(ref);
+            delete vbo;
             m_cachedVBOS.remove(ref);
         }
     }

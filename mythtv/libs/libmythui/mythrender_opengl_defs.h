@@ -37,22 +37,6 @@
 #define GL_TEXTURE0 0x84C0
 #endif
 
-#ifndef GL_ARRAY_BUFFER
-#define GL_ARRAY_BUFFER               0x8892
-#endif
-
-#ifndef GL_PIXEL_UNPACK_BUFFER
-#define GL_PIXEL_UNPACK_BUFFER        0x88EC
-#endif
-
-#ifndef GL_STREAM_DRAW
-#define GL_STREAM_DRAW                0x88E0
-#endif
-
-#ifndef GL_WRITE_ONLY
-#define GL_WRITE_ONLY                 0x88B9
-#endif
-
 #ifndef GL_NV_fence
 #define GL_ALL_COMPLETED_NV               0x84F2
 #endif
