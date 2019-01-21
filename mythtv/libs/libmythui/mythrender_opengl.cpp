@@ -578,7 +578,7 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
         if (ClearTexture(tex) && m_textures[tex].m_data_size)
         {
             SetTextureFilters(tex, filter, wrap);
-            m_textures[tex].m_vbo = CreateVBO();
+            m_textures[tex].m_vbo = CreateVBO(kVertexSize);
             if (use_pbo)
                 m_textures[tex].m_pbo = CreatePBO(tex);
         }
@@ -798,7 +798,7 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size)
         texture.m_data_type = GL_UNSIGNED_BYTE; // NB Guess!
         texture.m_data_fmt  = texture.m_internal_fmt = framebuffer->format().internalTextureFormat();
         texture.m_data_size = GetBufferSize(texture.m_size, texture.m_data_fmt, texture.m_data_type);
-        texture.m_vbo       = CreateVBO();
+        texture.m_vbo       = CreateVBO(kVertexSize);
         m_textures.insert(textureid, texture);
         Flush(true);
         m_framebuffers.append(framebuffer);
@@ -1391,7 +1391,7 @@ QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint tex)
     return buffer;
 }
 
-QOpenGLBuffer* MythRenderOpenGL::CreateVBO(bool Release /*=true*/)
+QOpenGLBuffer* MythRenderOpenGL::CreateVBO(uint Size, bool Release /*=true*/)
 {
     OpenGLLocker locker(this);
     QOpenGLBuffer* buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
@@ -1399,7 +1399,7 @@ QOpenGLBuffer* MythRenderOpenGL::CreateVBO(bool Release /*=true*/)
     {
         buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
         buffer->bind();
-        buffer->allocate(kVertexSize);
+        buffer->allocate(Size);
         if (Release)
             buffer->release(QOpenGLBuffer::VertexBuffer);
         return buffer;
@@ -1598,7 +1598,7 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
     }
 
     GLfloat *vertices = GetCachedVertices(type, area);
-    QOpenGLBuffer *vbo = CreateVBO(false);
+    QOpenGLBuffer *vbo = CreateVBO(kTextureOffset, false);
     m_cachedVBOS.insert(ref, vbo);
     m_vboExpiry.append(ref);
 

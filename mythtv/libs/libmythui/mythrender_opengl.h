@@ -205,7 +205,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void SetMatrixView(void);
 
     QOpenGLBuffer* CreatePBO(uint tex);
-    QOpenGLBuffer* CreateVBO(bool Release = true);
+    QOpenGLBuffer* CreateVBO(uint Size, bool Release = true);
     void DeleteOpenGLResources(void);
     void DeleteTextures(void);
     void DeleteFramebuffers(void);
