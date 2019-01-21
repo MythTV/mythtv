@@ -494,9 +494,8 @@ void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
     glBindTexture(m_textures[tex].m_type, tex);
     if (m_textures[tex].m_pbo)
     {
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_pbo);
-        glBufferData(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_data_size, nullptr, GL_STREAM_DRAW);
-        return m_glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+        m_textures[tex].m_pbo->bind();
+        return m_textures[tex].m_pbo->map(QOpenGLBuffer::WriteOnly);
     }
     else if (!create_buffer)
     {
@@ -525,11 +524,11 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
 
     if (m_textures[tex].m_pbo)
     {
-        m_glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+        m_textures[tex].m_pbo->unmap();
         glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
                         size.height(), m_textures[tex].m_data_fmt,
                         m_textures[tex].m_data_type, nullptr);
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+        m_textures[tex].m_pbo->release(QOpenGLBuffer::PixelUnpackBuffer);
     }
     else
     {
@@ -759,7 +758,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
     if (m_textures[tex].m_data)
         delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
-        glDeleteBuffers(1, &(m_textures[tex].m_pbo));
+        delete m_textures[tex].m_pbo;
     if (m_textures[tex].m_vbo)
         glDeleteBuffers(1, &(m_textures[tex].m_vbo));
     m_textures.remove(tex);
@@ -1356,35 +1355,36 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glDiscardFramebuffer = nullptr;
 }
 
-uint MythRenderOpenGL::CreatePBO(uint tex)
+QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint tex)
 {
+    OpenGLLocker locker(this);
     if (!(m_extraFeaturesUsed & kGLExtPBufObj))
-        return 0;
-
+        return nullptr;
     if (!m_textures.contains(tex))
-        return 0;
+        return nullptr;
 
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-    if (glCheck())
+    QOpenGLBuffer *buffer = new QOpenGLBuffer(QOpenGLBuffer::PixelUnpackBuffer);
+    if (buffer->create())
     {
-        // looks like we dont support PBOs so dont bother doing the rest
-        // and stop using it in the future
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Pixel Buffer Objects unusable, disabling");
-        m_extraFeatures &= ~kGLExtPBufObj;
-        m_extraFeaturesUsed &= ~kGLExtPBufObj;
-        return 0;
+        buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
+        buffer->bind();
+        buffer->allocate(m_textures[tex].m_data_size);
+        buffer->release();
+        return buffer;
     }
-    glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                 m_textures[tex].m_size.width(),
-                 m_textures[tex].m_size.height(), 0,
-                 m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
-
-    GLuint tmp_pbo;
-    glGenBuffers(1, &tmp_pbo);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-    Flush(true);
-    return tmp_pbo;
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to create Pixel Buffer Object");
+        if (glCheck())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Pixel Buffer Objects unusable, disabling");
+            m_extraFeatures &= ~kGLExtPBufObj;
+            m_extraFeaturesUsed &= ~kGLExtPBufObj;
+        }
+        delete buffer;
+        buffer = nullptr;
+    }
+    return buffer;
 }
 
 uint MythRenderOpenGL::CreateVBO(void)
@@ -1440,7 +1440,7 @@ void MythRenderOpenGL::DeleteTextures(void)
         if (it.value().m_data)
             delete it.value().m_data;
         if (it.value().m_pbo)
-            glDeleteBuffers(1, &(it.value().m_pbo));
+            delete it.value().m_pbo;
         if (it.value().m_vbo)
             glDeleteBuffers(1, &(it.value().m_vbo));
     }

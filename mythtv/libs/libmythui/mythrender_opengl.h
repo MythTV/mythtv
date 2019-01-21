@@ -11,6 +11,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLBuffer>
 #include <QOpenGLDebugLogger>
 #include <QHash>
 #include <QMutex>
@@ -51,7 +52,7 @@ class MythGLTexture
         m_external(External),
         m_type(GL_TEXTURE_2D), m_data(nullptr), m_data_size(0),
         m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_RGBA),
-        m_internal_fmt(GL_RGBA8), m_pbo(0), m_vbo(0),
+        m_internal_fmt(GL_RGBA8), m_pbo(nullptr), m_vbo(0),
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
         m_size(0,0), m_act_size(0,0)
     {
@@ -69,7 +70,7 @@ class MythGLTexture
     GLuint  m_data_type;
     GLuint  m_data_fmt;
     GLuint  m_internal_fmt;
-    GLuint  m_pbo;
+    QOpenGLBuffer *m_pbo;
     GLuint  m_vbo;
     GLuint  m_filter;
     GLuint  m_wrap;
@@ -203,7 +204,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void ResetProcs(void);
     void SetMatrixView(void);
 
-    uint CreatePBO(uint tex);
+    QOpenGLBuffer* CreatePBO(uint tex);
     uint CreateVBO(void);
     void DeleteOpenGLResources(void);
     void DeleteTextures(void);
