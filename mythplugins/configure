@@ -272,7 +272,6 @@ check_lib_cxx(){
 PLUGIN_LIST="
 archive
 browser
-gallery
 game
 music
 netvision
@@ -284,7 +283,6 @@ zmserver
 
 DEPRECATED_PLUGIN_LIST="
 flix
-gallery
 "
 
 CONFIG_LIST="
