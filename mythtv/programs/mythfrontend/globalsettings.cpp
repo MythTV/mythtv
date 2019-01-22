@@ -40,7 +40,9 @@
 #include "langsettings.h"
 #include "mythcodeccontext.h"
 #include "mythsorthelper.h"
-
+#ifdef USE_OPENGL_PAINTER
+#include "mythrender_opengl.h"
+#endif
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
 #endif
@@ -117,6 +119,7 @@ static HostSpinBoxSetting *AVSync2AdjustMS()
     return gc;
 }
 
+#ifdef USE_OPENGL_PAINTER
 static HostCheckBoxSetting *OpenGLExtraStage()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLExtraStage");
@@ -130,6 +133,28 @@ static HostCheckBoxSetting *OpenGLExtraStage()
 
     return gc;
 }
+
+static HostCheckBoxSetting *OpenGLDiscardFB()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLDiscardFB");
+    gc->setLabel(PlaybackSettings::tr("Discard OpenGL Framebuffers"));
+    gc->setHelpText(PlaybackSettings::tr(
+        "Enable to improve performance on some OpenGL ES GPU implementations (e.g. ARM Mali, Qualcomm Adreno) EXPERIMENTAL."));
+    gc->setValue(false);
+    return gc;
+}
+
+static HostCheckBoxSetting *OpenGLEnablePBO()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLEnablePBO");
+    gc->setLabel(PlaybackSettings::tr("Enable Pixel Buffer Objects for OpenGL video"));
+    gc->setHelpText(PlaybackSettings::tr(
+        "Pixel Buffer Objects are enabled by default to improve video playback "
+        "but on some integrated GPUs (e.g. Intel) they are not needed and will reduce performance."));
+    gc->setValue(true);
+    return gc;
+}
+#endif
 
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
@@ -4250,7 +4275,22 @@ void PlaybackSettings::Load(void)
     HostCheckBoxSetting *avsync2 = PlaybackAVSync2();
     advanced->addChild(avsync2);
     avsync2->addTargetedChild("1",AVSync2AdjustMS());
+
+#ifdef USE_OPENGL_PAINTER
+    bool isOpenGLES = false;
+    MythMainWindow* main = static_cast<MythMainWindow*>(gCoreContext->GetGUIObject());
+    if (main)
+    {
+        MythRenderOpenGL* render = static_cast<MythRenderOpenGL*>(main->GetRenderDevice());
+        if (render)
+            isOpenGLES = render->isOpenGLES();
+    }
     advanced->addChild(OpenGLExtraStage());
+    if (isOpenGLES)
+        advanced->addChild(OpenGLDiscardFB());
+    else
+        advanced->addChild(OpenGLEnablePBO());
+#endif
     addChild(advanced);
 
     m_playbackProfiles = CurrentPlaybackProfile();

@@ -114,6 +114,7 @@ using_xrandr:DEFINES += USING_XRANDR
 using_opengl:QT += opengl
 using_opengl:DEFINES += USING_OPENGL
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
+using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER
 using_vdpau:DEFINES += USING_VDPAU
 using_vaapi:using_opengl_video:DEFINES += USING_GLVAAPI
 using_vaapi2:DEFINES += USING_VAAPI2

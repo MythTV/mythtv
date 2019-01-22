@@ -10,6 +10,7 @@ using std::min;
 #include <QGuiApplication>
 
 // MythTV
+#include "mythcorecontext.h"
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_shaders.h"
 #include "mythlogging.h"
@@ -205,44 +206,44 @@ bool MythRenderOpenGL::Init(void)
     bool buffer_procs = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer") &&
                         (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
     if (!isOpenGLES() && hasExtension("GL_ARB_pixel_buffer_object") && buffer_procs)
-        m_extraFeatures += kGLExtPBufObj;
+        m_extraFeatures |= kGLExtPBufObj;
 
     // Buffers are available by default (GL and GLES).
     // Buffer mapping is available by extension
     if ((isOpenGLES() && hasExtension("GL_OES_mapbuffer") && buffer_procs) ||
         (hasExtension("GL_ARB_vertex_buffer_object") && buffer_procs))
-        m_extraFeatures += kGLBufferMap;
+        m_extraFeatures |= kGLBufferMap;
 
     // TODO combine fence functionality
     // NVidia fence
     if(hasExtension("GL_NV_fence") && m_glGenFencesNV && m_glDeleteFencesNV &&
         m_glSetFenceNV  && m_glFinishFenceNV)
-        m_extraFeatures += kGLNVFence;
+        m_extraFeatures |= kGLNVFence;
 
     // Apple fence
     if(hasExtension("GL_APPLE_fence") && m_glGenFencesAPPLE && m_glDeleteFencesAPPLE &&
         m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
-        m_extraFeatures += kGLAppleFence;
+        m_extraFeatures |= kGLAppleFence;
 
     // MESA YCbCr
     if (hasExtension("GL_MESA_ycbcr_texture"))
-        m_extraFeatures += kGLMesaYCbCr;
+        m_extraFeatures |= kGLMesaYCbCr;
 
     // Apple YCbCr
     if (hasExtension("GL_APPLE_ycbcr_422"))
-        m_extraFeatures += kGLAppleYCbCr;
+        m_extraFeatures |= kGLAppleYCbCr;
 
     // Mipmapping - is this available by default on ES?
     if (hasExtension("GL_SGIS_generate_mipmap"))
-        m_extraFeatures += kGLMipMaps;
+        m_extraFeatures |= kGLMipMaps;
 
-    // Framebuffer discard
+    // Framebuffer discard - GLES only
     if (isOpenGLES() && hasExtension("GL_EXT_discard_framebuffer") && m_glDiscardFramebuffer)
-        m_extraFeatures += kGLExtFBDiscard;
+        m_extraFeatures |= kGLExtFBDiscard;
 
-    m_extraFeatures += (m_features & NPOTTextures) ? kGLFeatNPOT : kGLFeatNone;
-    m_extraFeatures += (m_features & Framebuffers) ? kGLExtFBufObj : kGLFeatNone;
-    m_extraFeatures += (m_features & Shaders) ? kGLSL : kGLFeatNone;
+    m_extraFeatures |= (m_features & NPOTTextures) ? kGLFeatNPOT : kGLFeatNone;
+    m_extraFeatures |= (m_features & Framebuffers) ? kGLExtFBufObj : kGLFeatNone;
+    m_extraFeatures |= (m_features & Shaders) ? kGLSL : kGLFeatNone;
 
     DebugFeatures();
 
@@ -844,7 +845,7 @@ void MythRenderOpenGL::ClearFramebuffer(void)
 
 void MythRenderOpenGL::DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 {
-    if (!(m_extraFeatures & kGLExtFBDiscard))
+    if (!(m_extraFeaturesUsed & kGLExtFBDiscard))
         return;
 
     makeCurrent();
@@ -1419,9 +1420,9 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
 
     if (m_fence)
     {
-        if (m_extraFeatures & kGLAppleFence)
+        if (m_extraFeaturesUsed & kGLAppleFence)
             m_glDeleteFencesAPPLE(1, &m_fence);
-        else if(m_extraFeatures & kGLNVFence)
+        else if (m_extraFeaturesUsed & kGLNVFence)
             m_glDeleteFencesNV(1, &m_fence);
         m_fence = 0;
     }

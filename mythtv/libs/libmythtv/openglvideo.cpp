@@ -77,6 +77,8 @@ OpenGLVideo::OpenGLVideo() :
     gl_features(0),           forceResize(false)
 {
     forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
+    discardFramebuffers = gCoreContext->GetBoolSetting("OpenGLDiscardFB", false);
+    enablePBOs = gCoreContext->GetBoolSetting("OpenGLEnablePBO", true);
 }
 
 OpenGLVideo::~OpenGLVideo()
@@ -146,6 +148,23 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     // Set OpenGL feature support
     gl_features = gl_context->GetFeatures();
+
+    // Enable/Disable certain features based on settings
+    if (gl_context->isOpenGLES())
+    {
+        if ((gl_features & kGLExtFBDiscard) && discardFramebuffers)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling Framebuffer discards");
+        else
+            gl_features &= ~kGLExtFBDiscard;
+    }
+    else
+    {
+        if ((gl_features & kGLExtPBufObj) && !enablePBOs)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Pixel Buffer Objects");
+            gl_features &= ~kGLExtPBufObj;
+        }
+    }
 
     if (viewportControl)
         gl_context->SetFence();
@@ -680,17 +699,18 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     uint tmp_tex = 0;
+    bool pbo = gl_features & kGLExtPBufObj;
     if (kGLYCbCr == videoType)
     {
         uint type = (gl_features & kGLMesaYCbCr) ? GL_YCBCR_MESA : GL_YCBCR_422_APPLE;
-        tmp_tex = gl_context->CreateTexture(size, true, textureType,
+        tmp_tex = gl_context->CreateTexture(size, pbo, textureType,
                                             GL_UNSIGNED_SHORT_8_8_MESA,
                                             type, GL_RGBA);
     }
     else if (kGLYV12 == videoType)
     {
         size.setHeight((3 * size.height() + 1) / 2);
-        tmp_tex = gl_context->CreateTexture(size, true, textureType,
+        tmp_tex = gl_context->CreateTexture(size, pbo, textureType,
                                             GL_UNSIGNED_BYTE,   // data_type
                                             GL_LUMINANCE,       // data_fmt
                                             GL_LUMINANCE        // internal_fmt
@@ -699,12 +719,12 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
     else if (kGLUYVY == videoType)
     {
         size.setWidth(size.width() >> 1);
-        tmp_tex = gl_context->CreateTexture(size, true, textureType,
+        tmp_tex = gl_context->CreateTexture(size, pbo, textureType,
                                             GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA);
     }
     else if ((kGLHQUYV == videoType) || (kGLGPU == videoType) || (kGLRGBA == videoType))
     {
-        tmp_tex = gl_context->CreateTexture(size, true, textureType);
+        tmp_tex = gl_context->CreateTexture(size, pbo, textureType);
     }
 
     tex_size = gl_context->GetTextureSize(size);
@@ -830,6 +850,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
     vector<GLuint> inputs = inputTextures;
     QSize inputsize = inputTextureSize;
     QSize realsize  = gl_context->GetTextureSize(video_disp_dim);
+    QOpenGLFramebufferObject* lastFramebuffer = nullptr;
 
     glfilt_map_t::iterator it;
     for (it = filters.begin(); it != filters.end(); ++it)
@@ -984,7 +1005,21 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         foreach (QOpenGLFramebufferObject* fb, filter->frameBuffers)
             inputs.push_back(fb->texture());
         inputsize = realsize;
+
+        if (gl_features & kGLExtFBDiscard)
+        {
+            // If lastFramebuffer is set, it was from the last filter stage and
+            // has now been used to render. It can be discarded.
+            // If this is the last filter, we have rendered to the default framebuffer
+            // and it can be discarded.
+            if (lastFramebuffer)
+                gl_context->DiscardFramebuffer(lastFramebuffer);
+            else if (filter->outputBuffer == kDefaultBuffer)
+                gl_context->DiscardFramebuffer(nullptr);
+            lastFramebuffer = target;
+        }
     }
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         gl_context->logDebugMarker(LOC + "PREP_FRAME_END");
 }

@@ -132,5 +132,7 @@ class OpenGLVideo
     uint           gl_features;          ///< OR'd list of GLFeatures in use
     MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY
     bool           forceResize;          ///< Global setting to force a resize stage
+    bool           discardFramebuffers;  ///< Use GL_EXT_discard_framebuffer
+    bool           enablePBOs;           ///< Allow use of Pixel Buffer Objects
 };
 #endif // _OPENGL_VIDEO_H__
