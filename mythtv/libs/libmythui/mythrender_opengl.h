@@ -136,6 +136,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void  SetBlend(bool enable);
     void  SetBackground(int r, int g, int b, int a);
     void  SetFence(void);
+    void  DeleteFence(void);
 
     void* GetTextureBuffer(uint tex, bool create_buffer);
     void  UpdateTexture(uint tex, void *buf);

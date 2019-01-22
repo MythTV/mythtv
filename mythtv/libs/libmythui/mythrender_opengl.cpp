@@ -486,6 +486,20 @@ void MythRenderOpenGL::SetFence(void)
     doneCurrent();
 }
 
+void MythRenderOpenGL::DeleteFence(void)
+{
+    if (m_fence)
+    {
+        makeCurrent();
+        if (m_extraFeaturesUsed & kGLAppleFence)
+            m_glDeleteFencesAPPLE(1, &m_fence);
+        else if (m_extraFeaturesUsed & kGLNVFence)
+            m_glDeleteFencesNV(1, &m_fence);
+        m_fence = 0;
+        doneCurrent();
+    }
+}
+
 void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
 {
     if (!m_textures.contains(tex))
@@ -1416,18 +1430,8 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     DeleteTextures();
     DeleteDefaultShaders();
     DeleteShaderPrograms();
+    DeleteFence();
     Flush(true);
-
-    if (m_fence)
-    {
-        if (m_extraFeaturesUsed & kGLAppleFence)
-            m_glDeleteFencesAPPLE(1, &m_fence);
-        else if (m_extraFeaturesUsed & kGLNVFence)
-            m_glDeleteFencesNV(1, &m_fence);
-        m_fence = 0;
-    }
-
-    Flush(false);
 
     ExpireVertices();
     ExpireVBOS();

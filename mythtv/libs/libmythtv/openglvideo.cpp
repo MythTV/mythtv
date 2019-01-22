@@ -89,6 +89,8 @@ OpenGLVideo::~OpenGLVideo()
 
 void OpenGLVideo::Teardown(void)
 {
+    if (viewportControl)
+        gl_context->DeleteFence();
     if (helperTexture)
         gl_context->DeleteTexture(helperTexture);
     helperTexture = 0;
