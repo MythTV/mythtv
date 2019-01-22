@@ -143,7 +143,8 @@ class MainServer : public QObject, public MythSocketCBs
     size_t GetCurrentMaxBitrate(void);
     void BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                bool allHosts);
-    void GetFilesystemInfos(QList<FileSystemInfo> &fsInfos);
+    void GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
+                            bool useCache=true);
 
     int GetExitCode() const { return m_exitCode; }
 
@@ -352,6 +353,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     QMap<QString, int> fsIDcache;
     QMutex fsIDcacheLock;
+    QList<FileSystemInfo> fsInfosCache;
+    QMutex fsInfosCacheLock;
 
     QMutex                     m_downloadURLsLock;
     QMap<QString, QString>     m_downloadURLs;

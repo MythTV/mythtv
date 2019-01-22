@@ -141,7 +141,16 @@ void AutoExpire::CalcParams()
 
     instance_lock.lock();
     if (main_server)
-        main_server->GetFilesystemInfos(fsInfos);
+    {
+        // The scheduler relies on something forcing the mainserver
+        // fsinfos cache to get updated periodically.  Currently, that
+        // is done here.  Don't remove or change this invocation
+        // without handling that issue too.  It is done this way
+        // because the scheduler thread can't afford to be blocked by
+        // an unresponsive, remote filesystem and the autoexpirer
+        // thrad can.
+        main_server->GetFilesystemInfos(fsInfos, false);
+    }
     instance_lock.unlock();
 
     if (fsInfos.empty())
@@ -413,9 +422,6 @@ void AutoExpire::ExpireRecordings(void)
     QList<FileSystemInfo>::iterator fsit;
 
     LOG(VB_FILE, LOG_INFO, LOC + "ExpireRecordings()");
-
-    if (main_server)
-        main_server->GetFilesystemInfos(fsInfos);
 
     if (fsInfos.empty())
     {

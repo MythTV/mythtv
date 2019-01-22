@@ -201,7 +201,8 @@ class Scheduler : public MThread, public MythScheduler
                          uint cardid,
                          QString &recording_dir,
                          const RecList &reclist);
-    void FillDirectoryInfoCache(bool force = false);
+    void FillDirectoryInfoCache(MainServer *mainServer,
+                                bool useMainServerCache);
 
     void OldRecordedFixups(void);
     void ResetDuplicates(uint recordid, uint findid, const QString &title,
@@ -273,7 +274,6 @@ class Scheduler : public MThread, public MythScheduler
     bool m_isShuttingDown;
     MSqlQueryInfo dbConn;
 
-    QDateTime fsInfoCacheFillTime;
     QMap<QString, FileSystemInfo> fsInfoCache;
 
     int error;

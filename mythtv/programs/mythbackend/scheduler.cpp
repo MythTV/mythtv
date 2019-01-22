@@ -96,8 +96,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     InitInputInfoMap();
 
-    fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
-
     if (doRun)
     {
         ProgramInfo::CheckProgramIDAuthorities();
@@ -156,6 +154,9 @@ void Scheduler::Stop(void)
 
 void Scheduler::SetMainServer(MainServer *ms)
 {
+    // Make sure we have a good, fsinfo cache before setting
+    // m_mainServer.
+    FillDirectoryInfoCache(ms, false);
     m_mainServer = ms;
 }
 
@@ -2473,8 +2474,6 @@ bool Scheduler::HandleReschedule(void)
                 static_cast<double>(checkTime),
                 static_cast<double>(placeTime));
     LOG(VB_GENERAL, LOG_INFO, msg);
-
-    fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
 
     // Write changed entries to oldrecorded.
     RecIter it = reclist.begin();
@@ -5152,7 +5151,7 @@ int Scheduler::FillRecordingDir(
             gCoreContext->GetNumSetting("SGweightRemoteStarting", 0);
     int maxOverlap = gCoreContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
 
-    FillDirectoryInfoCache();
+    FillDirectoryInfoCache(m_mainServer, true);
 
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Calculating initial FS Weights.");
@@ -5587,18 +5586,15 @@ int Scheduler::FillRecordingDir(
     return fsID;
 }
 
-void Scheduler::FillDirectoryInfoCache(bool force)
+void Scheduler::FillDirectoryInfoCache(MainServer *mainServer,
+                                       bool useMainServerCache)
 {
-    if ((!force) &&
-        (fsInfoCacheFillTime > MythDate::current().addSecs(-180)))
-        return;
-
     QList<FileSystemInfo> fsInfos;
 
     fsInfoCache.clear();
 
-    if (m_mainServer)
-        m_mainServer->GetFilesystemInfos(fsInfos);
+    if (mainServer)
+        mainServer->GetFilesystemInfos(fsInfos, useMainServerCache);
 
     QMap <int, bool> fsMap;
     QList<FileSystemInfo>::iterator it1;
@@ -5611,8 +5607,6 @@ void Scheduler::FillDirectoryInfoCache(bool force)
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("FillDirectoryInfoCache: found %1 unique filesystems")
             .arg(fsMap.size()));
-
-    fsInfoCacheFillTime = MythDate::current();
 }
 
 void Scheduler::SchedLiveTV(void)
