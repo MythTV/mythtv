@@ -903,18 +903,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             }
         }
 
-        // hardware bobdeint
-        if (filter->outputBuffer == kDefaultBuffer &&
-            hardwareDeinterlacing &&
-            hardwareDeinterlacer == "openglbobdeint")
-        {
-            float bob = ((float)display.height() / (float)video_rect.height())
-                        / 2.0f;
-            float field = kScan_Interlaced ? -1.0f : 1.0f;
-            bob = bob * (topfieldfirst ? field : -field);
-            vrect.adjust(0, bob, 0, bob);
-        }
-
         QOpenGLFramebufferObject *target = nullptr;
         // bind correct frame buffer (default onscreen) and set viewport
         switch (filter->outputBuffer)
