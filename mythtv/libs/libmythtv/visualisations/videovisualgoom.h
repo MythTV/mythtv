@@ -3,6 +3,7 @@
 
 #include "videovisual.h"
 
+class MythGLTexture;
 class VideoVisualGoom : public VideoVisual
 {
   public:
@@ -15,9 +16,10 @@ class VideoVisualGoom : public VideoVisual
         { return m_hd ? "Goom HD" : "Goom"; }
 
   private:
-    unsigned int* m_buffer;
-    uint          m_surface;
-    bool          m_hd;
+    unsigned int  *m_buffer;
+    uint           m_vdpauSurface;
+    MythGLTexture *m_glSurface;
+    bool           m_hd;
 };
 
 #endif // VIDEOVISUALGOOM_H

@@ -7,7 +7,6 @@
 // QT headers
 #include <QCoreApplication>
 #include <QPainter>
-#include <QGLWidget>
 
 // libmythbase headers
 #include "mythlogging.h"
@@ -47,12 +46,11 @@ void MythOpenGLPainter::DeleteTextures(void)
     QMutexLocker locker(&m_textureDeleteLock);
     while (!m_textureDeleteList.empty())
     {
-        uint tex = m_textureDeleteList.front();
-        m_HardwareCacheSize -= realRender->GetTextureDataSize(tex);
-        realRender->DeleteTexture(tex);
+        MythGLTexture *texture = m_textureDeleteList.front();
+        m_HardwareCacheSize -= realRender->GetTextureDataSize(texture);
+        realRender->DeleteTexture(texture);
         m_textureDeleteList.pop_front();
     }
-    realRender->Flush(true);
 }
 
 void MythOpenGLPainter::ClearCache(void)
@@ -60,14 +58,14 @@ void MythOpenGLPainter::ClearCache(void)
     LOG(VB_GENERAL, LOG_INFO, "Clearing OpenGL painter cache.");
 
     QMutexLocker locker(&m_textureDeleteLock);
-    QMapIterator<MythImage *, unsigned int> it(m_ImageIntMap);
+    QMapIterator<MythImage *, MythGLTexture*> it(m_imageToTextureMap);
     while (it.hasNext())
     {
         it.next();
-        m_textureDeleteList.push_back(m_ImageIntMap[it.key()]);
+        m_textureDeleteList.push_back(m_imageToTextureMap[it.key()]);
         m_ImageExpireList.remove(it.key());
     }
-    m_ImageIntMap.clear();
+    m_imageToTextureMap.clear();
 }
 
 void MythOpenGLPainter::Begin(QPaintDevice *parent)
@@ -129,18 +127,18 @@ void MythOpenGLPainter::End(void)
     MythPainter::End();
 }
 
-int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
+MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 {
     if (!realRender)
-        return 0;
+        return nullptr;
 
-    if (m_ImageIntMap.contains(im))
+    if (m_imageToTextureMap.contains(im))
     {
         if (!im->IsChanged())
         {
             m_ImageExpireList.remove(im);
             m_ImageExpireList.push_back(im);
-            return m_ImageIntMap[im];
+            return m_imageToTextureMap[im];
         }
         else
         {
@@ -150,22 +148,18 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 
     im->SetChanged(false);
 
-    // TODO Remove QGLWidget use when we are using QOpenGLTexture
-    QImage tx = QGLWidget::convertToGLFormat(*im);
-    GLuint tx_id = 0;
+    MythGLTexture *texture = nullptr;
     for (;;)
     {
-        tx_id = realRender->CreateTexture(tx.size(), false, 0,
-                                  GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
-                                  GL_LINEAR_MIPMAP_LINEAR);
-        if (tx_id)
+        texture = realRender->CreateTextureFromQImage(im);
+        if (texture)
             break;
 
         // This can happen if the cached textures are too big for GPU memory
         if (m_HardwareCacheSize <= 8 * 1024 * 1024)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
-            return 0;
+            return nullptr;
         }
 
         // Shrink the cache size
@@ -184,13 +178,8 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
     }
 
     CheckFormatImage(im);
-    m_HardwareCacheSize += realRender->GetTextureDataSize(tx_id);
-    void* buffer = realRender->GetTextureBuffer(tx_id, false);
-    if (buffer) // just in case...
-        memcpy(buffer, tx.bits(), realRender->GetTextureDataSize(tx_id));
-    realRender->UpdateTexture(tx_id, tx.bits());
-
-    m_ImageIntMap[im] = tx_id;
+    m_HardwareCacheSize += realRender->GetTextureDataSize(texture);
+    m_imageToTextureMap[im] = texture;
     m_ImageExpireList.push_back(im);
 
     while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
@@ -201,7 +190,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
         DeleteTextures();
     }
 
-    return tx_id;
+    return texture;
 }
 
 void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
@@ -243,11 +232,11 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int cornerRadius,
 
 void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)
 {
-    if (m_ImageIntMap.contains(im))
+    if (m_imageToTextureMap.contains(im))
     {
         QMutexLocker locker(&m_textureDeleteLock);
-        m_textureDeleteList.push_back(m_ImageIntMap[im]);
-        m_ImageIntMap.remove(im);
+        m_textureDeleteList.push_back(m_imageToTextureMap[im]);
+        m_imageToTextureMap.remove(im);
         m_ImageExpireList.remove(im);
     }
 }

@@ -22,6 +22,7 @@ class OpenGLFilter
         vector<QOpenGLShaderProgram*> fragmentPrograms;
         uint           numInputs;
         vector<QOpenGLFramebufferObject*> frameBuffers;
+        vector<MythGLTexture*>            frameBufferTextures;
         DisplayBuffer  outputBuffer;
 };
 
@@ -73,7 +74,7 @@ OpenGLVideo::OpenGLVideo() :
     colourSpace(nullptr),     viewportControl(false),
     inputTextureSize(0,0),    refsNeeded(0),
     textureType(GL_TEXTURE_2D),
-    helperTexture(0),         defaultUpsize(kGLFilterResize),
+    helperTexture(nullptr),         defaultUpsize(kGLFilterResize),
     gl_features(0),           forceResize(false)
 {
     forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
@@ -93,7 +94,7 @@ void OpenGLVideo::Teardown(void)
         gl_context->DeleteFence();
     if (helperTexture)
         gl_context->DeleteTexture(helperTexture);
-    helperTexture = 0;
+    helperTexture = nullptr;
 
     DeleteTextures(&inputTextures);
     DeleteTextures(&referenceTextures);
@@ -175,12 +176,10 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     bool glsl  = gl_features & kGLSL;
     bool fbos  = gl_features & kGLExtFBufObj;
-    bool ycbcr = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
-    VideoType fallback = glsl ? (fbos ? kGLUYVY : kGLYV12) : ycbcr ? kGLYCbCr : kGLRGBA;
+    VideoType fallback = glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLRGBA;
 
     // check for feature support
-    bool unsupported = (kGLYCbCr == videoType) && !ycbcr;
-    unsupported     |= (kGLYV12  == videoType) && !glsl;
+    bool unsupported = (kGLYV12  == videoType) && !glsl;
     unsupported     |= (kGLUYVY  == videoType) && (!glsl || !fbos);
     unsupported     |= (kGLHQUYV == videoType) && !glsl;
 
@@ -194,7 +193,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     // check picture attributes support - colourspace adjustments require
     // shaders to operate on YUV textures
-    if (kGLRGBA == videoType || kGLGPU == videoType || kGLYCbCr == videoType)
+    if (kGLRGBA == videoType || kGLGPU == videoType)
         colourspace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
     // turn on bicubic filtering
@@ -207,12 +206,12 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     }
 
     // Create initial input texture and associated filter stage
-    GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
+    MythGLTexture *tex = CreateVideoTexture(video_dim, inputTextureSize);
     bool    ok = false;
 
     if (kGLYV12 == videoType)
         ok = tex && AddFilter(kGLFilterYV12RGB);
-    else if ((kGLUYVY == videoType) || (kGLHQUYV == videoType) || (kGLYCbCr == videoType))
+    else if ((kGLUYVY == videoType) || (kGLHQUYV == videoType))
         ok = tex && AddFilter(kGLFilterYUV2RGB);
     else
         ok = tex && AddFilter(kGLFilterResize);
@@ -238,7 +237,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                     "Failed to setup colourspace conversion.\n\t\t\t"
                     "Falling back to software conversion.\n\t\t\t"
                     "Any opengl filters will also be disabled.");
-            GLuint rgba32tex = CreateVideoTexture(video_dim, inputTextureSize);
+            MythGLTexture *rgba32tex = CreateVideoTexture(video_dim, inputTextureSize);
 
             if (rgba32tex && AddFilter(kGLFilterResize))
             {
@@ -269,8 +268,8 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 #endif
 
     CheckResize(false);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 NEON: %2 ForceResize: %3 Rects: %4")
-            .arg(mmx).arg(neon).arg(forceResize).arg(textureType != GL_TEXTURE_2D));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 NEON: %2 ForceResize: %3")
+            .arg(mmx).arg(neon).arg(forceResize));
     return true;
 }
 
@@ -359,9 +358,13 @@ bool OpenGLVideo::OptimiseFilters(void)
             {
                 for (int i = 0; i < buffers_diff; i++)
                 {
-                    QOpenGLFramebufferObject *tmp = gl_context->CreateFramebuffer(video_disp_dim);
-                    if (tmp)
-                        it->second->frameBuffers.push_back(tmp);
+                    QOpenGLFramebufferObject* framebuffer = gl_context->CreateFramebuffer(video_disp_dim);
+                    if (framebuffer)
+                    {
+                        MythGLTexture *texture = gl_context->CreateFramebufferTexture(framebuffer);
+                        it->second->frameBuffers.push_back(framebuffer);
+                        it->second->frameBufferTextures.push_back(texture);
+                    }
                     else
                         return false;
                 }
@@ -396,13 +399,13 @@ void OpenGLVideo::SetFiltering(void)
 {
     if (filters.size() < 2)
     {
-        SetTextureFilters(&inputTextures, GL_LINEAR, GL_CLAMP_TO_EDGE);
-        SetTextureFilters(&referenceTextures, GL_LINEAR, GL_CLAMP_TO_EDGE);
+        SetTextureFilters(&inputTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        SetTextureFilters(&referenceTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         return;
     }
 
-    SetTextureFilters(&inputTextures, GL_NEAREST, GL_CLAMP_TO_EDGE);
-    SetTextureFilters(&referenceTextures, GL_NEAREST, GL_CLAMP_TO_EDGE);
+    SetTextureFilters(&inputTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+    SetTextureFilters(&referenceTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
 
     glfilt_map_t::reverse_iterator rit;
     int last_filter = 0;
@@ -412,12 +415,12 @@ void OpenGLVideo::SetFiltering(void)
         if (last_filter == 1)
         {
             foreach (QOpenGLFramebufferObject* fb, rit->second->frameBuffers)
-                gl_context->SetTextureFilters(fb->texture(), GL_LINEAR, GL_CLAMP_TO_EDGE);
+                gl_context->SetTextureFilters(fb->texture(), QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         }
         else if (last_filter > 1)
         {
             foreach (QOpenGLFramebufferObject* fb, rit->second->frameBuffers)
-                gl_context->SetTextureFilters(fb->texture(), GL_NEAREST, GL_CLAMP_TO_EDGE);
+                gl_context->SetTextureFilters(fb->texture(), QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
         }
         ++last_filter;
     }
@@ -543,6 +546,11 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
         gl_context->DeleteFramebuffer(*it2);
     filters[filter]->frameBuffers.clear();
 
+    vector<MythGLTexture*>::const_iterator it3 = filters[filter]->frameBufferTextures.cbegin();
+    for ( ; it3 != filters[filter]->frameBufferTextures.cend(); ++it3)
+        gl_context->DeleteTexture(*it3);
+    filters[filter]->frameBufferTextures.clear();
+
     delete filters[filter];
     filters.erase(filter);
     return true;
@@ -616,15 +624,11 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
     {
         for (; ref_size > 0; ref_size--)
         {
-            GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
+            MythGLTexture *tex = CreateVideoTexture(video_dim, inputTextureSize);
             if (tex)
-            {
                 referenceTextures.push_back(tex);
-            }
             else
-            {
                 success = false;
-            }
         }
     }
 
@@ -698,42 +702,33 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
  *  Create and initialise an OpenGL texture suitable for a YV12 video frame
  *  of the given size.
  */
-uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
+MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
-    uint tmp_tex = 0;
+    MythGLTexture *texture = nullptr;
     bool pbo = gl_features & kGLExtPBufObj;
-    if (kGLYCbCr == videoType)
-    {
-        uint type = (gl_features & kGLMesaYCbCr) ? GL_YCBCR_MESA : GL_YCBCR_422_APPLE;
-        tmp_tex = gl_context->CreateTexture(size, pbo, textureType,
-                                            GL_UNSIGNED_SHORT_8_8_MESA,
-                                            type, GL_RGBA);
-    }
-    else if (kGLYV12 == videoType)
+    if (kGLYV12 == videoType)
     {
         size.setHeight((3 * size.height() + 1) / 2);
-        tmp_tex = gl_context->CreateTexture(size, pbo, textureType,
-                                            GL_UNSIGNED_BYTE,   // data_type
-                                            GL_LUMINANCE,       // data_fmt
-                                            GL_LUMINANCE        // internal_fmt
-                                            );
+        texture = gl_context->CreateTexture(size, pbo,
+            QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
+            QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
+            QOpenGLTexture::LuminanceFormat);
     }
     else if (kGLUYVY == videoType)
     {
         size.setWidth(size.width() >> 1);
-        tmp_tex = gl_context->CreateTexture(size, pbo, textureType,
-                                            GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA);
+        texture = gl_context->CreateTexture(size, pbo);
     }
     else if ((kGLHQUYV == videoType) || (kGLGPU == videoType) || (kGLRGBA == videoType))
     {
-        tmp_tex = gl_context->CreateTexture(size, pbo, textureType);
+        texture = gl_context->CreateTexture(size, pbo);
     }
 
     tex_size = gl_context->GetTextureSize(size);
-    return tmp_tex;
+    return texture;
 }
 
-uint OpenGLVideo::GetInputTexture(void) const
+MythGLTexture* OpenGLVideo::GetInputTexture(void) const
 {
     return inputTextures[0];
 }
@@ -778,7 +773,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
     {
         copybuffer((uint8_t*)buf, frame, video_dim.width());
     }
-    else if ((kGLYCbCr == videoType) || (kGLUYVY == videoType))
+    else if (kGLUYVY == videoType)
     {
         AVFrame img_out;
         m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_UYVY422);
@@ -849,7 +844,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         gl_context->logDebugMarker(LOC + "PREP_FRAME_START");
 
-    vector<GLuint> inputs = inputTextures;
+    vector<MythGLTexture*> inputs = inputTextures;
     QSize inputsize = inputTextureSize;
     QSize realsize  = gl_context->GetTextureSize(video_disp_dim);
     QOpenGLFramebufferObject* lastFramebuffer = nullptr;
@@ -954,7 +949,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         }
 
         // bind correct textures
-        uint textures[4]; // NB
+        MythGLTexture* textures[4]; // NB
         uint texture_count = 0;
         for (uint i = 0; i < inputs.size(); i++)
             textures[texture_count++] = inputs[i];
@@ -1003,9 +998,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                program);
 
 
-        inputs.clear();
-        foreach (QOpenGLFramebufferObject* fb, filter->frameBuffers)
-            inputs.push_back(fb->texture());
+        inputs = filter->frameBufferTextures;
         inputsize = realsize;
 
         if (gl_features & kGLExtFBDiscard)
@@ -1034,7 +1027,7 @@ void OpenGLVideo::RotateTextures(void)
     if (refsNeeded > 0)
         refsNeeded--;
 
-    GLuint tmp = referenceTextures[referenceTextures.size() - 1];
+    MythGLTexture *tmp = referenceTextures[referenceTextures.size() - 1];
 
     for (uint i = referenceTextures.size() - 1; i > 0;  i--)
         referenceTextures[i] = referenceTextures[i - 1];
@@ -1043,24 +1036,24 @@ void OpenGLVideo::RotateTextures(void)
     inputTextures[0] = tmp;
 }
 
-void OpenGLVideo::DeleteTextures(vector<GLuint> *textures)
-{
-    if ((*textures).empty())
-        return;
-
-    for (uint i = 0; i < (*textures).size(); i++)
-        gl_context->DeleteTexture((*textures)[i]);
-    (*textures).clear();
-}
-
-void OpenGLVideo::SetTextureFilters(vector<GLuint> *textures,
-                                    int filt, int wrap)
+void OpenGLVideo::DeleteTextures(vector<MythGLTexture*> *textures)
 {
     if (textures->empty())
         return;
 
     for (uint i = 0; i < textures->size(); i++)
-        gl_context->SetTextureFilters((*textures)[i], filt, wrap);
+        gl_context->DeleteTexture((*textures)[i]);
+    textures->clear();
+}
+
+void OpenGLVideo::SetTextureFilters(vector<MythGLTexture *> *Textures,
+                                    QOpenGLTexture::Filter Filter,
+                                    QOpenGLTexture::WrapMode Wrap)
+{
+    if (!Textures || (Textures && Textures->empty()))
+        return;
+    for (uint i = 0; i < Textures->size(); i++)
+        gl_context->SetTextureFilters((*Textures)[i], Filter, Wrap);
 }
 
 OpenGLVideo::OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
@@ -1104,7 +1097,6 @@ OpenGLVideo::VideoType OpenGLVideo::StringToType(const QString &Type)
     if ("opengl-yv12" == type)  return kGLYV12;
     if ("opengl-hquyv" == type) return kGLHQUYV;
     if ("opengl-rgba" == type)  return kGLRGBA;
-    if ("opengl-lite" == type)  return kGLYCbCr;
     if ("opengl-gpu" == type)   return kGLGPU;
     return kGLUYVY; // opengl
 }
@@ -1114,7 +1106,6 @@ QString OpenGLVideo::TypeToString(VideoType Type)
     switch (Type)
     {
         case kGLGPU:   return "opengl-gpu";
-        case kGLYCbCr: return "opengl-lite"; // compatibility with old profiles
         case kGLUYVY:  return "opengl";      // compatibility with old profiles
         case kGLYV12:  return "opengl-yv12";
         case kGLHQUYV: return "opengl-hquyv";

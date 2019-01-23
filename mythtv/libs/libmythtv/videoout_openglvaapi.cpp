@@ -277,17 +277,23 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
 
 void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd)
 {
+    if (!gl_context)
+        return;
+
+    QMutexLocker locker(&gl_context_lock);
+    if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
     {
-        QMutexLocker locker(&gl_context_lock);
-        if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
+        MythGLTexture *texture = gl_videochain->GetInputTexture();
+        GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
+        if (texture->m_texture)
         {
             gl_context->makeCurrent();
-            m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
-                                        gl_videochain->GetInputTexture(),
+            m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer, textureid,
                                         gl_videochain->GetTextureType(), scan);
             gl_context->doneCurrent();
         }
     }
+
     VideoOutputOpenGL::PrepareFrame(frame, scan, osd);
 }
 

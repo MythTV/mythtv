@@ -11,6 +11,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLTexture>
 #include <QOpenGLBuffer>
 #include <QOpenGLDebugLogger>
 #include <QHash>
@@ -34,9 +35,6 @@ typedef enum
     kGLExtPBufObj  = 0x0008,
     kGLNVFence     = 0x0010,
     kGLAppleFence  = 0x0020,
-    kGLMesaYCbCr   = 0x0040,
-    kGLAppleYCbCr  = 0x0080,
-    kGLMipMaps     = 0x0100,
     kGLSL          = 0x0200,
     kGLBufferMap   = 0x0800,
     kGLExtRGBA16   = 0x1000,
@@ -45,49 +43,28 @@ typedef enum
 
 #define TEX_OFFSET 8
 
-class MythGLTexture
+class MUI_PUBLIC MythGLTexture
 {
   public:
-    MythGLTexture(bool External = false) :
-        m_external(External),
-        m_type(GL_TEXTURE_2D), m_data(nullptr), m_data_size(0),
-        m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_RGBA),
-        m_internal_fmt(GL_RGBA8), m_pbo(nullptr), m_vbo(nullptr),
-        m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
-        m_size(0,0), m_act_size(0,0)
-    {
-        memset(&m_vertex_data, 0, sizeof(m_vertex_data));
-    }
+    explicit MythGLTexture(QOpenGLTexture *Texture);
+    explicit MythGLTexture(GLuint Texture);
+   ~MythGLTexture() = default;
 
-    ~MythGLTexture()
-    {
-    }
+    unsigned char  *m_data;
+    uint            m_bufferSize;
+    GLuint          m_textureId;
+    QOpenGLTexture *m_texture;
+    QOpenGLTexture::PixelFormat m_pixelFormat;
+    QOpenGLTexture::PixelType   m_pixelType;
+    QOpenGLBuffer  *m_pbo;
+    QOpenGLBuffer  *m_vbo;
+    QSize           m_size;
+    QSize           m_totalSize;
+    bool            m_flip;
+    GLfloat         m_vertexData[16];
 
-    bool    m_external;
-    GLuint  m_type;
-    unsigned char *m_data;
-    uint    m_data_size;
-    GLuint  m_data_type;
-    GLuint  m_data_fmt;
-    GLuint  m_internal_fmt;
-    QOpenGLBuffer *m_pbo;
-    QOpenGLBuffer *m_vbo;
-    GLuint  m_filter;
-    GLuint  m_wrap;
-    QSize   m_size;
-    QSize   m_act_size;
-    GLfloat m_vertex_data[16];
-};
-
-class MythRenderOpenGL;
-
-class MUI_PUBLIC OpenGLLocker
-{
-  public:
-    explicit OpenGLLocker(MythRenderOpenGL *render);
-   ~OpenGLLocker();
   private:
-    MythRenderOpenGL *m_render;
+    Q_DISABLE_COPY(MythGLTexture)
 };
 
 typedef enum
@@ -122,7 +99,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     virtual void swapBuffers();
 
     void setWidget(QWidget *Widget);
-    bool IsDirectRendering() const;
     bool  Init(void);
     int   GetMaxTextureSize(void)    { return m_max_tex_size; }
     uint  GetFeatures(void)          { return m_extraFeaturesUsed;    }
@@ -138,22 +114,27 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void  SetFence(void);
     void  DeleteFence(void);
 
-    void* GetTextureBuffer(uint tex, bool create_buffer);
-    void  UpdateTexture(uint tex, void *buf);
-    uint  CreateHelperTexture(void);
-    uint  CreateTexture(QSize act_size, bool use_pbo, uint type,
-                        uint data_type = GL_UNSIGNED_BYTE,
-                        uint data_fmt = GL_RGBA, uint internal_fmt = GL_RGBA8,
-                        uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
+    void* GetTextureBuffer(MythGLTexture *Texture, bool create_buffer);
+    void  UpdateTexture(MythGLTexture *Texture, void *buf);
+    MythGLTexture* CreateHelperTexture(void);
+    MythGLTexture* CreateTexture(QSize Size, bool UsePBO,
+                        QOpenGLTexture::PixelType     PixelType   = QOpenGLTexture::UInt8,
+                        QOpenGLTexture::PixelFormat   PixelFormat = QOpenGLTexture::RGBA,
+                        QOpenGLTexture::Filter        Filter      = QOpenGLTexture::Linear,
+                        QOpenGLTexture::WrapMode      Wrap        = QOpenGLTexture::ClampToEdge,
+                        QOpenGLTexture::TextureFormat Format      = QOpenGLTexture::NoFormat);
+    MythGLTexture* CreateTextureFromQImage(QImage *Image);
     QSize GetTextureSize(const QSize &size);
-    int   GetTextureDataSize(uint tex);
-    void  SetTextureFilters(uint tex, uint filt, uint wrap);
+    int   GetTextureDataSize(MythGLTexture *Texture);
+    void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
+    void  SetTextureFilters(GLuint Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
     void  ActiveTexture(int active_tex);
-    void  EnableTextures(uint type, uint tex_type = 0);
+    void  EnableTextures(void);
     void  DisableTextures(void);
-    void  DeleteTexture(uint tex);
+    void  DeleteTexture(MythGLTexture *Texture);
 
     QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size);
+    MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
     void DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void BindFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void ClearFramebuffer(void);
@@ -164,11 +145,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     bool   EnableShaderProgram(QOpenGLShaderProgram* Program);
     void   SetShaderProgramParams(QOpenGLShaderProgram* Program, const QMatrix4x4 &Value, const char* Uniform);
 
-    void DrawBitmap(uint tex, QOpenGLFramebufferObject *target,
+    void DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *target,
                     const QRect *src, const QRect *dst,
                     QOpenGLShaderProgram *Program, int alpha = 255,
                     int red = 255, int green = 255, int blue = 255);
-    void DrawBitmap(uint *textures, uint texture_count,
+    void DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                     QOpenGLFramebufferObject *target,
                     const QRectF *src, const QRectF *dst,
                     QOpenGLShaderProgram *Program);
@@ -187,10 +168,10 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
 
   protected:
     ~MythRenderOpenGL();
-    void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
+    void DrawBitmapPriv(MythGLTexture *Texture, const QRect *src, const QRect *dst,
                         QOpenGLShaderProgram *Program, int alpha, int red,
                         int green, int blue);
-    void DrawBitmapPriv(uint *textures, uint texture_count,
+    void DrawBitmapPriv(MythGLTexture **Textures, uint TextureCount,
                         const QRectF *src, const QRectF *dst,
                         QOpenGLShaderProgram *Program);
     void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
@@ -205,40 +186,32 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void ResetProcs(void);
     void SetMatrixView(void);
 
-    QOpenGLBuffer* CreatePBO(uint tex);
+    QOpenGLBuffer* CreatePBO(uint BufferSize);
     QOpenGLBuffer* CreateVBO(uint Size, bool Release = true);
     void DeleteOpenGLResources(void);
-    void DeleteTextures(void);
     void DeleteFramebuffers(void);
 
-    bool UpdateTextureVertices(uint tex, const QRect *src, const QRect *dst);
-    bool UpdateTextureVertices(uint tex, const QRectF *src, const QRectF *dst);
+    bool UpdateTextureVertices(MythGLTexture *Texture, const QRect *src, const QRect *dst);
+    bool UpdateTextureVertices(MythGLTexture *Texture, const QRectF *src, const QRectF *dst);
     GLfloat* GetCachedVertices(GLuint type, const QRect &area);
     void ExpireVertices(uint max = 0);
     void GetCachedVBO(GLuint type, const QRect &area);
     void ExpireVBOS(uint max = 0);
-    bool ClearTexture(uint tex);
-    uint GetBufferSize(QSize size, uint fmt, uint type);
+    uint GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
-    void DeleteShaderPrograms(void);
     bool CreateDefaultShaders(void);
     void DeleteDefaultShaders(void);
 
     static void StoreBicubicWeights(float x, float *dst);
 
   protected:
-    // Textures
-    QHash<GLuint, MythGLTexture> m_textures;
-
     // Framebuffers
-    QVector<QOpenGLFramebufferObject*> m_framebuffers;
     QOpenGLFramebufferObject    *m_activeFramebuffer;
 
     // Synchronisation
     GLuint                       m_fence;
 
     // Shaders
-    QVector<QOpenGLShaderProgram*> m_programs;
     QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount];
     QOpenGLShaderProgram*        m_activeProgram;
 
@@ -258,12 +231,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     uint     m_extraFeaturesUsed;
     int      m_max_tex_size;
     int      m_max_units;
-    int      m_default_texture_type;
 
     // State
     QRect      m_viewport;
     int        m_active_tex;
-    int        m_active_tex_type;
+    int        m_activeTextureTarget;
     bool       m_blend;
     uint32_t   m_background;
     QMatrix4x4 m_projection;
@@ -298,6 +270,15 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void DebugFeatures (void);
     QOpenGLDebugLogger *m_openglDebugger;
     QWindow *m_window;
+};
+
+class MUI_PUBLIC OpenGLLocker
+{
+  public:
+    explicit OpenGLLocker(MythRenderOpenGL *render);
+   ~OpenGLLocker();
+  private:
+    MythRenderOpenGL *m_render;
 };
 
 class MUI_PUBLIC GLMatrix4x4

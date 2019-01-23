@@ -9,6 +9,7 @@
 #include "mythimage.h"
 
 class QWidget;
+class MythGLTexture;
 class MythRenderOpenGL;
 class QOpenGLFramebufferObject;
 
@@ -51,16 +52,16 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     void DeleteFormatImagePriv(MythImage *im) override; // MythPainter
 
     void       ClearCache(void);
-    int        GetTextureFromCache(MythImage *im);
+    MythGLTexture* GetTextureFromCache(MythImage *im);
 
     QWidget          *realParent;
     MythRenderOpenGL *realRender;
     QOpenGLFramebufferObject* target;
     bool              swapControl;
 
-    QMap<MythImage *, uint>    m_ImageIntMap;
+    QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
     std::list<MythImage *>     m_ImageExpireList;
-    std::list<uint>            m_textureDeleteList;
+    std::list<MythGLTexture*>  m_textureDeleteList;
     QMutex                     m_textureDeleteLock;
 };
 

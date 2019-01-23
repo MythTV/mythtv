@@ -36,7 +36,6 @@ class OpenGLVideo
     enum VideoType
     {
         kGLGPU,   // Frame is already in GPU memory
-        kGLYCbCr, // Use Mesa or Apple YCbCr extensions (UYVY) - 16bpp
         kGLUYVY,  // CPU conversion to UYVY422 format - 16bpp
         kGLYV12,  // All processing on GPU - 12bpp
         kGLHQUYV, // High quality interlaced CPU conversion to UYV - 32bpp
@@ -52,7 +51,7 @@ class OpenGLVideo
               bool viewport_control,  VideoType type,
               QString options);
 
-    uint GetInputTexture(void) const;
+    MythGLTexture* GetInputTexture(void) const;
     uint GetTextureType(void) const;
     void UpdateInputFrame(const VideoFrame *frame);
 
@@ -90,7 +89,7 @@ class OpenGLVideo
     QOpenGLShaderProgram* AddFragmentProgram(OpenGLFilterType name,
                             QString deint = QString(),
                             FrameScanType field = kScan_Progressive);
-    uint CreateVideoTexture(QSize size, QSize &tex_size);
+    MythGLTexture* CreateVideoTexture(QSize size, QSize &tex_size);
     void GetProgramStrings(QString &vertex, QString &fragment,
                            OpenGLFilterType filter,
                            QString deint = QString(),
@@ -101,8 +100,10 @@ class OpenGLVideo
     void SetFiltering(void);
 
     void RotateTextures(void);
-    void SetTextureFilters(vector<GLuint> *textures, int filt, int clamp);
-    void DeleteTextures(vector<GLuint> *textures);
+    void SetTextureFilters(vector<MythGLTexture*>  *Textures,
+                           QOpenGLTexture::Filter   Filter,
+                           QOpenGLTexture::WrapMode Wrap);
+    void DeleteTextures(vector<MythGLTexture*> *Textures);
     void TearDownDeinterlacer(void);
 
     VideoType      videoType;
@@ -120,14 +121,13 @@ class OpenGLVideo
     bool           hardwareDeinterlacing;///< OpenGL deinterlacing is enabled
     VideoColourSpace *colourSpace;
     bool           viewportControl;      ///< Video has control over view port
-    vector<GLuint> referenceTextures;    ///< Up to 3 reference textures for filters
-    vector<GLuint> inputTextures;        ///< Textures with raw video data
+    vector<MythGLTexture*> referenceTextures; ///< Up to 3 reference textures for filters
+    vector<MythGLTexture*> inputTextures;     ///< Textures with raw video data
     QSize          inputTextureSize;     ///< Actual size of input texture(s)
     glfilt_map_t   filters;              ///< Filter stages to be applied to frame
     int            refsNeeded;           ///< Number of reference textures expected
-    bool           textureRects;         ///< OpenGLVideo is using rectangular textures
     uint           textureType;          ///< Texture type (e.g. GL_TEXTURE_2D or GL_TEXTURE_RECT)
-    uint           helperTexture;        ///< Extra texture for bicubic filter
+    MythGLTexture *helperTexture;        ///< Extra texture for bicubic filter
     OpenGLFilterType defaultUpsize;      ///< Regular or bicubic upsizing
     uint           gl_features;          ///< OR'd list of GLFeatures in use
     MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY

@@ -18,7 +18,7 @@ extern "C" {
 #include "videovisualgoom.h"
 
 VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd)
-  : VideoVisual(audio, render), m_buffer(nullptr), m_surface(0), m_hd(hd)
+  : VideoVisual(audio, render), m_buffer(nullptr), m_vdpauSurface(0), m_glSurface(nullptr), m_hd(hd)
 {
     int max_width  = m_hd ? 1200 : 600;
     int max_height = m_hd ? 800  : 400;
@@ -35,24 +35,23 @@ VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd
 VideoVisualGoom::~VideoVisualGoom()
 {
 #ifdef USING_OPENGL
-    if (m_surface && m_render && (m_render->Type() == kRenderOpenGL))
+    if (m_glSurface && m_render && (m_render->Type() == kRenderOpenGL))
     {
         MythRenderOpenGL *glrender = static_cast<MythRenderOpenGL*>(m_render);
         if (glrender)
-            glrender->DeleteTexture(m_surface);
-        m_surface = 0;
+            glrender->DeleteTexture(m_glSurface);
+        m_glSurface = nullptr;
     }
 #endif
 
 #ifdef USING_VDPAU
-    if (m_surface && m_render &&
+    if (m_vdpauSurface && m_render &&
        (m_render->Type() == kRenderVDPAU))
     {
-        MythRenderVDPAU *render =
-                    static_cast<MythRenderVDPAU*>(m_render);
+        MythRenderVDPAU *render = static_cast<MythRenderVDPAU*>(m_render);
         if (render)
-            render->DestroyBitmapSurface(m_surface);
-        m_surface = 0;
+            render->DestroyBitmapSurface(m_vdpauSurface);
+        m_vdpauSurface = 0;
     }
 #endif
 
@@ -95,25 +94,23 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
     if ((m_render->Type() == kRenderOpenGL))
     {
         MythRenderOpenGL *glrender = static_cast<MythRenderOpenGL*>(m_render);
-        if (!m_surface && glrender && m_buffer)
+        if (!m_glSurface && glrender && m_buffer)
         {
-            m_surface = glrender->CreateTexture(m_area.size(), true, 0,
-                                  GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
-                                  GL_LINEAR_MIPMAP_LINEAR);
+            m_glSurface = glrender->CreateTexture(m_area.size(), true);
         }
 
-        if (m_surface && glrender && m_buffer)
+        if (m_glSurface && glrender && m_buffer)
         {
             if (m_buffer != last)
             {
-                void* buf = glrender->GetTextureBuffer(m_surface, false);
+                void* buf = glrender->GetTextureBuffer(m_glSurface, false);
                 if (buf)
                     memcpy(buf, m_buffer, m_area.width() * m_area.height() * 4);
-                glrender->UpdateTexture(m_surface, (void*)m_buffer);
+                glrender->UpdateTexture(m_glSurface, (void*)m_buffer);
             }
             QRectF src(m_area);
             QRectF dst(area);
-            glrender->DrawBitmap(&m_surface, 1, nullptr, &src, &dst, nullptr);
+            glrender->DrawBitmap(&m_glSurface, 1, nullptr, &src, &dst, nullptr);
         }
         return;
     }
@@ -122,21 +119,20 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
 #ifdef USING_VDPAU
     if (m_render->Type() == kRenderVDPAU)
     {
-        MythRenderVDPAU *render =
-                    static_cast<MythRenderVDPAU*>(m_render);
+        MythRenderVDPAU *render = static_cast<MythRenderVDPAU*>(m_render);
 
-        if (!m_surface && render)
-            m_surface = render->CreateBitmapSurface(m_area.size());
+        if (!m_vdpauSurface && render)
+            m_vdpauSurface = render->CreateBitmapSurface(m_area.size());
 
-        if (m_surface && render && m_buffer)
+        if (m_vdpauSurface && render && m_buffer)
         {
             if (m_buffer != last)
             {
                 void    *plane[1] = { m_buffer };
                 uint32_t pitch[1] = { static_cast<uint32_t>(m_area.width() * 4) };
-                render->UploadBitmap(m_surface, plane, pitch);
+                render->UploadBitmap(m_vdpauSurface, plane, pitch);
             }
-            render->DrawBitmap(m_surface, 0, nullptr, nullptr, kVDPBlendNull, 255, 255, 255, 255);
+            render->DrawBitmap(m_vdpauSurface, 0, nullptr, nullptr, kVDPBlendNull, 255, 255, 255, 255);
         }
         return;
     }

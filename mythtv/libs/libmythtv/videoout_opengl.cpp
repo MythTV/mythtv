@@ -32,7 +32,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
                 "opengldoubleratefieldorder";
 
     QStringList safe;
-    safe << "opengl" << "opengl-lite" << "opengl-yv12" << "opengl-hquyv" << "opengl-rgba";
+    safe << "opengl" << "opengl-yv12" << "opengl-hquyv" << "opengl-rgba";
 
     // all profiles can handle all software frames
     (*opts.safe_renderers)["dummy"].append(safe);
@@ -67,12 +67,6 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     opts.deints->insert("opengl-yv12", cpudeints + gldeints);
     (*opts.osds)["opengl-yv12"].append("opengl2");
     opts.priorities->insert("opengl-yv12", 65);
-
-    // lite (YCbCr) profile - no colourspace control, GPU deinterlacing
-    opts.renderers->append("opengl-lite");
-    opts.deints->insert("opengl-lite", cpudeints);
-    (*opts.osds)["opengl-lite"].append("opengl2");
-    opts.priorities->insert("opengl-lite", 50);
 
     // software fallback
     opts.renderers->append("opengl-rgba");
@@ -699,7 +693,7 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID myth_codec_id, co
     if (!codec_sw_copy(myth_codec_id) || getenv("NO_OPENGL"))
         return list;
 
-    list << "opengl" << "opengl-lite" << "opengl-yv12" << "opengl-hquyv" << "opengl-rgba";
+    list << "opengl" << "opengl-yv12" << "opengl-hquyv" << "opengl-rgba";
     return list;
 }
 
@@ -988,8 +982,7 @@ bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
 {
     // anything OpenGL when using shaders
     if (filtername.contains("opengl") &&
-        ((OpenGLVideo::kGLRGBA != gl_opengl_type) && (OpenGLVideo::kGLYCbCr != gl_opengl_type) &&
-         (OpenGLVideo::kGLGPU != gl_opengl_type)))
+        ((OpenGLVideo::kGLRGBA != gl_opengl_type) && (OpenGLVideo::kGLGPU != gl_opengl_type)))
     {
         return true;
     }

@@ -6,7 +6,7 @@ using std::min;
 #include <QLibrary>
 #include <QPainter>
 #include <QWindow>
-#include <QGLFormat>
+#include <QWidget>
 #include <QGuiApplication>
 
 // MythTV
@@ -44,6 +44,38 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 #define MAX_VERTEX_CACHE 500
 #define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
 
+MythGLTexture::MythGLTexture(QOpenGLTexture *Texture)
+  : m_data(nullptr),
+    m_bufferSize(0),
+    m_textureId(0),
+    m_texture(Texture),
+    m_pixelFormat(QOpenGLTexture::RGBA),
+    m_pixelType(QOpenGLTexture::UInt8),
+    m_pbo(nullptr),
+    m_vbo(nullptr),
+    m_size(0,0),
+    m_totalSize(0,0),
+    m_flip(false)
+{
+    memset(&m_vertexData, 0, sizeof(m_vertexData));
+}
+
+MythGLTexture::MythGLTexture(GLuint Texture)
+  : m_data(nullptr),
+    m_bufferSize(0),
+    m_textureId(Texture),
+    m_texture(nullptr),
+    m_pixelFormat(QOpenGLTexture::RGBA),
+    m_pixelType(QOpenGLTexture::UInt8),
+    m_pbo(nullptr),
+    m_vbo(nullptr),
+    m_size(0,0),
+    m_totalSize(0,0),
+    m_flip(false)
+{
+    memset(&m_vertexData, 0, sizeof(m_vertexData));
+}
+
 OpenGLLocker::OpenGLLocker(MythRenderOpenGL *render) : m_render(render)
 {
     if (m_render)
@@ -76,7 +108,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
         return nullptr;
     }
 
-    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+    QSurfaceFormat format;
     format.setDepthBufferSize(0);
     format.setStencilBufferSize(0);
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
@@ -225,18 +257,6 @@ bool MythRenderOpenGL::Init(void)
         m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
         m_extraFeatures |= kGLAppleFence;
 
-    // MESA YCbCr
-    if (hasExtension("GL_MESA_ycbcr_texture"))
-        m_extraFeatures |= kGLMesaYCbCr;
-
-    // Apple YCbCr
-    if (hasExtension("GL_APPLE_ycbcr_422"))
-        m_extraFeatures |= kGLAppleYCbCr;
-
-    // Mipmapping - is this available by default on ES?
-    if (hasExtension("GL_SGIS_generate_mipmap"))
-        m_extraFeatures |= kGLMipMaps;
-
     // Framebuffer discard - GLES only
     if (isOpenGLES() && hasExtension("GL_EXT_discard_framebuffer") && m_glDiscardFramebuffer)
         m_extraFeatures |= kGLExtFBDiscard;
@@ -277,7 +297,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg((const char*)glGetString(GL_VENDOR)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg((const char*)glGetString(GL_RENDERER)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg((const char*)glGetString(GL_VERSION)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering     : %1").arg(GLYesNo(IsDirectRendering())));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(qApp->platformName()));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
@@ -292,8 +311,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer blitting : %1").arg(GLYesNo(QOpenGLFramebufferObject::hasOpenGLFramebufferBlit())));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer discard  : %1").arg(GLYesNo(m_extraFeatures & kGLExtFBDiscard)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("YCbCr textures       : %1")
-        .arg(GLYesNo((m_extraFeatures & kGLMesaYCbCr) || (m_extraFeatures & kGLAppleYCbCr))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
         .arg(GLYesNo((m_extraFeatures & kGLAppleFence) || (m_extraFeatures & kGLNVFence))));
 
@@ -313,11 +330,6 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL has no shader support");
         recommended = false;
     }
-    else if (!IsDirectRendering())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is using software rendering.");
-        recommended = false;
-    }
     else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is using software rasterizer.");
@@ -331,11 +343,6 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
         recommended = false;
     }
     return recommended;
-}
-
-bool MythRenderOpenGL::IsDirectRendering() const
-{
-    return QGLFormat::fromSurfaceFormat(format()).directRendering();
 }
 
 void MythRenderOpenGL::swapBuffers()
@@ -500,133 +507,148 @@ void MythRenderOpenGL::DeleteFence(void)
     }
 }
 
-void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
+void* MythRenderOpenGL::GetTextureBuffer(MythGLTexture *Texture, bool create_buffer)
 {
-    if (!m_textures.contains(tex))
+    if (!Texture || (Texture && !Texture->m_texture))
         return nullptr;
 
     makeCurrent(); // associated doneCurrent() in UpdateTexture
-    EnableTextures(tex);
-    glBindTexture(m_textures[tex].m_type, tex);
-    if (m_textures[tex].m_pbo)
+    EnableTextures();
+
+    if (Texture->m_pbo)
     {
-        m_textures[tex].m_pbo->bind();
-        return m_textures[tex].m_pbo->map(QOpenGLBuffer::WriteOnly);
+        Texture->m_pbo->bind();
+        return Texture->m_pbo->map(QOpenGLBuffer::WriteOnly);
     }
     else if (!create_buffer)
     {
         return nullptr;
     }
 
-    if (m_textures[tex].m_data)
-        return m_textures[tex].m_data;
+    if (Texture->m_data)
+        return Texture->m_data;
+    if (!Texture->m_bufferSize)
+        return nullptr;
 
-    unsigned char *scratch = new unsigned char[m_textures[tex].m_data_size];
+    unsigned char *scratch = new unsigned char[Texture->m_bufferSize];
     if (scratch)
     {
-        memset(scratch, 0, m_textures[tex].m_data_size);
-        m_textures[tex].m_data = scratch;
+        memset(scratch, 0, Texture->m_bufferSize);
+        Texture->m_data = scratch;
     }
     return scratch;
 }
 
-void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
+void MythRenderOpenGL::UpdateTexture(MythGLTexture *Texture, void *buf)
 {
     // N.B. GetTextureBuffer must be called first
-    if (!m_textures.contains(tex))
+    if (!Texture)
         return;
 
-    QSize size = m_textures[tex].m_act_size;
-
-    if (m_textures[tex].m_pbo)
+    if (Texture->m_pbo)
     {
-        m_textures[tex].m_pbo->unmap();
-        glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
-                        size.height(), m_textures[tex].m_data_fmt,
-                        m_textures[tex].m_data_type, nullptr);
-        m_textures[tex].m_pbo->release(QOpenGLBuffer::PixelUnpackBuffer);
+        Texture->m_pbo->unmap();
+        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, nullptr);
+        Texture->m_pbo->release(QOpenGLBuffer::PixelUnpackBuffer);
     }
     else
     {
-        glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
-                        size.height(), m_textures[tex].m_data_fmt,
-                        m_textures[tex].m_data_type, buf);
+        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, buf);
     }
 
     doneCurrent();
 }
 
-uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
-                                     uint type, uint data_type,
-                                     uint data_fmt, uint internal_fmt,
-                                     uint filter, uint wrap)
+MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
+                                               bool UsePBO,
+                                               QOpenGLTexture::PixelType PixelType,
+                                               QOpenGLTexture::PixelFormat PixelFormat,
+                                               QOpenGLTexture::Filter Filter,
+                                               QOpenGLTexture::WrapMode Wrap,
+                                               QOpenGLTexture::TextureFormat Format)
 {
-    // OpenGLES requires same formats for internal and external.
-    if (isOpenGLES())
-        internal_fmt = data_fmt;
+    OpenGLLocker locker(this);
+    uint datasize = GetBufferSize(Size, PixelFormat, PixelType);
+    if (!datasize)
+        return nullptr;
 
-    if (!type)
-        type = m_default_texture_type;
-
-    QSize tot_size = GetTextureSize(act_size);
-
-    makeCurrent();
-
-    EnableTextures(0, type);
-
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(type, tex);
-
-    if (tex)
+    QOpenGLTexture *texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    texture->setAutoMipMapGenerationEnabled(false);
+    texture->setMipLevels(1);
+    texture->setSize(Size.width(), Size.height()); // this triggers creation
+    if (!texture->textureId())
     {
-        MythGLTexture texture;
-        texture.m_type         = type;
-        texture.m_data_type    = data_type;
-        texture.m_data_fmt     = data_fmt;
-        texture.m_internal_fmt = internal_fmt;
-        texture.m_size         = tot_size;
-        texture.m_act_size     = act_size;
-        texture.m_data_size    = GetBufferSize(act_size, data_fmt, data_type);
-        m_textures.insert(tex, texture);
-
-        if (ClearTexture(tex) && m_textures[tex].m_data_size)
-        {
-            SetTextureFilters(tex, filter, wrap);
-            m_textures[tex].m_vbo = CreateVBO(kVertexSize);
-            if (use_pbo)
-                m_textures[tex].m_pbo = CreatePBO(tex);
-        }
-        else
-        {
-            DeleteTexture(tex);
-            tex = 0;
-        }
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to create texure");
+        delete texture;
+        return nullptr;
     }
 
-    Flush(true);
-    doneCurrent();
+    if (Format == QOpenGLTexture::NoFormat)
+    {
+        if (isOpenGLES() && format().majorVersion() < 3)
+            Format = QOpenGLTexture::RGBAFormat;
+        else
+            Format = QOpenGLTexture::RGBA8_UNorm;
+    }
+    texture->setFormat(Format);
+    texture->allocateStorage(PixelFormat, PixelType);
+    texture->setMinMagFilters(Filter, Filter);
+    texture->setWrapMode(Wrap);
 
-    return tex;
+    MythGLTexture *result = new MythGLTexture(texture);
+    result->m_pixelFormat = PixelFormat;
+    result->m_pixelType   = PixelType;
+    result->m_vbo         = CreateVBO(kVertexSize);
+    result->m_totalSize   = GetTextureSize(Size);
+    result->m_bufferSize  = datasize;
+    result->m_size        = Size;
+    if (UsePBO)
+        result->m_pbo = CreatePBO(datasize);
+    return result;
 }
 
-uint MythRenderOpenGL::CreateHelperTexture(void)
+MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
+{
+    if (!Image)
+        return nullptr;
+
+    OpenGLLocker locker(this);
+    QOpenGLTexture *texture = new QOpenGLTexture(*Image, QOpenGLTexture::DontGenerateMipMaps);
+    if (!texture->textureId())
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to create texure");
+        delete texture;
+        return nullptr;
+    }
+    texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+    texture->setWrapMode(QOpenGLTexture::ClampToEdge);
+    MythGLTexture *result = new MythGLTexture(texture);
+    result->m_texture     = texture;
+    result->m_vbo         = CreateVBO(kVertexSize);
+    result->m_totalSize   = GetTextureSize(Image->size());
+    // N.B. Format and type per qopengltexure.cpp
+    result->m_pixelFormat = QOpenGLTexture::RGBA;
+    result->m_pixelType   = QOpenGLTexture::UInt8;
+    result->m_bufferSize  = GetBufferSize(Image->size(), QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+    result->m_size        = Image->size();
+    result->m_flip        = true;
+    return result;
+}
+
+MythGLTexture* MythRenderOpenGL::CreateHelperTexture(void)
 {
     makeCurrent();
 
     uint width = m_max_tex_size;
-    uint tmp_tex = CreateTexture(QSize(width, 1), false,
-                                 GL_TEXTURE_2D, GL_FLOAT, GL_RGBA,
-                                 GL_RGBA16, GL_NEAREST, GL_REPEAT);
-
-    if (!tmp_tex)
-    {
-        DeleteTexture(tmp_tex);
-        return 0;
-    }
+    MythGLTexture *texture = CreateTexture(QSize(width, 1), false,
+                                           QOpenGLTexture::Float32,
+                                           QOpenGLTexture::RGBA,
+                                           QOpenGLTexture::Linear,
+                                           QOpenGLTexture::Repeat,
+                                           QOpenGLTexture::RGBA16_UNorm);
 
     float *buf = nullptr;
-    buf = new float[m_textures[tmp_tex].m_data_size];
+    buf = new float[texture->m_bufferSize];
     float *ref = buf;
 
     for (uint i = 0; i < width; i++)
@@ -638,15 +660,14 @@ uint MythRenderOpenGL::CreateHelperTexture(void)
     StoreBicubicWeights(0, buf);
     StoreBicubicWeights(1, &buf[(width - 1) << 2]);
 
-    EnableTextures(tmp_tex);
-    glBindTexture(m_textures[tmp_tex].m_type, tmp_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, width, 1, 0, GL_RGBA, GL_FLOAT, buf);
-
+    EnableTextures();
+    texture->m_texture->bind();
+    texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Created bicubic helper texture (%1 samples)") .arg(width));
     delete [] buf;
     doneCurrent();
-    return tmp_tex;
+    return texture;
 }
 
 QSize MythRenderOpenGL::GetTextureSize(const QSize &size)
@@ -663,42 +684,51 @@ QSize MythRenderOpenGL::GetTextureSize(const QSize &size)
     return QSize(w, h);
 }
 
-int MythRenderOpenGL::GetTextureDataSize(uint tex)
+int MythRenderOpenGL::GetTextureDataSize(MythGLTexture *Texture)
 {
-    if (!m_textures.contains(tex))
-        return 0;
-    return m_textures[tex].m_data_size;
+    if (Texture)
+        return Texture->m_bufferSize;
+    return 0;
 }
 
-void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
+void MythRenderOpenGL::SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap)
 {
-    if (!m_textures.contains(tex))
+    if (!Texture || (Texture && !Texture->m_texture))
         return;
 
-    if (filt == GL_LINEAR_MIPMAP_LINEAR && !(m_extraFeaturesUsed & kGLMipMaps))
-        filt = GL_LINEAR;
+    makeCurrent();
+    EnableTextures();
+    Texture->m_texture->bind();
+    Texture->m_texture->setWrapMode(Wrap);
+    Texture->m_texture->setMinMagFilters(Filter, Filter);
+    doneCurrent();
+}
+
+/*! \brief Set the texture filters for the given OpenGL texture object
+ *
+ * \note This is used to set filters for textures attached to QOpenGLFramebufferObjects.
+ * By default, these have GL_NEAREST set for the min/mag filters and there is no
+ * method to change them. Furthermore we cannot wrap these textures in a QOpenGLTexture
+ * and use the functionality in that class. So back to basics... and convert between
+ * QOpenGLTexture and GL enums.
+*/
+void MythRenderOpenGL::SetTextureFilters(GLuint Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode)
+{
+    if (!Texture)
+        return;
+
+    GLenum wrap   = GL_CLAMP_TO_EDGE;
+    GLenum minmag = GL_NEAREST;
+    if (Filter == QOpenGLTexture::Linear)
+        minmag = GL_LINEAR;
 
     makeCurrent();
-    EnableTextures(tex);
-    m_textures[tex].m_filter = filt;
-    m_textures[tex].m_wrap   = wrap;
-    uint type = m_textures[tex].m_type;
-    glBindTexture(type, tex);
-    uint mag_filt = filt;
-    if (filt == GL_LINEAR_MIPMAP_LINEAR)
-    {
-        mag_filt = GL_LINEAR;
-#ifdef GL_GENERATE_MIPMAP_HINT_SGIS
-        glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST);
-#endif
-#ifdef GL_GENERATE_MIPMAP_SGIS
-        glTexParameteri(type, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-#endif
-    }
-    glTexParameteri(type, GL_TEXTURE_MIN_FILTER, filt);
-    glTexParameteri(type, GL_TEXTURE_MAG_FILTER, mag_filt);
-    glTexParameteri(type, GL_TEXTURE_WRAP_S, wrap);
-    glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
+    EnableTextures();
+    glBindTexture(GL_TEXTURE_2D, Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minmag);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, minmag);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     wrap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     wrap);
     doneCurrent();
 }
 
@@ -728,57 +758,44 @@ void MythRenderOpenGL::StoreBicubicWeights(float x, float *dst)
     *dst++ = 0;
 }
 
-void MythRenderOpenGL::EnableTextures(uint tex, uint tex_type)
+void MythRenderOpenGL::EnableTextures(void)
 {
-    if (isOpenGLES())
-        return;
-    if (tex && !m_textures.contains(tex))
+    if (isOpenGLES() || m_activeTextureTarget)
         return;
 
     makeCurrent();
-    int type = tex ? m_textures[tex].m_type : tex_type;
-    if (type != m_active_tex_type)
-    {
-        if (m_active_tex_type)
-            glDisable(m_active_tex_type);
-        glEnable(type);
-        m_active_tex_type = type;
-    }
+    glEnable(GL_TEXTURE_2D);
+    m_activeTextureTarget = GL_TEXTURE_2D;
     doneCurrent();
 }
 
 void MythRenderOpenGL::DisableTextures(void)
 {
-    if (isOpenGLES())
+    if (isOpenGLES() || !m_activeTextureTarget)
         return;
-    if (!m_active_tex_type)
-        return;
+
     makeCurrent();
-    glDisable(m_active_tex_type);
-    m_active_tex_type = 0;
+    glDisable(m_activeTextureTarget);
+    m_activeTextureTarget = 0;
     doneCurrent();
 }
 
-void MythRenderOpenGL::DeleteTexture(uint tex)
+void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
 {
-    if (!m_textures.contains(tex))
+    if (!Texture)
         return;
 
     makeCurrent();
-
-    if (!m_textures[tex].m_external)
-    {
-        GLuint gltex = tex;
-        glDeleteTextures(1, &gltex);
-    }
-    if (m_textures[tex].m_data)
-        delete m_textures[tex].m_data;
-    if (m_textures[tex].m_pbo)
-        delete m_textures[tex].m_pbo;
-    if (m_textures[tex].m_vbo)
-        delete m_textures[tex].m_vbo;
-    m_textures.remove(tex);
-
+    // N.B. Don't delete m_textureId - it is owned externally
+    if (Texture->m_texture)
+        delete Texture->m_texture;
+    if (Texture->m_data)
+        delete [] Texture->m_data;
+    if (Texture->m_pbo)
+        delete Texture->m_pbo;
+    if (Texture->m_vbo)
+        delete Texture->m_vbo;
+    delete Texture;
     Flush(true);
     doneCurrent();
 }
@@ -792,31 +809,12 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size)
     QOpenGLFramebufferObject *framebuffer = new QOpenGLFramebufferObject(Size);
     if (framebuffer->isValid())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Created FBO: %1x%2 id %3 texture %4 attach %5 bound %6")
-            .arg(framebuffer->width()).arg(framebuffer->height())
-            .arg(framebuffer->handle()).arg(framebuffer->texture())
-            .arg(framebuffer->attachment()).arg(framebuffer->isBound()));
         if (framebuffer->isBound())
         {
             m_activeFramebuffer = framebuffer;
             BindFramebuffer(nullptr);
         }
-
-        // Add the texture to our known list. This is probably temporary code
-        // but we need a VBO to render the texture. We should not be attempting
-        // to create any PBOs or texture memory so data size should not be
-        // critical.
-        MythGLTexture texture(true /*external - don't delete!*/);
-        GLuint textureid    = framebuffer->texture();
-        texture.m_type      = framebuffer->format().textureTarget();
-        texture.m_size      = texture.m_act_size = framebuffer->size();
-        texture.m_data_type = GL_UNSIGNED_BYTE; // NB Guess!
-        texture.m_data_fmt  = texture.m_internal_fmt = framebuffer->format().internalTextureFormat();
-        texture.m_data_size = GetBufferSize(texture.m_size, texture.m_data_fmt, texture.m_data_type);
-        texture.m_vbo       = CreateVBO(kVertexSize);
-        m_textures.insert(textureid, texture);
         Flush(true);
-        m_framebuffers.append(framebuffer);
         return framebuffer;
     }
     LOG(VB_GENERAL, LOG_ERR, "Failed to create framebuffer object");
@@ -824,16 +822,25 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size)
     return nullptr;
 }
 
+MythGLTexture* MythRenderOpenGL::CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer)
+{
+    if (!Framebuffer)
+        return nullptr;
+
+    MythGLTexture *texture = new MythGLTexture(Framebuffer->texture());
+    texture->m_size        = texture->m_totalSize = Framebuffer->size();
+    texture->m_vbo         = CreateVBO(kVertexSize);
+    return texture;
+}
+
 void MythRenderOpenGL::DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 {
-    if (!m_framebuffers.contains(Framebuffer))
-        return;
-
-    makeCurrent();
-    m_framebuffers.removeAll(Framebuffer);
-    DeleteTexture(Framebuffer->texture());
-    delete Framebuffer;
-    doneCurrent();
+    if (Framebuffer)
+    {
+        makeCurrent();
+        delete Framebuffer;
+        doneCurrent();
+    }
 }
 
 void MythRenderOpenGL::BindFramebuffer(QOpenGLFramebufferObject *Framebuffer)
@@ -870,31 +877,28 @@ void MythRenderOpenGL::DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer)
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawBitmap(uint tex, QOpenGLFramebufferObject *target,
+void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *target,
                                   const QRect *src, const QRect *dst,
                                   QOpenGLShaderProgram *Program, int alpha,
                                   int red, int green, int blue)
 {
-    if (!tex || !m_textures.contains(tex))
-        return;
-
     makeCurrent();
     BindFramebuffer(target);
-    DrawBitmapPriv(tex, src, dst, Program, alpha, red, green, blue);
+    DrawBitmapPriv(Texture, src, dst, Program, alpha, red, green, blue);
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
+void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                                   QOpenGLFramebufferObject *target,
                                   const QRectF *src, const QRectF *dst,
                                   QOpenGLShaderProgram *Program)
 {
-    if (!textures || !texture_count)
+    if (!Textures || !TextureCount)
         return;
 
     makeCurrent();
     BindFramebuffer(target);
-    DrawBitmapPriv(textures, texture_count, src, dst, Program);
+    DrawBitmapPriv(Textures, TextureCount, src, dst, Program);
     doneCurrent();
 }
 
@@ -930,16 +934,13 @@ inline void MythRenderOpenGL::glVertexAttribPointerI(
 #pragma GCC diagnostic pop
 }
 
-void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
+void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture *Texture, const QRect *src, const QRect *dst,
                                       QOpenGLShaderProgram *Program, int alpha,
                                      int red, int green, int blue)
 {
-    if (!m_textures.contains(tex))
+    if (!Texture || (Texture && !((Texture->m_texture || Texture->m_textureId) && Texture->m_vbo)))
         return;
-    if (!m_textures[tex].m_vbo)
-        return;
-    if (Program && !m_programs.contains(Program))
-        Program = nullptr;
+
     if (Program == nullptr)
         Program = m_defaultPrograms[kShaderDefault];
 
@@ -947,25 +948,27 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
     SetBlend(true);
 
-    EnableTextures(tex);
-
+    EnableTextures();
     Program->setUniformValue("s_texture0", 0);
     ActiveTexture(GL_TEXTURE0);
-    glBindTexture(m_textures[tex].m_type, tex);
+    if (Texture->m_texture)
+        Texture->m_texture->bind();
+    else
+        glBindTexture(GL_TEXTURE_2D, Texture->m_textureId);
 
-    QOpenGLBuffer* buffer = m_textures[tex].m_vbo;
+    QOpenGLBuffer* buffer = Texture->m_vbo;
     buffer->bind();
-    UpdateTextureVertices(tex, src, dst);
+    UpdateTextureVertices(Texture, src, dst);
     if (m_extraFeaturesUsed & kGLBufferMap)
     {
         void* target = buffer->map(QOpenGLBuffer::WriteOnly);
         if (target)
-            memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
+            memcpy(target, Texture->m_vertexData, kVertexSize);
         buffer->unmap();
     }
     else
     {
-        buffer->write(0, m_textures[tex].m_vertex_data, kVertexSize);
+        buffer->write(0, Texture->m_vertexData, kVertexSize);
     }
 
     glEnableVertexAttribArray(VERTEX_INDEX);
@@ -986,51 +989,47 @@ void MythRenderOpenGL::DrawBitmapPriv(uint tex, const QRect *src, const QRect *d
     buffer->release(QOpenGLBuffer::VertexBuffer);
 }
 
-void MythRenderOpenGL::DrawBitmapPriv(uint *textures, uint texture_count,
+void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture **Textures, uint TextureCount,
                                       const QRectF *src, const QRectF *dst,
                                       QOpenGLShaderProgram *Program)
 {
-    if (Program && !m_programs.contains(Program))
-        Program = nullptr;
     if (Program == nullptr)
         Program = m_defaultPrograms[kShaderDefault];
 
-    uint first = textures[0];
-    if (!m_textures.contains(first))
-        return;
-    if (!m_textures[first].m_vbo)
+    MythGLTexture* first = Textures[0];
+    if (!first || (first && !((first->m_texture || first->m_textureId) && first->m_vbo)))
         return;
 
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
     SetBlend(false);
 
-    EnableTextures(first);
+    EnableTextures();
     uint active_tex = 0;
-    for (uint i = 0; i < texture_count; i++)
+    for (uint i = 0; i < TextureCount; i++)
     {
-        if (m_textures.contains(textures[i]))
-        {
-            QString uniform = QString("s_texture%1").arg(active_tex);
-            Program->setUniformValue(qPrintable(uniform), active_tex);
-            ActiveTexture(GL_TEXTURE0 + active_tex++);
-            glBindTexture(m_textures[textures[i]].m_type, textures[i]);
-        }
+        QString uniform = QString("s_texture%1").arg(active_tex);
+        Program->setUniformValue(qPrintable(uniform), active_tex);
+        ActiveTexture(GL_TEXTURE0 + active_tex++);
+        if (Textures[i]->m_texture)
+            Textures[i]->m_texture->bind();
+        else
+            glBindTexture(GL_TEXTURE_2D, Textures[i]->m_textureId);
     }
 
-    QOpenGLBuffer* buffer = m_textures[first].m_vbo;
+    QOpenGLBuffer* buffer = first->m_vbo;
     buffer->bind();
     UpdateTextureVertices(first, src, dst);
     if (m_extraFeaturesUsed & kGLBufferMap)
     {
         void* target = buffer->map(QOpenGLBuffer::WriteOnly);
         if (target)
-            memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
+            memcpy(target, first->m_vertexData, kVertexSize);
         buffer->unmap();
     }
     else
     {
-        buffer->write(0, m_textures[first].m_vertex_data, kVertexSize);
+        buffer->write(0, first->m_vertexData, kVertexSize);
     }
 
     glEnableVertexAttribArray(VERTEX_INDEX);
@@ -1343,11 +1342,10 @@ void MythRenderOpenGL::ResetVars(void)
     m_extraFeaturesUsed = kGLFeatNone;
     m_max_tex_size    = 0;
     m_max_units       = 0;
-    m_default_texture_type = GL_TEXTURE_2D;
 
     m_viewport        = QRect();
     m_active_tex      = 0;
-    m_active_tex_type = 0;
+    m_activeTextureTarget = 0;
     m_activeFramebuffer = nullptr;
     m_blend           = false;
     m_background      = 0x00000000;
@@ -1374,12 +1372,10 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glDiscardFramebuffer = nullptr;
 }
 
-QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint tex)
+QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint BufferSize)
 {
     OpenGLLocker locker(this);
-    if (!(m_extraFeaturesUsed & kGLExtPBufObj))
-        return nullptr;
-    if (!m_textures.contains(tex))
+    if (!(m_extraFeaturesUsed & kGLExtPBufObj) || !BufferSize)
         return nullptr;
 
     QOpenGLBuffer *buffer = new QOpenGLBuffer(QOpenGLBuffer::PixelUnpackBuffer);
@@ -1387,7 +1383,7 @@ QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint tex)
     {
         buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
         buffer->bind();
-        buffer->allocate(m_textures[tex].m_data_size);
+        buffer->allocate(BufferSize);
         buffer->release(QOpenGLBuffer::PixelUnpackBuffer);
         return buffer;
     }
@@ -1426,15 +1422,11 @@ QOpenGLBuffer* MythRenderOpenGL::CreateVBO(uint Size, bool Release /*=true*/)
 void MythRenderOpenGL::DeleteOpenGLResources(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
-    DeleteFramebuffers();
-    DeleteTextures();
     DeleteDefaultShaders();
-    DeleteShaderPrograms();
     DeleteFence();
-    Flush(true);
-
     ExpireVertices();
     ExpireVBOS();
+    Flush(false);
 
     if (m_cachedVertices.size())
     {
@@ -1449,53 +1441,22 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     }
 }
 
-void MythRenderOpenGL::DeleteTextures(void)
-{
-    QHash<GLuint, MythGLTexture>::iterator it;
-    for (it = m_textures.begin(); it !=m_textures.end(); ++it)
-    {
-        if (!it.value().m_external)
-            glDeleteTextures(1, &(it.key()));
-        if (it.value().m_data)
-            delete it.value().m_data;
-        if (it.value().m_pbo)
-            delete it.value().m_pbo;
-        if (it.value().m_vbo)
-            delete it.value().m_vbo;
-    }
-    m_textures.clear();
-    Flush(true);
-}
-
-void MythRenderOpenGL::DeleteFramebuffers(void)
-{
-    foreach (QOpenGLFramebufferObject *framebuffer, m_framebuffers)
-    {
-        DeleteTexture(framebuffer->texture());
-        delete framebuffer;
-    }
-    m_framebuffers.clear();
-    Flush(true);
-}
-
-bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
+bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect *src,
                                              const QRect *dst)
 {
-    if (!m_textures.contains(tex))
+    if (!Texture || (Texture && Texture->m_size.isEmpty()))
         return false;
 
-    GLfloat *data = m_textures[tex].m_vertex_data;
-    QSize    size = m_textures[tex].m_size;
-    if (size.isEmpty())
-        return false;
+    GLfloat *data = Texture->m_vertexData;
+    QSize    size = Texture->m_size;
 
     int width  = min(src->width(),  size.width());
     int height = min(src->height(), size.height());
 
     data[0 + TEX_OFFSET] = src->left() / (float)size.width();
-    data[1 + TEX_OFFSET] = (src->top() + height) / (float)size.height();
+    data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (src->top() + height) / (float)size.height();
     data[6 + TEX_OFFSET] = (src->left() + width) / (float)size.width();
-    data[7 + TEX_OFFSET] = src->top() / (float)size.height();
+    data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = src->top() / (float)size.height();
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
     data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
@@ -1509,16 +1470,14 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
     return true;
 }
 
-bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
+bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRectF *src,
                                              const QRectF *dst)
 {
-    if (!m_textures.contains(tex))
+    if (!Texture || (Texture && Texture->m_size.isEmpty()))
         return false;
 
-    GLfloat *data = m_textures[tex].m_vertex_data;
-    QSize    size = m_textures[tex].m_size;
-    if (size.isEmpty())
-        return false;
+    GLfloat *data = Texture->m_vertexData;
+    QSize    size = Texture->m_size;
 
     data[0 + TEX_OFFSET] = src->left() / (qreal)size.width();
     data[1 + TEX_OFFSET] = (src->top() + src->height()) / (qreal)size.height();
@@ -1637,87 +1596,41 @@ void MythRenderOpenGL::ExpireVBOS(uint max)
     }
 }
 
-bool MythRenderOpenGL::ClearTexture(uint tex)
+uint MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type)
 {
-    if (!m_textures.contains(tex))
-        return false;
+    uint bytes = 0;
+    uint bpp = 0;;
 
-    QSize size = m_textures[tex].m_size;
-    uint tmp_size = GetBufferSize(size, m_textures[tex].m_data_fmt,
-                                  m_textures[tex].m_data_type);
-
-    if (!tmp_size)
-        return false;
-
-    unsigned char *scratch = new unsigned char[tmp_size];
-
-    if (!scratch)
-        return false;
-
-    memset(scratch, 0, tmp_size);
-
-    glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                 size.width(), size.height(), 0, m_textures[tex].m_data_fmt,
-                 m_textures[tex].m_data_type, scratch);
-    delete [] scratch;
-
-    if (glCheck())
+    switch (Format)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("glTexImage size %1 failed")
-            .arg(tmp_size));
-        return false;
+        case QOpenGLTexture::BGRA:
+        case QOpenGLTexture::RGBA: bpp = 4; break;
+        case QOpenGLTexture::BGR:
+        case QOpenGLTexture::RGB:  bpp = 3; break;
+        case QOpenGLTexture::Red:
+        case QOpenGLTexture::Alpha:
+        case QOpenGLTexture::Luminance: bpp = 1; break;
+        default: break; // unsupported
     }
 
-    return true;
-}
-
-uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
-{
-    uint bytes;
-    uint bpp;
-
-    if (fmt ==GL_RGBA)
+    switch (Type)
     {
-        bpp = 4;
-    }
-    else if (fmt == GL_RGB)
-    {
-        bpp = 3;
-    }
-    else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE)
-    {
-        bpp = 2;
-    }
-    else if (fmt == GL_LUMINANCE || fmt == GL_ALPHA)
-    {
-        bpp = 1;
-    }
-    else
-    {
-        bpp =0;
+        case QOpenGLTexture::Int8:    bytes = sizeof(GLbyte); break;
+        case QOpenGLTexture::UInt8:   bytes = sizeof(GLubyte); break;
+        case QOpenGLTexture::Int16:   bytes = sizeof(GLshort); break;
+        case QOpenGLTexture::UInt16:  bytes = sizeof(GLushort); break;
+        case QOpenGLTexture::Int32:   bytes = sizeof(GLint); break;
+        case QOpenGLTexture::UInt32:  bytes = sizeof(GLuint); break;
+        case QOpenGLTexture::Float16: bytes = sizeof(GLhalf); break;
+        case QOpenGLTexture::Float32: bytes = sizeof(GLfloat); break;
+        case QOpenGLTexture::UInt32_RGB10A2: bytes = sizeof(GLuint); break;
+        default: break; // unsupported
     }
 
-    switch (type)
-    {
-        case GL_UNSIGNED_BYTE:
-            bytes = sizeof(GLubyte);
-            break;
-#ifdef GL_UNSIGNED_SHORT_8_8_MESA
-        case GL_UNSIGNED_SHORT_8_8_MESA:
-            bytes = sizeof(GLushort);
-            break;
-#endif
-        case GL_FLOAT:
-            bytes = sizeof(GLfloat);
-            break;
-        default:
-            bytes = 0;
-    }
-
-    if (!bpp || !bytes || size.width() < 1 || size.height() < 1)
+    if (!bpp || !bytes || Size.isEmpty())
         return 0;
 
-    return size.width() * size.height() * bpp * bytes;
+    return Size.width() * Size.height() * bpp * bytes;
 }
 
 void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
@@ -1777,49 +1690,36 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
     program->bindAttributeLocation("a_texcoord0", TEXTURE_INDEX);
     if (!program->link())
         return ShaderError(program, "");
-    m_programs.append(program);
     return program;
 }
 
 void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
 {
-    if (!m_programs.contains(Program))
-        return;
-    {
-        OpenGLLocker locker(this);
-        m_programs.removeAll(Program);
-        delete Program;
-        m_map.clear();
-    }
-}
-
-void MythRenderOpenGL::DeleteShaderPrograms(void)
-{
-    OpenGLLocker locker(this);
-    foreach (QOpenGLShaderProgram *program, m_programs)
-        delete program;
-    m_programs.clear();
+    makeCurrent();
+    delete Program;
     m_map.clear();
+    doneCurrent();
 }
 
 bool MythRenderOpenGL::EnableShaderProgram(QOpenGLShaderProgram* Program)
 {
-    if (!Program || !m_programs.contains(Program))
+    if (!Program)
         return false;
+
     if (m_activeProgram == Program)
         return true;
-    {
-        OpenGLLocker locker(this);
-        Program->bind();
-        m_activeProgram = Program;
-        return true;
-    }
+
+    makeCurrent();
+    Program->bind();
+    m_activeProgram = Program;
+    doneCurrent();
+    return true;
 }
 
 void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, const QMatrix4x4 &Value, const char *Uniform)
 {
     OpenGLLocker locker(this);
-    if (!Program || !Uniform || !EnableShaderProgram(Program))
+    if (!Uniform || !EnableShaderProgram(Program))
         return;
 
     // Uniform cacheing
