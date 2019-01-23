@@ -127,15 +127,16 @@ void MythQImagePainter::Clear(QPaintDevice *device, const QRegion &region)
     QVector<QRect> rects = region.rects();
     for (int i = 0; i < rects.size(); i++)
     {
-        if (rects[i].top() > img_height || rects[i].left() > img_width)
+        const QRect& r = rects[i];
+        if (r.top() > img_height || r.left() > img_width)
             continue;
 
-        int bottom = std::min(rects[i].top() + rects[i].height(), img_height);
-        int bwidth = std::min(rects[i].left() + rects[i].width(), img_width);
-        bwidth = (bwidth - rects[i].left()) << 2;
+        int bottom = std::min(r.top() + r.height(), img_height);
+        int bwidth = std::min(r.left() + r.width(), img_width);
+        bwidth = (bwidth - r.left()) << 2;
 
-        for (int row = rects[i].top(); row < bottom; row++)
-            memset(dev->scanLine(row) + (rects[i].left() << 2), 0, bwidth);
+        for (int row = r.top(); row < bottom; row++)
+            memset(dev->scanLine(row) + (r.left() << 2), 0, bwidth);
     }
 }
 

@@ -1575,10 +1575,11 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     QVector<QRect> vis = visible.rects();
     for (int i = 0; i < vis.size(); i++)
     {
-        int left   = min(vis[i].left(), osd_image->width());
-        int top    = min(vis[i].top(), osd_image->height());
-        int right  = min(left + vis[i].width(), osd_image->width());
-        int bottom = min(top + vis[i].height(), osd_image->height());
+        const QRect& r2 = vis[i];
+        int left   = min(r2.left(), osd_image->width());
+        int top    = min(r2.top(), osd_image->height());
+        int right  = min(left + r2.width(), osd_image->width());
+        int bottom = min(top + r2.height(), osd_image->height());
 
         if (FMT_YV12 == frame->codec)
         {

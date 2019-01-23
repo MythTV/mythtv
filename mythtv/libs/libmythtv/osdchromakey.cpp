@@ -287,11 +287,12 @@ bool ChromaKeyOSD::ProcessOSD(OSD *osd)
     QVector<QRect> update = dirty.rects();
     for (int i = 0; i < update.size(); i++)
     {
-        BlendOrCopy(letterbox, update[i].intersected(top));
-        BlendOrCopy(letterbox, update[i].intersected(left));
-        BlendOrCopy(colorkey,  update[i].intersected(video_rect));
-        BlendOrCopy(letterbox, update[i].intersected(right));
-        BlendOrCopy(letterbox, update[i].intersected(bot));
+        const QRect& r = update[i];
+        BlendOrCopy(letterbox, r.intersected(top));
+        BlendOrCopy(letterbox, r.intersected(left));
+        BlendOrCopy(colorkey,  r.intersected(video_rect));
+        BlendOrCopy(letterbox, r.intersected(right));
+        BlendOrCopy(letterbox, r.intersected(bot));
     }
 
     return (visible || was_visible);

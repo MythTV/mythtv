@@ -945,7 +945,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     QVector<QRect> rects = visible.rects();
     for (int i = 0; i < rects.size(); i++)
     {
-        QRect r   = rects[i];
+        const QRect& r = rects[i];
         int left  = r.left() & ~(alignx - 1);
         int top   = r.top()  & ~(aligny - 1);
         int right = (r.left() + r.width());

@@ -793,14 +793,14 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
         d->repaintRegion = QRegion(d->uiScreenRect);
 
     QVector<QRect> rects = d->repaintRegion.rects();
-
     for (int i = 0; i < rects.size(); i++)
     {
-        if (rects[i].width() == 0 || rects[i].height() == 0)
+        const QRect& r = rects[i];
+        if (r.width() == 0 || r.height() == 0)
             continue;
 
-        if (rects[i] != d->uiScreenRect)
-            painter->SetClipRect(rects[i]);
+        if (r != d->uiScreenRect)
+            painter->SetClipRect(r);
 
         QVector<MythScreenStack *>::Iterator it;
         for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
@@ -812,7 +812,7 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
             for (screenit = redrawList.begin(); screenit != redrawList.end();
                  ++screenit)
             {
-                (*screenit)->Draw(painter, 0, 0, 255, rects[i]);
+                (*screenit)->Draw(painter, 0, 0, 255, r);
             }
         }
     }

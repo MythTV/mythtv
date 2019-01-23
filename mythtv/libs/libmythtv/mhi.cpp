@@ -703,7 +703,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
             (QRegion(imageRect) - QRegion(m_videoDisplayRect)).rects();
         for (uint j = 0; j < (uint)rects.size(); j++)
         {
-            QRect &rect = rects[j];
+            const QRect &rect = rects[j];
             QImage image =
                 data->m_image.copy(rect.x()-data->m_x, rect.y()-data->m_y,
                                    rect.width(), rect.height());
