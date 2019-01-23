@@ -1564,16 +1564,17 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     vis += visible.intersected(QRect(c,r.bottomRight())).rects();
     vis += visible.intersected(QRect(r.bottomLeft(),c).normalized()).rects();
     vis += visible.intersected(QRect(c,r.topRight()).normalized()).rects();
-#else
-    QVector<QRect> vis = visible.rects();
-#endif
     for (int i = 0; i < vis.size(); i++)
     {
-#if THREADED_OSD_RENDER
         OsdRender *job = new OsdRender(frame, osd_image, video_dim, vis[i]);
         job->setAutoDelete(true);
         s_pool.start(job, "OsdRender");
+    }
+    s_pool.waitForDone();
 #else
+    QVector<QRect> vis = visible.rects();
+    for (int i = 0; i < vis.size(); i++)
+    {
         int left   = min(vis[i].left(), osd_image->width());
         int top    = min(vis[i].top(), osd_image->height());
         int right  = min(left + vis[i].width(), osd_image->width());
@@ -1595,10 +1596,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
             yuv888_to_i44(frame->buf, osd_image, video_dim,
                           left, top, right, bottom, false);
         }
-#endif
     }
-#if THREADED_OSD_RENDER
-    s_pool.waitForDone();
 #endif
     return show;
 }
