@@ -12,7 +12,6 @@ using namespace std;
 #include <QEvent>
 #include <QDir>
 #include <QTextCodec>
-#include <QWidget>
 #include <QApplication>
 #include <QTimer>
 #ifdef Q_OS_MAC

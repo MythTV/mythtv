@@ -485,12 +485,10 @@ using_frontend {
     }
 
     using_opengl {
-        CONFIG += opengl
         DEFINES += USING_OPENGL
         HEADERS += util-opengl.h
         SOURCES += util-opengl.cpp
         using_opengles: DEFINES += USING_OPENGLES
-        QT += opengl
     }
 
     using_opengl_video:DEFINES += USING_OPENGL_VIDEO

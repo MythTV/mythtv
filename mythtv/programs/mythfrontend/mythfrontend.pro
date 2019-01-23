@@ -2,16 +2,16 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql script
+QT += network xml sql script widgets
 mingw | win32-msvc* {
    # script debugger currently only enabled for WIN32 builds
    QT += scripttools
 }
 using_qtwebkit {
-    QT += widgets webkitwidgets
-    using_qtdbus: QT += dbus
+    QT += webkitwidgets
     android: QT += androidextras
 }
+using_qtdbus: QT += dbus
 
 TEMPLATE = app
 CONFIG += thread
@@ -111,7 +111,6 @@ win32 : !debug {
 using_x11:DEFINES += USING_X11
 using_xv:DEFINES += USING_XV
 using_xrandr:DEFINES += USING_XRANDR
-using_opengl:QT += opengl
 using_opengl:DEFINES += USING_OPENGL
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
 using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER

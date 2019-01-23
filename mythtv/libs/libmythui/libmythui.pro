@@ -1,8 +1,7 @@
 include ( ../../settings.pro )
 
-QT += xml sql network opengl
+QT += xml sql network widgets
 using_qtwebkit {
-    QT += widgets
     QT += webkitwidgets
     android: QT += androidextras
 }
@@ -194,8 +193,6 @@ using_opengl {
         }
     }
     inc.files += mythpainter_ogl.h
-    QT += opengl
-
     mingw|win32-msvc*:LIBS += -lopengl32
 }
 

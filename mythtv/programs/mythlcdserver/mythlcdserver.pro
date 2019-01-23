@@ -3,7 +3,6 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network xml sql widgets
-using_opengl:QT += opengl
 
 TEMPLATE = app
 CONFIG += thread
