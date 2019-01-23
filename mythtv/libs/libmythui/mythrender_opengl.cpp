@@ -1621,7 +1621,6 @@ uint MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat For
         case QOpenGLTexture::UInt16:  bytes = sizeof(GLushort); break;
         case QOpenGLTexture::Int32:   bytes = sizeof(GLint); break;
         case QOpenGLTexture::UInt32:  bytes = sizeof(GLuint); break;
-        case QOpenGLTexture::Float16: bytes = sizeof(GLhalf); break;
         case QOpenGLTexture::Float32: bytes = sizeof(GLfloat); break;
         case QOpenGLTexture::UInt32_RGB10A2: bytes = sizeof(GLuint); break;
         default: break; // unsupported
