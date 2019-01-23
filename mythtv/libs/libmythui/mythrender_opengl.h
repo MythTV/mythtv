@@ -61,6 +61,8 @@ class MUI_PUBLIC MythGLTexture
     QSize           m_size;
     QSize           m_totalSize;
     bool            m_flip;
+    QRect           m_source;
+    QRect           m_destination;
     GLfloat         m_vertexData[16];
 
   private:
@@ -145,8 +147,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     bool   EnableShaderProgram(QOpenGLShaderProgram* Program);
     void   SetShaderProgramParams(QOpenGLShaderProgram* Program, const QMatrix4x4 &Value, const char* Uniform);
 
-    void DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *target,
-                    const QRect *src, const QRect *dst,
+    void DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
+                    const QRect &Source, const QRect &Destination,
                     QOpenGLShaderProgram *Program, int alpha = 255,
                     int red = 255, int green = 255, int blue = 255);
     void DrawBitmap(MythGLTexture **Textures, uint TextureCount,
@@ -168,7 +170,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
 
   protected:
     ~MythRenderOpenGL();
-    void DrawBitmapPriv(MythGLTexture *Texture, const QRect *src, const QRect *dst,
+    void DrawBitmapPriv(MythGLTexture *Texture, const QRect &Source, const QRect &Destination,
                         QOpenGLShaderProgram *Program, int alpha, int red,
                         int green, int blue);
     void DrawBitmapPriv(MythGLTexture **Textures, uint TextureCount,
@@ -191,7 +193,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void DeleteOpenGLResources(void);
     void DeleteFramebuffers(void);
 
-    bool UpdateTextureVertices(MythGLTexture *Texture, const QRect *src, const QRect *dst);
+    bool UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source, const QRect &Destination);
     bool UpdateTextureVertices(MythGLTexture *Texture, const QRectF *src, const QRectF *dst);
     GLfloat* GetCachedVertices(GLuint type, const QRect &area);
     void ExpireVertices(uint max = 0);
