@@ -862,49 +862,28 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         float width = video_disp_dim.width();
         if (kGLUYVY == videoType)
             width /= 2.0f;
-        QRectF trect(QPoint(0, 0), QSize(width, video_disp_dim.height()));
+        QRect trect(QPoint(0, 0), QSize(width, video_disp_dim.height()));
 
         // only apply overscan on last filter
         if (filter->outputBuffer == kDefaultBuffer)
-            trect.setCoords(video_rect.left(),  video_rect.top(),
-                            video_rect.left() + video_rect.width(),
-                            video_rect.top()  + video_rect.height());
+            trect = video_rect;
 
         // discard stereoscopic fields
         if (filter->outputBuffer == kDefaultBuffer)
         {
             if (kStereoscopicModeSideBySideDiscard == stereo)
-                trect = QRectF(trect.left() / 2.0,  trect.top(),
-                               trect.width() / 2.0, trect.height());
+                trect = QRect(trect.left() >> 1,  trect.top(),
+                              trect.width() >> 1, trect.height());
             if (kStereoscopicModeTopAndBottomDiscard == stereo)
-                trect = QRectF(trect.left(),  trect.top() / 2.0,
-                               trect.width(), trect.height() / 2.0);
+                trect = QRect(trect.left(),  trect.top() >> 1,
+                              trect.width(), trect.height() >> 1);
         }
 
         // vertex coordinates
-        QRect display = (filter->outputBuffer == kDefaultBuffer) ?
-                         display_video_rect : frameBufferRect;
-        QRect visible = (filter->outputBuffer == kDefaultBuffer) ?
-                         display_visible_rect : frameBufferRect;
-        QRectF vrect(display);
+        QRect vrect = (filter->outputBuffer == kDefaultBuffer) ? display_video_rect : frameBufferRect;
 
-        // invert if first filter
-        if (it == filters.begin())
-        {
-            if (filters.size() > 1)
-            {
-                vrect.setTop((visible.height()) - display.top());
-                vrect.setBottom(vrect.top() - (display.height()));
-            }
-            else
-            {
-                vrect.setBottom(display.top());
-                vrect.setTop(display.top() + (display.height()));
-            }
-        }
-
-        QOpenGLFramebufferObject *target = nullptr;
         // bind correct frame buffer (default onscreen) and set viewport
+        QOpenGLFramebufferObject *target = nullptr;
         switch (filter->outputBuffer)
         {
             case kDefaultBuffer:
@@ -982,7 +961,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 COLOUR_UNIFORM);
         }
 
-        gl_context->DrawBitmap(textures, texture_count, target, &trect, &vrect,
+        gl_context->DrawBitmap(textures, texture_count, target, trect, vrect,
                                program);
 
 

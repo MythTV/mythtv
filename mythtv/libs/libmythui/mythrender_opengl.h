@@ -61,6 +61,7 @@ class MUI_PUBLIC MythGLTexture
     QSize           m_size;
     QSize           m_totalSize;
     bool            m_flip;
+    bool            m_crop;
     QRect           m_source;
     QRect           m_destination;
     GLfloat         m_vertexData[16];
@@ -153,7 +154,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
                     int red = 255, int green = 255, int blue = 255);
     void DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                     QOpenGLFramebufferObject *target,
-                    const QRectF *src, const QRectF *dst,
+                    const QRect &Source, const QRect &Destination,
                     QOpenGLShaderProgram *Program);
     void DrawRect(QOpenGLFramebufferObject *target,
                   const QRect &area, const QBrush &fillBrush,
@@ -174,7 +175,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
                         QOpenGLShaderProgram *Program, int alpha, int red,
                         int green, int blue);
     void DrawBitmapPriv(MythGLTexture **Textures, uint TextureCount,
-                        const QRectF *src, const QRectF *dst,
+                        const QRect &Source, const QRect &Destination,
                         QOpenGLShaderProgram *Program);
     void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
                       const QPen &linePen, int alpha);
@@ -194,7 +195,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void DeleteFramebuffers(void);
 
     bool UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source, const QRect &Destination);
-    bool UpdateTextureVertices(MythGLTexture *Texture, const QRectF *src, const QRectF *dst);
     GLfloat* GetCachedVertices(GLuint type, const QRect &area);
     void ExpireVertices(uint max = 0);
     void GetCachedVBO(GLuint type, const QRect &area);

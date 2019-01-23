@@ -55,7 +55,8 @@ MythGLTexture::MythGLTexture(QOpenGLTexture *Texture)
     m_vbo(nullptr),
     m_size(0,0),
     m_totalSize(0,0),
-    m_flip(false),
+    m_flip(true),
+    m_crop(false),
     m_source(),
     m_destination()
 {
@@ -73,7 +74,8 @@ MythGLTexture::MythGLTexture(GLuint Texture)
     m_vbo(nullptr),
     m_size(0,0),
     m_totalSize(0,0),
-    m_flip(false),
+    m_flip(true),
+    m_crop(false),
     m_source(),
     m_destination()
 {
@@ -643,9 +645,9 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     // N.B. Format and type per qopengltexure.cpp
     result->m_pixelFormat = QOpenGLTexture::RGBA;
     result->m_pixelType   = QOpenGLTexture::UInt8;
-    result->m_bufferSize  = GetBufferSize(Image->size(), QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+    result->m_bufferSize  = GetBufferSize(result->m_totalSize, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
     result->m_size        = Image->size();
-    result->m_flip        = true;
+    result->m_crop        = true;
     return result;
 }
 
@@ -844,6 +846,7 @@ MythGLTexture* MythRenderOpenGL::CreateFramebufferTexture(QOpenGLFramebufferObje
     MythGLTexture *texture = new MythGLTexture(Framebuffer->texture());
     texture->m_size        = texture->m_totalSize = Framebuffer->size();
     texture->m_vbo         = CreateVBO(kVertexSize);
+    texture->m_flip        = false;
     return texture;
 }
 
@@ -904,7 +907,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
 
 void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                                   QOpenGLFramebufferObject *Target,
-                                  const QRectF *src, const QRectF *dst,
+                                  const QRect &Source, const QRect &Destination,
                                   QOpenGLShaderProgram *Program)
 {
     if (!Textures || !TextureCount)
@@ -912,7 +915,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
 
     makeCurrent();
     BindFramebuffer(Target);
-    DrawBitmapPriv(Textures, TextureCount, src, dst, Program);
+    DrawBitmapPriv(Textures, TextureCount, Source, Destination, Program);
     doneCurrent();
 }
 
@@ -1007,7 +1010,7 @@ void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture *Texture, const QRect &Sourc
 }
 
 void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture **Textures, uint TextureCount,
-                                      const QRectF *src, const QRectF *dst,
+                                      const QRect &Source, const QRect &Destination,
                                       QOpenGLShaderProgram *Program)
 {
     if (Program == nullptr)
@@ -1036,17 +1039,19 @@ void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture **Textures, uint TextureCoun
 
     QOpenGLBuffer* buffer = first->m_vbo;
     buffer->bind();
-    UpdateTextureVertices(first, src, dst);
-    if (m_extraFeaturesUsed & kGLBufferMap)
+    if (UpdateTextureVertices(first, Source, Destination))
     {
-        void* target = buffer->map(QOpenGLBuffer::WriteOnly);
-        if (target)
-            memcpy(target, first->m_vertexData, kVertexSize);
-        buffer->unmap();
-    }
-    else
-    {
-        buffer->write(0, first->m_vertexData, kVertexSize);
+        if (m_extraFeaturesUsed & kGLBufferMap)
+        {
+            void* target = buffer->map(QOpenGLBuffer::WriteOnly);
+            if (target)
+                memcpy(target, first->m_vertexData, kVertexSize);
+            buffer->unmap();
+        }
+        else
+        {
+            buffer->write(0, first->m_vertexData, kVertexSize);
+        }
     }
 
     glEnableVertexAttribArray(VERTEX_INDEX);
@@ -1473,49 +1478,26 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     GLfloat *data = Texture->m_vertexData;
     QSize    size = Texture->m_size;
 
-    int width  = min(Source.width(),  size.width());
-    int height = min(Source.height(), size.height());
+    int width  = Texture->m_crop ? min(Source.width(),  size.width())  : Source.width();
+    int height = Texture->m_crop ? min(Source.height(), size.height()) : Source.height();
 
-    data[0 + TEX_OFFSET] = Source.left() / (float)size.width();
-    data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / (float)size.height();
-    data[6 + TEX_OFFSET] = (Source.left() + width) / (float)size.width();
-    data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top() / (float)size.height();
+    data[0 + TEX_OFFSET] = Source.left() / (GLfloat)size.width();
+    data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / (GLfloat)size.height();
+    data[6 + TEX_OFFSET] = (Source.left() + width) / (GLfloat)size.width();
+    data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top() / (GLfloat)size.height();
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
     data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
     data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
     data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
+
+    width  = Texture->m_crop ? min(width, Destination.width())   : Destination.width();
+    height = Texture->m_crop ? min(height, Destination.height()) : Destination.height();
 
     data[2] = data[0] = Destination.left();
     data[5] = data[1] = Destination.top();
-    data[4] = data[6] = Destination.left() + min(width, Destination.width());
-    data[3] = data[7] = Destination.top()  + min(height, Destination.height());
-    return true;
-}
-
-bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRectF *src,
-                                             const QRectF *dst)
-{
-    if (!Texture || (Texture && Texture->m_size.isEmpty()))
-        return false;
-
-    GLfloat *data = Texture->m_vertexData;
-    QSize    size = Texture->m_size;
-
-    data[0 + TEX_OFFSET] = src->left() / (qreal)size.width();
-    data[1 + TEX_OFFSET] = (src->top() + src->height()) / (qreal)size.height();
-    data[6 + TEX_OFFSET] = (src->left() + src->width()) / (qreal)size.width();
-    data[7 + TEX_OFFSET] = src->top() / (qreal)size.height();
-
-    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
-    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
-    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
-    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
-
-    data[2] = data[0] = dst->left();
-    data[5] = data[1] = dst->top();
-    data[4] = data[6] = dst->left() + dst->width();
-    data[3] = data[7] = dst->top() + dst->height();
+    data[4] = data[6] = Destination.left() + width;
+    data[3] = data[7] = Destination.top()  + height;
     return true;
 }
 

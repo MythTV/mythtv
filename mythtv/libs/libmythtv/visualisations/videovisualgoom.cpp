@@ -108,9 +108,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
                     memcpy(buf, m_buffer, m_area.width() * m_area.height() * 4);
                 glrender->UpdateTexture(m_glSurface, (void*)m_buffer);
             }
-            QRectF src(m_area);
-            QRectF dst(area);
-            glrender->DrawBitmap(&m_glSurface, 1, nullptr, &src, &dst, nullptr);
+            glrender->DrawBitmap(&m_glSurface, 1, nullptr, m_area, area, nullptr);
         }
         return;
     }
