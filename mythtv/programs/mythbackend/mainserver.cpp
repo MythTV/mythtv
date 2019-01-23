@@ -323,7 +323,13 @@ MainServer::MainServer(bool master, int port,
     deferredDeleteTimer->start(30 * 1000);
 
     if (sched)
+    {
+        // Make sure we have a good, fsinfo cache before setting
+        // mainServer in the scheduler.
+        QList<FileSystemInfo> fsInfos;
+        GetFilesystemInfos(fsInfos, false);
         sched->SetMainServer(this);
+    }
     if (expirer)
         expirer->SetMainServer(this);
 

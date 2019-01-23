@@ -154,9 +154,6 @@ void Scheduler::Stop(void)
 
 void Scheduler::SetMainServer(MainServer *ms)
 {
-    // Make sure we have a good, fsinfo cache before setting
-    // m_mainServer.
-    FillDirectoryInfoCache(ms, false);
     m_mainServer = ms;
 }
 
@@ -5151,7 +5148,7 @@ int Scheduler::FillRecordingDir(
             gCoreContext->GetNumSetting("SGweightRemoteStarting", 0);
     int maxOverlap = gCoreContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
 
-    FillDirectoryInfoCache(m_mainServer, true);
+    FillDirectoryInfoCache();
 
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Calculating initial FS Weights.");
@@ -5586,15 +5583,14 @@ int Scheduler::FillRecordingDir(
     return fsID;
 }
 
-void Scheduler::FillDirectoryInfoCache(MainServer *mainServer,
-                                       bool useMainServerCache)
+void Scheduler::FillDirectoryInfoCache(void)
 {
     QList<FileSystemInfo> fsInfos;
 
     fsInfoCache.clear();
 
-    if (mainServer)
-        mainServer->GetFilesystemInfos(fsInfos, useMainServerCache);
+    if (m_mainServer)
+        m_mainServer->GetFilesystemInfos(fsInfos, true);
 
     QMap <int, bool> fsMap;
     QList<FileSystemInfo>::iterator it1;
