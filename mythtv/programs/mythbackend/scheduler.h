@@ -201,8 +201,7 @@ class Scheduler : public MThread, public MythScheduler
                          uint cardid,
                          QString &recording_dir,
                          const RecList &reclist);
-    void FillDirectoryInfoCache(MainServer *mainServer,
-                                bool useMainServerCache);
+    void FillDirectoryInfoCache(void);
 
     void OldRecordedFixups(void);
     void ResetDuplicates(uint recordid, uint findid, const QString &title,
