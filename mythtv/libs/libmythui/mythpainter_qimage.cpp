@@ -124,10 +124,15 @@ void MythQImagePainter::Clear(QPaintDevice *device, const QRegion &region)
     int img_width  = dev->size().width();
     int img_height = dev->size().height();
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> rects = region.rects();
     for (int i = 0; i < rects.size(); i++)
     {
         const QRect& r = rects[i];
+#else
+    for (const QRect& r : region)
+    {
+#endif
         if (r.top() > img_height || r.left() > img_width)
             continue;
 

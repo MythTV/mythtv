@@ -750,6 +750,7 @@ void MythMainWindow::drawScreen(void)
             {
                 if ((*screenit)->NeedsRedraw())
                 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
                     QRegion topDirty = (*screenit)->GetDirtyArea();
                     QVector<QRect> wrects = topDirty.rects();
                     for (int i = 0; i < wrects.size(); i++)
@@ -758,6 +759,9 @@ void MythMainWindow::drawScreen(void)
                         QVector<QRect> drects = d->repaintRegion.rects();
                         for (int j = 0; j < drects.size(); j++)
                         {
+                            // Can't use QRegion::contains because it only
+                            // checks for overlap.  QRect::contains checks
+                            // if fully contained.
                             if (drects[j].contains(wrects[i]))
                             {
                                 foundThisRect = true;
@@ -768,6 +772,26 @@ void MythMainWindow::drawScreen(void)
                         if (!foundThisRect)
                             return;
                     }
+#else
+                    for (const QRect& wrect: (*screenit)->GetDirtyArea())
+                    {
+                        bool foundThisRect = false;
+                        for (const QRect& drect: d->repaintRegion)
+                        {
+                            // Can't use QRegion::contains because it only
+                            // checks for overlap.  QRect::contains checks
+                            // if fully contained.
+                            if (drect.contains(wrect))
+                            {
+                                foundThisRect = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundThisRect)
+                            return;
+                    }
+#endif
                 }
             }
         }
@@ -792,10 +816,15 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
     if (!painter->SupportsClipping())
         d->repaintRegion = QRegion(d->uiScreenRect);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> rects = d->repaintRegion.rects();
     for (int i = 0; i < rects.size(); i++)
     {
         const QRect& r = rects[i];
+#else
+    for (const QRect& r : d->repaintRegion)
+    {
+#endif
         if (r.width() == 0 || r.height() == 0)
             continue;
 

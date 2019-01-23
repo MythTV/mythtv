@@ -284,10 +284,15 @@ bool ChromaKeyOSD::ProcessOSD(OSD *osd)
     QRect bot   = QRect(0, video_rect.top() + video_rect.height(), osd_rect.width(),
                         osd_rect.height() - video_rect.top() - video_rect.height());
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> update = dirty.rects();
     for (int i = 0; i < update.size(); i++)
     {
         const QRect& r = update[i];
+#else
+    for (const QRect& r : dirty)
+    {
+#endif
         BlendOrCopy(letterbox, r.intersected(top));
         BlendOrCopy(letterbox, r.intersected(left));
         BlendOrCopy(colorkey,  r.intersected(video_rect));

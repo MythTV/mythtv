@@ -1560,10 +1560,22 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     // Split visible region for greater concurrency
     QRect r = osd_image->rect();
     QPoint c = r.center();
-    QVector<QRect> vis = visible.intersected(QRect(r.topLeft(),c)).rects();
+    QVector<QRect> vis;
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
+    vis += visible.intersected(QRect(r.topLeft(),c)).rects();
     vis += visible.intersected(QRect(c,r.bottomRight())).rects();
     vis += visible.intersected(QRect(r.bottomLeft(),c).normalized()).rects();
     vis += visible.intersected(QRect(c,r.topRight()).normalized()).rects();
+#else
+    for (const QRect &tmp : visible.intersected(QRect(r.topLeft(),c)))
+        vis += tmp;
+    for (const QRect &tmp : visible.intersected(QRect(c,r.bottomRight())))
+        vis += tmp;
+    for (const QRect &tmp : visible.intersected(QRect(r.bottomLeft(),c).normalized()))
+        vis += tmp;
+    for (const QRect &tmp : visible.intersected(QRect(c,r.topRight()).normalized()))
+        vis += tmp;
+#endif
     for (int i = 0; i < vis.size(); i++)
     {
         OsdRender *job = new OsdRender(frame, osd_image, video_dim, vis[i]);
@@ -1572,10 +1584,15 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     }
     s_pool.waitForDone();
 #else
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> vis = visible.rects();
     for (int i = 0; i < vis.size(); i++)
     {
         const QRect& r2 = vis[i];
+#else
+    for (const QRect& r2 : dirty)
+    {
+#endif
         int left   = min(r2.left(), osd_image->width());
         int top    = min(r2.top(), osd_image->height());
         int right  = min(left + r2.width(), osd_image->width());
