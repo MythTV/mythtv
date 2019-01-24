@@ -1483,9 +1483,11 @@ MythRenderEGL::MythRenderEGL() :
         return;
     }
 
-    QVariant v;
-    v.setValue(QEGLNativeContext(m_context, m_display));
-    setNativeHandle(v);
+    // MK 24.1.2019 QEGLNativeContext header requires a private header that is
+    // not always present. Not something we should be doing anyway...
+    //QVariant v;
+    //v.setValue(QEGLNativeContext(m_context, m_display));
+    //setNativeHandle(v);
 
     m_window = createNativeWindow();
 
