@@ -954,11 +954,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             program = filter->fragmentPrograms[prog_ref];
         }
 
-        if (type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB)
+        if ((type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB))
         {
-            gl_context->SetShaderProgramParams(program,
-                GLMatrix4x4(reinterpret_cast<float*>(colourSpace->GetMatrix())),
-                COLOUR_UNIFORM);
+            gl_context->SetShaderProgramParams(program, *colourSpace, COLOUR_UNIFORM);
         }
 
         gl_context->DrawBitmap(textures, texture_count, target, trect, vrect,

@@ -910,7 +910,7 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
             videoColourSpace.SetColourSpace((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601)
                          ? kCSTD_ITUR_BT_601 : kCSTD_ITUR_BT_709);
         }
-        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.GetMatrix());
+        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.data());
     }
     m_lock.unlock();
 }
@@ -924,7 +924,7 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
     m_lock.lock();
     newValue = videoColourSpace.SetPictureAttribute(attribute, newValue);
     if (newValue >= 0)
-        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.GetMatrix());
+        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.data());
     m_lock.unlock();
     return newValue;
 }

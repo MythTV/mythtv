@@ -2,24 +2,8 @@
 #define VIDEOCOLOURSPACE_H
 
 #include <QMap>
+#include <QMatrix4x4>
 #include "videoouttypes.h"
-
-class Matrix
-{
-  public:
-    Matrix(float m11, float m12, float m13, float m14,
-           float m21, float m22, float m23, float m24,
-           float m31, float m32, float m33, float m34);
-    Matrix();
-
-    void setToIdentity(void);
-    void scale(float val1, float val2, float val3);
-    void translate(float val1, float val2, float val3);
-    Matrix & operator*=(const Matrix &r);
-    void product(int row, const Matrix &r);
-    void debug(void);
-    float m[4][4];
-};
 
 typedef enum VideoCStd
 {
@@ -29,19 +13,15 @@ typedef enum VideoCStd
     kCSTD_SMPTE_240M,
 } VideoCStd;
 
-class VideoColourSpace
+class VideoColourSpace : public QMatrix4x4
 {
   public:
     explicit VideoColourSpace(VideoCStd colour_std = kCSTD_ITUR_BT_601);
    ~VideoColourSpace() = default;
 
-    PictureAttributeSupported SupportedAttributes(void) const
-        { return m_supported_attributes; }
+    PictureAttributeSupported SupportedAttributes(void) const;
     void  SetSupportedAttributes(PictureAttributeSupported supported);
-
-    void* GetMatrix(void)  { return &m_matrix.m; }
-    bool  HasChanged(void) const { return m_changed;   }
-
+    bool  HasChanged(void);
     int   GetPictureAttribute(PictureAttribute attribute);
     int   SetPictureAttribute(PictureAttribute attribute, int value);
     void  SetColourSpace(VideoCStd csp = kCSTD_Unknown);
@@ -68,7 +48,6 @@ class VideoColourSpace
     float     m_saturation;
     float     m_hue;
     VideoCStd m_colourSpace;
-    Matrix    m_matrix;
 };
 
 #endif

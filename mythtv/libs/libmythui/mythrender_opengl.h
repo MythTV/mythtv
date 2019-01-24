@@ -283,15 +283,4 @@ class MUI_PUBLIC OpenGLLocker
     MythRenderOpenGL *m_render;
 };
 
-class MUI_PUBLIC GLMatrix4x4
-{
-  public:
-    explicit GLMatrix4x4(const QMatrix4x4 &m);
-    explicit GLMatrix4x4(const GLfloat v[16]);
-    operator const GLfloat*() const;
-    operator QMatrix4x4() const;
-  private:
-    GLfloat m_v[4*4];
-};
-
 #endif
