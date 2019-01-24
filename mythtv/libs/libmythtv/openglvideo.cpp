@@ -66,16 +66,25 @@ class OpenGLFilter
 
 OpenGLVideo::OpenGLVideo() :
     videoType(kGLUYVY),
-    gl_context(nullptr),      video_disp_dim(0,0),
-    video_dim(0,0),           viewportSize(0,0),
-    masterViewportSize(0,0),  display_visible_rect(0,0,0,0),
-    display_video_rect(0,0,0,0), video_rect(0,0,0,0),
-    frameBufferRect(0,0,0,0), hardwareDeinterlacing(false),
-    colourSpace(nullptr),     viewportControl(false),
-    inputTextureSize(0,0),    refsNeeded(0),
+    gl_context(nullptr),
+    video_disp_dim(0,0),
+    video_dim(0,0),
+    viewportSize(0,0),
+    masterViewportSize(0,0),
+    display_visible_rect(0,0,0,0),
+    display_video_rect(0,0,0,0),
+    video_rect(0,0,0,0),
+    frameBufferRect(0,0,0,0),
+    hardwareDeinterlacing(false),
+    colourSpace(nullptr),
+    viewportControl(false),
+    inputTextureSize(0,0),
+    refsNeeded(0),
     textureType(GL_TEXTURE_2D),
-    helperTexture(nullptr),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           forceResize(false)
+    helperTexture(nullptr),
+    defaultUpsize(kGLFilterResize),
+    m_extraFeatures(0),
+    forceResize(false)
 {
     forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
     discardFramebuffers = gCoreContext->GetBoolSetting("OpenGLDiscardFB", false);
@@ -150,22 +159,23 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     videoType             = Type;
 
     // Set OpenGL feature support
-    gl_features = gl_context->GetFeatures();
+    m_features      = gl_context->GetFeatures();
+    m_extraFeatures = gl_context->GetExtraFeatures();
 
     // Enable/Disable certain features based on settings
     if (gl_context->isOpenGLES())
     {
-        if ((gl_features & kGLExtFBDiscard) && discardFramebuffers)
+        if ((m_extraFeatures & kGLExtFBDiscard) && discardFramebuffers)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling Framebuffer discards");
         else
-            gl_features &= ~kGLExtFBDiscard;
+            m_extraFeatures &= ~kGLExtFBDiscard;
     }
     else
     {
-        if ((gl_features & kGLExtPBufObj) && !enablePBOs)
+        if ((m_extraFeatures & kGLExtPBufObj) && !enablePBOs)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Pixel Buffer Objects");
-            gl_features &= ~kGLExtPBufObj;
+            m_extraFeatures &= ~kGLExtPBufObj;
         }
     }
 
@@ -174,8 +184,8 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     SetViewPort(masterViewportSize);
 
-    bool glsl  = gl_features & kGLSL;
-    bool fbos  = gl_features & kGLExtFBufObj;
+    bool glsl  = m_features & QOpenGLFunctions::Shaders;
+    bool fbos  = m_features & QOpenGLFunctions::Framebuffers;
     VideoType fallback = glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLRGBA;
 
     // check for feature support
@@ -199,7 +209,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     // turn on bicubic filtering
     if (options.contains("openglbicubic"))
     {
-        if (glsl && fbos && (gl_features & kGLExtRGBA16))
+        if (glsl && fbos && (m_extraFeatures & kGLExtRGBA16))
             defaultUpsize = kGLFilterBicubic;
         else
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL feature support for Bicubic filter.");
@@ -442,17 +452,15 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
           break;
 
       case kGLFilterResize:
-        if (!(gl_features & kGLExtFBufObj) && !filters.empty())
+        if (!(m_features & QOpenGLFunctions::Framebuffers) && !filters.empty())
         {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                "GL_EXT_framebuffer_object not available "
-                "for scaling/resizing filter.");
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Framebuffers not available for scaling/resizing filter.");
             return false;
         }
         break;
 
       case kGLFilterBicubic:
-        if (!(gl_features & kGLSL) || !(gl_features & kGLExtFBufObj))
+        if (!(m_features & QOpenGLFunctions::Framebuffers) || !(m_features & QOpenGLFunctions::Framebuffers))
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "Features not available for bicubic filter.");
             return false;
@@ -460,7 +468,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         break;
 
       case kGLFilterYUV2RGB:
-        if (!(gl_features & kGLSL))
+        if (!(m_features & QOpenGLFunctions::Framebuffers))
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "No shader support for OpenGL deinterlacing.");
@@ -469,7 +477,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         break;
 
       case kGLFilterYV12RGB:
-        if (!(gl_features & kGLSL))
+        if (!(m_features & QOpenGLFunctions::Framebuffers))
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "No shader support for OpenGL deinterlacing.");
@@ -500,7 +508,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 
     if (success &&
         (((filter != kGLFilterNone) && (filter != kGLFilterResize)) ||
-         ((gl_features & kGLSL) && (filter == kGLFilterResize))))
+         ((m_features & QOpenGLFunctions::Framebuffers) && (filter == kGLFilterResize))))
     {
         program = AddFragmentProgram(filter);
         if (!program)
@@ -585,7 +593,7 @@ void OpenGLVideo::TearDownDeinterlacer(void)
 
 bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 {
-    if (!(gl_features & kGLSL))
+    if (!(m_features & QOpenGLFunctions::Framebuffers))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "No shader support for OpenGL deinterlacing.");
         return false;
@@ -671,7 +679,7 @@ QOpenGLShaderProgram* OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
         return nullptr;
 
     QString vertex, fragment;
-    if (gl_features & kGLSL)
+    if (m_features & QOpenGLFunctions::Framebuffers)
     {
         GetProgramStrings(vertex, fragment, name, deint, field);
     }
@@ -705,7 +713,7 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     MythGLTexture *texture = nullptr;
-    bool pbo = gl_features & kGLExtPBufObj;
+    bool pbo = m_extraFeatures & kGLExtPBufObj;
     if (kGLYV12 == videoType)
     {
         size.setHeight((3 * size.height() + 1) / 2);
@@ -935,7 +943,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         // enable fragment program and set any environment variables
         QOpenGLShaderProgram *program = nullptr;
         if (((type != kGLFilterNone) && (type != kGLFilterResize)) ||
-            ((gl_features & kGLSL) && (type == kGLFilterResize)))
+            ((m_features & QOpenGLFunctions::Framebuffers) && (type == kGLFilterResize)))
         {
             GLuint prog_ref = 0;
 
@@ -966,7 +974,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         inputs = filter->frameBufferTextures;
         inputsize = realsize;
 
-        if (gl_features & kGLExtFBDiscard)
+        if (m_extraFeatures & kGLExtFBDiscard)
         {
             // If lastFramebuffer is set, it was from the last filter stage and
             // has now been used to render. It can be discarded.

@@ -129,7 +129,8 @@ class OpenGLVideo
     uint           textureType;          ///< Texture type (e.g. GL_TEXTURE_2D or GL_TEXTURE_RECT)
     MythGLTexture *helperTexture;        ///< Extra texture for bicubic filter
     OpenGLFilterType defaultUpsize;      ///< Regular or bicubic upsizing
-    uint           gl_features;          ///< OR'd list of GLFeatures in use
+    QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
+    uint           m_extraFeatures;      ///< OR'd list of extra, Myth specific features
     MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY
     bool           forceResize;          ///< Global setting to force a resize stage
     bool           discardFramebuffers;  ///< Use GL_EXT_discard_framebuffer

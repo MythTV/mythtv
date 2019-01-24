@@ -29,16 +29,12 @@
 typedef enum
 {
     kGLFeatNone    = 0x0000,
-    kGLFeatNPOT    = 0x0001,
-    kGLExtFBDiscard= 0x0002,
-    kGLExtFBufObj  = 0x0004,
-    kGLExtPBufObj  = 0x0008,
-    kGLNVFence     = 0x0010,
-    kGLAppleFence  = 0x0020,
-    kGLSL          = 0x0200,
-    kGLBufferMap   = 0x0800,
-    kGLExtRGBA16   = 0x1000,
-    kGLMaxFeat     = 0x2000,
+    kGLExtFBDiscard= 0x0001,
+    kGLExtPBufObj  = 0x0002,
+    kGLNVFence     = 0x0004,
+    kGLAppleFence  = 0x0008,
+    kGLBufferMap   = 0x0010,
+    kGLExtRGBA16   = 0x0020
 } GLFeatures;
 
 #define TEX_OFFSET 8
@@ -104,7 +100,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void setWidget(QWidget *Widget);
     bool  Init(void);
     int   GetMaxTextureSize(void)    { return m_max_tex_size; }
-    uint  GetFeatures(void)          { return m_extraFeaturesUsed;    }
+    uint  GetExtraFeatures(void) const;
+    QOpenGLFunctions::OpenGLFeatures GetFeatures(void) const;
     bool  IsRecommendedRenderer(void);
     void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QRect &rect, bool viewportonly = false);

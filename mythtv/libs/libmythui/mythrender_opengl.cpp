@@ -277,10 +277,6 @@ bool MythRenderOpenGL::Init(void)
     if (isOpenGLES() && hasExtension("GL_EXT_discard_framebuffer") && m_glDiscardFramebuffer)
         m_extraFeatures |= kGLExtFBDiscard;
 
-    m_extraFeatures |= (m_features & NPOTTextures) ? kGLFeatNPOT : kGLFeatNone;
-    m_extraFeatures |= (m_features & Framebuffers) ? kGLExtFBufObj : kGLFeatNone;
-    m_extraFeatures |= (m_features & Shaders) ? kGLSL : kGLFeatNone;
-
     DebugFeatures();
 
     m_extraFeaturesUsed = m_extraFeatures;
@@ -333,6 +329,16 @@ void MythRenderOpenGL::DebugFeatures(void)
     // warnings
     if (m_max_units < 3)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning: Insufficient texture units for some features.");
+}
+
+uint MythRenderOpenGL::GetExtraFeatures(void) const
+{
+    return m_extraFeaturesUsed;
+}
+
+QOpenGLFunctions::OpenGLFeatures MythRenderOpenGL::GetFeatures(void) const
+{
+    return m_features;
 }
 
 bool MythRenderOpenGL::IsRecommendedRenderer(void)
