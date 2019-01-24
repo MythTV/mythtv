@@ -479,8 +479,8 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += videoout_vdpau.h   videoout_nullvdpau.h
-        SOURCES += videoout_vdpau.cpp videoout_nullvdpau.cpp
+        HEADERS += videoout_vdpau.h
+        SOURCES += videoout_vdpau.cpp
         LIBS += -lvdpau
     }
 
@@ -498,8 +498,8 @@ using_frontend {
 
     using_vaapi {
         DEFINES += USING_VAAPI
-        HEADERS += vaapicontext.h   videoout_nullvaapi.h
-        SOURCES += vaapicontext.cpp videoout_nullvaapi.cpp
+        HEADERS += vaapicontext.h
+        SOURCES += vaapicontext.cpp
         LIBS    += -lva -lva-x11 -lva-glx
         using_opengl_video:HEADERS += videoout_openglvaapi.h
         using_opengl_video:SOURCES += videoout_openglvaapi.cpp

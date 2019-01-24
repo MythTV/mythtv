@@ -34,12 +34,8 @@
 
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
-#include "videoout_nullvdpau.h"
 #endif
 
-#ifdef USING_VAAPI
-#include "videoout_nullvaapi.h"
-#endif
 #ifdef USING_GLVAAPI
 #include "videoout_openglvaapi.h"
 #endif
@@ -98,12 +94,8 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 
 #ifdef USING_VDPAU
     VideoOutputVDPAU::GetRenderOptions(opts);
-    VideoOutputNullVDPAU::GetRenderOptions(opts);
 #endif // USING_VDPAU
 
-#ifdef USING_VAAPI
-    VideoOutputNullVAAPI::GetRenderOptions(opts);
-#endif // USING_VAAPI
 #ifdef USING_GLVAAPI
     VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
 #endif // USING_GLVAAPI
@@ -136,16 +128,6 @@ VideoOutput *VideoOutput::Create(
     {
         // plain null output
         renderers += "null";
-
-        if (playerFlags & kDecodeAllowGPU)
-        {
-#ifdef USING_VDPAU
-            renderers += VideoOutputNullVDPAU::GetAllowedRenderers(codec_id);
-#endif // USING_VDPAU
-#ifdef USING_VAAPI
-            renderers += VideoOutputNullVAAPI::GetAllowedRenderers(codec_id);
-#endif
-        }
     }
     else
     {
@@ -236,14 +218,7 @@ VideoOutput *VideoOutput::Create(
 #ifdef USING_VDPAU
         else if (renderer == "vdpau")
             vo = new VideoOutputVDPAU();
-        else if (renderer == "nullvdpau")
-            vo = new VideoOutputNullVDPAU();
 #endif // USING_VDPAU
-
-#ifdef USING_VAAPI
-        else if (renderer == "nullvaapi")
-            vo = new VideoOutputNullVAAPI();
-#endif // USING_VAAPI
 
 #ifdef USING_GLVAAPI
         else if (renderer == "openglvaapi")
