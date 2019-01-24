@@ -162,7 +162,7 @@ void VideoColourSpace::Debug(void)
     {
         QString stream;
         QDebug debug(&stream);
-        debug << this;
+        debug << *this;
         LOG(VB_PLAYBACK, LOG_DEBUG, stream);
     }
 }
