@@ -134,6 +134,8 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// \brief Only updated once during object creation
     bool isConnected(void) { return m_isConnected; }
 
+    bool isValid(void) { return QSqlQuery::isValid(); }
+
     /// \brief Wrap QSqlQuery::exec() so we can display SQL
     bool exec(void);
 
@@ -157,7 +159,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     bool exec(const QString &query);
 
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
-    bool prepare(const QString &query);
+    bool prepare(const QString &query, bool forward_only = true);
 
     void bindValue(const QString &placeholder, const QVariant &val);
 

@@ -816,7 +816,7 @@ bool MSqlQuery::seek(int where, bool relative)
     return seekDebug("seek", QSqlQuery::seek(where, relative), where, relative);
 }
 
-bool MSqlQuery::prepare(const QString& query)
+bool MSqlQuery::prepare(const QString& query, bool forward_only)
 {
     if (!m_db)
     {
@@ -834,10 +834,7 @@ bool MSqlQuery::prepare(const QString& query)
 
     // QT docs indicate that there are significant speed ups and a reduction
     // in memory usage by enabling forward-only cursors
-    //
-    // Unconditionally enable this since all existing uses of the database
-    // iterate forward over the result set.
-    setForwardOnly(true);
+    setForwardOnly(forward_only);
 
     bool ok = QSqlQuery::prepare(query);
 
