@@ -423,6 +423,9 @@ void AutoExpire::ExpireRecordings(void)
 
     LOG(VB_FILE, LOG_INFO, LOC + "ExpireRecordings()");
 
+    if (main_server)
+        main_server->GetFilesystemInfos(fsInfos, true);
+
     if (fsInfos.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Filesystem Info cache is empty, unable "
