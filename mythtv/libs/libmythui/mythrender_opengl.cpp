@@ -970,7 +970,6 @@ void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture *Texture, const QRect &Sourc
 
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
-    SetBlend(true);
 
     EnableTextures();
     Program->setUniformValue("s_texture0", 0);
@@ -1028,7 +1027,6 @@ void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture **Textures, uint TextureCoun
 
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
-    SetBlend(false);
 
     EnableTextures();
     uint active_tex = 0;
@@ -1106,7 +1104,6 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
     QRect bl(r.left(),  r.top() + r.height() - rad, rad, rad);
     QRect br(r.left() + r.width() - rad, r.top() + r.height() - rad, rad, rad);
 
-    SetBlend(true);
     DisableTextures();
 
     glEnableVertexAttribArray(VERTEX_INDEX);
@@ -1320,7 +1317,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
 void MythRenderOpenGL::Init2DState(void)
 {
-    SetBlend(false);
+    SetBlend(true);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);

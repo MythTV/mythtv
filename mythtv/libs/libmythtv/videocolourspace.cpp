@@ -14,6 +14,7 @@ VideoColourSpace::VideoColourSpace(VideoCStd colour_std)
     m_contrast(1.0f),
     m_saturation(1.0f),
     m_hue(0.0f),
+    m_alpha(1.0f),
     m_colourSpace(colour_std)
 {
     m_db_settings[kPictureAttribute_Brightness] =
@@ -49,8 +50,7 @@ PictureAttributeSupported VideoColourSpace::SupportedAttributes(void) const
 void VideoColourSpace::SetSupportedAttributes(PictureAttributeSupported supported)
 {
     m_supported_attributes = supported;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1")
-        .arg(toString(m_supported_attributes)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1").arg(toString(m_supported_attributes)));
 }
 
 int VideoColourSpace::GetPictureAttribute(PictureAttribute attribute)
@@ -116,7 +116,7 @@ void VideoColourSpace::Update(void)
             1.000f,                      ( 1.5756f * uvsin), ( 1.5756f * uvcos)                     , 0.000f,
             1.000f, (-0.2253f * uvcos) + ( 0.5000f * uvsin), ( 0.5000f * uvcos) - (-0.2253f * uvsin), 0.000f,
             1.000f, ( 1.8270f * uvcos)                     ,                    - ( 1.8270f * uvsin), 0.000f,
-            0.000f,                                  0.000f,                                  0.000f, 1.000f);
+            0.000f,                                  0.000f,                                  0.000f, m_alpha);
             break;
 
         case kCSTD_ITUR_BT_709:
@@ -124,7 +124,7 @@ void VideoColourSpace::Update(void)
             1.000f,                      ( 1.5701f * uvsin), ( 1.5701f * uvcos)                     , 0.000f,
             1.000f, (-0.1870f * uvcos) + (-0.4664f * uvsin), (-0.4664f * uvcos) - (-0.1870f * uvsin), 0.000f,
             1.000f, ( 1.8556f * uvcos)                     ,                    - ( 1.8556f * uvsin), 0.000f,
-            0.000f,                                  0.000f,                                  0.000f, 1.000f);
+            0.000f,                                  0.000f,                                  0.000f, m_alpha);
             break;
 
         case kCSTD_ITUR_BT_601:
@@ -133,7 +133,7 @@ void VideoColourSpace::Update(void)
             1.000f,                      ( 1.4030f * uvsin), ( 1.4030f * uvcos)                     , 0.000f,
             1.000f, (-0.3440f * uvcos) + (-0.7140f * uvsin), (-0.7140f * uvcos) - (-0.3440f * uvsin), 0.000f,
             1.000f, ( 1.7730f * uvcos)                     ,                    - ( 1.7730f * uvsin), 0.000f,
-            0.000f,                                  0.000f,                                  0.000f, 1.000f);
+            0.000f,                                  0.000f,                                  0.000f, m_alpha);
     }
 
     setToIdentity();
@@ -150,12 +150,12 @@ void VideoColourSpace::Update(void)
 void VideoColourSpace::Debug(void)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 "
-                "StudioLevels: %5")
+        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 Alpha: %5 StudioLevels: %6")
         .arg(m_brightness, 2, 'f', 4, QLatin1Char('0'))
         .arg(m_contrast  , 2, 'f', 4, QLatin1Char('0'))
         .arg(m_saturation, 2, 'f', 4, QLatin1Char('0'))
         .arg(m_hue       , 2, 'f', 4, QLatin1Char('0'))
+        .arg(m_alpha     , 2, 'f', 4, QLatin1Char('0'))
         .arg(m_studioLevels));
 
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
@@ -200,6 +200,12 @@ void VideoColourSpace::SetHue(int value)
 void VideoColourSpace::SetSaturation(int value)
 {
     m_saturation = value * 0.02f;
+    Update();
+}
+
+void VideoColourSpace::SetAlpha(int value)
+{
+    m_alpha = 100.0f / value;
     Update();
 }
 

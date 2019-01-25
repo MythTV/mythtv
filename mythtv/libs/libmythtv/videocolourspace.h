@@ -25,6 +25,7 @@ class VideoColourSpace : public QMatrix4x4
     int   GetPictureAttribute(PictureAttribute attribute);
     int   SetPictureAttribute(PictureAttribute attribute, int value);
     void  SetColourSpace(VideoCStd csp = kCSTD_Unknown);
+    void  SetAlpha(int value);
 
   private:
     void  SetStudioLevels(bool studio);
@@ -47,6 +48,7 @@ class VideoColourSpace : public QMatrix4x4
     float     m_contrast;
     float     m_saturation;
     float     m_hue;
+    float     m_alpha;
     VideoCStd m_colourSpace;
 };
 
