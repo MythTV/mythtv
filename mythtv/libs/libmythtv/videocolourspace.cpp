@@ -5,7 +5,21 @@
 
 #define LOC QString("ColourSpace: ")
 
-VideoColourSpace::VideoColourSpace(VideoCStd colour_std)
+static QString ToString(MythColorSpace ColorSpace)
+{
+    switch (ColorSpace)
+    {
+        case ColorSpaceBT601:     return "BT-601";
+        case ColorSpaceBT709:     return "BT-709";
+        case ColorSpaceBT2020:    return "BT-2020";
+        case ColorSpaceRGB:       return "RGB";
+        case ColorSpaceSMPTE240M: return "SMPTE-240M";
+        default: break;
+    }
+    return "Unknown";
+}
+
+VideoColourSpace::VideoColourSpace(MythColorSpace colour_std)
   : QMatrix4x4(),
     m_supported_attributes(kPictureAttributeSupported_None),
     m_changed(false),
@@ -111,7 +125,14 @@ void VideoColourSpace::Update(void)
     QMatrix4x4 csc;
     switch (m_colourSpace)
     {
-        case kCSTD_SMPTE_240M:
+        case ColorSpaceRGB:
+            csc = QMatrix4x4(1.000f, 0.000f, 0.000f, 0.000f,
+                             0.000f, 1.000f, 0.000f, 0.000f,
+                             0.000f, 0.000f, 1.000f, 0.000f,
+                             0.000f, 0.000f, 0.000f, m_alpha);
+            break;
+
+        case ColorSpaceSMPTE240M:
             csc = QMatrix4x4(
             1.000f,                      ( 1.5756f * uvsin), ( 1.5756f * uvcos)                     , 0.000f,
             1.000f, (-0.2253f * uvcos) + ( 0.5000f * uvsin), ( 0.5000f * uvcos) - (-0.2253f * uvsin), 0.000f,
@@ -119,7 +140,7 @@ void VideoColourSpace::Update(void)
             0.000f,                                  0.000f,                                  0.000f, m_alpha);
             break;
 
-        case kCSTD_ITUR_BT_709:
+        case ColorSpaceBT709:
             csc = QMatrix4x4(
             1.000f,                      ( 1.5701f * uvsin), ( 1.5701f * uvcos)                     , 0.000f,
             1.000f, (-0.1870f * uvcos) + (-0.4664f * uvsin), (-0.4664f * uvcos) - (-0.1870f * uvsin), 0.000f,
@@ -127,7 +148,7 @@ void VideoColourSpace::Update(void)
             0.000f,                                  0.000f,                                  0.000f, m_alpha);
             break;
 
-        case kCSTD_ITUR_BT_601:
+        case ColorSpaceBT601:
         default:
             csc = QMatrix4x4(
             1.000f,                      ( 1.4030f * uvsin), ( 1.4030f * uvcos)                     , 0.000f,
@@ -167,10 +188,14 @@ void VideoColourSpace::Debug(void)
     }
 }
 
-void VideoColourSpace::SetColourSpace(VideoCStd csp)
+bool VideoColourSpace::SetColourSpace(MythColorSpace csp)
 {
+    if (csp == m_colourSpace)
+        return false;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New video colourspace: %1").arg(ToString(csp)));
     m_colourSpace = csp;
     Update();
+    return true;
 }
 
 void VideoColourSpace::SetStudioLevels(bool studio)

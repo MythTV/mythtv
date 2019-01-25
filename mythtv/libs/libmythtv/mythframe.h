@@ -33,6 +33,16 @@ typedef enum FrameType_
     FMT_NV12
 } VideoFrameType;
 
+typedef enum MythColorSpace_
+{
+    ColorSpaceUnknown = 0,
+    ColorSpaceBT601,
+    ColorSpaceRGB,
+    ColorSpaceBT709,
+    ColorSpaceSMPTE240M,
+    ColorSpaceBT2020
+} MythColorSpace;
+
 typedef struct VideoFrame_
 {
     VideoFrameType codec;
@@ -65,6 +75,7 @@ typedef struct VideoFrame_
 
     int pix_fmt;
     int directrendering; ///< 1 if managed by FFmpeg
+    MythColorSpace colorspace;
 } VideoFrame;
 
 #ifdef __cplusplus

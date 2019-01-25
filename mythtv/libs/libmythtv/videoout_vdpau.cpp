@@ -411,6 +411,12 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
     if (!m_checked_surface_ownership && codec_is_std(video_codec_id))
         ClaimVideoSurfaces();
 
+    // N.B. this overrides the filter option - but we now have a definitive view
+    // from the decoder, so use it.
+    if (frame)
+        if (videoColourSpace.SetColourSpace(frame->colorspace))
+            UpdateCSCMatrix();
+
     m_pip_ready = false;
     ShowPIPs(frame, pipPlayers);
 }
@@ -905,13 +911,18 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
                         "BT.601" : "BT.709"));
         }
 
-        if (m_colorspace != VDP_COLOR_STANDARD_ITUR_BT_601)
-        {
-            videoColourSpace.SetColourSpace((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601)
-                         ? kCSTD_ITUR_BT_601 : kCSTD_ITUR_BT_709);
-        }
-        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.data());
+        videoColourSpace.SetColourSpace((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601)
+                         ? ColorSpaceBT601 : ColorSpaceBT709);
+        UpdateCSCMatrix();
     }
+    m_lock.unlock();
+}
+
+void VideoOutputVDPAU::UpdateCSCMatrix(void)
+{
+    m_lock.lock();
+    if (m_render && m_video_mixer)
+        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.data());
     m_lock.unlock();
 }
 
@@ -924,7 +935,7 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
     m_lock.lock();
     newValue = videoColourSpace.SetPictureAttribute(attribute, newValue);
     if (newValue >= 0)
-        m_render->SetCSCMatrix(m_video_mixer, videoColourSpace.data());
+        UpdateCSCMatrix();
     m_lock.unlock();
     return newValue;
 }

@@ -108,6 +108,7 @@ class VideoOutputVDPAU : public VideoOutput
     void DeinitPIPS(void);
     void DeinitPIPLayer(void);
     void ParseOptions(void);
+    void UpdateCSCMatrix(void);
 
     Window               m_win;
     MythRenderVDPAU     *m_render;

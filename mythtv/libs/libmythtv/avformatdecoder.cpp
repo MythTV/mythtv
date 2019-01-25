@@ -404,6 +404,25 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     PrivateDecoder::GetDecoders(opts);
 }
 
+/*! \brief Translate AVColorSpace to supported MythTV colorspaces.
+ * This currently makes no attempt to guess when the colorspace is undefined.
+*/
+static inline MythColorSpace GetColorSpace(AVFrame *Frame)
+{
+    switch (Frame->colorspace)
+    {
+        case AVCOL_SPC_RGB:       return ColorSpaceRGB;
+        case AVCOL_SPC_BT709:     return ColorSpaceBT709;
+        case AVCOL_SPC_SMPTE240M: return ColorSpaceSMPTE240M;
+        case AVCOL_SPC_BT2020_NCL:
+        case AVCOL_SPC_BT2020_CL: return ColorSpaceBT2020;
+        case AVCOL_SPC_BT470BG:
+        case AVCOL_SPC_SMPTE170M: return ColorSpaceBT601;
+        default: break;
+    }
+    return ColorSpaceUnknown;
+}
+
 AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  PlayerFlags flags)
@@ -4120,6 +4139,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->aspect           = current_aspect;
         picframe->dummy            = 0;
         picframe->directrendering  = directrendering ? 1 : 0;
+        picframe->colorspace       = GetColorSpace(mpa_pic);
 
         m_parent->ReleaseNextVideoFrame(picframe, temppts);
     }

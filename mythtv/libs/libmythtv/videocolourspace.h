@@ -1,22 +1,18 @@
 #ifndef VIDEOCOLOURSPACE_H
 #define VIDEOCOLOURSPACE_H
 
+// Qt
 #include <QMap>
 #include <QMatrix4x4>
-#include "videoouttypes.h"
 
-typedef enum VideoCStd
-{
-    kCSTD_Unknown = 0,
-    kCSTD_ITUR_BT_601,
-    kCSTD_ITUR_BT_709,
-    kCSTD_SMPTE_240M,
-} VideoCStd;
+// MythTV
+#include "mythframe.h"
+#include "videoouttypes.h"
 
 class VideoColourSpace : public QMatrix4x4
 {
   public:
-    explicit VideoColourSpace(VideoCStd colour_std = kCSTD_ITUR_BT_601);
+    explicit VideoColourSpace(MythColorSpace colour_std = ColorSpaceUnknown);
    ~VideoColourSpace() = default;
 
     PictureAttributeSupported SupportedAttributes(void) const;
@@ -24,7 +20,7 @@ class VideoColourSpace : public QMatrix4x4
     bool  HasChanged(void);
     int   GetPictureAttribute(PictureAttribute attribute);
     int   SetPictureAttribute(PictureAttribute attribute, int value);
-    void  SetColourSpace(VideoCStd csp = kCSTD_Unknown);
+    bool  SetColourSpace(MythColorSpace csp);
     void  SetAlpha(int value);
 
   private:
@@ -49,7 +45,7 @@ class VideoColourSpace : public QMatrix4x4
     float     m_saturation;
     float     m_hue;
     float     m_alpha;
-    VideoCStd m_colourSpace;
+    MythColorSpace m_colourSpace;
 };
 
 #endif

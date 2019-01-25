@@ -512,6 +512,8 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
     if (sw_frame && deint_proc && !m_deinterlaceBeforeOSD && !pauseframe && !dummy)
         m_deintFilter->ProcessFrame(frame, scan);
 
+    videoColourSpace.SetColourSpace(frame->colorspace);
+
     if (gl_videochain && sw_frame && !dummy)
         gl_videochain->UpdateInputFrame(frame);
 
