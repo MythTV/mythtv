@@ -428,6 +428,7 @@ bool LoggerThread::logConsole(LoggingItem *item)
 
     item->IncrRef();
 
+#ifndef Q_OS_ANDROID
     if (item->m_type & kStandardIO)
         snprintf( line, MAX_STRING_LENGTH, "%s", item->m_message );
     else
@@ -462,11 +463,42 @@ bool LoggerThread::logConsole(LoggingItem *item)
 #endif
     }
 
-#ifdef Q_OS_ANDROID
-    __android_log_print(ANDROID_LOG_INFO, "mfe", line);
-#else
     int result = write( 1, line, strlen(line) );
     (void)result;
+
+#else // Q_OS_ANDROID
+
+    android_LogPriority aprio;
+    switch (item->m_level)
+    {
+    case LOG_EMERG:
+        aprio = ANDROID_LOG_FATAL;
+    case LOG_ALERT:
+    case LOG_CRIT:
+    case LOG_ERR:
+        aprio = ANDROID_LOG_ERROR;
+        break;
+    case LOG_WARNING:
+        aprio = ANDROID_LOG_WARN;
+        break;
+    case LOG_NOTICE:
+    case LOG_INFO:
+        aprio = ANDROID_LOG_INFO;
+        break;
+    case LOG_DEBUG:
+        aprio = ANDROID_LOG_DEBUG;
+        break;
+    case LOG_UNKNOWN:
+    default:
+        aprio = ANDROID_LOG_UNKNOWN;
+        break;
+    }
+#if CONFIG_DEBUGTYPE
+    __android_log_print(aprio, "mfe", "%s:%d:%s  %s", item->m_file,
+                        item->m_line, item->m_function, item->m_message);
+#else
+    __android_log_print(aprio, "mfe", "%s", item->m_message);
+#endif
 #endif
 
     item->DecrRef();
