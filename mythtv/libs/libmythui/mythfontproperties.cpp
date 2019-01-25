@@ -9,6 +9,7 @@
 #include <QFontInfo>
 #include <QFontDatabase>
 #include <QRect>
+#include <QRegularExpression>
 
 #include "mythlogging.h"
 #include "mythdb.h"
@@ -432,7 +433,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     newFont->Unfreeze();
 
     QFontInfo fi(newFont->m_face);
-    if (newFont->m_face.family() != fi.family())
+    QString fi_family =
+        fi.family().remove(QRegularExpression("\\[.*]")).trimmed();
+    if (newFont->m_face.family() != fi_family)
     {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     QString("Failed to load '%1', got '%2' instead")
