@@ -23,8 +23,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef VAAPI2CONTEXT_H
-#define VAAPI2CONTEXT_H
+#ifndef NVDECCONTEXT_H
+#define NVDECCONTEXT_H
 
 #include "mythtvexp.h"
 #include "mythcodecid.h"
@@ -34,24 +34,23 @@ extern "C" {
     #include "libavcodec/avcodec.h"
 }
 
-class MTV_PUBLIC Vaapi2Context : public MythCodecContext
+class MTV_PUBLIC NvdecContext : public MythCodecContext
 {
   public:
-    Vaapi2Context(void);
-    ~Vaapi2Context();
+    NvdecContext(void);
     static MythCodecID GetBestSupportedCodec(AVCodec **ppCodec,
                                              const QString &decoder,
                                              uint stream_type,
                                              AVPixelFormat &pix_fmt);
     int HwDecoderInit(AVCodecContext *ctx) override; // MythCodecContext
-    QString GetDeinterlaceFilter(void) override; // MythCodecContext
     bool isValidDeinterlacer(QString /*name*/ ) override; // MythCodecContext
     QStringList GetDeinterlacers(void) override; // MythCodecContext
 
   protected:
-    int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame) override; // MythCodecContext
-    void CloseFilters();
+    int SetDeinterlace(AVCodecContext *ctx);
+    QString GetDeinterlaceMode(bool &dropSecondFld);
+
 
 };
 
-#endif // VAAPI2CONTEXT_H
+#endif // NVDECCONTEXT_H

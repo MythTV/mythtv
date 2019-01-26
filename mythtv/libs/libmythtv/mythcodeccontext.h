@@ -61,8 +61,7 @@ class MTV_PUBLIC MythCodecContext
 
   protected:
     virtual bool isValidDeinterlacer(QString /*name*/) { return false; }
-    int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
-    void CloseFilters();
+    virtual int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
     AVStream* stream;
     AVFilterContext *buffersink_ctx;
     AVFilterContext *buffersrc_ctx;

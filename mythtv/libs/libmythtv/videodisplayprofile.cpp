@@ -845,6 +845,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
         dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
         dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
+        dec_name["nvdec"]    = QObject::tr("NVidia NVDEC acceleration");
     }
 
     QString ret = decoder;
@@ -908,6 +909,11 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "VAAPI2 is a new implementation of VAAPI to will use the graphics hardware to "
             "accelerate video decoding on Intel CPUs. ");
+
+    if (decoder == "nvdec")
+        msg += QObject::tr(
+            "Nvdec uses the new NVDEC API to "
+            "accelerate video decoding on NVidia Graphics Adapters. ");
 
     return msg;
 }
@@ -996,6 +1002,20 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
     else if ("vaapi2doubleratemotion_compensated" == short_name)
         return QObject::tr("Motion Compensated (2x, HW-VA)");
 #endif
+#ifdef USING_NVDEC
+    else if ("nvdecweave" == short_name)
+        return QObject::tr("Weave (HW-NV)");
+    else if ("nvdecbob" == short_name)
+        return QObject::tr("Bob (HW-NV)");
+    else if ("nvdecadaptive" == short_name)
+        return QObject::tr("Adaptive (HW-NV)");
+    else if ("nvdecdoublerateweave" == short_name)
+        return QObject::tr("Weave (2x, HW-NV)");
+    else if ("nvdecdoubleratebob" == short_name)
+        return QObject::tr("Bob (2x, HW-NV)");
+    else if ("nvdecdoublerateadaptive" == short_name)
+        return QObject::tr("Adaptive (2x, HW-NV)");
+#endif // USING_NVDEC
 
     return "";
 }
@@ -1504,6 +1524,19 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
     }
 #endif
 
+#if defined(USING_NVDEC) && defined(USING_OPENGL_VIDEO)
+    if (!profiles.contains("NVDEC Normal")) {
+        (void) QObject::tr("NVDEC Normal",
+                           "Sample: NVDEC Normal");
+        groupid = CreateProfileGroup("NVDEC Normal", hostname);
+        CreateProfile(groupid, 1, "", "", "",
+                      "nvdec", 4, true, "opengl",
+                      "opengl2", true,
+                      "nvdecdoublerateadaptive", "nvdecadaptive",
+                      "");
+    }
+#endif
+
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
@@ -1670,6 +1703,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 
     QString kUsingVA = QObject::tr("(VAAPI Hardware Accelerated)");
 
+    QString kUsingNV = QObject::tr("(NVDEC Hardware Accelerated)");
+
     QString kUsingGL = QObject::tr("(OpenGL Hardware Accelerated)");
 
     QString kGreedyHMsg = QObject::tr(
@@ -1777,6 +1812,19 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kMAMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
     else if (deint == "vaapi2doubleratemotion_compensated")
         msg = kMCMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
+
+    else if (deint == "nvdecweave")
+        msg = kWeaveMsg + " " +  kUsingNV;
+    else if (deint == "nvdecbob")
+        msg = kBobMsg + " " +  kUsingNV;
+    else if (deint == "nvdecadaptive")
+        msg = kMAMsg + " " +  kUsingNV;
+    else if (deint == "nvdecdoublerateweave")
+        msg = kWeaveMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
+    else if (deint == "nvdecdoubleratebob")
+        msg = kBobMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
+    else if (deint == "nvdecdoublerateadaptive")
+        msg = kMAMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 

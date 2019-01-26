@@ -209,6 +209,8 @@ class AvFormatDecoder : public DecoderBase
                               int flags);
     friend int get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic,
                               int flags);
+    friend int get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic,
+                              int flags);
     friend void release_avf_buffer(void *opaque, uint8_t *data);
 
     friend int open_avf(URLContext *h, const char *filename, int flags);
