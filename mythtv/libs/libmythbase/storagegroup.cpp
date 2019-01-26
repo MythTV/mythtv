@@ -615,7 +615,7 @@ QString StorageGroup::FindFile(const QString &filename)
     if (!recDir.isEmpty())
     {
         result = recDir + "/" + filename;
-        LOG(VB_FILE, LOG_DEBUG, LOC +
+        LOG(VB_FILE, LOG_INFO, LOC +
             QString("FindFile: Found '%1'") .arg(result));
     }
     else
