@@ -1085,7 +1085,7 @@ void RingBuffer::run(void)
             uint64_t bps = !sr_elapsed ? 1000000001 :
                            (uint64_t)(((double)read_return * 8000.0) /
                                       (double)sr_elapsed);
-            LOG(VB_FILE, LOG_INFO, LOC +
+            LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("safe_read(...@%1, %2) -> %3, took %4 ms %5 avg %6 ms")
                     .arg(rbwposcopy).arg(totfree).arg(read_return)
                     .arg(sr_elapsed)
@@ -1270,6 +1270,8 @@ void RingBuffer::run(void)
     rbwlock.unlock();
     rbrlock.unlock();
     rwlock.unlock();
+
+    LOG(VB_FILE, LOG_INFO, LOC + QString("Exiting readahead thread"));
 
     RunEpilog();
 }
