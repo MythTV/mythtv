@@ -12,6 +12,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcodecid.h"
 #include "mythavutil.h"
+#include "videodisplayprofile.h"
 
 class RingBuffer;
 class TeletextViewer;
@@ -271,6 +272,7 @@ class DecoderBase
     void TrackTotalDuration(bool track) { trackTotalDuration = track; }
     int GetfpsMultiplier(void) { return fpsMultiplier; }
     MythCodecContext *GetMythCodecContext(void) { return m_mythcodecctx; }
+    VideoDisplayProfile * GetVideoDisplayProfile(void) { return &videoDisplayProfile; }
 
   protected:
     virtual int  AutoSelectTrack(uint type);
@@ -361,6 +363,7 @@ class DecoderBase
     /// language preferences for auto-selection of streams
     vector<int> languagePreference;
     MythCodecContext *m_mythcodecctx;
+    VideoDisplayProfile videoDisplayProfile;
 };
 
 inline int DecoderBase::IncrementTrack(uint type)

@@ -73,6 +73,10 @@ extern "C" {
 #include "vaapi2context.h"
 #endif
 
+#ifdef USING_NVDEC
+#include "nvdeccontext.h"
+#endif
+
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
@@ -188,6 +192,9 @@ int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 #ifdef USING_VAAPI2
 int  get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags);
+#endif
+#ifdef USING_NVDEC
+int  get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 
 static int determinable_frame_size(struct AVCodecContext *avctx)
@@ -395,6 +402,10 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
 #ifdef USING_VAAPI2
     opts.decoders->append("vaapi2");
     (*opts.equiv_decoders)["vaapi2"].append("dummy");
+#endif
+#ifdef USING_NVDEC
+    opts.decoders->append("nvdec");
+    (*opts.equiv_decoders)["nvdec"].append("dummy");
 #endif
 #ifdef USING_MEDIACODEC
     opts.decoders->append("mediacodec");
@@ -1600,6 +1611,23 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
 }
 #endif
 
+#ifdef USING_NVDEC
+static enum AVPixelFormat get_format_nvdec(struct AVCodecContext */*avctx*/,
+                                           const enum AVPixelFormat *valid_fmts)
+{
+    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (AV_PIX_FMT_CUDA ==  *valid_fmts)
+        {
+            ret = *valid_fmts;
+            break;
+        }
+        valid_fmts++;
+    }
+    return ret;
+}
+#endif
+
 #ifdef USING_MEDIACODEC
 static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext */*avctx*/,
                                            const enum AVPixelFormat *valid_fmts)
@@ -1704,6 +1732,15 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->get_buffer2     = get_avf_buffer_vaapi2;
         enc->get_format      = get_format_vaapi2;
+    }
+    else
+#endif
+#ifdef USING_NVDEC
+    if (codec_is_nvdec(video_codec_id))
+    {
+        enc->get_buffer2     = get_avf_buffer_nvdec;
+        enc->get_format      = get_format_nvdec;
+        directrendering = false;
     }
     else
 #endif
@@ -2519,11 +2556,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 fps = 0;
             if (!is_db_ignored)
             {
-                VideoDisplayProfile vdp;
-                vdp.SetInput(QSize(width, height),fps,codecName);
-                dec = vdp.GetDecoder();
-                thread_count = vdp.GetMaxCPUs();
-                bool skip_loop_filter = vdp.IsSkipLoopEnabled();
+                // VideoDisplayProfile vdp;
+                videoDisplayProfile.SetInput(QSize(width, height),fps,codecName);
+                dec = videoDisplayProfile.GetDecoder();
+                thread_count = videoDisplayProfile.GetMaxCPUs();
+                bool skip_loop_filter = videoDisplayProfile.IsSkipLoopEnabled();
                 if  (!skip_loop_filter)
                 {
                     enc->skip_loop_filter = AVDISCARD_NONKEY;
@@ -2647,6 +2684,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_VAAPI2
+#ifdef USING_NVDEC
+                if (!foundgpudecoder)
+                {
+                    MythCodecID nvdec_mcid;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+                    nvdec_mcid = NvdecContext::GetBestSupportedCodec(
+                        &codec, dec, mpeg_version(enc->codec_id),
+                        pix_fmt);
+
+                    if (codec_is_nvdec(nvdec_mcid))
+                    {
+                        gCodecMap->freeCodecContext(ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
+                        video_codec_id = nvdec_mcid;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif // USING_NVDEC
             }
             // default to mpeg2
             if (video_codec_id == kCodec_NONE)
@@ -2667,6 +2722,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 && (codec_is_std(video_codec_id)
                     || codec_is_mediacodec(video_codec_id)
                     || codec_is_vaapi2(video_codec_id)
+                    || codec_is_nvdec(video_codec_id)
                     || GetCodecDecoderName() == "openmax"))
                 use_frame_timing = true;
 
@@ -3040,11 +3096,9 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
-#ifdef USING_VAAPI2
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
-#endif
 
 #ifdef USING_VDPAU
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
@@ -3175,6 +3229,14 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
 #ifdef USING_VAAPI2
 int get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    nd->directrendering = false;
+    return avcodec_default_get_buffer2(c, pic, flags);
+}
+#endif
+#ifdef USING_NVDEC
+int get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     nd->directrendering = false;
@@ -3976,8 +4038,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe = m_parent->GetNextVideoFrame();
         unsigned char *buf = picframe->buf;
         bool used_picframe=false;
-#ifdef USING_VAAPI2
-        if (IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
+#if defined(USING_VAAPI2) || defined(USING_NVDEC)
+        if (AV_PIX_FMT_CUDA == (AVPixelFormat)mpa_pic->format
+            || IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
         {
             int ret = 0;
             tmp_frame = av_frame_alloc();
@@ -4022,7 +4085,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             av_freep(&pixelformats);
         }
         else
-#endif // USING_VAAPI2
+#endif // USING_VAAPI2 || USING_NVDEC
             use_frame = mpa_pic;
 
         if (!used_picframe)

@@ -135,6 +135,7 @@ Advanced options (experts only):
   --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-vaapi2         disable VAAPI2 hardware accelerated video decoding
+  --disable-nvdec          disable NVDEC (CUVID) hardware accelerated video decoding
   --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-mediacodec     disable hardware accelerated decoding on android
@@ -1397,6 +1398,7 @@ EXTERNAL_LIBRARY_LIST="
     sdl2
     vaapi
     vaapi2
+    nvdec
 "
 
 HWACCEL_AUTODETECT_LIBRARY_LIST="
@@ -2041,6 +2043,7 @@ USING_LIST='
     opengles
     vaapi
     vaapi2
+    nvdec
     vdpau
     openmax
     mediacodec
@@ -2772,6 +2775,7 @@ enable lirc
 enable mediacodec
 enable vaapi
 enable vaapi2
+enable nvdec
 enable mheg
 enable mythtranscode
 enable opengl
@@ -6986,6 +6990,19 @@ if enabled bindings_perl; then
     check_pl_lib "XML::Simple"  || disable_bindings_perl "XML::Simple"
 fi
 
+# nvdec processing
+here="$PWD"
+cd external/nv-codec-headers
+if enabled nvdec ; then
+    make install PREFIX=$PWD/install
+    if [ "$?" != 0 ] ; then die "Build of nv-codec-headers failed." ; fi
+    PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$PWD/install/lib/pkgconfig"
+    export PKG_CONFIG_PATH
+else
+    rm -rf install ffnvcodec.pc
+fi
+cd "$here"
+
 # Check for php dependencies
 # are none at this time
 
@@ -7173,6 +7190,8 @@ ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
 ffmpeg_optenable crystalhd sdl2 ffplay
+ffmpeg_optenable nvdec
+
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
     ffmpeg_optenable mediacodec jni
@@ -7386,6 +7405,7 @@ if enabled x11 ; then
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
   echo "VAAPI2 support            ${vaapi2-no}"
+  echo "NVDEC support             ${nvdec-no}"
   echo "CrystalHD support         ${crystalhd-no}"
   echo "OpenMAX support           ${openmax-no}"
   if enabled openmax ; then

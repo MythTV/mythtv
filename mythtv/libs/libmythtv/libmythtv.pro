@@ -512,6 +512,12 @@ using_frontend {
         SOURCES += vaapi2context.cpp
     }
 
+    using_nvdec {
+        DEFINES += USING_NVDEC
+        HEADERS += nvdeccontext.h
+        SOURCES += nvdeccontext.cpp
+    }
+
     using_mediacodec {
         DEFINES += USING_MEDIACODEC
         HEADERS += mediacodeccontext.h

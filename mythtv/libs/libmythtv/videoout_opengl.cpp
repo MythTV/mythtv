@@ -49,6 +49,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["mediacodec"].append(safe);
     if (opts.decoders->contains("vaapi2"))
         (*opts.safe_renderers)["vaapi2"].append(safe);
+    if (opts.decoders->contains("nvdec"))
+        (*opts.safe_renderers)["nvdec"].append(safe);
 
     // OpenGL UYVY
     opts.renderers->append("opengl");
@@ -261,7 +263,8 @@ bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
 
     if (!codec_is_std(av_codec_id)
         && !codec_is_mediacodec(av_codec_id)
-        && !codec_is_vaapi2(av_codec_id))
+        && !codec_is_vaapi2(av_codec_id)
+        && !codec_is_nvdec(av_codec_id))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
         errorState = kError_Unknown;
