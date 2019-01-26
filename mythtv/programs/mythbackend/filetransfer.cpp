@@ -19,7 +19,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
-    if (rbuffer)
+    if (rbuffer && rbuffer->IsOpen())
         rbuffer->Start();
 }
 
