@@ -7190,7 +7190,6 @@ ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
 ffmpeg_optenable crystalhd sdl2 ffplay
-ffmpeg_optenable nvdec
 
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
@@ -7230,6 +7229,11 @@ if [ $rc != 0 ] ; then
     exit $rc
 fi
 cd "$currentpwd"
+
+# If ffmpeg disabled nvdec then disable it for mythtv
+if ! grep "^CONFIG_NVDEC=yes$" external/FFmpeg/ffbuild/config.mak ; then
+    disable nvdec
+fi
 
 if test "$quiet" != "yes"; then
 
