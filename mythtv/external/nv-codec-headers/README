@@ -1,0 +1,11 @@
+FFmpeg version of headers required to interface with Nvidias codec APIs.
+
+Corresponds to Video Codec SDK version 8.2.15.
+
+Minimum required driver versions:
+Linux: 396.24 or newer
+Windows: 397.93 or newer
+
+Optional CUDA 10 features:
+Linux: 410.48 or newer
+Windows: 411.31 or newer
