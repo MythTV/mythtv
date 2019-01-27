@@ -42,5 +42,5 @@ libmythsoundtouch-all libmythsoundtouch-clean libmythsoundtouch-distclean libmyt
 libXNVCtrl-all libXNVCtrl-install libXNVCtrl-uninstall libXNVCtrl-clean libXNVCtrl-distclean:
 	${MAKE} -C libXNVCtrl -f Makefile.lib ${@:libXNVCtrl-%=%}
 
-nv-codec-headers-clean nv-codec-headers-distclean:
+nv-codec-headers-distclean:
 	rm -rf nv-codec-headers/install nv-codec-headers/ffnvcodec.pc
