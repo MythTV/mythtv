@@ -1558,14 +1558,12 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
-#if defined(USING_VAAPI) || defined(USING_VAAPI2)
 static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 {
     return fmt == AV_PIX_FMT_VAAPI_MOCO ||
            fmt == AV_PIX_FMT_VAAPI_IDCT ||
            fmt == AV_PIX_FMT_VAAPI_VLD;
 }
-#endif
 
 #ifdef USING_VAAPI
 // Declared separately to allow attribute
