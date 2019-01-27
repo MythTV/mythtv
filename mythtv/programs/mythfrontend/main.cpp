@@ -1907,6 +1907,11 @@ int main(int argc, char **argv)
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    // Ignore desktop scaling
+    QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
+
 #ifdef Q_OS_MAC
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
