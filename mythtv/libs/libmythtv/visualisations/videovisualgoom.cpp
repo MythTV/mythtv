@@ -94,21 +94,24 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
     if ((m_render->Type() == kRenderOpenGL))
     {
         MythRenderOpenGL *glrender = static_cast<MythRenderOpenGL*>(m_render);
-        if (!m_glSurface && glrender && m_buffer)
+        if (glrender && m_buffer)
         {
-            m_glSurface = glrender->CreateTexture(m_area.size(), true);
-        }
+            glrender->makeCurrent();
 
-        if (m_glSurface && glrender && m_buffer)
-        {
-            if (m_buffer != last)
+            if (!m_glSurface)
+                m_glSurface = glrender->CreateTexture(m_area.size());
+
+            if (m_glSurface)
             {
-                void* buf = glrender->GetTextureBuffer(m_glSurface, false);
-                if (buf)
-                    memcpy(buf, m_buffer, m_area.width() * m_area.height() * 4);
-                glrender->UpdateTexture(m_glSurface, (void*)m_buffer);
+                if (m_buffer != last)
+                    m_glSurface->m_texture->setData(m_glSurface->m_pixelFormat, m_glSurface->m_pixelType, m_buffer);
+                // goom doesn't render properly due to changes in video alpha blending
+                // so turn blend off
+                glrender->SetBlend(false);
+                glrender->DrawBitmap(&m_glSurface, 1, nullptr, m_area, area, nullptr);
+                glrender->SetBlend(true);
             }
-            glrender->DrawBitmap(&m_glSurface, 1, nullptr, m_area, area, nullptr);
+            glrender->doneCurrent();
         }
         return;
     }

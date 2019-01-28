@@ -143,17 +143,6 @@ static HostCheckBoxSetting *OpenGLDiscardFB()
     gc->setValue(false);
     return gc;
 }
-
-static HostCheckBoxSetting *OpenGLEnablePBO()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLEnablePBO");
-    gc->setLabel(PlaybackSettings::tr("Enable Pixel Buffer Objects for OpenGL video"));
-    gc->setHelpText(PlaybackSettings::tr(
-        "Pixel Buffer Objects are enabled by default to improve video playback "
-        "but on some integrated GPUs (e.g. Intel) they are not needed and will reduce performance."));
-    gc->setValue(true);
-    return gc;
-}
 #endif
 
 #if CONFIG_DEBUGTYPE
@@ -4288,8 +4277,6 @@ void PlaybackSettings::Load(void)
     advanced->addChild(OpenGLExtraStage());
     if (isOpenGLES)
         advanced->addChild(OpenGLDiscardFB());
-    else
-        advanced->addChild(OpenGLEnablePBO());
 #endif
     addChild(advanced);
 

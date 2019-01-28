@@ -30,11 +30,10 @@ typedef enum
 {
     kGLFeatNone    = 0x0000,
     kGLExtFBDiscard= 0x0001,
-    kGLExtPBufObj  = 0x0002,
-    kGLNVFence     = 0x0004,
-    kGLAppleFence  = 0x0008,
-    kGLBufferMap   = 0x0010,
-    kGLExtRGBA16   = 0x0020
+    kGLNVFence     = 0x0002,
+    kGLAppleFence  = 0x0004,
+    kGLBufferMap   = 0x0008,
+    kGLExtRGBA16   = 0x0010
 } GLFeatures;
 
 #define TEX_OFFSET 8
@@ -52,7 +51,6 @@ class MUI_PUBLIC MythGLTexture
     QOpenGLTexture *m_texture;
     QOpenGLTexture::PixelFormat m_pixelFormat;
     QOpenGLTexture::PixelType   m_pixelType;
-    QOpenGLBuffer  *m_pbo;
     QOpenGLBuffer  *m_vbo;
     QSize           m_size;
     QSize           m_totalSize;
@@ -114,10 +112,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void  SetFence(void);
     void  DeleteFence(void);
 
-    void* GetTextureBuffer(MythGLTexture *Texture, bool create_buffer);
-    void  UpdateTexture(MythGLTexture *Texture, void *buf);
     MythGLTexture* CreateHelperTexture(void);
-    MythGLTexture* CreateTexture(QSize Size, bool UsePBO,
+    MythGLTexture* CreateTexture(QSize Size,
                         QOpenGLTexture::PixelType     PixelType   = QOpenGLTexture::UInt8,
                         QOpenGLTexture::PixelFormat   PixelFormat = QOpenGLTexture::RGBA,
                         QOpenGLTexture::Filter        Filter      = QOpenGLTexture::Linear,
@@ -186,7 +182,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void ResetProcs(void);
     void SetMatrixView(void);
 
-    QOpenGLBuffer* CreatePBO(uint BufferSize);
     QOpenGLBuffer* CreateVBO(uint Size, bool Release = true);
     void DeleteOpenGLResources(void);
     void DeleteFramebuffers(void);

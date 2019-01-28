@@ -51,7 +51,6 @@ MythGLTexture::MythGLTexture(QOpenGLTexture *Texture)
     m_texture(Texture),
     m_pixelFormat(QOpenGLTexture::RGBA),
     m_pixelType(QOpenGLTexture::UInt8),
-    m_pbo(nullptr),
     m_vbo(nullptr),
     m_size(0,0),
     m_totalSize(0,0),
@@ -70,7 +69,6 @@ MythGLTexture::MythGLTexture(GLuint Texture)
     m_texture(nullptr),
     m_pixelFormat(QOpenGLTexture::RGBA),
     m_pixelType(QOpenGLTexture::UInt8),
-    m_pbo(nullptr),
     m_vbo(nullptr),
     m_size(0,0),
     m_totalSize(0,0),
@@ -253,8 +251,6 @@ bool MythRenderOpenGL::Init(void)
     // Pixel buffer objects
     bool buffer_procs = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer") &&
                         (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
-    if (!isOpenGLES() && hasExtension("GL_ARB_pixel_buffer_object") && buffer_procs)
-        m_extraFeatures |= kGLExtPBufObj;
 
     // Buffers are available by default (GL and GLES).
     // Buffer mapping is available by extension
@@ -321,7 +317,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer discard  : %1").arg(GLYesNo(m_extraFeatures & kGLExtFBDiscard)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
         .arg(GLYesNo((m_extraFeatures & kGLAppleFence) || (m_extraFeatures & kGLNVFence))));
 
@@ -528,60 +523,7 @@ void MythRenderOpenGL::DeleteFence(void)
     }
 }
 
-void* MythRenderOpenGL::GetTextureBuffer(MythGLTexture *Texture, bool create_buffer)
-{
-    if (!Texture || (Texture && !Texture->m_texture))
-        return nullptr;
-
-    makeCurrent(); // associated doneCurrent() in UpdateTexture
-    EnableTextures();
-
-    if (Texture->m_pbo)
-    {
-        Texture->m_pbo->bind();
-        return Texture->m_pbo->map(QOpenGLBuffer::WriteOnly);
-    }
-    else if (!create_buffer)
-    {
-        return nullptr;
-    }
-
-    if (Texture->m_data)
-        return Texture->m_data;
-    if (!Texture->m_bufferSize)
-        return nullptr;
-
-    unsigned char *scratch = new unsigned char[Texture->m_bufferSize];
-    if (scratch)
-    {
-        memset(scratch, 0, Texture->m_bufferSize);
-        Texture->m_data = scratch;
-    }
-    return scratch;
-}
-
-void MythRenderOpenGL::UpdateTexture(MythGLTexture *Texture, void *buf)
-{
-    // N.B. GetTextureBuffer must be called first
-    if (!Texture)
-        return;
-
-    if (Texture->m_pbo)
-    {
-        Texture->m_pbo->unmap();
-        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, nullptr);
-        Texture->m_pbo->release(QOpenGLBuffer::PixelUnpackBuffer);
-    }
-    else
-    {
-        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, buf);
-    }
-
-    doneCurrent();
-}
-
 MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
-                                               bool UsePBO,
                                                QOpenGLTexture::PixelType PixelType,
                                                QOpenGLTexture::PixelFormat PixelFormat,
                                                QOpenGLTexture::Filter Filter,
@@ -623,8 +565,6 @@ MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
     result->m_totalSize   = GetTextureSize(Size);
     result->m_bufferSize  = datasize;
     result->m_size        = Size;
-    if (UsePBO)
-        result->m_pbo = CreatePBO(datasize);
     return result;
 }
 
@@ -661,7 +601,7 @@ MythGLTexture* MythRenderOpenGL::CreateHelperTexture(void)
     makeCurrent();
 
     uint width = m_max_tex_size;
-    MythGLTexture *texture = CreateTexture(QSize(width, 1), false,
+    MythGLTexture *texture = CreateTexture(QSize(width, 1),
                                            QOpenGLTexture::Float32,
                                            QOpenGLTexture::RGBA,
                                            QOpenGLTexture::Linear,
@@ -812,8 +752,6 @@ void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
         delete Texture->m_texture;
     if (Texture->m_data)
         delete [] Texture->m_data;
-    if (Texture->m_pbo)
-        delete Texture->m_pbo;
     if (Texture->m_vbo)
         delete Texture->m_vbo;
     delete Texture;
@@ -1394,36 +1332,6 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glSetFenceAPPLE = nullptr;
     m_glFinishFenceAPPLE = nullptr;
     m_glDiscardFramebuffer = nullptr;
-}
-
-QOpenGLBuffer* MythRenderOpenGL::CreatePBO(uint BufferSize)
-{
-    OpenGLLocker locker(this);
-    if (!(m_extraFeaturesUsed & kGLExtPBufObj) || !BufferSize)
-        return nullptr;
-
-    QOpenGLBuffer *buffer = new QOpenGLBuffer(QOpenGLBuffer::PixelUnpackBuffer);
-    if (buffer->create())
-    {
-        buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
-        buffer->bind();
-        buffer->allocate(BufferSize);
-        buffer->release(QOpenGLBuffer::PixelUnpackBuffer);
-        return buffer;
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to create Pixel Buffer Object");
-        if (glCheck())
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Pixel Buffer Objects unusable, disabling");
-            m_extraFeatures &= ~kGLExtPBufObj;
-            m_extraFeaturesUsed &= ~kGLExtPBufObj;
-        }
-        delete buffer;
-        buffer = nullptr;
-    }
-    return buffer;
 }
 
 QOpenGLBuffer* MythRenderOpenGL::CreateVBO(uint Size, bool Release /*=true*/)

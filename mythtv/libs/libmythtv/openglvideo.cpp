@@ -150,14 +150,6 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         else
             m_extraFeatures &= ~kGLExtFBDiscard;
     }
-    else
-    {
-        if ((m_extraFeatures & kGLExtPBufObj) && !enablePBOs)
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling Pixel Buffer Objects");
-            m_extraFeatures &= ~kGLExtPBufObj;
-        }
-    }
 
     if (viewportControl)
         gl_context->SetFence();
@@ -650,11 +642,10 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     MythGLTexture *texture = nullptr;
-    bool pbo = m_extraFeatures & kGLExtPBufObj;
     if (kGLYV12 == videoType)
     {
         size.setHeight((3 * size.height() + 1) / 2);
-        texture = gl_context->CreateTexture(size, pbo,
+        texture = gl_context->CreateTexture(size,
             QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
             QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
             QOpenGLTexture::LuminanceFormat);
@@ -662,11 +653,11 @@ MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
     else if (kGLUYVY == videoType)
     {
         size.setWidth(size.width() >> 1);
-        texture = gl_context->CreateTexture(size, pbo);
+        texture = gl_context->CreateTexture(size);
     }
     else if ((kGLHQUYV == videoType) || (kGLGPU == videoType) || (kGLRGBA == videoType))
     {
-        texture = gl_context->CreateTexture(size, pbo);
+        texture = gl_context->CreateTexture(size);
     }
 
     tex_size = gl_context->GetTextureSize(size);
@@ -703,43 +694,58 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
     if (hardwareDeinterlacing)
         RotateTextures();
 
-    // We need to convert frames here to avoid dependencies in MythRenderOpenGL
+    MythGLTexture *texture = inputTextures[0];
+    if (!texture)
+        return;
 
-    // A buffer is not needed if we are transferring a YV12 frame directly without
-    // any conversion. If a Pixel Buffer Object is being used - that will however
-    // be returned and will need to be copied to.
-    bool usebuffer = !((kGLYV12 == videoType) && (video_dim.width() == frame->pitches[0]));
-    void* buf = gl_context->GetTextureBuffer(inputTextures[0], usebuffer);
-    if (!buf)
+    void* buf = nullptr;
+    if ((kGLYV12 == videoType) && (video_dim.width() == frame->pitches[0]))
     {
         buf = frame->buf;
     }
-    else if (kGLYV12 == videoType)
+    else
     {
-        copybuffer((uint8_t*)buf, frame, video_dim.width());
-    }
-    else if (kGLUYVY == videoType)
-    {
-        AVFrame img_out;
-        m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_UYVY422);
-    }
-    else if (kGLRGBA == videoType)
-    {
-        AVFrame img_out;
-        m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_RGBA);
-    }
-    else if (kGLHQUYV == videoType && frame->interlaced_frame)
-    {
-        pack_yv12interlaced(frame->buf, (unsigned char*)buf, frame->offsets,
-                            frame->pitches, video_dim);
-    }
-    else if (kGLHQUYV == videoType)
-    {
-        pack_yv12progressive(frame->buf, (unsigned char*)buf, frame->offsets,
-                             frame->pitches, video_dim);
+        // create a storage buffer
+        if (!texture->m_data)
+        {
+            unsigned char *scratch = new unsigned char[texture->m_bufferSize];
+            if (scratch)
+            {
+                memset(scratch, 0, texture->m_bufferSize);
+                texture->m_data = scratch;
+            }
+        }
+        if (!texture->m_data)
+            return;
+        buf = texture->m_data;
+
+        if (kGLYV12 == videoType)
+        {
+            copybuffer((uint8_t*)buf, frame, video_dim.width());
+        }
+        else if (kGLUYVY == videoType)
+        {
+            AVFrame img_out;
+            m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_UYVY422);
+        }
+        else if (kGLRGBA == videoType)
+        {
+            AVFrame img_out;
+            m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_RGBA);
+        }
+        else if (kGLHQUYV == videoType && frame->interlaced_frame)
+        {
+            pack_yv12interlaced(frame->buf, (unsigned char*)buf, frame->offsets,
+                                frame->pitches, video_dim);
+        }
+        else if (kGLHQUYV == videoType)
+        {
+            pack_yv12progressive(frame->buf, (unsigned char*)buf, frame->offsets,
+                                 frame->pitches, video_dim);
+        }
     }
 
-    gl_context->UpdateTexture(inputTextures[0], buf);
+    texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         gl_context->logDebugMarker(LOC + "UPDATE_FRAME_END");
