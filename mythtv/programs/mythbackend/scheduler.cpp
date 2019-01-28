@@ -48,6 +48,7 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "tv_rec.h"
+#include "jobqueue.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -3131,7 +3132,11 @@ void Scheduler::HandleIdleShutdown(
 
         // If there are BLOCKING clients, then we're not idle
         bool blocking = m_mainServer->isClientConnected(true);
-        if (!blocking && !recording)
+
+        // If there are active jobs, then we're not idle
+        bool activeJobs = JobQueue::HasRunningOrPendingJobs(0);
+
+        if (!blocking && !recording && !activeJobs)
         {
             // have we received a RESET_IDLETIME message?
             resetIdleTime_lock.lock();
@@ -3272,6 +3277,10 @@ void Scheduler::HandleIdleShutdown(
             if (blocking)
                 LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                          "of a connected client");
+
+            if (activeJobs)
+                LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
+                                         "of active jobs");
 
             // not idle, make the time invalid
             if (idleSince.isValid())

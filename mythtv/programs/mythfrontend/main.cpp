@@ -1900,9 +1900,16 @@ int main(int argc, char **argv)
 #ifdef Q_OS_ANDROID
     //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    // Ignore desktop scaling
+    QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
+
     QApplication::setSetuidAllowed(true);
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
+
 
 #ifdef Q_OS_MAC
     QString path = QCoreApplication::applicationDirPath();
