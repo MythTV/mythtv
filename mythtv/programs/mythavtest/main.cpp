@@ -8,6 +8,7 @@ using namespace std;
 #include <QDir>
 #include <QApplication>
 #include <QTime>
+#include <QSurfaceFormat>
 
 #include "tv_play.h"
 #include "programinfo.h"
@@ -188,6 +189,14 @@ int main(int argc, char *argv[])
     // try and disable sync to vblank on linux x11
     qputenv("vblank_mode", "0"); // Intel and AMD
     qputenv("__GL_SYNC_TO_VBLANK", "0"); // NVidia
+
+    // the default surface format has a swap interval of 1. This is used by
+    // the MythMainwindow widget that then drives vsync for all widgets/children
+    // (i.e. MythPainterWindow) and we cannot override it on some drivers. So
+    // force the default here.
+    QSurfaceFormat fmt;
+    fmt.setSwapInterval(0);
+    QSurfaceFormat::setDefaultFormat(fmt);
 
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
