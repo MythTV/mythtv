@@ -85,6 +85,7 @@ class OpenGLVideo : public QObject
 
   public slots:
     void UpdateColourSpace(void);
+    void UpdateShaderParameters(void);
 
   private:
     void Teardown(void);
@@ -101,7 +102,6 @@ class OpenGLVideo : public QObject
                            OpenGLFilterType filter,
                            QString deint = QString(),
                            FrameScanType field = kScan_Progressive);
-    void CustomiseProgramString(QString &string);
     static QString FilterToString(OpenGLFilterType filter);
     static OpenGLFilterType StringToFilter(const QString &filter);
     void SetFiltering(void);

@@ -296,6 +296,34 @@ void OpenGLVideo::UpdateColourSpace(void)
         gl_context->SetShaderProgramParams(*it, *colourSpace, "m_colourMatrix");
 }
 
+void OpenGLVideo::UpdateShaderParameters(void)
+{
+    if (inputTextureSize.isEmpty())
+        return;
+
+    OpenGLLocker locker(gl_context);
+    glfilt_map_t::const_iterator filter = filters.find(kGLFilterYUV2RGB);
+    if (filter == filters.cend())
+        filter = filters.find(kGLFilterYV12RGB);
+    if (filter == filters.cend())
+        return;
+
+    qreal lineheight = 1.0 / inputTextureSize.height();
+    qreal maxheight  = video_disp_dim.height() / (qreal)inputTextureSize.height();
+    QVector4D parameters(lineheight,                      /* lineheight */
+                        (qreal)inputTextureSize.width(),  /* 'Y' select */
+                        maxheight - lineheight,           /* maxheight  */
+                        inputTextureSize.height() / 2.0   /* fieldsize  */);
+
+    vector<QOpenGLShaderProgram*>::const_iterator it = filter->second->fragmentPrograms.cbegin();
+    for ( ; it != filter->second->fragmentPrograms.cend(); ++it)
+    {
+        QOpenGLShaderProgram *program = *it;
+        gl_context->EnableShaderProgram(program);
+        program->setUniformValue("m_frameData", parameters);
+    }
+}
+
 void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
 {
     if (vidrect == video_rect && dispvidrect == display_video_rect)
@@ -471,7 +499,11 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         temp = nullptr;
         success &= OptimiseFilters();
         if ((kGLFilterYUV2RGB == filter) || (kGLFilterYV12RGB == filter))
+        {
             UpdateColourSpace();
+            UpdateShaderParameters();
+        }
+
     }
 
     if (!success)
@@ -608,6 +640,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
         CheckResize(hardwareDeinterlacing);
         hardwareDeinterlacer = deinterlacer;
         UpdateColourSpace();
+        UpdateShaderParameters();
         return true;
     }
 
@@ -1040,30 +1073,6 @@ QString OpenGLVideo::TypeToString(VideoType Type)
     return "opengl";
 }
 
-void OpenGLVideo::CustomiseProgramString(QString &string)
-{
-    if (inputTextureSize.isEmpty())
-        return;
-
-    qreal lineHeight = 1.0 / inputTextureSize.height();
-    qreal colWidth   = 1.0 / inputTextureSize.width();
-    qreal yselect    = (qreal)inputTextureSize.width();
-    qreal maxheight  = video_disp_dim.height() / (qreal)inputTextureSize.height();
-    QSize fb_size    = gl_context->GetTextureSize(video_disp_dim);
-    qreal fieldSize  = inputTextureSize.height() / 2.0;
-
-    string.replace("%FIELDHEIGHT%",   QString::number(fieldSize, 'f', 16));
-    string.replace("%LINEHEIGHT%",    QString::number(lineHeight, 'f', 16));
-    string.replace("%2LINEHEIGHT%",   QString::number(lineHeight * 2.0, 'f', 16));
-    string.replace("%BICUBICCWIDTH%", QString::number(colWidth, 'f', 16));
-    string.replace("%BICUBICWIDTH%",  QString::number((qreal)fb_size.width(), 'f', 8));
-    string.replace("%BICUBICHEIGHT%", QString::number((qreal)fb_size.height(), 'f', 8));
-    string.replace("%SELECTCOL%",     QString::number(yselect, 'f', 16));
-    string.replace("%MAXHEIGHT%",     QString::number(maxheight - lineHeight, 'f', 16));
-    // TODO fix alternative swizzling by changing the YUVA packing code
-    string.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
-}
-
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
                                     QString deint, FrameScanType field)
@@ -1107,6 +1116,6 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown filter");
             break;
     }
-    CustomiseProgramString(vertex);
-    CustomiseProgramString(fragment);
+    // update packing code so this can be removed
+    fragment.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
 }
