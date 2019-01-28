@@ -320,7 +320,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer blitting : %1").arg(GLYesNo(QOpenGLFramebufferObject::hasOpenGLFramebufferBlit())));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer discard  : %1").arg(GLYesNo(m_extraFeatures & kGLExtFBDiscard)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Pixelbuffer objects  : %1").arg(GLYesNo(m_extraFeatures & kGLExtPBufObj)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
