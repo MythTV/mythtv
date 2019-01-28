@@ -1318,7 +1318,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_activeProgram = nullptr;
     m_transforms.clear();
     m_transforms.push(QMatrix4x4());
-    m_map.clear();
+    m_cachedMatrixUniforms.clear();
 }
 
 void MythRenderOpenGL::ResetProcs(void)
@@ -1611,7 +1611,7 @@ void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
 {
     makeCurrent();
     delete Program;
-    m_map.clear();
+    m_cachedMatrixUniforms.clear();
     doneCurrent();
 }
 
@@ -1638,9 +1638,9 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
 
     // Uniform cacheing
     QString tag = QStringLiteral("%1-%2").arg(Program->programId()).arg(Uniform);
-    map_t::iterator it = m_map.find(tag);
-    if (it == m_map.end())
-        m_map.insert(tag, Value);
+    QHash<QString,QMatrix4x4>::iterator it = m_cachedMatrixUniforms.find(tag);
+    if (it == m_cachedMatrixUniforms.end())
+        m_cachedMatrixUniforms.insert(tag, Value);
     else if (!qFuzzyCompare(Value, it.value()))
         it.value() = Value;
     else
