@@ -51,7 +51,8 @@ class OpenGLFilter
  *  with a call to OpenGLVideo::Init()
  */
 
-OpenGLVideo::OpenGLVideo() :
+OpenGLVideo::OpenGLVideo()
+  : QObject(),
     videoType(kGLUYVY),
     gl_context(nullptr),
     video_disp_dim(0,0),
@@ -79,6 +80,7 @@ OpenGLVideo::OpenGLVideo() :
 OpenGLVideo::~OpenGLVideo()
 {
     OpenGLLocker ctx_lock(gl_context);
+    colourSpace->DecrRef();
     Teardown();
 }
 
@@ -137,6 +139,9 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     viewportControl       = viewport_control;
     inputTextureSize      = QSize(0,0);
     videoType             = Type;
+
+    colourSpace->IncrRef();
+    connect(colourSpace, &VideoColourSpace::Updated, this, &OpenGLVideo::UpdateColourSpace);
 
     // Set OpenGL feature support
     m_features      = gl_context->GetFeatures();
@@ -277,6 +282,20 @@ void OpenGLVideo::CheckResize(bool deinterlacing)
     else
         RemoveFilter(kGLFilterResize);
     OptimiseFilters();
+}
+
+void OpenGLVideo::UpdateColourSpace(void)
+{
+    OpenGLLocker locker(gl_context);
+    glfilt_map_t::const_iterator filter = filters.find(kGLFilterYUV2RGB);
+    if (filter == filters.cend())
+        filter = filters.find(kGLFilterYV12RGB);
+    if (filter == filters.cend())
+        return;
+
+    vector<QOpenGLShaderProgram*>::const_iterator it = filter->second->fragmentPrograms.cbegin();
+    for ( ; it != filter->second->fragmentPrograms.cend(); ++it)
+        gl_context->SetShaderProgramParams(*it, *colourSpace, COLOUR_UNIFORM);
 }
 
 void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
@@ -453,6 +472,8 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         filters[filter] = temp;
         temp = nullptr;
         success &= OptimiseFilters();
+        if ((kGLFilterYUV2RGB == filter) || (kGLFilterYV12RGB == filter))
+            UpdateColourSpace();
     }
 
     if (!success)
@@ -588,6 +609,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
     {
         CheckResize(hardwareDeinterlacing);
         hardwareDeinterlacer = deinterlacer;
+        UpdateColourSpace();
         return true;
     }
 
@@ -693,6 +715,8 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
     }
     if (hardwareDeinterlacing)
         RotateTextures();
+
+    colourSpace->UpdateColourSpace(frame);
 
     MythGLTexture *texture = inputTextures[0];
     if (!texture)
@@ -880,7 +904,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 textures[texture_count++] = referenceTextures[i];
         }
 
-        // enable fragment program and set any environment variables
+        // enable fragment program
         QOpenGLShaderProgram *program = nullptr;
         if (((type != kGLFilterNone) && (type != kGLFilterResize)) ||
             ((m_features & QOpenGLFunctions::Framebuffers) && (type == kGLFilterResize)))
@@ -900,11 +924,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 }
             }
             program = filter->fragmentPrograms[prog_ref];
-        }
-
-        if ((type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB))
-        {
-            gl_context->SetShaderProgramParams(program, *colourSpace, COLOUR_UNIFORM);
         }
 
         gl_context->DrawBitmap(textures, texture_count, target, trect, vrect,

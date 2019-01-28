@@ -1,23 +1,29 @@
 #ifndef _OPENGL_VIDEO_H__
 #define _OPENGL_VIDEO_H__
 
-#include <vector>
-#include <map>
-using std::vector;
-using std::map;
-
+// Qt
 #include <QRect>
+#include <QObject>
 
+// MythTV
 #include "videooutbase.h"
 #include "videoouttypes.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
 #include "util-opengl.h"
 
+// Std
+#include <vector>
+#include <map>
+using std::vector;
+using std::map;
+
 class OpenGLFilter;
 
-class OpenGLVideo
+class OpenGLVideo : public QObject
 {
+    Q_OBJECT
+
     enum OpenGLFilterType
     {
         kGLFilterNone = 0,
@@ -76,6 +82,9 @@ class OpenGLVideo
     static VideoType StringToType(const QString &Type);
     static QString TypeToString(VideoType Type);
     VideoType GetType() { return videoType; }
+
+  public slots:
+    void UpdateColourSpace(void);
 
   private:
     void Teardown(void);

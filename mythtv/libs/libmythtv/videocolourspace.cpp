@@ -27,6 +27,14 @@ extern "C" {
  * levels will ensure there is no adjustment. In both cases it is assumed the display
  * device is setup appropriately.
  *
+ * Each instance may have a parent VideoColourSpace. This configuration is used
+ * for Picture In Picture support. The master/parent object will receive requests
+ * to update the various attributes and will signal changes to the children. Each
+ * instance manages its own underlying video colourspace for the stream it is playing.
+ * In this way, picture adjustments affect each player in the same way whilst each
+ * underlying stream dictates the video colourspace to use. 'Child' instances do
+ * not interrogate or update the database settings.
+ *
  * \note This class is not complete and will have limitations for certain source material
  * and displays. It currently assumes an 8bit display (and GPU framebuffer) with
  * a 'traditional' gamma of 2.2 (most colourspace standards have a reference gamma
@@ -34,8 +42,10 @@ extern "C" {
  * a colourspace that has a different reference gamma (e.g. Rec 2020) or when
  * using an HDR display. Futher work is required.
 */
-VideoColourSpace::VideoColourSpace()
-  : QMatrix4x4(),
+VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
+  : QObject(),
+    QMatrix4x4(),
+    ReferenceCounter("Colour"),
     m_supported_attributes(kPictureAttributeSupported_None),
     m_studioLevels(false),
     m_brightness(0.0f),
@@ -45,13 +55,28 @@ VideoColourSpace::VideoColourSpace()
     m_alpha(1.0f),
     m_colourSpace(AVCOL_SPC_UNSPECIFIED),
     m_colourSpaceDepth(8),
-    m_updatesDisabled(true)
+    m_updatesDisabled(true),
+    m_parent(Parent)
 {
-    m_db_settings[kPictureAttribute_Brightness]   = gCoreContext->GetNumSetting("PlaybackBrightness",   50);
-    m_db_settings[kPictureAttribute_Contrast]     = gCoreContext->GetNumSetting("PlaybackContrast",     50);
-    m_db_settings[kPictureAttribute_Colour]       = gCoreContext->GetNumSetting("PlaybackColour",       50);
-    m_db_settings[kPictureAttribute_Hue]          = gCoreContext->GetNumSetting("PlaybackHue",          0);
-    m_db_settings[kPictureAttribute_StudioLevels] = gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
+    if (m_parent)
+    {
+        m_parent->IncrRef();
+        connect(m_parent, &VideoColourSpace::PictureAttributeChanged, this, &VideoColourSpace::SetPictureAttribute);
+        m_supported_attributes = m_parent->SupportedAttributes();
+        m_db_settings[kPictureAttribute_Brightness]   = m_parent->GetPictureAttribute(kPictureAttribute_Brightness);
+        m_db_settings[kPictureAttribute_Contrast]     = m_parent->GetPictureAttribute(kPictureAttribute_Contrast);
+        m_db_settings[kPictureAttribute_Colour]       = m_parent->GetPictureAttribute(kPictureAttribute_Colour);
+        m_db_settings[kPictureAttribute_Hue]          = m_parent->GetPictureAttribute(kPictureAttribute_Hue);
+        m_db_settings[kPictureAttribute_StudioLevels] = m_parent->GetPictureAttribute(kPictureAttribute_StudioLevels);
+    }
+    else
+    {
+        m_db_settings[kPictureAttribute_Brightness]   = gCoreContext->GetNumSetting("PlaybackBrightness",   50);
+        m_db_settings[kPictureAttribute_Contrast]     = gCoreContext->GetNumSetting("PlaybackContrast",     50);
+        m_db_settings[kPictureAttribute_Colour]       = gCoreContext->GetNumSetting("PlaybackColour",       50);
+        m_db_settings[kPictureAttribute_Hue]          = gCoreContext->GetNumSetting("PlaybackHue",          0);
+        m_db_settings[kPictureAttribute_StudioLevels] = gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
+    }
 
     SetBrightness(m_db_settings[kPictureAttribute_Brightness]);
     SetContrast(m_db_settings[kPictureAttribute_Contrast]);
@@ -60,6 +85,12 @@ VideoColourSpace::VideoColourSpace()
     SetStudioLevels(m_db_settings[kPictureAttribute_StudioLevels]);
     m_updatesDisabled = false;
     Update();
+}
+
+VideoColourSpace::~VideoColourSpace()
+{
+    if (m_parent)
+        m_parent->DecrRef();
 }
 
 PictureAttributeSupported VideoColourSpace::SupportedAttributes(void) const
@@ -114,6 +145,8 @@ int VideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
         default:
             Value = -1;
     }
+
+    emit PictureAttributeChanged(Attribute, Value);
 
     if (Value >= 0)
         SaveValue(Attribute, Value);
@@ -207,6 +240,7 @@ void VideoColourSpace::Update(void)
     translate(offset, offset, offset);
     static_cast<QMatrix4x4*>(this)->operator = (this->transposed());
     Debug();
+    emit Updated();
 }
 
 void VideoColourSpace::Debug(void)
@@ -297,6 +331,10 @@ void VideoColourSpace::SetAlpha(int Value)
 /// \brief Save the PictureAttribute value to the database.
 void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
 {
+    // parent owns the database settings
+    if (m_parent)
+        return;
+
     QString dbName;
     if (kPictureAttribute_Brightness == AttributeType)
         dbName = "PlaybackBrightness";

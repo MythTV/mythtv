@@ -513,8 +513,6 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
     if (sw_frame && deint_proc && !m_deinterlaceBeforeOSD && !pauseframe && !dummy)
         m_deintFilter->ProcessFrame(frame, scan);
 
-    videoColourSpace.UpdateColourSpace(frame);
-
     if (gl_videochain && sw_frame && !dummy)
         gl_videochain->UpdateInputFrame(frame);
 
@@ -893,11 +891,13 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        bool success = gl_pipchain->Init(gl_context, &videoColourSpace,
+        VideoColourSpace *colourspace = new VideoColourSpace(&videoColourSpace);
+        bool success = gl_pipchain->Init(gl_context, colourspace,
                      pipVideoDim, pipVideoDim,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
                      false, gl_opengl_type);
+        colourspace->DecrRef();
         QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
         if (!success)
@@ -913,12 +913,14 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
+        VideoColourSpace *colourspace = new VideoColourSpace(&videoColourSpace);
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         bool success = gl_pipchain->Init(
-            gl_context, &videoColourSpace,
+            gl_context, colourspace,
             pipVideoDim, pipVideoDim, dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
             false, gl_opengl_type);
+        colourspace->DecrRef();
 
         QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);

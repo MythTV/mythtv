@@ -3,24 +3,38 @@
 
 // Qt
 #include <QMap>
+#include <QObject>
 #include <QMatrix4x4>
 
 // MythTV
 #include "mythframe.h"
 #include "videoouttypes.h"
+#include "referencecounter.h"
 
-class VideoColourSpace : public QMatrix4x4
+class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
 {
+    Q_OBJECT
+
+    friend class VideoOutput;
+
   public:
-    VideoColourSpace();
-   ~VideoColourSpace() = default;
+    explicit VideoColourSpace(VideoColourSpace *Parent = nullptr);
 
     bool  UpdateColourSpace(const VideoFrame *Frame);
     PictureAttributeSupported SupportedAttributes(void) const;
     void  SetSupportedAttributes(PictureAttributeSupported Supported);
     int   GetPictureAttribute(PictureAttribute Attribute);
-    int   SetPictureAttribute(PictureAttribute Attribute, int Value);
     void  SetAlpha(int Value);
+
+  public slots:
+    int   SetPictureAttribute(PictureAttribute Attribute, int Value);
+
+  signals:
+    void  Updated(void);
+    void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
+
+  protected:
+    ~VideoColourSpace();
 
   private:
     void  SetStudioLevels(bool Studio);
@@ -45,6 +59,7 @@ class VideoColourSpace : public QMatrix4x4
     int       m_colourSpace;
     int       m_colourSpaceDepth;
     bool      m_updatesDisabled;
+    VideoColourSpace *m_parent;
 };
 
 #endif
