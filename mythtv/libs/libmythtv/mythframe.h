@@ -30,18 +30,12 @@ typedef enum FrameType_
     FMT_VAAPI,
     FMT_YUY2,
     FMT_DXVA2,
-    FMT_NV12
+    FMT_NV12,
+    // these are all endian dependent and higher bit depth
+    FMT_YUV420P10,
+    FMT_YUV420P12,
+    FMT_YUV420P16
 } VideoFrameType;
-
-typedef enum MythColorSpace_
-{
-    ColorSpaceUnknown = 0,
-    ColorSpaceBT601,
-    ColorSpaceRGB,
-    ColorSpaceBT709,
-    ColorSpaceSMPTE240M,
-    ColorSpaceBT2020
-} MythColorSpace;
 
 typedef struct VideoFrame_
 {
@@ -75,12 +69,14 @@ typedef struct VideoFrame_
 
     int pix_fmt;
     int directrendering; ///< 1 if managed by FFmpeg
-    MythColorSpace colorspace;
+    int colorspace;
 } VideoFrame;
 
 #ifdef __cplusplus
 }
 #endif
+
+int MTV_PUBLIC ColorDepth(int Format);
 
 #ifdef __cplusplus
 
@@ -290,6 +286,11 @@ static inline int bitsperpixel(VideoFrameType type)
         case FMT_YV12:
         case FMT_NV12:
             res = 12;
+            break;
+        case FMT_YUV420P10: // NB stored in 16bits
+        case FMT_YUV420P12: // NB stored in 16bits
+        case FMT_YUV420P16:
+            res = 24;
             break;
         case FMT_IA44:
         case FMT_AI44:

@@ -38,6 +38,12 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
             return AV_PIX_FMT_RGB24;
         case FMT_RGB32:
             return AV_PIX_FMT_RGB32;
+        case FMT_YUV420P10:
+            return AV_PIX_FMT_YUV420P10;
+        case FMT_YUV420P12:
+            return AV_PIX_FMT_YUV420P12;
+        case FMT_YUV420P16:
+            return AV_PIX_FMT_YUV420P16;
         default:
             return AV_PIX_FMT_YUV420P;
     }
@@ -47,6 +53,12 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
 {
     switch (fmt)
     {
+        case AV_PIX_FMT_YUV420P10:
+            return FMT_YUV420P10;
+        case AV_PIX_FMT_YUV420P12:
+            return FMT_YUV420P12;
+        case AV_PIX_FMT_YUV420P16:
+            return FMT_YUV420P16;
         case AV_PIX_FMT_NV12:
             return FMT_NV12;
         case AV_PIX_FMT_YUV422P:

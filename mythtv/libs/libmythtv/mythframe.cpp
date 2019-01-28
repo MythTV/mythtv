@@ -781,3 +781,17 @@ void MythUSWCCopy::reset(int width)
 #endif
     resetUSWCDetection();
 }
+
+/// \brief Return the color depth for the given MythTV frame format
+int ColorDepth(int Format)
+{
+    switch (Format)
+    {
+        case FMT_YUV420P10: return 10;
+        case FMT_YUV420P12: return 12;
+        case FMT_YUV420P16: return 16;
+        default: break;
+    }
+    return 8;
+}
+

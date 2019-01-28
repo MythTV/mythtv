@@ -140,7 +140,6 @@ class VideoOutputVDPAU : public VideoOutput
     bool                 m_skip_chroma;
     float                m_denoise;
     float                m_sharpen;
-    int                  m_colorspace;
 };
 
 #endif // VIDEOOUT_VDPAU_H

@@ -62,8 +62,7 @@ VideoOutputVDPAU::VideoOutputVDPAU()
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
     m_pip_ready(false),      m_osd_painter(nullptr),
     m_skip_chroma(false),    m_denoise(0.0f),
-    m_sharpen(0.0f),
-    m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
+    m_sharpen(0.0f)
 {
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -411,11 +410,8 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
     if (!m_checked_surface_ownership && codec_is_std(video_codec_id))
         ClaimVideoSurfaces();
 
-    // N.B. this overrides the filter option - but we now have a definitive view
-    // from the decoder, so use it.
-    if (frame)
-        if (videoColourSpace.SetColourSpace(frame->colorspace))
-            UpdateCSCMatrix();
+    if (videoColourSpace.UpdateColourSpace(frame))
+        UpdateCSCMatrix();
 
     m_pip_ready = false;
     ShowPIPs(frame, pipPlayers);
@@ -896,26 +892,6 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
                                       kPictureAttributeSupported_Colour |
                                       kPictureAttributeSupported_Hue |
                                       kPictureAttributeSupported_StudioLevels));
-
-    m_lock.lock();
-    if (m_render && m_video_mixer)
-    {
-        if (m_colorspace < 0)
-        {
-            QSize size = window.GetVideoDim();
-            m_colorspace = (size.width() > 720 || size.height() > 576) ?
-                            VDP_COLOR_STANDARD_ITUR_BT_709 :
-                            VDP_COLOR_STANDARD_ITUR_BT_601;
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using ITU %1 colorspace")
-                        .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
-                        "BT.601" : "BT.709"));
-        }
-
-        videoColourSpace.SetColourSpace((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601)
-                         ? ColorSpaceBT601 : ColorSpaceBT709);
-        UpdateCSCMatrix();
-    }
-    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::UpdateCSCMatrix(void)
@@ -1248,7 +1224,6 @@ void VideoOutputVDPAU::ParseOptions(void)
     m_skip_chroma = false;
     m_denoise     = 0.0f;
     m_sharpen     = 0.0f;
-    m_colorspace  = VDP_COLOR_STANDARD_ITUR_BT_601;
     m_mixer_features = kVDPFeatNone;
 
     m_decoder_buffer_size = MAX_REFERENCE_FRAMES;
@@ -1311,23 +1286,6 @@ void VideoOutputVDPAU::ParseOptions(void)
                     QString("VDPAU Sharpen %1").arg(tmp,4,'f',2,'0'));
                 m_sharpen = tmp;
                 m_mixer_features |= kVDPFeatSharpness;
-            }
-        }
-        else if (name.contains("vdpaucolorspace"))
-        {
-            if (opts.contains("auto"))
-                m_colorspace = -1;
-            else if (opts.contains("601"))
-                m_colorspace = VDP_COLOR_STANDARD_ITUR_BT_601;
-            else if (opts.contains("709"))
-                m_colorspace = VDP_COLOR_STANDARD_ITUR_BT_709;
-
-            if (m_colorspace > -1)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("Forcing ITU BT.%1 colorspace")
-                        .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
-                             "BT.601" : "BT.709"));
             }
         }
         else if (name.contains("vdpauhqscaling"))
