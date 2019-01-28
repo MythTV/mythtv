@@ -7,8 +7,6 @@
 #include "openglvideoshaders.h"
 
 #define LOC QString("GLVid: ")
-#define COLOUR_UNIFORM "m_colourMatrix"
-#define MYTHTV_YV12 0x8a20
 
 enum DisplayBuffer
 {
@@ -295,7 +293,7 @@ void OpenGLVideo::UpdateColourSpace(void)
 
     vector<QOpenGLShaderProgram*>::const_iterator it = filter->second->fragmentPrograms.cbegin();
     for ( ; it != filter->second->fragmentPrograms.cend(); ++it)
-        gl_context->SetShaderProgramParams(*it, *colourSpace, COLOUR_UNIFORM);
+        gl_context->SetShaderProgramParams(*it, *colourSpace, "m_colourMatrix");
 }
 
 void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
@@ -1062,7 +1060,6 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%BICUBICHEIGHT%", QString::number((qreal)fb_size.height(), 'f', 8));
     string.replace("%SELECTCOL%",     QString::number(yselect, 'f', 16));
     string.replace("%MAXHEIGHT%",     QString::number(maxheight - lineHeight, 'f', 16));
-    string.replace("COLOUR_UNIFORM",  COLOUR_UNIFORM);
     // TODO fix alternative swizzling by changing the YUVA packing code
     string.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
 }
