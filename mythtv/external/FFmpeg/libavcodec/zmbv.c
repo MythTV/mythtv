@@ -57,6 +57,7 @@ typedef struct ZmbvContext {
     AVCodecContext *avctx;
 
     int bpp;
+    int alloc_bpp;
     unsigned int decomp_size;
     uint8_t* decomp_buf;
     uint8_t pal[768];
@@ -495,12 +496,17 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
             return AVERROR_UNKNOWN;
         }
 
-        c->cur  = av_realloc_f(c->cur, avctx->width * avctx->height,  (c->bpp / 8));
-        c->prev = av_realloc_f(c->prev, avctx->width * avctx->height,  (c->bpp / 8));
+        if (c->alloc_bpp < c->bpp) {
+            c->cur  = av_realloc_f(c->cur, avctx->width * avctx->height,  (c->bpp / 8));
+            c->prev = av_realloc_f(c->prev, avctx->width * avctx->height,  (c->bpp / 8));
+            c->alloc_bpp = c->bpp;
+        }
         c->bx = (c->width + c->bw - 1) / c->bw;
         c->by = (c->height+ c->bh - 1) / c->bh;
-        if (!c->cur || !c->prev)
+        if (!c->cur || !c->prev) {
+            c->alloc_bpp = 0;
             return AVERROR(ENOMEM);
+        }
         memset(c->cur, 0, avctx->width * avctx->height * (c->bpp / 8));
         memset(c->prev, 0, avctx->width * avctx->height * (c->bpp / 8));
         c->decode_intra= decode_intra;
@@ -614,12 +620,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
     c->decomp_size = (avctx->width + 255) * 4 * (avctx->height + 64);
 
     /* Allocate decompression buffer */
-    if (c->decomp_size) {
-        if (!(c->decomp_buf = av_mallocz(c->decomp_size))) {
-            av_log(avctx, AV_LOG_ERROR,
-                   "Can't allocate decompression buffer.\n");
-            return AVERROR(ENOMEM);
-        }
+    c->decomp_buf = av_mallocz(c->decomp_size);
+    if (!c->decomp_buf) {
+        av_log(avctx, AV_LOG_ERROR,
+                "Can't allocate decompression buffer.\n");
+        return AVERROR(ENOMEM);
     }
 
     c->zstream.zalloc = Z_NULL;
@@ -657,4 +662,5 @@ AVCodec ff_zmbv_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

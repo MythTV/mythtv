@@ -516,11 +516,8 @@ static int clv_decode_frame(AVCodecContext *avctx, void *data,
     frame_type = bytestream2_get_byte(&gb);
 
     if ((frame_type & 0x7f) == 0x30) {
-        if ((ret = ff_reget_buffer(avctx, c->pic)) < 0)
-            return ret;
-
-        c->pic->key_frame = 0;
-        c->pic->pict_type = AV_PICTURE_TYPE_P;
+        *got_frame = 0;
+        return buf_size;
     } else if (frame_type & 0x2) {
         if (buf_size < c->mb_width * c->mb_height) {
             av_log(avctx, AV_LOG_ERROR, "Packet too small\n");
@@ -573,6 +570,8 @@ static int clv_decode_frame(AVCodecContext *avctx, void *data,
 
         for (j = 0; j < c->pmb_height; j++) {
             for (i = 0; i < c->pmb_width; i++) {
+                if (get_bits_left(&c->gb) <= 0)
+                    return AVERROR_INVALIDDATA;
                 if (get_bits1(&c->gb)) {
                     MV mv = mvi_predict(&c->mvi, i, j, zero_mv);
 
@@ -639,6 +638,9 @@ static int clv_decode_frame(AVCodecContext *avctx, void *data,
     FFSWAP(AVFrame *, c->pic, c->prev);
 
     *got_frame = 1;
+
+    if (get_bits_left(&c->gb) < 0)
+        av_log(c->avctx, AV_LOG_WARNING, "overread %d\n", -get_bits_left(&c->gb));
 
     return mb_ret < 0 ? mb_ret : buf_size;
 }
