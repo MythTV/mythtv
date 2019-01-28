@@ -37,27 +37,14 @@ class OpenGLFilter
  *  , FrameBuffer Objects (flexible GPU storage) and PixelBuffer Objects
  *  (faster CPU->GPU memory transfers).
  *
- *  In the most basic case, for example, a YV12 frame pre-converted in software
- *  to RGBA format is simply blitted to the frame buffer.
- *  Currently, the most complicated example is the rendering of a standard
- *  definition, interlaced frame to a high(er) definition display using
- *  OpenGL (i.e. hardware based) deinterlacing, colourspace conversion and
- *  bicubic upsampling.
- *
  *  Higher level tasks such as coordination between OpenGLVideo instances,
  *  video buffer management, audio/video synchronisation etc are handled by
- *  the higher level classes VideoOutput and NuppelVideoPlayer. The bulk of
+ *  the higher level classes VideoOutput and MythPlayer. The bulk of
  *  the lower level interface with the window system and OpenGL is handled by
  *  MythRenderOpenGL.
  *
- *  N.B. Direct use of OpenGL calls is minimised to maintain platform
- *  independance. The only member function where this is impractical is
- *  PrepareFrame().
- *
- *  \warning Any direct OpenGL calls must be wrapped by calls to
- *  gl_context->MakeCurrent(). Alternatively use the convenience class
- *  OpenGLLocker.
- */
+ *  N.B. There should be no direct OpenGL calls from this class.
+*/
 
 /**
  *  Create a new OpenGLVideo instance that must be initialised
@@ -81,8 +68,6 @@ OpenGLVideo::OpenGLVideo() :
     inputTextureSize(0,0),
     refsNeeded(0),
     textureType(GL_TEXTURE_2D),
-    helperTexture(nullptr),
-    defaultUpsize(kGLFilterResize),
     m_extraFeatures(0),
     forceResize(false)
 {
@@ -101,9 +86,6 @@ void OpenGLVideo::Teardown(void)
 {
     if (viewportControl)
         gl_context->DeleteFence();
-    if (helperTexture)
-        gl_context->DeleteTexture(helperTexture);
-    helperTexture = nullptr;
 
     DeleteTextures(&inputTextures);
     DeleteTextures(&referenceTextures);
@@ -125,7 +107,6 @@ void OpenGLVideo::Teardown(void)
      displayVideoRect
  *  \param viewport_control   if true, this instance may permanently change
      the OpenGL viewport
- *  \param options            a string defining OpenGL features to disable
  *  \param hw_accel           if true, a GPU decoder will copy frames directly
      to an RGBA texture
  */
@@ -135,8 +116,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                        QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control,
-                       VideoType Type,
-                       QString options)
+                       VideoType Type)
 {
     if (!glcontext)
         return false;
@@ -205,15 +185,6 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     // shaders to operate on YUV textures
     if (kGLRGBA == videoType || kGLGPU == videoType)
         colourspace->SetSupportedAttributes(kPictureAttributeSupported_None);
-
-    // turn on bicubic filtering
-    if (options.contains("openglbicubic"))
-    {
-        if (glsl && fbos && (m_extraFeatures & kGLExtRGBA16))
-            defaultUpsize = kGLFilterBicubic;
-        else
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL feature support for Bicubic filter.");
-    }
 
     // Create initial input texture and associated filter stage
     MythGLTexture *tex = CreateVideoTexture(video_dim, inputTextureSize);
@@ -290,45 +261,29 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 void OpenGLVideo::CheckResize(bool deinterlacing)
 {
     // to improve performance on slower cards when deinterlacing
-    bool resize_up = ((video_disp_dim.height() < display_video_rect.height()) ||
-                     (video_disp_dim.width() < display_video_rect.width()));
+    bool resize = ((video_disp_dim.height() < display_video_rect.height()) ||
+                   (video_disp_dim.width() < display_video_rect.width()));
 
     // to ensure deinterlacing works correctly
-    bool resize_down = (video_disp_dim.height() > display_video_rect.height()) &&
+    resize |= (video_disp_dim.height() > display_video_rect.height()) &&
                         deinterlacing;
 
     // UYVY packed pixels must be sampled exactly and any overscan settings will
     // break sampling - so always force an extra stage
     // TODO optimise this away when 1 for 1 mapping is guaranteed
-    resize_down |= (kGLUYVY == videoType);
+    resize |= (kGLUYVY == videoType);
 
     // we always need at least one filter (i.e. a resize that simply blits the texture
     // to screen)
-    resize_down |= !filters.count(kGLFilterYUV2RGB) && !filters.count(kGLFilterYV12RGB);
+    resize |= !filters.count(kGLFilterYUV2RGB) && !filters.count(kGLFilterYV12RGB);
 
     // Extra stage needed on Fire Stick 4k, maybe others, because of blank screen when playing.
-    resize_down |= forceResize;
+    resize |= forceResize;
 
-    if (resize_up && (defaultUpsize == kGLFilterBicubic))
-    {
-        RemoveFilter(kGLFilterResize);
-        AddFilter(kGLFilterBicubic);
-        SetFiltering();
-        return;
-    }
-
-    if ((resize_up && (defaultUpsize == kGLFilterResize)) || resize_down)
-    {
-        RemoveFilter(kGLFilterBicubic);
+    if (resize)
         AddFilter(kGLFilterResize);
-        SetFiltering();
-        return;
-    }
-
-    if (!resize_down)
+    else
         RemoveFilter(kGLFilterResize);
-
-    RemoveFilter(kGLFilterBicubic);
     OptimiseFilters();
 }
 
@@ -459,14 +414,6 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         }
         break;
 
-      case kGLFilterBicubic:
-        if (!(m_features & QOpenGLFunctions::Framebuffers) || !(m_features & QOpenGLFunctions::Framebuffers))
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Features not available for bicubic filter.");
-            return false;
-        }
-        break;
-
       case kGLFilterYUV2RGB:
         if (!(m_features & QOpenGLFunctions::Framebuffers))
         {
@@ -495,16 +442,6 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 
     temp->numInputs = 1;
     QOpenGLShaderProgram *program = nullptr;
-
-    if (filter == kGLFilterBicubic)
-    {
-        if (helperTexture)
-            gl_context->DeleteTexture(helperTexture);
-
-        helperTexture = gl_context->CreateHelperTexture();
-        if (!helperTexture)
-            success = false;
-    }
 
     if (success &&
         (((filter != kGLFilterNone) && (filter != kGLFilterResize)) ||
@@ -937,9 +874,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 textures[texture_count++] = referenceTextures[i];
         }
 
-        if (helperTexture && type == kGLFilterBicubic)
-            textures[texture_count++] = helperTexture;
-
         // enable fragment program and set any environment variables
         QOpenGLShaderProgram *program = nullptr;
         if (((type != kGLFilterNone) && (type != kGLFilterResize)) ||
@@ -1037,8 +971,6 @@ OpenGLVideo::OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
         ret = kGLFilterYUV2RGB;
     else if (filter.contains("resize"))
         ret = kGLFilterResize;
-    else if (filter.contains("bicubic"))
-        ret = kGLFilterBicubic;
     else if (filter.contains("yv12rgb"))
         ret = kGLFilterYV12RGB;
 
@@ -1055,8 +987,6 @@ QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
             return "yuv2rgb";
         case kGLFilterResize:
             return "resize";
-        case kGLFilterBicubic:
-            return "bicubic";
         case kGLFilterYV12RGB:
             return "yv12rgb";
     }
@@ -1150,9 +1080,6 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             break;
         case kGLFilterResize:
             fragment = DefaultFragmentShader;
-            break;
-        case kGLFilterBicubic:
-            fragment = BicubicShader;
             break;
         default:
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown filter");

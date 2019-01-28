@@ -27,8 +27,7 @@ class OpenGLVideo
         kGLFilterYV12RGB,
 
         // Frame scaling/resizing filters
-        kGLFilterResize,
-        kGLFilterBicubic,
+        kGLFilterResize
     };
     typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
 
@@ -48,8 +47,7 @@ class OpenGLVideo
     bool Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
               QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
-              bool viewport_control,  VideoType type,
-              QString options);
+              bool viewport_control,  VideoType type);
 
     MythGLTexture* GetInputTexture(void) const;
     uint GetTextureType(void) const;
@@ -127,8 +125,6 @@ class OpenGLVideo
     glfilt_map_t   filters;              ///< Filter stages to be applied to frame
     int            refsNeeded;           ///< Number of reference textures expected
     uint           textureType;          ///< Texture type (e.g. GL_TEXTURE_2D or GL_TEXTURE_RECT)
-    MythGLTexture *helperTexture;        ///< Extra texture for bicubic filter
-    OpenGLFilterType defaultUpsize;      ///< Regular or bicubic upsizing
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
     uint           m_extraFeatures;      ///< OR'd list of extra, Myth specific features
     MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY

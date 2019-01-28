@@ -377,14 +377,12 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     bool success = false;
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
-    QString options = GetFilters();
     OpenGLVideo::VideoType type = codec_sw_copy(video_codec_id) ? gl_opengl_type : OpenGLVideo::kGLGPU;
     success = gl_videochain->Init(gl_context, &videoColourSpace,
                                   window.GetVideoDim(),
                                   window.GetVideoDispDim(), dvr,
                                   window.GetDisplayVideoRect(),
-                                  window.GetVideoRect(), true,
-                                  type, options);
+                                  window.GetVideoRect(), true, type);
     if (success)
     {
         // check if the profile changed
@@ -895,12 +893,11 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        QString options = GetFilters();
         bool success = gl_pipchain->Init(gl_context, &videoColourSpace,
                      pipVideoDim, pipVideoDim,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                     false, gl_opengl_type, options);
+                     false, gl_opengl_type);
         QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
         if (!success)
@@ -917,12 +914,11 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        QString options = GetFilters();
         bool success = gl_pipchain->Init(
             gl_context, &videoColourSpace,
             pipVideoDim, pipVideoDim, dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
-            false, gl_opengl_type, options);
+            false, gl_opengl_type);
 
         QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
