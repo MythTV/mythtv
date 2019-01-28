@@ -140,6 +140,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->dummy            = 0;
     vf->pix_fmt          = 0;
     vf->directrendering  = 1;
+    vf->colorspace       = 1; // BT.709
 
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 

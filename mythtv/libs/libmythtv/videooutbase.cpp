@@ -1635,7 +1635,6 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 
     to->frameNumber = from->frameNumber;
     to->disp_timecode = from->disp_timecode;
-    to->colorspace = from->colorspace;
 
     copy(to, from);
 }

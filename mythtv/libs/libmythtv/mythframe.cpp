@@ -326,6 +326,7 @@ void framecopy(VideoFrame* dst, const VideoFrame* src, bool useSSE)
     dst->interlaced_frame = src->interlaced_frame;
     dst->repeat_pict      = src->repeat_pict;
     dst->top_field_first  = src->top_field_first;
+    dst->colorspace       = src->colorspace;
 
     if (FMT_YV12 == codec)
     {
@@ -616,6 +617,7 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
     dst->interlaced_frame = src->interlaced_frame;
     dst->repeat_pict      = src->repeat_pict;
     dst->top_field_first  = src->top_field_first;
+    dst->colorspace       = src->colorspace;
 
     int width   = src->width;
     int height  = src->height;

@@ -4100,6 +4100,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             // since we are not using it for display.
             xf->interlaced_frame = mpa_pic->interlaced_frame;
             xf->top_field_first = mpa_pic->top_field_first;
+            xf->colorspace = mpa_pic->colorspace;
             xf->frameNumber = framesPlayed;
             xf->aspect = current_aspect;
             m_parent->DiscardVideoFrame(xf);
@@ -5604,6 +5605,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->repeat_pict      = 0; // not a repeated picture
         frame->frameNumber      = framesPlayed;
         frame->dummy            = 1;
+        frame->colorspace       = AVCOL_SPC_BT709;
 
         decoded_video_frame = frame;
         framesPlayed++;
