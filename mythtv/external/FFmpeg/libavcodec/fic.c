@@ -380,6 +380,8 @@ static int fic_decode_frame(AVCodecContext *avctx, void *data,
             slice_h      = FFALIGN(avctx->height - ctx->slice_h * (nslices - 1), 16);
         } else {
             slice_size = AV_RB32(src + tsize + FIC_HEADER_SIZE + slice * 4 + 4);
+            if (slice_size < slice_off)
+                return AVERROR_INVALIDDATA;
         }
 
         if (slice_size < slice_off || slice_size > msize)
@@ -469,7 +471,7 @@ static const AVOption options[] = {
 };
 
 static const AVClass fic_decoder_class = {
-    .class_name = "FIC encoder",
+    .class_name = "FIC decoder",
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
