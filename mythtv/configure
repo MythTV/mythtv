@@ -7198,6 +7198,8 @@ ffmpeg_optenable crystalhd sdl2 ffplay
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
     ffmpeg_optenable mediacodec jni
+    # udp is causing compile errors on android and it is not needed
+    ffopts="$ffopts --disable-protocol=udp --disable-protocol=udplite"
 else
     disable mediacodec
 fi
