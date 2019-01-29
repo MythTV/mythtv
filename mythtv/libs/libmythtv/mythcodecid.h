@@ -149,7 +149,7 @@ typedef enum
                                (id < kCodec_NVDEC_END))
 
 #define codec_sw_copy(id) (codec_is_std(id) || codec_is_mediacodec(id) \
-    || codec_is_vaapi2(id || codec_is_nvdec(id)))
+    || codec_is_vaapi2(id) || codec_is_nvdec(id))
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
