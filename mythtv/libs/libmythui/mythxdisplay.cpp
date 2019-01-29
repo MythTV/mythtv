@@ -142,19 +142,6 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
                                  rect.width(), rect.height()));
 }
 
-int MythXDisplay::GetNumberXineramaScreens(void)
-{
-    MythXLocker locker(this);
-    int nr_xinerama_screens = 0;
-    int event_base = 0, error_base = 0;
-    if (XineramaQueryExtension(m_disp, &event_base, &error_base) &&
-        XineramaIsActive(m_disp))
-    {
-        XFree(XineramaQueryScreens(m_disp, &nr_xinerama_screens));
-    }
-    return nr_xinerama_screens;
-}
-
 QSize MythXDisplay::GetDisplaySize(void)
 {
     MythXLocker locker(this);

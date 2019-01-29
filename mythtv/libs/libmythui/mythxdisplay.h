@@ -31,7 +31,6 @@ class MUI_PUBLIC MythXDisplay
     void     SetForeground(unsigned long color);
     void     FillRectangle(Window win, const QRect &rect);
     void     MoveResizeWin(Window win, const QRect &rect);
-    int      GetNumberXineramaScreens(void);
     QSize    GetDisplaySize(void);
     QSize    GetDisplayDimensions(void);
     float    GetRefreshRate(void);
