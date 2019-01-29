@@ -13,9 +13,10 @@
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras>
+#endif
+
 #include <mythlogging.h>
 #define LOC      QString("DispInfo: ")
-#endif
 
 #define VALID_RATE(rate) ((rate) > 20.0f && (rate) < 200.0f)
 
