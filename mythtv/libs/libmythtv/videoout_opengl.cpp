@@ -377,7 +377,7 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     bool success = false;
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
-    OpenGLVideo::VideoType type = codec_sw_copy(video_codec_id) ? gl_opengl_type : OpenGLVideo::kGLGPU;
+    OpenGLVideo::FrameType type = codec_sw_copy(video_codec_id) ? gl_opengl_type : OpenGLVideo::kGLGPU;
     success = gl_videochain->Init(gl_context, &videoColourSpace,
                                   window.GetVideoDim(),
                                   window.GetVideoDispDim(), dvr,
@@ -598,7 +598,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
-        gl_videochain->PrepareFrame(buffer->top_field_first, t, framesPlayed, m_stereo);
+        gl_videochain->PrepareFrame(buffer->top_field_first, t, m_stereo);
     }
 
     // PiPs/PBPs
@@ -612,12 +612,12 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                 bool active = gl_pipchain_active == *it;
                 if (twopass)
                     gl_context->SetViewPort(first, true);
-                (*it)->PrepareFrame(buffer->top_field_first, t, framesPlayed,
+                (*it)->PrepareFrame(buffer->top_field_first, t,
                                     kStereoscopicModeNone, active);
                 if (twopass)
                 {
                     gl_context->SetViewPort(second, true);
-                    (*it)->PrepareFrame(buffer->top_field_first, t, framesPlayed,
+                    (*it)->PrepareFrame(buffer->top_field_first, t,
                                     kStereoscopicModeNone, active);
                     gl_context->SetViewPort(main);
                 }

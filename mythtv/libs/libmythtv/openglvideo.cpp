@@ -51,47 +51,49 @@ class OpenGLFilter
 
 OpenGLVideo::OpenGLVideo()
   : QObject(),
-    videoType(kGLUYVY),
-    gl_context(nullptr),
-    video_disp_dim(0,0),
-    video_dim(0,0),
-    viewportSize(0,0),
-    masterViewportSize(0,0),
-    display_visible_rect(0,0,0,0),
-    display_video_rect(0,0,0,0),
-    video_rect(0,0,0,0),
-    frameBufferRect(0,0,0,0),
-    hardwareDeinterlacing(false),
-    colourSpace(nullptr),
-    viewportControl(false),
-    inputTextureSize(0,0),
-    refsNeeded(0),
-    textureType(GL_TEXTURE_2D),
+    m_frameType(kGLUYVY),
+    m_render(nullptr),
+    m_videoDispDim(0,0),
+    m_videoDim(0,0),
+    m_masterViewportSize(0,0),
+    m_displayVisibleRect(0,0,0,0),
+    m_displayVideoRect(0,0,0,0),
+    m_videoRect(0,0,0,0),
+    m_hardwareDeinterlacing(false),
+    m_videoColourSpace(nullptr),
+    m_viewportControl(false),
+    m_inputTextureSize(0,0),
+    m_referenceTexturesNeeded(0),
     m_extraFeatures(0),
-    forceResize(false)
+    m_forceResize(false)
 {
-    forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
-    discardFramebuffers = gCoreContext->GetBoolSetting("OpenGLDiscardFB", false);
-    enablePBOs = gCoreContext->GetBoolSetting("OpenGLEnablePBO", true);
+    m_forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
+    m_discardFrameBuffers = gCoreContext->GetBoolSetting("OpenGLDiscardFB", false);
 }
 
 OpenGLVideo::~OpenGLVideo()
 {
-    OpenGLLocker ctx_lock(gl_context);
-    colourSpace->DecrRef();
+    if (m_render)
+        m_render->makeCurrent();
+    m_videoColourSpace->DecrRef();
     Teardown();
+    if (m_render)
+    {
+        m_render->doneCurrent();
+        m_render->DecrRef();
+    }
 }
 
 void OpenGLVideo::Teardown(void)
 {
-    if (viewportControl)
-        gl_context->DeleteFence();
+    if (m_viewportControl)
+        m_render->DeleteFence();
 
-    DeleteTextures(&inputTextures);
-    DeleteTextures(&referenceTextures);
+    DeleteTextures(&m_inputTextures);
+    DeleteTextures(&m_referenceTextures);
 
-    while (!filters.empty())
-        RemoveFilter(filters.begin()->first);
+    while (!m_filters.empty())
+        RemoveFilter(m_filters.begin()->first);
 }
 
 /**
@@ -111,83 +113,85 @@ void OpenGLVideo::Teardown(void)
      to an RGBA texture
  */
 
-bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
-                       QSize videoDim, QSize videoDispDim,
-                       QRect displayVisibleRect,
-                       QRect displayVideoRect, QRect videoRect,
-                       bool viewport_control,
-                       VideoType Type)
+bool OpenGLVideo::Init(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
+                       QSize VideoDim, QSize VideoDispDim,
+                       QRect DisplayVisibleRect, QRect DisplayVideoRect, QRect VideoRect,
+                       bool  ViewportControl, FrameType Type)
 {
-    if (!glcontext)
+    if (!Render)
         return false;
 
-    gl_context            = glcontext;
-    OpenGLLocker ctx_lock(gl_context);
+    if (m_render)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot reinit OpenGLVideo");
+        return false;
+    }
 
-    video_dim             = videoDim;
-    video_disp_dim        = videoDispDim;
-    display_visible_rect  = displayVisibleRect;
-    display_video_rect    = displayVideoRect;
-    video_rect            = videoRect;
-    masterViewportSize    = display_visible_rect.size();
-    frameBufferRect       = QRect(QPoint(0,0), video_disp_dim);
-    softwareDeinterlacer  = "";
-    hardwareDeinterlacing = false;
-    colourSpace           = colourspace;
-    viewportControl       = viewport_control;
-    inputTextureSize      = QSize(0,0);
-    videoType             = Type;
+    m_render            = Render;
+    m_render->IncrRef();
+    OpenGLLocker ctx_lock(m_render);
 
-    colourSpace->IncrRef();
-    connect(colourSpace, &VideoColourSpace::Updated, this, &OpenGLVideo::UpdateColourSpace);
+    m_videoDim            = VideoDim;
+    m_videoDispDim        = VideoDispDim;
+    m_displayVisibleRect  = DisplayVisibleRect;
+    m_displayVideoRect    = DisplayVideoRect;
+    m_videoRect           = VideoRect;
+    m_masterViewportSize  = m_displayVisibleRect.size();
+    m_softwareDeiterlacer = "";
+    m_hardwareDeinterlacing = false;
+    m_videoColourSpace      = ColourSpace;
+    m_viewportControl       = ViewportControl;
+    m_inputTextureSize      = QSize(0,0);
+    m_frameType             = Type;
+
+    m_videoColourSpace->IncrRef();
+    connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &OpenGLVideo::UpdateColourSpace);
 
     // Set OpenGL feature support
-    m_features      = gl_context->GetFeatures();
-    m_extraFeatures = gl_context->GetExtraFeatures();
+    m_features      = m_render->GetFeatures();
+    m_extraFeatures = m_render->GetExtraFeatures();
 
     // Enable/Disable certain features based on settings
-    if (gl_context->isOpenGLES())
+    if (m_render->isOpenGLES())
     {
-        if ((m_extraFeatures & kGLExtFBDiscard) && discardFramebuffers)
+        if ((m_extraFeatures & kGLExtFBDiscard) && m_discardFrameBuffers)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling Framebuffer discards");
         else
             m_extraFeatures &= ~kGLExtFBDiscard;
     }
 
-    if (viewportControl)
-        gl_context->SetFence();
-
-    SetViewPort(masterViewportSize);
+    if (m_viewportControl)
+        m_render->SetFence();
 
     bool glsl  = m_features & QOpenGLFunctions::Shaders;
     bool fbos  = m_features & QOpenGLFunctions::Framebuffers;
-    VideoType fallback = glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLRGBA;
+    FrameType fallback = glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLRGBA;
 
     // check for feature support
-    bool unsupported = (kGLYV12  == videoType) && !glsl;
-    unsupported     |= (kGLUYVY  == videoType) && (!glsl || !fbos);
-    unsupported     |= (kGLHQUYV == videoType) && !glsl;
+    bool unsupported = (kGLYV12  == m_frameType) && !glsl;
+    unsupported     |= (kGLUYVY  == m_frameType) && (!glsl || !fbos);
+    unsupported     |= (kGLHQUYV == m_frameType) && !glsl;
 
     if (unsupported)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString(
                 "'%1' OpenGLVideo type not available - falling back to '%2'")
-                .arg(TypeToString(videoType)).arg(TypeToString(fallback)));
-        videoType = fallback;
+                .arg(TypeToString(m_frameType)).arg(TypeToString(fallback)));
+        m_frameType = fallback;
     }
 
     // check picture attributes support - colourspace adjustments require
     // shaders to operate on YUV textures
-    if (kGLRGBA == videoType || kGLGPU == videoType)
-        colourspace->SetSupportedAttributes(kPictureAttributeSupported_None);
+    if (kGLRGBA == m_frameType || kGLGPU == m_frameType)
+        ColourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
     // Create initial input texture and associated filter stage
-    MythGLTexture *tex = CreateVideoTexture(video_dim, inputTextureSize);
+    MythGLTexture *tex = CreateVideoTexture(m_videoDim, m_inputTextureSize);
     bool    ok = false;
 
-    if (kGLYV12 == videoType)
+    if (kGLYV12 == m_frameType)
         ok = tex && AddFilter(kGLFilterYV12RGB);
-    else if ((kGLUYVY == videoType) || (kGLHQUYV == videoType))
+    else if ((kGLUYVY == m_frameType) || (kGLHQUYV == m_frameType))
         ok = tex && AddFilter(kGLFilterYUV2RGB);
     else
         ok = tex && AddFilter(kGLFilterResize);
@@ -195,17 +199,17 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     if (ok)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using '%1' for OpenGL video type")
-            .arg(TypeToString(videoType)));
-        inputTextures.push_back(tex);
+            .arg(TypeToString(m_frameType)));
+        m_inputTextures.push_back(tex);
     }
     else
     {
         Teardown();
     }
 
-    if (filters.empty())
+    if (m_filters.empty())
     {
-        bool fatalerror = kGLRGBA == videoType;
+        bool fatalerror = kGLRGBA == m_frameType;
 
         if (!fatalerror)
         {
@@ -213,12 +217,12 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                     "Failed to setup colourspace conversion.\n\t\t\t"
                     "Falling back to software conversion.\n\t\t\t"
                     "Any opengl filters will also be disabled.");
-            MythGLTexture *rgba32tex = CreateVideoTexture(video_dim, inputTextureSize);
+            MythGLTexture *rgba32tex = CreateVideoTexture(m_videoDim, m_inputTextureSize);
 
             if (rgba32tex && AddFilter(kGLFilterResize))
             {
-                inputTextures.push_back(rgba32tex);
-                colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+                m_inputTextures.push_back(rgba32tex);
+                m_videoColourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
             }
             else
             {
@@ -233,19 +237,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         }
     }
 
-    bool mmx = false;
-    bool neon = false;
-#ifdef MMX
-    // cppcheck-suppress redundantAssignment
-    mmx = true;
-#endif
-#ifdef HAVE_NEON
-    neon = true;
-#endif
-
     CheckResize(false);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 NEON: %2 ForceResize: %3")
-            .arg(mmx).arg(neon).arg(forceResize));
     return true;
 }
 
@@ -253,27 +245,27 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
  *   Determine if the output is to be scaled at all and create or destroy
  *   the appropriate filter as necessary.
  */
-void OpenGLVideo::CheckResize(bool deinterlacing)
+void OpenGLVideo::CheckResize(bool Deinterlacing)
 {
     // to improve performance on slower cards when deinterlacing
-    bool resize = ((video_disp_dim.height() < display_video_rect.height()) ||
-                   (video_disp_dim.width() < display_video_rect.width()));
+    bool resize = ((m_videoDispDim.height() < m_displayVideoRect.height()) ||
+                   (m_videoDispDim.width() < m_displayVideoRect.width()));
 
     // to ensure deinterlacing works correctly
-    resize |= (video_disp_dim.height() > display_video_rect.height()) &&
-                        deinterlacing;
+    resize |= (m_videoDispDim.height() > m_displayVideoRect.height()) &&
+                        Deinterlacing;
 
     // UYVY packed pixels must be sampled exactly and any overscan settings will
     // break sampling - so always force an extra stage
     // TODO optimise this away when 1 for 1 mapping is guaranteed
-    resize |= (kGLUYVY == videoType);
+    resize |= (kGLUYVY == m_frameType);
 
     // we always need at least one filter (i.e. a resize that simply blits the texture
     // to screen)
-    resize |= !filters.count(kGLFilterYUV2RGB) && !filters.count(kGLFilterYV12RGB);
+    resize |= !m_filters.count(kGLFilterYUV2RGB) && !m_filters.count(kGLFilterYV12RGB);
 
     // Extra stage needed on Fire Stick 4k, maybe others, because of blank screen when playing.
-    resize |= forceResize;
+    resize |= m_forceResize;
 
     if (resize)
         AddFilter(kGLFilterResize);
@@ -284,56 +276,76 @@ void OpenGLVideo::CheckResize(bool deinterlacing)
 
 void OpenGLVideo::UpdateColourSpace(void)
 {
-    OpenGLLocker locker(gl_context);
-    glfilt_map_t::const_iterator filter = filters.find(kGLFilterYUV2RGB);
-    if (filter == filters.cend())
-        filter = filters.find(kGLFilterYV12RGB);
-    if (filter == filters.cend())
+    OpenGLLocker locker(m_render);
+    glfilt_map_t::const_iterator filter = m_filters.find(kGLFilterYUV2RGB);
+    if (filter == m_filters.cend())
+        filter = m_filters.find(kGLFilterYV12RGB);
+    if (filter == m_filters.cend())
         return;
 
     vector<QOpenGLShaderProgram*>::const_iterator it = filter->second->fragmentPrograms.cbegin();
     for ( ; it != filter->second->fragmentPrograms.cend(); ++it)
-        gl_context->SetShaderProgramParams(*it, *colourSpace, "m_colourMatrix");
+        m_render->SetShaderProgramParams(*it, *m_videoColourSpace, "m_colourMatrix");
 }
 
 void OpenGLVideo::UpdateShaderParameters(void)
 {
-    if (inputTextureSize.isEmpty())
+    if (m_inputTextureSize.isEmpty())
         return;
 
-    OpenGLLocker locker(gl_context);
-    glfilt_map_t::const_iterator filter = filters.find(kGLFilterYUV2RGB);
-    if (filter == filters.cend())
-        filter = filters.find(kGLFilterYV12RGB);
-    if (filter == filters.cend())
+    OpenGLLocker locker(m_render);
+    glfilt_map_t::const_iterator filter = m_filters.find(kGLFilterYUV2RGB);
+    if (filter == m_filters.cend())
+        filter = m_filters.find(kGLFilterYV12RGB);
+    if (filter == m_filters.cend())
         return;
 
-    qreal lineheight = 1.0 / inputTextureSize.height();
-    qreal maxheight  = video_disp_dim.height() / (qreal)inputTextureSize.height();
-    QVector4D parameters(lineheight,                      /* lineheight */
-                        (qreal)inputTextureSize.width(),  /* 'Y' select */
-                        maxheight - lineheight,           /* maxheight  */
-                        inputTextureSize.height() / 2.0   /* fieldsize  */);
+    qreal lineheight = 1.0 / m_inputTextureSize.height();
+    qreal maxheight  = m_videoDispDim.height() / (qreal)m_inputTextureSize.height();
+    QVector4D parameters(lineheight,                        /* lineheight */
+                        (qreal)m_inputTextureSize.width(),  /* 'Y' select */
+                        maxheight - lineheight,             /* maxheight  */
+                        m_inputTextureSize.height() / 2.0   /* fieldsize  */);
 
     vector<QOpenGLShaderProgram*>::const_iterator it = filter->second->fragmentPrograms.cbegin();
     for ( ; it != filter->second->fragmentPrograms.cend(); ++it)
     {
         QOpenGLShaderProgram *program = *it;
-        gl_context->EnableShaderProgram(program);
+        m_render->EnableShaderProgram(program);
         program->setUniformValue("m_frameData", parameters);
     }
 }
 
-void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
+void OpenGLVideo::SetMasterViewport(QSize Size)
 {
-    if (vidrect == video_rect && dispvidrect == display_video_rect)
+    m_masterViewportSize = Size;
+}
+
+void OpenGLVideo::SetVideoRect(const QRect &DisplayVideoRect, const QRect &VideoRect)
+{
+    if (VideoRect == m_videoRect && DisplayVideoRect == m_displayVideoRect)
         return;
 
-    display_video_rect = dispvidrect;
-    video_rect = vidrect;
-    gl_context->makeCurrent();
-    CheckResize(hardwareDeinterlacing);
-    gl_context->doneCurrent();
+    m_displayVideoRect = DisplayVideoRect;
+    m_videoRect = VideoRect;
+    m_render->makeCurrent();
+    CheckResize(m_hardwareDeinterlacing);
+    m_render->doneCurrent();
+}
+
+QString OpenGLVideo::GetDeinterlacer(void) const
+{
+    return m_hardwareDeinterlacer;
+}
+
+OpenGLVideo::FrameType OpenGLVideo::GetType(void) const
+{
+    return m_frameType;
+}
+
+QSize OpenGLVideo::GetVideoSize(void) const
+{
+    return m_videoDim;
 }
 
 /**
@@ -349,7 +361,7 @@ bool OpenGLVideo::OptimiseFilters(void)
     // and link filters
     uint buffers_needed = 1;
     bool last_filter    = true;
-    for (it = filters.rbegin(); it != filters.rend(); ++it)
+    for (it = m_filters.rbegin(); it != m_filters.rend(); ++it)
     {
         if (!last_filter)
         {
@@ -360,10 +372,10 @@ bool OpenGLVideo::OptimiseFilters(void)
             {
                 for (int i = 0; i < buffers_diff; i++)
                 {
-                    QOpenGLFramebufferObject* framebuffer = gl_context->CreateFramebuffer(video_disp_dim);
+                    QOpenGLFramebufferObject* framebuffer = m_render->CreateFramebuffer(m_videoDispDim);
                     if (framebuffer)
                     {
-                        MythGLTexture *texture = gl_context->CreateFramebufferTexture(framebuffer);
+                        MythGLTexture *texture = m_render->CreateFramebufferTexture(framebuffer);
                         it->second->frameBuffers.push_back(framebuffer);
                         it->second->frameBufferTextures.push_back(texture);
                     }
@@ -376,7 +388,7 @@ bool OpenGLVideo::OptimiseFilters(void)
                 for (int i = 0; i > buffers_diff; i--)
                 {
                     OpenGLFilter *filt = it->second;
-                    gl_context->DeleteFramebuffer(filt->frameBuffers.back());
+                    m_render->DeleteFramebuffer(filt->frameBuffers.back());
                     filt->frameBuffers.pop_back();
                 }
             }
@@ -399,30 +411,30 @@ bool OpenGLVideo::OptimiseFilters(void)
 
 void OpenGLVideo::SetFiltering(void)
 {
-    if (filters.size() < 2)
+    if (m_filters.size() < 2)
     {
-        SetTextureFilters(&inputTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
-        SetTextureFilters(&referenceTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        SetTextureFilters(&m_inputTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        SetTextureFilters(&m_referenceTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         return;
     }
 
-    SetTextureFilters(&inputTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
-    SetTextureFilters(&referenceTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+    SetTextureFilters(&m_inputTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+    SetTextureFilters(&m_referenceTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
 
     glfilt_map_t::reverse_iterator rit;
     int last_filter = 0;
 
-    for (rit = filters.rbegin(); rit != filters.rend(); ++rit)
+    for (rit = m_filters.rbegin(); rit != m_filters.rend(); ++rit)
     {
         if (last_filter == 1)
         {
             foreach (QOpenGLFramebufferObject* fb, rit->second->frameBuffers)
-                gl_context->SetTextureFilters(fb->texture(), QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+                m_render->SetTextureFilters(fb->texture(), QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         }
         else if (last_filter > 1)
         {
             foreach (QOpenGLFramebufferObject* fb, rit->second->frameBuffers)
-                gl_context->SetTextureFilters(fb->texture(), QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+                m_render->SetTextureFilters(fb->texture(), QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
         }
         ++last_filter;
     }
@@ -432,59 +444,21 @@ void OpenGLVideo::SetFiltering(void)
  *  Add a new filter stage and create any additional resources needed.
  */
 
-bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
+bool OpenGLVideo::AddFilter(OpenGLFilterType Filter)
 {
-    if (filters.count(filter))
+    if (m_filters.count(Filter))
         return true;
 
-    switch (filter)
-    {
-      case kGLFilterNone:
-          // Nothing to do. Prevents compiler warning.
-          break;
-
-      case kGLFilterResize:
-        if (!(m_features & QOpenGLFunctions::Framebuffers) && !filters.empty())
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Framebuffers not available for scaling/resizing filter.");
-            return false;
-        }
-        break;
-
-      case kGLFilterYUV2RGB:
-        if (!(m_features & QOpenGLFunctions::Framebuffers))
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                "No shader support for OpenGL deinterlacing.");
-            return false;
-        }
-        break;
-
-      case kGLFilterYV12RGB:
-        if (!(m_features & QOpenGLFunctions::Framebuffers))
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                "No shader support for OpenGL deinterlacing.");
-            return false;
-        }
-        break;
-    }
-
     bool success = true;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Creating %1 filter.")
-            .arg(FilterToString(filter)));
 
     OpenGLFilter *temp = new OpenGLFilter();
 
     temp->numInputs = 1;
     QOpenGLShaderProgram *program = nullptr;
 
-    if (success &&
-        (((filter != kGLFilterNone) && (filter != kGLFilterResize)) ||
-         ((m_features & QOpenGLFunctions::Framebuffers) && (filter == kGLFilterResize))))
+    if (success)
     {
-        program = AddFragmentProgram(filter);
+        program = AddFragmentProgram(Filter);
         if (!program)
             success = false;
         else
@@ -495,20 +469,19 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     {
         temp->outputBuffer = kDefaultBuffer;
         temp->frameBuffers.clear();
-        filters[filter] = temp;
+        m_filters[Filter] = temp;
         temp = nullptr;
         success &= OptimiseFilters();
-        if ((kGLFilterYUV2RGB == filter) || (kGLFilterYV12RGB == filter))
+        if ((kGLFilterYUV2RGB == Filter) || (kGLFilterYV12RGB == Filter))
         {
             UpdateColourSpace();
             UpdateShaderParameters();
         }
-
     }
 
     if (!success)
     {
-        RemoveFilter(filter);
+        RemoveFilter(Filter);
         delete temp;
         return false;
     }
@@ -516,38 +489,35 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     return true;
 }
 
-bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
+bool OpenGLVideo::RemoveFilter(OpenGLFilterType Filter)
 {
-    if (!filters.count(filter))
+    if (!m_filters.count(Filter))
         return true;
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Removing %1 filter")
-            .arg(FilterToString(filter)));
+    vector<QOpenGLShaderProgram*>::const_iterator it = m_filters[Filter]->fragmentPrograms.cbegin();
+    for ( ; it != m_filters[Filter]->fragmentPrograms.cend(); ++it)
+        m_render->DeleteShaderProgram(*it);
+    m_filters[Filter]->fragmentPrograms.clear();
 
-    vector<QOpenGLShaderProgram*>::const_iterator it = filters[filter]->fragmentPrograms.cbegin();
-    for ( ; it != filters[filter]->fragmentPrograms.cend(); ++it)
-        gl_context->DeleteShaderProgram(*it);
-    filters[filter]->fragmentPrograms.clear();
+    vector<QOpenGLFramebufferObject*>::const_iterator it2 = m_filters[Filter]->frameBuffers.cbegin();
+    for ( ; it2 != m_filters[Filter]->frameBuffers.cend(); ++it2)
+        m_render->DeleteFramebuffer(*it2);
+    m_filters[Filter]->frameBuffers.clear();
 
-    vector<QOpenGLFramebufferObject*>::const_iterator it2 = filters[filter]->frameBuffers.cbegin();
-    for ( ; it2 != filters[filter]->frameBuffers.cend(); ++it2)
-        gl_context->DeleteFramebuffer(*it2);
-    filters[filter]->frameBuffers.clear();
+    vector<MythGLTexture*>::const_iterator it3 = m_filters[Filter]->frameBufferTextures.cbegin();
+    for ( ; it3 != m_filters[Filter]->frameBufferTextures.cend(); ++it3)
+        m_render->DeleteTexture(*it3);
+    m_filters[Filter]->frameBufferTextures.clear();
 
-    vector<MythGLTexture*>::const_iterator it3 = filters[filter]->frameBufferTextures.cbegin();
-    for ( ; it3 != filters[filter]->frameBufferTextures.cend(); ++it3)
-        gl_context->DeleteTexture(*it3);
-    filters[filter]->frameBufferTextures.clear();
-
-    delete filters[filter];
-    filters.erase(filter);
+    delete m_filters[Filter];
+    m_filters.erase(Filter);
     return true;
 }
 
 void OpenGLVideo::TearDownDeinterlacer(void)
 {
-    glfilt_map_t::const_iterator it = filters.cbegin();
-    for ( ; it != filters.cend(); ++it)
+    glfilt_map_t::const_iterator it = m_filters.cbegin();
+    for ( ; it != m_filters.cend(); ++it)
     {
         if (it->first != kGLFilterYUV2RGB && it->first != kGLFilterYV12RGB)
             continue;
@@ -555,13 +525,13 @@ void OpenGLVideo::TearDownDeinterlacer(void)
         OpenGLFilter *tmp = it->second;
         while (tmp->fragmentPrograms.size() > 1)
         {
-            gl_context->DeleteShaderProgram(tmp->fragmentPrograms.back());
+            m_render->DeleteShaderProgram(tmp->fragmentPrograms.back());
             tmp->fragmentPrograms.pop_back();
         }
     }
 
-    DeleteTextures(&referenceTextures);
-    refsNeeded = 0;
+    DeleteTextures(&m_referenceTextures);
+    m_referenceTexturesNeeded = 0;
 }
 
 /**
@@ -571,82 +541,58 @@ void OpenGLVideo::TearDownDeinterlacer(void)
  *  required field.
  */
 
-bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
+bool OpenGLVideo::AddDeinterlacer(const QString &Deinterlacer)
 {
-    if (!(m_features & QOpenGLFunctions::Framebuffers))
-    {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "No shader support for OpenGL deinterlacing.");
-        return false;
-    }
-
-    OpenGLLocker ctx_lock(gl_context);
-
-    if (filters.end() == filters.find(kGLFilterYUV2RGB) &&
-        filters.end() == filters.find(kGLFilterYV12RGB) )
+    OpenGLLocker ctx_lock(m_render);
+    if (m_filters.end() == m_filters.find(kGLFilterYUV2RGB) && m_filters.end() == m_filters.find(kGLFilterYV12RGB) )
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "No YUV2RGB filter stage for OpenGL deinterlacing.");
         return false;
     }
 
-    if (hardwareDeinterlacer == deinterlacer)
+    if (m_hardwareDeinterlacer == Deinterlacer)
         return true;
 
     TearDownDeinterlacer();
 
     bool success = true;
 
-    uint ref_size = 2;
-
-    if (deinterlacer == "openglbobdeint" ||
-        deinterlacer == "openglonefield" ||
-        deinterlacer == "opengllinearblend" ||
-        deinterlacer == "opengldoubleratelinearblend" ||
-        deinterlacer == "opengldoubleratefieldorder")
+    uint refstocreate = Deinterlacer.contains("kernel") ? 2 : 0;
+    m_referenceTexturesNeeded = refstocreate;
+    for ( ; refstocreate > 0; refstocreate--)
     {
-        ref_size = 0;
-    }
-
-    refsNeeded = ref_size;
-    if (ref_size > 0)
-    {
-        for (; ref_size > 0; ref_size--)
-        {
-            MythGLTexture *tex = CreateVideoTexture(video_dim, inputTextureSize);
-            if (tex)
-                referenceTextures.push_back(tex);
-            else
-                success = false;
-        }
-    }
-
-    OpenGLFilterType type = (kGLYV12 == videoType) ? kGLFilterYV12RGB : kGLFilterYUV2RGB;
-
-    QOpenGLShaderProgram *prog1 = AddFragmentProgram(type, deinterlacer, kScan_Interlaced);
-    QOpenGLShaderProgram *prog2 = AddFragmentProgram(type, deinterlacer, kScan_Intr2ndField);
-
-    if (prog1 && prog2)
-    {
-        filters[type]->fragmentPrograms.push_back(prog1);
-        filters[type]->fragmentPrograms.push_back(prog2);
-    }
-    else
-    {
-        success = false;
+        MythGLTexture *tex = CreateVideoTexture(m_videoDim, m_inputTextureSize);
+        if (tex)
+            m_referenceTextures.push_back(tex);
+        else
+            success = false;
     }
 
     if (success)
     {
-        CheckResize(hardwareDeinterlacing);
-        hardwareDeinterlacer = deinterlacer;
+        OpenGLFilterType type = (kGLYV12 == m_frameType) ? kGLFilterYV12RGB : kGLFilterYUV2RGB;
+        QOpenGLShaderProgram *prog1 = AddFragmentProgram(type, Deinterlacer, kScan_Interlaced);
+        QOpenGLShaderProgram *prog2 = AddFragmentProgram(type, Deinterlacer, kScan_Intr2ndField);
+        success = prog1 && prog2;
+        if (success)
+        {
+            m_filters[type]->fragmentPrograms.push_back(prog1);
+            m_filters[type]->fragmentPrograms.push_back(prog2);
+        }
+    }
+
+    if (success)
+    {
+        CheckResize(m_hardwareDeinterlacing);
+        m_hardwareDeinterlacer = Deinterlacer;
         UpdateColourSpace();
         UpdateShaderParameters();
         return true;
     }
 
-    hardwareDeinterlacer = "";
+    m_hardwareDeinterlacer = "";
     TearDownDeinterlacer();
-
     return false;
 }
 
@@ -654,109 +600,117 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
  *  Create the correct fragment program for the given filter type
  */
 
-QOpenGLShaderProgram* OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
-                                     QString deint, FrameScanType field)
+QOpenGLShaderProgram* OpenGLVideo::AddFragmentProgram(OpenGLFilterType Filter, QString Deinterlacer, FrameScanType Field)
 {
-    if (!gl_context)
+    if (!m_render || !(m_features & QOpenGLFunctions::Shaders))
         return nullptr;
 
-    QString vertex, fragment;
-    if (m_features & QOpenGLFunctions::Framebuffers)
+    QString vertex = YUV2RGBVertexShader;
+    QString fragment = DefaultFragmentShader;
+    uint bottom = Field == kScan_Intr2ndField;
+    switch (Filter)
     {
-        GetProgramStrings(vertex, fragment, name, deint, field);
+        case kGLFilterYUV2RGB:
+        {
+            if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
+                fragment = OneFieldShader[bottom];
+            else if (Deinterlacer == "opengllinearblend" ||
+                     Deinterlacer == "opengldoubleratelinearblend")
+                fragment = LinearBlendShader[bottom];
+            else if (Deinterlacer == "openglkerneldeint" ||
+                     Deinterlacer == "opengldoubleratekerneldeint")
+                fragment = KernelShader[bottom];
+            else
+                fragment = YUV2RGBFragmentShader;
+            fragment.replace("SELECT_COLUMN", (kGLUYVY == m_frameType) ? SelectColumn : "");
+            break;
+        }
+        case kGLFilterYV12RGB:
+            vertex = YV12RGBVertexShader;
+            if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
+                fragment = YV12RGBOneFieldFragmentShader[bottom];
+            else if (Deinterlacer == "opengllinearblend" || Deinterlacer == "opengldoubleratelinearblend")
+                fragment = YV12RGBLinearBlendFragmentShader[bottom];
+            else if (Deinterlacer == "openglkerneldeint" || Deinterlacer == "opengldoubleratekerneldeint")
+                fragment = YV12RGBKernelShader[bottom];
+            else
+                fragment = YV12RGBFragmentShader;
+            break;
+        case kGLFilterResize:
+        default:
+            break;
     }
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL GLSL support");
-        return nullptr;
-    }
 
-    return gl_context->CreateShaderProgram(vertex, fragment);
-}
+    // update packing code so this can be removed
+    fragment.replace("%SWIZZLE%", kGLUYVY == m_frameType ? "arb" : "abr");
 
-void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
-{
-    uint w = max(viewPortSize.width(),  video_disp_dim.width());
-    uint h = max(viewPortSize.height(), video_disp_dim.height());
-
-    viewportSize = QSize(w, h);
-
-    if (!viewportControl)
-        return;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Viewport: %1x%2") .arg(w).arg(h));
-    gl_context->SetViewPort(QRect(QPoint(),viewportSize));
+    return m_render->CreateShaderProgram(vertex, fragment);
 }
 
 /**
  *  Create and initialise an OpenGL texture suitable for a YV12 video frame
  *  of the given size.
  */
-MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
+MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureSize)
 {
     MythGLTexture *texture = nullptr;
-    if (kGLYV12 == videoType)
+    if (kGLYV12 == m_frameType)
     {
-        size.setHeight((3 * size.height() + 1) / 2);
-        texture = gl_context->CreateTexture(size,
+        Size.setHeight((3 * Size.height() + 1) / 2);
+        texture = m_render->CreateTexture(Size,
             QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
             QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
             QOpenGLTexture::LuminanceFormat);
     }
-    else if (kGLUYVY == videoType)
+    else if (kGLUYVY == m_frameType)
     {
-        size.setWidth(size.width() >> 1);
-        texture = gl_context->CreateTexture(size);
+        Size.setWidth(Size.width() >> 1);
+        texture = m_render->CreateTexture(Size);
     }
-    else if ((kGLHQUYV == videoType) || (kGLGPU == videoType) || (kGLRGBA == videoType))
+    else if ((kGLHQUYV == m_frameType) || (kGLGPU == m_frameType) || (kGLRGBA == m_frameType))
     {
-        texture = gl_context->CreateTexture(size);
+        texture = m_render->CreateTexture(Size);
     }
 
-    tex_size = gl_context->GetTextureSize(size);
+    ActualTextureSize = m_render->GetTextureSize(Size);
     return texture;
 }
 
 MythGLTexture* OpenGLVideo::GetInputTexture(void) const
 {
-    return inputTextures[0];
-}
-
-uint OpenGLVideo::GetTextureType(void) const
-{
-    return textureType;
+    return m_inputTextures[0];
 }
 
 /*! \brief Update the current input texture using the data from the given YV12 video
  *  frame.
  */
-void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
+void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
 {
-    OpenGLLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(m_render);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        gl_context->logDebugMarker(LOC + "UPDATE_FRAME_START");
+        m_render->logDebugMarker(LOC + "UPDATE_FRAME_START");
 
-    if (frame->width  != video_dim.width()  ||
-        frame->height != video_dim.height() ||
-        frame->width  < 1 || frame->height < 1 ||
-        frame->codec != FMT_YV12 || (kGLGPU == videoType))
+    if (Frame->width  != m_videoDim.width()  ||
+        Frame->height != m_videoDim.height() ||
+        Frame->width  < 1 || Frame->height < 1 ||
+        Frame->codec != FMT_YV12 || (kGLGPU == m_frameType))
     {
         return;
     }
-    if (hardwareDeinterlacing)
+    if (m_hardwareDeinterlacing)
         RotateTextures();
 
-    colourSpace->UpdateColourSpace(frame);
+    m_videoColourSpace->UpdateColourSpace(Frame);
 
-    MythGLTexture *texture = inputTextures[0];
+    MythGLTexture *texture = m_inputTextures[0];
     if (!texture)
         return;
 
     void* buf = nullptr;
-    if ((kGLYV12 == videoType) && (video_dim.width() == frame->pitches[0]))
+    if ((kGLYV12 == m_frameType) && (m_videoDim.width() == Frame->pitches[0]))
     {
-        buf = frame->buf;
+        buf = Frame->buf;
     }
     else
     {
@@ -774,151 +728,147 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame)
             return;
         buf = texture->m_data;
 
-        if (kGLYV12 == videoType)
+        if (kGLYV12 == m_frameType)
         {
-            copybuffer((uint8_t*)buf, frame, video_dim.width());
+            copybuffer((uint8_t*)buf, Frame, m_videoDim.width());
         }
-        else if (kGLUYVY == videoType)
+        else if (kGLUYVY == m_frameType)
         {
             AVFrame img_out;
-            m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_UYVY422);
+            m_copyCtx.Copy(&img_out, Frame, (unsigned char*)buf, AV_PIX_FMT_UYVY422);
         }
-        else if (kGLRGBA == videoType)
+        else if (kGLRGBA == m_frameType)
         {
             AVFrame img_out;
-            m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_RGBA);
+            m_copyCtx.Copy(&img_out, Frame, (unsigned char*)buf, AV_PIX_FMT_RGBA);
         }
-        else if (kGLHQUYV == videoType && frame->interlaced_frame)
+        else if (kGLHQUYV == m_frameType && Frame->interlaced_frame)
         {
-            pack_yv12interlaced(frame->buf, (unsigned char*)buf, frame->offsets,
-                                frame->pitches, video_dim);
+            pack_yv12interlaced(Frame->buf, (unsigned char*)buf, Frame->offsets,
+                                Frame->pitches, m_videoDim);
         }
-        else if (kGLHQUYV == videoType)
+        else if (kGLHQUYV == m_frameType)
         {
-            pack_yv12progressive(frame->buf, (unsigned char*)buf, frame->offsets,
-                                 frame->pitches, video_dim);
+            pack_yv12progressive(Frame->buf, (unsigned char*)buf, Frame->offsets,
+                                 Frame->pitches, m_videoDim);
         }
     }
 
     texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        gl_context->logDebugMarker(LOC + "UPDATE_FRAME_END");
+        m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
 }
 
-void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
+void OpenGLVideo::SetDeinterlacing(bool Deinterlacing)
 {
-    hardwareDeinterlacing = deinterlacing;
-    OpenGLLocker ctx_lock(gl_context);
-    CheckResize(hardwareDeinterlacing);
+    m_hardwareDeinterlacing = Deinterlacing;
+    OpenGLLocker ctx_lock(m_render);
+    CheckResize(m_hardwareDeinterlacing);
 }
 
-void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
+void OpenGLVideo::SetSoftwareDeinterlacer(const QString &Filter)
 {
-    if (softwareDeinterlacer != filter)
+    if (m_softwareDeiterlacer != Filter)
     {
-        gl_context->makeCurrent();
+        m_render->makeCurrent();
         CheckResize(false);
-        gl_context->doneCurrent();
+        m_render->doneCurrent();
     }
-    softwareDeinterlacer = filter;
+    m_softwareDeiterlacer = Filter;
 }
 
 /**
  *  Render the contents of the current input texture to the framebuffer
  *  using the currently enabled filters.
- *  \param topfieldfirst         the frame is interlaced and top_field_first
- *                               is set
- *  \param scan                  interlaced or progressive?
- *  \param softwareDeinterlacing the frame has been deinterlaced in software
- *  \param frame                 the frame number
- *  \param stereo                Whether/how to drop stereo video information
- *  \param draw_border           if true, draw a red border around the frame
+ *  \param TopFieldFirst         the frame is interlaced and top_field_first is set
+ *  \param Scan                  interlaced or progressive
+ *  \param Stereo                Whether/how to drop stereo video information
+ *  \param DrawBorder            if true, draw a red border around the frame
  *  \warning This function is a finely tuned, sensitive beast. Tinker at
  *   your own risk.
  */
 
-void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
-                               long long, StereoscopicMode stereo,
-                               bool draw_border)
+void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
+                               StereoscopicMode Stereo, bool DrawBorder)
 {
-    if (inputTextures.empty() || filters.empty())
+    if (m_inputTextures.empty() || m_filters.empty())
         return;
 
-    OpenGLLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(m_render);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        gl_context->logDebugMarker(LOC + "PREP_FRAME_START");
+        m_render->logDebugMarker(LOC + "PREP_FRAME_START");
 
-    vector<MythGLTexture*> inputs = inputTextures;
-    QSize inputsize = inputTextureSize;
-    QSize realsize  = gl_context->GetTextureSize(video_disp_dim);
+    vector<MythGLTexture*> inputs = m_inputTextures;
+    QSize inputsize = m_inputTextureSize;
+    QSize realsize  = m_render->GetTextureSize(m_videoDispDim);
     QOpenGLFramebufferObject* lastFramebuffer = nullptr;
 
     glfilt_map_t::iterator it;
-    for (it = filters.begin(); it != filters.end(); ++it)
+    for (it = m_filters.begin(); it != m_filters.end(); ++it)
     {
         OpenGLFilterType type = it->first;
         OpenGLFilter *filter = it->second;
 
         if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-            gl_context->logDebugMarker(LOC + QString("FILTER_START_%1").arg(FilterToString(type)));
+            m_render->logDebugMarker(LOC + QString("FILTER_START_%1").arg(type));
 
         // texture coordinates
-        float width = video_disp_dim.width();
-        if (kGLUYVY == videoType)
+        float width = m_videoDispDim.width();
+        if (kGLUYVY == m_frameType)
             width /= 2.0f;
-        QRect trect(QPoint(0, 0), QSize(width, video_disp_dim.height()));
+        QRect trect(QPoint(0, 0), QSize(width, m_videoDispDim.height()));
 
         // only apply overscan on last filter
         if (filter->outputBuffer == kDefaultBuffer)
-            trect = video_rect;
+            trect = m_videoRect;
 
         // discard stereoscopic fields
         if (filter->outputBuffer == kDefaultBuffer)
         {
-            if (kStereoscopicModeSideBySideDiscard == stereo)
+            if (kStereoscopicModeSideBySideDiscard == Stereo)
                 trect = QRect(trect.left() >> 1,  trect.top(),
                               trect.width() >> 1, trect.height());
-            if (kStereoscopicModeTopAndBottomDiscard == stereo)
+            if (kStereoscopicModeTopAndBottomDiscard == Stereo)
                 trect = QRect(trect.left(),  trect.top() >> 1,
                               trect.width(), trect.height() >> 1);
         }
 
         // vertex coordinates
-        QRect vrect = (filter->outputBuffer == kDefaultBuffer) ? display_video_rect : frameBufferRect;
+        QRect vrect = (filter->outputBuffer == kDefaultBuffer) ? m_displayVideoRect : QRect(QPoint(0,0), m_videoDispDim);
 
         // bind correct frame buffer (default onscreen) and set viewport
         QOpenGLFramebufferObject *target = nullptr;
         switch (filter->outputBuffer)
         {
             case kDefaultBuffer:
-                gl_context->BindFramebuffer(target);
-                if (viewportControl)
-                    gl_context->SetViewPort(QRect(QPoint(), display_visible_rect.size()));
+                m_render->BindFramebuffer(target);
+                if (m_viewportControl)
+                    m_render->SetViewPort(QRect(QPoint(), m_displayVisibleRect.size()));
                 else
-                    gl_context->SetViewPort(QRect(QPoint(), masterViewportSize));
+                    m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
                 break;
             case kFrameBufferObject:
                 if (!filter->frameBuffers.empty())
                 {
                     target = filter->frameBuffers[0];
-                    gl_context->BindFramebuffer(target);
-                    gl_context->SetViewPort(QRect(QPoint(), frameBufferRect.size()));
+                    m_render->BindFramebuffer(target);
+                    m_render->SetViewPort(QRect(QPoint(0, 0), m_videoDispDim));
                 }
                 break;
             default:
                 continue;
         }
 
-        if (draw_border && filter->outputBuffer == kDefaultBuffer)
+        if (DrawBorder && filter->outputBuffer == kDefaultBuffer)
         {
             QRectF piprectf = vrect.adjusted(-10, -10, +10, +10);
             QRect  piprect(piprectf.left(), piprectf.top(),
                            piprectf.width(), piprectf.height());
             static const QPen nopen(Qt::NoPen);
             static const QBrush redbrush(QBrush(QColor(127, 0, 0, 255)));
-            gl_context->DrawRect(target, piprect, redbrush, nopen, 255);
+            m_render->DrawRect(target, piprect, redbrush, nopen, 255);
         }
 
         // bind correct textures
@@ -927,37 +877,30 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         for (uint i = 0; i < inputs.size(); i++)
             textures[texture_count++] = inputs[i];
 
-        if (!referenceTextures.empty() &&
-            hardwareDeinterlacing &&
+        if (!m_referenceTextures.empty() &&
+            m_hardwareDeinterlacing &&
             (type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB))
         {
-            for (uint i = 0; i < referenceTextures.size(); i++)
-                textures[texture_count++] = referenceTextures[i];
+            for (uint i = 0; i < m_referenceTextures.size(); i++)
+                textures[texture_count++] = m_referenceTextures[i];
         }
 
         // enable fragment program
-        QOpenGLShaderProgram *program = nullptr;
-        if (((type != kGLFilterNone) && (type != kGLFilterResize)) ||
-            ((m_features & QOpenGLFunctions::Framebuffers) && (type == kGLFilterResize)))
+        QOpenGLShaderProgram *program = filter->fragmentPrograms[0];
+        if (type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB)
         {
-            GLuint prog_ref = 0;
-
-            if (type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB)
+            if (m_hardwareDeinterlacing &&
+                filter->fragmentPrograms.size() == 3 &&
+                !m_referenceTexturesNeeded)
             {
-                if (hardwareDeinterlacing &&
-                    filter->fragmentPrograms.size() == 3 &&
-                    !refsNeeded)
-                {
-                    if (scan == kScan_Interlaced)
-                        prog_ref = topfieldfirst ? 1 : 2;
-                    else if (scan == kScan_Intr2ndField)
-                        prog_ref = topfieldfirst ? 2 : 1;
-                }
+                if (Scan == kScan_Interlaced)
+                    program = filter->fragmentPrograms[TopFieldFirst ? 1 : 2];
+                else if (Scan == kScan_Intr2ndField)
+                    program = filter->fragmentPrograms[TopFieldFirst ? 2 : 1];
             }
-            program = filter->fragmentPrograms[prog_ref];
         }
 
-        gl_context->DrawBitmap(textures, texture_count, target, trect, vrect,
+        m_render->DrawBitmap(textures, texture_count, target, trect, vrect,
                                program);
 
 
@@ -971,32 +914,32 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             // If this is the last filter, we have rendered to the default framebuffer
             // and it can be discarded.
             if (lastFramebuffer)
-                gl_context->DiscardFramebuffer(lastFramebuffer);
+                m_render->DiscardFramebuffer(lastFramebuffer);
             else if (filter->outputBuffer == kDefaultBuffer)
-                gl_context->DiscardFramebuffer(nullptr);
+                m_render->DiscardFramebuffer(nullptr);
             lastFramebuffer = target;
         }
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        gl_context->logDebugMarker(LOC + "PREP_FRAME_END");
+        m_render->logDebugMarker(LOC + "PREP_FRAME_END");
 }
 
 void OpenGLVideo::RotateTextures(void)
 {
-    if (referenceTextures.size() < 2)
+    if (m_referenceTextures.size() < 2)
         return;
 
-    if (refsNeeded > 0)
-        refsNeeded--;
+    if (m_referenceTexturesNeeded > 0)
+        m_referenceTexturesNeeded--;
 
-    MythGLTexture *tmp = referenceTextures[referenceTextures.size() - 1];
+    MythGLTexture *tmp = m_referenceTextures[m_referenceTextures.size() - 1];
 
-    for (uint i = referenceTextures.size() - 1; i > 0;  i--)
-        referenceTextures[i] = referenceTextures[i - 1];
+    for (uint i = m_referenceTextures.size() - 1; i > 0;  i--)
+        m_referenceTextures[i] = m_referenceTextures[i - 1];
 
-    referenceTextures[0] = inputTextures[0];
-    inputTextures[0] = tmp;
+    m_referenceTextures[0] = m_inputTextures[0];
+    m_inputTextures[0] = tmp;
 }
 
 void OpenGLVideo::DeleteTextures(vector<MythGLTexture*> *textures)
@@ -1005,7 +948,7 @@ void OpenGLVideo::DeleteTextures(vector<MythGLTexture*> *textures)
         return;
 
     for (uint i = 0; i < textures->size(); i++)
-        gl_context->DeleteTexture((*textures)[i]);
+        m_render->DeleteTexture((*textures)[i]);
     textures->clear();
 }
 
@@ -1016,41 +959,10 @@ void OpenGLVideo::SetTextureFilters(vector<MythGLTexture *> *Textures,
     if (!Textures || (Textures && Textures->empty()))
         return;
     for (uint i = 0; i < Textures->size(); i++)
-        gl_context->SetTextureFilters((*Textures)[i], Filter, Wrap);
+        m_render->SetTextureFilters((*Textures)[i], Filter, Wrap);
 }
 
-OpenGLVideo::OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
-{
-    OpenGLFilterType ret = kGLFilterNone;
-
-    if (filter.contains("yuv2rgb"))
-        ret = kGLFilterYUV2RGB;
-    else if (filter.contains("resize"))
-        ret = kGLFilterResize;
-    else if (filter.contains("yv12rgb"))
-        ret = kGLFilterYV12RGB;
-
-    return ret;
-}
-
-QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
-{
-    switch (filt)
-    {
-        case kGLFilterNone:
-            break;
-        case kGLFilterYUV2RGB:
-            return "yuv2rgb";
-        case kGLFilterResize:
-            return "resize";
-        case kGLFilterYV12RGB:
-            return "yv12rgb";
-    }
-
-    return "";
-}
-
-OpenGLVideo::VideoType OpenGLVideo::StringToType(const QString &Type)
+OpenGLVideo::FrameType OpenGLVideo::StringToType(const QString &Type)
 {
     QString type = Type.toLower().trimmed();
     if ("opengl-yv12" == type)  return kGLYV12;
@@ -1060,62 +972,15 @@ OpenGLVideo::VideoType OpenGLVideo::StringToType(const QString &Type)
     return kGLUYVY; // opengl
 }
 
-QString OpenGLVideo::TypeToString(VideoType Type)
+QString OpenGLVideo::TypeToString(FrameType Type)
 {
     switch (Type)
     {
         case kGLGPU:   return "opengl-gpu";
-        case kGLUYVY:  return "opengl";      // compatibility with old profiles
+        case kGLUYVY:  return "opengl"; // compatibility with old profiles
         case kGLYV12:  return "opengl-yv12";
         case kGLHQUYV: return "opengl-hquyv";
         case kGLRGBA:  return "opengl-rgba";
     }
     return "opengl";
-}
-
-void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
-                                    OpenGLFilterType filter,
-                                    QString deint, FrameScanType field)
-{
-    uint bottom = field == kScan_Intr2ndField;
-    vertex = YUV2RGBVertexShader;
-    switch (filter)
-    {
-        case kGLFilterYUV2RGB:
-        {
-            if (deint == "openglonefield" || deint == "openglbobdeint")
-                fragment = OneFieldShader[bottom];
-            else if (deint == "opengllinearblend" ||
-                     deint == "opengldoubleratelinearblend")
-                fragment = LinearBlendShader[bottom];
-            else if (deint == "openglkerneldeint" ||
-                     deint == "opengldoubleratekerneldeint")
-                fragment = KernelShader[bottom];
-            else
-                fragment = YUV2RGBFragmentShader;
-            fragment.replace("SELECT_COLUMN", (kGLUYVY == videoType) ? SelectColumn : "");
-            break;
-        }
-        case kGLFilterYV12RGB:
-            vertex = YV12RGBVertexShader;
-            if (deint == "openglonefield" || deint == "openglbobdeint")
-                fragment = YV12RGBOneFieldFragmentShader[bottom];
-            else if (deint == "opengllinearblend" || deint == "opengldoubleratelinearblend")
-                fragment = YV12RGBLinearBlendFragmentShader[bottom];
-            else if (deint == "openglkerneldeint" || deint == "opengldoubleratekerneldeint")
-                fragment = YV12RGBKernelShader[bottom];
-            else
-                fragment = YV12RGBFragmentShader;
-            break;
-        case kGLFilterNone:
-            break;
-        case kGLFilterResize:
-            fragment = DefaultFragmentShader;
-            break;
-        default:
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown filter");
-            break;
-    }
-    // update packing code so this can be removed
-    fragment.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
 }

@@ -89,7 +89,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     MythOpenGLPainter *gl_painter;
     QString            gl_opengl_profile;
-    OpenGLVideo::VideoType gl_opengl_type;
+    OpenGLVideo::FrameType gl_opengl_type;
 };
 
 #endif

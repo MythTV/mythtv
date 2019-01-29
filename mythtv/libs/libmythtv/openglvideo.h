@@ -26,19 +26,16 @@ class OpenGLVideo : public QObject
 
     enum OpenGLFilterType
     {
-        kGLFilterNone = 0,
-
         // Conversion filters
         kGLFilterYUV2RGB,
         kGLFilterYV12RGB,
-
         // Frame scaling/resizing filters
         kGLFilterResize
     };
     typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
 
   public:
-    enum VideoType
+    enum FrameType
     {
         kGLGPU,   // Frame is already in GPU memory
         kGLUYVY,  // CPU conversion to UYVY422 format - 16bpp
@@ -47,98 +44,73 @@ class OpenGLVideo : public QObject
         kGLRGBA   // fallback software YV12 to RGB - 32bpp
     };
 
+    static FrameType StringToType(const QString &Type);
+    static QString   TypeToString(FrameType Type);
+
     OpenGLVideo();
    ~OpenGLVideo();
 
-    bool Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
-              QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
-              QRect displayVideoRect, QRect videoRect,
-              bool viewport_control,  VideoType type);
+    bool    Init(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
+                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
+                 QRect DisplayVideoRect, QRect videoRect,
+                 bool ViewportControl,  FrameType Type);
 
     MythGLTexture* GetInputTexture(void) const;
-    uint GetTextureType(void) const;
-    void UpdateInputFrame(const VideoFrame *frame);
-
-    /// \brief Public interface to AddFilter(OpenGLFilterType filter)
-    bool AddFilter(const QString &filter)
-         { return AddFilter(StringToFilter(filter)); }
-    bool RemoveFilter(const QString &filter)
-         { return RemoveFilter(StringToFilter(filter)); }
-
-    bool AddDeinterlacer(const QString &deinterlacer);
-    void SetDeinterlacing(bool deinterlacing);
-    QString GetDeinterlacer(void) const
-         { return hardwareDeinterlacer; }
-    void SetSoftwareDeinterlacer(const QString &filter);
-
-    void PrepareFrame(bool topfieldfirst, FrameScanType scan,
-                      long long frame, StereoscopicMode stereo,
-                      bool draw_border = false);
-
-    void  SetMasterViewport(QSize size)   { masterViewportSize = size; }
-    QSize GetViewPort(void)         const { return viewportSize; }
-    void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect);
-    QSize GetVideoSize(void)        const { return video_dim;}
-    static VideoType StringToType(const QString &Type);
-    static QString TypeToString(VideoType Type);
-    VideoType GetType() { return videoType; }
+    void    UpdateInputFrame(const VideoFrame *Frame);
+    bool    AddDeinterlacer(const QString &Deinterlacer);
+    void    SetDeinterlacing(bool Deinterlacing);
+    QString GetDeinterlacer(void) const;
+    void    SetSoftwareDeinterlacer(const QString &Filter);
+    void    PrepareFrame(bool TopFieldFirst, FrameScanType Scan, StereoscopicMode Stereo, bool DrawBorder = false);
+    void    SetMasterViewport(QSize Size);
+    void    SetVideoRect(const QRect &DisplayVideoRect, const QRect &VideoRect);
+    QSize   GetVideoSize(void) const;
+    FrameType GetType() const;
 
   public slots:
-    void UpdateColourSpace(void);
-    void UpdateShaderParameters(void);
+    void    UpdateColourSpace(void);
+    void    UpdateShaderParameters(void);
 
   private:
-    void Teardown(void);
-    void SetViewPort(const QSize &new_viewport_size);
-    bool AddFilter(OpenGLFilterType filter);
-    bool RemoveFilter(OpenGLFilterType filter);
-    void CheckResize(bool deinterlacing);
-    bool OptimiseFilters(void);
-    QOpenGLShaderProgram* AddFragmentProgram(OpenGLFilterType name,
-                            QString deint = QString(),
-                            FrameScanType field = kScan_Progressive);
-    MythGLTexture* CreateVideoTexture(QSize size, QSize &tex_size);
-    void GetProgramStrings(QString &vertex, QString &fragment,
-                           OpenGLFilterType filter,
-                           QString deint = QString(),
-                           FrameScanType field = kScan_Progressive);
-    static QString FilterToString(OpenGLFilterType filter);
-    static OpenGLFilterType StringToFilter(const QString &filter);
-    void SetFiltering(void);
+    void    Teardown(void);
+    bool    AddFilter(OpenGLFilterType Filter);
+    bool    RemoveFilter(OpenGLFilterType Filter);
+    void    CheckResize(bool Deinterlacing);
+    bool    OptimiseFilters(void);
+    QOpenGLShaderProgram* AddFragmentProgram(OpenGLFilterType Name,
+                            QString Deinterlacer = QString(),
+                            FrameScanType Field = kScan_Progressive);
+    MythGLTexture* CreateVideoTexture(QSize Size, QSize &ActualTextureSize);
+    void    SetFiltering(void);
+    void    RotateTextures(void);
+    void    SetTextureFilters(vector<MythGLTexture*>  *Textures,
+                              QOpenGLTexture::Filter   Filter,
+                              QOpenGLTexture::WrapMode Wrap);
+    void    DeleteTextures(vector<MythGLTexture*> *Textures);
+    void    TearDownDeinterlacer(void);
 
-    void RotateTextures(void);
-    void SetTextureFilters(vector<MythGLTexture*>  *Textures,
-                           QOpenGLTexture::Filter   Filter,
-                           QOpenGLTexture::WrapMode Wrap);
-    void DeleteTextures(vector<MythGLTexture*> *Textures);
-    void TearDownDeinterlacer(void);
-
-    VideoType      videoType;
-    MythRenderOpenGL *gl_context;
-    QSize          video_disp_dim;       ///< Useful video frame size e.g. 1920x1080
-    QSize          video_dim;            ///< Total video frame size e.g. 1920x1088
-    QSize          viewportSize;         ///< Can be removed
-    QSize          masterViewportSize;   ///< Current viewport into which OpenGL is rendered
-    QRect          display_visible_rect; ///< Total useful, visible rectangle
-    QRect          display_video_rect;   ///< Sub-rect of display_visible_rect for video
-    QRect          video_rect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
-    QRect          frameBufferRect;      ///< Rect version of video_disp_dim
-    QString        softwareDeinterlacer;
-    QString        hardwareDeinterlacer;
-    bool           hardwareDeinterlacing;///< OpenGL deinterlacing is enabled
-    VideoColourSpace *colourSpace;
-    bool           viewportControl;      ///< Video has control over view port
-    vector<MythGLTexture*> referenceTextures; ///< Up to 3 reference textures for filters
-    vector<MythGLTexture*> inputTextures;     ///< Textures with raw video data
-    QSize          inputTextureSize;     ///< Actual size of input texture(s)
-    glfilt_map_t   filters;              ///< Filter stages to be applied to frame
-    int            refsNeeded;           ///< Number of reference textures expected
-    uint           textureType;          ///< Texture type (e.g. GL_TEXTURE_2D or GL_TEXTURE_RECT)
+    FrameType      m_frameType;
+    MythRenderOpenGL *m_render;
+    QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
+    QSize          m_videoDim;            ///< Total video frame size e.g. 1920x1088
+    QSize          m_masterViewportSize;  ///< Current viewport into which OpenGL is rendered
+    QRect          m_displayVisibleRect;  ///< Total useful, visible rectangle
+    QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
+    QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
+    QString        m_softwareDeiterlacer;
+    QString        m_hardwareDeinterlacer;
+    bool           m_hardwareDeinterlacing; ///< OpenGL deinterlacing is enabled
+    VideoColourSpace *m_videoColourSpace;
+    bool           m_viewportControl;     ///< Video has control over view port
+    vector<MythGLTexture*> m_referenceTextures; ///< Up to 3 reference textures for filters
+    vector<MythGLTexture*> m_inputTextures;     ///< Textures with raw video data
+    QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
+    glfilt_map_t   m_filters;             ///< Filter stages to be applied to frame
+    int            m_referenceTexturesNeeded; ///< Number of reference textures still required
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
-    uint           m_extraFeatures;      ///< OR'd list of extra, Myth specific features
-    MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY
-    bool           forceResize;          ///< Global setting to force a resize stage
-    bool           discardFramebuffers;  ///< Use GL_EXT_discard_framebuffer
-    bool           enablePBOs;           ///< Allow use of Pixel Buffer Objects
+    uint           m_extraFeatures;       ///< OR'd list of extra, Myth specific features
+    MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
+    bool           m_forceResize;         ///< Global setting to force a resize stage
+    bool           m_discardFrameBuffers; ///< Use GL_EXT_discard_framebuffer
 };
 #endif // _OPENGL_VIDEO_H__
