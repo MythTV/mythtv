@@ -6994,7 +6994,11 @@ fi
 here="$PWD"
 cd external/nv-codec-headers
 if enabled nvdec ; then
-    make install PREFIX=$PWD/install
+    if test $target_os = "freebsd"; then
+        gmake install PREFIX=$PWD/install
+    else
+        make install PREFIX=$PWD/install
+    fi
     if [ "$?" != 0 ] ; then die "Build of nv-codec-headers failed." ; fi
     PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$PWD/install/lib/pkgconfig"
     export PKG_CONFIG_PATH
