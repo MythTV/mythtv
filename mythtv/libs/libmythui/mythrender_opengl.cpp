@@ -346,6 +346,11 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL has no shader support");
         recommended = false;
     }
+    else if (!(openGLFeatures() & Framebuffers))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL has no framebuffer support");
+        recommended = false;
+    }
     else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is using software rasterizer.");
