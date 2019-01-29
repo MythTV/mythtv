@@ -142,6 +142,11 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
                                  rect.width(), rect.height()));
 }
 
+/**
+ * Return the size of the X Display in pixels.  This corresponds to
+ * the size of the desktop, not necessarily to the size of single
+ * screen.
+ */
 QSize MythXDisplay::GetDisplaySize(void)
 {
     MythXLocker locker(this);
@@ -150,6 +155,11 @@ QSize MythXDisplay::GetDisplaySize(void)
     return QSize(displayWidthPixel, displayHeightPixel);
 }
 
+/**
+ * Return the size of the X Display in millimeters.  This corresponds
+ * to the size of the desktop, not necessarily to the size of single
+ * screen.
+ */
 QSize MythXDisplay::GetDisplayDimensions(void)
 {
     MythXLocker locker(this);
