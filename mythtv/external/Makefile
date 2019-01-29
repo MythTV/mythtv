@@ -13,8 +13,8 @@ endif
 SUBDIRS_ALL = $(addsuffix -all, ${SUBDIRS})
 SUBDIRS_INSTALL = $(addsuffix -install, ${SUBDIRS})
 SUBDIRS_UNINSTALL = $(addsuffix -uninstall, ${SUBDIRS})
-SUBDIRS_CLEAN = $(addsuffix -clean, ${SUBDIRS}, nv-codec-headers)
-SUBDIRS_DISTCLEAN = $(addsuffix -distclean, ${SUBDIRS}, nv-codec-headers)
+SUBDIRS_CLEAN = $(addsuffix -clean, ${SUBDIRS})
+SUBDIRS_DISTCLEAN = $(addsuffix -distclean, ${SUBDIRS} nv-codec-headers)
 
 default:	all
 all:		${SUBDIRS_ALL}
