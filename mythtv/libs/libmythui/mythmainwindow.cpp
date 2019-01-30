@@ -568,8 +568,11 @@ MythMainWindow::~MythMainWindow()
 
     delete d->NC;
 
-    delete d;
+    delete d->painter;
+    if (d->render)
+        d->render->DecrRef();
 
+    delete d;
 }
 
 MythPainter *MythMainWindow::GetCurrentPainter(void)
