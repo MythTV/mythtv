@@ -659,42 +659,25 @@ int MythRenderOpenGL::GetTextureDataSize(MythGLTexture *Texture)
 
 void MythRenderOpenGL::SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap)
 {
-    if (!Texture || (Texture && !Texture->m_texture))
+    if (!Texture || (Texture && !(Texture->m_texture || Texture->m_textureId)))
         return;
 
     makeCurrent();
     EnableTextures();
-    Texture->m_texture->bind();
-    Texture->m_texture->setWrapMode(Wrap);
-    Texture->m_texture->setMinMagFilters(Filter, Filter);
-    doneCurrent();
-}
-
-/*! \brief Set the texture filters for the given OpenGL texture object
- *
- * \note This is used to set filters for textures attached to QOpenGLFramebufferObjects.
- * By default, these have GL_NEAREST set for the min/mag filters and there is no
- * method to change them. Furthermore we cannot wrap these textures in a QOpenGLTexture
- * and use the functionality in that class. So back to basics... and convert between
- * QOpenGLTexture and GL enums.
-*/
-void MythRenderOpenGL::SetTextureFilters(GLuint Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode)
-{
-    if (!Texture)
-        return;
-
-    GLenum wrap   = GL_CLAMP_TO_EDGE;
-    GLenum minmag = GL_NEAREST;
-    if (Filter == QOpenGLTexture::Linear)
-        minmag = GL_LINEAR;
-
-    makeCurrent();
-    EnableTextures();
-    glBindTexture(GL_TEXTURE_2D, Texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minmag);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, minmag);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     wrap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     wrap);
+    if (Texture->m_texture)
+    {
+        Texture->m_texture->bind();
+        Texture->m_texture->setWrapMode(Wrap);
+        Texture->m_texture->setMinMagFilters(Filter, Filter);
+    }
+    else
+    {
+        glBindTexture(QOpenGLTexture::Target2D, Texture->m_textureId);
+        glTexParameteri(QOpenGLTexture::Target2D, GL_TEXTURE_MIN_FILTER, Filter);
+        glTexParameteri(QOpenGLTexture::Target2D, GL_TEXTURE_MAG_FILTER, Filter);
+        glTexParameteri(QOpenGLTexture::Target2D, GL_TEXTURE_WRAP_S,     Wrap);
+        glTexParameteri(QOpenGLTexture::Target2D, GL_TEXTURE_WRAP_T,     Wrap);
+    }
     doneCurrent();
 }
 

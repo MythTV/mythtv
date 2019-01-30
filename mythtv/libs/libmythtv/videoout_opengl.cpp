@@ -374,15 +374,13 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
         QRect tmprect = QRect(QPoint(0,0), dvr.size());
         ResizeDisplayWindow(tmprect, true);
     }
-    bool success = false;
+
     OpenGLLocker ctx_lock(gl_context);
-    gl_videochain = new OpenGLVideo();
     OpenGLVideo::FrameType type = codec_sw_copy(video_codec_id) ? gl_opengl_type : OpenGLVideo::kGLGPU;
-    success = gl_videochain->Init(gl_context, &videoColourSpace,
-                                  window.GetVideoDim(),
-                                  window.GetVideoDispDim(), dvr,
-                                  window.GetDisplayVideoRect(),
-                                  window.GetVideoRect(), true, type);
+    gl_videochain = new OpenGLVideo(gl_context, &videoColourSpace, window.GetVideoDim(),
+                                    window.GetVideoDispDim(), dvr, window.GetDisplayVideoRect(),
+                                    window.GetVideoRect(), true, type);
+    bool success = gl_videochain->IsValid();
     if (success)
     {
         // check if the profile changed
@@ -393,16 +391,9 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
         }
 
         bool temp_deinterlacing = m_deinterlacing;
-        if (!m_deintfiltername.isEmpty() &&
-            !m_deintfiltername.contains("opengl"))
-        {
-            gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
-        }
         SetDeinterlacingEnabled(true);
         if (!temp_deinterlacing)
-        {
             SetDeinterlacingEnabled(false);
-        }
     }
 
     return success;
@@ -750,8 +741,7 @@ int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute attribute,
     return VideoOutput::SetPictureAttribute(attribute, newValue);
 }
 
-bool VideoOutputOpenGL::SetupDeinterlace(
-    bool interlaced, const QString &overridefilter)
+bool VideoOutputOpenGL::SetupDeinterlace(bool interlaced, const QString &overridefilter)
 {
     if (!gl_videochain || !gl_context)
         return false;
@@ -767,11 +757,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(
     if (!m_deintfiltername.contains("opengl"))
     {
         gl_videochain->SetDeinterlacing(false);
-        gl_videochain->SetSoftwareDeinterlacer(QString());
         VideoOutput::SetupDeinterlace(interlaced, overridefilter);
-        if (m_deinterlacing)
-            gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
-
         return m_deinterlacing;
     }
 
@@ -890,21 +876,22 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
     if (!gl_pipchain)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
-        gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         VideoColourSpace *colourspace = new VideoColourSpace(&videoColourSpace);
-        bool success = gl_pipchain->Init(gl_context, colourspace,
-                     pipVideoDim, pipVideoDim,
-                     dvr, position,
-                     QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                     false, gl_opengl_type);
+        gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo(gl_context, colourspace,
+                                                                pipVideoDim, pipVideoDim,
+                                                                dvr, position,
+                                                                QRect(0, 0, pipVideoWidth, pipVideoHeight),
+                                                                false, gl_opengl_type);
+
         colourspace->DecrRef();
-        QSize viewport = window.GetDisplayVisibleRect().size();
-        gl_pipchain->SetMasterViewport(viewport);
-        if (!success)
+        if (!gl_pipchain->IsValid())
         {
             pipplayer->ReleaseCurrentFrame(pipimage);
             return;
         }
+
+        QSize viewport = window.GetDisplayVisibleRect().size();
+        gl_pipchain->SetMasterViewport(viewport);
     }
 
     QSize current = gl_pipchain->GetVideoSize();
@@ -914,33 +901,29 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
         VideoColourSpace *colourspace = new VideoColourSpace(&videoColourSpace);
-        gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        bool success = gl_pipchain->Init(
-            gl_context, colourspace,
-            pipVideoDim, pipVideoDim, dvr, position,
-            QRect(0, 0, pipVideoWidth, pipVideoHeight),
-            false, gl_opengl_type);
+        gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo(gl_context, colourspace,
+                                                                pipVideoDim, pipVideoDim, dvr, position,
+                                                                QRect(0, 0, pipVideoWidth, pipVideoHeight),
+                                                                false, gl_opengl_type);
         colourspace->DecrRef();
-
-        QSize viewport = window.GetDisplayVisibleRect().size();
-        gl_pipchain->SetMasterViewport(viewport);
-
-        if (!success)
+        if (!gl_pipchain->IsValid())
         {
             pipplayer->ReleaseCurrentFrame(pipimage);
             return;
         }
 
+        QSize viewport = window.GetDisplayVisibleRect().size();
+        gl_pipchain->SetMasterViewport(viewport);
     }
-    gl_pipchain->SetVideoRect(position,
-                              QRect(0, 0, pipVideoWidth, pipVideoHeight));
-    gl_pipchain->UpdateInputFrame(pipimage);
 
+    if (gl_pipchain->IsValid())
+    {
+        gl_pipchain->SetVideoRect(position, QRect(0, 0, pipVideoWidth, pipVideoHeight));
+        gl_pipchain->UpdateInputFrame(pipimage);
+    }
     gl_pip_ready[pipplayer] = true;
-
     if (pipActive)
         gl_pipchain_active = gl_pipchain;
-
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
@@ -984,11 +967,8 @@ void VideoOutputOpenGL::StopEmbedding(void)
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
 {
     // anything OpenGL when using shaders
-    if (filtername.contains("opengl") &&
-        ((OpenGLVideo::kGLRGBA != gl_opengl_type) && (OpenGLVideo::kGLGPU != gl_opengl_type)))
-    {
+    if (filtername.contains("opengl") && (OpenGLVideo::kGLGPU != gl_opengl_type))
         return true;
-    }
 
     // anything software based
     if (!filtername.contains("vdpau") && !filtername.contains("vaapi") && (OpenGLVideo::kGLGPU != gl_opengl_type))

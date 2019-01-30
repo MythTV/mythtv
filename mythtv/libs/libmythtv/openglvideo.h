@@ -24,43 +24,40 @@ class OpenGLVideo : public QObject
 {
     Q_OBJECT
 
-    enum OpenGLFilterType
-    {
-        // Conversion filters
-        kGLFilterYUV2RGB,
-        kGLFilterYV12RGB,
-        // Frame scaling/resizing filters
-        kGLFilterResize
-    };
-    typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
-
   public:
+    enum VideoShaderType
+    {
+        Default       = 0, // Plain blit
+        Progressive   = 1, // Progressive video frame
+        InterlacedTop = 2, // Deinterlace with top field first
+        InterlacedBot = 3, // Deinterlace with bottom field first
+        Interlaced    = 4, // Interlaced but do not deinterlace
+        ShaderCount   = 5
+    };
+
     enum FrameType
     {
         kGLGPU,   // Frame is already in GPU memory
         kGLUYVY,  // CPU conversion to UYVY422 format - 16bpp
         kGLYV12,  // All processing on GPU - 12bpp
-        kGLHQUYV, // High quality interlaced CPU conversion to UYV - 32bpp
-        kGLRGBA   // fallback software YV12 to RGB - 32bpp
+        kGLHQUYV  // High quality interlaced CPU conversion to UYV - 32bpp
     };
 
     static FrameType StringToType(const QString &Type);
     static QString   TypeToString(FrameType Type);
 
-    OpenGLVideo();
+    OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
+                QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
+                QRect DisplayVideoRect, QRect videoRect,
+                bool ViewportControl,  FrameType Type);
    ~OpenGLVideo();
 
-    bool    Init(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
-                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                 QRect DisplayVideoRect, QRect videoRect,
-                 bool ViewportControl,  FrameType Type);
-
+    bool    IsValid(void) const;
     MythGLTexture* GetInputTexture(void) const;
     void    UpdateInputFrame(const VideoFrame *Frame);
     bool    AddDeinterlacer(const QString &Deinterlacer);
     void    SetDeinterlacing(bool Deinterlacing);
     QString GetDeinterlacer(void) const;
-    void    SetSoftwareDeinterlacer(const QString &Filter);
     void    PrepareFrame(bool TopFieldFirst, FrameScanType Scan, StereoscopicMode Stereo, bool DrawBorder = false);
     void    SetMasterViewport(QSize Size);
     void    SetVideoRect(const QRect &DisplayVideoRect, const QRect &VideoRect);
@@ -72,16 +69,8 @@ class OpenGLVideo : public QObject
     void    UpdateShaderParameters(void);
 
   private:
-    void    Teardown(void);
-    bool    AddFilter(OpenGLFilterType Filter);
-    bool    RemoveFilter(OpenGLFilterType Filter);
-    void    CheckResize(bool Deinterlacing);
-    bool    OptimiseFilters(void);
-    QOpenGLShaderProgram* AddFragmentProgram(OpenGLFilterType Name,
-                            QString Deinterlacer = QString(),
-                            FrameScanType Field = kScan_Progressive);
+    bool CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
     MythGLTexture* CreateVideoTexture(QSize Size, QSize &ActualTextureSize);
-    void    SetFiltering(void);
     void    RotateTextures(void);
     void    SetTextureFilters(vector<MythGLTexture*>  *Textures,
                               QOpenGLTexture::Filter   Filter,
@@ -89,6 +78,7 @@ class OpenGLVideo : public QObject
     void    DeleteTextures(vector<MythGLTexture*> *Textures);
     void    TearDownDeinterlacer(void);
 
+    bool           m_valid;
     FrameType      m_frameType;
     MythRenderOpenGL *m_render;
     QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
@@ -97,20 +87,22 @@ class OpenGLVideo : public QObject
     QRect          m_displayVisibleRect;  ///< Total useful, visible rectangle
     QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
     QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
-    QString        m_softwareDeiterlacer;
     QString        m_hardwareDeinterlacer;
     bool           m_hardwareDeinterlacing; ///< OpenGL deinterlacing is enabled
     VideoColourSpace *m_videoColourSpace;
     bool           m_viewportControl;     ///< Video has control over view port
+    QOpenGLShaderProgram* m_shaders[ShaderCount];
+    int            m_shaderCost[ShaderCount];
     vector<MythGLTexture*> m_referenceTextures; ///< Up to 3 reference textures for filters
     vector<MythGLTexture*> m_inputTextures;     ///< Textures with raw video data
+    QOpenGLFramebufferObject* m_frameBuffer;
+    MythGLTexture*            m_frameBufferTexture;
     QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
-    glfilt_map_t   m_filters;             ///< Filter stages to be applied to frame
     int            m_referenceTexturesNeeded; ///< Number of reference textures still required
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
     uint           m_extraFeatures;       ///< OR'd list of extra, Myth specific features
     MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
+    bool           m_resizing;
     bool           m_forceResize;         ///< Global setting to force a resize stage
-    bool           m_discardFrameBuffers; ///< Use GL_EXT_discard_framebuffer
 };
 #endif // _OPENGL_VIDEO_H__

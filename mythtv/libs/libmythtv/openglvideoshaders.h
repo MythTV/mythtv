@@ -1,12 +1,13 @@
 #ifndef OPENGLVIDEOSHADERS_H
 #define OPENGLVIDEOSHADERS_H
 
-static const QString YUV2RGBVertexShader =
-"attribute vec2 a_position;\n"
-"attribute vec2 a_texcoord0;\n"
-"varying highp vec2 v_texcoord0;\n"
-"uniform highp mat4 u_projection;\n"
-"void main() {\n"
+static const QString DefaultVertexShader =
+"attribute highp vec2 a_position;\n"
+"attribute highp vec2 a_texcoord0;\n"
+"varying   highp vec2 v_texcoord0;\n"
+"uniform   highp mat4 u_projection;\n"
+"void main()\n"
+"{\n"
 "    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
 "    v_texcoord0 = a_texcoord0;\n"
 "}\n";
@@ -188,18 +189,7 @@ static const QString DefaultFragmentShader =
 "void main(void)\n"
 "{\n"
 "    highp vec4 color = texture2D(s_texture0, v_texcoord0);\n"
-"    gl_FragColor = vec4(color.xyz, 1.0);\n"
-"}\n";
-
-static const QString YV12RGBVertexShader =
-"//YV12RGBVertexShader\n"
-"attribute highp vec2 a_position;\n"
-"attribute highp vec2 a_texcoord0;\n"
-"varying   highp vec2 v_texcoord0;\n"
-"uniform   highp mat4 u_projection;\n"
-"void main() {\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
-"    v_texcoord0 = a_texcoord0;\n"
+"    gl_FragColor = vec4(color.rgb, 1.0);\n"
 "}\n";
 
 #define SAMPLEYVU "\
