@@ -77,6 +77,17 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     if (!texture)
         return;
     m_inputTextures.push_back(texture);
+    if (kGLYV12 == m_frameType)
+    {
+        QSize temp;
+        QSize chroma(m_videoDim.width() >> 1, m_videoDim.height() >> 1);
+        texture = CreateVideoTexture(chroma, temp);
+        if (!texture) return;
+        m_inputTextures.push_back(texture);
+        texture = CreateVideoTexture(chroma, temp);
+        if (!texture) return;
+        m_inputTextures.push_back(texture);
+    }
 
     // Create initial shaders - default and optionally progressive
     if (!CreateVideoShader(Default))
@@ -192,28 +203,38 @@ bool OpenGLVideo::AddDeinterlacer(const QString &Deinterlacer)
     if (m_hardwareDeinterlacer == Deinterlacer)
         return true;
 
+    // delete old reference textures
+    while (!m_referenceTextures.empty())
+    {
+        m_render->DeleteTexture(m_referenceTextures.back());
+        m_referenceTextures.pop_back();
+    }
+
     // create new deinterlacers - the old ones will be deleted
     if (!(CreateVideoShader(InterlacedBot, Deinterlacer) && CreateVideoShader(InterlacedTop, Deinterlacer)))
         return false;
 
     // create the correct number of reference textures
-    int refstocreate = Deinterlacer.contains("kernel") ? 2 : 0;
-    m_referenceTexturesNeeded = refstocreate;
-    refstocreate -= m_referenceTextures.size();
-    for ( ; refstocreate < 0; ++refstocreate)
+    uint refstocreate = Deinterlacer.contains("kernel") ? 2 : 0;
+    m_referenceTexturesNeeded = refstocreate + 1;
+    refstocreate *= (kGLYV12 == m_frameType) ? 3 : 1;
+    while (m_referenceTextures.size() < refstocreate)
     {
-        m_render->DeleteTexture(m_referenceTextures.back());
-        m_referenceTextures.pop_back();
+        MythGLTexture *texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);
+        if (!texture) return false;
+        m_referenceTextures.push_back(texture);
+        if (kGLYV12 == m_frameType)
+        {
+            QSize temp;
+            QSize chroma(m_videoDim.width() >> 1, m_videoDim.height() >> 1);
+            texture = CreateVideoTexture(chroma, temp);
+            if (!texture) return false;
+            m_referenceTextures.push_back(CreateVideoTexture(chroma, temp));
+            texture = CreateVideoTexture(chroma, temp);
+            if (!texture) return false;
+            m_referenceTextures.push_back(CreateVideoTexture(chroma, temp));
+        }
     }
-    for ( ; refstocreate > 0; --refstocreate)
-    {
-        MythGLTexture *tex = CreateVideoTexture(m_videoDim, m_inputTextureSize);
-        if (tex)
-            m_referenceTextures.push_back(tex);
-    }
-
-    if ((int)m_referenceTextures.size() != m_referenceTexturesNeeded)
-        return false;
 
     // ensure they work correctly
     UpdateColourSpace();
@@ -251,7 +272,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     else if ((Progressive == Type) || Interlaced == Type || Deinterlacer.isEmpty())
     {
         fragment = (kGLYV12 == m_frameType) ? YV12RGBFragmentShader : YUV2RGBFragmentShader;
-        cost     = (kGLYV12 == m_frameType) ? 5 : 1;
+        cost     = (kGLYV12 == m_frameType) ? 3 : 1;
     }
     else
     {
@@ -266,17 +287,17 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
             else if (Deinterlacer == "opengllinearblend" || Deinterlacer == "opengldoubleratelinearblend")
             {
                 fragment = YV12RGBLinearBlendFragmentShader[bottom];
-                cost = 17;
+                cost = 15;
             }
             else if (Deinterlacer == "openglkerneldeint" || Deinterlacer == "opengldoubleratekerneldeint")
             {
                 fragment = YV12RGBKernelShader[bottom];
-                cost = 47;
+                cost = 45;
             }
             else
             {
                 fragment = YV12RGBFragmentShader;
-                cost = 5;
+                cost = 3;
             }
         }
         else
@@ -325,7 +346,6 @@ MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureS
     MythGLTexture *texture = nullptr;
     if (kGLYV12 == m_frameType)
     {
-        Size.setHeight((3 * Size.height() + 1) / 2);
         texture = m_render->CreateTexture(Size,
             QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
             QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
@@ -341,9 +361,12 @@ MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureS
         texture = m_render->CreateTexture(Size);
     }
 
-    ActualTextureSize = m_render->GetTextureSize(Size);
-    if (m_resizing)
-        m_render->SetTextureFilters(texture, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+    if (texture)
+    {
+        ActualTextureSize = texture->m_totalSize;
+        if (m_resizing)
+            m_render->SetTextureFilters(texture, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+    }
     return texture;
 }
 
@@ -388,7 +411,11 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
         // create a storage buffer
         if (!texture->m_data)
         {
-            unsigned char *scratch = new unsigned char[texture->m_bufferSize];
+            int size = texture->m_bufferSize;
+            // extra needed for raw YV12 frame
+            if (kGLYV12 == m_frameType)
+                size = size + (size >> 1);
+            unsigned char *scratch = new unsigned char[size];
             if (scratch)
             {
                 memset(scratch, 0, texture->m_bufferSize);
@@ -421,6 +448,16 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
     }
 
     texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
+
+    // update chroma for YV12 textures
+    if ((kGLYV12 == m_frameType) && (m_inputTextures.size() == 3))
+    {
+        int offset = (m_videoDim.width() * m_videoDim.height());
+        m_inputTextures[1]->m_texture->setData(m_inputTextures[1]->m_pixelFormat,
+                m_inputTextures[1]->m_pixelType, (uint8_t*)buf + offset);
+        m_inputTextures[2]->m_texture->setData(m_inputTextures[2]->m_pixelFormat,
+                m_inputTextures[2]->m_pixelType, (uint8_t*)buf + offset + (offset >> 2));
+    }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
@@ -546,7 +583,7 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
         m_render->SetViewPort(vrect);
 
         // bind correct textures
-        MythGLTexture* textures[4];
+        MythGLTexture* textures[m_inputTextures.size() + m_referenceTextures.size()];
         uint numtextures = 0;
         for (uint i = 0; i < inputtextures.size(); i++)
             textures[numtextures++] = inputtextures[i];
@@ -597,7 +634,7 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
     }
 
     // bind correct textures
-    MythGLTexture* textures[4];
+    MythGLTexture* textures[m_inputTextures.size() + m_referenceTextures.size()];
     uint numtextures = 0;
     for (uint i = 0; i < inputtextures.size(); i++)
         textures[numtextures++] = inputtextures[i];
@@ -623,17 +660,22 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
 
 void OpenGLVideo::RotateTextures(void)
 {
-    if (m_referenceTextures.size() < 2)
-        return;
-
     if (m_referenceTexturesNeeded > 0)
         m_referenceTexturesNeeded--;
 
-    MythGLTexture *tmp = m_referenceTextures[m_referenceTextures.size() - 1];
-    for (uint i = m_referenceTextures.size() - 1; i > 0;  i--)
-        m_referenceTextures[i] = m_referenceTextures[i - 1];
-    m_referenceTextures[0] = m_inputTextures[0];
-    m_inputTextures[0] = tmp;
+    if (m_referenceTextures.empty() || (m_referenceTextures.size() % m_inputTextures.size()))
+        return;
+
+    uint rotate = m_inputTextures.size();
+    vector<MythGLTexture*> newinputs, newrefs;
+    for (uint i = 0; i < rotate; ++i)
+        newinputs.push_back(m_referenceTextures[i]);
+    for (uint i = rotate; i < m_referenceTextures.size(); ++i)
+        newrefs.push_back(m_referenceTextures[i]);
+    for (uint i = 0; i < rotate; ++i)
+        newrefs.push_back(m_inputTextures[i]);
+    m_inputTextures = newinputs;
+    m_referenceTextures = newrefs;
 }
 
 void OpenGLVideo::DeleteTextures(vector<MythGLTexture*> *Textures)

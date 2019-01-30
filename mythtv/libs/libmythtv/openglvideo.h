@@ -69,7 +69,7 @@ class OpenGLVideo : public QObject
     void    UpdateShaderParameters(void);
 
   private:
-    bool CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
+    bool    CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
     MythGLTexture* CreateVideoTexture(QSize Size, QSize &ActualTextureSize);
     void    RotateTextures(void);
     void    SetTextureFilters(vector<MythGLTexture*>  *Textures,
