@@ -33,16 +33,7 @@ static const GLuint kVertexOffset  = 0;
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
 
-static inline int __glCheck__(const QString &loc, const char* fileName, int n)
-{
-    GLenum error;
-    while((error = glGetError()) != GL_NO_ERROR)
-        LOG(VB_GENERAL, LOG_ERR, QString("%1: %2 @ %3, %4").arg(loc).arg(error).arg(fileName).arg(n));
-    return error;
-}
-
 #define MAX_VERTEX_CACHE 500
-#define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
 
 MythGLTexture::MythGLTexture(QOpenGLTexture *Texture)
   : m_data(nullptr),
@@ -80,7 +71,8 @@ MythGLTexture::MythGLTexture(GLuint Texture)
     memset(&m_vertexData, 0, sizeof(m_vertexData));
 }
 
-OpenGLLocker::OpenGLLocker(MythRenderOpenGL *render) : m_render(render)
+OpenGLLocker::OpenGLLocker(MythRenderOpenGL *Render)
+  : m_render(Render)
 {
     if (m_render)
         m_render->makeCurrent();
@@ -92,7 +84,7 @@ OpenGLLocker::~OpenGLLocker()
         m_render->doneCurrent();
 }
 
-MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
+MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
 {
     QString display = getenv("DISPLAY");
     // Determine if we are running a remote X11 session
@@ -106,7 +98,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
      && !display.startsWith(":")
      && !display.startsWith("unix:")
      && !display.startsWith("/")
-     && display.contains(':'))
+     &&  display.contains(':'))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is disabled for Remote X Session");
         return nullptr;
@@ -127,22 +119,59 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         format.setOption(QSurfaceFormat::DebugContext);
 
-    return new MythRenderOpenGL(format, device);
+    return new MythRenderOpenGL(format, Device);
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, QPaintDevice* device,
-                                   RenderType type)
+MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* Device,
+                                   RenderType Type)
   : QOpenGLContext(),
     QOpenGLFunctions(),
-    MythRender(type),
+    MythRender(Type),
+    m_activeFramebuffer(nullptr),
+    m_fence(0),
+    m_activeProgram(nullptr),
+    m_cachedVertices(),
+    m_vertexExpiry(),
+    m_cachedVBOS(),
+    m_vboExpiry(),
     m_lock(QMutex::Recursive),
-    m_openglDebugger(nullptr)
+    m_lockLevel(0),
+    m_features(Multitexture),
+    m_extraFeatures(kGLFeatNone),
+    m_extraFeaturesUsed(kGLFeatNone),
+    m_maxTextureSize(0),
+    m_maxTextureUnits(0),
+    m_viewport(),
+    m_activeTexture(0),
+    m_activeTextureTarget(0),
+    m_blend(false),
+    m_background(0x00000000),
+    m_projection(),
+    m_transforms(),
+    m_parameters(),
+    m_cachedMatrixUniforms(),
+    m_flushEnabled(true),
+    m_glGenFencesNV(nullptr),
+    m_glDeleteFencesNV(nullptr),
+    m_glSetFenceNV(nullptr),
+    m_glFinishFenceNV(nullptr),
+    m_glGenFencesAPPLE(nullptr),
+    m_glDeleteFencesAPPLE(nullptr),
+    m_glSetFenceAPPLE(nullptr),
+    m_glFinishFenceAPPLE(nullptr),
+    m_glDiscardFramebuffer(nullptr),
+    m_openglDebugger(nullptr),
+    m_window(nullptr)
 {
-    QWidget *w = dynamic_cast<QWidget*>(device);
+    memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
+    m_projection.fill(0);
+    m_parameters.fill(0);
+    m_transforms.push(QMatrix4x4());
+
+    QWidget *w = dynamic_cast<QWidget*>(Device);
     m_window = (w) ? w->windowHandle() : nullptr;
-    ResetVars();
-    ResetProcs();
-    setFormat(format);
+
+    setFormat(Format);
 }
 
 MythRenderOpenGL::~MythRenderOpenGL()
@@ -242,15 +271,15 @@ bool MythRenderOpenGL::Init(void)
     GLint maxunits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxunits);
-    m_max_units = maxunits;
-    m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
+    m_maxTextureUnits = maxunits;
+    m_maxTextureSize  = (maxtexsz) ? maxtexsz : 512;
 
     // RGBA16 - available on ES via extension
     m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
 
     // Pixel buffer objects
-    bool buffer_procs = (MYTH_GLMAPBUFFERPROC)GetProcAddress("glMapBuffer") &&
-                        (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBuffer");
+    bool buffer_procs = reinterpret_cast<MYTH_GLMAPBUFFERPROC>(GetProcAddress("glMapBuffer")) &&
+                        reinterpret_cast<MYTH_GLUNMAPBUFFERPROC>(GetProcAddress("glUnmapBuffer"));
 
     // Buffers are available by default (GL and GLES).
     // Buffer mapping is available by extension
@@ -302,14 +331,14 @@ void MythRenderOpenGL::DebugFeatures(void)
             .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
             .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
             .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg((const char*)glGetString(GL_VENDOR)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg((const char*)glGetString(GL_RENDERER)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg((const char*)glGetString(GL_VERSION)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(qApp->platformName()));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_max_tex_size));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_max_units));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_maxTextureUnits));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(GLYesNo(m_features & Shaders)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
@@ -321,11 +350,16 @@ void MythRenderOpenGL::DebugFeatures(void)
         .arg(GLYesNo((m_extraFeatures & kGLAppleFence) || (m_extraFeatures & kGLNVFence))));
 
     // warnings
-    if (m_max_units < 3)
+    if (m_maxTextureUnits < 3)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning: Insufficient texture units for some features.");
 }
 
-uint MythRenderOpenGL::GetExtraFeatures(void) const
+int MythRenderOpenGL::GetMaxTextureSize(void) const
+{
+    return m_maxTextureSize;
+}
+
+int MythRenderOpenGL::GetExtraFeatures(void) const
 {
     return m_extraFeaturesUsed;
 }
@@ -339,7 +373,7 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
 {
     bool recommended = true;
     OpenGLLocker locker(this);
-    QString renderer = (const char*)glGetString(GL_RENDERER);
+    QString renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
 
     if (!(openGLFeatures() & Shaders))
     {
@@ -402,7 +436,7 @@ void MythRenderOpenGL::setWidget(QWidget *Widget)
 void MythRenderOpenGL::makeCurrent()
 {
     m_lock.lock();
-    if (!m_lock_level++)
+    if (!m_lockLevel++)
         QOpenGLContext::makeCurrent(m_window);
 }
 
@@ -410,8 +444,8 @@ void MythRenderOpenGL::doneCurrent()
 {
     // TODO add back QOpenGLContext::doneCurrent call
     // once calls are better pipelined
-    m_lock_level--;
-    if (m_lock_level < 0)
+    m_lockLevel--;
+    if (m_lockLevel < 0)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Mis-matched calls to makeCurrent()");
     m_lock.unlock();
 }
@@ -419,7 +453,7 @@ void MythRenderOpenGL::doneCurrent()
 void MythRenderOpenGL::Release(void)
 {
 #if !defined(Q_OS_WIN)
-    while (m_lock_level > 0)
+    while (m_lockLevel > 0)
         doneCurrent();
 #endif
 }
@@ -483,13 +517,13 @@ void MythRenderOpenGL::SetBlend(bool enable)
 
 void MythRenderOpenGL::SetBackground(int r, int g, int b, int a)
 {
-    uint32_t tmp = (r << 24) + (g << 16) + (b << 8) + a;
+    int32_t tmp = (r << 24) + (g << 16) + (b << 8) + a;
     if (tmp == m_background)
         return;
 
     m_background = tmp;
     makeCurrent();
-    glClearColor(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+    glClearColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
     doneCurrent();
 }
 
@@ -536,7 +570,7 @@ MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
                                                QOpenGLTexture::TextureFormat Format)
 {
     OpenGLLocker locker(this);
-    uint datasize = GetBufferSize(Size, PixelFormat, PixelType);
+    int datasize = GetBufferSize(Size, PixelFormat, PixelType);
     if (!datasize)
         return nullptr;
 
@@ -605,7 +639,7 @@ MythGLTexture* MythRenderOpenGL::CreateHelperTexture(void)
 {
     makeCurrent();
 
-    uint width = m_max_tex_size;
+    int width = m_maxTextureSize;
     MythGLTexture *texture = CreateTexture(QSize(width, 1),
                                            QOpenGLTexture::Float32,
                                            QOpenGLTexture::RGBA,
@@ -617,9 +651,9 @@ MythGLTexture* MythRenderOpenGL::CreateHelperTexture(void)
     buf = new float[texture->m_bufferSize];
     float *ref = buf;
 
-    for (uint i = 0; i < width; i++)
+    for (int i = 0; i < width; i++)
     {
-        float x = (((float)i) + 0.5f) / (float)width;
+        float x = (i + 0.5f) / static_cast<float>(width);
         StoreBicubicWeights(x, ref);
         ref += 4;
     }
@@ -681,30 +715,30 @@ void MythRenderOpenGL::SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture:
     doneCurrent();
 }
 
-void MythRenderOpenGL::ActiveTexture(int active_tex)
+void MythRenderOpenGL::ActiveTexture(GLuint ActiveTex)
 {
     if (!(m_features & Multitexture))
         return;
 
     makeCurrent();
-    if (m_active_tex != active_tex)
+    if (m_activeTexture != ActiveTex)
     {
-        glActiveTexture(active_tex);
-        m_active_tex = active_tex;
+        glActiveTexture(ActiveTex);
+        m_activeTexture = ActiveTex;
     }
     doneCurrent();
 }
 
-void MythRenderOpenGL::StoreBicubicWeights(float x, float *dst)
+void MythRenderOpenGL::StoreBicubicWeights(float X, float *Dst)
 {
-    float w0 = (((-1 * x + 3) * x - 3) * x + 1) / 6;
-    float w1 = ((( 3 * x - 6) * x + 0) * x + 4) / 6;
-    float w2 = (((-3 * x + 3) * x + 3) * x + 1) / 6;
-    float w3 = ((( 1 * x + 0) * x + 0) * x + 0) / 6;
-    *dst++ = 1 + x - w1 / (w0 + w1);
-    *dst++ = 1 - x + w3 / (w2 + w3);
-    *dst++ = w0 + w1;
-    *dst++ = 0;
+    float w0 = (((-1 * X + 3) * X - 3) * X + 1) / 6;
+    float w1 = ((( 3 * X - 6) * X + 0) * X + 4) / 6;
+    float w2 = (((-3 * X + 3) * X + 3) * X + 1) / 6;
+    float w3 = ((( 1 * X + 0) * X + 0) * X + 0) / 6;
+    *Dst++ = 1 + X - w1 / (w0 + w1);
+    *Dst++ = 1 - X + w3 / (w2 + w3);
+    *Dst++ = w0 + w1;
+    *Dst++ = 0;
 }
 
 void MythRenderOpenGL::EnableTextures(void)
@@ -827,71 +861,18 @@ void MythRenderOpenGL::DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 
 void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                                   const QRect &Source, const QRect &Destination,
-                                  QOpenGLShaderProgram *Program, int alpha,
-                                  int red, int green, int blue)
+                                  QOpenGLShaderProgram *Program, int Alpha,
+                                  int Red, int Green, int Blue)
 {
     makeCurrent();
-    BindFramebuffer(Target);
-    DrawBitmapPriv(Texture, Source, Destination, Program, alpha, red, green, blue);
-    doneCurrent();
-}
 
-void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
-                                  QOpenGLFramebufferObject *Target,
-                                  const QRect &Source, const QRect &Destination,
-                                  QOpenGLShaderProgram *Program)
-{
-    if (!Textures || !TextureCount)
-        return;
-
-    makeCurrent();
-    BindFramebuffer(Target);
-    DrawBitmapPriv(Textures, TextureCount, Source, Destination, Program);
-    doneCurrent();
-}
-
-void MythRenderOpenGL::DrawRect(QOpenGLFramebufferObject *target,
-                                const QRect &area, const QBrush &fillBrush,
-                                const QPen &linePen, int alpha)
-{
-    makeCurrent();
-    BindFramebuffer(target);
-    DrawRectPriv(area, fillBrush, linePen, alpha);
-    doneCurrent();
-}
-
-void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *target,
-                                     const QRect &area, int cornerRadius,
-                                     const QBrush &fillBrush,
-                                     const QPen &linePen, int alpha)
-{
-    makeCurrent();
-    BindFramebuffer(target);
-    DrawRoundRectPriv(area, cornerRadius, fillBrush, linePen, alpha);
-    doneCurrent();
-}
-
-inline void MythRenderOpenGL::glVertexAttribPointerI(
-    GLuint index, GLint size, GLenum type, GLboolean normalize,
-    GLsizei stride, const GLuint value)
-{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-    glVertexAttribPointer(index, size, type, normalize,
-                            stride, (const char *)value);
-#pragma GCC diagnostic pop
-}
-
-void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture *Texture, const QRect &Source,
-                                      const QRect &Destination,
-                                      QOpenGLShaderProgram *Program,
-                                      int alpha, int red, int green, int blue)
-{
     if (!Texture || (Texture && !((Texture->m_texture || Texture->m_textureId) && Texture->m_vbo)))
         return;
 
     if (Program == nullptr)
         Program = m_defaultPrograms[kShaderDefault];
+
+    BindFramebuffer(Target);
 
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
@@ -923,26 +904,27 @@ void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture *Texture, const QRect &Sourc
 
     glEnableVertexAttribArray(VERTEX_INDEX);
     glEnableVertexAttribArray(TEXTURE_INDEX);
-
-    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                            VERTEX_SIZE * sizeof(GLfloat),
-                            kVertexOffset);
-    glVertexAttrib4f(COLOR_INDEX, red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
-    glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
-                            TEXTURE_SIZE * sizeof(GLfloat),
-                            kTextureOffset);
-
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
+    glVertexAttrib4f(COLOR_INDEX, Red / 255.0f, Green / 255.0f, Blue / 255.0f, Alpha / 255.0f);
+    glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, TEXTURE_SIZE * sizeof(GLfloat), kTextureOffset);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
     buffer->release(QOpenGLBuffer::VertexBuffer);
+    doneCurrent();
 }
 
-void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture **Textures, uint TextureCount,
-                                      const QRect &Source, const QRect &Destination,
-                                      QOpenGLShaderProgram *Program)
+void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
+                                  QOpenGLFramebufferObject *Target,
+                                  const QRect &Source, const QRect &Destination,
+                                  QOpenGLShaderProgram *Program)
 {
+    if (!Textures || !TextureCount)
+        return;
+
+    makeCurrent();
+    BindFramebuffer(Target);
+
     if (Program == nullptr)
         Program = m_defaultPrograms[kShaderDefault];
 
@@ -985,44 +967,43 @@ void MythRenderOpenGL::DrawBitmapPriv(MythGLTexture **Textures, uint TextureCoun
 
     glEnableVertexAttribArray(VERTEX_INDEX);
     glEnableVertexAttribArray(TEXTURE_INDEX);
-
-    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                            VERTEX_SIZE * sizeof(GLfloat),
-                            kVertexOffset);
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
     glVertexAttrib4f(COLOR_INDEX, 1.0, 1.0, 1.0, 1.0);
-    glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
-                            TEXTURE_SIZE * sizeof(GLfloat),
-                            kTextureOffset);
-
+    glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, TEXTURE_SIZE * sizeof(GLfloat), kTextureOffset);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
     buffer->release(QOpenGLBuffer::VertexBuffer);
+    doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
-                                     const QPen &linePen, int alpha)
+void MythRenderOpenGL::DrawRect(QOpenGLFramebufferObject *Target,
+                                const QRect &Area, const QBrush &FillBrush,
+                                const QPen &LinePen, int Alpha)
 {
-    DrawRoundRectPriv(area, 1, fillBrush, linePen, alpha);
+    DrawRoundRect(Target, Area, 1, FillBrush, LinePen, Alpha);
 }
 
-void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
-                                          const QBrush &fillBrush,
-                                          const QPen &linePen, int alpha)
+void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
+                                     const QRect &Area, int CornerRadius,
+                                     const QBrush &FillBrush,
+                                     const QPen &LinePen, int Alpha)
 {
-    int lineWidth = linePen.width();
+    makeCurrent();
+    BindFramebuffer(Target);
+
+    int lineWidth = LinePen.width();
     int halfline  = lineWidth / 2;
-    int rad = cornerRadius - halfline;
+    int rad = CornerRadius - halfline;
 
-    if ((area.width() / 2) < rad)
-        rad = area.width() / 2;
+    if ((Area.width() / 2) < rad)
+        rad = Area.width() / 2;
 
-    if ((area.height() / 2) < rad)
-        rad = area.height() / 2;
+    if ((Area.height() / 2) < rad)
+        rad = Area.height() / 2;
     int dia = rad * 2;
 
-    QRect r(area.left(), area.top(), area.width(), area.height());
+    QRect r(Area.left(), Area.top(), Area.width(), Area.height());
 
     QRect tl(r.left(),  r.top(), rad, rad);
     QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
@@ -1033,7 +1014,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
     glEnableVertexAttribArray(VERTEX_INDEX);
 
-    if (fillBrush.style() != Qt::NoBrush)
+    if (FillBrush.style() != Qt::NoBrush)
     {
         // Get the shaders
         QOpenGLShaderProgram* elip = m_defaultPrograms[kShaderCircle];
@@ -1041,14 +1022,14 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Set the fill color
         glVertexAttrib4f(COLOR_INDEX,
-                           fillBrush.color().red() / 255.0,
-                           fillBrush.color().green() / 255.0,
-                           fillBrush.color().blue() / 255.0,
-                          (fillBrush.color().alpha() / 255.0) * (alpha / 255.0));
+                           FillBrush.color().red() / 255.0f,
+                           FillBrush.color().green() / 255.0f,
+                           FillBrush.color().blue() / 255.0f,
+                          (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
 
         // Set the radius
         m_parameters(2,0) = rad;
-        m_parameters(3,0) = rad - 1.0;
+        m_parameters(3,0) = rad - 1.0f;
 
         // Enable the Circle shader
         SetShaderProgramParams(elip, m_projection, "u_projection");
@@ -1060,9 +1041,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the top right segment
@@ -1070,9 +1049,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = tr.top() + rad;
         SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tr);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom left segment
@@ -1080,9 +1057,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = bl.top();
         SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, bl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom right segment
@@ -1090,9 +1065,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = br.top();
         SetShaderProgramParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, br);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Fill the remaining areas
@@ -1104,40 +1077,34 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         SetShaderProgramParams(fill, m_transforms.top(), "u_transform");
 
         GetCachedVBO(GL_TRIANGLE_STRIP, main);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         GetCachedVBO(GL_TRIANGLE_STRIP, left);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         GetCachedVBO(GL_TRIANGLE_STRIP, right);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     }
 
-    if (linePen.style() != Qt::NoPen)
+    if (LinePen.style() != Qt::NoPen)
     {
         // Get the shaders
-        QOpenGLShaderProgram* edge = m_defaultPrograms[kShaderCircleEdge];
+        QOpenGLShaderProgram* edge  = m_defaultPrograms[kShaderCircleEdge];
         QOpenGLShaderProgram* vline = m_defaultPrograms[kShaderVertLine];
         QOpenGLShaderProgram* hline = m_defaultPrograms[kShaderHorizLine];
 
         // Set the line color
         glVertexAttrib4f(COLOR_INDEX,
-                           linePen.color().red() / 255.0,
-                           linePen.color().green() / 255.0,
-                           linePen.color().blue() / 255.0,
-                          (linePen.color().alpha() / 255.0) * (alpha / 255.0));
+                           LinePen.color().red() / 255.0f,
+                           LinePen.color().green() / 255.0f,
+                           LinePen.color().blue() / 255.0f,
+                          (LinePen.color().alpha() / 255.0f) * (Alpha / 255.0f));
 
         // Set the radius and width
-        m_parameters(2,0) = rad - lineWidth / 2.0;
-        m_parameters(3,0) = lineWidth / 2.0;
+        m_parameters(2,0) = rad - lineWidth / 2.0f;
+        m_parameters(3,0) = lineWidth / 2.0f;
 
         // Enable the edge shader
         SetShaderProgramParams(edge, m_projection, "u_projection");
@@ -1148,9 +1115,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = tl.top() + rad;
         SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the top right edge segment
@@ -1158,9 +1123,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = tr.top() + rad;
         SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tr);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat),kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom left edge segment
@@ -1168,9 +1131,7 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = bl.top();
         SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, bl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom right edge segment
@@ -1178,26 +1139,21 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = br.top();
         SetShaderProgramParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, br);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Vertical lines
         SetShaderProgramParams(vline, m_projection, "u_projection");
         SetShaderProgramParams(vline, m_transforms.top(), "u_transform");
 
-        m_parameters(1,0) = lineWidth / 2.0;
-        QRect vl(r.left(), r.top() + rad,
-                 lineWidth, r.height() - dia);
+        m_parameters(1,0) = lineWidth / 2.0f;
+        QRect vl(r.left(), r.top() + rad, lineWidth, r.height() - dia);
 
         // Draw the left line segment
         m_parameters(0,0) = vl.left() + lineWidth;
         SetShaderProgramParams(vline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the right line segment
@@ -1205,24 +1161,19 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(0,0) = vl.left();
         SetShaderProgramParams(vline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Horizontal lines
         SetShaderProgramParams(hline, m_projection, "u_projection");
         SetShaderProgramParams(hline, m_transforms.top(), "u_transform");
-        QRect hl(r.left() + rad, r.top(),
-                 r.width() - dia, lineWidth);
+        QRect hl(r.left() + rad, r.top(), r.width() - dia, lineWidth);
 
         // Draw the top line segment
         m_parameters(0,0) = hl.top() + lineWidth;
         SetShaderProgramParams(hline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom line segment
@@ -1230,14 +1181,21 @@ void MythRenderOpenGL::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(0,0) = hl.top();
         SetShaderProgramParams(hline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               kVertexOffset);
+        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     }
-
     glDisableVertexAttribArray(VERTEX_INDEX);
+    doneCurrent();
+}
+
+inline void MythRenderOpenGL::glVertexAttribPointerI(GLuint Index, GLint Size, GLenum Type, GLboolean Normalize,
+                                                     GLsizei Stride, const GLuint Value)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+    glVertexAttribPointer(Index, Size, Type, Normalize, Stride, reinterpret_cast<const char *>(Value));
+#pragma GCC diagnostic pop
 }
 
 void MythRenderOpenGL::Init2DState(void)
@@ -1255,74 +1213,33 @@ void MythRenderOpenGL::Init2DState(void)
 
 void MythRenderOpenGL::InitProcs(void)
 {
-    m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)GetProcAddress("glGenFencesNV");
-    m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)GetProcAddress("glDeleteFencesNV");
-    m_glSetFenceNV = (MYTH_GLSETFENCENVPROC)GetProcAddress("glSetFenceNV");
-    m_glFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)GetProcAddress("glFinishFenceNV");
-    m_glGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)GetProcAddress("glGenFencesAPPLE");
-    m_glDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)GetProcAddress("glDeleteFencesAPPLE");
-    m_glSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)GetProcAddress("glSetFenceAPPLE");
-    m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)GetProcAddress("glFinishFenceAPPLE");
-    m_glDiscardFramebuffer = (MYTH_GLDISCARDFRAMEBUFFER)GetProcAddress("glDiscardFramebufferEXT");
+    m_glGenFencesNV = reinterpret_cast<MYTH_GLGENFENCESNVPROC>(GetProcAddress("glGenFencesNV"));
+    m_glDeleteFencesNV = reinterpret_cast<MYTH_GLDELETEFENCESNVPROC>(GetProcAddress("glDeleteFencesNV"));
+    m_glSetFenceNV = reinterpret_cast<MYTH_GLSETFENCENVPROC>(GetProcAddress("glSetFenceNV"));
+    m_glFinishFenceNV = reinterpret_cast<MYTH_GLFINISHFENCENVPROC>(GetProcAddress("glFinishFenceNV"));
+    m_glGenFencesAPPLE = reinterpret_cast<MYTH_GLGENFENCESAPPLEPROC>(GetProcAddress("glGenFencesAPPLE"));
+    m_glDeleteFencesAPPLE = reinterpret_cast<MYTH_GLDELETEFENCESAPPLEPROC>(GetProcAddress("glDeleteFencesAPPLE"));
+    m_glSetFenceAPPLE = reinterpret_cast<MYTH_GLSETFENCEAPPLEPROC>(GetProcAddress("glSetFenceAPPLE"));
+    m_glFinishFenceAPPLE = reinterpret_cast<MYTH_GLFINISHFENCEAPPLEPROC>(GetProcAddress("glFinishFenceAPPLE"));
+    m_glDiscardFramebuffer = reinterpret_cast<MYTH_GLDISCARDFRAMEBUFFER>(GetProcAddress("glDiscardFramebufferEXT"));
 }
 
-QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &proc) const
+QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const
 {
     static const QString exts[4] = { "", "ARB", "EXT", "OES" };
     QFunctionPointer result = nullptr;
     for (int i = 0; i < 4; i++)
     {
-        result = getProcAddress((proc + exts[i]).toLocal8Bit().constData());
+        result = getProcAddress((Proc + exts[i]).toLocal8Bit().constData());
         if (result)
             break;
     }
     if (result == nullptr)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Extension not found: %1").arg(proc));
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Extension not found: %1").arg(Proc));
     return result;
 }
 
-void MythRenderOpenGL::ResetVars(void)
-{
-    m_fence           = 0;
-
-    m_lock_level      = 0;
-
-    m_features        = Multitexture;
-    m_extraFeatures   = kGLFeatNone;
-    m_extraFeaturesUsed = kGLFeatNone;
-    m_max_tex_size    = 0;
-    m_max_units       = 0;
-
-    m_viewport        = QRect();
-    m_active_tex      = 0;
-    m_activeTextureTarget = 0;
-    m_activeFramebuffer = nullptr;
-    m_blend           = false;
-    m_background      = 0x00000000;
-    m_flushEnabled    = true;
-    m_projection.fill(0);
-    m_parameters.fill(0);
-    memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
-    m_activeProgram = nullptr;
-    m_transforms.clear();
-    m_transforms.push(QMatrix4x4());
-    m_cachedMatrixUniforms.clear();
-}
-
-void MythRenderOpenGL::ResetProcs(void)
-{
-    m_glGenFencesNV = nullptr;
-    m_glDeleteFencesNV = nullptr;
-    m_glSetFenceNV = nullptr;
-    m_glFinishFenceNV = nullptr;
-    m_glGenFencesAPPLE = nullptr;
-    m_glDeleteFencesAPPLE = nullptr;
-    m_glSetFenceAPPLE = nullptr;
-    m_glFinishFenceAPPLE = nullptr;
-    m_glDiscardFramebuffer = nullptr;
-}
-
-QOpenGLBuffer* MythRenderOpenGL::CreateVBO(uint Size, bool Release /*=true*/)
+QOpenGLBuffer* MythRenderOpenGL::CreateVBO(int Size, bool Release /*=true*/)
 {
     OpenGLLocker locker(this);
     QOpenGLBuffer* buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
@@ -1379,10 +1296,10 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     int width  = Texture->m_crop ? min(Source.width(),  size.width())  : Source.width();
     int height = Texture->m_crop ? min(Source.height(), size.height()) : Source.height();
 
-    data[0 + TEX_OFFSET] = Source.left() / (GLfloat)size.width();
-    data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / (GLfloat)size.height();
-    data[6 + TEX_OFFSET] = (Source.left() + width) / (GLfloat)size.width();
-    data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top() / (GLfloat)size.height();
+    data[0 + TEX_OFFSET] = Source.left() / static_cast<GLfloat>(size.width());
+    data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / static_cast<GLfloat>(size.height());
+    data[6 + TEX_OFFSET] = (Source.left() + width) / static_cast<GLfloat>(size.width());
+    data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top() / static_cast<GLfloat>(size.height());
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
     data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
@@ -1399,13 +1316,13 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     return true;
 }
 
-GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint type, const QRect &area)
+GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint Type, const QRect &Area)
 {
-    uint64_t ref = ((uint64_t)area.left() & 0xfff) +
-                  (((uint64_t)area.top() & 0xfff) << 12) +
-                  (((uint64_t)area.width() & 0xfff) << 24) +
-                  (((uint64_t)area.height() & 0xfff) << 36) +
-                  (((uint64_t)type & 0xfff) << 48);
+    uint64_t ref = (static_cast<uint64_t>(Area.left()) & 0xfff) +
+                  ((static_cast<uint64_t>(Area.top()) & 0xfff) << 12) +
+                  ((static_cast<uint64_t>(Area.width()) & 0xfff) << 24) +
+                  ((static_cast<uint64_t>(Area.height()) & 0xfff) << 36) +
+                  ((static_cast<uint64_t>(Type & 0xfff)) << 48);
 
     if (m_cachedVertices.contains(ref))
     {
@@ -1416,12 +1333,12 @@ GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint type, const QRect &area)
 
     GLfloat *vertices = new GLfloat[8];
 
-    vertices[2] = vertices[0] = area.left();
-    vertices[5] = vertices[1] = area.top();
-    vertices[4] = vertices[6] = area.left() + area.width();
-    vertices[3] = vertices[7] = area.top() + area.height();
+    vertices[2] = vertices[0] = Area.left();
+    vertices[5] = vertices[1] = Area.top();
+    vertices[4] = vertices[6] = Area.left() + Area.width();
+    vertices[3] = vertices[7] = Area.top() + Area.height();
 
-    if (type == GL_LINE_LOOP)
+    if (Type == GL_LINE_LOOP)
     {
         vertices[7] = vertices[1];
         vertices[5] = vertices[3];
@@ -1434,9 +1351,9 @@ GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint type, const QRect &area)
     return vertices;
 }
 
-void MythRenderOpenGL::ExpireVertices(uint max)
+void MythRenderOpenGL::ExpireVertices(int Max)
 {
-    while ((uint)m_vertexExpiry.size() > max)
+    while (m_vertexExpiry.size() > Max)
     {
         uint64_t ref = m_vertexExpiry.first();
         m_vertexExpiry.removeFirst();
@@ -1448,13 +1365,13 @@ void MythRenderOpenGL::ExpireVertices(uint max)
     }
 }
 
-void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
+void MythRenderOpenGL::GetCachedVBO(GLuint Type, const QRect &Area)
 {
-    uint64_t ref = ((uint64_t)area.left() & 0xfff) +
-                  (((uint64_t)area.top() & 0xfff) << 12) +
-                  (((uint64_t)area.width() & 0xfff) << 24) +
-                  (((uint64_t)area.height() & 0xfff) << 36) +
-                  (((uint64_t)type & 0xfff) << 48);
+    uint64_t ref = (static_cast<uint64_t>(Area.left()) & 0xfff) +
+                  ((static_cast<uint64_t>(Area.top()) & 0xfff) << 12) +
+                  ((static_cast<uint64_t>(Area.width()) & 0xfff) << 24) +
+                  ((static_cast<uint64_t>(Area.height()) & 0xfff) << 36) +
+                  ((static_cast<uint64_t>(Type & 0xfff)) << 48);
 
     if (m_cachedVBOS.contains(ref))
     {
@@ -1464,7 +1381,7 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         return;
     }
 
-    GLfloat *vertices = GetCachedVertices(type, area);
+    GLfloat *vertices = GetCachedVertices(Type, Area);
     QOpenGLBuffer *vbo = CreateVBO(kTextureOffset, false);
     m_cachedVBOS.insert(ref, vbo);
     m_vboExpiry.append(ref);
@@ -1484,9 +1401,9 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
     return;
 }
 
-void MythRenderOpenGL::ExpireVBOS(uint max)
+void MythRenderOpenGL::ExpireVBOS(int Max)
 {
-    while ((uint)m_vboExpiry.size() > max)
+    while (m_vboExpiry.size() > Max)
     {
         uint64_t ref = m_vboExpiry.first();
         m_vboExpiry.removeFirst();
@@ -1499,10 +1416,10 @@ void MythRenderOpenGL::ExpireVBOS(uint max)
     }
 }
 
-uint MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type)
+int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type)
 {
-    uint bytes = 0;
-    uint bpp = 0;;
+    int bytes = 0;
+    int bpp = 0;;
 
     switch (Format)
     {
@@ -1540,10 +1457,10 @@ void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
     QMatrix4x4 newtop = m_transforms.top();
     if (fx.hzoom != 1.0f || fx.vzoom != 1.0f || fx.angle != 0.0f)
     {
-        newtop.translate(center.x(), center.y());
+        newtop.translate(static_cast<GLfloat>(center.x()), static_cast<GLfloat>(center.y()));
         newtop.scale(fx.hzoom, fx.vzoom);
         newtop.rotate(fx.angle, 0, 0, 1);
-        newtop.translate(-center.x(), -center.y());
+        newtop.translate(static_cast<GLfloat>(-center.x()), static_cast<GLfloat>(-center.y()));
     }
     m_transforms.push(newtop);
 }
