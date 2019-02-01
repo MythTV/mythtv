@@ -34,7 +34,6 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 #include "mythcorecontext.h"
-#include "dithertable.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

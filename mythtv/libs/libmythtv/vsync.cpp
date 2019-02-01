@@ -41,10 +41,6 @@
 #include "videoout_vdpau.h"
 #endif
 
-#ifdef USING_XV
-#include "videoout_xv.h"
-#endif
-
 #ifdef __linux__
 #include <linux/rtc.h>
 #endif

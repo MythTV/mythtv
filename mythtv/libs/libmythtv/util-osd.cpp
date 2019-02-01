@@ -1,5 +1,4 @@
 #include "util-osd.h"
-#include "dithertable.h"
 
 #if HAVE_BIGENDIAN
 #define R_OI  1
@@ -306,46 +305,5 @@ void c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
         udest += frame->pitches[1];
         vdest += frame->pitches[2];
         src += bpl << 1;
-    }
-}
-
-void yuv888_to_i44(unsigned char *dest, MythImage *osd_image, QSize dst_size,
-                   int left, int top, int right, int bottom, bool ifirst)
-{
-    int width, ashift, amask, ishift, imask, src_wrap, dst_wrap;
-    unsigned char *src, *alpha, *dst;
-
-    width  = right - left;
-    ashift = ifirst ? 0 : 4;
-    amask  = ifirst ? 0x0f : 0xf0;
-    ishift = ifirst ? 4 : 0;
-    imask  = ifirst ? 0xf0 : 0x0f;
-
-    src   = osd_image->scanLine(top) + (left << 2) + R_OI;
-    alpha = osd_image->scanLine(top) + (left << 2) + A_OI;
-    dst   = dest + dst_size.width() * top + left;
-    dst_wrap = dst_size.width() - width;
-    src_wrap = osd_image->bytesPerLine() - (width << 2);
-
-    for (int row = top; row < bottom; row++)
-    {
-        const unsigned char *dmp = DM[row & (DM_HEIGHT - 1)];
-        for (int col = left; col < right; col++)
-        {
-            int grey;
-
-            grey = *src + ((dmp[col & (DM_WIDTH - 1)] << 2) >> 4);
-            grey = (grey - (grey >> 4)) >> 4;
-
-            *dst = (((*alpha >> 4) << ashift) & amask) |
-                    (((grey) << ishift) & imask);
-
-            alpha += 4;
-            src   += 4;
-            dst++;
-        }
-        alpha += src_wrap;
-        src   += src_wrap;
-        dst   += dst_wrap;
     }
 }

@@ -130,7 +130,6 @@ Advanced options (experts only):
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xnvctrl        disable xNVCtrl support
   --disable-xrandr         disable X11 resolution switching
-  --disable-xv             disable XVideo   (X11 video output accel.)
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
@@ -1990,7 +1989,6 @@ MYTHTV_CONFIG_LIST='
     xnvctrl_external
     libbluray_external
     xrandr
-    xv
     profiletype
     debugtype
     systemd_notify
@@ -2455,8 +2453,6 @@ oss_outdev_deps_any="soundcard_h sys_soundcard_h"
 pulse_indev_deps="libpulse"
 pulse_outdev_deps="libpulse"
 vfwcap_indev_deps="vfw32 vfwcap_defines"
-xv_outdev_deps="X11_extensions_Xvlib_h XvGetPortAttribute"
-xv_outdev_extralibs="-lXv -lX11 -lXext"
 
 # protocols
 async_protocol_deps="threads"
@@ -2623,7 +2619,6 @@ opengl_themepainter_deps="opengl"
 v4l2_deps="backend linux_videodev2_h"
 v4l1_deps="backend v4l2 linux_videodev_h"
 xrandr_deps="x11"
-xv_deps="x11"
 asi_deps="backend"
 
 # default parameters
@@ -2789,7 +2784,6 @@ enable x11
 enable xnvctrl
 enable xnvctrl_external
 enable xrandr
-enable xv
 disable indevs
 enable libfftw3
 enable taglib
@@ -5742,8 +5736,6 @@ check_func_headers windows.h Sleep
 check_func_headers windows.h VirtualAlloc
 check_struct windows.h "CONDITION_VARIABLE" Ptr
 check_func_headers glob.h glob
-enabled xlib &&
-    check_func_headers "X11/Xlib.h X11/extensions/Xvlib.h" XvGetPortAttribute -lXv -lX11 -lXext
 
 check_header d3d11.h
 check_header direct.h
@@ -6644,7 +6636,6 @@ fi
 
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
 enabled xrandr && check_lib Xrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr || disable xrandr
-enabled xv && check_lib Xv "X11/Xdefs.h X11/Xlib.h X11/extensions/Xvlib.h" XvPutStill -lXv || disable xv
 
 if enabled x11; then
     require libXxf86vm "X11/Xdefs.h X11/Xlib.h X11/extensions/xf86vmode.h" XF86VidModeSetClientVersion -lXxf86vm
@@ -7409,7 +7400,6 @@ if enabled x11 ; then
       echo "xnvctrl support           no"
   fi
   echo "xrandr support            ${xrandr-no}"
-  echo "xv support                ${xv-no}"
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
   echo "VAAPI2 support            ${vaapi2-no}"

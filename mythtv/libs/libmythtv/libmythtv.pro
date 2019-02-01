@@ -472,11 +472,6 @@ using_frontend {
 
     using_x11:DEFINES += USING_X11
 
-    using_xv:HEADERS += videoout_xv.h   util-xv.h   osdchromakey.h
-    using_xv:SOURCES += videoout_xv.cpp util-xv.cpp osdchromakey.cpp
-
-    using_xv:DEFINES += USING_XV
-
     using_vdpau {
         DEFINES += USING_VDPAU
         HEADERS += videoout_vdpau.h

@@ -20,10 +20,6 @@
 #include "mthreadpool.h"
 #include "mythcodeccontext.h"
 
-#ifdef USING_XV
-#include "videoout_xv.h"
-#endif
-
 #ifdef _WIN32
 #include "videoout_d3d.h"
 #endif
@@ -45,7 +41,6 @@
 #endif
 
 #include "videoout_null.h"
-#include "dithertable.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -84,10 +79,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
     VideoOutputD3D::GetRenderOptions(opts, cpudeints);
 #endif
 
-#ifdef USING_XV
-    VideoOutputXv::GetRenderOptions(opts, cpudeints);
-#endif // USING_XV
-
 #ifdef USING_OPENGL_VIDEO
     VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
 #endif // USING_OPENGL_VIDEO
@@ -119,9 +110,6 @@ VideoOutput *VideoOutput::Create(
 {
     (void) codec_priv;
     QStringList renderers;
-#ifdef USING_XV
-    QStringList xvlist;
-#endif
 
     // select the best available output
     if (playerFlags & kVideoIsNull)
@@ -135,12 +123,6 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputD3D::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif
-
-#ifdef USING_XV
-        xvlist = VideoOutputXv::
-            GetAllowedRenderers(codec_id, video_dim_disp);
-        renderers += xvlist;
-#endif // USING_XV
 
 #ifdef USING_OPENGL_VIDEO
         renderers += VideoOutputOpenGL::
@@ -230,10 +212,6 @@ VideoOutput *VideoOutput::Create(
             vo = new VideoOutputOMX();
 #endif // USING_OPENMAX
 
-#ifdef USING_XV
-        else if (xvlist.contains(renderer))
-            vo = new VideoOutputXv();
-#endif // USING_XV
         if (vo)
             vo->db_vdisp_profile = vprof;
 
@@ -1397,9 +1375,7 @@ class OsdRender : public QRunnable
         switch (m_frame->codec)
         {
           case FMT_YV12: yv12(); break;
-          case FMT_AI44: i44(true); break;
-          case FMT_IA44: i44(false); break;
-         default: break;
+          default: break;
         }
     }
 
@@ -1425,18 +1401,6 @@ class OsdRender : public QRunnable
         c_yuv888_to_yv12(m_frame, m_osd_image, left, top, right, bottom);
     }
 
-    inline void i44(bool ifirst)
-    {
-        int left   = std::min(m_vis.left(), m_osd_image->width());
-        int top    = std::min(m_vis.top(), m_osd_image->height());
-        int right  = std::min(left + m_vis.width(), m_osd_image->width());
-        int bottom = std::min(top + m_vis.height(), m_osd_image->height());
-
-        memset(m_frame->buf, 0, m_video_dim.width() * m_video_dim.height());
-        yuv888_to_i44(m_frame->buf, m_osd_image, m_video_dim,
-                      left, top, right, bottom, ifirst);
-    }
-
   private:
     VideoFrame * const m_frame;
     MythImage * const m_osd_image;
@@ -1449,9 +1413,6 @@ class OsdRender : public QRunnable
  * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
  * \brief If the OSD has changed, this will convert the OSD buffer
  *        to the OSDSurface's color format.
- *
- *  If the destination format is either IA44 or AI44 the osd is
- *  converted to greyscale.
  *
  * \return true if visible, false otherwise
  */
@@ -1505,8 +1466,6 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     switch (frame->codec)
     {
       case FMT_YV12:
-      case FMT_AI44:
-      case FMT_IA44:
         break;
       default:
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1527,9 +1486,8 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     if (!changed && frame->codec != FMT_YV12)
         return show;
 
-    QSize video_dim = window.GetVideoDim();
-
 #if THREADED_OSD_RENDER
+    QSize video_dim = window.GetVideoDim();
     static MThreadPool s_pool("OsdRender");
 
     // Split visible region for greater concurrency
@@ -1555,21 +1513,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         int bottom = min(top + vis[i].height(), osd_image->height());
 
         if (FMT_YV12 == frame->codec)
-        {
             yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
-        }
-        else if (FMT_AI44 == frame->codec)
-        {
-            memset(frame->buf, 0, video_dim.width() * video_dim.height());
-            yuv888_to_i44(frame->buf, osd_image, video_dim,
-                          left, top, right, bottom, true);
-        }
-        else if (FMT_IA44 == frame->codec)
-        {
-            memset(frame->buf, 0, video_dim.width() * video_dim.height());
-            yuv888_to_i44(frame->buf, osd_image, video_dim,
-                          left, top, right, bottom, false);
-        }
 #endif
     }
 #if THREADED_OSD_RENDER

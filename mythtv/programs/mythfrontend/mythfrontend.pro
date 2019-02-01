@@ -109,7 +109,6 @@ win32 : !debug {
 }
 
 using_x11:DEFINES += USING_X11
-using_xv:DEFINES += USING_XV
 using_xrandr:DEFINES += USING_XRANDR
 using_opengl:DEFINES += USING_OPENGL
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO

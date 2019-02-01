@@ -1562,26 +1562,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
         msg = QObject::tr(
             "Render video offscreen. Used internally.");
 
-    if (renderer == "xlib")
-        msg = QObject::tr(
-            "Use X11 pixel copy to render video. This is not recommended if "
-            "any other option is available. The video will not be scaled to "
-            "fit the screen. This will work with all X11 servers, local "
-            "and remote.");
-
-    if (renderer == "xshm")
-        msg = QObject::tr(
-            "Use X11 shared memory pixel transfer to render video. This is "
-            "only recommended over the X11 pixel copy renderer. The video "
-            "will not be scaled to fit the screen. This works with most "
-            "local X11 servers.");
-
-    if (renderer == "xv-blit")
-        msg = QObject::tr(
-            "This is the standard video renderer for X11 systems. It uses "
-            "XVideo hardware assist for scaling, color conversion. If the "
-            "hardware offers picture controls the renderer supports them.");
-
     if (renderer == "direct3d")
         msg = QObject::tr(
             "Windows video renderer based on Direct3D. Requires "
@@ -1596,12 +1576,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             " and optionally deinterlacing. Processing is balanced between the CPU"
             "and GPU.");
     }
-
-    if (renderer == "opengl-lite")
-        msg = QObject::tr(
-            "OpenGL is used for scaling and color conversion. "
-            "It uses faster OpenGL functionality when available but at the "
-            "expense of picture controls and GPU based deinterlacing.");
 
     if (renderer == "opengl-yv12")
     {
@@ -1618,14 +1592,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "content before using OpenGL for color conversion, scaling, picture"
             " controls and optionally deinterlacing. CPU load is higher "
             "particularly on embedded systems.");
-    }
-
-    if (renderer == "opengl-rgba")
-    {
-        msg = QObject::tr(
-            "All video processing is performed by the CPU. OpenGL is used "
-            "for display only. Does not support picture controls or GPU "
-            "deinterlacing. Requires a significantly faster CPU.");
     }
 
     if (renderer == "vdpau")
@@ -1849,16 +1815,6 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
 
     if (osd.isEmpty())
         return msg;
-
-    if (osd == "chromakey")
-        msg = QObject::tr(
-            "Render the OSD using the XVideo chromakey feature."
-            "This renderer does not alpha blend but is the fastest "
-            "OSD renderer for XVideo.") + "\n" +
-            QObject::tr(
-                "Note: nVidia hardware after the 5xxx series does not "
-                "have XVideo chromakey support.");
-
 
     if (osd == "softblend")
     {

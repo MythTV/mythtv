@@ -19,8 +19,6 @@ typedef enum FrameType_
     FMT_NONE = -1,
     FMT_RGB24 = 0,
     FMT_YV12,
-    FMT_IA44,
-    FMT_AI44,
     FMT_RGB32,   ///< endian dependent format, ARGB or BGRA
     FMT_ARGB32,
     FMT_RGBA32,
@@ -293,8 +291,6 @@ static inline int bitsperpixel(VideoFrameType type)
         case FMT_YUV420P16:
             res = 24;
             break;
-        case FMT_IA44:
-        case FMT_AI44:
         default:
             res = 8;
     }
