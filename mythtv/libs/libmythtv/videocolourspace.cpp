@@ -46,7 +46,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
   : QObject(),
     QMatrix4x4(),
     ReferenceCounter("Colour"),
-    m_supported_attributes(kPictureAttributeSupported_None),
+    m_supportedAttributes(kPictureAttributeSupported_None),
     m_studioLevels(false),
     m_brightness(0.0f),
     m_contrast(1.0f),
@@ -62,27 +62,27 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     {
         m_parent->IncrRef();
         connect(m_parent, &VideoColourSpace::PictureAttributeChanged, this, &VideoColourSpace::SetPictureAttribute);
-        m_supported_attributes = m_parent->SupportedAttributes();
-        m_db_settings[kPictureAttribute_Brightness]   = m_parent->GetPictureAttribute(kPictureAttribute_Brightness);
-        m_db_settings[kPictureAttribute_Contrast]     = m_parent->GetPictureAttribute(kPictureAttribute_Contrast);
-        m_db_settings[kPictureAttribute_Colour]       = m_parent->GetPictureAttribute(kPictureAttribute_Colour);
-        m_db_settings[kPictureAttribute_Hue]          = m_parent->GetPictureAttribute(kPictureAttribute_Hue);
-        m_db_settings[kPictureAttribute_StudioLevels] = m_parent->GetPictureAttribute(kPictureAttribute_StudioLevels);
+        m_supportedAttributes = m_parent->SupportedAttributes();
+        m_dbSettings[kPictureAttribute_Brightness]   = m_parent->GetPictureAttribute(kPictureAttribute_Brightness);
+        m_dbSettings[kPictureAttribute_Contrast]     = m_parent->GetPictureAttribute(kPictureAttribute_Contrast);
+        m_dbSettings[kPictureAttribute_Colour]       = m_parent->GetPictureAttribute(kPictureAttribute_Colour);
+        m_dbSettings[kPictureAttribute_Hue]          = m_parent->GetPictureAttribute(kPictureAttribute_Hue);
+        m_dbSettings[kPictureAttribute_StudioLevels] = m_parent->GetPictureAttribute(kPictureAttribute_StudioLevels);
     }
     else
     {
-        m_db_settings[kPictureAttribute_Brightness]   = gCoreContext->GetNumSetting("PlaybackBrightness",   50);
-        m_db_settings[kPictureAttribute_Contrast]     = gCoreContext->GetNumSetting("PlaybackContrast",     50);
-        m_db_settings[kPictureAttribute_Colour]       = gCoreContext->GetNumSetting("PlaybackColour",       50);
-        m_db_settings[kPictureAttribute_Hue]          = gCoreContext->GetNumSetting("PlaybackHue",          0);
-        m_db_settings[kPictureAttribute_StudioLevels] = gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
+        m_dbSettings[kPictureAttribute_Brightness]   = gCoreContext->GetNumSetting("PlaybackBrightness",   50);
+        m_dbSettings[kPictureAttribute_Contrast]     = gCoreContext->GetNumSetting("PlaybackContrast",     50);
+        m_dbSettings[kPictureAttribute_Colour]       = gCoreContext->GetNumSetting("PlaybackColour",       50);
+        m_dbSettings[kPictureAttribute_Hue]          = gCoreContext->GetNumSetting("PlaybackHue",          0);
+        m_dbSettings[kPictureAttribute_StudioLevels] = gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
     }
 
-    SetBrightness(m_db_settings[kPictureAttribute_Brightness]);
-    SetContrast(m_db_settings[kPictureAttribute_Contrast]);
-    SetSaturation(m_db_settings[kPictureAttribute_Colour]);
-    SetHue(m_db_settings[kPictureAttribute_Hue]);
-    SetStudioLevels(m_db_settings[kPictureAttribute_StudioLevels]);
+    SetBrightness(m_dbSettings[kPictureAttribute_Brightness]);
+    SetContrast(m_dbSettings[kPictureAttribute_Contrast]);
+    SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
+    SetHue(m_dbSettings[kPictureAttribute_Hue]);
+    SetStudioLevels(m_dbSettings[kPictureAttribute_StudioLevels]);
     m_updatesDisabled = false;
     Update();
 }
@@ -95,7 +95,7 @@ VideoColourSpace::~VideoColourSpace()
 
 PictureAttributeSupported VideoColourSpace::SupportedAttributes(void) const
 {
-    return m_supported_attributes;
+    return m_supportedAttributes;
 }
 
 /*! \brief Enable the given set of picture attributes.
@@ -105,21 +105,21 @@ PictureAttributeSupported VideoColourSpace::SupportedAttributes(void) const
 */
 void VideoColourSpace::SetSupportedAttributes(PictureAttributeSupported Supported)
 {
-    m_supported_attributes = Supported;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1").arg(toString(m_supported_attributes)));
+    m_supportedAttributes = Supported;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1").arg(toString(m_supportedAttributes)));
 }
 
 int VideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
 {
-    if (m_db_settings.contains(Attribute))
-        return m_db_settings.value(Attribute);
+    if (m_dbSettings.contains(Attribute))
+        return m_dbSettings.value(Attribute);
     return -1;
 }
 
 /// \brief Set the Value for the given PictureAttribute
 int VideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
 {
-    if (!(m_supported_attributes & toMask(Attribute)))
+    if (!(m_supportedAttributes & toMask(Attribute)))
         return -1;
 
     Value = std::min(std::max(Value, 0), 100);
@@ -170,15 +170,15 @@ void VideoColourSpace::Update(void)
     // build an RGB to YCbCr conversion matrix from first principles
     // and then invert it for the YCbCr to RGB conversion
     std::vector<float> rgb;
-    switch ((AVColorSpace)m_colourSpace)
+    switch (static_cast<AVColorSpace>(m_colourSpace))
     {
         case AVCOL_SPC_RGB:        rgb = { 1.0000f, 1.0000f, 1.0000f }; break;
         case AVCOL_SPC_BT709:      rgb = { 0.2126f, 0.7152f, 0.0722f }; break;
-        case AVCOL_SPC_FCC:        rgb = { 0.30,    0.59,    0.11    }; break;
+        case AVCOL_SPC_FCC:        rgb = { 0.30f,   0.59f,   0.11f   }; break;
         case AVCOL_SPC_BT470BG:
         case AVCOL_SPC_SMPTE170M:  rgb = { 0.299f,  0.587f,  0.114f  }; break;
         case AVCOL_SPC_SMPTE240M:  rgb = { 0.212f,  0.701f,  0.087f  }; break;
-        case AVCOL_SPC_YCOCG:      rgb = { 0.25,    0.5,     0.25    }; break;
+        case AVCOL_SPC_YCOCG:      rgb = { 0.25f,   0.5f,    0.25f   }; break;
         case AVCOL_SPC_BT2020_CL:
         case AVCOL_SPC_BT2020_NCL: rgb = { 0.2627f, 0.6780f, 0.0593f }; break;
         case AVCOL_SPC_UNSPECIFIED:
@@ -247,11 +247,11 @@ void VideoColourSpace::Debug(void)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 Alpha: %5 StudioLevels: %6")
-        .arg(m_brightness, 2, 'f', 4, QLatin1Char('0'))
-        .arg(m_contrast  , 2, 'f', 4, QLatin1Char('0'))
-        .arg(m_saturation, 2, 'f', 4, QLatin1Char('0'))
-        .arg(m_hue       , 2, 'f', 4, QLatin1Char('0'))
-        .arg(m_alpha     , 2, 'f', 4, QLatin1Char('0'))
+        .arg(static_cast<qreal>(m_brightness), 2, 'f', 4, QLatin1Char('0'))
+        .arg(static_cast<qreal>(m_contrast)  , 2, 'f', 4, QLatin1Char('0'))
+        .arg(static_cast<qreal>(m_saturation), 2, 'f', 4, QLatin1Char('0'))
+        .arg(static_cast<qreal>(m_hue)       , 2, 'f', 4, QLatin1Char('0'))
+        .arg(static_cast<qreal>(m_alpha)     , 2, 'f', 4, QLatin1Char('0'))
         .arg(m_studioLevels));
 
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
@@ -284,9 +284,9 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     m_colourSpaceDepth = depth;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video colourspace: %1, depth %2 (Stream: %3)")
-        .arg(av_color_space_name((AVColorSpace)m_colourSpace))
+        .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
         .arg(m_colourSpaceDepth)
-        .arg(av_color_space_name((AVColorSpace)Frame->colorspace)));
+        .arg(av_color_space_name(static_cast<AVColorSpace>(Frame->colorspace))));
 
     Update();
     return true;
@@ -350,5 +350,5 @@ void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
     if (!dbName.isEmpty())
         gCoreContext->SaveSetting(dbName, Value);
 
-    m_db_settings[AttributeType] = Value;
+    m_dbSettings[AttributeType] = Value;
 }

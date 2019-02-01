@@ -47,8 +47,8 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void  Debug(void);
 
   private:
-    PictureAttributeSupported  m_supported_attributes;
-    QMap<PictureAttribute,int> m_db_settings;
+    PictureAttributeSupported  m_supportedAttributes;
+    QMap<PictureAttribute,int> m_dbSettings;
 
     bool      m_studioLevels;
     float     m_brightness;
