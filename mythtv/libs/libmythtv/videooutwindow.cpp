@@ -22,7 +22,6 @@
 
 #include <cmath>
 
-#include <QDesktopWidget>
 #include <QApplication>
 
 #include "mythconfig.h"
@@ -58,7 +57,7 @@ VideoOutWindow::VideoOutWindow() :
     db_pip_size(26),
     db_scaling_allowed(true),
 
-    using_xinerama(false), screen_num(0), screen_geom(0, 0, 1024, 768),
+    using_xinerama(false), screen_geom(0, 0, 1024, 768),
 
     // Manual Zoom
     mz_scale_v(1.0f), mz_scale_h(1.0f), mz_move(0, 0),
@@ -100,25 +99,23 @@ VideoOutWindow::VideoOutWindow() :
 void VideoOutWindow::populateGeometry(void)
 {
     qApp->processEvents();
-    QDesktopWidget *desktop = nullptr;
-    if (qobject_cast<QApplication*>(qApp))
-        desktop = QApplication::desktop();
+    if (not qobject_cast<QApplication*>(qApp))
+        return;
 
-    if (desktop)
+    QScreen *screen = MythDisplay::GetScreen();
+    if (MythDisplay::SpanAllScreens())
     {
-        screen_num = desktop->primaryScreen();
-        using_xinerama  = MythDisplay::GetNumberXineramaScreens() > 1;
-        if (using_xinerama)
-        {
-            screen_num = gCoreContext->GetNumSetting("XineramaScreen", screen_num);
-            if (screen_num >= desktop->screenCount())
-                screen_num = 0;
-        }
-
-        screen_geom = desktop->geometry();
-        if (screen_num >= 0)
-            screen_geom = desktop->screenGeometry(screen_num);
+        using_xinerama = true;
+        screen_geom = screen->virtualGeometry();
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Window using all screens %2x%3")
+            .arg(screen_geom.width()).arg(screen_geom.height()));
+        return;
     }
+
+    screen_geom = screen->geometry();
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Window using screen %2 %3x%4")
+        .arg(screen->name())
+        .arg(screen_geom.width()).arg(screen_geom.height()));
 }
 
 /**

@@ -1,9 +1,9 @@
 #include "compat.h"
+#include "mythcorecontext.h"
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 
 #if defined(Q_OS_MAC)
 #import "util-osx.h"
@@ -148,12 +148,83 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     return ret;
 }
 
-int MythDisplay::GetNumberXineramaScreens(void)
+/**
+ * \brief Return the number of available screens.
+ *
+ * This is the number of screens configured to be part of the users
+ * desktop, at the time the call is made.  If the user closes the
+ * laptop lid, or connects an external screen, this number may be
+ * different the next time this function is called.
+ */
+int MythDisplay::GetNumberOfScreens(void)
 {
-    int nr_xinerama_screens = 0;
-    QDesktopWidget *m_desktop = QApplication::desktop();
-    if (m_desktop) {
-        nr_xinerama_screens = m_desktop->numScreens();
+    return qGuiApp->screens().size();
+}
+
+/**
+ * \brief Return true if the MythTV windows should span all screens.
+ */
+bool MythDisplay::SpanAllScreens(void)
+{
+    return gCoreContext->GetSetting("XineramaScreen", nullptr) == "-1";
+}
+
+/**
+ * \brief Return a pointer to the screen to use.
+ *
+ * This function looks at the users screen preference, and will return
+ * that screen if possible.  If not, i.e. the screen isn't plugged in,
+ * then this function returns the system's primary screen.
+ *
+ * Note: There is no special case here for the case of MythTV spanning
+ * all screens, as all screen have access to the virtual desktop
+ * attributes.  The check for spanning screens must be made when the
+ * screen size/geometry accessed, and the proper physical/virtual
+ * size/geometry retrieved.
+ */
+QScreen* MythDisplay::GetScreen(void)
+{
+    // Lookup by name
+    QString name = gCoreContext->GetSetting("XineramaScreen", nullptr);
+    foreach (QScreen *qscreen, qGuiApp->screens()) {
+        if (name == qscreen->name()) {
+            LOG(VB_GUI, LOG_INFO, LOC +
+                QString("found screen %1").arg(name));
+            return qscreen;
+        }
     }
-    return nr_xinerama_screens;
+
+    // No name match.  These were previously numbers.
+    bool ok;
+    int screen_num = name.toInt(&ok);
+    QList<QScreen *>screens = qGuiApp->screens();
+    if (ok && (screen_num >= 0) && (screen_num < screens.size())) {
+        LOG(VB_GUI, LOG_INFO, LOC +
+            QString("found screen number %1 (%2)")
+            .arg(name).arg(screens[screen_num]->name()));
+        return screens[screen_num];
+    }
+
+    // For aything else, return the primary screen.
+    QScreen *primary = qGuiApp->primaryScreen();
+    if (name != "-1")
+        LOG(VB_GUI, LOG_INFO,
+            QString("screen %1 not found, defaulting to primary screen (%2)")
+            .arg(name).arg(primary->name()));
+    return primary;
+}
+
+QString MythDisplay::GetExtraScreenInfo(QScreen *qscreen)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    QString mfg = qscreen->manufacturer();
+    if (mfg.isEmpty())
+        mfg = "unknown";
+    QString model = qscreen->model();
+    if (model.isEmpty())
+        model = "unknown";
+    return QString("(%1 %2)").arg(mfg).arg(model);
+#else
+    return QString();
+#endif
 }

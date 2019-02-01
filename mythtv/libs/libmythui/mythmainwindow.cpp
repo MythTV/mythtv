@@ -17,7 +17,6 @@ using namespace std;
 #include <QWaitCondition>
 #include <QApplication>
 #include <QTimer>
-#include <QDesktopWidget>
 #include <QHash>
 #include <QFile>
 #include <QDir>
@@ -25,6 +24,7 @@ using namespace std;
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QSize>
+#include <QWindow>
 
 // Platform headers
 #include "unistd.h"
@@ -58,6 +58,7 @@ using namespace std;
 #include "mythuiactions.h"
 #include "mythrect.h"
 #include "mythuidefines.h"
+#include "mythdisplay.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
@@ -880,9 +881,14 @@ void MythMainWindow::GrabWindow(QImage &image)
     if (active)
         winid = active->winId();
     else
-        winid = QApplication::desktop()->winId();
+        // According to the following we page, you "just pass 0 as the
+        // window id, indicating that we want to grab the entire screen".
+        //
+        // https://doc.qt.io/qt-5/qtwidgets-desktop-screenshot-example.html#screenshot-class-implementation
+        winid = 0;
 
-    QPixmap p = QPixmap::grabWindow(winid);
+    QScreen *screen = MythDisplay::GetScreen();
+    QPixmap p = screen->grabWindow(winid);
     image = p.toImage();
 }
 
@@ -1044,6 +1050,10 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     }
 
     setWindowFlags(flags);
+    if (this->windowHandle()) {
+        LOG(VB_GENERAL, LOG_INFO, QString("Have window handle, setting screen"));
+        this->windowHandle()->setScreen(MythDisplay::GetScreen());
+    }
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);

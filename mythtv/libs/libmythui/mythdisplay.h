@@ -5,6 +5,7 @@
 
 #include <QWidget> // for WId
 #include <QSize>
+#include <QScreen>
 
 #include "mythuiexp.h"
 
@@ -25,7 +26,10 @@ class MUI_PUBLIC MythDisplay
   public:
     static DisplayInfo GetDisplayInfo(int video_rate = 0);
     static WId GetWindowID(void);
-    static int GetNumberXineramaScreens(void);
+    static int GetNumberOfScreens(void);
+    static QScreen* GetScreen(void);
+    static bool SpanAllScreens(void);
+    static QString GetExtraScreenInfo(QScreen *qscreen);
 };
 
 #endif // MYTHDISPLAY_H

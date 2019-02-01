@@ -1,7 +1,6 @@
 #include <cmath>
 #include <cstdlib>
 
-#include <QDesktopWidget>
 #include <QRunnable>
 
 #include "osd.h"
