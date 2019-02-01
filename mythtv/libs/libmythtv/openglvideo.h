@@ -18,8 +18,6 @@
 using std::vector;
 using std::map;
 
-class OpenGLFilter;
-
 class OpenGLVideo : public QObject
 {
     Q_OBJECT
@@ -98,9 +96,9 @@ class OpenGLVideo : public QObject
     QOpenGLFramebufferObject* m_frameBuffer;
     MythGLTexture*            m_frameBufferTexture;
     QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
-    int            m_referenceTexturesNeeded; ///< Number of reference textures still required
+    uint           m_referenceTexturesNeeded; ///< Number of reference textures still required
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
-    uint           m_extraFeatures;       ///< OR'd list of extra, Myth specific features
+    int            m_extraFeatures;       ///< OR'd list of extra, Myth specific features
     MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
     bool           m_resizing;
     bool           m_forceResize;         ///< Global setting to force a resize stage
