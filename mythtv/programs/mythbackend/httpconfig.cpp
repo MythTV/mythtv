@@ -7,7 +7,6 @@
 
 // MythTV headers
 #include "httpconfig.h"
-#include "backendutil.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdirs.h"

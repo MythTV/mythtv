@@ -36,7 +36,7 @@
 #include "storagegroup.h"
 #include "programinfo.h"
 #include "previewgenerator.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "httprequest.h"
 #include "serviceUtil.h"
 #include "mythdate.h"

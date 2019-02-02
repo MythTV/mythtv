@@ -33,7 +33,6 @@ using namespace std;
 #include "encoderlink.h"
 #include "mainserver.h"
 #include "remoteutil.h"
-#include "backendutil.h"
 #include "mythdate.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
