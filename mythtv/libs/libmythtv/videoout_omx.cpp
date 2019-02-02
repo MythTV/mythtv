@@ -1650,16 +1650,16 @@ void MythRenderEGL::destroyNativeWindow()
 // virtual
 void MythRenderEGL::makeCurrent()
 {
-    assert(m_lock_level >= 0);
-    if (++m_lock_level == 1)
+    assert(m_lockLevel >= 0);
+    if (++m_lockLevel == 1)
         eglMakeCurrent(m_display, m_surface, m_surface, m_context);
 }
 
 // virtual
 void MythRenderEGL::doneCurrent()
 {
-    assert(m_lock_level > 0);
-    if (--m_lock_level == 0)
+    assert(m_lockLevel > 0);
+    if (--m_lockLevel == 0)
         eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 }
 
