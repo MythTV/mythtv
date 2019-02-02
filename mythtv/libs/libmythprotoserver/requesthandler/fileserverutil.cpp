@@ -57,7 +57,9 @@ QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
     }
     else
     {
+        locker.unlock();
         result = pginfo->GetPlaybackURL(false, true);
+        locker.relock();
         if (storePath && result.startsWith("/"))
             recordingPathCache[cacheKey] = result;
     }
