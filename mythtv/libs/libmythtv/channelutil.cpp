@@ -1865,6 +1865,7 @@ bool ChannelUtil::GetChannelData(
     dvb_networkid = dvb_transportid = 0;
     commfree      = false;
 
+    int found = 0;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT finetune, freqid, tvformat, freqtable, "
@@ -1874,7 +1875,7 @@ bool ChannelUtil::GetChannelData(
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
         "      channum              = :CHANNUM         AND "
-        "      channel.sourceid     = :SOURCEID", false);
+        "      channel.sourceid     = :SOURCEID");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":SOURCEID", sourceid);
 
@@ -1884,75 +1885,45 @@ bool ChannelUtil::GetChannelData(
         return false;
     }
 
-    QList<int> visible, invisible;
-    int        idx = -1;
-
     while (query.next())
     {
-        if (query.value(10).toInt())
-            visible.append(query.at());
-        else
-            invisible.append(query.at());
-    }
-
-    if (visible.isEmpty())
-    {
-        if (invisible.isEmpty())
+        found += query.value(10).toInt();
+        if (found)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("GetChannelData(): Could not "
-                        "find channel number '%1' in DB for source '%2'.")
-                .arg(channum)
-                .arg(sourceid));
-            return false;
-        }
-        else
-        {
-            idx = invisible.first();
-            LOG(VB_GENERAL, LOG_WARNING,
-                QString("GetChannelData(): No VISIBLE channels found for "
-                        "channel %1 on source '%2'")
-                .arg(channum)
-                .arg(sourceid));
+            finetune      = query.value(0).toInt();
+            freqid        = query.value(1).toString();
+            tvformat      = query.value(2).toString();
+            freqtable     = query.value(3).toString();
+            commfree      = (query.value(4).toInt() == -2);
+            mplexid       = query.value(5).toUInt();
+            atsc_major    = query.value(6).toUInt();
+            atsc_minor    = query.value(7).toUInt();
+            mpeg_prog_num = (query.value(8).isNull()) ? -1
+                            : query.value(8).toInt();
+            chanid        = query.value(9).toUInt();
         }
     }
-    else if (visible.size() > 1)
-    {
-        idx = visible.first();
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("GetChannelData(): Found MULTIPLE VISIBLE "
-                    "channels for channel number %1 on source '%2'")
-            .arg(channum)
-            .arg(sourceid));
-    }
-    else
-        idx = visible.first();
 
-    if (!query.seek(idx))
+    if (!found)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("No visible channels for %1").arg(channum));
+    }
+
+    if (found > 1)
     {
         LOG(VB_GENERAL, LOG_WARNING,
-            QString("GetChannelData(): Logic error, mysql record index %1 "
-                    "is invalid. Failed to find channel number %2 "
-                    "for source '%3'")
-            .arg(idx).arg(channum).arg(sourceid));
+            QString("Found multiple visible channels for %1").arg(channum));
+    }
+
+    if (!chanid)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetChannelData() failed because it could not\n"
+                    "\t\t\tfind channel number '%1' in DB for source '%2'.")
+                .arg(channum).arg(sourceid));
         return false;
     }
-
-    finetune      = query.value(0).toInt();
-    freqid        = query.value(1).toString();
-    tvformat      = query.value(2).toString();
-    freqtable     = query.value(3).toString();
-    commfree      = (query.value(4).toInt() == -2);
-    mplexid       = query.value(5).toUInt();
-    atsc_major    = query.value(6).toUInt();
-    atsc_minor    = query.value(7).toUInt();
-    mpeg_prog_num = (query.value(8).isNull()) ? -1
-                    : query.value(8).toInt();
-    chanid        = query.value(9).toUInt();
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Using chanid %1 for channum %2 "
-                                      "on sourceid '%3'")
-        .arg(chanid).arg(channum).arg(sourceid));
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
