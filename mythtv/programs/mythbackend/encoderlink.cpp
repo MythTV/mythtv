@@ -11,7 +11,7 @@
 #include "playbacksock.h"
 #include "tv_rec.h"
 #include "mythdate.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "compat.h"
 #include "referencecounter.h"
 #include "inputinfo.h"                  // for InputInfo

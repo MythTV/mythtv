@@ -36,7 +36,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "remoteencoder.h"
 #include "encoderlink.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "mainserver.h"
 #include "compat.h"
 #include "mythlogging.h"

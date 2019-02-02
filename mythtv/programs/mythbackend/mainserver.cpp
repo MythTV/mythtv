@@ -54,7 +54,7 @@ using namespace std;
 #include "server.h"
 #include "mthread.h"
 #include "scheduler.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "programinfo.h"
 #include "mythtimezone.h"
 #include "recordinginfo.h"

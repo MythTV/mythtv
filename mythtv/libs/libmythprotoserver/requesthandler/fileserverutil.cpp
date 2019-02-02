@@ -39,11 +39,11 @@ void DeleteHandler::Close(void)
     m_fd = -1;
 }
 
-QMap <QString, QString> recordingPathCache;
+static QMap <QString, QString> recordingPathCache;
+static QMutex recordingPathLock;
 
 QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
 {
-    static QMutex recordingPathLock;
     QString result = "";
     QMutexLocker locker(&recordingPathLock);
     QString cacheKey = QString("%1:%2").arg(pginfo->GetChanID())
