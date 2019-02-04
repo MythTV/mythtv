@@ -114,11 +114,6 @@ void MHMovement::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, ")\n");
 }
 
-MHTokenGroup::MHTokenGroup()
-{
-    m_nTokenPosition = 1; // Initial value
-}
-
 void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHPresentable::Initialise(p, engine);
@@ -327,16 +322,6 @@ void MHTokenGroup::Move(int n, MHEngine *engine)
 // ListGroup.  This is a complex class and the description was extensively revised in the MHEG corrigendum.
 // It doesn't seem to be used a great deal in practice and quite a few of the actions haven't been tested.
 
-MHListGroup::MHListGroup()
-{
-    m_fWrapAround = false;
-    m_fMultipleSelection = false;
-    m_nFirstItem = 1;
-    m_nLastFirstItem = m_nFirstItem;
-    m_nLastCount = 0;
-    m_fFirstItemDisplayed = false;
-    m_fLastItemDisplayed = false;
-}
 MHListGroup::~MHListGroup()
 {
     while (!m_ItemList.isEmpty())

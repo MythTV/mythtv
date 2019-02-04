@@ -43,9 +43,9 @@ class MHDLADisplay;
 // Asynchronous event data.
 class MHAsynchEvent {
   public:
-    MHRoot *pEventSource;
-    enum EventType eventType;
-    MHUnion eventData;
+    MHRoot *m_pEventSource {nullptr};
+    enum EventType m_eventType;
+    MHUnion m_eventData;
 };
 
 // Entry in the "persistent" store.  At the moment it's not really persistent.
@@ -62,7 +62,7 @@ class MHPSEntry {
 class MHExternContent {
   public:
     QString m_FileName;
-    MHIngredient *m_pRequester; 
+    MHIngredient *m_pRequester {nullptr}; 
     QTime m_time;
 };
 
@@ -199,16 +199,16 @@ class MHEngine: public MHEG {
 
     MHOwnPtrSequence <MHPSEntry> m_PersistentStore;
 
-    bool m_fInTransition; // If we get a TransitionTo, Quit etc during OnStartUp and OnCloseDown we ignore them.
+    bool m_fInTransition {false}; // If we get a TransitionTo, Quit etc during OnStartUp and OnCloseDown we ignore them.
 
     // To canonicalise the object ids we set this to the group id of the current scene or app
     // and use that wherever we get an object id without a group id.
     MHOctetString   m_CurrentGroupId;
 
-    MHContext       *m_Context; // Pointer to the context providing drawing and other operations
-    bool            m_fBooting;
+    MHContext       *m_Context {nullptr}; // Pointer to the context providing drawing and other operations
+    bool            m_fBooting {true};
 
-    MHInteractible  *m_Interacting; // Set to current interactive object if any.
+    MHInteractible  *m_Interacting {nullptr}; // Set to current interactive object if any.
 };
 
 #endif

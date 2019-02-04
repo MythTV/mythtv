@@ -47,10 +47,6 @@ MHEG *MHCreateEngine(MHContext *context)
 
 MHEngine::MHEngine(MHContext *context): m_Context(context)
 {
-    m_fInTransition = false;
-    m_fBooting = true;
-    m_Interacting = nullptr;
-
     // Required for BBC Freeview iPlayer
     MHPSEntry *pEntry = new MHPSEntry;
     pEntry->m_FileName.Copy("ram://bbcipstr");
@@ -175,9 +171,10 @@ int MHEngine::RunAll()
         {
             MHAsynchEvent *pEvent = m_EventQueue.dequeue();
             MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1 from %2")
-                  .arg(MHLink::EventTypeToString(pEvent->eventType))
-                  .arg(pEvent->pEventSource->m_ObjectReference.Printable()));
-            CheckLinks(pEvent->pEventSource->m_ObjectReference, pEvent->eventType, pEvent->eventData);
+                  .arg(MHLink::EventTypeToString(pEvent->m_eventType))
+                  .arg(pEvent->m_pEventSource->m_ObjectReference.Printable()));
+            CheckLinks(pEvent->m_pEventSource->m_ObjectReference,
+                       pEvent->m_eventType, pEvent->m_eventData);
             delete pEvent;
         }
     }
@@ -691,9 +688,9 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
         {
             // Asynchronous events.  Add to the event queue.
             MHAsynchEvent *pEvent = new MHAsynchEvent;
-            pEvent->pEventSource = pSource;
-            pEvent->eventType = ev;
-            pEvent->eventData = evData;
+            pEvent->m_pEventSource = pSource;
+            pEvent->m_eventType = ev;
+            pEvent->m_eventData = evData;
             m_EventQueue.enqueue(pEvent);
         }
         break;

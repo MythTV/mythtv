@@ -42,7 +42,7 @@ class MHElemAction
   protected:
     virtual void PrintArgs(FILE *, int) const {}
     MHRoot *Target(MHEngine *engine); // Look up the target
-    const char *m_ActionName;
+    const char        *m_ActionName {nullptr};
     MHGenericObjectRef m_Target;
 };
 

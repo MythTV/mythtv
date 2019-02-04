@@ -35,7 +35,7 @@ class MHEngine;
 class MHProgram : public MHIngredient  
 {
   public:
-    MHProgram();
+    MHProgram() = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
     void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
     bool InitiallyAvailable() override // MHIngredient
@@ -48,7 +48,7 @@ class MHProgram : public MHIngredient
         { Deactivation(engine); }
   protected:
     MHOctetString m_Name; // Name of the program
-    bool    m_fInitiallyAvailable;
+    bool          m_fInitiallyAvailable {true};
 };
 
 // Resident program

@@ -45,7 +45,7 @@ class MHTimer {
 class MHGroup : public MHRoot  
 {
   public:
-    MHGroup();
+    MHGroup() = default;
     virtual ~MHGroup();
     void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
 
@@ -65,10 +65,10 @@ class MHGroup : public MHRoot
     // Set this up from the parse tree.
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
     // Standard ID, Standard version, Object information aren't recorded.
-    int m_nOrigGCPriority;
+    int m_nOrigGCPriority {127};
     MHActionSequence m_StartUp, m_CloseDown;
     MHOwnPtrSequence <MHIngredient> m_Items; // Array of items.
-    bool m_fIsApp;
+    bool m_fIsApp {false};
     friend class MHEngine;
 
     // Timers are an attribute of the scene class in the standard but have been moved
@@ -78,7 +78,7 @@ class MHGroup : public MHRoot
     QList<MHTimer*> m_Timers;
     int CheckTimers(MHEngine *engine); // Checks the timers and fires any relevant events.  Returns the millisecs to the
                         // next event or zero if there aren't any.
-    int m_nLastId; // Highest numbered ingredient.  Used to make new ids for clones.
+    int m_nLastId {0}; // Highest numbered ingredient.  Used to make new ids for clones.
 
     friend class MHEGEngine;
 };
@@ -86,7 +86,7 @@ class MHGroup : public MHRoot
 class MHScene : public MHGroup  
 {
   public:
-    MHScene();
+    MHScene() = default;
      // Set this up from the parse tree.
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHGroup
     const char *ClassName() override // MHRoot
@@ -97,10 +97,15 @@ class MHScene : public MHGroup
     // Actions.
     void SetInputRegister(int nReg, MHEngine *engine) override; // MHRoot
   protected:
-    int m_nEventReg;
-    int m_nSceneCoordX, m_nSceneCoordY;
-    int m_nAspectRatioW, m_nAspectRatioH;
-    bool m_fMovingCursor;
+    int m_nEventReg      {0};
+    int m_nSceneCoordX   {0};
+    int m_nSceneCoordY   {0};
+
+    // TODO: In UK MHEG 1.06 the aspect ratio is optional and if not specified "the
+    // scene has no aspect ratio".
+    int m_nAspectRatioW  {4};
+    int m_nAspectRatioH  {3};
+    bool m_fMovingCursor {false};
     // We don't use the Next-Scenes info at the moment.
 //  MHSceneSeq m_NextScenes; // Preload info for next scenes.
     friend class MHEngine;
@@ -110,7 +115,7 @@ class MHScene : public MHGroup
 class MHApplication : public MHGroup  
 {
   public:
-    MHApplication();
+    MHApplication() { m_fIsApp = true; }
     virtual ~MHApplication();
     const char *ClassName() override // MHRoot
         { return "Application"; }
@@ -123,22 +128,26 @@ class MHApplication : public MHGroup
   protected:
     MHActionSequence m_OnSpawnCloseDown, m_OnRestart;
     // Default attributes.
-    int         m_nCharSet;
+    int         m_nCharSet      {0};
     MHColour    m_BGColour, m_TextColour, m_ButtonRefColour, m_HighlightRefColour, m_SliderRefColour;
-    int         m_nTextCHook, m_nIPCHook, m_nStrCHook, m_nBitmapCHook, m_nLineArtCHook;
+    int         m_nTextCHook    {0};
+    int         m_nIPCHook      {0};
+    int         m_nStrCHook     {0};
+    int         m_nBitmapCHook  {0};
+    int         m_nLineArtCHook {0};
     MHFontBody  m_Font;
     MHOctetString   m_FontAttrs;
-    int         m_tuneinfo;
+    int         m_tuneinfo      {0};
 
     // Internal attributes and additional state
-    int  m_nLockCount; // Count for locking the screen
+    int         m_nLockCount    {0}; // Count for locking the screen
     // Display stack.  Visible items with the lowest item in the stack first.
     // Later items may obscure earlier.
     MHSequence <MHVisible *> m_DisplayStack;
     int FindOnStack(const MHRoot *pVis); // Returns the index on the stack or -1 if it's not there.
 
-    MHScene *m_pCurrentScene;
-    bool m_fRestarting;
+    MHScene    *m_pCurrentScene {nullptr};
+    bool        m_fRestarting   {false};
     QString m_Path; // Path from the root directory to this application.  Either the null string or
                     // a string of the form /a/b/c .
 
