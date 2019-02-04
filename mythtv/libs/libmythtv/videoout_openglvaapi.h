@@ -2,8 +2,7 @@
 #define VIDEOOUTPUTOPENGLVAAPI_H
 
 #include "videoout_opengl.h"
-
-class VAAPIContext;
+#include "vaapicontext.h"
 
 class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
 {
@@ -12,19 +11,14 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
     static bool AllowVAAPIDisplay();
 
     VideoOutputOpenGLVAAPI();
-   ~VideoOutputOpenGLVAAPI();
+   ~VideoOutputOpenGLVAAPI() override;
 
     bool  Init(const QSize &video_dim_buf,
                const QSize &video_dim_disp,
                float aspect, WId winid,
                const QRect &win_rect, MythCodecID codec_id) override; // VideoOutputOpenGL
-    bool  CreateVAAPIContext(QSize size);
-    void  DeleteVAAPIContext(void);
     bool  CreateBuffers(void) override; // VideoOutputOpenGL
-    void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
-    uint8_t* GetSurfaceIDPointer(void* buf);
     void  SetProfile(void) override; // VideoOutputOpenGL
-    void  TearDown(void) override; // VideoOutputOpenGL
     bool  InputChanged(const QSize &video_dim_buf,
                        const QSize &video_dim_disp,
                        float aspect,
@@ -47,8 +41,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
                                              AVPixelFormat &pix_fmt);
 
   private:
-    VAAPIContext *m_ctx;
-    void         *m_pauseBuffer;
+    VAAPIContext m_vaapiContext;
 };
 #endif // VIDEOOUTPUTOPENGLVAAPI_H
 

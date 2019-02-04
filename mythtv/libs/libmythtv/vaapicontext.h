@@ -1,81 +1,81 @@
 #ifndef VAAPICONTEXT_H
 #define VAAPICONTEXT_H
 
-extern "C" {
-#include "libavcodec/vaapi.h"
-}
+
+// Qt
+#include <QHash>
+
+// MythTV
+#include "referencecounter.h"
+#include "videoouttypes.h"
+#include "mythcodecid.h"
+
+// VAAPI
+#include "va/va.h"
 #include "va/va_version.h"
 #if VA_CHECK_VERSION(0,34,0)
 #include "va/va_compat.h"
 #endif
-#include "va/va_x11.h"
 #include "va/va_glx.h"
-#include "videocolourspace.h"
 
-struct vaapi_surface
+class MythRenderOpenGL;
+class VideoColourSpace;
+
+// FFmpeg
+extern "C" {
+#include "libavutil/pixfmt.h"
+#include "libavutil/hwcontext.h"
+#include "libavcodec/avcodec.h"
+}
+
+#define NUM_VAAPI_BUFFERS 24
+
+class MythVAAPIDisplay : public ReferenceCounter
 {
-    VASurfaceID m_id;
-};
+  public:
+    explicit    MythVAAPIDisplay(MythRenderOpenGL *Context);
+    static void MythVAAPIDisplayDestroy(MythRenderOpenGL *Context, VADisplay Display);
+    static void MythVAAPIDisplayDestroyCallback(void* Context, void* Wait, void *Display);
 
-class VAAPIDisplay;
-class OpenGLVideo;
+    MythRenderOpenGL *m_context;
+    VADisplay         m_vaDisplay;
 
-enum VAAPIDisplayType
-{
-    kVADisplayX11,
-    kVADisplayGLX,
+  protected:
+   ~MythVAAPIDisplay();
 };
 
 class VAAPIContext
 {
   public:
-    static bool IsFormatAccelerated(QSize size, MythCodecID codec,
-                                    AVPixelFormat &pix_fmt);
-    VAAPIContext(VAAPIDisplayType display_type, MythCodecID codec);
+    VAAPIContext();
    ~VAAPIContext();
+    static MythCodecID GetBestSupportedCodec(AVCodec **Codec,
+                                             const QString &Decoder,
+                                             uint StreamType,
+                                             AVPixelFormat &PixFmt);
+    static void HWFramesContextFinished(struct AVHWFramesContext *Context);
+    static void HWDeviceContextFinished(struct AVHWDeviceContext *Context);
+    static void InitVAAPIContext(AVCodecContext *Context);
+    static int  HwDecoderInit(AVCodecContext *Context);
+    static void HWDecoderInitCallback(void*, void* Wait, void *Data);
+    bool  CopySurfaceToTexture(MythRenderOpenGL *Context,
+                               VideoFrame *Frame, uint Texture,
+                               uint TextureType, FrameScanType Scan);
+    void  InitPictureAttributes(VADisplay Display, VideoColourSpace &Colourspace);
+    int   SetPictureAttribute(PictureAttribute Attribute, int NewValue);
 
-    bool  CreateDisplay(QSize size, bool noreuse = false);
-    bool  CreateBuffers(void);
-    void* GetVideoSurface(int i);
-    uint8_t* GetSurfaceIDPointer(void* buf);
-    
-    int   GetNumBuffers(void)          const { return m_numSurfaces; }
-    AVPixelFormat GetPixelFormat(void) const { return m_pix_fmt;     }
+  private:
+    void* GetGLXSurface(uint Texture, uint TextureType, int Width, int Height, MythVAAPIDisplay *Display);
+    void  DeleteGLXSurface(void);
 
-    // X11 display
-    bool  CopySurfaceToFrame(VideoFrame *frame, const void *buf);
-    bool  InitImage(const void *buf);
-    // GLX display
-    bool  CopySurfaceToTexture(const void* buf, uint texture,
-                               uint texture_type, FrameScanType scan);
-    void* GetGLXSurface(uint texture, uint texture_type);
-    void  ClearGLXSurfaces(void);
-
-    bool InitDisplay(void);
-    bool InitProfiles(void);
-    bool InitBuffers(void);
-    bool InitContext(void);
-    void InitPictureAttributes(VideoColourSpace &colourspace);
-    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
-
-    VAAPIDisplayType m_dispType;
-    vaapi_context  m_ctx;
-    MythCodecID    m_codec;
-    QSize          m_size;
-    VAAPIDisplay  *m_display;
-    VAProfile      m_vaProfile;
-    VAEntrypoint   m_vaEntrypoint;
-    AVPixelFormat  m_pix_fmt;
-    int            m_numSurfaces;
-    VASurfaceID   *m_surfaces;
-    vaapi_surface *m_surfaceData;
-    QHash<uint, void*> m_glxSurfaces;
+    void               *m_glxSurface;
+    GLuint              m_glxSurfaceTexture;
+    GLenum              m_glxSurfaceTextureType;
+    QSize               m_glxSurfaceSize;
+    MythVAAPIDisplay   *m_glxSurfaceDisplay;
     VADisplayAttribute* m_pictureAttributes;
-    int            m_pictureAttributeCount;
-    int            m_hueBase;
-    VAImage        m_image;
-    bool           m_deriveSupport;
-    MythUSWCCopy  *m_copy;
+    int                 m_pictureAttributeCount;
+    int                 m_hueBase;
 };
 
 #endif // VAAPICONTEXT_H

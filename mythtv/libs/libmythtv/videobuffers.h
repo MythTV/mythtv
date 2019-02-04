@@ -133,6 +133,7 @@ class MTV_PUBLIC VideoBuffers
     frame_queue_t         *Queue(BufferType type);
     const frame_queue_t   *Queue(BufferType type) const;
     VideoFrame            *GetNextFreeFrameInternal(BufferType enqueue_to);
+    void                   ReleaseDecoderResources(VideoFrame *);
 
     frame_queue_t          available, used, limbo, pause, displayed, decode, finished;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
@@ -142,7 +143,7 @@ class MTV_PUBLIC VideoBuffers
     uint                   needfreeframes;
     uint                   needprebufferframes;
     uint                   needprebufferframes_normal;
-    uint                   needprebufferframes_small;;
+    uint                   needprebufferframes_small;
     uint                   keepprebufferframes;
     bool                   createdpauseframe;
 

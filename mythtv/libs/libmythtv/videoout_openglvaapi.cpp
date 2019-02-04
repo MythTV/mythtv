@@ -31,18 +31,13 @@ void VideoOutputOpenGLVAAPI::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()
-  : VideoOutputOpenGL(), m_ctx(nullptr), m_pauseBuffer(nullptr)
+  : VideoOutputOpenGL(),
+    m_vaapiContext()
 {
 }
 
 VideoOutputOpenGLVAAPI::~VideoOutputOpenGLVAAPI()
 {
-    TearDown();
-}
-
-void VideoOutputOpenGLVAAPI::TearDown(void)
-{
-    DeleteVAAPIContext();
 }
 
 bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &video_dim_buf,
@@ -119,63 +114,11 @@ bool VideoOutputOpenGLVAAPI::Init(const QSize &video_dim_buf,
     bool ok = VideoOutputOpenGL::Init(video_dim_buf, video_dim_disp,
                                       aspect, winid,
                                       win_rect, codec_id);
+
     if (ok && codec_is_vaapi(video_codec_id))
-        return CreateVAAPIContext(window.GetActualVideoDim());
+        for (int i = 0; i < NUM_VAAPI_BUFFERS; i++)
+            ok &= vbuffers.CreateBuffer(video_dim_disp.width(), video_dim_disp.height(), i, nullptr, FMT_VAAPI);
     return ok;
-}
-
-bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
-{
-    // FIXME During a video stream change this is called from the decoder
-    // thread - which breaks all other efforts to remove non-UI thread
-    // access to the OpenGL context. There is no obvious fix however - if we
-    // don't delete and re-create the VAAPI decoder context immediately then
-    // the decoder fails and playback exits.
-
-    // lvr 27-oct-13
-    // in 0.27 if m_ctx->CreateDisplay is called outside of the UI thread then
-    // it fails, which then causes subsequent unbalanced calls to doneCurrent
-    // which results in Qt aborting.  So just fail if non-UI.
-    if (!gCoreContext->IsUIThread())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "CreateVAAPIContext called from non-UI thread");
-        return false;
-    }
-
-    OpenGLLocker ctx_lock(gl_context);
-
-    if (m_ctx)
-        DeleteVAAPIContext();
-
-    m_ctx = new VAAPIContext(kVADisplayGLX, video_codec_id);
-    if (m_ctx && m_ctx->CreateDisplay(size) && m_ctx->CreateBuffers())
-    {
-        int num_buffers = m_ctx->GetNumBuffers();
-        const QSize video_dim = window.GetActualVideoDim();
-
-        bool ok = true;
-        for (int i = 0; i < num_buffers; i++)
-        {
-            ok &= vbuffers.CreateBuffer(video_dim.width(),
-                                        video_dim.height(), i,
-                                        m_ctx->GetVideoSurface(i),
-                                        FMT_VAAPI);
-        }
-        InitPictureAttributes();
-        return ok;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI context.");
-    errorState = kError_Unknown;
-    return false;
-}
-
-void VideoOutputOpenGLVAAPI::DeleteVAAPIContext(void)
-{
-    QMutexLocker locker(&gl_context_lock);
-    delete m_ctx;
-    m_ctx = nullptr;
 }
 
 bool VideoOutputOpenGLVAAPI::CreateBuffers(void)
@@ -187,23 +130,6 @@ bool VideoOutputOpenGLVAAPI::CreateBuffers(void)
         return true;
     }
     return VideoOutputOpenGL::CreateBuffers();
-}
-
-void* VideoOutputOpenGLVAAPI::GetDecoderContext(unsigned char* buf, uint8_t*& id)
-{
-    if (m_ctx)
-    {
-        id = GetSurfaceIDPointer(buf);
-        return &m_ctx->m_ctx;
-    }
-    return nullptr;
-}
-
-uint8_t* VideoOutputOpenGLVAAPI::GetSurfaceIDPointer(void* buf)
-{
-    if (m_ctx)
-        return m_ctx->GetSurfaceIDPointer(buf);
-    return nullptr;
 }
 
 void VideoOutputOpenGLVAAPI::SetProfile(void)
@@ -234,21 +160,15 @@ bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool interlaced, const QString& ov
 
 void VideoOutputOpenGLVAAPI::InitPictureAttributes(void)
 {
-    if (codec_is_vaapi(video_codec_id))
-    {
-        if (m_ctx)
-            m_ctx->InitPictureAttributes(videoColourSpace);
-        return;
-    }
     VideoOutputOpenGL::InitPictureAttributes();
 }
 
 int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
-                                                int newValue)
+int newValue)
 {
     int val = newValue;
-    if (codec_is_vaapi(video_codec_id) && m_ctx)
-        val = m_ctx->SetPictureAttribute(attribute, newValue);
+    if (codec_is_vaapi(video_codec_id))
+        val = m_vaapiContext.SetPictureAttribute(attribute, newValue);
     return VideoOutputOpenGL::SetPictureAttribute(attribute, val);
 }
 
@@ -265,7 +185,7 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     {
         VideoFrame *frame = vbuffers.Head(kVideoBuffer_used);
         CopyFrame(&av_pause_frame, frame);
-        m_pauseBuffer = frame->buf;
+        //m_pauseBuffer = frame->buf;
         disp_timecode = frame->disp_timecode;
     }
     else
@@ -277,23 +197,17 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
 
 void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd)
 {
-    if (!gl_context)
-        return;
-
-    QMutexLocker locker(&gl_context_lock);
-    if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
     {
-        MythGLTexture *texture = gl_videochain->GetInputTexture();
-        GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
-        if (texture->m_texture)
+        QMutexLocker locker(&gl_context_lock);
+        if (codec_is_vaapi(video_codec_id) && gl_videochain)
         {
-            gl_context->makeCurrent();
-            m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer, textureid,
-                                        GL_TEXTURE_2D, scan);
-            gl_context->doneCurrent();
+            // TODO pause frame
+            MythGLTexture *texture = gl_videochain->GetInputTexture();
+            GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
+            m_vaapiContext.CopySurfaceToTexture(gl_context, frame ? frame : nullptr /*av_pause_frame*/,
+                                                textureid, GL_TEXTURE_2D, scan);
         }
     }
-
     VideoOutputOpenGL::PrepareFrame(frame, scan, osd);
 }
 
@@ -308,27 +222,6 @@ QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(
         list += "openglvaapi";
     }
     return list;
-}
-
-MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
-    uint width,       uint height, const QString &decoder,
-    uint stream_type, bool no_acceleration,
-    AVPixelFormat &pix_fmt)
-{
-    QSize size(width, height);
-    bool use_cpu = no_acceleration;
-    AVPixelFormat fmt = AV_PIX_FMT_YUV420P;
-    MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VAAPI + (stream_type - 1));
-    if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI") && AllowVAAPIDisplay())
-        use_cpu |= !VAAPIContext::IsFormatAccelerated(size, test_cid, fmt);
-    else
-        use_cpu = true;
-
-    if (use_cpu)
-        return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
-
-    pix_fmt = fmt;
-    return test_cid;
 }
 
 // We currently (v30) only support rendering to a GLX surface.

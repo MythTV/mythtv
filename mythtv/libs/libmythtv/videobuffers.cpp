@@ -243,6 +243,24 @@ void VideoBuffers::SetPrebuffering(bool normal)
         needprebufferframes_normal : needprebufferframes_small;
 }
 
+void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
+{
+#ifdef USING_VAAPI
+    if (Frame->pix_fmt == AV_PIX_FMT_VAAPI)
+    {
+        AVBufferRef* ref = (AVBufferRef*)Frame->priv[0];
+        if (ref)
+            av_buffer_unref(&ref);
+        ref = (AVBufferRef*)Frame->priv[1];
+        if (ref)
+            av_buffer_unref(&ref);
+        Frame->priv[0] = Frame->priv[1] = nullptr;
+    }
+#else
+    (void)Frame;
+#endif
+}
+
 VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
 {
     QMutexLocker locker(&global_lock);
@@ -344,7 +362,10 @@ void VideoBuffers::DeLimboFrame(VideoFrame *frame)
     // if decoder didn't release frame and the buffer is getting released by
     // the decoder assume that the frame is lost and return to available
     if (!decode.contains(frame))
+    {
+        ReleaseDecoderResources(frame);
         SafeEnqueue(kVideoBuffer_avail, frame);
+    }
 
     // remove from decode queue since the decoder is finished
     while (decode.contains(frame))
@@ -382,6 +403,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
         if (!decode.contains(*it))
         {
             Remove(kVideoBuffer_finished, *it);
+            ReleaseDecoderResources(*it);
             Enqueue(kVideoBuffer_avail, *it);
         }
     }
@@ -395,6 +417,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
 void VideoBuffers::DiscardFrame(VideoFrame *frame)
 {
     QMutexLocker locker(&global_lock);
+    ReleaseDecoderResources(frame);
     SafeEnqueue(kVideoBuffer_avail, frame);
 }
 
