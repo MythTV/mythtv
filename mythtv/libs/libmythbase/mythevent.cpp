@@ -26,3 +26,5 @@ QEvent::Type MythEvent::kEnableUDPListenerEventType =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ExternalKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythCallbackEvent::kCallbackType =
+    (QEvent::Type) QEvent::registerEventType();

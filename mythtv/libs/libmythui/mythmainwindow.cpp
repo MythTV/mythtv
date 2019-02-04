@@ -2594,6 +2594,12 @@ void MythMainWindow::customEvent(QEvent *ce)
     {
         GetNotificationCenter()->ProcessQueue();
     }
+    else if (ce->type() == MythCallbackEvent::kCallbackType)
+    {
+        MythCallbackEvent *me = static_cast<MythCallbackEvent*>(ce);
+        if (me && me->m_function)
+            me->m_function(me->m_opaque1, me->m_opaque2, me->m_opaque3);
+    }
 }
 
 QObject *MythMainWindow::getTarget(QKeyEvent &key)
