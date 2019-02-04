@@ -2,7 +2,7 @@
 #define VIDEOOUTPUTOPENGLVAAPI_H
 
 #include "videoout_opengl.h"
-#include "vaapicontext.h"
+#include "mythopenglinterop.h"
 
 class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
 {
@@ -41,7 +41,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
                                              AVPixelFormat &pix_fmt);
 
   private:
-    VAAPIContext m_vaapiContext;
+    MythOpenGLInterop m_vaapiInterop;
 };
 #endif // VIDEOOUTPUTOPENGLVAAPI_H
 

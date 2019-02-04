@@ -1,12 +1,8 @@
 #ifndef VAAPICONTEXT_H
 #define VAAPICONTEXT_H
 
-// Qt
-#include <QHash>
-
 // MythTV
 #include "referencecounter.h"
-#include "videoouttypes.h"
 #include "mythcodecid.h"
 
 // VAAPI
@@ -18,7 +14,6 @@
 #include "va/va_glx.h"
 
 class MythRenderOpenGL;
-class VideoColourSpace;
 
 // FFmpeg
 extern "C" {
@@ -26,6 +21,17 @@ extern "C" {
 #include "libavutil/hwcontext.h"
 #include "libavcodec/avcodec.h"
 }
+
+#define INIT_ST \
+  VAStatus va_status; \
+  bool ok = true
+
+#define CHECK_ST \
+  ok &= (va_status == VA_STATUS_SUCCESS); \
+  if (!ok) \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
+              .arg(__FILE__).arg( __LINE__).arg(va_status) \
+              .arg(vaErrorStr(va_status)))
 
 #define NUM_VAAPI_BUFFERS 24
 
@@ -57,28 +63,6 @@ class VAAPIContext
     static void InitVAAPIContext(AVCodecContext *Context);
     static int  HwDecoderInit(AVCodecContext *Context);
     static void HWDecoderInitCallback(void*, void* Wait, void *Data);
-    bool  CopySurfaceToTexture(MythRenderOpenGL *Context,
-                               VideoColourSpace *ColourSpace,
-                               VideoFrame *Frame, uint Texture,
-                               uint TextureType, FrameScanType Scan);
-    int   SetPictureAttribute(PictureAttribute Attribute, int NewValue);
-
-  private:
-    void  InitPictureAttributes(void);
-    void* GetGLXSurface(uint Texture, uint TextureType, VideoFrame *Frame,
-                        MythVAAPIDisplay *Display, VideoColourSpace *ColourSpace);
-    void  DeleteGLXSurface(void);
-
-    void               *m_glxSurface;
-    GLuint              m_glxSurfaceTexture;
-    GLenum              m_glxSurfaceTextureType;
-    QSize               m_glxSurfaceSize;
-    MythVAAPIDisplay   *m_glxSurfaceDisplay;
-    VideoColourSpace   *m_colourSpace;
-    VADisplayAttribute* m_pictureAttributes;
-    int                 m_pictureAttributeCount;
-    int                 m_hueBase;
-    uint                m_vaapiColourSpace;
 };
 
 #endif // VAAPICONTEXT_H
