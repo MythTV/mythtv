@@ -12,13 +12,13 @@
 class DisplayInfo
 {
   public:
-    DisplayInfo(void)  : size(QSize(0,0)), res(QSize(0,0)), rate(-1) { }
-    explicit DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  { }
+    DisplayInfo(void) = default;
+    explicit DisplayInfo(int r) : m_rate(r)  { }
 
-    int Rate(void) const { return lroundf(rate); }
-    QSize size;
-    QSize res;
-    float rate;
+    int Rate(void) const { return lroundf(m_rate); }
+    QSize m_size {0,0};
+    QSize m_res  {0,0};
+    float m_rate {-1};
 };
 
 class MUI_PUBLIC MythDisplay

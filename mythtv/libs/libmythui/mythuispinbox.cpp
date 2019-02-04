@@ -10,12 +10,6 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 
-MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
-    : MythUIButtonList(parent, name), m_hasTemplate(false),
-      m_moveAmount(0), m_low(0), m_high(0), m_step(0)
-{
-}
-
 /**
  * \brief Set the lower and upper bounds of the spinbox, the interval and page
  *        amount

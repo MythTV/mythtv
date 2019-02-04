@@ -80,18 +80,6 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
 {
     m_parentEdit = parentEdit;
 
-    m_shift = false;
-    m_alt = false;
-    m_lock = false;
-
-    m_lockButton = nullptr;
-    m_altButton = nullptr;
-    m_compButton = nullptr;
-    m_shiftRButton = nullptr;
-    m_shiftLButton = nullptr;
-
-    m_composing = false;
-
     if (m_parentEdit)
         m_preferredPos = m_parentEdit->GetKeyboardPosition();
      else

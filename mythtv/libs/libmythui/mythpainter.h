@@ -125,12 +125,12 @@ class MUI_PUBLIC MythPainter
 
     void CheckFormatImage(MythImage *im);
 
-    QPaintDevice *m_Parent;
-    int m_HardwareCacheSize;
+    QPaintDevice *m_Parent      {nullptr};
+    int m_HardwareCacheSize     {0};
     int m_MaxHardwareCacheSize;
 
   private:
-    int64_t m_SoftwareCacheSize;
+    int64_t m_SoftwareCacheSize {0};
     int64_t m_MaxSoftwareCacheSize;
 
     QMutex           m_allocationLock;
@@ -139,8 +139,8 @@ class MUI_PUBLIC MythPainter
     QMap<QString, MythImage *> m_StringToImageMap;
     std::list<QString>         m_StringExpireList;
 
-    bool m_showBorders;
-    bool m_showNames;
+    bool m_showBorders          {false};
+    bool m_showNames            {false};
 };
 
 #endif

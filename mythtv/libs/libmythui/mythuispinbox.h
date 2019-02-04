@@ -17,7 +17,8 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
 {
     Q_OBJECT
   public:
-    MythUISpinBox(MythUIType *parent, const QString &name);
+    MythUISpinBox(MythUIType *parent, const QString &name)
+        : MythUIButtonList(parent, name) {}
     ~MythUISpinBox() = default;
 
     void SetRange(int low, int high, int step, uint pageMultiple = 5);
@@ -43,15 +44,15 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
     void ShowEntryDialog(QString initialEntry);
 
-    bool m_hasTemplate;
+    bool    m_hasTemplate      {false};
     QString m_negativeTemplate;
     QString m_zeroTemplate;
     QString m_positiveTemplate;
 
-    uint m_moveAmount;
-    int m_low;
-    int m_high;
-    int m_step;
+    uint    m_moveAmount       {0};
+    int     m_low              {0};
+    int     m_high             {0};
+    int     m_step             {0};
 };
 
 // Convenience Dialog to allow entry of a Spinbox value

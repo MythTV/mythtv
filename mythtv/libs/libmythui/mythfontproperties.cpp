@@ -23,10 +23,7 @@
 QMutex MythFontProperties::m_zoom_lock;
 uint MythFontProperties::m_zoom_percent = 0;
 
-MythFontProperties::MythFontProperties(void) :
-    m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
-    m_hasOutline(false), m_outlineSize(0), m_outlineAlpha(255),
-    m_relativeSize(0.05f), m_bFreeze(false), m_stretch(100)
+MythFontProperties::MythFontProperties(void)
 {
     Zoom();
     CalcHash();

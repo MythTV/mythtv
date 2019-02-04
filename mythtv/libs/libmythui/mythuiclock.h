@@ -43,11 +43,11 @@ class MUI_PUBLIC MythUIClock : public MythUIText
     QDateTime m_nextUpdate;
 
     QString m_Format;
-    QString m_TimeFormat;
-    QString m_DateFormat;
-    QString m_ShortDateFormat;
+    QString m_TimeFormat      {"h:mm ap"};
+    QString m_DateFormat      {"ddd d MMM yyyy"};
+    QString m_ShortDateFormat {"ddd M/d"};
 
-    bool m_Flash;
+    bool    m_Flash           {false};
 };
 
 #endif

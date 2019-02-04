@@ -51,11 +51,11 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
 
     void SetInitialStates(void);
 
-    MythUIStateType *m_BackgroundState;
-    MythUIStateType *m_CheckState;
+    MythUIStateType *m_BackgroundState {nullptr};
+    MythUIStateType *m_CheckState      {nullptr};
 
-    MythUIStateType::StateType m_currentCheckState;
-    QString m_state;
+    MythUIStateType::StateType m_currentCheckState {MythUIStateType::Off};
+    QString m_state                    {"active"};
 };
 
 #endif

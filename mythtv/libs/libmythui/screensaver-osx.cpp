@@ -10,7 +10,7 @@ public:
         UpdateSystemActivity(OverallAct);
     };
 
-    CFRunLoopTimerRef m_timer;
+    CFRunLoopTimerRef m_timer {nullptr};
 
     friend class ScreenSaverOSX;
 };
@@ -18,7 +18,6 @@ public:
 ScreenSaverOSX::ScreenSaverOSX()
 {
     d = new ScreenSaverOSXPrivate();
-    d->m_timer = nullptr;
 }
 
 ScreenSaverOSX::~ScreenSaverOSX()

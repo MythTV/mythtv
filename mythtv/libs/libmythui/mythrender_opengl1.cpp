@@ -258,8 +258,8 @@ void MythRenderOpenGL1::PushTransformation(const UIEffects &fx, QPointF &center)
     makeCurrent();
     glPushMatrix();
     glTranslatef(center.x(), center.y(), 0.0);
-    glScalef(fx.hzoom, fx.vzoom, 1.0);
-    glRotatef(fx.angle, 0, 0, 1);
+    glScalef(fx.m_hzoom, fx.m_vzoom, 1.0);
+    glRotatef(fx.m_angle, 0, 0, 1);
     glTranslatef(-center.x(), -center.y(), 0.0);
     doneCurrent();
 }

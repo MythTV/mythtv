@@ -41,21 +41,22 @@ class MUI_PUBLIC D3D9Image
 
   private:
     QSize                   m_size;
-    bool                    m_valid;
-    MythRenderD3D9         *m_render;
-    IDirect3DVertexBuffer9 *m_vertexbuffer;
-    IDirect3DTexture9      *m_texture;
-    IDirect3DSurface9      *m_surface;
+    bool                    m_valid        {false};
+    MythRenderD3D9         *m_render       {nullptr};
+    IDirect3DVertexBuffer9 *m_vertexbuffer {nullptr};
+    IDirect3DTexture9      *m_texture      {nullptr};
+    IDirect3DSurface9      *m_surface      {nullptr};
 };
 
 class MUI_PUBLIC D3D9Locker
 {
   public:
-    explicit D3D9Locker(MythRenderD3D9 *render);
+    explicit D3D9Locker(MythRenderD3D9 *render)
+        : m_render(render) {}
    ~D3D9Locker();
     IDirect3DDevice9* Acquire(void);
   private:
-    MythRenderD3D9 *m_render;
+    MythRenderD3D9 *m_render {nullptr};
 };
 
 class MUI_PUBLIC MythRenderD3D9 : public MythRender
@@ -63,7 +64,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
   public:
     static void* ResolveAddress(const char* lib, const char* proc);
 
-    MythRenderD3D9();
+    MythRenderD3D9() : MythRender(kRenderDirect3D9) {}
 
     bool Create(QSize size, HWND window);
     bool Test(bool &reset);
@@ -116,20 +117,20 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     QMap<IDirect3DVertexBuffer9*, MythD3DVertexBuffer> m_vertexbuffers;
     QMap<IDirect3DSurface9*, MythD3DSurface>           m_surfaces;
 
-    IDirect3D9             *m_d3d;
-    IDirect3DDevice9       *m_rootD3DDevice;
-    D3DFORMAT               m_adaptor_fmt;
-    D3DFORMAT               m_videosurface_fmt;
-    D3DFORMAT               m_surface_fmt;
-    D3DFORMAT               m_texture_fmt;
-    IDirect3DVertexBuffer9 *m_rect_vertexbuffer;
-    IDirect3DSurface9      *m_default_surface;
-    IDirect3DSurface9      *m_current_surface;
+    IDirect3D9             *m_d3d                 {nullptr};
+    IDirect3DDevice9       *m_rootD3DDevice       {nullptr};
+    D3DFORMAT               m_adaptor_fmt         {D3DFMT_UNKNOWN};
+    D3DFORMAT               m_videosurface_fmt    {D3DFMT_UNKNOWN};
+    D3DFORMAT               m_surface_fmt         {D3DFMT_UNKNOWN};
+    D3DFORMAT               m_texture_fmt         {D3DFMT_UNKNOWN};
+    IDirect3DVertexBuffer9 *m_rect_vertexbuffer   {nullptr};
+    IDirect3DSurface9      *m_default_surface     {nullptr};
+    IDirect3DSurface9      *m_current_surface     {nullptr};
 
-    QMutex                  m_lock;
-    bool                    m_blend;
-    bool                    m_multi_texturing;
-    bool                    m_texture_vertices;
+    QMutex                  m_lock                {QMutex::Recursive};
+    bool                    m_blend               {true};
+    bool                    m_multi_texturing     {true};
+    bool                    m_texture_vertices    {true};
 
   public:
     IDirect3DDevice9* AcquireDevice(void);
@@ -141,9 +142,9 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     void DestroyDeviceManager(void);
 
   private:
-    IDirect3DDeviceManager9 *m_deviceManager;
-    HANDLE                   m_deviceHandle;
-    uint                     m_deviceManagerToken;
+    IDirect3DDeviceManager9 *m_deviceManager      {nullptr};
+    HANDLE                   m_deviceHandle       {nullptr};
+    uint                     m_deviceManagerToken {0};
 };
 
 #endif // MYTHRENDER_D3D9_H

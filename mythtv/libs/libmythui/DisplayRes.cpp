@@ -12,38 +12,38 @@
 #endif
 
 
-DisplayRes * DisplayRes::m_instance = nullptr;
-bool         DisplayRes::m_locked   = false;
+DisplayRes * DisplayRes::s_instance = nullptr;
+bool         DisplayRes::s_locked   = false;
 
 DisplayRes * DisplayRes::GetDisplayRes(bool lock)
 {
-    if (lock && m_locked)
+    if (lock && s_locked)
         return nullptr;
 
-    if (!m_instance)
+    if (!s_instance)
     {
 #ifdef USING_XRANDR
-        m_instance = new DisplayResX();
+        s_instance = new DisplayResX();
 #elif CONFIG_DARWIN
-        m_instance = new DisplayResOSX();
+        s_instance = new DisplayResOSX();
 #endif
     }
 
-    if (m_instance && lock)
-        m_locked = true;
+    if (s_instance && lock)
+        s_locked = true;
 
-    return m_instance;
+    return s_instance;
 }
 
 void DisplayRes::Unlock(void)
 {
-    m_locked = false;
+    s_locked = false;
 }
 
 void DisplayRes::SwitchToDesktop()
 {
-    if (m_instance)
-        m_instance->SwitchToGUI(DESKTOP);
+    if (s_instance)
+        s_instance->SwitchToGUI(DESKTOP);
 }
 
 bool DisplayRes::Initialize(void)

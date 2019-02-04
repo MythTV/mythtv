@@ -23,9 +23,6 @@ ThemeInfo::ThemeInfo(QString theme)
         themeNoTrailingSlash.chop(1);
     }
     m_theme = QFileInfo(themeNoTrailingSlash);
-    m_type = THEME_UNKN;
-    m_baseres = QSize(800, 600);
-    m_majorver = m_minorver = 0;
 
     if (m_theme.exists())
         // since all the usages have a / inserted, remove the one in the url

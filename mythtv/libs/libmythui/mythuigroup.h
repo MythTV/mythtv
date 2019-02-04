@@ -12,7 +12,8 @@ class MUI_PUBLIC MythUIGroup : public MythUIComposite
 {
 
   public:
-    MythUIGroup(MythUIType *parent, const QString &name);
+    MythUIGroup(MythUIType *parent, const QString &name)
+        : MythUIComposite(parent, name) {}
    ~MythUIGroup() = default;
 
     void Reset(void) override; // MythUIType

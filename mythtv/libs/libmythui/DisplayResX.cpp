@@ -25,11 +25,11 @@ bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                                  int &h_mm, double &rate, double &par) const
 {
     DisplayInfo info = MythDisplay::GetDisplayInfo();
-    w_mm   = info.size.width();
-    h_mm   = info.size.height();
-    w_pix  = info.res.width();
-    h_pix  = info.res.height();
-    rate   = 1000000.0f / info.rate;
+    w_mm   = info.m_size.width();
+    h_mm   = info.m_size.height();
+    w_pix  = info.m_res.width();
+    h_pix  = info.m_res.height();
+    rate   = 1000000.0f / info.m_rate;
     par    = 1.0;
 
     if (w_mm > 0 && h_mm > 0 && w_pix > 0 && h_pix > 0)

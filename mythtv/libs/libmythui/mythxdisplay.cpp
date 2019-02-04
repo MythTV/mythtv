@@ -67,13 +67,6 @@ MythXDisplay *OpenMythXDisplay(void)
     return nullptr;
 }
 
-MythXDisplay::MythXDisplay()
-  : m_disp(nullptr), m_screen_num(0), m_screen(nullptr),
-    m_depth(0), m_black(0), m_gc(nullptr),
-    m_root(0), m_lock(QMutex::Recursive)
-{
-}
-
 MythXDisplay::~MythXDisplay()
 {
     MythXLocker locker(this);

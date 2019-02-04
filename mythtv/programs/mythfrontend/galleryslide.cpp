@@ -483,12 +483,12 @@ void Slide::Zoom(int percentage)
 void Slide::SetZoom(float zoom)
 {
     m_zoom          = zoom;
-    m_Effects.hzoom = m_Effects.vzoom = zoom;
+    m_Effects.m_hzoom = m_Effects.m_vzoom = zoom;
 
     // TODO
     // MythUIImage displaces widget or doesn't centre for some combinations of
     // zoom centre/cropping so frig centre for now.
-    m_Effects.centre = zoom < 1.0f ? UIEffects::Middle : UIEffects::TopLeft;
+    m_Effects.m_centre = zoom < 1.0f ? UIEffects::Middle : UIEffects::TopLeft;
 
     SetPan(m_pan);
 }

@@ -47,9 +47,9 @@ class MUI_PUBLIC MythD3D9Painter : public MythPainter
     void DeleteBitmaps(void);
     D3D9Image* GetImageFromCache(MythImage *im);
 
-    MythRenderD3D9               *m_render;
-    D3D9Image                    *m_target;
-    bool                          m_swap_control;
+    MythRenderD3D9               *m_render       {nullptr};
+    D3D9Image                    *m_target       {nullptr};
+    bool                          m_swap_control {true};
     QMap<MythImage *, D3D9Image*> m_ImageBitmapMap;
     std::list<MythImage *>        m_ImageExpireList;
     std::list<D3D9Image*>         m_bitmapDeleteList;

@@ -38,11 +38,11 @@ class MUI_PUBLIC MythUIShape : public MythUIType
     void CreateCopy(MythUIType *parent) override; // MythUIType
 
   private:
-    QString        m_type;
-    QBrush         m_fillBrush;
-    QPen           m_linePen;
-    int            m_cornerRadius;
-    MythRect       m_cropRect;
+    QString        m_type         {"box"};
+    QBrush         m_fillBrush    {Qt::NoBrush};
+    QPen           m_linePen      {Qt::NoPen};
+    int            m_cornerRadius {10};
+    MythRect       m_cropRect     {0,0,0,0};
 
     friend class MythUIProgressBar;
     friend class MythUIEditBar;

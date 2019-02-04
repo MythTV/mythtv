@@ -21,8 +21,6 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
     m_TimeFormat = GetMythDB()->GetSetting("TimeFormat", "h:mm ap");
 
     m_Format = QString("%1, %2").arg(m_DateFormat).arg(m_TimeFormat);
-
-    m_Flash = false;
 }
 
 MythUIClock::~MythUIClock()

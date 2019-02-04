@@ -16,8 +16,6 @@
 MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
     : MythUIComposite(parent, name)
 {
-    m_CurrentState = nullptr;
-    m_ShowEmpty = true;
     emit DependChanged(false);
 }
 

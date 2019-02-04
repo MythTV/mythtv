@@ -6,11 +6,6 @@
 #include <QString>
 #include "lircevent.h"
 
-AppleRemoteListener::AppleRemoteListener(QObject* mainWindow_)
-                   : mainWindow(mainWindow_)
-{
-}
-
 void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
                                             bool pressedDown)
 {

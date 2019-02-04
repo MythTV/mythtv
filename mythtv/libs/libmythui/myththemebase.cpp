@@ -12,10 +12,8 @@
 class MythThemeBasePrivate
 {
   public:
-    MythScreenStack *background;
-    MythScreenType *backgroundscreen;
-
-    MythUIImage *backimg; // just for now
+    MythScreenStack *m_background       {nullptr};
+    MythScreenType  *m_backgroundscreen {nullptr};
 };
 
 
@@ -43,38 +41,38 @@ void MythThemeBase::Reload(void)
     GetGlobalFontManager()->LoadFonts(GetMythUI()->GetThemeDir(), "UI");
     XMLParseBase::LoadBaseTheme();
 
-    d->background->PopScreen(nullptr, false, true);
+    d->m_background->PopScreen(nullptr, false, true);
 
-    d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
+    d->m_backgroundscreen = new MythScreenType(d->m_background, "backgroundscreen");
 
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
-                                          d->backgroundscreen))
+                                          d->m_backgroundscreen))
     {
         // Nada. All themes should use the MythUI code now.
     }
 
-    d->background->AddScreen(d->backgroundscreen, false);
+    d->m_background->AddScreen(d->m_backgroundscreen, false);
 }
 
 void MythThemeBase::Init(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
 
-    d->background = new MythScreenStack(mainWindow, "background");
-    d->background->DisableEffects();
+    d->m_background = new MythScreenStack(mainWindow, "background");
+    d->m_background->DisableEffects();
 
     GetGlobalFontManager()->LoadFonts(GetFontsDir(), "Shared");
     GetGlobalFontManager()->LoadFonts(GetMythUI()->GetThemeDir(), "UI");
     XMLParseBase::LoadBaseTheme();
-    d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
+    d->m_backgroundscreen = new MythScreenType(d->m_background, "backgroundscreen");
 
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
-                                          d->backgroundscreen))
+                                          d->m_backgroundscreen))
     {
         // Nada. All themes should use the MythUI code now.
     }
 
-    d->background->AddScreen(d->backgroundscreen, false);
+    d->m_background->AddScreen(d->m_backgroundscreen, false);
 
     new MythScreenStack(mainWindow, "main stack", true);
 

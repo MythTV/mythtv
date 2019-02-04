@@ -1875,7 +1875,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     // The very first Resize needs to be the maximum possible
     // desired res, because X will mask off anything outside
     // the initial dimensions
-    QSize sz1 = disp.res;
+    QSize sz1 = disp.m_res;
     QSize sz2 = window.GetScreenGeometry().size();
     QSize max_size = sz1.expandedTo(sz2);
 
@@ -1899,7 +1899,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     // DisplayRes, this will be overridden when we call ResizeForVideo
     if (db_display_dim.isEmpty())
     {
-        window.SetDisplayDim(disp.size);
+        window.SetDisplayDim(disp.m_size);
     }
     else
     {
