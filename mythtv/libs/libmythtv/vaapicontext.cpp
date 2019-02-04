@@ -235,8 +235,8 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
     hw_frames_ctx->sw_format         = Context->sw_pix_fmt;
     hw_frames_ctx->initial_pool_size = NUM_VAAPI_BUFFERS;
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
-    hw_frames_ctx->width             = FFALIGN(Context->coded_width, 32);
-    hw_frames_ctx->height            = FFALIGN(Context->coded_height, 32);
+    hw_frames_ctx->width             = Context->coded_width;
+    hw_frames_ctx->height            = Context->coded_height;
     hw_frames_ctx->user_opaque       = display;
     hw_frames_ctx->free              = &VAAPIContext::HWFramesContextFinished;
     res = av_hwframe_ctx_init(Context->hw_frames_ctx);
@@ -298,9 +298,11 @@ VAAPIContext::VAAPIContext(void)
     m_glxSurfaceTextureType(GL_TEXTURE_2D),
     m_glxSurfaceSize(),
     m_glxSurfaceDisplay(nullptr),
+    m_colourSpace(nullptr),
     m_pictureAttributes(nullptr),
     m_pictureAttributeCount(0),
-    m_hueBase(0)
+    m_hueBase(0),
+    m_vaapiColourSpace(0)
 {
 }
 
@@ -310,25 +312,29 @@ VAAPIContext::~VAAPIContext()
     DeleteGLXSurface();
 }
 
-void VAAPIContext::InitPictureAttributes(VADisplay Display, VideoColourSpace &Colourspace)
+void VAAPIContext::InitPictureAttributes(void)
 {
-    if (!Display)
+    m_vaapiColourSpace = 0;
+    if (!m_colourSpace || !m_glxSurfaceDisplay)
+        return;
+    if (!(m_glxSurfaceDisplay->m_vaDisplay && m_glxSurfaceDisplay->m_context))
         return;
 
-    m_hueBase = VideoOutput::CalcHueBase(vaQueryVendorString(Display));
+    m_hueBase = VideoOutput::CalcHueBase(vaQueryVendorString(m_glxSurfaceDisplay->m_vaDisplay));
 
     delete [] m_pictureAttributes;
     m_pictureAttributeCount = 0;
     int supported_controls = kPictureAttributeSupported_None;
     QList<VADisplayAttribute> supported;
-    int num = vaMaxNumDisplayAttributes(Display);
+    int num = vaMaxNumDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay);
     VADisplayAttribute* attribs = new VADisplayAttribute[num];
 
     int actual = 0;
     INIT_ST;
-    va_status = vaQueryDisplayAttributes(Display, attribs, &actual);
+    va_status = vaQueryDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay, attribs, &actual);
     CHECK_ST;
 
+    int updatecscmatrix = -1;
     for (int i = 0; i < actual; i++)
     {
         int type = attribs[i].type;
@@ -336,7 +342,8 @@ void VAAPIContext::InitPictureAttributes(VADisplay Display, VideoColourSpace &Co
             (type == VADisplayAttribBrightness ||
              type == VADisplayAttribContrast ||
              type == VADisplayAttribHue ||
-             type == VADisplayAttribSaturation))
+             type == VADisplayAttribSaturation ||
+             type == VADisplayAttribCSCMatrix))
         {
             supported.push_back(attribs[i]);
             if (type == VADisplayAttribBrightness)
@@ -347,10 +354,12 @@ void VAAPIContext::InitPictureAttributes(VADisplay Display, VideoColourSpace &Co
                 supported_controls += kPictureAttributeSupported_Contrast;
             if (type == VADisplayAttribSaturation)
                 supported_controls += kPictureAttributeSupported_Colour;
+            if (type == VADisplayAttribCSCMatrix)
+                updatecscmatrix = i;
         }
     }
 
-    Colourspace.SetSupportedAttributes((PictureAttributeSupported)supported_controls);
+    m_colourSpace->SetSupportedAttributes(static_cast<PictureAttributeSupported>(supported_controls));
     delete [] attribs;
 
     if (supported.isEmpty())
@@ -362,25 +371,47 @@ void VAAPIContext::InitPictureAttributes(VADisplay Display, VideoColourSpace &Co
         m_pictureAttributes[i] = supported.at(i);
 
     if (supported_controls & kPictureAttributeSupported_Brightness)
-        SetPictureAttribute(kPictureAttribute_Brightness,
-            Colourspace.GetPictureAttribute(kPictureAttribute_Brightness));
+        SetPictureAttribute(kPictureAttribute_Brightness, m_colourSpace->GetPictureAttribute(kPictureAttribute_Brightness));
     if (supported_controls & kPictureAttributeSupported_Hue)
-        SetPictureAttribute(kPictureAttribute_Hue,
-            Colourspace.GetPictureAttribute(kPictureAttribute_Hue));
+        SetPictureAttribute(kPictureAttribute_Hue, m_colourSpace->GetPictureAttribute(kPictureAttribute_Hue));
     if (supported_controls & kPictureAttributeSupported_Contrast)
-        SetPictureAttribute(kPictureAttribute_Contrast,
-            Colourspace.GetPictureAttribute(kPictureAttribute_Contrast));
+        SetPictureAttribute(kPictureAttribute_Contrast, m_colourSpace->GetPictureAttribute(kPictureAttribute_Contrast));
     if (supported_controls & kPictureAttributeSupported_Colour)
-        SetPictureAttribute(kPictureAttribute_Colour,
-            Colourspace.GetPictureAttribute(kPictureAttribute_Colour));
+        SetPictureAttribute(kPictureAttribute_Colour, m_colourSpace->GetPictureAttribute(kPictureAttribute_Colour));
+
+    if (updatecscmatrix > -1)
+    {
+        // FIXME - this is untested. Presumably available with the VDPAU backend.
+        // If functioning correctly we need to turn off all of the other VA picture attributes
+        // as this acts, as for OpenGL, as the master colourspace conversion matrix.
+        // We can also enable Studio levels support.
+        QMatrix4x4 yuv = static_cast<QMatrix4x4>(*m_colourSpace);
+        float raw[9];
+        raw[0] = yuv(0, 0); raw[1] = yuv(0, 1); raw[2] = yuv(0, 2);
+        raw[3] = yuv(1, 0); raw[4] = yuv(1, 1); raw[5] = yuv(1, 2);
+        raw[0] = yuv(2, 0); raw[7] = yuv(2, 1); raw[8] = yuv(2, 2);
+        m_pictureAttributes[updatecscmatrix].value = static_cast<int32_t>(raw[0]);
+        m_glxSurfaceDisplay->m_context->makeCurrent();
+        INIT_ST;
+        va_status = vaSetDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay, &m_pictureAttributes[updatecscmatrix], 1);
+        CHECK_ST;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Updated VAAPI colourspace matrix");
+        m_glxSurfaceDisplay->m_context->doneCurrent();
+        m_vaapiColourSpace = VA_SRC_COLOR_MASK;
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "No CSC matrix support - using limited VAAPI colourspace types");
+    }
 }
 
 int VAAPIContext::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
 {
-    (void)Attribute;
-    (void)NewValue;
-    /*
-    int adj = 0;
+    if (!m_glxSurfaceDisplay ||
+       (m_glxSurfaceDisplay && !(m_glxSurfaceDisplay->m_vaDisplay && m_glxSurfaceDisplay->m_context)))
+        return -1;
+
+    int adjustment = 0;
     VADisplayAttribType attrib = VADisplayAttribBrightness;
     switch (Attribute)
     {
@@ -392,7 +423,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
             break;
         case kPictureAttribute_Hue:
             attrib = VADisplayAttribHue;
-            adj = m_hueBase;
+            adjustment = m_hueBase;
             break;
         case kPictureAttribute_Colour:
             attrib = VADisplayAttribSaturation;
@@ -406,9 +437,11 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
     {
         if (m_pictureAttributes[i].type == attrib)
         {
-            int min = m_pictureAttributes[i].min_value;
-            int max = m_pictureAttributes[i].max_value;
-            int val = min + (int)(((float)((NewValue + adj) % 100) / 100.0f) * (max - min));
+            NewValue = std::min(std::max(NewValue, 0), 100);
+            int newval = NewValue + adjustment;
+            if (newval > 100) newval -= 100;
+            qreal range = (m_pictureAttributes[i].max_value - m_pictureAttributes[i].min_value) / 100.0;
+            int val = m_pictureAttributes[i].min_value + qRound(newval * range);
             m_pictureAttributes[i].value = val;
             found = true;
             break;
@@ -416,23 +449,22 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
     }
 
 
-    if (found && m_context)
+    if (found)
     {
-        m_context->makeCurrent();
+        m_glxSurfaceDisplay->m_context->makeCurrent();
         INIT_ST;
-        va_status = vaSetDisplayAttributes(m_display->m_vaDisplay,
+        va_status = vaSetDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay,
                                            m_pictureAttributes,
                                            m_pictureAttributeCount);
         CHECK_ST;
-        m_context->doneCurrent();
+        m_glxSurfaceDisplay->m_context->doneCurrent();
         return NewValue;
     }
     return -1;
-*/
-    return 0;
 }
 
 bool VAAPIContext::CopySurfaceToTexture(MythRenderOpenGL *Context,
+                                        VideoColourSpace *ColourSpace,
                                         VideoFrame *Frame, uint Texture,
                                         uint TextureType, FrameScanType Scan)
 {
@@ -462,28 +494,49 @@ bool VAAPIContext::CopySurfaceToTexture(MythRenderOpenGL *Context,
     OpenGLLocker locker(display->m_context);
 
     VASurfaceID id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
-    void* glx_surface = GetGLXSurface(Texture, TextureType, Frame->width, Frame->height, display);
+    void* glx_surface = GetGLXSurface(Texture, TextureType, Frame, display, ColourSpace);
     if (!glx_surface)
     {
         LOG(VB_GENERAL, LOG_ERR, "No GLX surface");
         return false;
     }
 
-    uint field = VA_FRAME_PICTURE;
+    uint flags = VA_FRAME_PICTURE;
     if (Scan == kScan_Interlaced)
-        field = Frame->top_field_first ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
+        flags = Frame->top_field_first ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
     else if (Scan == kScan_Intr2ndField)
-        field = Frame->top_field_first ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
+        flags = Frame->top_field_first ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
+
+    if (!m_vaapiColourSpace)
+    {
+        switch (Frame->colorspace)
+        {
+            case AVCOL_SPC_BT709:     m_vaapiColourSpace = VA_SRC_BT709; break;
+            case AVCOL_SPC_SMPTE170M:
+            case AVCOL_SPC_BT470BG:   m_vaapiColourSpace = VA_SRC_BT601; break;
+            case AVCOL_SPC_SMPTE240M: m_vaapiColourSpace = VA_SRC_SMPTE_240; break;
+            default:
+            m_vaapiColourSpace = ((Frame->width < 1280) ? VA_SRC_BT601 : VA_SRC_BT709); break;
+        }
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using '%1' VAAPI colourspace")
+            .arg((m_vaapiColourSpace == VA_SRC_BT709) ? "bt709" : ((m_vaapiColourSpace == VA_SRC_BT601) ? "bt601" : "smpte240")));
+    }
+
+    if (m_vaapiColourSpace)
+        flags |= m_vaapiColourSpace;
 
     INIT_ST;
-    va_status = vaCopySurfaceGLX(display->m_vaDisplay, glx_surface, id, field);
+    va_status = vaCopySurfaceGLX(display->m_vaDisplay, glx_surface, id, flags);
     CHECK_ST;
     return true;
 }
 
-void* VAAPIContext::GetGLXSurface(uint Texture, uint TextureType, int Width, int Height, MythVAAPIDisplay *Display)
+void* VAAPIContext::GetGLXSurface(uint Texture, uint TextureType, VideoFrame *Frame,
+                                  MythVAAPIDisplay *Display, VideoColourSpace *ColourSpace)
 {
-    QSize surfacesize(Width, Height);
+    if (!Frame)
+        return nullptr;
+    QSize surfacesize(Frame->width, Frame->height);
     if (m_glxSurface && (m_glxSurfaceSize == surfacesize) &&
        (m_glxSurfaceTexture == Texture) && (m_glxSurfaceTextureType == TextureType) &&
        (m_glxSurfaceDisplay == Display))
@@ -509,12 +562,28 @@ void* VAAPIContext::GetGLXSurface(uint Texture, uint TextureType, int Width, int
     m_glxSurfaceTextureType = TextureType;
     m_glxSurfaceDisplay     = Display;
     m_glxSurfaceDisplay->IncrRef();
+
+    if (ColourSpace)
+    {
+        ColourSpace->UpdateColourSpace(Frame);
+        m_colourSpace = ColourSpace;
+        m_colourSpace->IncrRef();
+        InitPictureAttributes();
+    }
+
     LOG(VB_GENERAL, LOG_INFO, LOC + "Created GLX surface");
     return m_glxSurface;
 }
 
 void VAAPIContext::DeleteGLXSurface(void)
 {
+    if (m_colourSpace)
+    {
+        m_colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+        m_colourSpace->DecrRef();
+    }
+    m_colourSpace = nullptr;
+
     if (!m_glxSurface || !m_glxSurfaceDisplay)
         return;
 

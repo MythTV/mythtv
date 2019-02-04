@@ -1,7 +1,6 @@
 #ifndef VAAPICONTEXT_H
 #define VAAPICONTEXT_H
 
-
 // Qt
 #include <QHash>
 
@@ -59,13 +58,15 @@ class VAAPIContext
     static int  HwDecoderInit(AVCodecContext *Context);
     static void HWDecoderInitCallback(void*, void* Wait, void *Data);
     bool  CopySurfaceToTexture(MythRenderOpenGL *Context,
+                               VideoColourSpace *ColourSpace,
                                VideoFrame *Frame, uint Texture,
                                uint TextureType, FrameScanType Scan);
-    void  InitPictureAttributes(VADisplay Display, VideoColourSpace &Colourspace);
     int   SetPictureAttribute(PictureAttribute Attribute, int NewValue);
 
   private:
-    void* GetGLXSurface(uint Texture, uint TextureType, int Width, int Height, MythVAAPIDisplay *Display);
+    void  InitPictureAttributes(void);
+    void* GetGLXSurface(uint Texture, uint TextureType, VideoFrame *Frame,
+                        MythVAAPIDisplay *Display, VideoColourSpace *ColourSpace);
     void  DeleteGLXSurface(void);
 
     void               *m_glxSurface;
@@ -73,9 +74,11 @@ class VAAPIContext
     GLenum              m_glxSurfaceTextureType;
     QSize               m_glxSurfaceSize;
     MythVAAPIDisplay   *m_glxSurfaceDisplay;
+    VideoColourSpace   *m_colourSpace;
     VADisplayAttribute* m_pictureAttributes;
     int                 m_pictureAttributeCount;
     int                 m_hueBase;
+    uint                m_vaapiColourSpace;
 };
 
 #endif // VAAPICONTEXT_H

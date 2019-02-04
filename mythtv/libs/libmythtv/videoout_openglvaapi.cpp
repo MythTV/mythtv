@@ -163,13 +163,14 @@ void VideoOutputOpenGLVAAPI::InitPictureAttributes(void)
     VideoOutputOpenGL::InitPictureAttributes();
 }
 
-int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
-int newValue)
+int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute, int newValue)
 {
     int val = newValue;
     if (codec_is_vaapi(video_codec_id))
         val = m_vaapiContext.SetPictureAttribute(attribute, newValue);
-    return VideoOutputOpenGL::SetPictureAttribute(attribute, val);
+    if (val > -1)
+        return VideoOutputOpenGL::SetPictureAttribute(attribute, val);
+    return -1;
 }
 
 void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
@@ -204,7 +205,8 @@ void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             // TODO pause frame
             MythGLTexture *texture = gl_videochain->GetInputTexture();
             GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
-            m_vaapiContext.CopySurfaceToTexture(gl_context, frame ? frame : nullptr /*av_pause_frame*/,
+            m_vaapiContext.CopySurfaceToTexture(gl_context, &videoColourSpace,
+                                                frame ? frame : nullptr /*av_pause_frame*/,
                                                 textureid, GL_TEXTURE_2D, scan);
         }
     }
