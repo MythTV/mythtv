@@ -1723,7 +1723,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (!mfmr)
             return;
 
-        MetadataLookupList list = mfmr->results;
+        MetadataLookupList list = mfmr->m_results;
 
         if (list.count() > 1)
         {
@@ -1789,7 +1789,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (!mfsr)
             return;
 
-        MetadataLookup *lookup = mfsr->result;
+        MetadataLookup *lookup = mfsr->m_result;
 
         if (!lookup)
             return;
@@ -1829,7 +1829,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
 
-        MetadataLookupList lul = lue->lookupList;
+        MetadataLookupList lul = lue->m_lookupList;
 
         if (lul.isEmpty())
             return;
@@ -1849,7 +1849,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
 
-        MetadataLookupList lul = luf->lookupList;
+        MetadataLookupList lul = luf->m_lookupList;
 
         if (lul.size())
         {
@@ -1875,7 +1875,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         ImageDLEvent *ide = (ImageDLEvent *)levent;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;

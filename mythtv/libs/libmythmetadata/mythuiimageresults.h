@@ -26,9 +26,9 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
 
   private:
     ArtworkList            m_list;
-    VideoArtworkType            m_type;
-    MythUIButtonList      *m_resultsList;
-    MetadataImageDownload *m_imageDownload;
+    VideoArtworkType       m_type;
+    MythUIButtonList      *m_resultsList   {nullptr};
+    MetadataImageDownload *m_imageDownload {nullptr};
 
   private slots:
     void sendResult(MythUIButtonListItem* item);

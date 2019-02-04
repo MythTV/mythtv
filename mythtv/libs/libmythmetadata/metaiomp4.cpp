@@ -13,11 +13,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-MetaIOMP4::MetaIOMP4(void)
-    : MetaIO()
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */

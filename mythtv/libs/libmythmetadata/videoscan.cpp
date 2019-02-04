@@ -84,9 +84,7 @@ class VideoMetadataListManager;
 class MythUIProgressDialog;
 
 VideoScannerThread::VideoScannerThread(QObject *parent) :
-    MThread("VideoScanner"),
-    m_RemoveAll(false), m_KeepAll(false), m_dialog(nullptr),
-    m_DBDataChanged(false)
+    MThread("VideoScanner")
 {
     m_parent = parent;
     m_dbmetadata = new VideoMetadataListManager;
@@ -417,7 +415,7 @@ void VideoScannerThread::SendProgressEvent(uint progress, uint total,
     QApplication::postEvent(m_dialog, pue);
 }
 
-VideoScanner::VideoScanner() : m_cancel(false)
+VideoScanner::VideoScanner()
 {
     m_scanThread = new VideoScannerThread(this);
 }

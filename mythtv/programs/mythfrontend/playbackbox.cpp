@@ -5480,7 +5480,7 @@ void RecMetadataEdit::customEvent(QEvent *levent)
         if (!mfmr)
             return;
 
-        MetadataLookupList list = mfmr->results;
+        MetadataLookupList list = mfmr->m_results;
 
         MetadataResultsDialog *resultsdialog =
             new MetadataResultsDialog(m_popupStack, list);
@@ -5502,10 +5502,10 @@ void RecMetadataEdit::customEvent(QEvent *levent)
 
         MetadataFactorySingleResult *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
 
-        if (!mfsr || !mfsr->result)
+        if (!mfsr || !mfsr->m_result)
             return;
 
-        QueryComplete(mfsr->result);
+        QueryComplete(mfsr->m_result);
     }
     else if (levent->type() == MetadataFactoryNoResult::kEventType)
     {

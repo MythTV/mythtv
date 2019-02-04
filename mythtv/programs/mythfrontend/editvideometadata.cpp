@@ -1005,7 +1005,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
     {
         MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
 
-        MetadataLookupList lul = lue->lookupList;
+        MetadataLookupList lul = lue->m_lookupList;
 
         if (lul.isEmpty())
             return;
@@ -1029,7 +1029,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
     {
         MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
 
-        MetadataLookupList lul = luf->lookupList;
+        MetadataLookupList lul = luf->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -1049,7 +1049,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
     {
         ImageDLEvent *ide = (ImageDLEvent *)levent;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;

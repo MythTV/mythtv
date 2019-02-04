@@ -947,7 +947,7 @@ void NetTree::customEvent(QEvent *event)
         if (!tde)
             return;
 
-        ThumbnailData *data = tde->thumb;
+        ThumbnailData *data = tde->m_thumb;
 
         if (!data)
             return;

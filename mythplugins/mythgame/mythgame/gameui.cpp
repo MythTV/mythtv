@@ -571,7 +571,7 @@ void GameUI::customEvent(QEvent *event)
     {
         MetadataLookupEvent *lue = (MetadataLookupEvent *)event;
 
-        MetadataLookupList lul = lue->lookupList;
+        MetadataLookupList lul = lue->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -603,7 +603,7 @@ void GameUI::customEvent(QEvent *event)
     {
         MetadataLookupFailure *luf = (MetadataLookupFailure *)event;
 
-        MetadataLookupList lul = luf->lookupList;
+        MetadataLookupList lul = luf->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -630,7 +630,7 @@ void GameUI::customEvent(QEvent *event)
     {
         ImageDLEvent *ide = (ImageDLEvent *)event;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;

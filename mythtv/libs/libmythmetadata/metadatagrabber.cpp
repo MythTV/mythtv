@@ -308,30 +308,19 @@ QString MetaGrabberScript::CleanedInetref(const QString &inetref)
     return inetref;
 }
 
-MetaGrabberScript::MetaGrabberScript(void) :
-    m_name(""), m_author(""), m_thumbnail(""), m_fullcommand(""), m_command(""),
-    m_type(kGrabberInvalid), m_typestring(""), m_description(""), m_accepts(),
-    m_version(0.0), m_valid(false)
-{
-}
-
 MetaGrabberScript::MetaGrabberScript(const QString &path,
                                      const QDomElement &dom) :
-    m_valid(false)
+    m_fullcommand(path)
 {
-    m_fullcommand = path;
     ParseGrabberVersion(dom);
 }
 
-MetaGrabberScript::MetaGrabberScript(const QDomElement &dom) :
-    m_valid(false)
+MetaGrabberScript::MetaGrabberScript(const QDomElement &dom)
 {
     ParseGrabberVersion(dom);
-    
 }
 
-MetaGrabberScript::MetaGrabberScript(const QString &path) :
-    m_type(kGrabberInvalid), m_version(0.0), m_valid(false)
+MetaGrabberScript::MetaGrabberScript(const QString &path)
 {
     if (path.isEmpty())
         return;

@@ -1374,7 +1374,7 @@ void AlbumArt::findFrontCover(void)
     {
         // not available so just show the first image available
         if (albumArt->getImageCount() > 0)
-            m_currImageType = albumArt->getImageAt(0)->imageType;
+            m_currImageType = albumArt->getImageAt(0)->m_imageType;
         else
             m_currImageType = IT_UNKNOWN;
     }

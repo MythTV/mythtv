@@ -360,8 +360,8 @@ protected:
 
     void RemoveFiles(ImageList &) const;
 
-    ImageThumb<DBFS>      *m_thumbGen; //!< Thumbnail generator
-    ImageScanThread<DBFS> *m_scanner;  //!< File scanner
+    ImageThumb<DBFS>      *m_thumbGen {nullptr}; //!< Thumbnail generator
+    ImageScanThread<DBFS> *m_scanner  {nullptr}; //!< File scanner
 };
 
 
@@ -383,7 +383,7 @@ protected:
     }
 
     //! BE Gallery instance
-    static ImageManagerBe *m_instance;
+    static ImageManagerBe *s_instance;
 };
 
 
@@ -503,7 +503,7 @@ protected:
     }
 
     //! FE Gallery instance
-    static ImageManagerFe *m_instance;
+    static ImageManagerFe *s_instance;
 
     //! UI format for thumbnail date captions
     QString    m_dateFormat;

@@ -24,8 +24,8 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
 
   private:
     MetadataLookupList m_results;
-    MythUIButtonList  *m_resultsList;
-    MetadataImageDownload *m_imageDownload;
+    MythUIButtonList      *m_resultsList   {nullptr};
+    MetadataImageDownload *m_imageDownload {nullptr};
 
   private slots:
     void customEvent(QEvent *event) override; // MythUIType

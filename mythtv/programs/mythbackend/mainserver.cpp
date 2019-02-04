@@ -6266,11 +6266,11 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         {
             fi.setFile(files.at(x));
             AlbumArtImage *image = new AlbumArtImage();
-            image->filename = startDir + '/' + fi.fileName();
-            image->hostname = gCoreContext->GetHostName();
-            image->embedded = false;
-            image->imageType = AlbumArtImages::guessImageType(image->filename);
-            image->description = "";
+            image->m_filename = startDir + '/' + fi.fileName();
+            image->m_hostname = gCoreContext->GetHostName();
+            image->m_embedded = false;
+            image->m_imageType = AlbumArtImages::guessImageType(image->m_filename);
+            image->m_description = "";
             images->addImage(image);
             delete image;
         }
@@ -6286,7 +6286,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
                 for (int x = 0; x < artList.count(); x++)
                 {
                     AlbumArtImage *image = artList.at(x);
-                    image->filename = QString("%1-%2").arg(mdata->ID()).arg(image->filename);
+                    image->m_filename = QString("%1-%2").arg(mdata->ID()).arg(image->m_filename);
                     images->addImage(image);
                 }
             }
@@ -6310,19 +6310,19 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         for (uint x = 0; x < images->getImageCount(); x++)
         {
             AlbumArtImage *image = images->getImageAt(x);
-            strlist.append(QString("%1").arg(image->id));
-            strlist.append(QString("%1").arg((int)image->imageType));
-            strlist.append(QString("%1").arg(image->embedded));
-            strlist.append(image->description);
-            strlist.append(image->filename);
-            strlist.append(image->hostname);
+            strlist.append(QString("%1").arg(image->m_id));
+            strlist.append(QString("%1").arg((int)image->m_imageType));
+            strlist.append(QString("%1").arg(image->m_embedded));
+            strlist.append(image->m_description);
+            strlist.append(image->m_filename);
+            strlist.append(image->m_hostname);
 
             // if this is an embedded image update the cached image
-            if (image->embedded)
+            if (image->m_embedded)
             {
                 QStringList paramList;
                 paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-                paramList.append(QString("--imagetype='%1'").arg(image->imageType));
+                paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
 
                 QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
                 QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
@@ -6468,9 +6468,9 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
         {
             AlbumArtImage oldImage = *image;
 
-            image->imageType = newType;
+            image->m_imageType = newType;
 
-            if (image->imageType == oldImage.imageType)
+            if (image->m_imageType == oldImage.m_imageType)
             {
                 // nothing to change
                 strlist << "OK";
@@ -6484,14 +6484,14 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
             }
 
             // rename any cached image to match the new type
-            if (image->embedded)
+            if (image->m_embedded)
             {
                 // change the image type in the tag if it supports it
                 MetaIO *tagger = mdata->getTagger();
 
                 if (tagger && tagger->supportsEmbeddedImages())
                 {
-                    if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->imageType))
+                    if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->m_imageType))
                     {
                         LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
 
@@ -6512,26 +6512,26 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
                 // update the new cached image filename
                 StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
-                oldImage.filename = artGroup.FindFile("AlbumArt/" + image->filename);
+                oldImage.m_filename = artGroup.FindFile("AlbumArt/" + image->m_filename);
 
-                QFileInfo fi(oldImage.filename);
-                image->filename = fi.path() + QString("/%1-%2.jpg")
+                QFileInfo fi(oldImage.m_filename);
+                image->m_filename = fi.path() + QString("/%1-%2.jpg")
                                           .arg(mdata->ID())
-                                          .arg(AlbumArtImages::getTypeFilename(image->imageType));
+                                          .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
 
                 // remove any old cached file with the same name as the new one
-                if (QFile::exists(image->filename))
-                    QFile::remove(image->filename);
+                if (QFile::exists(image->m_filename))
+                    QFile::remove(image->m_filename);
 
                 // rename the old cached file to the new one
-                if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
-                    QFile::rename(oldImage.filename, image->filename);
+                if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
+                    QFile::rename(oldImage.m_filename, image->m_filename);
                 else
                 {
                     // extract the image from the tag and cache it
                     QStringList paramList;
                     paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-                    paramList.append(QString("--imagetype='%1'").arg(image->imageType));
+                    paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
 
                     QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
 
@@ -6543,18 +6543,18 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
             }
             else
             {
-                QFileInfo fi(oldImage.filename);
+                QFileInfo fi(oldImage.m_filename);
 
                 // get the new images filename
-                image->filename = fi.absolutePath() + QString("/%1.jpg")
-                        .arg(AlbumArtImages::getTypeFilename(image->imageType));
+                image->m_filename = fi.absolutePath() + QString("/%1.jpg")
+                        .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
 
-                if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
+                if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
                 {
                     // remove any old cached file with the same name as the new one
-                    QFile::remove(image->filename);
+                    QFile::remove(image->m_filename);
                     // rename the old cached file to the new one
-                    QFile::rename(oldImage.filename, image->filename);
+                    QFile::rename(oldImage.m_filename, image->m_filename);
                 }
             }
         }
@@ -6692,8 +6692,8 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
         }
 
         AlbumArtImage image;
-        image.filename = imageFilename;
-        image.imageType = imageType;
+        image.m_filename = imageFilename;
+        image.m_imageType = imageType;
 
         if (!tagger->writeAlbumArt(mdata->getLocalFilename(), &image))
         {

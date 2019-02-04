@@ -12,10 +12,10 @@ class META_PUBLIC MetadataLookupEvent : public QEvent
 {
   public:
     explicit MetadataLookupEvent(MetadataLookupList lul) : QEvent(kEventType),
-                                            lookupList(lul) {}
+                                            m_lookupList(lul) {}
     ~MetadataLookupEvent() = default;
 
-    MetadataLookupList lookupList;
+    MetadataLookupList m_lookupList;
 
     static Type kEventType;
 };
@@ -24,10 +24,10 @@ class META_PUBLIC MetadataLookupFailure : public QEvent
 {
   public:
     explicit MetadataLookupFailure(MetadataLookupList lul) : QEvent(kEventType),
-                                            lookupList(lul) {}
+                                            m_lookupList(lul) {}
     ~MetadataLookupFailure() = default;
 
-    MetadataLookupList lookupList;
+    MetadataLookupList m_lookupList;
 
     static Type kEventType;
 };
@@ -36,7 +36,8 @@ class META_PUBLIC MetadataDownload : public MThread
 {
   public:
 
-    explicit MetadataDownload(QObject *parent);
+    explicit MetadataDownload(QObject *parent)
+        : MThread("MetadataDownload"), m_parent(parent) {}
     ~MetadataDownload();
 
     void addLookup(MetadataLookup *lookup);
@@ -80,10 +81,9 @@ class META_PUBLIC MetadataDownload : public MThread
                                  bool passseas = true);
     MetadataLookupList  readNFO(QString NFOpath, MetadataLookup* lookup);
 
-    QObject            *m_parent;
+    QObject            *m_parent {nullptr};
     MetadataLookupList  m_lookupList;
     QMutex              m_mutex;
-
 };
 
 #endif /* METADATADOWNLOAD_H */

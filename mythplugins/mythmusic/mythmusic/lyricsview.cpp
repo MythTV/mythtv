@@ -132,7 +132,7 @@ void LyricsView::customEvent(QEvent *event)
                 LyricsLine *lyric = item->GetData().value<LyricsLine*>();
                 if (lyric)
                 {
-                    if (lyric->Time > 1000 && rs >= lyric->Time)
+                    if (lyric->m_time > 1000 && rs >= lyric->m_time)
                         pos = x;
                 }
             }
@@ -346,7 +346,7 @@ void LyricsView::setLyricTime(void)
             LyricsLine *lyric = item->GetData().value<LyricsLine*>();
             if (lyric)
             {
-                lyric->Time = gPlayer->getOutput()->GetAudiotime() - 750;
+                lyric->m_time = gPlayer->getOutput()->GetAudiotime() - 750;
                 m_lyricData->setChanged(true);
                 m_lyricData->setSyncronized(true);
                 m_autoScroll = false;
@@ -460,7 +460,7 @@ void LyricsView::showLyrics(void)
     {
         LyricsLine *line = (*i);
         if (line)
-            new MythUIButtonListItem(m_lyricsList, line->Lyric, qVariantFromValue(line));
+            new MythUIButtonListItem(m_lyricsList, line->m_lyric, qVariantFromValue(line));
         ++i;
     }
 

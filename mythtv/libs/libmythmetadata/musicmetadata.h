@@ -38,17 +38,17 @@ class META_PUBLIC AlbumArtImage
 {
   public:
     AlbumArtImage(void) :
-            id(0), filename(""), hostname(""), imageType(IT_UNKNOWN),
-            description(""), embedded(false) {}
+            m_filename(""), m_hostname(""), m_description("") {}
     AlbumArtImage(AlbumArtImage *image) :
-            id(image->id), filename(image->filename), hostname(image->hostname), imageType(image->imageType),
-            description(image->description), embedded(image->embedded) {}
-     int       id;
-     QString   filename;
-     QString   hostname;
-     ImageType imageType;
-     QString   description;
-     bool      embedded;
+            m_id(image->m_id), m_filename(image->m_filename),
+            m_hostname(image->m_hostname), m_imageType(image->m_imageType),
+            m_description(image->m_description), m_embedded(image->m_embedded) {}
+     int       m_id          {0};
+     QString   m_filename;
+     QString   m_hostname;
+     ImageType m_imageType   {IT_UNKNOWN};
+     QString   m_description;
+     bool      m_embedded    {false};
 };
 
 typedef QList<AlbumArtImage*> AlbumArtList;
@@ -92,42 +92,18 @@ class META_PUBLIC MusicMetadata
                    m_compilation_artist(lcompilation_artist),
                    m_album(lalbum),
                    m_title(ltitle),
-                   m_formattedartist(""),
-                   m_formattedtitle(""),
                    m_genre(lgenre),
                    m_format(lformat),
                    m_year(lyear),
                    m_tracknum(ltracknum),
-                   m_trackCount(0),
-                   m_discnum(0),
-                   m_disccount(0),
                    m_length(llength),
                    m_rating(lrating),
-                   m_directoryid(-1),
-                   m_artistid(-1),
-                   m_compartistid(-1),
-                   m_albumid(-1),
-                   m_genreid(-1),
                    m_lastplay(llastplay),
-                   m_templastplay(QDateTime()),
                    m_dateadded(ldateadded),
                    m_playcount(lplaycount),
-                   m_tempplaycount(0),
                    m_compilation(lcompilation),
-                   m_albumArt(nullptr),
-                   m_lyricsData(nullptr),
                    m_id(lid),
-                   m_filename(lfilename),
-                   m_fileSize(0),
-                   m_changed(false),
-                   m_broadcaster(""),
-                   m_channel(""),
-                   m_description(""),
-                   m_logoUrl(""),
-                   m_metaFormat(""),
-                   m_country(""),
-                   m_language("")
-
+                   m_filename(lfilename)
     {
         checkEmptyFields();
         ensureSortFields();
@@ -349,35 +325,35 @@ class META_PUBLIC MusicMetadata
     QString m_genre;
     QString m_genre_sort;
     QString m_format;
-    int m_year;
-    int m_tracknum;
-    int m_trackCount;
-    int m_discnum;
-    int m_disccount;
-    int m_length;
-    int m_rating;
-    int m_directoryid;
-    int m_artistid;
-    int m_compartistid;
-    int m_albumid;
-    int m_genreid;
+    int     m_year             {0};
+    int     m_tracknum         {0};
+    int     m_trackCount       {0};
+    int     m_discnum          {0};
+    int     m_disccount        {0};
+    int     m_length           {0};
+    int     m_rating           {0};
+    int     m_directoryid      {-1};
+    int     m_artistid         {-1};
+    int     m_compartistid     {-1};
+    int     m_albumid          {-1};
+    int     m_genreid          {-1};
     QDateTime m_lastplay;
     QDateTime m_templastplay;
     QDateTime m_dateadded;
-    int  m_playcount;
-    int  m_tempplaycount;
-    bool m_compilation;
+    int  m_playcount           {0};
+    int  m_tempplaycount       {0};
+    bool m_compilation         {false};
 
-    AlbumArtImages *m_albumArt;
+    AlbumArtImages *m_albumArt {nullptr};
 
-    LyricsData *m_lyricsData;
+    LyricsData *m_lyricsData   {nullptr};
 
     IdType   m_id;
     QString  m_filename;       // file name as stored in the DB
     QString  m_hostname;       // host where file is located as stored in the DB
     QString  m_actualFilename; // actual URL of the file if found
-    uint64_t m_fileSize;
-    bool     m_changed;
+    uint64_t m_fileSize        {0};
+    bool     m_changed         {false};
 
     // radio stream stuff
     QString m_broadcaster;
@@ -418,12 +394,13 @@ class META_PUBLIC MetadataLoadingThread : public MThread
 
   public:
 
-    explicit MetadataLoadingThread(AllMusic *parent_ptr);
+    explicit MetadataLoadingThread(AllMusic *parent_ptr)
+        : MThread("MetadataLoading"), parent(parent_ptr) {}
     void run() override; // MThread
 
   private:
 
-    AllMusic *parent;
+    AllMusic *parent {nullptr};
 };
 
 //---------------------------------------------------------------------------
@@ -465,27 +442,27 @@ class META_PUBLIC AllMusic
   private:
     MetadataPtrList     m_all_music;
 
-    int m_numPcs;
-    int m_numLoaded;
+    int m_numPcs                               {0};
+    int m_numLoaded                            {0};
 
     typedef QMap<int, MusicMetadata*> MusicMap;
-    MusicMap music_map;
+    MusicMap m_music_map;
 
     // cd stuff
     MetadataPtrList m_cdData; //  More than one cd player?
     QString m_cdTitle;
 
-    MetadataLoadingThread   *m_metadata_loader;
-    bool                     m_done_loading;
+    MetadataLoadingThread   *m_metadata_loader {nullptr};
+    bool                     m_done_loading    {false};
 
-    int                      m_playcountMin;
-    int                      m_playcountMax;
+    int                      m_playcountMin    {0};
+    int                      m_playcountMax    {0};
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    double                   m_lastplayMin;
-    double                   m_lastplayMax;
+    double                   m_lastplayMin     {0.0};
+    double                   m_lastplayMax     {0.0};
 #else
-    qint64                   m_lastplayMin;
-    qint64                   m_lastplayMax;
+    qint64                   m_lastplayMin     {0};
+    qint64                   m_lastplayMax     {0};
 #endif
 };
 
@@ -562,7 +539,7 @@ class META_PUBLIC AlbumArtImages
   private:
     void findImages(void);
 
-    MusicMetadata *m_parent;
+    MusicMetadata *m_parent {nullptr};
     AlbumArtList   m_imageList;
 };
 

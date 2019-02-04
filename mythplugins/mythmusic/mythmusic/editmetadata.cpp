@@ -943,13 +943,13 @@ void EditAlbumartDialog::gridItemChanged(MythUIButtonListItem *item)
         AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
-            m_coverartImage->SetFilename(image->filename);
+            m_coverartImage->SetFilename(image->m_filename);
             m_coverartImage->Load();
             if (m_imagetypeText)
-                m_imagetypeText->SetText(AlbumArtImages::getTypeName(image->imageType));
+                m_imagetypeText->SetText(AlbumArtImages::getTypeName(image->m_imageType));
             if (m_imagefilenameText)
             {
-                QFileInfo fi(image->filename);
+                QFileInfo fi(image->m_filename);
                 m_imagefilenameText->SetText(fi.fileName());
             }
         }
@@ -966,10 +966,10 @@ void EditAlbumartDialog::updateImageGrid(void)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_coverartList,
-                                     AlbumArtImages::getTypeName(albumArtList->at(x)->imageType),
+                                     AlbumArtImages::getTypeName(albumArtList->at(x)->m_imageType),
                                      qVariantFromValue(albumArtList->at(x)));
-        item->SetImage(albumArtList->at(x)->filename);
-        QString state = albumArtList->at(x)->embedded ? "tag" : "file";
+        item->SetImage(albumArtList->at(x)->m_filename);
+        QString state = albumArtList->at(x)->m_embedded ? "tag" : "file";
         item->DisplayState(state, "locationstate");
     }
 }
@@ -1097,7 +1097,7 @@ void EditAlbumartDialog::showMenu(void )
                 AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
                 if (image)
                 {
-                    if (!image->embedded)
+                    if (!image->m_embedded)
                     {
                         if (tagger && tagger->supportsEmbeddedImages())
                             menu->AddButton(tr("Copy Selected Image To Tag"));
@@ -1155,7 +1155,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                         QStringList strList("MUSIC_TAG_CHANGEIMAGE");
                         strList << m_metadata->Hostname()
                                 << QString::number(m_metadata->ID())
-                                << QString::number(image->imageType)
+                                << QString::number(image->m_imageType)
                                 << QString::number(type);
 
                         gCoreContext->SendReceiveStringList(strList);
@@ -1269,8 +1269,8 @@ void EditAlbumartDialog::startCopyImageToTag(void)
 void EditAlbumartDialog::copyImageToTag(ImageType imageType)
 {
     AlbumArtImage image;
-    image.filename = m_imageFilename;
-    image.imageType = imageType;
+    image.m_filename = m_imageFilename;
+    image.m_imageType = imageType;
 
     doCopyImageToTag(&image);
 }
@@ -1315,7 +1315,7 @@ void EditAlbumartDialog::doRemoveImageFromTag(bool doIt)
             QStringList strList("MUSIC_TAG_REMOVEIMAGE");
             strList << m_metadata->Hostname()
                     << QString::number(m_metadata->ID())
-                    << QString::number(image->id);
+                    << QString::number(image->m_id);
 
             gCoreContext->SendReceiveStringList(strList);
 
@@ -1361,19 +1361,19 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
     }
 
     // copy the image to the tracks host
-    QFileInfo fi(image->filename);
+    QFileInfo fi(image->m_filename);
     QString saveFilename = gCoreContext->GenMythURL(m_metadata->Hostname(), 0,
                                                     QString("AlbumArt/") + fi.fileName(),
                                                     "MusicArt");
 
-    RemoteFile::CopyFile(image->filename, saveFilename, true);
+    RemoteFile::CopyFile(image->m_filename, saveFilename, true);
 
     // ask the backend to add the image to the tracks tag
     QStringList strList("MUSIC_TAG_ADDIMAGE");
     strList << m_metadata->Hostname()
             << QString::number(m_metadata->ID())
             << fi.fileName()
-            << QString::number(image->imageType);
+            << QString::number(image->m_imageType);
 
     CopyImageThread *copyThread = new CopyImageThread(strList);
     copyThread->start();
@@ -1398,8 +1398,8 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
 
 void EditAlbumartDialog::removeCachedImage(const AlbumArtImage *image)
 {
-    if (!image->embedded)
+    if (!image->m_embedded)
         return;
 
-    GetMythUI()->RemoveFromCacheByFile(image->filename);
+    GetMythUI()->RemoveFromCacheByFile(image->m_filename);
 }

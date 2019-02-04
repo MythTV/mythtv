@@ -555,7 +555,7 @@ void NetSearch::customEvent(QEvent *event)
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
         ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-        ThumbnailData *data = tde->thumb;
+        ThumbnailData *data = tde->m_thumb;
 
         if (!data)
             return;
