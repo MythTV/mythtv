@@ -64,12 +64,6 @@ void PrivTcpServer::incomingConnection(qt_socket_fd_t socket)
     emit newConnection(socket);
 }
 
-ServerPool::ServerPool(QObject *parent) : QObject(parent),
-    m_listening(false), m_maxPendingConn(30), m_port(0),
-    m_proxy(QNetworkProxy::NoProxy), m_lastUdpSocket(nullptr)
-{
-}
-
 ServerPool::~ServerPool()
 {
     close();

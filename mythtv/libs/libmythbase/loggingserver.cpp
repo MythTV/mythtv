@@ -121,7 +121,7 @@ LoggerBase::~LoggerBase()
 /// \brief FileLogger constructor
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
-        LoggerBase(filename), m_opened(false), m_fd(-1)
+        LoggerBase(filename)
 {
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
@@ -235,7 +235,7 @@ bool FileLogger::logmsg(LoggingItem *item)
 /// \brief SyslogLogger constructor \param facility Syslog facility to
 /// use in logging
 SyslogLogger::SyslogLogger(bool open) :
-    LoggerBase(nullptr), m_opened(false)
+    LoggerBase(nullptr)
 {
     if (open)
     {
@@ -358,7 +358,7 @@ const int DatabaseLogger::kMinDisabledTime = 1000;
 /// \brief DatabaseLogger constructor
 /// \param table C-string of the database table to log to
 DatabaseLogger::DatabaseLogger(const char *table) :
-    LoggerBase(table), m_opened(false), m_loggingTableExists(false)
+    LoggerBase(table)
 {
     m_query = QString(
         "INSERT INTO %1 "
@@ -373,9 +373,6 @@ DatabaseLogger::DatabaseLogger(const char *table) :
 
     m_thread = new DBLoggerThread(this);
     m_thread->start();
-
-    m_opened = true;
-    m_disabled = false;
 }
 
 /// \brief DatabaseLogger deconstructor
@@ -562,7 +559,7 @@ bool DatabaseLogger::tableExists(const QString &table)
 DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
     MThread("DBLogger"), m_logger(logger),
     m_queue(new QQueue<LoggingItem *>),
-    m_wait(new QWaitCondition()), m_aborted(false)
+    m_wait(new QWaitCondition())
 {
 }
 
@@ -688,7 +685,7 @@ void logSigHup(void)
 
 /// \brief LogForwardThread constructor.
 LogForwardThread::LogForwardThread() :
-    MThread("LogForward"), m_aborted(false)
+    MThread("LogForward")
 {
     moveToThread(qthread());
 }

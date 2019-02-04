@@ -42,7 +42,7 @@ class MBASE_PUBLIC HardwareProfile : public QObject
     QString   GetHardwareProfile(void) const;
 
   private:
-    bool      m_enabled;
+    bool      m_enabled {false};
     QString   m_uuid;
     QString   m_publicuuid;
     QDateTime m_lastUpdate;

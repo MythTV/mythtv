@@ -43,12 +43,6 @@ using namespace std;
 
 #define LOC QString("FileSystemInfo: ")
 
-FileSystemInfo::FileSystemInfo(void) :
-    m_hostname(""), m_path(""), m_local(false), m_fsid(-1),
-    m_grpid(-1), m_blksize(4096), m_total(0), m_used(0), m_weight(0)
-{
-}
-
 FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 {
     clone(other);
@@ -57,8 +51,7 @@ FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,
         int fsid, int groupid, int blksize, int64_t total, int64_t used) :
     m_hostname(hostname), m_path(path), m_local(local), m_fsid(fsid),
-    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used),
-    m_weight(0)
+    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used)
 {
 }
 

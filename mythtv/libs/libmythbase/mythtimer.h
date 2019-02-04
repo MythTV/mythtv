@@ -32,7 +32,7 @@ class MBASE_PUBLIC MythTimer
 
   private:
     QElapsedTimer m_timer;
-    int m_offset;
+    int           m_offset {0};
 };
 
 #endif

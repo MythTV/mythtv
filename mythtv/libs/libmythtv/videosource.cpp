@@ -185,7 +185,7 @@ QString VideoSourceDBStorage::GetSetClause(MSqlBindings& bindings) const
             GetColumnName() + " = " + colTag);
 
     bindings.insert(sourceidTag, m_parent.getSourceID());
-    bindings.insert(colTag, user->GetDBValue());
+    bindings.insert(colTag, m_user->GetDBValue());
 
     return query;
 }
@@ -210,7 +210,7 @@ QString CaptureCardDBStorage::GetSetClause(MSqlBindings& bindings) const
             GetColumnName() + " = " + colTag);
 
     bindings.insert(cardidTag, m_parent.getCardID());
-    bindings.insert(colTag, user->GetDBValue());
+    bindings.insert(colTag, m_user->GetDBValue());
 
     return query;
 }
@@ -3392,7 +3392,7 @@ QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
             GetColumnName() + " = " + colTag);
 
     bindings.insert(cardinputidTag, m_parent.getInputID());
-    bindings.insert(colTag, user->GetDBValue());
+    bindings.insert(colTag, m_user->GetDBValue());
 
     return query;
 }

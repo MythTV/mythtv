@@ -213,7 +213,7 @@ protected:
     QString GetSetClause(MSqlBindings &bindings) const override // SimpleStorage
     {
         bindings.insert(":SETPLAYERID", m_id.Value());
-        bindings.insert(":SETCOLUMN",   user->GetDBValue());
+        bindings.insert(":SETCOLUMN",   m_user->GetDBValue());
         return QString("gameplayerid = :SETPLAYERID, "
                        "%2 = :SETCOLUMN").arg(GetColumnName());
     }

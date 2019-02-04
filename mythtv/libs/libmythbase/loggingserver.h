@@ -41,7 +41,7 @@ class LoggerBase : public QObject
     /// \brief Stop logging to the database
     virtual void stopDatabaseAccess(void) { }
   protected:
-    char *m_handle; ///< semi-opaque handle for identifying instance
+    char *m_handle {nullptr}; ///< semi-opaque handle for identifying instance
 };
 
 /// \brief File-based logger - used for logfiles and console
@@ -56,8 +56,8 @@ class FileLogger : public LoggerBase
     void reopen(void) override; // LoggerBase
     static FileLogger *create(QString filename, QMutex *mutex);
   private:
-    bool m_opened;      ///< true when the logfile is opened
-    int  m_fd;          ///< contains the file descriptor for the logfile
+    bool m_opened {false}; ///< true when the logfile is opened
+    int  m_fd     {-1};    ///< contains the file descriptor for the logfile
 };
 
 /// \brief Syslog-based logger (not available in Windows)
@@ -74,7 +74,7 @@ class SyslogLogger : public LoggerBase
     void reopen(void) override { }; // LoggerBase
     static SyslogLogger *create(QMutex *mutex, bool open = true);
   private:
-    bool m_opened;          ///< true when syslog channel open.
+    bool m_opened {false};  ///< true when syslog channel open.
 };
 
 #if CONFIG_SYSTEMD_JOURNAL
@@ -116,9 +116,9 @@ class DatabaseLogger : public LoggerBase
 
     DBLoggerThread *m_thread;   ///< The database queue handling thread
     QString m_query;            ///< The database query to insert log messages
-    bool m_opened;              ///< The database is opened
-    bool m_loggingTableExists;  ///< The desired logging table exists
-    bool m_disabled;            ///< DB logging is temporarily disabled
+    bool m_opened             {true};  ///< The database is opened
+    bool m_loggingTableExists {false}; ///< The desired logging table exists
+    bool m_disabled           {false}; ///< DB logging is temporarily disabled
     QTime m_disabledTime;       ///< Time when the DB logging was disabled
     QTime m_errorLoggingTime;   ///< Time when DB error logging was last done
     static const int kMinDisabledTime; ///< Minimum time to disable DB logging
@@ -141,7 +141,7 @@ class LogForwardThread : public QObject, public MThread
     void run(void) override; // MThread
     void stop(void);
   private:
-    bool m_aborted;                  ///< Flag to abort the thread.
+    bool m_aborted {false};          ///< Flag to abort the thread.
 
     void forwardMessage(LogMessage *msg);
   signals:
@@ -182,15 +182,15 @@ class DBLoggerThread : public MThread
         return (m_queue->size() >= MAX_QUEUE_LEN);
     }
   private:
-    DatabaseLogger *m_logger;       ///< The associated logger instance
-    QMutex m_queueMutex;            ///< Mutex for protecting the queue
-    QQueue<LoggingItem *> *m_queue; ///< Queue of LoggingItems to insert
-    QWaitCondition *m_wait;         ///< Wait condition used for waiting
-                                    ///  for the queue to not be full.
-                                    ///  Protected by m_queueMutex
-    volatile bool m_aborted;        ///< Used during shutdown to indicate
-                                    ///  that the thread should stop ASAP.
-                                    ///  Protected by m_queueMutex
+    DatabaseLogger *m_logger {nullptr};///< The associated logger instance
+    QMutex m_queueMutex;               ///< Mutex for protecting the queue
+    QQueue<LoggingItem *> *m_queue {nullptr}; ///< Queue of LoggingItems to insert
+    QWaitCondition *m_wait {nullptr};  ///< Wait condition used for waiting
+                                       ///  for the queue to not be full.
+                                       ///  Protected by m_queueMutex
+    volatile bool m_aborted {false};   ///< Used during shutdown to indicate
+                                       ///  that the thread should stop ASAP.
+                                       ///  Protected by m_queueMutex
 };
 
 #ifndef _WIN32

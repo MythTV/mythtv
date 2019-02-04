@@ -263,7 +263,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void TVPlaybackPlaying(void);
 
   private:
-    MythCoreContextPrivate *d;
+    MythCoreContextPrivate *d {nullptr};
 
     void connected(MythSocket *sock) override { (void)sock; } //MythSocketCBs
     void connectionFailed(MythSocket *sock) override { (void)sock; } //MythSocketCBs

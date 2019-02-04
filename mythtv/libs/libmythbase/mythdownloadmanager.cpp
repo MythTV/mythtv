@@ -74,26 +74,26 @@ class MythDownloadInfo
 
     QString          m_url;
     QUrl             m_redirectedTo;
-    QNetworkRequest *m_request {nullptr};
-    QNetworkReply   *m_reply {nullptr};
+    QNetworkRequest *m_request                     {nullptr};
+    QNetworkReply   *m_reply                       {nullptr};
     QString          m_outFile;
-    QByteArray      *m_data {nullptr};
+    QByteArray      *m_data                        {nullptr};
     QByteArray       m_privData;
-    QObject         *m_caller {nullptr};
-    MRequestType     m_requestType {kRequestGet};
-    bool             m_reload {false};
-    bool             m_preferCache {false};
-    bool             m_syncMode {false};
-    bool             m_processReply {true};
-    bool             m_done {false};
-    qint64           m_bytesReceived {0};
-    qint64           m_bytesTotal {0};
+    QObject         *m_caller                      {nullptr};
+    MRequestType     m_requestType                 {kRequestGet};
+    bool             m_reload                      {false};
+    bool             m_preferCache                 {false};
+    bool             m_syncMode                    {false};
+    bool             m_processReply                {true};
+    bool             m_done                        {false};
+    qint64           m_bytesReceived               {0};
+    qint64           m_bytesTotal                  {0};
     QDateTime        m_lastStat;
-    AuthCallback     m_authCallback {nullptr};
-    void            *m_authArg {nullptr};
+    AuthCallback     m_authCallback                {nullptr};
+    void            *m_authArg                     {nullptr};
     const QHash<QByteArray, QByteArray> *m_headers {nullptr};
 
-    QNetworkReply::NetworkError m_errorCode {QNetworkReply::NoError};
+    QNetworkReply::NetworkError m_errorCode        {QNetworkReply::NoError};
     QMutex           m_lock;
 };
 
@@ -140,8 +140,8 @@ class RemoteFileDownloadThread : public QRunnable
     }
 
   private:
-    MythDownloadManager *m_parent;
-    MythDownloadInfo    *m_dlInfo;
+    MythDownloadManager *m_parent {nullptr};
+    MythDownloadInfo    *m_dlInfo {nullptr};
 };
 
 /** \brief Deletes the running MythDownloadManager at program exit.
@@ -186,22 +186,6 @@ MythDownloadManager *GetMythDownloadManager(void)
     atexit(ShutdownMythDownloadManager);
 
     return downloadManager;
-}
-
-/** \brief Constructor for MythDownloadManager.  Instantiates a
- *         QNetworkAccessManager and QNetworkDiskCache.
- */
-MythDownloadManager::MythDownloadManager() :
-    MThread("DownloadManager"),
-    m_manager(nullptr),
-    m_diskCache(nullptr),
-    m_proxy(nullptr),
-    m_infoLock(new QMutex(QMutex::Recursive)),
-    m_queueThread(nullptr),
-    m_runThread(false),
-    m_isRunning(false),
-    m_inCookieJar(nullptr)
-{
 }
 
 /** \brief Destructor for MythDownloadManager.

@@ -91,7 +91,7 @@ class MBASE_PUBLIC MythDB
    ~MythDB();
 
   private:
-    MythDBPrivate *d;
+    MythDBPrivate *d {nullptr};
 };
 
  MBASE_PUBLIC  MythDB *GetMythDB();

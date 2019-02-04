@@ -62,14 +62,14 @@ class DBPurgeHandler : public QObject
   public:
     DBPurgeHandler()
     {
-        purgeTimer = startTimer(5 * 60000);
+        m_purgeTimer = startTimer(5 * 60000);
     }
     void timerEvent(QTimerEvent *event) override // QObject
     {
-        if (event->timerId() == purgeTimer)
+        if (event->timerId() == m_purgeTimer)
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
     }
-    int purgeTimer;
+    int m_purgeTimer;
 };
 
 class MThreadInternal : public QThread
@@ -100,8 +100,7 @@ static QMutex s_all_threads_lock;
 static QSet<MThread*> s_all_threads;
 
 MThread::MThread(const QString &objectName) :
-    m_thread(new MThreadInternal(*this)), m_runnable(nullptr),
-    m_prolog_executed(true), m_epilog_executed(true)
+    m_thread(new MThreadInternal(*this))
 {
     m_thread->setObjectName(objectName);
     QMutexLocker locker(&s_all_threads_lock);

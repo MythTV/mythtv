@@ -86,8 +86,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     void            PrintRemovedWarning(QString &keyword) const;
     void            PrintDeprecatedWarning(QString &keyword) const;
 
-    bool                    m_given;
-    bool                    m_converted;
+    bool                    m_given     {false};
+    bool                    m_converted {false};
     QString                 m_name;
     QString                 m_group;
     QString                 m_deprecated;
@@ -292,7 +292,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QString                         m_appname;
     QMap<QString,CommandLineArg*>   m_optionedArgs;
     QMap<QString,CommandLineArg*>   m_namedArgs;
-    bool                            m_passthroughActive;
-    bool                            m_overridesImported;
-    bool                            m_verbose;
+    bool                            m_passthroughActive {false};
+    bool                            m_overridesImported {false};
+    bool                            m_verbose           {false};
 };

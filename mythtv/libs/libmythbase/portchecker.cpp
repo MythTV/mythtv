@@ -37,11 +37,6 @@
 
 #define LOC QString("PortChecker::%1(): ").arg(__func__)
 
-PortChecker::PortChecker() :
-    cancelCheck(false)
-{
-}
-
 /**
  * Check if a port is open and sort out the link-local scope.
  *
@@ -79,7 +74,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
 {
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
         .arg(host).arg(port).arg(timeLimit).arg(linkLocalOnly));
-    cancelCheck = false;
+    m_cancelCheck = false;
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);
     bool islinkLocal = false;
@@ -189,7 +184,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
             socket.abort();
         processEvents();
         // Check if user got impatient and canceled
-        if (cancelCheck)
+        if (m_cancelCheck)
             break;
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         state = socket.state();
@@ -247,7 +242,7 @@ void PortChecker::processEvents(void)
 */
 void PortChecker::cancelPortCheck(void)
 {
-    cancelCheck = true;
+    m_cancelCheck = true;
 }
 
 
