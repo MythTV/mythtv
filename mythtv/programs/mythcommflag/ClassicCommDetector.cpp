@@ -391,7 +391,14 @@ bool ClassicCommDetector::go()
         }
         LOG(VB_GENERAL, LOG_INFO, "Finding Logo");
 
-        logoInfoAvailable = logoDetector->searchForLogo(player);
+        if ( !(logoInfoAvailable = logoDetector->searchForLogo(player)))
+        {
+            if (COMM_DETECT_LOGO == commDetectMethod) {
+
+                LOG(VB_COMMFLAG, LOG_WARNING, "No logo found, abort flagging.");
+                return false;
+            }
+        }
 
         if (showProgress)
         {
