@@ -1589,7 +1589,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     {
         const QRect& r2 = vis[i];
 #else
-    for (const QRect& r2 : dirty)
+    for (const QRect& r2 : visible)
     {
 #endif
         int left   = min(r2.left(), osd_image->width());
