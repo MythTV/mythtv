@@ -32,20 +32,24 @@ public:
     int reportTime(void);
 
 private:
-    TemplateFinder          *logoFinder;
-    const struct AVFrame  *logo;
-    int                     logorow, logocol;
-    int                     logowidth, logoheight;
+    TemplateFinder         *m_logoFinder      {nullptr};
+    const struct AVFrame   *m_logo            {nullptr};
+    int                     m_logorow         {-1};
+    int                     m_logocol         {-1};
+    int                     m_logowidth       {-1};
+    int                     m_logoheight      {-1};
 
-    long long               frameno;            /* frame number */
-    int                     row, col;           /* content location */
-    int                     width, height;      /* content dimensions */
-    bool                    ismonochromatic;
+    long long               m_frameno         {-1}; /* frame number */
+    int                     m_row             {-1}; /* content location */
+    int                     m_col             {-1}; /* content location */
+    int                     m_width           {-1}; /* content dimensions */
+    int                     m_height          {-1}; /* content dimensions */
+    bool                    m_ismonochromatic {false};
 
     /* Debugging. */
-    int                     debugLevel;
-    struct timeval          analyze_time;
-    bool                    time_reported;
+    int                     m_debugLevel      {0};
+    struct timeval          m_analyze_time;
+    bool                    m_time_reported   {false};
 };
 
 #endif  /* !__BORDERDETECTOR_H__ */

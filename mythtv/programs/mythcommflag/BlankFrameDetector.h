@@ -28,23 +28,23 @@ public:
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
     FrameMap GetMap(unsigned int index) const override // FrameAnalyzer
-        { return (index) ? blankMap : breakMap; }
+        { return (index) ? m_blankMap : m_breakMap; }
 
     /* BlankFrameDetector interface. */
-    const FrameAnalyzer::FrameMap *getBlanks(void) const { return &blankMap; }
+    const FrameAnalyzer::FrameMap *getBlanks(void) const { return &m_blankMap; }
     int computeForLogoSurplus(const TemplateMatcher *tm);
     int computeForLogoDeficit(const TemplateMatcher *tm);
     int computeBreaks(FrameMap *breaks);
 
 private:
-    HistogramAnalyzer       *histogramAnalyzer;
-    float                   fps;
+    HistogramAnalyzer      *m_histogramAnalyzer;
+    float                   m_fps        {0.0f};
 
-    FrameAnalyzer::FrameMap blankMap;
-    FrameAnalyzer::FrameMap breakMap;
+    FrameAnalyzer::FrameMap m_blankMap;
+    FrameAnalyzer::FrameMap m_breakMap;
 
     /* Debugging */
-    int                     debugLevel;
+    int                     m_debugLevel {0};
 };
 
 #endif  /* !__BLANKFRAMEDETECTOR_H__ */

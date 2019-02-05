@@ -21,8 +21,8 @@ public:
     // do not override default copy constructor, as the default copy
     // constructor will do just fine.
 private:
-    int data[256];
-    unsigned int numberOfSamples;
+    int m_data[256];
+    unsigned int m_numberOfSamples;
 };
 
 #endif

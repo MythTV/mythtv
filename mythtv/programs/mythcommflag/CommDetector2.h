@@ -57,30 +57,34 @@ class CommDetector2 : public CommDetectorBase
     int computeBreaks(long long nframes);
 
   private:
-    enum SkipTypes          commDetectMethod;
-    bool                    showProgress;
-    bool                    fullSpeed;
-    MythPlayer             *player;
-    QDateTime               startts, endts, recstartts, recendts;
+    enum SkipTypes               m_commDetectMethod;
+    bool                         m_showProgress            {false};
+    bool                         m_fullSpeed               {false};
+    MythPlayer                  *m_player                  {nullptr};
+    QDateTime                    m_startts;
+    QDateTime                    m_endts;
+    QDateTime                    m_recstartts;
+    QDateTime                    m_recendts;
 
-    bool                    isRecording;        /* current state */
-    bool                    sendBreakMapUpdates;
-    bool                    breakMapUpdateRequested;
-    bool                    finished;
+                                 /* current state */
+    bool                         m_isRecording             {false};
+    bool                         m_sendBreakMapUpdates     {false};
+    bool                         m_breakMapUpdateRequested {false};
+    bool                         m_finished                {false};
 
-    long long               currentFrameNumber;
-    FrameAnalyzerList       frameAnalyzers;     /* one list per scan of file */
-    FrameAnalyzerList::iterator currentPass;
-    FrameAnalyzerItem       finishedAnalyzers;
+    long long                    m_currentFrameNumber      {0};
+    FrameAnalyzerList            m_frameAnalyzers; /* one list per scan of file */
+    FrameAnalyzerList::iterator  m_currentPass;
+    FrameAnalyzerItem            m_finishedAnalyzers;
 
-    FrameAnalyzer::FrameMap breaks;
+    FrameAnalyzer::FrameMap      m_breaks;
 
-    TemplateFinder          *logoFinder;
-    TemplateMatcher         *logoMatcher;
-    BlankFrameDetector      *blankFrameDetector;
-    SceneChangeDetector     *sceneChangeDetector;
+    TemplateFinder              *m_logoFinder              {nullptr};
+    TemplateMatcher             *m_logoMatcher             {nullptr};
+    BlankFrameDetector          *m_blankFrameDetector      {nullptr};
+    SceneChangeDetector         *m_sceneChangeDetector     {nullptr};
 
-    QString                 debugdir;
+    QString                      m_debugdir;
 };
 
 #endif  /* !_COMMDETECTOR2_H_ */
