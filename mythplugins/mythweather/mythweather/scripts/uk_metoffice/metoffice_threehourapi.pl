@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use utf8;
-use encoding 'utf8';
+
 use English;
 
 use File::Basename;

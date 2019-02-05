@@ -7,7 +7,7 @@ use warnings;
 require Exporter;
 
 use utf8;
-use encoding 'utf8';
+
 use LWP::UserAgent;
 use LWP::Simple;
 use XML::Simple;
