@@ -14,17 +14,17 @@ class BackendSettings : public GroupSetting
     ~BackendSettings();
 
   private:
-    TransMythUICheckBoxSetting *isMasterBackend;
-    HostTextEditSetting *localServerPort;
-    HostComboBoxSetting *backendServerAddr;
-    GlobalTextEditSetting *masterServerName;
-    IpAddressSettings *ipAddressSettings;
-    bool isLoaded;
-    QString priorMasterName;
+    TransMythUICheckBoxSetting *m_isMasterBackend   {nullptr};
+    HostTextEditSetting        *m_localServerPort   {nullptr};
+    HostComboBoxSetting        *m_backendServerAddr {nullptr};
+    GlobalTextEditSetting      *m_masterServerName  {nullptr};
+    IpAddressSettings          *m_ipAddressSettings {nullptr};
+    bool                        m_isLoaded          {false};
+    QString                     m_priorMasterName;
 
     // Deprecated - still here to support bindings
-    GlobalTextEditSetting *masterServerIP;
-    GlobalTextEditSetting *masterServerPort;
+    GlobalTextEditSetting      *m_masterServerIP    {nullptr};
+    GlobalTextEditSetting      *m_masterServerPort  {nullptr};
 
   private slots:
     void masterBackendChanged(void);

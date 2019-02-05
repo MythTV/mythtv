@@ -24,5 +24,5 @@ class ExitPrompter : public QObject
     ExitPrompter(const ExitPrompter &);
 
   private:
-    struct ExitPrompterPrivate *m_d;
+    struct ExitPrompterPrivate *m_d {nullptr};
 };
