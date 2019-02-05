@@ -808,26 +808,26 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     NameValues::const_iterator nit = args.begin();
     for (; nit != args.end(); ++nit)
     {
-        stream << "<" << (*nit).sName;
+        stream << "<" << (*nit).m_sName;
 
-        if ((*nit).pAttributes)
+        if ((*nit).m_pAttributes)
         {
-            NameValues::const_iterator nit2 = (*nit).pAttributes->begin();
-            for (; nit2 != (*nit).pAttributes->end(); ++nit2)
+            NameValues::const_iterator nit2 = (*nit).m_pAttributes->begin();
+            for (; nit2 != (*nit).m_pAttributes->end(); ++nit2)
             {
-                stream << " " << (*nit2).sName << "='"
-                       << Encode( (*nit2).sValue ) << "'";
+                stream << " " << (*nit2).m_sName << "='"
+                       << Encode( (*nit2).m_sValue ) << "'";
             }
         }
 
         stream << ">";
 
         if (m_bSOAPRequest)
-            stream << Encode( (*nit).sValue );
+            stream << Encode( (*nit).m_sValue );
         else
-            stream << (*nit).sValue;
+            stream << (*nit).m_sValue;
 
-        stream << "</" << (*nit).sName << ">\r\n";
+        stream << "</" << (*nit).m_sName << ">\r\n";
     }
 
     if (m_bSOAPRequest)

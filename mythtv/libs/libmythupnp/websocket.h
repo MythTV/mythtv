@@ -75,28 +75,27 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
 class WebSocketFrame
 {
   public:
-    WebSocketFrame() : finalFrame(false), payloadSize(0), opCode(kOpTextFrame),
-                       isMasked(false), fragmented(false)
+    WebSocketFrame()
     {
-       mask.reserve(4);
+        m_mask.reserve(4);
     }
 
    ~WebSocketFrame()
     {
-        payload.clear();
-        mask.clear();
+        m_payload.clear();
+        m_mask.clear();
     }
 
     void reset(void)
     {
-        finalFrame = false;
-        payload.clear();
-        payload.resize(128);
-        payload.squeeze();
-        mask.clear();
-        payloadSize = 0;
-        opCode = kOpTextFrame;
-        fragmented = false;
+        m_finalFrame = false;
+        m_payload.clear();
+        m_payload.resize(128);
+        m_payload.squeeze();
+        m_mask.clear();
+        m_payloadSize = 0;
+        m_opCode = kOpTextFrame;
+        m_fragmented = false;
     }
 
     typedef enum OpCodes
@@ -111,13 +110,13 @@ class WebSocketFrame
         // Reserved
     } OpCode;
 
-    bool finalFrame;
-    QByteArray payload;
-    uint64_t payloadSize;
-    OpCode opCode;
-    bool isMasked;
-    QByteArray mask;
-    bool fragmented;
+    bool m_finalFrame {false};
+    QByteArray m_payload;
+    uint64_t m_payloadSize {0};
+    OpCode m_opCode {kOpTextFrame};
+    bool m_isMasked {false};
+    QByteArray m_mask;
+    bool m_fragmented {false};
 };
 
 class WebSocketWorker;

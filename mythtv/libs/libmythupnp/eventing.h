@@ -31,42 +31,41 @@ class UPNP_PUBLIC SubscriberInfo
 {
     public:
         SubscriberInfo()
-            : nKey( 0 ), nDuration( 0 )
         {
-            memset( &ttExpires, 0, sizeof( ttExpires ) );
-            memset( &ttLastNotified, 0, sizeof( ttLastNotified ) );
-            sUUID          = QUuid::createUuid().toString();
-            sUUID          = sUUID.mid( 1, sUUID.length() - 2);
+            memset( &m_ttExpires, 0, sizeof( m_ttExpires ) );
+            memset( &m_ttLastNotified, 0, sizeof( m_ttLastNotified ) );
+            m_sUUID = QUuid::createUuid().toString();
+            m_sUUID = m_sUUID.mid( 1, m_sUUID.length() - 2);
         }
 
         SubscriberInfo( const QString &url, unsigned long duration )
-            : nKey( 0 ), nDuration( duration )
+            : m_nDuration( duration )
         {
-            memset( &ttExpires, 0, sizeof( ttExpires ) );
-            memset( &ttLastNotified, 0, sizeof( ttLastNotified ) );
-            sUUID          = QUuid::createUuid().toString();
-            sUUID          = sUUID.mid( 1, sUUID.length() - 2);
-            qURL           = url;
+            memset( &m_ttExpires, 0, sizeof( m_ttExpires ) );
+            memset( &m_ttLastNotified, 0, sizeof( m_ttLastNotified ) );
+            m_sUUID = QUuid::createUuid().toString();
+            m_sUUID = m_sUUID.mid( 1, m_sUUID.length() - 2);
+            m_qURL = url;
 
-            SetExpireTime( nDuration );
+            SetExpireTime( m_nDuration );
         }
 
         unsigned long IncrementKey()
         {
             // When key wraps around to zero again... must make it a 1. (upnp spec)
-            if ((++nKey) == 0)
-                nKey = 1;
+            if ((++m_nKey) == 0)
+                m_nKey = 1;
 
-            return nKey;
+            return m_nKey;
         }
 
-        TaskTime            ttExpires;
-        TaskTime            ttLastNotified;
+        TaskTime            m_ttExpires;
+        TaskTime            m_ttLastNotified;
 
-        QString             sUUID;
-        QUrl                qURL;
-        unsigned short      nKey;
-        unsigned long       nDuration;       // Seconds
+        QString             m_sUUID;
+        QUrl                m_qURL;
+        unsigned short      m_nKey {0};
+        unsigned long       m_nDuration {0};       // Seconds
 
     protected:
 
@@ -77,7 +76,7 @@ class UPNP_PUBLIC SubscriberInfo
 
             AddMicroSecToTaskTime( tt, (nSecs * 1000000) );
 
-            ttExpires = tt;
+            m_ttExpires = tt;
         }
 
 

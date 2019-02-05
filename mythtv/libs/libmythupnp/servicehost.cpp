@@ -428,13 +428,13 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
     }
     catch (HttpRedirectException &ex)
     {
-        UPnp::FormatRedirectResponse( pRequest, ex.hostName );
+        UPnp::FormatRedirectResponse( pRequest, ex.m_hostName );
         bHandled = true;
     }
     catch (HttpException &ex)
     {
-        LOG(VB_GENERAL, LOG_ERR, ex.msg);
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
+        LOG(VB_GENERAL, LOG_ERR, ex.m_msg);
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.m_msg );
 
         bHandled = true;
 

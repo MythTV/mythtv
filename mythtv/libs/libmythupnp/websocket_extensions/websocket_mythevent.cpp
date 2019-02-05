@@ -18,7 +18,7 @@ WebSocketMythEvent::~WebSocketMythEvent()
 
 bool WebSocketMythEvent::HandleTextFrame(const WebSocketFrame &frame)
 {
-    QString message = QString(frame.payload);
+    QString message = QString(frame.m_payload);
 
     if (message.isEmpty())
         return false;

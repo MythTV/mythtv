@@ -299,11 +299,11 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 class UPNP_PUBLIC HttpException
 {
     public:
-        int     code;
-        QString msg;
+        int     m_code;
+        QString m_msg;
 
         HttpException( int nCode = -1, const QString &sMsg = "")
-               : code( nCode ), msg ( sMsg  )
+               : m_code( nCode ), m_msg ( sMsg  )
         {}
 
         // Needed to force a v-table.
@@ -314,13 +314,13 @@ class UPNP_PUBLIC HttpRedirectException : public HttpException
 {
     public:
 
-        QString hostName;
-      //int     port;
+        QString m_hostName;
+      //int     m_port;
 
         HttpRedirectException( const QString &sHostName = "",
                                      int      nCode     = -1,
                                const QString &sMsg      = "" )
-               : HttpException( nCode, sMsg ), hostName( sHostName )
+               : HttpException( nCode, sMsg ), m_hostName( sHostName )
         {}
 
         virtual ~HttpRedirectException() = default;
