@@ -10,15 +10,12 @@ extern "C" {
 
 
 AudioBuffer::AudioBuffer()
-  : m_frames(0), m_time(-1)
 {
-    m_size      = 0;
     m_buffer    = (uint8_t *)av_malloc(ABLOCK_SIZE);
     if (m_buffer == nullptr)
     {
         throw std::bad_alloc();
     }
-    m_realsize  = ABLOCK_SIZE;
 }
 
 AudioBuffer::AudioBuffer(const AudioBuffer &old)
@@ -67,8 +64,7 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
 
 AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
                                          int audio_channels, bool passthru)
-  : m_last_audiotime(0),        m_audioFrameSize(0),
-    m_initpassthru(passthru),   m_saveBuffer(nullptr)
+  : m_initpassthru(passthru)
 {
     Reset();
     const AudioSettings settings(audio_format, audio_channels, 0, 0, false);

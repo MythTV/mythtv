@@ -17,11 +17,11 @@ class AudioBuffer
     char *data(void) { return (char *)m_buffer; }
     int   size(void) { return m_size; }
 
-    uint8_t    *m_buffer;
-    int         m_size;
-    int         m_realsize;
-    int         m_frames;
-    long long   m_time;
+    uint8_t    *m_buffer   {nullptr};
+    int         m_size     {0};
+    int         m_realsize {ABLOCK_SIZE};
+    int         m_frames   {0};
+    long long   m_time     {-1};
 };
 
 /**
@@ -71,15 +71,15 @@ class AudioReencodeBuffer : public AudioOutput
     int                  m_channels;
     int                  m_bytes_per_frame;
     int                  m_eff_audiorate;
-    long long            m_last_audiotime;
+    long long            m_last_audiotime  {0};
     bool                 m_passthru;
-    int                  m_audioFrameSize;
+    int                  m_audioFrameSize  {0};
 
   private:
     bool                 m_initpassthru;
     QMutex               m_bufferMutex;
     QList<AudioBuffer *> m_bufferList;
-    AudioBuffer         *m_saveBuffer;
+    AudioBuffer         *m_saveBuffer      {nullptr};
 };
 
 #endif
