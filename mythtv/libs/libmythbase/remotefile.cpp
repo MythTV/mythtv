@@ -1073,7 +1073,19 @@ int RemoteFile::Read(void *data, int size)
 
     if (error || sent != recv)
     {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("RemoteFile::Read(): sent %1 != recv %2")
+            .arg(sent).arg(recv));
         recv = -1;
+
+        // The TCP socket is dropped if there's a timeout, so we reconnect
+        if (!Resume())
+        {
+            LOG(VB_GENERAL, LOG_WARNING, "RemoteFile::Read(): Resume failed.");
+            sent = -1;
+        }
+        else
+            LOG(VB_GENERAL, LOG_NOTICE, "RemoteFile::Read(): Resume success.");
     }
     else
     {
