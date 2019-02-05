@@ -664,9 +664,6 @@ void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
         GetNotificationCenter()->Queue(n);
         return;
     }
-    MythScreenStack *m_popupStack =
-                     GetMythMainWindow()->GetStack("popup stack");
-
     ImageSearchResultsDialog *resultsdialog =
           new ImageSearchResultsDialog(m_popupStack, list, type);
 
