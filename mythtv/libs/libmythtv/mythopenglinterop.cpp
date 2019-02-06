@@ -111,7 +111,7 @@ void MythOpenGLInterop::InitPictureAttributes(void)
         float raw[9];
         raw[0] = yuv(0, 0); raw[1] = yuv(0, 1); raw[2] = yuv(0, 2);
         raw[3] = yuv(1, 0); raw[4] = yuv(1, 1); raw[5] = yuv(1, 2);
-        raw[0] = yuv(2, 0); raw[7] = yuv(2, 1); raw[8] = yuv(2, 2);
+        raw[6] = yuv(2, 0); raw[7] = yuv(2, 1); raw[8] = yuv(2, 2);
         m_pictureAttributes[updatecscmatrix].value = static_cast<int32_t>(raw[0]);
         m_glxSurfaceDisplay->m_context->makeCurrent();
         INIT_ST;
