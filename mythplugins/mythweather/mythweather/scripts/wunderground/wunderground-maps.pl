@@ -13,7 +13,7 @@ use lib dirname(abs_path($0 or $PROGRAM_NAME)),
         '/usr/local/share/mythtv/mythweather/scripts/wunderground';
 
 use utf8;
-use encoding 'utf8';
+
 use LWP::UserAgent;
 use Getopt::Std;
 use URI::Escape;

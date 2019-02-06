@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 
 // Qt headers
-#include <QCoreApplication>
+#include <QApplication>
 #include <QEvent>
 #include <QFileInfo>
 #include <QFile>
@@ -2014,10 +2014,12 @@ static HostTextEditSetting *SetupPinCode()
 static HostComboBoxSetting *XineramaScreen()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaScreen", false);
-    int num = MythDisplay::GetNumberXineramaScreens();
 
-    for (int i=0; i<num; ++i)
-        gc->addSelection(QString::number(i), QString::number(i));
+    foreach (QScreen *qscreen, qGuiApp->screens())
+    {
+        QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
+        gc->addSelection(qscreen->name() + extra, qscreen->name());
+    }
 
     gc->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
 
@@ -4553,7 +4555,7 @@ AppearanceSettings::AppearanceSettings()
 #endif
     screen->addChild(MenuTheme());
 
-    if (MythDisplay::GetNumberXineramaScreens() > 1)
+    if (MythDisplay::GetNumberOfScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());

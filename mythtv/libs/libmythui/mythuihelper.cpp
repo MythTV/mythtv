@@ -12,13 +12,13 @@
 #include <QFileInfo>
 #include <QApplication>
 #include <QPainter>
-#include <QDesktopWidget>
 #include <QStyleFactory>
 #include <QSize>
 #include <QFile>
 #include <QAtomicInt>
 #include <QEventLoop>
 #include <QTimer>
+#include <QScreen>
 
 // mythbase headers
 #include "mythdirs.h"
@@ -228,91 +228,64 @@ void MythUIHelperPrivate::Init(void)
 /**
  * \brief Get screen size from Qt, respecting for user's multiple screen prefs
  *
- * If the windowing system environment has multiple screens
- * (%e.g. Xinerama or Mac OS X), QApplication::desktop()->%width() will span
- * all of them, so we usually need to get the geometry of a specific screen.
+ * If the windowing system environment has multiple screens, then use
+ * QScreen::virtualSize() to get the size of the virtual desktop.
+ * Otherwise QScreen::size() or QScreen::availableSize() will provide
+ * the size of an individual screen.
  */
 void MythUIHelperPrivate::GetScreenBounds()
 {
-    QDesktopWidget *desktop = QApplication::desktop();
-    bool             hasXinerama = MythDisplay::GetNumberXineramaScreens() > 1;
-    int              numScreens  = desktop->numScreens();
-    int              screen;
-
-    if (hasXinerama)
+    foreach (QScreen *screen, qGuiApp->screens())
     {
-        LOG(VB_GUI, LOG_INFO, LOC +
-            QString("Total desktop dim: %1x%2, over %3 screen[s].")
-            .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
+        QRect dim = screen->geometry();
+        QString extra = MythDisplay::GetExtraScreenInfo(screen);
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1 dim: %2x%3 %4")
+            .arg(screen->name())
+            .arg(dim.width()).arg(dim.height())
+            .arg(extra));
     }
 
-    if (numScreens > 1)
+    QScreen *primary = qGuiApp->primaryScreen();
+    LOG(VB_GUI, LOG_INFO, LOC +
+        QString("Primary screen: %1.").arg(primary->name()));
+
+    int numScreens = MythDisplay::GetNumberOfScreens();
+    QSize dim = primary->virtualSize();
+    LOG(VB_GUI, LOG_INFO, LOC +
+        QString("Total desktop dim: %1x%2, over %3 screen[s].")
+        .arg(dim.width()).arg(dim.height()).arg(numScreens));
+
+    if (MythDisplay::SpanAllScreens())
     {
-        for (screen = 0; screen < numScreens; ++screen)
-        {
-            QRect dim = desktop->screenGeometry(screen);
-            LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1 dim: %2x%3.")
-                .arg(screen).arg(dim.width()).arg(dim.height()));
-        }
-    }
-
-    screen = desktop->primaryScreen();
-    LOG(VB_GUI, LOG_INFO, LOC + QString("Primary screen: %1.").arg(screen));
-
-    if (hasXinerama)
-        screen = GetMythDB()->GetNumSetting("XineramaScreen", screen);
-
-    if (screen == -1)       // Special case - span all screens
-    {
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Using entire desktop."));
         m_xbase  = 0;
         m_ybase  = 0;
-        m_width  = desktop->width();
-        m_height = desktop->height();
-
-        LOG(VB_GUI, LOG_INFO, LOC +
-            QString("Using all %1 screens. ").arg(numScreens) +
-            QString("Dimensions: %1x%2").arg(m_width).arg(m_height));
-
+        m_width  = dim.width();
+        m_height = dim.height();
         return;
     }
 
-    if (hasXinerama)        // User specified a single screen
+    QRect bounds;
+    QScreen *screen = MythDisplay::GetScreen();
+    if (GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
     {
-        if (screen < 0 || screen >= numScreens)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("Xinerama screen %1 was specified,"
-                        " but only %2 available, so using screen 0.")
-                .arg(screen).arg(numScreens));
-            screen = 0;
-        }
+        LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
+        // This doesn't include the area occupied by the
+        // Windows taskbar, or the Mac OS X menu bar and Dock
+        bounds = screen->availableGeometry();
     }
-
-
+    else
     {
-        QRect bounds;
-
-        bool inWindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-
-        if (inWindow)
-            LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
-
-        if (inWindow)
-            // This doesn't include the area occupied by the
-            // Windows taskbar, or the Mac OS X menu bar and Dock
-            bounds = desktop->availableGeometry(screen);
-        else
-            bounds = desktop->screenGeometry(screen);
-
-        m_xbase  = bounds.x();
-        m_ybase  = bounds.y();
-        m_width  = bounds.width();
-        m_height = bounds.height();
-
-        LOG(VB_GUI, LOG_INFO, LOC + QString("Using screen %1, %2x%3 at %4,%5")
-            .arg(screen).arg(m_width).arg(m_height)
-            .arg(m_xbase).arg(m_ybase));
+        bounds = screen->geometry();
     }
+    m_xbase  = bounds.x();
+    m_ybase  = bounds.y();
+    m_width  = bounds.width();
+    m_height = bounds.height();
+
+    LOG(VB_GUI, LOG_INFO, LOC + QString("Using screen %1, %2x%3 at %4,%5")
+        .arg(screen->name()).arg(m_width).arg(m_height)
+        .arg(m_xbase).arg(m_ybase));
 }
 
 /**
@@ -415,14 +388,14 @@ void MythUIHelperPrivate::WaitForScreenChange(void) const
     // Wait for screen signal change, so we later get updated screen resolution
     QEventLoop loop;
     QTimer timer;
-    QDesktopWidget *desktop = QApplication::desktop();
+    QScreen *screen = MythDisplay::GetScreen();
 
     timer.setSingleShot(true);
     QObject::connect(&timer, SIGNAL(timeout()),
                      &loop, SLOT(quit()));
-    QObject::connect(desktop, SIGNAL(resized(int)),
+    QObject::connect(screen, SIGNAL(geometryChanged(const QRect&)),
                      &loop, SLOT(quit()));
-    QObject::connect(desktop, SIGNAL(workAreaResized(int)),
+    QObject::connect(screen, SIGNAL(availableGeometryChanged(const QRect&)),
                      &loop, SLOT(quit()));
     timer.start(300); //300ms maximum wait
     loop.exec();

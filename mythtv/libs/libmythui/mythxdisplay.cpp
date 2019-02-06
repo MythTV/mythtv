@@ -142,19 +142,11 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
                                  rect.width(), rect.height()));
 }
 
-int MythXDisplay::GetNumberXineramaScreens(void)
-{
-    MythXLocker locker(this);
-    int nr_xinerama_screens = 0;
-    int event_base = 0, error_base = 0;
-    if (XineramaQueryExtension(m_disp, &event_base, &error_base) &&
-        XineramaIsActive(m_disp))
-    {
-        XFree(XineramaQueryScreens(m_disp, &nr_xinerama_screens));
-    }
-    return nr_xinerama_screens;
-}
-
+/**
+ * Return the size of the X Display in pixels.  This corresponds to
+ * the size of the desktop, not necessarily to the size of single
+ * screen.
+ */
 QSize MythXDisplay::GetDisplaySize(void)
 {
     MythXLocker locker(this);
@@ -163,6 +155,11 @@ QSize MythXDisplay::GetDisplaySize(void)
     return QSize(displayWidthPixel, displayHeightPixel);
 }
 
+/**
+ * Return the size of the X Display in millimeters.  This corresponds
+ * to the size of the desktop, not necessarily to the size of single
+ * screen.
+ */
 QSize MythXDisplay::GetDisplayDimensions(void)
 {
     MythXLocker locker(this);

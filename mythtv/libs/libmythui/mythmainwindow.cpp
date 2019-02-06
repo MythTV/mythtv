@@ -13,7 +13,6 @@ using namespace std;
 #include <QWaitCondition>
 #include <QApplication>
 #include <QTimer>
-#include <QDesktopWidget>
 #include <QHash>
 #include <QFile>
 #include <QDir>
@@ -21,6 +20,7 @@ using namespace std;
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QSize>
+#include <QWindow>
 
 // Platform headers
 #include "unistd.h"
@@ -48,6 +48,7 @@ using namespace std;
 #include "mythuiactions.h"
 #include "mythrect.h"
 #include "mythuidefines.h"
+#include "mythdisplay.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
@@ -736,6 +737,7 @@ void MythMainWindow::drawScreen(void)
             {
                 if ((*screenit)->NeedsRedraw())
                 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
                     QRegion topDirty = (*screenit)->GetDirtyArea();
                     QVector<QRect> wrects = topDirty.rects();
                     for (int i = 0; i < wrects.size(); i++)
@@ -744,6 +746,9 @@ void MythMainWindow::drawScreen(void)
                         QVector<QRect> drects = d->repaintRegion.rects();
                         for (int j = 0; j < drects.size(); j++)
                         {
+                            // Can't use QRegion::contains because it only
+                            // checks for overlap.  QRect::contains checks
+                            // if fully contained.
                             if (drects[j].contains(wrects[i]))
                             {
                                 foundThisRect = true;
@@ -754,6 +759,26 @@ void MythMainWindow::drawScreen(void)
                         if (!foundThisRect)
                             return;
                     }
+#else
+                    for (const QRect& wrect: (*screenit)->GetDirtyArea())
+                    {
+                        bool foundThisRect = false;
+                        for (const QRect& drect: d->repaintRegion)
+                        {
+                            // Can't use QRegion::contains because it only
+                            // checks for overlap.  QRect::contains checks
+                            // if fully contained.
+                            if (drect.contains(wrect))
+                            {
+                                foundThisRect = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundThisRect)
+                            return;
+                    }
+#endif
                 }
             }
         }
@@ -778,15 +803,20 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
     if (!painter->SupportsClipping())
         d->repaintRegion = QRegion(d->uiScreenRect);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> rects = d->repaintRegion.rects();
-
     for (int i = 0; i < rects.size(); i++)
     {
-        if (rects[i].width() == 0 || rects[i].height() == 0)
+        const QRect& r = rects[i];
+#else
+    for (const QRect& r : d->repaintRegion)
+    {
+#endif
+        if (r.width() == 0 || r.height() == 0)
             continue;
 
-        if (rects[i] != d->uiScreenRect)
-            painter->SetClipRect(rects[i]);
+        if (r != d->uiScreenRect)
+            painter->SetClipRect(r);
 
         QVector<MythScreenStack *>::Iterator it;
         for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
@@ -798,7 +828,7 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
             for (screenit = redrawList.begin(); screenit != redrawList.end();
                  ++screenit)
             {
-                (*screenit)->Draw(painter, 0, 0, 255, rects[i]);
+                (*screenit)->Draw(painter, 0, 0, 255, r);
             }
         }
     }
@@ -833,9 +863,14 @@ void MythMainWindow::GrabWindow(QImage &image)
     if (active)
         winid = active->winId();
     else
-        winid = QApplication::desktop()->winId();
+        // According to the following we page, you "just pass 0 as the
+        // window id, indicating that we want to grab the entire screen".
+        //
+        // https://doc.qt.io/qt-5/qtwidgets-desktop-screenshot-example.html#screenshot-class-implementation
+        winid = 0;
 
-    QPixmap p = QPixmap::grabWindow(winid);
+    QScreen *screen = MythDisplay::GetScreen();
+    QPixmap p = screen->grabWindow(winid);
     image = p.toImage();
 }
 
@@ -997,6 +1032,10 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     }
 
     setWindowFlags(flags);
+    if (this->windowHandle()) {
+        LOG(VB_GENERAL, LOG_INFO, QString("Have window handle, setting screen"));
+        this->windowHandle()->setScreen(MythDisplay::GetScreen());
+    }
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);

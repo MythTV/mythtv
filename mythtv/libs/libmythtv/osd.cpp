@@ -942,10 +942,15 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
 
     // assist yuv blending with some friendly alignments
     QRegion aligned;
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> rects = visible.rects();
     for (int i = 0; i < rects.size(); i++)
     {
-        QRect r   = rects[i];
+        const QRect& r = rects[i];
+#else
+    for (const QRect& r : visible)
+    {
+#endif
         int left  = r.left() & ~(alignx - 1);
         int top   = r.top()  & ~(aligny - 1);
         int right = (r.left() + r.width());
