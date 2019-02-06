@@ -842,7 +842,6 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
         dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
         dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
-        dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
         dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
         dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
         dec_name["nvdec"]    = QObject::tr("NVidia NVDEC acceleration");
@@ -888,12 +887,6 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding. REQUIRES OPENGL PAINTER.");
-
-    if (decoder == "vda")
-        msg += QObject::tr(
-            "VDA will attempt to use the graphics hardware to "
-            "accelerate video decoding. "
-            "(H264 only, requires Mac OS 10.6.3)");
 
     if (decoder == "openmax")
         msg += QObject::tr(
@@ -1386,47 +1379,6 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
                       "vdpau", 1, true, "vdpau", "vdpau", true,
                       "vdpaubobdeint", "vdpauonefield",
                       "vdpauskipchroma,vdpaucolorspace=auto");
-    }
-#endif
-
-#if defined(Q_OS_MACX)
-    if (!profiles.contains("VDA High Quality")) {
-        (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
-        groupid = CreateProfileGroup("VDA High Quality", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vda", 2, true, "opengl", "opengl2", true,
-                      "greedyhdoubleprocessdeint", "greedyhdeint",
-                      "");
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 2, true, "opengl", "opengl2", true,
-                      "greedyhdoubleprocessdeint", "greedyhdeint",
-                      "");
-    }
-
-    if (!profiles.contains("VDA Normal")) {
-        (void) QObject::tr("VDA Normal", "Sample: VDA average quality");
-        groupid = CreateProfileGroup("VDA Normal", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vda", 2, true, "opengl", "opengl2", true,
-                      "opengldoubleratekerneldeint", "openglkerneldeint",
-                      "");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 2, true, "opengl", "opengl2", true,
-                      "opengldoubleratekerneldeint", "openglkerneldeint",
-                      "");
-    }
-
-    if (!profiles.contains("VDA Slim")) {
-        (void) QObject::tr("VDA Slim", "Sample: VDA low power GPU");
-        groupid = CreateProfileGroup("VDA Slim", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vda", 2, true, "opengl", "opengl2", true,
-                      "opengldoubleratelinearblend", "opengllinearblend",
-                      "");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 2, true, "opengl", "opengl2", true,
-                      "opengldoubleratelinearblend", "opengllinearblend",
-                      "");
     }
 #endif
 

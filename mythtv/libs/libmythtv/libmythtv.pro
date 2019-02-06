@@ -404,11 +404,6 @@ using_frontend {
         LIBS    += -lass
     }
 
-    macx {
-        HEADERS += privatedecoder_vda.h privatedecoder_vda_defs.h
-        SOURCES += privatedecoder_vda.cpp
-    }
-
     # On screen display (video output overlay)
     HEADERS += osd.h                    teletextscreen.h
     HEADERS += subtitlescreen.h         interactivescreen.h

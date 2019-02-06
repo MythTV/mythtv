@@ -24,8 +24,6 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["ffmpeg"].append("null");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("null");
-    if (opts.decoders->contains("vda"))
-        (*opts.safe_renderers)["vda"].append("null");
 #ifdef USING_OPENMAX
     if (opts.decoders->contains("openmax"))
         (*opts.safe_renderers)["openmax"].append("null");

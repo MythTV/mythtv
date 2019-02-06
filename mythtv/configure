@@ -1403,7 +1403,6 @@ EXTERNAL_LIBRARY_LIST="
 HWACCEL_AUTODETECT_LIBRARY_LIST="
     crystalhd
     dxva2
-    vda
     vdpau
 "
 
@@ -2277,10 +2276,6 @@ rdft_select="fft"
 crystalhd_deps="libcrystalhd_libcrystalhd_if_h"
 dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32"
 dxva2_extralibs="-luser32"
-vda_framework_deps="VideoDecodeAcceleration_VDADecoder_h blocks_extension"
-vda_framework_extralibs="-framework VideoDecodeAcceleration"
-vda_deps="vda_framework pthreads"
-vda_extralibs="-framework CoreFoundation -framework QuartzCore"
 
 h263_vaapi_hwaccel_deps="vaapi"
 h263_vaapi_hwaccel_select="h263_decoder"
@@ -2288,10 +2283,6 @@ h264_dxva2_hwaccel_deps="dxva2"
 h264_dxva2_hwaccel_select="h264_decoder"
 h264_vaapi_hwaccel_deps="vaapi"
 h264_vaapi_hwaccel_select="h264_decoder"
-h264_vda_hwaccel_deps="vda"
-h264_vda_hwaccel_select="h264_decoder"
-h264_vda_old_hwaccel_deps="vda"
-h264_vda_old_hwaccel_select="h264_decoder"
 h264_vdpau_hwaccel_deps="vdpau"
 h264_vdpau_hwaccel_select="h264_decoder"
 hevc_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_HEVC"
@@ -5760,7 +5751,6 @@ check_header sys/un.h
 check_header termios.h
 check_header unistd.h
 check_header valgrind/valgrind.h
-check_header VideoDecodeAcceleration/VDADecoder.h
 check_func_headers VideoToolbox/VTCompressionSession.h VTCompressionSessionPrepareToEncodeFrames -framework VideoToolbox
 check_header windows.h
 check_header asm/types.h
@@ -7416,9 +7406,6 @@ fi
   echo "OpenGL support            ${opengl-no}"
   echo "OpenGL video              ${opengl_video-no}"
   echo "OpenGL ThemePainter       ${opengl_themepainter-no}"
-  if test x"$target_os" = x"darwin" ; then
-    echo "VDA support               ${vda-no}"
-  fi
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
     echo "DXVA2 support             ${dxva2-no}"
