@@ -33,13 +33,13 @@ class MediaServer : public UPnp
     private:
 
 #ifdef USING_LIBDNS_SD
-    BonjourRegister *m_bonjour;
+    BonjourRegister     *m_bonjour   {nullptr};
 #endif
 
     protected:
 
-        UPnpCDS         *m_pUPnpCDS;     // Do not delete (auto deleted)
-        UPnpCMGR        *m_pUPnpCMGR;    // Do not delete (auto deleted)
+        UPnpCDS         *m_pUPnpCDS  {nullptr};    // Do not delete (auto deleted)
+        UPnpCMGR        *m_pUPnpCMGR {nullptr};    // Do not delete (auto deleted)
 
         QString          m_sSharePath;
 
