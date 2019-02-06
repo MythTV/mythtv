@@ -47,15 +47,14 @@ class NameValues;
 class NameValue
 {
   public:
-    QString m_sName;
-    QString m_sValue;
-    bool    m_bRequired {false};
+    QString     m_sName;
+    QString     m_sValue;
+    bool        m_bRequired   {false};
 
     NameValues *m_pAttributes {nullptr};
 
   public:
-    NameValue() :
-        m_sName(), m_sValue(), m_bRequired(false) { }
+    NameValue() = default;
     NameValue(const QString &name, const QString &value, bool required = false) :
         m_sName(name), m_sValue(value), m_bRequired(required) { }
     NameValue(const QString &name, const char *value, bool required = false) :

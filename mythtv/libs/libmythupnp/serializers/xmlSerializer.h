@@ -34,9 +34,9 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
     protected:
 
-        QXmlStreamWriter *m_pXmlWriter;
+        QXmlStreamWriter *m_pXmlWriter   {nullptr};
         QString           m_sRequestName;
-        bool              m_bIsRoot;
+        bool              m_bIsRoot      {true};
 
         void BeginSerialize( QString &sName ) override; // Serializer
         void EndSerialize  () override; // Serializer
@@ -71,7 +71,7 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
     public:
 
-        bool     PropertiesAsAttributes;
+        bool     PropertiesAsAttributes {true};
 
                  XmlSerializer( QIODevice *pDevice, const QString &sRequestName );
         virtual ~XmlSerializer();

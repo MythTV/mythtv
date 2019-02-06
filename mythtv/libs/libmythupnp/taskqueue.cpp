@@ -76,7 +76,7 @@ void TaskQueue::Shutdown()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-TaskQueue::TaskQueue() : MThread("TaskQueue"), m_bTermRequested( false )
+TaskQueue::TaskQueue() : MThread("TaskQueue")
 {
     LOG(VB_UPNP, LOG_INFO, "Starting TaskQueue Thread...");
 

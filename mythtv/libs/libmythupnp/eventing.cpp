@@ -64,9 +64,7 @@ Eventing::Eventing(const QString &sExtensionName,
     HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(sEventMethodName),
     m_nSubscriptionDuration(
-        UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800)),
-    m_nHoldCount(0),
-    m_pInitializeSubscriber(nullptr)
+        UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800))
 {
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }

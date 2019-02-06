@@ -31,12 +31,9 @@ CDSObject::CDSObject( const QString &sId,
                       const QString &sTitle, 
                       const QString &sParentId )
     : ReferenceCounter("CDSObject", false),
-      m_nUpdateId(1), m_eType(OT_Container),
       m_sId(HTTPRequest::Encode(sId)),
       m_sParentId(HTTPRequest::Encode(sParentId)),
-      m_sTitle(HTTPRequest::Encode(sTitle)),
-      m_bRestricted(true), m_bSearchable(false),
-      m_sWriteStatus("PROTECTED"), m_nChildCount(0), m_nChildContainerCount(0)
+      m_sTitle(HTTPRequest::Encode(sTitle))
 {
 }
 

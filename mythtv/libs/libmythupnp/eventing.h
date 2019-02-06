@@ -64,7 +64,7 @@ class UPNP_PUBLIC SubscriberInfo
 
         QString             m_sUUID;
         QUrl                m_qURL;
-        unsigned short      m_nKey {0};
+        unsigned short      m_nKey      {0};
         unsigned long       m_nDuration {0};       // Seconds
 
     protected:
@@ -263,11 +263,11 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
         QString             m_sEventMethodName;
         Subscribers         m_Subscribers;
 
-        int                 m_nSubscriptionDuration;
+        int                 m_nSubscriptionDuration {1800};
 
-        short               m_nHoldCount;
+        short               m_nHoldCount            {0};
 
-        SubscriberInfo     *m_pInitializeSubscriber;
+        SubscriberInfo     *m_pInitializeSubscriber {nullptr};
 
     protected:
 

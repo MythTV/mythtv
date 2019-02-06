@@ -56,7 +56,7 @@ typedef enum
     // Not a request type
     RequestTypeResponse     = 0x1000
 
-} RequestType;
+} HttpRequestType;
 
 typedef enum
 {
@@ -64,7 +64,7 @@ typedef enum
     ContentType_Urlencoded = 1,
     ContentType_XML        = 2
 
-} ContentType;
+} HttpContentType;
 
 typedef enum
 {
@@ -80,7 +80,7 @@ typedef enum
     ResponseTypeOther    =  8,
     ResponseTypeHeader   =  9
 
-} ResponseType;
+} HttpResponseType;
 
 typedef struct
 {
@@ -106,15 +106,15 @@ class UPNP_PUBLIC HTTPRequest
 {
     protected:
 
-        static const char  *m_szServerHeaders;
+        static const char  *s_szServerHeaders;
 
-        QRegExp             m_procReqLineExp;
-        QRegExp             m_parseRangeExp;
+        QRegExp             m_procReqLineExp    {"[ \r\n][ \r\n]*"};
+        QRegExp             m_parseRangeExp     {"(\\d|\\-)"};
 
     public:
 
-        RequestType         m_eType;
-        ContentType         m_eContentType;
+        HttpRequestType     m_eType             {RequestTypeUnknown};
+        HttpContentType     m_eContentType      {ContentType_Unknown};
 
         QString             m_sRawRequest; // e.g. GET /foo/bar.html HTTP/1.1
 
@@ -131,42 +131,42 @@ class UPNP_PUBLIC HTTPRequest
         QString             m_sPayload;
 
         QString             m_sProtocol;
-        int                 m_nMajor;
-        int                 m_nMinor;
+        int                 m_nMajor            {0};
+        int                 m_nMinor            {0};
 
-        bool                m_bProtected;
-        bool                m_bEncrypted;
+        bool                m_bProtected        {false};
+        bool                m_bEncrypted        {false};
 
-        bool                m_bSOAPRequest;
+        bool                m_bSOAPRequest      {false};
         QString             m_sNameSpace;
 
         // Response
 
-        ResponseType        m_eResponseType;
+        HttpResponseType    m_eResponseType     {ResponseTypeUnknown};
         QString             m_sResponseTypeText;    // used for ResponseTypeOther
 
-        long                m_nResponseStatus;
+        long                m_nResponseStatus   {200};
         QStringMap          m_mapRespHeaders;
 
         QString             m_sFileName;
 
         QBuffer             m_response;
 
-        IPostProcess       *m_pPostProcess;
+        IPostProcess       *m_pPostProcess      {nullptr};
 
         QString             m_sPrivateToken;
         MythUserSession     m_userSession;
 
     private:
 
-        bool                m_bKeepAlive;
-        uint                m_nKeepAliveTimeout;
+        bool                m_bKeepAlive        {true};
+        uint                m_nKeepAliveTimeout {0};
 
     protected:
 
-        RequestType     SetRequestType      ( const QString &sType  );
+        HttpRequestType SetRequestType      ( const QString &sType  );
         void            SetRequestProtocol  ( const QString &sLine  );
-        ContentType     SetContentType      ( const QString &sType  );
+        HttpContentType SetContentType      ( const QString &sType  );
 
         void            ProcessRequestLine  ( const QString &sLine  );
         bool            ProcessSOAPPayload  ( const QString &sSOAPAction );
@@ -203,7 +203,7 @@ class UPNP_PUBLIC HTTPRequest
 
     public:
 
-                        HTTPRequest     ();
+                        HTTPRequest     () { m_response.open( QIODevice::ReadWrite ); }
         virtual        ~HTTPRequest     () = default;
 
         bool            ParseRequest    ();
@@ -274,11 +274,12 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 {
     public:
 
-        QTcpSocket    *m_pSocket;
+        QTcpSocket    *m_pSocket {nullptr};
 
     public:
 
-        explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket );
+        explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket )
+            : m_pSocket(pSocket) {}
         virtual ~BufferedSocketDeviceRequest() = default;
 
         QString  ReadLine        ( int msecs ) override; // HTTPRequest
@@ -299,7 +300,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 class UPNP_PUBLIC HttpException
 {
     public:
-        int     m_code;
+        int     m_code {-1};
         QString m_msg;
 
         HttpException( int nCode = -1, const QString &sMsg = "")

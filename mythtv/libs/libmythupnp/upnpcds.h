@@ -74,14 +74,14 @@ class UPNP_PUBLIC UPnpCDSRequest
 
         QString           m_sContainerID;
         QString           m_sFilter;
-        uint16_t          m_nStartingIndex;
-        uint16_t          m_nRequestedCount;
+        uint16_t          m_nStartingIndex  {0};
+        uint16_t          m_nRequestedCount {0};
         QString           m_sSortCriteria;
 
         // Browse specific properties
 
         QString           m_sParentId;
-        UPnpCDSBrowseFlag m_eBrowseFlag;
+        UPnpCDSBrowseFlag m_eBrowseFlag     {CDS_BrowseUnknown};
 
         // Search specific properties
 
@@ -90,18 +90,12 @@ class UPNP_PUBLIC UPnpCDSRequest
         QString           m_sSearchClass;
 
         // The device performing the request
-        UPnpCDSClient     m_eClient;
-        double            m_nClientVersion;
+        UPnpCDSClient     m_eClient          {CDS_ClientDefault};
+        double            m_nClientVersion   {0.0};
 
     public:
 
-        UPnpCDSRequest() : m_nStartingIndex ( 0 ),
-                           m_nRequestedCount( 0 ),
-                           m_eBrowseFlag( CDS_BrowseUnknown ),
-                           m_eClient( CDS_ClientDefault ),
-                           m_nClientVersion( 0 )
-        {
-        }
+        UPnpCDSRequest() = default;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -111,19 +105,15 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
     public:
 
         CDSObjects              m_List;
-        UPnPResultCode          m_eErrorCode;
+        UPnPResultCode          m_eErrorCode    {UPnPResult_Success};
         QString                 m_sErrorDesc;
 
-        uint16_t                m_nTotalMatches;
-        uint16_t                m_nUpdateID;
+        uint16_t                m_nTotalMatches {0};
+        uint16_t                m_nUpdateID     {0};
 
     public:
 
-        UPnpCDSExtensionResults() : m_eErrorCode( UPnPResult_Success ),
-                                    m_nTotalMatches(0), 
-                                    m_nUpdateID(0)
-        {
-        }
+        UPnpCDSExtensionResults() = default;
         ~UPnpCDSExtensionResults()
         {
             while (!m_List.isEmpty())
@@ -253,13 +243,13 @@ class UPNP_PUBLIC UPnpCDSExtension
                                       const QString &Name,
                                       const QString &Value );
 
-        CDSObject *m_pRoot;
+        CDSObject *m_pRoot {nullptr};
 
     public:
 
         UPnpCDSExtension( QString sName, 
                           QString sExtensionId, 
-                          QString sClass ) : m_pRoot(nullptr)
+                          QString sClass )
         {
             m_sName        = QObject::tr(sName.toLatin1().constData());
             m_sExtensionId = sExtensionId;
@@ -299,7 +289,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         QString                m_sControlUrl;
 
         UPnPFeatureList        m_features;
-        UPnPShortcutFeature      *m_pShortCuts;
+        UPnPShortcutFeature   *m_pShortCuts {nullptr};
 
     private:
 

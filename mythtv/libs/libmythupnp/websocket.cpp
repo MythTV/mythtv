@@ -23,7 +23,7 @@
 
 WebSocketServer::WebSocketServer() :
     ServerPool(),
-    m_threadPool("WebSocketServerPool"), m_running(true)
+    m_threadPool("WebSocketServerPool")
 {
     setObjectName("WebSocketServer");
     // Number of connections processed concurrently
@@ -107,14 +107,11 @@ WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
                                  )
                 : m_eventLoop(new QEventLoop()),
                   m_webSocketServer(webSocketServer),
-                  m_socketFD(sock), m_socket(nullptr),
-                  m_connectionType(type), m_webSocketMode(false),
-                  m_errorCount(0), m_isRunning(false),
-                  m_heartBeat(new QTimer()),
+                  m_socketFD(sock), m_connectionType(type),
+                  m_heartBeat(new QTimer())
 #ifndef QT_NO_OPENSSL
-                  m_sslConfig(sslConfig),
+                  , m_sslConfig(sslConfig)
 #endif
-                  m_fuzzTesting(false)
 {
     setObjectName(QString("WebSocketWorker(%1)")
                         .arg(m_socketFD));

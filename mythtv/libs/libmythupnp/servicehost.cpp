@@ -24,17 +24,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-MethodInfo::MethodInfo()
-{
-    m_nMethodIndex = 0;
-    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost |
-                                   RequestTypeHead);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
 QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 {
     HttpRedirectException exception;
@@ -240,9 +229,9 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
             oInfo.m_nMethodIndex = nIdx;
             oInfo.m_sName        = sName.section( '(', 0, 0 );
             oInfo.m_oMethod      = method;
-            oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
-                                                 RequestTypePost |
-                                                 RequestTypeHead);
+            oInfo.m_eRequestType = (HttpRequestType)(RequestTypeGet |
+                                                     RequestTypePost |
+                                                     RequestTypeHead);
 
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
@@ -257,8 +246,8 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
                 if (sRequestType == "POST")
                     oInfo.m_eRequestType = RequestTypePost;
                 else if (sRequestType == "GET" )
-                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
-                                                         RequestTypeHead);
+                    oInfo.m_eRequestType = (HttpRequestType)(RequestTypeGet |
+                                                             RequestTypeHead);
             }
 
             m_Methods.insert( oInfo.m_sName, oInfo );

@@ -154,35 +154,13 @@ static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 //static const int g_off         = 0;
 #endif
 
-const char *HTTPRequest::m_szServerHeaders = "Accept-Ranges: bytes\r\n";
+const char *HTTPRequest::s_szServerHeaders = "Accept-Ranges: bytes\r\n";
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
-                             m_parseRangeExp  ( "(\\d|\\-)"        ),
-                             m_eType          ( RequestTypeUnknown ),
-                             m_eContentType   ( ContentType_Unknown),
-                             m_nMajor         (   0 ),
-                             m_nMinor         (   0 ),
-                             m_bProtected     ( false ),
-                             m_bEncrypted     ( false ),
-                             m_bSOAPRequest   ( false ),
-                             m_eResponseType  ( ResponseTypeUnknown),
-                             m_nResponseStatus( 200 ),
-                             m_pPostProcess   ( nullptr ),
-                             m_bKeepAlive     ( true ),
-                             m_nKeepAliveTimeout ( 0 )
-{
-    m_response.open( QIODevice::ReadWrite );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-RequestType HTTPRequest::SetRequestType( const QString &sType )
+HttpRequestType HTTPRequest::SetRequestType( const QString &sType )
 {
     // HTTP
     if (sType == "GET"        ) return( m_eType = RequestTypeGet         );
@@ -945,7 +923,7 @@ QString HTTPRequest::GetResponseProtocol() const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-ContentType HTTPRequest::SetContentType( const QString &sType )
+HttpContentType HTTPRequest::SetContentType( const QString &sType )
 {
     if ((sType == "application/x-www-form-urlencoded"          ) ||
         (sType.startsWith("application/x-www-form-urlencoded;")))
@@ -1191,7 +1169,7 @@ QString HTTPRequest::GetRequestHeader( const QString &sKey, QString sDefault )
 
 QString HTTPRequest::GetResponseHeaders( void )
 {
-    QString sHeader = m_szServerHeaders;
+    QString sHeader = s_szServerHeaders;
 
     for ( QStringMap::iterator it  = m_mapRespHeaders.begin();
                                it != m_mapRespHeaders.end();
@@ -2363,15 +2341,6 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 // BufferedSocketDeviceRequest Class Implementation
 //
 /////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-BufferedSocketDeviceRequest::BufferedSocketDeviceRequest( QTcpSocket *pSocket )
-{
-    m_pSocket  = pSocket;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
 /////////////////////////////////////////////////////////////////////////////
 
 QString BufferedSocketDeviceRequest::ReadLine( int msecs )
