@@ -505,7 +505,7 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
         // ensure deinterlacing works correctly when down scaling in height
         resize = (m_videoDispDim.height() > m_displayVideoRect.height()) && deinterlacing;
         // UYVY packed pixels must be sampled exactly
-        resize |= (kGLUYVY == m_frameType) && (m_displayVideoRect.width() != m_videoRect.width());
+        resize |= (kGLUYVY == m_frameType);
         // user forced
         resize |= m_forceResize;
 
