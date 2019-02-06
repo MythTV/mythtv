@@ -36,7 +36,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 
     // VideoOutput overrides
     bool Init(const QSize&, const QSize&, float, WId, const QRect&, MythCodecID) override;
-    bool InputChanged(const QSize&, const QSize&, float, MythCodecID, void*, bool&) override;
+    bool InputChanged(const QSize&, const QSize&, float, MythCodecID, bool&) override;
     void Zoom(ZoomDirection) override;
     void EmbedInWidget(const QRect&) override;
     void StopEmbedding(void) override;

@@ -121,7 +121,7 @@ bool VideoOutputOpenGL::CreateGPUResources(void)
     bool result = SetupContext();
     if (result)
     {
-        QSize size = window.GetActualVideoDim();
+        QSize size = window.GetVideoDim();
         InitDisplayMeasurements(size.width(), size.height(), false);
         CreatePainter();
     }
@@ -197,7 +197,6 @@ bool VideoOutputOpenGL::Init(const QSize &video_dim_buf,
 {
     QMutexLocker locker(&gl_context_lock);
     bool success = true;
-    window.SetAllowPreviewEPG(true);
     gl_parent_win = winid;
     success &= VideoOutput::Init(video_dim_buf, video_dim_disp,
                                  aspect, winid,
@@ -234,12 +233,11 @@ bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
                                      const QSize &video_dim_disp,
                                      float        aspect,
                                      MythCodecID  av_codec_id,
-                                     void        */*codec_private*/,
                                      bool        &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
             .arg(video_dim_disp.width()).arg(video_dim_disp.height())
-            .arg(aspect)
+            .arg(static_cast<qreal>(aspect))
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&gl_context_lock);
@@ -266,7 +264,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
     }
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = video_dim_disp != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
@@ -458,7 +456,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "ProcessFrame called from wrong thread");
         }
-        QSize size = window.GetActualVideoDim();
+        QSize size = window.GetVideoDim();
         InitDisplayMeasurements(size.width(), size.height(), false);
         DestroyVideoResources();
         CreateVideoResources();
@@ -580,7 +578,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     // video
     if (gl_videochain && !buffer->dummy)
     {
-        gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
+        gl_videochain->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
         gl_videochain->PrepareFrame(buffer->top_field_first, t, m_stereo);
@@ -696,7 +694,7 @@ void VideoOutputOpenGL::MoveResize(void)
     VideoOutput::MoveResize();
     if (gl_videochain)
     {
-        gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
+        gl_videochain->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
     }
@@ -845,8 +843,8 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
     const bool  pipActive      = pipplayer->IsPIPActive();
     const bool  pipVisible     = pipplayer->IsPIPVisible();
-    const uint  pipVideoWidth  = pipVideoDim.width();
-    const uint  pipVideoHeight = pipVideoDim.height();
+    const int  pipVideoWidth   = pipVideoDim.width();
+    const int  pipVideoHeight  = pipVideoDim.height();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
     if ((pipVideoAspect <= 0) || !pipimage ||
@@ -912,7 +910,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
 
     if (gl_pipchain->IsValid())
     {
-        gl_pipchain->SetVideoRect(position, QRect(0, 0, pipVideoWidth, pipVideoHeight));
+        gl_pipchain->SetVideoRects(position, QRect(0, 0, pipVideoWidth, pipVideoHeight));
         gl_pipchain->UpdateInputFrame(pipimage);
     }
     gl_pip_ready[pipplayer] = true;

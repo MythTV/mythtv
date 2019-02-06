@@ -144,12 +144,11 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
                                   const QSize &video_dim_disp,
                                   float        aspect,
                                   MythCodecID  av_codec_id,
-                                  void        *codec_private,
                                   bool        &aspect_only)
 {
     QMutexLocker locker(&m_lock);
 
-    QSize cursize = window.GetActualVideoDim();
+    QSize cursize = window.GetVideoDim();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged from %1: %2x%3 aspect %4 to %5: %6x%7 aspect %9")
@@ -220,7 +219,6 @@ bool VideoOutputD3D::Init(const QSize &video_dim_buf,
 
     QMutexLocker locker(&m_lock);
     m_hWnd      = (HWND)winid;
-    window.SetAllowPreviewEPG(true);
 
     VideoOutput::Init(video_dim_buf, video_dim_disp,
                       aspect, winid, win_rect, codec_id);
@@ -522,8 +520,6 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         }
         pauseframe = true;
     }
-
-    CropToDisplay(frame);
 
     if (frame)
         dummy = frame->dummy;

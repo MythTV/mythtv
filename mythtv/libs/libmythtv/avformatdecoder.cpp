@@ -5629,11 +5629,6 @@ QString AvFormatDecoder::GetRawEncodingType(void)
     return ff_codec_id_string(ic->streams[stream]->codecpar->codec_id);
 }
 
-void *AvFormatDecoder::GetVideoCodecPrivate(void)
-{
-    return nullptr; // TODO is this still needed
-}
-
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
 {
     if (selectedTrack[kTrackTypeAudio].av_stream_index < 0)

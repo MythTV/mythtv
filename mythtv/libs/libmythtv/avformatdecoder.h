@@ -145,7 +145,6 @@ class AvFormatDecoder : public DecoderBase
     QString      GetCodecDecoderName(void) const override; // DecoderBase
     QString      GetRawEncodingType(void) override; // DecoderBase
     MythCodecID  GetVideoCodecID(void) const override { return video_codec_id; } // DecoderBase
-    void        *GetVideoCodecPrivate(void) override; // DecoderBase
 
     void SetDisablePassThrough(bool disable) override; // DecoderBase
     void ForceSetupAudioStream(void) override; // DecoderBase

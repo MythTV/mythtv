@@ -31,7 +31,7 @@ class VideoOutputOpenGL : public VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
                       float aspect,
-                      MythCodecID  av_codec_id, void *codec_private,
+                      MythCodecID  av_codec_id,
                       bool &aspect_only) override; // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
     void DrawUnusedRects(bool) override { } // VideoOutput

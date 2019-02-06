@@ -176,7 +176,7 @@ void OpenGLVideo::SetMasterViewport(QSize Size)
     m_masterViewportSize = Size;
 }
 
-void OpenGLVideo::SetVideoRect(const QRect &DisplayVideoRect, const QRect &VideoRect)
+void OpenGLVideo::SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect)
 {
     m_displayVideoRect = DisplayVideoRect;
     m_videoRect = VideoRect;

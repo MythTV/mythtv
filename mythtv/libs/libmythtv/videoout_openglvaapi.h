@@ -22,7 +22,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
     bool  InputChanged(const QSize &video_dim_buf,
                        const QSize &video_dim_disp,
                        float aspect,
-                       MythCodecID  av_codec_id, void *codec_private,
+                       MythCodecID  av_codec_id,
                        bool &aspect_only) override; // VideoOutputOpenGL
     void  UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutputOpenGL
     void  PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd) override; // VideoOutputOpenGL

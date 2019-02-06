@@ -101,13 +101,12 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
  * \return instance of VideoOutput if successful, nullptr otherwise.
  */
 VideoOutput *VideoOutput::Create(
-    const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
+    const QString &decoder, MythCodecID  codec_id,
     PIPState pipState,      const QSize &video_dim_buf,
     const QSize &video_dim_disp, float video_aspect,
     QWidget *parentwidget,  const QRect &embed_rect, float video_prate,
     uint playerFlags, QString &codecName)
 {
-    (void) codec_priv;
     QStringList renderers;
 
     // select the best available output
@@ -709,11 +708,9 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
                                const QSize &video_dim_disp,
                                float        aspect,
                                MythCodecID  myth_codec_id,
-                               void        *codec_private,
                                bool        &/*aspect_only*/)
 {
-    window.InputChanged(video_dim_buf, video_dim_disp,
-                        aspect, myth_codec_id, codec_private);
+    window.InputChanged(video_dim_buf, video_dim_disp, aspect);
 
     AVCodecID avCodecId = (AVCodecID) myth2av_codecid(myth_codec_id);
     AVCodec *codec = avcodec_find_decoder(avCodecId);
@@ -837,11 +834,6 @@ QRect VideoOutput::GetMHEGBounds(void)
     QRect dvr = window.GetDisplayVideoRect();
     return QRect(QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
                  QSize(dvr.width() & ~0x1, dvr.height() & ~0x1));
-}
-
-bool VideoOutput::AllowPreviewEPG(void) const
-{
-    return window.IsPreviewEPGAllowed();
 }
 
 /**
@@ -1301,11 +1293,6 @@ float VideoOutput::GetDisplayAspect(void) const
     return window.GetDisplayAspect();
 }
 
-bool VideoOutput::IsVideoScalingAllowed(void) const
-{
-    return window.IsVideoScalingAllowed();
-}
-
 void VideoOutput::ShutdownVideoResize(void)
 {
     if (vsz_tmp_buf)
@@ -1742,14 +1729,6 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
             return;
     }
 
-#if 0
-    // width and height should already be the properly cropped
-    // versions, and therefore height should not need this manual
-    // truncation.  Delete this code if no problems crop up.
-    if ((width == 1920 || width == 1440) && height == 1088)
-        height = 1080; // ATSC 1920x1080
-#endif
-
     float rate = db_vdisp_profile ? db_vdisp_profile->GetOutput() : 0.0f;
     if (display_res && display_res->SwitchToVideo(width, height, rate))
     {
@@ -1931,43 +1910,4 @@ int VideoOutput::CalcHueBase(const QString &adaptor_name)
     }
 
     return hue_adj;
-}
-
-void VideoOutput::CropToDisplay(VideoFrame *frame)
-{
-    // TODO: support cropping in the horizontal dimension
-    if (!frame)
-        return;
-    if (FMT_YV12 != frame->codec)
-        return;
-    if (frame->pitches[1] != frame->pitches[2])
-        return;
-    int crop = window.GetVideoDim().height() -
-        window.GetVideoDispDim().height();
-    if (crop <= 0 || crop >= 16)
-        return; // something may be amiss, so don't crop
-
-    uint64_t *ybuf = (uint64_t*) (frame->buf + frame->offsets[0]);
-    uint64_t *ubuf = (uint64_t*) (frame->buf + frame->offsets[1]);
-    uint64_t *vbuf = (uint64_t*) (frame->buf + frame->offsets[2]);
-    const uint64_t Y_black  = 0x0000000000000000LL; // 8 bytes
-    const uint64_t UV_black = 0x8080808080808080LL; // 8 bytes
-    int y;
-    int sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
-    // Luma bottom
-    y = ((frame->height - crop) >> 4) * frame->pitches[0] << 1;
-    y = y + (sz - y) * (16 - crop) / 16;
-    for (; y < sz; y++)
-    {
-        ybuf[y] = Y_black;
-    }
-    // Chroma bottom
-    sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
-    y = ((frame->height - crop) >> 4) * frame->pitches[1];
-    y = y + (sz - y) * (16 - crop) / 16;
-    for (; y < sz; y++)
-    {
-        ubuf[y] = UV_black;
-        vbuf[y] = UV_black;
-    }
 }

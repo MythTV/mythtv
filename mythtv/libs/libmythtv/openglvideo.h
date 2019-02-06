@@ -58,11 +58,11 @@ class OpenGLVideo : public QObject
     QString GetDeinterlacer(void) const;
     void    PrepareFrame(bool TopFieldFirst, FrameScanType Scan, StereoscopicMode Stereo, bool DrawBorder = false);
     void    SetMasterViewport(QSize Size);
-    void    SetVideoRect(const QRect &DisplayVideoRect, const QRect &VideoRect);
     QSize   GetVideoSize(void) const;
     FrameType GetType() const;
 
   public slots:
+    void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
     void    UpdateColourSpace(void);
     void    UpdateShaderParameters(void);
 

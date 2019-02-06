@@ -86,13 +86,12 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
                                    const QSize &video_dim_disp,
                                    float        aspect,
                                    MythCodecID  av_codec_id,
-                                   void        *codec_private,
                                    bool        &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("InputChanged(WxH = %1x%2, aspect = %3)")
             .arg(video_dim_disp.width())
-            .arg(video_dim_disp.height()).arg(aspect));
+            .arg(video_dim_disp.height()).arg(static_cast<qreal>(aspect)));
 
     if (!codec_is_std(av_codec_id))
     {
@@ -104,7 +103,7 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
 
     QMutexLocker locker(&global_lock);
 
-    if (video_dim_disp == window.GetActualVideoDim())
+    if (video_dim_disp == window.GetVideoDim())
     {
         vbuffers.Clear();
         MoveResize();
@@ -112,8 +111,7 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
     }
 
     VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
-                              aspect, av_codec_id, codec_private,
-                              aspect_only);
+                              aspect, av_codec_id, aspect_only);
     vbuffers.DeleteBuffers();
 
     MoveResize();

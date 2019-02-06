@@ -41,7 +41,6 @@ class VideoOutputVDPAU : public VideoOutput
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      void        *codec_private,
                       bool        &aspect_only) override; // VideoOutput
     void Zoom(ZoomDirection direction) override; // VideoOutput
     void VideoAspectRatioChanged(float aspect) override; // VideoOutput

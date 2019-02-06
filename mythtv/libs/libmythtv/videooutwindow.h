@@ -15,168 +15,131 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "mythcodecid.h"
 #include "videoouttypes.h"
 
 class MythPlayer;
 
-class VideoOutWindow
+class VideoOutWindow : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoOutWindow);
+    Q_OBJECT
 
   public:
     VideoOutWindow();
 
-    bool Init(const QSize &new_video_dim_buf,
-              const QSize &new_video_dim_disp, float aspect,
-              const QRect &new_display_visible_rect,
-              AspectOverrideMode aspectoverride,
-              AdjustFillMode adjustfill);
+    bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
+              float Aspect, const QRect &DisplayVisibleRect,
+              AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill);
+    bool InputChanged           (const QSize &VideDim, const QSize &VideoDispDim, float Aspect);
+    void VideoAspectRatioChanged(float Aspect);
+    void EmbedInWidget          (const QRect &Rect);
+    void StopEmbedding          (void);
+    void ToggleAdjustFill       (AdjustFillMode AdjustFillMode = kAdjustFill_Toggle);
+    void ToggleAspectOverride   (AspectOverrideMode AspectOverrideMode = kAspect_Toggle);
+    void ResizeDisplayWindow    (const QRect &Rect, bool SaveVisibleRect);
+    void MoveResize             (void);
+    void Zoom                   (ZoomDirection Direction);
+    void ToggleMoveBottomLine   (void);
+    void SaveBottomLine         (void);
 
-    bool InputChanged(const QSize &input_size_buf,
-                      const QSize &input_size_disp, float aspect,
-                      MythCodecID myth_codec_id, void *codec_private);
-    void VideoAspectRatioChanged(float aspect);
+  signals:
+    void VideoRectsChanged      (QRect DisplayVideoRect, QRect VideoRect);
 
-    void EmbedInWidget(const QRect&);
-    void StopEmbedding(void);
-
-    void ToggleAdjustFill(
-        AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
-
-    void ToggleAspectOverride(
-        AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
-
-    void ResizeDisplayWindow(const QRect&, bool);
-
-    void MoveResize(void);
-    void Zoom(ZoomDirection direction);
-    void ToggleMoveBottomLine(void);
-    void SaveBottomLine(void);
-
+  public slots:
     // Sets
-    void SetVideoScalingAllowed(bool change);
-    void SetAllowPreviewEPG(bool allowPreviewEPG)
-        { allowpreviewepg = allowPreviewEPG; }
-    void SetDisplayDim(QSize displayDim)
-        { display_dim = displayDim; }
-    void SetDisplayAspect(float displayAspect)
-        { display_aspect = displayAspect; }
-    void SetPIPState(PIPState setting);
-    void SetVideoDim(QSize dim)
-        { video_dim = dim; }
-    void SetDisplayVisibleRect(QRect rect)
-        { display_visible_rect = rect; }
-    void SetNeedRepaint(bool needRepaint)
-        { needrepaint = needRepaint; }
+    void SetVideoScalingAllowed (bool Change);
+    void SetDisplayDim          (QSize DisplayDim);
+    void SetDisplayAspect       (float DisplayAspect);
+    void SetPIPState            (PIPState Setting);
+    void SetVideoDim            (QSize Dim);
+    void SetDisplayVisibleRect  (QRect Rect);
+    void SetNeedRepaint         (bool NeedRepaint);
 
-    void populateGeometry(void);
     // Gets
-    bool     IsVideoScalingAllowed(void) const { return db_scaling_allowed; }
-    /// \brief Returns if videooutput is embedding
-    bool     IsEmbedding(void)           const { return embedding;       }
-    QSize    GetVideoDim(void)           const { return video_dim;       }
-    QSize    GetActualVideoDim(void)     const { return video_dim_act;   }
-    QSize    GetVideoDispDim(void)       const { return video_disp_dim;  }
-    QSize    GetDisplayDim(void)         const { return display_dim;     }
-    float    GetMzScaleV(void)           const { return mz_scale_v;      }
-    float    GetMzScaleH(void)           const { return mz_scale_h;      }
-    QPoint   GetMzMove(void)             const { return mz_move;         }
-    int         GetPIPSize(void)         const { return db_pip_size;     }
-    PIPState    GetPIPState(void)        const { return pip_state;       }
-    float  GetOverridenVideoAspect(void) const { return overriden_video_aspect;}
-    QRect  GetDisplayVisibleRect(void)   const { return display_visible_rect; }
-    QRect  GetScreenGeometry(void)       const { return screen_geom;     }
-    QRect  GetVideoRect(void)            const { return video_rect;      }
-    QRect  GetDisplayVideoRect(void)     const { return display_video_rect; }
-    QRect  GetEmbeddingRect(void)        const { return embedding_rect;  }
-    bool   UsingXinerama(void)           const { return using_xinerama;  }
-    bool   UsingGuiSize(void)            const { return db_use_gui_size; }
-    QString GetZoomString(void)          const;
-
-    /// \brief Returns current aspect override mode
-    /// \sa ToggleAspectOverride(AspectOverrideMode)
-    AspectOverrideMode GetAspectOverride(void) const
-        { return aspectoverride; }
-    /// \brief Returns current adjust fill mode
-    /// \sa ToggleAdjustFill(AdjustFillMode)
-    AdjustFillMode GetAdjustFill(void)   const { return adjustfill;      }
-
-    float  GetVideoAspect(void)          const { return video_aspect;    }
-    bool   IsPreviewEPGAllowed(void)     const { return allowpreviewepg; }
-    bool   IsRepaintNeeded(void)         const { return needrepaint;     }
-    /// \brief Returns current display aspect ratio.
-    float GetDisplayAspect(void)         const { return display_aspect;  }
-    QRect GetTmpDisplayVisibleRect(void) const
-        { return tmp_display_visible_rect; }
-    QRect GetVisibleOSDBounds(float&, float&, float) const;
-    QRect GetTotalOSDBounds(void) const;
-
-    QRect GetPIPRect(PIPLocation  location,
-                     MythPlayer  *pipplayer    = nullptr,
-                     bool         do_pixel_adj = true) const;
-
-  protected:
-    void ApplyDBScaleAndMove(void);
-    void ApplyManualScaleAndMove(void);
-    void ApplyLetterboxing(void);
-    void ApplySnapToVideoRect(void);
-    void PrintMoveResizeDebug(void);
-    void SetVideoAspectRatio(float aspect);
+    bool     IsEmbedding(void)             const { return m_embedding; }
+    QSize    GetVideoDim(void)             const { return m_videoDim; }
+    QSize    GetVideoDispDim(void)         const { return m_videoDispDim; }
+    QSize    GetDisplayDim(void)           const { return m_displayDimensions; }
+    int      GetPIPSize(void)              const { return m_dbPipSize; }
+    PIPState GetPIPState(void)             const { return m_pipState; }
+    float    GetOverridenVideoAspect(void) const { return m_videoAspectOverride;}
+    QRect    GetDisplayVisibleRect(void)   const { return m_displayVisibleRect; }
+    QRect    GetScreenGeometry(void)       const { return m_screenGeometry; }
+    QRect    GetVideoRect(void)            const { return m_videoRect; }
+    QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
+    QRect    GetEmbeddingRect(void)        const { return m_embeddingRect; }
+    bool     UsingXinerama(void)           const { return m_usingXinerama; }
+    bool     UsingGuiSize(void)            const { return m_dbUseGUISize; }
+    QString  GetZoomString(void)           const;
+    AspectOverrideMode GetAspectOverride(void) const { return m_videoAspectOverrideMode; }
+    AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
+    float    GetVideoAspect(void)          const { return m_videoAspect; }
+    bool     IsRepaintNeeded(void)         const { return m_needRepaint; }
+    float    GetDisplayAspect(void)        const { return m_displayAspect;  }
+    QRect    GetTmpDisplayVisibleRect(void) const { return m_tmpDisplayVisibleRect; }
+    QRect    GetVisibleOSDBounds(float &VisibleAspect, float &FontScaling, float ThemeAspect) const;
+    QRect    GetTotalOSDBounds(void) const;
+    QRect    GetPIPRect(PIPLocation  Location, MythPlayer *PiPPlayer  = nullptr,
+                        bool DoPixelAdjustment = true) const;
 
   private:
-    QPoint  db_move;          ///< Percentage move from database
-    float   db_scale_horiz;   ///< Horizontal Overscan/Underscan percentage
-    float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
-    int     db_pip_size;      ///< percentage of full window to use for PiP
-    bool    db_scaling_allowed;///< disable this to prevent overscan/underscan
-    bool    db_use_gui_size;  ///< Use the gui size for video window
+    void PopulateGeometry        (void);
+    void ApplyDBScaleAndMove     (void);
+    void ApplyManualScaleAndMove (void);
+    void ApplyLetterboxing       (void);
+    void ApplySnapToVideoRect    (void);
+    void PrintMoveResizeDebug    (void);
+    void SetVideoAspectRatio     (float Aspect);
 
-    bool    using_xinerama;   ///< Display is using multiple screens
-    QRect   screen_geom;      ///< Full screen geometry
+  private:
+    QPoint  m_dbMove;         ///< Percentage move from database
+    float   m_dbHorizScale;   ///< Horizontal Overscan/Underscan percentage
+    float   m_dbVertScale;    ///< Vertical Overscan/Underscan percentage
+    int     m_dbPipSize;      ///< percentage of full window to use for PiP
+    bool    m_dbScalingAllowed;///< disable this to prevent overscan/underscan
+    bool    m_dbUseGUISize;   ///< Use the gui size for video window
+    bool    m_usingXinerama;  ///< Display is using multiple screens
+    QRect   m_screenGeometry; ///< Full screen geometry
 
     // Manual Zoom
-    float   mz_scale_v;       ///< Manually applied vertical scaling.
-    float   mz_scale_h;       ///< Manually applied horizontal scaling.
-    QPoint  mz_move;          ///< Manually applied percentage move.
+    float   m_manualVertScale;///< Manually applied vertical scaling.
+    float   m_manualHorizScale; ///< Manually applied horizontal scaling.
+    QPoint  m_manualMove;     ///< Manually applied percentage move.
 
     // Physical dimensions
-    QSize   display_dim;      ///< Screen dimensions of playback window in mm
-    float   display_aspect;   ///< Physical aspect ratio of playback window
+    QSize   m_displayDimensions; ///< Screen dimensions of playback window in mm
+    float   m_displayAspect;  ///< Physical aspect ratio of playback window
 
     // Video dimensions
-    QSize   video_dim;        ///< Pixel dimensions of video buffer
-    QSize   video_disp_dim;   ///< Pixel dimensions of video display area
-    QSize   video_dim_act;    ///< Pixel dimensions of the raw video stream
-    float   video_aspect;     ///< Physical aspect ratio of video
+    QSize   m_videoDim;       ///< Pixel dimensions of video buffer
+    QSize   m_videoDispDim;   ///< Pixel dimensions of video display area
+    float   m_videoAspect;    ///< Physical aspect ratio of video
 
     /// Normally this is the same as videoAspect, but may not be
     /// if the user has toggled the aspect override mode.
-    float   overriden_video_aspect;
+    float   m_videoAspectOverride;
     /// AspectOverrideMode to use to modify overriden_video_aspect
-    AspectOverrideMode aspectoverride;
+    AspectOverrideMode m_videoAspectOverrideMode;
     /// Zoom mode
-    AdjustFillMode adjustfill;
+    AdjustFillMode m_adjustFill;
 
     /// Pixel rectangle in video frame to display
-    QRect   video_rect;
+    QRect   m_videoRect;
     /// Pixel rectangle in display window into which video_rect maps to
-    QRect   display_video_rect;
+    QRect   m_displayVideoRect;
     /// Visible portion of display window in pixels.
     /// This may be bigger or smaller than display_video_rect.
-    QRect   display_visible_rect;
+    QRect   m_displayVisibleRect;
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
-    QRect   tmp_display_visible_rect;
+    QRect   m_tmpDisplayVisibleRect;
     /// Embedded video rectangle
-    QRect    embedding_rect;
+    QRect   m_embeddingRect;
 
     /// State variables
-    bool     embedding;
-    bool     needrepaint;
-    bool     allowpreviewepg;
-    bool     bottomline;
-    PIPState pip_state;
+    bool    m_embedding;
+    bool    m_needRepaint;
+    bool    m_bottomLine;
+    PIPState m_pipState;
 
     // Constants
     static const float kManualZoomMaxHorizontalZoom;

@@ -504,7 +504,6 @@ bool MythPlayer::InitVideo(void)
     videoOutput = VideoOutput::Create(
                     decoder->GetCodecDecoderName(),
                     decoder->GetVideoCodecID(),
-                    decoder->GetVideoCodecPrivate(),
                     pipState, video_dim, video_disp_dim, video_aspect,
                     parentWidget, embedRect,
                     video_frame_rate, (uint)playerFlags, m_codecName);
@@ -590,9 +589,7 @@ void MythPlayer::ReinitVideo(void)
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
         if (!videoOutput->InputChanged(video_dim, video_disp_dim, aspect,
-                                       decoder->GetVideoCodecID(),
-                                       decoder->GetVideoCodecPrivate(),
-                                       aspect_only))
+                                       decoder->GetVideoCodecID(), aspect_only))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to Reinitialize Video. Exiting..");

@@ -25,7 +25,6 @@ class VideoOutputNull : public VideoOutput
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      void        *codec_private,
                       bool        &aspect_only) override; // VideoOutput
     void Zoom(ZoomDirection direction) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput

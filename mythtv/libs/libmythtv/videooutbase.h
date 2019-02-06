@@ -48,7 +48,7 @@ class VideoOutput
   public:
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
-        const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
+        const QString &decoder, MythCodecID  codec_id,
         PIPState pipState,      const QSize &video_dim_buf,
         const QSize &video_dim_disp, float video_aspect,
         QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
@@ -87,7 +87,6 @@ class VideoOutput
      *  \param video_dim_disp The size of the video display.
      *  \param aspect         The width/height of the presented video.
      *  \param myth_codec_id  The video codec ID.
-     *  \param codec_private  Private data for the video codec.
      *  \param aspect_changed An output parameter indicating that only
      *                        the aspect ratio has changed. It must be
      *                        initialized to false before calling this
@@ -97,7 +96,6 @@ class VideoOutput
                               const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  myth_codec_id,
-                              void        *codec_private,
                               bool        &aspect_changed);
 
     virtual void VideoAspectRatioChanged(float aspect);
@@ -107,9 +105,7 @@ class VideoOutput
     virtual void StopEmbedding(void);
     virtual void ResizeForGui(void);
     virtual void ResizeForVideo(uint width = 0, uint height = 0);
-    virtual void MoveResizeWindow(QRect new_rect) = 0;
 
-    virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
     virtual void ToggleMoveBottomLine(void);
     virtual void SaveBottomLine(void);
@@ -147,8 +143,6 @@ class VideoOutput
                               FilterChain *filterList,
                               const PIPMap &pipPlayers,
                               FrameScanType scan = kScan_Ignore) = 0;
-    void CropToDisplay(VideoFrame *frame);
-
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void);
 
@@ -250,9 +244,6 @@ class VideoOutput
 
     void SetVideoScalingAllowed(bool change);
 
-    /// \brief check if video underscan/overscan is allowed
-    bool IsVideoScalingAllowed(void) const;
-
     /// \brief Tells the player to flip the video frames for proper display
     virtual void SetVideoFlip(void) { };
 
@@ -293,6 +284,8 @@ class VideoOutput
     StereoscopicMode GetStereoscopicMode(void) const { return m_stereo; }
 
   protected:
+    virtual void MoveResize(void);
+    virtual void MoveResizeWindow(QRect new_rect) = 0;
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
                      int keepprebuffer);

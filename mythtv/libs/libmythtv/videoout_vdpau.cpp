@@ -196,7 +196,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
 
     uint buffer_size = m_decoder_buffer_size + m_process_buffer_size;
     const QSize video_dim = codec_is_std(video_codec_id) ?
-                            window.GetVideoDim() : window.GetActualVideoDim();
+                            window.GetVideoDim() : window.GetVideoDim();
 
     vbuffers.Init(buffer_size, false, 2, 1, 4, 1);
 
@@ -265,7 +265,7 @@ bool VideoOutputVDPAU::CreateVideoSurfaces(uint num)
 
     bool ret = true;
     const QSize size = codec_is_std(video_codec_id) ?
-                       window.GetVideoDim() : window.GetActualVideoDim();
+                       window.GetVideoDim() : window.GetVideoDim();
     for (uint i = 0; i < num; i++)
     {
         uint tmp = m_render->CreateVideoSurface(size);
@@ -618,7 +618,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int /* x */, int /* y */, in
             if (needed > 0)
             {
                 QMutexLocker locker(&m_lock);
-                const QSize size = window.GetActualVideoDim();
+                const QSize size = window.GetVideoDim();
                 uint created = 0;
                 for (int i = 0; i < needed; i++)
                 {
@@ -679,7 +679,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int /* x */, int /* y */, in
                 return;
         }
 
-        m_decoder = m_render->CreateDecoder(window.GetActualVideoDim(),
+        m_decoder = m_render->CreateDecoder(window.GetVideoDim(),
                                             vdp_decoder_profile, max_refs);
         if (m_decoder)
         {
@@ -711,8 +711,7 @@ void VideoOutputVDPAU::Show(FrameScanType /*scan*/)
     QMutexLocker locker(&m_lock);
     CHECK_ERROR("Show");
 
-    if (window.IsRepaintNeeded())
-        DrawUnusedRects(false);
+    DrawUnusedRects(false);
 
     if (m_render)
         m_render->Flip();
@@ -731,7 +730,6 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
                                     const QSize &video_dim_disp,
                                     float        aspect,
                                     MythCodecID  av_codec_id,
-                                    void        */*codec_private*/,
                                     bool        &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -754,7 +752,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
     }
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = video_dim_disp != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)

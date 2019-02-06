@@ -52,50 +52,51 @@ const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow() :
     // DB settings
-    db_move(0, 0), db_scale_horiz(0.0f), db_scale_vert(0.0f),
-    db_pip_size(26),
-    db_scaling_allowed(true),
-
-    using_xinerama(false), screen_geom(0, 0, 1024, 768),
-
+    m_dbMove(0, 0),
+    m_dbHorizScale(0.0f),
+    m_dbVertScale(0.0f),
+    m_dbPipSize(26),
+    m_dbScalingAllowed(true),
+    m_usingXinerama(false),
+    m_screenGeometry(0, 0, 1024, 768),
     // Manual Zoom
-    mz_scale_v(1.0f), mz_scale_h(1.0f), mz_move(0, 0),
-
+    m_manualVertScale(1.0f),
+    m_manualHorizScale(1.0f),
+    m_manualMove(0, 0),
     // Physical dimensions
-    display_dim(400, 300), display_aspect(1.3333f),
-
+    m_displayDimensions(400, 300),
+    m_displayAspect(1.3333f),
     // Video dimensions
-    video_dim(640, 480),     video_disp_dim(640, 480),
-    video_dim_act(640, 480), video_aspect(1.3333f),
-
+    m_videoDim(640, 480),
+    m_videoDispDim(640, 480),
+    m_videoAspect(1.3333f),
     // Aspect override
-    overriden_video_aspect(1.3333f), aspectoverride(kAspect_Off),
-
+    m_videoAspectOverride(1.3333f),
+    m_videoAspectOverrideMode(kAspect_Off),
     // Adjust Fill
-    adjustfill(kAdjustFill_Off),
-
+    m_adjustFill(kAdjustFill_Off),
     // Screen settings
-    video_rect(0, 0, 0, 0),
-    display_video_rect(0, 0, 0, 0),
-    display_visible_rect(0, 0, 0, 0),
-    tmp_display_visible_rect(0, 0, 0, 0),
-    embedding_rect(QRect()),
-
+    m_videoRect(0, 0, 0, 0),
+    m_displayVideoRect(0, 0, 0, 0),
+    m_displayVisibleRect(0, 0, 0, 0),
+    m_tmpDisplayVisibleRect(0, 0, 0, 0),
+    m_embeddingRect(QRect()),
     // Various state variables
-    embedding(false), needrepaint(false),
-    allowpreviewepg(true), bottomline(false),
-    pip_state(kPIPOff)
+    m_embedding(false),
+    m_needRepaint(false),
+    m_bottomLine(false),
+    m_pipState(kPIPOff)
 {
-    db_pip_size = gCoreContext->GetNumSetting("PIPSize", 26);
+    m_dbPipSize = gCoreContext->GetNumSetting("PIPSize", 26);
 
-    db_move = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
+    m_dbMove = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
-    db_use_gui_size = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
+    m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 
-    populateGeometry();
+    PopulateGeometry();
 }
 
-void VideoOutWindow::populateGeometry(void)
+void VideoOutWindow::PopulateGeometry(void)
 {
     qApp->processEvents();
     if (not qobject_cast<QApplication*>(qApp))
@@ -104,17 +105,16 @@ void VideoOutWindow::populateGeometry(void)
     QScreen *screen = MythDisplay::GetScreen();
     if (MythDisplay::SpanAllScreens())
     {
-        using_xinerama = true;
-        screen_geom = screen->virtualGeometry();
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Window using all screens %2x%3")
-            .arg(screen_geom.width()).arg(screen_geom.height()));
+        m_usingXinerama = true;
+        m_screenGeometry = screen->virtualGeometry();
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Window using all screens %1x%2")
+            .arg(m_screenGeometry.width()).arg(m_screenGeometry.height()));
         return;
     }
 
-    screen_geom = screen->geometry();
-    LOG(VB_PLAYBACK, LOG_INFO, QString("Window using screen %2 %3x%4")
-        .arg(screen->name())
-        .arg(screen_geom.width()).arg(screen_geom.height()));
+    m_screenGeometry = screen->geometry();
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Window using screen %1 %2x%3")
+        .arg(screen->name()).arg(m_screenGeometry.width()).arg(m_screenGeometry.height()));
 }
 
 /**
@@ -130,32 +130,28 @@ void VideoOutWindow::populateGeometry(void)
 void VideoOutWindow::MoveResize(void)
 {
     // Preset all image placement and sizing variables.
-    video_rect = QRect(QPoint(0, 0), video_disp_dim);
-    display_video_rect = display_visible_rect;
+    m_videoRect = QRect(QPoint(0, 0), m_videoDispDim);
+    m_displayVideoRect = m_displayVisibleRect;
 
     // Avoid too small frames for audio only streams (for OSD).
-    if ((video_rect.width() <= 0) || (video_rect.height() <= 0))
+    if ((m_videoRect.width() <= 0) || (m_videoRect.height() <= 0))
     {
-        video_disp_dim = video_dim_act = display_visible_rect.size();
-        video_dim      = fix_alignment(display_visible_rect.size());
-        video_rect     = QRect(QPoint(0, 0), video_dim);
+        m_videoDispDim = m_displayVisibleRect.size();
+        m_videoDim     = fix_alignment(m_displayVisibleRect.size());
+        m_videoRect    = QRect(QPoint(0, 0), m_videoDim);
     }
 
     // Apply various modifications
     ApplyDBScaleAndMove();
     ApplyLetterboxing();
     ApplyManualScaleAndMove();
-    if ((db_scale_vert == 0) && (db_scale_horiz == 0) &&
-        (mz_scale_v == 1.0f) && (mz_scale_h == 1.0f))
-    {
-        ApplySnapToVideoRect();
-    }
+    ApplySnapToVideoRect();
     PrintMoveResizeDebug();
-    needrepaint = true;
+    m_needRepaint = true;
 }
 
-/** \fn VideoOutWindow::ApplyDBScaleAndMove(void)
- *  \brief Apply scales and moves for "Overscan" and "Underscan" DB settings.
+
+/*!  \brief Apply scales and moves for "Overscan" and "Underscan" DB settings.
  *
  *  It doesn't make any sense to me to offset an image such that it is clipped.
  *  Therefore, we only apply offsets if there is an underscan or overscan which
@@ -166,108 +162,99 @@ void VideoOutWindow::MoveResize(void)
  */
 void VideoOutWindow::ApplyDBScaleAndMove(void)
 {
-    if (db_scale_vert > 0)
+    if (m_dbVertScale > 0)
     {
         // Veritcal overscan. Move the Y start point in original image.
-        float tmp = 1.0f - 2.0f * db_scale_vert;
-        video_rect.moveTop((int) round(video_rect.height() * db_scale_vert));
-        video_rect.setHeight((int) round(video_rect.height() * tmp));
+        float tmp = 1.0f - 2.0f * m_dbVertScale;
+        m_videoRect.moveTop(qRound(m_videoRect.height() * m_dbVertScale));
+        m_videoRect.setHeight(qRound(m_videoRect.height() * tmp));
 
         // If there is an offset, apply it now that we have a room.
-        int yoff = db_move.y();
+        int yoff = m_dbMove.y();
         if (yoff > 0)
         {
             // To move the image down, move the start point up.
             // Don't offset the image more than we have overscanned.
-            yoff = min(video_rect.top(), yoff);
-            video_rect.moveTop(video_rect.top() - yoff);
+            yoff = min(m_videoRect.top(), yoff);
+            m_videoRect.moveTop(m_videoRect.top() - yoff);
         }
         else if (yoff < 0)
         {
             // To move the image up, move the start point down.
             // Don't offset the image more than we have overscanned.
-            if (abs(yoff) > video_rect.top())
-                yoff = 0 - video_rect.top();
-            video_rect.moveTop(video_rect.top() - yoff);
+            if (abs(yoff) > m_videoRect.top())
+                yoff = 0 - m_videoRect.top();
+            m_videoRect.moveTop(m_videoRect.top() - yoff);
         }
     }
-    else if (db_scale_vert < 0)
+    else if (m_dbVertScale < 0)
     {
         // Vertical underscan. Move the starting Y point in the display window.
         // Use the abolute value of scan factor.
-        float vscanf = fabs(db_scale_vert);
+        float vscanf = fabs(m_dbVertScale);
         float tmp = 1.0f - 2.0f * vscanf;
 
-        display_video_rect.moveTop(
-            (int) round(display_visible_rect.height() * vscanf) +
-            display_visible_rect.top());
-
-        display_video_rect.setHeight(
-            (int) round(display_visible_rect.height() * tmp));
+        m_displayVideoRect.moveTop(qRound(m_displayVisibleRect.height() * vscanf) + m_displayVisibleRect.top());
+        m_displayVideoRect.setHeight(qRound(m_displayVisibleRect.height() * tmp));
 
         // Now offset the image within the extra blank space created by
         // underscanning. To move the image down, increase the Y offset
         // inside the display window.
-        int yoff = db_move.y();
+        int yoff = m_dbMove.y();
         if (yoff > 0)
         {
             // Don't offset more than we have underscanned.
-            yoff = min(display_video_rect.top(), yoff);
-            display_video_rect.moveTop(display_video_rect.top() + yoff);
+            yoff = min(m_displayVideoRect.top(), yoff);
+            m_displayVideoRect.moveTop(m_displayVideoRect.top() + yoff);
         }
         else if (yoff < 0)
         {
             // Don't offset more than we have underscanned.
-            if (abs(yoff) > display_video_rect.top())
-                yoff = 0 - display_video_rect.top();
-            display_video_rect.moveTop(display_video_rect.top() + yoff);
+            if (abs(yoff) > m_displayVideoRect.top())
+                yoff = 0 - m_displayVideoRect.top();
+            m_displayVideoRect.moveTop(m_displayVideoRect.top() + yoff);
         }
     }
 
     // Horizontal.. comments, same as vertical...
-    if (db_scale_horiz > 0)
+    if (m_dbHorizScale > 0)
     {
-        float tmp = 1.0f - 2.0f * db_scale_horiz;
-        video_rect.moveLeft(
-            (int) round(video_disp_dim.width() * db_scale_horiz));
-        video_rect.setWidth((int) round(video_disp_dim.width() * tmp));
+        float tmp = 1.0f - 2.0f * m_dbHorizScale;
+        m_videoRect.moveLeft(qRound(m_videoDispDim.width() * m_dbHorizScale));
+        m_videoRect.setWidth(qRound(m_videoDispDim.width() * tmp));
 
-        int xoff = db_move.x();
+        int xoff = m_dbMove.x();
         if (xoff > 0)
         {
-            xoff = min(video_rect.left(), xoff);
-            video_rect.moveLeft(video_rect.left() - xoff);
+            xoff = min(m_videoRect.left(), xoff);
+            m_videoRect.moveLeft(m_videoRect.left() - xoff);
         }
         else if (xoff < 0)
         {
-            if (abs(xoff) > video_rect.left())
-                xoff = 0 - video_rect.left();
-            video_rect.moveLeft(video_rect.left() - xoff);
+            if (abs(xoff) > m_videoRect.left())
+                xoff = 0 - m_videoRect.left();
+            m_videoRect.moveLeft(m_videoRect.left() - xoff);
         }
     }
-    else if (db_scale_horiz < 0)
+    else if (m_dbHorizScale < 0)
     {
-        float hscanf = fabs(db_scale_horiz);
+        float hscanf = fabs(m_dbHorizScale);
         float tmp = 1.0f - 2.0f * hscanf;
 
-        display_video_rect.moveLeft(
-            (int) round(display_visible_rect.width() * hscanf) +
-            display_visible_rect.left());
+        m_displayVideoRect.moveLeft(qRound(m_displayVisibleRect.width() * hscanf) + m_displayVisibleRect.left());
+        m_displayVideoRect.setWidth(qRound(m_displayVisibleRect.width() * tmp));
 
-        display_video_rect.setWidth(
-            (int) round(display_visible_rect.width() * tmp));
-
-        int xoff = db_move.x();
+        int xoff = m_dbMove.x();
         if (xoff > 0)
         {
-            xoff = min(display_video_rect.left(), xoff);
-            display_video_rect.moveLeft(display_video_rect.left() + xoff);
+            xoff = min(m_displayVideoRect.left(), xoff);
+            m_displayVideoRect.moveLeft(m_displayVideoRect.left() + xoff);
         }
         else if (xoff < 0)
         {
-            if (abs(xoff) > display_video_rect.left())
-                xoff = 0 - display_video_rect.left();
-            display_video_rect.moveLeft(display_video_rect.left() + xoff);
+            if (abs(xoff) > m_displayVideoRect.left())
+                xoff = 0 - m_displayVideoRect.left();
+            m_displayVideoRect.moveLeft(m_displayVideoRect.left() + xoff);
         }
     }
 
@@ -278,27 +265,27 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
  */
 void VideoOutWindow::ApplyManualScaleAndMove(void)
 {
-    if ((mz_scale_v != 1.0f) || (mz_scale_h != 1.0f))
+    if ((m_manualVertScale != 1.0f) || (m_manualHorizScale != 1.0f))
     {
-        QSize newsz = QSize((int) (display_video_rect.width() * mz_scale_h),
-                            (int) (display_video_rect.height() * mz_scale_v));
-        QSize tmp = (display_video_rect.size() - newsz) / 2;
+        QSize newsz = QSize(qRound(m_displayVideoRect.width() * m_manualHorizScale),
+                            qRound(m_displayVideoRect.height() * m_manualVertScale));
+        QSize tmp = (m_displayVideoRect.size() - newsz) / 2;
         QPoint chgloc = QPoint(tmp.width(), tmp.height());
-        QPoint newloc = display_video_rect.topLeft() + chgloc;
+        QPoint newloc = m_displayVideoRect.topLeft() + chgloc;
 
-        display_video_rect = QRect(newloc, newsz);
+        m_displayVideoRect = QRect(newloc, newsz);
     }
 
-    if (mz_move.y())
+    if (m_manualMove.y())
     {
-        int move_vert = mz_move.y() * display_video_rect.height() / 100;
-        display_video_rect.moveTop(display_video_rect.top() + move_vert);
+        int move_vert = m_manualMove.y() * m_displayVideoRect.height() / 100;
+        m_displayVideoRect.moveTop(m_displayVideoRect.top() + move_vert);
     }
 
-    if (mz_move.x())
+    if (m_manualMove.x())
     {
-        int move_horiz = mz_move.x() * display_video_rect.width() / 100;
-        display_video_rect.moveLeft(display_video_rect.left() + move_horiz);
+        int move_horiz = m_manualMove.x() * m_displayVideoRect.width() / 100;
+        m_displayVideoRect.moveLeft(m_displayVideoRect.left() + move_horiz);
     }
 }
 
@@ -307,130 +294,102 @@ void VideoOutWindow::ApplyManualScaleAndMove(void)
 void VideoOutWindow::ApplyLetterboxing(void)
 {
     float disp_aspect = fix_aspect(GetDisplayAspect());
-    float aspect_diff = disp_aspect - overriden_video_aspect;
+    float aspect_diff = disp_aspect - m_videoAspectOverride;
     bool aspects_match = abs(aspect_diff / disp_aspect) <= 0.02f;
-    bool nomatch_with_fill =
-        !aspects_match && ((kAdjustFill_HorizontalStretch == adjustfill) ||
-                           (kAdjustFill_VerticalStretch   == adjustfill));
+    bool nomatch_with_fill = !aspects_match && ((kAdjustFill_HorizontalStretch == m_adjustFill) ||
+                                                (kAdjustFill_VerticalStretch   == m_adjustFill));
     bool nomatch_without_fill = (!aspects_match) && !nomatch_with_fill;
 
     // Adjust for video/display aspect ratio mismatch
-    if (nomatch_with_fill && (disp_aspect > overriden_video_aspect))
+    if (nomatch_with_fill && (disp_aspect > m_videoAspectOverride))
     {
-        float pixNeeded = ((disp_aspect / overriden_video_aspect)
-                           * (float) display_video_rect.height()) + 0.5f;
-
-        display_video_rect.moveTop(
-            display_video_rect.top() +
-            (display_video_rect.height() - (int) pixNeeded) / 2);
-
-        display_video_rect.setHeight((int) pixNeeded);
+        int pixNeeded = qRound(((disp_aspect / m_videoAspectOverride) * static_cast<float>(m_displayVideoRect.height())));
+        m_displayVideoRect.moveTop(m_displayVideoRect.top() + (m_displayVideoRect.height() - pixNeeded) / 2);
+        m_displayVideoRect.setHeight(pixNeeded);
     }
     else if (nomatch_with_fill)
     {
-        float pixNeeded =
-            ((overriden_video_aspect / disp_aspect) *
-             (float) display_video_rect.width()) + 0.5f;
-
-        display_video_rect.moveLeft(
-            display_video_rect.left() +
-            (display_video_rect.width() - (int) pixNeeded) / 2);
-
-        display_video_rect.setWidth((int) pixNeeded);
+        int pixNeeded = qRound(((m_videoAspectOverride / disp_aspect) * static_cast<float>(m_displayVideoRect.width())));
+        m_displayVideoRect.moveLeft(m_displayVideoRect.left() + (m_displayVideoRect.width() - pixNeeded) / 2);
+        m_displayVideoRect.setWidth(pixNeeded);
     }
-    else if (nomatch_without_fill && (disp_aspect > overriden_video_aspect))
+    else if (nomatch_without_fill && (disp_aspect > m_videoAspectOverride))
     {
-        float pixNeeded =
-            ((overriden_video_aspect / disp_aspect) *
-             (float) display_video_rect.width()) + 0.5f;
-
-        display_video_rect.moveLeft(
-            display_video_rect.left() +
-            (display_video_rect.width() - (int) pixNeeded) / 2);
-
-        display_video_rect.setWidth((int) pixNeeded);
+        int pixNeeded = qRound(((m_videoAspectOverride / disp_aspect) * static_cast<float>(m_displayVideoRect.width())));
+        m_displayVideoRect.moveLeft(m_displayVideoRect.left() + (m_displayVideoRect.width() - pixNeeded) / 2);
+        m_displayVideoRect.setWidth(pixNeeded);
     }
     else if (nomatch_without_fill)
     {
-        float pixNeeded = ((disp_aspect / overriden_video_aspect) *
-                           (float) display_video_rect.height()) + 0.5f;
-
-        display_video_rect.moveTop(
-            display_video_rect.top() +
-            (display_video_rect.height() - (int) pixNeeded) / 2);
-
-        display_video_rect.setHeight((int) pixNeeded);
+        int pixNeeded = qRound(((disp_aspect / m_videoAspectOverride) * static_cast<float>(m_displayVideoRect.height())));
+        m_displayVideoRect.moveTop(m_displayVideoRect.top() + (m_displayVideoRect.height() - pixNeeded) / 2);
+        m_displayVideoRect.setHeight(pixNeeded);
     }
 
     // Process letterbox zoom modes
-    if (adjustfill == kAdjustFill_Full)
+    if (m_adjustFill == kAdjustFill_Full)
     {
         // Zoom mode -- Expand by 4/3 and overscan.
         // 1/6 of original is 1/8 of new
-        display_video_rect = QRect(
-            display_video_rect.left() - (display_video_rect.width() / 6),
-            display_video_rect.top() - (display_video_rect.height() / 6),
-            display_video_rect.width() * 4 / 3,
-            display_video_rect.height() * 4 / 3);
+        m_displayVideoRect = QRect(
+            m_displayVideoRect.left() - (m_displayVideoRect.width() / 6),
+            m_displayVideoRect.top() - (m_displayVideoRect.height() / 6),
+            m_displayVideoRect.width() * 4 / 3,
+            m_displayVideoRect.height() * 4 / 3);
     }
-    else if (adjustfill == kAdjustFill_Half)
+    else if (m_adjustFill == kAdjustFill_Half)
     {
         // Zoom mode -- Expand by 7/6 and overscan.
         // Intended for eliminating the top bars on 14:9 material.
         // Also good compromise for 4:3 material on 16:9 screen.
         // Expanding by 7/6, so remove 1/6 of original from overscan;
         // take half from each side, so remove 1/12.
-        display_video_rect = QRect(
-            display_video_rect.left() - (display_video_rect.width() / 12),
-            display_video_rect.top() - (display_video_rect.height() / 12),
-            display_video_rect.width() * 7 / 6,
-            display_video_rect.height() * 7 / 6);
+        m_displayVideoRect = QRect(
+            m_displayVideoRect.left() - (m_displayVideoRect.width() / 12),
+            m_displayVideoRect.top() - (m_displayVideoRect.height() / 12),
+            m_displayVideoRect.width() * 7 / 6,
+            m_displayVideoRect.height() * 7 / 6);
     }
-    else if (adjustfill == kAdjustFill_HorizontalStretch)
+    else if (m_adjustFill == kAdjustFill_HorizontalStretch)
     {
         // Horizontal Stretch mode -- 1/6 of original is 1/8 of new
         // Intended to be used to eliminate side bars on 4:3 material
         // encoded to 16:9.
-        display_video_rect.moveLeft(
-            display_video_rect.left() - (display_video_rect.width() / 6));
+        m_displayVideoRect.moveLeft(
+            m_displayVideoRect.left() - (m_displayVideoRect.width() / 6));
 
-        display_video_rect.setWidth(display_video_rect.width() * 4 / 3);
+        m_displayVideoRect.setWidth(m_displayVideoRect.width() * 4 / 3);
     }
-    else if (adjustfill == kAdjustFill_VerticalStretch)
+    else if (m_adjustFill == kAdjustFill_VerticalStretch)
     {
         // Vertical Stretch mode -- 1/6 of original is 1/8 of new
         // Intended to be used to eliminate top/bottom bars on 16:9
         // material encoded to 4:3.
-        display_video_rect.moveTop(
-            display_video_rect.top() - (display_video_rect.height() / 6));
+        m_displayVideoRect.moveTop(
+            m_displayVideoRect.top() - (m_displayVideoRect.height() / 6));
 
-        display_video_rect.setHeight(display_video_rect.height() * 4 / 3);
+        m_displayVideoRect.setHeight(m_displayVideoRect.height() * 4 / 3);
     }
-    else if (adjustfill == kAdjustFill_VerticalFill &&
-             display_video_rect.height() > 0)
+    else if (m_adjustFill == kAdjustFill_VerticalFill && m_displayVideoRect.height() > 0)
     {
         // Video fills screen vertically. May be cropped left and right
-        float factor = (float)display_visible_rect.height() /
-                       (float)display_video_rect.height();
-        QSize newsize = QSize((int) (display_video_rect.width() * factor),
-                              (int) (display_video_rect.height() * factor));
-        QSize temp = (display_video_rect.size() - newsize) / 2;
-        QPoint newloc = display_video_rect.topLeft() +
-                        QPoint(temp.width(), temp.height());
-        display_video_rect = QRect(newloc, newsize);
+        float factor = static_cast<float>(m_displayVisibleRect.height()) / static_cast<float>(m_displayVideoRect.height());
+        QSize newsize = QSize(qRound(m_displayVideoRect.width() * factor),
+                              qRound(m_displayVideoRect.height() * factor));
+        QSize temp = (m_displayVideoRect.size() - newsize) / 2;
+        QPoint newloc = m_displayVideoRect.topLeft() + QPoint(temp.width(), temp.height());
+        m_displayVideoRect = QRect(newloc, newsize);
     }
-    else if (adjustfill == kAdjustFill_HorizontalFill &&
-             display_video_rect.width() > 0)
+    else if (m_adjustFill == kAdjustFill_HorizontalFill && m_displayVideoRect.width() > 0)
     {
         // Video fills screen horizontally. May be cropped top and bottom
-        float factor = (float)display_visible_rect.width() /
-                       (float)display_video_rect.width();
-        QSize newsize = QSize((int) (display_video_rect.width() * factor),
-                              (int) (display_video_rect.height() * factor));
-        QSize temp = (display_video_rect.size() - newsize) / 2;
-        QPoint newloc = display_video_rect.topLeft() +
-                        QPoint(temp.width(), temp.height());
-        display_video_rect = QRect(newloc, newsize);
+        float factor = static_cast<float>(m_displayVisibleRect.width()) /
+                       static_cast<float>(m_displayVideoRect.width());
+        QSize newsize = QSize(qRound(m_displayVideoRect.width() * factor),
+                              qRound(m_displayVideoRect.height() * factor));
+        QSize temp = (m_displayVideoRect.size() - newsize) / 2;
+        QPoint newloc = m_displayVideoRect.topLeft() + QPoint(temp.width(), temp.height());
+        m_displayVideoRect = QRect(newloc, newsize);
     }
 }
 
@@ -444,81 +403,73 @@ void VideoOutWindow::ApplyLetterboxing(void)
  */
 void VideoOutWindow::ApplySnapToVideoRect(void)
 {
-    if (pip_state > kPIPOff)
+    if (m_pipState > kPIPOff)
         return;
 
-    if (display_video_rect.height() == 0 || display_video_rect.width() == 0)
+    if (m_displayVideoRect.height() == 0 || m_displayVideoRect.width() == 0)
         return;
 
-    float ydiff = abs(display_video_rect.height() - video_rect.height());
-    if ((ydiff / display_video_rect.height()) < 0.05f)
+    if (!((m_dbVertScale == 0.0f) && (m_dbHorizScale == 0.0f) &&
+        (m_manualVertScale == 1.0f) && (m_manualHorizScale == 1.0f)))
+        return;
+
+    float ydiff = abs(m_displayVideoRect.height() - m_videoRect.height());
+    if ((ydiff / m_displayVideoRect.height()) < 0.05f)
     {
-        display_video_rect.moveTop(
-            display_video_rect.top() +
-            (display_video_rect.height() - video_rect.height()) / 2);
-
-        display_video_rect.setHeight(video_rect.height());
-
+        m_displayVideoRect.moveTop(m_displayVideoRect.top() + (m_displayVideoRect.height() - m_videoRect.height()) / 2);
+        m_displayVideoRect.setHeight(m_videoRect.height());
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("Snapping height to avoid scaling: height: %1, top: %2")
-                .arg(display_video_rect.height())
-                .arg(display_video_rect.top()));
+                .arg(m_displayVideoRect.height())
+                .arg(m_displayVideoRect.top()));
     }
 
-    float xdiff = abs(display_video_rect.width() - video_rect.width());
-    if ((xdiff / display_video_rect.width()) < 0.05f)
+    float xdiff = abs(m_displayVideoRect.width() - m_videoRect.width());
+    if ((xdiff / m_displayVideoRect.width()) < 0.05f)
     {
-        display_video_rect.moveLeft(
-            display_video_rect.left() +
-            (display_video_rect.width() - video_rect.width()) / 2);
-
-        display_video_rect.setWidth(video_rect.width());
-
+        m_displayVideoRect.moveLeft(m_displayVideoRect.left() + (m_displayVideoRect.width() - m_videoRect.width()) / 2);
+        m_displayVideoRect.setWidth(m_videoRect.width());
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("Snapping width to avoid scaling: width: %1, left: %2")
-                .arg(display_video_rect.width())
-                .arg(display_video_rect.left()));
+                .arg(m_displayVideoRect.width())
+                .arg(m_displayVideoRect.left()));
     }
 }
 
-bool VideoOutWindow::Init(const QSize &new_video_dim_buf,
-                          const QSize &new_video_dim_disp, float new_video_aspect,
-                          const QRect &new_display_visible_rect,
-                          AspectOverrideMode new_aspectoverride,
-                          AdjustFillMode new_adjustfill)
+bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
+                          float Aspect, const QRect &DisplayVisibleRect,
+                          AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill)
 {
     // Refresh the geometry in case the video mode has changed
-    populateGeometry();
-    display_visible_rect = db_use_gui_size ? new_display_visible_rect :
-                                             screen_geom;
+    PopulateGeometry();
+    m_displayVisibleRect = m_dbUseGUISize ? DisplayVisibleRect : m_screenGeometry;
 
-    int pbp_width = display_visible_rect.width() / 2;
-    if (pip_state == kPBPLeft || pip_state == kPBPRight)
-        display_visible_rect.setWidth(pbp_width);
+    int pbp_width = m_displayVisibleRect.width() / 2;
+    if (m_pipState == kPBPLeft || m_pipState == kPBPRight)
+        m_displayVisibleRect.setWidth(pbp_width);
 
-    if (pip_state == kPBPRight)
-            display_visible_rect.moveLeft(pbp_width);
+    if (m_pipState == kPBPRight)
+            m_displayVisibleRect.moveLeft(pbp_width);
 
-    video_dim_act  = new_video_dim_disp;
-    video_disp_dim = new_video_dim_disp;
-    video_dim = new_video_dim_buf;
-    video_rect = QRect(display_visible_rect.topLeft(), video_disp_dim);
+    m_videoDispDim = VideoDispDim;
+    m_videoDim = VideoDim;
+    m_videoRect = QRect(m_displayVisibleRect.topLeft(), m_videoDispDim);
 
-    if (pip_state > kPIPOff)
+    if (m_pipState > kPIPOff)
     {
-        aspectoverride = kAspect_Off;
-        adjustfill = kAdjustFill_Off;
+        m_videoAspectOverrideMode = kAspect_Off;
+        m_adjustFill = kAdjustFill_Off;
     }
     else
     {
-        aspectoverride = new_aspectoverride;
-        adjustfill = new_adjustfill;
+        m_videoAspectOverrideMode = AspectOverride;
+        m_adjustFill = AdjustFill;
     }
 
     // apply aspect ratio and letterbox mode
-    VideoAspectRatioChanged(new_video_aspect);
+    VideoAspectRatioChanged(Aspect);
 
-    embedding = false;
+    m_embedding = false;
 
     return true;
 }
@@ -551,24 +502,23 @@ void VideoOutWindow::PrintMoveResizeDebug(void)
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("Display Rect  left: %1, top: %2, width: %3, "
                 "height: %4, aspect: %5")
-            .arg(display_video_rect.left())
-            .arg(display_video_rect.top())
-            .arg(display_video_rect.width())
-            .arg(display_video_rect.height())
-            .arg(fix_aspect(GetDisplayAspect())));
+            .arg(m_displayVideoRect.left())
+            .arg(m_displayVideoRect.top())
+            .arg(m_displayVideoRect.width())
+            .arg(m_displayVideoRect.height())
+            .arg(static_cast<qreal>(fix_aspect(GetDisplayAspect()))));
 
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("Video Rect    left: %1, top: %2, width: %3, "
                 "height: %4, aspect: %5")
-            .arg(video_rect.left())
-            .arg(video_rect.top())
-            .arg(video_rect.width())
-            .arg(video_rect.height())
-            .arg(overriden_video_aspect));
+            .arg(m_videoRect.left())
+            .arg(m_videoRect.top())
+            .arg(m_videoRect.width())
+            .arg(m_videoRect.height())
+            .arg(static_cast<qreal>(m_videoAspectOverride)));
 }
 
 /**
- * \fn VideoOutWindow::SetVideoAspectRatio(float aspect)
  * \brief Sets VideoOutWindow::video_aspect to aspect, and sets
  *        VideoOutWindow::overriden_video_aspect if aspectoverride
  *        is set to either 4:3, 14:9 or 16:9.
@@ -577,41 +527,31 @@ void VideoOutWindow::PrintMoveResizeDebug(void)
  */
 void VideoOutWindow::SetVideoAspectRatio(float aspect)
 {
-    video_aspect = aspect;
-    overriden_video_aspect = get_aspect_override(aspectoverride, aspect);
+    m_videoAspect = aspect;
+    m_videoAspectOverride = get_aspect_override(m_videoAspectOverrideMode, aspect);
 }
 
 /**
- * \fn VideoOutWindow::VideoAspectRatioChanged(float aspect)
  * \brief Calls SetVideoAspectRatio(float aspect),
  *        then calls MoveResize() to apply changes.
  * \param aspect video aspect ratio to use
  */
-void VideoOutWindow::VideoAspectRatioChanged(float aspect)
+void VideoOutWindow::VideoAspectRatioChanged(float Aspect)
 {
-    SetVideoAspectRatio(aspect);
+    SetVideoAspectRatio(Aspect);
     MoveResize();
 }
 
 /**
- * \fn VideoOutWindow::InputChanged(const QSize&, float, MythCodecID, void*)
  * \brief Tells video output to discard decoded frames and wait for new ones.
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
-                                  const QSize &input_size_disp, float aspect,
-                                  MythCodecID myth_codec_id, void *codec_private)
+bool VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
-    (void) myth_codec_id;
-    (void) codec_private;
-
-    video_dim_act  = input_size_disp;
-    video_disp_dim = input_size_disp;
-    video_dim = input_size_buf;
-
-    SetVideoAspectRatio(aspect);
-
+    m_videoDispDim = VideoDispDim;
+    m_videoDim      = VideoDim;
+    SetVideoAspectRatio(Aspect);
     return true;
 }
 
@@ -621,97 +561,109 @@ bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
  */
 QRect VideoOutWindow::GetTotalOSDBounds(void) const
 {
-    return QRect(QPoint(0, 0), video_disp_dim);
+    return QRect(QPoint(0, 0), m_videoDispDim);
 }
 
 /**
- * \fn VideoOutWindow::ToggleAdjustFill(AdjustFillMode)
  * \brief Sets up letterboxing for various standard video frame and
  *        monitor dimensions, then calls MoveResize()
  *        to apply them.
  * \sa Zoom(ZoomDirection), ToggleAspectOverride(AspectOverrideMode)
  */
-void VideoOutWindow::ToggleAdjustFill(AdjustFillMode adjustFill)
+void VideoOutWindow::ToggleAdjustFill(AdjustFillMode AdjustFill)
 {
-    if (adjustFill == kAdjustFill_Toggle)
-        adjustFill = (AdjustFillMode) ((adjustfill + 1) % kAdjustFill_END);
-
-    adjustfill = adjustFill;
-
+    if (AdjustFill == kAdjustFill_Toggle)
+        AdjustFill = static_cast<AdjustFillMode>((m_adjustFill + 1) % kAdjustFill_END);
+    m_adjustFill = AdjustFill;
     MoveResize();
 }
 
 /**
  * \brief Disable or enable underscan/overscan
  */
-void VideoOutWindow::SetVideoScalingAllowed(bool change)
+void VideoOutWindow::SetVideoScalingAllowed(bool Change)
 {
-    if (change)
+    if (Change)
     {
-        db_scale_vert =
-            gCoreContext->GetNumSetting("VertScanPercentage", 0) * 0.01f;
-        db_scale_horiz =
-            gCoreContext->GetNumSetting("HorizScanPercentage", 0) * 0.01f;
-        db_scaling_allowed = true;
+        m_dbVertScale = gCoreContext->GetNumSetting("VertScanPercentage", 0) * 0.01f;
+        m_dbHorizScale = gCoreContext->GetNumSetting("HorizScanPercentage", 0) * 0.01f;
+        m_dbScalingAllowed = true;
     }
     else
     {
-        db_scale_vert = 0.0f;
-        db_scale_horiz = 0.0f;
-        db_scaling_allowed = false;
+        m_dbVertScale = 0.0f;
+        m_dbHorizScale = 0.0f;
+        m_dbScalingAllowed = false;
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("Over/underscan. V: %1, H: %2")
-            .arg(db_scale_vert).arg(db_scale_horiz));
+        .arg(static_cast<double>(m_dbVertScale)).arg(static_cast<double>(m_dbHorizScale)));
 
     MoveResize();
+}
+
+void VideoOutWindow::SetDisplayDim(QSize DisplayDim)
+{
+    m_displayDimensions = DisplayDim;
+}
+
+void VideoOutWindow::SetDisplayAspect(float DisplayAspect)
+{
+    m_displayAspect = DisplayAspect;
+}
+
+void VideoOutWindow::SetVideoDim(QSize Dim)
+{
+    m_videoDim = Dim;
+}
+
+void VideoOutWindow::SetDisplayVisibleRect(QRect Rect)
+{
+    m_displayVisibleRect = Rect;
+}
+
+void VideoOutWindow::SetNeedRepaint(bool NeedRepaint)
+{
+    m_needRepaint = NeedRepaint;
 }
 
 /**
  * \brief Resize Display Window
  */
-void VideoOutWindow::ResizeDisplayWindow(const QRect &rect,
-                                         bool save_visible_rect)
+void VideoOutWindow::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRect)
 {
-    if (save_visible_rect)
-        tmp_display_visible_rect = display_visible_rect;
-    display_visible_rect = rect;
+    if (SaveVisibleRect)
+        m_tmpDisplayVisibleRect = m_displayVisibleRect;
+    m_displayVisibleRect = Rect;
     MoveResize();
 }
 
 /**
- * \fn VideoOutWindow::EmbedInWidget(const QRect &rect)
  * \brief Tells video output to embed video in an existing window.
- * \param rect new display_video_rect
+ * \param Rect new display_video_rect
  * \sa StopEmbedding()
  */
-void VideoOutWindow::EmbedInWidget(const QRect &new_video_rect)
+void VideoOutWindow::EmbedInWidget(const QRect &Rect)
 {
-    if (!allowpreviewepg && pip_state == kPIPOff)
-        return;
-
-    embedding_rect = new_video_rect;
-    bool save_visible_rect = !embedding;
-
-    embedding = true;
-
-    display_video_rect = new_video_rect;
-    ResizeDisplayWindow(display_video_rect, save_visible_rect);
+    m_embeddingRect = Rect;
+    bool savevisiblerect = !m_embedding;
+    m_embedding = true;
+    m_displayVideoRect = Rect;
+    ResizeDisplayWindow(m_displayVideoRect, savevisiblerect);
 }
 
 /**
- * \fn VideoOutWindow::StopEmbedding(void)
  * \brief Tells video output to stop embedding video in an existing window.
  * \sa EmbedInWidget(WId, int, int, int, int)
  */
 void VideoOutWindow::StopEmbedding(void)
 {
-    embedding_rect = QRect();
-    display_visible_rect = tmp_display_visible_rect;
+    m_embeddingRect = QRect();
+    m_displayVisibleRect = m_tmpDisplayVisibleRect;
 
     MoveResize();
 
-    embedding = false;
+    m_embedding = false;
 }
 
 /**
@@ -720,22 +672,17 @@ void VideoOutWindow::StopEmbedding(void)
  * \param font_scaling   scaling to apply to fonts
  * \param themeaspect    aspect ration of the theme
  */
-QRect VideoOutWindow::GetVisibleOSDBounds(
-    float &visible_aspect, float &font_scaling, float themeaspect) const
+QRect VideoOutWindow::GetVisibleOSDBounds(float &VisibleAspect,
+                                          float &FontScaling,
+                                          float ThemeAspect) const
 {
-    float dv_w = (((float)video_disp_dim.width())  /
-                  display_video_rect.width());
-    float dv_h = (((float)video_disp_dim.height()) /
-                  display_video_rect.height());
+    float dv_w = ((static_cast<float>(m_videoDispDim.width())) / m_displayVideoRect.width());
+    float dv_h = ((static_cast<float>(m_videoDispDim.height())) / m_displayVideoRect.height());
 
-    uint right_overflow = max(
-        (display_video_rect.width() + display_video_rect.left()) -
-        display_visible_rect.width(), 0);
-    uint lower_overflow = max(
-        (display_video_rect.height() + display_video_rect.top()) -
-        display_visible_rect.height(), 0);
+    int right_overflow = max((m_displayVideoRect.width() + m_displayVideoRect.left()) - m_displayVisibleRect.width(), 0);
+    int lower_overflow = max((m_displayVideoRect.height() + m_displayVideoRect.top()) - m_displayVisibleRect.height(), 0);
 
-    bool isPBP = (kPBPLeft == pip_state || kPBPRight == pip_state);
+    bool isPBP = (kPBPLeft == m_pipState || kPBPRight == m_pipState);
     if (isPBP)
     {
         right_overflow = 0;
@@ -743,18 +690,17 @@ QRect VideoOutWindow::GetVisibleOSDBounds(
     }
 
     // top left and bottom right corners respecting letterboxing
-    QPoint tl = QPoint(((uint) (max(-display_video_rect.left(),0)*dv_w)) & ~1,
-                       ((uint) (max(-display_video_rect.top(),0)*dv_h)) & ~1);
-    QPoint br = QPoint(
-        (uint) floor(video_disp_dim.width()  - (right_overflow * dv_w)),
-        (uint) floor(video_disp_dim.height() - (lower_overflow * dv_h)));
+    QPoint tl = QPoint((static_cast<int>(max(-m_displayVideoRect.left(),0)*dv_w)) & ~1,
+                       (static_cast<int>(max(-m_displayVideoRect.top(),0)*dv_h)) & ~1);
+    QPoint br = QPoint(static_cast<int>(floor(m_videoDispDim.width()  - (right_overflow * dv_w))),
+                       static_cast<int>(floor(m_videoDispDim.height() - (lower_overflow * dv_h))));
     // adjust for overscan
-    if ((db_scale_vert > 0.0f) || (db_scale_horiz > 0.0f))
+    if ((m_dbVertScale > 0.0f) || (m_dbHorizScale > 0.0f))
     {
         QRect v(tl, br);
-        float xs = (db_scale_horiz > 0.0f) ? db_scale_horiz : 0.0f;
-        float ys = (db_scale_vert > 0.0f) ? db_scale_vert : 0.0f;
-        QPoint s((int)(v.width() * xs), (int)(v.height() * ys));
+        float xs = (m_dbHorizScale > 0.0f) ? m_dbHorizScale : 0.0f;
+        float ys = (m_dbVertScale > 0.0f) ? m_dbVertScale : 0.0f;
+        QPoint s(qRound((v.width() * xs)), qRound((v.height() * ys)));
         tl += s;
         br -= s;
     }
@@ -767,93 +713,87 @@ QRect VideoOutWindow::GetVisibleOSDBounds(
     vb = QRect(vb.x(), vb.y(), abs(vb.width()), abs(vb.height()));
 
     // set the physical aspect ratio of the displayable area
-    const float dispPixelAdj = display_visible_rect.width() ?
-        (GetDisplayAspect() * display_visible_rect.height())
-                / display_visible_rect.width() : 1.f;
+    const float dispPixelAdj = m_displayVisibleRect.width() ?
+        (GetDisplayAspect() * m_displayVisibleRect.height())
+                / m_displayVisibleRect.width() : 1.f;
 
-    float vs = video_rect.height() ? (float)video_rect.width() /
-                video_rect.height() : 1.f;
-    visible_aspect = themeaspect / dispPixelAdj *
-        (overriden_video_aspect ? vs / overriden_video_aspect : 1.f);
+    float vs = m_videoRect.height() ? static_cast<float>(m_videoRect.width()) / m_videoRect.height() : 1.0f;
+    VisibleAspect = ThemeAspect / dispPixelAdj * (m_videoAspectOverride > 0.0f ? vs / m_videoAspectOverride : 1.f);
 
-    if (themeaspect > 0.0f)
+    if (ThemeAspect > 0.0f)
     {
         // now adjust for scaling of the video on the size
-        float tmp = sqrtf(2.0f/(sq(visible_aspect / themeaspect) + 1.0f));
+        float tmp = sqrtf(2.0f/(sq(VisibleAspect / ThemeAspect) + 1.0f));
         if (tmp > 0.0f)
-            font_scaling = 1.0f / tmp;
+            FontScaling = 1.0f / tmp;
         // now adjust for aspect ratio effect on font size
         // (should be in osd.cpp?)
-        font_scaling *= sqrtf(overriden_video_aspect / themeaspect);
+        FontScaling *= sqrtf(m_videoAspectOverride / ThemeAspect);
     }
 
     if (isPBP)
-        font_scaling *= 0.65f;
+        FontScaling *= 0.65f;
 
     return vb;
 }
 
 /**
- * \fn VideoOutWindow::ToggleAspectOverride(AspectOverrideMode)
  * \brief Enforce different aspect ration than detected,
  *        then calls VideoAspectRatioChanged(float)
  *        to apply them.
  * \sa Zoom(ZoomDirection), ToggleAdjustFill(AdjustFillMode)
  */
-void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode aspectMode)
+void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode AspectMode)
 {
-    if (pip_state > kPIPOff)
+    if (m_pipState > kPIPOff)
     {
-        aspectMode = kAspect_Off;
+        AspectMode = kAspect_Off;
         return;
     }
 
-    if (aspectMode == kAspect_Toggle)
-    {
-        aspectMode = (AspectOverrideMode) ((aspectoverride + 1) % kAspect_END);
-    }
+    if (AspectMode == kAspect_Toggle)
+        AspectMode = static_cast<AspectOverrideMode>(((m_videoAspectOverrideMode + 1) % kAspect_END));
 
-    aspectoverride = aspectMode;
-
-    VideoAspectRatioChanged(video_aspect);
+    m_videoAspectOverrideMode = AspectMode;
+    VideoAspectRatioChanged(m_videoAspect);
 }
 
 /*
  * \brief Determines PIP Window size and Position.
  */
 QRect VideoOutWindow::GetPIPRect(
-    PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
+    PIPLocation Location, MythPlayer *PiPPlayer, bool DoPixelAdjustment) const
 {
     QRect position;
 
-    float pipVideoAspect = pipplayer ? pipplayer->GetVideoAspect()
+    float pipVideoAspect = PiPPlayer ? PiPPlayer->GetVideoAspect()
         : (4.0f / 3.0f);
-    int tmph = (display_visible_rect.height() * db_pip_size) / 100;
-    float pixel_adj = 1;
-    if (do_pixel_adj)
+    int tmph = (m_displayVisibleRect.height() * m_dbPipSize) / 100;
+    float pixel_adj = 1.0f;
+    if (DoPixelAdjustment)
     {
-        pixel_adj = ((float) display_visible_rect.width() /
-                     (float) display_visible_rect.height()) / display_aspect;
+        pixel_adj = (static_cast<float>(m_displayVisibleRect.width()) /
+                     static_cast<float>(m_displayVisibleRect.height())) / m_displayAspect;
     }
     position.setHeight(tmph);
-    position.setWidth((int) (tmph * pipVideoAspect * pixel_adj));
+    position.setWidth(qRound((tmph * pipVideoAspect * pixel_adj)));
 
-    int xoff = (int) (display_visible_rect.width()  * 0.06);
-    int yoff = (int) (display_visible_rect.height() * 0.06);
-    switch (location)
+    int xoff = qRound(m_displayVisibleRect.width()  * 0.06);
+    int yoff = qRound(m_displayVisibleRect.height() * 0.06);
+    switch (Location)
     {
         case kPIP_END:
         case kPIPTopLeft:
             break;
         case kPIPBottomLeft:
-            yoff = display_visible_rect.height() - position.height() - yoff;
+            yoff = m_displayVisibleRect.height() - position.height() - yoff;
             break;
         case kPIPTopRight:
-            xoff = display_visible_rect.width() - position.width() - xoff;
+            xoff = m_displayVisibleRect.width() - position.width() - xoff;
             break;
         case kPIPBottomRight:
-            xoff = display_visible_rect.width() - position.width() - xoff;
-            yoff = display_visible_rect.height() - position.height() - yoff;
+            xoff = m_displayVisibleRect.width() - position.width() - xoff;
+            yoff = m_displayVisibleRect.height() - position.height() - yoff;
             break;
     }
     position.translate(xoff, yoff);
@@ -861,120 +801,115 @@ QRect VideoOutWindow::GetPIPRect(
 }
 
 /**
- * \fn VideoOutWindow::Zoom(ZoomDirection)
  * \brief Sets up zooming into to different parts of the video, the zoom
  *        is actually applied in MoveResize().
  * \sa ToggleAdjustFill(AdjustFillMode)
  */
-void VideoOutWindow::Zoom(ZoomDirection direction)
+void VideoOutWindow::Zoom(ZoomDirection Direction)
 {
-    const float zf = 0.02;
-    if (kZoomHome == direction)
+    const float zf = 0.02f;
+    if (kZoomHome == Direction)
     {
-        mz_scale_v = 1.0f;
-        mz_scale_h = 1.0f;
-        mz_move = QPoint(0, 0);
+        m_manualVertScale = 1.0f;
+        m_manualHorizScale = 1.0f;
+        m_manualMove = QPoint(0, 0);
     }
-    else if (kZoomIn == direction)
+    else if (kZoomIn == Direction)
     {
-        if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
-            (mz_scale_v < kManualZoomMaxVerticalZoom))
+        if ((m_manualHorizScale < kManualZoomMaxHorizontalZoom) &&
+            (m_manualVertScale < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h += zf;
-            mz_scale_v += zf;
+            m_manualHorizScale += zf;
+            m_manualVertScale += zf;
         }
     }
-    else if (kZoomOut == direction)
+    else if (kZoomOut == Direction)
     {
-        if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
-            (mz_scale_v > kManualZoomMinVerticalZoom))
+        if ((m_manualHorizScale > kManualZoomMinHorizontalZoom) &&
+            (m_manualVertScale > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h -= zf;
-            mz_scale_v -= zf;
+            m_manualHorizScale -= zf;
+            m_manualVertScale -= zf;
         }
     }
-    else if (kZoomAspectUp == direction)
+    else if (kZoomAspectUp == Direction)
     {
-        if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
-            (mz_scale_v > kManualZoomMinVerticalZoom))
+        if ((m_manualHorizScale < kManualZoomMaxHorizontalZoom) &&
+            (m_manualVertScale > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h += zf;
-            mz_scale_v -= zf;
+            m_manualHorizScale += zf;
+            m_manualVertScale -= zf;
         }
     }
-    else if (kZoomAspectDown == direction)
+    else if (kZoomAspectDown == Direction)
     {
-        if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
-            (mz_scale_v < kManualZoomMaxVerticalZoom))
+        if ((m_manualHorizScale > kManualZoomMinHorizontalZoom) &&
+            (m_manualVertScale < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h -= zf;
-            mz_scale_v += zf;
+            m_manualHorizScale -= zf;
+            m_manualVertScale += zf;
         }
     }
-    else if (kZoomVerticalIn == direction)
+    else if (kZoomVerticalIn == Direction)
     {
-        if (mz_scale_v < kManualZoomMaxVerticalZoom)
-            mz_scale_v += zf;
+        if (m_manualVertScale < kManualZoomMaxVerticalZoom)
+            m_manualVertScale += zf;
     }
-    else if (kZoomVerticalOut == direction)
+    else if (kZoomVerticalOut == Direction)
     {
-        if (mz_scale_v < kManualZoomMaxVerticalZoom)
-            mz_scale_v -= zf;
+        if (m_manualVertScale < kManualZoomMaxVerticalZoom)
+            m_manualVertScale -= zf;
     }
-    else if (kZoomHorizontalIn == direction)
+    else if (kZoomHorizontalIn == Direction)
     {
-        if (mz_scale_h < kManualZoomMaxHorizontalZoom)
-            mz_scale_h += zf;
+        if (m_manualHorizScale < kManualZoomMaxHorizontalZoom)
+            m_manualHorizScale += zf;
     }
-    else if (kZoomHorizontalOut == direction)
+    else if (kZoomHorizontalOut == Direction)
     {
-        if (mz_scale_h > kManualZoomMinHorizontalZoom)
-            mz_scale_h -= zf;
+        if (m_manualHorizScale > kManualZoomMinHorizontalZoom)
+            m_manualHorizScale -= zf;
     }
-    else if (kZoomUp    == direction && (mz_move.y() < +kManualZoomMaxMove))
-        mz_move.setY(mz_move.y() + 1);
-    else if (kZoomDown  == direction && (mz_move.y() > -kManualZoomMaxMove))
-        mz_move.setY(mz_move.y() - 1);
-    else if (kZoomLeft  == direction && (mz_move.x() < +kManualZoomMaxMove))
-        mz_move.setX(mz_move.x() + 2);
-    else if (kZoomRight == direction && (mz_move.x() > -kManualZoomMaxMove))
-        mz_move.setX(mz_move.x() - 2);
+    else if (kZoomUp    == Direction && (m_manualMove.y() < +kManualZoomMaxMove))
+        m_manualMove.setY(m_manualMove.y() + 1);
+    else if (kZoomDown  == Direction && (m_manualMove.y() > -kManualZoomMaxMove))
+        m_manualMove.setY(m_manualMove.y() - 1);
+    else if (kZoomLeft  == Direction && (m_manualMove.x() < +kManualZoomMaxMove))
+        m_manualMove.setX(m_manualMove.x() + 2);
+    else if (kZoomRight == Direction && (m_manualMove.x() > -kManualZoomMaxMove))
+        m_manualMove.setX(m_manualMove.x() - 2);
 
-    mz_scale_v = snap(mz_scale_v, 1.0f, zf / 2);
-    mz_scale_h = snap(mz_scale_h, 1.0f, zf / 2);
+    m_manualVertScale = snap(m_manualVertScale, 1.0f, zf / 2);
+    m_manualHorizScale = snap(m_manualHorizScale, 1.0f, zf / 2);
 }
 
 void VideoOutWindow::ToggleMoveBottomLine(void)
 {
-    if (bottomline)
+    if (m_bottomLine)
     {
-        mz_move.setX(0);
-        mz_move.setY(0);
-        mz_scale_h = 1.0;
-        mz_scale_v = 1.0;
-        bottomline = false;
+        m_manualMove.setX(0);
+        m_manualMove.setY(0);
+        m_manualHorizScale = 1.0;
+        m_manualVertScale = 1.0;
+        m_bottomLine = false;
     }
     else
     {
-        const float zf = 0.02;
+        const float zf = 0.02f;
 
         int x = gCoreContext->GetNumSetting("OSDMoveXBottomLine", 0);
-        mz_move.setX(x);
+        m_manualMove.setX(x);
 
         int y = gCoreContext->GetNumSetting("OSDMoveYBottomLine", 5);
-        mz_move.setY(y);
+        m_manualMove.setY(y);
 
-        double h = static_cast<double>
-                   (gCoreContext->GetNumSetting("OSDScaleHBottomLine", 100)) /
-                   100.0;
-        mz_scale_h = snap(h, 1.0f, zf / 2);
+        float h = static_cast<float>(gCoreContext->GetNumSetting("OSDScaleHBottomLine", 100)) / 100.0f;
+        m_manualHorizScale = snap(h, 1.0f, zf / 2.0f);
 
-        double v = static_cast<double>
-                   (gCoreContext->GetNumSetting("OSDScaleVBottomLine", 112)) /
-                   100.0;
-        mz_scale_v = snap(v, 1.0f, zf / 2);
+        float v = static_cast<float>(gCoreContext->GetNumSetting("OSDScaleVBottomLine", 112)) / 100.0f;
+        m_manualVertScale = snap(v, 1.0f, zf / 2.0f);
 
-        bottomline = true;
+        m_bottomLine = true;
     }
 
     MoveResize();
@@ -982,20 +917,18 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
 
 void VideoOutWindow::SaveBottomLine(void)
 {
-    gCoreContext->SaveSetting("OSDMoveXBottomLine", GetMzMove().x());
-    gCoreContext->SaveSetting("OSDMoveYBottomLine", GetMzMove().y());
-
-    gCoreContext->SaveSetting("OSDScaleHBottomLine", GetMzScaleH() * 100.0f);
-    gCoreContext->SaveSetting("OSDScaleVBottomLine", GetMzScaleV() * 100.0f);
+    gCoreContext->SaveSetting("OSDMoveXBottomLine", m_manualMove.x());
+    gCoreContext->SaveSetting("OSDMoveYBottomLine", m_manualMove.y());
+    gCoreContext->SaveSetting("OSDScaleHBottomLine", static_cast<int>(m_manualHorizScale * 100.0f));
+    gCoreContext->SaveSetting("OSDScaleVBottomLine", static_cast<int>(m_manualVertScale * 100.0f));
 }
 
 QString VideoOutWindow::GetZoomString(void) const
 {
-    float zh = GetMzScaleH();
-    float zv = GetMzScaleV();
-    QPoint zo = GetMzMove();
     return tr("Zoom %1x%2 @ (%3,%4)")
-        .arg(zh, 0, 'f', 2).arg(zv, 0, 'f', 2).arg(zo.x()).arg(zo.y());
+            .arg(static_cast<double>(m_manualHorizScale), 0, 'f', 2)
+            .arg(static_cast<double>(m_manualVertScale), 0, 'f', 2)
+            .arg(m_manualMove.x()).arg(m_manualMove.y());
 }
 
 /// Correct for rounding errors
@@ -1012,12 +945,10 @@ static float fix_aspect(float raw)
     return raw;
 }
 
-void VideoOutWindow::SetPIPState(PIPState setting)
+void VideoOutWindow::SetPIPState(PIPState Setting)
 {
-    LOG(VB_PLAYBACK, LOG_INFO,
-        QString("VideoOutWindow::SetPIPState. pip_state: %1]") .arg(setting));
-
-    pip_state = setting;
+    LOG(VB_PLAYBACK, LOG_INFO, QString("VideoOutWindow::SetPIPState. pip_state: %1]").arg(Setting));
+    m_pipState = Setting;
 }
 
 /// Correct for underalignment

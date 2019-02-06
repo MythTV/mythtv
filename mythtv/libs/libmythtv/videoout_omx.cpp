@@ -389,8 +389,6 @@ bool VideoOutputOMX::Init(          // Return true if successful
     if (!m_imagefx.IsValid())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Hardware deinterlace unavailable");
 
-    window.SetAllowPreviewEPG(true);
-
     if (!VideoOutput::Init(video_dim_buf, video_dim_disp,
                       aspect, winid, win_rect, codec_id))
     {
@@ -479,10 +477,9 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
     const QSize &video_dim_disp,    // video display size
     float        aspect,            // w/h of presented video
     MythCodecID  av_codec_id,       // video codec
-    void        *codec_private,
     bool        &aspect_only )      // Out: true if aspect only changed
 {
-    QSize cursize = window.GetActualVideoDim();
+    QSize cursize = window.GetVideoDim();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + __func__ +
         QString(" from %1: %2x%3 aspect %4 to %5: %6x%7 aspect %9")
@@ -514,8 +511,7 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
     }
 
     VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
-                              aspect, av_codec_id, codec_private,
-                              aspect_only);
+                              aspect, av_codec_id, aspect_only);
 
     m_imagefx.Shutdown();
     m_render.Shutdown();
@@ -776,8 +772,6 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
         frame = vbuffers.GetScratchFrame();
         CopyFrame(frame, &av_pause_frame);
     }
-
-    CropToDisplay(frame);
 
     if (filterList)
         filterList->ProcessFrame(frame);
@@ -1241,12 +1235,12 @@ bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)
         return true;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + __func__ + QString(
-            " display=%1,%2,%3x%4 (%9) video=%5,%6,%7x%8 (%10)")
+            " display=%1,%2,%3x%4 (%9) video=%5,%6,%7x%8")
         .arg(disp_rect.x()).arg(disp_rect.y())
         .arg(disp_rect.width()).arg(disp_rect.height())
         .arg(vid_rect.x()).arg(vid_rect.y())
         .arg(vid_rect.width()).arg(vid_rect.height())
-        .arg(window.GetDisplayAspect()).arg(window.GetOverridenVideoAspect()) );
+        .arg(window.GetDisplayAspect()));
 
 #ifdef USING_BROADCOM
     OMX_CONFIG_DISPLAYREGIONTYPE dregion;

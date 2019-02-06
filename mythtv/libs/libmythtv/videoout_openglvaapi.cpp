@@ -43,8 +43,8 @@ VideoOutputOpenGLVAAPI::~VideoOutputOpenGLVAAPI()
 bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &video_dim_buf,
                                           const QSize &video_dim_disp,
                                           float aspect,
-                              MythCodecID  av_codec_id, void *codec_private,
-                              bool &aspect_only)
+                                          MythCodecID  av_codec_id,
+                                          bool &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
             .arg(video_dim_disp.width()).arg(video_dim_disp.height())
@@ -53,8 +53,7 @@ bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &video_dim_buf,
 
     if (!codec_is_vaapi(av_codec_id))
         return VideoOutputOpenGL::InputChanged(video_dim_buf, video_dim_disp,
-                                               aspect, av_codec_id,
-                                               codec_private, aspect_only);
+                                               aspect, av_codec_id, aspect_only);
 
     QMutexLocker locker(&gl_context_lock);
 
@@ -67,7 +66,7 @@ bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &video_dim_buf,
     }
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = video_dim_disp != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
