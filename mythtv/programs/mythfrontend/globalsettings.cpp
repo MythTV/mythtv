@@ -46,9 +46,6 @@
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
 #endif
-#if defined(Q_OS_MACX)
-#include "privatedecoder_vda.h"
-#endif
 
 //Use for playBackGroup, to be remove at one point
 #include "playgroup.h"
