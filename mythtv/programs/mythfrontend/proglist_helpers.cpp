@@ -12,19 +12,6 @@
 #include "proglist.h"
 #include "mythdate.h"
 
-PhrasePopup::PhrasePopup(MythScreenStack *parentStack,
-                         ProgLister *parent,
-                         RecSearchType searchType,
-                         const QStringList &list,
-                         const QString &currentValue) :
-    MythScreenType(parentStack, "phrasepopup"),
-    m_parent(parent), m_searchType(searchType),  m_list(list),
-    m_titleText(nullptr), m_phraseList(nullptr), m_phraseEdit(nullptr),
-    m_okButton(nullptr), m_deleteButton(nullptr), m_recordButton(nullptr)
-{
-    m_currentValue = currentValue;
-}
-
 bool PhrasePopup::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "phrasepopup", this))
@@ -219,19 +206,6 @@ void PhrasePopup::recordClicked(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
-                                   ProgLister *parent,
-                                   RecSearchType searchType,
-                                   const QStringList &list,
-                                   const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup"),
-      m_parent(parent), m_searchType(searchType), m_list(list),
-      m_currentValue(currentValue),
-      m_titleText(nullptr), m_phraseList(nullptr), m_phraseEdit(nullptr),
-      m_editButton(nullptr), m_deleteButton(nullptr), m_recordButton(nullptr)
-{
-}
-
 bool PowerSearchPopup::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "powersearchpopup", this))
@@ -418,10 +392,7 @@ void PowerSearchPopup::recordClicked(void)
 EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
                                            ProgLister *parent,
                                            const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup"),
-        m_titleEdit(nullptr), m_subtitleEdit(nullptr), m_descEdit(nullptr),
-        m_categoryList(nullptr), m_genreList(nullptr), m_channelList(nullptr),
-        m_okButton(nullptr)
+    : MythScreenType(parentStack, "phrasepopup")
 {
     m_parent = parent;
 

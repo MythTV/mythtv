@@ -108,7 +108,6 @@ void AudioConfigScreen::Init(void)
 AudioConfigSettings::AudioConfigSettings() :
     GroupSetting()
 {
-    m_maxspeakers = 0;
     setLabel(tr("Audio System"));
 
     addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
@@ -600,7 +599,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                  bool hd) :
     MThread("AudioTest"),
     m_parent(parent), m_channels(channels), m_device(main),
-    m_passthrough(passthrough), m_interrupted(false), m_channel(-1), m_hd(hd)
+    m_passthrough(passthrough), m_hd(hd)
 {
     m_format = hd ? settings.BestSupportedFormat() : FORMAT_S16;
     m_samplerate = hd ? settings.BestSupportedRate() : 48000;
@@ -762,9 +761,7 @@ void AudioTestThread::run()
 }
 
 AudioTest::AudioTest()
-    : GroupSetting(),
-      m_at(nullptr),
-      m_quality(false)
+    : GroupSetting()
 {
     int channels = 2;
 
@@ -971,9 +968,9 @@ bool AudioTest::event(QEvent *event)
         return QObject::event(event); //not handled
 
     ChannelChangedEvent *cce = (ChannelChangedEvent*)(event);
-    QString channel          = cce->channel;
+    QString channel          = cce->m_channel;
 
-    if (!cce->fulltest)
+    if (!cce->m_fulltest)
         return false;
 
     bool fl, fr, c, lfe, sl, sr, rl, rr;

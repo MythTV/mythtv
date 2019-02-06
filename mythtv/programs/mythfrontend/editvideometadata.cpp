@@ -34,21 +34,8 @@
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, VideoMetadata *source_metadata,
         const VideoMetadataListManager &cache) : MythScreenType(lparent, lname),
-    m_origMetadata(source_metadata), m_titleEdit(nullptr), m_subtitleEdit(nullptr),
-    m_taglineEdit(nullptr), m_playerEdit(nullptr), m_ratingEdit(nullptr), m_directorEdit(nullptr),
-    m_inetrefEdit(nullptr), m_homepageEdit(nullptr), m_plotEdit(nullptr), m_seasonSpin(nullptr),
-    m_episodeSpin(nullptr), m_yearSpin(nullptr), m_userRatingSpin(nullptr), m_lengthSpin(nullptr),
-    m_categoryList(nullptr), m_levelList(nullptr), m_childList(nullptr), m_browseCheck(nullptr),
-    m_watchedCheck(nullptr), m_coverartButton(nullptr), m_coverartText(nullptr),
-    m_screenshotButton(nullptr), m_screenshotText(nullptr), m_bannerButton(nullptr),
-    m_bannerText(nullptr), m_fanartButton(nullptr), m_fanartText(nullptr),
-    m_trailerButton(nullptr), m_trailerText(nullptr),
-    m_netCoverartButton(nullptr), m_netFanartButton(nullptr), m_netBannerButton(nullptr),
-    m_netScreenshotButton(nullptr), m_coverart(nullptr), m_screenshot(nullptr),
-    m_banner(nullptr), m_fanart(nullptr),
-    m_doneButton(nullptr),
-    cachedChildSelection(0),
-    m_metaCache(cache), m_busyPopup(nullptr)
+    m_origMetadata(source_metadata),
+    m_metaCache(cache)
 {
     m_query = new MetadataDownload(this);
     m_imageDownload = new MetadataImageDownload(this);

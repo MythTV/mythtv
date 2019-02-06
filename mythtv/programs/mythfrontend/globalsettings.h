@@ -42,8 +42,8 @@ class PlaybackSettings : public GroupSetting
     void CreateNewPlaybackProfileSlot(const QString &name);
 
   private:
-    ButtonStandardSetting *m_newPlaybackProfileButton;
-    MythUIComboBoxSetting *m_playbackProfiles;
+    ButtonStandardSetting *m_newPlaybackProfileButton {nullptr};
+    MythUIComboBoxSetting *m_playbackProfiles {nullptr};
 };
 
 class VideoModeSettings : public HostCheckBoxSetting
@@ -172,10 +172,10 @@ class MainGeneralSettings : public GroupSetting
   public slots:
     void cecChanged(bool);
   protected:
-    HostCheckBoxSetting *m_CECPowerOnTVAllowed;
-    HostCheckBoxSetting *m_CECPowerOffTVAllowed;
-    HostCheckBoxSetting *m_CECPowerOnTVOnStart;
-    HostCheckBoxSetting *m_CECPowerOffTVOnExit;
+    HostCheckBoxSetting *m_CECPowerOnTVAllowed  {nullptr};
+    HostCheckBoxSetting *m_CECPowerOffTVAllowed {nullptr};
+    HostCheckBoxSetting *m_CECPowerOnTVOnStart  {nullptr};
+    HostCheckBoxSetting *m_CECPowerOffTVOnExit  {nullptr};
 #endif  // USING_LIBCEC
 };
 
@@ -218,22 +218,22 @@ class PlaybackProfileItemConfig : public GroupSetting
     void DoDeleteSlot(bool);
 
   private:
-    ProfileItem          &item;
-    TransTextEditSetting      *width_range;
-    TransTextEditSetting      *height_range;
-    MythUIComboBoxSetting      *codecs;
-    TransTextEditSetting      *framerate;
-    TransMythUIComboBoxSetting *decoder;
-    TransMythUISpinBoxSetting  *max_cpus;
-    TransMythUICheckBoxSetting *skiploop;
-    TransMythUIComboBoxSetting *vidrend;
-    TransMythUIComboBoxSetting *osdrend;
-    TransMythUICheckBoxSetting *osdfade;
-    TransMythUIComboBoxSetting *deint0;
-    TransMythUIComboBoxSetting *deint1;
-    TransTextEditSetting *filters;
-    PlaybackProfileConfig *parentConfig;
-    uint index;
+    ProfileItem                &m_item;
+    TransTextEditSetting       *m_width_range  {nullptr};
+    TransTextEditSetting       *m_height_range {nullptr};
+    MythUIComboBoxSetting      *m_codecs       {nullptr};
+    TransTextEditSetting       *m_framerate    {nullptr};
+    TransMythUIComboBoxSetting *m_decoder      {nullptr};
+    TransMythUISpinBoxSetting  *m_max_cpus     {nullptr};
+    TransMythUICheckBoxSetting *m_skiploop     {nullptr};
+    TransMythUIComboBoxSetting *m_vidrend      {nullptr};
+    TransMythUIComboBoxSetting *m_osdrend      {nullptr};
+    TransMythUICheckBoxSetting *m_osdfade      {nullptr};
+    TransMythUIComboBoxSetting *m_deint0       {nullptr};
+    TransMythUIComboBoxSetting *m_deint1       {nullptr};
+    TransTextEditSetting       *m_filters      {nullptr};
+    PlaybackProfileConfig      *m_parentConfig {nullptr};
+    uint                        m_index        {0};
 };
 
 class PlaybackProfileConfig : public GroupSetting
@@ -259,13 +259,13 @@ class PlaybackProfileConfig : public GroupSetting
 
   private:
     void ReloadSettings(void);
-    item_list_t items;
-    item_list_t del_items;
-    QString     profile_name;
-    uint        groupid;
+    item_list_t m_items;
+    item_list_t m_del_items;
+    QString     m_profile_name;
+    uint        m_groupid {0};
 
-    TransMythUICheckBoxSetting *m_markForDeletion;
-    ButtonStandardSetting* m_addNewEntry;
+    TransMythUICheckBoxSetting *m_markForDeletion {nullptr};
+    ButtonStandardSetting      *m_addNewEntry     {nullptr};
     vector<PlaybackProfileItemConfig*> m_profiles;
     vector<TransMythUISpinBoxSetting*> priority;
 };
@@ -280,8 +280,8 @@ class ChannelGroupSetting : public GroupSetting
     void deleteEntry(void) override; // GroupSetting
 
   private:
-    int m_groupId;
-    TransTextEditSetting       *m_groupName;
+    int                   m_groupId   {-1};
+    TransTextEditSetting *m_groupName {nullptr};
 };
 
 class ChannelGroupsSetting : public GroupSetting
@@ -297,7 +297,7 @@ class ChannelGroupsSetting : public GroupSetting
     void CreateNewGroup(QString name);
 
   private:
-    ButtonStandardSetting *m_addGroupButton;
+    ButtonStandardSetting *m_addGroupButton {nullptr};
 };
 
 #endif

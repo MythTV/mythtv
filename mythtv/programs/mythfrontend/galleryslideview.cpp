@@ -19,24 +19,14 @@
 GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
                                    bool editsAllowed)
     : MythScreenType(parent, name),
-      m_uiImage(nullptr),
-      m_uiStatus(nullptr),
-      m_uiSlideCount(nullptr), m_uiCaptionText(nullptr), m_uiHideCaptions(nullptr),
       m_mgr(ImageManagerFe::getInstance()),
-      m_view(nullptr),
       m_availableTransitions(GetMythPainter()->SupportsAnimation()),
       m_transition(m_availableTransitions.Select(
                        gCoreContext->GetNumSetting("GalleryTransitionType",
                                                    kBlendTransition))),
-      m_updateTransition(),
-      m_slides(),
       m_infoList(*this),
       m_slideShowTime(gCoreContext->GetNumSetting("GallerySlideShowTime", 3000)),
-      m_statusText(),
-      m_playing(false),
-      m_suspended(false),
       m_showCaptions(gCoreContext->GetBoolSetting("GalleryShowSlideCaptions", true)),
-      m_transitioning(false),
       m_editsAllowed(editsAllowed)
 {
     // Detect when transitions finish. Queued signal to allow redraw/pulse to

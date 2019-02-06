@@ -390,49 +390,18 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
                          TV *player, bool /*showTV*/)
     : ScheduleCommon(parent, name),
       m_titleChaff(" \\(.*\\)$"),
-      // UI variables
-      m_recgroupList(nullptr),
-      m_groupList(nullptr),
-      m_recordingList(nullptr),
-      m_noRecordingsText(nullptr),
-      m_previewImage(nullptr),
       // Artwork Variables
       m_artHostOverride(),
-      // Settings
-      m_titleView(false),
-      m_useCategories(false),
-      m_useRecGroups(false),
-      m_watchListAutoExpire(false),
-      m_watchListMaxAge(60),              m_watchListBlackOut(2),
-      m_listOrder(1),
       // Recording Group settings
       m_groupDisplayName(ProgramInfo::i18n("All Programs")),
       m_recGroup("All Programs"),
       m_watchGroupName(tr("Watch List")),
       m_watchGroupLabel(m_watchGroupName.toLower()),
-      m_viewMask(VIEW_TITLES),
 
-      // General m_popupMenu support
-      m_menuDialog(nullptr),
-      m_popupMenu(nullptr),
-      m_doToggleMenu(true),
-      // Main Recording List support
-      m_progsInDB(0),
-      m_isFilling(false),
       // Other state
-      m_op_on_playlist(false),
-      m_programInfoCache(this),           m_playingSomething(false),
-      // Selection state variables
-      m_needUpdate(false),
-      m_haveGroupInfoSet(false),
+      m_programInfoCache(this),
       // Other
-      m_player(nullptr),
-      m_helper(this),
-
-      m_firstGroup(true),
-      m_usingGroupSelector(false),
-      m_groupSelected(false),
-      m_passwordEntered(false)
+      m_helper(this)
 {
     for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
@@ -5096,14 +5065,6 @@ void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
 
 ///////////////////////////////////////////////////
 
-GroupSelector::GroupSelector(MythScreenStack *lparent, const QString &label,
-                             const QStringList &list, const QStringList &data,
-                             const QString &selected)
-            : MythScreenType(lparent, "groupselector"), m_label(label),
-              m_List(list), m_Data(data), m_selected(selected)
-{
-}
-
 bool GroupSelector::Create()
 {
     if (!LoadWindowFromXML("recordings-ui.xml", "groupselector", this))
@@ -5155,13 +5116,6 @@ void GroupSelector::AcceptItem(MythUIButtonListItem *item)
 }
 
 ////////////////////////////////////////////////
-
-ChangeView::ChangeView(MythScreenStack *lparent, MythScreenType *parentscreen,
-                       int viewMask)
-                : MythScreenType(lparent, "changeview"),
-                   m_parentScreen(parentscreen), m_viewMask(viewMask)
-{
-}
 
 bool ChangeView::Create()
 {
@@ -5255,14 +5209,6 @@ void ChangeView::SaveChanges()
 
 ////////////////////////////////////////////////
 
-PasswordChange::PasswordChange(MythScreenStack *lparent, QString oldpassword)
-                : MythScreenType(lparent, "passwordchanger"),
-                    m_oldPassword(oldpassword)
-{
-    m_oldPasswordEdit = m_newPasswordEdit = nullptr;
-    m_okButton = nullptr;
-}
-
 bool PasswordChange::Create()
 {
     if (!LoadWindowFromXML("recordings-ui.xml", "passwordchanger", this))
@@ -5313,9 +5259,6 @@ void PasswordChange::SendResult()
 
 RecMetadataEdit::RecMetadataEdit(MythScreenStack *lparent, ProgramInfo *pginfo)
   : MythScreenType(lparent, "recmetadataedit"),
-    m_titleEdit(nullptr),   m_subtitleEdit(nullptr), m_descriptionEdit(nullptr),
-    m_inetrefEdit(nullptr), m_seasonSpin(nullptr),   m_episodeSpin(nullptr),
-    m_busyPopup(nullptr),   m_queryButton(nullptr),
     m_progInfo(pginfo)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -5533,13 +5476,6 @@ void RecMetadataEdit::customEvent(QEvent *levent)
 }
 
 //////////////////////////////////////////
-
-HelpPopup::HelpPopup(MythScreenStack *lparent)
-                : MythScreenType(lparent, "helppopup"),
-                  m_iconList(nullptr)
-{
-
-}
 
 bool HelpPopup::Create()
 {

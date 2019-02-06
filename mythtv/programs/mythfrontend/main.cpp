@@ -268,7 +268,7 @@ namespace
         }
 
       private:
-        ProgramInfo* pgi;
+        ProgramInfo* pgi {nullptr};
     };
 
     void cleanup()

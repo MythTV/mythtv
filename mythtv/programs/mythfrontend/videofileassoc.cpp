@@ -46,7 +46,7 @@ namespace
         }
 
         explicit FileAssociationWrap(const FileAssociations::file_association &fa) :
-            m_fa(fa), m_state(efsNONE) {}
+            m_fa(fa) {}
 
         unsigned int GetIDx(void) const { return m_fa.id; }
         QString GetExtension(void) const { return m_fa.extension; }
@@ -108,7 +108,7 @@ namespace
 
       private:
         FileAssociations::file_association m_fa;
-        FA_State m_state;
+        FA_State m_state {efsNONE};
     };
 
     class BlockSignalsGuard
@@ -320,7 +320,7 @@ class FileAssocDialogPrivate
 
   private:
     FA_collection m_fileAssociations;
-    UIDToFAPair::UID_type m_nextFAID {0};
+    UIDToFAPair::UID_type m_nextFAID          {0};
     UIDToFAPair::UID_type m_selectionOverride {0};
 };
 
@@ -328,9 +328,8 @@ class FileAssocDialogPrivate
 
 FileAssocDialog::FileAssocDialog(MythScreenStack *screenParent,
         const QString &lname) :
-    MythScreenType(screenParent, lname), m_commandEdit(nullptr),
-    m_extensionList(nullptr), m_defaultCheck(nullptr), m_ignoreCheck(nullptr), m_doneButton(nullptr),
-    m_newButton(nullptr), m_deleteButton(nullptr), m_private(new FileAssocDialogPrivate)
+    MythScreenType(screenParent, lname),
+    m_private(new FileAssocDialogPrivate)
 {
 }
 

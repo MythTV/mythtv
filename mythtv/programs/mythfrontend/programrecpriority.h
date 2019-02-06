@@ -19,12 +19,16 @@ class ProgramRecPriority;
 
 class RecordingRule;
 
+// overloaded version of RecordingInfo with additional recording priority
+// values so we can keep everything together and don't
+// have to hit the db mulitiple times
 class ProgramRecPriorityInfo : public RecordingInfo
 {
     friend class ProgramRecPriority;
 
   public:
-    ProgramRecPriorityInfo();
+    ProgramRecPriorityInfo():
+        RecordingInfo() {}
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &/*other*/) = default;
     ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo &other)
         { clone(other); return *this; }
@@ -45,12 +49,12 @@ class ProgramRecPriorityInfo : public RecordingInfo
                bool showrerecord = false,
                uint star_range = 10) const override; // ProgramInfo
 
-    RecordingType recType;
-    int matchCount;
-    int recCount;
-    QDateTime last_record;
-    int avg_delay;
-    QString profile;
+    RecordingType m_recType     {kNotRecording};
+    int           m_matchCount  {0};
+    int           m_recCount    {0};
+    QDateTime     m_last_record;
+    int           m_avg_delay   {0};
+    QString       m_profile;
 };
 
 class ProgramRecPriority : public ScheduleCommon
@@ -110,25 +114,25 @@ class ProgramRecPriority : public ScheduleCommon
     QMap<int, int> m_recMatch;
     QMap<int, int> m_listMatch;
 
-    MythUIButtonList *m_programList;
+    MythUIButtonList *m_programList       {nullptr};
 
-    MythUIText *m_schedInfoText;
-    MythUIText *m_recPriorityText;
-    MythUIText *m_recPriorityBText;
-    MythUIText *m_finalPriorityText;
-    MythUIText *m_lastRecordedText;
-    MythUIText *m_lastRecordedDateText;
-    MythUIText *m_lastRecordedTimeText;
-    MythUIText *m_channameText;
-    MythUIText *m_channumText;
-    MythUIText *m_callsignText;
-    MythUIText *m_recProfileText;
+    MythUIText *m_schedInfoText           {nullptr};
+    MythUIText *m_recPriorityText         {nullptr};
+    MythUIText *m_recPriorityBText        {nullptr};
+    MythUIText *m_finalPriorityText       {nullptr};
+    MythUIText *m_lastRecordedText        {nullptr};
+    MythUIText *m_lastRecordedDateText    {nullptr};
+    MythUIText *m_lastRecordedTimeText    {nullptr};
+    MythUIText *m_channameText            {nullptr};
+    MythUIText *m_channumText             {nullptr};
+    MythUIText *m_callsignText            {nullptr};
+    MythUIText *m_recProfileText          {nullptr};
 
-    ProgramRecPriorityInfo *m_currentItem;
+    ProgramRecPriorityInfo *m_currentItem {nullptr};
 
-    bool m_reverseSort;
+    bool     m_reverseSort                {false};
 
-    SortType m_sortType;
+    SortType m_sortType                   {byTitle};
 };
 
 Q_DECLARE_METATYPE(ProgramRecPriorityInfo *)

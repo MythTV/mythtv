@@ -43,22 +43,22 @@ class VideoSetupWizard : public MythScreenType
     };
 
     QString              m_downloadFile;
-    TestType             m_testType;
+    TestType             m_testType                   {ttNone};
 
-    MythScreenType      *m_generalScreen;
-    MythScreenType      *m_audioScreen;
+    MythScreenType      *m_generalScreen              {nullptr};
+    MythScreenType      *m_audioScreen                {nullptr};
 
-    MythUIButtonList     *m_playbackProfileButtonList;
-    MythScreenStack      *m_popupStack;
-    MythUIProgressDialog *m_progressDialog;
+    MythUIButtonList     *m_playbackProfileButtonList {nullptr};
+    MythScreenStack      *m_popupStack                {nullptr};
+    MythUIProgressDialog *m_progressDialog            {nullptr};
 
-    MythUIButton        *m_testSDButton;
-    MythUIButton        *m_testHDButton;
+    MythUIButton        *m_testSDButton               {nullptr};
+    MythUIButton        *m_testHDButton               {nullptr};
 
-    MythUIButton        *m_nextButton;
-    MythUIButton        *m_prevButton;
+    MythUIButton        *m_nextButton                 {nullptr};
+    MythUIButton        *m_prevButton                 {nullptr};
 
-    VideoDisplayProfile *m_vdp;
+    VideoDisplayProfile *m_vdp                        {nullptr};
 
   private slots:
     void slotNext(void);

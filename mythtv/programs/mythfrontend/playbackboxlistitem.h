@@ -18,8 +18,8 @@ class PlaybackBoxListItem : public MythUIButtonListItem
 
   private:
 #ifdef INCLUDE_UNFINISHED
-    PlaybackBox *pbbox;
-    bool         needs_update;
+    PlaybackBox *m_pbbox        {nullptr};
+    bool         m_needs_update {true};
 #endif
 };
 

@@ -40,8 +40,8 @@ private:
     void CreateCount(ImageItemK &);
 
     MythScreenType   &m_screen;      //!< Parent screen
-    MythUIButtonList *m_btnList;     //!< Overlay buttonlist
-    InfoVisibleState  m_infoVisible; //!< Info list state
+    MythUIButtonList *m_btnList     {nullptr};  //!< Overlay buttonlist
+    InfoVisibleState  m_infoVisible {kNoInfo};  //!< Info list state
     ImageManagerFe   &m_mgr;         //!< Image Manager
     QTimer            m_timer;       //!< Clears list if no new metadata arrives
 };

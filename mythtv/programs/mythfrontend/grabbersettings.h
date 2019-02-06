@@ -16,7 +16,8 @@ class GrabberSettings : public MythScreenType
 
   public:
 
-    GrabberSettings(MythScreenStack *parent, const char *name = nullptr);
+    GrabberSettings(MythScreenStack *parent, const char *name = nullptr)
+        : MythScreenType(parent, name) {}
     ~GrabberSettings() = default;
 
     bool Create(void) override; // MythScreenType
@@ -30,14 +31,14 @@ class GrabberSettings : public MythScreenType
     GrabberList m_tvGrabberList;
     GrabberList m_gameGrabberList;
 
-    MythUIButtonList   *m_movieGrabberButtonList;
-    MythUIButtonList   *m_tvGrabberButtonList;
-    MythUIButtonList   *m_gameGrabberButtonList;
+    MythUIButtonList   *m_movieGrabberButtonList {nullptr};
+    MythUIButtonList   *m_tvGrabberButtonList    {nullptr};
+    MythUIButtonList   *m_gameGrabberButtonList  {nullptr};
 
-    MythUICheckBox     *m_dailyUpdatesCheck;
+    MythUICheckBox     *m_dailyUpdatesCheck      {nullptr};
 
-    MythUIButton       *m_okButton;
-    MythUIButton       *m_cancelButton;
+    MythUIButton       *m_okButton               {nullptr};
+    MythUIButton       *m_cancelButton           {nullptr};
 
   private slots:
     void slotSave(void);

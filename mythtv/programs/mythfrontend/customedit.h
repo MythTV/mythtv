@@ -44,33 +44,33 @@ class CustomEdit : public MythScreenType
     void deleteRule(void);
     QString evaluate(QString clause);
 
-    ProgramInfo *m_pginfo;
+    ProgramInfo *m_pginfo               {nullptr};
     QString m_baseTitle;
 
-    int m_maxex;
-    bool m_evaluate;
+    int m_maxex                         {0};
+    bool m_evaluate                     {true};
 
     QString m_seSuffix;
     QString m_exSuffix;
 
-    MythUIButtonList *m_ruleList;
-    MythUIButtonList *m_clauseList;
+    MythUIButtonList *m_ruleList        {nullptr};
+    MythUIButtonList *m_clauseList      {nullptr};
 
-    MythUITextEdit *m_titleEdit;
+    MythUITextEdit   *m_titleEdit       {nullptr};
 
     // Contains the SQL statement
-    MythUITextEdit *m_descriptionEdit;
+    MythUITextEdit   *m_descriptionEdit {nullptr};
 
     // Contains the additional SQL tables
-    MythUITextEdit *m_subtitleEdit;
+    MythUITextEdit   *m_subtitleEdit    {nullptr};
 
-    MythUIText   *m_clauseText;
-    MythUIButton *m_testButton;
-    MythUIButton *m_recordButton;
-    MythUIButton *m_storeButton;
-    MythUIButton *m_cancelButton;
+    MythUIText       *m_clauseText      {nullptr};
+    MythUIButton     *m_testButton      {nullptr};
+    MythUIButton     *m_recordButton    {nullptr};
+    MythUIButton     *m_storeButton     {nullptr};
+    MythUIButton     *m_cancelButton    {nullptr};
 
-    const MythUIButtonListItem *m_currentRuleItem;
+    const MythUIButtonListItem *m_currentRuleItem {nullptr};
 };
 
 struct CustomRuleInfo {

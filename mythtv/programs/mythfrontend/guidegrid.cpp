@@ -240,7 +240,7 @@ public:
     virtual void ExecuteUI(void) = 0;
 
 protected:
-    GuideGrid *m_guide;
+    GuideGrid *m_guide {nullptr};
 };
 
 class GuideUpdateProgramRow : public GuideUpdaterBase
@@ -325,7 +325,7 @@ private:
 
     QVector<ProgramList*> m_proglists;
     ProgInfoGuideArray m_programInfos;
-    int m_progPast;
+    int m_progPast {0};
     //QVector<GuideUIElement> m_result;
     QLinkedList<GuideUIElement> m_result;
 };
@@ -356,7 +356,7 @@ class UpdateGuideEvent : public QEvent
 public:
     explicit UpdateGuideEvent(GuideUpdaterBase *updater) :
         QEvent(kEventType), m_updater(updater) {}
-    GuideUpdaterBase *m_updater;
+    GuideUpdaterBase *m_updater {nullptr};
     static Type kEventType;
 };
 QEvent::Type UpdateGuideEvent::kEventType =
@@ -406,8 +406,8 @@ public:
         }
     }
 private:
-    GuideGrid *m_guide;
-    GuideUpdaterBase *m_updater;
+    GuideGrid        *m_guide   {nullptr};
+    GuideUpdaterBase *m_updater {nullptr};
 
     static QMutex                s_lock;
     static QWaitCondition        s_wait;
@@ -497,34 +497,17 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
          : ScheduleCommon(parent, "guidegrid"),
            m_selectRecThreshold(gCoreContext->GetNumSetting("SelChangeRecThreshold", 16)),
            m_allowFinder(allowFinder),
-           m_currentStartChannel(0),
            m_startChanID(chanid),
            m_startChanNum(channum),
-           m_currentRow(0),
-           m_currentCol(0),
            m_sortReverse(gCoreContext->GetBoolSetting("EPGSortReverse", false)),
-           m_channelCount(5),
-           m_timeCount(30),
-           m_verticalLayout(false),
            m_player(player),
-           m_usingNullVideo(false),
            m_embedVideo(embedVideo),
            m_previewVideoRefreshTimer(new QTimer(this)),
            m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
            m_updateTimer(new QTimer(this)),
            m_threadPool("GuideGridHelperPool"),
            m_changrpid(changrpid),
-           m_changrplist(ChannelGroup::GetChannelGroups(false)),
-           m_jumpToChannelLock(QMutex::Recursive),
-           m_jumpToChannel(nullptr),
-           m_timeList(nullptr),
-           m_channelList(nullptr),
-           m_guideGrid(nullptr),
-           m_dateText(nullptr),
-           m_longdateText(nullptr),
-           m_jumpToText(nullptr),
-           m_changroupname(nullptr),
-           m_channelImage(nullptr)
+           m_changrplist(ChannelGroup::GetChannelGroups(false))
 {
     connect(m_previewVideoRefreshTimer, SIGNAL(timeout()),
             this,                     SLOT(refreshVideo()));

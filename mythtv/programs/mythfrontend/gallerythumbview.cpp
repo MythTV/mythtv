@@ -24,7 +24,7 @@ class ShellThread: public MThread
 {
 public:
     ShellThread(QString cmd, QString path)
-        : MThread("Import"), m_result(0), m_command(cmd), m_path(path) {}
+        : MThread("Import"), m_command(cmd), m_path(path) {}
 
     int GetResult(void) { return m_result; }
 
@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    int     m_result;
+    int     m_result {0};
     QString m_command;
     QString m_path;
 };
@@ -150,11 +150,7 @@ static void WaitUntilDone(MThread &worker)
  */
 GalleryThumbView::GalleryThumbView(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_imageList(nullptr),
-      m_captionText(nullptr),      m_crumbsText(nullptr),     m_emptyText(nullptr),
-      m_hideFilterText(nullptr),   m_typeFilterText(nullptr), m_positionText(nullptr),
-      m_scanProgressText(nullptr), m_scanProgressBar(nullptr),
-      m_zoomWidgets(),          m_zoomLevel(0),
+      m_zoomWidgets(),
       m_popupStack(*GetMythMainWindow()->GetStack("popup stack")),
       m_mgr(ImageManagerFe::getInstance()),
       // This screen uses a single fixed view (Parent dir, ordered dirs, ordered images)

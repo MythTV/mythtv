@@ -39,8 +39,7 @@ class Reconnect : public QRunnable
 };
 
 BackendConnectionManager::BackendConnectionManager() :
-    QObject(), m_reconnecting(nullptr), m_reconnect_timer(nullptr),
-    m_reconnect_again(false)
+    QObject()
 {
     setObjectName("BackendConnectionManager");
     gCoreContext->addListener(this);

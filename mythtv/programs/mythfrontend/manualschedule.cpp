@@ -34,12 +34,6 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
 {
     m_nowDateTime = MythDate::current();
     m_startDateTime = m_nowDateTime;
-
-    m_daysahead = 0;
-    m_titleEdit = nullptr;
-    m_channelList = m_startdateList = nullptr;
-    m_recordButton = m_cancelButton = nullptr;
-    m_durationSpin = m_starthourSpin = m_startminuteSpin = nullptr;
 }
 
 bool ManualSchedule::Create(void)

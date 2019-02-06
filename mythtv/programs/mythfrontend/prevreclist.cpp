@@ -57,17 +57,8 @@ static const int fDefault = fReverseSort;
 PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
     const QString &title) :
     ScheduleCommon(parent,"PrevRecordedList"),
-    m_titleList(nullptr),
-    m_showList(nullptr),
-    m_curviewText(nullptr),
-    m_help1Text(nullptr),
-    m_help2Text(nullptr),
-    m_titleGroup(true),
-    m_reverseSort(false),
-    m_allowEvents(true),
     m_recid(recid),
-    m_title(title),
-    m_loadShows(false)
+    m_title(title)
 {
 
     if (m_recid && !m_title.isEmpty())

@@ -8,8 +8,7 @@
 
 Transition::Transition(QString name)
     : QObject(),
-      m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
-      m_old(nullptr), m_new(nullptr), m_prev(nullptr), m_next(nullptr)
+      m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000))
 {
     setObjectName(name);
 }

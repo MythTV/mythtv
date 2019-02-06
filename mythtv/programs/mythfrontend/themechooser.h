@@ -71,26 +71,26 @@ class ThemeChooser : public MythScreenType
     void updateProgressBar(int bytesReceived, int bytesTotal);
     bool removeThemeDir(const QString &dirname);
 
-    MythUIButtonList *m_themes;
-    MythUIImage      *m_preview;
+    MythUIButtonList *m_themes                    {nullptr};
+    MythUIImage      *m_preview                   {nullptr};
 
-    bool              m_fullPreviewShowing;
-    MythUIStateType  *m_fullPreviewStateType;
-    MythUIText       *m_fullScreenName;
-    MythUIImage      *m_fullScreenPreview;
+    bool              m_fullPreviewShowing        {false};
+    MythUIStateType  *m_fullPreviewStateType      {nullptr};
+    MythUIText       *m_fullScreenName            {nullptr};
+    MythUIImage      *m_fullScreenPreview         {nullptr};
 
     QFileInfoList     m_infoList;
-    bool              m_refreshDownloadableThemes;
+    bool              m_refreshDownloadableThemes {false};
     QString           m_userThemeDir;
 
     QMap<QString, ThemeInfo*>  m_themeNameInfos;
     QMap<QString, ThemeInfo*>  m_themeFileNameInfos;
     QMap<QString, QString>     m_themeStatuses;
-    ThemeInfo                 *m_downloadTheme;
-    QString                    m_downloadFile;
+    ThemeInfo                 *m_downloadTheme    {nullptr};
+    QString                    m_downloadFile     {dsIdle};
     DownloadState              m_downloadState;
 
-    MythDialogBox      *m_popupMenu;
+    MythDialogBox      *m_popupMenu               {nullptr};
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ class ThemeUpdateChecker : public QObject
     void checkForUpdate(void);
 
   private:
-    QTimer    *m_updateTimer;
+    QTimer    *m_updateTimer {nullptr};
     QStringList m_mythVersions;
     QString    m_infoPackage;
     QString    m_lastKnownThemeVersion;

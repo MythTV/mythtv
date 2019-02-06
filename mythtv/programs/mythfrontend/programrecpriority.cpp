@@ -31,19 +31,6 @@ using namespace std;
 #include "proglist.h"
 #include "scheduleeditor.h"
 
-// overloaded version of RecordingInfo with additional recording priority
-// values so we can keep everything together and don't
-// have to hit the db mulitiple times
-ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
-    RecordingInfo(),
-    recType(kNotRecording),
-    matchCount(0),         recCount(0),
-    last_record(QDateTime()),
-    avg_delay(0),
-    profile("")
-{
-}
-
 void ProgramRecPriorityInfo::clone(
     const ProgramRecPriorityInfo &other, bool ignore_non_serialized_data)
 {
@@ -51,12 +38,12 @@ void ProgramRecPriorityInfo::clone(
 
     if (!ignore_non_serialized_data)
     {
-        recType            = other.recType;
-        matchCount         = other.matchCount;
-        recCount           = other.recCount;
-        last_record        = other.last_record;
-        avg_delay          = other.avg_delay;
-        profile            = other.profile;
+        m_recType          = other.m_recType;
+        m_matchCount       = other.m_matchCount;
+        m_recCount         = other.m_recCount;
+        m_last_record      = other.m_last_record;
+        m_avg_delay        = other.m_avg_delay;
+        m_profile          = other.m_profile;
     }
 }
 
@@ -67,12 +54,12 @@ void ProgramRecPriorityInfo::clone(
 
     if (!ignore_non_serialized_data)
     {
-        recType            = kNotRecording;
-        matchCount         = 0;
-        recCount           = 0;
-        last_record        = QDateTime();
-        avg_delay          = 0;
-        profile.clear();
+        m_recType          = kNotRecording;
+        m_matchCount       = 0;
+        m_recCount         = 0;
+        m_last_record      = QDateTime();
+        m_avg_delay        = 0;
+        m_profile.clear();
     }
 }
 
@@ -83,12 +70,12 @@ void ProgramRecPriorityInfo::clone(
 
     if (!ignore_non_serialized_data)
     {
-        recType            = kNotRecording;
-        matchCount         = 0;
-        recCount           = 0;
-        last_record        = QDateTime();
-        avg_delay          = 0;
-        profile.clear();
+        m_recType          = kNotRecording;
+        m_matchCount       = 0;
+        m_recCount         = 0;
+        m_last_record      = QDateTime();
+        m_avg_delay        = 0;
+        m_profile.clear();
     }
 }
 
@@ -96,12 +83,12 @@ void ProgramRecPriorityInfo::clear(void)
 {
     RecordingInfo::clear();
 
-    recType            = kNotRecording;
-    matchCount         = 0;
-    recCount           = 0;
-    last_record        = QDateTime();
-    avg_delay          = 0;
-    profile.clear();
+    m_recType          = kNotRecording;
+    m_matchCount       = 0;
+    m_recCount         = 0;
+    m_last_record      = QDateTime();
+    m_avg_delay        = 0;
+    m_profile.clear();
 }
 
 void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
@@ -149,8 +136,8 @@ class TitleSort
                 return finalA > finalB;
         }
 
-        int typeA = RecTypePrecedence(a->recType);
-        int typeB = RecTypePrecedence(b->recType);
+        int typeA = RecTypePrecedence(a->m_recType);
+        int typeB = RecTypePrecedence(b->m_recType);
 
         if (typeA != typeB)
         {
@@ -169,7 +156,7 @@ class TitleSort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 class ProgramRecPrioritySort
@@ -191,8 +178,8 @@ class ProgramRecPrioritySort
                 return finalA > finalB;
         }
 
-        int typeA = RecTypePrecedence(a->recType);
-        int typeB = RecTypePrecedence(b->recType);
+        int typeA = RecTypePrecedence(a->m_recType);
+        int typeB = RecTypePrecedence(b->m_recType);
 
         if (typeA != typeB)
         {
@@ -211,7 +198,7 @@ class ProgramRecPrioritySort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 class ProgramRecTypeSort
@@ -222,8 +209,8 @@ class ProgramRecTypeSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int typeA = RecTypePrecedence(a->recType);
-        int typeB = RecTypePrecedence(b->recType);
+        int typeA = RecTypePrecedence(a->m_recType);
+        int typeB = RecTypePrecedence(b->m_recType);
 
         if (typeA != typeB)
         {
@@ -253,7 +240,7 @@ class ProgramRecTypeSort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 class ProgramCountSort
@@ -264,10 +251,10 @@ class ProgramCountSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int countA = a->matchCount;
-        int countB = b->matchCount;
-        int recCountA = a->recCount;
-        int recCountB = b->recCount;
+        int countA = a->m_matchCount;
+        int countB = b->m_matchCount;
+        int recCountA = a->m_recCount;
+        int recCountB = b->m_recCount;
 
         if (countA != countB)
         {
@@ -300,7 +287,7 @@ class ProgramCountSort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 class ProgramRecCountSort
@@ -311,10 +298,10 @@ class ProgramRecCountSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int countA = a->matchCount;
-        int countB = b->matchCount;
-        int recCountA = a->recCount;
-        int recCountB = b->recCount;
+        int countA = a->m_matchCount;
+        int countB = b->m_matchCount;
+        int recCountA = a->m_recCount;
+        int recCountB = b->m_recCount;
 
         if (recCountA != recCountB)
         {
@@ -347,7 +334,7 @@ class ProgramRecCountSort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 class ProgramLastRecordSort
@@ -358,8 +345,8 @@ class ProgramLastRecordSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        QDateTime lastRecA = a->last_record;
-        QDateTime lastRecB = b->last_record;
+        QDateTime lastRecA = a->m_last_record;
+        QDateTime lastRecB = b->m_last_record;
 
         if (lastRecA != lastRecB)
         {
@@ -384,7 +371,7 @@ class ProgramLastRecordSort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 class ProgramAvgDelaySort
@@ -395,8 +382,8 @@ class ProgramAvgDelaySort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        int avgA = a->avg_delay;
-        int avgB = b->avg_delay;
+        int avgA = a->m_avg_delay;
+        int avgB = b->m_avg_delay;
 
         if (avgA != avgB)
         {
@@ -421,21 +408,14 @@ class ProgramAvgDelaySort
     }
 
   private:
-    bool m_reverse;
+    bool m_reverse {false};
 };
 
 ////////////////////////////////////////////////////////
 
 ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                                        const QString &name)
-                   : ScheduleCommon(parent, name),
-                     m_programList(nullptr), m_schedInfoText(nullptr),
-                     m_recPriorityText(nullptr),
-                     m_recPriorityBText(nullptr), m_finalPriorityText(nullptr),
-                     m_lastRecordedText(nullptr), m_lastRecordedDateText(nullptr),
-                     m_lastRecordedTimeText(nullptr), m_channameText(nullptr),
-                     m_channumText(nullptr), m_callsignText(nullptr),
-                     m_recProfileText(nullptr), m_currentItem(nullptr)
+                   : ScheduleCommon(parent, name)
 {
     m_sortType = (SortType)gCoreContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
@@ -963,11 +943,11 @@ void ProgramRecPriority::scheduleChanged(int recid)
         progInfo.SetSubtitle(record.m_subtitle, record.m_sortSubtitle);
         progInfo.SetCategory(record.m_category);
         progInfo.SetRecordingPriority(record.m_recPriority);
-        progInfo.recType = record.m_type;
+        progInfo.m_recType = record.m_type;
         progInfo.recstatus = record.m_isInactive ?
             RecStatus::Inactive : RecStatus::Unknown;
-        progInfo.profile = record.m_recProfile;
-        progInfo.last_record = record.m_lastRecorded;
+        progInfo.m_profile = record.m_recProfile;
+        progInfo.m_last_record = record.m_lastRecorded;
 
         m_programData[recid] = progInfo;
         m_origRecPriorityData[record.m_recordID] =
@@ -997,7 +977,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
 
         // set the recording priorities of that program
         pgRecInfo->SetRecordingPriority(recPriority);
-        pgRecInfo->recType = (RecordingType)rectype;
+        pgRecInfo->m_recType = (RecordingType)rectype;
         // also set the m_origRecPriorityData with new recording
         // priority so we don't save to db again when we exit
         m_origRecPriorityData[pgRecInfo->GetRecordingRuleID()] =
@@ -1025,7 +1005,7 @@ void ProgramRecPriority::remove(void)
                         item->GetData().value<ProgramRecPriorityInfo*>();
 
     if (!pgRecInfo ||
-        (pgRecInfo->recType == kTemplateRecord &&
+        (pgRecInfo->m_recType == kTemplateRecord &&
          pgRecInfo->GetCategory()
          .compare("Default", Qt::CaseInsensitive) == 0))
     {
@@ -1232,14 +1212,14 @@ void ProgramRecPriority::FillList(void)
             {
                 ProgramRecPriorityInfo *progInfo = &(*it);
 
-                progInfo->recType = recType;
-                progInfo->matchCount =
+                progInfo->m_recType = recType;
+                progInfo->m_matchCount =
                     m_listMatch[progInfo->GetRecordingRuleID()];
-                progInfo->recCount =
+                progInfo->m_recCount =
                     m_recMatch[progInfo->GetRecordingRuleID()];
-                progInfo->last_record = lastrec;
-                progInfo->avg_delay = avgd;
-                progInfo->profile = profile;
+                progInfo->m_last_record = lastrec;
+                progInfo->m_avg_delay = avgd;
+                progInfo->m_profile = profile;
 
                 if (inactive)
                     progInfo->recstatus = RecStatus::Inactive;
@@ -1377,14 +1357,14 @@ void ProgramRecPriority::UpdateList()
             progInfo->subtitle.clear();
 
         QString state;
-        if (progInfo->recType == kDontRecord ||
-            (progInfo->recType != kTemplateRecord &&
+        if (progInfo->m_recType == kDontRecord ||
+            (progInfo->m_recType != kTemplateRecord &&
              progInfo->recstatus == RecStatus::Inactive))
             state = "disabled";
         else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "error";
         else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0 ||
-                 progInfo->recType == kTemplateRecord)
+                 progInfo->m_recType == kTemplateRecord)
             state = "normal";
         else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "running";
@@ -1426,24 +1406,24 @@ void ProgramRecPriority::UpdateList()
         item->SetText(QString::number(progRecPriority), "recpriority", state);
         item->SetText(QString::number(progRecPriority), "recpriorityB", state);
 
-        QString tempDateTime = MythDate::toString(progInfo->last_record,
+        QString tempDateTime = MythDate::toString(progInfo->m_last_record,
                                                     MythDate::kDateTimeFull | MythDate::kSimplify |
                                                     MythDate::kAddYear);
         item->SetText(tempDateTime, "lastrecorded", state);
-        QString tempDate = MythDate::toString(progInfo->last_record,
+        QString tempDate = MythDate::toString(progInfo->m_last_record,
                                                 MythDate::kDateFull | MythDate::kSimplify |
                                                 MythDate::kAddYear);
         item->SetText(tempDate, "lastrecordeddate", state);
         QString tempTime = MythDate::toString(
-            progInfo->last_record, MythDate::kTime);
+            progInfo->m_last_record, MythDate::kTime);
         item->SetText(tempTime, "lastrecordedtime", state);
 
         QString channame = progInfo->channame;
         QString channum = progInfo->chanstr;
         QString callsign = progInfo->chansign;
-        if (progInfo->recType != kSingleRecord &&
-            progInfo->recType != kOverrideRecord &&
-            progInfo->recType != kDontRecord &&
+        if (progInfo->m_recType != kSingleRecord &&
+            progInfo->m_recType != kOverrideRecord &&
+            progInfo->m_recType != kDontRecord &&
             !(progInfo->GetRecordingRule()->m_filter & 1024) &&
             progInfo->GetRecordingRule()->m_searchType != kManualSearch)
         {
@@ -1455,7 +1435,7 @@ void ProgramRecPriority::UpdateList()
         item->SetText(channum, "channum", state);
         item->SetText(callsign, "callsign", state);
 
-        QString profile = progInfo->profile;
+        QString profile = progInfo->m_profile;
         if ((profile == "Default") || (profile == "Live TV") ||
             (profile == "High Quality") || (profile == "Low Quality"))
             profile = tr(profile.toUtf8().constData());
@@ -1530,7 +1510,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_lastRecordedText)
     {
-        QString tempDateTime = MythDate::toString(pgRecInfo->last_record,
+        QString tempDateTime = MythDate::toString(pgRecInfo->m_last_record,
                                                     MythDate::kDateTimeFull | MythDate::kSimplify |
                                                     MythDate::kAddYear);
         m_lastRecordedText->SetText(tempDateTime);
@@ -1538,7 +1518,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_lastRecordedDateText)
     {
-        QString tempDate = MythDate::toString(pgRecInfo->last_record,
+        QString tempDate = MythDate::toString(pgRecInfo->m_last_record,
                                                 MythDate::kDateFull | MythDate::kSimplify |
                                                 MythDate::kAddYear);
         m_lastRecordedDateText->SetText(tempDate);
@@ -1547,7 +1527,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     if (m_lastRecordedTimeText)
     {
         QString tempTime = MythDate::toString(
-            pgRecInfo->last_record, MythDate::kTime);
+            pgRecInfo->m_last_record, MythDate::kTime);
         m_lastRecordedTimeText->SetText(tempTime);
     }
 
@@ -1556,9 +1536,9 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         QString channame = pgRecInfo->channame;
         QString channum = pgRecInfo->chanstr;
         QString callsign = pgRecInfo->chansign;
-        if (pgRecInfo->recType != kSingleRecord &&
-            pgRecInfo->recType != kOverrideRecord &&
-            pgRecInfo->recType != kDontRecord &&
+        if (pgRecInfo->m_recType != kSingleRecord &&
+            pgRecInfo->m_recType != kOverrideRecord &&
+            pgRecInfo->m_recType != kDontRecord &&
             !(pgRecInfo->GetRecordingRule()->m_filter & 1024) &&
             pgRecInfo->GetRecordingRule()->m_searchType != kManualSearch)
         {
@@ -1576,7 +1556,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_recProfileText)
     {
-        QString profile = pgRecInfo->profile;
+        QString profile = pgRecInfo->m_profile;
         if ((profile == "Default") || (profile == "Live TV") ||
             (profile == "High Quality") || (profile == "Low Quality"))
             profile = tr(profile.toUtf8().constData());
