@@ -1519,8 +1519,8 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 
         if (FMT_YV12 == frame->codec)
             yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
-#endif
     }
+#endif
     return show;
 }
 
