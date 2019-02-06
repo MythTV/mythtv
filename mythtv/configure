@@ -131,7 +131,6 @@ Advanced options (experts only):
   --disable-xnvctrl        disable xNVCtrl support
   --disable-xrandr         disable X11 resolution switching
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
-  --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-vaapi2         disable VAAPI2 hardware accelerated video decoding
   --disable-nvdec          disable NVDEC (CUVID) hardware accelerated video decoding
@@ -1401,7 +1400,6 @@ EXTERNAL_LIBRARY_LIST="
 "
 
 HWACCEL_AUTODETECT_LIBRARY_LIST="
-    crystalhd
     dxva2
     vdpau
 "
@@ -1950,7 +1948,6 @@ MYTHTV_CONFIG_LIST='
     bindings_perl
     bindings_python
     bindings_php
-    crystalhd
     cygwin
     darwin
     disable_mmx_for_debugging
@@ -2273,7 +2270,6 @@ rdft_select="fft"
 # decoders / encoders
 
 # hardware accelerators
-crystalhd_deps="libcrystalhd_libcrystalhd_if_h"
 dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32"
 dxva2_extralibs="-luser32"
 
@@ -5737,7 +5733,6 @@ check_header dxva.h
 check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_header fcntl.h
 check_header io.h
-check_header libcrystalhd/libcrystalhd_if.h
 check_header mach/mach_time.h
 check_header malloc.h
 check_header net/udplite.h
@@ -6210,8 +6205,6 @@ enabled vdpau &&
 
 enabled vdpau &&
     check_lib vdpau_x11 "vdpau/vdpau.h vdpau/vdpau_x11.h" vdp_device_create_x11 -lvdpau -lX11
-
-enabled crystalhd && check_lib crystalhd "stdint.h libcrystalhd/libcrystalhd_if.h" DtsCrystalHDVersion -lcrystalhd
 
 enabled debug && add_cflags -g"$debuglevel" && add_asflags -g"$debuglevel"
 enabled debug && add_cxxflags -g"$debuglevel"
@@ -7396,7 +7389,6 @@ if enabled x11 ; then
   echo "VAAPI support             ${vaapi-no}"
   echo "VAAPI2 support            ${vaapi2-no}"
   echo "NVDEC support             ${nvdec-no}"
-  echo "CrystalHD support         ${crystalhd-no}"
   echo "OpenMAX support           ${openmax-no}"
   if enabled openmax ; then
     echo "OpenMAX Broadcom          ${openmax_broadcom-no}"

@@ -372,13 +372,6 @@ using_frontend {
     SOURCES += privatedecoder.cpp
     SOURCES += mythcodeccontext.cpp
 
-    using_crystalhd {
-        DEFINES += USING_CRYSTALHD
-        HEADERS += privatedecoder_crystalhd.h
-        SOURCES += privatedecoder_crystalhd.cpp
-        LIBS += -lcrystalhd
-    }
-
     using_openmax {
         DEFINES += USING_OPENMAX
         HEADERS += privatedecoder_omx.h

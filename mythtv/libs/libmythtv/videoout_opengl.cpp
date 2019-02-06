@@ -39,8 +39,6 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     (*opts.safe_renderers)["nuppel"].append(safe);
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append(safe);
-    if (opts.decoders->contains("crystalhd"))
-        (*opts.safe_renderers)["crystalhd"].append(safe);
     if (opts.decoders->contains("openmax"))
         (*opts.safe_renderers)["openmax"].append(safe);
     if (opts.decoders->contains("mediacodec"))

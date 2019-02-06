@@ -251,8 +251,6 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
     (*opts.safe_renderers)["nuppel"].append(kName);
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append(kName);
-    if (opts.decoders->contains("crystalhd"))
-        (*opts.safe_renderers)["crystalhd"].append(kName);
     if (opts.decoders->contains(PrivateDecoderOMX::s_name))
         (*opts.safe_renderers)[PrivateDecoderOMX::s_name].append(kName);
 

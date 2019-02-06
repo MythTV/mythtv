@@ -34,8 +34,6 @@ void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
         (*opts.safe_renderers)["vdpau"].append("vdpau");
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append("vdpau");
-    if (opts.decoders->contains("crystalhd"))
-        (*opts.safe_renderers)["crystalhd"].append("vdpau");
     (*opts.safe_renderers)["dummy"].append("vdpau");
     (*opts.safe_renderers)["nuppel"].append("vdpau");
 

@@ -4,21 +4,13 @@
 #include "privatedecoder_omx.h"
 #endif
 
-#ifdef USING_CRYSTALHD
-#include "privatedecoder_crystalhd.h"
-#endif
-
 void PrivateDecoder::GetDecoders(render_opts &opts)
 {
 #ifdef USING_OPENMAX
     PrivateDecoderOMX::GetDecoders(opts);
 #endif
 
-#ifdef USING_CRYSTALHD
-    PrivateDecoderCrystalHD::GetDecoders(opts);
-#endif
-
-#if !(defined(Q_OS_MACX) || USING_OPENMAX || USING_CRYSTALHD)
+#if !(USING_OPENMAX)
     Q_UNUSED(opts);
 #endif
 }
@@ -34,14 +26,7 @@ PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
     delete omx;
 #endif
 
-#ifdef USING_CRYSTALHD
-    PrivateDecoderCrystalHD *chd = new PrivateDecoderCrystalHD();
-    if (chd && chd->Init(decoder, flags, avctx))
-        return chd;
-    delete chd;
-#endif
-
-#if !(defined(Q_OS_MACX) || USING_OPENMAX || USING_CRYSTALHD)
+#if !(USING_OPENMAX)
     Q_UNUSED(decoder);
     Q_UNUSED(flags);
     Q_UNUSED(avctx);
