@@ -406,7 +406,7 @@ using_frontend {
     # Video output
     HEADERS += videooutbase.h           videoout_null.h
     HEADERS += videobuffers.h           vsync.h
-    HEADERS += jitterometer.h           yuv2rgb.h
+    HEADERS += jitterometer.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h          util-osd.h
     HEADERS += videooutwindow.h         videocolourspace.h
@@ -414,7 +414,7 @@ using_frontend {
     HEADERS += visualisations/videovisualdefs.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
-    SOURCES += jitterometer.cpp         yuv2rgb.cpp
+    SOURCES += jitterometer.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp       util-osd.cpp
     SOURCES += videocolourspace.cpp
