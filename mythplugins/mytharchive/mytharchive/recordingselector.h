@@ -32,8 +32,9 @@ class RecordingSelector : public MythScreenType
   Q_OBJECT
 
   public:
-    RecordingSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList);
-
+    RecordingSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
+        : MythScreenType(parent, "RecordingSelector"),
+          m_archiveList(archiveList) {}
     ~RecordingSelector(void);
 
     bool Create() override; // MythScreenType
@@ -61,21 +62,21 @@ class RecordingSelector : public MythScreenType
     void updateCategorySelector(void);
     void getRecordingList(void);
 
-    QList<ArchiveItem *>        *m_archiveList;
-    std::vector<ProgramInfo *>  *m_recordingList;
+    QList<ArchiveItem *>        *m_archiveList   {nullptr};
+    std::vector<ProgramInfo *>  *m_recordingList {nullptr};
     QList<ProgramInfo *>         m_selectedList;
     QStringList                  m_categories;
 
-    MythUIButtonList   *m_recordingButtonList;
-    MythUIButton       *m_okButton;
-    MythUIButton       *m_cancelButton;
-    MythUIButtonList   *m_categorySelector;
-    MythUIText         *m_titleText;
-    MythUIText         *m_datetimeText;
-    MythUIText         *m_filesizeText;
-    MythUIText         *m_descriptionText;
-    MythUIImage        *m_previewImage;
-    MythUIImage        *m_cutlistImage;
+    MythUIButtonList   *m_recordingButtonList    {nullptr};
+    MythUIButton       *m_okButton               {nullptr};
+    MythUIButton       *m_cancelButton           {nullptr};
+    MythUIButtonList   *m_categorySelector       {nullptr};
+    MythUIText         *m_titleText              {nullptr};
+    MythUIText         *m_datetimeText           {nullptr};
+    MythUIText         *m_filesizeText           {nullptr};
+    MythUIText         *m_descriptionText        {nullptr};
+    MythUIImage        *m_previewImage           {nullptr};
+    MythUIImage        *m_cutlistImage           {nullptr};
 
     friend class GetRecordingListThread;
 };

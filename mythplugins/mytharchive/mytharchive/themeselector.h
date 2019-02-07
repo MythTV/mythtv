@@ -42,25 +42,25 @@ class DVDThemeSelector : public MythScreenType
     void loadConfiguration(void);
     void saveConfiguration(void);
 
-    MythScreenType    *m_destinationScreen;
+    MythScreenType    *m_destinationScreen {nullptr};
     ArchiveDestination m_archiveDestination;
 
     QString themeDir;
 
-    MythUIButtonList *theme_selector;
-    MythUIImage      *theme_image;
-    int               theme_no;
+    MythUIButtonList *theme_selector       {nullptr};
+    MythUIImage      *theme_image          {nullptr};
+    int               theme_no             {0};
     QStringList       theme_list;
 
-    MythUIImage      *intro_image;
-    MythUIImage      *mainmenu_image;
-    MythUIImage      *chapter_image;
-    MythUIImage      *details_image;
-    MythUIText       *themedesc_text;
+    MythUIImage      *intro_image          {nullptr};
+    MythUIImage      *mainmenu_image       {nullptr};
+    MythUIImage      *chapter_image        {nullptr};
+    MythUIImage      *details_image        {nullptr};
+    MythUIText       *themedesc_text       {nullptr};
 
-    MythUIButton     *m_nextButton;
-    MythUIButton     *m_prevButton;
-    MythUIButton     *m_cancelButton;
+    MythUIButton     *m_nextButton         {nullptr};
+    MythUIButton     *m_prevButton         {nullptr};
+    MythUIButton     *m_cancelButton       {nullptr};
 };
 
 #endif

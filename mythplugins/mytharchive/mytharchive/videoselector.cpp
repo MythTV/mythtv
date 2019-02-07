@@ -26,12 +26,7 @@ using namespace std;
 
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
-               m_archiveList(archiveList), m_videoList(nullptr),
-               m_currentParentalLevel(ParentalLevel::plNone),
-               m_plText(nullptr), m_videoButtonList(nullptr), m_warningText(),
-               m_okButton(nullptr), m_cancelButton(nullptr), m_categorySelector(nullptr),
-               m_titleText(nullptr), m_filesizeText(nullptr), m_plotText(nullptr),
-               m_coverImage(nullptr)
+               m_archiveList(archiveList)
 {
     m_parentalLevelChecker = new ParentalLevelChangeChecker();
     connect(m_parentalLevelChecker, SIGNAL(SigResultReady(bool, ParentalLevel::Level)),

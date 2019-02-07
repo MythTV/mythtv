@@ -30,18 +30,7 @@ DVDThemeSelector::DVDThemeSelector(
     MythScreenType(parent, name, true),
     m_destinationScreen(destinationScreen),
     m_archiveDestination(archiveDestination),
-    themeDir(GetShareDir() + "mytharchive/themes/"),
-    theme_selector(nullptr),
-    theme_image(nullptr),
-    theme_no(0),
-    intro_image(nullptr),
-    mainmenu_image(nullptr),
-    chapter_image(nullptr),
-    details_image(nullptr),
-    themedesc_text(nullptr),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr)
+    themeDir(GetShareDir() + "mytharchive/themes/")
 {
 }
 
