@@ -48,6 +48,8 @@ MythVAAPIDisplay::MythVAAPIDisplay(MythRenderOpenGL *Context)
     INIT_ST;
     va_status = vaInitialize(m_vaDisplay, &major_ver, &minor_ver);
     CHECK_ST;
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Created VAAPI GLX display");
 }
 
 MythVAAPIDisplay::~MythVAAPIDisplay()
@@ -89,7 +91,7 @@ void MythVAAPIDisplay::MythVAAPIDisplayDestroy(MythRenderOpenGL *Context, VADisp
     Context->makeCurrent();
     INIT_ST; va_status = vaTerminate(Display); CHECK_ST;
     Context->doneCurrent();
-    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI display closed");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI GLX display closed");
 }
 
 void MythVAAPIDisplay::MythVAAPIDisplayDestroyCallback(void *Context, void *Wait, void *Display)
@@ -106,11 +108,10 @@ void VAAPIContext::HWFramesContextFinished(AVHWFramesContext *Context)
 {
     if (!Context)
         return;
-
+    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI frames context destroyed");
     MythVAAPIDisplay* display = reinterpret_cast<MythVAAPIDisplay*>(Context->user_opaque);
     if (display)
         display->DecrRef();
-    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI frames context destroyed");
 }
 
 void VAAPIContext::HWDeviceContextFinished(AVHWDeviceContext*)
@@ -216,8 +217,6 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
     }
 
     // setup the frames context
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Setting up VAAPI hw frames context");
-
     // the frames context now holds the reference to MythVAAPIDisplay.
     // Set the callback to ensure it is released
     AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
@@ -238,7 +237,7 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("FFmpeg buffer pool created with %1 surfaces").arg(hw_frames_ctx->initial_pool_size));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces").arg(hw_frames_ctx->initial_pool_size));
     av_buffer_unref(&hwdeviceref);
 }
 
