@@ -248,13 +248,13 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 #ifdef USING_VAAPI
     if (Frame->pix_fmt == AV_PIX_FMT_VAAPI)
     {
-        AVBufferRef* ref = (AVBufferRef*)Frame->priv[0];
+        AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref)
             av_buffer_unref(&ref);
-        ref = (AVBufferRef*)Frame->priv[1];
+        ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
         if (ref)
             av_buffer_unref(&ref);
-        Frame->priv[0] = Frame->priv[1] = nullptr;
+        Frame->buf = Frame->priv[0] = Frame->priv[1] = nullptr;
     }
 #else
     (void)Frame;
