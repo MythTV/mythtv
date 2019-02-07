@@ -510,16 +510,21 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         gl_context->logDebugMarker(LOC + "PREPARE_FRAME_START");
 
+    bool dummy = false;
+    gl_context_lock.lock();
+    if (buffer)
+    {
+        framesPlayed = buffer->frameNumber + 1;
+        dummy = buffer->dummy;
+    }
+    gl_context_lock.unlock();
+
     if (!buffer)
     {
         buffer = vbuffers.GetScratchFrame();
         if (m_deinterlacing)
             t = kScan_Interlaced;
     }
-
-    gl_context_lock.lock();
-    framesPlayed = buffer->frameNumber + 1;
-    gl_context_lock.unlock();
 
     gl_context->BindFramebuffer(nullptr);
     if (db_letterbox_colour == kLetterBoxColour_Gray25)
@@ -548,31 +553,8 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         second = first.translated(0, main.height() / 2);
     }
 
-    // TODO this shouldn't be necessary anymore
-    // main UI when embedded
-    MythMainWindow *mwnd = GetMythMainWindow();
-    if (mwnd && mwnd->GetPaintWindow() && window.IsEmbedding())
-    {
-        if (twopass)
-            gl_context->SetViewPort(first, true);
-        mwnd->GetPaintWindow()->clearMask();
-        // Must force a UI redraw when embedded.  If not, when the EPG or
-        // finder screen is popped up over the video and the user then clicks
-        // away from Myth, the UI is left blank.
-        mwnd->GetMainStack()->GetTopScreen()->SetRedraw();
-        mwnd->draw(gl_painter);
-        if (twopass)
-        {
-            gl_context->SetViewPort(second, true);
-            mwnd->GetPaintWindow()->clearMask();
-            mwnd->GetMainStack()->GetTopScreen()->SetRedraw();
-            mwnd->draw(gl_painter);
-            gl_context->SetViewPort(main, true);
-        }
-    }
-
     // video
-    if (gl_videochain && !buffer->dummy)
+    if (gl_videochain && !dummy)
     {
         gl_videochain->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
@@ -633,9 +615,6 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     gl_context->Flush(false);
-
-    if (vbuffers.GetScratchFrame() == buffer)
-        vbuffers.SetLastShownFrameToScratch();
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         gl_context->logDebugMarker(LOC + "PREPARE_FRAME_END");
@@ -883,8 +862,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
     }
 
     QSize current = gl_pipchain->GetVideoSize();
-    if ((uint)current.width()  != pipVideoWidth ||
-        (uint)current.height() != pipVideoHeight)
+    if (current.width() != pipVideoWidth || current.height() != pipVideoHeight)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;

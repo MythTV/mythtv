@@ -1716,7 +1716,7 @@ void VideoOutput::ResizeForGui(void)
  *
  * \param width,height Resolution of the video we will be playing
  */
-void VideoOutput::ResizeForVideo(uint width, uint height)
+void VideoOutput::ResizeForVideo(int width, int height)
 {
     if (!display_res)
         return;
@@ -1765,7 +1765,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
  * \brief Init display measurements based on database settings and
  *        actual screen parameters.
  */
-void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
+void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
 {
     DisplayInfo disp = MythDisplay::GetDisplayInfo();
     QString     source = "Actual";

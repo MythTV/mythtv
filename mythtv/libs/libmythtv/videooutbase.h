@@ -104,7 +104,7 @@ class VideoOutput
     virtual void EmbedInWidget(const QRect &rect);
     virtual void StopEmbedding(void);
     virtual void ResizeForGui(void);
-    virtual void ResizeForVideo(uint width = 0, uint height = 0);
+    virtual void ResizeForVideo(int width = 0, int height = 0);
 
     virtual void Zoom(ZoomDirection direction);
     virtual void ToggleMoveBottomLine(void);
@@ -289,7 +289,7 @@ class VideoOutput
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
                      int keepprebuffer);
-    void InitDisplayMeasurements(uint width, uint height, bool resize);
+    void InitDisplayMeasurements(int width, int height, bool resize);
     virtual void ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers);
     virtual void ShowPIP(VideoFrame        *frame,
                          MythPlayer *pipplayer,
