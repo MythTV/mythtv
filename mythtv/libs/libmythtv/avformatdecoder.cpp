@@ -3185,6 +3185,8 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
     pic->reordered_opaque = c->reordered_opaque;
 
     int ret = avcodec_default_get_buffer2(c, pic, flags);
+    if (ret < 0)
+        return ret;
 
     // avcodec_default_get_buffer2 will retrieve an AVBufferRef from the pool of
     // VAAPI surfaces stored within AVHWFramesContext. The pointer to VASurfaceID is stored
