@@ -645,6 +645,8 @@ void VideoOutWindow::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRect
  */
 void VideoOutWindow::EmbedInWidget(const QRect &Rect)
 {
+    if (m_embedding && (Rect == m_embeddingRect))
+        return;
     m_embeddingRect = Rect;
     bool savevisiblerect = !m_embedding;
     m_embedding = true;
@@ -658,11 +660,11 @@ void VideoOutWindow::EmbedInWidget(const QRect &Rect)
  */
 void VideoOutWindow::StopEmbedding(void)
 {
+    if (!m_embedding)
+        return;
     m_embeddingRect = QRect();
     m_displayVisibleRect = m_tmpDisplayVisibleRect;
-
     MoveResize();
-
     m_embedding = false;
 }
 

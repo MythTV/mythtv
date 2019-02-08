@@ -55,8 +55,6 @@ bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &video_dim_buf,
         return VideoOutputOpenGL::InputChanged(video_dim_buf, video_dim_disp,
                                                aspect, av_codec_id, aspect_only);
 
-    QMutexLocker locker(&gl_context_lock);
-
     bool wasembedding = window.IsEmbedding();
     QRect oldrect;
     if (wasembedding)
@@ -89,7 +87,7 @@ bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &video_dim_buf,
 
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
-             aspect, gl_parent_win, disp, av_codec_id))
+             aspect, m_window, disp, av_codec_id))
     {
         if (wasembedding)
             EmbedInWidget(oldrect);
@@ -122,7 +120,6 @@ bool VideoOutputOpenGLVAAPI::Init(const QSize &video_dim_buf,
 
 bool VideoOutputOpenGLVAAPI::CreateBuffers(void)
 {
-    QMutexLocker locker(&gl_context_lock);
     if (codec_is_vaapi(video_codec_id))
     {
         vbuffers.Init(24, true, 2, 1, 4, 1);
@@ -184,7 +181,7 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     if (vbuffers.Size(kVideoBuffer_used))
     {
         VideoFrame *frame = vbuffers.Head(kVideoBuffer_used);
-        CopyFrame(&av_pause_frame, frame);
+        CopyFrame(&m_pauseFrame, frame);
         //m_pauseBuffer = frame->buf;
         disp_timecode = frame->disp_timecode;
     }
@@ -197,18 +194,16 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
 
 void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd)
 {
+    if (codec_is_vaapi(video_codec_id) && m_openGLVideo)
     {
-        QMutexLocker locker(&gl_context_lock);
-        if (codec_is_vaapi(video_codec_id) && gl_videochain)
-        {
-            // TODO pause frame
-            MythGLTexture *texture = gl_videochain->GetInputTexture();
-            GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
-            m_vaapiInterop.CopySurfaceToTexture(gl_context, &videoColourSpace,
-                                                frame ? frame : nullptr /*av_pause_frame*/,
-                                                textureid, GL_TEXTURE_2D, scan);
-        }
+        // TODO pause frame
+        MythGLTexture *texture = m_openGLVideo->GetInputTexture();
+        GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
+        m_vaapiInterop.CopySurfaceToTexture(m_render, &videoColourSpace,
+                                            frame ? frame : nullptr /*av_pause_frame*/,
+                                            textureid, GL_TEXTURE_2D, scan);
     }
+
     VideoOutputOpenGL::PrepareFrame(frame, scan, osd);
 }
 

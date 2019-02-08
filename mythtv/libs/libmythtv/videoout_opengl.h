@@ -11,58 +11,46 @@ class MythOpenGLPainter;
 class VideoOutputOpenGL : public VideoOutput
 {
   public:
-    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
-    explicit VideoOutputOpenGL(const QString &profile = QString());
-    virtual ~VideoOutputOpenGL();
+    static void GetRenderOptions(render_opts &Options, QStringList &SoftwareDeinteralacers);
+    static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize &VideoDim);
 
-    bool Init(const QSize &video_dim_buf,
-              const QSize &video_dim_disp,
-              float aspect,
-              WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
+    explicit VideoOutputOpenGL(const QString &Profile = QString());
+    virtual ~VideoOutputOpenGL() override;
+
     virtual void SetProfile(void);
     virtual void TearDown(void);
 
-    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
-                      const PIPMap &pipPlayers,
-                      FrameScanType scan) override; // VideoOutput
-    virtual void Show(FrameScanType ) override; // VideoOutput
-    bool InputChanged(const QSize &video_dim_buf,
-                      const QSize &video_dim_disp,
-                      float aspect,
-                      MythCodecID  av_codec_id,
-                      bool &aspect_only) override; // VideoOutput
-    void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
-    void DrawUnusedRects(bool) override { } // VideoOutput
-    void Zoom(ZoomDirection direction) override; // VideoOutput
-    void MoveResize(void) override; // VideoOutput
-    int  SetPictureAttribute(PictureAttribute attribute, int newValue) override; // VideoOutput
-    void InitPictureAttributes(void) override; // VideoOutput
-    static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
-                                           const QSize &video_dim);
-    void EmbedInWidget(const QRect &rect) override; // VideoOutput
-    void StopEmbedding(void) override; // VideoOutput
-    bool SetDeinterlacingEnabled(bool) override; // VideoOutput
-    bool SetupDeinterlace(bool interlaced,
-                          const QString& overridefilter="") override; // VideoOutput
-    void ShowPIP(VideoFrame  *frame,
-                 MythPlayer  *pipplayer,
-                 PIPLocation  loc) override; // VideoOutput
-    void MoveResizeWindow(QRect new_rect) override; // VideoOutput
+    // VideoOutput
+    bool Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
+              WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId) override;
 
-    void RemovePIP(MythPlayer *pipplayer) override; // VideoOutput
-    bool IsPIPSupported(void) const override  { return true; } //VideoOutput
-    bool hasFullScreenOSD(void) const override { return true; } // VideoOutput
-    bool ApproveDeintFilter(const QString& filtername) const override; // VideoOutput
-    MythPainter *GetOSDPainter(void) override; // VideoOutput
-
-    bool CanVisualise(AudioPlayer *audio, MythRender *render) override; // VideoOutput
-    bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
-                            const QString &name) override; // VideoOutput
-    QStringList GetVisualiserList(void) override; // VideoOutput
-
-    bool StereoscopicModesAllowed(void) const override { return true; } // VideoOutput
+    void PrepareFrame(VideoFrame *Frame, FrameScanType, OSD *Osd) override;
+    void ProcessFrame(VideoFrame *Frame, OSD *Osd, FilterChain *FilterList,
+                      const PIPMap &PiPPlayers, FrameScanType Scan) override;
+    virtual void Show(FrameScanType ) override;
+    bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
+                      float Aspect, MythCodecID CodecId, bool &AspectOnly) override;
+    void UpdatePauseFrame(int64_t &DisplayTimecode) override;
+    void DrawUnusedRects(bool) override { }
+    void Zoom(ZoomDirection Direction) override;
+    void MoveResize(void) override;
+    int  SetPictureAttribute(PictureAttribute Attribute, int Value) override;
+    void InitPictureAttributes(void) override;
+    void EmbedInWidget(const QRect &Rect) override;
+    void StopEmbedding(void) override;
+    bool SetDeinterlacingEnabled(bool Enable) override;
+    bool SetupDeinterlace(bool Interlaced, const QString &OverrideFilter = QString()) override;
+    void ShowPIP(VideoFrame *Frame, MythPlayer *PiPPlayer, PIPLocation Location) override;
+    void MoveResizeWindow(QRect NewRect) override;
+    void RemovePIP(MythPlayer *PiPPlayer) override;
+    bool IsPIPSupported(void) const override  { return true; }
+    bool hasFullScreenOSD(void) const override { return true; }
+    bool ApproveDeintFilter(const QString& Deinterlacer) const override;
+    MythPainter *GetOSDPainter(void) override;
+    bool CanVisualise(AudioPlayer *Audio, MythRender *Render) override;
+    bool SetupVisualisation(AudioPlayer *Audio, MythRender *Render, const QString &Name) override;
+    QStringList GetVisualiserList(void) override;
+    bool StereoscopicModesAllowed(void) const override { return true; }
 
   protected:
     bool CreateCPUResources(void);
@@ -77,19 +65,17 @@ class VideoOutputOpenGL : public VideoOutput
     bool SetupOpenGL(void);
     void CreatePainter(void);
 
-    QMutex            gl_context_lock;
-    MythRenderOpenGL *gl_context;
-    bool              gl_valid;
-    OpenGLVideo      *gl_videochain;
-    QMap<MythPlayer*,OpenGLVideo*> gl_pipchains;
-    QMap<MythPlayer*,bool>         gl_pip_ready;
-    OpenGLVideo      *gl_pipchain_active;
-    WId               gl_parent_win;
-    VideoFrame        av_pause_frame;
-
-    MythOpenGLPainter *gl_painter;
-    QString            gl_opengl_profile;
-    OpenGLVideo::FrameType gl_opengl_type;
+    MythRenderOpenGL      *m_render;
+    bool                   m_renderValid;
+    OpenGLVideo           *m_openGLVideo;
+    QMap<MythPlayer*,OpenGLVideo*> m_openGLVideoPiPs;
+    QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;
+    OpenGLVideo           *m_openGLVideoPiPActive;
+    WId                    m_window;
+    VideoFrame             m_pauseFrame;
+    MythOpenGLPainter     *m_openGLPainter;
+    QString                m_videoProfile;
+    OpenGLVideo::FrameType m_openGLVideoType;
 };
 
 #endif
