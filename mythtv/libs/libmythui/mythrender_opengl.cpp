@@ -359,6 +359,11 @@ int MythRenderOpenGL::GetMaxTextureSize(void) const
     return m_maxTextureSize;
 }
 
+int MythRenderOpenGL::GetMaxTextureUnits(void) const
+{
+    return m_maxTextureUnits;
+}
+
 int MythRenderOpenGL::GetExtraFeatures(void) const
 {
     return m_extraFeaturesUsed;

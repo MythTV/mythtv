@@ -197,7 +197,7 @@ QSize OpenGLVideo::GetVideoSize(void) const
     return m_videoDim;
 }
 
-bool OpenGLVideo::AddDeinterlacer(const QString &Deinterlacer)
+bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
 {
     OpenGLLocker ctx_lock(m_render);
 
@@ -223,14 +223,27 @@ bool OpenGLVideo::AddDeinterlacer(const QString &Deinterlacer)
         m_referenceTextures.pop_back();
     }
 
+    // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
+    int max = m_render->GetMaxTextureUnits();
+    int texturesperframe = (m_frameType == kGLYV12) ? 3 : 1;
+    uint refstocreate = kernel ? 2 : 0;
+    m_referenceTexturesNeeded = refstocreate + 1;
+
+    int totaltextures = texturesperframe * static_cast<int>(m_referenceTexturesNeeded);
+    if (totaltextures > max)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for '%1' (%2 < %3)")
+            .arg(Deinterlacer).arg(max).arg(totaltextures));
+        Deinterlacer = Deinterlacer.contains("double") ? "openglbobdeint" : "openglonefield";
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'").arg(Deinterlacer));
+    }
+
     // create new deinterlacers - the old ones will be deleted
     if (!(CreateVideoShader(InterlacedBot, Deinterlacer) && CreateVideoShader(InterlacedTop, Deinterlacer)))
         return false;
 
     // create the correct number of reference textures
-    uint refstocreate = kernel ? 2 : 0;
-    m_referenceTexturesNeeded = refstocreate + 1;
-    refstocreate *= (kGLYV12 == m_frameType) ? 3 : 1;
+    refstocreate *= static_cast<uint>(texturesperframe);
     while (m_referenceTextures.size() < refstocreate)
     {
         MythGLTexture *texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);

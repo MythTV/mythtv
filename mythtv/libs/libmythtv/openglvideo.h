@@ -53,7 +53,7 @@ class OpenGLVideo : public QObject
     bool    IsValid(void) const;
     MythGLTexture* GetInputTexture(void) const;
     void    UpdateInputFrame(const VideoFrame *Frame);
-    bool    AddDeinterlacer(const QString &Deinterlacer);
+    bool    AddDeinterlacer(QString &Deinterlacer);
     void    SetDeinterlacing(bool Deinterlacing);
     QString GetDeinterlacer(void) const;
     void    PrepareFrame(bool TopFieldFirst, FrameScanType Scan, StereoscopicMode Stereo, bool DrawBorder = false);

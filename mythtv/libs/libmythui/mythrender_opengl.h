@@ -98,6 +98,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
     void  setWidget(QWidget *Widget);
     bool  Init(void);
     int   GetMaxTextureSize(void) const;
+    int   GetMaxTextureUnits(void) const;
     int   GetExtraFeatures(void) const;
     QOpenGLFunctions::OpenGLFeatures GetFeatures(void) const;
     bool  IsRecommendedRenderer(void);
