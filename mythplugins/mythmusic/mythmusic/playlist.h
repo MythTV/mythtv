@@ -127,19 +127,19 @@ class Playlist : public QObject
     MusicMetadata* getRawSongAt(int pos) const;
     QString removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist);
 
-    int                   m_playlistid;
+    int                   m_playlistid  {0};
     QString               m_name;
 
     SongList              m_songs;
     SongList              m_shuffledSongs;
 
-    PlaylistContainer    *m_parent;
-    bool                  m_changed;
-    bool                  m_doSave;
+    PlaylistContainer    *m_parent      {nullptr};
+    bool                  m_changed     {false};
+    bool                  m_doSave      {true};
 #ifdef CD_WRTITING_FIXED
-    MythProgressDialog   *m_progress;
-    MythSystemLegacy     *m_proc;
-    uint                  m_procExitVal;
+    MythProgressDialog   *m_progress    {nullptr};
+    MythSystemLegacy     *m_proc        {nullptr};
+    uint                  m_procExitVal {0};
 #endif
 };
 

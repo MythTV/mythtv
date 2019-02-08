@@ -70,15 +70,6 @@ void DecoderHandlerEvent::getBufferStatus(int *available, int *maxSize) const
 
 /**********************************************************************/
 
-DecoderHandler::DecoderHandler(void) :
-    m_state(STOPPED),
-    m_playlist_pos(0),
-    m_decoder(nullptr),
-    m_op(false),
-    m_redirects(0)
-{
-}
-
 DecoderHandler::~DecoderHandler(void)
 {
     stop();

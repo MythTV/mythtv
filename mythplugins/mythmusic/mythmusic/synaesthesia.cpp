@@ -29,24 +29,7 @@ using namespace std;
 #include "mainvisual.h"
 #include "synaesthesia.h"
 
-Synaesthesia::Synaesthesia(void) :
-    m_size(0,0),
-
-    m_maxStarRadius(1),
-    m_fadeMode(Stars),
-    m_pointsAreDiamonds(true),
-    m_brightnessTwiddler(0.3),
-    m_starSize(0.5),
-
-    m_outWidth(0),
-    m_outHeight(0),
-
-    m_outputImage(nullptr),
-
-    m_fgRedSlider(0.0),  m_fgGreenSlider(0.5),
-    m_bgRedSlider(0.75), m_bgGreenSlider(0.4),
-
-    m_energy_avg(80.0)
+Synaesthesia::Synaesthesia(void)
 {
     m_fps = 29;
 
@@ -476,17 +459,17 @@ bool Synaesthesia::process(VisualNode *node)
     int brightFactor = int(Brightness * m_brightnessTwiddler / (m_starSize + 0.01));
 
     int numSamps = NumSamples;
-    if (node->length < NumSamples)
-        numSamps = node->length;
+    if (node->m_length < NumSamples)
+        numSamps = node->m_length;
 
     memset(x, 0, sizeof(x));
     memset(y, 0, sizeof(y));
 
     for (i = 0; i < numSamps; i++) 
     {
-        x[i] = node->left[i];
-        if (node->right)
-            y[i] = node->right[i];
+        x[i] = node->m_left[i];
+        if (node->m_right)
+            y[i] = node->m_right[i];
         else
             y[i] = x[i];
     }

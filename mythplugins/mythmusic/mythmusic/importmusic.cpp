@@ -45,11 +45,6 @@ void FileScannerThread::run()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileCopyThread::FileCopyThread(const QString &src, const QString &dst) :
-    MThread("FileCopy"), m_srcFile(src), m_dstFile(dst), m_result(false)
-{
-}
-
 void FileCopyThread::run()
 {
     RunProlog();
@@ -62,39 +57,7 @@ void FileCopyThread::run()
 
 ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent) :
     MythScreenType(parent, "musicimportfiles"),
-
-    m_musicStorageDir(""),
-    m_somethingWasImported(false),
-    m_tracks(new vector<TrackInfo*>),
-    m_currentTrack(0),
-    m_playingMetaData(nullptr),
-    // GUI stuff
-    m_locationEdit(nullptr),
-    m_locationButton(nullptr),
-    m_scanButton(nullptr),
-    m_coverartButton(nullptr),
-    m_filenameText(nullptr),
-    m_compartistText(nullptr),
-    m_artistText(nullptr),
-    m_albumText(nullptr),
-    m_titleText(nullptr),
-    m_genreText(nullptr),
-    m_yearText(nullptr),
-    m_trackText(nullptr),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_currentText(nullptr),
-    m_statusText(nullptr),
-    m_playButton(nullptr),
-    m_addButton(nullptr),
-    m_addallnewButton(nullptr),
-    m_nextnewButton(nullptr),
-    m_compilationCheck(nullptr),
-    // default metadata values
-    m_defaultCompilation(false),
-    m_defaultYear(0),
-    m_defaultRating(0),
-    m_haveDefaults(false)
+    m_tracks(new vector<TrackInfo*>)
 {
     QString lastHost = gCoreContext->GetSetting("MythMusicLastImportHost", gCoreContext->GetMasterHostName());
     QStringList dirs = StorageGroup::getGroupDirs("Music", lastHost);
@@ -945,29 +908,6 @@ void ImportMusicDialog::customEvent(QEvent *event)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
-                                           const QString &sourceDir,
-                                           MusicMetadata *metadata,
-                                           const QString &storageDir) :
-    MythScreenType(parent, "import_coverart"),
-    m_sourceDir(sourceDir),
-    m_musicStorageDir(storageDir),
-    m_metadata(metadata),
-    m_currentFile(0),
-    //  GUI stuff
-    m_filenameText(nullptr),
-    m_currentText(nullptr),
-    m_statusText(nullptr),
-    m_destinationText(nullptr),
-    m_coverartImage(nullptr),
-    m_typeList(nullptr),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_copyButton(nullptr),
-    m_exitButton(nullptr)
-{
-}
 
 bool ImportCoverArtDialog::keyPressEvent(QKeyEvent *event)
 {

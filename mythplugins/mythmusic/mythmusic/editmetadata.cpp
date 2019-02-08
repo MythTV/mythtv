@@ -40,19 +40,13 @@ MusicMetadata *EditMetadataCommon::s_sourceMetadata = nullptr;
 EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
                                        MusicMetadata *source_metadata,
                                        const QString &name) :
-    MythScreenType(parent, name), m_albumArtChanged(false), m_doneButton(nullptr)
+    MythScreenType(parent, name)
 {
     // make a copy so we can abandon changes
     s_metadata = new MusicMetadata(*source_metadata);
     s_sourceMetadata = source_metadata;
 
     s_metadataOnly = false;
-}
-
-EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
-                                       const QString &name) :
-    MythScreenType(parent, name), m_albumArtChanged(false), m_doneButton(nullptr)
-{
 }
 
 EditMetadataCommon::~EditMetadataCommon()
@@ -63,7 +57,7 @@ EditMetadataCommon::~EditMetadataCommon()
         s_metadata->getAlbumArtImages()->dumpToDatabase();
 
         // force a reload of the images for any tracks affected
-        MetadataPtrList *allMusic =  gMusicData->all_music->getAllMetadata();
+        MetadataPtrList *allMusic =  gMusicData->m_all_music->getAllMetadata();
         for (int x = 0; x < allMusic->count(); x++)
         {
             if ((allMusic->at(x)->ID() == s_sourceMetadata->ID()) ||
@@ -290,35 +284,13 @@ void EditMetadataCommon::scanForImages(void)
 // EditMatadataDialog
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent, MusicMetadata *source_metadata)
-                  : EditMetadataCommon(parent, source_metadata, "EditMetadataDialog"),
-    m_artistEdit(nullptr),          m_compArtistEdit(nullptr),
-    m_albumEdit(nullptr),           m_titleEdit(nullptr),
-    m_genreEdit(nullptr),           m_yearSpin(nullptr),
-    m_trackSpin(nullptr),           m_discSpin(nullptr),
-    m_ratingSpin(nullptr),          m_ratingState(nullptr),
-    m_incRatingButton(nullptr),     m_decRatingButton(nullptr),
-    m_searchArtistButton(nullptr),  m_searchCompArtistButton(nullptr),
-    m_searchAlbumButton(nullptr),   m_searchGenreButton(nullptr),
-    m_artistIcon(nullptr),          m_albumIcon(nullptr),
-    m_genreIcon(nullptr),           m_compilationCheck(nullptr),
-    m_albumartButton(nullptr)
+    : EditMetadataCommon(parent, source_metadata, "EditMetadataDialog")
 {
     gCoreContext->addListener(this);
 }
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent)
-                  : EditMetadataCommon(parent, "EditMetadataDialog"),
-    m_artistEdit(nullptr),          m_compArtistEdit(nullptr),
-    m_albumEdit(nullptr),           m_titleEdit(nullptr),
-    m_genreEdit(nullptr),           m_yearSpin(nullptr),
-    m_trackSpin(nullptr),           m_discSpin(nullptr),
-    m_ratingSpin(nullptr),          m_ratingState(nullptr),
-    m_incRatingButton(nullptr),     m_decRatingButton(nullptr),
-    m_searchArtistButton(nullptr),  m_searchCompArtistButton(nullptr),
-    m_searchAlbumButton(nullptr),   m_searchGenreButton(nullptr),
-    m_artistIcon(nullptr),          m_albumIcon(nullptr),
-    m_genreIcon(nullptr),           m_compilationCheck(nullptr),
-    m_albumartButton(nullptr)
+    : EditMetadataCommon(parent, "EditMetadataDialog")
 {
     gCoreContext->addListener(this);
 }
@@ -869,7 +841,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
 
                 s_metadata->getAlbumArtImages()->dumpToDatabase();
                 // force a reload of the images for any tracks affected
-                MetadataPtrList *allMusic =  gMusicData->all_music->getAllMetadata();
+                MetadataPtrList *allMusic =  gMusicData->m_all_music->getAllMetadata();
                 for (int x = 0; x < allMusic->count(); x++)
                 {
                     if ((allMusic->at(x)->ID() == s_sourceMetadata->ID()) ||
@@ -888,10 +860,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
 // EditAlbumartDialog
 
 EditAlbumartDialog::EditAlbumartDialog(MythScreenStack *parent)
-                  : EditMetadataCommon(parent, "EditAlbumartDialog"),
-    m_metadataButton(nullptr), m_coverartImage(nullptr),
-    m_coverartList(nullptr), m_imagetypeText(nullptr),
-    m_imagefilenameText(nullptr)
+    : EditMetadataCommon(parent, "EditAlbumartDialog")
 {
     gCoreContext->addListener(this);
 }

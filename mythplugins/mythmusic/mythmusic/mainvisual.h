@@ -61,16 +61,16 @@ class MainVisual :  public QObject, public MythTV::Visual
     void timeout();
 
   private:
-    MythUIVideo *m_visualizerVideo;
+    MythUIVideo *m_visualizerVideo {nullptr};
     QStringList m_visualizers;
-    int m_currentVisualizer;
-    VisualBase *m_vis;
+    int m_currentVisualizer        {0};
+    VisualBase *m_vis              {nullptr};
     QPixmap m_pixmap;
     QList<VisualNode*> m_nodes;
-    bool m_playing;
-    int m_fps;
-    unsigned long m_samples;
-    QTimer *m_updateTimer;
+    bool m_playing                 {false};
+    int m_fps                      {20};
+    unsigned long m_samples        {SAMPLES_DEFAULT_SIZE};
+    QTimer *m_updateTimer          {nullptr};
 };
 
 #endif // __mainvisual_h

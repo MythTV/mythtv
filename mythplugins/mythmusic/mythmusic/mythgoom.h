@@ -21,8 +21,9 @@ public:
 private:
     QSize m_size;
 
-    unsigned int *m_buffer;
-    int m_scalew, m_scaleh;
+    unsigned int *m_buffer {nullptr};
+    int           m_scalew {2};
+    int           m_scaleh {2};
 };
 
 #endif //MYTHGOOM

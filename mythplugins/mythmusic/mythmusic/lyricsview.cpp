@@ -37,9 +37,7 @@
 // LyricsView
 
 LyricsView::LyricsView(MythScreenStack *parent, MythScreenType *parentScreen)
-         :MusicCommon(parent, parentScreen, "lyricsview"),
-         m_lyricsList(nullptr), m_statusText(nullptr), m_loadingState(nullptr), m_bufferStatus(nullptr),
-         m_bufferProgress(nullptr), m_lyricData(nullptr), m_autoScroll(true)
+    : MusicCommon(parent, parentScreen, "lyricsview")
 {
     m_currentView = MV_LYRICS;
 
@@ -500,15 +498,7 @@ void LyricsView::editFinished(bool result)
 EditLyricsDialog::EditLyricsDialog(
     MythScreenStack *parent, LyricsData *sourceData) :
     MythScreenType(parent, "EditLyricsDialog"),
-    m_sourceData(sourceData),
-    m_grabberEdit(nullptr),
-    m_syncronizedCheck(nullptr),
-    m_titleEdit(nullptr),
-    m_artistEdit(nullptr),
-    m_albumEdit(nullptr),
-    m_lyricsEdit(nullptr),
-    m_cancelButton(nullptr),
-    m_okButton(nullptr)
+    m_sourceData(sourceData)
 {
 }
 
