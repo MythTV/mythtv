@@ -2413,13 +2413,14 @@ void MythPlayer::DisplayPauseFrame(void)
     RefreshPauseFrame();
     PreProcessNormalFrame(); // Allow interactiveTV to draw on pause frame
 
+    FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
     osdLock.lock();
     videofiltersLock.lock();
     videoOutput->ProcessFrame(nullptr, osd, videoFilters, pip_players);
     videofiltersLock.unlock();
-    videoOutput->PrepareFrame(nullptr, kScan_Ignore, osd);
+    videoOutput->PrepareFrame(nullptr, scan, osd);
     osdLock.unlock();
-    videoOutput->Show(kScan_Ignore);
+    videoOutput->Show(scan);
     videosync->Start();
 }
 
