@@ -19,18 +19,13 @@
 BookmarkEditor::BookmarkEditor(Bookmark *site, bool edit,
                                MythScreenStack *parent, const char *name)
     : MythScreenType (parent, name),
-      m_site(site),                  m_siteName(""),
-      m_siteCategory(),              m_editing(edit),
-      m_titleText(nullptr),          m_categoryEdit(nullptr),
-      m_nameEdit(nullptr),           m_urlEdit(nullptr),
-      m_isHomepage(nullptr),
-      m_okButton(nullptr),           m_cancelButton(nullptr),
-      m_findCategoryButton(nullptr), m_searchDialog(nullptr)
+      m_site(site),
+      m_editing(edit)
 {
     if (m_editing)
     {
-        m_siteCategory = m_site->category;
-        m_siteName = m_site->name;
+        m_siteCategory = m_site->m_category;
+        m_siteName = m_site->m_name;
     }
 }
 
@@ -70,11 +65,11 @@ bool BookmarkEditor::Create()
 
     if (m_editing && m_site)
     {
-        m_categoryEdit->SetText(m_site->category);
-        m_nameEdit->SetText(m_site->name);
-        m_urlEdit->SetText(m_site->url);
+        m_categoryEdit->SetText(m_site->m_category);
+        m_nameEdit->SetText(m_site->m_name);
+        m_urlEdit->SetText(m_site->m_url);
 
-        if (m_site->isHomepage)
+        if (m_site->m_isHomepage)
             m_isHomepage->SetCheckState(MythUIStateType::Full);
     }
 
@@ -116,10 +111,10 @@ void BookmarkEditor::Save()
     
     if (m_site)
     {
-        m_site->category = m_categoryEdit->GetText();
-        m_site->name = m_nameEdit->GetText();
-        m_site->url = m_urlEdit->GetText();
-        m_site->isHomepage = isHomepage;
+        m_site->m_category = m_categoryEdit->GetText();
+        m_site->m_name = m_nameEdit->GetText();
+        m_site->m_url = m_urlEdit->GetText();
+        m_site->m_isHomepage = isHomepage;
     }
 
     Exit();
