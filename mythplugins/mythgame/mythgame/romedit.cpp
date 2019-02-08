@@ -17,12 +17,8 @@
 #include "rominfo.h"
 
 EditRomInfoDialog::EditRomInfoDialog(MythScreenStack *parent,
-        QString name, RomInfo *romInfo) : MythScreenType(parent, name),
-    m_id(""), m_retObject(nullptr), m_gamenameEdit(nullptr), m_genreEdit(nullptr),
-    m_yearEdit(nullptr), m_countryEdit(nullptr), m_plotEdit(nullptr),
-    m_publisherEdit(nullptr), m_favoriteCheck(nullptr), m_screenshotButton(nullptr),
-    m_screenshotText(nullptr), m_fanartButton(nullptr), m_fanartText(nullptr),
-    m_boxartButton(nullptr), m_boxartText(nullptr), m_doneButton(nullptr)
+                                     QString name, RomInfo *romInfo)
+    : MythScreenType(parent, name)
 {
     m_workingRomInfo = new RomInfo(*romInfo);
 }
