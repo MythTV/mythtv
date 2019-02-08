@@ -34,9 +34,8 @@ const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a 
 
 ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer)
              :MythScreenType(parent, "zmliveview"),
-              m_frameTimer(new QTimer(this)), m_paused(false), m_monitorLayout(1),
-              m_monitorCount(0), m_players(nullptr), m_isMiniPlayer(isMiniPlayer),
-              m_alarmMonitor(-1)
+              m_frameTimer(new QTimer(this)),
+              m_isMiniPlayer(isMiniPlayer)
 {
     ZMClient::get()->setIsMiniPlayerEnabled(false);
 
@@ -464,12 +463,6 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-
-Player::Player() :
-    m_frameImage(nullptr), m_statusText(nullptr), m_cameraText(nullptr),
-    m_rgba(nullptr)
-{
-}
 
 Player::~Player()
 {
