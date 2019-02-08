@@ -2377,7 +2377,7 @@ static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*
             .arg(truncated).arg(bytes));
     }
 
-    LOG(verbose_mask, verbose_level, QString("libass: %s").arg(str));
+    LOG(verbose_mask, verbose_level, QString("libass: %1").arg(str));
     string_lock.unlock();
 }
 
