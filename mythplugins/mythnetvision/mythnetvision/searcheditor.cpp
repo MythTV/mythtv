@@ -1,11 +1,6 @@
 #include "searcheditor.h"
 #include <netutils.h>
 
-SearchEditor::SearchEditor(MythScreenStack *parent, const QString &name)
-    : NetEditorBase(parent, name)
-{
-}
-
 bool SearchEditor::InsertInDB(GrabberScript *script)
 {
     return insertSearchInDB(script, VIDEO_FILE);

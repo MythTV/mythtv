@@ -36,24 +36,24 @@ class NetSearch : public NetBase
   private:
     void Load() override; // MythScreenType
 
-    MythUIButtonList   *m_searchResultList;
-    MythUIButtonList   *m_siteList;
-    MythUITextEdit     *m_search;
+    MythUIButtonList   *m_searchResultList {nullptr};
+    MythUIButtonList   *m_siteList         {nullptr};
+    MythUITextEdit     *m_search           {nullptr};
 
-    MythUIText         *m_pageText;
-    MythUIText         *m_noSites;
+    MythUIText         *m_pageText         {nullptr};
+    MythUIText         *m_noSites          {nullptr};
 
-    MythUIProgressBar  *m_progress;
-    MythConfirmationDialog *m_okPopup;
+    MythUIProgressBar  *m_progress         {nullptr};
+    MythConfirmationDialog *m_okPopup      {nullptr};
 
-    QNetworkAccessManager *m_netSearch;
-    QNetworkReply         *m_reply;
+    QNetworkAccessManager *m_netSearch     {nullptr};
+    QNetworkReply         *m_reply         {nullptr};
 
     QString             m_currentSearch;
-    int                 m_currentGrabber;
+    int                 m_currentGrabber   {0};
     QString             m_currentCmd;
-    uint                m_pagenum;
-    uint                m_maxpage;
+    uint                m_pagenum          {0};
+    uint                m_maxpage          {0};
     QString             m_mythXML;
 
     RSSSite::rssList    m_rssList;

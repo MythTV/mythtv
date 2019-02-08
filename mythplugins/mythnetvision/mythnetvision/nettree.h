@@ -81,21 +81,21 @@ class NetTree : public NetBase
     // Only to keep track of what to delete
     QList<ResultItem*> m_videos;
 
-    MythUIButtonTree   *m_siteMap;
-    MythUIButtonList   *m_siteButtonList;
-    MythGenericTree    *m_siteGeneric;
-    MythGenericTree    *m_currentNode;
+    MythUIButtonTree   *m_siteMap        {nullptr};
+    MythUIButtonList   *m_siteButtonList {nullptr};
+    MythGenericTree    *m_siteGeneric    {nullptr};
+    MythGenericTree    *m_currentNode    {nullptr};
 
-    MythUIText         *m_noSites;
+    MythUIText         *m_noSites        {nullptr};
 
-    GrabberDownloadThread *m_gdt;
+    GrabberDownloadThread *m_gdt         {nullptr};
     RSSSite::rssList m_rssList;
 
     DialogType          m_type;
 
-    uint                m_updateFreq;
-    bool                m_rssAutoUpdate;
-    bool                m_treeAutoUpdate;
+    uint                m_updateFreq     {6};
+    bool                m_rssAutoUpdate  {false};
+    bool                m_treeAutoUpdate {false};
 
   private slots:
     void ShowMenu(void) override; // MythScreenType

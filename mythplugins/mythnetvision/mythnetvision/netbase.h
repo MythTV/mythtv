@@ -42,11 +42,11 @@ class NetBase : public MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
   protected:
-    MythUIImage           *m_thumbImage;
-    MythUIStateType       *m_downloadable;
-    MythScreenStack       *m_popupStack;
-    MythUIProgressDialog  *m_progressDialog;
-    MetadataImageDownload *m_imageDownload;
+    MythUIImage           *m_thumbImage     {nullptr};
+    MythUIStateType       *m_downloadable   {nullptr};
+    MythScreenStack       *m_popupStack     {nullptr};
+    MythUIProgressDialog  *m_progressDialog {nullptr};
+    MetadataImageDownload *m_imageDownload  {nullptr};
 
     QString m_downloadFile;
     GrabberScript::scriptList m_grabberList;

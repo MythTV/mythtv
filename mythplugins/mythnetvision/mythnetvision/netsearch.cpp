@@ -35,14 +35,7 @@ using namespace std;
 
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
-      m_searchResultList(nullptr),   m_siteList(nullptr),
-      m_search(nullptr),             m_pageText(nullptr),
-      m_noSites(nullptr),            m_progress(nullptr),
-      m_okPopup(nullptr),            m_netSearch(nullptr),
-      m_reply(nullptr),
-      m_currentSearch(QString()),    m_currentGrabber(0),
-      m_currentCmd(QString()),       m_pagenum(0),
-      m_maxpage(0),                  m_mythXML(GetMythXMLURL())
+      m_mythXML(GetMythXMLURL())
 {
 }
 
