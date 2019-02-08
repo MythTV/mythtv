@@ -324,13 +324,10 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
  * that wouldn't be good.
  */
 WeatherSource::WeatherSource(ScriptInfo *info)
-    : m_ready(info ? true : false),    m_inuse(info ? true : false),
+    : m_ready(info ? true : false),
+      m_inuse(info ? true : false),
       m_info(info),
-      m_ms(nullptr),
-      m_locale(""),
-      m_cachefile(""),
-      m_units(SI_UNITS),
-      m_updateTimer(new QTimer(this)), m_connectCnt(0)
+      m_updateTimer(new QTimer(this))
 {
     QDir dir(GetConfDir());
     if (!dir.exists("MythWeather"))
