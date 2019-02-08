@@ -50,7 +50,7 @@ class MPUBLIC MythDialog : public QFrame
     static const DialogCode Accepted  = kDialogCodeAccepted;
     static const DialogCode ListStart = kDialogCodeListStart;
 
-    DialogCode result(void) const { return rescode; }
+    DialogCode result(void) const { return m_rescode; }
 
      // QFrame::Show is not virtual, so this isn't an override.
     virtual void Show(void);
@@ -87,17 +87,20 @@ class MPUBLIC MythDialog : public QFrame
 
     void keyPressEvent(QKeyEvent *e) override; // QWidget
 
-    float wmult, hmult;
-    int screenwidth, screenheight;
-    int xbase, ybase;
+    float          m_dlgwmult     {0.0f};
+    float          m_dlghmult     {0.0f};
+    int            m_screenwidth  {0};
+    int            m_screenheight {0};
+    int            m_xbase        {0};
+    int            m_ybase        {0};
 
-    MythMainWindow *m_parent;
+    MythMainWindow *m_parent      {nullptr};
 
-    DialogCode rescode;
+    DialogCode      m_rescode     {kDialogCodeAccepted};
 
-    bool in_loop;
+    bool            m_in_loop     {false};
 
-    QFont defaultBigFont, defaultMediumFont, defaultSmallFont;
+    QFont m_defaultBigFont, m_defaultMediumFont, m_defaultSmallFont;
 };
 
 #endif

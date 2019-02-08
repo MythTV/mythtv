@@ -12,10 +12,7 @@
 #include "galleryfilter.h"
 #include "galleryutil.h"
 
-GalleryFilter::GalleryFilter(bool loaddefaultsettings) :
-    m_dirFilter(""), m_typeFilter(kTypeFilterAll),
-    m_sort(kSortOrderUnsorted),
-    m_changed_state(0)
+GalleryFilter::GalleryFilter(bool loaddefaultsettings)
 {
     // do nothing yet
     if (loaddefaultsettings)
