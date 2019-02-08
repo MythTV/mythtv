@@ -626,6 +626,7 @@ VideoFrame *VideoBuffers::GetScratchFrame(void)
     if (!createdpauseframe || !Head(kVideoBuffer_pause))
     {
         LOG(VB_GENERAL, LOG_ERR, "GetScratchFrame() called, but not allocated");
+        return nullptr;
     }
 
     QMutexLocker locker(&global_lock);

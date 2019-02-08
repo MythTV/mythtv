@@ -79,8 +79,6 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     m_videoProfile(Profile),
     m_openGLVideoType(OpenGLVideo::StringToType(Profile))
 {
-    memset(&m_pauseFrame, 0, sizeof(m_pauseFrame));
-    m_pauseFrame.buf = nullptr;
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
 }
@@ -98,13 +96,6 @@ void VideoOutputOpenGL::TearDown(void)
     DestroyCPUResources();
     DestroyVideoResources();
     DestroyGPUResources();
-}
-
-bool VideoOutputOpenGL::CreateCPUResources(void)
-{
-    bool result = CreateBuffers();
-    result &= CreatePauseFrame();
-    return result;
 }
 
 bool VideoOutputOpenGL::CreateGPUResources(void)
@@ -131,15 +122,6 @@ void VideoOutputOpenGL::DestroyCPUResources(void)
     DiscardFrames(true);
     vbuffers.DeleteBuffers();
     vbuffers.Reset();
-
-    if (m_pauseFrame.buf)
-    {
-        av_freep(&m_pauseFrame.buf);
-    }
-    if (m_pauseFrame.qscale_table)
-    {
-        av_freep(&m_pauseFrame.qscale_table);
-    }
 }
 
 void VideoOutputOpenGL::DestroyGPUResources(void)
@@ -184,7 +166,7 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     SetProfile();
     InitPictureAttributes();
 
-    success &= CreateCPUResources();
+    success &= CreateBuffers();
 
     if (!gCoreContext->IsUIThread())
     {
@@ -375,26 +357,10 @@ void VideoOutputOpenGL::CreatePainter(void)
 bool VideoOutputOpenGL::CreateBuffers(void)
 {
     if (codec_is_mediacodec(video_codec_id))
-        // vbuffers.Init(4, true, 1, 2, 2, 1);
-        vbuffers.Init(8, true, 1, 4, 2, 1);
+        vbuffers.Init(8, false, 1, 4, 2, 1);
     else
-        vbuffers.Init(31, true, 1, 12, 4, 2);
-    return vbuffers.CreateBuffers(FMT_YV12,
-                                  window.GetVideoDim().width(),
-                                  window.GetVideoDim().height());
-}
-
-bool VideoOutputOpenGL::CreatePauseFrame(void)
-{
-    uint size = buffersize(FMT_YV12, vbuffers.GetScratchFrame()->width, vbuffers.GetScratchFrame()->height);
-    unsigned char *buffer = static_cast<unsigned char*>(av_malloc(size));
-    init(&m_pauseFrame, FMT_YV12, buffer, vbuffers.GetScratchFrame()->width,
-         vbuffers.GetScratchFrame()->height, static_cast<int>(size));
-    m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
-    if (!m_pauseFrame.buf)
-        return false;
-    clear(&m_pauseFrame);
-    return true;
+        vbuffers.Init(31, false, 1, 12, 4, 2);
+    return vbuffers.CreateBuffers(FMT_YV12, window.GetVideoDim().width(), window.GetVideoDim().height());
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
@@ -426,15 +392,8 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_START");
 
-    bool pauseframe = false;
-    if (!Frame)
-    {
-        Frame = vbuffers.GetScratchFrame();
-        CopyFrame(vbuffers.GetScratchFrame(), &m_pauseFrame);
-        pauseframe = true;
-    }
-
-    bool dummy = Frame->dummy;
+    bool pauseframe = !Frame;
+    bool dummy = Frame ? Frame->dummy : false;
     if (FilterList && swframe && !dummy)
         FilterList->ProcessFrame(Frame);
 
@@ -450,7 +409,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (swframe && deintproc && !m_deinterlaceBeforeOSD && !pauseframe && !dummy)
         m_deintFilter->ProcessFrame(Frame, Scan);
 
-    if (m_openGLVideo && swframe && !dummy)
+    if (m_openGLVideo && swframe && !dummy && !pauseframe)
         m_openGLVideo->UpdateInputFrame(Frame);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -468,17 +427,12 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         m_render->logDebugMarker(LOC + "PREPARE_FRAME_START");
 
     bool dummy = false;
+    int topfieldfirst = 0;
     if (Frame)
     {
         framesPlayed = Frame->frameNumber + 1;
+        topfieldfirst = Frame->top_field_first;
         dummy = Frame->dummy;
-    }
-
-    if (!Frame)
-    {
-        Frame = vbuffers.GetScratchFrame();
-        if (m_deinterlacing)
-            Scan = kScan_Interlaced;
     }
 
     m_render->BindFramebuffer(nullptr);
@@ -511,7 +465,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         m_openGLVideo->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
-        m_openGLVideo->PrepareFrame(Frame->top_field_first, Scan, m_stereo);
+        m_openGLVideo->PrepareFrame(topfieldfirst, Scan, m_stereo);
     }
 
     // PiPs/PBPs
@@ -525,13 +479,11 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
                 bool active = m_openGLVideoPiPActive == *it;
                 if (twopass)
                     m_render->SetViewPort(first, true);
-                (*it)->PrepareFrame(Frame->top_field_first, Scan,
-                                    kStereoscopicModeNone, active);
+                (*it)->PrepareFrame(topfieldfirst, Scan, kStereoscopicModeNone, active);
                 if (twopass)
                 {
                     m_render->SetViewPort(second, true);
-                    (*it)->PrepareFrame(Frame->top_field_first, Scan,
-                                    kStereoscopicModeNone, active);
+                    (*it)->PrepareFrame(topfieldfirst, Scan, kStereoscopicModeNone, active);
                     m_render->SetViewPort(main);
                 }
             }
@@ -621,11 +573,14 @@ void VideoOutputOpenGL::MoveResize(void)
 
 void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 {
+    vbuffers.begin_lock(kVideoBuffer_used);
     VideoFrame *used = vbuffers.Head(kVideoBuffer_used);
-    if (!used)
-        used = vbuffers.GetScratchFrame();
-    CopyFrame(&m_pauseFrame, used);
-    DisplayTimecode = m_pauseFrame.disp_timecode;
+    if (used)
+    {
+        m_openGLVideo->UpdateInputFrame(used);
+        DisplayTimecode = used->disp_timecode;
+    }
+    vbuffers.end_lock();
 }
 
 void VideoOutputOpenGL::InitPictureAttributes(void)

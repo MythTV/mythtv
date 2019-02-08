@@ -53,14 +53,12 @@ class VideoOutputOpenGL : public VideoOutput
     bool StereoscopicModesAllowed(void) const override { return true; }
 
   protected:
-    bool CreateCPUResources(void);
     bool CreateGPUResources(void);
     bool CreateVideoResources(void);
     void DestroyCPUResources(void);
     void DestroyVideoResources(void);
     void DestroyGPUResources(void);
     virtual bool CreateBuffers(void);
-    bool CreatePauseFrame(void);
     bool SetupContext(void);
     bool SetupOpenGL(void);
     void CreatePainter(void);

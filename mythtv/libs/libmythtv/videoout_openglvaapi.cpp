@@ -122,7 +122,7 @@ bool VideoOutputOpenGLVAAPI::CreateBuffers(void)
 {
     if (codec_is_vaapi(video_codec_id))
     {
-        vbuffers.Init(24, true, 2, 1, 4, 1);
+        vbuffers.Init(NUM_VAAPI_BUFFERS, false, 2, 1, 4, 1);
         return true;
     }
     return VideoOutputOpenGL::CreateBuffers();
@@ -181,8 +181,6 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     if (vbuffers.Size(kVideoBuffer_used))
     {
         VideoFrame *frame = vbuffers.Head(kVideoBuffer_used);
-        CopyFrame(&m_pauseFrame, frame);
-        //m_pauseBuffer = frame->buf;
         disp_timecode = frame->disp_timecode;
     }
     else
