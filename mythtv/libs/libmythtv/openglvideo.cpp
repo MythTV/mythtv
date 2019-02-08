@@ -204,6 +204,18 @@ bool OpenGLVideo::AddDeinterlacer(const QString &Deinterlacer)
     if (m_hardwareDeinterlacer == Deinterlacer)
         return true;
 
+    // Don't delete and recreate for the sake of doublerate vs singlerate
+    // In the case of kernel, it also invalidates the reference textures
+    bool kernel = Deinterlacer.contains("kernel");
+    if (m_hardwareDeinterlacer.contains("kernel") && kernel)
+        return true;
+    if (m_hardwareDeinterlacer.contains("linear") && Deinterlacer.contains("linear"))
+        return true;
+    if (m_hardwareDeinterlacer.contains("bob") && Deinterlacer.contains("onefield"))
+        return true;
+    if (m_hardwareDeinterlacer.contains("onefield") && Deinterlacer.contains("bob"))
+        return true;
+
     // delete old reference textures
     while (!m_referenceTextures.empty())
     {
@@ -216,7 +228,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &Deinterlacer)
         return false;
 
     // create the correct number of reference textures
-    uint refstocreate = Deinterlacer.contains("kernel") ? 2 : 0;
+    uint refstocreate = kernel ? 2 : 0;
     m_referenceTexturesNeeded = refstocreate + 1;
     refstocreate *= (kGLYV12 == m_frameType) ? 3 : 1;
     while (m_referenceTextures.size() < refstocreate)
