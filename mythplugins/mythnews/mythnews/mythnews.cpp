@@ -41,23 +41,10 @@
  */
 MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name),
-    m_lock(QMutex::Recursive),
     m_RetrieveTimer(new QTimer(this)),
-    m_TimerTimeout(10*60*1000),
     m_UpdateFreq(gCoreContext->GetNumSetting("NewsUpdateFrequency", 30)),
     m_zoom(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0")),
-    m_browser(gCoreContext->GetSetting("WebBrowserCommand", "")),
-    m_menuPopup(nullptr),
-    m_sitesList(nullptr),
-    m_articlesList(nullptr),
-    m_nositesText(nullptr),
-    m_updatedText(nullptr),
-    m_titleText(nullptr),
-    m_descText(nullptr),
-    m_thumbnailImage(nullptr),
-    m_downloadImage(nullptr),
-    m_enclosureImage(nullptr),
-    m_podcastImage(nullptr)
+    m_browser(gCoreContext->GetSetting("WebBrowserCommand", ""))
 {
     // Setup cache directory
 
