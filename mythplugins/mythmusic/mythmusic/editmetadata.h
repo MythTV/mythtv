@@ -47,8 +47,9 @@ class EditMetadataCommon : public MythScreenType
     void searchForAlbumImages(void);
     void scanForImages(void);
 
-    static bool            metadataOnly;
-    static MusicMetadata  *m_metadata, *m_sourceMetadata;
+    static bool           s_metadataOnly;
+    static MusicMetadata *s_metadata;
+    static MusicMetadata *s_sourceMetadata;
 
     bool m_albumArtChanged;
 
