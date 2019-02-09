@@ -17,8 +17,6 @@
 
 #include "omxcontext.h"
 
-struct AVBitStreamFilterContext;
-
 class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
 {
   public:
@@ -26,7 +24,7 @@ class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
     static QString const s_name; // ="openmax"
 
     PrivateDecoderOMX();
-    virtual ~PrivateDecoderOMX();
+    virtual ~PrivateDecoderOMX() override;
 
     // PrivateDecoder implementation
     QString GetName(void) override; // PrivateDecoder
@@ -69,7 +67,7 @@ class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
 
   private:
     OMXComponent m_videc;
-    AVBitStreamFilterContext *m_filter;
+    AVBSFContext *m_bitstreamFilter;
     bool m_bStartTime;
     AVCodecContext *m_avctx;
 

@@ -94,11 +94,13 @@ void PrivateDecoderOMX::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)[s_name].append("dummy");
 }
 
-PrivateDecoderOMX::PrivateDecoderOMX() :
-    m_videc(gCoreContext->GetSetting("OMXVideoDecode", VIDEO_DECODE), *this),
-    m_filter(nullptr), m_bStartTime(false),
+PrivateDecoderOMX::PrivateDecoderOMX()
+  : m_videc(gCoreContext->GetSetting("OMXVideoDecode", VIDEO_DECODE), *this),
+    m_bitstreamFilter(nullptr),
+    m_bStartTime(false),
     m_avctx(nullptr),
-    m_lock(QMutex::Recursive), m_bSettingsChanged(false),
+    m_lock(QMutex::Recursive),
+    m_bSettingsChanged(false),
     m_bSettingsHaveChanged(false)
 {
     if (OMX_ErrorNone != m_videc.Init(OMX_IndexParamVideoInit))
@@ -122,8 +124,9 @@ PrivateDecoderOMX::~PrivateDecoderOMX()
     // When the decoder dtor is called our state has already been destroyed.
     m_videc.Shutdown();
 
-    if (m_filter)
-        av_bitstream_filter_close(m_filter);
+    // flush and delete the bitstream filter
+    if (m_bitstreamFilter)
+        av_bsf_free(&m_bitstreamFilter);
 }
 
 // virtual
@@ -467,23 +470,44 @@ bool PrivateDecoderOMX::CreateFilter(AVCodecContext *avctx)
       case 4:
         break;
       default:
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Invalid NAL size (%1)")
-            .arg(n));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Invalid NAL size (%1)").arg(n));
         return false;
     }
 
-    if (m_filter)
+    if (m_bitstreamFilter)
         return true;
 
-    m_filter = av_bitstream_filter_init("h264_mp4toannexb");
-    if (!m_filter)
+    const AVBitStreamFilter *filter = av_bsf_get_by_name("h264_mp4toannexb");
+    if (!filter)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            "Failed to create h264_mp4toannexb filter");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create bitstream filter");
         return false;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Installed h264_mp4toannexb filter");
+    if (av_bsf_alloc(filter, &m_bitstreamFilter) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to alloc bitstream filter");
+        return false;
+    }
+
+    if ((avcodec_parameters_from_context(m_bitstreamFilter->par_in, avctx) < 0) ||
+        (av_bsf_init(m_bitstreamFilter) < 0))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise bitstream filter");
+        av_bsf_free(&m_bitstreamFilter);
+        m_bitstreamFilter = nullptr;
+        return false;
+    }
+
+    if (avcodec_parameters_to_context(avctx, m_bitstreamFilter->par_out) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup bitstream filter");
+        av_bsf_free(&m_bitstreamFilter);
+        m_bitstreamFilter = nullptr;
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Created h264_mp4toannexb filter");
     return true;
 }
 
@@ -798,37 +822,28 @@ int PrivateDecoderOMX::GetFrame(
 // Submit a packet for decoding
 int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
 {
-    uint8_t *buf = pkt->data, *free_buf = nullptr;
-    int size = pkt->size;
-    int ret = pkt->size;
-
     // Convert h264_mp4toannexb
-    if (m_filter)
+    if (m_bitstreamFilter)
     {
-        AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
-        int outbuf_size = 0;
-        uint8_t *outbuf = nullptr;
-        int res = av_bitstream_filter_filter(m_filter, avctx, nullptr, &outbuf,
-                                             &outbuf_size, buf, size, 0);
-        if (res <= 0)
+        int res = av_bsf_send_packet(m_bitstreamFilter, pkt);
+        if (res < 0)
         {
-            static int count;
-            if (++count == 1)
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Failed to convert packet (%1)").arg(res));
-            if (count > 200)
-                count = 0;
+            av_packet_unref(pkt);
+            return res;
         }
 
-        if (outbuf && outbuf_size > 0)
-        {
-            size = outbuf_size;
-            buf = free_buf = outbuf;
-        }
+        while (!res)
+            res = av_bsf_receive_packet(m_bitstreamFilter, pkt);
+
+        if (res < 0 && (res != AVERROR(EAGAIN) && res != AVERROR_EOF))
+            return res;
     }
 
     // size is typically 50000 - 70000 but occasionally as low as 2500
     // or as high as 360000
+    uint8_t *buf = pkt->data, *free_buf = nullptr;
+    int size = pkt->size;
+    int ret = pkt->size;
     while (size > 0)
     {
         if (!m_ibufs_sema.tryAcquire(1, 100))
@@ -924,8 +939,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
     }
     else if (avctx->get_buffer2(avctx, picture, 0) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Decoded frame available but no video buffers");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Decoded frame available but no video buffers");
         ret = 0;
     }
     else
@@ -1219,8 +1233,7 @@ OMX_ERRORTYPE PrivateDecoderOMX::Event(OMXComponent &cmpnt, OMX_EVENTTYPE eEvent
         }
         else
         {
-            LOG(VB_GENERAL, LOG_CRIT, LOC +
-                "EventPortSettingsChanged deadlock");
+            LOG(VB_GENERAL, LOG_CRIT, LOC + "EventPortSettingsChanged deadlock");
         }
         return OMX_ErrorNone;
 
