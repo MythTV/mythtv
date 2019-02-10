@@ -876,7 +876,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *Stream, AVFrame *Picture)
             frame->bpp    = bitsperpixel(frametype);
             frame->codec  = frametype;
             frame->width  = static_cast<int>(portdef.nFrameWidth);
-            frame->height = static_cast<int>(portdef.nFrameHeight);
+            frame->height = static_cast<int>(portdef.nSliceHeight);
             memcpy(frame->offsets, offsets, sizeof frame->offsets);
             memcpy(frame->pitches, pitches, sizeof frame->pitches);
 
@@ -906,7 +906,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *Stream, AVFrame *Picture)
         {
             // Prepare to copy the OMX buffer
             init(&scratchframe, frametype, &header->pBuffer[header->nOffset],
-                 static_cast<int>(portdef.nFrameWidth), static_cast<int>(portdef.nFrameHeight),
+                 static_cast<int>(portdef.nFrameWidth), static_cast<int>(portdef.nSliceHeight),
                  static_cast<int>(header->nFilledLen), pitches, offsets);
         }
         else if (inputfmt != AV_PIX_FMT_NONE)
@@ -914,7 +914,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *Stream, AVFrame *Picture)
             int in_width   = static_cast<int>(portdef.nStride);
             int in_height  = static_cast<int>(portdef.nSliceHeight);
             int out_width  = static_cast<int>(portdef.nFrameWidth + 15) & (~0xf);
-            int out_height = static_cast<int>(portdef.nFrameHeight);
+            int out_height = static_cast<int>(portdef.nSliceHeight);
             int size       = ((bitsperpixel(frametype) * out_width) / 8) * out_height;
             uint8_t* src   = &header->pBuffer[header->nOffset];
 
