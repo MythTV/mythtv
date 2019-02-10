@@ -688,9 +688,6 @@ void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon
     if (area.width() <= 0 || area.height() <= 0)
         return;
 
-const char *msgx = QString("DrawText title=%1")
-    .arg(msg).toLocal8Bit();
-fprintf(stderr,"%s\n", msgx);
     p->DrawText(area, msg, m_justification, *m_font, alphaMod, area);
 }
 
