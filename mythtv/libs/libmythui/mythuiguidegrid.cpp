@@ -329,6 +329,7 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                 drawBox(p, xoffset, yoffset, data, m_recordingColor, alphaMod);
             else
                 drawBox(p, xoffset, yoffset, data, m_conflictingColor, alphaMod);
+            drawText(p, xoffset, yoffset, data, alphaMod);
         }
     }
 
@@ -341,10 +342,7 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         for (; it != m_allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
-            drawText(p, xoffset, yoffset, data, alphaMod);
-
-            if (data->m_recType != 0 || data->m_arrow != GridTimeNormal)
-                drawRecDecoration(p, xoffset, yoffset, data, alphaMod);
+            drawRecDecoration(p, xoffset, yoffset, data, alphaMod);
         }
     }
 }
@@ -690,6 +688,9 @@ void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon
     if (area.width() <= 0 || area.height() <= 0)
         return;
 
+const char *msgx = QString("DrawText title=%1")
+    .arg(msg).toLocal8Bit();
+fprintf(stderr,"%s\n", msgx);
     p->DrawText(area, msg, m_justification, *m_font, alphaMod, area);
 }
 
