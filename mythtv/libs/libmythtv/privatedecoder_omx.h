@@ -1,8 +1,13 @@
 #ifndef PRIVATEDECODER_OMX_H
 #define PRIVATEDECODER_OMX_H
 
-#include "privatedecoder.h"
+// Qt
+#include <QMutex>
+#include <QSemaphore>
+#include <QVector>
+#include <QList>
 
+// OpenMax
 #include <OMX_Types.h>
 #include <OMX_Core.h>
 #include <OMX_Component.h>
@@ -10,75 +15,65 @@
 #include <OMX_Broadcom.h>
 #endif
 
-#include <QMutex>
-#include <QSemaphore>
-#include <QVector>
-#include <QList>
-
+// MythTV
 #include "omxcontext.h"
+#include "privatedecoder.h"
 
 class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
 {
   public:
-    static void GetDecoders(render_opts &opts);
-    static QString const s_name; // ="openmax"
+    static  void GetDecoders(render_opts &Options);
+    static  const QString DecoderName;
 
     PrivateDecoderOMX();
     virtual ~PrivateDecoderOMX() override;
 
-    // PrivateDecoder implementation
-    QString GetName(void) override; // PrivateDecoder
-    bool Init(const QString &decoder,
-              PlayerFlags flags,
-              AVCodecContext *avctx) override; // PrivateDecoder
-    bool Reset(void) override; // PrivateDecoder
-    int  GetFrame(AVStream *stream,
-                  AVFrame *picture,
-                  int *got_picture_ptr,
-                  AVPacket *pkt) override; // PrivateDecoder
-    bool HasBufferedFrames(void) override; // PrivateDecoder
-    bool NeedsReorderedPTS(void)  override // PrivateDecoder
-        { return true; }
+    // PrivateDecoder
+    QString GetName(void) override;
+    bool    Init(const QString &Decoder, PlayerFlags Flags, AVCodecContext *AVCtx) override;
+    bool    Reset(void) override;
+    int     GetFrame(AVStream *Stream, AVFrame *Frame, int *GotPicturePtr, AVPacket *Packet) override;
+    bool    HasBufferedFrames(void) override;
+    bool    NeedsReorderedPTS(void) override { return true; }
 
   private:
-    // OMXComponentCtx implementation
-    OMX_ERRORTYPE Event(OMXComponent&, OMX_EVENTTYPE, OMX_U32, OMX_U32, OMX_PTR) override; // OMXComponentCtx
-    OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
-    OMX_ERRORTYPE FillBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
-    void ReleaseBuffers(OMXComponent&) override; // OMXComponentCtx
+    // OMXComponentCtx
+    OMX_ERRORTYPE Event(OMXComponent& Component, OMX_EVENTTYPE EventType, OMX_U32 Data1, OMX_U32 Data2, OMX_PTR EventData) override;
+    OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE* Header) override;
+    OMX_ERRORTYPE FillBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE* Header) override;
+    void          ReleaseBuffers(OMXComponent&) override;
 
   private:
-    // OMXComponentCB actions
-    typedef OMX_ERRORTYPE ComponentCB();
-    ComponentCB AllocBuffersCB;
-    ComponentCB FreeOutputBuffersCB, AllocOutputBuffersCB;
-    ComponentCB UseBuffersCB;
+    // Callbacks
+    OMX_ERRORTYPE AllocBuffersCB(void);
+    OMX_ERRORTYPE FreeOutputBuffersCB(void);
+    OMX_ERRORTYPE AllocOutputBuffersCB(void);
+    OMX_ERRORTYPE UseBuffersCB(void);
 
-    OMX_ERRORTYPE FillOutputBuffers();
-    OMX_ERRORTYPE SettingsChanged(AVCodecContext *);
-    OMX_ERRORTYPE SetNalType(AVCodecContext *);
-    OMX_ERRORTYPE GetAspect(OMX_CONFIG_POINTTYPE &, int index) const;
+    OMX_ERRORTYPE FillOutputBuffers(void);
+    OMX_ERRORTYPE SettingsChanged(AVCodecContext *AVCtx);
+    OMX_ERRORTYPE SetNalType(AVCodecContext *AVCtx);
+    int           ProcessPacket(AVStream *Stream, AVPacket *Packet);
+    int           GetBufferedFrame(AVStream *Stream, AVFrame *Frame);
+    bool          CreateFilter(AVCodecContext *AVCtx);
 #ifdef USING_BROADCOM
-    OMX_ERRORTYPE GetInterlace(OMX_CONFIG_INTERLACETYPE &, int index) const;
+    OMX_ERRORTYPE GetAspect(OMX_CONFIG_POINTTYPE &Point, int Index) const;
 #endif
-    int ProcessPacket(AVStream *, AVPacket *);
-    int GetBufferedFrame(AVStream *, AVFrame *);
-    bool CreateFilter(AVCodecContext *);
 
   private:
-    OMXComponent m_videc;
-    AVBSFContext *m_bitstreamFilter;
-    bool m_bStartTime;
+    OMXComponent    m_videoDecoder;
+    AVBSFContext   *m_bitstreamFilter;
+    bool            m_startTime;
     AVCodecContext *m_avctx;
 
-    QMutex mutable m_lock;      // Protects data following
-    bool m_bSettingsChanged;
-    bool m_bSettingsHaveChanged;
+    QMutex          m_settingsChangedLock;
+    bool            m_settingsChanged;
+    bool            m_settingsHaveChanged;
 
-    // video decoder buffers
-    QSemaphore m_ibufs_sema;    // EmptyBufferCB signal
-    QSemaphore m_obufs_sema;    // FillBufferCB signal
-    QList<OMX_BUFFERHEADERTYPE*> m_ibufs, m_obufs;
+    QSemaphore m_inputBuffersSem;
+    QSemaphore m_outputBuffersSem;
+    QList<OMX_BUFFERHEADERTYPE*> m_inputBuffers;
+    QList<OMX_BUFFERHEADERTYPE*> m_outputBuffers;
 };
 
 #endif // ndef PRIVATEDECODER_OMX_H
