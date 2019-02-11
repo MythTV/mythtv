@@ -10,7 +10,9 @@
 #include "mythrender_opengl.h"
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
+#ifdef USING_GLVAAPI
 #include "mythopenglinterop.h"
+#endif
 #include "videoout_opengl.h"
 
 #define LOC QString("VidOutGL: ")
