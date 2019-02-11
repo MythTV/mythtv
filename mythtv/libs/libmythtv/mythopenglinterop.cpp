@@ -15,6 +15,17 @@
 
 #define LOC QString("OpenGLInterop: ")
 
+#define INIT_ST \
+  VAStatus va_status; \
+  bool ok = true
+
+#define CHECK_ST \
+  ok &= (va_status == VA_STATUS_SUCCESS); \
+  if (!ok) \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
+              .arg(__FILE__).arg( __LINE__).arg(va_status) \
+              .arg(vaErrorStr(va_status)))
+
 bool MythOpenGLInterop::IsCodecSupported(MythCodecID CodecId)
 {
     bool supported = codec_sw_copy(CodecId);

@@ -2589,7 +2589,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     MythCodecID vaapi_mcid;
                     AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    vaapi_mcid = VAAPIContext::GetBestSupportedCodec(&codec, dec, mpeg_version(enc->codec_id), pix_fmt);
+                    vaapi_mcid = VAAPIContext::GetBestSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pix_fmt);
 
                     if (codec_is_vaapi(vaapi_mcid))
                     {

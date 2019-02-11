@@ -14,6 +14,7 @@
 
 extern "C" {
 #include "libavutil/hwcontext_vaapi.h"
+#include "libavutil/pixdesc.h"
 }
 
 #define LOC QString("VAAPIHWCtx: ")
@@ -46,10 +47,8 @@ MythVAAPIDisplay::MythVAAPIDisplay(MythRenderOpenGL *Context)
     }
 
     int major_ver, minor_ver;
-    INIT_ST;
-    va_status = vaInitialize(m_vaDisplay, &major_ver, &minor_ver);
-    CHECK_ST;
-
+    if (vaInitialize(m_vaDisplay, &major_ver, &minor_ver) != VA_STATUS_SUCCESS)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI GLX display");
     LOG(VB_GENERAL, LOG_INFO, LOC + "Created VAAPI GLX display");
 }
 
@@ -90,7 +89,8 @@ void MythVAAPIDisplay::MythVAAPIDisplayDestroy(MythRenderOpenGL *Context, VADisp
         return;
 
     Context->makeCurrent();
-    INIT_ST; va_status = vaTerminate(Display); CHECK_ST;
+    if(vaTerminate(Display) != VA_STATUS_SUCCESS)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Error closing VAAPI GLX display");
     Context->doneCurrent();
     LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI GLX display closed");
 }
@@ -120,45 +120,191 @@ void VAAPIContext::HWDeviceContextFinished(AVHWDeviceContext*)
     LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI device context destroyed");
 }
 
-MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodec **Codec,
+VAProfile VAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
+{
+    if (!Codec)
+        return VAProfileNone;
+
+    switch (Codec->codec_id)
+    {
+        case AV_CODEC_ID_MPEG2VIDEO:
+            switch (Codec->profile)
+            {
+                case FF_PROFILE_MPEG2_SIMPLE: return VAProfileMPEG2Simple;
+                case FF_PROFILE_MPEG2_MAIN: return VAProfileMPEG2Main;
+                default: break;
+            }
+            break;
+        case AV_CODEC_ID_H263: return VAProfileH263Baseline;
+        case AV_CODEC_ID_MPEG4:
+            switch (Codec->profile)
+            {
+                case FF_PROFILE_MPEG4_SIMPLE: return VAProfileMPEG4Simple;
+                case FF_PROFILE_MPEG4_ADVANCED_SIMPLE: return VAProfileMPEG4AdvancedSimple;
+                case FF_PROFILE_MPEG4_MAIN: return VAProfileMPEG4Main;
+                default: break;
+            }
+            break;
+        case AV_CODEC_ID_H264:
+            switch (Codec->profile)
+            {
+                case FF_PROFILE_H264_CONSTRAINED_BASELINE: return VAProfileH264ConstrainedBaseline;
+                case FF_PROFILE_H264_MAIN: return VAProfileH264Main;
+                case FF_PROFILE_H264_HIGH: return VAProfileH264High;
+                default: break;
+            }
+            break;
+        case AV_CODEC_ID_HEVC:
+#if VA_CHECK_VERSION(0, 37, 0)
+            switch (Codec->profile)
+            {
+                case FF_PROFILE_HEVC_MAIN: return VAProfileHEVCMain;
+                case FF_PROFILE_HEVC_MAIN_10: return VAProfileHEVCMain10;
+                default: break;
+            }
+#endif
+            break;
+        case AV_CODEC_ID_MJPEG: return VAProfileJPEGBaseline;
+        case AV_CODEC_ID_WMV3:
+        case AV_CODEC_ID_VC1:
+            switch (Codec->profile)
+            {
+                case FF_PROFILE_VC1_SIMPLE: return VAProfileVC1Simple;
+                case FF_PROFILE_VC1_MAIN: return VAProfileVC1Main;
+                case FF_PROFILE_VC1_ADVANCED:
+                case FF_PROFILE_VC1_COMPLEX: return VAProfileVC1Advanced;
+                default: break;
+            }
+            break;
+        case AV_CODEC_ID_VP8: return VAProfileVP8Version0_3;
+        case AV_CODEC_ID_VP9:
+            switch (Codec->profile)
+            {
+#if VA_CHECK_VERSION(0, 38, 0)
+                case FF_PROFILE_VP9_0: return VAProfileVP9Profile0;
+#endif
+#if VA_CHECK_VERSION(0, 39, 0)
+                case FF_PROFILE_VP9_2: return VAProfileVP9Profile2;
+#endif
+                default: break;
+            }
+            break;
+        default: break;
+    }
+
+    return VAProfileNone;
+}
+
+MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodecContext *CodecContext,
+                                                AVCodec **Codec,
                                                 const QString &Decoder,
                                                 uint StreamType,
                                                 AVPixelFormat &PixFmt)
 {
-    enum AVHWDeviceType type = AV_HWDEVICE_TYPE_VAAPI;
+    MythCodecID result = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    if (Decoder != "vaapi")
+        return result;
 
-    bool supported = MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI2);
-    AVPixelFormat fmt = AV_PIX_FMT_NONE;
-    if (Decoder == "vaapi" && supported)
+    if (!MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI2))
     {
-        for (int i = 0;; i++)
+        LOG(VB_GENERAL, LOG_WARNING, "Render device does not support VAAPI");
+        return result;
+    }
+
+    // check for actual decoder support
+    AVBufferRef *hwdevicectx = nullptr;
+    if (av_hwdevice_ctx_create(&hwdevicectx, AV_HWDEVICE_TYPE_VAAPI, nullptr, nullptr, 0) < 0)
+        return result;
+
+    bool foundhwfmt   = false;
+    bool foundswfmt   = false;
+    bool foundprofile = false;
+    bool foundentry   = false;
+    bool sizeok       = true;
+
+    AVHWFramesConstraints *constraints = av_hwdevice_get_hwframe_constraints(hwdevicectx, nullptr);
+    if (constraints)
+    {
+        if ((constraints->min_width > CodecContext->width) || (constraints->min_height > CodecContext->height))
+            sizeok = false;
+        if ((constraints->max_width < CodecContext->width) || (constraints->max_height < CodecContext->height))
+            sizeok = false;
+
+        enum AVPixelFormat *valid = constraints->valid_sw_formats;
+        while (*valid != AV_PIX_FMT_NONE)
         {
-            const AVCodecHWConfig *config = avcodec_get_hw_config(*Codec, i);
-            if (!config)
+            if (*valid == PixFmt)
             {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Decoder %1 does not support device type %2.")
-                        .arg((*Codec)->name).arg(av_hwdevice_get_type_name(type)));
+                foundswfmt = true;
                 break;
             }
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX) && (config->device_type == type))
+            valid++;
+        }
+        valid = constraints->valid_hw_formats;
+        while (*valid != AV_PIX_FMT_NONE)
+        {
+            if (*valid == AV_PIX_FMT_VAAPI)
             {
-                fmt = config->pix_fmt;
+                foundhwfmt = true;
+                break;
+            }
+            valid++;
+        }
+        av_hwframe_constraints_free(&constraints);
+    }
+
+    // FFmpeg checks profiles very late and never checks entrypoints.
+    AVHWDeviceContext    *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
+    AVVAAPIDeviceContext *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
+    int profilecount = vaMaxNumProfiles(hwctx->display);
+    VAProfile desired = VAAPIProfileForCodec(CodecContext);
+    VAProfile *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
+    if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
+    {
+        for (int i = 0; i < profilecount; ++i)
+        {
+            if (profilelist[i] == desired)
+            {
+                foundprofile = true;
                 break;
             }
         }
     }
+    av_freep(&profilelist);
 
-    if (fmt == AV_PIX_FMT_NONE)
+    if (VAProfileNone != desired)
     {
-        if (!supported)
-            LOG(VB_GENERAL, LOG_WARNING, "Render device does not support VAAPI");
-        return static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+        int count = 0;
+        int entrysize = vaMaxNumEntrypoints(hwctx->display);
+        VAEntrypoint *entrylist = static_cast<VAEntrypoint*>(av_malloc_array(static_cast<size_t>(entrysize), sizeof(VAEntrypoint)));
+        if (vaQueryConfigEntrypoints(hwctx->display, desired, entrylist, &count) == VA_STATUS_SUCCESS)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                if (entrylist[i] == VAEntrypointVLD)
+                {
+                    foundentry = true;
+                    break;
+                }
+            }
+        }
+        av_freep(&entrylist);
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Decoder %1 supports device type %2.")
-            .arg((*Codec)->name).arg(av_hwdevice_get_type_name(type)));
-    PixFmt = fmt;
-    return static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
+    av_buffer_unref(&hwdevicectx);
+
+    if (foundhwfmt && foundswfmt && foundprofile && sizeok && foundentry)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name));
+        PixFmt = AV_PIX_FMT_VAAPI;
+        return static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support '%2' (format: %3 size: %4 profile: %5 entry: %6)")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
+            .arg(foundswfmt).arg(sizeok).arg(foundprofile).arg(foundentry));
+    return result;
 }
 
 void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)

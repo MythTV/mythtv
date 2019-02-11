@@ -22,17 +22,6 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#define INIT_ST \
-  VAStatus va_status; \
-  bool ok = true
-
-#define CHECK_ST \
-  ok &= (va_status == VA_STATUS_SUCCESS); \
-  if (!ok) \
-      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
-              .arg(__FILE__).arg( __LINE__).arg(va_status) \
-              .arg(vaErrorStr(va_status)))
-
 #define NUM_VAAPI_BUFFERS 24
 
 class MythVAAPIDisplay : public ReferenceCounter
@@ -54,7 +43,8 @@ class VAAPIContext
   public:
     VAAPIContext();
    ~VAAPIContext();
-    static MythCodecID GetBestSupportedCodec(AVCodec **Codec,
+    static MythCodecID GetBestSupportedCodec(AVCodecContext *CodecContext,
+                                             AVCodec **Codec,
                                              const QString &Decoder,
                                              uint StreamType,
                                              AVPixelFormat &PixFmt);
@@ -63,6 +53,9 @@ class VAAPIContext
     static void InitVAAPIContext(AVCodecContext *Context);
     static int  HwDecoderInit(AVCodecContext *Context);
     static void HWDecoderInitCallback(void*, void* Wait, void *Data);
+
+  private:
+    static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);
 };
 
 #endif // VAAPICONTEXT_H
