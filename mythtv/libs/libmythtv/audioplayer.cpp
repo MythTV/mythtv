@@ -130,7 +130,7 @@ QString AudioPlayer::ReinitAudio(void)
                                           AUDIOOUTPUT_VIDEO,
                                           m_controls_volume, m_passthru);
         if (m_no_audio_in)
-            aos.init = false;
+            aos.m_init = false;
 
         m_audioOutput = AudioOutput::OpenAudio(aos);
         if (!m_audioOutput)

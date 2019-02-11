@@ -144,7 +144,7 @@ void AudioSetupWizard::Init(void)
         for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
              it != m_outputlist->end(); ++it)
         {
-            if (it->name == current)
+            if (it->m_name == current)
             {
                 found = true;
                 break;
@@ -154,7 +154,7 @@ void AudioSetupWizard::Init(void)
         {
             AudioOutput::AudioDeviceConfig *adc =
                 AudioOutput::GetAudioDeviceConfig(current, current, true);
-            if (adc->settings.IsInvalid())
+            if (adc->m_settings.IsInvalid())
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
                     .arg(current));
@@ -170,7 +170,7 @@ void AudioSetupWizard::Init(void)
     for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
          it != m_outputlist->end(); ++it)
     {
-        QString name = it->name;
+        QString name = it->m_name;
         MythUIButtonListItem *output =
                 new MythUIButtonListItem(m_audioDeviceButtonList, name);
         output->SetData(name);
@@ -204,9 +204,9 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
     for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
          it != m_outputlist->end(); ++it)
     {
-        if (it->name == out)
+        if (it->m_name == out)
         {
-            settings = it->settings;
+            settings = it->m_settings;
             break;
         }
     }

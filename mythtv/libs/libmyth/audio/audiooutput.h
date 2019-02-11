@@ -27,16 +27,15 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     class AudioDeviceConfig
     {
       public:
-        QString name;
-        QString desc;
-        AudioOutputSettings settings;
+        QString             m_name;
+        QString             m_desc;
+        AudioOutputSettings m_settings;
         AudioDeviceConfig(void) :
-            name(QString()), desc(QString()),
-            settings(AudioOutputSettings(true)) { };
+            m_settings(AudioOutputSettings(true)) { };
         AudioDeviceConfig(const QString &name,
                           const QString &desc) :
-            name(name), desc(desc),
-            settings(AudioOutputSettings(true)) { };
+            m_name(name), m_desc(desc),
+            m_settings(AudioOutputSettings(true)) { };
     };
 
     typedef QVector<AudioDeviceConfig> ADCVect;
@@ -60,8 +59,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         bool willsuspendpa = true);
 
     AudioOutput() :
-        VolumeBase(),             OutputListeners(),
-        pulsewassuspended(false), _frame(nullptr) {}
+        VolumeBase(), OutputListeners() {}
 
     virtual ~AudioOutput();
 
@@ -140,8 +138,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual void SetSourceBitrate(int ) { }
 
-    QString GetError(void)   const { return lastError; }
-    QString GetWarning(void) const { return lastWarn; }
+    QString GetError(void)   const { return m_lastError; }
+    QString GetWarning(void) const { return m_lastWarn; }
 
     virtual void GetBufferStatus(uint &fill, uint &total)
         { fill = total = 0; }
@@ -154,7 +152,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual bool IsUpmixing(void)   { return false; }
     virtual bool ToggleUpmix(void)  { return false; }
     virtual bool CanUpmix(void)     { return false; }
-    bool PulseStatus(void) { return pulsewassuspended; }
+    bool PulseStatus(void) { return m_pulsewassuspended; }
 
     /**
      * \param fmt The audio format in question.
@@ -198,10 +196,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     void ClearError(void);
     void ClearWarning(void);
 
-    QString lastError;
-    QString lastWarn;
-    bool pulsewassuspended;
-    AVFrame *_frame;
+    QString m_lastError;
+    QString m_lastWarn;
+    bool    m_pulsewassuspended {false};
+    AVFrame *m_frame            {nullptr};
 };
 
 #endif

@@ -22,7 +22,6 @@ extern "C" {
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
 SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecID codec_id)
-    : m_complete(false), m_oc(nullptr), m_size(0)
 {
     memset(&m_buffer, 0, sizeof(m_buffer));
 

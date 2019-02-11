@@ -85,11 +85,11 @@ void AudioReencodeBuffer::Reconfigure(const AudioSettings &settings)
 {
     ClearError();
 
-    m_passthru        = settings.use_passthru;
-    m_channels        = settings.channels;
+    m_passthru        = settings.m_use_passthru;
+    m_channels        = settings.m_channels;
     m_bytes_per_frame = m_channels *
-        AudioOutputSettings::SampleSize(settings.format);
-    m_eff_audiorate   = settings.samplerate;
+        AudioOutputSettings::SampleSize(settings.m_format);
+    m_eff_audiorate   = settings.m_samplerate;
 }
 
 /**

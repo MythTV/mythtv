@@ -194,13 +194,6 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
             .arg(success).arg(handler->m_pending_operations));
 }
 
-PulseHandler::PulseHandler(void)
-  : m_ctx_state(PA_CONTEXT_UNCONNECTED), m_ctx(nullptr), m_pending_operations(0),
-    m_loop(nullptr), m_initialised(false), m_valid(false),
-    m_thread(nullptr)
-{
-}
-
 PulseHandler::~PulseHandler(void)
 {
     // TODO - do we need to drain the context??

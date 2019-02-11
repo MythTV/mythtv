@@ -58,14 +58,14 @@ class AudioOutputPulseAudio : public AudioOutputBase
     static void SinkInfoCallback(pa_context *c, const pa_sink_info *info,
                                  int eol, void *arg);
 
-    pa_context             *pcontext;
-    pa_stream              *pstream;
-    pa_threaded_mainloop   *mainloop;
-    pa_sample_spec          sample_spec;
-    pa_channel_map          channel_map;
-    pa_cvolume              volume_control;
-    pa_buffer_attr          buffer_settings;
-    AudioOutputSettings    *m_aosettings;
+    pa_context             *m_pcontext   {nullptr};
+    pa_stream              *m_pstream    {nullptr};
+    pa_threaded_mainloop   *m_mainloop   {nullptr};
+    pa_sample_spec          m_sample_spec;
+    pa_channel_map          m_channel_map;
+    pa_cvolume              m_volume_control;
+    pa_buffer_attr          m_buffer_settings;
+    AudioOutputSettings    *m_aosettings {nullptr};
 };
 #endif
 

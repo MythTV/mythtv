@@ -48,8 +48,7 @@ DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
 class AudioOutputWinPrivate
 {
   public:
-    AudioOutputWinPrivate() :
-        m_hWaveOut(nullptr), m_WaveHdrs(nullptr), m_hEvent(nullptr)
+    AudioOutputWinPrivate()
     {
         m_WaveHdrs = new WAVEHDR[AudioOutputWin::kPacketCnt];
         memset(m_WaveHdrs, 0, sizeof(WAVEHDR) * AudioOutputWin::kPacketCnt);
@@ -84,9 +83,9 @@ class AudioOutputWinPrivate
                                      DWORD dwParam1, DWORD dwParam2);
 
   public:
-    HWAVEOUT  m_hWaveOut;
-    WAVEHDR  *m_WaveHdrs;
-    HANDLE    m_hEvent;
+    HWAVEOUT  m_hWaveOut {nullptr};
+    WAVEHDR  *m_WaveHdrs {nullptr};
+    HANDLE    m_hEvent {nullptr};
 };
 
 void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
@@ -107,9 +106,6 @@ void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
 AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
     AudioOutputBase(settings),
     m_priv(new AudioOutputWinPrivate()),
-    m_nPkts(0),
-    m_CurrentPkt(0),
-    m_OutPkts(nullptr),
     m_UseSPDIF(settings.use_passthru)
 {
     InitSettings(settings);

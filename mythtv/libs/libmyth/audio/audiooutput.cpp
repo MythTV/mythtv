@@ -82,11 +82,11 @@ AudioOutput *AudioOutput::OpenAudio(
 AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                                     bool willsuspendpa)
 {
-    QString &main_device = settings.main_device;
+    QString &main_device = settings.m_main_device;
     AudioOutput *ret = nullptr;
 
     // Don't suspend Pulse if unnecessary.  This can save 100mS
-    if (settings.format == FORMAT_NONE || settings.channels <= 0)
+    if (settings.m_format == FORMAT_NONE || settings.m_channels <= 0)
         willsuspendpa = false;
 
 #ifdef USING_PULSE
@@ -239,7 +239,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         return nullptr;
     }
 #ifdef USING_PULSE
-    ret->pulsewassuspended = pulsestatus;
+    ret->m_pulsewassuspended = pulsestatus;
 #endif
     return ret;
 }
@@ -247,10 +247,10 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 AudioOutput::~AudioOutput()
 {
 #ifdef USING_PULSE
-    if (pulsewassuspended)
+    if (m_pulsewassuspended)
         PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
-    av_frame_free(&_frame);
+    av_frame_free(&m_frame);
 }
 
 void AudioOutput::SetStretchFactor(float /*factor*/)
@@ -279,29 +279,29 @@ bool AudioOutput::CanPassthrough(int /*samplerate*/,
 //       GetWarning() and why.  These would give more useful logs as macros
 void AudioOutput::Error(const QString &msg)
 {
-    lastError = msg;
-    LOG(VB_GENERAL, LOG_ERR, "AudioOutput Error: " + lastError);
+    m_lastError = msg;
+    LOG(VB_GENERAL, LOG_ERR, "AudioOutput Error: " + m_lastError);
 }
 
 void AudioOutput::SilentError(const QString &msg)
 {
-    lastError = msg;
+    m_lastError = msg;
 }
 
 void AudioOutput::Warn(const QString &msg)
 {
-    lastWarn = msg;
-    LOG(VB_GENERAL, LOG_WARNING, "AudioOutput Warning: " + lastWarn);
+    m_lastWarn = msg;
+    LOG(VB_GENERAL, LOG_WARNING, "AudioOutput Warning: " + m_lastWarn);
 }
 
 void AudioOutput::ClearError(void)
 {
-    lastError.clear();
+    m_lastError.clear();
 }
 
 void AudioOutput::ClearWarning(void)
 {
-    lastWarn.clear();
+    m_lastWarn.clear();
 }
 
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
@@ -399,7 +399,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)")
                                 .arg(name).arg(capabilities));
     adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
-    adc->settings = aosettings;
+    adc->m_settings = aosettings;
     return adc;
 }
 
@@ -627,16 +627,16 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
-    if (!_frame)
+    if (!m_frame)
     {
-        if (!(_frame = av_frame_alloc()))
+        if (!(m_frame = av_frame_alloc()))
         {
             return AVERROR(ENOMEM);
         }
     }
     else
     {
-        av_frame_unref(_frame);
+        av_frame_unref(m_frame);
     }
 
 //  SUGGESTION
@@ -645,7 +645,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
 //  into separate routines or separate threads.
 //  Also now that it always consumes a whole buffer some code
 //  in the caller may be able to be optimized.
-    ret = avcodec_receive_frame(ctx,_frame);
+    ret = avcodec_receive_frame(ctx,m_frame);
     if (ret == 0)
         got_frame = true;
     if (ret == AVERROR(EAGAIN))
@@ -672,11 +672,11 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
         return ret;
     }
 
-    AVSampleFormat format = (AVSampleFormat)_frame->format;
+    AVSampleFormat format = (AVSampleFormat)m_frame->format;
     AudioFormat fmt =
         AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample);
 
-    data_size = _frame->nb_samples * _frame->channels * av_get_bytes_per_sample(format);
+    data_size = m_frame->nb_samples * m_frame->channels * av_get_bytes_per_sample(format);
 
     // May need to convert audio to S16
     AudioConvert converter(fmt, CanProcess(fmt) ? fmt : FORMAT_S16);
@@ -685,15 +685,15 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
     if (av_sample_fmt_is_planar(format))
     {
         src = buffer;
-        converter.InterleaveSamples(_frame->channels,
+        converter.InterleaveSamples(m_frame->channels,
                                     src,
-                                    (const uint8_t **)_frame->extended_data,
+                                    (const uint8_t **)m_frame->extended_data,
                                     data_size);
     }
     else
     {
         // data is already compacted...
-        src = _frame->extended_data[0];
+        src = m_frame->extended_data[0];
     }
 
     uint8_t* transit = buffer;

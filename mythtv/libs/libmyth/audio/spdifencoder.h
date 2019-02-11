@@ -29,10 +29,10 @@ class MPUBLIC SPDIFEncoder
     void Destroy();
 
   private:
-    bool                m_complete;
-    AVFormatContext    *m_oc;
+    bool                m_complete {false};
+    AVFormatContext    *m_oc       {nullptr};
     unsigned char       m_buffer[AudioOutput::MAX_SIZE_BUFFER];
-    long                m_size;
+    long                m_size     {0};
 };
 
 #endif

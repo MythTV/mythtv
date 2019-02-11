@@ -73,14 +73,14 @@ void AudioDeviceComboBox::AudioRescan()
     addSelection(value, value, true);
     for (it = vect.begin(); it != vect.end(); ++it)
     {
-        if (value != it->name)
-            addSelection(it->name, it->name);
+        if (value != it->m_name)
+            addSelection(it->m_name, it->m_name);
     }
 }
 
 void AudioDeviceComboBox::AudioDescriptionHelp(StandardSetting * setting)
 {
-    QString desc = m_parent->AudioDeviceMap().value(setting->getValue()).desc;
+    QString desc = m_parent->AudioDeviceMap().value(setting->getValue()).m_desc;
     setHelpText(desc);
 }
 
@@ -195,7 +195,7 @@ void AudioConfigSettings::CheckConfiguration(void)
         AudioOutput::GetAudioDeviceConfig(name, name, true);
     if (adc)
     {
-        if (adc->settings.IsInvalid())
+        if (adc->m_settings.IsInvalid())
         {
             QString msg = tr("%1 is invalid or not useable.").arg(name);
 
@@ -241,7 +241,7 @@ void AudioConfigSettings::AudioRescan()
 
     audiodevs.clear();
     for (it = list->begin(); it != list->end(); ++it)
-        audiodevs.insert(it->name, *it);
+        audiodevs.insert(it->m_name, *it);
 
     devices = *list;
     delete list;
@@ -316,10 +316,10 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     {
         bool bForceDigital = m_PassThroughOverride->boolValue();
 
-        settings = audiodevs.value(out).settings;
+        settings = audiodevs.value(out).m_settings;
         settingsdigital = bForceDigital ?
             audiodevs.value(m_PassThroughDeviceOverride->getValue())
-            .settings : settings;
+            .m_settings : settings;
 
         realmax_speakers = max_speakers = settings.BestSupportedChannels();
 
@@ -544,7 +544,7 @@ bool AudioConfigSettings::CheckPassthrough()
         QString name = m_PassThroughDeviceOverride->getValue();
         AudioOutput::AudioDeviceConfig *adc =
             AudioOutput::GetAudioDeviceConfig(name, name, true);
-        if (adc->settings.IsInvalid())
+        if (adc->m_settings.IsInvalid())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Passthru device %1 isn't usable "

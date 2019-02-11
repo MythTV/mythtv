@@ -1,6 +1,12 @@
 #ifndef AUDIOOUTPUTOSS
 #define AUDIOOUTPUTOSS
 
+#if HAVE_SYS_SOUNDCARD_H
+    #include <sys/soundcard.h>
+#elif HAVE_SOUNDCARD_H
+    #include <soundcard.h>
+#endif
+
 #include "audiooutputbase.h"
 
 class AudioOutputOSS : public AudioOutputBase
@@ -27,12 +33,12 @@ class AudioOutputOSS : public AudioOutputBase
 
     void SetFragSize(void);
 
-    int audiofd;
-    mutable int numbadioctls;
+    int         m_audiofd      {-1};
+    mutable int m_numbadioctls {0};
 
     // Volume related
-    int mixerfd;
-    int control;
+    int         m_mixerfd      {-1};
+    int         m_control      {SOUND_MIXER_VOLUME};
 };
 
 #endif
