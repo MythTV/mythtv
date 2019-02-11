@@ -205,7 +205,7 @@ MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodecContext *CodecContext,
     if (Decoder != "vaapi")
         return result;
 
-    if (!MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI2))
+    if (!MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI))
     {
         LOG(VB_GENERAL, LOG_WARNING, "Render device does not support VAAPI");
         return result;
@@ -402,7 +402,7 @@ void VAAPIContext::HWDecoderInitCallback(void*, void* Wait, void *Data)
 
 int VAAPIContext::HwDecoderInit(AVCodecContext *Context)
 {
-    if (!Context || !MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI2))
+    if (!Context || !MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI))
         return -1;
 
     if (gCoreContext->IsUIThread())
