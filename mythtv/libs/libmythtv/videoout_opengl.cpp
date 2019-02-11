@@ -393,6 +393,7 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     {
         vbuffers.Init(8, false, 1, 4, 2, 1);
     }
+#ifdef USING_GLVAAPI
     else if (codec_is_vaapi(video_codec_id))
     {
         vbuffers.Init(NUM_VAAPI_BUFFERS, false, 2, 1, 4, 1);
@@ -401,6 +402,7 @@ bool VideoOutputOpenGL::CreateBuffers(void)
             success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VAAPI);
         return success;
     }
+#endif
     else
     {
         vbuffers.Init(31, false, 1, 12, 4, 2);
@@ -612,11 +614,13 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
         return allowed;
     }
 
+#ifdef USING_GLVAAPI
     if (MythOpenGLInterop::IsCodecSupported(CodecId))
     {
         allowed += "openglvaapi";
         return allowed;
     }
+#endif
 
     return allowed;
 }
