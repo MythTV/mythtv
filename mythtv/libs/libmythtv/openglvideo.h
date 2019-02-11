@@ -35,7 +35,7 @@ class OpenGLVideo : public QObject
 
     enum FrameType
     {
-        kGLGPU,   // Frame is already in GPU memory
+        kGLVAAPI, // Frame is already in GPU memory
         kGLUYVY,  // CPU conversion to UYVY422 format - 16bpp
         kGLYV12,  // All processing on GPU - 12bpp
         kGLHQUYV  // High quality interlaced CPU conversion to UYV - 32bpp

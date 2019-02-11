@@ -31,10 +31,6 @@
 #include "videoout_vdpau.h"
 #endif
 
-#ifdef USING_GLVAAPI
-#include "videoout_openglvaapi.h"
-#endif
-
 #ifdef USING_OPENMAX
 #include "videoout_omx.h"
 #endif
@@ -86,10 +82,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
     VideoOutputVDPAU::GetRenderOptions(opts);
 #endif // USING_VDPAU
 
-#ifdef USING_GLVAAPI
-    VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
-#endif // USING_GLVAAPI
-
 #ifdef USING_OPENMAX
     VideoOutputOMX::GetRenderOptions(opts, cpudeints);
 #endif // USING_OPENMAX
@@ -131,11 +123,6 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputVDPAU::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_VDPAU
-
-#ifdef USING_GLVAAPI
-        renderers += VideoOutputOpenGLVAAPI::
-            GetAllowedRenderers(codec_id, video_dim_disp);
-#endif // USING_GLVAAPI
 
 #ifdef USING_OPENMAX
         renderers += VideoOutputOMX::
@@ -202,7 +189,7 @@ VideoOutput *VideoOutput::Create(
 
 #ifdef USING_GLVAAPI
         else if (renderer == "openglvaapi")
-            vo = new VideoOutputOpenGLVAAPI();
+            vo = new VideoOutputOpenGL(renderer);
 #endif // USING_GLVAAPI
 
 #ifdef USING_OPENMAX

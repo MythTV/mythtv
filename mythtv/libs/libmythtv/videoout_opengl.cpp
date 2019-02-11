@@ -1,5 +1,4 @@
 // MythTV
-#include "videoout_opengl.h"
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
@@ -11,6 +10,8 @@
 #include "mythrender_opengl.h"
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
+#include "mythopenglinterop.h"
+#include "videoout_opengl.h"
 
 #define LOC QString("VidOutGL: ")
 
@@ -66,6 +67,26 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     Options.deints->insert("opengl-yv12", SoftwareDeinterlacers + gldeints);
     (*Options.osds)["opengl-yv12"].append("opengl2");
     Options.priorities->insert("opengl-yv12", 65);
+
+#ifdef USING_GLVAAPI
+    Options.renderers->append("openglvaapi");
+
+    (*Options.deints)["openglvaapi"].append("vaapionefield");
+    (*Options.deints)["openglvaapi"].append("vaapibobdeint");
+    (*Options.deints)["openglvaapi"].append("none");
+    (*Options.osds)["openglvaapi"].append("opengl2");
+
+    if (Options.decoders->contains("vaapi"))
+        (*Options.safe_renderers)["vaapi"].append("openglvaapi");
+
+    if (Options.decoders->contains("ffmpeg"))
+        (*Options.safe_renderers)["ffmpeg"].append("openglvaapi");
+
+    (*Options.safe_renderers)["dummy"].append("openglvaapi");
+    (*Options.safe_renderers)["nuppel"].append("openglvaapi");
+
+    Options.priorities->insert("openglvaapi", 110);
+#endif
 }
 
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
@@ -78,6 +99,9 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     m_openGLPainter(nullptr),
     m_videoProfile(Profile),
     m_openGLVideoType(OpenGLVideo::StringToType(Profile))
+#ifdef USING_GLVAAPI
+    ,m_openglInterop()
+#endif
 {
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -160,6 +184,10 @@ void VideoOutputOpenGL::DestroyVideoResources(void)
 bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
                              WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
+    // if vaapi initialisation failed, fallback to yv12
+    if ((OpenGLVideo::kGLVAAPI == m_openGLVideoType) && !codec_is_vaapi(CodecId))
+        m_openGLVideoType = OpenGLVideo::kGLYV12;
+
     bool success = true;
     m_window = WinId;
     success &= VideoOutput::Init(VideoDim, VideoDispDim, Aspect, WinId, DisplayVisibleRect, CodecId);
@@ -216,7 +244,12 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDi
     }
 
     // fail fast if we don't know how to display the codec
-    if (!codec_sw_copy(CodecId))
+    bool supported = true;
+#ifdef USING_GLVAAPI
+    supported = MythOpenGLInterop::IsCodecSupported(CodecId);
+#endif
+
+    if (!codec_sw_copy(CodecId) && !supported)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
         errorState = kError_Unknown;
@@ -239,8 +272,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDi
         DestroyCPUResources();
 
     // Recreate buffers
-    if (Init(VideoDim, videoDispDim,
-             Aspect, m_window, window.GetDisplayVisibleRect(), CodecId))
+    if (Init(VideoDim, videoDispDim, Aspect, m_window, window.GetDisplayVisibleRect(), CodecId))
     {
         if (wasembedding)
             EmbedInWidget(oldrect);
@@ -318,17 +350,16 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     }
 
     OpenGLLocker ctx_lock(m_render);
-    OpenGLVideo::FrameType type = codec_sw_copy(video_codec_id) ? m_openGLVideoType : OpenGLVideo::kGLGPU;
     m_openGLVideo = new OpenGLVideo(m_render, &videoColourSpace, window.GetVideoDim(),
                                     window.GetVideoDispDim(), dvr, window.GetDisplayVideoRect(),
-                                    window.GetVideoRect(), true, type);
+                                    window.GetVideoRect(), true, m_openGLVideoType);
     bool success = m_openGLVideo->IsValid();
     if (success)
     {
         // check if the profile changed
         if (codec_sw_copy(video_codec_id))
         {
-            m_openGLVideoType    = m_openGLVideo->GetType();
+            m_openGLVideoType = m_openGLVideo->GetType();
             m_videoProfile = OpenGLVideo::TypeToString(m_openGLVideoType);
         }
 
@@ -357,9 +388,22 @@ void VideoOutputOpenGL::CreatePainter(void)
 bool VideoOutputOpenGL::CreateBuffers(void)
 {
     if (codec_is_mediacodec(video_codec_id))
+    {
         vbuffers.Init(8, false, 1, 4, 2, 1);
+    }
+    else if (codec_is_vaapi(video_codec_id))
+    {
+        vbuffers.Init(NUM_VAAPI_BUFFERS, false, 2, 1, 4, 1);
+        bool success = true;
+        for (uint i = 0; i < NUM_VAAPI_BUFFERS; i++)
+            success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VAAPI);
+        return success;
+    }
     else
+    {
         vbuffers.Init(31, false, 1, 12, 4, 2);
+    }
+
     return vbuffers.CreateBuffers(FMT_YV12, window.GetVideoDim().width(), window.GetVideoDim().height());
 }
 
@@ -462,6 +506,15 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // video
     if (m_openGLVideo && !dummy)
     {
+#ifdef USING_GLVAAPI
+        if (codec_is_vaapi(video_codec_id))
+        {
+            MythGLTexture *texture = m_openGLVideo->GetInputTexture();
+            GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
+            m_openglInterop.CopySurfaceToTexture(m_render, &videoColourSpace,
+                                                 Frame, textureid, QOpenGLTexture::Target2D, Scan);
+        }
+#endif
         m_openGLVideo->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
@@ -547,12 +600,23 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
 */
 QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize&)
 {
-    QStringList list;
-    if (!codec_sw_copy(CodecId) || getenv("NO_OPENGL"))
-        return list;
+    QStringList allowed;
+    if (getenv("NO_OPENGL"))
+        return allowed;
 
-    list << "opengl" << "opengl-yv12" << "opengl-hquyv";
-    return list;
+    if (codec_sw_copy(CodecId))
+    {
+        allowed << "opengl" << "opengl-yv12" << "opengl-hquyv";
+        return allowed;
+    }
+
+    if (MythOpenGLInterop::IsCodecSupported(CodecId))
+    {
+        allowed += "openglvaapi";
+        return allowed;
+    }
+
+    return allowed;
 }
 
 void VideoOutputOpenGL::Zoom(ZoomDirection Direction)
@@ -580,6 +644,10 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
         m_openGLVideo->UpdateInputFrame(used);
         DisplayTimecode = used->disp_timecode;
     }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Could not update pause frame");
+    }
     vbuffers.end_lock();
 }
 
@@ -595,6 +663,15 @@ void VideoOutputOpenGL::InitPictureAttributes(void)
 
 int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute Attribute, int Value)
 {
+#ifdef USING_GLVAAPI
+    if (codec_is_vaapi(video_codec_id))
+    {
+        int val = Value;
+        val = m_openglInterop.SetPictureAttribute(Attribute, Value);
+        if (val < 0)
+            return -1;
+    }
+#endif
     return VideoOutput::SetPictureAttribute(Attribute, Value);
 }
 
@@ -608,17 +685,14 @@ bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &Overrid
     if (db_vdisp_profile)
         m_deintfiltername = db_vdisp_profile->GetFilteredDeint(OverrideFilter);
 
-    if (MythCodecContext::isCodecDeinterlacer(m_deintfiltername))
-        return false;
-
-    if (!m_deintfiltername.contains("opengl"))
+    if (!m_deintfiltername.contains("opengl") && !m_deintfiltername.contains("vaapi"))
     {
         m_openGLVideo->SetDeinterlacing(false);
         VideoOutput::SetupDeinterlace(Interlaced, OverrideFilter);
         return m_deinterlacing;
     }
 
-    // clear any non opengl filters
+    // clear any non hardware filters
     if (m_deintFiltMan)
     {
         delete m_deintFiltMan;
@@ -628,6 +702,12 @@ bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &Overrid
     {
         delete m_deintFilter;
         m_deintFilter = nullptr;
+    }
+
+    if (OpenGLVideo::kGLVAAPI == m_openGLVideoType)
+    {
+        m_deinterlacing = m_deintfiltername.contains("vaapi") ? Interlaced : false;
+        return m_deinterlacing;
     }
 
     m_deinterlacing = Interlaced;
@@ -658,17 +738,9 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool Enable)
 
     if (Enable)
     {
-        if (m_deintfiltername.isEmpty() || m_deintfiltername.contains("opengl"))
-        {
-            return SetupDeinterlace(Enable);
-        }
-        else
-        {
-            // make sure opengl deinterlacing is disabled
+        if (!m_deintfiltername.contains("opengl"))
             m_openGLVideo->SetDeinterlacing(false);
-            if (!m_deintFiltMan || !m_deintFilter)
-                return VideoOutput::SetupDeinterlace(Enable);
-        }
+        return SetupDeinterlace(Enable);
     }
 
     m_openGLVideo->SetDeinterlacing(Enable);
@@ -778,12 +850,17 @@ void VideoOutputOpenGL::StopEmbedding(void)
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString &Deinterlacer) const
 {
+    bool vaapi = OpenGLVideo::kGLVAAPI == m_openGLVideoType;
     // anything OpenGL when using shaders
-    if (Deinterlacer.contains("opengl") && (OpenGLVideo::kGLGPU != m_openGLVideoType))
+    if (!vaapi && Deinterlacer.contains("opengl"))
+        return true;
+
+    // vaapi if allowed
+    if (vaapi && Deinterlacer.contains("vaapi"))
         return true;
 
     // anything software based
-    if (!Deinterlacer.contains("vdpau") && !Deinterlacer.contains("vaapi") && (OpenGLVideo::kGLGPU != m_openGLVideoType))
+    if (!vaapi && !Deinterlacer.contains("vdpau") && !Deinterlacer.contains("vaapi"))
         return true;
 
     return VideoOutput::ApproveDeintFilter(Deinterlacer);

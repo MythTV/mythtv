@@ -122,6 +122,11 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
     return new MythRenderOpenGL(format, Device);
 }
 
+bool MythRenderOpenGL::IsEGL(void)
+{
+    return qApp->platformName().contains("egl", Qt::CaseInsensitive);
+}
+
 MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* Device,
                                    RenderType Type)
   : QOpenGLContext(),

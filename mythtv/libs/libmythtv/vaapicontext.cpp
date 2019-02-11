@@ -9,6 +9,7 @@
 #include "mythcodecid.h"
 #include "mythframe.h"
 #include "mythrender_opengl.h"
+#include "mythopenglinterop.h"
 #include "vaapicontext.h"
 
 extern "C" {
@@ -126,8 +127,9 @@ MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodec **Codec,
 {
     enum AVHWDeviceType type = AV_HWDEVICE_TYPE_VAAPI;
 
+    bool supported = MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI2);
     AVPixelFormat fmt = AV_PIX_FMT_NONE;
-    if (Decoder == "vaapi")
+    if (Decoder == "vaapi" && supported)
     {
         for (int i = 0;; i++)
         {
@@ -138,24 +140,25 @@ MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodec **Codec,
                         .arg((*Codec)->name).arg(av_hwdevice_get_type_name(type)));
                 break;
             }
-            if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX && config->device_type == type)
+            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX) && (config->device_type == type))
             {
                 fmt = config->pix_fmt;
                 break;
             }
         }
     }
+
     if (fmt == AV_PIX_FMT_NONE)
     {
+        if (!supported)
+            LOG(VB_GENERAL, LOG_WARNING, "Render device does not support VAAPI");
         return static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
     }
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Decoder %1 supports device type %2.")
-                .arg((*Codec)->name).arg(av_hwdevice_get_type_name(type)));
-        PixFmt = fmt;
-        return static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
-    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Decoder %1 supports device type %2.")
+            .arg((*Codec)->name).arg(av_hwdevice_get_type_name(type)));
+    PixFmt = fmt;
+    return static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
 }
 
 void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
@@ -253,7 +256,7 @@ void VAAPIContext::HWDecoderInitCallback(void*, void* Wait, void *Data)
 
 int VAAPIContext::HwDecoderInit(AVCodecContext *Context)
 {
-    if (!Context)
+    if (!Context || !MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI2))
         return -1;
 
     if (gCoreContext->IsUIThread())

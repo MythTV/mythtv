@@ -2,6 +2,7 @@
 #include "videooutbase.h"
 #include "videocolourspace.h"
 #include "mythrender_opengl.h"
+#include "mythmainwindow.h"
 #include "mythopenglinterop.h"
 
 // VAAPI
@@ -13,6 +14,31 @@
 #include "va/va_glx.h"
 
 #define LOC QString("OpenGLInterop: ")
+
+bool MythOpenGLInterop::IsCodecSupported(MythCodecID CodecId)
+{
+    bool supported = codec_sw_copy(CodecId);
+
+#ifdef USING_GLVAAPI
+    if (codec_is_vaapi(CodecId))
+    {
+        supported = false;
+        MythMainWindow* win = MythMainWindow::getMainWindow();
+        if (win && !getenv("NO_VAAPI"))
+        {
+            MythRenderOpenGL *render = static_cast<MythRenderOpenGL*>(win->GetRenderDevice());
+            if (render)
+            {
+                supported = !render->IsEGL() && !render->isOpenGLES();
+                if (!supported)
+                    LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI - incompatible with current render device");
+            }
+        }
+    }
+#endif
+
+    return supported;
+}
 
 MythOpenGLInterop::MythOpenGLInterop(void)
   : m_glxSurface(nullptr),

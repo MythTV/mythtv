@@ -57,7 +57,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
 
     m_videoColourSpace->IncrRef();
     connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &OpenGLVideo::UpdateColourSpace);
-    if (kGLGPU == m_frameType)
+    if (kGLVAAPI == m_frameType)
         m_videoColourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
     // Set OpenGL feature support
@@ -93,7 +93,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     // Create initial shaders - default and optionally progressive
     if (!CreateVideoShader(Default))
         return;
-    if (kGLGPU != m_frameType)
+    if (kGLVAAPI != m_frameType)
         if(!CreateVideoShader(Progressive))
             return;
 
@@ -290,7 +290,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     QString fragment;
     int cost = 1;
 
-    if ((Default == Type) || (kGLGPU == m_frameType))
+    if ((Default == Type) || (kGLVAAPI == m_frameType))
     {
         fragment = DefaultFragmentShader;
     }
@@ -382,7 +382,7 @@ MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureS
         Size.setWidth(Size.width() >> 1);
         texture = m_render->CreateTexture(Size);
     }
-    else if ((kGLHQUYV == m_frameType) || (kGLGPU == m_frameType))
+    else if ((kGLHQUYV == m_frameType) || (kGLVAAPI == m_frameType))
     {
         texture = m_render->CreateTexture(Size);
     }
@@ -414,7 +414,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
     if (Frame->width  != m_videoDim.width()  ||
         Frame->height != m_videoDim.height() ||
         Frame->width  < 1 || Frame->height < 1 ||
-        Frame->codec != FMT_YV12 || (kGLGPU == m_frameType))
+        Frame->codec != FMT_YV12 || (kGLVAAPI == m_frameType))
     {
         return;
     }
@@ -508,7 +508,7 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
     // First determine which shader to use. This helps optimise the resize check.
 
     bool deinterlacing = false;
-    VideoShaderType program = (kGLGPU == m_frameType) ? Default : Progressive;
+    VideoShaderType program = (kGLVAAPI == m_frameType) ? Default : Progressive;
     if (m_hardwareDeinterlacing && !m_referenceTexturesNeeded)
     {
         if (Scan == kScan_Interlaced)
@@ -525,7 +525,7 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
 
     // Decide whether to use render to texture - for performance or quality
     bool resize = false;
-    if (kGLGPU != m_frameType)
+    if (kGLVAAPI != m_frameType)
     {
         // ensure deinterlacing works correctly when down scaling in height
         resize = (m_videoDispDim.height() > m_displayVideoRect.height()) && deinterlacing;
@@ -726,7 +726,7 @@ OpenGLVideo::FrameType OpenGLVideo::StringToType(const QString &Type)
     QString type = Type.toLower().trimmed();
     if ("opengl-yv12" == type)  return kGLYV12;
     if ("opengl-hquyv" == type) return kGLHQUYV;
-    if ("opengl-gpu" == type)   return kGLGPU;
+    if ("openglvaapi" == type)  return kGLVAAPI;
     return kGLUYVY; // opengl
 }
 
@@ -734,7 +734,7 @@ QString OpenGLVideo::TypeToString(FrameType Type)
 {
     switch (Type)
     {
-        case kGLGPU:   return "opengl-gpu";
+        case kGLVAAPI: return "openglvaapi";
         case kGLUYVY:  return "opengl"; // compatibility with old profiles
         case kGLYV12:  return "opengl-yv12";
         case kGLHQUYV: return "opengl-hquyv";

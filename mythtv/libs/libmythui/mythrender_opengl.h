@@ -84,6 +84,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
 
   public:
     static MythRenderOpenGL* Create(const QString &Painter, QPaintDevice* Device = nullptr);
+    static bool IsEGL(void);
     MythRenderOpenGL(const QSurfaceFormat &Format, QPaintDevice* Device, RenderType Type = kRenderOpenGL);
 
     // MythRender

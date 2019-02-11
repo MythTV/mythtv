@@ -54,9 +54,6 @@ extern "C" {
 #include "videoout_d3d.h"
 #endif
 
-#ifdef USING_GLVAAPI
-#include "videoout_openglvaapi.h"
-#endif // USING_GLVAAPI
 #ifdef USING_VAAPI
 #include "vaapicontext.h"
 #endif

@@ -15,6 +15,8 @@ class VideoColourSpace;
 class MythOpenGLInterop
 {
   public:
+    static bool IsCodecSupported(MythCodecID CodecId);
+
     MythOpenGLInterop();
    ~MythOpenGLInterop();
     bool  CopySurfaceToTexture(MythRenderOpenGL *Context,
