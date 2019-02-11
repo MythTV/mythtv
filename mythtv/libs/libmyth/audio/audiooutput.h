@@ -49,7 +49,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(
         const QString &audiodevice, const QString &passthrudevice,
-        AudioFormat format, int channels, int codec, int samplerate,
+        AudioFormat format, int channels, AVCodecID codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
         int upmixer_startup = 0, AudioOutputSettings *custom = nullptr);
     static AudioOutput *OpenAudio(AudioSettings &settings,
@@ -77,7 +77,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
     virtual AudioOutputSettings* GetOutputSettingsUsers(bool digital = true);
     virtual bool CanPassthrough(int samplerate, int channels,
-                                int codec, int profile) const;
+                                AVCodecID codec, int profile) const;
     virtual bool CanDownmix(void) const { return false; };
 
     // dsprate is in 100 * samples/second

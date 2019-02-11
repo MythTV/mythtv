@@ -59,7 +59,7 @@ void AudioOutput::Cleanup(void)
 
 AudioOutput *AudioOutput::OpenAudio(
     const QString &main_device, const QString &passthru_device,
-    AudioFormat format, int channels, int codec, int samplerate,
+    AudioFormat format, int channels, AVCodecID codec, int samplerate,
     AudioOutputSource source, bool set_initial_vol, bool passthru,
     int upmixer_startup, AudioOutputSettings *custom)
 {
@@ -269,7 +269,7 @@ AudioOutputSettings* AudioOutput::GetOutputSettingsUsers(bool /*digital*/)
 
 bool AudioOutput::CanPassthrough(int /*samplerate*/,
                                  int /*channels*/,
-                                 int /*codec*/,
+                                 AVCodecID /*codec*/,
                                  int /*profile*/) const
 {
     return false;

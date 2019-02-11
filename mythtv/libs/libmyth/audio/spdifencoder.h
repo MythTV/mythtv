@@ -14,7 +14,7 @@ extern "C" {
 class MPUBLIC SPDIFEncoder
 {
   public:
-    SPDIFEncoder(QString muxer, int codec_id);
+    SPDIFEncoder(QString muxer, AVCodecID codec_id);
     ~SPDIFEncoder();
     void WriteFrame(unsigned char *data, int size);
     int  GetData(unsigned char *buffer, int &dest_size);

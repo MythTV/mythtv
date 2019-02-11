@@ -258,7 +258,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
  * Test if we can output digital audio and if sample rate is supported
  */
 bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
-                                     int codec, int profile) const
+                                     AVCodecID codec, int profile) const
 {
     DigitalFeature arg = FEATURE_NONE;
     bool           ret = !(internal_vol && SWVolume());
@@ -289,6 +289,9 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
             break;
         case AV_CODEC_ID_TRUEHD:
             arg = FEATURE_TRUEHD;
+            break;
+        default:
+            arg = FEATURE_NONE;
             break;
     }
     // we can't passthrough any other codecs than those defined above
@@ -453,7 +456,7 @@ bool AudioOutputBase::CanUpmix(void)
  * Setup samplerate and number of channels for passthrough
  * Create SPDIF encoder and true if successful
  */
-bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
+bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
                                        int &samplerate_tmp, int &channels_tmp)
 {
     if (codec == AV_CODEC_ID_DTS &&
@@ -679,7 +682,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
 
     VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
-            .arg(ff_codec_id_string((AVCodecID)codec))
+            .arg(ff_codec_id_string(codec))
             .arg(output_settings->FormatToString(format))
             .arg(samplerate/1000)
             .arg(source_channels));

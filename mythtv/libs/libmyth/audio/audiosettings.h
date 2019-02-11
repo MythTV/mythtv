@@ -31,7 +31,7 @@ class MPUBLIC AudioSettings
         const QString          &passthru_device,
         AudioFormat             format,
         int                     channels,
-        int                     codec,
+        AVCodecID               codec,
         int                     samplerate,
         AudioOutputSource       source,
         bool                    set_initial_vol,
@@ -41,7 +41,7 @@ class MPUBLIC AudioSettings
 
     AudioSettings(AudioFormat   format,
                   int           channels,
-                  int           codec,
+                  AVCodecID     codec,
                   int           samplerate,
                   bool          use_passthru,
                   int           upmixer_startup = 0,
@@ -64,7 +64,7 @@ class MPUBLIC AudioSettings
     QString             passthru_device;
     AudioFormat         format;
     int                 channels;
-    int                 codec;
+    AVCodecID           codec;
     int                 codec_profile;
     int                 samplerate;
     bool                set_initial_vol;

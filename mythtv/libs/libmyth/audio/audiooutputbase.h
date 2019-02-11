@@ -71,7 +71,7 @@ class AudioOutputBase : public AudioOutput, public MThread
         { return source_bytes_per_frame; }
 
     bool CanPassthrough(int samplerate, int channels,
-                        int codec, int profile) const override; // AudioOutput
+                        AVCodecID codec, int profile) const override; // AudioOutput
     bool CanDownmix(void) const override { return true; } // AudioOutput
     bool IsUpmixing(void) override; // AudioOutput
     bool ToggleUpmix(void) override; // AudioOutput
@@ -167,7 +167,7 @@ class AudioOutputBase : public AudioOutput, public MThread
   protected:
     // Basic details about the audio stream
     int channels;
-    int codec;
+    AVCodecID codec;
     int bytes_per_frame;
     int output_bytes_per_frame;
     AudioFormat format;
@@ -207,7 +207,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     int source_samplerate;
 
  private:
-    bool SetupPassthrough(int codec, int codec_profile,
+    bool SetupPassthrough(AVCodecID codec, int codec_profile,
                           int &samplerate_tmp, int &channels_tmp);
     AudioOutputSettings* OutputSettings(bool digital = true);
     int CopyWithUpmix(char *buffer, int frames, uint &org_waud);

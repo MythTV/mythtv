@@ -373,7 +373,7 @@ bool MusicPlayer::openOutputDevice(void)
               gCoreContext->GetSetting("PassThruOutputDevice") : "auto";
 
     m_output = AudioOutput::OpenAudio(
-                   adevice, pdevice, FORMAT_S16, 2, 0, 44100,
+                   adevice, pdevice, FORMAT_S16, 2, AV_CODEC_ID_NONE, 44100,
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
 

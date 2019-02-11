@@ -606,7 +606,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
 
     m_audioOutput = AudioOutput::OpenAudio(m_device, m_passthrough,
                                            m_format, m_channels,
-                                           0, m_samplerate,
+                                           AV_CODEC_ID_NONE, m_samplerate,
                                            AUDIOOUTPUT_VIDEO,
                                            true, false, 0, &settings);
     if (result().isEmpty())
