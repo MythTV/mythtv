@@ -2501,12 +2501,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             selectedTrack[kTrackTypeVideo] = si;
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Selected track #%1 (id 0x%2 codec id %3, "
+                QString("Selected track #%1 (id 0x%2 codec id %3 profile %7, "
                         "type %4, bitrate %5 at 0x%6)")
                 .arg(selTrack).arg((uint64_t)ic->streams[selTrack]->id,0,16)
                 .arg(ff_codec_id_string(enc->codec_id))
                 .arg(ff_codec_type_string(enc->codec_type))
-                .arg(enc->bit_rate).arg((uint64_t)ic->streams[selTrack],0,16));
+                .arg(enc->bit_rate).arg((uint64_t)ic->streams[selTrack],0,16)
+                .arg(enc->profile));
 
             codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
 
