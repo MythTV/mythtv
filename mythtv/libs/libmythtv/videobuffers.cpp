@@ -134,6 +134,18 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
  * \see VideoOutput
  */
 
+uint VideoBuffers::GetNumBuffers(int PixelFormat)
+{
+    switch (PixelFormat)
+    {
+        case FMT_VAAPI: return 24;
+        case FMT_DXVA2: return 30;
+        case FMT_YV12:  return 31;
+        default: break;
+    }
+    return 30;
+}
+
 VideoBuffers::VideoBuffers()
     : needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),

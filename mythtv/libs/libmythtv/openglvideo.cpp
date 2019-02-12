@@ -44,7 +44,8 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_extraFeatures(0),
     m_copyCtx(),
     m_resizing(false),
-    m_forceResize()
+    m_forceResize(),
+    m_openglInterop()
 {
     memset(m_shaders, 0, sizeof(m_shaders));
     memset(m_shaderCost, 1, sizeof(m_shaderCost));
@@ -73,11 +74,16 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
             m_extraFeatures &= ~kGLExtFBDiscard;
     }
 
-    // Create initial input texture
-    MythGLTexture *texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);
-    if (!texture)
-        return;
-    m_inputTextures.push_back(texture);
+    // Create initial input texture. Hardware textures are created on demand.
+    MythGLTexture *texture = nullptr;
+    if (kGLVAAPI != m_frameType)
+    {
+        texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);
+        if (!texture)
+            return;
+        m_inputTextures.push_back(texture);
+    }
+
     if (kGLYV12 == m_frameType)
     {
         QSize temp;
@@ -176,6 +182,13 @@ void OpenGLVideo::SetMasterViewport(QSize Size)
     m_masterViewportSize = Size;
 }
 
+int OpenGLVideo::SetPictureAttribute(PictureAttribute Attribute, int Value)
+{
+    if (kGLVAAPI == m_frameType)
+        return m_openglInterop.SetPictureAttribute(Attribute, Value);
+    return 0;
+}
+
 void OpenGLVideo::SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect)
 {
     m_displayVideoRect = DisplayVideoRect;
@@ -200,6 +213,9 @@ QSize OpenGLVideo::GetVideoSize(void) const
 bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
 {
     OpenGLLocker ctx_lock(m_render);
+
+    if (kGLVAAPI == m_frameType)
+        return false;
 
     if (m_hardwareDeinterlacer == Deinterlacer)
         return true;
@@ -370,7 +386,11 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
 MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureSize)
 {
     MythGLTexture *texture = nullptr;
-    if (kGLYV12 == m_frameType)
+    if (kGLVAAPI == m_frameType)
+    {
+        return texture;
+    }
+    else if (kGLYV12 == m_frameType)
     {
         texture = m_render->CreateTexture(Size,
             QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
@@ -382,7 +402,7 @@ MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureS
         Size.setWidth(Size.width() >> 1);
         texture = m_render->CreateTexture(Size);
     }
-    else if ((kGLHQUYV == m_frameType) || (kGLVAAPI == m_frameType))
+    else if ((kGLHQUYV == m_frameType))
     {
         texture = m_render->CreateTexture(Size);
     }
@@ -494,10 +514,10 @@ void OpenGLVideo::SetDeinterlacing(bool Deinterlacing)
     m_hardwareDeinterlacing = Deinterlacing;
 }
 
-void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
+void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
                                StereoscopicMode Stereo, bool DrawBorder)
 {
-    if (m_inputTextures.empty() || !m_render)
+    if (!m_render)
         return;
 
     OpenGLLocker ctx_lock(m_render);
@@ -505,8 +525,18 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREP_FRAME_START");
 
-    // First determine which shader to use. This helps optimise the resize check.
+    // Set required input textures for the last stage (hardware frames are not pre-processed)
+    vector<MythGLTexture*> inputtextures;
 
+    // Hardware frames need updating here as all post processing is done before we render
+    if (kGLVAAPI == m_frameType)
+        inputtextures.push_back(m_openglInterop.GetTexture(m_render, m_videoColourSpace, Frame, Scan));
+    else
+        inputtextures = m_inputTextures;
+    if (inputtextures.empty())
+        return;
+
+    // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
     VideoShaderType program = (kGLVAAPI == m_frameType) ? Default : Progressive;
     if (m_hardwareDeinterlacing && !m_referenceTexturesNeeded)
@@ -571,8 +601,6 @@ void OpenGLVideo::PrepareFrame(bool TopFieldFirst, FrameScanType Scan,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled resizing");
     }
 
-    // inputs for the last stage
-    vector<MythGLTexture*> inputtextures = m_inputTextures;
     bool discardframebuffer = false;
 
     if (resize)

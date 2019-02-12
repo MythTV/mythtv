@@ -6,7 +6,6 @@ using namespace std;
 #include "videoout_null.h"
 #include "videodisplayprofile.h"
 
-const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
@@ -154,7 +153,7 @@ bool VideoOutputNull::Init(const QSize &video_dim_buf,
     VideoOutput::Init(video_dim_buf, video_dim_disp,
                       aspect, winid, win_rect, codec_id);
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+    vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
 

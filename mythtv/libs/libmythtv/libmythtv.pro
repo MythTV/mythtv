@@ -478,14 +478,14 @@ using_frontend {
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
     using_opengl_video:HEADERS += openglvideoshaders.h
     using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
+    using_opengl_video:HEADERS += mythopenglinterop.h
+    using_opengl_video:SOURCES += mythopenglinterop.cpp
 
     using_vaapi {
         DEFINES += USING_VAAPI
         HEADERS += vaapicontext.h
         SOURCES += vaapicontext.cpp
         LIBS    += -lva -lva-x11 -lva-glx
-        using_opengl_video:HEADERS += mythopenglinterop.h
-        using_opengl_video:SOURCES += mythopenglinterop.cpp
         using_opengl_video:DEFINES += USING_GLVAAPI
     }
 

@@ -11,6 +11,7 @@
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
 #include "util-opengl.h"
+#include "mythopenglinterop.h"
 
 // Std
 #include <vector>
@@ -56,10 +57,12 @@ class OpenGLVideo : public QObject
     bool    AddDeinterlacer(QString &Deinterlacer);
     void    SetDeinterlacing(bool Deinterlacing);
     QString GetDeinterlacer(void) const;
-    void    PrepareFrame(bool TopFieldFirst, FrameScanType Scan, StereoscopicMode Stereo, bool DrawBorder = false);
+    void    PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
+                         StereoscopicMode Stereo, bool DrawBorder = false);
     void    SetMasterViewport(QSize Size);
     QSize   GetVideoSize(void) const;
     FrameType GetType() const;
+    int     SetPictureAttribute(PictureAttribute Attribute, int Value);
 
   public slots:
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
@@ -102,5 +105,6 @@ class OpenGLVideo : public QObject
     MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
     bool           m_resizing;
     bool           m_forceResize;         ///< Global setting to force a resize stage
+    MythOpenGLInterop m_openglInterop;
 };
 #endif // _OPENGL_VIDEO_H__

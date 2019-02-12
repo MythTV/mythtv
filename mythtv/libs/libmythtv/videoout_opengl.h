@@ -4,9 +4,6 @@
 // MythTV headers
 #include "videooutbase.h"
 #include "openglvideo.h"
-#ifdef USING_GLVAAPI
-#include "mythopenglinterop.h"
-#endif
 
 class MythRenderOpenGL;
 class MythOpenGLPainter;
@@ -61,7 +58,7 @@ class VideoOutputOpenGL : public VideoOutput
     void DestroyCPUResources(void);
     void DestroyVideoResources(void);
     void DestroyGPUResources(void);
-    virtual bool CreateBuffers(void);
+    bool CreateBuffers(void);
     bool SetupContext(void);
     bool SetupOpenGL(void);
     void CreatePainter(void);
@@ -77,10 +74,6 @@ class VideoOutputOpenGL : public VideoOutput
     MythOpenGLPainter     *m_openGLPainter;
     QString                m_videoProfile;
     OpenGLVideo::FrameType m_openGLVideoType;
-
-#ifdef USING_GLVAAPI
-    MythOpenGLInterop      m_openglInterop;
-#endif
 };
 
 #endif

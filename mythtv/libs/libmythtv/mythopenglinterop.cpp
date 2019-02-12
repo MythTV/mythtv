@@ -5,35 +5,23 @@
 #include "mythmainwindow.h"
 #include "mythopenglinterop.h"
 
-// VAAPI
-#include "va/va.h"
-#include "va/va_version.h"
-#if VA_CHECK_VERSION(0,34,0)
-#include "va/va_compat.h"
-#endif
-#include "va/va_glx.h"
-
 #define LOC QString("OpenGLInterop: ")
 
-#define INIT_ST \
-  VAStatus va_status; \
-  bool ok = true
-
-#define CHECK_ST \
-  ok &= (va_status == VA_STATUS_SUCCESS); \
-  if (!ok) \
-      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
-              .arg(__FILE__).arg( __LINE__).arg(va_status) \
-              .arg(vaErrorStr(va_status)))
+QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
+{
+    QStringList result;
+    if (codec_is_vaapi(CodecId) && IsCodecSupported(CodecId))
+        result << "openglvaapi";
+    return result;
+}
 
 bool MythOpenGLInterop::IsCodecSupported(MythCodecID CodecId)
 {
-    bool supported = codec_sw_copy(CodecId);
+    bool supported = false;
 
 #ifdef USING_GLVAAPI
     if (codec_is_vaapi(CodecId))
     {
-        supported = false;
         MythMainWindow* win = MythMainWindow::getMainWindow();
         if (win && !getenv("NO_VAAPI"))
         {
@@ -46,51 +34,172 @@ bool MythOpenGLInterop::IsCodecSupported(MythCodecID CodecId)
             }
         }
     }
+#else
+    (void)CodecId;
 #endif
 
     return supported;
 }
 
 MythOpenGLInterop::MythOpenGLInterop(void)
-  : m_glxSurface(nullptr),
-    m_glxSurfaceTexture(0),
-    m_glxSurfaceTextureType(GL_TEXTURE_2D),
-    m_glxSurfaceSize(),
-    m_glxSurfaceDisplay(nullptr),
-    m_colourSpace(nullptr),
-    m_pictureAttributes(nullptr),
-    m_pictureAttributeCount(0),
-    m_hueBase(0),
+  : m_glTexture(nullptr),
+    m_glTextureFormat(0),
+    m_colourSpace(nullptr)
+#ifdef USING_GLVAAPI
+   ,m_vaapiDisplay(nullptr),
+    m_vaapiPictureAttributes(nullptr),
+    m_vaapiPictureAttributeCount(0),
+    m_vaapiHueBase(0),
     m_vaapiColourSpace(0)
+#endif
 {
 }
 
 MythOpenGLInterop::~MythOpenGLInterop()
 {
-    delete [] m_pictureAttributes;
-    DeleteGLXSurface();
+#ifdef USING_GLVAAPI
+    delete [] m_vaapiPictureAttributes;
+    DeleteVAAPIGLXSurface();
+#endif
 }
 
-void MythOpenGLInterop::InitPictureAttributes(void)
+int MythOpenGLInterop::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
+{
+#ifdef USING_GLVAAPI
+    if (m_vaapiDisplay)
+        return SetVAAPIPictureAttribute(Attribute, NewValue);
+#else
+    (void)Attribute;
+    (void)NewValue;
+#endif
+    return -1;
+}
+
+/*! \brief Return a valid MythGLTexture that encapsulates a hardware surface.
+ *
+ * \note When paused Frame is null and the last valid texture should be returned.
+ * This will already have been deinterlaced as necessary.
+*/
+MythGLTexture* MythOpenGLInterop::GetTexture(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace,
+                                             VideoFrame *Frame, FrameScanType Scan)
+{
+    if (!Frame)
+        return m_glTexture;
+    if (!Context || !ColourSpace)
+        return nullptr;
+
+#ifdef USING_GLVAAPI
+    if (Frame->codec == FMT_VAAPI)
+        return GetVAAPITexture(Context, ColourSpace, Frame, Scan);
+#else
+    (void)Scan;
+#endif
+
+    return nullptr;
+}
+
+#ifdef USING_GLVAAPI
+#include "vaapicontext.h"
+#define INIT_ST \
+  VAStatus va_status; \
+  bool ok = true
+
+#define CHECK_ST \
+  ok &= (va_status == VA_STATUS_SUCCESS); \
+  if (!ok) \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
+              .arg(__FILE__).arg( __LINE__).arg(va_status) \
+              .arg(vaErrorStr(va_status)))
+
+MythGLTexture* MythOpenGLInterop::GetVAAPITexture(MythRenderOpenGL *Context,
+                                                  VideoColourSpace *ColourSpace,
+                                                  VideoFrame *Frame,
+                                                  FrameScanType Scan)
+{
+    if ((Frame->pix_fmt != AV_PIX_FMT_VAAPI) || (Frame->codec != FMT_VAAPI) ||
+        !Frame->buf || !Frame->priv[1])
+        return nullptr;
+
+    // Unpick
+    AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+    if (!buffer || (buffer && !buffer->data))
+        return nullptr;
+    AVHWFramesContext* vaapiframes = reinterpret_cast<AVHWFramesContext*>(buffer->data);
+    if (!vaapiframes || (vaapiframes && !vaapiframes->user_opaque))
+        return nullptr;
+    MythVAAPIDisplay* display = reinterpret_cast<MythVAAPIDisplay*>(vaapiframes->user_opaque);
+    if (!display || (display && !(display->m_context && display->m_vaDisplay)))
+        return nullptr;
+
+    if (Context != display->m_context)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Mismatched OpenGL contexts");
+        return nullptr;
+    }
+
+    // Retrieve or create our texture
+    OpenGLLocker locker(display->m_context);
+    VASurfaceID id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
+    MythGLTexture* glxsurface = GetVAAPIGLXSurface(Frame, display, ColourSpace);
+    if (!glxsurface)
+        return nullptr;
+
+    // Set deinterlacing
+    uint flags = VA_FRAME_PICTURE;
+    if (Scan == kScan_Interlaced)
+        flags = Frame->top_field_first ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
+    else if (Scan == kScan_Intr2ndField)
+        flags = Frame->top_field_first ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
+
+    // Update colourspace
+    if (!m_vaapiColourSpace)
+    {
+        switch (Frame->colorspace)
+        {
+            case AVCOL_SPC_BT709:     m_vaapiColourSpace = VA_SRC_BT709; break;
+            case AVCOL_SPC_SMPTE170M:
+            case AVCOL_SPC_BT470BG:   m_vaapiColourSpace = VA_SRC_BT601; break;
+            case AVCOL_SPC_SMPTE240M: m_vaapiColourSpace = VA_SRC_SMPTE_240; break;
+            default:
+            m_vaapiColourSpace = ((Frame->width < 1280) ? VA_SRC_BT601 : VA_SRC_BT709); break;
+        }
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using '%1' VAAPI colourspace")
+            .arg((m_vaapiColourSpace == VA_SRC_BT709) ? "bt709" : ((m_vaapiColourSpace == VA_SRC_BT601) ? "bt601" : "smpte240")));
+    }
+
+    if (m_vaapiColourSpace)
+        flags |= m_vaapiColourSpace;
+
+    // Copy surface to texture
+    if (glxsurface->m_data)
+    {
+        INIT_ST;
+        va_status = vaCopySurfaceGLX(display->m_vaDisplay, glxsurface->m_data, id, flags);
+        CHECK_ST;
+    }
+    return glxsurface;
+}
+
+void MythOpenGLInterop::InitVAAPIPictureAttributes(void)
 {
     m_vaapiColourSpace = 0;
-    if (!m_colourSpace || !m_glxSurfaceDisplay)
+    if (!m_colourSpace || !m_vaapiDisplay)
         return;
-    if (!(m_glxSurfaceDisplay->m_vaDisplay && m_glxSurfaceDisplay->m_context))
+    if (!(m_vaapiDisplay->m_vaDisplay && m_vaapiDisplay->m_context))
         return;
 
-    m_hueBase = VideoOutput::CalcHueBase(vaQueryVendorString(m_glxSurfaceDisplay->m_vaDisplay));
+    m_vaapiHueBase = VideoOutput::CalcHueBase(vaQueryVendorString(m_vaapiDisplay->m_vaDisplay));
 
-    delete [] m_pictureAttributes;
-    m_pictureAttributeCount = 0;
+    delete [] m_vaapiPictureAttributes;
+    m_vaapiPictureAttributeCount = 0;
     int supported_controls = kPictureAttributeSupported_None;
     QList<VADisplayAttribute> supported;
-    int num = vaMaxNumDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay);
+    int num = vaMaxNumDisplayAttributes(m_vaapiDisplay->m_vaDisplay);
     VADisplayAttribute* attribs = new VADisplayAttribute[num];
 
     int actual = 0;
     INIT_ST;
-    va_status = vaQueryDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay, attribs, &actual);
+    va_status = vaQueryDisplayAttributes(m_vaapiDisplay->m_vaDisplay, attribs, &actual);
     CHECK_ST;
 
     int updatecscmatrix = -1;
@@ -124,10 +233,10 @@ void MythOpenGLInterop::InitPictureAttributes(void)
     if (supported.isEmpty())
         return;
 
-    m_pictureAttributeCount = supported.size();
-    m_pictureAttributes = new VADisplayAttribute[m_pictureAttributeCount];
-    for (int i = 0; i < m_pictureAttributeCount; i++)
-        m_pictureAttributes[i] = supported.at(i);
+    m_vaapiPictureAttributeCount = supported.size();
+    m_vaapiPictureAttributes = new VADisplayAttribute[m_vaapiPictureAttributeCount];
+    for (int i = 0; i < m_vaapiPictureAttributeCount; i++)
+        m_vaapiPictureAttributes[i] = supported.at(i);
 
     if (supported_controls & kPictureAttributeSupported_Brightness)
         SetPictureAttribute(kPictureAttribute_Brightness, m_colourSpace->GetPictureAttribute(kPictureAttribute_Brightness));
@@ -149,13 +258,13 @@ void MythOpenGLInterop::InitPictureAttributes(void)
         raw[0] = yuv(0, 0); raw[1] = yuv(0, 1); raw[2] = yuv(0, 2);
         raw[3] = yuv(1, 0); raw[4] = yuv(1, 1); raw[5] = yuv(1, 2);
         raw[6] = yuv(2, 0); raw[7] = yuv(2, 1); raw[8] = yuv(2, 2);
-        m_pictureAttributes[updatecscmatrix].value = static_cast<int32_t>(raw[0]);
-        m_glxSurfaceDisplay->m_context->makeCurrent();
+        m_vaapiPictureAttributes[updatecscmatrix].value = static_cast<int32_t>(raw[0]);
+        m_vaapiDisplay->m_context->makeCurrent();
         INIT_ST;
-        va_status = vaSetDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay, &m_pictureAttributes[updatecscmatrix], 1);
+        va_status = vaSetDisplayAttributes(m_vaapiDisplay->m_vaDisplay, &m_vaapiPictureAttributes[updatecscmatrix], 1);
         CHECK_ST;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Updated VAAPI colourspace matrix");
-        m_glxSurfaceDisplay->m_context->doneCurrent();
+        m_vaapiDisplay->m_context->doneCurrent();
         m_vaapiColourSpace = VA_SRC_COLOR_MASK;
     }
     else
@@ -164,10 +273,9 @@ void MythOpenGLInterop::InitPictureAttributes(void)
     }
 }
 
-int MythOpenGLInterop::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
+int MythOpenGLInterop::SetVAAPIPictureAttribute(PictureAttribute Attribute, int NewValue)
 {
-    if (!m_glxSurfaceDisplay ||
-       (m_glxSurfaceDisplay && !(m_glxSurfaceDisplay->m_vaDisplay && m_glxSurfaceDisplay->m_context)))
+    if (!m_vaapiDisplay || (m_vaapiDisplay && !(m_vaapiDisplay->m_vaDisplay && m_vaapiDisplay->m_context)))
         return -1;
 
     int adjustment = 0;
@@ -182,7 +290,7 @@ int MythOpenGLInterop::SetPictureAttribute(PictureAttribute Attribute, int NewVa
             break;
         case kPictureAttribute_Hue:
             attrib = VADisplayAttribHue;
-            adjustment = m_hueBase;
+            adjustment = m_vaapiHueBase;
             break;
         case kPictureAttribute_Colour:
             attrib = VADisplayAttribSaturation;
@@ -192,16 +300,16 @@ int MythOpenGLInterop::SetPictureAttribute(PictureAttribute Attribute, int NewVa
     }
 
     bool found = false;
-    for (int i = 0; i < m_pictureAttributeCount; i++)
+    for (int i = 0; i < m_vaapiPictureAttributeCount; i++)
     {
-        if (m_pictureAttributes[i].type == attrib)
+        if (m_vaapiPictureAttributes[i].type == attrib)
         {
             NewValue = std::min(std::max(NewValue, 0), 100);
             int newval = NewValue + adjustment;
             if (newval > 100) newval -= 100;
-            qreal range = (m_pictureAttributes[i].max_value - m_pictureAttributes[i].min_value) / 100.0;
-            int val = m_pictureAttributes[i].min_value + qRound(newval * range);
-            m_pictureAttributes[i].value = val;
+            qreal range = (m_vaapiPictureAttributes[i].max_value - m_vaapiPictureAttributes[i].min_value) / 100.0;
+            int val = m_vaapiPictureAttributes[i].min_value + qRound(newval * range);
+            m_vaapiPictureAttributes[i].value = val;
             found = true;
             break;
         }
@@ -210,132 +318,74 @@ int MythOpenGLInterop::SetPictureAttribute(PictureAttribute Attribute, int NewVa
 
     if (found)
     {
-        m_glxSurfaceDisplay->m_context->makeCurrent();
+        m_vaapiDisplay->m_context->makeCurrent();
         INIT_ST;
-        va_status = vaSetDisplayAttributes(m_glxSurfaceDisplay->m_vaDisplay,
-                                           m_pictureAttributes,
-                                           m_pictureAttributeCount);
+        va_status = vaSetDisplayAttributes(m_vaapiDisplay->m_vaDisplay,
+                                           m_vaapiPictureAttributes,
+                                           m_vaapiPictureAttributeCount);
         CHECK_ST;
-        m_glxSurfaceDisplay->m_context->doneCurrent();
+        m_vaapiDisplay->m_context->doneCurrent();
         return NewValue;
     }
     return -1;
 }
 
-bool MythOpenGLInterop::CopySurfaceToTexture(MythRenderOpenGL *Context,
-                                        VideoColourSpace *ColourSpace,
-                                        VideoFrame *Frame, uint Texture,
-                                        uint TextureType, FrameScanType Scan)
+MythGLTexture* MythOpenGLInterop::GetVAAPIGLXSurface(VideoFrame *Frame,
+                                                     MythVAAPIDisplay *Display,
+                                                     VideoColourSpace *ColourSpace)
 {
-    if (!Frame)
-        return false;
-
-    if ((Frame->pix_fmt != AV_PIX_FMT_VAAPI) || (Frame->codec != FMT_VAAPI) ||
-        !Frame->buf || !Frame->priv[1])
-        return false;
-
-    AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-    if (!buffer || (buffer && !buffer->data))
-        return false;
-    AVHWFramesContext* vaapiframes = reinterpret_cast<AVHWFramesContext*>(buffer->data);
-    if (!vaapiframes || (vaapiframes && !vaapiframes->user_opaque))
-        return false;
-    MythVAAPIDisplay* display = reinterpret_cast<MythVAAPIDisplay*>(vaapiframes->user_opaque);
-    if (!display || (display && !(display->m_context && display->m_vaDisplay)))
-        return false;
-
-    if (Context != display->m_context)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Mismatched OpenGL contexts");
-        return false;
-    }
-
-    OpenGLLocker locker(display->m_context);
-
-    VASurfaceID id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
-    void* glx_surface = GetGLXSurface(Texture, TextureType, Frame, display, ColourSpace);
-    if (!glx_surface)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "No GLX surface");
-        return false;
-    }
-
-    uint flags = VA_FRAME_PICTURE;
-    if (Scan == kScan_Interlaced)
-        flags = Frame->top_field_first ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
-    else if (Scan == kScan_Intr2ndField)
-        flags = Frame->top_field_first ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
-
-    if (!m_vaapiColourSpace)
-    {
-        switch (Frame->colorspace)
-        {
-            case AVCOL_SPC_BT709:     m_vaapiColourSpace = VA_SRC_BT709; break;
-            case AVCOL_SPC_SMPTE170M:
-            case AVCOL_SPC_BT470BG:   m_vaapiColourSpace = VA_SRC_BT601; break;
-            case AVCOL_SPC_SMPTE240M: m_vaapiColourSpace = VA_SRC_SMPTE_240; break;
-            default:
-            m_vaapiColourSpace = ((Frame->width < 1280) ? VA_SRC_BT601 : VA_SRC_BT709); break;
-        }
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using '%1' VAAPI colourspace")
-            .arg((m_vaapiColourSpace == VA_SRC_BT709) ? "bt709" : ((m_vaapiColourSpace == VA_SRC_BT601) ? "bt601" : "smpte240")));
-    }
-
-    if (m_vaapiColourSpace)
-        flags |= m_vaapiColourSpace;
-
-    INIT_ST;
-    va_status = vaCopySurfaceGLX(display->m_vaDisplay, glx_surface, id, flags);
-    CHECK_ST;
-    return true;
-}
-
-void* MythOpenGLInterop::GetGLXSurface(uint Texture, uint TextureType, VideoFrame *Frame,
-                                  MythVAAPIDisplay *Display, VideoColourSpace *ColourSpace)
-{
-    if (!Frame)
-        return nullptr;
+    // return any cached texture
     QSize surfacesize(Frame->width, Frame->height);
-    if (m_glxSurface && (m_glxSurfaceSize == surfacesize) &&
-       (m_glxSurfaceTexture == Texture) && (m_glxSurfaceTextureType == TextureType) &&
-       (m_glxSurfaceDisplay == Display))
+    if (m_glTexture && (m_glTextureFormat == FMT_VAAPI) &&
+       (m_glTexture->m_totalSize == surfacesize) && m_glTexture->m_data)
     {
-        return m_glxSurface;
+        return m_glTexture;
     }
 
-    DeleteGLXSurface();
+    // need new - delete old
+    DeleteVAAPIGLXSurface();
 
+    // create a texture
+    MythGLTexture *texture = Display->m_context->CreateTexture(surfacesize);
+    if (!texture)
+        return nullptr;
+
+    // create an associated GLX surface
     void *glxsurface = nullptr;
     INIT_ST;
-    va_status = vaCreateSurfaceGLX(Display->m_vaDisplay, TextureType, Texture, &glxsurface);
+    va_status = vaCreateSurfaceGLX(Display->m_vaDisplay, texture->m_texture->target(),
+                                   texture->m_texture->textureId(), &glxsurface);
     CHECK_ST;
     if (!glxsurface)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX surface.");
+        Display->m_context->DeleteTexture(texture);
         return nullptr;
     }
 
-    m_glxSurface            = glxsurface;
-    m_glxSurfaceSize        = surfacesize;
-    m_glxSurfaceTexture     = Texture;
-    m_glxSurfaceTextureType = TextureType;
-    m_glxSurfaceDisplay     = Display;
-    m_glxSurfaceDisplay->IncrRef();
+    texture->m_data = static_cast<unsigned char*>(glxsurface);
+    m_glTexture = texture;
+    m_glTextureFormat = FMT_VAAPI;
+
+    // Set display and colourspace
+    m_vaapiDisplay = Display;
+    m_vaapiDisplay->IncrRef();
 
     if (ColourSpace)
     {
         ColourSpace->UpdateColourSpace(Frame);
         m_colourSpace = ColourSpace;
         m_colourSpace->IncrRef();
-        InitPictureAttributes();
+        InitVAAPIPictureAttributes();
     }
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Created GLX surface");
-    return m_glxSurface;
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Created VAAPI GLX surface");
+    return m_glTexture;
 }
 
-void MythOpenGLInterop::DeleteGLXSurface(void)
+void MythOpenGLInterop::DeleteVAAPIGLXSurface(void)
 {
+    // cleanup up VAAPI colourspace
     if (m_colourSpace)
     {
         m_colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
@@ -343,24 +393,40 @@ void MythOpenGLInterop::DeleteGLXSurface(void)
     }
     m_colourSpace = nullptr;
 
-    if (!m_glxSurface || !m_glxSurfaceDisplay)
+    if (!m_vaapiDisplay)
         return;
 
-    if (m_glxSurfaceDisplay && m_glxSurfaceDisplay->m_context)
-        m_glxSurfaceDisplay->m_context->makeCurrent();
+    // warn against misuse
+    if (m_glTextureFormat != FMT_VAAPI)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Deleting a non VAAPI surface");
 
-    INIT_ST;
-    va_status = vaDestroySurfaceGLX(m_glxSurfaceDisplay->m_vaDisplay, m_glxSurface);
-    CHECK_ST;
+    // cleanup texture and associated GLX surface
+    if (m_vaapiDisplay->m_context)
+        m_vaapiDisplay->m_context->makeCurrent();
 
-    m_glxSurface            = nullptr;
-    m_glxSurfaceSize        = QSize();
-    m_glxSurfaceTexture     = 0;
-    m_glxSurfaceTextureType = 0;
-    if (m_glxSurfaceDisplay && m_glxSurfaceDisplay->m_context)
-        m_glxSurfaceDisplay->m_context->doneCurrent();
+    if (m_glTexture)
+    {
+        if (m_glTexture->m_data && m_vaapiDisplay->m_vaDisplay)
+        {
+            INIT_ST;
+            va_status = vaDestroySurfaceGLX(m_vaapiDisplay->m_vaDisplay, static_cast<void*>(m_glTexture->m_data));
+            CHECK_ST;
+        }
+        m_glTexture->m_data = nullptr;
+        if (m_vaapiDisplay->m_context)
+            m_vaapiDisplay->m_context->DeleteTexture(m_glTexture);
+        m_glTexture = nullptr;
+    }
 
-    m_glxSurfaceDisplay->DecrRef();
-    m_glxSurfaceDisplay = nullptr;
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Destroyed GLX surface");
+    // release display
+    if (m_vaapiDisplay->m_context)
+        m_vaapiDisplay->m_context->doneCurrent();
+    m_vaapiDisplay->DecrRef();
+    m_vaapiDisplay = nullptr;
+
+    // reset texture type
+    m_glTextureFormat = 0;
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Destroyed VAAPI GLX texture");
 }
+#endif // USING_GLVAAPI

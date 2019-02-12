@@ -10,9 +10,7 @@
 #include "mythrender_opengl.h"
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
-#ifdef USING_GLVAAPI
 #include "mythopenglinterop.h"
-#endif
 #include "videoout_opengl.h"
 
 #define LOC QString("VidOutGL: ")
@@ -101,9 +99,6 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     m_openGLPainter(nullptr),
     m_videoProfile(Profile),
     m_openGLVideoType(OpenGLVideo::StringToType(Profile))
-#ifdef USING_GLVAAPI
-    ,m_openglInterop()
-#endif
 {
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -246,12 +241,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDi
     }
 
     // fail fast if we don't know how to display the codec
-    bool supported = true;
-#ifdef USING_GLVAAPI
-    supported = MythOpenGLInterop::IsCodecSupported(CodecId);
-#endif
-
-    if (!codec_sw_copy(CodecId) && !supported)
+    if (!(codec_sw_copy(CodecId) || MythOpenGLInterop::IsCodecSupported(CodecId)))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
         errorState = kError_Unknown;
@@ -393,19 +383,18 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     {
         vbuffers.Init(8, false, 1, 4, 2, 1);
     }
-#ifdef USING_GLVAAPI
     else if (codec_is_vaapi(video_codec_id))
     {
-        vbuffers.Init(NUM_VAAPI_BUFFERS, false, 2, 1, 4, 1);
+        uint size = VideoBuffers::GetNumBuffers(FMT_VAAPI);
+        vbuffers.Init(size, false, 2, 1, 4, 1);
         bool success = true;
-        for (uint i = 0; i < NUM_VAAPI_BUFFERS; i++)
+        for (uint i = 0; i < size; i++)
             success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VAAPI);
         return success;
     }
-#endif
     else
     {
-        vbuffers.Init(31, false, 1, 12, 4, 2);
+        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), false, 1, 12, 4, 2);
     }
 
     return vbuffers.CreateBuffers(FMT_YV12, window.GetVideoDim().width(), window.GetVideoDim().height());
@@ -510,19 +499,10 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // video
     if (m_openGLVideo && !dummy)
     {
-#ifdef USING_GLVAAPI
-        if (codec_is_vaapi(video_codec_id))
-        {
-            MythGLTexture *texture = m_openGLVideo->GetInputTexture();
-            GLuint textureid = texture->m_texture ? texture->m_texture->textureId() : texture->m_textureId;
-            m_openglInterop.CopySurfaceToTexture(m_render, &videoColourSpace,
-                                                 Frame, textureid, QOpenGLTexture::Target2D, Scan);
-        }
-#endif
         m_openGLVideo->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
-        m_openGLVideo->PrepareFrame(topfieldfirst, Scan, m_stereo);
+        m_openGLVideo->PrepareFrame(Frame, topfieldfirst, Scan, m_stereo);
     }
 
     // PiPs/PBPs
@@ -536,11 +516,11 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
                 bool active = m_openGLVideoPiPActive == *it;
                 if (twopass)
                     m_render->SetViewPort(first, true);
-                (*it)->PrepareFrame(topfieldfirst, Scan, kStereoscopicModeNone, active);
+                (*it)->PrepareFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeNone, active);
                 if (twopass)
                 {
                     m_render->SetViewPort(second, true);
-                    (*it)->PrepareFrame(topfieldfirst, Scan, kStereoscopicModeNone, active);
+                    (*it)->PrepareFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeNone, active);
                     m_render->SetViewPort(main);
                 }
             }
@@ -614,14 +594,7 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
         return allowed;
     }
 
-#ifdef USING_GLVAAPI
-    if (MythOpenGLInterop::IsCodecSupported(CodecId))
-    {
-        allowed += "openglvaapi";
-        return allowed;
-    }
-#endif
-
+    allowed += MythOpenGLInterop::GetAllowedRenderers(CodecId);
     return allowed;
 }
 
@@ -669,15 +642,9 @@ void VideoOutputOpenGL::InitPictureAttributes(void)
 
 int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute Attribute, int Value)
 {
-#ifdef USING_GLVAAPI
-    if (codec_is_vaapi(video_codec_id))
-    {
-        int val = Value;
-        val = m_openglInterop.SetPictureAttribute(Attribute, Value);
-        if (val < 0)
-            return -1;
-    }
-#endif
+    int val = m_openGLVideo->SetPictureAttribute(Attribute, Value);
+    if (val < 0)
+        return val;
     return VideoOutput::SetPictureAttribute(Attribute, Value);
 }
 

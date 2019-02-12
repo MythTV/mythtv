@@ -30,8 +30,6 @@ const int kPrebufferFramesNormal = 10;
 const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
-#define NUM_DXVA2_BUFS 30
-
 #define LOC      QString("VideoOutputD3D: ")
 
 void VideoOutputD3D::GetRenderOptions(render_opts &opts,
@@ -269,13 +267,13 @@ bool VideoOutputD3D::CreateBuffers(void)
 {
     if (codec_is_dxva2(video_codec_id))
     {
-        vbuffers.Init(NUM_DXVA2_BUFS, false, 2, 1, 4, 1);
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Created %1 empty DXVA2 buffers.") .arg(NUM_DXVA2_BUFS));
+        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_DXVA2), false, 2, 1, 4, 1);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 empty DXVA2 buffers.")
+            .arg(VideoBuffers::GetNumBuffers(FMT_DXVA2)));
         return true;
     }
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+    vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
     return true;

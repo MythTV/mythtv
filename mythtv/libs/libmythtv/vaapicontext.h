@@ -22,8 +22,6 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#define NUM_VAAPI_BUFFERS 24
-
 class MythVAAPIDisplay : public ReferenceCounter
 {
   public:

@@ -10,6 +10,7 @@
 #include "mythframe.h"
 #include "mythrender_opengl.h"
 #include "mythopenglinterop.h"
+#include "videobuffers.h"
 #include "vaapicontext.h"
 
 extern "C" {
@@ -370,7 +371,7 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
     // Set the callback to ensure it is released
     AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     hw_frames_ctx->sw_format         = Context->sw_pix_fmt;
-    hw_frames_ctx->initial_pool_size = NUM_VAAPI_BUFFERS;
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
