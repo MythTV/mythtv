@@ -411,8 +411,6 @@ void LoggerThread::handleItem(LoggingItem *item)
 /// \param item LoggingItem containing the log message to process
 bool LoggerThread::logConsole(LoggingItem *item)
 {
-    char                line[MAX_STRING_LENGTH];
-
     if (m_quiet || (m_progress && item->m_level > LOG_ERR))
         return false;
 
@@ -422,6 +420,8 @@ bool LoggerThread::logConsole(LoggingItem *item)
     item->IncrRef();
 
 #ifndef Q_OS_ANDROID
+    char                line[MAX_STRING_LENGTH];
+
     if (item->m_type & kStandardIO)
         snprintf( line, MAX_STRING_LENGTH, "%s", item->m_message );
     else

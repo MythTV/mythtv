@@ -225,6 +225,7 @@ QString MythDisplay::GetExtraScreenInfo(QScreen *qscreen)
         model = "unknown";
     return QString("(%1 %2)").arg(mfg).arg(model);
 #else
+    Q_UNUSED(qscreen);
     return QString();
 #endif
 }
