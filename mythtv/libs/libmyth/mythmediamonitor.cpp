@@ -35,7 +35,7 @@ using namespace std;
 
 static const QString _Location = QObject::tr("Media Monitor");
 
-MediaMonitor *MediaMonitor::c_monitor = nullptr;
+MediaMonitor *MediaMonitor::s_monitor = nullptr;
 
 // MonitorThread
 MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
@@ -83,20 +83,20 @@ void MonitorThread::run(void)
 
 MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 {
-    if (c_monitor)
-        return c_monitor;
+    if (s_monitor)
+        return s_monitor;
 
 #ifdef USING_DARWIN_DA
-    c_monitor = new MediaMonitorDarwin(nullptr, MONITOR_INTERVAL, true);
+    s_monitor = new MediaMonitorDarwin(nullptr, MONITOR_INTERVAL, true);
 #else
   #if CONFIG_CYGWIN || defined(_WIN32)
-    c_monitor = new MediaMonitorWindows(nullptr, MONITOR_INTERVAL, true);
+    s_monitor = new MediaMonitorWindows(nullptr, MONITOR_INTERVAL, true);
   #else
-    c_monitor = new MediaMonitorUnix(nullptr, MONITOR_INTERVAL, true);
+    s_monitor = new MediaMonitorUnix(nullptr, MONITOR_INTERVAL, true);
   #endif
 #endif
 
-    return c_monitor;
+    return s_monitor;
 }
 
 void MediaMonitor::SetCDSpeed(const char *device, int speed)
@@ -347,7 +347,6 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
                            bool allowEject)
     : QObject(par), m_DevicesLock(QMutex::Recursive),
-      m_Active(false), m_Thread(nullptr),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
     // User can specify that some devices are not monitored
@@ -574,13 +573,13 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
 {
     QString mountPath;
 
-    if (c_monitor)
+    if (s_monitor)
     {
-        MythMediaDevice *pMedia = c_monitor->GetMedia(devPath);
-        if (pMedia && c_monitor->ValidateAndLock(pMedia))
+        MythMediaDevice *pMedia = s_monitor->GetMedia(devPath);
+        if (pMedia && s_monitor->ValidateAndLock(pMedia))
         {
             mountPath = pMedia->getMountPath();
-            c_monitor->Unlock(pMedia);
+            s_monitor->Unlock(pMedia);
         }
         // The media monitor could be inactive.
         // Create a fake media device just to lookup mount map:
@@ -869,12 +868,12 @@ QString MediaMonitor::defaultDevice(const QString &dbSetting,
     {
         device = hardCodedDefault;
 
-        if (!c_monitor)
-            c_monitor = GetMediaMonitor();
+        if (!s_monitor)
+            s_monitor = GetMediaMonitor();
 
-        if (c_monitor)
+        if (s_monitor)
         {
-            MythMediaDevice *d = c_monitor->selectDrivePopup(label, false, true);
+            MythMediaDevice *d = s_monitor->selectDrivePopup(label, false, true);
 
             if (d == (MythMediaDevice *) -1)    // User cancelled
             {
@@ -882,10 +881,10 @@ QString MediaMonitor::defaultDevice(const QString &dbSetting,
                 d = nullptr;
             }
 
-            if (d && c_monitor->ValidateAndLock(d))
+            if (d && s_monitor->ValidateAndLock(d))
             {
                 device = d->getDevicePath();
-                c_monitor->Unlock(d);
+                s_monitor->Unlock(d);
             }
         }
     }

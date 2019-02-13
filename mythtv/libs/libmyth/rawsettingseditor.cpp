@@ -19,13 +19,7 @@
   */
 RawSettingsEditor::RawSettingsEditor(MythScreenStack *parent, const char *name)
   : MythScreenType(parent, name),
-    m_title(tr("Settings Editor")),
-    // Settings widgets
-    m_settingsList(nullptr),   m_settingValue(nullptr),
-    // Action buttons
-    m_saveButton(nullptr),     m_cancelButton(nullptr),
-    // Labels
-    m_textLabel(nullptr)
+    m_title(tr("Settings Editor"))
 {
 }
 

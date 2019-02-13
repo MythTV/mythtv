@@ -87,15 +87,15 @@ class MPUBLIC RSSSite : public QObject
     bool        m_download;
     QDateTime   m_updated;
 
-    mutable    QMutex m_lock;
+    mutable    QMutex m_lock          {QMutex::Recursive};
     QByteArray m_data;
     QString    m_imageURL;
-    bool       m_podcast;
+    bool       m_podcast              {false};
 
     ResultItem::resultList m_articleList;
 
-    QNetworkReply          *m_reply;
-    QNetworkAccessManager  *m_manager;
+    QNetworkReply          *m_reply   {nullptr};
+    QNetworkAccessManager  *m_manager {nullptr};
 
   private slots:
     void slotCheckRedirect(QNetworkReply* reply);
@@ -129,9 +129,9 @@ class MPUBLIC RSSManager : public QObject
   private:
     void processAndInsertRSS(RSSSite *site);
 
-    QTimer                        *m_timer;
+    QTimer                        *m_timer      {nullptr};
     RSSSite::rssList               m_sites;
-    uint                           m_updateFreq;
+    uint                           m_updateFreq {6 * 3600 * 1000};
     RSSSite::rssList               m_inprogress;
 };
 
