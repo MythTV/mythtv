@@ -1675,7 +1675,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             {
                 if (proginfo)
                 {
-                    proginfo->spread++;
+                    proginfo->m_spread++;
                     proginfo->SetScheduledEndTime(proginfo->GetScheduledEndTime().addSecs(5 * 60));
                 }
             }
@@ -1685,8 +1685,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                                            GuideGrid::tr("Unknown", "Unknown program title"),
                                            ts, ts.addSecs(5*60));
                 unknownlist.push_back(proginfo);
-                proginfo->startCol = x;
-                proginfo->spread = 1;
+                proginfo->m_startCol = x;
+                proginfo->m_spread = 1;
                 unknown = true;
             }
         }
@@ -1694,15 +1694,15 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
         {
             if (proginfo && proginfo == *program)
             {
-                proginfo->spread++;
+                proginfo->m_spread++;
             }
             else
             {
                 proginfo = *program;
                 if (proginfo)
                 {
-                    proginfo->startCol = x;
-                    proginfo->spread = 1;
+                    proginfo->m_startCol = x;
+                    proginfo->m_spread = 1;
                     unknown = false;
                 }
             }
@@ -1757,9 +1757,9 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             if (pginfo->GetScheduledEndTime() > m_lastTime.addSecs(2100))
                 arrow |= GridTimeEndsAfter;
 
-            if (pginfo->spread != -1)
+            if (pginfo->m_spread != -1)
             {
-                spread = pginfo->spread;
+                spread = pginfo->m_spread;
             }
             else
             {
@@ -1770,16 +1770,16 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                                  pginfo->GetScheduledStartTime()))
                         spread++;
                 }
-                pginfo->spread = spread;
-                pginfo->startCol = x;
+                pginfo->m_spread = spread;
+                pginfo->m_startCol = x;
 
                 for (int z = x + 1; z < x + spread; ++z)
                 {
                     ProgramInfo *test = m_programInfos[row][z];
                     if (test)
                     {
-                        test->spread = spread;
-                        test->startCol = x;
+                        test->m_spread = spread;
+                        test->m_startCol = x;
                     }
                 }
             }
@@ -1789,13 +1789,13 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                 tempRect = QRect((int)(row * ydifference),
                                  (int)(x * xdifference),
                                  (int)(ydifference),
-                                 (int)(xdifference * pginfo->spread));
+                                 (int)(xdifference * pginfo->m_spread));
             }
             else
             {
                 tempRect = QRect((int)(x * xdifference),
                                  (int)(row * ydifference),
-                                 (int)(xdifference * pginfo->spread),
+                                 (int)(xdifference * pginfo->m_spread),
                                  (int)ydifference);
             }
 
@@ -2373,7 +2373,7 @@ void GuideGrid::cursorLeft()
         return;
     }
 
-    int startCol = test->startCol;
+    int startCol = test->m_startCol;
     m_currentCol = startCol - 1;
 
     if (m_currentCol < 0)
@@ -2397,8 +2397,8 @@ void GuideGrid::cursorRight()
         return;
     }
 
-    int spread = test->spread;
-    int startCol = test->startCol;
+    int spread = test->m_spread;
+    int startCol = test->m_startCol;
 
     m_currentCol = startCol + spread;
 
