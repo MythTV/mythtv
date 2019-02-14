@@ -38,8 +38,8 @@ class DVBRecorder : public DTVRecorder
     void UpdateCAMTimeOffset(void) override; // DTVRecorder
 
   private:
-    DVBChannel       *_channel;
-    DVBStreamHandler *_stream_handler;
+    DVBChannel       *m_channel        {nullptr};
+    DVBStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif // _DVB_RECORDER_H_

@@ -11,7 +11,6 @@ using namespace std;
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "mpegrecorder.h"
-#include "v4l2encrecorder.h"
 #include "recorderbase.h"
 #include "cetonchannel.h"
 #include "asirecorder.h"
@@ -25,7 +24,6 @@ using namespace std;
 #include "asichannel.h"
 #include "dtvchannel.h"
 #include "dvbchannel.h"
-#include "v4lchannel.h"
 #include "ExternalChannel.h"
 #include "ringbuffer.h"
 #include "cardutil.h"
@@ -33,6 +31,10 @@ using namespace std;
 #include "mythdate.h"
 #if CONFIG_LIBMP3LAME
 #include "NuppelVideoRecorder.h"
+#endif
+#if CONFIG_V4L2
+#include "v4l2encrecorder.h"
+#include "v4lchannel.h"
 #endif
 
 #define TVREC_CARDNUM \

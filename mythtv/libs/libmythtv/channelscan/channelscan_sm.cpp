@@ -964,14 +964,14 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                     .arg((*m_current).tuning.toString()).arg(m_current.offset()));
 
             TransportScanItem &item = *m_current;
-            item.tuning.frequency = item.freq_offset(m_current.offset());
+            item.tuning.m_frequency = item.freq_offset(m_current.offset());
 
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
             {
                 if (m_dvbt2Tried)
-                    item.tuning.mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
+                    item.tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
                 else
-                    item.tuning.mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+                    item.tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
             }
 
             m_channelList << ChannelListItem(m_current, m_currentInfo);
@@ -1214,9 +1214,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     const DTVChannelInfoList &echan = (*trans_info).expectedChannels;
     for (uint i = 0; i < echan.size(); ++i)
     {
-        uint pnum = echan[i].serviceid;
+        uint pnum = echan[i].m_serviceid;
         PCM_INFO_INIT("mpeg");
-        info.service_name = echan[i].name;
+        info.service_name = echan[i].m_name;
         info.in_channels_conf = true;
     }
 
@@ -1449,16 +1449,16 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
             GetChannelList(it->first, it->second);
 
         ScanDTVTransport item((*it->first).tuning, tuner_type, cardid);
-        item.iptv_tuning = (*(it->first)).iptv_tuning;
+        item.m_iptv_tuning = (*(it->first)).iptv_tuning;
 
         QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
         for (dbchan_it = pnum_to_dbchan.begin();
              dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
         {
-            item.channels.push_back(*dbchan_it);
+            item.m_channels.push_back(*dbchan_it);
         }
 
-        if (item.channels.size())
+        if (item.m_channels.size())
         {
             if (addFullTS)
             {
@@ -1489,7 +1489,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 info.service_id = 0;
                 info.atsc_minor_channel = 0;
                 info.format = "MPTS";
-                item.channels.push_back(info);
+                item.m_channels.push_back(info);
             }
 
             list.push_back(item);
@@ -1774,19 +1774,19 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     if (item.mplexid > 0 && transport.offset() == 0)
         return GetDTVChannel()->TuneMultiplex(item.mplexid, m_inputName);
 
-    if (item.tuning.sistandard == "MPEG")
+    if (item.tuning.m_sistandard == "MPEG")
         return GetDTVChannel()->Tune(item.iptv_tuning, true);
 
     const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.tuning;
-    tuning.frequency = freq;
+    tuning.m_frequency = freq;
 
     if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
     {
         if (m_dvbt2Tried)
-            tuning.mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
+            tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
         else
-            tuning.mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+            tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
     }
 
     return GetDTVChannel()->Tune(tuning);
@@ -1841,7 +1841,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
     m_signalMonitor->Start();
 
     m_timer.start();
-    m_waitingForTables = (item.tuning.sistandard != "analog");
+    m_waitingForTables = (item.tuning.m_sistandard != "analog");
 }
 
 /** \fn ChannelScanSM::StopScanner(void)
@@ -1967,7 +1967,7 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
     for (uint i = 0; it != channels.end(); ++it, ++i)
     {
         DTVTransport tmp = *it;
-        tmp.sistandard = std;
+        tmp.m_sistandard = std;
         TransportScanItem item(sourceid, QString::number(i),
                                tunertype, tmp, m_signalTimeout);
 
@@ -2071,7 +2071,7 @@ bool ChannelScanSM::ScanTransportsStartingOn(
 
     if (ok)
     {
-        tuning.sistandard = si_std;
+        tuning.m_sistandard = si_std;
         TransportScanItem item(
             sourceid, QObject::tr("Frequency %1").arg(startChan["frequency"]),
             tuning, m_signalTimeout);
@@ -2214,16 +2214,16 @@ bool ChannelScanSM::CheckImportedList(
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("comparing %1 %2 against %3 %4")
-                .arg(channels[i].serviceid).arg(channels[i].name)
+                .arg(channels[i].m_serviceid).arg(channels[i].m_name)
                 .arg(mpeg_program_num).arg(common_status_info));
 
-        if (channels[i].serviceid == mpeg_program_num)
+        if (channels[i].m_serviceid == mpeg_program_num)
         {
             found = true;
-            if (!channels[i].name.isEmpty())
+            if (!channels[i].m_name.isEmpty())
             {
-                service_name = channels[i].name;
-                callsign     = channels[i].name;
+                service_name = channels[i].m_name;
+                callsign     = channels[i].m_name;
             }
         }
     }

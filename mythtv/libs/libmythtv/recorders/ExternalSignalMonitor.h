@@ -37,9 +37,9 @@ class ExternalSignalMonitor: public DTVSignalMonitor
 //        { m_stream_handler->AddListener(data); }
 
   protected:
-    ExternalStreamHandler *m_stream_handler;
-    bool              m_stream_handler_started;
-    int               m_lock_timeout;
+    ExternalStreamHandler *m_stream_handler         {nullptr};
+    bool                   m_stream_handler_started {false};
+    int                    m_lock_timeout           {0};
 };
 
 #endif // EXTERNALSIGNALMONITOR_H

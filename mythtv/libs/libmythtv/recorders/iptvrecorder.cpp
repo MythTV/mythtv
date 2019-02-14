@@ -43,10 +43,10 @@ bool IPTVRecorder::Open(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
-    if (_stream_data)
-        m_channel->SetStreamData(_stream_data);
+    if (m_stream_data)
+        m_channel->SetStreamData(m_stream_data);
 
-    return _stream_data;
+    return m_stream_data;
 }
 
 bool IPTVRecorder::IsOpen(void) const
@@ -67,7 +67,7 @@ void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
     DTVRecorder::SetStreamData(data);
     if (IsOpen() && !IsPaused())
-        m_channel->SetStreamData(_stream_data);
+        m_channel->SetStreamData(m_stream_data);
 }
 
 bool IPTVRecorder::PauseAndWait(int timeout)
@@ -89,7 +89,7 @@ bool IPTVRecorder::PauseAndWait(int timeout)
 
     if (!request_pause && IsPaused(true))
     {
-        m_channel->SetStreamData(_stream_data);
+        m_channel->SetStreamData(m_stream_data);
         paused = false;
         unpauseWait.wakeAll();
     }
@@ -100,8 +100,8 @@ bool IPTVRecorder::PauseAndWait(int timeout)
 void IPTVRecorder::StartNewFile(void)
 {
     // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+    HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+    HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
 }
 
 void IPTVRecorder::run(void)
@@ -110,8 +110,8 @@ void IPTVRecorder::run(void)
 
     if (!Open())
     {
-        _error = "Failed to open IPTVRecorder device";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "Failed to open IPTVRecorder device";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         return;
     }
 
@@ -124,8 +124,8 @@ void IPTVRecorder::run(void)
 
     StartNewFile();
 
-    _stream_data->AddAVListener(this);
-    _stream_data->AddWritingListener(this);
+    m_stream_data->AddAVListener(this);
+    m_stream_data->AddWritingListener(this);
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -143,7 +143,7 @@ void IPTVRecorder::run(void)
             unpauseWait.wait(&pauseLock, 100);
         }
 
-        if (!_input_pmt)
+        if (!m_input_pmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
@@ -154,8 +154,8 @@ void IPTVRecorder::run(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- ending...");
 
-    _stream_data->RemoveWritingListener(this);
-    _stream_data->RemoveAVListener(this);
+    m_stream_data->RemoveWritingListener(this);
+    m_stream_data->RemoveAVListener(this);
 
     Close();
 

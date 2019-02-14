@@ -28,7 +28,8 @@ class TVRec;
 class ExternalRecorder : public DTVRecorder
 {
   public:
-    ExternalRecorder(TVRec *rec, ExternalChannel *channel);
+    ExternalRecorder(TVRec *rec, ExternalChannel *channel)
+        : DTVRecorder(rec), m_channel(channel) {}
 
     void run(void) override; // RecorderBase
 
@@ -44,8 +45,8 @@ class ExternalRecorder : public DTVRecorder
     bool StopStreaming(void);
 
   private:
-    ExternalChannel       *m_channel;
-    ExternalStreamHandler *m_stream_handler;
+    ExternalChannel       *m_channel        {nullptr};
+    ExternalStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif // _External_RECORDER_H_

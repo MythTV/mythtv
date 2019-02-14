@@ -178,7 +178,7 @@ void DVBSignalMonitor::HandlePMT(uint program_num, const ProgramMapTable *pmt)
 {
     DTVSignalMonitor::HandlePMT(program_num, pmt);
 
-    if (pmt->ProgramNumber() == (uint)programNumber)
+    if (pmt->ProgramNumber() == (uint)m_programNumber)
     {
         DVBChannel *dvbchannel = GetDVBChannel();
         if (dvbchannel)

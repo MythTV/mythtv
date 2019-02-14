@@ -34,15 +34,15 @@
             .arg(m_channel->GetDevice())
 
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
-    DTVRecorder(rec), m_channel(channel), m_stream_handler(nullptr)
+    DTVRecorder(rec), m_channel(channel)
 {
     if (channel->GetFormat().compare("MPTS") == 0)
     {
         // MPTS only.  Use TSStreamData to write out unfiltered data
         LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
         SetStreamData(new TSStreamData(tvrec ? tvrec->GetInputId() : -1));
-        _record_mpts_only = true;
-        _record_mpts = false;
+        m_record_mpts_only = true;
+        m_record_mpts = false;
     }
     else
     {
@@ -50,7 +50,7 @@ ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
         SetStreamData(new MPEGStreamData(-1, rec ? rec->GetInputId() : -1,
                                          false));
         if (channel->GetProgramNumber() < 0 || !channel->GetMinorChannel())
-            _stream_data->SetListeningDisabled(true);
+            m_stream_data->SetListeningDisabled(true);
     }
 }
 
@@ -68,14 +68,14 @@ void ASIRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void ASIRecorder::StartNewFile(void)
 {
-    if (!_record_mpts_only)
+    if (!m_record_mpts_only)
     {
-        if (_record_mpts)
+        if (m_record_mpts)
             m_stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
 
         // Make sure the first things in the file are a PAT & PMT
-        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+        HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
     }
 }
 
@@ -84,15 +84,15 @@ void ASIRecorder::run(void)
 {
     if (!Open())
     {
-        _error = "Failed to open device";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "Failed to open device";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         return;
     }
 
-    if (!_stream_data)
+    if (!m_stream_data)
     {
-        _error = "MPEGStreamData pointer has not been set";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "MPEGStreamData pointer has not been set";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         Close();
         return;
     }
@@ -108,22 +108,22 @@ void ASIRecorder::run(void)
     {
         const ProgramAssociationTable *pat = m_channel->GetGeneratedPAT();
         const ProgramMapTable         *pmt = m_channel->GetGeneratedPMT();
-        _stream_data->Reset(pat->ProgramNumber(0));
-        _stream_data->HandleTables(MPEG_PAT_PID, *pat);
-        _stream_data->HandleTables(pat->ProgramPID(0), *pmt);
+        m_stream_data->Reset(pat->ProgramNumber(0));
+        m_stream_data->HandleTables(MPEG_PAT_PID, *pat);
+        m_stream_data->HandleTables(pat->ProgramPID(0), *pmt);
     }
 
     // Listen for time table on DVB standard streams
     if (m_channel && (m_channel->GetSIStandard() == "dvb"))
-        _stream_data->AddListeningPID(DVB_TDT_PID);
+        m_stream_data->AddListeningPID(DVB_TDT_PID);
 
     StartNewFile();
 
-    _stream_data->AddAVListener(this);
-    _stream_data->AddWritingListener(this);
+    m_stream_data->AddAVListener(this);
+    m_stream_data->AddWritingListener(this);
     m_stream_handler->AddListener(
-        _stream_data, false, true,
-        (_record_mpts) ? ringBuffer->GetFilename() : QString());
+        m_stream_data, false, true,
+        (m_record_mpts) ? ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -138,7 +138,7 @@ void ASIRecorder::run(void)
             unpauseWait.wait(&pauseLock, 100);
         }
 
-        if (!_input_pmt && !_record_mpts_only)
+        if (!m_input_pmt && !m_record_mpts_only)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");
@@ -148,14 +148,14 @@ void ASIRecorder::run(void)
 
         if (!m_stream_handler->IsRunning())
         {
-            _error = "Stream handler died unexpectedly.";
-            LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+            m_error = "Stream handler died unexpectedly.";
+            LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         }
     }
 
-    m_stream_handler->RemoveListener(_stream_data);
-    _stream_data->RemoveWritingListener(this);
-    _stream_data->RemoveAVListener(this);
+    m_stream_handler->RemoveListener(m_stream_data);
+    m_stream_data->RemoveWritingListener(this);
+    m_stream_data->RemoveAVListener(this);
 
     Close();
 

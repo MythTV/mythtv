@@ -79,7 +79,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     FilterServices(transports);
 
     // Pull in DB info
-    sourceid = transports[0].channels[0].source_id;
+    sourceid = transports[0].m_channels[0].source_id;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
 
     // Make sure "Open Cable" channels are marked that way.
@@ -148,9 +148,9 @@ uint ChannelImporter::DeleteChannels(
 
     for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            ChannelInsertInfo chan = transports[i].channels[j];
+            ChannelInsertInfo chan = transports[i].m_channels[j];
             bool was_in_db = chan.db_mplexid && chan.channel_id;
             if (!was_in_db)
                 continue;
@@ -180,7 +180,7 @@ uint ChannelImporter::DeleteChannels(
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
             ChannelUtil::DeleteChannel(
-                transports[i].channels[j].channel_id);
+                transports[i].m_channels[j].channel_id);
             deleted[off_air_list[k]] = true;
         }
     }
@@ -189,7 +189,7 @@ uint ChannelImporter::DeleteChannels(
         for (uint k = 0; k < off_air_list.size(); ++k)
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
-            int chanid = transports[i].channels[j].channel_id;
+            int chanid = transports[i].m_channels[j].channel_id;
             QString channum = ChannelUtil::GetChanNum(chanid);
             ChannelUtil::SetVisible(chanid, false);
             ChannelUtil::SetChannelValue("channum", QString("_%1").arg(channum),
@@ -210,13 +210,13 @@ uint ChannelImporter::DeleteChannels(
     for (uint i = 0; i < transports.size(); ++i)
     {
         newlist.push_back(transports[i]);
-        newlist.back().channels.clear();
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        newlist.back().m_channels.clear();
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
             if (!deleted.contains(i<<16|j))
             {
-                newlist.back().channels.push_back(
-                    transports[i].channels[j]);
+                newlist.back().m_channels.push_back(
+                    transports[i].m_channels[j]);
             }
         }
     }
@@ -390,9 +390,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
         bool created_filter_transport = false;
         ScanDTVTransport filter_transport;
 
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            ChannelInsertInfo chan = transports[i].channels[j];
+            ChannelInsertInfo chan = transports[i].m_channels[j];
 
             bool filter = false, handle = false;
             if (!chan.channel_id && (kInsertIgnoreAll == action) &&
@@ -542,9 +542,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         QString(),
                         chan.default_authority);
 
-                    if (!transports[i].iptv_tuning.GetDataURL().isEmpty())
+                    if (!transports[i].m_iptv_tuning.GetDataURL().isEmpty())
                         ChannelUtil::CreateIPTVTuningData(chan.channel_id,
-                                          transports[i].iptv_tuning);
+                                          transports[i].m_iptv_tuning);
                 }
             }
 
@@ -553,20 +553,20 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 if (!created_filter_transport)
                 {
                     filter_transport = transports[i];
-                    filter_transport.channels.clear();
+                    filter_transport.m_channels.clear();
                     created_filter_transport = true;
                 }
-                filter_transport.channels.push_back(transports[i].channels[j]);
+                filter_transport.m_channels.push_back(transports[i].m_channels[j]);
             }
             else if (!inserted)
             {
                 if (!created_new_transport)
                 {
                     new_transport = transports[i];
-                    new_transport.channels.clear();
+                    new_transport.m_channels.clear();
                     created_new_transport = true;
                 }
-                new_transport.channels.push_back(transports[i].channels[j]);
+                new_transport.m_channels.push_back(transports[i].m_channels[j]);
             }
         }
 
@@ -600,9 +600,9 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
         bool created_filter_transport = false;
         ScanDTVTransport filter_transport;
 
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            ChannelInsertInfo chan = transports[i].channels[j];
+            ChannelInsertInfo chan = transports[i].m_channels[j];
 
             bool filter = false, handle = false;
             if (chan.channel_id && (kUpdateIgnoreAll == action) &&
@@ -709,20 +709,20 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 if (!created_filter_transport)
                 {
                     filter_transport = transports[i];
-                    filter_transport.channels.clear();
+                    filter_transport.m_channels.clear();
                     created_filter_transport = true;
                 }
-                filter_transport.channels.push_back(transports[i].channels[j]);
+                filter_transport.m_channels.push_back(transports[i].m_channels[j]);
             }
             else if (!updated)
             {
                 if (!created_transport)
                 {
                     new_transport = transports[i];
-                    new_transport.channels.clear();
+                    new_transport.m_channels.clear();
                     created_transport = true;
                 }
-                new_transport.channels.push_back(transports[i].channels[j]);
+                new_transport.m_channels.push_back(transports[i].m_channels[j]);
             }
         }
 
@@ -742,7 +742,7 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
-        tuner_type = transports[0].tuner_type;
+        tuner_type = transports[0].m_tuner_type;
 
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
                     (DTVTunerType::kTunerTypeDVBS2 == tuner_type));
@@ -764,21 +764,21 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
                 continue;
             }
 
-            for (uint k = 0; k < transports[j].channels.size(); ++k)
+            for (uint k = 0; k < transports[j].m_channels.size(); ++k)
             {
                 bool found_same = false;
-                for (uint l = 0; l < transports[i].channels.size(); ++l)
+                for (uint l = 0; l < transports[i].m_channels.size(); ++l)
                 {
-                    if (transports[j].channels[k].IsSameChannel(
-                            transports[i].channels[l]))
+                    if (transports[j].m_channels[k].IsSameChannel(
+                            transports[i].m_channels[l]))
                     {
                         found_same = true;
-                        transports[i].channels[l].ImportExtraInfo(
-                            transports[j].channels[k]);
+                        transports[i].m_channels[l].ImportExtraInfo(
+                            transports[j].m_channels[k]);
                     }
                 }
                 if (!found_same)
-                    transports[i].channels.push_back(transports[j].channels[k]);
+                    transports[i].m_channels.push_back(transports[j].m_channels[k]);
             }
             ignore[j] = true;
         }
@@ -796,30 +796,30 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
     for (uint i = 0; i < transports.size(); ++i)
     {
         ChannelInsertInfoList filtered;
-        for (uint k = 0; k < transports[i].channels.size(); ++k)
+        for (uint k = 0; k < transports[i].m_channels.size(); ++k)
         {
-            if (m_fta_only && transports[i].channels[k].is_encrypted &&
-                transports[i].channels[k].decryption_status != kEncDecrypted)
+            if (m_fta_only && transports[i].m_channels[k].is_encrypted &&
+                transports[i].m_channels[k].decryption_status != kEncDecrypted)
                 continue;
 
-            if (require_a && transports[i].channels[k].is_data_service)
+            if (require_a && transports[i].m_channels[k].is_data_service)
                 continue;
 
-            if (require_av && transports[i].channels[k].is_audio_service)
+            if (require_av && transports[i].m_channels[k].is_audio_service)
                 continue;
 
             // filter channels out only in channels.conf, i.e. not found
-            if (transports[i].channels[k].in_channels_conf &&
-                !(transports[i].channels[k].in_pat ||
-                  transports[i].channels[k].in_pmt ||
-                  transports[i].channels[k].in_vct ||
-                  transports[i].channels[k].in_nit ||
-                  transports[i].channels[k].in_sdt))
+            if (transports[i].m_channels[k].in_channels_conf &&
+                !(transports[i].m_channels[k].in_pat ||
+                  transports[i].m_channels[k].in_pmt ||
+                  transports[i].m_channels[k].in_vct ||
+                  transports[i].m_channels[k].in_nit ||
+                  transports[i].m_channels[k].in_sdt))
                 continue;
 
-            filtered.push_back(transports[i].channels[k]);
+            filtered.push_back(transports[i].m_channels[k]);
         }
-        transports[i].channels = filtered;
+        transports[i].m_channels = filtered;
     }
 }
 
@@ -834,7 +834,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
-        tuner_type = transports[0].tuner_type;
+        tuner_type = transports[0].m_tuner_type;
 
     bool is_dvbs =
         (DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
@@ -873,18 +873,18 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
             if (!transports[i].IsEqual(tuner_type, newt, 500 * freq_mult, true))
                 continue;
 
-            transports[i].mplex = mplexid;
+            transports[i].m_mplex = mplexid;
             newt_found = true;
-            for (uint j = 0; j < transports[i].channels.size(); ++j)
+            for (uint j = 0; j < transports[i].m_channels.size(); ++j)
             {
-                ChannelInsertInfo &chan = transports[i].channels[j];
-                for (uint k = 0; k < newt.channels.size(); ++k)
+                ChannelInsertInfo &chan = transports[i].m_channels[j];
+                for (uint k = 0; k < newt.m_channels.size(); ++k)
                 {
-                    if (newt.channels[k].IsSameChannel(chan, true))
+                    if (newt.m_channels[k].IsSameChannel(chan, true))
                     {
                         found_chan[k] = true;
                         chan.db_mplexid = mplexid;
-                        chan.channel_id = newt.channels[k].channel_id;
+                        chan.channel_id = newt.m_channels[k].channel_id;
                     }
                 }
             }
@@ -903,15 +903,15 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         else
         {
             ScanDTVTransport tmp = newt;
-            tmp.channels.clear();
+            tmp.m_channels.clear();
 
-            for (uint k = 0; k < newt.channels.size(); ++k)
+            for (uint k = 0; k < newt.m_channels.size(); ++k)
             {
                 if (!found_chan[k])
-                    tmp.channels.push_back(newt.channels[k]);
+                    tmp.m_channels.push_back(newt.m_channels[k]);
             }
 
-            if (tmp.channels.size())
+            if (tmp.m_channels.size())
                 not_in_scan.push_back(tmp);
         }
     }
@@ -924,9 +924,9 @@ void ChannelImporter::FixUpOpenCable(ScanDTVTransportList &transports)
     ChannelImporterBasicStats info;
     for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            ChannelInsertInfo &chan = transports[i].channels[j];
+            ChannelInsertInfo &chan = transports[i].m_channels[j];
             if (((chan.could_be_opencable && (chan.si_standard == "mpeg")) ||
                  chan.is_opencable) && !chan.in_vct)
             {
@@ -942,9 +942,9 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
     ChannelImporterBasicStats info;
     for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            const ChannelInsertInfo &chan = transports[i].channels[j];
+            const ChannelInsertInfo &chan = transports[i].m_channels[j];
             int enc = (chan.is_encrypted) ?
                 ((chan.decryption_status == kEncDecrypted) ? 2 : 1) : 0;
             info.atsc_channels[enc] += (chan.si_standard == "atsc");
@@ -983,9 +983,9 @@ ChannelImporterUniquenessStats ChannelImporter::CollectUniquenessStats(
 
     for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            const ChannelInsertInfo &chan = transports[i].channels[j];
+            const ChannelInsertInfo &chan = transports[i].m_channels[j];
             stats.unique_prognum +=
                 (info.prognum_cnt[chan.service_id] == 1) ? 1 : 0;
             stats.unique_channum +=
@@ -1020,9 +1020,9 @@ QString ChannelImporter::FormatChannel(
     QString msg;
     QTextStream ssMsg(&msg);
 
-    ssMsg << transport.modulation.toString().toLatin1().constData()
+    ssMsg << transport.m_modulation.toString().toLatin1().constData()
           << ":";
-    ssMsg << transport.frequency << ":";
+    ssMsg << transport.m_frequency << ":";
 
     QString si_standard = (chan.si_standard=="opencable") ?
         QString("scte") : chan.si_standard;
@@ -1145,8 +1145,8 @@ QString ChannelImporter::FormatChannels(
     QString msg;
 
     for (uint i = 0; i < transports.size(); ++i)
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
-            msg += FormatChannel(transports[i], transports[i].channels[j],
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+            msg += FormatChannel(transports[i], transports[i].m_channels[j],
                                  &info) + "\n";
 
     return msg;
@@ -1245,9 +1245,9 @@ void ChannelImporter::CountChannels(
     new_chan = old_chan = 0;
     for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); ++j)
+        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
         {
-            ChannelInsertInfo chan = transports[i].channels[j];
+            ChannelInsertInfo chan = transports[i].m_channels[j];
             if (IsType(info, chan, type))
             {
                 if (chan.channel_id)

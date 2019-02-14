@@ -26,11 +26,11 @@ uint SaveScan(const ScanDTVTransportList &scan)
             .arg(scan.size()));
 
     uint scanid = 0;
-    if (scan.empty() || scan[0].channels.empty())
+    if (scan.empty() || scan[0].m_channels.empty())
         return scanid;
 
-    uint sourceid = scan[0].channels[0].source_id;
-    uint cardid   = scan[0].cardid;
+    uint sourceid = scan[0].m_channels[0].source_id;
+    uint cardid   = scan[0].m_cardid;
 
     // Delete very old scans
     const vector<ScanInfo> list = LoadScanList();
@@ -182,7 +182,7 @@ ScanDTVTransportList LoadScan(uint scanid)
                 query2.value(34).toInt()/*decryption_status*/,
                 query2.value(35).toString()/*default_authority*/);
 
-            mux.channels.push_back(chan);
+            mux.m_channels.push_back(chan);
         }
 
         list.push_back(mux);

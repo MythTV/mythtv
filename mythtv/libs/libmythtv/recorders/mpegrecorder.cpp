@@ -382,7 +382,7 @@ bool MpegRecorder::OpenMpegFileAsInput(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Can't open MPEG File '%1'")
                 .arg(videodevice) + ENO);
-        _error = LOC + QString("Can't open MPEG File '%1'")
+        m_error = LOC + QString("Can't open MPEG File '%1'")
                  .arg(videodevice) + ENO;
         return false;
     }
@@ -399,7 +399,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (chanfd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device. " + ENO);
-        _error = LOC + "Can't open video device. " + ENO;
+        m_error = LOC + "Can't open video device. " + ENO;
         return false;
     }
 
@@ -423,7 +423,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!(capabilities & V4L2_CAP_VIDEO_CAPTURE))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "V4L version 1, unsupported");
-        _error = LOC + "V4L version 1, unsupported";
+        m_error = LOC + "V4L version 1, unsupported";
         close(chanfd);
         chanfd = -1;
         return false;
@@ -456,7 +456,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (readfd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device." + ENO);
-        _error = LOC + "Can't open video device." + ENO;
+        m_error = LOC + "Can't open video device." + ENO;
         close(chanfd);
         chanfd = -1;
         return false;
@@ -476,7 +476,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!_device_read_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = "Failed to allocate DRB buffer";
+        m_error = "Failed to allocate DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -487,7 +487,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup DRB buffer");
-        _error = "Failed to setup DRB buffer";
+        m_error = "Failed to setup DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -497,8 +497,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "DRB ready");
 
-    if (vbi_fd >= 0)
-        vbi_thread = new VBIThread(this);
+    if (m_vbi_fd >= 0)
+        m_vbi_thread = new VBIThread(this);
 
     return true;
 }
@@ -517,7 +517,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
     if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error getting format" + ENO);
-        _error = LOC + "Error getting format" + ENO;
+        m_error = LOC + "Error getting format" + ENO;
         return false;
     }
 
@@ -527,7 +527,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
     if (ioctl(chanfd, VIDIOC_S_FMT, &vfmt) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error setting format" + ENO);
-        _error = LOC + "Error setting format" + ENO;
+        m_error = LOC + "Error setting format" + ENO;
         return false;
     }
 
@@ -822,7 +822,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     set_ctrls(chanfd, ext_ctrls);
 
     bool ok;
-    int audioinput = audiodevice.toUInt(&ok);
+    int audioinput = m_audiodevice.toUInt(&ok);
     if (ok)
     {
         struct v4l2_audio ain;
@@ -866,7 +866,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 
 bool MpegRecorder::SetVBIOptions(int chanfd)
 {
-    if (VBIMode::None == vbimode)
+    if (VBIMode::None == m_vbimode)
         return true;
 
     if (driver == "hdpvr")
@@ -878,19 +878,19 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
         int fd;
 
         if (OpenVBIDevice() >= 0)
-            fd = vbi_fd;
+            fd = m_vbi_fd;
         else
             fd = chanfd;
 
         struct v4l2_format vbifmt;
         memset(&vbifmt, 0, sizeof(struct v4l2_format));
         vbifmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
-        vbifmt.fmt.sliced.service_set |= (VBIMode::PAL_TT == vbimode) ?
+        vbifmt.fmt.sliced.service_set |= (VBIMode::PAL_TT == m_vbimode) ?
             V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
         if (ioctl(fd, VIDIOC_S_FMT, &vbifmt) < 0)
         {
-            if (vbi_fd >= 0)
+            if (m_vbi_fd >= 0)
             {
                 fd = chanfd; // Retry with video device instead
                 if (ioctl(fd, VIDIOC_S_FMT, &vbifmt) < 0)
@@ -951,8 +951,8 @@ void MpegRecorder::run(void)
 {
     if (!Open())
     {
-        if (_error.isEmpty())
-            _error = "Failed to open V4L device";
+        if (m_error.isEmpty())
+            m_error = "Failed to open V4L device";
         return;
     }
 
@@ -969,22 +969,22 @@ void MpegRecorder::run(void)
         MPEGStreamData *sd = new MPEGStreamData
                              (progNum, tvrec ? tvrec->GetInputId() : -1,
                               true);
-        sd->SetRecordingType(_recording_type);
+        sd->SetRecordingType(m_recording_type);
         SetStreamData(sd);
 
-        _stream_data->AddAVListener(this);
-        _stream_data->AddWritingListener(this);
+        m_stream_data->AddAVListener(this);
+        m_stream_data->AddWritingListener(this);
 
         // Make sure the first things in the file are a PAT & PMT
-        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
-        _wait_for_keyframe_option = true;
+        HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
+        m_wait_for_keyframe_option = true;
     }
 
     {
         QMutexLocker locker(&pauseLock);
         request_recording = true;
-        request_helper = true;
+        m_request_helper = true;
         recording = true;
         recordingWait.wakeAll();
     }
@@ -1078,7 +1078,7 @@ void MpegRecorder::run(void)
                      IsRecordingRequested())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
-                _error = "Device EOF detected";
+                m_error = "Device EOF detected";
             }
             else
             {
@@ -1166,7 +1166,7 @@ void MpegRecorder::run(void)
 
                 if (len <= 0)
                 {
-                    _error = "Failed to read from video file";
+                    m_error = "Failed to read from video file";
                     continue;
                 }
             }
@@ -1185,7 +1185,7 @@ void MpegRecorder::run(void)
 
             if (driver == "hdpvr")
             {
-                remainder = _stream_data->ProcessData(buffer, len);
+                remainder = m_stream_data->ProcessData(buffer, len);
                 int start_remain = len - remainder;
                 if (remainder && (start_remain >= remainder))
                     memcpy(buffer, buffer+start_remain, remainder);
@@ -1205,14 +1205,14 @@ void MpegRecorder::run(void)
 
     {
         QMutexLocker locker(&pauseLock);
-        request_helper = false;
+        m_request_helper = false;
     }
 
-    if (vbi_thread)
+    if (m_vbi_thread)
     {
-        vbi_thread->wait();
-        delete vbi_thread;
-        vbi_thread = nullptr;
+        m_vbi_thread->wait();
+        delete m_vbi_thread;
+        m_vbi_thread = nullptr;
         CloseVBIDevice();
     }
 
@@ -1222,8 +1222,8 @@ void MpegRecorder::run(void)
 
     if (driver == "hdpvr")
     {
-        _stream_data->RemoveWritingListener(this);
-        _stream_data->RemoveAVListener(this);
+        m_stream_data->RemoveWritingListener(this);
+        m_stream_data->RemoveAVListener(this);
         SetStreamData(nullptr);
     }
 
@@ -1241,8 +1241,8 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
     if ((driver == "hdpvr") && (pid == 0x1001)) // PCRPID for HD-PVR
     {
         tspacket_fake = tspacket_real.CreateClone();
-        uint cc = (_continuity_counter[pid] == 0xFF) ?
-            0 : (_continuity_counter[pid] + 1) & 0xf;
+        uint cc = (m_continuity_counter[pid] == 0xFF) ?
+            0 : (m_continuity_counter[pid] + 1) & 0xf;
         tspacket_fake->SetContinuityCounter(cc);
     }
 
@@ -1262,14 +1262,14 @@ void MpegRecorder::Reset(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Reset(void)");
     ResetForNewFile();
 
-    _start_code = 0xffffffff;
+    m_start_code = 0xffffffff;
 
     if (curRecording)
     {
         curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
     }
-    if (_stream_data)
-        _stream_data->Reset(_stream_data->DesiredProgram());
+    if (m_stream_data)
+        m_stream_data->Reset(m_stream_data->DesiredProgram());
 }
 
 void MpegRecorder::Pause(bool clear)
@@ -1308,16 +1308,16 @@ bool MpegRecorder::PauseAndWait(int timeout)
         if (driver == "hdpvr")
         {
             m_h264_parser.Reset();
-            _wait_for_keyframe_option = true;
-            _seen_sps = false;
+            m_wait_for_keyframe_option = true;
+            m_seen_sps = false;
             // HD-PVR will sometimes reset to defaults
             SetV4L2DeviceOptions(chanfd);
         }
 
         StartEncoding();
 
-        if (_stream_data)
-            _stream_data->Reset(_stream_data->DesiredProgram());
+        if (m_stream_data)
+            m_stream_data->Reset(m_stream_data->DesiredProgram());
 
         paused = false;
     }
@@ -1334,13 +1334,13 @@ bool MpegRecorder::RestartEncoding(void)
     StopEncoding();
 
     // Make sure the next things in the file are a PAT & PMT
-    if (_stream_data &&
-        _stream_data->PATSingleProgram() &&
-        _stream_data->PMTSingleProgram())
+    if (m_stream_data &&
+        m_stream_data->PATSingleProgram() &&
+        m_stream_data->PMTSingleProgram())
     {
-        _payload_buffer.clear();  // No reason to keep part of a frame
-        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+        m_payload_buffer.clear();  // No reason to keep part of a frame
+        HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
     }
 
     if (driver == "hdpvr") // HD-PVR will sometimes reset to defaults
@@ -1362,7 +1362,7 @@ bool MpegRecorder::StartEncoding(void)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "StartEncoding: Can't open video device." + ENO);
-            _error = "Failed to start recording";
+            m_error = "Failed to start recording";
             return false;
         }
     }
@@ -1371,8 +1371,8 @@ bool MpegRecorder::StartEncoding(void)
     if (driver == "hdpvr")
     {
         m_h264_parser.Reset();
-        _wait_for_keyframe_option = true;
-        _seen_sps = false;
+        m_wait_for_keyframe_option = true;
+        m_seen_sps = false;
         good_res = HandleResolutionChanges();
     }
 
@@ -1399,7 +1399,7 @@ bool MpegRecorder::StartEncoding(void)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "StartEncoding: Can't open video device." + ENO);
-                _error = "Failed to start recording";
+                m_error = "Failed to start recording";
                 return false;
             }
         }
@@ -1415,7 +1415,7 @@ bool MpegRecorder::StartEncoding(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "StartEncoding: read from video device failed." + ENO);
-        _error = "Failed to start recording";
+        m_error = "Failed to start recording";
         close(readfd);
         readfd = -1;
         return false;
@@ -1484,8 +1484,8 @@ void MpegRecorder::StopEncoding(void)
 
 void MpegRecorder::InitStreamData(void)
 {
-    _stream_data->AddMPEGSPListener(this);
-    _stream_data->SetDesiredProgram(1);
+    m_stream_data->AddMPEGSPListener(this);
+    m_stream_data->SetDesiredProgram(1);
 }
 
 void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,

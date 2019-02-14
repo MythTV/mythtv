@@ -32,8 +32,8 @@ class CetonSignalMonitor: public DTVSignalMonitor
     CetonChannel *GetCetonChannel(void);
 
   protected:
-    bool                streamHandlerStarted;
-    CetonStreamHandler *streamHandler;
+    bool                m_streamHandlerStarted {false};
+    CetonStreamHandler *m_streamHandler        {nullptr};
 };
 
 #endif // CETONSIGNALMONITOR_H

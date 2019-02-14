@@ -32,7 +32,7 @@ class IPTVRecorder : public DTVRecorder
     void run(void) override; // RecorderBase
 
   private:
-    IPTVChannel *m_channel;
+    IPTVChannel *m_channel {nullptr};
 };
 
 #endif // _IPTV_RECORDER_H_

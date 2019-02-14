@@ -108,11 +108,6 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning, int inputid)
     : StreamHandler(tuning.GetDeviceKey(), inputid)
     , m_tuning(tuning)
-    , m_write_helper(nullptr)
-    , m_buffer(nullptr)
-    , m_rtsp_rtp_port(0)
-    , m_rtsp_rtcp_port(0)
-    , m_rtsp_ssrc(0)
 {
     memset(m_sockets, 0, sizeof(m_sockets));
     memset(m_read_helpers, 0, sizeof(m_read_helpers));
@@ -403,13 +398,6 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
             }
         }
     }
-}
-
-IPTVStreamHandlerWriteHelper::IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p)
-  : m_parent(p),                m_timer(0),             m_timer_rtcp(0),
-    m_last_sequence_number(0),  m_last_timestamp(0),    m_previous_last_sequence_number(0),
-    m_lost(0),                  m_lost_interval(0)
-{
 }
 
 IPTVStreamHandlerWriteHelper::~IPTVStreamHandlerWriteHelper()

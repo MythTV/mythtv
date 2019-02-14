@@ -135,36 +135,42 @@ class DVBChannel : public DTVChannel
     // Data
     DiSEqCDev         diseqc_dev;
     DiSEqCDevSettings diseqc_settings;
-    DiSEqCDevTree    *diseqc_tree;
-    DVBCam           *dvbcam; ///< Used to decrypt encrypted streams
+    DiSEqCDevTree    *diseqc_tree         {nullptr};
+                      /// Used to decrypt encrypted streams
+    DVBCam           *dvbcam              {nullptr};
 
     // Device info
     QString           frontend_name;
-    uint64_t          capabilities;
-    uint64_t          ext_modulations;
-    uint64_t          frequency_minimum;
-    uint64_t          frequency_maximum;
-    uint              symbol_rate_minimum;
-    uint              symbol_rate_maximum;
+    uint64_t          capabilities        {0};
+    uint64_t          ext_modulations     {0};
+    uint64_t          frequency_minimum   {0};
+    uint64_t          frequency_maximum   {0};
+    uint              symbol_rate_minimum {0};
+    uint              symbol_rate_maximum {0};
 
     // Tuning State
     mutable QMutex    tune_lock;
-    mutable QMutex    hw_lock;
+    mutable QMutex    hw_lock             {QMutex::Recursive};
     /// Last tuning options Tune() attempted to send to hardware
     DTVMultiplex      desired_tuning;
     /// Last tuning options Tune() succesfully sent to hardware
     DTVMultiplex      prev_tuning;
 
-    uint              last_lnb_dev_id;
+    uint              last_lnb_dev_id     {(uint)~0x0};
 
-    uint              tuning_delay;///< Extra delay to add for broken drivers
-    uint              sigmon_delay;///< Minimum delay between FE_LOCK checks
-    bool              first_tune;  ///< Used to force hardware reset
+                      /// Extra delay to add for broken drivers
+    uint              tuning_delay        {0};
+                      /// Minimum delay between FE_LOCK checks
+    uint              sigmon_delay        {25};
+                      /// Used to force hardware reset
+    bool              first_tune          {true};
 
     // Other State
-    int               fd_frontend; ///< File descriptor for tuning hardware
+                      /// File descriptor for tuning hardware
+    int               fd_frontend         {-1};
     QString           device;      ///< DVB Device
-    bool              has_crc_bug; ///< true iff our driver munges PMT
+                      /// true iff our driver munges PMT
+    bool              has_crc_bug         {false};
 
     static QDateTime  s_last_tuning;
     QMutex            tune_delay_lock;

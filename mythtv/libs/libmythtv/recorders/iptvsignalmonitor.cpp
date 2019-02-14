@@ -26,8 +26,7 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      bool _release_stream,
                                      uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      m_streamHandlerStarted(false), m_locked(false)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
     signalLock.SetValue(0);
@@ -69,7 +68,7 @@ void IPTVSignalMonitor::SetStreamData(MPEGStreamData *data)
 void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("HandlePAT pn: %1")
-        .arg(programNumber));
+        .arg(m_programNumber));
     DTVSignalMonitor::HandlePAT(pat);
 }
 

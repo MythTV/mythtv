@@ -103,33 +103,28 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
 
 ASIStreamHandler::ASIStreamHandler(const QString &device, int inputid)
     : StreamHandler(device, inputid)
-    , _device_num(-1), _buf_size(-1), _fd(-1)
-    , _packet_size(TSPacket::kSize)
-    , _clock_source(kASIInternalClock)
-    , _rx_mode(kASIRXSyncOnActualConvertTo188)
-    , _drb(nullptr)
 {
     setObjectName("ASISH");
 }
 
 void ASIStreamHandler::SetClockSource(ASIClockSource cs)
 {
-    _clock_source = cs;
+    m_clock_source = cs;
     // TODO we should make it possible to set this immediately
     // not wait for the next open
 }
 
 void ASIStreamHandler::SetRXMode(ASIRXMode m)
 {
-    _rx_mode = m;
+    m_rx_mode = m;
     // TODO we should make it possible to set this immediately
     // not wait for the next open
 }
 
 void ASIStreamHandler::SetRunningDesired(bool desired)
 {
-    if (_drb && _running_desired && !desired)
-        _drb->Stop();
+    if (m_drb && _running_desired && !desired)
+        m_drb->Stop();
     StreamHandler::SetRunningDesired(desired);
 }
 
@@ -148,8 +143,8 @@ void ASIStreamHandler::run(void)
     }
 
     DeviceReadBuffer *drb = new DeviceReadBuffer(this, true, false);
-    bool ok = drb->Setup(_device, _fd, _packet_size, _buf_size,
-                         _num_buffers / 4);
+    bool ok = drb->Setup(_device, m_fd, m_packet_size, m_buf_size,
+                         m_num_buffers / 4);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
@@ -161,7 +156,7 @@ void ASIStreamHandler::run(void)
         return;
     }
 
-    uint buffer_size = _packet_size * 15000;
+    uint buffer_size = m_packet_size * 15000;
     unsigned char *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
@@ -181,7 +176,7 @@ void ASIStreamHandler::run(void)
 
     {
         QMutexLocker locker(&_start_stop_lock);
-        _drb = drb;
+        m_drb = drb;
     }
 
     int remainder = 0;
@@ -247,7 +242,7 @@ void ASIStreamHandler::run(void)
 
     {
         QMutexLocker locker(&_start_stop_lock);
-        _drb = nullptr;
+        m_drb = nullptr;
     }
 
     if (drb->IsRunning())
@@ -265,40 +260,40 @@ void ASIStreamHandler::run(void)
 
 bool ASIStreamHandler::Open(void)
 {
-    if (_fd >= 0)
+    if (m_fd >= 0)
         return true;
 
     QString error;
-    _device_num = CardUtil::GetASIDeviceNumber(_device, &error);
-    if (_device_num < 0)
+    m_device_num = CardUtil::GetASIDeviceNumber(_device, &error);
+    if (m_device_num < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
-    _buf_size = CardUtil::GetASIBufferSize(_device_num, &error);
-    if (_buf_size <= 0)
+    m_buf_size = CardUtil::GetASIBufferSize(m_device_num, &error);
+    if (m_buf_size <= 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
-    _num_buffers = CardUtil::GetASINumBuffers(_device_num, &error);
-    if (_num_buffers <= 0)
+    m_num_buffers = CardUtil::GetASINumBuffers(m_device_num, &error);
+    if (m_num_buffers <= 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
-    if (!CardUtil::SetASIMode(_device_num, (uint)_rx_mode, &error))
+    if (!CardUtil::SetASIMode(m_device_num, (uint)m_rx_mode, &error))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set RX Mode: " + error);
         return false;
     }
 
     // actually open the device
-    _fd = open(_device.toLocal8Bit().constData(), O_RDONLY, 0);
-    if (_fd < 0)
+    m_fd = open(_device.toLocal8Bit().constData(), O_RDONLY, 0);
+    if (m_fd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to open '%1'").arg(_device) + ENO);
@@ -307,7 +302,7 @@ bool ASIStreamHandler::Open(void)
 
     // get the rx capabilities
     unsigned int cap;
-    if (ioctl(_fd, ASI_IOC_RXGETCAP, &cap) < 0)
+    if (ioctl(m_fd, ASI_IOC_RXGETCAP, &cap) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to query capabilities '%1'").arg(_device) + ENO);
@@ -317,33 +312,33 @@ bool ASIStreamHandler::Open(void)
     // TODO? do stuff with capabilities..
 
     // we need to handle 188 & 204 byte packets..
-    switch (_rx_mode)
+    switch (m_rx_mode)
     {
         case kASIRXRawMode:
         case kASIRXSyncOnActualSize:
-            _packet_size = TSPacket::kDVBEmissionSize *  TSPacket::kSize;
+            m_packet_size = TSPacket::kDVBEmissionSize *  TSPacket::kSize;
             break;
         case kASIRXSyncOn204:
-            _packet_size = TSPacket::kDVBEmissionSize;
+            m_packet_size = TSPacket::kDVBEmissionSize;
             break;
         case kASIRXSyncOn188:
         case kASIRXSyncOnActualConvertTo188:
         case kASIRXSyncOn204ConvertTo188:
-            _packet_size = TSPacket::kSize;
+            m_packet_size = TSPacket::kSize;
             break;
     }
 
     // pid counter?
 
-    return _fd >= 0;
+    return m_fd >= 0;
 }
 
 void ASIStreamHandler::Close(void)
 {
-    if (_fd >= 0)
+    if (m_fd >= 0)
     {
-        close(_fd);
-        _fd = -1;
+        close(m_fd);
+        m_fd = -1;
     }
 }
 

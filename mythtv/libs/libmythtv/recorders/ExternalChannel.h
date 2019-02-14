@@ -17,7 +17,8 @@ using namespace std;
 class ExternalChannel : public DTVChannel
 {
   public:
-    ExternalChannel(TVRec *parent, const QString & device);
+    ExternalChannel(TVRec *parent, const QString & device)
+        : DTVChannel(parent), m_device(device), m_loc(GetDevice()) {}
     ~ExternalChannel(void);
 
     // Commands
@@ -51,7 +52,7 @@ class ExternalChannel : public DTVChannel
   private:
     QString                  m_device;
     QStringList              m_args;
-    ExternalStreamHandler   *m_stream_handler;
+    ExternalStreamHandler   *m_stream_handler {nullptr};
     QString                  m_loc;
 };
 

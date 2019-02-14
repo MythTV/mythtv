@@ -58,9 +58,9 @@ class FirewireRecorder :
     explicit FirewireRecorder(TVRec *rec);
 
   private:
-    FirewireChannel       *channel;
-    bool                   isopen;
-    vector<unsigned char>  buffer;
+    FirewireChannel       *m_channel {nullptr};
+    bool                   m_isopen  {false};
+    vector<unsigned char>  m_buffer;
 };
 
 #endif //  _FIREWIRERECORDER_H_

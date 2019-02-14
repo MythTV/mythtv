@@ -108,13 +108,6 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
     : IPTVStreamHandler(IPTVTuningData("", 0, IPTVTuningData::kNone,
                                        "", 0, "", 0), inputid)
-    , _card(0)
-    , _tuner(0)
-    , _using_cablecard(false)
-    , _connected(false)
-    , _valid(false)
-    , _last_frequency(0)
-    , _last_program(0)
 {
     setObjectName("CetonStreamHandler");
 
@@ -125,13 +118,13 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
             QString("Invalid device id %1").arg(_device));
         return;
     }
-    _ip_address = parts.at(0);
+    m_ip_address = parts.at(0);
 
     QStringList tuner_parts = parts.at(1).split(".");
     if (tuner_parts.size() == 2)
     {
-        _card = tuner_parts.at(0).toUInt();
-        _tuner = tuner_parts.at(1).toUInt();
+        m_card = tuner_parts.at(0).toUInt();
+        m_tuner = tuner_parts.at(1).toUInt();
     }
     else
     {
@@ -149,16 +142,16 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
 
     int rtspPort = 8554;
     QString url = QString("rtsp://%1:%2/cetonmpeg%3")
-        .arg(_ip_address).arg(rtspPort).arg(_tuner);
+        .arg(m_ip_address).arg(rtspPort).arg(m_tuner);
     m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0);
     m_use_rtp_streaming = true;
 
-    _valid = true;
+    m_valid = true;
 
     QString cardstatus = GetVar("cas", "CardStatus");
-    _using_cablecard = cardstatus == "Inserted";
+    m_using_cablecard = cardstatus == "Inserted";
 
-    if (!s_info_queried.contains(_ip_address))
+    if (!s_info_queried.contains(m_ip_address))
     {
         QString sernum = GetVar("diag", "Host_Serial_Number");
         QString firmware_ver = GetVar("diag", "Host_Firmware");
@@ -167,9 +160,9 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("Ceton device %1 initialized. SN: %2, "
                     "Firmware ver. %3, Hardware ver. %4")
-            .arg(_ip_address).arg(sernum).arg(firmware_ver).arg(hardware_ver));
+            .arg(m_ip_address).arg(sernum).arg(firmware_ver).arg(hardware_ver));
 
-        if (_using_cablecard)
+        if (m_using_cablecard)
         {
             QString brand = GetVar("cas", "CardManufacturer");
             QString auth = GetVar("cas", "CardAuthorization");
@@ -183,7 +176,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
                 "Cable card NOT installed (operating in QAM tuner mode)");
         }
 
-        s_info_queried.insert(_ip_address, true);
+        s_info_queried.insert(m_ip_address, true);
     }
 }
 
@@ -194,19 +187,19 @@ bool CetonStreamHandler::Open(void)
 
 void CetonStreamHandler::Close(void)
 {
-    if (_connected)
+    if (m_connected)
     {
         TunerOff();
-        _connected = false;
+        m_connected = false;
     }
 }
 
 bool CetonStreamHandler::Connect(void)
 {
-    if (!_valid)
+    if (!m_valid)
         return false;
 
-    _connected = true;
+    m_connected = true;
     return true;
 }
 
@@ -230,7 +223,7 @@ bool CetonStreamHandler::EnterPowerSavingMode(void)
 
 bool CetonStreamHandler::IsConnected(void) const
 {
-    return _connected;
+    return m_connected;
 }
 
 bool CetonStreamHandler::VerifyTuning(void)
@@ -248,7 +241,7 @@ bool CetonStreamHandler::VerifyTuning(void)
     else
     {
         uint frequency = GetVar("tuner", "Frequency").toUInt();
-        if (frequency != _last_frequency)
+        if (frequency != m_last_frequency)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong frequency");
@@ -256,7 +249,7 @@ bool CetonStreamHandler::VerifyTuning(void)
         }
 
         QString modulation = GetVar("tuner", "Modulation");
-        if (modulation.toUpper() != _last_modulation.toUpper())
+        if (modulation.toUpper() != m_last_modulation.toUpper())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong modulation");
@@ -264,7 +257,7 @@ bool CetonStreamHandler::VerifyTuning(void)
         }
 
         uint program = GetVar("mux", "ProgramNumber").toUInt();
-        if (program != _last_program)
+        if (program != m_last_program)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong program");
@@ -295,19 +288,19 @@ void CetonStreamHandler::RepeatTuning(void)
 {
     if (IsCableCardInstalled())
     {
-        TuneVChannel(_last_vchannel);
+        TuneVChannel(m_last_vchannel);
     }
     else
     {
-        TuneFrequency(_last_frequency, _last_modulation);
-        TuneProgram(_last_program);
+        TuneFrequency(m_last_frequency, m_last_modulation);
+        TuneProgram(m_last_program);
     }
 }
 
 bool CetonStreamHandler::TunerOff(void)
 {
     bool result;
-    if (_using_cablecard)
+    if (m_using_cablecard)
         result = TuneVChannel("0");
     else
         result = TuneFrequency(0, "qam_256");
@@ -332,11 +325,11 @@ bool CetonStreamHandler::TuneFrequency(
     if (modulation_id == "")
         return false;
 
-    _last_frequency = frequency;
-    _last_modulation = modulation;
+    m_last_frequency = frequency;
+    m_last_modulation = modulation;
 
     QUrlQuery params;
-    params.addQueryItem("instance_id", QString::number(_tuner));
+    params.addQueryItem("instance_id", QString::number(m_tuner));
     params.addQueryItem("frequency", QString::number(frequency));
     params.addQueryItem("modulation",modulation_id);
     params.addQueryItem("tuner","1");
@@ -373,10 +366,10 @@ bool CetonStreamHandler::TuneProgram(uint program)
     };
 
 
-    _last_program = program;
+    m_last_program = program;
 
     QUrlQuery params;
-    params.addQueryItem("instance_id", QString::number(_tuner));
+    params.addQueryItem("instance_id", QString::number(m_tuner));
     params.addQueryItem("program", QString::number(program));
 
     QString response;
@@ -400,7 +393,7 @@ bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
         .arg(vchannel));
 
     QUrlQuery params;
-    params.addQueryItem("instance_id", QString::number(_tuner));
+    params.addQueryItem("instance_id", QString::number(m_tuner));
     params.addQueryItem("channel", vchannel);
 
     QString response;
@@ -428,12 +421,12 @@ bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
         return true;
     }
 
-    if ((vchannel != "0") && (_last_vchannel != "0"))
+    if ((vchannel != "0") && (m_last_vchannel != "0"))
         ClearProgramNumber();
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1)").arg(vchannel));
 
-    _last_vchannel = vchannel;
+    m_last_vchannel = vchannel;
 
     return PerformTuneVChannel(vchannel);
 }
@@ -478,10 +471,10 @@ QString CetonStreamHandler::GetVar(
     const QString &section, const QString &variable) const
 {
     QString loc = LOC + QString("DoGetVar(%1,%2,%3,%4) - ")
-        .arg(_ip_address).arg(_tuner).arg(section,variable);
+        .arg(m_ip_address).arg(m_tuner).arg(section,variable);
 
     QUrlQuery params;
-    params.addQueryItem("i", QString::number(_tuner));
+    params.addQueryItem("i", QString::number(m_tuner));
     params.addQueryItem("s", section);
     params.addQueryItem("v", variable);
 
@@ -510,10 +503,10 @@ QString CetonStreamHandler::GetVar(
 QStringList CetonStreamHandler::GetProgramList()
 {
     QString loc = LOC + QString("CetonHTTP: DoGetProgramList(%1,%2) - ")
-        .arg(_ip_address).arg(_tuner);
+        .arg(m_ip_address).arg(m_tuner);
 
     QUrlQuery params;
-    params.addQueryItem("i", QString::number(_tuner));
+    params.addQueryItem("i", QString::number(m_tuner));
 
     QString response;
     uint status;
@@ -550,7 +543,7 @@ bool CetonStreamHandler::HttpRequest(
     MythDownloadManager *manager = GetMythDownloadManager();
 
     url.setScheme("http");
-    url.setHost(_ip_address);
+    url.setHost(m_ip_address);
     url.setPath(script);
 
     // Specify un-cached access to the device

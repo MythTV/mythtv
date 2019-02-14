@@ -34,8 +34,7 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
                                        CetonChannel* _channel,
                                        bool _release_stream,
                                        uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      streamHandlerStarted(false), streamHandler(nullptr)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
@@ -43,7 +42,7 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = CetonStreamHandler::Get(channel->GetDevice(), inputid);
+    m_streamHandler = CetonStreamHandler::Get(channel->GetDevice(), inputid);
 }
 
 /** \fn CetonSignalMonitor::~CetonSignalMonitor()
@@ -53,7 +52,7 @@ CetonSignalMonitor::~CetonSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    CetonStreamHandler::Return(streamHandler, inputid);
+    CetonStreamHandler::Return(m_streamHandler, inputid);
 }
 
 /** \fn CetonSignalMonitor::Stop(void)
@@ -64,8 +63,8 @@ void CetonSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
-        streamHandler->RemoveListener(GetStreamData());
-    streamHandlerStarted = false;
+        m_streamHandler->RemoveListener(GetStreamData());
+    m_streamHandlerStarted = false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
@@ -86,7 +85,7 @@ void CetonSignalMonitor::UpdateValues(void)
     if (!running || exit)
         return;
 
-    if (streamHandlerStarted)
+    if (m_streamHandlerStarted)
     {
         EmitStatus();
         if (IsAllGood())
@@ -122,8 +121,8 @@ void CetonSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        streamHandler->AddListener(GetStreamData());
-        streamHandlerStarted = true;
+        m_streamHandler->AddListener(GetStreamData());
+        m_streamHandlerStarted = true;
     }
 
     update_done = true;

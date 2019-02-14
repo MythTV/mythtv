@@ -14,11 +14,11 @@
 
 #define LOC QString("FireRecBase[%1](%2): ") \
             .arg(tvrec ? tvrec->GetInputId() : -1) \
-            .arg(channel->GetDevice())
+            .arg(m_channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
     DTVRecorder(rec),
-    channel(chan), isopen(false)
+    m_channel(chan)
 {
 }
 
@@ -29,31 +29,31 @@ FirewireRecorder::~FirewireRecorder()
 
 bool FirewireRecorder::Open(void)
 {
-    if (!isopen)
+    if (!m_isopen)
     {
-        isopen = channel->GetFirewireDevice()->OpenPort();
+        m_isopen = m_channel->GetFirewireDevice()->OpenPort();
         ResetForNewFile();
     }
-    return isopen;
+    return m_isopen;
 }
 
 void FirewireRecorder::Close(void)
 {
-    if (isopen)
+    if (m_isopen)
     {
-        channel->GetFirewireDevice()->ClosePort();
-        isopen = false;
+        m_channel->GetFirewireDevice()->ClosePort();
+        m_isopen = false;
     }
 }
 
 void FirewireRecorder::StartStreaming(void)
 {
-    channel->GetFirewireDevice()->AddListener(this);
+    m_channel->GetFirewireDevice()->AddListener(this);
 }
 
 void FirewireRecorder::StopStreaming(void)
 {
-    channel->GetFirewireDevice()->RemoveListener(this);
+    m_channel->GetFirewireDevice()->RemoveListener(this);
 }
 
 void FirewireRecorder::run(void)
@@ -62,8 +62,8 @@ void FirewireRecorder::run(void)
 
     if (!Open())
     {
-        _error = "Failed to open firewire device";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "Failed to open firewire device";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         return;
     }
 
@@ -103,24 +103,24 @@ void FirewireRecorder::run(void)
 
 void FirewireRecorder::AddData(const unsigned char *data, uint len)
 {
-    uint bufsz = buffer.size();
+    uint bufsz = m_buffer.size();
     if ((SYNC_BYTE == data[0]) && (TSPacket::kSize == len) &&
         (TSPacket::kSize > bufsz))
     {
         if (bufsz)
-            buffer.clear();
+            m_buffer.clear();
 
         ProcessTSPacket(*(reinterpret_cast<const TSPacket*>(data)));
         return;
     }
 
-    buffer.insert(buffer.end(), data, data + len);
+    m_buffer.insert(m_buffer.end(), data, data + len);
     bufsz += len;
 
     int sync_at = -1;
     for (uint i = 0; (i < bufsz) && (sync_at < 0); i++)
     {
-        if (buffer[i] == SYNC_BYTE)
+        if (m_buffer[i] == SYNC_BYTE)
             sync_at = i;
     }
 
@@ -133,12 +133,12 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
     while (sync_at + TSPacket::kSize < bufsz)
     {
         ProcessTSPacket(*(reinterpret_cast<const TSPacket*>(
-                              &buffer[0] + sync_at)));
+                              &m_buffer[0] + sync_at)));
 
         sync_at += TSPacket::kSize;
     }
 
-    buffer.erase(buffer.begin(), buffer.begin() + sync_at);
+    m_buffer.erase(m_buffer.begin(), m_buffer.begin() + sync_at);
 
     return;
 }
@@ -218,8 +218,8 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 
 void FirewireRecorder::InitStreamData(void)
 {
-    _stream_data->AddMPEGSPListener(this);
+    m_stream_data->AddMPEGSPListener(this);
 
-    if (_stream_data->DesiredProgram() >= 0)
-        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
+    if (m_stream_data->DesiredProgram() >= 0)
+        m_stream_data->SetDesiredProgram(m_stream_data->DesiredProgram());
 }

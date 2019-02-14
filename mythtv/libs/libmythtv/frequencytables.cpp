@@ -35,12 +35,12 @@ TransportScanItem::TransportScanItem(uint           sourceid,
     memset(freq_offsets, 0, sizeof(int)*3);
 
     tuning.Clear();
-    tuning.sistandard = _si_std;
+    tuning.m_sistandard = _si_std;
 
     if (_si_std == "analog")
     {
-        tuning.sistandard = "analog";
-        tuning.modulation = DTVModulation::kModulationAnalog;
+        tuning.m_sistandard = "analog";
+        tuning.m_modulation = DTVModulation::kModulationAnalog;
     }
 }
 
@@ -74,14 +74,14 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
 
     tuning.ParseTuningParams(
         _tuner_type,
-        QString::number(_tuning.frequency),  _tuning.inversion.toString(),
-        QString::number(_tuning.symbolrate), _tuning.fec.toString(),
-        _tuning.polarity.toString(),         _tuning.hp_code_rate.toString(),
-        _tuning.lp_code_rate.toString(),     _tuning.modulation.toString(),
-        _tuning.trans_mode.toString(),       _tuning.guard_interval.toString(),
-        _tuning.hierarchy.toString(),        _tuning.modulation.toString(),
-        _tuning.bandwidth.toString(),        _tuning.mod_sys.toString(),
-        _tuning.rolloff.toString());
+        QString::number(_tuning.m_frequency),  _tuning.m_inversion.toString(),
+        QString::number(_tuning.m_symbolrate), _tuning.m_fec.toString(),
+        _tuning.m_polarity.toString(),         _tuning.m_hp_code_rate.toString(),
+        _tuning.m_lp_code_rate.toString(),     _tuning.m_modulation.toString(),
+        _tuning.m_trans_mode.toString(),       _tuning.m_guard_interval.toString(),
+        _tuning.m_hierarchy.toString(),        _tuning.m_modulation.toString(),
+        _tuning.m_bandwidth.toString(),        _tuning.m_mod_sys.toString(),
+        _tuning.m_rolloff.toString());
 }
 
 TransportScanItem::TransportScanItem(uint sourceid,
@@ -100,16 +100,16 @@ TransportScanItem::TransportScanItem(uint sourceid,
     tuning.Clear();
 
     // setup tuning params
-    tuning.frequency  = freq;
-    tuning.sistandard = "dvb";
-    tuning.modulation = ft.modulation;
+    tuning.m_frequency  = freq;
+    tuning.m_sistandard = "dvb";
+    tuning.m_modulation = ft.modulation;
 
     if (std.toLower() == "atsc")
-        tuning.sistandard = "atsc";
+        tuning.m_sistandard = "atsc";
     else if (std.toLower() == "analog")
     {
-        tuning.sistandard = "analog";
-        tuning.modulation = DTVModulation::kModulationAnalog;
+        tuning.m_sistandard = "analog";
+        tuning.m_modulation = DTVModulation::kModulationAnalog;
     }
 
     freq_offsets[1]   = ft.offset1;
@@ -117,18 +117,18 @@ TransportScanItem::TransportScanItem(uint sourceid,
 
     if (std == "dvbt")
     {
-        tuning.inversion      = ft.inversion;
-        tuning.bandwidth      = ft.bandwidth;
-        tuning.hp_code_rate   = ft.coderate_hp;
-        tuning.lp_code_rate   = ft.coderate_lp;
-        tuning.trans_mode     = ft.trans_mode;
-        tuning.guard_interval = ft.guard_interval;
-        tuning.hierarchy      = ft.hierarchy;
+        tuning.m_inversion      = ft.inversion;
+        tuning.m_bandwidth      = ft.bandwidth;
+        tuning.m_hp_code_rate   = ft.coderate_hp;
+        tuning.m_lp_code_rate   = ft.coderate_lp;
+        tuning.m_trans_mode     = ft.trans_mode;
+        tuning.m_guard_interval = ft.guard_interval;
+        tuning.m_hierarchy      = ft.hierarchy;
     }
     else if (std == "dvbc" || std == "dvbs")
     {
-        tuning.symbolrate     = ft.symbol_rate;
-        tuning.fec            = ft.fec_inner;
+        tuning.m_symbolrate     = ft.symbol_rate;
+        tuning.m_fec            = ft.fec_inner;
     }
 
     mplexid = GetMultiplexIdFromDB();
@@ -147,7 +147,7 @@ TransportScanItem::TransportScanItem(uint _sourceid,
 {
     memset(freq_offsets, 0, sizeof(int)*3);
     tuning.Clear();
-    tuning.sistandard = "MPEG";
+    tuning.m_sistandard = "MPEG";
 }
 
 /** \fn TransportScanItem::GetMultiplexIdFromDB(void) const
@@ -165,14 +165,14 @@ uint TransportScanItem::GetMultiplexIdFromDB(void) const
 
 uint64_t TransportScanItem::freq_offset(uint i) const
 {
-    int64_t freq = (int64_t) tuning.frequency;
+    int64_t freq = (int64_t) tuning.m_frequency;
 
     return (uint64_t) (freq + freq_offsets[i]);
 }
 
 QString TransportScanItem::toString() const
 {
-    if (tuning.sistandard == "MPEG")
+    if (tuning.m_sistandard == "MPEG")
     {
         return iptv_channel + ": " + iptv_tuning.GetDeviceKey();
     }
@@ -180,30 +180,30 @@ QString TransportScanItem::toString() const
     QString str = QString("Transport Scan Item '%1' #%2\n")
         .arg(FriendlyName).arg(friendlyNum);
     str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
-        .arg(mplexid).arg(tuning.sistandard).arg(SourceID);
+        .arg(mplexid).arg(tuning.m_sistandard).arg(SourceID);
     str += QString("\tUseTimer(%1) scanning(%2)\n")
         .arg(UseTimer).arg(scanning);
     str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
-    if (tuning.sistandard == "atsc" || tuning.sistandard == "analog")
+    if (tuning.m_sistandard == "atsc" || tuning.m_sistandard == "analog")
     {
         str += QString("\tfrequency(%1) modulation(%2)\n")
-            .arg(tuning.frequency)
-            .arg(tuning.modulation.toString());
+            .arg(tuning.m_frequency)
+            .arg(tuning.m_modulation.toString());
     }
     else
     {
         str += QString("\tfrequency(%1) constellation(%2)\n")
-            .arg(tuning.frequency)
-            .arg(tuning.modulation.toString());
+            .arg(tuning.m_frequency)
+            .arg(tuning.m_modulation.toString());
         str += QString("\t  inv(%1) bandwidth(%2) hp(%3) lp(%4)\n")
-            .arg(tuning.inversion)
-            .arg(tuning.bandwidth)
-            .arg(tuning.hp_code_rate)
-            .arg(tuning.lp_code_rate);
+            .arg(tuning.m_inversion)
+            .arg(tuning.m_bandwidth)
+            .arg(tuning.m_hp_code_rate)
+            .arg(tuning.m_lp_code_rate);
         str += QString("\t  trans_mode(%1) guard_int(%2) hierarchy(%3)\n")
-            .arg(tuning.trans_mode)
-            .arg(tuning.guard_interval)
-            .arg(tuning.hierarchy);
+            .arg(tuning.m_trans_mode)
+            .arg(tuning.m_guard_interval)
+            .arg(tuning.m_hierarchy);
     }
     str += QString("\t offset[0..2]: %1 %2 %3")
         .arg(freq_offsets[0]).arg(freq_offsets[1]).arg(freq_offsets[2]);

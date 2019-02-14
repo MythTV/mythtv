@@ -416,17 +416,17 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
                                   int transport_id, int network_id)
 {
     return insert_dtv_multiplex(
-        sourceid,                         mux.sistandard,
-        mux.frequency,                    mux.modulation.toString(),
+        sourceid,                            mux.m_sistandard,
+        mux.m_frequency,                     mux.m_modulation.toString(),
         // DVB specific
-        transport_id,                     network_id,
-        mux.symbolrate,                   mux.bandwidth.toChar().toLatin1(),
-        mux.polarity.toChar().toLatin1(),  mux.inversion.toChar().toLatin1(),
-        mux.trans_mode.toChar().toLatin1(),
-        mux.fec.toString(),               mux.modulation.toString(),
-        mux.hierarchy.toChar().toLatin1(), mux.hp_code_rate.toString(),
-        mux.lp_code_rate.toString(),      mux.guard_interval.toString(),
-        mux.mod_sys.toString(),           mux.rolloff.toString());
+        transport_id,                        network_id,
+        mux.m_symbolrate,                    mux.m_bandwidth.toChar().toLatin1(),
+        mux.m_polarity.toChar().toLatin1(),  mux.m_inversion.toChar().toLatin1(),
+        mux.m_trans_mode.toChar().toLatin1(),
+        mux.m_fec.toString(),                mux.m_modulation.toString(),
+        mux.m_hierarchy.toChar().toLatin1(), mux.m_hp_code_rate.toString(),
+        mux.m_lp_code_rate.toString(),       mux.m_guard_interval.toString(),
+        mux.m_mod_sys.toString(),            mux.m_rolloff.toString());
 }
 
 
