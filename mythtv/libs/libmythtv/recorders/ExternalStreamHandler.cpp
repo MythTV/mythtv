@@ -456,23 +456,23 @@ void ExternIO::Fork(void)
 }
 
 
-QMap<int, ExternalStreamHandler*> ExternalStreamHandler::m_handlers;
-QMap<int, uint>                   ExternalStreamHandler::m_handlers_refcnt;
-QMutex                            ExternalStreamHandler::m_handlers_lock;
+QMap<int, ExternalStreamHandler*> ExternalStreamHandler::s_handlers;
+QMap<int, uint>                   ExternalStreamHandler::s_handlers_refcnt;
+QMutex                            ExternalStreamHandler::s_handlers_lock;
 
 ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
                                                   int inputid, int majorid)
 {
-    QMutexLocker locker(&m_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
-    QMap<int, ExternalStreamHandler*>::iterator it = m_handlers.find(majorid);
+    QMap<int, ExternalStreamHandler*>::iterator it = s_handlers.find(majorid);
 
-    if (it == m_handlers.end())
+    if (it == s_handlers.end())
     {
         ExternalStreamHandler *newhandler =
             new ExternalStreamHandler(devname, inputid, majorid);
-        m_handlers[majorid] = newhandler;
-        m_handlers_refcnt[majorid] = 1;
+        s_handlers[majorid] = newhandler;
+        s_handlers_refcnt[majorid] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("ExternSH[%1]: Creating new stream handler %2 for %3")
@@ -480,30 +480,30 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
     }
     else
     {
-        m_handlers_refcnt[majorid]++;
-        uint rcount = m_handlers_refcnt[majorid];
+        s_handlers_refcnt[majorid]++;
+        uint rcount = s_handlers_refcnt[majorid];
         LOG(VB_RECORD, LOG_INFO,
             QString("ExternSH[%1]: Using existing stream handler for %2")
             .arg(inputid).arg(majorid) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return m_handlers[majorid];
+    return s_handlers[majorid];
 }
 
 void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
                                    int inputid)
 {
-    QMutexLocker locker(&m_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devname = ref->_device;
     int majorid = ref->m_majorid;
 
-    QMap<int, uint>::iterator rit = m_handlers_refcnt.find(majorid);
-    if (rit == m_handlers_refcnt.end())
+    QMap<int, uint>::iterator rit = s_handlers_refcnt.find(majorid);
+    if (rit == s_handlers_refcnt.end())
         return;
 
     QMap<int, ExternalStreamHandler*>::iterator it =
-        m_handlers.find(majorid);
+        s_handlers.find(majorid);
 
     LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return %2 in use %3")
         .arg(inputid).arg(majorid).arg(*rit));
@@ -515,12 +515,12 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
         return;
     }
 
-    if ((it != m_handlers.end()) && (*it == ref))
+    if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Closing handler for %2")
             .arg(inputid).arg(majorid));
         delete *it;
-        m_handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
@@ -529,7 +529,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
             .arg(inputid).arg(majorid));
     }
 
-    m_handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 

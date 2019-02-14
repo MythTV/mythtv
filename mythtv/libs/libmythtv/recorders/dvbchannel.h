@@ -166,7 +166,7 @@ class DVBChannel : public DTVChannel
     QString           device;      ///< DVB Device
     bool              has_crc_bug; ///< true iff our driver munges PMT
 
-    static QDateTime  last_tuning;
+    static QDateTime  s_last_tuning;
     QMutex            tune_delay_lock;
 };
 

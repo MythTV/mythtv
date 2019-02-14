@@ -57,7 +57,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType, const dvb_frontend_parameters&);
 
 int64_t concurrent_tunings_delay = 1000;
-QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
+QDateTime DVBChannel::s_last_tuning = QDateTime::currentDateTime();
 
 #define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
@@ -83,13 +83,13 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     fd_frontend(-1),                device(aDevice),
     has_crc_bug(false)
 {
-    master_map_lock.lockForWrite();
+    s_master_map_lock.lockForWrite();
     QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    master_map[key].push_back(this); // == RegisterForMaster
-    DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
+    s_master_map[key].push_back(this); // == RegisterForMaster
+    DVBChannel *master = static_cast<DVBChannel*>(s_master_map[key].front());
     if (master == this)
     {
         dvbcam = new DVBCam(device);
@@ -100,7 +100,7 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
         dvbcam       = master->dvbcam;
         has_crc_bug  = master->has_crc_bug;
     }
-    master_map_lock.unlock();
+    s_master_map_lock.unlock();
 
     sigmon_delay = CardUtil::GetMinSignalMonitoringDelay(device);
 }
@@ -109,36 +109,36 @@ DVBChannel::~DVBChannel()
 {
     // set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
-    master_map_lock.lockForWrite();
+    s_master_map_lock.lockForWrite();
     QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
+    DVBChannel *master = static_cast<DVBChannel*>(s_master_map[key].front());
     if (master == this)
     {
-        master_map[key].pop_front();
+        s_master_map[key].pop_front();
         DVBChannel *new_master = nullptr;
-        if (!master_map[key].empty())
-            new_master = dynamic_cast<DVBChannel*>(master_map[key].front());
+        if (!s_master_map[key].empty())
+            new_master = dynamic_cast<DVBChannel*>(s_master_map[key].front());
         if (new_master)
             new_master->is_open = master->is_open;
     }
     else
     {
-        master_map[key].removeAll(this);
+        s_master_map[key].removeAll(this);
     }
-    master_map_lock.unlock();
+    s_master_map_lock.unlock();
 
     Close();
 
     // if we're the last one out delete dvbcam
-    master_map_lock.lockForRead();
-    MasterMap::iterator mit = master_map.find(key);
+    s_master_map_lock.lockForRead();
+    MasterMap::iterator mit = s_master_map.find(key);
     if ((*mit).empty())
         delete dvbcam;
     dvbcam = nullptr;
-    master_map_lock.unlock();
+    s_master_map_lock.unlock();
 
     // diseqc_tree is managed elsewhere
 }
@@ -758,15 +758,15 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
         tune_delay_lock.lock();
 
-        if (QDateTime::currentDateTime() < last_tuning)
+        if (QDateTime::currentDateTime() < s_last_tuning)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Next tuning after less than %1ms. Delaying by %1ms")
                 .arg(concurrent_tunings_delay));
             usleep(concurrent_tunings_delay * 1000);
         }
 
-        last_tuning = QDateTime::currentDateTime();
-        last_tuning = last_tuning.addMSecs(concurrent_tunings_delay);
+        s_last_tuning = QDateTime::currentDateTime();
+        s_last_tuning = s_last_tuning.addMSecs(concurrent_tunings_delay);
 
         tune_delay_lock.unlock();
 

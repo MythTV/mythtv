@@ -23,25 +23,25 @@
 
 #define LOC      QString("DVBSH[%1](%2): ").arg(_inputid).arg(_device)
 
-QMap<QString,bool> DVBStreamHandler::_rec_supports_ts_monitoring;
-QMutex             DVBStreamHandler::_rec_supports_ts_monitoring_lock;
+QMap<QString,bool> DVBStreamHandler::s_rec_supports_ts_monitoring;
+QMutex             DVBStreamHandler::s_rec_supports_ts_monitoring_lock;
 
-QMap<QString,DVBStreamHandler*> DVBStreamHandler::_handlers;
-QMap<QString,uint>              DVBStreamHandler::_handlers_refcnt;
-QMutex                          DVBStreamHandler::_handlers_lock;
+QMap<QString,DVBStreamHandler*> DVBStreamHandler::s_handlers;
+QMap<QString,uint>              DVBStreamHandler::s_handlers_refcnt;
+QMutex                          DVBStreamHandler::s_handlers_lock;
 
 DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
                                         int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QMap<QString,DVBStreamHandler*>::iterator it =
-        _handlers.find(devname);
+        s_handlers.find(devname);
 
-    if (it == _handlers.end())
+    if (it == s_handlers.end())
     {
-        _handlers[devname] = new DVBStreamHandler(devname, inputid);
-        _handlers_refcnt[devname] = 1;
+        s_handlers[devname] = new DVBStreamHandler(devname, inputid);
+        s_handlers_refcnt[devname] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("DVBSH[%1]: Creating new stream handler %2")
@@ -49,28 +49,28 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
     }
     else
     {
-        _handlers_refcnt[devname]++;
-        uint rcount = _handlers_refcnt[devname];
+        s_handlers_refcnt[devname]++;
+        uint rcount = s_handlers_refcnt[devname];
         LOG(VB_RECORD, LOG_INFO,
             QString("DVBSH[%1]: Using existing stream handler for %2")
             .arg(inputid)
             .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return _handlers[devname];
+    return s_handlers[devname];
 }
 
 void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devname = ref->_device;
 
-    QMap<QString,uint>::iterator rit = _handlers_refcnt.find(devname);
-    if (rit == _handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
+    if (rit == s_handlers_refcnt.end())
         return;
 
-    QMap<QString,DVBStreamHandler*>::iterator it = _handlers.find(devname);
+    QMap<QString,DVBStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)
     {
@@ -79,12 +79,12 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
         return;
     }
 
-    if ((it != _handlers.end()) && (*it == ref))
+    if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("dVBSH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
         delete *it;
-        _handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
@@ -93,7 +93,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    _handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
@@ -574,10 +574,10 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
     const uint pat_pid = 0x0;
 
     {
-        QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
+        QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
         QMap<QString,bool>::const_iterator it;
-        it = _rec_supports_ts_monitoring.find(_device);
-        if (it != _rec_supports_ts_monitoring.end())
+        it = s_rec_supports_ts_monitoring.find(_device);
+        if (it != s_rec_supports_ts_monitoring.end())
             return *it;
     }
 
@@ -585,8 +585,8 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
     int dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
-        QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
-        _rec_supports_ts_monitoring[_device] = false;
+        QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
+        s_rec_supports_ts_monitoring[_device] = false;
         return false;
     }
 
@@ -599,8 +599,8 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
 
     close(dvr_fd);
 
-    QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
-    _rec_supports_ts_monitoring[_device] = supports_ts;
+    QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
+    s_rec_supports_ts_monitoring[_device] = supports_ts;
 
     return supports_ts;
 }

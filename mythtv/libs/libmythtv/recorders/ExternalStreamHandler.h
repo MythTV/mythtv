@@ -130,9 +130,9 @@ class ExternalStreamHandler : public StreamHandler
     bool           m_xon;
 
     // for implementing Get & Return
-    static QMutex                            m_handlers_lock;
-    static QMap<int, ExternalStreamHandler*> m_handlers;
-    static QMap<int, uint>                   m_handlers_refcnt;
+    static QMutex                            s_handlers_lock;
+    static QMap<int, ExternalStreamHandler*> s_handlers;
+    static QMap<int, uint>                   s_handlers_refcnt;
 
     QAtomicInt    m_streaming_cnt;
     QMutex        m_stream_lock;

@@ -448,18 +448,18 @@ QStringList CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
     return list;
 }
 
-QMap <QString,QStringList> CardUtil::videoDeviceCache;
+QMap <QString,QStringList> CardUtil::s_videoDeviceCache;
 
 void CardUtil::ClearVideoDeviceCache()
 {
-    videoDeviceCache.clear();
+    s_videoDeviceCache.clear();
 }
 
 
 QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 {
-    if (videoDeviceCache.contains(rawtype))
-        return videoDeviceCache[rawtype];
+    if (s_videoDeviceCache.contains(rawtype))
+        return s_videoDeviceCache[rawtype];
 
     QStringList devs;
 
@@ -570,7 +570,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                                      .arg(rawtype));
     }
 
-    videoDeviceCache.insert(rawtype,devs);
+    s_videoDeviceCache.insert(rawtype,devs);
     return devs;
 }
 

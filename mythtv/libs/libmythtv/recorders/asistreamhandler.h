@@ -81,9 +81,9 @@ class ASIStreamHandler : public StreamHandler
     DeviceReadBuffer                       *_drb;
 
     // for implementing Get & Return
-    static QMutex                           _handlers_lock;
-    static QMap<QString, ASIStreamHandler*> _handlers;
-    static QMap<QString, uint>              _handlers_refcnt;
+    static QMutex                           s_handlers_lock;
+    static QMap<QString, ASIStreamHandler*> s_handlers;
+    static QMap<QString, uint>              s_handlers_refcnt;
 };
 
 #endif // _ASISTREAMHANDLER_H_

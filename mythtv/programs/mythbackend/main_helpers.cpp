@@ -154,7 +154,7 @@ bool setupTVs(bool ismaster, bool &error)
         hosts.push_back(host);
     }
 
-    QWriteLocker tvlocker(&TVRec::inputsLock);
+    QWriteLocker tvlocker(&TVRec::s_inputsLock);
 
     for (uint i = 0; i < cardids.size(); i++)
     {
@@ -264,9 +264,9 @@ void cleanup(void)
         TaskQueue::Instance()->wait();
     }
 
-    while (!TVRec::inputs.empty())
+    while (!TVRec::s_inputs.empty())
     {
-        TVRec *rec = *TVRec::inputs.begin();
+        TVRec *rec = *TVRec::s_inputs.begin();
         delete rec;
     }
 

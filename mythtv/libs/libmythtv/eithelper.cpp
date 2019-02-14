@@ -22,7 +22,7 @@ using namespace std;
 #include "compat.h" // for gmtime_r on windows.
 
 const uint EITHelper::kChunkSize = 20;
-EITCache *EITHelper::eitcache = new EITCache();
+EITCache *EITHelper::s_eitcache = new EITCache();
 
 static uint get_chan_id_from_db_atsc(uint sourceid,
                                      uint atscmajor, uint atscminor);
@@ -389,7 +389,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     for (uint i = 0; i < eit->EventCount(); i++)
     {
         // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
+        if (!s_eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
                               eit->EndTimeUnixUTC(i)))
         {
             continue;
@@ -785,7 +785,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
         }
 
         // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(chanid, tableid, version, contentid, endtime))
+        if (!s_eitcache->IsNewEIT(chanid, tableid, version, contentid, endtime))
         {
             continue;
         }
@@ -818,12 +818,12 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 
 void EITHelper::PruneEITCache(uint timestamp)
 {
-    eitcache->PruneOldEntries(timestamp);
+    s_eitcache->PruneOldEntries(timestamp);
 }
 
 void EITHelper::WriteEITCache(void)
 {
-    eitcache->WriteToDB();
+    s_eitcache->WriteToDB();
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -100,7 +100,7 @@ class VideoSync
     int64_t m_nexttrigger;
     int m_delay;
     
-    static int m_forceskip;
+    static int s_forceskip;
 };
 
 #ifndef _WIN32

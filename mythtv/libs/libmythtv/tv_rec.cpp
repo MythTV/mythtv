@@ -47,8 +47,8 @@
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
-QReadWriteLock    TVRec::inputsLock;
-QMap<uint,TVRec*> TVRec::inputs;
+QReadWriteLock    TVRec::s_inputsLock;
+QMap<uint,TVRec*> TVRec::s_inputs;
 
 static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
@@ -123,7 +123,7 @@ TVRec::TVRec(int _inputid)
       // RingBuffer info
       ringBuffer(nullptr), rbFileExt("ts")
 {
-    inputs[inputid] = this;
+    s_inputs[inputid] = this;
 }
 
 bool TVRec::CreateChannel(const QString &startchannel,
@@ -210,7 +210,7 @@ bool TVRec::Init(void)
  */
 TVRec::~TVRec()
 {
-    inputs.remove(inputid);
+    s_inputs.remove(inputid);
 
     if (HasFlags(kFlagRunMainLoop))
     {
@@ -1337,10 +1337,10 @@ void TVRec::run(void)
         // to make sure this thread starts.  Until a better solution
         // is found, don't run HandleTuning unless we can safely get
         // the lock.
-        if (inputsLock.tryLockForRead())
+        if (s_inputsLock.tryLockForRead())
         {
             HandleTuning();
-            inputsLock.unlock();
+            s_inputsLock.unlock();
         }
 
         // Tell frontends about pending recordings
@@ -1469,7 +1469,7 @@ void TVRec::run(void)
                 // Check if another card in the same input group is
                 // busy.  This could be either virtual DVB-devices or
                 // a second tuner on a single card
-                inputsLock.lockForRead();
+                s_inputsLock.lockForRead();
                 bool allow_eit = true;
                 vector<uint> inputids =
                     CardUtil::GetConflictingInputs(inputid);
@@ -1491,7 +1491,7 @@ void TVRec::run(void)
                         .arg(inputid).arg(busy_input.inputid));
                     eitScanStartTime = eitScanStartTime.addSecs(300);
                 }
-                inputsLock.unlock();
+                s_inputsLock.unlock();
             }
         }
 
@@ -4847,8 +4847,8 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
 
 TVRec* TVRec::GetTVRec(uint inputid)
 {
-    QMap<uint,TVRec*>::const_iterator it = inputs.find(inputid);
-    if (it == inputs.end())
+    QMap<uint,TVRec*>::const_iterator it = s_inputs.find(inputid);
+    if (it == s_inputs.end())
         return nullptr;
     return *it;
 }

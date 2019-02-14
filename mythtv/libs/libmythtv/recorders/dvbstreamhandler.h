@@ -71,13 +71,13 @@ class DVBStreamHandler : public StreamHandler
     DeviceReadBuffer *_drb;
 
     // for caching TS monitoring supported value.
-    static QMutex             _rec_supports_ts_monitoring_lock;
-    static QMap<QString,bool> _rec_supports_ts_monitoring;
+    static QMutex             s_rec_supports_ts_monitoring_lock;
+    static QMap<QString,bool> s_rec_supports_ts_monitoring;
 
     // for implementing Get & Return
-    static QMutex                          _handlers_lock;
-    static QMap<QString,DVBStreamHandler*> _handlers;
-    static QMap<QString,uint>              _handlers_refcnt;
+    static QMutex                          s_handlers_lock;
+    static QMap<QString,DVBStreamHandler*> s_handlers;
+    static QMap<QString,uint>              s_handlers_refcnt;
 };
 
 #endif // _DVBSTREAMHANDLER_H_

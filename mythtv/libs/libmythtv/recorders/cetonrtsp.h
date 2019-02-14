@@ -66,7 +66,7 @@ protected:
     int                     _timer;
     bool                    _canGetParameter;
 
-    static QMutex _rtspMutex;
+    static QMutex  s_rtspMutex;
 
 };
 

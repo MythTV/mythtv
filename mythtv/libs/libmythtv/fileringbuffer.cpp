@@ -121,11 +121,11 @@ static bool check_permissions(const QString &filename)
 
 static bool is_subtitle_possible(const QString &extension)
 {
-    QMutexLocker locker(&RingBuffer::subExtLock);
+    QMutexLocker locker(&RingBuffer::s_subExtLock);
     bool no_subtitle = false;
-    for (uint i = 0; i < (uint)RingBuffer::subExtNoCheck.size(); i++)
+    for (uint i = 0; i < (uint)RingBuffer::s_subExtNoCheck.size(); i++)
     {
-        if (extension.contains(RingBuffer::subExtNoCheck[i].right(3)))
+        if (extension.contains(RingBuffer::s_subExtNoCheck[i].right(3)))
         {
             no_subtitle = true;
             break;
@@ -155,9 +155,9 @@ static QString local_sub_filename(QFileInfo &fileInfo)
             .replace("(", "?")
             .replace(")", "?");
 
-        QMutexLocker locker(&RingBuffer::subExtLock);
-        QStringList::const_iterator eit = RingBuffer::subExt.begin();
-        for (; eit != RingBuffer::subExt.end(); ++eit)
+        QMutexLocker locker(&RingBuffer::s_subExtLock);
+        QStringList::const_iterator eit = RingBuffer::s_subExt.begin();
+        for (; eit != RingBuffer::s_subExt.end(); ++eit)
             el += findBaseName + *eit;
     }
 
@@ -357,9 +357,9 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
             if (is_subtitle_possible(extension))
             {
-                QMutexLocker locker(&subExtLock);
-                QStringList::const_iterator eit = subExt.begin();
-                for (; eit != subExt.end(); ++eit)
+                QMutexLocker locker(&s_subExtLock);
+                QStringList::const_iterator eit = s_subExt.begin();
+                for (; eit != s_subExt.end(); ++eit)
                     auxFiles += baseName + *eit;
             }
         }

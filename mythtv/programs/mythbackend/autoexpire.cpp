@@ -282,7 +282,7 @@ void AutoExpire::RunExpirer(void)
 
     while (m_expire_thread_run)
     {
-        TVRec::inputsLock.lockForRead();
+        TVRec::s_inputsLock.lockForRead();
 
         curTime = MythDate::current();
         // recalculate auto expire parameters
@@ -331,7 +331,7 @@ void AutoExpire::RunExpirer(void)
             ExpireRecordings();
         }
 
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
 
         Sleep(60 * 1000 - timer.elapsed());
     }

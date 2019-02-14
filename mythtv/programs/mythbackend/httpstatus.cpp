@@ -196,7 +196,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     int  numencoders = 0;
     bool isLocal     = true;
 
-    TVRec::inputsLock.lockForRead();
+    TVRec::s_inputsLock.lockForRead();
 
     for (auto iter = m_pEncoders->begin(); iter != m_pEncoders->end(); ++iter)
     {
@@ -251,7 +251,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         }
     }
 
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     encoders.setAttribute("count", numencoders);
 

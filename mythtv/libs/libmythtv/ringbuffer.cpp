@@ -49,9 +49,9 @@ const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 
 #define LOC      QString("RingBuf(%1): ").arg(filename)
 
-QMutex      RingBuffer::subExtLock;
-QStringList RingBuffer::subExt;
-QStringList RingBuffer::subExtNoCheck;
+QMutex      RingBuffer::s_subExtLock;
+QStringList RingBuffer::s_subExt;
+QStringList RingBuffer::s_subExtNoCheck;
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -249,21 +249,21 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     bitrateInitialized(false)
 {
     {
-        QMutexLocker locker(&subExtLock);
-        if (subExt.empty())
+        QMutexLocker locker(&s_subExtLock);
+        if (s_subExt.empty())
         {
             // Possible subtitle file extensions '.srt', '.sub', '.txt'
             // since #9294 also .ass and .ssa
-            subExt += ".ass";
-            subExt += ".srt";
-            subExt += ".ssa";
-            subExt += ".sub";
-            subExt += ".txt";
+            s_subExt += ".ass";
+            s_subExt += ".srt";
+            s_subExt += ".ssa";
+            s_subExt += ".sub";
+            s_subExt += ".txt";
 
             // Extensions for which a subtitle file should not exist
-            subExtNoCheck = subExt;
-            subExtNoCheck += ".gif";
-            subExtNoCheck += ".png";
+            s_subExtNoCheck = s_subExt;
+            s_subExtNoCheck += ".gif";
+            s_subExtNoCheck += ".png";
         }
     }
 }

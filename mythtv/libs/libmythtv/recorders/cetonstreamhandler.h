@@ -77,10 +77,10 @@ class CetonStreamHandler : public IPTVStreamHandler
     QTime       _read_timer;
 
     // for implementing Get & Return
-    static QMutex                               _handlers_lock;
-    static QMap<QString, CetonStreamHandler*>   _handlers;
-    static QMap<QString, uint>                  _handlers_refcnt;
-    static QMap<QString, bool>                  _info_queried;
+    static QMutex                               s_handlers_lock;
+    static QMap<QString, CetonStreamHandler*>   s_handlers;
+    static QMap<QString, uint>                  s_handlers_refcnt;
+    static QMap<QString, bool>                  s_info_queried;
 };
 
 #endif // _CETONSTREAMHANDLER_H_

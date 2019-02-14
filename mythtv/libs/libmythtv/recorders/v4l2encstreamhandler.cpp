@@ -26,7 +26,7 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-const char* V4L2encStreamHandler::m_stream_types[] =
+const char* V4L2encStreamHandler::s_stream_types[] =
 {
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
@@ -34,44 +34,44 @@ const char* V4L2encStreamHandler::m_stream_types[] =
     "SVCD",      "DVD-Special 1", "DVD-Special 2", nullptr
 };
 
-const int V4L2encStreamHandler::m_audio_rateL1[] =
+const int V4L2encStreamHandler::s_audio_rateL1[] =
 {
     32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0
 };
 
-const int V4L2encStreamHandler::m_audio_rateL2[] =
+const int V4L2encStreamHandler::s_audio_rateL2[] =
 {
     32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0
 };
 
-const int V4L2encStreamHandler::m_audio_rateL3[] =
+const int V4L2encStreamHandler::s_audio_rateL3[] =
 {
     32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
 };
 
 #define LOC      QString("V4L2SH[%1](%2): ").arg(_inputid).arg(_device)
 
-QMap<QString,V4L2encStreamHandler*> V4L2encStreamHandler::m_handlers;
-QMap<QString,uint>              V4L2encStreamHandler::m_handlers_refcnt;
-QMutex                          V4L2encStreamHandler::m_handlers_lock;
+QMap<QString,V4L2encStreamHandler*> V4L2encStreamHandler::s_handlers;
+QMap<QString,uint>                  V4L2encStreamHandler::s_handlers_refcnt;
+QMutex                              V4L2encStreamHandler::s_handlers_lock;
 
 V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
                                                 int audioinput, int inputid)
 {
-    QMutexLocker locker(&m_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devkey = devname;
 
-    QMap<QString,V4L2encStreamHandler*>::iterator it = m_handlers.find(devkey);
+    QMap<QString,V4L2encStreamHandler*>::iterator it = s_handlers.find(devkey);
 
-    if (it == m_handlers.end())
+    if (it == s_handlers.end())
     {
         V4L2encStreamHandler *newhandler = new V4L2encStreamHandler(devname,
                                                                     audioinput,
                                                                     inputid);
 
-        m_handlers[devkey] = newhandler;
-        m_handlers_refcnt[devkey] = 1;
+        s_handlers[devkey] = newhandler;
+        s_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("V4L2SH[%1]: Creating new stream handler for %2")
@@ -79,24 +79,24 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
     }
     else
     {
-        m_handlers_refcnt[devkey]++;
-        uint rcount = m_handlers_refcnt[devkey];
+        s_handlers_refcnt[devkey]++;
+        uint rcount = s_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("V4L2SH[%1]: Using existing stream handler for %2")
             .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return m_handlers[devkey];
+    return s_handlers[devkey];
 }
 
 void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&m_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devname = ref->_device;
 
-    QMap<QString,uint>::iterator rit = m_handlers_refcnt.find(devname);
-    if (rit == m_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
+    if (rit == s_handlers_refcnt.end())
         return;
 
     LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Return '%2' in use %3")
@@ -110,13 +110,13 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
     }
 
     QMap<QString, V4L2encStreamHandler*>::iterator it =
-        m_handlers.find(devname);
-    if ((it != m_handlers.end()) && (*it == ref))
+        s_handlers.find(devname);
+    if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
         delete *it;
-        m_handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
@@ -125,7 +125,7 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    m_handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
@@ -766,7 +766,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel1")
     {
-        int index = find_index(m_audio_rateL1, value);
+        int index = find_index(s_audio_rateL1, value);
         if (index >= 0)
             m_audio_bitrateL1 = index;
         else
@@ -778,7 +778,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel2")
     {
-        int index = find_index(m_audio_rateL2, value);
+        int index = find_index(s_audio_rateL2, value);
         if (index >= 0)
             m_audio_bitrateL2 = index;
         else
@@ -790,7 +790,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel3")
     {
-        int index = find_index(m_audio_rateL3, value);
+        int index = find_index(s_audio_rateL3, value);
         if (index >= 0)
             m_audio_bitrateL3 = index;
         else
@@ -854,9 +854,9 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, const QString &value)
         m_vbi_device = value;
     else if (opt == "mpeg2streamtype")
     {
-        for (uint i = 0; i < sizeof(m_stream_types) / sizeof(char*); ++i)
+        for (uint i = 0; i < sizeof(s_stream_types) / sizeof(char*); ++i)
         {
-            if (QString(m_stream_types[i]) == value)
+            if (QString(s_stream_types[i]) == value)
             {
                 m_desired_stream_type = i;
                 return true;

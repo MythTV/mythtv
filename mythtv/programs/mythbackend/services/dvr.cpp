@@ -675,7 +675,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
 {
     DTC::EncoderList* pList = new DTC::EncoderList();
 
-    QReadLocker tvlocker(&TVRec::inputsLock);
+    QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
     QMap<int, EncoderLink *>::Iterator iter = tvList.begin();
 

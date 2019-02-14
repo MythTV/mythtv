@@ -368,22 +368,22 @@ QString ProfileItem::toString(void) const
 
 #define LOC     QString("VDP: ")
 
-QMutex      VideoDisplayProfile::safe_lock(QMutex::Recursive);
-bool        VideoDisplayProfile::safe_initialized = false;
-safe_map_t  VideoDisplayProfile::safe_renderer;
-safe_map_t  VideoDisplayProfile::safe_renderer_group;
-safe_map_t  VideoDisplayProfile::safe_deint;
-safe_map_t  VideoDisplayProfile::safe_osd;
-safe_map_t  VideoDisplayProfile::safe_equiv_dec;
-safe_list_t VideoDisplayProfile::safe_custom;
-priority_map_t VideoDisplayProfile::safe_renderer_priority;
-pref_map_t  VideoDisplayProfile::dec_name;
-safe_list_t VideoDisplayProfile::safe_decoders;
+QMutex         VideoDisplayProfile::s_safe_lock(QMutex::Recursive);
+bool           VideoDisplayProfile::s_safe_initialized = false;
+safe_map_t     VideoDisplayProfile::s_safe_renderer;
+safe_map_t     VideoDisplayProfile::s_safe_renderer_group;
+safe_map_t     VideoDisplayProfile::s_safe_deint;
+safe_map_t     VideoDisplayProfile::s_safe_osd;
+safe_map_t     VideoDisplayProfile::s_safe_equiv_dec;
+safe_list_t    VideoDisplayProfile::s_safe_custom;
+priority_map_t VideoDisplayProfile::s_safe_renderer_priority;
+pref_map_t     VideoDisplayProfile::s_dec_name;
+safe_list_t    VideoDisplayProfile::s_safe_decoders;
 
 VideoDisplayProfile::VideoDisplayProfile()
     : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
     QString hostname    = gCoreContext->GetHostName();
@@ -495,8 +495,8 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &renderer)
         QString("Preferred video renderer: %1 (current: %2)")
                 .arg(renderer).arg(last_video_renderer));
 
-    safe_map_t::const_iterator it = safe_renderer_group.begin();
-    for (; it != safe_renderer_group.end(); ++it)
+    safe_map_t::const_iterator it = s_safe_renderer_group.begin();
+    for (; it != s_safe_renderer_group.end(); ++it)
         if (it->contains(last_video_renderer) &&
             it->contains(renderer))
             return true;
@@ -509,8 +509,8 @@ bool VideoDisplayProfile::IsDecoderCompatible(const QString &decoder)
     if (dec == decoder)
         return true;
 
-    QMutexLocker locker(&safe_lock);
-    return (safe_equiv_dec[dec].contains(decoder));
+    QMutexLocker locker(&s_safe_lock);
+    return (s_safe_equiv_dec[dec].contains(decoder));
 }
 
 QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
@@ -813,7 +813,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
 QStringList VideoDisplayProfile::GetDecoders(void)
 {
     init_statics();
-    return safe_decoders;
+    return s_safe_decoders;
 }
 
 QStringList VideoDisplayProfile::GetDecoderNames(void)
@@ -834,23 +834,23 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     if (decoder.isEmpty())
         return "";
 
-    QMutexLocker locker(&safe_lock);
-    if (dec_name.empty())
+    QMutexLocker locker(&s_safe_lock);
+    if (s_dec_name.empty())
     {
-        dec_name["ffmpeg"]   = QObject::tr("Standard");
-        dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
-        dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
-        dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
-        dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
-        dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
-        dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
-        dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
-        dec_name["nvdec"]    = QObject::tr("NVidia NVDEC acceleration");
+        s_dec_name["ffmpeg"]   = QObject::tr("Standard");
+        s_dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
+        s_dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
+        s_dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
+        s_dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
+        s_dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
+        s_dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
+        s_dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
+        s_dec_name["nvdec"]    = QObject::tr("NVidia NVDEC acceleration");
     }
 
     QString ret = decoder;
-    pref_map_t::const_iterator it = dec_name.find(decoder);
-    if (it != dec_name.end())
+    pref_map_t::const_iterator it = s_dec_name.find(decoder);
+    if (it != s_dec_name.end())
         ret = *it;
     return ret;
 }
@@ -1541,12 +1541,12 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
-    safe_map_t::const_iterator it = safe_renderer.find(decoder);
+    safe_map_t::const_iterator it = s_safe_renderer.find(decoder);
     QStringList tmp;
-    if (it != safe_renderer.end())
+    if (it != s_safe_renderer.end())
         tmp = *it;
     return tmp;
 }
@@ -1653,12 +1653,12 @@ QString VideoDisplayProfile::GetPreferredVideoRenderer(const QString &decoder)
 QStringList VideoDisplayProfile::GetDeinterlacers(
     const QString &video_renderer)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
-    safe_map_t::const_iterator it = safe_deint.find(video_renderer);
+    safe_map_t::const_iterator it = s_safe_deint.find(video_renderer);
     QStringList tmp;
-    if (it != safe_deint.end())
+    if (it != s_safe_deint.end())
         tmp = *it;
     return tmp;
 }
@@ -1833,12 +1833,12 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 
 QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
-    safe_map_t::const_iterator it = safe_osd.find(video_renderer);
+    safe_map_t::const_iterator it = s_safe_osd.find(video_renderer);
     QStringList tmp;
-    if (it != safe_osd.end())
+    if (it != s_safe_osd.end())
         tmp = *it;
     return tmp;
 }
@@ -1892,9 +1892,9 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
 
 bool VideoDisplayProfile::IsFilterAllowed(const QString &video_renderer)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
-    return safe_custom.contains(video_renderer);
+    return s_safe_custom.contains(video_renderer);
 }
 
 QStringList VideoDisplayProfile::GetFilteredRenderers(
@@ -1915,7 +1915,7 @@ QStringList VideoDisplayProfile::GetFilteredRenderers(
 
 QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
     uint    top_priority = 0;
@@ -1924,8 +1924,8 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
     QStringList::const_iterator it = renderers.begin();
     for (; it != renderers.end(); ++it)
     {
-        priority_map_t::const_iterator p = safe_renderer_priority.find(*it);
-        if ((p != safe_renderer_priority.end()) && (*p >= top_priority))
+        priority_map_t::const_iterator p = s_safe_renderer_priority.find(*it);
+        if ((p != s_safe_renderer_priority.end()) && (*p >= top_priority))
         {
             top_priority = *p;
             top_renderer = *it;
@@ -1948,26 +1948,26 @@ QString VideoDisplayProfile::toString(void) const
 
 void VideoDisplayProfile::init_statics(void)
 {
-    if (safe_initialized)
+    if (s_safe_initialized)
         return;
 
-    safe_initialized = true;
+    s_safe_initialized = true;
 
     render_opts options;
-    options.renderers      = &safe_custom;
-    options.safe_renderers = &safe_renderer;
-    options.deints         = &safe_deint;
-    options.osds           = &safe_osd;
-    options.render_group   = &safe_renderer_group;
-    options.priorities     = &safe_renderer_priority;
-    options.decoders       = &safe_decoders;
-    options.equiv_decoders = &safe_equiv_dec;
+    options.renderers      = &s_safe_custom;
+    options.safe_renderers = &s_safe_renderer;
+    options.deints         = &s_safe_deint;
+    options.osds           = &s_safe_osd;
+    options.render_group   = &s_safe_renderer_group;
+    options.priorities     = &s_safe_renderer_priority;
+    options.decoders       = &s_safe_decoders;
+    options.equiv_decoders = &s_safe_equiv_dec;
 
     // N.B. assumes NuppelDecoder and DummyDecoder always present
     AvFormatDecoder::GetDecoders(options);
     VideoOutput::GetRenderOptions(options);
 
-    foreach(QString decoder, safe_decoders)
+    foreach(QString decoder, s_safe_decoders)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("decoder<->render support: %1%2")
                 .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
