@@ -2,18 +2,10 @@
 #define VAAPICONTEXT_H
 
 // MythTV
-#include "referencecounter.h"
 #include "mythcodecid.h"
 
 // VAAPI
 #include "va/va.h"
-#include "va/va_version.h"
-#if VA_CHECK_VERSION(0,34,0)
-#include "va/va_compat.h"
-#endif
-#include "va/va_glx.h"
-
-class MythRenderOpenGL;
 
 // FFmpeg
 extern "C" {
@@ -22,35 +14,22 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-class MythVAAPIDisplay : public ReferenceCounter
-{
-  public:
-    explicit    MythVAAPIDisplay(MythRenderOpenGL *Context);
-    static void MythVAAPIDisplayDestroy(MythRenderOpenGL *Context, VADisplay Display);
-    static void MythVAAPIDisplayDestroyCallback(void* Context, void* Wait, void *Display);
-
-    MythRenderOpenGL *m_context;
-    VADisplay         m_vaDisplay;
-
-  protected:
-   ~MythVAAPIDisplay();
-};
-
 class VAAPIContext
 {
   public:
-    VAAPIContext();
-   ~VAAPIContext();
-    static MythCodecID GetBestSupportedCodec(AVCodecContext *CodecContext,
-                                             AVCodec **Codec,
-                                             const QString &Decoder,
-                                             uint StreamType,
-                                             AVPixelFormat &PixFmt);
-    static void HWFramesContextFinished(struct AVHWFramesContext *Context);
-    static void HWDeviceContextFinished(struct AVHWDeviceContext *Context);
-    static void InitVAAPIContext(AVCodecContext *Context);
-    static int  HwDecoderInit(AVCodecContext *Context);
-    static void HWDecoderInitCallback(void*, void* Wait, void *Data);
+    VAAPIContext() = default;
+   ~VAAPIContext() = default;
+    static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
+                                          AVCodec       **Codec,
+                                          const QString  &Decoder,
+                                          uint            StreamType,
+                                          AVPixelFormat  &PixFmt);
+    static void FramesContextFinished    (struct AVHWFramesContext *Context);
+    static void DeviceContextFinished    (struct AVHWDeviceContext *Context);
+    static void InitialiseContext        (AVCodecContext *Context);
+    static int  InitialiseDecoder        (AVCodecContext *Context);
+    static void InitialiseDecoderCallback(void* Wait, void* Context, void*);
+    static void DestroyInteropCallback   (void* Wait, void* Interop, void*);
 
   private:
     static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);

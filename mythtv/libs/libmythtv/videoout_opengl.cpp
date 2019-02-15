@@ -182,7 +182,7 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
                              WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
     // if vaapi initialisation failed, fallback to yv12
-    if ((OpenGLVideo::kGLVAAPI == m_openGLVideoType) && !codec_is_vaapi(CodecId))
+    if ((OpenGLVideo::kGLInterop == m_openGLVideoType) && !codec_is_vaapi(CodecId))
         m_openGLVideoType = OpenGLVideo::kGLYV12;
 
     bool success = true;
@@ -241,11 +241,18 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDi
     }
 
     // fail fast if we don't know how to display the codec
-    if (!(codec_sw_copy(CodecId) || MythOpenGLInterop::IsCodecSupported(CodecId)))
+    if (!codec_sw_copy(CodecId))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
-        errorState = kError_Unknown;
-        return false;
+        if (!gCoreContext->IsUIThread())
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Cannot check interop support from this thread");
+        }
+        else if (MythOpenGLInterop::GetInteropType(CodecId) == MythOpenGLInterop::Unsupported)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
+            errorState = kError_Unknown;
+            return false;
+        }
     }
 
     // Ensure we don't lose embedding through program changes.
@@ -640,14 +647,6 @@ void VideoOutputOpenGL::InitPictureAttributes(void)
                                         kPictureAttributeSupported_StudioLevels));
 }
 
-int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute Attribute, int Value)
-{
-    int val = m_openGLVideo->SetPictureAttribute(Attribute, Value);
-    if (val < 0)
-        return val;
-    return VideoOutput::SetPictureAttribute(Attribute, Value);
-}
-
 bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &OverrideFilter)
 {
     if (!m_openGLVideo || !m_render)
@@ -677,7 +676,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &Overrid
         m_deintFilter = nullptr;
     }
 
-    if (OpenGLVideo::kGLVAAPI == m_openGLVideoType)
+    if (OpenGLVideo::kGLInterop == m_openGLVideoType)
     {
         m_deinterlacing = m_deintfiltername.contains("vaapi") ? Interlaced : false;
         return m_deinterlacing;
@@ -823,7 +822,7 @@ void VideoOutputOpenGL::StopEmbedding(void)
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString &Deinterlacer) const
 {
-    bool vaapi = OpenGLVideo::kGLVAAPI == m_openGLVideoType;
+    bool vaapi = OpenGLVideo::kGLInterop == m_openGLVideoType;
     // anything OpenGL when using shaders
     if (!vaapi && Deinterlacer.contains("opengl"))
         return true;

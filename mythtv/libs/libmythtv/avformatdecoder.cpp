@@ -104,9 +104,14 @@ __inline AVRational GetAVTimeBaseQ()
 
 #define LOC QString("AFD: ")
 
-// Maximum number of sequential invalid data packet errors
-// before we try switching to software decoder
-#define SEQ_PKT_ERR_MAX 10
+// Maximum number of sequential invalid data packet errors before we try
+// switching to software decoder. Packet errors are often seen when using
+// hardware contexts and, for example, seeking. Hence this needs to be high and
+// is probably best removed as it is treating the symptoms and not the cause
+// (e.g. VAAPI2 does not currently do any hardware support checks).
+// See also comment in MythCodecMap::freeCodecContext re trying to free an
+// active hardware context when it is errored.
+#define SEQ_PKT_ERR_MAX 50
 
 static const int max_video_queue_size = 220;
 
@@ -1557,7 +1562,7 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext* ctx,
     while (*valid_fmts != AV_PIX_FMT_NONE)
     {
         if (*valid_fmts == AV_PIX_FMT_VAAPI)
-            if (VAAPIContext::HwDecoderInit(ctx) >= 0)
+            if (VAAPIContext::InitialiseDecoder(ctx) >= 0)
                 return *valid_fmts;
         valid_fmts++;
     }
@@ -2590,7 +2595,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     MythCodecID vaapi_mcid;
                     AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    vaapi_mcid = VAAPIContext::GetBestSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pix_fmt);
+                    vaapi_mcid = VAAPIContext::GetSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pix_fmt);
 
                     if (codec_is_vaapi(vaapi_mcid))
                     {
@@ -3200,8 +3205,7 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
     frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(pic->buf[0]));
     // frame->hw_frames_ctx contains a reference to the AVHWFramesContext. Take an additional
     // reference to ensure AVHWFramesContext is not released until we are finished with it.
-    // This also gives the video classes access to the
-    // underlying VAAPI context (and VADisplay) that FFmpeg is using.
+    // This also gives the video classes access to the underlying VAAPI interop.
     frame->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(pic->hw_frames_ctx));
 
     // Set release method

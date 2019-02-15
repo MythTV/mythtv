@@ -9,8 +9,8 @@
 #include "mythcodecid.h"
 #include "mythframe.h"
 #include "mythrender_opengl.h"
-#include "mythopenglinterop.h"
 #include "videobuffers.h"
+#include "mythvaapiinterop.h"
 #include "vaapicontext.h"
 
 extern "C" {
@@ -18,107 +18,50 @@ extern "C" {
 #include "libavutil/pixdesc.h"
 }
 
-#define LOC QString("VAAPIHWCtx: ")
-#define ERR QString("VAAPIHWCtx Error: ")
+#define LOC QString("VAAPIDec: ")
 
-MythVAAPIDisplay::MythVAAPIDisplay(MythRenderOpenGL *Context)
-  : ReferenceCounter("VAAPIDisplay"),
-    m_context(Context),
-    m_vaDisplay(nullptr)
+void VAAPIContext::DestroyInteropCallback(void *Wait, void *Interop, void *)
 {
-    if (!m_context)
-      return;
-    m_context->IncrRef();
-
-    OpenGLLocker locker(m_context);
-    Display *display = glXGetCurrentDisplay();
-
-    if (!display)
-    {
-      LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open GLX display");
-      return;
-    }
-
-    m_vaDisplay = vaGetDisplayGLX(display);
-
-    if (!m_vaDisplay)
-    {
-      LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VADisplay");
-      return;
-    }
-
-    int major_ver, minor_ver;
-    if (vaInitialize(m_vaDisplay, &major_ver, &minor_ver) != VA_STATUS_SUCCESS)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI GLX display");
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Created VAAPI GLX display");
-}
-
-MythVAAPIDisplay::~MythVAAPIDisplay()
-{
-    if (!m_context)
-        return;
-
-    if (m_vaDisplay)
-    {
-        if (gCoreContext->IsUIThread())
-        {
-            MythVAAPIDisplayDestroy(m_context, m_vaDisplay);
-        }
-        else
-        {
-            MythMainWindow *window = MythMainWindow::getMainWindow();
-            if (!window)
-            {
-                QWaitCondition wait;
-                QMutex lock;
-                lock.lock();
-                MythCallbackEvent *event = new MythCallbackEvent(&MythVAAPIDisplayDestroyCallback, m_context, &wait, m_vaDisplay);
-                QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
-                int count = 0;
-                while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms to destroy display").arg(count));
-                lock.unlock();
-            }
-        }
-    }
-    m_context->DecrRef();
-}
-
-void MythVAAPIDisplay::MythVAAPIDisplayDestroy(MythRenderOpenGL *Context, VADisplay Display)
-{
-    if (!Context || !Display || !gCoreContext->IsUIThread())
-        return;
-
-    Context->makeCurrent();
-    if(vaTerminate(Display) != VA_STATUS_SUCCESS)
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Error closing VAAPI GLX display");
-    Context->doneCurrent();
-    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI GLX display closed");
-}
-
-void MythVAAPIDisplay::MythVAAPIDisplayDestroyCallback(void *Context, void *Wait, void *Display)
-{
-    MythRenderOpenGL *context = static_cast<MythRenderOpenGL*>(Context);
-    QWaitCondition   *wait    = static_cast<QWaitCondition*>(Wait);
-    VADisplay        *display = static_cast<VADisplay*>(Display);
-    MythVAAPIDisplayDestroy(context, display);
+    MythOpenGLInterop *interop = static_cast<MythOpenGLInterop*>(Interop);
+    QWaitCondition    *wait    = static_cast<QWaitCondition*>(Wait);
+    if (interop)
+        interop->DecrRef();
     if (wait)
         wait->wakeAll();
 }
 
-void VAAPIContext::HWFramesContextFinished(AVHWFramesContext *Context)
+void VAAPIContext::FramesContextFinished(AVHWFramesContext *Context)
 {
     if (!Context)
         return;
-    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI frames context destroyed");
-    MythVAAPIDisplay* display = reinterpret_cast<MythVAAPIDisplay*>(Context->user_opaque);
-    if (display)
-        display->DecrRef();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI frames context destroyed");
+
+    MythVAAPIInterop *interop = reinterpret_cast<MythVAAPIInterop*>(Context->user_opaque);
+    if (interop && gCoreContext->IsUIThread())
+    {
+        interop->DecrRef();
+    }
+    else if (interop)
+    {
+        MythMainWindow *window = MythMainWindow::getMainWindow();
+        if (window)
+        {
+            QWaitCondition wait;
+            QMutex lock;
+            lock.lock();
+            MythCallbackEvent *event = new MythCallbackEvent(&DestroyInteropCallback, &wait, interop, nullptr);
+            QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
+            int count = 0;
+            while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
+                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms to destroy interop").arg(count));
+            lock.unlock();
+        }
+    }
 }
 
-void VAAPIContext::HWDeviceContextFinished(AVHWDeviceContext*)
+void VAAPIContext::DeviceContextFinished(AVHWDeviceContext*)
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI device context destroyed");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI device context destroyed");
 }
 
 VAProfile VAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
@@ -196,26 +139,25 @@ VAProfile VAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
     return VAProfileNone;
 }
 
-MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodecContext *CodecContext,
-                                                AVCodec **Codec,
-                                                const QString &Decoder,
-                                                uint StreamType,
-                                                AVPixelFormat &PixFmt)
+MythCodecID VAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
+                                            AVCodec **Codec,
+                                            const QString &Decoder,
+                                            uint StreamType,
+                                            AVPixelFormat &PixFmt)
 {
-    MythCodecID result = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
-    if (Decoder != "vaapi")
-        return result;
+    MythCodecID success = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
+    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (!MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Render device does not support VAAPI");
-        return result;
-    }
+    if (Decoder != "vaapi")
+        return failure;
+
+    if (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported)
+        return failure;
 
     // check for actual decoder support
     AVBufferRef *hwdevicectx = nullptr;
     if (av_hwdevice_ctx_create(&hwdevicectx, AV_HWDEVICE_TYPE_VAAPI, nullptr, nullptr, 0) < 0)
-        return result;
+        return failure;
 
     bool foundhwfmt   = false;
     bool foundswfmt   = false;
@@ -299,18 +241,23 @@ MythCodecID VAAPIContext::GetBestSupportedCodec(AVCodecContext *CodecContext,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name));
         PixFmt = AV_PIX_FMT_VAAPI;
-        return static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
+        return success;
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support '%2' (format: %3 size: %4 profile: %5 entry: %6)")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
             .arg(foundswfmt).arg(sizeok).arg(foundprofile).arg(foundentry));
-    return result;
+    return failure;
 }
 
-void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
+void VAAPIContext::InitialiseContext(AVCodecContext *Context)
 {
     if (!Context || !gCoreContext->IsUIThread())
+        return;
+
+    MythCodecID vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
+    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(vaapiid);
+    if (type == MythOpenGLInterop::Unsupported)
         return;
 
     MythMainWindow* window = MythMainWindow::getMainWindow();
@@ -328,23 +275,24 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
     }
 
     // set hardware device context - just needs a display
-    AVHWDeviceContext*    hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
         return;
     AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
     if (!vaapidevicectx)
         return;
 
-    MythVAAPIDisplay* display = new MythVAAPIDisplay(render);
-    if (!display->m_vaDisplay)
+    MythVAAPIInterop *interop = MythVAAPIInterop::Create(render, type);
+    if (!interop->GetDisplay())
     {
+        interop->DecrRef();
         av_buffer_unref(&hwdeviceref);
         return;
     }
 
     // set the display and ensure it is closed when the device context is finished
-    hwdevicecontext->free        = &VAAPIContext::HWDeviceContextFinished;
-    vaapidevicectx->display    = display->m_vaDisplay;
+    hwdevicecontext->free   = &VAAPIContext::DeviceContextFinished;
+    vaapidevicectx->display = interop->GetDisplay();
 
     // initialise hardware device context
     int res = av_hwdevice_ctx_init(hwdeviceref);
@@ -352,7 +300,7 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI hardware context");
         av_buffer_unref(&hwdeviceref);
-        display->DecrRef();
+        interop->DecrRef();
         return;
     }
 
@@ -362,53 +310,82 @@ void VAAPIContext::InitVAAPIContext(AVCodecContext *Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI hardware frames context");
         av_buffer_unref(&hwdeviceref);
-        display->DecrRef();
+        interop->DecrRef();
         return;
     }
 
     // setup the frames context
-    // the frames context now holds the reference to MythVAAPIDisplay.
+    // the frames context now holds the reference to MythVAAPIInterop
     // Set the callback to ensure it is released
     AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    AVVAAPIFramesContext* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
+
+    // workarounds for specific drivers, surface formats and codecs
+    bool forceformat = false;
+    int  format      = VA_FOURCC_NV12;
+    QString vendor   = interop->GetVendor();
+    if (vendor.contains("ironlake", Qt::CaseInsensitive))
+    {
+        if (CODEC_IS_H264(Context->codec_id))
+        {
+            // ensure decoder outputs consistent frame format rather than a mixture
+            // of I420 and NV12. It won't respect just I420 (YV12).
+            forceformat = true;
+        }
+    }
+
+    if (forceformat)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
+            .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
+        VASurfaceAttrib prefs[3] = {
+            { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, VAGenericValueTypeInteger, format },
+            { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, VAGenericValueTypeInteger, VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY },
+            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, VAGenericValueTypeInteger, VA_SURFACE_ATTRIB_MEM_TYPE_VA} };
+        vaapi_frames_ctx->attributes = prefs;
+        vaapi_frames_ctx->nb_attributes = 3;
+    }
+
     hw_frames_ctx->sw_format         = Context->sw_pix_fmt;
     hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
-    hw_frames_ctx->user_opaque       = display;
-    hw_frames_ctx->free              = &VAAPIContext::HWFramesContextFinished;
+    hw_frames_ctx->user_opaque       = interop;
+    hw_frames_ctx->free              = &VAAPIContext::FramesContextFinished;
     res = av_hwframe_ctx_init(Context->hw_frames_ctx);
     if (res < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI frames context");
         av_buffer_unref(&hwdeviceref);
         av_buffer_unref(&(Context->hw_frames_ctx));
-        display->DecrRef();
+        interop->DecrRef();
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces").arg(hw_frames_ctx->initial_pool_size));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces")
+        .arg(vaapi_frames_ctx->nb_surfaces));
     av_buffer_unref(&hwdeviceref);
 }
 
-void VAAPIContext::HWDecoderInitCallback(void*, void* Wait, void *Data)
+void VAAPIContext::InitialiseDecoderCallback(void* Wait, void* Context, void*)
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Hardware decoder callback");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Hardware decoder callback");
     QWaitCondition* wait    = reinterpret_cast<QWaitCondition*>(Wait);
-    AVCodecContext* context = reinterpret_cast<AVCodecContext*>(Data);
-    InitVAAPIContext(context);
+    AVCodecContext* context = reinterpret_cast<AVCodecContext*>(Context);
+    InitialiseContext(context);
     if (wait)
         wait->wakeAll();
 }
 
-int VAAPIContext::HwDecoderInit(AVCodecContext *Context)
+int VAAPIContext::InitialiseDecoder(AVCodecContext *Context)
 {
-    if (!Context || !MythOpenGLInterop::IsCodecSupported(kCodec_MPEG2_VAAPI))
+    if (!Context)
         return -1;
 
     if (gCoreContext->IsUIThread())
     {
-        InitVAAPIContext(Context);
+        InitialiseContext(Context);
     }
     else
     {
@@ -418,7 +395,7 @@ int VAAPIContext::HwDecoderInit(AVCodecContext *Context)
             QWaitCondition wait;
             QMutex lock;
             lock.lock();
-            MythCallbackEvent *event = new MythCallbackEvent(&HWDecoderInitCallback, nullptr, &wait, Context);
+            MythCallbackEvent *event = new MythCallbackEvent(&InitialiseDecoderCallback, &wait, Context, nullptr);
             QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
             int count = 0;
             while (!wait.wait(&lock, 100) && ((count += 100) < 1100))

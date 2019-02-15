@@ -1,10 +1,10 @@
 // MythTV
-#include "openglvideo.h"
 #include "mythcontext.h"
 #include "tv.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
 #include "openglvideoshaders.h"
+#include "openglvideo.h"
 
 #define LOC QString("GLVid: ")
 #define MAX_VIDEO_TEXTURES 10 // YV12 Kernel deinterlacer + 1
@@ -23,6 +23,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
   : QObject(),
     m_valid(false),
     m_frameType(Type),
+    m_interopFrameType(kGLYV12),
     m_render(Render),
     m_videoDispDim(VideoDispDim),
     m_videoDim(VideoDim),
@@ -38,14 +39,13 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_inputTextures(),
     m_frameBuffer(nullptr),
     m_frameBufferTexture(nullptr),
-    m_inputTextureSize(0,0),
+    m_inputTextureSize(m_videoDim),
     m_referenceTexturesNeeded(0),
     m_features(),
     m_extraFeatures(0),
     m_copyCtx(),
     m_resizing(false),
-    m_forceResize(),
-    m_openglInterop()
+    m_forceResize()
 {
     memset(m_shaders, 0, sizeof(m_shaders));
     memset(m_shaderCost, 1, sizeof(m_shaderCost));
@@ -58,8 +58,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
 
     m_videoColourSpace->IncrRef();
     connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &OpenGLVideo::UpdateColourSpace);
-    if (kGLVAAPI == m_frameType)
-        m_videoColourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
     // Set OpenGL feature support
     m_features      = m_render->GetFeatures();
@@ -76,7 +74,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
 
     // Create initial input texture. Hardware textures are created on demand.
     MythGLTexture *texture = nullptr;
-    if (kGLVAAPI != m_frameType)
+    if (kGLInterop != m_frameType)
     {
         texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);
         if (!texture)
@@ -96,12 +94,9 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
         m_inputTextures.push_back(texture);
     }
 
-    // Create initial shaders - default and optionally progressive
-    if (!CreateVideoShader(Default))
+    // Create initial shaders - default and progressive
+    if (!CreateVideoShader(Default) || !CreateVideoShader(Progressive))
         return;
-    if (kGLVAAPI != m_frameType)
-        if(!CreateVideoShader(Progressive))
-            return;
 
     UpdateColourSpace();
     UpdateShaderParameters();
@@ -182,13 +177,6 @@ void OpenGLVideo::SetMasterViewport(QSize Size)
     m_masterViewportSize = Size;
 }
 
-int OpenGLVideo::SetPictureAttribute(PictureAttribute Attribute, int Value)
-{
-    if (kGLVAAPI == m_frameType)
-        return m_openglInterop.SetPictureAttribute(Attribute, Value);
-    return 0;
-}
-
 void OpenGLVideo::SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect)
 {
     m_displayVideoRect = DisplayVideoRect;
@@ -214,7 +202,7 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
 {
     OpenGLLocker ctx_lock(m_render);
 
-    if (kGLVAAPI == m_frameType)
+    if (kGLInterop == m_frameType)
         return false;
 
     if (m_hardwareDeinterlacer == Deinterlacer)
@@ -271,10 +259,10 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
             QSize chroma(m_videoDim.width() >> 1, m_videoDim.height() >> 1);
             texture = CreateVideoTexture(chroma, temp);
             if (!texture) return false;
-            m_referenceTextures.push_back(CreateVideoTexture(chroma, temp));
+            m_referenceTextures.push_back(texture);
             texture = CreateVideoTexture(chroma, temp);
             if (!texture) return false;
-            m_referenceTextures.push_back(CreateVideoTexture(chroma, temp));
+            m_referenceTextures.push_back(texture);
         }
     }
 
@@ -291,6 +279,9 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
  * If there are alternative shader conditions, the worst case is used.
  * (A dependent read is defined as any texture read that does not use the exact
  * texture coordinates passed into the fragment shader)
+ *
+ * \note m_interopFrameType is used to override the type of shader created for
+ * interop input. So kGLInterop frame type and kGLInterop interop type = RGB!
 */
 bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
 {
@@ -302,24 +293,31 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         m_render->DeleteShaderProgram(m_shaders[Type]);
     m_shaders[Type] = nullptr;
 
+    FrameType frametype = (kGLInterop == m_frameType) ? m_interopFrameType : m_frameType;
     QString vertex = DefaultVertexShader;
     QString fragment;
     int cost = 1;
 
-    if ((Default == Type) || (kGLVAAPI == m_frameType))
+    if ((Default == Type) || (kGLInterop == frametype))
     {
         fragment = DefaultFragmentShader;
     }
     // no interlaced shaders yet
-    else if ((Progressive == Type) || Interlaced == Type || Deinterlacer.isEmpty())
+    else if ((Progressive == Type) || (Interlaced == Type) || Deinterlacer.isEmpty())
     {
-        fragment = (kGLYV12 == m_frameType) ? YV12RGBFragmentShader : YUV2RGBFragmentShader;
-        cost     = (kGLYV12 == m_frameType) ? 3 : 1;
+        switch (frametype)
+        {
+            case kGLNV12:  fragment = NV12FragmentShader;    cost = 2; break;
+            case kGLYV12:  fragment = YV12RGBFragmentShader; cost = 3; break;
+            case kGLUYVY:
+            case kGLHQUYV:
+            default:       fragment = YUV2RGBFragmentShader; cost = 1; break;
+        }
     }
     else
     {
         uint bottom = (InterlacedBot == Type);
-        if (kGLYV12 == m_frameType)
+        if (kGLYV12 == frametype)
         {
             if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
             {
@@ -340,6 +338,30 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
             {
                 fragment = YV12RGBFragmentShader;
                 cost = 3;
+            }
+        }
+        else if (kGLNV12 == frametype)
+        {
+            if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
+            {
+                fragment = NV12OneFieldFragmentShader[bottom];
+                cost = 4;
+            }
+            else if (Deinterlacer == "opengllinearblend" || Deinterlacer == "opengldoubleratelinearblend")
+            {
+                fragment = NV12LinearBlendFragmentShader[bottom];
+                cost = 10;
+            }
+            else if (Deinterlacer == "openglkerneldeint" || Deinterlacer == "opengldoubleratekerneldeint")
+            {
+                // NB NO kernel shader yet. Need to figure out reference frames for interop.
+                fragment = NV12LinearBlendFragmentShader[bottom];
+                cost = 10;
+            }
+            else
+            {
+                fragment = NV12FragmentShader;
+                cost = 2;
             }
         }
         else
@@ -367,9 +389,9 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         }
     }
 
-    fragment.replace("SELECT_COLUMN", (kGLUYVY == m_frameType) ? SelectColumn : "");
+    fragment.replace("SELECT_COLUMN", (kGLUYVY == frametype) ? SelectColumn : "");
     // update packing code so this can be removed
-    fragment.replace("%SWIZZLE%", kGLUYVY == m_frameType ? "arb" : "abr");
+    fragment.replace("%SWIZZLE%", kGLUYVY == frametype ? "arb" : "abr");
 
     m_shaderCost[Type] = cost;
     QOpenGLShaderProgram *program = m_render->CreateShaderProgram(vertex, fragment);
@@ -386,7 +408,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
 MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureSize)
 {
     MythGLTexture *texture = nullptr;
-    if (kGLVAAPI == m_frameType)
+    if (kGLInterop == m_frameType)
     {
         return texture;
     }
@@ -434,7 +456,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
     if (Frame->width  != m_videoDim.width()  ||
         Frame->height != m_videoDim.height() ||
         Frame->width  < 1 || Frame->height < 1 ||
-        Frame->codec != FMT_YV12 || (kGLVAAPI == m_frameType))
+        Frame->codec != FMT_YV12 || (kGLInterop == m_frameType))
     {
         return;
     }
@@ -525,20 +547,44 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREP_FRAME_START");
 
-    // Set required input textures for the last stage (hardware frames are not pre-processed)
+    // Set required input textures for the last stage
     vector<MythGLTexture*> inputtextures;
 
-    // Hardware frames need updating here as all post processing is done before we render
-    if (kGLVAAPI == m_frameType)
-        inputtextures.push_back(m_openglInterop.GetTexture(m_render, m_videoColourSpace, Frame, Scan));
+    // Pull in any hardware frames
+    if (kGLInterop == m_frameType)
+    {
+        // NB this needs more work - but at least gets frames on screen as is
+        inputtextures = MythOpenGLInterop::Retrieve(m_render, m_videoColourSpace, Frame, Scan);
+        unsigned long count = inputtextures.size();
+        if (count)
+        {
+            FrameType newinteroptype = (count == 3) ? kGLYV12 : (count == 2) ? kGLNV12 : kGLInterop; // << HACK ALERT
+            if (m_interopFrameType != newinteroptype)
+            {
+                QSize newsize = inputtextures[0]->m_size;
+                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Interop change %1 %2x%3 -> %4 %5x%6")
+                    .arg(TypeToString(m_interopFrameType)).arg(m_inputTextureSize.width()).arg(m_inputTextureSize.height())
+                    .arg(TypeToString(newinteroptype)).arg(newsize.width()).arg(newsize.height()));
+                m_interopFrameType = newinteroptype;
+                CreateVideoShader(Progressive);
+                UpdateColourSpace();
+                UpdateShaderParameters();
+            }
+        }
+    }
     else
+    {
         inputtextures = m_inputTextures;
+    }
     if (inputtextures.empty())
         return;
 
     // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
-    VideoShaderType program = (kGLVAAPI == m_frameType) ? Default : Progressive;
+    VideoShaderType program = Progressive;
+    if ((kGLInterop == m_frameType) && (kGLInterop == m_interopFrameType))
+        program = Default;
+
     if (m_hardwareDeinterlacing && !m_referenceTexturesNeeded)
     {
         if (Scan == kScan_Interlaced)
@@ -555,7 +601,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 
     // Decide whether to use render to texture - for performance or quality
     bool resize = false;
-    if (kGLVAAPI != m_frameType)
+    if ((kGLInterop != m_frameType) || ((kGLInterop == m_frameType) && (kGLInterop != m_interopFrameType)))
     {
         // ensure deinterlacing works correctly when down scaling in height
         resize = (m_videoDispDim.height() > m_displayVideoRect.height()) && deinterlacing;
@@ -754,7 +800,8 @@ OpenGLVideo::FrameType OpenGLVideo::StringToType(const QString &Type)
     QString type = Type.toLower().trimmed();
     if ("opengl-yv12" == type)  return kGLYV12;
     if ("opengl-hquyv" == type) return kGLHQUYV;
-    if ("openglvaapi" == type)  return kGLVAAPI;
+    if ("opengl-nv12" == type)  return kGLNV12;
+    if ("openglvaapi" == type)  return kGLInterop;
     return kGLUYVY; // opengl
 }
 
@@ -762,10 +809,11 @@ QString OpenGLVideo::TypeToString(FrameType Type)
 {
     switch (Type)
     {
-        case kGLVAAPI: return "openglvaapi";
-        case kGLUYVY:  return "opengl"; // compatibility with old profiles
-        case kGLYV12:  return "opengl-yv12";
-        case kGLHQUYV: return "opengl-hquyv";
+        case kGLInterop: return "openglvaapi";
+        case kGLUYVY:    return "opengl"; // compatibility with old profiles
+        case kGLYV12:    return "opengl-yv12";
+        case kGLHQUYV:   return "opengl-hquyv";
+        case kGLNV12:    return "opengl-nv12";
     }
     return "opengl";
 }

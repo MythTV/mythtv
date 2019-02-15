@@ -2,53 +2,52 @@
 #define MYTHOPENGLINTEROP_H
 
 // MythTV
+#include "mythrender_opengl.h"
+#include "referencecounter.h"
 #include "videoouttypes.h"
 #include "mythcodecid.h"
 #include "mythframe.h"
 
-#ifdef USING_GLVAAPI
-#include "va/va.h"
-class MythVAAPIDisplay;
-#endif
+// Std
+#include "vector"
+using std::vector;
 
-class MythGLTexture;
-class MythRenderOpenGL;
 class VideoColourSpace;
 
-class MythOpenGLInterop
+class MythOpenGLInterop : public ReferenceCounter
 {
   public:
-    static QStringList GetAllowedRenderers(MythCodecID CodecId);
-    static bool IsCodecSupported(MythCodecID CodecId);
 
-    MythOpenGLInterop();
-   ~MythOpenGLInterop();
-    MythGLTexture* GetTexture(MythRenderOpenGL *Context,
-                              VideoColourSpace *ColourSpace,
-                              VideoFrame *Frame, FrameScanType Scan);
-    int   SetPictureAttribute(PictureAttribute Attribute, int NewValue);
+    enum Type
+    {
+        Unsupported  = 0,
+        VAAPIGLXCOPY = 1,
+        VAAPIGLXPIX  = 2,
+        VAAPIEGLDRM  = 3
+    };
 
-  private:
-    MythGLTexture      *m_glTexture;
-    int                 m_glTextureFormat;
-    VideoColourSpace   *m_colourSpace;
+    static QStringList GetAllowedRenderers (MythCodecID CodecId);
+    static Type        GetInteropType      (MythCodecID CodecId);
+    static vector<MythGLTexture*> Retrieve (MythRenderOpenGL *Context,
+                                            VideoColourSpace *ColourSpace,
+                                            VideoFrame *Frame,
+                                            FrameScanType Scan);
+    static QString     TypeToString        (Type InteropType);
 
-#ifdef USING_GLVAAPI
-    MythGLTexture *GetVAAPITexture(MythRenderOpenGL *Context,
-                                   VideoColourSpace *ColourSpace,
-                                   VideoFrame *Frame, FrameScanType Scan);
-    void           InitVAAPIPictureAttributes(void);
-    int            SetVAAPIPictureAttribute(PictureAttribute Attribute, int NewValue);
-    MythGLTexture* GetVAAPIGLXSurface(VideoFrame *Frame, MythVAAPIDisplay *Display,
-                                      VideoColourSpace *ColourSpace);
-    void           DeleteVAAPIGLXSurface(void);
+    virtual ~MythOpenGLInterop();
+    virtual vector<MythGLTexture*> Acquire (MythRenderOpenGL *Context,
+                                            VideoColourSpace *ColourSpace,
+                                            VideoFrame *Frame, FrameScanType Scan) = 0;
+    Type GetType(void);
 
-    MythVAAPIDisplay   *m_vaapiDisplay;
-    VADisplayAttribute* m_vaapiPictureAttributes;
-    int                 m_vaapiPictureAttributeCount;
-    int                 m_vaapiHueBase;
-    uint                m_vaapiColourSpace;
-#endif
+  protected:
+    explicit MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType);
+
+  protected:
+    MythRenderOpenGL   *m_context;
+    Type                m_type;
+    QHash<GLuint, vector<MythGLTexture*> > m_openglTextures;
+    QSize               m_openglTextureSize;
 };
 
 #endif // MYTHOPENGLINTEROP_H

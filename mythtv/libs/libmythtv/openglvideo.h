@@ -36,10 +36,11 @@ class OpenGLVideo : public QObject
 
     enum FrameType
     {
-        kGLVAAPI, // Frame is already in GPU memory
-        kGLUYVY,  // CPU conversion to UYVY422 format - 16bpp
-        kGLYV12,  // All processing on GPU - 12bpp
-        kGLHQUYV  // High quality interlaced CPU conversion to UYV - 32bpp
+        kGLInterop, // Frame is already in GPU memory
+        kGLUYVY,    // CPU conversion to UYVY422 format - 16bpp
+        kGLYV12,    // All processing on GPU - 12bpp
+        kGLHQUYV,   // High quality interlaced CPU conversion to UYV - 32bpp
+        kGLNV12     // Currently used for VAAPI interop only
     };
 
     static FrameType StringToType(const QString &Type);
@@ -62,7 +63,6 @@ class OpenGLVideo : public QObject
     void    SetMasterViewport(QSize Size);
     QSize   GetVideoSize(void) const;
     FrameType GetType() const;
-    int     SetPictureAttribute(PictureAttribute Attribute, int Value);
 
   public slots:
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
@@ -81,6 +81,7 @@ class OpenGLVideo : public QObject
 
     bool           m_valid;
     FrameType      m_frameType;
+    FrameType      m_interopFrameType;    ///< Interop can return RGB, YV12 or NV12
     MythRenderOpenGL *m_render;
     QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
     QSize          m_videoDim;            ///< Total video frame size e.g. 1920x1088
@@ -105,6 +106,5 @@ class OpenGLVideo : public QObject
     MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
     bool           m_resizing;
     bool           m_forceResize;         ///< Global setting to force a resize stage
-    MythOpenGLInterop m_openglInterop;
 };
 #endif // _OPENGL_VIDEO_H__

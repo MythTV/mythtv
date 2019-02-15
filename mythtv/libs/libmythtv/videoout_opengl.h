@@ -34,7 +34,6 @@ class VideoOutputOpenGL : public VideoOutput
     void DrawUnusedRects(bool) override { }
     void Zoom(ZoomDirection Direction) override;
     void MoveResize(void) override;
-    int  SetPictureAttribute(PictureAttribute Attribute, int Value) override;
     void InitPictureAttributes(void) override;
     void EmbedInWidget(const QRect &Rect) override;
     void StopEmbedding(void) override;

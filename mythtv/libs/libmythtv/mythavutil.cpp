@@ -436,6 +436,9 @@ AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
     return streamMap.value(stream, nullptr);
 }
 
+/// \note This will not free a hardware or frames context that is in anyway referenced outside
+/// of the decoder. Probably need to force the VideoOutput class to discard buffers
+/// as well. Leaking hardware contexts is a very bad idea.
 void MythCodecMap::freeCodecContext(const AVStream *stream)
 {
     QMutexLocker lock(&mapLock);
