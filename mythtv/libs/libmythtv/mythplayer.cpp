@@ -2451,7 +2451,6 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!videoOutput)
         return false;
 
-    bool paused_now = false;
     if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
                         (GetEof() != kEofStateNone) ||
                         (videoOutput->hasHWAcceleration() ?
@@ -2467,19 +2466,20 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         // for the jerking is detected.
 
         bool watchingTV = IsWatchingInprogress();
-        if (!paused_now && (livetv || watchingTV) && !FlagIsSet(kMusicChoice))
+        if ( (livetv || watchingTV) && !FlagIsSet(kMusicChoice))
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - framesPlayed;
             uint64_t margin = (uint64_t) (video_frame_rate * 3);
             if (framesLeft < margin)
             {
-                LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                    QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
-                    .arg(framesPlayed).arg(frameCount));
+                if (rtcbase)
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                        QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
+                        .arg(framesPlayed).arg(frameCount));
                 audio.Pause(true);
                 avsync_audiopaused = true;
-                paused_now = true;
+                rtcbase = 0;
             }
         }
         usleep(frame_interval >> 3);
