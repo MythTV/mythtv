@@ -618,16 +618,21 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
 
     OpenGLLocker ctx_lock(gl_context);
 
+    bool dummy = false;
+    gl_context_lock.lock();
+    if (buffer)
+    {
+        framesPlayed = buffer->frameNumber + 1;
+        dummy = buffer->dummy;
+    }
+    gl_context_lock.unlock();
+
     if (!buffer)
     {
         buffer = vbuffers.GetScratchFrame();
         if (m_deinterlacing && !IsBobDeint())
             t = kScan_Interlaced;
     }
-
-    gl_context_lock.lock();
-    framesPlayed = buffer->frameNumber + 1;
-    gl_context_lock.unlock();
 
     gl_context->BindFramebuffer(0);
     if (db_letterbox_colour == kLetterBoxColour_Gray25)
@@ -679,7 +684,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     // video
-    if (gl_videochain && !buffer->dummy)
+    if (gl_videochain && !dummy)
     {
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
@@ -743,9 +748,6 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     gl_context->Flush(false);
-
-    if (vbuffers.GetScratchFrame() == buffer)
-        vbuffers.SetLastShownFrameToScratch();
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)

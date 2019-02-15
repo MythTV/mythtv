@@ -719,8 +719,6 @@ void ExternalStreamHandler::run(void)
 
         if (read_len == 0)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(50));
-
             if (!nodata_timer.isRunning())
                 nodata_timer.start();
             else
@@ -731,15 +729,20 @@ void ExternalStreamHandler::run(void)
                         "No data for 50 seconds, Restarting stream.");
                     if (!RestartStream())
                     {
-                        LOG(VB_RECORD, LOG_ERR, LOC + "Failed to restart stream.");
+                        LOG(VB_RECORD, LOG_ERR, LOC +
+                            "Failed to restart stream.");
                         _error = true;
                     }
                     nodata_timer.stop();
                     continue;
                 }
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+            // HLS type streams may only produce data every ~10 seconds
+            if (nodata_timer.elapsed() < 12000 && buffer.size() < TS_PACKET_SIZE)
+                continue;
         }
         else
         {
