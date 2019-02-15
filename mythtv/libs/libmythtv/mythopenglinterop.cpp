@@ -24,6 +24,8 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
 #ifdef USING_GLVAAPI
     if (codec_is_vaapi(CodecId) && (GetInteropType(CodecId) != Unsupported))
         result << "openglvaapi";
+#else
+    (void)CodecId;
 #endif
     return result;
 }

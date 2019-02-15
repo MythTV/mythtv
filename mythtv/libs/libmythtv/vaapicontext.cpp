@@ -339,9 +339,9 @@ void VAAPIContext::InitialiseContext(AVCodecContext *Context)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
             .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
         VASurfaceAttrib prefs[3] = {
-            { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, VAGenericValueTypeInteger, format },
-            { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, VAGenericValueTypeInteger, VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY },
-            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, VAGenericValueTypeInteger, VA_SURFACE_ATTRIB_MEM_TYPE_VA} };
+            { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { format } } },
+            { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
+            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } };
         vaapi_frames_ctx->attributes = prefs;
         vaapi_frames_ctx->nb_attributes = 3;
     }
