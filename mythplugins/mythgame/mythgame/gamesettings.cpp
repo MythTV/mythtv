@@ -213,7 +213,7 @@ protected:
     QString GetSetClause(MSqlBindings &bindings) const override // SimpleStorage
     {
         bindings.insert(":SETPLAYERID", m_id.Value());
-        bindings.insert(":SETCOLUMN",   user->GetDBValue());
+        bindings.insert(":SETCOLUMN",   m_user->GetDBValue());
         return QString("gameplayerid = :SETPLAYERID, "
                        "%2 = :SETCOLUMN").arg(GetColumnName());
     }
@@ -317,7 +317,7 @@ struct AllowMultipleRoms : public MythUICheckBoxSetting
 /// Settings for a game player
 GamePlayerSetting::GamePlayerSetting(QString name, uint id)
     : GroupSetting()
-    , m_id        (id)
+    , m_id(id)
 {
     setName(name);
 

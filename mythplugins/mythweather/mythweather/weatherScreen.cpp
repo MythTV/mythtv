@@ -17,16 +17,13 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
 
 WeatherScreen::WeatherScreen(MythScreenStack *parent,
                              ScreenListInfo *screenDefn, int id) :
-               MythScreenType (parent, screenDefn->title),
-    m_units(SI_UNITS),
+               MythScreenType (parent, screenDefn->m_title),
     m_screenDefn(screenDefn),
-    m_name(m_screenDefn->name),
-    m_inuse(false),
-    m_prepared(false),
+               m_name(m_screenDefn->m_name),
     m_id(id)
 {
 
-    QStringList types = m_screenDefn->dataTypes;
+    QStringList types = m_screenDefn->m_dataTypes;
 
     for (int i = 0; i < types.size(); ++i)
     {

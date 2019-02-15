@@ -141,7 +141,7 @@ class EITHelper
     mutable ServiceToChanID srv_to_chanid;
 
     EITFixUp               *eitfixup;
-    static EITCache        *eitcache;
+    static EITCache        *s_eitcache;
 
     int                     gps_offset;
 

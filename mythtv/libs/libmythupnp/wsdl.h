@@ -36,7 +36,7 @@
 class UPNP_PUBLIC Wsdl : public QDomDocument
 {
     protected:
-        ServiceHost             *m_pServiceHost;
+        ServiceHost             *m_pServiceHost {nullptr};
         QMap<QString, TypeInfo>  m_typesToInclude;
 
         QDomElement              m_oRoot;
@@ -69,7 +69,8 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 
     public:
 
-        explicit Wsdl( ServiceHost *pServiceHost );
+        explicit Wsdl( ServiceHost *pServiceHost )
+            : m_pServiceHost( pServiceHost ) {}
 
         bool GetWSDL( HTTPRequest *pRequest );
 };

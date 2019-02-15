@@ -1696,7 +1696,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
     QString device = gCoreContext->GetSetting("AudioOutputDevice");
 
     m_audio = AudioOutput::OpenAudio(device, passthru, FORMAT_S16, m_channels,
-                                     0, m_frameRate, AUDIOOUTPUT_MUSIC,
+                                     AV_CODEC_ID_NONE, m_frameRate, AUDIOOUTPUT_MUSIC,
                                      m_allowVolumeControl, false);
     if (!m_audio)
     {

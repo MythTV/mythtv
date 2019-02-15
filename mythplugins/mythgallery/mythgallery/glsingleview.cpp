@@ -78,36 +78,7 @@ void GLSDialog::closeEvent(QCloseEvent *e)
 GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
                            int sortorder, QWidget *parent)
     : QGLWidget(parent),
-      ImageView(itemList, pos, slideShow, sortorder),
-      // General
-      m_source_x(0.0f),
-      m_source_y(0.0f),
-      m_scaleMax(kScaleToFit),
-
-      // Texture variables (for display and effects)
-      m_texMaxDim(512),
-      m_texSize(512,512),
-      m_texCur(0),
-      m_tex1First(true),
-
-      // Info variables
-      m_texInfo(0),
-
-      // Common effect state variables
-      m_effect_rotate_direction(0),
-      m_effect_transition_timeout(2000),
-      m_effect_transition_timeout_inv(1.0f / m_effect_transition_timeout),
-
-      // Unshared effect state variables
-      m_effect_cube_xrot(0.0f),
-      m_effect_cube_yrot(0.0f),
-      m_effect_cube_zrot(0.0f),
-      m_effect_kenBurns_image_timeout(0.0f),
-      m_effect_kenBurns_imageLoadThread(nullptr),
-      m_effect_kenBurns_image_ready(true),
-      m_effect_kenBurns_item(nullptr),
-      m_effect_kenBurns_initialized(false),
-      m_effect_kenBurns_new_image_started(true)
+      ImageView(itemList, pos, slideShow, sortorder)
 {
     m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
@@ -1531,15 +1502,6 @@ void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
     y_loc = (0.5f * random() / (RAND_MAX + 1.0f)) + 0.25f;
     if ((int)(2.0f * random() / (RAND_MAX + 1.0f)) == 0)
         y_loc = -1 * y_loc;
-}
-
-KenBurnsImageLoader::KenBurnsImageLoader(GLSingleView *singleView,
-                                         QSize texSize, QSize screenSize) :
-    MThread("KenBurnsImageLoader"),
-    m_singleView(singleView),
-    m_screenSize(screenSize),
-    m_texSize(texSize)
-{
 }
 
 void KenBurnsImageLoader::run()

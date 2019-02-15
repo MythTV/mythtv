@@ -73,9 +73,8 @@ bool TestDatabase(QString dbHostName,
 }
 
 MSqlDatabase::MSqlDatabase(const QString &name)
+    : m_name(name)
 {
-    m_name = name;
-
     if (!QSqlDatabase::isDriverAvailable("QMYSQL"))
     {
         LOG(VB_FLUSH, LOG_CRIT, "FATAL: Unable to load the QT mysql driver, is it installed?");
@@ -278,15 +277,6 @@ void MSqlDatabase::InitSessionVars()
 // -----------------------------------------------------------------------
 
 
-
-MDBManager::MDBManager()
-{
-    m_nextConnID = 0;
-    m_connCount = 0;
-
-    m_schedCon = nullptr;
-    m_DDCon = nullptr;
-}
 
 MDBManager::~MDBManager()
 {
@@ -524,7 +514,6 @@ static void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
          : QSqlQuery(QString(), qi.qsqldb)
 {
-    m_isConnected = false;
     m_db = qi.db;
     m_returnConnection = qi.returnConnection;
 

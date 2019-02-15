@@ -57,7 +57,7 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
     OMXComponent m_audiorender;
 
     QSemaphore m_ibufs_sema;    // EmptyBufferDone signal
-    QMutex mutable m_lock;      // Protects data following
+    QMutex mutable m_lock {QMutex::Recursive}; // Protects data following
     QList<OMX_BUFFERHEADERTYPE*> m_ibufs;
     QAtomicInt m_pending;
 };

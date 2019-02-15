@@ -50,17 +50,10 @@ class channelRecPrioritySort
 };
 
 ChannelRecPriority::ChannelRecPriority(MythScreenStack *parent)
-                  : MythScreenType(parent, "ChannelRecPriority"),
-                    m_channelList(nullptr), m_chanstringText(nullptr),
-                    m_channameText(nullptr), m_channumText(nullptr),
-                    m_callsignText(nullptr), m_sourcenameText(nullptr),
-                    m_sourceidText(nullptr), m_priorityText(nullptr),
-                    m_iconImage(nullptr)
+                  : MythScreenType(parent, "ChannelRecPriority")
 {
     m_sortType = (SortType)gCoreContext->GetNumSetting("ChannelRecPrioritySorting",
                                                  (int)byChannel);
-
-    m_currentItem = nullptr;
 
     gCoreContext->addListener(this);
 }

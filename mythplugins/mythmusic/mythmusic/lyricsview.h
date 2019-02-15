@@ -44,15 +44,15 @@ class LyricsView : public MusicCommon
     void lyricStatusChanged(LyricsData::Status status, const QString &message);
 
   private:
-    MythUIButtonList  *m_lyricsList;
-    MythUIText        *m_statusText;
-    MythUIStateType   *m_loadingState;
-    MythUIText        *m_bufferStatus;
-    MythUIProgressBar *m_bufferProgress;
+    MythUIButtonList  *m_lyricsList     {nullptr};
+    MythUIText        *m_statusText     {nullptr};
+    MythUIStateType   *m_loadingState   {nullptr};
+    MythUIText        *m_bufferStatus   {nullptr};
+    MythUIProgressBar *m_bufferProgress {nullptr};
 
-    LyricsData       *m_lyricData;
+    LyricsData        *m_lyricData      {nullptr};
 
-    bool              m_autoScroll;
+    bool               m_autoScroll     {true};
 };
 
 class EditLyricsDialog : public MythScreenType
@@ -81,16 +81,16 @@ class EditLyricsDialog : public MythScreenType
     void loadLyrics(void);
     bool somethingChanged(void);
 
-    LyricsData     *m_sourceData;
+    LyricsData     *m_sourceData       {nullptr};
 
-    MythUITextEdit *m_grabberEdit;
-    MythUICheckBox *m_syncronizedCheck;
-    MythUITextEdit *m_titleEdit;
-    MythUITextEdit *m_artistEdit;
-    MythUITextEdit *m_albumEdit;
-    MythUITextEdit *m_lyricsEdit;
-    MythUIButton   *m_cancelButton;
-    MythUIButton   *m_okButton;
+    MythUITextEdit *m_grabberEdit      {nullptr};
+    MythUICheckBox *m_syncronizedCheck {nullptr};
+    MythUITextEdit *m_titleEdit        {nullptr};
+    MythUITextEdit *m_artistEdit       {nullptr};
+    MythUITextEdit *m_albumEdit        {nullptr};
+    MythUITextEdit *m_lyricsEdit       {nullptr};
+    MythUIButton   *m_cancelButton     {nullptr};
+    MythUIButton   *m_okButton         {nullptr};
 };
 
 #endif

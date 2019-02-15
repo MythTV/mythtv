@@ -847,15 +847,15 @@ void MHFontBody::Copy(const MHFontBody &fb)
 
 void MHPointArg::Initialise(MHParseNode *p, MHEngine *engine)
 {
-    x.Initialise(p->GetSeqN(0), engine);
-    y.Initialise(p->GetSeqN(1), engine);
+    m_x.Initialise(p->GetSeqN(0), engine);
+    m_y.Initialise(p->GetSeqN(1), engine);
 }
 
 void MHPointArg::PrintMe(FILE *fd, int nTabs) const
 {
     fprintf(fd, "( ");
-    x.PrintMe(fd, nTabs);
-    y.PrintMe(fd, nTabs);
+    m_x.PrintMe(fd, nTabs);
+    m_y.PrintMe(fd, nTabs);
     fprintf(fd, ") ");
 }
 

@@ -72,11 +72,11 @@ class GalleryFilter
     void dumpFilter(QString src);
 
   private:
-    QString m_dirFilter;
-    int m_typeFilter;
-    int m_sort;
+    QString      m_dirFilter;
+    int          m_typeFilter    {kTypeFilterAll};
+    int          m_sort          {kSortOrderUnsorted};
 
-    unsigned int m_changed_state;
+    unsigned int m_changed_state {0};
 };
 
 #endif /* GALLERYFILTER_H */

@@ -69,8 +69,8 @@ class EITScanner : public QRunnable
 
     uint             cardnum;
 
-    static QMutex    resched_lock;
-    static QDateTime resched_next_time;
+    static QMutex    s_resched_lock;
+    static QDateTime s_resched_next_time;
 
     /// Minumum number of seconds between reschedules.
     static const uint kMinRescheduleInterval;

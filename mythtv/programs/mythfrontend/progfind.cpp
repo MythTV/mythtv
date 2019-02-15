@@ -52,18 +52,6 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
         delete programFind;
 }
 
-ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
-                       TV *player, bool embedVideo)
-          : ScheduleCommon(parentStack, "ProgFinder"),
-    m_currentLetter(""),
-    m_player(player),            m_embedVideo(embedVideo),
-    m_allowEPG(allowEPG),        m_allowKeypress(true),
-    m_alphabetList(nullptr),     m_showList(nullptr),
-    m_timesList(nullptr),        m_searchText(nullptr),
-    m_help1Text(nullptr),        m_help2Text(nullptr)
-{
-}
-
 bool ProgFinder::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "programfind", this))
@@ -709,7 +697,7 @@ void ProgFinder::restoreSelectedData(QString &data)
 // Japanese specific program finder
 
 // japanese HIRAGANA list and more
-const QChar JaProgFinder::searchChars[] =
+const QChar JaProgFinder::s_searchChars[] =
 {
     // "あ", "か", "さ", "た",
     QChar(0x3042), QChar(0x304b), QChar(0x3055), QChar(0x305f),
@@ -724,16 +712,16 @@ JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
-    for (numberOfSearchChars = 0; !searchChars[numberOfSearchChars].isNull();
-         ++numberOfSearchChars)
+    for (m_numberOfSearchChars = 0; !s_searchChars[m_numberOfSearchChars].isNull();
+         ++m_numberOfSearchChars)
          ;
 }
 
 void JaProgFinder::initAlphabetList()
 {
-    for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
+    for (int charNum = 0; charNum < m_numberOfSearchChars; ++charNum)
     {
-        new MythUIButtonListItem(m_alphabetList, QString(searchChars[charNum]));
+        new MythUIButtonListItem(m_alphabetList, QString(s_searchChars[charNum]));
     }
 }
 
@@ -824,7 +812,7 @@ void JaProgFinder::restoreSelectedData(QString& data)
 // Hebrew specific program finder
 
 // Hebrew alphabet list and more
-const QChar HeProgFinder::searchChars[] =
+const QChar HeProgFinder::s_searchChars[] =
 {
     // "א", "ב", "ג", "ד",
     QChar(0x5d0), QChar(0x5d1), QChar(0x5d2), QChar(0x5d3),
@@ -845,16 +833,16 @@ HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
-    for (numberOfSearchChars = 0; !searchChars[numberOfSearchChars].isNull();
-         ++numberOfSearchChars)
+    for (m_numberOfSearchChars = 0; !s_searchChars[m_numberOfSearchChars].isNull();
+         ++m_numberOfSearchChars)
         ;
 }
 
 void HeProgFinder::initAlphabetList()
 {
-    for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
+    for (int charNum = 0; charNum < m_numberOfSearchChars; ++charNum)
     {
-        new MythUIButtonListItem(m_alphabetList, QString(searchChars[charNum]));
+        new MythUIButtonListItem(m_alphabetList, QString(s_searchChars[charNum]));
     }
 }
 
@@ -866,7 +854,7 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     QString searchChar = m_alphabetList->GetValue();
 
     if (searchChar.isEmpty())
-        searchChar = searchChars[0];
+        searchChar = s_searchChars[0];
 
     where = "SELECT DISTINCT title FROM program "
             "LEFT JOIN channel ON program.chanid = channel.chanid "
@@ -922,7 +910,7 @@ void HeProgFinder::restoreSelectedData(QString& data)
 
 // Cyrrilic specific program finder
 // Cyrrilic alphabet list and more
-const QChar RuProgFinder::searchChars[] =
+const QChar RuProgFinder::s_searchChars[] =
 {
     // "А", "Б", "В", "Г",
     QChar(0x410), QChar(0x411), QChar(0x412), QChar(0x413),
@@ -957,16 +945,16 @@ RuProgFinder::RuProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
-    for (numberOfSearchChars = 0; !searchChars[numberOfSearchChars].isNull();
-         ++numberOfSearchChars)
+    for (m_numberOfSearchChars = 0; !s_searchChars[m_numberOfSearchChars].isNull();
+         ++m_numberOfSearchChars)
         ;
 }
 
 void RuProgFinder::initAlphabetList()
 {
-    for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
+    for (int charNum = 0; charNum < m_numberOfSearchChars; ++charNum)
     {
-        new MythUIButtonListItem(m_alphabetList, searchChars[charNum]);
+        new MythUIButtonListItem(m_alphabetList, s_searchChars[charNum]);
     }
 }
 
@@ -979,7 +967,7 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
    QString searchChar = m_alphabetList->GetValue();
 
    if (searchChar.isEmpty())
-       searchChar = searchChars[0];
+       searchChar = s_searchChars[0];
 
 
   if (searchChar.contains('@'))
@@ -1063,13 +1051,6 @@ ProgramInfo *ProgFinder::GetCurrentProgram(void) const
 };
 
 //////////////////////////////////////////////////////////////////////////////
-
-SearchInputDialog::SearchInputDialog(MythScreenStack *parent,
-                                     const QString &defaultValue)
-                 : MythTextInputDialog(parent, "", FilterNone,
-                                       false, defaultValue)
-{
-}
 
 bool SearchInputDialog::Create(void)
 {

@@ -58,9 +58,9 @@ class UPnpNotifyTask : public Task
 
         QString         m_sMasterIP;
         int             m_nServicePort;
-        int             m_nMaxAge;
+        int             m_nMaxAge       {3600};
 
-        UPnpNotifyNTS   m_eNTS;
+        UPnpNotifyNTS   m_eNTS          {NTS_alive};
 
     protected:
 

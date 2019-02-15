@@ -33,7 +33,7 @@ class MHParseNode;
 class MHIngredient : public MHRoot  
 {
   public:
-    MHIngredient();
+    MHIngredient() = default;
     MHIngredient(const MHIngredient &ref);
     virtual ~MHIngredient() = default;
     // Set this up from the parse tree.
@@ -62,21 +62,22 @@ class MHIngredient : public MHRoot
     virtual void ContentArrived(const unsigned char *, int, MHEngine *) { }
 
   protected:
-    bool    m_fInitiallyActive;
-    int     m_nContentHook;
-    bool    m_fShared;
+    bool    m_fInitiallyActive         {true}; // Default is true
+    int     m_nContentHook             {0};    // Need to choose a value that
+                                               // isn't otherwise used
+    bool    m_fShared                  {false};
     // Original content.  The original included content and the other fields are
     // mutually exclusive.
-    enum { IN_NoContent, IN_IncludedContent, IN_ReferencedContent } m_ContentType;
+    enum { IN_NoContent, IN_IncludedContent, IN_ReferencedContent } m_ContentType {IN_NoContent};
     MHOctetString   m_OrigIncludedContent;
     MHContentRef    m_OrigContentRef;
-    int             m_nOrigContentSize;
-    int             m_nOrigCCPrio;
+    int             m_nOrigContentSize {0};
+    int             m_nOrigCCPrio      {127};  // Default.
     // Internal attributes
     MHOctetString   m_IncludedContent;
     MHContentRef    m_ContentRef;
-    int             m_nContentSize;
-    int             m_nCCPrio;
+    int             m_nContentSize     {0};
+    int             m_nCCPrio          {0};
     friend class MHEngine;
 };
 
@@ -84,8 +85,8 @@ class MHIngredient : public MHRoot
 class MHFont : public MHIngredient  
 {
   public:
-    MHFont();
-    virtual ~MHFont();
+    MHFont() = default;
+    virtual ~MHFont() = default;
     const char *ClassName() override // MHRoot
         { return "Font"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -98,8 +99,8 @@ class MHFont : public MHIngredient
 class MHCursorShape : public MHIngredient  
 {
   public:
-    MHCursorShape();
-    virtual ~MHCursorShape();
+    MHCursorShape() = default;
+    virtual ~MHCursorShape() = default;
     const char *ClassName() override // MHRoot
         { return "CursorShape"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -112,8 +113,8 @@ class MHCursorShape : public MHIngredient
 class MHPalette : public MHIngredient  
 {
   public:
-    MHPalette();
-    virtual ~MHPalette();
+    MHPalette() = default;
+    virtual ~MHPalette() = default;
     const char *ClassName() override // MHRoot
         { return "Palette"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -127,14 +128,15 @@ class MHPalette : public MHIngredient
 class MHSetData: public MHElemAction
 {
   public:
-  MHSetData(): MHElemAction(":SetData"), m_fIsIncluded(false),
-        m_fSizePresent(false), m_fCCPriorityPresent(false) {}
+  MHSetData(): MHElemAction(":SetData") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
     // Either included content or referenced content.
-    bool m_fIsIncluded, m_fSizePresent, m_fCCPriorityPresent;
+    bool m_fIsIncluded        {false};
+    bool m_fSizePresent       {false};
+    bool m_fCCPriorityPresent {false};
     MHGenericOctetString m_Included;
     MHGenericContentRef m_Referenced;
     MHGenericInteger m_ContentSize;

@@ -176,8 +176,8 @@ class DTVChannel : public ChannelBase
     ProgramMapTable         *genPMT;
 
     typedef QMap<QString,QList<DTVChannel*> > MasterMap;
-    static QReadWriteLock    master_map_lock;
-    static MasterMap         master_map;
+    static QReadWriteLock    s_master_map_lock;
+    static MasterMap         s_master_map;
 };
 
 #endif // _DTVCHANNEL_H_

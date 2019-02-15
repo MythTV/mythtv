@@ -31,25 +31,6 @@
 
 Q_DECLARE_METATYPE(Event*);
 
-ZMEvents::ZMEvents(MythScreenStack *parent) :
-    MythScreenType(parent, "zmevents"),
-    m_oldestFirst(false),
-    m_showContinuous(false),
-    m_layout(-1),
-    m_eventList(new vector<Event*>),
-    m_savedPosition(0),
-    m_currentCamera(-1),
-    m_currentDate(-1),
-    m_eventNoText(nullptr),
-    m_eventGrid(nullptr),
-    m_playButton(nullptr),
-    m_deleteButton(nullptr),
-    m_cameraSelector(nullptr),
-    m_dateSelector(nullptr),
-    m_menuPopup(nullptr)
-{
-}
-
 ZMEvents::~ZMEvents()
 {
     if (m_eventList)

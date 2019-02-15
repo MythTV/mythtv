@@ -52,7 +52,8 @@ class MythSystemLegacyIOHandler: public MThread
 class MythSystemLegacyManager : public MThread
 {
     public:
-        MythSystemLegacyManager();
+        MythSystemLegacyManager()
+            : MThread("SystemManager") {}
         ~MythSystemLegacyManager();
         void run(void) override; // MThread
         void append(MythSystemLegacyWindows *);
@@ -61,19 +62,22 @@ class MythSystemLegacyManager : public MThread
     private:
         void ChildListRebuild();
 
-        int        m_childCount;
-        HANDLE    *m_children;
+        int        m_childCount {0};
+        HANDLE    *m_children   {nullptr};
         MSMap_t    m_pMap;
         QMutex     m_mapLock;
 
-        bool       m_jumpAbort;
+        bool       m_jumpAbort  {false};
         QMutex     m_jumpLock;
 };
 
+// spawn separate thread for signals to prevent manager
+// thread from blocking in some slot
 class MythSystemLegacySignalManager : public MThread
 {
     public:
-        MythSystemLegacySignalManager();
+        MythSystemLegacySignalManager()
+            : MThread("SystemSignalManager") {}
         ~MythSystemLegacySignalManager() { wait(); }
         void run(void) override; // MThread
     private:
@@ -103,8 +107,8 @@ class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
         friend class MythSystemLegacyIOHandler;
 
     private:
-        HANDLE      m_child;
-        time_t      m_timeout;
+        HANDLE      m_child   {nullptr};
+        time_t      m_timeout {0};
 
         HANDLE      m_stdpipe[3];
 };

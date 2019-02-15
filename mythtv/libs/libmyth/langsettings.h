@@ -43,17 +43,17 @@ class MPUBLIC LanguageSelection : public MythScreenType
   private:
     void LanguageChanged(void);
 
-    MythUIButtonList *m_languageList;
-    MythUIButtonList *m_countryList;
-    MythUIButton *m_saveButton;
-    MythUIButton *m_cancelButton;
+    MythUIButtonList *m_languageList    {nullptr};
+    MythUIButtonList *m_countryList     {nullptr};
+    MythUIButton     *m_saveButton      {nullptr};
+    MythUIButton     *m_cancelButton    {nullptr};
 
-    bool m_exitOnFinish;
-    bool m_loaded;
-    static bool m_languageChanged;
-    QString m_language;
-    QString m_country;
-    QEventLoop *m_loop;
+    bool              m_exitOnFinish;
+    bool              m_loaded          {false};
+    static bool       m_languageChanged;
+    QString           m_language;
+    QString           m_country;
+    QEventLoop       *m_loop            {nullptr};
 };
 
 #endif

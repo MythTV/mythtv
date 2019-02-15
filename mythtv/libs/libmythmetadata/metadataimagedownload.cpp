@@ -25,12 +25,6 @@ QEvent::Type ImageDLFailureEvent::kEventType =
 QEvent::Type ThumbnailDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-MetadataImageDownload::MetadataImageDownload(QObject *parent) :
-    MThread("MetadataImageDownload")
-{
-    m_parent = parent;
-}
-
 MetadataImageDownload::~MetadataImageDownload()
 {
     cancel();

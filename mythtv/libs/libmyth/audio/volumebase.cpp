@@ -96,50 +96,49 @@ QMutex VolumeWriteBackThread::s_mutex;
 } // namespace
 
 
-VolumeBase::VolumeBase() :
-    volume(80), current_mute_state(kMuteOff), channels(0)
+VolumeBase::VolumeBase()
 {
     internal_vol = gCoreContext->GetBoolSetting("MythControlsVolume", true);
-    swvol = swvol_setting =
+    m_swvol = m_swvol_setting =
         (gCoreContext->GetSetting("MixerDevice", "default").toLower() == "software");
 }
 
 bool VolumeBase::SWVolume(void) const
 {
-    return swvol;
+    return m_swvol;
 }
 
 void VolumeBase::SWVolume(bool set)
 {
-    if (swvol_setting)
+    if (m_swvol_setting)
         return;
-    swvol = set;
+    m_swvol = set;
 }
 
 uint VolumeBase::GetCurrentVolume(void) const
 {
-    return volume;
+    return m_volume;
 }
 
 void VolumeBase::SetCurrentVolume(int value)
 {
-    volume = max(min(value, 100), 0);
+    m_volume = max(min(value, 100), 0);
     UpdateVolume();
     
     // Throttle Db writes
-    VolumeWriteBackThread::Instance()->SetVolume(volume);
+    VolumeWriteBackThread::Instance()->SetVolume(m_volume);
 }
 
 void VolumeBase::AdjustCurrentVolume(int change)
 {
-    SetCurrentVolume(volume + change);
+    SetCurrentVolume(m_volume + change);
 }
 
 MuteState VolumeBase::SetMuteState(MuteState mstate)
 {
-    current_mute_state = mstate;
+    m_current_mute_state = mstate;
     UpdateVolume();
-    return current_mute_state;
+    return m_current_mute_state;
 }
 
 void VolumeBase::ToggleMute(void)
@@ -150,7 +149,7 @@ void VolumeBase::ToggleMute(void)
 
 MuteState VolumeBase::GetMuteState(void) const
 {
-    return current_mute_state;
+    return m_current_mute_state;
 }
 
 MuteState VolumeBase::NextMuteState(MuteState cur)
@@ -178,30 +177,30 @@ MuteState VolumeBase::NextMuteState(MuteState cur)
 
 void VolumeBase::UpdateVolume(void)
 {
-    int new_volume = volume;
-    if (current_mute_state == kMuteAll)
+    int new_volume = m_volume;
+    if (m_current_mute_state == kMuteAll)
     {
         new_volume = 0;
     }
 
-    if (swvol)
+    if (m_swvol)
     {
         SetSWVolume(new_volume, false);
         return;
     }
     
-    for (int i = 0; i < channels; i++)
+    for (int i = 0; i < m_channels; i++)
     {
         SetVolumeChannel(i, new_volume);
     }
     
     // Individual channel muting is handled in GetAudioData,
     // this code demonstrates the old method.
-    // if (current_mute_state == kMuteLeft)
+    // if (m_current_mute_state == kMuteLeft)
     // {
     //     SetVolumeChannel(0, 0);
     // }
-    // else if (current_mute_state == kMuteRight)
+    // else if (m_current_mute_state == kMuteRight)
     // {
     //     SetVolumeChannel(1, 0);
     // }
@@ -210,13 +209,13 @@ void VolumeBase::UpdateVolume(void)
 void VolumeBase::SyncVolume(void)
 {
     // Read the volume from the audio driver and setup our internal state to match
-    if (swvol)
-        volume = GetSWVolume();
+    if (m_swvol)
+        m_volume = GetSWVolume();
     else
-        volume = GetVolumeChannel(0);
+        m_volume = GetVolumeChannel(0);
 }
 
 void VolumeBase::SetChannels(int new_channels)
 {
-    channels = new_channels;
+    m_channels = new_channels;
 }

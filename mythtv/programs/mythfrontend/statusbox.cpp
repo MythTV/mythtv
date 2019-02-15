@@ -51,11 +51,6 @@ StatusBox::StatusBox(MythScreenStack *parent)
 {
     m_minLevel = gCoreContext->GetNumSetting("LogDefaultView",5);
 
-    m_iconState = nullptr;
-    m_categoryList = m_logList = nullptr;
-    m_helpText = nullptr;
-    m_justHelpText = nullptr;
-
     QStringList strlist;
     strlist << "QUERY_IS_ACTIVE_BACKEND";
     strlist << gCoreContext->GetHostName();

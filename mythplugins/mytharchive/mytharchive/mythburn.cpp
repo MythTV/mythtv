@@ -49,26 +49,7 @@ MythBurn::MythBurn(MythScreenStack   *parent,
     MythScreenType(parent, name),
     m_destinationScreen(destinationScreen),
     m_themeScreen(themeScreen),
-    m_archiveDestination(archiveDestination),
-    m_bCreateISO(false),
-    m_bDoBurn(false),
-    m_bEraseDvdRw(false),
-    m_saveFilename(""),
-    m_theme(),
-    m_moveMode(false),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr),
-    m_archiveButtonList(nullptr),
-    m_nofilesText(nullptr),
-    m_addrecordingButton(nullptr),
-    m_addvideoButton(nullptr),
-    m_addfileButton(nullptr),
-    m_sizeBar(nullptr),
-    m_maxsizeText(nullptr),
-    m_minsizeText(nullptr),
-    m_currentsizeErrorText(nullptr),
-    m_currentsizeText(nullptr)
+    m_archiveDestination(archiveDestination)
 {
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
@@ -1042,22 +1023,6 @@ void MythBurn::itemClicked(MythUIButtonListItem *item)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-ProfileDialog::ProfileDialog(
-    MythScreenStack *parent, ArchiveItem *archiveItem,
-    QList<EncoderProfile *> profileList) :
-    MythScreenType(parent, "functionpopup"),
-    m_archiveItem(archiveItem),
-    m_profileList(profileList),
-    m_captionText(nullptr),
-    m_descriptionText(nullptr),
-    m_oldSizeText(nullptr),
-    m_newSizeText(nullptr),
-    m_profile_list(nullptr),
-    m_enabledCheck(nullptr),
-    m_okButton(nullptr)
-{
-}
 
 bool ProfileDialog::Create()
 {

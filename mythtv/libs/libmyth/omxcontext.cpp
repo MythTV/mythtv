@@ -126,9 +126,7 @@ void OMXComponent::DecrRef()
 }
 
 OMXComponent::OMXComponent(const QString &name, OMXComponentCtx &cb) :
-    m_ref(s_ref++), m_cb(cb), m_handle(nullptr), m_base(0),
-    m_state_lock(QMutex::Recursive), m_state(OMX_StateInvalid),
-    m_error(OMX_ErrorNone)
+    m_ref(s_ref++), m_cb(cb)
 {
     if (!IncrRef())
     {

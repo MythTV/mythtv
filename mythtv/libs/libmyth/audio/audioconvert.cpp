@@ -623,15 +623,10 @@ public:
         }
     }
 
-    SwrContext* m_swr;
+    SwrContext* m_swr {nullptr};
     AVSampleFormat m_in, m_out;
 };
 
-
-AudioConvert::AudioConvert(AudioFormat in, AudioFormat out) :
-    m_ctx(nullptr), m_in(in), m_out(out)
-{
-}
 
 AudioConvert::~AudioConvert()
 {

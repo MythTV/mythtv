@@ -26,25 +26,25 @@
 
 #define LOC      QString("ASISH[%1](%2): ").arg(_inputid).arg(_device)
 
-QMap<QString,ASIStreamHandler*> ASIStreamHandler::_handlers;
-QMap<QString,uint>              ASIStreamHandler::_handlers_refcnt;
-QMutex                          ASIStreamHandler::_handlers_lock;
+QMap<QString,ASIStreamHandler*> ASIStreamHandler::s_handlers;
+QMap<QString,uint>              ASIStreamHandler::s_handlers_refcnt;
+QMutex                          ASIStreamHandler::s_handlers_lock;
 
 ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
                                         int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devkey = devname;
 
-    QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devkey);
+    QMap<QString,ASIStreamHandler*>::iterator it = s_handlers.find(devkey);
 
-    if (it == _handlers.end())
+    if (it == s_handlers.end())
     {
         ASIStreamHandler *newhandler = new ASIStreamHandler(devname, inputid);
         newhandler->Open();
-        _handlers[devkey] = newhandler;
-        _handlers_refcnt[devkey] = 1;
+        s_handlers[devkey] = newhandler;
+        s_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Creating new stream handler %2 for %3")
@@ -52,28 +52,28 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
     }
     else
     {
-        _handlers_refcnt[devkey]++;
-        uint rcount = _handlers_refcnt[devkey];
+        s_handlers_refcnt[devkey]++;
+        uint rcount = s_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Using existing stream handler %2 for %3")
             .arg(inputid).arg(devkey)
             .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return _handlers[devkey];
+    return s_handlers[devkey];
 }
 
 void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devname = ref->_device;
 
-    QMap<QString,uint>::iterator rit = _handlers_refcnt.find(devname);
-    if (rit == _handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
+    if (rit == s_handlers_refcnt.end())
         return;
 
-    QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devname);
+    QMap<QString,ASIStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)
     {
@@ -82,13 +82,13 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
         return;
     }
 
-    if ((it != _handlers.end()) && (*it == ref))
+    if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("ASISH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
         ref->Close();
         delete *it;
-        _handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
@@ -97,7 +97,7 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    _handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 

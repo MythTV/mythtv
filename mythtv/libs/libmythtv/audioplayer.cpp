@@ -11,7 +11,7 @@
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),     m_audioOutput(nullptr),m_channels(-1),
-    m_orig_channels(-1),  m_codec(0),            m_format(FORMAT_NONE),
+    m_orig_channels(-1),  m_codec(AV_CODEC_ID_NONE), m_format(FORMAT_NONE),
     m_samplerate(44100),  m_codec_profile(0),
     m_stretchfactor(1.0f),m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted),
@@ -130,7 +130,7 @@ QString AudioPlayer::ReinitAudio(void)
                                           AUDIOOUTPUT_VIDEO,
                                           m_controls_volume, m_passthru);
         if (m_no_audio_in)
-            aos.init = false;
+            aos.m_init = false;
 
         m_audioOutput = AudioOutput::OpenAudio(aos);
         if (!m_audioOutput)
@@ -252,7 +252,7 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
  * codec_profile is currently only used for DTS
  */
 void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
-                                 int channels, int codec,
+                                 int channels, AVCodecID codec,
                                  int samplerate, bool passthru,
                                  int codec_profile)
 {
@@ -436,7 +436,7 @@ int AudioPlayer::GetMaxHDRate()
 }
 
 bool AudioPlayer::CanPassthrough(int samplerate, int channels,
-                                 int codec, int profile)
+                                 AVCodecID codec, int profile)
 {
     if (!m_audioOutput)
         return false;

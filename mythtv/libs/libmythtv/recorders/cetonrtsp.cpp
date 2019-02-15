@@ -17,7 +17,7 @@
 
 #define LOC QString("CetonRTSP(%1): ").arg(_requestUrl.toString())
 
-QMutex CetonRTSP::_rtspMutex;
+QMutex CetonRTSP::s_rtspMutex;
 
 CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
     _socket(nullptr),
@@ -60,7 +60,7 @@ bool CetonRTSP::ProcessRequest(
     const QString &method, const QStringList* headers,
     bool use_control, bool waitforanswer, const QString &alternative)
 {
-    QMutexLocker locker(&_rtspMutex);
+    QMutexLocker locker(&s_rtspMutex);
 
     _responseHeaders.clear();
     _responseContent.clear();
@@ -473,7 +473,7 @@ bool CetonRTSP::Teardown(void)
 
     bool result = ProcessRequest("TEARDOWN");
 
-    QMutexLocker locker(&_rtspMutex);
+    QMutexLocker locker(&s_rtspMutex);
 
     delete _socket;
     _socket = nullptr;

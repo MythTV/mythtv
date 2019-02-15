@@ -152,7 +152,7 @@ typedef struct
 class MONITOR
 {
   public:
-    MONITOR();
+    MONITOR() = default;
 
     void initMonitor(bool debug, const string &mmapPath, int shmKey);
 
@@ -164,29 +164,29 @@ class MONITOR
     int getState(void);
     int getFrameSize(void);
 
-    string name;
-    string type;
-    string function;
-    int enabled;
-    string device;
-    string host;
-    int image_buffer_count;
-    int width;
-    int height;
-    int bytes_per_pixel;
-    int mon_id;
-    unsigned char *shared_images;
-    int last_read;
-    string status;
-    int palette;
-    int controllable;
-    int trackMotion;
-    int mapFile;
-    void *shm_ptr;
+    string         m_name               {""};
+    string         m_type               {""};
+    string         m_function           {""};
+    int            m_enabled            {0};
+    string         m_device             {""};
+    string         m_host               {""};
+    int            m_image_buffer_count {0};
+    int            m_width              {0};
+    int            m_height             {0};
+    int            m_bytes_per_pixel    {3};
+    int            m_mon_id             {0};
+    unsigned char *m_shared_images      {nullptr};
+    int            m_last_read          {0};
+    string         m_status             {""};
+    int            m_palette            {0};
+    int            m_controllable       {0};
+    int            m_trackMotion        {0};
+    int            m_mapFile            {-1};
+    void          *m_shm_ptr            {nullptr};
   private:
-    SharedData *shared_data;
-    SharedData26 *shared_data26;
-    string id;
+    SharedData    *m_shared_data        {nullptr};
+    SharedData26  *m_shared_data26      {nullptr};
+    string         m_id                 {""};
 };
 
 class ZMServer

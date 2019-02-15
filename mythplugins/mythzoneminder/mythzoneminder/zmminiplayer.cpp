@@ -19,8 +19,7 @@ const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a 
 
 ZMMiniPlayer::ZMMiniPlayer(MythScreenStack *parent)
           : ZMLivePlayer(parent, true),
-              m_displayTimer(new QTimer(this)), m_monitorText(nullptr),
-              m_statusText(nullptr), m_image(nullptr)
+            m_displayTimer(new QTimer(this))
 {
     m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));

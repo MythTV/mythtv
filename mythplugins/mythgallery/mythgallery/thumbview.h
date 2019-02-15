@@ -19,14 +19,12 @@ class ThumbItem
     Q_DECLARE_TR_FUNCTIONS (ThumbItem)
 
   public:
-    ThumbItem() :
-        m_isDir(false),
-        m_pixmap(nullptr),     m_mediaDevice(nullptr) { }
+    ThumbItem() = default;
     ThumbItem(const QString &name, const QString &path, bool isDir,
               MythMediaDevice *dev = nullptr) :
         m_name(name),
         m_path(path), m_isDir(isDir),
-        m_pixmap(nullptr), m_mediaDevice(dev) {}
+        m_mediaDevice(dev) {}
     ~ThumbItem();
 
     // commands
@@ -73,9 +71,9 @@ class ThumbItem
     QDateTime m_timestamp;
     QString  m_path;
     QString  m_imageFilename;
-    bool     m_isDir;
-    QPixmap *m_pixmap;
-    MythMediaDevice *m_mediaDevice;
+    bool     m_isDir               {false};
+    QPixmap *m_pixmap              {nullptr};
+    MythMediaDevice *m_mediaDevice {nullptr};
 };
 typedef QList<ThumbItem*> ThumbList;
 typedef QHash<QString, ThumbItem*>    ThumbHash;

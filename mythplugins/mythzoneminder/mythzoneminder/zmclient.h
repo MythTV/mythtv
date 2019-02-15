@@ -75,18 +75,18 @@ class MPUBLIC ZMClient : public QObject
     bool readData(unsigned char *data, int dataSize);
     bool sendReceiveStringList(QStringList &strList);
 
-    QMutex              m_listLock;
+    QMutex              m_listLock          {QMutex::Recursive};
     QList<Monitor*>     m_monitorList;
     QMap<int, Monitor*> m_monitorMap;
 
-    MythSocket       *m_socket;
-    QMutex            m_socketLock;
-    QString           m_hostname;
-    uint              m_port;
-    bool              m_bConnected;
-    QTimer           *m_retryTimer;
-    bool              m_zmclientReady;
-    bool              m_isMiniPlayerEnabled;
+    MythSocket       *m_socket              {nullptr};
+    QMutex            m_socketLock          {QMutex::Recursive};
+    QString           m_hostname            {"localhost"};
+    uint              m_port                {6548};
+    bool              m_bConnected          {false};
+    QTimer           *m_retryTimer          {nullptr};
+    bool              m_zmclientReady       {false};
+    bool              m_isMiniPlayerEnabled {true};
 };
 
 #endif

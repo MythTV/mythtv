@@ -22,12 +22,6 @@ QEvent::Type MetadataLookupEvent::kEventType =
 QEvent::Type MetadataLookupFailure::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-MetadataDownload::MetadataDownload(QObject *parent) :
-    MThread("MetadataDownload")
-{
-    m_parent = parent;
-}
-
 MetadataDownload::~MetadataDownload()
 {
     cancel();

@@ -28,7 +28,7 @@ class AudioOutputDX : public AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool passthrough) override; // AudioOutputBase
 
   protected:
-    AudioOutputDXPrivate *m_priv;
+    AudioOutputDXPrivate *m_priv {nullptr};
     bool                  m_UseSPDIF;
 };
 

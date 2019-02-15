@@ -28,32 +28,31 @@ class ClassicLogoDetector : public LogoDetectorBase
     void DumpLogo(bool fromCurrentFrame,unsigned char* framePtr);
     void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
 
-    ClassicCommDetector* commDetector;
-    unsigned int frameNumber;
-    unsigned int commDetectBorder;
+    ClassicCommDetector *m_commDetector                    {nullptr};
+    unsigned int         m_frameNumber                     {0};
+    unsigned int         m_commDetectBorder                {16};
 
-    int commDetectLogoSamplesNeeded;
-    int commDetectLogoSampleSpacing;
-    int commDetectLogoSecondsNeeded;
-    double commDetectLogoGoodEdgeThreshold;
-    double commDetectLogoBadEdgeThreshold;
+    int                  m_commDetectLogoSamplesNeeded     {240};
+    int                  m_commDetectLogoSampleSpacing     {2};
+    int                  m_commDetectLogoSecondsNeeded     {624};
+    double               m_commDetectLogoGoodEdgeThreshold {0.75};
+    double               m_commDetectLogoBadEdgeThreshold  {0.85};
 
-    EdgeMaskEntry *edgeMask;
+    EdgeMaskEntry       *m_edgeMask                        {nullptr};
 
-    unsigned char *logoMaxValues;
-    unsigned char *logoMinValues;
-    unsigned char *logoFrame;
-    unsigned char *logoMask;
-    unsigned char *logoCheckMask;
-    unsigned char *tmpBuf;
+    unsigned char       *m_logoMaxValues                   {nullptr};
+    unsigned char       *m_logoMinValues                   {nullptr};
+    unsigned char       *m_logoFrame                       {nullptr};
+    unsigned char       *m_logoMask                        {nullptr};
+    unsigned char       *m_logoCheckMask                   {nullptr};
 
-    int logoEdgeDiff;
-    unsigned int logoMinX;
-    unsigned int logoMaxX;
-    unsigned int logoMinY;
-    unsigned int logoMaxY;
+    int                  m_logoEdgeDiff                    {0};
+    unsigned int         m_logoMinX                        {0};
+    unsigned int         m_logoMaxX                        {0};
+    unsigned int         m_logoMinY                        {0};
+    unsigned int         m_logoMaxY                        {0};
 
-    bool logoInfoAvailable;
+    bool                 m_logoInfoAvailable               {false};
 };
 
 #endif

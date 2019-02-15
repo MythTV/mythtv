@@ -27,7 +27,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 XmlSerializer::XmlSerializer( QIODevice *pDevice, const QString &sRequestName )
-              : m_bIsRoot( true ), PropertiesAsAttributes( true )
 {
     m_pXmlWriter   = new QXmlStreamWriter( pDevice );
     m_sRequestName = sRequestName;

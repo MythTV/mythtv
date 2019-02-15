@@ -25,10 +25,10 @@ class AudioOutputWin : public AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
 
   protected:
-    AudioOutputWinPrivate *m_priv;
-    long                   m_nPkts;
-    uint                   m_CurrentPkt;
-    unsigned char        **m_OutPkts;
+    AudioOutputWinPrivate *m_priv       {nullptr};
+    long                   m_nPkts      {0};
+    uint                   m_CurrentPkt {0};
+    unsigned char        **m_OutPkts    {nullptr};
     bool                   m_UseSPDIF;
 
     static const uint      kPacketCnt;

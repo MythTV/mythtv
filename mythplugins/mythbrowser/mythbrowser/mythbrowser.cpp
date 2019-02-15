@@ -20,12 +20,7 @@ using namespace std;
 
 MythBrowser::MythBrowser(MythScreenStack *parent, QStringList &urlList)
     : MythScreenType (parent, "mythbrowser"),
-      m_urlList(urlList),        m_pageList(nullptr),
-      m_progressBar(nullptr),    m_titleText(nullptr),
-      m_statusText(nullptr),     m_backButton(nullptr),
-      m_forwardButton(nullptr),  m_exitButton(nullptr),
-      m_currentBrowser(-1),      m_menuPopup(nullptr),
-      m_defaultFavIcon(nullptr)
+      m_urlList(urlList)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
 }
@@ -259,9 +254,9 @@ void MythBrowser::slotForward()
 
 void MythBrowser::slotAddBookmark()
 {
-    m_editBookmark.category = "";
-    m_editBookmark.name = m_pageList->GetValue();
-    m_editBookmark.url = activeBrowser()->GetUrl().toString();
+    m_editBookmark.m_category = "";
+    m_editBookmark.m_name = m_pageList->GetValue();
+    m_editBookmark.m_url = activeBrowser()->GetUrl().toString();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 

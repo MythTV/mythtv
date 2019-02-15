@@ -762,7 +762,7 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
     window.InputChanged(video_dim_buf, video_dim_disp,
                         aspect, myth_codec_id, codec_private);
 
-    AVCodecID avCodecId = (AVCodecID) myth2av_codecid(myth_codec_id);
+    AVCodecID avCodecId = myth2av_codecid(myth_codec_id);
     AVCodec *codec = avcodec_find_decoder(avCodecId);
     QString codecName;
     if (codec)

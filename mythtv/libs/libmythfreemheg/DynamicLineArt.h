@@ -32,7 +32,7 @@ class MHDLADisplay;
 class MHDynamicLineArt : public MHLineArt  
 {
   public:
-    MHDynamicLineArt();
+    MHDynamicLineArt() = default;
     virtual ~MHDynamicLineArt();
     const char *ClassName() override // MHLineArt
         { return "DynamicLineArt"; }
@@ -69,7 +69,7 @@ class MHDynamicLineArt : public MHLineArt
     void DrawPoly(bool fIsPolygon, int nPoints, const int *xArray, const int *yArray, MHEngine *) override; // MHRoot
 
   protected:
-    MHDLADisplay *m_picture; // The sequence of drawing actions.
+    MHDLADisplay *m_picture {nullptr}; // The sequence of drawing actions.
 };
 
 // Actions

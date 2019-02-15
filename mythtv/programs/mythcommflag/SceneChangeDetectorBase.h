@@ -11,7 +11,7 @@ class SceneChangeDetectorBase : public QObject
 
   public:
     SceneChangeDetectorBase(unsigned int w, unsigned int h) :
-        width(w), height(h) {}
+        m_width(w), m_height(h) {}
 
     virtual void processFrame(VideoFrame* frame) = 0;
 
@@ -23,7 +23,7 @@ class SceneChangeDetectorBase : public QObject
     virtual ~SceneChangeDetectorBase() = default;
 
   protected:
-    unsigned int width, height;
+    unsigned int m_width, m_height;
 };
 
 #endif

@@ -23,13 +23,7 @@
  */
 NetEditorBase::NetEditorBase(MythScreenStack *parent,
                              const QString &name) :
-    MythScreenType(parent, name),
-    m_grabbers(nullptr),
-    m_busyPopup(nullptr),
-    m_popupStack(),
-    m_manager(nullptr),
-    m_reply(nullptr),
-    m_changed(false)
+    MythScreenType(parent, name)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }

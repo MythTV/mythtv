@@ -43,7 +43,7 @@ class MTV_PUBLIC AudioPlayer
                        uint           samplerate,
                        int            bitrate = -1);
     void  SetAudioParams(AudioFormat format, int orig_channels, int channels,
-                         int codec, int samplerate, bool passthru,
+                         AVCodecID codec, int samplerate, bool passthru,
                          int bitrate = -1);
     void  SetEffDsp(int dsprate);
 
@@ -56,7 +56,7 @@ class MTV_PUBLIC AudioPlayer
     bool  Pause(bool pause);
     bool  IsPaused(void);
     void  PauseAudioUntilBuffered(void);
-    int   GetCodec(void)        const { return m_codec;         }
+    AVCodecID GetCodec(void)    const { return m_codec;         }
     int   GetNumChannels(void)  const { return m_channels;      }
     int   GetOrigChannels(void) const { return m_orig_channels; }
     int   GetSampleRate(void)   const { return m_samplerate;    }
@@ -68,7 +68,7 @@ class MTV_PUBLIC AudioPlayer
     bool  IsUpmixing(void);
     bool  EnableUpmix(bool enable, bool toggle = false);
     bool  CanUpmix(void);
-    bool  CanPassthrough(int samplerate, int channels, int codec, int profile);
+    bool  CanPassthrough(int samplerate, int channels, AVCodecID codec, int profile);
     bool  CanDownmix(void);
     bool  CanAC3(void);
     bool  CanDTS(void);
@@ -113,7 +113,7 @@ class MTV_PUBLIC AudioPlayer
     AudioOutput *m_audioOutput;
     int          m_channels;
     int          m_orig_channels;
-    int          m_codec;
+    AVCodecID    m_codec;
     AudioFormat  m_format;
     int          m_samplerate;
     int          m_codec_profile;

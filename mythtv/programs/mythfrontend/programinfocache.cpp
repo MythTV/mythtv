@@ -44,12 +44,6 @@ class ProgramInfoLoader : public QRunnable
     bool              m_updateUI;
 };
 
-ProgramInfoCache::ProgramInfoCache(QObject *o) :
-    m_next_cache(nullptr), m_listener(o),
-    m_load_is_queued(false), m_loads_in_progress(0)
-{
-}
-
 ProgramInfoCache::~ProgramInfoCache()
 {
     QMutexLocker locker(&m_lock);

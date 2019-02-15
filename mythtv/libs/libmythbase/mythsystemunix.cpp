@@ -78,7 +78,7 @@ void ShutdownMythSystemLegacy(void)
 
 MythSystemLegacyIOHandler::MythSystemLegacyIOHandler(bool read) :
     MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
+    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
     m_read(read)
 {
     FD_ZERO(&m_fds);
@@ -263,11 +263,6 @@ void MythSystemLegacyIOHandler::BuildFDs()
         FD_SET(i.key(), &m_fds);
         m_maxfd = (i.key() > m_maxfd ? i.key() : m_maxfd);
     }
-}
-
-MythSystemLegacyManager::MythSystemLegacyManager() : MThread("SystemManager")
-{
-    m_jumpAbort = false;
 }
 
 void MythSystemLegacyManager::run(void)
@@ -496,13 +491,6 @@ void MythSystemLegacyManager::jumpAbort(void)
     m_jumpLock.unlock();
 }
 
-// spawn separate thread for signals to prevent manager
-// thread from blocking in some slot
-MythSystemLegacySignalManager::MythSystemLegacySignalManager() :
-    MThread("SystemSignalManager")
-{
-}
-
 void MythSystemLegacySignalManager::run(void)
 {
     RunProlog();
@@ -569,8 +557,7 @@ void MythSystemLegacySignalManager::run(void)
  ******************************/
 
 MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
-    MythSystemLegacyPrivate("MythSystemLegacyUnix"),
-    m_pid(0), m_timeout(0)
+    MythSystemLegacyPrivate("MythSystemLegacyUnix")
 {
     m_parent = parent;
 

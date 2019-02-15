@@ -86,7 +86,6 @@ public:
     explicit CoreAudioData(AudioOutputCA *parent);
     CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID);
     CoreAudioData(AudioOutputCA *parent, QString deviceName);
-    void Initialise();
 
     AudioDeviceID GetDefaultOutputDevice();
     int  GetTotalOutputChannels();
@@ -129,27 +128,26 @@ public:
     void  Warn (QString msg)
     {    LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:" + msg);   }
 
-    AudioOutputCA  *mCA;    // We could subclass, but this ends up tidier
+    AudioOutputCA  *mCA            {nullptr}; // We could subclass, but this ends up tidier
 
     // Analog output specific
-    AudioUnit      mOutputUnit;
+    AudioUnit      mOutputUnit     {nullptr};
 
     // SPDIF mode specific
-    bool           mDigitalInUse;   // Is the digital (SPDIF) output in use?
-    pid_t          mHog;
-    int            mMixerRestore;
-    AudioDeviceID  mDeviceID;
-    AudioStreamID  mStreamID;       // StreamID that has a cac3 streamformat
-    int            mStreamIndex;    // Index of mStreamID in an AudioBufferList
-    UInt32         mBytesPerPacket;
-    AudioStreamBasicDescription
-    mFormatOrig,     // The original format the stream
-    mFormatNew;      // The format we changed the stream to
-    bool           mRevertFormat;   // Do we need to revert the stream format?
-    bool           mIoProc;
-    bool           mInitialized;
-    bool           mStarted;
-    bool           mWasDigital;
+    bool           mDigitalInUse   {false};   // Is the digital (SPDIF) output in use?
+    pid_t          mHog            {-1};
+    int            mMixerRestore   {-1};
+    AudioDeviceID  mDeviceID       {0};
+    AudioStreamID  mStreamID;               // StreamID that has a cac3 streamformat
+    int            mStreamIndex    {-1};    // Index of mStreamID in an AudioBufferList
+    UInt32         mBytesPerPacket {static_cast<UInt32>(-1)};
+    AudioStreamBasicDescription mFormatOrig;// The original format the stream
+    AudioStreamBasicDescription mFormatNew; // The format we changed the stream to
+    bool           mRevertFormat  {false};  // Do we need to revert the stream format?
+    bool           mIoProc        {false};
+    bool           mInitialized   {false};
+    bool           mStarted       {false};
+    bool           mWasDigital    {false};
 };
 
 // These callbacks communicate with Core Audio.
@@ -174,12 +172,12 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
 AudioOutputCA::AudioOutputCA(const AudioSettings &settings) :
 AudioOutputBase(settings)
 {
-    main_device.remove(0, 10);
-    VBAUDIO(QString("AudioOutputCA::AudioOutputCA searching %1").arg(main_device));
-    d = new CoreAudioData(this, main_device);
+    m_main_device.remove(0, 10);
+    VBAUDIO(QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_main_device));
+    d = new CoreAudioData(this, m_main_device);
 
     InitSettings(settings);
-    if (settings.init)
+    if (settings.m_init)
         Reconfigure(settings);
 }
 
@@ -260,7 +258,7 @@ bool AudioOutputCA::OpenDevice()
     {
     }
     Debug("OpenDevice: Entering");
-    if (passthru || enc)
+    if (m_passthru || m_enc)
     {
         Debug("OpenDevice() Trying Digital.");
         if (!(deviceOpened = d->OpenSPDIF()))
@@ -291,7 +289,7 @@ bool AudioOutputCA::OpenDevice()
         return false;
     }
 
-    if (internal_vol && set_initial_vol)
+    if (internal_vol && m_set_initial_vol)
     {
         QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
@@ -344,9 +342,9 @@ static inline void ReorderSmpteToCA(void *buf, uint frames, AudioFormat format)
 bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
                                 int size, unsigned long long timestamp)
 {
-    if (pauseaudio || killaudio)
+    if (m_pauseaudio || m_killaudio)
     {
-        actually_paused = true;
+        m_actually_paused = true;
         return false;
     }
 
@@ -365,17 +363,17 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
     }
 
     //Audio received is in SMPTE channel order, reorder to CA unless passthru
-    if (!passthru && channels == 8)
+    if (!m_passthru && m_channels == 8)
     {
-        ReorderSmpteToCA(aubuf, size / output_bytes_per_frame, output_format);
+        ReorderSmpteToCA(aubuf, size / m_output_bytes_per_frame, m_output_format);
     }
 
     /* update audiotime (bufferedBytes is read by GetBufferedOnSoundcard) */
     UInt64 nanos = AudioConvertHostTimeToNanos(timestamp -
                                                AudioGetCurrentHostTime());
     bufferedBytes = (int)((nanos / 1000000000.0) *    // secs
-                          (effdsp / 100.0) *          // frames/sec
-                          output_bytes_per_frame);    // bytes/frame
+                          (m_effdsp / 100.0) *        // frames/sec
+                          m_output_bytes_per_frame);  // bytes/frame
 
     return (written_size > 0);
 }
@@ -405,8 +403,8 @@ int64_t AudioOutputCA::GetAudiotime(void)
     int totalbuffer = audioready() + GetBufferedOnSoundcard();
 
     return audbuf_timecode - (int)(totalbuffer * 100000.0 /
-                                   (output_bytes_per_frame *
-                                    effdsp * stretchfactor));
+                                   (m_output_bytes_per_frame *
+                                    m_effdsp * m_stretchfactor));
 }
 
 /* This callback provides converted audio data to the default output device. */
@@ -493,26 +491,8 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
     return noErr;
 }
 
-void CoreAudioData::Initialise()
-{
-    // Initialise private data
-    mOutputUnit     = nullptr;
-    mDeviceID       = 0;
-    mDigitalInUse   = false;
-    mRevertFormat   = false;
-    mHog            = -1;
-    mMixerRestore   = -1;
-    mStreamIndex    = -1;
-    mIoProc         = false;
-    mInitialized    = false;
-    mStarted        = false;
-    mBytesPerPacket = -1;
-    mWasDigital     = false;
-}
-
 CoreAudioData::CoreAudioData(AudioOutputCA *parent) : mCA(parent)
 {
-    Initialise();
     // Reset all the devices to a default 'non-hog' and mixable format.
     // If we don't do this we may be unable to find the Default Output device.
     // (e.g. if we crashed last time leaving it stuck in AC-3 mode)
@@ -524,7 +504,6 @@ CoreAudioData::CoreAudioData(AudioOutputCA *parent) : mCA(parent)
 CoreAudioData::CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID) :
     mCA(parent)
 {
-    Initialise();
     ResetAudioDevices();
     mDeviceID = deviceID;
 }
@@ -532,7 +511,6 @@ CoreAudioData::CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID) :
 CoreAudioData::CoreAudioData(AudioOutputCA *parent, QString deviceName) :
     mCA(parent)
 {
-    Initialise();
     ResetAudioDevices();
     mDeviceID = GetDeviceWithName(deviceName);
     if (!mDeviceID)
@@ -1239,7 +1217,7 @@ int CoreAudioData::OpenAnalog()
     }
 
     memset (&new_layout, 0, sizeof(new_layout));
-    switch(mCA->channels)
+    switch(mCA->m_channels)
     {
         case 1:
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
@@ -1275,7 +1253,7 @@ int CoreAudioData::OpenAnalog()
 
     // Set up the audio output unit
     int formatFlags;
-    switch (mCA->output_format)
+    switch (mCA->m_output_format)
     {
         case FORMAT_S16:
             formatFlags = kLinearPCMFormatFlagIsSignedInteger;
@@ -1290,18 +1268,18 @@ int CoreAudioData::OpenAnalog()
 
     AudioStreamBasicDescription conv_in_desc;
     memset(&conv_in_desc, 0, sizeof(AudioStreamBasicDescription));
-    conv_in_desc.mSampleRate       = mCA->samplerate;
+    conv_in_desc.mSampleRate       = mCA->m_samplerate;
     conv_in_desc.mFormatID         = kAudioFormatLinearPCM;
     conv_in_desc.mFormatFlags      = formatFlags |
         kAudioFormatFlagsNativeEndian |
         kLinearPCMFormatFlagIsPacked;
-    conv_in_desc.mBytesPerPacket   = mCA->output_bytes_per_frame;
+    conv_in_desc.mBytesPerPacket   = mCA->m_output_bytes_per_frame;
     // This seems inefficient, does it hurt if we increase this?
     conv_in_desc.mFramesPerPacket  = 1;
-    conv_in_desc.mBytesPerFrame    = mCA->output_bytes_per_frame;
-    conv_in_desc.mChannelsPerFrame = mCA->channels;
+    conv_in_desc.mBytesPerFrame    = mCA->m_output_bytes_per_frame;
+    conv_in_desc.mChannelsPerFrame = mCA->m_channels;
     conv_in_desc.mBitsPerChannel   =
-        AudioOutputSettings::FormatToBits(mCA->output_format);
+        AudioOutputSettings::FormatToBits(mCA->m_output_format);
 
     /* Set AudioUnit input format */
     err = AudioUnitSetProperty(mOutputUnit,
@@ -1426,7 +1404,7 @@ bool CoreAudioData::OpenSPDIF()
                   .arg(StreamDescriptionToString(formats[j])));
             if ((formats[j].mFormatID == 'IAC3' ||
                  formats[j].mFormatID == kAudioFormat60958AC3) &&
-                formats[j].mSampleRate == mCA->samplerate)
+                formats[j].mSampleRate == mCA->m_samplerate)
             {
                 Debug("OpenSPDIF: Found digital format");
                 mStreamIndex  = i;

@@ -15,7 +15,7 @@
 class MBASE_PUBLIC FileSystemInfo
 {
   public:
-    FileSystemInfo();
+    FileSystemInfo() = default;
     FileSystemInfo(const FileSystemInfo &other);
     FileSystemInfo(QString hostname, QString path, bool local, int fsid,
              int groupid, int blksize, int64_t total, int64_t used);
@@ -69,12 +69,12 @@ class MBASE_PUBLIC FileSystemInfo
 
     QString m_hostname;
     QString m_path;
-    bool m_local;
-    int m_fsid;
-    int m_grpid;
-    int m_blksize;
-    int64_t m_total;
-    int64_t m_used;
-    int m_weight;
+    bool m_local    {false};
+    int m_fsid      {-1};
+    int m_grpid     {-1};
+    int m_blksize   {4096};
+    int64_t m_total {0};
+    int64_t m_used  {0};
+    int m_weight    {0};
 };
 #endif

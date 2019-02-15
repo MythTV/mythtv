@@ -43,13 +43,13 @@ signals:
 
 protected:
     //! Seconds transition will last
-    int m_duration;
+    int m_duration {1000};
     //! The image currently displayed, which will be replaced
     //! (whatever the transition direction)
-    Slide *m_old;
+    Slide *m_old   {nullptr};
     //! The new image that will replace the current one
     //! (whatever the transition direction)
-    Slide *m_new;
+    Slide *m_new   {nullptr};
     // Transitions play forwards or backwards. Symmetric transitions can
     // define a one-way transition in terms of "prev" & "next" (as in
     // position rather than time). The reverse transition can then be
@@ -57,9 +57,9 @@ protected:
     // When played forwards next replaces prev, ie. prev = old, next = new
     // When played backwards prev replaces next, ie. prev = new, next = old
     //! The image occurring earlier in the slideshow sequence
-    Slide *m_prev;
+    Slide *m_prev  {nullptr};
     //! The image occurring later in the slideshow sequence
-    Slide *m_next;
+    Slide *m_next  {nullptr};
 };
 
 
@@ -91,7 +91,7 @@ public:
     void Finalise()   override = 0; // Transition
 
 protected:
-    GroupAnimation *m_animation;
+    GroupAnimation *m_animation {nullptr};
 };
 
 
@@ -156,7 +156,7 @@ class TransitionRandom : public Transition
     Q_OBJECT
 public:
     explicit TransitionRandom(QList<Transition*> peers)
-        : Transition(Transition::tr("Random")), m_peers(peers), m_current(nullptr) {}
+        : Transition(Transition::tr("Random")), m_peers(peers) {}
     void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0) override; // Transition
     void SetSpeed(float speed) override // Transition
         { if (m_current) m_current->SetSpeed(speed); }
@@ -174,7 +174,7 @@ protected:
     //! Set of distinct transitions
     QList<Transition*> m_peers;
     //! Selected transition
-    Transition        *m_current;
+    Transition        *m_current {nullptr};
 };
 
 

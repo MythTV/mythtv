@@ -241,7 +241,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (!mfmr)
             return;
 
-        MetadataLookupList list = mfmr->results;
+        MetadataLookupList list = mfmr->m_results;
 
         if (list.count() > 1)
         {
@@ -352,7 +352,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (!mfsr)
             return;
 
-        MetadataLookup *lookup = mfsr->result;
+        MetadataLookup *lookup = mfsr->m_result;
 
         if (!lookup)
             return;
@@ -422,7 +422,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (!mfnr)
             return;
 
-        MetadataLookup *lookup = mfnr->result;
+        MetadataLookup *lookup = mfnr->m_result;
 
         if (!lookup)
             return;

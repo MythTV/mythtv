@@ -13,18 +13,6 @@
 #include "imagemetadata.h"
 
 /*!
- \brief Constructor
- \param name Thread name
- \param dbfs Filesystem/Database adapter
-*/
-template <class DBFS>
-ThumbThread<DBFS>::ThumbThread(const QString &name, DBFS *const dbfs)
-    : MThread(name), m_dbfs(*dbfs),
-      m_requestQ(), m_backgroundQ(), m_doBackground(true)
-{}
-
-
-/*!
  \brief Destructor
 */
 template <class DBFS>

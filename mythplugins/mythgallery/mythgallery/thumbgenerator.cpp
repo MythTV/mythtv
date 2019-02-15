@@ -56,12 +56,6 @@
 QEvent::Type ThumbGenEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h) :
-    MThread("ThumbGenerator"), m_parent(parent),
-    m_isGallery(false), m_width(w), m_height(h), m_cancel(false)
-{
-}
-
 ThumbGenerator::~ThumbGenerator()
 {
     cancel();

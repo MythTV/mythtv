@@ -37,26 +37,6 @@
 UK MHEG content hook values: 2 => MPEG I-frame, 4 => PNG bitmap
 */
 
-MHBitmap::MHBitmap()
-{
-    m_fTiling = false;
-    m_nOrigTransparency = 0;
-    m_nTransparency = 0;
-    m_nXDecodeOffset = 0;
-    m_nYDecodeOffset = 0;
-    m_pContent = nullptr;
-}
-
-MHBitmap::MHBitmap(const MHBitmap &ref): MHVisible(ref)
-{
-    m_fTiling = ref.m_fTiling;
-    m_nOrigTransparency = ref.m_nOrigTransparency;
-    m_nTransparency = 0;
-    m_nXDecodeOffset = 0;
-    m_nYDecodeOffset = 0;
-    m_pContent = nullptr;
-}
-
 MHBitmap::~MHBitmap()
 {
     delete(m_pContent);

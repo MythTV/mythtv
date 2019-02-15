@@ -71,7 +71,7 @@ namespace
 
       public:
         explicit ParentalLevelNotifyContainer(QObject *lparent = nullptr) :
-            QObject(lparent), m_level(ParentalLevel::plNone)
+            QObject(lparent)
         {
             connect(&m_levelCheck,
                     SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
@@ -106,7 +106,7 @@ namespace
         }
 
       private:
-        ParentalLevel m_level;
+        ParentalLevel m_level {ParentalLevel::plNone};
         ParentalLevelChangeChecker m_levelCheck;
     };
 
@@ -354,9 +354,9 @@ namespace
         }
 
       private:
-        int             itemsPast {0};
+        int             itemsPast    {0};
         QMutex          m_fanartLock;
-        MythUIImage    *m_fanart {nullptr};
+        MythUIImage    *m_fanart     {nullptr};
         QTimer          m_fanartTimer;
         bool            m_bConnected {false};
     };
@@ -412,7 +412,7 @@ namespace
         }
 
       private:
-        MythScreenType *m_screen;
+        MythScreenType *m_screen {nullptr};
     };
 
     class MythUIButtonListItemCopyDest : public CopyMetadataDestination
@@ -438,7 +438,7 @@ namespace
         }
 
       private:
-        MythUIButtonListItem *m_item;
+        MythUIButtonListItem *m_item {nullptr};
     };
 
     void CopyMetadataToUI(const VideoMetadata *metadata,
@@ -576,7 +576,7 @@ class ItemDetailPopup : public MythScreenType
     ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
             const VideoMetadataListManager &listManager) :
         MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
-        m_listManager(listManager), m_playButton(nullptr), m_doneButton(nullptr)
+        m_listManager(listManager)
     {
     }
 
@@ -659,11 +659,11 @@ class ItemDetailPopup : public MythScreenType
 
   private:
     static const char * const WINDOW_NAME;
-    VideoMetadata *m_metadata;
+    VideoMetadata *m_metadata   {nullptr};
     const VideoMetadataListManager &m_listManager;
 
-    MythUIButton *m_playButton;
-    MythUIButton *m_doneButton;
+    MythUIButton  *m_playButton {nullptr};
+    MythUIButton  *m_doneButton {nullptr};
 };
 
 const char * const ItemDetailPopup::WINDOW_NAME = "itemdetailpopup";
@@ -690,10 +690,7 @@ class VideoDialogPrivate
   public:
     VideoDialogPrivate(VideoListPtr videoList, VideoDialog::DialogType type,
                        VideoDialog::BrowseType browse) :
-        m_switchingLayout(false), m_firstLoadPass(true),
-        m_rememberPosition(false), m_videoList(videoList), m_rootNode(nullptr),
-        m_currentNode(nullptr), m_treeLoaded(false), m_isFlatList(false),
-        m_type(type), m_browse(browse), m_scanner(nullptr)
+        m_videoList(videoList), m_type(type), m_browse(browse)
     {
         if (gCoreContext->GetBoolSetting("mythvideo.ParentalLevelFromRating", false))
         {
@@ -768,35 +765,35 @@ class VideoDialogPrivate
 
   public:
     ParentalLevelNotifyContainer m_parentalLevel;
-    bool m_switchingLayout;
+    bool m_switchingLayout {false};
 
     static VideoDialog::VideoListDeathDelayPtr m_savedPtr;
 
-    bool m_firstLoadPass;
+    bool m_firstLoadPass {true};
 
-    bool m_rememberPosition;
+    bool m_rememberPosition {false};
 
-    VideoListPtr m_videoList;
+    VideoListPtr m_videoList {nullptr};
 
-    MythGenericTree *m_rootNode;
-    MythGenericTree *m_currentNode;
+    MythGenericTree *m_rootNode {nullptr};
+    MythGenericTree *m_currentNode {nullptr};
 
-    bool m_treeLoaded;
+    bool m_treeLoaded {false};
 
-    bool m_isFileBrowser;
-    int  m_groupType;
-    bool m_isFlatList;
-    bool m_altPlayerEnabled;
+    bool m_isFileBrowser {false};
+    int  m_groupType {0};
+    bool m_isFlatList {false};
+    bool m_altPlayerEnabled {false};
     VideoDialog::DialogType m_type;
     VideoDialog::BrowseType m_browse;
 
-    bool m_autoMeta;
+    bool    m_autoMeta      {true};
 
     QString m_artDir;
     QString m_sshotDir;
     QString m_fanDir;
     QString m_banDir;
-    VideoScanner *m_scanner;
+    VideoScanner *m_scanner {nullptr};
 
     QString m_lastTreeNodePath;
     QMap<QString, int> m_notifications;
@@ -821,7 +818,7 @@ class VideoListDeathDelayPrivate
     }
 
   private:
-    VideoDialog::VideoListPtr m_savedList;
+    VideoDialog::VideoListPtr m_savedList {nullptr};
 };
 
 VideoListDeathDelay::VideoListDeathDelay(VideoDialog::VideoListPtr toSave) :
@@ -854,26 +851,8 @@ VideoDialog::VideoListDeathDelayPtr &VideoDialog::GetSavedVideoList()
 VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
         VideoListPtr video_list, DialogType type, BrowseType browse)
   : MythScreenType(lparent, lname),
-    m_menuPopup(nullptr),
-    m_busyPopup(nullptr),
     m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
     m_mainStack(GetMythMainWindow()->GetMainStack()),
-    m_videoButtonList(nullptr),
-    m_videoButtonTree(nullptr),
-    m_titleText(nullptr),
-    m_novideoText(nullptr),
-    m_positionText(nullptr),
-    m_crumbText(nullptr),
-    m_coverImage(nullptr),
-    m_screenshot(nullptr),
-    m_banner(nullptr),
-    m_fanart(nullptr),
-    m_trailerState(nullptr),
-    m_parentalLevelState(nullptr),
-    m_videoLevelState(nullptr),
-    m_userRatingState(nullptr),
-    m_watchedState(nullptr),
-    m_studioState(nullptr),
     m_metadataFactory(new MetadataFactory(this)),
     m_d(new VideoDialogPrivate(video_list, type, browse))
 {
@@ -3320,7 +3299,7 @@ void VideoDialog::customEvent(QEvent *levent)
         if (!mfmr)
             return;
 
-        MetadataLookupList list = mfmr->results;
+        MetadataLookupList list = mfmr->m_results;
 
         if (list.count() > 1)
         {
@@ -3345,7 +3324,7 @@ void VideoDialog::customEvent(QEvent *levent)
         if (!mfsr)
             return;
 
-        MetadataLookup *lookup = mfsr->result;
+        MetadataLookup *lookup = mfsr->m_result;
 
         if (!lookup)
             return;
@@ -3359,7 +3338,7 @@ void VideoDialog::customEvent(QEvent *levent)
         if (!mfnr)
             return;
 
-        MetadataLookup *lookup = mfnr->result;
+        MetadataLookup *lookup = mfnr->m_result;
 
         if (!lookup)
             return;

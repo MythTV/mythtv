@@ -35,7 +35,7 @@ class MHEngine;
 class MHVisible : public MHPresentable  
 {
   public:
-    MHVisible();
+    MHVisible() = default;
     MHVisible(const MHVisible &ref);
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
     void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
@@ -70,12 +70,16 @@ class MHVisible : public MHPresentable
 
   protected:
     // Exchange attributes
-    int m_nOriginalBoxWidth, m_nOriginalBoxHeight;
-    int m_nOriginalPosX, m_nOriginalPosY;
+    int m_nOriginalBoxWidth  {-1};
+    int m_nOriginalBoxHeight {-1};
+    int m_nOriginalPosX      {0};
+    int m_nOriginalPosY      {0};
     MHObjectRef m_OriginalPaletteRef; // Optional palette ref
     // Internal attributes
-    int m_nBoxWidth, m_nBoxHeight;
-    int m_nPosX, m_nPosY;
+    int m_nBoxWidth          {0};
+    int m_nBoxHeight         {0};
+    int m_nPosX              {0};
+    int m_nPosY              {0};
     MHObjectRef m_PaletteRef;
 
     // Return the colour, looking up in the palette if necessary.
@@ -85,7 +89,7 @@ class MHVisible : public MHPresentable
 class MHLineArt : public MHVisible  
 {
   public:
-    MHLineArt();
+    MHLineArt() = default;
     MHLineArt(const MHLineArt &ref);
     const char *ClassName() override // MHRoot
         { return "LineArt"; }
@@ -103,14 +107,14 @@ class MHLineArt : public MHVisible
 
   protected:
     // Exchanged attributes,
-    bool    m_fBorderedBBox; // Does it have lines round or not?
-    int     m_nOriginalLineWidth;
-    int     m_OriginalLineStyle;
+    bool    m_fBorderedBBox      {true}; // Does it have lines round or not?
+    int     m_nOriginalLineWidth {1};
     enum { LineStyleSolid = 1, LineStyleDashed = 2, LineStyleDotted = 3 };
+    int     m_OriginalLineStyle  {LineStyleSolid};
     MHColour    m_OrigLineColour, m_OrigFillColour; 
     // Internal attributes
-    int     m_nLineWidth;
-    int     m_LineStyle;
+    int     m_nLineWidth         {0};
+    int     m_LineStyle          {0};
     MHColour    m_LineColour, m_FillColour;
 };
 
@@ -134,8 +138,9 @@ class MHRectangle : public MHLineArt
 class MHInteractible
 {
   public:
-    MHInteractible(MHVisible *parent);
-    virtual ~MHInteractible();
+    MHInteractible(MHVisible *parent)
+        : m_parent(parent) {}
+    virtual ~MHInteractible() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
 
@@ -156,11 +161,11 @@ class MHInteractible
 
   protected:
     // Exchanged attributes
-    bool     m_fEngineResp;
+    bool     m_fEngineResp         {true};
     MHColour m_highlightRefColour;
     // Internal attributes
-    bool     m_fHighlightStatus;
-    bool     m_fInteractionStatus;
+    bool     m_fHighlightStatus    {false};
+    bool     m_fInteractionStatus  {false};
 
   private:
     MHVisible *m_parent;
@@ -169,8 +174,8 @@ class MHInteractible
 class MHSlider : public MHVisible, public MHInteractible
 {
   public:
-    MHSlider();
-    virtual ~MHSlider();
+    MHSlider() : MHInteractible(this) {}
+    virtual ~MHSlider() = default;
     const char *ClassName() override // MHRoot
         { return "Slider"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
@@ -198,10 +203,10 @@ class MHSlider : public MHVisible, public MHInteractible
     void Step(int nbSteps, MHEngine *engine) override; // MHRoot
     void SetSliderValue(int newValue, MHEngine *engine) override; // MHRoot
     int GetSliderValue(void) override // MHRoot
-        { return slider_value; }
+        { return m_slider_value; }
     void SetPortion(int newPortion, MHEngine *engine) override; // MHRoot
     int GetPortion(void) override // MHRoot
-        { return portion; }
+        { return m_portion; }
     // Additional action defined in UK MHEG.
     void SetSliderParameters(int newMin, int newMax, int newStep, MHEngine *engine) override; // MHRoot
 
@@ -215,26 +220,32 @@ class MHSlider : public MHVisible, public MHInteractible
     // Exchanged attributes
     // Orientation and direction of increasing value.
     enum SliderOrientation { SliderLeft = 1, SliderRight, SliderUp, SliderDown }
-        m_orientation;
-    int initial_value, initial_portion;
-    int orig_max_value, orig_min_value, orig_step_size;
+        m_orientation     {SliderLeft};
+    int m_initial_value   {1};
+    int m_initial_portion {0};
+    int m_orig_max_value  {-1};
+    int m_orig_min_value  {1};
+    int m_orig_step_size  {1};
     // Style of slider.  Normal represents a mark on a scale,
     // Thermometer a range from the start up to the mark and Proportional
     // a range from the slider to the portion.
     enum SliderStyle { SliderNormal = 1, SliderThermo, SliderProp }
-        m_style;
+        m_style           {SliderNormal};
     MHColour m_sliderRefColour;
     // Internal attributes
     // In UK MHEG min_value, max_value and step_size can be changed.
-    int max_value, min_value, step_size;
-    int slider_value, portion;
+    int m_max_value       {0};
+    int m_min_value       {0};
+    int m_step_size       {0};
+    int m_slider_value    {0};
+    int m_portion         {0};
 };
 
 class MHEntryField : public MHVisible, public MHInteractible
 {
   public:
-    MHEntryField();
-    virtual ~MHEntryField();
+    MHEntryField(): MHInteractible(this) {}
+    virtual ~MHEntryField() = default;
     const char *ClassName() override // MHRoot
         { return "EntryField"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
@@ -258,8 +269,8 @@ class MHEntryField : public MHVisible, public MHInteractible
 class MHButton : public MHVisible  
 {
   public:
-    MHButton();
-    virtual ~MHButton();
+    MHButton() = default;
+    virtual ~MHButton() = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
     void Display(MHEngine *) override {} // MHVisible - Not (yet?) supported
@@ -269,8 +280,8 @@ class MHButton : public MHVisible
 class MHHotSpot : public MHButton  
 {
   public:
-    MHHotSpot();
-    virtual ~MHHotSpot();
+    MHHotSpot() = default;
+    virtual ~MHHotSpot() = default;
     const char *ClassName() override // MHRoot
         { return "HotSpot"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHButton
@@ -282,8 +293,8 @@ class MHHotSpot : public MHButton
 class MHPushButton : public MHButton  
 {
   public:
-    MHPushButton();
-    virtual ~MHPushButton();
+    MHPushButton() = default;
+    virtual ~MHPushButton() = default;
     const char *ClassName() override // MHRoot
         { return "PushButton"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHButton
@@ -295,8 +306,8 @@ class MHPushButton : public MHButton
 class MHSwitchButton : public MHPushButton  
 {
   public:
-    MHSwitchButton();
-    virtual ~MHSwitchButton();
+    MHSwitchButton() = default;
+    virtual ~MHSwitchButton() = default;
     const char *ClassName() override // MHPushButton
         { return "SwitchButton"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHPushButton

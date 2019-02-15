@@ -10,9 +10,9 @@
 
 #define LOC QString("DTVChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
-QReadWriteLock DTVChannel::master_map_lock(QReadWriteLock::Recursive);
+QReadWriteLock DTVChannel::s_master_map_lock(QReadWriteLock::Recursive);
 typedef QMap<QString,QList<DTVChannel*> > MasterMap;
-MasterMap DTVChannel::master_map;
+MasterMap DTVChannel::s_master_map;
 
 DTVChannel::DTVChannel(TVRec *parent)
     : ChannelBase(parent),
@@ -123,33 +123,33 @@ void DTVChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
 
 void DTVChannel::RegisterForMaster(const QString &key)
 {
-    master_map_lock.lockForWrite();
-    master_map[key].push_back(this);
-    master_map_lock.unlock();
+    s_master_map_lock.lockForWrite();
+    s_master_map[key].push_back(this);
+    s_master_map_lock.unlock();
 }
 
 void DTVChannel::DeregisterForMaster(const QString &key)
 {
-    master_map_lock.lockForWrite();
-    MasterMap::iterator mit = master_map.find(key);
-    if (mit == master_map.end())
-        mit = master_map.begin();
-    for (; mit != master_map.end(); ++mit)
+    s_master_map_lock.lockForWrite();
+    MasterMap::iterator mit = s_master_map.find(key);
+    if (mit == s_master_map.end())
+        mit = s_master_map.begin();
+    for (; mit != s_master_map.end(); ++mit)
     {
         (*mit).removeAll(this);
         if (mit.key() == key)
             break;
     }
-    master_map_lock.unlock();
+    s_master_map_lock.unlock();
 }
 
 DTVChannel *DTVChannel::GetMasterLock(const QString &key)
 {
-    master_map_lock.lockForRead();
-    MasterMap::iterator mit = master_map.find(key);
-    if (mit == master_map.end() || (*mit).empty())
+    s_master_map_lock.lockForRead();
+    MasterMap::iterator mit = s_master_map.find(key);
+    if (mit == s_master_map.end() || (*mit).empty())
     {
-        master_map_lock.unlock();
+        s_master_map_lock.unlock();
         return nullptr;
     }
     return (*mit).front();
@@ -160,7 +160,7 @@ void DTVChannel::ReturnMasterLock(DTVChannelP &chan)
     if (chan != nullptr)
     {
         chan = nullptr;
-        master_map_lock.unlock();
+        s_master_map_lock.unlock();
     }
 }
 

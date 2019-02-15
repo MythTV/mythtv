@@ -22,8 +22,6 @@ Goom::Goom()
 {
     m_fps = 20;
 
-    m_buffer = nullptr;
-
     goom_init(800, 600, 0);
 
     m_scalew = gCoreContext->GetNumSetting("VisualScaleWidth", 2);
@@ -63,21 +61,21 @@ void Goom::resize(const QSize &newsize)
 
 bool Goom::process(VisualNode *node)
 {
-    if (!node || node->length == 0)
+    if (!node || node->m_length == 0)
         return false;
 
     int numSamps = 512;
-    if (node->length < 512)
-        numSamps = node->length;
+    if (node->m_length < 512)
+        numSamps = node->m_length;
 
     signed short int data[2][512];
 
     int i = 0;
     for (i = 0; i < numSamps; i++)
     {
-        data[0][i] = node->left[i];
-        if (node->right)
-            data[1][i] = node->right[i];
+        data[0][i] = node->m_left[i];
+        if (node->m_right)
+            data[1][i] = node->m_right[i];
         else
             data[1][i] = data[0][i];
     }

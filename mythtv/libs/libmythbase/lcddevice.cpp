@@ -39,27 +39,7 @@
 
 LCD::LCD()
     : QObject(),
-      m_socket(nullptr),              m_socketLock(QMutex::Recursive),
-      m_hostname("localhost"),        m_port(6545),
-      m_connected(false),
-
-      m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this)),
-
-      m_lcdWidth(0),                 m_lcdHeight(0),
-
-      m_lcdReady(false),             m_lcdShowTime(false),
-      m_lcdShowMenu(false),          m_lcdShowGeneric(false),
-      m_lcdShowMusic(false),         m_lcdShowChannel(false),
-      m_lcdShowVolume(false),        m_lcdShowRecStatus(false),
-      m_lcdBacklightOn(false),       m_lcdHeartbeatOn(false),
-
-      m_lcdPopupTime(0),
-
-      m_lcdShowMusicItems(),
-      m_lcdKeyString(),
-
-      m_lcdLedMask(0),
-      GetLEDMask(nullptr)
+      m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
 {
     m_sendBuffer.clear(); m_lastCommand.clear();
     m_lcdShowMusicItems.clear(); m_lcdKeyString.clear();

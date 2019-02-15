@@ -48,8 +48,8 @@ class Property
 
         QString  m_sName;
         QString  m_sNameSpace;
-        bool     m_bRequired;
-        bool     m_bMultiValue;
+        bool     m_bRequired   {false};
+        bool     m_bMultiValue {false};
         NameValues      m_lstAttributes;
 
     public:
@@ -184,9 +184,9 @@ typedef QStringList FilterMap;
 class UPNP_PUBLIC CDSObject : public ReferenceCounter
 {
     public:
-        short           m_nUpdateId;
+        short           m_nUpdateId            {1};
 
-        ObjectTypes     m_eType;
+        ObjectTypes     m_eType                {OT_Container};
 
         // Required
 
@@ -194,13 +194,13 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         QString         m_sParentId;
         QString         m_sTitle;
         QString         m_sClass;
-        bool            m_bRestricted;
-        bool            m_bSearchable;
+        bool            m_bRestricted          {true};
+        bool            m_bSearchable          {false};
 
         // Optional
 
         QString         m_sCreator;
-        QString         m_sWriteStatus;
+        QString         m_sWriteStatus         {"PROTECTED"};
 
         // Only appropriate for Container Classes
 
@@ -211,8 +211,8 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
 
         Properties      m_properties;
         CDSObjects      m_children;
-        uint32_t        m_nChildCount;
-        uint32_t        m_nChildContainerCount;
+        uint32_t        m_nChildCount          {0};
+        uint32_t        m_nChildContainerCount {0};
 
         Resources       m_resources;
 

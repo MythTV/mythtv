@@ -97,9 +97,9 @@ class HDHRStreamHandler : public StreamHandler
     mutable QMutex          _hdhr_lock;
 
     // for implementing Get & Return
-    static QMutex                            _handlers_lock;
-    static QMap<int, HDHRStreamHandler*>     _handlers;
-    static QMap<int, uint>                   _handlers_refcnt;
+    static QMutex                            s_handlers_lock;
+    static QMap<int, HDHRStreamHandler*>     s_handlers;
+    static QMap<int, uint>                   s_handlers_refcnt;
 };
 
 #endif // _HDHRSTREAMHANDLER_H_

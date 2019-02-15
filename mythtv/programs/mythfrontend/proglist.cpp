@@ -38,41 +38,12 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
                        const QDateTime &selectedTime) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
-    m_recid(0),
-    m_title(),
     m_extraArg(extraArg),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_selectedTime(selectedTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-
-    m_searchType(kNoSearch),
-
-    m_view(view),
-    m_curView(-1),
-    m_viewList(),
-    m_viewTextList(),
-
-    m_itemList(),
-    m_itemListSave(),
-    m_schedList(),
-
-    m_typeList(),
-    m_genreList(),
-    m_stationList(),
-
-    m_allowEvents(true),
-    m_titleSort(false),
-    m_reverseSort(false),
-    m_useGenres(false),
-
-    m_schedText(nullptr),
-    m_curviewText(nullptr),
-    m_positionText(nullptr),
-    m_progList(nullptr),
-    m_messageText(nullptr),
-
-    m_allowViewDialog(true)
+    m_view(view)
 {
     if (pltype == plMovies)
     {

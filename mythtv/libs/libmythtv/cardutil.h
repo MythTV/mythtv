@@ -412,7 +412,7 @@ class MTV_PUBLIC CardUtil
     static QStringList  ProbeV4LVideoInputs(QString device);
     static QStringList  ProbeV4LAudioInputs(QString device);
     static QStringList  ProbeDVBInputs(QString device);
-    static QMap <QString,QStringList> videoDeviceCache;
+    static QMap <QString,QStringList> s_videoDeviceCache;
 };
 
 #endif //_CARDUTIL_H_

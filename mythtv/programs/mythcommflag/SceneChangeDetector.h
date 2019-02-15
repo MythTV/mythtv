@@ -30,10 +30,10 @@ public:
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
     FrameMap GetMap(unsigned int) const override // FrameAnalyzer
-        { return changeMap; }
+        { return m_changeMap; }
 
     /* SceneChangeDetector interface. */
-    const FrameAnalyzer::FrameMap *getChanges(void) const { return &changeMap; }
+    const FrameAnalyzer::FrameMap *getChanges(void) const { return &m_changeMap; }
 
     typedef struct scenechange_data {
         unsigned char   color;
@@ -44,20 +44,20 @@ public:
     virtual ~SceneChangeDetector(void) = default;
 
   private:
-    HistogramAnalyzer       *histogramAnalyzer;
-    float                   fps;
+    HistogramAnalyzer       *m_histogramAnalyzer {nullptr};
+    float                   m_fps                {0.0f};
 
     /* per-frame info */
-    SceneChangeData         *scdata;
-    unsigned short          *scdiff;
+    SceneChangeData         *m_scdata            {nullptr};
+    unsigned short          *m_scdiff            {nullptr};
 
-    FrameAnalyzer::FrameMap changeMap;
+    FrameAnalyzer::FrameMap m_changeMap;
 
     /* Debugging */
-    int                     debugLevel;
-    QString                 debugdata;              /* filename */
-    bool                    debug_scenechange;
-    bool                    scenechange_done;
+    int                     m_debugLevel         {0};
+    QString                 m_debugdata;            /* filename */
+    bool                    m_debug_scenechange  {false};
+    bool                    m_scenechange_done   {false};
 };
 
 #endif  /* !__SCENECHANGEDETECTOR_H__ */

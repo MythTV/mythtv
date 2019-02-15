@@ -17,27 +17,7 @@ using namespace std;
 #include <QCoreApplication>
 #include <QPainter>
 
-BumpScope::BumpScope() :
-    m_image(nullptr),
-
-    m_size(0,0),
-
-    m_color(0x2050FF),
-    m_x(0), m_y(0), m_width(800), m_height(600),
-    m_phongrad(800),
-
-    m_color_cycle(true),
-    m_moving_light(true),
-    //m_diamond(true),
-
-    m_bpl(0),
-
-    m_rgb_buf(nullptr),
-
-    m_iangle(0), m_ixo(0), m_iyo(0), m_ixd(0), m_iyd(0), m_ilx(0), m_ily(0),
-    m_was_moving(0), m_was_color(0),
-    m_ih(0.0), m_is(0.0), m_iv(0.0), m_isd(0.0), m_ihd(0),
-    m_icolor(0)
+BumpScope::BumpScope()
 {
     m_fps = 15;
 
@@ -371,15 +351,15 @@ void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
 
 bool BumpScope::process(VisualNode *node)
 {
-    if (!node || node->length == 0 || !m_image)
+    if (!node || node->m_length == 0 || !m_image)
         return false;
 
     int numSamps = 512;
-    if (node->length < 512)
-        numSamps = node->length;
+    if (node->m_length < 512)
+        numSamps = node->m_length;
 
     int prev_y = (int)m_height / 2 +
-        ((int)node->left[0] * (int)m_height) / 0x10000;
+        ((int)node->m_left[0] * (int)m_height) / 0x10000;
 
     if (prev_y < 0)
         prev_y = 0;
@@ -389,7 +369,7 @@ bool BumpScope::process(VisualNode *node)
     {
         int y = (i * numSamps) / (m_width - 1);
         y = (int)m_height / 2 +
-            ((int)node->left[y] * (int)m_height) / 0x10000;
+            ((int)node->m_left[y] * (int)m_height) / 0x10000;
 
         if (y < 0)
             y = 0;

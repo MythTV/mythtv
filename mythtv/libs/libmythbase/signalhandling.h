@@ -47,10 +47,10 @@ class MBASE_PUBLIC SignalHandler: public QObject
     ~SignalHandler();
     void SetHandlerPrivate(int signal, SigHandlerFunc handler);
 
-    static int sigFd[2];
+    static int s_sigFd[2];
     static volatile bool s_exit_program;
-    QSocketNotifier *m_notifier;
-    char *m_sigStack;
+    QSocketNotifier *m_notifier {nullptr};
+    char            *m_sigStack {nullptr};
 
     QMutex m_sigMapLock;
     QMap<int, SigHandlerFunc> m_sigMap;

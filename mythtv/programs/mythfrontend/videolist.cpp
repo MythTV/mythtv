@@ -68,15 +68,11 @@ class TreeNodeDataPrivate
     }
 
   private:
-    VideoMetadata *m_metadata;
+    VideoMetadata *m_metadata {nullptr};
     QString m_host;
     QString m_path;
     QString m_prefix;
 };
-
-TreeNodeData::TreeNodeData() : m_d(nullptr)
-{
-}
 
 TreeNodeData::TreeNodeData(VideoMetadata *metadata)
 {
@@ -441,8 +437,8 @@ class VideoListImp
     void update_meta_view(bool flat_list);
 
   private:
-    bool m_ListUnknown;
-    bool m_LoadMetaData;
+    bool m_ListUnknown                      {false};
+    bool m_LoadMetaData                     {false};
 
     QScopedPointer <MythGenericTree> video_tree_root;
 

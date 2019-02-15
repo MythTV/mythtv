@@ -68,15 +68,9 @@ ext_to_media_t MythMediaDevice::s_ext_to_media;
 
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
                                  bool SuperMount,  bool AllowEject)
-               : QObject(par)
+    : QObject(par), m_DevicePath(DevicePath),
+      m_AllowEject(AllowEject), m_SuperMount(SuperMount)
 {
-    m_DevicePath = DevicePath;
-    m_AllowEject = AllowEject;
-    m_Locked = false;
-    m_DeviceHandle = -1;
-    m_SuperMount = SuperMount;
-    m_Status = MEDIASTAT_UNKNOWN;
-    m_MediaType = MEDIATYPE_UNKNOWN;
     m_RealDevice = getSymlinkTarget(m_DevicePath);
 }
 

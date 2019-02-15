@@ -94,9 +94,9 @@ class V4L2encStreamHandler : public StreamHandler
     bool           m_hasPictureAttributes;
 
     // for implementing Get & Return
-    static QMutex                           m_handlers_lock;
-    static QMap<QString, V4L2encStreamHandler*> m_handlers;
-    static QMap<QString, uint>              m_handlers_refcnt;
+    static QMutex                           s_handlers_lock;
+    static QMap<QString, V4L2encStreamHandler*> s_handlers;
+    static QMap<QString, uint>              s_handlers_refcnt;
 
     int           m_bufferSize;
 
@@ -117,11 +117,11 @@ class V4L2encStreamHandler : public StreamHandler
     uint m_high_bitrate;
     uint m_high_peak_bitrate;
 
-    static const int   m_audio_rateL1[];
-    static const int   m_audio_rateL2[];
-    static const int   m_audio_rateL3[];
-    static const char *m_stream_types[];
-    static const char *m_aspect_ratios[];
+    static const int   s_audio_rateL1[];
+    static const int   s_audio_rateL2[];
+    static const int   s_audio_rateL3[];
+    static const char *s_stream_types[];
+    static const char *s_aspect_ratios[];
 
     int           m_fd;
     int           m_audio_input;

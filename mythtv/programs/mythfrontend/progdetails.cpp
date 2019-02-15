@@ -17,12 +17,6 @@
 
 #define LASTPAGE 2
 
-ProgDetails::ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo) :
-    MythScreenType (parent, "progdetails"),
-    m_progInfo(*progInfo), m_infoList(*this)
-{
-}
-
 bool ProgDetails::Create(void)
 {
     // Load the theme for this screen

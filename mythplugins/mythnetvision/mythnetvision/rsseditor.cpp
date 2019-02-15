@@ -44,28 +44,6 @@ namespace
     }
 }
 
-/** \brief Creates a new RSS Edit Popup
- *  \param url The web page for which an entry is being created.
- *  \param edit If true, then editing an existing entry instead of
- *              creating a new entry.
- *  \param parent Pointer to the screen stack
- *  \param name The name of the window
- */
-RSSEditPopup::RSSEditPopup(
-    const QString &url, bool edit,
-    MythScreenStack *parent, const QString &name) :
-    MythScreenType(parent, name),
-    m_site(nullptr),
-    m_urlText(url),        m_editing(edit),
-    m_thumbImage(nullptr), m_thumbButton(nullptr),
-    m_urlEdit(nullptr),    m_titleEdit(nullptr),
-    m_descEdit(nullptr),   m_authorEdit(nullptr),
-    m_okButton(nullptr),   m_cancelButton(nullptr),
-    m_download(nullptr),   m_manager(nullptr),
-    m_reply(nullptr)
-{
-}
-
 RSSEditPopup::~RSSEditPopup()
 {
     if (m_manager)
@@ -331,13 +309,6 @@ void RSSEditPopup::customEvent(QEvent *levent)
             m_thumbImage->Show();
         }
     }
-}
-
-RSSEditor::RSSEditor(MythScreenStack *parent, const QString &name) :
-    MythScreenType(parent, name), m_lock(QMutex::Recursive),
-    m_changed(false), m_sites(nullptr), m_new(nullptr), m_delete(nullptr), m_edit(nullptr),
-    m_image(nullptr), m_title(nullptr), m_url(nullptr), m_desc(nullptr), m_author(nullptr)
-{
 }
 
 RSSEditor::~RSSEditor()

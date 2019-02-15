@@ -76,8 +76,7 @@ ReferenceCounter::ReferenceCounter(const QString &debugName, bool logDebug) :
 #ifdef EXTRA_DEBUG
     m_debugName(debugName),
 #endif
-    m_logDebug(logDebug),
-    m_referenceCount(1)
+    m_logDebug(logDebug)
 {
     (void) debugName;
 #ifdef LEAK_DEBUG

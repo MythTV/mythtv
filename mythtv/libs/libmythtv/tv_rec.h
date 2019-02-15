@@ -429,8 +429,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString      rbFileExt;
 
   public:
-    static QReadWriteLock    inputsLock;
-    static QMap<uint,TVRec*> inputs;
+    static QReadWriteLock    s_inputsLock;
+    static QMap<uint,TVRec*> s_inputs;
 
   public:
     static const uint kSignalMonitoringRate;

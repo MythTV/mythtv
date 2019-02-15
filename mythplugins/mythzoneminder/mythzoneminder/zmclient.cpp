@@ -25,15 +25,7 @@
 
 ZMClient::ZMClient()
     : QObject(nullptr),
-      m_listLock(QMutex::Recursive),
-      m_socket(nullptr),
-      m_socketLock(QMutex::Recursive),
-      m_hostname("localhost"),
-      m_port(6548),
-      m_bConnected(false),
-      m_retryTimer(new QTimer(this)),
-      m_zmclientReady(false),
-      m_isMiniPlayerEnabled(true)
+      m_retryTimer(new QTimer(this))
 {
     setObjectName("ZMClient");
     connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));

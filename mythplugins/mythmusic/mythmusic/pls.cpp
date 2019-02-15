@@ -29,10 +29,6 @@
 using namespace std;
 
 
-PlayListFile::PlayListFile(void) : m_version(0)
-{
-}
-
 PlayListFile::~PlayListFile(void)
 {
     clear();

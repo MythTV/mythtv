@@ -51,7 +51,7 @@ class MediaMonitorUnix : public MediaMonitor
     QStringList GetCDROMBlockDevices(void) override; // MediaMonitor
 
   protected:
-    int                          m_fifo;
+    int                          m_fifo {-1};
     static const char           *kUDEV_FIFO;
 };
 

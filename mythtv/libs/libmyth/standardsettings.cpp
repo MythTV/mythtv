@@ -17,15 +17,6 @@ void MythUIButtonListItemSetting::ShouldUpdate(StandardSetting *setting)
     setting->updateButton(this);
 }
 
-StandardSetting::StandardSetting(Storage *_storage) :
-    m_settingValue(""),
-    m_enabled(true), m_label(""), m_helptext(""), m_visible(true),
-    m_haveChanged(false),
-    m_storage(_storage),
-    m_parent(nullptr)
-{
-}
-
 StandardSetting::~StandardSetting()
 {
     QList<StandardSetting *>::const_iterator i;
@@ -380,11 +371,6 @@ AutoIncrementSetting::AutoIncrementSetting(QString _table, QString _column) :
                             Text Setting
 *******************************************************************************/
 
-MythUITextEditSetting::MythUITextEditSetting(Storage *_storage):
-    StandardSetting(_storage), m_passwordEcho(false)
-{
-}
-
 void MythUITextEditSetting::SetPasswordEcho(bool b)
 {
     m_passwordEcho = b;
@@ -428,15 +414,6 @@ void MythUITextEditSetting::updateButton(MythUIButtonListItem *item)
                             Directory Setting
 *******************************************************************************/
 
-MythUIFileBrowserSetting::MythUIFileBrowserSetting(Storage *_storage):
-    StandardSetting(_storage)
-{
-    m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files |
-                    QDir::Readable | QDir::Writable | QDir::Executable);
-    m_nameFilter.clear();
-    m_nameFilter << "*";
-}
-
 void MythUIFileBrowserSetting::edit(MythScreenType * screen)
 {
     if (!isEnabled())
@@ -474,20 +451,6 @@ void MythUIFileBrowserSetting::updateButton(MythUIButtonListItem *item)
 /******************************************************************************
                             ComboBoxSetting
 *******************************************************************************/
-/**
- * Create a Setting Widget to select the value from a list
- * \param _storage An object that knows how to get/set the value for
- *                 this item from/to a database.  This should be
- *                 created with a call to XXXStorage.
- * \param rw if set to true, the user can input it's own value
- */
-MythUIComboBoxSetting::MythUIComboBoxSetting(Storage *_storage, bool rw):
-    StandardSetting(_storage),
-    m_rewrite(rw),
-    m_isSet(false)
-{
-}
-
 MythUIComboBoxSetting::~MythUIComboBoxSetting()
 {
     m_labels.clear();
@@ -784,21 +747,6 @@ void MythUICheckBoxSetting::resultEdit(DialogCompletionEvent */*dce*/)
 /******************************************************************************
                            Standard setting dialog
 *******************************************************************************/
-
-StandardSettingDialog::StandardSettingDialog(MythScreenStack *parent,
-                                             const char *name,
-                                             GroupSetting *groupSettings) :
-    MythScreenType(parent, name),
-    m_buttonList(nullptr),
-    m_title(nullptr),
-    m_groupHelp(nullptr),
-    m_selectedSettingHelp(nullptr),
-    m_menuPopup(nullptr),
-    m_settingsTree(groupSettings),
-    m_currentGroupSetting(nullptr),
-    m_loaded(false)
-{
-}
 
 StandardSettingDialog::~StandardSettingDialog()
 {

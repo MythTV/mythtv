@@ -32,10 +32,7 @@ class MythNewsConfigPriv
 
 MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const QString &name)
     : MythScreenType(parent, name),
-      m_lock(QMutex::Recursive),
-      m_priv(new MythNewsConfigPriv), m_categoriesList(nullptr),
-      m_siteList(nullptr),            m_helpText(nullptr),
-      m_contextText(nullptr),
+      m_priv(new MythNewsConfigPriv),
       m_updateFreq(gCoreContext->GetNumSetting("NewsUpdateFrequency", 30))
 {
     populateSites();
@@ -90,7 +87,7 @@ void MythNewsConfig::populateSites(void)
         catNode = catList.item(i);
 
         NewsCategory cat;
-        cat.name = catNode.toElement().attribute("name");
+        cat.m_name = catNode.toElement().attribute("name");
 
         QDomNodeList siteList = catNode.childNodes();
 
@@ -99,14 +96,14 @@ void MythNewsConfig::populateSites(void)
             siteNode = siteList.item(j);
 
             NewsSiteItem site = NewsSiteItem();
-            site.name = siteNode.namedItem(QString("title")).toElement().text();
-            site.category = cat.name;
-            site.url = siteNode.namedItem(QString("url")).toElement().text();
-            site.ico = siteNode.namedItem(QString("ico")).toElement().text();
-            site.podcast = false;
-            site.inDB = findInDB(site.name);
+            site.m_name = siteNode.namedItem(QString("title")).toElement().text();
+            site.m_category = cat.m_name;
+            site.m_url = siteNode.namedItem(QString("url")).toElement().text();
+            site.m_ico = siteNode.namedItem(QString("ico")).toElement().text();
+            site.m_podcast = false;
+            site.m_inDB = findInDB(site.m_name);
 
-            cat.siteList.push_back(site);
+            cat.m_siteList.push_back(site);
         }
 
         m_priv->categoryList.push_back(cat);
@@ -158,9 +155,9 @@ void MythNewsConfig::loadData(void)
     for (; it != m_priv->categoryList.end(); ++it)
     {
         MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_categoriesList, (*it).name);
+            new MythUIButtonListItem(m_categoriesList, (*it).m_name);
         item->SetData(qVariantFromValue(&(*it)));
-        if (!(*it).siteList.empty())
+        if (!(*it).m_siteList.empty())
             item->setDrawArrow(true);
     }
     slotCategoryChanged(m_categoriesList->GetItemFirst());
@@ -183,7 +180,7 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
     {
         if (insertInDB(site))
         {
-            site->inDB = true;
+            site->m_inDB = true;
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
     }
@@ -191,7 +188,7 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
     {
         if (removeFromDB(site))
         {
-            site->inDB = false;
+            site->m_inDB = false;
             item->setChecked(MythUIButtonListItem::NotChecked);
         }
     }
@@ -210,12 +207,12 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
     if (!cat)
         return;
 
-    NewsSiteItem::List::iterator it = cat->siteList.begin();
-    for (; it != cat->siteList.end(); ++it)
+    NewsSiteItem::List::iterator it = cat->m_siteList.begin();
+    for (; it != cat->m_siteList.end(); ++it)
     {
         MythUIButtonListItem *newitem =
-            new MythUIButtonListItem(m_siteList, (*it).name, nullptr, true,
-                                     (*it).inDB ?
+            new MythUIButtonListItem(m_siteList, (*it).m_name, nullptr, true,
+                                     (*it).m_inDB ?
                                      MythUIButtonListItem::FullChecked :
                                      MythUIButtonListItem::NotChecked);
         newitem->SetData(qVariantFromValue(&(*it)));

@@ -51,7 +51,7 @@ class MBASE_PUBLIC MThreadPool
     void ReleaseThread(void);
 
 
-    MThreadPoolPrivate *m_priv;
+    MThreadPoolPrivate *m_priv {nullptr};
 };
 
 #endif // _MYTH_THREAD_POOL_H_

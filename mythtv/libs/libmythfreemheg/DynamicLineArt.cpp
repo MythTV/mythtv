@@ -30,11 +30,6 @@
 #include "Engine.h"
 #include "freemheg.h"
 
-MHDynamicLineArt::MHDynamicLineArt()
-{
-    m_picture = nullptr;
-}
-
 MHDynamicLineArt::~MHDynamicLineArt()
 {
     delete(m_picture);
@@ -207,8 +202,8 @@ void MHDrawPoly::Perform(MHEngine *engine)
     for (int i = 0; i < nPoints; i++)
     {
         MHPointArg *pPoint = m_Points[i];
-        xArray[i] = pPoint->x.GetValue(engine);
-        yArray[i] = pPoint->y.GetValue(engine);
+        xArray[i] = pPoint->m_x.GetValue(engine);
+        yArray[i] = pPoint->m_y.GetValue(engine);
     }
 
     Target(engine)->DrawPoly(m_fIsPolygon, nPoints, xArray, yArray, engine);

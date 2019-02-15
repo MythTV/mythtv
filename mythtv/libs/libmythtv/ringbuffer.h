@@ -276,9 +276,9 @@ class MTV_PUBLIC RingBuffer : protected MThread
     QWaitCondition generalWait;         // protected by rwlock
 
   public:
-    static QMutex subExtLock;
-    static QStringList subExt;
-    static QStringList subExtNoCheck;
+    static QMutex      s_subExtLock;
+    static QStringList s_subExt;
+    static QStringList s_subExtNoCheck;
 
   private:
     static bool gAVformat_net_initialised;

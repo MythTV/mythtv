@@ -125,7 +125,7 @@ class MPUBLIC ResultItem
               const uint& width, const uint& height, const QString& language,
               const bool& downloadable, const QStringList& countries,
               const uint& season, const uint& episode, const bool& customhtml);
-    ResultItem();
+    ResultItem() = default;
     ~ResultItem() = default;
 
     void ensureSortFields(void);
@@ -170,19 +170,19 @@ class MPUBLIC ResultItem
     QDateTime    m_date;
     QString      m_time;
     QString      m_rating;
-    off_t        m_filesize;
+    off_t        m_filesize     {0};
     QString      m_player;
     QStringList  m_playerargs;
     QString      m_download;
     QStringList  m_downloadargs;
-    uint         m_width;
-    uint         m_height;
+    uint         m_width        {0};
+    uint         m_height       {0};
     QString      m_language;
-    bool         m_downloadable;
+    bool         m_downloadable {false};
     QStringList  m_countries;
-    uint         m_season;
-    uint         m_episode;
-    bool         m_customhtml;
+    uint         m_season       {0};
+    uint         m_episode      {0};
+    bool         m_customhtml   {false};
 };
 
 class MPUBLIC Parse : public QObject
@@ -215,17 +215,17 @@ class MPUBLIC Parse : public QObject
     QMap<QString, int> TimezoneOffsets;
 
   protected:
-    static const QString DC;
-    static const QString WFW;
-    static const QString Atom;
-    static const QString RDF;
-    static const QString Slash;
-    static const QString Enc;
-    static const QString ITunes;
-    static const QString GeoRSSSimple;
-    static const QString GeoRSSW3;
-    static const QString MediaRSS;
-    static const QString MythRSS;
+    static const QString s_DC;
+    static const QString s_WFW;
+    static const QString s_Atom;
+    static const QString s_RDF;
+    static const QString s_Slash;
+    static const QString s_Enc;
+    static const QString s_ITunes;
+    static const QString s_GeoRSSSimple;
+    static const QString s_GeoRSSW3;
+    static const QString s_MediaRSS;
+    static const QString s_MythRSS;
 };
 
 Q_DECLARE_METATYPE(ResultItem*)

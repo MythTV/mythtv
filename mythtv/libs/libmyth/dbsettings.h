@@ -23,19 +23,19 @@ class MPUBLIC DatabaseSettings : public GroupSetting
     void isClosing(void);
 
   protected:
-    TransTextEditSetting       *dbHostName;
-    TransMythUICheckBoxSetting *dbHostPing;
-    TransTextEditSetting       *dbPort;
-    TransTextEditSetting       *dbName;
-    TransTextEditSetting       *dbUserName;
-    TransTextEditSetting       *dbPassword;
-    TransMythUICheckBoxSetting *localEnabled;
-    TransTextEditSetting       *localHostName;
-    TransMythUICheckBoxSetting *wolEnabled;
-    TransMythUISpinBoxSetting  *wolReconnect;
-    TransMythUISpinBoxSetting  *wolRetry;
-    TransTextEditSetting       *wolCommand;
-    QString              m_DBhostOverride;
+    TransTextEditSetting       *m_dbHostName    {nullptr};
+    TransMythUICheckBoxSetting *m_dbHostPing    {nullptr};
+    TransTextEditSetting       *m_dbPort        {nullptr};
+    TransTextEditSetting       *m_dbName        {nullptr};
+    TransTextEditSetting       *m_dbUserName    {nullptr};
+    TransTextEditSetting       *m_dbPassword    {nullptr};
+    TransMythUICheckBoxSetting *m_localEnabled  {nullptr};
+    TransTextEditSetting       *m_localHostName {nullptr};
+    TransMythUICheckBoxSetting *m_wolEnabled    {nullptr};
+    TransMythUISpinBoxSetting  *m_wolReconnect  {nullptr};
+    TransMythUISpinBoxSetting  *m_wolRetry      {nullptr};
+    TransTextEditSetting       *m_wolCommand    {nullptr};
+    QString                     m_DBhostOverride;
 };
 
 

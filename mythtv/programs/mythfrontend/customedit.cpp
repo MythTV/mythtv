@@ -25,20 +25,7 @@
 #include "proglist.h"
 
 CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
-              : MythScreenType(parent, "CustomEdit"),
-                m_maxex(0),
-                m_evaluate(true),
-                m_ruleList(nullptr),
-                m_clauseList(nullptr),
-                m_titleEdit(nullptr),
-                m_descriptionEdit(nullptr),
-                m_subtitleEdit(nullptr),
-                m_clauseText(nullptr),
-                m_testButton(nullptr),
-                m_recordButton(nullptr),
-                m_storeButton(nullptr),
-                m_cancelButton(nullptr),
-                m_currentRuleItem(nullptr)
+              : MythScreenType(parent, "CustomEdit")
 {
     if (pginfo)
         m_pginfo = new ProgramInfo(*pginfo);

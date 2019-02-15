@@ -36,15 +36,17 @@ class MPUBLIC TrackInfoPopup : public MythScreenType
 {
   Q_OBJECT
   public:
-    TrackInfoPopup(MythScreenStack *parent, MusicMetadata *mdata);
+    TrackInfoPopup(MythScreenStack *parent, MusicMetadata *mdata)
+        : MythScreenType(parent, "trackinfopopup", false),
+        m_metadata(mdata) {}
     ~TrackInfoPopup(void);
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
-    MusicMetadata *m_metadata;
-    QTimer   *m_displayTimer;
+    MusicMetadata *m_metadata     {nullptr};
+    QTimer        *m_displayTimer {nullptr};
 };
 
 #endif

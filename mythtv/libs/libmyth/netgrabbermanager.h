@@ -54,7 +54,7 @@ class MPUBLIC GrabberScript : public QObject, public MThread
     void parseDBTree(const QString &feedtitle, const QString &path,
                      const QString &pathThumb, QDomElement& domElem,
                      const ArticleType &type);
-    mutable QMutex m_lock;
+    mutable QMutex m_lock {QMutex::Recursive};
 
     QString     m_title;
     QString     m_image;
@@ -88,12 +88,12 @@ class MPUBLIC GrabberManager : public QObject
 
   private:
 
-    mutable QMutex                 m_lock;
-    QTimer                        *m_timer;
+    mutable QMutex                 m_lock         {QMutex::Recursive};
+    QTimer                        *m_timer        {nullptr};
     GrabberScript::scriptList      m_scripts;
-    uint                           m_updateFreq;
-    uint                           m_runningCount;
-    bool                           m_refreshAll;
+    uint                           m_updateFreq   {24 * 3600 * 1000};
+    uint                           m_runningCount {0};
+    bool                           m_refreshAll   {false};
 };
 
 const int kGrabberUpdateEventType = QEvent::User + 5000;
@@ -127,10 +127,10 @@ class MPUBLIC GrabberDownloadThread : public QObject, public MThread
 
   private:
 
-    QObject               *m_parent;
+    QObject               *m_parent     {nullptr};
     QList<GrabberScript*>  m_scripts;
     QMutex                 m_mutex;
-    bool                   m_refreshAll;
+    bool                   m_refreshAll {false};
 
 };
 
@@ -162,15 +162,15 @@ class MPUBLIC Search : public QObject
 
   private:
 
-    MythSystemLegacy             *m_searchProcess;
+    MythSystemLegacy       *m_searchProcess {nullptr};
 
     QByteArray              m_data;
     QDomDocument            m_document;
     ResultItem::resultList  m_videoList;
 
-    uint                    m_numResults;
-    uint                    m_numReturned;
-    uint                    m_numIndex;
+    uint                    m_numResults    {0};
+    uint                    m_numReturned   {0};
+    uint                    m_numIndex      {0};
 
     QString m_nextPageToken;
     QString m_prevPageToken;

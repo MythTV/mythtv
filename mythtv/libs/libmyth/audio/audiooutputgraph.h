@@ -38,10 +38,13 @@ public:
 
     // Implementation
 private:
-    MythPainter *m_painter;
-    int m_dBsilence, m_dBquiet, m_dBLoud, m_dbMax;
+    MythPainter *m_painter   {nullptr};
+    int          m_dBsilence {-72};
+    int          m_dBquiet   {-60};
+    int          m_dBLoud    {-12};
+    int          m_dbMax     {-6};
     class Buffer;
-    Buffer * const m_buffer;
+    Buffer * const m_buffer {nullptr};
     QMutex mutable m_mutex;
 };
 

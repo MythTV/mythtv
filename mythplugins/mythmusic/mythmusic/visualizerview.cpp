@@ -127,13 +127,6 @@ void VisualizerView::showTrackInfoPopup(void)
 //---------------------------------------------------------
 #define MUSICINFOPOPUPTIME (8 * 1000)
 
-TrackInfoPopup::TrackInfoPopup(MythScreenStack *parent, MusicMetadata *metadata)
-         : MythScreenType(parent, "trackinfopopup", false)
-{
-    m_metadata = metadata;
-    m_displayTimer = nullptr;
-}
-
 TrackInfoPopup::~TrackInfoPopup(void)
 {
     if (m_displayTimer)

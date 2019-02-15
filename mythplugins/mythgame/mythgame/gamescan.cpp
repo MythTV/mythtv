@@ -21,8 +21,7 @@ class MythUIProgressDialog;
 
 GameScannerThread::GameScannerThread(void) :
     MThread("GameScanner"),
-    m_HasGUI(gCoreContext->HasGUI()),
-    m_dialog(nullptr), m_DBDataChanged(false)
+    m_HasGUI(gCoreContext->HasGUI())
 {
 }
 

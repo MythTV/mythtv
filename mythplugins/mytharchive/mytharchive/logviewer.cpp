@@ -21,8 +21,6 @@
 #include "archiveutil.h"
 #include "logviewer.h"
 
-const int DEFAULT_UPDATE_TIME = 5;
-
 void showLogViewer(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -79,18 +77,7 @@ void showLogViewer(void)
 }
 
 LogViewer::LogViewer(MythScreenStack *parent) :
-    MythScreenType(parent, "logviewer"),
-    m_autoUpdate(false),
-    m_updateTime(DEFAULT_UPDATE_TIME),
-    m_updateTimer(nullptr),
-    m_currentLog(),
-    m_progressLog(),
-    m_fullLog(),
-    m_logList(nullptr),
-    m_logText(nullptr),
-    m_exitButton(nullptr),
-    m_cancelButton(nullptr),
-    m_updateButton(nullptr)
+    MythScreenType(parent, "logviewer")
 {
     m_updateTime = gCoreContext->GetNumSetting(
         "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);

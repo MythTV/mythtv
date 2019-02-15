@@ -25,11 +25,11 @@ class MPUBLIC ZMMiniPlayer : public ZMLivePlayer
     void timerTimeout(void);
 
   private:
-    QTimer *m_displayTimer;
+    QTimer      *m_displayTimer {nullptr};
 
-    MythUIText  *m_monitorText;
-    MythUIText  *m_statusText;
-    MythUIImage *m_image;
+    MythUIText  *m_monitorText  {nullptr};
+    MythUIText  *m_statusText   {nullptr};
+    MythUIImage *m_image        {nullptr};
 };
 
 #endif

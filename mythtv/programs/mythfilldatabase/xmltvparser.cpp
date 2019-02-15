@@ -29,15 +29,15 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
-XMLTVParser::XMLTVParser() : current_year(0)
+XMLTVParser::XMLTVParser()
 {
-    current_year = MythDate::current().date().toString("yyyy").toUInt();
+    m_current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
 
 void XMLTVParser::lateInit()
 {
-    _movieGrabberPath = MetadataDownload::GetMovieGrabber();
-    _tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
+    m_movieGrabberPath = MetadataDownload::GetMovieGrabber();
+    m_tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
 }
 
 static uint ELFHash(const QByteArray &ba)
@@ -559,7 +559,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     }
                 }
                 else if ((info.attribute("system") == "themoviedb.org") &&
-                    (_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
+                    (m_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
                 {
                     /* text is movie/<inetref> */
                     QString inetrefRaw(getFirstText(info));
@@ -569,7 +569,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     }
                 }
                 else if ((info.attribute("system") == "thetvdb.com") &&
-                    (_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
+                    (m_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
                 {
                     /* text is series/<inetref> */
                     QString inetrefRaw(getFirstText(info));
@@ -589,7 +589,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
     if (!pginfo->airdate
         && ProgramInfo::kCategorySeries != pginfo->categoryType)
-        pginfo->airdate = current_year;
+        pginfo->airdate = m_current_year;
 
     if (programid.isEmpty())
     {

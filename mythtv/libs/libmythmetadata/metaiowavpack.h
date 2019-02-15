@@ -23,7 +23,7 @@ using TagLib::String;
 class META_PUBLIC MetaIOWavPack : public MetaIOTagLib
 {
 public:
-    MetaIOWavPack(void);
+    MetaIOWavPack(void) : MetaIOTagLib() {}
     virtual ~MetaIOWavPack(void) = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib

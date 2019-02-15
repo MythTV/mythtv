@@ -69,9 +69,9 @@ void Playlist::addTrack(MusicMetadata::IdType trackID, bool update_display)
     MusicMetadata *mdata = nullptr;
 
     if (repo == RT_Radio)
-        mdata = gMusicData->all_streams->getMetadata(trackID);
+        mdata = gMusicData->m_all_streams->getMetadata(trackID);
     else
-        mdata = gMusicData->all_music->getMetadata(trackID);
+        mdata = gMusicData->m_all_music->getMetadata(trackID);
 
     if (mdata)
     {
@@ -145,16 +145,7 @@ void Playlist::moveTrackUpDown(bool flag, int where_its_at)
 }
 
 Playlist::Playlist(void) :
-    m_playlistid(0),
-    m_name(tr("oops")),
-    m_parent(nullptr),
-    m_changed(false),
-    m_doSave(true)
-#ifdef CD_WRTITING_FIXED
-    m_progress(nullptr),
-    m_proc(nullptr),
-    m_procExitVal(0)
-#endif
+    m_name(tr("oops"))
 {
 }
 
@@ -668,7 +659,7 @@ void Playlist::fillSongsFromSonglist(QString songList)
         if (repo == RT_Radio)
         {
             // check this is a valid stream ID
-            if (gMusicData->all_streams->isValidID(id))
+            if (gMusicData->m_all_streams->isValidID(id))
                 m_songs.push_back(id);
             else
             {
@@ -679,7 +670,7 @@ void Playlist::fillSongsFromSonglist(QString songList)
         else
         {
             // check this is a valid track ID
-            if (gMusicData->all_music->isValidID(id))
+            if (gMusicData->m_all_music->isValidID(id))
                 m_songs.push_back(id);
             else
             {
@@ -1104,9 +1095,9 @@ MusicMetadata* Playlist::getSongAt(int pos) const
         int repo = ID_TO_REPO(id);
 
         if (repo == RT_Radio)
-            mdata = gMusicData->all_streams->getMetadata(id);
+            mdata = gMusicData->m_all_streams->getMetadata(id);
         else
-            mdata = gMusicData->all_music->getMetadata(id);
+            mdata = gMusicData->m_all_music->getMetadata(id);
     }
 
     return mdata;
@@ -1122,9 +1113,9 @@ MusicMetadata* Playlist::getRawSongAt(int pos) const
         int repo = ID_TO_REPO(id);
 
         if (repo == RT_Radio)
-            mdata = gMusicData->all_streams->getMetadata(id);
+            mdata = gMusicData->m_all_streams->getMetadata(id);
         else
-            mdata = gMusicData->all_music->getMetadata(id);
+            mdata = gMusicData->m_all_music->getMetadata(id);
     }
 
     return mdata;

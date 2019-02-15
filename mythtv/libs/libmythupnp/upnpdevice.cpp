@@ -530,11 +530,11 @@ QString UPnpDeviceDesc::FormatValue(const NameValue& node)
 
     QString sAttributes;
     NameValues::iterator it;
-    for (it = node.pAttributes->begin(); it != node.pAttributes->end(); ++it)
+    for (it = node.m_pAttributes->begin(); it != node.m_pAttributes->end(); ++it)
     {
-        sAttributes += QString(" %1='%2'").arg((*it).sName).arg((*it).sValue);
+        sAttributes += QString(" %1='%2'").arg((*it).m_sName).arg((*it).m_sValue);
     }
-    sStr = QString("<%1%2>%3</%1>\n").arg(node.sName).arg(sAttributes).arg(node.sValue);
+    sStr = QString("<%1%2>%3</%1>\n").arg(node.m_sName).arg(sAttributes).arg(node.m_sValue);
 
     return( sStr );
 }
@@ -878,12 +878,12 @@ QString UPnpDevice::toString(uint padding) const
         ret += "Extra key value pairs\n";
         for (; it != m_lstExtra.end(); ++it)
         {
-            ret += (*it).sName;
+            ret += (*it).m_sName;
             ret += ":";
-            int int_padding = 18 - ((*it).sName.length() + 1);
+            int int_padding = 18 - ((*it).m_sName.length() + 1);
             for (int i = 0; i < int_padding; i++)
                 ret += " ";
-            ret += QString("%1\n").arg((*it).sValue);
+            ret += QString("%1\n").arg((*it).m_sValue);
         }
     }
 

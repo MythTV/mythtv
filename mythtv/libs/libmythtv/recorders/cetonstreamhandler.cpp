@@ -29,26 +29,26 @@
 
 #define LOC QString("CetonSH[%1](%2): ").arg(_inputid).arg(_device)
 
-QMap<QString,CetonStreamHandler*> CetonStreamHandler::_handlers;
-QMap<QString,uint>                CetonStreamHandler::_handlers_refcnt;
-QMutex                            CetonStreamHandler::_handlers_lock;
-QMap<QString, bool>               CetonStreamHandler::_info_queried;
+QMap<QString,CetonStreamHandler*> CetonStreamHandler::s_handlers;
+QMap<QString,uint>                CetonStreamHandler::s_handlers_refcnt;
+QMutex                            CetonStreamHandler::s_handlers_lock;
+QMap<QString, bool>               CetonStreamHandler::s_info_queried;
 
 CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
                                             int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devkey = devname.toUpper();
 
-    QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devkey);
+    QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devkey);
 
-    if (it == _handlers.end())
+    if (it == s_handlers.end())
     {
         CetonStreamHandler *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();
-        _handlers[devkey] = newhandler;
-        _handlers_refcnt[devkey] = 1;
+        s_handlers[devkey] = newhandler;
+        s_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Creating new stream handler %2 for %3")
@@ -56,28 +56,28 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
     }
     else
     {
-        _handlers_refcnt[devkey]++;
-        uint rcount = _handlers_refcnt[devkey];
+        s_handlers_refcnt[devkey]++;
+        uint rcount = s_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Using existing stream handler %2 for %3")
             .arg(inputid).arg(devkey)
             .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return _handlers[devkey];
+    return s_handlers[devkey];
 }
 
 void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devname = ref->_device;
 
-    QMap<QString,uint>::iterator rit = _handlers_refcnt.find(devname);
-    if (rit == _handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
+    if (rit == s_handlers_refcnt.end())
         return;
 
-    QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devname);
+    QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)
     {
@@ -86,13 +86,13 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
         return;
     }
 
-    if ((it != _handlers.end()) && (*it == ref))
+    if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("CetonSH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
         ref->Close();
         delete *it;
-        _handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
@@ -101,7 +101,7 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    _handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
@@ -158,7 +158,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
     QString cardstatus = GetVar("cas", "CardStatus");
     _using_cablecard = cardstatus == "Inserted";
 
-    if (!_info_queried.contains(_ip_address))
+    if (!s_info_queried.contains(_ip_address))
     {
         QString sernum = GetVar("diag", "Host_Serial_Number");
         QString firmware_ver = GetVar("diag", "Host_Firmware");
@@ -183,7 +183,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
                 "Cable card NOT installed (operating in QAM tuner mode)");
         }
 
-        _info_queried.insert(_ip_address, true);
+        s_info_queried.insert(_ip_address, true);
     }
 }
 

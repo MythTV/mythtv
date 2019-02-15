@@ -21,12 +21,9 @@ NewsSite::NewsSite(const QString   &name,
                    const QDateTime &updated,
                    const bool       podcast) :
     QObject(),
-    m_lock(QMutex::Recursive),
     m_name(name),  m_url(url), m_urlReq(url),
     m_updated(updated),
     m_destDir(GetConfDir()+"/MythNews"),
-    m_state(NewsSite::Success),
-    m_imageURL(""),
     m_podcast(podcast)
 {
     std::shared_ptr<MythSortHelper>sh = getMythSortHelper();

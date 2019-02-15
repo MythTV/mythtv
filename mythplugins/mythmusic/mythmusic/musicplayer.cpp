@@ -32,9 +32,6 @@
 #include "miniplayer.h"
 #include "playlistcontainer.h"
 
-// how long to wait before updating the lastplay and playcount fields
-#define LASTPLAY_DELAY 15
-
 MusicPlayer  *gPlayer = nullptr;
 QString gCDdevice = "";
 
@@ -57,32 +54,6 @@ MusicPlayer::MusicPlayer(QObject *parent)
     :QObject(parent)
 {
     setObjectName("MusicPlayer");
-
-    m_output = nullptr;
-    m_decoderHandler = nullptr;
-    m_currentTrack = -1;
-
-    m_currentTime = 0;
-    m_lastTrackStart = 0;
-
-    m_bufferAvailable = 0;
-    m_bufferSize = 0;
-
-    m_oneshotMetadata = nullptr;
-
-    m_isAutoplay = false;
-    m_isPlaying = false;
-    m_playMode = PLAYMODE_TRACKSPLAYLIST;
-    m_canShowPlayer = true;
-    m_wasPlaying = false;
-    m_updatedLastplay = false;
-    m_allowRestorePos = true;
-
-    m_playSpeed = 1.0;
-
-    m_showScannerNotifications = true;
-
-    m_errorCount = 0;
 
     QString playmode = gCoreContext->GetSetting("PlayMode", "none");
     if (playmode.toLower() == "random")
@@ -402,7 +373,7 @@ bool MusicPlayer::openOutputDevice(void)
               gCoreContext->GetSetting("PassThruOutputDevice") : "auto";
 
     m_output = AudioOutput::OpenAudio(
-                   adevice, pdevice, FORMAT_S16, 2, 0, 44100,
+                   adevice, pdevice, FORMAT_S16, 2, AV_CODEC_ID_NONE, 44100,
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
 
@@ -700,7 +671,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     if (list.size() == 4)
                     {
                         int trackID = list[3].toInt();
-                        MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
+                        MusicMetadata *mdata = gMusicData->m_all_music->getMetadata(trackID);
                         if (mdata)
                             playFile(*mdata);
                     }
@@ -749,13 +720,13 @@ void MusicPlayer::customEvent(QEvent *event)
         }
         else if (me->Message().startsWith("MUSIC_METADATA_CHANGED"))
         {
-            if (gMusicData->initialized)
+            if (gMusicData->m_initialized)
             {
                 QStringList list = me->Message().simplified().split(' ');
                 if (list.size() == 2)
                 {
                     int songID = list[1].toInt();
-                    MusicMetadata *mdata =  gMusicData->all_music->getMetadata(songID);
+                    MusicMetadata *mdata =  gMusicData->m_all_music->getMetadata(songID);
 
                     if (mdata)
                     {
@@ -1024,20 +995,20 @@ void MusicPlayer::loadStreamPlaylist(void)
     MusicMetadata::IdType id = getCurrentMetadata() ? getCurrentMetadata()->ID() : -1;
 
     // create the radio playlist
-    gMusicData->all_playlists->getStreamPlaylist()->disableSaves();
-    gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
-    StreamList *list = gMusicData->all_streams->getStreams();
+    gMusicData->m_all_playlists->getStreamPlaylist()->disableSaves();
+    gMusicData->m_all_playlists->getStreamPlaylist()->removeAllTracks();
+    StreamList *list = gMusicData->m_all_streams->getStreams();
 
     for (int x = 0; x < list->count(); x++)
     {
         MusicMetadata *mdata = list->at(x);
-        gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
+        gMusicData->m_all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
 
         if (mdata->ID() == id)
             m_currentTrack = x;
     }
 
-    gMusicData->all_playlists->getStreamPlaylist()->enableSaves();
+    gMusicData->m_all_playlists->getStreamPlaylist()->enableSaves();
 }
 
 void MusicPlayer::moveTrackUpDown(bool moveUp, int whichTrack)
@@ -1617,7 +1588,7 @@ void MusicPlayer::decoderHandlerReady(void)
 
 void MusicPlayer::removeTrack(int trackID)
 {
-    MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
+    MusicMetadata *mdata = gMusicData->m_all_music->getMetadata(trackID);
     if (mdata)
     {
         int trackPos = getCurrentPlaylist()->getTrackPosition(mdata->ID());
@@ -1635,16 +1606,16 @@ void MusicPlayer::addTrack(int trackID, bool updateUI)
 
 Playlist* MusicPlayer::getCurrentPlaylist ( void )
 {
-    if (!gMusicData || !gMusicData->all_playlists)
+    if (!gMusicData || !gMusicData->m_all_playlists)
         return nullptr;
 
     if (m_playMode == PLAYMODE_RADIO)
     {
-        return gMusicData->all_playlists->getStreamPlaylist();
+        return gMusicData->m_all_playlists->getStreamPlaylist();
     }
     else
     {
-        return gMusicData->all_playlists->getActive();
+        return gMusicData->m_all_playlists->getActive();
     }
 
     return nullptr;
@@ -1652,7 +1623,7 @@ Playlist* MusicPlayer::getCurrentPlaylist ( void )
 
 StreamList  *MusicPlayer::getStreamList(void) 
 {
-    return gMusicData->all_streams->getStreams();
+    return gMusicData->m_all_streams->getStreams();
 }
 
 int MusicPlayer::getNotificationID (const QString& hostname)

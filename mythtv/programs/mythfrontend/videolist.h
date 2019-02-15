@@ -61,7 +61,7 @@ class VideoMetadata;
 class TreeNodeData
 {
   public:
-    TreeNodeData();
+    TreeNodeData() = default;;
     explicit TreeNodeData(VideoMetadata *metadata);
     TreeNodeData(QString path, QString host, QString prefix);
 
@@ -77,7 +77,7 @@ class TreeNodeData
     QString GetPrefix() const;
 
   private:
-    class TreeNodeDataPrivate *m_d;
+    class TreeNodeDataPrivate *m_d {nullptr};
 };
 
 Q_DECLARE_METATYPE(TreeNodeData)

@@ -23,8 +23,7 @@ class MediaServerItem
   public:
     MediaServerItem() : m_scanned(false) { }
     MediaServerItem(QString id, QString parent, QString name, QString url)
-      : m_id(id), m_parentid(parent), m_name(name), m_url(url),
-        m_scanned(false) { }
+      : m_id(id), m_parentid(parent), m_name(name), m_url(url) { }
     QString NextUnbrowsed(void);
     MediaServerItem* Find(QString &id);
     bool Add(MediaServerItem &item);
@@ -34,7 +33,7 @@ class MediaServerItem
     QString m_parentid;
     QString m_name;
     QString m_url;
-    bool    m_scanned;
+    bool    m_scanned {false};
     QMap<QString, MediaServerItem> m_children;
 };
 
@@ -68,7 +67,8 @@ class UPNPScanner : public QObject
     void replyFinished(QNetworkReply *reply);
 
   private:
-    explicit UPNPScanner(UPNPSubscription *sub);
+    explicit UPNPScanner(UPNPSubscription *sub)
+        : QObject(), m_subscription(sub) {}
     void ScheduleUpdate(void);
     void CheckFailure(const QUrl &url);
     void Debug(void);
@@ -105,23 +105,23 @@ class UPNPScanner : public QObject
     static  MThread*     gUPNPScannerThread;
     static  QMutex*      gUPNPScannerLock;
 
-    UPNPSubscription *m_subscription;
-    QMutex  m_lock;
+    UPNPSubscription *m_subscription {nullptr};
+    QMutex  m_lock {QMutex::Recursive};
     QHash<QString,MediaServer*> m_servers;
-    QNetworkAccessManager *m_network;
+    QNetworkAccessManager *m_network {nullptr};
     // TODO Move to QMultiHash when we move to Qt >=4.7
     // QHash(QUrl) unsupported on < 4.7
     QMultiMap<QUrl, QNetworkReply*> m_descriptionRequests;
     QMultiMap<QUrl, QNetworkReply*> m_browseRequests;
 
-    QTimer *m_updateTimer;
-    QTimer *m_watchdogTimer;
+    QTimer *m_updateTimer {nullptr};
+    QTimer *m_watchdogTimer {nullptr};
 
     QString m_masterHost;
-    int     m_masterPort;
+    int     m_masterPort {0};
 
-    bool    m_scanComplete;
-    bool    m_fullscan;
+    bool    m_scanComplete {false};
+    bool    m_fullscan {false};
 };
 
 #endif // UPNPSCANNER_H

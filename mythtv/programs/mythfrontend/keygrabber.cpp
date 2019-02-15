@@ -13,14 +13,6 @@
 // MythControls headers
 #include "keygrabber.h"
 
-KeyGrabPopupBox::KeyGrabPopupBox(MythScreenStack *parent)
-    : MythScreenType (parent, "keygrabberdialog")
-{
-    m_waitingForKeyRelease = m_keyReleaseSeen = false;
-    m_okButton = m_cancelButton = nullptr;
-    m_messageText = nullptr;
-}
-
 bool KeyGrabPopupBox::Create(void)
 {
     // Load the theme for this screen

@@ -11,16 +11,6 @@
 #include "generalsettings.h"
 #include "musicdata.h"
 
-GeneralSettings::GeneralSettings(MythScreenStack *parent, const char *name)
-        : MythScreenType(parent, name),
-        m_musicAudioDevice(nullptr),
-        m_musicDefaultUpmix(nullptr), m_musicCDDevice(nullptr),
-        m_nonID3FileNameFormat(nullptr), m_ignoreID3Tags(nullptr),
-        m_allowTagWriting(nullptr), m_resetDBButton(nullptr), m_saveButton(nullptr),
-        m_cancelButton(nullptr)
-{
-}
-
 bool GeneralSettings::Create()
 {
     bool err = false;

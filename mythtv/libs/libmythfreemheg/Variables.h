@@ -41,7 +41,7 @@ class MHVariable : public MHIngredient
 class MHBooleanVar : public MHVariable  
 {
   public:
-    MHBooleanVar(): m_fOriginalValue(false), m_fValue(false) {}
+    MHBooleanVar() = default;
     const char *ClassName() override // MHRoot
         { return "BooleanVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -57,13 +57,14 @@ class MHBooleanVar : public MHVariable
     void SetVariableValue(const MHUnion &value) override; // MHRoot
 
   protected:
-    bool m_fOriginalValue, m_fValue;
+    bool m_fOriginalValue {false};
+    bool m_fValue         {false};
 };
 
 class MHIntegerVar : public MHVariable  
 {
   public:
-    MHIntegerVar(): m_nOriginalValue(0), m_nValue(0) {}
+    MHIntegerVar() = default;
     const char *ClassName() override // MHRoot
         { return "IntegerVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -78,7 +79,8 @@ class MHIntegerVar : public MHVariable
     void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
-    int m_nOriginalValue, m_nValue;
+    int m_nOriginalValue {0};
+    int m_nValue         {0};
 };
 
 class MHOctetStrVar : public MHVariable  

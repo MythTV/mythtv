@@ -184,35 +184,35 @@ class VideoDialog : public MythScreenType
     void OnVideoSearchDone(MetadataLookup *lookup);
 
   private:
-    MythDialogBox    *m_menuPopup;
-    MythUIBusyDialog *m_busyPopup;
-    MythScreenStack  *m_popupStack;
-    MythScreenStack  *m_mainStack;
+    MythDialogBox    *m_menuPopup          {nullptr};
+    MythUIBusyDialog *m_busyPopup          {nullptr};
+    MythScreenStack  *m_popupStack         {nullptr};
+    MythScreenStack  *m_mainStack          {nullptr};
 
-    MythUIButtonList *m_videoButtonList;
-    MythUIButtonTree *m_videoButtonTree;
+    MythUIButtonList *m_videoButtonList    {nullptr};
+    MythUIButtonTree *m_videoButtonTree    {nullptr};
 
-    MythUIText       *m_titleText;
-    MythUIText       *m_novideoText;
+    MythUIText       *m_titleText          {nullptr};
+    MythUIText       *m_novideoText        {nullptr};
 
-    MythUIText       *m_positionText;
-    MythUIText       *m_crumbText;
+    MythUIText       *m_positionText       {nullptr};
+    MythUIText       *m_crumbText          {nullptr};
 
-    MythUIImage      *m_coverImage;
-    MythUIImage      *m_screenshot;
-    MythUIImage      *m_banner;
-    MythUIImage      *m_fanart;
+    MythUIImage      *m_coverImage         {nullptr};
+    MythUIImage      *m_screenshot         {nullptr};
+    MythUIImage      *m_banner             {nullptr};
+    MythUIImage      *m_fanart             {nullptr};
 
-    MythUIStateType  *m_trailerState;
-    MythUIStateType  *m_parentalLevelState;
-    MythUIStateType  *m_videoLevelState;
-    MythUIStateType  *m_userRatingState;
-    MythUIStateType  *m_watchedState;
-    MythUIStateType  *m_studioState;
+    MythUIStateType  *m_trailerState       {nullptr};
+    MythUIStateType  *m_parentalLevelState {nullptr};
+    MythUIStateType  *m_videoLevelState    {nullptr};
+    MythUIStateType  *m_userRatingState    {nullptr};
+    MythUIStateType  *m_watchedState       {nullptr};
+    MythUIStateType  *m_studioState        {nullptr};
 
-    MetadataFactory *m_metadataFactory;
+    MetadataFactory *m_metadataFactory     {nullptr};
 
-    class VideoDialogPrivate *m_d;
+    class VideoDialogPrivate *m_d {nullptr};
 };
 
 class VideoListDeathDelay : public QObject
@@ -233,7 +233,7 @@ class VideoListDeathDelay : public QObject
     void OnTimeUp();
 
   private:
-    class VideoListDeathDelayPrivate *m_d;
+    class VideoListDeathDelayPrivate *m_d {nullptr};
 };
 
 #endif

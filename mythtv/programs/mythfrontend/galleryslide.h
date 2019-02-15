@@ -28,7 +28,7 @@ class AbstractAnimation : public QObject
 {
     Q_OBJECT
 public:
-    AbstractAnimation() : m_forwards(true), m_running(false), m_speed(0.0) {}
+    AbstractAnimation() = default;
     virtual void Start(bool forwards, float speed = 1.0);
     virtual void Stop()                 { m_running = false; }
     virtual void SetSpeed(float speed) { m_speed = speed; }
@@ -44,9 +44,9 @@ signals:
     void         finished();
 
 protected:
-    bool  m_forwards; //!< Play direction
-    bool  m_running;  //!< True whilst animation is active
-    float m_speed;    //!< Real-time = 1.0, Double-speed = 2.0
+    bool  m_forwards {true}; //!< Play direction
+    bool  m_running {false}; //!< True whilst animation is active
+    float m_speed   {0.0f};  //!< Real-time = 1.0, Double-speed = 2.0
 };
 
 
@@ -58,7 +58,14 @@ public:
     //! Supported effects
     enum Type {None, Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle};
 
-    Animation(Slide *image, Type type = Alpha);
+    /*!
+      \brief Create simple animation
+      \param image Image to be animated
+      \param type Effect to be animated
+    */
+    Animation(Slide *image, Type type = Alpha)
+        : AbstractAnimation(), QVariantAnimation(),
+          m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
     void Pulse(int interval) override; // AbstractAnimation
     void Set(QVariant from, QVariant to,
@@ -71,12 +78,12 @@ protected:
     //! Image to be animated
     // Should be MythUItype but that impacts elsewhere: SetZoom must become
     // virtual, which causes compiler (fn hiding) warnings in subtitles
-    Slide            *m_parent;
+    Slide            *m_parent  {nullptr};
     Type              m_type;
-    UIEffects::Centre m_centre;
+    UIEffects::Centre m_centre  {UIEffects::Middle};
     //! Current millisec position within animation, 0..duration.
     //! Decreases duration..0 when playing backwards
-    int               m_elapsed;
+    int               m_elapsed {0};
 };
 
 
@@ -103,7 +110,7 @@ class SequentialAnimation : public GroupAnimation
 {
     Q_OBJECT
 public:
-    SequentialAnimation() : GroupAnimation(), m_current(-1)  {}
+    SequentialAnimation() : GroupAnimation()  {}
     void Pulse(int interval) override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
@@ -112,7 +119,7 @@ protected slots:
     void Finished() override; // AbstractAnimation
 
 protected:
-    int m_current; //!< Index of child currently playing
+    int m_current {-1}; //!< Index of child currently playing
 };
 
 
@@ -121,7 +128,7 @@ class ParallelAnimation : public GroupAnimation
 {
     Q_OBJECT
 public:
-    ParallelAnimation() : GroupAnimation(), m_finished(0)  {}
+    ParallelAnimation() : GroupAnimation()  {}
     void Pulse(int interval) override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
@@ -130,7 +137,7 @@ protected slots:
     void Finished() override; // AbstractAnimation
 
 protected:
-    int m_finished; //!< Count of child animations that have finished
+    int m_finished {0}; //!< Count of child animations that have finished
 };
 
 
@@ -179,16 +186,16 @@ signals:
 private:
     enum SlideState { kEmpty, kLoading, kLoaded, kFailed }; // Order is significant
 
-    SlideState    m_state;        //!< Slide validity
-    ImagePtrK     m_data;         //!< The image currently loading/loaded
+    SlideState    m_state         {kEmpty};  //!< Slide validity
+    ImagePtrK     m_data          {nullptr}; //!< The image currently loading/loaded
     //! The most recently requested image. Null for preloads. Differs from m_data when skipping
-    ImagePtrK     m_waitingFor;
-    float         m_zoom;         //!< Current zoom, 1.0 = fullsize
+    ImagePtrK     m_waitingFor    {nullptr};
+    float         m_zoom          {1.0f};    //!< Current zoom, 1.0 = fullsize
     //! Navigation that created this image, -1 = Prev, 0 = Update, 1 = Next
-    int           m_direction;
-    Animation    *m_zoomAnimation;//!< Dedicated animation for zoom, if supported
-    PanAnimation *m_panAnimation; //!< Dedicated animation for panning, if supported
-    QPoint        m_pan;          //!< Pan position (0,0) = no pan
+    int           m_direction     {0};
+    Animation    *m_zoomAnimation {nullptr}; //!< Dedicated animation for zoom, if supported
+    PanAnimation *m_panAnimation  {nullptr}; //!< Dedicated animation for panning, if supported
+    QPoint        m_pan           {0,0};     //!< Pan position (0,0) = no pan
 };
 
 
@@ -208,7 +215,7 @@ class SlideBuffer : public QObject
 {
     Q_OBJECT
 public:
-    SlideBuffer() : m_mutexQ(QMutex::Recursive), m_nextLoad(0) {}
+    SlideBuffer() = default;
     ~SlideBuffer();
 
     void   Initialise(MythUIImage &image);
@@ -239,9 +246,9 @@ protected:
     QString BufferState();
 
     // Must be recursive to enable Flush->signal->Get whilst retaining lock
-    QMutex         m_mutexQ;   //!< Queue protection
-    QQueue<Slide*> m_queue;    //!< Queue of slides
-    int            m_nextLoad; //!< Index of first spare slide, (or last slide if none spare)
+    QMutex         m_mutexQ   {QMutex::Recursive}; //!< Queue protection
+    QQueue<Slide*> m_queue;        //!< Queue of slides
+    int            m_nextLoad {0}; //!< Index of first spare slide, (or last slide if none spare)
 };
 
 #endif // GALLERYSLIDE_H

@@ -71,10 +71,10 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     void            QueryLast(void);
 
     QString             m_dbTag;
-    bool                m_confirm;
+    bool                m_confirm {false};
     HouseKeeperScope    m_scope;
     HouseKeeperStartup  m_startup;
-    bool                m_running;
+    bool                m_running {false};
 
     QDateTime   m_lastRun;
     QDateTime   m_lastSuccess;

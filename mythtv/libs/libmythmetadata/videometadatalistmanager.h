@@ -32,7 +32,7 @@ class META_PUBLIC VideoMetadataListManager
     bool purgeByID(unsigned int db_id);
 
   private:
-    class VideoMetadataListManagerImp *m_imp;
+    class VideoMetadataListManagerImp *m_imp {nullptr};
 };
 
 class META_PUBLIC meta_node
@@ -49,7 +49,7 @@ class META_PUBLIC meta_node
     void setPathRoot(bool is_root = true);
 
   protected:
-    meta_node *m_parent;
+    meta_node *m_parent {nullptr};
 
   private:
     QString m_fq_path;
@@ -67,7 +67,7 @@ class META_PUBLIC meta_data_node : public meta_node
     VideoMetadata *getData();
 
   private:
-    VideoMetadata *m_data;
+    VideoMetadata *m_data {nullptr};
     static const QString m_meta_bug;
 };
 

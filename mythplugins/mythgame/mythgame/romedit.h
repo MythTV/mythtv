@@ -40,24 +40,24 @@ class EditRomInfoDialog : public MythScreenType
     void SetBoxart(QString file);
 
   private:
-    RomInfo             *m_workingRomInfo;
+    RomInfo             *m_workingRomInfo   {nullptr};
     QString              m_id;
-    QObject             *m_retObject;
+    QObject             *m_retObject        {nullptr};
 
-    MythUITextEdit      *m_gamenameEdit;
-    MythUITextEdit      *m_genreEdit;
-    MythUITextEdit      *m_yearEdit;
-    MythUITextEdit      *m_countryEdit;
-    MythUITextEdit      *m_plotEdit;
-    MythUITextEdit      *m_publisherEdit;
-    MythUICheckBox      *m_favoriteCheck;
-    MythUIButton        *m_screenshotButton;
-    MythUIText          *m_screenshotText;
-    MythUIButton        *m_fanartButton;
-    MythUIText          *m_fanartText;
-    MythUIButton        *m_boxartButton;
-    MythUIText          *m_boxartText;
-    MythUIButton        *m_doneButton;
+    MythUITextEdit      *m_gamenameEdit     {nullptr};
+    MythUITextEdit      *m_genreEdit        {nullptr};
+    MythUITextEdit      *m_yearEdit         {nullptr};
+    MythUITextEdit      *m_countryEdit      {nullptr};
+    MythUITextEdit      *m_plotEdit         {nullptr};
+    MythUITextEdit      *m_publisherEdit    {nullptr};
+    MythUICheckBox      *m_favoriteCheck    {nullptr};
+    MythUIButton        *m_screenshotButton {nullptr};
+    MythUIText          *m_screenshotText   {nullptr};
+    MythUIButton        *m_fanartButton     {nullptr};
+    MythUIText          *m_fanartText       {nullptr};
+    MythUIButton        *m_boxartButton     {nullptr};
+    MythUIText          *m_boxartText       {nullptr};
+    MythUIButton        *m_doneButton       {nullptr};
 };
 
 #endif // ROMEDITDLG_H_

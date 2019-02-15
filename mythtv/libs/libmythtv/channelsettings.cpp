@@ -31,7 +31,7 @@ QString ChannelDBStorage::GetSetClause(MSqlBindings &bindings) const
                   GetColumnName() + " = " + nameTag);
 
     bindings.insert(fieldTag, id.getValue());
-    bindings.insert(nameTag, user->GetDBValue());
+    bindings.insert(nameTag, m_user->GetDBValue());
 
     return query;
 }

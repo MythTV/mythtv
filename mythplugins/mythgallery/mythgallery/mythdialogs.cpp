@@ -44,9 +44,7 @@ static bool inline IsEGLFS()
  */
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
-    : QFrame(IsEGLFS() ? nullptr : parent), wmult(0.0), hmult(0.0),
-      screenwidth(0), screenheight(0), xbase(0), ybase(0),
-      m_parent(nullptr), rescode(kDialogCodeAccepted), in_loop(false)
+    : QFrame(IsEGLFS() ? nullptr : parent)
 {
     setObjectName(name);
     if (!parent)
@@ -58,19 +56,19 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
 
     MythUIHelper *ui = GetMythUI();
 
-    ui->GetScreenSettings(xbase, screenwidth, wmult,
-                          ybase, screenheight, hmult);
+    ui->GetScreenSettings(m_xbase, m_screenwidth,  m_dlgwmult,
+                          m_ybase, m_screenheight, m_dlghmult);
 
-    defaultBigFont = ui->GetBigFont();
-    defaultMediumFont = ui->GetMediumFont();
-    defaultSmallFont = ui->GetSmallFont();
+    m_defaultBigFont = ui->GetBigFont();
+    m_defaultMediumFont = ui->GetMediumFont();
+    m_defaultSmallFont = ui->GetSmallFont();
 
-    setFont(defaultMediumFont);
+    setFont(m_defaultMediumFont);
 
     if (setsize)
     {
         move(0, 0);
-        setFixedSize(QSize(screenwidth, screenheight));
+        setFixedSize(QSize(m_screenwidth, m_screenheight));
     }
 
     setAutoFillBackground(true);
@@ -126,7 +124,7 @@ void MythDialog::setResult(DialogCode r)
                          "called with invalid DialogCode").arg(r));
     }
 
-    rescode = r;
+    m_rescode = r;
 }
 
 void MythDialog::done(int r)
@@ -167,7 +165,7 @@ void MythDialog::reject()
 
 DialogCode MythDialog::exec(void)
 {
-    if (in_loop)
+    if (m_in_loop)
     {
         LOG(VB_GENERAL, LOG_ALERT,
                  "MythDialog::exec: Recursive call detected.");
@@ -178,7 +176,7 @@ DialogCode MythDialog::exec(void)
 
     Show();
 
-    in_loop = true;
+    m_in_loop = true;
 
     QEventLoop eventLoop;
     connect(this, SIGNAL(leaveModality()), &eventLoop, SLOT(quit()));
@@ -196,9 +194,9 @@ void MythDialog::hide(void)
 
     // Reimplemented to exit a modal when the dialog is hidden.
     QWidget::hide();
-    if (in_loop)
+    if (m_in_loop)
     {
-        in_loop = false;
+        m_in_loop = false;
         emit leaveModality();
     }
 }

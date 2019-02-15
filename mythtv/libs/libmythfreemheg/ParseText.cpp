@@ -42,17 +42,6 @@ This is very basic and is only there to enable some test programs to be run.
 #endif
 
 
-MHParseText::MHParseText(QByteArray &program)
-            :   m_lineCount(1),     m_nType(PTNull),
-                m_ch(0),            m_nTag(0),
-                m_nInt(0),          m_fBool(false),
-                m_String((unsigned char *)malloc(100)),
-                m_nStringLength(0), m_p(0),
-                m_data(program)
-
-{
-}
-
 MHParseText::~MHParseText()
 {
     free(m_String);

@@ -25,7 +25,11 @@ class ProgFinder : public ScheduleCommon
     Q_OBJECT
   public:
     explicit ProgFinder(MythScreenStack *parentStack, bool allowEPG = true,
-               TV *player = nullptr, bool embedVideo = false);
+               TV *player = nullptr, bool embedVideo = false)
+        : ScheduleCommon(parentStack, "ProgFinder"),
+          m_player(player),
+          m_embedVideo(embedVideo),
+          m_allowEPG(allowEPG) {}
     virtual ~ProgFinder();
 
     bool Create(void) override; // MythScreenType
@@ -66,23 +70,23 @@ class ProgFinder : public ScheduleCommon
     QString m_searchStr;
     QString m_currentLetter;
 
-    TV  *m_player;
-    bool m_embedVideo;
-    bool m_allowEPG;
-    bool m_allowKeypress;
+    TV  *m_player                    {nullptr};
+    bool m_embedVideo                {false};
+    bool m_allowEPG                  {true};
+    bool m_allowKeypress             {true};
 
     ProgramList m_showData;
     ProgramList m_schedList;
 
     InfoMap m_infoMap;
 
-    MythUIButtonList *m_alphabetList;
-    MythUIButtonList *m_showList;
-    MythUIButtonList *m_timesList;
+    MythUIButtonList *m_alphabetList {nullptr};
+    MythUIButtonList *m_showList     {nullptr};
+    MythUIButtonList *m_timesList    {nullptr};
 
-    MythUIText       *m_searchText;
-    MythUIText       *m_help1Text;
-    MythUIText       *m_help2Text;
+    MythUIText       *m_searchText   {nullptr};
+    MythUIText       *m_help1Text    {nullptr};
+    MythUIText       *m_help2Text    {nullptr};
 };
 
 class JaProgFinder : public ProgFinder
@@ -99,8 +103,8 @@ class JaProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar searchChars[];
-    int numberOfSearchChars;
+    static const QChar s_searchChars[];
+    int m_numberOfSearchChars;
 };
 
 class HeProgFinder : public ProgFinder
@@ -117,8 +121,8 @@ class HeProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar searchChars[];
-    int numberOfSearchChars;
+    static const QChar s_searchChars[];
+    int m_numberOfSearchChars;
 };
 ///////////////////////////////
 class RuProgFinder : public ProgFinder
@@ -135,8 +139,8 @@ class RuProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
                                              
   private:
-    static const QChar searchChars[];
-    int numberOfSearchChars;
+    static const QChar s_searchChars[];
+    int m_numberOfSearchChars;
 };
 ///////////////////////////////////
 
@@ -145,7 +149,8 @@ class SearchInputDialog : public MythTextInputDialog
   Q_OBJECT
 
   public:
-    SearchInputDialog(MythScreenStack *parent, const QString &defaultValue);
+    SearchInputDialog(MythScreenStack *parent, const QString &defaultValue)
+        : MythTextInputDialog(parent, "", FilterNone, false, defaultValue) {}
 
     bool Create(void) override; // MythTextInputDialog
 

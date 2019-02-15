@@ -25,9 +25,8 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
    Q_OBJECT
 
   public:
-   MythSingleDownload(void) : m_reply(nullptr), m_errorcode(QNetworkReply::NoError),
-                              m_buffer(nullptr), m_maxsize(0) { ; }
-   ~MythSingleDownload(void) { ; }
+   MythSingleDownload(void) = default;
+   ~MythSingleDownload(void) = default;
 
    bool DownloadURL(const QUrl &url, QByteArray *buffer, uint timeout = 30000,
                     uint redirs = 0, qint64 maxsize = 0);
@@ -41,14 +40,14 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
   private:
     QNetworkAccessManager m_mgr;
     QTimer                m_timer;
-    QNetworkReply        *m_reply;
+    QNetworkReply        *m_reply           {nullptr};
     QMutex                m_lock;
     QMutex                m_replylock;
 
     QString               m_errorstring;
-    QNetworkReply::NetworkError m_errorcode;
-    QByteArray           *m_buffer;
-    qint64                m_maxsize;
+    QNetworkReply::NetworkError m_errorcode {QNetworkReply::NoError};
+    QByteArray           *m_buffer          {nullptr};
+    qint64                m_maxsize         {0};
 };
 
 #endif

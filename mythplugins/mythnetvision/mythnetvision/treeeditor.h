@@ -11,7 +11,8 @@ class TreeEditor : public NetEditorBase
     Q_OBJECT
 
   public:
-    TreeEditor(MythScreenStack *parent, const QString &name = "TreeEditor");
+    TreeEditor(MythScreenStack *parent, const QString &name = "TreeEditor")
+        : NetEditorBase(parent, name) {}
 
   protected:
     bool InsertInDB(GrabberScript *script) override; // NetEditorBase

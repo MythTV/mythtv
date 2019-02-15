@@ -22,7 +22,7 @@ class VideoPlayerCommand
     QString GetCommandDisplayName() const;
 
   private:
-    class VideoPlayerCommandPrivate *m_d;
+    class VideoPlayerCommandPrivate *m_d {nullptr};
 };
 
 #endif // PLAYERCOMMAND_H_

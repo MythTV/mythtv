@@ -24,7 +24,7 @@ class WebSocketMythEvent : public WebSocketExtension
 
   private:
     QStringList m_filters;
-    bool m_sendEvents; /// True if the client has enabled events
+    bool        m_sendEvents {false}; /// True if the client has enabled events
 };
 
 #endif

@@ -59,21 +59,21 @@ class ViewScheduled : public ScheduleCommon
 
     void EmbedTVWindow(void);
 
-    bool m_conflictBool;
+    bool  m_conflictBool              {false};
     QDate m_conflictDate;
 
     QRect m_tvRect;
 
-    MythUIButtonList *m_schedulesList;
-    MythUIButtonList *m_groupList;
+    MythUIButtonList *m_schedulesList {nullptr};
+    MythUIButtonList *m_groupList     {nullptr};
 
-    bool m_showAll;
+    bool              m_showAll       {false};
 
-    bool m_inEvent;
-    bool m_inFill;
-    bool m_needFill;
+    bool              m_inEvent       {false};
+    bool              m_inFill        {false};
+    bool              m_needFill      {false};
 
-    int m_listPos;
+    int               m_listPos       {0};
     ProgramList m_recList;
     QMap<QDate, ProgramList> m_recgroupList;
 
@@ -81,10 +81,10 @@ class ViewScheduled : public ScheduleCommon
     QDate m_defaultGroup;
 
     QMap<int, int> m_inputref;
-    uint m_maxinput;
-    uint m_curinput;
+    uint           m_maxinput         {0};
+    uint           m_curinput         {0};
 
-    TV *m_player;
+    TV            *m_player           {nullptr};
 };
 
 #endif

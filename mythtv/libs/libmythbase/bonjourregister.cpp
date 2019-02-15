@@ -11,7 +11,7 @@
 QMutex BonjourRegister::g_lock;
 
 BonjourRegister::BonjourRegister(QObject *parent)
-    : QObject(parent), m_dnssref(nullptr), m_socket(nullptr), m_lock(nullptr)
+    : QObject(parent)
 {
     setenv("AVAHI_COMPAT_NOWARN", "1", 1);
 }

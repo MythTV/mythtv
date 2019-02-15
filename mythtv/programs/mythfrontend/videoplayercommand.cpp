@@ -378,7 +378,7 @@ VideoPlayerCommand VideoPlayerCommand::PlayerFor(const QString &filename)
     return ret;
 }
 
-VideoPlayerCommand::VideoPlayerCommand() : m_d(nullptr)
+VideoPlayerCommand::VideoPlayerCommand()
 {
     m_d = new VideoPlayerCommandPrivate;
 }

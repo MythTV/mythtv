@@ -201,17 +201,17 @@ class MTV_PUBLIC VideoDisplayProfile
     pref_map_t          pref;
     item_list_t         all_pref;
 
-    static QMutex       safe_lock;
-    static bool         safe_initialized;
-    static safe_map_t   safe_renderer;
-    static safe_map_t   safe_renderer_group;
-    static safe_map_t   safe_deint;
-    static safe_map_t   safe_osd;
-    static safe_map_t   safe_equiv_dec;
-    static safe_list_t  safe_custom;
-    static priority_map_t safe_renderer_priority;
-    static pref_map_t   dec_name;
-    static safe_list_t  safe_decoders;
+    static QMutex         s_safe_lock;
+    static bool           s_safe_initialized;
+    static safe_map_t     s_safe_renderer;
+    static safe_map_t     s_safe_renderer_group;
+    static safe_map_t     s_safe_deint;
+    static safe_map_t     s_safe_osd;
+    static safe_map_t     s_safe_equiv_dec;
+    static safe_list_t    s_safe_custom;
+    static priority_map_t s_safe_renderer_priority;
+    static pref_map_t     s_dec_name;
+    static safe_list_t    s_safe_decoders;
 };
 
 #endif // _VIDEO_DISPLAY_PROFILE_H_

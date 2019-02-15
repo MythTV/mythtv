@@ -96,21 +96,21 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
   protected:
     ~MythSocket(); // force reference counting
 
-    QTcpSocket     *m_tcpSocket; // only set in ctor
-    MThread        *m_thread; // only set in ctor
+    QTcpSocket     *m_tcpSocket        {nullptr}; // only set in ctor
+    MThread        *m_thread           {nullptr}; // only set in ctor
     mutable QMutex  m_lock;
-    qt_socket_fd_t  m_socketDescriptor; // protected by m_lock
-    QHostAddress    m_peerAddress; // protected by m_lock
-    int             m_peerPort; // protected by m_lock
-    MythSocketCBs  *m_callback; // only set in ctor
-    bool            m_useSharedThread; // only set in ctor
-    QAtomicInt      m_disableReadyReadCallback;
-    bool            m_connected; // protected by m_lock
+    qt_socket_fd_t  m_socketDescriptor {-1};      // protected by m_lock
+    QHostAddress    m_peerAddress;                // protected by m_lock
+    int             m_peerPort         {-1};      // protected by m_lock
+    MythSocketCBs  *m_callback         {nullptr}; // only set in ctor
+    bool            m_useSharedThread;            // only set in ctor
+    QAtomicInt      m_disableReadyReadCallback {false};
+    bool            m_connected        {false};   // protected by m_lock
     /// This is used internally as a hint that there might be
     /// data available for reading.
-    mutable QAtomicInt m_dataAvailable;
-    bool            m_isValidated; // only set in thread using MythSocket
-    bool            m_isAnnounced; // only set in thread using MythSocket
+    mutable QAtomicInt m_dataAvailable {0};
+    bool            m_isValidated      {false}; // only set in thread using MythSocket
+    bool            m_isAnnounced      {false}; // only set in thread using MythSocket
     QStringList     m_announce; // only set in thread using MythSocket
 
     static const int kSocketReceiveBufferSize;
@@ -120,7 +120,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     static QMutex s_thread_lock;
     static MThread *s_thread; // protected by s_thread_lock
-    static int s_thread_cnt; // protected by s_thread_lock
+    static int s_thread_cnt;  // protected by s_thread_lock
 };
 
 #endif /* MYTH_SOCKET_H */

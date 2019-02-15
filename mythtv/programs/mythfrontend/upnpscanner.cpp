@@ -111,9 +111,9 @@ class MediaServer : public MediaServerItem
     QUrl    m_eventSubURL;
     QString m_eventSubPath;
     QString m_friendlyName;
-    bool    m_subscribed {false};
-    int     m_renewalTimerId {0};
-    int     m_systemUpdateID {-1};
+    bool    m_subscribed         {false};
+    int     m_renewalTimerId     {0};
+    int     m_systemUpdateID     {-1};
 };
 
 UPNPScanner* UPNPScanner::gUPNPScanner        = nullptr;
@@ -131,14 +131,6 @@ QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
  *  renewed at an appropriate time before it expires. The available media for
  *  each device can then be queried by sending browse requests as needed.
  */
-UPNPScanner::UPNPScanner(UPNPSubscription *sub)
-  : QObject(), m_subscription(sub), m_lock(QMutex::Recursive),
-    m_network(nullptr), m_updateTimer(nullptr), m_watchdogTimer(nullptr),
-    m_masterHost(QString()), m_masterPort(0), m_scanComplete(false),
-    m_fullscan(false)
-{
-}
-
 UPNPScanner::~UPNPScanner()
 {
     Stop();

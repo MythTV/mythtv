@@ -235,15 +235,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 }
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
-    Decoder(d, o),
-    m_inited(false),              m_userStop(false),
-    m_stat(0),                    m_finish(false),
-    m_freq(0),                    m_bitrate(0),
-    m_channels(0),
-    m_seekTime(-1.0),             m_devicename(""),
-    m_inputFormat(nullptr),       m_inputContext(nullptr),
-    m_audioDec(nullptr),          m_inputIsFile(false),
-    m_mdataTimer(nullptr),        m_errCode(0)
+    Decoder(d, o)
 {
     MThread::setObjectName("avfDecoder");
     setURL(file);

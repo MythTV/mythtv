@@ -42,24 +42,19 @@ class FilterScanThread : public MThread
 {
   public:
     FilterScanThread(const QString& dir, const GalleryFilter& flt,
-                     int *dirCount, int *imageCount, int *movieCount);
+                     int *dirCount, int *imageCount, int *movieCount)
+        : MThread("FilterScan"), m_filter(flt), m_dir(dir),
+          m_dirCount(dirCount), m_imgCount(imageCount),
+          m_movCount(movieCount) {}
     void run() override; // MThread
 
   private:
     GalleryFilter m_filter;
     QString m_dir;
-    int *m_dirCount;
-    int *m_imgCount;
-    int *m_movCount;
+    int *m_dirCount {nullptr};
+    int *m_imgCount {nullptr};
+    int *m_movCount {nullptr};
 };
-
-FilterScanThread::FilterScanThread(const QString& dir, const GalleryFilter& flt,
-                                   int *dirCount, int *imageCount,
-                                   int *movieCount) :
-    MThread("FilterScan"), m_filter(flt), m_dir(dir), m_dirCount(dirCount),
-    m_imgCount(imageCount), m_movCount(movieCount)
-{
-}
 
 void FilterScanThread::run()
 {
@@ -73,10 +68,7 @@ void FilterScanThread::run()
 
 GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
                                          GalleryFilter *filter)
-            : MythScreenType(parent, name),
-            m_dirFilter(nullptr), m_typeFilter(nullptr), m_numImagesText(nullptr),
-            m_sortList(nullptr), m_checkButton(nullptr), m_saveButton(nullptr),
-            m_doneButton(nullptr)
+    : MythScreenType(parent, name)
 {
     m_settingsOriginal = filter;
     m_settingsOriginal->dumpFilter("GalleryFilterDialog:ctor (original)");
@@ -84,7 +76,6 @@ GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
     *m_settingsTemp = *filter;
     m_settingsTemp->dumpFilter("GalleryFilterDialog:ctor (temporary)");
     m_photoDir = gCoreContext->GetSetting("GalleryDir", "");
-    m_scanning = false;
 }
 
 GalleryFilterDialog::~GalleryFilterDialog()

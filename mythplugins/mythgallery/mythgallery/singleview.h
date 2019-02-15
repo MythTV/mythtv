@@ -104,43 +104,43 @@ class SingleView : public MythDialog, public ImageView
 
   private:
     // General
-    QPixmap      *m_pixmap;
+    QPixmap      *m_pixmap                 {nullptr};
     QImage        m_image;
-    int           m_angle;
-    QPoint        m_source_loc;
-    ScaleMax      m_scaleMax;
+    int           m_angle                  {0};
+    QPoint        m_source_loc             {0,0};
+    ScaleMax      m_scaleMax               {kScaleToFit};
 
     // Info variables
-    QPixmap      *m_info_pixmap;
+    QPixmap      *m_info_pixmap            {nullptr};
 
     // Common slideshow variables
-    int           m_caption_show;
-    bool          m_caption_remove;
-    QPixmap      *m_caption_pixmap;
-    QPixmap      *m_caption_restore_pixmap;
-    QTimer       *m_caption_timer;
+    int           m_caption_show           {0};
+    bool          m_caption_remove         {false};
+    QPixmap      *m_caption_pixmap         {nullptr};
+    QPixmap      *m_caption_restore_pixmap {nullptr};
+    QTimer       *m_caption_timer          {nullptr};
 
     // Common effect state variables
-    QPixmap      *m_effect_pixmap;
-    QPainter     *m_effect_painter;
-    int           m_effect_subtype;
-    QRect         m_effect_bounds;    ///< effect image bounds
-    QPoint        m_effect_delta0;    ///< misc effects delta
-    QPoint        m_effect_delta1;    ///< misc effects delta
-    int           m_effect_i;         ///< misc effects iterator
-    int           m_effect_j;         ///< misc effects iterator
-    int           m_effect_framerate; ///< timeout between effects
-    float         m_effect_delta2_x;
-    float         m_effect_delta2_y;
-    float         m_effect_alpha;
+    QPixmap      *m_effect_pixmap    {nullptr};
+    QPainter     *m_effect_painter   {nullptr};
+    int           m_effect_subtype   {0};
+    QRect         m_effect_bounds    {0,0,0,0}; ///< effect image bounds
+    QPoint        m_effect_delta0    {0,0};     ///< misc effects delta
+    QPoint        m_effect_delta1    {0,0};     ///< misc effects delta
+    int           m_effect_i         {0};       ///< misc effects iterator
+    int           m_effect_j         {0};       ///< misc effects iterator
+    int           m_effect_framerate {0};       ///< timeout between effects
+    float         m_effect_delta2_x  {0.0f};
+    float         m_effect_delta2_y  {0.0f};
+    float         m_effect_alpha     {0.0f};
 
     // Unshared effect state variables
-    QPoint        m_effect_spiral_tmp0;
-    QPoint        m_effect_spiral_tmp1;
+    QPoint        m_effect_spiral_tmp0                  {0,0};
+    QPoint        m_effect_spiral_tmp1                  {0,0};
     vector<int>   m_effect_meltdown_y_disp;
-    float         m_effect_multi_circle_out_delta_alpha;
-    QPolygon      m_effect_milti_circle_out_points;
-    QPolygon      m_effect_circle_out_points;
+    float         m_effect_multi_circle_out_delta_alpha {0.0f};
+    QPolygon      m_effect_milti_circle_out_points      {4};
+    QPolygon      m_effect_circle_out_points            {4};
 };
 
 #endif /* SINGLEVIEW_H */

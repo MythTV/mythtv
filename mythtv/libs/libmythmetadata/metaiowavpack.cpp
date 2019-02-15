@@ -10,11 +10,6 @@
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-MetaIOWavPack::MetaIOWavPack(void)
-    : MetaIOTagLib()
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *

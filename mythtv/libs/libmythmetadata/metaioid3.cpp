@@ -21,17 +21,6 @@
 
 const String email = "music@mythtv.org";  // TODO username/ip/hostname?
 
-MetaIOID3::MetaIOID3(void)
-    : MetaIOTagLib(),
-        m_file(nullptr), m_fileType(kMPEG)
-{
-}
-
-MetaIOID3::~MetaIOID3(void)
-{
-    CloseFile();
-}
-
 /*!
 * \brief Open the file to read the tag
 *
@@ -518,12 +507,12 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
             AlbumArtImage *art = new AlbumArtImage();
 
             if (frame->description().isEmpty())
-                art->description.clear();
+                art->m_description.clear();
             else
-                art->description = TStringToQString(frame->description());
+                art->m_description = TStringToQString(frame->description());
 
-            art->embedded = true;
-            art->hostname = gCoreContext->GetHostName();
+            art->m_embedded = true;
+            art->m_hostname = gCoreContext->GetHostName();
 
             QString ext = getExtFromMimeType(
                                 TStringToQString(frame->mimeType()).toLower());
@@ -531,28 +520,28 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
             switch (frame->type())
             {
                 case AttachedPictureFrame::FrontCover :
-                    art->imageType = IT_FRONTCOVER;
-                    art->filename = QString("front") + ext;
+                    art->m_imageType = IT_FRONTCOVER;
+                    art->m_filename = QString("front") + ext;
                     break;
                 case AttachedPictureFrame::BackCover :
-                    art->imageType = IT_BACKCOVER;
-                    art->filename = QString("back") + ext;
+                    art->m_imageType = IT_BACKCOVER;
+                    art->m_filename = QString("back") + ext;
                     break;
                 case AttachedPictureFrame::Media :
-                    art->imageType = IT_CD;
-                    art->filename = QString("cd") + ext;
+                    art->m_imageType = IT_CD;
+                    art->m_filename = QString("cd") + ext;
                     break;
                 case AttachedPictureFrame::LeafletPage :
-                    art->imageType = IT_INLAY;
-                    art->filename = QString("inlay") + ext;
+                    art->m_imageType = IT_INLAY;
+                    art->m_filename = QString("inlay") + ext;
                     break;
                 case AttachedPictureFrame::Artist :
-                    art->imageType = IT_ARTIST;
-                    art->filename = QString("artist") + ext;
+                    art->m_imageType = IT_ARTIST;
+                    art->m_filename = QString("artist") + ext;
                     break;
                 case AttachedPictureFrame::Other :
-                    art->imageType = IT_UNKNOWN;
-                    art->filename = QString("unknown") + ext;
+                    art->m_imageType = IT_UNKNOWN;
+                    art->m_filename = QString("unknown") + ext;
                     break;
                 default:
                     LOG(VB_GENERAL, LOG_ERR, "Music Scanner - APIC tag found "
@@ -624,14 +613,14 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
         return false;
 
     // load the image into a QByteArray
-    QImage image(albumart->filename);
+    QImage image(albumart->m_filename);
     QByteArray imageData;
     QBuffer buffer(&imageData);
     buffer.open(QIODevice::WriteOnly);
     image.save(&buffer, "JPEG");
 
     AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
-    switch (albumart->imageType)
+    switch (albumart->m_imageType)
     {
         case IT_FRONTCOVER:
             type = AttachedPictureFrame::FrontCover;
@@ -662,7 +651,7 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
         return false;
 
     AttachedPictureFrame *apic = findAPIC(tag, type,
-                                    QStringToTString(albumart->description));
+                                    QStringToTString(albumart->m_description));
 
     if (!apic)
     {
@@ -678,7 +667,7 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
 
     apic->setMimeType(QStringToTString(mimetype));
     apic->setPicture(bytevector);
-    apic->setDescription(QStringToTString(albumart->description));
+    apic->setDescription(QStringToTString(albumart->m_description));
 
     if (!SaveFile())
         return false;
@@ -700,7 +689,7 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
         return false;
 
     AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
-    switch (albumart->imageType)
+    switch (albumart->m_imageType)
     {
         case IT_FRONTCOVER:
             type = AttachedPictureFrame::FrontCover;
@@ -731,7 +720,7 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
         return false;
 
     AttachedPictureFrame *apic = findAPIC(tag, type,
-                                    QStringToTString(albumart->description));
+                                    QStringToTString(albumart->m_description));
     if (!apic)
         return false;
 
@@ -750,11 +739,11 @@ bool MetaIOID3::changeImageType(const QString &filename,
     if (!albumart)
         return false;
 
-    if (albumart->imageType == newType)
+    if (albumart->m_imageType == newType)
         return true;
 
     AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
-    switch (albumart->imageType)
+    switch (albumart->m_imageType)
     {
         case IT_FRONTCOVER:
             type = AttachedPictureFrame::FrontCover;
@@ -785,7 +774,7 @@ bool MetaIOID3::changeImageType(const QString &filename,
         return false;
 
     AttachedPictureFrame *apic = findAPIC(tag, type,
-                                    QStringToTString(albumart->description));
+                                    QStringToTString(albumart->m_description));
     if (!apic)
         return false;
 

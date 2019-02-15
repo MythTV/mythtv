@@ -20,23 +20,23 @@ class META_PUBLIC ImageDLEvent : public QEvent
   public:
     explicit ImageDLEvent(MetadataLookup *lookup) :
                  QEvent(kEventType),
-                 item(lookup)
+                 m_item(lookup)
     {
-        if (item)
+        if (m_item)
         {
-            item->IncrRef();
+            m_item->IncrRef();
         }
     }
     ~ImageDLEvent()
     {
-        if (item)
+        if (m_item)
         {
-            item->DecrRef();
-            item = nullptr;
+            m_item->DecrRef();
+            m_item = nullptr;
         }
     }
 
-    MetadataLookup *item;
+    MetadataLookup *m_item {nullptr};
 
     static Type kEventType;
 };
@@ -46,23 +46,23 @@ class META_PUBLIC ImageDLFailureEvent : public QEvent
   public:
     explicit ImageDLFailureEvent(MetadataLookup *lookup) :
                  QEvent(kEventType),
-                 item(lookup)
+                 m_item(lookup)
     {
-        if (item)
+        if (m_item)
         {
-            item->IncrRef();
+            m_item->IncrRef();
         }
     }
     ~ImageDLFailureEvent()
     {
-        if (item)
+        if (m_item)
         {
-            item->DecrRef();
-            item = nullptr;
+            m_item->DecrRef();
+            m_item = nullptr;
         }
     }
 
-    MetadataLookup *item;
+    MetadataLookup *m_item {nullptr};
 
     static Type kEventType;
 };
@@ -72,14 +72,14 @@ class META_PUBLIC ThumbnailDLEvent : public QEvent
   public:
     explicit ThumbnailDLEvent(ThumbnailData *data) :
                  QEvent(kEventType),
-                 thumb(data) {}
+                 m_thumb(data) {}
     ~ThumbnailDLEvent()
     {
-        delete thumb;
-        thumb = nullptr;
+        delete m_thumb;
+        m_thumb = nullptr;
     }
 
-    ThumbnailData *thumb;
+    ThumbnailData *m_thumb {nullptr};
 
     static Type kEventType;
 };
@@ -88,7 +88,8 @@ class META_PUBLIC MetadataImageDownload : public MThread
 {
   public:
 
-    explicit MetadataImageDownload(QObject *parent);
+    explicit MetadataImageDownload(QObject *parent)
+        : MThread("MetadataImageDownload"), m_parent(parent) {}
     ~MetadataImageDownload();
 
     void addThumb(QString title, QString url, QVariant data);

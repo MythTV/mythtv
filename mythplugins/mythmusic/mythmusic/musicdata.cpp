@@ -23,32 +23,24 @@ MusicData  *gMusicData = nullptr;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-MusicData::MusicData(void)
-{
-    all_playlists = nullptr;
-    all_music = nullptr;
-    all_streams = nullptr;
-    initialized = false;
-}
-
 MusicData::~MusicData(void)
 {
-    if (all_playlists)
+    if (m_all_playlists)
     {
-        delete all_playlists;
-        all_playlists = nullptr;
+        delete m_all_playlists;
+        m_all_playlists = nullptr;
     }
 
-    if (all_music)
+    if (m_all_music)
     {
-        delete all_music;
-        all_music = nullptr;
+        delete m_all_music;
+        m_all_music = nullptr;
     }
 
-    if (all_streams)
+    if (m_all_streams)
     {
-        delete all_streams;
-        all_streams = nullptr;
+        delete m_all_streams;
+        m_all_streams = nullptr;
     }
 }
 
@@ -64,7 +56,7 @@ void MusicData::scanMusic (void)
 /// reload music after a scan, rip or import
 void MusicData::reloadMusic(void)
 {
-    if (!all_music || !all_playlists)
+    if (!m_all_music || !m_all_playlists)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -88,14 +80,14 @@ void MusicData::reloadMusic(void)
         wasPlaying = true;
     }
 
-    all_music->startLoading();
-    while (!all_music->doneLoading())
+    m_all_music->startLoading();
+    while (!m_all_music->doneLoading())
     {
         qApp->processEvents();
         usleep(50000);
     }
 
-    all_playlists->resync();
+    m_all_playlists->resync();
 
     if (busy)
         busy->Close();
@@ -107,7 +99,7 @@ void MusicData::reloadMusic(void)
 void MusicData::loadMusic(void)
 {
     // only do this once
-    if (initialized)
+    if (m_initialized)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -129,13 +121,14 @@ void MusicData::loadMusic(void)
     //  Load all playlists into RAM (once!)
     PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
 
-    gMusicData->all_music = all_music;
-    gMusicData->all_streams = new AllStream();
-    gMusicData->all_playlists = all_playlists;
+    gMusicData->m_all_music = all_music;
+    gMusicData->m_all_streams = new AllStream();
+    gMusicData->m_all_playlists = all_playlists;
 
-    gMusicData->initialized = true;
+    gMusicData->m_initialized = true;
 
-    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
+    while (!gMusicData->m_all_playlists->doneLoading()
+           || !gMusicData->m_all_music->doneLoading())
     {
         qApp->processEvents();
         usleep(50000);
