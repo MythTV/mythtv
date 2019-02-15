@@ -78,7 +78,7 @@ typedef enum
 class QWindow;
 class QPaintDevice;
 
-class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunctions, public MythRender
+class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctions, public MythRender
 {
     Q_OBJECT
 
@@ -122,6 +122,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, protected QOpenGLFunc
                         QOpenGLTexture::WrapMode      Wrap        = QOpenGLTexture::ClampToEdge,
                         QOpenGLTexture::TextureFormat Format      = QOpenGLTexture::NoFormat);
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
+    MythGLTexture* CreateExternalTexture(QSize Size);
     QSize GetTextureSize(const QSize &size);
     int   GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);

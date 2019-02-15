@@ -110,10 +110,11 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSwapInterval(1);
+    bool opengles = !qgetenv("USE_OPENGLES").isEmpty();
 #ifdef USING_OPENGLES
-    format.setRenderableType(QSurfaceFormat::OpenGLES);
+    opengles = true; // this is probably unnecessary
 #endif
-    if (qApp->platformName().contains("egl"))
+    if (opengles)
         format.setRenderableType(QSurfaceFormat::OpenGLES);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -124,7 +125,17 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
 
 bool MythRenderOpenGL::IsEGL(void)
 {
-    return qApp->platformName().contains("egl", Qt::CaseInsensitive);
+    static bool egl = false;
+    static bool checked = false;
+    if (!checked)
+    {
+        checked = true;
+        if (QGuiApplication::platformName().contains("egl", Qt::CaseInsensitive))
+            egl = true;
+        if (QGuiApplication::platformName().contains("xcb", Qt::CaseInsensitive))
+            egl |= qgetenv("QT_XCB_GL_INTEGRATION") == "xcb_egl";
+    }
+    return egl;
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* Device,
@@ -339,7 +350,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(qApp->platformName()));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(QGuiApplication::platformName()));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
@@ -642,6 +653,23 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     result->m_bufferSize  = GetBufferSize(result->m_totalSize, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
     result->m_size        = Image->size();
     result->m_crop        = true;
+    return result;
+}
+
+/*! \brief Create a texture entirely independent of Qt
+ *
+ * Qt by default will use immutable texture storage if available and this feature
+ * cannot be turned off. In some instances this breaks compatibility (e.g. VAAPI DRM interop).
+*/
+MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size)
+{
+    GLuint textureid;
+    glGenTextures(1, &textureid);
+    MythGLTexture* result = new MythGLTexture(textureid);
+    result->m_size = Size;
+    result->m_totalSize = GetTextureSize(Size);
+    result->m_vbo = CreateVBO(kVertexSize);
+    SetTextureFilters(result, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
     return result;
 }
 
