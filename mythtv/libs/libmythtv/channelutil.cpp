@@ -1875,7 +1875,8 @@ bool ChannelUtil::GetChannelData(
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
         "      channum              = :CHANNUM         AND "
-        "      channel.sourceid     = :SOURCEID");
+        "      channel.sourceid     = :SOURCEID "
+        "ORDER BY channel.visible DESC, channel.chanid ");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":SOURCEID", sourceid);
 
@@ -1885,35 +1886,38 @@ bool ChannelUtil::GetChannelData(
         return false;
     }
 
-    while (query.next())
+    if (query.next())
     {
+        finetune      = query.value(0).toInt();
+        freqid        = query.value(1).toString();
+        tvformat      = query.value(2).toString();
+        freqtable     = query.value(3).toString();
+        commfree      = (query.value(4).toInt() == -2);
+        mplexid       = query.value(5).toUInt();
+        atsc_major    = query.value(6).toUInt();
+        atsc_minor    = query.value(7).toUInt();
+        mpeg_prog_num = (query.value(8).isNull()) ? -1
+                        : query.value(8).toInt();
+        chanid        = query.value(9).toUInt();
+
         found += query.value(10).toInt();
-        if (found)
-        {
-            finetune      = query.value(0).toInt();
-            freqid        = query.value(1).toString();
-            tvformat      = query.value(2).toString();
-            freqtable     = query.value(3).toString();
-            commfree      = (query.value(4).toInt() == -2);
-            mplexid       = query.value(5).toUInt();
-            atsc_major    = query.value(6).toUInt();
-            atsc_minor    = query.value(7).toUInt();
-            mpeg_prog_num = (query.value(8).isNull()) ? -1
-                            : query.value(8).toInt();
-            chanid        = query.value(9).toUInt();
-        }
     }
 
-    if (!found)
+    while (query.next())
+        found += query.value(10).toInt();
+
+    if (found == 0 && chanid)
     {
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("No visible channels for %1").arg(channum));
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("No visible channels for %1, using invisble chanid %2")
+            .arg(channum).arg(chanid));
     }
 
     if (found > 1)
     {
         LOG(VB_GENERAL, LOG_WARNING,
-            QString("Found multiple visible channels for %1").arg(channum));
+            QString("Found multiple visible channels for %1, using chanid %2")
+            .arg(channum).arg(chanid));
     }
 
     if (!chanid)
