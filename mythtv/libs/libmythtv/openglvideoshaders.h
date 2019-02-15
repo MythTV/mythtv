@@ -1,6 +1,98 @@
 #ifndef OPENGLVIDEOSHADERS_H
 #define OPENGLVIDEOSHADERS_H
 
+#define SAMPLE_NV12 "\
+vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n\
+{\n\
+    highp vec3 yuv;\n\
+    yuv.r  = texture2D(texture1, texcoord).r;\n\
+    yuv.gb = texture2D(texture2, texcoord).rg;\n\
+    return yuv;\n\
+}\n"
+
+static const QString NV12FragmentShader =
+"// NV12 FragmentShader\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+SAMPLE_NV12
+"void main(void)\n"
+"{\n"
+"    highp vec3 yuv = sampleNV12(s_texture0, s_texture1, v_texcoord0);\n"
+"    gl_FragColor = vec4(yuv, 1.0) * m_colourMatrix;\n"
+"}\n";
+
+static const QString NV12OneFieldFragmentShader[2] = {
+"// NV12 OneField FragmentShader 1\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+SAMPLE_NV12
+"void main(void)\n"
+"{\n"
+"    highp float field = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * m_frameData.w))) * m_frameData.x, m_frameData.z);\n"
+"    highp vec3 yuv = sampleNV12(s_texture0, s_texture1, vec2(v_texcoord0.x, field));\n"
+"    gl_FragColor = vec4(yuv, 1.0) * m_colourMatrix;\n"
+"}\n",
+
+"// NV12 OneField FragmentShader 2\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+SAMPLE_NV12
+"void main(void)\n"
+"{\n"
+"    highp float field = max(v_texcoord0.y + (step(0.5, 1.0 - fract(v_texcoord0.y * m_frameData.w))) * m_frameData.x, 0.0);\n"
+"    highp vec3 yuv = sampleNV12(s_texture0, s_texture1, vec2(v_texcoord0.x, field));\n"
+"    gl_FragColor = vec4(yuv, 1.0) * m_colourMatrix;\n"
+"}\n"
+};
+
+static const QString NV12LinearBlendFragmentShader[2] = {
+"// NV12 LinearBlend FragmentShader 1\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+SAMPLE_NV12
+"void main(void)\n"
+"{\n"
+"    highp vec3 current = sampleNV12(s_texture0, s_texture1, v_texcoord0);\n"
+"    if (fract(v_texcoord0.y * m_frameData.w) >= 0.5)\n"
+"    {\n"
+"        highp vec3 above = sampleNV12(s_texture0, s_texture1, vec2(v_texcoord0.x, min(v_texcoord0.y + m_frameData.x, m_frameData.z)));\n"
+"        highp vec3 below = sampleNV12(s_texture0, s_texture1, vec2(v_texcoord0.x, max(v_texcoord0.y - m_frameData.x, 0.0)));\n"
+"        current = mix(above, below, 0.5);\n"
+"    }\n"
+"    gl_FragColor = vec4(current, 1.0) * m_colourMatrix;\n"
+"}\n",
+
+"// NV12 LinearBlend FragmentShader 2\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+SAMPLE_NV12
+"void main(void)\n"
+"{\n"
+"    highp vec3 current = sampleNV12(s_texture0, s_texture1, v_texcoord0);\n"
+"    if (fract(v_texcoord0.y * m_frameData.w) < 0.5)\n"
+"    {\n"
+"        highp vec3 above = sampleNV12(s_texture0, s_texture1, vec2(v_texcoord0.x, min(v_texcoord0.y + m_frameData.x, m_frameData.z)));\n"
+"        highp vec3 below = sampleNV12(s_texture0, s_texture1, vec2(v_texcoord0.x, max(v_texcoord0.y - m_frameData.x, 0.0)));\n"
+"        current = mix(above, below, 0.5);\n"
+"    }\n"
+"    gl_FragColor = vec4(current, 1.0) * m_colourMatrix;\n"
+"}\n"};
+
 static const QString DefaultVertexShader =
 "attribute highp vec2 a_position;\n"
 "attribute highp vec2 a_texcoord0;\n"
