@@ -68,7 +68,7 @@ class MythBrowser : public MythScreenType
     QStringList               m_urlList;
 
     MythUIButtonList         *m_pageList      {nullptr};
-    QList<WebPage*>           m_browserList   {nullptr};
+    QList<WebPage*>           m_browserList;
     MythUIProgressBar        *m_progressBar   {nullptr};
     MythUIText               *m_titleText     {nullptr};
     MythUIText               *m_statusText    {nullptr};
