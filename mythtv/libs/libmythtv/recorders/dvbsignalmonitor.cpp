@@ -26,7 +26,7 @@
 #include "dvbstreamhandler.h"
 
 #define LOC QString("DVBSigMon[%1](%2): ") \
-            .arg(inputid).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -65,13 +65,13 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     int wait = 3000; // timeout when waiting on signal
     int threshold = 0; // signal strength threshold
 
-    signalLock.SetTimeout(wait);
-    signalStrength.SetTimeout(wait);
-    signalStrength.SetThreshold(threshold);
+    m_signalLock.SetTimeout(wait);
+    m_signalStrength.SetTimeout(wait);
+    m_signalStrength.SetThreshold(threshold);
 
     // This is incorrect for API 3.x but works better than int16_t range
     // in practice, however this is correct for the 4.0 DVB API
-    signalStrength.SetRange(0, 65535);
+    m_signalStrength.SetRange(0, 65535);
 
     bool ok;
     _channel->HasLock(&ok);
@@ -102,13 +102,13 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     RemoveFlags(rmflags);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "DVBSignalMonitor::ctor " +
-            QString("initial flags %1").arg(sm_flags_to_string(flags)));
+            QString("initial flags %1").arg(sm_flags_to_string(m_flags)));
 
-    minimum_update_rate = _channel->GetMinSignalMonitorDelay();
-    if (minimum_update_rate > 30)
-        usleep(minimum_update_rate * 1000);
+    m_minimum_update_rate = _channel->GetMinSignalMonitorDelay();
+    if (m_minimum_update_rate > 30)
+        usleep(m_minimum_update_rate * 1000);
 
-    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), inputid);
+    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()
@@ -117,13 +117,13 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 DVBSignalMonitor::~DVBSignalMonitor()
 {
     Stop();
-    DVBStreamHandler::Return(streamHandler, inputid);
+    DVBStreamHandler::Return(streamHandler, m_inputid);
 }
 
 // documented in dtvsignalmonitor.h
 void DVBSignalMonitor::SetRotorTarget(float target)
 {
-    QMutexLocker locker(&statusLock);
+    QMutexLocker locker(&m_statusLock);
     rotorPosition.SetThreshold((int)roundf(100 * target));
 }
 
@@ -137,7 +137,7 @@ void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
     if (!rotor)
         return;
 
-    QMutexLocker locker(&statusLock);
+    QMutexLocker locker(&m_statusLock);
     was_moving = rotorPosition.GetValue() < 100;
     int pos    = (int)truncf(rotor->GetProgress() * 100);
     rotorPosition.SetValue(pos);
@@ -161,7 +161,7 @@ void DVBSignalMonitor::Stop(void)
 QStringList DVBSignalMonitor::GetStatusList(void) const
 {
     QStringList list = DTVSignalMonitor::GetStatusList();
-    statusLock.lock();
+    m_statusLock.lock();
     if (HasFlags(kDVBSigMon_WaitForSNR))
         list<<signalToNoise.GetName()<<signalToNoise.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForBER))
@@ -170,7 +170,7 @@ QStringList DVBSignalMonitor::GetStatusList(void) const
         list<<uncorrectedBlocks.GetName()<<uncorrectedBlocks.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForPos))
         list<<rotorPosition.GetName()<<rotorPosition.GetStatus();
-    statusLock.unlock();
+    m_statusLock.unlock();
     return list;
 }
 
@@ -204,7 +204,7 @@ void DVBSignalMonitor::HandleTDT(const TimeDateTable *tdt)
 
 DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
 {
-    return dynamic_cast<DVBChannel*>(channel);
+    return dynamic_cast<DVBChannel*>(m_channel);
 }
 
 /** \fn DVBSignalMonitor::UpdateValues()
@@ -215,15 +215,15 @@ DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
  */
 void DVBSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (streamHandlerStarted)
     {
         if (!streamHandler->IsRunning())
         {
-            error = tr("Error: stream handler died");
-            update_done = true;
+            m_error = tr("Error: stream handler died");
+            m_update_done = true;
             return;
         }
 
@@ -233,7 +233,7 @@ void DVBSignalMonitor::UpdateValues(void)
 
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
@@ -274,19 +274,19 @@ void DVBSignalMonitor::UpdateValues(void)
 
     // Set SignalMonitorValues from info from card.
     {
-        QMutexLocker locker(&statusLock);
+        QMutexLocker locker(&m_statusLock);
 
         // BER and UB are actually uint32 values, but we
         // clamp them at 64K. This is because these values
         // are acutally cumulative, but we don't try to
         // normalize these to a time period.
 
-        wasLocked = signalLock.IsGood();
-        signalLock.SetValue((has_lock) ? 1 : 0);
-        isLocked = signalLock.IsGood();
+        wasLocked = m_signalLock.IsGood();
+        m_signalLock.SetValue((has_lock) ? 1 : 0);
+        isLocked = m_signalLock.IsGood();
 
         if (HasFlags(kSigMon_WaitForSig))
-            signalStrength.SetValue(sig);
+            m_signalStrength.SetValue(sig);
         if (HasFlags(kDVBSigMon_WaitForSNR))
             signalToNoise.SetValue(snr);
         if (HasFlags(kDVBSigMon_WaitForBER))
@@ -319,7 +319,7 @@ void DVBSignalMonitor::UpdateValues(void)
         streamHandlerStarted = true;
     }
 
-    update_done = true;
+    m_update_done = true;
 }
 
 /** \fn DVBSignalMonitor::EmitStatus(void)

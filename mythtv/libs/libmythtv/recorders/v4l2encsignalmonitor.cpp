@@ -20,7 +20,7 @@
 #include "v4l2encstreamhandler.h"
 #include "v4l2encsignalmonitor.h"
 
-#define LOC QString("V4L2SigMon[%1](%2): ").arg(inputid).arg(channel->GetDevice())
+#define LOC QString("V4L2SigMon[%1](%2): ").arg(m_inputid).arg(m_channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -43,7 +43,7 @@ V4L2encSignalMonitor::V4L2encSignalMonitor(int db_cardnum,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
-    m_v4l2.Open(channel->GetDevice());
+    m_v4l2.Open(m_channel->GetDevice());
     if (!m_v4l2.IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "ctor -- Open failed");
@@ -53,7 +53,7 @@ V4L2encSignalMonitor::V4L2encSignalMonitor(int db_cardnum,
     m_isTS = (m_v4l2.GetStreamType() == V4L2_MPEG_STREAM_TYPE_MPEG2_TS);
 
 
-    signalStrength.SetRange(0, 100);
+    m_signalStrength.SetRange(0, 100);
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("%1 stream.")
         .arg(m_isTS ? "Transport" : "Program"));
 }
@@ -66,7 +66,7 @@ V4L2encSignalMonitor::~V4L2encSignalMonitor()
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
     if (m_stream_handler)
-        V4L2encStreamHandler::Return(m_stream_handler, inputid);
+        V4L2encStreamHandler::Return(m_stream_handler, m_inputid);
 }
 
 /** \fn V4L2encSignalMonitor::Stop(void)
@@ -91,7 +91,7 @@ void V4L2encSignalMonitor::Stop(void)
  */
 void V4L2encSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (!m_isTS)
@@ -103,8 +103,8 @@ void V4L2encSignalMonitor::UpdateValues(void)
         SignalMonitor::UpdateValues();
 
         {
-            QMutexLocker locker(&statusLock);
-            if (!scriptStatus.IsGood())
+            QMutexLocker locker(&m_statusLock);
+            if (!m_scriptStatus.IsGood())
                 return;
         }
     }
@@ -115,7 +115,7 @@ void V4L2encSignalMonitor::UpdateValues(void)
         if (IsAllGood())
             SendMessageAllGood();
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
@@ -124,9 +124,9 @@ void V4L2encSignalMonitor::UpdateValues(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("isLocked: %1").arg(isLocked));
 
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(m_strength);
-        signalLock.SetValue(isLocked ? 1 : 0);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(m_strength);
+        m_signalLock.SetValue(isLocked ? 1 : 0);
     }
 
     EmitStatus();
@@ -140,10 +140,10 @@ void V4L2encSignalMonitor::UpdateValues(void)
                        kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                        kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        V4LChannel* chn = reinterpret_cast<V4LChannel*>(channel);
+        V4LChannel* chn = reinterpret_cast<V4LChannel*>(m_channel);
         m_stream_handler =
             V4L2encStreamHandler::Get(chn->GetDevice(),
-                                      chn->GetAudioDevice().toInt(), inputid);
+                                      chn->GetAudioDevice().toInt(), m_inputid);
         if (!m_stream_handler || m_stream_handler->HasError())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -156,7 +156,7 @@ void V4L2encSignalMonitor::UpdateValues(void)
         }
     }
 
-    update_done = true;
+    m_update_done = true;
 }
 
 bool V4L2encSignalMonitor::HasLock(void)

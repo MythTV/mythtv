@@ -21,7 +21,7 @@
 #include "diseqc.h" // for rotor retune
 #include "mythlogging.h"
 
-#define LOC      QString("DVBSH[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC      QString("DVBSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<QString,bool> DVBStreamHandler::s_rec_supports_ts_monitoring;
 QMutex             DVBStreamHandler::s_rec_supports_ts_monitoring_lock;
@@ -64,7 +64,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&s_handlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
     QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
     if (rit == s_handlers_refcnt.end())
@@ -99,7 +99,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 
 DVBStreamHandler::DVBStreamHandler(const QString &dvb_device, int inputid)
     : StreamHandler(dvb_device, inputid)
-    , _dvr_dev_path(CardUtil::GetDeviceName(DVB_DEV_DVR, _device))
+    , _dvr_dev_path(CardUtil::GetDeviceName(DVB_DEV_DVR, m_device))
     , _allow_retune(false)
     , _sigmon(nullptr)
     , _dvbchannel(nullptr)
@@ -110,7 +110,7 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device, int inputid)
 
 void DVBStreamHandler::SetRunningDesired(bool desired)
 {
-    if (_drb && _running_desired && !desired)
+    if (_drb && m_running_desired && !desired)
     {
         StreamHandler::SetRunningDesired(desired);
         _drb->Stop();
@@ -126,7 +126,7 @@ void DVBStreamHandler::run(void)
     RunProlog();
     LOG(VB_RECORD, LOG_DEBUG, LOC + "run(): begin");
 
-    if (!SupportsTSMonitoring() && _allow_section_reader)
+    if (!SupportsTSMonitoring() && m_allow_section_reader)
         RunSR();
     else
         RunTS();
@@ -164,7 +164,7 @@ void DVBStreamHandler::RunTS(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to open DVR device %1 : %2")
                     .arg(_dvr_dev_path).arg(strerror(errno)));
-            _error = true;
+            m_bError = true;
             return;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -177,22 +177,22 @@ void DVBStreamHandler::RunTS(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate memory");
         close(dvr_fd);
-        _error = true;
+        m_bError = true;
         return;
     }
     memset(buffer, 0, buffer_size);
 
     DeviceReadBuffer *drb = nullptr;
-    if (_needs_buffering)
+    if (m_needs_buffering)
     {
         drb = new DeviceReadBuffer(this, true, false);
-        if (!drb->Setup(_device, dvr_fd))
+        if (!drb->Setup(m_device, dvr_fd))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
             delete drb;
             delete[] buffer;
             close(dvr_fd);
-            _error = true;
+            m_bError = true;
             return;
         }
 
@@ -201,10 +201,10 @@ void DVBStreamHandler::RunTS(void)
 
     {
         // SetRunning() + set _drb
-        QMutexLocker locker(&_start_stop_lock);
-        _running = true;
-        _using_buffering = _needs_buffering;
-        _using_section_reader = false;
+        QMutexLocker locker(&m_start_stop_lock);
+        m_running = true;
+        m_using_buffering = m_needs_buffering;
+        m_using_section_reader = false;
         _drb = drb;
     }
 
@@ -213,7 +213,7 @@ void DVBStreamHandler::RunTS(void)
     fd_set fd_select_set;
     FD_ZERO(        &fd_select_set);
     FD_SET (dvr_fd, &fd_select_set);
-    while (_running_desired && !_error)
+    while (m_running_desired && !m_bError)
     {
         RetuneMonitor();
         UpdateFiltersFromStreamData();
@@ -228,13 +228,13 @@ void DVBStreamHandler::RunTS(void)
             if (drb->IsErrored())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device error detected");
-                _error = true;
+                m_bError = true;
             }
 
-            if (drb->IsEOF() && _running_desired)
+            if (drb->IsEOF() && m_running_desired)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
-                _error = true;
+                m_bError = true;
             }
         }
         else
@@ -267,21 +267,21 @@ void DVBStreamHandler::RunTS(void)
             continue;
         }
 
-        _listener_lock.lock();
+        m_listener_lock.lock();
 
-        if (_stream_data_list.empty())
+        if (m_stream_data_list.empty())
         {
-            _listener_lock.unlock();
+            m_listener_lock.unlock();
             continue;
         }
 
-        StreamDataList::const_iterator sit = _stream_data_list.begin();
-        for (; sit != _stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_stream_data_list.begin();
+        for (; sit != m_stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData(buffer, len);
 
         WriteMPTS(buffer, len - remainder);
 
-        _listener_lock.unlock();
+        m_listener_lock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);
@@ -291,7 +291,7 @@ void DVBStreamHandler::RunTS(void)
     RemoveAllPIDFilters();
 
     {
-        QMutexLocker locker(&_start_stop_lock);
+        QMutexLocker locker(&m_start_stop_lock);
         _drb = nullptr;
     }
 
@@ -307,7 +307,7 @@ void DVBStreamHandler::RunTS(void)
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): " + "end");
 
-    SetRunning(false, _needs_buffering, false);
+    SetRunning(false, m_needs_buffering, false);
 }
 
 /** \fn DVBStreamHandler::RunSR(void)
@@ -322,24 +322,24 @@ void DVBStreamHandler::RunSR(void)
     unsigned char *buffer = pes_alloc(buffer_size);
     if (!buffer)
     {
-        _error = true;
+        m_bError = true;
         return;
     }
 
-    SetRunning(true, _needs_buffering, true);
+    SetRunning(true, m_needs_buffering, true);
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): begin");
 
-    while (_running_desired && !_error)
+    while (m_running_desired && !m_bError)
     {
         RetuneMonitor();
         UpdateFiltersFromStreamData();
 
-        QMutexLocker read_locker(&_pid_lock);
+        QMutexLocker read_locker(&m_pid_lock);
 
         bool readSomething = false;
-        PIDInfoMap::const_iterator fit = _pid_info.begin();
-        for (; fit != _pid_info.end(); ++fit)
+        PIDInfoMap::const_iterator fit = m_pid_info.begin();
+        for (; fit != m_pid_info.end(); ++fit)
         {
             int len = read((*fit)->filter_fd, buffer, buffer_size);
             if (len <= 0)
@@ -351,11 +351,11 @@ void DVBStreamHandler::RunSR(void)
 
             if (psip.SectionSyntaxIndicator())
             {
-                _listener_lock.lock();
-                StreamDataList::const_iterator sit = _stream_data_list.begin();
-                for (; sit != _stream_data_list.end(); ++sit)
+                m_listener_lock.lock();
+                StreamDataList::const_iterator sit = m_stream_data_list.begin();
+                for (; sit != m_stream_data_list.end(); ++sit)
                     sit.key()->HandleTables(fit.key() /* pid */, psip);
-                _listener_lock.unlock();
+                m_listener_lock.unlock();
             }
         }
 
@@ -368,7 +368,7 @@ void DVBStreamHandler::RunSR(void)
 
     pes_free(buffer);
 
-    SetRunning(false, _needs_buffering, true);
+    SetRunning(false, m_needs_buffering, true);
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "end");
 }
@@ -401,12 +401,12 @@ static pid_list_t::iterator find(
 
 void DVBStreamHandler::CycleFiltersByPriority(void)
 {
-    QMutexLocker writing_locker(&_pid_lock);
+    QMutexLocker writing_locker(&m_pid_lock);
     QMap<PIDPriority, pid_list_t> priority_queue;
     QMap<PIDPriority, uint> priority_open_cnt;
 
-    PIDInfoMap::const_iterator cit = _pid_info.begin();
-    for (; cit != _pid_info.end(); ++cit)
+    PIDInfoMap::const_iterator cit = m_pid_info.begin();
+    for (; cit != m_pid_info.end(); ++cit)
     {
         PIDPriority priority = GetPIDPriority((*cit)->_pid);
         priority_queue[priority].push_back(cit.key());
@@ -427,21 +427,21 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
             // find first closed filter after first open an filter "k"
             pid_list_t::iterator open = find(
-                _pid_info, priority_queue[i],
+                m_pid_info, priority_queue[i],
                 priority_queue[i].begin(), priority_queue[i].end(), true);
             if (open == priority_queue[i].end())
                 open = priority_queue[i].begin();
 
             pid_list_t::iterator closed = find(
-                _pid_info, priority_queue[i],
+                m_pid_info, priority_queue[i],
                 open, priority_queue[i].end(), false);
 
             if (closed == priority_queue[i].end())
                 break; // something is broken
 
-            if (_pid_info[*closed]->Open(_device, _using_section_reader))
+            if (m_pid_info[*closed]->Open(m_device, m_using_section_reader))
             {
-                _open_pid_filters++;
+                m_open_pid_filters++;
                 priority_open_cnt[i]++;
                 continue;
             }
@@ -457,14 +457,14 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
                 for (uint k = 0; (k < priority_queue[j].size()) && !freed; k++)
                 {
-                    PIDInfo *info = _pid_info[priority_queue[j][k]];
+                    PIDInfo *info = m_pid_info[priority_queue[j][k]];
                     if (!info->IsOpen())
                         continue;
 
-                    if (info->Close(_device))
+                    if (info->Close(m_device))
                         freed = true;
 
-                    _open_pid_filters--;
+                    m_open_pid_filters--;
                     priority_open_cnt[j]--;
                 }
             }
@@ -472,10 +472,10 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
             if (freed)
             {
                 // if we can open a filter, just do it
-                if (_pid_info[*closed]->Open(
-                        _device, _using_section_reader))
+                if (m_pid_info[*closed]->Open(
+                        m_device, m_using_section_reader))
                 {
-                    _open_pid_filters++;
+                    m_open_pid_filters++;
                     priority_open_cnt[i]++;
                     continue;
                 }
@@ -483,22 +483,22 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
             // we have to cycle within our priority level
 
-            if (_cycle_timer.elapsed() < 1000)
+            if (m_cycle_timer.elapsed() < 1000)
                 break; // we don't want to cycle too often
 
-            if (!_pid_info[*open]->IsOpen())
+            if (!m_pid_info[*open]->IsOpen())
                 break; // nothing to close..
 
             // close "open"
-            bool ok = _pid_info[*open]->Close(_device);
-            _open_pid_filters--;
+            bool ok = m_pid_info[*open]->Close(m_device);
+            m_open_pid_filters--;
             priority_open_cnt[i]--;
 
             // open "closed"
-            if (ok && _pid_info[*closed]->
-                Open(_device, _using_section_reader))
+            if (ok && m_pid_info[*closed]->
+                Open(m_device, m_using_section_reader))
             {
-                _open_pid_filters++;
+                m_open_pid_filters++;
                 priority_open_cnt[i]++;
             }
 
@@ -506,7 +506,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
         }
     }
 
-    _cycle_timer.start();
+    m_cycle_timer.start();
 }
 
 void DVBStreamHandler::SetRetuneAllowed(
@@ -576,7 +576,7 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
     {
         QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
         QMap<QString,bool>::const_iterator it;
-        it = s_rec_supports_ts_monitoring.find(_device);
+        it = s_rec_supports_ts_monitoring.find(m_device);
         if (it != s_rec_supports_ts_monitoring.end())
             return *it;
     }
@@ -586,7 +586,7 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
     if (dvr_fd < 0)
     {
         QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
-        s_rec_supports_ts_monitoring[_device] = false;
+        s_rec_supports_ts_monitoring[m_device] = false;
         return false;
     }
 
@@ -600,7 +600,7 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
     close(dvr_fd);
 
     QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
-    s_rec_supports_ts_monitoring[_device] = supports_ts;
+    s_rec_supports_ts_monitoring[m_device] = supports_ts;
 
     return supports_ts;
 }

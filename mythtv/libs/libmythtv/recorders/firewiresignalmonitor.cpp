@@ -15,7 +15,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("FireSigMon[%1](%2): ") \
-            .arg(inputid).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 void FirewireTableMonitorThread::run(void)
 {
@@ -52,7 +52,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(int db_cardnum,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
-    signalStrength.SetThreshold(65);
+    m_signalStrength.SetThreshold(65);
 
     AddFlags(kSigMon_WaitForSig);
 
@@ -90,7 +90,7 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 {
     AddFlags(kDTVSigMon_PATSeen);
 
-    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(channel);
+    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!fwchan)
         return;
 
@@ -137,7 +137,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- begin");
 
-    FirewireChannel *lchan = dynamic_cast<FirewireChannel*>(channel);
+    FirewireChannel *lchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!lchan)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
@@ -188,7 +188,7 @@ void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
  */
 void FirewireSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (m_dtvMonitorRunning)
@@ -198,7 +198,7 @@ void FirewireSignalMonitor::UpdateValues(void)
             SendMessageAllGood();
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
@@ -209,7 +209,7 @@ void FirewireSignalMonitor::UpdateValues(void)
     }
     m_stb_needs_to_wait_for_power = false;
 
-    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(channel);
+    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!fwchan)
         return;
 
@@ -259,16 +259,16 @@ void FirewireSignalMonitor::UpdateValues(void)
     SignalMonitor::UpdateValues();
 
     {
-        QMutexLocker locker(&statusLock);
-        if (!scriptStatus.IsGood())
+        QMutexLocker locker(&m_statusLock);
+        if (!m_scriptStatus.IsGood())
             return;
     }
 
     // Set SignalMonitorValues from info from card.
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(isLocked ? 100 : 0);
-        signalLock.SetValue(isLocked ? 1 : 0);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(isLocked ? 100 : 0);
+        m_signalLock.SetValue(isLocked ? 1 : 0);
     }
 
     EmitStatus();
@@ -294,5 +294,5 @@ void FirewireSignalMonitor::UpdateValues(void)
                 "Table monitor started");
     }
 
-    update_done = true;
+    m_update_done = true;
 }

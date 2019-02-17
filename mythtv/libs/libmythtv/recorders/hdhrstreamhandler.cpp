@@ -23,7 +23,7 @@
 static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str);
 #endif
 
-#define LOC      QString("HDHRSH[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC      QString("HDHRSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<int,HDHRStreamHandler*>     HDHRStreamHandler::s_handlers;
 QMap<int,uint>                   HDHRStreamHandler::s_handlers_refcnt;
@@ -119,7 +119,7 @@ void HDHRStreamHandler::run(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Starting recording (set target failed). Aborting.");
-        _error = true;
+        m_bError = true;
         RunEpilog();
         return;
     }
@@ -131,7 +131,7 @@ void HDHRStreamHandler::run(void)
 
     int remainder = 0;
     QTime last_update;
-    while (_running_desired && !_error)
+    while (m_running_desired && !m_bError)
     {
         int elapsed = !last_update.isValid() ? -1 : last_update.elapsed();
         elapsed = (elapsed < 0) ? 1000 : elapsed;
@@ -159,21 +159,21 @@ void HDHRStreamHandler::run(void)
 
         // Assume data_length is a multiple of 188 (packet size)
 
-        _listener_lock.lock();
+        m_listener_lock.lock();
 
-        if (_stream_data_list.empty())
+        if (m_stream_data_list.empty())
         {
-            _listener_lock.unlock();
+            m_listener_lock.unlock();
             continue;
         }
 
-        StreamDataList::const_iterator sit = _stream_data_list.begin();
-        for (; sit != _stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_stream_data_list.begin();
+        for (; sit != m_stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData(data_buffer, data_length);
 
         WriteMPTS(data_buffer, data_length - remainder);
 
-        _listener_lock.unlock();
+        m_listener_lock.unlock();
         if (remainder != 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -242,20 +242,20 @@ bool HDHRStreamHandler::UpdateFilters(void)
 #ifdef DEBUG_PID_FILTERS
     LOG(VB_RECORD, LOG_INFO, LOC + "UpdateFilters()");
 #endif // DEBUG_PID_FILTERS
-    QMutexLocker locker(&_pid_lock);
+    QMutexLocker locker(&m_pid_lock);
 
     QString filter = "";
 
     vector<uint> range_min;
     vector<uint> range_max;
 
-    PIDInfoMap::const_iterator it = _pid_info.begin();
-    for (; it != _pid_info.end(); ++it)
+    PIDInfoMap::const_iterator it = m_pid_info.begin();
+    for (; it != m_pid_info.end(); ++it)
     {
         range_min.push_back(it.key());
         PIDInfoMap::const_iterator eit = it;
         for (++eit;
-             (eit != _pid_info.end()) && (it.key() + 1 == eit.key());
+             (eit != m_pid_info.end()) && (it.key() + 1 == eit.key());
              ++it, ++eit);
         range_max.push_back(it.key());
     }
@@ -365,7 +365,7 @@ bool HDHRStreamHandler::Connect(void)
         return false;
     }
 
-    QStringList devices = _device.split(",");
+    QStringList devices = m_device.split(",");
     for (int i = 0; i < devices.size(); ++i)
     {
         QByteArray ba = devices[i].toUtf8();

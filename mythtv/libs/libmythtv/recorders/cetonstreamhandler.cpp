@@ -27,7 +27,7 @@
 #include "cardutil.h"
 #include "mythdownloadmanager.h"
 
-#define LOC QString("CetonSH[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC QString("CetonSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<QString,CetonStreamHandler*> CetonStreamHandler::s_handlers;
 QMap<QString,uint>                CetonStreamHandler::s_handlers_refcnt;
@@ -71,7 +71,7 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&s_handlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
     QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
     if (rit == s_handlers_refcnt.end())
@@ -115,7 +115,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
     if (parts.size() != 2)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid device id %1").arg(_device));
+            QString("Invalid device id %1").arg(m_device));
         return;
     }
     m_ip_address = parts.at(0);
@@ -129,7 +129,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid device id %1").arg(_device));
+            QString("Invalid device id %1").arg(m_device));
         return;
     }
 
@@ -205,9 +205,9 @@ bool CetonStreamHandler::Connect(void)
 
 bool CetonStreamHandler::EnterPowerSavingMode(void)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listener_lock);
 
-    if (!_stream_data_list.empty())
+    if (!m_stream_data_list.empty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "Ignoring request - video streaming active");

@@ -15,7 +15,7 @@
 #include "v4lchannel.h"
 
 #define LOC QString("AnalogSigMon[%1](%2): ") \
-    .arg(inputid).arg(channel->GetDevice())
+    .arg(m_inputid).arg(m_channel->GetDevice())
 
 AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
                                          V4LChannel *_channel,
@@ -25,7 +25,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
       m_usingv4l2(false), m_version(0), m_width(0), m_stable_time(2000),
       m_lock_cnt(0), m_log_idx(40)
 {
-    int videofd = channel->GetFd();
+    int videofd = m_channel->GetFd();
     if (videofd >= 0)
     {
         uint32_t caps;
@@ -141,8 +141,8 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
         }
         else
         {
-            QMutexLocker locker(&statusLock);
-            signalStrength.SetValue(60 + m_lock_cnt);
+            QMutexLocker locker(&m_statusLock);
+            m_signalStrength.SetValue(60 + m_lock_cnt);
         }
     }
     else
@@ -154,8 +154,8 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
         }
         m_width = vfmt.fmt.pix.width;
         m_timer.stop();
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(20 + m_lock_cnt);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(20 + m_lock_cnt);
     }
 
     return false;
@@ -166,15 +166,15 @@ void AnalogSignalMonitor::UpdateValues(void)
     SignalMonitor::UpdateValues();
 
     {
-        QMutexLocker locker(&statusLock);
-        if (!scriptStatus.IsGood())
+        QMutexLocker locker(&m_statusLock);
+        if (!m_scriptStatus.IsGood())
             return;
     }
 
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
-    int videofd = channel->GetFd();
+    int videofd = m_channel->GetFd();
     if (videofd < 0)
         return;
 
@@ -216,10 +216,10 @@ void AnalogSignalMonitor::UpdateValues(void)
 #endif // USING_V4L1
 
     {
-        QMutexLocker locker(&statusLock);
-        signalLock.SetValue(isLocked);
+        QMutexLocker locker(&m_statusLock);
+        m_signalLock.SetValue(isLocked);
         if (isLocked)
-            signalStrength.SetValue(100);
+            m_signalStrength.SetValue(100);
     }
 
     EmitStatus();

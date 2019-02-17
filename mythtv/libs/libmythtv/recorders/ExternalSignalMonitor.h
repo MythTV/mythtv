@@ -27,7 +27,7 @@ class ExternalSignalMonitor: public DTVSignalMonitor
 
     void UpdateValues(void) override; // SignalMonitor
     ExternalChannel *GetExternalChannel(void)
-        { return dynamic_cast<ExternalChannel*>(channel); }
+        { return dynamic_cast<ExternalChannel*>(m_channel); }
 
     bool HasLock(void);
     int GetSignalStrengthPercent(void);

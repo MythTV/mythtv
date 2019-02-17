@@ -26,7 +26,7 @@
 #include "mythlogging.h"
 #include "cetonrtsp.h"
 
-#define LOC QString("IPTVSH[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC QString("IPTVSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<QString,IPTVStreamHandler*> IPTVStreamHandler::s_iptvhandlers;
 QMap<QString,uint>               IPTVStreamHandler::s_iptvhandlers_refcnt;
@@ -69,7 +69,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&s_iptvhandlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
     QMap<QString,uint>::iterator rit = s_iptvhandlers_refcnt.find(devname);
     if (rit == s_iptvhandlers_refcnt.end())
@@ -344,7 +344,7 @@ IPTVStreamHandlerReadHelper::IPTVStreamHandlerReadHelper(
             this,     SLOT(ReadPending()));
 }
 
-#define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->_device)
+#define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->m_device)
 
 void IPTVStreamHandlerReadHelper::ReadPending(void)
 {
@@ -435,11 +435,11 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
 
         int remainder = 0;
         {
-            QMutexLocker locker(&m_parent->_listener_lock);
+            QMutexLocker locker(&m_parent->m_listener_lock);
             QByteArray &data = packet.GetDataReference();
             IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->_stream_data_list.begin();
-            for (; sit != m_parent->_stream_data_list.end(); ++sit)
+            sit = m_parent->m_stream_data_list.begin();
+            for (; sit != m_parent->m_stream_data_list.end(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     reinterpret_cast<const unsigned char*>(data.data()),
@@ -494,18 +494,18 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
                 QString("Processing RTP packet(seq:%1 ts:%2)")
                 .arg(m_last_sequence_number).arg(m_last_timestamp));
 
-            m_parent->_listener_lock.lock();
+            m_parent->m_listener_lock.lock();
 
             int remainder = 0;
             IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->_stream_data_list.begin();
-            for (; sit != m_parent->_stream_data_list.end(); ++sit)
+            sit = m_parent->m_stream_data_list.begin();
+            for (; sit != m_parent->m_stream_data_list.end(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     ts_packet.GetTSData(), ts_packet.GetTSDataSize());
             }
 
-            m_parent->_listener_lock.unlock();
+            m_parent->m_listener_lock.unlock();
 
             if (remainder != 0)
             {

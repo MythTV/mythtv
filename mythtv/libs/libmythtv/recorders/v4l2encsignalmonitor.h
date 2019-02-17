@@ -28,7 +28,7 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
 
     void UpdateValues(void) override; // SignalMonitor
     V4LChannel *GetV4L2encChannel(void)
-        { return dynamic_cast<V4LChannel*>(channel); }
+        { return dynamic_cast<V4LChannel*>(m_channel); }
 
     bool HasLock(void);
     int  StableResolution(void);

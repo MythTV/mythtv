@@ -14,7 +14,7 @@
 #include "cetonchannel.h"
 
 #define LOC QString("CetonSigMon[%1](%2): ") \
-            .arg(inputid).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -38,11 +38,11 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
-    signalStrength.SetThreshold(45);
+    m_signalStrength.SetThreshold(45);
 
     AddFlags(kSigMon_WaitForSig);
 
-    m_streamHandler = CetonStreamHandler::Get(channel->GetDevice(), inputid);
+    m_streamHandler = CetonStreamHandler::Get(m_channel->GetDevice(), m_inputid);
 }
 
 /** \fn CetonSignalMonitor::~CetonSignalMonitor()
@@ -52,7 +52,7 @@ CetonSignalMonitor::~CetonSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    CetonStreamHandler::Return(m_streamHandler, inputid);
+    CetonStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 /** \fn CetonSignalMonitor::Stop(void)
@@ -71,7 +71,7 @@ void CetonSignalMonitor::Stop(void)
 
 CetonChannel *CetonSignalMonitor::GetCetonChannel(void)
 {
-    return dynamic_cast<CetonChannel*>(channel);
+    return dynamic_cast<CetonChannel*>(m_channel);
 }
 
 /** \fn CetonSignalMonitor::UpdateValues(void)
@@ -82,7 +82,7 @@ CetonChannel *CetonSignalMonitor::GetCetonChannel(void)
  */
 void CetonSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (m_streamHandlerStarted)
@@ -93,7 +93,7 @@ void CetonSignalMonitor::UpdateValues(void)
 
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
@@ -103,11 +103,11 @@ void CetonSignalMonitor::UpdateValues(void)
     // Set SignalMonitorValues from info from card.
     bool isLocked = false;
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(sig);
-        signalLock.SetValue(true);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(sig);
+        m_signalLock.SetValue(true);
         // TODO add some way to indicate if there is actually a lock
-        isLocked = signalLock.IsGood();
+        isLocked = m_signalLock.IsGood();
     }
 
     EmitStatus();
@@ -125,5 +125,5 @@ void CetonSignalMonitor::UpdateValues(void)
         m_streamHandlerStarted = true;
     }
 
-    update_done = true;
+    m_update_done = true;
 }

@@ -13,11 +13,11 @@ using namespace std;
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
-    QString("DTVSigMon[%1](%2)::%3: %4").arg(inputid) \
-    .arg(channel->GetDevice()).arg(FUNC).arg(MSG))
+    QString("DTVSigMon[%1](%2)::%3: %4").arg(m_inputid) \
+    .arg(m_channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("DTVSigMon[%1](%2): ") \
-            .arg(inputid).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 // inserts tid&crc value into an ordered list
 // returns true if item is inserted
@@ -71,21 +71,21 @@ DTVSignalMonitor::~DTVSignalMonitor()
 
 DTVChannel *DTVSignalMonitor::GetDTVChannel(void)
 {
-    return dynamic_cast<DTVChannel*>(channel);
+    return dynamic_cast<DTVChannel*>(m_channel);
 }
 
 QStringList DTVSignalMonitor::GetStatusList(void) const
 {
     QStringList list = SignalMonitor::GetStatusList();
-    QMutexLocker locker(&statusLock);
+    QMutexLocker locker(&m_statusLock);
 
     // mpeg tables
-    if (flags & kDTVSigMon_WaitForPAT)
+    if (m_flags & kDTVSigMon_WaitForPAT)
     {
         list<<m_seenPAT.GetName()<<m_seenPAT.GetStatus();
         list<<m_matchingPAT.GetName()<<m_matchingPAT.GetStatus();
     }
-    if (flags & kDTVSigMon_WaitForPMT)
+    if (m_flags & kDTVSigMon_WaitForPMT)
     {
 #define DEBUG_PMT 0
 #if DEBUG_PMT
@@ -107,35 +107,35 @@ QStringList DTVSignalMonitor::GetStatusList(void) const
 #endif
     }
     // atsc tables
-    if (flags & kDTVSigMon_WaitForMGT)
+    if (m_flags & kDTVSigMon_WaitForMGT)
     {
         list<<m_seenMGT.GetName()<<m_seenMGT.GetStatus();
         list<<m_matchingMGT.GetName()<<m_matchingMGT.GetStatus();
     }
-    if (flags & kDTVSigMon_WaitForVCT)
+    if (m_flags & kDTVSigMon_WaitForVCT)
     {
         list<<m_seenVCT.GetName()<<m_seenVCT.GetStatus();
         list<<m_matchingVCT.GetName()<<m_matchingVCT.GetStatus();
     }
     // dvb tables
-    if (flags & kDTVSigMon_WaitForNIT)
+    if (m_flags & kDTVSigMon_WaitForNIT)
     {
         list<<m_seenNIT.GetName()<<m_seenNIT.GetStatus();
         list<<m_matchingNIT.GetName()<<m_matchingNIT.GetStatus();
     }
-    if (flags & kDTVSigMon_WaitForSDT)
+    if (m_flags & kDTVSigMon_WaitForSDT)
     {
         list<<m_seenSDT.GetName()<<m_seenSDT.GetStatus();
         list<<m_matchingSDT.GetName()<<m_matchingSDT.GetStatus();
     }
-    if (flags & kDTVSigMon_WaitForCrypt)
+    if (m_flags & kDTVSigMon_WaitForCrypt)
     {
         list<<m_seenCrypt.GetName()<<m_seenCrypt.GetStatus();
         list<<m_matchingCrypt.GetName()<<m_matchingCrypt.GetStatus();
     }
-    if (error != "")
+    if (m_error != "")
     {
-        list<<"error"<<error;
+        list<<"error"<<m_error;
     }
     return list;
 }
@@ -154,21 +154,21 @@ void DTVSignalMonitor::RemoveFlags(uint64_t _flags)
 
 void DTVSignalMonitor::UpdateMonitorValues(void)
 {
-    QMutexLocker locker(&statusLock);
-    m_seenPAT.SetValue(    (flags & kDTVSigMon_PATSeen)  ? 1 : 0);
-    m_seenPMT.SetValue(    (flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
-    m_seenMGT.SetValue(    (flags & kDTVSigMon_MGTSeen)  ? 1 : 0);
-    m_seenVCT.SetValue(    (flags & kDTVSigMon_VCTSeen)  ? 1 : 0);
-    m_seenNIT.SetValue(    (flags & kDTVSigMon_NITSeen)  ? 1 : 0);
-    m_seenSDT.SetValue(    (flags & kDTVSigMon_SDTSeen)  ? 1 : 0);
-    m_seenCrypt.SetValue(  (flags & kDTVSigMon_CryptSeen)? 1 : 0);
-    m_matchingPAT.SetValue((flags & kDTVSigMon_PATMatch) ? 1 : 0);
-    m_matchingPMT.SetValue((flags & kDTVSigMon_PMTMatch) ? 1 : 0);
-    m_matchingMGT.SetValue((flags & kDTVSigMon_MGTMatch) ? 1 : 0);
-    m_matchingVCT.SetValue((flags & kDTVSigMon_VCTMatch) ? 1 : 0);
-    m_matchingNIT.SetValue((flags & kDTVSigMon_NITMatch) ? 1 : 0);
-    m_matchingSDT.SetValue((flags & kDTVSigMon_SDTMatch) ? 1 : 0);
-    m_matchingCrypt.SetValue((flags & kDTVSigMon_CryptMatch) ? 1 : 0);
+    QMutexLocker locker(&m_statusLock);
+    m_seenPAT.SetValue(    (m_flags & kDTVSigMon_PATSeen)  ? 1 : 0);
+    m_seenPMT.SetValue(    (m_flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
+    m_seenMGT.SetValue(    (m_flags & kDTVSigMon_MGTSeen)  ? 1 : 0);
+    m_seenVCT.SetValue(    (m_flags & kDTVSigMon_VCTSeen)  ? 1 : 0);
+    m_seenNIT.SetValue(    (m_flags & kDTVSigMon_NITSeen)  ? 1 : 0);
+    m_seenSDT.SetValue(    (m_flags & kDTVSigMon_SDTSeen)  ? 1 : 0);
+    m_seenCrypt.SetValue(  (m_flags & kDTVSigMon_CryptSeen)? 1 : 0);
+    m_matchingPAT.SetValue((m_flags & kDTVSigMon_PATMatch) ? 1 : 0);
+    m_matchingPMT.SetValue((m_flags & kDTVSigMon_PMTMatch) ? 1 : 0);
+    m_matchingMGT.SetValue((m_flags & kDTVSigMon_MGTMatch) ? 1 : 0);
+    m_matchingVCT.SetValue((m_flags & kDTVSigMon_VCTMatch) ? 1 : 0);
+    m_matchingNIT.SetValue((m_flags & kDTVSigMon_NITMatch) ? 1 : 0);
+    m_matchingSDT.SetValue((m_flags & kDTVSigMon_SDTMatch) ? 1 : 0);
+    m_matchingCrypt.SetValue((m_flags & kDTVSigMon_CryptMatch) ? 1 : 0);
 }
 
 void DTVSignalMonitor::UpdateListeningForEIT(void)
@@ -554,22 +554,22 @@ const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
 
 bool DTVSignalMonitor::IsAllGood(void) const
 {
-    QMutexLocker locker(&statusLock);
+    QMutexLocker locker(&m_statusLock);
     if (!SignalMonitor::IsAllGood())
         return false;
-    if ((flags & kDTVSigMon_WaitForPAT) && !m_matchingPAT.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForPAT) && !m_matchingPAT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForPMT) && !m_matchingPMT.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForPMT) && !m_matchingPMT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForMGT) && !m_matchingMGT.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForMGT) && !m_matchingMGT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForVCT) && !m_matchingVCT.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForVCT) && !m_matchingVCT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForNIT) && !m_matchingNIT.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForNIT) && !m_matchingNIT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForSDT) && !m_matchingSDT.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForSDT) && !m_matchingSDT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForCrypt) && !m_matchingCrypt.IsGood())
+    if ((m_flags & kDTVSigMon_WaitForCrypt) && !m_matchingCrypt.IsGood())
             return false;
 
     return true;

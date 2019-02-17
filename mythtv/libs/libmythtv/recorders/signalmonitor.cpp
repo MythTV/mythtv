@@ -62,8 +62,8 @@ extern "C" {
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
-    QString("SigMon[%1](%2)::%3: %4").arg(inputid) \
-                              .arg(channel->GetDevice()).arg(FUNC).arg(MSG))
+    QString("SigMon[%1](%2)::%3: %4").arg(m_inputid) \
+                              .arg(m_channel->GetDevice()).arg(FUNC).arg(MSG))
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.
@@ -218,24 +218,19 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 SignalMonitor::SignalMonitor(int _inputid, ChannelBase *_channel,
                              bool _release_stream, uint64_t wait_for_mask)
     : MThread("SignalMonitor"),
-      channel(_channel),               pParent(nullptr),
-      inputid(_inputid), flags(wait_for_mask),
-      release_stream(_release_stream),
-      update_rate(25),                 minimum_update_rate(5),
-      update_done(false),              notify_frontend(true),
-      tablemon(false),                 eit_scan(false),
-      signalLock    (QCoreApplication::translate("(Common)", "Signal Lock"),
+      m_channel(_channel),
+      m_inputid(_inputid), m_flags(wait_for_mask),
+      m_release_stream(_release_stream),
+      m_signalLock    (QCoreApplication::translate("(Common)", "Signal Lock"),
                      "slock", 1, true, 0,   1, 0),
-      signalStrength(QCoreApplication::translate("(Common)", "Signal Power"),
+      m_signalStrength(QCoreApplication::translate("(Common)", "Signal Power"),
                      "signal", 0, true, 0, 100, 0),
-      scriptStatus  (QCoreApplication::translate("(Common)", "Script Status"),
-                     "script", 3, true, 0, 3, 0),
-      running(false),                  exit(false),
-      statusLock(QMutex::Recursive)
+      m_scriptStatus  (QCoreApplication::translate("(Common)", "Script Status"),
+                     "script", 3, true, 0, 3, 0)
 {
-    if (!channel->IsExternalChannelChangeInUse())
+    if (!m_channel->IsExternalChannelChangeInUse())
     {
-        scriptStatus.SetValue(3);
+        m_scriptStatus.SetValue(3);
     }
 }
 
@@ -251,23 +246,23 @@ SignalMonitor::~SignalMonitor()
 void SignalMonitor::AddFlags(uint64_t _flags)
 {
     DBG_SM("AddFlags", sm_flags_to_string(_flags));
-    flags |= _flags;
+    m_flags |= _flags;
 }
 
 void SignalMonitor::RemoveFlags(uint64_t _flags)
 {
     DBG_SM("RemoveFlags", sm_flags_to_string(_flags));
-    flags &= ~_flags;
+    m_flags &= ~_flags;
 }
 
 bool SignalMonitor::HasFlags(uint64_t _flags) const
 {
-    return (flags & _flags) == _flags;
+    return (m_flags & _flags) == _flags;
 }
 
 bool SignalMonitor::HasAnyFlag(uint64_t _flags) const
 {
-    return (flags & _flags);
+    return (m_flags & _flags);
 }
 
 /** \fn SignalMonitor::Start()
@@ -277,11 +272,11 @@ void SignalMonitor::Start()
 {
     DBG_SM("Start", "begin");
     {
-        QMutexLocker locker(&startStopLock);
-        exit = false;
+        QMutexLocker locker(&m_startStopLock);
+        m_exit = false;
         start();
-        while (!running)
-            startStopWait.wait(locker.mutex());
+        while (!m_running)
+            m_startStopWait.wait(locker.mutex());
     }
     DBG_SM("Start", "end");
 }
@@ -293,9 +288,9 @@ void SignalMonitor::Stop()
 {
     DBG_SM("Stop", "begin");
 
-    QMutexLocker locker(&startStopLock);
-    exit = true;
-    if (running)
+    QMutexLocker locker(&m_startStopLock);
+    m_exit = true;
+    if (m_running)
     {
         locker.unlock();
         wait();
@@ -316,12 +311,12 @@ void SignalMonitor::Stop()
 QStringList SignalMonitor::GetStatusList(void) const
 {
     QStringList list;
-    statusLock.lock();
-    list<<scriptStatus.GetName()<<scriptStatus.GetStatus();
-    list<<signalLock.GetName()<<signalLock.GetStatus();
+    m_statusLock.lock();
+    list<<m_scriptStatus.GetName()<<m_scriptStatus.GetStatus();
+    list<<m_signalLock.GetName()<<m_signalLock.GetStatus();
     if (HasFlags(kSigMon_WaitForSig))
-        list<<signalStrength.GetName()<<signalStrength.GetStatus();
-    statusLock.unlock();
+        list<<m_signalStrength.GetName()<<m_signalStrength.GetStatus();
+    m_statusLock.unlock();
 
     return list;
 }
@@ -331,81 +326,81 @@ void SignalMonitor::run(void)
 {
     RunProlog();
 
-    QMutexLocker locker(&startStopLock);
-    running = true;
-    startStopWait.wakeAll();
+    QMutexLocker locker(&m_startStopLock);
+    m_running = true;
+    m_startStopWait.wakeAll();
 
-    while (!exit)
+    while (!m_exit)
     {
         locker.unlock();
 
         UpdateValues();
 
-        if (notify_frontend && inputid>=0)
+        if (m_notify_frontend && m_inputid>=0)
         {
             QStringList slist = GetStatusList();
-            MythEvent me(QString("SIGNAL %1").arg(inputid), slist);
+            MythEvent me(QString("SIGNAL %1").arg(m_inputid), slist);
             gCoreContext->dispatch(me);
         }
 
         locker.relock();
-        startStopWait.wait(locker.mutex(), update_rate);
+        m_startStopWait.wait(locker.mutex(), m_update_rate);
     }
 
     // We need to send a last informational message because a
     // signal update may have come in while we were sleeping
     // if we are using the multithreaded dtvsignalmonitor.
     locker.unlock();
-    if (notify_frontend && inputid>=0)
+    if (m_notify_frontend && m_inputid>=0)
     {
         QStringList slist = GetStatusList();
-        MythEvent me(QString("SIGNAL %1").arg(inputid), slist);
+        MythEvent me(QString("SIGNAL %1").arg(m_inputid), slist);
         gCoreContext->dispatch(me);
     }
     locker.relock();
 
-    running = false;
-    startStopWait.wakeAll();
+    m_running = false;
+    m_startStopWait.wakeAll();
 
     RunEpilog();
 }
 
 void SignalMonitor::AddListener(SignalMonitorListener *listener)
 {
-    QMutexLocker locker(&listenerLock);
-    for (uint i = 0; i < listeners.size(); i++)
+    QMutexLocker locker(&m_listenerLock);
+    for (uint i = 0; i < m_listeners.size(); i++)
     {
-        if (listeners[i] == listener)
+        if (m_listeners[i] == listener)
             return;
     }
-    listeners.push_back(listener);
+    m_listeners.push_back(listener);
 }
 
 void SignalMonitor::RemoveListener(SignalMonitorListener *listener)
 {
-    QMutexLocker locker(&listenerLock);
+    QMutexLocker locker(&m_listenerLock);
 
     vector<SignalMonitorListener*> new_listeners;
-    for (uint i = 0; i < listeners.size(); i++)
+    for (uint i = 0; i < m_listeners.size(); i++)
     {
-        if (listeners[i] != listener)
-            new_listeners.push_back(listeners[i]);
+        if (m_listeners[i] != listener)
+            new_listeners.push_back(m_listeners[i]);
     }
 
-    listeners = new_listeners;
+    m_listeners = new_listeners;
 }
 
 void SignalMonitor::SendMessage(
     SignalMonitorMessageType type, const SignalMonitorValue &value)
 {
-    statusLock.lock();
+    m_statusLock.lock();
     SignalMonitorValue val = value;
-    statusLock.unlock();
+    m_statusLock.unlock();
 
-    QMutexLocker locker(&listenerLock);
-    for (uint i = 0; i < listeners.size(); i++)
+    QMutexLocker locker(&m_listenerLock);
+    for (uint i = 0; i < m_listeners.size(); i++)
     {
-        SignalMonitorListener *listener = listeners[i];
+        SignalMonitorListener *listener = m_listeners[i];
         DVBSignalMonitorListener *dvblistener =
             dynamic_cast<DVBSignalMonitorListener*>(listener);
 
@@ -445,24 +440,24 @@ void SignalMonitor::SendMessage(
 
 void SignalMonitor::UpdateValues(void)
 {
-    QMutexLocker locker(&statusLock);
-    if (scriptStatus.GetValue() < 2)
+    QMutexLocker locker(&m_statusLock);
+    if (m_scriptStatus.GetValue() < 2)
     {
-        scriptStatus.SetValue(channel->GetScriptStatus());
+        m_scriptStatus.SetValue(m_channel->GetScriptStatus());
     }
 }
 
 void SignalMonitor::SendMessageAllGood(void)
 {
-    QMutexLocker locker(&listenerLock);
-    for (uint i = 0; i < listeners.size(); i++)
-        listeners[i]->AllGood();
+    QMutexLocker locker(&m_listenerLock);
+    for (uint i = 0; i < m_listeners.size(); i++)
+        m_listeners[i]->AllGood();
 }
 
 void SignalMonitor::EmitStatus(void)
 {
-    SendMessage(kStatusChannelTuned, scriptStatus);
-    SendMessage(kStatusSignalLock, signalLock);
+    SendMessage(kStatusChannelTuned, m_scriptStatus);
+    SendMessage(kStatusSignalLock, m_signalLock);
     if (HasFlags(kSigMon_WaitForSig))
-        SendMessage(kStatusSignalStrength,    signalStrength);
+        SendMessage(kStatusSignalStrength,    m_signalStrength);
 }
