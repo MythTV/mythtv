@@ -40,7 +40,7 @@ extern "C" {
 #define IVTV_KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
 #define LOC QString("MPEGRec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1).arg(videodevice)
+            .arg(m_tvrec ? m_tvrec->GetInputId() : -1).arg(m_videodevice)
 
 const int MpegRecorder::audRateL1[] =
 {
@@ -375,15 +375,15 @@ void MpegRecorder::SetStrOption(RecordingProfile *profile, const QString &name)
 
 bool MpegRecorder::OpenMpegFileAsInput(void)
 {
-    QByteArray vdevice = videodevice.toLatin1();
+    QByteArray vdevice = m_videodevice.toLatin1();
     chanfd = readfd = open(vdevice.constData(), O_RDONLY);
 
     if (readfd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Can't open MPEG File '%1'")
-                .arg(videodevice) + ENO);
+                .arg(m_videodevice) + ENO);
         m_error = LOC + QString("Can't open MPEG File '%1'")
-                 .arg(videodevice) + ENO;
+                 .arg(m_videodevice) + ENO;
         return false;
     }
     return true;
@@ -394,7 +394,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     // open implicitly starts encoding, so we need the lock..
     QMutexLocker locker(&start_stop_encoding_lock);
 
-    QByteArray vdevice = videodevice.toLatin1();
+    QByteArray vdevice = m_videodevice.toLatin1();
     chanfd = open(vdevice.constData(), O_RDWR);
     if (chanfd < 0)
     {
@@ -967,7 +967,7 @@ void MpegRecorder::run(void)
     {
         int progNum = 1;
         MPEGStreamData *sd = new MPEGStreamData
-                             (progNum, tvrec ? tvrec->GetInputId() : -1,
+                             (progNum, m_tvrec ? m_tvrec->GetInputId() : -1,
                               true);
         sd->SetRecordingType(m_recording_type);
         SetStreamData(sd);
@@ -982,11 +982,11 @@ void MpegRecorder::run(void)
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
         m_request_helper = true;
-        recording = true;
-        recordingWait.wakeAll();
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     unsigned char *buffer = new unsigned char[bufferSize + 1];
@@ -1021,7 +1021,7 @@ void MpegRecorder::run(void)
         StartEncoding();
     }
 
-    QByteArray vdevice = videodevice.toLatin1();
+    QByteArray vdevice = m_videodevice.toLatin1();
     while (IsRecordingRequested() && !IsErrored())
     {
         if (PauseAndWait(100))
@@ -1087,14 +1087,14 @@ void MpegRecorder::run(void)
                 {
                     if (gap)
                     {
-                        QMutexLocker locker(&statisticsLock);
+                        QMutexLocker locker(&m_statisticsLock);
                         QDateTime gap_end(MythDate::current());
 
-                        recordingGaps.push_back(RecordingGap
+                        m_recordingGaps.push_back(RecordingGap
                                                 (gap_start, gap_end));
                         LOG(VB_RECORD, LOG_DEBUG,
                             LOC + QString("Inserted gap %1 dur %2")
-                            .arg(recordingGaps.back().toString())
+                            .arg(m_recordingGaps.back().toString())
                             .arg(gap_start.secsTo(gap_end)));
                         gap = false;
                     }
@@ -1147,9 +1147,9 @@ void MpegRecorder::run(void)
 
             if (len < 0 && !has_select)
             {
-                QMutexLocker locker(&pauseLock);
-                if (request_recording && !request_pause)
-                    unpauseWait.wait(&pauseLock, 25);
+                QMutexLocker locker(&m_pauseLock);
+                if (m_request_recording && !m_request_pause)
+                    m_unpauseWait.wait(&m_pauseLock, 25);
                 continue;
             }
 
@@ -1173,7 +1173,7 @@ void MpegRecorder::run(void)
             else if (len < 0 && errno != EAGAIN)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("error reading from: %1")
-                        .arg(videodevice) + ENO);
+                        .arg(m_videodevice) + ENO);
                 continue;
             }
         }
@@ -1204,7 +1204,7 @@ void MpegRecorder::run(void)
     StopEncoding();
 
     {
-        QMutexLocker locker(&pauseLock);
+        QMutexLocker locker(&m_pauseLock);
         m_request_helper = false;
     }
 
@@ -1227,10 +1227,10 @@ void MpegRecorder::run(void)
         SetStreamData(nullptr);
     }
 
-    QMutexLocker locker(&pauseLock);
-    request_recording = false;
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_request_recording = false;
+    m_recording = false;
+    m_recordingWait.wakeAll();
 }
 
 bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
@@ -1264,9 +1264,9 @@ void MpegRecorder::Reset(void)
 
     m_start_code = 0xffffffff;
 
-    if (curRecording)
+    if (m_curRecording)
     {
-        curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
+        m_curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
     }
     if (m_stream_data)
         m_stream_data->Reset(m_stream_data->DesiredProgram());
@@ -1274,16 +1274,16 @@ void MpegRecorder::Reset(void)
 
 void MpegRecorder::Pause(bool clear)
 {
-    QMutexLocker locker(&pauseLock);
+    QMutexLocker locker(&m_pauseLock);
     cleartimeonpause = clear;
-    paused = false;
-    request_pause = true;
+    m_paused = false;
+    m_request_pause = true;
 }
 
 bool MpegRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
@@ -1291,17 +1291,17 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
             StopEncoding();
 
-            paused = true;
-            pauseWait.wakeAll();
+            m_paused = true;
+            m_pauseWait.wakeAll();
 
-            if (tvrec)
-                tvrec->RecorderPaused();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
 
-        unpauseWait.wait(&pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!request_pause && IsPaused(true))
+    if (!m_request_pause && IsPaused(true))
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait unpause");
 
@@ -1319,7 +1319,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
         if (m_stream_data)
             m_stream_data->Reset(m_stream_data->DesiredProgram());
 
-        paused = false;
+        m_paused = false;
     }
 
     return IsPaused(true);
@@ -1357,7 +1357,7 @@ bool MpegRecorder::StartEncoding(void)
 
     if (readfd < 0)
     {
-        readfd = open(videodevice.toLatin1().constData(), O_RDWR | O_NONBLOCK);
+        readfd = open(m_videodevice.toLatin1().constData(), O_RDWR | O_NONBLOCK);
         if (readfd < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1393,7 +1393,7 @@ bool MpegRecorder::StartEncoding(void)
                 "StartEncoding: read failing, re-opening device: " + ENO);
             close(readfd);
             std::this_thread::sleep_for(std::chrono::milliseconds(2));
-            readfd = open(videodevice.toLatin1().constData(),
+            readfd = open(m_videodevice.toLatin1().constData(),
                           O_RDWR | O_NONBLOCK);
             if (readfd < 0)
             {
@@ -1431,7 +1431,7 @@ bool MpegRecorder::StartEncoding(void)
 
     if (_device_read_buffer)
     {
-        _device_read_buffer->Reset(videodevice.toLatin1().constData(), readfd);
+        _device_read_buffer->Reset(m_videodevice.toLatin1().constData(), readfd);
         _device_read_buffer->SetRequestPause(false);
         _device_read_buffer->Start();
     }

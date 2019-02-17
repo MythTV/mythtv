@@ -29,8 +29,8 @@
 #include "tv_rec.h"
 #include "mythsystemevent.h"
 
-#define LOC ((tvrec) ? \
-    QString("DTVRec[%1]: ").arg(tvrec->GetInputId()) : \
+#define LOC ((m_tvrec) ? \
+    QString("DTVRec[%1]: ").arg(m_tvrec->GetInputId()) : \
     QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
@@ -117,10 +117,10 @@ void DTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
  */
 void DTVRecorder::FinishRecording(void)
 {
-    if (ringBuffer)
-        ringBuffer->WriterFlush();
+    if (m_ringBuffer)
+        m_ringBuffer->WriterFlush();
 
-    if (curRecording)
+    if (m_curRecording)
     {
         SetDuration((int64_t)(m_total_duration * 1000));
         SetTotalFrames(m_frames_written_count);
@@ -132,7 +132,7 @@ void DTVRecorder::FinishRecording(void)
 void DTVRecorder::ResetForNewFile(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "ResetForNewFile(void)");
-    QMutexLocker locker(&positionMapLock);
+    QMutexLocker locker(&m_positionMapLock);
 
     // m_seen_psp and m_h264_parser should
     // not be reset here. This will only be called just as
@@ -159,10 +159,10 @@ void DTVRecorder::ResetForNewFile(void)
 
     //m_pes_synced
     //m_seen_sps
-    positionMap.clear();
-    positionMapDelta.clear();
-    durationMap.clear();
-    durationMapDelta.clear();
+    m_positionMap.clear();
+    m_positionMapDelta.clear();
+    m_durationMap.clear();
+    m_durationMapDelta.clear();
 
     locker.unlock();
     ClearStatistics();
@@ -196,10 +196,10 @@ void DTVRecorder::Reset(void)
 
     m_start_code = 0xffffffff;
 
-    if (curRecording)
+    if (m_curRecording)
     {
-        curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
-        curRecording->ClearPositionMap(MARK_DURATION_MS);
+        m_curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
+        m_curRecording->ClearPositionMap(MARK_DURATION_MS);
     }
 }
 
@@ -244,30 +244,30 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
             m_first_keyframe < 0)
             return;
 
-        if (curRecording && timeOfFirstDataIsSet.testAndSetRelaxed(0,1))
+        if (m_curRecording && m_timeOfFirstDataIsSet.testAndSetRelaxed(0,1))
         {
-            QMutexLocker locker(&statisticsLock);
-            timeOfFirstData = MythDate::current();
-            timeOfLatestData = MythDate::current();
-            timeOfLatestDataTimer.start();
+            QMutexLocker locker(&m_statisticsLock);
+            m_timeOfFirstData = MythDate::current();
+            m_timeOfLatestData = MythDate::current();
+            m_timeOfLatestDataTimer.start();
         }
 
-        int val = timeOfLatestDataCount.fetchAndAddRelaxed(1);
-        int thresh = timeOfLatestDataPacketInterval.fetchAndAddRelaxed(0);
+        int val = m_timeOfLatestDataCount.fetchAndAddRelaxed(1);
+        int thresh = m_timeOfLatestDataPacketInterval.fetchAndAddRelaxed(0);
         if (val > thresh)
         {
-            QMutexLocker locker(&statisticsLock);
-            uint elapsed = timeOfLatestDataTimer.restart();
+            QMutexLocker locker(&m_statisticsLock);
+            uint elapsed = m_timeOfLatestDataTimer.restart();
             int interval = thresh;
             if (elapsed > kTimeOfLatestDataIntervalTarget + 250)
-                interval = timeOfLatestDataPacketInterval
+                interval = m_timeOfLatestDataPacketInterval
                            .fetchAndStoreRelaxed(thresh * 4 / 5);
             else if (elapsed + 250 < kTimeOfLatestDataIntervalTarget)
-                interval = timeOfLatestDataPacketInterval
+                interval = m_timeOfLatestDataPacketInterval
                            .fetchAndStoreRelaxed(thresh * 9 / 8);
 
-            timeOfLatestDataCount.fetchAndStoreRelaxed(1);
-            timeOfLatestData = MythDate::current();
+            m_timeOfLatestDataCount.fetchAndStoreRelaxed(1);
+            m_timeOfLatestData = MythDate::current();
 
             LOG(VB_RECORD, LOG_DEBUG, LOC +
                 QString("Updating timeOfLatestData elapsed(%1) interval(%2)")
@@ -287,14 +287,14 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
         // we have to write them first...
         if (!m_payload_buffer.empty())
         {
-            if (ringBuffer)
-                ringBuffer->Write(&m_payload_buffer[0], m_payload_buffer.size());
+            if (m_ringBuffer)
+                m_ringBuffer->Write(&m_payload_buffer[0], m_payload_buffer.size());
             m_payload_buffer.clear();
         }
     }
 
-    if (ringBuffer && ringBuffer->Write(tspacket.data(), TSPacket::kSize) < 0 &&
-        curRecording && curRecording->GetRecordingStatus() != RecStatus::Failing)
+    if (m_ringBuffer && m_ringBuffer->Write(tspacket.data(), TSPacket::kSize) < 0 &&
+        m_curRecording && m_curRecording->GetRecordingStatus() != RecStatus::Failing)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("BufferedWrite: Writes are failing, "
@@ -382,7 +382,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     if (!tspacket->HasPayload()) // no payload to scan
         return m_first_keyframe >= 0;
 
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return m_first_keyframe >= 0;
 
     // if packet contains start of PES packet, start
@@ -525,9 +525,9 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString
             ("Keyframe @ %1 + %2 = %3")
-            .arg(ringBuffer->GetWritePosition())
+            .arg(m_ringBuffer->GetWritePosition())
             .arg(m_payload_buffer.size())
-            .arg(ringBuffer->GetWritePosition() + m_payload_buffer.size()));
+            .arg(m_ringBuffer->GetWritePosition() + m_payload_buffer.size()));
 
         m_last_keyframe_seen = m_frames_seen_count;
         HandleKeyframe(0);
@@ -537,9 +537,9 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString
             ("Frame @ %1 + %2 = %3")
-            .arg(ringBuffer->GetWritePosition())
+            .arg(m_ringBuffer->GetWritePosition())
             .arg(m_payload_buffer.size())
-            .arg(ringBuffer->GetWritePosition() + m_payload_buffer.size()));
+            .arg(m_ringBuffer->GetWritePosition() + m_payload_buffer.size()));
 
         m_buffer_packets = false;  // We now know if it is a keyframe, or not
         m_frames_seen_count++;
@@ -621,9 +621,9 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
 
         if (diff > gap_threshold && m_first_keyframe >= 0)
         {
-            QMutexLocker locker(&statisticsLock);
+            QMutexLocker locker(&m_statisticsLock);
 
-            recordingGaps.push_back(
+            m_recordingGaps.push_back(
                 RecordingGap(
                     ts_to_qdatetime(
                         m_ts_last[stream_id], m_ts_first[stream_id],
@@ -631,11 +631,11 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
                     ts_to_qdatetime(
                         ts, m_ts_first[stream_id], m_ts_first_dt[stream_id])));
             LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Inserted gap %1 dur %2")
-                .arg(recordingGaps.back().toString()).arg(diff/90000.0));
+                .arg(m_recordingGaps.back().toString()).arg(diff/90000.0));
 
-            if (curRecording && curRecording->GetRecordingStatus() != RecStatus::Failing)
+            if (m_curRecording && m_curRecording->GetRecordingStatus() != RecStatus::Failing)
             {
-                RecordingQuality recq(curRecording, recordingGaps);
+                RecordingQuality recq(m_curRecording, m_recordingGaps);
                 if (recq.IsDamaged())
                 {
                     LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -700,11 +700,11 @@ void DTVRecorder::UpdateFramesWritten(void)
 bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
 {
     bool hasKeyFrame = false;
-    if (!ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
+    if (!m_ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
         return hasKeyFrame;
 
     static const uint64_t msec_per_day = 24 * 60 * 60 * 1000ULL;
-    const double frame_interval = (1000.0 / video_frame_rate);
+    const double frame_interval = (1000.0 / m_video_frame_rate);
     uint64_t elapsed = (uint64_t) max(m_audio_timer.elapsed(), 0);
     uint64_t expected_frame =
         (uint64_t) ((double)elapsed / frame_interval);
@@ -738,7 +738,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
 /// write just 1 key-frame at the start.
 bool DTVRecorder::FindOtherKeyframes(const TSPacket */*tspacket*/)
 {
-    if (!ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
+    if (!m_ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
         return true;
 
     if (m_has_written_other_keyframe)
@@ -764,7 +764,7 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket */*tspacket*/)
  */
 void DTVRecorder::HandleKeyframe(int64_t extra)
 {
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return;
 
     // Perform ringbuffer switch if needed.
@@ -774,27 +774,27 @@ void DTVRecorder::HandleKeyframe(int64_t extra)
     if (m_first_keyframe < 0)
     {
         m_first_keyframe = frameNum;
-        SendMythSystemRecEvent("REC_STARTED_WRITING", curRecording);
+        SendMythSystemRecEvent("REC_STARTED_WRITING", m_curRecording);
     }
 
     // Add key frame to position map
-    positionMapLock.lock();
-    if (!positionMap.contains(frameNum))
+    m_positionMapLock.lock();
+    if (!m_positionMap.contains(frameNum))
     {
-        int64_t startpos = ringBuffer->GetWritePosition() + extra;
+        int64_t startpos = m_ringBuffer->GetWritePosition() + extra;
 
         // Don't put negative offsets into the database, they get munged into
         // MAX_INT64 - offset, which is an exceedingly large number, and
         // certainly not valid.
         if (startpos >= 0)
         {
-            positionMapDelta[frameNum] = startpos;
-            positionMap[frameNum]      = startpos;
-            durationMap[frameNum]      = llround(m_total_duration);
-            durationMapDelta[frameNum] = llround(m_total_duration);
+            m_positionMapDelta[frameNum] = startpos;
+            m_positionMap[frameNum]      = startpos;
+            m_durationMap[frameNum]      = llround(m_total_duration);
+            m_durationMapDelta[frameNum] = llround(m_total_duration);
         }
     }
-    positionMapLock.unlock();
+    m_positionMapLock.unlock();
 }
 
 /** \fn DTVRecorder::FindH264Keyframes(const TSPacket*)
@@ -807,7 +807,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     if (!tspacket->HasPayload()) // no payload to scan
         return m_first_keyframe >= 0;
 
-    if (!ringBuffer)
+    if (!m_ringBuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "FindH264Keyframes: No ringbuffer");
         return m_first_keyframe >= 0;
@@ -901,7 +901,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
 
         uint32_t bytes_used = m_h264_parser.addBytes
                               (tspacket->data() + i, TSPacket::kSize - i,
-                               ringBuffer->GetWritePosition());
+                               m_ringBuffer->GetWritePosition());
         i += (bytes_used - 1);
 
         if (m_h264_parser.stateChanged())
@@ -937,9 +937,9 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString
             ("Keyframe @ %1 + %2 = %3 AU %4")
-            .arg(ringBuffer->GetWritePosition())
+            .arg(m_ringBuffer->GetWritePosition())
             .arg(m_payload_buffer.size())
-            .arg(ringBuffer->GetWritePosition() + m_payload_buffer.size())
+            .arg(m_ringBuffer->GetWritePosition() + m_payload_buffer.size())
             .arg(m_h264_parser.keyframeAUstreamOffset()));
 
         m_last_keyframe_seen = m_frames_seen_count;
@@ -950,9 +950,9 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString
             ("Frame @ %1 + %2 = %3 AU %4")
-            .arg(ringBuffer->GetWritePosition())
+            .arg(m_ringBuffer->GetWritePosition())
             .arg(m_payload_buffer.size())
-            .arg(ringBuffer->GetWritePosition() + m_payload_buffer.size())
+            .arg(m_ringBuffer->GetWritePosition() + m_payload_buffer.size())
             .arg(m_h264_parser.keyframeAUstreamOffset()));
 
         m_buffer_packets = false;  // We now know if this is a keyframe
@@ -1010,21 +1010,21 @@ void DTVRecorder::HandleH264Keyframe(void)
     {
         m_first_keyframe = frameNum;
         startpos = 0;
-        SendMythSystemRecEvent("REC_STARTED_WRITING", curRecording);
+        SendMythSystemRecEvent("REC_STARTED_WRITING", m_curRecording);
     }
     else
         startpos = m_h264_parser.keyframeAUstreamOffset();
 
     // Add key frame to position map
-    positionMapLock.lock();
-    if (!positionMap.contains(frameNum))
+    m_positionMapLock.lock();
+    if (!m_positionMap.contains(frameNum))
     {
-        positionMapDelta[frameNum] = startpos;
-        positionMap[frameNum]      = startpos;
-        durationMap[frameNum]      = llround(m_total_duration);
-        durationMapDelta[frameNum] = llround(m_total_duration);
+        m_positionMapDelta[frameNum] = startpos;
+        m_positionMap[frameNum]      = startpos;
+        m_durationMap[frameNum]      = llround(m_total_duration);
+        m_durationMapDelta[frameNum] = llround(m_total_duration);
     }
-    positionMapLock.unlock();
+    m_positionMapLock.unlock();
 }
 
 void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
@@ -1176,16 +1176,16 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             // buffered packet[s] we have to write them first...
             if (!m_payload_buffer.empty())
             {
-                if (ringBuffer)
+                if (m_ringBuffer)
                 {
-                    ringBuffer->Write(
+                    m_ringBuffer->Write(
                         &m_payload_buffer[0], m_payload_buffer.size());
                 }
                 m_payload_buffer.clear();
             }
 
-            if (ringBuffer)
-                ringBuffer->Write(bufstart, (bufptr - bufstart));
+            if (m_ringBuffer)
+                m_ringBuffer->Write(bufstart, (bufptr - bufstart));
 
             bufstart = bufptr;
         }
@@ -1289,7 +1289,7 @@ void DTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat,
         return;
     }
 
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return;
 
     uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
@@ -1391,7 +1391,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
         }
 
 //         LOG(VB_GENERAL, LOG_DEBUG, QString("Recording(%1): Stream #%2: %3 ")
-//             .arg(curRecording ? QString::number(curRecording->GetRecordingID()) : "")
+//             .arg(m_curRecording ? QString::number(m_curRecording->GetRecordingID()) : "")
 //             .arg(i)
 //             .arg(StreamID::GetDescription(pmt->StreamType(i))));
         m_stream_id[pmt->StreamPID(i)] = pmt->StreamType(i);
@@ -1403,7 +1403,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
     if(pmt->PCRPID() != 0x1fff && pmt->FindPID(pmt->PCRPID()) == -1)
         m_stream_id[pmt->PCRPID()] = StreamID::PrivSec;
 
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return;
 
     uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
@@ -1480,7 +1480,7 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
 
 bool DTVRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 {
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return true;
 
     uint streamType = m_stream_id[tspacket.PID()];
@@ -1490,8 +1490,8 @@ bool DTVRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
         if (m_buffer_packets && m_first_keyframe >= 0 && !m_payload_buffer.empty())
         {
             // Flush the buffer
-            if (ringBuffer)
-                ringBuffer->Write(&m_payload_buffer[0], m_payload_buffer.size());
+            if (m_ringBuffer)
+                m_ringBuffer->Write(&m_payload_buffer[0], m_payload_buffer.size());
             m_payload_buffer.clear();
         }
 
@@ -1513,7 +1513,7 @@ bool DTVRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 
 bool DTVRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
 {
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return true;
 
     if (tspacket.HasPayload() && tspacket.PayloadStart())
@@ -1521,8 +1521,8 @@ bool DTVRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
         if (m_buffer_packets && m_first_keyframe >= 0 && !m_payload_buffer.empty())
         {
             // Flush the buffer
-            if (ringBuffer)
-                ringBuffer->Write(&m_payload_buffer[0], m_payload_buffer.size());
+            if (m_ringBuffer)
+                m_ringBuffer->Write(&m_payload_buffer[0], m_payload_buffer.size());
             m_payload_buffer.clear();
         }
 

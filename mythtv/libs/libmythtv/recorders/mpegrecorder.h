@@ -36,7 +36,7 @@ class MpegRecorder : public V4LRecorder,
     bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
     bool IsRecording(void) override // RecorderBase
-        { return recording; }
+        { return m_recording; }
 
     bool Open(void);
     int GetVideoFd(void) override // DTVRecorder
@@ -47,7 +47,7 @@ class MpegRecorder : public V4LRecorder,
 
     // DeviceReaderCB
     void ReaderPaused(int /*fd*/) override // DeviceReaderCB
-        { pauseWait.wakeAll(); }
+        { m_pauseWait.wakeAll(); }
     void PriorityEvent(int /*fd*/) override { } //DeviceReaderCB
 
   private:

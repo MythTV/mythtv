@@ -47,14 +47,6 @@ using namespace std;
 
 #define LOC QString("ChannelBase[%1]: ").arg(m_inputid)
 
-ChannelBase::ChannelBase(TVRec *parent) :
-    m_pParent(parent), m_curchannelname(""),
-    m_commfree(false), m_inputid(0), m_sourceid(0), m_name(""),
-    m_startChanNum(""), m_externalChanger(""), m_tuneToChannel(""),
-    m_system(nullptr), m_system_status(0)
-{
-}
-
 ChannelBase::~ChannelBase(void)
 {
     QMutexLocker locker(&m_system_lock);

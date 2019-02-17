@@ -21,17 +21,17 @@
 #include "tv_rec.h"
 
 #define TVREC_CARDNUM \
-        ((tvrec != nullptr) ? QString::number(tvrec->GetInputId()) : "NULL")
+        ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("V4LRec[%1](%2): ") \
-            .arg(TVREC_CARDNUM).arg(videodevice)
+            .arg(TVREC_CARDNUM).arg(m_videodevice)
 
 V4LRecorder::~V4LRecorder()
 {
     {
-        QMutexLocker locker(&pauseLock);
+        QMutexLocker locker(&m_pauseLock);
         m_request_helper = false;
-        unpauseWait.wakeAll();
+        m_unpauseWait.wakeAll();
     }
 
     if (m_vbi_thread)
@@ -52,8 +52,8 @@ void V4LRecorder::StopRecording(void)
 
 bool V4LRecorder::IsHelperRequested(void) const
 {
-    QMutexLocker locker(&pauseLock);
-    return m_request_helper && request_recording;
+    QMutexLocker locker(&m_pauseLock);
+    return m_request_helper && m_request_recording;
 }
 
 void V4LRecorder::SetOption(const QString &name, const QString &value)

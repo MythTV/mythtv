@@ -34,7 +34,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("V4L2Rec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1) \
+            .arg(m_tvrec ? m_tvrec->GetInputId() : -1) \
             .arg(m_channel->GetDevice())
 
 V4L2encRecorder::V4L2encRecorder(TVRec *rec, V4LChannel *channel) :
@@ -147,10 +147,10 @@ void V4L2encRecorder::run(void)
     m_stream_handler->Configure();
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     if (m_channel->HasGeneratedPAT())
@@ -225,9 +225,9 @@ void V4L2encRecorder::run(void)
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- end");
 }
@@ -246,7 +246,7 @@ bool V4L2encRecorder::Open(void)
 
     m_stream_handler = V4L2encStreamHandler::Get(m_channel->GetDevice(),
                                          m_channel->GetAudioDevice().toInt(),
-                                         tvrec ? tvrec->GetInputId() : -1);
+                                         m_tvrec ? m_tvrec->GetInputId() : -1);
     if (!m_stream_handler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -260,7 +260,7 @@ bool V4L2encRecorder::Open(void)
             QString("Open() -- Failed to open recorder: %1")
             .arg(m_stream_handler->ErrorString()));
         V4L2encStreamHandler::Return(m_stream_handler,
-                                     tvrec ? tvrec->GetInputId() : -1);
+                                     m_tvrec ? m_tvrec->GetInputId() : -1);
         return false;
     }
 
@@ -276,7 +276,7 @@ void V4L2encRecorder::Close(void)
 
     if (IsOpen())
         V4L2encStreamHandler::Return(m_stream_handler,
-                                     tvrec ? tvrec->GetInputId() : -1);
+                                     m_tvrec ? m_tvrec->GetInputId() : -1);
 
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
@@ -284,8 +284,8 @@ void V4L2encRecorder::Close(void)
 
 bool V4L2encRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
@@ -293,11 +293,11 @@ bool V4L2encRecorder::PauseAndWait(int timeout)
 
             StopEncoding();
 
-            paused = true;
-            pauseWait.wakeAll();
+            m_paused = true;
+            m_pauseWait.wakeAll();
 
-            if (tvrec)
-                tvrec->RecorderPaused();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
     }
     else if (IsPaused(true))
@@ -308,11 +308,11 @@ bool V4L2encRecorder::PauseAndWait(int timeout)
         if (m_stream_data)
             m_stream_data->Reset(m_stream_data->DesiredProgram());
 
-        paused = false;
+        m_paused = false;
     }
 
     // Always wait a little bit, unless woken up
-    unpauseWait.wait(&pauseLock, timeout);
+    m_unpauseWait.wait(&m_pauseLock, timeout);
 
     return IsPaused(true);
 }

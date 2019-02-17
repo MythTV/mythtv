@@ -13,7 +13,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("FireRecBase[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1) \
+            .arg(m_tvrec ? m_tvrec->GetInputId() : -1) \
             .arg(m_channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
@@ -68,10 +68,10 @@ void FirewireRecorder::run(void)
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     StartStreaming();
@@ -86,19 +86,19 @@ void FirewireRecorder::run(void)
 
         {   // sleep 1 seconds unless StopRecording() or Unpause() is called,
             // just to avoid running this too often.
-            QMutexLocker locker(&pauseLock);
-            if (!request_recording || request_pause)
+            QMutexLocker locker(&m_pauseLock);
+            if (!m_request_recording || m_request_pause)
                 continue;
-            unpauseWait.wait(&pauseLock, 1000);
+            m_unpauseWait.wait(&m_pauseLock, 1000);
         }
     }
 
     StopStreaming();
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 }
 
 void FirewireRecorder::AddData(const unsigned char *data, uint len)
@@ -188,29 +188,29 @@ void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 // documented in recorderbase.cpp
 bool FirewireRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("PauseAndWait(%1) -- pause").arg(timeout));
         if (!IsPaused(true))
         {
             StopStreaming();
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
+            m_paused = true;
+            m_pauseWait.wakeAll();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
-        unpauseWait.wait(&pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!request_pause && IsPaused(true))
+    if (!m_request_pause && IsPaused(true))
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("PauseAndWait(%1) -- unpause").arg(timeout));
-        paused = false;
+        m_paused = false;
         StartStreaming();
-        unpauseWait.wakeAll();
+        m_unpauseWait.wakeAll();
     }
 
     return IsPaused(true);

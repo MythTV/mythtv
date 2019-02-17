@@ -18,7 +18,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("HDHRRec[%1]: ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1)
+            .arg(m_tvrec ? m_tvrec->GetInputId() : -1)
 
 bool HDHRRecorder::Open(void)
 {
@@ -45,7 +45,7 @@ void HDHRRecorder::Close(void)
 
     if (IsOpen())
         HDHRStreamHandler::Return(m_stream_handler,
-                                  (tvrec ? tvrec->GetInputId() : -1));
+                                  (m_tvrec ? m_tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
@@ -53,7 +53,7 @@ void HDHRRecorder::Close(void)
 void HDHRRecorder::StartNewFile(void)
 {
     if (m_record_mpts)
-        m_stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+        m_stream_handler->AddNamedOutputFile(m_ringBuffer->GetFilename());
 
     // Make sure the first things in the file are a PAT & PMT
     HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
@@ -73,10 +73,10 @@ void HDHRRecorder::run(void)
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     StartNewFile();
@@ -84,7 +84,7 @@ void HDHRRecorder::run(void)
     m_stream_data->AddAVListener(this);
     m_stream_data->AddWritingListener(this);
     m_stream_handler->AddListener(m_stream_data, false, false,
-                         (m_record_mpts) ? ringBuffer->GetFilename() : QString());
+                         (m_record_mpts) ? m_ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -96,10 +96,10 @@ void HDHRRecorder::run(void)
 
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
-            QMutexLocker locker(&pauseLock);
-            if (!request_recording || request_pause)
+            QMutexLocker locker(&m_pauseLock);
+            if (!m_request_recording || m_request_pause)
                 continue;
-            unpauseWait.wait(&pauseLock, 100);
+            m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
         if (!m_input_pmt)
@@ -127,36 +127,36 @@ void HDHRRecorder::run(void)
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }
 
 bool HDHRRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
             m_stream_handler->RemoveListener(m_stream_data);
 
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
+            m_paused = true;
+            m_pauseWait.wakeAll();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
 
-        unpauseWait.wait(&pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!request_pause && IsPaused(true))
+    if (!m_request_pause && IsPaused(true))
     {
-        paused = false;
+        m_paused = false;
         m_stream_handler->AddListener(m_stream_data);
-        unpauseWait.wakeAll();
+        m_unpauseWait.wakeAll();
     }
 
     return IsPaused(true);

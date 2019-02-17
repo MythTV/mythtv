@@ -58,10 +58,10 @@ void ExternalRecorder::run(void)
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     if (m_channel->HasGeneratedPAT())
@@ -116,9 +116,9 @@ void ExternalRecorder::run(void)
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 }
 
 bool ExternalRecorder::Open(void)
@@ -144,7 +144,7 @@ bool ExternalRecorder::Open(void)
         else
         {
             ExternalStreamHandler::Return(m_stream_handler,
-                                          (tvrec ? tvrec->GetInputId() : -1));
+                                          (m_tvrec ? m_tvrec->GetInputId() : -1));
 
             return false;
         }
@@ -163,15 +163,15 @@ void ExternalRecorder::Close(void)
 
     if (IsOpen())
         ExternalStreamHandler::Return(m_stream_handler,
-                                      (tvrec ? tvrec->GetInputId() : -1));
+                                      (m_tvrec ? m_tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 bool ExternalRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
@@ -179,11 +179,11 @@ bool ExternalRecorder::PauseAndWait(int timeout)
 
             StopStreaming();
 
-            paused = true;
-            pauseWait.wakeAll();
+            m_paused = true;
+            m_pauseWait.wakeAll();
 
-            if (tvrec)
-                tvrec->RecorderPaused();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
     }
     else if (IsPaused(true))
@@ -195,11 +195,11 @@ bool ExternalRecorder::PauseAndWait(int timeout)
         if (m_stream_data)
             m_stream_data->Reset(m_stream_data->DesiredProgram());
 
-        paused = false;
+        m_paused = false;
     }
 
     // Always wait a little bit, unless woken up
-    unpauseWait.wait(&pauseLock, timeout);
+    m_unpauseWait.wait(&m_pauseLock, timeout);
 
     return IsPaused(true);
 }

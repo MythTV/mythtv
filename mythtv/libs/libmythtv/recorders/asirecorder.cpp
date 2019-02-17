@@ -30,7 +30,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("ASIRec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1) \
+            .arg(m_tvrec ? m_tvrec->GetInputId() : -1) \
             .arg(m_channel->GetDevice())
 
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
@@ -40,7 +40,7 @@ ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
     {
         // MPTS only.  Use TSStreamData to write out unfiltered data
         LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
-        SetStreamData(new TSStreamData(tvrec ? tvrec->GetInputId() : -1));
+        SetStreamData(new TSStreamData(m_tvrec ? m_tvrec->GetInputId() : -1));
         m_record_mpts_only = true;
         m_record_mpts = false;
     }
@@ -71,7 +71,7 @@ void ASIRecorder::StartNewFile(void)
     if (!m_record_mpts_only)
     {
         if (m_record_mpts)
-            m_stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+            m_stream_handler->AddNamedOutputFile(m_ringBuffer->GetFilename());
 
         // Make sure the first things in the file are a PAT & PMT
         HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
@@ -98,10 +98,10 @@ void ASIRecorder::run(void)
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     if (m_channel->HasGeneratedPAT())
@@ -123,7 +123,7 @@ void ASIRecorder::run(void)
     m_stream_data->AddWritingListener(this);
     m_stream_handler->AddListener(
         m_stream_data, false, true,
-        (m_record_mpts) ? ringBuffer->GetFilename() : QString());
+        (m_record_mpts) ? m_ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -132,10 +132,10 @@ void ASIRecorder::run(void)
 
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
-            QMutexLocker locker(&pauseLock);
-            if (!request_recording || request_pause)
+            QMutexLocker locker(&m_pauseLock);
+            if (!m_request_recording || m_request_pause)
                 continue;
-            unpauseWait.wait(&pauseLock, 100);
+            m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
         if (!m_input_pmt && !m_record_mpts_only)
@@ -161,9 +161,9 @@ void ASIRecorder::run(void)
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 }
 
 bool ASIRecorder::Open(void)
@@ -177,7 +177,7 @@ bool ASIRecorder::Open(void)
     ResetForNewFile();
 
     m_stream_handler = ASIStreamHandler::Get(m_channel->GetDevice(),
-                                             tvrec ? tvrec->GetInputId() : -1);
+                                             m_tvrec ? m_tvrec->GetInputId() : -1);
 
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Opened successfully");
@@ -196,7 +196,7 @@ void ASIRecorder::Close(void)
 
     if (IsOpen())
         ASIStreamHandler::Return(m_stream_handler,
-                                 tvrec ? tvrec->GetInputId() : -1);
+                                 m_tvrec ? m_tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
