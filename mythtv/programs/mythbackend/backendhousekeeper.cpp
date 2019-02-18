@@ -651,9 +651,7 @@ bool MythFillDatabaseTask::UseSuggestedTime(void)
 //         // TODO: this is really cludgy. there has to be a better way to test
 //         result.prepare("SELECT COUNT(*) FROM videosource"
 //                        " WHERE xmltvgrabber IN"
-//                        "        ( 'datadirect',"
-//                        "          'technovera',"
-//                        "          'schedulesdirect1' );");
+//                        "        ( 'technovera' );");
 //         if ((result.exec()) &&
 //             (result.next()) &&
 //             (result.value(0).toInt() > 0))

@@ -515,7 +515,7 @@ void StatusBox::doListingsStatus()
 
     QDateTime mfdLastRunStart, mfdLastRunEnd, mfdNextRunStart;
     QString mfdLastRunStatus;
-    QString querytext, DataDirectMessage;
+    QString querytext;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
 
@@ -535,7 +535,6 @@ void StatusBox::doListingsStatus()
     mfdNextRunStart = MythDate::fromString(tmp);
 
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
-    DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
 
     AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
                .arg(MYTH_SOURCE_VERSION), helpmsg);
@@ -590,13 +589,6 @@ void StatusBox::doListingsStatus()
     if (DaysOfData <= 3)
         AddLogLine(tr("WARNING: is mythfilldatabase running?"), helpmsg,
                    "", "", "warning");
-
-    if (!DataDirectMessage.isEmpty())
-    {
-        AddLogLine(tr("DataDirect Status: "), helpmsg);
-        AddLogLine(DataDirectMessage, helpmsg);
-    }
-
 }
 
 void StatusBox::doScheduleStatus()

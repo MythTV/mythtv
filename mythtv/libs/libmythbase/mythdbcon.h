@@ -65,7 +65,7 @@ class MBASE_PUBLIC MDBManager
     void pushConnection(MSqlDatabase *db);
 
     MSqlDatabase *getSchedCon(void);
-    MSqlDatabase *getDDCon(void);
+    MSqlDatabase *getChannelCon(void);
 
   private:
     MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
@@ -82,7 +82,7 @@ class MBASE_PUBLIC MDBManager
     int m_connCount          {0};
 
     MSqlDatabase *m_schedCon {nullptr};
-    MSqlDatabase *m_DDCon    {nullptr};
+    MSqlDatabase *m_channelCon {nullptr};
     QHash<QThread*, DBList> m_static_pool;
 };
 
@@ -208,7 +208,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     static MSqlQueryInfo SchedCon();
 
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
-    static MSqlQueryInfo DDCon();
+    static MSqlQueryInfo ChannelCon();
 
   private:
     // Only QSql::In is supported as a param type and only named params...

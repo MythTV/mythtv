@@ -275,7 +275,7 @@ void ChannelScanSM::HandleAllGood(void)
     }
     else
     {
-        // nothing to do here, XMLTV & DataDirect have better info
+        // nothing to do here, XMLTV has better info
     }
 
     m_scanMonitor->ScanAppendTextToLog(msg);

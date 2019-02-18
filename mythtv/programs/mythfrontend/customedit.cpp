@@ -428,7 +428,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("All matches for a genre (Data Direct)");
+    rule.title = tr("All matches for a genre (Schedules Direct)");
     rule.subtitle = "LEFT JOIN programgenres ON "
                     "program.chanid = programgenres.chanid AND "
                     "program.starttime = programgenres.starttime ";
@@ -439,7 +439,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Limit by MPAA or VCHIP rating (Data Direct)");
+    rule.title = tr("Limit by MPAA or VCHIP rating (Schedules Direct)");
     rule.subtitle = "LEFT JOIN programrating ON "
                     "program.chanid = programrating.chanid AND "
                     "program.starttime = programrating.starttime ";
@@ -468,7 +468,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Person named in the credits (Data Direct)");
+    rule.title = tr("Person named in the credits (Schedules Direct)");
     rule.subtitle = ", people, credits";
     rule.description = "people.name = 'Tom Hanks' \n"
                        "AND credits.person = people.person \n"
@@ -535,7 +535,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("First Episodes (complete example for Data Direct)");
+    rule.title = tr("First Episodes (complete example for Schedules Direct)");
     rule.subtitle.clear();
     rule.description = "program.first > 0 \n"
                   "AND program.programid LIKE 'EP%0001' \n"

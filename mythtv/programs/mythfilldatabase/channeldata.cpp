@@ -41,7 +41,7 @@ static void get_atsc_stuff(QString channum, int sourceid, int freqid,
     freq = get_center_frequency("atsc", "vsb8", "us", freqid);
 
     // Check if this is connected to an HDTV card.
-    MSqlQuery query(MSqlQuery::DDCon());
+    MSqlQuery query(MSqlQuery::ChannelCon());
     query.prepare(
         "SELECT cardtype "
         "FROM capturecard "
@@ -72,8 +72,7 @@ bool ChannelData::insert_chan(uint sourceid)
             isEncoder    = CardUtil::IsEncoder(m_cardType);
             isUnscanable = CardUtil::IsUnscanable(m_cardType);
         }
-        insert_channels = (isCableCard || isEncoder || isUnscanable) &&
-                           !m_removeNewChannels;
+        insert_channels = (isCableCard || isEncoder || isUnscanable);
     }
 
     return insert_channels;
