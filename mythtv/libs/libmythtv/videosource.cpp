@@ -1294,7 +1294,7 @@ void FirewireModel::SetGUID(const QString &_guid)
 
 #ifdef USING_FIREWIRE
     AVCInfo info = guid->GetAVCInfo(_guid);
-    QString model = FirewireDevice::GetModelName(info.vendorid, info.modelid);
+    QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
     setValue(max(getValueIndex(model), 0));
 #endif // USING_FIREWIRE
 }
@@ -1306,7 +1306,7 @@ void FirewireDesc::SetGUID(const QString &_guid)
     setLabel(tr("Description"));
 
 #ifdef USING_FIREWIRE
-    QString name = guid->GetAVCInfo(_guid).product_name;
+    QString name = guid->GetAVCInfo(_guid).m_product_name;
     name.replace("Scientific-Atlanta", "SA");
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
