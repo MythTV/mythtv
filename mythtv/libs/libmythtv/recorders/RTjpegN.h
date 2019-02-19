@@ -122,8 +122,8 @@ private:
     int32_t Cwidth;
     int32_t Ysize;
     int32_t Csize;
-    int16_t *old;
-    int16_t *old_start;
+    int16_t *old {nullptr};
+    int16_t *old_start {nullptr};
     int key_count;
 
     int width;

@@ -44,7 +44,7 @@ class AudioInputOSS : public AudioInput
 
     private:
         QByteArray m_device_name;
-        int dsp_fd;
+    int dsp_fd {-1};
 };
 #endif /* _AUDIOINPUTOSS_H_ */
 

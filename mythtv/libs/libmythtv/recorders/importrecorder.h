@@ -23,8 +23,8 @@ class MythCommFlagPlayer;
 class ImportRecorder : public DTVRecorder
 {
   public:
-    explicit ImportRecorder(TVRec*);
-    ~ImportRecorder();
+    explicit ImportRecorder(TVRec*rec) : DTVRecorder(rec) {}
+    ~ImportRecorder() = default;
 
     // RecorderBase
     void SetOptionsFromProfile(RecordingProfile *profile,
@@ -45,9 +45,9 @@ class ImportRecorder : public DTVRecorder
     void UpdateRecSize();
 
   private:
-    int             _import_fd;
-    MythCommFlagPlayer *m_cfp;
-    long long m_nfc;
+    int                 m_import_fd {-1};
+    MythCommFlagPlayer *m_cfp       {nullptr};
+    long long           m_nfc       {0};
 };
 
 #endif // _IMPORT_RECORDER_H_

@@ -102,7 +102,6 @@ HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning, int inputid)
 {
     m_hls        = new HLSReader();
     m_readbuffer = new uint8_t[BUFFER_SIZE];
-    m_throttle   = true;
 }
 
 HLSStreamHandler::~HLSStreamHandler(void)

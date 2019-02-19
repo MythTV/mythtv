@@ -45,15 +45,6 @@
 #define LOC QString("ImportRec[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(m_videodevice)
 
-ImportRecorder::ImportRecorder(TVRec *rec) :
-    DTVRecorder(rec), _import_fd(-1), m_cfp(nullptr), m_nfc(0)
-{
-}
-
-ImportRecorder::~ImportRecorder()
-{
-}
-
 void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                            const QString &videodev,
                                            const QString &audiodev,
@@ -125,7 +116,7 @@ void ImportRecorder::run(void)
     m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
 
     // build seek table
-    if (_import_fd && IsRecordingRequested() && !IsErrored())
+    if (m_import_fd && IsRecordingRequested() && !IsErrored())
     {
         MythCommFlagPlayer *cfp =
             new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
@@ -166,7 +157,7 @@ void ImportRecorder::run(void)
 
 bool ImportRecorder::Open(void)
 {
-    if (_import_fd >= 0)   // already open
+    if (m_import_fd >= 0)   // already open
         return true;
 
     if (!m_curRecording)
@@ -233,21 +224,21 @@ bool ImportRecorder::Open(void)
         return false;
     }
 
-    _import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
-    if (_import_fd < 0)
+    m_import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
+    if (m_import_fd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Couldn't open '%1'").arg(fn) + ENO);
     }
 
-    return _import_fd >= 0;
+    return m_import_fd >= 0;
 }
 
 void ImportRecorder::Close(void)
 {
-    if (_import_fd >= 0)
+    if (m_import_fd >= 0)
     {
-        close(_import_fd);
-        _import_fd = -1;
+        close(m_import_fd);
+        m_import_fd = -1;
     }
 }

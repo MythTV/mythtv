@@ -21,9 +21,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
                                          V4LChannel *_channel,
                                          bool _release_stream,
                                          uint64_t _flags)
-    : SignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      m_usingv4l2(false), m_version(0), m_width(0), m_stable_time(2000),
-      m_lock_cnt(0), m_log_idx(40)
+    : SignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     int videofd = m_channel->GetFd();
     if (videofd >= 0)

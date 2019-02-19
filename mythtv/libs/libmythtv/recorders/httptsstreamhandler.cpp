@@ -91,7 +91,6 @@ void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref, int inputid)
 HTTPTSStreamHandler::HTTPTSStreamHandler(const IPTVTuningData& tuning,
                                          int inputid)
     : IPTVStreamHandler(tuning, inputid)
-    , m_reader(nullptr)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "ctor");
 }
