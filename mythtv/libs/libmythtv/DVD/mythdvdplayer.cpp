@@ -65,7 +65,7 @@ void MythDVDPlayer::EnableCaptions(uint mode, bool osd_msg)
             StreamInfo stream = decoder->GetTrackInfo(kTrackTypeSubtitle,
                                                       track);
             player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle,
-                                                stream.stream_id);
+                                                stream.m_stream_id);
         }
     }
     MythPlayer::EnableCaptions(mode, osd_msg);
@@ -537,7 +537,7 @@ int MythDVDPlayer::SetTrack(uint type, int trackNo)
     if (kTrackTypeAudio == type)
     {
         StreamInfo stream = decoder->GetTrackInfo(type, trackNo);
-        player_ctx->buffer->DVD()->SetTrack(type, stream.stream_id);
+        player_ctx->buffer->DVD()->SetTrack(type, stream.m_stream_id);
     }
 
     return MythPlayer::SetTrack(type, trackNo);

@@ -68,8 +68,8 @@ void AvFormatDecoderDVD::UpdateFramesPlayed(void)
     if (!ringBuffer->IsDVD())
         return;
 
-    long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
-    framesPlayed = framesRead = currentpos ;
+    long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * m_fps);
+    m_framesPlayed = m_framesRead = currentpos ;
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
@@ -134,7 +134,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
 
                         case DVDNAV_WAIT:
                         case DVDNAV_STILL_FRAME:
-                            if (storedPackets.count() > 0)
+                            if (m_storedPackets.count() > 0)
                             {
                                 // Ringbuffer is waiting for the player
                                 // to empty its buffers but we have one or
@@ -148,7 +148,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                                 storePacket = false;
 
                                 // Return the first buffered packet
-                                AVPacket *storedPkt = storedPackets.takeFirst();
+                                AVPacket *storedPkt = m_storedPackets.takeFirst();
                                 av_packet_ref(pkt, storedPkt);
                                 av_packet_unref(storedPkt);
                                 delete storedPkt;
@@ -195,7 +195,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                     // the packets through that let us find it.
                     gotPacket = false;
 
-                    AVStream *curstream = ic->streams[pkt->stream_index];
+                    AVStream *curstream = m_ic->streams[pkt->stream_index];
 
                     if ((curstream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) ||
                         (curstream->codecpar->codec_id == AV_CODEC_ID_DVD_NAV))
@@ -421,10 +421,10 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
     if (!ringBuffer->IsDVD())
         return;
 
-    if (tracks[kTrackTypeAudio].size() > 1)
+    if (m_tracks[kTrackTypeAudio].size() > 1)
     {
-        stable_sort(tracks[kTrackTypeAudio].begin(),
-                    tracks[kTrackTypeAudio].end());
+        stable_sort(m_tracks[kTrackTypeAudio].begin(),
+                    m_tracks[kTrackTypeAudio].end());
 
         int trackNo = -1;
         int dvdTrack = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
@@ -433,16 +433,16 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("DVD Audio Track Map Stream id #%1, av_stream_idx %2, MPEG stream 0x%3, lang %4")
-                    .arg(tracks[kTrackTypeAudio][i].stream_id)
-                    .arg(tracks[kTrackTypeAudio][i].av_stream_index)
-                    .arg(ic->streams[tracks[kTrackTypeAudio][i].av_stream_index]->id,0,16)
-                    .arg(iso639_key_toName(tracks[kTrackTypeAudio][i].language)));
+                    .arg(m_tracks[kTrackTypeAudio][i].m_stream_id)
+                    .arg(m_tracks[kTrackTypeAudio][i].m_av_stream_index)
+                    .arg(m_ic->streams[m_tracks[kTrackTypeAudio][i].m_av_stream_index]->id,0,16)
+                    .arg(iso639_key_toName(m_tracks[kTrackTypeAudio][i].m_language)));
 
             // Find the audio track in our list that maps to the
             // selected track in the ringbuffer (the ringbuffer's
             // list should be in the same order but can have gaps,
             // so we look for the track with the same index)
-            if (tracks[kTrackTypeAudio][i].stream_id == dvdTrack)
+            if (m_tracks[kTrackTypeAudio][i].m_stream_id == dvdTrack)
                 trackNo = i;
         }
 
@@ -456,7 +456,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
             SetTrack(kTrackTypeAudio, trackNo);
     }
 
-    if (tracks[kTrackTypeSubtitle].size() > 0)
+    if (m_tracks[kTrackTypeSubtitle].size() > 0)
     {
         map<int,uint> lang_sub_cnt;
         map<int,int>  stream2idx;
@@ -465,7 +465,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
         // of the subtitle streams that have been found so far.
         for (uint n = 0; n < GetTrackCount(kTrackTypeSubtitle); n++)
         {
-            int stream_id = tracks[kTrackTypeSubtitle][n].stream_id & 0x1f;
+            int stream_id = m_tracks[kTrackTypeSubtitle][n].m_stream_id & 0x1f;
 
             stream2idx[stream_id] = n;
         }
@@ -499,18 +499,18 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
                     else
                     {
                         // Otherwise use the real data
-                        filteredTracks.push_back(tracks[kTrackTypeSubtitle][trackNo]);
-                        filteredTracks.back().stream_id &= 0x1f;
-                        filteredTracks.back().language = lang;
-                        filteredTracks.back().language_index = lang_indx;
+                        filteredTracks.push_back(m_tracks[kTrackTypeSubtitle][trackNo]);
+                        filteredTracks.back().m_stream_id &= 0x1f;
+                        filteredTracks.back().m_language = lang;
+                        filteredTracks.back().m_language_index = lang_indx;
                     }
                 }
             }
         }
-        tracks[kTrackTypeSubtitle] = filteredTracks;
+        m_tracks[kTrackTypeSubtitle] = filteredTracks;
 
-        stable_sort(tracks[kTrackTypeSubtitle].begin(),
-                    tracks[kTrackTypeSubtitle].end());
+        stable_sort(m_tracks[kTrackTypeSubtitle].begin(),
+                    m_tracks[kTrackTypeSubtitle].end());
 
         int trackNo = -1;
         int selectedStream = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
@@ -519,23 +519,23 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
         // currently selected track.
         for (uint idx = 0; idx < GetTrackCount(kTrackTypeSubtitle); idx++)
         {
-            const StreamInfo& stream = tracks[kTrackTypeSubtitle][idx];
-            int avidx = stream.av_stream_index;
+            const StreamInfo& stream = m_tracks[kTrackTypeSubtitle][idx];
+            int avidx = stream.m_av_stream_index;
             QString mpegstream;
 
             if (avidx >= 0)
-                mpegstream = QString( "0x%1").arg(ic->streams[avidx]->id,0,16);
+                mpegstream = QString( "0x%1").arg(m_ic->streams[avidx]->id,0,16);
             else
                 mpegstream = "n/a";
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("DVD Subtitle Track Map Stream id #%1, av_stream_idx %2, MPEG #%3, lang %4")
-                    .arg(stream.stream_id)
-                    .arg(stream.av_stream_index)
+                    .arg(stream.m_stream_id)
+                    .arg(stream.m_av_stream_index)
                     .arg(mpegstream)
-                    .arg(iso639_key_toName(stream.language)));
+                    .arg(iso639_key_toName(stream. m_language)));
 
-            if ((selectedStream != -1) && (stream.stream_id == selectedStream))
+            if ((selectedStream != -1) && (stream.m_stream_id == selectedStream))
                 trackNo = (int)idx;
         }
 
@@ -561,7 +561,7 @@ bool AvFormatDecoderDVD::DoRewindSeek(long long desiredFrame)
         return false;
 
     ringBuffer->Seek(DVDFindPosition(desiredFrame), SEEK_SET);
-    framesPlayed = framesRead = lastKey = desiredFrame + 1;
+    m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
     return true;
 }
 
@@ -572,7 +572,7 @@ void AvFormatDecoderDVD::DoFastForwardSeek(long long desiredFrame, bool &needflu
 
     ringBuffer->Seek(DVDFindPosition(desiredFrame),SEEK_SET);
     needflush    = true;
-    framesPlayed = framesRead = lastKey = desiredFrame + 1;
+    m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
 }
 
 void AvFormatDecoderDVD::StreamChangeCheck(void)
@@ -604,12 +604,12 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
 
     // Always use the first video stream
     // (must come after ScanStreams above)
-    for (uint i = 0; i < ic->nb_streams; i++)
+    for (uint i = 0; i < m_ic->nb_streams; i++)
     {
-        AVStream *st = ic->streams[i];
+        AVStream *st = m_ic->streams[i];
         if (st && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
-            selectedTrack[kTrackTypeVideo].av_stream_index = i;
+            m_selectedTrack[kTrackTypeVideo].m_av_stream_index = i;
             break;
         }
     }
@@ -618,11 +618,11 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
 int AvFormatDecoderDVD::GetAudioLanguage(uint audio_index, uint stream_index)
 {
     (void)audio_index;
-    if ((ic->streams[stream_index]->id >= 0) &&
+    if ((m_ic->streams[stream_index]->id >= 0) &&
         ringBuffer && ringBuffer->IsDVD())
     {
         return ringBuffer->DVD()->GetAudioLanguage(
-            ringBuffer->DVD()->GetAudioTrackNum(ic->streams[stream_index]->id));
+            ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[stream_index]->id));
     }
     return iso639_str3_to_key("und");
 }
@@ -642,7 +642,7 @@ long long AvFormatDecoderDVD::DVDFindPosition(long long desiredFrame)
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
     {
-        int diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
+        int diffTime = (int)ceil((desiredFrame - m_framesPlayed) / m_fps);
         long long desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
                         diffTime;
         if (diffTime <= 0)
@@ -663,7 +663,7 @@ AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint stream_index)
 
     if (ringBuffer && ringBuffer->DVD())
     {
-        int logical_idx = ringBuffer->DVD()->GetAudioTrackNum(ic->streams[stream_index]->id);
+        int logical_idx = ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[stream_index]->id);
         type = ringBuffer->DVD()->GetAudioTrackType(logical_idx);
     }
 

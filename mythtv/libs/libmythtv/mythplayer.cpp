@@ -1602,7 +1602,7 @@ int MythPlayer::SetTrack(uint type, int trackNo)
         EnableCaptions(subtype, true);
         if ((kDisplayCC708 == subtype || kDisplayCC608 == subtype) && decoder)
         {
-            int sid = decoder->GetTrackInfo(type, trackNo).stream_id;
+            int sid = decoder->GetTrackInfo(type, trackNo).m_stream_id;
             if (sid >= 0)
             {
                 (kDisplayCC708 == subtype) ? cc708.SetCurrentService(sid) :
@@ -2724,7 +2724,7 @@ void MythPlayer::VideoStart(void)
             uint numTextTracks = decoder->GetTrackCount(kTrackTypeRawText);
             for (uint i = 0; !hasForcedTextTrack && i < numTextTracks; ++i)
             {
-                if (decoder->GetTrackInfo(kTrackTypeRawText, i).forced)
+                if (decoder->GetTrackInfo(kTrackTypeRawText, i).m_forced)
                 {
                     hasForcedTextTrack = true;
                     forcedTrackNumber = i;
