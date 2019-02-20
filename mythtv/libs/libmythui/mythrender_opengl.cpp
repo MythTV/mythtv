@@ -663,8 +663,11 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
 */
 MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size)
 {
+    OpenGLLocker locker(this);
     GLuint textureid;
     glGenTextures(1, &textureid);
+    if (!textureid)
+        return nullptr;
     MythGLTexture* result = new MythGLTexture(textureid);
     result->m_size = Size;
     result->m_totalSize = GetTextureSize(Size);
