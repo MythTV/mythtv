@@ -34,37 +34,32 @@ enum AirplayEvent
 class AirplayConnection
 {
   public:
-    AirplayConnection()
-      : controlSocket(nullptr), reverseSocket(nullptr), speed(1.0f),
-        position(0.0f), initial_position(-1.0f), url(QUrl()),
-        lastEvent(AP_EVENT_NONE), stopped(false), was_playing(false),
-        initialized(false), photos(false), notificationid(-1)
-    { }
+    AirplayConnection() = default;
     ~AirplayConnection()
     {
         UnRegister();
     }
     void UnRegister(void)
     {
-        if (notificationid > 0)
+        if (m_notificationid > 0)
         {
-            GetNotificationCenter()->UnRegister(this, notificationid);
-            notificationid = -1;
+            GetNotificationCenter()->UnRegister(this, m_notificationid);
+            m_notificationid = -1;
         }
     }
-    QTcpSocket  *controlSocket;
-    QTcpSocket  *reverseSocket;
-    float        speed;
-    double       position;
-    double       initial_position;
-    QUrl         url;
-    AirplayEvent lastEvent;
-    bool         stopped;
-    bool         was_playing;
-    bool         initialized;
-    bool         photos;
+    QTcpSocket  *m_controlSocket    {nullptr};
+    QTcpSocket  *m_reverseSocket    {nullptr};
+    float        m_speed            {1.0f};
+    double       m_position         {0.0};
+//  double       m_initial_position {-1.0};
+    QUrl         m_url;
+    AirplayEvent m_lastEvent        {AP_EVENT_NONE};
+    bool         m_stopped          {false};
+    bool         m_was_playing      {false};
+    bool         m_initialized      {false};
+    bool         m_photos           {false};
     // Notification
-    int          notificationid;
+    int          m_notificationid   {-1};
 };
 
 class APHTTPRequest;
@@ -79,7 +74,8 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     static MythAirplayServer *AirplaySharedInstance(void)
     { return gMythAirplayServer; }
 
-    MythAirplayServer();
+    MythAirplayServer()
+        : ServerPool(), m_lock(new QMutex(QMutex::Recursive)) {}
 
   private slots:
     void Start();
@@ -120,11 +116,11 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     static MThread           *gMythAirplayServerThread;
 
     // Members
-    QString          m_name;
-    BonjourRegister *m_bonjour;
-    bool             m_valid;
-    QMutex          *m_lock;
-    int              m_setupPort;
+    QString          m_name          {"MythTV"};
+    BonjourRegister *m_bonjour       {nullptr};
+    bool             m_valid         {false};
+    QMutex          *m_lock          {nullptr};
+    int              m_setupPort     {5100};
     QList<QTcpSocket*> m_sockets;
     QHash<QByteArray,AirplayConnection> m_connections;
     QString          m_pathname;
@@ -136,7 +132,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     QHash<QTcpSocket*, APHTTPRequest*> m_incoming;
 
     // Bonjour Service re-advertising
-    QTimer         *m_serviceRefresh;
+    QTimer         *m_serviceRefresh {nullptr};
 };
 
 #endif // MYTHAIRPLAYSERVER_H

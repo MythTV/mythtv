@@ -46,7 +46,7 @@ VideoVisual* VideoVisual::Create(const QString &name,
 }
 
 VideoVisual::VideoVisual(AudioPlayer *audio, MythRender *render)
-  : m_audio(audio), m_disabled(false), m_area(QRect()), m_render(render)
+  : m_audio(audio), m_render(render)
 {
     m_lastUpdate = MythDate::current();
     mutex()->lock();
@@ -94,7 +94,7 @@ VisualNode* VideoVisual::GetNode(void)
     int64_t timestamp = m_audio->GetAudioTime();
     while (m_nodes.size() > 1)
     {
-        if (m_nodes.front()->offset > timestamp)
+        if (m_nodes.front()->m_offset > timestamp)
             break;
         delete m_nodes.front();
         m_nodes.pop_front();

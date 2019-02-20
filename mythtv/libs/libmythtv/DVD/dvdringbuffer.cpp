@@ -47,7 +47,6 @@ static const char *dvdnav_menu_table[] =
 };
 
 DVDInfo::DVDInfo(const QString &filename)
-  : m_nav(nullptr)
 {
     LOG(VB_PLAYBACK, LOG_INFO, QString("DVDInfo: Trying %1").arg(filename));
     QString name = filename;
@@ -212,47 +211,7 @@ uint32_t MythDVDContext::GetLBAPrevVideoFrame() const
 }
 
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
-    RingBuffer(kRingBuffer_DVD),
-    m_dvdnav(nullptr),  m_dvdBlockReadBuf(nullptr),
-    m_dvdBlockRPos(0),  m_dvdBlockWPos(0),
-    m_pgLength(0),      m_pgcLength(0),
-    m_cellStart(0),     m_cellChanged(false),
-    m_pgcLengthChanged(false), m_pgStart(0),
-    m_currentpos(0),
-    m_lastNav(nullptr), m_part(0), m_lastPart(0),
-    m_title(0),         m_lastTitle(0),   m_playerWait(false),
-    m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
-    m_currentTitleAngleCount(0),
-    m_endPts(0),        m_timeDiff(0),
-    m_still(0), m_lastStill(0),
-    m_audioStreamsChanged(false),
-    m_dvdWaiting(false),
-    m_titleLength(0),
-
-    m_skipstillorwait(true),
-    m_cellstartPos(0), m_buttonSelected(false),
-    m_buttonExists(false),
-    m_buttonSeenInCell(false), m_lastButtonSeenInCell(false),
-    m_cellid(0), m_lastcellid(0),
-    m_vobid(0), m_lastvobid(0),
-    m_cellRepeated(false),
-
-    m_curAudioTrack(0),
-    m_curSubtitleTrack(0),
-    m_autoselectsubtitle(true),
-    m_seeking(false), m_seektime(0),
-    m_currentTime(0),
-    m_parent(nullptr),
-    m_forcedAspect(-1.0f),
-    m_contextLock(QMutex::Recursive), m_context(nullptr),
-    m_processState(PROCESS_NORMAL),
-    m_dvdStat(DVDNAV_STATUS_OK),
-    m_dvdEvent(0),
-    m_dvdEventSize(0),
-
-    // Menu/buttons
-    m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
-    m_hl_button(0, 0, 0, 0), m_menuSpuPkt(nullptr), m_menuBuflength(0)
+    RingBuffer(kRingBuffer_DVD)
 {
     memset(&m_dvdMenuButton, 0, sizeof(AVSubtitle));
     memset(m_dvdBlockWriteBuf, 0, sizeof(char) * DVD_BLOCK_SIZE);

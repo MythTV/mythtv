@@ -12,18 +12,6 @@ extern "C" {
 #include <unistd.h> // for usleep()
 
 #define LOC QString("AFD_DVD: ")
-#define INVALID_LBA 0xbfffffff
-
-AvFormatDecoderDVD::AvFormatDecoderDVD(
-    MythPlayer *parent, const ProgramInfo &pginfo, PlayerFlags flags)
-  : AvFormatDecoder(parent, pginfo, flags)
-  , m_curContext(nullptr)
-  , m_lastVideoPkt(nullptr)
-  , m_lbaLastVideoPkt(INVALID_LBA)
-  , m_framesReq(0)
-  , m_returnContext(nullptr)
-{
-}
 
 AvFormatDecoderDVD::~AvFormatDecoderDVD()
 {
