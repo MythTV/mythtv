@@ -192,13 +192,10 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
 
 MythRenderOpenGL::~MythRenderOpenGL()
 {
+    LOG(VB_GENERAL, LOG_INFO, LOC + "MythRenderOpenGL closing");
     if (!isValid())
         return;
-    makeCurrent();
-    DeleteOpenGLResources();
-    if (m_openglDebugger)
-        delete m_openglDebugger;
-    doneCurrent();
+    ReleaseResources();
 }
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
@@ -279,6 +276,9 @@ bool MythRenderOpenGL::Init(void)
         }
     }
 
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        logDebugMarker("RENDER_INIT_START");
+
     InitProcs();
     Init2DState();
 
@@ -328,6 +328,8 @@ bool MythRenderOpenGL::Init(void)
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "Initialised MythRenderOpenGL");
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        logDebugMarker("RENDER_INIT_END");
     return true;
 }
 
@@ -1297,26 +1299,27 @@ QOpenGLBuffer* MythRenderOpenGL::CreateVBO(int Size, bool Release /*=true*/)
     return nullptr;
 }
 
-void MythRenderOpenGL::DeleteOpenGLResources(void)
+void MythRenderOpenGL::ReleaseResources(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
+    OpenGLLocker locker(this);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        logDebugMarker("RENDER_RELEASE_START");
     DeleteDefaultShaders();
     DeleteFence();
     ExpireVertices();
     ExpireVBOS();
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        logDebugMarker("RENDER_RELEASE_END");
+    if (m_openglDebugger)
+        delete m_openglDebugger;
+    m_openglDebugger = nullptr;
     Flush(false);
 
     if (m_cachedVertices.size())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired vertices")
-            .arg(m_cachedVertices.size()));
-    }
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired vertices").arg(m_cachedVertices.size()));
 
     if (m_cachedVBOS.size())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired VBOs")
-            .arg(m_cachedVertices.size()));
-    }
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired VBOs").arg(m_cachedVertices.size()));
 }
 
 bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
@@ -1556,7 +1559,8 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
 void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
 {
     makeCurrent();
-    delete Program;
+    if (Program)
+        delete Program;
     m_cachedMatrixUniforms.clear();
     doneCurrent();
 }

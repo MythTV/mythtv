@@ -570,8 +570,9 @@ MythMainWindow::~MythMainWindow()
     delete d->NC;
 
     delete d->painter;
+    // Don't delete. If the app is closing down it causes intermittent segfaults
     if (d->render)
-        d->render->DecrRef();
+        d->render->ReleaseResources();
 
     delete d;
 }

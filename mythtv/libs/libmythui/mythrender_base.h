@@ -38,6 +38,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
     virtual void Release(void)  { }
+    virtual void ReleaseResources(void) { }
 
   protected:
     virtual  ~MythRender() = default;
