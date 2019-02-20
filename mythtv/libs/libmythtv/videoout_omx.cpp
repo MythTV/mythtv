@@ -1544,7 +1544,7 @@ MythRenderEGL::~MythRenderEGL()
     assert(b == EGL_TRUE);
 #endif
     m_display = EGL_NO_DISPLAY;
-    DeleteOpenGLResources();
+    ReleaseResources();
 
 #ifdef NDEBUG
     Q_UNUSED(b);

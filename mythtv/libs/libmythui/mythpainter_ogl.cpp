@@ -19,12 +19,12 @@ using namespace std;
 
 #define MAX_BUFFER_POOL 40
 
-MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render, QWidget *parent)
+MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
   : MythPainter(),
-    realParent(parent),
-    realRender(render),
-    target(nullptr),
-    swapControl(true),
+    m_parent(Parent),
+    m_render(Render),
+    m_target(nullptr),
+    m_swapControl(true),
     m_imageToTextureMap(),
     m_ImageExpireList(),
     m_textureDeleteList(),
@@ -38,18 +38,18 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render, QWidget *parent)
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
-    OpenGLLocker locker(realRender);
+    OpenGLLocker locker(m_render);
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        realRender->logDebugMarker("PAINTER_RELEASE_START");
+        m_render->logDebugMarker("PAINTER_RELEASE_START");
     Teardown();
     FreeResources();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        realRender->logDebugMarker("PAINTER_RELEASE_END");
+        m_render->logDebugMarker("PAINTER_RELEASE_END");
 }
 
 void MythOpenGLPainter::FreeResources(void)
 {
-    OpenGLLocker locker(realRender);
+    OpenGLLocker locker(m_render);
     ClearCache();
     DeleteTextures();
     while (!m_mappedBufferPool.isEmpty())
@@ -58,16 +58,16 @@ void MythOpenGLPainter::FreeResources(void)
 
 void MythOpenGLPainter::DeleteTextures(void)
 {
-    if (!realRender || m_textureDeleteList.empty())
+    if (!m_render || m_textureDeleteList.empty())
         return;
 
     QMutexLocker gllocker(&m_textureDeleteLock);
-    OpenGLLocker locker(realRender);
+    OpenGLLocker locker(m_render);
     while (!m_textureDeleteList.empty())
     {
         MythGLTexture *texture = m_textureDeleteList.front();
-        m_HardwareCacheSize -= realRender->GetTextureDataSize(texture);
-        realRender->DeleteTexture(texture);
+        m_HardwareCacheSize -= m_render->GetTextureDataSize(texture);
+        m_render->DeleteTexture(texture);
         m_textureDeleteList.pop_front();
     }
 }
@@ -87,16 +87,16 @@ void MythOpenGLPainter::ClearCache(void)
     m_imageToTextureMap.clear();
 }
 
-void MythOpenGLPainter::Begin(QPaintDevice *parent)
+void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
-    MythPainter::Begin(parent);
+    MythPainter::Begin(Parent);
 
-    if (!realParent)
-        realParent = dynamic_cast<QWidget *>(parent);
+    if (!m_parent)
+        m_parent = dynamic_cast<QWidget *>(Parent);
 
-    if (!realRender)
+    if (!m_render)
     {
-        MythPainterWindowGL* glwin = static_cast<MythPainterWindowGL*>(realParent);
+        MythPainterWindowGL* glwin = static_cast<MythPainterWindowGL*>(m_parent);
         if (!glwin)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to MythPainterWindowGL");
@@ -104,8 +104,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
         }
 
         if (glwin)
-            realRender = glwin->render;
-        if (!realRender)
+            m_render = glwin->render;
+        if (!m_render)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to get MythRenderOpenGL");
             return;
@@ -113,69 +113,69 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        realRender->logDebugMarker("PAINTER_FRAME_START");
+        m_render->logDebugMarker("PAINTER_FRAME_START");
 
     DeleteTextures();
-    realRender->makeCurrent();
+    m_render->makeCurrent();
 
     // initialise the VBO pool
     while (m_mappedBufferPool.size() < MAX_BUFFER_POOL)
-        m_mappedBufferPool.enqueue(realRender->CreateVBO(MythRenderOpenGL::kVertexSize));
+        m_mappedBufferPool.enqueue(m_render->CreateVBO(MythRenderOpenGL::kVertexSize));
 
-    if (target || swapControl)
+    if (m_target || m_swapControl)
     {
-        realRender->BindFramebuffer(target);
-        if (realParent)
-            realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
-        realRender->SetBackground(0, 0, 0, 0);
-        realRender->ClearFramebuffer();
+        m_render->BindFramebuffer(m_target);
+        if (m_parent)
+            m_render->SetViewPort(QRect(0, 0, m_parent->width(), m_parent->height()));
+        m_render->SetBackground(0, 0, 0, 0);
+        m_render->ClearFramebuffer();
     }
 }
 
 void MythOpenGLPainter::End(void)
 {
-    if (!realRender)
+    if (!m_render)
     {
         LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'End'");
         return;
     }
 
-    realRender->Flush(false);
+    m_render->Flush(false);
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        realRender->logDebugMarker("PAINTER_FRAME_END");
-    if (target == nullptr && swapControl)
-        realRender->swapBuffers();
-    realRender->doneCurrent();
+        m_render->logDebugMarker("PAINTER_FRAME_END");
+    if (m_target == nullptr && m_swapControl)
+        m_render->swapBuffers();
+    m_render->doneCurrent();
 
     m_mappedTextures.clear();
     MythPainter::End();
 }
 
-MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *im)
+MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
 {
-    if (!realRender)
+    if (!m_render)
         return nullptr;
 
-    if (m_imageToTextureMap.contains(im))
+    if (m_imageToTextureMap.contains(Image))
     {
-        if (!im->IsChanged())
+        if (!Image->IsChanged())
         {
-            m_ImageExpireList.remove(im);
-            m_ImageExpireList.push_back(im);
-            return m_imageToTextureMap[im];
+            m_ImageExpireList.remove(Image);
+            m_ImageExpireList.push_back(Image);
+            return m_imageToTextureMap[Image];
         }
         else
         {
-            DeleteFormatImagePriv(im);
+            DeleteFormatImagePriv(Image);
         }
     }
 
-    im->SetChanged(false);
+    Image->SetChanged(false);
 
     MythGLTexture *texture = nullptr;
     for (;;)
     {
-        texture = realRender->CreateTextureFromQImage(im);
+        texture = m_render->CreateTextureFromQImage(Image);
         if (texture)
             break;
 
@@ -201,10 +201,10 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *im)
         }
     }
 
-    CheckFormatImage(im);
-    m_HardwareCacheSize += realRender->GetTextureDataSize(texture);
-    m_imageToTextureMap[im] = texture;
-    m_ImageExpireList.push_back(im);
+    CheckFormatImage(Image);
+    m_HardwareCacheSize += m_render->GetTextureDataSize(texture);
+    m_imageToTextureMap[Image] = texture;
+    m_ImageExpireList.push_back(Image);
 
     while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
     {
@@ -217,79 +217,79 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *im)
     return texture;
 }
 
-void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
-                                  const QRect &src, int alpha)
+void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
+                                  const QRect &Source, int Alpha)
 {
-    if (realRender)
+    if (m_render)
     {
         // Drawing an multiple times with the same VBO will stall most GPUs as
         // the VBO is re-mapped whilst still in use. Use a pooled VBO instead.
-        MythGLTexture *texture = GetTextureFromCache(im);
+        MythGLTexture *texture = GetTextureFromCache(Image);
         if (texture && m_mappedTextures.contains(texture))
         {
             QOpenGLBuffer *vbo = texture->m_vbo;
             texture->m_vbo = m_mappedBufferPool.dequeue();
             texture->m_destination = QRect();
-            realRender->DrawBitmap(texture, target, src, r, nullptr, alpha);
+            m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
             m_mappedBufferPool.enqueue(texture->m_vbo);
             texture->m_vbo = vbo;
         }
         else
         {
-            realRender->DrawBitmap(texture, target, src, r, nullptr, alpha);
+            m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
             m_mappedTextures.append(texture);
         }
     }
 }
 
-void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
-                                 const QPen &linePen, int alpha)
+void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
+                                 const QPen &LinePen, int Alpha)
 {
-    if ((fillBrush.style() == Qt::SolidPattern ||
-         fillBrush.style() == Qt::NoBrush) && realRender)
+    if ((FillBrush.style() == Qt::SolidPattern ||
+         FillBrush.style() == Qt::NoBrush) && m_render)
     {
-        realRender->DrawRect(target, area, fillBrush, linePen, alpha);
+        m_render->DrawRect(m_target, Area, FillBrush, LinePen, Alpha);
         return;
     }
-    MythPainter::DrawRect(area, fillBrush, linePen, alpha);
+    MythPainter::DrawRect(Area, FillBrush, LinePen, Alpha);
 }
 
-void MythOpenGLPainter::DrawRoundRect(const QRect &area, int cornerRadius,
-                                      const QBrush &fillBrush,
-                                      const QPen &linePen, int alpha)
+void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
+                                      const QBrush &FillBrush,
+                                      const QPen &LinePen, int Alpha)
 {
-    if (realRender && realRender->RectanglesAreAccelerated())
+    if (m_render && m_render->RectanglesAreAccelerated())
     {
-        if (fillBrush.style() == Qt::SolidPattern ||
-            fillBrush.style() == Qt::NoBrush)
+        if (FillBrush.style() == Qt::SolidPattern ||
+            FillBrush.style() == Qt::NoBrush)
         {
-            realRender->DrawRoundRect(target, area, cornerRadius, fillBrush,
-                                      linePen, alpha);
+            m_render->DrawRoundRect(m_target, Area, CornerRadius, FillBrush,
+                                      LinePen, Alpha);
             return;
         }
     }
-    MythPainter::DrawRoundRect(area, cornerRadius, fillBrush, linePen, alpha);
+    MythPainter::DrawRoundRect(Area, CornerRadius, FillBrush, LinePen, Alpha);
 }
 
-void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)
+void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *Image)
 {
-    if (m_imageToTextureMap.contains(im))
+    if (m_imageToTextureMap.contains(Image))
     {
         QMutexLocker locker(&m_textureDeleteLock);
-        m_textureDeleteList.push_back(m_imageToTextureMap[im]);
-        m_imageToTextureMap.remove(im);
-        m_ImageExpireList.remove(im);
+        m_textureDeleteList.push_back(m_imageToTextureMap[Image]);
+        m_imageToTextureMap.remove(Image);
+        m_ImageExpireList.remove(Image);
     }
 }
 
-void MythOpenGLPainter::PushTransformation(const UIEffects &fx, QPointF center)
+void MythOpenGLPainter::PushTransformation(const UIEffects &Fx, QPointF Center)
 {
-    if (realRender)
-        realRender->PushTransformation(fx, center);
+    if (m_render)
+        m_render->PushTransformation(Fx, Center);
 }
 
 void MythOpenGLPainter::PopTransformation(void)
 {
-    if (realRender)
-        realRender->PopTransformation();
+    if (m_render)
+        m_render->PopTransformation();
 }
