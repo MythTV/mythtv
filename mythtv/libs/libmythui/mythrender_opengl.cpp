@@ -1562,6 +1562,7 @@ void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
     if (Program)
         delete Program;
     m_cachedMatrixUniforms.clear();
+    m_activeProgram = nullptr;
     doneCurrent();
 }
 
