@@ -105,7 +105,11 @@ MythOpenGLInterop::~MythOpenGLInterop()
             vector<MythGLTexture*> textures = it.value();
             vector<MythGLTexture*>::iterator it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
+            {
+                if ((*it2)->m_textureId)
+                    m_context->glDeleteTextures(1, &(*it2)->m_textureId);
                 m_context->DeleteTexture(*it2);
+            }
             textures.clear();
         }
         m_openglTextures.clear();
