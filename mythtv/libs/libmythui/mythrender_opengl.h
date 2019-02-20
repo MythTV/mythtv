@@ -114,6 +114,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  SetFence(void);
     void  DeleteFence(void);
 
+    static const GLuint kVertexSize;
+    QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
+
     MythGLTexture* CreateHelperTexture(void);
     MythGLTexture* CreateTexture(QSize Size,
                         QOpenGLTexture::PixelType     PixelType   = QOpenGLTexture::UInt8,
@@ -173,7 +176,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DeleteOpenGLResources(void);
     void  DeleteFramebuffers(void);
 
-    QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
     bool  UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source, const QRect &Destination);
     GLfloat* GetCachedVertices(GLuint Type, const QRect &Area);
     void  ExpireVertices(int Max = 0);

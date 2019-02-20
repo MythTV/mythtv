@@ -31,7 +31,7 @@ using std::min;
 
 static const GLuint kVertexOffset  = 0;
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
-static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
+const GLuint MythRenderOpenGL::kVertexSize = 16 * sizeof(GLfloat);
 
 #define MAX_VERTEX_CACHE 500
 

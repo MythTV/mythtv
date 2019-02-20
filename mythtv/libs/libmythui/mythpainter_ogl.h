@@ -1,16 +1,21 @@
 #ifndef MYTHPAINTER_OPENGL_H_
 #define MYTHPAINTER_OPENGL_H_
 
+// Qt
 #include <QMutex>
+#include <QQueue>
 
-#include <list>
-
+// MythTV
 #include "mythpainter.h"
 #include "mythimage.h"
+
+// Std
+#include <list>
 
 class QWidget;
 class MythGLTexture;
 class MythRenderOpenGL;
+class QOpenGLBuffer;
 class QOpenGLFramebufferObject;
 
 class MUI_PUBLIC MythOpenGLPainter : public MythPainter
@@ -18,7 +23,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     friend class VideoOutputOpenGL;
   public:
     MythOpenGLPainter(MythRenderOpenGL *render =  nullptr, QWidget *parent = nullptr);
-   ~MythOpenGLPainter();
+   ~MythOpenGLPainter() override;
 
     void SetTarget(QOpenGLFramebufferObject* new_target) { target = new_target; }
     void SetSwapControl(bool swap)       { swapControl = swap;       } 
@@ -44,14 +49,14 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 
     void PushTransformation(const UIEffects &fx, QPointF center = QPointF()) override; // MythPainter
     void PopTransformation(void) override; // MythPainter
-    void       DeleteTextures(void);
 
   protected:
     MythImage* GetFormatImagePriv(void) override // MythPainter
         { return new MythImage(this); }
-    void DeleteFormatImagePriv(MythImage *im) override; // MythPainter
+    void  DeleteFormatImagePriv(MythImage *im) override; // MythPainter
 
-    void       ClearCache(void);
+    void  DeleteTextures(void);
+    void  ClearCache(void);
     MythGLTexture* GetTextureFromCache(MythImage *im);
 
     QWidget          *realParent;
@@ -63,6 +68,9 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     std::list<MythImage *>     m_ImageExpireList;
     std::list<MythGLTexture*>  m_textureDeleteList;
     QMutex                     m_textureDeleteLock;
+
+    QVector<MythGLTexture*>    m_mappedTextures;
+    QQueue<QOpenGLBuffer*>     m_mappedBufferPool;
 };
 
 #endif

@@ -17,25 +17,39 @@
 
 using namespace std;
 
+#define MAX_BUFFER_POOL 40
+
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render, QWidget *parent)
   : MythPainter(),
     realParent(parent),
     realRender(render),
     target(nullptr),
-    swapControl(true)
+    swapControl(true),
+    m_imageToTextureMap(),
+    m_ImageExpireList(),
+    m_textureDeleteList(),
+    m_textureDeleteLock(),
+    m_mappedTextures(),
+    m_mappedBufferPool()
 {
+    m_mappedTextures.reserve(MAX_BUFFER_POOL);
+    m_mappedBufferPool.reserve(MAX_BUFFER_POOL);
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
+    OpenGLLocker locker(realRender);
     Teardown();
     FreeResources();
 }
 
 void MythOpenGLPainter::FreeResources(void)
 {
+    OpenGLLocker locker(realRender);
     ClearCache();
     DeleteTextures();
+    while (!m_mappedBufferPool.isEmpty())
+        delete m_mappedBufferPool.dequeue();
 }
 
 void MythOpenGLPainter::DeleteTextures(void)
@@ -43,7 +57,8 @@ void MythOpenGLPainter::DeleteTextures(void)
     if (!realRender || m_textureDeleteList.empty())
         return;
 
-    QMutexLocker locker(&m_textureDeleteLock);
+    QMutexLocker gllocker(&m_textureDeleteLock);
+    OpenGLLocker locker(realRender);
     while (!m_textureDeleteList.empty())
     {
         MythGLTexture *texture = m_textureDeleteList.front();
@@ -99,6 +114,10 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
     DeleteTextures();
     realRender->makeCurrent();
 
+    // initialise the VBO pool
+    while (m_mappedBufferPool.size() < MAX_BUFFER_POOL)
+        m_mappedBufferPool.enqueue(realRender->CreateVBO(MythRenderOpenGL::kVertexSize));
+
     if (target || swapControl)
     {
         realRender->BindFramebuffer(target);
@@ -124,6 +143,7 @@ void MythOpenGLPainter::End(void)
         realRender->swapBuffers();
     realRender->doneCurrent();
 
+    m_mappedTextures.clear();
     MythPainter::End();
 }
 
@@ -197,8 +217,25 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
                                   const QRect &src, int alpha)
 {
     if (realRender)
-        realRender->DrawBitmap(GetTextureFromCache(im), target,
-                               src, r, nullptr, alpha);
+    {
+        // Drawing an multiple times with the same VBO will stall most GPUs as
+        // the VBO is re-mapped whilst still in use. Use a pooled VBO instead.
+        MythGLTexture *texture = GetTextureFromCache(im);
+        if (texture && m_mappedTextures.contains(texture))
+        {
+            QOpenGLBuffer *vbo = texture->m_vbo;
+            texture->m_vbo = m_mappedBufferPool.dequeue();
+            texture->m_destination = QRect();
+            realRender->DrawBitmap(texture, target, src, r, nullptr, alpha);
+            m_mappedBufferPool.enqueue(texture->m_vbo);
+            texture->m_vbo = vbo;
+        }
+        else
+        {
+            realRender->DrawBitmap(texture, target, src, r, nullptr, alpha);
+            m_mappedTextures.append(texture);
+        }
+    }
 }
 
 void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
