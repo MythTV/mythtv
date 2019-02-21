@@ -189,6 +189,8 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_window = (w) ? w->windowHandle() : nullptr;
 
     setFormat(Format);
+
+    connect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
 }
 
 MythRenderOpenGL::~MythRenderOpenGL()
@@ -196,6 +198,7 @@ MythRenderOpenGL::~MythRenderOpenGL()
     LOG(VB_GENERAL, LOG_INFO, LOC + "MythRenderOpenGL closing");
     if (!isValid())
         return;
+    disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
     ReleaseResources();
 }
 
@@ -240,6 +243,11 @@ void MythRenderOpenGL::logDebugMarker(const QString &Message)
             Message, 0, QOpenGLDebugMessage::NotificationSeverity, QOpenGLDebugMessage::MarkerType);
         m_openglDebugger->logMessage(message);
     }
+}
+
+void MythRenderOpenGL::contextToBeDestroyed(void)
+{
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "Context about to be destroyed");
 }
 
 bool MythRenderOpenGL::Init(void)

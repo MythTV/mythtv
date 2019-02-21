@@ -166,6 +166,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
   public slots:
     void  messageLogged  (const QOpenGLDebugMessage &Message);
     void  logDebugMarker (const QString &Message);
+    void  contextToBeDestroyed(void);
 
   protected:
     ~MythRenderOpenGL() override;
