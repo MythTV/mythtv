@@ -10,15 +10,15 @@
 
 ChannelGroupItem& ChannelGroupItem::operator=(const ChannelGroupItem &other)
 {
-    grpid     = other.grpid;
-    name      = (other.name);
+    m_grpid   = other.m_grpid;
+    m_name    = other.m_name;
 
     return *this;
 }
 
 inline bool lt_group(const ChannelGroupItem &a, const ChannelGroupItem &b)
 {
-    return QString::localeAwareCompare(a.name, b.name) < 0;
+    return QString::localeAwareCompare(a.m_name, b.m_name) < 0;
 }
 
 bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
@@ -219,7 +219,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
 
     // If grpid is all channels (-1), then return the first grpid
     if (grpid == -1)
-      return sorted[0].grpid;
+      return sorted[0].m_grpid;
 
     ChannelGroupList::const_iterator it = find(sorted.begin(), sorted.end(), grpid);
 
@@ -233,7 +233,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
     if (it == sorted.end())
        return -1;
 
-    return it->grpid;
+    return it->m_grpid;
 }
 
 QString ChannelGroup::GetChannelGroupName(int grpid)

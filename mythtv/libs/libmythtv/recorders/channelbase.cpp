@@ -75,7 +75,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     // Attempt to find the requested startchannel
     for (auto cit = m_channels.begin(); cit != m_channels.end(); ++cit)
     {
-        if ((*cit).channum == startchannel &&
+        if ((*cit).m_channum == startchannel &&
             IsTunable(startchannel))
         {
             LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -91,7 +91,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
         IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         uint chanid = ChannelUtil::GetNextChannel(
-            m_channels, m_channels[0].chanid,
+            m_channels, m_channels[0].m_chanid,
             mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
 
         ChannelInfoList::const_iterator cit =
@@ -102,15 +102,15 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
             if (!setchan)
             {
                 ok = IsTunable((mplexid_restriction || chanid_restriction)
-                               ? (*cit).channum : startchannel);
+                               ? (*cit).m_channum : startchannel);
             }
             else
-                ok = SetChannelByString((*cit).channum);
+                ok = SetChannelByString((*cit).m_channum);
 
             if (ok)
             {
                 if (mplexid_restriction || chanid_restriction)
-                    startchannel = (*cit).channum;
+                    startchannel = (*cit).m_channum;
                 msg2 = QString("selected to '%1' instead.")
                     .arg(startchannel);
                 msg_error = false;

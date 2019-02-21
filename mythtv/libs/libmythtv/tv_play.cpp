@@ -1804,8 +1804,8 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
     {
         for (uint i = 0; i < selection.size(); i++)
         {
-            uint    chanid  = selection[i].chanid;
-            QString channum = selection[i].channum;
+            uint    chanid  = selection[i].m_chanid;
+            QString channum = selection[i].m_channum;
             if (!chanid || channum.isEmpty())
                 continue;
             QSet<uint> cards = IsTunableOn(ctx, chanid);
@@ -7974,8 +7974,8 @@ void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
 {
     for (uint i = 0; i < options.size(); i++)
     {
-        uint    chanid  = options[i].chanid;
-        QString channum = options[i].channum;
+        uint    chanid  = options[i].m_chanid;
+        QString channum = options[i].m_channum;
 
         if (chanid && !channum.isEmpty() && IsTunable(ctx, chanid))
         {
@@ -11058,7 +11058,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 ChannelInfoList::const_iterator it = list.begin();
                 for (; it != list.end(); ++it)
                 {
-                    if ((*it).channum == cur_channum)
+                    if ((*it).m_channum == cur_channum)
                     {
                         break;
                     }
@@ -11070,7 +11070,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                     // first channel in the group
                     it = list.begin();
                     if (it != list.end())
-                        new_channum = (*it).channum;
+                        new_channum = (*it).m_channum;
                 }
 
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -11877,9 +11877,9 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             for (it = db_channel_groups.begin();
                  it != db_channel_groups.end(); ++it)
             {
-                QString action = prefix + QString::number(it->grpid);
-                active = ((int)(it->grpid) == channelGroupId);
-                BUTTON(action, it->name);
+                QString action = prefix + QString::number(it->m_grpid);
+                active = ((int)(it->m_grpid) == channelGroupId);
+                BUTTON(action, it->m_name);
             }
         }
     }

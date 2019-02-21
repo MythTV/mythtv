@@ -129,7 +129,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
         // Load the list of programmes for this channel
         ProgramList  progList;
-        bindings[":CHANID"] = (*chan_it).chanid;
+        bindings[":CHANID"] = (*chan_it).m_chanid;
         LoadFromProgram( progList, sWhere, sOrderBy, sOrderBy, bindings,
                          schedList );
 

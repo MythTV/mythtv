@@ -75,7 +75,7 @@ bool ManualSchedule::Create(void)
         InfoMap infomap;
         channels[i].ToMap(infomap);
         item->SetTextFromMap(infomap);
-        m_chanids.push_back(channels[i].chanid);
+        m_chanids.push_back(channels[i].m_chanid);
     }
 
     for (uint index = 0; index <= 60; index++)

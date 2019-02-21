@@ -3015,13 +3015,13 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     ChannelUtil::SortChannels(channels, order);
     bool has_visible = false;
     for (uint i = 0; i < channels.size() && !has_visible; i++)
-        has_visible |= channels[i].visible;
+        has_visible |= channels[i].m_visible;
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        const QString channum = channels[i].channum;
+        const QString channum = channels[i].m_channum;
         bool sel = channum == startChan;
-        if (!has_visible || channels[i].visible || sel)
+        if (!has_visible || channels[i].m_visible || sel)
         {
             addSelection(channum, channum, sel);
         }

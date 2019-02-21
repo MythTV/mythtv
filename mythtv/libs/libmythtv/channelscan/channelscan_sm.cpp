@@ -1026,9 +1026,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
 #define PCM_INFO_INIT(SISTD) \
     ChannelInsertInfo &info = pnum_to_dbchan[pnum]; \
-    info.db_mplexid   = mplexid;   info.source_id    = m_sourceID;  \
-    info.service_id   = pnum;      info.freqid       = freqidStr; \
-    info.si_standard  = SISTD;
+    info.m_db_mplexid   = mplexid; info.m_source_id  = m_sourceID;  \
+    info.m_service_id   = pnum;    info.m_freqid     = freqidStr; \
+    info.m_si_standard  = SISTD;
 
 static void update_info(ChannelInsertInfo &info,
                         const VirtualChannelTable *vct, uint i)
@@ -1036,34 +1036,34 @@ static void update_info(ChannelInsertInfo &info,
     if (vct->ModulationMode(i) == 0x01 /* NTSC Modulation */ ||
         vct->ServiceType(i)    == 0x01 /* Analog TV */)
     {
-        info.si_standard = "ntsc";
-        info.format      = "ntsc";
+        info.m_si_standard = "ntsc";
+        info.m_format      = "ntsc";
     }
 
-    info.callsign = vct->ShortChannelName(i);
+    info.m_callsign = vct->ShortChannelName(i);
 
-    info.service_name = vct->GetExtendedChannelName(i);
-    if (info.service_name.isEmpty())
-        info.service_name = vct->ShortChannelName(i);
+    info.m_service_name = vct->GetExtendedChannelName(i);
+    if (info.m_service_name.isEmpty())
+        info.m_service_name = vct->ShortChannelName(i);
 
-    info.chan_num.clear();
+    info.m_chan_num.clear();
 
-    info.service_id         = vct->ProgramNumber(i);
-    info.atsc_major_channel = vct->MajorChannel(i);
-    info.atsc_minor_channel = vct->MinorChannel(i);
+    info.m_service_id         = vct->ProgramNumber(i);
+    info.m_atsc_major_channel = vct->MajorChannel(i);
+    info.m_atsc_minor_channel = vct->MinorChannel(i);
 
-    info.use_on_air_guide = !vct->IsHidden(i) || !vct->IsHiddenInGuide(i);
+    info.m_use_on_air_guide = !vct->IsHidden(i) || !vct->IsHiddenInGuide(i);
 
-    info.hidden           = vct->IsHidden(i);
-    info.hidden_in_guide  = vct->IsHiddenInGuide(i);
+    info.m_hidden           = vct->IsHidden(i);
+    info.m_hidden_in_guide  = vct->IsHiddenInGuide(i);
 
-    info.vct_tsid         = vct->TransportStreamID();
-    info.vct_chan_tsid    = vct->ChannelTransportStreamID(i);
-    info.is_encrypted    |= vct->IsAccessControlled(i);
-    info.is_data_service  = vct->ServiceType(i) == 0x04;
-    info.is_audio_service = vct->ServiceType(i) == 0x03;
+    info.m_vct_tsid         = vct->TransportStreamID();
+    info.m_vct_chan_tsid    = vct->ChannelTransportStreamID(i);
+    info.m_is_encrypted    |= vct->IsAccessControlled(i);
+    info.m_is_data_service  = vct->ServiceType(i) == 0x04;
+    info.m_is_audio_service = vct->ServiceType(i) == 0x03;
 
-    info.in_vct       = true;
+    info.m_in_vct       = true;
 }
 
 static void update_info(ChannelInsertInfo &info,
@@ -1102,28 +1102,28 @@ static void update_info(ChannelInsertInfo &info,
             service_name.clear();
     }
 
-    if (info.callsign.isEmpty())
-        info.callsign = callsign;
-    if (info.service_name.isEmpty())
-        info.service_name = service_name;
+    if (info.m_callsign.isEmpty())
+        info.m_callsign = callsign;
+    if (info.m_service_name.isEmpty())
+        info.m_service_name = service_name;
 
-    info.use_on_air_guide =
+    info.m_use_on_air_guide =
         sdt->HasEITPresentFollowing(i) ||
         sdt->HasEITSchedule(i) ||
         force_guide_present;
 
-    info.hidden           = false;
-    info.hidden_in_guide  = false;
+    info.m_hidden           = false;
+    info.m_hidden_in_guide  = false;
 
-    info.is_data_service =
+    info.m_is_data_service =
         (desc && !desc->IsDTV() && !desc->IsDigitalAudio());
-    info.is_audio_service = (desc && desc->IsDigitalAudio());
+    info.m_is_audio_service = (desc && desc->IsDigitalAudio());
     delete desc;
 
-    info.service_id = sdt->ServiceID(i);
-    info.sdt_tsid   = sdt->TSID();
-    info.orig_netid = sdt->OriginalNetworkID();
-    info.in_sdt     = true;
+    info.m_service_id = sdt->ServiceID(i);
+    info.m_sdt_tsid   = sdt->TSID();
+    info.m_orig_netid = sdt->OriginalNetworkID();
+    info.m_in_sdt     = true;
 
     desc_list_t parsed =
         MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
@@ -1136,15 +1136,15 @@ static void update_info(ChannelInsertInfo &info,
         DefaultAuthorityDescriptor authority(def_auth);
         LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
                                           "authority(SDT) for service %1 %2 %3")
-                .arg(info.orig_netid).arg(info.sdt_tsid).arg(info.service_id));
-        info.default_authority = authority.DefaultAuthority();
+                .arg(info.m_orig_netid).arg(info.m_sdt_tsid).arg(info.m_service_id));
+        info.m_default_authority = authority.DefaultAuthority();
     }
     else
     {
-        uint64_t index = (uint64_t)info.orig_netid << 32 |
-                        info.sdt_tsid << 16 | info.service_id;
+        uint64_t index = (uint64_t)info.m_orig_netid << 32 |
+                        info.m_sdt_tsid << 16 | info.m_service_id;
         if (defAuthorities.contains(index))
-            info.default_authority = defAuthorities[index];
+            info.m_default_authority = defAuthorities[index];
     }
 }
 
@@ -1165,8 +1165,8 @@ uint ChannelScanSM::GetCurrentTransportInfo(
         for (int i = 0; i < list.size(); ++i)
         {
             max_chan_cnt +=
-                (list[i].in_pat || list[i].in_pmt ||
-                 list[i].in_sdt || list[i].in_vct) ? 1 : 0;
+                (list[i].m_in_pat || list[i].m_in_pmt ||
+                 list[i].m_in_sdt || list[i].m_in_vct) ? 1 : 0;
         }
     }
 
@@ -1200,8 +1200,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         uint pnum = echan[i].m_serviceid;
         PCM_INFO_INIT("mpeg");
-        info.service_name = echan[i].m_name;
-        info.in_channels_conf = true;
+        info.m_service_name = echan[i].m_name;
+        info.m_in_channels_conf = true;
     }
 
     // PATs
@@ -1227,9 +1227,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 if (pnum)
                 {
                     PCM_INFO_INIT("mpeg");
-                    info.pat_tsid = (*pat_it)->TransportStreamID();
-                    info.could_be_opencable = could_be_opencable;
-                    info.in_pat = true;
+                    info.m_pat_tsid = (*pat_it)->TransportStreamID();
+                    info.m_could_be_opencable = could_be_opencable;
+                    info.m_in_pat = true;
                 }
             }
         }
@@ -1244,7 +1244,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         PCM_INFO_INIT("mpeg");
         for (uint i = 0; i < pmt->StreamCount(); ++i)
         {
-            info.could_be_opencable |=
+            info.m_could_be_opencable |=
                 (StreamID::OpenCableVideo == pmt->StreamType(i));
         }
 
@@ -1257,11 +1257,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             RegistrationDescriptor reg(descs[i]);
             if (reg.FormatIdentifierString() == "CUEI" ||
                 reg.FormatIdentifierString() == "SCTE")
-                info.could_be_opencable = true;
+                info.m_could_be_opencable = true;
         }
 
-        info.is_encrypted |= pmt->IsEncrypted(GetDTVChannel()->GetSIStandard());
-        info.in_pmt = true;
+        info.m_is_encrypted |= pmt->IsEncrypted(GetDTVChannel()->GetSIStandard());
+        info.m_in_pmt = true;
     }
 
     // Cable VCTs
@@ -1319,11 +1319,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             for (uint i = 0; i < (*nits_it)->TransportStreamCount(); ++i)
             {
                 const NetworkInformationTable *nit = (*nits_it);
-                if ((nit->TSID(i)              == info.sdt_tsid) &&
-                    (nit->OriginalNetworkID(i) == info.orig_netid))
+                if ((nit->TSID(i)              == info.m_sdt_tsid) &&
+                    (nit->OriginalNetworkID(i) == info.m_orig_netid))
                 {
-                    info.netid = nit->NetworkID();
-                    info.in_nit = true;
+                    info.m_netid = nit->NetworkID();
+                    info.m_in_nit = true;
                 }
                 else
                 {
@@ -1344,7 +1344,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     DVBLogicalChannelDescriptor uklist(desc);
                     for (uint j = 0; j < uklist.ChannelCount(); ++j)
                     {
-                        ukChanNums[((qlonglong)info.orig_netid<<32) |
+                        ukChanNums[((qlonglong)info.m_orig_netid<<32) |
                                    uklist.ServiceID(j)] =
                             uklist.ChannelNumber(j);
                     }
@@ -1359,26 +1359,26 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         ChannelInsertInfo &info = *dbchan_it;
 
-        if (!info.chan_num.isEmpty())
+        if (!info.m_chan_num.isEmpty())
             continue;
 
         if (iptv_channel.isEmpty()) // DVB Logical channel numbers (LCN)
         {
             QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
-                       (((qlonglong)info.orig_netid<<32) | info.service_id);
+                       (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
 
             if (it != ukChanNums.end())
-                info.chan_num = QString::number(*it);
+                info.m_chan_num = QString::number(*it);
         }
         else // IPTV programs
         {
-            info.chan_num = iptv_channel;
-            if (info.service_id)
-                info.chan_num += "-" + QString::number(info.service_id);
+            info.m_chan_num = iptv_channel;
+            if (info.m_service_id)
+                info.m_chan_num += "-" + QString::number(info.m_service_id);
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("GetChannelList: set chan_num '%1'").arg(info.chan_num));
+            QString("GetChannelList: set chan_num '%1'").arg(info.m_chan_num));
     }
 
     // Get QAM/SCTE/MPEG channel numbers
@@ -1387,21 +1387,21 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         ChannelInsertInfo &info = *dbchan_it;
 
-        if (!info.chan_num.isEmpty())
+        if (!info.m_chan_num.isEmpty())
             continue;
 
-        if ((info.si_standard == "mpeg") ||
-            (info.si_standard == "scte") ||
-            (info.si_standard == "opencable"))
+        if ((info.m_si_standard == "mpeg") ||
+            (info.m_si_standard == "scte") ||
+            (info.m_si_standard == "opencable"))
         {
-            if (info.freqid.isEmpty())
-                info.chan_num = QString("%1-%2")
-                    .arg(info.source_id)
-                    .arg(info.service_id);
+            if (info.m_freqid.isEmpty())
+                info.m_chan_num = QString("%1-%2")
+                    .arg(info.m_source_id)
+                    .arg(info.m_service_id);
             else
-                info.chan_num = QString("%1-%2")
-                    .arg(info.freqid)
-                    .arg(info.service_id);
+                info.m_chan_num = QString("%1-%2")
+                    .arg(info.m_freqid)
+                    .arg(info.m_service_id);
         }
     }
 
@@ -1411,7 +1411,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         uint pnum = dbchan_it.key();
         ChannelInsertInfo &info = *dbchan_it;
-        info.decryption_status = scan_info->m_program_encryption_status[pnum];
+        info.m_decryption_status = scan_info->m_program_encryption_status[pnum];
     }
 
     return pnum_to_dbchan;
@@ -1453,26 +1453,26 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 ChannelInsertInfo info = *dbchan_it;
 
                 if (tuner_type == DTVTunerType::kTunerTypeASI)
-                    info.callsign = QString("MPTS_%1")
+                    info.m_callsign = QString("MPTS_%1")
                                     .arg(CardUtil::GetDisplayName(cardid));
-                else if (info.si_standard == "mpeg" ||
-                         info.si_standard == "scte" ||
-                         info.si_standard == "opencable")
-                    info.callsign = QString("MPTS_%1").arg(info.freqid);
-                else if (info.atsc_major_channel > 0)
-                    info.callsign =
-                        QString("MPTS_%1").arg(info.atsc_major_channel);
-                else if (info.service_id > 0)
-                    info.callsign = QString("MPTS_%1").arg(info.service_id);
-                else if (!info.chan_num.isEmpty())
-                    info.callsign = QString("MPTS_%1").arg(info.chan_num);
+                else if (info.m_si_standard == "mpeg" ||
+                         info.m_si_standard == "scte" ||
+                         info.m_si_standard == "opencable")
+                    info.m_callsign = QString("MPTS_%1").arg(info.m_freqid);
+                else if (info.m_atsc_major_channel > 0)
+                    info.m_callsign =
+                        QString("MPTS_%1").arg(info.m_atsc_major_channel);
+                else if (info.m_service_id > 0)
+                    info.m_callsign = QString("MPTS_%1").arg(info.m_service_id);
+                else if (!info.m_chan_num.isEmpty())
+                    info.m_callsign = QString("MPTS_%1").arg(info.m_chan_num);
                 else
-                    info.callsign = "MPTS_UNKNOWN";
+                    info.m_callsign = "MPTS_UNKNOWN";
 
-                info.service_name = info.callsign;
-                info.service_id = 0;
-                info.atsc_minor_channel = 0;
-                info.format = "MPTS";
+                info.m_service_name = info.m_callsign;
+                info.m_service_id = 0;
+                info.m_atsc_minor_channel = 0;
+                info.m_format = "MPTS";
                 item.m_channels.push_back(info);
             }
 
