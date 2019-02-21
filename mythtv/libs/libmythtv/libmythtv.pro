@@ -64,7 +64,6 @@ macx {
     LIBS += -framework CoreServices
     LIBS += -framework CoreFoundation
     LIBS += -framework OpenGL
-    LIBS += -framework QuickTime
     LIBS += -framework IOKit
     LIBS += -framework CoreVideo
 

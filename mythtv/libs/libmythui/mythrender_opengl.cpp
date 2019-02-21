@@ -104,12 +104,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
         return nullptr;
     }
 
-    QSurfaceFormat format;
-    format.setDepthBufferSize(0);
-    format.setStencilBufferSize(0);
-    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setSwapInterval(1);
+    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     bool opengles = !qgetenv("USE_OPENGLES").isEmpty();
 #ifdef USING_OPENGLES
     opengles = true; // this is probably unnecessary

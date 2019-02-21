@@ -187,18 +187,6 @@ int main(int argc, char *argv[])
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 
-    // try and disable sync to vblank on linux x11
-    qputenv("vblank_mode", "0"); // Intel and AMD
-    qputenv("__GL_SYNC_TO_VBLANK", "0"); // NVidia
-
-    // the default surface format has a swap interval of 1. This is used by
-    // the MythMainwindow widget that then drives vsync for all widgets/children
-    // (i.e. MythPainterWindow) and we cannot override it on some drivers. So
-    // force the default here.
-    QSurfaceFormat fmt;
-    fmt.setSwapInterval(0);
-    QSurfaceFormat::setDefaultFormat(fmt);
-
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -217,6 +205,29 @@ int main(int argc, char *argv[])
         cmdline.PrintVersion();
         return GENERIC_EXIT_OK;
     }
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(0);
+    format.setStencilBufferSize(0);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1);
+
+    // try and disable vsync if running test
+    if (cmdline.toBool("test"))
+    {
+        // try and disable sync to vblank on linux x11
+        qputenv("vblank_mode", "0"); // Intel and AMD
+        qputenv("__GL_SYNC_TO_VBLANK", "0"); // NVidia
+
+        // the default surface format has a swap interval of 1. This is used by
+        // the MythMainwindow widget that then drives vsync for all widgets/children
+        // (i.e. MythPainterWindow) and we cannot override it on some drivers. So
+        // force the default here.
+        format.setSwapInterval(0);
+    }
+
+    QSurfaceFormat::setDefaultFormat(format);
 
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);

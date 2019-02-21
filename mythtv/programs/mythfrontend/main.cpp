@@ -13,6 +13,7 @@ using namespace std;
 #include <QDir>
 #include <QTextCodec>
 #include <QApplication>
+#include <QSurfaceFormat>
 #include <QTimer>
 #ifdef Q_OS_MAC
 #include <QProcessEnvironment>
@@ -1886,6 +1887,15 @@ int main(int argc, char **argv)
     }
 
     CleanupGuard callCleanup(cleanup);
+
+    // Set the default surface format. Explicitly required on some platforms.
+    QSurfaceFormat format;
+    format.setDepthBufferSize(0);
+    format.setStencilBufferSize(0);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1);
+    QSurfaceFormat::setDefaultFormat(format);
 
 #ifdef Q_OS_MAC
     // Without this, we can't set focus to any of the CheckBoxSetting, and most

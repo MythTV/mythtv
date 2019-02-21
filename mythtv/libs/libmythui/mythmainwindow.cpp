@@ -336,6 +336,7 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     winId();
+    setVisible(true); // must be visible before OpenGL initialisation on OSX
     render->setWidget(this);
 }
 
