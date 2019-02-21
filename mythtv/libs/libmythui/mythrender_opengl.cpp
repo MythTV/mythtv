@@ -106,9 +106,6 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     bool opengles = !qgetenv("USE_OPENGLES").isEmpty();
-#ifdef USING_OPENGLES
-    opengles = true; // this is probably unnecessary
-#endif
     if (opengles)
         format.setRenderableType(QSurfaceFormat::OpenGLES);
 

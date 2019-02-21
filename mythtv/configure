@@ -6498,7 +6498,7 @@ int main(void){ return 0; }
 EOF
 fi
 
-enabled qtwebkit || die "Error! QtWebkit headers not found"
+enabled qtwebkit || warn "QtWebkit headers not found. Plugins may fail."
 
 if $(pkg-config --exists Qt5Script) || $(pkg-config --exists QtScript) ; then
     enable qtscript
@@ -6525,14 +6525,6 @@ int main(void)
     return 0;
 }
 EOF
-    fi
-fi
-
-# Disable OpenGL ES support if Qt does not support it
-QTCONF=$(pkg-config --variable=qt_config Qt5Core || pkg-config --variable=qt_config QtCore)
-if echo "$QTCONF" | grep -qv opengles2 ; then
-    if test $target_os != android ; then
-        disable opengles
     fi
 fi
 
