@@ -11,23 +11,19 @@ class PlayerContext;
 
 typedef struct DeleteMapUndoEntry
 {
-    frm_dir_map_t deleteMap;
-    QString message; // how we got from previous map to this map
-    DeleteMapUndoEntry(const frm_dir_map_t &dm, const QString &msg);
-    DeleteMapUndoEntry(void);
+    frm_dir_map_t m_deleteMap;
+    QString       m_message; // how we got from previous map to this map
+    DeleteMapUndoEntry(const frm_dir_map_t &dm, const QString &msg)
+        : m_deleteMap(dm), m_message(msg) { }
+    DeleteMapUndoEntry(void) = default;
+
 } DeleteMapUndoEntry;
 
 class MTV_PUBLIC DeleteMap
 {
     Q_DECLARE_TR_FUNCTIONS(DeleteMap)
   public:
-    DeleteMap(): m_editing(false),
-                 m_nextCutStartIsValid(false),
-                 m_nextCutStart(0), m_changed(true),
-                 m_seekamountpos(4), m_seekamount(1.0),
-                 m_ctx(nullptr), m_cachedTotalForOSD(0), m_undoStackPointer(0)
-    {
-    }
+    DeleteMap() = default;
 
     void SetPlayerContext(PlayerContext *ctx) { m_ctx = ctx; }
     bool HandleAction(QString &action, uint64_t frame);
@@ -102,19 +98,19 @@ class MTV_PUBLIC DeleteMap
     QString CreateTimeString(uint64_t frame, bool use_cutlist,
                              double frame_rate, bool full_resolution) const;
 
-    bool          m_editing;
-    bool          m_nextCutStartIsValid;
-    uint64_t      m_nextCutStart;
+    bool          m_editing             {false};
+    bool          m_nextCutStartIsValid {false};
+    uint64_t      m_nextCutStart        {0};
     frm_dir_map_t m_deleteMap;
     QString       m_seekText;
-    bool          m_changed;
-    int           m_seekamountpos;
-    float         m_seekamount;
-    PlayerContext *m_ctx;
-    uint64_t      m_cachedTotalForOSD;
+    bool          m_changed             {true};
+    int           m_seekamountpos       {4};
+    float         m_seekamount          {1.0f};
+    PlayerContext *m_ctx                {nullptr};
+    uint64_t      m_cachedTotalForOSD   {0};
 
     QVector<DeleteMapUndoEntry> m_undoStack;
-    int m_undoStackPointer;
+    int m_undoStackPointer              {0};
 };
 
 #endif // DELETEMAP_H

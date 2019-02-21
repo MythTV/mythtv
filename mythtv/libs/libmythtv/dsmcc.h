@@ -75,8 +75,8 @@
 class Dsmcc
 {
   public:
-    Dsmcc();
-    ~Dsmcc();
+    Dsmcc() = default;
+    ~Dsmcc() { Reset(); }
     // Reset the object carousel and clear the caches.
     void Reset();
     // Process an incoming DSMCC carousel table
@@ -108,10 +108,10 @@ class Dsmcc
     ObjCarousel *GetCarouselById(unsigned int carId);
 
     // Known carousels.
-    QLinkedList<ObjCarousel*> carousels;
+    QLinkedList<ObjCarousel*> m_carousels;
 
     // Initial stream
-    unsigned short m_startTag;
+    unsigned short m_startTag {0};
 };
 
 #define COMBINE32(data, idx) \

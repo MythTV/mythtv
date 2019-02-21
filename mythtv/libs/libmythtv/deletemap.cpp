@@ -21,12 +21,6 @@
     } \
 } while(0)
 
-DeleteMapUndoEntry::DeleteMapUndoEntry(const frm_dir_map_t &dm,
-                                       const QString &msg) :
-    deleteMap(dm), message(msg) { }
-
-DeleteMapUndoEntry::DeleteMapUndoEntry(void) : message("") { }
-
 void DeleteMap::Push(const QString &undoMessage)
 {
     DeleteMapUndoEntry entry(m_deleteMap, undoMessage);
@@ -56,8 +50,8 @@ bool DeleteMap::Undo(void)
         return false;
     m_undoStackPointer --;
     frm_dir_map_t tmp = m_deleteMap;
-    m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
-    m_undoStack[m_undoStackPointer].deleteMap = tmp;
+    m_deleteMap = m_undoStack[m_undoStackPointer].m_deleteMap;
+    m_undoStack[m_undoStackPointer].m_deleteMap = tmp;
     m_changed = true;
     SaveMap(true);
     return true;
@@ -68,8 +62,8 @@ bool DeleteMap::Redo(void)
     if (!HasRedo())
         return false;
     frm_dir_map_t tmp = m_deleteMap;
-    m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
-    m_undoStack[m_undoStackPointer].deleteMap = tmp;
+    m_deleteMap = m_undoStack[m_undoStackPointer].m_deleteMap;
+    m_undoStack[m_undoStackPointer].m_deleteMap = tmp;
     m_undoStackPointer ++;
     m_changed = true;
     SaveMap(true);
@@ -78,13 +72,13 @@ bool DeleteMap::Redo(void)
 
 QString DeleteMap::GetUndoMessage(void) const
 {
-    return (HasUndo() ? m_undoStack[m_undoStackPointer - 1].message :
+    return (HasUndo() ? m_undoStack[m_undoStackPointer - 1].m_message :
             tr("(Nothing to undo)"));
 }
 
 QString DeleteMap::GetRedoMessage(void) const
 {
-    return (HasRedo() ? m_undoStack[m_undoStackPointer].message :
+    return (HasRedo() ? m_undoStack[m_undoStackPointer].m_message :
             tr("(Nothing to redo)"));
 }
 

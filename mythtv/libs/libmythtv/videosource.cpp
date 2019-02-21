@@ -536,7 +536,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 
     DDLineupList::const_iterator it;
     for (it = lineups.begin(); it != lineups.end(); ++it)
-        addSelection((*it).displayname, (*it).lineupid);
+        addSelection((*it).m_displayname, (*it).m_lineupid);
 
     MythCheckNotification n(tr("Fetching of lineups complete"),
                             tr("DataDirect"));

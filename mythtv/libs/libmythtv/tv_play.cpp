@@ -10813,15 +10813,15 @@ bool TV::LoadDDMap(uint sourceid)
     DDLineupChannels::const_iterator it;
     for (it = channels.begin(); it != channels.end(); ++it)
     {
-        DDStation station = ddp.GetDDStation((*it).stationid);
-        tmp["XMLTV"]    = (*it).stationid;
-        tmp["callsign"] = station.callsign;
-        tmp["channame"] = station.stationname;
-        tmp["channum"]  = (*it).channel;
-        if (!(*it).channelMinor.isEmpty())
+        DDStation station = ddp.GetDDStation((*it).m_stationid);
+        tmp["XMLTV"]    = (*it).m_stationid;
+        tmp["callsign"] = station.m_callsign;
+        tmp["channame"] = station.m_stationname;
+        tmp["channum"]  = (*it).m_channel;
+        if (!(*it).m_channelMinor.isEmpty())
         {
             tmp["channum"] += SourceUtil::GetChannelSeparator(sourceid);
-            tmp["channum"] += (*it).channelMinor;
+            tmp["channum"] += (*it).m_channelMinor;
         }
 
 #if 0

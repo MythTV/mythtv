@@ -30,9 +30,7 @@ class DSMCCCacheKey: public QByteArray
 class DSMCCCacheReference
 {
   public:
-    DSMCCCacheReference() :
-        m_nCarouselId(0),               m_nModuleId(0),
-        m_nStreamTag(0) {}
+    DSMCCCacheReference() = default;
 
     DSMCCCacheReference(unsigned long car, unsigned short m,
                         unsigned short s, const DSMCCCacheKey &k) :
@@ -58,9 +56,9 @@ class DSMCCCacheReference
     QString toString(void) const;
 
   public:
-    unsigned long  m_nCarouselId; // Reference info for the module
-    unsigned short m_nModuleId;
-    unsigned short m_nStreamTag;
+    unsigned long  m_nCarouselId {0}; // Reference info for the module
+    unsigned short m_nModuleId   {0};
+    unsigned short m_nStreamTag  {0};
     DSMCCCacheKey  m_Key;
 
     // Operator required for QMap
@@ -131,7 +129,7 @@ class DSMCCCache
     QMap<DSMCCCacheReference, DSMCCCacheFile*> m_Files;
 
   public:
-    Dsmcc *m_Dsmcc;
+    Dsmcc *m_Dsmcc {nullptr};
 };
 
 #endif
