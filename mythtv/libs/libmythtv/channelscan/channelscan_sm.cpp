@@ -92,25 +92,25 @@ class ScannedChannelInfo
 
     bool IsEmpty() const
     {
-        return pats.empty() && pmts.empty()        &&
-               program_encryption_status.isEmpty() &&
-               !mgt         && cvcts.empty()       && tvcts.empty() &&
-               nits.empty() && sdts.empty();
+        return m_pats.empty() && m_pmts.empty()      &&
+               m_program_encryption_status.isEmpty() &&
+               !m_mgt         && m_cvcts.empty()     && m_tvcts.empty() &&
+               m_nits.empty() && m_sdts.empty();
     }
 
     // MPEG
-    pat_map_t         pats;
-    pmt_vec_t         pmts;
-    QMap<uint,uint>   program_encryption_status; // pnum->enc_status
+    pat_map_t               m_pats;
+    pmt_vec_t               m_pmts;
+    QMap<uint,uint>         m_program_encryption_status; // pnum->enc_status
 
     // ATSC
-    const MasterGuideTable *mgt {nullptr};
-    cvct_vec_t        cvcts;
-    tvct_vec_t        tvcts;
+    const MasterGuideTable *m_mgt {nullptr};
+    cvct_vec_t              m_cvcts;
+    tvct_vec_t              m_tvcts;
 
     // DVB
-    nit_vec_t         nits;
-    sdt_map_t         sdts;
+    nit_vec_t               m_nits;
+    sdt_map_t               m_sdts;
 };
 
 /** \class ChannelScanSM
@@ -149,26 +149,10 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
       m_sourceID(_sourceID),
       m_signalTimeout(signal_timeout),
       m_channelTimeout(channel_timeout),
-      m_otherTableTimeout(0),
-      m_otherTableTime(0),
-      m_setOtherTables(false),
       m_inputName(_inputname),
       m_testDecryption(test_decryption),
-      m_extendScanList(false),
-      // Optional state
-      m_scanDTVTunerType(DTVTunerType::kTunerTypeUnknown),
-      // State
-      m_scanning(false),
-      m_threadExit(false),
-      m_waitingForTables(false),
-      // Transports List
-      m_transportsScanned(0),
-      m_currentTestingDecryption(false),
       // Misc
-      m_channelsFound(999),
-      m_currentInfo(nullptr),
-      m_analogSignalHandler(new AnalogSignalHandler(this)),
-      m_scannerThread(nullptr)
+      m_analogSignalHandler(new AnalogSignalHandler(this))
 {
     m_current = m_scanTransports.end();
 
@@ -585,7 +569,7 @@ void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
 
 bool ChannelScanSM::TestNextProgramEncryption(void)
 {
-    if (!m_currentInfo || m_currentInfo->pmts.empty())
+    if (!m_currentInfo || m_currentInfo->m_pmts.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't monitor decryption -- no pmts");
         m_currentTestingDecryption = false;
@@ -623,10 +607,10 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
         }
 
         const ProgramMapTable *pmt = nullptr;
-        for (uint i = 0; !pmt && (i < m_currentInfo->pmts.size()); ++i)
+        for (uint i = 0; !pmt && (i < m_currentInfo->m_pmts.size()); ++i)
         {
-            pmt = (m_currentInfo->pmts[i]->ProgramNumber() == pnum) ?
-                m_currentInfo->pmts[i] : nullptr;
+            pmt = (m_currentInfo->m_pmts[i]->ProgramNumber() == pnum) ?
+                m_currentInfo->m_pmts[i] : nullptr;
         }
 
         if (pmt)
@@ -796,16 +780,16 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;
-        if (m_currentInfo->pats.contains(tsid))
+        if (m_currentInfo->m_pats.contains(tsid))
             continue;
 
         if (!wait_until_complete || sd->HasCachedAllPAT(tsid))
         {
-            m_currentInfo->pats[tsid] = sd->GetCachedPATs(tsid);
-            if (!m_currentInfo->pmts.empty())
+            m_currentInfo->m_pats[tsid] = sd->GetCachedPATs(tsid);
+            if (!m_currentInfo->m_pmts.empty())
             {
-                sd->ReturnCachedPMTTables(m_currentInfo->pmts);
-                m_currentInfo->pmts.clear();
+                sd->ReturnCachedPMTTables(m_currentInfo->m_pmts);
+                m_currentInfo->m_pmts.clear();
             }
         }
         else
@@ -816,31 +800,31 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     // Grab PMT tables
     if ((!wait_until_complete || sd->HasCachedAllPMTs()) &&
-        m_currentInfo->pmts.empty())
-        m_currentInfo->pmts = sd->GetCachedPMTs();
+        m_currentInfo->m_pmts.empty())
+        m_currentInfo->m_pmts = sd->GetCachedPMTs();
 
     // ATSC
-    if (!m_currentInfo->mgt && sd->HasCachedMGT())
-        m_currentInfo->mgt = sd->GetCachedMGT();
+    if (!m_currentInfo->m_mgt && sd->HasCachedMGT())
+        m_currentInfo->m_mgt = sd->GetCachedMGT();
 
     if ((!wait_until_complete || sd->HasCachedAllCVCTs()) &&
-        m_currentInfo->cvcts.empty())
+        m_currentInfo->m_cvcts.empty())
     {
-        m_currentInfo->cvcts = sd->GetCachedCVCTs();
+        m_currentInfo->m_cvcts = sd->GetCachedCVCTs();
     }
 
     if ((!wait_until_complete || sd->HasCachedAllTVCTs()) &&
-        m_currentInfo->tvcts.empty())
+        m_currentInfo->m_tvcts.empty())
     {
-        m_currentInfo->tvcts = sd->GetCachedTVCTs();
+        m_currentInfo->m_tvcts = sd->GetCachedTVCTs();
     }
 
     // DVB
     if ((!wait_until_complete || sd->HasCachedAllNIT()) &&
-        (m_currentInfo->nits.empty() ||
+        (m_currentInfo->m_nits.empty() ||
         m_timer.elapsed() > (int)m_otherTableTime))
     {
-        m_currentInfo->nits = sd->GetCachedNIT();
+        m_currentInfo->m_nits = sd->GetCachedNIT();
     }
 
     sdt_vec_t sdttmp = sd->GetCachedSDTs();
@@ -851,43 +835,43 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;
-        if (m_currentInfo->sdts.contains(tsid))
+        if (m_currentInfo->m_sdts.contains(tsid))
             continue;
 
         if (!wait_until_complete || sd->HasCachedAllSDT(tsid))
-            m_currentInfo->sdts[tsid] = sd->GetCachedSDTSections(tsid);
+            m_currentInfo->m_sdts[tsid] = sd->GetCachedSDTSections(tsid);
     }
     sd->ReturnCachedSDTTables(sdttmp);
 
     // Check if transport tuning is complete
     if (transport_tune_complete)
     {
-        transport_tune_complete &= !m_currentInfo->pmts.empty();
+        transport_tune_complete &= !m_currentInfo->m_pmts.empty();
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
         {
             transport_tune_complete &= sd->HasCachedMGT();
             transport_tune_complete &=
-                (!m_currentInfo->tvcts.empty() || !m_currentInfo->cvcts.empty());
+                (!m_currentInfo->m_tvcts.empty() || !m_currentInfo->m_cvcts.empty());
         }
         if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
         {
-            transport_tune_complete &= !m_currentInfo->nits.empty();
-            transport_tune_complete &= !m_currentInfo->sdts.empty();
+            transport_tune_complete &= !m_currentInfo->m_nits.empty();
+            transport_tune_complete &= !m_currentInfo->m_sdts.empty();
         }
         if (transport_tune_complete)
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("transport_tune_complete: "
-                        "\n\t\t\tcurrentInfo->pmts.empty():     %1"
+                        "\n\t\t\tcurrentInfo->m_pmts.empty():   %1"
                         "\n\t\t\tsd->HasCachedAnyNIT():         %2"
                         "\n\t\t\tsd->HasCachedAnySDTs():        %3"
-                        "\n\t\t\tcurrentInfo->nits.empty():     %4"
-                        "\n\t\t\tcurrentInfo->sdts.empty():     %5")
-                    .arg(m_currentInfo->pmts.empty())
+                        "\n\t\t\tcurrentInfo->m_nits.empty():   %4"
+                        "\n\t\t\tcurrentInfo->m_sdts.empty():   %5")
+                    .arg(m_currentInfo->m_pmts.empty())
                     .arg(sd->HasCachedAnyNIT())
                     .arg(sd->HasCachedAnySDTs())
-                    .arg(m_currentInfo->nits.empty())
-                    .arg(m_currentInfo->sdts.empty()));
+                    .arg(m_currentInfo->m_nits.empty())
+                    .arg(m_currentInfo->m_sdts.empty()));
         }
     }
     if (!wait_until_complete)
@@ -910,7 +894,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.begin();
         for (; it != m_currentEncryptionStatus.end(); ++it)
         {
-            m_currentInfo->program_encryption_status[it.key()] = *it;
+            m_currentInfo->m_program_encryption_status[it.key()] = *it;
 
             QString msg_tr1 = QObject::tr("Program %1").arg(it.key());
             QString msg_tr2 = QObject::tr("Unknown decryption status");
@@ -935,11 +919,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     // append transports from the NIT to the scan list
     if (transport_tune_complete && m_extendScanList &&
-        !m_currentInfo->nits.empty())
+        !m_currentInfo->m_nits.empty())
     {
         // append delivery system descriptos to scan list
-        nit_vec_t::const_iterator it = m_currentInfo->nits.begin();
-        while (it != m_currentInfo->nits.end())
+        nit_vec_t::const_iterator it = m_currentInfo->m_nits.begin();
+        while (it != m_currentInfo->m_nits.end())
         {
             UpdateScanTransports(*it);
             ++it;
@@ -1221,8 +1205,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PATs
-    pat_map_t::const_iterator pat_list_it = scan_info->pats.begin();
-    for (; pat_list_it != scan_info->pats.end(); ++pat_list_it)
+    pat_map_t::const_iterator pat_list_it = scan_info->m_pats.begin();
+    for (; pat_list_it != scan_info->m_pats.end(); ++pat_list_it)
     {
         pat_vec_t::const_iterator pat_it = (*pat_list_it).begin();
         for (; pat_it != (*pat_list_it).end(); ++pat_it)
@@ -1252,8 +1236,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PMTs
-    pmt_vec_t::const_iterator pmt_it = scan_info->pmts.begin();
-    for (; pmt_it != scan_info->pmts.end(); ++pmt_it)
+    pmt_vec_t::const_iterator pmt_it = scan_info->m_pmts.begin();
+    for (; pmt_it != scan_info->m_pmts.end(); ++pmt_it)
     {
         const ProgramMapTable *pmt = *pmt_it;
         uint pnum = pmt->ProgramNumber();
@@ -1281,8 +1265,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // Cable VCTs
-    cvct_vec_t::const_iterator cvct_it = scan_info->cvcts.begin();
-    for (; cvct_it != scan_info->cvcts.end(); ++cvct_it)
+    cvct_vec_t::const_iterator cvct_it = scan_info->m_cvcts.begin();
+    for (; cvct_it != scan_info->m_cvcts.end(); ++cvct_it)
     {
         for (uint i = 0; i < (*cvct_it)->ChannelCount(); ++i)
         {
@@ -1293,8 +1277,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // Terrestrial VCTs
-    tvct_vec_t::const_iterator tvct_it = scan_info->tvcts.begin();
-    for (; tvct_it != scan_info->tvcts.end(); ++tvct_it)
+    tvct_vec_t::const_iterator tvct_it = scan_info->m_tvcts.begin();
+    for (; tvct_it != scan_info->m_tvcts.end(); ++tvct_it)
     {
         for (uint i = 0; i < (*tvct_it)->ChannelCount(); ++i)
         {
@@ -1305,8 +1289,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // SDTs
-    sdt_map_t::const_iterator sdt_list_it = scan_info->sdts.begin();
-    for (; sdt_list_it != scan_info->sdts.end(); ++sdt_list_it)
+    sdt_map_t::const_iterator sdt_list_it = scan_info->m_sdts.begin();
+    for (; sdt_list_it != scan_info->m_sdts.end(); ++sdt_list_it)
     {
         sdt_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
         for (; sdt_it != (*sdt_list_it).end(); ++sdt_it)
@@ -1329,8 +1313,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         ChannelInsertInfo &info = *dbchan_it;
 
         // NIT
-        nit_vec_t::const_iterator nits_it = scan_info->nits.begin();
-        for (; nits_it != scan_info->nits.end(); ++nits_it)
+        nit_vec_t::const_iterator nits_it = scan_info->m_nits.begin();
+        for (; nits_it != scan_info->m_nits.end(); ++nits_it)
         {
             for (uint i = 0; i < (*nits_it)->TransportStreamCount(); ++i)
             {
@@ -1427,7 +1411,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         uint pnum = dbchan_it.key();
         ChannelInsertInfo &info = *dbchan_it;
-        info.decryption_status = scan_info->program_encryption_status[pnum];
+        info.decryption_status = scan_info->m_program_encryption_status[pnum];
     }
 
     return pnum_to_dbchan;

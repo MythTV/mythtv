@@ -11,12 +11,10 @@
 #include "mythdbcon.h"
 #include "mythlogging.h"
 
-ScanInfo::ScanInfo() : scanid(0), cardid(0), sourceid(0), processed(false) { }
-
-ScanInfo::ScanInfo(uint _scanid, uint _cardid, uint _sourceid,
-                   bool _processed, const QDateTime &_scandate) :
-    scanid(_scanid), cardid(_cardid), sourceid(_sourceid),
-    processed(_processed), scandate(_scandate)
+ScanInfo::ScanInfo(uint scanid, uint cardid, uint sourceid,
+                   bool processed, const QDateTime &scandate) :
+    m_scanid(scanid), m_cardid(cardid), m_sourceid(sourceid),
+    m_processed(processed), m_scandate(scandate)
 {
 }
 
@@ -36,10 +34,10 @@ uint SaveScan(const ScanDTVTransportList &scan)
     const vector<ScanInfo> list = LoadScanList();
     for (uint i = 0; i < list.size(); ++i)
     {
-        if (list[i].scandate > MythDate::current().addDays(-14))
+        if (list[i].m_scandate > MythDate::current().addDays(-14))
             continue;
-        if ((list[i].cardid == cardid) && (list[i].sourceid == sourceid))
-            ScanInfo::DeleteScan(list[i].scanid);
+        if ((list[i].m_cardid == cardid) && (list[i].m_sourceid == sourceid))
+            ScanInfo::DeleteScan(list[i].m_scanid);
     }
 
     MSqlQuery query(MSqlQuery::InitCon());

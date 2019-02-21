@@ -42,40 +42,40 @@ class PaneDVBT2 : public GroupSetting
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
-                                      pfrequency       = new ScanFrequency(),
-                                      pbandwidth       = new ScanBandwidth(),
-                                      pinversion       = new ScanInversion(),
-                                      pconstellation   = new ScanConstellation(),
-                                      pmod_sys         = new ScanDVBTModSys(),
-                                      pcoderate_lp    = new ScanCodeRateLP(),
-                                      pcoderate_hp    = new ScanCodeRateHP(),
-                                      ptrans_mode     = new ScanTransmissionMode(),
-                                      pguard_interval = new ScanGuardInterval(),
-                                      phierarchy      = new ScanHierarchy()});
+                                      m_pfrequency       = new ScanFrequency(),
+                                      m_pbandwidth       = new ScanBandwidth(),
+                                      m_pinversion       = new ScanInversion(),
+                                      m_pconstellation   = new ScanConstellation(),
+                                      m_pmod_sys         = new ScanDVBTModSys(),
+                                      m_pcoderate_lp    = new ScanCodeRateLP(),
+                                      m_pcoderate_hp    = new ScanCodeRateHP(),
+                                      m_ptrans_mode     = new ScanTransmissionMode(),
+                                      m_pguard_interval = new ScanGuardInterval(),
+                                      m_phierarchy      = new ScanHierarchy()});
     }
 
-    QString frequency(void)      const { return pfrequency->getValue();     }
-    QString bandwidth(void)      const { return pbandwidth->getValue();     }
-    QString inversion(void)      const { return pinversion->getValue();     }
-    QString constellation(void)  const { return pconstellation->getValue(); }
-    QString coderate_lp(void)    const { return pcoderate_lp->getValue();   }
-    QString coderate_hp(void)    const { return pcoderate_hp->getValue();   }
-    QString trans_mode(void)     const { return ptrans_mode->getValue();    }
-    QString guard_interval(void) const { return pguard_interval->getValue(); }
-    QString hierarchy(void)      const { return phierarchy->getValue();     }
-    QString mod_sys(void)        const { return pmod_sys->getValue();    }
+    QString frequency(void)      const { return m_pfrequency->getValue();     }
+    QString bandwidth(void)      const { return m_pbandwidth->getValue();     }
+    QString inversion(void)      const { return m_pinversion->getValue();     }
+    QString constellation(void)  const { return m_pconstellation->getValue(); }
+    QString coderate_lp(void)    const { return m_pcoderate_lp->getValue();   }
+    QString coderate_hp(void)    const { return m_pcoderate_hp->getValue();   }
+    QString trans_mode(void)     const { return m_ptrans_mode->getValue();    }
+    QString guard_interval(void) const { return m_pguard_interval->getValue(); }
+    QString hierarchy(void)      const { return m_phierarchy->getValue();     }
+    QString mod_sys(void)        const { return m_pmod_sys->getValue();    }
 
   protected:
-    ScanFrequency        *pfrequency;
-    ScanInversion        *pinversion;
-    ScanBandwidth        *pbandwidth;
-    ScanConstellation    *pconstellation;
-    ScanCodeRateLP       *pcoderate_lp;
-    ScanCodeRateHP       *pcoderate_hp;
-    ScanTransmissionMode *ptrans_mode;
-    ScanGuardInterval    *pguard_interval;
-    ScanHierarchy        *phierarchy;
-    ScanDVBTModSys       *pmod_sys;
+    ScanFrequency        *m_pfrequency      {nullptr};
+    ScanInversion        *m_pinversion      {nullptr};
+    ScanBandwidth        *m_pbandwidth      {nullptr};
+    ScanConstellation    *m_pconstellation  {nullptr};
+    ScanCodeRateLP       *m_pcoderate_lp    {nullptr};
+    ScanCodeRateHP       *m_pcoderate_hp    {nullptr};
+    ScanTransmissionMode *m_ptrans_mode     {nullptr};
+    ScanGuardInterval    *m_pguard_interval {nullptr};
+    ScanHierarchy        *m_phierarchy      {nullptr};
+    ScanDVBTModSys       *m_pmod_sys        {nullptr};
 };
 
 #endif // _PANE_DVBT2_H_

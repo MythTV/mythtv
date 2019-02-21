@@ -41,25 +41,25 @@ class PaneDVBS : public GroupSetting
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
-                                      pfrequency  = new ScanFrequencykHz(),
-                                      ppolarity   = new ScanPolarity(),
-                                      psymbolrate = new ScanSymbolRateDVBS(),
-                                      pfec       = new ScanFec(),
-                                      pinversion = new ScanInversion()});
+                                      m_pfrequency  = new ScanFrequencykHz(),
+                                      m_ppolarity   = new ScanPolarity(),
+                                      m_psymbolrate = new ScanSymbolRateDVBS(),
+                                      m_pfec       = new ScanFec(),
+                                      m_pinversion = new ScanInversion()});
     }
 
-    QString frequency(void)  const { return pfrequency->getValue();  }
-    QString symbolrate(void) const { return psymbolrate->getValue(); }
-    QString inversion(void)  const { return pinversion->getValue();  }
-    QString fec(void)        const { return pfec->getValue();        }
-    QString polarity(void)   const { return ppolarity->getValue();   }
+    QString frequency(void)  const { return m_pfrequency->getValue();  }
+    QString symbolrate(void) const { return m_psymbolrate->getValue(); }
+    QString inversion(void)  const { return m_pinversion->getValue();  }
+    QString fec(void)        const { return m_pfec->getValue();        }
+    QString polarity(void)   const { return m_ppolarity->getValue();   }
 
   protected:
-    ScanFrequencykHz   *pfrequency;
-    ScanSymbolRateDVBS *psymbolrate;
-    ScanInversion  *pinversion;
-    ScanFec        *pfec;
-    ScanPolarity   *ppolarity;
+    ScanFrequencykHz   *m_pfrequency  {nullptr};
+    ScanSymbolRateDVBS *m_psymbolrate {nullptr};
+    ScanInversion      *m_pinversion  {nullptr};
+    ScanFec            *m_pfec        {nullptr};
+    ScanPolarity       *m_ppolarity   {nullptr};
 };
 
 #endif // _PANE_DVBS_H_

@@ -53,7 +53,7 @@ class ChannelScannerGUI :
     friend void *spawn_popup(void*);
 
   public:
-    ChannelScannerGUI(void);
+    ChannelScannerGUI(void) = default;
     virtual void deleteLater(void)
         { Teardown(); }
 
@@ -73,7 +73,7 @@ class ChannelScannerGUI :
     void quitScanning(void);
 
   private:
-    ChannelScannerGUIScanPane *m_scanStage;
+    ChannelScannerGUIScanPane *m_scanStage {nullptr};
     QStringList                m_messageList;
 };
 
