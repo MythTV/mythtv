@@ -166,6 +166,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_transforms(),
     m_parameters(),
     m_cachedMatrixUniforms(),
+    m_cachedUniformLocations(),
     m_flushEnabled(true),
     m_glGenFencesNV(nullptr),
     m_glDeleteFencesNV(nullptr),
@@ -1563,6 +1564,7 @@ void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
         delete Program;
     m_cachedMatrixUniforms.clear();
     m_activeProgram = nullptr;
+    m_cachedUniformLocations.remove(Program);
     doneCurrent();
 }
 
@@ -1587,7 +1589,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
     if (!Uniform || !EnableShaderProgram(Program))
         return;
 
-    // Uniform cacheing
+    // Uniform value cacheing
     QString tag = QStringLiteral("%1-%2").arg(Program->programId()).arg(Uniform);
     QHash<QString,QMatrix4x4>::iterator it = m_cachedMatrixUniforms.find(tag);
     if (it == m_cachedMatrixUniforms.end())
@@ -1597,7 +1599,21 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
     else
         return;
 
-    Program->setUniformValue(Uniform, Value);
+    // Uniform location cacheing
+    QByteArray uniform(Uniform);
+    GLint location = 0;
+    QHash<QByteArray, GLint> &uniforms = m_cachedUniformLocations[Program];
+    if (uniforms.contains(uniform))
+    {
+        location = uniforms[uniform];
+    }
+    else
+    {
+        location = Program->uniformLocation(Uniform);
+        uniforms.insert(uniform, location);
+    }
+
+    Program->setUniformValue(location, Value);
 }
 
 bool MythRenderOpenGL::CreateDefaultShaders(void)

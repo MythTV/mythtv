@@ -228,6 +228,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QStack<QMatrix4x4> m_transforms;
     QMatrix4x4 m_parameters;
     QHash<QString,QMatrix4x4> m_cachedMatrixUniforms;
+    QHash<QOpenGLShaderProgram*, QHash<QByteArray, GLint> > m_cachedUniformLocations;
 
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
