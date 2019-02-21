@@ -9,9 +9,7 @@ using namespace std;
 #include "cc608reader.h"
 
 CC608Reader::CC608Reader(MythPlayer *parent)
-  : m_parent(parent),   m_enabled(false), m_readPosition(0),
-    m_writePosition(0), m_maxTextSize(0), m_ccMode(CC_CC1),
-    m_ccPageNum(0x888)
+  : m_parent(parent)
 {
     memset(&m_inputBuffers, 0, sizeof(m_inputBuffers));
     m_maxTextSize = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);

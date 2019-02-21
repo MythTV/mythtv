@@ -10,12 +10,8 @@
 //static const QString _Location = AudioPlayer::tr("Audio Player");
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
-  : m_parent(parent),     m_audioOutput(nullptr),m_channels(-1),
-    m_orig_channels(-1),  m_codec(AV_CODEC_ID_NONE), m_format(FORMAT_NONE),
-    m_samplerate(44100),  m_codec_profile(0),
-    m_stretchfactor(1.0f),m_passthru(false),
-    m_lock(QMutex::Recursive), m_muted_on_creation(muted),
-    m_no_audio_in(false), m_no_audio_out(true), m_controls_volume(true)
+  : m_parent(parent),
+    m_muted_on_creation(muted)
 {
     m_controls_volume = gCoreContext->GetBoolSetting("MythControlsVolume", true);
 }
