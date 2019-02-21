@@ -464,7 +464,8 @@ void MythRenderOpenGL::makeCurrent()
 {
     m_lock.lock();
     if (!m_lockLevel++)
-        QOpenGLContext::makeCurrent(m_window);
+        if (!QOpenGLContext::makeCurrent(m_window))
+            LOG(VB_GENERAL, LOG_ERR, LOC + "makeCurrent failed");
 }
 
 void MythRenderOpenGL::doneCurrent()
