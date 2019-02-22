@@ -54,42 +54,8 @@ SingleView::SingleView(
     : MythDialog(parent, name),
       ImageView(itemList, pos, slideShow, sortorder),
 
-      // General
-      m_pixmap(nullptr),
-      m_angle(0),
-      m_source_loc(0,0),
-      m_scaleMax(kScaleToFit),
-
-      // Info variables
-      m_info_pixmap(nullptr),
-
       // Caption variables
-      m_caption_show(0),
-      m_caption_remove(false),
-      m_caption_pixmap(nullptr),
-      m_caption_restore_pixmap(nullptr),
-      m_caption_timer(new QTimer(this)),
-
-      // Common effect state variables
-      m_effect_pixmap(nullptr),
-      m_effect_painter(nullptr),
-      m_effect_subtype(0),
-      m_effect_bounds(0,0,0,0),
-      m_effect_delta0(0,0),
-      m_effect_delta1(0,0),
-      m_effect_i(0),
-      m_effect_j(0),
-      m_effect_framerate(0),
-      m_effect_delta2_x(0.0f),
-      m_effect_delta2_y(0.0f),
-      m_effect_alpha(0.0f),
-
-      // Unshared effect state variables
-      m_effect_spiral_tmp0(0,0),
-      m_effect_spiral_tmp1(0,0),
-      m_effect_multi_circle_out_delta_alpha(0.0f),
-      m_effect_milti_circle_out_points(4),
-      m_effect_circle_out_points(4)
+      m_caption_timer(new QTimer(this))
 {
     m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
@@ -113,8 +79,8 @@ SingleView::SingleView(
     m_caption_show = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
     if (m_caption_show)
     {
-        m_caption_pixmap  = CreateBackground(QSize(screenwidth, 100));
-        m_caption_restore_pixmap = new QPixmap(screenwidth, 100);
+        m_caption_pixmap  = CreateBackground(QSize(m_screenwidth, 100));
+        m_caption_restore_pixmap = new QPixmap(m_screenwidth, 100);
     }
 
     // --------------------------------------------------------------------
@@ -218,17 +184,17 @@ void SingleView::paintEvent(QPaintEvent *)
 
     if (!m_effect_running)
     {
-        QPixmap pix(screenwidth, screenheight);
+        QPixmap pix(m_screenwidth, m_screenheight);
         pix.fill(QWidget::palette().color(this->backgroundRole()));
 
         if (m_pixmap)
         {
-            if (m_pixmap->width() <= screenwidth &&
-                m_pixmap->height() <= screenheight)
+            if (m_pixmap->width() <= m_screenwidth &&
+                m_pixmap->height() <= m_screenheight)
             {
                 QPainter p(&pix);
-                p.drawPixmap(QPoint((screenwidth  - m_pixmap->width())  >> 1,
-                                    (screenheight - m_pixmap->height()) >> 1),
+                p.drawPixmap(QPoint((m_screenwidth  - m_pixmap->width())  >> 1,
+                                    (m_screenheight - m_pixmap->height()) >> 1),
                              *m_pixmap, QRect(0,0,-1,-1));
             }
             else
@@ -242,7 +208,7 @@ void SingleView::paintEvent(QPaintEvent *)
             {
                 m_caption_remove = false;
                 QPainter p(this);
-                p.drawPixmap(QPoint(0, screenheight - 100),
+                p.drawPixmap(QPoint(0, m_screenheight - 100),
                              *m_caption_restore_pixmap, QRect(0,0,-1,-1));
                 p.end();
             }
@@ -258,21 +224,21 @@ void SingleView::paintEvent(QPaintEvent *)
                     QPainter sb(m_caption_restore_pixmap);
                     sb.drawPixmap(QPoint(0, 0),
                                   pix,
-                                  QRect(0, screenheight - 100,
-                                        screenwidth, 100));
+                                  QRect(0, m_screenheight - 100,
+                                        m_screenwidth, 100));
                     sb.end();
 
                     // Blit semi-transparent background into place
                     QPainter pbg(&pix);
-                    pbg.drawPixmap(QPoint(0, screenheight - 100),
+                    pbg.drawPixmap(QPoint(0, m_screenheight - 100),
                                    *m_caption_pixmap,
-                                   QRect(0, 0, screenwidth, 100));
+                                   QRect(0, 0, m_screenwidth, 100));
                     pbg.end();
 
                     // Draw caption
                     QPainter p(&pix);
                     p.initFrom(this);
-                    p.drawText(0, screenheight - 100, screenwidth, 100,
+                    p.drawText(0, m_screenheight - 100, m_screenwidth, 100,
                                Qt::AlignCenter, item->GetCaption());
                     p.end();
 
@@ -286,7 +252,7 @@ void SingleView::paintEvent(QPaintEvent *)
             {
                 QPainter p(&pix);
                 p.initFrom(this);
-                p.drawText(screenwidth / 10, screenheight / 10,
+                p.drawText(m_screenwidth / 10, m_screenheight / 10,
                            QString::number(m_zoom) + "x Zoom");
                 p.end();
             }
@@ -296,12 +262,12 @@ void SingleView::paintEvent(QPaintEvent *)
                 if (!m_info_pixmap)
                 {
                     m_info_pixmap = CreateBackground(QSize(
-                        screenwidth  - 2 * screenwidth  / 10,
-                        screenheight - 2 * screenheight / 10));
+                        m_screenwidth  - 2 * m_screenwidth  / 10,
+                        m_screenheight - 2 * m_screenheight / 10));
                 }
 
                 QPainter ip(&pix);
-                ip.drawPixmap(QPoint(screenwidth / 10, screenheight / 10),
+                ip.drawPixmap(QPoint(m_screenwidth / 10, m_screenheight / 10),
                               *m_info_pixmap, QRect(0,0,-1,-1));
                 ip.end();
 
@@ -317,10 +283,10 @@ void SingleView::paintEvent(QPaintEvent *)
 
                 if (!info.isEmpty())
                 {
-                    p.drawText(screenwidth  / 10 + (int)(10 * wmult),
-                               screenheight / 10 + (int)(10 * hmult),
-                               m_info_pixmap->width()  - 2 * (int)(10 * wmult),
-                               m_info_pixmap->height() - 2 * (int)(10 * hmult),
+                    p.drawText(m_screenwidth  / 10 + (int)(10 * m_wmult),
+                               m_screenheight / 10 + (int)(10 * m_hmult),
+                               m_info_pixmap->width()  - 2 * (int)(10 * m_wmult),
+                               m_info_pixmap->height() - 2 * (int)(10 * m_hmult),
                                Qt::AlignLeft, info);
                 }
                 p.end();
@@ -360,8 +326,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-    int scrollX = screenwidth / 10;
-    int scrollY = screenheight / 10;
+    int scrollX = m_screenwidth / 10;
+    int scrollY = m_screenheight / 10;
 
     for (unsigned int i = 0; i < (unsigned int) actions.size() && !handled; i++)
     {
@@ -387,8 +353,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 SetZoom(m_zoom - 0.5f);
                 if (m_zoom > 1.0f)
                 {
-                    m_source_loc.setY(m_source_loc.y() - (screenheight / 4));
-                    m_source_loc.setX(m_source_loc.x() - (screenwidth / 4));
+                    m_source_loc.setY(m_source_loc.y() - (m_screenheight / 4));
+                    m_source_loc.setX(m_source_loc.x() - (m_screenwidth / 4));
                     CheckPosition();
                 }
                 else
@@ -402,8 +368,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 SetZoom(m_zoom + 0.5f);
                 if (m_zoom > 1.0f)
                 {
-                    m_source_loc.setY(m_source_loc.y() + (screenheight / 4));
-                    m_source_loc.setX(m_source_loc.x() + (screenwidth / 4));
+                    m_source_loc.setY(m_source_loc.y() + (m_screenheight / 4));
+                    m_source_loc.setX(m_source_loc.x() + (m_screenwidth / 4));
                     CheckPosition();
                 }
                 else
@@ -431,7 +397,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             {
                 m_source_loc.setX(m_source_loc.x() + scrollX);
                 m_source_loc.setX(min(m_source_loc.x(),
-                                  m_pixmap->width() - screenwidth));
+                                  m_pixmap->width() - m_screenwidth));
             }
         }
         else if (action == "SCROLLDOWN")
@@ -440,7 +406,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             {
                 m_source_loc.setY(m_source_loc.y() + scrollY);
                 m_source_loc.setY(min(m_source_loc.y(),
-                                  m_pixmap->height() - screenheight));
+                                  m_pixmap->height() - m_screenheight));
             }
         }
         else if (action == "SCROLLUP")
@@ -457,8 +423,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom > 1.0f && m_pixmap)
             {
                 m_source_loc = QPoint(
-                    (m_pixmap->width()  - screenwidth)  >> 1,
-                    (m_pixmap->height() - screenheight) >> 1);
+                    (m_pixmap->width()  - m_screenwidth)  >> 1,
+                    (m_pixmap->height() - m_screenheight) >> 1);
             }
         }
         else if (action == "UPLEFT")
@@ -473,8 +439,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom > 1.0f && m_pixmap)
             {
                 m_source_loc = QPoint(
-                    m_pixmap->width()  - scrollX - screenwidth,
-                    m_pixmap->height() - scrollY - screenheight);
+                    m_pixmap->width()  - scrollX - m_screenwidth,
+                    m_pixmap->height() - scrollY - m_screenheight);
             }
         }
         else if (action == "ROTRIGHT")
@@ -547,8 +513,8 @@ void  SingleView::CheckPosition(void)
 {
     m_source_loc.setX((m_source_loc.x() < 0) ? 0 : m_source_loc.x());
     m_source_loc.setY((m_source_loc.y() < 0) ? 0 : m_source_loc.y());
-    m_source_loc.setX(min(m_source_loc.x(), m_pixmap->width() - screenwidth));
-    m_source_loc.setY(min(m_source_loc.y(), m_pixmap->height() - screenheight));
+    m_source_loc.setX(min(m_source_loc.x(), m_pixmap->width() - m_screenwidth));
+    m_source_loc.setY(min(m_source_loc.y(), m_pixmap->height() - m_screenheight));
 }
 
 void SingleView::DisplayNext(bool reset, bool loadImage)
@@ -680,7 +646,7 @@ void SingleView::SetZoom(float zoom)
     QImage img = m_image;
 
     QSize dest = QSize(
-        (int)(screenwidth * m_zoom), (int)(screenheight * m_zoom));
+        (int)(m_screenwidth * m_zoom), (int)(m_screenheight * m_zoom));
 
     QSize sz = GalleryUtil::ScaleToDest(m_image.size(), dest, m_scaleMax);
     if ((sz.width() > 0) && (sz.height() > 0))
@@ -782,7 +748,7 @@ void SingleView::StartPainter(void)
 void SingleView::CreateEffectPixmap(void)
 {
     if (!m_effect_pixmap)
-        m_effect_pixmap = new QPixmap(screenwidth, screenheight);
+        m_effect_pixmap = new QPixmap(m_screenwidth, m_screenheight);
 
     m_effect_pixmap->fill(QWidget::palette().color(this->backgroundRole()));
 

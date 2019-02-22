@@ -36,8 +36,10 @@ class MHBitmapDisplay;
 class MHBitmap : public MHVisible  
 {
   public:
-    MHBitmap();
-    MHBitmap(const MHBitmap &ref);
+    MHBitmap() = default;
+    MHBitmap(const MHBitmap &ref)
+        : MHVisible(ref), m_fTiling(ref.m_fTiling),
+          m_nOrigTransparency(ref.m_nOrigTransparency) {}
     const char *ClassName() override // MHRoot
         { return "Bitmap"; }
     virtual ~MHBitmap();
@@ -62,15 +64,16 @@ class MHBitmap : public MHVisible
     QRegion GetOpaqueArea() override; // MHVisible
 
   protected:
-    bool    m_fTiling;
-    int     m_nOrigTransparency;
+    bool    m_fTiling           {false};
+    int     m_nOrigTransparency {0};
 
     // Internal attributes
-    int     m_nTransparency;
+    int     m_nTransparency     {0};
     // Added in UK MHEG
-    int     m_nXDecodeOffset, m_nYDecodeOffset;
+    int     m_nXDecodeOffset    {0};
+    int     m_nYDecodeOffset    {0};
 
-    MHBitmapDisplay  *m_pContent; // Pointer to current image if any.
+    MHBitmapDisplay  *m_pContent {nullptr}; // Pointer to current image if any.
 
     void CreateContent(const unsigned char *p, int s, MHEngine *engine);
 };

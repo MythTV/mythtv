@@ -29,15 +29,15 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
-XMLTVParser::XMLTVParser() : current_year(0)
+XMLTVParser::XMLTVParser()
 {
-    current_year = MythDate::current().date().toString("yyyy").toUInt();
+    m_current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
 
 void XMLTVParser::lateInit()
 {
-    _movieGrabberPath = MetadataDownload::GetMovieGrabber();
-    _tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
+    m_movieGrabberPath = MetadataDownload::GetMovieGrabber();
+    m_tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
 }
 
 static uint ELFHash(const QByteArray &ba)
@@ -78,8 +78,8 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 
     QString xmltvid = element.attribute("id", "");
 
-    chaninfo->xmltvid = xmltvid;
-    chaninfo->tvformat = "Default";
+    chaninfo->m_xmltvid = xmltvid;
+    chaninfo->m_tvformat = "Default";
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -89,42 +89,42 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                if (chaninfo->icon.isEmpty())
+                if (chaninfo->m_icon.isEmpty())
                 {
                     QString path = info.attribute("src", "");
                     if (!path.isEmpty() && !path.contains("://"))
                     {
                         QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                        chaninfo->icon = base +
+                        chaninfo->m_icon = base +
                             ((path.startsWith("/")) ? path : QString("/") + path);
                     }
                     else if (!path.isEmpty())
                     {
                         QUrl url(path);
                         if (url.isValid())
-                            chaninfo->icon = url.toString();
+                            chaninfo->m_icon = url.toString();
                     }
                 }
             }
             else if (info.tagName() == "display-name")
             {
-                if (chaninfo->name.isEmpty())
+                if (chaninfo->m_name.isEmpty())
                 {
-                    chaninfo->name = info.text();
+                    chaninfo->m_name = info.text();
                 }
-                else if (chaninfo->callsign.isEmpty())
+                else if (chaninfo->m_callsign.isEmpty())
                 {
-                    chaninfo->callsign = info.text();
+                    chaninfo->m_callsign = info.text();
                 }
-                else if (chaninfo->channum.isEmpty())
+                else if (chaninfo->m_channum.isEmpty())
                 {
-                    chaninfo->channum = info.text();
+                    chaninfo->m_channum = info.text();
                 }
             }
         }
     }
 
-    chaninfo->freqid = chaninfo->channum;
+    chaninfo->m_freqid = chaninfo->m_channum;
     return chaninfo;
 }
 
@@ -559,7 +559,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     }
                 }
                 else if ((info.attribute("system") == "themoviedb.org") &&
-                    (_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
+                    (m_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
                 {
                     /* text is movie/<inetref> */
                     QString inetrefRaw(getFirstText(info));
@@ -569,7 +569,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     }
                 }
                 else if ((info.attribute("system") == "thetvdb.com") &&
-                    (_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
+                    (m_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
                 {
                     /* text is series/<inetref> */
                     QString inetrefRaw(getFirstText(info));
@@ -589,7 +589,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
     if (!pginfo->airdate
         && ProgramInfo::kCategorySeries != pginfo->categoryType)
-        pginfo->airdate = current_year;
+        pginfo->airdate = m_current_year;
 
     if (programid.isEmpty())
     {
@@ -694,7 +694,7 @@ bool XMLTVParser::parseFile(
             if (e.tagName() == "channel")
             {
                 ChannelInfo *chinfo = parseChannel(e, baseUrl);
-                if (!chinfo->xmltvid.isEmpty())
+                if (!chinfo->m_xmltvid.isEmpty())
                     chanlist->push_back(*chinfo);
                 delete chinfo;
             }

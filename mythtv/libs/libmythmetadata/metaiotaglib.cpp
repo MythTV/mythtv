@@ -15,11 +15,6 @@
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-MetaIOTagLib::MetaIOTagLib()
-    : MetaIO()
-{
-}
-
 /*!
 * \brief Writes metadata common to all tag formats to the tag
 *

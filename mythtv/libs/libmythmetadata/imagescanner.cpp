@@ -13,16 +13,9 @@
 template <class DBFS>
 ImageScanThread<DBFS>::ImageScanThread(DBFS *const dbfs, ImageThumb<DBFS> *thumbGen)
     : MThread("ImageScanner"),
-      m_scanning(false), m_mutexState(),
-      m_clearQueue(),    m_mutexQueue(),
       m_dbfs(*dbfs),
       m_thumb(*thumbGen),
-      m_dbDirMap(), m_dbFileMap(), m_seenDir(), m_seenFile(),
-      m_changedImages(),
-      m_bcastTimer(),
-      m_progressCount(0), m_progressTotalCount(0), m_mutexProgress(),
-      m_dir(m_dbfs.GetImageFilters()),
-      m_exclusions()
+      m_dir(m_dbfs.GetImageFilters())
 { }
 
 

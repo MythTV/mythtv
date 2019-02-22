@@ -26,7 +26,7 @@ GrabberScript::GrabberScript(const QString& title, const QString& image,
               const bool& search, const bool& tree,
               const QString& description, const QString& commandline,
               const double& version) :
-    MThread("GrabberScript"), m_lock(QMutex::Recursive)
+    MThread("GrabberScript")
 {
     m_title = title;
     m_image = image;
@@ -140,13 +140,11 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
     }
 }
 
-GrabberManager::GrabberManager() :     m_lock(QMutex::Recursive)
+GrabberManager::GrabberManager()
 {
     m_updateFreq = (gCoreContext->GetNumSetting(
                        "netsite.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
-    m_runningCount = 0;
-    m_refreshAll = false;
     connect( m_timer, SIGNAL(timeout()),
                       this, SLOT(timeout()));
 }
@@ -191,7 +189,6 @@ GrabberDownloadThread::GrabberDownloadThread(QObject *parent) :
     MThread("GrabberDownload")
 {
     m_parent = parent;
-    m_refreshAll = false;
 }
 
 GrabberDownloadThread::~GrabberDownloadThread()
@@ -245,8 +242,6 @@ void GrabberDownloadThread::run()
 }
 
 Search::Search()
-    : m_searchProcess(nullptr), m_numResults(0),
-      m_numReturned(0), m_numIndex(0)
 {
     m_videoList.clear();
 }

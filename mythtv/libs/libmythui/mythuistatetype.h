@@ -64,10 +64,10 @@ class MUI_PUBLIC MythUIStateType : public MythUIComposite
     QMap<QString, MythUIType *> m_ObjectsByName;
     QMap<int, MythUIType *> m_ObjectsByState;
 
-    MythUIType *m_CurrentState;
+    MythUIType *m_CurrentState {nullptr};
     MythRect    m_ParentArea;
 
-    bool m_ShowEmpty;
+    bool        m_ShowEmpty    {true};
 
   friend class MythUIButtonList;
 };

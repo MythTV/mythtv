@@ -46,9 +46,6 @@ namespace
 
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
-      m_siteMap(nullptr),            m_siteButtonList(nullptr),
-      m_siteGeneric(nullptr),        m_currentNode(nullptr),
-      m_noSites(nullptr),
       m_gdt(new GrabberDownloadThread(this)), m_type(type)
 {
     connect(m_gdt, SIGNAL(finished()), SLOT(DoTreeRefresh()));
@@ -947,7 +944,7 @@ void NetTree::customEvent(QEvent *event)
         if (!tde)
             return;
 
-        ThumbnailData *data = tde->thumb;
+        ThumbnailData *data = tde->m_thumb;
 
         if (!data)
             return;

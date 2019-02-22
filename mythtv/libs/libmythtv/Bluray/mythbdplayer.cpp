@@ -6,11 +6,6 @@
 
 #define LOC     QString("BDPlayer: ")
 
-MythBDPlayer::MythBDPlayer(PlayerFlags flags)
-  : MythPlayer(flags), m_stillFrameShowing(false)
-{
-}
-
 bool MythBDPlayer::HasReachedEof(void) const
 {
     EofState eof = GetEof();

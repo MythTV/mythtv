@@ -42,7 +42,8 @@ class GlobalSetup : public MythScreenType
     Q_OBJECT
 
   public:
-    GlobalSetup(MythScreenStack *parent, const QString &name);
+    GlobalSetup(MythScreenStack *parent, const QString &name)
+        : MythScreenType(parent, name) {}
     ~GlobalSetup() = default;
 
     bool Create(void) override; // MythScreenType
@@ -54,11 +55,11 @@ class GlobalSetup : public MythScreenType
     void loadData(void);
 
   private:
-    MythUICheckBox *m_backgroundCheckbox;
-    MythUISpinBox *m_timeoutSpinbox;
-    int m_timeout;
-    int m_hold_timeout;
-    MythUIButton *m_finishButton;
+    MythUICheckBox *m_backgroundCheckbox {nullptr};
+    MythUISpinBox  *m_timeoutSpinbox     {nullptr};
+    int             m_timeout            {0};
+    int             m_hold_timeout       {0};
+    MythUIButton   *m_finishButton       {nullptr};
 };
 
 class ScreenSetup : public MythScreenType

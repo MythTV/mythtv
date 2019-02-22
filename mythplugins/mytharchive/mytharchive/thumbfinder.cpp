@@ -86,22 +86,9 @@ int SeekAmountsCount = sizeof(SeekAmounts) / sizeof(SeekAmounts[0]);
 ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
                          const QString &menuTheme)
             :MythScreenType(parent, "ThumbFinder"),
-    m_inputFC(nullptr),        m_codecCtx(nullptr),
-    m_codec(nullptr),
-    m_fps(0.0),                m_outputbuf(nullptr),
-    m_frameWidth(0),           m_frameHeight(0),
-    m_videostream(0),          m_currentSeek(0),
-    m_startTime(-1),           m_startPTS(-1),
-    m_currentPTS(-1),          m_firstIFramePTS(-1),
-    m_frameTime(0),            m_updateFrame(false),
-    m_finalDuration(0),        m_offset(0),
     m_archiveItem(archiveItem),
     m_thumbCount(getChapterCount(menuTheme)),
-    m_thumbDir(createThumbDir()),
-    m_frameButton(nullptr),    m_saveButton(nullptr),
-    m_cancelButton(nullptr),   m_frameImage(nullptr),
-    m_positionImage(nullptr),  m_imageGrid(nullptr),
-    m_seekAmountText(nullptr), m_currentPosText(nullptr)
+    m_thumbDir(createThumbDir())
 {
     // copy thumbList so we can abandon changes if required
     m_thumbList.clear();

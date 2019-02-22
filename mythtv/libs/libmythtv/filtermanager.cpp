@@ -39,8 +39,7 @@ static const char *FmtToString(VideoFrameType ft)
 
 FilterChain::~FilterChain()
 {
-    vector<VideoFilter*>::iterator it = filters.begin();
-    for (; it != filters.end(); ++it)
+    for (auto it = m_filters.begin(); it != m_filters.end(); ++it)
     {
         VideoFilter *filter = *it;
         if (filter->opts)
@@ -50,7 +49,7 @@ FilterChain::~FilterChain()
         dlclose(filter->handle);
         free(filter);
     }
-    filters.clear();
+    m_filters.clear();
 }
 
 void FilterChain::ProcessFrame(VideoFrame *frame, FrameScanType scan)
@@ -58,8 +57,7 @@ void FilterChain::ProcessFrame(VideoFrame *frame, FrameScanType scan)
     if (!frame)
         return;
 
-    vector<VideoFilter*>::iterator it = filters.begin();
-    for (; it != filters.end(); ++it)
+    for (auto it = m_filters.begin(); it != m_filters.end(); ++it)
         (*it)->filter(*it, frame, kScan_Intr2ndField == scan);
 }
 
@@ -97,8 +95,7 @@ FilterManager::FilterManager()
 
 FilterManager::~FilterManager()
 {
-    filter_map_t::iterator itf = filters.begin();
-    for (; itf != filters.end(); ++itf)
+    for (auto itf = m_filters.begin(); itf != m_filters.end(); ++itf)
     {
         FilterInfo *tmp = itf->second;
         itf->second = nullptr;
@@ -109,16 +106,15 @@ FilterManager::~FilterManager()
         delete [] (tmp->formats);
         delete tmp;
     }
-    filters.clear();
+    m_filters.clear();
 
-    library_map_t::iterator ith = dlhandles.begin();
-    for (; ith != dlhandles.end(); ++ith)
+    for (auto ith = m_dlhandles.begin(); ith != m_dlhandles.end(); ++ith)
     {
         void *tmp = ith->second;
         ith->second = nullptr;
         dlclose(tmp);
     }
-    dlhandles.clear();
+    m_dlhandles.clear();
 }
 
 bool FilterManager::LoadFilterLib(const QString &path)
@@ -126,8 +122,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
     dlerror(); // clear out any pre-existing dlerrors
 
     void *dlhandle = nullptr;
-    library_map_t::iterator it = dlhandles.find(path);
-    if (it != dlhandles.end())
+    library_map_t::iterator it = m_dlhandles.find(path);
+    if (it != m_dlhandles.end())
         dlhandle = it->second;
 
     if (!dlhandle)
@@ -141,7 +137,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
                 QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
             return false;
         }
-        dlhandles[path] = dlhandle;
+        m_dlhandles[path] = dlhandle;
     }
 
     const FilterInfo *filtInfo =
@@ -174,7 +170,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
 
         QByteArray libname = path.toLatin1();
         newFilter->libname = strdup(libname.constData());
-        filters[newFilter->name] = newFilter;
+        m_filters[newFilter->name] = newFilter;
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("filters[%1] = 0x%2")
                 .arg(newFilter->name).arg((uint64_t)newFilter,0,16));
     }
@@ -184,8 +180,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
 const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
 {
     const FilterInfo *finfo = nullptr;
-    filter_map_t::const_iterator it = filters.find(name);
-    if (it != filters.end())
+    filter_map_t::const_iterator it = m_filters.find(name);
+    if (it != m_filters.end())
         finfo = it->second;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("GetFilterInfo(%1)").arg(name) +
@@ -478,8 +474,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     bufsize = nbufsize;
 
-    vector<FmtConv*>::iterator it = FmtList.begin();
-    for (; it != FmtList.end(); ++it)
+    for (auto it = FmtList.begin(); it != FmtList.end(); ++it)
         delete *it;
     FmtList.clear();
 

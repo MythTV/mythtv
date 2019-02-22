@@ -382,12 +382,12 @@ DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
         {
             DTC::Lineup *pLineup = pLineups->AddNewLineup();
 
-            pLineup->setLineupId((*it).lineupid);
-            pLineup->setName((*it).name);
-            pLineup->setDisplayName((*it).displayname);
-            pLineup->setType((*it).type);
-            pLineup->setPostal((*it).postal);
-            pLineup->setDevice((*it).device);
+            pLineup->setLineupId((*it).m_lineupid);
+            pLineup->setName((*it).m_name);
+            pLineup->setDisplayName((*it).m_displayname);
+            pLineup->setType((*it).m_type);
+            pLineup->setPostal((*it).m_postal);
+            pLineup->setDevice((*it).m_device);
         }
     }
 

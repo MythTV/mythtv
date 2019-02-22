@@ -64,7 +64,7 @@ class DarwinFirewireDevice : public FirewireDevice
         bool add_plug, bool remove_plug, uint retry_cnt = 4);
 
     void RunController(void);
-    void BroadcastToListeners(const unsigned char *data, uint dataSize);
+    void BroadcastToListeners(const unsigned char *data, uint dataSize) override; // FirewireDevice
     void UpdateDeviceListItem(uint64_t guid, void *item);
     void ProcessNoDataMessage(void);
     void ProcessStreamingMessage(
@@ -79,9 +79,9 @@ class DarwinFirewireDevice : public FirewireDevice
     vector<AVCInfo> GetSTBListPrivate(void);
 
   private:
-    int      m_local_node;
-    int      m_remote_node;
-    DFDPriv *m_priv;
+    int      m_local_node  {-1};
+    int      m_remote_node {-1};
+    DFDPriv *m_priv        {nullptr};
 };
 
 #endif // _DARWIN_FIREWIRE_DEVICE_H_

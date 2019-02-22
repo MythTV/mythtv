@@ -47,14 +47,6 @@ using namespace std;
 
 #define LOC QString("ChannelBase[%1]: ").arg(m_inputid)
 
-ChannelBase::ChannelBase(TVRec *parent) :
-    m_pParent(parent), m_curchannelname(""),
-    m_commfree(false), m_inputid(0), m_sourceid(0), m_name(""),
-    m_startChanNum(""), m_externalChanger(""), m_tuneToChannel(""),
-    m_system(nullptr), m_system_status(0)
-{
-}
-
 ChannelBase::~ChannelBase(void)
 {
     QMutexLocker locker(&m_system_lock);
@@ -83,7 +75,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     // Attempt to find the requested startchannel
     for (auto cit = m_channels.begin(); cit != m_channels.end(); ++cit)
     {
-        if ((*cit).channum == startchannel &&
+        if ((*cit).m_channum == startchannel &&
             IsTunable(startchannel))
         {
             LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -99,7 +91,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
         IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         uint chanid = ChannelUtil::GetNextChannel(
-            m_channels, m_channels[0].chanid,
+            m_channels, m_channels[0].m_chanid,
             mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
 
         ChannelInfoList::const_iterator cit =
@@ -110,15 +102,15 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
             if (!setchan)
             {
                 ok = IsTunable((mplexid_restriction || chanid_restriction)
-                               ? (*cit).channum : startchannel);
+                               ? (*cit).m_channum : startchannel);
             }
             else
-                ok = SetChannelByString((*cit).channum);
+                ok = SetChannelByString((*cit).m_channum);
 
             if (ok)
             {
                 if (mplexid_restriction || chanid_restriction)
-                    startchannel = (*cit).channum;
+                    startchannel = (*cit).m_channum;
                 msg2 = QString("selected to '%1' instead.")
                     .arg(startchannel);
                 msg_error = false;
@@ -242,15 +234,15 @@ bool ChannelBase::IsInputAvailable(
         {
             LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                 QString("Input %1 is busy on %2/%3")
-                .arg(info.inputid)
-                .arg(info.chanid).arg(info.mplexid));
-            if (info.sourceid != m_sourceid)
+                .arg(info.m_inputid)
+                .arg(info.m_chanid).arg(info.m_mplexid));
+            if (info.m_sourceid != m_sourceid)
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is busy"));
                 return false;
             }
-            mplexid_restriction = info.mplexid;
-            chanid_restriction = info.chanid;
+            mplexid_restriction = info.m_mplexid;
+            chanid_restriction = info.m_chanid;
         }
     }
 

@@ -21,7 +21,7 @@ using TagLib::String;
 class META_PUBLIC MetaIOOggVorbis : public MetaIOTagLib
 {
   public:
-    MetaIOOggVorbis(void);
+    MetaIOOggVorbis(void) : MetaIOTagLib() {}
     ~MetaIOOggVorbis(void) = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib

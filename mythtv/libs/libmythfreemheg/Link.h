@@ -58,7 +58,7 @@ class MHLink : public MHIngredient
 
   protected:
     MHObjectRef m_EventSource;
-    enum EventType m_nEventType;
+    enum EventType m_nEventType {EventIsAvailable};
     MHUnion m_EventData;
     MHActionSequence m_LinkEffect;
 };

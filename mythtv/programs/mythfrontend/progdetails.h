@@ -14,7 +14,9 @@ class ProgDetails : public MythScreenType
 {
     Q_OBJECT
   public:
-     ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo);
+     ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo)
+         : MythScreenType (parent, "progdetails"),
+           m_progInfo(*progInfo), m_infoList(*this) {}
     ~ProgDetails();
 
     bool Create(void) override; // MythScreenType

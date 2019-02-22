@@ -85,7 +85,7 @@ class MTV_PUBLIC DVDInfo
                                     const QString &logPrefix);
 
   protected:
-    dvdnav_t   *m_nav;
+    dvdnav_t   *m_nav {nullptr};
     QString     m_name;
     QString     m_serialnumber;
     QString     m_lastError;
@@ -209,68 +209,68 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
         PROCESS_WAIT
     }processState_t;
 
-    dvdnav_t      *m_dvdnav;
+    dvdnav_t      *m_dvdnav                 {nullptr};
     unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE];
-    unsigned char *m_dvdBlockReadBuf;
-    int            m_dvdBlockRPos;
-    int            m_dvdBlockWPos;
-    long long      m_pgLength;
-    long long      m_pgcLength;
-    long long      m_cellStart;
-    bool           m_cellChanged;
-    bool           m_pgcLengthChanged;
-    long long      m_pgStart;
-    long long      m_currentpos;
-    dvdnav_t      *m_lastNav; // This really belongs in the player.
-    int32_t        m_part;
-    int32_t        m_lastPart;
-    int32_t        m_title;
-    int32_t        m_lastTitle;
-    bool           m_playerWait;
-    int32_t        m_titleParts;
-    bool           m_gotStop;
-    int            m_currentAngle;
-    int            m_currentTitleAngleCount;
-    int64_t        m_endPts;
-    int64_t        m_timeDiff;
+    unsigned char *m_dvdBlockReadBuf        {nullptr};
+    int            m_dvdBlockRPos           {0};
+    int            m_dvdBlockWPos           {0};
+    long long      m_pgLength               {0};
+    long long      m_pgcLength              {0};
+    long long      m_cellStart              {0};
+    bool           m_cellChanged            {false};
+    bool           m_pgcLengthChanged       {false};
+    long long      m_pgStart                {0};
+    long long      m_currentpos             {0};
+    dvdnav_t      *m_lastNav                {nullptr}; // This really belongs in the player.
+    int32_t        m_part                   {0};
+    int32_t        m_lastPart               {0};
+    int32_t        m_title                  {0};
+    int32_t        m_lastTitle              {0};
+    bool           m_playerWait             {false};
+    int32_t        m_titleParts             {0};
+    bool           m_gotStop                {false};
+    int            m_currentAngle           {0};
+    int            m_currentTitleAngleCount {0};
+    int64_t        m_endPts                 {0};
+    int64_t        m_timeDiff               {0};
 
-    int            m_still;
-    int            m_lastStill;
-    bool           m_audioStreamsChanged;
-    bool           m_dvdWaiting;
-    long long      m_titleLength;
-    bool           m_skipstillorwait;
-    long long      m_cellstartPos;
-    bool           m_buttonSelected;
-    bool           m_buttonExists;
-    bool           m_buttonSeenInCell;
-    bool           m_lastButtonSeenInCell;
-    int            m_cellid;
-    int            m_lastcellid;
-    int            m_vobid;
-    int            m_lastvobid;
-    bool           m_cellRepeated;
+    int            m_still                  {0};
+    int            m_lastStill              {0};
+    bool           m_audioStreamsChanged    {false};
+    bool           m_dvdWaiting             {false};
+    long long      m_titleLength            {0};
+    bool           m_skipstillorwait        {true};
+    long long      m_cellstartPos           {0};
+    bool           m_buttonSelected         {false};
+    bool           m_buttonExists           {false};
+    bool           m_buttonSeenInCell       {false};
+    bool           m_lastButtonSeenInCell   {false};
+    int            m_cellid                 {0};
+    int            m_lastcellid             {0};
+    int            m_vobid                  {0};
+    int            m_lastvobid              {0};
+    bool           m_cellRepeated           {false};
 
-    int            m_curAudioTrack;
-    int8_t         m_curSubtitleTrack;
-    bool           m_autoselectsubtitle;
+    int            m_curAudioTrack          {0};
+    int8_t         m_curSubtitleTrack       {0};
+    bool           m_autoselectsubtitle     {true};
     QString        m_dvdname;
     QString        m_serialnumber;
-    bool           m_seeking;
-    int64_t        m_seektime;
-    int64_t        m_currentTime;
+    bool           m_seeking                {false};
+    int64_t        m_seektime               {0};
+    int64_t        m_currentTime            {0};
     QMap<uint, uint> m_seekSpeedMap;
     QMap<uint, QList<uint64_t> > m_chapterMap;
 
-    MythDVDPlayer *m_parent;
-    float          m_forcedAspect;
+    MythDVDPlayer  *m_parent                {nullptr};
+    float           m_forcedAspect          {-1.0f};
 
-    QMutex          m_contextLock;
-    MythDVDContext *m_context;
-    processState_t  m_processState;
-    dvdnav_status_t m_dvdStat;
-    int32_t        m_dvdEvent;
-    int32_t        m_dvdEventSize;
+    QMutex          m_contextLock           {QMutex::Recursive};
+    MythDVDContext *m_context               {nullptr};
+    processState_t  m_processState          {PROCESS_NORMAL};
+    dvdnav_status_t m_dvdStat               {DVDNAV_STATUS_OK};
+    int32_t         m_dvdEvent              {0};
+    int32_t         m_dvdEventSize          {0};
 
     // Private menu/button stuff
     void ActivateButton(void);
@@ -282,15 +282,15 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void ClearMenuSPUParameters(void);
     void ClearMenuButton(void);
 
-    bool           m_inMenu;
-    uint           m_buttonVersion;
-    int            m_buttonStreamID;
+    bool           m_inMenu                 {false};
+    uint           m_buttonVersion          {1};
+    int            m_buttonStreamID         {0};
     uint32_t       m_clut[16];
     uint8_t        m_button_color[4];
     uint8_t        m_button_alpha[4];
-    QRect          m_hl_button;
-    uint8_t       *m_menuSpuPkt;
-    int            m_menuBuflength;
+    QRect          m_hl_button              {0,0,0,0};
+    uint8_t       *m_menuSpuPkt             {nullptr};
+    int            m_menuBuflength          {0};
     AVSubtitle     m_dvdMenuButton;
     QMutex m_menuBtnLock;
 

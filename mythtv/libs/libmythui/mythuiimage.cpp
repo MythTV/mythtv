@@ -36,14 +36,8 @@ class ImageLoadThread;
 
 /////////////////////////////////////////////////////
 
-ImageProperties::ImageProperties()
-{
-    Init();
-}
-
 ImageProperties::ImageProperties(const ImageProperties& other)
 {
-    Init();
     Copy(other);
 }
 
@@ -56,66 +50,45 @@ ImageProperties &ImageProperties::operator=(const ImageProperties &other)
 
 ImageProperties::~ImageProperties()
 {
-    if (maskImage)
-        maskImage->DecrRef();
-}
-
-void ImageProperties::Init()
-{
-    filename = QString();
-    cropRect = MythRect(0, 0, 0, 0);
-    forceSize = QSize(0, 0);
-    preserveAspect = false;
-    isGreyscale = false;
-    isReflected = false;
-    isMasked = false;
-    isOriented = false;
-    reflectAxis = ReflectVertical;
-    reflectScale = 100;
-    reflectLength = 100;
-    reflectShear = 0;
-    reflectSpacing = 0;
-    orientation = 1;
-    isThemeImage = false;
-    maskImage = nullptr;
+    if (m_maskImage)
+        m_maskImage->DecrRef();
 }
 
 void ImageProperties::Copy(const ImageProperties &other)
 {
-    filename = other.filename;
+    m_filename = other.m_filename;
 
-    cropRect = other.cropRect;
-    forceSize = other.forceSize;
+    m_cropRect = other.m_cropRect;
+    m_forceSize = other.m_forceSize;
 
-    preserveAspect = other.preserveAspect;
-    isGreyscale = other.isGreyscale;
-    isReflected = other.isReflected;
-    isOriented = other.isOriented;
+    m_preserveAspect = other.m_preserveAspect;
+    m_isGreyscale = other.m_isGreyscale;
+    m_isReflected = other.m_isReflected;
+    m_isOriented = other.m_isOriented;
 
-    reflectAxis = other.reflectAxis;
-    reflectScale = other.reflectScale;
-    reflectLength = other.reflectLength;
-    reflectShear = other.reflectShear;
-    reflectSpacing = other.reflectSpacing;
-    orientation = other.orientation;
+    m_reflectAxis = other.m_reflectAxis;
+    m_reflectScale = other.m_reflectScale;
+    m_reflectLength = other.m_reflectLength;
+    m_reflectShear = other.m_reflectShear;
+    m_reflectSpacing = other.m_reflectSpacing;
+    m_orientation = other.m_orientation;
 
-    isThemeImage = other.isThemeImage;
+    m_isThemeImage = other.m_isThemeImage;
 
-    SetMaskImage(other.maskImage);
-    isMasked = other.isMasked;
-    maskImageFilename = other.maskImageFilename;
+    SetMaskImage(other.m_maskImage);
+    m_isMasked = other.m_isMasked;
+    m_maskImageFilename = other.m_maskImageFilename;
 }
 
 void ImageProperties::SetMaskImage(MythImage *image)
 {
     if (image)
         image->IncrRef();
-    if (maskImage)
-        maskImage->DecrRef();
+    if (m_maskImage)
+        m_maskImage->DecrRef();
 
-    isMasked = false;
-    maskImage = image;
-    isMasked = maskImage;
+    m_maskImage = image;
+    m_isMasked = m_maskImage;
 }
 
 /*!
@@ -186,35 +159,35 @@ class ImageLoader
         QString imagelabel;
         QString s_Attrib;
 
-        if (imProps.isMasked)
+        if (imProps.m_isMasked)
             s_Attrib = "masked";
 
-        if (imProps.isReflected)
+        if (imProps.m_isReflected)
             s_Attrib += "reflected";
 
-        if (imProps.isGreyscale)
+        if (imProps.m_isGreyscale)
             s_Attrib += "greyscale";
 
-        if (imProps.isOriented)
+        if (imProps.m_isOriented)
         {
             s_Attrib += "orientation";
-            s_Attrib += QString("%1").arg(imProps.orientation);
+            s_Attrib += QString("%1").arg(imProps.m_orientation);
         }
 
         int w = -1;
         int h = -1;
-        if (!imProps.forceSize.isNull())
+        if (!imProps.m_forceSize.isNull())
         {
-            if (imProps.forceSize.width() != -1)
-                w = imProps.forceSize.width();
+            if (imProps.m_forceSize.width() != -1)
+                w = imProps.m_forceSize.width();
 
-            if (imProps.forceSize.height() != -1)
-                h = imProps.forceSize.height();
+            if (imProps.m_forceSize.height() != -1)
+                h = imProps.m_forceSize.height();
         }
 
 
         imagelabel  = QString("%1-%2-%3x%4.png")
-                    .arg(imProps.filename)
+                    .arg(imProps.m_filename)
                     .arg(s_Attrib)
                     .arg(w)
                     .arg(h);
@@ -244,7 +217,7 @@ class ImageLoader
             return nullptr;
         }
 
-        QString filename = imProps.filename;
+        QString filename = imProps.m_filename;
         MythImage *image = nullptr;
 
         bool bResize = false;
@@ -253,13 +226,13 @@ class ImageLoader
         int w = -1;
         int h = -1;
 
-        if (!imProps.forceSize.isNull())
+        if (!imProps.m_forceSize.isNull())
         {
-            if (imProps.forceSize.width() != -1)
-                w = imProps.forceSize.width();
+            if (imProps.m_forceSize.width() != -1)
+                w = imProps.m_forceSize.width();
 
-            if (imProps.forceSize.height() != -1)
-                h = imProps.forceSize.height();
+            if (imProps.m_forceSize.height() != -1)
+                h = imProps.m_forceSize.height();
 
             bResize = true;
         }
@@ -282,10 +255,10 @@ class ImageLoader
                     .arg(cacheKey).arg(cnt));
             }
 
-            if (imProps.isReflected)
+            if (imProps.m_isReflected)
                 image->setIsReflected(true);
 
-            if (imProps.isOriented)
+            if (imProps.m_isOriented)
                 image->setIsOriented(true);
 
             bFoundInCache = true;
@@ -323,21 +296,21 @@ class ImageLoader
 
         if (image && !bFoundInCache)
         {
-            if (imProps.isReflected)
-                image->Reflect(imProps.reflectAxis, imProps.reflectShear,
-                               imProps.reflectScale, imProps.reflectLength,
-                               imProps.reflectSpacing);
+            if (imProps.m_isReflected)
+                image->Reflect(imProps.m_reflectAxis, imProps.m_reflectShear,
+                               imProps.m_reflectScale, imProps.m_reflectLength,
+                               imProps.m_reflectSpacing);
 
-            if (imProps.isGreyscale)
+            if (imProps.m_isGreyscale)
                 image->ToGreyscale();
 
-            if (imProps.isOriented)
-                image->Orientation(imProps.orientation);
+            if (imProps.m_isOriented)
+                image->Orientation(imProps.m_orientation);
 
             // Even if an explicit size wasn't defined this image may still need
             // to be scaled because of a difference between the theme resolution
             // and the screen resolution. We want to avoid scaling twice.
-            if (!bResize && imProps.isThemeImage)
+            if (!bResize && imProps.m_isThemeImage)
             {
                 float wmult; // Width multipler
                 float hmult; // Height multipler
@@ -351,9 +324,9 @@ class ImageLoader
             }
 
             if (bResize)
-                image->Resize(QSize(w, h), imProps.preserveAspect);
+                image->Resize(QSize(w, h), imProps.m_preserveAspect);
 
-            if (imProps.isMasked)
+            if (imProps.m_isMasked)
             {
                 MythImage *newMaskImage = painter->GetFormatImage();
                 if (newMaskImage->Load(imProps.GetMaskImageFilename()))
@@ -416,11 +389,11 @@ class ImageLoader
                                               const MythUIImage *parent,
                                               bool &aborted)
     {
-        QString filename = QString("frame-%1-") + imProps.filename;
+        QString filename = QString("frame-%1-") + imProps.m_filename;
         QString frameFilename;
         int imageCount = 1;
 
-        MythImageReader *imageReader = new MythImageReader(imProps.filename);
+        MythImageReader *imageReader = new MythImageReader(imProps.m_filename);
 
         AnimationFrames *images = new AnimationFrames();
 
@@ -429,7 +402,7 @@ class ImageLoader
             frameFilename = filename.arg(imageCount);
 
             ImageProperties frameProps = imProps;
-            frameProps.filename = frameFilename;
+            frameProps.m_filename = frameFilename;
 
             MythImage *im = LoadImage(painter, frameProps, cacheMode, parent,
                                       aborted, imageReader);
@@ -464,14 +437,14 @@ class ImageLoadEvent : public QEvent
         : QEvent(kEventType),
           m_parent(parent), m_image(image), m_basefile(basefile),
           m_filename(filename), m_number(number),
-          m_images(nullptr), m_aborted(aborted) { }
+          m_aborted(aborted) { }
 
     ImageLoadEvent(const MythUIImage *parent, AnimationFrames *frames,
                    const QString &basefile,
                    const QString &filename, bool aborted)
         : QEvent(kEventType),
-          m_parent(parent), m_image(nullptr), m_basefile(basefile),
-          m_filename(filename), m_number(0),
+          m_parent(parent), m_basefile(basefile),
+          m_filename(filename),
           m_images(frames), m_aborted(aborted) { }
 
     const MythUIImage *GetParent() const    { return m_parent; }
@@ -485,17 +458,17 @@ class ImageLoadEvent : public QEvent
     static Type kEventType;
 
   private:
-    const MythUIImage     *m_parent;
-    MythImage       *m_image;
-    QString          m_basefile;
-    QString          m_filename;
-    int              m_number;
+    const MythUIImage *m_parent   {nullptr};
+    MythImage         *m_image    {nullptr};
+    QString            m_basefile;
+    QString            m_filename;
+    int                m_number   {0};
 
     // Animated Images
-    AnimationFrames  *m_images;
+    AnimationFrames   *m_images   {nullptr};
 
     // Image Load
-    bool             m_aborted;
+    bool               m_aborted;
 };
 
 QEvent::Type ImageLoadEvent::kEventType =
@@ -518,7 +491,7 @@ class ImageLoadThread : public QRunnable
     void run() override // QRunnable
     {
         bool aborted = false;
-        QString filename =  m_imageProperties.filename;
+        QString filename =  m_imageProperties.m_filename;
 
         // NOTE Do NOT use MythImageReader::supportsAnimation here, it defeats
         // the point of caching remote images
@@ -535,7 +508,7 @@ class ImageLoadThread : public QRunnable
              {
                 ImageLoadEvent *le = new ImageLoadEvent(m_parent, frames,
                                                         m_basefile,
-                                                        m_imageProperties.filename,
+                                                        m_imageProperties.m_filename,
                                                         aborted);
                 QCoreApplication::postEvent(const_cast<MythUIImage*>(m_parent), le);
 
@@ -550,14 +523,14 @@ class ImageLoadThread : public QRunnable
                                                     aborted);
 
         ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
-                                                m_imageProperties.filename,
+                                                m_imageProperties.m_filename,
                                                 m_number, aborted);
         QCoreApplication::postEvent(const_cast<MythUIImage*>(m_parent), le);
     }
 
 private:
-    const MythUIImage    *m_parent;
-    MythPainter       *m_painter;
+    const MythUIImage *m_parent  {nullptr};
+    MythPainter       *m_painter {nullptr};
     ImageProperties m_imageProperties;
     QString         m_basefile;
     int             m_number;
@@ -569,13 +542,12 @@ class MythUIImagePrivate
 {
 public:
     explicit MythUIImagePrivate(MythUIImage *p)
-        : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive)
-    { };
+        : m_parent(p) { }
     ~MythUIImagePrivate() = default;
 
-    MythUIImage *m_parent;
+    MythUIImage *m_parent       {nullptr};
 
-    QReadWriteLock m_UpdateLock;
+    QReadWriteLock m_UpdateLock {QReadWriteLock::Recursive};
 };
 
 /////////////////////////////////////////////////////////////////
@@ -585,7 +557,7 @@ MythUIImage::MythUIImage(const QString &filepattern,
                          MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    m_imageProperties.filename = filepattern;
+    m_imageProperties.m_filename = filepattern;
     m_LowNum = low;
     m_HighNum = high;
 
@@ -594,14 +566,13 @@ MythUIImage::MythUIImage(const QString &filepattern,
 
     d = new MythUIImagePrivate(this);
     emit DependChanged(false);
-    Init();
 }
 
 MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
                          const QString &name)
     : MythUIType(parent, name)
 {
-    m_imageProperties.filename = filename;
+    m_imageProperties.m_filename = filename;
     m_OrigFilename = filename;
 
     m_LowNum = 0;
@@ -611,7 +582,6 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
 
     d = new MythUIImagePrivate(this);
     emit DependChanged(false);
-    Init();
 }
 
 MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
@@ -623,8 +593,6 @@ MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
     m_EnableInitiator = true;
 
     d = new MythUIImagePrivate(this);
-
-    Init();
 }
 
 MythUIImage::~MythUIImage()
@@ -679,10 +647,10 @@ void MythUIImage::Reset(void)
 
     SetMinArea(MythRect());
 
-    if (m_imageProperties.filename != m_OrigFilename)
+    if (m_imageProperties.m_filename != m_OrigFilename)
     {
-        m_imageProperties.isThemeImage = true;
-        m_imageProperties.filename = m_OrigFilename;
+        m_imageProperties.m_isThemeImage = true;
+        m_imageProperties.m_filename = m_OrigFilename;
 
         if (m_animatedImage)
         {
@@ -702,32 +670,13 @@ void MythUIImage::Reset(void)
 }
 
 /**
- *  \brief Initialises the class
- */
-void MythUIImage::Init(void)
-{
-    m_CurPos = 0;
-    m_LastDisplay = QTime::currentTime();
-
-    m_NeedLoad = false;
-
-    m_animationCycle = kCycleStart;
-    m_animationReverse = false;
-    m_animatedImage = false;
-
-    m_runningThreads = 0;
-
-    m_showingRandomImage = false;
-}
-
-/**
  *  \brief Set the image filename, does not load the image. See Load()
  */
 void MythUIImage::SetFilename(const QString &filename)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
-    m_imageProperties.isThemeImage = false;
-    m_imageProperties.filename = filename;
+    m_imageProperties.m_isThemeImage = false;
+    m_imageProperties.m_filename = filename;
     if (filename == m_OrigFilename)
         emit DependChanged(true);
     else
@@ -742,8 +691,8 @@ void MythUIImage::SetFilepattern(const QString &filepattern, int low,
                                  int high)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
-    m_imageProperties.isThemeImage = false;
-    m_imageProperties.filename = filepattern;
+    m_imageProperties.m_isThemeImage = false;
+    m_imageProperties.m_filename = filepattern;
     m_LowNum = low;
     m_HighNum = high;
     if (filepattern == m_OrigFilename)
@@ -807,36 +756,36 @@ void MythUIImage::SetImage(MythImage *img)
         return;
     }
 
-    m_imageProperties.isThemeImage = false;
-    m_imageProperties.filename = img->GetFileName();
+    m_imageProperties.m_isThemeImage = false;
+    m_imageProperties.m_filename = img->GetFileName();
 
     img->IncrRef();
 
-    QSize forceSize = m_imageProperties.forceSize;
+    QSize forceSize = m_imageProperties.m_forceSize;
     if (!forceSize.isNull())
     {
         int w = (forceSize.width() <= 0) ? img->width() : forceSize.width();
         int h = (forceSize.height() <= 0) ? img->height() : forceSize.height();
-        img->Resize(QSize(w, h), m_imageProperties.preserveAspect);
+        img->Resize(QSize(w, h), m_imageProperties.m_preserveAspect);
     }
 
-    if (m_imageProperties.isReflected && !img->IsReflected())
-        img->Reflect(m_imageProperties.reflectAxis,
-                     m_imageProperties.reflectShear,
-                     m_imageProperties.reflectScale,
-                     m_imageProperties.reflectLength,
-                     m_imageProperties.reflectSpacing);
+    if (m_imageProperties.m_isReflected && !img->IsReflected())
+        img->Reflect(m_imageProperties.m_reflectAxis,
+                     m_imageProperties.m_reflectShear,
+                     m_imageProperties.m_reflectScale,
+                     m_imageProperties.m_reflectLength,
+                     m_imageProperties.m_reflectSpacing);
 
-    if (m_imageProperties.isGreyscale && !img->isGrayscale())
+    if (m_imageProperties.m_isGreyscale && !img->isGrayscale())
         img->ToGreyscale();
 
     Clear();
     m_Delay = -1;
 
-    if (m_imageProperties.isOriented && !img->IsOriented())
-        img->Orientation(m_imageProperties.orientation);
+    if (m_imageProperties.m_isOriented && !img->IsOriented())
+        img->Orientation(m_imageProperties.m_orientation);
 
-    if (m_imageProperties.forceSize.isNull())
+    if (m_imageProperties.m_forceSize.isNull())
         SetSize(img->size());
 
     m_ImagesLock.lock();
@@ -863,7 +812,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
     QWriteLocker updateLocker(&d->m_UpdateLock);
     QSize aSize = GetFullArea().size();
 
-    m_imageProperties.isThemeImage = false;
+    m_imageProperties.m_isThemeImage = false;
 
     QVector<MythImage *>::iterator it;
 
@@ -881,26 +830,26 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
         im->IncrRef();
 
 
-        QSize forceSize = m_imageProperties.forceSize;
+        QSize forceSize = m_imageProperties.m_forceSize;
         if (!forceSize.isNull())
         {
             int w = (forceSize.width() <= 0) ? im->width() : forceSize.width();
             int h = (forceSize.height() <= 0) ? im->height() : forceSize.height();
-            im->Resize(QSize(w, h), m_imageProperties.preserveAspect);
+            im->Resize(QSize(w, h), m_imageProperties.m_preserveAspect);
         }
 
-        if (m_imageProperties.isReflected && !im->IsReflected())
-            im->Reflect(m_imageProperties.reflectAxis,
-                        m_imageProperties.reflectShear,
-                        m_imageProperties.reflectScale,
-                        m_imageProperties.reflectLength,
-                        m_imageProperties.reflectSpacing);
+        if (m_imageProperties.m_isReflected && !im->IsReflected())
+            im->Reflect(m_imageProperties.m_reflectAxis,
+                        m_imageProperties.m_reflectShear,
+                        m_imageProperties.m_reflectScale,
+                        m_imageProperties.m_reflectLength,
+                        m_imageProperties.m_reflectSpacing);
 
-        if (m_imageProperties.isGreyscale && !im->isGrayscale())
+        if (m_imageProperties.m_isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
 
-        if (m_imageProperties.isOriented && !im->IsOriented())
-            im->Orientation(m_imageProperties.orientation);
+        if (m_imageProperties.m_isOriented && !im->IsOriented())
+            im->Orientation(m_imageProperties.m_orientation);
 
         m_ImagesLock.lock();
         m_Images[m_Images.size()] = im;
@@ -911,7 +860,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     SetImageCount(1, m_Images.size());
 
-    if (m_imageProperties.forceSize.isNull())
+    if (m_imageProperties.m_forceSize.isNull())
         SetSize(aSize);
 
     MythRect rect(GetFullArea());
@@ -953,17 +902,17 @@ void MythUIImage::SetAnimationFrames(AnimationFrames frames)
  */
 void MythUIImage::ForceSize(const QSize &size)
 {
-    if (m_imageProperties.forceSize == size)
+    if (m_imageProperties.m_forceSize == size)
         return;
 
     d->m_UpdateLock.lockForWrite();
-    m_imageProperties.forceSize = size;
+    m_imageProperties.m_forceSize = size;
     d->m_UpdateLock.unlock();
 
     if (size.isEmpty())
         return;
 
-    SetSize(m_imageProperties.forceSize);
+    SetSize(m_imageProperties.m_forceSize);
 
     Load();
     return;
@@ -974,8 +923,8 @@ void MythUIImage::ForceSize(const QSize &size)
  */
 void MythUIImage::SetOrientation(int orientation)
 {
-    m_imageProperties.isOriented = true;
-    m_imageProperties.orientation = orientation;
+    m_imageProperties.m_isOriented = true;
+    m_imageProperties.m_orientation = orientation;
 }
 
 /**
@@ -1012,7 +961,7 @@ void MythUIImage::SetCropRect(int x, int y, int width, int height)
 void MythUIImage::SetCropRect(const MythRect &rect)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
-    m_imageProperties.cropRect = rect;
+    m_imageProperties.m_cropRect = rect;
     SetRedraw();
 }
 
@@ -1025,7 +974,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
     m_Initiator = m_EnableInitiator;
 
-    QString bFilename = m_imageProperties.filename;
+    QString bFilename = m_imageProperties.m_filename;
 
     d->m_UpdateLock.unlock();
 
@@ -1064,7 +1013,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             filename = bFilename.arg(i);
 
         ImageProperties imProps = m_imageProperties;
-        imProps.filename = filename;
+        imProps.m_filename = filename;
         imagelabel = ImageLoader::GenImageLabel(imProps);
 
         // Only load in the background if allowed and the image is
@@ -1150,7 +1099,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
                 if (image)
                 {
-                    if (m_imageProperties.forceSize.isNull())
+                    if (m_imageProperties.m_forceSize.isNull())
                         SetSize(image->size());
 
                     MythRect rect(GetFullArea());
@@ -1303,7 +1252,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         QRect currentImageArea = currentImage->rect();
 
-        if (!m_imageProperties.forceSize.isNull())
+        if (!m_imageProperties.m_forceSize.isNull())
             area.setSize(area.size().expandedTo(currentImage->size()));
 
         // Centre image in available space, accounting for zoom
@@ -1320,10 +1269,10 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             area.translate(x, y);
 
         QRect srcRect;
-        m_imageProperties.cropRect.CalculateArea(GetFullArea());
+        m_imageProperties.m_cropRect.CalculateArea(GetFullArea());
 
-        if (!m_imageProperties.cropRect.isEmpty())
-            srcRect = m_imageProperties.cropRect.toQRect();
+        if (!m_imageProperties.m_cropRect.isEmpty())
+            srcRect = m_imageProperties.m_cropRect.toQRect();
         else
             srcRect = currentImageArea;
 
@@ -1346,21 +1295,21 @@ bool MythUIImage::ParseElement(
 
     if (element.tagName() == "filename")
     {
-        m_imageProperties.isThemeImage = true; // This is an image distributed with the theme
-        m_OrigFilename = m_imageProperties.filename = getFirstText(element);
+        m_imageProperties.m_isThemeImage = true; // This is an image distributed with the theme
+        m_OrigFilename = m_imageProperties.m_filename = getFirstText(element);
 
-        if (m_imageProperties.filename.endsWith('/'))
+        if (m_imageProperties.m_filename.endsWith('/'))
         {
             m_showingRandomImage = true;
-            m_imageDirectory = m_imageProperties.filename;
+            m_imageDirectory = m_imageProperties.m_filename;
 
             FindRandomImage();
         }
     }
     else if (element.tagName() == "filepattern")
     {
-        m_imageProperties.isThemeImage = true; // This is an image distributed with the theme
-        m_OrigFilename = m_imageProperties.filename = getFirstText(element);
+        m_imageProperties.m_isThemeImage = true; // This is an image distributed with the theme
+        m_OrigFilename = m_imageProperties.m_filename = getFirstText(element);
         QString tmp = element.attribute("low");
 
         if (!tmp.isEmpty())
@@ -1379,12 +1328,12 @@ bool MythUIImage::ParseElement(
     else if (element.tagName() == "area")
     {
         SetArea(parseRect(element));
-        m_imageProperties.forceSize = m_Area.size();
+        m_imageProperties.m_forceSize = m_Area.size();
     }
     else if (element.tagName() == "preserveaspect")
-        m_imageProperties.preserveAspect = parseBool(element);
+        m_imageProperties.m_preserveAspect = parseBool(element);
     else if (element.tagName() == "crop")
-        m_imageProperties.cropRect = parseRect(element);
+        m_imageProperties.m_cropRect = parseRect(element);
     else if (element.tagName() == "delay")
     {
         QString value = getFirstText(element);
@@ -1423,46 +1372,46 @@ bool MythUIImage::ParseElement(
     }
     else if (element.tagName() == "reflection")
     {
-        m_imageProperties.isReflected = true;
+        m_imageProperties.m_isReflected = true;
         QString tmp = element.attribute("axis");
 
         if (!tmp.isEmpty())
         {
             if (tmp.toLower() == "horizontal")
-                m_imageProperties.reflectAxis = ReflectHorizontal;
+                m_imageProperties.m_reflectAxis = ReflectHorizontal;
             else
-                m_imageProperties.reflectAxis = ReflectVertical;
+                m_imageProperties.m_reflectAxis = ReflectVertical;
         }
 
         tmp = element.attribute("shear");
 
         if (!tmp.isEmpty())
-            m_imageProperties.reflectShear = tmp.toInt();
+            m_imageProperties.m_reflectShear = tmp.toInt();
 
         tmp = element.attribute("scale");
 
         if (!tmp.isEmpty())
-            m_imageProperties.reflectScale = tmp.toInt();
+            m_imageProperties.m_reflectScale = tmp.toInt();
 
         tmp = element.attribute("length");
 
         if (!tmp.isEmpty())
-            m_imageProperties.reflectLength = tmp.toInt();
+            m_imageProperties.m_reflectLength = tmp.toInt();
 
         tmp = element.attribute("spacing");
 
         if (!tmp.isEmpty())
-            m_imageProperties.reflectSpacing = tmp.toInt();
+            m_imageProperties.m_reflectSpacing = tmp.toInt();
     }
     else if (element.tagName() == "mask")
     {
         m_imageProperties.SetMaskImageFilename(getFirstText(element));
-        m_imageProperties.isMasked = true;
+        m_imageProperties.m_isMasked = true;
     }
     else if (element.tagName() == "grayscale" ||
              element.tagName() == "greyscale")
     {
-        m_imageProperties.isGreyscale = parseBool(element);
+        m_imageProperties.m_isGreyscale = parseBool(element);
     }
     else
     {
@@ -1516,8 +1465,8 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     // We need to update forceSize in case the parent area has changed
     // however we only want to set forceSize if it was previously in use
-    if (!m_imageProperties.forceSize.isNull())
-        m_imageProperties.forceSize = m_Area.size();
+    if (!m_imageProperties.m_forceSize.isNull())
+        m_imageProperties.m_forceSize = m_Area.size();
 
     m_NeedLoad = im->m_NeedLoad;
 
@@ -1610,7 +1559,7 @@ void MythUIImage::customEvent(QEvent *event)
         m_runningThreads--;
 
         d->m_UpdateLock.lockForRead();
-        QString propFilename = m_imageProperties.filename;
+        QString propFilename = m_imageProperties.m_filename;
         d->m_UpdateLock.unlock();
 
         // 1) We aborted loading the image for some reason (e.g. two requests
@@ -1658,7 +1607,7 @@ void MythUIImage::customEvent(QEvent *event)
 
             d->m_UpdateLock.lockForWrite();
 
-            if (m_imageProperties.forceSize.isNull())
+            if (m_imageProperties.m_forceSize.isNull())
                 SetSize(image->size());
 
             MythRect rect(GetFullArea());
@@ -1732,5 +1681,5 @@ void MythUIImage::FindRandomImage(void)
         } while (imageList.size() > 1 && randFile == m_OrigFilename);
     }
 
-    m_OrigFilename = m_imageProperties.filename = randFile;
+    m_OrigFilename = m_imageProperties.m_filename = randFile;
 }

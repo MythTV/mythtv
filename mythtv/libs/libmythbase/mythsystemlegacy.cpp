@@ -57,8 +57,6 @@
 
 void MythSystemLegacy::initializePrivate(void)
 {
-    m_nice = 0;
-    m_ioprio = 0;
 #if CONFIG_CYGWIN || defined(_WIN32)
     d = new MythSystemLegacyWindows(this);
 #else

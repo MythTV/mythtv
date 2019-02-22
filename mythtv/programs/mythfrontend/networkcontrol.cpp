@@ -75,11 +75,8 @@ static bool is_abbrev(QString const& command,
 }
 
 NetworkControl::NetworkControl() :
-    ServerPool(), prompt("# "),
-    gotAnswer(false), answer(""),
-    clientLock(QMutex::Recursive),
-    commandThread(new MThread("NetworkControl", this)),
-    stopCommandThread(false)
+    ServerPool(),
+    commandThread(new MThread("NetworkControl", this))
 {
     // Eventually this map should be in the jumppoints table
     jumpMap["channelpriorities"]     = "Channel Recording Priorities";

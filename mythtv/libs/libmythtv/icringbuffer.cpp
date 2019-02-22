@@ -13,7 +13,7 @@
 
 
 ICRingBuffer::ICRingBuffer(const QString &url, RingBuffer *parent)
-  : RingBuffer(kRingBufferType), m_stream(nullptr), m_parent(parent)
+  : RingBuffer(kRingBufferType), m_parent(parent)
 {
     startreadahead = true;
     OpenFile(url);

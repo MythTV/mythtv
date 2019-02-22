@@ -18,19 +18,19 @@ using namespace std;
 class ScanInfo
 {
   public:
-    ScanInfo();
-    ScanInfo(uint _scanid, uint _cardid, uint _sourceid,
-             bool _processed, const QDateTime &_scandate);
+    ScanInfo() = default;
+    ScanInfo(uint scanid, uint cardid, uint sourceid,
+             bool processed, const QDateTime &scandate);
 
     static bool MarkProcessed(uint scanid);
     static bool DeleteScan(uint scanid);
 
   public:
-    uint      scanid;
-    uint      cardid;
-    uint      sourceid;
-    bool      processed;
-    QDateTime scandate;
+    uint      m_scanid    {0};
+    uint      m_cardid    {0};
+    uint      m_sourceid  {0};
+    bool      m_processed {false};
+    QDateTime m_scandate;
 };
 
 MTV_PUBLIC vector<ScanInfo> LoadScanList(void);

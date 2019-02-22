@@ -170,9 +170,8 @@ const char* NamedOptType(int type)
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
-    m_given(false), m_converted(false), m_name(name),
-    m_group(""), m_deprecated(""), m_removed(""), m_removedversion(""),
-    m_type(type), m_default(def), m_help(help), m_longhelp(longhelp)
+    m_name(name), m_type(type), m_default(def),
+    m_help(help), m_longhelp(longhelp)
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -187,9 +186,7 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
  */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
   : ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
-    m_given(false), m_converted(false), m_name(name),
-    m_group(""), m_deprecated(""), m_removed(""), m_removedversion(""),
-    m_type(type), m_default(def)
+    m_name(name), m_type(type), m_default(def)
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -1160,8 +1157,7 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
 /** \brief Default constructor for MythCommandLineArg class
  */
 MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(appname), m_passthroughActive(false),
-    m_overridesImported(false), m_verbose(false)
+    m_appname(appname)
 {
     char *verbose = getenv("VERBOSE_PARSER");
     if (verbose != nullptr)

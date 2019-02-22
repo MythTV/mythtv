@@ -33,7 +33,8 @@ class MPUBLIC AudioConvert
 {
 public:
 
-    AudioConvert(AudioFormat in, AudioFormat out);
+    AudioConvert(AudioFormat in, AudioFormat out)
+        : m_in(in), m_out(out) {}
     virtual ~AudioConvert();
     /**
      * Process
@@ -77,7 +78,7 @@ public:
                                   uint8_t* output, const uint8_t* input,
                                   int data_size);
 private:
-    AudioConvertInternal* m_ctx;
+    AudioConvertInternal* m_ctx {nullptr};
     AudioFormat m_in, m_out;
 };
 

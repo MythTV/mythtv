@@ -30,7 +30,7 @@ class META_PUBLIC ParentalLevel
 
   private:
     Level m_level;
-    bool m_hitlimit;
+    bool m_hitlimit {false};
 };
 
 META_PUBLIC bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs);
@@ -56,7 +56,7 @@ class META_PUBLIC ParentalLevelChangeChecker : public QObject
     void OnResultReady(bool passwordValid, ParentalLevel::Level newLevel);
 
   private:
-    class ParentalLevelChangeCheckerPrivate *m_private;
+    class ParentalLevelChangeCheckerPrivate *m_private {nullptr};
 };
 
 Q_DECLARE_METATYPE(ParentalLevelChangeChecker*)

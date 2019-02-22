@@ -104,7 +104,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
         }
 
         if (glwin)
-            m_render = glwin->render;
+            m_render = glwin->m_render;
         if (!m_render)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to get MythRenderOpenGL");

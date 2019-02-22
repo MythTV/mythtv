@@ -80,30 +80,30 @@ class AudioConfigSettings : public GroupSetting
 
     bool                CheckPassthrough();
 
-    AudioDeviceComboBox *m_OutputDevice;
-    HostComboBoxSetting *m_MaxAudioChannels;
-    HostCheckBoxSetting *m_AudioUpmix;
-    HostComboBoxSetting *m_AudioUpmixType;
+    AudioDeviceComboBox *m_OutputDevice              {nullptr};
+    HostComboBoxSetting *m_MaxAudioChannels          {nullptr};
+    HostCheckBoxSetting *m_AudioUpmix                {nullptr};
+    HostComboBoxSetting *m_AudioUpmixType            {nullptr};
 
     // digital settings
-    GroupSetting        *m_triggerDigital;
-    HostCheckBoxSetting *m_AC3PassThrough;
-    HostCheckBoxSetting *m_DTSPassThrough;
-    HostCheckBoxSetting *m_EAC3PassThrough;
-    HostCheckBoxSetting *m_TrueHDPassThrough;
-    HostCheckBoxSetting *m_DTSHDPassThrough;
+    GroupSetting        *m_triggerDigital            {nullptr};
+    HostCheckBoxSetting *m_AC3PassThrough            {nullptr};
+    HostCheckBoxSetting *m_DTSPassThrough            {nullptr};
+    HostCheckBoxSetting *m_EAC3PassThrough           {nullptr};
+    HostCheckBoxSetting *m_TrueHDPassThrough         {nullptr};
+    HostCheckBoxSetting *m_DTSHDPassThrough          {nullptr};
     //advanced setting
-    HostCheckBoxSetting       *m_MPCM;
-    HostCheckBoxSetting       *m_PassThroughOverride;
-    HostComboBoxSetting       *m_PassThroughDeviceOverride;
+    HostCheckBoxSetting *m_MPCM                      {nullptr};
+    HostCheckBoxSetting *m_PassThroughOverride       {nullptr};
+    HostComboBoxSetting *m_PassThroughDeviceOverride {nullptr};
 
-    AudioTest           *m_audioTest;
+    AudioTest           *m_audioTest                 {nullptr};
 
     ADCMap               audiodevs;
     AudioOutput::ADCVect devices;
     QMutex               slotlock;
 
-    int                  m_maxspeakers;
+    int                  m_maxspeakers               {0};
     QString              m_lastAudioDevice;
     static const char   *MixerControlControls[];
 };
@@ -121,18 +121,18 @@ class AudioDeviceComboBox : public HostComboBoxSetting
     void AudioDescriptionHelp(StandardSetting * setting);
 
   private:
-    AudioConfigSettings *m_parent;
+    AudioConfigSettings *m_parent {nullptr};
 };
 
 class ChannelChangedEvent : public QEvent
 {
   public:
     ChannelChangedEvent(QString channame, bool fulltest) :
-        QEvent(kEventType), channel(channame), fulltest(fulltest) {}
+        QEvent(kEventType), m_channel(channame), m_fulltest(fulltest) {}
     ~ChannelChangedEvent() = default;
 
-    QString channel;
-    bool    fulltest;
+    QString m_channel;
+    bool    m_fulltest;
 
     static Type kEventType;
 };
@@ -155,16 +155,16 @@ class AudioTestThread : public MThread
     void run() override; // MThread
 
   private:
-    QObject                *m_parent;
-    AudioOutput            *m_audioOutput;
+    QObject                *m_parent      {nullptr};
+    AudioOutput            *m_audioOutput {nullptr};
     int                     m_channels;
     QString                 m_device;
     QString                 m_passthrough;
-    bool                    m_interrupted;
-    int                     m_channel;
-    bool                    m_hd;
-    int                     m_samplerate;
-    AudioFormat             m_format;
+    bool                    m_interrupted {false};
+    int                     m_channel     {-1};
+    bool                    m_hd          {false};
+    int                     m_samplerate  {48000};
+    AudioFormat             m_format      {FORMAT_S16};
 };
 
 class AudioTest : public GroupSetting
@@ -178,22 +178,22 @@ class AudioTest : public GroupSetting
     bool event(QEvent *event) override; // QObject
 
   private:
-    int                         m_channels;
-    ButtonStandardSetting      *m_frontleft;
-    ButtonStandardSetting      *m_frontright;
-    ButtonStandardSetting      *m_center;
-    ButtonStandardSetting      *m_surroundleft;
-    ButtonStandardSetting      *m_surroundright;
-    ButtonStandardSetting      *m_rearleft;
-    ButtonStandardSetting      *m_rearright;
-    ButtonStandardSetting      *m_lfe;
-    AudioTestThread            *m_at;
-    ButtonStandardSetting      *m_startButton;
-    TransMythUICheckBoxSetting *m_hd;
+    int                         m_channels      {2};
+    ButtonStandardSetting      *m_frontleft     {nullptr};
+    ButtonStandardSetting      *m_frontright    {nullptr};
+    ButtonStandardSetting      *m_center        {nullptr};
+    ButtonStandardSetting      *m_surroundleft  {nullptr};
+    ButtonStandardSetting      *m_surroundright {nullptr};
+    ButtonStandardSetting      *m_rearleft      {nullptr};
+    ButtonStandardSetting      *m_rearright     {nullptr};
+    ButtonStandardSetting      *m_lfe           {nullptr};
+    AudioTestThread            *m_at            {nullptr};
+    ButtonStandardSetting      *m_startButton   {nullptr};
+    TransMythUICheckBoxSetting *m_hd            {nullptr};
     QString                     m_main;
     QString                     m_passthrough;
     AudioOutputSettings         m_settings;
-    bool                        m_quality;
+    bool                        m_quality       {false};
 
   private slots:
     void toggle();

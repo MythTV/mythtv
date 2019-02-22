@@ -60,7 +60,7 @@ class HDHRStreamHandler : public StreamHandler
 
     void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
-    vector<DTVTunerType> GetTunerTypes(void) const { return _tuner_types; }
+    vector<DTVTunerType> GetTunerTypes(void) const { return m_tuner_types; }
 
     // Commands
     bool TuneChannel(const QString &chanid);
@@ -87,19 +87,19 @@ class HDHRStreamHandler : public StreamHandler
     bool UpdateFilters(void) override; // StreamHandler
 
   private:
-    hdhomerun_device_t     *_hdhomerun_device;
-    hdhomerun_device_selector_t *_device_selector;
-    int                     _tuner;
-    vector<DTVTunerType>    _tuner_types;
-    HDHRTuneMode            _tune_mode; // debug self check
-    int                     _majorid;
+    hdhomerun_device_t          *m_hdhomerun_device {nullptr};
+    hdhomerun_device_selector_t *m_device_selector  {nullptr};
+    int                          m_tuner            {-1};
+    vector<DTVTunerType>         m_tuner_types;
+    HDHRTuneMode                 m_tune_mode        {hdhrTuneModeNone}; // debug self check
+    int                          m_majorid;
 
-    mutable QMutex          _hdhr_lock;
+    mutable QMutex               m_hdhr_lock        {QMutex::Recursive};
 
     // for implementing Get & Return
-    static QMutex                            _handlers_lock;
-    static QMap<int, HDHRStreamHandler*>     _handlers;
-    static QMap<int, uint>                   _handlers_refcnt;
+    static QMutex                            s_handlers_lock;
+    static QMap<int, HDHRStreamHandler*>     s_handlers;
+    static QMap<int, uint>                   s_handlers_refcnt;
 };
 
 #endif // _HDHRSTREAMHANDLER_H_

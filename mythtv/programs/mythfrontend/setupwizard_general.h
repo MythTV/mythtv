@@ -32,20 +32,20 @@ class GeneralSetupWizard : public MythScreenType
   private:
     void CreateBusyDialog(QString message);
 
-    MythUIButton     *m_submitButton;
-    MythUIButton     *m_viewButton;
-    MythUIButton     *m_deleteButton;
+    MythUIButton     *m_submitButton    {nullptr};
+    MythUIButton     *m_viewButton      {nullptr};
+    MythUIButton     *m_deleteButton    {nullptr};
 
-    MythUIButton     *m_nextButton;
-    MythUIButton     *m_cancelButton;
+    MythUIButton     *m_nextButton      {nullptr};
+    MythUIButton     *m_cancelButton    {nullptr};
 
-    MythUIText       *m_profileLocation;
-    MythUIText       *m_adminPassword;
+    MythUIText       *m_profileLocation {nullptr};
+    MythUIText       *m_adminPassword   {nullptr};
 
-    MythScreenStack  *m_popupStack;
-    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack      {nullptr};
+    MythUIBusyDialog *m_busyPopup       {nullptr};
 
-    HardwareProfile  *m_hardwareProfile;
+    HardwareProfile  *m_hardwareProfile {nullptr};
 
   private slots:
     void loadData(void);

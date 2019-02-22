@@ -35,20 +35,6 @@ void AbstractAnimation::Start(bool forwards, float speed)
 
 
 /*!
- \brief Create simple animation
- \param image Image to be animated
- \param type Effect to be animated
-*/
-Animation::Animation(Slide *image, Type type)
-    : AbstractAnimation(),
-      QVariantAnimation(),
-      m_parent(image), m_type(type), m_centre(UIEffects::Middle),
-      m_elapsed(0)
-{
-}
-
-
-/*!
  \brief Initialises an animation
  \param from Start value
  \param to End value
@@ -299,15 +285,7 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
  \param image Theme MythUIImage to clone
 */
 Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
-    : MythUIImage(parent, name),
-      m_state(kEmpty),
-      m_data(nullptr),
-      m_waitingFor(nullptr),
-      m_zoom(1.0),
-      m_direction(0),
-      m_zoomAnimation(nullptr),
-      m_panAnimation(nullptr),
-      m_pan(QPoint(0,0))
+    : MythUIImage(parent, name)
 {
     // Clone from image
     CopyFrom(image);
@@ -505,12 +483,12 @@ void Slide::Zoom(int percentage)
 void Slide::SetZoom(float zoom)
 {
     m_zoom          = zoom;
-    m_Effects.hzoom = m_Effects.vzoom = zoom;
+    m_Effects.m_hzoom = m_Effects.m_vzoom = zoom;
 
     // TODO
     // MythUIImage displaces widget or doesn't centre for some combinations of
     // zoom centre/cropping so frig centre for now.
-    m_Effects.centre = zoom < 1.0f ? UIEffects::Middle : UIEffects::TopLeft;
+    m_Effects.m_centre = zoom < 1.0f ? UIEffects::Middle : UIEffects::TopLeft;
 
     SetPan(m_pan);
 }

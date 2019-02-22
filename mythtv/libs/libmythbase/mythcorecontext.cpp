@@ -91,7 +91,7 @@ class MythCoreContextPrivate : public QObject
     QThread *m_UIThread;
 
     MythLocale *m_locale;
-    QString language;
+    QString m_language;
 
     MythScheduler *m_scheduler;
 
@@ -1748,15 +1748,15 @@ QString MythCoreContext::GetLanguage(void)
  */
 QString MythCoreContext::GetLanguageAndVariant(void)
 {
-    if (d->language.isEmpty())
-        d->language = GetSetting("Language", "en_US").toLower();
+    if (d->m_language.isEmpty())
+        d->m_language = GetSetting("Language", "en_US").toLower();
 
-    return d->language;
+    return d->m_language;
 }
 
 void MythCoreContext::ResetLanguage(void)
 {
-    d->language.clear();
+    d->m_language.clear();
 }
 
 void MythCoreContext::ResetSockets(void)

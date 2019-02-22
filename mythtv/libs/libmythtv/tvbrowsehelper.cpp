@@ -50,9 +50,9 @@ TVBrowseHelper::TVBrowseHelper(
     ChannelInfoList::const_iterator it = db_all_channels.begin();
     for (; it != db_all_channels.end(); ++it)
     {
-        db_chanid_to_channum[(*it).chanid] = (*it).channum;
-        db_chanid_to_sourceid[(*it).chanid] = (*it).sourceid;
-        db_channum_to_chanids.insert((*it).channum,(*it).chanid);
+        db_chanid_to_channum[(*it).m_chanid] = (*it).m_channum;
+        db_chanid_to_sourceid[(*it).m_chanid] = (*it).m_sourceid;
+        db_channum_to_chanids.insert((*it).m_channum,(*it).m_chanid);
     }
 
     db_all_visible_channels = ChannelUtil::GetChannels(
@@ -233,8 +233,8 @@ uint TVBrowseHelper::GetChanId(
         ChannelInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
-            if ((*it).sourceid == pref_sourceid && (*it).channum == channum)
-                return (*it).chanid;
+            if ((*it).m_sourceid == pref_sourceid && (*it).m_channum == channum)
+                return (*it).m_chanid;
         }
     }
 
@@ -244,8 +244,8 @@ uint TVBrowseHelper::GetChanId(
         for (; it != db_all_channels.end(); ++it)
         {
             if ((*it).GetInputIds().contains(pref_cardid) &&
-                (*it).channum == channum)
-                return (*it).chanid;
+                (*it).m_channum == channum)
+                return (*it).m_chanid;
         }
     }
 
@@ -254,8 +254,8 @@ uint TVBrowseHelper::GetChanId(
         ChannelInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
-            if ((*it).channum == channum)
-                return (*it).chanid;
+            if ((*it).m_channum == channum)
+                return (*it).m_chanid;
         }
     }
 

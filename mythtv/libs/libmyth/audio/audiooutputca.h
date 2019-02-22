@@ -52,7 +52,7 @@ protected:
 
 private:
 
-    CoreAudioData * d;
+    CoreAudioData * d {nullptr};
     friend class    CoreAudioData;
 
     int             bufferedBytes;

@@ -32,12 +32,12 @@
 #include "mythlogging.h"
 
 #define LOC QString("DVBRec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1).arg(videodevice)
+            .arg(m_tvrec ? m_tvrec->GetInputId() : -1).arg(m_videodevice)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel *channel)
-    : DTVRecorder(rec), _channel(channel), _stream_handler(nullptr)
+    : DTVRecorder(rec), m_channel(channel)
 {
-    videodevice.clear();
+    m_videodevice.clear();
 }
 
 bool DVBRecorder::Open(void)
@@ -48,22 +48,22 @@ bool DVBRecorder::Open(void)
         return true;
     }
 
-    if (videodevice.isEmpty())
+    if (m_videodevice.isEmpty())
         return false;
 
     ResetForNewFile();
 
-    if (_channel->GetFormat().compare("MPTS") == 0)
+    if (m_channel->GetFormat().compare("MPTS") == 0)
     {
         // MPTS only.  Use TSStreamData to write out unfiltered data
         LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
-        SetStreamData(new TSStreamData(tvrec ? tvrec->GetInputId() : -1));
-        _record_mpts_only = true;
-        _record_mpts = false;
+        SetStreamData(new TSStreamData(m_tvrec ? m_tvrec->GetInputId() : -1));
+        m_record_mpts_only = true;
+        m_record_mpts = false;
     }
 
-    _stream_handler = DVBStreamHandler::Get(videodevice,
-                                            tvrec ? tvrec->GetInputId() : -1);
+    m_stream_handler = DVBStreamHandler::Get(m_videodevice,
+                                             m_tvrec ? m_tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Card opened successfully");
 
@@ -72,28 +72,28 @@ bool DVBRecorder::Open(void)
 
 bool DVBRecorder::IsOpen(void) const
 {
-    return (nullptr != _stream_handler);
+    return (nullptr != m_stream_handler);
 }
 
 void DVBRecorder::Close(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
-    DVBStreamHandler::Return(_stream_handler, tvrec ? tvrec->GetInputId() : -1);
+    DVBStreamHandler::Return(m_stream_handler, m_tvrec ? m_tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void DVBRecorder::StartNewFile(void)
 {
-    if (!_record_mpts_only)
+    if (!m_record_mpts_only)
     {
-        if (_record_mpts)
-            _stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+        if (m_record_mpts)
+            m_stream_handler->AddNamedOutputFile(m_ringBuffer->GetFilename());
 
         // Make sure the first things in the file are a PAT & PMT
-        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+        HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
     }
 }
 
@@ -101,30 +101,30 @@ void DVBRecorder::run(void)
 {
     if (!Open())
     {
-        _error = "Failed to open DVB device";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "Failed to open DVB device";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         return;
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     // Listen for time table on DVB standard streams
-    if (_channel && (_channel->GetSIStandard() == "dvb"))
-        _stream_data->AddListeningPID(DVB_TDT_PID);
-    if (_record_mpts_only)
-        _stream_data->AddListeningPID(0x2000);
+    if (m_channel && (m_channel->GetSIStandard() == "dvb"))
+        m_stream_data->AddListeningPID(DVB_TDT_PID);
+    if (m_record_mpts_only)
+        m_stream_data->AddListeningPID(0x2000);
 
     StartNewFile();
 
-    _stream_data->AddAVListener(this);
-    _stream_data->AddWritingListener(this);
-    _stream_handler->AddListener(_stream_data, false, true,
-                         (_record_mpts) ? ringBuffer->GetFilename() : QString());
+    m_stream_data->AddAVListener(this);
+    m_stream_data->AddWritingListener(this);
+    m_stream_handler->AddListener(m_stream_data, false, true,
+                         (m_record_mpts) ? m_ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -133,13 +133,13 @@ void DVBRecorder::run(void)
 
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
-            QMutexLocker locker(&pauseLock);
-            if (!request_recording || request_pause)
+            QMutexLocker locker(&m_pauseLock);
+            if (!m_request_recording || m_request_pause)
                 continue;
-            unpauseWait.wait(&pauseLock, 100);
+            m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!_input_pmt && !_record_mpts_only)
+        if (!m_input_pmt && !m_record_mpts_only)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
@@ -147,49 +147,49 @@ void DVBRecorder::run(void)
             continue;
         }
 
-        if (!_stream_handler->IsRunning())
+        if (!m_stream_handler->IsRunning())
         {
-            _error = "Stream handler died unexpectedly.";
-            LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+            m_error = "Stream handler died unexpectedly.";
+            LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         }
     }
 
-    _stream_handler->RemoveListener(_stream_data);
-    _stream_data->RemoveWritingListener(this);
-    _stream_data->RemoveAVListener(this);
+    m_stream_handler->RemoveListener(m_stream_data);
+    m_stream_data->RemoveWritingListener(this);
+    m_stream_data->RemoveAVListener(this);
 
     Close();
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 }
 
 bool DVBRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
-            _stream_handler->RemoveListener(_stream_data);
+            m_stream_handler->RemoveListener(m_stream_data);
 
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
+            m_paused = true;
+            m_pauseWait.wakeAll();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
 
-        unpauseWait.wait(&pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!request_pause && IsPaused(true))
+    if (!m_request_pause && IsPaused(true))
     {
-        paused = false;
-        _stream_handler->AddListener(_stream_data, false, true);
-        unpauseWait.wakeAll();
+        m_paused = false;
+        m_stream_handler->AddListener(m_stream_data, false, true);
+        m_unpauseWait.wakeAll();
     }
 
     return IsPaused(true);
@@ -197,18 +197,18 @@ bool DVBRecorder::PauseAndWait(int timeout)
 
 QString DVBRecorder::GetSIStandard(void) const
 {
-    return _channel->GetSIStandard();
+    return m_channel->GetSIStandard();
 }
 
 void DVBRecorder::SetCAMPMT(const ProgramMapTable *pmt)
 {
-    if (pmt->IsEncrypted(_channel->GetSIStandard()))
-        _channel->SetPMT(pmt);
+    if (pmt->IsEncrypted(m_channel->GetSIStandard()))
+        m_channel->SetPMT(pmt);
 }
 
 void DVBRecorder::UpdateCAMTimeOffset(void)
 {
-    _channel->SetTimeOffset(GetStreamData()->TimeOffset());
+    m_channel->SetTimeOffset(GetStreamData()->TimeOffset());
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

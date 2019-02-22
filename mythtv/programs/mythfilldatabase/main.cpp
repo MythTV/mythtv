@@ -93,14 +93,14 @@ int main(int argc, char *argv[])
         cout << "### Running in manual channel configuration mode.\n";
         cout << "### This will ask you questions about every channel.\n";
         cout << "###\n";
-        fill_data.chan_data.m_interactive = true;
+        fill_data.m_chan_data.m_interactive = true;
     }
 
     if (cmdline.toBool("onlyguide") || cmdline.toBool("update"))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Only updating guide data, channel and icon updates will be ignored");
-        fill_data.chan_data.m_guideDataOnly = true;
+        fill_data.m_chan_data.m_guideDataOnly = true;
     }
 
     if (cmdline.toBool("preset"))
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
         cout << "### This will assign channel ";
         cout << "preset numbers to every channel.\n";
         cout << "###\n";
-        fill_data.chan_data.m_channelPreset = true;
+        fill_data.m_chan_data.m_channelPreset = true;
     }
 
     if (cmdline.toBool("file"))
@@ -157,13 +157,13 @@ int main(int argc, char *argv[])
     }
 
     if (cmdline.toBool("dochannelupdates"))
-        fill_data.chan_data.m_channelUpdates = true;
+        fill_data.m_chan_data.m_channelUpdates = true;
     if (cmdline.toBool("removechannels"))
-        fill_data.chan_data.m_removeNewChannels = true;
+        fill_data.m_chan_data.m_removeNewChannels = true;
     if (cmdline.toBool("nofilterchannels"))
-        fill_data.chan_data.m_filterNewChannels = false;
+        fill_data.m_chan_data.m_filterNewChannels = false;
     if (!cmdline.GetPassthrough().isEmpty())
-        fill_data.graboptions = " " + cmdline.GetPassthrough();
+        fill_data.m_graboptions = " " + cmdline.GetPassthrough();
     if (cmdline.toBool("sourceid"))
         sourceid = cmdline.toInt("sourceid");
     if (cmdline.toBool("cardtype"))
@@ -175,13 +175,13 @@ int main(int argc, char *argv[])
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
-        fill_data.chan_data.m_cardType = cmdline.toString("cardtype")
+        fill_data.m_chan_data.m_cardType = cmdline.toString("cardtype")
                                                 .trimmed().toUpper();
     }
     if (cmdline.toBool("maxdays") && cmdline.toInt("maxdays") > 0)
     {
-        fill_data.maxDays = cmdline.toInt("maxdays");
-        if (fill_data.maxDays == 1)
+        fill_data.m_maxDays = cmdline.toInt("maxdays");
+        if (fill_data.m_maxDays == 1)
             fill_data.SetRefresh(0, true);
     }
 
@@ -265,16 +265,16 @@ int main(int argc, char *argv[])
     }
 
     if (cmdline.toBool("dontrefreshtba"))
-        fill_data.refresh_tba = false;
+        fill_data.m_refresh_tba = false;
     if (cmdline.toBool("ddgraball"))
     {
         fill_data.SetRefresh(FillData::kRefreshClear, false);
-        fill_data.dd_grab_all = true;
+        fill_data.m_dd_grab_all = true;
     }
     if (cmdline.toBool("onlychannels"))
-        fill_data.only_update_channels = true;
+        fill_data.m_only_update_channels = true;
     if (cmdline.toBool("noallatonce"))
-        fill_data.no_allatonce = true;
+        fill_data.m_no_allatonce = true;
 
     mark_repeats = cmdline.toBool("markrepeats");
 
@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
             LOG(VB_GENERAL, LOG_NOTICE, "Data fetching complete.");
     }
 
-    if (fill_data.only_update_channels && !fill_data.need_post_grab_proc)
+    if (fill_data.m_only_update_channels && !fill_data.m_need_post_grab_proc)
     {
         return GENERIC_EXIT_OK;
     }
@@ -680,7 +680,7 @@ int main(int argc, char *argv[])
     if ((usingDataDirect) &&
         (gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", true)))
     {
-        fill_data.ddprocessor.GrabNextSuggestedTime();
+        fill_data.m_ddprocessor.GrabNextSuggestedTime();
     }
 
     LOG(VB_GENERAL, LOG_INFO, "\n"

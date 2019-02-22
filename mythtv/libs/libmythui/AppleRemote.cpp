@@ -171,16 +171,7 @@ static float GetATVversion()
 }
 
 // protected
-AppleRemote::AppleRemote() : MThread("AppleRemote"),
-                             openInExclusiveMode(true),
-                             hidDeviceInterface(nullptr),
-                             queue(nullptr),
-                             remoteId(0),
-                             _listener(nullptr),
-                             mUsingNewAtv(false),
-                             mLastEvent(AppleRemote::Undefined),
-                             mEventCount(0),
-                             mKeyIsDown(false)
+AppleRemote::AppleRemote() : MThread("AppleRemote")
 {
     if ( GetATVversion() > 2.2 )
     {

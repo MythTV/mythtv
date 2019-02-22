@@ -50,15 +50,15 @@ using namespace std;
 #include "vsync.h"
 
 bool tryingVideoSync = false;
-int VideoSync::m_forceskip = 0;
+int VideoSync::s_forceskip = 0;
 
 #define TESTVIDEOSYNC(NAME) \
-    do { if (++m_forceskip > skip) \
+    do { if (++s_forceskip > skip) \
     { \
         trial = new NAME (video_output, refresh_interval); \
         if (trial->TryInit()) \
         { \
-            m_forceskip = skip; \
+            s_forceskip = skip; \
             tryingVideoSync = false; \
             return trial; \
         } \
@@ -76,16 +76,16 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     VideoSync *trial = nullptr;
     tryingVideoSync  = true;
 
-    // m_forceskip allows for skipping one sync method
+    // s_forceskip allows for skipping one sync method
     // due to crash on the previous run.
     int skip = 0;
-    if (m_forceskip)
+    if (s_forceskip)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("A previous trial crashed, skipping %1").arg(m_forceskip));
+            QString("A previous trial crashed, skipping %1").arg(s_forceskip));
 
-        skip = m_forceskip;
-        m_forceskip = 0;
+        skip = s_forceskip;
+        s_forceskip = 0;
     }
 
 #ifdef USING_VDPAU

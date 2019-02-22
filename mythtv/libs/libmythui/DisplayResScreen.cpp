@@ -10,16 +10,16 @@
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
                                    double aspectRatio, double refreshRate)
-    : width(w), height(h), width_mm(mw), height_mm(mh), custom(false)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(aspectRatio);
     if (refreshRate > 0)
-        refreshRates.push_back(refreshRate);
+        m_refreshRates.push_back(refreshRate);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
                                    const std::vector<double>& rr)
-    : width(w), height(h), width_mm(mw), height_mm(mh), refreshRates(rr), custom(false)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(rr)
 {
     SetAspectRatio(-1.0);
 }
@@ -27,66 +27,65 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
                                    const std::vector<double>& rr,
                                    const std::map<double, short>& rr2)
-: realRates(rr2),   width(w),    height(h), width_mm(mw), height_mm(mh),
-  refreshRates(rr), custom(true)
+: realRates(rr2), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
+  m_refreshRates(rr), m_custom(true)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
                                    const double* rr, uint rr_length)
-    : width(w), height(h), width_mm(mw), height_mm(mh), custom(false)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        refreshRates.push_back(rr[i]);
+        m_refreshRates.push_back(rr[i]);
 
-    std::sort(refreshRates.begin(), refreshRates.end());
+    std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
                                    const short* rr, uint rr_length)
-    : width(w), height(h), width_mm(mw), height_mm(mh), custom(false)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        refreshRates.push_back((double)rr[i]);
-    std::sort(refreshRates.begin(), refreshRates.end());
+        m_refreshRates.push_back((double)rr[i]);
+    std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
 DisplayResScreen::DisplayResScreen(const QString &str)
-    : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0), custom(false)
 {
-    refreshRates.clear();
+    m_refreshRates.clear();
     QStringList slist = str.split(':');
     if (slist.size()<4)
         slist = str.split(','); // for backward compatibility
     if (slist.size() >= 4)
     {
-        width = slist[0].toInt();
-        height = slist[1].toInt();
-        width_mm = slist[2].toInt();
-        height_mm = slist[3].toInt();
-        aspect = slist[4].toDouble();
+        m_width = slist[0].toInt();
+        m_height = slist[1].toInt();
+        m_width_mm = slist[2].toInt();
+        m_height_mm = slist[3].toInt();
+        m_aspect = slist[4].toDouble();
         for (int i = 5; i<slist.size(); ++i)
-            refreshRates.push_back(slist[i].toDouble());
+            m_refreshRates.push_back(slist[i].toDouble());
     }
 }
 
 void DisplayResScreen::SetAspectRatio(double a)
 {
     if (a>0.0)
-        aspect = a;
+        m_aspect = a;
     else if (Height_mm())
-        aspect = ((double)(Width_mm())) / ((double)(Height_mm()));
+        m_aspect = ((double)(Width_mm())) / ((double)(Height_mm()));
 }
 
 QString DisplayResScreen::toString() const
 {
     QString str = QString("%1:%2:%3:%4:%5")
-        .arg(width).arg(height).arg(width_mm).arg(height_mm).arg(aspect);
-    for (uint i=0; i<refreshRates.size(); ++i)
-        str.append(QString(":%1").arg(refreshRates[i]));
+        .arg(m_width).arg(m_height).arg(m_width_mm).arg(m_height_mm).arg(m_aspect);
+    for (uint i=0; i<m_refreshRates.size(); ++i)
+        str.append(QString(":%1").arg(m_refreshRates[i]));
     return str;
 }
 

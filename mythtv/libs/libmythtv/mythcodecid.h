@@ -261,8 +261,8 @@ typedef enum
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
 QString toString(MythCodecID codecid);
-int myth2av_codecid(MythCodecID codec_id, bool &vdpau);
-inline int myth2av_codecid(MythCodecID codec_id)
+AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau);
+inline AVCodecID myth2av_codecid(MythCodecID codec_id)
 {
     bool vdpau;
     return myth2av_codecid(codec_id, vdpau);

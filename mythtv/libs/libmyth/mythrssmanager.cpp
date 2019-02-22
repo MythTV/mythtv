@@ -119,8 +119,7 @@ RSSSite::RSSSite(const QString& title,
     QObject(),
     m_title(title), m_sortTitle(sortTitle), m_image(image), m_type(type),
     m_description(description), m_url(url), m_author(author),
-    m_download(download), m_updated(updated), m_lock(QMutex::Recursive),
-    m_podcast(false), m_reply(nullptr), m_manager(nullptr)
+    m_download(download), m_updated(updated)
 {
     std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
     if (m_sortTitle.isEmpty() and not m_title.isEmpty())

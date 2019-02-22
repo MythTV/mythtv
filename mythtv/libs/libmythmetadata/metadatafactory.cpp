@@ -49,8 +49,7 @@ QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactory::MetadataFactory(QObject *parent) :
-    QObject(parent), m_scanning(false),
-    m_returnList(), m_sync(false)
+    QObject(parent)
 {
     m_lookupthread = new MetadataDownload(this);
     m_imagedownload = new MetadataImageDownload(this);
@@ -511,7 +510,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     {
         MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
 
-        MetadataLookupList lul = lue->lookupList;
+        MetadataLookupList lul = lue->m_lookupList;
 
         if (lul.isEmpty())
             return;
@@ -533,7 +532,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     {
         MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
 
-        MetadataLookupList lul = luf->lookupList;
+        MetadataLookupList lul = luf->m_lookupList;
 
         if (lul.isEmpty())
             return;
@@ -552,7 +551,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     {
         ImageDLEvent *ide = (ImageDLEvent *)levent;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;
@@ -566,7 +565,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     {
         ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;
@@ -583,9 +582,9 @@ void MetadataFactory::customEvent(QEvent *levent)
         if (!vsc)
             return;
 
-        QList<int> additions = vsc->additions;
-        QList<int> moves = vsc->moved;
-        QList<int> deletions = vsc->deleted;
+        QList<int> additions = vsc->m_additions;
+        QList<int> moves = vsc->m_moved;
+        QList<int> deletions = vsc->m_deleted;
 
         if (!m_scanning)
         {

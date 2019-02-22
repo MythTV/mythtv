@@ -7,6 +7,8 @@
 // myth
 #include <mythscreentype.h>
 
+const int DEFAULT_UPDATE_TIME = 5;
+
 class MythUIButton;
 class MythUIButtonList;
 class MythUIText;
@@ -42,20 +44,20 @@ class LogViewer : public MythScreenType
     void Init(void) override; // MythScreenType
     QString getSetting(const QString &key);
 
-    bool                m_autoUpdate;
-    int                 m_updateTime;
-    QTimer             *m_updateTimer;
+    bool                m_autoUpdate   {false};
+    int                 m_updateTime   {DEFAULT_UPDATE_TIME};
+    QTimer             *m_updateTimer  {nullptr};
 
     QString             m_currentLog;
     QString             m_progressLog;
     QString             m_fullLog;
 
-    MythUIButtonList   *m_logList;
-    MythUIText         *m_logText;
+    MythUIButtonList   *m_logList      {nullptr};
+    MythUIText         *m_logText      {nullptr};
 
-    MythUIButton       *m_exitButton;
-    MythUIButton       *m_cancelButton;
-    MythUIButton       *m_updateButton;
+    MythUIButton       *m_exitButton   {nullptr};
+    MythUIButton       *m_cancelButton {nullptr};
+    MythUIButton       *m_updateButton {nullptr};
 };
 
 #endif

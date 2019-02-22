@@ -536,9 +536,9 @@ int main(int argc, char *argv[])
         for (uint i = 0; i < scans.size(); i++)
         {
             printf("%5i %6i %8i %8s    %20s\n",
-                   scans[i].scanid,   scans[i].cardid,
-                   scans[i].sourceid, (scans[i].processed) ? "yes" : "no",
-                   scans[i].scandate.toString(Qt::ISODate)
+                   scans[i].m_scanid,   scans[i].m_cardid,
+                   scans[i].m_sourceid, (scans[i].m_processed) ? "yes" : "no",
+                   scans[i].m_scandate.toString(Qt::ISODate)
                    .toLatin1().constData());
         }
         cout<<endl;

@@ -119,7 +119,7 @@ class VDPAUColor
         m_vdp_color.alpha = (float)( m_color & 0xFF) / 255.0f;
     }
 
-    int      m_color;
+    int      m_color {0};
     VdpColor m_vdp_color;
 };
 
@@ -206,10 +206,10 @@ class VDPAUVideoSurface : public VDPAUResource
         m_render.surface = m_id;
     }
 
-    VdpChromaType      m_type {0};
+    VdpChromaType      m_type        {0};
     vdpau_render_state m_render;
     bool               m_needs_reset {false};
-    QThread*           m_owner {nullptr};
+    QThread*           m_owner       {nullptr};
 };
 
 class VDPAUBitmapSurface : public VDPAUResource
@@ -229,7 +229,7 @@ class VDPAUDecoder : public VDPAUResource
     VDPAUDecoder(uint id, QSize size, VdpDecoderProfile profile, uint refs)
       : VDPAUResource(id, size), m_profile(profile), m_max_refs(refs) { }
 
-    VdpDecoderProfile m_profile {0};
+    VdpDecoderProfile m_profile  {0};
     uint              m_max_refs {0};
 };
 
@@ -258,14 +258,14 @@ class VDPAUVideoMixer : public VDPAUResource
             delete m_background;
     }
 
-    uint            m_layers {0};
-    uint            m_features {0};
-    VdpChromaType   m_type {0};
+    uint            m_layers          {0};
+    uint            m_features        {0};
+    VdpChromaType   m_type            {0};
     VdpCSCMatrix    m_csc;
     float          *m_noise_reduction {nullptr};
-    float          *m_sharpness {nullptr};
-    uint8_t        *m_skip_chroma {nullptr};
-    VDPAUColor     *m_background {nullptr};
+    float          *m_sharpness       {nullptr};
+    uint8_t        *m_skip_chroma     {nullptr};
+    VDPAUColor     *m_background      {nullptr};
 };
 
 static void vdpau_preemption_callback(VdpDevice device, void *myth_render)
@@ -284,13 +284,7 @@ uint MythRenderVDPAU::gVDPAUBestScaling    = 0;
 bool MythRenderVDPAU::gVDPAUNVIDIA         = false;
 
 MythRenderVDPAU::MythRenderVDPAU()
-  : MythRender(kRenderVDPAU), m_preempted(false), m_recreating(false),
-    m_recreated(false), m_reset_video_surfaces(false),
-    m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
-    m_display(nullptr), m_window(0), m_device(0), m_surface(0),
-    m_flipQueue(0),  m_flipTarget(0), m_flipReady(false), m_colorKey(0),
-    m_flipFrames(false),
-    vdp_get_proc_address(nullptr), vdp_get_error_string(nullptr)
+  : MythRender(kRenderVDPAU)
 {
     LOCK_ALL
     ResetProcs();

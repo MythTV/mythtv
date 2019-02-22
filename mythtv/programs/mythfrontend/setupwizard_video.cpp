@@ -28,12 +28,8 @@ const QString VIDEO_SAMPLE_SD_FILENAME =
 VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
                                    MythScreenType *general,
                                    MythScreenType *audio, const char *name)
-    : MythScreenType(parent, name),         m_downloadFile(QString()),
-      m_testType(ttNone),
-      m_generalScreen(general),             m_audioScreen(audio),
-      m_playbackProfileButtonList(nullptr), m_progressDialog(nullptr),
-      m_testSDButton(nullptr),              m_testHDButton(nullptr),
-      m_nextButton(nullptr),                m_prevButton(nullptr)
+    : MythScreenType(parent, name),
+      m_generalScreen(general),             m_audioScreen(audio)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_vdp = new VideoDisplayProfile();

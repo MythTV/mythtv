@@ -47,8 +47,8 @@
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
-QReadWriteLock    TVRec::inputsLock;
-QMap<uint,TVRec*> TVRec::inputs;
+QReadWriteLock    TVRec::s_inputsLock;
+QMap<uint,TVRec*> TVRec::s_inputs;
 
 static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
@@ -123,7 +123,7 @@ TVRec::TVRec(int _inputid)
       // RingBuffer info
       ringBuffer(nullptr), rbFileExt("ts")
 {
-    inputs[inputid] = this;
+    s_inputs[inputid] = this;
 }
 
 bool TVRec::CreateChannel(const QString &startchannel,
@@ -210,7 +210,7 @@ bool TVRec::Init(void)
  */
 TVRec::~TVRec()
 {
-    inputs.remove(inputid);
+    s_inputs.remove(inputid);
 
     if (HasFlags(kFlagRunMainLoop))
     {
@@ -530,10 +530,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             }
 
             if (is_busy &&
-                ((sourceid != busy_input.sourceid) ||
-                 (mplexid  != busy_input.mplexid) ||
+                ((sourceid != busy_input.m_sourceid) ||
+                 (mplexid  != busy_input.m_mplexid) ||
                  ((mplexid == 0 || mplexid == 32767) &&
-                  chanid != busy_input.chanid)))
+                  chanid != busy_input.m_chanid)))
             {
                 states.push_back((TVState) RemoteGetState(inputids[i]));
                 inputids2.push_back(inputids[i]);
@@ -1197,7 +1197,9 @@ void TVRec::CloseChannel(void)
 {
     if (channel &&
         ((genOpt.inputtype == "DVB" && dvbOpt.dvb_on_demand) ||
-         genOpt.inputtype == "FREEBOX" || genOpt.inputtype == "VBOX" ||
+         genOpt.inputtype == "FREEBOX" ||
+         genOpt.inputtype == "VBOX" ||
+         genOpt.inputtype == "HDHOMERUN" ||
          CardUtil::IsV4L(genOpt.inputtype)))
     {
         channel->Close();
@@ -1337,10 +1339,10 @@ void TVRec::run(void)
         // to make sure this thread starts.  Until a better solution
         // is found, don't run HandleTuning unless we can safely get
         // the lock.
-        if (inputsLock.tryLockForRead())
+        if (s_inputsLock.tryLockForRead())
         {
             HandleTuning();
-            inputsLock.unlock();
+            s_inputsLock.unlock();
         }
 
         // Tell frontends about pending recordings
@@ -1469,7 +1471,7 @@ void TVRec::run(void)
                 // Check if another card in the same input group is
                 // busy.  This could be either virtual DVB-devices or
                 // a second tuner on a single card
-                inputsLock.lockForRead();
+                s_inputsLock.lockForRead();
                 bool allow_eit = true;
                 vector<uint> inputids =
                     CardUtil::GetConflictingInputs(inputid);
@@ -1488,10 +1490,10 @@ void TVRec::run(void)
                     LOG(VB_CHANNEL, LOG_INFO, LOC + QString(
                             "Postponing EIT scan on input [%1] "
                             "because input %2 is busy")
-                        .arg(inputid).arg(busy_input.inputid));
+                        .arg(inputid).arg(busy_input.m_inputid));
                     eitScanStartTime = eitScanStartTime.addSecs(300);
                 }
-                inputsLock.unlock();
+                s_inputsLock.unlock();
             }
         }
 
@@ -2525,8 +2527,8 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 
     if (GetState() != kState_None)
     {
-        busy_input->inputid = channel->GetInputID();
-        chanid              = channel->GetChanID();
+        busy_input->m_inputid = channel->GetInputID();
+        chanid                = channel->GetChanID();
     }
 
     PendingInfo pendinfo;
@@ -2540,7 +2542,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
         pendingRecLock.unlock();
     }
 
-    if (!busy_input->inputid && has_pending)
+    if (!busy_input->m_inputid && has_pending)
     {
         int timeLeft = MythDate::current()
             .secsTo(pendinfo.recordingStart);
@@ -2550,22 +2552,22 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
             QString channum, input;
             if (pendinfo.info->QueryTuningInfo(channum, input))
             {
-                busy_input->inputid = channel->GetInputID();
+                busy_input->m_inputid = channel->GetInputID();
                 chanid = pendinfo.info->GetChanID();
             }
         }
     }
 
-    if (busy_input->inputid)
+    if (busy_input->m_inputid)
     {
         CardUtil::GetInputInfo(*busy_input);
-        busy_input->chanid  = chanid;
-        busy_input->mplexid = ChannelUtil::GetMplexID(busy_input->chanid);
-        busy_input->mplexid =
-            (32767 == busy_input->mplexid) ? 0 : busy_input->mplexid;
+        busy_input->m_chanid  = chanid;
+        busy_input->m_mplexid = ChannelUtil::GetMplexID(busy_input->m_chanid);
+        busy_input->m_mplexid =
+            (32767 == busy_input->m_mplexid) ? 0 : busy_input->m_mplexid;
     }
 
-    return busy_input->inputid;
+    return busy_input->m_inputid;
 }
 
 
@@ -4847,8 +4849,8 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
 
 TVRec* TVRec::GetTVRec(uint inputid)
 {
-    QMap<uint,TVRec*>::const_iterator it = inputs.find(inputid);
-    if (it == inputs.end())
+    QMap<uint,TVRec*>::const_iterator it = s_inputs.find(inputid);
+    if (it == s_inputs.end())
         return nullptr;
     return *it;
 }

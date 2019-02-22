@@ -52,21 +52,21 @@ protected:
     QUrl GetBaseUrl(void);
     void timerEvent(QTimerEvent*) override; // QObject
 
-    QTcpSocket *_socket;
-    uint        _sequenceNumber;
-    QString     _sessionId;
-    QUrl        _requestUrl;
-    QUrl        _controlUrl;
+    QTcpSocket    *m_socket          {nullptr};
+    uint           m_sequenceNumber  {0};
+    QString        m_sessionId       {"0"};
+    QUrl           m_requestUrl;
+    QUrl           m_controlUrl;
 
-    int                     _responseCode;
-    QString                 _responseMessage;
-    Params                  _responseHeaders;
-    QByteArray              _responseContent;
-    int                     _timeout;
-    int                     _timer;
-    bool                    _canGetParameter;
+    int            m_responseCode    {-1};
+    QString        m_responseMessage;
+    Params         m_responseHeaders;
+    QByteArray     m_responseContent;
+    int            m_timeout         {60};
+    int            m_timer           {0};
+    bool           m_canGetParameter {false};
 
-    static QMutex _rtspMutex;
+    static QMutex  s_rtspMutex;
 
 };
 

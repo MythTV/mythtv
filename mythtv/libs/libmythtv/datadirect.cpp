@@ -56,54 +56,6 @@ void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
                             void *arg);
 QByteArray gUncompress(const QByteArray &data);
 
-DataDirectStation::DataDirectStation(void) :
-    stationid(""),              callsign(""),
-    stationname(""),            affiliate(""),
-    fccchannelnumber("")
-{
-}
-
-DataDirectLineup::DataDirectLineup() :
-    lineupid(""), name(""), displayname(""), type(""), postal(""), device("")
-{
-}
-
-DataDirectLineupMap::DataDirectLineupMap() :
-    lineupid(""), stationid(""), channel(""), channelMinor("")
-{
-}
-
-DataDirectSchedule::DataDirectSchedule() :
-    programid(""),              stationid(""),
-    time(),                     duration(),
-    repeat(false),              isnew(false),
-    stereo(false),              dolby(false),
-    subtitled(false),
-    hdtv(false),                closecaptioned(false),
-    tvrating(""),
-    partnumber(0),              parttotal(0)
-{
-}
-
-DataDirectProgram::DataDirectProgram() :
-    programid(""),  seriesid(""),      title(""),
-    subtitle(""),   description(""),   mpaaRating(""),
-    starRating(""), duration(),        year(""),
-    showtype(""),   colorcode(""),     originalAirDate(),
-    syndicatedEpisodeNumber("")
-{
-}
-
-DataDirectProductionCrew::DataDirectProductionCrew() :
-    programid(""), role(""), givenname(""), surname(""), fullname("")
-{
-}
-
-DataDirectGenre::DataDirectGenre() :
-    programid(""), gclass(""), relevance("")
-{
-}
-
 // XXX Program duration should be stored as seconds, not as a QTime.
 //     limited to 24 hours this way.
 
@@ -115,93 +67,93 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     (void)pnamespaceuri;
     (void)plocalname;
 
-    currtagname = pqname;
-    if (currtagname == "xtvd")
+    m_currtagname = pqname;
+    if (m_currtagname == "xtvd")
     {
         QString   beg   = pxmlatts.value("from");
         QDateTime begts = MythDate::fromString(beg);
-        parent.SetDDProgramsStartAt(begts);
+        m_parent.SetDDProgramsStartAt(begts);
 
         QString   end   = pxmlatts.value("to");
         QDateTime endts = MythDate::fromString(end);
-        parent.SetDDProgramsEndAt(endts);
+        m_parent.SetDDProgramsEndAt(endts);
     }
-    else if (currtagname == "station")
+    else if (m_currtagname == "station")
     {
-        curr_station.Reset();
-        curr_station.stationid = pxmlatts.value("id");
+        m_curr_station.Reset();
+        m_curr_station.m_stationid = pxmlatts.value("id");
     }
-    else if (currtagname == "lineup")
+    else if (m_currtagname == "lineup")
     {
-        curr_lineup.Reset();
-        curr_lineup.name = pxmlatts.value("name");
-        curr_lineup.type = pxmlatts.value("type");
-        curr_lineup.device = pxmlatts.value("device");
-        curr_lineup.postal = pxmlatts.value("postalCode");
-        curr_lineup.lineupid = pxmlatts.value("id");
-        curr_lineup.displayname = curr_lineup.name + "-" + curr_lineup.type +
-            "-" + curr_lineup.device + "-" +
-            curr_lineup.postal + "-" +
-            curr_lineup.lineupid;
+        m_curr_lineup.Reset();
+        m_curr_lineup.m_name = pxmlatts.value("name");
+        m_curr_lineup.m_type = pxmlatts.value("type");
+        m_curr_lineup.m_device = pxmlatts.value("device");
+        m_curr_lineup.m_postal = pxmlatts.value("postalCode");
+        m_curr_lineup.m_lineupid = pxmlatts.value("id");
+        m_curr_lineup.m_displayname = m_curr_lineup.m_name + "-" + m_curr_lineup.m_type +
+            "-" + m_curr_lineup.m_device + "-" +
+            m_curr_lineup.m_postal + "-" +
+            m_curr_lineup.m_lineupid;
 
-        if (curr_lineup.lineupid.isEmpty())
+        if (m_curr_lineup.m_lineupid.isEmpty())
         {
-            curr_lineup.lineupid = curr_lineup.name + curr_lineup.postal +
-                curr_lineup.device + curr_lineup.type;
+            m_curr_lineup.m_lineupid = m_curr_lineup.m_name + m_curr_lineup.m_postal +
+                m_curr_lineup.m_device + m_curr_lineup.m_type;
         }
     }
-    else if (currtagname == "map")
+    else if (m_currtagname == "map")
     {
         int tmpindex;
-        curr_lineupmap.Reset();
-        curr_lineupmap.lineupid = curr_lineup.lineupid;
-        curr_lineupmap.stationid = pxmlatts.value("station");
-        curr_lineupmap.channel = pxmlatts.value("channel");
+        m_curr_lineupmap.Reset();
+        m_curr_lineupmap.m_lineupid = m_curr_lineup.m_lineupid;
+        m_curr_lineupmap.m_stationid = pxmlatts.value("station");
+        m_curr_lineupmap.m_channel = pxmlatts.value("channel");
         tmpindex = pxmlatts.index("channelMinor"); // for ATSC
         if (tmpindex != -1)
-            curr_lineupmap.channelMinor = pxmlatts.value(tmpindex);
+            m_curr_lineupmap.m_channelMinor = pxmlatts.value(tmpindex);
     }
-    else if (currtagname == "schedule")
+    else if (m_currtagname == "schedule")
     {
-        curr_schedule.Reset();
-        curr_schedule.programid = pxmlatts.value("program");
-        curr_schedule.stationid = pxmlatts.value("station");
+        m_curr_schedule.Reset();
+        m_curr_schedule.m_programid = pxmlatts.value("program");
+        m_curr_schedule.m_stationid = pxmlatts.value("station");
 
-        curr_schedule.time = MythDate::fromString(pxmlatts.value("time"));
+        m_curr_schedule.m_time = MythDate::fromString(pxmlatts.value("time"));
         QString durstr = pxmlatts.value("duration");
-        curr_schedule.duration = QTime(durstr.mid(2, 2).toInt(),
+        m_curr_schedule.m_duration = QTime(durstr.mid(2, 2).toInt(),
                                        durstr.mid(5, 2).toInt(), 0, 0);
 
-        curr_schedule.repeat = (pxmlatts.value("repeat") == "true");
-        curr_schedule.isnew = (pxmlatts.value("new") == "true");
-        curr_schedule.stereo = (pxmlatts.value("stereo") == "true");
-        curr_schedule.dolby = (pxmlatts.value("dolby") == "Dolby" ||
+        m_curr_schedule.m_repeat = (pxmlatts.value("repeat") == "true");
+        m_curr_schedule.m_isnew = (pxmlatts.value("new") == "true");
+        m_curr_schedule.m_stereo = (pxmlatts.value("stereo") == "true");
+        m_curr_schedule.m_dolby = (pxmlatts.value("dolby") == "Dolby" ||
                                pxmlatts.value("dolby") == "Dolby Digital");
-        curr_schedule.subtitled = (pxmlatts.value("subtitled") == "true");
-        curr_schedule.hdtv = (pxmlatts.value("hdtv") == "true");
-        curr_schedule.closecaptioned = (pxmlatts.value("closeCaptioned") ==
+        m_curr_schedule.m_subtitled = (pxmlatts.value("subtitled") == "true");
+        m_curr_schedule.m_hdtv = (pxmlatts.value("hdtv") == "true");
+        m_curr_schedule.m_closecaptioned = (pxmlatts.value("closeCaptioned") ==
                                         "true");
-        curr_schedule.tvrating = pxmlatts.value("tvRating");
+        m_curr_schedule.m_tvrating = pxmlatts.value("tvRating");
     }
-    else if (currtagname == "part")
+    else if (m_currtagname == "part")
     {
-        curr_schedule.partnumber = pxmlatts.value("number").toInt();
-        curr_schedule.parttotal = pxmlatts.value("total").toInt();
+        m_curr_schedule.m_partnumber = pxmlatts.value("number").toInt();
+        m_curr_schedule.m_parttotal = pxmlatts.value("total").toInt();
     }
-    else if (currtagname == "program")
+    else if (m_currtagname == "program")
     {
-        curr_program.Reset();
-        curr_program.programid = pxmlatts.value("id");
+        m_curr_program.Reset();
+        m_curr_program.m_programid = pxmlatts.value("id");
     }
-    else if (currtagname == "crew")
+    else if (m_currtagname == "crew")
     {
-        curr_program.Reset();
-        lastprogramid = pxmlatts.value("program");
+        m_curr_program.Reset();
+        m_lastprogramid = pxmlatts.value("program");
     }
-    else if (currtagname == "programGenre")
+    else if (m_currtagname == "programGenre")
     {
-        curr_genre.Reset();
-        lastprogramid = pxmlatts.value("program");
+        m_curr_genre.Reset();
+        m_lastprogramid = pxmlatts.value("program");
     }
 
     return true;
@@ -218,7 +170,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
 
     if (pqname == "station")
     {
-        parent.m_stations[curr_station.stationid] = curr_station;
+        m_parent.m_stations[m_curr_station.m_stationid] = m_curr_station;
 
         query.prepare(
             "INSERT INTO dd_station "
@@ -228,20 +180,20 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "     (:STATIONID, :CALLSIGN, :STATIONNAME, "
             "      :AFFILIATE, :FCCCHANNUM)");
 
-        query.bindValue(":STATIONID",   curr_station.stationid);
-        query.bindValue(":CALLSIGN",    curr_station.callsign);
-        query.bindValue(":STATIONNAME", curr_station.stationname);
-        query.bindValue(":AFFILIATE",   curr_station.affiliate);
-        query.bindValue(":FCCCHANNUM",  curr_station.fccchannelnumber);
+        query.bindValue(":STATIONID",   m_curr_station.m_stationid);
+        query.bindValue(":CALLSIGN",    m_curr_station.m_callsign);
+        query.bindValue(":STATIONNAME", m_curr_station.m_stationname);
+        query.bindValue(":AFFILIATE",   m_curr_station.m_affiliate);
+        query.bindValue(":FCCCHANNUM",  m_curr_station.m_fccchannelnumber);
 
         if (!query.exec())
             MythDB::DBError("Inserting into dd_station", query);
     }
     else if (pqname == "lineup")
     {
-        set_lineup_type(curr_lineup.lineupid, curr_lineup.type);
+        set_lineup_type(m_curr_lineup.m_lineupid, m_curr_lineup.m_type);
 
-        parent.m_lineups.push_back(curr_lineup);
+        m_parent.m_lineups.push_back(m_curr_lineup);
 
         query.prepare(
             "INSERT INTO dd_lineup "
@@ -249,18 +201,18 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "VALUES "
             "     (:LINEUPID, :NAME, :TYPE, :DEVICE, :POSTAL)");
 
-        query.bindValue(":LINEUPID",    curr_lineup.lineupid);
-        query.bindValue(":NAME",        curr_lineup.name);
-        query.bindValue(":TYPE",        curr_lineup.type);
-        query.bindValue(":DEVICE",      curr_lineup.device);
-        query.bindValue(":POSTAL",      curr_lineup.postal);
+        query.bindValue(":LINEUPID",    m_curr_lineup.m_lineupid);
+        query.bindValue(":NAME",        m_curr_lineup.m_name);
+        query.bindValue(":TYPE",        m_curr_lineup.m_type);
+        query.bindValue(":DEVICE",      m_curr_lineup.m_device);
+        query.bindValue(":POSTAL",      m_curr_lineup.m_postal);
 
         if (!query.exec())
             MythDB::DBError("Inserting into dd_lineup", query);
     }
     else if (pqname == "map")
     {
-        parent.m_lineupmaps[curr_lineupmap.lineupid].push_back(curr_lineupmap);
+        m_parent.m_lineupmaps[m_curr_lineupmap.m_lineupid].push_back(m_curr_lineupmap);
 
         query.prepare(
             "INSERT INTO dd_lineupmap "
@@ -268,17 +220,17 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "VALUES "
             "     (:LINEUPID, :STATIONID, :CHANNEL, :CHANNELMINOR)");
 
-        query.bindValue(":LINEUPID",    curr_lineupmap.lineupid);
-        query.bindValue(":STATIONID",   curr_lineupmap.stationid);
-        query.bindValue(":CHANNEL",     curr_lineupmap.channel);
-        query.bindValue(":CHANNELMINOR",curr_lineupmap.channelMinor);
+        query.bindValue(":LINEUPID",    m_curr_lineupmap.m_lineupid);
+        query.bindValue(":STATIONID",   m_curr_lineupmap.m_stationid);
+        query.bindValue(":CHANNEL",     m_curr_lineupmap.m_channel);
+        query.bindValue(":CHANNELMINOR",m_curr_lineupmap.m_channelMinor);
         if (!query.exec())
             MythDB::DBError("Inserting into dd_lineupmap", query);
     }
     else if (pqname == "schedule")
     {
-        QDateTime endtime = curr_schedule.time.addSecs(
-            MythDate::toSeconds( curr_schedule.duration ));
+        QDateTime endtime = m_curr_schedule.m_time.addSecs(
+            MythDate::toSeconds( m_curr_schedule.m_duration ));
 
         query.prepare(
             "INSERT INTO dd_schedule "
@@ -294,21 +246,21 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "      :CAPTIONED, :TVRATING,   :PARTNUMBER,     "
             "      :PARTTOTAL, :ENDTIME,    :ISNEW)");
 
-        query.bindValue(":PROGRAMID",   curr_schedule.programid);
-        query.bindValue(":STATIONID",   curr_schedule.stationid);
-        query.bindValue(":TIME",        curr_schedule.time);
-        query.bindValue(":DURATION",    curr_schedule.duration);
-        query.bindValue(":ISREPEAT",    curr_schedule.repeat);
-        query.bindValue(":STEREO",      curr_schedule.stereo);
-        query.bindValue(":DOLBY",       curr_schedule.dolby);
-        query.bindValue(":SUBTITLED",   curr_schedule.subtitled);
-        query.bindValue(":HDTV",        curr_schedule.hdtv);
-        query.bindValue(":CAPTIONED",   curr_schedule.closecaptioned);
-        query.bindValue(":TVRATING",    curr_schedule.tvrating);
-        query.bindValue(":PARTNUMBER",  curr_schedule.partnumber);
-        query.bindValue(":PARTTOTAL",   curr_schedule.parttotal);
+        query.bindValue(":PROGRAMID",   m_curr_schedule.m_programid);
+        query.bindValue(":STATIONID",   m_curr_schedule.m_stationid);
+        query.bindValue(":TIME",        m_curr_schedule.m_time);
+        query.bindValue(":DURATION",    m_curr_schedule.m_duration);
+        query.bindValue(":ISREPEAT",    m_curr_schedule.m_repeat);
+        query.bindValue(":STEREO",      m_curr_schedule.m_stereo);
+        query.bindValue(":DOLBY",       m_curr_schedule.m_dolby);
+        query.bindValue(":SUBTITLED",   m_curr_schedule.m_subtitled);
+        query.bindValue(":HDTV",        m_curr_schedule.m_hdtv);
+        query.bindValue(":CAPTIONED",   m_curr_schedule.m_closecaptioned);
+        query.bindValue(":TVRATING",    m_curr_schedule.m_tvrating);
+        query.bindValue(":PARTNUMBER",  m_curr_schedule.m_partnumber);
+        query.bindValue(":PARTTOTAL",   m_curr_schedule.m_parttotal);
         query.bindValue(":ENDTIME",     endtime);
-        query.bindValue(":ISNEW",       curr_schedule.isnew);
+        query.bindValue(":ISNEW",       m_curr_schedule.m_isnew);
 
         if (!query.exec())
             MythDB::DBError("Inserting into dd_schedule", query);
@@ -316,22 +268,22 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     else if (pqname == "program")
     {
         float staravg = 0.0;
-        if (!curr_program.starRating.isEmpty())
+        if (!m_curr_program.m_starRating.isEmpty())
         {
-            int fullstarcount = curr_program.starRating.count("*");
-            int halfstarcount = curr_program.starRating.count("+");
+            int fullstarcount = m_curr_program.m_starRating.count("*");
+            int halfstarcount = m_curr_program.m_starRating.count("+");
             staravg = (fullstarcount + (halfstarcount * .5)) / 4;
         }
 
         QString cat_type = "";
-        QString prefix = curr_program.programid.left(2);
+        QString prefix = m_curr_program.m_programid.left(2);
 
         if (prefix == "MV")
             cat_type = "movie";
         else if (prefix == "SP")
             cat_type = "sports";
         else if (prefix == "EP" ||
-                 curr_program.showtype.contains("series", Qt::CaseInsensitive))
+                 m_curr_program.m_showtype.contains("series", Qt::CaseInsensitive))
             cat_type = "series";
         else
             cat_type = "tvshow";
@@ -350,50 +302,50 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "      :RUNTIME,     :YEAR,       :SERIESID,       "
             "      :COLORCODE,   :SYNDNUM,    :ORIGAIRDATE)    ");
 
-        query.bindValue(":PROGRAMID",   curr_program.programid);
-        query.bindValue(":TITLE",       curr_program.title);
-        query.bindValue(":SUBTITLE",    curr_program.subtitle);
-        query.bindValue(":DESCRIPTION", curr_program.description);
-        query.bindValue(":SHOWTYPE",    curr_program.showtype);
+        query.bindValue(":PROGRAMID",   m_curr_program.m_programid);
+        query.bindValue(":TITLE",       m_curr_program.m_title);
+        query.bindValue(":SUBTITLE",    m_curr_program.m_subtitle);
+        query.bindValue(":DESCRIPTION", m_curr_program.m_description);
+        query.bindValue(":SHOWTYPE",    m_curr_program.m_showtype);
         query.bindValue(":CATTYPE",     cat_type);
-        query.bindValue(":MPAARATING",  curr_program.mpaaRating);
-        query.bindValue(":STARRATING",  curr_program.starRating);
+        query.bindValue(":MPAARATING",  m_curr_program.m_mpaaRating);
+        query.bindValue(":STARRATING",  m_curr_program.m_starRating);
         query.bindValue(":STARS",       staravg);
-        query.bindValue(":RUNTIME",     curr_program.duration);
-        query.bindValue(":YEAR",        curr_program.year);
-        query.bindValue(":SERIESID",    curr_program.seriesid);
-        query.bindValue(":COLORCODE",   curr_program.colorcode);
-        query.bindValue(":SYNDNUM",     curr_program.syndicatedEpisodeNumber);
-        query.bindValue(":ORIGAIRDATE", curr_program.originalAirDate);
+        query.bindValue(":RUNTIME",     m_curr_program.m_duration);
+        query.bindValue(":YEAR",        m_curr_program.m_year);
+        query.bindValue(":SERIESID",    m_curr_program.m_seriesid);
+        query.bindValue(":COLORCODE",   m_curr_program.m_colorcode);
+        query.bindValue(":SYNDNUM",     m_curr_program.m_syndicatedEpisodeNumber);
+        query.bindValue(":ORIGAIRDATE", m_curr_program.m_originalAirDate);
 
         if (!query.exec())
             MythDB::DBError("Inserting into dd_program", query);
     }
     else if (pqname == "member")
     {
-        QString roleunderlines = curr_productioncrew.role.replace(" ", "_");
+        QString roleunderlines = m_curr_productioncrew.m_role.replace(" ", "_");
 
-        QString fullname = curr_productioncrew.givenname;
+        QString fullname = m_curr_productioncrew.m_givenname;
         if (!fullname.isEmpty())
             fullname += " ";
-        fullname += curr_productioncrew.surname;
+        fullname += m_curr_productioncrew.m_surname;
 
         query.prepare(
             "INSERT INTO dd_productioncrew "
             "       ( programid,  role,  givenname,  surname,  fullname) "
             "VALUES (:PROGRAMID, :ROLE, :GIVENNAME, :SURNAME, :FULLNAME)");
 
-        query.bindValue(":PROGRAMID",   lastprogramid);
+        query.bindValue(":PROGRAMID",   m_lastprogramid);
         query.bindValue(":ROLE",        roleunderlines);
-        query.bindValue(":GIVENNAME",   curr_productioncrew.givenname);
-        query.bindValue(":SURNAME",     curr_productioncrew.surname);
+        query.bindValue(":GIVENNAME",   m_curr_productioncrew.m_givenname);
+        query.bindValue(":SURNAME",     m_curr_productioncrew.m_surname);
         query.bindValue(":FULLNAME",    fullname);
 
         if (!query.exec())
             MythDB::DBError("Inserting into dd_productioncrew", query);
 
-        curr_productioncrew.givenname = "";
-        curr_productioncrew.surname = "";
+        m_curr_productioncrew.m_givenname = "";
+        m_curr_productioncrew.m_surname = "";
     }
     else if (pqname == "genre")
     {
@@ -402,9 +354,9 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "       ( programid,  class,  relevance) "
             "VALUES (:PROGRAMID, :CLASS, :RELEVANCE)");
 
-        query.bindValue(":PROGRAMID",   lastprogramid);
-        query.bindValue(":CLASS",       curr_genre.gclass);
-        query.bindValue(":RELEVANCE",   curr_genre.relevance);
+        query.bindValue(":PROGRAMID",   m_lastprogramid);
+        query.bindValue(":CLASS",       m_curr_genre.m_gclass);
+        query.bindValue(":RELEVANCE",   m_curr_genre.m_relevance);
 
         if (!query.exec())
             MythDB::DBError("Inserting into dd_genre", query);
@@ -415,7 +367,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
 
 bool DDStructureParser::startDocument()
 {
-    parent.CreateTempTables();
+    m_parent.CreateTempTables();
     return true;
 }
 
@@ -432,7 +384,7 @@ bool DDStructureParser::characters(const QString& pchars)
     if (pchars.trimmed().isEmpty())
         return true;
 
-    if (currtagname == "message")
+    if (m_currtagname == "message")
     {
         if (pchars.contains("expire"))
         {
@@ -471,65 +423,63 @@ bool DDStructureParser::characters(const QString& pchars)
                                             nullptr);
         }
     }
-    if (currtagname == "callSign")
-        curr_station.callsign = pchars;
-    else if (currtagname == "name")
-        curr_station.stationname = pchars;
-    else if (currtagname == "affiliate")
-        curr_station.affiliate = pchars;
-    else if (currtagname == "fccChannelNumber")
-        curr_station.fccchannelnumber = pchars;
-    else if (currtagname == "title")
-        curr_program.title = pchars;
-    else if (currtagname == "subtitle")
-        curr_program.subtitle = pchars;
-    else if (currtagname == "description")
-        curr_program.description = pchars;
-    else if (currtagname == "showType")
-        curr_program.showtype = pchars;
-    else if (currtagname == "series")
-        curr_program.seriesid = pchars;
-    else if (currtagname == "colorCode")
-        curr_program.colorcode = pchars;
-    else if (currtagname == "mpaaRating")
-        curr_program.mpaaRating = pchars;
-    else if (currtagname == "starRating")
-        curr_program.starRating = pchars;
-    else if (currtagname == "year")
-        curr_program.year = pchars;
-    else if (currtagname == "syndicatedEpisodeNumber")
-        curr_program.syndicatedEpisodeNumber = pchars;
-    else if (currtagname == "runTime")
+    if (m_currtagname == "callSign")
+        m_curr_station.m_callsign = pchars;
+    else if (m_currtagname == "name")
+        m_curr_station.m_stationname = pchars;
+    else if (m_currtagname == "affiliate")
+        m_curr_station.m_affiliate = pchars;
+    else if (m_currtagname == "fccChannelNumber")
+        m_curr_station.m_fccchannelnumber = pchars;
+    else if (m_currtagname == "title")
+        m_curr_program.m_title = pchars;
+    else if (m_currtagname == "subtitle")
+        m_curr_program.m_subtitle = pchars;
+    else if (m_currtagname == "description")
+        m_curr_program.m_description = pchars;
+    else if (m_currtagname == "showType")
+        m_curr_program.m_showtype = pchars;
+    else if (m_currtagname == "series")
+        m_curr_program.m_seriesid = pchars;
+    else if (m_currtagname == "colorCode")
+        m_curr_program.m_colorcode = pchars;
+    else if (m_currtagname == "mpaaRating")
+        m_curr_program.m_mpaaRating = pchars;
+    else if (m_currtagname == "starRating")
+        m_curr_program.m_starRating = pchars;
+    else if (m_currtagname == "year")
+        m_curr_program.m_year = pchars;
+    else if (m_currtagname == "syndicatedEpisodeNumber")
+        m_curr_program.m_syndicatedEpisodeNumber = pchars;
+    else if (m_currtagname == "runTime")
     {
         QString runtimestr = pchars;
         QTime runtime = QTime(runtimestr.mid(2,2).toInt(),
                               runtimestr.mid(5,2).toInt(), 0, 0);
-        curr_program.duration = runtime;
+        m_curr_program.m_duration = runtime;
     }
-    else if (currtagname == "originalAirDate")
+    else if (m_currtagname == "originalAirDate")
     {
         QDate airdate = QDate::fromString(pchars, Qt::ISODate);
-        curr_program.originalAirDate = airdate;
+        m_curr_program.m_originalAirDate = airdate;
     }
-    else if (currtagname == "role")
-        curr_productioncrew.role = pchars;
-    else if (currtagname == "givenname")
-        curr_productioncrew.givenname = pchars;
-    else if (currtagname == "surname")
-        curr_productioncrew.surname = pchars;
-    else if (currtagname == "class")
-        curr_genre.gclass = pchars;
-    else if (currtagname == "relevance")
-        curr_genre.relevance = pchars;
+    else if (m_currtagname == "role")
+        m_curr_productioncrew.m_role = pchars;
+    else if (m_currtagname == "givenname")
+        m_curr_productioncrew.m_givenname = pchars;
+    else if (m_currtagname == "surname")
+        m_curr_productioncrew.m_surname = pchars;
+    else if (m_currtagname == "class")
+        m_curr_genre.m_gclass = pchars;
+    else if (m_currtagname == "relevance")
+        m_curr_genre.m_relevance = pchars;
 
     return true;
 }
 
 DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     m_listingsProvider(lp % DD_PROVIDER_COUNT),
-    m_userid(user),                   m_password(pass),
-    m_tmpDir("/tmp"),                 m_cacheData(false),
-    m_inputFilename(""),              m_cookieFileDT()
+    m_userid(user),                   m_password(pass)
 {
     {
         QMutexLocker locker(&user_agent_lock);
@@ -1069,7 +1019,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Grabbing next suggested grabbing time");
 
-    QString ddurl = m_providers[m_listingsProvider].webServiceURL;
+    QString ddurl = m_providers[m_listingsProvider].m_webServiceURL;
 
     bool ok;
     QString resultFilename = GetResultFilename(ok);
@@ -1172,7 +1122,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
     LOG(VB_GENERAL, LOG_INFO, LOC + "Grabbing " + msg + " data");
 
     QString err = "";
-    QString ddurl = m_providers[m_listingsProvider].webServiceURL;
+    QString ddurl = m_providers[m_listingsProvider].m_webServiceURL;
     QString inputfile = m_inputFilename;
     QString cache_dd_data;
 
@@ -1358,8 +1308,8 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
     list.push_back(PostItem("password", GetPassword()));
     list.push_back(PostItem("action",   "Login"));
 
-    QString labsURL   = m_providers[m_listingsProvider].webURL;
-    QString loginPage = m_providers[m_listingsProvider].loginPage;
+    QString labsURL   = m_providers[m_listingsProvider].m_webURL;
+    QString loginPage = m_providers[m_listingsProvider].m_loginPage;
 
     bool ok;
     QString resultFilename = GetResultFilename(ok);
@@ -1420,8 +1370,8 @@ bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
         return false;
     }
 
-    QString labsURL = m_providers[m_listingsProvider].webURL;
-    ok = Post(labsURL + (*it).get_action, list, resultFilename,
+    QString labsURL = m_providers[m_listingsProvider].m_webURL;
+    ok = Post(labsURL + (*it).m_get_action, list, resultFilename,
                    cookieFilename, "");
 
     return ok && ParseLineup(lineupid, resultFilename);
@@ -1436,9 +1386,9 @@ void DataDirectProcessor::SetAll(const QString &lineupid, bool val)
     if (lit == m_rawLineups.end())
         return;
 
-    RawLineupChannels &ch = (*lit).channels;
+    RawLineupChannels &ch = (*lit).m_channels;
     for (RawLineupChannels::iterator it = ch.begin(); it != ch.end(); ++it)
-        (*it).chk_checked = val;
+        (*it).m_chk_checked = val;
 }
 
 static QString get_cache_filename(const QString &lineupid)
@@ -1514,32 +1464,32 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
         io.readLine(); // read "start record" string
 
         DataDirectLineupMap chan;
-        chan.lineupid     = lineupid;
-        chan.stationid    = io.readLine();
-        chan.channel      = io.readLine();
-        chan.channelMinor = io.readLine();
+        chan.m_lineupid     = lineupid;
+        chan.m_stationid    = io.readLine();
+        chan.m_channel      = io.readLine();
+        chan.m_channelMinor = io.readLine();
 
-        chan.mapFrom = QDate();
+        chan.m_mapFrom = QDate();
         tmp = io.readLine();
         if (!tmp.isEmpty())
-            chan.mapFrom.fromString(tmp, Qt::ISODate);
+            chan.m_mapFrom.fromString(tmp, Qt::ISODate);
 
-        chan.mapTo = QDate();
+        chan.m_mapTo = QDate();
         tmp = io.readLine();
         if (!tmp.isEmpty())
-            chan.mapTo.fromString(tmp, Qt::ISODate);
+            chan.m_mapTo.fromString(tmp, Qt::ISODate);
 
         channels.push_back(chan);
 
         DDStation station;
-        station.stationid   = chan.stationid;
-        station.callsign    = io.readLine();
-        station.stationname = io.readLine();
-        station.affiliate   = io.readLine();
-        station.fccchannelnumber = io.readLine();
+        station.m_stationid   = chan.m_stationid;
+        station.m_callsign    = io.readLine();
+        station.m_stationname = io.readLine();
+        station.m_affiliate   = io.readLine();
+        station.m_fccchannelnumber = io.readLine();
         tmp = io.readLine(); // read "end record" string
 
-        m_stations[station.stationid] = station;
+        m_stations[station.m_stationid] = station;
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "GrabLineupFromCache("+lineupid+
@@ -1584,17 +1534,17 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     for (it = channels.begin(); it != channels.end(); ++it)
     {
         io << "# start record"    << endl;
-        io << (*it).stationid     << endl;
-        io << (*it).channel       << endl;
-        io << (*it).channelMinor  << endl;
-        io << (*it).mapFrom.toString(Qt::ISODate) << endl;
-        io << (*it).mapTo.toString(Qt::ISODate)   << endl;
+        io << (*it).m_stationid     << endl;
+        io << (*it).m_channel       << endl;
+        io << (*it).m_channelMinor  << endl;
+        io << (*it).m_mapFrom.toString(Qt::ISODate) << endl;
+        io << (*it).m_mapTo.toString(Qt::ISODate)   << endl;
 
-        DDStation station = GetDDStation((*it).stationid);
-        io << station.callsign    << endl;
-        io << station.stationname << endl;
-        io << station.affiliate   << endl;
-        io << station.fccchannelnumber << endl;
+        DDStation station = GetDDStation((*it).m_stationid);
+        io << station.m_callsign    << endl;
+        io << station.m_stationname << endl;
+        io << station.m_affiliate   << endl;
+        io << station.m_fccchannelnumber << endl;
         io << "# end record"      << endl;
     }
     io << flush;
@@ -1636,7 +1586,7 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
     if (lit == m_rawLineups.end())
         return false;
 
-    const RawLineupChannels orig_channels = (*lit).channels;
+    const RawLineupChannels orig_channels = (*lit).m_channels;
 
     if (!onlyGrabSelected)
     {
@@ -1650,7 +1600,7 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
     if (ok)
         SaveLineupToCache(lineupid);
 
-    (*lit).channels = orig_channels;
+    (*lit).m_channels = orig_channels;
     if (restore && !onlyGrabSelected)
         ok &= SaveLineupChanges(lineupid);
 
@@ -1678,17 +1628,17 @@ bool DataDirectProcessor::SaveLineup(const QString &lineupid,
     DDLineupChannels::const_iterator it;
     for (it = (*ddit).begin(); it != (*ddit).end(); ++it)
     {
-        if (xmltvids.find((*it).stationid) != xmltvids.end())
-            callsigns[GetDDStation((*it).stationid).callsign] = true;
+        if (xmltvids.find((*it).m_stationid) != xmltvids.end())
+            callsigns[GetDDStation((*it).m_stationid).m_callsign] = true;
     }
 
     // Set checked mark based on whether the channel is mapped
-    RawLineupChannels &ch = (*lit).channels;
+    RawLineupChannels &ch = (*lit).m_channels;
     RawLineupChannels::iterator cit;
     for (cit = ch.begin(); cit != ch.end(); ++cit)
     {
-        bool chk = callsigns.find((*cit).lbl_callsign) != callsigns.end();
-        (*cit).chk_checked = chk;
+        bool chk = callsigns.find((*cit).m_lbl_callsign) != callsigns.end();
+        (*cit).m_chk_checked = chk;
     }
 
     // Save these changes
@@ -1702,14 +1652,14 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
         return false;
 
     const RawLineup &lineup = *lit;
-    const RawLineupChannels &ch = lineup.channels;
+    const RawLineupChannels &ch = lineup.m_channels;
     RawLineupChannels::const_iterator it;
 
     PostList list;
     for (it = ch.begin(); it != ch.end(); ++it)
     {
-        if ((*it).chk_checked)
-            list.push_back(PostItem((*it).chk_name, (*it).chk_value));
+        if ((*it).m_chk_checked)
+            list.push_back(PostItem((*it).m_chk_name, (*it).m_chk_value));
     }
     list.push_back(PostItem("action", "Update"));
 
@@ -1725,8 +1675,8 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
         return false;
     }
 
-    QString labsURL = m_providers[m_listingsProvider].webURL;
-    return Post(labsURL + lineup.set_action, list, "",
+    QString labsURL = m_providers[m_listingsProvider].m_webURL;
+    return Post(labsURL + lineup.m_set_action, list, "",
                 cookieFilename, "");
 }
 
@@ -1770,7 +1720,7 @@ QString DataDirectProcessor::GetRawUDLID(const QString &lineupid) const
     RawLineupMap::const_iterator it = m_rawLineups.find(lineupid);
     if (it == m_rawLineups.end())
         return QString();
-    return (*it).udl_id;
+    return (*it).m_udl_id;
 }
 
 QString DataDirectProcessor::GetRawZipCode(const QString &lineupid) const
@@ -1778,7 +1728,7 @@ QString DataDirectProcessor::GetRawZipCode(const QString &lineupid) const
     RawLineupMap::const_iterator it = m_rawLineups.find(lineupid);
     if (it == m_rawLineups.end())
         return QString();
-    return (*it).zipcode;
+    return (*it).m_zipcode;
 }
 
 RawLineup DataDirectProcessor::GetRawLineup(const QString &lineupid) const
@@ -1994,7 +1944,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
     QMap<QString,QString> settings;
 
     RawLineup &lineup = m_rawLineups[lineupid];
-    RawLineupChannels &ch = lineup.channels;
+    RawLineupChannels &ch = lineup.m_channels;
 
     while (!stream.atEnd())
     {
@@ -2004,10 +1954,10 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
         if (frm >= 0)
         {
             in_form = true;
-            lineup.set_action = get_setting(line.mid(frm + 5), "action");
+            lineup.m_set_action = get_setting(line.mid(frm + 5), "action");
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "set_action: " +
-                lineup.set_action);
+                lineup.sm_et_action);
 #endif
         }
 

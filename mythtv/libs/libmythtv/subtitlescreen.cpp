@@ -248,9 +248,9 @@ SubtitleFormat::GetFont(const QString &family,
 {
     int origPixelSize = pixelSize;
     float scale = zoom / 100.0;
-    if ((attr.pen_size & 0x3) == k708AttrSizeSmall)
+    if ((attr.m_pen_size & 0x3) == k708AttrSizeSmall)
         scale = scale * 32 / 42;
-    else if ((attr.pen_size & 0x3) == k708AttrSizeLarge)
+    else if ((attr.m_pen_size & 0x3) == k708AttrSizeLarge)
         scale = scale * 42 / 32;
 
     QString prefix = MakePrefix(family, attr);
@@ -267,11 +267,11 @@ SubtitleFormat::GetFont(const QString &family,
 
     result->GetFace()->setStretch(stretch);
     if (IsUnlocked(prefix, kSubAttrItalics))
-        result->GetFace()->setItalic(attr.italics);
+        result->GetFace()->setItalic(attr.m_italics);
     if (IsUnlocked(prefix, kSubAttrUnderline))
-        result->GetFace()->setUnderline(attr.underline);
+        result->GetFace()->setUnderline(attr.m_underline);
     if (IsUnlocked(prefix, kSubAttrBold))
-        result->GetFace()->setBold(attr.boldface);
+        result->GetFace()->setBold(attr.m_boldface);
     if (IsUnlocked(prefix, kSubAttrColor))
         result->SetColor(attr.GetFGColor());
 
@@ -288,12 +288,12 @@ SubtitleFormat::GetFont(const QString &family,
     {
         int off = lroundf(scale * pixelSize / 20);
         offset = QPoint(off, off);
-        if (attr.edge_type == k708AttrEdgeLeftDropShadow)
+        if (attr.m_edge_type == k708AttrEdgeLeftDropShadow)
         {
             shadow = true;
             offset.setX(-off);
         }
-        else if (attr.edge_type == k708AttrEdgeRightDropShadow)
+        else if (attr.m_edge_type == k708AttrEdgeRightDropShadow)
             shadow = true;
         else
             shadow = false;
@@ -316,9 +316,9 @@ SubtitleFormat::GetFont(const QString &family,
         alpha = attr.GetFGAlpha();
     if (IsUnlocked(prefix, kSubAttrOutlinesize))
     {
-        if (attr.edge_type == k708AttrEdgeUniform ||
-            attr.edge_type == k708AttrEdgeRaised  ||
-            attr.edge_type == k708AttrEdgeDepressed)
+        if (attr.m_edge_type == k708AttrEdgeUniform ||
+            attr.m_edge_type == k708AttrEdgeRaised  ||
+            attr.m_edge_type == k708AttrEdgeDepressed)
         {
             outline = true;
             off = lroundf(scale * pixelSize / 20);
@@ -357,7 +357,7 @@ QString SubtitleFormat::MakePrefix(const QString &family,
                                    const CC708CharacterAttribute &attr)
 {
     if (family == kSubFamily708)
-        return family + "_" + QString::number(attr.font_tag & 0x7);
+        return family + "_" + QString::number(attr.m_font_tag & 0x7);
     else
         return family;
 }
@@ -390,7 +390,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
             "TeX Gyre Chorus", // cursive
             "Droid Serif"      // small caps, QFont::SmallCaps will be applied
         };
-        font->GetFace()->setFamily(cc708Fonts[attr.font_tag & 0x7]);
+        font->GetFace()->setFamily(cc708Fonts[attr.m_font_tag & 0x7]);
     }
     else if (family == kSubFamilyText)
     {
@@ -494,7 +494,7 @@ void SubtitleFormat::Load(const QString &family,
     if (!testBG)
         testBG = negBG;
     if (family == kSubFamily708 &&
-        (attr.font_tag & 0x7) == k708AttrFontSmallCaps)
+        (attr.m_font_tag & 0x7) == k708AttrFontSmallCaps)
         resultFont->GetFace()->setCapitalization(QFont::SmallCaps);
     m_fontMap[prefix] = resultFont;
     m_shapeMap[prefix] = resultBG;
@@ -679,15 +679,15 @@ QString FormattedTextChunk::ToLogString(void) const
         .arg(m_format.GetBGAlpha());
     str += QString("edge=%1.%2 ")
         .arg(srtColorString(m_format.GetEdgeColor()))
-        .arg(m_format.edge_type);
+        .arg(m_format.m_edge_type);
     str += QString("off=%1 pensize=%2 ")
-        .arg(m_format.offset)
-        .arg(m_format.pen_size);
+        .arg(m_format.m_offset)
+        .arg(m_format.m_pen_size);
     str += QString("it=%1 ul=%2 bf=%3 ")
-        .arg(m_format.italics)
-        .arg(m_format.underline)
-        .arg(m_format.boldface);
-    str += QString("font=%1 ").arg(m_format.font_tag);
+        .arg(m_format.m_italics)
+        .arg(m_format.m_underline)
+        .arg(m_format.m_boldface);
+    str += QString("font=%1 ").arg(m_format.m_font_tag);
     str += QString(" text='%1'").arg(text);
     return str;
 }
@@ -946,14 +946,14 @@ QStringList FormattedTextSubtitle::ToSRT(void) const
         {
             const QString &text = (*chunk).text;
             const CC708CharacterAttribute &attr = (*chunk).m_format;
-            bool isBlank = !attr.underline && text.trimmed().isEmpty();
+            bool isBlank = !attr.m_underline && text.trimmed().isEmpty();
             if (!isBlank)
             {
-                if (attr.boldface)
+                if (attr.m_boldface)
                     line += "<b>";
-                if (attr.italics)
+                if (attr.m_italics)
                     line += "<i>";
-                if (attr.underline)
+                if (attr.m_underline)
                     line += "<u>";
                 if (attr.GetFGColor() != Qt::white)
                     line += QString("<font color=\"%1\">")
@@ -964,11 +964,11 @@ QStringList FormattedTextSubtitle::ToSRT(void) const
             {
                 if (attr.GetFGColor() != Qt::white)
                     line += QString("</font>");
-                if (attr.underline)
+                if (attr.m_underline)
                     line += "</u>";
-                if (attr.italics)
+                if (attr.m_italics)
                     line += "</i>";
-                if (attr.boldface)
+                if (attr.m_boldface)
                     line += "</b>";
             }
         }
@@ -1332,21 +1332,21 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     LOG(VB_VBI, LOG_DEBUG,LOC +
         QString("Display Win %1, Anchor_id %2, x_anch %3, y_anch %4, "
                 "relative %5")
-            .arg(m_num).arg(win.anchor_point).arg(win.anchor_horizontal)
-            .arg(win.anchor_vertical).arg(win.relative_pos));
+            .arg(m_num).arg(win.m_anchor_point).arg(win.m_anchor_horizontal)
+            .arg(win.m_anchor_vertical).arg(win.m_relative_pos));
     int pixelSize = m_safeArea.height() / 20;
     if (m_subScreen)
         m_subScreen->SetFontSize(pixelSize);
 
-    float xrange  = win.relative_pos ? 100.0f :
+    float xrange  = win.m_relative_pos ? 100.0f :
                     (aspect > 1.4f) ? 210.0f : 160.0f;
-    float yrange  = win.relative_pos ? 100.0f : 75.0f;
+    float yrange  = win.m_relative_pos ? 100.0f : 75.0f;
     float xmult   = (float)m_safeArea.width() / xrange;
     float ymult   = (float)m_safeArea.height() / yrange;
-    uint anchor_x = (uint)(xmult * (float)win.anchor_horizontal);
-    uint anchor_y = (uint)(ymult * (float)win.anchor_vertical);
-    m_xAnchorPoint = win.anchor_point % 3;
-    m_yAnchorPoint = win.anchor_point / 3;
+    uint anchor_x = (uint)(xmult * (float)win.m_anchor_horizontal);
+    uint anchor_y = (uint)(ymult * (float)win.m_anchor_vertical);
+    m_xAnchorPoint = win.m_anchor_point % 3;
+    m_yAnchorPoint = win.m_anchor_point / 3;
     m_xAnchor = anchor_x;
     m_yAnchor = anchor_y;
 
@@ -2262,14 +2262,14 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
     if (changed)
     {
         for (int i = 0; i < k708MaxWindows; i++)
-            cc708service->windows[i].SetChanged();
+            cc708service->m_windows[i].SetChanged();
     }
 
     uint64_t clearMask = 0;
     QList<FormattedTextSubtitle *> addList;
     for (int i = 0; i < k708MaxWindows; i++)
     {
-        CC708Window &win = cc708service->windows[i];
+        CC708Window &win = cc708service->m_windows[i];
         if (win.GetExists() && win.GetVisible() && !win.GetChanged())
             continue;
         if (!win.GetChanged())
@@ -2280,7 +2280,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         if (!win.GetExists() || !win.GetVisible())
             continue;
 
-        QMutexLocker locker(&win.lock);
+        QMutexLocker locker(&win.m_lock);
         vector<CC708String*> list = win.GetStrings();
         if (!list.empty())
         {

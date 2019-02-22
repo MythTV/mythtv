@@ -35,8 +35,7 @@ class Subscription
 };
 
 UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
-  : HttpServerExtension("UPnPSubscriptionManager", share_path),
-    m_subscriptionLock(QMutex::Recursive), m_callback(QString("NOTSET"))
+  : HttpServerExtension("UPnPSubscriptionManager", share_path)
 {
     m_nSupportedMethods = (uint)RequestTypeNotify; // Only NOTIFY supported
 

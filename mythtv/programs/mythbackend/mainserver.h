@@ -16,6 +16,7 @@ using namespace std;
 #include "playbacksock.h"
 #include "mthreadpool.h"
 #include "encoderlink.h"
+#include "exitcodes.h"
 #include "filetransfer.h"
 #include "scheduler.h"
 #include "livetvchain.h"
@@ -46,27 +47,26 @@ class DeleteStruct
         m_ms(ms), m_filename(filename), m_title(title), 
         m_chanid(chanid), m_recstartts(recstartts), 
         m_recendts(recendts), m_recordedid(recordedId),
-        m_forceMetadataDelete(forceMetadataDelete), m_fd(-1), m_size(0)
+        m_forceMetadataDelete(forceMetadataDelete)
     {
     }
 
     DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
-        m_ms(ms), m_filename(filename), m_chanid(0), m_recordedid(0),
-        m_forceMetadataDelete(false), m_fd(fd), m_size(size)
+        m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)
     {
     }
 
   protected:
-    MainServer *m_ms;
+    MainServer *m_ms                  {nullptr};
     QString     m_filename;
     QString     m_title;
-    uint        m_chanid;
+    uint        m_chanid              {0};
     QDateTime   m_recstartts;
     QDateTime   m_recendts;
-    uint        m_recordedid;
-    bool        m_forceMetadataDelete;
-    int         m_fd;
-    off_t       m_size;
+    uint        m_recordedid          {0};
+    bool        m_forceMetadataDelete {false};
+    int         m_fd                  {-1};
+    off_t       m_size                {0};
 };
 
 class DeleteThread : public QRunnable, public DeleteStruct
@@ -100,7 +100,7 @@ public:
     void run(void) override; // QRunnable
 
 private:
-    static QMutex m_renamelock;
+    static QMutex s_renamelock;
 
     MainServer   &m_ms;
     PlaybackSock &m_pbs;
@@ -305,38 +305,38 @@ class MainServer : public QObject, public MythSocketCBs
                                  int fd, const QString &filename,
                                  off_t fsize);
 
-    vector<LiveTVChain*> liveTVChains;
-    QMutex liveTVChainsLock;
+    vector<LiveTVChain*> m_liveTVChains;
+    QMutex               m_liveTVChainsLock;
 
-    QMap<int, EncoderLink *> *encoderList;
+    QMap<int, EncoderLink *> *m_encoderList  {nullptr};
 
-    MythServer *mythserver;
-    MetadataFactory *metadatafactory;
+    MythServer            *m_mythserver      {nullptr};
+    MetadataFactory       *m_metadatafactory {nullptr};
 
-    QReadWriteLock sockListLock;
-    vector<PlaybackSock *> playbackList;
-    vector<FileTransfer *> fileTransferList;
-    QSet<MythSocket*> controlSocketList;
-    vector<MythSocket*> decrRefSocketList;
+    QReadWriteLock         m_sockListLock;
+    vector<PlaybackSock *> m_playbackList;
+    vector<FileTransfer *> m_fileTransferList;
+    QSet<MythSocket*>      m_controlSocketList;
+    vector<MythSocket*>    m_decrRefSocketList;
 
-    QMutex masterFreeSpaceListLock;
-    FreeSpaceUpdater * volatile masterFreeSpaceListUpdater;
-    QWaitCondition masterFreeSpaceListWait;
-    QStringList masterFreeSpaceList;
+    QMutex                      m_masterFreeSpaceListLock;
+    FreeSpaceUpdater * volatile m_masterFreeSpaceListUpdater {nullptr};
+    QWaitCondition              m_masterFreeSpaceListWait;
+    QStringList                 m_masterFreeSpaceList;
 
-    QTimer *masterServerReconnect; // audited ref #5318
-    PlaybackSock *masterServer;
+    QTimer       *m_masterServerReconnect    {nullptr}; // audited ref #5318
+    PlaybackSock *m_masterServer             {nullptr};
 
-    bool ismaster;
+    bool m_ismaster;
 
-    QMutex deletelock;
-    MThreadPool threadPool;
+    QMutex m_deletelock;
+    MThreadPool m_threadPool;
 
-    bool masterBackendOverride;
+    bool m_masterBackendOverride             {false};
 
-    Scheduler *m_sched;
-    AutoExpire *m_expirer;
-    QMutex m_addChildInputLock;
+    Scheduler  *m_sched                      {nullptr};
+    AutoExpire *m_expirer                    {nullptr};
+    QMutex      m_addChildInputLock;
 
     struct DeferredDeleteStruct
     {
@@ -344,27 +344,27 @@ class MainServer : public QObject, public MythSocketCBs
         QDateTime ts;
     };
 
-    QMutex deferredDeleteLock;
-    QTimer *deferredDeleteTimer; // audited ref #5318
-    MythDeque<DeferredDeleteStruct> deferredDeleteList;
+    QMutex  m_deferredDeleteLock;
+    QTimer *m_deferredDeleteTimer            {nullptr}; // audited ref #5318
+    MythDeque<DeferredDeleteStruct> m_deferredDeleteList;
 
-    QTimer *autoexpireUpdateTimer; // audited ref #5318
-    static QMutex truncate_and_close_lock;
+    QTimer *m_autoexpireUpdateTimer          {nullptr}; // audited ref #5318
+    static QMutex s_truncate_and_close_lock;
 
-    QMap<QString, int> fsIDcache;
-    QMutex fsIDcacheLock;
-    QList<FileSystemInfo> fsInfosCache;
-    QMutex fsInfosCacheLock;
+    QMap<QString, int>    m_fsIDcache;
+    QMutex                m_fsIDcacheLock;
+    QList<FileSystemInfo> m_fsInfosCache;
+    QMutex                m_fsInfosCacheLock;
 
     QMutex                     m_downloadURLsLock;
     QMap<QString, QString>     m_downloadURLs;
 
-    int m_exitCode;
+    int m_exitCode                           {GENERIC_EXIT_OK};
 
     typedef QHash<QString,QString> RequestedBy;
     RequestedBy                m_previewRequestedBy;
 
-    bool m_stopped;
+    bool m_stopped                           {false};
 
     static const uint kMasterServerReconnectTimeout;
 };

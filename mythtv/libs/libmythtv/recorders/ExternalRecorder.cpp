@@ -32,16 +32,11 @@
             .arg(m_channel->GetInputID())    \
             .arg(m_channel->GetDescription())
 
-ExternalRecorder::ExternalRecorder(TVRec *rec, ExternalChannel *channel) :
-    DTVRecorder(rec), m_channel(channel), m_stream_handler(nullptr)
-{
-}
-
 void ExternalRecorder::StartNewFile(void)
 {
     // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+    HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+    HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
 }
 
 
@@ -49,45 +44,45 @@ void ExternalRecorder::run(void)
 {
     if (!Open())
     {
-        _error = "Failed to open device";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "Failed to open device";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         return;
     }
 
-    if (!_stream_data)
+    if (!m_stream_data)
     {
-        _error = "MPEGStreamData pointer has not been set";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "MPEGStreamData pointer has not been set";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         Close();
         return;
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     if (m_channel->HasGeneratedPAT())
     {
         const ProgramAssociationTable *pat = m_channel->GetGeneratedPAT();
         const ProgramMapTable         *pmt = m_channel->GetGeneratedPMT();
-        _stream_data->Reset(pat->ProgramNumber(0));
-        _stream_data->HandleTables(MPEG_PAT_PID, *pat);
-        _stream_data->HandleTables(pat->ProgramPID(0), *pmt);
+        m_stream_data->Reset(pat->ProgramNumber(0));
+        m_stream_data->HandleTables(MPEG_PAT_PID, *pat);
+        m_stream_data->HandleTables(pat->ProgramPID(0), *pmt);
         LOG(VB_GENERAL, LOG_INFO, LOC + "PMT set");
     }
 
     StartNewFile();
 
     m_h264_parser.Reset();
-    _wait_for_keyframe_option = true;
-    _seen_sps = false;
+    m_wait_for_keyframe_option = true;
+    m_seen_sps = false;
 
-    _stream_data->AddAVListener(this);
-    _stream_data->AddWritingListener(this);
-    m_stream_handler->AddListener(_stream_data, false, true);
+    m_stream_data->AddAVListener(this);
+    m_stream_data->AddWritingListener(this);
+    m_stream_handler->AddListener(m_stream_data, false, true);
 
     StartStreaming();
 
@@ -96,7 +91,7 @@ void ExternalRecorder::run(void)
         if (PauseAndWait())
             continue;
 
-        if (!_input_pmt)
+        if (!m_input_pmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");
@@ -106,24 +101,24 @@ void ExternalRecorder::run(void)
 
         if (!m_stream_handler->IsRunning())
         {
-            _error = "Stream handler died unexpectedly.";
-            LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+            m_error = "Stream handler died unexpectedly.";
+            LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         }
     }
 
     StopStreaming();
 
-    m_stream_handler->RemoveListener(_stream_data);
-    _stream_data->RemoveWritingListener(this);
-    _stream_data->RemoveAVListener(this);
+    m_stream_handler->RemoveListener(m_stream_data);
+    m_stream_data->RemoveWritingListener(this);
+    m_stream_data->RemoveAVListener(this);
 
     Close();
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 }
 
 bool ExternalRecorder::Open(void)
@@ -149,7 +144,7 @@ bool ExternalRecorder::Open(void)
         else
         {
             ExternalStreamHandler::Return(m_stream_handler,
-                                          (tvrec ? tvrec->GetInputId() : -1));
+                                          (m_tvrec ? m_tvrec->GetInputId() : -1));
 
             return false;
         }
@@ -168,15 +163,15 @@ void ExternalRecorder::Close(void)
 
     if (IsOpen())
         ExternalStreamHandler::Return(m_stream_handler,
-                                      (tvrec ? tvrec->GetInputId() : -1));
+                                      (m_tvrec ? m_tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 bool ExternalRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
@@ -184,11 +179,11 @@ bool ExternalRecorder::PauseAndWait(int timeout)
 
             StopStreaming();
 
-            paused = true;
-            pauseWait.wakeAll();
+            m_paused = true;
+            m_pauseWait.wakeAll();
 
-            if (tvrec)
-                tvrec->RecorderPaused();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
     }
     else if (IsPaused(true))
@@ -197,14 +192,14 @@ bool ExternalRecorder::PauseAndWait(int timeout)
 
         // The SignalMonitor will StartStreaming
 
-        if (_stream_data)
-            _stream_data->Reset(_stream_data->DesiredProgram());
+        if (m_stream_data)
+            m_stream_data->Reset(m_stream_data->DesiredProgram());
 
-        paused = false;
+        m_paused = false;
     }
 
     // Always wait a little bit, unless woken up
-    unpauseWait.wait(&pauseLock, timeout);
+    m_unpauseWait.wait(&m_pauseLock, timeout);
 
     return IsPaused(true);
 }

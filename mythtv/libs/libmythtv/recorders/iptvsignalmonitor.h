@@ -32,8 +32,8 @@ class IPTVSignalMonitor : public DTVSignalMonitor
     IPTVChannel *GetIPTVChannel(void);
 
   protected:
-    bool m_streamHandlerStarted;
-    bool m_locked;
+    bool m_streamHandlerStarted {false};
+    bool m_locked               {false};
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

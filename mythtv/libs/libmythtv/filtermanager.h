@@ -25,10 +25,10 @@ class FilterChain
 
     void ProcessFrame(VideoFrame *Frame, FrameScanType scan = kScan_Ignore);
 
-    void Append(VideoFilter *f) { filters.push_back(f); }
+    void Append(VideoFilter *f) { m_filters.push_back(f); }
 
   private:
-    vector<VideoFilter*> filters;
+    vector<VideoFilter*> m_filters;
 };
 
 class FilterManager
@@ -52,8 +52,8 @@ class FilterManager
   private:
     bool LoadFilterLib(const QString &path);
 
-    library_map_t dlhandles;
-    filter_map_t  filters;
+    library_map_t m_dlhandles;
+    filter_map_t  m_filters;
 };
 
 #endif // #ifndef FILTERMANAGER

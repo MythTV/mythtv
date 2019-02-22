@@ -6,6 +6,7 @@
 #include <QQueue>
 #include <QTime>
 #include <QPointer>
+#include <QCoreApplication>
 
 #include <cstdint>
 #include <cstdlib>
@@ -139,21 +140,21 @@ class LoggingItem: public QObject, public ReferenceCounter
     const char *rawMessage() const     { return m_message; };
 
   protected:
-    int                 m_pid;
-    qlonglong           m_tid;
-    qulonglong          m_threadId;
-    uint                m_usec;
-    int                 m_line;
-    LoggingType         m_type;
-    LogLevel_t          m_level;
-    int                 m_facility;
-    qlonglong           m_epoch;
-    char               *m_file;
-    char               *m_function;
-    char               *m_threadName;
-    char               *m_appName;
-    char               *m_table;
-    char               *m_logFile;
+    int                 m_pid        {-1};
+    qlonglong           m_tid        {-1};
+    qulonglong          m_threadId   {(qulonglong)-1};
+    uint                m_usec       {0};
+    int                 m_line       {0};
+    LoggingType         m_type       {kMessage};
+    LogLevel_t          m_level      {LOG_INFO};
+    int                 m_facility   {0};
+    qlonglong           m_epoch      {0};
+    char               *m_file       {nullptr};
+    char               *m_function   {nullptr};
+    char               *m_threadName {nullptr};
+    char               *m_appName    {nullptr};
+    char               *m_table      {nullptr};
+    char               *m_logFile    {nullptr};
     char                m_message[LOGLINE_MAX+1];
 
   private:
@@ -181,21 +182,24 @@ class LoggerThread : public QObject, public MThread
     void handleItem(LoggingItem *item);
     void fillItem(LoggingItem *item);
   private:
-    QWaitCondition *m_waitNotEmpty; ///< Condition variable for waiting
+    QWaitCondition *m_waitNotEmpty {nullptr};
+                                    ///< Condition variable for waiting
                                     ///  for the queue to not be empty
                                     ///  Protected by logQueueMutex
-    QWaitCondition *m_waitEmpty;    ///< Condition variable for waiting
+    QWaitCondition *m_waitEmpty    {nullptr};
+                                    ///< Condition variable for waiting
                                     ///  for the queue to be empty
                                     ///  Protected by logQueueMutex
-    bool m_aborted;                 ///< Flag to abort the thread.
+    bool    m_aborted {false};      ///< Flag to abort the thread.
                                     ///  Protected by logQueueMutex
-    QString m_filename; ///< Filename of debug logfile
-    bool m_progress;    ///< show only LOG_ERR and more important (console only)
-    int  m_quiet;       ///< silence the console (console only)
-    QString m_appname;      ///< Cached application name
-    QString m_tablename;    ///< Cached table name for db logging
-    int m_facility;         ///< Cached syslog facility (or -1 to disable)
-    pid_t m_pid;            ///< Cached pid value
+    QString m_filename;    ///< Filename of debug logfile
+    bool    m_progress;    ///< show only LOG_ERR and more important (console only)
+    int     m_quiet;       ///< silence the console (console only)
+    QString m_appname {QCoreApplication::applicationName()};
+                           ///< Cached application name
+    QString m_tablename;   ///< Cached table name for db logging
+    int     m_facility;    ///< Cached syslog facility (or -1 to disable)
+    pid_t   m_pid;         ///< Cached pid value
 
   protected:
     bool logConsole(LoggingItem *item);

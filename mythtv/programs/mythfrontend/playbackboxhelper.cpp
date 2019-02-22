@@ -326,9 +326,7 @@ void PBHEventHandler::UpdateFreeSpaceEvent(void)
 
 PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
     MThread("PlaybackBoxHelper"),
-    m_listener(listener), m_eventHandler(new PBHEventHandler(*this)),
-    // Free Space Tracking Variables
-    m_freeSpaceTotalMB(0ULL), m_freeSpaceUsedMB(0ULL)
+    m_listener(listener), m_eventHandler(new PBHEventHandler(*this))
 {
     start();
     m_eventHandler->moveToThread(qthread());

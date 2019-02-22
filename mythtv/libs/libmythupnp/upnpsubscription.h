@@ -30,8 +30,8 @@ class UPNP_PUBLIC UPNPSubscription : public HttpServerExtension, public MythObse
                                      QString &uuidout);
   private:
     QHash<QString, Subscription*> m_subscriptions;
-    QMutex  m_subscriptionLock;
-    QString m_callback;
+    QMutex  m_subscriptionLock {QMutex::Recursive};
+    QString m_callback         {"NOTSET"};
 };
 
 #endif // UPNPSUBSCRIPTION_H

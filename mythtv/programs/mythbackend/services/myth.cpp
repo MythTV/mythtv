@@ -604,12 +604,12 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
     for (it = frontends.begin(); it != frontends.end(); ++it)
     {
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
-        pFrontend->setName((*it)->name);
-        pFrontend->setIP((*it)->ip.toString());
+        pFrontend->setName((*it)->m_name);
+        pFrontend->setIP((*it)->m_ip.toString());
         int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
-                                                        (*it)->name, 6547);
+                                                        (*it)->m_name, 6547);
         pFrontend->setPort(port);
-        pFrontend->setOnLine((*it)->connectionCount > 0);
+        pFrontend->setOnLine((*it)->m_connectionCount > 0);
     }
 
     return pList;

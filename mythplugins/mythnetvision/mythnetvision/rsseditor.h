@@ -27,8 +27,17 @@ class RSSEditPopup : public MythScreenType
     Q_OBJECT
 
   public:
+    /** \brief Creates a new RSS Edit Popup
+     *  \param url The web page for which an entry is being created.
+     *  \param edit If true, then editing an existing entry instead of
+     *              creating a new entry.
+     *  \param parent Pointer to the screen stack
+     *  \param name The name of the window
+     */
     RSSEditPopup(const QString &url, bool edit, MythScreenStack *parent,
-                 const QString &name = "RSSEditPopup");
+                 const QString &name = "RSSEditPopup")
+        : MythScreenType(parent, name),
+          m_urlText(url), m_editing(edit) {}
    ~RSSEditPopup();
 
     bool Create(void) override; // MythScreenType
@@ -38,24 +47,24 @@ class RSSEditPopup : public MythScreenType
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
                      const QUrl& oldRedirectUrl) const;
 
-    RSSSite                *m_site;
+    RSSSite                *m_site         {nullptr};
     QString                 m_urlText;
     bool                    m_editing;
 
-    MythUIImage            *m_thumbImage;
-    MythUIButton           *m_thumbButton;
-    MythUITextEdit         *m_urlEdit;
-    MythUITextEdit         *m_titleEdit;
-    MythUITextEdit         *m_descEdit;
-    MythUITextEdit         *m_authorEdit;
+    MythUIImage            *m_thumbImage   {nullptr};
+    MythUIButton           *m_thumbButton  {nullptr};
+    MythUITextEdit         *m_urlEdit      {nullptr};
+    MythUITextEdit         *m_titleEdit    {nullptr};
+    MythUITextEdit         *m_descEdit     {nullptr};
+    MythUITextEdit         *m_authorEdit   {nullptr};
 
-    MythUIButton           *m_okButton;
-    MythUIButton           *m_cancelButton;
+    MythUIButton           *m_okButton     {nullptr};
+    MythUIButton           *m_cancelButton {nullptr};
 
-    MythUICheckBox         *m_download;
+    MythUICheckBox         *m_download     {nullptr};
 
-    QNetworkAccessManager  *m_manager;
-    QNetworkReply          *m_reply;
+    QNetworkAccessManager  *m_manager      {nullptr};
+    QNetworkReply          *m_reply        {nullptr};
 
   signals:
     void Saving(void);
@@ -76,7 +85,8 @@ class RSSEditor : public MythScreenType
     Q_OBJECT
 
   public:
-    RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor");
+    RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor")
+        : MythScreenType(parent, name) {}
    ~RSSEditor();
 
     bool Create(void) override; // MythScreenType
@@ -84,20 +94,20 @@ class RSSEditor : public MythScreenType
 
   private:
     void fillRSSButtonList();
-    mutable QMutex  m_lock;
-    bool m_changed;
+    mutable QMutex    m_lock    {QMutex::Recursive};
+    bool              m_changed {false};
 
-    RSSSite::rssList m_siteList;
-    MythUIButtonList *m_sites;
-    MythUIButton     *m_new;
-    MythUIButton     *m_delete;
-    MythUIButton     *m_edit;
+    RSSSite::rssList  m_siteList;
+    MythUIButtonList *m_sites   {nullptr};
+    MythUIButton     *m_new     {nullptr};
+    MythUIButton     *m_delete  {nullptr};
+    MythUIButton     *m_edit    {nullptr};
 
-    MythUIImage      *m_image;
-    MythUIText       *m_title;
-    MythUIText       *m_url;
-    MythUIText       *m_desc;
-    MythUIText       *m_author;
+    MythUIImage      *m_image   {nullptr};
+    MythUIText       *m_title   {nullptr};
+    MythUIText       *m_url     {nullptr};
+    MythUIText       *m_desc    {nullptr};
+    MythUIText       *m_author  {nullptr};
 
   signals:
     void ItemsChanged(void);

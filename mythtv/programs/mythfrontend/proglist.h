@@ -94,7 +94,7 @@ class ProgLister : public ScheduleCommon
 
   private:
     ProgListType      m_type;
-    uint              m_recid;
+    uint              m_recid           {0};
     QString           m_title;
     QString           m_extraArg;
     QDateTime         m_startTime;
@@ -102,10 +102,10 @@ class ProgLister : public ScheduleCommon
     QDateTime         m_selectedTime;
     QString           m_channelOrdering;
 
-    RecSearchType     m_searchType;
+    RecSearchType     m_searchType      {kNoSearch};
 
     QString           m_view;
-    int               m_curView;
+    int               m_curView         {-1};
     QStringList       m_viewList;
     QStringList       m_viewTextList;
 
@@ -117,18 +117,18 @@ class ProgLister : public ScheduleCommon
     QStringList       m_genreList;
     QStringList       m_stationList;
 
-    bool              m_allowEvents;
-    bool              m_titleSort;
-    bool              m_reverseSort;
-    bool              m_useGenres;
+    bool              m_allowEvents     {true};
+    bool              m_titleSort       {false};
+    bool              m_reverseSort     {false};
+    bool              m_useGenres       {false};
 
-    MythUIText       *m_schedText;
-    MythUIText       *m_curviewText;
-    MythUIText       *m_positionText;
-    MythUIButtonList *m_progList;
-    MythUIText       *m_messageText;
+    MythUIText       *m_schedText       {nullptr};
+    MythUIText       *m_curviewText     {nullptr};
+    MythUIText       *m_positionText    {nullptr};
+    MythUIButtonList *m_progList        {nullptr};
+    MythUIText       *m_messageText     {nullptr};
 
-    bool              m_allowViewDialog;
+    bool              m_allowViewDialog {true};
 };
 
 #endif

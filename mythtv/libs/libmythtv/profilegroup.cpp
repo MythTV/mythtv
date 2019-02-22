@@ -24,7 +24,7 @@ QString ProfileGroupStorage::GetSetClause(MSqlBindings &bindings) const
             GetColumnName() + " = " + colTag);
 
     bindings.insert(idTag, m_parent.getProfileNum());
-    bindings.insert(colTag, user->GetDBValue());
+    bindings.insert(colTag, m_user->GetDBValue());
 
     return query;
 }

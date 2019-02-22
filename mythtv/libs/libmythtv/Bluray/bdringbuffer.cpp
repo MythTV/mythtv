@@ -151,7 +151,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 BDInfo::BDInfo(const QString &filename)
     : m_isValid(true)
 {
-    BLURAY* bdnav = nullptr;
+    BLURAY* m_bdnav = nullptr;
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Trying %1").arg(filename));
     QString name = filename;
@@ -198,16 +198,16 @@ BDInfo::BDInfo(const QString &filename)
 
         if (imgHandle >= 0)
         {
-            bdnav = bd_init();
+            m_bdnav = bd_init();
 
-            if (bdnav)
-                bd_open_stream(bdnav, &imgHandle, _img_read);
+            if (m_bdnav)
+                bd_open_stream(m_bdnav, &imgHandle, _img_read);
         }
     }
     else
-        bdnav = bd_open(name.toLocal8Bit().data(), keyfilepath);
+        m_bdnav = bd_open(name.toLocal8Bit().data(), keyfilepath);
 
-    if (!bdnav)
+    if (!m_bdnav)
     {
         m_lastError = tr("Could not open Blu-ray device: %1").arg(name);
         LOG(VB_GENERAL, LOG_ERR, QString("BDInfo: ") + m_lastError);
@@ -215,8 +215,8 @@ BDInfo::BDInfo(const QString &filename)
     }
     else
     {
-        GetNameAndSerialNum(bdnav, m_name, m_serialnumber, name, QString("BDInfo: "));
-        bd_close(bdnav);
+        GetNameAndSerialNum(m_bdnav, m_name, m_serialnumber, name, QString("BDInfo: "));
+        bd_close(m_bdnav);
     }
 
     if (imgHandle >= 0)
@@ -301,15 +301,7 @@ bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_BD),
-    bdnav(nullptr), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
-    m_topMenuSupported(false), m_firstPlaySupported(false),
-    m_numTitles(0), m_currentTitleInfo(nullptr), m_imgHandle(-1),
-    m_titleChanged(false), m_playerWait(false),
-    m_ignorePlayerWait(true),
-    m_overlayPlanes(2, nullptr),
-    m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
-    m_processState(PROCESS_NORMAL),
-    m_infoLock(QMutex::Recursive), m_mainThread(nullptr)
+    m_overlayPlanes(2, nullptr)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
@@ -325,7 +317,7 @@ BDRingBuffer::~BDRingBuffer()
 
 void BDRingBuffer::close(void)
 {
-    if (bdnav)
+    if (m_bdnav)
     {
         m_infoLock.lock();
         QHash<uint32_t, BLURAY_TITLE_INFO*>::iterator it;
@@ -339,8 +331,8 @@ void BDRingBuffer::close(void)
         m_cachedPlaylistInfo.clear();
         m_infoLock.unlock();
 
-        bd_close(bdnav);
-        bdnav = nullptr;
+        bd_close(m_bdnav);
+        m_bdnav = nullptr;
     }
 
     if (m_imgHandle > 0)
@@ -385,7 +377,7 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
     else
     {
         SeekInternal(new_pos);
-        m_currentTime = bd_tell_time(bdnav);
+        m_currentTime = bd_tell_time(m_bdnav);
         ret = new_pos;
     }
 
@@ -419,8 +411,8 @@ uint64_t BDRingBuffer::SeekInternal(uint64_t pos)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Seeking to %1.").arg(pos));
     m_processState = PROCESS_NORMAL;
-    if (bdnav)
-        return bd_seek_time(bdnav, pos);
+    if (m_bdnav)
+        return bd_seek_time(m_bdnav, pos);
     return 0;
 }
 
@@ -575,7 +567,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     QMutexLocker locker(&m_infoLock);
     rwlock.lockForWrite();
 
-    if (bdnav)
+    if (m_bdnav)
         close();
 
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
@@ -594,16 +586,16 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
         if (m_imgHandle >= 0)
         {
-            bdnav = bd_init();
+            m_bdnav = bd_init();
 
-            if (bdnav)
-                bd_open_stream(bdnav, &m_imgHandle, _img_read);
+            if (m_bdnav)
+                bd_open_stream(m_bdnav, &m_imgHandle, _img_read);
         }
     }
     else
-        bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);
+        m_bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);
 
-    if (!bdnav)
+    if (!m_bdnav)
     {
         lastError = tr("Could not open Blu-ray device: %1").arg(filename);
         rwlock.unlock();
@@ -611,7 +603,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
         return false;
     }
 
-    const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
+    const meta_dl *metaDiscLibrary = bd_get_meta(m_bdnav);
 
     if (metaDiscLibrary)
     {
@@ -625,18 +617,18 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
                     .arg(metaDiscLibrary->di_num_sets));
     }
 
-    BDInfo::GetNameAndSerialNum(bdnav, m_name, m_serialNumber, safefilename, LOC);
+    BDInfo::GetNameAndSerialNum(m_bdnav, m_name, m_serialNumber, safefilename, LOC);
 
     // Check disc to see encryption status, menu and navigation types.
     m_topMenuSupported   = false;
     m_firstPlaySupported = false;
-    const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(bdnav);
+    const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(m_bdnav);
     if (!discinfo || (discinfo->aacs_detected && !discinfo->aacs_handled) ||
         (discinfo->bdplus_detected && !discinfo->bdplus_handled))
     {
         // couldn't decrypt bluray
-        bd_close(bdnav);
-        bdnav = nullptr;
+        bd_close(m_bdnav);
+        m_bdnav = nullptr;
         lastError = tr("Could not open Blu-ray device %1, failed to decrypt")
                     .arg(filename);
         rwlock.unlock();
@@ -649,7 +641,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     // parental controls, menu language, etc.  They are not yet used.
 
     // Set parental level "age" to 99 for now.  TODO: Add support for FE level
-    bd_set_player_setting(bdnav, BLURAY_PLAYER_SETTING_PARENTAL, 99);
+    bd_set_player_setting(m_bdnav, BLURAY_PLAYER_SETTING_PARENTAL, 99);
 
     // Set preferred language to FE guide language
     const char *langpref = gCoreContext->GetSetting(
@@ -657,22 +649,22 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     QString QScountry  = gCoreContext->GetLocale()->GetCountryCode().toLower();
     const char *country = QScountry.toLatin1().data();
     bd_set_player_setting_str(
-        bdnav, BLURAY_PLAYER_SETTING_AUDIO_LANG, langpref);
+        m_bdnav, BLURAY_PLAYER_SETTING_AUDIO_LANG, langpref);
 
     // Set preferred presentation graphics language to the FE guide language
-    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_PG_LANG, langpref);
+    bd_set_player_setting_str(m_bdnav, BLURAY_PLAYER_SETTING_PG_LANG, langpref);
 
     // Set preferred menu language to the FE guide language
-    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_MENU_LANG, langpref);
+    bd_set_player_setting_str(m_bdnav, BLURAY_PLAYER_SETTING_MENU_LANG, langpref);
 
     // Set player country code via MythLocale. (not a region setting)
     bd_set_player_setting_str(
-        bdnav, BLURAY_PLAYER_SETTING_COUNTRY_CODE, country);
+        m_bdnav, BLURAY_PLAYER_SETTING_COUNTRY_CODE, country);
 
     int regioncode = 0;
     regioncode = gCoreContext->GetNumSetting("BlurayRegionCode");
     if (regioncode > 0)
-        bd_set_player_setting(bdnav, BLURAY_PLAYER_SETTING_REGION_CODE,
+        bd_set_player_setting(m_bdnav, BLURAY_PLAYER_SETTING_REGION_CODE,
                               regioncode);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 as keyfile...")
@@ -680,14 +672,14 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     // Return an index of relevant titles (excludes dupe clips + titles)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Retrieving title list (please wait).");
-    m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT, 30);
+    m_numTitles = bd_get_titles(m_bdnav, TITLES_RELEVANT, 30);
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Found %1 titles.").arg(m_numTitles));
     if (!m_numTitles)
     {
         // no title, no point trying any longer
-        bd_close(bdnav);
-        bdnav = nullptr;
+        bd_close(m_bdnav);
+        m_bdnav = nullptr;
         lastError = tr("Unable to find any Blu-ray compatible titles");
         rwlock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
@@ -758,14 +750,14 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
-    if (m_tryHDMVNavigation && m_firstPlaySupported && bd_play(bdnav))
+    if (m_tryHDMVNavigation && m_firstPlaySupported && bd_play(m_bdnav))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Using HDMV navigation mode.");
         m_isHDMVNavigation = true;
 
         // Register the Menu Overlay Callback
-        bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
-        bd_register_argb_overlay_proc(bdnav, this, HandleARGBOverlayCallback, nullptr);
+        bd_register_overlay_proc(m_bdnav, this, HandleOverlayCallback);
+        bd_register_argb_overlay_proc(m_bdnav, this, HandleARGBOverlayCallback, nullptr);
     }
     else
     {
@@ -792,8 +784,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
         if (!found)
         {
             // no title, no point trying any longer
-            bd_close(bdnav);
-            bdnav = nullptr;
+            bd_close(m_bdnav);
+            m_bdnav = nullptr;
             lastError = tr("Unable to find any usable Blu-ray titles");
             rwlock.unlock();
             mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
@@ -818,8 +810,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
 long long BDRingBuffer::GetReadPosition(void) const
 {
-    if (bdnav)
-        return bd_tell(bdnav);
+    if (m_bdnav)
+        return bd_tell(m_bdnav);
     return 0;
 }
 
@@ -833,8 +825,8 @@ uint32_t BDRingBuffer::GetNumChapters(void)
 
 uint32_t BDRingBuffer::GetCurrentChapter(void)
 {
-    if (bdnav)
-        return bd_get_current_chapter(bdnav);
+    if (m_bdnav)
+        return bd_get_current_chapter(m_bdnav);
     return 0;
 }
 
@@ -880,27 +872,27 @@ int BDRingBuffer::GetTitleDuration(int title)
 
 bool BDRingBuffer::SwitchTitle(uint32_t index)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return false;
 
     m_infoLock.lock();
     m_currentTitleInfo = GetTitleInfo(index);
     m_infoLock.unlock();
-    bd_select_title(bdnav, index);
+    bd_select_title(m_bdnav, index);
 
     return UpdateTitleInfo();
 }
 
 bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return false;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchPlaylist - start");
 
     m_infoLock.lock();
     m_currentTitleInfo = GetPlaylistInfo(index);
-    m_currentTitle = bd_get_current_title(bdnav);
+    m_currentTitle = bd_get_current_title(m_bdnav);
     m_infoLock.unlock();
     bool result = UpdateTitleInfo();
 
@@ -910,7 +902,7 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 
 BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return nullptr;
 
     QMutexLocker locker(&m_infoLock);
@@ -920,7 +912,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
     if (index > m_numTitles)
         return nullptr;
 
-    BLURAY_TITLE_INFO* result = bd_get_title_info(bdnav, index, 0);
+    BLURAY_TITLE_INFO* result = bd_get_title_info(m_bdnav, index, 0);
     if (result)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -933,14 +925,14 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
 
 BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t index)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return nullptr;
 
     QMutexLocker locker(&m_infoLock);
     if (m_cachedPlaylistInfo.contains(index))
         return m_cachedPlaylistInfo.value(index);
 
-    BLURAY_TITLE_INFO* result = bd_get_playlist_info(bdnav, index, 0);
+    BLURAY_TITLE_INFO* result = bd_get_playlist_info(m_bdnav, index, 0);
     if (result)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -963,7 +955,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     m_currentAngle = 0;
     m_currentPlayitem = 0;
     m_timeDiff = 0;
-    m_titlesize = bd_get_title_size(bdnav);
+    m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
     uint64_t total_secs = m_currentTitleLength / 90000;
     int hours = (int)total_secs / 60 / 60;
@@ -1033,7 +1025,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Entering still frame (%1 seconds) UNSUPPORTED").arg(time));
-        bd_read_skip_still(bdnav);
+        bd_read_skip_still(m_bdnav);
     }
     else if (still == BLURAY_STILL_INFINITE)
     {
@@ -1055,20 +1047,20 @@ bool BDRingBuffer::TitleChanged(void)
 
 bool BDRingBuffer::SwitchAngle(uint angle)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Switching to Angle %1...").arg(angle));
-    bd_seamless_angle_change(bdnav, angle);
+    bd_seamless_angle_change(m_bdnav, angle);
     m_currentAngle = angle;
     return true;
 }
 
 uint64_t BDRingBuffer::GetTotalReadPosition(void)
 {
-    if (bdnav)
-        return bd_get_title_size(bdnav);
+    if (m_bdnav)
+        return bd_get_title_size(m_bdnav);
     return 0;
 }
 
@@ -1093,7 +1085,7 @@ int BDRingBuffer::safe_read(void *data, uint sz)
         while (result == 0)
         {
             BD_EVENT event;
-            result = bd_read_ext(bdnav,
+            result = bd_read_ext(m_bdnav,
                                  (unsigned char *)data,
                                   sz, &event);
             if (result == 0)
@@ -1110,7 +1102,7 @@ int BDRingBuffer::safe_read(void *data, uint sz)
             processState_t lastState = m_processState;
 
             if (m_processState == PROCESS_NORMAL)
-                result = bd_read(bdnav, (unsigned char *)data, sz);
+                result = bd_read(m_bdnav, (unsigned char *)data, sz);
 
             HandleBDEvents();
 
@@ -1136,14 +1128,14 @@ int BDRingBuffer::safe_read(void *data, uint sz)
     if (result < 0)
         StopReads();
 
-    m_currentTime = bd_tell_time(bdnav);
+    m_currentTime = bd_tell_time(m_bdnav);
     return result;
 }
 
 double BDRingBuffer::GetFrameRate(void)
 {
     QMutexLocker locker(&m_infoLock);
-    if (bdnav && m_currentTitleInfo)
+    if (m_bdnav && m_currentTitleInfo)
     {
         uint8_t rate = m_currentTitleInfo->clips->video_streams->rate;
         switch (rate)
@@ -1231,21 +1223,21 @@ void BDRingBuffer::PressButton(int32_t key, int64_t pts)
     // HACK for still frame menu navigation
     pts = 1;
 
-    if (!bdnav || pts <= 0 || key < 0)
+    if (!m_bdnav || pts <= 0 || key < 0)
         return;
 
-    bd_user_input(bdnav, pts, key);
+    bd_user_input(m_bdnav, pts, key);
 }
 
 void BDRingBuffer::ClickButton(int64_t pts, uint16_t x, uint16_t y)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return;
 
     if (pts <= 0 || x == 0 || y == 0)
         return;
 
-    bd_mouse_select(bdnav, pts, x, y);
+    bd_mouse_select(m_bdnav, pts, x, y);
 }
 
 /** \brief jump to a Blu-ray root or popup menu
@@ -1265,7 +1257,7 @@ bool BDRingBuffer::GoToMenu(const QString &str, int64_t pts)
 
     if (str.compare("root") == 0)
     {
-        if (bd_menu_call(bdnav, pts))
+        if (bd_menu_call(m_bdnav, pts))
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Invoked Top Menu (pts %1)").arg(pts));
@@ -1294,7 +1286,7 @@ bool BDRingBuffer::HandleBDEvents(void)
             // if it needs to so don't do it here.
         }
 
-        while (m_processState == PROCESS_NORMAL && bd_get_event(bdnav, &m_lastEvent))
+        while (m_processState == PROCESS_NORMAL && bd_get_event(m_bdnav, &m_lastEvent))
         {
             HandleBDEvent(m_lastEvent);
             if (m_lastEvent.event == BD_EVENT_NONE ||
@@ -1559,17 +1551,17 @@ void BDRingBuffer::WaitForPlayer(void)
 
 bool BDRingBuffer::StartFromBeginning(void)
 {
-    if (bdnav && m_isHDMVNavigation)
+    if (m_bdnav && m_isHDMVNavigation)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Starting from beginning...");
-        return true; //bd_play(bdnav);
+        return true; //bd_play(m_bdnav);
     }
     return true;
 }
 
 bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    if (!bdnav)
+    if (!m_bdnav)
         return false;
 
     name   = m_name;

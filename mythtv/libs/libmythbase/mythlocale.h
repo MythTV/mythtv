@@ -40,7 +40,7 @@ class MBASE_PUBLIC MythLocale
     void Init(const QString &localeName = QString());
 
     QString m_localeCode;
-    bool m_defaultsLoaded;
+    bool    m_defaultsLoaded {false};
     QLocale m_qtLocale;
 
     typedef QMap<QString, QString> SettingsMap;

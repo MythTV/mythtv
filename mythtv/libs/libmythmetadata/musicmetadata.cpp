@@ -62,39 +62,10 @@ bool operator!=(MusicMetadata& a, MusicMetadata& b)
 MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription,
                              UrlList lurls, QString llogourl, QString lgenre, QString lmetaformat,
                              QString lcountry, QString llanguage, QString lformat)
-         :  m_artist(""),
-            m_compilation_artist(""),
-            m_album(""),
-            m_title(""),
-            m_formattedartist(""),
-            m_formattedtitle(""),
-            m_genre(lgenre),
+         :  m_genre(lgenre),
             m_format(lformat),
-            m_year(0),
-            m_tracknum(0),
-            m_trackCount(0),
-            m_discnum(0),
-            m_disccount(0),
-            m_length(0),
-            m_rating(0),
-            m_directoryid(-1),
-            m_artistid(-1),
-            m_compartistid(-1),
-            m_albumid(-1),
-            m_genreid(-1),
-            m_lastplay(QDateTime()),
-            m_templastplay(QDateTime()),
-            m_dateadded(QDateTime()),
-            m_playcount(0),
-            m_tempplaycount(0),
-            m_compilation(false),
-            m_albumArt(nullptr),
-            m_lyricsData(nullptr),
             m_id(lid),
             m_filename(lurls[0]),
-            m_hostname(""),
-            m_fileSize(0),
-            m_changed(false),
             m_broadcaster(lbroadcaster),
             m_channel(lchannel),
             m_description(ldescription),
@@ -1217,7 +1188,7 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
     for (int x = 0; x < albumart.size(); x++)
     {
         AlbumArtImage *image = albumart.at(x);
-        image->filename = QString("%1-%2").arg(m_id).arg(image->filename);
+        image->m_filename = QString("%1-%2").arg(m_id).arg(image->m_filename);
         m_albumArt->addImage(albumart.at(x));
     }
 
@@ -1275,15 +1246,15 @@ QString MusicMetadata::getAlbumArtFile(void)
     QString res;
 
     if ((albumart_image = m_albumArt->getImage(IT_FRONTCOVER)))
-        res = albumart_image->filename;
+        res = albumart_image->m_filename;
     else if ((albumart_image = m_albumArt->getImage(IT_UNKNOWN)))
-        res = albumart_image->filename;
+        res = albumart_image->m_filename;
     else if ((albumart_image = m_albumArt->getImage(IT_BACKCOVER)))
-        res = albumart_image->filename;
+        res = albumart_image->m_filename;
     else if ((albumart_image = m_albumArt->getImage(IT_INLAY)))
-        res = albumart_image->filename;
+        res = albumart_image->m_filename;
     else if ((albumart_image = m_albumArt->getImage(IT_CD)))
-        res = albumart_image->filename;
+        res = albumart_image->m_filename;
 
     // check file exists
     if (!res.isEmpty() && albumart_image)
@@ -1296,19 +1267,19 @@ QString MusicMetadata::getAlbumArtFile(void)
             QFileInfo fi(res);
             QString filename = QString("%1-%2.%3").arg(m_id).arg("front").arg(fi.suffix());
 
-            albumart_image->filename = path + filename;
+            albumart_image->m_filename = path + filename;
 
-            if (!QFile::exists(albumart_image->filename))
+            if (!QFile::exists(albumart_image->m_filename))
             {
                 // file does not exist so try to download and cache it
-                if (!GetMythDownloadManager()->download(res, albumart_image->filename))
+                if (!GetMythDownloadManager()->download(res, albumart_image->m_filename))
                 {
                     m_albumArt->getImageList()->removeAll(albumart_image);
                     return QString("");
                 }
             }
 
-            res = albumart_image->filename;
+            res = albumart_image->m_filename;
         }
         else
         {
@@ -1322,14 +1293,14 @@ QString MusicMetadata::getAlbumArtFile(void)
 
             if (!RemoteFile::Exists(res))
             {
-                if (albumart_image->embedded)
+                if (albumart_image->m_embedded)
                 {
                     if (gCoreContext->IsMasterBackend() &&
                         url.host() == gCoreContext->GetMasterHostName())
                     {
                         QStringList paramList;
                         paramList.append(QString("--songid='%1'").arg(ID()));
-                        paramList.append(QString("--imagetype='%1'").arg(albumart_image->imageType));
+                        paramList.append(QString("--imagetype='%1'").arg(albumart_image->m_imageType));
 
                         QString command = "mythutil --extractimage " + paramList.join(" ");
 
@@ -1344,7 +1315,7 @@ QString MusicMetadata::getAlbumArtFile(void)
                         slist << "MUSIC_TAG_GETIMAGE"
                             << Hostname()
                             << QString::number(ID())
-                            << QString::number(albumart_image->imageType);
+                            << QString::number(albumart_image->m_imageType);
                         gCoreContext->SendReceiveStringList(slist);
                     }
                 }
@@ -1364,7 +1335,7 @@ QString MusicMetadata::getAlbumArtFile(ImageType type)
 
     AlbumArtImage *albumart_image = m_albumArt->getImage(type);
     if (albumart_image)
-        return albumart_image->filename;
+        return albumart_image->m_filename;
 
     return QString("");
 }
@@ -1412,11 +1383,6 @@ MetaIO* MusicMetadata::getTagger(void)
 
 //--------------------------------------------------------------------------
 
-MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr) :
-    MThread("MetadataLoading"), parent(parent_ptr)
-{
-}
-
 void MetadataLoadingThread::run()
 {
     RunProlog();
@@ -1426,21 +1392,7 @@ void MetadataLoadingThread::run()
     RunEpilog();
 }
 
-AllMusic::AllMusic(void) :
-    m_numPcs(0),
-    m_numLoaded(0),
-    m_metadata_loader(nullptr),
-    m_done_loading(false),
-
-    m_playcountMin(0),
-    m_playcountMax(0),
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    m_lastplayMin(0.0),
-    m_lastplayMax(0.0)
-#else
-    m_lastplayMin(0),
-    m_lastplayMax(0)
-#endif
+AllMusic::AllMusic(void)
 {
     //  Start a thread to do data loading and sorting
     startLoading();
@@ -1576,21 +1528,21 @@ void AllMusic::resync()
             dbMeta->setDiscNumber(query.value(22).toInt());
             dbMeta->setDiscCount(query.value(23).toInt());
 
-            if (!music_map.contains(id))
+            if (!m_music_map.contains(id))
             {
                 // new track
 
                 //  Don't delete dbMeta, as the MetadataPtrList now owns it
                 m_all_music.append(dbMeta);
 
-                music_map[id] = dbMeta;
+                m_music_map[id] = dbMeta;
 
                 added++;
             }
             else
             {
                 // existing track, check for any changes
-                MusicMetadata *cacheMeta = music_map[id];
+                MusicMetadata *cacheMeta = m_music_map[id];
 
                 if (cacheMeta && !cacheMeta->compare(dbMeta))
                 {
@@ -1649,9 +1601,9 @@ void AllMusic::resync()
     for (int x = 0; x < deleteList.size(); x++)
     {
         MusicMetadata::IdType id = deleteList.at(x);
-        MusicMetadata *mdata = music_map[id];
+        MusicMetadata *mdata = m_music_map[id];
         m_all_music.removeAll(mdata);
-        music_map.remove(id);
+        m_music_map.remove(id);
         removed++;
         delete mdata;
     }
@@ -1666,15 +1618,15 @@ void AllMusic::resync()
 
 MusicMetadata* AllMusic::getMetadata(int an_id)
 {
-    if (music_map.contains(an_id))
-        return music_map[an_id];
+    if (m_music_map.contains(an_id))
+        return m_music_map[an_id];
 
     return nullptr;
 }
 
 bool AllMusic::isValidID(int an_id)
 {
-    return music_map.contains(an_id);
+    return m_music_map.contains(an_id);
 }
 
 bool AllMusic::updateMetadata(int an_id, MusicMetadata *the_track)
@@ -1708,8 +1660,8 @@ void AllMusic::clearCDData(void)
     while (!m_cdData.empty())
     {
         MusicMetadata *mdata = m_cdData.back();
-        if (music_map.contains(mdata->ID()))
-            music_map.remove(mdata->ID());
+        if (m_music_map.contains(mdata->ID()))
+            m_music_map.remove(mdata->ID());
 
         delete m_cdData.back();
         m_cdData.pop_back();
@@ -1724,7 +1676,7 @@ void AllMusic::addCDTrack(const MusicMetadata &the_track)
     mdata->setID(m_cdData.count() + 1);
     mdata->setRepo(RT_CD);
     m_cdData.append(mdata);
-    music_map[mdata->ID()] = mdata;
+    m_music_map[mdata->ID()] = mdata;
 }
 
 bool AllMusic::checkCDTrack(MusicMetadata *the_track)
@@ -1972,11 +1924,11 @@ void AlbumArtImages::findImages(void)
                 QString logoUrl = query.value(0).toString();
 
                 AlbumArtImage *image = new AlbumArtImage();
-                image->id = -1;
-                image->filename = logoUrl;
-                image->imageType = IT_FRONTCOVER;
-                image->embedded = false;
-                image->hostname = "";
+                image->m_id = -1;
+                image->m_filename = logoUrl;
+                image->m_imageType = IT_FRONTCOVER;
+                image->m_embedded = false;
+                image->m_hostname = "";
                 m_imageList.push_back(image);
             }
         }
@@ -2007,32 +1959,32 @@ void AlbumArtImages::findImages(void)
             {
                 AlbumArtImage *image = new AlbumArtImage();
                 bool embedded = (query.value(4).toInt() == 1);
-                image->id = query.value(0).toInt();
+                image->m_id = query.value(0).toInt();
 
                 QUrl url(m_parent->Filename(true));
 
                 if (embedded)
                 {
                     if (url.scheme() == "myth")
-                        image->filename = gCoreContext->GenMythURL(url.host(), url.port(),
+                        image->m_filename = gCoreContext->GenMythURL(url.host(), url.port(),
                                                                    QString("AlbumArt/") + query.value(1).toString(),
                                                                    "MusicArt");
                     else
-                        image->filename = query.value(1).toString();
+                        image->m_filename = query.value(1).toString();
                 }
                 else
                 {
                     if (url.scheme() == "myth")
-                        image->filename =  gCoreContext->GenMythURL(url.host(), url.port(),
+                        image->m_filename =  gCoreContext->GenMythURL(url.host(), url.port(),
                                                                     query.value(1).toString(),
                                                                     "Music");
                     else
-                        image->filename = query.value(1).toString();
+                        image->m_filename = query.value(1).toString();
                 }
 
-                image->imageType = (ImageType) query.value(3).toInt();
-                image->embedded = embedded;
-                image->hostname = query.value(5).toString();
+                image->m_imageType = (ImageType) query.value(3).toInt();
+                image->m_embedded = embedded;
+                image->m_hostname = query.value(5).toString();
 
                 m_imageList.push_back(image);
             }
@@ -2043,10 +1995,10 @@ void AlbumArtImages::findImages(void)
         if (findIcon("artist", artist) != QString())
         {
             AlbumArtImage *image = new AlbumArtImage();
-            image->id = -1;
-            image->filename = findIcon("artist", artist);
-            image->imageType = IT_ARTIST;
-            image->embedded = false;
+            image->m_id = -1;
+            image->m_filename = findIcon("artist", artist);
+            image->m_imageType = IT_ARTIST;
+            image->m_embedded = false;
 
             m_imageList.push_back(image);
         }
@@ -2100,33 +2052,33 @@ void AlbumArtImages::scanForImages()
     for (int x = 2; x < strList.count(); x += 6)
     {
         AlbumArtImage *image = new AlbumArtImage;
-        image->id = strList[x].toInt();
-        image->imageType = (ImageType) strList[x + 1].toInt();
-        image->embedded = (strList[x + 2].toInt() == 1);
-        image->description = strList[x + 3];
+        image->m_id = strList[x].toInt();
+        image->m_imageType = (ImageType) strList[x + 1].toInt();
+        image->m_embedded = (strList[x + 2].toInt() == 1);
+        image->m_description = strList[x + 3];
 
-        if (image->embedded)
+        if (image->m_embedded)
         {
-            image->filename = gCoreContext->GenMythURL(m_parent->Hostname(), 0,
+            image->m_filename = gCoreContext->GenMythURL(m_parent->Hostname(), 0,
                                                        QString("AlbumArt/") + strList[x + 4],
                                                        "MusicArt");
         }
         else
         {
-            image->filename =  gCoreContext->GenMythURL(m_parent->Hostname(), 0,
+            image->m_filename =  gCoreContext->GenMythURL(m_parent->Hostname(), 0,
                                                         strList[x + 4],
                                                         "Music");
         }
 
-        image->hostname = strList[x + 5];
+        image->m_hostname = strList[x + 5];
 
         LOG(VB_FILE, LOG_INFO, "AlbumArtImages::scanForImages found image");
-        LOG(VB_FILE, LOG_INFO, QString("ID: %1").arg(image->id));
-        LOG(VB_FILE, LOG_INFO, QString("ImageType: %1").arg(image->imageType));
-        LOG(VB_FILE, LOG_INFO, QString("Embedded: %1").arg(image->embedded));
-        LOG(VB_FILE, LOG_INFO, QString("Description: %1").arg(image->description));
-        LOG(VB_FILE, LOG_INFO, QString("Filename: %1").arg(image->filename));
-        LOG(VB_FILE, LOG_INFO, QString("Hostname: %1").arg(image->hostname));
+        LOG(VB_FILE, LOG_INFO, QString("ID: %1").arg(image->m_id));
+        LOG(VB_FILE, LOG_INFO, QString("ImageType: %1").arg(image->m_imageType));
+        LOG(VB_FILE, LOG_INFO, QString("Embedded: %1").arg(image->m_embedded));
+        LOG(VB_FILE, LOG_INFO, QString("Description: %1").arg(image->m_description));
+        LOG(VB_FILE, LOG_INFO, QString("Filename: %1").arg(image->m_filename));
+        LOG(VB_FILE, LOG_INFO, QString("Hostname: %1").arg(image->m_hostname));
         LOG(VB_FILE, LOG_INFO, "-------------------------------");
 
         addImage(image);
@@ -2140,7 +2092,7 @@ AlbumArtImage *AlbumArtImages::getImage(ImageType type)
     AlbumArtList::iterator it = m_imageList.begin();
     for (; it != m_imageList.end(); ++it)
     {
-        if ((*it)->imageType == type)
+        if ((*it)->m_imageType == type)
             return *it;
     }
 
@@ -2152,7 +2104,7 @@ AlbumArtImage *AlbumArtImages::getImageByID(int imageID)
     AlbumArtList::iterator it = m_imageList.begin();
     for (; it != m_imageList.end(); ++it)
     {
-        if ((*it)->id == imageID)
+        if ((*it)->m_id == imageID)
             return *it;
     }
 
@@ -2165,7 +2117,7 @@ QStringList AlbumArtImages::getImageFilenames(void) const
 
     AlbumArtList::const_iterator it = m_imageList.begin();
     for (; it != m_imageList.end(); ++it)
-        paths += (*it)->filename;
+        paths += (*it)->m_filename;
 
     return paths;
 }
@@ -2265,7 +2217,8 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     AlbumArtList::iterator it = m_imageList.begin();
     for (; it != m_imageList.end(); ++it)
     {
-        if ((*it)->imageType == newImage.imageType && (*it)->embedded == newImage.embedded)
+        if ((*it)->m_imageType == newImage.m_imageType
+            && (*it)->m_embedded == newImage.m_embedded)
         {
             image = *it;
             break;
@@ -2281,11 +2234,11 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     else
     {
         // we already have an image of this type so just update it with the new info
-        image->filename = newImage.filename;
-        image->imageType = newImage.imageType;
-        image->embedded = newImage.embedded;
-        image->description = newImage.description;
-        image->hostname = newImage.hostname;
+        image->m_filename = newImage.m_filename;
+        image->m_imageType = newImage.m_imageType;
+        image->m_embedded = newImage.m_embedded;
+        image->m_description = newImage.m_description;
+        image->m_hostname = newImage.m_hostname;
     }
 }
 
@@ -2326,16 +2279,16 @@ void AlbumArtImages::dumpToDatabase(void)
         AlbumArtImage *image = (*it);
 
         //TODO: for the moment just ignore artist images
-        if (image->imageType == IT_ARTIST)
+        if (image->m_imageType == IT_ARTIST)
             continue;
 
-        if (image->id > 0)
+        if (image->m_id > 0)
         {
             // re-use the same id this image had before
             query.prepare("INSERT INTO music_albumart ( albumart_id, "
                           "filename, imagetype, song_id, directory_id, embedded, hostname ) "
                           "VALUES ( :ID, :FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED, :HOSTNAME );");
-            query.bindValue(":ID", image->id);
+            query.bindValue(":ID", image->m_id);
         }
         else
         {
@@ -2344,22 +2297,22 @@ void AlbumArtImages::dumpToDatabase(void)
                         ":FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED, :HOSTNAME );");
         }
 
-        QFileInfo fi(image->filename);
+        QFileInfo fi(image->m_filename);
         query.bindValue(":FILENAME", fi.fileName());
 
-        query.bindValue(":TYPE", image->imageType);
-        query.bindValue(":SONGID", image->embedded ? trackID : 0);
-        query.bindValue(":DIRECTORYID", image->embedded ? 0 : directoryID);
-        query.bindValue(":EMBED", image->embedded);
-        query.bindValue(":HOSTNAME", image->hostname);
+        query.bindValue(":TYPE", image->m_imageType);
+        query.bindValue(":SONGID", image->m_embedded ? trackID : 0);
+        query.bindValue(":DIRECTORYID", image->m_embedded ? 0 : directoryID);
+        query.bindValue(":EMBED", image->m_embedded);
+        query.bindValue(":HOSTNAME", image->m_hostname);
 
         if (!query.exec())
             MythDB::DBError("AlbumArtImages::dumpToDatabase - "
                             "add/update music_albumart", query);
         else
         {
-            if (image->id <= 0)
-                image->id = query.lastInsertId().toInt();
+            if (image->m_id <= 0)
+                image->m_id = query.lastInsertId().toInt();
         }
     }
 }

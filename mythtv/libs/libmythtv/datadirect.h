@@ -26,12 +26,12 @@ class DataDirectURLs
 
 public:
     DataDirectURLs(QString a, QString b, QString c, QString d) :
-            name(a), webServiceURL(b), webURL(c), loginPage(d) {}
+            m_name(a), m_webServiceURL(b), m_webURL(c), m_loginPage(d) {}
 
-    QString name;
-    QString webServiceURL;
-    QString webURL;
-    QString loginPage;
+    QString m_name;
+    QString m_webServiceURL;
+    QString m_webURL;
+    QString m_loginPage;
 };
 
 typedef vector<DataDirectURLs> DDProviders;
@@ -42,7 +42,7 @@ class DataDirectStation
 {
 
 public:
-    DataDirectStation();
+    DataDirectStation() = default;
 
     void Reset(void)
     {
@@ -52,11 +52,11 @@ public:
 
 public:
     //                      field length   req/opt
-    QString stationid;      //   12        required
-    QString callsign;       //   10        required
-    QString stationname;    //   40        required
-    QString affiliate;      //   25        optional
-    QString fccchannelnumber;//   8        optional
+    QString m_stationid;       //  12        required
+    QString m_callsign;        //  10        required
+    QString m_stationname;     //  40        required
+    QString m_affiliate;       //  25        optional
+    QString m_fccchannelnumber;//   8        optional
 };
 
 typedef DataDirectStation DDStation;
@@ -65,7 +65,7 @@ class DataDirectLineup
 {
 
 public:
-    DataDirectLineup();
+    DataDirectLineup() = default;
 
     void Reset(void)
     {
@@ -75,20 +75,20 @@ public:
 
 public:
     //                      field length   req/opt
-    QString lineupid;       //   12        required
-    QString name;           //  100        required
-    QString displayname;    //   50        ????????
-    QString type;           //   20        required
-    QString postal;         //    6        optional
-    QString device;         //   30        optional
-    QString location;       //   28        required unused
+    QString m_lineupid;       //   12        required
+    QString m_name;           //  100        required
+    QString m_displayname;    //   50        ????????
+    QString m_type;           //   20        required
+    QString m_postal;         //    6        optional
+    QString m_device;         //   30        optional
+    QString m_location;       //   28        required unused
 };
 
 class DataDirectLineupMap
 {
 
 public:
-    DataDirectLineupMap();
+    DataDirectLineupMap() = default;
 
     void Reset(void)
     {
@@ -98,19 +98,19 @@ public:
 
 public:
     //                      field length   req/opt
-    QString lineupid;       //   12        required
-    QString stationid;      //   12        required
-    QString channel;        //    5        optional (major channel num)
-    QString channelMinor;   //    3        optional
-    QDate   mapFrom;        //    8  optional unused (date broadcasting begins)
-    QDate   mapTo;          //    8  optional unused (date broadcasting ends)
+    QString m_lineupid;       //   12        required
+    QString m_stationid;      //   12        required
+    QString m_channel;        //    5        optional (major channel num)
+    QString m_channelMinor;   //    3        optional
+    QDate   m_mapFrom;        //    8  optional unused (date broadcasting begins)
+    QDate   m_mapTo;          //    8  optional unused (date broadcasting ends)
 };
 
 class DataDirectSchedule
 {
 
 public:
-    DataDirectSchedule();
+    DataDirectSchedule() = default;
 
     void Reset(void)
     {
@@ -119,27 +119,27 @@ public:
     }
 
 public:
-    QString   programid; // 12
-    QString   stationid; // 12
-    QDateTime time;
-    QTime     duration;
-    bool      repeat;
-    bool      isnew;
-    bool      stereo;
-    bool      dolby;
-    bool      subtitled;
-    bool      hdtv;
-    bool      closecaptioned;
-    QString   tvrating;
-    int       partnumber;
-    int       parttotal;
+    QString   m_programid; // 12
+    QString   m_stationid; // 12
+    QDateTime m_time;
+    QTime     m_duration;
+    bool      m_repeat         {false};
+    bool      m_isnew          {false};
+    bool      m_stereo         {false};
+    bool      m_dolby          {false};
+    bool      m_subtitled      {false};
+    bool      m_hdtv           {false};
+    bool      m_closecaptioned {false};
+    QString   m_tvrating;
+    int       m_partnumber     {0};
+    int       m_parttotal      {0};
 };
 
 class DataDirectProgram
 {
 
 public:
-    DataDirectProgram();
+    DataDirectProgram() = default;
 
     void Reset(void)
     {
@@ -148,19 +148,19 @@ public:
     }
 
 public:
-    QString programid;   // 12
-    QString seriesid;    // 12
-    QString title;       // 120
-    QString subtitle;    // 150
-    QString description; // 255
-    QString mpaaRating;  // 5
-    QString starRating;  // 5
-    QTime   duration;
-    QString year;        // 4
-    QString showtype;    // 30
-    QString colorcode;   // 20
-    QDate   originalAirDate; // 20
-    QString syndicatedEpisodeNumber; // 20
+    QString m_programid;   // 12
+    QString m_seriesid;    // 12
+    QString m_title;       // 120
+    QString m_subtitle;    // 150
+    QString m_description; // 255
+    QString m_mpaaRating;  // 5
+    QString m_starRating;  // 5
+    QTime   m_duration;
+    QString m_year;        // 4
+    QString m_showtype;    // 30
+    QString m_colorcode;   // 20
+    QDate   m_originalAirDate; // 20
+    QString m_syndicatedEpisodeNumber; // 20
     // advisories ?
 };
 
@@ -168,7 +168,7 @@ class DataDirectProductionCrew
 {
 
 public:
-    DataDirectProductionCrew();
+    DataDirectProductionCrew() = default;
 
     void Reset(void)
     {
@@ -177,18 +177,18 @@ public:
     }
 
 public:
-    QString programid; // 12
-    QString role;      // 30
-    QString givenname; // 20
-    QString surname;   // 20
-    QString fullname;  // 41
+    QString m_programid; // 12
+    QString m_role;      // 30
+    QString m_givenname; // 20
+    QString m_surname;   // 20
+    QString m_fullname;  // 41
 };
 
 class DataDirectGenre
 {
 
 public:
-    DataDirectGenre();
+    DataDirectGenre() = default;
 
     void Reset(void)
     {
@@ -197,31 +197,29 @@ public:
     }
 
 public:
-    QString programid; // 12
-    QString gclass;    // 30
-    QString relevance; // 1
+    QString m_programid; // 12
+    QString m_gclass;    // 30
+    QString m_relevance; // 1
 };
 
 class RawLineupChannel
 {
 
 public:
-    RawLineupChannel() :
-            chk_checked(false) {}
-
+    RawLineupChannel() = default;
     RawLineupChannel(QString name,  QString id,
                      QString value, bool    checked,
                      QString ch,    QString callsign) :
-            chk_name(name),       chk_id(id), chk_value(value),
-            chk_checked(checked), lbl_ch(ch), lbl_callsign(callsign) {}
+            m_chk_name(name),       m_chk_id(id), m_chk_value(value),
+            m_chk_checked(checked), m_lbl_ch(ch), m_lbl_callsign(callsign) {}
 
 public:
-    QString chk_name;
-    QString chk_id;
-    QString chk_value;
-    bool    chk_checked;
-    QString lbl_ch;
-    QString lbl_callsign;
+    QString m_chk_name;
+    QString m_chk_id;
+    QString m_chk_value;
+    bool    m_chk_checked {false};
+    QString m_lbl_ch;
+    QString m_lbl_callsign;
 };
 
 typedef vector<RawLineupChannel> RawLineupChannels;
@@ -233,15 +231,15 @@ public:
     RawLineup() = default;
 
     RawLineup(QString a, QString b, QString c) :
-            get_action(a), udl_id(b), zipcode(c) {}
+            m_get_action(a), m_udl_id(b), m_zipcode(c) {}
 
 public:
-    QString get_action;
-    QString set_action;
-    QString udl_id;
-    QString zipcode;
+    QString           m_get_action;
+    QString           m_set_action;
+    QString           m_udl_id;
+    QString           m_zipcode;
 
-    RawLineupChannels channels;
+    RawLineupChannels m_channels;
 };
 
 typedef QMap<QString, RawLineup> RawLineupMap;
@@ -263,7 +261,7 @@ class DDStructureParser: public QXmlDefaultHandler
 
 public:
     explicit DDStructureParser(DataDirectProcessor& _ddparent) :
-            parent(_ddparent) {}
+            m_parent(_ddparent) {}
 
     bool startElement(const QString &pnamespaceuri, const QString &plocalname,
                       const QString &pqname, const QXmlAttributes &pxmlatts) override; // QXmlDefaultHandler
@@ -277,17 +275,17 @@ public:
     bool endDocument(void) override; // QXmlDefaultHandler
 
 private:
-    DataDirectProcessor     &parent;
+    DataDirectProcessor     &m_parent;
 
-    QString                  currtagname;
-    DataDirectStation        curr_station;
-    DataDirectLineup         curr_lineup;
-    DataDirectLineupMap      curr_lineupmap;
-    DataDirectSchedule       curr_schedule;
-    DataDirectProgram        curr_program;
-    DataDirectProductionCrew curr_productioncrew;
-    DataDirectGenre          curr_genre;
-    QString                  lastprogramid;
+    QString                  m_currtagname;
+    DataDirectStation        m_curr_station;
+    DataDirectLineup         m_curr_lineup;
+    DataDirectLineupMap      m_curr_lineupmap;
+    DataDirectSchedule       m_curr_schedule;
+    DataDirectProgram        m_curr_program;
+    DataDirectProductionCrew m_curr_productioncrew;
+    DataDirectGenre          m_curr_genre;
+    QString                  m_lastprogramid;
 };
 
 
@@ -346,7 +344,7 @@ class MTV_PUBLIC DataDirectProcessor
 
     QString   GetListingsProviderName(void) const
     {
-        return m_providers[m_listingsProvider % DD_PROVIDER_COUNT].name;
+        return m_providers[m_listingsProvider % DD_PROVIDER_COUNT].m_name;
     }
 
     QDateTime GetDDProgramsStartAt(void) const { return m_actualListingsFrom; }
@@ -419,29 +417,29 @@ class MTV_PUBLIC DataDirectProcessor
   private:
     void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth);
 
-    uint          m_listingsProvider;
-    DDProviders   m_providers;
+    uint                m_listingsProvider;
+    DDProviders         m_providers;
 
-    QString         m_userid;
-    QString         m_password;
-    mutable QString m_tmpDir;
-    bool            m_cacheData;
+    QString             m_userid;
+    QString             m_password;
+    mutable QString     m_tmpDir    {"/tmp"};
+    bool                m_cacheData {false};
 
-    QDateTime     m_actualListingsFrom;
-    QDateTime     m_actualListingsTo;
+    QDateTime           m_actualListingsFrom;
+    QDateTime           m_actualListingsTo;
 
-    QString       m_inputFilename;
+    QString             m_inputFilename;
 
-    DDStationList m_stations;
-    DDLineupList  m_lineups;
-    DDLineupMap   m_lineupmaps;
+    DDStationList       m_stations;
+    DDLineupList        m_lineups;
+    DDLineupMap         m_lineupmaps;
 
-    RawLineupMap    m_rawLineups;
-    mutable QString m_tmpPostFile;
-    mutable QString m_tmpResultFile;
-    mutable QString m_tmpDDPFile;
-    mutable QString m_cookieFile;
-    QDateTime       m_cookieFileDT;
+    RawLineupMap        m_rawLineups;
+    mutable QString     m_tmpPostFile;
+    mutable QString     m_tmpResultFile;
+    mutable QString     m_tmpDDPFile;
+    mutable QString     m_cookieFile;
+    QDateTime           m_cookieFileDT;
 
     mutable QStringList m_fatalErrors;
 };

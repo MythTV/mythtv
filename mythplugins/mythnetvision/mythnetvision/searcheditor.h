@@ -12,7 +12,8 @@ class SearchEditor : public NetEditorBase
 
   public:
     SearchEditor(MythScreenStack *parent,
-               const QString &name = "SearchEditor");
+                 const QString &name = "SearchEditor")
+        : NetEditorBase(parent, name) {}
 
   protected:
     bool InsertInDB(GrabberScript *script) override; // NetEditorBase

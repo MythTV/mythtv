@@ -50,10 +50,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 MediaServer::MediaServer(void) :
-#ifdef USING_LIBDNS_SD
-    m_bonjour(nullptr),
-#endif
-    m_pUPnpCDS(nullptr), m_pUPnpCMGR(nullptr),
     m_sSharePath(GetShareDir())
 {
     LOG(VB_UPNP, LOG_INFO, "MediaServer(): Begin");

@@ -68,12 +68,12 @@ class FileCopyThread : public MThread
 
   private:
     bool         m_move;
-    IconView    *m_parent;
-    volatile int m_progress;
+    IconView    *m_parent {nullptr};
+    volatile int m_progress {0};
 };
 
 FileCopyThread::FileCopyThread(IconView *parent, bool move) :
-    MThread("FileCopy"), m_move(move), m_parent(parent), m_progress(0)
+    MThread("FileCopy"), m_move(move), m_parent(parent)
 {
 }
 
@@ -104,11 +104,6 @@ void FileCopyThread::run()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ImportThread::ImportThread(const QString &cmd) :
-    MThread("import"), m_command(cmd)
-{
-}
-
 void ImportThread::run()
 {
     RunProlog();
@@ -124,12 +119,6 @@ IconView::IconView(MythScreenStack *parent, const char *name,
         : MythScreenType(parent, name),
             m_galleryDir(galleryDir),
             m_galleryFilter(new GalleryFilter()),
-            m_imageList(nullptr),
-            m_captionText(nullptr),   m_crumbsText(nullptr),
-            m_positionText(nullptr),  m_noImagesText(nullptr),
-            m_selectedImage(nullptr), m_menuPopup(nullptr),
-            m_popupStack(nullptr),
-            m_isGallery(false),       m_showDevices(false),
             m_currDevice(initialDevice),
             m_thumbGen(new ThumbGenerator(this, 0, 0)),
             m_childCountThread(new ChildCountThread(this))
@@ -749,7 +738,7 @@ void IconView::customEvent(QEvent *event)
         if (!tge)
             return;
 
-        ThumbData *td = tge->thumbData;
+        ThumbData *td = tge->m_thumbData;
         if (!td)
             return;
 
@@ -1580,11 +1569,6 @@ ThumbItem *IconView::GetCurrentThumb(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-ChildCountThread::ChildCountThread(QObject *parent) :
-    MThread("ChildCountThread"), m_parent(parent)
-{
-}
 
 ChildCountThread::~ChildCountThread()
 {

@@ -166,29 +166,30 @@ class ImportIconsWizard : public MythScreenType
     QString m_strChannelname;        //!< the channel name if searching for a single channel icon
     QString m_strParam;
 
-    bool m_fRefresh;                 //!< are we doing a refresh or not
-    int m_nMaxCount;                 //!< the maximum number of TV channels
-    int m_nCount;                    //!< the current search point (0..m_nMaxCount)
-    int m_missingMaxCount;           //!< the total number of missing icons
-    int m_missingCount;              //!< the current search point (0..m_missingCount)
+    bool m_fRefresh       {false};   //!< are we doing a refresh or not
+    int m_nMaxCount       {0};       //!< the maximum number of TV channels
+    int m_nCount          {0};       //!< the current search point (0..m_nMaxCount)
+    int m_missingMaxCount {0};       //!< the total number of missing icons
+    int m_missingCount    {0};       //!< the current search point (0..m_missingCount)
 
-    const QString m_url;        //!< the default url
+                        //!< the default url
+    const QString m_url {"http://services.mythtv.org/channel-icon/"}; 
     QDir m_tmpDir;
 
     void startDialog();
 
-    MythScreenStack    *m_popupStack;
-    MythUIProgressDialog *m_progressDialog;
+    MythScreenStack      *m_popupStack     {nullptr};
+    MythUIProgressDialog *m_progressDialog {nullptr};
 
-    MythUIButtonList *m_iconsList;    //!< list of potential icons
-    MythUITextEdit   *m_manualEdit;  //!< manual edit field
-    MythUIText       *m_nameText;    //!< name field for the icon
-    MythUIButton     *m_manualButton;  //!< manual button field
-    MythUIButton     *m_skipButton;    //!< button skip
-    MythUIText       *m_statusText;
+    MythUIButtonList     *m_iconsList      {nullptr}; //!< list of potential icons
+    MythUITextEdit       *m_manualEdit     {nullptr}; //!< manual edit field
+    MythUIText           *m_nameText       {nullptr}; //!< name field for the icon
+    MythUIButton         *m_manualButton   {nullptr}; //!< manual button field
+    MythUIButton         *m_skipButton     {nullptr}; //!< button skip
+    MythUIText           *m_statusText     {nullptr};
 
-    MythUIImage      *m_preview;
-    MythUIText       *m_previewtitle;
+    MythUIImage          *m_preview        {nullptr};
+    MythUIText           *m_previewtitle   {nullptr};
 
 };
 

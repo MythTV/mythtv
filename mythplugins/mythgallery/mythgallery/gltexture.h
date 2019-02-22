@@ -35,8 +35,7 @@ class ThumbItem;
 class GLTexture
 {
   public:
-    GLTexture() : tex(0), angle(0), item(nullptr),
-        width(512), height(512), cx(1.0f), cy(1.0f) {}
+    GLTexture() = default;
     ~GLTexture() { Deinit(); }
 
     void Init(const QImage &image);
@@ -65,13 +64,13 @@ class GLTexture
     QString GetDescription(const QString &status) const;
 
   private:
-    GLuint     tex;
-    int        angle;
-    ThumbItem *item;
-    int        width;
-    int        height;
-    float      cx;
-    float      cy;
+    GLuint     tex    {0};
+    int        angle  {0};
+    ThumbItem *item   {nullptr};
+    int        width  {512};
+    int        height {512};
+    float      cx     {1.0f};
+    float      cy     {1.0f};
 };
 
 #endif // USING_OPENGL

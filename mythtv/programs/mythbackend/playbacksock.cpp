@@ -23,27 +23,21 @@ PlaybackSock::PlaybackSock(
     m_parent = parent;
     QString localhostname = gCoreContext->GetHostName();
 
-    sock = lsock;
-    hostname = lhostname;
+    m_sock = lsock;
+    m_hostname = lhostname;
     m_eventsMode = eventsMode;
-    ip = "";
-    backend = false;
-    mediaserver = false;
-    m_frontend = false;
+    m_ip = "";
 
-    disconnected = false;
-    blockshutdown = true;
-
-    if (hostname == localhostname)
-        local = true;
+    if (m_hostname == localhostname)
+        m_local = true;
     else
-        local = false;
+        m_local = false;
 }
 
 PlaybackSock::~PlaybackSock()
 {
-    sock->DecrRef();
-    sock = nullptr;
+    m_sock->DecrRef();
+    m_sock = nullptr;
 }
 
 bool PlaybackSock::wantsEvents(void) const
@@ -75,16 +69,16 @@ PlaybackSockEventsMode PlaybackSock::eventsMode(void) const
 
 bool PlaybackSock::ReadStringList(QStringList &list)
 {
-    sock->IncrRef();
-    ReferenceLocker rlocker(sock);
-    QMutexLocker locker(&sockLock);
-    if (!sock->IsDataAvailable())
+    m_sock->IncrRef();
+    ReferenceLocker rlocker(m_sock);
+    QMutexLocker locker(&m_sockLock);
+    if (!m_sock->IsDataAvailable())
     {
         LOG(VB_GENERAL, LOG_DEBUG,
             "PlaybackSock::ReadStringList(): Data vanished !!!");
         return false;
     }
-    return sock->ReadStringList(list);
+    return m_sock->ReadStringList(list);
 }
 
 bool PlaybackSock::SendReceiveStringList(
@@ -92,13 +86,13 @@ bool PlaybackSock::SendReceiveStringList(
 {
     bool ok = false;
 
-    sock->IncrRef();
+    m_sock->IncrRef();
 
     {
-        QMutexLocker locker(&sockLock);
-        sock->SetReadyReadCallbackEnabled(false);
+        QMutexLocker locker(&m_sockLock);
+        m_sock->SetReadyReadCallbackEnabled(false);
 
-        ok = sock->SendReceiveStringList(strlist);
+        ok = m_sock->SendReceiveStringList(strlist);
         while (ok && strlist[0] == "BACKEND_MESSAGE")
         {
             // oops, not for us
@@ -111,12 +105,12 @@ bool PlaybackSock::SendReceiveStringList(
                 gCoreContext->dispatch(me);
             }
 
-            ok = sock->ReadStringList(strlist);
+            ok = m_sock->ReadStringList(strlist);
         }
-        sock->SetReadyReadCallbackEnabled(true);
+        m_sock->SetReadyReadCallbackEnabled(true);
     }
 
-    sock->DecrRef();
+    m_sock->DecrRef();
 
     if (!ok)
     {

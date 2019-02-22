@@ -1920,9 +1920,9 @@ void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
 
 
 //! Backend Gallery instance
-ImageManagerBe *ImageManagerBe::m_instance = nullptr;
+ImageManagerBe *ImageManagerBe::s_instance = nullptr;
 //! Frontend Gallery instance
-ImageManagerFe *ImageManagerFe::m_instance = nullptr;
+ImageManagerFe *ImageManagerFe::s_instance = nullptr;
 
 
 /*!
@@ -1931,9 +1931,9 @@ ImageManagerFe *ImageManagerFe::m_instance = nullptr;
 */
 ImageManagerBe* ImageManagerBe::getInstance()
 {
-    if (!m_instance)
-        m_instance = new ImageManagerBe();
-    return m_instance;
+    if (!s_instance)
+        s_instance = new ImageManagerBe();
+    return s_instance;
 }
 
 
@@ -1943,15 +1943,15 @@ ImageManagerBe* ImageManagerBe::getInstance()
 */
 ImageManagerFe& ImageManagerFe::getInstance()
 {
-    if (!m_instance)
+    if (!s_instance)
         // Use saved settings
-        m_instance = new ImageManagerFe
+        s_instance = new ImageManagerFe
                 (gCoreContext->GetNumSetting("GalleryImageOrder"),
                  gCoreContext->GetNumSetting("GalleryDirOrder"),
                  gCoreContext->GetBoolSetting("GalleryShowHidden"),
                  gCoreContext->GetNumSetting("GalleryShowType"),
                  gCoreContext->GetSetting("GalleryDateFormat"));
-    return *m_instance;
+    return *s_instance;
 }
 
 

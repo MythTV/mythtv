@@ -92,22 +92,7 @@ public:
 
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
-    Decoder(d, o),
-    m_inited(false),   m_user_stop(false),
-    m_devicename(""),
-    m_stat(DecoderEvent::Error),
-    m_output_buf(nullptr),
-    m_output_at(0),    m_bks(0),
-    m_bksFrames(0),    m_decodeBytes(0),
-    m_finish(false),
-    m_freq(0),         m_bitrate(0),
-    m_chan(0),
-    m_seekTime(-1.),
-    m_settracknum(-1), m_tracknum(0),
-    m_cdio(nullptr),   m_device(nullptr), m_paranoia(nullptr),
-    m_start(CDIO_INVALID_LSN),
-    m_end(CDIO_INVALID_LSN),
-    m_curpos(CDIO_INVALID_LSN)
+    Decoder(d, o)
 {
     setURL(file);
 }

@@ -13,20 +13,6 @@
 #include "bluraymetadata.h"
 #include "mythdirs.h"
 
-BlurayMetadata::BlurayMetadata(const QString &path) :
-    m_bdnav(nullptr),
-    m_title(QString()),          m_alttitle(QString()),
-    m_language(QString()),       m_discnumber(0),
-    m_disctotal(0),              m_path(path),
-    m_images(QStringList()),     m_topMenuSupported(false),
-    m_firstPlaySupported(false), m_numHDMVTitles(0),
-    m_numBDJTitles(0),           m_numUnsupportedTitles(0),
-    m_aacsDetected(false),       m_libaacsDetected(false),
-    m_aacsHandled(false),        m_bdplusDetected(false),
-    m_libbdplusDetected(false),  m_bdplusHandled(false)
-{
-}
-
 BlurayMetadata::~BlurayMetadata()
 {
     if (m_bdnav)

@@ -46,7 +46,6 @@ using namespace std;
 #include "previewgeneratorqueue.h"
 #include "mythmiscutil.h"
 #include "mythsystemlegacy.h"
-#include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "mythdb.h"
@@ -136,7 +135,7 @@ int delete_file_immediately(const QString &filename,
 
 };
 
-QMutex MainServer::truncate_and_close_lock;
+QMutex MainServer::s_truncate_and_close_lock;
 const uint MainServer::kMasterServerReconnectTimeout = 1000; //ms
 
 class ProcessRequestRunnable : public QRunnable
@@ -179,9 +178,9 @@ class FreeSpaceUpdater : public QRunnable
     }
     ~FreeSpaceUpdater()
     {
-        QMutexLocker locker(&m_parent.masterFreeSpaceListLock);
-        m_parent.masterFreeSpaceListUpdater = nullptr;
-        m_parent.masterFreeSpaceListWait.wakeAll();
+        QMutexLocker locker(&m_parent.m_masterFreeSpaceListLock);
+        m_parent.m_masterFreeSpaceListUpdater = nullptr;
+        m_parent.m_masterFreeSpaceListWait.wakeAll();
     }
 
     void run(void) override // QRunnable
@@ -193,8 +192,8 @@ class FreeSpaceUpdater : public QRunnable
             QStringList list;
             m_parent.BackendQueryDiskSpace(list, true, true);
             {
-                QMutexLocker locker(&m_parent.masterFreeSpaceListLock);
-                m_parent.masterFreeSpaceList = list;
+                QMutexLocker locker(&m_parent.m_masterFreeSpaceListLock);
+                m_parent.m_masterFreeSpaceList = list;
             }
             QMutexLocker locker(&m_lock);
             int left = kRequeryTimeout - t.elapsed();
@@ -241,30 +240,23 @@ const int FreeSpaceUpdater::kExitTimeout = 61000;
 MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *_tvList,
                        Scheduler *sched, AutoExpire *_expirer) :
-    encoderList(_tvList), mythserver(nullptr),
-    metadatafactory(nullptr),
-    masterFreeSpaceListUpdater(nullptr),
-    masterServerReconnect(nullptr),
-    masterServer(nullptr), ismaster(master), threadPool("ProcessRequestPool"),
-    masterBackendOverride(false),
-    m_sched(sched), m_expirer(_expirer), m_addChildInputLock(),
-    deferredDeleteTimer(nullptr),
-    autoexpireUpdateTimer(nullptr), m_exitCode(GENERIC_EXIT_OK),
-    m_stopped(false)
+    m_encoderList(_tvList),
+    m_ismaster(master), m_threadPool("ProcessRequestPool"),
+    m_sched(sched), m_expirer(_expirer), m_addChildInputLock()
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
     PreviewGeneratorQueue::AddListener(this);
 
-    threadPool.setMaxThreadCount(PRT_STARTUP_THREAD_COUNT);
+    m_threadPool.setMaxThreadCount(PRT_STARTUP_THREAD_COUNT);
 
-    masterBackendOverride =
+    m_masterBackendOverride =
         gCoreContext->GetBoolSetting("MasterBackendOverride", false);
 
-    mythserver = new MythServer();
-    mythserver->setProxy(QNetworkProxy::NoProxy);
+    m_mythserver = new MythServer();
+    m_mythserver->setProxy(QNetworkProxy::NoProxy);
 
-    QList<QHostAddress> listenAddrs = mythserver->DefaultListen();
+    QList<QHostAddress> listenAddrs = m_mythserver->DefaultListen();
     if (!gCoreContext->GetBoolSetting("ListenOnAllIps",true))
     {
         // test to make sure listen addresses are available
@@ -298,64 +290,64 @@ MainServer::MainServer(bool master, int port,
             return;
         }
     }
-    if (!mythserver->listen(port))
+    if (!m_mythserver->listen(port))
     {
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-    connect(mythserver, SIGNAL(NewConnection(qt_socket_fd_t)),
+    connect(m_mythserver, SIGNAL(NewConnection(qt_socket_fd_t)),
             this,       SLOT(NewConnection(qt_socket_fd_t)));
 
     gCoreContext->addListener(this);
 
-    if (!ismaster)
+    if (!m_ismaster)
     {
-        masterServerReconnect = new QTimer(this);
-        masterServerReconnect->setSingleShot(true);
-        connect(masterServerReconnect, SIGNAL(timeout()),
+        m_masterServerReconnect = new QTimer(this);
+        m_masterServerReconnect->setSingleShot(true);
+        connect(m_masterServerReconnect, SIGNAL(timeout()),
                 this, SLOT(reconnectTimeout()));
-        masterServerReconnect->start(kMasterServerReconnectTimeout);
+        m_masterServerReconnect->start(kMasterServerReconnectTimeout);
     }
 
-    deferredDeleteTimer = new QTimer(this);
-    connect(deferredDeleteTimer, SIGNAL(timeout()),
+    m_deferredDeleteTimer = new QTimer(this);
+    connect(m_deferredDeleteTimer, SIGNAL(timeout()),
             this, SLOT(deferredDeleteSlot()));
-    deferredDeleteTimer->start(30 * 1000);
+    m_deferredDeleteTimer->start(30 * 1000);
 
     if (sched)
     {
         // Make sure we have a good, fsinfo cache before setting
         // mainServer in the scheduler.
-        QList<FileSystemInfo> fsInfos;
-        GetFilesystemInfos(fsInfos, false);
+        QList<FileSystemInfo> m_fsInfos;
+        GetFilesystemInfos(m_fsInfos, false);
         sched->SetMainServer(this);
     }
     if (expirer)
         expirer->SetMainServer(this);
 
-    metadatafactory = new MetadataFactory(this);
+    m_metadatafactory = new MetadataFactory(this);
 
-    autoexpireUpdateTimer = new QTimer(this);
-    connect(autoexpireUpdateTimer, SIGNAL(timeout()),
+    m_autoexpireUpdateTimer = new QTimer(this);
+    connect(m_autoexpireUpdateTimer, SIGNAL(timeout()),
             this, SLOT(autoexpireUpdate()));
-    autoexpireUpdateTimer->setSingleShot(true);
+    m_autoexpireUpdateTimer->setSingleShot(true);
 
     AutoExpire::Update(true);
 
-    masterFreeSpaceList << gCoreContext->GetHostName();
-    masterFreeSpaceList << "TotalDiskSpace";
-    masterFreeSpaceList << "0";
-    masterFreeSpaceList << "-2";
-    masterFreeSpaceList << "-2";
-    masterFreeSpaceList << "0";
-    masterFreeSpaceList << "0";
-    masterFreeSpaceList << "0";
+    m_masterFreeSpaceList << gCoreContext->GetHostName();
+    m_masterFreeSpaceList << "TotalDiskSpace";
+    m_masterFreeSpaceList << "0";
+    m_masterFreeSpaceList << "-2";
+    m_masterFreeSpaceList << "-2";
+    m_masterFreeSpaceList << "0";
+    m_masterFreeSpaceList << "0";
+    m_masterFreeSpaceList << "0";
 
-    masterFreeSpaceListUpdater = (master ? new FreeSpaceUpdater(*this) : nullptr);
-    if (masterFreeSpaceListUpdater)
+    m_masterFreeSpaceListUpdater = (master ? new FreeSpaceUpdater(*this) : nullptr);
+    if (m_masterFreeSpaceListUpdater)
     {
         MThreadPool::globalInstance()->startReserved(
-            masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+            m_masterFreeSpaceListUpdater, "FreeSpaceUpdater");
     }
 }
 
@@ -372,12 +364,12 @@ void MainServer::Stop()
     gCoreContext->removeListener(this);
 
     {
-        QMutexLocker locker(&masterFreeSpaceListLock);
-        if (masterFreeSpaceListUpdater)
-            masterFreeSpaceListUpdater->KeepRunning(false);
+        QMutexLocker locker(&m_masterFreeSpaceListLock);
+        if (m_masterFreeSpaceListUpdater)
+            m_masterFreeSpaceListUpdater->KeepRunning(false);
     }
 
-    threadPool.Stop();
+    m_threadPool.Stop();
 
     // since Scheduler::SetMainServer() isn't thread-safe
     // we need to shut down the scheduler thread before we
@@ -388,11 +380,11 @@ void MainServer::Stop()
     PreviewGeneratorQueue::RemoveListener(this);
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
-    if (mythserver)
+    if (m_mythserver)
     {
-        mythserver->disconnect();
-        mythserver->deleteLater();
-        mythserver = nullptr;
+        m_mythserver->disconnect();
+        m_mythserver->deleteLater();
+        m_mythserver = nullptr;
     }
 
     if (m_sched)
@@ -405,36 +397,33 @@ void MainServer::Stop()
         m_expirer->SetMainServer(nullptr);
 
     {
-        QMutexLocker locker(&masterFreeSpaceListLock);
-        while (masterFreeSpaceListUpdater)
+        QMutexLocker locker(&m_masterFreeSpaceListLock);
+        while (m_masterFreeSpaceListUpdater)
         {
-            masterFreeSpaceListUpdater->KeepRunning(false);
-            masterFreeSpaceListWait.wait(locker.mutex());
+            m_masterFreeSpaceListUpdater->KeepRunning(false);
+            m_masterFreeSpaceListWait.wait(locker.mutex());
         }
     }
 
     // Close all open sockets
-    QWriteLocker locker(&sockListLock);
+    QWriteLocker locker(&m_sockListLock);
 
-    vector<PlaybackSock *>::iterator it = playbackList.begin();
-    for (; it != playbackList.end(); ++it)
+    for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
         (*it)->DecrRef();
-    playbackList.clear();
+    m_playbackList.clear();
 
-    vector<FileTransfer *>::iterator ft = fileTransferList.begin();
-    for (; ft != fileTransferList.end(); ++ft)
+    for (auto ft = m_fileTransferList.begin(); ft != m_fileTransferList.end(); ++ft)
         (*ft)->DecrRef();
-    fileTransferList.clear();
+    m_fileTransferList.clear();
 
-    QSet<MythSocket*>::iterator cs = controlSocketList.begin();
-    for (; cs != controlSocketList.end(); ++cs)
+    for (auto cs = m_controlSocketList.begin(); cs != m_controlSocketList.end(); ++cs)
         (*cs)->DecrRef();
-    controlSocketList.clear();
+    m_controlSocketList.clear();
 
-    while (!decrRefSocketList.empty())
+    while (!m_decrRefSocketList.empty())
     {
-        (*decrRefSocketList.begin())->DecrRef();
-        decrRefSocketList.erase(decrRefSocketList.begin());
+        (*m_decrRefSocketList.begin())->DecrRef();
+        m_decrRefSocketList.erase(m_decrRefSocketList.begin());
     }
 }
 
@@ -445,17 +434,17 @@ void MainServer::autoexpireUpdate(void)
 
 void MainServer::NewConnection(qt_socket_fd_t socketDescriptor)
 {
-    QWriteLocker locker(&sockListLock);
+    QWriteLocker locker(&m_sockListLock);
     MythSocket *ms =  new MythSocket(socketDescriptor, this);
     if (ms->IsConnected())
-        controlSocketList.insert(ms);
+        m_controlSocketList.insert(ms);
     else
         ms-> DecrRef();
 }
 
 void MainServer::readyRead(MythSocket *sock)
 {
-    threadPool.startReserved(
+    m_threadPool.startReserved(
         new ProcessRequestRunnable(*this, sock),
         "ProcessRequest", PRT_TIMEOUT);
 
@@ -473,13 +462,13 @@ void MainServer::ProcessRequest(MythSocket *sock)
 
 void MainServer::ProcessRequestWork(MythSocket *sock)
 {
-    sockListLock.lockForRead();
+    m_sockListLock.lockForRead();
     PlaybackSock *pbs = GetPlaybackBySock(sock);
     if (pbs)
         pbs->IncrRef();
 
-    bool bIsControl = (pbs) ? false : controlSocketList.contains(sock);
-    sockListLock.unlock();
+    bool bIsControl = (pbs) ? false : m_controlSocketList.contains(sock);
+    m_sockListLock.unlock();
 
     QStringList listline;
     if (pbs)
@@ -528,16 +517,16 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         return;
     }
 
-    sockListLock.lockForRead();
+    m_sockListLock.lockForRead();
     pbs = GetPlaybackBySock(sock);
     if (!pbs)
     {
-        sockListLock.unlock();
+        m_sockListLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC + "ProcessRequest unknown socket");
         return;
     }
     pbs->IncrRef();
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 
     if (command == "QUERY_FILETRANSFER")
     {
@@ -666,7 +655,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "ADD_CHILD_INPUT")
     {
         QStringList reslist;
-        if (ismaster)
+        if (m_ismaster)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "ADD_CHILD_INPUT command received in master context");
@@ -1060,7 +1049,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         if (tokens.size() != 1)
             SendErrorResponse(pbs, "Bad SHUTDOWN_NOW query");
-        else if (!ismaster)
+        else if (!m_ismaster)
         {
             QString halt_cmd;
             if (listline.size() >= 2)
@@ -1130,16 +1119,16 @@ void MainServer::customEvent(QEvent *e)
     QSet<QString> receivers;
 
     // delete stale sockets in the UI thread
-    sockListLock.lockForRead();
-    bool decrRefEmpty = decrRefSocketList.empty();
-    sockListLock.unlock();
+    m_sockListLock.lockForRead();
+    bool decrRefEmpty = m_decrRefSocketList.empty();
+    m_sockListLock.unlock();
     if (!decrRefEmpty)
     {
-        QWriteLocker locker(&sockListLock);
-        while (!decrRefSocketList.empty())
+        QWriteLocker locker(&m_sockListLock);
+        while (!m_decrRefSocketList.empty())
         {
-            (*decrRefSocketList.begin())->DecrRef();
-            decrRefSocketList.erase(decrRefSocketList.begin());
+            (*m_decrRefSocketList.begin())->DecrRef();
+            m_decrRefSocketList.erase(m_decrRefSocketList.begin());
         }
     }
 
@@ -1403,7 +1392,7 @@ void MainServer::customEvent(QEvent *e)
         {
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
-            if (!ismaster)
+            if (!m_ismaster)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "ADD_CHILD_INPUT event received in slave context");
             else if (tokens.size() != 2)
@@ -1475,7 +1464,7 @@ void MainServer::customEvent(QEvent *e)
             m_sched->ResetIdleTime();
 
         if (me->Message() == "LOCAL_RECONNECT_TO_MASTER")
-            masterServerReconnect->start(kMasterServerReconnectTimeout);
+            m_masterServerReconnect->start(kMasterServerReconnectTimeout);
 
         if (me->Message() == "LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE")
             HandleSlaveDisconnectedEvent(*me);
@@ -1549,17 +1538,16 @@ void MainServer::customEvent(QEvent *e)
     {
         // Make a local copy of the list, upping the refcount as we go..
         vector<PlaybackSock *> localPBSList;
-        sockListLock.lockForRead();
-        vector<PlaybackSock *>::iterator it = playbackList.begin();
-        for (; it != playbackList.end(); ++it)
+        m_sockListLock.lockForRead();
+        for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
         {
             (*it)->IncrRef();
             localPBSList.push_back(*it);
         }
-        sockListLock.unlock();
+        m_sockListLock.unlock();
 
         bool sendGlobal = false;
-        if (ismaster && broadcast[1].startsWith("GLOBAL_"))
+        if (m_ismaster && broadcast[1].startsWith("GLOBAL_"))
         {
             broadcast[1].replace("GLOBAL_", "LOCAL_");
             MythEvent me(broadcast[1], broadcast[2]);
@@ -1590,7 +1578,7 @@ void MainServer::customEvent(QEvent *e)
 
             if (broadcast[1] == "CLEAR_SETTINGS_CACHE")
             {
-                if ((ismaster) &&
+                if ((m_ismaster) &&
                     (pbs->isSlaveBackend() || pbs->wantsEvents()))
                     reallysendit = true;
             }
@@ -1731,8 +1719,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         return;
     }
 
-    sockListLock.lockForRead();
-    for (auto iter = playbackList.begin(); iter != playbackList.end(); ++iter)
+    m_sockListLock.lockForRead();
+    for (auto iter = m_playbackList.begin(); iter != m_playbackList.end(); ++iter)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->getSocket() == socket)
@@ -1742,11 +1730,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                         "multiple times.")
                     .arg(commands[2]));
             socket->WriteStringList(retlist);
-            sockListLock.unlock();
+            m_sockListLock.unlock();
             return;
         }
     }
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 
     if (commands[1] == "Playback" || commands[1] == "Monitor" ||
         commands[1] == "Frontend")
@@ -1768,12 +1756,12 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         PlaybackSockEventsMode eventsMode =
             (PlaybackSockEventsMode)commands[3].toInt();
 
-        QWriteLocker lock(&sockListLock);
-        if (!controlSocketList.remove(socket))
+        QWriteLocker lock(&m_sockListLock);
+        if (!m_controlSocketList.remove(socket))
             return; // socket was disconnected
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                              eventsMode);
-        playbackList.push_back(pbs);
+        m_playbackList.push_back(pbs);
         lock.unlock();
 
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("MainServer::ANN %1")
@@ -1790,14 +1778,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             pbs->SetAsFrontend();
             Frontend *frontend = new Frontend();
-            frontend->name = commands[2];
+            frontend->m_name = commands[2];
             // On a combined mbe/fe the frontend will connect using the localhost
             // address, we need the external IP which happily will be the same as
             // the backend's external IP
-            if (frontend->name == gCoreContext->GetMasterHostName())
-                frontend->ip = QHostAddress(gCoreContext->GetBackendServerIP());
+            if (frontend->m_name == gCoreContext->GetMasterHostName())
+                frontend->m_ip = QHostAddress(gCoreContext->GetBackendServerIP());
             else
-                frontend->ip = socket->GetPeerAddress();
+                frontend->m_ip = socket->GetPeerAddress();
             if (gBackendContext)
                 gBackendContext->SetFrontendConnected(frontend);
             else
@@ -1816,14 +1804,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
 
-        QWriteLocker lock(&sockListLock);
-        if (!controlSocketList.remove(socket))
+        QWriteLocker lock(&m_sockListLock);
+        if (!m_controlSocketList.remove(socket))
             return; // socket was disconnected
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                               kPBSEvents_Normal);
         pbs->setAsMediaServer();
         pbs->setBlockShutdown(false);
-        playbackList.push_back(pbs);
+        m_playbackList.push_back(pbs);
         lock.unlock();
 
         gCoreContext->SendSystemEvent(
@@ -1841,12 +1829,12 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
 
-        QWriteLocker lock(&sockListLock);
-        if (!controlSocketList.remove(socket))
+        QWriteLocker lock(&m_sockListLock);
+        if (!m_controlSocketList.remove(socket))
             return; // socket was disconnected
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                              kPBSEvents_None);
-        playbackList.push_back(pbs);
+        m_playbackList.push_back(pbs);
         lock.unlock();
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -1873,8 +1861,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         }
 
         bool wasAsleep = true;
-        TVRec::inputsLock.lockForRead();
-        for (auto iter = encoderList->begin(); iter != encoderList->end(); ++iter)
+        TVRec::s_inputsLock.lockForRead();
+        for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
         {
             EncoderLink *elink = *iter;
             if (elink->GetHostName() == commands[2])
@@ -1884,7 +1872,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 elink->SetSocket(pbs);
             }
         }
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
 
         if (!wasAsleep && m_sched)
             m_sched->ReschedulePlace("SlaveConnected");
@@ -1896,7 +1884,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         pbs->setBlockShutdown(false);
 
-        autoexpireUpdateTimer->start(1000);
+        m_autoexpireUpdateTimer->start(1000);
 
         gCoreContext->SendSystemEvent(
             QString("SLAVE_CONNECTED HOSTNAME %1").arg(commands[2]));
@@ -2017,15 +2005,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     return;
                 }
             }
-            QWriteLocker lock(&sockListLock);
-            if (!controlSocketList.remove(socket))
+            QWriteLocker lock(&m_sockListLock);
+            if (!m_controlSocketList.remove(socket))
                 return; // socket was disconnected
             ft = new FileTransfer(filename, socket, writemode);
         }
         else
         {
-            QWriteLocker lock(&sockListLock);
-            if (!controlSocketList.remove(socket))
+            QWriteLocker lock(&m_sockListLock);
+            if (!m_controlSocketList.remove(socket))
                 return; // socket was disconnected
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
         }
@@ -2045,7 +2033,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             QString("adding: %1(%2) as a file transfer")
                                       .arg(commands[2])
                                       .arg(quintptr(socket),0,16));
-        fileTransferList.push_back(ft);
+        m_fileTransferList.push_back(ft);
 
         retlist << QString::number(socket->GetSocketDescriptor());
         retlist << QString::number(ft->GetFileSize());
@@ -2110,10 +2098,10 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
     bool do_write = false;
     if (socket)
     {
-        sockListLock.lockForRead();
+        m_sockListLock.lockForRead();
         do_write = (GetPlaybackBySock(socket) ||
                     GetFileTransferBySock(socket));
-        sockListLock.unlock();
+        m_sockListLock.unlock();
     }
 
     if (do_write)
@@ -2182,7 +2170,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             slave = GetSlaveByHostname(proginfo->GetHostname());
 
         if ((proginfo->GetHostname() == gCoreContext->GetHostName()) ||
-            (!slave && masterBackendOverride))
+            (!slave && m_masterBackendOverride))
         {
             proginfo->SetPathname(gCoreContext->GenMythURL(host,port,proginfo->GetBasename()));
             if (!proginfo->GetFilesize())
@@ -2355,7 +2343,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     std::this_thread::sleep_for(std::chrono::seconds(3));
     std::this_thread::sleep_for(std::chrono::milliseconds(random()%2));
 
-    deletelock.lock();
+    m_deletelock.lock();
 
     QString logInfo = QString("recording id %1 (chanid %2 at %3)")
         .arg(ds->m_recordedid)
@@ -2374,7 +2362,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
             .arg(ds->m_recstartts.toString(Qt::ISODate));
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
-        deletelock.unlock();
+        m_deletelock.unlock();
         return;
     }
 
@@ -2389,7 +2377,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
             .arg(ds->m_recstartts.toString(Qt::ISODate));
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
-        deletelock.unlock();
+        m_deletelock.unlock();
         return;
     }
 
@@ -2406,7 +2394,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                 .arg(ds->m_filename));
 
         pginfo.SaveDeletePendingFlag(false);
-        deletelock.unlock();
+        m_deletelock.unlock();
         return;
     }
 
@@ -2453,7 +2441,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                     .arg(ds->m_filename));
 
         pginfo.SaveDeletePendingFlag(false);
-        deletelock.unlock();
+        m_deletelock.unlock();
         return;
     }
 
@@ -2488,7 +2476,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     DoDeleteInDB(ds);
 
-    deletelock.unlock();
+    m_deletelock.unlock();
 
     if (slowDeletes && fd >= 0)
         TruncateAndClose(&pginfo, fd, ds->m_filename, size);
@@ -2726,7 +2714,7 @@ int MainServer::OpenAndUnlink(const QString &filename)
 bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
                                   const QString &filename, off_t fsize)
 {
-    QMutexLocker locker(&truncate_and_close_lock);
+    QMutexLocker locker(&s_truncate_and_close_lock);
 
     if (pginfo)
     {
@@ -2808,7 +2796,7 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
 
     int result = 0;
 
-    if (ismaster && pginfo.GetHostname() != gCoreContext->GetHostName())
+    if (m_ismaster && pginfo.GetHostname() != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = GetSlaveByHostname(pginfo.GetHostname());
         if (slave)
@@ -2819,16 +2807,15 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
     }
     else
     {
-        TVRec::inputsLock.lockForRead();
-        QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-        for (; iter != encoderList->end(); ++iter)
+        TVRec::s_inputsLock.lockForRead();
+        for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
         {
             EncoderLink *elink = *iter;
 
             if (elink->IsLocal() && elink->MatchesRecording(&pginfo))
                 result = iter.key();
         }
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
     }
 
     QStringList outputlist( QString::number(result) );
@@ -2844,7 +2831,7 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
     RecordingInfo recinfo(it, slist.end());
     if (recinfo.GetChanID())
     {
-        if (ismaster)
+        if (m_ismaster)
         {
             // Stop recording may have been called for the same program on
             // different channel in the guide, we need to find the actual channel
@@ -2883,7 +2870,7 @@ void MainServer::DoHandleStopRecording(
     // change than I care to make during the 0.25 code freeze.
     recinfo.SetRecordingStatus(RecStatus::Unknown);
 
-    if (ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
+    if (m_ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = GetSlaveByHostname(recinfo.GetHostname());
 
@@ -2893,12 +2880,12 @@ void MainServer::DoHandleStopRecording(
 
             if (num > 0)
             {
-                TVRec::inputsLock.lockForRead();
-                if (encoderList->contains(num))
+                TVRec::s_inputsLock.lockForRead();
+                if (m_encoderList->contains(num))
                 {
-                    (*encoderList)[num]->StopRecording();
+                    (*m_encoderList)[num]->StopRecording();
                 }
-                TVRec::inputsLock.unlock();
+                TVRec::s_inputsLock.unlock();
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
@@ -2925,9 +2912,8 @@ void MainServer::DoHandleStopRecording(
 
     int recnum = -1;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
@@ -2943,14 +2929,14 @@ void MainServer::DoHandleStopRecording(
                 std::this_thread::sleep_for(std::chrono::microseconds(100));
             }
 
-            if (ismaster)
+            if (m_ismaster)
             {
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     if (pbssock)
     {
@@ -3053,7 +3039,7 @@ void MainServer::DoHandleDeleteRecording(
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
-    if (ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
+    if (m_ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = GetSlaveByHostname(recinfo.GetHostname());
 
@@ -3252,9 +3238,9 @@ bool MainServer::HandleAddChildInput(uint inputid)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("HandleAddChildInput: Handling input %1").arg(inputid));
 
-    TVRec::inputsLock.lockForWrite();
+    TVRec::s_inputsLock.lockForWrite();
 
-    if (ismaster)
+    if (m_ismaster)
     {
         // First, add the new input to the database.
         uint childid = CardUtil::AddChildInput(inputid);
@@ -3263,7 +3249,7 @@ bool MainServer::HandleAddChildInput(uint inputid)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("HandleAddChildInput: "
                         "Failed to add child to input %1").arg(inputid));
-            TVRec::inputsLock.unlock();
+            TVRec::s_inputsLock.unlock();
             m_addChildInputLock.unlock();
             return false;
         }
@@ -3289,11 +3275,11 @@ bool MainServer::HandleAddChildInput(uint inputid)
             }
 
             EncoderLink *enc = new EncoderLink(childid, tv);
-            (*encoderList)[childid] = enc;
+            (*m_encoderList)[childid] = enc;
         }
         else
         {
-            EncoderLink *enc = (*encoderList)[inputid];
+            EncoderLink *enc = (*m_encoderList)[inputid];
             if (!enc->AddChildInput(childid))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -3306,7 +3292,7 @@ bool MainServer::HandleAddChildInput(uint inputid)
             PlaybackSock *pbs = enc->GetSocket();
             enc = new EncoderLink(childid, nullptr, hostname);
             enc->SetSocket(pbs);
-            (*encoderList)[childid] = enc;
+            (*m_encoderList)[childid] = enc;
         }
 
         // Finally, add the new input to the Scheduler.
@@ -3326,10 +3312,10 @@ bool MainServer::HandleAddChildInput(uint inputid)
         }
 
         EncoderLink *enc = new EncoderLink(inputid, tv);
-        (*encoderList)[inputid] = enc;
+        (*m_encoderList)[inputid] = enc;
     }
 
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
     m_addChildInputLock.unlock();
 
     LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -3398,19 +3384,19 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
 
     if (allHosts)
     {
-        QMutexLocker locker(&masterFreeSpaceListLock);
-        strlist = masterFreeSpaceList;
-        if (!masterFreeSpaceListUpdater ||
-            !masterFreeSpaceListUpdater->KeepRunning(true))
+        QMutexLocker locker(&m_masterFreeSpaceListLock);
+        strlist = m_masterFreeSpaceList;
+        if (!m_masterFreeSpaceListUpdater ||
+            !m_masterFreeSpaceListUpdater->KeepRunning(true))
         {
-            while (masterFreeSpaceListUpdater)
+            while (m_masterFreeSpaceListUpdater)
             {
-                masterFreeSpaceListUpdater->KeepRunning(false);
-                masterFreeSpaceListWait.wait(locker.mutex());
+                m_masterFreeSpaceListUpdater->KeepRunning(false);
+                m_masterFreeSpaceListWait.wait(locker.mutex());
             }
-            masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
+            m_masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
             MThreadPool::globalInstance()->startReserved(
-                masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+                m_masterFreeSpaceListUpdater, "FreeSpaceUpdater");
         }
     }
     else
@@ -3428,19 +3414,19 @@ void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
 {
     QStringList strlist;
     {
-        QMutexLocker locker(&masterFreeSpaceListLock);
-        strlist = masterFreeSpaceList;
-        if (!masterFreeSpaceListUpdater ||
-            !masterFreeSpaceListUpdater->KeepRunning(true))
+        QMutexLocker locker(&m_masterFreeSpaceListLock);
+        strlist = m_masterFreeSpaceList;
+        if (!m_masterFreeSpaceListUpdater ||
+            !m_masterFreeSpaceListUpdater->KeepRunning(true))
         {
-            while (masterFreeSpaceListUpdater)
+            while (m_masterFreeSpaceListUpdater)
             {
-                masterFreeSpaceListUpdater->KeepRunning(false);
-                masterFreeSpaceListWait.wait(locker.mutex());
+                m_masterFreeSpaceListUpdater->KeepRunning(false);
+                m_masterFreeSpaceListWait.wait(locker.mutex());
             }
-            masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
+            m_masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
             MThreadPool::globalInstance()->startReserved(
-                masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+                m_masterFreeSpaceListUpdater, "FreeSpaceUpdater");
         }
     }
 
@@ -3581,7 +3567,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
     int exists = 0;
 
-    if (recinfo.HasPathname() && (ismaster) &&
+    if (recinfo.HasPathname() && (m_ismaster) &&
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
         (checkSlaves))
     {
@@ -3791,7 +3777,7 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
             m_sched->GetAllPending(strList);
         else
         {
-            Scheduler *sched = new Scheduler(false, encoderList,
+            Scheduler *sched = new Scheduler(false, m_encoderList,
                                              tmptable, m_sched);
             sched->FillRecordListFromDB(recordid);
             sched->GetAllPending(strList);
@@ -4061,7 +4047,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
 
     // if we still haven't found it and this is the master and fallback is enabled
     // check all other slaves that have a directory in the storagegroup
-    if (ismaster && fileList.isEmpty() && allowFallback)
+    if (m_ismaster && fileList.isEmpty() && allowFallback)
     {
         // get a list of hosts
         MSqlQuery query(MSqlQuery::InitCon());
@@ -4241,9 +4227,8 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
     EncoderLink *encoder = nullptr;
     QString enchost;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
@@ -4265,7 +4250,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
             break;
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     if (encoder)
     {
@@ -4322,9 +4307,9 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
     QStringList strlist;
     EncoderLink *encoder = nullptr;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(cardid);
-    if (iter == encoderList->end())
+    TVRec::s_inputsLock.lockForRead();
+    auto iter = m_encoderList->find(cardid);
+    if (iter == m_encoderList->end())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "MainServer::HandleFreeTuner() " +
             QString("Unknown encoder: %1").arg(cardid));
@@ -4344,16 +4329,16 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
 
         strlist << "OK";
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     SendResponse(pbssock, strlist);
 }
 
 static bool comp_livetvorder(const InputInfo &a, const InputInfo &b)
 {
-    if (a.livetvorder != b.livetvorder)
-        return a.livetvorder < b.livetvorder;
-    return a.inputid < b.inputid;
+    if (a.m_livetvorder != b.m_livetvorder)
+        return a.m_livetvorder < b.m_livetvorder;
+    return a.m_inputid < b.m_inputid;
 }
 
 void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
@@ -4370,46 +4355,45 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
 
     // Lopp over each encoder and divide the inputs into busy and free
     // lists.
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
         InputInfo info;
-        info.inputid = elink->GetInputID();
+        info.m_inputid = elink->GetInputID();
 
         if (!elink->IsConnected() || elink->IsTunerLocked())
         {
             LOG(VB_CHANNEL, LOG_INFO,
                 LOC + QString("Input %1 is locked or not connected")
-                .arg(info.inputid));
+                .arg(info.m_inputid));
             continue;
         }
 
         vector<uint> infogroups;
         CardUtil::GetInputInfo(info, &infogroups);
         for (uint i = 0; i < infogroups.size(); ++i)
-            groupids[info.inputid].insert(infogroups[i]);
+            groupids[info.m_inputid].insert(infogroups[i]);
 
         InputInfo busyinfo;
-        if (info.inputid != excluded_input && elink->IsBusy(&busyinfo))
+        if (info.m_inputid != excluded_input && elink->IsBusy(&busyinfo))
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is busy on %2/%3")
-                .arg(info.inputid).arg(busyinfo.chanid).arg(busyinfo.mplexid));
-            info.chanid = busyinfo.chanid;
-            info.mplexid = busyinfo.mplexid;
+                .arg(info.m_inputid).arg(busyinfo.m_chanid).arg(busyinfo.m_mplexid));
+            info.m_chanid = busyinfo.m_chanid;
+            info.m_mplexid = busyinfo.m_mplexid;
             busyinputs.push_back(info);
         }
-        else if (info.livetvorder)
+        else if (info.m_livetvorder)
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is free")
-                .arg(info.inputid));
+                .arg(info.m_inputid));
             freeinputs.push_back(info);
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     // Loop over each busy input and restrict or delete any free
     // inputs that are in the same group.
@@ -4423,28 +4407,28 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
         {
             InputInfo &freeinfo = *freeiter;
 
-            if ((groupids[busyinfo.inputid] & groupids[freeinfo.inputid])
+            if ((groupids[busyinfo.m_inputid] & groupids[freeinfo.m_inputid])
                 .isEmpty())
             {
                 ++freeiter;
                 continue;
             }
 
-            if (busyinfo.sourceid == freeinfo.sourceid)
+            if (busyinfo.m_sourceid == freeinfo.m_sourceid)
             {
                 LOG(VB_CHANNEL, LOG_DEBUG,
                     LOC + QString("Input %1 is limited to %2/%3 by input %4")
-                    .arg(freeinfo.inputid).arg(busyinfo.chanid)
-                    .arg(busyinfo.mplexid).arg(busyinfo.inputid));
-                freeinfo.chanid = busyinfo.chanid;
-                freeinfo.mplexid = busyinfo.mplexid;
+                    .arg(freeinfo.m_inputid).arg(busyinfo.m_chanid)
+                    .arg(busyinfo.m_mplexid).arg(busyinfo.m_inputid));
+                freeinfo.m_chanid = busyinfo.m_chanid;
+                freeinfo.m_mplexid = busyinfo.m_mplexid;
                 ++freeiter;
                 continue;
             }
 
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is unavailable by input %2")
-                .arg(freeinfo.inputid).arg(busyinfo.inputid));
+                .arg(freeinfo.m_inputid).arg(busyinfo.m_inputid));
             freeiter = freeinputs.erase(freeiter);
         }
     }
@@ -4456,8 +4440,8 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     {
         LOG(VB_CHANNEL, LOG_INFO,
             LOC + QString("Input %1 is available on %2/%3")
-            .arg(freeinputs[i].inputid).arg(freeinputs[i].chanid)
-            .arg(freeinputs[i].mplexid));
+            .arg(freeinputs[i].m_inputid).arg(freeinputs[i].m_chanid)
+            .arg(freeinputs[i].m_mplexid));
         freeinputs[i].ToStringList(strlist);
     }
 
@@ -4491,18 +4475,18 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
     int recnum = commands[1].toInt();
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
-    if (iter == encoderList->end())
+    TVRec::s_inputsLock.lockForRead();
+    auto iter = m_encoderList->find(recnum);
+    if (iter == m_encoderList->end())
     {
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC + "MainServer::HandleRecorderQuery() " +
             QString("Unknown encoder: %1").arg(recnum));
         QStringList retlist( "bad" );
         SendResponse(pbssock, retlist);
         return;
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     QString command = slist[1];
 
@@ -4859,18 +4843,18 @@ void MainServer::HandleSetNextLiveTVDir(QStringList &commands,
 
     int recnum = commands[1].toInt();
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
-    if (iter == encoderList->end())
+    TVRec::s_inputsLock.lockForRead();
+    auto iter = m_encoderList->find(recnum);
+    if (iter == m_encoderList->end())
     {
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC + "MainServer::HandleSetNextLiveTVDir() " +
             QString("Unknown encoder: %1").arg(recnum));
         QStringList retlist( "bad" );
         SendResponse(pbssock, retlist);
         return;
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     EncoderLink *enc = *iter;
     enc->SetNextLiveTVDir(commands[2]);
@@ -4899,9 +4883,8 @@ void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
         return;
     }
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::iterator it = encoderList->begin();
-    for (; it != encoderList->end(); ++it)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto it = m_encoderList->begin(); it != m_encoderList->end(); ++it)
     {
         if (*it)
         {
@@ -4909,7 +4892,7 @@ void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
                                         callsign, channum, channame, xmltv);
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     retlist << ((ok) ? "1" : "0");
     SendResponse(pbssock, retlist);
@@ -4923,11 +4906,11 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     int recnum = commands[1].toInt();
     QStringList retlist;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
-    if (iter == encoderList->end())
+    TVRec::s_inputsLock.lockForRead();
+    auto iter = m_encoderList->find(recnum);
+    if (iter == m_encoderList->end())
     {
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("HandleRemoteEncoder(cmd %1) ").arg(slist[1]) +
             QString("Unknown encoder: %1").arg(recnum));
@@ -4935,7 +4918,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         SendResponse(pbssock, retlist);
         return;
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     EncoderLink *enc = *iter;
 
@@ -5039,9 +5022,8 @@ void MainServer::GetActiveBackends(QStringList &hosts)
     hosts << gCoreContext->GetHostName();
 
     QString hostname;
-    QReadLocker rlock(&sockListLock);
-    vector<PlaybackSock*>::iterator it;
-    for (it = playbackList.begin(); it != playbackList.end(); ++it)
+    QReadLocker rlock(&m_sockListLock);
+    for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
     {
         if ((*it)->isMediaServer())
         {
@@ -5086,20 +5068,19 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
 int MainServer::GetfsID(QList<FileSystemInfo>::iterator fsInfo)
 {
     QString fskey = fsInfo->getHostname() + ":" + fsInfo->getPath();
-    QMutexLocker lock(&fsIDcacheLock);
-    if (!fsIDcache.contains(fskey))
-        fsIDcache[fskey] = fsIDcache.count();
+    QMutexLocker lock(&m_fsIDcacheLock);
+    if (!m_fsIDcache.contains(fskey))
+        m_fsIDcache[fskey] = m_fsIDcache.count();
 
-    return fsIDcache[fskey];
+    return m_fsIDcache[fskey];
 }
 
 size_t MainServer::GetCurrentMaxBitrate(void)
 {
     size_t totalKBperMin = 0;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink*>::iterator it = encoderList->begin();
-    for (; it != encoderList->end(); ++it)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto it = m_encoderList->begin(); it != m_encoderList->end(); ++it)
     {
         EncoderLink *enc = *it;
 
@@ -5114,7 +5095,7 @@ size_t MainServer::GetCurrentMaxBitrate(void)
         LOG(VB_FILE, LOG_INFO, LOC + QString("Cardid %1: max bitrate %2 KB/min")
                 .arg(enc->GetInputID()).arg(thisKBperMin));
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("Maximal bitrate of busy encoders is %1 KB/min")
@@ -5227,10 +5208,9 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 
         list<PlaybackSock *> localPlaybackList;
 
-        sockListLock.lockForRead();
+        m_sockListLock.lockForRead();
 
-        vector<PlaybackSock *>::iterator pbsit = playbackList.begin();
-        for (; pbsit != playbackList.end(); ++pbsit)
+        for (auto pbsit = m_playbackList.begin(); pbsit != m_playbackList.end(); ++pbsit)
         {
             PlaybackSock *pbs = *pbsit;
 
@@ -5246,7 +5226,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             allHostList += "," + pbs->getHostname();
         }
 
-        sockListLock.unlock();
+        m_sockListLock.unlock();
 
         for (list<PlaybackSock *>::iterator p = localPlaybackList.begin() ;
              p != localPlaybackList.end() ; ++p) {
@@ -5353,8 +5333,8 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
     // Return cached information if requested.
     if (useCache)
     {
-        QMutexLocker locker(&fsInfosCacheLock);
-        fsInfos = fsInfosCache;
+        QMutexLocker locker(&m_fsInfosCacheLock);
+        fsInfos = m_fsInfosCache;
         return;
     }
 
@@ -5428,8 +5408,8 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
     }
 
     // Save these results to the cache.
-    QMutexLocker locker(&fsInfosCacheLock);
-    fsInfosCache = fsInfos;
+    QMutexLocker locker(&m_fsInfosCacheLock);
+    m_fsInfosCache = fsInfos;
 }
 
 void MainServer::HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
@@ -5482,12 +5462,12 @@ void MainServer::HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
     MThreadPool::globalInstance()->start(renamer, "Rename");
 }
 
-QMutex RenameThread::m_renamelock;
+QMutex RenameThread::s_renamelock;
 
 void RenameThread::run()
 {
     // Only permit one rename to run at any time
-    QMutexLocker lock(&m_renamelock);
+    QMutexLocker lock(&s_renamelock);
     LOG(VB_FILE, LOG_INFO, QString("MainServer::RenameThread: Renaming %1 -> %2")
         .arg(m_src, m_dst));
 
@@ -5520,7 +5500,7 @@ void MainServer::DoTruncateThread(DeleteStruct *ds)
     }
     else
     {
-        QMutexLocker dl(&deletelock);
+        QMutexLocker dl(&m_deletelock);
         close(ds->m_fd);
     }
 }
@@ -5884,11 +5864,11 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
 
     QStringList retlist;
 
-    if (metadatafactory)
+    if (m_metadatafactory)
     {
         QStringList hosts;
         GetActiveBackends(hosts);
-        metadatafactory->VideoScan(hosts);
+        m_metadatafactory->VideoScan(hosts);
         retlist << "OK";
     }
     else
@@ -5904,7 +5884,7 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
 
     QStringList strlist;
 
-    if (ismaster)
+    if (m_ismaster)
     {
         // get a list of hosts with a directory defined for the 'Music' storage group
         MSqlQuery query(MSqlQuery::InitCon());
@@ -5977,7 +5957,7 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6041,7 +6021,7 @@ void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock 
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6103,7 +6083,7 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6193,7 +6173,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6266,11 +6246,11 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         {
             fi.setFile(files.at(x));
             AlbumArtImage *image = new AlbumArtImage();
-            image->filename = startDir + '/' + fi.fileName();
-            image->hostname = gCoreContext->GetHostName();
-            image->embedded = false;
-            image->imageType = AlbumArtImages::guessImageType(image->filename);
-            image->description = "";
+            image->m_filename = startDir + '/' + fi.fileName();
+            image->m_hostname = gCoreContext->GetHostName();
+            image->m_embedded = false;
+            image->m_imageType = AlbumArtImages::guessImageType(image->m_filename);
+            image->m_description = "";
             images->addImage(image);
             delete image;
         }
@@ -6286,7 +6266,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
                 for (int x = 0; x < artList.count(); x++)
                 {
                     AlbumArtImage *image = artList.at(x);
-                    image->filename = QString("%1-%2").arg(mdata->ID()).arg(image->filename);
+                    image->m_filename = QString("%1-%2").arg(mdata->ID()).arg(image->m_filename);
                     images->addImage(image);
                 }
             }
@@ -6310,19 +6290,19 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         for (uint x = 0; x < images->getImageCount(); x++)
         {
             AlbumArtImage *image = images->getImageAt(x);
-            strlist.append(QString("%1").arg(image->id));
-            strlist.append(QString("%1").arg((int)image->imageType));
-            strlist.append(QString("%1").arg(image->embedded));
-            strlist.append(image->description);
-            strlist.append(image->filename);
-            strlist.append(image->hostname);
+            strlist.append(QString("%1").arg(image->m_id));
+            strlist.append(QString("%1").arg((int)image->m_imageType));
+            strlist.append(QString("%1").arg(image->m_embedded));
+            strlist.append(image->m_description);
+            strlist.append(image->m_filename);
+            strlist.append(image->m_hostname);
 
             // if this is an embedded image update the cached image
-            if (image->embedded)
+            if (image->m_embedded)
             {
                 QStringList paramList;
                 paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-                paramList.append(QString("--imagetype='%1'").arg(image->imageType));
+                paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
 
                 QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
                 QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
@@ -6351,7 +6331,7 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
     QString songid = slist[2];
     QString imagetype = slist[3];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6405,7 +6385,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6468,9 +6448,9 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
         {
             AlbumArtImage oldImage = *image;
 
-            image->imageType = newType;
+            image->m_imageType = newType;
 
-            if (image->imageType == oldImage.imageType)
+            if (image->m_imageType == oldImage.m_imageType)
             {
                 // nothing to change
                 strlist << "OK";
@@ -6484,14 +6464,14 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
             }
 
             // rename any cached image to match the new type
-            if (image->embedded)
+            if (image->m_embedded)
             {
                 // change the image type in the tag if it supports it
                 MetaIO *tagger = mdata->getTagger();
 
                 if (tagger && tagger->supportsEmbeddedImages())
                 {
-                    if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->imageType))
+                    if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->m_imageType))
                     {
                         LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
 
@@ -6512,26 +6492,26 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
                 // update the new cached image filename
                 StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
-                oldImage.filename = artGroup.FindFile("AlbumArt/" + image->filename);
+                oldImage.m_filename = artGroup.FindFile("AlbumArt/" + image->m_filename);
 
-                QFileInfo fi(oldImage.filename);
-                image->filename = fi.path() + QString("/%1-%2.jpg")
+                QFileInfo fi(oldImage.m_filename);
+                image->m_filename = fi.path() + QString("/%1-%2.jpg")
                                           .arg(mdata->ID())
-                                          .arg(AlbumArtImages::getTypeFilename(image->imageType));
+                                          .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
 
                 // remove any old cached file with the same name as the new one
-                if (QFile::exists(image->filename))
-                    QFile::remove(image->filename);
+                if (QFile::exists(image->m_filename))
+                    QFile::remove(image->m_filename);
 
                 // rename the old cached file to the new one
-                if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
-                    QFile::rename(oldImage.filename, image->filename);
+                if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
+                    QFile::rename(oldImage.m_filename, image->m_filename);
                 else
                 {
                     // extract the image from the tag and cache it
                     QStringList paramList;
                     paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-                    paramList.append(QString("--imagetype='%1'").arg(image->imageType));
+                    paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
 
                     QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
 
@@ -6543,18 +6523,18 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
             }
             else
             {
-                QFileInfo fi(oldImage.filename);
+                QFileInfo fi(oldImage.m_filename);
 
                 // get the new images filename
-                image->filename = fi.absolutePath() + QString("/%1.jpg")
-                        .arg(AlbumArtImages::getTypeFilename(image->imageType));
+                image->m_filename = fi.absolutePath() + QString("/%1.jpg")
+                        .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
 
-                if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
+                if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
                 {
                     // remove any old cached file with the same name as the new one
-                    QFile::remove(image->filename);
+                    QFile::remove(image->m_filename);
                     // rename the old cached file to the new one
-                    QFile::rename(oldImage.filename, image->filename);
+                    QFile::rename(oldImage.m_filename, image->m_filename);
                 }
             }
         }
@@ -6578,7 +6558,7 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6692,8 +6672,8 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
         }
 
         AlbumArtImage image;
-        image.filename = imageFilename;
-        image.imageType = imageType;
+        image.m_filename = imageFilename;
+        image.m_imageType = imageType;
 
         if (!tagger->writeAlbumArt(mdata->getLocalFilename(), &image))
         {
@@ -6738,7 +6718,7 @@ void MainServer::HandleMusicTagRemoveImage(const QStringList& slist, PlaybackSoc
 
     QString hostname = slist[1];
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -6881,7 +6861,7 @@ void MainServer::HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *p
         title = slist[6];
     }
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -7048,7 +7028,7 @@ void MainServer::HandleMusicSaveLyrics(const QStringList& slist, PlaybackSock* p
     QString hostname = slist[1];
     int songID = slist[2].toInt();
 
-    if (ismaster && !gCoreContext->IsThisHost(hostname))
+    if (m_ismaster && !gCoreContext->IsThisHost(hostname))
     {
         // forward the request to the slave BE
         PlaybackSock *slave = GetMediaServerByHostname(hostname);
@@ -7121,7 +7101,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
     QStringList retlist;
 
-    sockListLock.lockForRead();
+    m_sockListLock.lockForRead();
     FileTransfer *ft = GetFileTransferByID(recnum);
     if (!ft)
     {
@@ -7139,13 +7119,13 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
                                .arg(recnum);
         }
 
-        sockListLock.unlock();
+        m_sockListLock.unlock();
         SendResponse(pbssock, retlist);
         return;
     }
 
     ft->IncrRef();
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 
     if (command == "REQUEST_BLOCK")
     {
@@ -7218,9 +7198,8 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
 
     EncoderLink *encoder = nullptr;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
@@ -7230,7 +7209,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
             encoder = elink;
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     QStringList strlist( QString::number(retval) );
 
@@ -7265,11 +7244,11 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
     EncoderLink *encoder = nullptr;
     QStringList strlist;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recordernum);
-    if (iter != encoderList->end())
+    TVRec::s_inputsLock.lockForRead();
+    auto iter = m_encoderList->find(recordernum);
+    if (iter != m_encoderList->end())
         encoder =  (*iter);
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     if (encoder && encoder->IsConnected())
     {
@@ -7390,9 +7369,8 @@ void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
     int LiveTVRecordingsInProgress = 0;
     QStringList retlist;
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
         if (elink->IsBusyRecording()) {
@@ -7405,7 +7383,7 @@ void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
             delete info;
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     retlist << QString::number(RecordingsInProgress);
     retlist << QString::number(LiveTVRecordingsInProgress);
@@ -7495,9 +7473,9 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     m_previewRequestedBy[token] = pbs->getHostname();
 
-    if ((ismaster) &&
+    if ((m_ismaster) &&
         (pginfo.GetHostname() != gCoreContext->GetHostName()) &&
-        (!masterBackendOverride || !pginfo.IsLocal()))
+        (!m_masterBackendOverride || !pginfo.IsLocal()))
     {
         PlaybackSock *slave = GetSlaveByHostname(pginfo.GetHostname());
 
@@ -7566,9 +7544,9 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     QStringList strlist;
 
-    if (ismaster &&
+    if (m_ismaster &&
         (pginfo.GetHostname() != gCoreContext->GetHostName()) &&
-        (!masterBackendOverride || !pginfo.IsLocal()))
+        (!m_masterBackendOverride || !pginfo.IsLocal()))
     {
         PlaybackSock *slave = GetSlaveByHostname(pginfo.GetHostname());
 
@@ -7746,7 +7724,7 @@ void MainServer::HandlePixmapGetIfModified(
     }
 
     // handle remote ...
-    if (ismaster && pginfo.GetHostname() != gCoreContext->GetHostName())
+    if (m_ismaster && pginfo.GetHostname() != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = GetSlaveByHostname(pginfo.GetHostname());
         if (!slave)
@@ -7791,19 +7769,19 @@ void MainServer::HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs)
 
 void MainServer::deferredDeleteSlot(void)
 {
-    QMutexLocker lock(&deferredDeleteLock);
+    QMutexLocker lock(&m_deferredDeleteLock);
 
-    if (deferredDeleteList.empty())
+    if (m_deferredDeleteList.empty())
         return;
 
-    DeferredDeleteStruct dds = deferredDeleteList.front();
+    DeferredDeleteStruct dds = m_deferredDeleteList.front();
     while (dds.ts.secsTo(MythDate::current()) > 30)
     {
         dds.sock->DecrRef();
-        deferredDeleteList.pop_front();
-        if (deferredDeleteList.empty())
+        m_deferredDeleteList.pop_front();
+        if (m_deferredDeleteList.empty())
             return;
-        dds = deferredDeleteList.front();
+        dds = m_deferredDeleteList.front();
     }
 }
 
@@ -7813,8 +7791,8 @@ void MainServer::DeletePBS(PlaybackSock *sock)
     dds.sock = sock;
     dds.ts = MythDate::current();
 
-    QMutexLocker lock(&deferredDeleteLock);
-    deferredDeleteList.push_back(dds);
+    QMutexLocker lock(&m_deferredDeleteLock);
+    m_deferredDeleteList.push_back(dds);
 }
 
 #undef QT_NO_DEBUG
@@ -7825,23 +7803,22 @@ void MainServer::connectionClosed(MythSocket *socket)
     if (m_stopped)
         return;
 
-    sockListLock.lockForWrite();
+    m_sockListLock.lockForWrite();
 
     // make sure these are not actually deleted in the callback
     socket->IncrRef();
-    decrRefSocketList.push_back(socket);
+    m_decrRefSocketList.push_back(socket);
 
-    vector<PlaybackSock *>::iterator it = playbackList.begin();
-    for (; it != playbackList.end(); ++it)
+    for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
     {
         PlaybackSock *pbs = (*it);
         MythSocket *sock = pbs->getSocket();
-        if (sock == socket && pbs == masterServer)
+        if (sock == socket && pbs == m_masterServer)
         {
-            playbackList.erase(it);
-            sockListLock.unlock();
-            masterServer->DecrRef();
-            masterServer = nullptr;
+            m_playbackList.erase(it);
+            m_sockListLock.unlock();
+            m_masterServer->DecrRef();
+            m_masterServer = nullptr;
             MythEvent me("LOCAL_RECONNECT_TO_MASTER");
             gCoreContext->dispatch(me);
             return;
@@ -7851,16 +7828,15 @@ void MainServer::connectionClosed(MythSocket *socket)
             QList<uint> disconnectedSlaves;
             bool needsReschedule = false;
 
-            if (ismaster && pbs->isSlaveBackend())
+            if (m_ismaster && pbs->isSlaveBackend())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Slave backend: %1 no longer connected")
                         .arg(pbs->getHostname()));
 
                 bool isFallingAsleep = true;
-                TVRec::inputsLock.lockForRead();
-                QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-                for (; iter != encoderList->end(); ++iter)
+                TVRec::s_inputsLock.lockForRead();
+                for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
                 {
                     EncoderLink *elink = *iter;
                     if (elink->GetSocket() == pbs)
@@ -7873,7 +7849,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                             disconnectedSlaves.push_back(elink->GetInputID());
                     }
                 }
-                TVRec::inputsLock.unlock();
+                TVRec::s_inputsLock.unlock();
                 if (m_sched && !isFallingAsleep)
                     needsReschedule = true;
 
@@ -7889,7 +7865,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                     QString("SLAVE_DISCONNECTED HOSTNAME %1")
                             .arg(pbs->getHostname()));
             }
-            else if (ismaster && pbs->IsFrontend())
+            else if (m_ismaster && pbs->IsFrontend())
             {
                 if (gBackendContext)
                     gBackendContext->SetFrontendDisconnected(pbs->getHostname());
@@ -7901,8 +7877,8 @@ void MainServer::connectionClosed(MythSocket *socket)
                 chain->DelHostSocket(sock);
                 if (chain->HostSocketCount() == 0)
                 {
-                    TVRec::inputsLock.lockForRead();
-                    for (auto it2 = encoderList->begin(); it2 != encoderList->end(); ++it2)
+                    TVRec::s_inputsLock.lockForRead();
+                    for (auto it2 = m_encoderList->begin(); it2 != m_encoderList->end(); ++it2)
                     {
                         EncoderLink *enc = *it2;
                         if (enc->IsLocal())
@@ -7917,7 +7893,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                             }
                         }
                     }
-                    TVRec::inputsLock.unlock();
+                    TVRec::s_inputsLock.unlock();
                     DeleteChain(chain);
                 }
             }
@@ -7927,7 +7903,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                 .arg(quintptr(socket),0,16)
                 .arg(pbs->getHostname()) );
             pbs->SetDisconnected();
-            playbackList.erase(it);
+            m_playbackList.erase(it);
 
             PlaybackSock *testsock = GetPlaybackBySock(socket);
             if (testsock)
@@ -7935,7 +7911,7 @@ void MainServer::connectionClosed(MythSocket *socket)
 
             pbs->DecrRef();
 
-            sockListLock.unlock();
+            m_sockListLock.unlock();
 
             // Since we may already be holding the scheduler lock
             // delay handling the disconnect until a little later. #9885
@@ -7957,8 +7933,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         }
     }
 
-    vector<FileTransfer *>::iterator ft = fileTransferList.begin();
-    for (; ft != fileTransferList.end(); ++ft)
+    for (auto ft = m_fileTransferList.begin(); ft != m_fileTransferList.end(); ++ft)
     {
         MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
@@ -7966,26 +7941,26 @@ void MainServer::connectionClosed(MythSocket *socket)
             LOG(VB_GENERAL, LOG_INFO, QString("FileTransfer sock(%1) disconnected")
                 .arg(quintptr(socket),0,16) );
             (*ft)->DecrRef();
-            fileTransferList.erase(ft);
-            sockListLock.unlock();
+            m_fileTransferList.erase(ft);
+            m_sockListLock.unlock();
             UpdateSystemdStatus();
             return;
         }
     }
 
-    QSet<MythSocket*>::iterator cs = controlSocketList.find(socket);
-    if (cs != controlSocketList.end())
+    QSet<MythSocket*>::iterator cs = m_controlSocketList.find(socket);
+    if (cs != m_controlSocketList.end())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Control sock(%1) disconnected")
             .arg(quintptr(socket),0,16) );
         (*cs)->DecrRef();
-        controlSocketList.erase(cs);
-        sockListLock.unlock();
+        m_controlSocketList.erase(cs);
+        m_sockListLock.unlock();
         UpdateSystemdStatus();
         return;
     }
 
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 
     LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("Unknown socket closing MythSocket(0x%1)")
@@ -7995,38 +7970,36 @@ void MainServer::connectionClosed(MythSocket *socket)
 
 PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
 {
-    if (!ismaster)
+    if (!m_ismaster)
         return nullptr;
 
-    sockListLock.lockForRead();
+    m_sockListLock.lockForRead();
 
-    vector<PlaybackSock *>::iterator iter = playbackList.begin();
-    for (; iter != playbackList.end(); ++iter)
+    for (auto iter = m_playbackList.begin(); iter != m_playbackList.end(); ++iter)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
             gCoreContext->IsThisHost(hostname, pbs->getHostname()))
         {
-            sockListLock.unlock();
+            m_sockListLock.unlock();
             pbs->IncrRef();
             return pbs;
         }
     }
 
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 
     return nullptr;
 }
 
 PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
 {
-    if (!ismaster)
+    if (!m_ismaster)
         return nullptr;
 
-    QReadLocker rlock(&sockListLock);
+    QReadLocker rlock(&m_sockListLock);
 
-    vector<PlaybackSock *>::iterator iter = playbackList.begin();
-    for (; iter != playbackList.end(); ++iter)
+    for (auto iter = m_playbackList.begin(); iter != m_playbackList.end(); ++iter)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isMediaServer() &&
@@ -8045,8 +8018,7 @@ PlaybackSock *MainServer::GetPlaybackBySock(MythSocket *sock)
 {
     PlaybackSock *retval = nullptr;
 
-    vector<PlaybackSock *>::iterator it = playbackList.begin();
-    for (; it != playbackList.end(); ++it)
+    for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
     {
         if (sock == (*it)->getSocket())
         {
@@ -8063,8 +8035,7 @@ FileTransfer *MainServer::GetFileTransferByID(int id)
 {
     FileTransfer *retval = nullptr;
 
-    vector<FileTransfer *>::iterator it = fileTransferList.begin();
-    for (; it != fileTransferList.end(); ++it)
+    for (auto it = m_fileTransferList.begin(); it != m_fileTransferList.end(); ++it)
     {
         if (id == (*it)->getSocket()->GetSocketDescriptor())
         {
@@ -8081,8 +8052,7 @@ FileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
 {
     FileTransfer *retval = nullptr;
 
-    vector<FileTransfer *>::iterator it = fileTransferList.begin();
-    for (; it != fileTransferList.end(); ++it)
+    for (auto it = m_fileTransferList.begin(); it != m_fileTransferList.end(); ++it)
     {
         if (sock == (*it)->getSocket())
         {
@@ -8096,10 +8066,9 @@ FileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
 
 LiveTVChain *MainServer::GetExistingChain(const QString &id)
 {
-    QMutexLocker lock(&liveTVChainsLock);
+    QMutexLocker lock(&m_liveTVChainsLock);
 
-    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
-    for (; it != liveTVChains.end(); ++it)
+    for (auto it = m_liveTVChains.begin(); it != m_liveTVChains.end(); ++it)
     {
         if ((*it)->GetID() == id)
             return *it;
@@ -8110,10 +8079,9 @@ LiveTVChain *MainServer::GetExistingChain(const QString &id)
 
 LiveTVChain *MainServer::GetExistingChain(const MythSocket *sock)
 {
-    QMutexLocker lock(&liveTVChainsLock);
+    QMutexLocker lock(&m_liveTVChainsLock);
 
-    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
-    for (; it != liveTVChains.end(); ++it)
+    for (auto it = m_liveTVChains.begin(); it != m_liveTVChains.end(); ++it)
     {
         if ((*it)->IsHostSocket(sock))
             return *it;
@@ -8124,10 +8092,9 @@ LiveTVChain *MainServer::GetExistingChain(const MythSocket *sock)
 
 LiveTVChain *MainServer::GetChainWithRecording(const ProgramInfo &pginfo)
 {
-    QMutexLocker lock(&liveTVChainsLock);
+    QMutexLocker lock(&m_liveTVChainsLock);
 
-    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
-    for (; it != liveTVChains.end(); ++it)
+    for (auto it = m_liveTVChains.begin(); it != m_liveTVChains.end(); ++it)
     {
         if ((*it)->ProgramIsAt(pginfo) >= 0)
             return *it;
@@ -8138,28 +8105,27 @@ LiveTVChain *MainServer::GetChainWithRecording(const ProgramInfo &pginfo)
 
 void MainServer::AddToChains(LiveTVChain *chain)
 {
-    QMutexLocker lock(&liveTVChainsLock);
+    QMutexLocker lock(&m_liveTVChainsLock);
 
     if (chain)
-        liveTVChains.push_back(chain);
+        m_liveTVChains.push_back(chain);
 }
 
 void MainServer::DeleteChain(LiveTVChain *chain)
 {
-    QMutexLocker lock(&liveTVChainsLock);
+    QMutexLocker lock(&m_liveTVChainsLock);
 
     if (!chain)
         return;
 
     vector<LiveTVChain*> newChains;
 
-    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
-    for (; it != liveTVChains.end(); ++it)
+    for (auto it = m_liveTVChains.begin(); it != m_liveTVChains.end(); ++it)
     {
         if (*it != chain)
             newChains.push_back(*it);
     }
-    liveTVChains = newChains;
+    m_liveTVChains = newChains;
 
     chain->DecrRef();
 }
@@ -8280,7 +8246,7 @@ void MainServer::reconnectTimeout(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, LOC +
             "Connection to master server timed out.");
-        masterServerReconnect->start(kMasterServerReconnectTimeout);
+        m_masterServerReconnect->start(kMasterServerReconnectTimeout);
         masterServerSock->DecrRef();
         return;
     }
@@ -8293,9 +8259,8 @@ void MainServer::reconnectTimeout(void)
 
     QStringList strlist( str );
 
-    TVRec::inputsLock.lockForRead();
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
+    TVRec::s_inputsLock.lockForRead();
+    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
         elink->CancelNextRecording(true);
@@ -8312,7 +8277,7 @@ void MainServer::reconnectTimeout(void)
             dummy.ToStringList(strlist);
         }
     }
-    TVRec::inputsLock.unlock();
+    TVRec::s_inputsLock.unlock();
 
     // Calling SendReceiveStringList() with callbacks enabled is asking for
     // trouble, our reply might be swallowed by readyRead
@@ -8335,18 +8300,18 @@ void MainServer::reconnectTimeout(void)
                 QString(", error was %1").arg(strlist[1]) :
                 QString(", remote error")));
         }
-        masterServerReconnect->start(kMasterServerReconnectTimeout);
+        m_masterServerReconnect->start(kMasterServerReconnectTimeout);
         return;
     }
     masterServerSock->SetReadyReadCallbackEnabled(true);
 
-    masterServer = new PlaybackSock(this, masterServerSock, server,
+    m_masterServer = new PlaybackSock(this, masterServerSock, server,
                                     kPBSEvents_Normal);
-    sockListLock.lockForWrite();
-    playbackList.push_back(masterServer);
-    sockListLock.unlock();
+    m_sockListLock.lockForWrite();
+    m_playbackList.push_back(m_masterServer);
+    m_sockListLock.unlock();
 
-    autoexpireUpdateTimer->start(1000);
+    m_autoexpireUpdateTimer->start(1000);
 }
 
 // returns true, if a client (slavebackends are not counted!)
@@ -8355,12 +8320,12 @@ bool MainServer::isClientConnected(bool onlyBlockingClients)
 {
     bool foundClient = false;
 
-    sockListLock.lockForRead();
+    m_sockListLock.lockForRead();
 
-    foundClient |= !fileTransferList.empty();
+    foundClient |= !m_fileTransferList.empty();
 
-    vector<PlaybackSock *>::iterator it = playbackList.begin();
-    for (; !foundClient && (it != playbackList.end()); ++it)
+    for (auto it = m_playbackList.begin();
+         !foundClient && (it != m_playbackList.end()); ++it)
     {
         // Ignore slave backends
         if ((*it)->isSlaveBackend())
@@ -8374,7 +8339,7 @@ bool MainServer::isClientConnected(bool onlyBlockingClients)
         foundClient = true;
     }
 
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 
     return (foundClient);
 }
@@ -8388,16 +8353,15 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
     QStringList bcast( "SHUTDOWN_NOW" );
     bcast << haltcmd;
 
-    sockListLock.lockForRead();
+    m_sockListLock.lockForRead();
 
-    vector<PlaybackSock *>::iterator it = playbackList.begin();
-    for (; it != playbackList.end(); ++it)
+    for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
     {
         if ((*it)->isSlaveBackend())
             (*it)->getSocket()->WriteStringList(bcast);
     }
 
-    sockListLock.unlock();
+    m_sockListLock.unlock();
 }
 
 void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
@@ -8433,7 +8397,7 @@ void MainServer::UpdateSystemdStatus (void)
 #if CONFIG_SYSTEMD_NOTIFY
     QStringList status2;
 
-    if (ismaster)
+    if (m_ismaster)
         status2 << QString("Master backend.");
     else
         status2 << QString("Slave backend.");
@@ -8442,9 +8406,9 @@ void MainServer::UpdateSystemdStatus (void)
     // Count connections
     {
         int playback = 0, frontend = 0, monitor = 0, slave = 0, media = 0;
-        QReadLocker rlock(&sockListLock);
+        QReadLocker rlock(&m_sockListLock);
 
-        for (auto iter = playbackList.begin(); iter != playbackList.end(); ++iter)
+        for (auto iter = m_playbackList.begin(); iter != m_playbackList.end(); ++iter)
         {
             PlaybackSock *pbs = *iter;
             if (pbs->IsDisconnected())
@@ -8462,15 +8426,15 @@ void MainServer::UpdateSystemdStatus (void)
         }
         status2 << QString("Connections: Pl %1, Fr %2, Mo %3, Sl %4, MS %5, FT %6, Co %7")
             .arg(playback).arg(frontend).arg(monitor).arg(slave).arg(media)
-            .arg(fileTransferList.size()).arg(controlSocketList.size());
+            .arg(m_fileTransferList.size()).arg(m_controlSocketList.size());
     }
 #endif
 
     // Count active recordings
     {
         int active = 0;
-        TVRec::inputsLock.lockForRead();
-        for (auto iter = encoderList->begin(); iter != encoderList->end(); ++iter)
+        TVRec::s_inputsLock.lockForRead();
+        for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
         {
             EncoderLink *elink = *iter;
             if (not elink->IsLocal())
@@ -8486,7 +8450,7 @@ void MainServer::UpdateSystemdStatus (void)
                 break;
             }
         }
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
 
         // Count scheduled recordings
         int scheduled = 0;

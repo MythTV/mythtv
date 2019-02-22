@@ -33,15 +33,6 @@
 // libmythbase headers
 #include "mythplugin.h"
 
-MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
-                                         const QString &name)
-    : MythScreenType(parent, name),
-      m_callback(nullptr), m_callbackdata(nullptr),
-      m_killable(false), m_loaded(false), m_titleState(nullptr),
-      m_watermarkState(nullptr), m_buttonList(nullptr), m_descriptionText(nullptr)
-{
-}
-
 bool MythThemedMenuState::Create(void)
 {
     if (!LoadWindowFromXML("menu-ui.xml", "mainmenu", this))
@@ -100,9 +91,7 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
 MythThemedMenu::MythThemedMenu(const QString &/*cdir*/, const QString &menufile,
                                MythScreenStack *parent, const QString &name,
                                bool /*allowreorder*/, MythThemedMenuState *state)
-    : MythThemedMenuState(parent, name),
-      m_state(state), m_allocedstate(false), m_foundtheme(false),
-      m_ignorekeys(false), m_wantpop(false), m_menuPopup(nullptr)
+    : MythThemedMenuState(parent, name), m_state(state)
 {
     if (!m_state)
     {

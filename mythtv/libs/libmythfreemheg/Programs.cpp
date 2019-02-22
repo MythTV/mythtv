@@ -51,12 +51,6 @@
  * applications I've seen so I haven't implemented them.
  */
 
-
-MHProgram::MHProgram()
-{
-    m_fInitiallyAvailable = true; // Default true
-}
-
 void MHProgram::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHIngredient::Initialise(p, engine);

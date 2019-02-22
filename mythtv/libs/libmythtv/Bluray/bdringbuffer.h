@@ -112,7 +112,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; }
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);
-    bool IsOpen(void) const override { return bdnav; } // RingBuffer
+    bool IsOpen(void) const override { return m_bdnav; } // RingBuffer
     bool IsHDMVNavigation(void) const { return m_isHDMVNavigation; }
     bool IsInMenu(void) const override { return m_inMenu; } // RingBuffer
     bool IsInStillFrame(void) const override; // RingBuffer
@@ -171,62 +171,65 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
         PROCESS_WAIT
     }processState_t;
 
-    BLURAY            *bdnav;
-    bool               m_isHDMVNavigation;
-    bool               m_tryHDMVNavigation;
-    bool               m_topMenuSupported;
-    bool               m_firstPlaySupported;
+    BLURAY            *m_bdnav                       {nullptr};
+    bool               m_isHDMVNavigation            {false};
+    bool               m_tryHDMVNavigation           {false};
+    bool               m_topMenuSupported            {false};
+    bool               m_firstPlaySupported          {false};
 
-    uint32_t           m_numTitles;
-    uint32_t           m_mainTitle; // Index number of main title
-    uint64_t           m_currentTitleLength; // Selected title's duration, in ticks (90Khz)
-    BLURAY_TITLE_INFO *m_currentTitleInfo; // Selected title info from struct in bluray.h
-    uint64_t           m_titlesize;
-    uint64_t           m_currentTitleAngleCount;
-    uint64_t           m_currentTime;
+    uint32_t           m_numTitles                   {0};
+                       // Index number of main title
+    uint32_t           m_mainTitle                   {0};
+                       // Selected title's duration, in ticks (90Khz)
+    uint64_t           m_currentTitleLength          {0};
+                       // Selected title info from struct in bluray.h
+    BLURAY_TITLE_INFO *m_currentTitleInfo            {nullptr};
+    uint64_t           m_titlesize                   {0};
+    uint64_t           m_currentTitleAngleCount      {0};
+    uint64_t           m_currentTime                 {0};
 
-    int                m_imgHandle;
+    int                m_imgHandle                   {-1};
 
-    int                m_currentAngle;
-    int                m_currentTitle;
-    int                m_currentPlaylist;
-    int                m_currentPlayitem;
-    int                m_currentChapter;
+    int                m_currentAngle                {0};
+    int                m_currentTitle                {-1};
+    int                m_currentPlaylist             {0};
+    int                m_currentPlayitem             {0};
+    int                m_currentChapter              {0};
 
-    int                m_currentAudioStream;
-    int                m_currentIGStream;
-    int                m_currentPGTextSTStream;
-    int                m_currentSecondaryAudioStream;
-    int                m_currentSecondaryVideoStream;
+    int                m_currentAudioStream          {0};
+    int                m_currentIGStream             {0};
+    int                m_currentPGTextSTStream       {0};
+    int                m_currentSecondaryAudioStream {0};
+    int                m_currentSecondaryVideoStream {0};
 
-    bool               m_PGTextSTEnabled;
-    bool               m_secondaryAudioEnabled;
-    bool               m_secondaryVideoEnabled;
-    bool               m_secondaryVideoIsFullscreen;
+    bool               m_PGTextSTEnabled             {false};
+    bool               m_secondaryAudioEnabled       {false};
+    bool               m_secondaryVideoEnabled       {false};
+    bool               m_secondaryVideoIsFullscreen  {false};
 
-    bool               m_titleChanged;
+    bool               m_titleChanged                {false};
 
-    bool               m_playerWait;
-    bool               m_ignorePlayerWait;
+    bool               m_playerWait                  {false};
+    bool               m_ignorePlayerWait            {true};
 
     QMutex             m_overlayLock;
     QList<BDOverlay*>  m_overlayImages;
     QVector<BDOverlay*> m_overlayPlanes;
 
-    uint8_t            m_stillTime;
-    uint8_t            m_stillMode;
-    volatile bool      m_inMenu;
+    uint8_t            m_stillTime                   {0};
+    uint8_t            m_stillMode                   {BLURAY_STILL_NONE};
+    volatile bool      m_inMenu                      {false};
     BD_EVENT           m_lastEvent;
-    processState_t     m_processState;
+    processState_t     m_processState                {PROCESS_NORMAL};
     QByteArray         m_pendingData;
-    int64_t            m_timeDiff;
+    int64_t            m_timeDiff                    {0};
 
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedTitleInfo;
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedPlaylistInfo;
-    QMutex             m_infoLock;
+    QMutex             m_infoLock                    {QMutex::Recursive};
     QString            m_name;
     QString            m_serialNumber;
 
-    QThread           *m_mainThread;
+    QThread           *m_mainThread                  {nullptr};
 };
 #endif

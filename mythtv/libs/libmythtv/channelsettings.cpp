@@ -14,24 +14,24 @@
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString fieldTag = (":WHERE" + id.getField().toUpper());
-    QString query(id.getField() + " = " + fieldTag);
+    QString fieldTag = (":WHERE" + m_id.getField().toUpper());
+    QString query(m_id.getField() + " = " + fieldTag);
 
-    bindings.insert(fieldTag, id.getValue());
+    bindings.insert(fieldTag, m_id.getValue());
 
     return query;
 }
 
 QString ChannelDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString fieldTag = (":SET" + id.getField().toUpper());
+    QString fieldTag = (":SET" + m_id.getField().toUpper());
     QString nameTag = (":SET" + GetColumnName().toUpper());
 
-    QString query(id.getField() + " = " + fieldTag + ", " +
+    QString query(m_id.getField() + " = " + fieldTag + ", " +
                   GetColumnName() + " = " + nameTag);
 
-    bindings.insert(fieldTag, id.getValue());
-    bindings.insert(nameTag, user->GetDBValue());
+    bindings.insert(fieldTag, m_id.getValue());
+    bindings.insert(nameTag, m_user->GetDBValue());
 
     return query;
 }
@@ -482,11 +482,11 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(channum);
     if (add_freqid)
     {
-        freqid = new Freqid(id);
-        addChild(freqid);
+        m_freqid = new Freqid(id);
+        addChild(m_freqid);
     }
     else
-        freqid = nullptr;
+        m_freqid = nullptr;
     addChild(new Callsign(id));
 
 
@@ -498,14 +498,14 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new ChannelTVFormat(id));
     addChild(new Priority(id));
 
-    addChild(onairguide = new OnAirGuide(id));
-    addChild(xmltvID = new XmltvID(id, source->getValueLabel()));
+    addChild(m_onairguide = new OnAirGuide(id));
+    addChild(m_xmltvID = new XmltvID(id, source->getValueLabel()));
     addChild(new TimeOffset(id));
 
     addChild(new CommMethod(id));
     addChild(new Icon(id));
 
-    connect(onairguide, SIGNAL(valueChanged(     bool)),
+    connect(m_onairguide, SIGNAL(valueChanged(     bool)),
             this,       SLOT(  onAirGuideChanged(bool)));
     connect(source,     SIGNAL(valueChanged( const QString&)),
             this,       SLOT(  sourceChanged(const QString&)));
@@ -556,9 +556,9 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         }
     }
 
-    onairguide->setEnabled(supports_eit);
-    xmltvID->setEnabled(!uses_eit_only);
-    xmltvID->Load();
+    m_onairguide->setEnabled(supports_eit);
+    m_xmltvID->setEnabled(!uses_eit_only);
+    m_xmltvID->Load();
 }
 
 ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id)
@@ -588,27 +588,27 @@ ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id)
  *****************************************************************************/
 
 ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
-    cid(id)
+    m_cid(id)
 {
     setLabel(QCoreApplication::translate("(ChannelSettings)",
         "Channel Options - Raw Transport Stream"));
 
     const uint mx = kMaxPIDs;
-    pids.resize(mx);
-    sids.resize(mx);
-    pcrs.resize(mx);
+    m_pids.resize(mx);
+    m_sids.resize(mx);
+    m_pcrs.resize(mx);
 
     for (uint i = 0; i < mx; i++)
     {
-        addChild((pids[i] = new TransTextEditSetting()));
-        pids[i]->setLabel("PID");
-        addChild((sids[i] = new TransMythUIComboBoxSetting()));
-        sids[i]->setLabel("    StreamID");
+        addChild((m_pids[i] = new TransTextEditSetting()));
+        m_pids[i]->setLabel("PID");
+        addChild((m_sids[i] = new TransMythUIComboBoxSetting()));
+        m_sids[i]->setLabel("    StreamID");
         for (uint j = 0x101; j <= 0x1ff; j++)
         {
             QString desc = StreamID::GetDescription(j&0xff);
             if (!desc.isEmpty())
-                sids[i]->addSelection(
+                m_sids[i]->addSelection(
                     QString("%1 (0x%2)")
                     .arg(desc).arg(j&0xff,2,16,QLatin1Char('0')),
                     QString::number(j), false);
@@ -617,7 +617,7 @@ ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
         {
             QString desc = StreamID::GetDescription(j&0xff);
             if (desc.isEmpty())
-                sids[i]->addSelection(
+                m_sids[i]->addSelection(
                     QString("0x%1").arg(j&0xff,2,16,QLatin1Char('0')),
                     QString::number(j), false);
         }
@@ -627,21 +627,21 @@ ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
             QString desc = TableID::GetDescription(j);
             if (!desc.isEmpty())
             {
-                sids[i]->addSelection(
+                m_sids[i]->addSelection(
                     QString("%1 (0x%2)").arg(j,0,16,QLatin1Char('0')),
                     QString::number(j),
                     false);
             }
         }
 */
-        addChild((pcrs[i] = new TransMythUICheckBoxSetting()));
-        pcrs[i]->setLabel("    Is PCR");
+        addChild((m_pcrs[i] = new TransMythUICheckBoxSetting()));
+        m_pcrs[i]->setLabel("    Is PCR");
     }
 };
 
 void ChannelOptionsRawTS::Load(void)
 {
-    uint chanid = cid.getValue().toUInt();
+    uint chanid = m_cid.getValue().toUInt();
 
     pid_cache_t pid_cache;
     if (!ChannelUtil::GetCachedPids(chanid, pid_cache))
@@ -656,10 +656,10 @@ void ChannelOptionsRawTS::Load(void)
             continue;
         }
 
-        pids[i]->setValue(QString("0x%1")
+        m_pids[i]->setValue(QString("0x%1")
                           .arg(it->GetPID(),2,16,QLatin1Char('0')));
-        sids[i]->setValue(QString::number(it->GetComposite()&0x1ff));
-        pcrs[i]->setValue(it->IsPCRPID());
+        m_sids[i]->setValue(QString::number(it->GetComposite()&0x1ff));
+        m_pcrs[i]->setValue(it->IsPCRPID());
 
         ++it;
         ++i;
@@ -668,20 +668,20 @@ void ChannelOptionsRawTS::Load(void)
 
 void ChannelOptionsRawTS::Save(void)
 {
-    uint chanid = cid.getValue().toUInt();
+    uint chanid = m_cid.getValue().toUInt();
 
     pid_cache_t pid_cache;
     for (uint i = 0; i < kMaxPIDs; i++)
     {
         bool ok;
-        uint pid = pids[i]->getValue().toUInt(&ok, 0);
-        if (!ok || !sids[i]->getValue().toUInt())
+        uint pid = m_pids[i]->getValue().toUInt(&ok, 0);
+        if (!ok || !m_sids[i]->getValue().toUInt())
             continue;
 
         pid_cache.push_back(
             pid_cache_item_t(
-                pid, sids[i]->getValue().toUInt() | 0x10000 |
-                (pcrs[i]->getValue().toUInt() ? 0x200 : 0x0)));
+                pid, m_sids[i]->getValue().toUInt() | 0x10000 |
+                (m_pcrs[i]->getValue().toUInt() ? 0x200 : 0x0)));
     }
 
     ChannelUtil::SaveCachedPids(chanid, pid_cache, true /* delete_all */);

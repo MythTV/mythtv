@@ -40,7 +40,6 @@ Configuration   *UPnp::g_pConfig        = nullptr;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
-    : m_pHttpServer(nullptr), m_nServicePort(0)
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp - Constructor");
 }

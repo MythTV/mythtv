@@ -117,19 +117,23 @@ private:
     typedef QPair<int,int> IntPair;
 
     // Theme widgets
-    MythUIButtonList  *m_imageList;
-    MythUIText        *m_captionText,    *m_crumbsText,     *m_emptyText;
-    MythUIText        *m_hideFilterText, *m_typeFilterText, *m_positionText;
-    MythUIText        *m_scanProgressText;
-    MythUIProgressBar *m_scanProgressBar;
+    MythUIButtonList  *m_imageList        {nullptr};
+    MythUIText        *m_captionText      {nullptr};
+    MythUIText        *m_crumbsText       {nullptr};
+    MythUIText        *m_emptyText        {nullptr};
+    MythUIText        *m_hideFilterText   {nullptr};
+    MythUIText        *m_typeFilterText   {nullptr};
+    MythUIText        *m_positionText     {nullptr};
+    MythUIText        *m_scanProgressText {nullptr};
+    MythUIProgressBar *m_scanProgressBar  {nullptr};
 
     //! Theme buttonlist widgets implementing zoom levels
     QList<MythUIButtonList *> m_zoomWidgets;
-    int                       m_zoomLevel;
+    int                       m_zoomLevel {0};
 
     MythScreenStack &m_popupStack;
     ImageManagerFe  &m_mgr;  //!< Manages the images
-    DirectoryView   *m_view; //!< List of images comprising the view
+    DirectoryView   *m_view {nullptr}; //!< List of images comprising the view
     InfoList         m_infoList; //!< Image details overlay
 
     //! Last scan updates received from scanners
@@ -144,8 +148,8 @@ private:
     //! Buttons waiting for thumbnails to be created
     QHash<int, ThumbLocation> m_pendingMap;
 
-    QSet<int> m_thumbExists;  //!< Images where thumbnails are known to exist
-    bool      m_editsAllowed; //!< Edit privileges
+    QSet<int> m_thumbExists;          //!< Images where thumbnails are known to exist
+    bool      m_editsAllowed {false}; //!< Edit privileges
 };
 
 

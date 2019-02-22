@@ -122,18 +122,14 @@ public:
     {
         m_duration      = mduration; /* seconds */
         m_id            = id;
-        m_bitrate       = 0;
         m_url           = uri;
-        m_played        = 0;
         m_title         = title;
 #ifdef USING_LIBCRYPTO
-        m_keyloaded     = false;
         m_psz_key_path  = current_key_path;
         memset(&m_aeskey, 0, sizeof(m_aeskey));
 #else
         Q_UNUSED(current_key_path);
 #endif
-        m_downloading   = false;
     }
 
     HLSSegment(const HLSSegment &rhs)
@@ -378,21 +374,21 @@ public:
     }
 private:
     AES_KEY     m_aeskey;       // AES-128 key
-    bool        m_keyloaded;
+    bool        m_keyloaded {false};
     QString     m_psz_key_path; // URL key path
 #endif
 
 private:
     int         m_id;           // unique sequence number
     int         m_duration;     // segment duration (seconds)
-    uint64_t    m_bitrate;      // bitrate of segment's content (bits per second)
+    uint64_t    m_bitrate {0};  // bitrate of segment's content (bits per second)
     QString     m_title;        // human-readable informative title of the media segment
 
     QString     m_url;
     QByteArray  m_data;         // raw data
-    int32_t     m_played;       // bytes counter of data already read from segment
+    int32_t     m_played  {0};  // bytes counter of data already read from segment
     QMutex      m_lock;
-    bool        m_downloading;
+    bool        m_downloading {false};
 };
 
 /* stream class */
@@ -404,16 +400,8 @@ public:
     {
         m_id            = mid;
         m_bitrate       = bitrate;
-        m_targetduration= -1;   // not known yet
-        m_size          = 0LL;
-        m_duration      = 0LL;
-        m_live          = true;
-        m_startsequence = 0;    // default is 0
-        m_version       = 1;    // default protocol version
-        m_cache         = true;
         m_url           = uri;
 #ifdef USING_LIBCRYPTO
-        m_ivloaded      = false;
         memset(m_AESIV, 0, sizeof(m_AESIV));
 #endif
     }
@@ -865,25 +853,25 @@ public:
 
 private:
     QString     m_keypath;              // URL path of the encrypted key
-    bool        m_ivloaded;
+    bool        m_ivloaded       {false};
     uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
 #endif
 
 private:
     int         m_id;                   // program id
-    int         m_version;              // protocol version should be 1
-    int         m_startsequence;        // media starting sequence number
-    int         m_targetduration;       // maximum duration per segment (s)
+    int         m_version        {1};   // protocol version should be 1
+    int         m_startsequence  {0};   // media starting sequence number
+    int         m_targetduration {-1};  // maximum duration per segment (s)
     uint64_t    m_bitrate;              // bitrate of stream content (bits per second)
-    uint64_t    m_size;                 // stream length is calculated by taking the sum
+    uint64_t    m_size           {0LL}; // stream length is calculated by taking the sum
                                         // foreach segment of (segment->duration * hls->bitrate/8)
-    int64_t     m_duration;             // duration of the stream in seconds
-    bool        m_live;
+    int64_t     m_duration       {0LL}; // duration of the stream in seconds
+    bool        m_live           {true};
 
     QList<HLSSegment*> m_segments;      // list of segments
     QString     m_url;                  // uri to m3u8
     QMutex      m_lock;
-    bool        m_cache;                // allow caching
+    bool        m_cache          {true};// allow caching
 };
 
 // Playback Stream Information
@@ -943,9 +931,7 @@ class StreamWorker : public MThread
 {
 public:
     StreamWorker(HLSRingBuffer *parent, int startup, int buffer) : MThread("HLSStream"),
-        m_parent(parent), m_interrupted(false), m_bandwidth(0), m_stream(0),
-        m_segment(startup), m_buffer(buffer),
-        m_sumbandwidth(0.0), m_countbandwidth(0)
+        m_parent(parent), m_segment(startup), m_buffer(buffer)
     {
     }
     void Cancel(void)
@@ -1250,17 +1236,18 @@ protected:
     }
 
 private:
-    HLSRingBuffer  *m_parent;
-    bool            m_interrupted;
-    int64_t         m_bandwidth;// measured average download bandwidth (bits per second)
-    int             m_stream;   // current HLSStream
+    HLSRingBuffer  *m_parent         {nullptr};
+    bool            m_interrupted    {false};
+                    // measured average download bandwidth (bits per second)
+    int64_t         m_bandwidth      {0};
+    int             m_stream         {0};// current HLSStream
     int             m_segment;  // current segment for downloading
     int             m_buffer;   // buffer kept between download and playback
     QMap<int,int>   m_segmap;   // segment with streamid used for download
     mutable QMutex  m_lock;
     QWaitCondition  m_waitcond;
-    double          m_sumbandwidth;
-    int             m_countbandwidth;
+    double          m_sumbandwidth   {0.0};
+    int             m_countbandwidth {0};
 };
 
 // Playlist Refresh Thread
@@ -1268,11 +1255,7 @@ class PlaylistWorker : public MThread
 {
 public:
     PlaylistWorker(HLSRingBuffer *parent, int64_t wait) : MThread("HLSStream"),
-        m_parent(parent), m_interrupted(false), m_retries(0)
-    {
-        m_wakeup    = wait;
-        m_wokenup   = false;
-    }
+        m_parent(parent), m_wakeup(wait) {}
     void Cancel()
     {
         m_interrupted = true;
@@ -1554,22 +1537,18 @@ private:
     }
 
     // private variable members
-    HLSRingBuffer * m_parent;
-    bool            m_interrupted;
+    HLSRingBuffer * m_parent      {nullptr};
+    bool            m_interrupted {false};
     int64_t         m_wakeup;       // next reload time
-    int             m_retries;      // number of consecutive failures
-    bool            m_wokenup;
+    int             m_retries     {0}; // number of consecutive failures
+    bool            m_wokenup     {false};
     QMutex          m_lock;
     QWaitCondition  m_waitcond;
 };
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     RingBuffer(kRingBuffer_HLS),
-    m_playback(new HLSPlayback()),
-    m_meta(false),          m_error(false),         m_aesmsg(false),
-    m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(nullptr),m_playlistworker(nullptr), m_fd(nullptr),
-    m_interrupted(false),   m_killed(false)
+    m_playback(new HLSPlayback())
 {
     startreadahead = false;
     OpenFile(lfilename);
@@ -1577,11 +1556,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
     RingBuffer(kRingBuffer_HLS),
-    m_playback(new HLSPlayback()),
-    m_meta(false),          m_error(false),         m_aesmsg(false),
-    m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(nullptr),m_playlistworker(nullptr), m_fd(nullptr),
-    m_interrupted(false),   m_killed(false)
+    m_playback(new HLSPlayback())
 {
     startreadahead = false;
     if (open)

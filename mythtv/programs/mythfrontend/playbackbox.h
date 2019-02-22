@@ -339,13 +339,13 @@ class PlaybackBox : public ScheduleCommon
 
     QRegExp m_titleChaff; ///< stuff to remove for search rules
 
-    MythUIButtonList *m_recgroupList;
-    MythUIButtonList *m_groupList;
-    MythUIButtonList *m_recordingList;
+    MythUIButtonList *m_recgroupList          {nullptr};
+    MythUIButtonList *m_groupList             {nullptr};
+    MythUIButtonList *m_recordingList         {nullptr};
 
-    MythUIText *m_noRecordingsText;
+    MythUIText *m_noRecordingsText            {nullptr};
 
-    MythUIImage *m_previewImage;
+    MythUIImage *m_previewImage               {nullptr};
 
     QString      m_artHostOverride;
     MythUIImage *m_artImage[3];
@@ -355,23 +355,23 @@ class PlaybackBox : public ScheduleCommon
 
     // Settings ///////////////////////////////////////////////////////////////
     /// titleView controls showing titles in group list
-    bool                m_titleView;
+    bool                m_titleView           {false};
     /// useCategories controls showing categories in group list
-    bool                m_useCategories;
+    bool                m_useCategories       {false};
     /// useRecGroups controls showing of recording groups in group list
-    bool                m_useRecGroups;
+    bool                m_useRecGroups        {false};
     /// use the Watch List as the initial view
-    bool                m_watchListStart;
+    bool                m_watchListStart      {false};
     /// exclude recording not marked for auto-expire from the Watch List
-    bool                m_watchListAutoExpire;
+    bool                m_watchListAutoExpire {false};
     /// add 1 to the Watch List scord up to this many days
-    int                 m_watchListMaxAge;
+    int                 m_watchListMaxAge     {60};
     /// adjust exclusion of a title from the Watch List after a delete
-    int                 m_watchListBlackOut;
+    int                 m_watchListBlackOut   {2};
     /// allOrder controls the ordering of the "All Programs" list
     int                 m_allOrder;
     /// listOrder controls the ordering of the recordings in the list
-    int                 m_listOrder;
+    int                 m_listOrder           {1};
 
     // Recording Group settings
     QString             m_groupDisplayName;
@@ -380,15 +380,15 @@ class PlaybackBox : public ScheduleCommon
     QString             m_newRecGroup;
     QString             m_watchGroupName;
     QString             m_watchGroupLabel;
-    ViewMask            m_viewMask;
+    ViewMask            m_viewMask            {VIEW_TITLES};
 
     // Popup support //////////////////////////////////////////////////////////
     // General popup support
-    MythDialogBox      *m_menuDialog;
-    MythMenu           *m_popupMenu;
-    MythScreenStack    *m_popupStack;
+    MythDialogBox      *m_menuDialog          {nullptr};
+    MythMenu           *m_popupMenu           {nullptr};
+    MythScreenStack    *m_popupStack          {nullptr};
 
-    bool m_doToggleMenu;
+    bool                m_doToggleMenu        {true};
 
     // Recording Group popup support
     typedef QPair<QString, QString> RecGroup;
@@ -399,12 +399,12 @@ class PlaybackBox : public ScheduleCommon
     // Main Recording List support
     QStringList         m_titleList;  ///< list of pages
     ProgramMap          m_progLists;  ///< lists of programs by page
-    int                 m_progsInDB;  ///< total number of recordings in DB
-    bool                m_isFilling;
+    int                 m_progsInDB           {0};  ///< total number of recordings in DB
+    bool                m_isFilling           {false};
 
     QStringList         m_recGroups;
     mutable QMutex      m_recGroupsLock;
-    int                 m_recGroupIdx;
+    int                 m_recGroupIdx         {-1};
 
     // Other state
     /// Recording[s] currently selected for deletion
@@ -414,36 +414,36 @@ class PlaybackBox : public ScheduleCommon
 
     // Play List support
     QList<uint>         m_playList;   ///< list of selected items "play list"
-    bool                m_op_on_playlist;
+    bool                m_op_on_playlist      {false};
     QList<uint>         m_playListPlay; ///< list of items being played.
 
     ProgramInfoCache    m_programInfoCache;
 
     /// playingSomething is set to true iff a full screen recording is playing
-    bool                m_playingSomething;
+    bool                m_playingSomething    {false};
 
     /// Does the recording list need to be refilled
-    bool m_needUpdate;
+    bool                m_needUpdate          {false};
 
     // Selection state variables
-    bool                m_haveGroupInfoSet;
+    bool                m_haveGroupInfoSet    {false};
 
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      m_ncLock;
     deque<QString>      m_networkControlCommands;
 
     // Other
-    TV                 *m_player;
+    TV                 *m_player              {nullptr};
     QStringList         m_player_selected_new_show;
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
     /// Outstanding preview image requests
     QSet<QString>       m_preview_tokens;
 
-    bool                m_firstGroup;
-    bool                m_usingGroupSelector;
-    bool                m_groupSelected;
-    bool                m_passwordEntered;
+    bool                m_firstGroup          {true};
+    bool                m_usingGroupSelector  {false};
+    bool                m_groupSelected       {false};
+    bool                m_passwordEntered     {false};
 
     // This class caches the contents of the jobqueue table to avoid excessive
     // DB queries each time the PBB selection changes (currently 4 queries per
@@ -476,7 +476,9 @@ class GroupSelector : public MythScreenType
   public:
     GroupSelector(MythScreenStack *lparent, const QString &label,
                   const QStringList &list, const QStringList &data,
-                  const QString &selected);
+                  const QString &selected)
+        : MythScreenType(lparent, "groupselector"), m_label(label),
+          m_List(list), m_Data(data), m_selected(selected) {}
 
     bool Create(void) override; // MythScreenType
 
@@ -501,7 +503,9 @@ class ChangeView : public MythScreenType
 
   public:
     ChangeView(MythScreenStack *lparent, MythScreenType *parentScreen,
-               int viewMask);
+               int viewMask)
+        : MythScreenType(lparent, "changeview"),
+          m_parentScreen(parentScreen), m_viewMask(viewMask) {}
 
     bool Create(void) override; // MythScreenType
 
@@ -521,7 +525,9 @@ class PasswordChange : public MythScreenType
     Q_OBJECT
 
   public:
-    PasswordChange(MythScreenStack *lparent, QString oldpassword);
+    PasswordChange(MythScreenStack *lparent, QString oldpassword)
+        : MythScreenType(lparent, "passwordchanger"),
+          m_oldPassword(oldpassword){}
 
     bool Create(void) override; // MythScreenType
 
@@ -533,9 +539,9 @@ class PasswordChange : public MythScreenType
     void SendResult(void);
 
   private:
-    MythUITextEdit     *m_oldPasswordEdit;
-    MythUITextEdit     *m_newPasswordEdit;
-    MythUIButton       *m_okButton;
+    MythUITextEdit     *m_oldPasswordEdit {nullptr};
+    MythUITextEdit     *m_newPasswordEdit {nullptr};
+    MythUIButton       *m_okButton        {nullptr};
 
     QString m_oldPassword;
 };
@@ -562,18 +568,18 @@ class RecMetadataEdit : public MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
     void QueryComplete(MetadataLookup *lookup);
 
-    MythUITextEdit     *m_titleEdit;
-    MythUITextEdit     *m_subtitleEdit;
-    MythUITextEdit     *m_descriptionEdit;
-    MythUITextEdit     *m_inetrefEdit;
-    MythUISpinBox      *m_seasonSpin;
-    MythUISpinBox      *m_episodeSpin;
-    MythUIBusyDialog   *m_busyPopup;
-    MythUIButton       *m_queryButton;
+    MythUITextEdit     *m_titleEdit       {nullptr};
+    MythUITextEdit     *m_subtitleEdit    {nullptr};
+    MythUITextEdit     *m_descriptionEdit {nullptr};
+    MythUITextEdit     *m_inetrefEdit     {nullptr};
+    MythUISpinBox      *m_seasonSpin      {nullptr};
+    MythUISpinBox      *m_episodeSpin     {nullptr};
+    MythUIBusyDialog   *m_busyPopup       {nullptr};
+    MythUIButton       *m_queryButton     {nullptr};
 
-    ProgramInfo        *m_progInfo;
-    MythScreenStack    *m_popupStack;
-    MetadataFactory    *m_metadataFactory;
+    ProgramInfo        *m_progInfo        {nullptr};
+    MythScreenStack    *m_popupStack      {nullptr};
+    MetadataFactory    *m_metadataFactory {nullptr};
 };
 
 class HelpPopup : public MythScreenType
@@ -581,14 +587,15 @@ class HelpPopup : public MythScreenType
     Q_OBJECT
 
   public:
-    explicit HelpPopup(MythScreenStack *lparent);
+    explicit HelpPopup(MythScreenStack *lparent)
+        : MythScreenType(lparent, "helppopup") {}
 
     bool Create(void) override; // MythScreenType
 
   private:
     void addItem(const QString &state, const QString &text);
 
-    MythUIButtonList *m_iconList;
+    MythUIButtonList *m_iconList {nullptr};
 };
 
 #endif

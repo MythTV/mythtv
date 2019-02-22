@@ -10,14 +10,6 @@
 
 #define LOC  QString("ExternChan[%1](%2): ").arg(m_inputid).arg(m_loc)
 
-ExternalChannel::ExternalChannel(TVRec *parent, const QString & device)
-    : DTVChannel(parent)
-    , m_device(device)
-    , m_stream_handler(nullptr)
-    , m_loc(GetDevice())
-{
-}
-
 ExternalChannel::~ExternalChannel(void)
 {
     if (IsOpen())

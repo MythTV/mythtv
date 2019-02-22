@@ -37,7 +37,7 @@ class MHTextDisplay;
 class MHText : public MHVisible  
 {
   public:
-    MHText();
+    MHText() = default;
     MHText(const MHText &ref);
     ~MHText();
     const char *ClassName() override // MHRoot
@@ -74,11 +74,16 @@ class MHText : public MHVisible
     MHFontBody      m_OrigFont;
     MHOctetString   m_OriginalFontAttrs;
     MHColour        m_OriginalTextColour, m_OriginalBgColour;
-    int             m_nCharSet;
-    enum Justification { Start = 1, End, Centre, Justified } m_HorizJ, m_VertJ;
-    enum LineOrientation { Vertical = 1, Horizontal } m_LineOrientation;
-    enum StartCorner { UpperLeft = 1, UpperRight, LowerLeft, LowerRight } m_StartCorner;
-    bool            m_fTextWrap;
+    int             m_nCharSet        {-1};
+
+    enum Justification   { Start = 1, End, Centre, Justified };
+    enum LineOrientation { Vertical = 1, Horizontal };
+    enum StartCorner     { UpperLeft = 1, UpperRight, LowerLeft, LowerRight };
+    Justification   m_HorizJ          {Start};
+    Justification   m_VertJ           {Start};
+    LineOrientation m_LineOrientation {Horizontal};
+    StartCorner     m_StartCorner     {UpperLeft};
+    bool            m_fTextWrap       {false};
     // Internal attributes.  The font colour, background colour and font attributes are
     // internal attributes in UK MHEG.
 //  MHFontBody      m_Font;
@@ -86,8 +91,8 @@ class MHText : public MHVisible
     MHOctetString   m_fontAttrs;
     MHOctetString   m_Content; // The content as an octet string
 
-    MHTextDisplay   *m_pDisplay; // Pointer to the display object.
-    bool            m_fNeedsRedraw;
+    MHTextDisplay   *m_pDisplay       {nullptr}; // Pointer to the display object.
+    bool            m_fNeedsRedraw    {false};
 
     // Create the Unicode content from the character input.
     void CreateContent(const unsigned char *p, int s, MHEngine *engine);

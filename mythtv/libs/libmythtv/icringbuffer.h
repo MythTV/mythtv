@@ -33,8 +33,8 @@ class ICRingBuffer : public RingBuffer
     RingBuffer *Take();
 
   private:
-    NetStream *m_stream;
-    RingBuffer *m_parent; // parent RingBuffer
+    NetStream  *m_stream {nullptr};
+    RingBuffer *m_parent {nullptr}; // parent RingBuffer
 };
 
 #endif // ICRINGBUFFER_H

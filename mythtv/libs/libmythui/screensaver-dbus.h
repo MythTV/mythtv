@@ -17,7 +17,7 @@ class ScreenSaverDBus : public ScreenSaver
     bool Asleep(void) override; // ScreenSaver
   protected:
     QDBusConnection m_bus;
-    class ScreenSaverDBusPrivate *d;
+    class ScreenSaverDBusPrivate *d {nullptr};
     QList<ScreenSaverDBusPrivate *> m_dbusPrivateInterfaces;
 };
 

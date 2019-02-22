@@ -33,8 +33,8 @@ using TagLib::ID3v2::AttachedPictureFrame;
 class META_PUBLIC MetaIOID3 : public MetaIOTagLib
 {
   public:
-    MetaIOID3(void);
-    virtual ~MetaIOID3(void);
+    MetaIOID3(void) : MetaIOTagLib() {}
+    virtual ~MetaIOID3(void) { CloseFile(); }
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
     bool writeVolatileMetadata(const QString &filename, MusicMetadata* mdata) override; // MetaIO
@@ -74,10 +74,10 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
                                    const String &description = String::null);
     QString getExtFromMimeType(const QString &mimeType);
 
-    TagLib::File *m_file;
+    TagLib::File *m_file {nullptr};
 
     typedef enum { kMPEG, kFLAC } TagType;
-    TagType m_fileType;
+    TagType m_fileType {kMPEG};
 };
 
 #endif

@@ -5,7 +5,6 @@
 #include <QList>
 #include <QQueue>
 #include <QHash>
-#include <QCoreApplication>
 #include <QFileInfo>
 #include <QStringList>
 #include <QMap>
@@ -138,11 +137,7 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 }
 
 LoggingItem::LoggingItem() :
-        ReferenceCounter("LoggingItem", false),
-        m_pid(-1), m_tid(-1), m_threadId(-1), m_usec(0), m_line(0),
-        m_type(kMessage), m_level(LOG_INFO), m_facility(0), m_epoch(0),
-        m_file(nullptr), m_function(nullptr), m_threadName(nullptr), m_appName(nullptr),
-        m_table(nullptr), m_logFile(nullptr)
+        ReferenceCounter("LoggingItem", false)
 {
     m_message[0]='\0';
     m_message[LOGLINE_MAX]='\0';
@@ -150,11 +145,10 @@ LoggingItem::LoggingItem() :
 
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
-        ReferenceCounter("LoggingItem", false), m_pid(-1),
+        ReferenceCounter("LoggingItem", false),
         m_threadId((uint64_t)(QThread::currentThreadId())),
-        m_line(_line), m_type(_type), m_level(_level), m_facility(0),
-        m_file(strdup(_file)), m_function(strdup(_function)),
-        m_threadName(nullptr), m_appName(nullptr), m_table(nullptr), m_logFile(nullptr)
+        m_line(_line), m_type(_type), m_level(_level),
+        m_file(strdup(_file)), m_function(strdup(_function))
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
 
@@ -252,8 +246,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
-    m_aborted(false), m_filename(filename), m_progress(progress),
-    m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
+    m_filename(filename), m_progress(progress), m_quiet(quiet),
     m_tablename(table), m_facility(facility), m_pid(getpid())
 {
     char *debug = getenv("VERBOSE_THREADS");
@@ -418,8 +411,6 @@ void LoggerThread::handleItem(LoggingItem *item)
 /// \param item LoggingItem containing the log message to process
 bool LoggerThread::logConsole(LoggingItem *item)
 {
-    char                line[MAX_STRING_LENGTH];
-
     if (m_quiet || (m_progress && item->m_level > LOG_ERR))
         return false;
 
@@ -429,6 +420,8 @@ bool LoggerThread::logConsole(LoggingItem *item)
     item->IncrRef();
 
 #ifndef Q_OS_ANDROID
+    char                line[MAX_STRING_LENGTH];
+
     if (item->m_type & kStandardIO)
         snprintf( line, MAX_STRING_LENGTH, "%s", item->m_message );
     else

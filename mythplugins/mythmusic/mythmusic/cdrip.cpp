@@ -98,11 +98,6 @@ QEvent::Type RipStatusEvent::kFinishedEvent =
 QEvent::Type RipStatusEvent::kEncoderErrorEvent =
     (QEvent::Type) QEvent::registerEventType();
 
-CDScannerThread::CDScannerThread(Ripper *ripper) :
-    MThread("CDScanner"), m_parent(ripper)
-{
-}
-
 void CDScannerThread::run()
 {
     RunProlog();
@@ -111,11 +106,6 @@ void CDScannerThread::run()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-CDEjectorThread::CDEjectorThread(Ripper *ripper) :
-    MThread("CDEjector"), m_parent(ripper)
-{
-}
 
 void CDEjectorThread::run()
 {
@@ -177,12 +167,9 @@ static void paranoia_cb(long, paranoia_cb_mode_t)
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
     MThread("CDRipper"),
-    m_parent(parent),   m_quit(false),
+    m_parent(parent),
     m_CDdevice(device), m_quality(quality),
-    m_tracks(tracks), m_totalSectors(0),
-    m_totalSectorsDone(0), m_lastTrackPct(0),
-    m_lastOverallPct(0), m_musicStorageDir("")
-
+    m_tracks(tracks)
 {
 #ifdef WIN32 // libcdio needs the drive letter with no path
     if (m_CDdevice.endsWith('\\'))
@@ -530,35 +517,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
 Ripper::Ripper(MythScreenStack *parent, QString device) :
     MythScreenType(parent, "ripcd"),
-    m_musicStorageDir(""),
-
-    m_decoder(nullptr),
-
-    m_artistEdit(nullptr),
-    m_albumEdit(nullptr),
-    m_genreEdit(nullptr),
-    m_yearEdit(nullptr),
-
-    m_compilationCheck(nullptr),
-
-    m_trackList(nullptr),
-    m_qualityList(nullptr),
-
-    m_switchTitleArtist(nullptr),
-    m_scanButton(nullptr),
-    m_ripButton(nullptr),
-    m_searchArtistButton(nullptr),
-    m_searchAlbumButton(nullptr),
-    m_searchGenreButton(nullptr),
-
     m_tracks(new QVector<RipTrack*>),
-
-    m_somethingwasripped(false),
-    m_mediaMonitorActive(false),
-
-    m_CDdevice(device),
-
-    m_ejectThread(nullptr), m_scanThread(nullptr)
+    m_CDdevice(device)
 {
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
@@ -1520,18 +1480,6 @@ void Ripper::customEvent(QEvent* event)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RipStatus::RipStatus(MythScreenStack *parent, const QString &device,
-                     QVector<RipTrack*> *tracks, int quality)
-    : MythScreenType(parent, "ripstatus"),
-    m_tracks(tracks),           m_quality(quality),
-    m_CDdevice(device),         m_overallText(nullptr),
-    m_trackText(nullptr),       m_statusText(nullptr),
-    m_overallPctText(nullptr),  m_trackPctText(nullptr),
-    m_overallProgress(nullptr), m_trackProgress(nullptr),
-    m_ripperThread(nullptr)
-{
-}
-
 RipStatus::~RipStatus(void)
 {
     if (m_ripperThread)
@@ -1619,32 +1567,32 @@ void RipStatus::customEvent(QEvent *event)
     if (event->type() == RipStatusEvent::kTrackTextEvent)
     {
         if (m_trackText)
-            m_trackText->SetText(rse->text);
+            m_trackText->SetText(rse->m_text);
     }
     else if (event->type() == RipStatusEvent::kOverallTextEvent)
     {
         if (m_overallText)
-            m_overallText->SetText(rse->text);
+            m_overallText->SetText(rse->m_text);
     }
     else if (event->type() == RipStatusEvent::kStatusTextEvent)
     {
         if (m_statusText)
-            m_statusText->SetText(rse->text);
+            m_statusText->SetText(rse->m_text);
     }
     else if (event->type() == RipStatusEvent::kTrackProgressEvent)
     {
         if (m_trackProgress)
-            m_trackProgress->SetUsed(rse->value);
+            m_trackProgress->SetUsed(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kTrackPercentEvent)
     {
         if (m_trackPctText)
-            m_trackPctText->SetText(QString("%1%").arg(rse->value));
+            m_trackPctText->SetText(QString("%1%").arg(rse->m_value));
     }
     else if (event->type() == RipStatusEvent::kTrackStartEvent)
     {
         if (m_trackProgress)
-            m_trackProgress->SetTotal(rse->value);
+            m_trackProgress->SetTotal(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kCopyStartEvent)
     {
@@ -1659,17 +1607,17 @@ void RipStatus::customEvent(QEvent *event)
     else if (event->type() == RipStatusEvent::kOverallProgressEvent)
     {
         if (m_overallProgress)
-            m_overallProgress->SetUsed(rse->value);
+            m_overallProgress->SetUsed(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kOverallStartEvent)
     {
         if (m_overallProgress)
-            m_overallProgress->SetTotal(rse->value);
+            m_overallProgress->SetTotal(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kOverallPercentEvent)
     {
         if (m_overallPctText)
-            m_overallPctText->SetText(QString("%1%").arg(rse->value));
+            m_overallPctText->SetText(QString("%1%").arg(rse->m_value));
     }
     else if (event->type() == RipStatusEvent::kFinishedEvent)
     {

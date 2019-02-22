@@ -699,7 +699,7 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
 {
     window.InputChanged(video_dim_buf, video_dim_disp, aspect);
 
-    AVCodecID avCodecId = (AVCodecID) myth2av_codecid(myth_codec_id);
+    AVCodecID avCodecId = myth2av_codecid(myth_codec_id);
     AVCodec *codec = avcodec_find_decoder(avCodecId);
     QString codecName;
     if (codec)
@@ -1760,7 +1760,7 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
     // The very first Resize needs to be the maximum possible
     // desired res, because X will mask off anything outside
     // the initial dimensions
-    QSize sz1 = disp.res;
+    QSize sz1 = disp.m_res;
     QSize sz2 = window.GetScreenGeometry().size();
     QSize max_size = sz1.expandedTo(sz2);
 
@@ -1784,7 +1784,7 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
     // DisplayRes, this will be overridden when we call ResizeForVideo
     if (db_display_dim.isEmpty())
     {
-        window.SetDisplayDim(disp.size);
+        window.SetDisplayDim(disp.m_size);
     }
     else
     {

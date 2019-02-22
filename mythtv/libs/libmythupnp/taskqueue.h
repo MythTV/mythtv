@@ -90,7 +90,7 @@ class UPNP_PUBLIC TaskQueue : public MThread
 
         TaskMap     m_mapTasks;
         QMutex      m_mutex;
-        bool        m_bTermRequested;
+        bool        m_bTermRequested {false};
 
     protected:
 

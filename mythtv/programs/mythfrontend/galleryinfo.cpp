@@ -50,8 +50,7 @@ static QSet<QString> kBasicInfoSet = QSet<QString>::fromList(kBasicInfoFields);
 
 //! Constructor
 InfoList::InfoList(MythScreenType &screen)
-    : m_screen(screen), m_btnList(nullptr),
-      m_infoVisible(kNoInfo), m_mgr(ImageManagerFe::getInstance())
+    : m_screen(screen), m_mgr(ImageManagerFe::getInstance())
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(1000);

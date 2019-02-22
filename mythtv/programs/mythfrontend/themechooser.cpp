@@ -58,7 +58,7 @@ class ThemeExtractThread : public QRunnable
     }
 
   private:
-    ThemeChooser        *m_parent;
+    ThemeChooser        *m_parent {nullptr};
     QString              m_srcFile;
     QString              m_destDir;
 };
@@ -70,17 +70,7 @@ class ThemeExtractThread : public QRunnable
  */
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
                            const QString &name) :
-    MythScreenType(parent, name),
-    m_themes(nullptr),
-    m_preview(nullptr),
-    m_fullPreviewShowing(false),
-    m_fullPreviewStateType(nullptr),
-    m_fullScreenName(nullptr),
-    m_fullScreenPreview(nullptr),
-    m_refreshDownloadableThemes(false),
-    m_downloadTheme(nullptr),
-    m_downloadState(dsIdle),
-    m_popupMenu(nullptr)
+    MythScreenType(parent, name)
 {
     gCoreContext->addListener(this);
 

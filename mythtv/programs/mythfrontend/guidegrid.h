@@ -67,12 +67,12 @@ class JumpToChannel : public QObject
     bool Update(void);
 
   private:
-    JumpToChannelListener *m_listener;
+    JumpToChannelListener *m_listener {nullptr};
     QString  m_entry;
     int      m_previous_start_channel_index;
     int      m_previous_current_channel_index;
     uint     m_rows_displayed;
-    QTimer  *m_timer; // audited ref #5318
+    QTimer  *m_timer                  {nullptr}; // audited ref #5318
 
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
@@ -232,9 +232,9 @@ private:
     void updateDateText(void);
 
   private:
-    int   m_selectRecThreshold;
+    int   m_selectRecThreshold      {16};
 
-    bool m_allowFinder;
+    bool  m_allowFinder             {false};
     db_chan_list_list_t m_channelInfos;
     QMap<uint,uint>      m_channelInfoIdx;
 
@@ -245,50 +245,50 @@ private:
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
     QDateTime m_currentEndTime;
-    uint      m_currentStartChannel;
+    uint      m_currentStartChannel       {0};
     uint      m_startChanID;
     QString   m_startChanNum;
 
-    int m_currentRow;
-    int m_currentCol;
+    int       m_currentRow                {0};
+    int       m_currentCol                {0};
 
-    bool    m_sortReverse;
+    bool      m_sortReverse               {false};
 
-    int  m_channelCount;
-    int  m_timeCount;
-    bool m_verticalLayout;
+    int       m_channelCount              {5};
+    int       m_timeCount                 {30};
+    bool      m_verticalLayout            {false};
 
     QDateTime m_firstTime;
     QDateTime m_lastTime;
 
-    TV     *m_player;
-    bool    m_usingNullVideo;
-    bool    m_embedVideo;
-    QTimer *m_previewVideoRefreshTimer; // audited ref #5318
+    TV     *m_player                      {nullptr};
+    bool    m_usingNullVideo              {false};
+    bool    m_embedVideo                  {false};
+    QTimer *m_previewVideoRefreshTimer    {nullptr}; // audited ref #5318
     void    EmbedTVWindow(void);
     void    HideTVWindow(void);
     QRect   m_videoRect;
 
     QString m_channelOrdering;
 
-    QTimer *m_updateTimer; // audited ref #5318
+    QTimer *m_updateTimer                 {nullptr}; // audited ref #5318
 
     MThreadPool       m_threadPool;
 
-    int               m_changrpid;
+    int               m_changrpid {-1};
     ChannelGroupList  m_changrplist;
 
-    QMutex            m_jumpToChannelLock;
-    JumpToChannel    *m_jumpToChannel;
+    QMutex            m_jumpToChannelLock {QMutex::Recursive};
+    JumpToChannel    *m_jumpToChannel     {nullptr};
 
-    MythUIButtonList *m_timeList;
-    MythUIButtonList *m_channelList;
-    MythUIGuideGrid  *m_guideGrid;
-    MythUIText       *m_dateText;
-    MythUIText       *m_longdateText;
-    MythUIText       *m_jumpToText;
-    MythUIText       *m_changroupname;
-    MythUIImage      *m_channelImage;
+    MythUIButtonList *m_timeList          {nullptr};
+    MythUIButtonList *m_channelList       {nullptr};
+    MythUIGuideGrid  *m_guideGrid         {nullptr};
+    MythUIText       *m_dateText          {nullptr};
+    MythUIText       *m_longdateText      {nullptr};
+    MythUIText       *m_jumpToText        {nullptr};
+    MythUIText       *m_changroupname     {nullptr};
+    MythUIImage      *m_channelImage      {nullptr};
 };
 
 #endif

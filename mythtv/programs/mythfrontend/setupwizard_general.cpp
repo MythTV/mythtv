@@ -17,11 +17,7 @@
 // ---------------------------------------------------
 
 GeneralSetupWizard::GeneralSetupWizard(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name),
-      m_submitButton(nullptr), m_viewButton(nullptr),
-      m_deleteButton(nullptr), m_nextButton(nullptr),
-      m_cancelButton(nullptr), m_profileLocation(nullptr),
-      m_adminPassword(nullptr),m_busyPopup(nullptr)
+    : MythScreenType(parent, name)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_hardwareProfile = new HardwareProfile();

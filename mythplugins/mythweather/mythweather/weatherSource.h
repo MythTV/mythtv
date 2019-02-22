@@ -87,17 +87,17 @@ class WeatherSource : public QObject
   private:
     void processData();
 
-    bool m_ready;
-    bool m_inuse;
-    ScriptInfo *m_info;
-    MythSystemLegacy *m_ms;
+    bool              m_ready {false};
+    bool              m_inuse {false};
+    ScriptInfo       *m_info  {nullptr};
+    MythSystemLegacy *m_ms    {nullptr};
     QString m_dir;
     QString m_locale;
     QString m_cachefile;
     QByteArray m_buffer;
-    units_t m_units;
-    QTimer *m_updateTimer;
-    int m_connectCnt;
+    units_t m_units           {SI_UNITS};
+    QTimer *m_updateTimer     {nullptr};
+    int     m_connectCnt      {0};
     DataMap m_data;
 };
 

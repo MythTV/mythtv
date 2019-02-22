@@ -84,8 +84,7 @@ void MythRAOPDevice::Cleanup(void)
 }
 
 MythRAOPDevice::MythRAOPDevice()
-  : ServerPool(), m_name(QString("MythTV")), m_bonjour(nullptr), m_valid(false),
-    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000), m_basePort(0)
+    : ServerPool(), m_lock(new QMutex(QMutex::Recursive))
 {
     m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toLatin1());
 }

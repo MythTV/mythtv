@@ -37,13 +37,6 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
                     sizeof(ling)) < 0) 
         LOG(VB_GENERAL, LOG_ERR, 
             "BufferedSocketDevice: setsockopt - SO_LINGER: " + ENO);
-
-    m_nDestPort          = 0;
-
-    m_nMaxReadBufferSize = 0; 
-    m_nWriteSize         = 0;
-    m_nWriteIndex        = 0;
-    m_bHandleSocketDelete= true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

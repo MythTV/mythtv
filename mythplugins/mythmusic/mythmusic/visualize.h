@@ -51,7 +51,7 @@ class VisualNode
 {
   public:
     VisualNode(short *l, short *r, unsigned long n, unsigned long o)
-        : left(l), right(r), length(n), offset(o)
+        : m_left(l), m_right(r), m_length(n), m_offset(o)
     {
         // left and right are allocated and then passed to this class
         // the code that allocated left and right should give up all ownership
@@ -59,12 +59,14 @@ class VisualNode
 
     ~VisualNode()
     {
-        delete [] left;
-        delete [] right;
+        delete [] m_left;
+        delete [] m_right;
     }
 
-    short *left, *right;
-    unsigned long length, offset;
+    short *m_left  {nullptr};
+    short *m_right {nullptr};
+    unsigned long m_length;
+    unsigned long m_offset;
 };
 
 class VisualBase
@@ -92,8 +94,8 @@ class VisualBase
     void drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning, int fontsize = 28);
 
   protected:
-    int m_fps;
-    bool m_xscreensaverenable;
+    int  m_fps                {20};
+    bool m_xscreensaverenable {true};
 };
 
 class VisFactory
@@ -108,8 +110,11 @@ class VisFactory
     static const VisFactory* VisFactories() {return g_pVisFactories;}
   protected:
     static VisFactory* g_pVisFactories;
-    VisFactory*        m_pNextVisFactory;
+    VisFactory*        m_pNextVisFactory {nullptr};
 };
+
+#define RUBBERBAND 0
+#define TWOCOLOUR 0
 
 class StereoScope : public VisualBase
 {
@@ -124,11 +129,12 @@ class StereoScope : public VisualBase
         {(void) action;}
 
   protected:
-    QColor startColor, targetColor;
-    vector<double> magnitudes;
-    QSize size;
-    bool const rubberband;
-    double const falloff;
+    QColor         m_startColor  {Qt::green};
+    QColor         m_targetColor {Qt::red};
+    vector<double> m_magnitudes;
+    QSize          m_size;
+    bool const     m_rubberband  {RUBBERBAND};
+    double const   m_falloff     {1.0};
 };
 
 class MonoScope : public StereoScope
@@ -147,8 +153,8 @@ class LogScale
     LogScale(int = 0, int = 0);
     ~LogScale();
 
-    int scale() const { return s; }
-    int range() const { return r; }
+    int scale() const { return m_s; }
+    int range() const { return m_r; }
 
     void setMax(int, int);
 
@@ -156,8 +162,9 @@ class LogScale
 
 
   private:
-    int *indices;
-    int s, r;
+    int *m_indices {nullptr};
+    int  m_s       {0};
+    int  m_r       {0};
 };
 
 #ifdef FFTW3_SUPPORT
@@ -180,17 +187,25 @@ class Spectrum : public VisualBase
   protected:
     inline double clamp(double cur, double max, double min);
 
-    QColor startColor, targetColor;
-    QVector<QRect> rects;
-    QVector<double> magnitudes;
-    QSize size;
-    LogScale scale;
-    double scaleFactor, falloff;
-    int analyzerBarWidth;
+    QColor             m_startColor       {Qt::blue};
+    QColor             m_targetColor      {Qt::red};
+    QVector<QRect>     m_rects;
+    QVector<double>    m_magnitudes;
+    QSize              m_size;
+    LogScale           m_scale;
 
-    fftw_plan lplan, rplan;
-    myth_fftw_float *lin, *rin;
-    myth_fftw_complex *lout, *rout;
+    // Setup the "magical" audio data transformations
+    // provided by the Fast Fourier Transforms library
+    double             m_scaleFactor      {2.0};
+    double             m_falloff          {10.0};
+    int                m_analyzerBarWidth {6};
+
+    fftw_plan          m_lplan;
+    fftw_plan          m_rplan;
+    myth_fftw_float   *m_lin              {nullptr};
+    myth_fftw_float   *m_rin              {nullptr};
+    myth_fftw_complex *m_lout             {nullptr};
+    myth_fftw_complex *m_rout             {nullptr};
 };
 
 class Squares : public Spectrum
@@ -206,9 +221,9 @@ class Squares : public Spectrum
 
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
-    QSize actualSize;
-    int fake_height;
-    int number_of_squares;
+    QSize m_actualSize        {0,0};
+    int   m_fake_height       {0};
+    int   m_number_of_squares {16};
 };
 
 #endif // FFTW3_SUPPORT
@@ -264,17 +279,20 @@ typedef struct piano_key_data {
     bool process_all_types(VisualNode *node, bool this_will_be_displayed);
     void zero_analysis(void);
 
-    QColor whiteStartColor, whiteTargetColor, blackStartColor, blackTargetColor;
+    QColor          m_whiteStartColor  {245,245,245};
+    QColor          m_whiteTargetColor {Qt::red};
+    QColor          m_blackStartColor  {10,10,10};
+    QColor          m_blackTargetColor {Qt::red};
 
-    vector<QRect> rects;
-    QSize size;
+    vector<QRect>   m_rects;
+    QSize           m_size;
 
-    unsigned long offset_processed;
+    unsigned long   m_offset_processed;
 
-    piano_key_data *piano_data;
-    piano_audio *audio_data;
+    piano_key_data *m_piano_data       {nullptr};
+    piano_audio    *m_audio_data       {nullptr};
 
-    vector<double> magnitude;
+    vector<double>  m_magnitude;
 };
 
 class AlbumArt : public VisualBase
@@ -295,11 +313,12 @@ class AlbumArt : public VisualBase
     void findFrontCover(void);
     bool cycleImage(void);
 
-    QSize m_size, m_cursize;
+    QSize m_size;
+    QSize m_cursize;
     ImageType m_currImageType;
     QImage m_image;
 
-    MusicMetadata *m_currentMetadata;
+    MusicMetadata *m_currentMetadata {nullptr};
     QDateTime m_lastCycle;
 };
 
@@ -317,7 +336,7 @@ class Blank : public VisualBase
         {(void) action;}
 
   private:
-    QSize size;
+    QSize m_size;
 };
 
 #endif // __visualize_h

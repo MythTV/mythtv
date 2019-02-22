@@ -298,7 +298,7 @@ QString toString(MythCodecID codecid)
     return QString("Unknown(%1)").arg(codecid);
 }
 
-int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
+AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
 {
     vdpau = false;
     switch (codec_id)

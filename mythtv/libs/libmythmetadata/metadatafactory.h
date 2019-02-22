@@ -19,10 +19,10 @@ class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 {
   public:
     explicit MetadataFactoryMultiResult(MetadataLookupList res)
-        : QEvent(kEventType), results(res) {}
+        : QEvent(kEventType), m_results(res) {}
     ~MetadataFactoryMultiResult() = default;
 
-    MetadataLookupList results;
+    MetadataLookupList m_results;
 
     static Type kEventType;
 };
@@ -31,23 +31,23 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
 {
   public:
     explicit MetadataFactorySingleResult(MetadataLookup *res)
-        : QEvent(kEventType), result(res)
+        : QEvent(kEventType), m_result(res)
     {
-        if (result)
+        if (m_result)
         {
-            result->IncrRef();
+            m_result->IncrRef();
         }
     }
     ~MetadataFactorySingleResult()
     {
-        if (result)
+        if (m_result)
         {
-            result->DecrRef();
-            result = nullptr;
+            m_result->DecrRef();
+            m_result = nullptr;
         }
     }
 
-    MetadataLookup *result;
+    MetadataLookup *m_result {nullptr};
 
     static Type kEventType;
 };
@@ -56,23 +56,23 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
 {
   public:
     explicit MetadataFactoryNoResult(MetadataLookup *res)
-        : QEvent(kEventType), result(res)
+        : QEvent(kEventType), m_result(res)
     {
-        if (result)
+        if (m_result)
         {
-            result->IncrRef();
+            m_result->IncrRef();
         }
     }
     ~MetadataFactoryNoResult()
     {
-        if (result)
+        if (m_result)
         {
-            result->DecrRef();
-            result = nullptr;
+            m_result->DecrRef();
+            m_result = nullptr;
         }
     }
 
-    MetadataLookup *result;
+    MetadataLookup *m_result {nullptr};
 
     static Type kEventType;
 };
@@ -82,13 +82,13 @@ class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
   public:
     MetadataFactoryVideoChanges(QList<int> adds, QList<int> movs,
                                 QList<int>dels) : QEvent(kEventType),
-                                additions(adds), moved(movs),
-                                deleted(dels) {}
+                                m_additions(adds), m_moved(movs),
+                                m_deleted(dels) {}
     ~MetadataFactoryVideoChanges() = default;
 
-    QList<int> additions; // newly added intids
-    QList<int> moved; // intids moved to new filename
-    QList<int> deleted; // orphaned/deleted intids
+    QList<int> m_additions; // newly added intids
+    QList<int> m_moved; // intids moved to new filename
+    QList<int> m_deleted; // orphaned/deleted intids
 
     static Type kEventType;
 };
@@ -138,16 +138,16 @@ class META_PUBLIC MetadataFactory : public QObject
 
     void OnVideoResult(MetadataLookup *lookup);
 
-    MetadataDownload *m_lookupthread;
-    MetadataImageDownload *m_imagedownload;
+    MetadataDownload      *m_lookupthread  {nullptr};
+    MetadataImageDownload *m_imagedownload {nullptr};
 
-    VideoScannerThread *m_videoscanner;
-    VideoMetadataListManager *m_mlm;
-    bool m_scanning;
+    VideoScannerThread *m_videoscanner     {nullptr};
+    VideoMetadataListManager *m_mlm        {nullptr};
+    bool m_scanning                        {false};
 
     // Variables used in synchronous mode
     MetadataLookupList m_returnList;
-    bool m_sync;
+    bool m_sync                            {false};
 };
 
 META_PUBLIC LookupType GuessLookupType(ProgramInfo *pginfo);

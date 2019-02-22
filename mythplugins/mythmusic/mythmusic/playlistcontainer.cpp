@@ -9,12 +9,6 @@
 #include "playlistcontainer.h"
 
 
-PlaylistLoadingThread::PlaylistLoadingThread(PlaylistContainer *parent_ptr,
-                                             AllMusic *all_music_ptr) :
-    MThread("PlaylistLoading"), parent(parent_ptr), all_music(all_music_ptr)
-{
-}
-
 void PlaylistLoadingThread::run()
 {
     RunProlog();
@@ -31,11 +25,8 @@ void PlaylistLoadingThread::run()
 #define LOC_ERR  QString("PlaylistContainer, Error: ")
 
 PlaylistContainer::PlaylistContainer(AllMusic *all_music) :
-    m_activePlaylist(nullptr), m_streamPlaylist(nullptr),
-    m_allPlaylists(nullptr),
-
     m_playlistsLoader(new PlaylistLoadingThread(this, all_music)),
-    m_doneLoading(false), m_myHost(gCoreContext->GetHostName()),
+    m_myHost(gCoreContext->GetHostName()),
 
     m_ratingWeight(   gCoreContext->GetNumSetting("IntelliRatingWeight",    2)),
     m_playCountWeight(gCoreContext->GetNumSetting("IntelliPlayCountWeight", 2)),

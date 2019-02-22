@@ -28,13 +28,13 @@ QEvent::Type DialogCompletionEvent::kEventType =
 
 
 MythMenu::MythMenu(const QString &text, QObject *retobject, const QString &resultid) :
-    m_parentMenu(nullptr),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
+    m_text(text), m_resultid(resultid), m_retObject(retobject)
 {
     Init();
 }
 
 MythMenu::MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid) :
-    m_parentMenu(nullptr),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
+    m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject)
 {
     Init();
 }
@@ -45,8 +45,8 @@ MythMenu::~MythMenu(void)
     {
         MythMenuItem *item = m_menuItems.takeFirst();
 
-        if (item->SubMenu)
-            delete item->SubMenu;
+        if (item->m_subMenu)
+            delete item->m_subMenu;
 
         delete item;
     }
@@ -91,7 +91,7 @@ void MythMenu::SetSelectedByTitle(const QString& title)
         if (!item)
             continue;
 
-        if (item->Text == title)
+        if (item->m_text == title)
         {
             m_selectedItem = m_menuItems.indexOf(item);
             break;
@@ -108,7 +108,7 @@ void MythMenu::SetSelectedByData(QVariant data)
         if (!item)
             continue;
 
-        if (item->Data == data)
+        if (item->m_data == data)
         {
             m_selectedItem = m_menuItems.indexOf(item);
             break;
@@ -117,77 +117,6 @@ void MythMenu::SetSelectedByData(QVariant data)
 }
 
 /////////////////////////////////////////////////////////////////
-
-MythDialogBox::MythDialogBox(const QString &text,
-                             MythScreenStack *parent, const char *name,
-                             bool fullscreen, bool osd)
-         : MythScreenType(parent, name, false)
-{
-    m_menu = nullptr;
-    m_currentMenu = nullptr;
-    m_retObject = nullptr;
-    m_titlearea = nullptr;
-    m_text = text;
-    m_textarea = nullptr;
-    m_buttonList = nullptr;
-
-    m_fullscreen = fullscreen;
-    m_osdDialog  = osd;
-    m_useSlots = false;
-
-    m_backtext = "";
-    m_backdata = 0;
-    m_exittext = "";
-    m_exitdata = 0;
-}
-
-MythDialogBox::MythDialogBox(const QString &title, const QString &text,
-                             MythScreenStack *parent, const char *name,
-                             bool fullscreen, bool osd)
-         : MythScreenType(parent, name, false)
-{
-    m_menu = nullptr;
-    m_currentMenu = nullptr;
-    m_id = "";
-    m_retObject = nullptr;
-    m_title = title;
-    m_titlearea = nullptr;
-    m_text = text;
-    m_textarea = nullptr;
-    m_buttonList = nullptr;
-
-    m_fullscreen = fullscreen;
-    m_osdDialog  = osd;
-    m_useSlots = false;
-
-    m_backtext = "";
-    m_backdata = 0;
-    m_exittext = "";
-    m_exitdata = 0;
-}
-
-MythDialogBox::MythDialogBox(MythMenu *menu, MythScreenStack *parent, const char *name,
-                               bool fullscreen, bool osd)
-         : MythScreenType(parent, name, false)
-{
-    m_menu = menu;
-    m_currentMenu = m_menu;
-    m_id = "";
-    m_retObject = nullptr;
-    m_title = "";
-    m_titlearea = nullptr;
-    m_textarea = nullptr;
-    m_buttonList = nullptr;
-
-    m_fullscreen = fullscreen;
-    m_osdDialog  = osd;
-    m_useSlots = false;
-
-    m_backtext = "";
-    m_backdata = 0;
-    m_exittext = "";
-    m_exitdata = 0;
-}
 
 MythDialogBox::~MythDialogBox(void)
 {
@@ -265,9 +194,9 @@ void MythDialogBox::updateMenu(void)
     for (int x = 0; x < m_currentMenu->m_menuItems.count(); x++)
     {
         MythMenuItem *menuItem = m_currentMenu->m_menuItems.at(x);
-        MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, menuItem->Text);
+        MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, menuItem->m_text);
         button->SetData(qVariantFromValue(menuItem));
-        button->setDrawArrow((menuItem->SubMenu != nullptr));
+        button->setDrawArrow((menuItem->m_subMenu != nullptr));
 
         if (m_currentMenu->m_selectedItem == x)
             m_buttonList->SetItemCurrent(button);
@@ -287,33 +216,33 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     {
                 MythMenuItem *menuItem = item->GetData().value< MythMenuItem * >();
 
-        if (menuItem->SubMenu)
+        if (menuItem->m_subMenu)
         {
             m_currentMenu->m_selectedItem = m_buttonList->GetCurrentPos();
-            m_currentMenu = menuItem->SubMenu;
+            m_currentMenu = menuItem->m_subMenu;
             updateMenu();
             return;
         }
 
-        if (menuItem->UseSlot)
+        if (menuItem->m_useSlot)
         {
-            const char *slot = menuItem->Data.value < const char * >();
+            const char *slot = menuItem->m_data.value < const char * >();
             if (slot)
             {
                 connect(this, SIGNAL(Selected()), m_currentMenu->m_retObject, slot,
                         Qt::QueuedConnection);
                 emit Selected();
             }
-            else if (menuItem->Data.value<MythUIButtonCallback>())
+            else if (menuItem->m_data.value<MythUIButtonCallback>())
             {
                 connect(this, &MythDialogBox::Selected, m_currentMenu->m_retObject,
-                        menuItem->Data.value<MythUIButtonCallback>(),
+                        menuItem->m_data.value<MythUIButtonCallback>(),
                         Qt::QueuedConnection);
                 emit Selected();
             }
         }
 
-        SendEvent(m_buttonList->GetItemPos(item), item->GetText(), menuItem->Data);
+        SendEvent(m_buttonList->GetItemPos(item), item->GetText(), menuItem->m_data);
     }
     else
     {
@@ -506,19 +435,6 @@ void MythDialogBox::SendEvent(int res, QString text, QVariant data)
 
 /////////////////////////////////////////////////////////////////
 
-MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
-                                               const QString &message,
-                                               bool showCancel)
-                       : MythScreenType(parent, "mythconfirmpopup")
-{
-    m_messageText = nullptr;
-    m_message = message;
-    m_showCancel = showCancel;
-
-    m_id = "";
-    m_retObject = nullptr;
-}
-
 bool MythConfirmationDialog::Create(void)
 {
     if (!CopyWindowFromBase("MythConfirmationDialog", this))
@@ -691,23 +607,6 @@ bool WaitFor(MythConfirmationDialog *dialog)
 }
 
 /////////////////////////////////////////////////////////////////
-
-MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
-                                         const QString &message,
-                                         InputFilter filter,
-                                         bool isPassword,
-                                         const QString &defaultValue)
-           : MythScreenType(parent, "mythtextinputpopup")
-{
-    m_filter = filter;
-    m_isPassword = isPassword;
-    m_message = message;
-    m_defaultValue = defaultValue;
-    m_textEdit = nullptr;
-
-    m_id = "";
-    m_retObject = nullptr;
-}
 
 bool MythTextInputDialog::Create(void)
 {

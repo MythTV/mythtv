@@ -41,7 +41,8 @@ class MythFontReference
 {
   public:
     MythFontReference(const QString &fontPath, const QString &registeredFor,
-                      const int fontID);
+                      const int fontID)
+        : m_fontPath(fontPath), m_registeredFor(registeredFor), m_fontID(fontID) {}
 
     QString GetFontPath(void) const { return m_fontPath; }
     QString GetRegisteredFor(void) const { return m_registeredFor; }

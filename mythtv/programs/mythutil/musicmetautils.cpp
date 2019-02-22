@@ -128,7 +128,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     }
 
 
-    if (!image->embedded || !tagger->supportsEmbeddedImages())
+    if (!image->m_embedded || !tagger->supportsEmbeddedImages())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Either the image isn't embedded or the tagger doesn't support embedded images"));
         return GENERIC_EXIT_NOT_OK;
@@ -154,7 +154,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     path += "/AlbumArt/";
     QDir dir(path);
 
-    QString filename = QString("%1-%2.jpg").arg(mdata->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
+    QString filename = QString("%1-%2.jpg").arg(mdata->ID()).arg(AlbumArtImages::getTypeFilename(image->m_imageType));
 
     if (QFile::exists(path + filename))
         QFile::remove(path + filename);
@@ -162,7 +162,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     if (!dir.exists())
         dir.mkpath(path);
 
-    QImage *saveImage = tagger->getAlbumArt(trackFilename, image->imageType);
+    QImage *saveImage = tagger->getAlbumArt(trackFilename, image->m_imageType);
     if (saveImage)
     {
         saveImage->save(path + filename, "JPEG");

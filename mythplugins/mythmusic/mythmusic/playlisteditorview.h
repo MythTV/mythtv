@@ -51,10 +51,9 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
 
   protected:
     QString  m_action;
-    QPointer<MusicButtonItem> m_buttonItem;
-    MythUIButtonListItem::CheckState m_check;
-    bool     m_showArrow;
-    //bool     m_active;
+    QPointer<MusicButtonItem> m_buttonItem {nullptr};
+    MythUIButtonListItem::CheckState m_check {MythUIButtonListItem::CantCheck};
+    bool     m_showArrow {true};
 };
 
 Q_DECLARE_METATYPE(MusicGenericTree*);
@@ -110,13 +109,13 @@ class PlaylistEditorView : public MusicCommon
 
   private:
     QString                 m_layout;
-    bool                    m_restorePosition;
-    MusicGenericTree       *m_rootNode;
+    bool                    m_restorePosition {false};
+    MusicGenericTree       *m_rootNode        {nullptr};
     QList<MetadataPtrList*> m_deleteList;
 
-    MythUIButtonTree *m_playlistTree;
-    MythUIText       *m_breadcrumbsText;
-    MythUIText       *m_positionText;
+    MythUIButtonTree *m_playlistTree          {nullptr};
+    MythUIText       *m_breadcrumbsText       {nullptr};
+    MythUIText       *m_positionText          {nullptr};
 };
 
 #endif

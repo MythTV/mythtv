@@ -18,10 +18,7 @@ const QString SMOLT_SERVER_LOCATION =
 const QString SMOLT_TOKEN =
                   QString("smolt_token-smolt.mythtv.org");
 
-HardwareProfile::HardwareProfile() :
-    m_enabled(false),
-    m_uuid(QString()),               m_publicuuid(QString()),
-    m_lastUpdate(QDateTime()),       m_hardwareProfile(QString())
+HardwareProfile::HardwareProfile()
 {
     m_enabled = (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 1);
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");

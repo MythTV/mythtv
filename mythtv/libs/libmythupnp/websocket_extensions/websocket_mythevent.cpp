@@ -5,7 +5,7 @@
 #include "mythlogging.h"
 
 WebSocketMythEvent::WebSocketMythEvent()
-                   : WebSocketExtension(), m_sendEvents(false)
+                   : WebSocketExtension()
 {
     setObjectName("WebSocketMythEvent");
     gCoreContext->addListener(this);
@@ -18,7 +18,7 @@ WebSocketMythEvent::~WebSocketMythEvent()
 
 bool WebSocketMythEvent::HandleTextFrame(const WebSocketFrame &frame)
 {
-    QString message = QString(frame.payload);
+    QString message = QString(frame.m_payload);
 
     if (message.isEmpty())
         return false;

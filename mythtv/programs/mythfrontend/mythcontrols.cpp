@@ -47,25 +47,6 @@
 #define LOC QString("MythControls: ")
 #define LOC_ERR QString("MythControls, Error: ")
 
-/**
- *  \brief Creates a new MythControls wizard
- *  \param parent Pointer to the screen stack
- *  \param name The name of the window
- */
-MythControls::MythControls(MythScreenStack *parent, const char *name)
-    : MythScreenType (parent, name)
-{
-    m_currentView = kActionsByContext;
-    m_leftList = m_rightList = nullptr;
-    m_description = m_leftDescription = m_rightDescription = nullptr;
-    m_bindings = nullptr;
-
-    m_leftListType  = kContextList;
-    m_rightListType = kActionList;
-
-    m_menuPopup = nullptr;
-}
-
 MythControls::~MythControls()
 {
     Teardown();

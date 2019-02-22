@@ -73,15 +73,7 @@ void SSDP::Shutdown()
 /////////////////////////////////////////////////////////////////////////////
 
 SSDP::SSDP() :
-    MThread                ("SSDP" ),
-    m_procReqLineExp       ("[ \r\n][ \r\n]*"),
-    m_nPort                ( SSDP_PORT ),
-    m_nSearchPort          ( SSDP_SEARCHPORT ),
-    m_nServicePort         ( 0 ),
-    m_pNotifyTask          ( nullptr ),
-    m_bAnnouncementsEnabled( false ),
-    m_bTermRequested       ( false ),
-    m_lock                 ( QMutex::NonRecursive )
+    MThread("SSDP")
 {
     LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 

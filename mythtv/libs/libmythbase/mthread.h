@@ -127,10 +127,10 @@ class MBASE_PUBLIC MThread
     static void msleep(unsigned long time);
     static void usleep(unsigned long time);
 
-    MThreadInternal *m_thread;
-    QRunnable *m_runnable;
-    bool m_prolog_executed;
-    bool m_epilog_executed;
+    MThreadInternal *m_thread {nullptr};
+    QRunnable *m_runnable     {nullptr};
+    bool m_prolog_executed    {true};
+    bool m_epilog_executed    {true};
 };
 
 #endif // _MYTH_THREAD_H_

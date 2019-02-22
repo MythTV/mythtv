@@ -94,20 +94,14 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
                                uint32_t bitrate, uint32_t abitrate,
                                uint16_t maxSegments, uint16_t segmentSize,
                                uint32_t aobitrate, int32_t srate)
-  : m_writing(false),
-    m_streamid(-1),              m_sourceFile(srcFile),
-    m_sourceWidth(0),            m_sourceHeight(0),
+  : m_sourceFile(srcFile),
     m_segmentSize(segmentSize),  m_maxSegments(maxSegments),
-    m_segmentCount(0),           m_startSegment(0),
-    m_curSegment(0),
     m_height(height),            m_width(width),
     m_bitrate(bitrate),
     m_audioBitrate(abitrate),    m_audioOnlyBitrate(aobitrate),
     m_sampleRate(srate),
     m_created(MythDate::current()),
-    m_lastModified(MythDate::current()),
-    m_percentComplete(0),
-    m_status(kHLSStatusUndefined)
+    m_lastModified(MythDate::current())
 {
     if ((m_width == 0) && (m_height == 0))
         m_width = 640;

@@ -22,7 +22,9 @@ class EditMetadataDialog : public MythScreenType
 
   public:
 
-    EditMetadataDialog(MythScreenStack *parent, ArchiveItem *source_metadata);
+    EditMetadataDialog(MythScreenStack *parent, ArchiveItem *source_metadata)
+        : MythScreenType(parent, "EditMetadataDialog"),
+          m_sourceMetadata(source_metadata) {}
     ~EditMetadataDialog();
 
     bool Create(void) override; // MythScreenType
@@ -36,15 +38,15 @@ class EditMetadataDialog : public MythScreenType
     void okPressed(void);
     void cancelPressed(void);
   private:
-    ArchiveItem    *m_sourceMetadata;
+    ArchiveItem    *m_sourceMetadata  {nullptr};
 
-    MythUITextEdit *m_titleEdit;
-    MythUITextEdit *m_subtitleEdit;
-    MythUITextEdit *m_descriptionEdit;
-    MythUITextEdit *m_startdateEdit;
-    MythUITextEdit *m_starttimeEdit;
-    MythUIButton   *m_cancelButton;
-    MythUIButton   *m_okButton;
+    MythUITextEdit *m_titleEdit       {nullptr};
+    MythUITextEdit *m_subtitleEdit    {nullptr};
+    MythUITextEdit *m_descriptionEdit {nullptr};
+    MythUITextEdit *m_startdateEdit   {nullptr};
+    MythUITextEdit *m_starttimeEdit   {nullptr};
+    MythUIButton   *m_cancelButton    {nullptr};
+    MythUIButton   *m_okButton        {nullptr};
 };
 
 #endif

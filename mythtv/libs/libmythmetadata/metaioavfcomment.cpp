@@ -12,11 +12,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-MetaIOAVFComment::MetaIOAVFComment(void)
-    : MetaIO()
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */

@@ -46,8 +46,8 @@ class InteractiveTV
     MythPlayer *GetNVP(void) { return m_nvp; }
 
   protected:
-    MHIContext        *m_context;
-    MythPlayer *m_nvp;
+    MHIContext *m_context {nullptr};
+    MythPlayer *m_nvp     {nullptr};
 #endif
 };
 

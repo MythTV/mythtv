@@ -32,7 +32,7 @@ class MythUDPListener : public QObject
     void TeardownAll(void) { Disable(); }
 
   private:
-    ServerPool *m_socketPool;
+    ServerPool *m_socketPool {nullptr};
 };
 
 #endif // MYTHUDPLISTENER_H

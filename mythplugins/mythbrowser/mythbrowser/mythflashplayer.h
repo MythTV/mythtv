@@ -18,11 +18,11 @@ class MythFlashPlayer : public MythScreenType
 
   private:
     QVariant evaluateJavaScript(const QString&);
-    MythUIWebBrowser*         m_browser;
+    MythUIWebBrowser*         m_browser  {nullptr};
     QString                   m_url;
-    int                       m_fftime;
-    int                       m_rewtime;
-    int                       m_jumptime;
+    int                       m_fftime   {30};
+    int                       m_rewtime  {5};
+    int                       m_jumptime {10};
 };
 
 #endif

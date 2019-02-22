@@ -22,7 +22,7 @@
 #include "hdhrstreamhandler.h"
 
 #define LOC QString("HDHRSigMon[%1](%2): ") \
-            .arg(inputid).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -47,13 +47,13 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
-    signalStrength.SetThreshold(45);
+    m_signalStrength.SetThreshold(45);
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = HDHRStreamHandler::Get(channel->GetDevice(),
-                                           channel->GetInputID(),
-                                           channel->GetMajorID());
+    streamHandler = HDHRStreamHandler::Get(m_channel->GetDevice(),
+                                           m_channel->GetInputID(),
+                                           m_channel->GetMajorID());
 }
 
 /** \fn HDHRSignalMonitor::~HDHRSignalMonitor()
@@ -63,7 +63,7 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    HDHRStreamHandler::Return(streamHandler, inputid);
+    HDHRStreamHandler::Return(streamHandler, m_inputid);
 }
 
 /** \fn HDHRSignalMonitor::Stop(void)
@@ -82,7 +82,7 @@ void HDHRSignalMonitor::Stop(void)
 
 HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
 {
-    return dynamic_cast<HDHRChannel*>(channel);
+    return dynamic_cast<HDHRChannel*>(m_channel);
 }
 
 /** \fn HDHRSignalMonitor::UpdateValues(void)
@@ -93,7 +93,7 @@ HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
  */
 void HDHRSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (streamHandlerStarted)
@@ -104,7 +104,7 @@ void HDHRSignalMonitor::UpdateValues(void)
 
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
@@ -124,10 +124,10 @@ void HDHRSignalMonitor::UpdateValues(void)
     // Set SignalMonitorValues from info from card.
     bool isLocked = false;
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(sig);
-        signalLock.SetValue(status.lock_supported);
-        isLocked = signalLock.IsGood();
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(sig);
+        m_signalLock.SetValue(status.lock_supported);
+        isLocked = m_signalLock.IsGood();
     }
 
     EmitStatus();
@@ -145,5 +145,5 @@ void HDHRSignalMonitor::UpdateValues(void)
         streamHandlerStarted = true;
     }
 
-    update_done = true;
+    m_update_done = true;
 }

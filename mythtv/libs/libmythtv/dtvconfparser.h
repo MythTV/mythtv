@@ -49,15 +49,13 @@ class QStringList;
 class DTVChannelInfo
 {
   public:
-    DTVChannelInfo() :
-        serviceid(0), lcn(-1) {}
-
+    DTVChannelInfo() = default;
     QString toString() const;
 
  public:
-    QString name;
-    uint    serviceid;
-    int     lcn;
+    QString m_name;
+    uint    m_serviceid {0};
+    int     m_lcn       {-1};
 };
 typedef vector<DTVChannelInfo> DTVChannelInfoList;
 
@@ -80,12 +78,13 @@ class DTVConfParser
     enum return_t   { ERROR_CARDTYPE, ERROR_OPEN, ERROR_PARSE, OK };
     enum cardtype_t { ATSC, OFDM, QPSK, QAM, DVBS2, UNKNOWN };
 
-    DTVConfParser(enum cardtype_t _type, uint sourceid, const QString &_file);
+    DTVConfParser(enum cardtype_t type, uint sourceid, const QString &file)
+        : m_type(type), m_sourceid(sourceid), m_filename(file) {}
     virtual ~DTVConfParser() = default;
 
     return_t Parse(void);
 
-    DTVChannelList GetChannels(void) const { return channels; }
+    DTVChannelList GetChannels(void) const { return m_channels; }
 
   private:
     bool ParseVDR(     const QStringList &tokens, int channelNo = -1);
@@ -96,13 +95,13 @@ class DTVConfParser
     bool ParseConfATSC(const QStringList &tokens);
 
   private:
-    cardtype_t type;
-    uint       sourceid;
-    QString    filename;
+    cardtype_t     m_type;
+    uint           m_sourceid;
+    QString        m_filename;
 
     void AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan);
 
-    DTVChannelList channels;
+    DTVChannelList m_channels;
 };
 
 #endif // _DTVCONFPARSER_H_

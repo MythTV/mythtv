@@ -23,7 +23,7 @@ class ImageLoadThread;
 class ImageProperties
 {
   public:
-    ImageProperties();
+    ImageProperties() = default;
     ImageProperties(const ImageProperties& other);
    ~ImageProperties();
 
@@ -32,56 +32,56 @@ class ImageProperties
     void SetMaskImage(MythImage *image);
     void SetMaskImageFilename(const QString &filename)
     {
-        maskImageFilename=filename;
+        m_maskImageFilename=filename;
     }
     QString GetMaskImageFilename()
     {
-        return maskImageFilename;
+        return m_maskImageFilename;
     }
     QRect GetMaskImageRect(void)
     {
         QRect rect;
-        if (maskImage)
-            rect = maskImage->rect();
+        if (m_maskImage)
+            rect = m_maskImage->rect();
         return rect;
     }
     QImage GetMaskImageSubset(const QRect &imageArea)
     {
-        if (maskImage)
-            return maskImage->copy(imageArea);
+        if (m_maskImage)
+            return m_maskImage->copy(imageArea);
 
         QImage img(imageArea.size(), QImage::Format_ARGB32);
         img.fill(0xFFFFFFFF);
         return img;
     }
 
-    QString filename;
+    QString m_filename;
 
-    MythRect cropRect;
-    QSize forceSize;
+    MythRect m_cropRect       {0,0,0,0};
+    QSize    m_forceSize      {0,0};
 
-    bool preserveAspect;
-    bool isGreyscale;
-    bool isReflected;
-    bool isMasked;
-    bool isOriented;
+    bool     m_preserveAspect {false};
+    bool     m_isGreyscale    {false};
+    bool     m_isReflected    {false};
+    bool     m_isMasked       {false};
+    bool     m_isOriented     {false};
 
-    ReflectAxis reflectAxis;
-    int reflectScale;
-    int reflectLength;
-    int reflectShear;
-    int reflectSpacing;
+    ReflectAxis m_reflectAxis {ReflectVertical};
+    int m_reflectScale        {100};
+    int m_reflectLength       {100};
+    int m_reflectShear        {0};
+    int m_reflectSpacing      {0};
 
-    int orientation;
+    int m_orientation         {1};
 
-    bool isThemeImage;
+    bool m_isThemeImage       {false};
 
   private:
     void Init(void);
     void Copy(const ImageProperties &other);
 
-    MythImage *maskImage;
-    QString maskImageFilename;
+    MythImage *m_maskImage {nullptr};
+    QString m_maskImageFilename;
 };
 
 typedef QPair<MythImage *, int> AnimationFrame;
@@ -144,7 +144,6 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                   int alphaMod, QRect clipRect) override; // MythUIType
 
-    void Init(void);
     void Clear(void);
 
     void SetAnimationFrames(AnimationFrames frames);
@@ -176,24 +175,24 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     int m_LowNum;
     int m_HighNum;
 
-    unsigned int m_CurPos;
-    QTime m_LastDisplay;
+    unsigned int    m_CurPos             {0};
+    QTime           m_LastDisplay        {QTime::currentTime()};
 
-    bool m_NeedLoad;
+    bool            m_NeedLoad           {false};
 
     ImageProperties m_imageProperties;
 
-    int m_runningThreads;
+    int             m_runningThreads     {0};
 
-    bool m_showingRandomImage;
-    QString m_imageDirectory;
+    bool            m_showingRandomImage {false};
+    QString         m_imageDirectory;
 
-    MythUIImagePrivate *d;
+    MythUIImagePrivate *d                {nullptr};
 
     enum AnimationCycle {kCycleStart, kCycleReverse};
-    AnimationCycle m_animationCycle;
-    bool m_animationReverse;
-    bool m_animatedImage;
+    AnimationCycle  m_animationCycle     {kCycleStart};
+    bool            m_animationReverse   {false};
+    bool            m_animatedImage      {false};
 
     friend class MythUIImagePrivate;
     friend class MythThemeBase;

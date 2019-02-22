@@ -36,13 +36,13 @@ class NetEditorBase : public MythScreenType
     void ParsedData();
 
     GrabberScript::scriptList m_grabberList;
-    MythUIButtonList *m_grabbers;
-    MythUIBusyDialog *m_busyPopup;
-    MythScreenStack  *m_popupStack;
+    MythUIButtonList      *m_grabbers   {nullptr};
+    MythUIBusyDialog      *m_busyPopup  {nullptr};
+    MythScreenStack       *m_popupStack {nullptr};
 
-    QNetworkAccessManager *m_manager;
-    QNetworkReply         *m_reply;
-    bool m_changed;
+    QNetworkAccessManager *m_manager    {nullptr};
+    QNetworkReply         *m_reply      {nullptr};
+    bool                   m_changed    {false};
 
   protected:
     void CreateBusyDialog(QString title);

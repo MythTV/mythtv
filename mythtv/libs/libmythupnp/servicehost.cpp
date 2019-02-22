@@ -24,17 +24,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-MethodInfo::MethodInfo()
-{
-    m_nMethodIndex = 0;
-    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost |
-                                   RequestTypeHead);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
 QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 {
     HttpRedirectException exception;
@@ -240,9 +229,9 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
             oInfo.m_nMethodIndex = nIdx;
             oInfo.m_sName        = sName.section( '(', 0, 0 );
             oInfo.m_oMethod      = method;
-            oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
-                                                 RequestTypePost |
-                                                 RequestTypeHead);
+            oInfo.m_eRequestType = (HttpRequestType)(RequestTypeGet |
+                                                     RequestTypePost |
+                                                     RequestTypeHead);
 
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
@@ -257,8 +246,8 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
                 if (sRequestType == "POST")
                     oInfo.m_eRequestType = RequestTypePost;
                 else if (sRequestType == "GET" )
-                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
-                                                         RequestTypeHead);
+                    oInfo.m_eRequestType = (HttpRequestType)(RequestTypeGet |
+                                                             RequestTypeHead);
             }
 
             m_Methods.insert( oInfo.m_sName, oInfo );
@@ -428,13 +417,13 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
     }
     catch (HttpRedirectException &ex)
     {
-        UPnp::FormatRedirectResponse( pRequest, ex.hostName );
+        UPnp::FormatRedirectResponse( pRequest, ex.m_hostName );
         bHandled = true;
     }
     catch (HttpException &ex)
     {
-        LOG(VB_GENERAL, LOG_ERR, ex.msg);
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
+        LOG(VB_GENERAL, LOG_ERR, ex.m_msg);
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.m_msg );
 
         bHandled = true;
 

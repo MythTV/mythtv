@@ -233,52 +233,52 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     QList< QPair<MythUIType *, bool> >m_dependsValue;
     QList<int> m_dependOperator;
 
-    bool m_Visible;
-    bool m_HasFocus;
-    bool m_CanHaveFocus;
-    bool m_Enabled;
-    bool m_EnableInitiator;
-    bool m_Initiator;
-    bool m_Vanish;
-    bool m_Vanished;
-    bool m_IsDependDefault;
+    bool         m_Visible         {true};
+    bool         m_HasFocus        {false};
+    bool         m_CanHaveFocus    {false};
+    bool         m_Enabled         {true};
+    bool         m_EnableInitiator {false};
+    bool         m_Initiator       {false};
+    bool         m_Vanish          {false};
+    bool         m_Vanished        {false};
+    bool         m_IsDependDefault {false};
     QMap<MythUIType *, bool> m_ReverseDepend;
 
-    int m_focusOrder;
+    int          m_focusOrder      {0};
 
-    MythRect m_Area;
-    MythRect m_MinArea;
-    MythPoint m_MinSize;
-//    QSize m_NormalSize;
+    MythRect     m_Area            {0,0,0,0};
+    MythRect     m_MinArea         {0,0,0,0};
+    MythPoint    m_MinSize;
+//  QSize        m_NormalSize;
 
-    QRegion m_DirtyRegion;
-    bool m_NeedsRedraw;
+    QRegion      m_DirtyRegion     {0,0,0,0};
+    bool         m_NeedsRedraw     {false};
 
-    UIEffects m_Effects;
+    UIEffects    m_Effects;
 
-    int m_AlphaChangeMode; // 0 - none, 1 - once, 2 - cycle
-    int m_AlphaChange;
-    int m_AlphaMin;
-    int m_AlphaMax;
+    int          m_AlphaChangeMode {0}; // 0 - none, 1 - once, 2 - cycle
+    int          m_AlphaChange     {0};
+    int          m_AlphaMin        {0};
+    int          m_AlphaMax        {255};
 
-    bool m_Moving;
-    QPoint m_XYDestination;
-    QPoint m_XYSpeed;
+    bool         m_Moving          {false};
+    QPoint       m_XYDestination   {0,0};
+    QPoint       m_XYSpeed         {0,0};
 
-    FontMap *m_Fonts;
+    FontMap     *m_Fonts           {nullptr};
 
-    MythUIType *m_Parent;
-    MythPainter *m_Painter;
+    MythUIType  *m_Parent          {nullptr};
+    MythPainter *m_Painter         {nullptr};
 
     QList<MythUIAnimation*> m_animations;
-    QString m_helptext;
+    QString      m_helptext;
 
-    QString m_xmlName;
-    QString m_xmlLocation;
+    QString      m_xmlName;
+    QString      m_xmlLocation;
 
-    bool m_deferload;
+    bool         m_deferload       {false};
 
-    QColor m_BorderColor;
+    QColor       m_BorderColor     {Qt::black};
 
     friend class XMLParseBase;
 };

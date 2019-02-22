@@ -43,10 +43,10 @@ bool IPTVRecorder::Open(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
-    if (_stream_data)
-        m_channel->SetStreamData(_stream_data);
+    if (m_stream_data)
+        m_channel->SetStreamData(m_stream_data);
 
-    return _stream_data;
+    return m_stream_data;
 }
 
 bool IPTVRecorder::IsOpen(void) const
@@ -67,31 +67,31 @@ void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
     DTVRecorder::SetStreamData(data);
     if (IsOpen() && !IsPaused())
-        m_channel->SetStreamData(_stream_data);
+        m_channel->SetStreamData(m_stream_data);
 }
 
 bool IPTVRecorder::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
             m_channel->SetStreamData(nullptr);
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
+            m_paused = true;
+            m_pauseWait.wakeAll();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
 
-        unpauseWait.wait(&pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!request_pause && IsPaused(true))
+    if (!m_request_pause && IsPaused(true))
     {
-        m_channel->SetStreamData(_stream_data);
-        paused = false;
-        unpauseWait.wakeAll();
+        m_channel->SetStreamData(m_stream_data);
+        m_paused = false;
+        m_unpauseWait.wakeAll();
     }
 
     return IsPaused(true);
@@ -100,8 +100,8 @@ bool IPTVRecorder::PauseAndWait(int timeout)
 void IPTVRecorder::StartNewFile(void)
 {
     // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+    HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
+    HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
 }
 
 void IPTVRecorder::run(void)
@@ -110,22 +110,22 @@ void IPTVRecorder::run(void)
 
     if (!Open())
     {
-        _error = "Failed to open IPTVRecorder device";
-        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
+        m_error = "Failed to open IPTVRecorder device";
+        LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         return;
     }
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     StartNewFile();
 
-    _stream_data->AddAVListener(this);
-    _stream_data->AddWritingListener(this);
+    m_stream_data->AddAVListener(this);
+    m_stream_data->AddWritingListener(this);
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -137,13 +137,13 @@ void IPTVRecorder::run(void)
 
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
-            QMutexLocker locker(&pauseLock);
-            if (!request_recording || request_pause)
+            QMutexLocker locker(&m_pauseLock);
+            if (!m_request_recording || m_request_pause)
                 continue;
-            unpauseWait.wait(&pauseLock, 100);
+            m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!_input_pmt)
+        if (!m_input_pmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
@@ -154,16 +154,16 @@ void IPTVRecorder::run(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- ending...");
 
-    _stream_data->RemoveWritingListener(this);
-    _stream_data->RemoveAVListener(this);
+    m_stream_data->RemoveWritingListener(this);
+    m_stream_data->RemoveAVListener(this);
 
     Close();
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }

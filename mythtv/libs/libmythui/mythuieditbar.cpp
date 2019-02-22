@@ -11,11 +11,6 @@
 #include "mythuishape.h"
 #include "mythuiimage.h"
 
-MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name), m_editPosition(0.0), m_total(1.0)
-{
-}
-
 void MythUIEditBar::ReleaseImages(void)
 {
     ClearImages();

@@ -112,7 +112,7 @@ public:
     void ProcessQueue(void);
 
 private:
-    NCPrivate *d;
+    NCPrivate *d {nullptr};
 };
 
 /**

@@ -37,15 +37,15 @@ protected:
 
     // Implementation
 private:
-    dvd_reader_t *m_reader;
-    uint32_t m_start;
+    dvd_reader_t *m_reader {nullptr};
+    uint32_t      m_start  {0};
 
     class BlockRange;
     typedef QList<BlockRange> list_t;
-    list_t m_list;          // List of possibly encryoted block ranges
+    list_t        m_list;   // List of possibly encryoted block ranges
 
-    uint32_t m_pos;         // Current read position (blocks)
-    int m_title;            // Last title decrypted
+    uint32_t      m_pos    {0};     // Current read position (blocks)
+    int           m_title  {-1};    // Last title decrypted
 };
 
 #endif /* ndef DVDSTREAM_H */

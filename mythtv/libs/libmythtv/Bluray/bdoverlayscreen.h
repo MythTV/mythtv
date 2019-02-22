@@ -15,7 +15,7 @@ class BDOverlayScreen : public MythScreenType
     void DisplayBDOverlay(BDOverlay *overlay);
 
   private:
-    MythPlayer *m_player;
+    MythPlayer *m_player {nullptr};
 };
 
 #endif // BDOVERLAYSCREEN_H

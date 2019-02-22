@@ -7,11 +7,6 @@
 // Libmyth
 #include <mythcontext.h>
 
-MetaIOOggVorbis::MetaIOOggVorbis(void)
-    : MetaIOTagLib()
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *

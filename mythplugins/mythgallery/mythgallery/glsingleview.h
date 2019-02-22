@@ -54,7 +54,7 @@ class GLSDialog : public MythDialog
     void closeEvent(QCloseEvent *e) override; // QWidget
 
   private:
-    GLSingleView *m_view;
+    GLSingleView *m_view {nullptr};
 };
 
 class GLSingleView : public QGLWidget, public ImageView
@@ -118,53 +118,57 @@ class GLSingleView : public QGLWidget, public ImageView
 
   private:
     // General
-    float         m_source_x;
-    float         m_source_y;
-    ScaleMax      m_scaleMax;
+    float         m_source_x      {0.0f};
+    float         m_source_y      {0.0f};
+    ScaleMax      m_scaleMax      {kScaleToFit};
 
     // Texture variables (for display and effects)
-    int           m_texMaxDim;
-    QSize         m_texSize;
-    GLTexture     m_texItem[2];
-    int           m_texCur;
-    bool          m_tex1First;
+    int           m_texMaxDim     {512};
+    QSize         m_texSize       {512,512};
+    GLTexture     m_texItem[2]    ;
+    int           m_texCur        {0};
+    bool          m_tex1First     {true};
 
     // Info variables
-    GLuint        m_texInfo;
+    GLuint        m_texInfo       {0};
 
     // Common effect state variables
-    int           m_effect_rotate_direction;
+    int           m_effect_rotate_direction                {0};
     MythTimer     m_effect_frame_time;
-    int           m_effect_transition_timeout;
-    float         m_effect_transition_timeout_inv;
+    int           m_effect_transition_timeout              {2000};
+    float         m_effect_transition_timeout_inv          {1.0f / 2000};
 
     // Unshared effect state variables
     float         m_effect_flutter_points[40][40][3];
-    float         m_effect_cube_xrot;
-    float         m_effect_cube_yrot;
-    float         m_effect_cube_zrot;
+    float         m_effect_cube_xrot                       {0.0f};
+    float         m_effect_cube_yrot                       {0.0f};
+    float         m_effect_cube_zrot                       {0.0f};
     float         m_effect_kenBurns_location_x[2];
     float         m_effect_kenBurns_location_y[2];
     int           m_effect_kenBurns_projection[2];
     MythTimer     m_effect_kenBurns_image_time[2];
-    float         m_effect_kenBurns_image_timeout;
-    KenBurnsImageLoader *m_effect_kenBurns_imageLoadThread;
-    bool          m_effect_kenBurns_image_ready;
+    float         m_effect_kenBurns_image_timeout          {0.0f};
+    KenBurnsImageLoader *m_effect_kenBurns_imageLoadThread {nullptr};
+    bool          m_effect_kenBurns_image_ready            {true};
     QImage        m_effect_kenBurns_image;
     QSize         m_effect_kenBurns_orig_image_size;
-    ThumbItem     *m_effect_kenBurns_item;
-    bool          m_effect_kenBurns_initialized;
-    bool          m_effect_kenBurns_new_image_started;
+    ThumbItem     *m_effect_kenBurns_item                  {nullptr};
+    bool          m_effect_kenBurns_initialized            {false};
+    bool          m_effect_kenBurns_new_image_started      {true};
 
 };
 
 class KenBurnsImageLoader : public MThread
 {
 public:
-    KenBurnsImageLoader(GLSingleView *singleView, QSize m_texSize, QSize m_screenSize);
+    KenBurnsImageLoader(GLSingleView *singleView, QSize texSize, QSize screenSize)
+        : MThread("KenBurnsImageLoader"),
+          m_singleView(singleView),
+          m_screenSize(screenSize),
+          m_texSize(texSize) {}
     void run() override; // MThread
 private:
-    GLSingleView *m_singleView;
+    GLSingleView *m_singleView {nullptr};
     QSize         m_screenSize;
     QSize         m_texSize;
 

@@ -28,15 +28,15 @@ class MythNewsConfig : public MythScreenType
     void loadData(void);
     void populateSites(void);
 
-    mutable QMutex      m_lock;
-    MythNewsConfigPriv *m_priv;
+    mutable QMutex      m_lock           {QMutex::Recursive};
+    MythNewsConfigPriv *m_priv           {nullptr};
 
-    MythUIButtonList   *m_categoriesList;
-    MythUIButtonList   *m_siteList;
+    MythUIButtonList   *m_categoriesList {nullptr};
+    MythUIButtonList   *m_siteList       {nullptr};
 
-    MythUIText         *m_helpText;
-    MythUIText         *m_contextText;
-    int                 m_updateFreq;
+    MythUIText         *m_helpText       {nullptr};
+    MythUIText         *m_contextText    {nullptr};
+    int                 m_updateFreq     {30};
 
   private slots:
     void slotCategoryChanged(MythUIButtonListItem *item);

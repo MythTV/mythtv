@@ -18,7 +18,7 @@ class RefCountHandler
 {
 public:
     RefCountHandler() : r(new T()) { }
-    RefCountHandler(T *r) : r(r) { r->IncrRef(); }
+    RefCountHandler(T *_r) : r(_r) { r->IncrRef(); }
     RefCountHandler(const RefCountHandler &other) : r(other.r) { r->IncrRef(); }
     RefCountHandler &operator= (const RefCountHandler &other)
     {

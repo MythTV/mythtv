@@ -10,7 +10,7 @@
 #define LOC     QString("ASIChan[%1](%2): ").arg(GetInputID()).arg(GetDevice())
 
 ASIChannel::ASIChannel(TVRec *parent, const QString &device) :
-    DTVChannel(parent), m_device(device), m_isopen(false)
+    DTVChannel(parent), m_device(device)
 {
     m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeASI));
 }

@@ -99,20 +99,21 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void ChangeSaved();
 
   protected:
-    explicit StandardSetting(Storage *_storage = nullptr);
+    explicit StandardSetting(Storage *_storage = nullptr)
+        : m_storage(_storage) {}
     virtual ~StandardSetting();
     void setParent(StandardSetting *parent);
     QString m_settingValue;
-    bool m_enabled;
+    bool    m_enabled         {true};
     QString m_label;
     QString m_helptext;
     QString m_name;
-    bool m_visible;
+    bool    m_visible         {true};
 
   private:
-    bool m_haveChanged;
-    Storage *m_storage;
-    StandardSetting *m_parent;
+    bool    m_haveChanged     {false};
+    Storage *m_storage        {nullptr};
+    StandardSetting *m_parent {nullptr};
     QList<StandardSetting *> m_children;
     QMap<QString, QList<StandardSetting *> > m_targets;
 };
@@ -145,8 +146,9 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
     void SetPasswordEcho(bool b);
 
   protected:
-    explicit MythUITextEditSetting(Storage *_storage = nullptr);
-    bool m_passwordEcho;
+    explicit MythUITextEditSetting(Storage *_storage = nullptr)
+        : StandardSetting(_storage) {}
+    bool m_passwordEcho {false};
 };
 
 
@@ -187,9 +189,12 @@ class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
     void SetNameFilter(QStringList filter) { m_nameFilter = filter; };
 
   protected:
-    explicit MythUIFileBrowserSetting(Storage *_storage);
-    QDir::Filters      m_typeFilter;
-    QStringList        m_nameFilter;
+    explicit MythUIFileBrowserSetting(Storage *_storage)
+        : StandardSetting(_storage) {}
+    QDir::Filters      m_typeFilter {QDir::AllDirs  | QDir::Drives |
+                                     QDir::Files    | QDir::Readable |
+                                     QDir::Writable | QDir::Executable};
+    QStringList        m_nameFilter {"*"};
 };
 
 
@@ -225,14 +230,22 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
     void setValue(const QString&) override; // StandardSetting
 
   protected:
-    MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false);
+    /**
+     * Create a Setting Widget to select the value from a list
+     * \param _storage An object that knows how to get/set the value for
+     *                 this item from/to a database.  This should be
+     *                 created with a call to XXXStorage.
+     * \param rw if set to true, the user can input it's own value
+     */
+    MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
+        : StandardSetting(_storage), m_rewrite(rw) {}
     ~MythUIComboBoxSetting();
     QVector<QString> m_labels;
     QVector<QString> m_values;
 
   private:
     bool m_rewrite;
-    bool m_isSet;
+    bool m_isSet {false};
 
 };
 
@@ -459,7 +472,8 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
   public:
 
     StandardSettingDialog(MythScreenStack *parent, const char *name,
-                          GroupSetting *groupSettings = nullptr);
+                          GroupSetting *groupSettings = nullptr)
+        : MythScreenType(parent, name), m_settingsTree(groupSettings) {}
     virtual ~StandardSettingDialog();
     bool Create(void) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
@@ -478,7 +492,7 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
     GroupSetting *GetGroupSettings(void) const;
-    MythUIButtonList *m_buttonList;
+    MythUIButtonList *m_buttonList         {nullptr};
 
   private slots:
     void settingSelected(MythUIButtonListItem *item);
@@ -491,13 +505,13 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
                                 StandardSetting *selectedSetting = nullptr);
     void Save();
 
-    MythUIText      *m_title;
-    MythUIText      *m_groupHelp;
-    MythUIText      *m_selectedSettingHelp;
-    MythDialogBox   *m_menuPopup;
-    GroupSetting    *m_settingsTree;
-    StandardSetting *m_currentGroupSetting;
-    bool m_loaded;
+    MythUIText      *m_title               {nullptr};
+    MythUIText      *m_groupHelp           {nullptr};
+    MythUIText      *m_selectedSettingHelp {nullptr};
+    MythDialogBox   *m_menuPopup           {nullptr};
+    GroupSetting    *m_settingsTree        {nullptr};
+    StandardSetting *m_currentGroupSetting {nullptr};
+    bool             m_loaded              {false};
 };
 
 Q_DECLARE_METATYPE(StandardSetting *);

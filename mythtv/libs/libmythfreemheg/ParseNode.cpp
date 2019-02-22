@@ -24,12 +24,6 @@
 #include "Engine.h"
 #include "Logging.h"
 
-MHPTagged::MHPTagged(int nTag): MHParseNode(PNTagged)
-{
-    m_TagNo = nTag;
-}
-
-
 // Add an argument to the argument sequence.
 void MHPTagged::AddArg(MHParseNode *pArg)
 {

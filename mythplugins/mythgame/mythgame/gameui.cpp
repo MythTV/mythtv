@@ -44,16 +44,7 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI"),
-            m_showHashed(false), m_gameShowFileName(0),
-            m_gameTree(nullptr), m_favouriteNode(nullptr),
-            m_busyPopup(nullptr),
-            m_gameUITree(nullptr), m_gameTitleText(nullptr),
-            m_gameSystemText(nullptr), m_gameYearText(nullptr),
-            m_gameGenreText(nullptr), m_gamePlotText(nullptr),
-            m_gameFavouriteState(nullptr), m_gameImage(nullptr),
-            m_fanartImage(nullptr), m_boxImage(nullptr),
-            m_scanner(nullptr)
+       : MythScreenType(parent, "GameUI")
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -571,7 +562,7 @@ void GameUI::customEvent(QEvent *event)
     {
         MetadataLookupEvent *lue = (MetadataLookupEvent *)event;
 
-        MetadataLookupList lul = lue->lookupList;
+        MetadataLookupList lul = lue->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -603,7 +594,7 @@ void GameUI::customEvent(QEvent *event)
     {
         MetadataLookupFailure *luf = (MetadataLookupFailure *)event;
 
-        MetadataLookupList lul = luf->lookupList;
+        MetadataLookupList lul = luf->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -630,7 +621,7 @@ void GameUI::customEvent(QEvent *event)
     {
         ImageDLEvent *ide = (ImageDLEvent *)event;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;

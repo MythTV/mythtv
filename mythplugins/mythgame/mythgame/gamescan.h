@@ -61,9 +61,9 @@ class GameScannerThread : public MThread
     QList<uint> m_remove;
     QList<RomInfo*> m_dbgames;
 
-    MythUIProgressDialog *m_dialog;
+    MythUIProgressDialog *m_dialog        {nullptr};
 
-    bool m_DBDataChanged;
+    bool                  m_DBDataChanged {false};
 };
 
 class GameScanner : public QObject

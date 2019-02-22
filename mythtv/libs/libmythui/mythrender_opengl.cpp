@@ -1501,11 +1501,11 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
 void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.hzoom != 1.0f || fx.vzoom != 1.0f || fx.angle != 0.0f)
+    if (fx.m_hzoom != 1.0f || fx.m_vzoom != 1.0f || fx.m_angle != 0.0f)
     {
         newtop.translate(static_cast<GLfloat>(center.x()), static_cast<GLfloat>(center.y()));
-        newtop.scale(fx.hzoom, fx.vzoom);
-        newtop.rotate(fx.angle, 0, 0, 1);
+        newtop.scale(fx.m_hzoom, fx.m_vzoom);
+        newtop.rotate(fx.m_angle, 0, 0, 1);
         newtop.translate(static_cast<GLfloat>(-center.x()), static_cast<GLfloat>(-center.y()));
     }
     m_transforms.push(newtop);

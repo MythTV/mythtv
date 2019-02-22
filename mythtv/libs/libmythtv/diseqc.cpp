@@ -122,11 +122,6 @@ uint DiSEqCDevDevice::TableFromString(const QString   &type,
  *  of a given network of DVB-S devices.
  */
 
-DiSEqCDevSettings::DiSEqCDevSettings()
-    : m_input_id((uint) -1)
-{
-}
-
 /** \fn DiSEqCDevSettings::Load(uint)
  *  \brief Loads configuration chain from DB for specified card input id.
  *  \param card_input_id Desired capture card input ID.
@@ -236,7 +231,7 @@ void DiSEqCDevSettings::SetValue(uint devid, double value)
  *  \brief Main DVB-S device interface.
  */
 
-DiSEqCDevTrees DiSEqCDev::m_trees;
+DiSEqCDevTrees DiSEqCDev::s_trees;
 
 /** \fn DiSEqCDev::FindTree(uint)
  *  \brief Retrieve device tree.
@@ -244,7 +239,7 @@ DiSEqCDevTrees DiSEqCDev::m_trees;
  */
 DiSEqCDevTree *DiSEqCDev::FindTree(uint cardid)
 {
-    return m_trees.FindTree(cardid);
+    return s_trees.FindTree(cardid);
 }
 
 /** \fn DiSEqCDev::InvalidateTrees(void)
@@ -252,7 +247,7 @@ DiSEqCDevTree *DiSEqCDev::FindTree(uint cardid)
  */
 void DiSEqCDev::InvalidateTrees(void)
 {
-    m_trees.InvalidateTrees();
+    s_trees.InvalidateTrees();
 }
 
 //////////////////////////////////////// DiSEqCDevTrees
@@ -306,13 +301,6 @@ void DiSEqCDevTrees::InvalidateTrees(void)
  */
 
 const uint DiSEqCDevTree::kFirstFakeDiSEqCID = 0xf0000000;
-
-DiSEqCDevTree::DiSEqCDevTree() :
-    m_fd_frontend(-1), m_root(nullptr),
-    m_previous_fake_diseqcid(kFirstFakeDiSEqCID)
-{
-    Reset();
-}
 
 DiSEqCDevTree::~DiSEqCDevTree()
 {
@@ -881,18 +869,6 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[5] =
 };
 
 
-/**
- *  \param tree Parent reference to tree object.
- *  \param devid Device ID of this node.
- */
-DiSEqCDevDevice::DiSEqCDevDevice(DiSEqCDevTree &tree, uint devid)
-    : m_devid(devid),           m_dev_type(kTypeLNB),
-                                m_tree(tree),
-      m_parent(nullptr),        m_ordinal(0),
-      m_repeat(1)
-{
-}
-
 DiSEqCDevDevice::~DiSEqCDevDevice()
 {
     if (IsRealDeviceID())
@@ -1088,9 +1064,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[9] =
 };
 
 DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeTone), m_address(DISEQC_ADR_SW_ALL),
-      m_num_ports(2)
+    : DiSEqCDevDevice(tree, devid)
 {
     m_children.resize(m_num_ports);
 
@@ -1737,18 +1711,6 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevRotor::RotorTypeTable[] =
     { nullptr, kTypeDiSEqC_1_3 }
 };
 
-DiSEqCDevRotor::DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeDiSEqC_1_3),
-      m_speed_hi(2.5),          m_speed_lo(1.9),
-      m_child(nullptr),
-      m_last_position(0.0),     m_desired_azimuth(0.0),
-      m_reset(true),            m_move_time(0.0),
-      m_last_pos_known(false),  m_last_azimuth(0.0)
-{
-    Reset();
-}
-
 DiSEqCDevRotor::~DiSEqCDevRotor()
 {
     if (m_child)
@@ -2158,16 +2120,6 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSCR::SCRPositionTable[3] =
     { QString(),      kTypeScrPosA },
 };
 
-DiSEqCDevSCR::DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid)
-    , m_scr_userband(0)
-    , m_scr_frequency(1400)
-    , m_scr_pin(-1)
-    , m_child(nullptr)
-{
-    Reset();
-}
-
 DiSEqCDevSCR::~DiSEqCDevSCR()
 {
     if (m_child)
@@ -2212,7 +2164,7 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("SCR: Tuning to %1kHz, %2, %3 using UB=%4, FREQ=%5MHz, POS=%6%7")
-            .arg(tuning.frequency)
+            .arg(tuning.m_frequency)
             .arg(high_band ? "HiBand" : "LoBand")
             .arg(horizontal ? "H" : "V")
             .arg(m_scr_userband)
@@ -2454,15 +2406,6 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevLNB::LNBTypeTable[5] =
     { QString(),      kTypeVoltageAndToneControl },
 };
 
-DiSEqCDevLNB::DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeVoltageAndToneControl), m_lof_switch(11700000),
-      m_lof_hi(10600000),       m_lof_lo(9750000),
-      m_pol_inv(false)
-{
-    Reset();
-}
-
 bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
 {
     // set tone for bandselect
@@ -2591,7 +2534,7 @@ bool DiSEqCDevLNB::IsHighBand(const DTVMultiplex &tuning) const
     switch (m_type)
     {
         case kTypeVoltageAndToneControl:
-            return (tuning.frequency > m_lof_switch);
+            return (tuning.m_frequency > m_lof_switch);
         case kTypeBandstacked:
             return IsHorizontal(tuning);
         default:
@@ -2608,7 +2551,7 @@ bool DiSEqCDevLNB::IsHighBand(const DTVMultiplex &tuning) const
  */
 bool DiSEqCDevLNB::IsHorizontal(const DTVMultiplex &tuning) const
 {
-    QString pol = tuning.polarity.toString().toLower();
+    QString pol = tuning.m_polarity.toString().toLower();
     return (pol == "h" || pol == "l") ^ IsPolarityInverted();
 }
 
@@ -2623,7 +2566,7 @@ uint32_t DiSEqCDevLNB::GetIntermediateFrequency(
 {
     (void) tuning;
 
-    uint64_t abs_freq = tuning.frequency;
+    uint64_t abs_freq = tuning.m_frequency;
     uint lof = (IsHighBand(tuning)) ? m_lof_hi : m_lof_lo;
 
     return (lof > abs_freq) ? (lof - abs_freq) : (abs_freq - lof);

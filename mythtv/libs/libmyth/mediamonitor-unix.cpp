@@ -116,7 +116,7 @@ static void statError(const QString &methodName, const QString &devPath)
 
 MediaMonitorUnix::MediaMonitorUnix(QObject* par,
                                    unsigned long interval, bool allowEject)
-                : MediaMonitor(par, interval, allowEject), m_fifo(-1)
+                : MediaMonitor(par, interval, allowEject)
 {
     CheckFileSystemTable();
     CheckMountable();

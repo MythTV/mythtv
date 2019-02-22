@@ -82,16 +82,8 @@ MythSocket::MythSocket(
     qt_socket_fd_t socket, MythSocketCBs *cb, bool use_shared_thread) :
     ReferenceCounter(QString("MythSocket(%1)").arg(socket)),
     m_tcpSocket(new QTcpSocket()),
-    m_thread(nullptr),
-    m_socketDescriptor(-1),
-    m_peerPort(-1),
     m_callback(cb),
-    m_useSharedThread(use_shared_thread),
-    m_disableReadyReadCallback(false),
-    m_connected(false),
-    m_dataAvailable(0),
-    m_isValidated(false),
-    m_isAnnounced(false)
+    m_useSharedThread(use_shared_thread)
 {
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("MythSocket(%1, 0x%2) ctor")
         .arg(socket).arg((intptr_t)(cb),0,16));

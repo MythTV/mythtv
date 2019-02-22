@@ -107,22 +107,22 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     void SetBusyPopupMessage(const QString &message);
     void ResetBusyPopup(void);
 
-    bool m_FullScreen;
-    bool m_IsDeleting;
+    bool m_FullScreen                {false};
+    bool m_IsDeleting                {false};
 
-    QSemaphore m_LoadLock;
-    volatile bool m_IsLoading;
-    volatile bool m_IsLoaded;
-    bool m_IsInitialized;
+    QSemaphore m_LoadLock            {1};
+    volatile bool m_IsLoading        {false};
+    volatile bool m_IsLoaded         {false};
+    bool m_IsInitialized             {false};
 
-    MythUIType *m_CurrentFocusWidget;
+    MythUIType *m_CurrentFocusWidget {nullptr};
     //TODO We are currently dependant on the internal sorting of QMap for
     //     entries to be iterated in the correct order, this should probably
     //     be changed.
     QMap<int, MythUIType *> m_FocusWidgetList;
 
-    MythScreenStack *m_ScreenStack;
-    MythUIBusyDialog *m_BusyPopup;
+    MythScreenStack  *m_ScreenStack  {nullptr};
+    MythUIBusyDialog *m_BusyPopup    {nullptr};
 
     QRegion m_SavedMask;
 

@@ -27,14 +27,13 @@ class DecoderHandlerEvent : public MythEvent
 {
   public:
     explicit DecoderHandlerEvent(Type type)
-        : MythEvent(type), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0) {}
+        : MythEvent(type) {}
 
     DecoderHandlerEvent(Type type, QString *e)
-        : MythEvent(type), m_msg(e), m_meta(nullptr), m_available(0), m_maxSize(0) {}
+        : MythEvent(type), m_msg(e) {}
 
     DecoderHandlerEvent(Type type, int available, int maxSize)
-        : MythEvent(type), m_msg(nullptr), m_meta(nullptr), 
-          m_available(available), m_maxSize(maxSize) {}
+        : MythEvent(type), m_available(available), m_maxSize(maxSize) {}
 
     DecoderHandlerEvent(Type type, const MusicMetadata &m);
     ~DecoderHandlerEvent();
@@ -53,10 +52,10 @@ class DecoderHandlerEvent : public MythEvent
     static Type Error;
 
   private:
-    QString  *m_msg;
-    MusicMetadata *m_meta;
-    int       m_available;
-    int       m_maxSize;
+    QString       *m_msg       {nullptr};
+    MusicMetadata *m_meta      {nullptr};
+    int            m_available {0};
+    int            m_maxSize   {0};
 };
 
 /** \brief Class for starting stream decoding.
@@ -80,7 +79,7 @@ class DecoderHandler : public QObject, public MythObservable
         STOPPED
     } State;
 
-    DecoderHandler(void);
+    DecoderHandler(void) = default;
     virtual ~DecoderHandler(void);
 
     Decoder *getDecoder(void) { return m_decoder; }
@@ -111,14 +110,14 @@ class DecoderHandler : public QObject, public MythObservable
     void createPlaylistFromFile(const QUrl &url);
     void createPlaylistFromRemoteUrl(const QUrl &url);
 
-    int               m_state;
-    int               m_playlist_pos;
+    int               m_state        {STOPPED};
+    int               m_playlist_pos {0};
     PlayListFile      m_playlist;
-    Decoder          *m_decoder;
+    Decoder          *m_decoder      {nullptr};
     MusicMetadata     m_meta;
     QUrl              m_url;
-    bool              m_op;
-    uint              m_redirects;
+    bool              m_op           {false};
+    uint              m_redirects    {0};
 
     static const uint MaxRedirects = 3;
 };

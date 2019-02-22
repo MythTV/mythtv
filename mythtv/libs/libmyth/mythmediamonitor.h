@@ -117,15 +117,15 @@ class MPUBLIC MediaMonitor : public QObject
     // List of devices/mountpoints that the user doesn't want to monitor:
     QStringList                  m_IgnoreList;
 
-    bool volatile                m_Active;      ///< Was MonitorThread started?
+    bool volatile                m_Active {false};      ///< Was MonitorThread started?
     QWaitCondition               m_wait;
-    MonitorThread                *m_Thread;
+    MonitorThread               *m_Thread {nullptr};
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
 
     QMap<QString, MHData>        m_handlerMap;  ///< Registered Media Handlers
 
-    static MediaMonitor         *c_monitor;
+    static MediaMonitor         *s_monitor;
 };
 
 #define REG_MEDIA_HANDLER(a, b, c, d, e) \

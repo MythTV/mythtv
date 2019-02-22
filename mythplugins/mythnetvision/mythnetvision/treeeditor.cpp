@@ -1,11 +1,6 @@
 #include "treeeditor.h"
 #include <netutils.h>
 
-TreeEditor::TreeEditor(MythScreenStack *parent, const QString &name)
-    : NetEditorBase(parent, name)
-{
-}
-
 bool TreeEditor::InsertInDB(GrabberScript *script)
 {
     return insertTreeInDB(script, VIDEO_FILE);

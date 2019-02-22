@@ -54,7 +54,7 @@ class MBASE_PUBLIC MDBManager
 {
   friend class MSqlQuery;
   public:
-    MDBManager(void);
+    MDBManager(void) = default;
     ~MDBManager(void);
 
     void CloseDatabases(void);
@@ -78,11 +78,11 @@ class MBASE_PUBLIC MDBManager
     QHash<QThread*, int> m_inuse_count; // protected by m_lock
 #endif
 
-    int m_nextConnID;
-    int m_connCount;
+    int m_nextConnID         {0};
+    int m_connCount          {0};
 
-    MSqlDatabase *m_schedCon;
-    MSqlDatabase *m_DDCon;
+    MSqlDatabase *m_schedCon {nullptr};
+    MSqlDatabase *m_DDCon    {nullptr};
     QHash<QThread*, DBList> m_static_pool;
 };
 
@@ -219,10 +219,10 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     bool seekDebug(const char *type, bool result,
                    int where, bool relative) const;
 
-    MSqlDatabase *m_db;
-    bool m_isConnected;
-    bool m_returnConnection;
-    QString m_last_prepared_query; // holds a copy of the last prepared query
+    MSqlDatabase *m_db               {nullptr};
+    bool          m_isConnected      {false};
+    bool          m_returnConnection {false};
+    QString       m_last_prepared_query; // holds a copy of the last prepared query
 };
 
 #endif

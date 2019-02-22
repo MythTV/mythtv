@@ -35,7 +35,7 @@
  *  If a start state of kStartRunning is passed in the timer is
  *  started immediately as if start() had been called.
  */
-MythTimer::MythTimer(StartState state) : m_offset(0)
+MythTimer::MythTimer(StartState state)
 {
     if (kStartRunning == state)
         start();

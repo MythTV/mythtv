@@ -3,6 +3,9 @@
 
 #include "mythuitype.h"
 
+const int kDefaultMaxValue = 99;
+const int kDefaultPageStep = 10;
+
 /** \class MythUIScrollBar
  *
  * \brief Scroll bar widget.
@@ -14,7 +17,8 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     Q_OBJECT
 
   public:
-    MythUIScrollBar(MythUIType *parent, const QString &name);
+    MythUIScrollBar(MythUIType *parent, const QString &name)
+        : MythUIType(parent, name) {}
    ~MythUIScrollBar() = default;
 
     void Reset(void) override; // MythUIType
@@ -38,15 +42,15 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     void CalculatePosition(void);
     void timerEvent(QTimerEvent *) override; // QObject
 
-    LayoutType m_layout;
+    LayoutType m_layout   {LayoutVertical};
 
     MythRect m_sliderArea;
-    int m_pageStep;
-    int m_sliderPosition;
-    int m_maximum;
+    int m_pageStep        {kDefaultPageStep};
+    int m_sliderPosition  {0};
+    int m_maximum         {0};
 
-    int m_hideDelay;
-    int m_timerId;
+    int m_hideDelay       {0};
+    int m_timerId         {0};
 };
 
 #endif

@@ -25,14 +25,7 @@
 ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
                                      const QString &channelname)
                   :MythScreenType(parent, "ChannelIconImporter"),
-    m_strChannelname(channelname), m_fRefresh(fRefresh),
-    m_nMaxCount(0),                m_nCount(0),
-    m_missingMaxCount(0),          m_missingCount(0),
-    m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(nullptr),
-    m_iconsList(nullptr),          m_manualEdit(nullptr),
-    m_nameText(nullptr),           m_manualButton(nullptr),
-    m_skipButton(nullptr),         m_statusText(nullptr),
-    m_preview(nullptr),            m_previewtitle(nullptr)
+    m_strChannelname(channelname), m_fRefresh(fRefresh)
 {
     if (!m_strChannelname.isEmpty())
         LOG(VB_GENERAL, LOG_INFO,

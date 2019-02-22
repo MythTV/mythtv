@@ -13,78 +13,6 @@
 
 static int x0 = qRegisterMetaType< RefCountHandler<MetadataLookup> >();
 
-// null constructor
-MetadataLookup::MetadataLookup(void) :
-    ReferenceCounter("MetadataLookup"),
-
-    m_type(kMetadataVideo),
-    m_subtype(kUnknownVideo),
-    m_data(),
-    m_step(kLookupSearch),
-    m_automatic(false),
-    m_handleimages(false),
-    m_allowoverwrites(false),
-    m_allowgeneric(false),
-    m_dvdorder(false),
-    m_host(),
-    m_filename(),
-    m_title(),
-    m_network(),
-    m_status(),
-    m_categories(),
-    m_userrating(0),
-    m_ratingcount(0),
-    m_language(),
-    m_subtitle(),
-    m_tagline(),
-    m_description(),
-    m_season(0),
-    m_episode(0),
-    m_chanid(0),
-    m_channum(),
-    m_chansign(),
-    m_channame(),
-    m_chanplaybackfilters(),
-    m_recgroup(),
-    m_playgroup(),
-    m_seriesid(),
-    m_programid(),
-    m_storagegroup(),
-    m_startts(),
-    m_endts(),
-    m_recstartts(),
-    m_recendts(),
-    m_programflags(0),
-    m_audioproperties(0),
-    m_videoproperties(0),
-    m_subtitletype(0),
-    m_certification(),
-    m_countries(),
-    m_popularity(0),
-    m_budget(0),
-    m_revenue(0),
-    m_album(),
-    m_tracknum(0),
-    m_system(),
-    m_year(0),
-    m_releasedate(),
-    m_lastupdated(),
-    m_runtime(0),
-    m_runtimesecs(0),
-    m_inetref(),
-    m_collectionref(),
-    m_tmsref(),
-    m_imdb(),
-    m_iscollection(false),
-    m_people(),
-    m_studios(),
-    m_homepage(),
-    m_trailerURL(),
-    m_artwork(),
-    m_downloads()
-{
-}
-
 // full constructor
 MetadataLookup::MetadataLookup(
     MetadataType type,
@@ -211,7 +139,6 @@ MetadataLookup::MetadataLookup(
     m_collectionref(collectionref),
     m_tmsref(tmsref),
     m_imdb(imdb),
-    m_iscollection(false),
     m_people(people),
     m_studios(studios),
     m_homepage(homepage),
@@ -308,13 +235,8 @@ MetadataLookup::MetadataLookup(
     m_releasedate(releasedate),
     m_lastupdated(lastupdated),
     m_runtime(runtime),
-    m_runtimesecs(runtimesecs),
-    m_iscollection(false)
+    m_runtimesecs(runtimesecs)
 {
-    m_tracknum = 0;
-    m_popularity = 0;
-    m_budget = 0;
-    m_revenue = 0;
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
     m_base_title = title;
     m_base_title.replace(manRecSuffix,"");
@@ -367,28 +289,17 @@ MetadataLookup::MetadataLookup(
     m_title(title),
     m_categories(categories),
     m_userrating(userrating),
-    m_ratingcount(0),
     m_subtitle(subtitle),
     m_tagline(tagline),
     m_description(description),
     m_season(season),
     m_episode(episode),
-    m_chanid(0),
-    m_programflags(0),
-    m_audioproperties(0),
-    m_videoproperties(0),
-    m_subtitletype(0),
     m_certification(certification),
-    m_popularity(0),
-    m_budget(0),
-    m_revenue(0),
-    m_tracknum(0),
     m_year(year),
     m_releasedate(releasedate),
     m_runtime(runtime),
     m_runtimesecs(runtimesecs),
     m_inetref(inetref),
-    m_iscollection(false),
     m_people(people),
     m_trailerURL(trailerURL),
     m_artwork(artwork),

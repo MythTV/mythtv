@@ -69,30 +69,30 @@ class GameUI : public MythScreenType
     void    handleDownloadedImages(MetadataLookup *lookup);
 
   private:
-    bool m_showHashed;
-    int m_gameShowFileName;
+    bool m_showHashed                      {false};
+    int m_gameShowFileName                 {0};
 
-    MythGenericTree  *m_gameTree;
-    MythGenericTree  *m_favouriteNode;
+    MythGenericTree  *m_gameTree           {nullptr};
+    MythGenericTree  *m_favouriteNode      {nullptr};
 
-    MythUIBusyDialog *m_busyPopup;
-    MythScreenStack  *m_popupStack;
+    MythUIBusyDialog *m_busyPopup          {nullptr};
+    MythScreenStack  *m_popupStack         {nullptr};
 
-    MythUIButtonTree *m_gameUITree;
-    MythUIText       *m_gameTitleText;
-    MythUIText       *m_gameSystemText;
-    MythUIText       *m_gameYearText;
-    MythUIText       *m_gameGenreText;
-    MythUIText       *m_gamePlotText;
-    MythUIStateType  *m_gameFavouriteState;
-    MythUIImage      *m_gameImage;
-    MythUIImage      *m_fanartImage;
-    MythUIImage      *m_boxImage;
+    MythUIButtonTree *m_gameUITree         {nullptr};
+    MythUIText       *m_gameTitleText      {nullptr};
+    MythUIText       *m_gameSystemText     {nullptr};
+    MythUIText       *m_gameYearText       {nullptr};
+    MythUIText       *m_gameGenreText      {nullptr};
+    MythUIText       *m_gamePlotText       {nullptr};
+    MythUIStateType  *m_gameFavouriteState {nullptr};
+    MythUIImage      *m_gameImage          {nullptr};
+    MythUIImage      *m_fanartImage        {nullptr};
+    MythUIImage      *m_boxImage           {nullptr};
 
-    MetadataDownload      *m_query;
-    MetadataImageDownload *m_imageDownload;
+    MetadataDownload      *m_query         {nullptr};
+    MetadataImageDownload *m_imageDownload {nullptr};
 
-    GameScanner      *m_scanner;
+    GameScanner      *m_scanner            {nullptr};
 };
 
 #endif

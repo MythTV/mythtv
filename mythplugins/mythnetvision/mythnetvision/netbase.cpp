@@ -18,10 +18,7 @@
 
 NetBase::NetBase(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_thumbImage(nullptr),
-      m_downloadable(nullptr),
       m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
-      m_progressDialog(nullptr),
       m_imageDownload(new MetadataImageDownload(this))
 {
     gCoreContext->addListener(this);

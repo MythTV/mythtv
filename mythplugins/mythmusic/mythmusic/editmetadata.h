@@ -21,7 +21,8 @@ class EditMetadataCommon : public MythScreenType
 
   public:
     EditMetadataCommon(MythScreenStack *parent, MusicMetadata *source_metadata, const QString &name);
-    EditMetadataCommon(MythScreenStack *parent, const QString &name);
+    EditMetadataCommon(MythScreenStack *parent, const QString &name)
+        : MythScreenType(parent, name) {}
 
     ~EditMetadataCommon(void);
 
@@ -47,14 +48,13 @@ class EditMetadataCommon : public MythScreenType
     void searchForAlbumImages(void);
     void scanForImages(void);
 
-    static bool            metadataOnly;
-    static MusicMetadata  *m_metadata, *m_sourceMetadata;
+    static bool           s_metadataOnly;
+    static MusicMetadata *s_metadata;
+    static MusicMetadata *s_sourceMetadata;
 
-    bool m_albumArtChanged;
-
-    QString m_searchType;
-
-    MythUIButton *m_doneButton;
+    bool                  m_albumArtChanged {false};
+    QString               m_searchType;
+    MythUIButton         *m_doneButton      {nullptr};
 };
 
 class EditMetadataDialog : public EditMetadataCommon
@@ -110,33 +110,33 @@ class EditMetadataDialog : public EditMetadataCommon
     //
     //  GUI stuff
     //
-    MythUITextEdit    *m_artistEdit;
-    MythUITextEdit    *m_compArtistEdit;
-    MythUITextEdit    *m_albumEdit;
-    MythUITextEdit    *m_titleEdit;
-    MythUITextEdit    *m_genreEdit;
+    MythUITextEdit    *m_artistEdit             {nullptr};
+    MythUITextEdit    *m_compArtistEdit         {nullptr};
+    MythUITextEdit    *m_albumEdit              {nullptr};
+    MythUITextEdit    *m_titleEdit              {nullptr};
+    MythUITextEdit    *m_genreEdit              {nullptr};
 
-    MythUISpinBox     *m_yearSpin;
-    MythUISpinBox     *m_trackSpin;
-    MythUISpinBox     *m_discSpin;
-    MythUISpinBox     *m_ratingSpin;
+    MythUISpinBox     *m_yearSpin               {nullptr};
+    MythUISpinBox     *m_trackSpin              {nullptr};
+    MythUISpinBox     *m_discSpin               {nullptr};
+    MythUISpinBox     *m_ratingSpin             {nullptr};
 
-    MythUIStateType   *m_ratingState;
-    MythUIButton      *m_incRatingButton;
-    MythUIButton      *m_decRatingButton;
+    MythUIStateType   *m_ratingState            {nullptr};
+    MythUIButton      *m_incRatingButton        {nullptr};
+    MythUIButton      *m_decRatingButton        {nullptr};
 
-    MythUIButton      *m_searchArtistButton;
-    MythUIButton      *m_searchCompArtistButton;
-    MythUIButton      *m_searchAlbumButton;
-    MythUIButton      *m_searchGenreButton;
+    MythUIButton      *m_searchArtistButton     {nullptr};
+    MythUIButton      *m_searchCompArtistButton {nullptr};
+    MythUIButton      *m_searchAlbumButton      {nullptr};
+    MythUIButton      *m_searchGenreButton      {nullptr};
 
-    MythUIImage       *m_artistIcon;
-    MythUIImage       *m_albumIcon;
-    MythUIImage       *m_genreIcon;
+    MythUIImage       *m_artistIcon             {nullptr};
+    MythUIImage       *m_albumIcon              {nullptr};
+    MythUIImage       *m_genreIcon              {nullptr};
 
-    MythUICheckBox    *m_compilationCheck;
+    MythUICheckBox    *m_compilationCheck       {nullptr};
 
-    MythUIButton      *m_albumartButton;
+    MythUIButton      *m_albumartButton         {nullptr};
 };
 
 class EditAlbumartDialog : public EditMetadataCommon
@@ -179,12 +179,12 @@ class EditAlbumartDialog : public EditMetadataCommon
     //
     //  GUI stuff
     //
-    MythUIButton      *m_metadataButton;
+    MythUIButton      *m_metadataButton    {nullptr};
 
-    MythUIImage       *m_coverartImage;
-    MythUIButtonList  *m_coverartList;
-    MythUIText        *m_imagetypeText;
-    MythUIText        *m_imagefilenameText;
+    MythUIImage       *m_coverartImage     {nullptr};
+    MythUIButtonList  *m_coverartList      {nullptr};
+    MythUIText        *m_imagetypeText     {nullptr};
+    MythUIText        *m_imagefilenameText {nullptr};
 };
 
 #endif

@@ -19,10 +19,6 @@
  *  to addListener was too big a patch.
  */
 
-MythObservable::MythObservable() : m_lock(new QMutex())
-{
-}
-
 MythObservable::~MythObservable()
 {
     m_lock->lock();

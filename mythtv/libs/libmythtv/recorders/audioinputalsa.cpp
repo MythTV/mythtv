@@ -25,15 +25,6 @@
 #define LOC     QString("AudioInALSA: ")
 #define LOC_DEV QString("AudioInALSA(%1): ").arg(alsa_device.constData())
 
-AudioInputALSA::AudioInputALSA(const QString &device):
-    AudioInput(device),
-    pcm_handle(nullptr),
-    period_size(0),
-    myth_block_bytes(0)
-{
-    alsa_device = device.right(device.size()-5).toLatin1();
-}
-
 bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
 {
     if (alsa_device.isEmpty())

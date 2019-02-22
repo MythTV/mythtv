@@ -95,8 +95,8 @@
  */
 HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
                                  HouseKeeperStartup startup):
-    ReferenceCounter(dbTag), m_dbTag(dbTag), m_confirm(false), m_scope(scope),
-    m_startup(startup), m_running(false),
+    ReferenceCounter(dbTag), m_dbTag(dbTag), m_scope(scope),
+    m_startup(startup),
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     m_lastRun(MythDate::fromTime_t(0)),
     m_lastSuccess(MythDate::fromTime_t(0)),

@@ -6,16 +6,6 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
-VideoDecodeBuffer::VideoDecodeBuffer(MythPlayer *player, VideoOutput *videoout,
-                                     bool cutlist, int size)
-  : m_player(player),         m_videoOutput(videoout),
-    m_honorCutlist(cutlist),  m_maxFrames(size),
-    m_runThread(true),        m_isRunning(false),
-    m_eof(false)
-{
-
-}
-
 VideoDecodeBuffer::~VideoDecodeBuffer()
 {
     m_runThread = false;

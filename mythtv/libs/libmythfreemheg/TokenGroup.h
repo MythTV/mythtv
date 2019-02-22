@@ -59,10 +59,10 @@ class MHMovement
 class MHTokenGroup : public MHPresentable  
 {
   public:
-    MHTokenGroup();
+    MHTokenGroup() = default;
     const char *ClassName() override // MHRoot
         { return "TokenGroup"; }
-    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+   void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
     void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
     void Activation(MHEngine *engine) override; // MHRoot
@@ -85,7 +85,7 @@ class MHTokenGroup : public MHPresentable
     MHOwnPtrSequence <MHActionSequence> m_NoTokenActionSlots;
 
     // Internal attributes
-    int m_nTokenPosition;
+    int m_nTokenPosition {1};  // Initial value
 };
 
 // Items in the list group consist of a Visible and a "selected" flag.
@@ -101,7 +101,7 @@ class MHListItem {
 class MHListGroup : public MHTokenGroup  
 {
   public:
-    MHListGroup();
+    MHListGroup() = default;
     ~MHListGroup();
     const char *ClassName() override // MHTokenGroup
         { return "ListGroup"; }
@@ -137,12 +137,15 @@ class MHListGroup : public MHTokenGroup
 
     // Exchanged attributes
     MHSequence <QPoint> m_Positions;
-    bool    m_fWrapAround, m_fMultipleSelection;
+    bool    m_fWrapAround        {false};
+    bool    m_fMultipleSelection {false};
     //Internal attributes
     QList<MHListItem*> m_ItemList; // Items found by looking up the object refs
-    int m_nFirstItem; // First item displayed - N.B. MHEG indexes from 1.
-    bool m_fFirstItemDisplayed, m_fLastItemDisplayed;
-    int m_nLastCount, m_nLastFirstItem;
+    int  m_nFirstItem {1}; // First item displayed - N.B. MHEG indexes from 1.
+    bool m_fFirstItemDisplayed   {false};
+    bool m_fLastItemDisplayed    {false};
+    int  m_nLastCount            {0};
+    int  m_nLastFirstItem        {m_nFirstItem};
 };
 
 // Call action slot.

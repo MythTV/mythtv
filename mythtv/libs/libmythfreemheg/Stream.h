@@ -32,7 +32,7 @@
 class MHStream : public MHPresentable  
 {
   public:
-    MHStream();
+    MHStream() = default;
     const char *ClassName() override // MHRoot
         { return "Stream"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -57,15 +57,15 @@ class MHStream : public MHPresentable
 
   protected:
     MHOwnPtrSequence <MHPresentable> m_Multiplex;
-    enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage;
-    int         m_nLooping;
+    enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage {ST_Stream};
+    int         m_nLooping {0}; // Infinity
 };
 
 
 class MHAudio : public MHPresentable  
 {
   public:
-    MHAudio();
+    MHAudio() = default;
     const char *ClassName() override // MHRoot
         { return "Audio"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -78,16 +78,16 @@ class MHAudio : public MHPresentable
     void StopPlaying(MHEngine *engine) override; // MHPresentable
 
   protected:
-    int m_nComponentTag;
-    int m_nOriginalVol;
+    int  m_nComponentTag  {0};
+    int  m_nOriginalVol   {0};
 
-    bool m_fStreamPlaying;
+    bool m_fStreamPlaying {false};
 };
 
 class MHVideo : public MHVisible  
 {
   public:
-    MHVideo();
+    MHVideo() = default;
     const char *ClassName() override // MHRoot
         { return "Video"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
@@ -113,23 +113,25 @@ class MHVideo : public MHVisible
     void StopPlaying(MHEngine *engine) override; // MHPresentable
 
   protected:
-    int m_nComponentTag;
-    enum Termination { VI_Freeze = 1, VI_Disappear } m_Termination;
+    int m_nComponentTag      {0};
+    enum Termination { VI_Freeze = 1, VI_Disappear } m_Termination {VI_Disappear};
     // Added in UK MHEG
-    int     m_nXDecodeOffset, m_nYDecodeOffset;
-    int     m_nDecodeWidth, m_nDecodeHeight;
+    int     m_nXDecodeOffset {0};
+    int     m_nYDecodeOffset {0};
+    int     m_nDecodeWidth   {0};
+    int     m_nDecodeHeight  {0};
 
-    bool m_fStreamPlaying;
+    bool m_fStreamPlaying    {false};
 };
 
 // Real-time graphics - not needed for UK MHEG.
 class MHRTGraphics : public MHVisible  
 {
   public:
-    MHRTGraphics();
+    MHRTGraphics() = default;
     const char *ClassName() override // MHRoot
         { return "RTGraphics"; }
-    virtual ~MHRTGraphics();
+    virtual ~MHRTGraphics() = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
     void Display(MHEngine *) override {} // MHVisible - Not supported

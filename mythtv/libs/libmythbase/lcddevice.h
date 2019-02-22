@@ -45,9 +45,9 @@ class MBASE_PUBLIC LCDMenuItem
     bool m_selected;
     CHECKED_STATE m_checked;
     QString m_name;
-    bool m_scroll;
-    unsigned int m_indent;
-    unsigned int m_scrollPosition;
+    bool m_scroll                 {false};
+    unsigned int m_indent         {0};
+    unsigned int m_scrollPosition {0};
 };
 
 enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
@@ -82,9 +82,9 @@ class MBASE_PUBLIC LCDTextItem
     unsigned int m_itemRow;
     TEXT_ALIGNMENT m_itemAlignment;
     QString m_itemText;
-    QString m_itemScreen;
-    QString m_itemWidget;
-    bool m_itemScrollable;
+    QString m_itemScreen     {"Generic"};
+    QString m_itemWidget     {"textWidget"};
+    bool    m_itemScrollable {false};
 };
 
 //only one active at a time
@@ -310,39 +310,39 @@ signals:
     void Disconnected(void);
 
   private:
-    QTcpSocket *m_socket;
-    QMutex   m_socketLock;
-    QString  m_hostname;
-    uint     m_port;
-    bool     m_connected;
+    QTcpSocket *m_socket        {nullptr};
+    QMutex   m_socketLock       {QMutex::Recursive};
+    QString  m_hostname         {"localhost"};
+    uint     m_port             {6545};
+    bool     m_connected        {false};
 
-    QTimer *m_retryTimer;
-    QTimer *m_LEDTimer;
+    QTimer *m_retryTimer        {nullptr};
+    QTimer *m_LEDTimer          {nullptr};
 
     QString m_sendBuffer;
     QString m_lastCommand;
 
-    int  m_lcdWidth;
-    int  m_lcdHeight;
+    int     m_lcdWidth          {0};
+    int     m_lcdHeight         {0};
 
-    bool m_lcdReady;
+    bool    m_lcdReady          {false};
 
-    bool m_lcdShowTime;
-    bool m_lcdShowMenu;
-    bool m_lcdShowGeneric;
-    bool m_lcdShowMusic;
-    bool m_lcdShowChannel;
-    bool m_lcdShowVolume;
-    bool m_lcdShowRecStatus;
-    bool m_lcdBacklightOn;
-    bool m_lcdHeartbeatOn;
-    int  m_lcdPopupTime;
+    bool    m_lcdShowTime       {false};
+    bool    m_lcdShowMenu       {false};
+    bool    m_lcdShowGeneric    {false};
+    bool    m_lcdShowMusic      {false};
+    bool    m_lcdShowChannel    {false};
+    bool    m_lcdShowVolume     {false};
+    bool    m_lcdShowRecStatus  {false};
+    bool    m_lcdBacklightOn    {false};
+    bool    m_lcdHeartbeatOn    {false};
+    int     m_lcdPopupTime      {0};
     QString m_lcdShowMusicItems;
     QString m_lcdKeyString;
 
-    int m_lcdLedMask;
+    int     m_lcdLedMask        {0};
 
-    int (*GetLEDMask)(void);
+    int (*GetLEDMask)(void)     {nullptr};
 };
 
 #endif

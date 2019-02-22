@@ -29,17 +29,17 @@ class AudioOutput;
 class DecoderEvent : public MythEvent
 {
   public:
-    explicit DecoderEvent(Type type) : MythEvent(type), error_msg(nullptr) { ; }
+    explicit DecoderEvent(Type type) : MythEvent(type) { ; }
 
-    explicit DecoderEvent(QString *e) : MythEvent(Error), error_msg(e) { ; }
+    explicit DecoderEvent(QString *e) : MythEvent(Error), m_error_msg(e) { ; }
 
     ~DecoderEvent()
     {
-        if (error_msg)
-            delete error_msg;
+        if (m_error_msg)
+            delete m_error_msg;
     }
 
-    const QString *errorMessage() const { return error_msg; }
+    const QString *errorMessage() const { return m_error_msg; }
 
     MythEvent *clone(void) const override // MythEvent
         { return new DecoderEvent(*this); }
@@ -50,17 +50,17 @@ class DecoderEvent : public MythEvent
     static Type Error;
 
   private:
-    DecoderEvent(const DecoderEvent &o) : MythEvent(o), error_msg(nullptr)
+    DecoderEvent(const DecoderEvent &o) : MythEvent(o)
     {
-        if (o.error_msg)
+        if (o.m_error_msg)
         {
-            error_msg = new QString(*o.error_msg);
+            m_error_msg = new QString(*o.m_error_msg);
         }
     }
     DecoderEvent &operator=(const DecoderEvent&);
 
   private:
-    QString *error_msg;
+    QString *m_error_msg {nullptr};
 };
 
 class Decoder : public MThread, public MythObservable
@@ -93,16 +93,17 @@ class Decoder : public MThread, public MythObservable
     static Decoder *create(const QString &, AudioOutput *, bool = false);
 
   protected:
-    Decoder(DecoderFactory *, AudioOutput *);
+    Decoder(DecoderFactory *d, AudioOutput *o)
+        : MThread("MythMusicDecoder"), m_fctry(d), m_out(o) {}
     QMutex* getMutex(void) { return &m_mtx; }
     void error(const QString &);
 
     QString m_url;
 
   private:
-    DecoderFactory *m_fctry;
+    DecoderFactory *m_fctry {nullptr};
 
-    AudioOutput *m_out;
+    AudioOutput *m_out {nullptr};
 
     QMutex m_mtx;
     QWaitCondition m_cnd;

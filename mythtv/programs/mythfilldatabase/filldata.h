@@ -26,18 +26,15 @@ bool updateNextScheduledRun();
 
 struct Source
 {
-    Source() : id(0), name(), xmltvgrabber(), userid(), password(), lineupid(),
-        xmltvgrabber_baseline(false), xmltvgrabber_manualconfig(false),
-        xmltvgrabber_cache(false), xmltvgrabber_prefmethod() {}
-    int id;
+    int     id                        {0};
     QString name;
     QString xmltvgrabber;
     QString userid;
     QString password;
     QString lineupid;
-    bool    xmltvgrabber_baseline;
-    bool    xmltvgrabber_manualconfig;
-    bool    xmltvgrabber_cache;
+    bool    xmltvgrabber_baseline     {false};
+    bool    xmltvgrabber_manualconfig {false};
+    bool    xmltvgrabber_cache        {false};
     QString xmltvgrabber_prefmethod;
     vector<int> dd_dups;
 };
@@ -46,14 +43,7 @@ typedef vector<Source> SourceList;
 class FillData
 {
   public:
-    FillData() :
-        raw_lineup(0),                  maxDays(0),
-        interrupted(false),             endofdata(false),
-        refresh_tba(true),              dd_grab_all(false),
-        dddataretrieved(false),
-        need_post_grab_proc(true),      only_update_channels(false),
-        channel_update_run(false),      no_allatonce(false),
-        refresh_all(false)
+    FillData()
     {
         SetRefresh(1, true);
     }
@@ -77,31 +67,31 @@ class FillData
     };
 
   public:
-    ProgramData         prog_data;
-    ChannelData         chan_data;
-    XMLTVParser         xmltv_parser;
-    DataDirectProcessor ddprocessor;
+    ProgramData         m_prog_data;
+    ChannelData         m_chan_data;
+    XMLTVParser         m_xmltv_parser;
+    DataDirectProcessor m_ddprocessor;
 
-    QString logged_in;
-    QString lastdduserid;
-    QString graboptions;
-    int     raw_lineup;
-    uint    maxDays;
+    QString m_logged_in;
+    QString m_lastdduserid;
+    QString m_graboptions;
+    int     m_raw_lineup              {0};
+    uint    m_maxDays                 {0};
 
-    bool    interrupted;
-    bool    endofdata;
-    bool    refresh_tba;
-    bool    dd_grab_all;
-    bool    dddataretrieved;
-    bool    need_post_grab_proc;
-    bool    only_update_channels;
-    bool    channel_update_run;
-    bool    no_allatonce;
+    bool    m_interrupted             {false};
+    bool    m_endofdata               {false};
+    bool    m_refresh_tba             {true};
+    bool    m_dd_grab_all             {false};
+    bool    m_dddataretrieved         {false};
+    bool    m_need_post_grab_proc     {true};
+    bool    m_only_update_channels    {false};
+    bool    m_channel_update_run      {false};
+    bool    m_no_allatonce            {false};
 
   private:
-    QMap<uint,bool>     refresh_day;
-    bool                refresh_all;
-    mutable QStringList fatalErrors;
+    QMap<uint,bool>     m_refresh_day;
+    bool                m_refresh_all {false};
+    mutable QStringList m_fatalErrors;
 };
 
 #endif // _FILLDATA_H_

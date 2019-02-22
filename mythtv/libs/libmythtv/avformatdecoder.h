@@ -120,7 +120,7 @@ class AvFormatDecoder : public DecoderBase
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
     bool IsCodecMPEG(void) const override // DecoderBase
-        { return codec_is_mpeg; }
+        { return m_codec_is_mpeg; }
 
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid,
@@ -144,7 +144,7 @@ class AvFormatDecoder : public DecoderBase
 
     QString      GetCodecDecoderName(void) const override; // DecoderBase
     QString      GetRawEncodingType(void) override; // DecoderBase
-    MythCodecID  GetVideoCodecID(void) const override { return video_codec_id; } // DecoderBase
+    MythCodecID  GetVideoCodecID(void) const override { return m_video_codec_id; } // DecoderBase
 
     void SetDisablePassThrough(bool disable) override; // DecoderBase
     void ForceSetupAudioStream(void) override; // DecoderBase
@@ -274,113 +274,114 @@ class AvFormatDecoder : public DecoderBase
 
     virtual int ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
 
-    PrivateDecoder *private_dec;
+    PrivateDecoder    *m_private_dec                  {nullptr};
 
-    bool is_db_ignored;
+    bool               m_is_db_ignored;
 
-    H264Parser *m_h264_parser;
+    H264Parser        *m_h264_parser                  {nullptr};
 
-    AVFormatContext *ic;
+    AVFormatContext   *m_ic                           {nullptr};
     // AVFormatParameters params;
 
-    URLContext readcontext;
+    URLContext         m_readcontext;
 
-    int frame_decoded;
-    VideoFrame *decoded_video_frame;
-    AVFRingBuffer *avfRingBuffer;
+    int                m_frame_decoded                {0};
+    VideoFrame        *m_decoded_video_frame          {nullptr};
+    AVFRingBuffer     *m_avfRingBuffer                {nullptr};
 
-    struct SwsContext *sws_ctx;
-    bool directrendering;
+    struct SwsContext *m_sws_ctx                      {nullptr};
+    bool               m_directrendering              {false};
 
-    bool no_dts_hack;
-    bool dorewind;
+    bool               m_no_dts_hack                  {false};
+    bool               m_dorewind                     {false};
 
-    bool gopset;
+    bool               m_gopset                       {false};
     /// A flag to indicate that we've seen a GOP frame.  Used in junction with seq_count.
-    bool seen_gop;
-    int seq_count; ///< A counter used to determine if we need to force a call to HandleGopStart
+    bool               m_seen_gop                     {false};
+    /// A counter used to determine if we need to force a call to HandleGopStart
+    int                m_seq_count                    {0};
 
-    QList<AVPacket*> storedPackets;
+    QList<AVPacket*>   m_storedPackets;
 
-    int prevgoppos;
+    int                m_prevgoppos                   {0};
 
     // GetFrame
-    bool gotVideoFrame;
-    bool hasVideo;
-    bool needDummyVideoFrames;
-    bool skipaudio;
-    bool allowedquit;
+    bool               m_gotVideoFrame                {false};
+    bool               m_hasVideo                     {false};
+    bool               m_needDummyVideoFrames         {false};
+    bool               m_skipaudio                    {false};
+    bool               m_allowedquit                  {false};
 
-    uint32_t  start_code_state;
+    uint32_t           m_start_code_state             {0xffffffff};
 
-    long long lastvpts;
-    long long lastapts;
-    long long lastccptsu;
-    long long firstvpts;
-    bool      firstvptsinuse;
+    long long          m_lastvpts                     {0};
+    long long          m_lastapts                     {0};
+    long long          m_lastccptsu                   {0};
+    long long          m_firstvpts                    {0};
+    bool               m_firstvptsinuse               {false};
 
-    int64_t faulty_pts;
-    int64_t faulty_dts;
-    int64_t last_pts_for_fault_detection;
-    int64_t last_dts_for_fault_detection;
-    bool pts_detected;
-    bool reordered_pts_detected;
-    bool pts_selected;
+    int64_t            m_faulty_pts                   {0};
+    int64_t            m_faulty_dts                   {0};
+    int64_t            m_last_pts_for_fault_detection {0};
+    int64_t            m_last_dts_for_fault_detection {0};
+    bool               m_pts_detected                 {false};
+    bool               m_reordered_pts_detected       {false};
+    bool               m_pts_selected                 {true};
     // set use_frame_timing true to utilize the pts values in returned
     // frames. Set fale to use deprecated method.
-    bool use_frame_timing;
+    bool               m_use_frame_timing             {false};
 
-    bool force_dts_timestamps;
+    bool               m_force_dts_timestamps         {false};
 
-    PlayerFlags playerFlags;
-    MythCodecID video_codec_id;
+    PlayerFlags        playerFlags;
+    MythCodecID        m_video_codec_id               {kCodec_NONE};
 
-    int maxkeyframedist;
-    int averror_count;
+    int                m_maxkeyframedist              {-1};
+    int                m_averror_count                {0};
 
     // Caption/Subtitle/Teletext decoders
-    uint             ignore_scte;
-    uint             invert_scte_field;
-    uint             last_scte_field;
-    CC608Decoder     *ccd608;
-    CC708Decoder     *ccd708;
-    TeletextDecoder  *ttd;
-    int               cc608_parity_table[256];
+    uint               m_ignore_scte                  {0};
+    uint               m_invert_scte_field            {0};
+    uint               m_last_scte_field              {0};
+    CC608Decoder      *m_ccd608                       {nullptr};
+    CC708Decoder      *m_ccd708                       {nullptr};
+    TeletextDecoder   *m_ttd                          {nullptr};
+    int                m_cc608_parity_table[256];
     /// Lookup table for whether a stream was seen in the PMT
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool              ccX08_in_pmt[64+4];
+    bool               m_ccX08_in_pmt[64+4];
     /// Lookup table for whether a stream is represented in the UI
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool              ccX08_in_tracks[64+4];
+    bool               m_ccX08_in_tracks[64+4];
     /// StreamInfo for 608 and 708 Captions seen in the PMT descriptor
-    QList<StreamInfo> pmt_tracks;
+    QList<StreamInfo>  m_pmt_tracks;
     /// TrackType (608 or 708) for Captions seen in the PMT descriptor
-    QList<TrackType>  pmt_track_types;
+    QList<TrackType>   m_pmt_track_types;
     /// StreamInfo for 608 and 708 Captions seen in the caption stream itself
     /// but not seen in the PMT
-    QList<StreamInfo> stream_tracks;
+    QList<StreamInfo>  m_stream_tracks;
     /// TrackType (608 or 708) for Captions seen in the caption stream itself
     /// but not seen in the PMT
-    QList<TrackType>  stream_track_types;
+    QList<TrackType>   m_stream_track_types;
 
-    // MHEG
-    InteractiveTV    *itv;                ///< MHEG/MHP decoder
+    /// MHEG/MHP decoder
+    InteractiveTV     *m_itv                          {nullptr};
 
     // Audio
-    uint8_t          *audioSamples;
-    bool              disable_passthru;
+    uint8_t           *m_audioSamples                 {nullptr};
+    bool               m_disable_passthru             {false};
 
-    AudioInfo         audioIn;
-    AudioInfo         audioOut;
+    AudioInfo          m_audioIn;
+    AudioInfo          m_audioOut;
 
-    float m_fps;
-    bool  codec_is_mpeg;
-    bool  m_processFrames;
-    bool  m_streams_changed;
+    float              m_fps                          {0.0f};
+    bool               m_codec_is_mpeg                {false};
+    bool               m_processFrames                {true};
+    bool               m_streams_changed              {false};
     // Value in milliseconds, from setting AudioReadAhead
-    int m_audioReadAhead;
+    int                m_audioReadAhead               {100};
 };
 
 #endif

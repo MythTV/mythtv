@@ -154,7 +154,7 @@ QString StorageGroupDirStorage::GetSetClause(MSqlBindings &bindings) const
 
     QString query("dirname = " + dirnameTag);
 
-    bindings.insert(dirnameTag, user->GetDBValue());
+    bindings.insert(dirnameTag, m_user->GetDBValue());
 
     return query;
 }

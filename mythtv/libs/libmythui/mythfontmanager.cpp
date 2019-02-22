@@ -278,11 +278,4 @@ MythFontManager *GetGlobalFontManager(void)
     return MythFontManager::GetGlobalFontManager();
 }
 
-MythFontReference::MythFontReference(const QString &fontPath,
-                                     const QString &registeredFor,
-                                     const int fontID) :
-    m_fontPath(fontPath), m_registeredFor(registeredFor), m_fontID(fontID)
-{
-}
-
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -16,7 +16,7 @@ public:
     bool Asleep(void);
 
 protected:
-    class ScreenSaverOSXPrivate *d;
+    class ScreenSaverOSXPrivate *d {nullptr};
 };
 
 #endif // MYTH_SCREENSAVER_OSX_H

@@ -32,25 +32,14 @@ class MUI_PUBLIC MythNotification : public MythEvent
     static Type Busy;
 
     MythNotification(Type type, void *parent = nullptr)
-        : MythEvent(type, "NOTIFICATION"), m_id(-1),
-        m_parent(parent), m_fullScreen(false),
-        m_duration(0), m_visibility(kAll), m_priority(kDefault)
-    {
-    }
+        : MythEvent(type, "NOTIFICATION"), m_parent(parent) {}
 
     MythNotification(int id, void *parent)
-        : MythEvent(Update, "NOTIFICATION"), m_id(id),
-        m_parent(parent), m_fullScreen(false),
-        m_duration(0), m_visibility(kAll), m_priority(kDefault)
-    {
-    }
+        : MythEvent(Update, "NOTIFICATION"), m_id(id), m_parent(parent) {}
 
     MythNotification(const QString &title, const QString &author,
                      const QString &details = QString())
-        : MythEvent(New, "NOTIFICATION"), m_id(-1),
-        m_parent(nullptr), m_fullScreen(false),
-        m_description(title), m_duration(0), m_visibility(kAll),
-        m_priority(kDefault)
+        : MythEvent(New, "NOTIFICATION"), m_description(title)
     {
         DMAP map;
         map["minm"] = title;
@@ -63,9 +52,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
     MythNotification(Type type, const QString &title, const QString &author,
                      const QString &details = QString(),
                      const QString &extra   = QString())
-        : MythEvent(type, "NOTIFICATION"), m_id(-1), m_parent(nullptr),
-        m_fullScreen(false), m_description(title), m_duration(0),
-        m_visibility(kAll), m_priority(kDefault)
+        : MythEvent(type, "NOTIFICATION"), m_description(title)
     {
         DMAP map;
         map["minm"] = title;
@@ -77,15 +64,13 @@ class MUI_PUBLIC MythNotification : public MythEvent
     }
 
     MythNotification(Type type, const DMAP &metadata)
-        : MythEvent(type, "NOTIFICATION"), m_id(-1), m_parent(nullptr),
-        m_fullScreen(false), m_duration(0), m_metadata(metadata),
-        m_visibility(kAll), m_priority(kDefault)
+        : MythEvent(type, "NOTIFICATION"), m_metadata(metadata)
     {
         ToStringList();
     }
 
     explicit MythNotification(const MythEvent &me)
-        : MythEvent(me), m_id(-1), m_parent(nullptr)
+        : MythEvent(me)
     {
         FromStringList();
     }
@@ -218,15 +203,15 @@ class MUI_PUBLIC MythNotification : public MythEvent
 #endif
 
   protected:
-    int         m_id;
-    void       *m_parent;
-    bool        m_fullScreen;
+    int         m_id          {-1};
+    void       *m_parent      {nullptr};
+    bool        m_fullScreen  {false};
     QString     m_description;
-    int         m_duration;
+    int         m_duration    {0};
     DMAP        m_metadata;
     QString     m_style;
-    VNMask      m_visibility;
-    Priority    m_priority;
+    VNMask      m_visibility  {(VNMask)kAll};
+    Priority    m_priority    {kDefault};
 };
 
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification

@@ -54,7 +54,7 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
     }
 
   private:
-    SortType m_sortType {SORT_STRING};
+    SortType m_sortType  {SORT_STRING};
     int m_attributeIndex {0}; // for getAttribute
 };
 
@@ -65,17 +65,9 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
 {
     m_subnodes = new SortableMythGenericTreeList;
 
-    m_parent = nullptr;
-    m_selectedSubnode = nullptr;
-
     m_text = a_string;
-
     m_int = an_int;
-    m_data = 0;
-
     m_selectable = selectable_flag;
-    m_visible = true;
-    m_visibleCount = 0;
 
     ensureSortFields();
 }

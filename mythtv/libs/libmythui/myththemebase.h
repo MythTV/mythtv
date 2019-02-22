@@ -16,7 +16,7 @@ class MUI_PUBLIC MythThemeBase
   private:
     void Init(void);
 
-    MythThemeBasePrivate *d;
+    MythThemeBasePrivate *d {nullptr};
 };
 
 #endif

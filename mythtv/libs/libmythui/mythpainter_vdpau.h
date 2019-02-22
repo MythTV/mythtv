@@ -46,9 +46,9 @@ class MUI_PUBLIC MythVDPAUPainter : public MythPainter
     void DeleteBitmaps(void);
     uint GetTextureFromCache(MythImage *im);
 
-    MythRenderVDPAU            *m_render;
-    uint                        m_target;
-    bool                        m_swap_control;
+    MythRenderVDPAU            *m_render       {nullptr};
+    uint                        m_target       {0};
+    bool                        m_swap_control {true};
 
     QMap<MythImage *, uint32_t> m_ImageBitmapMap;
     std::list<MythImage *>      m_ImageExpireList;

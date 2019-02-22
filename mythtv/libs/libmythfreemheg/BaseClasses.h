@@ -39,7 +39,7 @@ class MHEngine;
 // Simple sequence class.
 template <class BASE> class MHSequence {
     public:
-        MHSequence(){ m_VecSize = 0; m_Values = nullptr; }
+        MHSequence() = default;
         // The destructor frees the vector but not the elements.
         ~MHSequence() { free(m_Values); }
         // Get the current size.
@@ -67,8 +67,8 @@ template <class BASE> class MHSequence {
             m_VecSize--;
         }
     protected:
-        int m_VecSize;
-        BASE *m_Values;
+        int   m_VecSize {0};
+        BASE *m_Values  {nullptr};
 };
 
 // As above, but it deletes the pointers when the sequence is destroyed.
@@ -126,21 +126,21 @@ class MHOctetString
 
 protected:
     int m_nLength;
-    unsigned char *m_pChars;
+    unsigned char *m_pChars {nullptr};
 };
 
 // A colour is encoded as a string or the index into a palette.
 // Palettes aren't defined in UK MHEG so the palette index isn't really relevant.
 class MHColour {
   public:
-    MHColour(): m_nColIndex(-1) {}
+    MHColour() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     bool IsSet() const { return m_nColIndex >= 0 || m_ColStr.Size() != 0; }
     void SetFromString(const char *str, int nLen);
     void Copy(const MHColour &col);
     MHOctetString m_ColStr;
-    int m_nColIndex;
+    int           m_nColIndex {-1};
 };
 
 // An object reference is used to identify and refer to an object.
@@ -148,7 +148,7 @@ class MHColour {
 class MHObjectRef
 {
   public:
-    MHObjectRef() { m_nObjectNo = 0; }
+    MHObjectRef() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void Copy(const MHObjectRef &objr);
     static MHObjectRef Null;
@@ -159,7 +159,7 @@ class MHObjectRef
     bool Equal(const MHObjectRef &objr, MHEngine *engine) const;
     QString Printable() const;
 
-    int m_nObjectNo;
+    int           m_nObjectNo {0};
     MHOctetString m_GroupId;
 };
 
@@ -192,23 +192,23 @@ protected:
 class MHGenericBoolean: public MHGenericBase
 {
   public:
-    MHGenericBoolean() : m_fDirect(false) {}
+    MHGenericBoolean() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     bool GetValue(MHEngine *engine) const; // Return the value, looking up any indirect ref.
 protected:
-    bool    m_fDirect;
+    bool    m_fDirect {false};
 };
 
 class MHGenericInteger: public MHGenericBase
 {
   public:
-    MHGenericInteger() : m_nDirect(-1) {}
+    MHGenericInteger() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     int GetValue(MHEngine *engine) const; // Return the value, looking up any indirect ref.
 protected:
-    int     m_nDirect;
+    int     m_nDirect {-1};
 };
 
 class MHGenericOctetString: public MHGenericBase
@@ -266,22 +266,22 @@ class MHParameter
 class MHUnion
 {
   public:
-    MHUnion() : m_Type(U_None), m_nIntVal(0), m_fBoolVal(false) {}
-    MHUnion(int nVal) : m_Type(U_Int), m_nIntVal(nVal), m_fBoolVal(false) {}
+    MHUnion() = default;
+    MHUnion(int nVal) : m_Type(U_Int), m_nIntVal(nVal) {}
     MHUnion(bool fVal) : m_Type(U_Bool), m_nIntVal(0), m_fBoolVal(fVal)  {}
-    MHUnion(const MHOctetString &strVal) : m_Type(U_String), m_nIntVal(0), m_fBoolVal(false) { m_StrVal.Copy(strVal); }
-    MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef), m_nIntVal(0), m_fBoolVal(false) { m_ObjRefVal.Copy(objVal); };
-    MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef), m_nIntVal(0), m_fBoolVal(false) { m_ContentRefVal.Copy(cnVal); }
+    MHUnion(const MHOctetString &strVal) : m_Type(U_String) { m_StrVal.Copy(strVal); }
+    MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef) { m_ObjRefVal.Copy(objVal); };
+    MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef) { m_ContentRefVal.Copy(cnVal); }
 
     void GetValueFrom(const MHParameter &value, MHEngine *engine); // Copies the argument, getting the value of an indirect args.
     QString Printable() const;
 
-    enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type;
+    enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
     void CheckType (enum UnionTypes) const; // Check a type and fail if it doesn't match. 
     static const char *GetAsString(enum UnionTypes t);
 
-    int             m_nIntVal;
-    bool            m_fBoolVal;
+    int             m_nIntVal  {0};
+    bool            m_fBoolVal {false};
     MHOctetString   m_StrVal;
     MHObjectRef     m_ObjRefVal;
     MHContentRef    m_ContentRefVal;
@@ -306,7 +306,7 @@ class MHPointArg {
     MHPointArg() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
-    MHGenericInteger x, y;
+    MHGenericInteger m_x, m_y;
 };
 
 #endif
