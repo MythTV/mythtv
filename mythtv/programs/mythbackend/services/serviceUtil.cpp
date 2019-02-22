@@ -519,15 +519,15 @@ void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
 
 void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
 {
-    input->setId(inputInfo.inputid);
-    input->setInputName(inputInfo.name);
-    input->setCardId(inputInfo.inputid);
-    input->setSourceId(inputInfo.sourceid);
-    input->setDisplayName(inputInfo.displayName);
-    input->setLiveTVOrder(inputInfo.livetvorder);
-    input->setScheduleOrder(inputInfo.scheduleOrder);
-    input->setRecPriority(inputInfo.recPriority);
-    input->setQuickTune(inputInfo.quickTune);
+    input->setId(inputInfo.m_inputid);
+    input->setInputName(inputInfo.m_name);
+    input->setCardId(inputInfo.m_inputid);
+    input->setSourceId(inputInfo.m_sourceid);
+    input->setDisplayName(inputInfo.m_displayName);
+    input->setLiveTVOrder(inputInfo.m_livetvorder);
+    input->setScheduleOrder(inputInfo.m_scheduleOrder);
+    input->setRecPriority(inputInfo.m_recPriority);
+    input->setQuickTune(inputInfo.m_quickTune);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -251,25 +251,25 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static void *UserJobThread(void *param);
     void DoUserJobThread(int jobID);
 
-    QString m_hostname;
+    QString                    m_hostname;
 
-    int jobsRunning;
-    int jobQueueCPU;
+    int                        m_jobsRunning         {0};
+    int                        m_jobQueueCPU         {0};
 
-    ProgramInfo *m_pginfo;
+    ProgramInfo               *m_pginfo              {nullptr};
 
-    QMutex controlFlagsLock;
-    QMap<QString, int *> jobControlFlags;
+//  QMutex                     m_controlFlagsLock;
+//  QMap<QString, int *>       m_jobControlFlags;
 
-    QMutex *runningJobsLock;
-    QMap<int, RunningJobInfo> runningJobs;
+    QMutex                    *m_runningJobsLock     {nullptr};
+    QMap<int, RunningJobInfo>  m_runningJobs;
 
-    bool isMaster;
+    bool                       m_isMaster;
 
-    MThread *queueThread;
-    QWaitCondition queueThreadCond;
-    QMutex queueThreadCondLock;
-    bool processQueue;
+    MThread                   *m_queueThread         {nullptr};
+    QWaitCondition             m_queueThreadCond;
+    QMutex                     m_queueThreadCondLock;
+    bool                       m_processQueue        {false};
 };
 
 #endif

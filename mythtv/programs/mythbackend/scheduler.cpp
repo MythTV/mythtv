@@ -1927,8 +1927,8 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     if (is_busy &&
         (rcinfo->GetRecordingStatus() == RecStatus::Pending ||
          !m_sinputinfomap[rcinfo->GetInputID()].m_schedgroup ||
-         ((!busy_input.mplexid || busy_input.mplexid != rcinfo->m_mplexid) &&
-          (busy_input.mplexid || busy_input.chanid != rcinfo->GetChanID()))))
+         ((!busy_input.m_mplexid || busy_input.m_mplexid != rcinfo->m_mplexid) &&
+          (busy_input.m_mplexid || busy_input.m_chanid != rcinfo->GetChanID()))))
     {
         return true;
     }
@@ -1952,10 +1952,10 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         EncoderLink *rctv2 = (*m_tvList)[inputids[i]];
         if (rctv2->IsBusy(&busy_input, -1))
         {
-            if ((!busy_input.mplexid ||
-                 busy_input.mplexid != rcinfo->m_mplexid) &&
-                (busy_input.mplexid ||
-                 busy_input.chanid != rcinfo->GetChanID()))
+            if ((!busy_input.m_mplexid ||
+                 busy_input.m_mplexid != rcinfo->m_mplexid) &&
+                (busy_input.m_mplexid ||
+                 busy_input.m_chanid != rcinfo->GetChanID()))
             {
                 // This conflicting input is busy on a different
                 // multiplex than is desired.  There is no way the
@@ -3029,8 +3029,8 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
                 QString("Input %1 is free").arg(inputid));
             bestid = inputid;
         }
-        else if ((ri.m_mplexid && busy_info.mplexid != ri.m_mplexid) ||
-                 (!ri.m_mplexid && busy_info.chanid != ri.GetChanID()))
+        else if ((ri.m_mplexid && busy_info.m_mplexid != ri.m_mplexid) ||
+                 (!ri.m_mplexid && busy_info.m_chanid != ri.GetChanID()))
         {
             LOG(VB_SCHEDULE, LOG_DEBUG,
                 QString("Input %1 is on livetv but has to stop")
@@ -5609,14 +5609,14 @@ void Scheduler::SchedLiveTV(void)
         InputInfo in;
         enc->IsBusy(&in);
 
-        if (!in.inputid)
+        if (!in.m_inputid)
             continue;
 
         // Get the program that will be recording on this channel at
         // record start time and assume this LiveTV session continues
         // for at least another 30 minutes from now.
         RecordingInfo *dummy = new RecordingInfo(
-            in.chanid, m_livetvTime, true, 4);
+            in.m_chanid, m_livetvTime, true, 4);
         dummy->SetRecordingStartTime(m_schedTime);
         if (m_schedTime.secsTo(dummy->GetRecordingEndTime()) < 1800)
             dummy->SetRecordingEndTime(m_schedTime.addSecs(1800));

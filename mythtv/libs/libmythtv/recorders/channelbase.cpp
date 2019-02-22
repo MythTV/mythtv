@@ -234,15 +234,15 @@ bool ChannelBase::IsInputAvailable(
         {
             LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                 QString("Input %1 is busy on %2/%3")
-                .arg(info.inputid)
-                .arg(info.chanid).arg(info.mplexid));
-            if (info.sourceid != m_sourceid)
+                .arg(info.m_inputid)
+                .arg(info.m_chanid).arg(info.m_mplexid));
+            if (info.m_sourceid != m_sourceid)
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is busy"));
                 return false;
             }
-            mplexid_restriction = info.mplexid;
-            chanid_restriction = info.chanid;
+            mplexid_restriction = info.m_mplexid;
+            chanid_restriction = info.m_chanid;
         }
     }
 

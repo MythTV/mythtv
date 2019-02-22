@@ -123,10 +123,10 @@ class PaneATSC : public GroupSetting
             ++next;
 
             const FrequencyTable &ft = **it;
-            int     name_num         = ft.name_offset;
-            QString strNameFormat    = ft.name_format;
-            uint    freq             = ft.frequencyStart;
-            while (freq <= ft.frequencyEnd)
+            int     name_num         = ft.m_nameOffset;
+            QString strNameFormat    = ft.m_nameFormat;
+            uint    freq             = ft.m_frequencyStart;
+            while (freq <= ft.m_frequencyEnd)
             {
                 QString name = strNameFormat;
                 if (strNameFormat.indexOf("%") >= 0)
@@ -136,11 +136,11 @@ class PaneATSC : public GroupSetting
                 first = false;
 
                 bool last = (next == m_tables.end()) &&
-                    ((freq + ft.frequencyStep) >= ft.frequencyEnd);
+                    ((freq + ft.m_frequencyStep) >= ft.m_frequencyEnd);
                 m_transport_end->addSelection(name, name, last);
 
                 name_num++;
-                freq += ft.frequencyStep;
+                freq += ft.m_frequencyStep;
             }
         }
     }

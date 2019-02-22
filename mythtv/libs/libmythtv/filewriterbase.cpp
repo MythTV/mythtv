@@ -25,17 +25,6 @@
 #define LOC QString("FWB(%1): ").arg(m_filename)
 #define LOC_ERR QString("FWB(%1) Error: ").arg(m_filename)
 
-FileWriterBase::FileWriterBase()
-    : m_videoBitrate(800000),   m_width(0),               m_height(0),
-      m_aspect(1.333333),       m_frameRate(29.97),       m_keyFrameDist(15),
-      m_audioBitrate(0),        m_audioChannels(2),
-      m_audioFrameRate(48000),  m_audioFormat(FORMAT_S16),m_audioFrameSize(-1),
-      m_encodingThreadCount(1),
-      m_framesWritten(0),
-      m_startingTimecodeOffset(-1)
-{
-}
-
 int FileWriterBase::WriteVideoFrame(VideoFrame */*frame*/)
 {
     LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): Shouldn't be here!");
