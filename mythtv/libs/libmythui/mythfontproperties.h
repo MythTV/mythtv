@@ -57,25 +57,25 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     void CalcHash(void);
 
     QFont   m_face;
-    QBrush  m_brush;
+    QBrush  m_brush         {Qt::white};
 
-    bool    m_hasShadow;
+    bool    m_hasShadow     {false};
     QPoint  m_shadowOffset;
     QColor  m_shadowColor;
-    int     m_shadowAlpha;
+    int     m_shadowAlpha   {255};
 
-    bool    m_hasOutline;
+    bool    m_hasOutline    {false};
     QColor  m_outlineColor;
-    int     m_outlineSize;
-    int     m_outlineAlpha;
+    int     m_outlineSize   {0};
+    int     m_outlineAlpha  {255};
 
-    float   m_relativeSize;
+    float   m_relativeSize  {0.5f};
 
     QString m_hash;
 
-    bool    m_bFreeze;
+    bool    m_bFreeze       {false};
 
-    int     m_stretch;
+    int     m_stretch       {100};
 
     static QMutex m_zoom_lock;
     static uint   m_zoom_percent;

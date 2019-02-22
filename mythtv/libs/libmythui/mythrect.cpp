@@ -5,30 +5,11 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 
-MythRect::MythRect()
-         : QRect()
-{
-    Init();
-}
-
-MythRect::MythRect(int x, int y, int width, int height)
-         : QRect(x, y, width, height)
-{
-    Init();
-}
-
 MythRect::MythRect(const QString &sX, const QString &sY, const QString &sWidth,
                    const QString &sHeight, const QString &baseRes)
          : QRect()
 {
-    Init();
     setRect(sX,sY,sWidth,sHeight,baseRes);
-}
-
-MythRect::MythRect(QRect rect)
-          : QRect(rect)
-{
-    Init();
 }
 
 bool MythRect::operator== (const MythRect &other) const
@@ -42,13 +23,6 @@ bool MythRect::operator== (const MythRect &other) const
             (m_offsetX == other.m_offsetX) &&
             (m_offsetY == other.m_offsetY) &&
             (QRect)(*this) == (QRect)other);
-}
-
-void MythRect::Init(void)
-{
-    m_needsUpdate = true;
-    m_percentWidth = m_percentHeight = m_percentX = m_percentY = 0.0;
-    m_offsetWidth = m_offsetHeight = m_offsetX = m_offsetY = 0;
 }
 
 void MythRect::Reset(void)
@@ -385,39 +359,11 @@ QRect MythRect::toQRect() const
 
 ///////////////////////////////////////////////////////////////////
 
-MythPoint::MythPoint()
-         : QPoint()
-{
-    Init();
-    valid = false;
-}
-
-MythPoint::MythPoint(int x, int y)
-         : QPoint(x, y)
-{
-    Init();
-}
-
 MythPoint::MythPoint(const QString &sX, const QString &sY)
          : QPoint()
 {
-    Init();
     setX(sX);
     setY(sY);
-}
-
-MythPoint::MythPoint(QPoint point)
-          : QPoint(point)
-{
-    Init();
-}
-
-void MythPoint::Init()
-{
-    m_needsUpdate = true;
-    m_percentX = m_percentY = 0.0;
-    m_offsetX = m_offsetY = 0;
-    valid = true;
 }
 
 void MythPoint::CalculatePoint(const MythRect & parentArea)
@@ -440,7 +386,7 @@ void MythPoint::CalculatePoint(const MythRect & parentArea)
     QPoint::setY(Y);
 
     m_needsUpdate = false;
-    valid = true;
+    m_valid = true;
 }
 
 void MythPoint::NormPoint(void)

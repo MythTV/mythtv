@@ -78,8 +78,8 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 
     QString xmltvid = element.attribute("id", "");
 
-    chaninfo->xmltvid = xmltvid;
-    chaninfo->tvformat = "Default";
+    chaninfo->m_xmltvid = xmltvid;
+    chaninfo->m_tvformat = "Default";
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -89,42 +89,42 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                if (chaninfo->icon.isEmpty())
+                if (chaninfo->m_icon.isEmpty())
                 {
                     QString path = info.attribute("src", "");
                     if (!path.isEmpty() && !path.contains("://"))
                     {
                         QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                        chaninfo->icon = base +
+                        chaninfo->m_icon = base +
                             ((path.startsWith("/")) ? path : QString("/") + path);
                     }
                     else if (!path.isEmpty())
                     {
                         QUrl url(path);
                         if (url.isValid())
-                            chaninfo->icon = url.toString();
+                            chaninfo->m_icon = url.toString();
                     }
                 }
             }
             else if (info.tagName() == "display-name")
             {
-                if (chaninfo->name.isEmpty())
+                if (chaninfo->m_name.isEmpty())
                 {
-                    chaninfo->name = info.text();
+                    chaninfo->m_name = info.text();
                 }
-                else if (chaninfo->callsign.isEmpty())
+                else if (chaninfo->m_callsign.isEmpty())
                 {
-                    chaninfo->callsign = info.text();
+                    chaninfo->m_callsign = info.text();
                 }
-                else if (chaninfo->channum.isEmpty())
+                else if (chaninfo->m_channum.isEmpty())
                 {
-                    chaninfo->channum = info.text();
+                    chaninfo->m_channum = info.text();
                 }
             }
         }
     }
 
-    chaninfo->freqid = chaninfo->channum;
+    chaninfo->m_freqid = chaninfo->m_channum;
     return chaninfo;
 }
 
@@ -694,7 +694,7 @@ bool XMLTVParser::parseFile(
             if (e.tagName() == "channel")
             {
                 ChannelInfo *chinfo = parseChannel(e, baseUrl);
-                if (!chinfo->xmltvid.isEmpty())
+                if (!chinfo->m_xmltvid.isEmpty())
                     chanlist->push_back(*chinfo);
                 delete chinfo;
             }

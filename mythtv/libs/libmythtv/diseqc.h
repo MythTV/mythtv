@@ -35,7 +35,7 @@ typedef vector<DiSEqCDevDevice*>   dvbdev_vec_t;
 class DiSEqCDevSettings
 {
   public:
-    DiSEqCDevSettings();
+    DiSEqCDevSettings() = default;
 
     bool   Load( uint card_input_id);
     bool   Store(uint card_input_id) const;
@@ -43,8 +43,8 @@ class DiSEqCDevSettings
     void   SetValue(uint devid, double value);
 
   protected:
-    uint_to_dbl_t m_config;   ///< map of dev tree id to configuration value
-    uint          m_input_id; ///< current input id
+    uint_to_dbl_t m_config;       //< map of dev tree id to configuration value
+    uint          m_input_id {1}; ///< current input id
 };
 
 class DiSEqCDev
@@ -54,7 +54,7 @@ class DiSEqCDev
     void           InvalidateTrees(void);
 
   protected:
-    static DiSEqCDevTrees m_trees;
+    static DiSEqCDevTrees s_trees;
 };
 
 class DiSEqCDevTrees
@@ -73,7 +73,7 @@ class DiSEqCDevTrees
 class DiSEqCDevTree
 {
   public:
-    DiSEqCDevTree();
+    DiSEqCDevTree() { Reset(); }
     ~DiSEqCDevTree();
 
     bool Load(const QString &device);
@@ -121,10 +121,10 @@ class DiSEqCDevTree
     bool ApplyVoltage(const DiSEqCDevSettings &settings,
                       const DTVMultiplex &tuning);
 
-    int              m_fd_frontend;
-    DiSEqCDevDevice *m_root;
+    int              m_fd_frontend            {-1};
+    DiSEqCDevDevice *m_root                   {nullptr};
     uint             m_last_voltage;
-    uint             m_previous_fake_diseqcid;
+    uint             m_previous_fake_diseqcid {kFirstFakeDiSEqCID};
     vector<uint>     m_delete;
 
     static const uint kFirstFakeDiSEqCID;
@@ -133,7 +133,8 @@ class DiSEqCDevTree
 class DiSEqCDevDevice
 {
   public:
-    DiSEqCDevDevice(DiSEqCDevTree &tree, uint devid);
+    DiSEqCDevDevice(DiSEqCDevTree &tree, uint devid)
+        : m_devid(devid), m_tree(tree) {}
     virtual ~DiSEqCDevDevice();
 
     // Commands
@@ -195,12 +196,12 @@ class DiSEqCDevDevice
     void SetDeviceID(uint devid)       const { m_devid    = devid;   }
 
     mutable uint     m_devid;
-    dvbdev_t         m_dev_type;
+    dvbdev_t         m_dev_type {kTypeLNB};
     QString          m_desc;
     DiSEqCDevTree   &m_tree;
-    DiSEqCDevDevice *m_parent;
-    uint             m_ordinal;
-    uint             m_repeat;
+    DiSEqCDevDevice *m_parent   {nullptr};
+    uint             m_ordinal  {0};
+    uint             m_repeat   {1};
 
     typedef struct { QString name; uint value; } TypeTable;
     static QString TableToString(uint type, const TypeTable *table);
@@ -278,12 +279,12 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     int  GetPosition(  const DiSEqCDevSettings&) const;
 
   private:
-    dvbdev_switch_t m_type;
-    uint            m_address;
-    uint            m_num_ports;
-    uint            m_last_pos;
-    uint            m_last_high_band;
-    uint            m_last_horizontal;
+    dvbdev_switch_t m_type            {kTypeTone};
+    uint            m_address         {0x10}; //DISEQC_ADR_SW_ALL
+    uint            m_num_ports       {2};
+    uint            m_last_pos        {(uint)-1};
+    uint            m_last_high_band  {(uint)-1};
+    uint            m_last_horizontal {(uint)-1};
     dvbdev_vec_t    m_children;
 
     static const TypeTable SwitchTypeTable[9];
@@ -292,7 +293,8 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 class DiSEqCDevRotor : public DiSEqCDevDevice
 {
   public:
-    DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid);
+    DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
+        : DiSEqCDevDevice(tree, devid) { Reset(); }
     ~DiSEqCDevRotor();
 
     // Commands
@@ -348,21 +350,21 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
 
   private:
     // configuration
-    dvbdev_rotor_t m_type;
-    double         m_speed_hi;
-    double         m_speed_lo;
-    dbl_to_uint_t  m_posmap;
-    DiSEqCDevDevice  *m_child;
+    dvbdev_rotor_t    m_type            {kTypeDiSEqC_1_3};
+    double            m_speed_hi        {2.5};
+    double            m_speed_lo        {1.9};
+    dbl_to_uint_t     m_posmap;
+    DiSEqCDevDevice  *m_child           {nullptr};
 
     // state
-    double         m_last_position;
-    double         m_desired_azimuth;
-    bool           m_reset;
+    double            m_last_position   {0.0};
+    double            m_desired_azimuth {0.0};
+    bool              m_reset           {true};
 
     // rotor position tracking state
-    mutable double m_move_time;
-    mutable bool   m_last_pos_known;
-    mutable double m_last_azimuth;
+    mutable double m_move_time          {0.0};
+    mutable bool   m_last_pos_known     {false};
+    mutable double m_last_azimuth       {0.0};
 
     // statics
     static const TypeTable RotorTypeTable[3];
@@ -371,7 +373,8 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
 class DiSEqCDevSCR : public DiSEqCDevDevice
 {
   public:
-    DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid);
+    DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
+        : DiSEqCDevDevice(tree, devid) { Reset(); }
     ~DiSEqCDevSCR();
 
     // Commands
@@ -423,11 +426,11 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
                              unsigned char *data = nullptr) const;
 
   private:
-    uint         m_scr_userband;  /* 0-7 */
-    uint         m_scr_frequency;
-    int          m_scr_pin;       /* 0-255, -1=disabled */
+    uint             m_scr_userband  {0};    /* 0-7 */
+    uint             m_scr_frequency {1400};
+    int              m_scr_pin       {-1};   /* 0-255, -1=disabled */
 
-    DiSEqCDevDevice *m_child;
+    DiSEqCDevDevice *m_child         {nullptr};
 
     static const TypeTable SCRPositionTable[3];
 };
@@ -435,7 +438,8 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
 class DiSEqCDevLNB : public DiSEqCDevDevice
 {
   public:
-    DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid);
+    DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
+        : DiSEqCDevDevice(tree, devid) { Reset(); }
 
     // Commands
     bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) override; // DiSEqCDevDevice
@@ -477,14 +481,14 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
         { return (dvbdev_lnb_t) TableFromString(type, LNBTypeTable); }
 
   private:
-    dvbdev_lnb_t m_type;
-    uint         m_lof_switch;
-    uint         m_lof_hi;
-    uint         m_lof_lo;
+    dvbdev_lnb_t m_type       {kTypeVoltageAndToneControl};
+    uint         m_lof_switch {11700000};
+    uint         m_lof_hi     {10600000};
+    uint         m_lof_lo     { 9750000};
     /// If a signal is circularly polarized the polarity will flip
     /// on each reflection, so antenna systems with an even number
     /// of reflectors will need to set this value.
-    bool         m_pol_inv;
+    bool         m_pol_inv    {false};
 
     static const TypeTable LNBTypeTable[5];
 };

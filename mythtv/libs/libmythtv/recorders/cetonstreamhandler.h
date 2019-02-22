@@ -29,7 +29,7 @@ class CetonStreamHandler : public IPTVStreamHandler
     static void Return(CetonStreamHandler * & ref, int inputid);
 
     bool IsConnected(void) const;
-    bool IsCableCardInstalled() const { return _using_cablecard; };
+    bool IsCableCardInstalled() const { return m_using_cablecard; };
 
     // Commands
     bool EnterPowerSavingMode(void);
@@ -62,19 +62,19 @@ class CetonStreamHandler : public IPTVStreamHandler
 
 
   private:
-    QString     _ip_address;
-    uint        _card;
-    uint        _tuner;
-    QString     _device_path;
-    bool        _using_cablecard;
-    bool        _connected;
-    bool               _valid;
+    QString     m_ip_address;
+    uint        m_card            {0};
+    uint        m_tuner           {0};
+    QString     m_device_path;
+    bool        m_using_cablecard {false};
+    bool        m_connected       {false};
+    bool        m_valid           {false};
 
-    uint        _last_frequency;
-    QString     _last_modulation;
-    uint        _last_program;
-    QString     _last_vchannel;
-    QTime       _read_timer;
+    uint        m_last_frequency  {0};
+    QString     m_last_modulation;
+    uint        m_last_program    {0};
+    QString     m_last_vchannel;
+    QTime       m_read_timer;
 
     // for implementing Get & Return
     static QMutex                               s_handlers_lock;

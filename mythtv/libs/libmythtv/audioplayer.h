@@ -109,23 +109,23 @@ class MTV_PUBLIC AudioPlayer
     void ResetVisuals(void);
 
   private:
-    MythPlayer  *m_parent;
-    AudioOutput *m_audioOutput;
-    int          m_channels;
-    int          m_orig_channels;
-    AVCodecID    m_codec;
-    AudioFormat  m_format;
-    int          m_samplerate;
-    int          m_codec_profile;
-    float        m_stretchfactor;
-    bool         m_passthru;
-    QMutex       m_lock;
+    MythPlayer  *m_parent            {nullptr};
+    AudioOutput *m_audioOutput       {nullptr};
+    int          m_channels          {-1};
+    int          m_orig_channels     {-1};
+    AVCodecID    m_codec             {AV_CODEC_ID_NONE};
+    AudioFormat  m_format            {FORMAT_NONE};
+    int          m_samplerate        {44100};
+    int          m_codec_profile     {0};
+    float        m_stretchfactor     {1.0f};
+    bool         m_passthru          {false};
+    QMutex       m_lock              {QMutex::Recursive};
     bool         m_muted_on_creation;
     QString      m_main_device;
     QString      m_passthru_device;
-    bool         m_no_audio_in;
-    bool         m_no_audio_out;
-    bool         m_controls_volume;
+    bool         m_no_audio_in       {false};
+    bool         m_no_audio_out      {true};
+    bool         m_controls_volume   {true};
     vector<MythTV::Visual*> m_visuals;
 };
 

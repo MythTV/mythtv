@@ -65,20 +65,20 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
 
     void SwitchList(bool right);
 
-    bool m_active;
-    bool m_initialized;
-    uint m_numLists;
-    uint m_visibleLists;
-    uint m_currentDepth;
-    int  m_depthOffset;
-    uint m_oldDepth;
+    bool m_active                    {true};
+    bool m_initialized               {false};
+    uint m_numLists                  {1};
+    uint m_visibleLists              {0};
+    uint m_currentDepth              {0};
+    int  m_depthOffset               {0};
+    uint m_oldDepth                  {0};
     QList<MythUIButtonList*> m_buttonlists;
-    MythUIButtonList *m_listTemplate;
-    MythUIButtonList *m_activeList;
-    uint m_activeListID;
-    MythGenericTree *m_rootNode;
-    MythGenericTree *m_currentNode;
-    uint m_listSpacing;
+    MythUIButtonList *m_listTemplate {nullptr};
+    MythUIButtonList *m_activeList   {nullptr};
+    uint              m_activeListID {0};
+    MythGenericTree  *m_rootNode     {nullptr};
+    MythGenericTree  *m_currentNode  {nullptr};
+    uint              m_listSpacing  {0};
 };
 
 #endif

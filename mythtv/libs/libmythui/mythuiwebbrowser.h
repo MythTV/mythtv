@@ -114,13 +114,13 @@ class MythWebView : public QWebView
     QString getReplyMimetype(void);
     QString getExtensionForMimetype(const QString &mimetype);
 
-    MythWebPage      *m_webpage;
-    MythUIWebBrowser *m_parentBrowser;
-    BrowserApi       *m_api;
+    MythWebPage      *m_webpage         {nullptr};
+    MythUIWebBrowser *m_parentBrowser   {nullptr};
+    BrowserApi       *m_api             {nullptr};
     QNetworkRequest   m_downloadRequest;
-    QNetworkReply    *m_downloadReply;
-    MythUIBusyDialog *m_busyPopup;
-    bool              m_downloadAndPlay;
+    QNetworkReply    *m_downloadReply   {nullptr};
+    MythUIBusyDialog *m_busyPopup       {nullptr};
+    bool              m_downloadAndPlay {false};
 };
 
 /**

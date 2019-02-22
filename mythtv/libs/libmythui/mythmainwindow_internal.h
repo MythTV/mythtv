@@ -38,9 +38,9 @@ class MythPainterWindowGL : public MythPainterWindowWidget
 
     void paintEvent(QPaintEvent *e) override; // MythPainterWindowWidget aka QWidget
 
-    MythMainWindow *parent;
+    MythMainWindow *m_parent;
     MythMainWindowPrivate *d;
-    MythRenderOpenGL *render;
+    MythRenderOpenGL *m_render;
 };
 #endif
 
@@ -56,7 +56,7 @@ class MythPainterWindowD3D9 : public QGLWidget
 
     void paintEvent(QPaintEvent *e) override; // QGLWidget
 
-    MythMainWindow *parent;
+    MythMainWindow *m_parent;
     MythMainWindowPrivate *d;
 };
 #endif
@@ -70,7 +70,7 @@ class MythPainterWindowQt : public QWidget
 
     void paintEvent(QPaintEvent *e) override; // QWidget
 
-    MythMainWindow *parent;
+    MythMainWindow *m_parent;
     MythMainWindowPrivate *d;
 };
 

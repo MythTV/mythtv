@@ -33,7 +33,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void GetRotorStatus(bool &was_moving, bool &is_moving) override; // DTVSignalMonitor
     void SetRotorValue(int val) override // DTVSignalMonitor
     {
-        QMutexLocker locker(&statusLock);
+        QMutexLocker locker(&m_statusLock);
         rotorPosition.SetValue(val);
     }
 

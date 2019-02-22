@@ -5,8 +5,7 @@
 
 HLSStreamWorker::HLSStreamWorker(HLSReader *parent)
     : MThread("HLSStream"),
-      m_parent(parent), m_downloader(nullptr),
-      m_cancel(false), m_wokenup(false)
+      m_parent(parent)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }

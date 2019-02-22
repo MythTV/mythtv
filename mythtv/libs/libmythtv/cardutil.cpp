@@ -1149,7 +1149,7 @@ bool CardUtil::SetStartChannel(uint inputid, const QString &channum)
 
 bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 {
-    if (!input.inputid)
+    if (!input.m_inputid)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1158,7 +1158,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
                   "schedorder, displayname, recpriority, quicktune "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", input.inputid);
+    query.bindValue(":INPUTID", input.m_inputid);
 
     if (!query.exec())
     {
@@ -1169,20 +1169,20 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     if (!query.next())
         return false;
 
-    input.name     = query.value(0).toString();
-    input.sourceid = query.value(1).toUInt();
-    input.livetvorder = query.value(2).toUInt();
-    input.scheduleOrder = query.value(3).toUInt();
-    input.displayName = query.value(4).toString();
-    input.recPriority = query.value(5).toInt();
-    input.quickTune = query.value(6).toBool();
+    input.m_name          = query.value(0).toString();
+    input.m_sourceid      = query.value(1).toUInt();
+    input.m_livetvorder   = query.value(2).toUInt();
+    input.m_scheduleOrder = query.value(3).toUInt();
+    input.m_displayName   = query.value(4).toString();
+    input.m_recPriority   = query.value(5).toInt();
+    input.m_quickTune     = query.value(6).toBool();
 
-    if (input.displayName.isEmpty())
-        input.displayName = QObject::tr("Input %1:%2")
-            .arg(input.inputid).arg(input.name);
+    if (input.m_displayName.isEmpty())
+        input.m_displayName = QObject::tr("Input %1:%2")
+            .arg(input.m_inputid).arg(input.m_name);
 
     if (groupids)
-        *groupids = GetInputGroups(input.inputid);
+        *groupids = GetInputGroups(input.m_inputid);
 
     return true;
 }
@@ -1206,14 +1206,14 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
     while (query.next())
     {
         InputInfo input;
-        input.inputid  = query.value(0).toUInt();
-        input.name     = query.value(1).toString();
-        input.sourceid = query.value(2).toUInt();
-        input.livetvorder = query.value(3).toUInt();
-        input.scheduleOrder = query.value(4).toUInt();
-        input.displayName = query.value(5).toString();
-        input.recPriority = query.value(6).toInt();
-        input.quickTune = query.value(7).toBool();
+        input.m_inputid       = query.value(0).toUInt();
+        input.m_name          = query.value(1).toString();
+        input.m_sourceid      = query.value(2).toUInt();
+        input.m_livetvorder   = query.value(3).toUInt();
+        input.m_scheduleOrder = query.value(4).toUInt();
+        input.m_displayName   = query.value(5).toString();
+        input.m_recPriority   = query.value(6).toInt();
+        input.m_quickTune     = query.value(7).toBool();
 
         infoInputList.push_back(input);
     }
@@ -1225,7 +1225,7 @@ QString CardUtil::GetInputName(uint inputid)
 {
     InputInfo info("None", 0, inputid, 0, 0, 0);
     GetInputInfo(info);
-    return info.name;
+    return info.m_name;
 }
 
 QString CardUtil::GetStartingChannel(uint inputid)

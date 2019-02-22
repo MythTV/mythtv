@@ -90,7 +90,7 @@ void post_event(QObject *dest, QEvent::Type type, int val,
 
 void ScanMonitor::deleteLater(void)
 {
-    channelScanner = nullptr;
+    m_channelScanner = nullptr;
 
     QObject::deleteLater();
 }
@@ -160,9 +160,9 @@ void ScanMonitor::StatusSignalStrength(const SignalMonitorValue &val)
 
 void ScanMonitor::customEvent(QEvent *e)
 {
-    if (channelScanner)
+    if (m_channelScanner)
     {
         ScannerEvent *scanEvent = (ScannerEvent*) e;
-        channelScanner->HandleEvent(scanEvent);
+        m_channelScanner->HandleEvent(scanEvent);
     }
 }

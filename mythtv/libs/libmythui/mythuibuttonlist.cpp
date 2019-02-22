@@ -27,9 +27,7 @@
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    m_showArrow = true;
-    m_showScrollBar = true;
-
+    // Parent members
     connect(this, SIGNAL(Enabling()), this, SLOT(ToggleEnabled()));
     connect(this, SIGNAL(Disabling()), this, SLOT(ToggleEnabled()));
 
@@ -39,12 +37,11 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
                                    const QRect &area, bool showArrow,
                                    bool showScrollBar)
-    : MythUIType(parent, name)
+    : MythUIType(parent, name),
+      m_showArrow(showArrow), m_showScrollBar(showScrollBar)
 {
+    // Parent members
     m_Area      = area;
-    m_showArrow = showArrow;
-    m_showScrollBar = showScrollBar;
-
     m_Initiator = true;
     m_EnableInitiator = true;
 
@@ -56,49 +53,6 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
 
 void MythUIButtonList::Const(void)
 {
-    m_contentsRect = MythRect(0, 0, 0, 0);
-
-    m_layout      = LayoutVertical;
-    m_arrange     = ArrangeFixed;
-    m_alignment   = Qt::AlignLeft | Qt::AlignTop;
-    m_scrollStyle = ScrollFree;
-    m_wrapStyle   = WrapNone;
-
-    m_active         = false;
-    m_drawFromBottom = false;
-
-    m_selPosition = 0;
-    m_topPosition = 0;
-    m_itemCount = 0;
-    m_keepSelAtBottom = false;
-
-    m_initialized      = false;
-    m_needsUpdate      = false;
-    m_clearing         = false;
-    m_itemHorizSpacing = 0;
-    m_itemVertSpacing  = 0;
-    m_itemHeight       = 0;
-    m_itemWidth        = 0;
-    m_itemsVisible     = 0;
-    m_maxVisible       = 0;
-    m_columns          = 0;
-    m_rows             = 0;
-    m_leftColumns      = 0;
-    m_rightColumns     = 0;
-    m_topRows          = 0;
-    m_bottomRows       = 0;
-    m_lcdTitle         = "";
-
-    m_searchPosition   = MythPoint(-2, -2);
-    m_searchFields     = "**ALL**";
-    m_searchStartsWith = false;
-
-    m_upArrow = m_downArrow = nullptr;
-    m_scrollBar = nullptr;
-
-    m_buttontemplate = nullptr;
-
-    m_nextItemLoaded = 0;
 
     SetCanTakeFocus(true);
 
@@ -3246,20 +3200,11 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
                                            const QString &text, const QString &image,
                                            bool checkable, CheckState state,
                                            bool showArrow, int listPosition)
+    : m_parent(lbtype), m_text(text), m_imageFilename(image),
+      m_checkable(checkable), m_state(state), m_showArrow(showArrow)
 {
     if (!lbtype)
         LOG(VB_GENERAL, LOG_ERR, "Cannot add a button to a non-existent list!");
-
-    m_parent    = lbtype;
-    m_text      = text;
-    m_image     = nullptr;
-    m_imageFilename = image;
-    m_checkable = checkable;
-    m_state     = state;
-    m_showArrow = showArrow;
-    m_data      = 0;
-    m_isVisible = false;
-    m_enabled   = true;
 
     if (state >= NotChecked)
         m_checkable = true;
@@ -3854,16 +3799,6 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 //---------------------------------------------------------
 // SearchButtonListDialog
 //---------------------------------------------------------
-SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const char *name,
-                                               MythUIButtonList *parentList, QString searchText)
-    : MythScreenType(parent, name, false),
-        m_startsWith(false),            m_parentList(parentList),
-        m_searchText(searchText),       m_searchEdit(nullptr),
-        m_prevButton(nullptr),          m_nextButton(nullptr),
-        m_searchState(nullptr)
-{
-}
-
 bool SearchButtonListDialog::Create(void)
 {
     if (!CopyWindowFromBase("MythSearchListDialog", this))

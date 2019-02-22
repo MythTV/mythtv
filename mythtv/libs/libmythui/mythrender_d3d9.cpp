@@ -63,8 +63,7 @@ typedef struct
 } VERTEX;
 
 D3D9Image::D3D9Image(MythRenderD3D9 *render, QSize size, bool video)
-  : m_size(size), m_valid(false), m_render(render), m_vertexbuffer(nullptr),
-    m_texture(nullptr), m_surface(nullptr)
+  : m_size(size), m_render(render)
 {
     if (m_render)
     {
@@ -161,10 +160,6 @@ QRect D3D9Image::GetRect(void)
 #define D3DFVF_VERTEX        (D3DFVF_XYZRHW|D3DFVF_DIFFUSE)
 #define D3DLOC QString("MythRenderD3D9: ")
 
-D3D9Locker::D3D9Locker(MythRenderD3D9 *render) : m_render(render)
-{
-}
-
 D3D9Locker::~D3D9Locker()
 {
     if (m_render)
@@ -184,19 +179,6 @@ IDirect3DDevice9* D3D9Locker::Acquire(void)
 void* MythRenderD3D9::ResolveAddress(const char* lib, const char* proc)
 {
     return QLibrary::resolve(lib, proc);
-}
-
-MythRenderD3D9::MythRenderD3D9(void)
-  : MythRender(kRenderDirect3D9),
-    m_d3d(nullptr), m_rootD3DDevice(nullptr),
-    m_adaptor_fmt(D3DFMT_UNKNOWN),
-    m_videosurface_fmt(D3DFMT_UNKNOWN),
-    m_surface_fmt(D3DFMT_UNKNOWN), m_texture_fmt(D3DFMT_UNKNOWN),
-    m_rect_vertexbuffer(nullptr), m_default_surface(nullptr), m_current_surface(nullptr),
-    m_lock(QMutex::Recursive),
-    m_blend(true), m_multi_texturing(true), m_texture_vertices(true),
-    m_deviceManager(nullptr), m_deviceHandle(nullptr), m_deviceManagerToken(0)
-{
 }
 
 MythRenderD3D9::~MythRenderD3D9(void)

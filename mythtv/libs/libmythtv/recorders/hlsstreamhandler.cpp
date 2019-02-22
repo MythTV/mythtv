@@ -13,7 +13,7 @@
 #include "mythlogging.h"
 #include "recorders/HLS/HLSReader.h"
 
-#define LOC QString("HLSSH[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC QString("HLSSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 // BUFFER_SIZE is a multiple of TS_SIZE
 #define TS_SIZE     188
@@ -59,7 +59,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
 {
     QMutexLocker locker(&s_hlshandlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
     QMap<QString,uint>::iterator rit = s_hlshandlers_refcnt.find(devname);
     if (rit == s_hlshandlers_refcnt.end())
@@ -102,7 +102,6 @@ HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning, int inputid)
 {
     m_hls        = new HLSReader();
     m_readbuffer = new uint8_t[BUFFER_SIZE];
-    m_throttle   = true;
 }
 
 HLSStreamHandler::~HLSStreamHandler(void)
@@ -131,7 +130,7 @@ void HLSStreamHandler::run(void)
     m_hls->Throttle(false);
 
     int remainder = 0;
-    while (_running_desired)
+    while (m_running_desired)
     {
         if (!m_hls->IsOpen(url))
         {
@@ -186,10 +185,10 @@ void HLSStreamHandler::run(void)
         }
 
         {
-            QMutexLocker locker(&_listener_lock);
+            QMutexLocker locker(&m_listener_lock);
             HLSStreamHandler::StreamDataList::const_iterator sit;
-            sit = _stream_data_list.begin();
-            for (; sit != _stream_data_list.end(); ++sit)
+            sit = m_stream_data_list.begin();
+            for (; sit != m_stream_data_list.end(); ++sit)
                 remainder = sit.key()->ProcessData(m_readbuffer, size);
         }
 

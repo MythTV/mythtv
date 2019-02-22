@@ -51,15 +51,6 @@
 
 #define LOC QString("JoystickMenuThread: ")
 
-JoystickMenuThread::JoystickMenuThread(QObject *main_window)
-    : MThread("JoystickMenu"),
-      m_mainWindow(main_window), m_devicename(""),
-      m_fd(-1),                  m_buttonCount(0),
-      m_axesCount(0),            m_buttons(nullptr),
-      m_axes(nullptr),           m_bStop(false)
-{
-}
-
 JoystickMenuThread::~JoystickMenuThread()
 {
     if (m_fd != -1)

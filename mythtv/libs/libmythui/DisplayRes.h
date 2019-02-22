@@ -160,8 +160,8 @@ class MUI_PUBLIC DisplayRes
 
     double m_pixelAspectRatio;
 
-    static DisplayRes *m_instance;
-    static bool        m_locked;
+    static DisplayRes *s_instance;
+    static bool        s_locked;
 };
 
 /** \fn GetVideoModes(void)

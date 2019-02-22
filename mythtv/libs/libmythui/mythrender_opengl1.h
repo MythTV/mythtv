@@ -49,16 +49,16 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
     QVector<GLuint> m_programs;
 
     // State
-    uint     m_active_prog;
-    uint32_t m_color;
+    uint     m_active_prog {0};
+    uint32_t m_color       {0x00000000};
 
     // Fragment programs
-    MYTH_GLGENPROGRAMSARBPROC             m_glGenProgramsARB;
-    MYTH_GLBINDPROGRAMARBPROC             m_glBindProgramARB;
-    MYTH_GLPROGRAMSTRINGARBPROC           m_glProgramStringARB;
-    MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC m_glProgramLocalParameter4fARB;
-    MYTH_GLDELETEPROGRAMSARBPROC          m_glDeleteProgramsARB;
-    MYTH_GLGETPROGRAMIVARBPROC            m_glGetProgramivARB;
+    MYTH_GLGENPROGRAMSARBPROC             m_glGenProgramsARB {nullptr};
+    MYTH_GLBINDPROGRAMARBPROC             m_glBindProgramARB {nullptr};
+    MYTH_GLPROGRAMSTRINGARBPROC           m_glProgramStringARB {nullptr};
+    MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC m_glProgramLocalParameter4fARB {nullptr};
+    MYTH_GLDELETEPROGRAMSARBPROC          m_glDeleteProgramsARB {nullptr};
+    MYTH_GLGETPROGRAMIVARBPROC            m_glGetProgramivARB {nullptr};
 };
 
 #endif // MYTHRENDEROPENGL1_H

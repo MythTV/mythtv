@@ -41,7 +41,6 @@ AudioInputOSS::AudioInputOSS(const QString &device) : AudioInput(device)
         m_device_name = device.toLatin1();
     else
         m_device_name = QByteArray();
-    dsp_fd = -1;
 }
 
 bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)

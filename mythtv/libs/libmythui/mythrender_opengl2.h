@@ -74,7 +74,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     uint     m_shaders[kShaderCount];
 
     // State
-    uint  m_active_obj;
+    uint       m_active_obj {0};
     QMatrix4x4 m_projection;
     QStack<QMatrix4x4> m_transforms;
     QMatrix4x4 m_parameters;
@@ -85,30 +85,30 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     map_t m_map;
 
     // Procs
-    MYTH_GLGETSHADERIVPROC               m_glGetShaderiv;
-    MYTH_GLCREATESHADERPROC              m_glCreateShader;
-    MYTH_GLSHADERSOURCEPROC              m_glShaderSource;
-    MYTH_GLCOMPILESHADERPROC             m_glCompileShader;
-    MYTH_GLATTACHSHADERPROC              m_glAttachShader;
-    MYTH_GLGETSHADERINFOLOGPROC          m_glGetShaderInfoLog;
-    MYTH_GLDETACHSHADERPROC              m_glDetachShader;
-    MYTH_GLDELETESHADERPROC              m_glDeleteShader;
+    MYTH_GLGETSHADERIVPROC               m_glGetShaderiv {nullptr};
+    MYTH_GLCREATESHADERPROC              m_glCreateShader {nullptr};
+    MYTH_GLSHADERSOURCEPROC              m_glShaderSource {nullptr};
+    MYTH_GLCOMPILESHADERPROC             m_glCompileShader {nullptr};
+    MYTH_GLATTACHSHADERPROC              m_glAttachShader {nullptr};
+    MYTH_GLGETSHADERINFOLOGPROC          m_glGetShaderInfoLog {nullptr};
+    MYTH_GLDETACHSHADERPROC              m_glDetachShader {nullptr};
+    MYTH_GLDELETESHADERPROC              m_glDeleteShader {nullptr};
 
-    MYTH_GLCREATEPROGRAMPROC             m_glCreateProgram;
-    MYTH_GLLINKPROGRAMPROC               m_glLinkProgram;
-    MYTH_GLUSEPROGRAMPROC                m_glUseProgram;
-    MYTH_GLDELETEPROGRAMPROC             m_glDeleteProgram;
-    MYTH_GLGETPROGRAMINFOLOGPROC         m_glGetProgramInfoLog;
-    MYTH_GLGETPROGRAMIVPROC              m_glGetProgramiv;
+    MYTH_GLCREATEPROGRAMPROC             m_glCreateProgram {nullptr};
+    MYTH_GLLINKPROGRAMPROC               m_glLinkProgram {nullptr};
+    MYTH_GLUSEPROGRAMPROC                m_glUseProgram {nullptr};
+    MYTH_GLDELETEPROGRAMPROC             m_glDeleteProgram {nullptr};
+    MYTH_GLGETPROGRAMINFOLOGPROC         m_glGetProgramInfoLog {nullptr};
+    MYTH_GLGETPROGRAMIVPROC              m_glGetProgramiv {nullptr};
 
-    MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation;
-    MYTH_GLUNIFORM1IPROC                 m_glUniform1i;
-    MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv;
-    MYTH_GLVERTEXATTRIBPOINTERPROC       m_glVertexAttribPointer;
-    MYTH_GLENABLEVERTEXATTRIBARRAYPROC   m_glEnableVertexAttribArray;
-    MYTH_GLDISABLEVERTEXATTRIBARRAYPROC  m_glDisableVertexAttribArray;
-    MYTH_GLBINDATTRIBLOCATIONPROC        m_glBindAttribLocation;
-    MYTH_GLVERTEXATTRIB4FPROC            m_glVertexAttrib4f;
+    MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation {nullptr};
+    MYTH_GLUNIFORM1IPROC                 m_glUniform1i {nullptr};
+    MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv {nullptr};
+    MYTH_GLVERTEXATTRIBPOINTERPROC       m_glVertexAttribPointer {nullptr};
+    MYTH_GLENABLEVERTEXATTRIBARRAYPROC   m_glEnableVertexAttribArray {nullptr};
+    MYTH_GLDISABLEVERTEXATTRIBARRAYPROC  m_glDisableVertexAttribArray {nullptr};
+    MYTH_GLBINDATTRIBLOCATIONPROC        m_glBindAttribLocation {nullptr};
+    MYTH_GLVERTEXATTRIB4FPROC            m_glVertexAttrib4f {nullptr};
 
     // Prevent compiler complaints about using 0 as a null pointer.
     inline void m_glVertexAttribPointerI(GLuint index, GLint size, GLenum type,

@@ -15,8 +15,8 @@ class VideoVisualGoom : public VideoVisual
         { return m_hd ? "Goom HD" : "Goom"; }
 
   private:
-    unsigned int* m_buffer;
-    uint          m_surface;
+    unsigned int* m_buffer  {nullptr};
+    uint          m_surface {0};
     bool          m_hd;
 };
 

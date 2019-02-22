@@ -69,12 +69,7 @@ typedef enum
 class MythGLTexture
 {
   public:
-    MythGLTexture() :
-        m_type(GL_TEXTURE_2D), m_data(nullptr), m_data_size(0),
-        m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_RGBA),
-        m_internal_fmt(GL_RGBA8), m_pbo(0), m_vbo(0),
-        m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
-        m_size(0,0), m_act_size(0,0)
+    MythGLTexture()
     {
         memset(&m_vertex_data, 0, sizeof(m_vertex_data));
     }
@@ -83,19 +78,19 @@ class MythGLTexture
     {
     }
 
-    GLuint  m_type;
-    unsigned char *m_data;
-    uint    m_data_size;
-    GLuint  m_data_type;
-    GLuint  m_data_fmt;
-    GLuint  m_internal_fmt;
-    GLuint  m_pbo;
-    GLuint  m_vbo;
-    GLuint  m_filter;
-    GLuint  m_wrap;
-    QSize   m_size;
-    QSize   m_act_size;
-    GLfloat m_vertex_data[16];
+    GLuint         m_type            {GL_TEXTURE_2D};
+    unsigned char *m_data            {nullptr};
+    uint           m_data_size       {0};
+    GLuint         m_data_type       {GL_UNSIGNED_BYTE};
+    GLuint         m_data_fmt        {GL_RGBA};
+    GLuint         m_internal_fmt    {GL_RGBA8};
+    GLuint         m_pbo             {0};
+    GLuint         m_vbo             {0};
+    GLuint         m_filter          {GL_LINEAR};
+    GLuint         m_wrap            {GL_CLAMP_TO_EDGE};
+    QSize          m_size            {0,0};
+    QSize          m_act_size        {0,0};
+    GLfloat        m_vertex_data[16];
 };
 
 class MythRenderOpenGL;
@@ -106,7 +101,7 @@ class MUI_PUBLIC OpenGLLocker
     explicit OpenGLLocker(MythRenderOpenGL *render);
    ~OpenGLLocker();
   private:
-    MythRenderOpenGL *m_render;
+    MythRenderOpenGL *m_render {nullptr};
 };
 
 #ifdef USE_OPENGL_QT5
@@ -255,27 +250,27 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     // Resources
     QHash<GLuint, MythGLTexture> m_textures;
     QVector<GLuint>              m_framebuffers;
-    GLuint                       m_fence;
+    GLuint                       m_fence {0};
 
     // Locking
     QMutex   m_lock;
-    int      m_lock_level;
+    int      m_lock_level                {0};
 
     // profile
     QString  m_extensions;
-    uint     m_exts_supported;
-    uint     m_exts_used;
-    int      m_max_tex_size;
-    int      m_max_units;
-    int      m_default_texture_type;
+    uint     m_exts_supported            {kGLFeatNone};
+    uint     m_exts_used                 {kGLFeatNone};
+    int      m_max_tex_size              {0};
+    int      m_max_units                 {0};
+    int      m_default_texture_type      {GL_TEXTURE_2D};
 
     // State
     QRect    m_viewport;
-    int      m_active_tex;
-    int      m_active_tex_type;
-    int      m_active_fb;
-    bool     m_blend;
-    uint32_t m_background;
+    int      m_active_tex                {0};
+    int      m_active_tex_type           {0};
+    int      m_active_fb                 {0};
+    bool     m_blend                     {false};
+    uint32_t m_background                {0x00000000};
 
     // vertex cache
     QMap<uint64_t,GLfloat*> m_cachedVertices;
@@ -285,38 +280,38 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
 
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
-    bool    m_flushEnabled;
+    bool    m_flushEnabled          {true};
 
     // Multi-texturing
-    MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;
+    MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture {nullptr};
 
     // PixelBuffer Objects
-    MYTH_GLMAPBUFFERPROC                 m_glMapBuffer;
-    MYTH_GLBINDBUFFERPROC                m_glBindBuffer;
-    MYTH_GLGENBUFFERSPROC                m_glGenBuffers;
-    MYTH_GLBUFFERDATAPROC                m_glBufferData;
-    MYTH_GLUNMAPBUFFERPROC               m_glUnmapBuffer;
-    MYTH_GLDELETEBUFFERSPROC             m_glDeleteBuffers;
+    MYTH_GLMAPBUFFERPROC                 m_glMapBuffer {nullptr};
+    MYTH_GLBINDBUFFERPROC                m_glBindBuffer {nullptr};
+    MYTH_GLGENBUFFERSPROC                m_glGenBuffers {nullptr};
+    MYTH_GLBUFFERDATAPROC                m_glBufferData {nullptr};
+    MYTH_GLUNMAPBUFFERPROC               m_glUnmapBuffer {nullptr};
+    MYTH_GLDELETEBUFFERSPROC             m_glDeleteBuffers {nullptr};
     // FrameBuffer Objects
-    MYTH_GLGENFRAMEBUFFERSPROC           m_glGenFramebuffers;
-    MYTH_GLBINDFRAMEBUFFERPROC           m_glBindFramebuffer;
-    MYTH_GLFRAMEBUFFERTEXTURE2DPROC      m_glFramebufferTexture2D;
-    MYTH_GLCHECKFRAMEBUFFERSTATUSPROC    m_glCheckFramebufferStatus;
-    MYTH_GLDELETEFRAMEBUFFERSPROC        m_glDeleteFramebuffers;
+    MYTH_GLGENFRAMEBUFFERSPROC           m_glGenFramebuffers {nullptr};
+    MYTH_GLBINDFRAMEBUFFERPROC           m_glBindFramebuffer {nullptr};
+    MYTH_GLFRAMEBUFFERTEXTURE2DPROC      m_glFramebufferTexture2D {nullptr};
+    MYTH_GLCHECKFRAMEBUFFERSTATUSPROC    m_glCheckFramebufferStatus {nullptr};
+    MYTH_GLDELETEFRAMEBUFFERSPROC        m_glDeleteFramebuffers {nullptr};
     // NV_fence
-    MYTH_GLGENFENCESNVPROC               m_glGenFencesNV;
-    MYTH_GLDELETEFENCESNVPROC            m_glDeleteFencesNV;
-    MYTH_GLSETFENCENVPROC                m_glSetFenceNV;
-    MYTH_GLFINISHFENCENVPROC             m_glFinishFenceNV;
+    MYTH_GLGENFENCESNVPROC               m_glGenFencesNV {nullptr};
+    MYTH_GLDELETEFENCESNVPROC            m_glDeleteFencesNV {nullptr};
+    MYTH_GLSETFENCENVPROC                m_glSetFenceNV {nullptr};
+    MYTH_GLFINISHFENCENVPROC             m_glFinishFenceNV {nullptr};
     // APPLE_fence
-    MYTH_GLGENFENCESAPPLEPROC            m_glGenFencesAPPLE;
-    MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
-    MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
-    MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
+    MYTH_GLGENFENCESAPPLEPROC            m_glGenFencesAPPLE {nullptr};
+    MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE {nullptr};
+    MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE {nullptr};
+    MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE {nullptr};
 
 #ifdef USE_OPENGL_QT5
   private:
-    QWindow *m_window;
+    QWindow *m_window {nullptr};
 #endif
 };
 

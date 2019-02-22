@@ -57,10 +57,7 @@ class CC608Buffer
 class CC608StateTracker
 {
   public:
-    CC608StateTracker() :
-        m_outputText(""), m_outputCol(0), m_outputRow(0), m_changed(true)
-    {
-    }
+    CC608StateTracker() = default;
     
     void Clear(void)
     {
@@ -72,9 +69,9 @@ class CC608StateTracker
     }
 
     QString  m_outputText;
-    int      m_outputCol;
-    int      m_outputRow;
-    bool     m_changed;
+    int      m_outputCol {0};
+    int      m_outputRow {0};
+    bool     m_changed   {true};
     CC608Buffer m_output;
 };
 
@@ -108,16 +105,16 @@ class MTV_PUBLIC CC608Reader : public CC608Input
                          int streamIdx = CC_CC1);
     int  NumInputBuffers(bool need_to_lock = true);
 
-    MythPlayer *m_parent;
-    bool     m_enabled;
+    MythPlayer       *m_parent        {nullptr};
+    bool              m_enabled       {false};
     // Input buffers
-    int      m_readPosition;
-    int      m_writePosition;
-    QMutex   m_inputBufLock;
-    int      m_maxTextSize;
-    TextContainer m_inputBuffers[MAXTBUFFER+1];
-    int      m_ccMode;
-    int      m_ccPageNum;
+    int               m_readPosition  {0};
+    int               m_writePosition {0};
+    QMutex            m_inputBufLock;
+    int               m_maxTextSize   {0};
+    TextContainer     m_inputBuffers[MAXTBUFFER+1];
+    int               m_ccMode        {CC_CC1};
+    int               m_ccPageNum     {0x888};
     // Output buffers
     CC608StateTracker m_state[MAXOUTBUFFERS];
 };

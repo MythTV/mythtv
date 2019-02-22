@@ -62,11 +62,11 @@ class IPTVChannel : QObject, public DTVChannel
 
   private:
     mutable QMutex     m_tune_lock;
-    volatile bool      m_firsttune;
+    volatile bool      m_firsttune      {true};
     IPTVTuningData     m_last_tuning;
     mutable QMutex     m_stream_lock;
-    IPTVStreamHandler *m_stream_handler;
-    MPEGStreamData    *m_stream_data;
+    IPTVStreamHandler *m_stream_handler {nullptr};
+    MPEGStreamData    *m_stream_data    {nullptr};
     QString            m_videodev;
 };
 

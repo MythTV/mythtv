@@ -14,8 +14,8 @@ class ScriptSignalMonitor : public SignalMonitor
                         uint64_t _flags = 0) :
         SignalMonitor(db_cardnum, _channel, _release_stream, _flags)
     {
-        signalLock.SetValue(true);
-        signalStrength.SetValue(100);
+        m_signalLock.SetValue(true);
+        m_signalStrength.SetValue(100);
     }
 
     void UpdateValues(void) override // SignalMonitor

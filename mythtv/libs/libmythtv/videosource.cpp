@@ -536,7 +536,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 
     DDLineupList::const_iterator it;
     for (it = lineups.begin(); it != lineups.end(); ++it)
-        addSelection((*it).displayname, (*it).lineupid);
+        addSelection((*it).m_displayname, (*it).m_lineupid);
 
     MythCheckNotification n(tr("Fetching of lineups complete"),
                             tr("DataDirect"));
@@ -1294,7 +1294,7 @@ void FirewireModel::SetGUID(const QString &_guid)
 
 #ifdef USING_FIREWIRE
     AVCInfo info = guid->GetAVCInfo(_guid);
-    QString model = FirewireDevice::GetModelName(info.vendorid, info.modelid);
+    QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
     setValue(max(getValueIndex(model), 0));
 #endif // USING_FIREWIRE
 }
@@ -1306,7 +1306,7 @@ void FirewireDesc::SetGUID(const QString &_guid)
     setLabel(tr("Description"));
 
 #ifdef USING_FIREWIRE
-    QString name = guid->GetAVCInfo(_guid).product_name;
+    QString name = guid->GetAVCInfo(_guid).m_product_name;
     name.replace("Scientific-Atlanta", "SA");
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
@@ -3015,13 +3015,13 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     ChannelUtil::SortChannels(channels, order);
     bool has_visible = false;
     for (uint i = 0; i < channels.size() && !has_visible; i++)
-        has_visible |= channels[i].visible;
+        has_visible |= channels[i].m_visible;
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        const QString channum = channels[i].channum;
+        const QString channum = channels[i].m_channum;
         bool sel = channum == startChan;
-        if (!has_visible || channels[i].visible || sel)
+        if (!has_visible || channels[i].m_visible || sel)
         {
             addSelection(channum, channum, sel);
         }

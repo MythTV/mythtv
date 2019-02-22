@@ -22,17 +22,17 @@ extern "C" {
 // A range of block numbers
 class DVDStream::BlockRange
 {
-    uint32_t start, end;
-    int title;
+    uint32_t m_start, m_end;
+    int m_title;
 
 public:
-    BlockRange(uint32_t b, uint32_t n, int t) : start(b), end(b+n), title(t) { }
+    BlockRange(uint32_t b, uint32_t n, int t) : m_start(b), m_end(b+n), m_title(t) { }
 
-    bool operator < (const BlockRange& rhs) const { return end <= rhs.start; }
+    bool operator < (const BlockRange& rhs) const { return m_end <= rhs.m_start; }
 
-    uint32_t Start() const { return start; }
-    uint32_t End() const { return end; }
-    int Title() const { return title; }
+    uint32_t Start() const { return m_start; }
+    uint32_t End() const { return m_end; }
+    int Title() const { return m_title; }
 };
 
 
@@ -49,7 +49,7 @@ inline uint32_t Len2Blocks(uint32_t len)
 }
 
 DVDStream::DVDStream(const QString& filename)
-: RingBuffer(kRingBuffer_File), m_reader(nullptr), m_start(0), m_pos(0), m_title(-1)
+: RingBuffer(kRingBuffer_File)
 {
     OpenFile(filename);
 }

@@ -26,8 +26,7 @@ using namespace std;
 #define LOC QString("MythUIGuideGrid: ")
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-    m_allData(nullptr)
+    : MythUIType(parent, name)
 {
     // themeable setting defaults
     for (uint x = 0; x < RECSTATUSSIZE; x++)
@@ -36,32 +35,11 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     for (uint x = 0; x < ARROWIMAGESIZE; x++)
         m_arrowImages[x] = nullptr;
 
-    m_channelCount = 5;
-    m_timeCount = 4;
-    m_verticalLayout = false;
-
     m_font = new MythFontProperties();
-    m_justification = Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap;
-    m_multilineText = true;
-    m_cutdown = true;
-
-    m_selType = "box";
-    m_drawSelLine = QPen(Qt::NoPen);
-    m_drawSelFill = QBrush(Qt::NoBrush);
-
-    m_fillType = Solid;
-
-    m_rowCount = 0;
-    m_progPastCol = 0;
-
-    m_drawCategoryColors = true;
-    m_drawCategoryText = true;
-    m_categoryAlpha = 255;
 
     QMap<QString, QString> catColors;
     parseDefaultCategoryColors(catColors);
     SetCategoryColors(catColors);
-
 }
 
 void MythUIGuideGrid::Finalize(void)
@@ -800,7 +778,7 @@ void MythUIGuideGrid::SetCategoryColors(const QMap<QString, QString> &catC)
 void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 {
     MythUIImage *uiimage = new MythUIImage(file, this, "guidegrid image");
-    uiimage->m_imageProperties.isThemeImage = true;
+    uiimage->m_imageProperties.m_isThemeImage = true;
     uiimage->SetVisible(false);
     uiimage->Load(false);
 
@@ -813,7 +791,7 @@ void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 void MythUIGuideGrid::SetArrow(int direction, const QString &file)
 {
     MythUIImage *uiimage = new MythUIImage(file, this, "guidegrid arrow");
-    uiimage->m_imageProperties.isThemeImage = true;
+    uiimage->m_imageProperties.m_isThemeImage = true;
     uiimage->SetVisible(false);
     uiimage->Load(false);
 

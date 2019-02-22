@@ -26,16 +26,6 @@ static uint64_t MDate(void)
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
-HLSReader::HLSReader(void)
-    : m_curstream(nullptr), m_cur_seq(-1), m_bitrate_index(0),
-      m_fatal(false), m_cancel(false),
-      m_throttle(true), m_aesmsg(false),
-      m_playlistworker(nullptr), m_streamworker(nullptr),
-      m_playlist_size(0), m_bandwidthcheck(false), m_prebuffer_cnt(10),
-      m_debug(false), m_debug_cnt(0), m_slow_cnt(0)
-{
-}
-
 HLSReader::~HLSReader(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- start");

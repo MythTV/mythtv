@@ -42,26 +42,6 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 {
     setObjectName(name);
 
-    m_Visible = true;
-    m_Enabled = true;
-    m_EnableInitiator = false;
-    m_Initiator = false;
-    m_Vanish = false;
-    m_Vanished = false;
-    m_CanHaveFocus = m_HasFocus = false;
-    m_Area = MythRect(0, 0, 0, 0);
-    m_MinArea = MythRect(0, 0, 0, 0);
-    m_NeedsRedraw = false;
-    m_AlphaChangeMode = m_AlphaChange = m_AlphaMin = 0;
-    m_AlphaMax = 255;
-    m_Moving = false;
-    m_XYDestination = QPoint(0, 0);
-    m_XYSpeed = QPoint(0, 0);
-    m_deferload = false;
-    m_IsDependDefault = false;
-
-    m_Parent = nullptr;
-
     if (parent)
     {
         m_Parent = dynamic_cast<MythUIType *>(parent);
@@ -70,11 +50,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
             m_Parent->AddChild(this);
     }
 
-    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
-
     m_Fonts = new FontMap();
-    m_focusOrder = 0;
-    m_Painter = nullptr;
 
     m_BorderColor = QColor(random() % 255, random()  % 255, random()  % 255);
 }
@@ -430,16 +406,16 @@ void MythUIType::HandleAlphaPulse(void)
     if (m_AlphaChangeMode == 0)
         return;
 
-    m_Effects.alpha += m_AlphaChange;
+    m_Effects.m_alpha += m_AlphaChange;
 
-    if (m_Effects.alpha > m_AlphaMax)
-        m_Effects.alpha = m_AlphaMax;
+    if (m_Effects.m_alpha > m_AlphaMax)
+        m_Effects.m_alpha = m_AlphaMax;
 
-    if (m_Effects.alpha < m_AlphaMin)
-        m_Effects.alpha = m_AlphaMin;
+    if (m_Effects.m_alpha < m_AlphaMin)
+        m_Effects.m_alpha = m_AlphaMin;
 
     // Reached limits so change direction
-    if (m_Effects.alpha == m_AlphaMax || m_Effects.alpha == m_AlphaMin)
+    if (m_Effects.m_alpha == m_AlphaMax || m_Effects.m_alpha == m_AlphaMin)
     {
         if (m_AlphaChangeMode == 2)
         {
@@ -482,7 +458,7 @@ void MythUIType::Pulse(void)
 
 int MythUIType::CalcAlpha(int alphamod)
 {
-    return (int)(m_Effects.alpha * (alphamod / 255.0));
+    return (int)(m_Effects.m_alpha * (alphamod / 255.0));
 }
 
 void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
@@ -936,30 +912,30 @@ void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
     m_AlphaMin = minalpha;
     m_AlphaMax = maxalpha;
 
-    if (m_Effects.alpha > m_AlphaMax)
-        m_Effects.alpha = m_AlphaMax;
+    if (m_Effects.m_alpha > m_AlphaMax)
+        m_Effects.m_alpha = m_AlphaMax;
 
-    if (m_Effects.alpha < m_AlphaMin)
-        m_Effects.alpha = m_AlphaMin;
+    if (m_Effects.m_alpha < m_AlphaMin)
+        m_Effects.m_alpha = m_AlphaMin;
 }
 
 void MythUIType::SetAlpha(int newalpha)
 {
-    if (m_Effects.alpha == newalpha)
+    if (m_Effects.m_alpha == newalpha)
         return;
 
-    m_Effects.alpha = newalpha;
+    m_Effects.m_alpha = newalpha;
     SetRedraw();
 }
 
 int MythUIType::GetAlpha(void) const
 {
-    return m_Effects.alpha;
+    return m_Effects.m_alpha;
 }
 
 void MythUIType::SetCentre(UIEffects::Centre centre)
 {
-    m_Effects.centre = centre;
+    m_Effects.m_centre = centre;
 }
 
 void MythUIType::SetZoom(float zoom)
@@ -970,19 +946,19 @@ void MythUIType::SetZoom(float zoom)
 
 void MythUIType::SetHorizontalZoom(float zoom)
 {
-    m_Effects.hzoom = zoom;
+    m_Effects.m_hzoom = zoom;
     SetRedraw();
 }
 
 void MythUIType::SetVerticalZoom(float zoom)
 {
-    m_Effects.vzoom = zoom;
+    m_Effects.m_vzoom = zoom;
     SetRedraw();
 }
 
 void MythUIType::SetAngle(float angle)
 {
-    m_Effects.angle = angle;
+    m_Effects.m_angle = angle;
     SetRedraw();
 }
 
@@ -1255,17 +1231,17 @@ bool MythUIType::ParseElement(
     }
     else if (element.tagName() == "alpha")
     {
-        m_Effects.alpha = getFirstText(element).toInt();
+        m_Effects.m_alpha = getFirstText(element).toInt();
         m_AlphaChangeMode = 0;
     }
     else if (element.tagName() == "alphapulse")
     {
         m_AlphaChangeMode = 2;
         m_AlphaMin = element.attribute("min", "0").toInt();
-        m_Effects.alpha = m_AlphaMax = element.attribute("max", "255").toInt();
+        m_Effects.m_alpha = m_AlphaMax = element.attribute("max", "255").toInt();
 
         if (m_AlphaMax > 255)
-            m_Effects.alpha = m_AlphaMax = 255;
+            m_Effects.m_alpha = m_AlphaMax = 255;
 
         if (m_AlphaMin < 0)
             m_AlphaMin = 0;

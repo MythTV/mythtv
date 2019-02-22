@@ -40,8 +40,8 @@ class DSMCCCacheModuleData
     /// Return the, possibly uncompressed, module size
     unsigned long  DataSize(void) const
     {
-        return (m_descriptorData.isCompressed) ?
-            m_descriptorData.originalSize : m_moduleSize;
+        return (m_descriptorData.m_isCompressed) ?
+            m_descriptorData.m_originalSize : m_moduleSize;
     }
 
 
@@ -52,28 +52,28 @@ class DSMCCCacheModuleData
 
     unsigned char  m_version;
     unsigned long  m_moduleSize;   ///< Total size
-    unsigned long  m_receivedData; ///< Size received so far.
+    unsigned long  m_receivedData {0}; ///< Size received so far.
 
     /// Block table.  As blocks are received they are added to this table. 
     vector<QByteArray*> m_blocks;
     /// True if we have completed this module.
-    bool                   m_completed;
+    bool                   m_completed {false};
     ModuleDescriptorData   m_descriptorData;
 };
 
 class ObjCarousel
 {
   public:
-    explicit ObjCarousel(Dsmcc*);
+    explicit ObjCarousel(Dsmcc*dsmcc) : m_filecache(dsmcc) {}
     ~ObjCarousel();
     void AddModuleInfo(DsmccDii *dii, Dsmcc *status, unsigned short streamTag);
     void AddModuleData(DsmccDb *ddb, const unsigned char *data);
 
-    DSMCCCache                     filecache;
+    DSMCCCache                         m_filecache;
     QLinkedList<DSMCCCacheModuleData*> m_Cache;
     /// Component tags matched to this carousel.
-    vector<unsigned short>         m_Tags;
-    unsigned long                  m_id;
+    vector<unsigned short>             m_Tags;
+    unsigned long                      m_id        {0};
 };
 
 #endif

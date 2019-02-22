@@ -34,8 +34,8 @@ class MUI_PUBLIC MythUIVideo : public MythUIType
     void CopyFrom(MythUIType *base) override; // MythUIType
     void CreateCopy(MythUIType *parent) override; // MythUIType
 
-    MythImage     *m_image;
-    QColor         m_backgroundColor;
+    MythImage     *m_image           {nullptr};
+    QColor         m_backgroundColor {Qt::black};
 };
 
 #endif

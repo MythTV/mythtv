@@ -4336,9 +4336,9 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
 
 static bool comp_livetvorder(const InputInfo &a, const InputInfo &b)
 {
-    if (a.livetvorder != b.livetvorder)
-        return a.livetvorder < b.livetvorder;
-    return a.inputid < b.inputid;
+    if (a.m_livetvorder != b.m_livetvorder)
+        return a.m_livetvorder < b.m_livetvorder;
+    return a.m_inputid < b.m_inputid;
 }
 
 void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
@@ -4360,36 +4360,36 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     {
         EncoderLink *elink = *iter;
         InputInfo info;
-        info.inputid = elink->GetInputID();
+        info.m_inputid = elink->GetInputID();
 
         if (!elink->IsConnected() || elink->IsTunerLocked())
         {
             LOG(VB_CHANNEL, LOG_INFO,
                 LOC + QString("Input %1 is locked or not connected")
-                .arg(info.inputid));
+                .arg(info.m_inputid));
             continue;
         }
 
         vector<uint> infogroups;
         CardUtil::GetInputInfo(info, &infogroups);
         for (uint i = 0; i < infogroups.size(); ++i)
-            groupids[info.inputid].insert(infogroups[i]);
+            groupids[info.m_inputid].insert(infogroups[i]);
 
         InputInfo busyinfo;
-        if (info.inputid != excluded_input && elink->IsBusy(&busyinfo))
+        if (info.m_inputid != excluded_input && elink->IsBusy(&busyinfo))
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is busy on %2/%3")
-                .arg(info.inputid).arg(busyinfo.chanid).arg(busyinfo.mplexid));
-            info.chanid = busyinfo.chanid;
-            info.mplexid = busyinfo.mplexid;
+                .arg(info.m_inputid).arg(busyinfo.m_chanid).arg(busyinfo.m_mplexid));
+            info.m_chanid = busyinfo.m_chanid;
+            info.m_mplexid = busyinfo.m_mplexid;
             busyinputs.push_back(info);
         }
-        else if (info.livetvorder)
+        else if (info.m_livetvorder)
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is free")
-                .arg(info.inputid));
+                .arg(info.m_inputid));
             freeinputs.push_back(info);
         }
     }
@@ -4407,28 +4407,28 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
         {
             InputInfo &freeinfo = *freeiter;
 
-            if ((groupids[busyinfo.inputid] & groupids[freeinfo.inputid])
+            if ((groupids[busyinfo.m_inputid] & groupids[freeinfo.m_inputid])
                 .isEmpty())
             {
                 ++freeiter;
                 continue;
             }
 
-            if (busyinfo.sourceid == freeinfo.sourceid)
+            if (busyinfo.m_sourceid == freeinfo.m_sourceid)
             {
                 LOG(VB_CHANNEL, LOG_DEBUG,
                     LOC + QString("Input %1 is limited to %2/%3 by input %4")
-                    .arg(freeinfo.inputid).arg(busyinfo.chanid)
-                    .arg(busyinfo.mplexid).arg(busyinfo.inputid));
-                freeinfo.chanid = busyinfo.chanid;
-                freeinfo.mplexid = busyinfo.mplexid;
+                    .arg(freeinfo.m_inputid).arg(busyinfo.m_chanid)
+                    .arg(busyinfo.m_mplexid).arg(busyinfo.m_inputid));
+                freeinfo.m_chanid = busyinfo.m_chanid;
+                freeinfo.m_mplexid = busyinfo.m_mplexid;
                 ++freeiter;
                 continue;
             }
 
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is unavailable by input %2")
-                .arg(freeinfo.inputid).arg(busyinfo.inputid));
+                .arg(freeinfo.m_inputid).arg(busyinfo.m_inputid));
             freeiter = freeinputs.erase(freeiter);
         }
     }
@@ -4440,8 +4440,8 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     {
         LOG(VB_CHANNEL, LOG_INFO,
             LOC + QString("Input %1 is available on %2/%3")
-            .arg(freeinputs[i].inputid).arg(freeinputs[i].chanid)
-            .arg(freeinputs[i].mplexid));
+            .arg(freeinputs[i].m_inputid).arg(freeinputs[i].m_chanid)
+            .arg(freeinputs[i].m_mplexid));
         freeinputs[i].ToStringList(strlist);
     }
 

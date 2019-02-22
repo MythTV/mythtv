@@ -19,8 +19,7 @@ using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
                                      QWidget *parent) :
-    MythPainter(), realParent(parent), realRender(render),
-    target(0), swapControl(true)
+    MythPainter(), realParent(parent), realRender(render)
 {
     if (realRender)
         LOG(VB_GENERAL, LOG_INFO,

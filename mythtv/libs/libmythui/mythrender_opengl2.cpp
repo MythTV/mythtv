@@ -146,7 +146,7 @@ class MythGLShaderObject
       : m_vertex_shader(vert), m_fragment_shader(frag) { }
     MythGLShaderObject() = default;
 
-    GLuint m_vertex_shader {0};
+    GLuint m_vertex_shader   {0};
     GLuint m_fragment_shader {0};
 };
 
@@ -925,11 +925,11 @@ void MythRenderOpenGL2::SetMatrixView(void)
 void MythRenderOpenGL2::PushTransformation(const UIEffects &fx, QPointF &center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.hzoom != 1.0f || fx.vzoom != 1.0f || fx.angle != 0.0f)
+    if (fx.m_hzoom != 1.0f || fx.m_vzoom != 1.0f || fx.m_angle != 0.0f)
     {
         newtop.translate(center.x(), center.y());
-        newtop.scale(fx.hzoom, fx.vzoom);
-        newtop.rotate(fx.angle, 0, 0, 1);
+        newtop.scale(fx.m_hzoom, fx.m_vzoom);
+        newtop.rotate(fx.m_angle, 0, 0, 1);
         newtop.translate(-center.x(), -center.y());
     }
     m_transforms.push(newtop);

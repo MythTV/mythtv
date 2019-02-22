@@ -89,10 +89,10 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     void HandleBusReset(void);
 
   private:
-    uint                     m_bufsz;
-    bool                     m_db_reset_disabled;
-    bool                     m_use_p2p;
-    LFDPriv                 *m_priv;
+    uint     m_bufsz;
+    bool     m_db_reset_disabled {false};
+    bool     m_use_p2p;
+    LFDPriv *m_priv              {nullptr};
 };
 
 #endif // _LINUX_FIREWIRE_DEVICE_H_

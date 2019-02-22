@@ -52,8 +52,8 @@ class V4L2encRecorder : public V4LRecorder
                                const QString &vbidev) override; // DTVRecorder
 
   private:
-    V4LChannel        *m_channel;
-    V4L2encStreamHandler *m_stream_handler;
+    V4LChannel           *m_channel        {nullptr};
+    V4L2encStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif // _V4L2enc_RECORDER_H_

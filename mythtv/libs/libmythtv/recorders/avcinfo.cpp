@@ -17,42 +17,39 @@ uint64_t string_to_guid(const QString &guid)
 }
 
 #ifndef GUID_ONLY
-AVCInfo::AVCInfo() :
-    port(-1), node(-1),
-    guid(0), specid(0), vendorid(0), modelid(0),
-    firmware_revision(0)
+AVCInfo::AVCInfo()
 {
-    memset(unit_table, 0xff, sizeof(unit_table));
+    memset(m_unit_table, 0xff, sizeof(m_unit_table));
 }
 
 AVCInfo::AVCInfo(const AVCInfo &o) :
-    port(o.port),         node(o.node),
-    guid(o.guid),         specid(o.specid),
-    vendorid(o.vendorid), modelid(o.modelid),
-    firmware_revision(o.firmware_revision),
-    product_name(o.product_name)
+    m_port(o.m_port),         m_node(o.m_node),
+    m_guid(o.m_guid),         m_specid(o.m_specid),
+    m_vendorid(o.m_vendorid), m_modelid(o.m_modelid),
+    m_firmware_revision(o.m_firmware_revision),
+    m_product_name(o.m_product_name)
 {
-    memcpy(unit_table, o.unit_table, sizeof(unit_table));
+    memcpy(m_unit_table, o.m_unit_table, sizeof(m_unit_table));
 }
 
 AVCInfo &AVCInfo::operator=(const AVCInfo &o)
 {
-    port     = o.port;
-    node     = o.node;
-    guid     = o.guid;
-    specid   = o.specid;
-    vendorid = o.vendorid;
-    modelid  = o.modelid;
-    firmware_revision = o.firmware_revision;
-    product_name = o.product_name;
-    memcpy(unit_table, o.unit_table, sizeof(unit_table));
+    m_port     = o.m_port;
+    m_node     = o.m_node;
+    m_guid     = o.m_guid;
+    m_specid   = o.m_specid;
+    m_vendorid = o.m_vendorid;
+    m_modelid  = o.m_modelid;
+    m_firmware_revision = o.m_firmware_revision;
+    m_product_name = o.m_product_name;
+    memcpy(m_unit_table, o.m_unit_table, sizeof(m_unit_table));
 
     return *this;
 }
 
 bool AVCInfo::GetSubunitInfo(void)
 {
-    memset(unit_table, 0xff, 32 * sizeof(uint8_t));
+    memset(m_unit_table, 0xff, 32 * sizeof(uint8_t));
 
     for (uint i = 0; i < 8; i++)
     {
@@ -74,10 +71,10 @@ bool AVCInfo::GetSubunitInfo(void)
 
         if (ret.size() >= 8)
         {
-            unit_table[(i<<2)+0] = ret[4];
-            unit_table[(i<<2)+1] = ret[5];
-            unit_table[(i<<2)+2] = ret[6];
-            unit_table[(i<<2)+3] = ret[7];
+            m_unit_table[(i<<2)+0] = ret[4];
+            m_unit_table[(i<<2)+1] = ret[5];
+            m_unit_table[(i<<2)+2] = ret[6];
+            m_unit_table[(i<<2)+3] = ret[7];
         }
     }
 
@@ -88,7 +85,7 @@ bool AVCInfo::IsSubunitType(int subunit_type) const
 {
     for (uint i = 0; i < 32; i++)
     {
-        int subunit = unit_table[i];
+        int subunit = m_unit_table[i];
         if ((subunit != 0xff) &&
             (subunit & FirewireDevice::kAVCSubunitTypeUnit) == subunit_type)
         {

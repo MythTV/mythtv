@@ -164,7 +164,7 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
         {
             // Don't use an ett description if it was scanned long in the past.
             if (!it->IsStale()) {
-              ett_text = it->ett_text;
+              ett_text = it->m_ett_text;
               found_matching_ett = true;
             }
             etts.erase(it);
@@ -173,15 +173,15 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
         // Create an event immediately if a matching ett description was found,
         // or if item is false, indicating that no ett description should be
         // expected.
-        if (found_matching_ett || !ev.etm)
+        if (found_matching_ett || !ev.m_etm)
         {
             CompleteEvent(atsc_major, atsc_minor, ev, ett_text);
         }
         else
         {
-            unsigned char *tmp = new unsigned char[ev.desc_length];
-            memcpy(tmp, eit->Descriptors(i), ev.desc_length);
-            ev.desc = tmp;
+            unsigned char *tmp = new unsigned char[ev.m_desc_length];
+            memcpy(tmp, eit->Descriptors(i), ev.m_desc_length);
+            ev.m_desc = tmp;
             events.insert(eit->EventID(i), ev);
         }
     }
@@ -207,8 +207,8 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                   ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
             }
 
-            if ((*it).desc)
-                delete [] (*it).desc;
+            if ((*it).m_desc)
+                delete [] (*it).m_desc;
 
             (*eits_it).erase(it);
 
@@ -224,7 +224,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
     const QString next_ett_text = ett->ExtendedTextMessage()
         .GetBestMatch(languagePreferences);
     if (existing_unmatched_ett_it != elist.end() &&
-        existing_unmatched_ett_it->ett_text != next_ett_text)
+        existing_unmatched_ett_it->m_ett_text != next_ett_text)
     {
        LOG(VB_EIT, LOG_DEBUG, LOC +
            QString("Overwriting previously unmatched ett. stale: %1 major: %2 "
@@ -232,7 +232,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                .arg(existing_unmatched_ett_it->IsStale())
                .arg(atsc_major)
                .arg(atsc_minor)
-               .arg(existing_unmatched_ett_it->ett_text)
+               .arg(existing_unmatched_ett_it->m_ett_text)
                .arg(next_ett_text));
     }
     elist.insert(ett->EventID(), ATSCEtt(next_ett_text));
@@ -840,18 +840,18 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     QDateTime starttime = MythDate::fromTime_t(
-        event.start_time + GPS_EPOCH + gps_offset);
+        event.m_start_time + GPS_EPOCH + gps_offset);
 #else
     QDateTime starttime = MythDate::fromSecsSinceEpoch(
-        event.start_time + GPS_EPOCH + gps_offset);
+        event.m_start_time + GPS_EPOCH + gps_offset);
 #endif
 
     // fix starttime only if the duration is a multiple of a minute
-    if (!(event.length % 60))
+    if (!(event.m_length % 60))
         EITFixUp::TimeFix(starttime);
-    QDateTime endtime = starttime.addSecs(event.length);
+    QDateTime endtime = starttime.addSecs(event.m_length);
 
-    desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
+    desc_list_t list = MPEGDescriptor::Parse(event.m_desc, event.m_desc_length);
     unsigned char subtitle_type =
         MPEGDescriptor::Find(list, DescriptorID::caption_service) ?
         SUB_HARDHEAR : SUB_UNKNOWN;
@@ -861,7 +861,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     uint atsc_key = (atsc_major << 16) | atsc_minor;
 
     QMutexLocker locker(&eitList_lock);
-    QString title = event.title;
+    QString title = event.m_title;
     QString subtitle = ett;
     db_events.enqueue(new DBEventEIT(chanid, title, subtitle,
                                      starttime, endtime,

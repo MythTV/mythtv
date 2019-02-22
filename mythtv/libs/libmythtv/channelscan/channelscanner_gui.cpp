@@ -51,17 +51,12 @@ using namespace std;
 static const int kCodeRejected  = 0;
 static const int kCodeAccepted  = 1;
 
-ChannelScannerGUI::ChannelScannerGUI(void)
-    : m_scanStage(nullptr)
-{
-}
-
 ChannelScannerGUI::~ChannelScannerGUI()
 {
     Teardown();
-    if (scanMonitor)
+    if (m_scanMonitor)
     {
-        post_event(scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
+        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
     }
 }
 
@@ -75,21 +70,21 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         InformUser(tr("Scan complete"));
 
         // HACK: make channel insertion work after [21644]
-        post_event(scanMonitor, ScannerEvent::ScanShutdown, kCodeAccepted);
+        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, kCodeAccepted);
     }
     else if (scanEvent->type() == ScannerEvent::ScanShutdown ||
              scanEvent->type() == ScannerEvent::ScanErrored)
     {
         ScanDTVTransportList transports;
-        if (sigmonScanner)
+        if (m_sigmonScanner)
         {
-            sigmonScanner->StopScanner();
-            transports = sigmonScanner->GetChannelList(addFullTS);
+            m_sigmonScanner->StopScanner();
+            transports = m_sigmonScanner->GetChannelList(m_addFullTS);
         }
 
-        bool success = (iptvScanner != nullptr);
+        bool success = (m_iptvScanner != nullptr);
 #ifdef USING_VBOX
-        success |= (vboxScanner != nullptr);
+        success |= (m_vboxScanner != nullptr);
 #endif
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
         success |= (m_ExternRecScanner != nullptr);
@@ -142,7 +137,7 @@ void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports,
                                 bool success)
 {
     ChannelImporter ci(true, true, true, true, true,
-                       freeToAirOnly, serviceRequirements, success);
+                       m_freeToAirOnly, m_serviceRequirements, success);
     ci.Process(_transports, m_sourceid);
 }
 
@@ -155,9 +150,9 @@ void ChannelScannerGUI::quitScanning(void)
 {
     m_scanStage = nullptr;
 
-    if (scanMonitor)
+    if (m_scanMonitor)
     {
-        post_event(scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
+        post_event(m_scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
     }
 }
 

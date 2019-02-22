@@ -528,7 +528,7 @@ void EditPowerSearchPopup::initLists(void)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
-        m_parent->m_viewList << QString::number(channels[i].chanid);
+        m_parent->m_viewList << QString::number(channels[i].m_chanid);
         m_parent->m_viewTextList << chantext;
 
         MythUIButtonListItem *item =
@@ -538,8 +538,8 @@ void EditPowerSearchPopup::initLists(void)
         channels[i].ToMap(chanmap);
         item->SetTextFromMap(chanmap);
 
-        m_channels << channels[i].callsign;
-        if (channels[i].callsign == field[5])
+        m_channels << channels[i].m_callsign;
+        if (channels[i].m_callsign == field[5])
             m_channelList->SetItemCurrent(m_channelList->GetCount() - 1);
     }
 }

@@ -57,16 +57,16 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
         rate = get_float_CF(ref, kCGDisplayRefreshRate);
 
     if (VALID_RATE(rate))
-        ret.rate = 1000000.0f / rate;
+        ret.m_rate = 1000000.0f / rate;
     else
-        ret.rate = fix_rate(video_rate);
+        ret.m_rate = fix_rate(video_rate);
 
     CGSize size_in_mm = CGDisplayScreenSize(disp);
-    ret.size = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
+    ret.m_size = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
 
     uint width  = (uint)CGDisplayPixelsWide(disp);
     uint height = (uint)CGDisplayPixelsHigh(disp);
-    ret.res     = QSize(width, height);
+    ret.m_res   = QSize(width, height);
 
 #elif defined(Q_OS_WIN)
     HDC hdc = GetDC((HWND)GetWindowID());
@@ -76,10 +76,10 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
         rate       = GetDeviceCaps(hdc, VREFRESH);
         int width  = GetDeviceCaps(hdc, HORZSIZE);
         int height = GetDeviceCaps(hdc, VERTSIZE);
-        ret.size   = QSize((uint)width, (uint)height);
+        ret.m_size = QSize((uint)width, (uint)height);
         width      = GetDeviceCaps(hdc, HORZRES);
         height     = GetDeviceCaps(hdc, VERTRES);
-        ret.res    = QSize((uint)width, (uint)height);
+        ret.m_res  = QSize((uint)width, (uint)height);
     }
 
     if (VALID_RATE(rate))
@@ -87,17 +87,17 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
         // see http://support.microsoft.com/kb/2006076
         switch (rate)
         {
-            case 23:  ret.rate = 41708; break; // 23.976Hz
-            case 29:  ret.rate = 33367; break; // 29.970Hz
-            case 47:  ret.rate = 20854; break; // 47.952Hz
-            case 59:  ret.rate = 16683; break; // 59.940Hz
-            case 71:  ret.rate = 13903; break; // 71.928Hz
-            case 119: ret.rate = 8342;  break; // 119.880Hz
-            default:  ret.rate = 1000000.0f / (float)rate;
+            case 23:  ret.m_rate = 41708; break; // 23.976Hz
+            case 29:  ret.m_rate = 33367; break; // 29.970Hz
+            case 47:  ret.m_rate = 20854; break; // 47.952Hz
+            case 59:  ret.m_rate = 16683; break; // 59.940Hz
+            case 71:  ret.m_rate = 13903; break; // 71.928Hz
+            case 119: ret.m_rate = 8342;  break; // 119.880Hz
+            default:  ret.m_rate = 1000000.0f / (float)rate;
         }
     }
     else
-        ret.rate = fix_rate(video_rate);
+        ret.m_rate = fix_rate(video_rate);
 
 #elif USING_X11
     MythXDisplay *disp = OpenMythXDisplay();
@@ -106,11 +106,11 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
 
     float rate = disp->GetRefreshRate();
     if (VALID_RATE(rate))
-        ret.rate = 1000000.0f / rate;
+        ret.m_rate = 1000000.0f / rate;
     else
-        ret.rate = fix_rate(video_rate);
-    ret.res  = disp->GetDisplaySize();
-    ret.size = disp->GetDisplayDimensions();
+        ret.m_rate = fix_rate(video_rate);
+    ret.m_res  = disp->GetDisplaySize();
+    ret.m_size = disp->GetDisplayDimensions();
     delete disp;
 #elif defined(Q_OS_ANDROID)
     QAndroidJniEnvironment env;
@@ -137,13 +137,13 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
         );
 
     if (VALID_RATE(rate))
-        ret.rate = 1000000.0f / rate;
+        ret.m_rate = 1000000.0f / rate;
     else
-        ret.rate = fix_rate(video_rate);
-    ret.res = QSize((uint)width, (uint)height);
-    ret.size = QSize((uint)width, (uint)height);
+        ret.m_rate = fix_rate(video_rate);
+    ret.m_res = QSize((uint)width, (uint)height);
+    ret.m_size = QSize((uint)width, (uint)height);
     if (xdpi > 0 && ydpi > 0)
-        ret.size = QSize((uint)width/xdpi*25.4f, (uint)height/ydpi*25.4f);
+        ret.m_size = QSize((uint)width/xdpi*25.4f, (uint)height/ydpi*25.4f);
 #endif
     return ret;
 }

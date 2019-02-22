@@ -7,8 +7,7 @@ const int PLAYLIST_FAILURE = 20;  // number of consecutive failures after which
 #define LOC QString("%1 playlist: ").arg(m_parent->StreamURL().isEmpty() ? "Worker" : m_parent->StreamURL())
 
 HLSPlaylistWorker::HLSPlaylistWorker(HLSReader *parent)
-    :  MThread("HLSPlaylist"), m_parent(parent),
-       m_cancel(false), m_wokenup(false)
+    :  MThread("HLSPlaylist"), m_parent(parent)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }

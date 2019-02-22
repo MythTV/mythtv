@@ -52,10 +52,10 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     void       ClearCache(void);
     int        GetTextureFromCache(MythImage *im);
 
-    QWidget          *realParent;
-    MythRenderOpenGL *realRender;
-    int               target;
-    bool              swapControl;
+    QWidget          *realParent  {nullptr};
+    MythRenderOpenGL *realRender  {nullptr};
+    int               target      {0};
+    bool              swapControl {true};
 
     QMap<MythImage *, uint>    m_ImageIntMap;
     std::list<MythImage *>     m_ImageExpireList;

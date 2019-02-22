@@ -14,7 +14,7 @@ class AVFRingBuffer
 {
 public:
     explicit AVFRingBuffer(RingBuffer *rbuffer = nullptr)
-        : m_rbuffer(rbuffer), m_initState(false) { }
+        : m_rbuffer(rbuffer) { }
     void                SetRingBuffer(RingBuffer *rbuffer)
     {
         m_rbuffer = rbuffer;
@@ -36,7 +36,7 @@ public:
     bool                IsInInit(void) { return m_initState; }
 
 private:
-    RingBuffer         *m_rbuffer;
+    RingBuffer         *m_rbuffer {nullptr};
     bool                m_initState;
     static bool         s_avrprotocol_initialised;
     static URLProtocol  s_avfrURL;

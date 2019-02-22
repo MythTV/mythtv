@@ -103,35 +103,35 @@ private:
     QString             m_m3u8;     // M3U8 url
     QByteArray          m_peeked;
 
-    HLSPlayback        *m_playback;
+    HLSPlayback        *m_playback {nullptr};
 
     /* state */
     StreamsList         m_streams;  // bandwidth adaptation
     mutable QMutex      m_lock;     // protect general class members
-    bool                m_meta;     // meta playlist
-    bool                m_error;    // parsing error
-    bool                m_aesmsg;   // only print one time that the media is encrypted
-    int                 m_startup;  // starting segment (where seek start)
+    bool                m_meta    {false}; // meta playlist
+    bool                m_error   {false}; // parsing error
+    bool                m_aesmsg  {false}; // only print one time that the media is encrypted
+    int                 m_startup {0};  // starting segment (where seek start)
     /**
      * assumed bitrate of playback
      * used for the purpose of calculating length and seek position.
      * the value itself is irrelevant, as it's only used as a common reference
      */
-    int64_t             m_bitrate;
+    int64_t             m_bitrate {0};
     /**
      * FFmpeg seek to the end of the stream in order to determine the length
      * of the video. Set to boolean to true after we detected a seek to the end
      * this will prevent waiting for new data in safe_read
      */
-    bool                m_seektoend;
+    bool                m_seektoend      {false};
 
     friend class StreamWorker;
-    StreamWorker       *m_streamworker;
+    StreamWorker       *m_streamworker   {nullptr};
     friend class PlaylistWorker;
-    PlaylistWorker     *m_playlistworker;
-    FILE               *m_fd;
-    bool                m_interrupted;
-    bool                m_killed;
+    PlaylistWorker     *m_playlistworker {nullptr};
+    FILE               *m_fd             {nullptr};
+    bool                m_interrupted    {false};
+    bool                m_killed         {false};
 };
 
 #endif

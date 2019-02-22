@@ -36,7 +36,7 @@ class FirewireChannel : public DTVChannel
 
     // Gets
     bool IsOpen(void) const override // ChannelBase
-        { return isopen; }
+        { return m_isopen; }
     QString GetDevice(void) const override; // ChannelBase
 
   protected:
@@ -45,14 +45,14 @@ class FirewireChannel : public DTVChannel
 
   private:
     virtual FirewireDevice::PowerState GetPowerState(void) const;
-    virtual FirewireDevice *GetFirewireDevice(void) { return device; }
+    virtual FirewireDevice *GetFirewireDevice(void) { return m_device; }
 
   protected:
-    QString            videodevice;
-    FireWireDBOptions  fw_opts;
-    FirewireDevice    *device;
-    uint               current_channel;
-    bool               isopen;
+    QString            m_videodevice;
+    FireWireDBOptions  m_fw_opts;
+    FirewireDevice    *m_device          {nullptr};
+    uint               m_current_channel {0};
+    bool               m_isopen          {false};
 };
 
 #endif // _FIREWIRECHANNEL_H_

@@ -10,11 +10,6 @@
 #include "compat.h"
 #include "mythlogging.h"
 
-MythQImagePainter::MythQImagePainter() :
-    MythPainter(), painter(nullptr), copy(false)
-{
-}
-
 MythQImagePainter::~MythQImagePainter()
 {
     Teardown();
@@ -30,86 +25,86 @@ void MythQImagePainter::Begin(QPaintDevice *parent)
     }
 
     MythPainter::Begin(parent);
-    painter       = new QPainter(parent);
-    copy          = true;
-    paintedRegion = QRegion();
-    painter->setCompositionMode(QPainter::CompositionMode_Source);
-    clipRegion = QRegion();
+    m_painter       = new QPainter(parent);
+    m_copy          = true;
+    m_paintedRegion = QRegion();
+    m_painter->setCompositionMode(QPainter::CompositionMode_Source);
+    m_clipRegion = QRegion();
     SetClipRect(QRect());
 }
 
 void MythQImagePainter::CheckPaintMode(const QRect &area)
 {
-    if (!painter)
+    if (!m_painter)
         return;
 
     bool intersects;
 
-    if (paintedRegion.isEmpty())
+    if (m_paintedRegion.isEmpty())
     {
         intersects = false;
-        paintedRegion = QRegion(area);
+        m_paintedRegion = QRegion(area);
     }
     else
     {
-        intersects = paintedRegion.intersects(area);
-        paintedRegion = paintedRegion.united(area);
+        intersects = m_paintedRegion.intersects(area);
+        m_paintedRegion = m_paintedRegion.united(area);
     }
 
-    if (intersects && copy)
+    if (intersects && m_copy)
     {
-        copy = false;
-        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+        m_copy = false;
+        m_painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     }
-    else if (!intersects && !copy)
+    else if (!intersects && !m_copy)
     {
-        copy = true;
-        painter->setCompositionMode(QPainter::CompositionMode_Source);
+        m_copy = true;
+        m_painter->setCompositionMode(QPainter::CompositionMode_Source);
     }
 }
 
 void MythQImagePainter::End(void)
 {
-    if (!painter)
+    if (!m_painter)
         return;
 
-    painter->end();
-    delete painter;
+    m_painter->end();
+    delete m_painter;
 
     MythPainter::End();
 }
 
 void MythQImagePainter::SetClipRect(const QRect &clipRect)
 {
-    if (!painter)
+    if (!m_painter)
         return;
 
     if (!clipRect.isEmpty())
     {
-        painter->setClipping(true);
-        if (clipRegion.isEmpty())
-            clipRegion = QRegion(clipRect);
+        m_painter->setClipping(true);
+        if (m_clipRegion.isEmpty())
+            m_clipRegion = QRegion(clipRect);
         else
-            clipRegion = clipRegion.united(clipRect);
-        painter->setClipRegion(clipRegion);
+            m_clipRegion = m_clipRegion.united(clipRect);
+        m_painter->setClipRegion(m_clipRegion);
     }
     else
-        painter->setClipping(false);
+        m_painter->setClipping(false);
 }
 
 void MythQImagePainter::SetClipRegion(const QRegion &region)
 {
-    if (!painter)
+    if (!m_painter)
         return;
 
     if (!region.isEmpty())
     {
-        painter->setClipping(true);
-        clipRegion = region;
-        painter->setClipRegion(clipRegion);
+        m_painter->setClipping(true);
+        m_clipRegion = region;
+        m_painter->setClipRegion(m_clipRegion);
     }
     else
-        painter->setClipping(false);
+        m_painter->setClipping(false);
 }
 
 void MythQImagePainter::Clear(QPaintDevice *device, const QRegion &region)
@@ -148,7 +143,7 @@ void MythQImagePainter::Clear(QPaintDevice *device, const QRegion &region)
 void MythQImagePainter::DrawImage(const QRect &r, MythImage *im,
                                   const QRect &src, int alpha)
 {
-    if (!painter)
+    if (!m_painter)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "FATAL ERROR: DrawImage called with no painter");
@@ -158,9 +153,9 @@ void MythQImagePainter::DrawImage(const QRect &r, MythImage *im,
     (void)alpha;
 
     CheckPaintMode(QRect(r.topLeft(), src.size()));
-    painter->setOpacity(static_cast<float>(alpha) / 255.0f);
-    painter->drawImage(r.topLeft(), (QImage)(*im), src);
-    painter->setOpacity(1.0);
+    m_painter->setOpacity(static_cast<float>(alpha) / 255.0f);
+    m_painter->drawImage(r.topLeft(), (QImage)(*im), src);
+    m_painter->setOpacity(1.0);
 }
 
 void MythQImagePainter::DrawText(const QRect &r, const QString &msg,

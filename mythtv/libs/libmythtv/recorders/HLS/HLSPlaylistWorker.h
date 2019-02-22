@@ -21,9 +21,9 @@ class HLSPlaylistWorker : public MThread
 
   private:
     // Class vars
-    HLSReader * m_parent;
-    bool        m_cancel;
-    bool        m_wokenup;
+    HLSReader      *m_parent  {nullptr};
+    bool            m_cancel  {false};
+    bool            m_wokenup {false};
 
     QWaitCondition  m_waitcond;
     QMutex          m_lock;

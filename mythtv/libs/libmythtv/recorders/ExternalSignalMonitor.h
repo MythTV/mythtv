@@ -27,7 +27,7 @@ class ExternalSignalMonitor: public DTVSignalMonitor
 
     void UpdateValues(void) override; // SignalMonitor
     ExternalChannel *GetExternalChannel(void)
-        { return dynamic_cast<ExternalChannel*>(channel); }
+        { return dynamic_cast<ExternalChannel*>(m_channel); }
 
     bool HasLock(void);
     int GetSignalStrengthPercent(void);
@@ -37,9 +37,9 @@ class ExternalSignalMonitor: public DTVSignalMonitor
 //        { m_stream_handler->AddListener(data); }
 
   protected:
-    ExternalStreamHandler *m_stream_handler;
-    bool              m_stream_handler_started;
-    int               m_lock_timeout;
+    ExternalStreamHandler *m_stream_handler         {nullptr};
+    bool                   m_stream_handler_started {false};
+    int                    m_lock_timeout           {0};
 };
 
 #endif // EXTERNALSIGNALMONITOR_H

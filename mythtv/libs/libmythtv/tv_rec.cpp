@@ -530,10 +530,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             }
 
             if (is_busy &&
-                ((sourceid != busy_input.sourceid) ||
-                 (mplexid  != busy_input.mplexid) ||
+                ((sourceid != busy_input.m_sourceid) ||
+                 (mplexid  != busy_input.m_mplexid) ||
                  ((mplexid == 0 || mplexid == 32767) &&
-                  chanid != busy_input.chanid)))
+                  chanid != busy_input.m_chanid)))
             {
                 states.push_back((TVState) RemoteGetState(inputids[i]));
                 inputids2.push_back(inputids[i]);
@@ -1490,7 +1490,7 @@ void TVRec::run(void)
                     LOG(VB_CHANNEL, LOG_INFO, LOC + QString(
                             "Postponing EIT scan on input [%1] "
                             "because input %2 is busy")
-                        .arg(inputid).arg(busy_input.inputid));
+                        .arg(inputid).arg(busy_input.m_inputid));
                     eitScanStartTime = eitScanStartTime.addSecs(300);
                 }
                 s_inputsLock.unlock();
@@ -2527,8 +2527,8 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 
     if (GetState() != kState_None)
     {
-        busy_input->inputid = channel->GetInputID();
-        chanid              = channel->GetChanID();
+        busy_input->m_inputid = channel->GetInputID();
+        chanid                = channel->GetChanID();
     }
 
     PendingInfo pendinfo;
@@ -2542,7 +2542,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
         pendingRecLock.unlock();
     }
 
-    if (!busy_input->inputid && has_pending)
+    if (!busy_input->m_inputid && has_pending)
     {
         int timeLeft = MythDate::current()
             .secsTo(pendinfo.recordingStart);
@@ -2552,22 +2552,22 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
             QString channum, input;
             if (pendinfo.info->QueryTuningInfo(channum, input))
             {
-                busy_input->inputid = channel->GetInputID();
+                busy_input->m_inputid = channel->GetInputID();
                 chanid = pendinfo.info->GetChanID();
             }
         }
     }
 
-    if (busy_input->inputid)
+    if (busy_input->m_inputid)
     {
         CardUtil::GetInputInfo(*busy_input);
-        busy_input->chanid  = chanid;
-        busy_input->mplexid = ChannelUtil::GetMplexID(busy_input->chanid);
-        busy_input->mplexid =
-            (32767 == busy_input->mplexid) ? 0 : busy_input->mplexid;
+        busy_input->m_chanid  = chanid;
+        busy_input->m_mplexid = ChannelUtil::GetMplexID(busy_input->m_chanid);
+        busy_input->m_mplexid =
+            (32767 == busy_input->m_mplexid) ? 0 : busy_input->m_mplexid;
     }
 
-    return busy_input->inputid;
+    return busy_input->m_inputid;
 }
 
 

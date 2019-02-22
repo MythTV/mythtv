@@ -70,8 +70,8 @@ class ASIRecorder : public DTVRecorder
     void StartNewFile(void) override; // RecorderBase
 
   private:
-    ASIChannel       *m_channel;
-    ASIStreamHandler *m_stream_handler;
+    ASIChannel       *m_channel        {nullptr};
+    ASIStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif // _ASI_RECORDER_H_

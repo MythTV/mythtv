@@ -61,31 +61,10 @@ public:
 
 MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
-  : QObject(parent),       m_watchdogTimer(nullptr), m_socket(socket),
-    m_textStream(nullptr), m_hardwareId(id),
-    m_incomingHeaders(),   m_incomingContent(),      m_incomingPartial(false),
-    m_incomingSize(0),
-    m_dataSocket(nullptr),                           m_dataPort(port),
-    m_clientControlSocket(nullptr),                  m_clientControlPort(0),
-    m_clientTimingSocket(nullptr),                   m_clientTimingPort(0),
-    m_eventServer(nullptr),                          m_eventPort(-1),
-    m_audio(nullptr),      m_codec(nullptr),         m_codeccontext(nullptr),
-    m_channels(2),         m_sampleSize(16),         m_frameRate(44100),
-    m_framesPerPacket(352),m_dequeueAudioTimer(nullptr),
-    m_queueLength(0),      m_streamingStarted(false),
-    m_allowVolumeControl(true),
-    //audio sync
-    m_seqNum(0),
-    m_lastSequence(0),     m_lastTimestamp(0),
-    m_currentTimestamp(0), m_nextSequence(0),        m_nextTimestamp(0),
-    m_bufferLength(0),     m_timeLastSync(0),
-    m_cardLatency(-1),     m_adjustedLatency(-1),    m_audioStarted(false),
-    // clock sync
-    m_masterTimeStamp(0),  m_deviceTimeStamp(0),     m_networkLatency(0),
-    m_clockSkew(0),
-    m_audioTimer(nullptr),
-    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
-    m_firstsend(false),    m_playbackStarted(false)
+  : QObject(parent),
+    m_socket(socket),
+    m_hardwareId(id),
+    m_dataPort(port)
 {
     m_id = GetNotificationCenter()->Register(this);
     memset(&m_aesKey, 0, sizeof(m_aesKey));

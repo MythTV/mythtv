@@ -24,21 +24,21 @@ class NetworkInformationTable;
 class pid_cache_item_t
 {
   public:
-    pid_cache_item_t() : pid(0), sid_tid(0) {}
-    pid_cache_item_t(uint _pid, uint _sid_tid) :
-        pid(_pid), sid_tid(_sid_tid) {}
-    uint GetPID(void) const { return pid; }
+    pid_cache_item_t() = default;
+    pid_cache_item_t(uint pid, uint sid_tid) :
+        m_pid(pid), m_sid_tid(sid_tid) {}
+    uint GetPID(void) const { return m_pid; }
     uint GetStreamID(void) const
-        { return (sid_tid&0x100) ? GetID() : 0; }
+        { return (m_sid_tid&0x100) ? GetID() : 0; }
     uint GetTableID(void) const
-        { return (sid_tid&0x100) ? 0 : GetID(); }
-    uint GetID(void) const { return sid_tid & 0xff; }
-    bool IsPCRPID(void) const { return sid_tid&0x200; }
-    bool IsPermanent(void) const { return sid_tid&0x10000; }
-    uint GetComposite(void) const { return sid_tid; }
+        { return (m_sid_tid&0x100) ? 0 : GetID(); }
+    uint GetID(void) const { return m_sid_tid & 0xff; }
+    bool IsPCRPID(void) const { return m_sid_tid&0x200; }
+    bool IsPermanent(void) const { return m_sid_tid&0x10000; }
+    uint GetComposite(void) const { return m_sid_tid; }
   private:
-    uint pid;
-    uint sid_tid;
+    uint m_pid     {0};
+    uint m_sid_tid {0};
 };
 typedef vector<pid_cache_item_t> pid_cache_t;
 

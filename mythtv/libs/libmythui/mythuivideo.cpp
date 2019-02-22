@@ -22,7 +22,6 @@ MythUIVideo::MythUIVideo(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
     m_image = GetMythPainter()->GetFormatImage();
-    m_backgroundColor = QColor(Qt::black);
 }
 
 MythUIVideo::~MythUIVideo()

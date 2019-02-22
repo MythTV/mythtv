@@ -21,7 +21,7 @@ class InteractiveScreen : public MythScreenType
     void Close() override; // MythScreenType
 
   private:
-    MythPlayer *m_player;
+    MythPlayer *m_player {nullptr};
     QRect       m_safeArea;
 };
 

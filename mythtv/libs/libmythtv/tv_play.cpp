@@ -1804,8 +1804,8 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
     {
         for (uint i = 0; i < selection.size(); i++)
         {
-            uint    chanid  = selection[i].chanid;
-            QString channum = selection[i].channum;
+            uint    chanid  = selection[i].m_chanid;
+            QString channum = selection[i].m_channum;
             if (!chanid || channum.isEmpty())
                 continue;
             QSet<uint> cards = IsTunableOn(ctx, chanid);
@@ -1964,7 +1964,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             // is busy_input in same input group as recording
             if (!busy_input_grps_loaded)
             {
-                busy_input_grps = CardUtil::GetInputGroups(busy_input.inputid);
+                busy_input_grps = CardUtil::GetInputGroups(busy_input.m_inputid);
                 busy_input_grps_loaded = true;
             }
 
@@ -1993,10 +1993,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
                 (*it).is_conflicting = true;
             else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetInputID()))
                 (*it).is_conflicting = true;
-            else if ((busy_input.mplexid &&
-                      (busy_input.mplexid  == (*it).info->QueryMplexID())) ||
-                     (!busy_input.mplexid &&
-                      (busy_input.chanid == (*it).info->GetChanID())))
+            else if ((busy_input.m_mplexid &&
+                      (busy_input.m_mplexid  == (*it).info->QueryMplexID())) ||
+                     (!busy_input.m_mplexid &&
+                      (busy_input.m_chanid == (*it).info->GetChanID())))
                 (*it).is_conflicting = false;
             else
                 (*it).is_conflicting = true;
@@ -7273,11 +7273,11 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     for (uint i = 0; i < inputs.size(); i++)
     {
         // prefer the current card's input in sources list
-        if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-            ((cardid == inputs[i].inputid) &&
-             (cardid != sources[inputs[i].sourceid].inputid)))
+        if ((sources.find(inputs[i].m_sourceid) == sources.end()) ||
+            ((cardid == inputs[i].m_inputid) &&
+             (cardid != sources[inputs[i].m_sourceid].m_inputid)))
         {
-            sources[inputs[i].sourceid] = inputs[i];
+            sources[inputs[i].m_sourceid] = inputs[i];
         }
     }
 
@@ -7317,7 +7317,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
         return;
     }
 
-    switchToInputId = (*sit).inputid;
+    switchToInputId = (*sit).m_inputid;
 
     QMutexLocker locker(&timerIdLock);
     if (!switchToInputTimerId)
@@ -7974,8 +7974,8 @@ void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
 {
     for (uint i = 0; i < options.size(); i++)
     {
-        uint    chanid  = options[i].chanid;
-        QString channum = options[i].channum;
+        uint    chanid  = options[i].m_chanid;
+        QString channum = options[i].m_channum;
 
         if (chanid && !channum.isEmpty() && IsTunable(ctx, chanid))
         {
@@ -8626,18 +8626,18 @@ QSet<uint> TV::IsTunableOn(
 
     for (uint j = 0; j < inputs.size(); j++)
     {
-        if (inputs[j].sourceid != sourceid)
+        if (inputs[j].m_sourceid != sourceid)
             continue;
 
-        if (inputs[j].mplexid &&
-            inputs[j].mplexid != mplexid)
+        if (inputs[j].m_mplexid &&
+            inputs[j].m_mplexid != mplexid)
             continue;
 
-        if (!inputs[j].mplexid && inputs[j].chanid &&
-            inputs[j].chanid != chanid)
+        if (!inputs[j].m_mplexid && inputs[j].m_chanid &&
+            inputs[j].m_chanid != chanid)
             continue;
 
-        tunable_cards.insert(inputs[j].inputid);
+        tunable_cards.insert(inputs[j].m_inputid);
     }
 
     if (tunable_cards.empty())
@@ -10813,15 +10813,15 @@ bool TV::LoadDDMap(uint sourceid)
     DDLineupChannels::const_iterator it;
     for (it = channels.begin(); it != channels.end(); ++it)
     {
-        DDStation station = ddp.GetDDStation((*it).stationid);
-        tmp["XMLTV"]    = (*it).stationid;
-        tmp["callsign"] = station.callsign;
-        tmp["channame"] = station.stationname;
-        tmp["channum"]  = (*it).channel;
-        if (!(*it).channelMinor.isEmpty())
+        DDStation station = ddp.GetDDStation((*it).m_stationid);
+        tmp["XMLTV"]    = (*it).m_stationid;
+        tmp["callsign"] = station.m_callsign;
+        tmp["channame"] = station.m_stationname;
+        tmp["channum"]  = (*it).m_channel;
+        if (!(*it).m_channelMinor.isEmpty())
         {
             tmp["channum"] += SourceUtil::GetChannelSeparator(sourceid);
-            tmp["channum"] += (*it).channelMinor;
+            tmp["channum"] += (*it).m_channelMinor;
         }
 
 #if 0
@@ -11058,7 +11058,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 ChannelInfoList::const_iterator it = list.begin();
                 for (; it != list.end(); ++it)
                 {
-                    if ((*it).channum == cur_channum)
+                    if ((*it).m_channum == cur_channum)
                     {
                         break;
                     }
@@ -11070,7 +11070,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                     // first channel in the group
                     it = list.begin();
                     if (it != list.end())
-                        new_channum = (*it).channum;
+                        new_channum = (*it).m_channum;
                 }
 
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -11877,9 +11877,9 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             for (it = db_channel_groups.begin();
                  it != db_channel_groups.end(); ++it)
             {
-                QString action = prefix + QString::number(it->grpid);
-                active = ((int)(it->grpid) == channelGroupId);
-                BUTTON(action, it->name);
+                QString action = prefix + QString::number(it->m_grpid);
+                active = ((int)(it->m_grpid) == channelGroupId);
+                BUTTON(action, it->m_name);
             }
         }
     }
@@ -11959,14 +11959,14 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             addednames += CardUtil::GetDisplayName(inputid);
             for (; it != inputs.end(); ++it)
             {
-                if ((*it).inputid == inputid ||
-                    addednames.contains((*it).displayName))
+                if ((*it).m_inputid == inputid ||
+                    addednames.contains((*it).m_displayName))
                     continue;
                 active = false;
-                addednames += (*it).displayName;
+                addednames += (*it).m_displayName;
                 QString action = QString("SWITCHTOINPUT_") +
-                    QString::number((*it).inputid);
-                BUTTON(action, (*it).displayName);
+                    QString::number((*it).m_inputid);
+                BUTTON(action, (*it).m_displayName);
             }
         }
     }
@@ -11983,14 +11983,14 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             vector<InputInfo>::iterator it = inputs.begin();
             for (; it != inputs.end(); ++it)
             {
-                if ((*it).sourceid == sourceid ||
-                    sourceids[(*it).sourceid])
+                if ((*it).m_sourceid == sourceid ||
+                    sourceids[(*it).m_sourceid])
                     continue;
                 active = false;
-                sourceids[(*it).sourceid] = true;
+                sourceids[(*it).m_sourceid] = true;
                 QString action = QString("SWITCHTOINPUT_") +
-                    QString::number((*it).inputid);
-                BUTTON(action, SourceUtil::GetSourceName((*it).sourceid));
+                    QString::number((*it).m_inputid);
+                BUTTON(action, SourceUtil::GetSourceName((*it).m_sourceid));
             }
         }
     }

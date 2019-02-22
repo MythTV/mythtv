@@ -33,7 +33,7 @@ class ChannelBase
     friend class SignalMonitor;
 
   public:
-    explicit ChannelBase(TVRec *parent);
+    explicit ChannelBase(TVRec *parent) : m_pParent(parent) {}
     virtual ~ChannelBase(void);
 
     virtual bool Init(QString &startchannel, bool setchan);
@@ -131,23 +131,23 @@ class ChannelBase
     bool ChangeInternalChannel(const QString &newchan,
                                uint cardinputid);
 
-    TVRec   *m_pParent;
-    QString  m_curchannelname;
-    bool     m_commfree;
-    uint     m_inputid;
-    uint     m_sourceid;
-    QString  m_name;
-    QString  m_startChanNum;
-    QString  m_externalChanger;
-    QString  m_tuneToChannel;
-    ChannelInfoList m_channels; ///< channels across all inputs
+    TVRec            *m_pParent        {nullptr};
+    QString           m_curchannelname;
+    bool              m_commfree       {false};
+    uint              m_inputid        {0};
+    uint              m_sourceid       {0};
+    QString           m_name;
+    QString           m_startChanNum;
+    QString           m_externalChanger;
+    QString           m_tuneToChannel;
+    ChannelInfoList   m_channels; ///< channels across all inputs
 
-    QMutex         m_system_lock;
-    MythSystemLegacy    *m_system;
+    QMutex            m_system_lock;
+    MythSystemLegacy *m_system         {nullptr};
     /// These get mapped from the GENERIC_EXIT_* to these values for use
     /// with the signalmonitor code.
     /// 0 == unknown, 1 == pending, 2 == failed, 3 == success
-    uint           m_system_status;
+    uint              m_system_status  {0};
 };
 
 

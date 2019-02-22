@@ -32,24 +32,8 @@ MythImage::MythImage(MythPainter *parent, const char *name) :
         LOG(VB_GENERAL, LOG_ERR, "Image created without parent!");
 
     m_Parent = parent;
-
-    m_Changed = false;
-
-    m_isGradient = false;
-    m_gradBegin = QColor("#000000");
-    m_gradEnd = QColor("#FFFFFF");
-    m_gradAlpha = 255;
-    m_gradDirection = FillTopToBottom;
-
-    m_isOriented = false;
-    m_isReflected = false;
-    m_isYUV = false;
-
-    m_imageId = 0;
-
     m_FileName = "";
 
-    m_cached = false;
     if (!s_ui)
         s_ui = GetMythUI();
 }
@@ -481,7 +465,7 @@ void MythImage::ConvertToYUV(void)
 
 MythImageReader::MythImageReader(const QString &fileName)
   : QImageReader(),
-    m_fileName(fileName), m_networkReply(nullptr)
+    m_fileName(fileName)
 {
     if ((m_fileName.startsWith("http://")) ||
         (m_fileName.startsWith("https://")) ||

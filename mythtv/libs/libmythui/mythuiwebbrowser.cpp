@@ -353,7 +353,6 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
     setPage(m_webpage);
 
     m_parentBrowser = parentBrowser;
-    m_busyPopup = nullptr;
 
     connect(page(), SIGNAL(unsupportedContent(QNetworkReply *)),
             this, SLOT(handleUnsupportedContent(QNetworkReply *)));
@@ -365,9 +364,6 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
     m_api = new BrowserApi(this);
     m_api->setWebView(this);
-
-    m_downloadAndPlay = false;
-    m_downloadReply = nullptr;
 }
 
 MythWebView::~MythWebView(void)

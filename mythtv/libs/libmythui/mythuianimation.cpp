@@ -7,10 +7,10 @@
 QRect UIEffects::GetExtent(const QSize &size)
 {
     int x = 0, y = 0;
-    int zoomedWidth = size.width() * hzoom;
-    int zoomedHeight = size.height() * vzoom;
+    int zoomedWidth = size.width() * m_hzoom;
+    int zoomedHeight = size.height() * m_vzoom;
 
-    switch (centre)
+    switch (m_centre)
     {
     case TopLeft:
     case Top:
@@ -26,7 +26,7 @@ QRect UIEffects::GetExtent(const QSize &size)
         y = size.height() - zoomedHeight / 2; break;
     }
 
-    switch (centre)
+    switch (m_centre)
     {
     case TopLeft:
     case Left:
@@ -43,13 +43,6 @@ QRect UIEffects::GetExtent(const QSize &size)
     }
 
     return QRect(x, y, zoomedWidth, zoomedHeight);
-}
-
-MythUIAnimation::MythUIAnimation(MythUIType* parent, Trigger trigger, Type type)
-    : m_parent(parent), m_type(type), m_trigger(trigger),
-      m_centre(UIEffects::Middle), m_active(false), m_looped(false),
-      m_reversible(false)
-{
 }
 
 void MythUIAnimation::Activate(void)

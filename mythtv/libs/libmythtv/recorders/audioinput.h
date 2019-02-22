@@ -44,11 +44,12 @@ class AudioInput
     static AudioInput *CreateDevice(const QByteArray &device);
 
   protected:
-    explicit AudioInput(const QString &device);
+    explicit AudioInput(const QString &device)
+        : m_audio_device(device.toLatin1()) {}
 
     QByteArray m_audio_device;
-    int        m_audio_channels;
-    int        m_audio_sample_bits;
-    int        m_audio_sample_rate;
+    int        m_audio_channels    {0};
+    int        m_audio_sample_bits {0};
+    int        m_audio_sample_rate {0};
 };
 #endif /* _AUDIOINPUT_H_ */

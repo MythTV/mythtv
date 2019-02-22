@@ -17,7 +17,7 @@ class QPainter;
 class MUI_PUBLIC MythQImagePainter : public MythPainter
 {
   public:
-    MythQImagePainter();
+    MythQImagePainter() : MythPainter() {}
    ~MythQImagePainter();
 
     QString GetName(void) override // MythPainter
@@ -56,10 +56,10 @@ class MUI_PUBLIC MythQImagePainter : public MythPainter
 
     void CheckPaintMode(const QRect &area);
 
-    QPainter *painter;
-    QRegion   clipRegion;
-    QRegion   paintedRegion;
-    bool      copy;
+    QPainter *m_painter       {nullptr};
+    QRegion   m_clipRegion;
+    QRegion   m_paintedRegion;
+    bool      m_copy          {false};
 };
 
 #endif

@@ -42,7 +42,7 @@ class ASIChannel : public DTVChannel
   private:
     vector<DTVTunerType>     m_tuner_types;
     QString                  m_device;
-    bool                     m_isopen;
+    bool                     m_isopen {false};
 };
 
 #endif // _ASI_CHANNEL_H_

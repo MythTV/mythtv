@@ -23,7 +23,7 @@
 static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str);
 #endif
 
-#define LOC      QString("HDHRSH[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC      QString("HDHRSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<int,HDHRStreamHandler*>     HDHRStreamHandler::s_handlers;
 QMap<int,uint>                   HDHRStreamHandler::s_handlers_refcnt;
@@ -65,7 +65,7 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&s_handlers_lock);
 
-    int majorid = ref->_majorid;
+    int majorid = ref->m_majorid;
 
     QMap<int,uint>::iterator rit = s_handlers_refcnt.find(majorid);
     if (rit == s_handlers_refcnt.end())
@@ -101,11 +101,8 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 HDHRStreamHandler::HDHRStreamHandler(const QString &device, int inputid,
                                      int majorid)
     : StreamHandler(device, inputid)
-    , _hdhomerun_device(nullptr)
-    , _tuner(-1)
-    , _tune_mode(hdhrTuneModeNone)
-    , _majorid(majorid)
-    , _hdhr_lock(QMutex::Recursive)
+    , m_tune_mode(hdhrTuneModeNone)
+    , m_majorid(majorid)
 {
     setObjectName("HDHRStreamHandler");
 }
@@ -118,15 +115,15 @@ void HDHRStreamHandler::run(void)
     RunProlog();
 
     /* Create TS socket. */
-    if (!hdhomerun_device_stream_start(_hdhomerun_device))
+    if (!hdhomerun_device_stream_start(m_hdhomerun_device))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Starting recording (set target failed). Aborting.");
-        _error = true;
+        m_bError = true;
         RunEpilog();
         return;
     }
-    hdhomerun_device_stream_flush(_hdhomerun_device);
+    hdhomerun_device_stream_flush(m_hdhomerun_device);
 
     SetRunning(true, false, false);
 
@@ -134,14 +131,14 @@ void HDHRStreamHandler::run(void)
 
     int remainder = 0;
     QTime last_update;
-    while (_running_desired && !_error)
+    while (m_running_desired && !m_bError)
     {
         int elapsed = !last_update.isValid() ? -1 : last_update.elapsed();
         elapsed = (elapsed < 0) ? 1000 : elapsed;
         if (elapsed > 100)
         {
             UpdateFiltersFromStreamData();
-            if (_tune_mode != hdhrTuneModeVChannel)
+            if (m_tune_mode != hdhrTuneModeVChannel)
                 UpdateFilters();
             last_update.restart();
         }
@@ -152,7 +149,7 @@ void HDHRStreamHandler::run(void)
 
         size_t data_length;
         unsigned char *data_buffer = hdhomerun_device_stream_recv(
-            _hdhomerun_device, read_size, &data_length);
+            m_hdhomerun_device, read_size, &data_length);
 
         if (!data_buffer)
         {
@@ -162,21 +159,21 @@ void HDHRStreamHandler::run(void)
 
         // Assume data_length is a multiple of 188 (packet size)
 
-        _listener_lock.lock();
+        m_listener_lock.lock();
 
-        if (_stream_data_list.empty())
+        if (m_stream_data_list.empty())
         {
-            _listener_lock.unlock();
+            m_listener_lock.unlock();
             continue;
         }
 
-        StreamDataList::const_iterator sit = _stream_data_list.begin();
-        for (; sit != _stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_stream_data_list.begin();
+        for (; sit != m_stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData(data_buffer, data_length);
 
         WriteMPTS(data_buffer, data_length - remainder);
 
-        _listener_lock.unlock();
+        m_listener_lock.unlock();
         if (remainder != 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -188,13 +185,13 @@ void HDHRStreamHandler::run(void)
 
     RemoveAllPIDFilters();
 
-    hdhomerun_device_stream_stop(_hdhomerun_device);
+    hdhomerun_device_stream_stop(m_hdhomerun_device);
 
     if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
     {
         struct hdhomerun_video_sock_t* vs;
         struct hdhomerun_video_stats_t stats;
-        vs = hdhomerun_device_get_video_sock(_hdhomerun_device);
+        vs = hdhomerun_device_get_video_sock(m_hdhomerun_device);
         if (vs)
         {
             hdhomerun_video_get_stats(vs, &stats);
@@ -232,10 +229,10 @@ static QString filt_str(uint pid)
 
 bool HDHRStreamHandler::UpdateFilters(void)
 {
-    if (_tune_mode == hdhrTuneModeFrequency)
-        _tune_mode = hdhrTuneModeFrequencyPid;
+    if (m_tune_mode == hdhrTuneModeFrequency)
+        m_tune_mode = hdhrTuneModeFrequencyPid;
 
-    if (_tune_mode != hdhrTuneModeFrequencyPid)
+    if (m_tune_mode != hdhrTuneModeFrequencyPid)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "UpdateFilters called in wrong tune mode");
@@ -245,20 +242,20 @@ bool HDHRStreamHandler::UpdateFilters(void)
 #ifdef DEBUG_PID_FILTERS
     LOG(VB_RECORD, LOG_INFO, LOC + "UpdateFilters()");
 #endif // DEBUG_PID_FILTERS
-    QMutexLocker locker(&_pid_lock);
+    QMutexLocker locker(&m_pid_lock);
 
     QString filter = "";
 
     vector<uint> range_min;
     vector<uint> range_max;
 
-    PIDInfoMap::const_iterator it = _pid_info.begin();
-    for (; it != _pid_info.end(); ++it)
+    PIDInfoMap::const_iterator it = m_pid_info.begin();
+    for (; it != m_pid_info.end(); ++it)
     {
         range_min.push_back(it.key());
         PIDInfoMap::const_iterator eit = it;
         for (++eit;
-             (eit != _pid_info.end()) && (it.key() + 1 == eit.key());
+             (eit != m_pid_info.end()) && (it.key() + 1 == eit.key());
              ++it, ++eit);
         range_max.push_back(it.key());
     }
@@ -297,15 +294,15 @@ bool HDHRStreamHandler::Open(void)
 {
     if (Connect())
     {
-        const char *model = hdhomerun_device_get_model_str(_hdhomerun_device);
-        _tuner_types.clear();
+        const char *model = hdhomerun_device_get_model_str(m_hdhomerun_device);
+        m_tuner_types.clear();
         if (QString(model).toLower().contains("cablecard"))
         {
             QString status_channel = "none";
             hdhomerun_tuner_status_t t_status;
 
             if (hdhomerun_device_get_oob_status(
-                    _hdhomerun_device, nullptr, &t_status) < 0)
+                    m_hdhomerun_device, nullptr, &t_status) < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to query Cable card OOB channel");
@@ -321,22 +318,22 @@ bool HDHRStreamHandler::Open(void)
             if (status_channel ==  "none")
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is not present");
-                _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
+                m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
             }
             else
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is present");
-                _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeOCUR));
+                m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeOCUR));
             }
         }
         else if (QString(model).toLower().contains("dvb"))
         {
-            _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBT));
-            _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBC));
+            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBT));
+            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBC));
         }
         else
         {
-            _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
+            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
         }
 
         return true;
@@ -346,54 +343,54 @@ bool HDHRStreamHandler::Open(void)
 
 void HDHRStreamHandler::Close(void)
 {
-    if (_hdhomerun_device)
+    if (m_hdhomerun_device)
     {
         TuneChannel("none");
-        hdhomerun_device_tuner_lockkey_release(_hdhomerun_device);
-        _hdhomerun_device = nullptr;
+        hdhomerun_device_tuner_lockkey_release(m_hdhomerun_device);
+        m_hdhomerun_device = nullptr;
     }
-    if (_device_selector)
+    if (m_device_selector)
     {
-        hdhomerun_device_selector_destroy(_device_selector, true);
-        _device_selector = nullptr;
+        hdhomerun_device_selector_destroy(m_device_selector, true);
+        m_device_selector = nullptr;
     }
 }
 
 bool HDHRStreamHandler::Connect(void)
 {
-    _device_selector = hdhomerun_device_selector_create(nullptr);
-    if (!_device_selector)
+    m_device_selector = hdhomerun_device_selector_create(nullptr);
+    if (!m_device_selector)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create device selector");
         return false;
     }
 
-    QStringList devices = _device.split(",");
+    QStringList devices = m_device.split(",");
     for (int i = 0; i < devices.size(); ++i)
     {
         QByteArray ba = devices[i].toUtf8();
         int n = hdhomerun_device_selector_load_from_str(
-            _device_selector, ba.data());
+            m_device_selector, ba.data());
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Added %1 devices from %3")
             .arg(n).arg(devices[i]));
     }
 
-    _hdhomerun_device = hdhomerun_device_selector_choose_and_lock(
-        _device_selector, nullptr);
-    if (!_hdhomerun_device)
+    m_hdhomerun_device = hdhomerun_device_selector_choose_and_lock(
+        m_device_selector, nullptr);
+    if (!m_hdhomerun_device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Unable to find a free device"));
-        hdhomerun_device_selector_destroy(_device_selector, true);
-        _device_selector = nullptr;
+        hdhomerun_device_selector_destroy(m_device_selector, true);
+        m_device_selector = nullptr;
         return false;
     }
 
-    _tuner = hdhomerun_device_get_tuner(_hdhomerun_device);
+    m_tuner = hdhomerun_device_get_tuner(m_hdhomerun_device);
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Connected to device(%1)")
-        .arg(hdhomerun_device_get_name(_hdhomerun_device)));
+        .arg(hdhomerun_device_get_name(m_hdhomerun_device)));
 
     return true;
 }
@@ -401,19 +398,19 @@ bool HDHRStreamHandler::Connect(void)
 QString HDHRStreamHandler::TunerGet(
     const QString &name, bool report_error_return, bool print_error) const
 {
-    QMutexLocker locker(&_hdhr_lock);
+    QMutexLocker locker(&m_hdhr_lock);
 
-    if (!_hdhomerun_device)
+    if (!m_hdhomerun_device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed (not connected)");
         return QString();
     }
 
-    QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
+    QString valname = QString("/tuner%1/%2").arg(m_tuner).arg(name);
     char *value = nullptr;
     char *error = nullptr;
     if (hdhomerun_device_get_var(
-            _hdhomerun_device, valname.toLocal8Bit().constData(),
+            m_hdhomerun_device, valname.toLocal8Bit().constData(),
             &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed" + ENO);
@@ -438,21 +435,21 @@ QString HDHRStreamHandler::TunerSet(
     const QString &name, const QString &val,
     bool report_error_return, bool print_error)
 {
-    QMutexLocker locker(&_hdhr_lock);
+    QMutexLocker locker(&m_hdhr_lock);
 
-    if (!_hdhomerun_device)
+    if (!m_hdhomerun_device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed (not connected)");
         return QString();
     }
 
 
-    QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
+    QString valname = QString("/tuner%1/%2").arg(m_tuner).arg(name);
     char *value = nullptr;
     char *error = nullptr;
 
     if (hdhomerun_device_set_var(
-            _hdhomerun_device, valname.toLocal8Bit().constData(),
+            m_hdhomerun_device, valname.toLocal8Bit().constData(),
             val.toLocal8Bit().constData(), &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed" + ENO);
@@ -476,17 +473,17 @@ QString HDHRStreamHandler::TunerSet(
 
 void HDHRStreamHandler::GetTunerStatus(struct hdhomerun_tuner_status_t *status)
 {
-    hdhomerun_device_get_tuner_status(_hdhomerun_device, nullptr, status);
+    hdhomerun_device_get_tuner_status(m_hdhomerun_device, nullptr, status);
 }
 
 bool HDHRStreamHandler::IsConnected(void) const
 {
-    return (_hdhomerun_device != nullptr);
+    return (m_hdhomerun_device != nullptr);
 }
 
 bool HDHRStreamHandler::TuneChannel(const QString &chn)
 {
-    _tune_mode = hdhrTuneModeFrequency;
+    m_tune_mode = hdhrTuneModeFrequency;
 
     QString current = TunerGet("channel");
     if (current == chn)
@@ -503,10 +500,10 @@ bool HDHRStreamHandler::TuneChannel(const QString &chn)
 
 bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
 {
-    if (_tune_mode == hdhrTuneModeFrequency)
-        _tune_mode = hdhrTuneModeFrequencyProgram;
+    if (m_tune_mode == hdhrTuneModeFrequency)
+        m_tune_mode = hdhrTuneModeFrequencyProgram;
 
-    if (_tune_mode != hdhrTuneModeFrequencyProgram)
+    if (m_tune_mode != hdhrTuneModeFrequencyProgram)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "TuneProgram called in wrong tune mode");
         return false;
@@ -520,7 +517,7 @@ bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
 
 bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
 {
-    _tune_mode = hdhrTuneModeVChannel;
+    m_tune_mode = hdhrTuneModeVChannel;
 
     QString current = TunerGet("vchannel");
     if (current == vchn)

@@ -21,14 +21,7 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
     if (parent)
         parent->AddScreenStack(this, mainstack);
 
-    m_newTop = nullptr;
-    m_topScreen = nullptr;
-
     EnableEffects();
-    m_InNewTransition = false;
-
-    m_DoInit = false;
-    m_InitTimerStarted = false;
 }
 
 MythScreenStack::~MythScreenStack()

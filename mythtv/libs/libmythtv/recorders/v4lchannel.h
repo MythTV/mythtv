@@ -33,7 +33,8 @@ class V4LChannel : public DTVChannel
 {
  public:
     V4LChannel(TVRec *parent, const QString &videodevice,
-               const QString &audiodevice = "");
+               const QString &audiodevice = "")
+        : DTVChannel(parent), m_device(videodevice), m_audio_device(audiodevice) {}
     virtual ~V4LChannel(void);
 
     bool Init(QString &startchannel, bool setchan) override; // ChannelBase
@@ -56,10 +57,10 @@ class V4LChannel : public DTVChannel
     bool IsOpen(void)       const override // ChannelBase
         { return GetFd() >= 0; }
     int  GetFd(void)        const override // ChannelBase
-        { return videofd; }
+        { return m_videofd; }
     QString GetDevice(void) const override // ChannelBase
-        { return device; }
-    QString GetAudioDevice(void) const { return audio_device; }
+        { return m_device; }
+    QString GetAudioDevice(void) const { return m_audio_device; }
     QString GetSIStandard(void) const { return "atsc"; }
 
     // Picture attributes.
@@ -89,27 +90,27 @@ class V4LChannel : public DTVChannel
 
   private:
     // Data
-    QString     device;
-    QString     audio_device;
-    int         videofd;
-    QString     device_name;
-    QString     driver_name;
-    QMap<QString,int> pict_attr_default;
+    QString           m_device;
+    QString           m_audio_device;
+    int               m_videofd           {-1};
+    QString           m_device_name;
+    QString           m_driver_name;
+    QMap<QString,int> m_pict_attr_default;
 
-    struct CHANLIST *curList;
-    int         totalChannels;
+    struct CHANLIST *m_curList            {nullptr};
+    int              m_totalChannels      {0};
 
-    bool        has_stream_io;
-    bool        has_std_io;
-    bool        has_async_io;
-    bool        has_tuner;
-    bool        has_sliced_vbi;
+    bool             m_has_stream_io      {false};
+    bool             m_has_std_io         {false};
+    bool             m_has_async_io       {false};
+    bool             m_has_tuner          {false};
+    bool             m_has_sliced_vbi     {false};
 
-    VidModV4L2  videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
+    VidModV4L2       videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
 
-    int         defaultFreqTable;
-    int         m_inputNumV4L;
-    int         m_videoModeV4L2;
+    int              m_defaultFreqTable   {1};
+    int              m_inputNumV4L        {0};
+    int              m_videoModeV4L2      {0};
 };
 
 #endif

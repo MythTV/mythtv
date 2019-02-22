@@ -19,8 +19,8 @@ class QWidget;
 class ChannelID : public GroupSetting
 {
   public:
-    ChannelID(QString _field = "chanid", QString _table = "channel") :
-        field(_field), table(_table)
+    ChannelID(QString field = "chanid", QString table = "channel") :
+        m_field(field), m_table(table)
     {
         setVisible(false);
     }
@@ -33,7 +33,7 @@ class ChannelID : public GroupSetting
             MSqlQuery query(MSqlQuery::InitCon());
 
             QString querystr = QString("SELECT %1 FROM %2 WHERE %3='%4'")
-                             .arg(field).arg(table).arg(field).arg(getValue());
+                             .arg(m_field).arg(m_table).arg(m_field).arg(getValue());
             query.prepare(querystr);
 
             if (!query.exec() && !query.isActive())
@@ -43,7 +43,7 @@ class ChannelID : public GroupSetting
                 return;
 
             querystr = QString("INSERT INTO %1 (%2) VALUES ('%3')")
-                             .arg(table).arg(field).arg(getValue());
+                             .arg(m_table).arg(m_field).arg(getValue());
             query.prepare(querystr);
 
             if (!query.exec() || !query.isActive())
@@ -52,7 +52,7 @@ class ChannelID : public GroupSetting
             if (query.numRowsAffected() != 1)
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("ChannelID, Error: ") +
-                        QString("Failed to insert into: %1").arg(table));
+                        QString("Failed to insert into: %1").arg(m_table));
             }
         }
     }
@@ -63,7 +63,7 @@ class ChannelID : public GroupSetting
         MSqlQuery query(MSqlQuery::InitCon());
 
         QString querystr = QString("SELECT %1 FROM %2")
-                                .arg(field).arg(table);
+                                .arg(m_field).arg(m_table);
         query.prepare(querystr);
 
         if (!query.exec() || !query.isActive())
@@ -81,23 +81,24 @@ class ChannelID : public GroupSetting
     };
 
     const QString& getField(void) const {
-        return field;
+        return m_field;
     };
 
 protected:
-    QString field,table;
+    QString m_field;
+    QString m_table;
 };
 
 class ChannelDBStorage : public SimpleDBStorage
 {
   public:
     ChannelDBStorage(StorageUser *_user, const ChannelID &_id, QString _name) :
-        SimpleDBStorage(_user, "channel", _name), id(_id) { }
+        SimpleDBStorage(_user, "channel", _name), m_id(_id) { }
 
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
-    const ChannelID& id;
+    const ChannelID& m_id;
 };
 
 class OnAirGuide;
@@ -117,9 +118,9 @@ class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
     void sourceChanged(const QString&);
 
   protected:
-    OnAirGuide *onairguide;
-    XmltvID    *xmltvID;
-    Freqid     *freqid;
+    OnAirGuide *m_onairguide {nullptr};
+    XmltvID    *m_xmltvID    {nullptr};
+    Freqid     *m_freqid     {nullptr};
 };
 
 class MTV_PUBLIC ChannelOptionsFilters: public GroupSetting
@@ -144,11 +145,11 @@ class MTV_PUBLIC ChannelOptionsRawTS: public GroupSetting
     virtual void Save(QString /*destination*/) { Save(); }
 
   private:
-    const ChannelID &cid;
+    const ChannelID &m_cid;
 
-    std::vector<TransTextEditSetting*> pids;
-    std::vector<TransMythUIComboBoxSetting*> sids;
-    std::vector<TransMythUICheckBoxSetting*> pcrs;
+    std::vector<TransTextEditSetting*>       m_pids;
+    std::vector<TransMythUIComboBoxSetting*> m_sids;
+    std::vector<TransMythUICheckBoxSetting*> m_pcrs;
 
     static const uint kMaxPIDs = 10;
 };

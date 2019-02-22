@@ -8,15 +8,6 @@
 
 #define LOC      QString("DVDPlayer: ")
 
-MythDVDPlayer::MythDVDPlayer(PlayerFlags flags)
-  : MythPlayer(flags), m_buttonVersion(0),
-    dvd_stillframe_showing(false),
-    m_initial_title(-1), m_initial_audio_track(-1),
-    m_initial_subtitle_track(-1),
-    m_stillFrameLength(0)
-{
-}
-
 void MythDVDPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 {
     (void)frame;
@@ -65,7 +56,7 @@ void MythDVDPlayer::EnableCaptions(uint mode, bool osd_msg)
             StreamInfo stream = decoder->GetTrackInfo(kTrackTypeSubtitle,
                                                       track);
             player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle,
-                                                stream.stream_id);
+                                                stream.m_stream_id);
         }
     }
     MythPlayer::EnableCaptions(mode, osd_msg);
@@ -159,9 +150,9 @@ bool MythDVDPlayer::VideoLoop(void)
         // so do this 'manually'
         DisplayNormalFrame(false);
         // unpause the still frame if more frames become available
-        if (dvd_stillframe_showing && nbframes > 1)
+        if (m_dvd_stillframe_showing && nbframes > 1)
         {
-            dvd_stillframe_showing = false;
+            m_dvd_stillframe_showing = false;
             UnpauseVideo();
         }
         return !IsErrored();
@@ -195,14 +186,14 @@ bool MythDVDPlayer::VideoLoop(void)
         if (player_ctx->buffer->DVD()->IsStillFramePending())
         {
             // ensure we refresh the pause frame
-            if (!dvd_stillframe_showing)
+            if (!m_dvd_stillframe_showing)
                 needNewPauseFrame = true;
 
             // we are in a still frame so pause video output
             if (!videoPaused)
             {
                 PauseVideo();
-                dvd_stillframe_showing = true;
+                m_dvd_stillframe_showing = true;
                 return !IsErrored();
             }
 
@@ -218,15 +209,15 @@ bool MythDVDPlayer::VideoLoop(void)
                 return !IsErrored();
             }
 
-            dvd_stillframe_showing = true;
+            m_dvd_stillframe_showing = true;
         }
     }
 
     // unpause the still frame if more frames become available
-    if (dvd_stillframe_showing && nbframes > 1)
+    if (m_dvd_stillframe_showing && nbframes > 1)
     {
         UnpauseVideo();
-        dvd_stillframe_showing = false;
+        m_dvd_stillframe_showing = false;
         return !IsErrored();
     }
 
@@ -537,7 +528,7 @@ int MythDVDPlayer::SetTrack(uint type, int trackNo)
     if (kTrackTypeAudio == type)
     {
         StreamInfo stream = decoder->GetTrackInfo(type, trackNo);
-        player_ctx->buffer->DVD()->SetTrack(type, stream.stream_id);
+        player_ctx->buffer->DVD()->SetTrack(type, stream.m_stream_id);
     }
 
     return MythPlayer::SetTrack(type, trackNo);

@@ -33,7 +33,7 @@ class SemaphoreLocker
             m_lock->release();
     }
   private:
-    QSemaphore *m_lock;
+    QSemaphore *m_lock {nullptr};
 };
 
 QEvent::Type ScreenLoadCompletionEvent::kEventType =
@@ -58,17 +58,11 @@ class ScreenLoadTask : public QRunnable
 
 MythScreenType::MythScreenType(
     MythScreenStack *parent, const QString &name, bool fullscreen) :
-    MythUIComposite(parent, name), m_LoadLock(1)
+    MythUIComposite(parent, name)
 {
     m_FullScreen = fullscreen;
-    m_CurrentFocusWidget = nullptr;
 
     m_ScreenStack = parent;
-    m_BusyPopup = nullptr;
-    m_IsDeleting = false;
-    m_IsLoading = false;
-    m_IsLoaded = false;
-    m_IsInitialized = false;
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
@@ -80,17 +74,9 @@ MythScreenType::MythScreenType(
 
 MythScreenType::MythScreenType(
     MythUIType *parent, const QString &name, bool fullscreen) :
-    MythUIComposite(parent, name), m_LoadLock(1)
+    MythUIComposite(parent, name)
 {
     m_FullScreen = fullscreen;
-    m_CurrentFocusWidget = nullptr;
-
-    m_ScreenStack = nullptr;
-    m_BusyPopup = nullptr;
-    m_IsDeleting = false;
-    m_IsLoading = false;
-    m_IsLoaded = false;
-    m_IsInitialized = false;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
