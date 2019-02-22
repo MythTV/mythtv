@@ -8,6 +8,7 @@
 #include "mythlogging.h"
 #include "mythcodecid.h"
 #include "mythframe.h"
+#include "avformatdecoder.h"
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
 #include "mythvaapiinterop.h"
@@ -248,6 +249,66 @@ MythCodecID VAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
             .arg(foundswfmt).arg(sizeok).arg(foundprofile).arg(foundentry));
     return failure;
+}
+
+enum AVPixelFormat VAAPIContext::GetFormat(struct AVCodecContext *Context,
+                                           const enum AVPixelFormat *PixFmt)
+{
+    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
+    while (*PixFmt != AV_PIX_FMT_NONE)
+    {
+        if (*PixFmt == AV_PIX_FMT_VAAPI)
+            if (VAAPIContext::InitialiseDecoder(Context) >= 0)
+                return *PixFmt;
+        PixFmt++;
+    }
+    return ret;
+}
+
+int VAAPIContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
+{
+    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
+    VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
+
+    // set fields required for directrendering
+    for (int i = 0; i < 4; i++)
+    {
+        Frame->data[i]     = nullptr;
+        Frame->linesize[i] = 0;
+    }
+    Frame->opaque           = videoframe;
+    videoframe->pix_fmt     = Context->pix_fmt;
+    Frame->reordered_opaque = Context->reordered_opaque;
+
+    int ret = avcodec_default_get_buffer2(Context, Frame, Flags);
+    if (ret < 0)
+        return ret;
+
+    // avcodec_default_get_buffer2 will retrieve an AVBufferRef from the pool of
+    // VAAPI surfaces stored within AVHWFramesContext. The pointer to VASurfaceID is stored
+    // in Frame->data[3]. Store this in VideoFrame::buf for MythVAAPIInterop to use.
+    videoframe->buf = Frame->data[3];
+    // Frame->buf(0) also contains a reference to the buffer. Take an additional reference to this
+    // buffer to retain the surface until it has been displayed (otherwise it is
+    // reused once the decoder is finished with it).
+    videoframe->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
+    // frame->hw_frames_ctx contains a reference to the AVHWFramesContext. Take an additional
+    // reference to ensure AVHWFramesContext is not released until we are finished with it.
+    // This also contains the underlying MythOpenGLInterop class reference.
+    videoframe->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->hw_frames_ctx));
+
+    // Set release method
+    Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
+                                     VAAPIContext::ReleaseBuffer, avfd, 0);
+    return ret;
+}
+
+void VAAPIContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
+{
+    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Opaque);
+    VideoFrame *frame = reinterpret_cast<VideoFrame*>(Data);
+    if (decoder && decoder->GetPlayer())
+        decoder->GetPlayer()->DeLimboFrame(frame);
 }
 
 void VAAPIContext::InitialiseContext(AVCodecContext *Context)

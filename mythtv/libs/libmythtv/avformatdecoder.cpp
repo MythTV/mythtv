@@ -189,9 +189,6 @@ int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
 #ifdef USING_DXVA2
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
-#ifdef USING_VAAPI
-int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags);
-#endif
 #ifdef USING_VAAPI2
 int  get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
@@ -1513,26 +1510,6 @@ static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 }
 #endif
 
-#ifdef USING_VAAPI
-// Declared separately to allow attribute
-static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
-                                         const enum AVPixelFormat *);
-
-enum AVPixelFormat get_format_vaapi(struct AVCodecContext* ctx,
-                                    const enum AVPixelFormat *valid_fmts)
-{
-    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
-    while (*valid_fmts != AV_PIX_FMT_NONE)
-    {
-        if (*valid_fmts == AV_PIX_FMT_VAAPI)
-            if (VAAPIContext::InitialiseDecoder(ctx) >= 0)
-                return *valid_fmts;
-        valid_fmts++;
-    }
-    return ret;
-}
-#endif
-
 #ifdef USING_VAAPI2
 static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
                                            const enum AVPixelFormat *valid_fmts)
@@ -1652,8 +1629,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VAAPI
     if (CODEC_IS_VAAPI(codec1, enc) && codec_is_vaapi(m_video_codec_id))
     {
-        enc->get_buffer2     = get_avf_buffer_vaapi;
-        enc->get_format      = get_format_vaapi;
+        enc->get_buffer2     = VAAPIContext::GetBuffer;
+        enc->get_format      = VAAPIContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
@@ -3130,46 +3107,6 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
     pic->buf[0] = buffer;
 
     return 0;
-}
-#endif
-
-#ifdef USING_VAAPI
-int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
-{
-    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(c->opaque);
-    VideoFrame *frame = avfd->GetPlayer()->GetNextVideoFrame();
-
-    // set fields required for directrendering
-    for (int i = 0; i < 4; i++)
-    {
-        pic->data[i]     = nullptr;
-        pic->linesize[i] = 0;
-    }
-    pic->opaque           = frame;
-    frame->pix_fmt        = c->pix_fmt;
-    pic->reordered_opaque = c->reordered_opaque;
-
-    int ret = avcodec_default_get_buffer2(c, pic, flags);
-    if (ret < 0)
-        return ret;
-
-    // avcodec_default_get_buffer2 will retrieve an AVBufferRef from the pool of
-    // VAAPI surfaces stored within AVHWFramesContext. The pointer to VASurfaceID is stored
-    // in pic->data[3]. Store this in VideoFrame::buf for our video classes to use.
-    frame->buf = pic->data[3];
-    // pic->buf(0) also contains a reference to the buffer. Take an additional reference to this
-    // buffer to retain the surface until it has been displayed (otherwise it is
-    // reused once the decoder is finished with it). Store reference in frame->priv[0]
-    frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(pic->buf[0]));
-    // frame->hw_frames_ctx contains a reference to the AVHWFramesContext. Take an additional
-    // reference to ensure AVHWFramesContext is not released until we are finished with it.
-    // This also gives the video classes access to the underlying VAAPI interop.
-    frame->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(pic->hw_frames_ctx));
-
-    // Set release method
-    AVBufferRef *buffer = av_buffer_create(reinterpret_cast<uint8_t*>(frame), 0, release_avf_buffer, avfd, 0);
-    pic->buf[1] = buffer; // NB not buf[0]
-    return ret;
 }
 #endif
 
