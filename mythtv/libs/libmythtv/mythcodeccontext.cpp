@@ -73,11 +73,11 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 {
     MythCodecContext *mctx = nullptr;
 #ifdef USING_VAAPI2
-    if (codec_is_vaapi2(codec))
+    if (codec_is_vaapi_dec(codec))
         mctx = new Vaapi2Context();
 #endif
 #ifdef USING_NVDEC
-    if (codec_is_nvdec(codec))
+    if (codec_is_nvdec_dec(codec))
         mctx = new NvdecContext();
 #endif
     // In case neither was defined
@@ -93,7 +93,7 @@ QStringList MythCodecContext::GetDeinterlacers(QString decodername)
 {
     QStringList ret;
 #ifdef USING_VAAPI2
-    if (decodername == "vaapi2")
+    if (decodername == "vaapi-dec")
     {
         ret.append("vaapi2default");
         ret.append("vaapi2bob");
@@ -126,7 +126,7 @@ QStringList MythCodecContext::GetDeinterlacers(QString decodername)
     }
 #endif
 #ifdef USING_NVDEC
-    if (decodername == "nvdec")
+    if (decodername == "nvdec-dec")
     {
         ret.append("nvdecweave");
         ret.append("nvdecbob");
@@ -152,8 +152,8 @@ QStringList MythCodecContext::GetDeinterlacers(QString decodername)
 // static - Find if a deinterlacer is codec-provided
 bool MythCodecContext::isCodecDeinterlacer(QString decodername)
 {
-    return (decodername.startsWith("vaapi2")
-            || decodername.startsWith("nvdec") );
+    return (decodername.startsWith("vaapi-dec")
+            || decodername.startsWith("nvdec-dec") );
 }
 
 // Currently this will only set up the filter after an interlaced frame.

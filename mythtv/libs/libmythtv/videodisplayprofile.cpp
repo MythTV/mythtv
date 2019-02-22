@@ -837,14 +837,14 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     QMutexLocker locker(&safe_lock);
     if (dec_name.empty())
     {
-        dec_name["ffmpeg"]   = QObject::tr("Standard");
-        dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
-        dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
-        dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
-        dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
-        dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
-        dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
-        dec_name["nvdec"]    = QObject::tr("NVidia NVDEC acceleration");
+        dec_name["ffmpeg"]         = QObject::tr("Standard");
+        dec_name["macaccel"]       = QObject::tr("Mac hardware acceleration");
+        dec_name["vdpau"]          = QObject::tr("NVidia VDPAU acceleration");
+        dec_name["vaapi"]          = QObject::tr("VAAPI acceleration");
+        dec_name["vaapi-dec"]      = QObject::tr("VAAPI acceleration (decode only)");
+        dec_name["dxva2"]          = QObject::tr("Windows hardware acceleration");
+        dec_name["mediacodec-dec"] = QObject::tr("Android MediaCodec acceleration (decode only)");
+        dec_name["nvdec-dec"]      = QObject::tr("NVidia NVDEC acceleration (decode only)");
     }
 
     QString ret = decoder;
@@ -877,33 +877,32 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
             "VDPAU will attempt to use the graphics hardware to "
             "accelerate video decoding and playback.");
 
-    if (decoder == "dxva2")
-        msg += QObject::tr(
-            "DXVA2 will use the graphics hardware to "
-            "accelerate video decoding and playback "
-            "(requires Windows Vista or later).");
-
     if (decoder == "vaapi")
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
-            "accelerate video decoding. REQUIRES OPENGL PAINTER.");
+            "accelerate video decoding and playback.");
+
+    if (decoder == "vaapi-dec")
+        msg += QObject::tr(
+            "Will attempt to use the graphics hardware to "
+            "accelerate video decoding only.");
+
+    if (decoder == "dxva2")
+        msg += QObject::tr(
+            "DXVA2 will use the graphics hardware to "
+            "accelerate video decoding and playback. ");
 
     if (decoder == "openmax")
         msg += QObject::tr(
             "Openmax will use the graphics hardware to "
             "accelerate video decoding on Raspberry Pi. ");
 
-    if (decoder == "mediacodec")
+    if (decoder == "mediacodec-dec")
         msg += QObject::tr(
             "Mediacodec will use the graphics hardware to "
             "accelerate video decoding on Android. ");
 
-    if (decoder == "vaapi2")
-        msg += QObject::tr(
-            "VAAPI2 is a new implementation of VAAPI to will use the graphics hardware to "
-            "accelerate video decoding on Intel CPUs. ");
-
-    if (decoder == "nvdec")
+    if (decoder == "nvdec-dec")
         msg += QObject::tr(
             "Nvdec uses the new NVDEC API to "
             "accelerate video decoding on NVidia Graphics Adapters. ");
@@ -1456,7 +1455,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
                            "Sample: MediaCodec Normal");
         groupid = CreateProfileGroup("MediaCodec Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
-                      "mediacodec", 4, true, "opengl",
+                      "mediacodec-dec", 4, true, "opengl",
                       "opengl2", true,
                       "opengldoubleratelinearblend", "opengllinearblend",
                       "");
@@ -1469,7 +1468,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
                            "Sample: VAAPI2 Normal");
         groupid = CreateProfileGroup("VAAPI2 Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
-                      "vaapi2", 4, true, "opengl",
+                      "vaapi-dec", 4, true, "opengl",
                       "opengl2", true,
                       "vaapi2doubleratedefault", "vaapi2default",
                       "");

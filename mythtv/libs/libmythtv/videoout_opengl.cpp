@@ -43,12 +43,14 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
         (*Options.safe_renderers)["ffmpeg"].append(safe);
     if (Options.decoders->contains("openmax"))
         (*Options.safe_renderers)["openmax"].append(safe);
-    if (Options.decoders->contains("mediacodec"))
-        (*Options.safe_renderers)["mediacodec"].append(safe);
-    if (Options.decoders->contains("vaapi2"))
-        (*Options.safe_renderers)["vaapi2"].append(safe);
-    if (Options.decoders->contains("nvdec"))
-        (*Options.safe_renderers)["nvdec"].append(safe);
+    if (Options.decoders->contains("mediacodec-dec"))
+        (*Options.safe_renderers)["mediacodec-dec"].append(safe);
+    if (Options.decoders->contains("vaapi"))
+        (*Options.safe_renderers)["vaapi"].append(safe);
+    if (Options.decoders->contains("vaapi-dec"))
+        (*Options.safe_renderers)["vaapi-dec"].append(safe);
+    if (Options.decoders->contains("nvdec-dec"))
+        (*Options.safe_renderers)["nvdec-dec"].append(safe);
 
     // OpenGL UYVY
     Options.renderers->append("opengl");
@@ -386,7 +388,7 @@ void VideoOutputOpenGL::CreatePainter(void)
 
 bool VideoOutputOpenGL::CreateBuffers(void)
 {
-    if (codec_is_mediacodec(video_codec_id))
+    if (codec_is_mediacodec_dec(video_codec_id))
     {
         vbuffers.Init(8, false, 1, 4, 2, 1);
     }

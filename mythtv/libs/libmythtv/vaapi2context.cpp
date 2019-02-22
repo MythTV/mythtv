@@ -60,7 +60,7 @@ MythCodecID Vaapi2Context::GetBestSupportedCodec(
     enum AVHWDeviceType type = AV_HWDEVICE_TYPE_VAAPI;
 
     AVPixelFormat fmt = AV_PIX_FMT_NONE;
-    if (decoder == "vaapi2")
+    if (decoder == "vaapi-dec")
     {
         for (int i = 0;; i++) {
             const AVCodecHWConfig *config = avcodec_get_hw_config(*ppCodec, i);
@@ -85,7 +85,7 @@ MythCodecID Vaapi2Context::GetBestSupportedCodec(
             QString("Decoder %1 supports device type %2.")
                 .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
         pix_fmt = fmt;
-        return (MythCodecID)(kCodec_MPEG1_VAAPI2 + (stream_type - 1));
+        return (MythCodecID)(kCodec_MPEG1_VAAPI_DEC + (stream_type - 1));
     }
 }
 
@@ -153,7 +153,7 @@ bool Vaapi2Context::isValidDeinterlacer(QString filtername)
 
 QStringList Vaapi2Context::GetDeinterlacers(void)
 {
-    return MythCodecContext::GetDeinterlacers("vaapi2");
+    return MythCodecContext::GetDeinterlacers("vaapi-dec");
 }
 
 

@@ -52,7 +52,7 @@ MythCodecID NvdecContext::GetBestSupportedCodec(
     enum AVHWDeviceType type = AV_HWDEVICE_TYPE_CUDA;
 
     AVPixelFormat fmt = AV_PIX_FMT_NONE;
-    if (decoder == "nvdec")
+    if (decoder == "nvdec-dec")
     {
         for (int i = 0;; i++) {
             const AVCodecHWConfig *config = avcodec_get_hw_config(*ppCodec, i);
@@ -91,7 +91,7 @@ MythCodecID NvdecContext::GetBestSupportedCodec(
             QString("Decoder %1 supports device type %2.")
                 .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
         pix_fmt = fmt;
-        return (MythCodecID)(kCodec_MPEG1_NVDEC + (stream_type - 1));
+        return (MythCodecID)(kCodec_MPEG1_NVDEC_DEC + (stream_type - 1));
     }
 }
 
@@ -136,7 +136,7 @@ bool NvdecContext::isValidDeinterlacer(QString filtername)
 
 QStringList NvdecContext::GetDeinterlacers(void)
 {
-    return MythCodecContext::GetDeinterlacers("nvdec");
+    return MythCodecContext::GetDeinterlacers("nvdec-dec");
 }
 
 int NvdecContext::SetDeinterlace(AVCodecContext *ctx)

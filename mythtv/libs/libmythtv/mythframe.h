@@ -24,15 +24,20 @@ typedef enum FrameType_
     FMT_RGBA32,
     FMT_YUV422P,
     FMT_BGRA,
-    FMT_VDPAU,
-    FMT_VAAPI,
     FMT_YUY2,
-    FMT_DXVA2,
     FMT_NV12,
     // these are all endian dependent and higher bit depth
     FMT_YUV420P10,
     FMT_YUV420P12,
-    FMT_YUV420P16
+    FMT_YUV420P16,
+    // hardware formats
+    FMT_VDPAU,
+    FMT_VAAPI,
+    FMT_DXVA2,
+    FMT_OMXEGL,
+    FMT_MEDIACODEC,
+    FMT_VTB,
+    FMT_NVDEC
 } VideoFrameType;
 
 typedef struct VideoFrame_

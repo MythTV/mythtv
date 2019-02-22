@@ -43,7 +43,7 @@ MythCodecID MediaCodecContext::GetBestSupportedCodec(
     enum AVHWDeviceType type = AV_HWDEVICE_TYPE_MEDIACODEC;
 
     AVPixelFormat fmt = AV_PIX_FMT_NONE;
-    if (decoder == "mediacodec")
+    if (decoder == "mediacodec-dec")
     {
         QString decodername = QString((*ppCodec)->name) + "_mediacodec";
         if (decodername == "mpeg2video_mediacodec")
@@ -68,6 +68,6 @@ MythCodecID MediaCodecContext::GetBestSupportedCodec(
             QString("Decoder %1 supports device type %2.")
                 .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
         pix_fmt = fmt;
-        return (MythCodecID)(kCodec_MPEG1_MEDIACODEC + (stream_type - 1));
+        return (MythCodecID)(kCodec_MPEG1_MEDIACODEC_DEC + (stream_type - 1));
     }
 }

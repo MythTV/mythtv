@@ -402,16 +402,16 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["vaapi"].append("dummy");
 #endif
 #ifdef USING_VAAPI2
-    opts.decoders->append("vaapi2");
-    (*opts.equiv_decoders)["vaapi2"].append("dummy");
+    opts.decoders->append("vaapi-dec");
+    (*opts.equiv_decoders)["vaapi-dec"].append("dummy");
 #endif
 #ifdef USING_NVDEC
-    opts.decoders->append("nvdec");
-    (*opts.equiv_decoders)["nvdec"].append("dummy");
+    opts.decoders->append("nvdec-dec");
+    (*opts.equiv_decoders)["nvdec-dec"].append("dummy");
 #endif
 #ifdef USING_MEDIACODEC
-    opts.decoders->append("mediacodec");
-    (*opts.equiv_decoders)["mediacodec"].append("dummy");
+    opts.decoders->append("mediacodec-dec");
+    (*opts.equiv_decoders)["mediacodec-dec"].append("dummy");
 #endif
 
     PrivateDecoder::GetDecoders(opts);
@@ -1704,7 +1704,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else
 #endif
 #ifdef USING_VAAPI2
-    if (codec_is_vaapi2(video_codec_id))
+    if (codec_is_vaapi_dec(video_codec_id))
     {
         enc->get_buffer2     = get_avf_buffer_vaapi2;
         enc->get_format      = get_format_vaapi2;
@@ -1712,7 +1712,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else
 #endif
 #ifdef USING_NVDEC
-    if (codec_is_nvdec(video_codec_id))
+    if (codec_is_nvdec_dec(video_codec_id))
     {
         enc->get_buffer2     = get_avf_buffer_nvdec;
         enc->get_format      = get_format_nvdec;
@@ -2631,7 +2631,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         &codec, dec, mpeg_version(enc->codec_id),
                         pix_fmt);
 
-                    if (codec_is_mediacodec(mediacodec_mcid))
+                    if (codec_is_mediacodec_dec(mediacodec_mcid))
                     {
                         gCodecMap->freeCodecContext(ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
@@ -2649,7 +2649,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         &codec, dec, mpeg_version(enc->codec_id),
                         pix_fmt);
 
-                    if (codec_is_vaapi2(vaapi2_mcid))
+                    if (codec_is_vaapi_dec(vaapi2_mcid))
                     {
                         gCodecMap->freeCodecContext(ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
@@ -2667,7 +2667,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         &codec, dec, mpeg_version(enc->codec_id),
                         pix_fmt);
 
-                    if (codec_is_nvdec(nvdec_mcid))
+                    if (codec_is_nvdec_dec(nvdec_mcid))
                     {
                         gCodecMap->freeCodecContext(ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
@@ -2692,12 +2692,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 thread_count = 1;
 
             use_frame_timing = false;
-            if (! ringBuffer->IsDVD()
-                && (codec_is_std(video_codec_id)
-                    || codec_is_mediacodec(video_codec_id)
-                    || codec_is_vaapi2(video_codec_id)
-                    || codec_is_nvdec(video_codec_id)
-                    || GetCodecDecoderName() == "openmax"))
+            if (!ringBuffer->IsDVD() && (codec_sw_copy(video_codec_id) || GetCodecDecoderName() == "openmax"))
                 use_frame_timing = true;
 
             if (FlagIsSet(kDecodeSingleThreaded))
