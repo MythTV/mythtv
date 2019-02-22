@@ -483,8 +483,8 @@ using_frontend {
     using_vaapi:using_opengl_video {
         DEFINES += USING_VAAPI
         DEFINES += USING_GLVAAPI
-        HEADERS += vaapicontext.h mythvaapiinterop.h
-        SOURCES += vaapicontext.cpp mythvaapiinterop.cpp
+        HEADERS += mythvaapicontext.h   mythvaapiinterop.h
+        SOURCES += mythvaapicontext.cpp mythvaapiinterop.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lEGL
     }
 

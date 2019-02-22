@@ -12,7 +12,7 @@
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
 #include "mythvaapiinterop.h"
-#include "vaapicontext.h"
+#include "mythvaapicontext.h"
 
 extern "C" {
 #include "libavutil/hwcontext_vaapi.h"
@@ -21,7 +21,7 @@ extern "C" {
 
 #define LOC QString("VAAPIDec: ")
 
-void VAAPIContext::DestroyInteropCallback(void *Wait, void *Interop, void *)
+void MythVAAPIContext::DestroyInteropCallback(void *Wait, void *Interop, void *)
 {
     MythOpenGLInterop *interop = static_cast<MythOpenGLInterop*>(Interop);
     QWaitCondition    *wait    = static_cast<QWaitCondition*>(Wait);
@@ -31,7 +31,7 @@ void VAAPIContext::DestroyInteropCallback(void *Wait, void *Interop, void *)
         wait->wakeAll();
 }
 
-void VAAPIContext::FramesContextFinished(AVHWFramesContext *Context)
+void MythVAAPIContext::FramesContextFinished(AVHWFramesContext *Context)
 {
     if (!Context)
         return;
@@ -60,12 +60,12 @@ void VAAPIContext::FramesContextFinished(AVHWFramesContext *Context)
     }
 }
 
-void VAAPIContext::DeviceContextFinished(AVHWDeviceContext*)
+void MythVAAPIContext::DeviceContextFinished(AVHWDeviceContext*)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI device context destroyed");
 }
 
-VAProfile VAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
+VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
 {
     if (!Codec)
         return VAProfileNone;
@@ -140,7 +140,7 @@ VAProfile VAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
     return VAProfileNone;
 }
 
-MythCodecID VAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
+MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
                                             AVCodec **Codec,
                                             const QString &Decoder,
                                             uint StreamType,
@@ -251,21 +251,21 @@ MythCodecID VAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
     return failure;
 }
 
-enum AVPixelFormat VAAPIContext::GetFormat(struct AVCodecContext *Context,
+enum AVPixelFormat MythVAAPIContext::GetFormat(struct AVCodecContext *Context,
                                            const enum AVPixelFormat *PixFmt)
 {
     enum AVPixelFormat ret = AV_PIX_FMT_NONE;
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
-            if (VAAPIContext::InitialiseDecoder(Context) >= 0)
+            if (MythVAAPIContext::InitialiseDecoder(Context) >= 0)
                 return *PixFmt;
         PixFmt++;
     }
     return ret;
 }
 
-int VAAPIContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
+int MythVAAPIContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
 {
     AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
     VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
@@ -299,11 +299,11 @@ int VAAPIContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int 
 
     // Set release method
     Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
-                                     VAAPIContext::ReleaseBuffer, avfd, 0);
+                                     MythVAAPIContext::ReleaseBuffer, avfd, 0);
     return ret;
 }
 
-void VAAPIContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
+void MythVAAPIContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
 {
     AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Opaque);
     VideoFrame *frame = reinterpret_cast<VideoFrame*>(Data);
@@ -311,7 +311,7 @@ void VAAPIContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
         decoder->GetPlayer()->DeLimboFrame(frame);
 }
 
-void VAAPIContext::InitialiseContext(AVCodecContext *Context)
+void MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 {
     if (!Context || !gCoreContext->IsUIThread())
         return;
@@ -352,7 +352,7 @@ void VAAPIContext::InitialiseContext(AVCodecContext *Context)
     }
 
     // set the display and ensure it is closed when the device context is finished
-    hwdevicecontext->free   = &VAAPIContext::DeviceContextFinished;
+    hwdevicecontext->free   = &MythVAAPIContext::DeviceContextFinished;
     vaapidevicectx->display = interop->GetDisplay();
 
     // initialise hardware device context
@@ -413,7 +413,7 @@ void VAAPIContext::InitialiseContext(AVCodecContext *Context)
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
     hw_frames_ctx->user_opaque       = interop;
-    hw_frames_ctx->free              = &VAAPIContext::FramesContextFinished;
+    hw_frames_ctx->free              = &MythVAAPIContext::FramesContextFinished;
     res = av_hwframe_ctx_init(Context->hw_frames_ctx);
     if (res < 0)
     {
@@ -429,7 +429,7 @@ void VAAPIContext::InitialiseContext(AVCodecContext *Context)
     av_buffer_unref(&hwdeviceref);
 }
 
-void VAAPIContext::InitialiseDecoderCallback(void* Wait, void* Context, void*)
+void MythVAAPIContext::InitialiseDecoderCallback(void* Wait, void* Context, void*)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Hardware decoder callback");
     QWaitCondition* wait    = reinterpret_cast<QWaitCondition*>(Wait);
@@ -439,7 +439,7 @@ void VAAPIContext::InitialiseDecoderCallback(void* Wait, void* Context, void*)
         wait->wakeAll();
 }
 
-int VAAPIContext::InitialiseDecoder(AVCodecContext *Context)
+int MythVAAPIContext::InitialiseDecoder(AVCodecContext *Context)
 {
     if (!Context)
         return -1;

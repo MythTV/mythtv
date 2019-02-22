@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 #ifdef USING_VAAPI
-#include "vaapicontext.h"
+#include "mythvaapicontext.h"
 #endif
 
 #ifdef USING_MEDIACODEC
@@ -1629,8 +1629,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VAAPI
     if (CODEC_IS_VAAPI(codec1, enc) && codec_is_vaapi(m_video_codec_id))
     {
-        enc->get_buffer2     = VAAPIContext::GetBuffer;
-        enc->get_format      = VAAPIContext::GetFormat;
+        enc->get_buffer2     = MythVAAPIContext::GetBuffer;
+        enc->get_format      = MythVAAPIContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
@@ -2535,7 +2535,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     MythCodecID vaapi_mcid;
                     AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    vaapi_mcid = VAAPIContext::GetSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pix_fmt);
+                    vaapi_mcid = MythVAAPIContext::GetSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pix_fmt);
 
                     if (codec_is_vaapi(vaapi_mcid))
                     {

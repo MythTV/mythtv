@@ -1,5 +1,5 @@
-#ifndef VAAPICONTEXT_H
-#define VAAPICONTEXT_H
+#ifndef MYTHVAAPICONTEXT_H
+#define MYTHVAAPICONTEXT_H
 
 // MythTV
 #include "mythcodecid.h"
@@ -14,7 +14,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-class VAAPIContext
+class MythVAAPIContext
 {
   public:
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
@@ -39,4 +39,4 @@ class VAAPIContext
     static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);
 };
 
-#endif // VAAPICONTEXT_H
+#endif // MYTHVAAPICONTEXT_H

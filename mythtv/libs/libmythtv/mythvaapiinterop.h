@@ -5,7 +5,6 @@
 #include <QFile>
 
 // MythTV
-#include "vaapicontext.h"
 #include "mythopenglinterop.h"
 
 // VAAPI
