@@ -70,24 +70,19 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     (*Options.osds)["opengl-yv12"].append("opengl2");
     Options.priorities->insert("opengl-yv12", 65);
 
-#ifdef USING_GLVAAPI
-    Options.renderers->append("openglvaapi");
-
-    (*Options.deints)["openglvaapi"].append("vaapionefield");
-    (*Options.deints)["openglvaapi"].append("vaapibobdeint");
-    (*Options.deints)["openglvaapi"].append("none");
-    (*Options.osds)["openglvaapi"].append("opengl2");
-
-    if (Options.decoders->contains("vaapi"))
-        (*Options.safe_renderers)["vaapi"].append("openglvaapi");
-
+#if defined(USING_VAAPI) || defined (USING_VTB)
+    Options.renderers->append("opengl-hw");
+    (*Options.deints)["opengl-hw"].append("none");
+    (*Options.osds)["opengl-hw"].append("opengl2");
     if (Options.decoders->contains("ffmpeg"))
-        (*Options.safe_renderers)["ffmpeg"].append("openglvaapi");
-
-    (*Options.safe_renderers)["dummy"].append("openglvaapi");
-    (*Options.safe_renderers)["nuppel"].append("openglvaapi");
-
-    Options.priorities->insert("openglvaapi", 110);
+        (*Options.safe_renderers)["ffmpeg"].append("opengl-hw");
+    (*Options.safe_renderers)["dummy"].append("opengl-hw");
+    (*Options.safe_renderers)["nuppel"].append("opengl-hw");
+    Options.priorities->insert("opengl-hw", 110);
+#endif
+#ifdef USING_VAAPI
+    if (Options.decoders->contains("vaapi"))
+        (*Options.safe_renderers)["vaapi"].append("opengl-hw");
 #endif
 }
 

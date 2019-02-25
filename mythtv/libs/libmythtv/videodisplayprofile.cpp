@@ -960,10 +960,6 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
         return QObject::tr("Advanced (1x, HW)");
     else if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, HW)");
-    else if ("vaapionefield" == short_name)
-        return QObject::tr("One Field (1x, HW)");
-    else if ("vaapibobdeint" == short_name)
-        return QObject::tr("Bob (2x, HW)");
 #ifdef USING_OPENMAX
     else if ("openmaxadvanced" == short_name)
         return QObject::tr("Advanced (HW)");
@@ -1416,8 +1412,8 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
         groupid = CreateProfileGroup("VAAPI Normal", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vaapi", 2, true, "openglvaapi", "opengl2", true,
-                      "vaapibobdeint", "vaapionefield",
+                      "vaapi", 2, true, "opengl-hw", "opengl2", true,
+                      "none", "none",
                       "");
         CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                       "ffmpeg", 2, true, "opengl", "opengl2", true,
@@ -1551,11 +1547,11 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "This is the only video renderer for NVidia VDPAU decoding.");
     }
 
-    if (renderer == "openglvaapi")
+    if (renderer == "opengl-hw")
     {
         msg = QObject::tr(
-             "This video renderer uses VAAPI for video decoding and "
-             "OpenGL for scaling and color conversion.");
+             "This video renderer is used by hardware decoders to display "
+             "frames using OpenGL.");
     }
 
     return msg;

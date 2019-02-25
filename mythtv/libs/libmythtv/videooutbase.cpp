@@ -178,7 +178,7 @@ VideoOutput *VideoOutput::Create(
 #endif // _WIN32
 
 #ifdef USING_OPENGL_VIDEO
-        else if (renderer.contains("opengl") && (renderer != "openglvaapi"))
+        else if (renderer.contains("opengl"))
             vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
 
@@ -186,11 +186,6 @@ VideoOutput *VideoOutput::Create(
         else if (renderer == "vdpau")
             vo = new VideoOutputVDPAU();
 #endif // USING_VDPAU
-
-#ifdef USING_GLVAAPI
-        else if (renderer == "openglvaapi")
-            vo = new VideoOutputOpenGL(renderer);
-#endif // USING_GLVAAPI
 
 #ifdef USING_OPENMAX
         else if (renderer == VideoOutputOMX::kName)

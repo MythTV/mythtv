@@ -801,7 +801,7 @@ OpenGLVideo::FrameType OpenGLVideo::StringToType(const QString &Type)
     if ("opengl-yv12" == type)  return kGLYV12;
     if ("opengl-hquyv" == type) return kGLHQUYV;
     if ("opengl-nv12" == type)  return kGLNV12;
-    if ("openglvaapi" == type)  return kGLInterop;
+    if ("opengl-hw" == type)  return kGLInterop;
     return kGLUYVY; // opengl
 }
 
@@ -809,7 +809,7 @@ QString OpenGLVideo::TypeToString(FrameType Type)
 {
     switch (Type)
     {
-        case kGLInterop: return "openglvaapi";
+        case kGLInterop: return "opengl-hw";
         case kGLUYVY:    return "opengl"; // compatibility with old profiles
         case kGLYV12:    return "opengl-yv12";
         case kGLHQUYV:   return "opengl-hquyv";
