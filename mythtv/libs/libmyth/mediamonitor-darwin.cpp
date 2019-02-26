@@ -366,6 +366,7 @@ void diskChangedCallback(DADiskRef disk, CFArrayRef keys, void *context)
  */
 void MonitorThreadDarwin::run(void)
 {
+    RunProlog();
     CFDictionaryRef match     = kDADiskDescriptionMatchVolumeMountable;
     DASessionRef    daSession = DASessionCreate(kCFAllocatorDefault);
 
@@ -397,6 +398,7 @@ void MonitorThreadDarwin::run(void)
     DAUnregisterCallback(daSession, (void(*))diskDisappearedCallback, this);
     DAUnregisterCallback(daSession, (void(*))diskAppearedCallback,    this);
     CFRelease(daSession);
+    RunEpilog();
 }
 
 /**
