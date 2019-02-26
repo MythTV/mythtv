@@ -120,16 +120,16 @@ MThread::~MThread()
 {
     if (!m_prolog_executed)
     {
-        LOG(VB_GENERAL, LOG_CRIT, "MThread prolog was never run!");
+        LOG(VB_GENERAL, LOG_CRIT, QString("'%1': MThread prolog was never run!").arg(objectName()));
     }
     if (!m_epilog_executed)
     {
-        LOG(VB_GENERAL, LOG_CRIT, "MThread epilog was never run!");
+        LOG(VB_GENERAL, LOG_CRIT, QString("'%1': MThread epilog was never run! (%1)").arg(objectName()));
     }
     if (m_thread->isRunning())
     {
-        LOG(VB_GENERAL, LOG_CRIT,
-            "MThread destructor called while thread still running!");
+        LOG(VB_GENERAL, LOG_CRIT, QString("'%1': MThread destructor called while thread still running! (%1)")
+                                          .arg(objectName()));
         m_thread->wait();
     }
 
