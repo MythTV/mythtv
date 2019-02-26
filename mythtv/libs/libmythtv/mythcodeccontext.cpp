@@ -33,6 +33,9 @@
 #ifdef USING_NVDEC
 #include "nvdeccontext.h"
 #endif
+#ifdef USING_VTB
+#include "mythvtbcontext.h"
+#endif
 
 extern "C" {
     #include "libavutil/pixfmt.h"
@@ -79,6 +82,10 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 #ifdef USING_NVDEC
     if (codec_is_nvdec_dec(codec))
         mctx = new NvdecContext();
+#endif
+#ifdef USING_VTB
+    if (codec_is_vtb_dec(codec) || codec_is_vtb(codec))
+        mctx = new MythVTBContext(codec);
 #endif
     // In case neither was defined
     Q_UNUSED(codec);

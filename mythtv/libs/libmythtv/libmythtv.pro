@@ -66,6 +66,10 @@ macx {
     LIBS += -framework OpenGL
     LIBS += -framework IOKit
     LIBS += -framework CoreVideo
+    LIBS += -framework VideoToolBox
+    DEFINES += USING_VTB
+    HEADERS += mythvtbinterop.h   mythvtbcontext.h
+    SOURCES += mythvtbinterop.cpp mythvtbcontext.cpp
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}

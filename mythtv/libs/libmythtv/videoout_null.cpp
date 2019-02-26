@@ -25,7 +25,10 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("openmax"))
         (*opts.safe_renderers)["openmax"].append("null");
 #endif
-
+#ifdef USING_VTB
+    if (opts.decoders->contains("vtb-dec"))
+        (*opts.safe_renderers)["vtb-dec"].append("null");
+#endif
     opts.priorities->insert("null", 10);
 }
 

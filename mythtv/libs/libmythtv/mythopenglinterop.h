@@ -23,7 +23,8 @@ class MythOpenGLInterop : public ReferenceCounter
         Unsupported  = 0,
         VAAPIGLXCOPY = 1,
         VAAPIGLXPIX  = 2,
-        VAAPIEGLDRM  = 3
+        VAAPIEGLDRM  = 3,
+        VTBOPENGL    = 4
     };
 
     static QStringList GetAllowedRenderers (MythCodecID CodecId);

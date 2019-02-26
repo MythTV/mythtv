@@ -58,6 +58,10 @@ extern "C" {
 #include "mythvaapicontext.h"
 #endif
 
+#ifdef USING_VTB
+#include "mythvtbcontext.h"
+#endif
+
 #ifdef USING_MEDIACODEC
 #include "mediacodeccontext.h"
 extern "C" {
@@ -410,7 +414,12 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     opts.decoders->append("mediacodec-dec");
     (*opts.equiv_decoders)["mediacodec-dec"].append("dummy");
 #endif
-
+#ifdef USING_VTB
+    opts.decoders->append("vtb");
+    opts.decoders->append("vtb-dec");
+    (*opts.equiv_decoders)["vtb"].append("dummy");
+    (*opts.equiv_decoders)["vtb-dec"].append("dummy");
+#endif
     PrivateDecoder::GetDecoders(opts);
 }
 
@@ -1501,7 +1510,7 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
-#if defined(USING_VAAPI2) || defined(USING_NVDEC)
+#if defined(USING_VAAPI2) || defined(USING_NVDEC) || defined(USING_VTB)
 static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 {
     return fmt == AV_PIX_FMT_VAAPI_MOCO ||
@@ -1632,6 +1641,16 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->get_buffer2     = MythVAAPIContext::GetBuffer;
         enc->get_format      = MythVAAPIContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+    }
+    else
+#endif
+#ifdef USING_VTB
+    if (codec_is_vtb(m_video_codec_id) || codec_is_vtb_dec(m_video_codec_id))
+    {
+        enc->get_format  = MythVTBContext::GetFormat;
+        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        if (codec_is_vtb_dec(m_video_codec_id))
+            m_directrendering = false;
     }
     else
 #endif
@@ -2545,6 +2564,20 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_GLVAAPI
+#ifdef USING_VTB
+                if (!foundgpudecoder)
+                {
+                    MythCodecID vtbid;
+                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
+                    vtbid = MythVTBContext::GetSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pixfmt);
+                    if (codec_is_vtb(vtbid) || codec_is_vtb_dec(vtbid))
+                    {
+                        m_video_codec_id = vtbid;
+                        enc->pix_fmt = pixfmt;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif
 #ifdef USING_DXVA2
                 if (!foundgpudecoder)
                 {
@@ -3005,7 +3038,7 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
-#if defined(USING_VAAPI2) || defined(USING_NVDEC)
+#if defined(USING_VAAPI2) || defined(USING_NVDEC) || defined(USING_VTB)
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
@@ -3920,10 +3953,11 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         VideoFrame *xf = picframe;
         picframe = m_parent->GetNextVideoFrame();
         unsigned char *buf = picframe->buf;
-        bool used_picframe=false;
-#if defined(USING_VAAPI2) || defined(USING_NVDEC)
-        if (AV_PIX_FMT_CUDA == (AVPixelFormat)mpa_pic->format
-            || IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
+        bool used_picframe = false;
+#if defined(USING_VAAPI2) || defined(USING_NVDEC) || defined(USING_VTB)
+        if (AV_PIX_FMT_CUDA == (AVPixelFormat)mpa_pic->format ||
+            IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format) ||
+            AV_PIX_FMT_VIDEOTOOLBOX == (AVPixelFormat)mpa_pic->format)
         {
             int ret = 0;
             tmp_frame = av_frame_alloc();
@@ -3962,13 +3996,13 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                 LOG(VB_GENERAL, LOG_ERR, LOC
                     + QString("Error %1 transferring the data to system memory")
                         .arg(ret));
-                av_frame_free(&use_frame);
-                return false;
+                //av_frame_free(&use_frame);
+                //return false;
             }
             av_freep(&pixelformats);
         }
         else
-#endif // USING_VAAPI2 || USING_NVDEC
+#endif // USING_VAAPI2 || USING_NVDEC || USING_VTB
             use_frame = mpa_pic;
 
         if (!used_picframe)
@@ -4014,9 +4048,18 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
     else if (!picframe)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "NULL videoframe - direct rendering not"
-                                       "correctly initialized.");
-        return false;
+#ifdef USING_VTB
+        // VideoToolBox does not call get_buffer2 - so initialise the frame now
+        if (mpa_pic->format == AV_PIX_FMT_VIDEOTOOLBOX)
+            if (MythVTBContext::InitialiseBuffer(context, mpa_pic, 0) >= 0)
+                picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
+#endif
+        if (!picframe)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "NULL videoframe - direct rendering not"
+                                           "correctly initialized.");
+            return false;
+        }
     }
 
     long long pts;

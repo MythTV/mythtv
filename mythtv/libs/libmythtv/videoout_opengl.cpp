@@ -45,12 +45,12 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
         (*Options.safe_renderers)["openmax"].append(safe);
     if (Options.decoders->contains("mediacodec-dec"))
         (*Options.safe_renderers)["mediacodec-dec"].append(safe);
-    if (Options.decoders->contains("vaapi"))
-        (*Options.safe_renderers)["vaapi"].append(safe);
     if (Options.decoders->contains("vaapi-dec"))
         (*Options.safe_renderers)["vaapi-dec"].append(safe);
     if (Options.decoders->contains("nvdec-dec"))
         (*Options.safe_renderers)["nvdec-dec"].append(safe);
+    if (Options.decoders->contains("vtb-dec"))
+        (*Options.safe_renderers)["vtb-dec"].append(safe);
 
     // OpenGL UYVY
     Options.renderers->append("opengl");
@@ -74,8 +74,6 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     Options.renderers->append("opengl-hw");
     (*Options.deints)["opengl-hw"].append("none");
     (*Options.osds)["opengl-hw"].append("opengl2");
-    if (Options.decoders->contains("ffmpeg"))
-        (*Options.safe_renderers)["ffmpeg"].append("opengl-hw");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
     (*Options.safe_renderers)["nuppel"].append("opengl-hw");
     Options.priorities->insert("opengl-hw", 110);
@@ -83,6 +81,10 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
 #ifdef USING_VAAPI
     if (Options.decoders->contains("vaapi"))
         (*Options.safe_renderers)["vaapi"].append("opengl-hw");
+#endif
+#ifdef USING_VTB
+    if (Options.decoders->contains("vtb"))
+        (*Options.safe_renderers)["vtb"].append("opengl-hw");
 #endif
 }
 
@@ -178,8 +180,8 @@ void VideoOutputOpenGL::DestroyVideoResources(void)
 bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
                              WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
-    // if vaapi initialisation failed, fallback to yv12
-    if ((OpenGLVideo::kGLInterop == m_openGLVideoType) && !codec_is_vaapi(CodecId))
+    // if hardware initialisation failed, fallback to yv12
+    if ((OpenGLVideo::kGLInterop == m_openGLVideoType) && codec_sw_copy(CodecId))
         m_openGLVideoType = OpenGLVideo::kGLYV12;
 
     bool success = true;
@@ -394,6 +396,19 @@ bool VideoOutputOpenGL::CreateBuffers(void)
         bool success = true;
         for (uint i = 0; i < size; i++)
             success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VAAPI);
+        return success;
+    }
+    else if (codec_is_vtb_dec(video_codec_id))
+    {
+        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_VTB), false, 1, 4, 2, 1);
+    }
+    else if (codec_is_vtb(video_codec_id))
+    {
+        uint size = VideoBuffers::GetNumBuffers(FMT_VTB);
+        vbuffers.Init(size, false, 1, 4, 2, 1);
+        bool success = true;
+        for (uint i = 0; i < size; ++i)
+            success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VTB);
         return success;
     }
     else

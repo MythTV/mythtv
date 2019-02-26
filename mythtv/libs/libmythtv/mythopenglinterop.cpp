@@ -8,6 +8,10 @@
 #include "mythvaapiinterop.h"
 #endif
 
+#ifdef USING_VTB
+#include "mythvtbinterop.h"
+#endif
+
 #define LOC QString("OpenGLInterop: ")
 
 QString MythOpenGLInterop::TypeToString(Type InteropType)
@@ -15,17 +19,22 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     if (InteropType == VAAPIEGLDRM)  return "VAAPI DRM";
     if (InteropType == VAAPIGLXPIX)  return "VAAPI GLX Pixmap";
     if (InteropType == VAAPIGLXCOPY) return "VAAPI GLX Copy";
+    if (InteropType == VTBOPENGL)    return "VTB OpenGL";
     return "Unsupported";
 }
 
 QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
 {
     QStringList result;
+    if (codec_sw_copy(CodecId))
+        return result;
 #ifdef USING_GLVAAPI
-    if (codec_is_vaapi(CodecId) && (GetInteropType(CodecId) != Unsupported))
+    else if (codec_is_vaapi(CodecId) && (GetInteropType(CodecId) != Unsupported))
         result << "opengl-hw";
-#else
-    (void)CodecId;
+#endif
+#ifdef USING_VTB
+    else if (codec_is_vtb(CodecId) && (GetInteropType(CodecId) != Unsupported))
+        result << "opengl-hw";
 #endif
     return result;
 }
@@ -39,6 +48,10 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
         return supported;
     }
 
+#ifdef USING_VTB
+    if (codec_is_vtb(CodecId))
+        supported = MythVTBInterop::GetInteropType(CodecId);
+#endif
 #ifdef USING_GLVAAPI
     if (codec_is_vaapi(CodecId))
         supported = MythVAAPIInterop::GetInteropType(CodecId);
@@ -61,25 +74,42 @@ vector<MythGLTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if (!(Context && Frame))
         return result;
 
+    MythOpenGLInterop* interop = nullptr;
     bool validhwframe = Frame->buf && Frame->priv[1];
     bool validhwcodec = false;
+#ifdef USING_VTB
+    if ((Frame->codec == FMT_VTB) && (Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX))
+        validhwcodec = true;
+#endif
 #ifdef USING_GLVAAPI
     if ((Frame->codec == FMT_VAAPI) && (Frame->pix_fmt == AV_PIX_FMT_VAAPI))
         validhwcodec = true;
 #endif
     if (!(validhwframe && validhwcodec))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Not a valid hardware frame");
         return result;
+    }
 
-    // Unpick
-    AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-    if (!buffer || (buffer && !buffer->data))
-        return result;
-    AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
-    if (!frames || (frames && !frames->user_opaque))
-        return result;
-    MythOpenGLInterop* interop = reinterpret_cast<MythOpenGLInterop*>(frames->user_opaque);
+    if (Frame->codec == FMT_VTB)
+    {
+        interop = reinterpret_cast<MythOpenGLInterop*>(Frame->priv[1]);
+    }
+    else
+    {
+        // Unpick
+        AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+        if (!buffer || (buffer && !buffer->data))
+            return result;
+        AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
+        if (!frames || (frames && !frames->user_opaque))
+            return result;
+        interop = reinterpret_cast<MythOpenGLInterop*>(frames->user_opaque);
+    }
+
     if (interop)
         return interop->Acquire(Context, ColourSpace, Frame, Scan);
+    LOG(VB_GENERAL, LOG_ERR, LOC + "No OpenGL interop found");
     return result;
 }
 

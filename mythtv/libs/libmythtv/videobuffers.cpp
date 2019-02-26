@@ -15,6 +15,10 @@ extern "C" {
 #include "compat.h"
 #include "mythlogging.h"
 
+#ifdef USING_VTB
+#include <CoreVideo/CoreVideo.h>
+#endif
+
 #define TRY_LOCK_SPINS                 2000
 #define TRY_LOCK_SPINS_BEFORE_WARNING  9999
 #define TRY_LOCK_SPIN_WAIT             1000 /* usec */
@@ -138,6 +142,7 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat)
 {
     switch (PixelFormat)
     {
+        case FMT_VTB:   return 12;
         case FMT_VAAPI: return 24;
         case FMT_DXVA2: return 30;
         case FMT_YV12:  return 31;
@@ -268,9 +273,17 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = Frame->priv[1] = nullptr;
     }
-#else
-    (void)Frame;
 #endif
+#ifdef USING_VTB
+    if (Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX)
+    {
+        CVPixelBufferRef ref = reinterpret_cast<CVPixelBufferRef>(Frame->buf);
+        if (ref)
+            CFRelease(ref);
+        Frame->buf = nullptr;
+    }
+#endif
+    (void)Frame;
 }
 
 VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
