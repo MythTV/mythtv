@@ -8,6 +8,13 @@
 #define UNIX_PROC_STAT "/proc/stat"
 #define MAX_CORES 8
 
+#ifdef Q_OS_MACOS
+#include <mach/mach_init.h>
+#include <mach/mach_error.h>
+#include <mach/mach_host.h>
+#include <mach/vm_map.h>
+#endif
+
 Jitterometer::Jitterometer(const QString &nname, int ncycles)
   : m_num_cycles(ncycles), m_name(nname)
 {
@@ -35,6 +42,11 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
             }
         }
     }
+#endif
+
+#ifdef Q_OS_MACOS
+    m_laststats = new unsigned long long[MAX_CORES * 2];
+    memset(m_laststats, 0, sizeof(unsigned long long) * MAX_CORES * 2);
 #endif
 }
 
@@ -134,10 +146,12 @@ void Jitterometer::RecordStartTime()
 
 QString Jitterometer::GetCPUStat(void)
 {
-    if (!m_cpustat)
-        return "N/A";
+    QString result = "N/A";
 
 #ifdef __linux__
+    if (!m_cpustat)
+        return result;
+
     QString res;
     m_cpustat->seek(0);
     m_cpustat->flush();
@@ -177,7 +191,32 @@ QString Jitterometer::GetCPUStat(void)
         ptr += 9;
     }
     return res;
-#else
-    return "N/A";
 #endif
+
+#ifdef Q_OS_MACOS
+    processor_cpu_load_info_t load;
+    mach_msg_type_number_t    msgcount;
+    natural_t                 processorcount;
+
+    if (host_processor_info(mach_host_self(), PROCESSOR_CPU_LOAD_INFO, &processorcount, (processor_info_array_t *)&load, &msgcount) == KERN_SUCCESS)
+    {
+        result = "";
+        int ptr = 0;
+        for (natural_t i = 0; i < processorcount && i < MAX_CORES; i++)
+        {
+            unsigned long long stats[9];
+            memset(stats, 0, sizeof(unsigned long long) * 2);
+            stats[0] = load[i].cpu_ticks[CPU_STATE_IDLE];
+            stats[1] = load[i].cpu_ticks[CPU_STATE_IDLE] + load[i].cpu_ticks[CPU_STATE_USER] +
+                       load[i].cpu_ticks[CPU_STATE_SYSTEM] + load[i].cpu_ticks[CPU_STATE_NICE];
+            double idledelta  = stats[0] - m_laststats[ptr];
+            double totaldelta = stats[1] - m_laststats[ptr + 1];
+            if (totaldelta > 0)
+                result += QString("%1% ").arg(((totaldelta - idledelta) / totaldelta) * 100.0, 0, 'f', 0);
+            memcpy(&m_laststats[ptr], stats, sizeof(unsigned long long) * 2);
+            ptr += 2;
+        }
+    }
+#endif
+    return result;
 }
