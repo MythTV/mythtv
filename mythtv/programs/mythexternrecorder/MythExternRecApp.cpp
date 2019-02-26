@@ -31,7 +31,8 @@
 
 MythExternRecApp::MythExternRecApp(const QString & command,
                                    const QString & conf_file,
-                                   const QString & log_file)
+                                   const QString & log_file,
+                                   const QString & logging)
     : QObject()
     , m_fatal(false)
     , m_run(true)
@@ -43,6 +44,7 @@ MythExternRecApp::MythExternRecApp(const QString & command,
     , m_lock_timeout(0)
     , m_scan_timeout(120000)
     , m_log_file(log_file)
+    , m_logging(logging)
     , m_config_ini(conf_file)
     , m_tuned(false)
     , m_chan_settings(nullptr)
@@ -146,7 +148,8 @@ bool MythExternRecApp::Open(void)
 
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
     QObject::connect(&m_proc,
-                     static_cast<void (QProcess::*)(int,QProcess::ExitStatus exitStatus)>
+                     static_cast<void (QProcess::*)
+                     (int,QProcess::ExitStatus exitStatus)>
                      (&QProcess::finished),
                      this, &MythExternRecApp::ProcFinished);
 
@@ -391,7 +394,24 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
     {
         m_command.replace("%URL%", url);
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-            QString(": '%URL%' replaced in cmd: '%1'").arg(m_command));
+            QString(": '%URL%' replaced with '%1' in cmd: '%2'")
+            .arg(url).arg(m_command));
+    }
+
+    if (!m_log_file.isEmpty() && m_command.indexOf("%LOGFILE%") >= 0)
+    {
+        m_command.replace("%LOGFILE%", m_log_file);
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString(": '%LOGFILE%' replaced with '%1' in cmd: '%2'")
+            .arg(m_log_file).arg(m_command));
+    }
+
+    if (!m_logging.isEmpty() && m_command.indexOf("%LOGGING%") >= 0)
+    {
+        m_command.replace("%LOGGING%", m_logging);
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString(": '%LOGGING%' replaced with '%1' in cmd: '%2'")
+            .arg(m_logging).arg(m_command));
     }
 
     m_desc = m_rec_desc;
@@ -498,7 +518,7 @@ Q_SLOT void MythExternRecApp::StopStreaming(const QString & serial, bool silent)
     if (m_proc.state() == QProcess::Running)
     {
         m_proc.terminate();
-        m_proc.waitForFinished();
+        m_proc.waitForFinished(3000);
         m_proc.kill();
 
         LOG(VB_RECORD, LOG_INFO, LOC + ": External application terminated.");

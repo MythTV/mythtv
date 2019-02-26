@@ -35,7 +35,7 @@ class MythExternRecApp : public QObject
 
   public:
     MythExternRecApp(const QString & command, const QString & conf_file,
-                     const QString & log_file);
+                     const QString & log_file, const QString & logging);
     ~MythExternRecApp(void);
 
     bool Open(void);
@@ -108,6 +108,7 @@ class MythExternRecApp : public QObject
     uint      m_scan_timeout;
 
     QString   m_log_file;
+    QString   m_logging;
     QString   m_config_ini;
     QString   m_desc;
 

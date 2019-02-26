@@ -1141,7 +1141,7 @@ bool ExternalStreamHandler::StartStreaming(void)
 
     if (StreamingCount() == 0)
     {
-        if (!ProcessCommand("StartStreaming", result, 10000))
+        if (!ProcessCommand("StartStreaming", result, 15000))
         {
             LogLevel_t level = LOG_ERR;
             if (result.toLower().startsWith("warn"))
@@ -1171,8 +1171,6 @@ bool ExternalStreamHandler::StartStreaming(void)
 
 bool ExternalStreamHandler::StopStreaming(void)
 {
-    QString result;
-
     QMutexLocker locker(&m_stream_lock);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
@@ -1209,7 +1207,8 @@ bool ExternalStreamHandler::StopStreaming(void)
         return false;
     }
 
-    if (!ProcessCommand("StopStreaming", result, 6000))
+    QString result;
+    if (!ProcessCommand("StopStreaming", result, 10000))
     {
         LogLevel_t level = LOG_ERR;
         if (result.toLower().startsWith("warn"))
