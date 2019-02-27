@@ -357,7 +357,7 @@ void VideoOutputXv::UngrabXvPort(MythXDisplay *disp, int port)
  *
  * \return port number if it succeeds, else -1.
  */
-int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
+int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* _disp, Window root,
                                       MythCodecID /*mcodecid*/,
                                       uint width, uint height,
                                       bool &xvsetdefaults,
@@ -397,7 +397,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     XvAdaptorInfo *ai = nullptr;
     uint p_num_adaptors = 0;
     int ret = Success;
-    XLOCK(disp, ret = XvQueryAdaptors(disp->GetDisplay(), root,
+    XLOCK(_disp, ret = XvQueryAdaptors(_disp->GetDisplay(), root,
                                      &p_num_adaptors, &ai));
     if (Success != ret)
     {
@@ -439,7 +439,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             XvPortID p = 0;
 
             if ((req[j].feature_flags & XvAttributes::kFeaturePicCtrl) &&
-                (!xv_is_attrib_supported(disp, firstPort, "XV_BRIGHTNESS")))
+                (!xv_is_attrib_supported(_disp, firstPort, "XV_BRIGHTNESS")))
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     "Missing XV_BRIGHTNESS, rejecting.");
@@ -449,7 +449,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_BRIGHTNESS...");
 
             if ((req[j].feature_flags & XvAttributes::kFeatureChromakey) &&
-                (!xv_is_attrib_supported(disp, firstPort, "XV_COLORKEY")))
+                (!xv_is_attrib_supported(_disp, firstPort, "XV_COLORKEY")))
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     "Missing XV_COLORKEY, rejecting.");
@@ -460,16 +460,16 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
 
             for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
             {
-                disp->Lock();
-                ret = XvGrabPort(disp->GetDisplay(), p, CurrentTime);
+                _disp->Lock();
+                ret = XvGrabPort(_disp->GetDisplay(), p, CurrentTime);
                 if (Success == ret)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("Grabbed xv port %1").arg(p));
                     port = p;
-                    xvsetdefaults = add_open_xv_port(disp, p);
+                    xvsetdefaults = add_open_xv_port(_disp, p);
                 }
-                disp->Unlock();
+                _disp->Unlock();
             }
         }
 
@@ -480,7 +480,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                 QString("XV_SET_DEFAULTS is %1supported on this port")
                     .arg(xvsetdefaults ? "" : "not "));
 
-            bool xv_vsync = xv_is_attrib_supported(disp, port,
+            bool xv_vsync = xv_is_attrib_supported(_disp, port,
                                                    "XV_SYNC_TO_VBLANK");
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("XV_SYNC_TO_VBLANK %1supported")
@@ -489,7 +489,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("XVideo Sync to VBlank %1set")
-                        .arg(xv_set_attrib(disp, port, "XV_SYNC_TO_VBLANK", 1) ?
+                        .arg(xv_set_attrib(_disp, port, "XV_SYNC_TO_VBLANK", 1) ?
                              "" : "NOT "));
             }
 
@@ -502,7 +502,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
 
     // free list of Xv ports
     if (ai)
-        XLOCK(disp, XvFreeAdaptorInfo(ai));
+        XLOCK(_disp, XvFreeAdaptorInfo(ai));
 
     if ((port != -1) && adaptor_name)
         *adaptor_name = lastAdaptorName;
