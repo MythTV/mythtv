@@ -95,6 +95,8 @@ void MythVAAPIInterop::IniitaliseDisplay(void)
     if (vaInitialize(m_vaDisplay, &major, &minor) != VA_STATUS_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI display");
+        vaTerminate(m_vaDisplay);
+        m_vaDisplay = nullptr;
     }
     else
     {
