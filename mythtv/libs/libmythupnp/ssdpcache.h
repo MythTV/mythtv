@@ -105,6 +105,7 @@ class UPNP_PUBLIC SSDPCache : public QObject,
         // ------------------------------------------------------------------
 
         SSDPCache();
+        Q_DISABLE_COPY(SSDPCache)
 
     public:
 
