@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
 {
     FillData fill_data;
     int fromfile_id = 1;
-    int fromfile_offset = 0;
     QString fromfile_name;
     bool from_file = false;
     bool mark_repeats = true;

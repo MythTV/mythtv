@@ -50,7 +50,7 @@ class FillData
     void SetRefresh(int day, bool set);
 
     bool GrabDataFromFile(int id, QString &filename);
-    bool GrabData(Source source, int offset, QDate *qCurrentDate = nullptr);
+    bool GrabData(Source source, int offset);
     bool Run(SourceList &sourcelist);
 
     enum

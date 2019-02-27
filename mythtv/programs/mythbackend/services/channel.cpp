@@ -357,9 +357,9 @@ bool Channel::RemoveVideoSource( uint nSourceID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
-                                           const QString &sUserId,
-                                           const QString &sPassword )
+DTC::LineupList* Channel::GetDDLineupList( const QString &/*sSource*/,
+                                           const QString &/*sUserId*/,
+                                           const QString &/*sPassword*/ )
 {
     DTC::LineupList *pLineups = new DTC::LineupList();
     return pLineups;

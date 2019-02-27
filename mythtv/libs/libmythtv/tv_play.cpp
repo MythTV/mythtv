@@ -10493,16 +10493,6 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)
  */
 void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap) const
 {
-    QMap<QString,bool> dummy;
-    ChannelEditAutoFill(ctx, infoMap, dummy);
-}
-
-/** \fn TV::ChannelEditAutoFill(const PlayerContext*,InfoMap&,const QMap<QString,bool>&) const
- *  \brief Automatically fills in as much information as possible.
- */
-void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap,
-                             const QMap<QString,bool> &changed) const
-{
     const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
 
     // fill in uninitialized and unchanged fields from XDS

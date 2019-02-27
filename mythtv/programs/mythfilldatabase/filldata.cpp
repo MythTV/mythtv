@@ -109,7 +109,7 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     return true;
 }
 
-bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
+bool FillData::GrabData(Source source, int offset)
 {
     QString xmltv_grabber = source.xmltvgrabber;
 
@@ -242,7 +242,6 @@ bool FillData::Run(SourceList &sourcelist)
 
     m_need_post_grab_proc = false;
     int nonewdata = 0;
-    bool has_dd_source = false;
 
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
@@ -614,7 +613,7 @@ bool FillData::Run(SourceList &sourcelist)
                 {
                     LOG(VB_GENERAL, LOG_NOTICE,
                         QString("Refreshing data for ") + currDate);
-                    if (!GrabData(*it, i, &qCurrentDate))
+                    if (!GrabData(*it, i))
                     {
                         ++failures;
                         if (!m_fatalErrors.empty() || m_interrupted)

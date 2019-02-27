@@ -692,8 +692,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void StartChannelEditMode(PlayerContext*);
     bool HandleOSDChannelEdit(PlayerContext*, QString action);
     void ChannelEditAutoFill(const PlayerContext*, InfoMap&) const;
-    void ChannelEditAutoFill(const PlayerContext*, InfoMap&,
-                             const QMap<QString,bool>&) const;
     void ChannelEditXDSFill(const PlayerContext*, InfoMap&) const;
 
     // General dialog handling
