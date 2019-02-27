@@ -48,16 +48,11 @@ int main(int argc, char *argv[])
 {
     FillData fill_data;
     int fromfile_id = 1;
-    int fromfile_offset = 0;
     QString fromfile_name;
     bool from_file = false;
     bool mark_repeats = true;
 
-    bool usingDataDirect = false;
-
-    bool from_dd_file = false;
     int sourceid = -1;
-    QString fromddfile_lineupid;
 
     MythFillDatabaseCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -132,34 +127,8 @@ int main(int argc, char *argv[])
         from_file = true;
     }
 
-    if (cmdline.toBool("ddfile"))
-    {
-        // datadirect file mode
-        if (!cmdline.toBool("sourceid") ||
-            !cmdline.toBool("offset") ||
-            !cmdline.toBool("lineupid") ||
-            !cmdline.toBool("xmlfile"))
-        {
-            cerr << "The --dd-file option must be used in combination" << endl
-                 << "with each of --sourceid, --offset, --lineupid," << endl
-                 << "and --xmlfile." << endl;
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        fromfile_id         = cmdline.toInt("sourceid");
-        fromfile_offset     = cmdline.toInt("offset");
-        fromddfile_lineupid = cmdline.toString("lineupid");
-        fromfile_name       = cmdline.toString("xmlfile");
-
-        LOG(VB_GENERAL, LOG_INFO,
-            "Bypassing grabbers, reading directly from file");
-        from_dd_file = true;
-    }
-
     if (cmdline.toBool("dochannelupdates"))
         fill_data.m_chan_data.m_channelUpdates = true;
-    if (cmdline.toBool("removechannels"))
-        fill_data.m_chan_data.m_removeNewChannels = true;
     if (cmdline.toBool("nofilterchannels"))
         fill_data.m_chan_data.m_filterNewChannels = false;
     if (!cmdline.GetPassthrough().isEmpty())
@@ -266,11 +235,6 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("dontrefreshtba"))
         fill_data.m_refresh_tba = false;
-    if (cmdline.toBool("ddgraball"))
-    {
-        fill_data.SetRefresh(FillData::kRefreshClear, false);
-        fill_data.m_dd_grab_all = true;
-    }
     if (cmdline.toBool("onlychannels"))
         fill_data.m_only_update_channels = true;
     if (cmdline.toBool("noallatonce"))
@@ -366,11 +330,6 @@ int main(int argc, char *argv[])
 
         updateLastRunStatus(status);
     }
-    else if (from_dd_file)
-    {
-        fill_data.GrabDataFromDDFile(
-            fromfile_id, fromfile_offset, fromfile_name, fromddfile_lineupid);
-    }
     else
     {
         SourceList sourcelist;
@@ -412,8 +371,6 @@ int main(int argc, char *argv[])
                        newsource.xmltvgrabber_prefmethod = "";
 
                        sourcelist.push_back(newsource);
-                       usingDataDirect |=
-                           is_grabber_datadirect(newsource.xmltvgrabber);
                   }
              }
              else
@@ -675,12 +632,6 @@ int main(int argc, char *argv[])
             else
                 gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);
         }
-    }
-
-    if ((usingDataDirect) &&
-        (gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", true)))
-    {
-        fill_data.m_ddprocessor.GrabNextSuggestedTime();
     }
 
     LOG(VB_GENERAL, LOG_INFO, "\n"

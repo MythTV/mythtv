@@ -49,11 +49,8 @@ class PlayerContext;
 class TvPlayWindow;
 class TV;
 class TVBrowseHelper;
-class DDLoader;
 struct osdInfo;
 
-typedef QMap<QString,InfoMap>    DDValueMap;
-typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef void (*EMBEDRETURNVOID) (void *, bool);
 typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, const QDateTime, TV *, bool, bool, int);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
@@ -293,7 +290,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     friend class ScheduleEditor;
     friend class TvPlayWindow;
     friend class TVBrowseHelper;
-    friend class DDLoader;
 
     Q_OBJECT
   public:
@@ -696,14 +692,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void StartChannelEditMode(PlayerContext*);
     bool HandleOSDChannelEdit(PlayerContext*, QString action);
     void ChannelEditAutoFill(const PlayerContext*, InfoMap&) const;
-    void ChannelEditAutoFill(const PlayerContext*, InfoMap&,
-                             const QMap<QString,bool>&) const;
     void ChannelEditXDSFill(const PlayerContext*, InfoMap&) const;
-    void ChannelEditDDFill(InfoMap&, const QMap<QString,bool>&, bool) const;
-    QString GetDataDirect(QString key,   QString value,
-                          QString field, bool    allow_partial = false) const;
-    bool LoadDDMap(uint sourceid);
-    void RunLoadDDMap(uint sourceid);
 
     // General dialog handling
     bool DialogIsVisible(PlayerContext *ctx, const QString &dialog);
@@ -852,10 +841,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap
     InfoMap   chanEditMap;          ///< Channel Editing initial map
-
-    DDKeyMap  ddMap;                ///< DataDirect channel map
-    uint      ddMapSourceId;        ///< DataDirect channel map sourceid
-    DDLoader *ddMapLoader;          ///< DataDirect map loader runnable
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.

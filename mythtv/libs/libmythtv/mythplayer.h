@@ -856,6 +856,8 @@ class MTV_PUBLIC MythPlayer
     int       maxtcframes;    // number of frames seen since max to date tc
     int64_t   avsync2adjustms; // number of milliseconds to adjust for av sync errors
     int       numdroppedframes; // number of consecutive dropped frames.
+    int64_t   prior_audiotimecode;    // time code from prior frame
+    int64_t   prior_videotimecode;    // time code from prior frame
 
     // LiveTV
     TV *m_tv;

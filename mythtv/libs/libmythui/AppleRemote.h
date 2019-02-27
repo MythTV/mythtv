@@ -55,7 +55,7 @@ public:
     bool      isOpenInExclusiveMode()         { return openInExclusiveMode; };
     void      startListening();
     void      stopListening();
-    void      run();
+    void      run() override; // MThread
 
 protected:
     AppleRemote(); // will be a singleton class

@@ -223,6 +223,8 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       rtcbase(0),
       maxtcval(0), maxtcframes(0),
       numdroppedframes(0),
+      prior_audiotimecode(0),
+      prior_videotimecode(0),
       // LiveTVChain stuff
       m_tv(nullptr),                isDummy(false),
       // Counter for buffering messages
@@ -415,6 +417,8 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
         return false;
     }
     rtcbase = 0;
+    prior_audiotimecode = 0;
+    prior_videotimecode = 0;
     SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
@@ -1806,6 +1810,8 @@ void MythPlayer::ResetAVSync(void)
     prevtc = 0;
     avsync_next = avsync_interval;      // Frames till next sync check
     rtcbase = 0;
+    prior_audiotimecode = 0;
+    prior_videotimecode = 0;
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "A/V sync reset");
 }
 
@@ -1822,6 +1828,8 @@ void MythPlayer::InitAVSync(void)
     // Number of frames over which to average time divergence
     avsync_averaging=4;
     rtcbase = 0;
+    prior_audiotimecode = 0;
+    prior_videotimecode = 0;
 
     // Special averaging default of 60 for OpenMAX passthru
     QString device = gCoreContext->GetSetting("AudioOutputDevice","");
@@ -2170,7 +2178,7 @@ void wait_for_time(int64_t framedue)
         QThread::usleep(delay);
 }
 
-#define AVSYNC_MAX_LATE 1000000
+#define AVSYNC_MAX_LATE 10000000
 void MythPlayer::AVSync2(VideoFrame *buffer)
 {
     if (videoOutput->IsErrored())
@@ -2180,7 +2188,6 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         SetErrored(tr("Failed to initialize A/V Sync"));
         return;
     }
-    int64_t audiotimecode = audio.GetAudioTime();
     int64_t videotimecode = 0;
 
     bool dropframe = false;
@@ -2191,10 +2198,10 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     int64_t unow = 0;
     int64_t lateness = 0;
     int64_t playspeed1000 = (float)1000 / play_speed;
+    bool reset = false;
 
     while (framedue == 0)
     {
-        bool reset = false;
         if (buffer)
         {
             videotimecode = buffer->timecode & 0x0000ffffffffffff;
@@ -2205,12 +2212,18 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
 
         now = QDateTime::currentDateTimeUtc();
         unow = now.toMSecsSinceEpoch() * 1000;
+
+        if (!normal_speed || FlagIsSet(kMusicChoice))
+        {
+            framedue = unow + frame_interval;
+            break;
+        }
         // first time or after a seek - setup of rtcbase
         if (rtcbase == 0)
         {
             // cater for DVB radio
             if (videotimecode == 0)
-                videotimecode = audiotimecode;
+                videotimecode = audio.GetAudioTime();;
             // On first frame we get nothing, so exit out.
             if (videotimecode == 0)
                 return;
@@ -2242,26 +2255,37 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         lateness = unow - framedue;
         dropframe = false;
         if (lateness > 30000)
-            dropframe = !FlagIsSet(kMusicChoice) && numdroppedframes < 10;
+            dropframe = numdroppedframes < 10;
 
-        if (lateness <= 30000 && audiotimecode > 0 && normal_speed && !FlagIsSet(kMusicChoice))
+        if (lateness <= 30000 && prior_audiotimecode > 0
+            && prior_videotimecode > 0)
         {
             // Get video in sync with audio
-            audio_adjustment = audiotimecode - videotimecode;
-            int sign = audio_adjustment < 0 ? -1 : 1;
-            if (audio_adjustment * sign > 40)
+            audio_adjustment = prior_audiotimecode - prior_videotimecode;
+            // If there is excess audio - throw it away.
+            if (audio_adjustment < -200)
             {
-                // adjust by AVSyncIncrementMS milliseconds at a time (range 1-40)
-                rtcbase -= (int64_t)1000000 * avsync2adjustms * sign / playspeed1000;
+                audio.Reset();
+                audio_adjustment = 0;
+            }
+            int sign = audio_adjustment < 0 ? -1 : 1;
+            int64_t fix_amount = audio_adjustment * sign;
+            if (fix_amount > avsync2adjustms)
+                fix_amount = avsync2adjustms;
+            // Faster catch-up when off by more than 200 ms
+            if (audio_adjustment * sign > 200)
+                // fix the sync within 15 - 20 frames
+                fix_amount = audio_adjustment * sign / 15;
+            int64_t speedup1000 = (float)1000 * play_speed;
+            rtcbase -= (int64_t)1000000 * fix_amount * sign / speedup1000;
+            if (audio_adjustment * sign > 20 || (framesPlayed % 400 == 0))
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("AV Sync, audio ahead by %1 ms").arg(audio_adjustment));
-            }
-            if (audio_adjustment > 1000)
+            if (audio_adjustment > 200)
                 pause_audio = true;
         }
         // sanity check - reset rtcbase if time codes have gone crazy.
-        if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE)
-            && !FlagIsSet(kMusicChoice))
+        if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE))
         {
             framedue = 0;
             rtcbase = 0;
@@ -2277,7 +2301,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             reset = true;
         }
     }
-
+    prior_videotimecode = videotimecode;
     disp_timecode = videotimecode;
 
     output_jmeter && output_jmeter->RecordCycleTime();
@@ -2307,17 +2331,6 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         audio.Pause(true);
     }
 
-    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-        QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
-                "audioadj=%4 tcoffset=%5 unow=%6 udue=%7")
-            .arg(audiotimecode)
-            .arg(videotimecode)
-            .arg(frame_interval)
-            .arg(audio_adjustment)
-            .arg(tc_wrap[TC_AUDIO])
-            .arg(unow)
-            .arg(framedue)
-                );
 
     if (dropframe)
         numdroppedframes++;
@@ -2338,6 +2351,8 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         // the primary PBP will become out of sync
         if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
             wait_for_time(framedue);
+        // get time codes for calculating difference next time
+        prior_audiotimecode = audio.GetAudioTime();
         videoOutput->Show(ps);
         if (videoOutput->IsErrored())
         {
@@ -2373,6 +2388,19 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     }
     else
         wait_for_time(framedue);
+
+    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+        QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
+                "audioadj=%4 tcoffset=%5 unow=%6 udue=%7")
+            .arg(prior_audiotimecode)
+            .arg(prior_videotimecode)
+            .arg(frame_interval)
+            .arg(audio_adjustment)
+            .arg(tc_wrap[TC_AUDIO])
+            .arg(unow)
+            .arg(framedue)
+                );
+
 }
 
 void MythPlayer::RefreshPauseFrame(void)
@@ -2451,7 +2479,6 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!videoOutput)
         return false;
 
-    bool paused_now = false;
     if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
                         (GetEof() != kEofStateNone) ||
                         (videoOutput->hasHWAcceleration() ?
@@ -2467,19 +2494,20 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         // for the jerking is detected.
 
         bool watchingTV = IsWatchingInprogress();
-        if (!paused_now && (livetv || watchingTV) && !FlagIsSet(kMusicChoice))
+        if ( (livetv || watchingTV) && !FlagIsSet(kMusicChoice))
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - framesPlayed;
             uint64_t margin = (uint64_t) (video_frame_rate * 3);
             if (framesLeft < margin)
             {
-                LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                    QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
-                    .arg(framesPlayed).arg(frameCount));
+                if (rtcbase)
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                        QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
+                        .arg(framesPlayed).arg(frameCount));
                 audio.Pause(true);
                 avsync_audiopaused = true;
-                paused_now = true;
+                rtcbase = 0;
             }
         }
         usleep(frame_interval >> 3);

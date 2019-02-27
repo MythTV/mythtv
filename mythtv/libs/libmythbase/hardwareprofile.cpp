@@ -157,7 +157,7 @@ QString HardwareProfile::GetAdminPasswordFromFile() const
     return ret;
 }
 
-bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
+bool HardwareProfile::WritePrivateUUIDToFile(const QString &uuid)
 {
     QString hwuuid_file = GetConfDir() + "/HardwareProfile/hw-uuid";
     QFile file(hwuuid_file);

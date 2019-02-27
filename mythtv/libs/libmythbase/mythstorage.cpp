@@ -31,13 +31,13 @@ void SimpleDBStorage::Load(void)
     }
 }
 
-void SimpleDBStorage::Save(QString _table)
+void SimpleDBStorage::Save(const QString &table)
 {
     if (!IsSaveRequired())
         return;
 
     MSqlBindings bindings;
-    QString querystr = "SELECT * FROM " + _table + " WHERE "
+    QString querystr = "SELECT * FROM " + table + " WHERE "
                        + GetWhereClause(bindings) + ';';
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -54,7 +54,7 @@ void SimpleDBStorage::Save(QString _table)
     {
         // Row already exists
         // Don"t change this QString. See the CVS logs rev 1.91.
-        querystr = "UPDATE " + _table + " SET " + GetSetClause(bindings) +
+        querystr = "UPDATE " + table + " SET " + GetSetClause(bindings) +
                    " WHERE " + GetWhereClause(bindings) + ';';
 
         query.prepare(querystr);
@@ -66,7 +66,7 @@ void SimpleDBStorage::Save(QString _table)
     else
     {
         // Row does not exist yet
-        querystr = "INSERT INTO " + _table + " SET "
+        querystr = "INSERT INTO " + table + " SET "
                    + GetSetClause(bindings) + ';';
 
         query.prepare(querystr);

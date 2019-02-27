@@ -1392,7 +1392,7 @@ static uint get_max_chanid(uint sourceid)
     QString qstr = "SELECT MAX(chanid) FROM channel ";
     qstr += (sourceid) ? "WHERE sourceid = :SOURCEID" : "";
 
-    MSqlQuery query(MSqlQuery::DDCon());
+    MSqlQuery query(MSqlQuery::ChannelCon());
     query.prepare(qstr);
 
     if (sourceid)
@@ -1410,7 +1410,7 @@ static uint get_max_chanid(uint sourceid)
 
 static bool chanid_available(uint chanid)
 {
-    MSqlQuery query(MSqlQuery::DDCon());
+    MSqlQuery query(MSqlQuery::ChannelCon());
     query.prepare(
         "SELECT chanid "
         "FROM channel "

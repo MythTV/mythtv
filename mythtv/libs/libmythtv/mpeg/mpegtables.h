@@ -1164,7 +1164,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     vector<const unsigned char*> _ptrs0;
     vector<const unsigned char*> _ptrs1;
     const unsigned char *_epilog;
-    int scte_pid;
+    int scte_pid {0};
 };
 
 /** \class AdaptationFieldControl

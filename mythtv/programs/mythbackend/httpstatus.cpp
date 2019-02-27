@@ -560,10 +560,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         guide.setAttribute("guideDays", qdtNow.daysTo(GuideDataThrough));
     }
 
-    QDomText dataDirectMessage =
-        pDoc->createTextNode(gCoreContext->GetSetting("DataDirectMessage"));
-    guide.appendChild(dataDirectMessage);
-
     // Add Miscellaneous information
 
     QString info_script = gCoreContext->GetSetting("MiscStatusScript");
@@ -1437,9 +1433,6 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
             else
                 os << "    There's <strong>no guide data</strong> available! "
                    << "Have you run mythfilldatabase?";
-
-            if (!sMsg.isEmpty())
-                os << "<br />\r\n    DataDirect Status: " << sMsg;
         }
     }
     os << "\r\n  </div>\r\n";

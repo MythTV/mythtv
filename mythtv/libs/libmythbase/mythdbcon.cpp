@@ -282,7 +282,7 @@ MDBManager::~MDBManager()
 {
     CloseDatabases();
 
-    if (m_connCount != 0 || m_schedCon || m_DDCon)
+    if (m_connCount != 0 || m_schedCon || m_channelCon)
     {
         LOG(VB_GENERAL, LOG_CRIT,
             "MDBManager exiting with connections still open");
@@ -290,7 +290,7 @@ MDBManager::~MDBManager()
 #if 0 /* some post logStop() debugging... */
     cout<<"m_connCount: "<<m_connCount<<endl;
     cout<<"m_schedCon: "<<m_schedCon<<endl;
-    cout<<"m_DDCon: "<<m_DDCon<<endl;
+    cout<<"m_channelCon: "<<m_channelCon<<endl;
 #endif
 }
 
@@ -461,9 +461,9 @@ MSqlDatabase *MDBManager::getSchedCon()
     return getStaticCon(&m_schedCon, "SchedCon");
 }
 
-MSqlDatabase *MDBManager::getDDCon()
+MSqlDatabase *MDBManager::getChannelCon()
 {
-    return getStaticCon(&m_DDCon, "DataDirectCon");
+    return getStaticCon(&m_channelCon, "ChannelCon");
 }
 
 void MDBManager::CloseDatabases()
@@ -494,8 +494,8 @@ void MDBManager::CloseDatabases()
 
         if (db == m_schedCon)
             m_schedCon = nullptr;
-        if (db == m_DDCon)
-            m_DDCon = nullptr;
+        if (db == m_channelCon)
+            m_channelCon = nullptr;
     }
     m_lock.unlock();
 }
@@ -582,9 +582,9 @@ MSqlQueryInfo MSqlQuery::SchedCon()
     return qi;
 }
 
-MSqlQueryInfo MSqlQuery::DDCon()
+MSqlQueryInfo MSqlQuery::ChannelCon()
 {
-    MSqlDatabase *db = GetMythDB()->GetDBManager()->getDDCon();
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->getChannelCon();
     MSqlQueryInfo qi;
 
     InitMSqlQueryInfo(qi);

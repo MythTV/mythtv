@@ -22,6 +22,7 @@ class UPNP_PUBLIC UPNPSubscription : public HttpServerExtension, public MythObse
     void Remove(const QString &usn);
 
   private:
+    Q_DISABLE_COPY(UPNPSubscription)
     static bool SendUnsubscribeRequest(const QString &usn, const QUrl &url,
                                        const QString &path, const QString &uuid);
     static int  SendSubscribeRequest(const QString &callback,

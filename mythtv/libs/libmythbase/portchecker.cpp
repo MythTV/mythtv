@@ -101,7 +101,9 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
             return false;
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
+#ifndef _WIN32
     QListIterator<QNetworkInterface> iCard = cards;
+#endif
     MythTimer timer(MythTimer::kStartRunning);
     QTcpSocket socket(this);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;

@@ -102,7 +102,7 @@ static inline QString iso639_str_to_canonoical_str(const QString &str3)
     return iso639_key_to_str3(can);
 }
 
-MBASE_PUBLIC  QString GetISO639LanguageName(QString iso639Code);
-MBASE_PUBLIC  QString GetISO639EnglishLanguageName(QString iso639Code);
+MBASE_PUBLIC  QString GetISO639LanguageName(const QString &iso639Code);
+MBASE_PUBLIC  QString GetISO639EnglishLanguageName(const QString &iso639Code);
 
 #endif // _ISO_639_2_H_
