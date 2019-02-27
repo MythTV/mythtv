@@ -26,7 +26,7 @@ class MBASE_PUBLIC Storage
 
     virtual void Load(void) = 0;
     virtual void Save(void) = 0;
-    virtual void Save(QString /*destination*/) { }
+    virtual void Save(const QString &/*destination*/) { }
     virtual bool IsSaveRequired(void) const { return true; };
     virtual void SetSaveRequired(void) { };
 };
@@ -34,8 +34,8 @@ class MBASE_PUBLIC Storage
 class MBASE_PUBLIC DBStorage : public Storage
 {
   public:
-    DBStorage(StorageUser *_user, QString _table, QString _column) :
-        m_user(_user), m_tablename(_table), m_columnname(_column) { }
+    DBStorage(StorageUser *user, const QString &table, const QString &column) :
+        m_user(user), m_tablename(table), m_columnname(column) { }
 
     virtual ~DBStorage() = default;
 
@@ -51,14 +51,14 @@ class MBASE_PUBLIC DBStorage : public Storage
 class MBASE_PUBLIC SimpleDBStorage : public DBStorage
 {
   public:
-    SimpleDBStorage(StorageUser *_user,
-                    QString _table, QString _column) :
-        DBStorage(_user, _table, _column) { m_initval.clear(); }
+    SimpleDBStorage(StorageUser *user,
+                    const QString &table, const QString &column) :
+        DBStorage(user, table, column) { m_initval.clear(); }
     virtual ~SimpleDBStorage() = default;
 
     void Load(void) override; // Storage
     void Save(void) override; // Storage
-    void Save(QString destination) override; // Storage
+    void Save(const QString &destination) override; // Storage
     bool IsSaveRequired(void) const override; // Storage
     void SetSaveRequired(void) override; // Storage
 
@@ -73,11 +73,11 @@ class MBASE_PUBLIC SimpleDBStorage : public DBStorage
 class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
 {
   public:
-    GenericDBStorage(StorageUser *_user,
-                     QString _table, QString _column,
-                     QString _keycolumn, QString _keyvalue = QString()) :
-        SimpleDBStorage(_user, _table, _column),
-        m_keycolumn(_keycolumn), m_keyvalue(_keyvalue) {}
+    GenericDBStorage(StorageUser *user,
+                     const QString &table, const QString &column,
+                     const QString &keycolumn, const QString &keyvalue = QString()) :
+        SimpleDBStorage(user, table, column),
+        m_keycolumn(keycolumn), m_keyvalue(keyvalue) {}
     virtual ~GenericDBStorage() = default;
 
     void SetKeyValue(const QString &val) { m_keyvalue = val; }
@@ -100,7 +100,7 @@ class MBASE_PUBLIC TransientStorage : public Storage
 
     void Load(void) override { } // Storage
     void Save(void) override { } // Storage
-    void Save(QString /*destination*/) override { } // Storage
+    void Save(const QString &/*destination*/) override { } // Storage
 };
 
 class MBASE_PUBLIC HostDBStorage : public SimpleDBStorage
