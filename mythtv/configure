@@ -6609,6 +6609,12 @@ if enabled taglib; then
     taglib_libs=`taglib-config --libs`
 fi
 
+if enabled x11; then
+    if enabled opengles; then
+        check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || disable opengles
+    fi
+fi
+
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
 enabled xrandr && check_lib Xrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr || disable xrandr
 
