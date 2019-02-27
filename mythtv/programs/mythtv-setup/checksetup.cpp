@@ -44,9 +44,6 @@ bool checkStoragePaths(QStringList &probs)
 {
     bool problemFound = false;
 
-    QString recordFilePrefix =
-            gCoreContext->GetSetting("RecordFilePrefix", "EMPTY");
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT count(groupname) FROM storagegroup;");

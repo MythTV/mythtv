@@ -131,7 +131,7 @@ int PlayListFile::parseASX(PlayListFile *pls, const QString &filename)
     }
     file.close();
 
-    QDomElement docElem = doc.documentElement();
+    //QDomElement docElem = doc.documentElement();
     QDomNodeList entryList = doc.elementsByTagName("Entry");
     QString url;
 
