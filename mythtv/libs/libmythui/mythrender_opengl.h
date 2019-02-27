@@ -33,7 +33,8 @@ typedef enum
     kGLNVFence     = 0x0002,
     kGLAppleFence  = 0x0004,
     kGLBufferMap   = 0x0008,
-    kGLExtRGBA16   = 0x0010
+    kGLExtRects    = 0x0010,
+    kGLExtRGBA16   = 0x0020
 } GLFeatures;
 
 #define TEX_OFFSET 8
@@ -45,20 +46,21 @@ class MUI_PUBLIC MythGLTexture
     explicit MythGLTexture(GLuint Texture);
    ~MythGLTexture() = default;
 
-    unsigned char  *m_data;
-    int             m_bufferSize;
-    GLuint          m_textureId;
-    QOpenGLTexture *m_texture;
-    QOpenGLTexture::PixelFormat m_pixelFormat;
-    QOpenGLTexture::PixelType   m_pixelType;
-    QOpenGLBuffer  *m_vbo;
-    QSize           m_size;
-    QSize           m_totalSize;
-    bool            m_flip;
-    bool            m_crop;
-    QRect           m_source;
-    QRect           m_destination;
-    GLfloat         m_vertexData[16];
+    unsigned char  *m_data                    { nullptr };
+    int             m_bufferSize              { 0 } ;
+    GLuint          m_textureId               { 0 } ;
+    QOpenGLTexture *m_texture                 { nullptr } ;
+    QOpenGLTexture::PixelFormat m_pixelFormat { QOpenGLTexture::RGBA };
+    QOpenGLTexture::PixelType   m_pixelType   { QOpenGLTexture::UInt8 };
+    QOpenGLBuffer  *m_vbo                     { nullptr };
+    QSize           m_size                    { QSize() };
+    QSize           m_totalSize               { QSize() };
+    bool            m_flip                    { true };
+    bool            m_crop                    { false };
+    QRect           m_source                  { QRect() };
+    QRect           m_destination             { QRect() };
+    GLfloat         m_vertexData[16]          { 0.0f };
+    bool            m_normalised              { true };
 
   private:
     Q_DISABLE_COPY(MythGLTexture)
@@ -126,12 +128,12 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
                         QOpenGLTexture::WrapMode      Wrap        = QOpenGLTexture::ClampToEdge,
                         QOpenGLTexture::TextureFormat Format      = QOpenGLTexture::NoFormat);
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
-    MythGLTexture* CreateExternalTexture(QSize Size);
-    QSize GetTextureSize(const QSize &size);
+    MythGLTexture* CreateExternalTexture(QSize Size, bool SetFilters = true);
+    QSize GetTextureSize(const QSize &size, bool Normalised);
     int   GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
     void  ActiveTexture(GLuint ActiveTex);
-    void  EnableTextures(void);
+    void  EnableTextures(GLenum Type = QOpenGLTexture::Target2D);
     void  DisableTextures(void);
     void  DeleteTexture(MythGLTexture *Texture);
 

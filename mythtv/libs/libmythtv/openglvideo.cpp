@@ -45,7 +45,8 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_extraFeatures(0),
     m_copyCtx(),
     m_resizing(false),
-    m_forceResize()
+    m_forceResize(false),
+    m_forceRectangles(false)
 {
     memset(m_shaders, 0, sizeof(m_shaders));
     memset(m_shaderCost, 1, sizeof(m_shaderCost));
@@ -392,6 +393,12 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     fragment.replace("SELECT_COLUMN", (kGLUYVY == frametype) ? SelectColumn : "");
     // update packing code so this can be removed
     fragment.replace("%SWIZZLE%", kGLUYVY == frametype ? "arb" : "abr");
+    if (m_forceRectangles)
+    {
+        fragment.replace("sampler2D", "sampler2DRect");
+        fragment.replace("texture2D", "texture2DRect");
+        fragment.prepend("#extension GL_ARB_texture_rectangle : enable\n");
+    }
 
     m_shaderCost[Type] = cost;
     QOpenGLShaderProgram *program = m_render->CreateShaderProgram(vertex, fragment);
@@ -559,13 +566,18 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         if (count)
         {
             FrameType newinteroptype = (count == 3) ? kGLYV12 : (count == 2) ? kGLNV12 : kGLInterop; // << HACK ALERT
-            if (m_interopFrameType != newinteroptype)
+            bool newrectangles = !inputtextures[0]->m_normalised;
+            if ((m_interopFrameType != newinteroptype) || (m_forceRectangles != newrectangles))
             {
                 QSize newsize = inputtextures[0]->m_size;
-                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Interop change %1 %2x%3 -> %4 %5x%6")
-                    .arg(TypeToString(m_interopFrameType)).arg(m_inputTextureSize.width()).arg(m_inputTextureSize.height())
-                    .arg(TypeToString(newinteroptype)).arg(newsize.width()).arg(newsize.height()));
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Interop change %1 %2x%3 (Rects: %4) -> %5 %6x%7 (Rects: %8)")
+                    .arg(TypeToString(m_interopFrameType)).arg(m_inputTextureSize.width())
+                    .arg(m_inputTextureSize.height()).arg(m_forceRectangles)
+                    .arg(TypeToString(newinteroptype)).arg(newsize.width())
+                    .arg(newsize.height()).arg(newrectangles));
                 m_interopFrameType = newinteroptype;
+                m_forceRectangles  = newrectangles;
                 CreateVideoShader(Progressive);
                 UpdateColourSpace();
                 UpdateShaderParameters();

@@ -36,39 +36,13 @@ const GLuint MythRenderOpenGL::kVertexSize = 16 * sizeof(GLfloat);
 #define MAX_VERTEX_CACHE 500
 
 MythGLTexture::MythGLTexture(QOpenGLTexture *Texture)
-  : m_data(nullptr),
-    m_bufferSize(0),
-    m_textureId(0),
-    m_texture(Texture),
-    m_pixelFormat(QOpenGLTexture::RGBA),
-    m_pixelType(QOpenGLTexture::UInt8),
-    m_vbo(nullptr),
-    m_size(0,0),
-    m_totalSize(0,0),
-    m_flip(true),
-    m_crop(false),
-    m_source(),
-    m_destination()
+  : m_texture(Texture)
 {
-    memset(&m_vertexData, 0, sizeof(m_vertexData));
 }
 
 MythGLTexture::MythGLTexture(GLuint Texture)
-  : m_data(nullptr),
-    m_bufferSize(0),
-    m_textureId(Texture),
-    m_texture(nullptr),
-    m_pixelFormat(QOpenGLTexture::RGBA),
-    m_pixelType(QOpenGLTexture::UInt8),
-    m_vbo(nullptr),
-    m_size(0,0),
-    m_totalSize(0,0),
-    m_flip(true),
-    m_crop(false),
-    m_source(),
-    m_destination()
+  : m_textureId(Texture)
 {
-    memset(&m_vertexData, 0, sizeof(m_vertexData));
 }
 
 OpenGLLocker::OpenGLLocker(MythRenderOpenGL *Render)
@@ -319,6 +293,12 @@ bool MythRenderOpenGL::Init(void)
     if (isOpenGLES() && hasExtension("GL_EXT_discard_framebuffer") && m_glDiscardFramebuffer)
         m_extraFeatures |= kGLExtFBDiscard;
 
+    // Rectangular textures
+    if (!isOpenGLES() && (hasExtension("GL_NV_texture_rectangle") ||
+                          hasExtension("GL_ARB_texture_rectangle") ||
+                          hasExtension("GL_EXT_texture_rectangle")))
+        m_extraFeatures |= kGLExtRects;
+
     DebugFeatures();
 
     m_extraFeaturesUsed = m_extraFeatures;
@@ -361,6 +341,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(GLYesNo(m_features & Shaders)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rectangular textures : %1").arg(GLYesNo(m_extraFeatures & kGLExtRects)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
@@ -626,7 +607,7 @@ MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
     result->m_pixelFormat = PixelFormat;
     result->m_pixelType   = PixelType;
     result->m_vbo         = CreateVBO(kVertexSize);
-    result->m_totalSize   = GetTextureSize(Size);
+    result->m_totalSize   = GetTextureSize(Size, result->m_normalised);
     result->m_bufferSize  = datasize;
     result->m_size        = Size;
     return result;
@@ -650,7 +631,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     MythGLTexture *result = new MythGLTexture(texture);
     result->m_texture     = texture;
     result->m_vbo         = CreateVBO(kVertexSize);
-    result->m_totalSize   = GetTextureSize(Image->size());
+    result->m_totalSize   = GetTextureSize(Image->size(), result->m_normalised);
     // N.B. Format and type per qopengltexure.cpp
     result->m_pixelFormat = QOpenGLTexture::RGBA;
     result->m_pixelType   = QOpenGLTexture::UInt8;
@@ -664,8 +645,9 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
  *
  * Qt by default will use immutable texture storage if available and this feature
  * cannot be turned off. In some instances this breaks compatibility (e.g. VAAPI DRM interop).
+ * Similarily a texture is sometimes required that is entirely uninitialised (e.g. OSX IOSurface interop).
 */
-MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size)
+MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size, bool SetFilters /*=true*/)
 {
     OpenGLLocker locker(this);
     GLuint textureid;
@@ -674,9 +656,10 @@ MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size)
         return nullptr;
     MythGLTexture* result = new MythGLTexture(textureid);
     result->m_size = Size;
-    result->m_totalSize = GetTextureSize(Size);
+    result->m_totalSize = GetTextureSize(Size, result->m_normalised);
     result->m_vbo = CreateVBO(kVertexSize);
-    SetTextureFilters(result, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+    if (SetFilters)
+        SetTextureFilters(result, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
     return result;
 }
 
@@ -715,9 +698,9 @@ MythGLTexture* MythRenderOpenGL::CreateHelperTexture(void)
     return texture;
 }
 
-QSize MythRenderOpenGL::GetTextureSize(const QSize &size)
+QSize MythRenderOpenGL::GetTextureSize(const QSize &size, bool Normalised)
 {
-    if (m_features & NPOTTextures)
+    if ((m_features & NPOTTextures) || !Normalised)
         return size;
 
     int w = 64;
@@ -786,14 +769,14 @@ void MythRenderOpenGL::StoreBicubicWeights(float X, float *Dst)
     *Dst++ = 0;
 }
 
-void MythRenderOpenGL::EnableTextures(void)
+void MythRenderOpenGL::EnableTextures(GLenum Type)
 {
-    if (isOpenGLES() || m_activeTextureTarget)
+    if (isOpenGLES() || (m_activeTextureTarget == Type))
         return;
 
     makeCurrent();
-    glEnable(GL_TEXTURE_2D);
-    m_activeTextureTarget = GL_TEXTURE_2D;
+    glEnable(Type);
+    m_activeTextureTarget = Type;
     doneCurrent();
 }
 
@@ -922,13 +905,14 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
 
-    EnableTextures();
+    GLenum target = Texture->m_normalised ? QOpenGLTexture::Target2D : QOpenGLTexture::TargetRectangle;
+    EnableTextures(target);
     Program->setUniformValue("s_texture0", 0);
     ActiveTexture(GL_TEXTURE0);
     if (Texture->m_texture)
         Texture->m_texture->bind();
     else
-        glBindTexture(GL_TEXTURE_2D, Texture->m_textureId);
+        glBindTexture(target, Texture->m_textureId);
 
     QOpenGLBuffer* buffer = Texture->m_vbo;
     buffer->bind();
@@ -980,7 +964,8 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     SetShaderProgramParams(Program, m_projection, "u_projection");
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
 
-    EnableTextures();
+    GLenum target = first->m_normalised ? QOpenGLTexture::Target2D : QOpenGLTexture::TargetRectangle;
+    EnableTextures(target);
     uint active_tex = 0;
     for (uint i = 0; i < TextureCount; i++)
     {
@@ -990,7 +975,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
         if (Textures[i]->m_texture)
             Textures[i]->m_texture->bind();
         else
-            glBindTexture(GL_TEXTURE_2D, Textures[i]->m_textureId);
+            glBindTexture(target, Textures[i]->m_textureId);
     }
 
     QOpenGLBuffer* buffer = first->m_vbo;
@@ -1342,10 +1327,20 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     int width  = Texture->m_crop ? min(Source.width(),  size.width())  : Source.width();
     int height = Texture->m_crop ? min(Source.height(), size.height()) : Source.height();
 
-    data[0 + TEX_OFFSET] = Source.left() / static_cast<GLfloat>(size.width());
-    data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / static_cast<GLfloat>(size.height());
-    data[6 + TEX_OFFSET] = (Source.left() + width) / static_cast<GLfloat>(size.width());
-    data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top() / static_cast<GLfloat>(size.height());
+    if (Texture->m_normalised)
+    {
+        data[0 + TEX_OFFSET] = Source.left() / static_cast<GLfloat>(size.width());
+        data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / static_cast<GLfloat>(size.height());
+        data[6 + TEX_OFFSET] = (Source.left() + width) / static_cast<GLfloat>(size.width());
+        data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top() / static_cast<GLfloat>(size.height());
+    }
+    else
+    {
+        data[0 + TEX_OFFSET] = Source.left();
+        data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height);
+        data[6 + TEX_OFFSET] = (Source.left() + width);
+        data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = Source.top();
+    }
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
     data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
