@@ -31,7 +31,7 @@ class MBASE_PUBLIC MythSortHelper
 
   public:
     MythSortHelper();
-    MythSortHelper(MythSortHelper *other);
+    explicit MythSortHelper(MythSortHelper *other);
     MythSortHelper(Qt::CaseSensitivity case_sensitve, SortPrefixMode prefix_mode,
                    const QString &exclusions);
 
