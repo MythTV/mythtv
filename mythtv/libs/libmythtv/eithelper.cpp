@@ -80,7 +80,7 @@ uint EITHelper::ProcessEvents(void)
         eitfixup->Fix(*event);
 
         insertCount += event->UpdateDB(query, 1000);
-        maxStarttime = max (maxStarttime, event->starttime);
+        maxStarttime = max (maxStarttime, event->m_starttime);
 
         delete event;
         eitList_lock.lock();
@@ -106,11 +106,11 @@ uint EITHelper::ProcessEvents(void)
     return insertCount;
 }
 
-void EITHelper::SetFixup(uint atsc_major, uint atsc_minor, FixupValue eitfixup)
+void EITHelper::SetFixup(uint atsc_major, uint atsc_minor, FixupValue drheitfixup)
 {
     QMutexLocker locker(&eitList_lock);
     FixupKey atsc_key = (atsc_major << 16) | atsc_minor;
-    fixup[atsc_key] = eitfixup;
+    fixup[atsc_key] = drheitfixup;
 }
 
 void EITHelper::SetLanguagePreferences(const QStringList &langPref)
@@ -693,7 +693,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             video_props, stars,
             seriesId,  programId,
             season, episode, totalepisodes);
-        event->items = items;
+        event->m_items = items;
 
         db_events.enqueue(event);
     }
@@ -808,7 +808,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 video_props, 0.0,
                 "",  "",
                 season, episode, totalepisodes);
-            event->items = items;
+            event->m_items = items;
 
             db_events.enqueue(event);
         }

@@ -31,7 +31,7 @@ class MTV_PUBLIC PlayGroupEditor : public GroupSetting
     void CreateNewPlayBackGroupSlot(const QString&);
 
   private:
-    ButtonStandardSetting *m_addGroupButton;
+    ButtonStandardSetting *m_addGroupButton {nullptr};
 };
 
 class MTV_PUBLIC PlayGroupConfig : public GroupSetting
@@ -46,12 +46,12 @@ class MTV_PUBLIC PlayGroupConfig : public GroupSetting
     void deleteEntry(void) override; // GroupSetting
 
   private:
-    StandardSetting            *m_titleMatch;
-    MythUISpinBoxSetting       *m_skipAhead;
-    MythUISpinBoxSetting       *m_skipBack;
-    MythUISpinBoxSetting       *m_jumpMinutes;
-    MythUISpinBoxSetting       *m_timeStrech;
-    bool                        m_isNew;
+    StandardSetting            *m_titleMatch  {nullptr};
+    MythUISpinBoxSetting       *m_skipAhead   {nullptr};
+    MythUISpinBoxSetting       *m_skipBack    {nullptr};
+    MythUISpinBoxSetting       *m_jumpMinutes {nullptr};
+    MythUISpinBoxSetting       *m_timeStrech  {nullptr};
+    bool                        m_isNew       {false};
 };
 
 #endif
