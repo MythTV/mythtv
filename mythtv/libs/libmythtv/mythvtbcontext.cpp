@@ -215,7 +215,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     
     // Add our interop class and set the callback for its release
     AVHWDeviceContext* devicectx = reinterpret_cast<AVHWDeviceContext*>(deviceref->data);
-    devicectx->user_opaque = MythVTBInterop::Create(render);
+    devicectx->user_opaque = MythVTBInterop::Create(render, type);
     devicectx->free        = MythVTBContext::DeviceContextFinished;
 
     // Create

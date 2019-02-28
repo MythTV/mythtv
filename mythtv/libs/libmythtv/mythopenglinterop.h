@@ -24,7 +24,8 @@ class MythOpenGLInterop : public ReferenceCounter
         VAAPIGLXCOPY = 1,
         VAAPIGLXPIX  = 2,
         VAAPIEGLDRM  = 3,
-        VTBOPENGL    = 4
+        VTBOPENGL    = 4,
+        VTBSURFACE   = 5
     };
 
     static QStringList GetAllowedRenderers (MythCodecID CodecId);

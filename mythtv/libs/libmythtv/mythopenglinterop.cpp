@@ -20,6 +20,7 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     if (InteropType == VAAPIGLXPIX)  return "VAAPI GLX Pixmap";
     if (InteropType == VAAPIGLXCOPY) return "VAAPI GLX Copy";
     if (InteropType == VTBOPENGL)    return "VTB OpenGL";
+    if (InteropType == VTBSURFACE)   return "VTB IOSurface";
     return "Unsupported";
 }
 

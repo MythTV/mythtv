@@ -67,6 +67,7 @@ macx {
     LIBS += -framework IOKit
     LIBS += -framework CoreVideo
     LIBS += -framework VideoToolBox
+    LIBS += -framework IOSurface
     DEFINES += USING_VTB
     HEADERS += mythvtbinterop.h   mythvtbcontext.h
     SOURCES += mythvtbinterop.cpp mythvtbcontext.cpp

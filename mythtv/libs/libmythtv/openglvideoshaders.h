@@ -6,7 +6,7 @@ vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoor
 {\n\
     highp vec3 yuv;\n\
     yuv.r  = texture2D(texture1, texcoord).r;\n\
-    yuv.gb = texture2D(texture2, texcoord).rg;\n\
+    yuv.gb = texture2D(texture2, texcoord%NV12_UV_RECT%).rg;\n\
     return yuv;\n\
 }\n"
 

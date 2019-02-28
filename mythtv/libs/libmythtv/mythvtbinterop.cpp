@@ -24,18 +24,25 @@ MythOpenGLInterop::Type MythVTBInterop::GetInteropType(MythCodecID CodecId, Myth
     if (Context->isOpenGLES() || Context->IsEGL())
         return Unsupported;
 
+    if (Context->hasExtension("GL_ARB_texture_rg"))
+        return VTBSURFACE;
     return VTBOPENGL;
 }
 
-MythVTBInterop* MythVTBInterop::Create(MythRenderOpenGL *Context)
+MythVTBInterop* MythVTBInterop::Create(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type)
 {
     if (Context)
-        return new MythVTBInterop(Context);
+    {
+        if (Type == VTBSURFACE)
+            return new MythVTBSurfaceInterop(Context);
+        else if (Type == VTBOPENGL)
+            return new MythVTBInterop(Context, VTBOPENGL);
+    }
     return nullptr;
 }
 
-MythVTBInterop::MythVTBInterop(MythRenderOpenGL *Context)
-  : MythOpenGLInterop(Context, VTBOPENGL)
+MythVTBInterop::MythVTBInterop(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type)
+  : MythOpenGLInterop(Context, Type)
 {
 }
 
@@ -132,5 +139,100 @@ vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
         }
     }
     CVPixelBufferUnlockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
+    return result;
+}
+
+MythVTBSurfaceInterop::MythVTBSurfaceInterop(MythRenderOpenGL *Context)
+  : MythVTBInterop(Context, VTBSURFACE)
+{
+}
+
+MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
+{
+}
+
+vector<MythGLTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
+                                                      VideoColourSpace *ColourSpace,
+                                                      VideoFrame *Frame,
+                                                      FrameScanType)
+{
+    vector<MythGLTexture*> result;
+    if (!Frame)
+        return result;
+
+    if (Context && (Context != m_context))
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
+
+    // Lock
+    OpenGLLocker locker(m_context);
+
+    // Update colourspace and initialise on first frame
+    if (ColourSpace)
+    {
+        if (m_openglTextures.isEmpty())
+        {
+            ColourSpace->SetSupportedAttributes(static_cast<PictureAttributeSupported>
+                                               (kPictureAttributeSupported_Brightness |
+                                                kPictureAttributeSupported_Contrast |
+                                                kPictureAttributeSupported_Colour |
+                                                kPictureAttributeSupported_Hue |
+                                                kPictureAttributeSupported_StudioLevels));
+        }
+        ColourSpace->UpdateColourSpace(Frame);
+    }
+
+    // Retrieve pixel buffer
+    // N.B. Buffer was retained in MythVTBContext and will be released in VideoBuffers
+    CVPixelBufferRef buffer = reinterpret_cast<CVPixelBufferRef>(Frame->buf);
+    if (!buffer)
+        return result;
+
+    IOSurfaceRef surface = CVPixelBufferGetIOSurface(buffer);
+    if (!surface)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve IOSurface from CV buffer");
+        return result;
+    }
+
+    IOSurfaceID surfaceid = IOSurfaceGetID(surface);
+    if (!surfaceid)
+        return result;
+
+    // return cached textures if available
+    if (m_openglTextures.contains(surfaceid))
+        return m_openglTextures[surfaceid];
+
+    // Create new and attach to IOSurface
+    int planes = IOSurfaceGetPlaneCount(surface);
+    IOSurfaceLock(surface, kIOSurfaceLockReadOnly, nullptr);
+
+    for (int plane = 0; plane < planes; ++plane)
+    {
+        int width  = IOSurfaceGetWidthOfPlane(surface, plane);
+        int height = IOSurfaceGetHeightOfPlane(surface, plane);
+        QSize size(width, height);
+
+        MythGLTexture* texture = m_context->CreateExternalTexture(size, false);
+        if (!texture)
+            continue;
+        texture->m_normalised = false;
+        m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
+        m_context->glBindTexture(QOpenGLTexture::TargetRectangle, texture->m_textureId);
+
+        // TODO proper handling of all formats - this assumes NV12
+        GLenum format = plane == 0 ? QOpenGLTexture::Red : QOpenGLTexture::RG;
+        CGLError error = CGLTexImageIOSurface2D(
+                CGLGetCurrentContext(), QOpenGLTexture::TargetRectangle, format, width, height,
+                format, QOpenGLTexture::UInt8, surface, plane);
+        if (error != kCGLNoError)
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("CGLTexImageIOSurface2D error %1").arg(error));
+
+        m_context->glBindTexture(QOpenGLTexture::TargetRectangle, 0);
+        result.push_back(texture);
+    }
+
+    IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);
+
+    m_openglTextures.insert(surfaceid, result);
     return result;
 }

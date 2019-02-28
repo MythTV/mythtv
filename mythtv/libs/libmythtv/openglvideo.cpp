@@ -395,9 +395,16 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     fragment.replace("%SWIZZLE%", kGLUYVY == frametype ? "arb" : "abr");
     if (m_forceRectangles)
     {
+        // N.B. Currently only NV12 shaders are supported and deinterlacing parameters
+        // need fixing as well (when interop deinterlacing is fixed)
+        fragment.replace("%NV12_UV_RECT%", " * vec2(0.5, 0.5)");
         fragment.replace("sampler2D", "sampler2DRect");
         fragment.replace("texture2D", "texture2DRect");
         fragment.prepend("#extension GL_ARB_texture_rectangle : enable\n");
+    }
+    else
+    {
+        fragment.replace("%NV12_UV_RECT%", "");
     }
 
     m_shaderCost[Type] = cost;
