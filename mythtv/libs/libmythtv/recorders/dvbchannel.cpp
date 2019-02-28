@@ -1449,7 +1449,7 @@ static void drain_dvb_events(int fd)
     struct dvb_frontend_event event;
     int ret = 0;
     while ((ret = ioctl(fd, FE_GET_EVENT, &event)) == 0);
-    if (ret < 0)
+    if ((ret < 0) && (EAGAIN != errno))
     {
         LOG(VB_CHANNEL, LOG_DEBUG, "Draining DVB Event failed. " + ENO);
     }
