@@ -29,9 +29,9 @@ class StreamingRingBuffer : public RingBuffer
     long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
   private:
-    URLContext *m_context;
-    bool        m_streamed;
-    bool        m_allowSeeks;
+    URLContext *m_context    {nullptr};
+    bool        m_streamed   {true};
+    bool        m_allowSeeks {false};
 };
 
 #endif // STREAMINGRINGBUFFER_H

@@ -27,10 +27,10 @@ class MTV_PUBLIC FileRingBuffer : public RingBuffer
 
     int safe_read(void *data, uint sz) override // RingBuffer
     {
-        if (remotefile)
-            return safe_read(remotefile, data, sz);
-        else if (fd2 >= 0)
-            return safe_read(fd2, data, sz);
+        if (m_remotefile)
+            return safe_read(m_remotefile, data, sz);
+        else if (m_fd2 >= 0)
+            return safe_read(m_fd2, data, sz);
 
         errno = EBADF;
         return -1;

@@ -24,7 +24,8 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     if (!overlay || !m_player)
         return;
 
-    MythRect rect(overlay->x, overlay->y, overlay->image.width(), overlay->image.height());
+    MythRect rect(overlay->m_x, overlay->m_y,
+                  overlay->m_image.width(), overlay->m_image.height());
     SetArea(rect);
     DeleteAllChildren();
 
@@ -32,7 +33,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     if (!vo)
         return;
 
-    QImage& img = overlay->image;
+    QImage& img = overlay->m_image;
 
     // add to screen
     QRect scaled = vo->GetImageRect(rect);

@@ -25,6 +25,14 @@ extern "C" {
 /* should be minimum of the above test sizes */
 #define kReadTestSize PNG_MIN_SIZE
 
+// about one second at 35mbit
+#define BUFFER_SIZE_MINIMUM (4 * 1024 * 1024)
+#define BUFFER_FACTOR_NETWORK  2
+#define BUFFER_FACTOR_BITRATE  2
+#define BUFFER_FACTOR_MATROSKA 2
+
+#define CHUNK 32768 /* readblocksize increments */
+
 class ThreadedFileWriter;
 class DVDRingBuffer;
 class BDRingBuffer;
@@ -59,28 +67,28 @@ class MTV_PUBLIC RingBuffer : protected MThread
     void SetOldFile(bool is_old);
     void UpdateRawBitrate(uint raw_bitrate);
     void UpdatePlaySpeed(float play_speed);
-    void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
+    void EnableBitrateMonitor(bool enable) { m_bitrateMonitorEnabled = enable; }
     void SetBufferSizeFactors(bool estbitrate, bool matroska);
-    void SetWaitForWrite(void) { waitforwrite = true; }
+    void SetWaitForWrite(void) { m_waitForWrite = true; }
 
     // Gets
-    QString   GetSafeFilename(void) { return safefilename; }
+    QString   GetSafeFilename(void) { return m_safeFilename; }
     QString   GetFilename(void)      const;
     QString   GetSubtitleFilename(void) const;
     QString   GetLastError(void)     const;
-    bool      GetCommsError(void) const { return commserror; }
-    void      ResetCommsError(void) { commserror = 0; }
+    bool      GetCommsError(void) const { return m_commsError; }
+    void      ResetCommsError(void) { m_commsError = 0; }
 
     /// Returns value of stopreads
     /// \sa StartReads(void), StopReads(void)
-    bool      GetStopReads(void)     const { return stopreads; }
+    bool      GetStopReads(void)     const { return m_stopReads; }
     bool      isPaused(void)         const;
     /// \brief Returns how far into the file we have read.
     virtual long long GetReadPosition(void)  const = 0;
     QString GetDecoderRate(void);
     QString GetStorageRate(void);
     QString GetAvailableBuffer(void);
-    uint    GetBufferSize(void) { return bufferSize; }
+    uint    GetBufferSize(void) { return m_bufferSize; }
     long long GetWritePosition(void) const;
     /// \brief Returns the size of the file we are reading/writing,
     ///        or -1 if the query fails.
@@ -93,17 +101,17 @@ class MTV_PUBLIC RingBuffer : protected MThread
     virtual bool IsBookmarkAllowed(void) { return true; }
     virtual int  BestBufferSize(void)   { return 32768; }
     static QString BitrateToString(uint64_t rate, bool hz = false);
-    RingBufferType GetType() const { return type; }
+    RingBufferType GetType() const { return m_type; }
 
     // LiveTV used utilities
     int GetReadBufAvail() const;
     bool SetReadInternalMode(bool mode);
-    bool IsReadInternalMode(void) { return readInternalMode; }
+    bool IsReadInternalMode(void) { return m_readInternalMode; }
 
     // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
-    bool IsDVD(void)  const { return type == kRingBuffer_DVD; }
-    bool IsBD(void)   const { return type == kRingBuffer_BD;  }
+    bool IsDVD(void)  const { return m_type == kRingBuffer_DVD; }
+    bool IsBD(void)   const { return m_type == kRingBuffer_BD;  }
     const DVDRingBuffer *DVD(void) const;
     const BDRingBuffer  *BD(void)  const;
     DVDRingBuffer *DVD(void);
@@ -193,78 +201,99 @@ class MTV_PUBLIC RingBuffer : protected MThread
     uint64_t UpdateStorageRate(uint64_t latest = 0);
 
   protected:
-    RingBufferType type;
-    mutable QReadWriteLock poslock;
-    long long readpos;            // protected by poslock
-    long long writepos;           // protected by poslock
-    long long internalreadpos;    // protected by poslock
-    long long ignorereadpos;      // protected by poslock
-    mutable QReadWriteLock rbrlock;
-    int       rbrpos;             // protected by rbrlock
-    mutable QReadWriteLock rbwlock;
-    int       rbwpos;             // protected by rbwlock
+    RingBufferType         m_type;
 
-    // note should not go under rwlock..
-    // this is used to break out of read_safe where rwlock is held
-    volatile bool stopreads;
+    //
+    // The following are protected by posLock
+    //
+    mutable QReadWriteLock m_posLock;
+    long long              m_readPos         {0};
+    long long              m_writePos        {0};
+    long long              m_internalReadPos {0};
+    long long              m_ignoreReadPos   {-1};
 
-    mutable QReadWriteLock rwlock;
+    //
+    // The following are protected by rbrLock
+    //
+    mutable QReadWriteLock m_rbrLock;
+    int                    m_rbrPos          {0};
 
-    QString safefilename;         // unprotected (for debugging)
-    QString filename;             // protected by rwlock
-    QString subtitlefilename;     // protected by rwlock
-    QString lastError;            // protected by rwlock
+    //
+    // The following are protected by rbwLock
+    //
+    mutable QReadWriteLock m_rbwLock;
+    int                    m_rbwPos          {0};
 
-    ThreadedFileWriter *tfw;      // protected by rwlock
-    int fd2;                      // protected by rwlock
+    // note should not go under rwLock..
+    // this is used to break out of read_safe where rwLock is held
+    volatile bool          m_stopReads       {false};
 
-    bool writemode;               // protected by rwlock
+    //
+    // unprotected (for debugging)
+    //
+    QString                m_safeFilename;
 
-    RemoteFile *remotefile;       // protected by rwlock
+    //
+    // The following are protected by rwLock
+    //
+    mutable QReadWriteLock m_rwLock;
+    QString                m_filename;
+    QString                m_subtitleFilename;
+    QString                m_lastError;
 
-    uint      bufferSize;         // protected by rwlock
-    bool      low_buffers;        // protected by rwlock
-    bool      fileismatroska;     // protected by rwlock
-    bool      unknownbitrate;     // protected by rwlock
-    bool      startreadahead;     // protected by rwlock
-    char     *readAheadBuffer;    // protected by rwlock
-    bool      readaheadrunning;   // protected by rwlock
-    bool      reallyrunning;      // protected by rwlock
-    bool      request_pause;      // protected by rwlock
-    bool      paused;             // protected by rwlock
-    bool      ateof;              // protected by rwlock
-    bool      waitforwrite;       // protected by rwlock
-    bool      beingwritten;       // protected by rwlock
-    bool      readsallowed;       // protected by rwlock
-    bool      readsdesired;       // protected by rwlock
-    volatile bool recentseek;
-    bool      setswitchtonext;    // protected by rwlock
-    uint      rawbitrate;         // protected by rwlock
-    float     playspeed;          // protected by rwlock
-    int       fill_threshold;     // protected by rwlock
-    int       fill_min;           // protected by rwlock
-    int       readblocksize;      // protected by rwlock
-    int       wanttoread;         // protected by rwlock
-    int       numfailures;        // protected by rwlock (see note 1)
-    bool      commserror;         // protected by rwlock
+    ThreadedFileWriter    *m_tfw              {nullptr};
+    int                    m_fd2              {-1};
 
-    bool oldfile;                 // protected by rwlock
+    bool                   m_writeMode        {false};
 
-    LiveTVChain *livetvchain;     // protected by rwlock
-    bool ignoreliveeof;           // protected by rwlock
+    RemoteFile            *m_remotefile       {nullptr};
 
-    long long readAdjust;         // protected by rwlock
+    uint                   m_bufferSize       {BUFFER_SIZE_MINIMUM};
+    bool                   m_lowBuffers       {false};
+    bool                   m_fileIsMatroska   {false};
+    bool                   m_unknownBitrate   {false};
+    bool                   m_startReadAhead   {false};
+    char                  *m_readAheadBuffer  {nullptr};
+    bool                   m_readAheadRunning {false};
+    bool                   m_reallyRunning    {false};
+    bool                   m_requestPause     {false};
+    bool                   m_paused           {false};
+    bool                   m_ateof            {false};
+    bool                   m_waitForWrite     {false};
+    bool                   m_beingWritten     {false};
+    bool                   m_readsAllowed     {false};
+    bool                   m_readsDesired     {false};
+    volatile bool          m_recentSeek       {true}; // not protected by rwLock
+    bool                   m_setSwitchToNext  {false};
+    uint                   m_rawBitrate       {8000};
+    float                  m_playSpeed        {1.0f};
+    int                    m_fillThreshold    {65536};
+    int                    m_fillMin          {-1};
+    int                    m_readBlockSize    {CHUNK};
+    int                    m_wantToRead       {0};
+    int                    m_numFailures      {0};    // (see note 1)
+    bool                   m_commsError       {false};
+
+    bool                   m_oldfile          {false};
+
+    LiveTVChain           *m_liveTVChain      {nullptr};
+    bool                   m_ignoreLiveEOF    {false};
+
+    long long              m_readAdjust       {0};
 
     // Internal RingBuffer Method
-    int       readOffset;         // protected by rwlock
-    bool      readInternalMode;   // protected by rwlock
+    int                    m_readOffset       {0};
+    bool                   m_readInternalMode {false};
+    //
+    // End of section protected by rwLock
+    //
 
     // bitrate monitors
-    bool              bitrateMonitorEnabled;
-    QMutex            decoderReadLock;
-    QMap<qint64, uint64_t> decoderReads;
-    QMutex            storageReadLock;
-    QMap<qint64, uint64_t> storageReads;
+    bool                   m_bitrateMonitorEnabled {false};
+    QMutex                 m_decoderReadLock;
+    QMap<qint64, uint64_t> m_decoderReads;
+    QMutex                 m_storageReadLock;
+    QMap<qint64, uint64_t> m_storageReads;
 
     // note 1: numfailures is modified with only a read lock in the
     // read ahead thread, but this is safe since all other places
@@ -273,7 +302,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     // code or locking around this variable.
 
     /// Condition to signal that the read ahead thread is running
-    QWaitCondition generalWait;         // protected by rwlock
+    QWaitCondition         m_generalWait; // protected by rwLock
 
   public:
     static QMutex      s_subExtLock;
@@ -282,7 +311,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
 
   private:
     static bool gAVformat_net_initialised;
-    bool bitrateInitialized;
+    bool m_bitrateInitialized {false};
 };
 
 #endif // _RINGBUFFER_H_
