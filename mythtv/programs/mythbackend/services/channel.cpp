@@ -38,7 +38,6 @@
 #include "channelutil.h"
 #include "sourceutil.h"
 #include "cardutil.h"
-#include "datadirect.h"
 #include "mythdate.h"
 
 #include "serviceUtil.h"
@@ -358,39 +357,11 @@ bool Channel::RemoveVideoSource( uint nSourceID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
-                                           const QString &sUserId,
-                                           const QString &sPassword )
+DTC::LineupList* Channel::GetDDLineupList( const QString &/*sSource*/,
+                                           const QString &/*sUserId*/,
+                                           const QString &/*sPassword*/ )
 {
     DTC::LineupList *pLineups = new DTC::LineupList();
-
-    if (sSource.toLower() == "schedulesdirect1" ||
-        sSource.toLower() == "schedulesdirect" ||
-        sSource.isEmpty())
-    {
-        int source = 1;
-        DataDirectProcessor ddp(source, sUserId, sPassword);
-        if (!ddp.GrabLineupsOnly())
-        {
-            delete pLineups;
-            throw( QString("Unable to grab lineups. Check info."));
-        }
-        const DDLineupList lineups = ddp.GetLineups();
-
-        DDLineupList::const_iterator it;
-        for (it = lineups.begin(); it != lineups.end(); ++it)
-        {
-            DTC::Lineup *pLineup = pLineups->AddNewLineup();
-
-            pLineup->setLineupId((*it).m_lineupid);
-            pLineup->setName((*it).m_name);
-            pLineup->setDisplayName((*it).m_displayname);
-            pLineup->setType((*it).m_type);
-            pLineup->setPostal((*it).m_postal);
-            pLineup->setDevice((*it).m_device);
-        }
-    }
-
     return pLineups;
 }
 

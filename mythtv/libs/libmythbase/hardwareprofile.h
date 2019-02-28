@@ -27,7 +27,7 @@ class MBASE_PUBLIC HardwareProfile : public QObject
     void GenerateUUIDs(void);
 
     QString GetPrivateUUIDFromFile(void) const;
-    bool WritePrivateUUIDToFile(QString uuid);
+    bool WritePrivateUUIDToFile(const QString &uuid);
     QString GetPublicUUIDFromFile(void) const;
     QString GetAdminPasswordFromFile(void) const;
 

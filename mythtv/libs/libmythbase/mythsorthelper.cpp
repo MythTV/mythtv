@@ -79,7 +79,7 @@ MythSortHelper::MythSortHelper()
 MythSortHelper::MythSortHelper(
     Qt::CaseSensitivity case_sensitive,
     SortPrefixMode prefix_mode,
-    QString exclusions) :
+    const QString &exclusions) :
     m_case_sensitive(case_sensitive),
     m_prefix_mode(prefix_mode),
     m_exclusions(exclusions)

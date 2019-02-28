@@ -177,8 +177,7 @@ class TimeOffset : public MythUISpinBoxSetting
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "Offset (in minutes) to apply to the program guide data during "
             "import.  This can be used when the listings for a particular "
-            "channel are in a different time zone. (Works for DataDirect "
-            "listings only.)"));
+            "channel are in a different time zone."));
     }
 };
 

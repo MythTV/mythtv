@@ -44,9 +44,6 @@ bool checkStoragePaths(QStringList &probs)
 {
     bool problemFound = false;
 
-    QString recordFilePrefix =
-            gCoreContext->GetSetting("RecordFilePrefix", "EMPTY");
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT count(groupname) FROM storagegroup;");
@@ -241,9 +238,7 @@ bool needsMFDBReminder()
 
     query.prepare("SELECT sourceid "
                   "FROM videosource "
-                  "WHERE xmltvgrabber = 'schedulesdirect1' "
-                  "OR xmltvgrabber = 'datadirect' "
-                  "OR xmltvgrabber LIKE 'tv_grab_%';");
+                  "WHERE xmltvgrabber LIKE 'tv_grab_%';");
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("needsMFDBReminder", query);

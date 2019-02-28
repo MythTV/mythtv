@@ -826,7 +826,7 @@ static GlobalCheckBoxSetting *MythFillGrabberSuggestsTime()
     bc->setLabel(QObject::tr("Run guide data program at time suggested by the "
                              "grabber."));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("If enabled, allow a DataDirect guide data "
+    bc->setHelpText(QObject::tr("If enabled, allow a guide data "
                     "provider to specify the next download time in order "
                     "to distribute load on their servers. Guide data program "
                     "execution start/end times are also ignored."));

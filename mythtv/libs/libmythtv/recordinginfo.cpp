@@ -1307,7 +1307,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", 0);
-    result.bindValue(":FUTURE", m_future);
+    result.bindValue(":FUTURE", future);
 
     if (!result.exec())
         MythDB::DBError("addHistory", result);

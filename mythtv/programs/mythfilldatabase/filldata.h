@@ -9,7 +9,6 @@ using namespace std;
 #include <QString>
 
 // libmythtv headers
-#include "datadirect.h"
 #include "programdata.h"
 
 // filldata headers
@@ -50,14 +49,8 @@ class FillData
 
     void SetRefresh(int day, bool set);
 
-    void DataDirectStationUpdate(Source source);
-    bool DataDirectUpdateChannels(Source source);
-    bool GrabDDData(Source source, int poffset,
-                    QDate pdate, int ddSource);
     bool GrabDataFromFile(int id, QString &filename);
-    bool GrabData(Source source, int offset, QDate *qCurrentDate = nullptr);
-    bool GrabDataFromDDFile(int id, int offset, const QString &filename,
-                            const QString &lineupid, QDate *qCurrentDate = nullptr);
+    bool GrabData(Source source, int offset);
     bool Run(SourceList &sourcelist);
 
     enum
@@ -70,7 +63,6 @@ class FillData
     ProgramData         m_prog_data;
     ChannelData         m_chan_data;
     XMLTVParser         m_xmltv_parser;
-    DataDirectProcessor m_ddprocessor;
 
     QString m_logged_in;
     QString m_lastdduserid;

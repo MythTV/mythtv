@@ -256,7 +256,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
  *                  search.  It is inserted into a query after the
  *                  FROM clause and before the WHERE clause.  For an
  *                  example, see the text inserted when matching on a
- *                  datadirect genre.
+ *                  genre.
  *  \param pginfo   A pointer to an existing ProgramInfo structure.
  *  \return True if search data was successfully loaded.
  */

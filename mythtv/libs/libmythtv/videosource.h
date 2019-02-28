@@ -6,8 +6,8 @@ using namespace std;
 
 #include "mthread.h"
 #include "standardsettings.h"
-#include "datadirect.h"
 #include "mythcontext.h"
+#include "mythtvexp.h"
 
 class SignalTimeout;
 class ChannelTimeout;
@@ -26,30 +26,14 @@ class InputGroup;
 
 static inline bool is_grabber_external(const QString &grabber)
 {
-    return !(grabber == "datadirect" ||
-             grabber == "eitonly" ||
-             grabber == "schedulesdirect1" ||
+    return !(grabber == "eitonly" ||
              grabber == "/bin/true");
-}
-
-static inline bool is_grabber_datadirect(const QString &grabber)
-{
-    return (grabber == "datadirect") || (grabber == "schedulesdirect1");
-}
-
-static inline int get_datadirect_provider(const QString &grabber)
-{
-    if (grabber == "datadirect")
-        return DD_ZAP2IT;
-    else if (grabber == "schedulesdirect1")
-        return DD_SCHEDULES_DIRECT;
-    else
-        return -1;
 }
 
 static inline bool is_grabber_labs(const QString &grabber)
 {
-    return grabber == "datadirect";
+    Q_UNUSED(grabber);
+    return false;
 }
 
 class VideoSourceDBStorage : public SimpleDBStorage
@@ -113,56 +97,6 @@ class TransFreqTableSelector : public TransMythUIComboBoxSetting
   private:
     uint    sourceid;
     QString loaded_freq_table;
-};
-
-class DataDirectLineupSelector :
-    public MythUIComboBoxSetting
-{
-   Q_OBJECT
-public:
-   explicit DataDirectLineupSelector(const VideoSource& parent) :
-       MythUIComboBoxSetting(new VideoSourceDBStorage(this, parent, "lineupid"))
-   {
-       setLabel(QObject::tr("Data Direct lineup"));
-   };
-
- public slots:
-    void fillSelections(const QString& uid, const QString& pwd, int source);
-};
-
-class DataDirectButton : public ButtonStandardSetting
-{
-  public:
-    DataDirectButton() : ButtonStandardSetting(QObject::tr("Retrieve Lineups"))
-    {
-    }
-};
-
-class DataDirectUserID;
-class DataDirectPassword;
-
-class DataDirect_config: public GroupSetting
-{
-    Q_OBJECT
-  public:
-    DataDirect_config(const VideoSource& _parent, int _ddsource, StandardSetting *_setting);
-
-    void Load(void) override; // StandardSetting
-
-    QString getLineupID(void) const { return lineupselector->getValue(); };
-
-  protected slots:
-    void fillDataDirectLineupSelector(void);
-
-  protected:
-    const VideoSource        &parent;
-    DataDirectUserID         *userid;
-    DataDirectPassword       *password;
-    DataDirectButton         *button;
-    DataDirectLineupSelector *lineupselector;
-    QString lastloadeduserid;
-    QString lastloadedpassword;
-    int source;
 };
 
 class XMLTV_generic_config: public GroupSetting

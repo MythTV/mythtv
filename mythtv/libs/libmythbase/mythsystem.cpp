@@ -50,9 +50,6 @@ class MythSystemLegacyWrapper : public MythSystem
         if (args.empty())
             return nullptr;
 
-        QString program = args[0];
-        QStringList other_args = args.mid(1);
-
         MythSystemLegacy *legacy =
             new MythSystemLegacy(args.join(" "), flags);
 

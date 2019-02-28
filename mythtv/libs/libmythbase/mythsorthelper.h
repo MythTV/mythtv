@@ -31,8 +31,9 @@ class MBASE_PUBLIC MythSortHelper
 
   public:
     MythSortHelper();
-    MythSortHelper(MythSortHelper *other);
-    MythSortHelper(Qt::CaseSensitivity case_sensitve, SortPrefixMode prefix_mode, QString exclusions);
+    explicit MythSortHelper(MythSortHelper *other);
+    MythSortHelper(Qt::CaseSensitivity case_sensitve, SortPrefixMode prefix_mode,
+                   const QString &exclusions);
 
     QString doTitle(const QString& title) const;
     QString doPathname(const QString& filename) const;

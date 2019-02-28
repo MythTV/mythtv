@@ -29,7 +29,6 @@ class ChannelData
     bool    m_guideDataOnly     {false};
     bool    m_channelPreset     {false};
     bool    m_channelUpdates    {false};
-    bool    m_removeNewChannels {false};
     bool    m_filterNewChannels {false};
     QString m_cardType;
 };

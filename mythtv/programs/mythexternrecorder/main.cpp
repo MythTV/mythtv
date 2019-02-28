@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
         return retval;
     QString logfile = cmdline.GetLogFilePath();
+    QString logging = logPropagateArgs;
 
     MythExternControl *control = new MythExternControl();
     MythExternRecApp  *process = nullptr;
@@ -70,12 +71,12 @@ int main(int argc, char *argv[])
     QString conf_file = cmdline.toString("conf");
     if (!conf_file.isEmpty())
     {
-        process = new MythExternRecApp("", conf_file, logfile);
+        process = new MythExternRecApp("", conf_file, logfile, logging);
     }
     else if (!cmdline.toString("exec").isEmpty())
     {
         QString command = cmdline.toString("exec");
-        process = new MythExternRecApp(command, "", logfile);
+        process = new MythExternRecApp(command, "", logfile, logging);
     }
     else if (!cmdline.toString("infile").isEmpty())
     {
@@ -83,7 +84,7 @@ int main(int argc, char *argv[])
         QString command = QString("ffmpeg -re -i \"%1\" "
                                   "-c:v copy -c:a copy -f mpegts -")
                           .arg(filename);
-        process = new MythExternRecApp(command, "", logfile);
+        process = new MythExternRecApp(command, "", logfile, logging);
     }
 
     QObject::connect(process, &MythExternRecApp::Opened,

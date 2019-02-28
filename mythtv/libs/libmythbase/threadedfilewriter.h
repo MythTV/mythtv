@@ -76,7 +76,7 @@ class MBASE_PUBLIC ThreadedFileWriter
     int             m_fd                 {-1};
 
     // state
-    bool            m_flush;                              // protected by buflock
+    bool            m_flush              {false};         // protected by buflock
     bool            m_in_dtor            {false};         // protected by buflock
     bool            m_ignore_writes      {false};         // protected by buflock
     uint            m_tfw_min_write_size {kMinWriteSize}; // protected by buflock

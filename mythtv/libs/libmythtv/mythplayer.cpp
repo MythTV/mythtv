@@ -2209,6 +2209,12 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
 
         now = QDateTime::currentDateTimeUtc();
         unow = now.toMSecsSinceEpoch() * 1000;
+
+        if (!normal_speed || FlagIsSet(kMusicChoice))
+        {
+            framedue = unow + frame_interval;
+            break;
+        }
         // first time or after a seek - setup of rtcbase
         if (rtcbase == 0)
         {
@@ -2246,10 +2252,10 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         lateness = unow - framedue;
         dropframe = false;
         if (lateness > 30000)
-            dropframe = !FlagIsSet(kMusicChoice) && numdroppedframes < 10;
+            dropframe = numdroppedframes < 10;
 
         if (lateness <= 30000 && prior_audiotimecode > 0
-            && prior_videotimecode > 0 && normal_speed && !FlagIsSet(kMusicChoice))
+            && prior_videotimecode > 0)
         {
             // Get video in sync with audio
             audio_adjustment = prior_audiotimecode - prior_videotimecode;
@@ -2276,8 +2282,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 pause_audio = true;
         }
         // sanity check - reset rtcbase if time codes have gone crazy.
-        if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE)
-            && !FlagIsSet(kMusicChoice))
+        if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE))
         {
             framedue = 0;
             rtcbase = 0;

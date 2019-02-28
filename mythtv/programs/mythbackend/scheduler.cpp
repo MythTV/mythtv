@@ -75,7 +75,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         master_sched->GetAllPending(m_reclist);
 
     if (!m_doRun)
-        m_dbConn = MSqlQuery::DDCon();
+        m_dbConn = MSqlQuery::ChannelCon();
 
     if (tmptable == "powerpriority_tmp")
     {

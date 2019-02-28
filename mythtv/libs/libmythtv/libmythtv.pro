@@ -179,10 +179,6 @@ SOURCES += recordingfile.cpp
 HEADERS += diseqc.h                 diseqcsettings.h
 SOURCES += diseqc.cpp               diseqcsettings.cpp
 
-# Listings downloading classes
-HEADERS += datadirect.h
-SOURCES += datadirect.cpp
-
 # File/FIFO Writer classes
 HEADERS += filewriterbase.h         avformatwriter.h
 HEADERS += fifowriter.h

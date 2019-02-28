@@ -13,7 +13,7 @@
 #include "iso3166.h"
 #include "iso639.h"
 
-MythLocale::MythLocale(QString localeName)
+MythLocale::MythLocale(const QString &localeName)
 {
     Init(localeName);
 }

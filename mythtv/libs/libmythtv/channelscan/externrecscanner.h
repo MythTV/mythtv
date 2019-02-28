@@ -44,7 +44,7 @@ class ExternRecChannelScanner : public QRunnable
     uint         m_cardid;
     QString      m_inputname;
     uint         m_sourceid;
-    uint         m_channel_total;
+    uint         m_channel_total  {0};
     uint         m_channel_cnt    {1};
     bool         m_thread_running {false};
     bool         m_stop_now       {false};

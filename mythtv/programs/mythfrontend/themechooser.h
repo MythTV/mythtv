@@ -87,8 +87,8 @@ class ThemeChooser : public MythScreenType
     QMap<QString, ThemeInfo*>  m_themeFileNameInfos;
     QMap<QString, QString>     m_themeStatuses;
     ThemeInfo                 *m_downloadTheme    {nullptr};
-    QString                    m_downloadFile     {dsIdle};
-    DownloadState              m_downloadState;
+    QString                    m_downloadFile;
+    DownloadState              m_downloadState    {dsIdle};
 
     MythDialogBox      *m_popupMenu               {nullptr};
 };

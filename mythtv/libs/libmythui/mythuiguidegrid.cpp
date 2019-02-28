@@ -312,6 +312,8 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     }
 
     drawCurrent(p, xoffset, yoffset, &m_selectedItem, alphaMod);
+    // Redraw the current selection's text in case it was clobbered by the above call.
+    drawText(p, xoffset, yoffset, &m_selectedItem, alphaMod);
 
     for (int i = 0; i < m_rowCount; i++)
     {

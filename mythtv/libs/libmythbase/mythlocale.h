@@ -12,7 +12,7 @@
 class MBASE_PUBLIC MythLocale
 {
   public:
-    explicit MythLocale(QString localeName = QString());
+    explicit MythLocale(const QString &localeName = QString());
     ~MythLocale() = default;
 
     void ReInit();

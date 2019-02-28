@@ -24,9 +24,9 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     explicit CommandLineArg(QString name);
    ~CommandLineArg() = default;
 
-    CommandLineArg* SetGroup(QString group)         { m_group = group;
+    CommandLineArg* SetGroup(const QString &group)    { m_group = group;
                                                       return this; }
-    void            AddKeyword(QString keyword)     { m_keywords << keyword; }
+    void            AddKeyword(const QString &keyword) { m_keywords << keyword; }
 
     QString         GetName(void) const             { return m_name; }
     QString         GetUsedKeyword(void) const      { return m_usedKeyword; }

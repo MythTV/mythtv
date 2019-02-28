@@ -114,6 +114,8 @@ protected:
     void prepareVisuals();
 
 private:
+    Q_DISABLE_COPY(OutputListeners)
+
     QMutex       m_mtx;
     Visuals      m_visuals;
 

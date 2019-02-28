@@ -428,6 +428,7 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
     }
 
     QString transport = readParameters("Transport", params);
+    Q_UNUSED(transport);
     if (params.contains("ssrc"))
     {
         bool ok;
