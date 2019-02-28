@@ -38,13 +38,14 @@ MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(MythCodecID CodecId,
 
     OpenGLLocker locker(Context);
     bool egl = Context->IsEGL();
-    bool opengles = Context->isOpenGLES(); // hrm - opengles is not always egl...
+    bool opengles = Context->isOpenGLES();
+    bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
     // best first
     if (egl && MythVAAPIInteropDRM::IsSupported(Context)) // zero copy
         return VAAPIEGLDRM;
-    else if (!egl && !opengles) // copy
+    else if (!egl && !opengles && !wayland) // copy
         return VAAPIGLXCOPY;
-    else if (!egl && MythVAAPIInteropGLXPixmap::IsSupported(Context)) // copy
+    else if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context)) // copy
         return VAAPIGLXPIX;
     return Unsupported;
 }
