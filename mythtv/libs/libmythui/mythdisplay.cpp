@@ -186,10 +186,11 @@ QScreen* MythDisplay::GetScreen(void)
 {
     // Lookup by name
     QString name = gCoreContext->GetSetting("XineramaScreen", nullptr);
-    foreach (QScreen *qscreen, qGuiApp->screens()) {
-        if (name == qscreen->name()) {
-            LOG(VB_GUI, LOG_INFO, LOC +
-                QString("found screen %1").arg(name));
+    foreach (QScreen *qscreen, qGuiApp->screens())
+    {
+        if (!name.isEmpty() && name == qscreen->name())
+        {
+            LOG(VB_GUI, LOG_INFO, LOC + QString("Found screen '%1'").arg(name));
             return qscreen;
         }
     }
@@ -198,19 +199,25 @@ QScreen* MythDisplay::GetScreen(void)
     bool ok;
     int screen_num = name.toInt(&ok);
     QList<QScreen *>screens = qGuiApp->screens();
-    if (ok && (screen_num >= 0) && (screen_num < screens.size())) {
-        LOG(VB_GUI, LOG_INFO, LOC +
-            QString("found screen number %1 (%2)")
+    if (ok && (screen_num >= 0) && (screen_num < screens.size()))
+    {
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Found screen number %1 (%2)")
             .arg(name).arg(screens[screen_num]->name()));
         return screens[screen_num];
     }
 
-    // For aything else, return the primary screen.
+    // For anything else, return the primary screen.
     QScreen *primary = qGuiApp->primaryScreen();
-    if (name != "-1")
-        LOG(VB_GUI, LOG_INFO,
-            QString("screen %1 not found, defaulting to primary screen (%2)")
+    if (name.isEmpty())
+    {
+        LOG(VB_GUI, LOG_INFO, QString("Defaulting to primary screen (%1)")
+            .arg(primary->name()));
+    }
+    else if (name != "-1")
+    {
+        LOG(VB_GUI, LOG_INFO, QString("Screen '%1' not found, defaulting to primary screen (%2)")
             .arg(name).arg(primary->name()));
+    }
     return primary;
 }
 
@@ -223,7 +230,7 @@ QString MythDisplay::GetExtraScreenInfo(QScreen *qscreen)
     QString model = qscreen->model();
     if (model.isEmpty())
         model = "unknown";
-    return QString("(%1 %2)").arg(mfg).arg(model);
+    return QString("(Make: %1 Model: %2)").arg(mfg).arg(model);
 #else
     Q_UNUSED(qscreen);
     return QString();

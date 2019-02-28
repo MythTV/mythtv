@@ -1039,10 +1039,16 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     }
 
     setWindowFlags(flags);
-    if (this->windowHandle()) {
-        LOG(VB_GENERAL, LOG_INFO, QString("Have window handle, setting screen"));
-        this->windowHandle()->setScreen(MythDisplay::GetScreen());
+    if (this->windowHandle())
+    {
+        QScreen *screen = MythDisplay::GetScreen();
+        if (screen && (screen != this->windowHandle()->screen()))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Setting screen"));
+            this->windowHandle()->setScreen(screen);
+        }
     }
+
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 
     d->m_screenRect = QRect(d->m_xbase, d->m_ybase, d->m_screenwidth, d->m_screenheight);
