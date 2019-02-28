@@ -142,7 +142,7 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat)
 {
     switch (PixelFormat)
     {
-        case FMT_VTB:   return 12;
+        case FMT_VTB:   return 24;
         case FMT_VAAPI: return 24;
         case FMT_DXVA2: return 30;
         case FMT_YV12:  return 31;
