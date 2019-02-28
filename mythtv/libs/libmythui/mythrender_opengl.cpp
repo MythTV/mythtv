@@ -427,7 +427,7 @@ void MythRenderOpenGL::setWidget(QWidget *Widget)
     // change all window surfacetypes to OpenGLSurface
     // otherwise the raster gets painted on top of the GL surface
     m_window->setSurfaceType(QWindow::OpenGLSurface);
-    QWidget* wNativeParent = w->nativeParentWidget();
+    QWidget* wNativeParent = Widget->nativeParentWidget();
     if (wNativeParent)
         wNativeParent->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
 #endif
