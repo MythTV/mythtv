@@ -55,10 +55,10 @@ void CommBreakMap::LoadMap(PlayerContext *player_ctx, uint64_t framesPlayed)
 
     QMutexLocker locker(&m_commBreakMapLock);
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->playingInfo)
+    if (player_ctx->m_playingInfo)
     {
         m_commBreakMap.clear();
-        player_ctx->playingInfo->QueryCommBreakList(m_commBreakMap);
+        player_ctx->m_playingInfo->QueryCommBreakList(m_commBreakMap);
         m_hascommbreaktable = !m_commBreakMap.isEmpty();
         SetTracker(framesPlayed);
     }

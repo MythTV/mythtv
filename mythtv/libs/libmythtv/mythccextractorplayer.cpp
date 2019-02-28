@@ -167,8 +167,8 @@ bool MythCCExtractorPlayer::run(void)
         {
             inuse_timer.restart();
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            if (player_ctx->playingInfo)
-                player_ctx->playingInfo->UpdateInUseMark();
+            if (player_ctx->m_playingInfo)
+                player_ctx->m_playingInfo->UpdateInUseMark();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 

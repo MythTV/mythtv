@@ -79,12 +79,12 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
     m_tv->ClearOSD(ctx);
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (ctx->playingInfo)
+    if (ctx->m_playingInfo)
     {
         m_ctx       = ctx;
-        m_channum   = ctx->playingInfo->GetChanNum();
-        m_chanid    = ctx->playingInfo->GetChanID();
-        m_starttime = ctx->playingInfo->GetScheduledStartTime(MythDate::ISODate);
+        m_channum   = ctx->m_playingInfo->GetChanNum();
+        m_chanid    = ctx->m_playingInfo->GetChanID();
+        m_starttime = ctx->m_playingInfo->GetScheduledStartTime(MythDate::ISODate);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         if (!skip_browse)
@@ -181,11 +181,11 @@ void TVBrowseHelper::BrowseChannel(PlayerContext *ctx, const QString &channum)
         return;
     }
 
-    if (!ctx->recorder || !ctx->last_cardid)
+    if (!ctx->m_recorder || !ctx->m_lastCardid)
         return;
 
-    QString inputname = ctx->recorder->GetInput();
-    uint    inputid   = ctx->last_cardid;
+    QString inputname = ctx->m_recorder->GetInput();
+    uint    inputid   = ctx->m_lastCardid;
     uint    sourceid  = CardUtil::GetSourceID(inputid);
     if (sourceid)
     {
@@ -270,7 +270,7 @@ uint TVBrowseHelper::GetChanId(
 void TVBrowseHelper::GetNextProgram(
     BrowseDirection direction, InfoMap &infoMap) const
 {
-    if (!m_ctx || !m_ctx->recorder)
+    if (!m_ctx || !m_ctx->m_recorder)
         return;
 
     QString title, subtitle, desc, category, endtime, callsign, iconpath;
@@ -282,7 +282,7 @@ void TVBrowseHelper::GetNextProgram(
     QString seriesid  = infoMap["seriesid"];
     QString programid = infoMap["programid"];
 
-    m_ctx->recorder->GetNextProgram(
+    m_ctx->m_recorder->GetNextProgram(
         direction,
         title,     subtitle,  desc,      category,
         starttime, endtime,   callsign,  iconpath,
