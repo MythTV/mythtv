@@ -85,7 +85,6 @@ PreviewGeneratorQueue::PreviewGeneratorQueue(
     uint maxAttempts, uint minBlockSeconds) :
     MThread("PreviewGeneratorQueue"),
     m_mode(mode),
-    m_running(0), m_maxThreads(2),
     m_maxAttempts(maxAttempts), m_minBlockSeconds(minBlockSeconds)
 {
     if (PreviewGenerator::kLocal & mode)
@@ -113,9 +112,9 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
     PreviewMap::iterator it = m_previewMap.begin();
     for (;it != m_previewMap.end(); ++it)
     {
-        if ((*it).gen)
-            (*it).gen->deleteLater();
-        (*it).gen = nullptr;
+        if ((*it).m_gen)
+            (*it).m_gen->deleteLater();
+        (*it).m_gen = nullptr;
     }
     locker.unlock();
     wait();
@@ -281,22 +280,22 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 return true;
             }
 
-            if ((*it).gen)
-                (*it).gen->deleteLater();
-            (*it).gen           = nullptr;
-            (*it).genStarted    = false;
+            if ((*it).m_gen)
+                (*it).m_gen->deleteLater();
+            (*it).m_gen           = nullptr;
+            (*it).m_genStarted    = false;
             if (me->Message() == "PREVIEW_SUCCESS")
             {
-                (*it).attempts      = 0;
-                (*it).lastBlockTime = 0;
-                (*it).blockRetryUntil = QDateTime();
+                (*it).m_attempts      = 0;
+                (*it).m_lastBlockTime = 0;
+                (*it).m_blockRetryUntil = QDateTime();
             }
             else
             {
-                (*it).lastBlockTime =
-                    max(m_minBlockSeconds, (*it).lastBlockTime * 2);
-                (*it).blockRetryUntil =
-                    MythDate::current().addSecs((*it).lastBlockTime);
+                (*it).m_lastBlockTime =
+                    max(m_minBlockSeconds, (*it).m_lastBlockTime * 2);
+                (*it).m_blockRetryUntil =
+                    MythDate::current().addSecs((*it).m_lastBlockTime);
             }
 
             QStringList list;
@@ -304,8 +303,8 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             list.push_back(filename);
             list.push_back(msg);
             list.push_back(datetime);
-            QSet<QString>::const_iterator tit = (*it).tokens.begin();
-            for (; tit != (*it).tokens.end(); ++tit)
+            QSet<QString>::const_iterator tit = (*it).m_tokens.begin();
+            for (; tit != (*it).m_tokens.end(); ++tit)
             {
                 kit = m_tokenToKeyMap.find(*tit);
                 if (kit != m_tokenToKeyMap.end())
@@ -318,10 +317,10 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 QSet<QObject*>::iterator sit = m_listeners.begin();
                 for (; sit != m_listeners.end(); ++sit)
                 {
-                    MythEvent *e = new MythEvent(me->Message(), list);
-                    QCoreApplication::postEvent(*sit, e);
+                    MythEvent *le = new MythEvent(me->Message(), list);
+                    QCoreApplication::postEvent(*sit, le);
                 }
-                (*it).tokens.clear();
+                (*it).m_tokens.clear();
             }
 
             m_running = (m_running > 0) ? m_running - 1 : 0;
@@ -605,7 +604,7 @@ void PreviewGeneratorQueue::GetInfo(
     QMutexLocker locker(&m_lock);
     queue_depth = m_queue.size();
     PreviewMap::iterator pit = m_previewMap.find(key);
-    token_cnt = (pit == m_previewMap.end()) ? 0 : (*pit).tokens.size();
+    token_cnt = (pit == m_previewMap.end()) ? 0 : (*pit).m_tokens.size();
 }
 
 /**
@@ -625,13 +624,13 @@ void PreviewGeneratorQueue::IncPreviewGeneratorPriority(
     if (pit == m_previewMap.end())
         return;
 
-    if ((*pit).gen && !(*pit).genStarted)
+    if ((*pit).m_gen && !(*pit).m_genStarted)
         m_queue.push_back(key);
 
     if (!token.isEmpty())
     {
         m_tokenToKeyMap[token] = key;
-        (*pit).tokens.insert(token);
+        (*pit).m_tokens.insert(token);
     }
 }
 
@@ -648,11 +647,11 @@ void PreviewGeneratorQueue::UpdatePreviewGeneratorThreads(void)
         QString fn = q.back();
         q.pop_back();
         PreviewMap::iterator it = m_previewMap.find(fn);
-        if (it != m_previewMap.end() && (*it).gen && !(*it).genStarted)
+        if (it != m_previewMap.end() && (*it).m_gen && !(*it).m_genStarted)
         {
             m_running++;
-            (*it).gen->start();
-            (*it).genStarted = true;
+            (*it).m_gen->start();
+            (*it).m_genStarted = true;
         }
     }
 }
@@ -675,12 +674,12 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
         QMutexLocker locker(&m_lock);
         m_tokenToKeyMap[g->GetToken()] = key;
         PreviewGenState &state = m_previewMap[key];
-        if (state.gen)
+        if (state.m_gen)
         {
-            if (g && state.gen != g)
+            if (g && state.m_gen != g)
             {
                 if (!g->GetToken().isEmpty())
-                    state.tokens.insert(g->GetToken());
+                    state.m_tokens.insert(g->GetToken());
                 g->deleteLater();
                 g = nullptr;
             }
@@ -688,10 +687,10 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
         else
         {
             g->AttachSignals(this);
-            state.gen = g;
-            state.genStarted = false;
+            state.m_gen = g;
+            state.m_genStarted = false;
             if (!g->GetToken().isEmpty())
-                state.tokens.insert(g->GetToken());
+                state.m_tokens.insert(g->GetToken());
         }
     }
 
@@ -720,10 +719,10 @@ bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
     if ((it = m_previewMap.find(key)) == m_previewMap.end())
         return false;
 
-    if ((*it).blockRetryUntil.isValid())
-        return MythDate::current() < (*it).blockRetryUntil;
+    if ((*it).m_blockRetryUntil.isValid())
+        return MythDate::current() < (*it).m_blockRetryUntil;
 
-    return (*it).gen;
+    return (*it).m_gen;
 }
 
 /**
@@ -737,7 +736,7 @@ bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
 uint PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString &key)
 {
     QMutexLocker locker(&m_lock);
-    return m_previewMap[key].attempts++;
+    return m_previewMap[key].m_attempts++;
 }
 
 /**
@@ -752,9 +751,9 @@ uint PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString &key)
 void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
 {
     QMutexLocker locker(&m_lock);
-    m_previewMap[key].attempts = 0;
-    m_previewMap[key].lastBlockTime = 0;
-    m_previewMap[key].blockRetryUntil =
+    m_previewMap[key].m_attempts = 0;
+    m_previewMap[key].m_lastBlockTime = 0;
+    m_previewMap[key].m_blockRetryUntil =
         MythDate::current().addSecs(-60);
 }
 

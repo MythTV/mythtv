@@ -25,55 +25,10 @@ static inline QString null_to_empty(const QString &str)
 // versions to lose those settings.
 
 RecordingRule::RecordingRule()
-  : m_recordID(-1), m_parentRecID(0),
-    m_isInactive(false),
-    m_season(0),
-    m_episode(0),
-    m_starttime(),
-    m_startdate(),
-    m_endtime(),
-    m_enddate(),
-    m_inetref(), // String could be null when we trying to insert into DB
-    m_channelid(0),
-    m_findday(0),
-    m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
+  : m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
     m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
              + 719528),
-    m_type(kNotRecording),
-    m_searchType(kNoSearch),
-    m_recPriority(0),
-    m_prefInput(0),
-    m_startOffset(0),
-    m_endOffset(0),
-    m_dupMethod(kDupCheckSubThenDesc),
-    m_dupIn(kDupsInAll),
-    m_filter(0),
-    m_recProfile(tr("Default")),
-    m_recGroupID(RecordingInfo::kDefaultRecGroup),
-    m_storageGroup("Default"),
-    m_playGroup("Default"),
-    m_autoExpire(false),
-    m_maxEpisodes(0),
-    m_maxNewest(false),
-    m_autoCommFlag(true),
-    m_autoTranscode(false),
-    m_transcoder(RecordingProfile::TranscoderAutodetect),
-    m_autoUserJob1(false),
-    m_autoUserJob2(false),
-    m_autoUserJob3(false),
-    m_autoUserJob4(false),
-    m_autoMetadataLookup(true),
-    m_nextRecording(),
-    m_lastRecorded(),
-    m_lastDeleted(),
-    m_averageDelay(100),
-    m_recordTable("record"),
-    m_tempID(0),
-    m_isOverride(false),
-    m_isTemplate(false),
-    m_template(),
-    m_progInfo(nullptr),
-    m_loaded(false)
+    m_transcoder(RecordingProfile::TranscoderAutodetect)
 {
     QDateTime dt = MythDate::current();
     m_enddate = m_startdate = dt.date();

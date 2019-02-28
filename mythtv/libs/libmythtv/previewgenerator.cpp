@@ -73,11 +73,9 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    const QString     &token,
                                    PreviewGenerator::Mode mode)
     : MThread("PreviewGenerator"),
-      m_programInfo(*pginfo), m_mode(mode), m_listener(nullptr),
+      m_programInfo(*pginfo), m_mode(mode),
       m_pathname(pginfo->GetPathname()),
-      m_timeInSeconds(true),  m_captureTime(-1),
-      m_outSize(0,0),  m_outFormat("PNG"),
-      m_token(token), m_gotReply(false), m_pixmapOk(false)
+      m_token(token)
 {
     // Qt requires that a receiver have the same thread affinity as the QThread
     // sending the event, which is used to dispatch MythEvents sent by

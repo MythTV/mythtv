@@ -29,33 +29,32 @@ typedef enum AVContainerFormats
 class MTV_PUBLIC RecordingFile
 {
   public:
-    RecordingFile();
+    RecordingFile() = default;
    ~RecordingFile() = default;
 
     bool Load();
     bool Save();
 
-    uint m_recordingId;
+    uint        m_recordingId      {0};
 
-    QString m_storageDeviceID; // aka Hostname in old parlance
-    QString m_storageGroup;
+    QString     m_storageDeviceID; // aka Hostname in old parlance
+    QString     m_storageGroup;
 
-    uint m_fileId;
-    QString m_fileName;
-    uint64_t m_fileSize;
+    uint        m_fileId           {0};
+    QString     m_fileName;
+    uint64_t    m_fileSize         {0};
 
-    AVContainer m_containerFormat;
+    AVContainer m_containerFormat  {formatUnknown};
 
-    QString m_videoCodec; // ff_codec_id_string
-    QSize m_videoResolution;
-    double m_videoAspectRatio;
-    double m_videoFrameRate;
-    //int   m_videoBitrate;
+    QString     m_videoCodec; // ff_codec_id_string
+    QSize       m_videoResolution;
+    double      m_videoAspectRatio {0.0};
+    double      m_videoFrameRate   {0.0};
 
-    QString m_audioCodec; // Main audio stream or best quality stream?
-    int m_audioChannels;
-    double m_audioSampleRate;
-    int m_audioBitrate;
+    QString     m_audioCodec; // Main audio stream or best quality stream?
+    int         m_audioChannels    {0};
+    double      m_audioSampleRate  {0.0};
+    int         m_audioBitrate     {0};
 
     static QString AVContainerToString(AVContainer format);
     static AVContainer AVContainerFromString(const QString &formatStr);

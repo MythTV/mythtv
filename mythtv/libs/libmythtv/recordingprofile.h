@@ -90,12 +90,12 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     // sets
     void setCodecTypes();
     void setName(const QString& newName) override // StandardSetting
-        { name->setValue(newName); }
+        { m_name->setValue(newName); }
 
     // gets
-    const ImageSize& getImageSize(void) const { return *imageSize;       }
-    int     getProfileNum(void)         const { return id->getValue().toInt(); }
-    QString getName(void)               const { return name->getValue(); }
+    const ImageSize& getImageSize(void) const { return *m_imageSize;       }
+    int     getProfileNum(void)         const { return m_id->getValue().toInt(); }
+    QString getName(void)               const { return m_name->getValue(); }
     QString groupType(void)             const;
 
     // static functions
@@ -135,18 +135,18 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     void FiltersChanged(const QString &val);
 
   private:
-    ID                       *id;
-    Name                     *name;
-    ImageSize                *imageSize;
-    TranscodeResize          *tr_resize;
-    TranscodeLossless        *tr_lossless;
-    TranscodeFilters         *tr_filters;
-    VideoCompressionSettings *videoSettings;
-    AudioCompressionSettings *audioSettings;
-    QString                   profileName;
-    bool                      isEncoder;
+    ID                       *m_id            {nullptr};
+    Name                     *m_name          {nullptr};
+    ImageSize                *m_imageSize     {nullptr};
+    TranscodeResize          *m_trResize      {nullptr};
+    TranscodeLossless        *m_trLossless    {nullptr};
+    TranscodeFilters         *m_trFilters     {nullptr};
+    VideoCompressionSettings *m_videoSettings {nullptr};
+    AudioCompressionSettings *m_audioSettings {nullptr};
+    QString                   m_profileName;
+    bool                      m_isEncoder     {true};
 
-    V4L2util                 *v4l2util;
+    V4L2util                 *m_v4l2util      {nullptr};
 };
 
 class RecordingProfileEditor :
