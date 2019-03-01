@@ -175,7 +175,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         }
         else if (query.next())
         {
-            uint nitid = query.value(0).toInt();
+            int nitid = query.value(0).toInt();
             data->SetRealNetworkID(nitid);
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Setting NIT-ID to %1").arg(nitid));
