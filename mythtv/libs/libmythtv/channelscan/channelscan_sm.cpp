@@ -971,7 +971,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         }
 
         SignalMonitor *sm = GetSignalMonitor();
-        if ((m_timer.elapsed() > (int)m_channelTimeout))
+        if (HasTimedOut())
         {
             msg_tr = (cchan_cnt) ?
                 QObject::tr("%1 possible channels").arg(cchan_cnt) :
