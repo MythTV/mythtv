@@ -896,13 +896,17 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         {
             m_currentInfo->m_program_encryption_status[it.key()] = *it;
 
-            QString msg_tr1 = QObject::tr("Program %1").arg(it.key());
-            QString msg_tr2 = QObject::tr("Unknown decryption status");
-            if (kEncEncrypted == *it)
-                msg_tr2 = QObject::tr("Encrypted");
-            else if (kEncDecrypted == *it)
-                msg_tr2 = QObject::tr("Decrypted");
-            QString msg_tr =QString("%1, %2").arg(msg_tr1).arg(msg_tr2);
+            if (m_testDecryption)
+            {
+                QString msg_tr1 = QObject::tr("Program %1").arg(it.key());
+                QString msg_tr2 = QObject::tr("Unknown decryption status");
+                if (kEncEncrypted == *it)
+                    msg_tr2 = QObject::tr("Encrypted");
+                else if (kEncDecrypted == *it)
+                    msg_tr2 = QObject::tr("Decrypted");
+                QString msg_tr =QString("%1, %2").arg(msg_tr1).arg(msg_tr2);
+                m_scanMonitor->ScanAppendTextToLog(msg_tr);
+            }
 
             QString msg = LOC + QString("Program %1").arg(it.key());
             if (kEncEncrypted == *it)
@@ -912,7 +916,6 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             else if (kEncUnknown == *it)
                 msg = msg + " -- Unknown decryption status";
 
-            m_scanMonitor->ScanAppendTextToLog(msg_tr);
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
     }
