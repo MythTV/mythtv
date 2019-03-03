@@ -21,7 +21,7 @@ void conv2latin(unsigned char *p, int n, int lang);
 
 void init_enhance(struct enhance *eh);
 void add_enhance(struct enhance *eh, int dcode, unsigned int *data);
-void enhance(struct enhance *eh, struct vt_page *vtp);
+void do_enhancements(struct enhance *eh, struct vt_page *vtp);
 
 #ifdef __cplusplus
 }
