@@ -106,6 +106,6 @@ class OpenGLVideo : public QObject
     MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
     bool           m_resizing;
     bool           m_forceResize;         ///< Global setting to force a resize stage
-    bool           m_forceRectangles;     ///< Some interops may require rectangular textures
+    GLenum         m_textureTarget;       ///< Some interops require custom texture targets
 };
 #endif // _OPENGL_VIDEO_H__

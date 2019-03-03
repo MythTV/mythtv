@@ -60,7 +60,7 @@ class MUI_PUBLIC MythGLTexture
     QRect           m_source                  { QRect() };
     QRect           m_destination             { QRect() };
     GLfloat         m_vertexData[16]          { 0.0f };
-    bool            m_normalised              { true };
+    GLenum          m_target                  { QOpenGLTexture::Target2D };
 
   private:
     Q_DISABLE_COPY(MythGLTexture)

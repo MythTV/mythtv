@@ -46,7 +46,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_copyCtx(),
     m_resizing(false),
     m_forceResize(false),
-    m_forceRectangles(false)
+    m_textureTarget(QOpenGLTexture::Target2D)
 {
     memset(m_shaders, 0, sizeof(m_shaders));
     memset(m_shaderCost, 1, sizeof(m_shaderCost));
@@ -393,7 +393,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     fragment.replace("SELECT_COLUMN", (kGLUYVY == frametype) ? SelectColumn : "");
     // update packing code so this can be removed
     fragment.replace("%SWIZZLE%", kGLUYVY == frametype ? "arb" : "abr");
-    if (m_forceRectangles)
+    if (m_textureTarget == QOpenGLTexture::TextureRectangle)
     {
         // N.B. Currently only NV12 shaders are supported and deinterlacing parameters
         // need fixing as well (when interop deinterlacing is fixed)
@@ -401,6 +401,12 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         fragment.replace("sampler2D", "sampler2DRect");
         fragment.replace("texture2D", "texture2DRect");
         fragment.prepend("#extension GL_ARB_texture_rectangle : enable\n");
+    }
+    else if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
+    {
+        fragment.replace("%NV12_UV_RECT%", "");
+        fragment.replace("sampler2D", "samplerExternalOES");
+        fragment.prepend("#extension GL_OES_EGL_image_external : require\n");
     }
     else
     {
@@ -573,18 +579,19 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         if (count)
         {
             FrameType newinteroptype = (count == 3) ? kGLYV12 : (count == 2) ? kGLNV12 : kGLInterop; // << HACK ALERT
-            bool newrectangles = !inputtextures[0]->m_normalised;
-            if ((m_interopFrameType != newinteroptype) || (m_forceRectangles != newrectangles))
+            GLenum newtarget = inputtextures[0]->m_target;
+            if ((m_interopFrameType != newinteroptype) || (m_textureTarget != newtarget))
             {
                 QSize newsize = inputtextures[0]->m_size;
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
-                    QString("Interop change %1 %2x%3 (Rects: %4) -> %5 %6x%7 (Rects: %8)")
+                    QString("Interop change %1 %2x%3 (Type: %4) -> %5 %6x%7 (Type: %8)")
                     .arg(TypeToString(m_interopFrameType)).arg(m_inputTextureSize.width())
-                    .arg(m_inputTextureSize.height()).arg(m_forceRectangles)
+                    .arg(m_inputTextureSize.height()).arg(m_textureTarget)
                     .arg(TypeToString(newinteroptype)).arg(newsize.width())
-                    .arg(newsize.height()).arg(newrectangles));
+                    .arg(newsize.height()).arg(newtarget));
                 m_interopFrameType = newinteroptype;
-                m_forceRectangles  = newrectangles;
+                m_textureTarget  = newtarget;
+                CreateVideoShader(Default);
                 CreateVideoShader(Progressive);
                 UpdateColourSpace();
                 UpdateShaderParameters();

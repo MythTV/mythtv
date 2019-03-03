@@ -13,6 +13,10 @@
 #define GL_ALL_COMPLETED_NV               0x84F2
 #endif
 
+#ifndef GL_TEXTURE_EXTERNAL_OES
+#define GL_TEXTURE_EXTERNAL_OES 0x8D65
+#endif
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif

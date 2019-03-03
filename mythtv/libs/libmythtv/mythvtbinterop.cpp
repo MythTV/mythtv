@@ -215,7 +215,7 @@ vector<MythGLTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
         MythGLTexture* texture = m_context->CreateExternalTexture(size, false);
         if (!texture)
             continue;
-        texture->m_normalised = false;
+        texture->m_target = QOpenGLTexture::TargetRectangle;
         m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
         m_context->glBindTexture(QOpenGLTexture::TargetRectangle, texture->m_textureId);
 
