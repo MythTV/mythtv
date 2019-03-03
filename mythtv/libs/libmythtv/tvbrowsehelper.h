@@ -110,24 +110,24 @@ class TVBrowseHelper : public MThread
 
     void run() override; // MThread
 
-    TV               *m_tv;
-    ChannelInfoList   db_all_channels;
-    ChannelInfoList   db_all_visible_channels;
-    uint              db_browse_max_forward;
-    bool              db_browse_all_tuners;
-    bool              db_use_channel_groups;
-    QHash<uint,QString>     db_chanid_to_channum;
-    QHash<uint,uint>        db_chanid_to_sourceid;
-    QMultiMap<QString,uint> db_channum_to_chanids;
+    TV                      *m_tv        {nullptr};
+    ChannelInfoList          m_dbAllChannels;
+    ChannelInfoList          m_dbAllVisibleChannels;
+    uint                     m_dbBrowseMaxForward;
+    bool                     m_dbBrowseAllTuners;
+    bool                     m_dbUseChannelGroups;
+    QHash<uint,QString>      m_dbChanidToChannum;
+    QHash<uint,uint>         m_dbChanidToSourceid;
+    QMultiMap<QString,uint>  m_dbChannumToChanids;
 
-    mutable QMutex    m_lock; // protects variables below
-    PlayerContext    *m_ctx;
-    QString           m_channum;
-    uint              m_chanid;
-    QString           m_starttime;
-    bool              m_run;
-    QWaitCondition    m_wait;
-    QList<BrowseInfo> m_list;
+    mutable QMutex           m_lock; // protects variables below
+    PlayerContext           *m_ctx       {nullptr};
+    QString                  m_channum;
+    uint                     m_chanid    {0};
+    QString                  m_starttime;
+    bool                     m_run       {true};
+    QWaitCondition           m_wait;
+    QList<BrowseInfo>        m_list;
 };
 
 #endif // _TV_BROWSE_HELPER_H_
