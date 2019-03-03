@@ -2,7 +2,7 @@
 #define OPENGLVIDEOSHADERS_H
 
 #define SAMPLE_NV12 "\
-vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n\
+highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n\
 {\n\
     highp vec3 yuv;\n\
     yuv.r  = texture2D(texture1, texcoord).r;\n\
@@ -285,7 +285,7 @@ static const QString DefaultFragmentShader =
 "}\n";
 
 #define SAMPLEYVU "\
-vec3 sampleYVU(in sampler2D texture1, in sampler2D texture2, in sampler2D texture3, highp vec2 texcoord)\n\
+highp vec3 sampleYVU(in sampler2D texture1, in sampler2D texture2, in sampler2D texture3, highp vec2 texcoord)\n\
 {\n\
     highp vec3 yvu;\n\
     yvu.r = texture2D(texture1, texcoord).r;\n\
