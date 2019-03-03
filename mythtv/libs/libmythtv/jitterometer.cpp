@@ -1,10 +1,8 @@
-#include <sys/time.h>
-#include <cstdlib>
-#include <cmath>
-
+// MythTV
 #include "mythlogging.h"
 #include "jitterometer.h"
 
+// Std
 #define UNIX_PROC_STAT "/proc/stat"
 #define MAX_CORES 8
 
@@ -24,7 +22,8 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
     if (m_name.isEmpty())
         m_name = "Jitterometer";
 
-#ifdef __linux__
+#if defined(__linux__) || defined(Q_OS_ANDROID)
+    // N.B. Access to /proc/stat was revoked on Android for API >=26 (Oreo)
     if (QFile::exists(UNIX_PROC_STAT))
     {
         m_cpustat = new QFile(UNIX_PROC_STAT);
@@ -148,49 +147,48 @@ QString Jitterometer::GetCPUStat(void)
 {
     QString result = "N/A";
 
-#ifdef __linux__
-    if (!m_cpustat)
-        return result;
-
-    QString res;
-    m_cpustat->seek(0);
-    m_cpustat->flush();
-
-    QByteArray line = m_cpustat->readLine(256);
-    if (line.isEmpty())
-        return res;
-
-    int cores = 0;
-    int ptr   = 0;
-    line = m_cpustat->readLine(256);
-    while (!line.isEmpty() && cores < MAX_CORES)
+#if defined(__linux__) || defined(Q_OS_ANDROID)
+    if (m_cpustat)
     {
-        static const int size = sizeof(unsigned long long) * 9;
-        unsigned long long stats[9];
-        memset(stats, 0, size);
-        int num = 0;
-        if (sscanf(line.constData(),
-                   "cpu%30d %30llu %30llu %30llu %30llu %30llu "
-                   "%30llu %30llu %30llu %30llu %*5000s\n",
-                   &num, &stats[0], &stats[1], &stats[2], &stats[3],
-                   &stats[4], &stats[5], &stats[6], &stats[7], &stats[8]) >= 4)
-        {
-            float load  = stats[0] + stats[1] + stats[2] + stats[4] +
-                          stats[5] + stats[6] + stats[7] + stats[8] -
-                          m_laststats[ptr + 0] - m_laststats[ptr + 1] -
-                          m_laststats[ptr + 2] - m_laststats[ptr + 4] -
-                          m_laststats[ptr + 5] - m_laststats[ptr + 6] -
-                          m_laststats[ptr + 7] - m_laststats[ptr + 8];
-            float total = load + stats[3] - m_laststats[ptr + 3];
-            if (total > 0)
-                res += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
-            memcpy(&m_laststats[ptr], stats, size);
-        }
+        m_cpustat->seek(0);
+        m_cpustat->flush();
+
+        QByteArray line = m_cpustat->readLine(256);
+        if (line.isEmpty())
+            return result;
+
+        result = "";
+        int cores = 0;
+        int ptr   = 0;
         line = m_cpustat->readLine(256);
-        cores++;
-        ptr += 9;
+        while (!line.isEmpty() && cores < MAX_CORES)
+        {
+            static const int size = sizeof(unsigned long long) * 9;
+            unsigned long long stats[9];
+            memset(stats, 0, size);
+            int num = 0;
+            if (sscanf(line.constData(),
+                       "cpu%30d %30llu %30llu %30llu %30llu %30llu "
+                       "%30llu %30llu %30llu %30llu %*5000s\n",
+                       &num, &stats[0], &stats[1], &stats[2], &stats[3],
+                       &stats[4], &stats[5], &stats[6], &stats[7], &stats[8]) >= 4)
+            {
+                float load  = stats[0] + stats[1] + stats[2] + stats[4] +
+                              stats[5] + stats[6] + stats[7] + stats[8] -
+                              m_laststats[ptr + 0] - m_laststats[ptr + 1] -
+                              m_laststats[ptr + 2] - m_laststats[ptr + 4] -
+                              m_laststats[ptr + 5] - m_laststats[ptr + 6] -
+                              m_laststats[ptr + 7] - m_laststats[ptr + 8];
+                float total = load + stats[3] - m_laststats[ptr + 3];
+                if (total > 0)
+                    result += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
+                memcpy(&m_laststats[ptr], stats, size);
+            }
+            line = m_cpustat->readLine(256);
+            cores++;
+            ptr += 9;
+        }
     }
-    return res;
 #endif
 
 #ifdef Q_OS_MACOS
