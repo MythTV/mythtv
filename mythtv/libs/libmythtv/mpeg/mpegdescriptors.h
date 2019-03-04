@@ -271,6 +271,8 @@ class MTV_PUBLIC MPEGDescriptor
 
   protected:
     const unsigned char *_data;
+
+  public:
     QString hexdump(void) const;
 };
 

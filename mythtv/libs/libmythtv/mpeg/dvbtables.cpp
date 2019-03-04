@@ -128,8 +128,28 @@ QString ServiceDescriptionTable::toString(void) const
                 MPEGDescriptor::Parse(ServiceDescriptors(i),
                                       ServiceDescriptorsLength(i));
             for (uint j = 0; j < desc.size(); j++)
-                str.append(QString("    %1\n")
-                           .arg(MPEGDescriptor(desc[j]).toString()));
+            {
+                // Descriptors 0x80 to 0xFE are user defined, see
+                // Final draft ETSI EN 300 468 v1.13.1 (2012-04)
+                // Table 12: "Possible location of descriptors", page 33)
+                if(MPEGDescriptor(desc[j]).DescriptorTag() < 0x80)
+                {
+                    str.append(QString("    %1\n")
+                               .arg(MPEGDescriptor(desc[j]).toString()));
+                }
+                else
+                {
+                    QString udd = "Invalid Descriptor";
+                    if (MPEGDescriptor(desc[j]).IsValid())
+                    {
+                        udd = QString("User Defined Descriptor (0x%1) length(%2). Dumping\n")
+                            .arg(MPEGDescriptor(desc[j]).DescriptorTag(),2,16,QChar('0'))
+                            .arg(MPEGDescriptor(desc[j]).DescriptorLength());
+                        udd.append(MPEGDescriptor(desc[j]).hexdump());
+                    }
+                    str.append(QString("    %1\n").arg(udd));
+                }
+            }
         }
     }
     return str;
