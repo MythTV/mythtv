@@ -2533,7 +2533,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                     QString("Waited %1ms for video buffers %2")
                         .arg(waited_for).arg(videoOutput->GetFrameStatus()));
             buffering_last_msg = QTime::currentTime();
-            if (audio.GetAudioBufferedTime() > 2000 && framesPlayed < 5
+            if (audio.IsBufferAlmostFull() && framesPlayed < 5
                 && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
             {
                 playerFlags = (PlayerFlags)(playerFlags | kMusicChoice);
