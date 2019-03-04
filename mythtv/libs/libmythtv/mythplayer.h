@@ -858,6 +858,7 @@ class MTV_PUBLIC MythPlayer
     int       numdroppedframes; // number of consecutive dropped frames.
     int64_t   prior_audiotimecode;    // time code from prior frame
     int64_t   prior_videotimecode;    // time code from prior frame
+    int64_t   m_timeOffsetBase;
 
     // LiveTV
     TV *m_tv;

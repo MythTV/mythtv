@@ -225,6 +225,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       numdroppedframes(0),
       prior_audiotimecode(0),
       prior_videotimecode(0),
+      m_timeOffsetBase(0),
       // LiveTVChain stuff
       m_tv(nullptr),                isDummy(false),
       // Counter for buffering messages
@@ -2231,6 +2232,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             maxtcval = 0;
             maxtcframes = 0;
             numdroppedframes = 0;
+            m_timeOffsetBase = TranslatePositionFrameToMs(framesPlayed, false) - videotimecode;
         }
 
         if (videotimecode == 0)
@@ -2251,6 +2253,10 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             framedue = rtcbase + videotimecode * playspeed1000;
         else
             framedue = unow + frame_interval / 2;
+
+        // recalculate framesPlayed to conform to actual time code.
+        framesPlayed = TranslatePositionMsToFrame(videotimecode + m_timeOffsetBase, false);
+        decoder->SetFramesPlayed(framesPlayed);
 
         lateness = unow - framedue;
         dropframe = false;
