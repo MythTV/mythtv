@@ -3,6 +3,10 @@
 #include "jitterometer.h"
 
 // Std
+#include <sys/time.h>
+#include <cstdlib>
+#include <cmath>
+
 #define UNIX_PROC_STAT "/proc/stat"
 #define MAX_CORES 8
 
