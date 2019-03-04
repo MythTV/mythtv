@@ -7,9 +7,11 @@
 #ifdef USING_GLVAAPI
 #include "mythvaapiinterop.h"
 #endif
-
 #ifdef USING_VTB
 #include "mythvtbinterop.h"
+#endif
+#ifdef USING_MEDIACODEC
+#include "mythmediacodeccontext.h"
 #endif
 
 #define LOC QString("OpenGLInterop: ")
@@ -21,6 +23,7 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     if (InteropType == VAAPIGLXCOPY) return "VAAPI GLX Copy";
     if (InteropType == VTBOPENGL)    return "VTB OpenGL";
     if (InteropType == VTBSURFACE)   return "VTB IOSurface";
+    if (InteropType == MEDIACODEC)   return "MediaCodec Surface";
     return "Unsupported";
 }
 
@@ -35,6 +38,10 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
 #endif
 #ifdef USING_VTB
     else if (codec_is_vtb(CodecId) && (GetInteropType(CodecId) != Unsupported))
+        result << "opengl-hw";
+#endif
+#ifdef USING_MEDIACODEC
+    else if (codec_is_mediacodec(CodecId) /*&& (GetInteropType(CodecId) != Unsupported)*/)
         result << "opengl-hw";
 #endif
     return result;
@@ -56,6 +63,10 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
 #ifdef USING_GLVAAPI
     if (codec_is_vaapi(CodecId))
         supported = MythVAAPIInterop::GetInteropType(CodecId);
+#endif
+#ifdef USING_MEDIACODEC
+    if (codec_is_mediacodec(CodecId))
+        supported = MEDIACODEC;
 #endif
 
     if (Unsupported == supported)
@@ -86,13 +97,18 @@ vector<MythGLTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if ((Frame->codec == FMT_VAAPI) && (Frame->pix_fmt == AV_PIX_FMT_VAAPI))
         validhwcodec = true;
 #endif
+#ifdef USING_MEDIACODEC
+    if ((Frame->codec == FMT_MEDIACODEC) && (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC))
+        validhwcodec = true;
+#endif
+
     if (!(validhwframe && validhwcodec))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not a valid hardware frame");
         return result;
     }
 
-    if (Frame->codec == FMT_VTB)
+    if ((Frame->codec == FMT_VTB) || (Frame->codec == FMT_MEDIACODEC))
     {
         interop = reinterpret_cast<MythOpenGLInterop*>(Frame->priv[1]);
     }

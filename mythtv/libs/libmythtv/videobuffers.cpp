@@ -146,6 +146,7 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat)
         case FMT_VAAPI: return 24;
         case FMT_DXVA2: return 30;
         case FMT_YV12:  return 31;
+        case FMT_MEDIACODEC: return 8;
         default: break;
     }
     return 30;
@@ -281,6 +282,15 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
         if (ref)
             CFRelease(ref);
         Frame->buf = nullptr;
+    }
+#endif
+#ifdef USING_MEDIACODEC
+    if (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC)
+    {
+        AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
+        if (ref)
+            av_buffer_unref(&ref);
+        Frame->buf = Frame->priv[0] = nullptr;
     }
 #endif
     (void)Frame;

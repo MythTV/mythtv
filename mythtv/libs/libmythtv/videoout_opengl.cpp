@@ -70,7 +70,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     (*Options.osds)["opengl-yv12"].append("opengl2");
     Options.priorities->insert("opengl-yv12", 65);
 
-#if defined(USING_VAAPI) || defined (USING_VTB)
+#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC)
     Options.renderers->append("opengl-hw");
     (*Options.deints)["opengl-hw"].append("none");
     (*Options.osds)["opengl-hw"].append("opengl2");
@@ -85,6 +85,10 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
 #ifdef USING_VTB
     if (Options.decoders->contains("vtb"))
         (*Options.safe_renderers)["vtb"].append("opengl-hw");
+#endif
+#ifdef USING_MEDIACODEC
+    if (Options.decoders->contains("mediacodec"))
+        (*Options.safe_renderers)["mediacodec"].append("opengl-hw");
 #endif
 }
 
@@ -388,6 +392,15 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     if (codec_is_mediacodec_dec(video_codec_id))
     {
         vbuffers.Init(8, false, 1, 4, 2, 1);
+    }
+    else if (codec_is_mediacodec(video_codec_id))
+    {
+        uint size = VideoBuffers::GetNumBuffers(FMT_MEDIACODEC);
+        vbuffers.Init(size, false, 1, 2, 2, 1);
+        bool success = true;
+        for (uint i = 0; i < size; i++)
+            success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_MEDIACODEC);
+        return success;
     }
     else if (codec_is_vaapi(video_codec_id))
     {

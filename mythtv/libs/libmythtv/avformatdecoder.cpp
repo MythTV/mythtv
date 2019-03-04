@@ -64,6 +64,7 @@ extern "C" {
 
 #ifdef USING_MEDIACODEC
 #include "mediacodeccontext.h"
+#include "mythmediacodeccontext.h"
 extern "C" {
 #include "libavcodec/jni.h"
 }
@@ -411,6 +412,8 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["nvdec-dec"].append("dummy");
 #endif
 #ifdef USING_MEDIACODEC
+    opts.decoders->append("mediacodec");
+    (*opts.equiv_decoders)["mediacodec"].append("dummy");
     opts.decoders->append("mediacodec-dec");
     (*opts.equiv_decoders)["mediacodec-dec"].append("dummy");
 #endif
@@ -1657,8 +1660,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_MEDIACODEC
     if (CODEC_IS_MEDIACODEC(codec1))
     {
-        enc->get_format      = get_format_mediacodec;
-        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        if (codec_is_mediacodec(m_video_codec_id))
+            enc->get_format = MythMediaCodecContext::GetFormat;
+        else
+            enc->get_format = get_format_mediacodec;
+        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
 #endif
@@ -2596,6 +2602,22 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 #endif // USING_DXVA2
 #ifdef USING_MEDIACODEC
+                if (!foundgpudecoder)
+                {
+                    MythCodecID mediacodecmcid;
+                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
+                    mediacodecmcid = MythMediaCodecContext::GetBestSupportedCodec(enc, &codec,
+                                                      dec, mpeg_version(enc->codec_id), pixfmt);
+
+                    if (codec_is_mediacodec(mediacodecmcid))
+                    {
+                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
+                        m_video_codec_id = mediacodecmcid;
+                        foundgpudecoder = true;
+                    }
+                }
+
                 if (!foundgpudecoder)
                 {
                     MythCodecID mediacodec_mcid;
@@ -3696,7 +3718,6 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 #define RETRY_WAIT_TIME 10000   // microseconds
 bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
-    int retryCount = 0;
     int ret = 0, gotpicture = 0;
     AVCodecContext *context = gCodecMap->getCodecContext(curstream);
     MythAVFrame mpa_pic;
@@ -3711,6 +3732,8 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
     bool tryAgain = true;
     bool sentPacket = false;
+    QElapsedTimer timeout;
+    timeout.start();
     int ret2 = 0;
     while (tryAgain)
     {
@@ -3797,14 +3820,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
         if (tryAgain)
         {
-            if (++retryCount > PACKET_MAX_RETRIES)
+            if (timeout.elapsed() > PACKET_MAX_RETRIES)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("ERROR: Video decode buffering retries exceeded maximum"));
+                    "Error: Timed out waiting for video decode buffering");
                 return false;
             }
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Video decode buffering retry"));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video decode buffering retry"));
             usleep(RETRY_WAIT_TIME);
         }
     }
@@ -4052,6 +4074,11 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         // VideoToolBox does not call get_buffer2 - so initialise the frame now
         if (mpa_pic->format == AV_PIX_FMT_VIDEOTOOLBOX)
             if (MythVTBContext::InitialiseBuffer(context, mpa_pic, 0) >= 0)
+                picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
+#endif
+#ifdef USING_MEDIACODEC
+        if (mpa_pic->format == AV_PIX_FMT_MEDIACODEC)
+            if (MythMediaCodecContext::GetBuffer(context, mpa_pic, 0) >= 0)
                 picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
 #endif
         if (!picframe)
