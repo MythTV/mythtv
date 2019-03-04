@@ -1822,6 +1822,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
     {
         GetDTVSignalMonitor()->GetScanStreamData()->Reset();
         GetDTVSignalMonitor()->SetChannel(-1,-1);
+        GetDTVSignalMonitor()->SetDVBService(0, 0, -1);
     }
 
     // Start signal monitor for this channel
