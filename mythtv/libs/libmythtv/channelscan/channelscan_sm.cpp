@@ -1309,6 +1309,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // NIT
     QMap<qlonglong, uint> ukChanNums;
+    QMap<qlonglong, uint> scnChanNums;
     QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
@@ -1338,18 +1339,40 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                           nit->TransportDescriptorsLength(i));
 
-                const unsigned char *desc =
-                    MPEGDescriptor::Find(
-                        list, PrivateDescriptorID::dvb_logical_channel_descriptor);
-
-                if (desc)
+                // Logical channel numbers
                 {
-                    DVBLogicalChannelDescriptor uklist(desc);
-                    for (uint j = 0; j < uklist.ChannelCount(); ++j)
+                    const unsigned char *desc =
+                        MPEGDescriptor::Find(
+                            list, PrivateDescriptorID::dvb_logical_channel_descriptor);
+
+                    if (desc)
                     {
-                        ukChanNums[((qlonglong)info.m_orig_netid<<32) |
-                                   uklist.ServiceID(j)] =
-                            uklist.ChannelNumber(j);
+                        DVBLogicalChannelDescriptor uklist(desc);
+                        for (uint j = 0; j < uklist.ChannelCount(); ++j)
+                        {
+                            ukChanNums[((qlonglong)info.m_orig_netid<<32) |
+                                    uklist.ServiceID(j)] =
+                                uklist.ChannelNumber(j);
+                        }
+                    }
+                }
+
+                // HD Simulcast logical channel numbers
+                {
+                    const unsigned char *desc =
+                        MPEGDescriptor::Find(
+                            list, PrivateDescriptorID::dvb_simulcast_channel_descriptor);
+
+                    if (desc)
+                    {
+                        DVBSimulcastChannelDescriptor scnlist(desc);
+
+                        for (uint j = 0; j < scnlist.ChannelCount(); ++j)
+                        {
+                            scnChanNums[((qlonglong)info.m_orig_netid<<32) |
+                                        scnlist.ServiceID(j)] =
+                                 scnlist.ChannelNumber(j);
+                        }
                     }
                 }
             }
@@ -1367,11 +1390,30 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
         if (iptv_channel.isEmpty()) // DVB Logical channel numbers (LCN)
         {
-            QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
-                       (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
+            {
+                // Look for a logical channel number in the HD simulcast channel numbers.
+                // This gives the correct channel number when HD and SD versions of the same
+                // channel are simultaneously broadcast and the receiver is capable
+                // of receiving the HD signal.
+                QMap<qlonglong, uint>::const_iterator it = scnChanNums.find
+                        (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
 
-            if (it != ukChanNums.end())
-                info.m_chan_num = QString::number(*it);
+                if (it != scnChanNums.end())
+                {
+                    info.m_chan_num = QString::number(*it);
+                    continue;
+                }
+            }
+            {
+                // If there is no simulcast for this channel then descriptor 0x83
+                // gives the logical channel number. This can be either an SD
+                // or an HD channel.
+                QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
+                        (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
+
+                if (it != ukChanNums.end())
+                    info.m_chan_num = QString::number(*it);
+            }
         }
         else // IPTV programs
         {
