@@ -3669,6 +3669,15 @@ void MythPlayer::DecoderStart(bool start_paused)
 
 void MythPlayer::DecoderEnd(void)
 {
+    // FIXME Hopefully temporary
+    // MediaCodec surface rendering will block waiting for
+    // free output buffers. Release them to prevent a deadlock
+    // or lengthy wait
+    vidExitLock.lock();
+    if (videoOutput)
+        videoOutput->DiscardFrames(false);
+    vidExitLock.unlock();
+
     PauseDecoder();
     SetPlaying(false);
     killdecoder = true;
