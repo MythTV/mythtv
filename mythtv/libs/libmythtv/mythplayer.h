@@ -625,6 +625,7 @@ class MTV_PUBLIC MythPlayer
     int64_t AVSyncGetAudiotime(void);
     void  SetFrameInterval(FrameScanType scan, double speed);
     void  FallbackDeint(void);
+    void WaitForTime(int64_t framedue);
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);
@@ -711,6 +712,7 @@ class MTV_PUBLIC MythPlayer
     int64_t   totalDuration;
     long long rewindtime;
     int64_t   m_latestVideoTimecode;
+    QElapsedTimer m_avTimer;
 
     // -- end state stuff --
 

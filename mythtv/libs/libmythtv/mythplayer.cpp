@@ -271,6 +271,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
         avsync2adjustms = 1;
     if (avsync2adjustms > 40)
         avsync2adjustms = 40;
+    m_avTimer.start();
 }
 
 MythPlayer::~MythPlayer(void)
@@ -2168,12 +2169,9 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     }
 }
 
-static void wait_for_time(int64_t framedue);
-
-void wait_for_time(int64_t framedue)
+void MythPlayer::WaitForTime(int64_t framedue)
 {
-    QDateTime now = QDateTime::currentDateTimeUtc();
-    int64_t unow = now.toMSecsSinceEpoch() * 1000;
+    int64_t unow = m_avTimer.nsecsElapsed() / 1000;
     int64_t delay = framedue - unow;
     if (delay > 0)
         QThread::usleep(delay);
@@ -2195,7 +2193,6 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     bool pause_audio = false;
     int64_t framedue = 0;
     int64_t audio_adjustment = 0;
-    QDateTime now;
     int64_t unow = 0;
     int64_t lateness = 0;
     int64_t playspeed1000 = (float)1000 / play_speed;
@@ -2211,8 +2208,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 videotimecode = maxtcval;
         }
 
-        now = QDateTime::currentDateTimeUtc();
-        unow = now.toMSecsSinceEpoch() * 1000;
+        unow = m_avTimer.nsecsElapsed() / 1000;
 
         if (!normal_speed || FlagIsSet(kMusicChoice))
         {
@@ -2356,7 +2352,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         // Don't wait for sync if this is a secondary PBP otherwise
         // the primary PBP will become out of sync
         if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
-            wait_for_time(framedue);
+            WaitForTime(framedue);
         // get time codes for calculating difference next time
         prior_audiotimecode = audio.GetAudioTime();
         videoOutput->Show(ps);
@@ -2387,13 +2383,13 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
             {
                 int64_t due = framedue + frame_interval / 2;
-                wait_for_time(due);
+                WaitForTime(due);
             }
             videoOutput->Show(ps);
         }
     }
     else
-        wait_for_time(framedue);
+        WaitForTime(framedue);
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
