@@ -222,7 +222,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
 {
     if (m_render)
     {
-        // Drawing an multiple times with the same VBO will stall most GPUs as
+        // Drawing an image  multiple times with the same VBO will stall most GPUs as
         // the VBO is re-mapped whilst still in use. Use a pooled VBO instead.
         MythGLTexture *texture = GetTextureFromCache(Image);
         if (texture && m_mappedTextures.contains(texture))
@@ -231,6 +231,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
             texture->m_vbo = m_mappedBufferPool.dequeue();
             texture->m_destination = QRect();
             m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
+            texture->m_destination = QRect();
             m_mappedBufferPool.enqueue(texture->m_vbo);
             texture->m_vbo = vbo;
         }
