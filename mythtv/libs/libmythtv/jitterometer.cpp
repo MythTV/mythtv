@@ -3,7 +3,6 @@
 #include "jitterometer.h"
 
 // Std
-#include <sys/time.h>
 #include <cstdlib>
 #include <cmath>
 

@@ -1,9 +1,15 @@
 #ifndef JITTEROMETER_H
 #define JITTEROMETER_H
 
+// Qt
 #include <QVector>
 #include <QFile>
+
+// MythTV
 #include "mythtvexp.h"
+
+// Std
+#include <sys/time.h>
 
 /* Jitterometer usage. There are 2 ways to use this:
 ------------------------------------------------------------------
