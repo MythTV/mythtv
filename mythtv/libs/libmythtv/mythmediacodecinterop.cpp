@@ -30,7 +30,8 @@ MythMediaCodecInterop::MythMediaCodecInterop(MythRenderOpenGL* Context)
     m_frameWaitLock(),
     m_colourSpaceInitialised(false),
     m_surface(),
-    m_surfaceTexture()
+    m_surfaceTexture(),
+    m_surfaceListener()
 {
 }
 
@@ -41,6 +42,13 @@ MythMediaCodecInterop::~MythMediaCodecInterop()
 void* MythMediaCodecInterop::GetSurface(void)
 {
     return m_surface.object();
+}
+
+void Java_org_mythtv_android_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
+{
+    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    if (wait)
+        wait->wakeAll();
 }
 
 bool MythMediaCodecInterop::Initialise(QSize Size)
@@ -73,12 +81,13 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
 
     // Create surface
     m_surfaceTexture = QAndroidJniObject("android/graphics/SurfaceTexture", "(I)V", texture->m_textureId);
-    if (m_surfaceTexture.isValid())
+    //N.B. org/mythtv/android/SurfaceTextureListener is found in the packaging repo
+    m_surfaceListener = QAndroidJniObject("org/mythtv/android/SurfaceTextureListener", "(J)V", jlong(&m_frameWait));
+    if (m_surfaceTexture.isValid() && m_surfaceListener.isValid())
     {
-        //m_surfaceTexture.callMethod<void>("setOnFrameAvailableListener",
-        //                                  "(Landroid/graphics/SurfaceTexture$OnFrameAvailableListener;)V",
-        //                                  QAndroidJniObject("com/mythtv/android/SurfaceTextureListener",
-        //                                  "(J)V", jlong(&m_frameWait)).object());
+        m_surfaceTexture.callMethod<void>("setOnFrameAvailableListener",
+                                          "(Landroid/graphics/SurfaceTexture$OnFrameAvailableListener;)V",
+                                          m_surfaceListener.object());
         m_surface = QAndroidJniObject("android/view/Surface",
                                       "(Landroid/graphics/SurfaceTexture;)V",
                                       m_surfaceTexture.object());
@@ -95,18 +104,8 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android SurfaceTexture");
     m_context->glDeleteTextures(1, &(texture->m_textureId));
     m_context->DeleteTexture(texture);
-
     return false;
 }
-
-
-//extern "C" void Java_com_mythtv_android_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
-//{
-//    LOG(VB_GENERAL, LOG_INFO, LOC + "frameAvailable");
-//    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
-//    if (wait)
-//        wait->wakeAll();
-//}
 
 vector<MythGLTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
                                                       VideoColourSpace *ColourSpace,
@@ -143,15 +142,14 @@ vector<MythGLTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Render...
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Release to render...");
+    m_frameWaitLock.lock();
     if (av_mediacodec_release_buffer(buffer, 1) < 0)
         LOG(VB_GENERAL, LOG_ERR , LOC + "av_mediacodec_release_buffer failed");
 
     // Wait for completion
-    //m_frameWaitLock.lock();
-    //if (!m_frameWait.wait(&m_frameWaitLock, 50))
-    //    LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for frame update");
-    //m_frameWaitLock.unlock();
+    if (!m_frameWait.wait(&m_frameWaitLock, 10))
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for frame update");
+    m_frameWaitLock.unlock();
 
     // Ensure we don't try and release it again
     Frame->buf = nullptr;

@@ -9,6 +9,8 @@
 // MythTV
 #include "mythopenglinterop.h"
 
+extern "C" MTV_PUBLIC void Java_org_mythtv_android_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject);
+
 class MythMediaCodecInterop : public MythOpenGLInterop
 {
   public:
@@ -29,6 +31,7 @@ class MythMediaCodecInterop : public MythOpenGLInterop
     bool              m_colourSpaceInitialised;
     QAndroidJniObject m_surface;
     QAndroidJniObject m_surfaceTexture;
+    QAndroidJniObject m_surfaceListener;
 };
 
 #endif // MYTHMEDIACODECINTEROP_H

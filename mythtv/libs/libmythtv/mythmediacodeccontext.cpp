@@ -211,7 +211,6 @@ int MythMediaCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Fr
 
     // Frame->buf[0] contains the release method. Take another reference to ensure the frame
     // is not released before it is displayed.
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer ref count %1").arg(av_buffer_get_ref_count(Frame->buf[0])));
     videoframe->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
 
     // Retrieve and set the interop class
