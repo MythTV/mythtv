@@ -81,7 +81,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 
     if ((it != s_handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("dVBSH[%1]: Closing handler for %2")
+        LOG(VB_RECORD, LOG_INFO, QString("DVBSH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
         delete *it;
         s_handlers.erase(it);
@@ -106,19 +106,6 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device, int inputid)
     , _drb(nullptr)
 {
     setObjectName("DVBRead");
-}
-
-void DVBStreamHandler::SetRunningDesired(bool desired)
-{
-    if (_drb && m_running_desired && !desired)
-    {
-        StreamHandler::SetRunningDesired(desired);
-        _drb->Stop();
-    }
-    else
-    {
-        StreamHandler::SetRunningDesired(desired);
-    }
 }
 
 void DVBStreamHandler::run(void)
@@ -297,8 +284,6 @@ void DVBStreamHandler::RunTS(void)
 
     if (drb)
     {
-        if (drb->IsRunning())
-            drb->Stop();
         delete drb;
     }
 
