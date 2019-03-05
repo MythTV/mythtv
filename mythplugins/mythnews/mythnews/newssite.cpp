@@ -504,6 +504,7 @@ QString NewsSite::ReplaceHtmlChar(const QString &orig)
 
     QString s = orig;
     s.replace("&amp;", "&");
+    s.replace("&pound;", "£");
     s.replace("&lt;", "<");
     s.replace("&gt;", ">");
     s.replace("&quot;", "\"");
