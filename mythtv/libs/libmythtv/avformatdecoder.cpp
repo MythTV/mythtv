@@ -1459,7 +1459,6 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
             QString("Selected FPS is %1 (avg %2 codec %3 "
                     "container %4 estimated %5)").arg(fps).arg(avg_fps)
                 .arg(codec_fps).arg(container_fps).arg(estimated_fps));
-        m_fps = fps;
     }
 
     return fps;
