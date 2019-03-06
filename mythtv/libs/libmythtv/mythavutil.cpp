@@ -444,7 +444,11 @@ void MythCodecMap::freeCodecContext(const AVStream *stream)
     QMutexLocker lock(&mapLock);
     AVCodecContext *avctx = streamMap.take(stream);
     if (avctx)
+    {
+        if (avctx->internal)
+            avcodec_flush_buffers(avctx);
         avcodec_free_context(&avctx);
+    }
 }
 
 void MythCodecMap::freeAllCodecContexts()
