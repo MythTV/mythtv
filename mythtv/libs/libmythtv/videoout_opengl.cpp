@@ -528,6 +528,26 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         second = first.translated(0, main.height() / 2);
     }
 
+    // main UI when embedded
+    if (window.IsEmbedding())
+    {
+        MythMainWindow *window = GetMythMainWindow();
+        if (window && window->GetPaintWindow())
+        {
+            if (twopass)
+                m_render->SetViewPort(first, true);
+            window->GetPaintWindow()->clearMask();
+            window->draw(m_openGLPainter);
+            if (twopass)
+            {
+                m_render->SetViewPort(second, true);
+                window->GetPaintWindow()->clearMask();
+                window->draw(m_openGLPainter);
+                m_render->SetViewPort(main, true);
+            }
+        }
+    }
+
     // video
     if (m_openGLVideo && !dummy)
     {
