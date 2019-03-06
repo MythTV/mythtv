@@ -323,26 +323,26 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     query.bindValue(":MPLEX_ID", m_db_mplexid);
     query.bindValue(":SOURCE_ID", m_source_id);
     query.bindValue(":CHANNEL_ID", m_channel_id);
-    query.bindValue(":CALLSIGN", m_callsign);
-    query.bindValue(":SERVICE_NAME", m_service_name);
-    query.bindValue(":CHAN_NUM", m_chan_num);
+    query.bindValueNoNull(":CALLSIGN", m_callsign);
+    query.bindValueNoNull(":SERVICE_NAME", m_service_name);
+    query.bindValueNoNull(":CHAN_NUM", m_chan_num);
     query.bindValue(":SERVICE_ID", m_service_id);
     query.bindValue(":ATSC_MAJOR_CHANNEL", m_atsc_major_channel);
     query.bindValue(":ATSC_MINOR_CHANNEL", m_atsc_minor_channel);
     query.bindValue(":USE_ON_AIR_GUIDE", m_use_on_air_guide);
     query.bindValue(":HIDDEN", m_hidden);
     query.bindValue(":HIDDEN_IN_GUIDE", m_hidden_in_guide);
-    query.bindValue(":FREQID", m_freqid);
-    query.bindValue(":ICON", m_icon);
-    query.bindValue(":TVFORMAT", m_format);
-    query.bindValue(":XMLTVID", m_xmltvid);
+    query.bindValueNoNull(":FREQID", m_freqid);
+    query.bindValueNoNull(":ICON", m_icon);
+    query.bindValueNoNull(":TVFORMAT", m_format);
+    query.bindValueNoNull(":XMLTVID", m_xmltvid);
     query.bindValue(":PAT_TSID", m_pat_tsid);
     query.bindValue(":VCT_TSID", m_vct_tsid);
     query.bindValue(":VCT_CHAN_TSID", m_vct_chan_tsid);
     query.bindValue(":SDT_TSID", m_sdt_tsid);
     query.bindValue(":ORIG_NETID",  m_orig_netid);
     query.bindValue(":NETID", m_netid);
-    query.bindValue(":SI_STANDARD", m_si_standard);
+    query.bindValueNoNull(":SI_STANDARD", m_si_standard);
     query.bindValue(":IN_CHANNELS_CONF", m_in_channels_conf);
     query.bindValue(":IN_PAT", m_in_pat);
     query.bindValue(":IN_PMT", m_in_pmt);
@@ -355,7 +355,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     query.bindValue(":IS_OPEBCABLE", m_is_opencable);
     query.bindValue(":COULD_BE_OPENCABLE", m_could_be_opencable);
     query.bindValue(":DECRYPTION_STATUS", m_decryption_status);
-    query.bindValue(":DEFAULT_AUTHORITY", m_default_authority);
+    query.bindValueNoNull(":DEFAULT_AUTHORITY", m_default_authority);
 
     if (!query.exec())
     {
