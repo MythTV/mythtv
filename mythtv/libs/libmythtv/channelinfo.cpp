@@ -314,7 +314,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
         "   :NETID,             :SI_STANDARD,       :IN_CHANNELS_CONF,   "
         "   :IN_PAT,            :IN_PMT,            :IN_VCT,             "
         "   :IN_NIT,            :IN_SDT,            :IS_ENCRYPTED,       "
-        "   :IS_DATA_SERVICE,   :IS_AUDIO_SERVICE,  :IS_OPEBCABLE,       "
+        "   :IS_DATA_SERVICE,   :IS_AUDIO_SERVICE,  :IS_OPENCABLE,       "
         "   :COULD_BE_OPENCABLE,:DECRYPTION_STATUS, :DEFAULT_AUTHORITY   "
         " );");
 
@@ -352,7 +352,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     query.bindValue(":IS_ENCRYPTED", m_is_encrypted);
     query.bindValue(":IS_DATA_SERVICE", m_is_data_service);
     query.bindValue(":IS_AUDIO_SERVICE", m_is_audio_service);
-    query.bindValue(":IS_OPEBCABLE", m_is_opencable);
+    query.bindValue(":IS_OPENCABLE", m_is_opencable);
     query.bindValue(":COULD_BE_OPENCABLE", m_could_be_opencable);
     query.bindValue(":DECRYPTION_STATUS", m_decryption_status);
     query.bindValueNoNull(":DEFAULT_AUTHORITY", m_default_authority);
