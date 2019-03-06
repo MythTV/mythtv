@@ -159,7 +159,23 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
 
+    /// \brief Add a single binding
     void bindValue(const QString &placeholder, const QVariant &val);
+
+    /// \brief Add a single binding, taking care not to set a NULL value.
+    ///
+    /// Most of Qt5 treats an uninitialized (i.e. null) string and an
+    /// empty string as the same thing, but not the QSqlQuery code.
+    /// This means that an uninitialized QString() and an explicitly
+    /// initialized to empty QString("") both represent an empty
+    /// string everywhere in Qt except in the QSqlQuery code.  This
+    /// function adds the same behavior to SQL queries, by checking
+    /// and substituting a QString("") where necessary.  This function
+    /// should be used for any database string field that has been
+    /// declared "NOT NULL" so that MythTV won't throw an errors
+    /// complaining about trying to set a NULL value in a SQL column
+    /// that's marked "non-NULL".
+    void bindValueNoNull(const QString &placeholder, const QVariant &val);
 
     /// \brief Add all the bindings in the passed in bindings
     void bindValues(const MSqlBindings &bindings);
