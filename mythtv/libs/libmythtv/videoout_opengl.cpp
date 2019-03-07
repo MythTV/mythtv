@@ -143,6 +143,11 @@ bool VideoOutputOpenGL::CreateVideoResources(void)
 
 void VideoOutputOpenGL::DestroyCPUResources(void)
 {
+    vbuffers.begin_lock(kVideoBuffer_pause);
+    while (vbuffers.Size(kVideoBuffer_pause))
+        vbuffers.DiscardFrame(vbuffers.Tail(kVideoBuffer_pause));
+    vbuffers.end_lock();
+
     DiscardFrames(true);
     vbuffers.DeleteBuffers();
     vbuffers.Reset();
@@ -503,6 +508,12 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         topfieldfirst = Frame->top_field_first;
         dummy = Frame->dummy;
     }
+    else if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+    {
+        // see VideoOutputOpenGL::DoneDisplayingFrame
+        if (vbuffers.Size(kVideoBuffer_pause))
+            Frame = vbuffers.Tail(kVideoBuffer_pause);
+    }
 
     m_render->BindFramebuffer(nullptr);
     if (db_letterbox_colour == kLetterBoxColour_Gray25)
@@ -613,6 +624,42 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         m_render->logDebugMarker(LOC + "PREPARE_FRAME_END");
 }
 
+/*! \brief Release a video frame back into the decoder pool.
+ *
+ * Software frames do not need a pause frame as OpenGLVideo
+ * holds a copy of the last frame in its input textures. So
+ * just release the frame.
+ *
+ * Hardware frames hold the underlying interop class and
+ * hence access to the video texture. We cannot access them
+ * without a frame so retain the most recent frame by removing
+ * it from the 'used' queue and adding it to the 'pause' queue.
+*/
+void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
+{
+    if (!Frame)
+        return;
+
+    if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+    {
+        vbuffers.begin_lock(kVideoBuffer_pause);
+        while (vbuffers.Size(kVideoBuffer_pause))
+        {
+            VideoFrame* frame = vbuffers.Dequeue(kVideoBuffer_pause);
+            if (frame != Frame)
+                VideoOutput::DoneDisplayingFrame(frame);
+        }
+        vbuffers.Enqueue(kVideoBuffer_pause, Frame);
+        if(vbuffers.Contains(kVideoBuffer_used, Frame))
+            vbuffers.Remove(kVideoBuffer_used, Frame);
+        vbuffers.end_lock();
+    }
+    else
+    {
+        VideoOutput::DoneDisplayingFrame(Frame);
+    }
+}
+
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
 {
     if (m_render && !IsErrored())
@@ -672,7 +719,10 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
     VideoFrame *used = vbuffers.Head(kVideoBuffer_used);
     if (used)
     {
-        m_openGLVideo->UpdateInputFrame(used);
+        if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+            DoneDisplayingFrame(used);
+        else
+            m_openGLVideo->UpdateInputFrame(used);
         DisplayTimecode = used->disp_timecode;
     }
     else

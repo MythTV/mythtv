@@ -50,8 +50,6 @@ MythVTBInterop::~MythVTBInterop()
 {
 }
 
-#define DUMMY_TEXTURE_ID 1
-
 vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
                                                VideoColourSpace *ColourSpace,
                                                VideoFrame *Frame,
@@ -106,12 +104,12 @@ vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
 
         if (result.size() != static_cast<uint>(planes))
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
-        m_openglTextures.insert(DUMMY_TEXTURE_ID, result);
+        m_openglTextures.insert(DUMMY_INTEROP_ID, result);
     }
 
-    if (m_openglTextures.contains(DUMMY_TEXTURE_ID))
+    if (m_openglTextures.contains(DUMMY_INTEROP_ID))
     {
-        result = m_openglTextures[DUMMY_TEXTURE_ID];
+        result = m_openglTextures[DUMMY_INTEROP_ID];
         m_context->glEnable(QOpenGLTexture::Target2D);
         
         // Update textures

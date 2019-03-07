@@ -50,6 +50,7 @@ class VideoOutputOpenGL : public VideoOutput
     bool SetupVisualisation(AudioPlayer *Audio, MythRender *Render, const QString &Name) override;
     QStringList GetVisualiserList(void) override;
     bool StereoscopicModesAllowed(void) const override { return true; }
+    void DoneDisplayingFrame(VideoFrame *Frame) override;
 
   protected:
     bool CreateGPUResources(void);

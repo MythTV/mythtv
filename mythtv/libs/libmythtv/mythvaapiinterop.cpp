@@ -18,8 +18,6 @@
               .arg(__FILE__).arg( __LINE__).arg(va_status) \
               .arg(vaErrorStr(va_status)))
 
-#define GLX_DUMMY_ID 1
-
 /*! \brief Return an 'interoperability' method that is supported by the current render device.
  *
  * DRM interop is the preferred option as it is copy free but requires EGL. To
@@ -157,6 +155,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFram
 
 MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type InteropType)
   : MythVAAPIInterop(Context, InteropType),
+    m_lastSurface(0),
     m_vaapiPictureAttributes(nullptr),
     m_vaapiPictureAttributeCount(0),
     m_vaapiHueBase(0),
@@ -427,17 +426,22 @@ vector<MythGLTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Contex
         }
 
         result.push_back(texture);
-        m_openglTextures.insert(GLX_DUMMY_ID, result);
+        m_openglTextures.insert(DUMMY_INTEROP_ID, result);
     }
 
     if (m_openglTextures.isEmpty() || !m_glxSurface)
         return result;
-    result = m_openglTextures[GLX_DUMMY_ID];
+    result = m_openglTextures[DUMMY_INTEROP_ID];
+
+    // Pause frame - no need to update the same frame
+    if (m_lastSurface == id)
+        return result;
 
     // Copy surface to texture
     INIT_ST;
     va_status = vaCopySurfaceGLX(m_vaDisplay, m_glxSurface, id, GetFlagsForFrame(Frame, Scan));
     CHECK_ST;
+    m_lastSurface = id;
     return result;
 }
 
@@ -561,12 +565,16 @@ vector<MythGLTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Cont
         if (!texture)
             return result;
         result.push_back(texture);
-        m_openglTextures.insert(GLX_DUMMY_ID, result);
+        m_openglTextures.insert(DUMMY_INTEROP_ID, result);
     }
 
     if (m_openglTextures.isEmpty() || !m_glxPixmap || !m_pixmap)
         return result;
-    result = m_openglTextures[GLX_DUMMY_ID];
+    result = m_openglTextures[DUMMY_INTEROP_ID];
+
+    // Pause frame - no need to update the same frame
+    if (m_lastSurface == id)
+        return result;
 
     // Copy the surface to the texture
     INIT_ST;
@@ -587,6 +595,7 @@ vector<MythGLTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Cont
         m_glxBindTexImageEXT(glxdisplay, m_glxPixmap, GLX_FRONT_EXT, nullptr);
         m_context->glBindTexture(QOpenGLTexture::Target2D, 0);
     }
+    m_lastSurface = id;
     return result;
 }
 

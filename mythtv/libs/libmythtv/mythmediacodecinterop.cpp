@@ -10,7 +10,6 @@ extern "C" {
 }
 
 #define LOC QString("MediaCodecInterop: ")
-#define DUMMY_TEXTURE_ID 1
 
 MythMediaCodecInterop* MythMediaCodecInterop::Create(MythRenderOpenGL *Context, QSize Size)
 {
@@ -95,7 +94,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
         {
             vector<MythGLTexture*> result;
             result.push_back(texture);
-            m_openglTextures.insert(DUMMY_TEXTURE_ID, result);
+            m_openglTextures.insert(DUMMY_INTEROP_ID, result);
             LOG(VB_GENERAL, LOG_INFO, LOC + "Created Android Surface");
             return true;
         }
@@ -113,10 +112,16 @@ vector<MythGLTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
                                                       FrameScanType)
 {
     vector<MythGLTexture*> result;
+    if (!Frame)
+        return result;
 
-    // Pause frame handling
-    if (!Frame && !m_openglTextures.isEmpty())
-        return m_openglTextures[DUMMY_TEXTURE_ID];
+    // Pause frame handling - we can never release the same buffer twice
+    if (!Frame->buf)
+    {
+        if (!m_openglTextures.isEmpty())
+            return m_openglTextures[DUMMY_INTEROP_ID];
+        return result;
+    }
 
     // Sanitise
     if (!Context || !ColourSpace || !Frame || m_openglTextures.isEmpty())
@@ -156,5 +161,5 @@ vector<MythGLTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
 
     // Update texture
     m_surfaceTexture.callMethod<void>("updateTexImage");
-    return m_openglTextures[DUMMY_TEXTURE_ID];
+    return m_openglTextures[DUMMY_INTEROP_ID];
 }

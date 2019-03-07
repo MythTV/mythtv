@@ -14,6 +14,8 @@ using std::vector;
 
 class VideoColourSpace;
 
+#define DUMMY_INTEROP_ID 1
+
 class MythOpenGLInterop : public ReferenceCounter
 {
   public:
