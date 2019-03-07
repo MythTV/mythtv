@@ -20,6 +20,21 @@
 
 #define GLX_DUMMY_ID 1
 
+/*! \brief Return an 'interoperability' method that is supported by the current render device.
+ *
+ * DRM interop is the preferred option as it is copy free but requires EGL. To
+ * force Qt to use EGL, try setting the environment variable 'QT_XCB_GL_INTEGRATION=xcb_egl'.
+ * DRM returns raw YUV frames which gives us full colourspace and deinterlacing control.
+ *
+ * GLX Pixmap interop will copy the frame to an RGBA texture. VAAPI functionality is
+ * used for colourspace conversion and deinterlacing. It is not supported
+ * when EGL and/or Wayland are running.
+ *
+ * GLX Copy is only available when GLX is running (no OpenGLES or Wayland) and,
+ * under the hood, performs the same Pixmap copy as GLXPixmap support plus an
+ * additional render to texture via a FramebufferObject. As it is less performant
+ * and less widely available than GLX Pixmap, it may be removed in the future.
+*/
 MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(MythCodecID CodecId,
                                                          MythRenderOpenGL *Context)
 {
@@ -43,10 +58,10 @@ MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(MythCodecID CodecId,
     // best first
     if (egl && MythVAAPIInteropDRM::IsSupported(Context)) // zero copy
         return VAAPIEGLDRM;
-    else if (!egl && !opengles && !wayland) // copy
-        return VAAPIGLXCOPY;
     else if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context)) // copy
         return VAAPIGLXPIX;
+    else if (!egl && !opengles && !wayland) // 2 * copy
+        return VAAPIGLXCOPY;
     return Unsupported;
 }
 
