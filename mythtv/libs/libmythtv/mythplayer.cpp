@@ -4446,6 +4446,13 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     bool need_clear = false;
     while (decoderSeek >= 0)
     {
+        // Waiting blocks the main UI thread but the decoder may
+        // have initiated a callback into the UI thread to create
+        // certain resources. Ensure the callback is processed.
+        // Ideally MythPlayer should be fully event driven and these
+        // calls wouldn't be necessary.
+        qApp->processEvents();
+
         usleep(50 * 1000);
 
         // provide some on screen feedback if seeking is slow
