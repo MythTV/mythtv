@@ -798,6 +798,10 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     QMutexLocker locker(avcodeclock);
 
+    // Discard all the queued up decoded frames
+    if (discardFrames)
+        m_parent->DiscardVideoFrames(doflush);
+
     if (doflush)
     {
         m_lastapts = 0;
@@ -834,14 +838,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         }
         if (m_private_dec)
             m_private_dec->Reset();
-    }
 
-    // Discard all the queued up decoded frames
-    if (discardFrames)
-        m_parent->DiscardVideoFrames(doflush);
-
-    if (doflush)
-    {
         // Free up the stored up packets
         while (!m_storedPackets.isEmpty())
         {
