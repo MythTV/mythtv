@@ -202,9 +202,7 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
  */
 CommandLineArg::CommandLineArg(QString name) :
     ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
-    m_given(false), m_converted(false), m_name(name),
-    m_deprecated(""), m_removed(""), m_removedversion(""),
-    m_type(QVariant::Invalid)
+    m_name(name)
 {
 }
 
