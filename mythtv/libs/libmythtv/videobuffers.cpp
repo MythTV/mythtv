@@ -753,6 +753,14 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
             .arg(next_frame_keyframe).arg(GetStatus()));
 }
 
+/*! \brief Clear used frames after seeking.
+ *
+ * \note The use of this function after seeking is a little
+ * dubious as the decoder is often not paused. In extreme cases
+ * every video buffer has already been requested by the decoder
+ * by the time this function is called. Should probably be
+ * repurposed as ClearBeforeSeek...
+*/
 void VideoBuffers::ClearAfterSeek(void)
 {
     {
@@ -761,18 +769,32 @@ void VideoBuffers::ClearAfterSeek(void)
         for (uint i = 0; i < Size(); i++)
             At(i)->timecode = 0;
 
-        while (used.count() > 1)
+        for (uint i = 0; (i < Size()) && (used.count() > 1); i++)
         {
-            VideoFrame *buffer = used.dequeue();
-            available.enqueue(buffer);
+            VideoFrame *buffer = At(i);
+            if (used.contains(buffer) && !decode.contains(buffer))
+            {
+                used.remove(buffer);
+                available.enqueue(buffer);
+                ReleaseDecoderResources(buffer);
+            }
         }
 
         if (used.count() > 0)
         {
-            VideoFrame *buffer = used.dequeue();
-            available.enqueue(buffer);
-            vpos = vbufferMap[buffer];
-            rpos = vpos;
+            for (uint i = 0; i < Size(); i++)
+            {
+                VideoFrame *buffer = At(i);
+                if (used.contains(buffer) && !decode.contains(buffer))
+                {
+                    used.remove(buffer);
+                    available.enqueue(buffer);
+                    ReleaseDecoderResources(buffer);
+                    vpos = vbufferMap[buffer];
+                    rpos = vpos;
+                    break;
+                }
+            }
         }
         else
         {
