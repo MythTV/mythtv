@@ -660,6 +660,20 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
     }
 }
 
+void VideoOutputOpenGL::DiscardFrames(bool NextFrameIsKeyFrame)
+{
+    if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+    {
+        // This may need revisiting/relaxing for certain decoders.
+        vbuffers.begin_lock(kVideoBuffer_pause);
+        while (vbuffers.Size(kVideoBuffer_pause))
+            VideoOutput::DoneDisplayingFrame(vbuffers.Dequeue(kVideoBuffer_pause));
+        vbuffers.end_lock();
+    }
+
+    vbuffers.DiscardFrames(NextFrameIsKeyFrame);
+}
+
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
 {
     if (m_render && !IsErrored())
