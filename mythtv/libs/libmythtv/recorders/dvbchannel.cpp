@@ -108,7 +108,11 @@ DVBChannel::~DVBChannel()
         if (!s_master_map[key].empty())
             new_master = dynamic_cast<DVBChannel*>(s_master_map[key].front());
         if (new_master)
+        {
+            QMutexLocker master_locker(&(master->m_hw_lock));
+            QMutexLocker new_master_locker(&(new_master->m_hw_lock));
             new_master->m_is_open = master->m_is_open;
+        }
     }
     else
     {
@@ -133,13 +137,13 @@ void DVBChannel::Close(DVBChannel *who)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing DVB channel");
 
+    QMutexLocker locker(&m_hw_lock);
+
     IsOpenMap::iterator it = m_is_open.find(who);
     if (it == m_is_open.end())
         return; // this caller didn't have it open in the first place..
 
     m_is_open.erase(it);
-
-    QMutexLocker locker(&m_hw_lock);
 
     DVBChannel *master = GetMasterLock();
     if (master != nullptr && master != this)
@@ -357,6 +361,8 @@ bool DVBChannel::Open(DVBChannel *who)
 
 bool DVBChannel::IsOpen(void) const
 {
+    //Have to acquire the hw lock to prevent is_open being modified whilst we're searching it
+    QMutexLocker locker(&m_hw_lock);
     IsOpenMap::const_iterator it = m_is_open.find(this);
     return it != m_is_open.end();
 }
