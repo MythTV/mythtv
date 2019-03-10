@@ -607,7 +607,7 @@ MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
     result->m_pixelFormat = PixelFormat;
     result->m_pixelType   = PixelType;
     result->m_vbo         = CreateVBO(kVertexSize);
-    result->m_totalSize   = GetTextureSize(Size, result->m_target != QOpenGLTexture::TextureRectangle);
+    result->m_totalSize   = GetTextureSize(Size, result->m_target != QOpenGLTexture::TargetRectangle);
     result->m_bufferSize  = datasize;
     result->m_size        = Size;
     return result;
@@ -631,7 +631,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     MythGLTexture *result = new MythGLTexture(texture);
     result->m_texture     = texture;
     result->m_vbo         = CreateVBO(kVertexSize);
-    result->m_totalSize   = GetTextureSize(Image->size(), result->m_target != QOpenGLTexture::TextureRectangle);
+    result->m_totalSize   = GetTextureSize(Image->size(), result->m_target != QOpenGLTexture::TargetRectangle);
     // N.B. Format and type per qopengltexure.cpp
     result->m_pixelFormat = QOpenGLTexture::RGBA;
     result->m_pixelType   = QOpenGLTexture::UInt8;
@@ -656,7 +656,7 @@ MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size, bool SetFilte
         return nullptr;
     MythGLTexture* result = new MythGLTexture(textureid);
     result->m_size = Size;
-    result->m_totalSize = GetTextureSize(Size, result->m_target != QOpenGLTexture::TextureRectangle);
+    result->m_totalSize = GetTextureSize(Size, result->m_target != QOpenGLTexture::TargetRectangle);
     result->m_vbo = CreateVBO(kVertexSize);
     if (SetFilters)
         SetTextureFilters(result, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
@@ -1327,7 +1327,7 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     int width  = Texture->m_crop ? min(Source.width(),  size.width())  : Source.width();
     int height = Texture->m_crop ? min(Source.height(), size.height()) : Source.height();
 
-    if (Texture->m_target != QOpenGLTexture::TextureRectangle)
+    if (Texture->m_target != QOpenGLTexture::TargetRectangle)
     {
         data[0 + TEX_OFFSET] = Source.left() / static_cast<GLfloat>(size.width());
         data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = (Source.top() + height) / static_cast<GLfloat>(size.height());

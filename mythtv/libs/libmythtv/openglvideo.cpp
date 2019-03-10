@@ -393,7 +393,12 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     fragment.replace("SELECT_COLUMN", (kGLUYVY == frametype) ? SelectColumn : "");
     // update packing code so this can be removed
     fragment.replace("%SWIZZLE%", kGLUYVY == frametype ? "arb" : "abr");
-    if (m_textureTarget == QOpenGLTexture::TextureRectangle)
+
+    // N.B. Rectangular texture support is only currently used for VideoToolBox
+    // video frames which are NV12. Do not use rectangular textures for the 'default'
+    // shaders as it breaks video resizing and would require changes to our
+    // FramebufferObject code.
+    if ((m_textureTarget == QOpenGLTexture::TargetRectangle) && (Default != Type))
     {
         // N.B. Currently only NV12 shaders are supported and deinterlacing parameters
         // need fixing as well (when interop deinterlacing is fixed)
