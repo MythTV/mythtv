@@ -208,7 +208,7 @@ class DecoderBase
     virtual void UpdateFramesPlayed(void);
     long long GetFramesRead(void) const { return framesRead; }
     long long GetFramesPlayed(void) const { return framesPlayed; }
-    void SetFramesPlayed(long long newValue) {m_framesPlayed = newValue;}
+    void SetFramesPlayed(long long newValue) {framesPlayed = newValue;}
 
     virtual QString GetCodecDecoderName(void) const = 0;
     virtual QString GetRawEncodingType(void) { return QString(); }
