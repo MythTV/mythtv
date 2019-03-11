@@ -49,6 +49,11 @@
 #include "dvbcam.h"
 #include "tv_rec.h"
 
+// Returned by drivers on unsupported dvbv3 ioctl calls
+#ifndef ENOTSUPP
+#define ENOTSUPP 524
+#endif
+
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
@@ -1173,7 +1178,7 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     if (ret < 0)
     {
 #if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP)
+        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
         {
             return GetSignalStrengthDVBv5(ok);
         }
@@ -1261,7 +1266,7 @@ double DVBChannel::GetSNR(bool *ok) const
     if (ret < 0)
     {
 #if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP)
+        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
         {
             return GetSNRDVBv5(ok);
         }
@@ -1332,7 +1337,7 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     if (ret < 0)
     {
 #if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP)
+        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
         {
             return GetBitErrorRateDVBv5(ok);
         }
@@ -1396,7 +1401,7 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
     if (ret < 0)
     {
 #if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP)
+        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
         {
             return GetUncorrectedBlockCountDVBv5(ok);
         }
@@ -1521,6 +1526,8 @@ static bool wait_for_backend(int fd, int timeout_ms)
 
     // This is supposed to work on all cards, post 2.6.12...
     fe_status_t status;
+    memset(&status, 0, sizeof(status));
+
     if (ioctl(fd, FE_READ_STATUS, &status) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
