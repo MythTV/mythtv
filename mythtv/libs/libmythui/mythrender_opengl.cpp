@@ -142,7 +142,6 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_glDeleteFencesAPPLE(nullptr),
     m_glSetFenceAPPLE(nullptr),
     m_glFinishFenceAPPLE(nullptr),
-    m_glDiscardFramebuffer(nullptr),
     m_openglDebugger(nullptr),
     m_window(nullptr)
 {
@@ -289,10 +288,6 @@ bool MythRenderOpenGL::Init(void)
         m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
         m_extraFeatures |= kGLAppleFence;
 
-    // Framebuffer discard - GLES only
-    if (isOpenGLES() && hasExtension("GL_EXT_discard_framebuffer") && m_glDiscardFramebuffer)
-        m_extraFeatures |= kGLExtFBDiscard;
-
     // Rectangular textures
     if (!isOpenGLES() && (hasExtension("GL_NV_texture_rectangle") ||
                           hasExtension("GL_ARB_texture_rectangle") ||
@@ -345,7 +340,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer discard  : %1").arg(GLYesNo(m_extraFeatures & kGLExtFBDiscard)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
         .arg(GLYesNo((m_extraFeatures & kGLAppleFence) || (m_extraFeatures & kGLNVFence))));
 
@@ -874,19 +868,6 @@ void MythRenderOpenGL::ClearFramebuffer(void)
     doneCurrent();
 }
 
-void MythRenderOpenGL::DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer)
-{
-    if (!(m_extraFeaturesUsed & kGLExtFBDiscard))
-        return;
-
-    makeCurrent();
-    static const GLenum fbdiscards[] = { GL_COLOR_ATTACHMENT0 };
-    static const GLenum dfdiscards[] = { GL_COLOR_EXT };
-    BindFramebuffer(Framebuffer);
-    m_glDiscardFramebuffer(GL_FRAMEBUFFER, 1, (Framebuffer ? true : defaultFramebufferObject()) ? fbdiscards : dfdiscards);
-    doneCurrent();
-}
-
 void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                                   const QRect &Source, const QRect &Destination,
                                   QOpenGLShaderProgram *Program, int Alpha,
@@ -1251,7 +1232,6 @@ void MythRenderOpenGL::InitProcs(void)
     m_glDeleteFencesAPPLE = reinterpret_cast<MYTH_GLDELETEFENCESAPPLEPROC>(GetProcAddress("glDeleteFencesAPPLE"));
     m_glSetFenceAPPLE = reinterpret_cast<MYTH_GLSETFENCEAPPLEPROC>(GetProcAddress("glSetFenceAPPLE"));
     m_glFinishFenceAPPLE = reinterpret_cast<MYTH_GLFINISHFENCEAPPLEPROC>(GetProcAddress("glFinishFenceAPPLE"));
-    m_glDiscardFramebuffer = reinterpret_cast<MYTH_GLDISCARDFRAMEBUFFER>(GetProcAddress("glDiscardFramebufferEXT"));
 }
 
 QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const

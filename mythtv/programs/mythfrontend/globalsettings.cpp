@@ -130,16 +130,6 @@ static HostCheckBoxSetting *OpenGLExtraStage()
 
     return gc;
 }
-
-static HostCheckBoxSetting *OpenGLDiscardFB()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLDiscardFB");
-    gc->setLabel(PlaybackSettings::tr("Discard OpenGL Framebuffers"));
-    gc->setHelpText(PlaybackSettings::tr(
-        "Enable to improve performance on some OpenGL ES GPU implementations (e.g. ARM Mali, Qualcomm Adreno) EXPERIMENTAL."));
-    gc->setValue(false);
-    return gc;
-}
 #endif
 
 #if CONFIG_DEBUGTYPE
@@ -4262,17 +4252,7 @@ void PlaybackSettings::Load(void)
     avsync2->addTargetedChild("1",AVSync2AdjustMS());
 
 #ifdef USE_OPENGL_PAINTER
-    bool isOpenGLES = false;
-    MythMainWindow* main = static_cast<MythMainWindow*>(gCoreContext->GetGUIObject());
-    if (main)
-    {
-        MythRenderOpenGL* render = static_cast<MythRenderOpenGL*>(main->GetRenderDevice());
-        if (render)
-            isOpenGLES = render->isOpenGLES();
-    }
     advanced->addChild(OpenGLExtraStage());
-    if (isOpenGLES)
-        advanced->addChild(OpenGLDiscardFB());
 #endif
     addChild(advanced);
 

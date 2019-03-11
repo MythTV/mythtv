@@ -29,12 +29,11 @@
 typedef enum
 {
     kGLFeatNone    = 0x0000,
-    kGLExtFBDiscard= 0x0001,
-    kGLNVFence     = 0x0002,
-    kGLAppleFence  = 0x0004,
-    kGLBufferMap   = 0x0008,
-    kGLExtRects    = 0x0010,
-    kGLExtRGBA16   = 0x0020
+    kGLNVFence     = 0x0001,
+    kGLAppleFence  = 0x0002,
+    kGLBufferMap   = 0x0004,
+    kGLExtRects    = 0x0008,
+    kGLExtRGBA16   = 0x0010
 } GLFeatures;
 
 #define TEX_OFFSET 8
@@ -142,7 +141,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void  BindFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void  ClearFramebuffer(void);
-    void  DiscardFramebuffer(QOpenGLFramebufferObject *Framebuffer);
 
     QOpenGLShaderProgram* CreateShaderProgram(const QString &Vertex, const QString &Fragment);
     void  DeleteShaderProgram(QOpenGLShaderProgram* Program);
@@ -247,8 +245,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
-    // Framebuffer discard
-    MYTH_GLDISCARDFRAMEBUFFER            m_glDiscardFramebuffer;
 
   private:
     void DebugFeatures (void);

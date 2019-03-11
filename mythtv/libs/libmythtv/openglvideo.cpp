@@ -64,15 +64,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_features      = m_render->GetFeatures();
     m_extraFeatures = m_render->GetExtraFeatures();
 
-    // Enable/Disable certain features based on settings
-    if (m_render->isOpenGLES())
-    {
-        if ((m_extraFeatures & kGLExtFBDiscard) && gCoreContext->GetBoolSetting("OpenGLDiscardFB", false))
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling Framebuffer discards");
-        else
-            m_extraFeatures &= ~kGLExtFBDiscard;
-    }
-
     // Create initial input texture. Hardware textures are created on demand.
     MythGLTexture *texture = nullptr;
     if (kGLInterop != m_frameType)
@@ -678,8 +669,6 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled resizing");
     }
 
-    bool discardframebuffer = false;
-
     if (resize)
     {
         // render to texture stage
@@ -729,7 +718,6 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         inputtextures.clear();
         inputtextures.push_back(m_frameBufferTexture);
         program = Default;
-        discardframebuffer = true;
         deinterlacing = false;
     }
 
@@ -774,14 +762,6 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 
     // draw
     m_render->DrawBitmap(textures, numtextures, nullptr, trect, m_displayVideoRect, m_shaders[program]);
-
-    // discard
-    if (m_extraFeatures & kGLExtFBDiscard)
-    {
-        if (discardframebuffer && m_frameBuffer)
-            m_render->DiscardFramebuffer(m_frameBuffer);
-        m_render->DiscardFramebuffer(nullptr);
-    }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREP_FRAME_END");
