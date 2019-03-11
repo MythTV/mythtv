@@ -884,7 +884,18 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             (exactSeeks || begin.elapsed() < maxSeekTimeMs));
          --skipFrames, ++profileFrames)
     {
-        GetFrame(kDecodeVideo);
+        // TODO this won't work well in conjunction with the MythTimer
+        // above...
+        QElapsedTimer getframetimer;
+        bool retry = true;
+        while (retry && !getframetimer.hasExpired(100))
+        {
+            retry = false;
+            GetFrame(kDecodeVideo, retry);
+            if (retry)
+                usleep(1000);
+        }
+
         if (m_decoded_video_frame)
         {
             m_parent->DiscardVideoFrame(m_decoded_video_frame);
@@ -3711,123 +3722,99 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
-// Maximum retries - 500 = 5 seconds
-#define PACKET_MAX_RETRIES 5000
-#define RETRY_WAIT_TIME 10000   // microseconds
-bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
+bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, bool &Retry)
 {
     int ret = 0, gotpicture = 0;
     AVCodecContext *context = gCodecMap->getCodecContext(curstream);
     MythAVFrame mpa_pic;
     if (!mpa_pic)
-    {
         return false;
-    }
     mpa_pic->reordered_opaque = AV_NOPTS_VALUE;
 
     if (pkt->pts != AV_NOPTS_VALUE)
         m_pts_detected = true;
 
-    bool tryAgain = true;
     bool sentPacket = false;
-    QElapsedTimer timeout;
-    timeout.start();
     int ret2 = 0;
-    while (tryAgain)
+    avcodeclock->lock();
+    if (m_private_dec)
     {
-        tryAgain = false;
-        gotpicture = 0;
-        avcodeclock->lock();
-        if (m_private_dec)
-        {
-            if (QString(m_ic->iformat->name).contains("avi") || !m_pts_detected)
-                pkt->pts = pkt->dts;
-            // TODO disallow private decoders for dvd playback
-            // N.B. we do not reparse the frame as it breaks playback for
-            // everything but libmpeg2
-            ret = m_private_dec->GetFrame(curstream, mpa_pic, &gotpicture, pkt);
-            sentPacket = true;
-        }
+        if (QString(m_ic->iformat->name).contains("avi") || !m_pts_detected)
+            pkt->pts = pkt->dts;
+        // TODO disallow private decoders for dvd playback
+        // N.B. we do not reparse the frame as it breaks playback for
+        // everything but libmpeg2
+        ret = m_private_dec->GetFrame(curstream, mpa_pic, &gotpicture, pkt);
+        sentPacket = true;
+    }
+    else
+    {
+        if (!m_use_frame_timing)
+            context->reordered_opaque = pkt->pts;
+
+        //  SUGGESTION
+        //  Now that avcodec_decode_video2 is deprecated and replaced
+        //  by 2 calls (receive frame and send packet), this could be optimized
+        //  into separate routines or separate threads.
+        //  Also now that it always consumes a whole buffer some code
+        //  in the caller may be able to be optimized.
+
+        // FilteredReceiveFrame will call avcodec_receive_frame and
+        // apply any codec-dependent filtering
+        ret = m_mythcodecctx->FilteredReceiveFrame(context, mpa_pic);
+
+        if (ret == 0)
+            gotpicture = 1;
         else
+            gotpicture = 0;
+        if (ret == AVERROR(EAGAIN))
+            ret = 0;
+        // If we got a picture do not send the packet until we have
+        // all available pictures
+        if (ret==0 && !gotpicture)
         {
-            if (!m_use_frame_timing)
-                context->reordered_opaque = pkt->pts;
-
-            //  SUGGESTION
-            //  Now that avcodec_decode_video2 is deprecated and replaced
-            //  by 2 calls (receive frame and send packet), this could be optimized
-            //  into separate routines or separate threads.
-            //  Also now that it always consumes a whole buffer some code
-            //  in the caller may be able to be optimized.
-
-            // FilteredReceiveFrame will call avcodec_receive_frame and
-            // apply any codec-dependent filtering
-            ret = m_mythcodecctx->FilteredReceiveFrame(context, mpa_pic);
-
-            if (ret == 0)
-                gotpicture = 1;
+            ret2 = avcodec_send_packet(context, pkt);
+            if (ret2 == AVERROR(EAGAIN))
+            {
+                Retry = true;
+                ret2 = 0;
+            }
             else
-                gotpicture = 0;
-            if (ret == AVERROR(EAGAIN))
-                ret = 0;
-            // If we got a picture do not send the packet until we have
-            // all available pictures
-            if (ret==0 && !gotpicture)
             {
-                ret2 = avcodec_send_packet(context, pkt);
-                if (ret2 == AVERROR(EAGAIN))
-                {
-                    tryAgain = true;
-                    ret2 = 0;
-                }
-                else
-                {
-                    sentPacket = true;
-                }
+                sentPacket = true;
             }
-        }
-        avcodeclock->unlock();
-
-        if (ret < 0 || ret2 < 0)
-        {
-            char error[AV_ERROR_MAX_STRING_SIZE];
-            if (ret < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("video avcodec_receive_frame error: %1 (%2) gotpicture:%3")
-                    .arg(av_make_error_string(error, sizeof(error), ret))
-                    .arg(ret).arg(gotpicture));
-            }
-            if (ret2 < 0)
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
-                    .arg(av_make_error_string(error, sizeof(error), ret2))
-                    .arg(ret2).arg(gotpicture));
-            if (++m_averror_count > SEQ_PKT_ERR_MAX)
-            {
-                // If erroring on GPU assist, try switching to software decode
-                if (codec_is_std(m_video_codec_id))
-                    m_parent->SetErrored(QObject::tr("Video Decode Error"));
-                else
-                    m_streams_changed = true;
-            }
-            if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
-                m_streams_changed = true;
-            return false;
-        }
-
-        if (tryAgain)
-        {
-            if (timeout.elapsed() > PACKET_MAX_RETRIES)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Error: Timed out waiting for video decode buffering");
-                return false;
-            }
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video decode buffering retry"));
-            usleep(RETRY_WAIT_TIME);
         }
     }
+    avcodeclock->unlock();
+
+    if (ret < 0 || ret2 < 0)
+    {
+        char error[AV_ERROR_MAX_STRING_SIZE];
+        if (ret < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("video avcodec_receive_frame error: %1 (%2) gotpicture:%3")
+                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(ret).arg(gotpicture));
+        }
+        if (ret2 < 0)
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
+                .arg(av_make_error_string(error, sizeof(error), ret2))
+                .arg(ret2).arg(gotpicture));
+        if (++m_averror_count > SEQ_PKT_ERR_MAX)
+        {
+            // If erroring on GPU assist, try switching to software decode
+            if (codec_is_std(m_video_codec_id))
+                m_parent->SetErrored(QObject::tr("Video Decode Error"));
+            else
+                m_streams_changed = true;
+        }
+        if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
+            m_streams_changed = true;
+        return false;
+    }
+
     // averror_count counts sequential errors, so if you have a successful
     // packet then reset it
     m_averror_count = 0;
@@ -3901,6 +3888,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         }
         ProcessVideoFrame(curstream, mpa_pic);
     }
+
     if (!sentPacket)
     {
         // MythTV logic expects that only one frame is processed
@@ -5196,7 +5184,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 }
 
 // documented in decoderbase.h
-bool AvFormatDecoder::GetFrame(DecodeType decodetype)
+bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 {
     AVPacket *pkt = nullptr;
     bool have_err = false;
@@ -5244,9 +5232,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                  .m_av_stream_index];
         MythAVFrame mpa_pic;
         if (!mpa_pic)
-        {
             return false;
-        }
 
         m_private_dec->GetFrame(stream, mpa_pic, &got_picture, nullptr);
         if (got_picture)
@@ -5481,7 +5467,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     break;
                 }
 
-                if (!ProcessVideoPacket(curstream, pkt))
+                if (!ProcessVideoPacket(curstream, pkt, Retry))
                     have_err = true;
                 break;
             }
@@ -5504,10 +5490,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         }
 
-        if (!have_err)
+        if (!have_err && !Retry)
             m_frame_decoded = 1;
-
         av_packet_unref(pkt);
+        if (Retry)
+            break;
     }
 
     if (pkt)

@@ -593,6 +593,7 @@ class MTV_PUBLIC MythPlayer
     virtual bool DecoderGetFrameFFREW(void);
     virtual bool DecoderGetFrameREW(void);
     bool         DecoderGetFrame(DecodeType, bool unsafe = false);
+    bool         DoGetFrame(DecodeType DecodeType);
 
     // These actually execute commands requested by public members
     bool UpdateFFRewSkip(void);

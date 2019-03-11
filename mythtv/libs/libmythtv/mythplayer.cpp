@@ -3669,15 +3669,6 @@ void MythPlayer::DecoderStart(bool start_paused)
 
 void MythPlayer::DecoderEnd(void)
 {
-    // FIXME Hopefully temporary
-    // MediaCodec surface rendering will block waiting for
-    // free output buffers. Release them to prevent a deadlock
-    // or lengthy wait
-    vidExitLock.lock();
-    if (videoOutput)
-        videoOutput->DiscardFrames(false);
-    vidExitLock.unlock();
-
     PauseDecoder();
     SetPlaying(false);
     killdecoder = true;
@@ -3822,7 +3813,7 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
     {
         DecoderGetFrameREW();
     }
-    return decoder->GetFrame(deleteMap.IsEditing() ? kDecodeAV : kDecodeVideo);
+    return DoGetFrame(deleteMap.IsEditing() ? kDecodeAV : kDecodeVideo);
 }
 
 bool MythPlayer::DecoderGetFrameREW(void)
@@ -3848,7 +3839,7 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
     while (!unsafe &&
         (!videoOutput->EnoughFreeFrames() || GetAudio()->IsBufferAlmostFull()) )
     {
-        if (killdecoder)
+        if (killdecoder || pauseDecoder)
             return false;
 
         if (++tries > 10)
@@ -3870,17 +3861,54 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
 
     if (!decoder_change_lock.tryLock(5))
         return false;
-    if (killdecoder || !decoder || IsErrored())
+    if (killdecoder || !decoder || pauseDecoder || IsErrored())
     {
         decoder_change_lock.unlock();
         return false;
     }
 
     if (ffrew_skip == 1 || decodeOneFrame)
-        ret = decoder->GetFrame(decodetype);
+        ret = DoGetFrame(decodetype);
     else if (ffrew_skip != 0)
         ret = DecoderGetFrameFFREW();
     decoder_change_lock.unlock();
+    return ret;
+}
+
+/*! \brief Get one frame from the decoder.
+ *
+ * Certain decoders operate asynchronously and will return EAGAIN if a
+ * video frame is not yet ready. We handle the retries here in MythPlayer
+ * so that we can abort retries if we need to pause or stop the decoder.
+ *
+ * This is most relevant for MediaCodec decoding when using direct rendering
+ * as there are a limited number of decoder output buffers that are retained by
+ * the VideoOutput classes (VideoOutput and VideoBuffers) until they have been
+ * used.
+ *
+ * \note The caller must hold decoder_change_lock.
+*/
+bool MythPlayer::DoGetFrame(DecodeType DecodeType)
+{
+    bool ret = false;
+    QElapsedTimer timeout;
+    timeout.start();
+    bool retry = true;
+    // retry for a maximum of 5 seconds
+    while (retry && !pauseDecoder && !killdecoder && !timeout.hasExpired(5000))
+    {
+        retry = false;
+        ret = decoder->GetFrame(DecodeType, retry);
+        if (retry)
+        {
+            decoder_change_lock.unlock();
+            QThread::usleep(10000);
+            decoder_change_lock.lock();
+        }
+    }
+
+    if (timeout.hasExpired(5000))
+        return false;
     return ret;
 }
 
@@ -5217,8 +5245,11 @@ bool MythPlayer::TranscodeGetNextFrame(
     if (!decoder)
         return false;
 
-    if (!decoder->GetFrame(kDecodeAV))
-        return false;
+    {
+        QMutexLocker decoderlocker(&decoder_change_lock);
+        if (!DoGetFrame(kDecodeAV))
+            return false;
+    }
 
     if (GetEof() != kEofStateNone)
         return false;
@@ -5244,7 +5275,9 @@ bool MythPlayer::TranscodeGetNextFrame(
             WaitForSeek(jumpto, 0);
             decoder->ClearStoredData();
             ClearAfterSeek();
-            decoder->GetFrame(kDecodeAV);
+            decoder_change_lock.lock();
+            DoGetFrame(kDecodeAV);
+            decoder_change_lock.unlock();
             did_ff = 1;
         }
     }

@@ -1032,7 +1032,7 @@ void NuppelDecoder::ClearStoredData()
     }
 }
 
-bool NuppelDecoder::GetFrame(DecodeType decodetype)
+bool NuppelDecoder::GetFrame(DecodeType decodetype, bool&)
 {
     bool gotvideo = false;
     int seeklen = 0;
@@ -1373,7 +1373,8 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
 
     for (;(skipFrames > 0) && !m_ateof; skipFrames--)
     {
-        GetFrame(kDecodeAV);
+        bool retry = false;
+        GetFrame(kDecodeAV, retry);
         if (m_decoded_video_frame)
             GetPlayer()->DiscardVideoFrame(m_decoded_video_frame);
     }

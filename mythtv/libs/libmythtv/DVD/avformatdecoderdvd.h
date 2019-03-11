@@ -17,11 +17,11 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     virtual ~AvFormatDecoderDVD();
     void Reset(bool reset_video_data, bool seek_reset, bool reset_file) override; // AvFormatDecoder
     void UpdateFramesPlayed(void) override; // AvFormatDecoder
-    bool GetFrame(DecodeType decodetype) override; // AvFormatDecoder
+    bool GetFrame(DecodeType Type, bool &Retry) override; // AvFormatDecoder
 
   protected:
     int  ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket) override; // AvFormatDecoder
-    bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt) override; // AvFormatDecoder
+    bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt, bool &Retry) override; // AvFormatDecoder
     bool ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic) override; // AvFormatDecoder
     bool ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
                            DecodeType decodetype) override; // AvFormatDecoder

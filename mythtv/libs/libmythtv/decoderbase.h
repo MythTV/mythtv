@@ -150,7 +150,7 @@ class DecoderBase
 
     virtual void SetWatchingRecording(bool mode);
     /// Demux, preprocess and possibly decode a frame of video/audio.
-    virtual bool GetFrame(DecodeType) = 0;
+    virtual bool GetFrame(DecodeType Type, bool &Retry) = 0;
     MythPlayer *GetPlayer() { return m_parent; }
 
     virtual int GetNumChapters(void)                      { return 0; }

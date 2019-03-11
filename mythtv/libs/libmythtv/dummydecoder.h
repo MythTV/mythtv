@@ -13,24 +13,15 @@ class DummyDecoder : public DecoderBase
         DecoderBase(parent, pginfo) {}
     virtual ~DummyDecoder() = default;
 
-    int OpenFile(RingBuffer *, bool, char *, int) override // DecoderBase
-        { return 0; }
-    bool GetFrame(DecodeType)override // DecoderBase
-        { usleep(10000); return false; }
-
-    bool IsLastFrameKey(void) const override // DecoderBase
-        { return true; }
-    void WriteStoredData(RingBuffer *, bool, long) override {} // DecoderBase
-
-    long UpdateStoredFrameNum(long) override { return 0; } // DecoderBase
-
-    QString GetCodecDecoderName(void) const override // DecoderBase
-        { return "dummy"; }
-    MythCodecID GetVideoCodecID(void) const override // DecoderBase
-        { return kCodec_NONE; }
-
-    bool SyncPositionMap(void) override // DecoderBase
-        { return false; }
+    // DecoderBase
+    int         OpenFile(RingBuffer *, bool, char *, int) override { return 0; }
+    bool        GetFrame(DecodeType, bool&) override      { usleep(10000); return false; }
+    bool        IsLastFrameKey(void) const override       { return true; }
+    void        WriteStoredData(RingBuffer *, bool, long) override {}
+    long        UpdateStoredFrameNum(long) override       { return 0; }
+    QString     GetCodecDecoderName(void) const override  { return "dummy"; }
+    MythCodecID GetVideoCodecID(void) const override      { return kCodec_NONE; }
+    bool        SyncPositionMap(void) override            { return false; }
 };
 
 #endif

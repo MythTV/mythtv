@@ -115,7 +115,7 @@ class AvFormatDecoder : public DecoderBase
                  char testbuf[kDecoderProbeBufferSize],
                  int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    bool GetFrame(DecodeType) override; // DecoderBase
+    bool GetFrame(DecodeType Type, bool &Retry) override; // DecoderBase
 
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
@@ -228,7 +228,7 @@ class AvFormatDecoder : public DecoderBase
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
     int  H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
     bool PreProcessVideoPacket(AVStream *stream, AVPacket *pkt);
-    virtual bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt);
+    virtual bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt, bool &Retry);
     virtual bool ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic);
     bool ProcessAudioPacket(AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);

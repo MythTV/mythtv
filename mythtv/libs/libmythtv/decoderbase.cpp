@@ -766,7 +766,8 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         m_exitafterdecoded = true; // don't actualy get a frame
         while ((desiredFrame > last_frame) && !m_ateof)
         {
-            GetFrame(kDecodeNothing); // don't need to return frame...
+            bool retry = false;
+            GetFrame(kDecodeNothing, retry); // don't need to return frame...
             SyncPositionMap();
             last_frame = GetLastFrameInPosMap();
         }

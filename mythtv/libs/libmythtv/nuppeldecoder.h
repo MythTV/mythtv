@@ -43,7 +43,7 @@ class NuppelDecoder : public DecoderBase
                  char testbuf[kDecoderProbeBufferSize], 
                  int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    bool GetFrame(DecodeType) override; // DecoderBase
+    bool GetFrame(DecodeType, bool&) override; // DecoderBase
 
     // lastFrame is really (m_framesPlayed - 1) since we increment after getting
     bool IsLastFrameKey(void) const override // DecoderBase

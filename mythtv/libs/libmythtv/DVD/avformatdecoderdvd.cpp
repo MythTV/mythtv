@@ -61,10 +61,10 @@ void AvFormatDecoderDVD::UpdateFramesPlayed(void)
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
-bool AvFormatDecoderDVD::GetFrame(DecodeType /*decodetype*/)
+bool AvFormatDecoderDVD::GetFrame(DecodeType /*Type*/, bool &Retry)
 {
     // Always try to decode audio and video for DVDs
-    return AvFormatDecoder::GetFrame( kDecodeAV );
+    return AvFormatDecoder::GetFrame(kDecodeAV, Retry);
 }
 
 int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket)
@@ -276,7 +276,7 @@ void AvFormatDecoderDVD::CheckContext(int64_t pts)
 }
 
 
-bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt)
+bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt, bool &Retry)
 {
     int64_t pts = pkt->pts;
 
@@ -285,7 +285,9 @@ bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt)
 
     CheckContext(pts);
 
-    bool ret = AvFormatDecoder::ProcessVideoPacket(stream, pkt);
+    bool ret = AvFormatDecoder::ProcessVideoPacket(stream, pkt, Retry);
+    if (Retry)
+        return ret;
 
     if( ret &&
         m_curContext &&
