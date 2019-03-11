@@ -257,13 +257,11 @@ int MythVTBContext::InitialiseBuffer(struct AVCodecContext *Context, AVFrame *Fr
     Frame->reordered_opaque = Context->reordered_opaque;
 
     // CVPixelBufferRef is stored in Frame->data[3]
-    CVPixelBufferRef buffer = reinterpret_cast<CVPixelBufferRef>(Frame->data[3]);
-    if (buffer)
-    {
-        // N.B. This is released in VideoBuffers::ReleaseDecoderResources
-        CFRetain(buffer);
-        videoframe->buf = Frame->data[3];
-    }
+    videoframe->buf = Frame->data[3];
+
+    // Frame->buf[0] contains the release method. Take another reference to
+    // ensure the frame is not released before it is displayed.
+    videoframe->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
     
     // Retrieve and set the interop class
     AVHWDeviceContext *devicectx = reinterpret_cast<AVHWDeviceContext*>(Context->hw_device_ctx->data);

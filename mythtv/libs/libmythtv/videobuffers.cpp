@@ -15,10 +15,6 @@ extern "C" {
 #include "compat.h"
 #include "mythlogging.h"
 
-#ifdef USING_VTB
-#include <CoreVideo/CoreVideo.h>
-#endif
-
 #define TRY_LOCK_SPINS                 2000
 #define TRY_LOCK_SPINS_BEFORE_WARNING  9999
 #define TRY_LOCK_SPIN_WAIT             1000 /* usec */
@@ -263,34 +259,20 @@ void VideoBuffers::SetPrebuffering(bool normal)
 
 void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
-#ifdef USING_VAAPI
-    if (Frame->pix_fmt == AV_PIX_FMT_VAAPI)
-    {
-        AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
-        if (ref)
-            av_buffer_unref(&ref);
-        ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-        if (ref)
-            av_buffer_unref(&ref);
-        Frame->buf = Frame->priv[0] = Frame->priv[1] = nullptr;
-    }
-#endif
-#ifdef USING_VTB
-    if (Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX)
-    {
-        CVPixelBufferRef ref = reinterpret_cast<CVPixelBufferRef>(Frame->buf);
-        if (ref)
-            CFRelease(ref);
-        Frame->buf = nullptr;
-    }
-#endif
-#ifdef USING_MEDIACODEC
-    if (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC)
+#if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI)
+    if ((Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX) || (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC) ||
+        (Frame->pix_fmt == AV_PIX_FMT_VAAPI))
     {
         AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
+#ifdef USING_VAAPI
+        ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+        if (ref)
+            av_buffer_unref(&ref);
+        Frame->priv[1] = nullptr;
+#endif
     }
 #endif
     (void)Frame;
