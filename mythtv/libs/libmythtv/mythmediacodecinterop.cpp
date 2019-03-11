@@ -65,7 +65,6 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     OpenGLLocker locker(m_context);
 
     // Create texture
-    // N.B. SetTextureFilters currently assumes Texture2D (default value)
     MythGLTexture *texture = m_context->CreateExternalTexture(Size, false);
     if (!texture)
     {

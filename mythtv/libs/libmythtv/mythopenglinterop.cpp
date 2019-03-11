@@ -87,7 +87,7 @@ vector<MythGLTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
         return result;
 
     MythOpenGLInterop* interop = nullptr;
-    bool validhwframe = Frame->buf && Frame->priv[1];
+    bool validhwframe = Frame->priv[1];
     bool validhwcodec = false;
 #ifdef USING_VTB
     if ((Frame->codec == FMT_VTB) && (Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX))
