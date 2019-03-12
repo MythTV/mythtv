@@ -106,8 +106,6 @@ class V4LChannel : public DTVChannel
     bool             m_has_tuner          {false};
     bool             m_has_sliced_vbi     {false};
 
-    VidModV4L2       videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
-
     int              m_defaultFreqTable   {1};
     int              m_inputNumV4L        {0};
     int              m_videoModeV4L2      {0};

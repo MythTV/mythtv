@@ -3089,10 +3089,10 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
 
 #ifdef MMX
 
-int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
+int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 {
  int i;
- mmx_t *mold=(mmx_t *)old;
+ mmx_t *mold=(mmx_t *)_old;
  mmx_t *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
  static mmx_t neg= { 0xffffffffffffffffULL };
@@ -3126,7 +3126,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
 
  if (result.q)
  {
-  for(i=0; i<16; i++)((uint64_t *)old)[i]=((uint64_t *)rblock)[i];
+  for(i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
   return 0;
  }
  return 1;
