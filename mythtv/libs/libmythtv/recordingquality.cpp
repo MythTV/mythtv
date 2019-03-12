@@ -44,9 +44,9 @@ RecordingQuality::RecordingQuality(
     while (!m_recording_gaps.empty() &&
            m_recording_gaps.first().GetStart() < start)
     {
-        RecordingGap &first = m_recording_gaps.first();
-        if (start < first.GetEnd())
-            first = RecordingGap(start, first.GetEnd());
+        RecordingGap &firstGap = m_recording_gaps.first();
+        if (start < firstGap.GetEnd())
+            firstGap = RecordingGap(start, firstGap.GetEnd());
         else
             m_recording_gaps.pop_front();
     }
