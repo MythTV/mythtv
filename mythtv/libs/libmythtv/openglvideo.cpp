@@ -454,11 +454,6 @@ MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureS
     return texture;
 }
 
-MythGLTexture* OpenGLVideo::GetInputTexture(void) const
-{
-    return m_inputTextures[0];
-}
-
 /*! \brief Update the current input texture using the data from the given YV12 video
  *  frame.
  */

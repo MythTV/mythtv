@@ -53,7 +53,6 @@ class OpenGLVideo : public QObject
    ~OpenGLVideo();
 
     bool    IsValid(void) const;
-    MythGLTexture* GetInputTexture(void) const;
     void    UpdateInputFrame(const VideoFrame *Frame);
     bool    AddDeinterlacer(QString &Deinterlacer);
     void    SetDeinterlacing(bool Deinterlacing);
