@@ -474,12 +474,18 @@ using_frontend {
         using_opengles: DEFINES += USING_OPENGLES
     }
 
-    using_opengl_video:DEFINES += USING_OPENGL_VIDEO
-    using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
-    using_opengl_video:HEADERS += openglvideoshaders.h
-    using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
-    using_opengl_video:HEADERS += mythopenglinterop.h
-    using_opengl_video:SOURCES += mythopenglinterop.cpp
+    using_opengl_video {
+        DEFINES += USING_OPENGL_VIDEO
+        HEADERS += openglvideo.h
+        HEADERS += videoout_opengl.h
+        HEADERS += openglvideoshaders.h
+        HEADERS += mythopenglinterop.h
+        HEADERS += mythvideotexture.h
+        SOURCES += openglvideo.cpp
+        SOURCES += videoout_opengl.cpp
+        SOURCES += mythopenglinterop.cpp
+        SOURCES += mythvideotexture.cpp
+    }
 
     using_vaapi:using_opengl_video {
         DEFINES += USING_VAAPI

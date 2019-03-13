@@ -77,12 +77,12 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
     return supported;
 }
 
-vector<MythGLTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
-                                                   VideoColourSpace *ColourSpace,
-                                                   VideoFrame       *Frame,
-                                                   FrameScanType     Scan)
+vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
+                                                      VideoColourSpace *ColourSpace,
+                                                      VideoFrame       *Frame,
+                                                      FrameScanType     Scan)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!(Context && Frame))
         return result;
 
@@ -146,16 +146,16 @@ MythOpenGLInterop::~MythOpenGLInterop()
     {
         OpenGLLocker locker(m_context);
         LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting textures");
-        QHash<GLuint, vector<MythGLTexture*> >::const_iterator it = m_openglTextures.constBegin();
+        QHash<GLuint, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythGLTexture*> textures = it.value();
-            vector<MythGLTexture*>::iterator it2 = textures.begin();
+            vector<MythVideoTexture*> textures = it.value();
+            vector<MythVideoTexture*>::iterator it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
                 if ((*it2)->m_textureId)
                     m_context->glDeleteTextures(1, &(*it2)->m_textureId);
-                m_context->DeleteTexture(*it2);
+                MythVideoTexture::DeleteTexture(m_context, *it2);
             }
             textures.clear();
         }

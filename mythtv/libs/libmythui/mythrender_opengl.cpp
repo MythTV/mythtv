@@ -562,51 +562,6 @@ void MythRenderOpenGL::DeleteFence(void)
     }
 }
 
-MythGLTexture* MythRenderOpenGL::CreateTexture(QSize Size,
-                                               QOpenGLTexture::PixelType PixelType,
-                                               QOpenGLTexture::PixelFormat PixelFormat,
-                                               QOpenGLTexture::Filter Filter,
-                                               QOpenGLTexture::WrapMode Wrap,
-                                               QOpenGLTexture::TextureFormat Format)
-{
-    OpenGLLocker locker(this);
-    int datasize = GetBufferSize(Size, PixelFormat, PixelType);
-    if (!datasize)
-        return nullptr;
-
-    QOpenGLTexture *texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
-    texture->setAutoMipMapGenerationEnabled(false);
-    texture->setMipLevels(1);
-    texture->setSize(Size.width(), Size.height()); // this triggers creation
-    if (!texture->textureId())
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to create texure");
-        delete texture;
-        return nullptr;
-    }
-
-    if (Format == QOpenGLTexture::NoFormat)
-    {
-        if (isOpenGLES() && format().majorVersion() < 3)
-            Format = QOpenGLTexture::RGBAFormat;
-        else
-            Format = QOpenGLTexture::RGBA8_UNorm;
-    }
-    texture->setFormat(Format);
-    texture->allocateStorage(PixelFormat, PixelType);
-    texture->setMinMagFilters(Filter, Filter);
-    texture->setWrapMode(Wrap);
-
-    MythGLTexture *result = new MythGLTexture(texture);
-    result->m_pixelFormat = PixelFormat;
-    result->m_pixelType   = PixelType;
-    result->m_vbo         = CreateVBO(kVertexSize);
-    result->m_totalSize   = GetTextureSize(Size, result->m_target != QOpenGLTexture::TargetRectangle);
-    result->m_bufferSize  = datasize;
-    result->m_size        = Size;
-    return result;
-}
-
 MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
 {
     if (!Image)
@@ -633,63 +588,6 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     result->m_size        = Image->size();
     result->m_crop        = true;
     return result;
-}
-
-/*! \brief Create a texture entirely independent of Qt
- *
- * Qt by default will use immutable texture storage if available and this feature
- * cannot be turned off. In some instances this breaks compatibility (e.g. VAAPI DRM interop).
- * Similarily a texture is sometimes required that is entirely uninitialised (e.g. OSX IOSurface interop).
-*/
-MythGLTexture* MythRenderOpenGL::CreateExternalTexture(QSize Size, bool SetFilters /*=true*/)
-{
-    OpenGLLocker locker(this);
-    GLuint textureid;
-    glGenTextures(1, &textureid);
-    if (!textureid)
-        return nullptr;
-    MythGLTexture* result = new MythGLTexture(textureid);
-    result->m_size = Size;
-    result->m_totalSize = GetTextureSize(Size, result->m_target != QOpenGLTexture::TargetRectangle);
-    result->m_vbo = CreateVBO(kVertexSize);
-    if (SetFilters)
-        SetTextureFilters(result, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
-    return result;
-}
-
-MythGLTexture* MythRenderOpenGL::CreateHelperTexture(void)
-{
-    makeCurrent();
-
-    int width = m_maxTextureSize;
-    MythGLTexture *texture = CreateTexture(QSize(width, 1),
-                                           QOpenGLTexture::Float32,
-                                           QOpenGLTexture::RGBA,
-                                           QOpenGLTexture::Linear,
-                                           QOpenGLTexture::Repeat,
-                                           QOpenGLTexture::RGBA16_UNorm);
-
-    float *buf = nullptr;
-    buf = new float[texture->m_bufferSize];
-    float *ref = buf;
-
-    for (int i = 0; i < width; i++)
-    {
-        float x = (i + 0.5f) / static_cast<float>(width);
-        StoreBicubicWeights(x, ref);
-        ref += 4;
-    }
-    StoreBicubicWeights(0, buf);
-    StoreBicubicWeights(1, &buf[(width - 1) << 2]);
-
-    EnableTextures();
-    texture->m_texture->bind();
-    texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Created bicubic helper texture (%1 samples)") .arg(width));
-    delete [] buf;
-    doneCurrent();
-    return texture;
 }
 
 QSize MythRenderOpenGL::GetTextureSize(const QSize &size, bool Normalised)
@@ -749,18 +647,6 @@ void MythRenderOpenGL::ActiveTexture(GLuint ActiveTex)
         m_activeTexture = ActiveTex;
     }
     doneCurrent();
-}
-
-void MythRenderOpenGL::StoreBicubicWeights(float X, float *Dst)
-{
-    float w0 = (((-1 * X + 3) * X - 3) * X + 1) / 6;
-    float w1 = ((( 3 * X - 6) * X + 0) * X + 4) / 6;
-    float w2 = (((-3 * X + 3) * X + 3) * X + 1) / 6;
-    float w3 = ((( 1 * X + 0) * X + 0) * X + 0) / 6;
-    *Dst++ = 1 + X - w1 / (w0 + w1);
-    *Dst++ = 1 - X + w3 / (w2 + w3);
-    *Dst++ = w0 + w1;
-    *Dst++ = 0;
 }
 
 void MythRenderOpenGL::EnableTextures(GLenum Type)

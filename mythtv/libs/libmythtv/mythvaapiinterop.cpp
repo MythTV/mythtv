@@ -384,12 +384,12 @@ MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
     }
 }
 
-vector<MythGLTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Context,
-                                                        VideoColourSpace *ColourSpace,
-                                                        VideoFrame *Frame,
-                                                        FrameScanType Scan)
+vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Context,
+                                                           VideoColourSpace *ColourSpace,
+                                                           VideoFrame *Frame,
+                                                           FrameScanType Scan)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -409,9 +409,14 @@ vector<MythGLTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Contex
     if (m_openglTextures.isEmpty())
     {
         // create a texture
-        MythGLTexture *texture = m_context->CreateTexture(m_openglTextureSize);
+        MythVideoTexture *texture = MythVideoTexture::CreateTexture(m_context, m_openglTextureSize);
         if (!texture)
             return result;
+
+        texture->m_plane = 0;
+        texture->m_planeCount = 1;
+        texture->m_frameType = FMT_VAAPI;
+        texture->m_frameFormat = FMT_RGBA32;
 
         // create an associated GLX surface
         INIT_ST;
@@ -421,7 +426,7 @@ vector<MythGLTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Contex
         if (!m_glxSurface)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX surface.");
-            m_context->DeleteTexture(texture);
+            MythVideoTexture::DeleteTexture(m_context, texture);
             return result;
         }
 
@@ -479,12 +484,12 @@ MythVAAPIInteropGLXPixmap::~MythVAAPIInteropGLXPixmap()
         XFreePixmap(display, m_pixmap);
 }
 
-vector<MythGLTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Context,
-                                                          VideoColourSpace *ColourSpace,
-                                                          VideoFrame *Frame,
-                                                          FrameScanType Scan)
+vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Context,
+                                                             VideoColourSpace *ColourSpace,
+                                                             VideoFrame *Frame,
+                                                             FrameScanType Scan)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -561,10 +566,13 @@ vector<MythGLTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Cont
         }
 
         // Create a texture
-        MythGLTexture *texture = m_context->CreateExternalTexture(m_openglTextureSize);
-        if (!texture)
+        vector<QSize> size;
+        size.push_back(m_openglTextureSize);
+        vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
+        if (textures.empty())
             return result;
-        result.push_back(texture);
+        MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        result.push_back(textures[0]);
         m_openglTextures.insert(DUMMY_INTEROP_ID, result);
     }
 
@@ -670,11 +678,11 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
     if (!m_openglTextures.isEmpty() && InitEGL() && display)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting DRM buffers");
-        QHash<GLuint, vector<MythGLTexture*> >::const_iterator it = m_openglTextures.constBegin();
+        QHash<GLuint, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythGLTexture*> textures = it.value();
-            vector<MythGLTexture*>::iterator it2 = textures.begin();
+            vector<MythVideoTexture*> textures = it.value();
+            vector<MythVideoTexture*>::iterator it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
                 if ((*it2)->m_data)
@@ -690,11 +698,11 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
         m_drmFile.close();
 }
 
-vector<MythGLTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
-                                                    VideoColourSpace *ColourSpace,
-                                                    VideoFrame *Frame, FrameScanType)
+vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
+                                                       VideoColourSpace *ColourSpace,
+                                                       VideoFrame *Frame, FrameScanType)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -732,7 +740,7 @@ vector<MythGLTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
     INIT_ST;
     va_status = vaDeriveImage(m_vaDisplay, id, &vaimage);
     CHECK_ST;
-    uint planes = vaimage.num_planes;
+    uint count = vaimage.num_planes;
 
     VABufferInfo vabufferinfo;
     memset(&vabufferinfo, 0, sizeof(vabufferinfo));
@@ -740,13 +748,42 @@ vector<MythGLTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
     va_status = vaAcquireBufferHandle(m_vaDisplay, vaimage.buf, &vabufferinfo);
     CHECK_ST;
 
-    for (uint i = 0 ; i < planes; ++i)
+    VideoFrameType format = VATypeToMythType(vaimage.format.fourcc);
+    if (format == FMT_NONE)
     {
-        MythGLTexture* texture = GetDRMTexture(i, planes, m_openglTextureSize, vabufferinfo.handle, vaimage);
-        if (texture)
-            result.push_back(texture);
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1").arg(fourcc_str(vaimage.format.fourcc)));
+    }
+    else
+    {
+        if (count != planes(format))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Inconsistent plane count %1 != %2")
+                .arg(count).arg(planes(format)));
+        }
         else
-            break;
+        {
+            vector<QSize> sizes;
+            for (uint plane = 0 ; plane < count; ++plane)
+            {
+                QSize size = m_openglTextureSize;
+                if (plane > 0)
+                    size = QSize(m_openglTextureSize.width() >> 1, m_openglTextureSize.height() >> 1);
+                sizes.push_back(size);
+            }
+
+            vector<MythVideoTexture*> textures =
+                    MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, format, sizes);
+            if (textures.size() != count)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
+            }
+            else
+            {
+                MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+                CreateDRMBuffers(format, textures, vabufferinfo.handle, vaimage);
+                result = textures;
+            }
+        }
     }
 
     va_status = vaReleaseBufferHandle(m_vaDisplay, vaimage.buf);
@@ -756,6 +793,23 @@ vector<MythGLTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
 
     m_openglTextures.insert(id, result);
     return result;
+}
+
+VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
+{
+    switch (Fourcc)
+    {
+        case VA_FOURCC_IYUV:
+        case VA_FOURCC_I420: return FMT_YV12;
+        case VA_FOURCC_NV12: return FMT_NV12;
+        case VA_FOURCC_YUY2: return FMT_YUY2;
+        case VA_FOURCC_UYVY: return FMT_YUY2; // ?
+        case VA_FOURCC_P010: return FMT_YUV420P10;
+        case VA_FOURCC_P016: return FMT_YUV420P16;
+        case VA_FOURCC_ARGB: return FMT_ARGB32;
+        case VA_FOURCC_RGBA: return FMT_RGBA32;
+    }
+    return FMT_NONE;
 }
 
 bool MythVAAPIInteropDRM::InitEGL(void)
@@ -779,41 +833,41 @@ bool MythVAAPIInteropDRM::InitEGL(void)
     return true;
 }
 
-/*! \brief Create an EGL image backed by an external DMA buffer.
- *
- * \note Fourcc and width/height need to be dealt with properly. They
- * currently assume either I420/YV12 or NV12 and adapt accordingly.
+/*! \brief Create a set of EGL images/DRM buffers associated with the given textures
 */
-MythGLTexture* MythVAAPIInteropDRM::GetDRMTexture(uint Plane, uint TotalPlanes,
-                                                  QSize Size, uintptr_t Handle, VAImage &Image)
+void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
+                                           vector<MythVideoTexture*> Textures,
+                                           uintptr_t Handle, VAImage &Image)
 {
-    int fourcc = DRM_FORMAT_R8;
-    if ((TotalPlanes == 2) && (Plane > 0))
-        fourcc = DRM_FORMAT_GR88;
-    const EGLint attributes[] = {
-            EGL_LINUX_DRM_FOURCC_EXT, fourcc,
-            EGL_WIDTH,  Plane > 0 ? Size.width() >> 1 : Size.width(),
-            EGL_HEIGHT, Plane > 0 ? Size.height() >> 1 : Size.height(),
-            EGL_DMA_BUF_PLANE0_FD_EXT,     static_cast<EGLint>(Handle),
-            EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(Image.offsets[Plane]),
-            EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(Image.pitches[Plane]),
-            EGL_NONE
-    };
+    for (uint plane = 0; plane < Textures.size(); ++plane)
+    {
+        MythVideoTexture* texture = Textures[plane];
+        int fourcc = DRM_FORMAT_R8;
+        if ((Format == FMT_NV12) && (plane > 0))
+            fourcc = DRM_FORMAT_GR88;
+        const EGLint attributes[] = {
+                EGL_LINUX_DRM_FOURCC_EXT, fourcc,
+                EGL_WIDTH,  texture->m_size.width(),
+                EGL_HEIGHT, texture->m_size.height(),
+                EGL_DMA_BUF_PLANE0_FD_EXT,     static_cast<EGLint>(Handle),
+                EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(Image.offsets[plane]),
+                EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(Image.pitches[plane]),
+                EGL_NONE
+        };
 
-    MythGLTexture *texture = m_context->CreateExternalTexture(Size);
-    EGLDisplay display = eglGetCurrentDisplay();
-    if (!display)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLDisplay");
+        EGLDisplay display = eglGetCurrentDisplay();
+        if (!display)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLDisplay");
 
-    EGLImageKHR image = m_eglCreateImageKHR(display, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
-    if (!image)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLImage");
+        EGLImageKHR image = m_eglCreateImageKHR(display, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
+        if (!image)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLImage");
 
-    m_context->glBindTexture(QOpenGLTexture::Target2D, texture->m_textureId);
-    m_eglImageTargetTexture2DOES(QOpenGLTexture::Target2D, image);
-    m_context->glBindTexture(QOpenGLTexture::Target2D, 0);
-    texture->m_data = static_cast<unsigned char *>(image);
-    return texture;
+        m_context->glBindTexture(texture->m_target, texture->m_textureId);
+        m_eglImageTargetTexture2DOES(texture->m_target, image);
+        m_context->glBindTexture(texture->m_target, 0);
+        texture->m_data = static_cast<unsigned char *>(image);
+    }
 }
 
 bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)

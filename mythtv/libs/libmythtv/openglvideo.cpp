@@ -43,7 +43,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_referenceTexturesNeeded(0),
     m_features(),
     m_extraFeatures(0),
-    m_copyCtx(),
     m_resizing(false),
     m_forceResize(false),
     m_textureTarget(QOpenGLTexture::Target2D)
@@ -64,26 +63,21 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_features      = m_render->GetFeatures();
     m_extraFeatures = m_render->GetExtraFeatures();
 
-    // Create initial input texture. Hardware textures are created on demand.
-    MythGLTexture *texture = nullptr;
+    // Create initial input texture(s). Hardware textures are created on demand.
     if (kGLInterop != m_frameType)
     {
-        texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);
-        if (!texture)
-            return;
-        m_inputTextures.push_back(texture);
-    }
-
-    if (kGLYV12 == m_frameType)
-    {
-        QSize temp;
-        QSize chroma(m_videoDim.width() >> 1, m_videoDim.height() >> 1);
-        texture = CreateVideoTexture(chroma, temp);
-        if (!texture) return;
-        m_inputTextures.push_back(texture);
-        texture = CreateVideoTexture(chroma, temp);
-        if (!texture) return;
-        m_inputTextures.push_back(texture);
+        VideoFrameType format = FMT_YV12;
+        if (kGLUYVY == m_frameType)
+            format = FMT_YUY2;
+        else if (kGLHQUYV == m_frameType)
+            format = FMT_YUYVHQ;
+        vector<QSize> sizes;
+        sizes.push_back(QSize(m_videoDim));
+        m_inputTextures = MythVideoTexture::CreateTextures(m_render, FMT_YV12, format, sizes);
+        if (m_inputTextures.empty())
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create input textures");
+        else
+            m_inputTextureSize = m_inputTextures[0]->m_totalSize;
     }
 
     // Create initial shaders - default and progressive
@@ -122,8 +116,8 @@ OpenGLVideo::~OpenGLVideo()
     for (int i = 0; i < ShaderCount; ++i)
         if (m_shaders[i])
             m_render->DeleteShaderProgram(m_shaders[i]);
-    DeleteTextures(&m_inputTextures);
-    DeleteTextures(&m_referenceTextures);
+    MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
+    MythVideoTexture::DeleteTextures(m_render, m_referenceTextures);
 
     m_render->doneCurrent();
     m_render->DecrRef();
@@ -213,11 +207,7 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
         return true;
 
     // delete old reference textures
-    while (!m_referenceTextures.empty())
-    {
-        m_render->DeleteTexture(m_referenceTextures.back());
-        m_referenceTextures.pop_back();
-    }
+    MythVideoTexture::DeleteTextures(m_render, m_referenceTextures);
 
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_render->GetMaxTextureUnits();
@@ -240,22 +230,21 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
 
     // create the correct number of reference textures
     refstocreate *= static_cast<uint>(texturesperframe);
+    VideoFrameType format = FMT_YV12;
+    if (kGLUYVY == m_frameType)
+        format = FMT_YUY2;
+    else if (kGLHQUYV == m_frameType)
+        format = FMT_YUYVHQ;
+    vector<QSize> sizes;
+    sizes.push_back(QSize(m_videoDim));
     while (m_referenceTextures.size() < refstocreate)
     {
-        MythGLTexture *texture = CreateVideoTexture(m_videoDim, m_inputTextureSize);
-        if (!texture) return false;
-        m_referenceTextures.push_back(texture);
-        if (kGLYV12 == m_frameType)
-        {
-            QSize temp;
-            QSize chroma(m_videoDim.width() >> 1, m_videoDim.height() >> 1);
-            texture = CreateVideoTexture(chroma, temp);
-            if (!texture) return false;
-            m_referenceTextures.push_back(texture);
-            texture = CreateVideoTexture(chroma, temp);
-            if (!texture) return false;
-            m_referenceTextures.push_back(texture);
-        }
+        vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_render,
+                                                 FMT_YV12, format, sizes);
+        if (textures.empty())
+            return false;
+        for (uint i = 0; i < textures.size(); ++i)
+            m_referenceTextures.push_back(textures[i]);
     }
 
     // ensure they work correctly
@@ -418,42 +407,6 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     return true;
 }
 
-/*! \brief Create and initialise an OpenGL texture suitable for a YV12 video frame
- * of the given size.
-*/
-MythGLTexture* OpenGLVideo::CreateVideoTexture(QSize Size, QSize &ActualTextureSize)
-{
-    MythGLTexture *texture = nullptr;
-    if (kGLInterop == m_frameType)
-    {
-        return texture;
-    }
-    else if (kGLYV12 == m_frameType)
-    {
-        texture = m_render->CreateTexture(Size,
-            QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
-            QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
-            QOpenGLTexture::LuminanceFormat);
-    }
-    else if (kGLUYVY == m_frameType)
-    {
-        Size.setWidth(Size.width() >> 1);
-        texture = m_render->CreateTexture(Size);
-    }
-    else if ((kGLHQUYV == m_frameType))
-    {
-        texture = m_render->CreateTexture(Size);
-    }
-
-    if (texture)
-    {
-        ActualTextureSize = texture->m_totalSize;
-        if (m_resizing)
-            m_render->SetTextureFilters(texture, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
-    }
-    return texture;
-}
-
 /*! \brief Update the current input texture using the data from the given YV12 video
  *  frame.
  */
@@ -476,67 +429,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
 
     m_videoColourSpace->UpdateColourSpace(Frame);
 
-    MythGLTexture *texture = m_inputTextures[0];
-    if (!texture)
-        return;
-
-    void* buf = nullptr;
-    if ((kGLYV12 == m_frameType) && (m_videoDim.width() == Frame->pitches[0]))
-    {
-        buf = Frame->buf;
-    }
-    else
-    {
-        // create a storage buffer
-        if (!texture->m_data)
-        {
-            int size = texture->m_bufferSize;
-            // extra needed for raw YV12 frame
-            if (kGLYV12 == m_frameType)
-                size = size + (size >> 1);
-            unsigned char *scratch = new unsigned char[size];
-            if (scratch)
-            {
-                memset(scratch, 0, static_cast<size_t>(texture->m_bufferSize));
-                texture->m_data = scratch;
-            }
-        }
-        if (!texture->m_data)
-            return;
-        buf = texture->m_data;
-
-        if (kGLYV12 == m_frameType)
-        {
-            copybuffer(static_cast<uint8_t*>(buf), Frame, m_videoDim.width());
-        }
-        else if (kGLUYVY == m_frameType)
-        {
-            AVFrame img_out;
-            m_copyCtx.Copy(&img_out, Frame, static_cast<unsigned char*>(buf), AV_PIX_FMT_UYVY422);
-        }
-        else if (kGLHQUYV == m_frameType && Frame->interlaced_frame)
-        {
-            pack_yv12interlaced(Frame->buf, static_cast<unsigned char*>(buf), Frame->offsets,
-                                Frame->pitches, m_videoDim);
-        }
-        else if (kGLHQUYV == m_frameType)
-        {
-            pack_yv12progressive(Frame->buf, static_cast<unsigned char*>(buf), Frame->offsets,
-                                 Frame->pitches, m_videoDim);
-        }
-    }
-
-    texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
-
-    // update chroma for YV12 textures
-    if ((kGLYV12 == m_frameType) && (m_inputTextures.size() == 3))
-    {
-        int offset = (m_videoDim.width() * m_videoDim.height());
-        m_inputTextures[1]->m_texture->setData(m_inputTextures[1]->m_pixelFormat,
-                m_inputTextures[1]->m_pixelType, static_cast<uint8_t*>(buf) + offset);
-        m_inputTextures[2]->m_texture->setData(m_inputTextures[2]->m_pixelFormat,
-                m_inputTextures[2]->m_pixelType, static_cast<uint8_t*>(buf) + offset + (offset >> 2));
-    }
+    MythVideoTexture::UpdateTextures(m_render, Frame, m_inputTextures);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
@@ -559,7 +452,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         m_render->logDebugMarker(LOC + "PREP_FRAME_START");
 
     // Set required input textures for the last stage
-    vector<MythGLTexture*> inputtextures;
+    vector<MythVideoTexture*> inputtextures;
 
     // Pull in any hardware frames
     if (kGLInterop == m_frameType)
@@ -651,15 +544,15 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
             m_render->DeleteFramebuffer(m_frameBuffer);
             m_frameBuffer = nullptr;
         }
-        SetTextureFilters(&m_inputTextures,     QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
-        SetTextureFilters(&m_referenceTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_referenceTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         m_resizing = false;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled resizing");
     }
     else if (!m_resizing && resize)
     {
-        SetTextureFilters(&m_inputTextures,     QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
-        SetTextureFilters(&m_referenceTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_referenceTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
         m_resizing = true;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled resizing");
     }
@@ -681,7 +574,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         // and its associated texture
         if (!m_frameBufferTexture)
         {
-            m_frameBufferTexture = m_render->CreateFramebufferTexture(m_frameBuffer);
+            m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_render->CreateFramebufferTexture(m_frameBuffer));
             if (!m_frameBufferTexture)
                 return;
             m_render->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
@@ -701,10 +594,10 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         MythGLTexture* textures[MAX_VIDEO_TEXTURES];
         uint numtextures = 0;
         for (uint i = 0; i < inputtextures.size(); i++)
-            textures[numtextures++] = inputtextures[i];
+            textures[numtextures++] = reinterpret_cast<MythGLTexture*>(inputtextures[i]);
         if (deinterlacing)
             for (uint i = 0; i < m_referenceTextures.size(); i++)
-                textures[numtextures++] = m_referenceTextures[i];
+                textures[numtextures++] = reinterpret_cast<MythGLTexture*>(m_referenceTextures[i]);
 
         // render
         m_render->DrawBitmap(textures, numtextures, m_frameBuffer, trect, vrect, m_shaders[program]);
@@ -749,11 +642,10 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     MythGLTexture* textures[MAX_VIDEO_TEXTURES];
     uint numtextures = 0;
     for (uint i = 0; i < inputtextures.size(); i++)
-        textures[numtextures++] = inputtextures[i];
-
+        textures[numtextures++] = reinterpret_cast<MythGLTexture*>(inputtextures[i]);
     if (deinterlacing)
         for (uint i = 0; i < m_referenceTextures.size(); i++)
-            textures[numtextures++] = m_referenceTextures[i];
+            textures[numtextures++] = reinterpret_cast<MythGLTexture*>(m_referenceTextures[i]);
 
     // draw
     m_render->DrawBitmap(textures, numtextures, nullptr, trect, m_displayVideoRect, m_shaders[program]);
@@ -771,7 +663,7 @@ void OpenGLVideo::RotateTextures(void)
         return;
 
     uint rotate = static_cast<uint>(m_inputTextures.size());
-    vector<MythGLTexture*> newinputs, newrefs;
+    vector<MythVideoTexture*> newinputs, newrefs;
     for (uint i = 0; i < rotate; ++i)
         newinputs.push_back(m_referenceTextures[i]);
     for (uint i = rotate; i < m_referenceTextures.size(); ++i)
@@ -780,25 +672,6 @@ void OpenGLVideo::RotateTextures(void)
         newrefs.push_back(m_inputTextures[i]);
     m_inputTextures = newinputs;
     m_referenceTextures = newrefs;
-}
-
-void OpenGLVideo::DeleteTextures(vector<MythGLTexture*> *Textures)
-{
-    if (Textures && m_render)
-    {
-        for (uint i = 0; i < Textures->size(); i++)
-            m_render->DeleteTexture((*Textures)[i]);
-        Textures->clear();
-    }
-}
-
-void OpenGLVideo::SetTextureFilters(vector<MythGLTexture *> *Textures,
-                                    QOpenGLTexture::Filter Filter,
-                                    QOpenGLTexture::WrapMode Wrap)
-{
-    if (Textures && m_render)
-        for (uint i = 0; i < Textures->size(); i++)
-            m_render->SetTextureFilters((*Textures)[i], Filter, Wrap);
 }
 
 OpenGLVideo::FrameType OpenGLVideo::StringToType(const QString &Type)

@@ -7,6 +7,7 @@
 #include "videoouttypes.h"
 #include "mythcodecid.h"
 #include "mythframe.h"
+#include "mythvideotexture.h"
 
 // Std
 #include "vector"
@@ -31,18 +32,18 @@ class MythOpenGLInterop : public ReferenceCounter
         MEDIACODEC   = 6
     };
 
-    static QStringList GetAllowedRenderers (MythCodecID CodecId);
-    static Type        GetInteropType      (MythCodecID CodecId);
-    static vector<MythGLTexture*> Retrieve (MythRenderOpenGL *Context,
-                                            VideoColourSpace *ColourSpace,
-                                            VideoFrame *Frame,
-                                            FrameScanType Scan);
-    static QString     TypeToString        (Type InteropType);
+    static QStringList GetAllowedRenderers   (MythCodecID CodecId);
+    static Type        GetInteropType        (MythCodecID CodecId);
+    static vector<MythVideoTexture*> Retrieve(MythRenderOpenGL *Context,
+                                              VideoColourSpace *ColourSpace,
+                                              VideoFrame *Frame,
+                                              FrameScanType Scan);
+    static QString     TypeToString          (Type InteropType);
 
     virtual ~MythOpenGLInterop();
-    virtual vector<MythGLTexture*> Acquire (MythRenderOpenGL *Context,
-                                            VideoColourSpace *ColourSpace,
-                                            VideoFrame *Frame, FrameScanType Scan) = 0;
+    virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
+                                              VideoColourSpace *ColourSpace,
+                                              VideoFrame *Frame, FrameScanType Scan) = 0;
     Type GetType(void);
 
   protected:
@@ -51,7 +52,7 @@ class MythOpenGLInterop : public ReferenceCounter
   protected:
     MythRenderOpenGL   *m_context;
     Type                m_type;
-    QHash<GLuint, vector<MythGLTexture*> > m_openglTextures;
+    QHash<GLuint, vector<MythVideoTexture*> > m_openglTextures;
     QSize               m_openglTextureSize;
 };
 

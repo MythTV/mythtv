@@ -66,9 +66,9 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
   public:
     MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context);
     ~MythVAAPIInteropGLXCopy() override;
-    vector<MythGLTexture*> Acquire(MythRenderOpenGL *Context,
-                                   VideoColourSpace *ColourSpace,
-                                   VideoFrame *Frame, FrameScanType Scan) final override;
+    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
+                                      VideoColourSpace *ColourSpace,
+                                      VideoFrame *Frame, FrameScanType Scan) final override;
 
   private:
     void* m_glxSurface;
@@ -85,9 +85,9 @@ class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
   public:
     MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context);
     ~MythVAAPIInteropGLXPixmap() override;
-    vector<MythGLTexture*> Acquire(MythRenderOpenGL *Context,
-                                   VideoColourSpace *ColourSpace,
-                                   VideoFrame *Frame, FrameScanType Scan) final override;
+    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
+                                      VideoColourSpace *ColourSpace,
+                                      VideoFrame *Frame, FrameScanType Scan) final override;
     static bool IsSupported(MythRenderOpenGL *Context);
 
   private:
@@ -111,15 +111,17 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop
   public:
     MythVAAPIInteropDRM(MythRenderOpenGL *Context);
     ~MythVAAPIInteropDRM() override;
-    vector<MythGLTexture*> Acquire(MythRenderOpenGL *Context,
-                                   VideoColourSpace *ColourSpace,
-                                   VideoFrame *Frame,FrameScanType Scan) final override;
+    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
+                                      VideoColourSpace *ColourSpace,
+                                      VideoFrame *Frame,FrameScanType Scan) final override;
     static bool    IsSupported(MythRenderOpenGL *Context);
 
   private:
-    MythGLTexture* GetDRMTexture(uint Plane, uint TotalPlanes,
-                                 QSize Size, uintptr_t Handle, VAImage &Image);
+    void           CreateDRMBuffers(VideoFrameType Format,
+                                    vector<MythVideoTexture*> Textures,
+                                    uintptr_t Handle, VAImage &Image);
     bool           InitEGL(void);
+    VideoFrameType VATypeToMythType(uint32_t Fourcc);
 
   private:
     QFile                m_drmFile;

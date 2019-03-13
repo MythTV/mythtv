@@ -65,16 +65,20 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     OpenGLLocker locker(m_context);
 
     // Create texture
-    MythGLTexture *texture = m_context->CreateExternalTexture(Size, false);
-    if (!texture)
+    vector<QSize> sizes;
+    sizes.push_back(Size);
+    vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_MEDIACODEC, FMT_RGBA32, sizes);
+    if (textures.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create texture");
         return false;
     }
 
     // Set the texture type
+    // N.B. CreateTextures is not GL_TEXTURE_EXTERNAL_OES aware (no Qt enum)
+    MythVideoTexture *texture = textures[0];
     texture->m_target = GL_TEXTURE_EXTERNAL_OES;
-    m_context->SetTextureFilters(texture, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+    MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
 
     // Create surface
@@ -91,26 +95,23 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
                                       m_surfaceTexture.object());
         if (m_surface.isValid())
         {
-            vector<MythGLTexture*> result;
-            result.push_back(texture);
-            m_openglTextures.insert(DUMMY_INTEROP_ID, result);
+            m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
             LOG(VB_GENERAL, LOG_INFO, LOC + "Created Android Surface");
             return true;
         }
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android Surface");
     }
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android SurfaceTexture");
-    m_context->glDeleteTextures(1, &(texture->m_textureId));
-    m_context->DeleteTexture(texture);
+    MythVideoTexture::DeleteTextures(m_context, textures);
     return false;
 }
 
-vector<MythGLTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
-                                                      VideoColourSpace *ColourSpace,
-                                                      VideoFrame *Frame,
-                                                      FrameScanType)
+vector<MythVideoTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
+                                                         VideoColourSpace *ColourSpace,
+                                                         VideoFrame *Frame,
+                                                         FrameScanType)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 

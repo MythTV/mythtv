@@ -10,7 +10,6 @@
 #include "videoouttypes.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
-#include "util-opengl.h"
 #include "mythopenglinterop.h"
 
 // Std
@@ -70,12 +69,7 @@ class OpenGLVideo : public QObject
 
   private:
     bool    CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
-    MythGLTexture* CreateVideoTexture(QSize Size, QSize &ActualTextureSize);
     void    RotateTextures(void);
-    void    SetTextureFilters(vector<MythGLTexture*>  *Textures,
-                              QOpenGLTexture::Filter   Filter,
-                              QOpenGLTexture::WrapMode Wrap);
-    void    DeleteTextures(vector<MythGLTexture*> *Textures);
     void    TearDownDeinterlacer(void);
 
     bool           m_valid;
@@ -94,15 +88,14 @@ class OpenGLVideo : public QObject
     bool           m_viewportControl;     ///< Video has control over view port
     QOpenGLShaderProgram* m_shaders[ShaderCount];
     int            m_shaderCost[ShaderCount];
-    vector<MythGLTexture*> m_referenceTextures; ///< Up to 3 reference textures for filters
-    vector<MythGLTexture*> m_inputTextures;     ///< Textures with raw video data
+    vector<MythVideoTexture*> m_referenceTextures; ///< Up to 3 reference textures for filters
+    vector<MythVideoTexture*> m_inputTextures;     ///< Textures with raw video data
     QOpenGLFramebufferObject* m_frameBuffer;
-    MythGLTexture*            m_frameBufferTexture;
+    MythVideoTexture*         m_frameBufferTexture;
     QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
     uint           m_referenceTexturesNeeded; ///< Number of reference textures still required
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
     int            m_extraFeatures;       ///< OR'd list of extra, Myth specific features
-    MythAVCopy     m_copyCtx;             ///< Conversion context for YV12 to UYVY
     bool           m_resizing;
     bool           m_forceResize;         ///< Global setting to force a resize stage
     GLenum         m_textureTarget;       ///< Some interops require custom texture targets

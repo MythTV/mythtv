@@ -119,15 +119,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     static const GLuint kVertexSize;
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
 
-    MythGLTexture* CreateHelperTexture(void);
-    MythGLTexture* CreateTexture(QSize Size,
-                        QOpenGLTexture::PixelType     PixelType   = QOpenGLTexture::UInt8,
-                        QOpenGLTexture::PixelFormat   PixelFormat = QOpenGLTexture::RGBA,
-                        QOpenGLTexture::Filter        Filter      = QOpenGLTexture::Linear,
-                        QOpenGLTexture::WrapMode      Wrap        = QOpenGLTexture::ClampToEdge,
-                        QOpenGLTexture::TextureFormat Format      = QOpenGLTexture::NoFormat);
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
-    MythGLTexture* CreateExternalTexture(QSize Size, bool SetFilters = true);
     QSize GetTextureSize(const QSize &size, bool Normalised);
     int   GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
@@ -135,6 +127,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  EnableTextures(GLenum Type = QOpenGLTexture::Target2D);
     void  DisableTextures(void);
     void  DeleteTexture(MythGLTexture *Texture);
+    int   GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
     QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size);
     MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
@@ -180,12 +173,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  ExpireVertices(int Max = 0);
     void  GetCachedVBO(GLuint Type, const QRect &Area);
     void  ExpireVBOS(int Max = 0);
-    int   GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
-
     bool  CreateDefaultShaders(void);
     void  DeleteDefaultShaders(void);
-
-    static void StoreBicubicWeights(float X, float *Dst);
 
   protected:
     // Prevent compiler complaints about using 0 as a null pointer.

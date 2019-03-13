@@ -50,12 +50,12 @@ MythVTBInterop::~MythVTBInterop()
 {
 }
 
-vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
-                                               VideoColourSpace *ColourSpace,
-                                               VideoFrame *Frame,
-                                               FrameScanType)
+vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
+                                                  VideoColourSpace *ColourSpace,
+                                                  VideoFrame *Frame,
+                                                  FrameScanType)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -92,14 +92,20 @@ vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
     // Create necessary textures
     if (m_openglTextures.isEmpty())
     {
-        for (int i = 0; i < planes; ++i)
+        for (int plane = 0; plane < planes; ++plane)
         {
-            int width  = CVPixelBufferGetWidthOfPlane(buffer, i);
-            int height = CVPixelBufferGetHeightOfPlane(buffer, i);
+            int width  = CVPixelBufferGetWidthOfPlane(buffer, plane);
+            int height = CVPixelBufferGetHeightOfPlane(buffer, plane);
             QSize size(width, height);
-            MythGLTexture *texture = m_context->CreateTexture(size);
+            MythVideoTexture *texture = MythVideoTexture::CreateTexture(m_context, size);
             if (texture)
+            {
+                texture->m_frameType = FMT_VTB;
+                texture->m_frameFormat = FMT_NV12; // TODO check this
+                texture->m_plane = plane;
+                texture->m_planeCount = planes;
                 result.push_back(texture);
+            }
         }
 
         if (result.size() != static_cast<uint>(planes))
@@ -113,16 +119,16 @@ vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
         m_context->glEnable(QOpenGLTexture::Target2D);
         
         // Update textures
-        for (int i = 0; i < planes; ++i)
+        for (int plane = 0; plane < planes; ++plane)
         {
-            if (static_cast<uint>(i) >= result.size())
+            if (static_cast<uint>(plane) >= result.size())
                 continue;
         
-            int width  = CVPixelBufferGetWidthOfPlane(buffer, i);
-            int height = CVPixelBufferGetHeightOfPlane(buffer, i);
-            int bytes  = CVPixelBufferGetBytesPerRowOfPlane(buffer, i) / width;
-            void* buf  = CVPixelBufferGetBaseAddressOfPlane(buffer, i);
-            result[i]->m_texture->bind();
+            int width  = CVPixelBufferGetWidthOfPlane(buffer, plane);
+            int height = CVPixelBufferGetHeightOfPlane(buffer, plane);
+            int bytes  = CVPixelBufferGetBytesPerRowOfPlane(buffer, plane) / width;
+            void* buf  = CVPixelBufferGetBaseAddressOfPlane(buffer, plane);
+            result[plane]->m_texture->bind();
             if ((bytes == 1) && buf)
             {
                 m_context->glTexImage2D(QOpenGLTexture::Target2D, 0, QOpenGLTexture::RGBA, width, height,
@@ -133,7 +139,7 @@ vector<MythGLTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
                 m_context->glTexImage2D(QOpenGLTexture::Target2D, 0, QOpenGLTexture::RGBA, width, height,
                                         0, QOpenGLTexture::RG, QOpenGLTexture::UInt8, buf);
             }
-            result[i]->m_texture->release();
+            result[plane]->m_texture->release();
         }
     }
     CVPixelBufferUnlockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
@@ -149,12 +155,12 @@ MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
 {
 }
 
-vector<MythGLTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
-                                                      VideoColourSpace *ColourSpace,
-                                                      VideoFrame *Frame,
-                                                      FrameScanType)
+vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
+                                                         VideoColourSpace *ColourSpace,
+                                                         VideoFrame *Frame,
+                                                         FrameScanType)
 {
-    vector<MythGLTexture*> result;
+    vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -204,33 +210,35 @@ vector<MythGLTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
     int planes = IOSurfaceGetPlaneCount(surface);
     IOSurfaceLock(surface, kIOSurfaceLockReadOnly, nullptr);
 
-    for (int plane = 0; plane < planes; ++plane)
+    // Create raw rectangular textures
+    vector<QSize> sizes;
+    for (int plane = 0; planes < planes; ++plane)
     {
         int width  = IOSurfaceGetWidthOfPlane(surface, plane);
         int height = IOSurfaceGetHeightOfPlane(surface, plane);
-        QSize size(width, height);
+        sizes.push_back(QSize(width, height));
+    }
+    // TODO proper handling of all formats - this assumes NV12
+    result = MythVideoTexture::CreateTextures(m_context, FMT_VTB, FMT_NV12, sizes, QOpenGLTexture::TargetRectangle);
 
-        MythGLTexture* texture = m_context->CreateExternalTexture(size, false);
+    for (int plane = 0; plane < result.size(); ++plane)
+    {
+       MythVideoTexture* texture = result[i];
         if (!texture)
             continue;
-        texture->m_target = QOpenGLTexture::TargetRectangle;
         m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
-        m_context->glBindTexture(QOpenGLTexture::TargetRectangle, texture->m_textureId);
-
-        // TODO proper handling of all formats - this assumes NV12
+        m_context->glBindTexture(texture->m_target, texture->m_textureId);
         GLenum format = plane == 0 ? QOpenGLTexture::Red : QOpenGLTexture::RG;
         CGLError error = CGLTexImageIOSurface2D(
-                CGLGetCurrentContext(), QOpenGLTexture::TargetRectangle, format, width, height,
+                CGLGetCurrentContext(), QOpenGLTexture::TargetRectangle, format,
+                texture->m_size.width(), texture->m_size.height(),
                 format, QOpenGLTexture::UInt8, surface, plane);
         if (error != kCGLNoError)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("CGLTexImageIOSurface2D error %1").arg(error));
-
         m_context->glBindTexture(QOpenGLTexture::TargetRectangle, 0);
-        result.push_back(texture);
     }
 
     IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);
-
     m_openglTextures.insert(surfaceid, result);
     return result;
 }

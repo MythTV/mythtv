@@ -26,6 +26,7 @@ typedef enum FrameType_
     FMT_BGRA,
     FMT_YUY2,
     FMT_NV12,
+    FMT_YUYVHQ, // temporary
     // these are all endian dependent and higher bit depth
     FMT_YUV420P10,
     FMT_YUV420P12,
@@ -39,6 +40,14 @@ typedef enum FrameType_
     FMT_VTB,
     FMT_NVDEC
 } VideoFrameType;
+
+static inline int format_is_hw(VideoFrameType Type)
+{
+    return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
+           (Type == FMT_DXVA2) || (Type == FMT_OMXEGL) ||
+           (Type == FMT_MEDIACODEC) || (Type == FMT_VTB) ||
+           (Type == FMT_NVDEC);
+}
 
 typedef struct VideoFrame_
 {
@@ -269,6 +278,28 @@ static inline void copy(VideoFrame *dst, const VideoFrame *src)
     framecopy(dst, src, true);
 }
 
+static inline uint planes(VideoFrameType Type)
+{
+    switch (Type)
+    {
+        case FMT_YV12:
+        case FMT_YUV422P:
+        case FMT_YUV420P10:
+        case FMT_YUV420P12:
+        case FMT_YUV420P16: return 3;
+        case FMT_NV12:      return 2;
+        case FMT_YUY2:
+        case FMT_YUYVHQ:
+        case FMT_BGRA:
+        case FMT_ARGB32:
+        case FMT_RGB24:
+        case FMT_RGB32:
+        case FMT_RGBA32:    return 1;
+        default: break;
+    }
+    return 0;
+}
+
 static inline int bitsperpixel(VideoFrameType type)
 {
     int res = 8;
@@ -278,6 +309,7 @@ static inline int bitsperpixel(VideoFrameType type)
         case FMT_RGBA32:
         case FMT_ARGB32:
         case FMT_RGB32:
+        case FMT_YUYVHQ:
             res = 32;
             break;
         case FMT_RGB24:
@@ -391,6 +423,18 @@ static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
         init(&frameout, type, dstbuffer, src->width, src->height, src->size,
              pitches, offsets);
         copy(&frameout, src);
+    }
+}
+
+static inline void copyplane(uint8_t* dst, int dst_pitch,
+                             const uint8_t* src, int src_pitch,
+                             int width, int height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        memcpy(dst, src, width);
+        src += src_pitch;
+        dst += dst_pitch;
     }
 }
 #endif /* __cplusplus */
