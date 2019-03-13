@@ -101,6 +101,7 @@ Advanced options (experts only):
   --disable-yasm           disable use of yasm assembler
   --enable-pic             build position-independent code
   --enable-proc-opt        enable processor specific compilation
+  --enable-compdb          enable clang compiler database
 
   --disable-audio-oss      disable OSS audio support
   --disable-audio-alsa     disable ALSA audio support
@@ -1480,6 +1481,7 @@ CONFIG_LIST="
     neon_clobber_test
     ossfuzz
     pic
+    compdb
     thumb
     valgrind_backtrace
     xmm_clobber_test
@@ -2034,6 +2036,7 @@ USING_LIST='
     bindings_perl
     bindings_python
     bindings_php
+    compdb
     darwin_da
     fontconfig
     freetype2
