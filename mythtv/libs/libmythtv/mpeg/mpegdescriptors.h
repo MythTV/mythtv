@@ -180,8 +180,9 @@ class PrivateDescriptorID
         // These can conflict and should only be used
         // on these specific networks.
 
-        // Private -- UK
+        // Private -- UK and NL
         dvb_logical_channel_descriptor = 0x83, /* implemented */
+        dvb_simulcast_channel_descriptor = 0x88, /* implemented */
 
         // Private -- Dish Network
         dish_event_rights              = 0x87,
@@ -271,6 +272,8 @@ class MTV_PUBLIC MPEGDescriptor
 
   protected:
     const unsigned char *_data;
+
+  public:
     QString hexdump(void) const;
 };
 

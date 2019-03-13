@@ -1121,16 +1121,21 @@ bool cCiDateTime::SendDateTime(void)
      int L = (M == 1 || M == 2) ? 1 : 0;
      int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
 #define DEC2BCD(d) (uint8_t((((d) / 10) << 4) + ((d) % 10)))
-     struct tTime { unsigned short mjd; uint8_t h, m, s; short offset; };
-     tTime T;
-     T.mjd = htons(MJD);
-     T.h = DEC2BCD(tm_gmt.tm_hour);
-     T.m = DEC2BCD(tm_gmt.tm_min);
-     T.s = DEC2BCD(tm_gmt.tm_sec);
-     T.offset = static_cast<short>(htons(tm_loc.tm_gmtoff / 60));
+#define BYTE0(a) ((a) & 0xFF)
+#define BYTE1(a) (((a) >> 8) & 0xFF)
+     uint8_t T[7];
+     uint16_t mjd = htons(MJD);
+     int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
+     T[0] = BYTE0(mjd);
+     T[1] = BYTE1(mjd);
+     T[2] = DEC2BCD(tm_gmt.tm_hour);
+     T[3] = DEC2BCD(tm_gmt.tm_min);
+     T[4] = DEC2BCD(tm_gmt.tm_sec);
+     T[5] = BYTE0(local_offset);
+     T[6] = BYTE1(local_offset);
 
      dbgprotocol("%d: ==> Date Time\n", SessionId());
-     SendData(AOT_DATE_TIME, 7, (uint8_t*)&T);
+     SendData(AOT_DATE_TIME, 7, T);
      //XXX return value of all SendData() calls???
      return true;
      }

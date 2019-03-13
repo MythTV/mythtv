@@ -597,6 +597,17 @@ QString DVBLogicalChannelDescriptor::toString() const
     return ret;
 }
 
+QString DVBSimulcastChannelDescriptor::toString() const
+{
+    QString ret = "DVBSimulcastChannelDescriptor sid->chan_num: ";
+    for (uint i = 0; i < ChannelCount(); i++)
+    {
+        ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
+        ret += (i+1<ChannelCount()) ? ", " : "";
+    }
+    return ret;
+}
+
 QString CAIdentifierDescriptor::toString(void) const
 {
     QString ret = QString("CAIdentifierDescriptor ");

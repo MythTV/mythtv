@@ -436,6 +436,8 @@ QString MPEGDescriptor::toString() const
     /// POSSIBLY UNSAFE ! -- begin
     else if (PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
         SET_STRING(DVBLogicalChannelDescriptor);
+    else if (PrivateDescriptorID::dvb_simulcast_channel_descriptor == DescriptorTag())
+        SET_STRING(DVBSimulcastChannelDescriptor);
     /// POSSIBLY UNSAFE ! -- end
     else if (IsValid())
     {

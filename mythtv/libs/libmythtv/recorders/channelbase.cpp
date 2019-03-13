@@ -494,7 +494,7 @@ int ChannelBase::GetChanID(void) const
     query.prepare("SELECT chanid,visible FROM channel "
                   "WHERE channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
-    query.bindValue(":CHANNUM", m_curchannelname);
+    query.bindValueNoNull(":CHANNUM", m_curchannelname);
     query.bindValue(":SOURCEID", m_sourceid);
 
     if (!query.exec() || !query.isActive())

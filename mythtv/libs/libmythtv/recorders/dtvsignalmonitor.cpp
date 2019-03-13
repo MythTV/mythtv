@@ -439,7 +439,7 @@ void DTVSignalMonitor::HandleTVCT(
         return;
     }
 
-    DBG_SM("SetVCT()", QString("tvct->ProgramNumber(idx %1): prog num %2")
+    DBG_SM("HandleTVCT()", QString("tvct->ProgramNumber(idx %1): prog num %2")
            .arg(idx).arg(tvct->ProgramNumber(idx)));
 
     SetProgramNumber(tvct->ProgramNumber(idx));
@@ -464,7 +464,7 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
         return;
     }
 
-    DBG_SM("SetVCT()", QString("cvct->ProgramNumber(idx %1): prog num %2")
+    DBG_SM("HandleCVCT()", QString("cvct->ProgramNumber(idx %1): prog num %2")
            .arg(idx).arg(cvct->ProgramNumber(idx)));
 
     SetProgramNumber(cvct->ProgramNumber(idx));
@@ -479,7 +479,7 @@ void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
 
 void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
 {
-    DBG_SM("SetNIT()", QString("net_id = %1").arg(nit->NetworkID()));
+    DBG_SM("HandleNIT()", QString("net_id = %1").arg(nit->NetworkID()));
     AddFlags(kDTVSigMon_NITSeen);
     if (!GetDVBStreamData())
         return;
@@ -508,7 +508,7 @@ void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
     }
     else
     {
-        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+        DBG_SM("HandleSDT()", QString("tsid = %1 orig_net_id = %2")
                .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
         AddFlags(kDTVSigMon_SDTMatch);
         RemoveFlags(kDVBSigMon_WaitForPos);

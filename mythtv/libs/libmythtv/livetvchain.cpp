@@ -88,7 +88,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     query.bindValue(":CHANID", pginfo->GetChanID());
     query.bindValue(":START", pginfo->GetRecordingStartTime());
     query.bindValue(":END", pginfo->GetRecordingEndTime());
-    query.bindValue(":CHAINID", m_id);
+    query.bindValueNoNull(":CHAINID", m_id);
     query.bindValue(":CHAINPOS", m_maxpos);
     query.bindValue(":DISCONT", discont);
     query.bindValue(":WATCHING", 0);

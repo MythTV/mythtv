@@ -2071,6 +2071,34 @@ class DVBLogicalChannelDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
+/**
+ *  \brief DVB HD Simulcast Logical Channel Descriptor
+ *
+ * NIT descriptor ID 0x88 (Private Extension)
+ *
+ * Provides the Logical Channel Number (LCN) for each channel when the channel
+ * is simultaneously broadcast in SD and HD.
+ */
+class DVBSimulcastChannelDescriptor : public MPEGDescriptor
+{
+  public:
+    DVBSimulcastChannelDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::dvb_simulcast_channel_descriptor) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x88
+    // descriptor_length        8   1.0
+
+    uint ChannelCount(void) const { return DescriptorLength() >> 2; }
+
+    uint ServiceID(uint i) const
+        { return (_data[2 + (i<<2)] << 8) | _data[3 + (i<<2)]; }
+
+    uint ChannelNumber(uint i) const
+        { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
 // ETSI TS 102 323 (TV Anytime)
 class DVBContentIdentifierDescriptor : public MPEGDescriptor
 {

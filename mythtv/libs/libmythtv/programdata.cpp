@@ -625,19 +625,19 @@ uint DBEvent::UpdateDB(
     QString  linetref         = m_inetref;
     QDate    loriginalairdate = m_originalairdate;
 
-    if (match.m_title.length() >= ltitle.length())
+    if (ltitle.isEmpty() && !match.m_title.isEmpty())
         ltitle = match.m_title;
 
-    if (match.m_subtitle.length() >= lsubtitle.length())
+    if (lsubtitle.isEmpty() && !match.m_subtitle.isEmpty())
         lsubtitle = match.m_subtitle;
 
-    if (match.m_description.length() >= ldesc.length())
+    if (ldesc.isEmpty() && !match.m_description.isEmpty())
         ldesc = match.m_description;
 
     if (lcategory.isEmpty() && !match.m_category.isEmpty())
         lcategory = match.m_category;
 
-    if (!lairdate && !match.m_airdate)
+    if (!lairdate && match.m_airdate)
         lairdate = match.m_airdate;
 
     if (!loriginalairdate.isValid() && match.m_originalairdate.isValid())

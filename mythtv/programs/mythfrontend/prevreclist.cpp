@@ -236,7 +236,9 @@ bool PrevRecordedList::LoadTitles(void)
 
 bool PrevRecordedList::LoadDates(void)
 {
-    QString querystr = "SELECT DISTINCT YEAR(starttime), MONTH(starttime) "
+    QString querystr = "SELECT DISTINCT "
+            "YEAR(CONVERT_TZ(starttime,'UTC','SYSTEM')), "
+            "MONTH(CONVERT_TZ(starttime,'UTC','SYSTEM')) "
         "FROM oldrecorded "
         "WHERE oldrecorded.future = 0 " + m_where;
 
@@ -403,8 +405,11 @@ void PrevRecordedList::LoadShowsByTitle(void)
 {
     MSqlBindings bindings;
     QString sql = " AND oldrecorded.title = :TITLE " + m_where;
-    int selected = m_titleList->GetCurrentPos();
-    bindings[":TITLE"] = m_titleData[selected]->GetTitle();
+    uint selected = m_titleList->GetCurrentPos();
+    if (selected < m_titleData.size())
+        bindings[":TITLE"] = m_titleData[selected]->GetTitle();
+    else
+        bindings[":TITLE"] = "";
     if (!m_title.isEmpty())
         bindings[":MTITLE"] = m_title;
     m_showData.clear();
