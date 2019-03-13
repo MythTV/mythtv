@@ -245,6 +245,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                     case FMT_YUYVHQ: YV12ToYUYVHQ(Context, Frame, texture);  break;
                     default: break;
                 }
+                break;
             }
             default: break;
         }

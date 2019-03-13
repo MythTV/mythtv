@@ -212,7 +212,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
 
     // Create raw rectangular textures
     vector<QSize> sizes;
-    for (int plane = 0; planes < planes; ++plane)
+    for (int plane = 0; plane < planes; ++plane)
     {
         int width  = IOSurfaceGetWidthOfPlane(surface, plane);
         int height = IOSurfaceGetHeightOfPlane(surface, plane);
@@ -221,9 +221,9 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     // TODO proper handling of all formats - this assumes NV12
     result = MythVideoTexture::CreateTextures(m_context, FMT_VTB, FMT_NV12, sizes, QOpenGLTexture::TargetRectangle);
 
-    for (int plane = 0; plane < result.size(); ++plane)
+    for (uint plane = 0; plane < result.size(); ++plane)
     {
-       MythVideoTexture* texture = result[i];
+       MythVideoTexture* texture = result[plane];
         if (!texture)
             continue;
         m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
