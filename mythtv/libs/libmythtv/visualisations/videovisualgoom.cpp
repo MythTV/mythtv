@@ -99,7 +99,11 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
             glrender->makeCurrent();
 
             if (!m_glSurface)
-                m_glSurface = glrender->CreateTexture(m_area.size());
+            {
+                QImage image(m_area.size(), QImage::Format_ARGB32);
+                m_glSurface = glrender->CreateTextureFromQImage(&image);
+                m_glSurface->m_crop = false;
+            }
 
             if (m_glSurface)
             {
