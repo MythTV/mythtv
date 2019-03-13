@@ -10,31 +10,15 @@
 #include <QRegularExpression>
 
 #define v4l2_ioctl(_FD_, _REQUEST_, _DATA_) ioctl(_FD_, _REQUEST_, _DATA_)
-#define LOC      QString("V4L2(%1): ").arg(m_device_name)
-
-V4L2util::V4L2util(void)
-    : m_fd(-1),
-      m_vbi_fd(-1),
-      m_version(0),
-      m_capabilities(0),
-      m_have_query_ext_ctrl(false)
-{
-}
+#define LOC      QString("V4L2(%1): ").arg(m_deviceName)
 
 V4L2util::V4L2util(const QString& dev_name)
-    : m_fd(-1),
-      m_vbi_fd(-1),
-      m_capabilities(0),
-      m_have_query_ext_ctrl(false)
 {
     Open(dev_name);
 }
 
 V4L2util::V4L2util(const QString& dev_name, const QString& vbi_dev_name)
-    : m_fd(0),
-      m_vbi_fd(-1),
-      m_capabilities(0),
-      m_have_query_ext_ctrl(false)
+    : m_fd(0)
 {
     Open(dev_name, vbi_dev_name);
 }
@@ -46,7 +30,7 @@ V4L2util::~V4L2util(void)
 
 bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
 {
-    if (m_fd >= 0 && dev_name == m_device_name)
+    if (m_fd >= 0 && dev_name == m_deviceName)
         return true;
 
     Close();
@@ -58,15 +42,15 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
             QString("Could not open '%1': ").arg(dev_name) + ENO);
         return false;
     }
-    m_device_name = dev_name;
+    m_deviceName = dev_name;
 
     struct v4l2_query_ext_ctrl qc;
     memset(&qc, 0, sizeof(v4l2_query_ext_ctrl));
     qc.id = V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND;
-    m_have_query_ext_ctrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
+    m_haveQueryExtCtrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
 
-    m_card_name.clear();
-    m_driver_name.clear();
+    m_cardName.clear();
+    m_driverName.clear();
     m_version = 0;
     m_capabilities = 0;
 
@@ -74,8 +58,8 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
     memset(&capability, 0, sizeof(v4l2_capability));
     if (ioctl(m_fd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
-        m_card_name    = QString::fromLatin1((const char*)capability.card);
-        m_driver_name  = QString::fromLatin1((const char*)capability.driver);
+        m_cardName     = QString::fromLatin1((const char*)capability.card);
+        m_driverName   = QString::fromLatin1((const char*)capability.driver);
         m_version      = capability.version;
         m_capabilities = capability.capabilities;
     }
@@ -85,8 +69,8 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
         return false;
     }
 
-    if (!m_driver_name.isEmpty())
-        m_driver_name.remove( QRegExp("\\[[0-9]\\]$") );
+    if (!m_driverName.isEmpty())
+        m_driverName.remove( QRegExp("\\[[0-9]\\]$") );
 
     OpenVBI(vbi_dev_name);
 
@@ -723,7 +707,7 @@ bool V4L2util::UserAdjustableResolution(void) const
     // I have not been able to come up with a way of querying the
     // driver to answer this question.
 
-    if (m_driver_name == "hdpvr")
+    if (m_driverName == "hdpvr")
         return false;
     return true;
 }
@@ -1250,7 +1234,7 @@ bool V4L2util::SetSlicedVBI(const VBIMode::vbimode_t& vbimode)
     vbifmt.fmt.sliced.service_set |= (VBIMode::PAL_TT == vbimode) ?
                                      V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
-    int fd = m_vbi_fd < 0 ? m_fd : m_vbi_fd;
+    int fd = m_vbiFd < 0 ? m_fd : m_vbiFd;
 
     if (ioctl(fd, VIDIOC_S_FMT, &vbifmt) < 0)
     {

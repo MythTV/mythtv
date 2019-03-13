@@ -40,16 +40,16 @@ class TeletextScreen: public MythScreenType
     void DrawStatus(void);
     void DrawPage(void);
 
-    MythPlayer     *m_player;
-    TeletextReader *m_teletextReader;
+    MythPlayer     *m_player         {nullptr};
+    TeletextReader *m_teletextReader {nullptr};
     QRect           m_safeArea;
-    int             m_colWidth;
-    int             m_rowHeight;
-    QColor          m_bgColor;
-    bool            m_displaying;
+    int             m_colWidth       {10};
+    int             m_rowHeight      {10};
+    QColor          m_bgColor        {kColorBlack};
+    bool            m_displaying     {false};
     QHash<int, QImage*> m_rowImages;
     int             m_fontStretch;
-    int             m_fontHeight;
+    int             m_fontHeight     {10};
 
   public:
     static const QColor kColorBlack;

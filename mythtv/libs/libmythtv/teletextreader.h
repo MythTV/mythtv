@@ -123,20 +123,20 @@ class TeletextReader
     const TeletextSubPage *FindSubPageInternal(int,int,int) const;
     const TeletextPage    *FindPageInternal(int,int) const;
 
-    int              m_curpage;
-    int              m_cursubpage;
-    bool             m_curpage_showheader;
-    bool             m_curpage_issubtitle;
+    int              m_curpage            {0x100};
+    int              m_cursubpage         {-1};
+    bool             m_curpage_showheader {true};
+    bool             m_curpage_issubtitle {false};
     int              m_pageinput[3];
-    bool             m_transparent;
-    bool             m_revealHidden;
+    bool             m_transparent        {false};
+    bool             m_revealHidden       {false};
     uint8_t          m_header[40];
-    bool             m_header_changed;
-    bool             m_page_changed;
+    bool             m_header_changed     {false};
+    bool             m_page_changed       {false};
     TeletextMagazine m_magazines[8];
     unsigned char    m_bitswap[256];
-    int              m_fetchpage;
-    int              m_fetchsubpage;
+    int              m_fetchpage          {0};
+    int              m_fetchsubpage       {0};
 };
 
 #endif // TELETEXTREADER_H

@@ -13,26 +13,26 @@ extern "C" {
 class AVSubtitles
 {
   public:
-    AVSubtitles() : fixPosition(false) { }
-    MythDeque<AVSubtitle> buffers;
-    QMutex lock;
-    bool   fixPosition;
+    AVSubtitles() = default;
+    MythDeque<AVSubtitle> m_buffers;
+    QMutex                m_lock;
+    bool                  m_fixPosition {false};
 };
 
 class RawTextSubs
 {
   public:
-    RawTextSubs(void) { duration = 0; }
+    RawTextSubs(void) = default;
 
-    QStringList buffers;
-    uint64_t    duration;
-    QMutex      lock;
+    QStringList m_buffers;
+    uint64_t    m_duration {0};
+    QMutex      m_lock;
 };
 
 class SubtitleReader
 {
   public:
-    SubtitleReader();
+    SubtitleReader() = default;
     ~SubtitleReader();
 
     void EnableAVSubtitles(bool enable);
@@ -55,11 +55,11 @@ class SubtitleReader
 
   private:
     AVSubtitles   m_AVSubtitles;
-    bool          m_AVSubtitlesEnabled;
+    bool          m_AVSubtitlesEnabled      {false};
     TextSubtitles m_TextSubtitles;
-    bool          m_TextSubtitlesEnabled;
+    bool          m_TextSubtitlesEnabled    {false};
     RawTextSubs   m_RawTextSubtitles;
-    bool          m_RawTextSubtitlesEnabled;
+    bool          m_RawTextSubtitlesEnabled {false};
 };
 
 #endif // SUBTITLEREADER_H

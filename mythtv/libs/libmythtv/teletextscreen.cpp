@@ -42,12 +42,8 @@ static QChar cvt_char(char ch, int lang)
 TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
                                int fontStretch) :
     MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player),           m_teletextReader(nullptr),
-    m_safeArea(QRect()),
-    m_colWidth(10),             m_rowHeight(10),
-    m_bgColor(QColor(kColorBlack)),
-    m_displaying(false),        m_fontStretch(fontStretch),
-    m_fontHeight(10)
+    m_player(player),
+    m_fontStretch(fontStretch)
 {
 }
 

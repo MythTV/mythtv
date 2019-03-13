@@ -11,11 +11,6 @@
 #define MAGAZINE(page) ((page) / 256)
 
 TeletextReader::TeletextReader()
-  : m_curpage(0x100),           m_cursubpage(-1),
-    m_curpage_showheader(true), m_curpage_issubtitle(false),
-    m_transparent(false),       m_revealHidden(false),
-    m_header_changed(false),    m_page_changed(false),
-    m_fetchpage(0),             m_fetchsubpage(0)
 {
     memset(m_pageinput, 0, sizeof(m_pageinput));
     memset(m_header,    0, sizeof(m_header));

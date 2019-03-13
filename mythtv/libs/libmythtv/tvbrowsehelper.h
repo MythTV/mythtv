@@ -29,14 +29,13 @@ class BrowseInfo
                uint           chanid,
                const QString &starttime) :
         m_dir(dir),         m_channum(channum),
-        m_chanid(chanid),   m_starttime(starttime),
-        m_sourceid(0)
+        m_chanid(chanid),   m_starttime(starttime)
     {
     }
     BrowseInfo(const QString &channum,
                uint           sourceid) :
-        m_dir(BROWSE_SAME), m_channum(channum),
-        m_chanid(0),        m_sourceid(sourceid)
+        m_channum(channum),
+        m_sourceid(sourceid)
     {
     }
 
@@ -53,11 +52,11 @@ class BrowseInfo
             .arg(m_sourceid);
     }
 
-    BrowseDirection m_dir;
+    BrowseDirection m_dir      {BROWSE_SAME};
     QString         m_channum;
-    uint            m_chanid;
+    uint            m_chanid   {0};
     QString         m_starttime;
-    uint            m_sourceid;
+    uint            m_sourceid {0};
 };
 
 

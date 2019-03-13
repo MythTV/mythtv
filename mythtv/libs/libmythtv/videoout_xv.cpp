@@ -1086,8 +1086,8 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                             img->pitches, img->offsets);
                 if (xv_chroma == GUID_YV12_PLANAR)
                 {
-                    swap(tmp.pitches[1], tmp.pitches[2]);
-                    swap(tmp.offsets[1], tmp.offsets[2]);
+                    swap(tmp.m_pitches[1], tmp.m_pitches[2]);
+                    swap(tmp.m_offsets[1], tmp.m_offsets[2]);
                 }
 
                 XJ_yuv_infos.push_back(tmp);

@@ -153,7 +153,7 @@ private:
 static bool operator<(const text_subtitle_t& left,
                       const text_subtitle_t& right)
 {
-    return left.start < right.start;
+    return left.m_start < right.m_start;
 }
 
 TextSubtitles::~TextSubtitles()
@@ -173,8 +173,8 @@ TextSubtitles::~TextSubtitles()
  */
 bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const
 {
-    return (timecode < m_lastReturnedSubtitle.start ||
-            timecode > m_lastReturnedSubtitle.end);
+    return (timecode < m_lastReturnedSubtitle.m_start ||
+            timecode > m_lastReturnedSubtitle.m_end);
 }
 
 /** \fn TextSubtitles::GetSubtitles(uint64_t timecode) const
@@ -202,15 +202,15 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
         --currentSubPos;
 
         const text_subtitle_t &sub = *currentSubPos;
-        if (sub.start <= timecode && sub.end >= timecode)
+        if (sub.m_start <= timecode && sub.m_end >= timecode)
         {
             // found a sub to display
             m_lastReturnedSubtitle = sub;
-            return m_lastReturnedSubtitle.textLines;
+            return m_lastReturnedSubtitle.m_textLines;
         }
 
         // the subtitle time span has ended, let's display a blank sub
-        startCode = sub.end + 1;
+        startCode = sub.m_end + 1;
     }
 
     if (nextSubPos == m_subtitles.end())
@@ -239,7 +239,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
     }
     else
     {
-        endCode = (*nextSubPos).start - 1;
+        endCode = (*nextSubPos).m_start - 1;
     }
 
     // we are in a position in which there are no subtitles to display,
@@ -386,8 +386,8 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
 
         if (!target.IsFrameBasedTiming())
         {
-            newsub.start *= 10; // convert from csec to msec
-            newsub.end *= 10;
+            newsub.m_start *= 10; // convert from csec to msec
+            newsub.m_end *= 10;
         }
 
         for (int line = 0; line < sub->lines; ++line)
@@ -398,7 +398,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
                 str = dec->toUnicode(subLine, strlen(subLine));
             else
                 str = QString(subLine);
-            newsub.textLines.push_back(str);
+            newsub.m_textLines.push_back(str);
 
             free(sub->text[line]);
         }

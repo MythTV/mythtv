@@ -60,7 +60,7 @@ class TransportSetting : public GroupSetting
     void openMenu();
 
   private:
-    MultiplexID *m_mplexid;
+    MultiplexID *m_mplexid {nullptr};
 };
 
 // Page for selecting a transport to be created/edited
@@ -84,11 +84,11 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     void Delete(TransportSetting *transport);
 
   private:
-    VideoSourceSelector *m_videosource;
+    VideoSourceSelector *m_videosource {nullptr};
     QVector<StandardSetting*> m_list;
     uint m_sourceid;
     uint m_cardtype;
-    bool isLoading;
+    bool m_isLoading {false};
 };
 
 #endif // _TRANSPORT_EDITOR_H_
