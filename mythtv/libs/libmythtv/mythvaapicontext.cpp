@@ -19,10 +19,6 @@ extern "C" {
 #include "libavutil/pixdesc.h"
 }
 
-#ifndef VA_FOURCC_I420
-#define VA_FOURCC_I420 0x30323449
-#endif
-
 #define LOC QString("VAAPIDec: ")
 
 void MythVAAPIContext::DestroyInteropCallback(void *Wait, void *Interop, void *)

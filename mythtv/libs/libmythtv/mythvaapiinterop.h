@@ -18,6 +18,10 @@
 #include "va/va_drm.h"
 #include "va/va_drmcommon.h"
 
+#ifndef VA_FOURCC_I420
+#define VA_FOURCC_I420 0x30323449
+#endif
+
 class MythVAAPIInterop : public MythOpenGLInterop
 {
   public:
