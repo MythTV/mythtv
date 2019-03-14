@@ -398,7 +398,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     long long tc = timecode;
 
-    if (m_bufferedAudioFrameTimes.size())
+    if (!m_bufferedAudioFrameTimes.empty())
         tc = m_bufferedAudioFrameTimes.takeFirst();
 
     if (m_startingTimecodeOffset == -1)

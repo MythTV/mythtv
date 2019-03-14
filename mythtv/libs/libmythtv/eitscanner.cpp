@@ -145,7 +145,7 @@ void EITScanner::run(void)
 
             m_activeScanNextTrig = MythDate::current()
                 .addSecs(m_activeScanTrigTime);
-            if (m_activeScanChannels.size())
+            if (!m_activeScanChannels.empty())
             {
                 ++m_activeScanNextChan;
                 m_activeScanNextChanIndex =
@@ -275,7 +275,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
     // Start at a random channel. This is so that multiple cards with
     // the same source don't all scan the same channels in the same
     // order when the backend is first started up.
-    if (m_activeScanChannels.size())
+    if (!m_activeScanChannels.empty())
     {
         // The start channel is random.  From now on, start on the
         // next channel.  This makes sure the immediately following

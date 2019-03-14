@@ -566,7 +566,7 @@ bool LinuxFirewireDevice::CloseAVStream(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Closing A/V stream object");
 
-    while (m_listeners.size())
+    while (!m_listeners.empty())
         FirewireDevice::RemoveListener(m_listeners[m_listeners.size() - 1]);
 
     if (m_priv->m_is_streaming)

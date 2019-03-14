@@ -203,7 +203,7 @@ void JobQueue::ProcessQueue(void)
         m_jobsRunning = 0;
         GetJobsInQueue(jobs);
 
-        if (jobs.size())
+        if (!jobs.empty())
         {
             inTimeWindow = InJobRunWindow();
             for (int x = 0; x < jobs.size(); x++)
@@ -1247,7 +1247,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
 
     JobQueue::GetJobsInQueue(jobs, JOB_LIST_NOT_DONE);
 
-    if (jobs.size()) {
+    if (!jobs.empty()) {
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
             int tmpStatus = (*it).status;
@@ -1584,7 +1584,7 @@ void JobQueue::RecoverQueue(bool justOld)
 
     GetJobsInQueue(jobs);
 
-    if (jobs.size())
+    if (!jobs.empty())
     {
         QMap<int, JobQueueEntry>::Iterator it;
         QDateTime oldDate = MythDate::current().addDays(-1);

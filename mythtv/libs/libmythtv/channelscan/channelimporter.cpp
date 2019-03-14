@@ -203,7 +203,7 @@ uint ChannelImporter::DeleteChannels(
 
     // TODO delete encrypted channels when m_fta_only set
 
-    if (deleted.size() == 0)
+    if (deleted.empty())
         return 0;
 
     // Create a new transports list without the deleted channels
@@ -911,7 +911,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
                     tmp.m_channels.push_back(newt.m_channels[k]);
             }
 
-            if (tmp.m_channels.size())
+            if (!tmp.m_channels.empty())
                 not_in_scan.push_back(tmp);
         }
     }

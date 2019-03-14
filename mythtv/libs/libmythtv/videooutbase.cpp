@@ -192,7 +192,7 @@ VideoOutput *VideoOutput::Create(
 
     VideoDisplayProfile *vprof = new VideoDisplayProfile();
 
-    if (renderers.size() > 0)
+    if (!renderers.empty())
     {
         vprof->SetInput(video_dim_disp, video_prate, codecName);
         QString tmp = vprof->GetVideoRenderer();

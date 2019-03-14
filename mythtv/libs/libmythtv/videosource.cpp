@@ -1004,7 +1004,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
                 sel = dev;
         }
 
-        if (sel.isEmpty() && sdevs.size())
+        if (sel.isEmpty() && !sdevs.empty())
             sel = sdevs[0];
 
         QString usestr = QString(" -- ");
@@ -1699,7 +1699,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         }
 
         // Unfortunately all devices are conflicted, select first device.
-        if (sel.isEmpty() && sdevs.size())
+        if (sel.isEmpty() && !sdevs.empty())
             sel = sdevs[0];
 
         QString usestr = QString(" -- ");
@@ -2309,7 +2309,7 @@ void V4L2encGroup::probeCard(const QString &device_name)
 
     m_cardInfo->setValue(card_info);
 
-    if (m_device->getSubSettings()->size() == 0)
+    if (m_device->getSubSettings()->empty())
     {
         TunerCardAudioInput* audioinput =
             new TunerCardAudioInput(m_parent, QString(), "V4L2");

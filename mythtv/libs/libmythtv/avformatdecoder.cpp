@@ -1997,7 +1997,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 {
     // ScanStreams() calls m_tracks[kTrackTypeTeletextCaptions].clear()
-    if (!m_ic->cur_pmt_sect || m_tracks[kTrackTypeTeletextCaptions].size())
+    if (!m_ic->cur_pmt_sect || !m_tracks[kTrackTypeTeletextCaptions].empty())
         return;
 
     const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
@@ -2040,7 +2040,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
         }
 
         // Assume there is only one multiplexed teletext stream in PMT..
-        if (m_tracks[kTrackTypeTeletextCaptions].size())
+        if (!m_tracks[kTrackTypeTeletextCaptions].empty())
             break;
     }
 }

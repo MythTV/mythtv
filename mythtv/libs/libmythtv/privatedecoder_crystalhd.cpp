@@ -417,7 +417,7 @@ bool PrivateDecoderCrystalHD::Reset(void)
 bool PrivateDecoderCrystalHD::HasBufferedFrames(void)
 {
     m_decoded_frames_lock.lock();
-    bool result = m_decoded_frames.size() > 0;
+    bool result = !m_decoded_frames.empty();
     m_decoded_frames_lock.unlock();
     return result;
 }
@@ -442,7 +442,7 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("%1 packet buffers queued up").arg(m_packet_buffers.size()));
 
-    while (m_packet_buffers.size() > 0)
+    while (!m_packet_buffers.empty())
     {
         PacketBuffer *buffer2 = m_packet_buffers.last();
         if (GetTxFreeSize(false) < buffer2->size)

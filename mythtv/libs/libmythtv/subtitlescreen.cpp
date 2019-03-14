@@ -1823,7 +1823,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             AVSubtitleRect* rect = subtitle.rects[i];
 
             bool displaysub = true;
-            if (subs->m_buffers.size() > 0 &&
+            if (!subs->m_buffers.empty() &&
                 subs->m_buffers.front().end_display_time <
                 currentFrame->timecode)
             {
@@ -2257,7 +2257,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
     {
         Clear708Cache(clearMask);
     }
-    if (addList.size())
+    if (!addList.empty())
         m_qInited.append(addList);
 }
 

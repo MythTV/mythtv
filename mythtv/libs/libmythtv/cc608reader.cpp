@@ -367,7 +367,7 @@ void CC608Reader::Update608Text(
     int visible = 0;
 
     m_state[streamIdx].m_output.lock.lock();
-    if (m_state[streamIdx].m_output.buffers.size() && (scroll || replace))
+    if (!m_state[streamIdx].m_output.buffers.empty() && (scroll || replace))
     {
         CC608Text *cc;
 

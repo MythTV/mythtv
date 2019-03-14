@@ -461,7 +461,7 @@ VideoFrame *VideoBuffers::Head(BufferType type)
     if (!q)
         return nullptr;
 
-    if (q->size())
+    if (!q->empty())
         return q->head();
 
     return nullptr;
@@ -476,7 +476,7 @@ VideoFrame *VideoBuffers::Tail(BufferType type)
     if (!q)
         return nullptr;
 
-    if (q->size())
+    if (!q->empty())
         return q->tail();
 
     return nullptr;

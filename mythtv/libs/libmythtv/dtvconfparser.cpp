@@ -84,7 +84,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         QStringList list = line.split(":", QString::SkipEmptyParts);
 
-        if (list.size() < 1)
+        if (list.empty())
             continue;
 
         QString str = list[0];

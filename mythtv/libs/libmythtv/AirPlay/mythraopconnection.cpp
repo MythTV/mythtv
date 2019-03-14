@@ -852,7 +852,7 @@ void MythRAOPConnection::readClient(void)
         }
         while (!line.isNull());
 
-        if (m_incomingHeaders.size() == 0)
+        if (m_incomingHeaders.empty())
             return;
 
         if (!stream.atEnd())

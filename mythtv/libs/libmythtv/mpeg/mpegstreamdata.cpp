@@ -1218,7 +1218,7 @@ bool MPEGStreamData::HasCachedAnyPAT(uint tsid) const
 bool MPEGStreamData::HasCachedAnyPAT(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    return _cached_pats.size();
+    return !_cached_pats.empty();
 }
 
 bool MPEGStreamData::HasCachedAllCAT(uint tsid) const
@@ -1254,7 +1254,7 @@ bool MPEGStreamData::HasCachedAnyCAT(uint tsid) const
 bool MPEGStreamData::HasCachedAnyCAT(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    return _cached_cats.size();
+    return !_cached_cats.empty();
 }
 
 bool MPEGStreamData::HasCachedAllPMT(uint pnum) const
@@ -1312,7 +1312,7 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
 bool MPEGStreamData::HasCachedAnyPMTs(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    return _cached_pmts.size();
+    return !_cached_pmts.empty();
 }
 
 pat_const_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const

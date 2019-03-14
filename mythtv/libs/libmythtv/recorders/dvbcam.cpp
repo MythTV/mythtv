@@ -206,7 +206,7 @@ void DVBCam::HandlePMT(void)
     if (m_pmtSent && m_pmtAdded && !m_pmtUpdated)
     {
         // Send added PMT
-        while (m_pmtAddList.size() > 0)
+        while (!m_pmtAddList.empty())
         {
             pmt_list_t::iterator it = m_pmtAddList.begin();
             const ChannelBase *chan = it.key();
@@ -222,7 +222,7 @@ void DVBCam::HandlePMT(void)
     }
 
     // Grab any added PMT
-    while (m_pmtAddList.size() > 0)
+    while (!m_pmtAddList.empty())
     {
         pmt_list_t::iterator it = m_pmtAddList.begin();
         const ChannelBase *chan = it.key();

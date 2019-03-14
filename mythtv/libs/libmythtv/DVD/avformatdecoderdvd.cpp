@@ -18,7 +18,7 @@ AvFormatDecoderDVD::~AvFormatDecoderDVD()
     ReleaseContext(m_curContext);
     ReleaseContext(m_returnContext);
 
-    while (m_contextList.size() > 0)
+    while (!m_contextList.empty())
         m_contextList.takeFirst()->DecrRef();
 
     ReleaseLastVideoPkt();
@@ -112,7 +112,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                             m_framesReq = 0;
                             ReleaseContext(m_curContext);
 
-                            while (m_contextList.size() > 0)
+                            while (!m_contextList.empty())
                                 m_contextList.takeFirst()->DecrRef();
 
                             Reset(true, false, false);
@@ -205,7 +205,7 @@ void AvFormatDecoderDVD::CheckContext(int64_t pts)
     {
         // Remove any contexts we should have
         // already processed.(but have somehow jumped past)
-        while (m_contextList.size() > 0 &&
+        while (!m_contextList.empty() &&
                pts >= m_contextList.first()->GetEndPTS())
         {
             ReleaseContext(m_curContext);
@@ -219,7 +219,7 @@ void AvFormatDecoderDVD::CheckContext(int64_t pts)
         }
 
         // See whether we can take the next context from the list
-        if (m_contextList.size() > 0 &&
+        if (!m_contextList.empty() &&
             pts >= m_contextList.first()->GetStartPTS())
         {
             ReleaseContext(m_curContext);
@@ -367,7 +367,7 @@ bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
         if (context)
             m_contextList.append(context);
 
-        if ((m_curContext == nullptr) && (m_contextList.size() > 0))
+        if ((m_curContext == nullptr) && (!m_contextList.empty()))
         {
             // If we don't have a current context, use
             // the first in the list
@@ -444,7 +444,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
             SetTrack(kTrackTypeAudio, trackNo);
     }
 
-    if (m_tracks[kTrackTypeSubtitle].size() > 0)
+    if (!m_tracks[kTrackTypeSubtitle].empty())
     {
         map<int,uint> lang_sub_cnt;
         map<int,int>  stream2idx;

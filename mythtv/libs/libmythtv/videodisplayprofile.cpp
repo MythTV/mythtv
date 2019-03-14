@@ -177,7 +177,7 @@ bool ProfileItem::IsMatch(const QSize &size,
     if (!cmp.isEmpty())
     {
         QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-        if (clist.size() > 0)
+        if (!clist.empty())
             match &= clist.contains(codecName,Qt::CaseInsensitive);
     }
 
@@ -1051,7 +1051,7 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 
     if (tmp.isEmpty())
     {
-        if (profiles.size())
+        if (!profiles.empty())
             tmp = profiles[0];
 
         tmp = (profiles.contains("Normal")) ? "Normal" : tmp;

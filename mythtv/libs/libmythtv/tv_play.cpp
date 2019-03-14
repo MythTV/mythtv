@@ -2201,7 +2201,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             if (getit)
                 reclist = ChannelUtil::GetValidRecorderList(chanid, channum);
 
-            if (reclist.size())
+            if (!reclist.empty())
             {
                 RemoteEncoder *testrec = RemoteRequestFreeRecorderFromList(reclist, 0);
                 if (testrec && testrec->IsValidRecorder())
@@ -2682,7 +2682,7 @@ void TV::timerEvent(QTimerEvent *te)
     {
         QMutexLocker locker(&m_timerIdLock);
         ignore =
-            (m_stateChangeTimerId.size() &&
+            (!m_stateChangeTimerId.empty() &&
              m_stateChangeTimerId.find(timer_id) == m_stateChangeTimerId.end());
     }
     if (ignore)
@@ -2799,7 +2799,7 @@ void TV::timerEvent(QTimerEvent *te)
         QMutexLocker locker(&m_timerIdLock);
         if (timer_id == m_networkControlTimerId)
         {
-            if (networkControlCommands.size())
+            if (!networkControlCommands.empty())
                 netCmd = networkControlCommands.dequeue();
             if (networkControlCommands.empty())
             {
@@ -7757,7 +7757,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         }
     }
 
-    if (reclist.size())
+    if (!reclist.empty())
     {
         RemoteEncoder *testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
         if (!testrec || !testrec->IsValidRecorder())
@@ -8679,7 +8679,7 @@ void TV::DoEditSchedule(int editType)
     pause_active |= !isLiveTV && (!m_dbContinueEmbedded || isNearEnd);
     pause_active |= paused;
     vector<bool> do_pause;
-    do_pause.insert(do_pause.begin(), true, m_player.size());
+    do_pause.insert(do_pause.begin(), true, !m_player.empty());
     int actx_index = find_player_index(actx);
     if (actx_index < 0)
     {

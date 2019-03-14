@@ -634,7 +634,7 @@ bool PlayerContext::InStateChange(void) const
 {
     if (!m_stateLock.tryLock())
         return true;
-    bool inStateChange = m_nextState.size() > 0;
+    bool inStateChange = !m_nextState.empty();
     m_stateLock.unlock();
     return inStateChange;
 }

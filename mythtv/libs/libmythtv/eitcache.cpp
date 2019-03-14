@@ -253,7 +253,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
         (*eventMap)[eventid] = construct_sig(tableid, version, endtime, false);
     }
 
-    if (eventMap->size())
+    if (!eventMap->empty())
         LOG(VB_EIT, LOG_INFO, LOC + QString("Loaded %1 entries for channel %2")
                 .arg(eventMap->size()).arg(chanid));
 

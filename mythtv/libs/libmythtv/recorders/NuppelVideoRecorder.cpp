@@ -127,21 +127,21 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete m_seektable;
     }
 
-    while (videobuffer.size() > 0)
+    while (!videobuffer.empty())
     {
         struct vidbuffertype *vb = videobuffer.back();
         delete [] vb->buffer;
         delete vb;
         videobuffer.pop_back();
     }
-    while (audiobuffer.size() > 0)
+    while (!audiobuffer.empty())
     {
         struct audbuffertype *ab = audiobuffer.back();
         delete [] ab->buffer;
         delete ab;
         audiobuffer.pop_back();
     }
-    while (textbuffer.size() > 0)
+    while (!textbuffer.empty())
     {
         struct txtbuffertype *tb = textbuffer.back();
         delete [] tb->buffer;

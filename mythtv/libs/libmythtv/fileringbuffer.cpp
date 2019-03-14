@@ -380,7 +380,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         else
         {
             QStringList aux = m_remotefile->GetAuxiliaryFiles();
-            if (aux.size())
+            if (!aux.empty())
                 m_subtitleFilename = dirName + "/" + aux[0];
         }
     }

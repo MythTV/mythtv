@@ -3479,7 +3479,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
  */
 void TVRec::HandleTuning(void)
 {
-    if (m_tuningRequests.size())
+    if (!m_tuningRequests.empty())
     {
         TuningRequest request = m_tuningRequests.front();
         LOG(VB_RECORD, LOG_INFO, LOC +

@@ -598,7 +598,7 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
         return;
 
     bar->ClearRegions();
-    if (!map.size() || total < 1)
+    if (map.empty() || total < 1)
     {
         bar->Display();
         return;
