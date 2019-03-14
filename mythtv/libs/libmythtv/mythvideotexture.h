@@ -49,6 +49,7 @@ class MythVideoTexture : public MythGLTexture
    ~MythVideoTexture();
 
   public:
+    bool           m_valid       { false };
     VideoFrameType m_frameType   { FMT_NONE };
     VideoFrameType m_frameFormat { FMT_NONE };
     uint           m_plane       { 0 };

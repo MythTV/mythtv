@@ -337,6 +337,7 @@ void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *F
     // Update
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
                                 static_cast<uint8_t*>(buffer) + offset);
+    Texture->m_valid = true;
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture.
@@ -375,6 +376,7 @@ void MythVideoTexture::YV12ToYUYV(MythRenderOpenGL *Context, const VideoFrame *F
 
     // Update
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, buffer);
+    Texture->m_valid = true;
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture with high quality interlaced chroma sampling.
@@ -402,6 +404,7 @@ void MythVideoTexture::YV12ToYUYVHQ(MythRenderOpenGL *Context, const VideoFrame 
 
     // Update
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
+    Texture->m_valid = true;
 }
 
 /// \brief Create a data buffer for holding CPU side texture data.
