@@ -407,7 +407,7 @@ bool DeviceReadBuffer::HandlePausing(void)
         usleep(5000);
         return false;
     }
-    else if (IsPaused())
+    if (IsPaused())
     {
         Reset(m_videodevice, m_stream_fd);
         SetPaused(false);
@@ -467,7 +467,7 @@ bool DeviceReadBuffer::Poll(void) const
             LOG(VB_GENERAL, LOG_ERR, LOC + "poll eof (POLLHUP)");
             break;
         }
-        else if (polls[0].revents & POLLNVAL)
+        if (polls[0].revents & POLLNVAL)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "poll error" + ENO);
             m_error = true;
@@ -489,7 +489,7 @@ bool DeviceReadBuffer::Poll(void) const
         {
             if (ret > 0)
                 break; // we have data to read :)
-            else if (ret < 0)
+            if (ret < 0)
             {
                 if ((EOVERFLOW == errno))
                     break; // we have an error to handle
@@ -597,7 +597,7 @@ bool DeviceReadBuffer::CheckForErrors(
         usleep(500);
         return false;
     }
-    else if (len == 0)
+    if (len == 0)
     {
         if (++errcnt > 5)
         {

@@ -164,10 +164,7 @@ void FIFOWriter::FIFOWriteThread(int id)
                     ///FIXME: proper error propagation
                     break;
                 }
-                else
-                {
-                    written += ret;
-                }
+                written += ret;
             }
         }
         flock.relock();

@@ -207,8 +207,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     {
         if (m_ignore_time_code)
             return;
-        else
-           goto skip;
+        goto skip;
     }
 
     if (XDSDecode(field, b1, b2))
@@ -605,10 +604,7 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
             m_lastcode[field] = -1;
             return 1;
         }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 
     // bttv-0.9 VBI reads are pretty reliable (1 read/33367us).
@@ -1126,33 +1122,33 @@ QString CC608Decoder::GetXDS(const QString &key) const
 
     if (key == "ratings")
         return QString::number(GetRatingSystems(false));
-    else if (key.startsWith("has_rating_"))
+    if (key.startsWith("has_rating_"))
         return ((1<<key.right(1).toUInt()) & GetRatingSystems(false))?"1":"0";
-    else if (key.startsWith("rating_"))
+    if (key.startsWith("rating_"))
         return GetRatingString(key.right(1).toUInt(), false);
 
-    else if (key == "future_ratings")
+    if (key == "future_ratings")
         return QString::number(GetRatingSystems(true));
-    else if (key.startsWith("has_future_rating_"))
+    if (key.startsWith("has_future_rating_"))
         return ((1<<key.right(1).toUInt()) & GetRatingSystems(true))?"1":"0";
-    else if (key.startsWith("future_rating_"))
+    if (key.startsWith("future_rating_"))
         return GetRatingString(key.right(1).toUInt(), true);
 
-    else if (key == "programname")
+    if (key == "programname")
         return GetProgramName(false);
-    else if (key == "future_programname")
+    if (key == "future_programname")
         return GetProgramName(true);
 
-    else if (key == "programtype")
+    if (key == "programtype")
         return GetProgramType(false);
-    else if (key == "future_programtype")
+    if (key == "future_programtype")
         return GetProgramType(true);
 
-    else if (key == "callsign")
+    if (key == "callsign")
         return m_xds_net_call;
-    else if (key == "channame")
+    if (key == "channame")
         return m_xds_net_name;
-    else if (key == "tsid")
+    if (key == "tsid")
         return QString::number(m_xds_tsid);
 
     return QString();

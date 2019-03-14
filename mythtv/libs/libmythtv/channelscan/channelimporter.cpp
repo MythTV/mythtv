@@ -1387,12 +1387,10 @@ ChannelImporter::QueryUserDelete(const QString &msg)
                 action = (4 == val) ? kDeleteIgnoreAll : action;
                 break;
             }
-            else
-            {
-                //cout << "Please enter either 1, 2, 3 or 4:" << endl;
-                cout << tr("Please enter either 1, 2 or 4:")
-                    .toLatin1().constData() << endl;//
-            }
+
+            //cout << "Please enter either 1, 2, 3 or 4:" << endl;
+            cout << tr("Please enter either 1, 2 or 4:")
+                .toLatin1().constData() << endl;//
         }
     }
 
@@ -1459,11 +1457,9 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 action = (3 == val) ? kInsertIgnoreAll : action;
                 break;
             }
-            else
-            {
-                cout << tr("Please enter either 1, 2, or 3:")
-                    .toLatin1().constData() << endl;
-            }
+
+            cout << tr("Please enter either 1, 2, or 3:")
+                .toLatin1().constData() << endl;
         }
     }
 
@@ -1531,11 +1527,9 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 action = (3 == val) ? kUpdateIgnoreAll : action;
                 break;
             }
-            else
-            {
-                cout << tr("Please enter either 1, 2, or 3:")
-                    .toLatin1().constData() << endl;
-            }
+
+            cout << tr("Please enter either 1, 2, or 3:")
+                .toLatin1().constData() << endl;
         }
     }
 

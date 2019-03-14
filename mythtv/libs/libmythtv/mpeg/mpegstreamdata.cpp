@@ -306,7 +306,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         DeletePartialPSIP(tspacket->PID());
         return psip;
     }
-    else if (partial)
+    if (partial)
     {
         if (broken)
             DeletePartialPSIP(tspacket->PID());
@@ -1527,7 +1527,7 @@ bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return false;
     }
-    else if (TableID::PAT == psip->TableID() &&
+    if (TableID::PAT == psip->TableID() &&
              (_cached_pats[(tid << 8) | psip->Section()] == psip))
     {
         _cached_pats[(tid << 8) | psip->Section()] = nullptr;
@@ -1858,10 +1858,9 @@ static QString toString(CryptStatus status)
 {
     if (kEncDecrypted == status)
         return "Decrypted";
-    else if (kEncEncrypted == status)
+    if (kEncEncrypted == status)
         return "Encrypted";
-    else
-        return "Unknown";
+    return "Unknown";
 }
 
 /** \fn MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)

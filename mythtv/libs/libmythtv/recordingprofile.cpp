@@ -1759,7 +1759,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
         MythDB::DBError("RecordingProfile::fillSelections 1", result);
         return;
     }
-    else if (!result.next())
+    if (!result.next())
     {
         return;
     }
@@ -1833,7 +1833,7 @@ QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
         MythDB::DBError("RecordingProfile::GetProfileMap()", query);
         return profiles;
     }
-    else if (!query.next())
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "RecordingProfile::fillselections, Warning: "

@@ -358,8 +358,7 @@ QString SubtitleFormat::MakePrefix(const QString &family,
 {
     if (family == kSubFamily708)
         return family + "_" + QString::number(attr.m_font_tag & 0x7);
-    else
-        return family;
+    return family;
 }
 
 void SubtitleFormat::CreateProviderDefault(const QString &family,

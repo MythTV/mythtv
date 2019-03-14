@@ -1199,7 +1199,7 @@ static bool get_use_eit(uint inputid)
         MythDB::DBError("get_use_eit", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toBool();
     return false;
 }
@@ -1219,7 +1219,7 @@ static bool is_dishnet_eit(uint inputid)
         MythDB::DBError("is_dishnet_eit", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toBool();
     return false;
 }
@@ -1239,7 +1239,7 @@ static int num_inputs(void)
         MythDB::DBError("num_inputs", query);
         return -1;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toInt();
     return -1;
 }
@@ -3727,11 +3727,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                 m_tuningRequests.enqueue(TuningRequest(kFlagKillRec));
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to set channel to %1.").arg(channum));
-        }
+
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to set channel to %1.").arg(channum));
     }
 
 
@@ -4799,16 +4797,14 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
             "Failed to create new RB.");
         return nullptr;
     }
-    else
-    {
-        m_recorder->SetNextRecording(ri, rb);
-        SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
-        m_recordEndTime = GetRecordEndTime(ri);
-        m_switchingBuffer = true;
-        ri->SetRecordingStatus(RecStatus::Recording);
-        LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
-        return ri;
-    }
+
+    m_recorder->SetNextRecording(ri, rb);
+    SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
+    m_recordEndTime = GetRecordEndTime(ri);
+    m_switchingBuffer = true;
+    ri->SetRecordingStatus(RecStatus::Recording);
+    LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
+    return ri;
 }
 
 TVRec* TVRec::GetTVRec(uint inputid)

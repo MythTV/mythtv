@@ -1087,7 +1087,7 @@ QStringList ChannelUtil::GetValidRecorderList(
 {
     if (chanid)
         return get_valid_recorder_list(chanid);
-    else if (!channum.isEmpty())
+    if (!channum.isEmpty())
         return get_valid_recorder_list(channum);
     return QStringList();
 }

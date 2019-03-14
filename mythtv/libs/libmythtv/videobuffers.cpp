@@ -552,8 +552,7 @@ frame_queue_t::iterator VideoBuffers::begin_lock(BufferType type)
     frame_queue_t *q = Queue(type);
     if (q)
         return q->begin();
-    else
-        return m_available.begin();
+    return m_available.begin();
 }
 
 frame_queue_t::iterator VideoBuffers::end(BufferType type)
@@ -921,8 +920,7 @@ const QString& DebugString(const VideoFrame *frame, bool short_str)
 {
     if (short_str)
         return dbg_str_arr_short[DebugNum(frame) % DBG_STR_ARR_SIZE];
-    else
-        return dbg_str_arr[DebugNum(frame) % DBG_STR_ARR_SIZE];
+    return dbg_str_arr[DebugNum(frame) % DBG_STR_ARR_SIZE];
 }
 
 const QString& DebugString(uint i, bool short_str)

@@ -494,8 +494,7 @@ int64_t MythDVDPlayer::GetTotalSeconds(bool /*honorCutList*/, int divisor) const
     {
         if (m_stillFrameLength == 255)
             return -1;
-        else
-            total = m_stillFrameLength;
+        total = m_stillFrameLength;
     }
 
     return total * 1000 / divisor;

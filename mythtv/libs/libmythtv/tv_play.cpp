@@ -3835,11 +3835,8 @@ bool TV::TranslateGesture(const QString &context, MythGestureEvent *e,
                 return GetMythMainWindow()->TranslateKeyPress(
                         context, &(m_screenPressKeyMapLiveTV[region]), actions, true);
             }
-            else
-            {
-                return GetMythMainWindow()->TranslateKeyPress(
-                        context, &(m_screenPressKeyMapPlayback[region]), actions, true);
-            }
+            return GetMythMainWindow()->TranslateKeyPress(
+                context, &(m_screenPressKeyMapPlayback[region]), actions, true);
         }
         return false;
     }
@@ -4650,10 +4647,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 ShowOSDStopWatchingRecording(ctx);
                 return handled;
             }
-            else
-            {
-                do_exit = true;
-            }
+            do_exit = true;
         }
         else
         {
@@ -4676,19 +4670,17 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 PxPTeardownView(ctx);
                 return handled;
             }
-            else
+
+            // If it's a DVD, and we're not trying to execute a
+            // jumppoint, try to back up.
+            if (isDVD &&
+                !GetMythMainWindow()->IsExitingToMain() &&
+                has_action("BACK", actions) &&
+                ctx->m_buffer && ctx->m_buffer->DVD()->GoBack())
             {
-                // If it's a DVD, and we're not trying to execute a
-                // jumppoint, try to back up.
-                if (isDVD &&
-                    !GetMythMainWindow()->IsExitingToMain() &&
-                    has_action("BACK", actions) &&
-                    ctx->m_buffer && ctx->m_buffer->DVD()->GoBack())
-                {
-                    return handled;
-                }
-                SetExitPlayer(true, true);
+                return handled;
             }
+            SetExitPlayer(true, true);
         }
 
         SetActive(ctx, 0, false);
@@ -11127,8 +11119,8 @@ bool TV::MenuItemDisplay(const MenuItemContext &c)
     {
         return MenuItemDisplayPlayback(c);
     }
-    else if (&c.m_menu == &m_cutlistMenu ||
-             &c.m_menu == &m_cutlistCompactMenu)
+    if (&c.m_menu == &m_cutlistMenu ||
+        &c.m_menu == &m_cutlistCompactMenu)
     {
         return MenuItemDisplayCutlist(c);
     }

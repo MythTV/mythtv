@@ -87,11 +87,8 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         MythDB::DBError("TransportWizard()", query);
         return CardUtil::ERROR_PROBE;
     }
-    else
-    {
-        while (query.next())
-            cardids.push_back(query.value(0).toUInt());
-    }
+    while (query.next())
+        cardids.push_back(query.value(0).toUInt());
 
     if (cardids.empty())
     {

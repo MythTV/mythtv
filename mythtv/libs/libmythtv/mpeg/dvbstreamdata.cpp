@@ -815,7 +815,7 @@ bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return false;
     }
-    else if ((TableID::NIT == psip->TableID()) &&
+    if ((TableID::NIT == psip->TableID()) &&
              _cached_nit[psip->Section()])
     {
         _cached_nit[psip->Section()] = nullptr;

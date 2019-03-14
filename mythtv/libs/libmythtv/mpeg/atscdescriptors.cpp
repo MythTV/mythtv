@@ -263,9 +263,8 @@ QString AudioStreamDescriptor::BitRateCodeString(void) const
 
     if (BitRateCode() <= 18)
         return QString(ebr[BitRateCode()]);
-    else if ((BitRateCode() >= 32) && (BitRateCode() <= 50))
+    if ((BitRateCode() >= 32) && (BitRateCode() <= 50))
         return QString(ubr[BitRateCode()-32]);
-
     return QString("Unknown Bit Rate Code");
 }
 

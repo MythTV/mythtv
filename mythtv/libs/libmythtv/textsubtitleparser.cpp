@@ -116,33 +116,24 @@ public:
     bool isOpen(void) const {
         if (m_isRemote)
             return m_remoteFile->isOpen();
-        else
-            return m_localFile;
+        return m_localFile;
     }
     long long GetFileSize(void) const {
         if (m_isRemote)
             return m_remoteFile->GetFileSize();
-        else
-        {
-            if (m_localFile)
-                return m_localFile->size();
-            else
-                return 0;
-        }
+        if (m_localFile)
+            return m_localFile->size();
+        return 0;
     }
     int Read(void *data, int size) {
         if (m_isRemote)
             return m_remoteFile->Read(data, size);
-        else
+        if (m_localFile)
         {
-            if (m_localFile)
-            {
-                QDataStream stream(m_localFile);
-                return stream.readRawData(static_cast<char*>(data), size);
-            }
-            else
-                return 0;
+            QDataStream stream(m_localFile);
+            return stream.readRawData(static_cast<char*>(data), size);
         }
+        return 0;
     }
 private:
     bool m_isRemote;

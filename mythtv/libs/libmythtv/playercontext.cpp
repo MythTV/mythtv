@@ -461,12 +461,9 @@ bool PlayerContext::StartPlaying(int maxWait)
                 .arg(t.elapsed()));
         return true;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
-        StopPlaying();
-        return false;
-    }
+    LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
+    StopPlaying();
+    return false;
 }
 
 void PlayerContext::StopPlaying(void)
@@ -498,10 +495,7 @@ bool PlayerContext::ReloadTVChain(void)
         delete pinfo;
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 /**

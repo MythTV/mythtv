@@ -366,18 +366,15 @@ static int get_canonical_lang(const char *lang_cstr)
     {
         return iso639_str3_to_key("und");
     }
-    else if (lang_cstr[2] == '\0')
+    if (lang_cstr[2] == '\0')
     {
         QString tmp2 = lang_cstr;
         QString tmp3 = iso639_str2_to_str3(tmp2);
         int lang = iso639_str3_to_key(tmp3);
         return iso639_key_to_canonical_key(lang);
     }
-    else
-    {
-        int lang = iso639_str3_to_key(lang_cstr);
-        return iso639_key_to_canonical_key(lang);
-    }
+    int lang = iso639_str3_to_key(lang_cstr);
+    return iso639_key_to_canonical_key(lang);
 }
 
 void AvFormatDecoder::GetDecoders(render_opts &opts)
@@ -2780,15 +2777,13 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
             .arg(error));
         return false;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Opened codec 0x%1, id(%2) type(%3)")
-            .arg((uint64_t)avctx,0,16)
-            .arg(ff_codec_id_string(avctx->codec_id))
-            .arg(ff_codec_type_string(avctx->codec_type)));
-        return true;
-    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Opened codec 0x%1, id(%2) type(%3)")
+        .arg((uint64_t)avctx,0,16)
+        .arg(ff_codec_id_string(avctx->codec_id))
+        .arg(ff_codec_type_string(avctx->codec_type)));
+    return true;
 }
 
 void AvFormatDecoder::UpdateFramesPlayed(void)
@@ -3482,7 +3477,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (m_start_code_state >= SLICE_MIN && m_start_code_state <= SLICE_MAX)
             continue;
-        else if (SEQ_START == m_start_code_state)
+        if (SEQ_START == m_start_code_state)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
                 continue; // not enough valid data...
@@ -4519,20 +4514,17 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QString("%1: %2").arg(trackNo + 1).arg(msg);
     }
-    else if (kTrackTypeSubtitle == type)
+    if (kTrackTypeSubtitle == type)
     {
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
             .arg(forcedString);
     }
-    else if (forced && kTrackTypeRawText == type)
+    if (forced && kTrackTypeRawText == type)
     {
         return DecoderBase::GetTrackDesc(type, trackNo) + forcedString;
     }
-    else
-    {
-        return DecoderBase::GetTrackDesc(type, trackNo);
-    }
+    return DecoderBase::GetTrackDesc(type, trackNo);
 }
 
 int AvFormatDecoder::GetTeletextDecoderType(void) const
@@ -5061,8 +5053,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if ((m_lastapts < m_lastvpts - (10.0f / m_fps)) || m_lastvpts == 0)
                     break;
-                else
-                    m_skipaudio = false;
+                m_skipaudio = false;
             }
 
             // skip any audio frames preceding first video frame

@@ -39,7 +39,7 @@ VideoVisual* VideoVisual::Create(const QString &name,
     {
         if (name.isEmpty())
             return factory->Create(audio, render);
-        else if (factory->name() == name)
+        if (factory->name() == name)
             return factory->Create(audio, render);
     }
     return nullptr;

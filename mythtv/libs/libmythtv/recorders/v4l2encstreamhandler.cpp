@@ -153,8 +153,7 @@ V4L2encStreamHandler::V4L2encStreamHandler(const QString & device,
         m_error = true;
         return;
     }
-    else
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("'%1' open").arg(m_device));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("'%1' open").arg(m_device));
 }
 
 V4L2encStreamHandler::~V4L2encStreamHandler(void)

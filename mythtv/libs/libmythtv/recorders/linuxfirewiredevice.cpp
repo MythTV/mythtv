@@ -390,8 +390,7 @@ bool LinuxFirewireDevice::OpenNode(void)
 {
     if (m_use_p2p)
         return OpenP2PNode();
-    else
-        return OpenBroadcastNode();
+    return OpenBroadcastNode();
 }
 
 bool LinuxFirewireDevice::CloseNode(void)

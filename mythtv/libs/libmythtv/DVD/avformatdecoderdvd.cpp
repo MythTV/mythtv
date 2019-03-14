@@ -672,6 +672,7 @@ AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint stream_index)
         }
         return ret;
     }
-    else // If the DVD metadata doesn't include the info then we might as well fall through, maybe we'll get lucky
-        return AvFormatDecoder::GetAudioTrackType(stream_index);
+
+    // If the DVD metadata doesn't include the info then we might as well fall through, maybe we'll get lucky
+    return AvFormatDecoder::GetAudioTrackType(stream_index);
 }

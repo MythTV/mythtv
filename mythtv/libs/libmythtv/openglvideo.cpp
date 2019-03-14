@@ -355,11 +355,8 @@ bool OpenGLVideo::OptimiseFilters(void)
                 {
                     if (!AddFrameBuffer(tmp_buf, tmp_tex, video_disp_dim))
                         return false;
-                    else
-                    {
-                        it->second->frameBuffers.push_back(tmp_buf);
-                        it->second->frameBufferTextures.push_back(tmp_tex);
-                    }
+                    it->second->frameBuffers.push_back(tmp_buf);
+                    it->second->frameBufferTextures.push_back(tmp_tex);
                 }
             }
             else if (buffers_diff < 0)

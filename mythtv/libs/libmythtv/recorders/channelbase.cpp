@@ -565,7 +565,7 @@ bool ChannelBase::InitializeInput(void)
         MythDB::DBError("InitializeInputs", query);
         return false;
     }
-    else if (!query.size())
+    if (!query.size())
     {
         LOG(VB_GENERAL, LOG_ERR, "InitializeInputs(): "
             "\n\t\t\tCould not get inputs for the capturecard."

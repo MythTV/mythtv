@@ -223,10 +223,7 @@ static QDateTime get_start(const RecordingInfo &ri)
         return (ri.GetScheduledStartTime() > ri.GetDesiredStartTime()) ?
             ri.GetScheduledStartTime() : ri.GetDesiredStartTime();
     }
-    else
-    {
-        return ri.GetScheduledStartTime();
-    }
+    return ri.GetScheduledStartTime();
 }
 
 static QDateTime get_end(const RecordingInfo &ri)
@@ -236,8 +233,5 @@ static QDateTime get_end(const RecordingInfo &ri)
         return (ri.GetScheduledEndTime() < ri.GetDesiredEndTime()) ?
             ri.GetScheduledEndTime() : ri.GetDesiredEndTime();
     }
-    else
-    {
-        return ri.GetScheduledEndTime();
-    }
+    return ri.GetScheduledEndTime();
 }

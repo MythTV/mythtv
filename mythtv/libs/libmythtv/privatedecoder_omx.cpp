@@ -787,12 +787,10 @@ int PrivateDecoderOMX::GetFrame(
         *got_picture_ptr = 0;
         return -1;
     }
-    else 
-    {
-        // Submit a packet for decoding
-        lock.unlock();
-        return (pkt && pkt->size) ? ProcessPacket(stream, pkt) : 0;
-    }
+
+    // Submit a packet for decoding
+    lock.unlock();
+    return (pkt && pkt->size) ? ProcessPacket(stream, pkt) : 0;
 }
 
 // Submit a packet for decoding

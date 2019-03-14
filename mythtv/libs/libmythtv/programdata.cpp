@@ -304,23 +304,21 @@ uint DBEvent::UpdateDB(
                 .arg(programs[i].m_title.left(35)));
         return UpdateDB(query, chanid, programs, i);
     }
-    else
-    {
-        // If we are here then either we have a match but the match is
-        // not good enough (the "i >= 0" case) or we did not find
-        // a match at all.
-        if (i >= 0)
-        {
-            LOG(VB_EIT, LOG_DEBUG,
-                QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
-                    .arg(i).arg(match).arg(m_title.left(35))
-                    .arg(programs[i].m_title.left(35)));
-        }
 
-        // Move the overlapping programs out of the way and
-        // insert the new program.
-        return UpdateDB(query, chanid, programs, -1);
+    // If we are here then either we have a match but the match is
+    // not good enough (the "i >= 0" case) or we did not find
+    // a match at all.
+    if (i >= 0)
+    {
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
+                .arg(i).arg(match).arg(m_title.left(35))
+                .arg(programs[i].m_title.left(35)));
     }
+
+    // Move the overlapping programs out of the way and
+    // insert the new program.
+    return UpdateDB(query, chanid, programs, -1);
 }
 
 // Get all programs in the database that overlap with our new program.
@@ -460,7 +458,7 @@ static int score_match(const QString &a, const QString &b)
 {
     if (a.isEmpty() || b.isEmpty())
         return 0;
-    else if (a == b)
+    if (a == b)
         return 1000;
 
     QString A = a.simplified().toUpper();
@@ -943,7 +941,7 @@ bool DBEvent::MoveOutOfTheWayDB(
                     .arg(prog.m_endtime.toString(Qt::ISODate)));
         return delete_program(query, chanid, prog.m_starttime);
     }
-    else if (prog.m_starttime < m_starttime && prog.m_endtime > m_starttime)
+    if (prog.m_starttime < m_starttime && prog.m_endtime > m_starttime)
     {
         // Old program starts before, but ends during or after our new program.
         // Adjust the end time of the old program to the start time
@@ -958,7 +956,7 @@ bool DBEvent::MoveOutOfTheWayDB(
                               prog.m_starttime, // Keep the start time
                               m_starttime);     // New end time is our start time
     }
-    else if (prog.m_starttime < m_endtime && prog.m_endtime > m_endtime)
+    if (prog.m_starttime < m_endtime && prog.m_endtime > m_endtime)
     {
         // Old program starts during, but ends after our new program.
         // Adjust the starttime of the old program to the end time

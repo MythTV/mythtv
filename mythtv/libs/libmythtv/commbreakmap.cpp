@@ -307,8 +307,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
                 jumpToFrame = 0;
                 return true;
             }
-            else
-                m_commBreakIter--;
+            m_commBreakIter--;
         }
     }
     else

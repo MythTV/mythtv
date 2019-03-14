@@ -85,14 +85,12 @@ MythCodecID NvdecContext::GetBestSupportedCodec(
     }
     if (fmt == AV_PIX_FMT_NONE)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Decoder %1 supports device type %2.")
-                .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
-        pix_fmt = fmt;
-        return (MythCodecID)(kCodec_MPEG1_NVDEC + (stream_type - 1));
-    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Decoder %1 supports device type %2.")
+        .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
+    pix_fmt = fmt;
+    return (MythCodecID)(kCodec_MPEG1_NVDEC + (stream_type - 1));
 }
 
 int NvdecContext::HwDecoderInit(AVCodecContext *ctx)

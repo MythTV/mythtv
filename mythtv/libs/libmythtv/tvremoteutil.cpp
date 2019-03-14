@@ -16,8 +16,7 @@ uint RemoteGetFlags(uint inputid)
         const TVRec *rec = TVRec::GetTVRec(inputid);
         if (rec)
             return rec->GetFlags();
-        else
-            return 0;
+        return 0;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -35,8 +34,7 @@ uint RemoteGetState(uint inputid)
         const TVRec *rec = TVRec::GetTVRec(inputid);
         if (rec)
             return rec->GetState();
-        else
-            return kState_ChangingState;
+        return kState_ChangingState;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -59,8 +57,7 @@ bool RemoteRecordPending(uint inputid, const ProgramInfo *pginfo,
             rec->RecordPending(pginfo, secsleft, hasLater);
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -85,8 +82,7 @@ bool RemoteStopLiveTV(uint inputid)
             rec->StopLiveTV();
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -108,8 +104,7 @@ bool RemoteStopRecording(uint inputid)
             rec->StopRecording();
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -380,16 +375,14 @@ bool RemoteIsBusy(uint inputid, InputInfo &busy_input)
         const TVRec *rec = TVRec::GetTVRec(inputid);
         if (rec)
             return rec->IsBusy(&busy_input);
-        else
-        {
-            // Note this value is intentionally different than the
-            // non-backend, error value below.  There is a small
-            // window when adding an input where an input can exist in
-            // the database, but not yet have a TVRec.  In such cases,
-            // we don't want it to be considered busy and block other
-            // actions.
-            return false;
-        }
+
+        // Note this value is intentionally different than the
+        // non-backend, error value below.  There is a small
+        // window when adding an input where an input can exist in
+        // the database, but not yet have a TVRec.  In such cases,
+        // we don't want it to be considered busy and block other
+        // actions.
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));

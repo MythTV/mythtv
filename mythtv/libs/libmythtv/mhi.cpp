@@ -892,9 +892,9 @@ bool MHIContext::LoadChannelCache()
         MythDB::DBError("MHIContext::LoadChannelCache", query);
         return false;
     }
-    else if (!query.isActive())
+    if (!query.isActive())
         return false;
-    else while (query.next())
+    while (query.next())
     {
         int nid = query.value(0).toInt();
         int sid = query.value(1).toInt();
@@ -941,7 +941,7 @@ int MHIContext::GetChannelIndex(const QString &str)
             Key_t(netID,serviceID) );
         if (it == m_channelCache.end())
             break;
-        else if (transportID < 0)
+        if (transportID < 0)
             nResult = Cid(it);
         else do
         {

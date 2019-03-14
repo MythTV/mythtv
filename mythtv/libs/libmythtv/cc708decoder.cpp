@@ -263,12 +263,12 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
             // There must be an incomplete code in buffer...
             break;
         }
-        else if (cc->m_delayed[service_num] && dlc_loc < i)
+        if (cc->m_delayed[service_num] && dlc_loc < i)
         {
             // delay in effect
             break;
         }
-        else if (cc->m_delayed[service_num])
+        if (cc->m_delayed[service_num])
         {
             // this delay has already been canceled..
             cc->DelayCancel(service_num);

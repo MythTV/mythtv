@@ -134,12 +134,11 @@ AVContainer RecordingFile::AVContainerFromString(const QString &formatStr)
 {
     if (formatStr == "NUV")
         return formatNUV;
-    else if (formatStr == "MPEG2-TS")
+    if (formatStr == "MPEG2-TS")
         return formatMPEG2_TS;
-    else if (formatStr == "MPEG2-PS")
+    if (formatStr == "MPEG2-PS")
         return formatMPEG2_PS;
-    else
-        return formatUnknown;
+    return formatUnknown;
 }
 
 QString RecordingFile::AVContainerToString(AVContainer format)

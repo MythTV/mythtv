@@ -78,8 +78,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
             m_state[streamIdx].m_changed = false;
             return &m_state[streamIdx].m_output;
         }
-        else
-            return &m_state[MAXOUTBUFFERS - 1].m_output;
+        return &m_state[MAXOUTBUFFERS - 1].m_output;
     }
 
     VideoFrame *last = nullptr;
@@ -149,10 +148,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
         m_state[streamIdx].m_changed = false;
         return &m_state[streamIdx].m_output;
     }
-    else
-    {
-        return &m_state[MAXOUTBUFFERS - 1].m_output;
-    }
+    return &m_state[MAXOUTBUFFERS - 1].m_output;
 }
 
 void CC608Reader::SetMode(int mode)

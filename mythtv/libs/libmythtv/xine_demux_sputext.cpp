@@ -237,7 +237,7 @@ static char *sub_readtext(char *source, char **dest) {
     p++;
 
   if (*p)  return p;  /* not-last text field */
-  else return (char*)nullptr;   /* last text field     */
+  return (char*)nullptr;   /* last text field     */
 }
 
 static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t *current) {
@@ -335,8 +335,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
     if(!read_line_from_input(demuxstr,line,LINE_LEN)) {
       if(i)
         break; /* if something was read, transmit it */
-      else
-        return nullptr; /* if not, repport EOF */
+      return nullptr; /* if not, repport EOF */
     }
     for(temp_index=0,p=line;*p!='\0' && !end_sub && temp_index<SUB_BUFSIZE && i<SUB_MAX_TEXT;p++) {
       switch(*p) {
@@ -658,8 +657,7 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
     } else {
       if (num)
         return current;
-      else
-        return nullptr;
+      return nullptr;
     }
   }
 
@@ -768,14 +766,13 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                     }
                 }
                 continue;
-            } else {
-                current->start =
-                    (unsigned long) ((a4 + jacoShift) * 100.0 /
-                                     jacoTimeres);
-                current->end =
-                    (unsigned long) ((b4 + jacoShift) * 100.0 /
-                                     jacoTimeres);
             }
+            current->start =
+                (unsigned long) ((a4 + jacoShift) * 100.0 /
+                                 jacoTimeres);
+            current->end =
+                (unsigned long) ((b4 + jacoShift) * 100.0 /
+                                 jacoTimeres);
         } else {
             current->start =
                 (unsigned
@@ -1160,9 +1157,8 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
     if (!sub) {
       break;   /* EOF */
-    } else {
-      demuxstr->emptyReads = 0;
     }
+    demuxstr->emptyReads = 0;
 
     if (sub==ERR)
       ++demuxstr->errs;

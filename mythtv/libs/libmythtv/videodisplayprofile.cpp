@@ -721,7 +721,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 ok = false;
                 continue;
             }
-            else if (query.next())
+            if (query.next())
             {
                 (*it).SetProfileID(query.value(0).toUInt() + 1);
             }
@@ -763,7 +763,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 ok = false;
                 continue;
             }
-            else if (query.next() && (1 == query.value(0).toUInt()))
+            if (query.next() && (1 == query.value(0).toUInt()))
             {
                 if (lit->isEmpty())
                 {
@@ -922,98 +922,98 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
 {
     if ("none" == short_name)
         return QObject::tr("None");
-    else if ("linearblend" == short_name)
+    if ("linearblend" == short_name)
         return QObject::tr("Linear blend");
-    else if ("kerneldeint" == short_name)
+    if ("kerneldeint" == short_name)
         return QObject::tr("Kernel");
-    else if ("kerneldoubleprocessdeint" == short_name)
+    if ("kerneldoubleprocessdeint" == short_name)
         return QObject::tr("Kernel (2x)");
-    else if ("greedyhdeint" == short_name)
+    if ("greedyhdeint" == short_name)
         return QObject::tr("Greedy HighMotion");
-    else if ("greedyhdoubleprocessdeint" == short_name)
+    if ("greedyhdoubleprocessdeint" == short_name)
         return QObject::tr("Greedy HighMotion (2x)");
-    else if ("yadifdeint" == short_name)
+    if ("yadifdeint" == short_name)
         return QObject::tr("Yadif");
-    else if ("yadifdoubleprocessdeint" == short_name)
+    if ("yadifdoubleprocessdeint" == short_name)
         return QObject::tr("Yadif (2x)");
-    else if ("bobdeint" == short_name)
+    if ("bobdeint" == short_name)
         return QObject::tr("Bob (2x)");
-    else if ("onefield" == short_name)
+    if ("onefield" == short_name)
         return QObject::tr("One field");
-    else if ("fieldorderdoubleprocessdeint" == short_name)
+    if ("fieldorderdoubleprocessdeint" == short_name)
         return QObject::tr("Interlaced (2x)");
-    else if ("opengllinearblend" == short_name)
+    if ("opengllinearblend" == short_name)
         return QObject::tr("Linear blend (HW-GL)");
-    else if ("openglkerneldeint" == short_name)
+    if ("openglkerneldeint" == short_name)
         return QObject::tr("Kernel (HW-GL)");
-    else if ("openglbobdeint" == short_name)
+    if ("openglbobdeint" == short_name)
         return QObject::tr("Bob (2x, HW-GL)");
-    else if ("openglonefield" == short_name)
+    if ("openglonefield" == short_name)
         return QObject::tr("One field (HW-GL)");
-    else if ("opengldoubleratekerneldeint" == short_name)
+    if ("opengldoubleratekerneldeint" == short_name)
         return QObject::tr("Kernel (2x, HW-GL)");
-    else if ("opengldoubleratelinearblend" == short_name)
+    if ("opengldoubleratelinearblend" == short_name)
         return QObject::tr("Linear blend (2x, HW-GL)");
-    else if ("opengldoubleratefieldorder" == short_name)
+    if ("opengldoubleratefieldorder" == short_name)
         return QObject::tr("Interlaced (2x, HW-GL)");
-    else if ("vdpauonefield" == short_name)
+    if ("vdpauonefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
-    else if ("vdpaubobdeint" == short_name)
+    if ("vdpaubobdeint" == short_name)
         return QObject::tr("Bob (2x, HW)");
-    else if ("vdpaubasic" == short_name)
+    if ("vdpaubasic" == short_name)
         return QObject::tr("Temporal (1x, HW)");
-    else if ("vdpaubasicdoublerate" == short_name)
+    if ("vdpaubasicdoublerate" == short_name)
         return QObject::tr("Temporal (2x, HW)");
-    else if ("vdpauadvanced" == short_name)
+    if ("vdpauadvanced" == short_name)
         return QObject::tr("Advanced (1x, HW)");
-    else if ("vdpauadvanceddoublerate" == short_name)
+    if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, HW)");
-    else if ("vaapionefield" == short_name)
+    if ("vaapionefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
-    else if ("vaapibobdeint" == short_name)
+    if ("vaapibobdeint" == short_name)
         return QObject::tr("Bob (2x, HW)");
 #ifdef USING_OPENMAX
-    else if ("openmaxadvanced" == short_name)
+    if ("openmaxadvanced" == short_name)
         return QObject::tr("Advanced (HW)");
-    else if ("openmaxfast" == short_name)
+    if ("openmaxfast" == short_name)
         return QObject::tr("Fast (HW)");
-    else if ("openmaxlinedouble" == short_name)
+    if ("openmaxlinedouble" == short_name)
         return QObject::tr("Line double (HW)");
 #endif // def USING_OPENMAX
 #ifdef USING_VAAPI2
-    else if ("vaapi2default" == short_name)
+    if ("vaapi2default" == short_name)
         return QObject::tr("Advanced (HW-VA)");
-    else if ("vaapi2bob" == short_name)
+    if ("vaapi2bob" == short_name)
         return QObject::tr("Bob (HW-VA)");
-    else if ("vaapi2weave" == short_name)
+    if ("vaapi2weave" == short_name)
         return QObject::tr("Weave (HW-VA)");
-    else if ("vaapi2motion_adaptive" == short_name)
+    if ("vaapi2motion_adaptive" == short_name)
         return QObject::tr("Motion Adaptive (HW-VA)");
-    else if ("vaapi2motion_compensated" == short_name)
+    if ("vaapi2motion_compensated" == short_name)
         return QObject::tr("Motion Compensated (HW-VA)");
-    else if ("vaapi2doubleratedefault" == short_name)
+    if ("vaapi2doubleratedefault" == short_name)
         return QObject::tr("Advanced (2x, HW-VA)");
-    else if ("vaapi2doubleratebob" == short_name)
+    if ("vaapi2doubleratebob" == short_name)
         return QObject::tr("Bob (2x, HW-VA)");
-    else if ("vaapi2doublerateweave" == short_name)
+    if ("vaapi2doublerateweave" == short_name)
         return QObject::tr("Weave (2x, HW-VA)");
-    else if ("vaapi2doubleratemotion_adaptive" == short_name)
+    if ("vaapi2doubleratemotion_adaptive" == short_name)
         return QObject::tr("Motion Adaptive (2x, HW-VA)");
-    else if ("vaapi2doubleratemotion_compensated" == short_name)
+    if ("vaapi2doubleratemotion_compensated" == short_name)
         return QObject::tr("Motion Compensated (2x, HW-VA)");
 #endif
 #ifdef USING_NVDEC
-    else if ("nvdecweave" == short_name)
+    if ("nvdecweave" == short_name)
         return QObject::tr("Weave (HW-NV)");
-    else if ("nvdecbob" == short_name)
+    if ("nvdecbob" == short_name)
         return QObject::tr("Bob (HW-NV)");
-    else if ("nvdecadaptive" == short_name)
+    if ("nvdecadaptive" == short_name)
         return QObject::tr("Adaptive (HW-NV)");
-    else if ("nvdecdoublerateweave" == short_name)
+    if ("nvdecdoublerateweave" == short_name)
         return QObject::tr("Weave (2x, HW-NV)");
-    else if ("nvdecdoubleratebob" == short_name)
+    if ("nvdecdoubleratebob" == short_name)
         return QObject::tr("Bob (2x, HW-NV)");
-    else if ("nvdecdoublerateadaptive" == short_name)
+    if ("nvdecdoublerateadaptive" == short_name)
         return QObject::tr("Adaptive (2x, HW-NV)");
 #endif // USING_NVDEC
 

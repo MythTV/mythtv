@@ -526,11 +526,8 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
             .arg(vchn));
         return true;
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
-            .arg(vchn).arg(current));
-    }
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
+        .arg(vchn).arg(current));
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet("vchannel", vchn).isEmpty();

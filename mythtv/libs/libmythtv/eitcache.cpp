@@ -156,27 +156,24 @@ static bool lock_channel(uint chanid, uint endtime)
                 .arg(chanid));
         return false;
     }
-    else
-    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        uint now = MythDate::current().toTime_t();
+    uint now = MythDate::current().toTime_t();
 #else
-        uint now = MythDate::current().toSecsSinceEpoch();
+    uint now = MythDate::current().toSecsSinceEpoch();
 #endif
-        qstr = "INSERT INTO eit_cache "
-               "       ( chanid,  endtime,  status) "
-               "VALUES (:CHANID, :ENDTIME, :STATUS)";
+    qstr = "INSERT INTO eit_cache "
+           "       ( chanid,  endtime,  status) "
+           "VALUES (:CHANID, :ENDTIME, :STATUS)";
 
-        query.prepare(qstr);
-        query.bindValue(":CHANID",   chanid);
-        query.bindValue(":ENDTIME",  now);
-        query.bindValue(":STATUS",   CHANNEL_LOCK);
+    query.prepare(qstr);
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":ENDTIME",  now);
+    query.bindValue(":STATUS",   CHANNEL_LOCK);
 
-        if (!query.exec())
-        {
-            MythDB::DBError("Error inserting channel lock", query);
-            return false;
-        }
+    if (!query.exec())
+    {
+        MythDB::DBError("Error inserting channel lock", query);
+        return false;
     }
 
     return true;

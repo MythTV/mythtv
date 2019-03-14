@@ -110,5 +110,5 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
 
         return QString::fromUtf8(uncompressed, p);
     }
-    else return QString("");
+    return QString("");
 }

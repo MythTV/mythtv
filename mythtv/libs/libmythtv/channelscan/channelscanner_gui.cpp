@@ -98,13 +98,11 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             InformUser(error);
             return;
         }
-        else
+
+        int ret = scanEvent->intValue();
+        if (!transports.empty() || (kCodeRejected != ret))
         {
-            int ret = scanEvent->intValue();
-            if (!transports.empty() || (kCodeRejected != ret))
-            {
-                Process(transports, success);
-            }
+            Process(transports, success);
         }
     }
     else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)

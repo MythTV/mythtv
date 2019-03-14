@@ -1271,22 +1271,20 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
                     "v4l2: Unable to set desired format");
                 return false;
             }
-            else
+
+            // we need to convert the buffer - we can't deal with uyvy
+            // directly.
+            if (m_inpixfmt == FMT_YUV422P)
             {
-                // we need to convert the buffer - we can't deal with uyvy
-                // directly.
-                if (m_inpixfmt == FMT_YUV422P)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "v4l2: uyvy format supported, but yuv422 requested.");
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "v4l2: unfortunately, this converter hasn't been "
-                        "written yet, exiting");
-                    return false;
-                }
-                LOG(VB_RECORD, LOG_INFO, LOC +
-                    "v4l2: format set, getting uyvy from v4l, converting");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "v4l2: uyvy format supported, but yuv422 requested.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "v4l2: unfortunately, this converter hasn't been "
+                    "written yet, exiting");
+                return false;
             }
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                "v4l2: format set, getting uyvy from v4l, converting");
         }
         else
         {

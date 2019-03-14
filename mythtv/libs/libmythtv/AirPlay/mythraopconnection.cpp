@@ -876,10 +876,7 @@ void MythRAOPConnection::readClient(void)
         m_incomingPartial = true;
         return;
     }
-    else
-    {
-        m_incomingPartial = false;
-    }
+    m_incomingPartial = false;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Content(%1) = %2")
         .arg(m_incomingContent.size()).arg(m_incomingContent.constData()));
 

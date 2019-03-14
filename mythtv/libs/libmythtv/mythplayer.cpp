@@ -1003,7 +1003,7 @@ int MythPlayer::OpenFile(uint retries)
         delete[] testbuf;
         return -1;
     }
-    else if (decoder->IsErrored())
+    if (decoder->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
         SetDecoder(nullptr);
@@ -1747,7 +1747,7 @@ bool MythPlayer::HasCaptionTrack(int mode)
     {
         return true;
     }
-    else if (!(mode == kDisplayTextSubtitle) &&
+    if (!(mode == kDisplayTextSubtitle) &&
                decoder->GetTrackCount(toTrackType(mode)))
     {
         return true;

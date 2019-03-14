@@ -914,7 +914,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateById(DiSEqCDevTree &tree, uint devid)
         MythDB::DBError("DiSEqCDevDevice::CreateById", query);
         return nullptr;
     }
-    else if (!query.next())
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "CreateById failed to find dtv dev " +
                 QString("%1").arg(devid));
@@ -1243,7 +1243,7 @@ bool DiSEqCDevSwitch::Load(void)
         MythDB::DBError("DiSEqCDevSwitch::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type = SwitchTypeFromString(query.value(0).toString());
         m_address = query.value(1).toUInt();
@@ -1843,7 +1843,7 @@ bool DiSEqCDevRotor::Load(void)
         MythDB::DBError("DiSEqCDevRotor::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type     = RotorTypeFromString(query.value(0).toString());
         m_speed_hi = query.value(2).toDouble();
@@ -1880,7 +1880,7 @@ bool DiSEqCDevRotor::Load(void)
         MythDB::DBError("DiSEqCDevRotor::Load 2", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         uint child_dev_id = query.value(0).toUInt();
         SetChild(0, CreateById(m_tree, child_dev_id));
@@ -2192,9 +2192,8 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     {
         data[2] = m_scr_pin;
         return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
-    } else {
-        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
     }
+    return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
 }
 
 bool DiSEqCDevSCR::PowerOff(void) const
@@ -2222,9 +2221,8 @@ bool DiSEqCDevSCR::PowerOff(void) const
     {
         data[2] = m_scr_pin;
         return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
-    } else {
-        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
     }
+    return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
 }
 
 bool DiSEqCDevSCR::SendCommand(uint cmd, uint repeats, uint data_len,
@@ -2275,7 +2273,7 @@ bool DiSEqCDevSCR::Load(void)
         MythDB::DBError("DiSEqCDevSCR::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_scr_userband  = query.value(0).toUInt();
         m_scr_frequency = query.value(1).toUInt();
@@ -2301,7 +2299,7 @@ bool DiSEqCDevSCR::Load(void)
         MythDB::DBError("DiSEqCDevSCR::Load 2", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         uint child_dev_id = query.value(0).toUInt();
         SetChild(0, CreateById(m_tree, child_dev_id));
@@ -2446,7 +2444,7 @@ bool DiSEqCDevLNB::Load(void)
         MythDB::DBError("DiSEqCDevLNB::Load", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type       = LNBTypeFromString(query.value(0).toString());
         m_lof_switch = query.value(1).toInt();

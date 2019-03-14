@@ -86,8 +86,7 @@ bool NetworkInformationTable::Mutate(void)
         SetCRC(CalcCRC());
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 void ServiceDescriptionTable::Parse(void) const
@@ -178,8 +177,7 @@ bool ServiceDescriptionTable::Mutate(void)
         SetCRC(CalcCRC());
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 void BouquetAssociationTable::Parse(void) const

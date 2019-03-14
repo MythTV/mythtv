@@ -119,10 +119,9 @@ static QString progress_string(
     if (m_myFramesPlayed < totalFrames)
         return QString("%1 fps %2%      \r")
           .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0)).arg(percentage,4,'f',1);
-    else
-        return QString("%1 fps %2      \r")
-          .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
-          .arg(spin_chars[++spin_cnt % 4]);
+    return QString("%1 fps %2      \r")
+        .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
+        .arg(spin_chars[++spin_cnt % 4]);
 }
 
 bool MythCCExtractorPlayer::run(void)

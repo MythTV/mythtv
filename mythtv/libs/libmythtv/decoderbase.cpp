@@ -451,7 +451,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
             return true;
         }
-        else if (value > desired_value)
+        if (value > desired_value)
             upper = i;
         else
             lower = i;
@@ -934,11 +934,8 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 
     if (!lang)
         return type_msg + QString(" %1").arg(hnum);
-    else
-    {
-        QString lang_msg = iso639_key_toName(lang);
-        return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
-    }
+    QString lang_msg = iso639_key_toName(lang);
+    return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
 }
 
 int DecoderBase::SetTrack(uint type, int trackNo)
@@ -1248,11 +1245,8 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
             .arg(key).arg(fallback_ratio).arg(key2).arg(val2));
         return val2;
     }
-    else
-    {
-        key2 = upper.key();
-        val2 = upper.value();
-    }
+    key2 = upper.key();
+    val2 = upper.value();
     if (key1 == key2) // this happens for an exact keyframe match
         return val2; // can also set key2 = key1 + 1 avoid dividing by zero
 

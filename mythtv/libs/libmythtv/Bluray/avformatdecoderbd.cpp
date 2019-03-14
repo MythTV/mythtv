@@ -16,8 +16,7 @@ bool AvFormatDecoderBD::IsValidStream(int streamid)
 {
     if (ringBuffer && ringBuffer->IsBD())
         return ringBuffer->BD()->IsValidStream(streamid);
-    else
-        return AvFormatDecoder::IsValidStream(streamid);
+    return AvFormatDecoder::IsValidStream(streamid);
 }
 
 void AvFormatDecoderBD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)

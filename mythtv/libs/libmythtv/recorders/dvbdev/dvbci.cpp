@@ -526,19 +526,19 @@ int cCiTransportConnection::CreateConnection(void)
            _connected=true;
            return OK;
         // the following is a workaround for CAMs that don't quite follow the specs...
-        } else {
-           for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
-               dsyslog("CAM: retrying to establish connection");
-               if (RecvTPDU() == T_CTC_REPLY) {
-                  dsyslog("CAM: connection established");
-                  _connected=true;
-                  return OK;
-                  }
-               }
-           return ERROR;
-           }
         }
+
+        for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
+            dsyslog("CAM: retrying to establish connection");
+            if (RecvTPDU() == T_CTC_REPLY) {
+                dsyslog("CAM: connection established");
+                _connected=true;
+                return OK;
+            }
+        }
+        return ERROR;
      }
+  }
   return ERROR;
 }
 
@@ -614,8 +614,7 @@ bool cCiTransportLayer::ResetSlot(int Slot)
      dbgprotocol("ok.\n");
      return true;
      }
-  else
-     esyslog("ERROR: can't reset CAM slot %d: %m", Slot);
+  esyslog("ERROR: can't reset CAM slot %d: %m", Slot);
   dbgprotocol("failed!\n");
   return false;
 }
@@ -626,8 +625,7 @@ bool cCiTransportLayer::ModuleReady(int Slot)
   sinfo.num = Slot;
   if (ioctl(m_fd, CA_GET_SLOT_INFO, &sinfo) != -1)
      return sinfo.flags & CA_CI_MODULE_READY;
-  else
-     esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
+  esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
   return false;
 }
 
@@ -1255,8 +1253,7 @@ char *cCiMMI::GetText(int &Length, const uint8_t **Data)
      dbgprotocol("%d: <== Text Last '%s'\n", SessionId(), s);
      return s;
      }
-  else
-     esyslog("CI MMI: unexpected text tag: %06X", Tag);
+  esyslog("CI MMI: unexpected text tag: %06X", Tag);
   return nullptr;
 }
 
@@ -1581,11 +1578,10 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
             {
                 if (Caps.slot_type & CA_CI_LINK)
                     return new cLlCiHandler(fd_ca, NumSlots);
-                else if (Caps.slot_type & CA_CI)
+                if (Caps.slot_type & CA_CI)
                     return new cHlCiHandler(fd_ca, NumSlots);
-                else
-                    isyslog("CAM doesn't support either high or low level CI,"
-                            " Caps.slot_type=%i", Caps.slot_type);
+                isyslog("CAM doesn't support either high or low level CI,"
+                        " Caps.slot_type=%i", Caps.slot_type);
             }
             else
                 esyslog("ERROR: no CAM slots found");
@@ -1698,10 +1694,9 @@ bool cLlCiHandler::CloseSession(int SessionId)
      Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_OK);
      return true;
      }
-  else {
-     esyslog("ERROR: unknown session id: %d", SessionId);
-     Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_NOT_ALLOCATED);
-     }
+
+  esyslog("ERROR: unknown session id: %d", SessionId);
+  Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_NOT_ALLOCATED);
   return false;
 }
 

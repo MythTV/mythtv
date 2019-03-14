@@ -872,7 +872,7 @@ bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return false;
     }
-    else if (TableID::MGT == psip->TableID())
+    if (TableID::MGT == psip->TableID())
     {
         if (psip == _cached_mgt)
             _cached_mgt = nullptr;
