@@ -596,7 +596,7 @@ static int decide_frame_length(struct pullup_context *c)
 			&& (f0->affinity != 1 || f1->affinity != -1) )
 			return 1;
 		if (f1->affinity == 1) return 1;
-		else return 2;
+                return 2;
 	case 3:
 		if (f2->affinity == 1) return 2;
 		else return 3;
@@ -606,7 +606,7 @@ static int decide_frame_length(struct pullup_context *c)
 		else if (f1->affinity == -1) return 2; /* covers 6 */
 		else if (f2->affinity == -1) { /* covers 2 */
 			if (f0->affinity == 1) return 3;
-			else return 1;
+                        return 1;
 		}
 		else return 2; /* the remaining 6 */
 	}

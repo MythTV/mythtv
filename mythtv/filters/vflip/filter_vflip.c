@@ -57,10 +57,9 @@ static int comp(const void *va, const void *vb)
     int *b = (int *) vb;
     if (*a == *b)
         return 0;
-    else if (*a < *b)
+    if (*a < *b)
         return -1;
-    else
-        return 1;
+    return 1;
 }
 
 static int vflip(VideoFilter *vf, VideoFrame *frame, int field)
