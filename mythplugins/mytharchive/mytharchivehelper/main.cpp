@@ -1806,7 +1806,7 @@ static int64_t getCutFrames(const QString &filename, int64_t lastFrame)
 
     progInfo->QueryCutList(cutlist);
 
-    if (cutlist.size() == 0)
+    if (cutlist.empty())
     {
         delete progInfo;
         return 0;

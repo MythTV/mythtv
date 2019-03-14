@@ -207,7 +207,7 @@ void LogViewer::updateClicked(void)
     QStringList list;
     loadFile(m_currentLog, list, m_logList->GetCount());
 
-    if (list.size() > 0)
+    if (!list.empty())
     {
         bool bUpdateCurrent =
                 (m_logList->GetCount() == m_logList->GetCurrentPos() + 1) ||

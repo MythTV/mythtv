@@ -355,7 +355,7 @@ void WeatherSource::connectScreen(WeatherScreen *ws)
             ws, SLOT(newData(QString, units_t, DataMap)));
     ++m_connectCnt;
 
-    if (m_data.size() > 0)
+    if (!m_data.empty())
     {
         emit newData(m_locale, m_units, m_data);
     }

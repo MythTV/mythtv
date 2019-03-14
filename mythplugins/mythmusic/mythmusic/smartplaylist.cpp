@@ -718,7 +718,7 @@ void SmartPlaylistEditor::updateMatches(void)
 
     m_matchesText->SetText(QString::number(m_matchesCount));
 
-    m_playlistIsValid = (m_criteriaRows.size() > 0);
+    m_playlistIsValid = !m_criteriaRows.empty();
     m_showResultsButton->SetEnabled((m_matchesCount > 0));
     titleChanged();
 }
@@ -982,7 +982,7 @@ QString SmartPlaylistEditor::getOrderByClause(void)
 
 QString SmartPlaylistEditor::getWhereClause(void)
 {
-    if (m_criteriaRows.size() == 0)
+    if (m_criteriaRows.empty())
         return QString();
 
     bool bFirst = true;

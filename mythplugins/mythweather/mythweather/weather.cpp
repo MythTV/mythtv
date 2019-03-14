@@ -211,7 +211,7 @@ bool Weather::SetupScreens()
 
 void Weather::screenReady(WeatherScreen *ws)
 {
-    if (m_firstRun && m_screens.size() && ws == m_screens[m_cur_screen])
+    if (m_firstRun && !m_screens.empty() && ws == m_screens[m_cur_screen])
     {
         m_firstRun = false;
         showScreen(ws);

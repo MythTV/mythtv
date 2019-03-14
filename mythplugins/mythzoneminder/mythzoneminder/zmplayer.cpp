@@ -348,7 +348,7 @@ void ZMPlayer::prevPressed()
 
 void ZMPlayer::updateFrame(void)
 {
-    if (!m_frameList->size())
+    if (m_frameList->empty())
         return;
 
     m_frameTimer->stop();

@@ -114,10 +114,10 @@ void NetBase::ShowWebVideo()
     {
         QString cmd = item->GetPlayer();
         QStringList args = item->GetPlayerArguments();
-        if (!args.size())
+        if (args.empty())
         {
             args += item->GetMediaURL();
-            if (!args.size())
+            if (args.empty())
                 args += item->GetURL();
         }
         else

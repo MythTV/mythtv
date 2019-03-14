@@ -197,7 +197,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
 
 void ExportNative::handleNextPage()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         ShowOkPopup(tr("You need to add at least one item to archive!"));
         return;
@@ -224,7 +224,7 @@ void ExportNative::updateArchiveList(void)
 {
     m_archiveButtonList->Reset();
 
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         m_titleText->Reset();
         m_datetimeText->Reset();

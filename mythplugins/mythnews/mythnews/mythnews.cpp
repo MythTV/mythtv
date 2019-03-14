@@ -197,7 +197,7 @@ void MythNews::loadSites(void)
 
     if (m_nositesText)
     {
-        if (m_NewsSites.size() == 0)
+        if (m_NewsSites.empty())
             m_nositesText->Show();
         else
             m_nositesText->Hide();
@@ -675,7 +675,7 @@ void MythNews::ShowMenu(void)
 
         m_menuPopup->AddButton(tr("Manage Feeds"));
         m_menuPopup->AddButton(tr("Add Feed"));
-        if (m_NewsSites.size() > 0)
+        if (!m_NewsSites.empty())
         {
             m_menuPopup->AddButton(tr("Edit Feed"));
             m_menuPopup->AddButton(tr("Delete Feed"));

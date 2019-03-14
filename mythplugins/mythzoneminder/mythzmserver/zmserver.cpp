@@ -366,7 +366,7 @@ bool MONITOR::isValid(void)
 
 string MONITOR::getIdStr(void)
 {
-    if (m_id == "")
+    if (m_id.empty())
     {
         std::stringstream out;
         out << m_mon_id;
@@ -438,7 +438,7 @@ ZMServer::ZMServer(int sock, bool debug)
     m_shmKey = 0x7a6d2000;
     string setting = getZMSetting("ZM_SHM_KEY");
 
-    if (setting != "")
+    if (!setting.empty())
     {
         unsigned long long tmp = m_shmKey;
         sscanf(setting.c_str(), "%20llx", &tmp);
@@ -1576,7 +1576,7 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
         ++it;
     while (it != tokens.end())
     {
-        if (eventList == "")
+        if (eventList.empty())
             eventList = (*it);
         else
             eventList += "," + (*it);

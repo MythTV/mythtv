@@ -156,7 +156,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
     }
 
     // sanity check
-    if (strList.size() < 1)
+    if (strList.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
         return false;
@@ -731,7 +731,7 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
     strList << QString::number(monitorID);
     if (!sendReceiveStringList(strList))
     {
-        if (strList.size() < 1)
+        if (strList.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
             return 0;

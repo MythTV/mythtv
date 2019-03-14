@@ -202,7 +202,7 @@ void CDRipperThread::run(void)
 {
     RunProlog();
 
-    if (m_tracks->size() <= 0)
+    if (m_tracks->empty())
     {
         RunEpilog();
         return;
@@ -948,7 +948,7 @@ void Ripper::artistChanged()
 {
     QString newartist = m_artistEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -977,7 +977,7 @@ void Ripper::albumChanged()
 {
     QString newalbum = m_albumEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -994,7 +994,7 @@ void Ripper::genreChanged()
 {
     QString newgenre = m_genreEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1011,7 +1011,7 @@ void Ripper::yearChanged()
 {
     QString newyear = m_yearEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1028,7 +1028,7 @@ void Ripper::compilationChanged(bool state)
 {
     if (!state)
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the ablum...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1047,7 +1047,7 @@ void Ripper::compilationChanged(bool state)
     }
     else
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the album...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1079,7 +1079,7 @@ void Ripper::switchTitlesAndArtists()
 
     // Switch title and artist for each track
     QString tmp;
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int track = 0; track < m_tracks->size(); ++track)
         {

@@ -1006,7 +1006,7 @@ void ImportCoverArtDialog::selectorChanged()
 
 void ImportCoverArtDialog::copyPressed()
 {
-    if (m_filelist.size() > 0)
+    if (!m_filelist.empty())
     {
         if (!RemoteFile::CopyFile(m_filelist[m_currentFile], m_saveFilename, true))
         {
@@ -1088,7 +1088,7 @@ void ImportCoverArtDialog::scanDirectory()
 
 void ImportCoverArtDialog::updateStatus()
 {
-    if (m_filelist.size() > 0)
+    if (!m_filelist.empty())
     {
         if (m_currentText)
             //: %1 is the current position of the file being copied,
@@ -1152,7 +1152,7 @@ void ImportCoverArtDialog::updateStatus()
 
 void ImportCoverArtDialog::updateTypeSelector()
 {
-    if (m_filelist.size() == 0)
+    if (m_filelist.empty())
         return;
 
     QString filename = m_filelist[m_currentFile];

@@ -166,7 +166,7 @@ int main(int argc, char **argv)
     // set up log file
     int logfd = -1;
 
-    if (logfile != "")
+    if (!logfile.empty())
     {
         logfd = open(logfile.c_str(), O_WRONLY|O_CREAT|O_APPEND, 0664);
 

@@ -458,7 +458,7 @@ bool ThumbFinder::getThumbImages()
     m_frameFile = m_thumbDir + "/title.jpg";
     ThumbImage *thumb = nullptr;
 
-    if (m_thumbList.size() > 0)
+    if (!m_thumbList.empty())
     {
         // use the thumb details in the thumbList if already available
         thumb = m_thumbList.at(0);

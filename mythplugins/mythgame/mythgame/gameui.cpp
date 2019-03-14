@@ -602,7 +602,7 @@ void GameUI::customEvent(QEvent *event)
             m_busyPopup = nullptr;
         }
 
-        if (lul.size())
+        if (!lul.empty())
         {
             MetadataLookup *lookup = lul[0];
             MythGenericTree *node = lookup->GetData().value<MythGenericTree *>();
@@ -1024,21 +1024,21 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     QString system = metadata->System();
     QString title = metadata->Gamename();
 
-    if (metadata->Boxart().isEmpty() && coverart.size())
+    if (metadata->Boxart().isEmpty() && !coverart.empty())
     {
         ArtworkInfo info;
         info.url = coverart.takeAt(0).trimmed();
         map.insert(kArtworkCoverart, info);
     }
 
-    if (metadata->Fanart().isEmpty() && fanart.size())
+    if (metadata->Fanart().isEmpty() && !fanart.empty())
     {
         ArtworkInfo info;
         info.url = fanart.takeAt(0).trimmed();
         map.insert(kArtworkFanart, info);
     }
 
-    if (metadata->Screenshot().isEmpty() && screenshot.size())
+    if (metadata->Screenshot().isEmpty() && !screenshot.empty())
     {
         ArtworkInfo info;
         info.url = screenshot.takeAt(0).trimmed();

@@ -129,7 +129,7 @@ void GameScannerThread::updateDB()
 
 bool GameScannerThread::buildFileList()
 {
-    if (m_handlers.size() == 0)
+    if (m_handlers.empty())
         return false;
 
     int counter = 0;
