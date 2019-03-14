@@ -663,6 +663,12 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
         m_render->doneCurrent();
     }
 }
+void VideoOutputOpenGL::ClearAfterSeek(void)
+{
+    if (m_openGLVideo)
+        m_openGLVideo->ResetTextures();
+    VideoOutput::ClearAfterSeek();
+}
 
 /*! \brief Generate a list of supported OpenGL profiles.
  *

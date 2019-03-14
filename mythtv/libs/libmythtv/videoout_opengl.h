@@ -15,8 +15,8 @@ class VideoOutputOpenGL : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize &VideoDim);
 
     explicit VideoOutputOpenGL(const QString &Profile = QString());
-    virtual ~VideoOutputOpenGL() override;
-    virtual void TearDown(void);
+    ~VideoOutputOpenGL() override;
+    void TearDown(void);
 
     // VideoOutput
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
@@ -25,7 +25,8 @@ class VideoOutputOpenGL : public VideoOutput
     void PrepareFrame(VideoFrame *Frame, FrameScanType, OSD *Osd) override;
     void ProcessFrame(VideoFrame *Frame, OSD *Osd, FilterChain *FilterList,
                       const PIPMap &PiPPlayers, FrameScanType Scan) override;
-    virtual void Show(FrameScanType ) override;
+    void Show(FrameScanType ) override;
+    void ClearAfterSeek(void) override;
     bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                       float Aspect, MythCodecID CodecId, bool &AspectOnly) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;

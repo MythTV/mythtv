@@ -52,6 +52,7 @@ class OpenGLVideo : public QObject
     void    SetMasterViewport(QSize Size);
     QSize   GetVideoSize(void) const;
     QString GetProfile() const;
+    void    ResetTextures(void);
 
   public slots:
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
@@ -60,7 +61,8 @@ class OpenGLVideo : public QObject
 
   private:
     bool    CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
-    void    RotateTextures(void);
+    void    LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
+                         MythGLTexture** Textures, uint &TextureCount);
     void    TearDownDeinterlacer(void);
 
     bool           m_valid;
@@ -79,12 +81,12 @@ class OpenGLVideo : public QObject
     bool           m_viewportControl;     ///< Video has control over view port
     QOpenGLShaderProgram* m_shaders[ShaderCount];
     int            m_shaderCost[ShaderCount];
-    vector<MythVideoTexture*> m_referenceTextures; ///< Up to 3 reference textures for filters
-    vector<MythVideoTexture*> m_inputTextures;     ///< Textures with raw video data
+    vector<MythVideoTexture*> m_inputTextures; ///< Current textures with raw video data
+    vector<MythVideoTexture*> m_prevTextures;  ///< Previous textures with raw video data
+    vector<MythVideoTexture*> m_nextTextures;  ///< Next textures with raw video data
     QOpenGLFramebufferObject* m_frameBuffer;
     MythVideoTexture*         m_frameBufferTexture;
     QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
-    uint           m_referenceTexturesNeeded; ///< Number of reference textures still required
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
     int            m_extraFeatures;       ///< OR'd list of extra, Myth specific features
     bool           m_resizing;

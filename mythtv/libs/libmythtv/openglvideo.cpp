@@ -35,12 +35,12 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_hardwareDeinterlacing(false),
     m_videoColourSpace(ColourSpace),
     m_viewportControl(ViewportControl),
-    m_referenceTextures(),
     m_inputTextures(),
+    m_prevTextures(),
+    m_nextTextures(),
     m_frameBuffer(nullptr),
     m_frameBufferTexture(nullptr),
     m_inputTextureSize(m_videoDim),
-    m_referenceTexturesNeeded(0),
     m_features(),
     m_extraFeatures(0),
     m_resizing(false),
@@ -115,7 +115,8 @@ OpenGLVideo::~OpenGLVideo()
         if (m_shaders[i])
             m_render->DeleteShaderProgram(m_shaders[i]);
     MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
-    MythVideoTexture::DeleteTextures(m_render, m_referenceTextures);
+    MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
+    MythVideoTexture::DeleteTextures(m_render, m_nextTextures);
 
     m_render->doneCurrent();
     m_render->DecrRef();
@@ -207,15 +208,13 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
         return true;
 
     // delete old reference textures
-    MythVideoTexture::DeleteTextures(m_render, m_referenceTextures);
+    MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
+    MythVideoTexture::DeleteTextures(m_render, m_nextTextures);
 
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_render->GetMaxTextureUnits();
-    uint texturesperframe = planes(m_outputType);
     uint refstocreate = kernel ? 2 : 0;
-    m_referenceTexturesNeeded = refstocreate + 1;
-
-    int totaltextures = texturesperframe * static_cast<int>(m_referenceTexturesNeeded);
+    int totaltextures = planes(m_outputType) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for '%1' (%2 < %3)")
@@ -229,17 +228,12 @@ bool OpenGLVideo::AddDeinterlacer(QString &Deinterlacer)
         return false;
 
     // create the correct number of reference textures
-    refstocreate *= static_cast<uint>(texturesperframe);
-    vector<QSize> sizes;
-    sizes.push_back(QSize(m_videoDim));
-    while (m_referenceTextures.size() < refstocreate)
+    if (refstocreate)
     {
-        vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_render,
-                                                 m_inputType, m_outputType, sizes);
-        if (textures.size() != texturesperframe)
-            return false;
-        for (uint i = 0; i < textures.size(); ++i)
-            m_referenceTextures.push_back(textures[i]);
+        vector<QSize> sizes;
+        sizes.push_back(QSize(m_videoDim));
+        m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
     }
 
     // ensure they work correctly
@@ -419,10 +413,23 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *Frame)
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_START");
 
-    if (m_hardwareDeinterlacing)
-        RotateTextures();
     m_videoColourSpace->UpdateColourSpace(Frame);
-    MythVideoTexture::UpdateTextures(m_render, Frame, m_inputTextures);
+
+    // Rotate textures if necessary
+    bool current = true;
+    if (m_hardwareDeinterlacing)
+    {
+        if (!m_nextTextures.empty() && !m_prevTextures.empty())
+        {
+            vector<MythVideoTexture*> temp = m_prevTextures;
+            m_prevTextures = m_inputTextures;
+            m_inputTextures = m_nextTextures;
+            m_nextTextures = temp;
+            current = false;
+        }
+    }
+
+    MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
@@ -491,7 +498,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     if (!format_is_yuv(m_outputType))
         program = Default;
 
-    if (m_hardwareDeinterlacing && !m_referenceTexturesNeeded)
+    if (m_hardwareDeinterlacing)
     {
         if (Scan == kScan_Interlaced)
         {
@@ -541,14 +548,16 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
             m_frameBuffer = nullptr;
         }
         MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
-        MythVideoTexture::SetTextureFilters(m_render, m_referenceTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         m_resizing = false;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled resizing");
     }
     else if (!m_resizing && resize)
     {
         MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
-        MythVideoTexture::SetTextureFilters(m_render, m_referenceTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
         m_resizing = true;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled resizing");
     }
@@ -589,11 +598,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         // bind correct textures
         MythGLTexture* textures[MAX_VIDEO_TEXTURES];
         uint numtextures = 0;
-        for (uint i = 0; i < inputtextures.size(); i++)
-            textures[numtextures++] = reinterpret_cast<MythGLTexture*>(inputtextures[i]);
-        if (deinterlacing)
-            for (uint i = 0; i < m_referenceTextures.size(); i++)
-                textures[numtextures++] = reinterpret_cast<MythGLTexture*>(m_referenceTextures[i]);
+        LoadTextures(deinterlacing, inputtextures, &textures[0], numtextures);
 
         // render
         m_render->DrawBitmap(textures, numtextures, m_frameBuffer, trect, vrect, m_shaders[program]);
@@ -637,11 +642,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     // bind correct textures
     MythGLTexture* textures[MAX_VIDEO_TEXTURES];
     uint numtextures = 0;
-    for (uint i = 0; i < inputtextures.size(); i++)
-        textures[numtextures++] = reinterpret_cast<MythGLTexture*>(inputtextures[i]);
-    if (deinterlacing)
-        for (uint i = 0; i < m_referenceTextures.size(); i++)
-            textures[numtextures++] = reinterpret_cast<MythGLTexture*>(m_referenceTextures[i]);
+    LoadTextures(deinterlacing, inputtextures, &textures[0], numtextures);
 
     // draw
     m_render->DrawBitmap(textures, numtextures, nullptr, trect, m_displayVideoRect, m_shaders[program]);
@@ -650,24 +651,40 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         m_render->logDebugMarker(LOC + "PREP_FRAME_END");
 }
 
-void OpenGLVideo::RotateTextures(void)
+/// \brief Clear reference frames after a seek as they will contain old images.
+void OpenGLVideo::ResetTextures(void)
 {
-    if (m_referenceTexturesNeeded > 0)
-        m_referenceTexturesNeeded--;
+    for (uint i = 0; i < m_inputTextures.size(); ++i)
+        m_inputTextures[i]->m_valid = false;
+    for (uint i = 0; i < m_prevTextures.size(); ++i)
+        m_prevTextures[i]->m_valid = false;
+    for (uint i = 0; i < m_nextTextures.size(); ++i)
+        m_nextTextures[i]->m_valid = false;
+}
 
-    if (m_referenceTextures.empty() || (m_referenceTextures.size() % m_inputTextures.size()))
-        return;
+void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
+                               MythGLTexture **Textures, uint &TextureCount)
+{
+    if (Deinterlacing && (m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
+    {
+        // if we are using reference frames, we want the current frame in the middle
+        // but next will be the first valid, followed by current...
+        uint count = Current.size();
+        vector<MythVideoTexture*> &current = Current[0]->m_valid ? Current : m_nextTextures;
+        vector<MythVideoTexture*> &prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
-    uint rotate = static_cast<uint>(m_inputTextures.size());
-    vector<MythVideoTexture*> newinputs, newrefs;
-    for (uint i = 0; i < rotate; ++i)
-        newinputs.push_back(m_referenceTextures[i]);
-    for (uint i = rotate; i < m_referenceTextures.size(); ++i)
-        newrefs.push_back(m_referenceTextures[i]);
-    for (uint i = 0; i < rotate; ++i)
-        newrefs.push_back(m_inputTextures[i]);
-    m_inputTextures = newinputs;
-    m_referenceTextures = newrefs;
+        for (uint i = 0; i < count; ++i)
+            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(prev[i]);
+        for (uint i = 0; i < count; ++i)
+            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(current[i]);
+        for (uint i = 0; i < count; ++i)
+            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(m_nextTextures[i]);
+    }
+    else
+    {
+        for (uint i = 0; i < Current.size(); ++i)
+            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(Current[i]);
+    }
 }
 
 VideoFrameType OpenGLVideo::ProfileToType(const QString &Profile)
