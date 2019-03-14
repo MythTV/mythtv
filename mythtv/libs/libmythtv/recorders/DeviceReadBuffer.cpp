@@ -58,8 +58,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
 {
     QMutexLocker locker(&m_lock);
 
-    if (m_buffer)
-        delete[] m_buffer;
+    delete[] m_buffer;
 
     m_videodevice   = streamName;
     m_videodevice   = m_videodevice.isNull() ? "" : m_videodevice;

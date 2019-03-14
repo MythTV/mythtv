@@ -69,10 +69,8 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
 
 NuppelDecoder::~NuppelDecoder()
 {
-    if (m_rtjd)
-        delete m_rtjd;
-    if (m_ffmpeg_extradata)
-        delete [] m_ffmpeg_extradata;
+    delete m_rtjd;
+    delete [] m_ffmpeg_extradata;
     if (m_buf)
         av_freep(&m_buf);
     if (m_buf2)

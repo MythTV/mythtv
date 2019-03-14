@@ -210,8 +210,7 @@ void DTVRecorder::SetStreamData(MPEGStreamData *data)
 
     MPEGStreamData *old_data = m_stream_data;
     m_stream_data = data;
-    if (old_data)
-        delete old_data;
+    delete old_data;
 
     if (m_stream_data)
         InitStreamData();

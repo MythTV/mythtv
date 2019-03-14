@@ -248,17 +248,13 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 MythContextPrivate::~MythContextPrivate()
 {
-    if (m_pConfig)
-        delete m_pConfig;
+    delete m_pConfig;
     if (GetNotificationCenter() && m_registration > 0)
     {
         GetNotificationCenter()->UnRegister(this, m_registration, true);
     }
 
-    if (m_loop)
-    {
-        delete m_loop;
-    }
+    delete m_loop;
 
     if (m_ui)
         DestroyMythUI();

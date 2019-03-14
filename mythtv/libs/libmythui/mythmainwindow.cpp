@@ -578,14 +578,11 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_LIBCEC
-    if (d->m_cecAdapter)
-        delete d->m_cecAdapter;
+    delete d->m_cecAdapter;
 #endif
 
     delete d->m_NC;
-
     delete d;
-
 }
 
 MythPainter *MythMainWindow::GetCurrentPainter(void)

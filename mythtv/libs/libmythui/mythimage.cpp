@@ -282,9 +282,7 @@ bool MythImage::Load(MythImageReader *reader)
         return true;
     }
 
-    if (im)
-        delete im;
-
+    delete im;
     return false;
 }
 

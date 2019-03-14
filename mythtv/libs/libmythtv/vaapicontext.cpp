@@ -314,10 +314,8 @@ VAAPIContext::~VAAPIContext()
         }
     }
 
-    if (m_surfaces)
-        delete [] m_surfaces;
-    if (m_surfaceData)
-        delete [] m_surfaceData;
+    delete [] m_surfaces;
+    delete [] m_surfaceData;
 
     if (m_display)
     {

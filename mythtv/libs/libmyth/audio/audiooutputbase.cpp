@@ -413,10 +413,7 @@ bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
         m_output_settingsdigital->GetMaxHDRate() == 768000);
     VBAUDIO("Setting " + log + " passthrough");
 
-    if (m_spdifenc)
-    {
-        delete m_spdifenc;
-    }
+    delete m_spdifenc;
 
     // No spdif encoder if using openmax audio
     if (m_main_device.startsWith("OpenMAX:"))
@@ -698,8 +695,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         {
             m_kAudioSRCOutputSize = newsize;
             VBAUDIO(QString("Resampler allocating %1").arg(newsize));
-            if (m_src_out)
-                delete[] m_src_out;
+            delete[] m_src_out;
             m_src_out = new float[m_kAudioSRCOutputSize];
         }
         m_src_data.data_out       = m_src_out;

@@ -399,9 +399,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
             ProgramInfo *nextProgram = tv->GetLastProgram();
 
             tv->SetLastProgram(curProgram);
-            if (curProgram)
-                delete curProgram;
-
+            delete curProgram;
             curProgram = nextProgram;
 
             SendMythSystemPlayEvent("PLAY_CHANGED", curProgram);
@@ -1293,8 +1291,7 @@ TV::~TV(void)
     if (!m_dbUseGuiSizeForTv)
         mwnd->move(m_savedGuiBounds.topLeft());
 
-    if (m_lastProgram)
-        delete m_lastProgram;
+    delete m_lastProgram;
 
     if (LCD *lcd = LCD::Get())
     {
@@ -7764,8 +7761,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         {
             ClearInputQueues(ctx, true);
             ShowNoRecorderDialog(ctx);
-            if (testrec)
-                delete testrec;
+            delete testrec;
             return;
         }
 
@@ -12330,8 +12326,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
                 }
             }
             SetLastProgram(lastprog);
-            if (lastprog)
-                delete lastprog;
+            delete lastprog;
 
             while (!infoList->empty())
             {
@@ -13184,8 +13179,7 @@ void TV::SetLastProgram(const ProgramInfo *rcinfo)
 {
     QMutexLocker locker(&m_lastProgramLock);
 
-    if (m_lastProgram)
-        delete m_lastProgram;
+    delete m_lastProgram;
 
     if (rcinfo)
         m_lastProgram = new ProgramInfo(*rcinfo);

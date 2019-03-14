@@ -1599,10 +1599,7 @@ void HLSRingBuffer::FreeStreamsList(StreamsList *streams) const
     {
         HLSStream *hls;
         hls = GetStream(i, streams);
-        if (hls)
-        {
-            delete hls;
-        }
+        delete hls;
     }
     if (streams != &m_streams)
     {

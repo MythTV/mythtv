@@ -1588,8 +1588,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                 QStringList::iterator Idev = devices.begin();
                 for ( ; Idev != devices.end(); ++Idev)
                 {
-                    if (m_v4l2util)
-                        delete m_v4l2util;
+                    delete m_v4l2util;
                     m_v4l2util = new V4L2util(*Idev);
                     if (m_v4l2util->IsOpen() &&
                         m_v4l2util->DriverName() == type.mid(5))

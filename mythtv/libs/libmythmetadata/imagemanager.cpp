@@ -48,8 +48,7 @@ public:
         Close();
 
         // Remove imported images
-        if (m_dir)
-            delete m_dir;
+        delete m_dir;
 
         // Clean up non-SG thumbnails
         if (m_mount != STORAGE_GROUP_MOUNT)

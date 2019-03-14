@@ -106,14 +106,11 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete m_ringBuffer;
         m_ringBuffer = nullptr;
     }
-    if (m_rtjc)
-        delete m_rtjc;
-    if (m_mp3buf)
-        delete [] m_mp3buf;
+    delete m_rtjc;
+    delete [] m_mp3buf;
     if (m_gf)
         lame_close(m_gf);
-    if (m_strm)
-        delete [] m_strm;
+    delete [] m_strm;
     if (m_audio_device)
     {
         delete m_audio_device;
@@ -155,12 +152,9 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_free_context(&m_mpa_vidctx);
     }
 
-    if (m_videoFilters)
-        delete m_videoFilters;
-    if (m_filtMan)
-        delete m_filtMan;
-    if (m_ccd)
-        delete m_ccd;
+    delete m_videoFilters;
+    delete m_filtMan;
+    delete m_ccd;
 }
 
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
@@ -770,8 +764,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 void NuppelVideoRecorder::InitFilters(void)
 {
     int btmp = m_video_buffer_size;
-    if (m_videoFilters)
-        delete m_videoFilters;
+    delete m_videoFilters;
 
     QString tmpVideoFilterList;
 

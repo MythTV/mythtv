@@ -33,14 +33,12 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
 
 DecoderBase::~DecoderBase()
 {
-    if (m_playbackinfo)
-        delete m_playbackinfo;
+    delete m_playbackinfo;
 }
 
 void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
 {
-    if (m_playbackinfo)
-        delete m_playbackinfo;
+    delete m_playbackinfo;
     m_playbackinfo = new ProgramInfo(pginfo);
 }
 

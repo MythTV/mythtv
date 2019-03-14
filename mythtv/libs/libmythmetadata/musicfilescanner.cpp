@@ -625,11 +625,8 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &st
         m_albumid[album_cache_string] = disk_meta->getAlbumId();
     }
 
-    if (disk_meta)
-        delete disk_meta;
-
-    if (db_meta)
-        delete db_meta;
+    delete disk_meta;
+    delete db_meta;
 }
 
 /*!

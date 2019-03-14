@@ -108,10 +108,8 @@ public:
         }
     }
     ~RemoteFileWrapper() {
-        if (m_remoteFile)
-            delete m_remoteFile;
-        if (m_localFile)
-            delete m_localFile;
+        delete m_remoteFile;
+        delete m_localFile;
     }
     bool isOpen(void) const {
         if (m_isRemote)

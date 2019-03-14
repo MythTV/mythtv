@@ -466,8 +466,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     av_freep(&m_audioSamples);
 
-    if (m_avfRingBuffer)
-        delete m_avfRingBuffer;
+    delete m_avfRingBuffer;
 
     if (LCD *lcd = LCD::Get())
     {
@@ -1037,8 +1036,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     // anything whilst probing the data streams.
     m_processFrames = !ringBuffer->IsDVD();
 
-    if (m_avfRingBuffer)
-        delete m_avfRingBuffer;
+    delete m_avfRingBuffer;
     m_avfRingBuffer = new AVFRingBuffer(rbuffer);
 
     AVInputFormat *fmt      = nullptr;
@@ -5489,9 +5487,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         av_packet_unref(pkt);
     }
 
-    if (pkt)
-        delete pkt;
-
+    delete pkt;
     return true;
 }
 

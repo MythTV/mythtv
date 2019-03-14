@@ -463,22 +463,17 @@ VideoOutput::~VideoOutput()
 {
     if (osd_image)
         osd_image->DecrRef();
-    if (osd_painter)
-        delete osd_painter;
-    if (invalid_osd_painter)
-        delete invalid_osd_painter;
+    delete osd_painter;
+    delete invalid_osd_painter;
     invalid_osd_painter = nullptr;
 
     ShutdownPipResize();
 
     ShutdownVideoResize();
 
-    if (m_deintFilter)
-        delete m_deintFilter;
-    if (m_deintFiltMan)
-        delete m_deintFiltMan;
-    if (db_vdisp_profile)
-        delete db_vdisp_profile;
+    delete m_deintFilter;
+    delete m_deintFiltMan;
+    delete db_vdisp_profile;
 
     ResizeForGui();
     if (display_res)

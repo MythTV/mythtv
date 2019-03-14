@@ -92,8 +92,7 @@ bool MetaIOFLACVorbis::write(const QString &filename, MusicMetadata* mdata)
     bool result = flacfile->save();
     restoreTimeStamps();
 
-    if (flacfile)
-        delete flacfile;
+    delete flacfile;
 
     return (result);
 }

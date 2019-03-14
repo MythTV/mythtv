@@ -168,8 +168,7 @@ void VideoOutputVDPAU::DeleteRender(void)
         // deleted while image load thread is still busy
         // loading images with that painter
         m_osd_painter->Teardown();
-        if (invalid_osd_painter)
-            delete invalid_osd_painter;
+        delete invalid_osd_painter;
         invalid_osd_painter = m_osd_painter;
     }
 

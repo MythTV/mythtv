@@ -635,8 +635,7 @@ void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
 
     m_root = root;
 
-    if (old_root)
-        delete old_root;
+    delete old_root;
 }
 
 #ifdef USING_DVB
@@ -1713,8 +1712,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevRotor::RotorTypeTable[] =
 
 DiSEqCDevRotor::~DiSEqCDevRotor()
 {
-    if (m_child)
-        delete m_child;
+    delete m_child;
 }
 
 bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
@@ -1787,8 +1785,7 @@ bool DiSEqCDevRotor::SetChild(uint ordinal, DiSEqCDevDevice *device)
 
     DiSEqCDevDevice *old_child = m_child;
     m_child = nullptr;
-    if (old_child)
-        delete old_child;
+    delete old_child;
 
     m_child = device;
     if (m_child)
@@ -2122,8 +2119,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSCR::SCRPositionTable[3] =
 
 DiSEqCDevSCR::~DiSEqCDevSCR()
 {
-    if (m_child)
-        delete m_child;
+    delete m_child;
 }
 
 void DiSEqCDevSCR::Reset(void)
@@ -2376,8 +2372,7 @@ bool DiSEqCDevSCR::SetChild(uint ordinal, DiSEqCDevDevice *device)
 
     DiSEqCDevDevice *old_child = m_child;
     m_child = nullptr;
-    if (old_child)
-        delete old_child;
+    delete old_child;
 
     m_child = device;
     if (m_child)

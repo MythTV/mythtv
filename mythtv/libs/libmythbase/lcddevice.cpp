@@ -150,9 +150,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                     "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
                                            .arg(count));
 
-            if (m_socket)
-                delete m_socket;
-
+            delete m_socket;
             m_socket = new QTcpSocket();
 
             QObject::connect(m_socket, SIGNAL(readyRead()),

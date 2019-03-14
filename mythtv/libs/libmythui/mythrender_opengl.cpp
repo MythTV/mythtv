@@ -777,8 +777,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
 
     GLuint gltex = tex;
     glDeleteTextures(1, &gltex);
-    if (m_textures[tex].m_data)
-        delete m_textures[tex].m_data;
+    delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
         m_glDeleteBuffers(1, &(m_textures[tex].m_pbo));
     if (m_textures[tex].m_vbo)
@@ -1338,8 +1337,7 @@ void MythRenderOpenGL::DeleteTextures(void)
     for (it = m_textures.begin(); it !=m_textures.end(); ++it)
     {
         glDeleteTextures(1, &(it.key()));
-        if (it.value().m_data)
-            delete it.value().m_data;
+        delete it.value().m_data;
         if (it.value().m_pbo)
             m_glDeleteBuffers(1, &(it.value().m_pbo));
     }

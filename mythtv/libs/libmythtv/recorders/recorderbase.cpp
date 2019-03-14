@@ -118,8 +118,7 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
     else
         m_curRecording = nullptr;
 
-    if (oldrec)
-        delete oldrec;
+    delete oldrec;
 }
 
 void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
@@ -147,8 +146,7 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
     if (ri)
         m_nextRecording = new RecordingInfo(*ri);
 
-    if (m_nextRingBuffer)
-        delete m_nextRingBuffer;
+    delete m_nextRingBuffer;
     m_nextRingBuffer = rb;
 }
 

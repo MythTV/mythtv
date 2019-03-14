@@ -61,9 +61,7 @@ GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
 
 GUIStartup::~GUIStartup()
 {
-    if (m_progressTimer)
-        delete m_progressTimer;
-
+    delete m_progressTimer;
 }
 
 bool GUIStartup::Create(void)
@@ -129,8 +127,7 @@ bool GUIStartup::setMessageState(const QString &name)
 
 void GUIStartup::setTotal(int total)
 {
-    if (m_progressTimer)
-        delete m_progressTimer;
+    delete m_progressTimer;
     m_progressTimer = new MythTimer(MythTimer::kStartRunning);
     m_timer.start(500);
     m_total = total*1000;

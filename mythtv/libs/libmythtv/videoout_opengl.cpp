@@ -187,8 +187,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
         // deleted while image load thread is still busy
         // loading images with that painter
         gl_painter->Teardown();
-        if (invalid_osd_painter)
-            delete invalid_osd_painter;
+        delete invalid_osd_painter;
         invalid_osd_painter = gl_painter;
     }
     else if (gl_painter)
@@ -1034,8 +1033,7 @@ void VideoOutputOpenGL::RemovePIP(MythPlayer *pipplayer)
     OpenGLLocker ctx_lock(gl_context);
 
     OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
-    if (gl_pipchain)
-        delete gl_pipchain;
+    delete gl_pipchain;
     gl_pip_ready.remove(pipplayer);
     gl_pipchains.remove(pipplayer);
 }

@@ -129,8 +129,7 @@ void VBoxChannelFetcher::run(void)
         m_scan_monitor->ScanAppendTextToLog(tr("Downloading Channel List"));
     }
 
-    if (m_channels)
-        delete m_channels;
+    delete m_channels;
 
     VBox *vbox = new VBox(ip);
     m_channels = vbox->getChannels();

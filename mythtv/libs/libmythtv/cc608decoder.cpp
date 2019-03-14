@@ -87,8 +87,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
 
 CC608Decoder::~CC608Decoder(void)
 {
-    if (m_rbuf)
-        delete [] m_rbuf;
+    delete [] m_rbuf;
 }
 
 void CC608Decoder::FormatCC(int tc, int code1, int code2)

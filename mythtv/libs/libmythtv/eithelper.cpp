@@ -207,8 +207,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                   ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
             }
 
-            if ((*it).m_desc)
-                delete [] (*it).m_desc;
+            delete [] (*it).m_desc;
 
             (*eits_it).erase(it);
 

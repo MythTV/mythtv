@@ -74,8 +74,7 @@ bool MetaIOWavPack::write(const QString &filename, MusicMetadata* mdata)
     bool result = wpfile->save();
     restoreTimeStamps();
 
-    if (wpfile)
-        delete wpfile;
+    delete wpfile;
 
     return (result);
 }

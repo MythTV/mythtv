@@ -81,8 +81,7 @@ bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
     bool result = oggfile->save();
     restoreTimeStamps();
 
-    if (oggfile)
-        delete oggfile;
+    delete oggfile;
 
     return (result);
 }

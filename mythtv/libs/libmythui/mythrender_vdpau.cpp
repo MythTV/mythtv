@@ -248,14 +248,10 @@ class VDPAUVideoMixer : public VDPAUResource
 
    ~VDPAUVideoMixer()
     {
-        if (m_noise_reduction)
-            delete m_noise_reduction;
-        if (m_sharpness)
-            delete m_sharpness;
-        if (m_skip_chroma)
-            delete m_skip_chroma;
-        if (m_background)
-            delete m_background;
+        delete m_noise_reduction;
+        delete m_sharpness;
+        delete m_skip_chroma;
+        delete m_background;
     }
 
     uint            m_layers          {0};
@@ -351,8 +347,7 @@ bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
     LOG(VB_GENERAL, (supported ? LOG_INFO : LOG_WARNING), LOC +
         QString("Hardware decoding of this H.264 video is %1supported "
                 "on this video card.").arg(supported ? "" : "NOT "));
-    if (dummy)
-        delete dummy;
+    delete dummy;
     return supported;
 }
 

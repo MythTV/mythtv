@@ -324,8 +324,7 @@ void TVRec::SetPseudoLiveTVRecording(RecordingInfo *pi)
 {
     RecordingInfo *old_rec = m_pseudoLiveTVRecording;
     m_pseudoLiveTVRecording = pi;
-    if (old_rec)
-        delete old_rec;
+    delete old_rec;
 }
 
 /** \fn TVRec::GetRecordEndTime(const ProgramInfo*) const
