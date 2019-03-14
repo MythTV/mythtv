@@ -74,8 +74,7 @@ AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
 AudioReencodeBuffer::~AudioReencodeBuffer()
 {
     Reset();
-    if (m_saveBuffer)
-        delete m_saveBuffer;
+    delete m_saveBuffer;
 }
 
 /**

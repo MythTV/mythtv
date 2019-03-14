@@ -632,8 +632,7 @@ void PrevRecordedList::customEvent(QEvent *event)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to delete recording rule");
             }
-            if (record)
-                delete record;
+            delete record;
         }
         else
         {

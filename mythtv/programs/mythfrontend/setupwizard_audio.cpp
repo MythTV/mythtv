@@ -123,10 +123,7 @@ AudioSetupWizard::~AudioSetupWizard()
         m_testThread->wait();
         delete m_testThread;
     }
-    if (m_outputlist)
-    {
-        delete m_outputlist;
-    }
+    delete m_outputlist;
 }
 
 void AudioSetupWizard::Load(void)

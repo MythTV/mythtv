@@ -2439,8 +2439,7 @@ LCDProcClient::~LCDProcClient()
         m_lcdReady = false;
     }
 
-    if ( m_lcdMenuItems )
-        delete m_lcdMenuItems;
+    delete m_lcdMenuItems;
 
     gCoreContext->removeListener(this);
 }

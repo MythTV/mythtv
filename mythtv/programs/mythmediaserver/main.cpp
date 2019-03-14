@@ -166,8 +166,7 @@ int main(int argc, char *argv[])
     int exitCode = a.exec();
 
     ms_sd_notify("STOPPING=1\nSTATUS=Exiting");
-    if (sysEventHandler)
-        delete sysEventHandler;
+    delete sysEventHandler;
 
     return exitCode ? exitCode : GENERIC_EXIT_OK;
 }

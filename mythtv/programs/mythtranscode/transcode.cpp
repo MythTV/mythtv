@@ -75,18 +75,13 @@ Transcode::Transcode(ProgramInfo *pginfo) :
 Transcode::~Transcode()
 {
 #if CONFIG_LIBMP3LAME
-    if (nvr)
-        delete nvr;
+    delete nvr;
 #endif
     SetPlayerContext(nullptr);
-    if (outRingBuffer)
-        delete outRingBuffer;
-    if (fifow)
-        delete fifow;
-    if (kfa_table)
-        delete kfa_table;
-    if (m_recProfile)
-        delete m_recProfile;
+    delete outRingBuffer;
+    delete fifow;
+    delete kfa_table;
+    delete m_recProfile;
 }
 void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
 {
@@ -276,8 +271,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             QString("Transcoding aborted, error: '%1'")
             .arg(rb? rb->GetLastError() : ""));
         delete player_ctx;
-        if (hls)
-            delete hls;
+        delete hls;
         return REENCODE_ERROR;
     }
     player_ctx->SetRingBuffer(rb);
@@ -305,8 +299,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     {
         LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
         SetPlayerContext(nullptr);
-        if (hls)
-            delete hls;
+        delete hls;
         return REENCODE_ERROR;
     }
 
@@ -365,8 +358,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_INFO, "Transcoding aborted, cutlist changed");
             SetPlayerContext(nullptr);
-            if (hls)
-                delete hls;
+            delete hls;
             return REENCODE_CUTLIST_CHANGE;
         }
         m_proginfo->ClearMarkupFlag(MARK_UPDATED_CUT);
@@ -453,8 +445,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_ERR,
                 "Transcoding aborted, error creating AVFormatWriter.");
             SetPlayerContext(nullptr);
-            if (hls)
-                delete hls;
+            delete hls;
             return REENCODE_ERROR;
         }
 
@@ -483,8 +474,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
                     SetPlayerContext(nullptr);
                     delete avfw;
-                    if (avfw2)
-                        delete avfw2;
+                    delete avfw2;
                     return REENCODE_ERROR;
                 }
             }
@@ -521,8 +511,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 SetPlayerContext(nullptr);
                 delete hls;
                 delete avfw;
-                if (avfw2)
-                    delete avfw2;
+                delete avfw2;
                 return REENCODE_ERROR;
             }
 
@@ -584,11 +573,9 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->Init() failed");
             SetPlayerContext(nullptr);
-            if (hls)
-                delete hls;
+            delete hls;
             delete avfw;
-            if (avfw2)
-                delete avfw2;
+            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -596,11 +583,9 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->OpenFile() failed");
             SetPlayerContext(nullptr);
-            if (hls)
-                delete hls;
+            delete hls;
             delete avfw;
-            if (avfw2)
-                delete avfw2;
+            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -608,8 +593,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->Init() failed");
             SetPlayerContext(nullptr);
-            if (hls)
-                delete hls;
+            delete hls;
             delete avfw;
             delete avfw2;
             return REENCODE_ERROR;
@@ -619,8 +603,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->OpenFile() failed");
             SetPlayerContext(nullptr);
-            if (hls)
-                delete hls;
+            delete hls;
             delete avfw;
             delete avfw2;
             return REENCODE_ERROR;
@@ -882,12 +865,9 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_ERR,
             "Unable to initialize MythPlayer for Transcode");
         SetPlayerContext(nullptr);
-        if (hls)
-            delete hls;
-        if (avfw)
-            delete avfw;
-        if (avfw2)
-            delete avfw2;
+        delete hls;
+        delete avfw;
+        delete avfw2;
         return REENCODE_ERROR;
     }
 
@@ -1647,14 +1627,9 @@ int Transcode::TranscodeFile(const QString &inputname,
         fifow->FIFODrain();
     }
 
-    if (cutter)
-        delete cutter;
-
-    if (avfw)
-        delete avfw;
-
-    if (avfw2)
-        delete avfw2;
+    delete cutter;
+    delete avfw;
+    delete avfw2;
 
     if (hls)
     {

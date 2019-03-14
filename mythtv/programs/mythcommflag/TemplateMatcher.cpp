@@ -362,10 +362,8 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 
 TemplateMatcher::~TemplateMatcher(void)
 {
-    if (m_matches)
-        delete []m_matches;
-    if (m_match)
-        delete []m_match;
+    delete []m_matches;
+    delete []m_match;
     av_freep(&m_cropped.data[0]);
 }
 

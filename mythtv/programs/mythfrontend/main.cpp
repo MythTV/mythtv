@@ -2242,10 +2242,7 @@ int main(int argc, char **argv)
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete housekeeping;
-
-    if (themeUpdateChecker)
-        delete themeUpdateChecker;
-
+    delete themeUpdateChecker;
     delete sysEventHandler;
 
     g_pmanager->DestroyAllPlugins();
@@ -2254,9 +2251,7 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-
     return ret;
-
 }
 
 void handleSIGUSR1(void)

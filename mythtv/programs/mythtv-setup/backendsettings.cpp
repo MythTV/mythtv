@@ -1159,10 +1159,8 @@ void BackendSettings::Save(void)
 
 BackendSettings::~BackendSettings()
 {
-    if (m_masterServerIP)
-        delete m_masterServerIP;
+    delete m_masterServerIP;
     m_masterServerIP=nullptr;
-    if (m_masterServerPort)
-        delete m_masterServerPort;
+    delete m_masterServerPort;
     m_masterServerPort=nullptr;
 }

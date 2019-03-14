@@ -6457,13 +6457,11 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
                     delete mdata;
                     delete tagger;
-
                     return;
                 }
             }
 
-            if (tagger)
-                delete tagger;
+            delete tagger;
 
             // update the new cached image filename
             StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);

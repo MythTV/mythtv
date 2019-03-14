@@ -622,8 +622,7 @@ AudioTestThread::~AudioTestThread()
 {
     cancel();
     wait();
-    if (m_audioOutput)
-        delete m_audioOutput;
+    delete m_audioOutput;
 }
 
 void AudioTestThread::cancel()

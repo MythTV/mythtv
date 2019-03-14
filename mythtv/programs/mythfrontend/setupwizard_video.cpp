@@ -86,8 +86,7 @@ bool VideoSetupWizard::Create()
 
 VideoSetupWizard::~VideoSetupWizard()
 {
-    if (m_vdp)
-        delete m_vdp;
+    delete m_vdp;
 
     gCoreContext->removeListener(this);
 }
