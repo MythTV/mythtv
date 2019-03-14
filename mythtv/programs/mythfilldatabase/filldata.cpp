@@ -228,7 +228,6 @@ bool FillData::GrabData(Source source, int offset)
 bool FillData::Run(SourceList &sourcelist)
 {
     SourceList::iterator it;
-    SourceList::iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
