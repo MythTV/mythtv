@@ -673,14 +673,11 @@ int MHListGroup::AdjustIndex(int nIndex) // Added in the MHEG corrigendum
     {
         return ((nIndex - 1) % nItems) + 1;
     }
-    else if (nIndex < 0)
+    if (nIndex < 0)
     {
         return nItems - ((-nIndex) % nItems);
     }
-    else
-    {
-        return nIndex;
-    }
+    return nIndex;
 }
 
 void MHListGroup::GetListItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine)

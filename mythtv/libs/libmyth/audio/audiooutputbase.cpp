@@ -166,8 +166,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(bool digital)
 
     if (digital)
         return (m_output_settingsdigitalraw = aosettings);
-    else
-        return (m_output_settingsraw = aosettings);
+    return (m_output_settingsraw = aosettings);
 }
 
 /**
@@ -193,8 +192,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
 
     if (digital)
         return (m_output_settingsdigital = aosettings);
-    else
-        return (m_output_settings = aosettings);
+    return (m_output_settings = aosettings);
 }
 
 /**
@@ -978,8 +976,7 @@ inline int AudioOutputBase::audiolen()
 {
     if (m_waud >= m_raud)
         return m_waud - m_raud;
-    else
-        return kAudioRingBufferSize - (m_raud - m_waud);
+    return kAudioRingBufferSize - (m_raud - m_waud);
 }
 
 /**
@@ -1004,8 +1001,7 @@ int AudioOutputBase::audioready()
 {
     if (m_passthru || m_enc || m_bytes_per_frame == m_output_bytes_per_frame)
         return audiolen();
-    else
-        return audiolen() * m_output_bytes_per_frame / m_bytes_per_frame;
+    return audiolen() * m_output_bytes_per_frame / m_bytes_per_frame;
 }
 
 /**
@@ -1650,15 +1646,13 @@ void AudioOutputBase::OutputAudioLoop(void)
             WriteAudio(zeros, zero_fragment_size);
             continue;
         }
-        else
+
+        if (m_was_paused)
         {
-            if (m_was_paused)
-            {
-                VBAUDIO("OutputAudioLoop: Play Event");
-                OutputEvent e(OutputEvent::Playing);
-                dispatch(e);
-                m_was_paused = false;
-            }
+            VBAUDIO("OutputAudioLoop: Play Event");
+            OutputEvent e(OutputEvent::Playing);
+            dispatch(e);
+            m_was_paused = false;
         }
 
         /* do audio output */

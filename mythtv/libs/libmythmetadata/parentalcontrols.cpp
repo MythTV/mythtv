@@ -14,7 +14,7 @@ namespace
     {
         if (pl < ParentalLevel::plNone)
             return ParentalLevel::plNone;
-        else if (pl > ParentalLevel::plHigh)
+        if (pl > ParentalLevel::plHigh)
             return ParentalLevel::plHigh;
 
         return pl;

@@ -1131,11 +1131,11 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
         // Return requested value
         if (position == 1 && !title.isEmpty())
             return title.trimmed();
-        else if (position == 2)
+        if (position == 2)
             return season.trimmed();
-        else if (position == 3)
+        if (position == 3)
             return episode.trimmed();
-        else if (position == 4)
+        if (position == 4)
             return subtitle.trimmed();
     }
     else if (position == 1)

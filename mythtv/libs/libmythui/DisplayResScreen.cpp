@@ -111,8 +111,7 @@ bool DisplayResScreen::compare_rates(double f1, double f2, double precision)
     if (((f1 - precision) < f2) &&
         ((f1 + precision) > f2))
         return true;
-    else
-        return false;
+    return false;
 }
 
 int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,

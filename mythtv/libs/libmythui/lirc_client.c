@@ -455,7 +455,7 @@ static void lirc_parse_include(char *s,const char *name,int line)
 	{
 		return;
 	}
-	else if(*s=='<' && last!='>')
+	if(*s=='<' && last!='>')
 	{
 		return;
 	}
@@ -488,22 +488,20 @@ int lirc_mode(const struct lirc_state *state,
 						    state->lirc_prog);
 					return(-1);
 				}
-				else
-				{
-					new_entry->prog=NULL;
-					new_entry->code=NULL;
-					new_entry->rep_delay=0;
-					new_entry->rep=0;
-					new_entry->config=NULL;
-					new_entry->change_mode=NULL;
-					new_entry->flags=none;
-					new_entry->mode=NULL;
-					new_entry->next_config=NULL;
-					new_entry->next_code=NULL;
-					new_entry->next=NULL;
 
-					*new_config=new_entry;
-				}
+                                new_entry->prog=NULL;
+                                new_entry->code=NULL;
+                                new_entry->rep_delay=0;
+                                new_entry->rep=0;
+                                new_entry->config=NULL;
+                                new_entry->change_mode=NULL;
+                                new_entry->flags=none;
+                                new_entry->mode=NULL;
+                                new_entry->next_config=NULL;
+                                new_entry->next_code=NULL;
+                                new_entry->next=NULL;
+
+                                *new_config=new_entry;
 			}
 			else
 			{
@@ -1398,10 +1396,8 @@ static char *lirc_startupmode(const struct lirc_state *state, struct lirc_config
 				scan->change_mode=NULL;
 				break;
 			}
-			else {
-				lirc_printf(state, "%s: startup_mode flags requires 'mode ='\n",
-					    state->lirc_prog);
-			}
+                        lirc_printf(state, "%s: startup_mode flags requires 'mode ='\n",
+                                    state->lirc_prog);
 		}
 		scan=scan->next;
 	}
@@ -1786,7 +1782,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 					scan=scan->next;
 					continue;
 				}
-				else if(s!=NULL)
+				if(s!=NULL)
 				{
 					config->next=scan->next;
 					break;
@@ -1862,7 +1858,7 @@ int lirc_nextcode(struct lirc_state *state, char **code)
 		if(len<=0)
 		{
 			if(len==-1 && errno==EAGAIN) return(0);
-			else return(-1);
+                        return(-1);
 		}
 		end_len+=len;
 		state->lirc_buffer[end_len]=0;
@@ -1912,10 +1908,7 @@ const char *lirc_getmode(const struct lirc_state *state, struct lirc_config *con
 			{
 				return buf;
 			}
-			else
-			{
-				return NULL;
-			}
+                        return NULL;
 		}
 		return NULL;
 	}
@@ -1947,10 +1940,7 @@ const char *lirc_setmode(const struct lirc_state *state, struct lirc_config *con
 			{
 				return buf;
 			}
-			else
-			{
-				return NULL;
-			}
+                        return NULL;
 		}
 		return NULL;
 	}

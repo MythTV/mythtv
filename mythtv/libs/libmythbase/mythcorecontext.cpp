@@ -1649,7 +1649,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
         return false;
     }
-    else if (strlist[0] == "REJECT" && strlist.size() >= 2)
+    if (strlist[0] == "REJECT" && strlist.size() >= 2)
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Protocol version or token mismatch "
                                           "(frontend=%1/%2,backend=%3/\?\?)\n")
@@ -1666,7 +1666,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
         return false;
     }
-    else if (strlist[0] == "ACCEPT")
+    if (strlist[0] == "ACCEPT")
     {
         if (!d->m_announcedProtocol)
         {

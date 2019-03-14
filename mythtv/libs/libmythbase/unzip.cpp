@@ -185,14 +185,11 @@
 			ec = headers->size() != 0 ? UnZip::PartiallyCorrupted : UnZip::Corrupted;\
 			break;\
 		}\
-		else\
-		{\
-			delete device;\
-			device = nullptr;\
-			qDebug() << "Corrupted or invalid zip archive";\
-			ec = UnZip::Corrupted;\
-			break;\
-		}\
+                delete device;                                  \
+                device = nullptr;                               \
+                qDebug() << "Corrupted or invalid zip archive"; \
+                ec = UnZip::Corrupted;                          \
+                break;                                          \
 	}
 
 

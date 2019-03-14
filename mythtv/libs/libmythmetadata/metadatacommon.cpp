@@ -1370,8 +1370,7 @@ QString nearestName(const QString& actual, const QStringList& candidates)
     if ( numBest == 1 && deltaBest <= tolerance &&
        actual.length() + best.length() >= 5 )
         return best;
-    else
-        return QString();
+    return QString();
 }
 
 QDateTime RFC822TimeToQDateTime(const QString& t)

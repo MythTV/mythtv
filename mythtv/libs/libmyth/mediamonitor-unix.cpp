@@ -215,8 +215,8 @@ bool MediaMonitorUnix::CheckMountable(void)
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "UDisks2 service found. Media Monitor does not support this yet!");
                 return false;
-            } else
-                continue;
+            }
+            continue;
         }
 
         // Enumerate devices

@@ -61,8 +61,7 @@ bool StorageGroupEditor::keyPressEvent(QKeyEvent *e)
     }
     if (handled)
         return handled;
-    else
-        return GroupSetting::keyPressEvent(e);
+    return GroupSetting::keyPressEvent(e);
 }
 
 bool StorageGroupEditor::canDelete(void)

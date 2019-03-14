@@ -480,13 +480,11 @@ SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 
     if ( sLine.startsWith( QString("HTTP/") ))
         return SSDP_MSearchResp;
-    else
+
+    if (tokens.count() > 0)
     {
-        if (tokens.count() > 0)
-        {
-            if (tokens[0] == "M-SEARCH" ) return SSDP_MSearch;
-            if (tokens[0] == "NOTIFY"   ) return SSDP_Notify;
-        }
+        if (tokens[0] == "M-SEARCH" ) return SSDP_MSearch;
+        if (tokens[0] == "NOTIFY"   ) return SSDP_Notify;
     }
 
     return SSDP_Unknown;

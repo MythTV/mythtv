@@ -169,7 +169,7 @@ int XMLParseBase::parseAlignment(const QString &text)
             alignment |= Qt::AlignCenter;
             break;
         }
-        else if (align == "justify")
+        if (align == "justify")
         {
             alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignJustify;
@@ -553,8 +553,7 @@ MythUIType *XMLParseBase::ParseUIType(
                 parent->DeleteChild(uitype);
             return nullptr;
         }
-        else
-            uitype->CopyFrom(base);
+        uitype->CopyFrom(base);
 
     }
 
@@ -695,10 +694,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
         {
             return true;
         }
-        else
-        {
-            LOG(VB_FILE, LOG_ERR, LOC + "No theme file " + themefile);
-        }
+        LOG(VB_FILE, LOG_ERR, LOC + "No theme file " + themefile);
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC +

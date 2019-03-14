@@ -240,9 +240,6 @@ QRegion MHBitmap::GetOpaqueArea()
     {
         return QRegion();
     }
-    else
-    {
-        return GetVisibleArea();
-    }
+    return GetVisibleArea();
 }
 

@@ -1044,10 +1044,7 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
             delete pContent;
             return;
         }
-        else
-        {
-            ++it;
-        }
+        ++it;
     }
 }
 
@@ -1215,10 +1212,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
 
         // I've also seen SceneCoordinateSystem(1,1)
     }
@@ -1229,10 +1223,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     if (strings[0] == "MultipleVideoStreams" || strings[0] == "MVS")
@@ -1241,10 +1232,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     // We're supposed to return true for all values of N
@@ -1259,14 +1247,11 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        else if ((strings[1] == "4" && strings[2] == "3") || (strings[1] == "16" && strings[2] == "9"))
+        if ((strings[1] == "4" && strings[2] == "3") || (strings[1] == "16" && strings[2] == "9"))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     // We're supposed to support these at least.  May also support(10,1440,1152)
@@ -1276,14 +1261,11 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        else if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
+        if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     if (strings[0] == "BitmapScaling" || strings[0] == "BSc")
@@ -1292,14 +1274,11 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        else if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
+        if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     // I think we only support the video fully on screen
@@ -1309,10 +1288,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     // We support bitmaps that are partially off screen (don't we?)
@@ -1322,14 +1298,11 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else if (strings.count() >= 2 && (strings[1] == "4" || strings[1] == "6"))
+        if (strings.count() >= 2 && (strings[1] == "4" || strings[1] == "6"))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     if (strings[0] == "UKEngineProfile" || strings[0] == "UniversalEngineProfile" || strings[0] == "UEP")
@@ -1408,10 +1381,7 @@ int MHEngine::GetDefaultCharSet()
     {
         return pApp->m_nCharSet;
     }
-    else
-    {
-        return 10;    // UK MHEG default.
-    }
+    return 10;    // UK MHEG default.
 }
 
 void MHEngine::GetDefaultBGColour(MHColour &colour)
@@ -1492,10 +1462,7 @@ int MHEngine::GetDefaultTextCHook()
     {
         return pApp->m_nTextCHook;
     }
-    else
-    {
-        return 10;    // UK MHEG default.
-    }
+    return 10;    // UK MHEG default.
 }
 
 int MHEngine::GetDefaultStreamCHook()
@@ -1506,10 +1473,7 @@ int MHEngine::GetDefaultStreamCHook()
     {
         return pApp->m_nStrCHook;
     }
-    else
-    {
-        return 10;    // UK MHEG default.
-    }
+    return 10;    // UK MHEG default.
 }
 
 int MHEngine::GetDefaultBitmapCHook()
@@ -1520,10 +1484,7 @@ int MHEngine::GetDefaultBitmapCHook()
     {
         return pApp->m_nBitmapCHook;
     }
-    else
-    {
-        return 4;    // UK MHEG default - PNG bitmap
-    }
+    return 4;    // UK MHEG default - PNG bitmap
 }
 
 void MHEngine::GetDefaultFontAttrs(MHOctetString &str)

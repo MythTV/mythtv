@@ -185,7 +185,7 @@ bool MythSystemLegacyIOHandler::HandleWrite(HANDLE h, QBuffer *buff)
         return false;
     }
 
-    else if( rlen != len )
+    if( rlen != len )
         buff->seek(pos+rlen);
 
     return true;

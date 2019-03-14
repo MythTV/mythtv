@@ -611,7 +611,7 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
         MythDB::DBError(DBLOC, query);
         return -1;
     }
-    else while (query.next())
+    while (query.next())
     {
         ImagePtr im(CreateImage(query));
 
@@ -2368,11 +2368,10 @@ QString ImageManagerFe::DeviceCaption(ImageItemK &im) const
 {
     if (im.m_id == GALLERY_DB_ID)
         return tr("Gallery");
-    else if (im.m_id == PHOTO_DB_ID)
+    if (im.m_id == PHOTO_DB_ID)
         return tr("Photographs");
-    else
-        return im.IsLocal() ? DeviceName(im.m_device)
-                            : m_remote->DeviceName(im.m_device);
+    return im.IsLocal() ? DeviceName(im.m_device)
+                        : m_remote->DeviceName(im.m_device);
 }
 
 

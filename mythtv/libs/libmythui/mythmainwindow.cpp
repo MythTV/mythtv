@@ -1627,8 +1627,7 @@ void MythMainWindow::ExitToMainMenu(void)
             }
             return;
         }
-        else
-            jumpdone = true;
+        jumpdone = true;
     }
 
     MythScreenStack *toplevel = GetMainStack();
@@ -1659,8 +1658,7 @@ void MythMainWindow::ExitToMainMenu(void)
             }
             return;
         }
-        else
-            jumpdone = true;
+        jumpdone = true;
     }
 
     if (jumpdone)
@@ -2164,18 +2162,16 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                     // waiting for release of key.
                     return true; // discard the key press
                 }
-                else
-                {
-                    // expired log press - generate long key
-                    newEvent = new QKeyEvent(QEvent::KeyPress, keycode,
-                        ke->modifiers() | Qt::MetaModifier, ke->nativeScanCode(),
-                        ke->nativeVirtualKey(), ke->nativeModifiers(),
-                        ke->text(), false,1);
-                    *e = newEvent;
-                    sNewEvent.reset(newEvent);
-                    d->m_longPressTime = 0;   // indicate we have generated the long press
-                    return false;
-                }
+
+                // expired log press - generate long key
+                newEvent = new QKeyEvent(QEvent::KeyPress, keycode,
+                                         ke->modifiers() | Qt::MetaModifier, ke->nativeScanCode(),
+                                         ke->nativeVirtualKey(), ke->nativeModifiers(),
+                                         ke->text(), false,1);
+                *e = newEvent;
+                sNewEvent.reset(newEvent);
+                d->m_longPressTime = 0;   // indicate we have generated the long press
+                return false;
             }
             // If we got a keycode different from the long press keycode it
             // may have been injected by a jump point. Ignore it.
@@ -2226,12 +2222,10 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                     d->m_longPressKeyCode = 0;
                     return false;
                 }
-                else
-                {
-                    // end of long press
-                    d->m_longPressKeyCode = 0;
-                    return true;
-                }
+
+                // end of long press
+                d->m_longPressKeyCode = 0;
+                return true;
             }
             break;
         }

@@ -176,9 +176,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 
             return true;
         }
-        else
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
-                    .arg(DoMount ? "mount" : "unmount").arg(m_DevicePath));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
+            .arg(DoMount ? "mount" : "unmount").arg(m_DevicePath));
     }
     else
     {
@@ -358,8 +357,7 @@ bool MythMediaDevice::isMounted(bool Verify)
 {
     if (Verify)
         return findMountPath();
-    else
-        return (m_Status == MEDIASTAT_MOUNTED);
+    return (m_Status == MEDIASTAT_MOUNTED);
 }
 
 /// \brief Try to find a mount of m_DevicePath in the mounts file.

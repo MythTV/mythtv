@@ -258,8 +258,7 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
 
     if (handled)
         return true;
-    else
-        return MythUIButtonList::keyPressEvent(event);
+    return MythUIButtonList::keyPressEvent(event);
 }
 
 void MythUISpinBox::ShowEntryDialog(QString initialEntry)

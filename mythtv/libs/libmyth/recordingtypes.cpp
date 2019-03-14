@@ -104,23 +104,22 @@ RecordingType recTypeFromString(QString type)
         return kNotRecording;
     if (type.toLower() == "single record" || type.toLower() == "single")
         return kSingleRecord;
-    else if (type.toLower() == "record all" || type.toLower() == "all")
+    if (type.toLower() == "record all" || type.toLower() == "all")
         return kAllRecord;
-    else if (type.toLower() == "record one" || type.toLower() == "one" ||
-             type.toLower() == "find one" || type.toLower() == "findone")
+    if (type.toLower() == "record one" || type.toLower() == "one" ||
+        type.toLower() == "find one" || type.toLower() == "findone")
         return kOneRecord;
-    else if (type.toLower() == "record daily" || type.toLower() == "daily" ||
-             type.toLower() == "find daily" || type.toLower() == "finddaily")
+    if (type.toLower() == "record daily" || type.toLower() == "daily" ||
+        type.toLower() == "find daily" || type.toLower() == "finddaily")
         return kDailyRecord;
-    else if (type.toLower() == "record weekly" || type.toLower() == "weekly" ||
-             type.toLower() == "find weekly" || type.toLower() == "findweekly")
+    if (type.toLower() == "record weekly" || type.toLower() == "weekly" ||
+        type.toLower() == "find weekly" || type.toLower() == "findweekly")
         return kWeeklyRecord;
-    else if (type.toLower() == "recording template" || type.toLower() == "template")
+    if (type.toLower() == "recording template" || type.toLower() == "template")
         return kTemplateRecord;
-    else if (type.toLower() == "override recording" || type.toLower() == "override")
+    if (type.toLower() == "override recording" || type.toLower() == "override")
         return kOverrideRecord;
-    else
-        return kDontRecord;
+    return kDontRecord;
 }
 
 /// \brief Converts "rectype" into a human readable character.
@@ -208,14 +207,13 @@ RecordingDupInType dupInFromString(QString type)
 {
     if (type.toLower() == "current recordings" || type.toLower() == "current")
         return kDupsInRecorded;
-    else if (type.toLower() == "previous recordings" || type.toLower() == "previous")
+    if (type.toLower() == "previous recordings" || type.toLower() == "previous")
         return kDupsInOldRecorded;
-    else if (type.toLower() == "all recordings" || type.toLower() == "all")
+    if (type.toLower() == "all recordings" || type.toLower() == "all")
         return kDupsInAll;
-    else if (type.toLower() == "new episodes only" || type.toLower() == "new")
+    if (type.toLower() == "new episodes only" || type.toLower() == "new")
         return kDupsNewEpi;
-    else
-        return kDupsInAll;
+    return kDupsInAll;
 }
 
 QString toString(RecordingDupMethodType duptype)
@@ -279,16 +277,15 @@ RecordingDupMethodType dupMethodFromString(QString type)
 {
     if (type.toLower() == "none")
         return kDupCheckNone;
-    else if (type.toLower() == "subtitle")
+    if (type.toLower() == "subtitle")
         return kDupCheckSub;
-    else if (type.toLower() == "description")
+    if (type.toLower() == "description")
         return kDupCheckDesc;
-    else if (type.toLower() == "subtitle and description" || type.toLower() == "subtitleanddescription")
+    if (type.toLower() == "subtitle and description" || type.toLower() == "subtitleanddescription")
         return kDupCheckSubDesc;
-    else if (type.toLower() == "subtitle then description" || type.toLower() == "subtitlethendescription")
+    if (type.toLower() == "subtitle then description" || type.toLower() == "subtitlethendescription")
         return kDupCheckSubThenDesc;
-    else
-        return kDupCheckSubDesc;
+    return kDupCheckSubDesc;
 }
 
 QString toRawString(RecSearchType searchtype)
@@ -316,16 +313,15 @@ RecSearchType searchTypeFromString(QString type)
 {
     if (type.toLower() == "none")
         return kNoSearch;
-    else if (type.toLower() == "power search" || type.toLower() == "power")
+    if (type.toLower() == "power search" || type.toLower() == "power")
         return kPowerSearch;
-    else if (type.toLower() == "title search" || type.toLower() == "title")
+    if (type.toLower() == "title search" || type.toLower() == "title")
         return kTitleSearch;
-    else if (type.toLower() == "keyword search" || type.toLower() == "keyword")
+    if (type.toLower() == "keyword search" || type.toLower() == "keyword")
         return kKeywordSearch;
-    else if (type.toLower() == "people search" || type.toLower() == "people")
+    if (type.toLower() == "people search" || type.toLower() == "people")
         return kPeopleSearch;
-    else if (type.toLower() == "manual search" || type.toLower() == "manual")
+    if (type.toLower() == "manual search" || type.toLower() == "manual")
         return kManualSearch;
-    else
-        return kNoSearch;
+    return kNoSearch;
 }

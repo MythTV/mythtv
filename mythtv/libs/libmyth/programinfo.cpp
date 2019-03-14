@@ -2526,7 +2526,7 @@ QString ProgramInfo::GetPlaybackURL(
                 QString("GetPlaybackURL: File is local: '%1'") .arg(tmpURL));
             return tmpURL;
         }
-        else if (m_hostname == gCoreContext->GetHostName())
+        if (m_hostname == gCoreContext->GetHostName())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("GetPlaybackURL: '%1' should be local, but it can "
@@ -4854,7 +4854,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
 
             if (testFile.isFile())
                 return testFile.path();
-            else if (testFile.isDir())
+            if (testFile.isDir())
                 return testFile.filePath();
         }
         else
@@ -5096,11 +5096,8 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
         input   = query.value(1).toString();
         return true;
     }
-    else
-    {
-        MythDB::DBError("GetChannel(ProgInfo...)", query);
-        return false;
-    }
+    MythDB::DBError("GetChannel(ProgInfo...)", query);
+    return false;
 }
 
 static int init_tr(void)

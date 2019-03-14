@@ -469,8 +469,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 
         return true;
     }
-    else
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
+    UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
 
     return false;
 }

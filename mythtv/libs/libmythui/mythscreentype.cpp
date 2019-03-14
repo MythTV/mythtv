@@ -186,11 +186,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.begin();
-                }
+                looped = true;
+                it = m_FocusWidgetList.begin();
             }
         }
     }
@@ -214,11 +211,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.end() - 1;
-                }
+                looped = true;
+                it = m_FocusWidgetList.end() - 1;
             }
         }
     }

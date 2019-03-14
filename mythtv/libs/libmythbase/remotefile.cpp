@@ -827,11 +827,7 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         m_sock->Reset();
         return strlist[0].toLongLong();
     }
-    else
-    {
-        m_lastposition = 0LL;
-    }
-
+    m_lastposition = 0LL;
     return -1;
 }
 

@@ -311,64 +311,63 @@ MHParseNode *MHParseBinary::DoParse()
 
         return pNode;
     }
-    else   // Universal - i.e. a primitive type.
+
+    // Universal - i.e. a primitive type.
+    // Tag values
+
+    switch (tagNumber)
     {
-        // Tag values
+    case U_BOOL: // Boolean
+    {
+        int intVal = ParseInt(endOfItem);
+        return new MHPBool(intVal != 0);
+    }
+    case U_INT: // Integer
+    {
+        int intVal = ParseInt(endOfItem);
+        return new MHPInt(intVal);
+    }
+    case U_ENUM: // ENUM
+    {
+        int intVal = ParseInt(endOfItem);
+        return new MHPEnum(intVal);
+    }
+    case U_STRING: // String
+    {
+        MHOctetString str;
+        ParseString(endOfItem, str);
+        return new MHPString(str);
+    }
+    case U_NULL: // ASN1 NULL
+    {
+        return new MHPNull;
+    }
+    case U_SEQUENCE: // Sequence
+    {
+        MHParseSequence *pNode = new MHParseSequence();
 
-        switch (tagNumber)
+        if (endOfItem == INDEFINITE_LENGTH)
         {
-            case U_BOOL: // Boolean
-            {
-                int intVal = ParseInt(endOfItem);
-                return new MHPBool(intVal != 0);
-            }
-            case U_INT: // Integer
-            {
-                int intVal = ParseInt(endOfItem);
-                return new MHPInt(intVal);
-            }
-            case U_ENUM: // ENUM
-            {
-                int intVal = ParseInt(endOfItem);
-                return new MHPEnum(intVal);
-            }
-            case U_STRING: // String
-            {
-                MHOctetString str;
-                ParseString(endOfItem, str);
-                return new MHPString(str);
-            }
-            case U_NULL: // ASN1 NULL
-            {
-                return new MHPNull;
-            }
-            case U_SEQUENCE: // Sequence
-            {
-                MHParseSequence *pNode = new MHParseSequence();
-
-                if (endOfItem == INDEFINITE_LENGTH)
-                {
-                    MHERROR("Indefinite length sequences are not implemented");
-                }
-
-                try
-                {
-                    while (m_p < endOfItem)
-                    {
-                        pNode->Append(DoParse());
-                    }
-                }
-                catch (...)
-                {
-                    // Memory clean-up if error.
-                    delete pNode;
-                    throw;
-                }
-
-                return pNode;
-            }
-            default:
-                MHERROR(QString("Unknown universal %1").arg(tagNumber));
+            MHERROR("Indefinite length sequences are not implemented");
         }
+
+        try
+        {
+            while (m_p < endOfItem)
+            {
+                pNode->Append(DoParse());
+            }
+        }
+        catch (...)
+        {
+            // Memory clean-up if error.
+            delete pNode;
+            throw;
+        }
+
+        return pNode;
+    }
+    default:
+        MHERROR(QString("Unknown universal %1").arg(tagNumber));
     }
 }

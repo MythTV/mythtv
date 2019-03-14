@@ -471,8 +471,7 @@ uint FreeSurround::frameLatency()
 {
     if (processed)
         return in_count + out_count + (block_size/2);
-    else
-        return in_count + out_count;
+    return in_count + out_count;
 }
 
 uint FreeSurround::framesPerBlock()

@@ -218,10 +218,10 @@ int Orientation::Apply(int transform)
 */
 int Orientation::FromRotation(const QString &degrees)
 {
-    if      (degrees ==   "0") return 1;
-    else if (degrees ==  "90") return 6;
-    else if (degrees == "180") return 3;
-    else if (degrees == "270") return 8;
+    if (degrees ==   "0") return 1;
+    if (degrees ==  "90") return 6;
+    if (degrees == "180") return 3;
+    if (degrees == "270") return 8;
     return 0;
 }
 

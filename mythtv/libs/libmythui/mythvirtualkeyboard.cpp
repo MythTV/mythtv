@@ -615,8 +615,7 @@ QString MythUIVirtualKeyboard::getKeyText(KeyDefinition key)
     {
         if (m_alt)
             return key.altshift;
-        else
-            return key.shift;
+        return key.shift;
     }
 
     if (m_alt)

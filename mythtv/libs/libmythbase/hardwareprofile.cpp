@@ -168,8 +168,7 @@ bool HardwareProfile::WritePrivateUUIDToFile(const QString &uuid)
         file.close();
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 bool HardwareProfile::NeedsUpdate(void) const
@@ -221,9 +220,6 @@ bool HardwareProfile::SubmitProfile(bool updateTime)
 
         return true;
     }
-    else
-        return false;
-
     return false;
 }
 
@@ -248,9 +244,6 @@ bool HardwareProfile::DeleteProfile(void)
         Disable();
         return true;
     }
-    else
-        return false;
-
     return false;
 }
 

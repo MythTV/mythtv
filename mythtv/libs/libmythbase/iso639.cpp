@@ -103,9 +103,8 @@ QString iso639_str_toName(const unsigned char *iso639)
 {
     if (strlen((const char *)iso639) == 2)
         return iso639_Alpha2_toName(iso639);
-    else if (strlen((const char *)iso639) == 3)
+    if (strlen((const char *)iso639) == 3)
         return iso639_Alpha3_toName(iso639);
-
     return "Unknown";
 }
 

@@ -236,8 +236,7 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
 
     if (withArt)
         return exactMatchesWithArt;
-    else
-        return exactMatches;
+    return exactMatches;
 }
 
 MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,

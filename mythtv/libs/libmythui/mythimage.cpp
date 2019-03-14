@@ -361,8 +361,7 @@ bool MythImage::Load(const QString &filename)
         delete im;
         return true;
     }
-    else
-        LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
+    LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
 
     return false;
 }

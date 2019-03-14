@@ -236,12 +236,9 @@ bool MusicFileScanner::HasFileChanged(
         QDateTime old_dt = MythDate::fromString(date_modified);
         return !old_dt.isValid() || (dt > old_dt);
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
-                .arg(filename));
-        return false;
-    }
+    LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
+        .arg(filename));
+    return false;
 }
 
 /*!
@@ -814,7 +811,7 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
-                else if (HasFileChanged(name, query.value(1).toString()))
+                if (HasFileChanged(name, query.value(1).toString()))
                     music_files[name].location = MusicFileScanner::kNeedUpdate;
                 else
                 {
@@ -870,11 +867,8 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
             {
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
-                else
-                {
-                    ++m_coverartUnchanged;
-                    music_files.erase(iter);
-                }
+                ++m_coverartUnchanged;
+                music_files.erase(iter);
             }
             else
             {

@@ -100,8 +100,7 @@ MythSocket::MythSocket(
             m_useSharedThread = false;
             return;
         }
-        else
-            ConnectHandler(); // already called implicitly above?
+        ConnectHandler(); // already called implicitly above?
     }
 
     // Use direct connections so m_tcpSocket can be used

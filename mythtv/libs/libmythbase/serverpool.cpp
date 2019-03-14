@@ -125,7 +125,7 @@ void ServerPool::SelectDefaultListen(bool force)
                     // already defined, skip
                     continue;
 
-                else if (!config_v4.isNull() && (ip == config_v4))
+                if (!config_v4.isNull() && (ip == config_v4))
                 {
                     // IPv4 address is defined, add it
                     LOG(VB_GENERAL, LOG_DEBUG,
@@ -204,7 +204,7 @@ void ServerPool::SelectDefaultListen(bool force)
                     // already defined, skip
                     continue;
 
-                else if ((!config_v6.isNull()) && (ip == config_v6))
+                if ((!config_v6.isNull()) && (ip == config_v6))
                 {
                 // IPv6 address is defined, add it
                     LOG(VB_GENERAL, LOG_DEBUG,
@@ -759,14 +759,12 @@ int ServerPool::tryListeningPort(QTcpServer *server, int baseport,
             {
                 break;
             }
-            else
+
+            // did we fail because IPv6 isn't available?
+            QAbstractSocket::SocketError err = server->serverError();
+            if (err == QAbstractSocket::UnsupportedSocketOperationError)
             {
-                // did we fail because IPv6 isn't available?
-                QAbstractSocket::SocketError err = server->serverError();
-                if (err == QAbstractSocket::UnsupportedSocketOperationError)
-                {
-                    ipv6 = false;
-                }
+                ipv6 = false;
             }
         }
         if (!ipv6)
@@ -825,14 +823,12 @@ int ServerPool::tryBindingPort(QUdpSocket *socket, int baseport,
             {
                 break;
             }
-            else
+
+            // did we fail because IPv6 isn't available?
+            QAbstractSocket::SocketError err = socket->error();
+            if (err == QAbstractSocket::UnsupportedSocketOperationError)
             {
-                // did we fail because IPv6 isn't available?
-                QAbstractSocket::SocketError err = socket->error();
-                if (err == QAbstractSocket::UnsupportedSocketOperationError)
-                {
-                    ipv6 = false;
-                }
+                ipv6 = false;
             }
         }
         if (!ipv6)

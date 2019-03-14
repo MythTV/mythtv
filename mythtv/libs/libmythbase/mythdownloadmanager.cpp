@@ -1005,13 +1005,9 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
 
     if (isOK)
         return true;
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Link Local request failed: %1")
-          .arg(url.toString()));
-        return false;
-    }
-
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Link Local request failed: %1")
+        .arg(url.toString()));
+    return false;
 }
 #endif
 
