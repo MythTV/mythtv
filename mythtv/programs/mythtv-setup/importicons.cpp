@@ -406,7 +406,7 @@ bool ImportIconsWizard::initialLoad(QString name)
 
         LOG(VB_GENERAL, LOG_NOTICE, message);
 
-        if (m_missingEntries.size() > 0)
+        if (!m_missingEntries.empty())
         {
             message.append("\n");
             message.append(tr("Could not find %n icon(s).", "", 
@@ -435,7 +435,7 @@ bool ImportIconsWizard::initialLoad(QString name)
         m_progressDialog = nullptr;
     }
 
-    if (m_missingEntries.size() == 0 || closeDialog)
+    if (m_missingEntries.empty() || closeDialog)
         return false;
 
     if (m_nMaxCount <= 0)

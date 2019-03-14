@@ -257,9 +257,9 @@ void LookerUpper::customEvent(QEvent *levent)
 
                 if (pginfo && (QString::compare(pginfo->GetTitle(), list[p]->GetBaseTitle(), Qt::CaseInsensitive)) == 0)
                 {
-                    bool hasArtwork = (((list[p]->GetArtwork(kArtworkFanart)).size() != 0) ||
-                                       ((list[p]->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                                       ((list[p]->GetArtwork(kArtworkBanner)).size() != 0));
+                    bool hasArtwork = ((!(list[p]->GetArtwork(kArtworkFanart)).empty()) ||
+                                       (!(list[p]->GetArtwork(kArtworkCoverart)).empty()) ||
+                                       (!(list[p]->GetArtwork(kArtworkBanner)).empty()));
 
                     // After the first exact match, prefer any more popular one.
                     // Most of the Movie database entries have Popularity fields.

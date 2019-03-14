@@ -1018,7 +1018,7 @@ void StatusBox::doJobQueueStatus()
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
 
-    if (jobs.size())
+    if (!jobs.empty())
     {
         QString detail;
         QString line;

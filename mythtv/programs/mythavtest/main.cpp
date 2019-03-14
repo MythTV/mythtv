@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
     QString filename = "";
     if (!cmdline.toString("infile").isEmpty())
         filename = cmdline.toString("infile");
-    else if (cmdline.GetArgs().size() >= 1)
+    else if (!cmdline.GetArgs().empty())
         filename = cmdline.GetArgs()[0];
 
     gContext = new MythContext(MYTH_BINARY_VERSION, true);

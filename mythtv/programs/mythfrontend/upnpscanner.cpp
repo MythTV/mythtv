@@ -526,7 +526,7 @@ void UPNPScanner::Update(void)
             bool sent = false;
             QUrl url = it.value()->m_URL;
             if (!m_descriptionRequests.contains(url) &&
-                (m_descriptionRequests.size() < MAX_REQUESTS) &&
+                (m_descriptionRequests.empty()) &&
                 url.isValid())
             {
                 QNetworkReply *reply = m_network->get(QNetworkRequest(url));

@@ -216,7 +216,7 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList successes;
             QStringList failures;
             QStringList list = me->ExtraDataList();
-            while (list.size() >= 1)
+            while (!list.empty())
             {
                 uint recordingID = list[0].toUInt();
 

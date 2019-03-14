@@ -375,7 +375,7 @@ void ProgFinder::updateInfo(void)
     }
     else if (GetFocusWidget() == m_timesList)
     {
-        if (m_showData.size() == 0)
+        if (m_showData.empty())
         {
             ResetMap(m_infoMap);
             if (m_help1Text)
@@ -431,7 +431,7 @@ void ProgFinder::updateTimesList()
 
     m_timesList->Reset();
 
-    if (m_showData.size() > 0)
+    if (!m_showData.empty())
     {
         QString itemText;
         QDateTime starttime;

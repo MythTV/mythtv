@@ -676,7 +676,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     if (handled)
         return true;
 
-    if (actions.size())
+    if (!actions.empty())
     {
         QMutexLocker locker(&m_jumpToChannelLock);
 
@@ -1382,8 +1382,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
             chan = channels.size() - i - 1;
         }
 
-        bool ndup = channum_to_index_map[channels[chan].m_channum].size();
-        bool cdup = callsign_to_index_map[channels[chan].m_callsign].size();
+        bool ndup = !channum_to_index_map[channels[chan].m_channum].empty();
+        bool cdup = !callsign_to_index_map[channels[chan].m_callsign].empty();
 
         if (ndup && cdup)
             continue;
@@ -2595,7 +2595,7 @@ void GuideGrid::channelUpdate(void)
 
     ChannelInfoList sel = GetSelection();
 
-    if (sel.size())
+    if (!sel.empty())
     {
         PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
         m_player->ChangeChannel(ctx, sel);

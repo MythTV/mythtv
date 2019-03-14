@@ -336,7 +336,7 @@ void PrevRecordedList::updateInfo(void)
     if (m_help2Text)
         m_help2Text->Reset();
 
-    if (m_showData.size() > 0)
+    if (!m_showData.empty())
     {
         InfoMap infoMap;
         m_showData[m_showList->GetCurrentPos()]->ToMap(infoMap,true);

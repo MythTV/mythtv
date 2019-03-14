@@ -2040,7 +2040,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         ft->DecrRef();
 
-        if (checkfiles.size())
+        if (!checkfiles.empty())
         {
             QFileInfo fi(filename);
             QDir dir = fi.absoluteDir();

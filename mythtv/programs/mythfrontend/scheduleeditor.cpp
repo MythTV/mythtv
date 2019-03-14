@@ -1838,7 +1838,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         MetadataLookupList lul = luf->m_lookupList;
 
-        if (lul.size())
+        if (!lul.empty())
         {
             QString title = tr("This number, season, and episode combination "
                                "does not appear to be valid (or the site may "

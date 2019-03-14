@@ -2321,10 +2321,10 @@ bool Scheduler::HandleReschedule(void)
     {
         QStringList request = m_reschedQueue.dequeue();
         QStringList tokens;
-        if (request.size() >= 1)
+        if (!request.empty())
             tokens = request[0].split(' ', QString::SkipEmptyParts);
 
-        if (request.size() < 1 || tokens.size() < 1)
+        if (request.empty() || tokens.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, "Empty Reschedule request received");
             continue;

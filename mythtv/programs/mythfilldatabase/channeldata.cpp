@@ -471,7 +471,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     QStringList words = (*i).m_name.simplified().toUpper()
                         .split(" ");
                     QString callsign = "";
-                    QString w1 = words.size() > 0 ? words[0] : QString();
+                    QString w1 = !words.empty() ? words[0] : QString();
                     QString w2 = words.size() > 1 ? words[1] : QString();
                     if (w1.isEmpty())
                         callsign = QString::number(chanid);

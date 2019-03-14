@@ -142,7 +142,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     QString path;
     StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
     QStringList dirList = artGroup.GetDirList();
-    if (dirList.size())
+    if (!dirList.empty())
         path = artGroup.FindNextDirMostFree();
 
     if (!QDir(path).exists())

@@ -2106,9 +2106,9 @@ bool PlaybackBox::UpdateUILists(void)
     }
 
     m_titleList = QStringList("");
-    if (m_progLists[m_watchGroupLabel].size() > 0)
+    if (!m_progLists[m_watchGroupLabel].empty())
         m_titleList << m_watchGroupName;
-    if ((m_progLists["livetv"].size() > 0) &&
+    if ((!m_progLists["livetv"].empty()) &&
         (!sortedList.values().contains(tr("Live TV"))))
         m_titleList << tr("Live TV");
     m_titleList << sortedList.values();

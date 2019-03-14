@@ -292,7 +292,7 @@ Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
 
 void MythExternRecApp::GetChannel(const QString & serial, const QString & func)
 {
-    if (m_channels_ini.isEmpty() || m_channels.size() == 0)
+    if (m_channels_ini.isEmpty() || m_channels.empty())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
         emit SendMessage("FirstChannel", serial,

@@ -463,8 +463,8 @@ bool ClassicCommDetector::go()
 
             GetCommercialBreakList(commBreakMap);
 
-            if ((commBreakMap.size() == 0) &&
-                (m_lastSentCommBreakMap.size() == 0))
+            if ((commBreakMap.empty()) &&
+                (m_lastSentCommBreakMap.empty()))
             {
                 mapsAreIdentical = true;
             }
@@ -1057,7 +1057,7 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
 
     frm_dir_map_t newMap;
 
-    if (a.size())
+    if (!a.empty())
     {
         frm_dir_map_t::const_iterator it = a.begin();
         for (; it != a.end(); ++it)
@@ -2324,7 +2324,7 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
         ++it;
     }
 
-    if (map.size() == 0)
+    if (map.empty())
         return;
 
     // delete any segments less than 'length' frames in length

@@ -327,7 +327,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         QString cutStr;
         long long lastStart = 0;
 
-        if (deleteMap.size() == 0)
+        if (deleteMap.empty())
             m_proginfo->QueryCutList(deleteMap);
 
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
@@ -802,7 +802,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         nvr->AudioInit(true);
 
         // For overriding settings on the command line
-        if (recorderOptionsMap.size() > 0)
+        if (!recorderOptionsMap.empty())
         {
             QMap<QString, QString>::Iterator it;
             QString key, value;
@@ -858,7 +858,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 #endif // CONFIG_LIBMP3LAME
 
-    if (honorCutList && deleteMap.size() > 0)
+    if (honorCutList && !deleteMap.empty())
     {
         if (cleanCut)
         {

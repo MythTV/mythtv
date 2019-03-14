@@ -324,7 +324,7 @@ void KeyBindings::CommitChanges(void)
 {
     ActionList modified = m_actionSet.GetModified();
 
-    while (modified.size() > 0)
+    while (!modified.empty())
     {
         ActionID id = modified.front();
 

@@ -157,7 +157,7 @@ void SequentialAnimation::Pulse(int interval)
 */
 void SequentialAnimation::Start(bool forwards, float speed)
 {
-    if (m_group.size() == 0)
+    if (m_group.empty())
         return;
 
     m_current = forwards ? 0 : m_group.size() - 1;
@@ -224,7 +224,7 @@ void ParallelAnimation::Pulse(int interval)
 */
 void ParallelAnimation::Start(bool forwards, float speed)
 {
-    if (m_group.size() == 0)
+    if (m_group.empty())
         return;
 
     m_finished = m_group.size();

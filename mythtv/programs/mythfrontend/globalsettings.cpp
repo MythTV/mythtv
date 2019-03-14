@@ -2258,7 +2258,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (scr.size() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
+    if (!scr.empty() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
         int w = 0, h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
@@ -2334,7 +2334,7 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
             setValue(hz50+1);
     }
 
-    setEnabled(list.size());
+    setEnabled(!list.empty());
 }
 
 const vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
