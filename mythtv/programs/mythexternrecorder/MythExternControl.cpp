@@ -464,7 +464,7 @@ void Commands::Run(void)
             LOG(VB_RECORD, LOG_ERR, LOC + "poll eof (POLLHUP)");
             break;
         }
-        else if (polls[0].revents & POLLNVAL)
+        if (polls[0].revents & POLLNVAL)
         {
             m_parent->Fatal("poll error");
             return;

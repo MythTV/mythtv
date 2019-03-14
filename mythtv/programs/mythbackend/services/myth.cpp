@@ -644,15 +644,13 @@ QString Myth::GetSetting( const QString &sHostName,
 
         return query.next() ? query.value(0).toString() : sDefault;
     }
-    else
-    {
-        QString hostname = sHostName;
 
-        if (sHostName.isEmpty())
-            hostname = gCoreContext->GetHostName();
+    QString hostname = sHostName;
 
-        return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
-    }
+    if (sHostName.isEmpty())
+        hostname = gCoreContext->GetHostName();
+
+    return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
 }
 
 /////////////////////////////////////////////////////////////////////////////

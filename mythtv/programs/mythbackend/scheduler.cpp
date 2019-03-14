@@ -765,8 +765,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
             newp->SetRecordingStatus(RecStatus::Recorded);
             return false;
         }
-        else
-            return true;
+        return true;
     }
 
     EncoderLink *tv = (*m_tvList)[oldp->GetInputID()];
@@ -1962,7 +1961,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
                 // main input nor any of its children can be free.
                 return true;
             }
-            else if (!is_busy)
+            if (!is_busy)
             {
                 // This conflicting input is busy on the desired
                 // multiplex and the main input is not busy.  Nothing
@@ -4024,7 +4023,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         MythDB::DBError("UpdateMatches3", query);
         return;
     }
-    else if (query.size())
+    if (query.size())
     {
         QDate epoch(1970, 1, 1);
         int findtoday =
@@ -4977,11 +4976,11 @@ static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
         {
             return true;
         }
-        else if (a->getWeight() > b->getWeight())
+        if (a->getWeight() > b->getWeight())
         {
             return false;
         }
-        else if (a->getFreeSpace() > b->getFreeSpace())
+        if (a->getFreeSpace() > b->getFreeSpace())
         {
             return true;
         }
@@ -5030,7 +5029,7 @@ static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
     {
         return true;
     }
-    else if (a->getWeight() == b->getWeight())
+    if (a->getWeight() == b->getWeight())
     {
         if (a->getFreeSpace() > b->getFreeSpace())
             return true;

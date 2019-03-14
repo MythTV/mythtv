@@ -240,7 +240,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         {
             return true; // eat escape key
         }
-        else if (action == "MENU")
+        if (action == "MENU")
         {
             ShowMenu();
         }

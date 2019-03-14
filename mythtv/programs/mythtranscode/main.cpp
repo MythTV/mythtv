@@ -304,8 +304,8 @@ int main(int argc, char *argv[])
                                                      .arg(cur.key()));
                         return GENERIC_EXIT_INVALID_CMDLINE;
                     }
-                    else if ( (prev.value() == MARK_CUT_START) &&
-                              ((cur.key() - prev.key()) < 2) )
+                    if ( (prev.value() == MARK_CUT_START) &&
+                         ((cur.key() - prev.key()) < 2) )
                     {
                         LOG(VB_GENERAL, LOG_WARNING, QString("Discarding "
                                           "insufficiently long cut: %1-%2")

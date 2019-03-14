@@ -290,7 +290,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     m_busyRecList.removeAll(pginfo);
                     return;
                 }
-                else if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
+                if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
                          (list[p])->GetYear() != 0 &&
                          pginfo->GetYearOfInitialRelease() == (list[p])->GetYear())
                 {
@@ -301,11 +301,8 @@ void LookerUpper::customEvent(QEvent *levent)
                         m_busyRecList.removeAll(pginfo);
                         return;
                     }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_INFO, "Matched from multiple results based on year. ");
-                        yearindex = p;
-                    }
+                    LOG(VB_GENERAL, LOG_INFO, "Matched from multiple results based on year. ");
+                    yearindex = p;
                 }
             }
 

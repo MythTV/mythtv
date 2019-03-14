@@ -360,7 +360,7 @@ long long EncoderLink::GetMaxBitrate()
 {
     if (m_local)
         return m_tv->GetMaxBitrate();
-    else if (HasSockAndIncrRef())
+    if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(m_sock);
         return m_sock->GetMaxBitrate(m_inputid);
@@ -387,7 +387,7 @@ int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
 {
     if (m_local)
         return m_tv->SetSignalMonitoringRate(rate, notifyFrontend);
-    else if (HasSockAndIncrRef())
+    if (HasSockAndIncrRef())
     {
         ReferenceLocker rlocker(m_sock);
         return m_sock->SetSignalMonitoringRate(m_inputid, rate,
@@ -541,10 +541,7 @@ void EncoderLink::FinishRecording(void)
         m_tv->FinishRecording();
         return;
     }
-    else
-    {
-        m_endRecordingTime = MythDate::current().addDays(-2);
-    }
+    m_endRecordingTime = MythDate::current().addDays(-2);
 }
 
 /** \fn EncoderLink::IsReallyRecording()

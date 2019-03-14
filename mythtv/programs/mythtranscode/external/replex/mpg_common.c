@@ -215,7 +215,7 @@ int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le)
 		
 	}
 	if (found) return -2;
-	else return -1;
+	return -1;
 }
 
 
@@ -255,6 +255,6 @@ int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le)
 		c++;
 	}
 	if (found) return -2;
-	else return -1;
+	return -1;
 }
 

@@ -83,8 +83,7 @@ static QString toStringFrameAspects(int aspect, bool verbose)
 {
     if (verbose)
         return (COMM_ASPECT_NORMAL == aspect) ? "normal" : " wide ";
-    else
-        return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
+    return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
 }
 
 static QString toStringFrameFormats(int format, bool verbose)
@@ -879,8 +878,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             if (rowMax[y] > m_commDetectBoxBrightness)
                 break;
-            else
-                topDarkRow = y;
+            topDarkRow = y;
         }
 
         for(int y = m_commDetectBorder; y < (m_height - m_commDetectBorder);
@@ -896,8 +894,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             if (colMax[x] > m_commDetectBoxBrightness)
                 break;
-            else
-                leftDarkCol = x;
+            leftDarkCol = x;
         }
 
         for(int x = m_commDetectBorder; x < (m_width - m_commDetectBorder);

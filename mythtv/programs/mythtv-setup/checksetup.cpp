@@ -74,7 +74,7 @@ bool checkStoragePaths(QStringList &probs)
         MythDB::DBError("checkStoragePaths", query);
         return false;
     }
-    else if (query.size() < 1)
+    if (query.size() < 1)
     {
         if (gCoreContext->IsMasterHost())
         {
@@ -88,8 +88,7 @@ bool checkStoragePaths(QStringList &probs)
             LOG(VB_GENERAL, LOG_ERR, trMesg);
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QDir checkDir("");
@@ -132,7 +131,7 @@ bool checkImageStoragePaths(QStringList &probs)
         MythDB::DBError("checkImageStoragePaths", query);
         return false;
     }
-    else if (query.size() < 1)
+    if (query.size() < 1)
     {
         return false;
     }

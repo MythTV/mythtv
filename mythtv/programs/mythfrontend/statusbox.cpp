@@ -1089,12 +1089,12 @@ static const QString sm_str(long long sizeKB, int prec=1)
         double sizeGB = sizeKB/(1024*1024*1024.0);
         return QObject::tr("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024*1024) // Gigabytes
+    if (sizeKB>1024*1024) // Gigabytes
     {
         double sizeGB = sizeKB/(1024*1024.0);
         return QObject::tr("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024) // Megabytes
+    if (sizeKB>1024) // Megabytes
     {
         double sizeMB = sizeKB/1024.0;
         return QObject::tr("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
@@ -1183,14 +1183,10 @@ static const QString uptimeStr(time_t uptime)
 
         return str + QString("%1, %2").arg(dayLabel).arg(buff);
     }
-    else
-    {
-        char  buff[9];
 
-        sprintf(buff, "%d:%02d:%02d", hours, min, secs);
-
-        return str + QString( buff );
-    }
+    char  buff[9];
+    sprintf(buff, "%d:%02d:%02d", hours, min, secs);
+    return str + QString( buff );
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)

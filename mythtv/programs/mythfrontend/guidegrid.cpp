@@ -182,11 +182,10 @@ bool JumpToChannel::Update(void)
         m_listener->GoTo(start, cur);
         return true;
     }
-    else
-    { // prefix must be invalid.. reset entry..
-        deleteLater();
-        return false;
-    }
+
+    // prefix must be invalid.. reset entry..
+    deleteLater();
+    return false;
 }
 
 // GuideStatus is used for transferring the relevant read-only data
@@ -2328,8 +2327,7 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     {
       if (m_changrpid == -1)
           return;
-      else
-          grpid = m_changrpid;
+      grpid = m_changrpid;
     }
 
     // Get current channel id, and make sure it exists...

@@ -688,16 +688,13 @@ bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
 
         return true;
     }
-    else if (InWindow(now))
+    if (InWindow(now))
         // we're inside our permitted window
         return true;
 
-    else
-    {
-        // just let DailyHouseKeeperTask handle things
-        LOG(VB_GENERAL, LOG_DEBUG, "Performing daily run check.");
-        return DailyHouseKeeperTask::DoCheckRun(now);
-    }
+    // just let DailyHouseKeeperTask handle things
+    LOG(VB_GENERAL, LOG_DEBUG, "Performing daily run check.");
+    return DailyHouseKeeperTask::DoCheckRun(now);
 }
 
 bool MythFillDatabaseTask::DoRun(void)

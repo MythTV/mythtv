@@ -1725,10 +1725,10 @@ void MetadataOptions::customEvent(QEvent *levent)
                     QueryComplete(lookup);
                     return;
                 }
-                else if (m_recInfo &&
-                         m_recInfo->GetYearOfInitialRelease() != 0 &&
-                         (list[p])->GetYear() != 0 &&
-                         m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
+                if (m_recInfo &&
+                    m_recInfo->GetYearOfInitialRelease() != 0 &&
+                    (list[p])->GetYear() != 0 &&
+                    m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
                 {
                     if (yearindex > -1)
                     {

@@ -451,12 +451,11 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 		if ( af->layer != ((headr[1] & 0x06) >> 1) ){
 			if ( headr[1] == 0xff){
 				return -3;
-			} else {
-#ifdef IN_DEBUG
-				LOG(VB_GENERAL, LOG_ERR, "Wrong audio layer");
-#endif
-				return -1;
 			}
+#ifdef IN_DEBUG
+                        LOG(VB_GENERAL, LOG_ERR, "Wrong audio layer");
+#endif
+                        return -1;
 		}
 		if ( af->bit_rate != 
 		     (bitrates[(3-af->layer)][(headr[2] >> 4 )]*1000)){

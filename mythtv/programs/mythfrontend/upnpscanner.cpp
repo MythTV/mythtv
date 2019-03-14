@@ -650,7 +650,7 @@ void UPNPScanner::customEvent(QEvent *event)
         BrowseNextContainer();
         return;
     }
-    else if (ev == "UPNP_BROWSEOBJECT")
+    if (ev == "UPNP_BROWSEOBJECT")
     {
         if (me->ExtraDataCount() == 2)
         {
@@ -670,7 +670,7 @@ void UPNPScanner::customEvent(QEvent *event)
         }
         return;
     }
-    else if (ev == "UPNP_EVENT")
+    if (ev == "UPNP_EVENT")
     {
         MythInfoMapEvent *info = (MythInfoMapEvent*)event;
         if (!info)

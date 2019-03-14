@@ -491,7 +491,7 @@ int CommDetector2::computeBreaks(long long nframes)
             if (cmp > 0 &&
                     m_blankFrameDetector->computeForLogoSurplus(matcher))
                 return -1;
-            else if (cmp < 0 &&
+            if (cmp < 0 &&
                     m_blankFrameDetector->computeForLogoDeficit(matcher))
                 return -1;
 

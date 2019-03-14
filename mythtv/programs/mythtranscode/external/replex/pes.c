@@ -584,11 +584,10 @@ static int write_ps_header(uint8_t *buf,
 		cwrite_ps(buf, &p, PS_HEADER_L2);
 		kill_ps(&p);
 		return PS_HEADER_L2;
-	} else {
-		cwrite_ps(buf, &p, PS_HEADER_L1);
-		kill_ps(&p);
-		return PS_HEADER_L1;
 	}
+        cwrite_ps(buf, &p, PS_HEADER_L1);
+        kill_ps(&p);
+        return PS_HEADER_L1;
 }
 
 

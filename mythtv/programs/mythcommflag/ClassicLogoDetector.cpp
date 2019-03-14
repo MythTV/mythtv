@@ -434,8 +434,7 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
     if ((goodEdgeRatio > m_commDetectLogoGoodEdgeThreshold) &&
         (badEdgeRatio < m_commDetectLogoBadEdgeThreshold))
         return true;
-    else
-        return false;
+    return false;
 }
 
 bool ClassicLogoDetector::pixelInsideLogo(unsigned int x, unsigned int y)

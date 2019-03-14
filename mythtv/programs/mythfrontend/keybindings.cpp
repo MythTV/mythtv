@@ -193,12 +193,12 @@ ActionID *KeyBindings::GetConflict(
             level = KeyBindings::kKeyBindingError;
             return new ActionID(ids[i]);
         }
-        else if (ids[i].GetContext() == context_name)
+        if (ids[i].GetContext() == context_name)
         {
             level = KeyBindings::kKeyBindingError;
             return new ActionID(ids[i]);
         }
-        else if (ids[i].GetContext() == ActionSet::kGlobalContext)
+        if (ids[i].GetContext() == ActionSet::kGlobalContext)
         {
             level = KeyBindings::kKeyBindingWarning;
             return new ActionID(ids[i]);

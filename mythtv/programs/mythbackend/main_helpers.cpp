@@ -322,12 +322,9 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
                 QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Unable to connect to backend, verbose mask unchanged ");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to connect to backend, verbose mask unchanged ");
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("setloglevel"))
@@ -342,12 +339,9 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
                 QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Unable to connect to backend, log level unchanged ");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to connect to backend, log level unchanged ");
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("clearcache"))
@@ -358,12 +352,9 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
             return GENERIC_EXIT_OK;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
-                    "cache will not be cleared.");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
+            "cache will not be cleared.");
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("printsched") ||

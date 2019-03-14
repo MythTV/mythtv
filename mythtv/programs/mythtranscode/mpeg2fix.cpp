@@ -1585,16 +1585,13 @@ bool MPEG2fixup::FindStart()
                         found[it.key()] = true;
                         break;
                     }
-                    else
-                    {
-                        LOG(VB_PROCESS, LOG_INFO,
-                            QString("Dropping A packet from stream %1")
-                                .arg(it.key()));
-                        m_framePool.enqueue(af->takeFirst());
-                        continue;
-                    }
+                    LOG(VB_PROCESS, LOG_INFO,
+                        QString("Dropping A packet from stream %1")
+                        .arg(it.key()));
+                    m_framePool.enqueue(af->takeFirst());
+                    continue;
                 }
-                else if (delta >= 0)
+                if (delta >= 0)
                 {
                     LOG(VB_PROCESS, LOG_INFO,
                         QString("Found useful audio frame from stream %1")

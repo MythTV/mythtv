@@ -353,7 +353,7 @@ void ViewScheduled::LoadList(bool useExistingData)
                 listPos = i;
                 break;
             }
-            else if (recstartts <= pginfo->GetRecordingStartTime())
+            if (recstartts <= pginfo->GetRecordingStartTime())
                 listPos = i;
         }
         m_schedulesList->SetItemCurrent(listPos);
