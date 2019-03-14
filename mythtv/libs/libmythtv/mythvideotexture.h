@@ -27,10 +27,10 @@ class MythVideoTexture : public MythGLTexture
                                                     QOpenGLTexture::Target Target = QOpenGLTexture::Target2D);
     static MythVideoTexture* CreateHelperTexture(MythRenderOpenGL *Context);
     static void UpdateTextures(MythRenderOpenGL* Context, const VideoFrame *Frame,
-                               vector<MythVideoTexture*> Textures);
+                               const vector<MythVideoTexture*> &Textures);
     static void DeleteTexture (MythRenderOpenGL* Context, MythVideoTexture *Texture);
     static void DeleteTextures(MythRenderOpenGL* Context, vector<MythVideoTexture*> &Textures);
-    static void SetTextureFilters(MythRenderOpenGL* Context, vector<MythVideoTexture*> &Textures,
+    static void SetTextureFilters(MythRenderOpenGL* Context, const vector<MythVideoTexture*> &Textures,
                                   QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
     static MythVideoTexture* CreateTexture(MythRenderOpenGL *Context, QSize Size,
                                            QOpenGLTexture::Target Target = QOpenGLTexture::Target2D,

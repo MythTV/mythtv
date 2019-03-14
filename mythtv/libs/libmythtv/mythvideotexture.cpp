@@ -47,7 +47,7 @@ void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, vector<MythVide
 }
 
 void MythVideoTexture::SetTextureFilters(MythRenderOpenGL *Context,
-                                         vector<MythVideoTexture *> &Textures,
+                                         const vector<MythVideoTexture *> &Textures,
                                          QOpenGLTexture::Filter Filter,
                                          QOpenGLTexture::WrapMode Wrap)
 {
@@ -195,7 +195,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
 */
 void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                                       const VideoFrame *Frame,
-                                      vector<MythVideoTexture*> Textures)
+                                      const vector<MythVideoTexture*> &Textures)
 {
     if (!Context || !Frame || Textures.empty())
     {
