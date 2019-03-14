@@ -51,9 +51,7 @@ class GetRecordingListThread : public MThread
 
 RecordingSelector::~RecordingSelector(void)
 {
-    if (m_recordingList)
-        delete m_recordingList;
-
+    delete m_recordingList;
     while (!m_selectedList.isEmpty())
         delete m_selectedList.takeFirst();
 }

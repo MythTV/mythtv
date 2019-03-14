@@ -346,8 +346,7 @@ int main(int argc, char **argv)
 
                         // remove from server list
                         ZMServer *server = serverList[i];
-                        if (server)
-                            delete server;
+                        delete server;
                         serverList.erase(i);
                     }
                     else

@@ -40,8 +40,7 @@ Synaesthesia::Synaesthesia(void)
 
 Synaesthesia::~Synaesthesia()
 {
-    if (m_outputImage)
-        delete m_outputImage;
+    delete m_outputImage;
 }
 
 void Synaesthesia::setupPalette(void)
@@ -116,8 +115,7 @@ void Synaesthesia::resize(const QSize &newsize)
     m_outWidth = m_size.width();
     m_outHeight = m_size.height();
 
-    if (m_outputImage)
-        delete m_outputImage;
+    delete m_outputImage;
 
     m_size.setHeight(m_size.height() * 2);
     m_outputImage = new QImage(m_size, QImage::Format_Indexed8);

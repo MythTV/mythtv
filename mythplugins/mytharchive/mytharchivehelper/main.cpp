@@ -1751,8 +1751,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
         av_packet_unref(&pkt);
     }
 
-    if (outputbuf)
-        delete[] outputbuf;
+    delete[] outputbuf;
 
     // close the codec
     gCodecMap->freeCodecContext

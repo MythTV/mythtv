@@ -100,8 +100,7 @@ void Weather::clearScreens()
         WeatherScreen *screen = m_screens.back();
         m_weatherStack->PopScreen(screen, false, false);
         m_screens.pop_back();
-        if (screen)
-            delete screen;
+        delete screen;
     }
 }
 

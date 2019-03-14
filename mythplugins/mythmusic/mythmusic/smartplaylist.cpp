@@ -361,8 +361,7 @@ SmartPlaylistEditor::~SmartPlaylistEditor(void)
         m_criteriaRows.pop_back();
     }
 
-    if (m_tempCriteriaRow)
-        delete m_tempCriteriaRow;
+    delete m_tempCriteriaRow;
 }
 
 
@@ -583,9 +582,7 @@ void SmartPlaylistEditor::addCriteria(void)
     editCriteria();
     */
 
-    if (m_tempCriteriaRow)
-        delete m_tempCriteriaRow;
-
+    delete m_tempCriteriaRow;
     m_tempCriteriaRow = new SmartPLCriteriaRow();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");

@@ -863,8 +863,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
 void ThumbFinder::closeAVCodec()
 {
-    if (m_outputbuf)
-        delete[] m_outputbuf;
+    delete[] m_outputbuf;
 
     // close the codec
     gCodecMap->freeCodecContext

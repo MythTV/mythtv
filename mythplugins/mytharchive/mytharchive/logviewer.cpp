@@ -88,9 +88,7 @@ LogViewer::~LogViewer(void)
 {
     gCoreContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
     gCoreContext->SaveSetting("LogViewerAutoUpdate", m_autoUpdate ? "1" : "0");
-
-    if (m_updateTimer)
-        delete m_updateTimer;
+    delete m_updateTimer;
 }
 
 bool LogViewer::Create(void)

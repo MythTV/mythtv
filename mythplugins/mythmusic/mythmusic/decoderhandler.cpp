@@ -39,11 +39,8 @@ DecoderHandlerEvent::DecoderHandlerEvent(Type type, const MusicMetadata &meta)
 
 DecoderHandlerEvent::~DecoderHandlerEvent(void)
 {
-    if (m_msg)
-        delete m_msg;
-
-    if (m_meta)
-        delete m_meta;
+    delete m_msg;
+    delete m_meta;
 }
 
 MythEvent* DecoderHandlerEvent::clone(void) const

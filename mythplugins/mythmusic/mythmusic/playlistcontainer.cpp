@@ -42,10 +42,8 @@ PlaylistContainer::~PlaylistContainer()
     delete m_playlistsLoader;
     m_playlistsLoader = nullptr;
 
-    if (m_activePlaylist)
-        delete m_activePlaylist;
-    if (m_streamPlaylist)
-        delete m_streamPlaylist;
+    delete m_activePlaylist;
+    delete m_streamPlaylist;
     if (m_allPlaylists)
     {
         while (!m_allPlaylists->empty())

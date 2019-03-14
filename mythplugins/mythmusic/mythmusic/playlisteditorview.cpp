@@ -104,8 +104,7 @@ PlaylistEditorView::~PlaylistEditorView()
         delete m_deleteList.at(x);
     m_deleteList.clear();
 
-    if (m_rootNode)
-        delete m_rootNode;
+    delete m_rootNode;
 }
 
 bool PlaylistEditorView::Create(void)

@@ -552,8 +552,7 @@ Ripper::~Ripper(void)
     QString command = "rm -f " + GetConfDir() + "/tmp/RipTemp/*";
     myth_system(command);
 
-    if (m_decoder)
-        delete m_decoder;
+    delete m_decoder;
 
 #ifndef _WIN32
     // if the MediaMonitor was active when we started then restart it
@@ -834,9 +833,7 @@ void Ripper::scanCD(void)
     }
 #endif // HAVE_CDIO
 
-    if (m_decoder)
-        delete m_decoder;
-
+    delete m_decoder;
     m_decoder = new CdDecoder("cda", nullptr, nullptr);
     if (m_decoder)
         m_decoder->setDevice(m_CDdevice);
@@ -1482,9 +1479,7 @@ void Ripper::customEvent(QEvent* event)
 
 RipStatus::~RipStatus(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 }
@@ -1639,9 +1634,7 @@ void RipStatus::customEvent(QEvent *event)
 
 void RipStatus::startRip(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     m_ripperThread = new CDRipperThread(this, m_CDdevice, m_tracks, m_quality);
     m_ripperThread->start();
 }

@@ -258,8 +258,7 @@ ZMClient::~ZMClient()
         m_zmclientReady = false;
     }
 
-    if (m_retryTimer)
-        delete m_retryTimer;
+    delete m_retryTimer;
 }
 
 void ZMClient::getServerStatus(QString &status, QString &cpuStat, QString &diskStat)
