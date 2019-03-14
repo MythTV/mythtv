@@ -922,7 +922,7 @@ int NativeArchive::doImportArchive(const QString &xmlFile, int chanID)
     {
         return importRecording(itemNode, xmlFile, chanID);
     }
-    else if (type == "video")
+    if (type == "video")
     {
         return importVideo(itemNode, xmlFile);
     }

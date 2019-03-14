@@ -481,12 +481,9 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.bindValue(":FILENAME", baseName);
         if (query.exec() && query.size())
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: Recording not found (%1)")
-                    .arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: Recording not found (%1)")
+            .arg(filename));
     }
     else if (type == "Video")
     {
@@ -496,21 +493,15 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.bindValue(":FILENAME", filename);
         if (query.exec() && query.size())
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: Video not found (%1)").arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: Video not found (%1)").arg(filename));
     }
     else if (type == "File")
     {
         if (QFile::exists(filename))
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: File not found (%1)").arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: File not found (%1)").arg(filename));
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythArchive: Archive item removed from list");

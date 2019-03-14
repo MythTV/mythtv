@@ -300,8 +300,7 @@ void NetBase::DoDownloadAndPlay()
         DoPlayVideo(finalFilename);
         return;
     }
-    else
-        DownloadVideo(item->GetMediaURL(), baseFilename);
+    DownloadVideo(item->GetMediaURL(), baseFilename);
 }
 
 void NetBase::DoPlayVideo(const QString &filename)

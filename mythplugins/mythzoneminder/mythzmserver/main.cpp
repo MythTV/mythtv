@@ -282,7 +282,7 @@ int main(int argc, char **argv)
             perror("select");
             return EXIT_SOCKET_ERROR;
         }
-        else if (res == 0)
+        if (res == 0)
         {
             // select timed out
             // just kick the DB connection to keep it alive

@@ -171,10 +171,7 @@ void GalleryFilterDialog::updateFilter()
         m_numImagesText->SetText(tr("-- please be patient --"));
         return;
     }
-    else
-    {
-        m_scanning = true;
-    }
+    m_scanning = true;
 
     int dir_count = 0;
     int img_count = 0;

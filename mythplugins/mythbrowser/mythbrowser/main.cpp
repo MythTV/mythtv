@@ -150,11 +150,8 @@ int mythplugin_run(void)
         mainStack->AddScreen(manager);
         return 0;
     }
-    else
-    {
-        delete manager;
-        return -1;
-    }
+    delete manager;
+    return -1;
 }
 
 int mythplugin_config(void)
@@ -168,9 +165,6 @@ int mythplugin_config(void)
         mainStack->AddScreen(config);
         return 0;
     }
-    else
-    {
-        delete config;
-        return -1;
-    }
+    delete config;
+    return -1;
 }

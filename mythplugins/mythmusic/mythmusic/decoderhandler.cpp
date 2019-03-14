@@ -213,7 +213,7 @@ void DecoderHandler::customEvent(QEvent *event)
         // Proxy all DecoderHandlerEvents
         return dispatch(*dhe);
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

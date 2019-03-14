@@ -305,15 +305,12 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
             MythDB::DBError("Getting weather sourceid", db);
             return nullptr;
         }
-        else if (!db.next())
+        if (!db.next())
         {
             LOG(VB_GENERAL, LOG_ERR, "Error getting weather sourceid");
             return nullptr;
         }
-        else
-        {
-            info.id = db.value(0).toInt();
-        }
+        info.id = db.value(0).toInt();
     }
 
     return new ScriptInfo(info);
@@ -459,12 +456,9 @@ void WeatherSource::startUpdate(bool forceUpdate)
                 }
                 return;
             }
-            else
-            {
-                LOG(VB_GENERAL, LOG_NOTICE,
-                    QString("No cachefile for %1, forcing update.")
-                        .arg(m_info->name));
-            }
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("No cachefile for %1, forcing update.")
+                .arg(m_info->name));
         }
     }
 

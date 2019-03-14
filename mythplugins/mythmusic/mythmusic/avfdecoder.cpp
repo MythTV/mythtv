@@ -520,11 +520,8 @@ void avfDecoder::run()
                 // never go below 1s buffered
                 if (buffered < 1000)
                     break;
-                else
-                {
-                    // wait
-                    usleep((buffered - 1000) * 1000);
-                }
+                // wait
+                usleep((buffered - 1000) * 1000);
             }
         }
     }

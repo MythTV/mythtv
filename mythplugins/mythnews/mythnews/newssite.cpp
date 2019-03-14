@@ -191,30 +191,28 @@ void NewsSite::customEvent(QEvent *event)
                     emit finished(this);
                     return;
                 }
+
+                m_updateErrorString.clear();
+                //m_data = data;
+
+                if (m_name.isEmpty())
+                {
+                    m_state = NewsSite::WriteFailed;
+                }
                 else
                 {
-                    m_updateErrorString.clear();
-                    //m_data = data;
-
-                    if (m_name.isEmpty())
+                    if (QFile::exists(filename))
                     {
-                        m_state = NewsSite::WriteFailed;
+                        m_updated = MythDate::current();
+                        m_state = NewsSite::Success;
                     }
                     else
                     {
-                        if (QFile::exists(filename))
-                        {
-                            m_updated = MythDate::current();
-                            m_state = NewsSite::Success;
-                        }
-                        else
-                        {
-                            m_state = NewsSite::WriteFailed;
-                        }
+                        m_state = NewsSite::WriteFailed;
                     }
-
-                    emit finished(this);
                 }
+
+                emit finished(this);
             }
         }
     }
@@ -276,18 +274,14 @@ void NewsSite::process(void)
         xmlFile.close();
         return;
     }
-    else if (rootName == "feed")
+    if (rootName == "feed")
     {
         parseAtom(domDoc);
         xmlFile.close();
         return;
     }
-    else {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "XML-file is not valid RSS-feed");
-        m_errorString += tr("XML-file is not valid RSS-feed");
-        return;
-    }
-
+    LOG(VB_GENERAL, LOG_ERR, LOC + "XML-file is not valid RSS-feed");
+    m_errorString += tr("XML-file is not valid RSS-feed");
 }
 
 static bool isImage(const QString &mimeType)

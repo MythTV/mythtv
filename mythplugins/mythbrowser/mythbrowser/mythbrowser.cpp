@@ -132,8 +132,7 @@ MythUIWebBrowser* MythBrowser::activeBrowser(void)
 {
     if (m_currentBrowser >=0 && m_currentBrowser < m_browserList.size())
         return m_browserList[m_currentBrowser]->getBrowser();
-    else
-        return m_browserList[0]->getBrowser();
+    return m_browserList[0]->getBrowser();
 }
 
 void MythBrowser::slotEnterURL(void)

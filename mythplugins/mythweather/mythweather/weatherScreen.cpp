@@ -94,8 +94,7 @@ QString WeatherScreen::getTemperatureUnit()
 {
     if (m_units == ENG_UNITS)
         return QString::fromUtf8("°") + "F";
-    else
-        return QString::fromUtf8("°") + "C";
+    return QString::fromUtf8("°") + "C";
 }
 
 bool WeatherScreen::prepareScreen(bool checkOnly)
@@ -117,7 +116,7 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
                         .arg(m_name));
                 return false;
             }
-            else if (name == "copyrightlogo")
+            if (name == "copyrightlogo")
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("No copyrightlogo widget found, skipping screen %1.")
@@ -181,8 +180,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     {
        if ((value == "NA") || (value == "N/A"))
           return QString();
-       else
-          return value + getTemperatureUnit();
+       return value + getTemperatureUnit();
     }
 
     if (key.startsWith("wind_gust") ||

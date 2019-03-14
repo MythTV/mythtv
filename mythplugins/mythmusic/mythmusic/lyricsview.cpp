@@ -562,8 +562,7 @@ bool EditLyricsDialog::keyPressEvent(QKeyEvent *event)
             cancelPressed();
             return true;
         }
-        else
-            handled = false;
+        handled = false;
     }
 
     if (MythScreenType::keyPressEvent(event))

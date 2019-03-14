@@ -550,8 +550,7 @@ bool Dbase::Write(const Cddb::Album& album)
             QTextStream(&file) << album;
             return true;
         }
-        else
-            LOG(VB_GENERAL, LOG_ERR, "Cddb can't write " + file.fileName());
+        LOG(VB_GENERAL, LOG_ERR, "Cddb can't write " + file.fileName());
     }
     else
         LOG(VB_GENERAL, LOG_ERR, "Cddb can't mkpath " + GetDB() + '/' + genre);

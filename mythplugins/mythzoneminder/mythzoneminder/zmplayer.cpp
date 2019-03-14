@@ -147,11 +147,9 @@ void ZMPlayer::getEventInfo()
 
         return;
     }
-    else
-    {
-        if (m_noEventsText)
-            m_noEventsText->SetVisible(false);
-    }
+
+    if (m_noEventsText)
+        m_noEventsText->SetVisible(false);
 
     Event *event = m_eventList->at(*m_currentEvent);
     if (!event)

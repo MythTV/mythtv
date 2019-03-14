@@ -743,11 +743,8 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
         {
             return 0;
         }
-        else
-        {
-            status = strList[0];
-            return 0;
-        }
+        status = strList[0];
+        return 0;
     }
 
     // sanity check
