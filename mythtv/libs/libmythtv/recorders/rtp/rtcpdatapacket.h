@@ -45,11 +45,11 @@ public:
 
     RTCPDataPacket(uint32_t timestamp, uint32_t last_timestamp,
                    uint32_t sequence, uint32_t last_sequence,
-                   uint32_t m_lost, uint32_t lost_interval,
+                   uint32_t lost, uint32_t lost_interval,
                    uint32_t ssrc)
   : m_timestamp(timestamp),     m_last_timestamp(last_timestamp),
     m_sequence(sequence),       m_last_sequence(last_sequence),
-    m_lost(m_lost),             m_lost_interval(lost_interval),
+    m_lost(lost),               m_lost_interval(lost_interval),
     m_ssrc(ssrc) { }
 
     QByteArray GetData(void) const

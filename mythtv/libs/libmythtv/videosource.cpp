@@ -65,9 +65,9 @@ static const uint kDefaultMultirecCount = 2;
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
                                          bool           _must_have_mplexid) :
-    initial_sourceid(_initial_sourceid),
-    card_types(_card_types),
-    must_have_mplexid(_must_have_mplexid)
+    m_initialSourceId(_initial_sourceid),
+    m_cardTypes(_card_types),
+    m_mustHaveMplexId(_must_have_mplexid)
 {
     setLabel(tr("Video Source"));
 }
@@ -80,19 +80,19 @@ void VideoSourceSelector::Load(void)
         "SELECT DISTINCT videosource.name, videosource.sourceid "
         "FROM capturecard, videosource";
 
-    querystr += (must_have_mplexid) ? ", channel " : " ";
+    querystr += (m_mustHaveMplexId) ? ", channel " : " ";
 
     querystr +=
         "WHERE capturecard.sourceid = videosource.sourceid AND "
         "      capturecard.hostname = :HOSTNAME ";
 
-    if (!card_types.isEmpty())
+    if (!m_cardTypes.isEmpty())
     {
         querystr += QString(" AND capturecard.cardtype in %1 ")
-            .arg(card_types);
+            .arg(m_cardTypes);
     }
 
-    if (must_have_mplexid)
+    if (m_mustHaveMplexId)
     {
         querystr +=
             " AND channel.sourceid      = videosource.sourceid "
@@ -112,10 +112,10 @@ void VideoSourceSelector::Load(void)
         addSelection(query.value(0).toString(),
                      query.value(1).toString());
 
-        sel = (query.value(1).toUInt() == initial_sourceid) ? cnt : sel;
+        sel = (query.value(1).toUInt() == m_initialSourceId) ? cnt : sel;
     }
 
-    if (initial_sourceid)
+    if (m_initialSourceId)
     {
         if (cnt)
             setValue(sel);
@@ -378,7 +378,7 @@ FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
 }
 
 TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
-    sourceid(_sourceid)
+    m_sourceId(_sourceid)
 {
     setLabel(QObject::tr("Channel frequency table"));
 
@@ -392,7 +392,7 @@ void TransFreqTableSelector::Load(void)
     if (idx1 >= 0)
         setValue(idx1);
 
-    if (!sourceid)
+    if (!m_sourceId)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -400,7 +400,7 @@ void TransFreqTableSelector::Load(void)
         "SELECT freqtable "
         "FROM videosource "
         "WHERE sourceid = :SOURCEID");
-    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":SOURCEID", m_sourceId);
 
     if (!query.exec() || !query.isActive())
     {
@@ -408,15 +408,15 @@ void TransFreqTableSelector::Load(void)
         return;
     }
 
-    loaded_freq_table.clear();
+    m_LoadedFreqTable.clear();
 
     if (query.next())
     {
-        loaded_freq_table = query.value(0).toString();
-        if (!loaded_freq_table.isEmpty() &&
-            (loaded_freq_table.toLower() != "default"))
+        m_LoadedFreqTable = query.value(0).toString();
+        if (!m_LoadedFreqTable.isEmpty() &&
+            (m_LoadedFreqTable.toLower() != "default"))
         {
-            int idx2 = getValueIndex(loaded_freq_table);
+            int idx2 = getValueIndex(m_LoadedFreqTable);
             if (idx2 >= 0)
                 setValue(idx2);
         }
@@ -427,8 +427,8 @@ void TransFreqTableSelector::Save(void)
 {
     LOG(VB_GENERAL, LOG_INFO, "TransFreqTableSelector::Save(void)");
 
-    if ((loaded_freq_table == getValue()) ||
-        ((loaded_freq_table.toLower() == "default") &&
+    if ((m_LoadedFreqTable == getValue()) ||
+        ((m_LoadedFreqTable.toLower() == "default") &&
          (getValue() == gCoreContext->GetSetting("FreqTable"))))
     {
         return;
@@ -441,7 +441,7 @@ void TransFreqTableSelector::Save(void)
         "WHERE sourceid = :SOURCEID");
 
     query.bindValue(":FREQTABLE", getValue());
-    query.bindValue(":SOURCEID",  sourceid);
+    query.bindValue(":SOURCEID",  m_sourceId);
 
     if (!query.exec() || !query.isActive())
     {
@@ -452,7 +452,7 @@ void TransFreqTableSelector::Save(void)
 
 void TransFreqTableSelector::SetSourceID(uint _sourceid)
 {
-    sourceid = _sourceid;
+    m_sourceId = _sourceid;
     Load();
 }
 
@@ -473,18 +473,18 @@ class UseEIT : public MythUICheckBoxSetting
 XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
                                            QString _grabber,
                                            StandardSetting *_setting) :
-    parent(_parent), grabber(_grabber)
+    m_parent(_parent), m_grabber(_grabber)
 {
     setVisible(false);
 
     QString filename = QString("%1/%2.xmltv")
-        .arg(GetConfDir()).arg(parent.getSourceName());
+        .arg(GetConfDir()).arg(m_parent.getSourceName());
 
-    grabberArgs.push_back("--config-file");
-    grabberArgs.push_back(filename);
-    grabberArgs.push_back("--configure");
+    m_grabberArgs.push_back("--config-file");
+    m_grabberArgs.push_back(filename);
+    m_grabberArgs.push_back("--configure");
 
-    _setting->addTargetedChild(_grabber, new UseEIT(parent));
+    _setting->addTargetedChild(_grabber, new UseEIT(m_parent));
 
     ButtonStandardSetting *config = new ButtonStandardSetting(tr("Configure"));
     config->setHelpText(tr("Run XMLTV configure command."));
@@ -503,7 +503,7 @@ void XMLTV_generic_config::Save()
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
         "channel numbers, so you have to set them manually.");
 
-    if (is_grabber_external(grabber))
+    if (is_grabber_external(m_grabber))
     {
         LOG(VB_GENERAL, LOG_ERR, err_msg);
         ShowOkPopup(err_msg);
@@ -515,7 +515,7 @@ void XMLTV_generic_config::RunConfig(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     MythScreenType *ssd =
-        new MythTerminal(mainStack, grabber, grabberArgs);
+        new MythTerminal(mainStack, m_grabber, m_grabberArgs);
 
     if (ssd->Create())
         mainStack->AddScreen(ssd);
@@ -527,10 +527,10 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_set
 {
     setVisible(false);
 
-    useeit = new UseEIT(_parent);
-    useeit->setValue(true);
-    useeit->setVisible(false);
-    addChild(useeit);
+    m_useeit = new UseEIT(_parent);
+    m_useeit->setValue(true);
+    m_useeit->setVisible(false);
+    addChild(m_useeit);
 
     TransTextEditSetting *label;
     label=new TransTextEditSetting();
@@ -544,16 +544,16 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_set
 void EITOnly_config::Save(void)
 {
     // Force this value on
-    useeit->setValue(true);
-    useeit->Save();
+    m_useeit->setValue(true);
+    m_useeit->Save();
 }
 
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
 {
-    useeit = new UseEIT(_parent);
-    useeit->setValue(false);
-    useeit->setVisible(false);
-    addChild(useeit);
+    m_useeit = new UseEIT(_parent);
+    m_useeit->setValue(false);
+    m_useeit->setVisible(false);
+    addChild(m_useeit);
 
     TransTextEditSetting *label = new TransTextEditSetting();
     label->setValue(QObject::tr("Do not configure a grabber"));
@@ -562,18 +562,18 @@ NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
 
 void NoGrabber_config::Save(void)
 {
-    useeit->setValue(false);
-    useeit->Save();
+    m_useeit->setValue(false);
+    m_useeit->Save();
 }
 
 VideoSource::VideoSource()
 {
     // must be first
-    id = new ID();
-    addChild(id = new ID());
+    m_id = new ID();
+    addChild(m_id = new ID());
 
     setLabel(QObject::tr("Video Source Setup"));
-    addChild(name = new Name(*this));
+    addChild(m_name = new Name(*this));
     addChild(new XMLTVGrabber(*this));
     addChild(new FreqTableSelector(*this));
     addChild(new DVBNetID(*this, -1, -1));
@@ -645,7 +645,7 @@ void VideoSource::fillSelections(MythUIComboBoxSetting* setting)
 
 void VideoSource::loadByID(int sourceid)
 {
-    id->setValue(sourceid);
+    m_id->setValue(sourceid);
 }
 
 class VideoDevice : public CaptureCardComboBoxSetting
@@ -733,7 +733,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
                 continue;
 
             // ignore duplicates if allow_duplicates not set
-            if (!allow_duplicates && minor_list[minor_num])
+            if (!allow_duplicates && m_minorList[minor_num])
                 continue;
 
             // if the driver returns any info add this device to our list
@@ -753,20 +753,20 @@ class VideoDevice : public CaptureCardComboBoxSetting
             }
 
             // add to list of minors discovered to avoid duplicates
-            minor_list[minor_num] = 1;
+            m_minorList[minor_num] = 1;
         }
         delete driverExp;
 
         return cnt;
     }
 
-    QString Driver(void) const { return driver_name; }
-    QString Card(void) const { return card_name; }
+    QString Driver(void) const { return m_driverName; }
+    QString Card(void) const { return m_cardName; }
 
   private:
-    QMap<uint, uint> minor_list;
-    QString card_name;
-    QString driver_name;
+    QMap<uint, uint> m_minorList;
+    QString          m_cardName;
+    QString          m_driverName;
 };
 
 class VBIDevice : public CaptureCardComboBoxSetting
@@ -1142,7 +1142,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
 FirewireModel::FirewireModel(const CaptureCard  &parent,
                              const FirewireGUID *_guid) :
     CaptureCardComboBoxSetting(parent, false, "firewire_model"),
-    guid(_guid)
+    m_guid(_guid)
 {
     setLabel(QObject::tr("Cable box model"));
     addSelection(QObject::tr("Motorola Generic"), "MOTO GENERIC");
@@ -1174,7 +1174,7 @@ void FirewireModel::SetGUID(const QString &_guid)
     (void) _guid;
 
 #ifdef USING_FIREWIRE
-    AVCInfo info = guid->GetAVCInfo(_guid);
+    AVCInfo info = m_guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
     setValue(max(getValueIndex(model), 0));
 #endif // USING_FIREWIRE
@@ -1187,7 +1187,7 @@ void FirewireDesc::SetGUID(const QString &_guid)
     setLabel(tr("Description"));
 
 #ifdef USING_FIREWIRE
-    QString name = guid->GetAVCInfo(_guid).m_product_name;
+    QString name = m_guid->GetAVCInfo(_guid).m_product_name;
     name.replace("Scientific-Atlanta", "SA");
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
@@ -1315,38 +1315,38 @@ class UseHDHomeRunDevice : public TransMythUICheckBoxSetting
 
 HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
         (CaptureCard& a_parent, CardType &a_cardtype) :
-    parent(a_parent)
+    m_parent(a_parent)
 {
     setVisible(false);
 
     // Fill Device list
     FillDeviceList();
 
-    deviceid     = new HDHomeRunDeviceID(parent, *this);
+    m_deviceId   = new HDHomeRunDeviceID(m_parent, *this);
 
     QMap<QString, HDHomeRunDevice>::iterator dit;
-    for (dit = devicelist.begin(); dit != devicelist.end(); ++dit)
+    for (dit = m_deviceList.begin(); dit != m_deviceList.end(); ++dit)
     {
         HDHomeRunDevice &dev = *dit;
         dev.checkbox = new UseHDHomeRunDevice(
             dev.deviceid, dev.model, dev.cardip);
         a_cardtype.addTargetedChild("HDHOMERUN", dev.checkbox);
     }
-    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(parent));
-    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyVBIDevice(parent));
-    a_cardtype.addTargetedChild("HDHOMERUN", deviceid);
+    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(m_parent));
+    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyVBIDevice(m_parent));
+    a_cardtype.addTargetedChild("HDHOMERUN", m_deviceId);
 
     GroupSetting *buttonRecOpt = new GroupSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));
-    buttonRecOpt->addChild(new SignalTimeout(parent, 1000, 250));
-    buttonRecOpt->addChild(new ChannelTimeout(parent, 3000, 1750));
-    buttonRecOpt->addChild(new HDHomeRunEITScan(parent));
+    buttonRecOpt->addChild(new SignalTimeout(m_parent, 1000, 250));
+    buttonRecOpt->addChild(new ChannelTimeout(m_parent, 3000, 1750));
+    buttonRecOpt->addChild(new HDHomeRunEITScan(m_parent));
     a_cardtype.addTargetedChild("HDHOMERUN", buttonRecOpt);
 };
 
 void HDHomeRunConfigurationGroup::FillDeviceList(void)
 {
-    devicelist.clear();
+    m_deviceList.clear();
 
     // Find physical devices first
     // ProbeVideoDevices returns "deviceid ip" pairs
@@ -1366,13 +1366,13 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         tmpdevice.model    = model;
         tmpdevice.cardip   = devip;
         tmpdevice.deviceid = devid;
-        devicelist[tmpdevice.deviceid] = tmpdevice;
+        m_deviceList[tmpdevice.deviceid] = tmpdevice;
     }
 
 #if 0
     // Debug dump of cards
     QMap<QString, HDHomeRunDevice>::iterator debugit;
-    for (debugit = devicelist.begin(); debugit != devicelist.end(); ++debugit)
+    for (debugit = m_deviceList.begin(); debugit != m_deviceList.end(); ++debugit)
     {
         LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2 %3")
             .arg(debugit.key()).arg((*debugit).model)
@@ -1400,8 +1400,8 @@ void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(QString devices)
 
         // If we know about this device, set its checkbox to on.
         QMap<QString, HDHomeRunDevice>::iterator dit;
-        dit = devicelist.find(devid);
-        if (dit != devicelist.end())
+        dit = m_deviceList.find(devid);
+        if (dit != m_deviceList.end())
             (*dit).checkbox->setValue(true);
     }
 }
@@ -1412,7 +1412,7 @@ QString HDHomeRunConfigurationGroup::GetDeviceCheckBoxes(void)
     // turned on.
     QStringList devstrs;    
     QMap<QString, HDHomeRunDevice>::iterator dit;
-    for (dit = devicelist.begin(); dit != devicelist.end(); ++dit)
+    for (dit = m_deviceList.begin(); dit != m_deviceList.end(); ++dit)
     {
         if ((*dit).checkbox->boolValue())
             devstrs << (*dit).deviceid;
@@ -1434,7 +1434,6 @@ VBoxIP::VBoxIP()
     setEnabled(false);
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
-    _oldValue="";
 };
 
 void VBoxIP::setEnabled(bool e)
@@ -1442,13 +1441,13 @@ void VBoxIP::setEnabled(bool e)
     MythUITextEditSetting::setEnabled(e);
     if (e)
     {
-        if (!_oldValue.isEmpty())
-            setValue(_oldValue);
+        if (!m_oldValue.isEmpty())
+            setValue(m_oldValue);
         emit NewIP(getValue());
     }
     else
     {
-        _oldValue = getValue();
+        m_oldValue = getValue();
     }
 }
 
@@ -1465,20 +1464,19 @@ VBoxTunerIndex::VBoxTunerIndex()
     setEnabled(false);
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
-    _oldValue = "";
 };
 
 void VBoxTunerIndex::setEnabled(bool e)
 {
     MythUITextEditSetting::setEnabled(e);
     if (e) {
-        if (!_oldValue.isEmpty())
-            setValue(_oldValue);
+        if (!m_oldValue.isEmpty())
+            setValue(m_oldValue);
         emit NewTuner(getValue());
     }
     else
     {
-        _oldValue = getValue();
+        m_oldValue = getValue();
     }
 }
 
@@ -1498,29 +1496,29 @@ VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
 
 void VBoxDeviceID::SetIP(const QString &ip)
 {
-    _ip = ip;
-    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
+    m_ip = ip;
+    setValue(QString("%1-%2").arg(m_ip).arg(m_tuner));
 }
 
 void VBoxDeviceID::SetTuner(const QString &tuner)
 {
-    _tuner = tuner;
-    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
+    m_tuner = tuner;
+    setValue(QString("%1-%2").arg(m_ip).arg(m_tuner));
 }
 
 void VBoxDeviceID::SetOverrideDeviceID(const QString &deviceid)
 {
-    _overridedeviceid = deviceid;
+    m_overrideDeviceId = deviceid;
     setValue(deviceid);
 }
 
 void VBoxDeviceID::Load(void)
 {
     GetStorage()->Load();
-    if (!_overridedeviceid.isEmpty())
+    if (!m_overrideDeviceId.isEmpty())
     {
-        setValue(_overridedeviceid);
-        _overridedeviceid.clear();
+        setValue(m_overrideDeviceId);
+        m_overrideDeviceId.clear();
     }
 }
 
@@ -1531,11 +1529,11 @@ VBoxDeviceIDList::VBoxDeviceIDList(
     VBoxTunerIndex      *cardtuner,
     VBoxDeviceList      *devicelist,
     const CaptureCard &parent) :
-    _deviceid(deviceid),
-    _desc(desc),
-    _cardip(cardip),
-    _cardtuner(cardtuner),
-    _devicelist(devicelist),
+    m_deviceId(deviceid),
+    m_desc(desc),
+    m_cardIp(cardip),
+    m_cardTuner(cardtuner),
+    m_deviceList(devicelist),
     m_parent(parent)
 {
     setLabel(QObject::tr("Available devices"));
@@ -1545,8 +1543,6 @@ VBoxDeviceIDList::VBoxDeviceIDList(
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
-
-    _oldValue = "";
 };
 
 /// \brief Adds all available device-tuner combinations to list
@@ -1559,8 +1555,8 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
 
     QString current = cur;
 
-    VBoxDeviceList::iterator it = _devicelist->begin();
-    for (; it != _devicelist->end(); ++it)
+    VBoxDeviceList::iterator it = m_deviceList->begin();
+    for (; it != m_deviceList->end(); ++it)
     {
         devs.push_back(it.key());
         in_use[it.key()] = (*it).inuse;
@@ -1586,18 +1582,18 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
 
     if (current != cur)
     {
-        _deviceid->SetOverrideDeviceID(current);
+        m_deviceId->SetOverrideDeviceID(current);
     }
     else if (sel == man_addr && !current.isEmpty())
     {
         // Populate the proper values for IP address and tuner
         QStringList selection = current.split("-");
 
-        _cardip->SetOldValue(selection.first());
-        _cardtuner->SetOldValue(selection.last());
+        m_cardIp->SetOldValue(selection.first());
+        m_cardTuner->SetOldValue(selection.last());
 
-        _cardip->setValue(selection.first());
-        _cardtuner->setValue(selection.last());
+        m_cardIp->setValue(selection.first());
+        m_cardTuner->setValue(selection.last());
     }
 }
 
@@ -1614,24 +1610,24 @@ void VBoxDeviceIDList::UpdateDevices(const QString &v)
 {
     if (v == VBoxDeviceIDList::tr("Manually Enter IP Address"))
     {
-        _cardip->setEnabled(true);
-        _cardtuner->setEnabled(true);
+        m_cardIp->setEnabled(true);
+        m_cardTuner->setEnabled(true);
     }
     else if (!v.isEmpty())
     {
-        if (_oldValue == VBoxDeviceIDList::tr("Manually Enter IP Address"))
+        if (m_oldValue == VBoxDeviceIDList::tr("Manually Enter IP Address"))
         {
-            _cardip->setEnabled(false);
-            _cardtuner->setEnabled(false);
+            m_cardIp->setEnabled(false);
+            m_cardTuner->setEnabled(false);
         }
-        _deviceid->setValue(v);
+        m_deviceId->setValue(v);
 
         // Update _cardip and _cardtuner
-        _cardip->setValue((*_devicelist)[v].cardip);
-        _cardtuner->setValue(QString("%1").arg((*_devicelist)[v].tunerno));
-        _desc->setValue((*_devicelist)[v].desc);
+        m_cardIp->setValue((*m_deviceList)[v].cardip);
+        m_cardTuner->setValue(QString("%1").arg((*m_deviceList)[v].tunerno));
+        m_desc->setValue((*m_deviceList)[v].desc);
     }
-    _oldValue = v;
+    m_oldValue = v;
 };
 
 // -----------------------
@@ -1740,23 +1736,23 @@ class ASIDevice : public CaptureCardComboBoxSetting
 
 ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent,
                                              CardType &cardType):
-    parent(a_parent),
-    device(new ASIDevice(parent)),
-    cardinfo(new TransTextEditSetting())
+    m_parent(a_parent),
+    m_device(new ASIDevice(m_parent)),
+    m_cardInfo(new TransTextEditSetting())
 {
     setVisible(false);
-    cardinfo->setLabel(tr("Status"));
-    cardinfo->setEnabled(false);
+    m_cardInfo->setLabel(tr("Status"));
+    m_cardInfo->setEnabled(false);
 
-    cardType.addTargetedChild("ASI", device);
-    cardType.addTargetedChild("ASI", new EmptyAudioDevice(parent));
-    cardType.addTargetedChild("ASI", new EmptyVBIDevice(parent));
-    cardType.addTargetedChild("ASI", cardinfo);
+    cardType.addTargetedChild("ASI", m_device);
+    cardType.addTargetedChild("ASI", new EmptyAudioDevice(m_parent));
+    cardType.addTargetedChild("ASI", new EmptyVBIDevice(m_parent));
+    cardType.addTargetedChild("ASI", m_cardInfo);
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(m_device, SIGNAL(valueChanged(const QString&)),
+            this,     SLOT(  probeCard(   const QString&)));
 
-    probeCard(device->getValue());
+    probeCard(m_device->getValue());
 };
 
 void ASIConfigurationGroup::probeCard(const QString &device)
@@ -1764,13 +1760,13 @@ void ASIConfigurationGroup::probeCard(const QString &device)
 #ifdef USING_ASI
     if (device.isEmpty())
     {
-        cardinfo->setValue("");
+        m_cardInfo->setValue("");
         return;
     }
 
-    if (parent.getCardID() && parent.GetRawCardType() != "ASI")
+    if (m_parent.getCardID() && m_parent.GetRawCardType() != "ASI")
     {
-        cardinfo->setValue("");
+        m_cardInfo->setValue("");
         return;
     }
 
@@ -1778,40 +1774,40 @@ void ASIConfigurationGroup::probeCard(const QString &device)
     int device_num = CardUtil::GetASIDeviceNumber(device, &error);
     if (device_num < 0)
     {
-        cardinfo->setValue(tr("Not a valid DVEO ASI card"));
+        m_cardInfo->setValue(tr("Not a valid DVEO ASI card"));
         LOG(VB_GENERAL, LOG_WARNING,
             "ASIConfigurationGroup::probeCard(), Warning: " + error);
         return;
     }
-    cardinfo->setValue(tr("Valid DVEO ASI card"));
+    m_cardInfo->setValue(tr("Valid DVEO ASI card"));
 #else
     Q_UNUSED(device);
-    cardinfo->setValue(QString("Not compiled with ASI support"));
+    m_cardInfo->setValue(QString("Not compiled with ASI support"));
 #endif
 }
 
 ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
                                                    CardType& a_cardtype):
-    parent(a_parent),
-    info(new TransTextEditSetting()), size(new TransTextEditSetting())
+    m_parent(a_parent),
+    m_info(new TransTextEditSetting()), m_size(new TransTextEditSetting())
 {
     setVisible(false);
-    FileDevice *device = new FileDevice(parent);
+    FileDevice *device = new FileDevice(m_parent);
     device->setHelpText(tr("A local file used to simulate a recording."
                            " Leave empty to use MythEvents to trigger an"
                            " external program to import recording files."));
     a_cardtype.addTargetedChild("IMPORT", device);
 
-    a_cardtype.addTargetedChild("IMPORT", new EmptyAudioDevice(parent));
-    a_cardtype.addTargetedChild("IMPORT", new EmptyVBIDevice(parent));
+    a_cardtype.addTargetedChild("IMPORT", new EmptyAudioDevice(m_parent));
+    a_cardtype.addTargetedChild("IMPORT", new EmptyVBIDevice(m_parent));
 
-    info->setLabel(tr("File info"));
-    info->setEnabled(false);
-    a_cardtype.addTargetedChild("IMPORT", info);
+    m_info->setLabel(tr("File info"));
+    m_info->setEnabled(false);
+    a_cardtype.addTargetedChild("IMPORT", m_info);
 
-    size->setLabel(tr("File size"));
-    size->setEnabled(false);
-    a_cardtype.addTargetedChild("IMPORT", size);
+    m_size->setLabel(tr("File size"));
+    m_size->setEnabled(false);
+    a_cardtype.addTargetedChild("IMPORT", m_size);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -1843,8 +1839,8 @@ void ImportConfigurationGroup::probeCard(const QString &device)
         ci = tr("File %1 does not exist").arg(device);
     }
 
-    info->setValue(ci);
-    size->setValue(cs);
+    m_info->setValue(ci);
+    m_size->setValue(cs);
 }
 
 // -----------------------
@@ -1853,30 +1849,30 @@ void ImportConfigurationGroup::probeCard(const QString &device)
 
 VBoxConfigurationGroup::VBoxConfigurationGroup
         (CaptureCard& a_parent, CardType& a_cardtype) :
-    parent(a_parent)
+    m_parent(a_parent)
 {
     setVisible(false);
 
     // Fill Device list
     FillDeviceList();
 
-    deviceid     = new VBoxDeviceID(parent);
-    desc         = new GroupSetting();
-    desc->setLabel(tr("Description"));
-    cardip       = new VBoxIP();
-    cardtuner    = new VBoxTunerIndex();
-    deviceidlist = new VBoxDeviceIDList(
-        deviceid, desc, cardip, cardtuner, &devicelist, parent);
+    m_deviceId     = new VBoxDeviceID(m_parent);
+    m_desc         = new GroupSetting();
+    m_desc->setLabel(tr("Description"));
+    m_cardIp       = new VBoxIP();
+    m_cardTuner    = new VBoxTunerIndex();
+    m_deviceIdList = new VBoxDeviceIDList(
+        m_deviceId, m_desc, m_cardIp, m_cardTuner, &m_deviceList, m_parent);
 
-    a_cardtype.addTargetedChild("VBOX", deviceidlist);
-    a_cardtype.addTargetedChild("VBOX", new EmptyAudioDevice(parent));
-    a_cardtype.addTargetedChild("VBOX", new EmptyVBIDevice(parent));
-    a_cardtype.addTargetedChild("VBOX", deviceid);
-    a_cardtype.addTargetedChild("VBOX", desc);
-    a_cardtype.addTargetedChild("VBOX", cardip);
-    a_cardtype.addTargetedChild("VBOX", cardtuner);
-    a_cardtype.addTargetedChild("VBOX", new SignalTimeout(parent, 7000, 1000));
-    a_cardtype.addTargetedChild("VBOX", new ChannelTimeout(parent, 10000, 1750));
+    a_cardtype.addTargetedChild("VBOX", m_deviceIdList);
+    a_cardtype.addTargetedChild("VBOX", new EmptyAudioDevice(m_parent));
+    a_cardtype.addTargetedChild("VBOX", new EmptyVBIDevice(m_parent));
+    a_cardtype.addTargetedChild("VBOX", m_deviceId);
+    a_cardtype.addTargetedChild("VBOX", m_desc);
+    a_cardtype.addTargetedChild("VBOX", m_cardIp);
+    a_cardtype.addTargetedChild("VBOX", m_cardTuner);
+    a_cardtype.addTargetedChild("VBOX", new SignalTimeout(m_parent, 7000, 1000));
+    a_cardtype.addTargetedChild("VBOX", new ChannelTimeout(m_parent, 10000, 1750));
 //    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
 //    buttonRecOpt->setLabel(tr("Recording Options"));
 //    addChild(buttonRecOpt);
@@ -1884,15 +1880,15 @@ VBoxConfigurationGroup::VBoxConfigurationGroup
 //    connect(buttonRecOpt, SIGNAL(pressed()),
 //            this,         SLOT(  VBoxExtraPanel()));
 
-    connect(cardip,    SIGNAL(NewIP(const QString&)),
-            deviceid,  SLOT(  SetIP(const QString&)));
-    connect(cardtuner, SIGNAL(NewTuner(const QString&)),
-            deviceid,  SLOT(  SetTuner(const QString&)));
+    connect(m_cardIp,    SIGNAL(NewIP(const QString&)),
+            m_deviceId,  SLOT(  SetIP(const QString&)));
+    connect(m_cardTuner, SIGNAL(NewTuner(const QString&)),
+            m_deviceId,  SLOT(  SetTuner(const QString&)));
 };
 
 void VBoxConfigurationGroup::FillDeviceList(void)
 {
-    devicelist.clear();
+    m_deviceList.clear();
 
     // Find physical devices first
     // ProbeVideoDevices returns "deviceid ip tunerno tunertype"
@@ -1918,7 +1914,7 @@ void VBoxConfigurationGroup::FillDeviceList(void)
         tmpdevice.tunerno  = tunerNo;
         tmpdevice.tunertype  = tunerType;
         tmpdevice.mythdeviceid = id + "-" + tunerNo + "-" + tunerType;
-        devicelist[tmpdevice.mythdeviceid] = tmpdevice;
+        m_deviceList[tmpdevice.mythdeviceid] = tmpdevice;
     }
 
     // Now find configured devices
@@ -1929,9 +1925,9 @@ void VBoxConfigurationGroup::FillDeviceList(void)
     for (it = db.begin(); it != db.end(); ++it)
     {
         QMap<QString, VBoxDevice>::iterator dit;
-        dit = devicelist.find(*it);
+        dit = m_deviceList.find(*it);
 
-        if (dit != devicelist.end())
+        if (dit != m_deviceList.end())
             (*dit).inuse = true;
     }
 }
@@ -1961,7 +1957,7 @@ void CetonSetting::LoadValue(const QString &value)
 
 CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
     MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice")),
-    _ip(), _card(), _tuner(), _parent(parent)
+    m_parent(parent)
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of Ceton device"));
@@ -1972,8 +1968,8 @@ void CetonDeviceID::SetIP(const QString &ip)
     QString regexp = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){4}$";
     if (QRegExp(regexp).exactMatch(ip + "."))
     {
-        _ip = ip;
-        setValue(QString("%1-RTP.%3").arg(_ip).arg(_tuner));
+        m_ip = ip;
+        setValue(QString("%1-RTP.%3").arg(m_ip).arg(m_tuner));
     }
 }
 
@@ -1981,8 +1977,8 @@ void CetonDeviceID::SetTuner(const QString &tuner)
 {
     if (QRegExp("^\\d$").exactMatch(tuner))
     {
-        _tuner = tuner;
-        setValue(QString("%1-RTP.%2").arg(_ip).arg(_tuner));
+        m_tuner = tuner;
+        setValue(QString("%1-RTP.%2").arg(m_ip).arg(m_tuner));
     }
 }
 
@@ -2037,22 +2033,22 @@ static void CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
                                              CardType& a_cardtype) :
-    parent(a_parent),
-    cardinfo(new TransTextEditSetting()),  vbidev(new VBIDevice(parent))
+    m_parent(a_parent),
+    m_cardInfo(new TransTextEditSetting()),  m_vbiDev(new VBIDevice(m_parent))
 {
     setVisible(false);
     QString drv = "(?!ivtv|hdpvr|(saa7164(.*))).*";
-    VideoDevice *device = new VideoDevice(parent, 0, 15, QString(), drv);
+    VideoDevice *device = new VideoDevice(m_parent, 0, 15, QString(), drv);
 
-    cardinfo->setLabel(tr("Probed info"));
-    cardinfo->setEnabled(false);
+    m_cardInfo->setLabel(tr("Probed info"));
+    m_cardInfo->setEnabled(false);
 
     a_cardtype.addTargetedChild("V4L", device);
-    a_cardtype.addTargetedChild("V4L", cardinfo);
-    a_cardtype.addTargetedChild("V4L", vbidev);
-    a_cardtype.addTargetedChild("V4L", new AudioDevice(parent));
-    a_cardtype.addTargetedChild("V4L", new AudioRateLimit(parent));
-    a_cardtype.addTargetedChild("V4L", new SkipBtAudio(parent));
+    a_cardtype.addTargetedChild("V4L", m_cardInfo);
+    a_cardtype.addTargetedChild("V4L", m_vbiDev);
+    a_cardtype.addTargetedChild("V4L", new AudioDevice(m_parent));
+    a_cardtype.addTargetedChild("V4L", new AudioRateLimit(m_parent));
+    a_cardtype.addTargetedChild("V4L", new SkipBtAudio(m_parent));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -2075,34 +2071,33 @@ void V4LConfigurationGroup::probeCard(const QString &device)
         close(videofd);
     }
 
-    cardinfo->setValue(ci);
-    vbidev->setFilter(cn, dn);
+    m_cardInfo->setValue(ci);
+    m_vbiDev->setFilter(cn, dn);
 }
 
 MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
                                                CardType &a_cardtype) :
-    parent(a_parent),
-    device(nullptr), vbidevice(nullptr),
-    cardinfo(new TransTextEditSetting())
+    m_parent(a_parent),
+    m_cardInfo(new TransTextEditSetting())
 {
     setVisible(false);
     QString drv = "ivtv|(saa7164(.*))";
-    device    = new VideoDevice(parent, 0, 15, QString(), drv);
-    vbidevice = new VBIDevice(parent);
-    vbidevice->setVisible(false);
+    m_device    = new VideoDevice(m_parent, 0, 15, QString(), drv);
+    m_vbiDevice = new VBIDevice(m_parent);
+    m_vbiDevice->setVisible(false);
 
-    cardinfo->setLabel(tr("Probed info"));
-    cardinfo->setEnabled(false);
+    m_cardInfo->setLabel(tr("Probed info"));
+    m_cardInfo->setEnabled(false);
 
-    a_cardtype.addTargetedChild("MPEG", device);
-    a_cardtype.addTargetedChild("MPEG", vbidevice);
-    a_cardtype.addTargetedChild("MPEG", cardinfo);
-    a_cardtype.addTargetedChild("MPEG", new ChannelTimeout(parent, 12000, 2000));
+    a_cardtype.addTargetedChild("MPEG", m_device);
+    a_cardtype.addTargetedChild("MPEG", m_vbiDevice);
+    a_cardtype.addTargetedChild("MPEG", m_cardInfo);
+    a_cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12000, 2000));
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(m_device, SIGNAL(valueChanged(const QString&)),
+            this,     SLOT(  probeCard(   const QString&)));
 
-    probeCard(device->getValue());
+    probeCard(m_device->getValue());
 }
 
 void MPEGConfigurationGroup::probeCard(const QString &device)
@@ -2120,32 +2115,32 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
         close(videofd);
     }
 
-    cardinfo->setValue(ci);
-    vbidevice->setVisible(dn!="ivtv");
-    vbidevice->setFilter(cn, dn);
+    m_cardInfo->setValue(ci);
+    m_vbiDevice->setVisible(dn!="ivtv");
+    m_vbiDevice->setFilter(cn, dn);
 }
 
 DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
                                                CardType &a_cardtype) :
-    parent(a_parent),
-    info(new TransTextEditSetting()), size(new TransTextEditSetting())
+    m_parent(a_parent),
+    m_info(new TransTextEditSetting()), m_size(new TransTextEditSetting())
 {
     setVisible(false);
-    FileDevice *device = new FileDevice(parent);
+    FileDevice *device = new FileDevice(m_parent);
     device->setHelpText(tr("A local MPEG file used to simulate a recording."));
 
     a_cardtype.addTargetedChild("DEMO", device);
 
-    a_cardtype.addTargetedChild("DEMO", new EmptyAudioDevice(parent));
-    a_cardtype.addTargetedChild("DEMO", new EmptyVBIDevice(parent));
+    a_cardtype.addTargetedChild("DEMO", new EmptyAudioDevice(m_parent));
+    a_cardtype.addTargetedChild("DEMO", new EmptyVBIDevice(m_parent));
 
-    info->setLabel(tr("File info"));
-    info->setEnabled(false);
-    a_cardtype.addTargetedChild("DEMO", info);
+    m_info->setLabel(tr("File info"));
+    m_info->setEnabled(false);
+    a_cardtype.addTargetedChild("DEMO", m_info);
 
-    size->setLabel(tr("File size"));
-    size->setEnabled(false);
-    a_cardtype.addTargetedChild("DEMO", size);
+    m_size->setLabel(tr("File size"));
+    m_size->setEnabled(false);
+    a_cardtype.addTargetedChild("DEMO", m_size);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -2172,30 +2167,30 @@ void DemoConfigurationGroup::probeCard(const QString &device)
         ci = tr("File does not exist");
     }
 
-    info->setValue(ci);
-    size->setValue(cs);
+    m_info->setValue(ci);
+    m_size->setValue(cs);
 }
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
                                                        CardType &a_cardtype) :
-    parent(a_parent),
-    info(new TransTextEditSetting())
+    m_parent(a_parent),
+    m_info(new TransTextEditSetting())
 {
     setVisible(false);
-    CommandPath *device = new CommandPath(parent);
+    CommandPath *device = new CommandPath(m_parent);
     device->setLabel(tr("Command path"));
     device->setHelpText(tr("A 'black box' application controlled via "
                            "stdin, status on stderr and TransportStream "
                            "read from stdout"));
     a_cardtype.addTargetedChild("EXTERNAL", device);
 
-    info->setLabel(tr("File info"));
-    info->setEnabled(false);
-    a_cardtype.addTargetedChild("EXTERNAL", info);
+    m_info->setLabel(tr("File info"));
+    m_info->setEnabled(false);
+    a_cardtype.addTargetedChild("EXTERNAL", m_info);
 
     a_cardtype.addTargetedChild("EXTERNAL",
-                                new ChannelTimeout(parent, 20000, 1750));
+                                new ChannelTimeout(m_parent, 20000, 1750));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeApp(   const QString&)));
@@ -2227,30 +2222,29 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
              .arg(fileInfo.absoluteFilePath());
     }
 
-    info->setValue(ci);
+    m_info->setValue(ci);
 }
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
 
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
-    parent(a_parent), cardinfo(new GroupSetting()),
-    audioinput(new TunerCardAudioInput(parent, QString(), "HDPVR")),
-    vbidevice(nullptr)
+    m_parent(a_parent), m_cardInfo(new GroupSetting()),
+    m_audioInput(new TunerCardAudioInput(m_parent, QString(), "HDPVR"))
 {
     setVisible(false);
 
     VideoDevice *device =
-        new VideoDevice(parent, 0, 15, QString(), "hdpvr");
+        new VideoDevice(m_parent, 0, 15, QString(), "hdpvr");
 
-    cardinfo->setLabel(tr("Probed info"));
-    cardinfo->setEnabled(false);
+    m_cardInfo->setLabel(tr("Probed info"));
+    m_cardInfo->setEnabled(false);
 
     a_cardtype.addTargetedChild("HDPVR", device);
-    a_cardtype.addTargetedChild("HDPVR", new EmptyAudioDevice(parent));
-    a_cardtype.addTargetedChild("HDPVR", new EmptyVBIDevice(parent));
-    a_cardtype.addTargetedChild("HDPVR", cardinfo);
-    a_cardtype.addTargetedChild("HDPVR", audioinput);
-    a_cardtype.addTargetedChild("HDPVR", new ChannelTimeout(parent, 15000, 2000));
+    a_cardtype.addTargetedChild("HDPVR", new EmptyAudioDevice(m_parent));
+    a_cardtype.addTargetedChild("HDPVR", new EmptyVBIDevice(m_parent));
+    a_cardtype.addTargetedChild("HDPVR", m_cardInfo);
+    a_cardtype.addTargetedChild("HDPVR", m_audioInput);
+    a_cardtype.addTargetedChild("HDPVR", new ChannelTimeout(m_parent, 15000, 2000));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -2272,20 +2266,20 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
         close(videofd);
     }
 
-    cardinfo->setValue(ci);
-    audioinput->fillSelections(device);
+    m_cardInfo->setValue(ci);
+    m_audioInput->fillSelections(device);
 }
 
 V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     m_parent(parent),
-    m_cardinfo(new TransTextEditSetting())
+    m_cardInfo(new TransTextEditSetting())
 {
     setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
     m_device = new VideoDevice(m_parent, 0, 15);
 
     cardtype.addTargetedChild("V4L2ENC", m_device);
-    m_cardinfo->setLabel(tr("Probed info"));
-    cardtype.addTargetedChild("V4L2ENC", m_cardinfo);
+    m_cardInfo->setLabel(tr("Probed info"));
+    cardtype.addTargetedChild("V4L2ENC", m_cardInfo);
 
     setVisible(false);
 
@@ -2313,7 +2307,7 @@ void V4L2encGroup::probeCard(const QString &device_name)
     if (!m_DriverName.isEmpty())
         card_info = card_name + "  [" + m_DriverName + "]";
 
-    m_cardinfo->setValue(card_info);
+    m_cardInfo->setValue(card_info);
 
     if (m_device->getSubSettings()->size() == 0)
     {
@@ -2421,9 +2415,9 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
 }
 
 CaptureCard::CaptureCard(bool use_card_group)
-    : id(new ID)
+    : m_id(new ID)
 {
-    addChild(id);
+    addChild(m_id);
     if (use_card_group)
         CaptureCardGroup(*this);
     addChild(new Hostname(*this));
@@ -2473,7 +2467,7 @@ void CaptureCard::fillSelections(GroupSetting *setting)
 
 void CaptureCard::loadByID(int cardid)
 {
-    id->setValue(cardid);
+    m_id->setValue(cardid);
     Load();
 }
 
@@ -2697,11 +2691,11 @@ class InputGroup : public TransMythUIComboBoxSetting
 {
   public:
     InputGroup(const CardInput &parent, uint group_num) :
-        TransMythUIComboBoxSetting(), cardinput(parent),
-        groupnum(group_num), groupid(0)
+        TransMythUIComboBoxSetting(), m_cardInput(parent),
+        m_groupNum(group_num)
     {
         setLabel(QObject::tr("Input group") +
-                 QString(" %1").arg(groupnum + 1));
+                 QString(" %1").arg(m_groupNum + 1));
         setHelpText(QObject::tr(
                         "Leave as 'Generic' unless this input is shared with "
                         "another device. Only one of the inputs in an input "
@@ -2712,11 +2706,11 @@ class InputGroup : public TransMythUIComboBoxSetting
 
     void Save(void) override // StandardSetting
     {
-        uint inputid     = cardinput.getInputID();
+        uint inputid     = m_cardInput.getInputID();
         uint new_groupid = getValue().toUInt();
 
-        if (groupid)
-            CardUtil::UnlinkInputGroup(inputid, groupid);
+        if (m_groupId)
+            CardUtil::UnlinkInputGroup(inputid, m_groupId);
 
         if (new_groupid)
         {
@@ -2728,19 +2722,19 @@ class InputGroup : public TransMythUIComboBoxSetting
     virtual void Save(QString /*destination*/) { Save(); }
 
   private:
-    const CardInput &cardinput;
-    uint             groupnum;
-    uint             groupid;
+    const CardInput &m_cardInput;
+    uint             m_groupNum;
+    uint             m_groupId   {0};
 };
 
 void InputGroup::Load(void)
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("InputGroup::Load() %1 %2")
-            .arg(groupnum).arg(cardinput.getInputID()));
+            .arg(m_groupNum).arg(m_cardInput.getInputID()));
 #endif
 
-    uint             inputid = cardinput.getInputID();
+    uint             inputid = m_cardInput.getInputID();
     QMap<uint, uint> grpcnt;
     vector<QString>  names;
     vector<uint>     grpid;
@@ -2780,13 +2774,13 @@ void InputGroup::Load(void)
     }
 
     // makes sure we select something
-    groupid = 0;
-    if (groupnum < selected_groupids.size())
-        groupid = selected_groupids[groupnum];
+    m_groupId = 0;
+    if (m_groupNum < selected_groupids.size())
+        m_groupId = selected_groupids[m_groupNum];
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("Group num: %1 id: %2")
-            .arg(groupnum).arg(groupid));
+            .arg(m_groupNum).arg(m_groupId));
     {
         QString msg;
         for (uint i = 0; i < selected_groupids.size(); i++)
@@ -2800,7 +2794,7 @@ void InputGroup::Load(void)
     uint index = 0;
     for (uint i = 0; i < names.size(); i++)
     {
-        bool sel = (groupid == grpid[i]);
+        bool sel = (m_groupId == grpid[i]);
         index = (sel) ? i : index;
 
 #if 0
@@ -2980,29 +2974,27 @@ class DishNetEIT : public MythUICheckBoxSetting
 
 CardInput::CardInput(const QString & cardtype, const QString & device,
                      int _cardid) :
-    id(new ID()),
-    inputname(new InputName(*this)),
-    sourceid(new SourceID(*this)),
-    startchan(new StartingChannel(*this)),
-    scan(new ButtonStandardSetting(tr("Scan for channels"))),
-    srcfetch(new ButtonStandardSetting(tr("Fetch channels from listings source"))),
-    externalInputSettings(new DiSEqCDevSettings()),
-    inputgrp0(new InputGroup(*this, 0)),
-    inputgrp1(new InputGroup(*this, 1)),
-    instancecount(nullptr),
-    schedgroup(nullptr)
+    m_id(new ID()),
+    m_inputName(new InputName(*this)),
+    m_sourceId(new SourceID(*this)),
+    m_startChan(new StartingChannel(*this)),
+    m_scan(new ButtonStandardSetting(tr("Scan for channels"))),
+    m_srcFetch(new ButtonStandardSetting(tr("Fetch channels from listings source"))),
+    m_externalInputSettings(new DiSEqCDevSettings()),
+    m_inputGrp0(new InputGroup(*this, 0)),
+    m_inputGrp1(new InputGroup(*this, 1))
 {
-    addChild(id);
+    addChild(m_id);
 
     if (CardUtil::IsInNeedOfExternalInputConf(_cardid))
     {
-        addChild(new DTVDeviceConfigGroup(*externalInputSettings,
+        addChild(new DTVDeviceConfigGroup(*m_externalInputSettings,
                                           _cardid, true));
     }
 
-    addChild(inputname);
+    addChild(m_inputName);
     addChild(new InputDisplayName(*this));
-    addChild(sourceid);
+    addChild(m_sourceId);
 
     if (CardUtil::IsEncoder(cardtype) || CardUtil::IsUnscanable(cardtype))
     {
@@ -3017,28 +3009,28 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
             addChild(new DishNetEIT(*this));
     }
 
-    scan->setHelpText(
+    m_scan->setHelpText(
         tr("Use channel scanner to find channels for this input."));
 
-    srcfetch->setHelpText(
+    m_srcFetch->setHelpText(
         tr("This uses the listings data source to "
            "provide the channels for this input.") + " " +
         tr("This can take a long time to run."));
 
-    addChild(scan);
-    addChild(srcfetch);
+    addChild(m_scan);
+    addChild(m_srcFetch);
 
-    addChild(startchan);
+    addChild(m_startChan);
 
     GroupSetting *interact = new GroupSetting();
 
     interact->setLabel(QObject::tr("Interactions between inputs"));
     if (CardUtil::IsTunerSharingCapable(cardtype))
     {
-        instancecount = new InstanceCount(*this, kDefaultMultirecCount);
-        interact->addChild(instancecount);
-        schedgroup = new SchedGroup(*this);
-        interact->addChild(schedgroup);
+        m_instanceCount = new InstanceCount(*this, kDefaultMultirecCount);
+        interact->addChild(m_instanceCount);
+        m_schedGroup = new SchedGroup(*this);
+        interact->addChild(m_schedGroup);
     }
     interact->addChild(new InputPriority(*this));
     interact->addChild(new ScheduleOrder(*this, _cardid));
@@ -3051,63 +3043,63 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
                     "share the same resource such as a FireWire card and "
                     "an analog card input controlling the same set top box."));
     interact->addChild(ingrpbtn);
-    interact->addChild(inputgrp0);
-    interact->addChild(inputgrp1);
+    interact->addChild(m_inputGrp0);
+    interact->addChild(m_inputGrp1);
 
     addChild(interact);
 
     setObjectName("CardInput");
     SetSourceID("-1");
 
-    connect(scan,     SIGNAL(clicked()), SLOT(channelScanner()));
-    connect(srcfetch, SIGNAL(clicked()), SLOT(sourceFetch()));
-    connect(sourceid, SIGNAL(valueChanged(const QString&)),
-            startchan,SLOT(  SetSourceID (const QString&)));
-    connect(sourceid, SIGNAL(valueChanged(const QString&)),
-            this,     SLOT(  SetSourceID (const QString&)));
-    connect(ingrpbtn, SIGNAL(clicked()),
-            this,     SLOT(  CreateNewInputGroup()));
-    if (schedgroup)
-        connect(instancecount, SIGNAL(valueChanged(const QString &)),
-                this,     SLOT(UpdateSchedGroup(const QString &)));
+    connect(m_scan,     SIGNAL(clicked()), SLOT(channelScanner()));
+    connect(m_srcFetch, SIGNAL(clicked()), SLOT(sourceFetch()));
+    connect(m_sourceId, SIGNAL(valueChanged(const QString&)),
+            m_startChan,SLOT(  SetSourceID (const QString&)));
+    connect(m_sourceId, SIGNAL(valueChanged(const QString&)),
+            this,       SLOT(  SetSourceID (const QString&)));
+    connect(ingrpbtn,   SIGNAL(clicked()),
+            this,       SLOT(  CreateNewInputGroup()));
+    if (m_schedGroup)
+        connect(m_instanceCount, SIGNAL(valueChanged(const QString &)),
+                this,            SLOT(UpdateSchedGroup(const QString &)));
 }
 
 CardInput::~CardInput()
 {
-    if (externalInputSettings)
+    if (m_externalInputSettings)
     {
-        delete externalInputSettings;
-        externalInputSettings = nullptr;
+        delete m_externalInputSettings;
+        m_externalInputSettings = nullptr;
     }
 }
 
 void CardInput::SetSourceID(const QString &sourceid)
 {
-    uint cid = id->getValue().toUInt();
+    uint cid = m_id->getValue().toUInt();
     QString raw_card_type = CardUtil::GetRawInputType(cid);
     bool enable = (sourceid.toInt() > 0);
-    scan->setEnabled(enable && !raw_card_type.isEmpty() &&
+    m_scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
-    srcfetch->setEnabled(enable);
+    m_srcFetch->setEnabled(enable);
 }
 
 void CardInput::UpdateSchedGroup(const QString &val)
 {
     int value = val.toInt();
     if (value <= 1)
-        schedgroup->setValue(false);
-    schedgroup->setEnabled(value > 1);
+        m_schedGroup->setValue(false);
+    m_schedGroup->setEnabled(value > 1);
 }
 
 QString CardInput::getSourceName(void) const
 {
-    return sourceid->getValueLabel();
+    return m_sourceId->getValueLabel();
 }
 
 void CardInput::CreateNewInputGroup(void)
 {
-    inputgrp0->Save();
-    inputgrp1->Save();
+    m_inputGrp0->Save();
+    m_inputGrp1->Save();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythTextInputDialog *settingdialog =
@@ -3153,26 +3145,26 @@ void CardInput::CreateNewInputGroupSlot(const QString& name)
 
     uint inputgroupid = CardUtil::CreateInputGroup(new_name);
 
-    inputgrp0->Load();
-    inputgrp1->Load();
+    m_inputGrp0->Load();
+    m_inputGrp1->Load();
 
-    if (!inputgrp0->getValue().toUInt())
+    if (!m_inputGrp0->getValue().toUInt())
     {
-        inputgrp0->setValue(
-            inputgrp0->getValueIndex(QString::number(inputgroupid)));
+        m_inputGrp0->setValue(
+            m_inputGrp0->getValueIndex(QString::number(inputgroupid)));
     }
     else
     {
-        inputgrp1->setValue(
-            inputgrp1->getValueIndex(QString::number(inputgroupid)));
+        m_inputGrp1->setValue(
+            m_inputGrp1->getValueIndex(QString::number(inputgroupid)));
     }
 }
 
 void CardInput::channelScanner(void)
 {
-    uint srcid = sourceid->getValue().toUInt();
-    uint crdid = id->getValue().toUInt();
-    QString in = inputname->getValue();
+    uint srcid = m_sourceId->getValue().toUInt();
+    uint crdid = m_id->getValue().toUInt();
+    QString in = m_inputName->getValue();
 
 #ifdef USING_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
@@ -3199,11 +3191,11 @@ void CardInput::channelScanner(void)
                 [=]()
                 {
                     if (SourceUtil::GetChannelCount(srcid))
-                        startchan->SetSourceID(QString::number(srcid));
+                        m_startChan->SetSourceID(QString::number(srcid));
                     if (num_channels_before)
                     {
-                        startchan->Load();
-                        startchan->Save();
+                        m_startChan->Load();
+                        m_startChan->Save();
                     }
                 });
         mainStack->AddScreen(ssd);
@@ -3219,8 +3211,8 @@ void CardInput::channelScanner(void)
 
 void CardInput::sourceFetch(void)
 {
-    uint srcid = sourceid->getValue().toUInt();
-    uint crdid = id->getValue().toUInt();
+    uint srcid = m_sourceId->getValue().toUInt();
+    uint crdid = m_id->getValue().toUInt();
 
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
@@ -3245,11 +3237,11 @@ void CardInput::sourceFetch(void)
     }
 
     if (SourceUtil::GetChannelCount(srcid))
-        startchan->SetSourceID(QString::number(srcid));
+        m_startChan->SetSourceID(QString::number(srcid));
     if (num_channels_before)
     {
-        startchan->Load();
-        startchan->Save();
+        m_startChan->Load();
+        m_startChan->Save();
     }
 }
 
@@ -3280,8 +3272,8 @@ QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
 
 void CardInput::loadByID(int inputid)
 {
-    id->setValue(inputid);
-    externalInputSettings->Load(inputid);
+    m_id->setValue(inputid);
+    m_externalInputSettings->Load(inputid);
     GroupSetting::Load();
 }
 
@@ -3301,14 +3293,14 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
 
 void CardInput::Save(void)
 {
-    uint cardid = id->getValue().toUInt();
+    uint cardid = m_id->getValue().toUInt();
     QString init_input = CardUtil::GetInputName(cardid);
     GroupSetting::Save();
-    externalInputSettings->Store(getInputID());
+    m_externalInputSettings->Store(getInputID());
 
     uint icount = 1;
-    if (instancecount)
-        icount = instancecount->getValue().toUInt();
+    if (m_instanceCount)
+        icount = m_instanceCount->getValue().toUInt();
     vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
 
     // Delete old clone cards as required.
@@ -3502,7 +3494,7 @@ CardInputEditor::CardInputEditor()
 
 void CardInputEditor::Load(void)
 {
-    cardinputs.clear();
+    m_cardInputs.clear();
     clearSettings();
 
     // We do this manually because we want custom labels.  If
@@ -3537,7 +3529,7 @@ void CardInputEditor::Load(void)
         QString inputlabel = QString("%1 (%2) -> %3")
             .arg(CardUtil::GetDeviceLabel(cardtype, videodevice))
             .arg(inputname).arg(cardinput->getSourceName());
-        cardinputs.push_back(cardinput);
+        m_cardInputs.push_back(cardinput);
         cardinput->setLabel(inputlabel);
         addChild(cardinput);
     }
@@ -3591,23 +3583,23 @@ static QString remove_chaff(const QString &name)
 
 void DVBConfigurationGroup::reloadDiseqcTree(const QString &videodevice)
 {
-    if (diseqc_tree)
-        diseqc_tree->Load(videodevice);
+    if (m_diseqcTree)
+        m_diseqcTree->Load(videodevice);
 }
 
 void DVBConfigurationGroup::probeCard(const QString &videodevice)
 {
     if (videodevice.isEmpty())
     {
-        cardname->setValue("");
-        cardtype->setValue("");
+        m_cardName->setValue("");
+        m_cardType->setValue("");
         return;
     }
 
-    if (parent.getCardID() && parent.GetRawCardType() != "DVB")
+    if (m_parent.getCardID() && m_parent.GetRawCardType() != "DVB")
     {
-        cardname->setValue("");
-        cardtype->setValue("");
+        m_cardName->setValue("");
+        m_cardType->setValue("");
         return;
     }
 
@@ -3621,51 +3613,51 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     switch (CardUtil::toInputType(subtype))
     {
         case CardUtil::ERROR_OPEN:
-            cardname->setValue(err_open);
-            cardtype->setValue(strerror(errno));
+            m_cardName->setValue(err_open);
+            m_cardType->setValue(strerror(errno));
             break;
         case CardUtil::ERROR_UNKNOWN:
-            cardname->setValue(err_other);
-            cardtype->setValue("Unknown error");
+            m_cardName->setValue(err_other);
+            m_cardType->setValue("Unknown error");
             break;
         case CardUtil::ERROR_PROBE:
-            cardname->setValue(err_other);
-            cardtype->setValue(strerror(errno));
+            m_cardName->setValue(err_other);
+            m_cardType->setValue(strerror(errno));
             break;
         case CardUtil::QPSK:
-            cardtype->setValue("DVB-S");
-            cardname->setValue(frontend_name);
-            signal_timeout->setValue(7000);
-            channel_timeout->setValue(10000);
+            m_cardType->setValue("DVB-S");
+            m_cardName->setValue(frontend_name);
+            m_signalTimeout->setValue(7000);
+            m_channelTimeout->setValue(10000);
             break;
         case CardUtil::DVBS2:
-            cardtype->setValue("DVB-S2");
-            cardname->setValue(frontend_name);
-            signal_timeout->setValue(7000);
-            channel_timeout->setValue(10000);
+            m_cardType->setValue("DVB-S2");
+            m_cardName->setValue(frontend_name);
+            m_signalTimeout->setValue(7000);
+            m_channelTimeout->setValue(10000);
             break;
         case CardUtil::QAM:
-            cardtype->setValue("DVB-C");
-            cardname->setValue(frontend_name);
-            signal_timeout->setValue(1000);
-            channel_timeout->setValue(3000);
+            m_cardType->setValue("DVB-C");
+            m_cardName->setValue(frontend_name);
+            m_signalTimeout->setValue(1000);
+            m_channelTimeout->setValue(3000);
             break;
         case CardUtil::DVBT2:
-            cardtype->setValue("DVB-T2");
-            cardname->setValue(frontend_name);
-            signal_timeout->setValue(1000);
-            channel_timeout->setValue(3000);
+            m_cardType->setValue("DVB-T2");
+            m_cardName->setValue(frontend_name);
+            m_signalTimeout->setValue(1000);
+            m_channelTimeout->setValue(3000);
             break;
         case CardUtil::OFDM:
         {
-            cardtype->setValue("DVB-T");
-            cardname->setValue(frontend_name);
-            signal_timeout->setValue(1000);
-            channel_timeout->setValue(3000);
+            m_cardType->setValue("DVB-T");
+            m_cardName->setValue(frontend_name);
+            m_signalTimeout->setValue(1000);
+            m_channelTimeout->setValue(3000);
             if (frontend_name.toLower().indexOf("usb") >= 0)
             {
-                signal_timeout->setValue(40000);
-                channel_timeout->setValue(42500);
+                m_signalTimeout->setValue(40000);
+                m_channelTimeout->setValue(42500);
             }
 
             // slow down tuning for buggy drivers
@@ -3673,12 +3665,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
                 (frontend_name ==
                  "TerraTec/qanu USB2.0 Highspeed DVB-T Receiver"))
             {
-                tuning_delay->setValue(200);
+                m_tuningDelay->setValue(200);
             }
 
 #if 0 // frontends on hybrid DVB-T/Analog cards
             QString short_name = remove_chaff(frontend_name);
-            buttonAnalog->setVisible(
+            m_buttonAnalog->setVisible(
                 short_name.startsWith("zarlink zl10353",
                                       Qt::CaseInsensitive) ||
                 short_name.startsWith("wintv hvr 900 m/r: 65008/a1c0",
@@ -3691,23 +3683,23 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         case CardUtil::ATSC:
         {
             QString short_name = remove_chaff(frontend_name);
-            cardtype->setValue("ATSC");
-            cardname->setValue(short_name);
-            signal_timeout->setValue(500);
-            channel_timeout->setValue(3000);
+            m_cardType->setValue("ATSC");
+            m_cardName->setValue(short_name);
+            m_signalTimeout->setValue(500);
+            m_channelTimeout->setValue(3000);
 
             // According to #1779 and #1935 the AverMedia 180 needs
             // a 3000 ms signal timeout, at least for QAM tuning.
             if (frontend_name == "Nextwave NXT200X VSB/QAM frontend")
             {
-                signal_timeout->setValue(3000);
-                channel_timeout->setValue(5500);
+                m_signalTimeout->setValue(3000);
+                m_channelTimeout->setValue(5500);
             }
 
 #if 0 // frontends on hybrid DVB-T/Analog cards
             if (frontend_name.toLower().indexOf("usb") < 0)
             {
-                buttonAnalog->setVisible(
+                m_buttonAnalog->setVisible(
                     short_name.startsWith("pchdtv", Qt::CaseInsensitive) ||
                     short_name.startsWith("dvico", Qt::CaseInsensitive) ||
                     short_name.startsWith("nextwave", Qt::CaseInsensitive));
@@ -3719,14 +3711,14 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             break;
     }
 #else
-    cardtype->setValue(QString("Recompile with DVB-Support!"));
+    m_cardType->setValue(QString("Recompile with DVB-Support!"));
 #endif
 }
 
 TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
                                          QString dev, QString type) :
     CaptureCardComboBoxSetting(parent, false, "audiodevice"),
-    last_device(dev), last_cardtype(type)
+    m_lastDevice(dev), m_lastCardType(type)
 {
     setLabel(QObject::tr("Audio input"));
     setHelpText(QObject::tr("If there is more than one audio input, "
@@ -3735,8 +3727,8 @@ TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
     if (cardid <= 0)
         return;
 
-    last_cardtype = CardUtil::GetRawInputType(cardid);
-    last_device   = CardUtil::GetAudioDevice(cardid);
+    m_lastCardType = CardUtil::GetRawInputType(cardid);
+    m_lastDevice   = CardUtil::GetAudioDevice(cardid);
 }
 
 int TunerCardAudioInput::fillSelections(const QString &device)
@@ -3746,89 +3738,89 @@ int TunerCardAudioInput::fillSelections(const QString &device)
     if (device.isEmpty())
         return 0;
 
-    last_device = device;
+    m_lastDevice = device;
     QStringList inputs =
-        CardUtil::ProbeAudioInputs(device, last_cardtype);
+        CardUtil::ProbeAudioInputs(device, m_lastCardType);
 
     for (uint i = 0; i < (uint)inputs.size(); i++)
     {
         addSelection(inputs[i], QString::number(i),
-                     last_device == QString::number(i));
+                     m_lastDevice == QString::number(i));
     }
     return inputs.size();
 }
 
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
                                              CardType& cardType) :
-    parent(a_parent),
-    diseqc_tree(new DiSEqCDevTree())
+    m_parent(a_parent),
+    m_diseqcTree(new DiSEqCDevTree())
 {
     setVisible(false);
 
-    cardnum  = new DVBCardNum(parent);
-    cardname = new DVBCardName();
-    cardtype = new DVBCardType();
+    m_cardNum  = new DVBCardNum(m_parent);
+    m_cardName = new DVBCardName();
+    m_cardType = new DVBCardType();
 
-    signal_timeout = new SignalTimeout(parent, 500, 250);
-    channel_timeout = new ChannelTimeout(parent, 3000, 1750);
+    m_signalTimeout = new SignalTimeout(m_parent, 500, 250);
+    m_channelTimeout = new ChannelTimeout(m_parent, 3000, 1750);
 
-    cardType.addTargetedChild("DVB", cardnum);
+    cardType.addTargetedChild("DVB", m_cardNum);
 
-    cardType.addTargetedChild("DVB", cardname);
-    cardType.addTargetedChild("DVB", cardtype);
+    cardType.addTargetedChild("DVB", m_cardName);
+    cardType.addTargetedChild("DVB", m_cardType);
 
-    cardType.addTargetedChild("DVB", signal_timeout);
-    cardType.addTargetedChild("DVB", channel_timeout);
+    cardType.addTargetedChild("DVB", m_signalTimeout);
+    cardType.addTargetedChild("DVB", m_channelTimeout);
 
-    cardType.addTargetedChild("DVB", new EmptyAudioDevice(parent));
-    cardType.addTargetedChild("DVB", new EmptyVBIDevice(parent));
+    cardType.addTargetedChild("DVB", new EmptyAudioDevice(m_parent));
+    cardType.addTargetedChild("DVB", new EmptyVBIDevice(m_parent));
 
-    cardType.addTargetedChild("DVB", new DVBNoSeqStart(parent));
-    cardType.addTargetedChild("DVB", new DVBOnDemand(parent));
-    cardType.addTargetedChild("DVB", new DVBEITScan(parent));
+    cardType.addTargetedChild("DVB", new DVBNoSeqStart(m_parent));
+    cardType.addTargetedChild("DVB", new DVBOnDemand(m_parent));
+    cardType.addTargetedChild("DVB", new DVBEITScan(m_parent));
 
-    diseqc_btn = new DeviceTree(*diseqc_tree);
-    diseqc_btn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
-    diseqc_btn->setHelpText(tr("Input and satellite settings."));
-    diseqc_btn->setVisible(false);
+    m_diseqcBtn = new DeviceTree(*m_diseqcTree);
+    m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
+    m_diseqcBtn->setHelpText(tr("Input and satellite settings."));
+    m_diseqcBtn->setVisible(false);
 
-    tuning_delay = new DVBTuningDelay(parent);
-    cardType.addTargetedChild("DVB", tuning_delay);
-    cardType.addTargetedChild("DVB", diseqc_btn);
-    tuning_delay->setVisible(false);
+    m_tuningDelay = new DVBTuningDelay(m_parent);
+    cardType.addTargetedChild("DVB", m_tuningDelay);
+    cardType.addTargetedChild("DVB", m_diseqcBtn);
+    m_tuningDelay->setVisible(false);
 
-    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
+    connect(m_cardNum,    SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
-    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
+    connect(m_cardNum,    SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  reloadDiseqcTree(const QString&)));
 }
 
 DVBConfigurationGroup::~DVBConfigurationGroup()
 {
-    if (diseqc_tree)
+    if (m_diseqcTree)
     {
-        delete diseqc_tree;
-        diseqc_tree = nullptr;
+        delete m_diseqcTree;
+        m_diseqcTree = nullptr;
     }
 }
 
 void DVBConfigurationGroup::Load(void)
 {
-    reloadDiseqcTree(cardnum->getValue());
-    diseqc_btn->Load();
+    reloadDiseqcTree(m_cardNum->getValue());
+    m_diseqcBtn->Load();
     GroupSetting::Load();
-    if (cardtype->getValue() == "DVB-S" ||
-        cardtype->getValue() == "DVB-S2" ||
-        DiSEqCDevTree::Exists(parent.getCardID()))
+    if (m_cardType->getValue() == "DVB-S" ||
+        m_cardType->getValue() == "DVB-S2" ||
+        DiSEqCDevTree::Exists(m_parent.getCardID()))
     {
-        diseqc_btn->setVisible(true);
+        m_diseqcBtn->setVisible(true);
     }
 }
 
 void DVBConfigurationGroup::Save(void)
 {
     GroupSetting::Save();
-    diseqc_tree->Store(parent.getCardID(), cardnum->getValue());
+    m_diseqcTree->Store(m_parent.getCardID(), m_cardNum->getValue());
     DiSEqCDev trees;
     trees.InvalidateTrees();
 }

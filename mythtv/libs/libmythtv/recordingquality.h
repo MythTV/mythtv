@@ -43,10 +43,10 @@ class MTV_PUBLIC RecordingQuality
     QString toStringXML(void) const;
 
   private:
-    int           m_continuity_error_count;
-    int           m_packet_count;
+    int           m_continuity_error_count {0};
+    int           m_packet_count           {0};
     QString       m_program_key;
-    double        m_overall_score;
+    double        m_overall_score          {1.0};
     RecordingGaps m_recording_gaps;
 };
 

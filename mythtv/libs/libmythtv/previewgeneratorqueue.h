@@ -22,31 +22,29 @@ class QSize;
 class PreviewGenState
 {
   public:
-    PreviewGenState() :
-        gen(nullptr), genStarted(false),
-        attempts(0), lastBlockTime(0) {}
+    PreviewGenState() = default;
 
     /// A pointer to the generator that this state object describes.
-    PreviewGenerator *gen;
+    PreviewGenerator *m_gen           {nullptr};
 
     /// The preview generator for this file is currently running.
-    bool              genStarted;
+    bool              m_genStarted    {false};
 
     /// How many attempts have been made to generate a preview for
     /// this file.
-    uint              attempts;
+    uint              m_attempts      {0};
 
     /// The amount of time (in seconds) that this generator was
     /// blocked before it could start. Initialized to zero.
-    uint              lastBlockTime;
+    uint              m_lastBlockTime {0};
 
     /// Any request to generate an image will be ignored until after
     /// this time.
-    QDateTime         blockRetryUntil;
+    QDateTime         m_blockRetryUntil;
 
     /// The full set of tokens for all callers that have requested
     /// this preview.
-    QSet<QString>     tokens;
+    QSet<QString>     m_tokens;
 };
 typedef QMap<QString,PreviewGenState> PreviewMap;
 
@@ -145,10 +143,10 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     /// processed is the one at the *back* of the queue.
     QStringList            m_queue;
     /// The number of threads currently generating previews.
-    uint                   m_running;
+    uint                   m_running    {0};
     /// The maximum number of threads that may concurrently generate
     /// previews.
-    uint                   m_maxThreads;
+    uint                   m_maxThreads {2};
     /// How many times total will the code attempt to generate a
     /// preview for a specific file, before giving up and ignoring all
     /// future requests.

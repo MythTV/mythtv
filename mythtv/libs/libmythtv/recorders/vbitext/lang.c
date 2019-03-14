@@ -140,7 +140,7 @@ add_enhance(struct enhance *eh, int dcode, unsigned int *t)
 }
 
 void
-enhance(struct enhance *eh, struct vt_page *vtp)
+do_enhancements(struct enhance *eh, struct vt_page *vtp)
 {
     int row = 0;
     unsigned int *p, *e;

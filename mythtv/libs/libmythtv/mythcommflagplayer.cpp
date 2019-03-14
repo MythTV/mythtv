@@ -73,12 +73,12 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     // clear out any existing seektables
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->playingInfo)
+    if (player_ctx->m_playingInfo)
     {
-        player_ctx->playingInfo->ClearPositionMap(MARK_KEYFRAME);
-        player_ctx->playingInfo->ClearPositionMap(MARK_GOP_START);
-        player_ctx->playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
-        player_ctx->playingInfo->ClearPositionMap(MARK_DURATION_MS);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_KEYFRAME);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_GOP_START);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_DURATION_MS);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
@@ -117,8 +117,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         {
             inuse_timer.restart();
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            if (player_ctx->playingInfo)
-                player_ctx->playingInfo->UpdateInUseMark();
+            if (player_ctx->m_playingInfo)
+                player_ctx->m_playingInfo->UpdateInUseMark();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 

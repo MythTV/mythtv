@@ -6742,7 +6742,7 @@ elif enabled gcc; then
     check_cflags -Wjump-misses-init
     check_cflags -Wlogical-op
     check_cflags -Wnull-dereference
-    #check_cflags -Wshadow
+    check_cflags -Wshadow
 elif enabled llvm_gcc; then
     check_cflags -mllvm -stack-alignment=16
 elif enabled clang; then
@@ -6842,7 +6842,7 @@ if enabled gxx; then
     check_cxxflags -Wmissing-declarations
     check_cxxflags -Wnull-dereference
     check_cxxflags -Woverloaded-virtual
-    #check_cxxflags -Wshadow
+    check_cxxflags -Wshadow
 
     # This warning flag isn't enabled yet because it will require a
     # large number of changes to the code to eliminate all the

@@ -152,12 +152,12 @@ TransportScanItem::TransportScanItem(uint _sourceid,
  */
 uint TransportScanItem::GetMultiplexIdFromDB(void) const
 {
-    int m_mplexid = 0;
+    int mplexid = 0;
 
-    for (uint i = 0; (i < offset_cnt()) && (m_mplexid <= 0); i++)
-        m_mplexid = ChannelUtil::GetMplexID(m_sourceID, freq_offset(i));
+    for (uint i = 0; (i < offset_cnt()) && (mplexid <= 0); i++)
+        mplexid = ChannelUtil::GetMplexID(m_sourceID, freq_offset(i));
 
-    return m_mplexid < 0 ? 0 : m_mplexid;
+    return mplexid < 0 ? 0 : mplexid;
 }
 
 uint64_t TransportScanItem::freq_offset(uint i) const

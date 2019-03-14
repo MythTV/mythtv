@@ -88,7 +88,7 @@ vbi_send_page(struct vbi *vbi, struct raw_page *rvtp, int page)
        {
            struct vt_page *cvtp = 0;
            rvtp->page->flags &= ~PG_ACTIVE;
-           enhance(rvtp->enh, rvtp->page);
+           do_enhancements(rvtp->enh, rvtp->page);
 //         if (vbi->cache)
 //             cvtp = vbi->cache->op->put(vbi->cache, rvtp->page);
            vbi_send(vbi, EV_PAGE, 0, 0, 0, cvtp ?: rvtp->page);

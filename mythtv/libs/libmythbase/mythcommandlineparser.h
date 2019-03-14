@@ -93,7 +93,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QString                 m_deprecated;
     QString                 m_removed;
     QString                 m_removedversion;
-    QVariant::Type          m_type;
+    QVariant::Type          m_type      {QVariant::Invalid};
     QVariant                m_default;
     QVariant                m_stored;
 

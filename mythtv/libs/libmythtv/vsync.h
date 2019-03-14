@@ -95,12 +95,12 @@ class VideoSync
     int64_t GetTime(void);
     int CalcDelay(int nominal_frame_interval);
 
-    VideoOutput *m_video_output;
-    int m_refresh_interval; // of display
-    int64_t m_nexttrigger;
-    int m_delay;
+    VideoOutput *m_video_output     {nullptr};
+    int          m_refresh_interval; // of display
+    int64_t      m_nexttrigger      {0};
+    int          m_delay            {-1};
     
-    static int s_forceskip;
+    static int   s_forceskip;
 };
 
 #ifndef _WIN32
@@ -124,7 +124,7 @@ class DRMVideoSync : public VideoSync
 
   private:
     int m_dri_fd;
-    static const char *sm_dri_dev;
+    static const char *s_dri_dev;
     
 };
 #endif // !_WIN32
@@ -169,17 +169,17 @@ class RTCVideoSync : public VideoSync
 class BusyWaitVideoSync : public VideoSync
 {
   public:
-    BusyWaitVideoSync(VideoOutput *, int refresh_interval);
+    BusyWaitVideoSync(VideoOutput *vo, int ri) : VideoSync(vo, ri) {};
     ~BusyWaitVideoSync() = default;
 
     QString getName(void) const override // VideoSync
         { return QString("USleep with busy wait"); }
-    bool TryInit(void) override; // VideoSync
+    bool TryInit(void) override {return true; } // VideoSync
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override; // VideoSync
 
   private:
-    int m_cheat;
-    int m_fudge;
+    int m_cheat {5000};
+    int m_fudge {0};
 };
 
 /** \brief Video synchronization classes employing only usleep().
@@ -195,12 +195,12 @@ class BusyWaitVideoSync : public VideoSync
 class USleepVideoSync : public VideoSync
 {
   public:
-    USleepVideoSync(VideoOutput *, int refresh_interval);
+    USleepVideoSync(VideoOutput *vo, int ri) : VideoSync(vo, ri) {}
     ~USleepVideoSync() = default;
 
     QString getName(void) const override // VideoSync
         { return QString("USleep"); }
-    bool TryInit(void) override; // VideoSync
+    bool TryInit(void) override {return true; } // VideoSync
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override; // VideoSync
 };
 

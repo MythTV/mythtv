@@ -96,25 +96,25 @@ public:
     static void fillSelections(GroupSetting* setting);
     static void getHostNames(QStringList* hostnames);
     int getProfileNum(void) const {
-        return id->getValue().toInt();
+        return m_id->getValue().toInt();
     };
 
     int isDefault(void) const {
-        return is_default->getValue().toInt();
+        return m_is_default->getValue().toInt();
     };
 
-    QString getName(void) const { return name->getValue(); };
+    QString getName(void) const { return m_name->getValue(); };
     static QString getName(int group);
     void setName(const QString& newName) override // StandardSetting
-        { name->setValue(newName); };
+        { m_name->setValue(newName); };
     bool allowedGroupName(void);
 
 private:
 
-    ID* id;
-    Name* name;
-    HostName* host;
-    Is_default* is_default;
+    ID         *m_id         {nullptr};
+    Name       *m_name       {nullptr};
+    HostName   *m_host       {nullptr};
+    Is_default *m_is_default {nullptr};
 };
 
 class MTV_PUBLIC ProfileGroupEditor :

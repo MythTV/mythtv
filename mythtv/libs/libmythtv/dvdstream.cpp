@@ -58,12 +58,12 @@ DVDStream::~DVDStream()
 {
     KillReadAheadThread();
 
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
     if (m_reader)
         DVDClose(m_reader);
 
-    rwlock.unlock();
+    m_rwLock.unlock();
 }
 
 /** \fn DVDStream::OpenFile(const QString &, uint)
@@ -76,7 +76,7 @@ DVDStream::~DVDStream()
  */
 bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
 {
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
     const QString root = filename.section("/VIDEO_TS/", 0, 0);
     const QString path = filename.section(root, 1);
@@ -88,7 +88,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
     if (!m_reader)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("DVDStream DVDOpen(%1) failed").arg(filename));
-        rwlock.unlock();
+        m_rwLock.unlock();
         return false;
     }
 
@@ -103,7 +103,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
                 arg(root).arg(path));
             DVDClose(m_reader);
             m_reader = nullptr;
-            rwlock.unlock();
+            m_rwLock.unlock();
             return false;
         }
         else
@@ -151,16 +151,16 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             LOG(VB_GENERAL, LOG_ERR, "DVDStream DVDOpenFile(VOBS_1) failed");
     }
 
-    rwlock.unlock();
+    m_rwLock.unlock();
     return true;
 }
 
 //virtual
 bool DVDStream::IsOpen(void) const
 {
-    rwlock.lockForRead();
+    m_rwLock.lockForRead();
     bool ret = m_reader != nullptr;
-    rwlock.unlock();
+    m_rwLock.unlock();
     return ret;
 }
 
@@ -263,13 +263,13 @@ long long DVDStream::SeekInternal(long long pos, int whence)
         return -1;
     }
 
-    poslock.lockForWrite();
+    m_posLock.lockForWrite();
 
     m_pos = lb;
 
-    poslock.unlock();
+    m_posLock.unlock();
 
-    generalWait.wakeAll();
+    m_generalWait.wakeAll();
 
     return pos;
 }
@@ -277,9 +277,9 @@ long long DVDStream::SeekInternal(long long pos, int whence)
 //virtual
 long long DVDStream::GetReadPosition(void)  const
 {
-    poslock.lockForRead();
+    m_posLock.lockForRead();
     long long ret = (long long)m_pos * DVD_VIDEO_LB_LEN;
-    poslock.unlock();
+    m_posLock.unlock();
     return ret;
 }
 

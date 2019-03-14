@@ -1377,43 +1377,42 @@ class ImageSize : public GroupSetting
 
 // id and name will be deleted by ConfigurationGroup's destructor
 RecordingProfile::RecordingProfile(QString profName)
-    : id(new ID()),        name(new Name(*this)),
-      imageSize(nullptr),  videoSettings(nullptr),
-      audioSettings(nullptr), profileName(profName),
-      isEncoder(true),     v4l2util(nullptr)
+    : m_id(new ID()),
+      m_name(new Name(*this)),
+      m_profileName(profName)
 {
     // This must be first because it is needed to load/save the other settings
-    addChild(id);
+    addChild(m_id);
 
     setLabel(profName);
-    addChild(name);
+    addChild(m_name);
 
-    tr_filters = nullptr;
-    tr_lossless = nullptr;
-    tr_resize = nullptr;
+    m_trFilters  = nullptr;
+    m_trLossless = nullptr;
+    m_trResize   = nullptr;
 
     if (!profName.isEmpty())
     {
         if (profName.startsWith("Transcoders"))
         {
-            tr_filters = new TranscodeFilters(*this);
-            tr_lossless = new TranscodeLossless(*this);
-            tr_resize = new TranscodeResize(*this);
-            addChild(tr_filters);
-            addChild(tr_lossless);
-            addChild(tr_resize);
+            m_trFilters  = new TranscodeFilters(*this);
+            m_trLossless = new TranscodeLossless(*this);
+            m_trResize   = new TranscodeResize(*this);
+            addChild(m_trFilters);
+            addChild(m_trLossless);
+            addChild(m_trResize);
         }
         else
             addChild(new AutoTranscode(*this));
     }
     else
     {
-        tr_filters = new TranscodeFilters(*this);
-        tr_lossless = new TranscodeLossless(*this);
-        tr_resize = new TranscodeResize(*this);
-        addChild(tr_filters);
-        addChild(tr_lossless);
-        addChild(tr_resize);
+        m_trFilters  = new TranscodeFilters(*this);
+        m_trLossless = new TranscodeLossless(*this);
+        m_trResize   = new TranscodeResize(*this);
+        addChild(m_trFilters);
+        addChild(m_trLossless);
+        addChild(m_trResize);
         addChild(new AutoTranscode(*this));
     }
 };
@@ -1421,27 +1420,27 @@ RecordingProfile::RecordingProfile(QString profName)
 RecordingProfile::~RecordingProfile(void)
 {
 #ifdef USING_V4L2
-    delete v4l2util;
-    v4l2util = nullptr;
+    delete m_v4l2util;
+    m_v4l2util = nullptr;
 #endif
 }
 
 void RecordingProfile::ResizeTranscode(const QString &)
 {
-    if (imageSize)
-        imageSize->setEnabled(tr_resize->boolValue());
+    if (m_imageSize)
+        m_imageSize->setEnabled(m_trResize->boolValue());
 }
 
 void RecordingProfile::SetLosslessTranscode(const QString &)
 {
-    bool lossless = tr_lossless->boolValue();
-    bool show_size = (lossless) ? false : tr_resize->boolValue();
-    if (imageSize)
-        imageSize->setEnabled(show_size);
-    videoSettings->setEnabled(! lossless);
-    audioSettings->setEnabled(! lossless);
-    tr_resize->setEnabled(! lossless);
-    tr_filters->setEnabled(! lossless);
+    bool lossless = m_trLossless->boolValue();
+    bool show_size = (lossless) ? false : m_trResize->boolValue();
+    if (m_imageSize)
+        m_imageSize->setEnabled(show_size);
+    m_videoSettings->setEnabled(! lossless);
+    m_audioSettings->setEnabled(! lossless);
+    m_trResize->setEnabled(! lossless);
+    m_trFilters->setEnabled(! lossless);
 }
 
 void RecordingProfile::loadByID(int profileId)
@@ -1474,12 +1473,12 @@ void RecordingProfile::FiltersChanged(const QString &val)
     // If there are filters, we cannot do lossless transcoding
     if (!val.trimmed().isEmpty())
     {
-       tr_lossless->setValue(false);
-       tr_lossless->setEnabled(false);
+       m_trLossless->setValue(false);
+       m_trLossless->setEnabled(false);
     }
     else
     {
-       tr_lossless->setEnabled(true);
+       m_trLossless->setEnabled(true);
     }
 }
 
@@ -1493,9 +1492,9 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
 #ifdef USING_V4L2
     if (cardtype == "V4L2ENC")
     {
-        v4l2util = new V4L2util(videodev);
-        if (v4l2util->IsOpen())
-            cardtype = v4l2util->ProfileName();
+        m_v4l2util = new V4L2util(videodev);
+        if (m_v4l2util->IsOpen())
+            cardtype = m_v4l2util->ProfileName();
     }
 #else
     Q_UNUSED(videodev);
@@ -1573,12 +1572,12 @@ bool RecordingProfile::loadByGroup(const QString &name, const QString &group)
 void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                                     const QString &name)
 {
-    if (profileName.isEmpty())
-        profileName = name;
+    if (m_profileName.isEmpty())
+        m_profileName = name;
 
-    isEncoder = CardUtil::IsEncoder(type);
+    m_isEncoder = CardUtil::IsEncoder(type);
 
-    if (isEncoder)
+    if (m_isEncoder)
     {
 #ifdef USING_V4L2
         if (type.startsWith("V4L2:"))
@@ -1589,14 +1588,14 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                 QStringList::iterator Idev = devices.begin();
                 for ( ; Idev != devices.end(); ++Idev)
                 {
-                    if (v4l2util)
-                        delete v4l2util;
-                    v4l2util = new V4L2util(*Idev);
-                    if (v4l2util->IsOpen() &&
-                        v4l2util->DriverName() == type.mid(5))
+                    if (m_v4l2util)
+                        delete m_v4l2util;
+                    m_v4l2util = new V4L2util(*Idev);
+                    if (m_v4l2util->IsOpen() &&
+                        m_v4l2util->DriverName() == type.mid(5))
                         break;
-                    delete v4l2util;
-                    v4l2util = nullptr;
+                    delete m_v4l2util;
+                    m_v4l2util = nullptr;
                 }
             }
         }
@@ -1605,30 +1604,30 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
         QString tvFormat = gCoreContext->GetSetting("TVFormat");
         // TODO: When mpegrecorder is removed, don't check for "HDPVR' anymore...
         if (type != "HDPVR" &&
-            (!v4l2util
+            (!m_v4l2util
 #ifdef USING_V4L2
-             || v4l2util->UserAdjustableResolution()
+             || m_v4l2util->UserAdjustableResolution()
 #endif
             ))
         {
-            addChild(new ImageSize(*this, tvFormat, profileName));
+            addChild(new ImageSize(*this, tvFormat, m_profileName));
         }
-        videoSettings = new VideoCompressionSettings(*this,
-                                                     v4l2util);
-        addChild(videoSettings);
+        m_videoSettings = new VideoCompressionSettings(*this,
+                                                       m_v4l2util);
+        addChild(m_videoSettings);
 
-        audioSettings = new AudioCompressionSettings(*this,
-                                                     v4l2util);
-        addChild(audioSettings);
+        m_audioSettings = new AudioCompressionSettings(*this,
+                                                       m_v4l2util);
+        addChild(m_audioSettings);
 
-        if (!profileName.isEmpty() && profileName.startsWith("Transcoders"))
+        if (!m_profileName.isEmpty() && m_profileName.startsWith("Transcoders"))
         {
-            connect(tr_resize,   SIGNAL(valueChanged   (const QString &)),
-                    this,        SLOT(  ResizeTranscode(const QString &)));
-            connect(tr_lossless, SIGNAL(valueChanged        (const QString &)),
-                    this,        SLOT(  SetLosslessTranscode(const QString &)));
-            connect(tr_filters,  SIGNAL(valueChanged(const QString&)),
-                    this,        SLOT(FiltersChanged(const QString&)));
+            connect(m_trResize,   SIGNAL(valueChanged   (const QString &)),
+                    this,         SLOT(  ResizeTranscode(const QString &)));
+            connect(m_trLossless, SIGNAL(valueChanged        (const QString &)),
+                    this,         SLOT(  SetLosslessTranscode(const QString &)));
+            connect(m_trFilters,  SIGNAL(valueChanged(const QString&)),
+                    this,         SLOT(FiltersChanged(const QString&)));
         }
     }
     else if (type.toUpper() == "DVB")
@@ -1641,16 +1640,16 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
         addChild(new RecordFullTSStream(*this));
     }
 
-    id->setValue(profileId);
+    m_id->setValue(profileId);
     Load();
 }
 
 void RecordingProfile::setCodecTypes()
 {
-    if (videoSettings)
-        videoSettings->selectCodecs(groupType());
-    if (audioSettings)
-        audioSettings->selectCodecs(groupType());
+    if (m_videoSettings)
+        m_videoSettings->selectCodecs(groupType());
+    if (m_audioSettings)
+        m_audioSettings->selectCodecs(groupType());
 }
 
 RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
@@ -1925,7 +1924,7 @@ void RecordingProfile::deleteEntry(void)
         "FROM recordingprofiles "
         "WHERE id = :ID");
 
-    result.bindValue(":ID", id->getValue());
+    result.bindValue(":ID", m_id->getValue());
 
     if (!result.exec())
         MythDB::DBError("RecordingProfile::deleteEntry", result);

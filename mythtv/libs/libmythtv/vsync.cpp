@@ -109,8 +109,7 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
  *         video synchronization method.
  */
 VideoSync::VideoSync(VideoOutput *video_output, int refreshint) :
-    m_video_output(video_output), m_refresh_interval(refreshint),
-    m_nexttrigger(0), m_delay(-1)
+    m_video_output(video_output), m_refresh_interval(refreshint)
 {
 }
 
@@ -208,7 +207,7 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
     return ret;
 }
 
-const char *DRMVideoSync::sm_dri_dev = "/dev/dri/card0";
+const char *DRMVideoSync::s_dri_dev = "/dev/dri/card0";
 
 DRMVideoSync::DRMVideoSync(VideoOutput *vo, int ri) :
     VideoSync(vo, ri)
@@ -227,12 +226,12 @@ bool DRMVideoSync::TryInit(void)
 {
     drm_wait_vblank_t blank;
 
-    m_dri_fd = open(sm_dri_dev, O_RDWR);
+    m_dri_fd = open(s_dri_dev, O_RDWR);
     if (m_dri_fd < 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DRMVideoSync: Could not open device %1, %2")
-                .arg(sm_dri_dev).arg(strerror(errno)));
+                .arg(s_dri_dev).arg(strerror(errno)));
         return false; // couldn't open device
     }
 
@@ -364,18 +363,6 @@ int RTCVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 }
 #endif /* __linux__ */
 
-BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
-{
-    m_cheat = 5000;
-    m_fudge = 0;
-}
-
-bool BusyWaitVideoSync::TryInit(void)
-{
-    return true;
-}
-
 int BusyWaitVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 {
     // Offset for externally-provided A/V sync delay
@@ -406,16 +393,6 @@ int BusyWaitVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
             m_cheat -= 200;
     }
     return 0;
-}
-
-USleepVideoSync::USleepVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
-{
-}
-
-bool USleepVideoSync::TryInit(void)
-{
-    return true;
 }
 
 int USleepVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)

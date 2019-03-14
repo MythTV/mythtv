@@ -150,7 +150,7 @@ class MTV_PUBLIC ChannelUtil
 
     static bool    DeleteChannel(uint channel_id);
 
-    static bool    SetVisible(uint channel_id, bool hidden);
+    static bool    SetVisible(uint channel_id, bool visible);
 
     static bool    SetServiceVersion(int mplexid, int version);
 

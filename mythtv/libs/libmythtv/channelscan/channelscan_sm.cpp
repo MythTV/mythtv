@@ -175,7 +175,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         }
         else if (query.next())
         {
-            uint nitid = query.value(0).toInt();
+            int nitid = query.value(0).toInt();
             data->SetRealNetworkID(nitid);
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Setting NIT-ID to %1").arg(nitid));
@@ -896,13 +896,17 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         {
             m_currentInfo->m_program_encryption_status[it.key()] = *it;
 
-            QString msg_tr1 = QObject::tr("Program %1").arg(it.key());
-            QString msg_tr2 = QObject::tr("Unknown decryption status");
-            if (kEncEncrypted == *it)
-                msg_tr2 = QObject::tr("Encrypted");
-            else if (kEncDecrypted == *it)
-                msg_tr2 = QObject::tr("Decrypted");
-            QString msg_tr =QString("%1, %2").arg(msg_tr1).arg(msg_tr2);
+            if (m_testDecryption)
+            {
+                QString msg_tr1 = QObject::tr("Program %1").arg(it.key());
+                QString msg_tr2 = QObject::tr("Unknown decryption status");
+                if (kEncEncrypted == *it)
+                    msg_tr2 = QObject::tr("Encrypted");
+                else if (kEncDecrypted == *it)
+                    msg_tr2 = QObject::tr("Decrypted");
+                QString msg_tr =QString("%1, %2").arg(msg_tr1).arg(msg_tr2);
+                m_scanMonitor->ScanAppendTextToLog(msg_tr);
+            }
 
             QString msg = LOC + QString("Program %1").arg(it.key());
             if (kEncEncrypted == *it)
@@ -912,7 +916,6 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             else if (kEncUnknown == *it)
                 msg = msg + " -- Unknown decryption status";
 
-            m_scanMonitor->ScanAppendTextToLog(msg_tr);
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
     }
@@ -968,7 +971,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         }
 
         SignalMonitor *sm = GetSignalMonitor();
-        if ((m_timer.elapsed() > (int)m_channelTimeout))
+        if (HasTimedOut())
         {
             msg_tr = (cchan_cnt) ?
                 QObject::tr("%1 possible channels").arg(cchan_cnt) :
@@ -1306,6 +1309,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // NIT
     QMap<qlonglong, uint> ukChanNums;
+    QMap<qlonglong, uint> scnChanNums;
     QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
@@ -1335,18 +1339,40 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                           nit->TransportDescriptorsLength(i));
 
-                const unsigned char *desc =
-                    MPEGDescriptor::Find(
-                        list, PrivateDescriptorID::dvb_logical_channel_descriptor);
-
-                if (desc)
+                // Logical channel numbers
                 {
-                    DVBLogicalChannelDescriptor uklist(desc);
-                    for (uint j = 0; j < uklist.ChannelCount(); ++j)
+                    const unsigned char *desc =
+                        MPEGDescriptor::Find(
+                            list, PrivateDescriptorID::dvb_logical_channel_descriptor);
+
+                    if (desc)
                     {
-                        ukChanNums[((qlonglong)info.m_orig_netid<<32) |
-                                   uklist.ServiceID(j)] =
-                            uklist.ChannelNumber(j);
+                        DVBLogicalChannelDescriptor uklist(desc);
+                        for (uint j = 0; j < uklist.ChannelCount(); ++j)
+                        {
+                            ukChanNums[((qlonglong)info.m_orig_netid<<32) |
+                                    uklist.ServiceID(j)] =
+                                uklist.ChannelNumber(j);
+                        }
+                    }
+                }
+
+                // HD Simulcast logical channel numbers
+                {
+                    const unsigned char *desc =
+                        MPEGDescriptor::Find(
+                            list, PrivateDescriptorID::dvb_simulcast_channel_descriptor);
+
+                    if (desc)
+                    {
+                        DVBSimulcastChannelDescriptor scnlist(desc);
+
+                        for (uint j = 0; j < scnlist.ChannelCount(); ++j)
+                        {
+                            scnChanNums[((qlonglong)info.m_orig_netid<<32) |
+                                        scnlist.ServiceID(j)] =
+                                 scnlist.ChannelNumber(j);
+                        }
                     }
                 }
             }
@@ -1364,11 +1390,30 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
         if (iptv_channel.isEmpty()) // DVB Logical channel numbers (LCN)
         {
-            QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
-                       (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
+            {
+                // Look for a logical channel number in the HD simulcast channel numbers.
+                // This gives the correct channel number when HD and SD versions of the same
+                // channel are simultaneously broadcast and the receiver is capable
+                // of receiving the HD signal.
+                QMap<qlonglong, uint>::const_iterator it = scnChanNums.find
+                        (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
 
-            if (it != ukChanNums.end())
-                info.m_chan_num = QString::number(*it);
+                if (it != scnChanNums.end())
+                {
+                    info.m_chan_num = QString::number(*it);
+                    continue;
+                }
+            }
+            {
+                // If there is no simulcast for this channel then descriptor 0x83
+                // gives the logical channel number. This can be either an SD
+                // or an HD channel.
+                QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
+                        (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
+
+                if (it != ukChanNums.end())
+                    info.m_chan_num = QString::number(*it);
+            }
         }
         else // IPTV programs
         {
@@ -1819,6 +1864,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
     {
         GetDTVSignalMonitor()->GetScanStreamData()->Reset();
         GetDTVSignalMonitor()->SetChannel(-1,-1);
+        GetDTVSignalMonitor()->SetDVBService(0, 0, -1);
     }
 
     // Start signal monitor for this channel

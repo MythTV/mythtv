@@ -531,14 +531,14 @@ void RTjpeg::QuantInit(void)
     qtbl.int16[i] = static_cast<int16_t>(cqt[i]);
 }
 
-void RTjpeg::Quant(int16_t *block, int32_t *qtbl)
+void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
 {
  int i;
  mmx_t *bl, *ql;
 
 
  ql=(mmx_t *)qtbl;
- bl=(mmx_t *)block;
+ bl=(mmx_t *)_block;
 
  movq_m2r(RTjpeg_ones, mm6);
  movq_m2r(RTjpeg_half, mm7);
@@ -572,12 +572,12 @@ void RTjpeg::QuantInit()
 {
 }
 
-void RTjpeg::Quant(int16_t *block, int32_t *qtbl)
+void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
 {
  int i;
 
  for(i=0; i<64; i++)
-   block[i]=(int16_t)((block[i]*qtbl[i]+32767)>>16);
+   _block[i]=(int16_t)((_block[i]*qtbl[i]+32767)>>16);
 }
 #endif
 
@@ -3089,10 +3089,10 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
 
 #ifdef MMX
 
-int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
+int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 {
  int i;
- mmx_t *mold=(mmx_t *)old;
+ mmx_t *mold=(mmx_t *)_old;
  mmx_t *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
  static mmx_t neg= { 0xffffffffffffffffULL };
@@ -3126,7 +3126,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
 
  if (result.q)
  {
-  for(i=0; i<16; i++)((uint64_t *)old)[i]=((uint64_t *)rblock)[i];
+  for(i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
   return 0;
  }
  return 1;

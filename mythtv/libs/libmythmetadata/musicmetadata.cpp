@@ -514,7 +514,7 @@ int MusicMetadata::getArtistId()
         // Load the artist id
         query.prepare("SELECT artist_id FROM music_artists "
                     "WHERE artist_name = :ARTIST ;");
-        query.bindValue(":ARTIST", m_artist);
+        query.bindValueNoNull(":ARTIST", m_artist);
 
         if (!query.exec() || !query.isActive())
         {
@@ -528,7 +528,7 @@ int MusicMetadata::getArtistId()
         else
         {
             query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
-            query.bindValue(":ARTIST", m_artist);
+            query.bindValueNoNull(":ARTIST", m_artist);
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
@@ -547,7 +547,7 @@ int MusicMetadata::getArtistId()
         {
             query.prepare("SELECT artist_id FROM music_artists "
                         "WHERE artist_name = :ARTIST ;");
-            query.bindValue(":ARTIST", m_compilation_artist);
+            query.bindValueNoNull(":ARTIST", m_compilation_artist);
             if (!query.exec() || !query.isActive())
             {
                 MythDB::DBError("music select compilation artist id", query);
@@ -560,7 +560,7 @@ int MusicMetadata::getArtistId()
             else
             {
                 query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
-                query.bindValue(":ARTIST", m_compilation_artist);
+                query.bindValueNoNull(":ARTIST", m_compilation_artist);
 
                 if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
                 {
@@ -584,8 +584,8 @@ int MusicMetadata::getAlbumId()
         query.prepare("SELECT album_id FROM music_albums "
                     "WHERE artist_id = :COMP_ARTIST_ID "
                     " AND album_name = :ALBUM ;");
-        query.bindValue(":COMP_ARTIST_ID", m_compartistid);
-        query.bindValue(":ALBUM", m_album);
+        query.bindValueNoNull(":COMP_ARTIST_ID", m_compartistid);
+        query.bindValueNoNull(":ALBUM", m_album);
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("music select album id", query);
@@ -599,8 +599,8 @@ int MusicMetadata::getAlbumId()
         {
             query.prepare("INSERT INTO music_albums (artist_id, album_name, compilation, year) "
                           "VALUES (:COMP_ARTIST_ID, :ALBUM, :COMPILATION, :YEAR);");
-            query.bindValue(":COMP_ARTIST_ID", m_compartistid);
-            query.bindValue(":ALBUM", m_album);
+            query.bindValueNoNull(":COMP_ARTIST_ID", m_compartistid);
+            query.bindValueNoNull(":ALBUM", m_album);
             query.bindValue(":COMPILATION", m_compilation);
             query.bindValue(":YEAR", m_year);
 
@@ -624,7 +624,7 @@ int MusicMetadata::getGenreId()
 
         query.prepare("SELECT genre_id FROM music_genres "
                     "WHERE genre = :GENRE ;");
-        query.bindValue(":GENRE", m_genre);
+        query.bindValueNoNull(":GENRE", m_genre);
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("music select genre id", query);
@@ -637,7 +637,7 @@ int MusicMetadata::getGenreId()
         else
         {
             query.prepare("INSERT INTO music_genres (genre) VALUES (:GENRE);");
-            query.bindValue(":GENRE", m_genre);
+            query.bindValueNoNull(":GENRE", m_genre);
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
@@ -738,7 +738,7 @@ void MusicMetadata::dumpToDatabase()
     query.bindValue(":LENGTH", m_length);
     query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":RATING", m_rating);
-    query.bindValue(":FORMAT", m_format);
+    query.bindValueNoNull(":FORMAT", m_format);
     query.bindValue(":DATE_MOD", MythDate::current());
     query.bindValue(":PLAYCOUNT", m_playcount);
 
@@ -1800,20 +1800,20 @@ void AllStream::addStream(MusicMetadata* mdata)
                   "logourl, genre, country, language, format, metaformat) "
                   "VALUES (:BROADCASTER, :CHANNEL, :DESCRIPTION, :URL1, :URL2, :URL3, :URL4, :URL5, "
                   ":LOGOURL, :GENRE, :COUNTRY, :LANGUAGE, :FORMAT, :METAFORMAT);");
-    query.bindValue(":BROADCASTER", mdata->Broadcaster());
-    query.bindValue(":CHANNEL", mdata->Channel());
-    query.bindValue(":DESCRIPTION", mdata->Description());
-    query.bindValue(":URL1", mdata->Url(0));
-    query.bindValue(":URL2", mdata->Url(1));
-    query.bindValue(":URL3", mdata->Url(2));
-    query.bindValue(":URL4", mdata->Url(3));
-    query.bindValue(":URL5", mdata->Url(4));
-    query.bindValue(":LOGOURL", mdata->LogoUrl());
-    query.bindValue(":GENRE", mdata->Genre());
-    query.bindValue(":COUNTRY", mdata->Country());
-    query.bindValue(":LANGUAGE", mdata->Language());
-    query.bindValue(":FORMAT", mdata->Format());
-    query.bindValue(":METAFORMAT", mdata->MetadataFormat());
+    query.bindValueNoNull(":BROADCASTER", mdata->Broadcaster());
+    query.bindValueNoNull(":CHANNEL", mdata->Channel());
+    query.bindValueNoNull(":DESCRIPTION", mdata->Description());
+    query.bindValueNoNull(":URL1", mdata->Url(0));
+    query.bindValueNoNull(":URL2", mdata->Url(1));
+    query.bindValueNoNull(":URL3", mdata->Url(2));
+    query.bindValueNoNull(":URL4", mdata->Url(3));
+    query.bindValueNoNull(":URL5", mdata->Url(4));
+    query.bindValueNoNull(":LOGOURL", mdata->LogoUrl());
+    query.bindValueNoNull(":GENRE", mdata->Genre());
+    query.bindValueNoNull(":COUNTRY", mdata->Country());
+    query.bindValueNoNull(":LANGUAGE", mdata->Language());
+    query.bindValueNoNull(":FORMAT", mdata->Format());
+    query.bindValueNoNull(":METAFORMAT", mdata->MetadataFormat());
 
     if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
     {
@@ -1854,20 +1854,20 @@ void AllStream::updateStream(MusicMetadata* mdata)
                   "logourl = :LOGOURL, genre = :GENRE, country = :COUNTRY, language = :LANGUAGE, "
                   "format = :FORMAT, metaformat = :METAFORMAT "
                   "WHERE intid = :ID");
-    query.bindValue(":BROADCASTER", mdata->Broadcaster());
-    query.bindValue(":CHANNEL", mdata->Channel());
-    query.bindValue(":DESCRIPTION", mdata->Description());
-    query.bindValue(":URL1", mdata->Url(0));
-    query.bindValue(":URL2", mdata->Url(1));
-    query.bindValue(":URL3", mdata->Url(2));
-    query.bindValue(":URL4", mdata->Url(3));
-    query.bindValue(":URL5", mdata->Url(4));
-    query.bindValue(":LOGOURL", mdata->LogoUrl());
-    query.bindValue(":GENRE", mdata->Genre());
-    query.bindValue(":COUNTRY", mdata->Country());
-    query.bindValue(":LANGUAGE", mdata->Language());
-    query.bindValue(":FORMAT", mdata->Format());
-    query.bindValue(":METAFORMAT", mdata->MetadataFormat());
+    query.bindValueNoNull(":BROADCASTER", mdata->Broadcaster());
+    query.bindValueNoNull(":CHANNEL", mdata->Channel());
+    query.bindValueNoNull(":DESCRIPTION", mdata->Description());
+    query.bindValueNoNull(":URL1", mdata->Url(0));
+    query.bindValueNoNull(":URL2", mdata->Url(1));
+    query.bindValueNoNull(":URL3", mdata->Url(2));
+    query.bindValueNoNull(":URL4", mdata->Url(3));
+    query.bindValueNoNull(":URL5", mdata->Url(4));
+    query.bindValueNoNull(":LOGOURL", mdata->LogoUrl());
+    query.bindValueNoNull(":GENRE", mdata->Genre());
+    query.bindValueNoNull(":COUNTRY", mdata->Country());
+    query.bindValueNoNull(":LANGUAGE", mdata->Language());
+    query.bindValueNoNull(":FORMAT", mdata->Format());
+    query.bindValueNoNull(":METAFORMAT", mdata->MetadataFormat());
     query.bindValue(":ID", id);
 
     if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)

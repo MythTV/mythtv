@@ -14,8 +14,7 @@ static QDateTime get_end(const RecordingInfo&);
 
 RecordingQuality::RecordingQuality(const RecordingInfo *ri,
                                    const RecordingGaps &rg)
-                 : m_continuity_error_count(0), m_packet_count(0),
-                   m_overall_score(1.0), m_recording_gaps(rg)
+                 : m_recording_gaps(rg)
 {
     if (!ri)
         return;
@@ -45,9 +44,9 @@ RecordingQuality::RecordingQuality(
     while (!m_recording_gaps.empty() &&
            m_recording_gaps.first().GetStart() < start)
     {
-        RecordingGap &first = m_recording_gaps.first();
-        if (start < first.GetEnd())
-            first = RecordingGap(start, first.GetEnd());
+        RecordingGap &firstGap = m_recording_gaps.first();
+        if (start < firstGap.GetEnd())
+            firstGap = RecordingGap(start, firstGap.GetEnd());
         else
             m_recording_gaps.pop_front();
     }

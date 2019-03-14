@@ -32,31 +32,31 @@ class SignalMonitorValue
     /// \brief Returns a signal monitor value as one long string.
     QString GetStatus() const
     {
-        QString str = noSpaceName.isNull() ? "(null)" : noSpaceName;
+        QString str = m_noSpaceName.isNull() ? "(null)" : m_noSpaceName;
         return QString("%1 %2 %3 %4 %5 %6 %7 %8")
-            .arg(str).arg(value).arg(threshold).arg(minval).arg(maxval)
-            .arg(timeout).arg((int)high_threshold).arg((int)set);
+            .arg(str).arg(m_value).arg(m_threshold).arg(m_minVal).arg(m_maxVal)
+            .arg(m_timeout).arg((int)m_highThreshold).arg((int)m_set);
     }
     /// \brief Returns the value.
-    int GetValue() const { return value; }
+    int GetValue() const { return m_value; }
     /// \brief Returns smallest value possible, used for signal monitor bars.
-    int GetMin() const { return minval; }
+    int GetMin() const { return m_minVal; }
     /// \brief Returns greatest value possible, used for signal monitor bars.
-    int GetMax() const { return maxval; }
+    int GetMax() const { return m_maxVal; }
     /// \brief Returns the threshold at which the value is considered "good".
     /// \sa IsHighThreshold(), IsGood()
-    int GetThreshold() const { return threshold; }
+    int GetThreshold() const { return m_threshold; }
     /// \brief Returns true if values greater than the threshold are
     ///        considered good, false otherwise.
-    bool IsHighThreshold() const { return high_threshold; }
+    bool IsHighThreshold() const { return m_highThreshold; }
     /// \brief Returns how long to wait for a good value in milliseconds.
-    int GetTimeout() const { return timeout; }
+    int GetTimeout() const { return m_timeout; }
 
     /// \brief Returns true if the value is equal to the threshold, or on the
     ///        right side of the threshold (depends on IsHighThreashold()).
     bool IsGood() const
     {
-        return (high_threshold) ? value >= threshold : value <= threshold;
+        return (m_highThreshold) ? m_value >= m_threshold : m_value <= m_threshold;
     }
     /// \brief Returns the value normalized to the [newmin, newmax] range.
     /// \param newmin New minimum value.
@@ -74,29 +74,29 @@ class SignalMonitorValue
 
     void SetValue(int _value)
     {
-        set = true;
-        value = min(max(_value,minval),maxval);
+        m_set = true;
+        m_value = min(max(_value,m_minVal),m_maxVal);
     }
 
-    void SetMin(int _min) { minval = _min; }
+    void SetMin(int _min) { m_minVal = _min; }
 
-    void SetMax(int _max) { maxval = _max; }
+    void SetMax(int _max) { m_maxVal = _max; }
 
-    void SetThreshold(int _threshold) { threshold = _threshold; }
+    void SetThreshold(int _threshold) { m_threshold = _threshold; }
 
     void SetThreshold(int _threshold, bool _high_threshold) {
-        threshold = _threshold;
-        high_threshold = _high_threshold;
+        m_threshold = _threshold;
+        m_highThreshold = _high_threshold;
     }
 
     /// \brief Sets the minimum and maximum values.
     /// \sa SetMin(int), SetMax(int)
     void SetRange(int _min, int _max) {
-        minval = _min;
-        maxval = _max;
+        m_minVal = _min;
+        m_maxVal = _max;
     }
 
-    void SetTimeout(int _timeout) { timeout = _timeout; }
+    void SetTimeout(int _timeout) { m_timeout = _timeout; }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Static Methods // // // // // // // // // // // // // // // // // //
@@ -120,32 +120,30 @@ class SignalMonitorValue
 
     QString toString() const
     {
-        QString str = noSpaceName.isNull() ? "(null)" : noSpaceName;
+        QString str = m_noSpaceName.isNull() ? "(null)" : m_noSpaceName;
         return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) "
                        "timeout(%7 ms) %8 set. %9 good.")
-            .arg(str).arg(value).arg( (high_threshold) ? ">=" : "<=" )
-            .arg(threshold).arg(minval).arg(maxval)
-            .arg(timeout).arg( (set) ? "is" : "is NOT" )
+            .arg(str).arg(m_value).arg( (m_highThreshold) ? ">=" : "<=" )
+            .arg(m_threshold).arg(m_minVal).arg(m_maxVal)
+            .arg(m_timeout).arg( (m_set) ? "is" : "is NOT" )
             .arg( (IsGood()) ? "Is" : "Is NOT" );
     }
   private:
-    SignalMonitorValue() :
-        value(-1), threshold(-1), minval(-1), maxval(-1), timeout(-1),
-        high_threshold(true), set(false) { }
+    SignalMonitorValue() = default;
     SignalMonitorValue(const QString& _name, const QString& _noSpaceName,
                        int _value, int _threshold, bool _high_threshold,
                        int _min, int _max, int _timeout, bool _set);
     bool Set(const QString& _name, const QString& _longString);
 
-    QString name;
-    QString noSpaceName;
-    int     value;
-    int     threshold;
-    int     minval;
-    int     maxval;
-    int     timeout;
-    bool    high_threshold; // false when we must be below threshold
-    bool    set; // false until value initially set
+    QString m_name;
+    QString m_noSpaceName;
+    int     m_value         {-1};
+    int     m_threshold     {-1};
+    int     m_minVal        {-1};
+    int     m_maxVal        {-1};
+    int     m_timeout       {-1};
+    bool    m_highThreshold {true}; // false when we must be below threshold
+    bool    m_set           {false}; // false until value initially set
 };
 
 typedef vector<SignalMonitorValue> SignalMonitorList;

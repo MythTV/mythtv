@@ -1550,7 +1550,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     RingBuffer(kRingBuffer_HLS),
     m_playback(new HLSPlayback())
 {
-    startreadahead = false;
+    m_startReadAhead = false;
     OpenFile(lfilename);
 }
 
@@ -1558,7 +1558,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
     RingBuffer(kRingBuffer_HLS),
     m_playback(new HLSPlayback())
 {
-    startreadahead = false;
+    m_startReadAhead = false;
     if (open)
     {
         OpenFile(lfilename);
@@ -1569,7 +1569,7 @@ HLSRingBuffer::~HLSRingBuffer()
 {
     KillReadAheadThread();
 
-    QWriteLocker lock(&rwlock);
+    QWriteLocker lock(&m_rwLock);
 
     m_killed = true;
 
@@ -2516,26 +2516,26 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
  */
 bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
-    QWriteLocker lock(&rwlock);
+    QWriteLocker lock(&m_rwLock);
 
-    safefilename = lfilename;
-    filename = lfilename;
+    m_safeFilename = lfilename;
+    m_filename = lfilename;
 
     QByteArray buffer;
-    if (!downloadURL(filename, &buffer))
+    if (!downloadURL(m_filename, &buffer))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("Couldn't open URL %1").arg(filename));
+            QString("Couldn't open URL %1").arg(m_filename));
         return false;   // can't download file
     }
     if (!IsHTTPLiveStreaming(&buffer))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("%1 isn't a HTTP Live Streaming URL").arg(filename));
+            QString("%1 isn't a HTTP Live Streaming URL").arg(m_filename));
         return false;
     }
     // let's go
-    m_m3u8 = filename;
+    m_m3u8 = m_filename;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HTTP Live Streaming (%1)")
         .arg(m_m3u8));
 
@@ -2543,7 +2543,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     if (ParseM3U8(&buffer, &m_streams) != RET_OK || m_streams.isEmpty())
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("An error occurred reading M3U8 playlist (%1)").arg(filename));
+            QString("An error occurred reading M3U8 playlist (%1)").arg(m_filename));
         m_error = true;
         return false;
     }
@@ -2781,7 +2781,7 @@ int HLSRingBuffer::DurationForBytes(uint size)
 
 long long HLSRingBuffer::GetRealFileSizeInternal(void) const
 {
-    QReadLocker lock(&rwlock);
+    QReadLocker lock(&m_rwLock);
     return SizeMedia();
 }
 
@@ -2797,7 +2797,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
 
     int64_t starting = mdate();
 
-    QWriteLocker lock(&poslock);
+    QWriteLocker lock(&m_posLock);
 
     int totalsize = SizeMedia();
     int64_t where;

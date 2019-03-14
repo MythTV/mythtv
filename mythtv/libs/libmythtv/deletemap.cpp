@@ -108,8 +108,8 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame)
         AddMark(frame, MARK_CUT_START);
         // If the recording is still in progress, add an explicit end
         // mark at the end.
-        if (m_ctx->player && m_ctx->player->IsWatchingInprogress())
-            AddMark(m_ctx->player->GetTotalFrameCount() - 1, MARK_CUT_END);
+        if (m_ctx->m_player && m_ctx->m_player->IsWatchingInprogress())
+            AddMark(m_ctx->m_player->GetTotalFrameCount() - 1, MARK_CUT_END);
     }
     else if (action == "NEWCUT")
         NewCut(frame);
@@ -181,15 +181,15 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
 
     InfoMap infoMap;
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (m_ctx->playingInfo)
-        m_ctx->playingInfo->ToMap(infoMap);
+    if (m_ctx->m_playingInfo)
+        m_ctx->m_playingInfo->ToMap(infoMap);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     QString cutmarker = " ";
     if (IsInDelete(frame))
         cutmarker = tr("cut");
 
-    uint64_t total = m_ctx->player->GetTotalFrameCount();
+    uint64_t total = m_ctx->m_player->GetTotalFrameCount();
     QString timestr = CreateTimeString(frame, false, frame_rate, true);
     QString relTimeDisplay;
     relTimeDisplay = CreateTimeString(frame, true, frame_rate, false);
@@ -235,8 +235,8 @@ void DeleteMap::SetFileEditing(bool edit)
     if (m_ctx)
     {
         m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (m_ctx->playingInfo)
-            m_ctx->playingInfo->SetEditing(edit);
+        if (m_ctx->m_playingInfo)
+            m_ctx->m_playingInfo->SetEditing(edit);
         m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 }
@@ -248,8 +248,8 @@ bool DeleteMap::IsFileEditing(void)
     if (m_ctx)
     {
         m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (m_ctx->playingInfo)
-            result = m_ctx->playingInfo->QueryIsEditing();
+        if (m_ctx->m_playingInfo)
+            result = m_ctx->m_playingInfo->QueryIsEditing();
         m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
     return result;
@@ -412,7 +412,7 @@ void DeleteMap::NewCut(uint64_t frame)
 
     if (existing > -1)
     {
-        uint64_t total = m_ctx->player->GetTotalFrameCount();
+        uint64_t total = m_ctx->m_player->GetTotalFrameCount();
         uint64_t otherframe = static_cast<uint64_t>(existing);
         if (otherframe == frame)
             Delete(otherframe);
@@ -539,7 +539,7 @@ void DeleteMap::Move(uint64_t frame, uint64_t to)
     {
         if (frame == 0)
             type = MARK_CUT_START;
-        else if (frame == m_ctx->player->GetTotalFrameCount())
+        else if (frame == m_ctx->m_player->GetTotalFrameCount())
             type = MARK_CUT_END;
     }
     AddMark(to, type);
@@ -618,7 +618,7 @@ uint64_t DeleteMap::GetNearestMark(uint64_t frame, bool right, bool *hasMark)
     frm_dir_map_t::const_iterator it = m_deleteMap.begin();
     if (right)
     {
-        result = m_ctx->player->GetTotalFrameCount();
+        result = m_ctx->m_player->GetTotalFrameCount();
         for (; it != m_deleteMap.end(); ++it)
             if (it.key() > frame)
                 return it.key();
@@ -664,7 +664,7 @@ void DeleteMap::CleanMap(void)
     if (IsEmpty())
         return;
 
-    uint64_t total = m_ctx->player->GetTotalFrameCount();
+    uint64_t total = m_ctx->m_player->GetTotalFrameCount();
     Delete(0);
     Delete(total);
 
@@ -742,14 +742,14 @@ void DeleteMap::LoadCommBreakMap(frm_dir_map_t &map)
 /// Loads the delete map from the database.
 void DeleteMap::LoadMap(QString undoMessage)
 {
-    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->m_playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
     if (!undoMessage.isEmpty())
         Push(undoMessage);
     Clear();
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    m_ctx->playingInfo->QueryCutList(m_deleteMap);
+    m_ctx->m_playingInfo->QueryCutList(m_deleteMap);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap();
 }
@@ -758,13 +758,13 @@ void DeleteMap::LoadMap(QString undoMessage)
 /// Does nothing and returns false if not.
 bool DeleteMap::LoadAutoSaveMap(void)
 {
-    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->m_playingInfo || gCoreContext->IsDatabaseIgnored())
         return false;
 
     frm_dir_map_t tmpDeleteMap = m_deleteMap;
     Clear();
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    bool result = m_ctx->playingInfo->QueryCutList(m_deleteMap, true);
+    bool result = m_ctx->m_playingInfo->QueryCutList(m_deleteMap, true);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap();
     if (result)
@@ -778,7 +778,7 @@ bool DeleteMap::LoadAutoSaveMap(void)
 /// Saves the delete map to the database.
 void DeleteMap::SaveMap(bool isAutoSave)
 {
-    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->m_playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
     if (!isAutoSave)
@@ -798,8 +798,8 @@ void DeleteMap::SaveMap(bool isAutoSave)
         CleanMap();
     }
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    m_ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
-    m_ctx->playingInfo->SaveCutList(m_deleteMap, isAutoSave);
+    m_ctx->m_playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
+    m_ctx->m_playingInfo->SaveCutList(m_deleteMap, isAutoSave);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
@@ -829,7 +829,7 @@ void DeleteMap::TrackerReset(uint64_t frame)
             ++cutpoint;
             m_nextCutStartIsValid = (cutpoint != m_deleteMap.end());
             m_nextCutStart = m_nextCutStartIsValid ? cutpoint.key() :
-                m_ctx->player->GetTotalFrameCount();
+                m_ctx->m_player->GetTotalFrameCount();
         }
     }
     else
@@ -860,7 +860,7 @@ bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t &to)
  */
 uint64_t DeleteMap::GetLastFrame(void) const
 {
-    uint64_t result = m_ctx->player->GetCurrentFrameCount();
+    uint64_t result = m_ctx->m_player->GetCurrentFrameCount();
     if (IsEmpty())
         return result;
 
@@ -877,13 +877,13 @@ uint64_t DeleteMap::GetLastFrame(void) const
  */
 bool DeleteMap::IsSaved(void) const
 {
-    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->m_playingInfo || gCoreContext->IsDatabaseIgnored())
         return true;
 
     frm_dir_map_t currentMap(m_deleteMap);
     frm_dir_map_t savedMap;
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    m_ctx->playingInfo->QueryCutList(savedMap);
+    m_ctx->m_playingInfo->QueryCutList(savedMap);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     // Remove temporary placeholder marks from currentMap
@@ -902,7 +902,7 @@ uint64_t DeleteMap::TranslatePositionFrameToMs(uint64_t position,
                                                float fallback_framerate,
                                                bool use_cutlist) const
 {
-    return m_ctx->player->GetDecoder()
+    return m_ctx->m_player->GetDecoder()
         ->TranslatePositionFrameToMs(position, fallback_framerate,
                                      use_cutlist ? m_deleteMap :
                                      frm_dir_map_t());
@@ -911,7 +911,7 @@ uint64_t DeleteMap::TranslatePositionMsToFrame(uint64_t dur_ms,
                                                float fallback_framerate,
                                                bool use_cutlist) const
 {
-    return m_ctx->player->GetDecoder()
+    return m_ctx->m_player->GetDecoder()
         ->TranslatePositionMsToFrame(dur_ms, fallback_framerate,
                                      use_cutlist ? m_deleteMap :
                                      frm_dir_map_t());

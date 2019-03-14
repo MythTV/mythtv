@@ -73,11 +73,9 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    const QString     &token,
                                    PreviewGenerator::Mode mode)
     : MThread("PreviewGenerator"),
-      m_programInfo(*pginfo), m_mode(mode), m_listener(nullptr),
+      m_programInfo(*pginfo), m_mode(mode),
       m_pathname(pginfo->GetPathname()),
-      m_timeInSeconds(true),  m_captureTime(-1),
-      m_outSize(0,0),  m_outFormat("PNG"),
-      m_token(token), m_gotReply(false), m_pixmapOk(false)
+      m_token(token)
 {
     // Qt requires that a receiver have the same thread affinity as the QThread
     // sending the event, which is used to dispatch MythEvents sent by
@@ -839,13 +837,13 @@ char *PreviewGenerator::GetScreenGrab(
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetPlayer(new MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV)));
-    ctx->player->SetPlayerInfo(nullptr, nullptr, ctx);
+    ctx->m_player->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (time_in_secs)
-        retbuf = ctx->player->GetScreenGrab(seektime, bufferlen,
+        retbuf = ctx->m_player->GetScreenGrab(seektime, bufferlen,
                                     video_width, video_height, video_aspect);
     else
-        retbuf = ctx->player->GetScreenGrabAtFrame(
+        retbuf = ctx->m_player->GetScreenGrabAtFrame(
             seektime, true, bufferlen,
             video_width, video_height, video_aspect);
 

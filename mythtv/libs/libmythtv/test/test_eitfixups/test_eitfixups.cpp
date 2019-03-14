@@ -132,24 +132,24 @@ QString getVideoProps(unsigned char props)
 void printEvent(const DBEventEIT& event, const QString& name)
 {
     printf("\n------------Event - %s------------\n", name.toLocal8Bit().constData());
-    printf("Title          %s\n",  event.title.toLocal8Bit().constData());
-    printf("Subtitle       %s\n",  event.subtitle.toLocal8Bit().constData());
-    printf("Description    %s\n",  event.description.toLocal8Bit().constData());
-    printf("Season         %3u\n", event.season);
-    printf("Episode        %3u\n", event.episode);
-    printf("Total episodes %3u\n", event.totalepisodes);
-    printf("Part number    %3u\n", event.partnumber);
-    printf("Part total     %3u\n", event.parttotal);
-    printf("SubtitleType   %s\n",  getSubtitleType(event.subtitleType).toLocal8Bit().constData());
-    printf("Audio props    %s\n",  getAudioProps(event.audioProps).toLocal8Bit().constData());
-    printf("Video props    %s\n",  getVideoProps(event.videoProps).toLocal8Bit().constData());
-    if (event.credits && !event.credits->empty())
+    printf("Title          %s\n",  event.m_title.toLocal8Bit().constData());
+    printf("Subtitle       %s\n",  event.m_subtitle.toLocal8Bit().constData());
+    printf("Description    %s\n",  event.m_description.toLocal8Bit().constData());
+    printf("Season         %3u\n", event.m_season);
+    printf("Episode        %3u\n", event.m_episode);
+    printf("Total episodes %3u\n", event.m_totalepisodes);
+    printf("Part number    %3u\n", event.m_partnumber);
+    printf("Part total     %3u\n", event.m_parttotal);
+    printf("SubtitleType   %s\n",  getSubtitleType(event.m_subtitleType).toLocal8Bit().constData());
+    printf("Audio props    %s\n",  getAudioProps(event.m_audioProps).toLocal8Bit().constData());
+    printf("Video props    %s\n",  getVideoProps(event.m_videoProps).toLocal8Bit().constData());
+    if (event.m_credits && !event.m_credits->empty())
     {
-        printf("Credits      %3zu\n", event.credits->size());
+        printf("Credits      %3zu\n", event.m_credits->size());
     }
-    if (!event.items.isEmpty())
+    if (!event.m_items.isEmpty())
     {
-        printf("Items        %3d\n", event.items.count());
+        printf("Items        %3d\n", event.m_items.count());
     }
     printf("\n");
 }
@@ -171,8 +171,8 @@ void TestEITFixups::testUKFixups1()
     fixup.Fix(event1);
 
     PRINT_EVENT(event1);
-    QCOMPARE(event1.episode,       3u);
-    QCOMPARE(event1.totalepisodes, 5u);
+    QCOMPARE(event1.m_episode,       3u);
+    QCOMPARE(event1.m_totalepisodes, 5u);
 }
 
 void TestEITFixups::testUKFixups2()
@@ -191,8 +191,8 @@ void TestEITFixups::testUKFixups2()
 
     fixup.Fix(event2);
     PRINT_EVENT(event2);
-    QCOMPARE(event2.season,  3u);
-    QCOMPARE(event2.episode, 1u);
+    QCOMPARE(event2.m_season,  3u);
+    QCOMPARE(event2.m_episode, 1u);
 }
 
 void TestEITFixups::testUKFixups3()
@@ -211,10 +211,10 @@ void TestEITFixups::testUKFixups3()
 
     fixup.Fix(event3);
     PRINT_EVENT(event3);
-    QCOMPARE(event3.season,     1u);
-    QCOMPARE(event3.episode,    2u);
-    QCOMPARE(event3.partnumber, (uint16_t)2u);
-    QCOMPARE(event3.parttotal,  (uint16_t)2u);
+    QCOMPARE(event3.m_season,     1u);
+    QCOMPARE(event3.m_episode,    2u);
+    QCOMPARE(event3.m_partnumber, (uint16_t)2u);
+    QCOMPARE(event3.m_parttotal,  (uint16_t)2u);
 }
 
 void TestEITFixups::testUKFixups4()
@@ -233,8 +233,8 @@ void TestEITFixups::testUKFixups4()
 
     fixup.Fix(event4);
     PRINT_EVENT(event4);
-    QCOMPARE(event4.season,  1u);
-    QCOMPARE(event4.episode, 39u);
+    QCOMPARE(event4.m_season,  1u);
+    QCOMPARE(event4.m_episode, 39u);
 }
 
 void TestEITFixups::testUKFixups5()
@@ -253,11 +253,11 @@ void TestEITFixups::testUKFixups5()
 
     fixup.Fix(event5);
     PRINT_EVENT(event5);
-    QCOMPARE(event5.episode,       12u);
-    QCOMPARE(event5.totalepisodes, 26u);
-    QCOMPARE(event5.subtitleType,  (unsigned char)SUB_NORMAL);
-    QCOMPARE(event5.subtitle,      QString("Whirlwind"));
-    QCOMPARE(event5.description,   QString("Acclaimed documentary series about World War II. This episode focuses on the Allied bombing campaign which inflicted grievous damage upon Germany, both day and night."));
+    QCOMPARE(event5.m_episode,       12u);
+    QCOMPARE(event5.m_totalepisodes, 26u);
+    QCOMPARE(event5.m_subtitleType,  (unsigned char)SUB_NORMAL);
+    QCOMPARE(event5.m_subtitle,      QString("Whirlwind"));
+    QCOMPARE(event5.m_description,   QString("Acclaimed documentary series about World War II. This episode focuses on the Allied bombing campaign which inflicted grievous damage upon Germany, both day and night."));
 }
 
 void TestEITFixups::testUKFixups6()
@@ -276,11 +276,11 @@ void TestEITFixups::testUKFixups6()
 
     fixup.Fix(event6);
     PRINT_EVENT(event6);
-    QCOMPARE(event6.season,       4u);
-    QCOMPARE(event6.episode,      3u);
-    QCOMPARE(event6.subtitleType, (unsigned char)SUB_SIGNED);
-    QCOMPARE(event6.subtitle,     QString("The Things We Do for Love"));
-    QCOMPARE(event6.description,  QString("When a beautiful woman is found dead in a car park, the list of suspects leads Jack Frost (David Jason) into the heart of a religious community.  S4 Ep3"));
+    QCOMPARE(event6.m_season,       4u);
+    QCOMPARE(event6.m_episode,      3u);
+    QCOMPARE(event6.m_subtitleType, (unsigned char)SUB_SIGNED);
+    QCOMPARE(event6.m_subtitle,     QString("The Things We Do for Love"));
+    QCOMPARE(event6.m_description,  QString("When a beautiful woman is found dead in a car park, the list of suspects leads Jack Frost (David Jason) into the heart of a religious community.  S4 Ep3"));
 }
 
 void TestEITFixups::testUKFixups7()
@@ -299,13 +299,13 @@ void TestEITFixups::testUKFixups7()
 
     fixup.Fix(event7);
     PRINT_EVENT(event7);
-    QCOMPARE(event7.episode,       2u);
-    QCOMPARE(event7.totalepisodes, 3u);
-    QCOMPARE(event7.subtitleType,  (unsigned char)SUB_NORMAL);
-    QCOMPARE(event7.audioProps,    (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
-    QCOMPARE(event7.title,         QString("Suffragettes Forever!"));
-    QCOMPARE(event7.subtitle,      QString("The Story of Women and Power"));
-    QCOMPARE(event7.description,   QString("2/3. Documentary series presented by Amanda Vickery. During Victoria's reign extraordinary women gradually changed the lives and opportunities of their sex."));
+    QCOMPARE(event7.m_episode,       2u);
+    QCOMPARE(event7.m_totalepisodes, 3u);
+    QCOMPARE(event7.m_subtitleType,  (unsigned char)SUB_NORMAL);
+    QCOMPARE(event7.m_audioProps,    (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
+    QCOMPARE(event7.m_title,         QString("Suffragettes Forever!"));
+    QCOMPARE(event7.m_subtitle,      QString("The Story of Women and Power"));
+    QCOMPARE(event7.m_description,   QString("2/3. Documentary series presented by Amanda Vickery. During Victoria's reign extraordinary women gradually changed the lives and opportunities of their sex."));
 }
 
 void TestEITFixups::testUKFixups8()
@@ -324,10 +324,10 @@ void TestEITFixups::testUKFixups8()
 
     fixup.Fix(event8);
     PRINT_EVENT(event8);
-    QCOMPARE(event8.subtitleType, (unsigned char)SUB_NORMAL);
-    QCOMPARE(event8.audioProps,   (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
-    QCOMPARE(event8.description,  QString("Three unconnected Brooklyn cops wind up at the same deadly location. Contains very strong language, sexual content and some violence."));
-    QCOMPARE(event8.airdate,      (uint16_t)2009u);
+    QCOMPARE(event8.m_subtitleType, (unsigned char)SUB_NORMAL);
+    QCOMPARE(event8.m_audioProps,   (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
+    QCOMPARE(event8.m_description,  QString("Three unconnected Brooklyn cops wind up at the same deadly location. Contains very strong language, sexual content and some violence."));
+    QCOMPARE(event8.m_airdate,      (uint16_t)2009u);
 }
 
 void TestEITFixups::testUKFixups9()
@@ -347,8 +347,8 @@ void TestEITFixups::testUKFixups9()
 
     fixup.Fix(event9);
     PRINT_EVENT(event9);
-    QCOMPARE(event9.title,       QString("Channel 4 News"));
-    QCOMPARE(event9.description, QString("Includes sport and weather"));
+    QCOMPARE(event9.m_title,       QString("Channel 4 News"));
+    QCOMPARE(event9.m_description, QString("Includes sport and weather"));
 }
 
 void TestEITFixups::testUKLawAndOrder()
@@ -363,8 +363,8 @@ void TestEITFixups::testUKLawAndOrder()
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
-    QCOMPARE(event->title,    QString("Law & Order: Special Victims Unit"));
-    QCOMPARE(event->subtitle, QString(""));
+    QCOMPARE(event->m_title,    QString("Law & Order: Special Victims Unit"));
+    QCOMPARE(event->m_subtitle, QString(""));
 
     delete event;
 
@@ -376,9 +376,9 @@ void TestEITFixups::testUKLawAndOrder()
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
-    QCOMPARE(event2->title,    QString("Law & Order: Special Victims Unit"));
-    QCOMPARE(event2->subtitle, QString("Sugar"));
-    QCOMPARE(event2->description, QString("Police drama series about an elite sex crime  ..."));
+    QCOMPARE(event2->m_title,    QString("Law & Order: Special Victims Unit"));
+    QCOMPARE(event2->m_subtitle, QString("Sugar"));
+    QCOMPARE(event2->m_description, QString("Police drama series about an elite sex crime  ..."));
 
     delete event2;
 }
@@ -395,8 +395,8 @@ void TestEITFixups::testUKMarvel()
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
-    QCOMPARE(event->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
-    QCOMPARE(event->subtitle, QString("Maveth"));
+    QCOMPARE(event->m_title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    QCOMPARE(event->m_subtitle, QString("Maveth"));
 
     delete event;
 
@@ -409,8 +409,8 @@ void TestEITFixups::testUKMarvel()
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
-    QCOMPARE(event2->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
-    QCOMPARE(event2->subtitle, QString("Bouncing Back"));
+    QCOMPARE(event2->m_title,    QString("Marvel's Agents of S.H.I.E.L.D."));
+    QCOMPARE(event2->m_subtitle, QString("Bouncing Back"));
 
     delete event2;
 }
@@ -456,8 +456,8 @@ void TestEITFixups::testUKXFiles()
 
     fixup.Fix(event);
     PRINT_EVENT(event);
-    QCOMPARE(event.title,       QString("The X-Files"));
-    QCOMPARE(event.description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)"));
+    QCOMPARE(event.m_title,       QString("The X-Files"));
+    QCOMPARE(event.m_description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)"));
 }
 
 void TestEITFixups::testDEPro7Sat1()
@@ -472,9 +472,9 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
-    QCOMPARE(event->title,    QString("Titel"));
-    QCOMPARE(event->subtitle, QString("Folgentitel"));
-    QCOMPARE(event->airdate,  (unsigned short) 2011);
+    QCOMPARE(event->m_title,    QString("Titel"));
+    QCOMPARE(event->m_subtitle, QString("Folgentitel"));
+    QCOMPARE(event->m_airdate,  (unsigned short) 2011);
 
     delete event;
 
@@ -485,8 +485,8 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
-    QCOMPARE(event2->subtitle, QString(""));
-    QCOMPARE(event2->airdate,  (unsigned short) 2015);
+    QCOMPARE(event2->m_subtitle, QString(""));
+    QCOMPARE(event2->m_airdate,  (unsigned short) 2015);
 
     delete event2;
 
@@ -497,8 +497,8 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event3);
     fixup.Fix(*event3);
     PRINT_EVENT(*event3);
-    QCOMPARE(event3->subtitle, QString("Folgentitel"));
-    QCOMPARE(event3->airdate,  (unsigned short) 0);
+    QCOMPARE(event3->m_subtitle, QString("Folgentitel"));
+    QCOMPARE(event3->m_airdate,  (unsigned short) 0);
 
     delete event3;
 
@@ -509,8 +509,8 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event4);
     fixup.Fix(*event4);
     PRINT_EVENT(*event4);
-    QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
-    QCOMPARE(event4->airdate,  (unsigned short) 2015);
+    QCOMPARE(event4->m_subtitle, QString("\"Lokal\", Ort"));
+    QCOMPARE(event4->m_airdate,  (unsigned short) 2015);
 
     delete event4;
 
@@ -521,8 +521,8 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event5);
     fixup.Fix(*event5);
     PRINT_EVENT(*event5);
-    QCOMPARE(event5->subtitle, QString("In Morpheus' Armen"));
-    QCOMPARE(event5->airdate,  (unsigned short) 2006);
+    QCOMPARE(event5->m_subtitle, QString("In Morpheus' Armen"));
+    QCOMPARE(event5->m_airdate,  (unsigned short) 2006);
 
     delete event5;
 
@@ -533,8 +533,8 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event6);
     fixup.Fix(*event6);
     PRINT_EVENT(*event6);
-    QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
-    QCOMPARE(event6->airdate,  (unsigned short) 2014);
+    QCOMPARE(event6->m_subtitle, QString("Drei Kleintiere durchschneiden (1)"));
+    QCOMPARE(event6->m_airdate,  (unsigned short) 2014);
 
     delete event6;
 
@@ -551,9 +551,9 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event7);
     fixup.Fix(*event7);
     PRINT_EVENT(*event7);
-    QCOMPARE(event7->subtitle, QString("<episode title>"));
-    QCOMPARE(event7->airdate,  (unsigned short) 2011);
-    QCOMPARE(event7->description, QString("<plot summary>"));
+    QCOMPARE(event7->m_subtitle, QString("<episode title>"));
+    QCOMPARE(event7->m_airdate,  (unsigned short) 2011);
+    QCOMPARE(event7->m_description, QString("<plot summary>"));
 
     delete event7;
 }
@@ -575,10 +575,10 @@ void TestEITFixups::testHTMLFixup()
 
     fixup.Fix(event);
     PRINT_EVENT(event);
-    QCOMPARE(event.title,       QString("CSI: Crime Scene Investigation"));
-    QCOMPARE(event.subtitle,    QString("Double-Cross"));
+    QCOMPARE(event.m_title,       QString("CSI: Crime Scene Investigation"));
+    QCOMPARE(event.m_subtitle,    QString("Double-Cross"));
 // FIXME: Need to fix the capturing of (S7 Ep 5) for this to properly validate.
-//    QCOMPARE(event.description, QString("Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest."));
+//    QCOMPARE(event.m_description, QString("Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest."));
 
     DBEventEIT event2(9311,
                       "<EM>New: Redneck Island</EM>",
@@ -592,7 +592,7 @@ void TestEITFixups::testHTMLFixup()
 
     fixup.Fix(event2);
     PRINT_EVENT(event2);
-    QCOMPARE(event2.title,       QString("Redneck Island"));
+    QCOMPARE(event2.m_title,       QString("Redneck Island"));
 
     DBEventEIT event3(14101,
                       "New: Jericho",
@@ -606,8 +606,8 @@ void TestEITFixups::testHTMLFixup()
 
     fixup.Fix(event3);
     PRINT_EVENT(event3);
-    QCOMPARE(event3.title,       QString("Jericho"));
-    QCOMPARE(event3.description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
+    QCOMPARE(event3.m_title,       QString("Jericho"));
+    QCOMPARE(event3.m_description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
 }
 
 void TestEITFixups::testSkyEpisodes()
@@ -622,9 +622,9 @@ void TestEITFixups::testSkyEpisodes()
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
-    QCOMPARE(event->description, QString("Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? Ab 12 Jahren"));
-    QCOMPARE(event->season,   4u);
-    QCOMPARE(event->episode, 16u);
+    QCOMPARE(event->m_description, QString("Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? Ab 12 Jahren"));
+    QCOMPARE(event->m_season,   4u);
+    QCOMPARE(event->m_episode, 16u);
     /* FixPremiere should scrape the credits, too! */
     QVERIFY(event->HasCredits());
 
@@ -638,9 +638,9 @@ void TestEITFixups::testSkyEpisodes()
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
-    QCOMPARE(event2->description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
-    QCOMPARE(event2->season,  0u);
-    QCOMPARE(event2->episode, 0u);
+    QCOMPARE(event2->m_description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
+    QCOMPARE(event2->m_season,  0u);
+    QCOMPARE(event2->m_episode, 0u);
 
     delete event2;
 
@@ -652,9 +652,9 @@ void TestEITFixups::testSkyEpisodes()
     PRINT_EVENT(*event3);
     fixup.Fix(*event3);
     PRINT_EVENT(*event3);
-    QCOMPARE(event3->description, QString("Ab 12 Jahren"));
-    QCOMPARE(event3->season,  0u);
-    QCOMPARE(event3->episode, 0u);
+    QCOMPARE(event3->m_description, QString("Ab 12 Jahren"));
+    QCOMPARE(event3->m_season,  0u);
+    QCOMPARE(event3->m_episode, 0u);
 
     delete event3;
 
@@ -665,10 +665,10 @@ void TestEITFixups::testSkyEpisodes()
 
     fixup.Fix(*event4);
     PRINT_EVENT(*event4);
-    QCOMPARE(event4->description, QString("Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. Ab 16 Jahren"));
-    QCOMPARE(event4->season,  0u);
-    QCOMPARE(event4->episode, 0u);
-    QCOMPARE(event4->airdate,  (unsigned short) 2011);
+    QCOMPARE(event4->m_description, QString("Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. Ab 16 Jahren"));
+    QCOMPARE(event4->m_season,  0u);
+    QCOMPARE(event4->m_episode, 0u);
+    QCOMPARE(event4->m_airdate,  (unsigned short) 2011);
     QVERIFY(event4->HasCredits());
 
     delete event4;
@@ -680,10 +680,10 @@ void TestEITFixups::testSkyEpisodes()
 
     fixup.Fix(*event5);
     PRINT_EVENT(*event5);
-    QCOMPARE(event5->description, QString("Lauries Auszug setzt Red zu, denn er hat ... ist."));
-    QCOMPARE(event5->season,  2u);
-    QCOMPARE(event5->episode, 11u);
-    QCOMPARE(event5->airdate,  (unsigned short) 1999);
+    QCOMPARE(event5->m_description, QString("Lauries Auszug setzt Red zu, denn er hat ... ist."));
+    QCOMPARE(event5->m_season,  2u);
+    QCOMPARE(event5->m_episode, 11u);
+    QCOMPARE(event5->m_airdate,  (unsigned short) 1999);
     QVERIFY(event5->HasCredits());
 
     delete event5;
@@ -702,21 +702,21 @@ void TestEITFixups::testUnitymedia()
     cast.insertMulti ("Role Player", "Other Actor");
     cast.insertMulti ("Director", "Great Director");
     cast.insertMulti ("Unhandled", "lets fix it up");
-    event->items = cast;
+    event->m_items = cast;
 
     QVERIFY(!event->HasCredits());
-    QCOMPARE(event->items.count(), 4);
+    QCOMPARE(event->m_items.count(), 4);
 
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
 
     QVERIFY(event->HasCredits());
-    QCOMPARE(event->credits->size(), (size_t)3);
-    QVERIFY(event->subtitle.isEmpty());
-    QCOMPARE(event->description, QString("Beschreibung ..."));
-    QCOMPARE(event->stars, 0.89f);
-    QCOMPARE(event->items.count(), 1);
+    QCOMPARE(event->m_credits->size(), (size_t)3);
+    QVERIFY(event->m_subtitle.isEmpty());
+    QCOMPARE(event->m_description, QString("Beschreibung ..."));
+    QCOMPARE(event->m_stars, 0.89f);
+    QCOMPARE(event->m_items.count(), 1);
 
     delete event;
 
@@ -730,7 +730,7 @@ void TestEITFixups::testUnitymedia()
     fixup.Fix(*event);
     PRINT_EVENT(*event);
 
-    QCOMPARE(event->stars, 0.89f);
+    QCOMPARE(event->m_stars, 0.89f);
 
     delete event;
 }
@@ -747,10 +747,10 @@ void TestEITFixups::testDeDisneyChannel()
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
-    QCOMPARE(event->title,    QString("Meine Schwester Charlie"));
-    QCOMPARE(event->subtitle, QString("Das Ablenkungsmanöver"));
-    QCOMPARE(event->category, QString("Familien-Serie"));
-    QCOMPARE(event->categoryType, ProgramInfo::kCategorySeries);
+    QCOMPARE(event->m_title,    QString("Meine Schwester Charlie"));
+    QCOMPARE(event->m_subtitle, QString("Das Ablenkungsmanöver"));
+    QCOMPARE(event->m_category, QString("Familien-Serie"));
+    QCOMPARE(event->m_categoryType, ProgramInfo::kCategorySeries);
 
     delete event;
 
@@ -762,8 +762,8 @@ void TestEITFixups::testDeDisneyChannel()
     PRINT_EVENT(*event2);
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
-    QCOMPARE(event2->title,    QString("Phineas und Ferb"));
-    QCOMPARE(event2->subtitle, QString("Das Achterbahn - Musical"));
+    QCOMPARE(event2->m_title,    QString("Phineas und Ferb"));
+    QCOMPARE(event2->m_subtitle, QString("Das Achterbahn - Musical"));
 
     delete event2;
 }
@@ -780,8 +780,8 @@ void TestEITFixups::testATV()
     PRINT_EVENT(*event);
     fixup.Fix(*event);
     PRINT_EVENT(*event);
-    QCOMPARE(event->title,    QString("Gilmore Girls"));
-    QCOMPARE(event->subtitle, QString("Eine Hochzeit und ein Todesfall"));
+    QCOMPARE(event->m_title,    QString("Gilmore Girls"));
+    QCOMPARE(event->m_subtitle, QString("Eine Hochzeit und ein Todesfall"));
 
     delete event;
 }

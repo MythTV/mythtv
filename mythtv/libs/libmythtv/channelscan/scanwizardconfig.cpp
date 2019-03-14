@@ -24,62 +24,62 @@ void ScanWizard::SetupConfig(
     uint    default_sourceid,  uint default_cardid,
     QString default_inputname)
 {
-    videoSource = new VideoSourceSelector(
+    m_videoSource = new VideoSourceSelector(
                     default_sourceid, CardUtil::GetScanableInputTypes(), false);
-    input = new InputSelector(default_cardid, default_inputname);
-    scanType = new ScanTypeSetting(),
-    scanConfig = new ScanOptionalConfig(scanType);
-    services = new DesiredServices();
-    ftaOnly = new FreeToAirOnly();
-    addFullTS = new AddFullTS();
-    trustEncSI = new TrustEncSISetting();
+    m_input = new InputSelector(default_cardid, default_inputname);
+    m_scanType = new ScanTypeSetting(),
+    m_scanConfig = new ScanOptionalConfig(m_scanType);
+    m_services = new DesiredServices();
+    m_ftaOnly = new FreeToAirOnly();
+    m_addFullTS = new AddFullTS();
+    m_trustEncSI = new TrustEncSISetting();
 
-    addChild(services);
-    addChild(ftaOnly);
-    addChild(addFullTS);
-    addChild(trustEncSI);
+    addChild(m_services);
+    addChild(m_ftaOnly);
+    addChild(m_addFullTS);
+    addChild(m_trustEncSI);
 
-    addChild(videoSource);
-    addChild(input);
-    addChild(scanType);
-    addChild(scanConfig);
+    addChild(m_videoSource);
+    addChild(m_input);
+    addChild(m_scanType);
+    addChild(m_scanConfig);
 
-    connect(videoSource, SIGNAL(valueChanged(const QString&)),
-            scanConfig,  SLOT(  SetSourceID( const QString&)));
+    connect(m_videoSource, SIGNAL(valueChanged(const QString&)),
+            m_scanConfig,  SLOT(  SetSourceID( const QString&)));
 
-    connect(videoSource, SIGNAL(valueChanged(const QString&)),
-            input,       SLOT(  SetSourceID( const QString&)));
+    connect(m_videoSource, SIGNAL(valueChanged(const QString&)),
+            m_input,       SLOT(  SetSourceID( const QString&)));
 
-    connect(input,       SIGNAL(valueChanged(const QString&)),
-            scanType,    SLOT(  SetInput(    const QString&)));
+    connect(m_input,       SIGNAL(valueChanged(const QString&)),
+            m_scanType,    SLOT(  SetInput(    const QString&)));
 
-    connect(input,       SIGNAL(valueChanged(const QString&)),
-            this,     SLOT(  SetInput(    const QString&)));
+    connect(m_input,       SIGNAL(valueChanged(const QString&)),
+            this,          SLOT(  SetInput(    const QString&)));
 }
 
 uint ScanWizard::GetSourceID(void) const
 {
-    return videoSource->getValue().toUInt();
+    return m_videoSource->getValue().toUInt();
 }
 
 ServiceRequirements ScanWizard::GetServiceRequirements(void) const
 {
-    return services->GetServiceRequirements();
+    return m_services->GetServiceRequirements();
 }
 
 bool ScanWizard::DoFreeToAirOnly(void) const
 {
-    return ftaOnly->getValue().toInt();
+    return m_ftaOnly->getValue().toInt();
 }
 
 bool ScanWizard::DoAddFullTS(void) const
 {
-    return addFullTS->getValue().toInt();
+    return m_addFullTS->getValue().toInt();
 }
 
 bool ScanWizard::DoTestDecryption(void) const
 {
-    return trustEncSI->getValue().toInt();
+    return m_trustEncSI->getValue().toInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////

@@ -45,13 +45,13 @@ protected:
     QString     m_name;
     QString     m_serialnumber;
     QString     m_lastError;
-    bool        m_isValid;
+    bool        m_isValid      {true};
 };
 
 class BDOverlay
 {
   public:
-    BDOverlay();
+    BDOverlay() = default;
     explicit BDOverlay(const bd_overlay_s * const overlay);
     explicit BDOverlay(const bd_argb_overlay_s * const overlay);
 
@@ -59,10 +59,10 @@ class BDOverlay
     void    wipe();
     void    wipe(int x, int y, int width, int height);
 
-    QImage  image;
-    int64_t pts;
-    int     x;
-    int     y;
+    QImage  m_image;
+    int64_t m_pts   {-1};
+    int     m_x     {0};
+    int     m_y     {0};
 };
 
 /** \class BDRingBufferPriv

@@ -866,6 +866,16 @@ void MSqlQuery::bindValue(const QString &placeholder, const QVariant &val)
     QSqlQuery::bindValue(placeholder, val, QSql::In);
 }
 
+void MSqlQuery::bindValueNoNull(const QString &placeholder, const QVariant &val)
+{
+    if ((val.type() == QVariant::String) && val.isNull())
+    {
+        QSqlQuery::bindValue(placeholder, QString(""), QSql::In);
+        return;
+    }
+    QSqlQuery::bindValue(placeholder, val, QSql::In);
+}
+
 void MSqlQuery::bindValues(const MSqlBindings &bindings)
 {
     MSqlBindings::const_iterator it;

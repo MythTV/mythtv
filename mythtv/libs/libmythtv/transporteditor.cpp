@@ -183,7 +183,7 @@ void TransportListEditor::SetSourceID(uint _sourceid)
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString(), false)), isLoading(false)
+    m_videosource(new VideoSourceSelector(sourceid, QString(), false))
 {
     setLabel(tr("Multiplex Editor"));
 
@@ -202,7 +202,7 @@ TransportListEditor::TransportListEditor(uint sourceid) :
 
 void TransportListEditor::SetSourceID(const QString& sourceid)
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
     SetSourceID(sourceid.toUInt());
     Load();
@@ -210,9 +210,9 @@ void TransportListEditor::SetSourceID(const QString& sourceid)
 
 void TransportListEditor::Load()
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
-    isLoading = true;
+    m_isLoading = true;
     if (m_sourceid)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -229,7 +229,7 @@ void TransportListEditor::Load()
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("TransportList::fillSelections", query);
-            isLoading = false;
+            m_isLoading = false;
             return;
         }
 
@@ -281,7 +281,7 @@ void TransportListEditor::Load()
     }
 
     GroupSetting::Load();
-    isLoading = false;
+    m_isLoading = false;
 }
 
 void TransportListEditor::NewTransport()
@@ -297,7 +297,7 @@ void TransportListEditor::NewTransport()
 
 void TransportListEditor::Delete(TransportSetting *transport)
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
 
     ShowOkPopup(
@@ -340,7 +340,7 @@ void TransportListEditor::Delete(TransportSetting *transport)
 
 void TransportListEditor::Menu(TransportSetting *transport)
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
 
     MythMenu *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");

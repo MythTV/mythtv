@@ -35,27 +35,18 @@
 
 #define LOC      QString("BDRingBuf: ")
 
-BDOverlay::BDOverlay()
-  : pts(-1),
-    x(0),
-    y(0)
-{
-}
-
 BDOverlay::BDOverlay(const bd_overlay_s * const overlay)
-  : image(overlay->w, overlay->h, QImage::Format_Indexed8),
-    pts(-1),
-    x(overlay->x),
-    y(overlay->y)
+  : m_image(overlay->w, overlay->h, QImage::Format_Indexed8),
+    m_x(overlay->x),
+    m_y(overlay->y)
 {
     wipe();
 }
 
 BDOverlay::BDOverlay(const bd_argb_overlay_s * const overlay)
-  : image(overlay->w, overlay->h, QImage::Format_ARGB32),
-    pts(-1),
-    x(overlay->x),
-    y(overlay->y)
+  : m_image(overlay->w, overlay->h, QImage::Format_ARGB32),
+    m_x(overlay->x),
+    m_y(overlay->y)
 {
 }
 
@@ -82,31 +73,31 @@ void BDOverlay::setPalette(const BD_PG_PALETTE_ENTRY *palette)
             rgbpalette.push_back((a << 24) | (r << 16) | (g << 8) | b);
         }
 
-        image.setColorTable(rgbpalette);
+        m_image.setColorTable(rgbpalette);
     }
 }
 
 void BDOverlay::wipe()
 {
-    wipe(0, 0, image.width(), image.height());
+    wipe(0, 0, m_image.width(), m_image.height());
 }
 
 void BDOverlay::wipe(int x, int y, int width, int height)
 {
-    if (image.format() == QImage::Format_Indexed8)
+    if (m_image.format() == QImage::Format_Indexed8)
     {
-        uint8_t *data = image.bits();
-        uint32_t offset = (y * image.bytesPerLine()) + x;
+        uint8_t *data = m_image.bits();
+        uint32_t offset = (y * m_image.bytesPerLine()) + x;
         for (int i = 0; i < height; i++ )
         {
             memset( &data[offset], 0xff, width );
-            offset += image.bytesPerLine();
+            offset += m_image.bytesPerLine();
         }
     }
     else
     {
         QColor   transparent(0, 0, 0, 255);
-        QPainter painter(&image);
+        QPainter painter(&m_image);
         painter.setCompositionMode(QPainter::CompositionMode_Source);
         painter.fillRect(x, y, width, height, transparent);
     }
@@ -149,7 +140,6 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 }
 
 BDInfo::BDInfo(const QString &filename)
-    : m_isValid(true)
 {
     BLURAY* m_bdnav = nullptr;
 
@@ -348,22 +338,22 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
 {
     long long ret = -1;
 
-    poslock.lockForWrite();
+    m_posLock.lockForWrite();
 
     // Optimize no-op seeks
-    if (readaheadrunning &&
-        ((whence == SEEK_SET && pos == readpos) ||
+    if (m_readAheadRunning &&
+        ((whence == SEEK_SET && pos == m_readPos) ||
          (whence == SEEK_CUR && pos == 0)))
     {
-        ret = readpos;
+        ret = m_readPos;
 
-        poslock.unlock();
+        m_posLock.unlock();
 
         return ret;
     }
 
     // only valid for SEEK_SET & SEEK_CUR
-    long long new_pos = (SEEK_SET==whence) ? pos : readpos + pos;
+    long long new_pos = (SEEK_SET==whence) ? pos : m_readPos + pos;
 
     // Here we perform a normal seek. When successful we
     // need to call ResetReadAhead(). A reset means we will
@@ -383,14 +373,14 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
 
     if (ret >= 0)
     {
-        readpos = ret;
+        m_readPos = ret;
 
-        ignorereadpos = -1;
+        m_ignoreReadPos = -1;
 
-        if (readaheadrunning)
-            ResetReadAhead(readpos);
+        if (m_readAheadRunning)
+            ResetReadAhead(m_readPos);
 
-        readAdjust = 0;
+        m_readAdjust = 0;
     }
     else
     {
@@ -400,9 +390,9 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
         LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
     }
 
-    poslock.unlock();
+    m_posLock.unlock();
 
-    generalWait.wakeAll();
+    m_generalWait.wakeAll();
 
     return ret;
 }
@@ -533,8 +523,8 @@ void BDRingBuffer::ProgressUpdate(void)
  */
 bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
-    safefilename = lfilename;
-    filename = lfilename;
+    m_safeFilename = lfilename;
+    m_filename = lfilename;
 
     // clean path filename
     QString filename = QDir(QDir::cleanPath(lfilename)).canonicalPath();
@@ -544,7 +534,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
             QString("%1 nonexistent").arg(lfilename));
         filename = lfilename;
     }
-    safefilename = filename;
+    m_safeFilename = filename;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened BDRingBuffer device at %1")
             .arg(filename));
@@ -565,7 +555,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
                                     file_opened_callback);
 
     QMutexLocker locker(&m_infoLock);
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
     if (m_bdnav)
         close();
@@ -597,8 +587,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     if (!m_bdnav)
     {
-        lastError = tr("Could not open Blu-ray device: %1").arg(filename);
-        rwlock.unlock();
+        m_lastError = tr("Could not open Blu-ray device: %1").arg(filename);
+        m_rwLock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
@@ -617,7 +607,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
                     .arg(metaDiscLibrary->di_num_sets));
     }
 
-    BDInfo::GetNameAndSerialNum(m_bdnav, m_name, m_serialNumber, safefilename, LOC);
+    BDInfo::GetNameAndSerialNum(m_bdnav, m_name, m_serialNumber, m_safeFilename, LOC);
 
     // Check disc to see encryption status, menu and navigation types.
     m_topMenuSupported   = false;
@@ -629,9 +619,9 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
         // couldn't decrypt bluray
         bd_close(m_bdnav);
         m_bdnav = nullptr;
-        lastError = tr("Could not open Blu-ray device %1, failed to decrypt")
+        m_lastError = tr("Could not open Blu-ray device %1, failed to decrypt")
                     .arg(filename);
-        rwlock.unlock();
+        m_rwLock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
@@ -680,8 +670,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
         // no title, no point trying any longer
         bd_close(m_bdnav);
         m_bdnav = nullptr;
-        lastError = tr("Unable to find any Blu-ray compatible titles");
-        rwlock.unlock();
+        m_lastError = tr("Unable to find any Blu-ray compatible titles");
+        m_rwLock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
@@ -786,23 +776,23 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
             // no title, no point trying any longer
             bd_close(m_bdnav);
             m_bdnav = nullptr;
-            lastError = tr("Unable to find any usable Blu-ray titles");
-            rwlock.unlock();
+            m_lastError = tr("Unable to find any usable Blu-ray titles");
+            m_rwLock.unlock();
             mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
             return false;
         }
         SwitchTitle(m_mainTitle);
     }
 
-    readblocksize   = BD_BLOCK_SIZE * 62;
-    setswitchtonext = false;
-    ateof           = false;
-    commserror      = false;
-    numfailures     = 0;
-    rawbitrate      = 8000;
+    m_readBlockSize   = BD_BLOCK_SIZE * 62;
+    m_setSwitchToNext = false;
+    m_ateof           = false;
+    m_commsError      = false;
+    m_numFailures     = 0;
+    m_rawBitrate      = 8000;
     CalcReadAheadThresh();
 
-    rwlock.unlock();
+    m_rwLock.unlock();
 
     mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
     return true;
@@ -1730,12 +1720,12 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
             {
                 const BD_PG_RLE_ELEM *rlep = overlay->img;
                 unsigned actual = overlay->w * overlay->h;
-                uint8_t *data   = osd->image.bits();
-                data = &data[(overlay->y * osd->image.bytesPerLine()) + overlay->x];
+                uint8_t *data   = osd->m_image.bits();
+                data = &data[(overlay->y * osd->m_image.bytesPerLine()) + overlay->x];
 
                 for (unsigned i = 0; i < actual; i += rlep->len, rlep++)
                 {
-                    int dst_y = (i / overlay->w) * osd->image.bytesPerLine();
+                    int dst_y = (i / overlay->w) * osd->m_image.bytesPerLine();
                     int dst_x = (i % overlay->w);
                     memset(data + dst_y + dst_x, rlep->color, rlep->len);
                 }
@@ -1748,9 +1738,9 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
             if (osd)
             {
                 BDOverlay* newOverlay = new BDOverlay(*osd);
-                newOverlay->image =
-                    osd->image.convertToFormat(QImage::Format_ARGB32);
-                newOverlay->pts = overlay->pts;
+                newOverlay->m_image =
+                    osd->m_image.convertToFormat(QImage::Format_ARGB32);
+                newOverlay->m_pts = overlay->pts;
 
                 QMutexLocker lock(&m_overlayLock);
                 m_overlayImages.append(newOverlay);
@@ -1810,10 +1800,10 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
             if (osd)
             {
                 /* draw image */
-                uint8_t* data = osd->image.bits();
+                uint8_t* data = osd->m_image.bits();
 
                 uint32_t srcOffset = 0;
-                uint32_t dstOffset = (overlay->y * osd->image.bytesPerLine()) + (overlay->x * 4);
+                uint32_t dstOffset = (overlay->y * osd->m_image.bytesPerLine()) + (overlay->x * 4);
 
                 for (uint16_t y = 0; y < overlay->h; y++)
                 {
@@ -1821,7 +1811,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
                            &overlay->argb[srcOffset],
                            overlay->w * 4);
 
-                    dstOffset += osd->image.bytesPerLine();
+                    dstOffset += osd->m_image.bytesPerLine();
                     srcOffset += overlay->stride;
                 }
             }
@@ -1833,7 +1823,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
             {
                 QMutexLocker lock(&m_overlayLock);
                 BDOverlay* newOverlay = new BDOverlay(*osd);
-                newOverlay->pts = overlay->pts;
+                newOverlay->m_pts = overlay->pts;
                 m_overlayImages.append(newOverlay);
             }
             break;

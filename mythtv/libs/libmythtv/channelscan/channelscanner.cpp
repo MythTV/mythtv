@@ -421,9 +421,10 @@ void ChannelScanner::PreScanCommon(
     if ("DVB" == card_type)
     {
         QString sub_type = CardUtil::ProbeDVBType(device).toUpper();
-        bool need_nit = (("QAM"  == sub_type) ||
-                         ("QPSK" == sub_type) ||
-                         ("OFDM" == sub_type));
+        bool need_nit = (("QAM"    == sub_type) ||
+                         ("QPSK"   == sub_type) ||
+                         ("OFDM"   == sub_type) ||
+                         ("DVB_T2" == sub_type));
 
         // Ugh, Some DVB drivers don't fully support signal monitoring...
         if ((ScanTypeSetting::TransportScan     == scantype) ||

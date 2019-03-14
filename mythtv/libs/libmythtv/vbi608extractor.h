@@ -31,8 +31,8 @@ class VBI608Extractor
   public:
     VBI608Extractor();
 
-    uint16_t GetCode1(void) const { return code[0]; }
-    uint16_t GetCode2(void) const { return code[1]; }
+    uint16_t GetCode1(void) const { return m_code[0]; }
+    uint16_t GetCode2(void) const { return m_code[1]; }
 
     bool ExtractCC(const VideoFrame*, uint max_lines = 4);
     bool ExtractCC12(const unsigned char *buf, uint width);
@@ -41,17 +41,17 @@ class VBI608Extractor
     uint FillCCData(uint8_t cc_data[8]) const;
 
   private:
-    float    GetClockStart(void) const { return start; }
-    float    GetClockRate(void)  const { return rate;  }
+    float    GetClockStart(void) const { return m_start; }
+    float    GetClockRate(void)  const { return m_rate;  }
     bool     FindClocks(const unsigned char *buf, uint width);
 
-    QList<uint>  raw_minimas;
-    QList<uint>  raw_maximas;
-    QList<float> maximas;
-    QList<float> minimas;
-    float        start;
-    float        rate;
-    uint16_t     code[2];
+    QList<uint>  m_rawMinimas;
+    QList<uint>  m_rawMaximas;
+    QList<float> m_maximas;
+    QList<float> m_minimas;
+    float        m_start       {0.0f};
+    float        m_rate        {0.0f};
+    uint16_t     m_code[2];
 };
 
 #endif // _VBI_608_EXTRACTOR_H_

@@ -1792,7 +1792,7 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
         ResizeForVideo(width, height);
 
     // Determine window and screen dimensions in pixels
-    QSize screen_size = window.GetScreenGeometry().size();
+    QSize screen_size = disp.m_res;
     QSize window_size = window.GetDisplayVisibleRect().size();
 
     float pixel_aspect = (float)screen_size.width() /

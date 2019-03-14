@@ -409,9 +409,10 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
         int spatial_pred= (c+e)>>1;
         int spatial_score= ABS(cur[-refs-1] - cur[+refs-1]) + ABS(c-e)
                          + ABS(cur[-refs+1] - cur[+refs+1]) - 1;
+        int score;
 
 #define CHECK(j)\
-    {   int score= ABS(cur[-refs-1+j] - cur[+refs-1-j])\
+    {   score= ABS(cur[-refs-1+j] - cur[+refs-1-j])\
                  + ABS(cur[-refs  +j] - cur[+refs  -j])\
                  + ABS(cur[-refs+1+j] - cur[+refs+1-j]);\
         if (score < spatial_score){\
@@ -478,8 +479,8 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
                 uint8_t *prev= &p->ref[nr_p][i][y*refs];
                 uint8_t *cur = &p->ref[nr_c][i][y*refs];
                 uint8_t *next= &p->ref[2][i][y*refs];
-                uint8_t *dst2= dst + dst_offsets[i] + y*dst_stride[i];
-                p->filter_line(p, dst2, prev, cur, next, w, refs, field);
+                uint8_t *dst2a= dst + dst_offsets[i] + y*dst_stride[i];
+                p->filter_line(p, dst2a, prev, cur, next, w, refs, field);
             }
             else
             {

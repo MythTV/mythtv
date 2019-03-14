@@ -25,9 +25,7 @@ GalleryFilter::GalleryFilter(bool loaddefaultsettings)
     }
 }
 
-GalleryFilter::GalleryFilter(const GalleryFilter &gfs) :
-    m_dirFilter(""), m_typeFilter(kTypeFilterAll),
-    m_sort(kSortOrderUnsorted), m_changed_state(0)
+GalleryFilter::GalleryFilter(const GalleryFilter &gfs)
 {
     *this = gfs;
 }
