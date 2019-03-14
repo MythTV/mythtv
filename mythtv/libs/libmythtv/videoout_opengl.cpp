@@ -100,8 +100,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     m_openGLVideoPiPActive(nullptr),
     m_window(0),
     m_openGLPainter(nullptr),
-    m_videoProfile(Profile),
-    m_openGLVideoType(OpenGLVideo::StringToType(Profile))
+    m_videoProfile(Profile)
 {
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -190,13 +189,14 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
                              WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
     // if hardware initialisation failed, fallback to yv12
-    if ((OpenGLVideo::kGLInterop == m_openGLVideoType) && codec_sw_copy(CodecId))
-        m_openGLVideoType = OpenGLVideo::kGLYV12;
+    if (format_is_hw(OpenGLVideo::ProfileToType(m_videoProfile)) && codec_sw_copy(CodecId))
+        m_videoProfile = "opengl-yv12";
 
     bool success = true;
     m_window = WinId;
     success &= VideoOutput::Init(VideoDim, VideoDispDim, Aspect, WinId, DisplayVisibleRect, CodecId);
-    SetProfile();
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer(m_videoProfile);
     InitPictureAttributes();
 
     success &= CreateBuffers();
@@ -215,12 +215,6 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     if (!success)
         TearDown();
     return success;
-}
-
-void VideoOutputOpenGL::SetProfile(void)
-{
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer(m_videoProfile);
 }
 
 bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDispDim,
@@ -359,17 +353,11 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     OpenGLLocker ctx_lock(m_render);
     m_openGLVideo = new OpenGLVideo(m_render, &videoColourSpace, window.GetVideoDim(),
                                     window.GetVideoDispDim(), dvr, window.GetDisplayVideoRect(),
-                                    window.GetVideoRect(), true, m_openGLVideoType);
+                                    window.GetVideoRect(), true, m_videoProfile);
     bool success = m_openGLVideo->IsValid();
     if (success)
     {
-        // check if the profile changed
-        if (codec_sw_copy(video_codec_id))
-        {
-            m_openGLVideoType = m_openGLVideo->GetType();
-            m_videoProfile = OpenGLVideo::TypeToString(m_openGLVideoType);
-        }
-
+        m_videoProfile = m_openGLVideo->GetProfile();
         bool temp_deinterlacing = m_deinterlacing;
         SetDeinterlacingEnabled(true);
         if (!temp_deinterlacing)
@@ -459,19 +447,19 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_renderValid = true;
     }
 
-    bool swframe   = codec_sw_copy(video_codec_id) && video_codec_id != kCodec_NONE;
-    bool deintproc = m_deinterlacing && (m_deintFilter != nullptr);
     OpenGLLocker ctx_lock(m_render);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_START");
 
-    bool pauseframe = !Frame;
-    bool dummy = Frame ? Frame->dummy : false;
+    bool swframe   = Frame ? !format_is_hw(Frame->codec) : false;
+    bool dummy     = Frame ? Frame->dummy : false;
+    bool deintproc = m_deinterlacing && (m_deintFilter != nullptr);
+
     if (FilterList && swframe && !dummy)
         FilterList->ProcessFrame(Frame);
 
-    if (swframe && deintproc && m_deinterlaceBeforeOSD && !pauseframe && !dummy)
+    if (swframe && deintproc && !dummy && m_deinterlaceBeforeOSD)
         m_deintFilter->ProcessFrame(Frame, Scan);
 
     if (!window.IsEmbedding())
@@ -480,10 +468,10 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         ShowPIPs(Frame, PiPPlayers);
     }
 
-    if (swframe && deintproc && !m_deinterlaceBeforeOSD && !pauseframe && !dummy)
+    if (swframe && deintproc && !dummy && !m_deinterlaceBeforeOSD)
         m_deintFilter->ProcessFrame(Frame, Scan);
 
-    if (m_openGLVideo && swframe && !dummy && !pauseframe)
+    if (m_openGLVideo && swframe && !dummy)
         m_openGLVideo->UpdateInputFrame(Frame);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -508,9 +496,10 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         topfieldfirst = Frame->top_field_first;
         dummy = Frame->dummy;
     }
-    else if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+    else
     {
         // see VideoOutputOpenGL::DoneDisplayingFrame
+        // we only retain pause frames for hardware formats
         if (vbuffers.Size(kVideoBuffer_pause))
             Frame = vbuffers.Tail(kVideoBuffer_pause);
     }
@@ -640,24 +629,27 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
     if (!Frame)
         return;
 
-    if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+    bool retain = format_is_hw(Frame->codec);
+
+    vbuffers.begin_lock(kVideoBuffer_pause);
+    while (vbuffers.Size(kVideoBuffer_pause))
     {
-        vbuffers.begin_lock(kVideoBuffer_pause);
-        while (vbuffers.Size(kVideoBuffer_pause))
-        {
-            VideoFrame* frame = vbuffers.Dequeue(kVideoBuffer_pause);
-            if (frame != Frame)
-                VideoOutput::DoneDisplayingFrame(frame);
-        }
+        VideoFrame* frame = vbuffers.Dequeue(kVideoBuffer_pause);
+        if (!retain || (retain && (frame != Frame)))
+            VideoOutput::DoneDisplayingFrame(frame);
+    }
+
+    if (retain)
+    {
         vbuffers.Enqueue(kVideoBuffer_pause, Frame);
-        if(vbuffers.Contains(kVideoBuffer_used, Frame))
+        if (vbuffers.Contains(kVideoBuffer_used, Frame))
             vbuffers.Remove(kVideoBuffer_used, Frame);
-        vbuffers.end_lock();
     }
     else
     {
-        VideoOutput::DoneDisplayingFrame(Frame);
+        vbuffers.DoneDisplayingFrame(Frame);
     }
+    vbuffers.end_lock();
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
@@ -719,7 +711,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
     VideoFrame *used = vbuffers.Head(kVideoBuffer_used);
     if (used)
     {
-        if ((m_openGLVideoType == OpenGLVideo::kGLInterop) && !(codec_sw_copy(video_codec_id)))
+        if (format_is_hw(used->codec))
             DoneDisplayingFrame(used);
         else
             m_openGLVideo->UpdateInputFrame(used);
@@ -771,7 +763,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &Overrid
         m_deintFilter = nullptr;
     }
 
-    if (OpenGLVideo::kGLInterop == m_openGLVideoType)
+    if (m_videoProfile.contains("hw"))
     {
         m_deinterlacing = m_deintfiltername.contains("vaapi") ? Interlaced : false;
         return m_deinterlacing;
@@ -844,7 +836,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new OpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
-                                                                false, m_openGLVideoType);
+                                                                false, m_videoProfile);
 
         colourspace->DecrRef();
         if (!gl_pipchain->IsValid())
@@ -863,7 +855,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new OpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
-                                                                false, m_openGLVideoType);
+                                                                false, m_videoProfile);
         colourspace->DecrRef();
         if (!gl_pipchain->IsValid())
         {
@@ -917,17 +909,17 @@ void VideoOutputOpenGL::StopEmbedding(void)
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString &Deinterlacer) const
 {
-    bool vaapi = OpenGLVideo::kGLInterop == m_openGLVideoType;
+    bool hw = m_videoProfile.contains("hw");
     // anything OpenGL when using shaders
-    if (!vaapi && Deinterlacer.contains("opengl"))
+    if (!hw && Deinterlacer.contains("opengl"))
         return true;
 
     // vaapi if allowed
-    if (vaapi && Deinterlacer.contains("vaapi"))
+    if (hw && Deinterlacer.contains("vaapi"))
         return true;
 
     // anything software based
-    if (!vaapi && !Deinterlacer.contains("vdpau") && !Deinterlacer.contains("vaapi"))
+    if (!hw && !Deinterlacer.contains("vdpau") && !Deinterlacer.contains("vaapi"))
         return true;
 
     return VideoOutput::ApproveDeintFilter(Deinterlacer);

@@ -49,6 +49,14 @@ static inline int format_is_hw(VideoFrameType Type)
            (Type == FMT_NVDEC);
 }
 
+static inline int format_is_yuv(VideoFrameType Type)
+{
+    return (Type == FMT_YV12) || (Type == FMT_YUV422P) ||
+           (Type == FMT_YUY2) || (Type == FMT_NV12) ||
+           (Type == FMT_YUYVHQ) || (Type == FMT_YUV420P10) ||
+           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16);
+}
+
 typedef struct VideoFrame_
 {
     VideoFrameType codec;

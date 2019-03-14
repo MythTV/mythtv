@@ -75,12 +75,8 @@ vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Con
     OpenGLLocker locker(Context);
 
     // Hardware frames
-    if (Type == FMT_VDPAU || Type == FMT_VAAPI      || Type == FMT_DXVA2 ||
-        Type == FMT_OMXEGL|| Type == FMT_MEDIACODEC || Type == FMT_VTB ||
-        Type == FMT_NVDEC)
-    {
+    if (format_is_hw(Type))
         return CreateHardwareTextures(Context, Type, Format, Sizes, Target);
-    }
 
     return CreateSoftwareTextures(Context, Type, Format, Sizes, Target);
 }
@@ -146,7 +142,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
 {
     vector<MythVideoTexture*> result;
 
-    uint count = planes(Type);
+    uint count = planes(Format);
     if (count < 1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid software frame format");
@@ -213,7 +209,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
         return;
     }
 
-    uint count = planes(Textures[0]->m_frameType);
+    uint count = planes(Textures[0]->m_frameFormat);
     if (!count || (count != Textures.size()))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid software frame type");

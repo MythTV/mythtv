@@ -33,22 +33,13 @@ class OpenGLVideo : public QObject
         ShaderCount   = 5
     };
 
-    enum FrameType
-    {
-        kGLInterop, // Frame is already in GPU memory
-        kGLUYVY,    // CPU conversion to UYVY422 format - 16bpp
-        kGLYV12,    // All processing on GPU - 12bpp
-        kGLHQUYV,   // High quality interlaced CPU conversion to UYV - 32bpp
-        kGLNV12     // Currently used for VAAPI interop only
-    };
-
-    static FrameType StringToType(const QString &Type);
-    static QString   TypeToString(FrameType Type);
+    static VideoFrameType ProfileToType(const QString &Profile);
+    static QString        TypeToProfile(VideoFrameType Type);
 
     OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                 QRect DisplayVideoRect, QRect videoRect,
-                bool ViewportControl,  FrameType Type);
+                bool ViewportControl, QString Profile);
    ~OpenGLVideo();
 
     bool    IsValid(void) const;
@@ -60,7 +51,7 @@ class OpenGLVideo : public QObject
                          StereoscopicMode Stereo, bool DrawBorder = false);
     void    SetMasterViewport(QSize Size);
     QSize   GetVideoSize(void) const;
-    FrameType GetType() const;
+    QString GetProfile() const;
 
   public slots:
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
@@ -73,8 +64,8 @@ class OpenGLVideo : public QObject
     void    TearDownDeinterlacer(void);
 
     bool           m_valid;
-    FrameType      m_frameType;
-    FrameType      m_interopFrameType;    ///< Interop can return RGB, YV12 or NV12
+    VideoFrameType m_inputType;           ///< Usually YV12 for software, VDPAU etc for hardware
+    VideoFrameType m_outputType;          ///< Set by profile for software or decoder for hardware
     MythRenderOpenGL *m_render;
     QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
     QSize          m_videoDim;            ///< Total video frame size e.g. 1920x1088

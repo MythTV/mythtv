@@ -16,8 +16,6 @@ class VideoOutputOpenGL : public VideoOutput
 
     explicit VideoOutputOpenGL(const QString &Profile = QString());
     virtual ~VideoOutputOpenGL() override;
-
-    virtual void SetProfile(void);
     virtual void TearDown(void);
 
     // VideoOutput
@@ -73,7 +71,6 @@ class VideoOutputOpenGL : public VideoOutput
     VideoFrame             m_pauseFrame;
     MythOpenGLPainter     *m_openGLPainter;
     QString                m_videoProfile;
-    OpenGLVideo::FrameType m_openGLVideoType;
 };
 
 #endif
