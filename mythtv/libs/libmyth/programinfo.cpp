@@ -1017,7 +1017,7 @@ void ProgramInfo::clear(void)
  *  Compare two QStrings when they can either be initialized to
  *  "Default" or to the empty string.
  */
-bool qstringEqualOrDefault(const QString a, const QString b);
+bool qstringEqualOrDefault(QString a, QString b);
 bool qstringEqualOrDefault(const QString a, const QString b)
 {
     if (a == b)

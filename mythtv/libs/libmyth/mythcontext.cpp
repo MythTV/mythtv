@@ -72,10 +72,10 @@ class MythContextPrivate : public QObject
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    bool Init        (const bool gui,
-                      const bool prompt, const bool noPrompt,
-                      const bool ignoreDB);
-    bool FindDatabase(const bool prompt, const bool noPrompt);
+    bool Init        (bool gui,
+                      bool prompt, bool noPrompt,
+                      bool ignoreDB);
+    bool FindDatabase(bool prompt, bool noPrompt);
 
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
@@ -90,7 +90,7 @@ class MythContextPrivate : public QObject
     void    ResetDatabase(void);
 
     int     ChooseBackend(const QString &error);
-    int     UPnPautoconf(const int milliSeconds = 2000);
+    int     UPnPautoconf(int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
     void    ShowGuiStartup(void);

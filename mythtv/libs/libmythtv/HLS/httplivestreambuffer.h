@@ -71,7 +71,7 @@ protected:
 private:
     void FreeStreamsList(QList<HLSStream*> *streams) const;
     HLSStream *GetStreamForSegment(int segid) const;
-    HLSStream *GetStream(const int wanted, const StreamsList *streams = nullptr) const;
+    HLSStream *GetStream(int wanted, const StreamsList *streams = nullptr) const;
     HLSStream *GetFirstStream(const StreamsList *streams = nullptr) const;
     HLSStream *GetLastStream(const StreamsList *streams = nullptr) const;
     HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = nullptr) const;

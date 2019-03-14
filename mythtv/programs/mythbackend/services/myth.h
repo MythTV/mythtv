@@ -60,11 +60,11 @@ class Myth : public MythServices
 
         DTC::TimeZoneInfo*  GetTimeZone         ( ) override; // MythServices
 
-        QString             GetFormatDate       ( const QDateTime Date,
+        QString             GetFormatDate       ( QDateTime       Date,
                                                   bool            ShortDate ) override; // MythServices
-        QString             GetFormatDateTime   ( const QDateTime DateTime,
+        QString             GetFormatDateTime   ( QDateTime       DateTime,
                                                   bool            ShortDate ) override; // MythServices
-        QString             GetFormatTime       ( const QDateTime Time ) override; // MythServices
+        QString             GetFormatTime       ( QDateTime       Time ) override; // MythServices
         QDateTime           ParseISODateString  ( const QString   &DateTime ) override; // MythServices
 
         DTC::LogMessageList* GetLogs            ( const QString   &HostName,

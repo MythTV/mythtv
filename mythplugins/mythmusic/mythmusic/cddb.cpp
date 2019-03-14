@@ -34,16 +34,16 @@ static const QString& helloID();
  */
 struct Dbase
 {
-    static bool Search(Cddb::Matches& res, const Cddb::discid_t discID);
-    static bool Search(Cddb::Album& a, const QString& genre, const Cddb::discid_t discID);
+    static bool Search(Cddb::Matches& res, Cddb::discid_t discID);
+    static bool Search(Cddb::Album& a, const QString& genre, Cddb::discid_t discID);
     static bool Write(const Cddb::Album& album);
 
-    static void New(const Cddb::discid_t discID, const Cddb::Toc& toc);
-    static void MakeAlias(const Cddb::Album& album, const Cddb::discid_t discID);
+    static void New(Cddb::discid_t discID, const Cddb::Toc& toc);
+    static void MakeAlias(const Cddb::Album& album, Cddb::discid_t discID);
 
 private:
-    static bool CacheGet(Cddb::Matches& res, const Cddb::discid_t discID);
-    static bool CacheGet(Cddb::Album& album, const QString& genre, const Cddb::discid_t discID);
+    static bool CacheGet(Cddb::Matches& res, Cddb::discid_t discID);
+    static bool CacheGet(Cddb::Album& album, const QString& genre, Cddb::discid_t discID);
     static void CachePut(const Cddb::Album& album);
 
     // DiscID to album info cache
