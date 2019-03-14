@@ -290,7 +290,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         // If there isn't a password for this level or higher levels, treat
         // the next lower password as valid. This is only done so people
         // cannot lock themselves out of the setup.
-        if (!m_validPasswords.size())
+        if (m_validPasswords.empty())
         {
             QString pw = m_pm.FirstAtOrBelow(which_level.GetLevel());
             if (pw.length())
@@ -298,7 +298,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         }
 
         // There are no suitable passwords.
-        if (!m_validPasswords.size())
+        if (m_validPasswords.empty())
             return true;
 
         // If we got here, there is a password, and there's no backing down.

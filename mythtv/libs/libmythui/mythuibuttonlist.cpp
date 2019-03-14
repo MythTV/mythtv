@@ -1250,7 +1250,7 @@ bool MythUIButtonList::DistributeButtons(void)
 
 void MythUIButtonList::CalculateButtonPositions(void)
 {
-    if (m_ButtonList.size() == 0)
+    if (m_ButtonList.empty())
         return;
 
     int button = 0;

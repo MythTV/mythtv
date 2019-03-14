@@ -1319,13 +1319,13 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     ExpireVertices();
     ExpireVBOS();
 
-    if (m_cachedVertices.size())
+    if (!m_cachedVertices.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired vertices")
             .arg(m_cachedVertices.size()));
     }
 
-    if (m_cachedVBOS.size())
+    if (!m_cachedVBOS.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired VBOs")
             .arg(m_cachedVertices.size()));

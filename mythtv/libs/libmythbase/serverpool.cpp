@@ -456,7 +456,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         }
     }
 
-    if (m_tcpServers.size() == 0)
+    if (m_tcpServers.empty())
         return false;
 
     m_listening = true;
@@ -562,7 +562,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         }
     }
 
-    if (m_udpSockets.size() == 0)
+    if (m_udpSockets.empty())
         return false;
 
     m_listening = true;
@@ -586,7 +586,7 @@ bool ServerPool::bind(quint16 port, bool requireall)
 qint64 ServerPool::writeDatagram(const char * data, qint64 size,
                                  const QHostAddress &addr, quint16 port)
 {
-    if (!m_listening || m_udpSockets.size() == 0)
+    if (!m_listening || m_udpSockets.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "Trying to write datagram to disconnected "
                             "ServerPool instance.");

@@ -2491,12 +2491,12 @@ QString ProgramInfo::GetPlaybackURL(
         QString path = url.path();
         QString host = url.toString(QUrl::RemovePath).mid(7);
         QStringList list = host.split(":", QString::SkipEmptyParts);
-        if (list.size())
+        if (!list.empty())
         {
             host = list[0];
             list = host.split("@", QString::SkipEmptyParts);
             QString group;
-            if (list.size() > 0 && list.size() < 3)
+            if (!list.empty() && list.size() < 3)
             {
                 host  = list.size() == 1 ? list[0]   : list[1];
                 group = list.size() == 1 ? QString() : list[0];
@@ -5621,7 +5621,7 @@ ProgramInfo* LoadProgramFromProgram(const uint chanid,
 
     LoadFromProgram( progList, sSQL, bindings, schedList );
 
-    if (progList.size() == 0)
+    if (progList.empty())
         return progInfo;
 
     // progList is an Auto-delete deque, the object will be deleted with the

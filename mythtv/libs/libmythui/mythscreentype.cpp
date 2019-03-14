@@ -227,7 +227,7 @@ void MythScreenType::BuildFocusList(void)
 
     AddFocusableChildrenToList(m_FocusWidgetList);
 
-    if (m_FocusWidgetList.size() > 0)
+    if (!m_FocusWidgetList.empty())
         SetFocusWidget();
 }
 

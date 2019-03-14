@@ -820,11 +820,11 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
 
     if (lookup->GetCertification().size())
         AddCertifications(lookup, item, docroot);
-    if (lookup->GetCategories().size())
+    if (!lookup->GetCategories().empty())
         AddCategories(lookup, item, docroot);
-    if (lookup->GetStudios().size())
+    if (!lookup->GetStudios().empty())
         AddStudios(lookup, item, docroot);
-    if (lookup->GetCountries().size())
+    if (!lookup->GetCountries().empty())
         AddCountries(lookup, item, docroot);
 }
 

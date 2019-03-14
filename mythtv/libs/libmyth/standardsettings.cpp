@@ -139,7 +139,7 @@ void StandardSetting::clearTargetedSettings(const QString &value)
 QList<StandardSetting *> *StandardSetting::getSubSettings()
 {
     if (m_targets.contains(m_settingValue) &&
-        m_targets[m_settingValue].size() > 0)
+        !m_targets[m_settingValue].empty())
         return &m_targets[m_settingValue];
     return &m_children;
 }
@@ -147,7 +147,7 @@ QList<StandardSetting *> *StandardSetting::getSubSettings()
 bool StandardSetting::haveSubSettings()
 {
     QList<StandardSetting *> *subSettings = getSubSettings();
-    return subSettings && subSettings->size() > 0;
+    return subSettings && !subSettings->empty();
 }
 
 void StandardSetting::clearSettings()
@@ -537,7 +537,7 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
                                  QString("NEWENTRY"),
                                  false,
                                  m_settingValue == "");
-        for (int i = 0; i < m_labels.size() && m_values.size(); ++i)
+        for (int i = 0; i < m_labels.size() && !m_values.empty(); ++i)
         {
             QString value = m_values.at(i);
             menuPopup->AddButton(m_labels.at(i),

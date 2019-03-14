@@ -484,7 +484,7 @@ QString DBUtil::GetBackupDirectory()
     QString directory;
     StorageGroup sgroup("DB Backups", gCoreContext->GetHostName());
     QStringList dirList = sgroup.GetDirList();
-    if (dirList.size())
+    if (!dirList.empty())
     {
         directory = sgroup.FindNextDirMostFree();
 

@@ -474,7 +474,7 @@ void VideoScanner::doScanAll()
 void VideoScanner::finishedScan()
 {
     QStringList failedHosts = m_scanThread->GetOfflineSGHosts();
-    if (failedHosts.size() > 0)
+    if (!failedHosts.empty())
     {
         QString hosts = failedHosts.join(" ");
         QString msg = tr("Failed to Scan SG Video Hosts:\n\n%1\n\n"

@@ -1529,7 +1529,7 @@ void MythMainWindow::detach(QWidget *child)
 
 QWidget *MythMainWindow::currentWidget(void)
 {
-    if (d->m_widgetList.size() > 0)
+    if (!d->m_widgetList.empty())
         return d->m_widgetList.back();
     return nullptr;
 }
@@ -2191,7 +2191,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                 LOG(VB_GUI, LOG_ERR, QString("TranslateKeyPress Long Press Invalid Response"));
                 return true;
             }
-            if (actions.size()>0 && actions[0].startsWith("LONGPRESS"))
+            if (!actions.empty() && actions[0].startsWith("LONGPRESS"))
             {
                 // Beginning of a press
                 d->m_longPressKeyCode = keycode;

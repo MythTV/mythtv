@@ -2622,7 +2622,7 @@ void MythCommandLineParser::ApplySettingsOverride(void)
         cerr << "Applying settings override" << endl;
 
     QMap<QString, QString> override = GetSettingsOverride();
-    if (override.size())
+    if (!override.empty())
     {
         QMap<QString, QString>::iterator it;
         for (it = override.begin(); it != override.end(); ++it)

@@ -390,7 +390,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         // ------------------------------------------------------------------
         QString     str          = QString(buffer.constData());
         QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);
-        QString     sRequestLine = lines.size() ? lines[0] : "";
+        QString     sRequestLine = !lines.empty() ? lines[0] : "";
 
         if (!lines.isEmpty())
             lines.pop_front();

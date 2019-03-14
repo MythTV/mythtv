@@ -1366,7 +1366,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
 
         if (gCoreContext->SendReceiveStringList(strList))
         {
-            if (strList.size() > 0 && !strList[0].isEmpty() &&
+            if (!strList.empty() && !strList[0].isEmpty() &&
                 strList[0] != "NOT FOUND" && !strList[0].startsWith("ERROR: "))
                 return strList;
         }

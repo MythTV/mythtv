@@ -334,7 +334,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
           << QString::number(socket->GetSocketDescriptor())
           << QString::number(ft->GetFileSize());
 
-    if (checkfiles.size())
+    if (!checkfiles.empty())
     {
         QFileInfo fi(filename);
         QDir dir = fi.absoluteDir();

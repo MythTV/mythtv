@@ -436,7 +436,7 @@ meta_data_list::const_iterator meta_dir_node::entries_end() const
 // have entries. TODO: cache this value
 bool meta_dir_node::has_entries() const
 {
-    bool ret = m_entries.size();
+    bool ret = !m_entries.empty();
 
     if (!ret)
     {

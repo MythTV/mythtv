@@ -135,7 +135,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
         if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height())
         {
             const std::vector<double>& rates = dsr[i].RefreshRates();
-            if (rates.size() && videorate != 0)
+            if (!rates.empty() && videorate != 0)
             {
                 while (!end)
                 {

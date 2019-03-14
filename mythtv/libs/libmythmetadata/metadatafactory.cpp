@@ -286,7 +286,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         DownloadMap map;
 
         ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);
-        if (coverartlist.size())
+        if (!coverartlist.empty())
         {
             ArtworkInfo info;
             info.url = coverartlist.takeFirst().url;
@@ -294,7 +294,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         }
 
         ArtworkList fanartlist = lookup->GetArtwork(kArtworkFanart);
-        if (fanartlist.size())
+        if (!fanartlist.empty())
         {
             ArtworkInfo info;
             int index = 0;
@@ -306,7 +306,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         }
 
         ArtworkList bannerlist = lookup->GetArtwork(kArtworkBanner);
-        if (bannerlist.size())
+        if (!bannerlist.empty())
         {
             ArtworkInfo info;
             info.url = bannerlist.takeFirst().url;
@@ -316,7 +316,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (lookup->GetType() != kMetadataRecording)
         {
             ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
-            if (screenshotlist.size())
+            if (!screenshotlist.empty())
             {
                 ArtworkInfo info;
                 info.url = screenshotlist.takeFirst().url;
@@ -542,7 +542,7 @@ void MetadataFactory::customEvent(QEvent *levent)
             m_returnList = MetadataLookupList();
             m_sync = false;
         }
-        if (lul.size())
+        if (!lul.empty())
         {
             OnNoResult(lul[0]);
         }

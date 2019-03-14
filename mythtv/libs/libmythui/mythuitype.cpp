@@ -1043,7 +1043,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
         }
     }
 
-    if (m_dependsValue.size() > 0)
+    if (!m_dependsValue.empty())
         visible = m_dependsValue[0].second;
     for (int i = 1; i <  m_dependsValue.size(); i++)
     {
