@@ -1841,7 +1841,7 @@ static void cc608_build_parity_table(int *parity_table)
         int parity_v = cc608_parity(byte);
         /* CC uses odd parity (i.e., # of 1's in byte is odd.) */
         parity_table[byte] = parity_v;
-        parity_table[byte | 0x80] = !parity_v;
+        parity_table[byte | 0x80] = (parity_v == 0 ? 1 : 0);
     }
 }
 
@@ -1850,13 +1850,14 @@ static void cc608_build_parity_table(int *parity_table)
 
 static int cc608_good_parity(const int *parity_table, uint16_t data)
 {
-    int ret = parity_table[data & 0xff] && parity_table[(data & 0xff00) >> 8];
+    bool ret = (parity_table[data & 0xff] != 0)
+        && (parity_table[(data & 0xff00) >> 8] != 0);
     if (!ret)
     {
         LOG(VB_VBI, LOG_ERR, LOC +
             QString("VBI: Bad parity in EIA-608 data (%1)") .arg(data,0,16));
     }
-    return ret;
+    return ret ? 1 : 0;
 }
 
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
@@ -3232,8 +3233,8 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint len, bool scte)
             if (cc_type == 0x2)
             {
                 // SCTE repeated field
-                field = !m_last_scte_field;
-                m_invert_scte_field = !m_invert_scte_field;
+                field = (m_last_scte_field == 0 ? 1 : 0);
+                m_invert_scte_field = (m_invert_scte_field == 0 ? 1 : 0);
             }
             else
             {

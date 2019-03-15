@@ -1208,14 +1208,14 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     }
 
     if (info->display_picture->nb_fields % 2)
-        m_picture->top_field_first = !(info->display_picture->flags &
-                                     PIC_FLAG_TOP_FIELD_FIRST);
+        m_picture->top_field_first = ((info->display_picture->flags &
+                                       PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 0 : 1;
     else
-        m_picture->top_field_first = !!(info->display_picture->flags &
-                                      PIC_FLAG_TOP_FIELD_FIRST);
+        m_picture->top_field_first = ((info->display_picture->flags &
+                                       PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 1 : 0;
 
-    m_picture->interlaced_frame = !(info->display_picture->flags &
-                                  PIC_FLAG_PROGRESSIVE_FRAME);
+    m_picture->interlaced_frame = ((info->display_picture->flags &
+                                    PIC_FLAG_PROGRESSIVE_FRAME) != 0) ? 0 : 1;
 
     out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
 
