@@ -263,11 +263,11 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
 
         if (m_delMap.contains(0))
         {
-            m_discard = 1;
+            m_discard = true;
             m_delMap.remove(0);
         }
         if (m_delMap.begin().value() == MARK_CUT_END)
-            m_discard = 1;
+            m_discard = true;
         m_use_secondary = true;
     }
 
@@ -1905,7 +1905,7 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
     if (type == MPF_TYPE_CUTLIST)
     {
         mapPtr = &m_delMap;
-        m_discard = 0;
+        m_discard = false;
     }
     else
         mapPtr = &m_saveMap;
@@ -1928,7 +1928,7 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
             if (start == 0)
             {
                 if (type == MPF_TYPE_CUTLIST)
-                    m_discard = 1;
+                    m_discard = true;
             }
             else
                 mapPtr->insert(start - 1, MARK_CUT_START);
@@ -2107,7 +2107,7 @@ int MPEG2fixup::Start()
         origaPTS[it.key()] = af->first()->m_pkt.pts * 300;
         //expectedPTS[it.key()] = udiff2x33(af->first()->m_pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
-        cutState[it.key()] = !!(m_discard);
+        cutState[it.key()] = m_discard;
     }
 
     ShowRangeMap(&m_delMap, "Cutlist:");

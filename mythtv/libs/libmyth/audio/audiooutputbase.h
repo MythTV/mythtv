@@ -291,7 +291,7 @@ class AudioOutputBase : public AudioOutput, public MThread
      */
     uchar             m_audiobuffer[kAudioRingBufferSize];
     uint              m_memory_corruption_test3           {0xdeadbeef};;
-    uint              m_configure_succeeded               {false};
+    bool              m_configure_succeeded               {false};
     int64_t           m_length_last_data                  {0};
 
     // SPDIF Encoder for digital passthrough

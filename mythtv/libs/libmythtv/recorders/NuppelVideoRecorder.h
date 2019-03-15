@@ -171,7 +171,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     int                 m_height                 {240};
     int                 m_pip_mode               {0};
     int                 m_compression            {1};
-    int                 m_compressaudio          {1};
+    bool                m_compressaudio          {true};
     AudioInput         *m_audio_device           {nullptr};
     unsigned long long  m_audiobytes             {0};
     int                 m_audio_channels         {2}; 

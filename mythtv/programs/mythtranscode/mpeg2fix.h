@@ -238,7 +238,7 @@ class MPEG2fixup
     int64_t         m_ptsIncrement;
     bool            m_mkvfile;
 
-    int             m_discard       {0};
+    bool            m_discard       {false};
     //control options
     int             m_no_repeat, m_fix_PTS, m_maxframes;
     QString         m_infile;

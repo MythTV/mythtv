@@ -1641,7 +1641,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     unsigned char *outputbuf = new unsigned char[bufflen];
 
     int frameNo = -1, thumbCount = 0;
-    int frameFinished = 0;
+    bool frameFinished = false;
     int keyFrame;
 
     while (av_read_frame(inputFC, &pkt) >= 0)
@@ -1655,10 +1655,10 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
 
                 avcodec_flush_buffers(codecCtx);
                 av_frame_unref(frame);
-                frameFinished = 0;
+                frameFinished = false;
                 ret = avcodec_receive_frame(codecCtx, frame);
                 if (ret == 0)
-                    frameFinished = 1;
+                    frameFinished = true;
                 if (ret == 0 || ret == AVERROR(EAGAIN))
                     ret = avcodec_send_packet(codecCtx, &pkt);
                 keyFrame = frame->key_frame;
@@ -1675,7 +1675,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                         av_frame_unref(frame);
                         ret = avcodec_receive_frame(codecCtx, frame);
                         if (ret == 0)
-                            frameFinished = 1;
+                            frameFinished = true;
                         if (ret == 0 || ret == AVERROR(EAGAIN))
                             ret = avcodec_send_packet(codecCtx, &pkt);
                         keyFrame = frame->key_frame;
@@ -1734,7 +1734,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                                     frameNo++;
                                     ret = avcodec_receive_frame(codecCtx, frame);
                                     if (ret == 0)
-                                        frameFinished = 1;
+                                        frameFinished = true;
                                     if (ret == 0 || ret == AVERROR(EAGAIN))
                                         ret = avcodec_send_packet(codecCtx, &pkt);
                                 }
