@@ -182,7 +182,7 @@ const uint8_t *avc_find_startcode(const uint8_t *p, const uint8_t *end)
     return out;
 }
 
-const int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
+int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
 {
     const uint8_t *p = buf_in;
     const uint8_t *end = p + size;
@@ -202,7 +202,7 @@ const int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
     return size;
 }
 
-const int avc_parse_nal_units_buf(const uint8_t *buf_in,
+int avc_parse_nal_units_buf(const uint8_t *buf_in,
                                   uint8_t **buf, int *size)
 {
     AVIOContext *pb;
@@ -217,7 +217,7 @@ const int avc_parse_nal_units_buf(const uint8_t *buf_in,
     return 0;
 }
 
-const int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
+int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
 {
     // extradata from bytestream h264, convert to avcC atom data for bitstream
     if (len > 6)
