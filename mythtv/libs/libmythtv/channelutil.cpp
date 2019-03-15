@@ -1804,7 +1804,7 @@ int ChannelUtil::GetServiceVersion(int mplexid)
     if (!query.exec())
     {
         MythDB::DBError("Selecting channel/dtv_multiplex", query);
-        return false;
+        return 0;
     }
 
     if (query.next())

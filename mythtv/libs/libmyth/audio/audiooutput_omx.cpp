@@ -76,7 +76,7 @@ AudioOutputOMX::AudioOutputOMX(const AudioSettings &settings) :
     for (unsigned port = 0; port < m_audiorender.Ports(); ++port)
     {
         m_audiorender.ShowPortDef(port, LOG_DEBUG, VB_AUDIO);
-        if (0) m_audiorender.ShowFormats(port, LOG_DEBUG, VB_AUDIO);
+        if (false) m_audiorender.ShowFormats(port, LOG_DEBUG, VB_AUDIO);
     }
 
     InitSettings(settings);

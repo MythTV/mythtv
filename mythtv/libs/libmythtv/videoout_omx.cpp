@@ -303,7 +303,7 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_render.Ports(); ++port)
     {
         m_render.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_render.ShowFormats(port, LOG_DEBUG);
+        if (false) m_render.ShowFormats(port, LOG_DEBUG);
     }
 
     if (OMX_ErrorNone != m_imagefx.Init(OMX_IndexParamImageInit))
@@ -316,7 +316,7 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_imagefx.Ports(); ++port)
     {
         m_imagefx.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_imagefx.ShowFormats(port, LOG_DEBUG);
+        if (false) m_imagefx.ShowFormats(port, LOG_DEBUG);
     }
 }
 

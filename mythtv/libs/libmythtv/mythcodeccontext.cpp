@@ -164,7 +164,7 @@ int MythCodecContext::FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame)
 {
     int ret = 0;
 
-    while (1)
+    while (true)
     {
         if (filter_graph)
         {

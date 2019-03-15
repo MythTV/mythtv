@@ -1373,7 +1373,7 @@ void MythUIWebBrowser::slotIconChanged(void)
 
 void MythUIWebBrowser::slotScrollBarShowing(void)
 {
-    bool wasActive = (m_wasActive | m_active);
+    bool wasActive = (m_wasActive || m_active);
     SetActive(false);
     m_wasActive = wasActive;
 }

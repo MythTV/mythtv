@@ -744,7 +744,7 @@ OMX_ERRORTYPE OMXComponentCtx::Event( OMXComponent &cmpnt,
         break;
 
       case OMX_EventBufferFlag:
-        if (0) LOG(VB_PLAYBACK, LOG_DEBUG, LOCB(cmpnt) + QString(
+        if (false) LOG(VB_PLAYBACK, LOG_DEBUG, LOCB(cmpnt) + QString(
                 "EventBufferFlag: port=%1 flags=%2")
             .arg(nData1).arg(HeaderFlags(nData2)) );
         break;

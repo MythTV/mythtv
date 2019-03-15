@@ -407,7 +407,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     /* Check if name or description contains information
        to know if device can accept passthrough or not */
     QMap<QString, QString> *alsadevs = GetDevices("pcm");
-    while(1)
+    while (true)
     {
         QString real_device = ((passthrough && m_discretedigital) ?
                                m_passthru_device : m_main_device);

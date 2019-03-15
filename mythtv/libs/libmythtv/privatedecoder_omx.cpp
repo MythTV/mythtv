@@ -111,7 +111,7 @@ PrivateDecoderOMX::PrivateDecoderOMX() :
     for (unsigned port = 0; port < m_videc.Ports(); ++port)
     {
         m_videc.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_videc.ShowFormats(port, LOG_DEBUG);
+        if (false) m_videc.ShowFormats(port, LOG_DEBUG);
     }
 }
 

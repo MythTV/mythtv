@@ -114,7 +114,7 @@ bool ExternalRecChannelFetcher::FetchChannel(const QString & cmd,
 int ExternalRecChannelFetcher::LoadChannels(void)
 {
     if (!Valid())
-        return false;
+        return 0;
 
     QString result;
     int     cnt = -1;

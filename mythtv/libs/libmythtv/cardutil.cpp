@@ -1415,7 +1415,7 @@ uint CardUtil::GetDeviceInputGroup(uint inputid)
     if (!query.exec())
     {
         MythDB::DBError("CardUtil::GetDeviceInputGroup()", query);
-        return false;
+        return 0;
     }
 
     if (query.next())
