@@ -170,6 +170,19 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
             case FMT_YUYVHQ:
                 texture = CreateTexture(Context, size, Target);
                 break;
+            case FMT_NV12:
+                if (plane == 0)
+                {
+                    texture = CreateTexture(Context, size, Target,
+                                            QOpenGLTexture::UInt8,  QOpenGLTexture::Red);
+                }
+                else
+                {
+                    size = QSize(size.width() >> 1, size.height() >> 1);
+                    texture = CreateTexture(Context, size, Target,
+                                            QOpenGLTexture::UInt8, QOpenGLTexture::RG);
+                }
+                break;
             default: break;
         }
         if (texture)
@@ -216,6 +229,8 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
         return;
     }
 
+    OpenGLLocker locker(Context);
+
     for (uint i = 0; i < count; ++i)
     {
         MythVideoTexture *texture = Textures[i];
@@ -236,9 +251,18 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
             {
                 switch (texture->m_frameFormat)
                 {
-                    case FMT_YV12:   YV12ToYV12(Context, Frame, texture, i); break;
-                    case FMT_YUY2:   YV12ToYUYV(Context, Frame, texture);    break;
-                    case FMT_YUYVHQ: YV12ToYUYVHQ(Context, Frame, texture);  break;
+                    case FMT_YV12:   YV12ToYV12(Frame, texture, i); break;
+                    case FMT_YUY2:   YV12ToYUYV(Frame, texture);    break;
+                    case FMT_YUYVHQ: YV12ToYUYVHQ(Frame, texture);  break;
+                    default: break;
+                }
+                break;
+            }
+            case FMT_NV12:
+            {
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_NV12:   NV12ToNV12(Frame, texture, i); break;
                     default: break;
                 }
                 break;
@@ -306,17 +330,15 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 }
 
 /// \brief Copy YV12 frame data to 'YV12' textures.
-void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
+void MythVideoTexture::YV12ToYV12(const VideoFrame *Frame,
                                   MythVideoTexture *Texture, int Plane)
 {
-    OpenGLLocker locker(Context);
-
     void *buffer = nullptr;
     int offset   = 0;
     int width    = Texture->m_size.width();
 
     // Direct copy
-    if ((Frame->codec == FMT_YV12) && (Frame->pitches[Plane] == width))
+    if (Frame->pitches[Plane] == width)
     {
         buffer = Frame->buf;
         offset = Frame->offsets[Plane];
@@ -341,15 +363,13 @@ void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *F
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture.
-void MythVideoTexture::YV12ToYUYV(MythRenderOpenGL *Context, const VideoFrame *Frame,
+void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame,
                                   MythVideoTexture *Texture)
 {
-    OpenGLLocker locker(Context);
-
     void * buffer = nullptr;
 
     // Direct copy
-    if ((Frame->codec == FMT_YUY2) && (Frame->pitches[0] == Texture->m_size.width()))
+    if (Frame->pitches[0] == Texture->m_size.width())
     {
         buffer = Frame->buf;
     }
@@ -380,11 +400,9 @@ void MythVideoTexture::YV12ToYUYV(MythRenderOpenGL *Context, const VideoFrame *F
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture with high quality interlaced chroma sampling.
-void MythVideoTexture::YV12ToYUYVHQ(MythRenderOpenGL *Context, const VideoFrame *Frame,
+void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame,
                                     MythVideoTexture *Texture)
 {
-    OpenGLLocker locker(Context);
-
     // Create a buffer
     if (!Texture->m_data)
         if (!CreateBuffer(Texture, Texture->m_bufferSize))
@@ -404,6 +422,40 @@ void MythVideoTexture::YV12ToYUYVHQ(MythRenderOpenGL *Context, const VideoFrame 
 
     // Update
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
+    Texture->m_valid = true;
+}
+
+/// \brief Copy NV12 video frame data to 'NV12' textures.
+void MythVideoTexture::NV12ToNV12(const VideoFrame *Frame, MythVideoTexture *Texture, int Plane)
+{
+    void *buffer = nullptr;
+    int offset = 0;
+    int width = Texture->m_size.width();
+    if (Plane)
+        width *= 2;
+
+    // Direct copy
+    if (Frame->pitches[Plane] == width)
+    {
+        buffer = Frame->buf;
+        offset = Frame->offsets[Plane];
+    }
+    else
+    {
+        // Create a buffer
+        if (!Texture->m_data)
+            if (!CreateBuffer(Texture, Texture->m_bufferSize))
+                return;
+        buffer = Texture->m_data;
+
+        // Refresh
+        copyplane(static_cast<uint8_t*>(buffer), width, Frame->buf + Frame->offsets[Plane],
+                  Frame->pitches[Plane], width, Texture->m_size.height());
+    }
+
+    // Update
+    Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
+                                static_cast<uint8_t*>(buffer) + offset);
     Texture->m_valid = true;
 }
 

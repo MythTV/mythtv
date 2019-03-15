@@ -1334,6 +1334,7 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
         case QOpenGLTexture::RGBA: bpp = 4; break;
         case QOpenGLTexture::BGR:
         case QOpenGLTexture::RGB:  bpp = 3; break;
+        case QOpenGLTexture::RG:   bpp = 2; break;
         case QOpenGLTexture::Red:
         case QOpenGLTexture::Alpha:
         case QOpenGLTexture::Luminance: bpp = 1; break;
