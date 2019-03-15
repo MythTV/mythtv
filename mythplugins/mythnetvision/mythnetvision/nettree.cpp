@@ -924,15 +924,15 @@ void NetTree::UpdateTrees()
 void NetTree::ToggleRSSUpdates()
 {
     m_rssAutoUpdate = !m_rssAutoUpdate;
-    gCoreContext->SaveSetting("mythnetvision.rssBackgroundFetch",
-                              m_rssAutoUpdate);
+    gCoreContext->SaveBoolSetting("mythnetvision.rssBackgroundFetch",
+                                  m_rssAutoUpdate);
 }
 
 void NetTree::ToggleTreeUpdates()
 {
     m_treeAutoUpdate = !m_treeAutoUpdate;
-    gCoreContext->SaveSetting("mythnetvision.backgroundFetch",
-                              m_treeAutoUpdate);
+    gCoreContext->SaveBoolSetting("mythnetvision.backgroundFetch",
+                                  m_treeAutoUpdate);
 }
 
 void NetTree::customEvent(QEvent *event)

@@ -1663,7 +1663,7 @@ void GalleryThumbView::ShowSettings()
 */
 void GalleryThumbView::ShowHidden(bool show)
 {
-    gCoreContext->SaveSetting("GalleryShowHidden", show);
+    gCoreContext->SaveBoolSetting("GalleryShowHidden", show);
 
     // Update Db(s)
     m_mgr.SetVisibility(show);

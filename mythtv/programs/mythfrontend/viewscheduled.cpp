@@ -54,7 +54,7 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool /*showTV*
 ViewScheduled::~ViewScheduled()
 {
     gCoreContext->removeListener(this);
-    gCoreContext->SaveSetting("ViewSchedShowLevel", !m_showAll);
+    gCoreContext->SaveBoolSetting("ViewSchedShowLevel", !m_showAll);
 
     // if we have a player, we need to tell we are done
     if (m_player)

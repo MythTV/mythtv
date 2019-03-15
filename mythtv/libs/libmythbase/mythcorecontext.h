@@ -145,6 +145,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetSetting(const QString &key, const QString &defaultval = "");
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
+    void SaveBoolSetting(const QString &key, bool newValue)
+        { SaveSetting(key, static_cast<int>(newValue)); }
 
     // Convenience setting query methods
     bool GetBoolSetting(const QString &key, bool defaultval = false);
