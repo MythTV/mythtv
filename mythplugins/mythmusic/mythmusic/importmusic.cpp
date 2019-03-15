@@ -1159,13 +1159,13 @@ void ImportCoverArtDialog::updateTypeSelector()
     QFileInfo fi(filename);
     filename = fi.fileName();
 
-    if (filename.contains("front", Qt::CaseInsensitive) > 0)
+    if (filename.contains("front", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("Front Cover"));
-    else if (filename.contains("back", Qt::CaseInsensitive) > 0)
+    else if (filename.contains("back", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("Back Cover"));
-    else if (filename.contains("inlay", Qt::CaseInsensitive) > 0)
+    else if (filename.contains("inlay", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("Inlay"));
-    else if (filename.contains("cd", Qt::CaseInsensitive) > 0)
+    else if (filename.contains("cd", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("CD"));
     else
         m_typeList->SetValue(tr("<Unknown>"));
