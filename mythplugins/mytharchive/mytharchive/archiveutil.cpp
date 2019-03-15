@@ -102,7 +102,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(tempDir);
-        if( chmod(qPrintable(tempDir), 0777) )
+        if( chmod(qPrintable(tempDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to change permissions on archive directory: " + ENO);
     }
@@ -111,7 +111,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(workDir);
-        if( chmod(qPrintable(workDir), 0777) )
+        if( chmod(qPrintable(workDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to change permissions on archive work directory: " +
                 ENO);
@@ -121,7 +121,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(logDir);
-        if( chmod(qPrintable(logDir), 0777) )
+        if( chmod(qPrintable(logDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to change permissions on archive log directory: " +
                 ENO);
@@ -130,7 +130,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(configDir);
-        if( chmod(qPrintable(configDir), 0777) )
+        if( chmod(qPrintable(configDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR, 
                 "Failed to change permissions on archive config directory: " +
                 ENO);

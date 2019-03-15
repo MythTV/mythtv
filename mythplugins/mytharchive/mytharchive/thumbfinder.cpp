@@ -353,7 +353,7 @@ QString ThumbFinder::createThumbDir(void)
     if (!dir.exists())
     {
         dir.mkdir(thumbDir);
-        if( chmod(qPrintable(thumbDir), 0777) )
+        if( chmod(qPrintable(thumbDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions"
                                      " on thumb directory: " + ENO);
     }
@@ -366,7 +366,7 @@ QString ThumbFinder::createThumbDir(void)
     }
 
     dir.mkdir(path);
-    if( chmod(qPrintable(path), 0777) )
+    if( chmod(qPrintable(path), 0777) != 0 )
         LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions on "
                                  "thumb directory: %1" + ENO);
 
