@@ -397,7 +397,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     void setValue(const QString&) override; // StandardSetting
     virtual void setValue(bool value);
     using StandardSetting::setValue;
-    bool boolValue();
+    bool boolValue() { return m_settingValue == "1"; }
 
   signals:
     void valueChanged(bool);

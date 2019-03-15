@@ -698,11 +698,6 @@ MythUICheckBoxSetting::MythUICheckBoxSetting(Storage *_storage):
 {
 }
 
-bool MythUICheckBoxSetting::boolValue()
-{
-    return m_settingValue == "1";
-}
-
 void MythUICheckBoxSetting::setValue(const QString &value)
 {
     StandardSetting::setValue(value);
