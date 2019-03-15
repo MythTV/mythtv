@@ -774,7 +774,7 @@ static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
     frm_dir_map_t delMap = *deleteMap;
     bool withinCut = false;
     bool firstMark = true;
-    while (delMap.count() && delMap.begin().key() <= oldBookmark)
+    while (!delMap.empty() && delMap.begin().key() <= oldBookmark)
     {
         uint64_t key = delMap.begin().key();
         MarkTypes mark = delMap.begin().value();

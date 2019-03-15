@@ -2245,7 +2245,7 @@ int MPEG2fixup::Start()
                     {
                         if (m_saveMap.begin().key() <= frame_count)
                            m_saveMap.remove(m_saveMap.begin().key());
-                        if (m_saveMap.count() && m_saveMap.begin().value() == 0)
+                        if (!m_saveMap.empty() && m_saveMap.begin().value() == 0)
                         {
                             LOG(VB_GENERAL, LOG_INFO,
                                 QString("Saving frame #%1") .arg(frame_count));
@@ -2261,7 +2261,7 @@ int MPEG2fixup::Start()
                         }
                     }
 
-                    if (m_delMap.count() && m_delMap.begin().key() <= frame_count)
+                    if (!m_delMap.empty() && m_delMap.begin().key() <= frame_count)
                     {
                         new_discard_state = m_delMap.begin().value();
                         LOG(VB_GENERAL, LOG_INFO,
