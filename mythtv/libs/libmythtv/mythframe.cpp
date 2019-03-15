@@ -286,6 +286,18 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
 }
 #endif /* ARCH_X86 */
 
+static inline void copyplane(uint8_t* dst, int dst_pitch,
+                             const uint8_t* src, int src_pitch,
+                             int width, int height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        memcpy(dst, src, width);
+        src += src_pitch;
+        dst += dst_pitch;
+    }
+}
+
 static void splitplanes(uint8_t* dstu, int dstu_pitch,
                         uint8_t* dstv, int dstv_pitch,
                         const uint8_t* src, int src_pitch,

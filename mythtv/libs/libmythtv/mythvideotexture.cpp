@@ -249,7 +249,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
             {
                 switch (texture->m_frameFormat)
                 {
-                    case FMT_YV12:   YV12ToYV12(Frame, texture, i); break;
+                    case FMT_YV12:   YV12ToYV12(Context, Frame, texture, i); break;
                     case FMT_YUY2:   YV12ToYUYV(Frame, texture);    break;
                     case FMT_YUYVHQ: YV12ToYUYVHQ(Frame, texture);  break;
                     default: break;
@@ -260,7 +260,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
             {
                 switch (texture->m_frameFormat)
                 {
-                    case FMT_NV12:   NV12ToNV12(Frame, texture, i); break;
+                    case FMT_NV12:   NV12ToNV12(Context, Frame, texture, i); break;
                     default: break;
                 }
                 break;
@@ -328,69 +328,36 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 }
 
 /// \brief Copy YV12 frame data to 'YV12' textures.
-void MythVideoTexture::YV12ToYV12(const VideoFrame *Frame,
-                                  MythVideoTexture *Texture, int Plane)
+inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
+                                         MythVideoTexture *Texture, int Plane)
 {
-    void *buffer = nullptr;
-    int offset   = 0;
-    int width    = Texture->m_size.width();
-
-    // Direct copy
-    if (Frame->pitches[Plane] == width)
-    {
-        buffer = Frame->buf;
-        offset = Frame->offsets[Plane];
-    }
-    else
-    {
-        // Create a buffer
-        if (!Texture->m_data)
-            if (!CreateBuffer(Texture, Texture->m_bufferSize))
-                return;
-        buffer = Texture->m_data;
-
-        // Refresh
-        copyplane(static_cast<uint8_t*>(buffer), width, Frame->buf + Frame->offsets[Plane],
-                  Frame->pitches[Plane], width, Texture->m_size.height());
-    }
-
-    // Update
+    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Frame->pitches[Plane]);
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
-                                static_cast<uint8_t*>(buffer) + offset);
+                                static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
     Texture->m_valid = true;
+    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture.
-void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame,
-                                  MythVideoTexture *Texture)
+inline void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame, MythVideoTexture *Texture)
 {
-    void * buffer = nullptr;
+    // Create a buffer
+    if (!Texture->m_data)
+        if (!CreateBuffer(Texture, Texture->m_bufferSize))
+            return;
+   void* buffer = Texture->m_data;
 
-    // Direct copy
-    if (Frame->pitches[0] == Texture->m_size.width())
+    // Create a copy context
+    if (!Texture->m_copyContext)
     {
-        buffer = Frame->buf;
-    }
-    else
-    {
-        // Create a buffer
-        if (!Texture->m_data)
-            if (!CreateBuffer(Texture, Texture->m_bufferSize))
-                return;
-        buffer = Texture->m_data;
-
-        // Create a copy context
+        Texture->m_copyContext = new MythAVCopy();
         if (!Texture->m_copyContext)
-        {
-            Texture->m_copyContext = new MythAVCopy();
-            if (!Texture->m_copyContext)
-                return;
-        }
-
-        // Convert
-        AVFrame out;
-        Texture->m_copyContext->Copy(&out, Frame, static_cast<unsigned char*>(buffer), AV_PIX_FMT_UYVY422);
+            return;
     }
+
+    // Convert
+    AVFrame out;
+    Texture->m_copyContext->Copy(&out, Frame, static_cast<unsigned char*>(buffer), AV_PIX_FMT_UYVY422);
 
     // Update
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, buffer);
@@ -398,8 +365,7 @@ void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame,
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture with high quality interlaced chroma sampling.
-void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame,
-                                    MythVideoTexture *Texture)
+inline void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame, MythVideoTexture *Texture)
 {
     // Create a buffer
     if (!Texture->m_data)
@@ -424,41 +390,18 @@ void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame,
 }
 
 /// \brief Copy NV12 video frame data to 'NV12' textures.
-void MythVideoTexture::NV12ToNV12(const VideoFrame *Frame, MythVideoTexture *Texture, int Plane)
+inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
+                                         MythVideoTexture *Texture, int Plane)
 {
-    void *buffer = nullptr;
-    int offset = 0;
-    int width = Texture->m_size.width();
-    if (Plane)
-        width *= 2;
-
-    // Direct copy
-    if (Frame->pitches[Plane] == width)
-    {
-        buffer = Frame->buf;
-        offset = Frame->offsets[Plane];
-    }
-    else
-    {
-        // Create a buffer
-        if (!Texture->m_data)
-            if (!CreateBuffer(Texture, Texture->m_bufferSize))
-                return;
-        buffer = Texture->m_data;
-
-        // Refresh
-        copyplane(static_cast<uint8_t*>(buffer), width, Frame->buf + Frame->offsets[Plane],
-                  Frame->pitches[Plane], width, Texture->m_size.height());
-    }
-
-    // Update
+    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->pitches[Plane] >> 1 : Frame->pitches[Plane]);
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
-                                static_cast<uint8_t*>(buffer) + offset);
+                                static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
     Texture->m_valid = true;
+    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 }
 
 /// \brief Create a data buffer for holding CPU side texture data.
-bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
+inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
 {
     if (!Texture || Size < 1)
         return false;
