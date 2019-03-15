@@ -168,7 +168,7 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
                  int width, int height)
 {
     if ((pix_fmt == AV_PIX_FMT_YUV420P || pix_fmt == AV_PIX_FMT_NV12) &&
-        (dst_pix_fmt == AV_PIX_FMT_YUV420P || dst_pix_fmt == AV_PIX_FMT_NV12))
+        (dst_pix_fmt == AV_PIX_FMT_YUV420P))
     {
         VideoFrame framein, frameout;
 
@@ -208,7 +208,7 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
 int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
 {
     if ((src->codec == FMT_YV12 || src->codec == FMT_NV12) &&
-        (dst->codec == FMT_YV12 || dst->codec == FMT_NV12))
+        (dst->codec == FMT_YV12))
     {
         d->copyctx->copy(dst, src);
         return dst->size;
