@@ -827,7 +827,7 @@ void VideoMetadataImp::updateGenres()
     genre_list::iterator genre = m_genres.begin();
     while (genre != m_genres.end())
     {
-        if (genre->second.trimmed().length())
+        if (!genre->second.trimmed().isEmpty())
         {
             genre->first = VideoGenre::getGenre().add(genre->second);
             VideoGenreMap::getGenreMap().add(m_id, genre->first);
@@ -848,7 +848,7 @@ void VideoMetadataImp::updateCountries()
     country_list::iterator country = m_countries.begin();
     while (country != m_countries.end())
     {
-        if (country->second.trimmed().length())
+        if (!country->second.trimmed().isEmpty())
         {
             country->first = VideoCountry::getCountry().add(country->second);
             VideoCountryMap::getCountryMap().add(m_id, country->first);
@@ -869,7 +869,7 @@ void VideoMetadataImp::updateCast()
     cast_list::iterator cast = m_cast.begin();
     while (cast != m_cast.end())
     {
-        if (cast->second.trimmed().length())
+        if (!cast->second.trimmed().isEmpty())
         {
             cast->first = VideoCast::GetCast().add(cast->second);
             VideoCastMap::getCastMap().add(m_id, cast->first);

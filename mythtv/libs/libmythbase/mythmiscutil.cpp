@@ -923,7 +923,7 @@ void setHttpProxy(void)
         // via myth_system(command), by setting HTTP_PROXY
         QString url;
 
-        if (p.user().length())
+        if (!p.user().isEmpty())
             url = "http://%1:%2@%3:%4",
             url = url.arg(p.user()).arg(p.password());
         else

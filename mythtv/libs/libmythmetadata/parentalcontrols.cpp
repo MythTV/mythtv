@@ -177,7 +177,7 @@ namespace
                     i <= ParentalLevel::plHigh && i.good(); ++i)
             {
                 pws::const_iterator p = m_passwords.find(i.GetLevel());
-                if (p != m_passwords.end() && p->second.length())
+                if (p != m_passwords.end() && !p->second.isEmpty())
                     ret.push_back(p->second);
             }
 
@@ -191,7 +191,7 @@ namespace
                     i >= ParentalLevel::plLow && i.good(); --i)
             {
                 pws::const_iterator p = m_passwords.find(i.GetLevel());
-                if (p != m_passwords.end() && p->second.length())
+                if (p != m_passwords.end() && !p->second.isEmpty())
                 {
                     ret = p->second;
                     break;
@@ -255,7 +255,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         // The assumption is that if you password protected lower levels,
         // and a higher level does not have a password it is something
         // you've overlooked (rather than intended).
-        if (!m_pm.FirstAtOrBelow(which_level.GetLevel()).length())
+        if (m_pm.FirstAtOrBelow(which_level.GetLevel()).isEmpty())
             return true;
 
         // See if we recently (and successfully) asked for a password

@@ -818,7 +818,7 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
                        lookup->GetRuntimeSeconds())));
     }
 
-    if (lookup->GetCertification().size())
+    if (!lookup->GetCertification().isEmpty())
         AddCertifications(lookup, item, docroot);
     if (!lookup->GetCategories().empty())
         AddCategories(lookup, item, docroot);

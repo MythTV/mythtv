@@ -726,7 +726,7 @@ void CustomEdit::storeClicked(void)
     QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
                                        .arg(m_titleEdit->GetText());
 
-    if (m_subtitleEdit->GetText().length())
+    if (!m_subtitleEdit->GetText().isEmpty())
         msg += m_subtitleEdit->GetText() + "\n\n";
 
     msg += m_descriptionEdit->GetText();
