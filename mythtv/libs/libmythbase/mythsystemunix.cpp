@@ -641,7 +641,7 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
                     escaped = true;
             }
 
-            else if ((quoted & (*i == quote)) ||
+            else if ((quoted && (*i == quote)) ||
                             (hardquoted && (*i == hardquote)))
                 // end of quoted sequence
                 quoted = hardquoted = false;

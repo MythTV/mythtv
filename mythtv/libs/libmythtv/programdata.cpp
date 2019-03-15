@@ -680,7 +680,7 @@ uint DBEvent::UpdateDB(
         lparttotal  = m_parttotal;
     }
 
-    bool lpreviouslyshown = m_previouslyshown | match.m_previouslyshown;
+    bool lpreviouslyshown = m_previouslyshown || match.m_previouslyshown;
 
     uint32_t llistingsource = m_listingsource | match.m_listingsource;
 
