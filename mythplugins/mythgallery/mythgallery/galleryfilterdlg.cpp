@@ -252,7 +252,7 @@ void GalleryFilterDialog::saveAndExit()
 
     m_settingsOriginal->dumpFilter("GalleryFilterDialog::saveAndExit()");
 
-    if (m_settingsOriginal->getChangedState() > 0)
+    if (m_settingsOriginal->getChangedState())
         emit filterChanged();
 
     Close();

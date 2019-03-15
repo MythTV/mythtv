@@ -92,7 +92,7 @@ class GameHandler : public QObject
     bool needRebuild(void) const { return m_rebuild; }
 
     static RomInfo* create_rominfo(RomInfo* parent);
-    int SpanDisks() const { return m_spandisks; }
+    bool SpanDisks() const { return m_spandisks; }
     QString SystemName() const { return m_systemname; }
     QString SystemCmdLine() const { return m_commandline; }
     QString SystemRomPath() const { return m_rompath; }
@@ -111,7 +111,7 @@ class GameHandler : public QObject
     void customEvent(QEvent *event) override; // QObject
 
     bool    m_rebuild      {false};
-    int     m_spandisks    {0};
+    bool    m_spandisks    {false};
     QString m_systemname;
     QString m_rompath;
     QString m_commandline;

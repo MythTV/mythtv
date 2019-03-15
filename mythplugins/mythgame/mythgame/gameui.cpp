@@ -81,7 +81,7 @@ bool GameUI::Create()
     connect(m_gameUITree, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(nodeChanged(MythGenericTree*)));
 
-    m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
+    m_gameShowFileName = gCoreContext->GetBoolSetting("GameShowFileNames");
 
     BuildTree();
 
@@ -124,7 +124,7 @@ void GameUI::BuildTree()
     else
         systemFilter += ")";
 
-    m_showHashed = gCoreContext->GetSetting("GameTreeView").toInt();
+    m_showHashed = gCoreContext->GetBoolSetting("GameTreeView");
 
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create

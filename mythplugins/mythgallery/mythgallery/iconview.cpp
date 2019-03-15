@@ -123,7 +123,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
             m_thumbGen(new ThumbGenerator(this, 0, 0)),
             m_childCountThread(new ChildCountThread(this))
 {
-    m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_showcaption = gCoreContext->GetBoolSetting("GalleryOverlayCaption", false);
     m_sortorder = gCoreContext->GetNumSetting("GallerySortOrder", 0);
     m_useOpenGL = gCoreContext->GetBoolSetting("SlideshowUseOpenGL", false);
     m_recurse = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
@@ -1102,7 +1102,7 @@ void IconView::ReloadSettings(void)
     gCoreContext->ClearSettingsCache();
 
     // reload settings
-    m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_showcaption = gCoreContext->GetBoolSetting("GalleryOverlayCaption", false);
     m_sortorder   = gCoreContext->GetNumSetting("GallerySortOrder", 0);
     m_useOpenGL   = gCoreContext->GetBoolSetting("SlideshowUseOpenGL", false);
     m_recurse     = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);

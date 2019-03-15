@@ -912,12 +912,12 @@ void ZMClient::doGetMonitorList(void)
     }
 }
 
-void ZMClient::setMonitorFunction(const int monitorID, const QString &function, const int enabled)
+void ZMClient::setMonitorFunction(const int monitorID, const QString &function, const bool enabled)
 {
     QStringList strList("SET_MONITOR_FUNCTION");
     strList << QString::number(monitorID);
     strList << function;
-    strList << QString::number(enabled);
+    strList << QString::number(static_cast<int>(enabled));
 
     if (!sendReceiveStringList(strList))
         return;

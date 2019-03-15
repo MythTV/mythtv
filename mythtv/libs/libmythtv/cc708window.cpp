@@ -353,7 +353,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
             // create a chunk to preserve spacing between lines.
             if (!inTrailingSpaces || !createdString)
             {
-                int allSpaces = (inLeadingSpaces || inTrailingSpaces);
+                bool allSpaces = (inLeadingSpaces || inTrailingSpaces);
                 int length = allSpaces ? 0 : m_column_count - strStart;
                 if (length)
                     createdNonblankStrings = true;

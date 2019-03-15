@@ -140,7 +140,7 @@ class IconView : public MythScreenType
     ThumbGenerator     *m_thumbGen           {nullptr};
     ChildCountThread   *m_childCountThread   {nullptr};
 
-    int                 m_showcaption        {0};
+    bool                m_showcaption        {false};
     int                 m_sortorder          {0};
     bool                m_useOpenGL          {false};
     bool                m_recurse            {false};
