@@ -538,7 +538,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.LoadDefaults();
 
     m_DBparams.localHostName = m_pConfig->GetValue("LocalHostName", "");
-    m_DBparams.dbHostPing = m_pConfig->GetValue(kDefaultDB + "PingHost", true);
+    m_DBparams.dbHostPing = m_pConfig->GetBoolValue(kDefaultDB + "PingHost", true);
     m_DBparams.dbHostName = m_pConfig->GetValue(kDefaultDB + "Host", "");
     m_DBparams.dbUserName = m_pConfig->GetValue(kDefaultDB + "UserName", "");
     m_DBparams.dbPassword = m_pConfig->GetValue(kDefaultDB + "Password", "");
@@ -546,7 +546,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.dbPort = m_pConfig->GetValue(kDefaultDB + "Port", 0);
 
     m_DBparams.wolEnabled =
-        m_pConfig->GetValue(kDefaultWOL + "Enabled", false);
+        m_pConfig->GetBoolValue(kDefaultWOL + "Enabled", false);
     m_DBparams.wolReconnect =
         m_pConfig->GetValue(kDefaultWOL + "SQLReconnectWaitTime", 0);
     m_DBparams.wolRetry =
@@ -651,7 +651,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->SetValue(
             "LocalHostName", params.localHostName);
 
-        m_pConfig->SetValue(
+        m_pConfig->SetBoolValue(
             kDefaultDB + "PingHost", params.dbHostPing);
 
         // If dbHostName is an IPV6 address with scope,
@@ -675,7 +675,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->SetValue(
             kDefaultDB + "Port", params.dbPort);
 
-        m_pConfig->SetValue(
+        m_pConfig->SetBoolValue(
             kDefaultWOL + "Enabled", params.wolEnabled);
         m_pConfig->SetValue(
             kDefaultWOL + "SQLReconnectWaitTime", params.wolReconnect);
