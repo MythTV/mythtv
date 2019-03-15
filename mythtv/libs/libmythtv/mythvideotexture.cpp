@@ -159,9 +159,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
                 texture = CreateTexture(Context, size, Target,
-                                        QOpenGLTexture::UInt8,  QOpenGLTexture::Luminance,
-                                        QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
-                                        QOpenGLTexture::LuminanceFormat);
+                                        QOpenGLTexture::UInt8,  QOpenGLTexture::Red);
                 break;
             case FMT_YUY2:
                 size.setWidth(size.width() >> 1);
