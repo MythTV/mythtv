@@ -361,10 +361,9 @@ static void UpdateGameCounts(QStringList updatelist)
                 else
                 {
                     if (basename == lastrom)
-                            updateDisplayRom(RomName,0,System);
-                        else
-                            lastrom = basename;
-
+                        updateDisplayRom(RomName,0,System);
+                    else
+                        lastrom = basename;
                 }
             }
         }

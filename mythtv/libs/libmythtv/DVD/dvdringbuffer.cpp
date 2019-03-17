@@ -181,8 +181,7 @@ int MythDVDContext::GetNumFramesPresent() const
         // are not present all the way to 'End PTS'
         frames = ((GetSeqEndPTS() - GetStartPTS()) * GetFPS()) / 90000;
     }
-    else
-    if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
+    else if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
     {
         // At least one video frame is present
         frames = GetNumFrames();

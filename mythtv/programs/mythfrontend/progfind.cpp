@@ -970,7 +970,7 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
        searchChar = s_searchChars[0];
 
 
-  if (searchChar.contains('@'))
+   if (searchChar.contains('@'))
    {
        where = "SELECT DISTINCT title FROM program "
                "LEFT JOIN channel ON program.chanid = channel.chanid "

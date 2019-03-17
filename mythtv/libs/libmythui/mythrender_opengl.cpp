@@ -240,8 +240,7 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
             "OpenGL is using software rendering.");
         recommended = false;
     }
-    else
-    if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
+    else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rasterizer.");

@@ -512,11 +512,11 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                             m_mainvisual->prepare();
                             m_mainvisual->mutex()->unlock();
                         }
-                     }
-                     else
-                     {
-                         handled = false;
-                     }
+                    }
+                    else
+                    {
+                        handled = false;
+                    }
                  }
              }
         }

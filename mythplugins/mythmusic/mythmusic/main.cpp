@@ -321,8 +321,8 @@ static void MusicCallback(void *data, QString &selection)
 
        if (vs->Create())
            mainStack->AddScreen(vs);
-        else
-            delete vs;
+       else
+           delete vs;
     }
     else if (sel == "settings_import")
     {

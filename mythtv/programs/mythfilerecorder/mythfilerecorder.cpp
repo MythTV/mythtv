@@ -227,7 +227,7 @@ bool Commands::process_command(QString & cmd)
         }
         else
         {
-        if (m_eof.loadAcquire() != 0)
+            if (m_eof.loadAcquire() != 0)
                 send_status("ERR:End of file");
             else
             {

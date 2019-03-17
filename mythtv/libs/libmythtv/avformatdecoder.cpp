@@ -243,8 +243,8 @@ static int has_codec_parameters(AVStream *st)
             if (avctx->pix_fmt == AV_PIX_FMT_NONE)
                 FAIL("unspecified pixel format");
             if (avctx->codec_id == AV_CODEC_ID_RV30 || avctx->codec_id == AV_CODEC_ID_RV40)
-            if (!st->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !st->codec_info_nb_frames)
-            FAIL("no frame in rv30/40 and no sar");
+                if (!st->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !st->codec_info_nb_frames)
+                    FAIL("no frame in rv30/40 and no sar");
             break;
         case AVMEDIA_TYPE_SUBTITLE:
             if (st->codecpar->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && !st->codecpar->width)
@@ -5246,8 +5246,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     m_allowedquit = true;
             }
         }
-        else
-        if ((origDecodetype & kDecodeAudio) &&
+        else if ((origDecodetype & kDecodeAudio) &&
             (m_currentTrack[kTrackTypeAudio] >= 0) &&
             (m_selectedTrack[kTrackTypeAudio].m_av_stream_index >= 0))
         {

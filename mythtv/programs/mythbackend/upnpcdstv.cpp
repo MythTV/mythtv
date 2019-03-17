@@ -556,8 +556,8 @@ bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
         int nRecordingID = query.value(2).toInt();
         int nTitleCount = query.value(3).toInt();
 
-         if (nTitleCount > 1)
-         {
+        if (nTitleCount > 1)
+        {
             // TODO Album or plain old container?
             CDSObject* pContainer = CDSObject::CreateAlbum( CreateIDString(sRequestId, "Title", sTitle),
                                                             sTitle,

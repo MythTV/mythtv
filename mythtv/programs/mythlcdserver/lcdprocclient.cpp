@@ -1243,7 +1243,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
 
     // Write out the app name
     if ( m_lcdHeight > 1)
-    outputCenteredText("Menu", app_name, "topWidget", 1);
+        outputCenteredText("Menu", app_name, "topWidget", 1);
 
     QList<LCDMenuItem>::iterator it = menuItems->begin();
     LCDMenuItem *curItem;
