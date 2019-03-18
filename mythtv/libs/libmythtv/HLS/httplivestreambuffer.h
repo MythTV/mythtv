@@ -64,13 +64,13 @@ public:
     int DurationForBytes(uint size);
 
 protected:
-    int safe_read(void *data, uint i_read) override; // RingBuffer
+    int safe_read(void *data, uint sz) override; // RingBuffer
     long long GetRealFileSizeInternal(void) const override; // RingBuffer
     long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
 private:
     void FreeStreamsList(QList<HLSStream*> *streams) const;
-    HLSStream *GetStreamForSegment(int segid) const;
+    HLSStream *GetStreamForSegment(int segnum) const;
     HLSStream *GetStream(int wanted, const StreamsList *streams = nullptr) const;
     HLSStream *GetFirstStream(const StreamsList *streams = nullptr) const;
     HLSStream *GetLastStream(const StreamsList *streams = nullptr) const;

@@ -206,9 +206,9 @@ class PlaybackProfileItemConfig : public GroupSetting
     void IncreasePriority(void);
 
   private slots:
-    void widthChanged(const QString &dec);
-    void heightChanged(const QString &dec);
-    void framerateChanged(const QString &dec);
+    void widthChanged(const QString &val);
+    void heightChanged(const QString &val);
+    void framerateChanged(const QString &val);
     void decoderChanged(const QString &dec);
     void vrenderChanged(const QString &renderer);
     void orenderChanged(const QString &renderer);
@@ -248,7 +248,7 @@ class PlaybackProfileConfig : public GroupSetting
 
     void DeleteProfileItem(PlaybackProfileItemConfig *profile);
 
-    void swap(int indexA, int intexB);
+    void swap(int indexA, int indexB);
 
   private slots:
     void AddNewEntry(void);

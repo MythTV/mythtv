@@ -141,7 +141,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     virtual void onDeviceUnmounted() {};
 
     MythMediaType DetectMediaType(void);
-    bool ScanMediaType(const QString &directory, ext_cnt_t &counts);
+    bool ScanMediaType(const QString &directory, ext_cnt_t &cnt);
 
     MythMediaStatus setStatus(MythMediaStatus newStat, bool CloseIt=false);
 

@@ -48,7 +48,7 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     enum MythSchemaUpgrade PromptForUpgrade(const char *name,
                                             const bool upgradeAllowed,
                                             const bool upgradeIfNoUI,
-                                            const int  minDMBSmajor = 0,
+                                            const int  minDBMSmajor = 0,
                                             const int  minDBMSminor = 0,
                                             const int  minDBMSpoint = 0);
 

@@ -14,7 +14,7 @@ class DisplayResX : public DisplayRes
   protected:
     bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                         int &h_mm, double &rate, double &par) const override; // DisplayRes
-    bool SwitchToVideoMode(int width, int height, double framerate) override; // DisplayRes
+    bool SwitchToVideoMode(int width, int height, double desired_rate) override; // DisplayRes
 
   private:
     mutable std::vector<DisplayResScreen> m_videoModes;

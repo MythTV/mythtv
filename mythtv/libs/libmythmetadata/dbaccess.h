@@ -16,7 +16,7 @@ class META_PUBLIC SingleValue
 
   public:
     int add(const QString &name);
-    bool get(int id, QString &value);
+    bool get(int id, QString &category);
     void remove(int id);
     bool exists(int id);
     bool exists(const QString &name);

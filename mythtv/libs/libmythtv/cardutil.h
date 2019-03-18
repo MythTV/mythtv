@@ -311,7 +311,7 @@ class MTV_PUBLIC CardUtil
     // Other input functions
 
     static vector<uint> GetInputIDs(uint sourceid);
-    static bool         GetInputInfo(InputInfo &info,
+    static bool         GetInputInfo(InputInfo &input,
                                      vector<uint> *groupids = nullptr);
     static QList<InputInfo> GetAllInputInfo();
     static QString      GetInputName(uint inputid);
@@ -364,13 +364,13 @@ class MTV_PUBLIC CardUtil
                                         const QString &inputname);
     static bool         TVOnly(uint inputid, const QString &inputname);
     static bool         IsInNeedOfExternalInputConf(uint inputid);
-    static uint         GetQuickTuning(uint inputid, const QString &inputname);
+    static uint         GetQuickTuning(uint inputid, const QString &input_name);
 
     // DVB info
     /// \brief Returns true if the input is a DVB input
     static bool         IsDVB(uint inputid)
         { return "DVB" == GetRawInputType(inputid); }
-    static bool         IsDVBInputType(const QString &input_type);
+    static bool         IsDVBInputType(const QString &inputType);
     static QString      ProbeDVBFrontendName(const QString &device);
     static QString      ProbeDVBType(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);

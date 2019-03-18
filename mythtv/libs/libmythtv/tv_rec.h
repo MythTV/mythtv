@@ -161,7 +161,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
-    RecStatus::Type StartRecording(ProgramInfo *rcinfo);
+    RecStatus::Type StartRecording(ProgramInfo *pginfo);
     RecStatus::Type GetRecordingStatus(void) const;
 
     void StopRecording(bool killFile = false);
@@ -228,7 +228,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                         QString &desc,        QString &category,
                         QString &starttime,   QString &endtime,
                         QString &callsign,    QString &iconpath,
-                        QString &channelname, uint    &chanid,
+                        QString &channum,     uint    &chanid,
                         QString &seriesid,    QString &programid);
     bool GetChannelInfo(uint &chanid, uint &sourceid,
                         QString &callsign, QString &channum,
@@ -270,7 +270,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     static bool GetDevices(uint inputid,
                            uint &parentid,
-                           GeneralDBOptions   &general_opts,
+                           GeneralDBOptions   &gen_opts,
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
@@ -279,7 +279,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);
 
-    bool CreateChannel(const QString &startChanNum,
+    bool CreateChannel(const QString &startchannel,
                        bool enter_power_save_mode);
     void CloseChannel(void);
     DTVChannel *GetDTVChannel(void);

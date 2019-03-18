@@ -51,7 +51,7 @@ public:
     /* TemplateMatcher interface. */
     int templateCoverage(long long nframes, bool final) const;
     const FrameAnalyzer::FrameMap *getBreaks(void) const { return &m_breakMap; }
-    int adjustForBlanks(const BlankFrameDetector *bf, long long nframes);
+    int adjustForBlanks(const BlankFrameDetector *blankFrameDetector, long long nframes);
     int computeBreaks(FrameMap *breaks);
 
 private:

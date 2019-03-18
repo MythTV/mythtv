@@ -63,7 +63,7 @@ class MTV_PUBLIC RecordingRule
     AutoExpireType GetAutoExpire(void) const
         { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }
 
-    bool IsValid(QString &text);
+    bool IsValid(QString &msg);
 
     static QString SearchTypeToString(const RecSearchType searchType);
     static QStringList GetTemplateNames(void);

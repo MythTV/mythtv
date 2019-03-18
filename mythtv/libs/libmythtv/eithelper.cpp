@@ -25,11 +25,11 @@ const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::s_eitcache = new EITCache();
 
 static uint get_chan_id_from_db_atsc(uint sourceid,
-                                     uint atscmajor, uint atscminor);
+                                     uint atsc_major, uint atsc_minor);
 static uint get_chan_id_from_db_dvb(uint sourceid,  uint serviceid,
                                     uint networkid, uint transportid);
 static uint get_chan_id_from_db_dtv(uint sourceid,
-                                    uint programnumber, uint tunedchanid);
+                                    uint serviceid, uint tunedchanid);
 static void init_fixup(FixupMap &fix);
 
 #define LOC QString("EITHelper: ")

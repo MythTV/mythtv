@@ -24,7 +24,7 @@ static bool parse_chan_info(const QString   &rawdata,
                             QString         &channum,
                             uint            &lineNum);
 
-static bool parse_extinf(const QString &data,
+static bool parse_extinf(const QString &line,
                          QString       &channum,
                          QString       &name);
 

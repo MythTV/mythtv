@@ -190,7 +190,7 @@ class DiSEqCDevDevice
                                       uint        devid);
     static DiSEqCDevDevice *CreateByType(DiSEqCDevTree &tree,
                                       dvbdev_t    type,
-                                      uint        devid = 0);
+                                      uint        dev_id = 0);
 
   protected:
     void SetDeviceID(uint devid)       const { m_devid    = devid;   }

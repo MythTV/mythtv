@@ -62,7 +62,7 @@ class GLSingleView : public QGLWidget, public ImageView
     Q_OBJECT
 
   public:
-    GLSingleView(ThumbList itemList, int *pos, int slideShow, int sordorder,
+    GLSingleView(ThumbList itemList, int *pos, int slideShow, int sortorder,
                  QWidget *parent);
     ~GLSingleView();
 

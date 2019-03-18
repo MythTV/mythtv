@@ -35,7 +35,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual void setHelpText(const QString &str) { m_helptext = str; }
     QString getHelpText(void) const { return m_helptext; }
 
-    virtual void setName(const QString &str);
+    virtual void setName(const QString &name);
     QString getName(void) const { return m_name; }
     StandardSetting * byName(const QString &name);
 

@@ -406,7 +406,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
     MythTimeInputDialog(MythScreenStack *parent, const QString &message,
                         int resolutionFlags,
                         QDateTime startTime = QDateTime::currentDateTime(),
-                        int dayLimit = 14);
+                        int rangeLimit = 14);
 
     bool Create() override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);

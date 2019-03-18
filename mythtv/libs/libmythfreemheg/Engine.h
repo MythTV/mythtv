@@ -87,7 +87,7 @@ class MHEngine: public MHEG {
     // Look up an object by its object reference.  In nearly all cases we want to throw
     // an exception if it isn't found.  In a very few cases where we don't fail this
     // returns nullptr if it isn't there.
-    MHRoot *FindObject(const MHObjectRef &objr, bool failOnNotFound = true);
+    MHRoot *FindObject(const MHObjectRef &oRef, bool failOnNotFound = true);
 
     // Called when an event is triggered.  Either queues the event or finds a link that matches.
     void EventTriggered(MHRoot *pSource, enum EventType ev)

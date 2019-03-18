@@ -69,7 +69,7 @@ class MusicPlayer : public QObject, public MythObservable
     void setPlayMode(PlayMode mode);
     PlayMode getPlayMode(void) { return m_playMode; }
 
-    void playFile(const MusicMetadata &meta);
+    void playFile(const MusicMetadata &mdata);
 
     void addListener(QObject *listener);
     void removeListener(QObject *listener);

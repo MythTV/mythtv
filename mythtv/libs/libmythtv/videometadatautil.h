@@ -10,7 +10,7 @@
 class MTV_PUBLIC VideoMetaDataUtil
 {
   public:
-    static QString GetArtPath(const QString &basename, const QString &type);
+    static QString GetArtPath(const QString &pathname, const QString &type);
 };
 
 #endif // _VIDEO_META_DATA_UTIL_H_

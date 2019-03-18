@@ -95,7 +95,7 @@ class EITFixUp
     void FixUK(DBEventEIT &event) const;            // UK DVB-T
     void FixPBS(DBEventEIT &event) const;           // USA ATSC
     void FixComHem(DBEventEIT &event,
-                   bool parse_subtitle) const;      // Sweden DVB-C
+                   bool process_subtitle) const;    // Sweden DVB-C
     void FixAUStar(DBEventEIT &event) const;        // Australia DVB-S
     void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
     void FixAUNine(DBEventEIT &event) const;    

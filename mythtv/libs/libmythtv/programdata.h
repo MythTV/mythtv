@@ -125,7 +125,7 @@ class MTV_PUBLIC DBEvent
     uint UpdateDB(
         MSqlQuery&, uint chanid, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(
-        MSqlQuery&, uint chanid, const DBEvent &nonmatch) const;
+        MSqlQuery&, uint chanid, const DBEvent &prog) const;
     virtual uint InsertDB(MSqlQuery&, uint chanid) const;
     virtual void Squeeze(void);
 

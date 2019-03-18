@@ -73,7 +73,7 @@ class CC608Decoder
     int NewRowCC(int mode, int len);
 
     QString XDSDecodeString(const vector<unsigned char>&,
-                            uint string, uint end) const;
+                            uint start, uint end) const;
     bool XDSDecode(int field, int b1, int b2);
 
     bool XDSPacketParseProgram(const vector<unsigned char> &xds_buf,

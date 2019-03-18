@@ -258,9 +258,9 @@ class MTV_PUBLIC MPEGDescriptor
     
     static desc_list_t Parse(const unsigned char *data, uint len);
     static desc_list_t ParseAndExclude(const unsigned char *data, uint len,
-                                       int descriptorid);
+                                       int excluded_descid);
     static desc_list_t ParseOnlyInclude(const unsigned char *data, uint len,
-                                        int descriptorid);
+                                        int excluded_descid);
 
     static const unsigned char *Find(const desc_list_t &parsed, uint desc_tag);
     static desc_list_t FindAll(const desc_list_t &parsed, uint desc_tag);

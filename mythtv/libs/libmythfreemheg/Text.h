@@ -65,7 +65,7 @@ class MHText : public MHVisible
     static int GetStartCorner(const char *str);
 
     // Display function.
-    void Display(MHEngine *d) override; // MHVisible
+    void Display(MHEngine *engine) override; // MHVisible
     QRegion GetOpaqueArea() override; // MHVisible
 
   protected:

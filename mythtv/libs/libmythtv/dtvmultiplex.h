@@ -45,7 +45,7 @@ class MTV_PUBLIC DTVMultiplex
     bool ParseDVB_T(
         const QString &frequency,   const QString &inversion,
         const QString &bandwidth,   const QString &coderate_hp,
-        const QString &coderate_lp, const QString &constellation,
+        const QString &coderate_lp, const QString &modulation,
         const QString &trans_mode,  const QString &guard_interval,
         const QString &hierarchy);
 
@@ -63,7 +63,7 @@ class MTV_PUBLIC DTVMultiplex
     bool ParseDVB_T2(
         const QString &frequency,   const QString &inversion,
         const QString &bandwidth,   const QString &coderate_hp,
-        const QString &coderate_lp, const QString &constellation,
+        const QString &coderate_lp, const QString &modulation,
         const QString &trans_mode,  const QString &guard_interval,
         const QString &hierarchy,   const QString &mod_sys);
 
@@ -71,7 +71,7 @@ class MTV_PUBLIC DTVMultiplex
         DTVTunerType type,
         QString frequency,    QString inversion,      QString symbolrate,
         QString fec,          QString polarity,
-        QString hp_code_rate, QString lp_code_rate,   QString constellation,
+        QString hp_code_rate, QString lp_code_rate,   QString ofdm_modulation,
         QString trans_mode,   QString guard_interval, QString hierarchy,
         QString modulation,   QString bandwidth,      QString mod_sys,
         QString rolloff);
@@ -117,7 +117,7 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
         DTVTunerType type,
         QString frequency,    QString inversion,      QString symbolrate,
         QString fec,          QString polarity,
-        QString hp_code_rate, QString lp_code_rate,   QString constellation,
+        QString hp_code_rate, QString lp_code_rate,   QString ofdm_modulation,
         QString trans_mode,   QString guard_interval, QString hierarchy,
         QString modulation,   QString bandwidth,
         QString mod_sys,      QString rolloff);

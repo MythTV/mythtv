@@ -32,11 +32,11 @@ class MBASE_PUBLIC MythSortHelper
   public:
     MythSortHelper();
     explicit MythSortHelper(MythSortHelper *other);
-    MythSortHelper(Qt::CaseSensitivity case_sensitve, SortPrefixMode prefix_mode,
+    MythSortHelper(Qt::CaseSensitivity case_sensitive, SortPrefixMode prefix_mode,
                    const QString &exclusions);
 
     QString doTitle(const QString& title) const;
-    QString doPathname(const QString& filename) const;
+    QString doPathname(const QString& pathname) const;
 
     /**
      *  \brief Does the language translation specify any prefixes.

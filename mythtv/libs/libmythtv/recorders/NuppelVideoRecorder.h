@@ -79,7 +79,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
 
-    void SetOption(const QString &name, int value) override; // DTVRecorder
+    void SetOption(const QString &opt, int value) override; // DTVRecorder
     void SetOption(const QString &name, const QString &value) override; // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,

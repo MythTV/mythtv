@@ -75,7 +75,7 @@ class MythContextPrivate : public QObject
     bool Init        (bool gui,
                       bool prompt, bool noPrompt,
                       bool ignoreDB);
-    bool FindDatabase(bool prompt, bool noPrompt);
+    bool FindDatabase(bool prompt, bool noAutodetect);
 
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
@@ -92,9 +92,9 @@ class MythContextPrivate : public QObject
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
-    bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
+    bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    checkPort(QString &host, int port, int wakeupTime);
+    bool    checkPort(QString &host, int port, int timeLimit);
     void    processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
@@ -107,7 +107,7 @@ class MythContextPrivate : public QObject
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup(void);
 
-    void ShowVersionMismatchPopup(uint remoteVersion);
+    void ShowVersionMismatchPopup(uint remote_version);
 
   public slots:
     void OnCloseDialog();

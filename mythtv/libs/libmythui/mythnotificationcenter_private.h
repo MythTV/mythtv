@@ -178,7 +178,7 @@ public:
     // UI methods
     void AdjustYPosition(void);
     void AdjustIndex(int by, bool set=false);
-    void SetIndex(int value);
+    void SetIndex(int index);
     int  GetHeight(void);
 
     enum Content {

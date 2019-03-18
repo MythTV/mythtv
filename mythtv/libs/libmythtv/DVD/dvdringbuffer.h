@@ -129,7 +129,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
-    void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id, uint32_t startTime);
+    void GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id, uint32_t startTime);
 
     uint32_t AdjustTimestamp(uint32_t timestamp);
     int64_t AdjustTimestamp(int64_t timestamp);
@@ -145,10 +145,10 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool HandleAction(const QStringList &actions, int64_t pts) override; // RingBuffer
 
     // Subtitles
-    uint GetSubtitleLanguage(int key);
+    uint GetSubtitleLanguage(int id);
     int GetSubtitleTrackNum(uint stream_id);
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
-                         const uint8_t * buf, int buf_size, uint32_t startTime);
+                         const uint8_t * spu_pkt, int buf_size, uint32_t startTime);
 
     uint GetAudioLanguage(int idx);
     int  GetAudioTrackNum(uint stream_id);

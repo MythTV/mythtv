@@ -48,7 +48,7 @@ private:
     void    StartSlideshow(ImageSlideShowType mode);
     void    SelectZoomWidget(int change);
     QString CheckThumbnail(MythUIButtonListItem *, ImagePtrK,
-                           ImageIdList &required, int);
+                           ImageIdList &request, int);
     void    UpdateThumbnail(MythUIButtonListItem *, ImagePtrK,
                             const QString &url, int);
     void    MenuMain();

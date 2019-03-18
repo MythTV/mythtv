@@ -54,7 +54,7 @@ class MHLink : public MHIngredient
     // Handle activation and deactivation
     void Activate(bool f, MHEngine *engine) override; // MHRoot
     // Called when an event has been triggered and fires this link if it matches. 
-    virtual void MatchEvent(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un, MHEngine *engine);
+    virtual void MatchEvent(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &evData, MHEngine *engine);
 
   protected:
     MHObjectRef m_EventSource;

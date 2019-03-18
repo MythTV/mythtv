@@ -215,8 +215,8 @@ class MPUBLIC ProgramInfo
                 bool commfree,
                 bool repeat,
 
-                uint videoprops,
-                uint audioprops,
+                uint videoproperties,
+                uint audioproperties,
                 uint subtitletype,
 
                 uint season,
@@ -581,7 +581,7 @@ class MPUBLIC ProgramInfo
     bool        QueryIsEditing(void) const;
     bool        QueryIsInUse(QStringList &byWho) const;
     bool        QueryIsInUse(QString &byWho) const;
-    bool        QueryIsDeleteCandidate(bool one_player_allowed = false) const;
+    bool        QueryIsDeleteCandidate(bool one_playback_allowed = false) const;
     AutoExpireType QueryAutoExpire(void) const;
     TranscodingStatus QueryTranscodeStatus(void) const;
     bool        QueryTuningInfo(QString &channum, QString &input) const;
@@ -643,7 +643,7 @@ class MPUBLIC ProgramInfo
     void QueryPositionMap(frm_pos_map_t &, MarkTypes type) const;
     void ClearPositionMap(MarkTypes type) const;
     void SavePositionMap(frm_pos_map_t &, MarkTypes type,
-                         int64_t min_frm = -1, int64_t max_frm = -1) const;
+                         int64_t min_frame = -1, int64_t max_frame = -1) const;
     void SavePositionMapDelta(frm_pos_map_t &, MarkTypes type) const;
 
     // Get position/duration for keyframe and vice versa
@@ -703,22 +703,22 @@ class MPUBLIC ProgramInfo
     static uint64_t QueryBookmark(uint chanid, const QDateTime &recstartts);
     static QMap<QString,uint32_t> QueryInUseMap(void);
     static QMap<QString,bool> QueryJobsRunning(int type);
-    static QStringList LoadFromScheduler(const QString &altTable, int recordid);
+    static QStringList LoadFromScheduler(const QString &tmptable, int recordid);
 
     // Flagging map support methods
     void QueryMarkupMap(frm_dir_map_t&, MarkTypes type,
                         bool merge = false) const;
     void SaveMarkupMap(const frm_dir_map_t &, MarkTypes type = MARK_ALL,
-                       int64_t min_frm = -1, int64_t max_frm = -1) const;
+                       int64_t min_frame = -1, int64_t max_frame = -1) const;
     void ClearMarkupMap(MarkTypes type = MARK_ALL,
-                        int64_t min_frm = -1, int64_t max_frm = -1) const;
+                        int64_t min_frame = -1, int64_t max_frame = -1) const;
 
   protected:
     // Creates a basename from the start and end times
     QString CreateRecordBasename(const QString &ext) const;
 
     bool  LoadProgramFromRecorded(
-        const uint chanid, const QDateTime &recstarttime);
+        const uint chanid, const QDateTime &recstartts);
 
     bool FromStringList(QStringList::const_iterator &it,
                         QStringList::const_iterator  end);

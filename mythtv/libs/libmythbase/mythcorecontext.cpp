@@ -59,7 +59,7 @@ class MythCoreContextPrivate : public QObject
                            QObject *guicontext);
    ~MythCoreContextPrivate();
 
-    bool WaitForWOL(int timeout_ms = INT_MAX);
+    bool WaitForWOL(int timeout_in_ms = INT_MAX);
 
   public:
     MythCoreContext *m_parent;

@@ -36,7 +36,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
   public:
     MusicGenericTree(MusicGenericTree *parent, const QString &name,
                      const QString &action = "",
-                     MythUIButtonListItem::CheckState state = MythUIButtonListItem::CantCheck,
+                     MythUIButtonListItem::CheckState check = MythUIButtonListItem::CantCheck,
                      bool showArrow = true);
     virtual ~MusicGenericTree() = default;
 

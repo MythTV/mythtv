@@ -270,7 +270,7 @@ class MTV_PUBLIC ChannelUtil
                                       uint           sourceid,
                                       const QString &channum);
 
-    static bool    IsOnSameMultiplex(uint sourceid,
+    static bool    IsOnSameMultiplex(uint srcid,
                                      const QString &new_channum,
                                      const QString &old_channum);
 
@@ -292,17 +292,17 @@ class MTV_PUBLIC ChannelUtil
      * \brief Returns the channel-number string of the given channel.
      * \param chanid primary key for channel record
      */
-    static QString GetChanNum(int chanid);
+    static QString GetChanNum(int chan_id);
 
     /**
      * \brief Returns the listings time offset in minutes for given channel.
      * \param chanid primary key for channel record
      */
-    static int     GetTimeOffset(int chanid);
+    static int     GetTimeOffset(int chan_id);
     static int     GetSourceID(int mplexid);
     static uint    GetSourceIDForChannel(uint chanid);
 
-    static QStringList GetInputTypes(uint chandid);
+    static QStringList GetInputTypes(uint chanid);
 
     static bool    GetCachedPids(uint chanid, pid_cache_t &pid_cache);
 
@@ -329,7 +329,7 @@ class MTV_PUBLIC ChannelUtil
     static ChannelInfoList GetChannelsInternal(
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
-    static QString GetChannelStringField(int chanid, const QString &field);
+    static QString GetChannelStringField(int chan_id, const QString &field);
 };
 
 #endif // CHANUTIL_H

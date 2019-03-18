@@ -21,7 +21,7 @@ namespace M3U
 			     int& duration);
     bool ParseSegmentInformation(int version, const QString& line,
 				 uint& duration, QString& title,
-				 const QString& url);
+				 const QString& loc);
     bool ParseMediaSequence(int64_t & sequence_num, const QString& line,
 			    const QString& loc);
     bool ParseKey(int version, const QString& line, bool& aesmsg,

@@ -58,7 +58,7 @@ class MBASE_PUBLIC SimpleDBStorage : public DBStorage
 
     void Load(void) override; // Storage
     void Save(void) override; // Storage
-    void Save(const QString &destination) override; // Storage
+    void Save(const QString &table) override; // Storage
     bool IsSaveRequired(void) const override; // Storage
     void SetSaveRequired(void) override; // Storage
 

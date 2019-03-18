@@ -52,7 +52,7 @@ public:
             int *pwidth, int *pheight) const;
 
 private:
-    int resetBuffers(int newcwidth, int newcheight);
+    int resetBuffers(int newwidth, int newheight);
 
     PGMConverter   *m_pgmConverter;
     BorderDetector *m_borderDetector;

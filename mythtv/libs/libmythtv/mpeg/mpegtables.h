@@ -194,7 +194,7 @@ class MTV_PUBLIC StreamID
     static uint Normalize(uint stream_id, const desc_list_t &desc,
                           const QString &sistandard);
     static const char* toString(uint streamID);
-    static QString GetDescription(uint streamID);
+    static QString GetDescription(uint stream_id);
 };
 
 enum
@@ -773,7 +773,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         SetProgramInfoLength(0);
         _ptrs.clear();
     }
-    void AppendStream(uint pid, uint type, unsigned char* si = nullptr, uint il = 0);
+    void AppendStream(uint pid, uint type, unsigned char* streamInfo = nullptr, uint infoLength = 0);
 
     void Parse(void) const;
     QString toString(void) const override; // PSIPTable

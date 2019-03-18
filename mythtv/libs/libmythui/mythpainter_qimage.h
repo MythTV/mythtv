@@ -36,9 +36,9 @@ class MUI_PUBLIC MythQImagePainter : public MythPainter
     void SetClipRegion(const QRegion &region) override; // MythPainter
     void Clear(QPaintDevice *device, const QRegion &region) override; // MythPainter
 
-    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
                    int alpha) override; // MythPainter
-    void DrawText(const QRect &dest, const QString &msg, int flags,
+    void DrawText(const QRect &r, const QString &msg, int flags,
                   const MythFontProperties &font, int alpha,
                   const QRect &boundRect) override; // MythPainter
     void DrawRect(const QRect &area, const QBrush &fillBrush,

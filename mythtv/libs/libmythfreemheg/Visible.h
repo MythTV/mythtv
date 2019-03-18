@@ -127,7 +127,7 @@ class MHRectangle : public MHLineArt
         { return "Rectangle"; }
     void PrintMe(FILE *fd, int nTabs) const override; // MHLineArt
     // Display function.
-    void Display(MHEngine *q) override; // MHLineArt
+    void Display(MHEngine *engine) override; // MHLineArt
     QRegion GetOpaqueArea() override; // MHVisible
     MHIngredient *Clone(MHEngine *) override // MHRoot
         { return new MHRectangle(*this); } // Create a clone of this ingredient.

@@ -32,7 +32,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     void Begin(QPaintDevice *parent) override; // MythPainter
     void End() override; // MythPainter
 
-    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
                    int alpha) override; // MythPainter
     void DrawRect(const QRect &area, const QBrush &fillBrush,
                   const QPen &linePen, int alpha) override; // MythPainter

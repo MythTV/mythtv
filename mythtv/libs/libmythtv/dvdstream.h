@@ -32,7 +32,7 @@ public:
     bool OpenFile(const QString &lfilename, uint retry_ms = 0) override; // RingBuffer
 
 protected:
-    int safe_read(void *data, uint sz) override; // RingBuffer
+    int safe_read(void *data, uint size) override; // RingBuffer
     long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
     // Implementation

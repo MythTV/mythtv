@@ -284,7 +284,7 @@ public:
 
     // Scanner support
     bool ReadAllImages(ImageHash &files, ImageHash &dirs) const;
-    void ClearDb(int fsId, const QString &action);
+    void ClearDb(int devId, const QString &action);
 
     // ImageReader support
     int  GetChildren(QString ids, ImageList &files, ImageList &dirs,
@@ -299,7 +299,7 @@ protected:
     explicit ImageDb(const QString &table) : FS(), m_table(table) {}
 
     ImageItem *CreateImage(const MSqlQuery &query) const;
-    int        ReadImages(ImageList &dirs, ImageList &images,
+    int        ReadImages(ImageList &dirs, ImageList &files,
                           const QString &selector) const;
     //! Db table name
     QString m_table;
@@ -465,7 +465,7 @@ public:
     QString     IgnoreDirs(const QString &excludes);
     QString     MakeDir(int, const QStringList &names, bool rescan = true);
     QString     RenameFile(ImagePtrK im, const QString &name);
-    QString     CreateImages(int, const ImageListK &transfers);
+    QString     CreateImages(int, const ImageListK &images);
     QString     MoveDbImages(ImagePtrK destDir, ImageListK &images, const QString &);
     QString     DeleteFiles(const ImageIdList &);
     void        ClearStorageGroup();

@@ -174,7 +174,7 @@ static float get_aspect(H264Parser &p)
 }
 
 
-int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flase);
+int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 void release_avf_buffer(void *opaque, uint8_t *data);
 #ifdef USING_VDPAU
 int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags);

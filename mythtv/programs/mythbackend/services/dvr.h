@@ -64,57 +64,57 @@ class Dvr : public DvrServices
 
         DTC::Program*     GetRecorded         ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime  ) override; // DvrServices
+                                                const QDateTime &recstarttsRaw  ) override; // DvrServices
 
         bool              RemoveRecorded      ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime,
+                                                const QDateTime &recstarttsRaw,
                                                 bool             ForceDelete,
                                                 bool             AllowRerecord  ) override; // DvrServices
 
         bool              DeleteRecording     ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime,
+                                                const QDateTime &recstarttsRaw,
                                                 bool             ForceDelete,
                                                 bool             AllowRerecord  ) override; // DvrServices
 
         bool              UnDeleteRecording   ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime ) override; // DvrServices
+                                                const QDateTime &recstarttsRaw ) override; // DvrServices
 
         bool              StopRecording       ( int              RecordedId ) override; // DvrServices
 
         bool              ReactivateRecording ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime ) override; // DvrServices
+                                                const QDateTime &recstarttsRaw ) override; // DvrServices
 
         bool              RescheduleRecordings( void ) override; // DvrServices
 
         bool              UpdateRecordedWatchedStatus ( int   RecordedId,
                                                         int   ChanId,
-                                                        const QDateTime &StartTime,
+                                                        const QDateTime &recstarttsRaw,
                                                         bool  Watched) override; // DvrServices
 
        long              GetSavedBookmark     ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime,
+                                                const QDateTime &recstarttsRaw,
                                                 const QString   &OffsetType ) override; // DvrServices
 
        bool              SetSavedBookmark     ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime,
+                                                const QDateTime &recstarttsRaw,
                                                 const QString   &OffsetType,
                                                 long             Offset
                                                 ) override; // DvrServices
 
         DTC::CutList*     GetRecordedCutList  ( int              RecordedId,
                                                 int              ChanId,
-                                                const QDateTime &StartTime,
+                                                const QDateTime &recstarttsRaw,
                                                 const QString   &OffsetType ) override; // DvrServices
 
         DTC::CutList*     GetRecordedCommBreak ( int              RecordedId,
                                                  int              ChanId,
-                                                 const QDateTime &StartTime,
+                                                 const QDateTime &recstarttsRaw,
                                                  const QString   &OffsetType ) override; // DvrServices
 
         DTC::CutList*     GetRecordedSeek      ( int              RecordedId,
@@ -154,8 +154,8 @@ class Dvr : public DvrServices
                                                 QString   Subtitle,
                                                 QString   Description,
                                                 QString   Category,
-                                                QDateTime StartTime,
-                                                QDateTime EndTime,
+                                                QDateTime recstarttsRaw,
+                                                QDateTime recendtsRaw,
                                                 QString   SeriesId,
                                                 QString   ProgramId,
                                                 int       ChanId,
@@ -197,8 +197,8 @@ class Dvr : public DvrServices
                                                   QString   Subtitle,
                                                   QString   Description,
                                                   QString   Category,
-                                                  QDateTime StartTime,
-                                                  QDateTime EndTime,
+                                                  QDateTime dStartTimeRaw,
+                                                  QDateTime dEndTimeRaw,
                                                   QString   SeriesId,
                                                   QString   ProgramId,
                                                   int       ChanId,
@@ -249,7 +249,7 @@ class Dvr : public DvrServices
                                                  QString          Template,
                                                  int              nRecordedId,
                                                  int              ChanId,
-                                                 QDateTime        StartTime,
+                                                 QDateTime        dStartTimeRaw,
                                                  bool             MakeOverride ) override; // DvrServices
 
         bool              EnableRecordSchedule ( uint             RecordId   ) override; // DvrServices
@@ -257,9 +257,9 @@ class Dvr : public DvrServices
         bool              DisableRecordSchedule( uint             RecordId   ) override; // DvrServices
 
         int               RecordedIdForKey( int              ChanId,
-                                            const QDateTime &StartTime ) override; // DvrServices
+                                            const QDateTime &recstarttsRaw ) override; // DvrServices
 
-        int               RecordedIdForPathname( const QString   &Filename ) override; // DvrServices
+        int               RecordedIdForPathname( const QString   &pathname ) override; // DvrServices
 
         QString           RecStatusToString    ( int              RecStatus ) override; // DvrServices
 
@@ -283,7 +283,7 @@ class Dvr : public DvrServices
                                                  const QString   &JobName,
                                                  int              JobId,
                                                  int              RecordedId,
-                                                       QDateTime  JobStartTime,
+                                                       QDateTime  jobstarttsRaw,
                                                        QString    RemoteHost,
                                                        QString    JobArgs   ) override; // DvrServices
 

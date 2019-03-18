@@ -82,7 +82,7 @@ class MHIContext : public MHContext, public QRunnable
 
     // Set the input register.  This sets the keys that are to be handled
     // by MHEG.  Flushes the key queue.
-    void SetInputRegister(int nReg) override; // MHContext
+    void SetInputRegister(int num) override; // MHContext
 
     /// An area of the screen/image needs to be redrawn.
     void RequireRedraw(const QRegion &region) override; // MHContext
@@ -98,12 +98,12 @@ class MHIContext : public MHContext, public QRunnable
     MHDLADisplay *CreateDynamicLineArt(
         bool isBoxed, MHRgba lineColour, MHRgba fillColour) override; // MHContext
     MHTextDisplay *CreateText(void) override; // MHContext
-    MHBitmapDisplay *CreateBitmap(bool tiling) override; // MHContext
+    MHBitmapDisplay *CreateBitmap(bool tiled) override; // MHContext
     /// Additional drawing functions.
     void DrawRect(int xPos, int yPos, int width, int height,
                   MHRgba colour) override; // MHContext
     void DrawBackground(const QRegion &reg) override; // MHContext
-    void DrawVideo(const QRect &videoRect, const QRect &displayRect) override; // MHContext
+    void DrawVideo(const QRect &videoRect, const QRect &dispRect) override; // MHContext
 
     void DrawImage(int x, int y, const QRect &rect, const QImage &image,
         bool bScaled = false, bool bUnder = false);

@@ -55,7 +55,7 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
 
     bool SupportsTSMonitoring(void);
 
-    void AddData(const unsigned char *data, uint dataSize) override; // TSDataListener
+    void AddData(const unsigned char *data, uint len) override; // TSDataListener
 
   public:
     static const uint kPowerTimeout;

@@ -79,7 +79,7 @@ class MUI_PUBLIC DisplayRes
      *  \param which_gui either regular GUI or CUSTOM_GUI
      *  \sa SwitchToCustomGUI(int, int, short)
      */
-    bool SwitchToGUI(tmode which_gui=GUI);
+    bool SwitchToGUI(tmode next_mode=GUI);
     /** \brief Switches to the custom GUI resolution specified.
      *
      *   This switches to the specified resolution, and refresh

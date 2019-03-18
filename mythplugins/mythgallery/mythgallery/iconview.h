@@ -188,7 +188,7 @@ public:
         MThread("ChildCountThread"), m_parent(parent) {}
     ~ChildCountThread();
 
-    void addFile(const QString &fileName);
+    void addFile(const QString &filePath);
     void cancel();
 
 protected:
@@ -197,7 +197,7 @@ protected:
 private:
 
     bool moreWork();
-    int  getChildCount(const QString &fileName);
+    int  getChildCount(const QString &filepath);
 
     QObject     *m_parent {nullptr};
     QStringList  m_fileList;

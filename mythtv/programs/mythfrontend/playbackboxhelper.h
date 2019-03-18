@@ -42,7 +42,7 @@ class PlaybackBoxHelper : public MThread
     void UndeleteRecording(uint recordingID);
     void CheckAvailability(const ProgramInfo&,
                            CheckAvailabilityType cat = kCheckForCache);
-    QString GetPreviewImage(const ProgramInfo&, bool check_availibility = true);
+    QString GetPreviewImage(const ProgramInfo&, bool check_availability = true);
 
     QString LocateArtwork(const QString &inetref, uint season,
                           VideoArtworkType type, const ProgramInfo *pginfo,

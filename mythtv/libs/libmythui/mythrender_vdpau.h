@@ -164,7 +164,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool DownloadYUVFrame(uint id, void* const planes[3], uint32_t pitches[3]);
     bool DrawBitmap(uint id, uint target, const QRect *src,
                     const QRect *dst, VDPBlendType blendi = kVDPBlendNormal,
-                    int alpha = 0, int red = 0, int blue = 0, int green = 0);
+                    int alpha = 0, int red = 0, int green = 0, int blue = 0);
     bool DrawLayer(uint id, uint target);
 
     int   GetBitmapSize(uint id);

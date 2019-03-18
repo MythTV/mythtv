@@ -67,7 +67,7 @@ class VideoOutputXv : public VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     void MoveResizeWindow(QRect new_rect) override; // VideoOutput
     void DrawUnusedRects(bool sync = true) override; // VideoOutput
-    void UpdatePauseFrame(int64_t &default_tc) override; // VideoOutput
+    void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
     int  SetPictureAttribute(PictureAttribute attribute, int newValue) override; // VideoOutput
     void InitPictureAttributes(void) override; // VideoOutput
 

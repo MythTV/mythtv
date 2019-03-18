@@ -64,7 +64,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
                          IDTokenMap tokens );
 
 
-        void PopulateArtworkURIS( CDSObject *pItem, int nVideoId,
+        void PopulateArtworkURIS( CDSObject *pItem, int nVidID,
                                   const QUrl &URIBase );
 
         // Common code helpers

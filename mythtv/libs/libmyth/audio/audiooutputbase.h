@@ -146,7 +146,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
-    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer,
+    int GetAudioData(uchar *buffer, int buf_size, bool full_buffer,
                      volatile uint *local_raud = nullptr);
 
     void OutputAudioLoop(void);

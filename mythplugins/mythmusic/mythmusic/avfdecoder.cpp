@@ -63,7 +63,7 @@ class ShoutCastMetaParser
     ~ShoutCastMetaParser(void) = default;
 
     void setMetaFormat(const QString &metaformat);
-    ShoutCastMetaMap parseMeta(const QString &meta);
+    ShoutCastMetaMap parseMeta(const QString &mdata);
 
   private:
     QString m_meta_format;

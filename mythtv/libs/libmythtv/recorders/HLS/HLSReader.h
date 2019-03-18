@@ -43,7 +43,7 @@ class MTV_PUBLIC  HLSReader
     HLSReader(void) = default;
     ~HLSReader(void);
 
-    bool Open(const QString & uri, int bitrate_index = 0);
+    bool Open(const QString & m3u, int bitrate_index = 0);
     void Close(bool quiet = false);
     int Read(uint8_t* buffer, int len);
     void Throttle(bool val);

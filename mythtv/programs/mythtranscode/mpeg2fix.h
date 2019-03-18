@@ -123,7 +123,7 @@ class MPEG2fixup
                void (*update_func)(float) = nullptr, int (*check_func)() = nullptr);
     ~MPEG2fixup();
     int Start();
-    void AddRangeList(QStringList cutlist, int type);
+    void AddRangeList(QStringList rangelist, int type);
     void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
     int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
@@ -160,7 +160,7 @@ class MPEG2fixup
     void SetRepeat(MPEG2frame *vf, int nb_fields, bool topff);
     void SetRepeat(uint8_t *ptr, int size, int fields, bool topff);
     MPEG2frame *FindFrameNum(int frameNum);
-    void RenumberFrames(int frame_pos, int delta);
+    void RenumberFrames(int start_pos, int delta);
     void StoreSecondary();
     int  PlaybackSecondary();
     MPEG2frame *DecodeToFrame(int frameNum, int skip_reset);

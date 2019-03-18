@@ -351,7 +351,7 @@ class VideoListImp
         bool include_updirs);
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
-                     bool flatlist, int group_type);
+                     bool flat_list, int group_type);
     bool refreshNode(MythGenericTree *node);
 
     unsigned int count(void) const

@@ -157,8 +157,8 @@ class DecoderBase
     virtual int GetCurrentChapter(long long /*framesPlayed*/) { return 0; }
     virtual void GetChapterTimes(QList<long long> &/*times*/) { return;   }
     virtual long long GetChapter(int /*chapter*/)             { return m_framesPlayed; }
-    virtual bool DoRewind(long long desiredFrame, bool doflush = true);
-    virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
+    virtual bool DoRewind(long long desiredFrame, bool discardFrames = true);
+    virtual bool DoFastForward(long long desiredFrame, bool discardFrames = true);
     virtual void SetIdrOnlyKeyframes(bool /*value*/) { }
 
     static uint64_t

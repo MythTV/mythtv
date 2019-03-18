@@ -46,7 +46,7 @@ enum HDHRTuneMode {
 class HDHRStreamHandler : public StreamHandler
 {
   public:
-    static HDHRStreamHandler *Get(const QString &devicename, int inputid,
+    static HDHRStreamHandler *Get(const QString &devname, int inputid,
                                   int majorid);
     static void Return(HDHRStreamHandler * & ref, int inputid);
 

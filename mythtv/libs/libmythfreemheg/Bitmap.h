@@ -75,7 +75,7 @@ class MHBitmap : public MHVisible
 
     MHBitmapDisplay  *m_pContent {nullptr}; // Pointer to current image if any.
 
-    void CreateContent(const unsigned char *p, int s, MHEngine *engine);
+    void CreateContent(const unsigned char *data, int length, MHEngine *engine);
 };
 
 // Actions.

@@ -187,8 +187,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool HasCachedAnyCAT(uint tsid) const;
     bool HasCachedAnyCAT(void) const;
 
-    bool HasCachedAllPMT(uint program_num) const;
-    bool HasCachedAnyPMT(uint program_num) const;
+    bool HasCachedAllPMT(uint pnum) const;
+    bool HasCachedAnyPMT(uint pnum) const;
     bool HasCachedAllPMTs(void) const;
     bool HasCachedAnyPMTs(void) const;
 
@@ -307,7 +307,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void IncrementRefCnt(const PSIPTable *psip) const;
     virtual bool DeleteCachedTable(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
-    void CacheCAT(const ConditionalAccessTable *pat);
+    void CacheCAT(const ConditionalAccessTable *_cat);
     void CachePMT(const ProgramMapTable *pmt);
 
   protected:

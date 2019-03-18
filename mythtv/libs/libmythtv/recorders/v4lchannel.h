@@ -77,7 +77,7 @@ class V4LChannel : public DTVChannel
     // Helper Sets
     void SetFreqTable(const int index);
     int  SetFreqTable(const QString &name) override; // ChannelBase
-    bool SetInputAndFormat(int newcapchannel, QString newFmt);
+    bool SetInputAndFormat(int inputNum, QString newFmt);
 
     // Helper Gets
     int  GetCurrentChannelNum(const QString &channame);

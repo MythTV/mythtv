@@ -94,7 +94,7 @@ class MUI_PUBLIC MythUIHelper
     QString GetMenuThemeDir(void);
     QList<ThemeInfo> GetThemes(ThemeType type);
 
-    bool FindThemeFile(QString &filename);
+    bool FindThemeFile(QString &path);
 
     QFont GetBigFont(void);
     QFont GetMediumFont(void);

@@ -47,7 +47,7 @@ enum BufferType
 class YUVInfo
 {
   public:
-    YUVInfo(uint w, uint h, uint size, const int *p, const int *o,
+    YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
             int aligned = 64);
 
   public:

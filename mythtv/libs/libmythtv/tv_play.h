@@ -308,10 +308,10 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // Public PlaybackBox methods
     /// true iff program is the same as the one in the selected player
-    bool IsSameProgram(int player_idx, const ProgramInfo *p) const;
+    bool IsSameProgram(int player_idx, const ProgramInfo *rcinfo) const;
 
     // Public recorder methods
-    void FinishRecording(int player_idx); ///< Finishes player's recording
+    void FinishRecording(int player_ctx); ///< Finishes player's recording
 
     // static functions
     static void InitKeys(void);
@@ -684,7 +684,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                              const QString &action = QString(""));
 
     // Manual zoom mode
-    void SetManualZoom(const PlayerContext *, bool enabled, QString msg);
+    void SetManualZoom(const PlayerContext *, bool zoomON, QString desc);
     bool ManualZoomHandleAction(PlayerContext *actx,
                                 const QStringList &actions);
 

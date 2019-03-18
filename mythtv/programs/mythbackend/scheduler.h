@@ -49,7 +49,7 @@ class Scheduler : public MThread, public MythScheduler
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-              QString recordTbl = "record", Scheduler *master_sched = nullptr);
+              QString tmptable = "record", Scheduler *master_sched = nullptr);
     ~Scheduler();
 
     void Stop(void);
@@ -117,7 +117,7 @@ class Scheduler : public MThread, public MythScheduler
 
     int GetError(void) const { return m_error; }
 
-    void AddChildInput(uint parentid, uint childid);
+    void AddChildInput(uint parentid, uint inputid);
 
   protected:
     void run(void) override; // MThread

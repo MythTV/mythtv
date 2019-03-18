@@ -126,7 +126,7 @@ class NewsSite : public QObject
     bool       m_podcast;
 
     NewsArticle::List m_articleList;
-    static QString ReplaceHtmlChar(const QString &s);
+    static QString ReplaceHtmlChar(const QString &orig);
 
   signals:
 
