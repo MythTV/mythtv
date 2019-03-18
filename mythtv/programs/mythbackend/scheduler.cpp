@@ -263,8 +263,10 @@ static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
     if (aprec != bprec)
         return aprec < bprec;
 
-    if (a->GetFindID() != b->GetFindID())
-        return a->GetFindID() > b->GetFindID();
+    // If all else is equal, use the rule with higher priority.
+    if (a->GetRecordingPriority() != b->GetRecordingPriority())
+        return a->GetRecordingPriority() > b->GetRecordingPriority();
+
     return a->GetRecordingRuleID() < b->GetRecordingRuleID();
 }
 
