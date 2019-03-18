@@ -1549,15 +1549,15 @@ bool BDRingBuffer::StartFromBeginning(void)
     return true;
 }
 
-bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
+bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serialnum)
 {
     if (!m_bdnav)
         return false;
 
-    name   = m_name;
-    serial = m_serialNumber;
+    name      = m_name;
+    serialnum = m_serialNumber;
 
-    return !serial.isEmpty();
+    return !serialnum.isEmpty();
 }
 
 /** \brief Get a snapshot of the current BD state

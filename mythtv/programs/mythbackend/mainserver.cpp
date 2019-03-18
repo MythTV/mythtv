@@ -8335,14 +8335,14 @@ void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
 }
 
 void MainServer::SendSlaveDisconnectedEvent(
-    const QList<uint> &cardids, bool needsReschedule)
+    const QList<uint> &offlineEncoderIDs, bool needsReschedule)
 {
     QStringList extraData;
     extraData.push_back(
         QString::number(static_cast<uint>(needsReschedule)));
 
     QList<uint>::const_iterator it;
-    for (it = cardids.begin(); it != cardids.end(); ++it)
+    for (it = offlineEncoderIDs.begin(); it != offlineEncoderIDs.end(); ++it)
         extraData.push_back(QString::number(*it));
 
     MythEvent me("LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE", extraData);

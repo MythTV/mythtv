@@ -824,7 +824,7 @@ bool Myth::SendNotification( bool  bError,
                              const QString &Type,
                              const QString &sMessage,
                              const QString &sOrigin,
-                             const QString &sDecription,
+                             const QString &sDescription,
                              const QString &sImage,
                              const QString &sExtra,
                              const QString &sProgressText,
@@ -848,7 +848,7 @@ bool Myth::SendNotification( bool  bError,
         "<mythnotification version=\"1\">\n"
         "  <text>" + sMessage + "</text>\n"
         "  <origin>" + (sOrigin.isNull() ? tr("MythServices") : sOrigin) + "</origin>\n"
-        "  <description>" + sDecription + "</description>\n"
+        "  <description>" + sDescription + "</description>\n"
         "  <timeout>" + QString::number(Duration) + "</timeout>\n"
         "  <image>" + sImage + "</image>\n"
         "  <extra>" + sExtra + "</extra>\n"

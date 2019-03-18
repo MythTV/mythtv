@@ -455,7 +455,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 
 
 IFSPoint *
-draw_ifs ( /* ModeInfo * mi */ int *nbpt)
+draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 {
 	int     i;
 	DBL     u, uu, v, vv, u0, u1, u2, u3;
@@ -525,7 +525,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbpt)
 	F->Col++;
 
 	/* #1 code added by JeKo */
-	(*nbpt) = Cur_Pt;
+	(*nbPoints) = Cur_Pt;
 	return F->Buffer2;
 	/* #1 end */
 }

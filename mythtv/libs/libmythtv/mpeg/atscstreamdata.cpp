@@ -119,10 +119,10 @@ void ATSCStreamData::Reset(int desiredProgram)
     AddListeningPID(ATSC_PSIP_PID);
 }
 
-void ATSCStreamData::Reset(int major, int minor)
+void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
 {
-    _desired_major_channel = major;
-    _desired_minor_channel = minor;
+    _desired_major_channel = desiredMajorChannel;
+    _desired_minor_channel = desiredMinorChannel;
 
     MPEGStreamData::Reset(-1);
     _mgt_version = -1;

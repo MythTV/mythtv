@@ -1129,14 +1129,14 @@ void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
-int MythUIType::NormX(const int x)
+int MythUIType::NormX(const int width)
 {
-    return GetMythMainWindow()->NormX(x);
+    return GetMythMainWindow()->NormX(width);
 }
 
-int MythUIType::NormY(const int y)
+int MythUIType::NormY(const int height)
 {
-    return GetMythMainWindow()->NormY(y);
+    return GetMythMainWindow()->NormY(height);
 }
 
 /**

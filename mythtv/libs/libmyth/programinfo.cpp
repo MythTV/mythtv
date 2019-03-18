@@ -4638,13 +4638,13 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
     }
 }
 
-void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
+void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     LOG(VB_RECORD, LOG_INFO,
         QString("SaveVideoProperties(0x%1, 0x%2)")
-        .arg(mask,2,16,QChar('0')).arg(vid_flags,2,16,QChar('0')));
+        .arg(mask,2,16,QChar('0')).arg(video_property_flags,2,16,QChar('0')));
 
     query.prepare(
         "UPDATE recordedprogram "
@@ -4652,7 +4652,7 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
         "WHERE chanid = :CHANID AND starttime = :STARTTIME");
 
     query.bindValue(":OTHERFLAGS", ~mask);
-    query.bindValue(":FLAGS",      vid_flags);
+    query.bindValue(":FLAGS",      video_property_flags);
     query.bindValue(":CHANID",     m_chanid);
     query.bindValue(":STARTTIME",  m_startts);
     if (!query.exec())
@@ -4663,7 +4663,7 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= ~mask;
-    videoproperties |= vid_flags;
+    videoproperties |= video_property_flags;
     m_properties &= ~kVideoPropertyMask;
     m_properties |= videoproperties << kVideoPropertyOffset;
 

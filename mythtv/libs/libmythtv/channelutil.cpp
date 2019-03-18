@@ -2011,8 +2011,8 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
  * \deprecated Use ChannelInfo::LoadChannels() instead
  */
 ChannelInfoList ChannelUtil::GetChannelsInternal(
-    uint sourceid, bool vis_only, bool include_disconnected,
-    const QString &grp, uint changrpid)
+    uint sourceid, bool visible_only, bool include_disconnected,
+    const QString &group_by, uint channel_groupid)
 {
     ChannelInfoList list;
 
@@ -2039,14 +2039,14 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
     }
 
     // Select only channels from the specified channel group
-    if (changrpid > 0)
+    if (channel_groupid > 0)
     {
         qstr += QString("%1 channelgroup.grpid = '%2' ")
-            .arg(cond).arg(changrpid);
+            .arg(cond).arg(channel_groupid);
         cond = " AND ";
     }
 
-    if (vis_only)
+    if (visible_only)
     {
         qstr += QString("%1 visible=1 ").arg(cond);
         cond = " AND ";
@@ -2054,8 +2054,8 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
 
     qstr += " GROUP BY chanid";
 
-    if (!grp.isEmpty())
-        qstr += QString(", %1").arg(grp);
+    if (!group_by.isEmpty())
+        qstr += QString(", %1").arg(group_by);
 
     query.prepare(qstr);
     if (!query.exec())

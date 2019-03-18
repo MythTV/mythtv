@@ -295,14 +295,14 @@ void MythSocket::CallReadyReadHandler(void)
 }
 
 bool MythSocket::ConnectToHost(
-    const QHostAddress &hadr, quint16 port)
+    const QHostAddress &address, quint16 port)
 {
     bool ret = false;
     QMetaObject::invokeMethod(
         this, "ConnectToHostReal",
         (QThread::currentThread() != m_thread->qthread()) ?
         Qt::BlockingQueuedConnection : Qt::DirectConnection,
-        Q_ARG(QHostAddress, hadr),
+        Q_ARG(QHostAddress, address),
         Q_ARG(quint16, port),
         Q_ARG(bool*, &ret));
     return ret;

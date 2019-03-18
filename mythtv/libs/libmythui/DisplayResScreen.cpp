@@ -18,39 +18,39 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr)
-    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(rr)
+                                   const std::vector<double>& refreshRate)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(refreshRate)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr,
-                                   const std::map<double, short>& rr2)
-: realRates(rr2), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
-  m_refreshRates(rr), m_custom(true)
+                                   const std::vector<double>& refreshRate,
+                                   const std::map<double, short>& realrates)
+: realRates(realrates), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
+  m_refreshRates(refreshRate), m_custom(true)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const double* rr, uint rr_length)
+                                   const double* refreshRate, uint rr_length)
     : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        m_refreshRates.push_back(rr[i]);
+        m_refreshRates.push_back(refreshRate[i]);
 
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const short* rr, uint rr_length)
+                                   const short* refreshRate, uint rr_length)
     : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        m_refreshRates.push_back((double)rr[i]);
+        m_refreshRates.push_back((double)refreshRate[i]);
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 

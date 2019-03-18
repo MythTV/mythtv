@@ -3179,9 +3179,9 @@ int get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic, int flags)
 }
 #endif
 
-void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
+void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte)
 {
-    if (!len)
+    if (!buf_size)
         return;
 
     // closed caption data
@@ -3198,19 +3198,19 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
     uint cc_count = buf[0] & 0x1f;
     // em_data                 8 1.0
 
-    if (len < 2+(3*cc_count))
+    if (buf_size < 2+(3*cc_count))
         return;
 
     DecodeCCx08(buf+2, cc_count*3, scte);
 }
 
-void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint len, bool scte)
+void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 {
-    if (len < 3)
+    if (buf_size < 3)
         return;
 
     bool had_608 = false, had_708 = false;
-    for (uint cur = 0; cur + 3 < len; cur += 3)
+    for (uint cur = 0; cur + 3 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
         bool cc_valid = cc_code & 0x04;

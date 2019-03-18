@@ -707,7 +707,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 bool XMLParseBase::doLoad(const QString &windowname,
                           MythUIType *parent,
                           const QString &filename,
-                          bool onlywindows,
+                          bool onlyLoadWindows,
                           bool showWarnings)
 {
     QDomDocument doc;
@@ -748,7 +748,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                      LoadBaseTheme(include);
             }
 
-            if (onlywindows && e.tagName() == "window")
+            if (onlyLoadWindows && e.tagName() == "window")
             {
                 QString name = e.attribute("name", "");
                 QString include = e.attribute("include", "");
@@ -769,7 +769,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
             }
 
-            if (!onlywindows)
+            if (!onlyLoadWindows)
             {
                 QString type = e.tagName();
                 if (type == "font" || type == "fontdef")
@@ -825,7 +825,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
         }
         n = n.nextSibling();
     }
-    if (onlywindows)
+    if (onlyLoadWindows)
         return false;
     return true;
 }

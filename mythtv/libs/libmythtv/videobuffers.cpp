@@ -923,9 +923,9 @@ const QString& DebugString(const VideoFrame *frame, bool short_str)
     return dbg_str_arr[DebugNum(frame) % DBG_STR_ARR_SIZE];
 }
 
-const QString& DebugString(uint i, bool short_str)
+const QString& DebugString(uint str_num, bool short_str)
 {
-    return ((short_str) ? dbg_str_arr_short : dbg_str_arr)[i];
+    return ((short_str) ? dbg_str_arr_short : dbg_str_arr)[str_num];
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& list, int n)

@@ -15,9 +15,9 @@
 
 BackendSelection::BackendSelection(
     MythScreenStack *parent, DatabaseParams *params,
-    Configuration *conf, bool exitOnFinish) :
+    Configuration *pConfig, bool exitOnFinish) :
     MythScreenType(parent, "BackEnd Selection"),
-    m_DBparams(params), m_pConfig(conf), m_exitOnFinish(exitOnFinish)
+    m_DBparams(params), m_pConfig(pConfig), m_exitOnFinish(exitOnFinish)
 {
     if (exitOnFinish)
     {

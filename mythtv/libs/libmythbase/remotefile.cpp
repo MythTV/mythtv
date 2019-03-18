@@ -69,11 +69,11 @@ static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlis
     return ok;
 }
 
-RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
-                       int _timeout_ms,
+RemoteFile::RemoteFile(const QString &url, bool write, bool usereadahead,
+                       int timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
-    m_path(_path),
-    m_usereadahead(useRA),  m_timeout_ms(_timeout_ms),
+    m_path(url),
+    m_usereadahead(usereadahead),  m_timeout_ms(timeout_ms),
     m_writemode(write)
 {
     if (m_writemode)

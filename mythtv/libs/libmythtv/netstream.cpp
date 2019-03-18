@@ -616,7 +616,7 @@ qlonglong NetStream::GetSize() const
 /**
  * Synchronous interface
  */
-bool NetStream::WaitTillReady(unsigned long time)
+bool NetStream::WaitTillReady(unsigned long milliseconds)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -624,16 +624,16 @@ bool NetStream::WaitTillReady(unsigned long time)
     while (m_state < kReady)
     {
         unsigned elapsed = t.elapsed();
-        if (elapsed > time)
+        if (elapsed > milliseconds)
             return false;
 
-        m_ready.wait(&m_mutex, time - elapsed);
+        m_ready.wait(&m_mutex, milliseconds - elapsed);
     }
 
     return true;
 }
 
-bool NetStream::WaitTillFinished(unsigned long time)
+bool NetStream::WaitTillFinished(unsigned long milliseconds)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -641,10 +641,10 @@ bool NetStream::WaitTillFinished(unsigned long time)
     while (m_state < kFinished)
     {
         unsigned elapsed = t.elapsed();
-        if (elapsed > time)
+        if (elapsed > milliseconds)
             return false;
 
-        m_finished.wait(&m_mutex, time - elapsed);
+        m_finished.wait(&m_mutex, milliseconds - elapsed);
     }
 
     return true;

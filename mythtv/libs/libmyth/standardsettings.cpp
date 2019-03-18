@@ -44,9 +44,9 @@ MythUIButtonListItem * StandardSetting::createButton(MythUIButtonList * list)
     return item;
 }
 
-void StandardSetting::setEnabled(bool b)
+void StandardSetting::setEnabled(bool enabled)
 {
-    m_enabled = b;
+    m_enabled = enabled;
     emit ShouldRedraw(this);
 }
 

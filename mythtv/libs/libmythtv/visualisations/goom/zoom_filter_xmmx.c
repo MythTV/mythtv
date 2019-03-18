@@ -256,12 +256,12 @@ int zoom_filter_xmmx_supported () {
 }
 void zoom_filter_xmmx (int prevX, int prevY,
 											 unsigned int *expix1, unsigned int *expix2,
-											 int *lbruS, int *lbruD, int buffratio,
+											 int *brutS, int *brutD, int buffratio,
 											 int precalCoef[16][16])
 {
     (void) prevX;     (void) prevY;
     (void) expix1;    (void) expix2;
-    (void) lbruS;     (void) lbruD;
+    (void) brutS;     (void) brutD;
     (void) buffratio; (void) precalCoef;
 	return;
 }

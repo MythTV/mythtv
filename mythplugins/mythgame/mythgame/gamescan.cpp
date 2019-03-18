@@ -175,13 +175,13 @@ bool GameScannerThread::buildFileList()
 }
 
 void GameScannerThread::SendProgressEvent(uint progress, uint total,
-                                           QString messsage)
+                                          QString message)
 {
     if (!m_dialog)
         return;
 
     ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       messsage);
+                                                       message);
     QApplication::postEvent(m_dialog, pue);
 }
 

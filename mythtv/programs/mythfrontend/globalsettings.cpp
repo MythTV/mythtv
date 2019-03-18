@@ -1270,22 +1270,22 @@ void PlaybackProfileConfig::ReloadSettings(void)
     setChanged(true);
 }
 
-void PlaybackProfileConfig::swap(int i, int j)
+void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
         profile->Save();
     }
 
-    QString pri_i = QString::number(m_items[i].GetPriority());
-    QString pri_j = QString::number(m_items[j].GetPriority());
+    QString pri_i = QString::number(m_items[indexA].GetPriority());
+    QString pri_j = QString::number(m_items[indexB].GetPriority());
 
-    ProfileItem item = m_items[j];
-    m_items[j] = m_items[i];
-    m_items[i] = item;
+    ProfileItem item = m_items[indexB];
+    m_items[indexB] = m_items[indexA];
+    m_items[indexA] = item;
 
-    m_items[i].Set("pref_priority", pri_i);
-    m_items[j].Set("pref_priority", pri_j);
+    m_items[indexA].Set("pref_priority", pri_i);
+    m_items[indexB].Set("pref_priority", pri_j);
 
     ReloadSettings();
 }

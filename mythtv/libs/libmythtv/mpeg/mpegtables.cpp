@@ -591,10 +591,10 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
  *
  *  \param i index of stream
  */
-bool ProgramMapTable::IsStreamEncrypted(uint i) const
+bool ProgramMapTable::IsStreamEncrypted(uint pid) const
 {
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
-        StreamInfo(i), StreamInfoLength(i), DescriptorID::conditional_access);
+        StreamInfo(pid), StreamInfoLength(pid), DescriptorID::conditional_access);
 
     uint encrypted = 0;
     QMap<uint,uint> encryption_system;

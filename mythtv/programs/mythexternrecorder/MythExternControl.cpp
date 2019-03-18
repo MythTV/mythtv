@@ -206,21 +206,21 @@ void Commands::NextChannel(const QString & serial)
     emit m_parent->NextChannel(serial);
 }
 
-bool Commands::SendStatus(const QString & command, const QString & msg)
+bool Commands::SendStatus(const QString & command, const QString & status)
 {
-    int len = write(2, msg.toUtf8().constData(), msg.size());
+    int len = write(2, status.toUtf8().constData(), status.size());
     write(2, "\n", 1);
 
-    if (len != msg.size())
+    if (len != status.size())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
-            .arg(command).arg(len).arg(msg.size()).arg(msg));
+            .arg(command).arg(len).arg(status.size()).arg(status));
         return false;
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-        .arg(command).arg(msg));
+        .arg(command).arg(status));
 
     m_parent->ClearError();
     return true;

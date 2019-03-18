@@ -1539,15 +1539,15 @@ QStringList MythRAOPConnection::splitLines(const QByteArray &lines)
 /**
  * stringFromSeconds:
  *
- * Usage: stringFromSeconds(seconds)
+ * Usage: stringFromSeconds(timeInSeconds)
  * Description: create a string in the format HH:mm:ss from a duration in seconds
  * HH: will not be displayed if there's less than one hour
  */
-QString MythRAOPConnection::stringFromSeconds(int time)
+QString MythRAOPConnection::stringFromSeconds(int timeInSeconds)
 {
-    int   hour    = time / 3600;
-    int   minute  = (time - hour * 3600) / 60;
-    int seconds   = time - hour * 3600 - minute * 60;
+    int hour    = timeInSeconds / 3600;
+    int minute  = (timeInSeconds - hour * 3600) / 60;
+    int seconds = timeInSeconds - hour * 3600 - minute * 60;
     QString str;
 
     if (hour)
