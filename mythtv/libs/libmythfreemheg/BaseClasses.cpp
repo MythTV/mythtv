@@ -795,7 +795,7 @@ MHObjectRef *MHParameter::GetReference()
 // A content reference is simply a string.
 MHContentRef MHContentRef::Null; // This is the empty string.
 
-void MHContentRef::Initialise(MHParseNode *p, MHEngine *)
+void MHContentRef::Initialise(MHParseNode *p, MHEngine * /*engine*/)
 {
     p->GetStringValue(m_ContentRef);
 }

@@ -3917,7 +3917,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
   private slots:
-    void childChanged(StandardSetting *) override; // StandardSetting
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
   private:
     StandardSetting *m_overrideExitMenu {nullptr};
     StandardSetting *m_haltCommand      {nullptr};
@@ -3936,7 +3936,7 @@ ShutDownRebootSetting::ShutDownRebootSetting()
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting *)
+void ShutDownRebootSetting::childChanged(StandardSetting * /*setting*/)
 {
     switch (m_overrideExitMenu->getValue().toInt())
     {
@@ -4036,7 +4036,7 @@ MainGeneralSettings::MainGeneralSettings()
 }
 
 #ifdef USING_LIBCEC
-void MainGeneralSettings::cecChanged(bool)
+void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_CECPowerOnTVAllowed->boolValue())
         m_CECPowerOnTVOnStart->setEnabled(true);
@@ -4072,7 +4072,7 @@ class PlayBackScaling : public GroupSetting
     void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
   private slots:
-    void childChanged(StandardSetting *) override; // StandardSetting
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
     StandardSetting *m_VertScan  {nullptr};
@@ -4116,7 +4116,7 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
                 .arg(m_YScan->getValue()), "value");
 }
 
-void PlayBackScaling::childChanged(StandardSetting *)
+void PlayBackScaling::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }
@@ -4461,7 +4461,7 @@ class GuiDimension : public GroupSetting
         void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
     private slots:
-        void childChanged(StandardSetting *) override; // StandardSetting
+        void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
         StandardSetting *m_width   {nullptr};
         StandardSetting *m_height  {nullptr};
@@ -4503,7 +4503,7 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
                       .arg(m_offsetY->getValue()), "value");
 }
 
-void GuiDimension::childChanged(StandardSetting *)
+void GuiDimension::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }

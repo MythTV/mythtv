@@ -553,7 +553,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
  * Do not use.
  *
  */
-void MythScreenType::CreateCopy(MythUIType *)
+void MythScreenType::CreateCopy(MythUIType * /*parent*/)
 {
     LOG(VB_GENERAL, LOG_ERR, "CreateCopy called on screentype - bad.");
 }

@@ -461,7 +461,8 @@ int MythUIType::CalcAlpha(int alphamod)
     return (int)(m_Effects.m_alpha * (alphamod / 255.0));
 }
 
-void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
+void MythUIType::DrawSelf(MythPainter * /*p*/, int /*xoffset*/, int /*yoffset*/,
+                          int /*alphaMod*/, QRect /*clipRect*/)
 {
 }
 
@@ -1198,7 +1199,7 @@ void MythUIType::CopyFrom(MythUIType *base)
  *  \brief Copy the state of this widget to the one given, it must be of the
  *         same type.
  */
-void MythUIType::CreateCopy(MythUIType *)
+void MythUIType::CreateCopy(MythUIType * /*parent*/)
 {
     // Calling CreateCopy on base type is not valid
 }

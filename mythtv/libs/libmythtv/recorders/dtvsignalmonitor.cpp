@@ -339,7 +339,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
     }
 }
 
-void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
+void DTVSignalMonitor::HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
 {
     AddFlags(kDTVSigMon_PMTSeen);
 
@@ -393,7 +393,7 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
     }
 }
 
-void DTVSignalMonitor::HandleSTT(const SystemTimeTable*)
+void DTVSignalMonitor::HandleSTT(const SystemTimeTable* /*stt*/)
 {
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("Time Offset: %1")
             .arg(GetStreamData()->TimeOffset()));
@@ -418,7 +418,7 @@ void DTVSignalMonitor::HandleMGT(const MasterGuideTable* mgt)
 }
 
 void DTVSignalMonitor::HandleTVCT(
-    uint, const TerrestrialVirtualChannelTable* tvct)
+    uint /*pid*/, const TerrestrialVirtualChannelTable* tvct)
 {
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_TVCTSeen);
     int idx = tvct->Find(m_majorChannel, m_minorChannel);
@@ -446,7 +446,7 @@ void DTVSignalMonitor::HandleTVCT(
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_TVCTMatch);
 }
 
-void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
+void DTVSignalMonitor::HandleCVCT(uint /*pid*/, const CableVirtualChannelTable* cvct)
 {
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_CVCTSeen);
     int idx = cvct->Find(m_majorChannel, m_minorChannel);
@@ -471,7 +471,7 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_CVCTMatch);
 }
 
-void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
+void DTVSignalMonitor::HandleTDT(const TimeDateTable* /*tdt*/)
 {
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("Time Offset: %1")
             .arg(GetStreamData()->TimeOffset()));
@@ -485,7 +485,7 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
         return;
 }
 
-void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
+void DTVSignalMonitor::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 {
     AddFlags(kDTVSigMon_SDTSeen);
 
@@ -515,7 +515,7 @@ void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
     }
 }
 
-void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
+void DTVSignalMonitor::HandleEncryptionStatus(uint /*program_number*/, bool enc_status)
 {
     AddFlags(kDTVSigMon_CryptSeen);
     if (!enc_status)

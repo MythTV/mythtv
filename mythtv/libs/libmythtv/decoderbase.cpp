@@ -70,7 +70,8 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
     }
 }
 
-void DecoderBase::SeekReset(long long, uint, bool, bool)
+void DecoderBase::SeekReset(long long /*newkey*/, uint /*skipFrames*/,
+                            bool /*doFlush*/, bool /*discardFrames*/)
 {
     m_readAdjust = 0;
 }

@@ -60,8 +60,8 @@ enum packet_state
 };
 
 /* internal functions */
-static void lirc_printf(const struct lirc_state*, const char *format_str, ...);
-static void lirc_perror(const struct lirc_state*, const char *s);
+static void lirc_printf(const struct lirc_state* /*state*/, const char *format_str, ...);
+static void lirc_perror(const struct lirc_state* /*state*/, const char *s);
 static int lirc_readline(const struct lirc_state *state, char **line,FILE *f);
 static char *lirc_trim(char *s);
 static char lirc_parse_escape(const struct lirc_state *state, char **s,const char *name,int line);

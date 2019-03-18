@@ -159,7 +159,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
 }
 
 #ifdef HAVE_CDIO
-static void paranoia_cb(long, paranoia_cb_mode_t)
+static void paranoia_cb(long /*status*/, paranoia_cb_mode_t /*mode*/)
 {
 }
 #endif // HAVE_CDIO

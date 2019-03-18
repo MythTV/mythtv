@@ -76,7 +76,7 @@ void StandardSetting::removeChild(StandardSetting *child)
     emit settingsChanged(this);
 }
 
-bool StandardSetting::keyPressEvent(QKeyEvent *)
+bool StandardSetting::keyPressEvent(QKeyEvent * /*e*/)
 {
     return false;
 }

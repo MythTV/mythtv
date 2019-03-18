@@ -333,7 +333,7 @@ QStringList ImageAdapterBase::SupportedVideos()
  \return ImageItem An image object
 */
 ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
-                                         int devId, const QString &) const
+                                         int devId, const QString & /*base*/) const
 {
     ImageItem *im = new ImageItem();
 
@@ -408,7 +408,7 @@ void ImageAdapterLocal::Notify(const QString &mesg,
  \return ImageItem An image object
 */
 ImageItem *ImageAdapterSg::CreateItem(const QFileInfo &fi, int parentId,
-                                      int, const QString &base) const
+                                      int /*devId*/, const QString &base) const
 {
     ImageItem *im = new ImageItem();
 

@@ -123,7 +123,7 @@ void MHBooleanVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 }
 
 // Get the variable value.  Used in IndirectRef.
-void MHBooleanVar::GetVariableValue(MHUnion &value, MHEngine *)
+void MHBooleanVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_Bool;
     value.m_fBoolVal = m_fValue;
@@ -208,7 +208,7 @@ void MHIntegerVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 }
 
 // Get the variable value.  Used in IndirectRef.
-void MHIntegerVar::GetVariableValue(MHUnion &value, MHEngine *)
+void MHIntegerVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_Int;
     value.m_nIntVal = m_nValue;
@@ -329,7 +329,7 @@ void MHOctetStrVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 }
 
 // Get the variable value.  Used in IndirectRef.
-void MHOctetStrVar::GetVariableValue(MHUnion &value, MHEngine *)
+void MHOctetStrVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_String;
     value.m_StrVal.Copy(m_Value);
@@ -422,7 +422,7 @@ void MHObjectRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine
 }
 
 // Get the variable value.  Used in IndirectRef.
-void MHObjectRefVar::GetVariableValue(MHUnion &value, MHEngine *)
+void MHObjectRefVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_ObjRef;
     value.m_ObjRefVal.Copy(m_Value);
@@ -501,7 +501,7 @@ void MHContentRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engin
 }
 
 // Get the variable value.  Used in IndirectRef.
-void MHContentRefVar::GetVariableValue(MHUnion &value, MHEngine *)
+void MHContentRefVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_ContentRef;
     value.m_ContentRefVal.Copy(m_Value);

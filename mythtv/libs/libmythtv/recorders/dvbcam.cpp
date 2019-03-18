@@ -330,7 +330,7 @@ static const char *cplm_info[] =
     "CPLM_UPDATE"
 };
 
-cCiCaPmt CreateCAPMT(const ProgramMapTable&, const unsigned short*, uint);
+cCiCaPmt CreateCAPMT(const ProgramMapTable& /*pmt*/, const unsigned short* /*casids*/, uint /*cplm*/);
 
 /*
  * Send a CA_PMT object to the CAM (see EN50221, section 8.4.3.4)

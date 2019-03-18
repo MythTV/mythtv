@@ -1811,7 +1811,7 @@ void AudioOutputBase::run(void)
     RunEpilog();
 }
 
-int AudioOutputBase::readOutputData(unsigned char*, int)
+int AudioOutputBase::readOutputData(unsigned char* /*read_buffer*/, int /*max_length*/)
 {
     VBERROR("AudioOutputBase should not be getting asked to readOutputData()");
     return 0;

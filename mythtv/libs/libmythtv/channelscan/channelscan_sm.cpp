@@ -368,7 +368,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
     }
 }
 
-void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
+void ChannelScanSM::HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_lock);
 
@@ -381,7 +381,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
         m_currentEncryptionStatus[pmt->ProgramNumber()] = kEncUnknown;
 }
 
-void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
+void ChannelScanSM::HandleVCT(uint /*pid*/, const VirtualChannelTable *vct)
 {
     QMutexLocker locker(&m_lock);
 

@@ -147,7 +147,7 @@ SingleView::~SingleView()
     gCoreContext->SaveSetting("GalleryScaleMax", m_scaleMax);
 }
 
-void SingleView::paintEvent(QPaintEvent *)
+void SingleView::paintEvent(QPaintEvent * /*e*/)
 {
     if (1 == m_movieState)
     {

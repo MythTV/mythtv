@@ -24,9 +24,9 @@ class MPUBLIC VolumeBase
     virtual void ToggleMute(void);
 
     virtual MuteState GetMuteState(void) const;
-    virtual MuteState SetMuteState(MuteState);
+    virtual MuteState SetMuteState(MuteState /*mstate*/);
 
-    static MuteState NextMuteState(MuteState);
+    static MuteState NextMuteState(MuteState /*cur*/);
 
   protected:
 

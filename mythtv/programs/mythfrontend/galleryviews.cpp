@@ -669,7 +669,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
  \brief Resets view
  \param resetParent parent id is only reset to root when this is set
 */
-void DirectoryView::Clear(bool)
+void DirectoryView::Clear(bool /*resetParent*/)
 {
     ClearMarked();
     ClearCache();

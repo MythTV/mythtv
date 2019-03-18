@@ -771,7 +771,7 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
  * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
  * alternative.
 */
-QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID myth_codec_id, const QSize&)
+QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID myth_codec_id, const QSize& /*video_dim*/)
 {
     QStringList list;
     if (!codec_sw_copy(myth_codec_id) || getenv("NO_OPENGL"))

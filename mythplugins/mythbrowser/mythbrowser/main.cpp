@@ -19,9 +19,11 @@
 
 using namespace std;
 
+// Based on MediaPlayCallback.  Parameters only seem to have local significance.
 static int handleMedia(const QString &url, const QString &directory, const QString &filename,
-                       const QString &, const QString &, int, int, const QString &, int,
-                       const QString &, const QString &, bool)
+                       const QString & /*unused*/, const QString & /*unused*/, int /*unused*/,
+                       int /*unused*/, const QString & /*unused*/, int /*unused*/,
+                       const QString & /*unused*/, const QString & /*unused*/, bool /*unused*/)
 {
     if (url.isEmpty())
     {

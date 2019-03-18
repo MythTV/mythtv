@@ -206,11 +206,11 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     framesPlayed = buffer->frameNumber + 1;
 }
 
-void VideoOutputNull::Show(FrameScanType )
+void VideoOutputNull::Show(FrameScanType  /*scan*/)
 {
 }
 
-void VideoOutputNull::DrawUnusedRects(bool)
+void VideoOutputNull::DrawUnusedRects(bool /*sync*/)
 {
 }
 

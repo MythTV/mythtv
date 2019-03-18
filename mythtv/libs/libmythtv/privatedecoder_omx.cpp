@@ -1231,7 +1231,7 @@ OMX_ERRORTYPE PrivateDecoderOMX::Event(OMXComponent &cmpnt, OMX_EVENTTYPE eEvent
 
 // virtual
 OMX_ERRORTYPE PrivateDecoderOMX::EmptyBufferDone(
-    OMXComponent&, OMX_BUFFERHEADERTYPE *hdr)
+    OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE *hdr)
 {
     assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
     assert(hdr->nVersion.nVersion == OMX_VERSION);
@@ -1249,7 +1249,7 @@ OMX_ERRORTYPE PrivateDecoderOMX::EmptyBufferDone(
 
 // virtual
 OMX_ERRORTYPE PrivateDecoderOMX::FillBufferDone(
-    OMXComponent&, OMX_BUFFERHEADERTYPE *hdr)
+    OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE *hdr)
 {
     assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
     assert(hdr->nVersion.nVersion == OMX_VERSION);
@@ -1265,7 +1265,7 @@ OMX_ERRORTYPE PrivateDecoderOMX::FillBufferDone(
 }
 
 // virtual
-void PrivateDecoderOMX::ReleaseBuffers(OMXComponent &)
+void PrivateDecoderOMX::ReleaseBuffers(OMXComponent & /*cmpnt*/)
 {
     // Free all output buffers
     FreeOutputBuffersCB();

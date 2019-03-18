@@ -103,7 +103,7 @@ void DTVRecorder::SetOption(const QString &name, int value)
 
 void DTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                         const QString &videodev,
-                                        const QString&, const QString&)
+                                        const QString& /*audiodev*/, const QString& /*vbidev*/)
 {
     SetOption("videodevice", videodev);
     DTVRecorder::SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
@@ -696,7 +696,7 @@ void DTVRecorder::UpdateFramesWritten(void)
             .arg(m_total_duration));
 }
 
-bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
+bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)
 {
     bool hasKeyFrame = false;
     if (!m_ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))

@@ -1134,7 +1134,7 @@ void MHSetColour::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-void MHSetColour::PrintArgs(FILE *fd, int) const
+void MHSetColour::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     if (m_ColourType == CT_Indexed)
     {

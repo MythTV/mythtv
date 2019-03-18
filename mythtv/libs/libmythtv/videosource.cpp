@@ -3337,7 +3337,7 @@ int CaptureCardDBStorage::getCardID(void) const
     return m_parent.getCardID();
 }
 
-void CaptureCardButton::edit(MythScreenType *)
+void CaptureCardButton::edit(MythScreenType * /*screen*/)
 {
     emit Clicked(m_value);
 }

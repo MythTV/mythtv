@@ -9,7 +9,7 @@ static bool             frequencies_initialized = false;
 static QMutex           frequencies_lock;
 static freq_table_map_t frequencies;
 
-static void init_freq_tables(freq_table_map_t&);
+static void init_freq_tables(freq_table_map_t& /*fmap*/);
 static freq_table_list_t get_matching_freq_tables_internal(
     const QString &format, const QString &modulation, const QString &country);
 

@@ -102,7 +102,7 @@ class MythContextPrivate : public QObject
 
 
   protected:
-    bool event(QEvent*) override; // QObject
+    bool event(QEvent* /*e*/) override; // QObject
 
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup(void);

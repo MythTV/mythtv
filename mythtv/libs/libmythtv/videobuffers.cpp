@@ -816,7 +816,7 @@ void VideoBuffers::DeleteBuffers()
     m_allocatedArrays.clear();
 }
 
-static unsigned long long to_bitmap(const frame_queue_t& list, int);
+static unsigned long long to_bitmap(const frame_queue_t& list, int /*n*/);
 QString VideoBuffers::GetStatus(int n) const
 {
     if (n <= 0)

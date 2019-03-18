@@ -2232,7 +2232,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
     return false;
 }
 
-bool MythMainWindow::eventFilter(QObject *, QEvent *e)
+bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 {
     MythGestureEvent *ge;
 

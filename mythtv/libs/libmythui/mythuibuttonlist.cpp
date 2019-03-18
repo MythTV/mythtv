@@ -2931,7 +2931,8 @@ bool MythUIButtonList::ParseElement(
 /**
  *  \copydoc MythUIType::DrawSelf()
  */
-void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
+void MythUIButtonList::DrawSelf(MythPainter * /*p*/, int /*xoffset*/, int /*yoffset*/,
+                                int /*alphaMod*/, QRect /*clipRect*/)
 {
     if (m_needsUpdate)
     {

@@ -1343,7 +1343,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 //                  deleteDialog->AddButton(tr("Handle manually"));
                 deleteDialog->AddButton(tr("Ignore all"));
                 QObject::connect(deleteDialog, &MythDialogBox::Closed,
-                                 [&](const QString &, int result)
+                                 [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1417,7 +1417,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 insertDialog->AddButton(tr("Insert manually"));
                 insertDialog->AddButton(tr("Ignore all"));
                 QObject::connect(insertDialog, &MythDialogBox::Closed,
-                                 [&](const QString &, int result)
+                                 [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1487,7 +1487,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 updateDialog->AddButton(tr("Update manually"));
                 updateDialog->AddButton(tr("Ignore all"));
                 QObject::connect(updateDialog, &MythDialogBox::Closed,
-                                 [&](QString, int result)
+                                 [&](QString /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1552,7 +1552,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed,
-                         [&](const QString &, int result)
+                         [&](const QString & /*resultId*/, int result)
                          {
                              dc = result;
                              m_eventLoop.quit();

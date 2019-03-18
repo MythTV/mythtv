@@ -65,7 +65,7 @@ extern "C" {
 #define round(x) ((int) ((x) + 0.5))
 #endif
 
-static unsigned dbg_ident(const MythPlayer*);
+static unsigned dbg_ident(const MythPlayer* /*player*/);
 
 #define LOC      QString("Player(%1): ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)

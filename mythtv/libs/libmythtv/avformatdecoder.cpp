@@ -1505,8 +1505,8 @@ static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 
 #ifdef USING_VAAPI
 // Declared separately to allow attribute
-static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
-                                         const enum AVPixelFormat *);
+static enum AVPixelFormat get_format_vaapi(struct AVCodecContext * /*avctx*/,
+                                         const enum AVPixelFormat * /*valid_fmts*/);
 
 enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
                                          const enum AVPixelFormat *valid_fmts)
@@ -4244,7 +4244,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
  *  \sa TeletextDecoder
  */
 void AvFormatDecoder::ProcessDVBDataPacket(
-    const AVStream*, const AVPacket *pkt)
+    const AVStream* /*stream*/, const AVPacket *pkt)
 {
     const uint8_t *buf     = pkt->data;
     const uint8_t *buf_end = pkt->data + pkt->size;

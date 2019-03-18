@@ -249,7 +249,7 @@ void GameUI::nodeChanged(MythGenericTree* node)
     }
 }
 
-void GameUI::itemClicked(MythUIButtonListItem*)
+void GameUI::itemClicked(MythUIButtonListItem* /*item*/)
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))

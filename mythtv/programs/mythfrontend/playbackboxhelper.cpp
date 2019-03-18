@@ -43,7 +43,7 @@ class PBHEventHandler : public QObject
             killTimer(m_checkAvailabilityTimerId);
     }
 
-    bool event(QEvent*) override; // QObject
+    bool event(QEvent* /*e*/) override; // QObject
     void UpdateFreeSpaceEvent(void);
     AvailableStatusType CheckAvailability(const QStringList &slist);
     PlaybackBoxHelper &m_pbh;

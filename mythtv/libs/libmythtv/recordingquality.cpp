@@ -8,9 +8,9 @@ using namespace std;
 #include "mythlogging.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
-static double score_gaps(const RecordingInfo&, const RecordingGaps&);
-static QDateTime get_start(const RecordingInfo&);
-static QDateTime get_end(const RecordingInfo&);
+static double score_gaps(const RecordingInfo& /*ri*/, const RecordingGaps& /*gaps*/);
+static QDateTime get_start(const RecordingInfo& /*ri*/);
+static QDateTime get_end(const RecordingInfo& /*ri*/);
 
 RecordingQuality::RecordingQuality(const RecordingInfo *ri,
                                    const RecordingGaps &rg)

@@ -54,7 +54,7 @@ QMap<uint,TVRec*> TVRec::s_inputs;
 static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
-static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*);
+static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/);
 static int eit_start_rand(int eitTransportTimeout);
 
 /** \class TVRec

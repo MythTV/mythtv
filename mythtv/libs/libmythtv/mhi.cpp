@@ -761,7 +761,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 // An area of the screen/image needs to be redrawn.
 // Called from the MHEG engine.
 // We always redraw the whole scene.
-void MHIContext::RequireRedraw(const QRegion &)
+void MHIContext::RequireRedraw(const QRegion & /*region*/)
 {
     m_updated = false;
     m_display_lock.lock();

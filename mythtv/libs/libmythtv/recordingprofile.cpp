@@ -1425,13 +1425,13 @@ RecordingProfile::~RecordingProfile(void)
 #endif
 }
 
-void RecordingProfile::ResizeTranscode(const QString &)
+void RecordingProfile::ResizeTranscode(const QString & /*val*/)
 {
     if (m_imageSize)
         m_imageSize->setEnabled(m_trResize->boolValue());
 }
 
-void RecordingProfile::SetLosslessTranscode(const QString &)
+void RecordingProfile::SetLosslessTranscode(const QString & /*val*/)
 {
     bool lossless = m_trLossless->boolValue();
     bool show_size = (lossless) ? false : m_trResize->boolValue();

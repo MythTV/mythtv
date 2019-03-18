@@ -576,7 +576,7 @@ void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 }
 
 // Remove an item from the list
-void MHListGroup::DelItem(MHRoot *pItem, MHEngine *)
+void MHListGroup::DelItem(MHRoot *pItem, MHEngine * /*engine*/)
 {
     // See if the item is already there and ignore this if it is.
     for (int i = 0; i < m_ItemList.size(); i++)
@@ -806,7 +806,7 @@ void MHAddItem::Initialise(MHParseNode *p, MHEngine *engine)
     m_Item.Initialise(p->GetArgN(2), engine);
 }
 
-void MHAddItem::PrintArgs(FILE *fd, int) const
+void MHAddItem::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     m_Index.PrintMe(fd, 0);
     m_Item.PrintMe(fd, 0);
@@ -826,7 +826,7 @@ void MHGetListActionData::Initialise(MHParseNode *p, MHEngine *engine)
     m_Result.Initialise(p->GetArgN(2), engine);
 }
 
-void MHGetListActionData::PrintArgs(FILE *fd, int) const
+void MHGetListActionData::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     m_Index.PrintMe(fd, 0);
     m_Result.PrintMe(fd, 0);

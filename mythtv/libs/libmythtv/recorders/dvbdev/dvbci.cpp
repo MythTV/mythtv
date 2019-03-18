@@ -1954,7 +1954,7 @@ bool cHlCiHandler::Process(void)
     return result;
 }
 
-bool cHlCiHandler::EnterMenu(int)
+bool cHlCiHandler::EnterMenu(int /*Slot*/)
 {
     return false;
 }
@@ -1969,12 +1969,12 @@ cCiEnquiry *cHlCiHandler::GetEnquiry(void)
     return nullptr;
 }
 
-const unsigned short *cHlCiHandler::GetCaSystemIds(int)
+const unsigned short *cHlCiHandler::GetCaSystemIds(int /*Slot*/)
 {
     return m_caSystemIds;
 }
 
-bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
+bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
 {
     cMutexLock MutexLock(&m_mutex);
     struct ca_msg msg;
@@ -2000,7 +2000,7 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
     return true;
 }
 
-bool cHlCiHandler::Reset(int)
+bool cHlCiHandler::Reset(int /*Slot*/)
 {
     if ((ioctl(m_fdCa, CA_RESET)) < 0) {
         esyslog("ioctl CA_RESET failed.");

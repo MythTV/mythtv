@@ -442,7 +442,7 @@ void MHVideo::SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *eng
 }
 
 // Added action in UK MHEG.
-void MHVideo::GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *)
+void MHVideo::GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine * /*engine*/)
 {
     pXOffset->SetVariableValue(m_nXDecodeOffset);
     pYOffset->SetVariableValue(m_nYDecodeOffset);

@@ -1773,7 +1773,7 @@ bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings,
     return false;
 }
 
-DiSEqCDevDevice *DiSEqCDevRotor::GetSelectedChild(const DiSEqCDevSettings&) const
+DiSEqCDevDevice *DiSEqCDevRotor::GetSelectedChild(const DiSEqCDevSettings& /*settings*/) const
 {
     return m_child;
 }
@@ -2021,7 +2021,8 @@ void DiSEqCDevRotor::SetPosMap(const uint_to_dbl_t &inv_posmap)
         m_posmap[*it] = it.key();
 }
 
-bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
+bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings& /*setttings*/,
+                                  const DTVMultiplex& /*tuning*/,
                                   double angle)
 {
     // determine stored position from position map
@@ -2040,7 +2041,8 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
                               m_repeat, 1, &index);
 }
 
-bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
+bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings& /*settings*/,
+                                  const DTVMultiplex& /*tuning*/,
                                   double angle)
 {
     double azimuth = CalculateAzimuth(angle);
@@ -2399,7 +2401,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevLNB::LNBTypeTable[5] =
     { QString(),      kTypeVoltageAndToneControl },
 };
 
-bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
+bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings& /*settings*/, const DTVMultiplex &tuning)
 {
     // set tone for bandselect
     if (m_type == kTypeVoltageAndToneControl)
@@ -2408,7 +2410,7 @@ bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
     return true;
 }
 
-uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings&,
+uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings& /*settings*/,
                               const DTVMultiplex &tuning) const
 {
     uint voltage = SEC_VOLTAGE_18;

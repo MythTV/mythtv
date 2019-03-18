@@ -17,7 +17,7 @@ public:
     virtual ~AudioOutputGraph();
 
     // Properties
-    void SetPainter(MythPainter*);
+    void SetPainter(MythPainter* /*painter*/);
     void SetSampleRate(unsigned sample_rate);
     void SetSampleCount(unsigned sample_count);
 
