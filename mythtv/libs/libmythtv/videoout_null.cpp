@@ -207,14 +207,14 @@ void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
     QMutexLocker locker(&global_lock);
 
     // Try used frame first, then fall back to scratch frame.
-    vbuffers.begin_lock(kVideoBuffer_used);
+    vbuffers.BeginLock(kVideoBuffer_used);
     VideoFrame *used_frame = nullptr;
     if (vbuffers.Size(kVideoBuffer_used) > 0)
         used_frame = vbuffers.Head(kVideoBuffer_used);
 
     if (used_frame)
         CopyFrame(&av_pause_frame, used_frame);
-    vbuffers.end_lock();
+    vbuffers.EndLock();
 
     if (!used_frame)
     {

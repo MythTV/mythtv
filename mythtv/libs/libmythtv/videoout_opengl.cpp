@@ -164,10 +164,10 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
 
 void VideoOutputOpenGL::DestroyBuffers(void)
 {
-    vbuffers.begin_lock(kVideoBuffer_pause);
+    vbuffers.BeginLock(kVideoBuffer_pause);
     while (vbuffers.Size(kVideoBuffer_pause))
         vbuffers.DiscardFrame(vbuffers.Tail(kVideoBuffer_pause));
-    vbuffers.end_lock();
+    vbuffers.EndLock();
 
     DiscardFrames(true);
     vbuffers.DeleteBuffers();
@@ -278,10 +278,10 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
     }
 
     // delete and recreate the buffers and flag that the input has changed
-    vbuffers.begin_lock(kVideoBuffer_all);
+    vbuffers.BeginLock(kVideoBuffer_all);
     DestroyBuffers();
     m_buffersCreated = CreateBuffers(CodecId, VideoDim);
-    vbuffers.end_lock();
+    vbuffers.EndLock();
     if (!m_buffersCreated)
         return false;
 
@@ -588,7 +588,7 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
 
     bool retain = format_is_hw(Frame->codec);
 
-    vbuffers.begin_lock(kVideoBuffer_pause);
+    vbuffers.BeginLock(kVideoBuffer_pause);
     while (vbuffers.Size(kVideoBuffer_pause))
     {
         VideoFrame* frame = vbuffers.Dequeue(kVideoBuffer_pause);
@@ -606,7 +606,7 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
     {
         vbuffers.DoneDisplayingFrame(Frame);
     }
-    vbuffers.end_lock();
+    vbuffers.EndLock();
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
@@ -665,7 +665,7 @@ void VideoOutputOpenGL::MoveResize(void)
 
 void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 {
-    vbuffers.begin_lock(kVideoBuffer_used);
+    vbuffers.BeginLock(kVideoBuffer_used);
     VideoFrame *used = vbuffers.Head(kVideoBuffer_used);
     if (used)
     {
@@ -679,7 +679,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
     {
         LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Could not update pause frame");
     }
-    vbuffers.end_lock();
+    vbuffers.EndLock();
 }
 
 void VideoOutputOpenGL::InitPictureAttributes(void)

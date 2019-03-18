@@ -841,7 +841,7 @@ void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "UpdatePauseFrame() " +
             vbuffers.GetStatus());
 
-    vbuffers.begin_lock(kVideoBuffer_used);
+    vbuffers.BeginLock(kVideoBuffer_used);
 
     if (vbuffers.Size(kVideoBuffer_used) && m_render)
     {
@@ -870,7 +870,7 @@ void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
         LOG(VB_PLAYBACK, LOG_WARNING, LOC +
             "Could not update pause frame - no used frames.");
 
-    vbuffers.end_lock();
+    vbuffers.EndLock();
 }
 
 void VideoOutputVDPAU::InitPictureAttributes(void)
@@ -1027,8 +1027,8 @@ void VideoOutputVDPAU::CheckFrameStates(void)
 {
     m_lock.lock();
     frame_queue_t::iterator it;
-    it = vbuffers.begin_lock(kVideoBuffer_displayed);
-    while (it != vbuffers.end(kVideoBuffer_displayed))
+    it = vbuffers.BeginLock(kVideoBuffer_displayed);
+    while (it != vbuffers.End(kVideoBuffer_displayed))
     {
         VideoFrame* frame = *it;
         if (!FrameIsInUse(frame))
@@ -1043,14 +1043,14 @@ void VideoOutputVDPAU::CheckFrameStates(void)
             else
             {
                 vbuffers.SafeEnqueue(kVideoBuffer_avail, frame);
-                vbuffers.end_lock();
-                it = vbuffers.begin_lock(kVideoBuffer_displayed);
+                vbuffers.EndLock();
+                it = vbuffers.BeginLock(kVideoBuffer_displayed);
                 continue;
             }
         }
         ++it;
     }
-    vbuffers.end_lock();
+    vbuffers.EndLock();
     m_lock.unlock();
 }
 

@@ -716,7 +716,7 @@ void VideoOutputOMX::UpdatePauseFrame(int64_t &disp_timecode)
     }
 
     // Try used frame first, then fall back to scratch frame.
-    vbuffers.begin_lock(kVideoBuffer_used);
+    vbuffers.BeginLock(kVideoBuffer_used);
 
     VideoFrame *used_frame = (vbuffers.Size(kVideoBuffer_used) > 0) ?
                                 vbuffers.Head(kVideoBuffer_used) : nullptr;
