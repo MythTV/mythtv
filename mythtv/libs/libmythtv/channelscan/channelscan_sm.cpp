@@ -1084,7 +1084,9 @@ static void update_info(ChannelInsertInfo &info,
         (sdt->OriginalNetworkID() ==   222) ||
 #endif
         // ERT (GR) from the private temporary allocation, see #9592:comment:17
-        (sdt->OriginalNetworkID() == 65330)
+        (sdt->OriginalNetworkID() == 65330) ||
+        // Digitenne (NL) see #13427
+        (sdt->OriginalNetworkID() == 8720)
     );
     // HACK end -- special exception for these networks
 
