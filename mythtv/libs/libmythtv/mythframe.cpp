@@ -34,6 +34,35 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+const char* format_description(VideoFrameType Type)
+{
+    switch (Type)
+    {
+        case FMT_NONE:       return "None";
+        case FMT_RGB24:      return "RGB24";
+        case FMT_YV12:       return "YV12";
+        case FMT_RGB32:      return "RGB32";
+        case FMT_ARGB32:     return "ARGB32";
+        case FMT_RGBA32:     return "RGBA32";
+        case FMT_YUV422P:    return "YUV422P";
+        case FMT_BGRA:       return "BGRA";
+        case FMT_YUY2:       return "YUY2";
+        case FMT_NV12:       return "NV12";
+        case FMT_YUYVHQ:     return "YUYVHQ";
+        case FMT_YUV420P10:  return "YUV420P10";
+        case FMT_YUV420P12:  return "YUV420P12";
+        case FMT_YUV420P16:  return "YUV420P16";
+        case FMT_VDPAU:      return "VDPAU";
+        case FMT_VAAPI:      return "VAAPI";
+        case FMT_DXVA2:      return "DXVA2";
+        case FMT_OMXEGL:     return "OMXEGL";
+        case FMT_MEDIACODEC: return "MediaCodec";
+        case FMT_VTB:        return "VideoToolBox";
+        case FMT_NVDEC:      return "NVDec";
+    }
+    return "?";
+}
+
 #ifndef __MAX
 #   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
 #endif

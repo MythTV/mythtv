@@ -41,6 +41,8 @@ typedef enum FrameType_
     FMT_NVDEC
 } VideoFrameType;
 
+const char* format_description(VideoFrameType Type);
+
 static inline int format_is_hw(VideoFrameType Type)
 {
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
