@@ -53,25 +53,33 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
 {
     switch (fmt)
     {
+        case AV_PIX_FMT_YUVJ420P:
+        case AV_PIX_FMT_YUV420P:
+            return FMT_YV12;
+        case AV_PIX_FMT_NV12:
+            return FMT_NV12;
         case AV_PIX_FMT_YUV420P10:
             return FMT_YUV420P10;
         case AV_PIX_FMT_YUV420P12:
             return FMT_YUV420P12;
         case AV_PIX_FMT_YUV420P16:
             return FMT_YUV420P16;
-        case AV_PIX_FMT_NV12:
-            return FMT_NV12;
+        case AV_PIX_FMT_YUVJ422P:
         case AV_PIX_FMT_YUV422P:
             return FMT_YUV422P;
-        case AV_PIX_FMT_RGB32:
-            return FMT_RGB32;
         case AV_PIX_FMT_UYVY422:
             return FMT_YUY2;
         case AV_PIX_FMT_RGB24:
             return FMT_RGB24;
-        default:
-            return FMT_YV12;
+        case AV_PIX_FMT_ARGB:
+            return FMT_ARGB32;
+        case AV_PIX_FMT_RGBA:
+            return FMT_RGBA32;
+        case AV_PIX_FMT_BGRA:
+            return FMT_BGRA;
+        default: break;
     }
+    return FMT_NONE;
 }
 
 int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
