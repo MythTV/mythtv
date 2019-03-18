@@ -127,7 +127,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
 }
 
 // When ejecting one of multiple devices, present a nice name to the user
-static const QString DevName(MythMediaDevice *d)
+static QString DevName(MythMediaDevice *d)
 {
     QString str = d->getVolumeID();  // First choice, the name of the media
 
@@ -947,7 +947,7 @@ QString MediaMonitor::defaultDVDWriter()
 /**
  * \brief A string summarising the current devices, for debugging
  */
-const QString MediaMonitor::listDevices(void)
+QString MediaMonitor::listDevices(void)
 {
     QList<MythMediaDevice*>::const_iterator dev;
     QStringList list;

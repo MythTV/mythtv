@@ -211,7 +211,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void InitLocale(void);
     void ReInitLocale(void);
     MythLocale *GetLocale(void) const;
-    const QLocale GetQLocale(void);
+    QLocale GetQLocale(void);
     void SaveLocaleDefaults(void);
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);

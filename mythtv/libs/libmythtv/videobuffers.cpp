@@ -948,12 +948,12 @@ static QString bitmap_to_string(unsigned long long bitmap)
     return str;
 }
 
-const QString DebugString(const frame_queue_t& list)
+QString DebugString(const frame_queue_t& list)
 {
     return bitmap_to_string(to_bitmap(list, DBG_STR_ARR_SIZE));
 }
 
-const QString DebugString(const vector<const VideoFrame*>& list)
+QString DebugString(const vector<const VideoFrame*>& list)
 {
     // first create a bitmap..
     unsigned long long bitmap = 0;

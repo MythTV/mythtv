@@ -128,7 +128,7 @@ class MBASE_PUBLIC MythSessionManager
      *
      * The username should be checked for validity first
      */
-    const QString GetPasswordDigest(const QString &username);
+    QString GetPasswordDigest(const QString &username);
 
     /**
      * \brief Login user by digest

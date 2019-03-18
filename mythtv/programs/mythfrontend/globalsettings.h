@@ -157,7 +157,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
 #endif
 
   private:
-    static const vector<double> GetRefreshRates(const QString &resolution);
+    static vector<double> GetRefreshRates(const QString &resolution);
 };
 
 class MainGeneralSettings : public GroupSetting

@@ -138,7 +138,7 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
-const QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
+QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 {
     FileSystemInfo fsInfo;
     QList<FileSystemInfo> fsInfos;

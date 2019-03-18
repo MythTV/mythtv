@@ -227,7 +227,7 @@ MythUserSession MythSessionManager::GetSession(const QString &username,
 /**
  * \public
  */
-const QString MythSessionManager::GetPasswordDigest(const QString& username)
+QString MythSessionManager::GetPasswordDigest(const QString& username)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT password_digest FROM users WHERE username = :USERNAME");

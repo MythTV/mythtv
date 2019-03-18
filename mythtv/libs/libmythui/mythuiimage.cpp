@@ -449,8 +449,8 @@ class ImageLoadEvent : public QEvent
 
     const MythUIImage *GetParent() const    { return m_parent; }
     MythImage *GetImage() const       { return m_image; }
-    const QString GetBasefile() const { return m_basefile; }
-    const QString GetFilename() const { return m_filename; }
+    QString GetBasefile() const { return m_basefile; }
+    QString GetFilename() const { return m_filename; }
     int GetNumber() const             { return m_number; }
     AnimationFrames *GetAnimationFrames() const { return m_images; }
     bool GetAbortState() const        { return m_aborted; }

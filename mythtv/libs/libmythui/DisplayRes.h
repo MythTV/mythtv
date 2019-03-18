@@ -133,7 +133,7 @@ class MUI_PUBLIC DisplayRes
     /// \brief Returns all video modes supported by the display.
     virtual const DisplayResVector& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
-    const std::vector<double> GetRefreshRates(int width, int height) const;
+    std::vector<double> GetRefreshRates(int width, int height) const;
     /** @} */
 
   protected:
@@ -172,6 +172,6 @@ class MUI_PUBLIC DisplayRes
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
  */
-MUI_PUBLIC const DisplayResVector GetVideoModes(void);
+MUI_PUBLIC DisplayResVector GetVideoModes(void);
 
 #endif
