@@ -1,5 +1,4 @@
 // MythTV
-#include "mythmainwindow.h"
 #include "videooutbase.h"
 #include "videocolourspace.h"
 #include "fourcc.h"
@@ -40,12 +39,7 @@ MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(MythCodecID CodecId,
         return Unsupported;
 
     if (!Context)
-    {
-        MythMainWindow* win = MythMainWindow::getMainWindow();
-        if (!win)
-            return Unsupported;
-        Context = static_cast<MythRenderOpenGL*>(win->GetRenderDevice());
-    }
+        Context = MythRenderOpenGL::GetOpenGLRender();
     if (!Context)
         return Unsupported;
 

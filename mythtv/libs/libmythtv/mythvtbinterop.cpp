@@ -12,12 +12,7 @@ MythOpenGLInterop::Type MythVTBInterop::GetInteropType(MythCodecID CodecId, Myth
         return Unsupported;
 
     if (!Context)
-    {
-        MythMainWindow* win = MythMainWindow::getMainWindow();
-        if (!win)
-            return Unsupported;
-        Context = static_cast<MythRenderOpenGL*>(win->GetRenderDevice());
-    }
+        Context = MythRenderOpenGL::GetOpenGLRender();
     if (!Context)
         return Unsupported;
 

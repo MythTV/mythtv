@@ -190,10 +190,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
         return -1;
 
     // Retrieve OpenGL render context
-    MythMainWindow* window = MythMainWindow::getMainWindow();
-    if (!window)
-        return -1;
-    MythRenderOpenGL* render = dynamic_cast<MythRenderOpenGL*>(window->GetRenderDevice());
+    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return -1;
 

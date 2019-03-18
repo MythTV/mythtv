@@ -11,6 +11,7 @@ using std::min;
 
 // MythTV
 #include "mythcorecontext.h"
+#include "mythmainwindow.h"
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_shaders.h"
 #include "mythlogging.h"
@@ -56,6 +57,18 @@ OpenGLLocker::~OpenGLLocker()
 {
     if (m_render)
         m_render->doneCurrent();
+}
+
+MythRenderOpenGL* MythRenderOpenGL::GetOpenGLRender(void)
+{
+    MythMainWindow* window = MythMainWindow::getMainWindow();
+    if (!window)
+        return nullptr;
+
+    MythRenderOpenGL* result = dynamic_cast<MythRenderOpenGL*>(window->GetRenderDevice());
+    if (result)
+        return result;
+    return nullptr;
 }
 
 MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)

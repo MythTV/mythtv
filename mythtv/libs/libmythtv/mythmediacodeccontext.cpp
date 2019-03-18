@@ -62,10 +62,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
         return -1;
 
     // Create interop class
-    MythMainWindow *win = MythMainWindow::getMainWindow();
-    if (!win)
-        return -1;
-    MythRenderOpenGL* render = static_cast<MythRenderOpenGL*>(win->GetRenderDevice());
+    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return -1;
 

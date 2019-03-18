@@ -321,10 +321,7 @@ void MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     if (type == MythOpenGLInterop::Unsupported)
         return;
 
-    MythMainWindow* window = MythMainWindow::getMainWindow();
-    if (!window)
-        return;
-    MythRenderOpenGL* render = dynamic_cast<MythRenderOpenGL*>(window->GetRenderDevice());
+    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return;
 
