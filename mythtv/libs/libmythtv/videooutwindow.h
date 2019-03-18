@@ -42,7 +42,11 @@ class VideoOutWindow : public QObject
     void SaveBottomLine         (void);
 
   signals:
-    void VideoRectsChanged      (QRect DisplayVideoRect, QRect VideoRect);
+    // Note These are emitted from MoveResize - which must be called after any call
+    // that changes the current video dimensions or video rectangles.
+    void VideoSizeChanged       (const QSize &VideoDim, const QSize &VideoDispDim);
+    void VideoRectsChanged      (const QRect &DisplayVideoRect, const QRect &VideoRect);
+    void VisibleRectChanged     (const QRect &DisplayVisibleRect);
 
   public slots:
     // Sets

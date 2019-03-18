@@ -148,6 +148,11 @@ void VideoOutWindow::MoveResize(void)
     ApplySnapToVideoRect();
     PrintMoveResizeDebug();
     m_needRepaint = true;
+
+    // TODO fine tune when these are emitted
+    emit VideoSizeChanged(m_videoDim, m_videoDispDim);
+    emit VideoRectsChanged(m_displayVideoRect, m_videoRect);
+    emit VisibleRectChanged(m_displayVisibleRect);
 }
 
 
@@ -550,7 +555,7 @@ void VideoOutWindow::VideoAspectRatioChanged(float Aspect)
 bool VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
     m_videoDispDim = VideoDispDim;
-    m_videoDim      = VideoDim;
+    m_videoDim     = VideoDim;
     SetVideoAspectRatio(Aspect);
     return true;
 }
@@ -803,8 +808,7 @@ QRect VideoOutWindow::GetPIPRect(
 }
 
 /**
- * \brief Sets up zooming into to different parts of the video, the zoom
- *        is actually applied in MoveResize().
+ * \brief Sets up zooming into to different parts of the video.
  * \sa ToggleAdjustFill(AdjustFillMode)
  */
 void VideoOutWindow::Zoom(ZoomDirection Direction)
@@ -883,6 +887,8 @@ void VideoOutWindow::Zoom(ZoomDirection Direction)
 
     m_manualVertScale = snap(m_manualVertScale, 1.0f, zf / 2);
     m_manualHorizScale = snap(m_manualHorizScale, 1.0f, zf / 2);
+
+    MoveResize();
 }
 
 void VideoOutWindow::ToggleMoveBottomLine(void)

@@ -53,14 +53,6 @@ VideoOutputNull::~VideoOutputNull()
     vbuffers.DeleteBuffers();
 }
 
-// this is documented in videooutbase.cpp
-void VideoOutputNull::Zoom(ZoomDirection direction)
-{
-    QMutexLocker locker(&global_lock);
-    VideoOutput::Zoom(direction);
-    MoveResize();
-}
-
 void VideoOutputNull::CreatePauseFrame(void)
 {
     if (av_pause_frame.buf)

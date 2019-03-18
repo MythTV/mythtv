@@ -38,7 +38,6 @@ class VideoOutputD3D : public VideoOutput
     void MoveResizeWindow(QRect new_rect) override {;} // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
     void DrawUnusedRects(bool) override {;} // VideoOutput
-    void Zoom(ZoomDirection direction) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     bool hasFullScreenOSD(void) const override // VideoOutput

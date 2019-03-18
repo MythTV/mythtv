@@ -425,13 +425,6 @@ void VideoOutputD3D::StopEmbedding(void)
     VideoOutput::StopEmbedding();
 }
 
-void VideoOutputD3D::Zoom(ZoomDirection direction)
-{
-    QMutexLocker locker(&m_lock);
-    VideoOutput::Zoom(direction);
-    MoveResize();
-}
-
 void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);

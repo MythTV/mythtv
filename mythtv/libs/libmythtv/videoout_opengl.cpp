@@ -95,52 +95,74 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
   : VideoOutput(),
     m_render(nullptr),
-    m_renderValid(true),
     m_openGLVideo(nullptr),
     m_openGLVideoPiPActive(nullptr),
-    m_window(0),
     m_openGLPainter(nullptr),
-    m_videoProfile(Profile)
+    m_videoProfile(Profile),
+    m_newCodecId(kCodec_NONE),
+    m_newVideoDim(),
+    m_newVideoDispDim(),
+    m_newAspect(0.0f),
+    m_buffersCreated(false)
 {
+    // Setup display switching
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
+
+    // Retrieve render context
+    m_render = MythRenderOpenGL::GetOpenGLRender();
+    if (!m_render)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve OpenGL context");
+        return;
+    }
+
+    // Retain and lock
+    m_render->IncrRef();
+    OpenGLLocker locker(m_render);
+
+    // Retrieve OpenGL painter
+    MythMainWindow *win = MythMainWindow::getMainWindow();
+    m_openGLPainter = dynamic_cast<MythOpenGLPainter*>(win->GetCurrentPainter());
+    if (!m_openGLPainter)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get painter");
+        return;
+    }
+
+    m_openGLPainter->SetSwapControl(false);
+
+    // Create OpenGLVideo
+    QRect dvr = GetDisplayVisibleRect();
+    m_openGLVideo = new OpenGLVideo(m_render, &videoColourSpace, window.GetVideoDim(),
+                                    window.GetVideoDispDim(), dvr, window.GetDisplayVideoRect(),
+                                    window.GetVideoRect(), true, m_videoProfile);
+
+    // Connect VideoOutWindow to OpenGLVideo
+    QObject::connect(&window, &VideoOutWindow::VideoSizeChanged, m_openGLVideo, &OpenGLVideo::SetVideoDimensions);
+    QObject::connect(&window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &OpenGLVideo::SetVideoRects);
+    QObject::connect(&window, &VideoOutWindow::VisibleRectChanged, m_openGLVideo, &OpenGLVideo::SetViewportRect);
 }
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
 {
-    TearDown();
+    DestroyBuffers();
+    while (!m_openGLVideoPiPs.empty())
+    {
+        delete *m_openGLVideoPiPs.begin();
+        m_openGLVideoPiPs.erase(m_openGLVideoPiPs.begin());
+    }
+    m_openGLVideoPiPsReady.clear();
+    if (m_openGLPainter)
+        m_openGLPainter->SetSwapControl(true);
+    if (m_openGLVideo)
+        delete m_openGLVideo;
     if (m_render)
         m_render->DecrRef();
     m_render = nullptr;
 }
 
-void VideoOutputOpenGL::TearDown(void)
-{
-    DestroyCPUResources();
-    DestroyVideoResources();
-    DestroyGPUResources();
-}
-
-bool VideoOutputOpenGL::CreateGPUResources(void)
-{
-    bool result = SetupContext();
-    if (result)
-    {
-        QSize size = window.GetVideoDim();
-        InitDisplayMeasurements(size.width(), size.height(), false);
-        CreatePainter();
-    }
-    return result;
-}
-
-bool VideoOutputOpenGL::CreateVideoResources(void)
-{
-    bool result = SetupOpenGL();
-    MoveResize();
-    return result;
-}
-
-void VideoOutputOpenGL::DestroyCPUResources(void)
+void VideoOutputOpenGL::DestroyBuffers(void)
 {
     vbuffers.begin_lock(kVideoBuffer_pause);
     while (vbuffers.Size(kVideoBuffer_pause))
@@ -152,72 +174,70 @@ void VideoOutputOpenGL::DestroyCPUResources(void)
     vbuffers.Reset();
 }
 
-void VideoOutputOpenGL::DestroyGPUResources(void)
-{
-    if (m_render)
-        m_render->makeCurrent();
-    if (m_openGLPainter)
-        m_openGLPainter->SetSwapControl(true);
-    m_openGLPainter = nullptr;
-    if (m_render)
-        m_render->doneCurrent();
-}
-
-void VideoOutputOpenGL::DestroyVideoResources(void)
-{
-    if (m_render)
-        m_render->makeCurrent();
-
-    if (m_openGLVideo)
-    {
-        delete m_openGLVideo;
-        m_openGLVideo = nullptr;
-    }
-
-    while (!m_openGLVideoPiPs.empty())
-    {
-        delete *m_openGLVideoPiPs.begin();
-        m_openGLVideoPiPs.erase(m_openGLVideoPiPs.begin());
-    }
-    m_openGLVideoPiPsReady.clear();
-
-    if (m_render)
-        m_render->doneCurrent();
-}
-
 bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
-                             WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
+                             WId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
-    // if hardware initialisation failed, fallback to yv12
-    if (format_is_hw(OpenGLVideo::ProfileToType(m_videoProfile)) && codec_sw_copy(CodecId))
-        m_videoProfile = "opengl-yv12";
-
-    bool success = true;
-    m_window = WinId;
-    success &= VideoOutput::Init(VideoDim, VideoDispDim, Aspect, WinId, DisplayVisibleRect, CodecId);
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer(m_videoProfile);
-    InitPictureAttributes();
-
-    success &= CreateBuffers();
+    if (!m_render || !m_openGLPainter || !m_openGLVideo)
+        return false;
 
     if (!gCoreContext->IsUIThread())
     {
-        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Deferring creation of OpenGL resources");
-        m_renderValid = false;
-    }
-    else
-    {
-        success &= CreateGPUResources();
-        success &= CreateVideoResources();
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot initialise OpenGL video from this thread");
+        return false;
     }
 
-    if (!success)
-        TearDown();
-    return success;
+    OpenGLLocker ctx_lock(m_render);
+
+    // Default initialisation - mainly VideoOutWindow
+    if (!VideoOutput::Init(VideoDim, VideoDispDim, Aspect, 0, DisplayVisibleRect, CodecId))
+        return false;
+
+    // Ensure any new profile preferences are handled after a stream change
+    if (db_vdisp_profile)
+        m_openGLVideo->SetProfile(db_vdisp_profile->GetVideoRenderer());
+
+    // Set default support for picture attributes
+    InitPictureAttributes();
+
+    // Setup display
+    QSize size = window.GetVideoDim();
+    InitDisplayMeasurements(size.width(), size.height(), false);
+
+    // Create buffers
+    if (!CreateBuffers(CodecId, window.GetVideoDim()))
+        return false;
+
+    // Adjust visible rect for embedding
+    QRect dvr = GetDisplayVisibleRect();
+    if (video_codec_id == kCodec_NONE)
+    {
+        m_render->SetViewPort(QRect(QPoint(), dvr.size()));
+        MoveResize();
+        return true;
+    }
+
+    if (window.GetPIPState() >= kPIPStandAlone)
+    {
+        QRect tmprect = QRect(QPoint(0,0), dvr.size());
+        ResizeDisplayWindow(tmprect, true);
+    }
+
+    // Reset OpenGLVideo
+    if (m_openGLVideo->IsValid())
+    {
+        m_openGLVideo->ResetFrameFormat();
+        bool temp_deinterlacing = m_deinterlacing;
+        SetDeinterlacingEnabled(true);
+        if (!temp_deinterlacing)
+            SetDeinterlacingEnabled(false);
+    }
+
+    // Finalise output
+    MoveResize();
+    return true;
 }
 
-bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDispDim,
+bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                      float Aspect, MythCodecID CodecId, bool &AspectOnly)
 {
     QSize currentvideodim     = window.GetVideoDim();
@@ -228,12 +248,12 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDi
         .arg(currentvideodispdim.width()).arg(currentvideodispdim.height())
         .arg(currentvideodim.width()).arg(currentvideodim.height())
         .arg(toString(video_codec_id)).arg(static_cast<double>(window.GetVideoAspect()))
-        .arg(videoDispDim.width()).arg(videoDispDim.height())
+        .arg(VideoDispDim.width()).arg(VideoDispDim.height())
         .arg(VideoDim.width()).arg(VideoDim.height())
         .arg(toString(CodecId)).arg(static_cast<double>(Aspect)));
 
     bool cidchanged = (CodecId != video_codec_id);
-    bool reschanged = (videoDispDim != currentvideodispdim);
+    bool reschanged = (VideoDispDim != currentvideodispdim);
 
     // aspect ratio changes are a no-op as changes are handled at display time
     if (!cidchanged && !reschanged)
@@ -257,164 +277,84 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &videoDi
         }
     }
 
-    // Ensure we don't lose embedding through program changes.
-    bool wasembedding = window.IsEmbedding();
-    QRect oldrect;
-    if (wasembedding)
-    {
-        oldrect = window.GetEmbeddingRect();
-        StopEmbedding();
-    }
-
-    // Destroy buffers
-    if (gCoreContext->IsUIThread())
-        TearDown();
-    else
-        DestroyCPUResources();
-
-    // Recreate buffers
-    if (Init(VideoDim, videoDispDim, Aspect, m_window, window.GetDisplayVisibleRect(), CodecId))
-    {
-        if (wasembedding)
-            EmbedInWidget(oldrect);
-        if (gCoreContext->IsUIThread())
-            BestDeint();
-        return true;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-initialise video output.");
-    errorState = kError_Unknown;
-    return false;
-}
-
-bool VideoOutputOpenGL::SetupContext(void)
-{
-    if (m_render)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Re-using context"));
-        return true;
-    }
-
-    MythMainWindow* win = MythMainWindow::getMainWindow();
-    if (!win)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get MythMainWindow");
-        return false;
-    }
-
-    m_render = dynamic_cast<MythRenderOpenGL*>(win->GetRenderDevice());
-    if (m_render)
-    {
-        m_render->IncrRef();
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using main UI render context");
-        return true;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to use OpenGL without OpenGL UI");
-    return false;
-}
-
-bool VideoOutputOpenGL::SetupOpenGL(void)
-{
-    if (!m_render)
+    // delete and recreate the buffers and flag that the input has changed
+    vbuffers.begin_lock(kVideoBuffer_all);
+    DestroyBuffers();
+    m_buffersCreated = CreateBuffers(CodecId, VideoDim);
+    vbuffers.end_lock();
+    if (!m_buffersCreated)
         return false;
 
+    m_newCodecId= CodecId;
+    m_newVideoDim = VideoDim;
+    m_newVideoDispDim = VideoDispDim;
+    m_newAspect = Aspect;
+    return true;
+}
+
+QRect VideoOutputOpenGL::GetDisplayVisibleRect(void)
+{
     QRect dvr = window.GetDisplayVisibleRect();
 
-    MythMainWindow *mainWin = GetMythMainWindow();
-    QSize mainSize = mainWin->size();
+    MythMainWindow *mainwin = GetMythMainWindow();
+    if (!mainwin)
+        return dvr;
+    QSize size = mainwin->size();
 
     // If the Video screen mode has vertically less pixels
     // than the GUI screen mode - OpenGL coordinate adjustments
-    // must be made to put the video at the top of the display 
+    // must be made to put the video at the top of the display
     // area instead of at the bottom.
-    if (dvr.height() < mainSize.height())
-        dvr.setTop(dvr.top()-mainSize.height()+dvr.height());
+    if (dvr.height() < size.height())
+        dvr.setTop(dvr.top()-size.height()+dvr.height());
 
     // If the Video screen mode has horizontally less pixels
     // than the GUI screen mode - OpenGL width must be set
     // as the higher GUI width so that the Program Guide
     // invoked from playback is not cut off.
-    if (dvr.width() < mainSize.width())
-        dvr.setWidth(mainSize.width());
+    if (dvr.width() < size.width())
+        dvr.setWidth(size.width());
+    return dvr;
+}
 
-    if (video_codec_id == kCodec_NONE)
-    {
-        m_render->SetViewPort(QRect(QPoint(),dvr.size()));
+bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
+{
+    if (m_buffersCreated)
         return true;
-    }
 
-    if (window.GetPIPState() >= kPIPStandAlone)
-    {
-        QRect tmprect = QRect(QPoint(0,0), dvr.size());
-        ResizeDisplayWindow(tmprect, true);
-    }
-
-    OpenGLLocker ctx_lock(m_render);
-    m_openGLVideo = new OpenGLVideo(m_render, &videoColourSpace, window.GetVideoDim(),
-                                    window.GetVideoDispDim(), dvr, window.GetDisplayVideoRect(),
-                                    window.GetVideoRect(), true, m_videoProfile);
-    bool success = m_openGLVideo->IsValid();
-    if (success)
-    {
-        m_videoProfile = m_openGLVideo->GetProfile();
-        bool temp_deinterlacing = m_deinterlacing;
-        SetDeinterlacingEnabled(true);
-        if (!temp_deinterlacing)
-            SetDeinterlacingEnabled(false);
-    }
-
-    return success;
-}
-
-void VideoOutputOpenGL::CreatePainter(void)
-{
-    MythMainWindow *win = MythMainWindow::getMainWindow();
-    m_openGLPainter = dynamic_cast<MythOpenGLPainter*>(win->GetCurrentPainter());
-    if (!m_openGLPainter)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get painter");
-        return;
-    }
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using main UI painter");
-    m_openGLPainter->SetSwapControl(false);
-}
-
-bool VideoOutputOpenGL::CreateBuffers(void)
-{
-    if (codec_is_mediacodec_dec(video_codec_id))
+    if (codec_is_mediacodec_dec(CodecID))
     {
         vbuffers.Init(8, false, 1, 4, 2, 1);
     }
-    else if (codec_is_mediacodec(video_codec_id))
+    else if (codec_is_mediacodec(CodecID))
     {
         uint size = VideoBuffers::GetNumBuffers(FMT_MEDIACODEC);
         vbuffers.Init(size, false, 1, 2, 2, 1);
         bool success = true;
         for (uint i = 0; i < size; i++)
-            success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_MEDIACODEC);
+            success &= vbuffers.CreateBuffer(Size.width(), Size.height(), i, nullptr, FMT_MEDIACODEC);
         return success;
     }
-    else if (codec_is_vaapi(video_codec_id))
+    else if (codec_is_vaapi(CodecID))
     {
         uint size = VideoBuffers::GetNumBuffers(FMT_VAAPI);
         vbuffers.Init(size, false, 2, 1, 4, 1);
         bool success = true;
         for (uint i = 0; i < size; i++)
-            success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VAAPI);
+            success &= vbuffers.CreateBuffer(Size.width(), Size.height(), i, nullptr, FMT_VAAPI);
         return success;
     }
-    else if (codec_is_vtb_dec(video_codec_id))
+    else if (codec_is_vtb_dec(CodecID))
     {
         vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_VTB), false, 1, 4, 2, 1);
     }
-    else if (codec_is_vtb(video_codec_id))
+    else if (codec_is_vtb(CodecID))
     {
         uint size = VideoBuffers::GetNumBuffers(FMT_VTB);
         vbuffers.Init(size, false, 1, 4, 2, 1);
         bool success = true;
         for (uint i = 0; i < size; ++i)
-            success &= vbuffers.CreateBuffer(window.GetVideoDim().width(), window.GetVideoDim().height(), i, nullptr, FMT_VTB);
+            success &= vbuffers.CreateBuffer(Size.width(), Size.height(), i, nullptr, FMT_VTB);
         return success;
     }
     else
@@ -422,7 +362,7 @@ bool VideoOutputOpenGL::CreateBuffers(void)
         vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), false, 1, 12, 4, 2);
     }
 
-    return vbuffers.CreateBuffers(FMT_YV12, window.GetVideoDim().width(), window.GetVideoDim().height());
+    return vbuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
@@ -432,22 +372,36 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (!m_render)
         return;
 
-    if (!m_renderValid)
-    {
-        if (!gCoreContext->IsUIThread())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "ProcessFrame called from wrong thread");
-        }
-        QSize size = window.GetVideoDim();
-        InitDisplayMeasurements(size.width(), size.height(), false);
-        DestroyVideoResources();
-        CreateVideoResources();
-        BestDeint();
-        m_renderValid = true;
-    }
-
     OpenGLLocker ctx_lock(m_render);
+
+    // Process input changes
+    if (m_newCodecId != kCodec_NONE)
+    {
+        // Ensure we don't lose embedding through program changes.
+        bool wasembedding = window.IsEmbedding();
+        QRect oldrect;
+        if (wasembedding)
+        {
+            oldrect = window.GetEmbeddingRect();
+            StopEmbedding();
+        }
+
+        bool error = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
+                          0, window.GetDisplayVisibleRect(), m_newCodecId);
+        m_newCodecId = kCodec_NONE;
+        m_newVideoDim = QSize();
+        m_newVideoDispDim = QSize();
+        m_newAspect = 0.0f;
+
+        if (wasembedding && !error)
+        {
+            EmbedInWidget(oldrect);
+            BestDeint();
+        }
+
+        if (error)
+            return;
+    }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_START");
@@ -472,7 +426,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_deintFilter->ProcessFrame(Frame, Scan);
 
     if (m_openGLVideo && swframe && !dummy)
-        m_openGLVideo->UpdateInputFrame(Frame);
+        m_openGLVideo->ProcessFrame(Frame);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_END");
@@ -482,6 +436,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
 {
     if (!m_render)
         return;
+
+    if (m_newCodecId != kCodec_NONE)
+        return; // input changes need to be handled in ProcessFrame
 
     OpenGLLocker ctx_lock(m_render);
 
@@ -531,18 +488,18 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // main UI when embedded
     if (window.IsEmbedding())
     {
-        MythMainWindow *window = GetMythMainWindow();
-        if (window && window->GetPaintWindow())
+        MythMainWindow *win = GetMythMainWindow();
+        if (win && win->GetPaintWindow())
         {
             if (twopass)
                 m_render->SetViewPort(first, true);
-            window->GetPaintWindow()->clearMask();
-            window->draw(m_openGLPainter);
+            win->GetPaintWindow()->clearMask();
+            win->draw(m_openGLPainter);
             if (twopass)
             {
                 m_render->SetViewPort(second, true);
-                window->GetPaintWindow()->clearMask();
-                window->draw(m_openGLPainter);
+                win->GetPaintWindow()->clearMask();
+                win->draw(m_openGLPainter);
                 m_render->SetViewPort(main, true);
             }
         }
@@ -663,6 +620,7 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
         m_render->doneCurrent();
     }
 }
+
 void VideoOutputOpenGL::ClearAfterSeek(void)
 {
     if (m_openGLVideo)
@@ -695,12 +653,6 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
     return allowed;
 }
 
-void VideoOutputOpenGL::Zoom(ZoomDirection Direction)
-{
-    VideoOutput::Zoom(Direction);
-    MoveResize();
-}
-
 void VideoOutputOpenGL::MoveResize(void)
 {
     VideoOutput::MoveResize();
@@ -720,7 +672,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
         if (format_is_hw(used->codec))
             DoneDisplayingFrame(used);
         else
-            m_openGLVideo->UpdateInputFrame(used);
+            m_openGLVideo->ProcessFrame(used);
         DisplayTimecode = used->disp_timecode;
     }
     else
@@ -874,7 +826,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
     if (gl_pipchain->IsValid())
     {
         gl_pipchain->SetVideoRects(position, pipvideorect);
-        gl_pipchain->UpdateInputFrame(pipimage);
+        gl_pipchain->ProcessFrame(pipimage);
     }
 
     m_openGLVideoPiPsReady[PiPPlayer] = true;

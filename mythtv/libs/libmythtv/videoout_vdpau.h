@@ -42,7 +42,6 @@ class VideoOutputVDPAU : public VideoOutput
                       float        aspect,
                       MythCodecID  av_codec_id,
                       bool        &aspect_only) override; // VideoOutput
-    void Zoom(ZoomDirection direction) override; // VideoOutput
     void VideoAspectRatioChanged(float aspect) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput

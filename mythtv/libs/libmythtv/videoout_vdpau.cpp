@@ -786,13 +786,6 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
     return false;
 }
 
-void VideoOutputVDPAU::Zoom(ZoomDirection direction)
-{
-    QMutexLocker locker(&m_lock);
-    VideoOutput::Zoom(direction);
-    MoveResize();
-}
-
 void VideoOutputVDPAU::VideoAspectRatioChanged(float aspect)
 {
     QMutexLocker locker(&m_lock);

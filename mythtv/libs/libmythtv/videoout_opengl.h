@@ -16,7 +16,6 @@ class VideoOutputOpenGL : public VideoOutput
 
     explicit VideoOutputOpenGL(const QString &Profile = QString());
     ~VideoOutputOpenGL() override;
-    void TearDown(void);
 
     // VideoOutput
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
@@ -31,7 +30,6 @@ class VideoOutputOpenGL : public VideoOutput
                       float Aspect, MythCodecID CodecId, bool &AspectOnly) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;
     void DrawUnusedRects(bool) override { }
-    void Zoom(ZoomDirection Direction) override;
     void MoveResize(void) override;
     void InitPictureAttributes(void) override;
     void EmbedInWidget(const QRect &Rect) override;
@@ -52,26 +50,22 @@ class VideoOutputOpenGL : public VideoOutput
     void DoneDisplayingFrame(VideoFrame *Frame) override;
 
   protected:
-    bool CreateGPUResources(void);
-    bool CreateVideoResources(void);
-    void DestroyCPUResources(void);
-    void DestroyVideoResources(void);
-    void DestroyGPUResources(void);
-    bool CreateBuffers(void);
-    bool SetupContext(void);
-    bool SetupOpenGL(void);
-    void CreatePainter(void);
+    void DestroyBuffers(void);
+    bool CreateBuffers(MythCodecID CodecID, QSize Size);
+    QRect GetDisplayVisibleRect(void);
 
     MythRenderOpenGL      *m_render;
-    bool                   m_renderValid;
     OpenGLVideo           *m_openGLVideo;
     QMap<MythPlayer*,OpenGLVideo*> m_openGLVideoPiPs;
     QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;
     OpenGLVideo           *m_openGLVideoPiPActive;
-    WId                    m_window;
-    VideoFrame             m_pauseFrame;
     MythOpenGLPainter     *m_openGLPainter;
     QString                m_videoProfile;
+    MythCodecID            m_newCodecId;
+    QSize                  m_newVideoDim;
+    QSize                  m_newVideoDispDim;
+    float                  m_newAspect;
+    bool                   m_buffersCreated;
 };
 
 #endif

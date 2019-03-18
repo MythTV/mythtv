@@ -664,13 +664,6 @@ void VideoOutputOMX::StopEmbedding(void)
 }
 
 // virtual
-void VideoOutputOMX::Zoom(ZoomDirection direction)
-{
-    VideoOutput::Zoom(direction);
-    MoveResize();
-}
-
-// virtual
 QRect VideoOutputOMX::GetPIPRect(
     PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
 {

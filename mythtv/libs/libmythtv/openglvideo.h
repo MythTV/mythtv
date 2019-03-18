@@ -33,7 +33,6 @@ class OpenGLVideo : public QObject
         ShaderCount   = 5
     };
 
-    static VideoFrameType ProfileToType(const QString &Profile);
     static QString        TypeToProfile(VideoFrameType Type);
 
     OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
@@ -43,29 +42,36 @@ class OpenGLVideo : public QObject
    ~OpenGLVideo();
 
     bool    IsValid(void) const;
-    void    UpdateInputFrame(const VideoFrame *Frame);
-    bool    AddDeinterlacer(QString &Deinterlacer);
-    void    SetDeinterlacing(bool Deinterlacing);
-    QString GetDeinterlacer(void) const;
+    void    ProcessFrame(const VideoFrame *Frame);
     void    PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
                          StereoscopicMode Stereo, bool DrawBorder = false);
+    bool    AddDeinterlacer(QString Deinterlacer);
+    void    SetDeinterlacing(bool Deinterlacing);
+    QString GetDeinterlacer(void) const;
     void    SetMasterViewport(QSize Size);
     QSize   GetVideoSize(void) const;
     QString GetProfile() const;
+    void    SetProfile(const QString &Profile);
+    void    ResetFrameFormat(void);
     void    ResetTextures(void);
 
   public slots:
+    void    SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim);
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
+    void    SetViewportRect(const QRect &DisplayVisibleRect);
     void    UpdateColourSpace(void);
     void    UpdateShaderParameters(void);
 
   private:
+    bool    SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
+                             QSize Size, GLenum TextureTarget);
     bool    CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
     void    LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                          MythGLTexture** Textures, uint &TextureCount);
     void    TearDownDeinterlacer(void);
 
     bool           m_valid;
+    QString        m_profile;
     VideoFrameType m_inputType;           ///< Usually YV12 for software, VDPAU etc for hardware
     VideoFrameType m_outputType;          ///< Set by profile for software or decoder for hardware
     MythRenderOpenGL *m_render;
@@ -76,11 +82,12 @@ class OpenGLVideo : public QObject
     QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
     QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
     QString        m_hardwareDeinterlacer;
+    QString        m_queuedHardwareDeinterlacer; ///< Temporary prior to deinterlacing refactor
     bool           m_hardwareDeinterlacing; ///< OpenGL deinterlacing is enabled
     VideoColourSpace *m_videoColourSpace;
     bool           m_viewportControl;     ///< Video has control over view port
-    QOpenGLShaderProgram* m_shaders[ShaderCount];
-    int            m_shaderCost[ShaderCount];
+    QOpenGLShaderProgram* m_shaders[ShaderCount] { nullptr };
+    int            m_shaderCost[ShaderCount]     { 1 };
     vector<MythVideoTexture*> m_inputTextures; ///< Current textures with raw video data
     vector<MythVideoTexture*> m_prevTextures;  ///< Previous textures with raw video data
     vector<MythVideoTexture*> m_nextTextures;  ///< Next textures with raw video data

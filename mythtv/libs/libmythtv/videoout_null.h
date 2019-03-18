@@ -26,7 +26,6 @@ class VideoOutputNull : public VideoOutput
                       float        aspect,
                       MythCodecID  av_codec_id,
                       bool        &aspect_only) override; // VideoOutput
-    void Zoom(ZoomDirection direction) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     void DrawUnusedRects(bool sync = true) override; // VideoOutput
