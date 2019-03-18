@@ -324,45 +324,22 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 
     if (codec_is_mediacodec_dec(CodecID))
     {
-        vbuffers.Init(8, false, 1, 4, 2, 1);
-    }
-    else if (codec_is_mediacodec(CodecID))
-    {
-        uint size = VideoBuffers::GetNumBuffers(FMT_MEDIACODEC);
-        vbuffers.Init(size, false, 1, 2, 2, 1);
-        bool success = true;
-        for (uint i = 0; i < size; i++)
-            success &= vbuffers.CreateBuffer(Size.width(), Size.height(), i, nullptr, FMT_MEDIACODEC);
-        return success;
-    }
-    else if (codec_is_vaapi(CodecID))
-    {
-        uint size = VideoBuffers::GetNumBuffers(FMT_VAAPI);
-        vbuffers.Init(size, false, 2, 1, 4, 1);
-        bool success = true;
-        for (uint i = 0; i < size; i++)
-            success &= vbuffers.CreateBuffer(Size.width(), Size.height(), i, nullptr, FMT_VAAPI);
-        return success;
+        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_MEDIACODEC), false, 1, 4, 2, 1);
+        return vbuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
     }
     else if (codec_is_vtb_dec(CodecID))
     {
         vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_VTB), false, 1, 4, 2, 1);
-    }
-    else if (codec_is_vtb(CodecID))
-    {
-        uint size = VideoBuffers::GetNumBuffers(FMT_VTB);
-        vbuffers.Init(size, false, 1, 4, 2, 1);
-        bool success = true;
-        for (uint i = 0; i < size; ++i)
-            success &= vbuffers.CreateBuffer(Size.width(), Size.height(), i, nullptr, FMT_VTB);
-        return success;
-    }
-    else
-    {
-        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), false, 1, 12, 4, 2);
+        return vbuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
     }
 
-    return vbuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
+    if (codec_is_mediacodec(CodecID))
+        return vbuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2, 1);
+    else if (codec_is_vaapi(CodecID))
+        return vbuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1);
+    else if (codec_is_vtb(CodecID))
+        return vbuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
+    return vbuffers.CreateBuffers(FMT_YV12, Size, false, 1, 12, 4, 2);
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,

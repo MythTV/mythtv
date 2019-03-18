@@ -802,8 +802,25 @@ void VideoBuffers::ClearAfterSeek(void)
     }
 }
 
+bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
+                                 uint NeedFree, uint NeedprebufferNormal,
+                                 uint NeedPrebufferSmall, uint KeepPrebuffer)
+{
+    Init(GetNumBuffers(Type), ExtraForPause, NeedFree, NeedprebufferNormal,
+         NeedPrebufferSmall, KeepPrebuffer);
+    return CreateBuffers(Type, Size.width(), Size.height());
+}
+
 bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
 {
+    if (format_is_hw(Type))
+    {
+        bool success = true;
+        for (uint i = 0; i < Size(); i++)
+            success &= CreateBuffer(Width, Height, i, nullptr, Type);
+        return success;
+    }
+
     vector<unsigned char*> bufs;
     vector<YUVInfo>        yuvinfo;
     return CreateBuffers(Type, Width, Height, bufs, yuvinfo);

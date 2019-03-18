@@ -59,7 +59,9 @@ class MTV_PUBLIC VideoBuffers
     void Init(uint NumDecode, bool ExtraForPause,
               uint NeedFree, uint NeedprebufferNormal,
               uint NeedPrebufferSmall, uint KeepPrebuffer);
-
+    bool CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
+                       uint NeedFree, uint NeedprebufferNormal,
+                       uint NeedPrebufferSmall, uint KeepPrebuffer);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height,
                        vector<unsigned char*> Buffers,
                        vector<YUVInfo>        YUVInfos);
