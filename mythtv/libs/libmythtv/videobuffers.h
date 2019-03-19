@@ -2,6 +2,7 @@
 #define __VIDEOBUFFERS_H__
 
 // Qt
+#include <QSize>
 #include <QMutex>
 #include <QString>
 
