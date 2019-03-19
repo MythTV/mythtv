@@ -105,7 +105,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     // utility functions
     int64_t     AudioCardLatency(void);
     QStringList splitLines(const QByteArray &lines);
-    QString     stringFromSeconds(int seconds);
+    QString     stringFromSeconds(int timeInSeconds);
     uint64_t    framesToMs(uint64_t frames);
 
     // notification functions

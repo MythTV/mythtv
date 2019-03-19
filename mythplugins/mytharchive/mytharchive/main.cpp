@@ -238,12 +238,10 @@ static void runTestDVD(void)
         GetMythMainWindow()->HandleMedia(command, filename);
         return;
     }
-    else
-    {
-        if (command.contains("%f"))
-            command = command.replace(QRegExp("%f"), filename);
-        myth_system(command);
-    }
+
+    if (command.contains("%f"))
+        command = command.replace(QRegExp("%f"), filename);
+    myth_system(command);
 }
 
 static void runBurnDVD(void)
@@ -323,13 +321,11 @@ static int runMenu(QString which_menu)
         GetMythMainWindow()->GetMainStack()->AddScreen(diag);
         return 0;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
-                .arg(which_menu).arg(themedir));
-        delete diag;
-        return -1;
-    }
+
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+        .arg(which_menu).arg(themedir));
+    delete diag;
+    return -1;
 }
 
 static void initKeys(void)

@@ -1087,8 +1087,7 @@ void EditAlbumartDialog::showMenu(void )
             menu->AddButton(tr("Copy Image To Tag"));
     }
 
-    if (tagger)
-        delete tagger;
+    delete tagger;
 
     popupStack->AddScreen(menu);
 }

@@ -735,43 +735,37 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
     QFile file(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetMenuThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetShareDir() + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = "../mythfrontend/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetShareDir() + "themes/defaultmenu/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     return QString();
 }
@@ -797,7 +791,7 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 
         return false;
     }
-    else if (action.startsWith("EXECTV "))
+    if (action.startsWith("EXECTV "))
     {
         QString rest = action.right(action.length() - 7).trimmed();
         if (cbs && cbs->exec_program_tv)

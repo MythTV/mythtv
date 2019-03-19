@@ -608,7 +608,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 #endif
 	    ) >=
            d->m_maxCacheSize.fetchAndAddOrdered(0) &&
-           d->m_imageCache.size())
+           !d->m_imageCache.empty())
     {
         QMap<QString, MythImage *>::iterator it = d->m_imageCache.begin();
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)

@@ -200,7 +200,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 entries = sgroup.GetFileInfoList(parts[1]);
             }
 
-            if (entries.size())
+            if (!entries.empty())
             {
                 QTextStream os(&request->m_response);
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";

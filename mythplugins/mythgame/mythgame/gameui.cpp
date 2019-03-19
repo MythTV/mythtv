@@ -81,7 +81,7 @@ bool GameUI::Create()
     connect(m_gameUITree, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(nodeChanged(MythGenericTree*)));
 
-    m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
+    m_gameShowFileName = gCoreContext->GetBoolSetting("GameShowFileNames");
 
     BuildTree();
 
@@ -124,7 +124,7 @@ void GameUI::BuildTree()
     else
         systemFilter += ")";
 
-    m_showHashed = gCoreContext->GetSetting("GameTreeView").toInt();
+    m_showHashed = gCoreContext->GetBoolSetting("GameTreeView");
 
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
@@ -249,7 +249,7 @@ void GameUI::nodeChanged(MythGenericTree* node)
     }
 }
 
-void GameUI::itemClicked(MythUIButtonListItem*)
+void GameUI::itemClicked(MythUIButtonListItem* /*item*/)
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
@@ -602,7 +602,7 @@ void GameUI::customEvent(QEvent *event)
             m_busyPopup = nullptr;
         }
 
-        if (lul.size())
+        if (!lul.empty())
         {
             MetadataLookup *lookup = lul[0];
             MythGenericTree *node = lookup->GetData().value<MythGenericTree *>();
@@ -1024,21 +1024,21 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     QString system = metadata->System();
     QString title = metadata->Gamename();
 
-    if (metadata->Boxart().isEmpty() && coverart.size())
+    if (metadata->Boxart().isEmpty() && !coverart.empty())
     {
         ArtworkInfo info;
         info.url = coverart.takeAt(0).trimmed();
         map.insert(kArtworkCoverart, info);
     }
 
-    if (metadata->Fanart().isEmpty() && fanart.size())
+    if (metadata->Fanart().isEmpty() && !fanart.empty())
     {
         ArtworkInfo info;
         info.url = fanart.takeAt(0).trimmed();
         map.insert(kArtworkFanart, info);
     }
 
-    if (metadata->Screenshot().isEmpty() && screenshot.size())
+    if (metadata->Screenshot().isEmpty() && !screenshot.empty())
     {
         ArtworkInfo info;
         info.url = screenshot.takeAt(0).trimmed();

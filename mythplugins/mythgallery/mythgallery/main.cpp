@@ -47,8 +47,7 @@ static int run(MythMediaDevice *dev = nullptr, bool startRandomShow = false)
             }
             return 0;
         }
-        else
-            delete iconview;
+        delete iconview;
     }
     else
     {

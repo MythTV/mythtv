@@ -1270,22 +1270,22 @@ void PlaybackProfileConfig::ReloadSettings(void)
     setChanged(true);
 }
 
-void PlaybackProfileConfig::swap(int i, int j)
+void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
         profile->Save();
     }
 
-    QString pri_i = QString::number(m_items[i].GetPriority());
-    QString pri_j = QString::number(m_items[j].GetPriority());
+    QString pri_i = QString::number(m_items[indexA].GetPriority());
+    QString pri_j = QString::number(m_items[indexB].GetPriority());
 
-    ProfileItem item = m_items[j];
-    m_items[j] = m_items[i];
-    m_items[i] = item;
+    ProfileItem item = m_items[indexB];
+    m_items[indexB] = m_items[indexA];
+    m_items[indexA] = item;
 
-    m_items[i].Set("pref_priority", pri_i);
-    m_items[j].Set("pref_priority", pri_j);
+    m_items[indexA].Set("pref_priority", pri_i);
+    m_items[indexB].Set("pref_priority", pri_j);
 
     ReloadSettings();
 }
@@ -2258,7 +2258,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (scr.size() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
+    if (!scr.empty() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
         int w = 0, h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
@@ -2334,10 +2334,10 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
             setValue(hz50+1);
     }
 
-    setEnabled(list.size());
+    setEnabled(!list.empty());
 }
 
-const vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
+vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
     const QString &res)
 {
     QStringList slist = res.split("x");
@@ -3917,7 +3917,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
   private slots:
-    void childChanged(StandardSetting *) override; // StandardSetting
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
   private:
     StandardSetting *m_overrideExitMenu {nullptr};
     StandardSetting *m_haltCommand      {nullptr};
@@ -3936,7 +3936,7 @@ ShutDownRebootSetting::ShutDownRebootSetting()
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting *)
+void ShutDownRebootSetting::childChanged(StandardSetting * /*setting*/)
 {
     switch (m_overrideExitMenu->getValue().toInt())
     {
@@ -4036,7 +4036,7 @@ MainGeneralSettings::MainGeneralSettings()
 }
 
 #ifdef USING_LIBCEC
-void MainGeneralSettings::cecChanged(bool)
+void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_CECPowerOnTVAllowed->boolValue())
         m_CECPowerOnTVOnStart->setEnabled(true);
@@ -4072,7 +4072,7 @@ class PlayBackScaling : public GroupSetting
     void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
   private slots:
-    void childChanged(StandardSetting *) override; // StandardSetting
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
     StandardSetting *m_VertScan  {nullptr};
@@ -4116,7 +4116,7 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
                 .arg(m_YScan->getValue()), "value");
 }
 
-void PlayBackScaling::childChanged(StandardSetting *)
+void PlayBackScaling::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }
@@ -4461,7 +4461,7 @@ class GuiDimension : public GroupSetting
         void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
     private slots:
-        void childChanged(StandardSetting *) override; // StandardSetting
+        void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
         StandardSetting *m_width   {nullptr};
         StandardSetting *m_height  {nullptr};
@@ -4503,7 +4503,7 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
                       .arg(m_offsetY->getValue()), "value");
 }
 
-void GuiDimension::childChanged(StandardSetting *)
+void GuiDimension::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }

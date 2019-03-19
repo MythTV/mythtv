@@ -101,8 +101,7 @@ void DeleteThread::ProcessNew(void)
             QMutexLocker lock(&m_newlock);
             if (m_newfiles.isEmpty())
                 break;
-            else
-                handler = m_newfiles.takeFirst();
+            handler = m_newfiles.takeFirst();
         }
 
         // empty path given to delete thread, this should not happen

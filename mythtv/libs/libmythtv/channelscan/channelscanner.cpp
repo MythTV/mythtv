@@ -196,7 +196,7 @@ void ChannelScanner::Scan(
             Teardown();
         }
     }
-    else if ((ScanTypeSetting::DVBUtilsImport == scantype) && m_channels.size())
+    else if ((ScanTypeSetting::DVBUtilsImport == scantype) && !m_channels.empty())
     {
         ok = true;
 

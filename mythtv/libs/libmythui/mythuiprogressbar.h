@@ -40,7 +40,7 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
     int m_total         {0};
     int m_start         {0};
     int m_current       {0};
-    int m_firstdepend   {true};
+    bool m_firstdepend   {true};
 
     void CalculatePosition(void);
 };

@@ -338,7 +338,7 @@ void MythBurn::toggleUseCutlist(void)
 
 void MythBurn::handleNextPage()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         ShowOkPopup(tr("You need to add at least one item to archive!"));
         return;
@@ -405,7 +405,7 @@ void MythBurn::updateArchiveList(void)
 
     m_archiveButtonList->Reset();
 
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         m_nofilesText->Show();
     }
@@ -481,12 +481,9 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.bindValue(":FILENAME", baseName);
         if (query.exec() && query.size())
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: Recording not found (%1)")
-                    .arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: Recording not found (%1)")
+            .arg(filename));
     }
     else if (type == "Video")
     {
@@ -496,21 +493,15 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.bindValue(":FILENAME", filename);
         if (query.exec() && query.size())
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: Video not found (%1)").arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: Video not found (%1)").arg(filename));
     }
     else if (type == "File")
     {
         if (QFile::exists(filename))
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: File not found (%1)").arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: File not found (%1)").arg(filename));
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythArchive: Archive item removed from list");
@@ -612,7 +603,7 @@ void MythBurn::createConfigFile(const QString &filename)
             details.appendChild(desc);
         }
 
-        if (a->thumbList.size() > 0)
+        if (!a->thumbList.empty())
         {
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
@@ -770,7 +761,7 @@ void MythBurn::saveConfiguration(void)
 
 void MythBurn::ShowMenu()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
         return;
 
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();

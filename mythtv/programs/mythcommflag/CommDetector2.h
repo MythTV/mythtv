@@ -43,7 +43,7 @@ class CommDetector2 : public CommDetectorBase
         int chanid, const QDateTime& startts, const QDateTime& endts,
         const QDateTime& recstartts, const QDateTime& recendts, bool useDB);
     bool go(void) override; // CommDetectorBase
-    void GetCommercialBreakList(frm_dir_map_t &comms) override; // CommDetectorBase
+    void GetCommercialBreakList(frm_dir_map_t &marks) override; // CommDetectorBase
     void recordingFinished(long long totalFileSize) override; // CommDetectorBase
     void requestCommBreakMapUpdate(void) override; // CommDetectorBase
     void PrintFullMap(ostream &out, const frm_dir_map_t *comm_breaks,
@@ -52,7 +52,7 @@ class CommDetector2 : public CommDetectorBase
   private:
     virtual ~CommDetector2() = default;
 
-    void reportState(int elapsed_sec, long long frameno, long long nframes,
+    void reportState(int elapsedms, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);
     int computeBreaks(long long nframes);
 

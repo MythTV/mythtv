@@ -57,9 +57,9 @@
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
-    DTVTunerType, const DTVMultiplex&, int intermediate_freq, bool can_fec_auto);
+    DTVTunerType /*tuner_type*/, const DTVMultiplex& /*tuning*/, int intermediate_freq, bool can_fec_auto);
 static DTVMultiplex dvbparams_to_dtvmultiplex(
-    DTVTunerType, const dvb_frontend_parameters&);
+    DTVTunerType /*tuner_type*/, const dvb_frontend_parameters& /*params*/);
 
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::s_last_tuning = QDateTime::currentDateTime();

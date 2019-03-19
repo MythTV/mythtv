@@ -23,7 +23,7 @@ class MPUBLIC MythTerminal : public MythScreenType
     Q_OBJECT
 
   public:
-    MythTerminal(MythScreenStack *stack, QString program,
+    MythTerminal(MythScreenStack *parent, QString program,
                  QStringList arguments);
     virtual void deleteLater(void)
         { TeardownAll(); MythScreenType::deleteLater(); }

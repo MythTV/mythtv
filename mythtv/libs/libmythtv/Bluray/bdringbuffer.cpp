@@ -1549,15 +1549,15 @@ bool BDRingBuffer::StartFromBeginning(void)
     return true;
 }
 
-bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
+bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serialnum)
 {
     if (!m_bdnav)
         return false;
 
-    name   = m_name;
-    serial = m_serialNumber;
+    name      = m_name;
+    serialnum = m_serialNumber;
 
-    return !serial.isEmpty();
+    return !serialnum.isEmpty();
 }
 
 /** \brief Get a snapshot of the current BD state
@@ -1680,10 +1680,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
     {
         case BD_OVERLAY_INIT:    /* init overlay plane. Size and position of plane in x,y,w,h */
             /* init overlay plane. Size of plane in w,h */
-            if (osd)
-            {
-                delete osd;
-            }
+            delete osd;
             osd = new BDOverlay(overlay);
             break;
 
@@ -1773,9 +1770,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
     {
         case BD_ARGB_OVERLAY_INIT:
             /* init overlay plane. Size of plane in w,h */
-            if (osd)
-                delete osd;
-
+            delete osd;
             osd = new BDOverlay(overlay);
             break;
 

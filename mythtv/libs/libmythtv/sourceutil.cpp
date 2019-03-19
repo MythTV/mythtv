@@ -56,7 +56,7 @@ QString SourceUtil::GetSourceName(uint sourceid)
         MythDB::DBError("SourceUtil::GetSourceName()", query);
         return QString();
     }
-    else if (!query.next())
+    if (!query.next())
     {
         return QString();
     }

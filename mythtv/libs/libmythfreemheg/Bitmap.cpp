@@ -159,7 +159,7 @@ void MHBitmap::CreateContent(const unsigned char *data, int length, MHEngine *en
 
 
 // Set the transparency.
-void MHBitmap::SetTransparency(int nTransPerCent, MHEngine *)
+void MHBitmap::SetTransparency(int nTransPerCent, MHEngine * /*engine*/)
 {
     // The object transparency isn't actually used in UK MHEG.
     // We want a value between 0 and 255
@@ -202,7 +202,7 @@ void MHBitmap::GetBitmapDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset)
     pYOffset->SetVariableValue(m_nYDecodeOffset);
 }
 
-void MHBitmap::Display(MHEngine *)
+void MHBitmap::Display(MHEngine * /*engine*/)
 {
     if (! m_fRunning || ! m_pContent || m_nBoxWidth == 0 || m_nBoxHeight == 0)
     {
@@ -240,9 +240,6 @@ QRegion MHBitmap::GetOpaqueArea()
     {
         return QRegion();
     }
-    else
-    {
-        return GetVisibleArea();
-    }
+    return GetVisibleArea();
 }
 

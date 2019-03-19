@@ -1021,7 +1021,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
             m_busyPopup = nullptr;
         }
 
-        if (lul.size())
+        if (!lul.empty())
         {
             MetadataLookup *lookup = lul[0];
             LOG(VB_GENERAL, LOG_INFO,

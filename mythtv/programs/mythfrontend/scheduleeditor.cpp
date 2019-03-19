@@ -1725,10 +1725,10 @@ void MetadataOptions::customEvent(QEvent *levent)
                     QueryComplete(lookup);
                     return;
                 }
-                else if (m_recInfo &&
-                         m_recInfo->GetYearOfInitialRelease() != 0 &&
-                         (list[p])->GetYear() != 0 &&
-                         m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
+                if (m_recInfo &&
+                    m_recInfo->GetYearOfInitialRelease() != 0 &&
+                    (list[p])->GetYear() != 0 &&
+                    m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
                 {
                     if (yearindex > -1)
                     {
@@ -1838,7 +1838,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         MetadataLookupList lul = luf->m_lookupList;
 
-        if (lul.size())
+        if (!lul.empty())
         {
             QString title = tr("This number, season, and episode combination "
                                "does not appear to be valid (or the site may "

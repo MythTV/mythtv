@@ -81,8 +81,7 @@ LogScale::LogScale(int maxscale, int maxrange)
 
 LogScale::~LogScale()
 {
-    if (m_indices)
-        delete [] m_indices;
+    delete [] m_indices;
 }
 
 void LogScale::setMax(int maxscale, int maxrange)
@@ -93,8 +92,7 @@ void LogScale::setMax(int maxscale, int maxrange)
     m_s = maxscale;
     m_r = maxrange;
 
-    if (m_indices)
-        delete [] m_indices;
+    delete [] m_indices;
 
     double alpha;
     long double domain = (long double) maxscale;

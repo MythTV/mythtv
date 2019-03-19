@@ -180,7 +180,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     int   GetTextureDataSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
-    void  EnableTextures(uint type, uint tex_type = 0);
+    void  EnableTextures(uint tex, uint tex_type = 0);
     void  DisableTextures(void);
     void  DeleteTexture(uint tex);
 

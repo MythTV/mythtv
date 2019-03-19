@@ -35,13 +35,10 @@ VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *arch
 
 VideoSelector::~VideoSelector(void)
 {
-    if (m_videoList)
-        delete m_videoList;
-
+    delete m_videoList;
     while (!m_selectedList.isEmpty())
          delete m_selectedList.takeFirst();
     m_selectedList.clear();
-
     delete m_parentalLevelChecker;
 }
 

@@ -282,11 +282,7 @@ void DVBStreamHandler::RunTS(void)
         _drb = nullptr;
     }
 
-    if (drb)
-    {
-        delete drb;
-    }
-
+    delete drb;
     close(dvr_fd);
     delete[] buffer;
 

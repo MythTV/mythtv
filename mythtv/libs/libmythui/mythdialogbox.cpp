@@ -45,9 +45,7 @@ MythMenu::~MythMenu(void)
     {
         MythMenuItem *item = m_menuItems.takeFirst();
 
-        if (item->m_subMenu)
-            delete item->m_subMenu;
-
+        delete item->m_subMenu;
         delete item;
     }
 }

@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
         treeloop.exec();
     }
 
-    if ((refreshall || refreshrss) && findAllDBRSS().count())
+    if ((refreshall || refreshrss) && !findAllDBRSS().empty())
     {
         QEventLoop rssloop;
 

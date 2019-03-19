@@ -182,17 +182,14 @@
 		if (headers != nullptr)\
 		{\
 			qDebug() << "Corrupted zip archive. Some files might be extracted.";\
-			ec = headers->size() != 0 ? UnZip::PartiallyCorrupted : UnZip::Corrupted;\
+			ec = headers->empty() ? UnZip::Corrupted : UnZip::PartiallyCorrupted;\
 			break;\
 		}\
-		else\
-		{\
-			delete device;\
-			device = nullptr;\
-			qDebug() << "Corrupted or invalid zip archive";\
-			ec = UnZip::Corrupted;\
-			break;\
-		}\
+                delete device;                                  \
+                device = nullptr;                               \
+                qDebug() << "Corrupted or invalid zip archive"; \
+                ec = UnZip::Corrupted;                          \
+                break;                                          \
 	}
 
 

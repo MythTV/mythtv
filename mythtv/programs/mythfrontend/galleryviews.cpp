@@ -624,7 +624,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
                 // be empty
                 LoadDirThumbs(*im, thumbsNeeded, level);
 
-                if (im->m_thumbNails.size() > 0)
+                if (!im->m_thumbNails.empty())
                 {
                     // Add first thumbnail to parent thumb
                     parent.m_thumbNails.append(im->m_thumbNails.at(0));
@@ -669,7 +669,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
  \brief Resets view
  \param resetParent parent id is only reset to root when this is set
 */
-void DirectoryView::Clear(bool)
+void DirectoryView::Clear(bool /*resetParent*/)
 {
     ClearMarked();
     ClearCache();

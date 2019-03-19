@@ -65,7 +65,7 @@ extern "C" {
 #define round(x) ((int) ((x) + 0.5))
 #endif
 
-static unsigned dbg_ident(const MythPlayer*);
+static unsigned dbg_ident(const MythPlayer* /*player*/);
 
 #define LOC      QString("Player(%1): ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)
@@ -1003,7 +1003,7 @@ int MythPlayer::OpenFile(uint retries)
         delete[] testbuf;
         return -1;
     }
-    else if (decoder->IsErrored())
+    if (decoder->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
         SetDecoder(nullptr);
@@ -1747,7 +1747,7 @@ bool MythPlayer::HasCaptionTrack(int mode)
     {
         return true;
     }
-    else if (!(mode == kDisplayTextSubtitle) &&
+    if (!(mode == kDisplayTextSubtitle) &&
                decoder->GetTrackCount(toTrackType(mode)))
     {
         return true;

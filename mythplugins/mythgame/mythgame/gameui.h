@@ -70,7 +70,7 @@ class GameUI : public MythScreenType
 
   private:
     bool m_showHashed                      {false};
-    int m_gameShowFileName                 {0};
+    bool m_gameShowFileName                {false};
 
     MythGenericTree  *m_gameTree           {nullptr};
     MythGenericTree  *m_favouriteNode      {nullptr};

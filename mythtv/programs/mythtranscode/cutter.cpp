@@ -104,18 +104,16 @@ bool Cutter::InhibitUseVideoFrame()
     {
         return false;
     }
-    else
-    {
-        // We are inside a cut. Inhibit use of this frame
-        m_videoFramesToCut--;
 
-        if(m_videoFramesToCut == 0)
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Clean cut: end of video cut; audio frames left "
-                        "to cut %1") .arg(m_audioFramesToCut));
+    // We are inside a cut. Inhibit use of this frame
+    m_videoFramesToCut--;
 
-        return true;
-    }
+    if(m_videoFramesToCut == 0)
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Clean cut: end of video cut; audio frames left "
+                    "to cut %1") .arg(m_audioFramesToCut));
+
+    return true;
 }
 
 bool Cutter::InhibitUseAudioFrames(int64_t frames, long *totalAudio)
@@ -128,7 +126,7 @@ bool Cutter::InhibitUseAudioFrames(int64_t frames, long *totalAudio)
     {
         return false;
     }
-    else if (delta < m_audioFramesToCut)
+    if (delta < m_audioFramesToCut)
     {
         // Drop the packet containing these frames if doing
         // so gets us closer to zero left to drop
@@ -139,18 +137,16 @@ bool Cutter::InhibitUseAudioFrames(int64_t frames, long *totalAudio)
                         "to cut %1") .arg(m_videoFramesToCut));
         return true;
     }
-    else
-    {
-        // Don't drop this packet even though we still have frames to cut,
-        // because doing so would put us further out. Instead, inflate the
-        // callers record of how many audio frames have been output.
-        *totalAudio += m_audioFramesToCut;
-        m_audioFramesToCut = 0;
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("Clean cut: end of audio cut; vidio frames left to "
-                    "cut %1") .arg(m_videoFramesToCut));
-        return false;
-    }
+
+    // Don't drop this packet even though we still have frames to cut,
+    // because doing so would put us further out. Instead, inflate the
+    // callers record of how many audio frames have been output.
+    *totalAudio += m_audioFramesToCut;
+    m_audioFramesToCut = 0;
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Clean cut: end of audio cut; vidio frames left to "
+                "cut %1") .arg(m_videoFramesToCut));
+    return false;
 }
 
 bool Cutter::InhibitDummyFrame()
@@ -162,10 +158,7 @@ bool Cutter::InhibitDummyFrame()
         m_audioFramesToCut += llroundf(m_audioFramesPerVideoFrame);
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool Cutter::InhibitDropFrame()
@@ -184,15 +177,9 @@ bool Cutter::InhibitDropFrame()
             m_videoFramesToCut-- ;
             return false;
         }
-        else
-        {
-            return true;
-        }
+        return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -87,7 +87,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     uint mplexid_restriction = 0;
     uint chanid_restriction = 0;
 
-    if (m_channels.size() &&
+    if (!m_channels.empty() &&
         IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         uint chanid = ChannelUtil::GetNextChannel(
@@ -565,7 +565,7 @@ bool ChannelBase::InitializeInput(void)
         MythDB::DBError("InitializeInputs", query);
         return false;
     }
-    else if (!query.size())
+    if (!query.size())
     {
         LOG(VB_GENERAL, LOG_ERR, "InitializeInputs(): "
             "\n\t\t\tCould not get inputs for the capturecard."

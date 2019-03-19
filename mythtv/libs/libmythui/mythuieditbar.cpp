@@ -294,7 +294,7 @@ void MythUIEditBar::CalcInverseRegions(void)
 
 void MythUIEditBar::ClearImages(void)
 {
-    while (m_images.size())
+    while (!m_images.empty())
         DeleteChild(m_images.takeFirst());
     SetRedraw();
 }

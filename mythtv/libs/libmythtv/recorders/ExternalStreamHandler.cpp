@@ -85,7 +85,7 @@ bool ExternIO::Ready(int fd, int timeout, const QString & what)
         m_error = what + " poll eof (POLLHUP)";
         return false;
     }
-    else if (m_poll[0].revents & POLLNVAL)
+    if (m_poll[0].revents & POLLNVAL)
     {
         LOG(VB_GENERAL, LOG_ERR, "poll error");
         return false;
@@ -766,7 +766,7 @@ void ExternalStreamHandler::run(void)
             std::this_thread::sleep_for(std::chrono::microseconds(50));
             continue;
         }
-        else if (data_short_err)
+        if (data_short_err)
         {
             if (data_short_err > 1)
             {
@@ -1224,7 +1224,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
 
     if (m_apiVersion == 2)
         return ProcessVer2(cmd, result, timeout, retry_cnt);
-    else if (m_apiVersion == 1)
+    if (m_apiVersion == 1)
         return ProcessVer1(cmd, result, timeout, retry_cnt);
 
     LOG(VB_RECORD, LOG_ERR, LOC +
@@ -1323,10 +1323,9 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 
                 return okay;
             }
-            else
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
-                    QString("External Recorder invalid response to '%1': '%2'")
-                    .arg(cmd).arg(result));
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("External Recorder invalid response to '%1': '%2'")
+                .arg(cmd).arg(result));
         }
 
         if (++m_io_errcnt > 10)
@@ -1465,10 +1464,9 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
 
                 return okay;
             }
-            else
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
-                    QString("External Recorder invalid response to '%1': '%2'")
-                    .arg(cmd).arg(result));
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("External Recorder invalid response to '%1': '%2'")
+                .arg(cmd).arg(result));
         }
 
         if (++m_io_errcnt > 10)

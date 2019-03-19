@@ -168,7 +168,7 @@ class PlaybackBox : public ScheduleCommon
     void ShowRecGroupChanger(bool use_playlist = false);
     void ShowPlayGroupChanger(bool use_playlist = false);
 
-    void popupClosed(QString which, int reason);
+    void popupClosed(QString which, int result);
 
     void doPlayListRandom();
 
@@ -211,7 +211,7 @@ class PlaybackBox : public ScheduleCommon
                          const QString &newDescription, const QString &newInetref,
                          uint season, uint episode);
 
-    void SetRecGroupPassword(const QString &newPasswd);
+    void SetRecGroupPassword(const QString &newPassword);
 
     void doJobQueueJob(int jobType, int jobFlags = 0);
     void doPlaylistJobQueueJob(int jobType, int jobFlags = 0);
@@ -270,7 +270,7 @@ class PlaybackBox : public ScheduleCommon
 
     void UpdateProgressBar(void);
 
-    void PlayX(const ProgramInfo &rec,
+    void PlayX(const ProgramInfo &pginfo,
                bool ignoreBookmark,
                bool ignoreProgStart,
                bool ignoreLastPlayPos,
@@ -312,7 +312,7 @@ class PlaybackBox : public ScheduleCommon
 
     void SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo);
     void UpdateUIListItem(
-        ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists,
+        ProgramInfo *pginfo,
         bool force_preview_reload);
     void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
                           bool force_preview_reload = true);
@@ -331,7 +331,7 @@ class PlaybackBox : public ScheduleCommon
     //    { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
     bool CreatePopupMenuPlaylist(void);
 
-    QString CreateProgramInfoString(const ProgramInfo &program) const;
+    QString CreateProgramInfoString(const ProgramInfo &pginfo) const;
 
     QString extract_job_state(const ProgramInfo &pginfo);
     QString extract_commflag_state(const ProgramInfo &pginfo);

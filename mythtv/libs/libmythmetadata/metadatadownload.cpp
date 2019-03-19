@@ -224,9 +224,9 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
         {
             // In lookup by name, the television database tends to only include Banner artwork.
             // In lookup by name, the movie database tends to include only Fan and Cover artwork.
-            if ((((*i)->GetArtwork(kArtworkFanart)).size() != 0) ||
-                (((*i)->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                (((*i)->GetArtwork(kArtworkBanner)).size() != 0))
+            if ((!((*i)->GetArtwork(kArtworkFanart)).empty()) ||
+                (!((*i)->GetArtwork(kArtworkCoverart)).empty()) ||
+                (!((*i)->GetArtwork(kArtworkBanner)).empty()))
             {
                 exactMatchesWithArt++;
             }
@@ -236,8 +236,7 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
 
     if (withArt)
         return exactMatchesWithArt;
-    else
-        return exactMatches;
+    return exactMatches;
 }
 
 MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
@@ -263,9 +262,9 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
         // Consider exact title matches (ignoring case), which have some artwork available.
         if (QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0)
         {
-            bool hasArtwork = ((((*i)->GetArtwork(kArtworkFanart)).size() != 0) ||
-                               (((*i)->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                               (((*i)->GetArtwork(kArtworkBanner)).size() != 0));
+            bool hasArtwork = ((!((*i)->GetArtwork(kArtworkFanart)).empty()) ||
+                               (!((*i)->GetArtwork(kArtworkCoverart)).empty()) ||
+                               (!((*i)->GetArtwork(kArtworkBanner)).empty()));
 
             LOG(VB_GENERAL, LOG_INFO, QString("'%1', popularity = %2, ReleaseDate = %3")
                     .arg(title)

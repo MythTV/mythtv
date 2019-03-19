@@ -73,8 +73,7 @@ void ThumbItem::SetRotationAngle(int angle)
 
 void ThumbItem::SetPixmap(QPixmap *pixmap)
 {
-    if (m_pixmap)
-        delete m_pixmap;
+    delete m_pixmap;
     m_pixmap = pixmap;
 }
 

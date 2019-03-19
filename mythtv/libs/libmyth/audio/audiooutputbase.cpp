@@ -166,8 +166,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(bool digital)
 
     if (digital)
         return (m_output_settingsdigitalraw = aosettings);
-    else
-        return (m_output_settingsraw = aosettings);
+    return (m_output_settingsraw = aosettings);
 }
 
 /**
@@ -193,8 +192,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
 
     if (digital)
         return (m_output_settingsdigital = aosettings);
-    else
-        return (m_output_settings = aosettings);
+    return (m_output_settings = aosettings);
 }
 
 /**
@@ -415,10 +413,7 @@ bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
         m_output_settingsdigital->GetMaxHDRate() == 768000);
     VBAUDIO("Setting " + log + " passthrough");
 
-    if (m_spdifenc)
-    {
-        delete m_spdifenc;
-    }
+    delete m_spdifenc;
 
     // No spdif encoder if using openmax audio
     if (m_main_device.startsWith("OpenMAX:"))
@@ -700,8 +695,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         {
             m_kAudioSRCOutputSize = newsize;
             VBAUDIO(QString("Resampler allocating %1").arg(newsize));
-            if (m_src_out)
-                delete[] m_src_out;
+            delete[] m_src_out;
             m_src_out = new float[m_kAudioSRCOutputSize];
         }
         m_src_data.data_out       = m_src_out;
@@ -978,8 +972,7 @@ inline int AudioOutputBase::audiolen()
 {
     if (m_waud >= m_raud)
         return m_waud - m_raud;
-    else
-        return kAudioRingBufferSize - (m_raud - m_waud);
+    return kAudioRingBufferSize - (m_raud - m_waud);
 }
 
 /**
@@ -1004,8 +997,7 @@ int AudioOutputBase::audioready()
 {
     if (m_passthru || m_enc || m_bytes_per_frame == m_output_bytes_per_frame)
         return audiolen();
-    else
-        return audiolen() * m_output_bytes_per_frame / m_bytes_per_frame;
+    return audiolen() * m_output_bytes_per_frame / m_bytes_per_frame;
 }
 
 /**
@@ -1650,15 +1642,13 @@ void AudioOutputBase::OutputAudioLoop(void)
             WriteAudio(zeros, zero_fragment_size);
             continue;
         }
-        else
+
+        if (m_was_paused)
         {
-            if (m_was_paused)
-            {
-                VBAUDIO("OutputAudioLoop: Play Event");
-                OutputEvent e(OutputEvent::Playing);
-                dispatch(e);
-                m_was_paused = false;
-            }
+            VBAUDIO("OutputAudioLoop: Play Event");
+            OutputEvent e(OutputEvent::Playing);
+            dispatch(e);
+            m_was_paused = false;
         }
 
         /* do audio output */
@@ -1821,7 +1811,7 @@ void AudioOutputBase::run(void)
     RunEpilog();
 }
 
-int AudioOutputBase::readOutputData(unsigned char*, int)
+int AudioOutputBase::readOutputData(unsigned char* /*read_buffer*/, int /*max_length*/)
 {
     VBERROR("AudioOutputBase should not be getting asked to readOutputData()");
     return 0;

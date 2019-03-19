@@ -76,7 +76,7 @@ AudioOutputOMX::AudioOutputOMX(const AudioSettings &settings) :
     for (unsigned port = 0; port < m_audiorender.Ports(); ++port)
     {
         m_audiorender.ShowPortDef(port, LOG_DEBUG, VB_AUDIO);
-        if (0) m_audiorender.ShowFormats(port, LOG_DEBUG, VB_AUDIO);
+        if (false) m_audiorender.ShowFormats(port, LOG_DEBUG, VB_AUDIO);
     }
 
     InitSettings(settings);
@@ -768,7 +768,7 @@ bool AudioOutputOMX::OpenMixer()
 
 // virtual
 OMX_ERRORTYPE AudioOutputOMX::EmptyBufferDone(
-    OMXComponent&, OMX_BUFFERHEADERTYPE *hdr)
+    OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE *hdr)
 {
     assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
     assert(hdr->nVersion.nVersion == OMX_VERSION);

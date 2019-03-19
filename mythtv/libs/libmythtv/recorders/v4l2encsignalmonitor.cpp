@@ -199,11 +199,8 @@ int V4L2encSignalMonitor::StableResolution(void)
                 .arg(width).arg(height));
             return 100;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Device wedged?");
-            return 0;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Device wedged?");
+        return 0;
     }
 
     if (m_width == width)

@@ -438,12 +438,9 @@ QDateTime GalleryUtil::GetTimestamp(const QString &filePath)
                         // Found one, done
                         break;
                     }
-                    else
-                    {
-                        LOG(VB_FILE, LOG_ERR, LOC +
-                            QString("Could not parse exif timestamp from '%1'")
-                            .arg(filePath));
-                    }
+                    LOG(VB_FILE, LOG_ERR, LOC +
+                        QString("Could not parse exif timestamp from '%1'")
+                        .arg(filePath));
                 }
             }
             exif_data_free(data);

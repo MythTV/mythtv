@@ -106,14 +106,11 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete m_ringBuffer;
         m_ringBuffer = nullptr;
     }
-    if (m_rtjc)
-        delete m_rtjc;
-    if (m_mp3buf)
-        delete [] m_mp3buf;
+    delete m_rtjc;
+    delete [] m_mp3buf;
     if (m_gf)
         lame_close(m_gf);
-    if (m_strm)
-        delete [] m_strm;
+    delete [] m_strm;
     if (m_audio_device)
     {
         delete m_audio_device;
@@ -127,21 +124,21 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete m_seektable;
     }
 
-    while (videobuffer.size() > 0)
+    while (!videobuffer.empty())
     {
         struct vidbuffertype *vb = videobuffer.back();
         delete [] vb->buffer;
         delete vb;
         videobuffer.pop_back();
     }
-    while (audiobuffer.size() > 0)
+    while (!audiobuffer.empty())
     {
         struct audbuffertype *ab = audiobuffer.back();
         delete [] ab->buffer;
         delete ab;
         audiobuffer.pop_back();
     }
-    while (textbuffer.size() > 0)
+    while (!textbuffer.empty())
     {
         struct txtbuffertype *tb = textbuffer.back();
         delete [] tb->buffer;
@@ -155,12 +152,9 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_free_context(&m_mpa_vidctx);
     }
 
-    if (m_videoFilters)
-        delete m_videoFilters;
-    if (m_filtMan)
-        delete m_filtMan;
-    if (m_ccd)
-        delete m_ccd;
+    delete m_videoFilters;
+    delete m_filtMan;
+    delete m_ccd;
 }
 
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
@@ -770,8 +764,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 void NuppelVideoRecorder::InitFilters(void)
 {
     int btmp = m_video_buffer_size;
-    if (m_videoFilters)
-        delete m_videoFilters;
+    delete m_videoFilters;
 
     QString tmpVideoFilterList;
 
@@ -1271,22 +1264,20 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
                     "v4l2: Unable to set desired format");
                 return false;
             }
-            else
+
+            // we need to convert the buffer - we can't deal with uyvy
+            // directly.
+            if (m_inpixfmt == FMT_YUV422P)
             {
-                // we need to convert the buffer - we can't deal with uyvy
-                // directly.
-                if (m_inpixfmt == FMT_YUV422P)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "v4l2: uyvy format supported, but yuv422 requested.");
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "v4l2: unfortunately, this converter hasn't been "
-                        "written yet, exiting");
-                    return false;
-                }
-                LOG(VB_RECORD, LOG_INFO, LOC +
-                    "v4l2: format set, getting uyvy from v4l, converting");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "v4l2: uyvy format supported, but yuv422 requested.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "v4l2: unfortunately, this converter hasn't been "
+                    "written yet, exiting");
+                return false;
             }
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                "v4l2: format set, getting uyvy from v4l, converting");
         }
         else
         {

@@ -104,8 +104,7 @@ PlaylistEditorView::~PlaylistEditorView()
         delete m_deleteList.at(x);
     m_deleteList.clear();
 
-    if (m_rootNode)
-        delete m_rootNode;
+    delete m_rootNode;
 }
 
 bool PlaylistEditorView::Create(void)
@@ -513,11 +512,11 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                             m_mainvisual->prepare();
                             m_mainvisual->mutex()->unlock();
                         }
-                     }
-                     else
-                     {
-                         handled = false;
-                     }
+                    }
+                    else
+                    {
+                        handled = false;
+                    }
                  }
              }
         }

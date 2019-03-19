@@ -58,7 +58,7 @@ public:
 
     void setSize(int w, int h);
     void setDirectory(const QString& directory, bool isGallery=false);
-    void addFile(const QString& fileName);
+    void addFile(const QString& filePath);
     void cancel();
 
     static QString getThumbcacheDir(const QString& inDir);

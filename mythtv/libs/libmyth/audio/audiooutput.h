@@ -47,7 +47,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(
-        const QString &audiodevice, const QString &passthrudevice,
+        const QString &main_device, const QString &passthru_device,
         AudioFormat format, int channels, AVCodecID codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
         int upmixer_startup = 0, AudioOutputSettings *custom = nullptr);
@@ -136,7 +136,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     /// report amount of audio buffered in milliseconds.
     virtual int64_t GetAudioBufferedTime(void) { return 0; }
 
-    virtual void SetSourceBitrate(int ) { }
+    virtual void SetSourceBitrate(int /*rate*/ ) { }
 
     QString GetError(void)   const { return m_lastError; }
     QString GetWarning(void) const { return m_lastWarn; }

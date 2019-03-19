@@ -1018,7 +1018,7 @@ void StatusBox::doJobQueueStatus()
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
 
-    if (jobs.size())
+    if (!jobs.empty())
     {
         QString detail;
         QString line;
@@ -1082,19 +1082,19 @@ void StatusBox::doJobQueueStatus()
  *  \param prec   Precision to use if we have less than ten of whatever
  *                unit is chosen.
  */
-static const QString sm_str(long long sizeKB, int prec=1)
+static QString sm_str(long long sizeKB, int prec=1)
 {
     if (sizeKB>1024*1024*1024) // Terabytes
     {
         double sizeGB = sizeKB/(1024*1024*1024.0);
         return QObject::tr("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024*1024) // Gigabytes
+    if (sizeKB>1024*1024) // Gigabytes
     {
         double sizeGB = sizeKB/(1024*1024.0);
         return QObject::tr("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024) // Megabytes
+    if (sizeKB>1024) // Megabytes
     {
         double sizeMB = sizeKB/1024.0;
         return QObject::tr("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
@@ -1103,7 +1103,7 @@ static const QString sm_str(long long sizeKB, int prec=1)
     return QObject::tr("%1 KB").arg(sizeKB);
 }
 
-static const QString usage_str_kb(long long total,
+static QString usage_str_kb(long long total,
                                   long long used,
                                   long long free)
 {
@@ -1118,7 +1118,7 @@ static const QString usage_str_kb(long long total,
     return ret;
 }
 
-static const QString usage_str_mb(float total, float used, float free)
+static QString usage_str_mb(float total, float used, float free)
 {
     return usage_str_kb((long long)(total*1024), (long long)(used*1024),
                         (long long)(free*1024));
@@ -1157,7 +1157,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     }
 }
 
-static const QString uptimeStr(time_t uptime)
+static QString uptimeStr(time_t uptime)
 {
     int     days, hours, min, secs;
     QString str;
@@ -1183,14 +1183,10 @@ static const QString uptimeStr(time_t uptime)
 
         return str + QString("%1, %2").arg(dayLabel).arg(buff);
     }
-    else
-    {
-        char  buff[9];
 
-        sprintf(buff, "%d:%02d:%02d", hours, min, secs);
-
-        return str + QString( buff );
-    }
+    char  buff[9];
+    sprintf(buff, "%d:%02d:%02d", hours, min, secs);
+    return str + QString( buff );
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)

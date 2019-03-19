@@ -92,11 +92,8 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
         }
         return true;
     }
-    else
-    {
-        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        return false;
-    }
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    return false;
 }
 
 /** \brief Ends channel browsing.

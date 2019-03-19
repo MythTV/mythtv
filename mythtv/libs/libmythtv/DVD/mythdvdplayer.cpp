@@ -468,7 +468,7 @@ long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     return MythPlayer::CalcMaxFFTime(ff, setjump);
 }
 
-int64_t MythDVDPlayer::GetSecondsPlayed(bool, int divisor) const
+int64_t MythDVDPlayer::GetSecondsPlayed(bool /*honorCutList*/, int divisor) const
 {
     if (!player_ctx->m_buffer->IsDVD())
         return 0;
@@ -494,8 +494,7 @@ int64_t MythDVDPlayer::GetTotalSeconds(bool /*honorCutList*/, int divisor) const
     {
         if (m_stillFrameLength == 255)
             return -1;
-        else
-            total = m_stillFrameLength;
+        total = m_stillFrameLength;
     }
 
     return total * 1000 / divisor;

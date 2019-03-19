@@ -129,7 +129,7 @@ class MPUBLIC ResultItem
     ~ResultItem() = default;
 
     void ensureSortFields(void);
-    void toMap(InfoMap &infoMap);
+    void toMap(InfoMap &metadataMap);
 
     const QString& GetTitle() const { return m_title; }
     const QString& GetSortTitle() const { return m_sorttitle; }

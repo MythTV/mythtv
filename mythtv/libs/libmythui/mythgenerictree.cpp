@@ -32,10 +32,9 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 
         if (onesel == twosel)
             return 0;
-        else if (onesel && !twosel)
+        if (onesel && !twosel)
             return 1;
-        else
-            return -1;
+        return -1;
     }
 
     void Sort(SortType stype, int attributeIndex = 0)
@@ -552,10 +551,9 @@ QString MythGenericTree::GetText(const QString &name) const
 {
     if (name.isEmpty())
         return m_text;
-    else if (m_strings.contains(name))
+    if (m_strings.contains(name))
         return m_strings[name].text;
-    else
-        return QString();
+    return QString();
 }
 
 void MythGenericTree::SetImage(const QString &filename, const QString &name)

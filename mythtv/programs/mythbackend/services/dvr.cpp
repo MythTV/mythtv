@@ -380,8 +380,7 @@ bool Dvr::StopRecording(int RecordedId)
         gCoreContext->dispatch(me);
         return true;
     }
-    else
-        throw QString("RecordedId %1 not found").arg(RecordedId);
+    throw QString("RecordedId %1 not found").arg(RecordedId);
 
     return false;
 }
@@ -477,12 +476,11 @@ long Dvr::GetSavedBookmark( int RecordedId,
         ri.QueryKeyFramePosition(&offset, position, isend);
         return offset;
     }
-    else if (offsettype.toLower() == "duration"){
+    if (offsettype.toLower() == "duration"){
         ri.QueryKeyFrameDuration(&offset, position, isend);
         return offset;
     }
-    else
-        return position;
+    return position;
 }
 
 /////////////////////////////////////////////////////////////////////////////

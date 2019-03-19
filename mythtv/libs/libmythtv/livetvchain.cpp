@@ -375,15 +375,13 @@ int LiveTVChain::GetLengthAtPos(int pos)
         // We're on live program, it hasn't ended. Use current time as end time
         return entry.starttime.secsTo(MythDate::current());
     }
-    else
-    {
-        // use begin time from the following program, as it's certain to be right
-        // the end time is set as per the EPG, but should playback be interrupted
-        // such as a channel change, the end value wouldn't have reflected the actual
-        // duration of the program
-        nextentry = m_chain[pos+1];
-        return entry.starttime.secsTo(nextentry.starttime);
-    }
+
+    // use begin time from the following program, as it's certain to be right
+    // the end time is set as per the EPG, but should playback be interrupted
+    // such as a channel change, the end value wouldn't have reflected the actual
+    // duration of the program
+    nextentry = m_chain[pos+1];
+    return entry.starttime.secsTo(nextentry.starttime);
 }
 
 int LiveTVChain::TotalSize(void) const

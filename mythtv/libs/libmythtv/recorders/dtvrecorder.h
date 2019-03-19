@@ -39,7 +39,7 @@ class DTVRecorder :
     explicit DTVRecorder(TVRec *rec);
     virtual ~DTVRecorder();
 
-    void SetOption(const QString &opt, const QString &value) override; // RecorderBase
+    void SetOption(const QString &name, const QString &value) override; // RecorderBase
     void SetOption(const QString &name, int value) override; // RecorderBase
     void SetOptionsFromProfile(
         RecordingProfile *profile, const QString &videodev,
@@ -56,7 +56,7 @@ class DTVRecorder :
     int GetVideoFd(void) override // RecorderBase
         { return m_stream_fd; }
 
-    virtual void SetStreamData(MPEGStreamData* sd);
+    virtual void SetStreamData(MPEGStreamData* data);
     MPEGStreamData *GetStreamData(void) const { return m_stream_data; }
 
     void Reset(void) override; // RecorderBase
@@ -66,7 +66,7 @@ class DTVRecorder :
     // MPEG Stream Listener
     void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
     void HandleCAT(const ConditionalAccessTable*) override {} // MPEGStreamListener
-    void HandlePMT(uint pid, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandlePMT(uint progNum, const ProgramMapTable*) override; // MPEGStreamListener
     void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) override { } // MPEGStreamListener
 
     // MPEG Single Program Stream Listener
@@ -176,7 +176,7 @@ class DTVRecorder :
     bool                     m_has_no_av                  {false};
 
     // TS recorder stuff
-    int                      m_record_mpts                {0};
+    bool                     m_record_mpts                {false};
     bool                     m_record_mpts_only           {false};
     unsigned char            m_stream_id[0x1fff + 1];
     unsigned char            m_pid_status[0x1fff + 1];

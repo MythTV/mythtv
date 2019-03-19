@@ -564,12 +564,10 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
             sLine.replace(patStr, QCoreApplication::translate("HtmlUI", repStr.toLocal8Bit().data()));
             return ProcessLine(sCode, sLine, bInCode, sTransBuffer);
         }
-        else
-        {
-            sTransBuffer = " ";
-            sTransBuffer.append(sLine.mid(nStartTransPos + 6).trimmed());
-            sLine = sLine.left(nStartTransPos);
-        }
+
+        sTransBuffer = " ";
+        sTransBuffer.append(sLine.mid(nStartTransPos + 6).trimmed());
+        sLine = sLine.left(nStartTransPos);
     }
 
     int  nStartPos       = 0;

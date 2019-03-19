@@ -22,7 +22,7 @@ class HLSRecStream
     typedef QMap<QString, AES_KEY* >  AESKeyMap;
 #endif
 
-    HLSRecStream(int seq, uint64_t bitrate, const QString& uri);
+    HLSRecStream(int seq, uint64_t bitrate, const QString& url);
     ~HLSRecStream(void);
 
     int Read(uint8_t* buffer, int len);

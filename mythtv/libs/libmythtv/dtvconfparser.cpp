@@ -41,7 +41,7 @@
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \
-    if (it == tokens.end()) return false; else ++it; } while(0)
+    if (it == tokens.end()) return false; ++it; } while(0)
 
 #define PARSE_CONF(VAR) do { \
     if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
@@ -84,7 +84,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         QStringList list = line.split(":", QString::SkipEmptyParts);
 
-        if (list.size() < 1)
+        if (list.empty())
             continue;
 
         QString str = list[0];

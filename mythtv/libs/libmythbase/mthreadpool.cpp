@@ -411,14 +411,12 @@ bool MThreadPool::TryStartInternal(
         {
             return true;
         }
-        else
-        {
-            if (reserved)
-                m_priv->m_reserve_thread--;
-            thread->Shutdown();
-            m_priv->m_running_threads.remove(thread);
-            m_priv->m_delete_threads.push_front(thread);
-        }
+
+        if (reserved)
+            m_priv->m_reserve_thread--;
+        thread->Shutdown();
+        m_priv->m_running_threads.remove(thread);
+        m_priv->m_delete_threads.push_front(thread);
     }
 
     if (reserved ||
@@ -434,16 +432,14 @@ bool MThreadPool::TryStartInternal(
         {
             return true;
         }
-        else
-        {
-            // Thread failed to run, OOM?
-            // QThread will print an error, so we don't have to
-            if (reserved)
-                m_priv->m_reserve_thread--;
-            thread->Shutdown();
-            m_priv->m_running_threads.remove(thread);
-            m_priv->m_delete_threads.push_front(thread);
-        }
+
+        // Thread failed to run, OOM?
+        // QThread will print an error, so we don't have to
+        if (reserved)
+            m_priv->m_reserve_thread--;
+        thread->Shutdown();
+        m_priv->m_running_threads.remove(thread);
+        m_priv->m_delete_threads.push_front(thread);
     }
 
     return false;

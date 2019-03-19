@@ -99,7 +99,7 @@ class NetworkControl : public ServerPool, public QRunnable
     ~NetworkControl();
 
   private slots:
-    void newConnection(QTcpSocket *socket);
+    void newConnection(QTcpSocket *client);
     void receiveCommand(QString &command);
     void deleteClient(void);
 

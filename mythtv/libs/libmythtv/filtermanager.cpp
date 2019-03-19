@@ -338,7 +338,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     }
 
     if (ifmt != outpixfmt && outpixfmt != FMT_NONE &&
-        (FiltInfoChain.size() || inpixfmt != FMT_NONE))
+        (!FiltInfoChain.empty() || inpixfmt != FMT_NONE))
     {
         if (!Convert)
         {

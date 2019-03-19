@@ -105,6 +105,5 @@ bool ScanStreamData::DeleteCachedTable(PSIPTable *psip) const
 
     if (ATSCStreamData::DeleteCachedTable(psip))
         return true;
-    else
-        return DVBStreamData::DeleteCachedTable(psip);
+    return DVBStreamData::DeleteCachedTable(psip);
 }

@@ -46,7 +46,7 @@ class VideoSync
 // virtual base class
 {
   public:
-    VideoSync(VideoOutput*, int ri);
+    VideoSync(VideoOutput*, int refreshint);
     virtual ~VideoSync() = default;
 
     /// \brief Returns name of instanciated VSync method.

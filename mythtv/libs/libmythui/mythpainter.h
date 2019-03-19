@@ -62,7 +62,7 @@ class MUI_PUBLIC MythPainter
     void DrawImage(int x, int y, MythImage *im, int alpha);
     void DrawImage(const QPoint &topLeft, MythImage *im, int alph);
 
-    virtual void DrawText(const QRect &dest, const QString &msg, int flags,
+    virtual void DrawText(const QRect &r, const QString &msg, int flags,
                           const MythFontProperties &font, int alpha,
                           const QRect &boundRect);
     virtual void DrawTextLayout(const QRect &canvasRect,

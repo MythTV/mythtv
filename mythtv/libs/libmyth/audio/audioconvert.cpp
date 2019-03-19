@@ -156,8 +156,9 @@ static int toFloat8(float* out, const uchar* in, int len)
 
 static inline uchar clip_uchar(int a)
 {
-    if (a&(~0xFF)) return (-a)>>31;
-    else           return a;
+    if (a&(~0xFF))
+        return (-a)>>31;
+    return a;
 }
 
 static int fromFloat8(uchar* out, const float* in, int len)
@@ -267,8 +268,9 @@ static int toFloat16(float* out, const short* in, int len)
 
 static inline short clip_short(int a)
 {
-    if ((a+0x8000) & ~0xFFFF) return (a>>31) ^ 0x7FFF;
-    else                      return a;
+    if ((a+0x8000) & ~0xFFFF)
+        return (a>>31) ^ 0x7FFF;
+    return a;
 }
 
 static int fromFloat16(short* out, const float* in, int len)

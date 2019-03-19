@@ -461,7 +461,8 @@ int MythUIType::CalcAlpha(int alphamod)
     return (int)(m_Effects.m_alpha * (alphamod / 255.0));
 }
 
-void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
+void MythUIType::DrawSelf(MythPainter * /*p*/, int /*xoffset*/, int /*yoffset*/,
+                          int /*alphaMod*/, QRect /*clipRect*/)
 {
 }
 
@@ -1043,7 +1044,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
         }
     }
 
-    if (m_dependsValue.size() > 0)
+    if (!m_dependsValue.empty())
         visible = m_dependsValue[0].second;
     for (int i = 1; i <  m_dependsValue.size(); i++)
     {
@@ -1128,14 +1129,14 @@ void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
-int MythUIType::NormX(const int x)
+int MythUIType::NormX(const int width)
 {
-    return GetMythMainWindow()->NormX(x);
+    return GetMythMainWindow()->NormX(width);
 }
 
-int MythUIType::NormY(const int y)
+int MythUIType::NormY(const int height)
 {
-    return GetMythMainWindow()->NormY(y);
+    return GetMythMainWindow()->NormY(height);
 }
 
 /**
@@ -1198,7 +1199,7 @@ void MythUIType::CopyFrom(MythUIType *base)
  *  \brief Copy the state of this widget to the one given, it must be of the
  *         same type.
  */
-void MythUIType::CreateCopy(MythUIType *)
+void MythUIType::CreateCopy(MythUIType * /*parent*/)
 {
     // Calling CreateCopy on base type is not valid
 }

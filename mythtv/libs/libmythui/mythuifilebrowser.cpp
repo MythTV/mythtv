@@ -72,64 +72,56 @@ QString MFileInfo::fileName(void) const
 {
     if (m_isRemote)
         return m_fileName;
-    else
-        return QFileInfo::fileName();
+    return QFileInfo::fileName();
 }
 
 QString MFileInfo::filePath(void) const
 {
     if (m_isRemote)
         return m_fileName;
-    else
-        return QFileInfo::filePath();
+    return QFileInfo::filePath();
 }
 
 bool MFileInfo::isDir(void) const
 {
     if (m_isRemote)
         return m_isDir;
-    else
-        return QFileInfo::isDir();
+    return QFileInfo::isDir();
 }
 
 bool MFileInfo::isFile(void) const
 {
     if (m_isRemote)
         return m_isFile;
-    else
-        return QFileInfo::isFile();
+    return QFileInfo::isFile();
 }
 
 bool MFileInfo::isParentDir(void) const
 {
     if (m_isRemote)
         return m_isParentDir;
-    else
-        return (QFileInfo::fileName() == "..");
+    return (QFileInfo::fileName() == "..");
 }
 
 bool MFileInfo::isExecutable(void) const
 {
     if (m_isRemote)
         return false;
-    else
-        return QFileInfo::isExecutable();
+    return QFileInfo::isExecutable();
 }
 
 QString MFileInfo::absoluteFilePath(void) const
 {
     if (m_isRemote)
         return m_fileName;
-    else
-        return QFileInfo::absoluteFilePath();
+    return QFileInfo::absoluteFilePath();
 }
 
 qint64 MFileInfo::size(void) const
 {
     if (m_isRemote)
         return m_size;
-    else
-        return QFileInfo::size();
+    return QFileInfo::size();
 }
 
 /////////////////////////////////////////////////////////////////////

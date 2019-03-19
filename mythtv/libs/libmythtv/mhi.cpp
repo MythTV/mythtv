@@ -761,7 +761,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 // An area of the screen/image needs to be redrawn.
 // Called from the MHEG engine.
 // We always redraw the whole scene.
-void MHIContext::RequireRedraw(const QRegion &)
+void MHIContext::RequireRedraw(const QRegion & /*region*/)
 {
     m_updated = false;
     m_display_lock.lock();
@@ -892,9 +892,9 @@ bool MHIContext::LoadChannelCache()
         MythDB::DBError("MHIContext::LoadChannelCache", query);
         return false;
     }
-    else if (!query.isActive())
+    if (!query.isActive())
         return false;
-    else while (query.next())
+    while (query.next())
     {
         int nid = query.value(0).toInt();
         int sid = query.value(1).toInt();
@@ -915,70 +915,73 @@ int MHIContext::GetChannelIndex(const QString &str)
 {
     int nResult = -1;
 
-    do if (str.startsWith("dvb://"))
+    do
     {
-        QStringList list = str.mid(6).split('.');
-        if (list.size() != 3)
-            break; // Malformed.
-        // The various fields are expressed in hexadecimal.
-        // Convert them to decimal for the DB.
-        bool ok;
-        int netID = list[0].toInt(&ok, 16);
-        if (!ok)
-            break;
-        int transportID = !list[1].isEmpty() ? list[1].toInt(&ok, 16) : -1;
-        if (!ok)
-            break;
-        int serviceID = list[2].toInt(&ok, 16);
-        if (!ok)
-            break;
-
-        QMutexLocker locker(&m_channelMutex);
-        if (m_channelCache.isEmpty())
-            LoadChannelCache();
-
-        ChannelCache_t::const_iterator it = m_channelCache.find(
-            Key_t(netID,serviceID) );
-        if (it == m_channelCache.end())
-            break;
-        else if (transportID < 0)
-            nResult = Cid(it);
-        else do
+        if (str.startsWith("dvb://"))
         {
-            if (Tid(it) == transportID)
-            {
-                nResult = Cid(it);
+            QStringList list = str.mid(6).split('.');
+            if (list.size() != 3)
+                break; // Malformed.
+            // The various fields are expressed in hexadecimal.
+            // Convert them to decimal for the DB.
+            bool ok;
+            int netID = list[0].toInt(&ok, 16);
+            if (!ok)
                 break;
+            int transportID = !list[1].isEmpty() ? list[1].toInt(&ok, 16) : -1;
+            if (!ok)
+                break;
+            int serviceID = list[2].toInt(&ok, 16);
+            if (!ok)
+                break;
+
+            QMutexLocker locker(&m_channelMutex);
+            if (m_channelCache.isEmpty())
+                LoadChannelCache();
+
+            ChannelCache_t::const_iterator it = m_channelCache.find(
+                Key_t(netID,serviceID) );
+            if (it == m_channelCache.end())
+                break;
+            if (transportID < 0)
+                nResult = Cid(it);
+            else do
+            {
+                if (Tid(it) == transportID)
+                {
+                    nResult = Cid(it);
+                    break;
+                }
             }
+            while (++it != m_channelCache.end());
         }
-        while (++it != m_channelCache.end());
-    }
-    else if (str.startsWith("rec://svc/lcn/"))
-    {
-        // I haven't seen this yet so this is untested.
-        bool ok;
-        int channelNo = str.mid(14).toInt(&ok); // Decimal integer
-        if (!ok)
-            break;
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT chanid "
-                      "FROM channel "
-                      "WHERE channum = :CHAN AND "
-                      "      channel.sourceid = :SOURCEID");
-        query.bindValue(":CHAN", channelNo);
-        query.bindValue(":SOURCEID", m_currentSource);
-        if (query.exec() && query.isActive() && query.next())
-            nResult = query.value(0).toInt();
-    }
-    else if (str == "rec://svc/cur")
-        nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
-    else if (str == "rec://svc/def")
-        nResult = m_currentChannel;
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("[mhi] GetChannelIndex -- Unrecognized URL %1")
-            .arg(str));
+        else if (str.startsWith("rec://svc/lcn/"))
+        {
+            // I haven't seen this yet so this is untested.
+            bool ok;
+            int channelNo = str.mid(14).toInt(&ok); // Decimal integer
+            if (!ok)
+                break;
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT chanid "
+                          "FROM channel "
+                          "WHERE channum = :CHAN AND "
+                          "      channel.sourceid = :SOURCEID");
+            query.bindValue(":CHAN", channelNo);
+            query.bindValue(":SOURCEID", m_currentSource);
+            if (query.exec() && query.isActive() && query.next())
+                nResult = query.value(0).toInt();
+        }
+        else if (str == "rec://svc/cur")
+            nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
+        else if (str == "rec://svc/def")
+            nResult = m_currentChannel;
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("[mhi] GetChannelIndex -- Unrecognized URL %1")
+                .arg(str));
+        }
     }
     while (false);
 

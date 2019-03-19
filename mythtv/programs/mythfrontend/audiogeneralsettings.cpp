@@ -261,7 +261,7 @@ void AudioConfigSettings::AudioRescan()
     UpdateCapabilities();
 }
 
-void AudioConfigSettings::UpdateVisibility(StandardSetting *)
+void AudioConfigSettings::UpdateVisibility(StandardSetting * /*setting*/)
 {
     if (!m_MaxAudioChannels || !m_AudioUpmix || !m_AudioUpmixType)
         return;
@@ -622,8 +622,7 @@ AudioTestThread::~AudioTestThread()
 {
     cancel();
     wait();
-    if (m_audioOutput)
-        delete m_audioOutput;
+    delete m_audioOutput;
 }
 
 void AudioTestThread::cancel()

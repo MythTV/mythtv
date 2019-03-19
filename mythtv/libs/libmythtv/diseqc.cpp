@@ -635,8 +635,7 @@ void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
 
     m_root = root;
 
-    if (old_root)
-        delete old_root;
+    delete old_root;
 }
 
 #ifdef USING_DVB
@@ -914,7 +913,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateById(DiSEqCDevTree &tree, uint devid)
         MythDB::DBError("DiSEqCDevDevice::CreateById", query);
         return nullptr;
     }
-    else if (!query.next())
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "CreateById failed to find dtv dev " +
                 QString("%1").arg(devid));
@@ -1243,7 +1242,7 @@ bool DiSEqCDevSwitch::Load(void)
         MythDB::DBError("DiSEqCDevSwitch::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type = SwitchTypeFromString(query.value(0).toString());
         m_address = query.value(1).toUInt();
@@ -1713,8 +1712,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevRotor::RotorTypeTable[] =
 
 DiSEqCDevRotor::~DiSEqCDevRotor()
 {
-    if (m_child)
-        delete m_child;
+    delete m_child;
 }
 
 bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
@@ -1775,7 +1773,7 @@ bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings,
     return false;
 }
 
-DiSEqCDevDevice *DiSEqCDevRotor::GetSelectedChild(const DiSEqCDevSettings&) const
+DiSEqCDevDevice *DiSEqCDevRotor::GetSelectedChild(const DiSEqCDevSettings& /*settings*/) const
 {
     return m_child;
 }
@@ -1787,8 +1785,7 @@ bool DiSEqCDevRotor::SetChild(uint ordinal, DiSEqCDevDevice *device)
 
     DiSEqCDevDevice *old_child = m_child;
     m_child = nullptr;
-    if (old_child)
-        delete old_child;
+    delete old_child;
 
     m_child = device;
     if (m_child)
@@ -1843,7 +1840,7 @@ bool DiSEqCDevRotor::Load(void)
         MythDB::DBError("DiSEqCDevRotor::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type     = RotorTypeFromString(query.value(0).toString());
         m_speed_hi = query.value(2).toDouble();
@@ -1880,7 +1877,7 @@ bool DiSEqCDevRotor::Load(void)
         MythDB::DBError("DiSEqCDevRotor::Load 2", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         uint child_dev_id = query.value(0).toUInt();
         SetChild(0, CreateById(m_tree, child_dev_id));
@@ -2024,7 +2021,8 @@ void DiSEqCDevRotor::SetPosMap(const uint_to_dbl_t &inv_posmap)
         m_posmap[*it] = it.key();
 }
 
-bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
+bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings& /*setttings*/,
+                                  const DTVMultiplex& /*tuning*/,
                                   double angle)
 {
     // determine stored position from position map
@@ -2043,7 +2041,8 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
                               m_repeat, 1, &index);
 }
 
-bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
+bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings& /*settings*/,
+                                  const DTVMultiplex& /*tuning*/,
                                   double angle)
 {
     double azimuth = CalculateAzimuth(angle);
@@ -2122,8 +2121,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSCR::SCRPositionTable[3] =
 
 DiSEqCDevSCR::~DiSEqCDevSCR()
 {
-    if (m_child)
-        delete m_child;
+    delete m_child;
 }
 
 void DiSEqCDevSCR::Reset(void)
@@ -2192,9 +2190,8 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     {
         data[2] = m_scr_pin;
         return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
-    } else {
-        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
     }
+    return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
 }
 
 bool DiSEqCDevSCR::PowerOff(void) const
@@ -2222,9 +2219,8 @@ bool DiSEqCDevSCR::PowerOff(void) const
     {
         data[2] = m_scr_pin;
         return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
-    } else {
-        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
     }
+    return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
 }
 
 bool DiSEqCDevSCR::SendCommand(uint cmd, uint repeats, uint data_len,
@@ -2275,7 +2271,7 @@ bool DiSEqCDevSCR::Load(void)
         MythDB::DBError("DiSEqCDevSCR::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_scr_userband  = query.value(0).toUInt();
         m_scr_frequency = query.value(1).toUInt();
@@ -2301,7 +2297,7 @@ bool DiSEqCDevSCR::Load(void)
         MythDB::DBError("DiSEqCDevSCR::Load 2", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         uint child_dev_id = query.value(0).toUInt();
         SetChild(0, CreateById(m_tree, child_dev_id));
@@ -2378,8 +2374,7 @@ bool DiSEqCDevSCR::SetChild(uint ordinal, DiSEqCDevDevice *device)
 
     DiSEqCDevDevice *old_child = m_child;
     m_child = nullptr;
-    if (old_child)
-        delete old_child;
+    delete old_child;
 
     m_child = device;
     if (m_child)
@@ -2406,7 +2401,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevLNB::LNBTypeTable[5] =
     { QString(),      kTypeVoltageAndToneControl },
 };
 
-bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
+bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings& /*settings*/, const DTVMultiplex &tuning)
 {
     // set tone for bandselect
     if (m_type == kTypeVoltageAndToneControl)
@@ -2415,7 +2410,7 @@ bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
     return true;
 }
 
-uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings&,
+uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings& /*settings*/,
                               const DTVMultiplex &tuning) const
 {
     uint voltage = SEC_VOLTAGE_18;
@@ -2446,7 +2441,7 @@ bool DiSEqCDevLNB::Load(void)
         MythDB::DBError("DiSEqCDevLNB::Load", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type       = LNBTypeFromString(query.value(0).toString());
         m_lof_switch = query.value(1).toInt();

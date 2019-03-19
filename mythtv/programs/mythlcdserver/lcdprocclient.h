@@ -30,26 +30,26 @@ class LCDProcClient : public QObject
     bool SetupLCD(void);
     void reset(void);
 
-    void setStartupMessage(QString msq, uint messagetime);
+    void setStartupMessage(QString msg, uint messagetime);
 
     // Used to actually connect to an LCD device       
     bool connectToHost(const QString &hostname, unsigned int port);
 
     void switchToTime();
     void switchToMusic(const QString &artist, const QString &album, const QString &track);
-    void setMusicProgress(QString time, float generic_progress);
+    void setMusicProgress(QString time, float value);
     void setMusicRepeat(int repeat);
     void setMusicShuffle(int shuffle);
     void switchToChannel(QString channum = "", QString title = "", 
                          QString subtitle = "");
-    void setChannelProgress(const QString &time, float percentViewed);
+    void setChannelProgress(const QString &time, float value);
     void switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name = "",
                       bool popMenu = true);
     void switchToGeneric(QList<LCDTextItem> *textItems);
-    void setGenericProgress(bool busy, float generic_progress);
+    void setGenericProgress(bool busy, float value);
 
     void switchToVolume(QString app_name);
-    void setVolumeLevel(float volume_level);
+    void setVolumeLevel(float value);
 
     void switchToNothing();
 

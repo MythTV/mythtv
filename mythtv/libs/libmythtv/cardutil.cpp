@@ -147,7 +147,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
 #endif
         return false;
     }
-    else if (inputType == "CETON")
+    if (inputType == "CETON")
     {
 #ifdef USING_CETON
         QString device = GetVideoDevice(inputid);
@@ -222,8 +222,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         return false;
 #endif
     }
-    else
-        return false;
+    return false;
 }
 
 bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
@@ -1416,7 +1415,7 @@ uint CardUtil::GetDeviceInputGroup(uint inputid)
     if (!query.exec())
     {
         MythDB::DBError("CardUtil::GetDeviceInputGroup()", query);
-        return false;
+        return 0;
     }
 
     if (query.next())
@@ -2216,15 +2215,15 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 
     if (DVB_DEV_FRONTEND == type)
         return devname;
-    else if (DVB_DEV_DVR == type)
+    if (DVB_DEV_DVR == type)
         return devname.replace(devname.indexOf("frontend"), 8, "dvr");
-    else if (DVB_DEV_DEMUX == type)
+    if (DVB_DEV_DEMUX == type)
         return devname.replace(devname.indexOf("frontend"), 8, "demux");
-    else if (DVB_DEV_CA == type)
+    if (DVB_DEV_CA == type)
         return devname.replace(devname.indexOf("frontend"), 8, "ca");
-    else if (DVB_DEV_AUDIO == type)
+    if (DVB_DEV_AUDIO == type)
         return devname.replace(devname.indexOf("frontend"), 8, "audio");
-    else if (DVB_DEV_VIDEO == type)
+    if (DVB_DEV_VIDEO == type)
         return devname.replace(devname.indexOf("frontend"), 8, "video");
 
     return "";

@@ -1415,13 +1415,10 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
         val = tmp;
         return kOptVal;
     }
-    else
-    {
-        // input is not an option string, return as arg
-        val = tmp;
-        return kArg;
-    }
 
+    // input is not an option string, return as arg
+    val = tmp;
+    return kArg;
 }
 
 /** \brief Loop through argv and populate arguments with values
@@ -1467,11 +1464,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 
         // GetOpt pulled an empty option, this shouldnt happen by ignore
         // it and continue
-        else if (res == kEmpty)
+        if (res == kEmpty)
             continue;
 
         // more than one equal found in key/value pair, fault out
-        else if (res == kInvalid)
+        if (res == kInvalid)
         {
             cerr << "Invalid option received:" << endl << "    "
                  << opt.toLocal8Bit().constData();
@@ -1480,14 +1477,14 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
 
         // passthrough is active, so add the data to the stringlist
-        else if (m_passthroughActive)
+        if (m_passthroughActive)
         {
             m_namedArgs["_passthrough"]->Set("", val);
             continue;
         }
 
         // argument with no preceeding '-' encountered, add to stringlist
-        else if (res == kArg)
+        if (res == kArg)
         {
             if (!m_namedArgs.contains("_args"))
             {
@@ -2625,7 +2622,7 @@ void MythCommandLineParser::ApplySettingsOverride(void)
         cerr << "Applying settings override" << endl;
 
     QMap<QString, QString> override = GetSettingsOverride();
-    if (override.size())
+    if (!override.empty())
     {
         QMap<QString, QString>::iterator it;
         for (it = override.begin(); it != override.end(); ++it)
@@ -2676,7 +2673,7 @@ bool setUser(const QString &username)
         cerr << "You must be running as root to use the --user switch." << endl;
         return false;
     }
-    else if (user_info && user_id == user_info->pw_uid)
+    if (user_info && user_id == user_info->pw_uid)
     {
         LOG(VB_GENERAL, LOG_WARNING,
             QString("Already running as '%1'").arg(username));

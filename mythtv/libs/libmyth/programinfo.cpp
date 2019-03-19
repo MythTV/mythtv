@@ -1017,7 +1017,7 @@ void ProgramInfo::clear(void)
  *  Compare two QStrings when they can either be initialized to
  *  "Default" or to the empty string.
  */
-bool qstringEqualOrDefault(const QString a, const QString b);
+bool qstringEqualOrDefault(QString a, QString b);
 bool qstringEqualOrDefault(const QString a, const QString b)
 {
     if (a == b)
@@ -2491,12 +2491,12 @@ QString ProgramInfo::GetPlaybackURL(
         QString path = url.path();
         QString host = url.toString(QUrl::RemovePath).mid(7);
         QStringList list = host.split(":", QString::SkipEmptyParts);
-        if (list.size())
+        if (!list.empty())
         {
             host = list[0];
             list = host.split("@", QString::SkipEmptyParts);
             QString group;
-            if (list.size() > 0 && list.size() < 3)
+            if (!list.empty() && list.size() < 3)
             {
                 host  = list.size() == 1 ? list[0]   : list[1];
                 group = list.size() == 1 ? QString() : list[0];
@@ -2526,7 +2526,7 @@ QString ProgramInfo::GetPlaybackURL(
                 QString("GetPlaybackURL: File is local: '%1'") .arg(tmpURL));
             return tmpURL;
         }
-        else if (m_hostname == gCoreContext->GetHostName())
+        if (m_hostname == gCoreContext->GetHostName())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("GetPlaybackURL: '%1' should be local, but it can "
@@ -4638,13 +4638,13 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
     }
 }
 
-void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
+void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     LOG(VB_RECORD, LOG_INFO,
         QString("SaveVideoProperties(0x%1, 0x%2)")
-        .arg(mask,2,16,QChar('0')).arg(vid_flags,2,16,QChar('0')));
+        .arg(mask,2,16,QChar('0')).arg(video_property_flags,2,16,QChar('0')));
 
     query.prepare(
         "UPDATE recordedprogram "
@@ -4652,7 +4652,7 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
         "WHERE chanid = :CHANID AND starttime = :STARTTIME");
 
     query.bindValue(":OTHERFLAGS", ~mask);
-    query.bindValue(":FLAGS",      vid_flags);
+    query.bindValue(":FLAGS",      video_property_flags);
     query.bindValue(":CHANID",     m_chanid);
     query.bindValue(":STARTTIME",  m_startts);
     if (!query.exec())
@@ -4663,7 +4663,7 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= ~mask;
-    videoproperties |= vid_flags;
+    videoproperties |= video_property_flags;
     m_properties &= ~kVideoPropertyMask;
     m_properties |= videoproperties << kVideoPropertyOffset;
 
@@ -4854,7 +4854,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
 
             if (testFile.isFile())
                 return testFile.path();
-            else if (testFile.isDir())
+            if (testFile.isDir())
                 return testFile.filePath();
         }
         else
@@ -5096,11 +5096,8 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
         input   = query.value(1).toString();
         return true;
     }
-    else
-    {
-        MythDB::DBError("GetChannel(ProgInfo...)", query);
-        return false;
-    }
+    MythDB::DBError("GetChannel(ProgInfo...)", query);
+    return false;
 }
 
 static int init_tr(void)
@@ -5624,7 +5621,7 @@ ProgramInfo* LoadProgramFromProgram(const uint chanid,
 
     LoadFromProgram( progList, sSQL, bindings, schedList );
 
-    if (progList.size() == 0)
+    if (progList.empty())
         return progInfo;
 
     // progList is an Auto-delete deque, the object will be deleted with the

@@ -2821,8 +2821,7 @@ RTjpeg::RTjpeg(void)
 
 RTjpeg::~RTjpeg(void)
 {
-    if (old_start)
-        delete [] old_start;
+    delete [] old_start;
 }
 
 inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)
@@ -3206,7 +3205,8 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-        else sp+=b2s(block, sp, cb8);
+   else
+    sp+=b2s(block, sp, cb8);
    lblock+=64;
 
    DctY(bp3+k, Cwidth);
@@ -3215,7 +3215,8 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-        else sp+=b2s(block, sp, cb8);
+   else
+    sp+=b2s(block, sp, cb8);
    lblock+=64;
   }
   bp += width<<4;

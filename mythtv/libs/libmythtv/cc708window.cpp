@@ -353,7 +353,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
             // create a chunk to preserve spacing between lines.
             if (!inTrailingSpaces || !createdString)
             {
-                int allSpaces = (inLeadingSpaces || inTrailingSpaces);
+                bool allSpaces = (inLeadingSpaces || inTrailingSpaces);
                 int length = allSpaces ? 0 : m_column_count - strStart;
                 if (length)
                     createdNonblankStrings = true;
@@ -650,12 +650,12 @@ bool CC708CharacterAttribute::operator==(
             (m_edge_color == other.m_edge_color));
 }
 
-QColor CC708CharacterAttribute::ConvertToQColor(uint c)
+QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
 {
     // Color is expressed in 6 bits, 2 each for red, green, and blue.
     // U.S. ATSC programs seem to use just the higher-order bit,
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
     static int X[] = {0, 96, 255, 255};
-    return QColor(X[(c>>4)&3], X[(c>>2)&3], X[c&3]);
+    return QColor(X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]);
 }

@@ -203,7 +203,7 @@ uint ChannelImporter::DeleteChannels(
 
     // TODO delete encrypted channels when m_fta_only set
 
-    if (deleted.size() == 0)
+    if (deleted.empty())
         return 0;
 
     // Create a new transports list without the deleted channels
@@ -911,7 +911,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
                     tmp.m_channels.push_back(newt.m_channels[k]);
             }
 
-            if (tmp.m_channels.size())
+            if (!tmp.m_channels.empty())
                 not_in_scan.push_back(tmp);
         }
     }
@@ -1343,7 +1343,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 //                  deleteDialog->AddButton(tr("Handle manually"));
                 deleteDialog->AddButton(tr("Ignore all"));
                 QObject::connect(deleteDialog, &MythDialogBox::Closed,
-                                 [&](const QString &, int result)
+                                 [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1387,12 +1387,10 @@ ChannelImporter::QueryUserDelete(const QString &msg)
                 action = (4 == val) ? kDeleteIgnoreAll : action;
                 break;
             }
-            else
-            {
-                //cout << "Please enter either 1, 2, 3 or 4:" << endl;
-                cout << tr("Please enter either 1, 2 or 4:")
-                    .toLatin1().constData() << endl;//
-            }
+
+            //cout << "Please enter either 1, 2, 3 or 4:" << endl;
+            cout << tr("Please enter either 1, 2 or 4:")
+                .toLatin1().constData() << endl;//
         }
     }
 
@@ -1419,7 +1417,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 insertDialog->AddButton(tr("Insert manually"));
                 insertDialog->AddButton(tr("Ignore all"));
                 QObject::connect(insertDialog, &MythDialogBox::Closed,
-                                 [&](const QString &, int result)
+                                 [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1459,11 +1457,9 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 action = (3 == val) ? kInsertIgnoreAll : action;
                 break;
             }
-            else
-            {
-                cout << tr("Please enter either 1, 2, or 3:")
-                    .toLatin1().constData() << endl;
-            }
+
+            cout << tr("Please enter either 1, 2, or 3:")
+                .toLatin1().constData() << endl;
         }
     }
 
@@ -1491,7 +1487,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 updateDialog->AddButton(tr("Update manually"));
                 updateDialog->AddButton(tr("Ignore all"));
                 QObject::connect(updateDialog, &MythDialogBox::Closed,
-                                 [&](QString, int result)
+                                 [&](QString /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1531,11 +1527,9 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 action = (3 == val) ? kUpdateIgnoreAll : action;
                 break;
             }
-            else
-            {
-                cout << tr("Please enter either 1, 2, or 3:")
-                    .toLatin1().constData() << endl;
-            }
+
+            cout << tr("Please enter either 1, 2, or 3:")
+                .toLatin1().constData() << endl;
         }
     }
 
@@ -1558,7 +1552,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed,
-                         [&](const QString &, int result)
+                         [&](const QString & /*resultId*/, int result)
                          {
                              dc = result;
                              m_eventLoop.quit();

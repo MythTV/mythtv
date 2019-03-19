@@ -56,9 +56,9 @@ static void CECCommandCallback(void *adapter, const cec_command* command);
 static int CECAlertCallback(void *adapter, const libcec_alert alert, const libcec_parameter CEC_CALLBACK_PARAM_TYPE data);
 #endif
 #if CEC_LIB_VERSION_MAJOR >= 4
-static void CECAlertCallback(void *adapter, const libcec_alert alert, const libcec_parameter data);
+static void CECAlertCallback(void *adapter, libcec_alert alert, libcec_parameter data);
 #endif
-static void CECSourceActivatedCallback(void *adapter, const cec_logical_address address, const uint8_t activated);
+static void CECSourceActivatedCallback(void *adapter, cec_logical_address address, uint8_t activated);
 #endif
 
 class CECAdapterPriv

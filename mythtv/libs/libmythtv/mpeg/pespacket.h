@@ -91,7 +91,7 @@ class MTV_PUBLIC PESPacket
     TSHeader* tsheader()
         { return reinterpret_cast<TSHeader*>(_fullbuffer); }
 
-    void GetAsTSPackets(vector<TSPacket> &pkts, uint cc) const;
+    void GetAsTSPackets(vector<TSPacket> &output, uint cc) const;
 
     // _pesdata[-3] == 0, _pesdata[-2] == 0, _pesdata[-1] == 1
     uint StreamID()   const { return _pesdata[0]; }

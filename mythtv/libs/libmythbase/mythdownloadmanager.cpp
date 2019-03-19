@@ -54,8 +54,7 @@ class MythDownloadInfo
 
    ~MythDownloadInfo()
     {
-        if (m_request)
-            delete m_request;
+        delete m_request;
         if (m_reply && m_processReply)
             m_reply->deleteLater();
     }
@@ -198,9 +197,7 @@ MythDownloadManager::~MythDownloadManager()
     wait();
 
     delete m_infoLock;
-
-    if (m_inCookieJar)
-        delete m_inCookieJar;
+    delete m_inCookieJar;
 }
 
 /** \brief Runs a loop to process incoming download requests and
@@ -1005,13 +1002,9 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
 
     if (isOK)
         return true;
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Link Local request failed: %1")
-          .arg(url.toString()));
-        return false;
-    }
-
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Link Local request failed: %1")
+        .arg(url.toString()));
+    return false;
 }
 #endif
 
@@ -1690,8 +1683,7 @@ QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
 void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
 {
     QMutexLocker locker(&m_cookieLock);
-    if (m_inCookieJar)
-        delete m_inCookieJar;
+    delete m_inCookieJar;
 
     MythCookieJar *inJar = static_cast<MythCookieJar *>(jar);
     MythCookieJar *outJar = new MythCookieJar;

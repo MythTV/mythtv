@@ -68,7 +68,7 @@ class RTjpeg
    ~RTjpeg();
    
     int SetQuality(int *quality);
-    int SetFormat(int *format);
+    int SetFormat(int *fmt);
     int SetSize(int *w, int *h);
     int SetIntra(int *key, int *lm, int *cm);
 

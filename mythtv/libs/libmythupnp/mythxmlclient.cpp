@@ -96,14 +96,12 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
 
         return UPnPResult_Success;
     }
-    else
-    {
-        sMsg = sErrDesc;
 
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("MythXMLClient::GetConnectionInfo Failed - (%1) %2")
-                .arg(nErrCode) .arg(sErrDesc));
-    }
+    sMsg = sErrDesc;
+
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("MythXMLClient::GetConnectionInfo Failed - (%1) %2")
+        .arg(nErrCode) .arg(sErrDesc));
 
     if (( nErrCode == UPnPResult_HumanInterventionRequired ) || 
         ( nErrCode == UPnPResult_ActionNotAuthorized       ) ||

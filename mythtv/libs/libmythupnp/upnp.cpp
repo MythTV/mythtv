@@ -60,9 +60,7 @@ UPnp::~UPnp()
 
 void UPnp::SetConfiguration( Configuration *pConfig )
 {
-    if (g_pConfig)
-        delete g_pConfig;
-
+    delete g_pConfig;
     g_pConfig = pConfig;
 }
 

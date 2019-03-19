@@ -166,7 +166,7 @@ int main(int argc, char **argv)
     // set up log file
     int logfd = -1;
 
-    if (logfile != "")
+    if (!logfile.empty())
     {
         logfd = open(logfile.c_str(), O_WRONLY|O_CREAT|O_APPEND, 0664);
 
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
             perror("select");
             return EXIT_SOCKET_ERROR;
         }
-        else if (res == 0)
+        if (res == 0)
         {
             // select timed out
             // just kick the DB connection to keep it alive
@@ -346,8 +346,7 @@ int main(int argc, char **argv)
 
                         // remove from server list
                         ZMServer *server = serverList[i];
-                        if (server)
-                            delete server;
+                        delete server;
                         serverList.erase(i);
                     }
                     else

@@ -365,7 +365,7 @@ yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 #if HAVE_MMX
     if ((bpp == 16) && (mode == MODE_RGB))
         return mmxext_rgb16;
-    else if ((bpp == 32) && (mode == MODE_RGB))
+    if ((bpp == 32) && (mode == MODE_RGB))
         return mmxext_argb32;
 #endif
 
@@ -389,7 +389,7 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 #if HAVE_MMX
     if ((bpp == 16) && (mode == MODE_RGB))
         return mmx_rgb16;
-    else if ((bpp == 32) && (mode == MODE_RGB))
+    if ((bpp == 32) && (mode == MODE_RGB))
         return mmx_argb32;
 #endif
     if ((bpp == 32) && (mode == MODE_RGB))

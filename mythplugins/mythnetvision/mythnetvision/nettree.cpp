@@ -598,7 +598,7 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
     // A little loop to determine what path of the provided path might
     // already exist in the tree.
 
-    while (folder == nullptr && paths.size())
+    while (folder == nullptr && !paths.empty())
     {
         QString curPath = paths.takeFirst();
         curPath.replace("|", "/");
@@ -619,7 +619,7 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
     if (m_type != DLG_TREE)
         folder->addNode(tr("Back"), kUpFolder, true, false);
 
-    if (paths.size())
+    if (!paths.empty())
         BuildGenericTree(folder, paths, dirthumb, videos);
     else
     {
@@ -924,15 +924,15 @@ void NetTree::UpdateTrees()
 void NetTree::ToggleRSSUpdates()
 {
     m_rssAutoUpdate = !m_rssAutoUpdate;
-    gCoreContext->SaveSetting("mythnetvision.rssBackgroundFetch",
-                              m_rssAutoUpdate);
+    gCoreContext->SaveBoolSetting("mythnetvision.rssBackgroundFetch",
+                                  m_rssAutoUpdate);
 }
 
 void NetTree::ToggleTreeUpdates()
 {
     m_treeAutoUpdate = !m_treeAutoUpdate;
-    gCoreContext->SaveSetting("mythnetvision.backgroundFetch",
-                              m_treeAutoUpdate);
+    gCoreContext->SaveBoolSetting("mythnetvision.backgroundFetch",
+                                  m_treeAutoUpdate);
 }
 
 void NetTree::customEvent(QEvent *event)

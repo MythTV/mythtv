@@ -206,7 +206,7 @@ void DVBCam::HandlePMT(void)
     if (m_pmtSent && m_pmtAdded && !m_pmtUpdated)
     {
         // Send added PMT
-        while (m_pmtAddList.size() > 0)
+        while (!m_pmtAddList.empty())
         {
             pmt_list_t::iterator it = m_pmtAddList.begin();
             const ChannelBase *chan = it.key();
@@ -222,7 +222,7 @@ void DVBCam::HandlePMT(void)
     }
 
     // Grab any added PMT
-    while (m_pmtAddList.size() > 0)
+    while (!m_pmtAddList.empty())
     {
         pmt_list_t::iterator it = m_pmtAddList.begin();
         const ChannelBase *chan = it.key();
@@ -330,7 +330,7 @@ static const char *cplm_info[] =
     "CPLM_UPDATE"
 };
 
-cCiCaPmt CreateCAPMT(const ProgramMapTable&, const unsigned short*, uint);
+cCiCaPmt CreateCAPMT(const ProgramMapTable& /*pmt*/, const unsigned short* /*casids*/, uint /*cplm*/);
 
 /*
  * Send a CA_PMT object to the CAM (see EN50221, section 8.4.3.4)

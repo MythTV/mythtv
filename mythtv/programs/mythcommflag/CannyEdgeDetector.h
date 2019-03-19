@@ -26,7 +26,7 @@ public:
             int percentile) override; // EdgeDetector
 
 private:
-    int resetBuffers(int pgmwidth, int pgmheight);
+    int resetBuffers(int newwidth, int newheight);
 
     double         *m_mask        {nullptr}; /* pre-computed Gaussian mask */
     int             m_mask_radius {2};       /* radius of mask */

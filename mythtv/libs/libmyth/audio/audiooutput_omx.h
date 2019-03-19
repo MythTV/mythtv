@@ -38,8 +38,8 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 
   private:
     // OMXComponentCtx implementation
-    OMX_ERRORTYPE EmptyBufferDone (OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
-    void ReleaseBuffers(OMXComponent&) override; // OMXComponentCtx
+    OMX_ERRORTYPE EmptyBufferDone (OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE* /*hdr*/) override; // OMXComponentCtx
+    void ReleaseBuffers(OMXComponent& /*cmpnt*/) override; // OMXComponentCtx
 
   private:
     // implementation

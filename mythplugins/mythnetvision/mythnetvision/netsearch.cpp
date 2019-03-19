@@ -396,7 +396,7 @@ void NetSearch::SearchFinished(void)
     SetFocusWidget(m_searchResultList);
 }
 
-void NetSearch::SearchTimeout(Search *)
+void NetSearch::SearchTimeout(Search * /*item*/)
 {
     CloseBusyPopup();
 

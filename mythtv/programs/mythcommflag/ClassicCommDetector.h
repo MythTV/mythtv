@@ -57,7 +57,7 @@ class ClassicCommDetector : public CommDetectorBase
         virtual void deleteLater(void);
 
         bool go() override; // CommDetectorBase
-        void GetCommercialBreakList(frm_dir_map_t &comms) override; // CommDetectorBase
+        void GetCommercialBreakList(frm_dir_map_t &marks) override; // CommDetectorBase
         void recordingFinished(long long totalFileSize) override; // CommDetectorBase
         void requestCommBreakMapUpdate(void) override; // CommDetectorBase
 

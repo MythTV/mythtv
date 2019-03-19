@@ -304,8 +304,8 @@ int main(int argc, char *argv[])
                                                      .arg(cur.key()));
                         return GENERIC_EXIT_INVALID_CMDLINE;
                     }
-                    else if ( (prev.value() == MARK_CUT_START) &&
-                              ((cur.key() - prev.key()) < 2) )
+                    if ( (prev.value() == MARK_CUT_START) &&
+                         ((cur.key() - prev.key()) < 2) )
                     {
                         LOG(VB_GENERAL, LOG_WARNING, QString("Discarding "
                                           "insufficiently long cut: %1-%2")
@@ -774,7 +774,7 @@ static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
     frm_dir_map_t delMap = *deleteMap;
     bool withinCut = false;
     bool firstMark = true;
-    while (delMap.count() && delMap.begin().key() <= oldBookmark)
+    while (!delMap.empty() && delMap.begin().key() <= oldBookmark)
     {
         uint64_t key = delMap.begin().key();
         MarkTypes mark = delMap.begin().value();

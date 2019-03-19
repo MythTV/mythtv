@@ -243,7 +243,7 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
             break;
         }
     }
-    if (actions.size() == 0 && event->text() == "-")
+    if (actions.empty() && event->text() == "-")
     {
         if (!m_hasTemplate)
             initialEntry = "-";
@@ -258,8 +258,7 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
 
     if (handled)
         return true;
-    else
-        return MythUIButtonList::keyPressEvent(event);
+    return MythUIButtonList::keyPressEvent(event);
 }
 
 void MythUISpinBox::ShowEntryDialog(QString initialEntry)

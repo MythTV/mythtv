@@ -47,7 +47,7 @@ class MPUBLIC MythContext
 
     bool Init(const bool gui = true,
               const bool promptForBackend = false,
-              const bool bypassAutoDiscovery = false,
+              const bool disableAutoDiscovery = false,
               const bool ignoreDB = false);
 
     DatabaseParams GetDatabaseParams(void);

@@ -186,11 +186,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.begin();
-                }
+                looped = true;
+                it = m_FocusWidgetList.begin();
             }
         }
     }
@@ -214,11 +211,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.end() - 1;
-                }
+                looped = true;
+                it = m_FocusWidgetList.end() - 1;
             }
         }
     }
@@ -233,7 +227,7 @@ void MythScreenType::BuildFocusList(void)
 
     AddFocusableChildrenToList(m_FocusWidgetList);
 
-    if (m_FocusWidgetList.size() > 0)
+    if (!m_FocusWidgetList.empty())
         SetFocusWidget();
 }
 
@@ -559,7 +553,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
  * Do not use.
  *
  */
-void MythScreenType::CreateCopy(MythUIType *)
+void MythScreenType::CreateCopy(MythUIType * /*parent*/)
 {
     LOG(VB_GENERAL, LOG_ERR, "CreateCopy called on screentype - bad.");
 }

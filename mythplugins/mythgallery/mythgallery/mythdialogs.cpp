@@ -102,7 +102,7 @@ void MythDialog::setNoErase(void)
 {
 }
 
-bool MythDialog::onMediaEvent(MythMediaDevice*)
+bool MythDialog::onMediaEvent(MythMediaDevice* /*mediadevice*/)
 {
     return false;
 }

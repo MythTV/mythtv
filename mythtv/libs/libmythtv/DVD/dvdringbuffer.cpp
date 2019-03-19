@@ -181,8 +181,7 @@ int MythDVDContext::GetNumFramesPresent() const
         // are not present all the way to 'End PTS'
         frames = ((GetSeqEndPTS() - GetStartPTS()) * GetFPS()) / 90000;
     }
-    else
-    if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
+    else if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
     {
         // At least one video frame is present
         frames = GetNumFrames();
@@ -351,12 +350,9 @@ bool DVDRingBuffer::SectorSeek(uint64_t sector)
             QString("SectorSeek() to sector %1 failed").arg(sector));
         return false;
     }
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("DVD Playback SectorSeek() sector: %1").arg(sector));
-        return true;
-    }
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("DVD Playback SectorSeek() sector: %1").arg(sector));
+    return true;
 }
 
 long long DVDRingBuffer::Seek(long long time)
@@ -395,7 +391,7 @@ long long DVDRingBuffer::Seek(long long time)
             QString("Seek() to time %1 failed").arg(time));
         return -1;
     }
-    else if (!m_inMenu)
+    if (!m_inMenu)
     {
         m_gotStop = false;
         if (time > 0 && ffrewSkip == 1)
@@ -1082,12 +1078,10 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     m_processState = PROCESS_WAIT;
                     break;
                 }
-                else
-                {
-                    // debug
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL");
-                    WaitForPlayer();
-                }
+
+                // debug
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL");
+                WaitForPlayer();
             }
             break;
 
@@ -1284,10 +1278,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         errno = EAGAIN;
         return 0;
     }
-    else
-    {
-        return tot;
-    }
+    return tot;
 }
 
 bool DVDRingBuffer::playTrack(int track)
@@ -1905,8 +1896,7 @@ int DVDRingBuffer::NumMenuButtons(void) const
     int numButtons = pci->hli.hl_gi.btn_ns;
     if (numButtons > 0 && numButtons < 36)
         return numButtons;
-    else
-        return 0;
+    return 0;
 }
 
 /** \brief get the audio language from the dvd
@@ -2091,7 +2081,7 @@ int DVDRingBuffer::GetTrack(uint type)
 {
     if (type == kTrackTypeSubtitle)
         return m_curSubtitleTrack;
-    else if (type == kTrackTypeAudio)
+    if (type == kTrackTypeAudio)
         return m_curAudioTrack;
 
     return 0;

@@ -423,7 +423,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
                 QWebView::keyPressEvent(event);
                 return;
             }
-            else if (action == "PREVIOUSLINK")
+            if (action == "PREVIOUSLINK")
             {
                 QKeyEvent shiftTabKey(event->type(), Qt::Key_Tab,
                                       event->modifiers() | Qt::ShiftModifier,
@@ -433,7 +433,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
                 QWebView::keyPressEvent(event);
                 return;
             }
-            else if (action == "FOLLOWLINK")
+            if (action == "FOLLOWLINK")
             {
                 QKeyEvent returnKey(event->type(), Qt::Key_Return,
                                     event->modifiers(), QString(),
@@ -1267,8 +1267,7 @@ QIcon MythUIWebBrowser::GetIcon(void)
     {
         return QWebSettings::iconForUrl(m_browser->url());
     }
-    else
-        return QIcon();
+    return QIcon();
 }
 
 /** \fn MythUIWebBrowser::GetUrl(void)
@@ -1281,8 +1280,7 @@ QUrl MythUIWebBrowser::GetUrl(void)
     {
         return m_browser->url();
     }
-    else
-        return QUrl();
+    return QUrl();
 }
 
 /** \fn MythUIWebBrowser::GetTitle(void)
@@ -1293,8 +1291,7 @@ QString MythUIWebBrowser::GetTitle(void)
 {
     if (m_browser)
         return m_browser->title();
-    else
-        return QString("");
+    return QString("");
 }
 
 /** \fn MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
@@ -1308,8 +1305,7 @@ QVariant MythUIWebBrowser::evaluateJavaScript(const QString &scriptSource)
         QWebFrame *frame = m_browser->page()->currentFrame();
         return frame->evaluateJavaScript(scriptSource);
     }
-    else
-        return QVariant();
+    return QVariant();
 }
 
 void MythUIWebBrowser::Scroll(int dx, int dy)
@@ -1377,7 +1373,7 @@ void MythUIWebBrowser::slotIconChanged(void)
 
 void MythUIWebBrowser::slotScrollBarShowing(void)
 {
-    bool wasActive = (m_wasActive | m_active);
+    bool wasActive = (m_wasActive || m_active);
     SetActive(false);
     m_wasActive = wasActive;
 }

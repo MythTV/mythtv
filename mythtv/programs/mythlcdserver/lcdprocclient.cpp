@@ -672,32 +672,28 @@ void LCDProcClient::setWidth(unsigned int x)
 {
     if (x < 1 || x > 80)
         return;
-    else
-        m_lcdWidth = x;
+    m_lcdWidth = x;
 }
 
 void LCDProcClient::setHeight(unsigned int x)
 {
     if (x < 1 || x > 80)
         return;
-    else
-        m_lcdHeight = x;
+    m_lcdHeight = x;
 }
 
 void LCDProcClient::setCellWidth(unsigned int x)
 {
     if (x < 1 || x > 16)
         return;
-    else
-        m_cellWidth = x;
+    m_cellWidth = x;
 }
 
 void LCDProcClient::setCellHeight(unsigned int x)
 {
     if (x < 1 || x > 16)
         return;
-    else
-        m_cellHeight = x;
+    m_cellHeight = x;
 }
 
 void LCDProcClient::setVersion(const QString &sversion, const QString &pversion)
@@ -1247,7 +1243,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
 
     // Write out the app name
     if ( m_lcdHeight > 1)
-    outputCenteredText("Menu", app_name, "topWidget", 1);
+        outputCenteredText("Menu", app_name, "topWidget", 1);
 
     QList<LCDMenuItem>::iterator it = menuItems->begin();
     LCDMenuItem *curItem;
@@ -2443,8 +2439,7 @@ LCDProcClient::~LCDProcClient()
         m_lcdReady = false;
     }
 
-    if ( m_lcdMenuItems )
-        delete m_lcdMenuItems;
+    delete m_lcdMenuItems;
 
     gCoreContext->removeListener(this);
 }

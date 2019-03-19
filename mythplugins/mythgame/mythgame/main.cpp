@@ -81,13 +81,11 @@ static int runMenu(QString which_menu)
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return 0;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
-        delete menu;
-        return -1;
-    }
+
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+        .arg(which_menu).arg(themedir));
+    delete menu;
+    return -1;
 }
 
 static int RunGames(void)
@@ -100,11 +98,8 @@ static int RunGames(void)
         mainStack->AddScreen(game);
         return 0;
     }
-    else
-    {
-        delete game;
-        return -1;
-    }
+    delete game;
+    return -1;
 }
 
 static void runGames(void)

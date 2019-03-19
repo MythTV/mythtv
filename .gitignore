@@ -1,5 +1,6 @@
 *.a
 *.o
+*.o.json
 moc_*.cpp
 moc_*.h
 *.moc
@@ -46,3 +47,4 @@ TAGS
 GPATH
 GRTAGS
 GTAGS
+compile_commands.json

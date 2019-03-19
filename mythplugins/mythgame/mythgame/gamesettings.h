@@ -4,8 +4,8 @@
 // MythTV headers
 #include <standardsettings.h>
 
-const QString GetGameTypeName(const QString &GameType);
-const QString GetGameTypeExtensions(const QString &GameType);
+QString GetGameTypeName(const QString &GameType);
+QString GetGameTypeExtensions(const QString &GameType);
 
 struct MPUBLIC GameGeneralSettings : public GroupSetting
 {

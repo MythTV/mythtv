@@ -15,7 +15,7 @@ class FileAssocDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    FileAssocDialog(MythScreenStack *screeParent, const QString &lname);
+    FileAssocDialog(MythScreenStack *screenParent, const QString &lname);
     ~FileAssocDialog();
 
     bool Create() override; // MythScreenType

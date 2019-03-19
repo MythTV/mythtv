@@ -118,7 +118,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         RecordingDupMethodType dupmethod,
 
         uint sourceid,
-        uint cardid,
+        uint inputid,
 
         uint findid,
 
@@ -253,7 +253,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ApplyRecordRecID(void);//pi
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
     void ApplyRecordRecGroupChange(int newrecgroupid);
-    void ApplyRecordPlayGroupChange(const QString &newrecgroup);
+    void ApplyRecordPlayGroupChange(const QString &newplaygroup);
     void ApplyStorageGroupChange(const QString &newstoragegroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,
                                    const QString &newSubtitle,
@@ -270,7 +270,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void LoadRecordingFile();
     RecordingFile *GetRecordingFile() const { return m_recordingFile; }
     void SaveFilesize(uint64_t fsize) override; // ProgramInfo
-    void SetFilesize( uint64_t sz ) override; // ProgramInfo
+    void SetFilesize( uint64_t fsize ) override; // ProgramInfo
     uint64_t GetFilesize(void) const override; // ProgramInfo
 
     RecStatus::Type m_oldrecstatus      {RecStatus::Unknown};

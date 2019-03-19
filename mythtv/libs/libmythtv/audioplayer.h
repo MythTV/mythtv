@@ -41,10 +41,10 @@ class MTV_PUBLIC AudioPlayer
     void  SetAudioInfo(const QString &main_device,
                        const QString &passthru_device,
                        uint           samplerate,
-                       int            bitrate = -1);
+                       int            codec_profile = -1);
     void  SetAudioParams(AudioFormat format, int orig_channels, int channels,
                          AVCodecID codec, int samplerate, bool passthru,
-                         int bitrate = -1);
+                         int codec_profile = -1);
     void  SetEffDsp(int dsprate);
 
     void  CheckFormat(void);

@@ -140,7 +140,7 @@ class IconView : public MythScreenType
     ThumbGenerator     *m_thumbGen           {nullptr};
     ChildCountThread   *m_childCountThread   {nullptr};
 
-    int                 m_showcaption        {0};
+    bool                m_showcaption        {false};
     int                 m_sortorder          {0};
     bool                m_useOpenGL          {false};
     bool                m_recurse            {false};
@@ -188,7 +188,7 @@ public:
         MThread("ChildCountThread"), m_parent(parent) {}
     ~ChildCountThread();
 
-    void addFile(const QString &fileName);
+    void addFile(const QString &filePath);
     void cancel();
 
 protected:
@@ -197,7 +197,7 @@ protected:
 private:
 
     bool moreWork();
-    int  getChildCount(const QString &fileName);
+    int  getChildCount(const QString &filepath);
 
     QObject     *m_parent {nullptr};
     QStringList  m_fileList;

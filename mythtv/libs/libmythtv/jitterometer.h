@@ -37,7 +37,7 @@
 class MTV_PUBLIC Jitterometer
 {
   public:
-    Jitterometer(const QString &nname, int num_cycles = 0);
+    Jitterometer(const QString &nname, int ncycles = 0);
    ~Jitterometer();
 
     float GetLastFPS(void) const { return m_last_fps; }

@@ -263,11 +263,11 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
 
         if (m_delMap.contains(0))
         {
-            m_discard = 1;
+            m_discard = true;
             m_delMap.remove(0);
         }
         if (m_delMap.begin().value() == MARK_CUT_END)
-            m_discard = 1;
+            m_discard = true;
         m_use_secondary = true;
     }
 
@@ -1208,14 +1208,14 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     }
 
     if (info->display_picture->nb_fields % 2)
-        m_picture->top_field_first = !(info->display_picture->flags &
-                                     PIC_FLAG_TOP_FIELD_FIRST);
+        m_picture->top_field_first = ((info->display_picture->flags &
+                                       PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 0 : 1;
     else
-        m_picture->top_field_first = !!(info->display_picture->flags &
-                                      PIC_FLAG_TOP_FIELD_FIRST);
+        m_picture->top_field_first = ((info->display_picture->flags &
+                                       PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 1 : 0;
 
-    m_picture->interlaced_frame = !(info->display_picture->flags &
-                                  PIC_FLAG_PROGRESSIVE_FRAME);
+    m_picture->interlaced_frame = ((info->display_picture->flags &
+                                    PIC_FLAG_PROGRESSIVE_FRAME) != 0) ? 0 : 1;
 
     out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
 
@@ -1585,16 +1585,13 @@ bool MPEG2fixup::FindStart()
                         found[it.key()] = true;
                         break;
                     }
-                    else
-                    {
-                        LOG(VB_PROCESS, LOG_INFO,
-                            QString("Dropping A packet from stream %1")
-                                .arg(it.key()));
-                        m_framePool.enqueue(af->takeFirst());
-                        continue;
-                    }
+                    LOG(VB_PROCESS, LOG_INFO,
+                        QString("Dropping A packet from stream %1")
+                        .arg(it.key()));
+                    m_framePool.enqueue(af->takeFirst());
+                    continue;
                 }
-                else if (delta >= 0)
+                if (delta >= 0)
                 {
                     LOG(VB_PROCESS, LOG_INFO,
                         QString("Found useful audio frame from stream %1")
@@ -1908,7 +1905,7 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
     if (type == MPF_TYPE_CUTLIST)
     {
         mapPtr = &m_delMap;
-        m_discard = 0;
+        m_discard = false;
     }
     else
         mapPtr = &m_saveMap;
@@ -1931,7 +1928,7 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
             if (start == 0)
             {
                 if (type == MPF_TYPE_CUTLIST)
-                    m_discard = 1;
+                    m_discard = true;
             }
             else
                 mapPtr->insert(start - 1, MARK_CUT_START);
@@ -2110,7 +2107,7 @@ int MPEG2fixup::Start()
         origaPTS[it.key()] = af->first()->m_pkt.pts * 300;
         //expectedPTS[it.key()] = udiff2x33(af->first()->m_pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
-        cutState[it.key()] = !!(m_discard);
+        cutState[it.key()] = m_discard;
     }
 
     ShowRangeMap(&m_delMap, "Cutlist:");
@@ -2248,7 +2245,7 @@ int MPEG2fixup::Start()
                     {
                         if (m_saveMap.begin().key() <= frame_count)
                            m_saveMap.remove(m_saveMap.begin().key());
-                        if (m_saveMap.count() && m_saveMap.begin().value() == 0)
+                        if (!m_saveMap.empty() && m_saveMap.begin().value() == 0)
                         {
                             LOG(VB_GENERAL, LOG_INFO,
                                 QString("Saving frame #%1") .arg(frame_count));
@@ -2264,7 +2261,7 @@ int MPEG2fixup::Start()
                         }
                     }
 
-                    if (m_delMap.count() && m_delMap.begin().key() <= frame_count)
+                    if (!m_delMap.empty() && m_delMap.begin().key() <= frame_count)
                     {
                         new_discard_state = m_delMap.begin().value();
                         LOG(VB_GENERAL, LOG_INFO,

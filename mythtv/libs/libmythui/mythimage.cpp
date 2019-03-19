@@ -282,9 +282,7 @@ bool MythImage::Load(MythImageReader *reader)
         return true;
     }
 
-    if (im)
-        delete im;
-
+    delete im;
     return false;
 }
 
@@ -361,8 +359,7 @@ bool MythImage::Load(const QString &filename)
         delete im;
         return true;
     }
-    else
-        LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
+    LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
 
     return false;
 }

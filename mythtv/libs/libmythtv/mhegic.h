@@ -30,10 +30,10 @@ public:
     // Operations
 public:
     // Is a file ready to read?
-    bool CheckFile(const QString &url, const QByteArray &cert = QByteArray());
+    bool CheckFile(const QString &csPath, const QByteArray &cert = QByteArray());
     // Read a file
     enum EResult { kError = -1, kSuccess = 0, kPending };
-    EResult GetFile(const QString &url, QByteArray &data,
+    EResult GetFile(const QString &csPath, QByteArray &data,
                     const QByteArray &cert = QByteArray() );
 
     // Implementation

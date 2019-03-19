@@ -100,8 +100,7 @@ MythSocket::MythSocket(
             m_useSharedThread = false;
             return;
         }
-        else
-            ConnectHandler(); // already called implicitly above?
+        ConnectHandler(); // already called implicitly above?
     }
 
     // Use direct connections so m_tcpSocket can be used
@@ -296,14 +295,14 @@ void MythSocket::CallReadyReadHandler(void)
 }
 
 bool MythSocket::ConnectToHost(
-    const QHostAddress &hadr, quint16 port)
+    const QHostAddress &address, quint16 port)
 {
     bool ret = false;
     QMetaObject::invokeMethod(
         this, "ConnectToHostReal",
         (QThread::currentThread() != m_thread->qthread()) ?
         Qt::BlockingQueuedConnection : Qt::DirectConnection,
-        Q_ARG(QHostAddress, hadr),
+        Q_ARG(QHostAddress, address),
         Q_ARG(quint16, port),
         Q_ARG(bool*, &ret));
     return ret;

@@ -55,9 +55,8 @@ MHInteractionChannel::EStatus MHInteractionChannel::status()
     QStringList opts = QString(getenv("MYTHMHEG")).split(':');
     if (opts.contains("noice", Qt::CaseInsensitive))
         return kDisabled;
-    else if (opts.contains("ice", Qt::CaseInsensitive))
+    if (opts.contains("ice", Qt::CaseInsensitive))
         return kActive;
-
     return gCoreContext->GetBoolSetting("EnableMHEGic", true) ? kActive : kDisabled;
 }
 

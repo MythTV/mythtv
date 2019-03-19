@@ -78,7 +78,7 @@ FIFOWriter::~FIFOWriter()
     delete [] m_fbmaxcount;
 }
 
-int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
+bool FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
                          int num_bufs)
 {
     if (id < 0 || id >= m_num_fifos)
@@ -164,10 +164,7 @@ void FIFOWriter::FIFOWriteThread(int id)
                     ///FIXME: proper error propagation
                     break;
                 }
-                else
-                {
-                    written += ret;
-                }
+                written += ret;
             }
         }
         flock.relock();

@@ -63,7 +63,7 @@ class ShoutCastMetaParser
     ~ShoutCastMetaParser(void) = default;
 
     void setMetaFormat(const QString &metaformat);
-    ShoutCastMetaMap parseMeta(const QString &meta);
+    ShoutCastMetaMap parseMeta(const QString &mdata);
 
   private:
     QString m_meta_format;
@@ -250,8 +250,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
 
 avfDecoder::~avfDecoder(void)
 {
-    if (m_mdataTimer)
-        delete m_mdataTimer;
+    delete m_mdataTimer;
 
     if (m_inited)
         deinit();
@@ -259,8 +258,7 @@ avfDecoder::~avfDecoder(void)
     if (m_outputBuffer)
         av_freep(&m_outputBuffer);
 
-    if (m_inputContext)
-        delete m_inputContext;
+    delete m_inputContext;
 }
 
 void avfDecoder::stop()
@@ -290,9 +288,7 @@ bool avfDecoder::initialize()
 
     output()->PauseUntilBuffered();
 
-    if (m_inputContext)
-        delete m_inputContext;
-
+    delete m_inputContext;
     m_inputContext = new RemoteAVFormatContext(getURL());
 
     if (!m_inputContext->isOpen())
@@ -520,11 +516,8 @@ void avfDecoder::run()
                 // never go below 1s buffered
                 if (buffered < 1000)
                     break;
-                else
-                {
-                    // wait
-                    usleep((buffered - 1000) * 1000);
-                }
+                // wait
+                usleep((buffered - 1000) * 1000);
             }
         }
     }

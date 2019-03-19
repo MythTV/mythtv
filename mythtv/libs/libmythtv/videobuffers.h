@@ -29,8 +29,8 @@ typedef vector<unsigned char*>                uchar_vector_t;
 
 const QString& DebugString(const VideoFrame *frame, bool short_str=false);
 const QString& DebugString(uint str_num, bool short_str=false);
-const QString DebugString(const frame_queue_t& list);
-const QString DebugString(const vector<const VideoFrame*>& list);
+QString DebugString(const frame_queue_t& list);
+QString DebugString(const vector<const VideoFrame*>& list);
 
 enum BufferType
 {
@@ -47,7 +47,7 @@ enum BufferType
 class YUVInfo
 {
   public:
-    YUVInfo(uint w, uint h, uint size, const int *p, const int *o,
+    YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
             int aligned = 64);
 
   public:

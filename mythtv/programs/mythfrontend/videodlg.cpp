@@ -3056,20 +3056,17 @@ void VideoDialog::ShowHomepage()
         GetMythMainWindow()->HandleMedia("WebBrowser", url);
         return;
     }
-    else
-    {
-        QString cmd = browser;
-        cmd.replace("%ZOOM%", zoom);
-        cmd.replace("%URL%", url);
-        cmd.replace('\'', "%27");
-        cmd.replace("&","\\&");
-        cmd.replace(";","\\;");
 
-        GetMythMainWindow()->AllowInput(false);
-        myth_system(cmd, kMSDontDisableDrawing);
-        GetMythMainWindow()->AllowInput(true);
-        return;
-    }
+    QString cmd = browser;
+    cmd.replace("%ZOOM%", zoom);
+    cmd.replace("%URL%", url);
+    cmd.replace('\'', "%27");
+    cmd.replace("&","\\&");
+    cmd.replace(";","\\;");
+
+    GetMythMainWindow()->AllowInput(false);
+    myth_system(cmd, kMSDontDisableDrawing);
+    GetMythMainWindow()->AllowInput(true);
 }
 
 /** \fn VideoDialog::playVideo()

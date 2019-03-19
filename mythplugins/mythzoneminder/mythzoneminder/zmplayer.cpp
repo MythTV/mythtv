@@ -51,8 +51,7 @@ ZMPlayer::~ZMPlayer()
 
     m_frameTimer->deleteLater();
 
-    if (m_frameList)
-        delete m_frameList;
+    delete m_frameList;
 }
 
 void ZMPlayer::stopPlayer(void)
@@ -147,11 +146,9 @@ void ZMPlayer::getEventInfo()
 
         return;
     }
-    else
-    {
-        if (m_noEventsText)
-            m_noEventsText->SetVisible(false);
-    }
+
+    if (m_noEventsText)
+        m_noEventsText->SetVisible(false);
 
     Event *event = m_eventList->at(*m_currentEvent);
     if (!event)
@@ -350,7 +347,7 @@ void ZMPlayer::prevPressed()
 
 void ZMPlayer::updateFrame(void)
 {
-    if (!m_frameList->size())
+    if (m_frameList->empty())
         return;
 
     m_frameTimer->stop();

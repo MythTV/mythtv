@@ -213,12 +213,10 @@ bool CetonStreamHandler::EnterPowerSavingMode(void)
             "Ignoring request - video streaming active");
         return false;
     }
-    else
-    {
-        locker.unlock(); // _listener_lock
-        TunerOff();
-        return true;
-    }
+
+    locker.unlock(); // _listener_lock
+    TunerOff();
+    return true;
 }
 
 bool CetonStreamHandler::IsConnected(void) const
@@ -563,14 +561,12 @@ bool CetonStreamHandler::HttpRequest(
             status_code = 200;
             return true;
         }
-        else
-        {
-            response = "Download failed";
-            status_code = 500;
-            return false;
-        }
+
+        response = "Download failed";
+        status_code = 500;
+        return false;
     }
-    else if ("POST" == method)
+    if ("POST" == method)
     {
         request->setUrl(url);
         request->setHeader(QNetworkRequest::ContentTypeHeader,
@@ -584,12 +580,10 @@ bool CetonStreamHandler::HttpRequest(
             status_code = 200;
             return true;
         }
-        else
-        {
-            response = "Download failed";
-            status_code = 500;
-            return false;
-        }
+
+        response = "Download failed";
+        status_code = 500;
+        return false;
     }
 
     delete request;

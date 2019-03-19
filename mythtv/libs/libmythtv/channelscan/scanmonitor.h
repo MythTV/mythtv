@@ -126,6 +126,6 @@ class ScannerEvent : public QEvent
 void post_event(QObject *dest, QEvent::Type type, int val);
 void post_event(QObject *dest, QEvent::Type type, const QString &val);
 void post_event(QObject *dest, QEvent::Type type, int val,
-                Configurable *cfg);
+                Configurable *spp);
 
 #endif // _SCAN_MONITOR_H_

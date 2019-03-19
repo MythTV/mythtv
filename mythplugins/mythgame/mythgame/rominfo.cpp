@@ -214,7 +214,7 @@ void RomInfo::setField(QString field, QString data)
 
 void RomInfo::setFavorite(bool updateDatabase)
 {
-    m_favorite = 1 - m_favorite;
+    m_favorite = !m_favorite;
 
     if (updateDatabase)
     {

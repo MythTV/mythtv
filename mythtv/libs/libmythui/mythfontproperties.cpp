@@ -418,7 +418,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         delete newFont;
         return nullptr;
     }
-    else if (pixelsize > 0)
+    if (pixelsize > 0)
     {
         newFont->SetPixelSize(pixelsize);
     }

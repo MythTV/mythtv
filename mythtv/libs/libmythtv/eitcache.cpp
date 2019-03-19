@@ -156,27 +156,24 @@ static bool lock_channel(uint chanid, uint endtime)
                 .arg(chanid));
         return false;
     }
-    else
-    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        uint now = MythDate::current().toTime_t();
+    uint now = MythDate::current().toTime_t();
 #else
-        uint now = MythDate::current().toSecsSinceEpoch();
+    uint now = MythDate::current().toSecsSinceEpoch();
 #endif
-        qstr = "INSERT INTO eit_cache "
-               "       ( chanid,  endtime,  status) "
-               "VALUES (:CHANID, :ENDTIME, :STATUS)";
+    qstr = "INSERT INTO eit_cache "
+           "       ( chanid,  endtime,  status) "
+           "VALUES (:CHANID, :ENDTIME, :STATUS)";
 
-        query.prepare(qstr);
-        query.bindValue(":CHANID",   chanid);
-        query.bindValue(":ENDTIME",  now);
-        query.bindValue(":STATUS",   CHANNEL_LOCK);
+    query.prepare(qstr);
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":ENDTIME",  now);
+    query.bindValue(":STATUS",   CHANNEL_LOCK);
 
-        if (!query.exec())
-        {
-            MythDB::DBError("Error inserting channel lock", query);
-            return false;
-        }
+    if (!query.exec())
+    {
+        MythDB::DBError("Error inserting channel lock", query);
+        return false;
     }
 
     return true;
@@ -256,7 +253,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
         (*eventMap)[eventid] = construct_sig(tableid, version, endtime, false);
     }
 
-    if (eventMap->size())
+    if (!eventMap->empty())
         LOG(VB_EIT, LOG_INFO, LOC + QString("Loaded %1 entries for channel %2")
                 .arg(eventMap->size()).arg(chanid));
 

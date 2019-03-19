@@ -1250,7 +1250,7 @@ bool MythUIButtonList::DistributeButtons(void)
 
 void MythUIButtonList::CalculateButtonPositions(void)
 {
-    if (m_ButtonList.size() == 0)
+    if (m_ButtonList.empty())
         return;
 
     int button = 0;
@@ -1671,8 +1671,7 @@ bool MythUIButtonList::IsEmpty() const
 {
     if (m_itemCount > 0)
         return false;
-    else
-        return true;
+    return true;
 }
 
 MythUIButtonListItem *MythUIButtonList::GetItemAt(int pos) const
@@ -2932,7 +2931,8 @@ bool MythUIButtonList::ParseElement(
 /**
  *  \copydoc MythUIType::DrawSelf()
  */
-void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
+void MythUIButtonList::DrawSelf(MythPainter * /*p*/, int /*xoffset*/, int /*yoffset*/,
+                                int /*alphaMod*/, QRect /*clipRect*/)
 {
     if (m_needsUpdate)
     {
@@ -3298,10 +3298,9 @@ QString MythUIButtonListItem::GetText(const QString &name) const
 {
     if (name.isEmpty())
         return m_text;
-    else if (m_strings.contains(name))
+    if (m_strings.contains(name))
         return m_strings[name].text;
-    else
-        return QString();
+    return QString();
 }
 
 bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fieldList,
@@ -3311,10 +3310,9 @@ bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fie
     {
         if (startsWith)
             return m_text.startsWith(searchStr, Qt::CaseInsensitive);
-        else
-            return m_text.contains(searchStr, Qt::CaseInsensitive);
+        return m_text.contains(searchStr, Qt::CaseInsensitive);
     }
-    else if (fieldList == "**ALL**")
+    if (fieldList == "**ALL**")
     {
         if (startsWith)
         {
@@ -3576,8 +3574,7 @@ bool MythUIButtonListItem::MoveUpDown(bool flag)
 {
     if (m_parent)
         return m_parent->MoveItemUpDown(this, flag);
-    else
-        return false;
+    return false;
 }
 
 void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selected)

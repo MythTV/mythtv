@@ -381,11 +381,9 @@ QString MythScreenStack::GetLocation(bool fullPath) const
         }
         return path;
     }
-    else
-    {
-        if (m_topScreen)
-            return m_topScreen->objectName();
-    }
+
+    if (m_topScreen)
+        return m_topScreen->objectName();
 
     return QString();
 }

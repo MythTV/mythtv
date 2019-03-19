@@ -59,8 +59,7 @@ MainVisual::~MainVisual()
     m_updateTimer->stop();
     delete m_updateTimer;
 
-    if (m_vis)
-        delete m_vis;
+    delete m_vis;
 
     while (!m_nodes.empty())
         delete m_nodes.takeLast();

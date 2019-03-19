@@ -769,8 +769,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
 
 TemplateFinder::~TemplateFinder(void)
 {
-    if (scores)
-        delete []scores;
+    delete []scores;
     av_freep(&m_tmpl.data[0]);
     av_freep(&m_cropped.data[0]);
 }

@@ -32,8 +32,8 @@ public:
 
     /* BlankFrameDetector interface. */
     const FrameAnalyzer::FrameMap *getBlanks(void) const { return &m_blankMap; }
-    int computeForLogoSurplus(const TemplateMatcher *tm);
-    int computeForLogoDeficit(const TemplateMatcher *tm);
+    int computeForLogoSurplus(const TemplateMatcher *templateMatcher);
+    int computeForLogoDeficit(const TemplateMatcher *templateMatcher);
     int computeBreaks(FrameMap *breaks);
 
 private:

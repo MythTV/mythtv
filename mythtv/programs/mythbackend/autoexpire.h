@@ -64,7 +64,7 @@ class AutoExpire : public QObject
 
     friend class ExpireThread;
   public:
-    explicit AutoExpire(QMap<int, EncoderLink *> *encoderList);
+    explicit AutoExpire(QMap<int, EncoderLink *> *tvList);
     AutoExpire() = default;
    ~AutoExpire();
 

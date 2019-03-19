@@ -248,14 +248,10 @@ class VDPAUVideoMixer : public VDPAUResource
 
    ~VDPAUVideoMixer()
     {
-        if (m_noise_reduction)
-            delete m_noise_reduction;
-        if (m_sharpness)
-            delete m_sharpness;
-        if (m_skip_chroma)
-            delete m_skip_chroma;
-        if (m_background)
-            delete m_background;
+        delete m_noise_reduction;
+        delete m_sharpness;
+        delete m_skip_chroma;
+        delete m_background;
     }
 
     uint            m_layers          {0};
@@ -330,8 +326,8 @@ bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
 {
     int mbs = ceil((double)width / 16.0);
     // see Appendix H of the NVIDIA proprietary driver README
-    int check = (mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
-                (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128);
+    bool check = (mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
+                 (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128);
     if (!check)
         return true;
 
@@ -351,8 +347,7 @@ bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
     LOG(VB_GENERAL, (supported ? LOG_INFO : LOG_WARNING), LOC +
         QString("Hardware decoding of this H.264 video is %1supported "
                 "on this video card.").arg(supported ? "" : "NOT "));
-    if (dummy)
-        delete dummy;
+    delete dummy;
     return supported;
 }
 
@@ -1964,7 +1959,7 @@ void MythRenderVDPAU::DestroyOutputSurfaces(void)
     if (!vdp_output_surface_destroy)
         return;
 
-    if (m_outputSurfaces.size())
+    if (!m_outputSurfaces.empty())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned output surfaces.");
 
     INIT_ST
@@ -1982,7 +1977,7 @@ void MythRenderVDPAU::DestroyVideoSurfaces(void)
     if (!vdp_video_surface_destroy)
         return;
 
-    if (m_videoSurfaces.size())
+    if (!m_videoSurfaces.empty())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned video surfaces.");
 
     INIT_ST
@@ -1998,7 +1993,7 @@ void MythRenderVDPAU::DestroyVideoSurfaces(void)
 
 void MythRenderVDPAU::DestroyLayers(void)
 {
-    if (m_layers.size())
+    if (!m_layers.empty())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned layers.");
     m_layers.clear();
 }
@@ -2008,7 +2003,7 @@ void MythRenderVDPAU::DestroyBitmapSurfaces(void)
     if (!vdp_bitmap_surface_destroy)
         return;
 
-    if (m_bitmapSurfaces.size())
+    if (!m_bitmapSurfaces.empty())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned bitmap surfaces.");
 
     INIT_ST
@@ -2026,7 +2021,7 @@ void MythRenderVDPAU::DestroyDecoders(void)
     if (!vdp_decoder_destroy)
         return;
 
-    if (m_decoders.size())
+    if (!m_decoders.empty())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned decoders.");
 
     INIT_ST
@@ -2044,7 +2039,7 @@ void MythRenderVDPAU::DestroyVideoMixers(void)
     if (!vdp_video_mixer_destroy)
         return;
 
-    if (m_videoMixers.size())
+    if (!m_videoMixers.empty())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned video mixers.");
 
     INIT_ST
@@ -2088,7 +2083,7 @@ void MythRenderVDPAU::Preempted(void)
     if (ok && m_window) ok = SetColorKey(m_colorKey);
     if (ok) ok = RegisterCallback();
 
-    if (ok && m_outputSurfaces.size())
+    if (ok && !m_outputSurfaces.empty())
     {
         // also need to update output surfaces referenced in VdpLayer structs
         QHash<uint ,uint> old_surfaces;
@@ -2115,7 +2110,7 @@ void MythRenderVDPAU::Preempted(void)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created output surfaces.");
     }
 
-    if (ok && m_bitmapSurfaces.size())
+    if (ok && !m_bitmapSurfaces.empty())
     {
         QHash<uint, VDPAUBitmapSurface>::iterator it;
         for (it = m_bitmapSurfaces.begin(); it != m_bitmapSurfaces.end(); ++it)
@@ -2130,7 +2125,7 @@ void MythRenderVDPAU::Preempted(void)
 
     }
 
-    if (ok && m_decoders.size())
+    if (ok && !m_decoders.empty())
     {
         QHash<uint, VDPAUDecoder>::iterator it;
         for (it = m_decoders.begin(); it != m_decoders.end(); ++it)
@@ -2144,7 +2139,7 @@ void MythRenderVDPAU::Preempted(void)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created decoders.");
     }
 
-    if (ok && m_videoMixers.size())
+    if (ok && !m_videoMixers.empty())
     {
         QHash<uint, VDPAUVideoMixer>::iterator it;
         for (it = m_videoMixers.begin(); it != m_videoMixers.end(); ++it)

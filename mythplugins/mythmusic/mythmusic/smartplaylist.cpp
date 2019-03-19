@@ -361,8 +361,7 @@ SmartPlaylistEditor::~SmartPlaylistEditor(void)
         m_criteriaRows.pop_back();
     }
 
-    if (m_tempCriteriaRow)
-        delete m_tempCriteriaRow;
+    delete m_tempCriteriaRow;
 }
 
 
@@ -583,9 +582,7 @@ void SmartPlaylistEditor::addCriteria(void)
     editCriteria();
     */
 
-    if (m_tempCriteriaRow)
-        delete m_tempCriteriaRow;
-
+    delete m_tempCriteriaRow;
     m_tempCriteriaRow = new SmartPLCriteriaRow();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -718,7 +715,7 @@ void SmartPlaylistEditor::updateMatches(void)
 
     m_matchesText->SetText(QString::number(m_matchesCount));
 
-    m_playlistIsValid = (m_criteriaRows.size() > 0);
+    m_playlistIsValid = !m_criteriaRows.empty();
     m_showResultsButton->SetEnabled((m_matchesCount > 0));
     titleChanged();
 }
@@ -982,7 +979,7 @@ QString SmartPlaylistEditor::getOrderByClause(void)
 
 QString SmartPlaylistEditor::getWhereClause(void)
 {
-    if (m_criteriaRows.size() == 0)
+    if (m_criteriaRows.empty())
         return QString();
 
     bool bFirst = true;

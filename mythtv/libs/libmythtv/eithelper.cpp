@@ -25,11 +25,11 @@ const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::s_eitcache = new EITCache();
 
 static uint get_chan_id_from_db_atsc(uint sourceid,
-                                     uint atscmajor, uint atscminor);
+                                     uint atsc_major, uint atsc_minor);
 static uint get_chan_id_from_db_dvb(uint sourceid,  uint serviceid,
                                     uint networkid, uint transportid);
 static uint get_chan_id_from_db_dtv(uint sourceid,
-                                    uint programnumber, uint tunedchanid);
+                                    uint serviceid, uint tunedchanid);
 static void init_fixup(FixupMap &fix);
 
 #define LOC QString("EITHelper: ")
@@ -46,7 +46,7 @@ EITHelper::EITHelper() :
 EITHelper::~EITHelper()
 {
     QMutexLocker locker(&eitList_lock);
-    while (db_events.size())
+    while (!db_events.empty())
         delete db_events.dequeue();
 
     delete eitfixup;
@@ -72,7 +72,7 @@ uint EITHelper::ProcessEvents(void)
         return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    for (uint i = 0; (i < kChunkSize) && (db_events.size() > 0); i++)
+    for (uint i = 0; (i < kChunkSize) && (!db_events.empty()); i++)
     {
         DBEventEIT *event = db_events.dequeue();
         eitList_lock.unlock();
@@ -89,7 +89,7 @@ uint EITHelper::ProcessEvents(void)
     if (!insertCount)
         return 0;
 
-    if (incomplete_events.size() || unmatched_etts.size())
+    if (!incomplete_events.empty() || !unmatched_etts.empty())
     {
         LOG(VB_EIT, LOG_INFO,
             LOC + QString("Added %1 events -- complete(%2) "
@@ -207,8 +207,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                   ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
             }
 
-            if ((*it).m_desc)
-                delete [] (*it).m_desc;
+            delete [] (*it).m_desc;
 
             (*eits_it).erase(it);
 

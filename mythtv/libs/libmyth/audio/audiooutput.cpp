@@ -115,7 +115,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         return nullptr;
 #endif
     }
-    else if (main_device.startsWith("NULL"))
+    if (main_device.startsWith("NULL"))
     {
         return new AudioOutputNULL(settings);
     }
@@ -320,11 +320,8 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     {
         if (!willsuspendpa)
             return nullptr;
-        else
-        {
-            QString msg = tr("Invalid or unuseable audio device");
-            return new AudioOutput::AudioDeviceConfig(name, msg);
-        }
+        QString msg = tr("Invalid or unuseable audio device");
+        return new AudioOutput::AudioDeviceConfig(name, msg);
     }
 
     QString capabilities = desc;

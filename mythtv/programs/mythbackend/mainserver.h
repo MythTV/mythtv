@@ -138,7 +138,7 @@ class MainServer : public QObject, public MythSocketCBs
     void connected(MythSocket *socket) override // MythSocketCBs
         { (void)socket; }
 
-    void DeletePBS(PlaybackSock *pbs);
+    void DeletePBS(PlaybackSock *sock);
 
     size_t GetCurrentMaxBitrate(void);
     void BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
@@ -192,7 +192,7 @@ class MainServer : public QObject, public MythSocketCBs
                                     PlaybackSock *pbs);
     bool HandleAddChildInput(uint inputid);
     void HandleGoToSleep(PlaybackSock *pbs);
-    void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
+    void HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts);
     void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs);

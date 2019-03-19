@@ -74,21 +74,21 @@ static inline int get_macroblock_modes (mpeg2_decoder_t * const decoder)
 		DUMPBITS (bit_buf, bits, 2);
 	    }
 	    return macroblock_modes | MACROBLOCK_MOTION_FORWARD;
-	} else if (decoder->frame_pred_frame_dct) {
+        }
+        if (decoder->frame_pred_frame_dct) {
 	    if (macroblock_modes & MACROBLOCK_MOTION_FORWARD)
 		macroblock_modes |= MC_FRAME << MOTION_TYPE_SHIFT;
 	    return macroblock_modes | MACROBLOCK_MOTION_FORWARD;
-	} else {
-	    if (macroblock_modes & MACROBLOCK_MOTION_FORWARD) {
-		macroblock_modes |= UBITS (bit_buf, 2) << MOTION_TYPE_SHIFT;
-		DUMPBITS (bit_buf, bits, 2);
-	    }
-	    if (macroblock_modes & (MACROBLOCK_INTRA | MACROBLOCK_PATTERN)) {
-		macroblock_modes |= UBITS (bit_buf, 1) * DCT_TYPE_INTERLACED;
-		DUMPBITS (bit_buf, bits, 1);
-	    }
-	    return macroblock_modes | MACROBLOCK_MOTION_FORWARD;
 	}
+        if (macroblock_modes & MACROBLOCK_MOTION_FORWARD) {
+            macroblock_modes |= UBITS (bit_buf, 2) << MOTION_TYPE_SHIFT;
+            DUMPBITS (bit_buf, bits, 2);
+        }
+        if (macroblock_modes & (MACROBLOCK_INTRA | MACROBLOCK_PATTERN)) {
+            macroblock_modes |= UBITS (bit_buf, 1) * DCT_TYPE_INTERLACED;
+            DUMPBITS (bit_buf, bits, 1);
+        }
+        return macroblock_modes | MACROBLOCK_MOTION_FORWARD;
 
     case B_TYPE:
 
@@ -102,22 +102,22 @@ static inline int get_macroblock_modes (mpeg2_decoder_t * const decoder)
 		DUMPBITS (bit_buf, bits, 2);
 	    }
 	    return macroblock_modes;
-	} else if (decoder->frame_pred_frame_dct) {
+        }
+        if (decoder->frame_pred_frame_dct) {
 	    /* if (! (macroblock_modes & MACROBLOCK_INTRA)) */
 	    macroblock_modes |= MC_FRAME << MOTION_TYPE_SHIFT;
 	    return macroblock_modes;
-	} else {
-	    if (macroblock_modes & MACROBLOCK_INTRA)
-		goto intra;
-	    macroblock_modes |= UBITS (bit_buf, 2) << MOTION_TYPE_SHIFT;
-	    DUMPBITS (bit_buf, bits, 2);
-	    if (macroblock_modes & (MACROBLOCK_INTRA | MACROBLOCK_PATTERN)) {
-	    intra:
-		macroblock_modes |= UBITS (bit_buf, 1) * DCT_TYPE_INTERLACED;
-		DUMPBITS (bit_buf, bits, 1);
-	    }
-	    return macroblock_modes;
 	}
+        if (macroblock_modes & MACROBLOCK_INTRA)
+            goto intra;
+        macroblock_modes |= UBITS (bit_buf, 2) << MOTION_TYPE_SHIFT;
+        DUMPBITS (bit_buf, bits, 2);
+        if (macroblock_modes & (MACROBLOCK_INTRA | MACROBLOCK_PATTERN)) {
+        intra:
+            macroblock_modes |= UBITS (bit_buf, 1) * DCT_TYPE_INTERLACED;
+            DUMPBITS (bit_buf, bits, 1);
+        }
+        return macroblock_modes;
 
     case D_TYPE:
 
@@ -170,7 +170,8 @@ static inline int get_motion_delta (mpeg2_decoder_t * const decoder,
     if (bit_buf & 0x80000000) {
 	DUMPBITS (bit_buf, bits, 1);
 	return 0;
-    } else if (bit_buf >= 0x0c000000) {
+    }
+    if (bit_buf >= 0x0c000000) {
 
 	tab = MV_4 + UBITS (bit_buf, 4);
 	delta = (tab->delta << f_code) + 1;
@@ -186,25 +187,24 @@ static inline int get_motion_delta (mpeg2_decoder_t * const decoder,
 
 	return (delta ^ sign) - sign;
 
-    } else {
-
-	tab = MV_10 + UBITS (bit_buf, 10);
-	delta = (tab->delta << f_code) + 1;
-	bits += tab->len + 1;
-	bit_buf <<= tab->len;
-
-	sign = SBITS (bit_buf, 1);
-	bit_buf <<= 1;
-
-	if (f_code) {
-	    NEEDBITS (bit_buf, bits, bit_ptr);
-	    delta += UBITS (bit_buf, f_code);
-	    DUMPBITS (bit_buf, bits, f_code);
-	}
-
-	return (delta ^ sign) - sign;
-
     }
+
+    tab = MV_10 + UBITS (bit_buf, 10);
+    delta = (tab->delta << f_code) + 1;
+    bits += tab->len + 1;
+    bit_buf <<= tab->len;
+
+    sign = SBITS (bit_buf, 1);
+    bit_buf <<= 1;
+
+    if (f_code) {
+        NEEDBITS (bit_buf, bits, bit_ptr);
+        delta += UBITS (bit_buf, f_code);
+        DUMPBITS (bit_buf, bits, f_code);
+    }
+
+    return (delta ^ sign) - sign;
+
 #undef bit_buf
 #undef bits
 #undef bit_ptr
@@ -247,13 +247,11 @@ static inline int get_coded_block_pattern (mpeg2_decoder_t * const decoder)
 	DUMPBITS (bit_buf, bits, tab->len);
 	return tab->cbp;
 
-    } else {
-
-	tab = CBP_9 + UBITS (bit_buf, 9);
-	DUMPBITS (bit_buf, bits, tab->len);
-	return tab->cbp;
     }
 
+    tab = CBP_9 + UBITS (bit_buf, 9);
+    DUMPBITS (bit_buf, bits, tab->len);
+    return tab->cbp;
 #undef bit_buf
 #undef bits
 #undef bit_ptr
@@ -278,19 +276,17 @@ static inline int get_luma_dc_dct_diff (mpeg2_decoder_t * const decoder)
 		UBITS (bit_buf, size) - UBITS (SBITS (~bit_buf, 1), size);
 	    bit_buf <<= size;
 	    return dc_diff << decoder->intra_dc_precision;
-	} else {
-	    DUMPBITS (bit_buf, bits, 3);
-	    return 0;
 	}
-    } else {
-	tab = DC_long + (UBITS (bit_buf, 9) - 0x1e0);
-	size = tab->size;
-	DUMPBITS (bit_buf, bits, tab->len);
-	NEEDBITS (bit_buf, bits, bit_ptr);
-	dc_diff = UBITS (bit_buf, size) - UBITS (SBITS (~bit_buf, 1), size);
-	DUMPBITS (bit_buf, bits, size);
-	return dc_diff << decoder->intra_dc_precision;
+        DUMPBITS (bit_buf, bits, 3);
+        return 0;
     }
+    tab = DC_long + (UBITS (bit_buf, 9) - 0x1e0);
+    size = tab->size;
+    DUMPBITS (bit_buf, bits, tab->len);
+    NEEDBITS (bit_buf, bits, bit_ptr);
+    dc_diff = UBITS (bit_buf, size) - UBITS (SBITS (~bit_buf, 1), size);
+    DUMPBITS (bit_buf, bits, size);
+    return dc_diff << decoder->intra_dc_precision;
 #undef bit_buf
 #undef bits
 #undef bit_ptr
@@ -315,19 +311,17 @@ static inline int get_chroma_dc_dct_diff (mpeg2_decoder_t * const decoder)
 		UBITS (bit_buf, size) - UBITS (SBITS (~bit_buf, 1), size);
 	    bit_buf <<= size;
 	    return dc_diff << decoder->intra_dc_precision;
-	} else {
-	    DUMPBITS (bit_buf, bits, 2);
-	    return 0;
 	}
-    } else {
-	tab = DC_long + (UBITS (bit_buf, 10) - 0x3e0);
-	size = tab->size;
-	DUMPBITS (bit_buf, bits, tab->len + 1);
-	NEEDBITS (bit_buf, bits, bit_ptr);
-	dc_diff = UBITS (bit_buf, size) - UBITS (SBITS (~bit_buf, 1), size);
-	DUMPBITS (bit_buf, bits, size);
-	return dc_diff << decoder->intra_dc_precision;
+        DUMPBITS (bit_buf, bits, 2);
+        return 0;
     }
+    tab = DC_long + (UBITS (bit_buf, 10) - 0x3e0);
+    size = tab->size;
+    DUMPBITS (bit_buf, bits, tab->len + 1);
+    NEEDBITS (bit_buf, bits, bit_ptr);
+    dc_diff = UBITS (bit_buf, size) - UBITS (SBITS (~bit_buf, 1), size);
+    DUMPBITS (bit_buf, bits, size);
+    return dc_diff << decoder->intra_dc_precision;
 #undef bit_buf
 #undef bits
 #undef bit_ptr
@@ -390,7 +384,8 @@ static void get_intra_block_B14 (mpeg2_decoder_t * const decoder,
 
 	    continue;
 
-	} else if (bit_buf >= 0x04000000) {
+        }
+        if (bit_buf >= 0x04000000) {
 
 	    tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
 
@@ -419,7 +414,8 @@ static void get_intra_block_B14 (mpeg2_decoder_t * const decoder,
 
 	    continue;
 
-	} else if (bit_buf >= 0x02000000) {
+        }
+        if (bit_buf >= 0x02000000) {
 	    tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
 	    i += tab->run;
 	    if (i < 64)
@@ -500,36 +496,35 @@ static void get_intra_block_B15 (mpeg2_decoder_t * const decoder,
 
 		continue;
 
-	    } else {
-
-		/* end of block. I commented out this code because if we */
-		/* dont exit here we will still exit at the later test :) */
-
-		/* if (i >= 128) break;	*/	/* end of block */
-
-		/* escape code */
-
-		i += UBITS (bit_buf << 6, 6) - 64;
-		if (i >= 64)
-		    break;	/* illegal, check against buffer overflow */
-
-		j = scan[i];
-
-		DUMPBITS (bit_buf, bits, 12);
-		NEEDBITS (bit_buf, bits, bit_ptr);
-		val = (SBITS (bit_buf, 12) * quant_matrix[j]) / 16;
-
-		SATURATE (val);
-		dest[j] = val;
-		mismatch ^= val;
-
-		DUMPBITS (bit_buf, bits, 12);
-		NEEDBITS (bit_buf, bits, bit_ptr);
-
-		continue;
-
 	    }
-	} else if (bit_buf >= 0x02000000) {
+
+            /* end of block. I commented out this code because if we */
+            /* dont exit here we will still exit at the later test :) */
+
+            /* if (i >= 128) break;	*/	/* end of block */
+
+            /* escape code */
+
+            i += UBITS (bit_buf << 6, 6) - 64;
+            if (i >= 64)
+                break;	/* illegal, check against buffer overflow */
+
+            j = scan[i];
+
+            DUMPBITS (bit_buf, bits, 12);
+            NEEDBITS (bit_buf, bits, bit_ptr);
+            val = (SBITS (bit_buf, 12) * quant_matrix[j]) / 16;
+
+            SATURATE (val);
+            dest[j] = val;
+            mismatch ^= val;
+
+            DUMPBITS (bit_buf, bits, 12);
+            NEEDBITS (bit_buf, bits, bit_ptr);
+
+            continue;
+        }
+        if (bit_buf >= 0x02000000) {
 	    tab = DCT_B15_10 + (UBITS (bit_buf, 10) - 8);
 	    i += tab->run;
 	    if (i < 64)
@@ -733,7 +728,8 @@ static void get_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
 
 	    continue;
 
-	} else if (bit_buf >= 0x04000000) {
+        }
+        if (bit_buf >= 0x04000000) {
 
 	    tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
 
@@ -769,7 +765,8 @@ static void get_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
 
 	    continue;
 
-	} else if (bit_buf >= 0x02000000) {
+        }
+        if (bit_buf >= 0x02000000) {
 	    tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
 	    i += tab->run;
 	    if (i < 64)
@@ -1735,10 +1732,12 @@ static inline int slice_init (mpeg2_decoder_t * const decoder, int code)
 	if (bit_buf >= 0x08000000) {
 	    mba = MBA_5 + (UBITS (bit_buf, 6) - 2);
 	    break;
-	} else if (bit_buf >= 0x01800000) {
+        }
+        if (bit_buf >= 0x01800000) {
 	    mba = MBA_11 + (UBITS (bit_buf, 12) - 24);
 	    break;
-	} else switch (UBITS (bit_buf, 12)) {
+        }
+        switch (UBITS (bit_buf, 12)) {
 	case 8:		/* macroblock_escape */
 	    offset += 33;
 	    DUMPBITS (bit_buf, bits, 11);
@@ -2016,10 +2015,12 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 	    if (bit_buf >= 0x10000000) {
 		mba = MBA_5 + (UBITS (bit_buf, 5) - 2);
 		break;
-	    } else if (bit_buf >= 0x03000000) {
+            }
+            if (bit_buf >= 0x03000000) {
 		mba = MBA_11 + (UBITS (bit_buf, 11) - 24);
 		break;
-	    } else switch (UBITS (bit_buf, 11)) {
+            }
+            switch (UBITS (bit_buf, 11)) {
 	    case 8:		/* macroblock_escape */
 		mba_inc += 33;
 		/* pass through */

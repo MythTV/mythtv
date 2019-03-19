@@ -61,10 +61,8 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
                 .arg(m_width).arg(m_height));
         return -1;
     }
-    if (m_copy)
-    {
-        delete m_copy;
-    }
+
+    delete m_copy;
     m_copy = new MythAVCopy;
     LOG(VB_COMMFLAG, LOG_INFO, QString("PGMConverter::MythPlayerInited "
                                        "using true greyscale conversion"));

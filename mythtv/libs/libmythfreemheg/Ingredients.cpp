@@ -341,7 +341,7 @@ void MHSetData::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-void MHSetData::PrintArgs(FILE *fd, int) const
+void MHSetData::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     if (m_fIsIncluded)
     {

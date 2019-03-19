@@ -786,8 +786,7 @@ void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 
     MythUIImage *tmp = m_recImages[recType];
     m_recImages[recType] = uiimage;
-    if (tmp)
-        delete tmp;
+    delete tmp;
 }
 
 void MythUIGuideGrid::SetArrow(int direction, const QString &file)
@@ -799,8 +798,7 @@ void MythUIGuideGrid::SetArrow(int direction, const QString &file)
 
     MythUIImage *tmp = m_arrowImages[direction];
     m_arrowImages[direction] = uiimage;
-    if (tmp)
-        delete tmp;
+    delete tmp;
 }
 
 void MythUIGuideGrid::ResetData(void)

@@ -361,10 +361,9 @@ static void UpdateGameCounts(QStringList updatelist)
                 else
                 {
                     if (basename == lastrom)
-                            updateDisplayRom(RomName,0,System);
-                        else
-                            lastrom = basename;
-
+                        updateDisplayRom(RomName,0,System);
+                    else
+                        lastrom = basename;
                 }
             }
         }
@@ -572,27 +571,25 @@ int GameHandler::buildFileCount(QString directory, GameHandler *handler)
             filecount += buildFileCount(Info.filePath(), handler);
             continue;
         }
-        else
+
+        if (handler->m_validextensions.count() > 0)
         {
-            if (handler->m_validextensions.count() > 0)
+            QRegExp r;
+
+            r.setPattern("^" + Info.suffix() + "$");
+            r.setCaseSensitivity(Qt::CaseInsensitive);
+            QStringList result;
+            for (int x = 0; x < handler->m_validextensions.size(); x++)
             {
-                QRegExp r;
-
-                r.setPattern("^" + Info.suffix() + "$");
-                r.setCaseSensitivity(Qt::CaseInsensitive);
-                QStringList result;
-                for (int x = 0; x < handler->m_validextensions.size(); x++)
-                {
-                    QString extension = handler->m_validextensions.at(x);
-                    if (extension.contains(r))
-                        result.append(extension);
-                }
-                if (result.isEmpty())
-                    continue;
+                QString extension = handler->m_validextensions.at(x);
+                if (extension.contains(r))
+                    result.append(extension);
             }
-
-            filecount++;
+            if (result.isEmpty())
+                continue;
         }
+
+        filecount++;
     }
 
     return filecount;
@@ -640,38 +637,34 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
             buildFileList(Info.filePath(), handler, filecount);
             continue;
         }
-        else
+
+        if (handler->m_validextensions.count() > 0)
         {
+            QRegExp r;
 
-            if (handler->m_validextensions.count() > 0)
+            r.setPattern("^" + Info.suffix() + "$");
+            r.setCaseSensitivity(Qt::CaseInsensitive);
+            QStringList result;
+            for (int x = 0; x < handler->m_validextensions.size(); x++)
             {
-                QRegExp r;
-
-                r.setPattern("^" + Info.suffix() + "$");
-                r.setCaseSensitivity(Qt::CaseInsensitive);
-                QStringList result;
-                for (int x = 0; x < handler->m_validextensions.size(); x++)
-                {
-                    QString extension = handler->m_validextensions.at(x);
-                    if (extension.contains(r))
-                        result.append(extension);
-                }
-
-                if (result.isEmpty())
-                    continue;
+                QString extension = handler->m_validextensions.at(x);
+                if (extension.contains(r))
+                    result.append(extension);
             }
 
-            m_GameMap[RomName] = GameScan(RomName,Info.filePath(),inFileSystem,
-                                 GameName, Info.absoluteDir().path());
-
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found ROM : (%1) - %2")
-                    .arg(handler->SystemName()).arg(RomName));
-
-            *filecount = *filecount + 1;
-            if (m_progressDlg)
-                m_progressDlg->SetProgress(*filecount);
-
+            if (result.isEmpty())
+                continue;
         }
+
+        m_GameMap[RomName] = GameScan(RomName,Info.filePath(),inFileSystem,
+                                      GameName, Info.absoluteDir().path());
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found ROM : (%1) - %2")
+            .arg(handler->SystemName()).arg(RomName));
+
+        *filecount = *filecount + 1;
+        if (m_progressDlg)
+            m_progressDlg->SetProgress(*filecount);
     }
 }
 

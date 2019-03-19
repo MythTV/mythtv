@@ -34,7 +34,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     using MPEGStreamData::Reset;
     void Reset(void) override // MPEGStreamData
         { Reset(0, 0, -1); }
-    void Reset(uint desired_netid, uint desired_tsid, int desired_sid);
+    void Reset(uint desired_netid, uint desired_tsid, int desired_serviceid);
 
     // DVB table monitoring
     void SetDesiredService(uint netid, uint tsid, int serviceid);
@@ -54,7 +54,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     inline bool HasAnyEIT(void) const;
     inline bool HasEIT(uint serviceid) const;
     bool HasEITPIDChanges(const uint_vec_t &in_use_pids) const override; // MPEGStreamData
-    bool GetEITPIDChanges(const uint_vec_t &in_use_pids,
+    bool GetEITPIDChanges(const uint_vec_t &cur_pids,
                           uint_vec_t &add_pids,
                           uint_vec_t &del_pids) const override; // MPEGStreamData
 

@@ -167,18 +167,14 @@ static int QueueCommFlagJob(uint chanid, QDateTime starttime, bool rebuild)
         }
         return GENERIC_EXIT_OK;
     }
-    else
-    {
-        if (progress)
-        {
-            QString tmp = QString("Error queueing job for chanid %1 @ %2")
-                .arg(chanid).arg(startstring);
-            cerr << tmp.toLocal8Bit().constData() << endl;
-        }
-        return GENERIC_EXIT_DB_ERROR;
-    }
 
-    return GENERIC_EXIT_OK;
+    if (progress)
+    {
+        QString tmp = QString("Error queueing job for chanid %1 @ %2")
+            .arg(chanid).arg(startstring);
+        cerr << tmp.toLocal8Bit().constData() << endl;
+    }
+    return GENERIC_EXIT_DB_ERROR;
 }
 
 static int CopySkipListToCutList(uint chanid, QDateTime starttime)
@@ -817,7 +813,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     // if selection has failed, or intentionally disabled, drop out
     if (commDetectMethod == COMM_DETECT_UNINIT)
         return GENERIC_EXIT_NOT_OK;
-    else if (commDetectMethod == COMM_DETECT_OFF)
+    if (commDetectMethod == COMM_DETECT_OFF)
         return GENERIC_EXIT_OK;
 
     frm_dir_map_t blanks;

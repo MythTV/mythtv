@@ -1425,13 +1425,13 @@ RecordingProfile::~RecordingProfile(void)
 #endif
 }
 
-void RecordingProfile::ResizeTranscode(const QString &)
+void RecordingProfile::ResizeTranscode(const QString & /*val*/)
 {
     if (m_imageSize)
         m_imageSize->setEnabled(m_trResize->boolValue());
 }
 
-void RecordingProfile::SetLosslessTranscode(const QString &)
+void RecordingProfile::SetLosslessTranscode(const QString & /*val*/)
 {
     bool lossless = m_trLossless->boolValue();
     bool show_size = (lossless) ? false : m_trResize->boolValue();
@@ -1588,8 +1588,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                 QStringList::iterator Idev = devices.begin();
                 for ( ; Idev != devices.end(); ++Idev)
                 {
-                    if (m_v4l2util)
-                        delete m_v4l2util;
+                    delete m_v4l2util;
                     m_v4l2util = new V4L2util(*Idev);
                     if (m_v4l2util->IsOpen() &&
                         m_v4l2util->DriverName() == type.mid(5))
@@ -1759,7 +1758,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
         MythDB::DBError("RecordingProfile::fillSelections 1", result);
         return;
     }
-    else if (!result.next())
+    if (!result.next())
     {
         return;
     }
@@ -1833,7 +1832,7 @@ QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
         MythDB::DBError("RecordingProfile::GetProfileMap()", query);
         return profiles;
     }
-    else if (!query.next())
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "RecordingProfile::fillselections, Warning: "

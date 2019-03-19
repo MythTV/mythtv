@@ -1020,7 +1020,7 @@ int verboseArgParse(QString arg)
             verboseHelp();
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (option == "important")
+        if (option == "important")
         {
             cerr << "The \"important\" log mask is no longer valid.\n";
         }

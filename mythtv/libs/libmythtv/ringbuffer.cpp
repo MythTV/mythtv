@@ -178,7 +178,7 @@ RingBuffer *RingBuffer::Create(
 
         return new DVDRingBuffer(lfilename);
     }
-    else if (!stream_only && (bdurl || bddir))
+    if (!stream_only && (bdurl || bddir))
     {
         if (lfilename.startsWith("bd:"))        // URI "bd:" + path
             lfilename.remove(0,3);             // e.g. "bd:/videos/ET"
@@ -1507,7 +1507,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
         m_rwLock.unlock();
         return count;
     }
-    else if (count <= 0)
+    if (count <= 0)
     {
         // If we're not at the end of file but have no data
         // at this point time out and shutdown read ahead.
@@ -1605,11 +1605,11 @@ QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
     {
         return "-";
     }
-    else if (rate > 1000000000)
+    if (rate > 1000000000)
     {
         return QObject::tr(">1Gbps");
     }
-    else if (rate >= 1000000)
+    if (rate >= 1000000)
     {
         msg = hz ? QObject::tr("%1MHz") : QObject::tr("%1Mbps");
         bitrate  = (float)rate / (1000000.0f);

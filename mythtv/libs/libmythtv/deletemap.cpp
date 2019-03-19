@@ -508,8 +508,8 @@ void DeleteMap::MoveRelative(uint64_t frame, bool right)
             // instead, "move" this mark onto itself
             return;
         }
-        else if (((MARK_CUT_START == type) && right) ||
-                 ((MARK_CUT_END == type) && !right))
+        if (((MARK_CUT_START == type) && right) ||
+            ((MARK_CUT_END == type) && !right))
         {
             // If on a mark, don't collapse a cut region to 0;
             // instead, delete the region
@@ -517,7 +517,7 @@ void DeleteMap::MoveRelative(uint64_t frame, bool right)
             Delete(frame, tr("Delete"));
             return;
         }
-        else if (MARK_PLACEHOLDER == type)
+        if (MARK_PLACEHOLDER == type)
         {
             // Delete the temporary mark before putting a real mark at its
             // location

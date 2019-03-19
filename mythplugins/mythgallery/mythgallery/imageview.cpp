@@ -355,10 +355,7 @@ double ImageView::GetSeasonalWeight(ThumbItem *item) {
             LEADING_BETA_SHAPE - 1);
         return weight;
     }
-    else
-    {
-        return DEFAULT_WEIGHT;
-    }
+    return DEFAULT_WEIGHT;
 }
 
 ImageView::LoadAlbumRunnable::LoadAlbumRunnable(

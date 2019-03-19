@@ -54,7 +54,7 @@ QMap<uint,TVRec*> TVRec::s_inputs;
 static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
-static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*);
+static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/);
 static int eit_start_rand(int eitTransportTimeout);
 
 /** \class TVRec
@@ -324,8 +324,7 @@ void TVRec::SetPseudoLiveTVRecording(RecordingInfo *pi)
 {
     RecordingInfo *old_rec = m_pseudoLiveTVRecording;
     m_pseudoLiveTVRecording = pi;
-    if (old_rec)
-        delete old_rec;
+    delete old_rec;
 }
 
 /** \fn TVRec::GetRecordEndTime(const ProgramInfo*) const
@@ -1199,7 +1198,7 @@ static bool get_use_eit(uint inputid)
         MythDB::DBError("get_use_eit", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toBool();
     return false;
 }
@@ -1219,7 +1218,7 @@ static bool is_dishnet_eit(uint inputid)
         MythDB::DBError("is_dishnet_eit", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toBool();
     return false;
 }
@@ -1239,7 +1238,7 @@ static int num_inputs(void)
         MythDB::DBError("num_inputs", query);
         return -1;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toInt();
     return -1;
 }
@@ -3479,7 +3478,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
  */
 void TVRec::HandleTuning(void)
 {
-    if (m_tuningRequests.size())
+    if (!m_tuningRequests.empty())
     {
         TuningRequest request = m_tuningRequests.front();
         LOG(VB_RECORD, LOG_INFO, LOC +
@@ -3727,11 +3726,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                 m_tuningRequests.enqueue(TuningRequest(kFlagKillRec));
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to set channel to %1.").arg(channum));
-        }
+
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to set channel to %1.").arg(channum));
     }
 
 
@@ -3782,7 +3779,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         LOG(VB_RECORD, LOG_INFO, LOC + "Starting Signal Monitor");
         bool error = false;
         if (!SetupSignalMonitor(
-                !antadj, request.flags & kFlagEITScan, livetv | antadj))
+                !antadj, request.flags & kFlagEITScan, livetv || antadj))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup signal monitor");
             if (m_signalMonitor)
@@ -4799,16 +4796,14 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
             "Failed to create new RB.");
         return nullptr;
     }
-    else
-    {
-        m_recorder->SetNextRecording(ri, rb);
-        SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
-        m_recordEndTime = GetRecordEndTime(ri);
-        m_switchingBuffer = true;
-        ri->SetRecordingStatus(RecStatus::Recording);
-        LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
-        return ri;
-    }
+
+    m_recorder->SetNextRecording(ri, rb);
+    SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
+    m_recordEndTime = GetRecordEndTime(ri);
+    m_switchingBuffer = true;
+    ri->SetRecordingStatus(RecStatus::Recording);
+    LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
+    return ri;
 }
 
 TVRec* TVRec::GetTVRec(uint inputid)

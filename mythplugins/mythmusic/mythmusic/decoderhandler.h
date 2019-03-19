@@ -90,7 +90,7 @@ class DecoderHandler : public QObject, public MythObservable
     void customEvent(QEvent *e) override; // QObject
     bool done(void);
     bool next(void);
-    void error(const QString &msg);
+    void error(const QString &e);
 
     MusicMetadata& getMetadata() { return m_meta; }
 

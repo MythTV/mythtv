@@ -48,7 +48,7 @@ class NuppelDecoder : public DecoderBase
     // lastFrame is really (m_framesPlayed - 1) since we increment after getting
     bool IsLastFrameKey(void) const override // DecoderBase
         { return (m_lastKey == m_framesPlayed); }
-    void WriteStoredData(RingBuffer *rb, bool writevid,
+    void WriteStoredData(RingBuffer *rb, bool storevid,
                          long timecodeOffset) override; // DecoderBase
     void ClearStoredData(void) override; // DecoderBase
 
@@ -60,8 +60,8 @@ class NuppelDecoder : public DecoderBase
     MythCodecID GetVideoCodecID(void) const override; // DecoderBase
 
   private:
-    inline bool ReadFileheader(struct rtfileheader *fileheader);
-    inline bool ReadFrameheader(struct rtframeheader *frameheader);
+    inline bool ReadFileheader(struct rtfileheader *fh);
+    inline bool ReadFrameheader(struct rtframeheader *fh);
 
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *lstrm, VideoFrame *frame);
@@ -74,7 +74,7 @@ class NuppelDecoder : public DecoderBase
     void StoreRawData(unsigned char *strm);
 
     void SeekReset(long long newKey = 0, uint skipFrames = 0,
-                   bool needFlush = false, bool discardFrames = false) override; // DecoderBase
+                   bool doFlush = false, bool discardFrames = false) override; // DecoderBase
 
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
     friend void release_nuppel_buffer(void *opaque, uint8_t *data);

@@ -69,8 +69,7 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysinfo() error");
         return false;
     }
-    else
-        uptime = sinfo.uptime;
+    uptime = sinfo.uptime;
 
 #elif defined(__FreeBSD__) || CONFIG_DARWIN
 
@@ -88,8 +87,7 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
     }
-    else
-        uptime = time(nullptr) - bootTime.tv_sec;
+    uptime = time(nullptr) - bootTime.tv_sec;
 #elif defined(_WIN32)
     uptime = ::GetTickCount() / 1000;
 #else
@@ -925,7 +923,7 @@ void setHttpProxy(void)
         // via myth_system(command), by setting HTTP_PROXY
         QString url;
 
-        if (p.user().length())
+        if (!p.user().isEmpty())
             url = "http://%1:%2@%3:%4",
             url = url.arg(p.user()).arg(p.password());
         else
@@ -1134,19 +1132,19 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
                 {
                     break;
                 }
-                else if (!currA->isDigit())
+                if (!currA->isDigit())
                 {
                     return +1;
                 }
-                else if (!currB->isDigit())
+                if (!currB->isDigit())
                 {
                     return -1;
                 }
-                else if (*currA < *currB)
+                if (*currA < *currB)
                 {
                     return -1;
                 }
-                else if (*currA > *currB)
+                if (*currA > *currB)
                 {
                     return + 1;
                 }
@@ -1176,29 +1174,23 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
                     }
                     break;
                 }
-                else if (!currA->isDigit())
+                if (!currA->isDigit())
                 {
                     if (isFirstRun)
                     {
                         return *currA < *currB ? -1 : +1;
                     }
-                    else
-                    {
-                        return -1;
-                    }
+                    return -1;
                 }
-                else if (!currB->isDigit())
+                if (!currB->isDigit())
                 {
                     if (isFirstRun)
                     {
                         return *currA < *currB ? -1 : +1;
                     }
-                    else
-                    {
-                        return +1;
-                    }
+                    return +1;
                 }
-                else if ((*currA < *currB) && (weight == 0))
+                if ((*currA < *currB) && (weight == 0))
                 {
                     weight = -1;
                 }

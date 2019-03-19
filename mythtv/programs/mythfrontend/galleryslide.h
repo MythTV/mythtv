@@ -160,12 +160,12 @@ public:
     ~Slide();
 
     void      Clear();
-    bool      LoadSlide(ImagePtrK im, int direction = 0, bool waiting = false);
+    bool      LoadSlide(ImagePtrK im, int direction = 0, bool notifyCompletion = false);
     ImagePtrK GetImageData() const  { return m_data; }
     void      Zoom(int percentage);
     void      SetZoom(float);
-    void      Pan(QPoint distance);
-    void      SetPan(QPoint value);
+    void      Pan(QPoint offset);
+    void      SetPan(QPoint pos);
     bool      CanZoomIn() const     { return m_zoom < MAX_ZOOM; }
     bool      CanZoomOut() const    { return m_zoom > MIN_ZOOM; }
     bool      IsEmpty() const       { return m_state == kEmpty || !m_waitingFor; }

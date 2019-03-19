@@ -54,7 +54,7 @@ class MUI_PUBLIC MythRect : public QRect
     void moveTopLeft(const MythPoint &point);
     void moveLeft(const QString &sX);
     void moveLeft(int X) { QRect::moveLeft(X); }
-    void moveTop(const QString &sX);
+    void moveTop(const QString &sY);
     void moveTop(int Y) { QRect::moveTop(Y); }
 
     QString toString(bool details = false) const;

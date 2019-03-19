@@ -381,7 +381,7 @@ private:
     {
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "player");
-        if (!elems.size())
+        if (elems.empty())
             return QString();
 
         return elems.at(0).toElement().attribute("url");
@@ -392,7 +392,7 @@ private:
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "title");
 
-        if (!elems.size())
+        if (elems.empty())
             return QString();
 
         QDomElement telem = elems.at(0).toElement();
@@ -404,7 +404,7 @@ private:
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "description");
 
-        if (!elems.size())
+        if (elems.empty())
             return QString();
 
         QDomElement telem = elems.at(0).toElement();
@@ -416,7 +416,7 @@ private:
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "keywords");
 
-        if (!elems.size())
+        if (elems.empty())
             return QString();
 
         QDomElement telem = elems.at(0).toElement();
@@ -486,7 +486,7 @@ private:
         QList<QDomNode> commParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "comments");
 
-        if (commParents.size())
+        if (!commParents.empty())
         {
             QDomNodeList comments = commParents.at(0).toElement()
                 .elementsByTagNameNS(Parse::s_MediaRSS,
@@ -505,7 +505,7 @@ private:
         QList<QDomNode> respParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "responses");
 
-        if (respParents.size())
+        if (!respParents.empty())
         {
             QDomNodeList responses = respParents.at(0).toElement()
                 .elementsByTagNameNS(Parse::s_MediaRSS,
@@ -524,7 +524,7 @@ private:
         QList<QDomNode> backParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "backLinks");
 
-        if (backParents.size())
+        if (!backParents.empty())
         {
             QDomNodeList backlinks = backParents.at(0).toElement()
                 .elementsByTagNameNS(Parse::s_MediaRSS,
@@ -567,7 +567,7 @@ private:
         QList<QDomNode> scenesNode = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "scenes");
 
-        if (scenesNode.size())
+        if (!scenesNode.empty())
         {
             QDomNodeList scenesNodes = scenesNode.at(0).toElement()
                 .elementsByTagNameNS(Parse::s_MediaRSS, "scene");
@@ -597,7 +597,7 @@ private:
             QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
                 "rating");
 
-            if (elems.size())
+            if (!elems.empty())
             {
                 QDomElement relem = elems.at(0).toElement();
                 rating = relem.text();
@@ -614,7 +614,7 @@ private:
             QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
                 "copyright");
 
-            if (elems.size())
+            if (!elems.empty())
             {
                 QDomElement celem = elems.at(0).toElement();
                 ctext = celem.text();
@@ -633,7 +633,7 @@ private:
         {
             QList<QDomNode> comms = GetDirectChildrenNS(element, Parse::s_MediaRSS,
                 "community");
-            if (comms.size())
+            if (!comms.empty())
             {
                 QDomElement comm = comms.at(0).toElement();
                 QDomNodeList stars = comm.elementsByTagNameNS(Parse::s_MediaRSS,
@@ -884,12 +884,12 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
 
     QList<MRSSEntry> enclosures = GetMediaRSS(item);
 
-    if (enclosures.size())
+    if (!enclosures.empty())
     {
         MRSSEntry media = enclosures.takeAt(0);
 
         QList<MRSSThumbnail> thumbs = media.Thumbnails;
-        if (thumbs.size())
+        if (!thumbs.empty())
         {
             MRSSThumbnail thumb = thumbs.takeAt(0);
             thumbnail = thumb.URL;
@@ -914,7 +914,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     {
         QList<Enclosure> stdEnc = GetEnclosures(item);
 
-        if (stdEnc.size())
+        if (!stdEnc.empty())
         {
             Enclosure e = stdEnc.takeAt(0);
 

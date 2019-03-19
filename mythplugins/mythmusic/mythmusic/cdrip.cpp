@@ -159,7 +159,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
 }
 
 #ifdef HAVE_CDIO
-static void paranoia_cb(long, paranoia_cb_mode_t)
+static void paranoia_cb(long /*status*/, paranoia_cb_mode_t /*mode*/)
 {
 }
 #endif // HAVE_CDIO
@@ -202,7 +202,7 @@ void CDRipperThread::run(void)
 {
     RunProlog();
 
-    if (m_tracks->size() <= 0)
+    if (m_tracks->empty())
     {
         RunEpilog();
         return;
@@ -552,8 +552,7 @@ Ripper::~Ripper(void)
     QString command = "rm -f " + GetConfDir() + "/tmp/RipTemp/*";
     myth_system(command);
 
-    if (m_decoder)
-        delete m_decoder;
+    delete m_decoder;
 
 #ifndef _WIN32
     // if the MediaMonitor was active when we started then restart it
@@ -834,9 +833,7 @@ void Ripper::scanCD(void)
     }
 #endif // HAVE_CDIO
 
-    if (m_decoder)
-        delete m_decoder;
-
+    delete m_decoder;
     m_decoder = new CdDecoder("cda", nullptr, nullptr);
     if (m_decoder)
         m_decoder->setDevice(m_CDdevice);
@@ -948,7 +945,7 @@ void Ripper::artistChanged()
 {
     QString newartist = m_artistEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -977,7 +974,7 @@ void Ripper::albumChanged()
 {
     QString newalbum = m_albumEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -994,7 +991,7 @@ void Ripper::genreChanged()
 {
     QString newgenre = m_genreEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1011,7 +1008,7 @@ void Ripper::yearChanged()
 {
     QString newyear = m_yearEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1028,7 +1025,7 @@ void Ripper::compilationChanged(bool state)
 {
     if (!state)
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the ablum...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1047,7 +1044,7 @@ void Ripper::compilationChanged(bool state)
     }
     else
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the album...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1079,7 +1076,7 @@ void Ripper::switchTitlesAndArtists()
 
     // Switch title and artist for each track
     QString tmp;
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int track = 0; track < m_tracks->size(); ++track)
         {
@@ -1482,9 +1479,7 @@ void Ripper::customEvent(QEvent* event)
 
 RipStatus::~RipStatus(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 }
@@ -1639,9 +1634,7 @@ void RipStatus::customEvent(QEvent *event)
 
 void RipStatus::startRip(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     m_ripperThread = new CDRipperThread(this, m_CDdevice, m_tracks, m_quality);
     m_ripperThread->start();
 }

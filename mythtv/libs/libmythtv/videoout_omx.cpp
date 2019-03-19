@@ -267,7 +267,7 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
 
 // static
 QStringList VideoOutputOMX::GetAllowedRenderers(
-    MythCodecID myth_codec_id, const QSize &)
+    MythCodecID myth_codec_id, const QSize & /*video_dim*/)
 {
     QStringList list;
     if (codec_is_std(myth_codec_id))
@@ -303,7 +303,7 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_render.Ports(); ++port)
     {
         m_render.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_render.ShowFormats(port, LOG_DEBUG);
+        if (false) m_render.ShowFormats(port, LOG_DEBUG);
     }
 
     if (OMX_ErrorNone != m_imagefx.Init(OMX_IndexParamImageInit))
@@ -316,7 +316,7 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_imagefx.Ports(); ++port)
     {
         m_imagefx.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_imagefx.ShowFormats(port, LOG_DEBUG);
+        if (false) m_imagefx.ShowFormats(port, LOG_DEBUG);
     }
 }
 
@@ -906,7 +906,7 @@ void VideoOutputOMX::Show(FrameScanType /*scan*/)
 }
 
 // pure virtual
-void VideoOutputOMX::MoveResizeWindow(QRect)
+void VideoOutputOMX::MoveResizeWindow(QRect /*new_rect*/)
 {
 }
 
@@ -1325,7 +1325,7 @@ bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)
 
 // virtual
 OMX_ERRORTYPE VideoOutputOMX::EmptyBufferDone(
-    OMXComponent&, OMX_BUFFERHEADERTYPE *hdr)
+    OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE *hdr)
 {
     assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
     assert(hdr->nVersion.nVersion == OMX_VERSION);

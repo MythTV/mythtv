@@ -185,10 +185,7 @@ QString MHLink::EventTypeToString(enum EventType ev)
     {
         return rchEventType[ev-1];
     }
-    else
-    {
-        return QString("Unknown event %1").arg(ev);
-    }
+    return QString("Unknown event %1").arg(ev);
 }
 
 void MHLink::PrintMe(FILE *fd, int nTabs) const

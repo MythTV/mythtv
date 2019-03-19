@@ -562,7 +562,7 @@ class DVBConfigurationGroup : public GroupSetting
     void Save(void) override; // StandardSetting
 
   public slots:
-    void probeCard(const QString& cardNumber);
+    void probeCard(const QString& videodevice);
     void reloadDiseqcTree(const QString &device);
 
   private:
@@ -787,7 +787,7 @@ class CardInput : public GroupSetting
     int getInputID(void) const { return m_id->intValue(); };
 
     void loadByID(int id);
-    void loadByInput(int cardid, QString input);
+    void loadByInput(int cardid, QString inputname);
     QString getSourceName(void) const;
 
     void Save(void) override; // StandardSetting

@@ -106,10 +106,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             m_rwLock.unlock();
             return false;
         }
-        else
-        {
-            m_list.append(BlockRange(0, Len2Blocks(len), 0));
-        }
+        m_list.append(BlockRange(0, Len2Blocks(len), 0));
     }
     else
     {

@@ -166,26 +166,16 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
 
 HistogramAnalyzer::~HistogramAnalyzer()
 {
-    if (m_monochromatic)
-        delete []m_monochromatic;
-    if (m_mean)
-        delete []m_mean;
-    if (m_median)
-        delete []m_median;
-    if (m_stddev)
-        delete []m_stddev;
-    if (m_frow)
-        delete []m_frow;
-    if (m_fcol)
-        delete []m_fcol;
-    if (m_fwidth)
-        delete []m_fwidth;
-    if (m_fheight)
-        delete []m_fheight;
-    if (m_histogram)
-        delete []m_histogram;
-    if (m_buf)
-        delete []m_buf;
+    delete []m_monochromatic;
+    delete []m_mean;
+    delete []m_median;
+    delete []m_stddev;
+    delete []m_frow;
+    delete []m_fcol;
+    delete []m_fwidth;
+    delete []m_fheight;
+    delete []m_histogram;
+    delete []m_buf;
 }
 
 enum FrameAnalyzer::analyzeFrameResult

@@ -8,9 +8,9 @@ using namespace std;
 #include "mythlogging.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
-static double score_gaps(const RecordingInfo&, const RecordingGaps&);
-static QDateTime get_start(const RecordingInfo&);
-static QDateTime get_end(const RecordingInfo&);
+static double score_gaps(const RecordingInfo& /*ri*/, const RecordingGaps& /*gaps*/);
+static QDateTime get_start(const RecordingInfo& /*ri*/);
+static QDateTime get_end(const RecordingInfo& /*ri*/);
 
 RecordingQuality::RecordingQuality(const RecordingInfo *ri,
                                    const RecordingGaps &rg)
@@ -223,10 +223,7 @@ static QDateTime get_start(const RecordingInfo &ri)
         return (ri.GetScheduledStartTime() > ri.GetDesiredStartTime()) ?
             ri.GetScheduledStartTime() : ri.GetDesiredStartTime();
     }
-    else
-    {
-        return ri.GetScheduledStartTime();
-    }
+    return ri.GetScheduledStartTime();
 }
 
 static QDateTime get_end(const RecordingInfo &ri)
@@ -236,8 +233,5 @@ static QDateTime get_end(const RecordingInfo &ri)
         return (ri.GetScheduledEndTime() < ri.GetDesiredEndTime()) ?
             ri.GetScheduledEndTime() : ri.GetDesiredEndTime();
     }
-    else
-    {
-        return ri.GetScheduledEndTime();
-    }
+    return ri.GetScheduledEndTime();
 }

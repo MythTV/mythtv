@@ -32,12 +32,8 @@ BumpScope::BumpScope()
 
 BumpScope::~BumpScope()
 {
-    if (m_rgb_buf)
-        delete [] m_rgb_buf;
-
-    if (m_image)
-        delete m_image;
-
+    delete [] m_rgb_buf;
+    delete m_image;
     for (unsigned int i = 0; i < m_phongdat.size(); i++)
         m_phongdat[i].resize(0);
     m_phongdat.resize(0);
@@ -50,8 +46,7 @@ void BumpScope::resize(const QSize &newsize)
     m_size.setHeight((m_size.height() / 2) * 2);
     m_size.setWidth((m_size.width() / 4) * 4);
 
-    if (m_rgb_buf)
-        delete [] m_rgb_buf;
+    delete [] m_rgb_buf;
 
     int bufsize = (m_size.height() + 2) * (m_size.width() + 2);
 
@@ -59,9 +54,7 @@ void BumpScope::resize(const QSize &newsize)
 
     m_bpl = m_size.width() + 2;
 
-    if (m_image)
-        delete m_image;
-
+    delete m_image;
     m_image = new QImage(m_size.width(), m_size.height(), QImage::Format_Indexed8);
 
     m_width = m_size.width();

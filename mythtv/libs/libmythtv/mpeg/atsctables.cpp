@@ -29,14 +29,14 @@ int MasterGuideTable::TableClass(uint i) const
     {
         return tt;
     }
-    else if (tt < 0x300)
+    if (tt < 0x300)
     {
         if (tt < 0x200) return TableClass::EIT;
         return TableClass::ETTe;
     }
-    else if (tt >= 0x1400 && tt < 0x1500)
+    if (tt >= 0x1400 && tt < 0x1500)
         return TableClass::DCCT;
-    else if (tt < 0x400)
+    if (tt < 0x400)
         return TableClass::RRT;
     return TableClass::UNKNOWN;
 }
@@ -182,8 +182,7 @@ QString VirtualChannelTable::ModulationModeString(uint i) const
     uint mode = ModulationMode(i);
     if (mode >= (sizeof(modnames) / sizeof(char*)))
         return QString("Unknown 0x%1").arg(mode,2,16,QChar('0'));
-    else
-        return QString(modnames[mode]);
+    return QString(modnames[mode]);
 }
 
 QString VirtualChannelTable::ServiceTypeString(uint i) const
@@ -195,8 +194,7 @@ QString VirtualChannelTable::ServiceTypeString(uint i) const
     uint type = ServiceType(i);
     if (type >= (sizeof(servicenames) / sizeof(char*)))
         return QString("Unknown 0x%1").arg(type,2,16,QChar('0'));
-    else
-        return QString(servicenames[type]);
+    return QString(servicenames[type]);
 }
 
 QString VirtualChannelTable::toString(void) const

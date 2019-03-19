@@ -52,7 +52,7 @@ class AudioOutputJACK : public AudioOutputBase
 
     jack_client_t* _jack_client_open(void);
     const char** _jack_get_ports(void);
-    bool _jack_connect_ports(const char**);
+    bool _jack_connect_ports(const char** /*matching_ports*/);
     inline void _jack_client_close(jack_client_t **client);
 
     void DeinterleaveAudio(float *aubuf, float **bufs,

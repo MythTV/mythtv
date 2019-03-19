@@ -138,7 +138,7 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
-const QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
+QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 {
     FileSystemInfo fsInfo;
     QList<FileSystemInfo> fsInfos;
@@ -230,7 +230,7 @@ void FileSystemInfo::PopulateFSProp(void)
     struct statfs statbuf;
     memset(&statbuf, 0, sizeof(statbuf));
 
-    if (!statfs(getPath().toLocal8Bit().constData(), &statbuf))
+    if (statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0)
     {
 #if CONFIG_DARWIN
         char *fstypename = statbuf.f_fstypename;

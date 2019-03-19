@@ -27,7 +27,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
             "Error: We started a PES packet, without a payloadStart!");
         return true;
     }
-    else if (!IsClone())
+    if (!IsClone())
     {
         LOG(VB_RECORD, LOG_ERR,
             "Error: Must clone initially to use addPackets()");
@@ -333,7 +333,7 @@ unsigned char *pes_alloc(uint size)
 #ifndef USING_VALGRIND
     if (size <= 188)
         return get_188_block();
-    else if (size <= 4096)
+    if (size <= 4096)
         return get_4096_block();
 #endif // USING_VALGRIND
     return (unsigned char*) malloc(size);

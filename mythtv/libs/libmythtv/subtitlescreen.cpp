@@ -358,8 +358,7 @@ QString SubtitleFormat::MakePrefix(const QString &family,
 {
     if (family == kSubFamily708)
         return family + "_" + QString::number(attr.m_font_tag & 0x7);
-    else
-        return family;
+    return family;
 }
 
 void SubtitleFormat::CreateProviderDefault(const QString &family,
@@ -1824,7 +1823,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             AVSubtitleRect* rect = subtitle.rects[i];
 
             bool displaysub = true;
-            if (subs->m_buffers.size() > 0 &&
+            if (!subs->m_buffers.empty() &&
                 subs->m_buffers.front().end_display_time <
                 currentFrame->timecode)
             {
@@ -2258,7 +2257,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
     {
         Clear708Cache(clearMask);
     }
-    if (addList.size())
+    if (!addList.empty())
         m_qInited.append(addList);
 }
 

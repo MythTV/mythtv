@@ -524,49 +524,47 @@ void MHParseText::NextSym()
 
                             continue; // continue with the first character on the next line
                         }
+
+                        int byte = 0;
+
+                        if (m_ch >= '0' && m_ch <= '9')
+                        {
+                            byte = m_ch - '0';
+                        }
+                        else if (m_ch >= 'A' && m_ch <= 'F')
+                        {
+                            byte = m_ch - 'A' + 10;
+                        }
+                        else if (m_ch >= 'a' && m_ch <= 'f')
+                        {
+                            byte = m_ch - 'a' + 10;
+                        }
                         else
                         {
-                            int byte = 0;
-
-                            if (m_ch >= '0' && m_ch <= '9')
-                            {
-                                byte = m_ch - '0';
-                            }
-                            else if (m_ch >= 'A' && m_ch <= 'F')
-                            {
-                                byte = m_ch - 'A' + 10;
-                            }
-                            else if (m_ch >= 'a' && m_ch <= 'f')
-                            {
-                                byte = m_ch - 'a' + 10;
-                            }
-                            else
-                            {
-                                Error("Malformed quoted printable string");
-                            }
-
-                            byte *= 16;
-                            GetNextChar();
-
-                            if (m_ch >= '0' && m_ch <= '9')
-                            {
-                                byte += m_ch - '0';
-                            }
-                            else if (m_ch >= 'A' && m_ch <= 'F')
-                            {
-                                byte += m_ch - 'A' + 10;
-                            }
-                            else if (m_ch >= 'a' && m_ch <= 'f')
-                            {
-                                byte += m_ch - 'a' + 10;
-                            }
-                            else
-                            {
-                                Error("Malformed quoted printable string");
-                            }
-
-                            m_ch = byte; // Put this into the string.
+                            Error("Malformed quoted printable string");
                         }
+
+                        byte *= 16;
+                        GetNextChar();
+
+                        if (m_ch >= '0' && m_ch <= '9')
+                        {
+                            byte += m_ch - '0';
+                        }
+                        else if (m_ch >= 'A' && m_ch <= 'F')
+                        {
+                            byte += m_ch - 'A' + 10;
+                        }
+                        else if (m_ch >= 'a' && m_ch <= 'f')
+                        {
+                            byte += m_ch - 'a' + 10;
+                        }
+                        else
+                        {
+                            Error("Malformed quoted printable string");
+                        }
+
+                        m_ch = byte; // Put this into the string.
                     }
 
                     // We grow the buffer to the largest string in the input.

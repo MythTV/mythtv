@@ -370,7 +370,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         DVBEventInformationTable::IsEIT(psip.TableID()))
     {
         QMutexLocker locker(&_listener_lock);
-        if (!_dvb_eit_listeners.size() && !_eit_helper)
+        if (_dvb_eit_listeners.empty() && !_eit_helper)
             return true;
 
         uint service_id = psip.TableIDExtension();
@@ -393,7 +393,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         PremiereContentInformationTable::IsEIT(psip.TableID()))
     {
         QMutexLocker locker(&_listener_lock);
-        if (!_dvb_eit_listeners.size() && !_eit_helper)
+        if (_dvb_eit_listeners.empty() && !_eit_helper)
             return true;
 
         PremiereContentInformationTable cit(psip);
@@ -437,7 +437,7 @@ bool DVBStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
 {
     QMutexLocker locker(&_listener_lock);
     bool want_eit = (_eit_rate >= 0.5f) && HasAnyEIT();
-    bool has_eit  = in_use_pids.size();
+    bool has_eit  = !in_use_pids.empty();
     return want_eit != has_eit;
 }
 
@@ -547,7 +547,7 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
         }
     }
 
-    return add_pids.size() || del_pids.size();
+    return !add_pids.empty() || !del_pids.empty();
 }
 
 bool DVBStreamData::HasAllNITSections(void) const
@@ -815,7 +815,7 @@ bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return false;
     }
-    else if ((TableID::NIT == psip->TableID()) &&
+    if ((TableID::NIT == psip->TableID()) &&
              _cached_nit[psip->Section()])
     {
         _cached_nit[psip->Section()] = nullptr;

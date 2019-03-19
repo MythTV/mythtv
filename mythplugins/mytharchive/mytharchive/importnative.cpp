@@ -116,7 +116,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             details->callsign =  e.attribute("callsign");
             return true;
         }
-        else if (type == "video")
+        if (type == "video")
         {
             QDomNodeList nodeList = e.elementsByTagName("videometadata");
             if (nodeList.count() < 1)

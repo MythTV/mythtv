@@ -390,8 +390,7 @@ bool LinuxFirewireDevice::OpenNode(void)
 {
     if (m_use_p2p)
         return OpenP2PNode();
-    else
-        return OpenBroadcastNode();
+    return OpenBroadcastNode();
 }
 
 bool LinuxFirewireDevice::CloseNode(void)
@@ -567,7 +566,7 @@ bool LinuxFirewireDevice::CloseAVStream(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Closing A/V stream object");
 
-    while (m_listeners.size())
+    while (!m_listeners.empty())
         FirewireDevice::RemoveListener(m_listeners[m_listeners.size() - 1]);
 
     if (m_priv->m_is_streaming)

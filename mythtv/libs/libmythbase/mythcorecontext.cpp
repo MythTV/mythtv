@@ -59,7 +59,7 @@ class MythCoreContextPrivate : public QObject
                            QObject *guicontext);
    ~MythCoreContextPrivate();
 
-    bool WaitForWOL(int timeout_ms = INT_MAX);
+    bool WaitForWOL(int timeout_in_ms = INT_MAX);
 
   public:
     MythCoreContext *m_parent;
@@ -1649,7 +1649,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
         return false;
     }
-    else if (strlist[0] == "REJECT" && strlist.size() >= 2)
+    if (strlist[0] == "REJECT" && strlist.size() >= 2)
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Protocol version or token mismatch "
                                           "(frontend=%1/%2,backend=%3/\?\?)\n")
@@ -1666,7 +1666,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
         return false;
     }
-    else if (strlist[0] == "ACCEPT")
+    if (strlist[0] == "ACCEPT")
     {
         if (!d->m_announcedProtocol)
         {
@@ -1794,7 +1794,7 @@ void MythCoreContext::ReInitLocale(void)
     QLocale::setDefault(d->m_locale->ToQLocale());
 }
 
-const QLocale MythCoreContext::GetQLocale(void)
+QLocale MythCoreContext::GetQLocale(void)
 {
     if (!d->m_locale)
         InitLocale();

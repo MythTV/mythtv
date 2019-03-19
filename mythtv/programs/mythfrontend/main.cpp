@@ -791,28 +791,26 @@ static void playDisc()
 
             return;
         }
-        else
+
+        if (command_string.contains("%d"))
         {
-            if (command_string.contains("%d"))
-            {
-                //
-                //  Need to do device substitution
-                //
-                command_string =
-                        command_string.replace(QRegExp("%d"), dvd_device);
-            }
-            gCoreContext->emitTVPlaybackStarted();
-            GetMythMainWindow()->PauseIdleTimer(true);
-            myth_system(command_string);
-            gCoreContext->emitTVPlaybackStopped();
-            GetMythMainWindow()->PauseIdleTimer(false);
-            if (GetMythMainWindow())
-            {
-                GetMythMainWindow()->raise();
-                GetMythMainWindow()->activateWindow();
-                if (GetMythMainWindow()->currentWidget())
-                    GetMythMainWindow()->currentWidget()->setFocus();
-            }
+            //
+            //  Need to do device substitution
+            //
+            command_string =
+                command_string.replace(QRegExp("%d"), dvd_device);
+        }
+        gCoreContext->emitTVPlaybackStarted();
+        GetMythMainWindow()->PauseIdleTimer(true);
+        myth_system(command_string);
+        gCoreContext->emitTVPlaybackStopped();
+        GetMythMainWindow()->PauseIdleTimer(false);
+        if (GetMythMainWindow())
+        {
+            GetMythMainWindow()->raise();
+            GetMythMainWindow()->activateWindow();
+            if (GetMythMainWindow()->currentWidget())
+                GetMythMainWindow()->currentWidget()->setFocus();
         }
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -2244,10 +2242,7 @@ int main(int argc, char **argv)
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete housekeeping;
-
-    if (themeUpdateChecker)
-        delete themeUpdateChecker;
-
+    delete themeUpdateChecker;
     delete sysEventHandler;
 
     g_pmanager->DestroyAllPlugins();
@@ -2256,9 +2251,7 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-
     return ret;
-
 }
 
 void handleSIGUSR1(void)

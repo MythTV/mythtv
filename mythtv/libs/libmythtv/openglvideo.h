@@ -84,7 +84,7 @@ class OpenGLVideo
 
   private:
     void Teardown(void);
-    void SetViewPort(const QSize &new_viewport_size);
+    void SetViewPort(const QSize &viewPortSize);
     bool AddFilter(OpenGLFilterType filter);
     bool RemoveFilter(OpenGLFilterType filter);
     void CheckResize(bool deinterlacing, bool allow = true);
@@ -94,7 +94,7 @@ class OpenGLVideo
                             QString deint = QString(),
                             FrameScanType field = kScan_Progressive);
     uint CreateVideoTexture(QSize size, QSize &tex_size);
-    QString GetProgramString(OpenGLFilterType filter,
+    QString GetProgramString(OpenGLFilterType name,
                              QString deint = QString(),
                              FrameScanType field = kScan_Progressive);
     void GetProgramStrings(QString &vertex, QString &fragment,
@@ -108,7 +108,7 @@ class OpenGLVideo
     void SetFiltering(void);
 
     void RotateTextures(void);
-    void SetTextureFilters(vector<GLuint> *textures, int filt, int clamp);
+    void SetTextureFilters(vector<GLuint> *textures, int filt, int wrap);
     void DeleteTextures(vector<GLuint> *textures);
     void TearDownDeinterlacer(void);
 

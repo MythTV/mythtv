@@ -188,10 +188,8 @@ bool AudioOutputJACK::OpenDevice()
     m_fragment_size = jack_get_buffer_size(m_client) * m_output_bytes_per_frame;
 
     // Allocate a new temp buffer to de-interleave our audio data
-    if (m_aubuf)
-        delete[] m_aubuf;
+    delete[] m_aubuf;
     m_aubuf = new unsigned char[m_fragment_size];
-
 
     // Set our callbacks
     // These will actually get called after jack_activate()!

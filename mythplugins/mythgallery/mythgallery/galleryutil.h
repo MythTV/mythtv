@@ -51,7 +51,7 @@ class GalleryUtil
                               const GalleryFilter& flt, bool recurse,
                               ThumbHash *itemHash, ThumbGenerator *thumbGen);
 
-    static QSize ScaleToDest(const QSize &sz, const QSize &dest, ScaleMax scaleMax);
+    static QSize ScaleToDest(const QSize &src, const QSize &dest, ScaleMax scaleMax);
 
     static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
         { if (move) return Move(src, dst); else return Copy(src, dst); }

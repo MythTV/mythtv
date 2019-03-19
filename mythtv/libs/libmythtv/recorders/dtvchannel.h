@@ -142,7 +142,7 @@ class DTVChannel : public ChannelBase
     // Sets
 
     /// \brief Sets tuning mode: "mpeg", "dvb", "atsc", etc.
-    void SetTuningMode(const QString &tuningmode);
+    void SetTuningMode(const QString &tuning_mode);
 
     void SaveCachedPids(const pid_cache_t &pid_cache) const;
 

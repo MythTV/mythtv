@@ -114,10 +114,10 @@ void NetBase::ShowWebVideo()
     {
         QString cmd = item->GetPlayer();
         QStringList args = item->GetPlayerArguments();
-        if (!args.size())
+        if (args.empty())
         {
             args += item->GetMediaURL();
-            if (!args.size())
+            if (args.empty())
                 args += item->GetURL();
         }
         else
@@ -300,8 +300,7 @@ void NetBase::DoDownloadAndPlay()
         DoPlayVideo(finalFilename);
         return;
     }
-    else
-        DownloadVideo(item->GetMediaURL(), baseFilename);
+    DownloadVideo(item->GetMediaURL(), baseFilename);
 }
 
 void NetBase::DoPlayVideo(const QString &filename)

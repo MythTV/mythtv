@@ -120,7 +120,7 @@ class META_PUBLIC MusicMetadata
          m_changed = false;
     }
 
-    MusicMetadata& operator=(const MusicMetadata &other);
+    MusicMetadata& operator=(const MusicMetadata &rhs);
 
     QString Artist() const { return m_artist; }
     QString ArtistSort() const { return m_artist_sort; }

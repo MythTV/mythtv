@@ -129,7 +129,7 @@ void GameScannerThread::updateDB()
 
 bool GameScannerThread::buildFileList()
 {
-    if (m_handlers.size() == 0)
+    if (m_handlers.empty())
         return false;
 
     int counter = 0;
@@ -175,13 +175,13 @@ bool GameScannerThread::buildFileList()
 }
 
 void GameScannerThread::SendProgressEvent(uint progress, uint total,
-                                           QString messsage)
+                                          QString message)
 {
     if (!m_dialog)
         return;
 
     ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       messsage);
+                                                       message);
     QApplication::postEvent(m_dialog, pue);
 }
 

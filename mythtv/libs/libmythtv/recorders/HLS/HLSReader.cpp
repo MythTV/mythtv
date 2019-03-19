@@ -820,11 +820,9 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
             m_seq_lock.unlock();
             return false;
         }
-        else
-        {
-            m_cur_seq = m_segments.front().Sequence();
-            m_segments.pop_front();
-        }
+
+        m_cur_seq = m_segments.front().Sequence();
+        m_segments.pop_front();
 
         m_seq_lock.unlock();
 

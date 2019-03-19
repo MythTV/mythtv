@@ -604,7 +604,7 @@ setup_dev(struct vbi *vbi)
 
 
 struct vbi *
-vbi_open(const char *vbi_name, struct cache *ca, int fine_tune, int big_buf)
+vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
 {
     static int inited = 0;
     struct vbi *vbi = 0;
@@ -621,7 +621,7 @@ vbi_open(const char *vbi_name, struct cache *ca, int fine_tune, int big_buf)
        goto fail1;
     }
 
-    if ((vbi->fd = open(vbi_name, O_RDONLY)) == -1)
+    if ((vbi->fd = open(vbi_dev_name, O_RDONLY)) == -1)
     {
        error("cannot open vbi device");
        goto fail2;

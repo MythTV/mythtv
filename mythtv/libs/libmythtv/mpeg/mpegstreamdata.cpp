@@ -306,7 +306,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         DeletePartialPSIP(tspacket->PID());
         return psip;
     }
-    else if (partial)
+    if (partial)
     {
         if (broken)
             DeletePartialPSIP(tspacket->PID());
@@ -869,7 +869,7 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 
 }
 
-#define DONE_WITH_PSIP_PACKET() { if (psip) delete psip; \
+#define DONE_WITH_PSIP_PACKET() { delete psip; \
     if (morePSIPTables) goto HAS_ANOTHER_PSIP; else return; }
 
 /** \fn MPEGStreamData::HandleTSTables(const TSPacket*)
@@ -1218,7 +1218,7 @@ bool MPEGStreamData::HasCachedAnyPAT(uint tsid) const
 bool MPEGStreamData::HasCachedAnyPAT(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    return _cached_pats.size();
+    return !_cached_pats.empty();
 }
 
 bool MPEGStreamData::HasCachedAllCAT(uint tsid) const
@@ -1254,7 +1254,7 @@ bool MPEGStreamData::HasCachedAnyCAT(uint tsid) const
 bool MPEGStreamData::HasCachedAnyCAT(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    return _cached_cats.size();
+    return !_cached_cats.empty();
 }
 
 bool MPEGStreamData::HasCachedAllPMT(uint pnum) const
@@ -1312,7 +1312,7 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
 bool MPEGStreamData::HasCachedAnyPMTs(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    return _cached_pmts.size();
+    return !_cached_pmts.empty();
 }
 
 pat_const_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const
@@ -1527,7 +1527,7 @@ bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return false;
     }
-    else if (TableID::PAT == psip->TableID() &&
+    if (TableID::PAT == psip->TableID() &&
              (_cached_pats[(tid << 8) | psip->Section()] == psip))
     {
         _cached_pats[(tid << 8) | psip->Section()] = nullptr;
@@ -1858,10 +1858,9 @@ static QString toString(CryptStatus status)
 {
     if (kEncDecrypted == status)
         return "Decrypted";
-    else if (kEncEncrypted == status)
+    if (kEncEncrypted == status)
         return "Encrypted";
-    else
-        return "Unknown";
+    return "Unknown";
 }
 
 /** \fn MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)

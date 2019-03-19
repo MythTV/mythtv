@@ -204,10 +204,9 @@ MusicPlayer::ResumeMode MusicPlayer::getResumeMode(void)
 {
     if (m_playMode == PLAYMODE_RADIO)
         return m_resumeModeRadio;
-    else if (m_playMode == PLAYMODE_TRACKSEDITOR)
+    if (m_playMode == PLAYMODE_TRACKSEDITOR)
         return m_resumeModeEditor;
-    else
-        return m_resumeModePlayback;
+    return m_resumeModePlayback;
 }
 
 void MusicPlayer::loadSettings(void)
@@ -507,11 +506,8 @@ void MusicPlayer::nextAuto(void)
         play();
         return;
     }
-    else
-    {
-        if (!m_decoderHandler->next())
-            next();
-    }
+    if (!m_decoderHandler->next())
+        next();
 
     // if we don't already have a gui attached show the miniplayer if configured to do so
     if (m_isAutoplay && m_canShowPlayer && m_autoShowPlayer && m_isPlaying)
@@ -1180,16 +1176,11 @@ MusicMetadata *MusicPlayer::getNextMetadata(void)
     // if we are not playing the last track then just return the next track
     if (m_currentTrack < getCurrentPlaylist()->getTrackCount() - 1)
         return getCurrentPlaylist()->getSongAt(m_currentTrack + 1);
-    else
-    {
-        // if we are playing the last track then we need to take the
-        // repeat mode into account
-        if (m_repeatMode == REPEAT_ALL)
-            return getCurrentPlaylist()->getSongAt(0);
-        else
-            return nullptr;
-    }
 
+    // if we are playing the last track then we need to take the
+    // repeat mode into account
+    if (m_repeatMode == REPEAT_ALL)
+        return getCurrentPlaylist()->getSongAt(0);
     return nullptr;
 }
 
@@ -1613,12 +1604,7 @@ Playlist* MusicPlayer::getCurrentPlaylist ( void )
     {
         return gMusicData->m_all_playlists->getStreamPlaylist();
     }
-    else
-    {
-        return gMusicData->m_all_playlists->getActive();
-    }
-
-    return nullptr;
+    return gMusicData->m_all_playlists->getActive();
 }
 
 StreamList  *MusicPlayer::getStreamList(void) 

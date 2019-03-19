@@ -119,10 +119,10 @@ void ATSCStreamData::Reset(int desiredProgram)
     AddListeningPID(ATSC_PSIP_PID);
 }
 
-void ATSCStreamData::Reset(int major, int minor)
+void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
 {
-    _desired_major_channel = major;
-    _desired_minor_channel = minor;
+    _desired_major_channel = desiredMajorChannel;
+    _desired_minor_channel = desiredMinorChannel;
 
     MPEGStreamData::Reset(-1);
     _mgt_version = -1;
@@ -287,7 +287,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::EIT:
         {
             QMutexLocker locker(&_listener_lock);
-            if (!_atsc_eit_listeners.size() && !_eit_helper)
+            if (_atsc_eit_listeners.empty() && !_eit_helper)
                 return true;
 
             uint key = (pid<<16) | psip.TableIDExtension();
@@ -534,7 +534,7 @@ bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             add_pids.push_back(add_pids_tmp[i]);
     }
 
-    return add_pids.size() || del_pids.size();
+    return !add_pids.empty() || !del_pids.empty();
 }
 
 void ATSCStreamData::ProcessMGT(const MasterGuideTable *mgt)
@@ -872,7 +872,7 @@ bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return false;
     }
-    else if (TableID::MGT == psip->TableID())
+    if (TableID::MGT == psip->TableID())
     {
         if (psip == _cached_mgt)
             _cached_mgt = nullptr;

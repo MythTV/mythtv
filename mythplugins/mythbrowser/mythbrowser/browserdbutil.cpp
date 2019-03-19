@@ -239,12 +239,10 @@ int GetCategoryList(QStringList &list)
         MythDB::DBError("mythbrowser: get category list", query);
         return false;
     }
-    else
+
+    while (query.next())
     {
-        while (query.next())
-        {
-            list << query.value(0).toString();
-        }
+        list << query.value(0).toString();
     }
 
     return list.size();

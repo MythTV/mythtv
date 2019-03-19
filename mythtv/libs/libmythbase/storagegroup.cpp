@@ -164,7 +164,7 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
         }
     }
 
-    if (allowFallback && !m_dirlist.size())
+    if (allowFallback && m_dirlist.empty())
     {
         QString msg = "Unable to find any Storage Group Directories.  ";
         QString tmpDir = gCoreContext->GetSetting("RecordFilePrefix");
@@ -686,7 +686,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     if (m_allowFallback)
         nextDir = kDefaultStorageDir;
 
-    if (m_dirlist.size())
+    if (!m_dirlist.empty())
         nextDir = m_dirlist[0];
 
     QDir checkDir("");

@@ -225,7 +225,7 @@ class UPNP_PUBLIC HTTPRequest
                                             bool replace = false );
 
         void            SetCookie ( const QString &sKey, const QString &sValue,
-                                    const QDateTime &dtExpires,
+                                    const QDateTime &expiryDate,
                                     bool secure );
 
         QString         GetRequestHeader  ( const QString &sKey, QString sDefault );

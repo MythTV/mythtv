@@ -186,11 +186,11 @@ void ScanWizard::Scan()
     }
 }
 
-void ScanWizard::SetInput(const QString &cardids_inputname)
+void ScanWizard::SetInput(const QString &cardid_inputname)
 {
     uint    cardid;
     QString inputname;
-    if (!InputSelector::Parse(cardids_inputname, cardid, inputname))
+    if (!InputSelector::Parse(cardid_inputname, cardid, inputname))
         return;
 
     // Work out what kind of card we've got

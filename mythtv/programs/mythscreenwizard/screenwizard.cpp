@@ -339,14 +339,13 @@ bool ScreenWizard::anythingChanged()
 {
     if (m_screenwidth != m_bottomright_x - m_topleft_x)
         return true;
-    else if (m_xoffset != m_topleft_x)
+    if (m_xoffset != m_topleft_x)
         return true;
-    else if (m_screenheight != m_bottomright_y - m_topleft_y)
+    if (m_screenheight != m_bottomright_y - m_topleft_y)
         return true;
-    else if (m_yoffset != m_topleft_y)
+    if (m_yoffset != m_topleft_y)
         return true;
-    else
-        return false;
+    return false;
 }
 
 void ScreenWizard::customEvent(QEvent *event)

@@ -187,8 +187,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
         // deleted while image load thread is still busy
         // loading images with that painter
         gl_painter->Teardown();
-        if (invalid_osd_painter)
-            delete invalid_osd_painter;
+        delete invalid_osd_painter;
         invalid_osd_painter = gl_painter;
     }
     else if (gl_painter)
@@ -694,7 +693,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     // PiPs/PBPs
-    if (gl_pipchains.size())
+    if (!gl_pipchains.empty())
     {
         QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
         for (; it != gl_pipchains.end(); ++it)
@@ -772,7 +771,7 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
  * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
  * alternative.
 */
-QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID myth_codec_id, const QSize&)
+QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID myth_codec_id, const QSize& /*video_dim*/)
 {
     QStringList list;
     if (!codec_sw_copy(myth_codec_id) || getenv("NO_OPENGL"))
@@ -1034,8 +1033,7 @@ void VideoOutputOpenGL::RemovePIP(MythPlayer *pipplayer)
     OpenGLLocker ctx_lock(gl_context);
 
     OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
-    if (gl_pipchain)
-        delete gl_pipchain;
+    delete gl_pipchain;
     gl_pip_ready.remove(pipplayer);
     gl_pipchains.remove(pipplayer);
 }

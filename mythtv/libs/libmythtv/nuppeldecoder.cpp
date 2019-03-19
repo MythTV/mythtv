@@ -69,10 +69,8 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
 
 NuppelDecoder::~NuppelDecoder()
 {
-    if (m_rtjd)
-        delete m_rtjd;
-    if (m_ffmpeg_extradata)
-        delete [] m_ffmpeg_extradata;
+    delete m_rtjd;
+    delete [] m_ffmpeg_extradata;
     if (m_buf)
         av_freep(&m_buf);
     if (m_buf2)
@@ -92,7 +90,7 @@ NuppelDecoder::~NuppelDecoder()
 }
 
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
-                              int)
+                              int /*testbufsize*/)
 {
     if (!strncmp(testbuf, "NuppelVideo", 11) ||
         !strncmp(testbuf, "MythTVVideo", 11))
@@ -158,7 +156,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 
 int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                             char testbuf[kDecoderProbeBufferSize],
-                            int)
+                            int /*testbufsize*/)
 {
     (void)testbuf;
 

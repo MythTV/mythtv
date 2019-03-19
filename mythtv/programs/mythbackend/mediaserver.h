@@ -45,7 +45,7 @@ class MediaServer : public UPnp
 
     public:
         explicit MediaServer();
-        void Init(bool bMaster, bool bDisableUPnp = false);
+        void Init(bool bIsMaster, bool bDisableUPnp = false);
 
         virtual ~MediaServer();
 

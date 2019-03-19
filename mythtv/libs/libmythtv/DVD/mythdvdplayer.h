@@ -66,7 +66,7 @@ class MythDVDPlayer : public MythPlayer
     void ChangeSpeed(void) override; // MythPlayer
 
     // Playback
-    void AVSync(VideoFrame *buffer, bool limit_delay = false) override; // MythPlayer
+    void AVSync(VideoFrame *frame, bool limit_delay = false) override; // MythPlayer
     void DisplayPauseFrame(void) override; // MythPlayer
     void PreProcessNormalFrame(void) override; // MythPlayer
     void VideoStart(void) override; // MythPlayer

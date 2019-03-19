@@ -489,7 +489,7 @@ void CetonRTSP::StopKeepAlive()
     m_timer = 0;
 }
 
-void CetonRTSP::timerEvent(QTimerEvent*)
+void CetonRTSP::timerEvent(QTimerEvent* /*event*/)
 {
     QStringList dummy;
 

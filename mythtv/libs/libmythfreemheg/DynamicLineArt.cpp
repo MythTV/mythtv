@@ -61,7 +61,7 @@ void MHDynamicLineArt::Preparation(MHEngine *engine)
     m_picture->SetFillColour(GetColour(m_FillColour));
 }
 
-void MHDynamicLineArt::Display(MHEngine *)
+void MHDynamicLineArt::Display(MHEngine * /*engine*/)
 {
     m_picture->Draw(m_nPosX, m_nPosY);
 }
@@ -73,10 +73,7 @@ QRegion MHDynamicLineArt::GetOpaqueArea()
     {
         return GetVisibleArea();
     }
-    else
-    {
-        return QRegion();
-    }
+    return QRegion();
 }
 
 // Reset the picture.
@@ -96,26 +93,26 @@ void MHDynamicLineArt::SetBoxSize(int nWidth, int nHeight, MHEngine *engine)
 // SetPosition, BringToFront, SendToBack, PutBefore and PutBehind were defined in the original
 // MHEG standard to clear the drawing.  This was removed in the MHEG Corrigendum.
 
-void MHDynamicLineArt::SetFillColour(const MHColour &colour, MHEngine *)
+void MHDynamicLineArt::SetFillColour(const MHColour &colour, MHEngine * /*engine*/)
 {
     m_FillColour.Copy(colour);
     m_picture->SetFillColour(GetColour(m_FillColour));
 }
 
-void MHDynamicLineArt::SetLineColour(const MHColour &colour, MHEngine *)
+void MHDynamicLineArt::SetLineColour(const MHColour &colour, MHEngine * /*engine*/)
 {
     m_LineColour.Copy(colour);
     m_picture->SetLineColour(GetColour(m_LineColour));
 }
 
-void MHDynamicLineArt::SetLineWidth(int nWidth, MHEngine *)
+void MHDynamicLineArt::SetLineWidth(int nWidth, MHEngine * /*engine*/)
 {
     m_nLineWidth = nWidth;
     m_picture->SetLineSize(m_nLineWidth);
 }
 
 // We don't actually use this at the moment.
-void MHDynamicLineArt::SetLineStyle(int nStyle, MHEngine *)
+void MHDynamicLineArt::SetLineStyle(int nStyle, MHEngine * /*engine*/)
 {
     m_LineStyle = nStyle;
 }

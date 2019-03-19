@@ -125,55 +125,45 @@ bool DBUtil::IsBackupInProgress(void)
                     .arg(backupStartTime.secsTo(MythDate::current())));
             return true;
         }
-        else
-        {
-            LOG(VB_DATABASE, LOG_ERR, QString("DBUtil::BackupInProgress(): "
-                    "Database backup started at %1, but no end time was found. "
-                    "The backup started %2 seconds ago and should have "
-                    "finished by now therefore it appears it is not running .")
-                    .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(MythDate::current())));
-            return false;
-        }
+        LOG(VB_DATABASE, LOG_ERR, QString("DBUtil::BackupInProgress(): "
+                "Database backup started at %1, but no end time was found. "
+                "The backup started %2 seconds ago and should have "
+                "finished by now therefore it appears it is not running .")
+                .arg(backupStartTimeStr)
+                .arg(backupStartTime.secsTo(MythDate::current())));
+        return false;
     }
-    else
+
+    backupEndTimeStr.replace(" ", "T");
+
+    QDateTime backupEndTime = MythDate::fromString(backupEndTimeStr);
+
+    if (backupEndTime >= backupStartTime)
     {
-        backupEndTimeStr.replace(" ", "T");
-
-        QDateTime backupEndTime = MythDate::fromString(backupEndTimeStr);
-
-        if (backupEndTime >= backupStartTime)
-        {
-            LOG(VB_DATABASE, LOG_ERR,
-                QString("DBUtil::BackupInProgress(): Found "
+        LOG(VB_DATABASE, LOG_ERR,
+            QString("DBUtil::BackupInProgress(): Found "
                     "database backup end time of %1 later than start time "
                     "of %2, therefore backup is not running.")
-                    .arg(backupEndTimeStr).arg(backupStartTimeStr));
-            return false;
-        }
-        else if (backupStartTime.secsTo(MythDate::current()) > 600)
-        {
-            LOG(VB_DATABASE, LOG_ERR,
-                QString("DBUtil::BackupInProgress(): "
+            .arg(backupEndTimeStr).arg(backupStartTimeStr));
+        return false;
+    }
+    if (backupStartTime.secsTo(MythDate::current()) > 600)
+    {
+        LOG(VB_DATABASE, LOG_ERR,
+            QString("DBUtil::BackupInProgress(): "
                     "Database backup started at %1, but has not ended yet.  "
                     "The backup started %2 seconds ago and should have "
                     "finished by now therefore it appears it is not running")
-                    .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(MythDate::current())));
-            return false;
-        }
-        else
-        {
-            // start > end and started less than 10 minutes ago
-            LOG(VB_DATABASE, LOG_INFO, QString("DBUtil::BackupInProgress(): "
-                    "Database backup started at %1, and is still running.")
-                    .arg(backupStartTimeStr));
-            return true;
-        }
+            .arg(backupStartTimeStr)
+            .arg(backupStartTime.secsTo(MythDate::current())));
+        return false;
     }
 
-    // Shouldn't get here
-    return false;
+    // start > end and started less than 10 minutes ago
+    LOG(VB_DATABASE, LOG_INFO, QString("DBUtil::BackupInProgress(): "
+                                       "Database backup started at %1, and is still running.")
+        .arg(backupStartTimeStr));
+    return true;
 }
 
 /** \fn DBUtil::BackupDB(QString&, bool)
@@ -494,7 +484,7 @@ QString DBUtil::GetBackupDirectory()
     QString directory;
     StorageGroup sgroup("DB Backups", gCoreContext->GetHostName());
     QStringList dirList = sgroup.GetDirList();
-    if (dirList.size())
+    if (!dirList.empty())
     {
         directory = sgroup.FindNextDirMostFree();
 

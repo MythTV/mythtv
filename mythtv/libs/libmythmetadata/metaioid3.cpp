@@ -561,11 +561,11 @@ QString MetaIOID3::getExtFromMimeType(const QString &mimeType)
 {
     if (mimeType == "image/png")
         return QString(".png");
-    else if (mimeType == "image/jpeg" || mimeType == "image/jpg")
+    if (mimeType == "image/jpeg" || mimeType == "image/jpg")
         return QString(".jpg");
-    else if (mimeType == "image/gif")
+    if (mimeType == "image/gif")
         return QString(".gif");
-    else if (mimeType == "image/bmp")
+    if (mimeType == "image/bmp")
         return QString(".bmp");
 
     LOG(VB_GENERAL, LOG_ERR,

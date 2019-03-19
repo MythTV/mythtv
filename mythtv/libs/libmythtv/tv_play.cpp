@@ -399,9 +399,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
             ProgramInfo *nextProgram = tv->GetLastProgram();
 
             tv->SetLastProgram(curProgram);
-            if (curProgram)
-                delete curProgram;
-
+            delete curProgram;
             curProgram = nextProgram;
 
             SendMythSystemPlayEvent("PLAY_CHANGED", curProgram);
@@ -1293,8 +1291,7 @@ TV::~TV(void)
     if (!m_dbUseGuiSizeForTv)
         mwnd->move(m_savedGuiBounds.topLeft());
 
-    if (m_lastProgram)
-        delete m_lastProgram;
+    delete m_lastProgram;
 
     if (LCD *lcd = LCD::Get())
     {
@@ -2201,7 +2198,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             if (getit)
                 reclist = ChannelUtil::GetValidRecorderList(chanid, channum);
 
-            if (reclist.size())
+            if (!reclist.empty())
             {
                 RemoteEncoder *testrec = RemoteRequestFreeRecorderFromList(reclist, 0);
                 if (testrec && testrec->IsValidRecorder())
@@ -2682,7 +2679,7 @@ void TV::timerEvent(QTimerEvent *te)
     {
         QMutexLocker locker(&m_timerIdLock);
         ignore =
-            (m_stateChangeTimerId.size() &&
+            (!m_stateChangeTimerId.empty() &&
              m_stateChangeTimerId.find(timer_id) == m_stateChangeTimerId.end());
     }
     if (ignore)
@@ -2799,7 +2796,7 @@ void TV::timerEvent(QTimerEvent *te)
         QMutexLocker locker(&m_timerIdLock);
         if (timer_id == m_networkControlTimerId)
         {
-            if (networkControlCommands.size())
+            if (!networkControlCommands.empty())
                 netCmd = networkControlCommands.dequeue();
             if (networkControlCommands.empty())
             {
@@ -3835,11 +3832,8 @@ bool TV::TranslateGesture(const QString &context, MythGestureEvent *e,
                 return GetMythMainWindow()->TranslateKeyPress(
                         context, &(m_screenPressKeyMapLiveTV[region]), actions, true);
             }
-            else
-            {
-                return GetMythMainWindow()->TranslateKeyPress(
-                        context, &(m_screenPressKeyMapPlayback[region]), actions, true);
-            }
+            return GetMythMainWindow()->TranslateKeyPress(
+                context, &(m_screenPressKeyMapPlayback[region]), actions, true);
         }
         return false;
     }
@@ -4650,10 +4644,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 ShowOSDStopWatchingRecording(ctx);
                 return handled;
             }
-            else
-            {
-                do_exit = true;
-            }
+            do_exit = true;
         }
         else
         {
@@ -4676,19 +4667,17 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 PxPTeardownView(ctx);
                 return handled;
             }
-            else
+
+            // If it's a DVD, and we're not trying to execute a
+            // jumppoint, try to back up.
+            if (isDVD &&
+                !GetMythMainWindow()->IsExitingToMain() &&
+                has_action("BACK", actions) &&
+                ctx->m_buffer && ctx->m_buffer->DVD()->GoBack())
             {
-                // If it's a DVD, and we're not trying to execute a
-                // jumppoint, try to back up.
-                if (isDVD &&
-                    !GetMythMainWindow()->IsExitingToMain() &&
-                    has_action("BACK", actions) &&
-                    ctx->m_buffer && ctx->m_buffer->DVD()->GoBack())
-                {
-                    return handled;
-                }
-                SetExitPlayer(true, true);
+                return handled;
             }
+            SetExitPlayer(true, true);
         }
 
         SetActive(ctx, 0, false);
@@ -7765,15 +7754,14 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         }
     }
 
-    if (reclist.size())
+    if (!reclist.empty())
     {
         RemoteEncoder *testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
         if (!testrec || !testrec->IsValidRecorder())
         {
             ClearInputQueues(ctx, true);
             ShowNoRecorderDialog(ctx);
-            if (testrec)
-                delete testrec;
+            delete testrec;
             return;
         }
 
@@ -8687,7 +8675,7 @@ void TV::DoEditSchedule(int editType)
     pause_active |= !isLiveTV && (!m_dbContinueEmbedded || isNearEnd);
     pause_active |= paused;
     vector<bool> do_pause;
-    do_pause.insert(do_pause.begin(), true, m_player.size());
+    do_pause.insert(do_pause.begin(), true, !m_player.empty());
     int actx_index = find_player_index(actx);
     if (actx_index < 0)
     {
@@ -11127,8 +11115,8 @@ bool TV::MenuItemDisplay(const MenuItemContext &c)
     {
         return MenuItemDisplayPlayback(c);
     }
-    else if (&c.m_menu == &m_cutlistMenu ||
-             &c.m_menu == &m_cutlistCompactMenu)
+    if (&c.m_menu == &m_cutlistMenu ||
+        &c.m_menu == &m_cutlistCompactMenu)
     {
         return MenuItemDisplayCutlist(c);
     }
@@ -12338,8 +12326,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
                 }
             }
             SetLastProgram(lastprog);
-            if (lastprog)
-                delete lastprog;
+            delete lastprog;
 
             while (!infoList->empty())
             {
@@ -13192,8 +13179,7 @@ void TV::SetLastProgram(const ProgramInfo *rcinfo)
 {
     QMutexLocker locker(&m_lastProgramLock);
 
-    if (m_lastProgram)
-        delete m_lastProgram;
+    delete m_lastProgram;
 
     if (rcinfo)
         m_lastProgram = new ProgramInfo(*rcinfo);

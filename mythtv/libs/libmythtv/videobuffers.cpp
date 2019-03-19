@@ -461,7 +461,7 @@ VideoFrame *VideoBuffers::Head(BufferType type)
     if (!q)
         return nullptr;
 
-    if (q->size())
+    if (!q->empty())
         return q->head();
 
     return nullptr;
@@ -476,7 +476,7 @@ VideoFrame *VideoBuffers::Tail(BufferType type)
     if (!q)
         return nullptr;
 
-    if (q->size())
+    if (!q->empty())
         return q->tail();
 
     return nullptr;
@@ -552,8 +552,7 @@ frame_queue_t::iterator VideoBuffers::begin_lock(BufferType type)
     frame_queue_t *q = Queue(type);
     if (q)
         return q->begin();
-    else
-        return m_available.begin();
+    return m_available.begin();
 }
 
 frame_queue_t::iterator VideoBuffers::end(BufferType type)
@@ -817,7 +816,7 @@ void VideoBuffers::DeleteBuffers()
     m_allocatedArrays.clear();
 }
 
-static unsigned long long to_bitmap(const frame_queue_t& list, int);
+static unsigned long long to_bitmap(const frame_queue_t& list, int /*n*/);
 QString VideoBuffers::GetStatus(int n) const
 {
     if (n <= 0)
@@ -921,13 +920,12 @@ const QString& DebugString(const VideoFrame *frame, bool short_str)
 {
     if (short_str)
         return dbg_str_arr_short[DebugNum(frame) % DBG_STR_ARR_SIZE];
-    else
-        return dbg_str_arr[DebugNum(frame) % DBG_STR_ARR_SIZE];
+    return dbg_str_arr[DebugNum(frame) % DBG_STR_ARR_SIZE];
 }
 
-const QString& DebugString(uint i, bool short_str)
+const QString& DebugString(uint str_num, bool short_str)
 {
-    return ((short_str) ? dbg_str_arr_short : dbg_str_arr)[i];
+    return ((short_str) ? dbg_str_arr_short : dbg_str_arr)[str_num];
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& list, int n)
@@ -950,12 +948,12 @@ static QString bitmap_to_string(unsigned long long bitmap)
     return str;
 }
 
-const QString DebugString(const frame_queue_t& list)
+QString DebugString(const frame_queue_t& list)
 {
     return bitmap_to_string(to_bitmap(list, DBG_STR_ARR_SIZE));
 }
 
-const QString DebugString(const vector<const VideoFrame*>& list)
+QString DebugString(const vector<const VideoFrame*>& list)
 {
     // first create a bitmap..
     unsigned long long bitmap = 0;

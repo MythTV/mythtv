@@ -29,7 +29,7 @@ const GameTypes GameTypeList[MAX_GAME_TYPES] =
     { QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
 };
 
-const QString GetGameTypeName(const QString &GameType)
+QString GetGameTypeName(const QString &GameType)
 {
     QString result = "";
 
@@ -44,7 +44,7 @@ const QString GetGameTypeName(const QString &GameType)
     return result;
 }
 
-const QString GetGameTypeExtensions(const QString &GameType)
+QString GetGameTypeExtensions(const QString &GameType)
 {
     QString result = "";
 

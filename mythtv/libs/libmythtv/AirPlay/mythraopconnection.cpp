@@ -852,7 +852,7 @@ void MythRAOPConnection::readClient(void)
         }
         while (!line.isNull());
 
-        if (m_incomingHeaders.size() == 0)
+        if (m_incomingHeaders.empty())
             return;
 
         if (!stream.atEnd())
@@ -876,10 +876,7 @@ void MythRAOPConnection::readClient(void)
         m_incomingPartial = true;
         return;
     }
-    else
-    {
-        m_incomingPartial = false;
-    }
+    m_incomingPartial = false;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Content(%1) = %2")
         .arg(m_incomingContent.size()).arg(m_incomingContent.constData()));
 
@@ -1542,15 +1539,15 @@ QStringList MythRAOPConnection::splitLines(const QByteArray &lines)
 /**
  * stringFromSeconds:
  *
- * Usage: stringFromSeconds(seconds)
+ * Usage: stringFromSeconds(timeInSeconds)
  * Description: create a string in the format HH:mm:ss from a duration in seconds
  * HH: will not be displayed if there's less than one hour
  */
-QString MythRAOPConnection::stringFromSeconds(int time)
+QString MythRAOPConnection::stringFromSeconds(int timeInSeconds)
 {
-    int   hour    = time / 3600;
-    int   minute  = (time - hour * 3600) / 60;
-    int seconds   = time - hour * 3600 - minute * 60;
+    int hour    = timeInSeconds / 3600;
+    int minute  = (timeInSeconds - hour * 3600) / 60;
+    int seconds = timeInSeconds - hour * 3600 - minute * 60;
     QString str;
 
     if (hour)

@@ -608,7 +608,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
                 SendClose(kCloseProtocolError, "Control frames MUST NOT be fragmented");
                 return;
             }
-            else if (frame.m_payloadSize > 125)
+            if (frame.m_payloadSize > 125)
             {
                 SendClose(kCloseProtocolError, "Control frames MUST NOT have payload greater than 125 bytes");
                 return;

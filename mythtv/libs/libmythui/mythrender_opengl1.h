@@ -16,7 +16,7 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
     void SetColor(int r, int g, int b, int a) override; // MythRenderOpenGL
 
     uint CreateShaderObject(const QString &vert, const QString &frag) override; // MythRenderOpenGL
-    void DeleteShaderObject(uint obj) override; // MythRenderOpenGL
+    void DeleteShaderObject(uint fp) override; // MythRenderOpenGL
     void EnableShaderObject(uint obj) override; // MythRenderOpenGL
     void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform) override; // MythRenderOpenGL
     void PushTransformation(const UIEffects &fx, QPointF &center) override; // MythRenderOpenGL

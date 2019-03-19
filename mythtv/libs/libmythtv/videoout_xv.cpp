@@ -431,8 +431,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* _disp, Window root,
                     "Missing XVideo flags, rejecting.");
                 continue;
             }
-            else
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XVideo flags...");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XVideo flags...");
 
             const XvPortID firstPort = ai[i].base_id;
             const XvPortID lastPort = ai[i].base_id + ai[i].num_ports - 1;
@@ -445,7 +444,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* _disp, Window root,
                     "Missing XV_BRIGHTNESS, rejecting.");
                 continue;
             }
-            else if (req[j].feature_flags & XvAttributes::kFeaturePicCtrl)
+            if (req[j].feature_flags & XvAttributes::kFeaturePicCtrl)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_BRIGHTNESS...");
 
             if ((req[j].feature_flags & XvAttributes::kFeatureChromakey) &&
@@ -455,7 +454,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* _disp, Window root,
                     "Missing XV_COLORKEY, rejecting.");
                 continue;
             }
-            else if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
+            if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_COLORKEY...");
 
             for (p = firstPort; (p <= lastPort) && (port == -1); ++p)

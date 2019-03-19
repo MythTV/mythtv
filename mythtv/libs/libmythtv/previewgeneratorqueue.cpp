@@ -254,8 +254,8 @@ bool PreviewGeneratorQueue::event(QEvent *e)
         }
         return true;
     }
-    else if (me->Message() == "PREVIEW_SUCCESS" ||
-             me->Message() == "PREVIEW_FAILED")
+    if (me->Message() == "PREVIEW_SUCCESS" ||
+        me->Message() == "PREVIEW_FAILED")
     {
         uint recordedingID = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
         QString filename   = me->ExtraData(1); // outFileName

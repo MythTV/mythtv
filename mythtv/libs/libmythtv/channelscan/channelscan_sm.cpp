@@ -368,7 +368,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
     }
 }
 
-void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
+void ChannelScanSM::HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_lock);
 
@@ -381,7 +381,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
         m_currentEncryptionStatus[pmt->ProgramNumber()] = kEncUnknown;
 }
 
-void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
+void ChannelScanSM::HandleVCT(uint /*pid*/, const VirtualChannelTable *vct)
 {
     QMutexLocker locker(&m_lock);
 
@@ -884,7 +884,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     if (transport_tune_complete &&
-        /*!ignoreEncryptedServices &&*/ m_currentEncryptionStatus.size())
+        /*!ignoreEncryptedServices &&*/ !m_currentEncryptionStatus.empty())
     {
         //GetDTVSignalMonitor()->GetStreamData()->StopTestingDecryption();
 
@@ -1489,7 +1489,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
             item.m_channels.push_back(*dbchan_it);
         }
 
-        if (item.m_channels.size())
+        if (!item.m_channels.empty())
         {
             if (addFullTS)
             {
@@ -1920,7 +1920,7 @@ bool ChannelScanSM::ScanTransports(
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
 
-    if (tables.size() == 0)
+    if (tables.empty())
     {
         QString msg = QString("No freq table for (%1, %2, %3) found")
                       .arg(std).arg(modulation).arg(country);

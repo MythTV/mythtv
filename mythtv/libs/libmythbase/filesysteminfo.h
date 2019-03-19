@@ -56,7 +56,7 @@ class MBASE_PUBLIC FileSystemInfo
 
     bool        ToStringList(QStringList &slist) const;
 
-    static const QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=nullptr);
+    static QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=nullptr);
     static void Consolidate(QList<FileSystemInfo> &disks, bool merge=true,
                             int64_t fuzz=14000);
     void PopulateDiskSpace(void);

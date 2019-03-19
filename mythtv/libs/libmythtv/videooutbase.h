@@ -115,7 +115,7 @@ class VideoOutput
     virtual void SaveBottomLine(void);
 
     virtual void GetOSDBounds(QRect &total, QRect &visible,
-                              float &visibleAspect, float &fontScale,
+                              float &visible_aspect, float &font_scaling,
                               float themeAspect) const;
     QRect        GetMHEGBounds(void);
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
@@ -132,7 +132,7 @@ class VideoOutput
     /// \sa ToggleAspectOverride(AspectOverrideMode)
     AspectOverrideMode GetAspectOverride(void) const;
     virtual void ToggleAspectOverride(
-        AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
+        AspectOverrideMode aspectMode = kAspect_Toggle);
 
     /// \brief Returns current adjust fill mode
     /// \sa ToggleAdjustFill(AdjustFillMode)

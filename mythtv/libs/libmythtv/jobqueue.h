@@ -229,9 +229,9 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 
     bool AllowedToRun(JobQueueEntry job);
 
-    static bool InJobRunWindow(int orStartingWithinMins = 0);
+    static bool InJobRunWindow(int orStartsWithinMins = 0);
 
-    void StartChildJob(void *(*start_routine)(void *), int jobID);
+    void StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID);
 
     QString GetJobDescription(int jobType);
     QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);

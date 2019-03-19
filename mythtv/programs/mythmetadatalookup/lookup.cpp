@@ -257,9 +257,9 @@ void LookerUpper::customEvent(QEvent *levent)
 
                 if (pginfo && (QString::compare(pginfo->GetTitle(), list[p]->GetBaseTitle(), Qt::CaseInsensitive)) == 0)
                 {
-                    bool hasArtwork = (((list[p]->GetArtwork(kArtworkFanart)).size() != 0) ||
-                                       ((list[p]->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                                       ((list[p]->GetArtwork(kArtworkBanner)).size() != 0));
+                    bool hasArtwork = ((!(list[p]->GetArtwork(kArtworkFanart)).empty()) ||
+                                       (!(list[p]->GetArtwork(kArtworkCoverart)).empty()) ||
+                                       (!(list[p]->GetArtwork(kArtworkBanner)).empty()));
 
                     // After the first exact match, prefer any more popular one.
                     // Most of the Movie database entries have Popularity fields.
@@ -290,7 +290,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     m_busyRecList.removeAll(pginfo);
                     return;
                 }
-                else if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
+                if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
                          (list[p])->GetYear() != 0 &&
                          pginfo->GetYearOfInitialRelease() == (list[p])->GetYear())
                 {
@@ -301,11 +301,8 @@ void LookerUpper::customEvent(QEvent *levent)
                         m_busyRecList.removeAll(pginfo);
                         return;
                     }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_INFO, "Matched from multiple results based on year. ");
-                        yearindex = p;
-                    }
+                    LOG(VB_GENERAL, LOG_INFO, "Matched from multiple results based on year. ");
+                    yearindex = p;
                 }
             }
 

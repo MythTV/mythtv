@@ -58,9 +58,7 @@ lighten (unsigned char value, float power)
 			val = 0;
 		return val;
 	}
-	else {
-		return 0;
-	}
+        return 0;
 }
 
 static void

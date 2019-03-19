@@ -47,7 +47,7 @@ class SubtitleReader
 
     TextSubtitles* GetTextSubtitles(void) { return &m_TextSubtitles; }
     bool HasTextSubtitles(void);
-    void LoadExternalSubtitles(const QString &videoFile, bool isInProgress);
+    void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);
 
     QStringList GetRawTextSubtitles(uint64_t &duration);
     void AddRawTextSubtitle(QStringList list, uint64_t duration);

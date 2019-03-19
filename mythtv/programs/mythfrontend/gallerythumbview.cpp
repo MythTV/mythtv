@@ -1169,7 +1169,7 @@ void GalleryThumbView::MenuAction(MythMenu *mainMenu)
     ImagePtrK selected = m_menuState.m_selected;
 
     // Operate on current marked files, if any
-    if (m_menuState.m_markedId.size() > 0)
+    if (!m_menuState.m_markedId.empty())
     {
         QString title = tr("%L1 marked").arg(m_menuState.m_markedId.size());
 
@@ -1663,7 +1663,7 @@ void GalleryThumbView::ShowSettings()
 */
 void GalleryThumbView::ShowHidden(bool show)
 {
-    gCoreContext->SaveSetting("GalleryShowHidden", show);
+    gCoreContext->SaveBoolSetting("GalleryShowHidden", show);
 
     // Update Db(s)
     m_mgr.SetVisibility(show);

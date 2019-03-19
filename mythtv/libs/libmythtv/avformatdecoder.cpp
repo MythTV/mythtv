@@ -174,7 +174,7 @@ static float get_aspect(H264Parser &p)
 }
 
 
-int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flase);
+int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 void release_avf_buffer(void *opaque, uint8_t *data);
 #ifdef USING_VDPAU
 int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags);
@@ -243,8 +243,8 @@ static int has_codec_parameters(AVStream *st)
             if (avctx->pix_fmt == AV_PIX_FMT_NONE)
                 FAIL("unspecified pixel format");
             if (avctx->codec_id == AV_CODEC_ID_RV30 || avctx->codec_id == AV_CODEC_ID_RV40)
-            if (!st->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !st->codec_info_nb_frames)
-            FAIL("no frame in rv30/40 and no sar");
+                if (!st->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !st->codec_info_nb_frames)
+                    FAIL("no frame in rv30/40 and no sar");
             break;
         case AVMEDIA_TYPE_SUBTITLE:
             if (st->codecpar->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && !st->codecpar->width)
@@ -366,18 +366,15 @@ static int get_canonical_lang(const char *lang_cstr)
     {
         return iso639_str3_to_key("und");
     }
-    else if (lang_cstr[2] == '\0')
+    if (lang_cstr[2] == '\0')
     {
         QString tmp2 = lang_cstr;
         QString tmp3 = iso639_str2_to_str3(tmp2);
         int lang = iso639_str3_to_key(tmp3);
         return iso639_key_to_canonical_key(lang);
     }
-    else
-    {
-        int lang = iso639_str3_to_key(lang_cstr);
-        return iso639_key_to_canonical_key(lang);
-    }
+    int lang = iso639_str3_to_key(lang_cstr);
+    return iso639_key_to_canonical_key(lang);
 }
 
 void AvFormatDecoder::GetDecoders(render_opts &opts)
@@ -469,8 +466,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     av_freep(&m_audioSamples);
 
-    if (m_avfRingBuffer)
-        delete m_avfRingBuffer;
+    delete m_avfRingBuffer;
 
     if (LCD *lcd = LCD::Get())
     {
@@ -1040,8 +1036,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     // anything whilst probing the data streams.
     m_processFrames = !ringBuffer->IsDVD();
 
-    if (m_avfRingBuffer)
-        delete m_avfRingBuffer;
+    delete m_avfRingBuffer;
     m_avfRingBuffer = new AVFRingBuffer(rbuffer);
 
     AVInputFormat *fmt      = nullptr;
@@ -1510,8 +1505,8 @@ static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 
 #ifdef USING_VAAPI
 // Declared separately to allow attribute
-static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
-                                         const enum AVPixelFormat *);
+static enum AVPixelFormat get_format_vaapi(struct AVCodecContext * /*avctx*/,
+                                         const enum AVPixelFormat * /*valid_fmts*/);
 
 enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
                                          const enum AVPixelFormat *valid_fmts)
@@ -1846,7 +1841,7 @@ static void cc608_build_parity_table(int *parity_table)
         int parity_v = cc608_parity(byte);
         /* CC uses odd parity (i.e., # of 1's in byte is odd.) */
         parity_table[byte] = parity_v;
-        parity_table[byte | 0x80] = !parity_v;
+        parity_table[byte | 0x80] = (parity_v == 0 ? 1 : 0);
     }
 }
 
@@ -1855,13 +1850,14 @@ static void cc608_build_parity_table(int *parity_table)
 
 static int cc608_good_parity(const int *parity_table, uint16_t data)
 {
-    int ret = parity_table[data & 0xff] && parity_table[(data & 0xff00) >> 8];
+    bool ret = (parity_table[data & 0xff] != 0)
+        && (parity_table[(data & 0xff00) >> 8] != 0);
     if (!ret)
     {
         LOG(VB_VBI, LOG_ERR, LOC +
             QString("VBI: Bad parity in EIA-608 data (%1)") .arg(data,0,16));
     }
-    return ret;
+    return ret ? 1 : 0;
 }
 
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
@@ -2000,7 +1996,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 {
     // ScanStreams() calls m_tracks[kTrackTypeTeletextCaptions].clear()
-    if (!m_ic->cur_pmt_sect || m_tracks[kTrackTypeTeletextCaptions].size())
+    if (!m_ic->cur_pmt_sect || !m_tracks[kTrackTypeTeletextCaptions].empty())
         return;
 
     const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
@@ -2043,7 +2039,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
         }
 
         // Assume there is only one multiplexed teletext stream in PMT..
-        if (m_tracks[kTrackTypeTeletextCaptions].size())
+        if (!m_tracks[kTrackTypeTeletextCaptions].empty())
             break;
     }
 }
@@ -2780,15 +2776,13 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
             .arg(error));
         return false;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Opened codec 0x%1, id(%2) type(%3)")
-            .arg((uint64_t)avctx,0,16)
-            .arg(ff_codec_id_string(avctx->codec_id))
-            .arg(ff_codec_type_string(avctx->codec_type)));
-        return true;
-    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Opened codec 0x%1, id(%2) type(%3)")
+        .arg((uint64_t)avctx,0,16)
+        .arg(ff_codec_id_string(avctx->codec_id))
+        .arg(ff_codec_type_string(avctx->codec_type)));
+    return true;
 }
 
 void AvFormatDecoder::UpdateFramesPlayed(void)
@@ -3185,9 +3179,9 @@ int get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic, int flags)
 }
 #endif
 
-void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
+void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte)
 {
-    if (!len)
+    if (!buf_size)
         return;
 
     // closed caption data
@@ -3204,19 +3198,19 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
     uint cc_count = buf[0] & 0x1f;
     // em_data                 8 1.0
 
-    if (len < 2+(3*cc_count))
+    if (buf_size < 2+(3*cc_count))
         return;
 
     DecodeCCx08(buf+2, cc_count*3, scte);
 }
 
-void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint len, bool scte)
+void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 {
-    if (len < 3)
+    if (buf_size < 3)
         return;
 
     bool had_608 = false, had_708 = false;
-    for (uint cur = 0; cur + 3 < len; cur += 3)
+    for (uint cur = 0; cur + 3 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
         bool cc_valid = cc_code & 0x04;
@@ -3239,8 +3233,8 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint len, bool scte)
             if (cc_type == 0x2)
             {
                 // SCTE repeated field
-                field = !m_last_scte_field;
-                m_invert_scte_field = !m_invert_scte_field;
+                field = (m_last_scte_field == 0 ? 1 : 0);
+                m_invert_scte_field = (m_invert_scte_field == 0 ? 1 : 0);
             }
             else
             {
@@ -3482,7 +3476,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (m_start_code_state >= SLICE_MIN && m_start_code_state <= SLICE_MAX)
             continue;
-        else if (SEQ_START == m_start_code_state)
+        if (SEQ_START == m_start_code_state)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
                 continue; // not enough valid data...
@@ -4250,7 +4244,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
  *  \sa TeletextDecoder
  */
 void AvFormatDecoder::ProcessDVBDataPacket(
-    const AVStream*, const AVPacket *pkt)
+    const AVStream* /*stream*/, const AVPacket *pkt)
 {
     const uint8_t *buf     = pkt->data;
     const uint8_t *buf_end = pkt->data + pkt->size;
@@ -4519,20 +4513,17 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QString("%1: %2").arg(trackNo + 1).arg(msg);
     }
-    else if (kTrackTypeSubtitle == type)
+    if (kTrackTypeSubtitle == type)
     {
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
             .arg(forcedString);
     }
-    else if (forced && kTrackTypeRawText == type)
+    if (forced && kTrackTypeRawText == type)
     {
         return DecoderBase::GetTrackDesc(type, trackNo) + forcedString;
     }
-    else
-    {
-        return DecoderBase::GetTrackDesc(type, trackNo);
-    }
+    return DecoderBase::GetTrackDesc(type, trackNo);
 }
 
 int AvFormatDecoder::GetTeletextDecoderType(void) const
@@ -5061,8 +5052,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if ((m_lastapts < m_lastvpts - (10.0f / m_fps)) || m_lastvpts == 0)
                     break;
-                else
-                    m_skipaudio = false;
+                m_skipaudio = false;
             }
 
             // skip any audio frames preceding first video frame
@@ -5256,8 +5246,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     m_allowedquit = true;
             }
         }
-        else
-        if ((origDecodetype & kDecodeAudio) &&
+        else if ((origDecodetype & kDecodeAudio) &&
             (m_currentTrack[kTrackTypeAudio] >= 0) &&
             (m_selectedTrack[kTrackTypeAudio].m_av_stream_index >= 0))
         {
@@ -5498,9 +5487,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         av_packet_unref(pkt);
     }
 
-    if (pkt)
-        delete pkt;
-
+    delete pkt;
     return true;
 }
 

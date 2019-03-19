@@ -41,8 +41,7 @@ UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
 
 UPnpEventTask::~UPnpEventTask()  
 { 
-    if (m_pPayload != nullptr)
-        delete m_pPayload;
+    delete m_pPayload;
 }
 
 /////////////////////////////////////////////////////////////////////////////

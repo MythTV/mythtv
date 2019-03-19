@@ -82,14 +82,14 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
 
     if (m_parentEdit)
         m_preferredPos = m_parentEdit->GetKeyboardPosition();
-     else
+    else
         m_preferredPos = VK_POSBELOWEDIT;
 
-     loadEventKeyDefinitions(&m_upKey, "UP");
-     loadEventKeyDefinitions(&m_downKey, "DOWN");
-     loadEventKeyDefinitions(&m_leftKey, "LEFT");
-     loadEventKeyDefinitions(&m_rightKey, "RIGHT");
-     loadEventKeyDefinitions(&m_newlineKey, "NEWLINE");
+    loadEventKeyDefinitions(&m_upKey, "UP");
+    loadEventKeyDefinitions(&m_downKey, "DOWN");
+    loadEventKeyDefinitions(&m_leftKey, "LEFT");
+    loadEventKeyDefinitions(&m_rightKey, "RIGHT");
+    loadEventKeyDefinitions(&m_newlineKey, "NEWLINE");
 }
 
 bool MythUIVirtualKeyboard::Create()
@@ -615,8 +615,7 @@ QString MythUIVirtualKeyboard::getKeyText(KeyDefinition key)
     {
         if (m_alt)
             return key.altshift;
-        else
-            return key.shift;
+        return key.shift;
     }
 
     if (m_alt)

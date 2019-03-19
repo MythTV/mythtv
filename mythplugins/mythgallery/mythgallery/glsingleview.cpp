@@ -1488,8 +1488,7 @@ float GLSingleView::FindMaxScale(float x_loc, float y_loc)
     // Zoom big enough to keep the entire image on screen when we pan
     if (abs(x_loc) > abs(y_loc))
         return abs(x_loc) * 2;
-    else
-        return abs(y_loc) * 2;
+    return abs(y_loc) * 2;
 }
 
 void GLSingleView::FindRandXY(float &x_loc, float &y_loc)

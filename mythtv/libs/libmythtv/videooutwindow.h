@@ -45,7 +45,7 @@ class VideoOutWindow
         AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
     void ToggleAspectOverride(
-        AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
+        AspectOverrideMode aspectMode = kAspect_Toggle);
 
     void ResizeDisplayWindow(const QRect&, bool);
 

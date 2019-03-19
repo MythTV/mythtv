@@ -168,7 +168,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     MythRect GetButtonArea(void) const;
 
     void SetItemCurrent(MythUIButtonListItem* item);
-    void SetItemCurrent(int pos, int topPos = -1);
+    void SetItemCurrent(int current, int topPos = -1);
     MythUIButtonListItem* GetItemCurrent() const;
     MythUIButtonListItem* GetItemFirst() const;
     MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item) const;

@@ -164,7 +164,7 @@ int MythCodecContext::FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame)
 {
     int ret = 0;
 
-    while (1)
+    while (true)
     {
         if (filter_graph)
         {
@@ -243,13 +243,10 @@ bool MythCodecContext::setDeinterlacer(bool enable, QString name)
     {
         if (deinterlacername.isEmpty())
             return true;
-        else
-        {
-            deinterlacername.clear();
-            doublerate = false;
-            filtersInitialized = false;
-            return true;
-        }
+        deinterlacername.clear();
+        doublerate = false;
+        filtersInitialized = false;
+        return true;
     }
 
     // Code to enable or change interlace

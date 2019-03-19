@@ -104,13 +104,13 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *   tvformat&nbsp;(ntsc,ntsc-jp,pal-m),
      *   vbiformat&nbsp;("none","pal teletext","ntsc").
      */
-    virtual void SetOption(const QString &opt, const QString &value);
+    virtual void SetOption(const QString &name, const QString &value);
 
     /** \brief Set an specific integer option.
      *
      *   There are no integer options in RecorderBase.
      */
-    virtual void SetOption(const QString &opt, int value);
+    virtual void SetOption(const QString &name, int value);
 
     /** \brief Tells recorder which filters to use.
      *
@@ -265,7 +265,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     /** \brief Note a change in aspect ratio in the recordedmark table
      */
-    void AspectChange(uint ratio, long long frame);
+    void AspectChange(uint aspect, long long frame);
 
     /** \brief Note a change in video size in the recordedmark table
      */

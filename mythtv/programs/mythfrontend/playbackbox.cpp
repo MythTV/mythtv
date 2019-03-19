@@ -59,8 +59,7 @@ static int comp_programid(const ProgramInfo *a, const ProgramInfo *b)
     if (a->GetProgramID() == b->GetProgramID())
         return (a->GetRecordingStartTime() <
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (a->GetProgramID() < b->GetProgramID() ? 1 : -1);
+    return (a->GetProgramID() < b->GetProgramID() ? 1 : -1);
 }
 
 static int comp_programid_rev(const ProgramInfo *a, const ProgramInfo *b)
@@ -68,8 +67,7 @@ static int comp_programid_rev(const ProgramInfo *a, const ProgramInfo *b)
     if (a->GetProgramID() == b->GetProgramID())
         return (a->GetRecordingStartTime() >
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (a->GetProgramID() > b->GetProgramID() ? 1 : -1);
+    return (a->GetProgramID() > b->GetProgramID() ? 1 : -1);
 }
 
 static int comp_originalAirDate(const ProgramInfo *a, const ProgramInfo *b)
@@ -82,8 +80,7 @@ static int comp_originalAirDate(const ProgramInfo *a, const ProgramInfo *b)
     if (dt1 == dt2)
         return (a->GetRecordingStartTime() <
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (dt1 < dt2 ? 1 : -1);
+    return (dt1 < dt2 ? 1 : -1);
 }
 
 static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
@@ -96,8 +93,7 @@ static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
     if (dt1 == dt2)
         return (a->GetRecordingStartTime() >
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (dt1 > dt2 ? 1 : -1);
+    return (dt1 > dt2 ? 1 : -1);
 }
 
 static int comp_recpriority2(const ProgramInfo *a, const ProgramInfo *b)
@@ -105,9 +101,8 @@ static int comp_recpriority2(const ProgramInfo *a, const ProgramInfo *b)
     if (a->GetRecordingPriority2() == b->GetRecordingPriority2())
         return (a->GetRecordingStartTime() <
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (a->GetRecordingPriority2() <
-                b->GetRecordingPriority2() ? 1 : -1);
+    return (a->GetRecordingPriority2() <
+            b->GetRecordingPriority2() ? 1 : -1);
 }
 
 static int comp_recordDate(const ProgramInfo *a, const ProgramInfo *b)
@@ -115,9 +110,8 @@ static int comp_recordDate(const ProgramInfo *a, const ProgramInfo *b)
     if (a->GetScheduledStartTime().date() == b->GetScheduledStartTime().date())
         return (a->GetRecordingStartTime() <
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (a->GetScheduledStartTime().date() <
-                b->GetScheduledStartTime().date() ? 1 : -1);
+    return (a->GetScheduledStartTime().date() <
+            b->GetScheduledStartTime().date() ? 1 : -1);
 }
 
 static int comp_recordDate_rev(const ProgramInfo *a, const ProgramInfo *b)
@@ -125,9 +119,8 @@ static int comp_recordDate_rev(const ProgramInfo *a, const ProgramInfo *b)
     if (a->GetScheduledStartTime().date() == b->GetScheduledStartTime().date())
         return (a->GetRecordingStartTime() >
                 b->GetRecordingStartTime() ? 1 : -1);
-    else
-        return (a->GetScheduledStartTime().date() >
-                b->GetScheduledStartTime().date() ? 1 : -1);
+    return (a->GetScheduledStartTime().date() >
+            b->GetScheduledStartTime().date() ? 1 : -1);
 }
 
 static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
@@ -1989,23 +1982,21 @@ bool PlaybackBox::UpdateUILists(void)
                     pit = m_progLists[m_watchGroupLabel].erase(pit);
                     continue;
                 }
+
+                LOG(VB_FILE, LOG_INFO, QString("Daily interval:  %1")
+                    .arg((*pit)->GetTitle()));
+
+                if (maxEpisodes[recid] > 0)
+                {
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        (baseValue / 2) + (hrs / 24));
+                }
                 else
                 {
-                    LOG(VB_FILE, LOG_INFO, QString("Daily interval:  %1")
-                            .arg((*pit)->GetTitle()));
-
-                    if (maxEpisodes[recid] > 0)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            (baseValue / 2) + (hrs / 24));
-                    }
-                    else
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            (baseValue / 5) + hrs);
-                    }
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        (baseValue / 5) + hrs);
                 }
             }
             // Weekly
@@ -2022,11 +2013,43 @@ bool PlaybackBox::UpdateUILists(void)
                     pit = m_progLists[m_watchGroupLabel].erase(pit);
                     continue;
                 }
+
+                LOG(VB_FILE, LOG_INFO, QString("Weekly interval: %1")
+                    .arg((*pit)->GetTitle()));
+
+                if (maxEpisodes[recid] > 0)
+                {
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        (baseValue / 2) + (hrs / 24));
+                }
                 else
                 {
-                    LOG(VB_FILE, LOG_INFO, QString("Weekly interval: %1")
-                            .arg((*pit)->GetTitle()));
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        (baseValue / 3) + (baseValue * hrs / 24 / 4));
+                }
+            }
+            // Not recurring
+            else
+            {
+                if (delHours[recid] < (m_watchListBlackOut * 48) - 4)
+                {
+                    (*pit)->SetRecordingPriority2(wlDeleted);
+                    pit = m_progLists[m_watchGroupLabel].erase(pit);
+                    continue;
+                }
 
+                // add points for a new Single or final episode
+                if (hrs < 36)
+                {
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        baseValue * (36 - hrs) / 36);
+                }
+
+                if (avgd != 100)
+                {
                     if (maxEpisodes[recid] > 0)
                     {
                         (*pit)->SetRecordingPriority2(
@@ -2040,53 +2063,17 @@ bool PlaybackBox::UpdateUILists(void)
                             (baseValue / 3) + (baseValue * hrs / 24 / 4));
                     }
                 }
-            }
-            // Not recurring
-            else
-            {
-                if (delHours[recid] < (m_watchListBlackOut * 48) - 4)
+                else if ((hrs / 24) < m_watchListMaxAge)
                 {
-                    (*pit)->SetRecordingPriority2(wlDeleted);
-                    pit = m_progLists[m_watchGroupLabel].erase(pit);
-                    continue;
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        hrs / 24);
                 }
                 else
                 {
-                    // add points for a new Single or final episode
-                    if (hrs < 36)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            baseValue * (36 - hrs) / 36);
-                    }
-
-                    if (avgd != 100)
-                    {
-                        if (maxEpisodes[recid] > 0)
-                        {
-                            (*pit)->SetRecordingPriority2(
-                                (*pit)->GetRecordingPriority2() +
-                                (baseValue / 2) + (hrs / 24));
-                        }
-                        else
-                        {
-                            (*pit)->SetRecordingPriority2(
-                                (*pit)->GetRecordingPriority2() +
-                                (baseValue / 3) + (baseValue * hrs / 24 / 4));
-                        }
-                    }
-                    else if ((hrs / 24) < m_watchListMaxAge)
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            hrs / 24);
-                    }
-                    else
-                    {
-                        (*pit)->SetRecordingPriority2(
-                            (*pit)->GetRecordingPriority2() +
-                            m_watchListMaxAge);
-                    }
+                    (*pit)->SetRecordingPriority2(
+                        (*pit)->GetRecordingPriority2() +
+                        m_watchListMaxAge);
                 }
             }
 
@@ -2119,9 +2106,9 @@ bool PlaybackBox::UpdateUILists(void)
     }
 
     m_titleList = QStringList("");
-    if (m_progLists[m_watchGroupLabel].size() > 0)
+    if (!m_progLists[m_watchGroupLabel].empty())
         m_titleList << m_watchGroupName;
-    if ((m_progLists["livetv"].size() > 0) &&
+    if ((!m_progLists["livetv"].empty()) &&
         (!sortedList.values().contains(tr("Live TV"))))
         m_titleList << tr("Live TV");
     m_titleList << sortedList.values();
@@ -4164,12 +4151,9 @@ void PlaybackBox::customEvent(QEvent *event)
                     ShowDeletePopup(kForceDeleteRecording);
                     return;
                 }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        "Delete failures not handled due to "
-                        "pre-existing popup.");
-                }
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    "Delete failures not handled due to "
+                    "pre-existing popup.");
             }
 
             // Since we deleted items from the UI after we set

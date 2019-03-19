@@ -22,7 +22,7 @@ class DVDThemeSelector : public MythScreenType
   Q_OBJECT
 
   public:
-    DVDThemeSelector(MythScreenStack *parent, MythScreenType *previousScreen,
+    DVDThemeSelector(MythScreenStack *parent, MythScreenType *destinationScreen,
                      ArchiveDestination archiveDestination, QString name);
     ~DVDThemeSelector(void);
 

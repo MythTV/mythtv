@@ -261,7 +261,7 @@ void MythControls::Close()
  *  \brief Refreshes the right list when an item in the
  *         left list is selected
  */
-void MythControls::LeftSelected(MythUIButtonListItem*)
+void MythControls::LeftSelected(MythUIButtonListItem* /*item*/)
 {
     UpdateRightList();
 }
@@ -270,7 +270,7 @@ void MythControls::LeftSelected(MythUIButtonListItem*)
  *  \brief Refreshes key information when an item in the
  *         right list is selected
  */
-void MythControls::RightSelected(MythUIButtonListItem*)
+void MythControls::RightSelected(MythUIButtonListItem* /*item*/)
 {
     RefreshKeyInformation();
 }

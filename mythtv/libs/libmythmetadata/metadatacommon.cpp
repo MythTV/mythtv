@@ -818,13 +818,13 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
                        lookup->GetRuntimeSeconds())));
     }
 
-    if (lookup->GetCertification().size())
+    if (!lookup->GetCertification().isEmpty())
         AddCertifications(lookup, item, docroot);
-    if (lookup->GetCategories().size())
+    if (!lookup->GetCategories().empty())
         AddCategories(lookup, item, docroot);
-    if (lookup->GetStudios().size())
+    if (!lookup->GetStudios().empty())
         AddStudios(lookup, item, docroot);
-    if (lookup->GetCountries().size())
+    if (!lookup->GetCountries().empty())
         AddCountries(lookup, item, docroot);
 }
 
@@ -1370,8 +1370,7 @@ QString nearestName(const QString& actual, const QStringList& candidates)
     if ( numBest == 1 && deltaBest <= tolerance &&
        actual.length() + best.length() >= 5 )
         return best;
-    else
-        return QString();
+    return QString();
 }
 
 QDateTime RFC822TimeToQDateTime(const QString& t)

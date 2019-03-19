@@ -18,39 +18,39 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr)
-    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(rr)
+                                   const std::vector<double>& refreshRate)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(refreshRate)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr,
-                                   const std::map<double, short>& rr2)
-: realRates(rr2), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
-  m_refreshRates(rr), m_custom(true)
+                                   const std::vector<double>& refreshRate,
+                                   const std::map<double, short>& realrates)
+: realRates(realrates), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
+  m_refreshRates(refreshRate), m_custom(true)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const double* rr, uint rr_length)
+                                   const double* refreshRate, uint rr_length)
     : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        m_refreshRates.push_back(rr[i]);
+        m_refreshRates.push_back(refreshRate[i]);
 
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const short* rr, uint rr_length)
+                                   const short* refreshRate, uint rr_length)
     : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        m_refreshRates.push_back((double)rr[i]);
+        m_refreshRates.push_back((double)refreshRate[i]);
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
@@ -111,8 +111,7 @@ bool DisplayResScreen::compare_rates(double f1, double f2, double precision)
     if (((f1 - precision) < f2) &&
         ((f1 + precision) > f2))
         return true;
-    else
-        return false;
+    return false;
 }
 
 int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
@@ -136,7 +135,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
         if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height())
         {
             const std::vector<double>& rates = dsr[i].RefreshRates();
-            if (rates.size() && videorate != 0)
+            if (!rates.empty() && videorate != 0)
             {
                 while (!end)
                 {

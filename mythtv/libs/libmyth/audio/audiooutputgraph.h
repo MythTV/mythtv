@@ -17,7 +17,7 @@ public:
     virtual ~AudioOutputGraph();
 
     // Properties
-    void SetPainter(MythPainter*);
+    void SetPainter(MythPainter* /*painter*/);
     void SetSampleRate(unsigned sample_rate);
     void SetSampleCount(unsigned sample_count);
 
@@ -33,7 +33,7 @@ public:
     // MythTV::Visual implementation
 public:
     void add(const void *b, unsigned long b_len, unsigned long timecode,
-             int chnls, int bits) override; // Visual
+             int channels, int bits) override; // Visual
     void prepare() override; // Visual
 
     // Implementation

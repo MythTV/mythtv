@@ -78,7 +78,7 @@ class ChannelBase
     virtual QString GetDevice(void) const { return ""; }
 
     // Sets
-    virtual void Renumber(uint srcid, const QString &oldChanNum,
+    virtual void Renumber(uint sourceid, const QString &oldChanNum,
                           const QString &newChanNum);
 
     virtual bool InitializeInput(void);
@@ -104,7 +104,7 @@ class ChannelBase
     int GetMajorID(void);
 
     static ChannelBase *CreateChannel(
-        TVRec                    *tv_rec,
+        TVRec                    *tvrec,
         const GeneralDBOptions   &genOpt,
         const DVBDBOptions       &dvbOpt,
         const FireWireDBOptions  &fwOpt,
@@ -117,7 +117,7 @@ class ChannelBase
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
     virtual bool IsInputAvailable(uint &mplexid_restriction,
-                                  uint &chanid_restrtiction) const;
+                                  uint &chanid_restriction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
   protected:
@@ -127,8 +127,8 @@ class ChannelBase
     uint GetScriptStatus(bool holding_lock = false);
 
     bool ChangeExternalChannel(const QString &changer,
-                               const QString &newchan);
-    bool ChangeInternalChannel(const QString &newchan,
+                               const QString &freqid);
+    bool ChangeInternalChannel(const QString &freqid,
                                uint cardinputid);
 
     TVRec            *m_pParent        {nullptr};

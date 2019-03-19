@@ -142,22 +142,19 @@ static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
     {
         if (a->GetRecordingStartTime() > b->GetRecordingStartTime())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
     {
         if (a->GetRecordingEndTime() > b->GetRecordingEndTime())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
     {
         if (a->GetChannelSchedulingID() < b->GetChannelSchedulingID())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     if (a->GetRecordingPriority() != b->GetRecordingPriority() &&
         (a->GetRecordingStatus() == RecStatus::WillRecord ||
@@ -167,8 +164,7 @@ static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
     {
         if (a->GetRecordingPriority() < b->GetRecordingPriority())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     return 0;
 }
@@ -342,6 +338,5 @@ ProgramInfo *ViewScheduleDiff::CurrentProgram()
 
     if (s.m_after)
         return s.m_after;
-    else
-        return s.m_before;
+    return s.m_before;
 }

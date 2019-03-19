@@ -506,12 +506,12 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             HandleVersion(sock, tokens);
         return;
     }
-    else if (command == "ANN")
+    if (command == "ANN")
     {
         HandleAnnounce(listline, tokens, sock);
         return;
     }
-    else if (command == "DONE")
+    if (command == "DONE")
     {
         HandleDone(sock);
         return;
@@ -1600,7 +1600,7 @@ void MainServer::customEvent(QEvent *e)
                     {
                         continue;
                     }
-                    else if (!pbs->wantsOnlySystemEvents())
+                    if (!pbs->wantsOnlySystemEvents())
                     {
                         if (sentSetSystemEvent.contains(pbs->getHostname()))
                             continue;
@@ -2040,7 +2040,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         ft->DecrRef();
 
-        if (checkfiles.size())
+        if (!checkfiles.empty())
         {
             QFileInfo fi(filename);
             QDir dir = fi.absoluteDir();
@@ -2898,16 +2898,13 @@ void MainServer::DoHandleStopRecording(
             slave->DecrRef();
             return;
         }
-        else
-        {
-            // If the slave is unreachable, we can assume that the
-            // recording has stopped and the status should be updated.
-            // Continue so that the master can try to update the endtime
-            // of the file is in a shared directory.
-            if (m_sched)
-                m_sched->UpdateRecStatus(&recinfo);
-        }
 
+        // If the slave is unreachable, we can assume that the
+        // recording has stopped and the status should be updated.
+        // Continue so that the master can try to update the endtime
+        // of the file is in a shared directory.
+        if (m_sched)
+            m_sched->UpdateRecStatus(&recinfo);
     }
 
     int recnum = -1;
@@ -4283,10 +4280,9 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
                 SendResponse(pbssock, strlist);
                 return;
             }
-            else
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "MainServer::LockTuner(): Could not find "
-                    "card info in database");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "MainServer::LockTuner(): Could not find "
+                "card info in database");
         }
         else
         {
@@ -5973,37 +5969,33 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagUpdateVolatile: Failed to grab slave socket on '%1'").arg(hostname));
-
-            strlist << "ERROR: slave not found";
-
-            if (pbssock)
-                SendResponse(pbssock, strlist);
-
-            return;
-        }
-    }
-    else
-    {
-        //  run mythutil to update the metadata
-        QStringList paramList;
-        paramList.append(QString("--songid='%1'").arg(slist[2]));
-        paramList.append(QString("--rating='%1'").arg(slist[3]));
-        paramList.append(QString("--playcount='%1'").arg(slist[4]));
-        paramList.append(QString("--lastplayed='%1'").arg(slist[5]));
-
-        QString command = GetAppBinDir() + "mythutil --updatemeta " + paramList.join(" ");
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("HandleMusicTagUpdateVolatile: running %1'").arg(command));
-        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                          kMSAutoCleanup | kMSRunBackground |
-                                                          kMSDontDisableDrawing | kMSProcessEvents |
-                                                          kMSDontBlockInputDevs));
+            QString("HandleMusicTagUpdateVolatile: Failed to grab slave socket on '%1'").arg(hostname));
+
+        strlist << "ERROR: slave not found";
+
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
     }
+
+    //  run mythutil to update the metadata
+    QStringList paramList;
+    paramList.append(QString("--songid='%1'").arg(slist[2]));
+    paramList.append(QString("--rating='%1'").arg(slist[3]));
+    paramList.append(QString("--playcount='%1'").arg(slist[4]));
+    paramList.append(QString("--lastplayed='%1'").arg(slist[5]));
+
+    QString command = GetAppBinDir() + "mythutil --updatemeta " + paramList.join(" ");
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("HandleMusicTagUpdateVolatile: running %1'").arg(command));
+    QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                      kMSAutoCleanup | kMSRunBackground |
+                                                      kMSDontDisableDrawing | kMSProcessEvents |
+                                                      kMSDontBlockInputDevs));
 
     strlist << "OK";
 
@@ -6037,34 +6029,30 @@ void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock 
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicCalcTrackLen: Failed to grab slave socket on '%1'").arg(hostname));
-
-            strlist << "ERROR: slave not found";
-
-            if (pbssock)
-                SendResponse(pbssock, strlist);
-
-            return;
-        }
-    }
-    else
-    {
-        //  run mythutil to calc the tracks length
-        QStringList paramList;
-        paramList.append(QString("--songid='%1'").arg(slist[2]));
-
-        QString command = GetAppBinDir() + "mythutil --calctracklen " + paramList.join(" ");
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("HandleMusicCalcTrackLen: running %1'").arg(command));
-        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                          kMSAutoCleanup | kMSRunBackground |
-                                                          kMSDontDisableDrawing | kMSProcessEvents |
-                                                          kMSDontBlockInputDevs));
+            QString("HandleMusicCalcTrackLen: Failed to grab slave socket on '%1'").arg(hostname));
+
+        strlist << "ERROR: slave not found";
+
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
     }
+
+    //  run mythutil to calc the tracks length
+    QStringList paramList;
+    paramList.append(QString("--songid='%1'").arg(slist[2]));
+
+    QString command = GetAppBinDir() + "mythutil --calctracklen " + paramList.join(" ");
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("HandleMusicCalcTrackLen: running %1'").arg(command));
+    QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                      kMSAutoCleanup | kMSRunBackground |
+                                                      kMSDontDisableDrawing | kMSProcessEvents |
+                                                      kMSDontBlockInputDevs));
 
     strlist << "OK";
 
@@ -6100,59 +6088,55 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagUpdateMetadata: Failed to grab "
-                        "slave socket on '%1'").arg(hostname));
 
-            strlist << "ERROR: slave not found";
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicTagUpdateMetadata: Failed to grab "
+                    "slave socket on '%1'").arg(hostname));
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+        strlist << "ERROR: slave not found";
 
-            return;
-        }
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
     }
-    else
+
+    // load the new metadata from the database
+    int songID = slist[2].toInt();
+
+    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+    if (!mdata)
     {
-        // load the new metadata from the database
-        int songID = slist[2].toInt();
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagUpdateMetadata: "
+                    "Cannot find metadata for trackid: %1")
+            .arg(songID));
 
-        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        strlist << "ERROR: track not found";
 
-        if (!mdata)
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
+    }
+
+    MetaIO *tagger = mdata->getTagger();
+    if (tagger)
+    {
+        if (!tagger->write(mdata->getLocalFilename(), mdata))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("HandleMusicTagUpdateMetadata: "
-                        "Cannot find metadata for trackid: %1")
-                    .arg(songID));
+                        "Failed to write to tag for trackid: %1")
+                .arg(songID));
 
-            strlist << "ERROR: track not found";
+            strlist << "ERROR: write to tag failed";
 
             if (pbssock)
                 SendResponse(pbssock, strlist);
 
             return;
-        }
-
-        MetaIO *tagger = mdata->getTagger();
-        if (tagger)
-        {
-            if (!tagger->write(mdata->getLocalFilename(), mdata))
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("HandleMusicTagUpdateMetadata: "
-                            "Failed to write to tag for trackid: %1")
-                        .arg(songID));
-
-                strlist << "ERROR: write to tag failed";
-
-                if (pbssock)
-                    SendResponse(pbssock, strlist);
-
-                return;
-            }
         }
     }
 
@@ -6190,130 +6174,126 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
 
             return;
         }
-        else
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicFindAlbumArt: Failed to grab "
+                    "slave socket on '%1'").arg(hostname));
+
+        strlist << "ERROR: slave not found";
+
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
+    }
+
+    // find the track in the database
+    int songID = slist[2].toInt();
+    bool updateDatabase = (slist[3].toInt() == 1);
+
+    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+    if (!mdata)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicFindAlbumArt: "
+                    "Cannot find metadata for trackid: %1").arg(songID));
+
+        strlist << "ERROR: track not found";
+
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
+    }
+
+    // find any directory images
+    QFileInfo fi(mdata->getLocalFilename());
+    QDir dir = fi.absoluteDir();
+
+    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
+                                                  "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+    dir.setNameFilters(nameFilter.split(";"));
+
+    QStringList files = dir.entryList();
+
+    // create an empty image list
+    AlbumArtImages *images = new AlbumArtImages(mdata, false);
+
+    fi.setFile(mdata->Filename(false));
+    QString startDir = fi.path();
+
+    for (int x = 0; x < files.size(); x++)
+    {
+        fi.setFile(files.at(x));
+        AlbumArtImage *image = new AlbumArtImage();
+        image->m_filename = startDir + '/' + fi.fileName();
+        image->m_hostname = gCoreContext->GetHostName();
+        image->m_embedded = false;
+        image->m_imageType = AlbumArtImages::guessImageType(image->m_filename);
+        image->m_description = "";
+        images->addImage(image);
+        delete image;
+    }
+
+    // find any embedded albumart in the tracks tag
+    MetaIO *tagger = mdata->getTagger();
+    if (tagger)
+    {
+        if (tagger->supportsEmbeddedImages())
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicFindAlbumArt: Failed to grab "
-                        "slave socket on '%1'").arg(hostname));
+            AlbumArtList artList = tagger->getAlbumArtList(mdata->getLocalFilename());
 
-            strlist << "ERROR: slave not found";
-
-            if (pbssock)
-                SendResponse(pbssock, strlist);
-
-            return;
+            for (int x = 0; x < artList.count(); x++)
+            {
+                AlbumArtImage *image = artList.at(x);
+                image->m_filename = QString("%1-%2").arg(mdata->ID()).arg(image->m_filename);
+                images->addImage(image);
+            }
         }
+
+        delete tagger;
     }
     else
     {
-        // find the track in the database
-        int songID = slist[2].toInt();
-        bool updateDatabase = (slist[3].toInt() == 1);
-
-        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
-
-        if (!mdata)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicFindAlbumArt: "
-                        "Cannot find metadata for trackid: %1").arg(songID));
-
-            strlist << "ERROR: track not found";
-
-            if (pbssock)
-                SendResponse(pbssock, strlist);
-
-            return;
-        }
-
-        // find any directory images
-        QFileInfo fi(mdata->getLocalFilename());
-        QDir dir = fi.absoluteDir();
-
-        QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
-                                                    "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
-        dir.setNameFilters(nameFilter.split(";"));
-
-        QStringList files = dir.entryList();
-
-        // create an empty image list
-        AlbumArtImages *images = new AlbumArtImages(mdata, false);
-
-        fi.setFile(mdata->Filename(false));
-        QString startDir = fi.path();
-
-        for (int x = 0; x < files.size(); x++)
-        {
-            fi.setFile(files.at(x));
-            AlbumArtImage *image = new AlbumArtImage();
-            image->m_filename = startDir + '/' + fi.fileName();
-            image->m_hostname = gCoreContext->GetHostName();
-            image->m_embedded = false;
-            image->m_imageType = AlbumArtImages::guessImageType(image->m_filename);
-            image->m_description = "";
-            images->addImage(image);
-            delete image;
-        }
-
-        // find any embedded albumart in the tracks tag
-        MetaIO *tagger = mdata->getTagger();
-        if (tagger)
-        {
-            if (tagger->supportsEmbeddedImages())
-            {
-                AlbumArtList artList = tagger->getAlbumArtList(mdata->getLocalFilename());
-
-                for (int x = 0; x < artList.count(); x++)
-                {
-                    AlbumArtImage *image = artList.at(x);
-                    image->m_filename = QString("%1-%2").arg(mdata->ID()).arg(image->m_filename);
-                    images->addImage(image);
-                }
-            }
-
-            delete tagger;
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicFindAlbumArt: "
-                        "Failed to find a tagger for trackid: %1").arg(songID));
-        }
-
-        // finally save the result to the database
-        if (updateDatabase)
-            images->dumpToDatabase();
-
-        strlist << "OK";
-        strlist.append(QString("%1").arg(images->getImageCount()));
-
-        for (uint x = 0; x < images->getImageCount(); x++)
-        {
-            AlbumArtImage *image = images->getImageAt(x);
-            strlist.append(QString("%1").arg(image->m_id));
-            strlist.append(QString("%1").arg((int)image->m_imageType));
-            strlist.append(QString("%1").arg(image->m_embedded));
-            strlist.append(image->m_description);
-            strlist.append(image->m_filename);
-            strlist.append(image->m_hostname);
-
-            // if this is an embedded image update the cached image
-            if (image->m_embedded)
-            {
-                QStringList paramList;
-                paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-                paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
-
-                QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
-                QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                    kMSAutoCleanup | kMSRunBackground |
-                                                    kMSDontDisableDrawing | kMSProcessEvents |
-                                                    kMSDontBlockInputDevs));
-            }
-        }
-
-        delete images;
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicFindAlbumArt: "
+                    "Failed to find a tagger for trackid: %1").arg(songID));
     }
+
+    // finally save the result to the database
+    if (updateDatabase)
+        images->dumpToDatabase();
+
+    strlist << "OK";
+    strlist.append(QString("%1").arg(images->getImageCount()));
+
+    for (uint x = 0; x < images->getImageCount(); x++)
+    {
+        AlbumArtImage *image = images->getImageAt(x);
+        strlist.append(QString("%1").arg(image->m_id));
+        strlist.append(QString("%1").arg((int)image->m_imageType));
+        strlist.append(QString("%1").arg(image->m_embedded));
+        strlist.append(image->m_description);
+        strlist.append(image->m_filename);
+        strlist.append(image->m_hostname);
+
+        // if this is an embedded image update the cached image
+        if (image->m_embedded)
+        {
+            QStringList paramList;
+            paramList.append(QString("--songid='%1'").arg(mdata->ID()));
+            paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
+
+            QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
+            QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                kMSAutoCleanup | kMSRunBackground |
+                                                kMSDontDisableDrawing | kMSProcessEvents |
+                                                kMSDontBlockInputDevs));
+        }
+    }
+
+    delete images;
 
     if (pbssock)
         SendResponse(pbssock, strlist);
@@ -6348,12 +6328,10 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagGetImage: Failed to grab slave "
-                        "socket on '%1'").arg(hostname));
-        }
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicTagGetImage: Failed to grab slave "
+                    "socket on '%1'").arg(hostname));
     }
     else
     {
@@ -6402,145 +6380,139 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagChangeImage: Failed to grab "
-                        "slave socket on '%1'").arg(hostname));
 
-            strlist << "ERROR: slave not found";
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicTagChangeImage: Failed to grab "
+                    "slave socket on '%1'").arg(hostname));
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+        strlist << "ERROR: slave not found";
 
-            return;
-        }
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
     }
-    else
+
+    int songID = slist[2].toInt();
+    ImageType oldType = (ImageType)slist[3].toInt();
+    ImageType newType = (ImageType)slist[4].toInt();
+
+    // load the metadata from the database
+    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+    if (!mdata)
     {
-        int songID = slist[2].toInt();
-        ImageType oldType = (ImageType)slist[3].toInt();
-        ImageType newType = (ImageType)slist[4].toInt();
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagChangeImage: "
+                    "Cannot find metadata for trackid: %1")
+            .arg(songID));
 
-        // load the metadata from the database
-        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        strlist << "ERROR: track not found";
 
-        if (!mdata)
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
+    }
+
+    mdata->setFilename(mdata->getLocalFilename());
+
+    AlbumArtImages *albumArt = mdata->getAlbumArtImages();
+    AlbumArtImage *image = albumArt->getImage(oldType);
+    if (image)
+    {
+        AlbumArtImage oldImage = *image;
+
+        image->m_imageType = newType;
+
+        if (image->m_imageType == oldImage.m_imageType)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicTagChangeImage: "
-                        "Cannot find metadata for trackid: %1")
-                    .arg(songID));
-
-            strlist << "ERROR: track not found";
+            // nothing to change
+            strlist << "OK";
 
             if (pbssock)
                 SendResponse(pbssock, strlist);
 
+            delete mdata;
+
             return;
         }
 
-        mdata->setFilename(mdata->getLocalFilename());
-
-        AlbumArtImages *albumArt = mdata->getAlbumArtImages();
-        AlbumArtImage *image = albumArt->getImage(oldType);
-        if (image)
+        // rename any cached image to match the new type
+        if (image->m_embedded)
         {
-            AlbumArtImage oldImage = *image;
+            // change the image type in the tag if it supports it
+            MetaIO *tagger = mdata->getTagger();
 
-            image->m_imageType = newType;
-
-            if (image->m_imageType == oldImage.m_imageType)
+            if (tagger && tagger->supportsEmbeddedImages())
             {
-                // nothing to change
-                strlist << "OK";
-
-                if (pbssock)
-                    SendResponse(pbssock, strlist);
-
-                delete mdata;
-
-                return;
-            }
-
-            // rename any cached image to match the new type
-            if (image->m_embedded)
-            {
-                // change the image type in the tag if it supports it
-                MetaIO *tagger = mdata->getTagger();
-
-                if (tagger && tagger->supportsEmbeddedImages())
+                if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->m_imageType))
                 {
-                    if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->m_imageType))
-                    {
-                        LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
+                    LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
 
-                        strlist << "ERROR: failed to change image type";
+                    strlist << "ERROR: failed to change image type";
 
-                        if (pbssock)
-                            SendResponse(pbssock, strlist);
+                    if (pbssock)
+                        SendResponse(pbssock, strlist);
 
-                        delete mdata;
-                        delete tagger;
-
-                        return;
-                    }
-                }
-
-                if (tagger)
+                    delete mdata;
                     delete tagger;
-
-                // update the new cached image filename
-                StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
-                oldImage.m_filename = artGroup.FindFile("AlbumArt/" + image->m_filename);
-
-                QFileInfo fi(oldImage.m_filename);
-                image->m_filename = fi.path() + QString("/%1-%2.jpg")
-                                          .arg(mdata->ID())
-                                          .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
-
-                // remove any old cached file with the same name as the new one
-                if (QFile::exists(image->m_filename))
-                    QFile::remove(image->m_filename);
-
-                // rename the old cached file to the new one
-                if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
-                    QFile::rename(oldImage.m_filename, image->m_filename);
-                else
-                {
-                    // extract the image from the tag and cache it
-                    QStringList paramList;
-                    paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-                    paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
-
-                    QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
-
-                    QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                   kMSAutoCleanup | kMSRunBackground |
-                                                   kMSDontDisableDrawing | kMSProcessEvents |
-                                                   kMSDontBlockInputDevs));
+                    return;
                 }
             }
+
+            delete tagger;
+
+            // update the new cached image filename
+            StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
+            oldImage.m_filename = artGroup.FindFile("AlbumArt/" + image->m_filename);
+
+            QFileInfo fi(oldImage.m_filename);
+            image->m_filename = fi.path() + QString("/%1-%2.jpg")
+                .arg(mdata->ID())
+                .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
+
+            // remove any old cached file with the same name as the new one
+            if (QFile::exists(image->m_filename))
+                QFile::remove(image->m_filename);
+
+            // rename the old cached file to the new one
+            if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
+                QFile::rename(oldImage.m_filename, image->m_filename);
             else
             {
-                QFileInfo fi(oldImage.m_filename);
+                // extract the image from the tag and cache it
+                QStringList paramList;
+                paramList.append(QString("--songid='%1'").arg(mdata->ID()));
+                paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
 
-                // get the new images filename
-                image->m_filename = fi.absolutePath() + QString("/%1.jpg")
-                        .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
+                QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
 
-                if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
-                {
-                    // remove any old cached file with the same name as the new one
-                    QFile::remove(image->m_filename);
-                    // rename the old cached file to the new one
-                    QFile::rename(oldImage.m_filename, image->m_filename);
-                }
+                QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                               kMSAutoCleanup | kMSRunBackground |
+                                               kMSDontDisableDrawing | kMSProcessEvents |
+                                               kMSDontBlockInputDevs));
             }
         }
+        else
+        {
+            QFileInfo fi(oldImage.m_filename);
 
-        delete mdata;
+            // get the new images filename
+            image->m_filename = fi.absolutePath() + QString("/%1.jpg")
+                .arg(AlbumArtImages::getTypeFilename(image->m_imageType));
+
+            if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
+            {
+                // remove any old cached file with the same name as the new one
+                QFile::remove(image->m_filename);
+                // rename the old cached file to the new one
+                QFile::rename(oldImage.m_filename, image->m_filename);
+            }
+        }
     }
+
+    delete mdata;
 
     strlist << "OK";
 
@@ -6575,131 +6547,126 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagAddImage: Failed to grab "
-                        "slave socket on '%1'").arg(hostname));
 
-            strlist << "ERROR: slave not found";
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicTagAddImage: Failed to grab "
+                    "slave socket on '%1'").arg(hostname));
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+        strlist << "ERROR: slave not found";
 
-            return;
-        }
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
     }
-    else
+
+    // load the metadata from the database
+    int songID = slist[2].toInt();
+    QString filename = slist[3];
+    ImageType imageType = (ImageType) slist[4].toInt();
+
+    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+    if (!mdata)
     {
-        // load the metadata from the database
-        int songID = slist[2].toInt();
-        QString filename = slist[3];
-        ImageType imageType = (ImageType) slist[4].toInt();
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagAddImage: Cannot find metadata for trackid: %1")
+            .arg(songID));
 
-        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        strlist << "ERROR: track not found";
 
-        if (!mdata)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicTagAddImage: Cannot find metadata for trackid: %1")
-                        .arg(songID));
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: track not found";
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    MetaIO *tagger = mdata->getTagger();
 
-            return;
-        }
+    if (!tagger)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "HandleMusicTagAddImage: failed to find a tagger for track");
 
-        MetaIO *tagger = mdata->getTagger();
+        strlist << "ERROR: tagger not found";
 
-        if (!tagger)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "HandleMusicTagAddImage: failed to find a tagger for track");
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: tagger not found";
+        delete mdata;
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    if (!tagger->supportsEmbeddedImages())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "HandleMusicTagAddImage: asked to write album art to the tag "
+            "but the tagger doesn't support it!");
 
-            delete mdata;
-            return;
-        }
+        strlist << "ERROR: embedded images not supported by tag";
 
-        if (!tagger->supportsEmbeddedImages())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "HandleMusicTagAddImage: asked to write album art to the tag "
-                "but the tagger doesn't support it!");
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: embedded images not supported by tag";
+        delete tagger;
+        delete mdata;
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    // is the image in the 'MusicArt' storage group
+    bool isDirectoryImage = false;
+    StorageGroup storageGroup("MusicArt", gCoreContext->GetHostName(), false);
+    QString imageFilename = storageGroup.FindFile("AlbumArt/" + filename);
+    if (imageFilename.isEmpty())
+    {
+        // not found there so look in the tracks directory
+        QFileInfo fi(mdata->getLocalFilename());
+        imageFilename = fi.absolutePath() + '/' + filename;
+        isDirectoryImage = true;
+    }
 
-            delete tagger;
-            delete mdata;
-            return;
-        }
+    if (!QFile::exists(imageFilename))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagAddImage: cannot find image file %1").arg(filename));
 
-        // is the image in the 'MusicArt' storage group
-        bool isDirectoryImage = false;
-        StorageGroup storageGroup("MusicArt", gCoreContext->GetHostName(), false);
-        QString imageFilename = storageGroup.FindFile("AlbumArt/" + filename);
-        if (imageFilename.isEmpty())
-        {
-            // not found there so look in the tracks directory
-            QFileInfo fi(mdata->getLocalFilename());
-            imageFilename = fi.absolutePath() + '/' + filename;
-            isDirectoryImage = true;
-        }
+        strlist << "ERROR: failed to find image file";
 
-        if (!QFile::exists(imageFilename))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicTagAddImage: cannot find image file %1").arg(filename));
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: failed to find image file";
+        delete tagger;
+        delete mdata;
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    AlbumArtImage image;
+    image.m_filename = imageFilename;
+    image.m_imageType = imageType;
 
-            delete tagger;
-            delete mdata;
-            return;
-        }
+    if (!tagger->writeAlbumArt(mdata->getLocalFilename(), &image))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagAddImage: failed to write album art to tag");
 
-        AlbumArtImage image;
-        image.m_filename = imageFilename;
-        image.m_imageType = imageType;
+        strlist << "ERROR: failed to write album art to tag";
 
-        if (!tagger->writeAlbumArt(mdata->getLocalFilename(), &image))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagAddImage: failed to write album art to tag");
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: failed to write album art to tag";
-
-            if (pbssock)
-                SendResponse(pbssock, strlist);
-
-            if (!isDirectoryImage)
-                QFile::remove(imageFilename);
-
-            delete tagger;
-            delete mdata;
-            return;
-        }
-
-        // only remove the image if we temporarily saved one to the 'AlbumArt' storage group
         if (!isDirectoryImage)
             QFile::remove(imageFilename);
 
         delete tagger;
         delete mdata;
+        return;
     }
 
+    // only remove the image if we temporarily saved one to the 'AlbumArt' storage group
+    if (!isDirectoryImage)
+        QFile::remove(imageFilename);
+
+    delete tagger;
+    delete mdata;
 
     strlist << "OK";
 
@@ -6735,101 +6702,97 @@ void MainServer::HandleMusicTagRemoveImage(const QStringList& slist, PlaybackSoc
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagRemoveImage: Failed to grab "
-                        "slave socket on '%1'").arg(hostname));
 
-            strlist << "ERROR: slave not found";
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicTagRemoveImage: Failed to grab "
+                    "slave socket on '%1'").arg(hostname));
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+        strlist << "ERROR: slave not found";
 
-            return;
-        }
+        if (pbssock)
+            SendResponse(pbssock, strlist);
+
+        return;
     }
-    else
+
+    int songID = slist[2].toInt();
+    int imageID = slist[3].toInt();
+
+    // load the metadata from the database
+    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+    if (!mdata)
     {
-        int songID = slist[2].toInt();
-        int imageID = slist[3].toInt();
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagRemoveImage: Cannot find metadata for trackid: %1")
+            .arg(songID));
 
-        // load the metadata from the database
-        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+        strlist << "ERROR: track not found";
 
-        if (!mdata)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicTagRemoveImage: Cannot find metadata for trackid: %1")
-                        .arg(songID));
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: track not found";
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    MetaIO *tagger = mdata->getTagger();
 
-            return;
-        }
+    if (!tagger)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "HandleMusicTagRemoveImage: failed to find a tagger for track");
 
-        MetaIO *tagger = mdata->getTagger();
+        strlist << "ERROR: tagger not found";
 
-        if (!tagger)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "HandleMusicTagRemoveImage: failed to find a tagger for track");
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: tagger not found";
+        delete mdata;
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    if (!tagger->supportsEmbeddedImages())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagRemoveImage: asked to remove album art "
+            "from the tag but the tagger doesn't support it!");
 
-            delete mdata;
-            return;
-        }
+        strlist << "ERROR: embedded images not supported by tag";
 
-        if (!tagger->supportsEmbeddedImages())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagRemoveImage: asked to remove album art "
-                                           "from the tag but the tagger doesn't support it!");
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: embedded images not supported by tag";
+        delete mdata;
+        delete tagger;
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    AlbumArtImage *image = mdata->getAlbumArtImages()->getImageByID(imageID);
+    if (!image)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagRemoveImage: Cannot find image for imageid: %1")
+            .arg(imageID));
 
-            delete mdata;
-            delete tagger;
-            return;
-        }
+        strlist << "ERROR: image not found";
 
-        AlbumArtImage *image = mdata->getAlbumArtImages()->getImageByID(imageID);
-        if (!image)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicTagRemoveImage: Cannot find image for imageid: %1")
-                        .arg(imageID));
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: image not found";
+        delete mdata;
+        delete tagger;
+        return;
+    }
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+    if (!tagger->removeAlbumArt(mdata->getLocalFilename(), image))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagRemoveImage: failed to remove album art from tag");
 
-            delete mdata;
-            delete tagger;
-            return;
-        }
+        strlist << "ERROR: failed to remove album art from tag";
 
-        if (!tagger->removeAlbumArt(mdata->getLocalFilename(), image))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagRemoveImage: failed to remove album art from tag");
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            strlist << "ERROR: failed to remove album art from tag";
-
-            if (pbssock)
-                SendResponse(pbssock, strlist);
-
-            return;
-        }
+        return;
     }
 
     strlist << "OK";
@@ -6878,12 +6841,10 @@ void MainServer::HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *p
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicFindLyrics: Failed to grab slave "
-                        "socket on '%1'").arg(hostname));
-        }
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicFindLyrics: Failed to grab slave "
+                    "socket on '%1'").arg(hostname));
     }
     else
     {
@@ -7045,12 +7006,10 @@ void MainServer::HandleMusicSaveLyrics(const QStringList& slist, PlaybackSock* p
 
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-               QString("HandleMusicSaveLyrics: Failed to grab slave "
-                        "socket on '%1'").arg(hostname));
-        }
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleMusicSaveLyrics: Failed to grab slave "
+                    "socket on '%1'").arg(hostname));
     }
     else
     {
@@ -7566,13 +7525,11 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
              SendResponse(pbssock, strlist);
              return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandlePixmapLastModified() "
-                        "Couldn't find backend for:\n\t\t\t%1")
-                    .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)));
-        }
+
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandlePixmapLastModified() "
+                    "Couldn't find backend for:\n\t\t\t%1")
+            .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)));
     }
 
     if (!pginfo.IsLocal())
@@ -7823,7 +7780,7 @@ void MainServer::connectionClosed(MythSocket *socket)
             gCoreContext->dispatch(me);
             return;
         }
-        else if (sock == socket)
+        if (sock == socket)
         {
             QList<uint> disconnectedSlaves;
             bool needsReschedule = false;
@@ -8378,14 +8335,14 @@ void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
 }
 
 void MainServer::SendSlaveDisconnectedEvent(
-    const QList<uint> &cardids, bool needsReschedule)
+    const QList<uint> &offlineEncoderIDs, bool needsReschedule)
 {
     QStringList extraData;
     extraData.push_back(
         QString::number(static_cast<uint>(needsReschedule)));
 
     QList<uint>::const_iterator it;
-    for (it = cardids.begin(); it != cardids.end(); ++it)
+    for (it = offlineEncoderIDs.begin(); it != offlineEncoderIDs.end(); ++it)
         extraData.push_back(QString::number(*it));
 
     MythEvent me("LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE", extraData);

@@ -95,7 +95,7 @@ class MTV_PUBLIC PlayerContext
 
     // Sets
     void SetInitialTVState(bool islivetv);
-    void SetPlayer(MythPlayer *new_player);
+    void SetPlayer(MythPlayer *newplayer);
     void SetRecorder(RemoteEncoder *rec);
     void SetTVChain(LiveTVChain *chain);
     void SetRingBuffer(RingBuffer *buf);

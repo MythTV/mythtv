@@ -25,7 +25,7 @@ class QUrlQuery;
 class CetonStreamHandler : public IPTVStreamHandler
 {
   public:
-    static CetonStreamHandler *Get(const QString &devicename, int inputid);
+    static CetonStreamHandler *Get(const QString &devname, int inputid);
     static void Return(CetonStreamHandler * & ref, int inputid);
 
     bool IsConnected(void) const;

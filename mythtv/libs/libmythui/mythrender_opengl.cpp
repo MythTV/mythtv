@@ -240,8 +240,7 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
             "OpenGL is using software rendering.");
         recommended = false;
     }
-    else
-    if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
+    else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rasterizer.");
@@ -777,8 +776,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
 
     GLuint gltex = tex;
     glDeleteTextures(1, &gltex);
-    if (m_textures[tex].m_data)
-        delete m_textures[tex].m_data;
+    delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
         m_glDeleteBuffers(1, &(m_textures[tex].m_pbo));
     if (m_textures[tex].m_vbo)
@@ -1319,13 +1317,13 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     ExpireVertices();
     ExpireVBOS();
 
-    if (m_cachedVertices.size())
+    if (!m_cachedVertices.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired vertices")
             .arg(m_cachedVertices.size()));
     }
 
-    if (m_cachedVBOS.size())
+    if (!m_cachedVBOS.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired VBOs")
             .arg(m_cachedVertices.size()));
@@ -1338,8 +1336,7 @@ void MythRenderOpenGL::DeleteTextures(void)
     for (it = m_textures.begin(); it !=m_textures.end(); ++it)
     {
         glDeleteTextures(1, &(it.key()));
-        if (it.value().m_data)
-            delete it.value().m_data;
+        delete it.value().m_data;
         if (it.value().m_pbo)
             m_glDeleteBuffers(1, &(it.value().m_pbo));
     }

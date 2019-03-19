@@ -74,7 +74,7 @@ void restore_port_attributes(int port, bool clear)
 {
     if (!open_xv_ports.count(port))
         return;
-    if (!open_xv_ports[port].attribs.size())
+    if (open_xv_ports[port].attribs.empty())
         return;
 
     MythXDisplay *disp = open_xv_ports[port].disp;

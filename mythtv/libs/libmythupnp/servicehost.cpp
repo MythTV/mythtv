@@ -256,8 +256,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
 
     // ----------------------------------------------------------------------
 
-    if (pService != nullptr)
-        delete pService;
+    delete pService;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -445,9 +444,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
         bHandled = true;
     }
 
-    if (pService != nullptr)
-        delete pService;
-
+    delete pService;
     return bHandled;
 }
 
@@ -469,8 +466,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 
         return true;
     }
-    else
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
+    UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
 
     return false;
 }

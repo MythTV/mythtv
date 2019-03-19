@@ -44,7 +44,7 @@ typedef enum ASIRXMode
 class ASIStreamHandler : public StreamHandler
 {
   public:
-    static ASIStreamHandler *Get(const QString &devicename, int inputid);
+    static ASIStreamHandler *Get(const QString &devname, int inputid);
     static void Return(ASIStreamHandler * & ref, int inputid);
 
     void AddListener(MPEGStreamData *data,

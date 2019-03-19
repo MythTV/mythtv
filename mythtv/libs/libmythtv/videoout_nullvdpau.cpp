@@ -211,7 +211,7 @@ bool VideoOutputNullVDPAU::CreateVideoSurfaces(uint num)
 
 void VideoOutputNullVDPAU::DeleteVideoSurfaces(void)
 {
-    if (!m_render || !m_video_surfaces.size())
+    if (!m_render || m_video_surfaces.empty())
         return;
 
     for (int i = 0; i < m_video_surfaces.size(); i++)

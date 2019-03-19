@@ -481,21 +481,21 @@ bool HDHRStreamHandler::IsConnected(void) const
     return (m_hdhomerun_device != nullptr);
 }
 
-bool HDHRStreamHandler::TuneChannel(const QString &chn)
+bool HDHRStreamHandler::TuneChannel(const QString &chanid)
 {
     m_tune_mode = hdhrTuneModeFrequency;
 
     QString current = TunerGet("channel");
-    if (current == chn)
+    if (current == chanid)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Not Re-Tuning channel %1")
-                .arg(chn));
+                .arg(chanid));
         return true;
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning channel %1 (was %2)")
-            .arg(chn).arg(current));
-    return !TunerSet("channel", chn).isEmpty();
+            .arg(chanid).arg(current));
+    return !TunerSet("channel", chanid).isEmpty();
 }
 
 bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
@@ -526,11 +526,8 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
             .arg(vchn));
         return true;
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
-            .arg(vchn).arg(current));
-    }
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
+        .arg(vchn).arg(current));
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet("vchannel", vchn).isEmpty();

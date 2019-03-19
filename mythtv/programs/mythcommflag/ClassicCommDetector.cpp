@@ -83,8 +83,7 @@ static QString toStringFrameAspects(int aspect, bool verbose)
 {
     if (verbose)
         return (COMM_ASPECT_NORMAL == aspect) ? "normal" : " wide ";
-    else
-        return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
+    return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
 }
 
 static QString toStringFrameFormats(int format, bool verbose)
@@ -464,8 +463,8 @@ bool ClassicCommDetector::go()
 
             GetCommercialBreakList(commBreakMap);
 
-            if ((commBreakMap.size() == 0) &&
-                (m_lastSentCommBreakMap.size() == 0))
+            if ((commBreakMap.empty()) &&
+                (m_lastSentCommBreakMap.empty()))
             {
                 mapsAreIdentical = true;
             }
@@ -879,8 +878,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             if (rowMax[y] > m_commDetectBoxBrightness)
                 break;
-            else
-                topDarkRow = y;
+            topDarkRow = y;
         }
 
         for(int y = m_commDetectBorder; y < (m_height - m_commDetectBorder);
@@ -896,8 +894,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             if (colMax[x] > m_commDetectBoxBrightness)
                 break;
-            else
-                leftDarkCol = x;
+            leftDarkCol = x;
         }
 
         for(int x = m_commDetectBorder; x < (m_width - m_commDetectBorder);
@@ -1060,7 +1057,7 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
 
     frm_dir_map_t newMap;
 
-    if (a.size())
+    if (!a.empty())
     {
         frm_dir_map_t::const_iterator it = a.begin();
         for (; it != a.end(); ++it)
@@ -2327,7 +2324,7 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
         ++it;
     }
 
-    if (map.size() == 0)
+    if (map.empty())
         return;
 
     // delete any segments less than 'length' frames in length

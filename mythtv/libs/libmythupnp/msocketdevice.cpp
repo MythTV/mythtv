@@ -208,7 +208,7 @@ MSocketDevice::MSocketDevice(Type type)
 
     \sa blocking() protocol()
 */
-MSocketDevice::MSocketDevice(Type type, Protocol protocol, int)
+MSocketDevice::MSocketDevice(Type type, Protocol protocol, int /*dummy*/)
         : fd(-1), t(type), p(0), pp(0), e(NoError),
         d(new MSocketDevicePrivate(protocol))
 {

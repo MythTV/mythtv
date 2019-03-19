@@ -1218,8 +1218,7 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 
     bool ret = DTVRecorder::ProcessTSPacket(tspacket);
 
-    if (tspacket_fake)
-        delete tspacket_fake;
+    delete tspacket_fake;
 
     return ret;
 }

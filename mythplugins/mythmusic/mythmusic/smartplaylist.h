@@ -30,7 +30,7 @@ enum SmartPLFieldType
 QString getCriteriaSQL(QString fieldName, QString operatorName,
                        QString value1, QString value2);
 
-QString getSQLFieldName(QString orderBy);
+QString getSQLFieldName(QString fieldName);
 QString getOrderBySQL(QString orderByFields);
 
 // used by playbackbox.cpp

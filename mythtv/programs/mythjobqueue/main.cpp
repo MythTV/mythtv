@@ -131,8 +131,7 @@ int main(int argc, char *argv[])
 
     int exitCode = a.exec();
 
-    if (sysEventHandler)
-        delete sysEventHandler;
+    delete sysEventHandler;
 
     return exitCode ? exitCode : GENERIC_EXIT_OK;
 }

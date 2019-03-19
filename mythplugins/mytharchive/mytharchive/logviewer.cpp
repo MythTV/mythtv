@@ -88,9 +88,7 @@ LogViewer::~LogViewer(void)
 {
     gCoreContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
     gCoreContext->SaveSetting("LogViewerAutoUpdate", m_autoUpdate ? "1" : "0");
-
-    if (m_updateTimer)
-        delete m_updateTimer;
+    delete m_updateTimer;
 }
 
 bool LogViewer::Create(void)
@@ -207,7 +205,7 @@ void LogViewer::updateClicked(void)
     QStringList list;
     loadFile(m_currentLog, list, m_logList->GetCount());
 
-    if (list.size() > 0)
+    if (!list.empty())
     {
         bool bUpdateCurrent =
                 (m_logList->GetCount() == m_logList->GetCurrentPos() + 1) ||

@@ -159,10 +159,7 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
             m_ImageExpireList.push_back(im);
             return m_ImageBitmapMap[im];
         }
-        else
-        {
-            DeleteFormatImagePriv(im);
-        }
+        DeleteFormatImagePriv(im);
     }
 
     im->SetChanged(false);

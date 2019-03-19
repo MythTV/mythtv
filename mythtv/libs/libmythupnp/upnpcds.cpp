@@ -858,8 +858,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                 LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::Browse: BrowseMetadata (%1)").arg(pRequest->m_sObjectId));
                 if (LoadMetadata(pRequest, pResults, tokens, currentToken))
                     return pResults;
-                else
-                    pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
                 break;
             }
 
@@ -869,8 +868,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                 LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::Browse: BrowseDirectChildren (%1)").arg(pRequest->m_sObjectId));
                 if (LoadChildren(pRequest, pResults, tokens, currentToken))
                     return pResults;
-                else
-                    pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
                 break;
             }
 
@@ -1072,10 +1070,9 @@ QString UPnpCDSExtension::CreateIDString(const QString &requestId,
     if (currentName == name.toLower() && !currentValue.isEmpty() &&
         currentValue == value.toLower())
         return requestId;
-    else if (currentName == name.toLower() && currentValue.isEmpty())
+    if (currentName == name.toLower() && currentValue.isEmpty())
         return QString("%1=%2").arg(requestId).arg(value);
-    else
-        return QString("%1/%2=%3").arg(requestId).arg(name).arg(value);
+    return QString("%1/%2=%3").arg(requestId).arg(name).arg(value);
 }
 
 void UPnpCDSExtension::CreateRoot()

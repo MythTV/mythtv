@@ -79,7 +79,7 @@ bool operator < (const DSMCCCacheKey &key1, const DSMCCCacheKey &key2)
     int res = memcmp(data1, data2, size);
     if (res < 0)
         return true;
-    else if (res > 0)
+    if (res > 0)
         return false;
 
     return size1 < size2;
@@ -113,17 +113,17 @@ bool operator < (const DSMCCCacheReference &ref1,
 {
     if (ref1.m_nCarouselId < ref2.m_nCarouselId)
         return true;
-    else if (ref1.m_nCarouselId > ref2.m_nCarouselId)
+    if (ref1.m_nCarouselId > ref2.m_nCarouselId)
         return false;
-    else if (ref1.m_nStreamTag < ref2.m_nStreamTag)
+    if (ref1.m_nStreamTag < ref2.m_nStreamTag)
         return true;
-    else if (ref1.m_nStreamTag > ref2.m_nStreamTag)
+    if (ref1.m_nStreamTag > ref2.m_nStreamTag)
         return false;
-    else if (ref1.m_nModuleId < ref2.m_nModuleId)
+    if (ref1.m_nModuleId < ref2.m_nModuleId)
         return true;
-    else if (ref1.m_nModuleId > ref2.m_nModuleId)
+    if (ref1.m_nModuleId > ref2.m_nModuleId)
         return false;
-    else if (ref1.m_Key < ref2.m_Key)
+    if (ref1.m_Key < ref2.m_Key)
         return true;
 
     return false;
@@ -305,20 +305,19 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
             result = fil->m_Contents;
             return 0;
         }
-        else
-        { // It's a directory
-            QMap<QString, DSMCCCacheReference>::Iterator ref =
-                dir->m_SubDirectories.find(name);
 
-            if (ref == dir->m_SubDirectories.end())
-                return -1; // Not there
+        // It's a directory
+        QMap<QString, DSMCCCacheReference>::Iterator ref =
+            dir->m_SubDirectories.find(name);
 
-            dir = FindDir(*ref);
+        if (ref == dir->m_SubDirectories.end())
+            return -1; // Not there
 
-            if (dir == nullptr) // Exists but not yet set.
-                return 1;
-            // else search in this directory
-        }
+        dir = FindDir(*ref);
+
+        if (dir == nullptr) // Exists but not yet set.
+            return 1;
+        // else search in this directory
     }
 
     return -1;

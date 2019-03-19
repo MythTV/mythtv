@@ -322,8 +322,7 @@ void V4LRecorder::RunVBIDevice(void)
         }
     }
 
-    if (buf)
-        delete [] buf;
+    delete [] buf;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

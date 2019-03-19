@@ -122,10 +122,8 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
 
 void SceneChangeDetector::deleteLater(void)
 {
-    if (m_scdata)
-        delete []m_scdata;
-    if (m_scdiff)
-        delete []m_scdiff;
+    delete []m_scdata;
+    delete []m_scdiff;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
