@@ -141,7 +141,7 @@ class MPEG2fixup
     MPEG2replex m_rx;
 
   private:
-    int FindMPEG2Header(uint8_t *buf, int size, uint8_t code);
+    int FindMPEG2Header(const uint8_t *buf, int size, uint8_t code);
     void InitReplex();
     void FrameInfo(MPEG2frame *f);
     int AddFrame(MPEG2frame *f);

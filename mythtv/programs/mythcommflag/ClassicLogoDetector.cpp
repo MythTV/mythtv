@@ -310,7 +310,7 @@ void ClassicLogoDetector::SetLogoMaskArea()
 
 
 void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
-    unsigned char* framePtr)
+    const unsigned char* framePtr)
 {
     char scrPixels[] = " .oxX";
 

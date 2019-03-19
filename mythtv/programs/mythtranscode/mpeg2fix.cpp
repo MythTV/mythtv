@@ -450,7 +450,7 @@ int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
     return ret;
 }
 
-int MPEG2fixup::FindMPEG2Header(uint8_t *buf, int size, uint8_t code)
+int MPEG2fixup::FindMPEG2Header(const uint8_t *buf, int size, uint8_t code)
 {
     int i;
 

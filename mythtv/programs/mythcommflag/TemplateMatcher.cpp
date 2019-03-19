@@ -193,7 +193,7 @@ int sort_ascending(const void *aa, const void *bb)
     return *(unsigned short*)aa - *(unsigned short*)bb;
 }
 
-long long matchspn(long long nframes, unsigned char *match, long long frameno,
+long long matchspn(long long nframes, const unsigned char *match, long long frameno,
                   unsigned char acceptval)
 {
     /*

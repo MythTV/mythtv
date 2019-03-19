@@ -380,7 +380,7 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 	return -1;
 }
 
-int find_audio_s(uint8_t *rbuf, int off, int type, int le)
+int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 {
 	int found = 0;
 	int c=0;

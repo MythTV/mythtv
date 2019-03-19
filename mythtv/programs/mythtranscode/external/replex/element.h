@@ -122,7 +122,7 @@ struct audio_frame_s{
 
 void pts2time(uint64_t pts, uint8_t *buf, int len);
 int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le);
-int find_audio_s(uint8_t *rbuf, int off, int type, int le);
+int find_audio_s(const uint8_t *rbuf, int off, int type, int le);
 int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le);
 int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le); 
 int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le);
