@@ -914,6 +914,54 @@ void VideoBuffers::DeleteBuffers(void)
     m_allocatedArrays.clear();
 }
 
+bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
+{
+    if (!Frame)
+        return false;
+    if (format_is_hw(Type))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot re-initialise a hardware buffer");
+        return false;
+    }
+
+    // Find the frame
+    BeginLock(kVideoBuffer_all);
+    for (uint i = 0; i < Size(); ++i)
+    {
+        if (At(i) == Frame)
+        {
+            // Free existing buffer
+            av_freep(&Frame->qscale_table);
+            av_free(m_allocatedArrays[i]);
+            Frame->qscale_table = nullptr;
+            m_allocatedArrays[i] = nullptr;
+
+            // Initialise new
+            VideoFrameType old = Frame->codec;
+            uint size = buffersize(Type, Frame->width, Frame->height);
+            unsigned char *data = (unsigned char*)av_malloc(size + 64);
+            if (data)
+            {
+                m_allocatedArrays[i] = data;
+                init(Frame, Type, data, Frame->width, Frame->height, size);
+                LOG(VB_PLAYBACK, LOG_DEBUG, QString("Reallocated frame %1->%2")
+                    .arg(format_description(old)).arg(format_description(Type)));
+                EndLock();
+                return true;
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
+                EndLock();
+                return false;
+            }
+        }
+    }
+    EndLock();
+    LOG(VB_GENERAL, LOG_ERR, "Failed to find frame to reallocate");
+    return false;
+}
+
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num);
 
 QString VideoBuffers::GetStatus(uint Num) const

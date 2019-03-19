@@ -263,6 +263,8 @@ class MTV_PUBLIC MythPlayer
     void SetCutList(const frm_dir_map_t &newCutList);
 
     // Decoder stuff..
+    VideoFrameType* DirectRenderFormats(void);
+    bool ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type);
     VideoFrame *GetNextVideoFrame(void);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);

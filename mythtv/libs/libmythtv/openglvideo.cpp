@@ -116,12 +116,15 @@ void OpenGLVideo::UpdateShaderParameters(void)
                          maxheight - lineheight,                          /* maxheight  */
                          m_inputTextureSize.height() / 2.0f               /* fieldsize  */);
 
+    int range = (1 << ColorDepth(m_inputType)) - 1;
+    QVector2D scaler = QVector2D(1.0, 256.0) *255.0 / (float)range;
     for (int i = Progressive; i < ShaderCount; ++i)
     {
         if (m_shaders[i])
         {
             m_render->EnableShaderProgram(m_shaders[i]);
             m_shaders[i]->setUniformValue("m_frameData", parameters);
+            m_shaders[i]->setUniformValue("m_scaler", scaler);
         }
     }
 }
@@ -273,8 +276,11 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     {
         switch (m_outputType)
         {
-            case FMT_NV12:  fragment = NV12FragmentShader;    cost = 2; break;
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P16:
             case FMT_YV12:  fragment = YV12RGBFragmentShader; cost = 3; break;
+            case FMT_NV12:  fragment = NV12FragmentShader;    cost = 2; break;
             case FMT_YUY2:
             case FMT_YUYVHQ:
             default:        fragment = YUV2RGBFragmentShader; cost = 1; break;
@@ -283,7 +289,8 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     else
     {
         uint bottom = (InterlacedBot == Type);
-        if (FMT_YV12 == m_outputType)
+        if (FMT_YV12 == m_outputType || FMT_YUV420P10 == m_outputType ||
+            FMT_YUV420P12 == m_outputType || FMT_YUV420P16 == m_outputType)
         {
             if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
             {
@@ -354,6 +361,10 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
             }
         }
     }
+
+    // Set correct YV12 sampler
+    int depth = ColorDepth(m_inputType);
+    fragment.replace("%YV12SAMPLER%", depth > 8 ? SampleYV12HDR : SampleYV12);
 
     fragment.replace("SELECT_COLUMN", (FMT_YUY2 == m_outputType) ? SelectColumn : "");
     // update packing code so this can be removed
@@ -488,8 +499,7 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
 
     // Can we render this frame format - ideally this should be a check
     // against format_is_yuv.
-    if ((Frame->codec != FMT_YV12) && (Frame->codec != FMT_YUY2) &&
-        (Frame->codec != FMT_NV12))
+    if (!format_is_yuv(Frame->codec) || Frame->codec == FMT_YUV422P)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame format is not supported");
         return;

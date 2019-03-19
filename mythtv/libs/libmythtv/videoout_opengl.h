@@ -48,6 +48,7 @@ class VideoOutputOpenGL : public VideoOutput
     QStringList GetVisualiserList(void) override;
     bool StereoscopicModesAllowed(void) const override { return true; }
     void DoneDisplayingFrame(VideoFrame *Frame) override;
+    VideoFrameType* DirectRenderFormats(void) override;
 
   protected:
     void DestroyBuffers(void);

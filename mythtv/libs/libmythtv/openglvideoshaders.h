@@ -284,15 +284,26 @@ static const QString DefaultFragmentShader =
 "    gl_FragColor = vec4(color.rgb, 1.0);\n"
 "}\n";
 
-#define SAMPLEYVU "\
-highp vec3 sampleYVU(in sampler2D texture1, in sampler2D texture2, in sampler2D texture3, highp vec2 texcoord)\n\
-{\n\
-    highp vec3 yvu;\n\
-    yvu.r = texture2D(texture1, texcoord).r;\n\
-    yvu.g = texture2D(texture2, texcoord).r;\n\
-    yvu.b = texture2D(texture3, texcoord).r;\n\
-    return yvu;\n\
-}\n"
+static const QString SampleYV12 =
+"highp vec3 sampleYVU(in sampler2D texture1, in sampler2D texture2, in sampler2D texture3, highp vec2 texcoord)\n"
+"{\n"
+"    highp vec3 yvu;\n"
+"    yvu.r = texture2D(texture1, texcoord).r;\n"
+"    yvu.g = texture2D(texture2, texcoord).r;\n"
+"    yvu.b = texture2D(texture3, texcoord).r;\n"
+"    return yvu;\n"
+"}\n";
+
+static const QString SampleYV12HDR =
+"uniform highp vec2 m_scaler;\n"
+"highp vec3 sampleYVU(in sampler2D texture1, in sampler2D texture2, in sampler2D texture3, highp vec2 texcoord)\n"
+"{\n"
+"    highp vec3 yvu;\n"
+"    yvu.r = dot(texture2D(texture1, texcoord).rg, m_scaler);\n"
+"    yvu.g = dot(texture2D(texture2, texcoord).rg, m_scaler);\n"
+"    yvu.b = dot(texture2D(texture3, texcoord).rg, m_scaler);\n"
+"    return yvu;\n"
+"}\n";
 
 static const QString YV12RGBFragmentShader =
 "//YV12RGBFragmentShader\n"
@@ -302,7 +313,7 @@ static const QString YV12RGBFragmentShader =
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp vec3 yvu = sampleYVU(s_texture0, s_texture1, s_texture2, v_texcoord0);\n"
@@ -317,7 +328,7 @@ static const QString YV12RGBOneFieldFragmentShader[2] = {
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp float field  = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * m_frameData.w))) * m_frameData.x, m_frameData.z);\n"
@@ -332,7 +343,7 @@ SAMPLEYVU
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp float field  = max(v_texcoord0.y + (step(0.5, 1.0 - fract(v_texcoord0.y * m_frameData.w))) * m_frameData.x, 0.0);\n"
@@ -349,7 +360,7 @@ static const QString YV12RGBLinearBlendFragmentShader[2] = {
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp vec3 current = sampleYVU(s_texture0, s_texture1, s_texture2, v_texcoord0);\n"
@@ -369,7 +380,7 @@ SAMPLEYVU
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp vec3 current = sampleYVU(s_texture0, s_texture1, s_texture2, v_texcoord0);\n"
@@ -419,7 +430,7 @@ static const QString YV12RGBKernelShader[2] = {
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 KERNELYVU
 "void main(void)\n"
 "{\n"
@@ -439,7 +450,7 @@ KERNELYVU
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLEYVU
+"%YV12SAMPLER%"
 KERNELYVU
 "void main(void)\n"
 "{\n"

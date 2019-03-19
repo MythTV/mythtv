@@ -1666,6 +1666,17 @@ static QString to_comma_list(const QStringList &list)
     return "";
 }
 
+VideoFrameType* VideoOutput::DirectRenderFormats(void)
+{
+    static VideoFrameType defaultformats[] = { FMT_YV12, FMT_NONE };
+    return &defaultformats[0];
+}
+
+bool VideoOutput::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
+{
+    return vbuffers.ReinitBuffer(Frame, Type);
+}
+
 bool VideoOutput::IsEmbedding(void)
 {
     return window.IsEmbedding();

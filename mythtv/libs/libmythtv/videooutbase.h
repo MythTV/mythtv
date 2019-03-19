@@ -178,7 +178,6 @@ class VideoOutput
     void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }
     /// \brief Tells video output to toss decoded buffers due to a seek
     virtual void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
-
     /// \brief Returns number of frames that are fully decoded.
     virtual int ValidVideoFrames(void) const
         { return vbuffers.ValidVideoFrames(); }
@@ -192,7 +191,8 @@ class VideoOutput
     /// \brief Returns true iff we have at least the minimum number of
     ///        decoded frames ready for display.
     bool EnoughPrebufferedFrames(void) { return vbuffers.EnoughPrebufferedFrames(); }
-
+    virtual VideoFrameType* DirectRenderFormats(void);
+    bool ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type);
     /// \brief Returns if videooutput is embedding
     bool IsEmbedding(void);
 

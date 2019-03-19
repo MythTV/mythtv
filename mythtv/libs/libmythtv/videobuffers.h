@@ -67,6 +67,7 @@ class MTV_PUBLIC VideoBuffers
                        vector<unsigned char*> Buffers,
                        vector<YUVInfo>        YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
+    bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type);
     void DeleteBuffers(void);
 
     void Reset(void);

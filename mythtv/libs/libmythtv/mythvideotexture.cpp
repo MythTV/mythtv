@@ -159,7 +159,17 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
                 texture = CreateTexture(Context, size, Target,
-                                        QOpenGLTexture::UInt8,  QOpenGLTexture::Red);
+                                        QOpenGLTexture::UInt8, QOpenGLTexture::Red);
+                break;
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P16:
+                if (plane > 0)
+                    size = QSize(size.width() >> 1, size.height() >> 1);
+                texture = CreateTexture(Context, size, Target,
+                                        QOpenGLTexture::UInt8, QOpenGLTexture::RG,
+                                        QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
+                                        QOpenGLTexture::RG16_UNorm);
                 break;
             case FMT_YUY2:
                 size.setWidth(size.width() >> 1);
@@ -172,7 +182,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane == 0)
                 {
                     texture = CreateTexture(Context, size, Target,
-                                            QOpenGLTexture::UInt8,  QOpenGLTexture::Red);
+                                            QOpenGLTexture::UInt8, QOpenGLTexture::Red);
                 }
                 else
                 {
@@ -256,6 +266,17 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 }
                 break;
             }
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P16:
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_YUV420P10:
+                    case FMT_YUV420P12:
+                    case FMT_YUV420P16: YV12ToYV12(Context, Frame, texture, i); break;
+                    default: break;
+                }
+                break;
             case FMT_NV12:
             {
                 switch (texture->m_frameFormat)
@@ -331,7 +352,10 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
                                          MythVideoTexture *Texture, int Plane)
 {
-    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Frame->pitches[Plane]);
+    int pitch = Frame->pitches[Plane];
+    if (Frame->codec != FMT_YV12)
+        pitch = pitch >> 1;
+    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
                                 static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
     Texture->m_valid = true;

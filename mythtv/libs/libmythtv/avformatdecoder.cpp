@@ -1580,19 +1580,6 @@ static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext */*avctx*/
 }
 #endif
 
-
-static bool IS_DR1_PIX_FMT(const enum AVPixelFormat fmt)
-{
-    switch (fmt)
-    {
-        case AV_PIX_FMT_YUV420P:
-        case AV_PIX_FMT_YUVJ420P:
-            return true;
-        default:
-            return false;
-    }
-}
-
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
@@ -3028,19 +3015,35 @@ void AvFormatDecoder::RemoveAudioStreams()
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    AvFormatDecoder *decoder = (AvFormatDecoder *)(c->opaque);
 
-    if (!IS_DR1_PIX_FMT(c->pix_fmt))
+    VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
+    VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
+    bool found = false;
+    while (*supported != FMT_NONE)
     {
-        nd->m_directrendering = false;
+        if (*supported == type)
+        {
+            found = true;
+            break;
+        }
+        supported++;
+    }
+
+    if (!found)
+    {
+        decoder->m_directrendering = false;
         return avcodec_default_get_buffer2(c, pic, flags);
     }
-    nd->m_directrendering = true;
 
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
-
+    decoder->m_directrendering = true;
+    VideoFrame *frame = decoder->GetPlayer()->GetNextVideoFrame();
     if (!frame)
         return -1;
+
+    if (frame->codec != type)
+        if (!decoder->GetPlayer()->ReAllocateFrame(frame, type))
+            return -1;
 
     for (int i = 0; i < 3; i++)
     {
@@ -3052,8 +3055,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     pic->reordered_opaque = c->reordered_opaque;
 
     // Set release method
-    AVBufferRef *buffer =
-        av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, nd, 0);
+    AVBufferRef *buffer = av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, decoder, 0);
     pic->buf[0] = buffer;
 
     return 0;

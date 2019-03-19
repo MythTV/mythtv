@@ -1148,6 +1148,23 @@ int MythPlayer::GetFreeVideoFrames(void) const
     return 0;
 }
 
+/// \brief Return a list of frame types that can be rendered directly.
+VideoFrameType* MythPlayer::DirectRenderFormats(void)
+{
+    static VideoFrameType defaultformats[] = { FMT_YV12, FMT_NONE };
+    if (videoOutput)
+        return videoOutput->DirectRenderFormats();
+    return &defaultformats[0];
+}
+
+/// \brief Reallocate the given from as Type
+bool MythPlayer::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
+{
+    if (videoOutput)
+        return videoOutput->ReAllocateFrame(Frame, Type);
+    return false;
+}
+
 /**
  *  \brief Removes a frame from the available queue for decoding onto.
  *

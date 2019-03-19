@@ -586,6 +586,13 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
     vbuffers.EndLock();
 }
 
+VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
+{
+    static VideoFrameType openglformats[] =
+        { FMT_YV12, FMT_NV12, FMT_YUY2, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P16, FMT_NONE };
+    return &openglformats[0];
+}
+
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
 {
     if (m_render && !IsErrored())
