@@ -277,7 +277,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
         raw[6] = yuv(2, 0); raw[7] = yuv(2, 1); raw[8] = yuv(2, 2);
         m_vaapiPictureAttributes[updatecscmatrix].value = static_cast<int32_t>(raw[0]);
         m_context->makeCurrent();
-        INIT_ST;
+        ok = true;
         va_status = vaSetDisplayAttributes(m_vaDisplay, &m_vaapiPictureAttributes[updatecscmatrix], 1);
         CHECK_ST;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Updated VAAPI colourspace matrix");
