@@ -6517,6 +6517,19 @@ case "$cc_type" in
         ;;
 esac
 
+enable enforce_wshadow
+case $target_os in
+    android)
+        disable enforce_wshadow
+        ;;
+    linux)
+        . /etc/os-release
+        if test $ID = "centos"; then
+            disable enforce_wshadow
+        fi
+        ;;
+esac
+
 if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
@@ -6783,7 +6796,9 @@ elif enabled gcc; then
     check_cflags -Wjump-misses-init
     check_cflags -Wlogical-op
     check_cflags -Wnull-dereference
-    check_cflags -Wshadow
+    if enabled enforce_wshadow ; then
+        check_cflags -Wshadow
+    fi
 elif enabled llvm_gcc; then
     check_cflags -mllvm -stack-alignment=16
 elif enabled clang; then
@@ -6883,7 +6898,9 @@ if enabled gxx; then
     check_cxxflags -Wmissing-declarations
     check_cxxflags -Wnull-dereference
     check_cxxflags -Woverloaded-virtual
-    check_cxxflags -Wshadow
+    if enabled enforce_wshadow ; then
+        check_cxxflags -Wshadow
+    fi
 
     # This warning flag isn't enabled yet because it will require a
     # large number of changes to the code to eliminate all the
@@ -7481,6 +7498,7 @@ echo ""
 
 echo "# Compilation Options"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
+echo "Enforce shadowed vars     ${enforce_wshadow-no}"
 echo ""
 
 # Remove redundant elements from variables

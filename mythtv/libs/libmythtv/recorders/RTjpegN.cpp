@@ -3132,14 +3132,14 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 }
 
 #else
-int RTjpeg::bcomp(int16_t *rblock, int16_t *old, uint16_t *mask)
+int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, uint16_t *mask)
 {
  int i;
 
  for(i=0; i<64; i++)
-  if (abs(old[i]-rblock[i])>*mask)
+  if (abs(_old[i]-rblock[i])>*mask)
   {
-   for(i=0; i<16; i++)((uint64_t *)old)[i]=((uint64_t *)rblock)[i];
+   for(i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
    return 0;
   }
  return 1;
