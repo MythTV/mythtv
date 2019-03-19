@@ -40,7 +40,7 @@ int invert(VideoFilter *vf, VideoFrame *frame, int field)
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                VideoFrameType outpixfmt,
-                               int *width, int *height, char *options,
+                               const int *width, const int *height, const char *options,
                                int threads)
 {
     ThisFilter *filter;

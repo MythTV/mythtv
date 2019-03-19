@@ -54,7 +54,7 @@ typedef struct ThisFilter
     TF_STRUCT;
 } ThisFilter;
 
-static void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
+static void adjustRegion(uint8_t *buf, const uint8_t *end, const uint8_t *table)
 {
     while (buf < end)
     {
@@ -64,7 +64,7 @@ static void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
 }
 
 #if HAVE_MMX
-static void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
+static void adjustRegionMMX(uint8_t *buf, const uint8_t *end, const uint8_t *table,
                      const mmx_t *shift, const mmx_t *scale, const mmx_t *min,
                      const mmx_t *clamp1, const mmx_t *clamp2)
 {
@@ -234,7 +234,7 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
 static VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                 int *width, int *height, char *options, int threads)
+                 const int *width, const int *height, const char *options, int threads)
 {
     ThisFilter *filter;
     int numopts = 0, ymin = 16, ymax = 253, cmin = 16, cmax = 240;

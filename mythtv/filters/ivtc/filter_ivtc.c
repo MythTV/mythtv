@@ -29,7 +29,7 @@ typedef struct ThisFilter
     int apply_filter;
 } ThisFilter;
 
-static void SetupFilter(ThisFilter *vf, int width, int height, int *pitches);
+static void SetupFilter(ThisFilter *vf, int width, int height, const int *pitches);
 
 static inline void * memcpy_pic(void * dst, const void * src, int height, int dstStride, int srcStride)
 {
@@ -162,7 +162,7 @@ IvtcFilterCleanup( VideoFilter * filter)
     pullup_free_context((((ThisFilter *)filter)->context));
 }
 
-static void SetupFilter(ThisFilter *vf, int width, int height, int *pitches)
+static void SetupFilter(ThisFilter *vf, int width, int height, const int *pitches)
 {
     if (vf->width  == width  &&
         vf->height == height &&
@@ -192,7 +192,7 @@ static void SetupFilter(ThisFilter *vf, int width, int height, int *pitches)
 
 static VideoFilter *NewIvtcFilter(VideoFrameType inpixfmt,
                                   VideoFrameType outpixfmt,
-                                  int *width, int *height, char *options,
+                                  const int *width, const int *height, const char *options,
                                   int threads)
 {
     (void) threads;
