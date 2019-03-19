@@ -21,7 +21,7 @@ typedef struct FmtConv_
 
 typedef struct VideoFilter_ VideoFilter;
 
-typedef VideoFilter*(*init_filter)(int, int, int *, int *, char *, int);
+typedef VideoFilter*(*init_filter)(int, int, const int *, const int *, const char *, int);
 
 typedef struct FilterInfo_
 {

@@ -68,8 +68,8 @@ class RTjpeg
    ~RTjpeg();
    
     int SetQuality(int *quality);
-    int SetFormat(int *fmt);
-    int SetSize(int *w, int *h);
+    int SetFormat(const int *fmt);
+    int SetSize(const int *w, const int *h);
     int SetIntra(int *key, int *lm, int *cm);
 
     int Compress(int8_t *sp, uint8_t **planes);
@@ -78,8 +78,8 @@ class RTjpeg
     void SetNextKey(void);
 
 private:
-    int b2s(int16_t *data, int8_t *strm, uint8_t bt8);
-    int s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla);
+    int b2s(const int16_t *data, int8_t *strm, uint8_t bt8);
+    int s2b(int16_t *data, const int8_t *strm, uint8_t bt8, int32_t *qtbla);
 
     void QuantInit(void);
     void Quant(int16_t *block, int32_t *qtbl);

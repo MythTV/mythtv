@@ -255,8 +255,8 @@ int AudioOutputJACK::GetBufferedOnSoundcard(void) const
         nframes: number of frames of output required
   Output: bufs: non interleaved float values.
 */
-void AudioOutputJACK::DeinterleaveAudio(float *aubuf, float **bufs, int nframes,
-                                        int* channel_volumes)
+void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nframes,
+                                        const int* channel_volumes)
 {
     // Convert to floats and de-interleave
     // TODO: Implicit assumption dealing with float input only.

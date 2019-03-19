@@ -33,7 +33,7 @@
 extern volatile guint32 resolx;
 extern volatile guint32 c_resoly;
 
-void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
+void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, const signed int *brutS, const signed int *brutD);
 
 /* Prototype to keep gcc from spewing warnings */
 static void select_zoom_filter (void);
@@ -148,8 +148,8 @@ void generatePrecalCoef (void);
 void calculatePXandPY (int x, int y, int *px, int *py);
 void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
 void setPixelRGB_ (Uint * buffer, Uint x, Color c);
-inline void getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c);
-void getPixelRGB_ (Uint * buffer, Uint x, Color * c);
+inline void getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c);
+void getPixelRGB_ (const Uint * buffer, Uint x, Color * c);
 
 void
 generatePrecalCoef ()
@@ -359,7 +359,7 @@ setPixelRGB_ (Uint * buffer, Uint x, Color c)
 
 
 inline void
-getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
+getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 {
 //    register unsigned char *tmp8;
 	unsigned int i;
@@ -380,7 +380,7 @@ getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
 
 
 /*inline*/ void
-getPixelRGB_ (Uint * buffer, Uint x, Color * c)
+getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
 {
 	register unsigned char *tmp8;
 
@@ -409,7 +409,7 @@ getPixelRGB_ (Uint * buffer, Uint x, Color * c)
 
 void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
              unsigned int lprevX, unsigned int lprevY,
-             signed int *lbrutS, signed int *lbrutD)
+             const signed int *lbrutS, const signed int *lbrutD)
 {
 	int     myPos, myPos2;
 	Color   couleur;

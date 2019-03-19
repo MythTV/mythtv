@@ -103,7 +103,7 @@ void surf3d_translate (surf3d *s) {
 	}
 }
 
-void grid3d_update (grid3d *g, float angle, float *vals, float dist) {
+void grid3d_update (grid3d *g, float angle, const float *vals, float dist) {
 	int i;
 	float cosa;
 	float sina;

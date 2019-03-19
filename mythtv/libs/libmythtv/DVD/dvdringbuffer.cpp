@@ -2180,8 +2180,9 @@ uint DVDRingBuffer::TitleTimeLeft(void)
 
 /** \brief converts palette values from YUV to RGB
  */
-void DVDRingBuffer::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
-                                        uint8_t *alpha)
+void DVDRingBuffer::guess_palette(uint32_t *rgba_palette,
+                                  const uint8_t *palette,
+                                  const uint8_t *alpha)
 {
     memset(rgba_palette, 0, 16);
 

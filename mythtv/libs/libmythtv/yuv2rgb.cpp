@@ -84,7 +84,7 @@ do {                            \
 } while (0)
 
 #if HAVE_MMX
-static inline void mmx_yuv2rgb (uint8_t * py, uint8_t * pu, uint8_t * pv)
+static inline void mmx_yuv2rgb (const uint8_t * py, const uint8_t * pu, const uint8_t * pv)
 {
     static mmx_t mmx_80w = {0x0080008000800080ULL};
     static mmx_t mmx_U_green = {0xf37df37df37df37dULL};

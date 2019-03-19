@@ -56,7 +56,7 @@ static int parityok(int n)      /* check parity for 2 bytes packed in n */
 }
 
 
-static int decodebit(unsigned char *data, int threshold, int scale1)
+static int decodebit(const unsigned char *data, int threshold, int scale1)
 {
     int i, sum = 0;
     for (i = 0; i < scale1; i++)

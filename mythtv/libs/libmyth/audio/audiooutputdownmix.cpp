@@ -165,7 +165,7 @@ static const float s51_matrix[3][8][6] =
 };
 
 int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
-                                      float *dst, float *src, int frames)
+                                      float *dst, const float *src, int frames)
 {
     if (channels_in < channels_out)
         return -1;

@@ -209,7 +209,7 @@ goom_lines_free (GMLine ** l)
 }
 
 void
-goom_lines_draw (GMLine * line, gint16 data[512], unsigned int *p)
+goom_lines_draw (GMLine * line, const gint16 data[512], unsigned int *p)
 {
 	if (line != NULL) {
 		int     i, x1, y1;

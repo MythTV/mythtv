@@ -177,12 +177,12 @@ class BiopMessage
     // Process directories and service gateways.
     bool ProcessDir(bool isSrg,
                     DSMCCCacheModuleData *cachep, DSMCCCache *cache,
-                    unsigned char *data, unsigned long *curp);
+                    const unsigned char *data, unsigned long *curp);
     // Process files.
     bool ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *cache,
                      unsigned char *data, unsigned long *curp);
 
-    bool ProcessMsgHdr(unsigned char *data, unsigned long *curp);
+    bool ProcessMsgHdr(const unsigned char *data, unsigned long *curp);
 
   protected:
     unsigned char  m_version_major {0};

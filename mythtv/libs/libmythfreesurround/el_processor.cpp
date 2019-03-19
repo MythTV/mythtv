@@ -425,7 +425,7 @@ private:
     }
 
     // filter the complex source signal and add it to target
-    void apply_filter(cfloat *signal, float *flt, float *target) {
+    void apply_filter(cfloat *signal, const float *flt, float *target) {
         // filter the signal
         unsigned f;
         for (f=0;f<=halfN;f++) {
