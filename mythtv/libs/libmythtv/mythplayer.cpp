@@ -3890,7 +3890,7 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
  *
  * \note The caller must hold decoder_change_lock.
 */
-bool MythPlayer::DoGetFrame(DecodeType DecodeType)
+bool MythPlayer::DoGetFrame(DecodeType Type)
 {
     bool ret = false;
     QElapsedTimer timeout;
@@ -3900,7 +3900,7 @@ bool MythPlayer::DoGetFrame(DecodeType DecodeType)
     while (retry && !pauseDecoder && !killdecoder && !timeout.hasExpired(5000))
     {
         retry = false;
-        ret = decoder->GetFrame(DecodeType, retry);
+        ret = decoder->GetFrame(Type, retry);
         if (retry)
         {
             decoder_change_lock.unlock();
