@@ -32,7 +32,7 @@ class AudioOutputNULL : public AudioOutputBase
     int GetVolumeChannel(int /* channel */) const override // VolumeBase
         { return 100; }
     void SetVolumeChannel(int /* channel */, int /* volume */) override // VolumeBase
-        {return;}
+        {}
 
     int readOutputData(unsigned char *read_buffer, int max_length) override; // AudioOutputBase
 

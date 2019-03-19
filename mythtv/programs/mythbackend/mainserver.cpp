@@ -2821,8 +2821,6 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
     QStringList outputlist( QString::number(result) );
     if (pbssock)
         SendResponse(pbssock, outputlist);
-
-    return;
 }
 
 void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
@@ -5625,8 +5623,6 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleCommBreakQuery(const QString &chanid,
@@ -5688,8 +5684,6 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 
@@ -5730,8 +5724,6 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
@@ -5752,8 +5744,6 @@ void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
     retlist << retvalue;
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleDownloadFile(const QStringList &command,
@@ -5850,8 +5840,6 @@ void MainServer::HandleSetSetting(QStringList &tokens,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleScanVideos(PlaybackSock *pbs)

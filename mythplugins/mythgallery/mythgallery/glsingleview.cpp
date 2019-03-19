@@ -728,7 +728,6 @@ void GLSingleView::EffectNone(void)
     paintTexture();
     m_effect_running = false;
     m_slideshow_frame_delay_state = -1;
-    return;
 }
 
 void GLSingleView::EffectBlend(void)

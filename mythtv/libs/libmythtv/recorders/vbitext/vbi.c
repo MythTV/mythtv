@@ -468,7 +468,6 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
            dl_remove(cl->node);
            break;
        }
-    return;
 }
 
 #ifdef USING_V4L2

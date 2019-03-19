@@ -767,7 +767,6 @@ void SingleView::EffectNone(void)
     m_effect_running = false;
     m_slideshow_frame_delay_state = -1;
     update();
-    return;
 }
 
 void SingleView::EffectChessboard(void)
@@ -1351,7 +1350,6 @@ void SingleView::EffectNoise(void)
     m_slideshow_frame_delay_state = -1;
     m_effect_running = false;
     update();
-    return;
 }
 
 void SingleView::SlideTimeout(void)

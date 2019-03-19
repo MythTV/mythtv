@@ -422,8 +422,6 @@ static void LoadDeadKeys(QMap<QPair<int, int>, int> &map)
 
     map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_Y)] = Qt::Key_Yacute;
     map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_Y)] = Qt::Key_ydiaeresis;
-
-    return;
 }
 
 bool MythUITextEdit::keyPressEvent(QKeyEvent *event)

@@ -946,8 +946,6 @@ void Piano::zero_analysis(void)
         m_piano_data[key].samples_processed = 0;
     }
     m_offset_processed = 0;
-
-    return;
 }
 
 void Piano::resize(const QSize &newsize)
@@ -1031,8 +1029,6 @@ void Piano::resize(const QSize &newsize)
     {
         m_magnitude[key] = 0.0;
     }
-
-    return;
 }
 
 unsigned long Piano::getDesiredSamples(void)

@@ -495,8 +495,6 @@ void VideoBuffers::Enqueue(BufferType type, VideoFrame *frame)
     q->remove(frame);
     q->enqueue(frame);
     m_globalLock.unlock();
-
-    return;
 }
 
 void VideoBuffers::Remove(BufferType type, VideoFrame *frame)

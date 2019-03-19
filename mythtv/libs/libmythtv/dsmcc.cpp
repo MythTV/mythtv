@@ -302,7 +302,6 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
     dii.m_private_data_len = (data[off] << 8) | data[off + 1];
 
     car->AddModuleInfo(&dii, this, streamTag);
-    return;
 }
 
 // DSI or DII message.
@@ -435,8 +434,6 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Data Block ModID %1 Pos %2"
             " unknown carousel %3")
             .arg(ddb.m_module_id).arg(ddb.m_block_number).arg(download_id));
-
-    return;
 }
 
 void Dsmcc::ProcessSectionDesc(const unsigned char *data, int length)

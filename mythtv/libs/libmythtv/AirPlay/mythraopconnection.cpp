@@ -1756,7 +1756,6 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
     m_eventClients.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteEventClient()));
-    return;
 }
 
 void MythRAOPConnection::deleteEventClient(void)

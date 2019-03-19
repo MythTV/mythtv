@@ -795,7 +795,6 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
     m_tcpSocket->flush();
 
     *ret = true;
-    return;
 }
 
 void MythSocket::ReadStringListReal(

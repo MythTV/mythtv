@@ -915,7 +915,6 @@ void MythUIImage::ForceSize(const QSize &size)
     SetSize(m_imageProperties.m_forceSize);
 
     Load();
-    return;
 }
 
 /**

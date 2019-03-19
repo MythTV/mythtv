@@ -588,7 +588,6 @@ public:
                 break;
             }
         }
-        return;
     }
 
     void RemoveSegment(int segnum, bool willdelete = true)
@@ -601,8 +600,8 @@ public:
             delete segment;
         }
         m_segments.removeAt(segnum);
-        return;
     }
+
     void RemoveListSegments(QMap<HLSSegment*,bool> &table)
     {
         QMap<HLSSegment*,bool>::iterator it;

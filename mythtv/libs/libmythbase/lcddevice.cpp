@@ -538,7 +538,6 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
 void LCD::outputLEDs()
 {
     /* now implemented elsewhere for advanced icon control */
-    return;
 #if 0
     if (!lcd_ready)
         return;

@@ -2798,8 +2798,8 @@ bool AvFormatDecoder::DoRewindSeek(long long desiredFrame)
 void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 {
     DecoderBase::DoFastForwardSeek(desiredFrame, needflush);
-    return;
 }
+
 ///Returns TeleText language
 int AvFormatDecoder::GetTeletextLanguage(uint lang_idx) const
 {

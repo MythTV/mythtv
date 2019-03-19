@@ -115,8 +115,6 @@ static void delete_in_db(uint endtime)
 
     if (!query.exec())
         MythDB::DBError("Error deleting old eitcache entries.", query);
-
-    return;
 }
 
 

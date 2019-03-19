@@ -392,7 +392,6 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			}
 		} 
 	} while(!done);
-	return;
 }
 
 

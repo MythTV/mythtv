@@ -1906,7 +1906,6 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
     if (m_act_video_buffer >= m_video_buffer_count)
         m_act_video_buffer = 0; // cycle to begin of buffer
     videobuffer[act]->freeToEncode = 1; // set last to prevent race
-    return;
 }
 
 inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)

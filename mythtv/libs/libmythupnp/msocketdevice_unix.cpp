@@ -116,8 +116,6 @@ static inline void qt_socket_getportaddr(struct sockaddr *sa,
     *port = ntohs(sa4->sin_port);
 
     *addr = QHostAddress(ntohl(sa4->sin_addr.s_addr));
-
-    return;
 }
 
 // internal

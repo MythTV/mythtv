@@ -501,7 +501,6 @@ void MythAirplayServer::Start(void)
         m_serviceRefresh->start(2000);
     }
     m_valid = true;
-    return;
 }
 
 void MythAirplayServer::timeout(void)

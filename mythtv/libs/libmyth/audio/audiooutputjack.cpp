@@ -561,7 +561,7 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
 {
     (void)aubuf;
     (void)size;
-    return;     // unneeded and unused in JACK
+    // unneeded and unused in JACK
 }
 
 /* **********************************************

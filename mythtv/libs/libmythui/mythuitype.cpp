@@ -975,7 +975,6 @@ bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
 
 void MythUIType::customEvent(QEvent * /*event*/)
 {
-    return;
 }
 
 /** \brief Mouse click/movement handler, receives mouse gesture events from the
@@ -994,7 +993,6 @@ bool MythUIType::gestureEvent(MythGestureEvent * /*event*/)
  */
 void MythUIType::mediaEvent(MythMediaEvent * /*event*/)
 {
-    return;
 }
 
 void MythUIType::LoseFocus(void)

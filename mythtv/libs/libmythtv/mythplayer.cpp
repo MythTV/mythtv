@@ -6124,7 +6124,6 @@ void MythPlayer::syncWithAudioStretch()
             .arg((disable_passthrough) ? "disable" : "allow"));
         SetDisablePassThrough(disable_passthrough);
     }
-    return;
 }
 
 void MythPlayer::SetDisablePassThrough(bool disabled)

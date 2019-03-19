@@ -394,6 +394,4 @@ void SourceManager::recurseDirs( QDir dir )
             }
         }
     }
-
-    return;
 }

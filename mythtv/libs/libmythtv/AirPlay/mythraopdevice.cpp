@@ -143,7 +143,6 @@ void MythRAOPDevice::Start(void)
     }
 
     m_valid = true;
-    return;
 }
 
 void MythRAOPDevice::Stop(void)
