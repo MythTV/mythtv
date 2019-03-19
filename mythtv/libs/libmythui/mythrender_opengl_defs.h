@@ -17,6 +17,10 @@
 #define GL_TEXTURE_EXTERNAL_OES 0x8D65
 #endif
 
+#ifndef GL_UNPACK_ROW_LENGTH
+#define GL_UNPACK_ROW_LENGTH 0x0CF2
+#endif
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif
