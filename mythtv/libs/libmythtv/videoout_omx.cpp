@@ -723,7 +723,7 @@ void VideoOutputOMX::UpdatePauseFrame(int64_t &disp_timecode)
     if (used_frame)
         CopyFrame(&av_pause_frame, used_frame);
 
-    vbuffers.end_lock();
+    vbuffers.EndLock();
 
     if (!used_frame)
     {
