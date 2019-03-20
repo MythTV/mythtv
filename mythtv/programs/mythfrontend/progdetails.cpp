@@ -821,11 +821,11 @@ void ProgDetails::loadPage(void)
 
         if (query.exec() && query.next())
         {
-            recordingProfile = m_progInfo.i18n(query.value(0).toString());
+            recordingProfile = ProgramInfo::i18n(query.value(0).toString());
         }
-        recordingGroup = m_progInfo.i18n(m_progInfo.GetRecordingGroup());
-        storageGroup   = m_progInfo.i18n(m_progInfo.GetStorageGroup());
-        playbackGroup  = m_progInfo.i18n(m_progInfo.GetPlaybackGroup());
+        recordingGroup = ProgramInfo::i18n(m_progInfo.GetRecordingGroup());
+        storageGroup   = ProgramInfo::i18n(m_progInfo.GetStorageGroup());
+        playbackGroup  = ProgramInfo::i18n(m_progInfo.GetPlaybackGroup());
     }
     else if (m_progInfo.GetRecordingRuleID())
     {

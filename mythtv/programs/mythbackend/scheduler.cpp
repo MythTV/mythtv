@@ -2878,7 +2878,7 @@ bool Scheduler::HandleRecording(
 
             // activate auto expirer
             if (m_expirer && recStatus == RecStatus::Tuning)
-                m_expirer->Update(ri.GetInputID(), fsID, false);
+                AutoExpire::Update(ri.GetInputID(), fsID, false);
         }
     }
 
@@ -5062,7 +5062,7 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
             .arg(recording_dir));
 
     if (m_expirer) // update auto expirer
-        m_expirer->Update(cardid, fsID, true);
+        AutoExpire::Update(cardid, fsID, true);
 }
 
 int Scheduler::FillRecordingDir(

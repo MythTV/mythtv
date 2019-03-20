@@ -1104,7 +1104,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
         return false;
     }
 
-    if (sessionManager->CreateDigest("admin", sAdminPassword) !=
+    if (MythSessionManager::CreateDigest("admin", sAdminPassword) !=
             sessionManager->GetPasswordDigest("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1")

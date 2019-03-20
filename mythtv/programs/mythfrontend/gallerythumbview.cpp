@@ -1916,7 +1916,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
     foreach(ImagePtr im, files)
     {
         // Replace base path with destination path
-        im->m_filePath = m_mgr.ConstructPath(destDir->m_filePath,
+        im->m_filePath = ImageManagerFe::ConstructPath(destDir->m_filePath,
                                              im->m_filePath.mid(basePathSize));
 
         transfers.insert(im, m_mgr.BuildTransferUrl(im->m_filePath,
@@ -1962,7 +1962,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
         dirPaths << relPath;
 
         // Replace base path with destination path
-        im->m_filePath = m_mgr.ConstructPath(destDir->m_filePath, relPath);
+        im->m_filePath = ImageManagerFe::ConstructPath(destDir->m_filePath, relPath);
 
         // Append dirs so that hidden state & cover is preserved for new dirs
         // Pre-existing dirs will take precedance over these.
@@ -2051,7 +2051,7 @@ void GalleryThumbView::Move()
     foreach(ImagePtrK im, images)
     {
         // Replace base path with destination path
-        QString newPath = m_mgr.ConstructPath(destDir->m_filePath,
+        QString newPath = ImageManagerFe::ConstructPath(destDir->m_filePath,
                                               im->m_filePath.mid(basePathSize));
 
         transfers.insert(im, m_mgr.BuildTransferUrl(newPath, aChild->IsLocal()));

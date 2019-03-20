@@ -269,7 +269,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
     // Create .thumbcache dir if neccesary
     if (thumbGen)
-        thumbGen->getThumbcacheDir(currDir);
+        ThumbGenerator::getThumbcacheDir(currDir);
 
     QFileInfoList list = d.entryInfoList(GetMediaFilter(),
                                          QDir::Files | QDir::AllDirs |

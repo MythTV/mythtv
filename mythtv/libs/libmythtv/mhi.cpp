@@ -668,7 +668,7 @@ void MHIContext::SetInputRegister(int num)
 int MHIContext::GetICStatus()
 {
    // 0= Active, 1= Inactive, 2= Disabled
-    return m_ic.status();
+    return MHInteractionChannel::status();
 }
 
 // Called by the video player to redraw the image.

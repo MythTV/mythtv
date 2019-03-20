@@ -731,12 +731,12 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         m_samplerate = samplerate_tmp;
         m_format = m_output_format = FORMAT_S16;
         m_source_bytes_per_frame = m_channels *
-            m_output_settings->SampleSize(m_format);
+            AudioOutputSettings::SampleSize(m_format);
     }
     else
     {
         m_source_bytes_per_frame = m_source_channels *
-            m_output_settings->SampleSize(m_format);
+            AudioOutputSettings::SampleSize(m_format);
     }
 
     // Turn on float conversion?
@@ -754,14 +754,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
 
     m_bytes_per_frame =  m_processing ?
-        sizeof(float) : m_output_settings->SampleSize(m_format);
+        sizeof(float) : AudioOutputSettings::SampleSize(m_format);
     m_bytes_per_frame *= m_channels;
 
     if (m_enc)
         m_channels = 2; // But only post-encoder
 
     m_output_bytes_per_frame = m_channels *
-                             m_output_settings->SampleSize(m_output_format);
+                             AudioOutputSettings::SampleSize(m_output_format);
 
     VBGENERAL(
         QString("Opening audio device '%1' ch %2(%3) sr %4 sf %5 reenc %6")
@@ -1237,7 +1237,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
 
     // Upmix to 6ch via FreeSurround
     // Calculate frame size of input
-    off =  m_processing ? sizeof(float) : m_output_settings->SampleSize(m_format);
+    off =  m_processing ? sizeof(float) : AudioOutputSettings::SampleSize(m_format);
     off *= m_source_channels;
 
     int i = 0;
@@ -1367,7 +1367,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     {
         // Send original samples to any attached visualisations
         dispatchVisual((uchar *)in_buffer, len, timecode, m_source_channels,
-                       m_output_settings->FormatToBits(m_format));
+                       AudioOutputSettings::FormatToBits(m_format));
     }
 
     // Calculate amount of free space required in ringbuffer
@@ -1586,13 +1586,13 @@ void AudioOutputBase::Status()
 
     if (m_source_bitrate == -1)
         m_source_bitrate = m_source_samplerate * m_source_channels *
-                         m_output_settings->FormatToBits(m_format);
+                         AudioOutputSettings::FormatToBits(m_format);
 
     if (ct / 1000 != m_current_seconds)
     {
         m_current_seconds = ct / 1000;
         OutputEvent e(m_current_seconds, ct, m_source_bitrate, m_source_samplerate,
-                      m_output_settings->FormatToBits(m_format), m_source_channels);
+                      AudioOutputSettings::FormatToBits(m_format), m_source_channels);
         dispatch(e);
     }
 }
@@ -1731,7 +1731,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
 
     int bdiff = kAudioRingBufferSize - m_raud;
 
-    int obytes = m_output_settings->SampleSize(m_output_format);
+    int obytes = AudioOutputSettings::SampleSize(m_output_format);
 
     if (obytes <= 0)
         return 0;

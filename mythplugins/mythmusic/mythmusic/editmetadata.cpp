@@ -1018,14 +1018,12 @@ void EditAlbumartDialog::showTypeMenu(bool changeType)
         imageType = AlbumArtImages::guessImageType(m_imageFilename);
     }
 
-    AlbumArtImages *albumArt = s_metadata->getAlbumArtImages();
-
-    menu->AddButton(albumArt->getTypeName(IT_UNKNOWN),    qVariantFromValue((int)IT_UNKNOWN),    false, (imageType == IT_UNKNOWN));
-    menu->AddButton(albumArt->getTypeName(IT_FRONTCOVER), qVariantFromValue((int)IT_FRONTCOVER), false, (imageType == IT_FRONTCOVER));
-    menu->AddButton(albumArt->getTypeName(IT_BACKCOVER),  qVariantFromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
-    menu->AddButton(albumArt->getTypeName(IT_CD),         qVariantFromValue((int)IT_CD),         false, (imageType == IT_CD));
-    menu->AddButton(albumArt->getTypeName(IT_INLAY),      qVariantFromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
-    menu->AddButton(albumArt->getTypeName(IT_ARTIST),     qVariantFromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_UNKNOWN),    qVariantFromValue((int)IT_UNKNOWN),    false, (imageType == IT_UNKNOWN));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_FRONTCOVER), qVariantFromValue((int)IT_FRONTCOVER), false, (imageType == IT_FRONTCOVER));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_BACKCOVER),  qVariantFromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_CD),         qVariantFromValue((int)IT_CD),         false, (imageType == IT_CD));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_INLAY),      qVariantFromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_ARTIST),     qVariantFromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
 
     popupStack->AddScreen(menu);
 }
@@ -1115,8 +1113,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                 MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
                 if (item)
                 {
-                    AlbumArtImages *albumArt = s_metadata->getAlbumArtImages();
-                    item->SetText(albumArt->getTypeName((ImageType) type));
+                    item->SetText(AlbumArtImages::getTypeName((ImageType) type));
                     AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
                     if (image)
                     {

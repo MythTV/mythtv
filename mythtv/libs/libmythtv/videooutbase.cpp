@@ -477,7 +477,7 @@ VideoOutput::~VideoOutput()
 
     ResizeForGui();
     if (display_res)
-        display_res->Unlock();
+        DisplayRes::Unlock();
 }
 
 /**
@@ -728,7 +728,7 @@ void VideoOutput::GetDeinterlacers(QStringList &deinterlacers)
     if (!db_vdisp_profile)
         return;
     QString rend = db_vdisp_profile->GetActualVideoRenderer();
-    deinterlacers = db_vdisp_profile->GetDeinterlacers(rend);
+    deinterlacers = VideoDisplayProfile::GetDeinterlacers(rend);
 }
 
 /**

@@ -256,7 +256,7 @@ MainServer::MainServer(bool master, int port,
     m_mythserver = new MythServer();
     m_mythserver->setProxy(QNetworkProxy::NoProxy);
 
-    QList<QHostAddress> listenAddrs = m_mythserver->DefaultListen();
+    QList<QHostAddress> listenAddrs = MythServer::DefaultListen();
     if (!gCoreContext->GetBoolSetting("ListenOnAllIps",true))
     {
         // test to make sure listen addresses are available
