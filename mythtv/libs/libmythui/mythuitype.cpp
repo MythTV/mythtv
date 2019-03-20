@@ -1384,10 +1384,7 @@ void MythUIType::LoadNow(void)
  */
 bool MythUIType::ContainsPoint(const QPoint &point) const
 {
-    if (m_Area.contains(point))
-        return true;
-
-    return false;
+    return m_Area.contains(point);
 }
 
 MythPainter *MythUIType::GetPainter(void)

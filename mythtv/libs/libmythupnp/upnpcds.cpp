@@ -890,10 +890,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
 bool UPnpCDSExtension::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 {
-    if ( !m_sClass.startsWith( pRequest->m_sSearchClass ))
-        return false;
-
-    return true;
+    return m_sClass.startsWith( pRequest->m_sSearchClass );
 }
 
 /////////////////////////////////////////////////////////////////////////////

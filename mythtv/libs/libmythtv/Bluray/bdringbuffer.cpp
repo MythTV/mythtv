@@ -284,9 +284,7 @@ bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
     name   = m_name;
     serial = m_serialnumber;
-    if (name.isEmpty() && serial.isEmpty())
-        return false;
-    return true;
+    return !(name.isEmpty() && serial.isEmpty());
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)

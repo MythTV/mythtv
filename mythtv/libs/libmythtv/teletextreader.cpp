@@ -518,7 +518,7 @@ void TeletextReader::HeaderUpdated(
     if (page_ptr == nullptr)
         return;
 
-    if (m_curpage_showheader == false)
+    if (!m_curpage_showheader)
         return;
 
     m_header_changed = true;

@@ -825,9 +825,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
         }
         n = n.nextSibling();
     }
-    if (onlyLoadWindows)
-        return false;
-    return true;
+    return !onlyLoadWindows;
 }
 
 bool XMLParseBase::LoadBaseTheme(void)

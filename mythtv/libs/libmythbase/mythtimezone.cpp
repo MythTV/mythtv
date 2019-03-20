@@ -66,10 +66,7 @@ static bool compare_zone_files(QFileInfo first_file_info,
         }
         second_file.close();
     }
-    if (first_file_data == second_file_data)
-        return true;
-
-    return false;
+    return first_file_data == second_file_data;
 }
 
 #ifndef _WIN32

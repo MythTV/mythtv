@@ -997,7 +997,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
 
     int r = 0;
 
-    while (done == false)
+    while (!done)
     {
         if (t == Datagram)
         {

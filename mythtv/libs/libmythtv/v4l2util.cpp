@@ -707,9 +707,7 @@ bool V4L2util::UserAdjustableResolution(void) const
     // I have not been able to come up with a way of querying the
     // driver to answer this question.
 
-    if (m_driverName == "hdpvr")
-        return false;
-    return true;
+    return m_driverName != "hdpvr";
 }
 
 int V4L2util::GetExtControl(int request, const QString& ctrl_desc) const

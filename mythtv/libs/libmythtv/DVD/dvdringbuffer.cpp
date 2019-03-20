@@ -144,9 +144,7 @@ bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
     name   = m_name;
     serial = m_serialnumber;
-    if (name.isEmpty() && serial.isEmpty())
-        return false;
-    return true;
+    return !(name.isEmpty() && serial.isEmpty());
 }
 
 MythDVDContext::MythDVDContext(const dsi_t& dsi, const pci_t& pci) :
@@ -1400,9 +1398,7 @@ bool DVDRingBuffer::GoToMenu(const QString &str)
         return false;
 
     dvdnav_status_t ret = dvdnav_menu_call(m_dvdnav, menuid);
-    if (ret == DVDNAV_STATUS_OK)
-        return true;
-    return false;
+    return ret == DVDNAV_STATUS_OK;
 }
 
 /** \brief Attempts to back-up by trying to jump to the 'Go up' PGC,
@@ -1846,11 +1842,8 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
 
     m_hl_button.setCoords(hl.sx, hl.sy, hl.ex, hl.ey);
 
-    if (((hl.sx + hl.sy) > 0) &&
-            (hl.sx < videowidth && hl.sy < videoheight))
-        return true;
-
-    return false;
+    return ((hl.sx + hl.sy) > 0) &&
+            (hl.sx < videowidth && hl.sy < videoheight);
 }
 
 /** \brief clears the dvd menu button structures
@@ -2109,9 +2102,7 @@ bool DVDRingBuffer::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
     _name    = m_dvdname;
     _serial  = m_serialnumber;
-    if (_name.isEmpty() && _serial.isEmpty())
-        return false;
-    return true;
+    return !(_name.isEmpty() && _serial.isEmpty());
 }
 
 /** \brief Get a snapshot of the current DVD VM state

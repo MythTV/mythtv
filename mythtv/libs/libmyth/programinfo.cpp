@@ -2237,11 +2237,8 @@ bool ProgramInfo::IsSameTitleStartTimeAndChannel(const ProgramInfo& other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    if (m_startts == other.m_startts &&
-        IsSameChannel(other))
-        return true;
-
-    return false;
+    return m_startts == other.m_startts &&
+        IsSameChannel(other);
 }
 
 /**
@@ -2254,12 +2251,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    if (IsSameChannel(other) &&
+    return IsSameChannel(other) &&
         m_startts < other.m_endts &&
-        m_endts > other.m_startts)
-        return true;
-
-    return false;
+        m_endts > other.m_startts;
 }
 
 /**
@@ -2270,12 +2264,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
  */
 bool ProgramInfo::IsSameChannel(const ProgramInfo& other) const
 {
-    if (m_chanid == other.m_chanid ||
+    return m_chanid == other.m_chanid ||
          (!m_chansign.isEmpty() &&
-          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0))
-        return true;
-
-    return false;
+          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0);
 }
 
 void ProgramInfo::CheckProgramIDAuthorities(void)

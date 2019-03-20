@@ -1527,10 +1527,7 @@ bool MythDownloadManager::saveFile(const QString &outFile,
         remaining   -= written;
     }
 
-    if (remaining > 0)
-        return false;
-
-    return true;
+    return remaining <= 0;
 }
 
 /** \brief Gets the Last Modified timestamp for a URI

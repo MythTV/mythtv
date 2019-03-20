@@ -1095,7 +1095,7 @@ void RingBuffer::run(void)
         bool reads_were_allowed = m_readsAllowed;
 
         ignore_for_read_timing =
-            ((totfree < m_readBlockSize) || (read_return < totfree)) ? true : false;
+            (totfree < m_readBlockSize) || (read_return < totfree);
 
         if ((0 == read_return) || (m_numFailures > 5) ||
             (m_readsAllowed != (used >= 1 || m_ateof ||

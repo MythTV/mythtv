@@ -646,7 +646,7 @@ QString StorageGroup::FindFileDir(const QString &filename)
         curDir++;
     }
 
-    if (m_groupname.isEmpty() || (m_allowFallback == false))
+    if (m_groupname.isEmpty() || !m_allowFallback)
     {
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =

@@ -141,13 +141,10 @@ class ImageLoader
     static bool SupportsAnimation(const QString &filename)
     {
         QString extension = filename.section('.', -1);
-        if (!filename.startsWith("myth://") &&
+        return !filename.startsWith("myth://") &&
             (extension == "gif" ||
              extension == "apng" ||
-             extension == "mng"))
-            return true;
-
-        return false;
+             extension == "mng");
     }
 
     /**

@@ -557,7 +557,7 @@ bool MythDB::GetBoolSetting(const QString &key, bool defaultval)
     QString val = QString::number(defaultval);
     QString retval = GetSetting(key, val);
 
-    return retval.toInt() > 0 ? true : false;
+    return retval.toInt() > 0;
 }
 
 int MythDB::GetNumSetting(const QString &key, int defaultval)
@@ -589,7 +589,7 @@ bool MythDB::GetBoolSetting(const QString &key)
     QString retval = GetSetting(key, sentinel);
     if (retval == sentinel)
         return false;
-    return retval.toInt() > 0 ? true : false;
+    return retval.toInt() > 0;
 }
 
 int MythDB::GetNumSetting(const QString &key)

@@ -954,9 +954,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
         score--;
     }
 
-    if (av_probe_input_format2(&probe, true, &score))
-        return true;
-    return false;
+    return av_probe_input_format2(&probe, true, &score) != nullptr;
 }
 
 void AvFormatDecoder::InitByteContext(bool forceseek)

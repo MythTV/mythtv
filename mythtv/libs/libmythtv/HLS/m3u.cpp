@@ -322,7 +322,7 @@ namespace M3U
         else if (attr.startsWith(QLatin1String("AES-128")))
         {
             QString uri;
-            if (aesmsg == false)
+            if (!aesmsg)
             {
                 LOG(VB_RECORD, LOG_INFO, loc +
                     "playback of AES-128 encrypted HTTP Live media detected.");

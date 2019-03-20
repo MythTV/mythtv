@@ -108,10 +108,8 @@ DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 //compares if the double f1 is equal with f2 and returns 1 if true and 0 if false
 bool DisplayResScreen::compare_rates(double f1, double f2, double precision)
 {
-    if (((f1 - precision) < f2) &&
-        ((f1 + precision) > f2))
-        return true;
-    return false;
+    return ((f1 - precision) < f2) &&
+           ((f1 + precision) > f2);
 }
 
 int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,

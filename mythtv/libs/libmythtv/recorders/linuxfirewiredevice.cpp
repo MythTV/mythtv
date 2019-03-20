@@ -996,10 +996,7 @@ static bool has_data(int fd, uint msec)
     if (ready < 0)
         LOG(VB_GENERAL, LOG_ERR, "LFireDev: Select Error" + ENO);
 
-    if (ready <= 0)
-        return false;
-
-    return true;
+    return ready > 0;
 }
 
 static QString speed_to_string(uint speed)

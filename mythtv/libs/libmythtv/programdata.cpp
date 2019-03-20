@@ -719,10 +719,10 @@ uint DBEvent::UpdateDB(
     query.bindValue(":CATTYPE",     lcattype);
     query.bindValue(":STARTTIME",   m_starttime);
     query.bindValue(":ENDTIME",     m_endtime);
-    query.bindValue(":CC",          (lsubtype & SUB_HARDHEAR) ? true : false);
-    query.bindValue(":HASSUBTITLES",(lsubtype & SUB_NORMAL)   ? true : false);
-    query.bindValue(":STEREO",      (laudio   & AUD_STEREO)   ? true : false);
-    query.bindValue(":HDTV",        (lvideo   & VID_HDTV)     ? true : false);
+    query.bindValue(":CC",          (lsubtype & SUB_HARDHEAR) != 0);
+    query.bindValue(":HASSUBTITLES",(lsubtype & SUB_NORMAL) != 0);
+    query.bindValue(":STEREO",      (laudio   & AUD_STEREO) != 0);
+    query.bindValue(":HDTV",        (lvideo   & VID_HDTV) != 0);
     query.bindValue(":SUBTYPE",     lsubtype);
     query.bindValue(":AUDIOPROP",   laudio);
     query.bindValue(":VIDEOPROP",   lvideo);
@@ -846,11 +846,7 @@ static bool program_exists(MSqlQuery &query, uint chanid, const QDateTime &st)
     {
         MythDB::DBError("program_exists", query);
     }
-    if (query.next())
-    {
-        return true;
-    }
-    return false;
+    return query.next();
 }
 
 static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
@@ -1027,10 +1023,10 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":CATTYPE",     cattype);
     query.bindValue(":STARTTIME",   m_starttime);
     query.bindValue(":ENDTIME",     m_endtime);
-    query.bindValue(":CC",          (m_subtitleType & SUB_HARDHEAR) ? true : false);
-    query.bindValue(":STEREO",      (m_audioProps   & AUD_STEREO)   ? true : false);
-    query.bindValue(":HDTV",        (m_videoProps   & VID_HDTV)     ? true : false);
-    query.bindValue(":HASSUBTITLES",(m_subtitleType & SUB_NORMAL)   ? true : false);
+    query.bindValue(":CC",          (m_subtitleType & SUB_HARDHEAR) != 0);
+    query.bindValue(":STEREO",      (m_audioProps   & AUD_STEREO) != 0);
+    query.bindValue(":HDTV",        (m_videoProps   & VID_HDTV) != 0);
+    query.bindValue(":HASSUBTITLES",(m_subtitleType & SUB_NORMAL) != 0);
     query.bindValue(":SUBTYPES",    m_subtitleType);
     query.bindValue(":AUDIOPROP",   m_audioProps);
     query.bindValue(":VIDEOPROP",   m_videoProps);
@@ -1190,13 +1186,13 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":STARTTIME",   m_starttime);
     query.bindValue(":ENDTIME",     denullify(m_endtime));
     query.bindValue(":CC",
-                    (m_subtitleType & SUB_HARDHEAR) ? true : false);
+                    (m_subtitleType & SUB_HARDHEAR) != 0);
     query.bindValue(":STEREO",
-                    (m_audioProps   & AUD_STEREO)   ? true : false);
+                    (m_audioProps   & AUD_STEREO) != 0);
     query.bindValue(":HDTV",
-                    (m_videoProps   & VID_HDTV)     ? true : false);
+                    (m_videoProps   & VID_HDTV) != 0);
     query.bindValue(":HASSUBTITLES",
-                    (m_subtitleType & SUB_NORMAL)   ? true : false);
+                    (m_subtitleType & SUB_NORMAL) != 0);
     query.bindValue(":SUBTYPES",    m_subtitleType);
     query.bindValue(":AUDIOPROP",   m_audioProps);
     query.bindValue(":VIDEOPROP",   m_videoProps);

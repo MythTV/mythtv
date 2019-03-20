@@ -413,18 +413,13 @@ bool PeriodicHouseKeeperTask::InWindow(QDateTime now)
         // something bad has happened. let's just move along
         return false;
 
-    if ((elapsed > m_windowElapsed.first) &&
-        (elapsed < m_windowElapsed.second))
-            return true;
-
-    return false;
+    return (elapsed > m_windowElapsed.first) &&
+           (elapsed < m_windowElapsed.second);
 }
 
 bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
 {
-    if (GetLastRun().secsTo(now) > m_windowElapsed.second)
-        return true;
-    return false;
+    return GetLastRun().secsTo(now) > m_windowElapsed.second;
 }
 
 /** \class DailyHouseKeeperTask

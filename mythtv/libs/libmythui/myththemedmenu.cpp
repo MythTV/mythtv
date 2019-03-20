@@ -887,10 +887,7 @@ bool MythThemedMenu::findDependsExec(const QString &filename)
 {
     QFileInfo filename_info(filename);
 
-    if (filename_info.exists() && filename_info.isFile() && filename_info.isExecutable())
-        return true;
-
-    return false;
+    return filename_info.exists() && filename_info.isFile() && filename_info.isExecutable();
 }
 
 /** \brief Queries the user for a password to enter a part of MythTV

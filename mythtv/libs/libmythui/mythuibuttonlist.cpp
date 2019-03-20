@@ -1669,9 +1669,7 @@ uint MythUIButtonList::GetVisibleCount()
 
 bool MythUIButtonList::IsEmpty() const
 {
-    if (m_itemCount > 0)
-        return false;
-    return true;
+    return m_itemCount <= 0;
 }
 
 MythUIButtonListItem *MythUIButtonList::GetItemAt(int pos) const
@@ -3040,10 +3038,7 @@ void MythUIButtonList::updateLCD(void)
 
     for (int r = start; r < end; ++r)
     {
-        if (r == GetCurrentPos())
-            selected = true;
-        else
-            selected = false;
+        selected = r == GetCurrentPos();
 
         MythUIButtonListItem *item = GetItemAt(r);
         CHECKED_STATE state = NOTCHECKABLE;

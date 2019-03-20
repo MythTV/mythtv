@@ -1978,7 +1978,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
     else if (attr.startsWith(QLatin1String("AES-128")))
     {
         QString uri, iv;
-        if (m_aesmsg == false)
+        if (!m_aesmsg)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "playback of AES-128 encrypted HTTP Live media detected.");
@@ -2152,7 +2152,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     }
 
     /* Is it a meta index file ? */
-    bool meta = buffer->indexOf("#EXT-X-STREAM-INF") < 0 ? false : true;
+    bool meta = buffer->indexOf("#EXT-X-STREAM-INF") >= 0;
 
     int err = RET_OK;
 

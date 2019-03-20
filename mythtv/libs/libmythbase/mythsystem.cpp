@@ -109,9 +109,7 @@ class MythSystemLegacyWrapper : public MythSystem
         timeout_ms = (timeout_ms >= 1000) ? timeout_ms + 500 :
             ((timeout_ms == 0) ? 0 : 1000);
         uint legacy_wait_ret = m_legacy->Wait(timeout_ms / 1000);
-        if (GENERIC_EXIT_RUNNING == legacy_wait_ret)
-            return false;
-        return true;
+        return GENERIC_EXIT_RUNNING != legacy_wait_ret;
     }
 
     /// Returns the standard input stream for the program

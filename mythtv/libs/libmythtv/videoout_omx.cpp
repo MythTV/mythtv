@@ -1232,10 +1232,7 @@ bool VideoOutputOMX::Start()
             return false;
     }
 
-    if (m_render.SetState(OMX_StateExecuting, 500) != OMX_ErrorNone)
-        return false;
-
-    return true;
+    return m_render.SetState(OMX_StateExecuting, 500) == OMX_ErrorNone;
 }
 
 bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)

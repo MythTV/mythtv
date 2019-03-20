@@ -1943,10 +1943,7 @@ bool MythCommandLineParser::toBool(QString key) const
         return arg->m_default.toBool();
     }
 
-    if (arg->m_given)
-        return true;
-
-    return false;
+    return arg->m_given;
 }
 
 /** \brief Returns stored QVariant as an integer, falling to default

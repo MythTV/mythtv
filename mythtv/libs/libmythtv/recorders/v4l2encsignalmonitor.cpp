@@ -171,7 +171,7 @@ bool V4L2encSignalMonitor::HasLock(void)
     if (m_strength >= 0)
         m_strength = m_v4l2.GetSignalStrength();
     if (m_strength < 0)
-        return (true || StableResolution() == 100);
+        return (true /* || StableResolution() == 100 */);
 
     return m_strength > 50;
 }

@@ -660,7 +660,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     // Set out file position to requested start location.
     // ----------------------------------------------------------------------
 
-    if ( pDevice->seek( llStart ) == false)
+    if ( !pDevice->seek( llStart ))
         return -1;
 
     char   aBuffer[ SENDFILE_BUFFER_SIZE ];

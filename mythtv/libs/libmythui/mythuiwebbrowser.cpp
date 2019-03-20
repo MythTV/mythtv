@@ -280,10 +280,7 @@ MythWebPage::~MythWebPage()
 
 bool MythWebPage::supportsExtension(Extension extension) const
 {
-    if (extension == QWebPage::ErrorPageExtension)
-        return true;
-
-    return false;
+    return extension == QWebPage::ErrorPageExtension;
 }
 
 bool MythWebPage::extension(Extension extension, const ExtensionOption *option,

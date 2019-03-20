@@ -1810,14 +1810,10 @@ bool VideoMetadata::sortBefore(const VideoMetadata &rhs) const
 
 bool operator==(const VideoMetadata& a, const VideoMetadata& b)
 {
-    if (a.GetFilename() == b.GetFilename())
-        return true;
-    return false;
+    return a.GetFilename() == b.GetFilename();
 }
 
 bool operator!=(const VideoMetadata& a, const VideoMetadata& b)
 {
-    if (a.GetFilename() != b.GetFilename())
-        return true;
-    return false;
+    return a.GetFilename() != b.GetFilename();
 }

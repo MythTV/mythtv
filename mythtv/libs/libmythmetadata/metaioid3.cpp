@@ -220,10 +220,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
         tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
     }
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 /*!
@@ -669,10 +666,7 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
     apic->setPicture(bytevector);
     apic->setDescription(QStringToTString(albumart->m_description));
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 /*!
@@ -726,10 +720,7 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
 
     tag->removeFrame(apic);
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 bool MetaIOID3::changeImageType(const QString &filename,
@@ -801,10 +792,7 @@ bool MetaIOID3::changeImageType(const QString &filename,
             break;
     }
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 /*!

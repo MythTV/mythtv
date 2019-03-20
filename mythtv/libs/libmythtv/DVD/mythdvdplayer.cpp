@@ -324,10 +324,8 @@ bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
     if (!player_ctx->m_buffer->IsInDiscMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
-    if (player_ctx->m_buffer->IsDVD() &&
-        player_ctx->m_buffer->DVD()->IsInStillFrame())
-        return true;
-    return false;
+    return player_ctx->m_buffer->IsDVD() &&
+           player_ctx->m_buffer->DVD()->IsInStillFrame();
 }
 
 void MythDVDPlayer::SetBookmark(bool clear)

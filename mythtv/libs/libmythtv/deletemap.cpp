@@ -586,9 +586,7 @@ bool DeleteMap::IsInDelete(uint64_t frame) const
         lastframe = it.key();
     }
 
-    if (lasttype == MARK_CUT_START && lastframe <= frame)
-        return true;
-    return false;
+    return lasttype == MARK_CUT_START && lastframe <= frame;
 }
 
 /**

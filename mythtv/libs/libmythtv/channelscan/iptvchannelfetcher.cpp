@@ -476,7 +476,7 @@ static bool parse_extinf(const QString &line,
         name = chanNumName5.cap(2).simplified();
         bool ok;
         int channel_number = channum.toInt (&ok);
-        if ((ok == true) && (channel_number > 0))
+        if (ok && (channel_number > 0))
         {
             return true;
         }

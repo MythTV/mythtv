@@ -215,11 +215,8 @@ bool AVFormatWriter::CloseFile(void)
 
 bool AVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    if ((m_bufferedVideoFrameTypes.isEmpty()) ||
-        (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I))
-        return true;
-
-    return false;
+    return (m_bufferedVideoFrameTypes.isEmpty()) ||
+           (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
 }
 
 int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)

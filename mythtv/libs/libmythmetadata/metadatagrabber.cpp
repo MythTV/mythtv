@@ -411,10 +411,7 @@ bool MetaGrabberScript::Test(void)
     MythSystemLegacy grabber(m_fullcommand, args, kMSStdOut);
 
     grabber.Run();
-    if (grabber.Wait() != GENERIC_EXIT_OK)
-        return false;
-
-    return true;
+    return grabber.Wait() == GENERIC_EXIT_OK;
 }
 
 // TODO

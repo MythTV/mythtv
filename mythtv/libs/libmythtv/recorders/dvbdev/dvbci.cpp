@@ -2011,8 +2011,5 @@ bool cHlCiHandler::Reset(int /*Slot*/)
 
 bool cHlCiHandler::NeedCaPmt(void)
 {
-    if(m_state == 1)
-        return true;
-
-    return false;
+    return m_state == 1;
 }
