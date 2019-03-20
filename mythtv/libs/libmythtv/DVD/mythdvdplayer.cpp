@@ -32,11 +32,9 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
 bool MythDVDPlayer::HasReachedEof(void) const
 {
     EofState eof = GetEof();
-    if (eof != kEofStateNone && !allpaused)
-        return true;
     // DeleteMap and EditMode from the parent MythPlayer should not be
     // relevant here.
-    return false;
+    return eof != kEofStateNone && !allpaused;
 }
 
 void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)

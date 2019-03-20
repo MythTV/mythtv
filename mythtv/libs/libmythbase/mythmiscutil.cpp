@@ -235,9 +235,8 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
                   .arg(timeout*1000).arg(host);
 
-    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents) != GENERIC_EXIT_OK)
-        return false;
+    return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                         kMSProcessEvents) == GENERIC_EXIT_OK;
 #else
     QString addrstr =
         gCoreContext->resolveAddress(host, gCoreContext->ResolveAny, true);
@@ -253,12 +252,9 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
                   .arg(pingcmd).arg(timeoutparam).arg(timeout).arg(host);
 
-    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents) != GENERIC_EXIT_OK)
-      return false;
+    return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                         kMSProcessEvents) == GENERIC_EXIT_OK;
 #endif
-
-    return true;
 }
 
 /**

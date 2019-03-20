@@ -674,11 +674,8 @@ bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
         LOG(VB_GENERAL, LOG_DEBUG,
                 QString("MythFillDatabase scheduled to run at %1.")
                     .arg(nextRun.toString()));
-        if (nextRun > now)
-            // not yet time
-            return false;
-
-        return true;
+        // is it yet time
+        return nextRun <= now;
     }
     if (InWindow(now))
         // we're inside our permitted window

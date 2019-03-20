@@ -484,12 +484,9 @@ bool DailyHouseKeeperTask::InWindow(QDateTime now)
         return true;
 
     int hour = now.time().hour();
-    if (PastWindow(now) && (m_windowHour.first <= hour)
-                        && (m_windowHour.second > hour))
-        // we've missed the window, but we're within our time constraints
-        return true;
-
-    return false;
+    // true if we've missed the window, but we're within our time constraints
+    return PastWindow(now) && (m_windowHour.first <= hour)
+                        && (m_windowHour.second > hour);
 }
 
 /** \class HouseKeepingThread

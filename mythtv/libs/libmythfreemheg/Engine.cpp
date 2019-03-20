@@ -1335,9 +1335,8 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
     }
     if (strings[0] == "HDGraphicsPlaneExtension" || strings[0] == "HDG") {
         if (strings.count() < 2) return false;
-        if (strings[1] == "0")
-            return true; // HDGraphicsPlaneExtension
-        return false;
+        // true if HDGraphicsPlaneExtension
+        return strings[1] == "0";
     }
 
     // Otherwise return false.
