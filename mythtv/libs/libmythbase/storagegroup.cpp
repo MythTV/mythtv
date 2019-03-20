@@ -366,13 +366,7 @@ bool StorageGroup::FileExists(const QString &filename)
     if (badPath)
         return false;
 
-    bool result = false;
-
-    QFile checkFile(filename);
-    if (checkFile.exists(filename))
-        result = true;
-
-    return result;
+    return QFile::exists(filename);
 }
 
 
