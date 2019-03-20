@@ -541,7 +541,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         }
     }
 
-    m_render->Flush(false);
+    m_render->Flush();
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREPARE_FRAME_END");

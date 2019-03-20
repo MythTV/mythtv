@@ -29,12 +29,10 @@
 typedef enum
 {
     kGLFeatNone    = 0x0000,
-    kGLNVFence     = 0x0001,
-    kGLAppleFence  = 0x0002,
-    kGLBufferMap   = 0x0004,
-    kGLExtRects    = 0x0008,
-    kGLExtRGBA16   = 0x0010,
-    kGLExtSubimage = 0x0020
+    kGLBufferMap   = 0x0001,
+    kGLExtRects    = 0x0002,
+    kGLExtRGBA16   = 0x0004,
+    kGLExtSubimage = 0x0008
 } GLFeatures;
 
 #define TEX_OFFSET 8
@@ -113,11 +111,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QRect GetViewPort(void) { return m_viewport; }
     void  PushTransformation(const UIEffects &fx, QPointF &center);
     void  PopTransformation(void);
-    void  Flush(bool use_fence);
+    void  Flush(void);
     void  SetBlend(bool enable);
     void  SetBackground(int r, int g, int b, int a);
-    void  SetFence(void);
-    void  DeleteFence(void);
 
     static const GLuint kVertexSize;
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
@@ -167,7 +163,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
   protected:
     ~MythRenderOpenGL() override;
     void  Init2DState(void);
-    void  InitProcs(void);
     QFunctionPointer GetProcAddress(const QString &Proc) const;
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
@@ -227,17 +222,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
     bool       m_flushEnabled;
-
-    // NV_fence
-    MYTH_GLGENFENCESNVPROC               m_glGenFencesNV;
-    MYTH_GLDELETEFENCESNVPROC            m_glDeleteFencesNV;
-    MYTH_GLSETFENCENVPROC                m_glSetFenceNV;
-    MYTH_GLFINISHFENCENVPROC             m_glFinishFenceNV;
-    // APPLE_fence
-    MYTH_GLGENFENCESAPPLEPROC            m_glGenFencesAPPLE;
-    MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
-    MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
-    MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
 
   private:
     void DebugFeatures (void);

@@ -148,14 +148,6 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_cachedMatrixUniforms(),
     m_cachedUniformLocations(),
     m_flushEnabled(true),
-    m_glGenFencesNV(nullptr),
-    m_glDeleteFencesNV(nullptr),
-    m_glSetFenceNV(nullptr),
-    m_glFinishFenceNV(nullptr),
-    m_glGenFencesAPPLE(nullptr),
-    m_glDeleteFencesAPPLE(nullptr),
-    m_glSetFenceAPPLE(nullptr),
-    m_glFinishFenceAPPLE(nullptr),
     m_openglDebugger(nullptr),
     m_window(nullptr)
 {
@@ -267,7 +259,6 @@ bool MythRenderOpenGL::Init(void)
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_INIT_START");
 
-    InitProcs();
     Init2DState();
 
     // basic features
@@ -292,17 +283,6 @@ bool MythRenderOpenGL::Init(void)
     if ((isOpenGLES() && hasExtension("GL_OES_mapbuffer") && buffer_procs) ||
         (hasExtension("GL_ARB_vertex_buffer_object") && buffer_procs))
         m_extraFeatures |= kGLBufferMap;
-
-    // TODO combine fence functionality
-    // NVidia fence
-    if(hasExtension("GL_NV_fence") && m_glGenFencesNV && m_glDeleteFencesNV &&
-        m_glSetFenceNV  && m_glFinishFenceNV)
-        m_extraFeatures |= kGLNVFence;
-
-    // Apple fence
-    if(hasExtension("GL_APPLE_fence") && m_glGenFencesAPPLE && m_glDeleteFencesAPPLE &&
-        m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
-        m_extraFeatures |= kGLAppleFence;
 
     // Rectangular textures
     if (!isOpenGLES() && (hasExtension("GL_NV_texture_rectangle") ||
@@ -357,12 +337,10 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rectangular textures : %1").arg(GLYesNo(m_extraFeatures & kGLExtRects)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
+    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Fence                : %1")
-        .arg(GLYesNo((m_extraFeatures & kGLAppleFence) || (m_extraFeatures & kGLNVFence))));
 
     // warnings
     if (m_maxTextureUnits < 3)
@@ -503,30 +481,13 @@ void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
     doneCurrent();
 }
 
-void MythRenderOpenGL::Flush(bool use_fence)
+void MythRenderOpenGL::Flush(void)
 {
     if (!m_flushEnabled)
         return;
 
     makeCurrent();
-
-    if ((m_extraFeaturesUsed & kGLAppleFence) &&
-        (m_fence && use_fence))
-    {
-        m_glSetFenceAPPLE(m_fence);
-        m_glFinishFenceAPPLE(m_fence);
-    }
-    else if ((m_extraFeaturesUsed & kGLNVFence) &&
-             (m_fence && use_fence))
-    {
-        m_glSetFenceNV(m_fence, GL_ALL_COMPLETED_NV);
-        m_glFinishFenceNV(m_fence);
-    }
-    else
-    {
-        glFlush();
-    }
-
+    glFlush();
     doneCurrent();
 }
 
@@ -551,41 +512,6 @@ void MythRenderOpenGL::SetBackground(int r, int g, int b, int a)
     makeCurrent();
     glClearColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
     doneCurrent();
-}
-
-void MythRenderOpenGL::SetFence(void)
-{
-    if (!m_flushEnabled)
-        return;
-
-    makeCurrent();
-    if (m_extraFeaturesUsed & kGLAppleFence)
-    {
-        m_glGenFencesAPPLE(1, &m_fence);
-        if (m_fence)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using GL_APPLE_fence");
-    }
-    else if (m_extraFeaturesUsed & kGLNVFence)
-    {
-        m_glGenFencesNV(1, &m_fence);
-        if (m_fence)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using GL_NV_fence");
-    }
-    doneCurrent();
-}
-
-void MythRenderOpenGL::DeleteFence(void)
-{
-    if (m_fence)
-    {
-        makeCurrent();
-        if (m_extraFeaturesUsed & kGLAppleFence)
-            m_glDeleteFencesAPPLE(1, &m_fence);
-        else if (m_extraFeaturesUsed & kGLNVFence)
-            m_glDeleteFencesNV(1, &m_fence);
-        m_fence = 0;
-        doneCurrent();
-    }
 }
 
 MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
@@ -711,7 +637,7 @@ void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
     if (Texture->m_vbo)
         delete Texture->m_vbo;
     delete Texture;
-    Flush(true);
+    Flush();
     doneCurrent();
 }
 
@@ -729,7 +655,7 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size)
             m_activeFramebuffer = framebuffer;
             BindFramebuffer(nullptr);
         }
-        Flush(true);
+        Flush();
         return framebuffer;
     }
     LOG(VB_GENERAL, LOG_ERR, "Failed to create framebuffer object");
@@ -1131,19 +1057,7 @@ void MythRenderOpenGL::Init2DState(void)
     glDisable(GL_CULL_FACE);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    Flush(true);
-}
-
-void MythRenderOpenGL::InitProcs(void)
-{
-    m_glGenFencesNV = reinterpret_cast<MYTH_GLGENFENCESNVPROC>(GetProcAddress("glGenFencesNV"));
-    m_glDeleteFencesNV = reinterpret_cast<MYTH_GLDELETEFENCESNVPROC>(GetProcAddress("glDeleteFencesNV"));
-    m_glSetFenceNV = reinterpret_cast<MYTH_GLSETFENCENVPROC>(GetProcAddress("glSetFenceNV"));
-    m_glFinishFenceNV = reinterpret_cast<MYTH_GLFINISHFENCENVPROC>(GetProcAddress("glFinishFenceNV"));
-    m_glGenFencesAPPLE = reinterpret_cast<MYTH_GLGENFENCESAPPLEPROC>(GetProcAddress("glGenFencesAPPLE"));
-    m_glDeleteFencesAPPLE = reinterpret_cast<MYTH_GLDELETEFENCESAPPLEPROC>(GetProcAddress("glDeleteFencesAPPLE"));
-    m_glSetFenceAPPLE = reinterpret_cast<MYTH_GLSETFENCEAPPLEPROC>(GetProcAddress("glSetFenceAPPLE"));
-    m_glFinishFenceAPPLE = reinterpret_cast<MYTH_GLFINISHFENCEAPPLEPROC>(GetProcAddress("glFinishFenceAPPLE"));
+    Flush();
 }
 
 QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const
@@ -1184,7 +1098,6 @@ void MythRenderOpenGL::ReleaseResources(void)
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_RELEASE_START");
     DeleteDefaultShaders();
-    DeleteFence();
     ExpireVertices();
     ExpireVBOS();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -1192,7 +1105,7 @@ void MythRenderOpenGL::ReleaseResources(void)
     if (m_openglDebugger)
         delete m_openglDebugger;
     m_openglDebugger = nullptr;
-    Flush(false);
+    Flush();
 
     if (m_cachedVertices.size())
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired vertices").arg(m_cachedVertices.size()));

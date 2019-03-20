@@ -62,9 +62,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_features      = m_render->GetFeatures();
     m_extraFeatures = m_render->GetExtraFeatures();
 
-    if (m_viewportControl)
-        m_render->SetFence();
-
     m_forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
     m_valid = true;
 }
@@ -79,8 +76,6 @@ OpenGLVideo::~OpenGLVideo()
 
     m_render->makeCurrent();
 
-    if (m_viewportControl)
-        m_render->DeleteFence();
     if (m_frameBuffer)
         m_render->DeleteFramebuffer(m_frameBuffer);
     if (m_frameBufferTexture)
