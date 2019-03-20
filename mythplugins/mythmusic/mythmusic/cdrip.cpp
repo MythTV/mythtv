@@ -339,7 +339,7 @@ void CDRipperThread::run(void)
                 }
             }
 
-            if (!encoder.get())
+            if (!encoder)
             {
                 // This should never happen.
                 QApplication::postEvent(
