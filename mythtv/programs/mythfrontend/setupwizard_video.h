@@ -58,8 +58,6 @@ class VideoSetupWizard : public MythScreenType
     MythUIButton        *m_nextButton                 {nullptr};
     MythUIButton        *m_prevButton                 {nullptr};
 
-    VideoDisplayProfile *m_vdp                        {nullptr};
-
   private slots:
     void slotNext(void);
     void slotPrevious(void);

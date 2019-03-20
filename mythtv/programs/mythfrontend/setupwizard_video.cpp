@@ -32,7 +32,6 @@ VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
       m_generalScreen(general),             m_audioScreen(audio)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_vdp = new VideoDisplayProfile();
 
     gCoreContext->addListener(this);
 }
@@ -86,14 +85,12 @@ bool VideoSetupWizard::Create()
 
 VideoSetupWizard::~VideoSetupWizard()
 {
-    delete m_vdp;
-
     gCoreContext->removeListener(this);
 }
 
 void VideoSetupWizard::loadData(void)
 {
-    QStringList profiles = m_vdp->GetProfiles(gCoreContext->GetHostName());
+    QStringList profiles = VideoDisplayProfile::GetProfiles(gCoreContext->GetHostName());
 
     for (QStringList::const_iterator i = profiles.begin();
          i != profiles.end(); ++i)
@@ -103,7 +100,7 @@ void VideoSetupWizard::loadData(void)
         item->SetData(*i);
     }
 
-    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
+    QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());
     if (!currentpbp.isEmpty())
     {
         MythUIButtonListItem *set =
@@ -135,7 +132,7 @@ void VideoSetupWizard::save(void)
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    m_vdp->SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
+    VideoDisplayProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
 }
 
 void VideoSetupWizard::slotPrevious(void)
@@ -202,11 +199,11 @@ void VideoSetupWizard::playVideoTest(QString desc, QString title, QString file)
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
+    QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());
 
-    m_vdp->SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
+    VideoDisplayProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
     GetMythMainWindow()->HandleMedia("Internal", file, desc, title);
-    m_vdp->SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
+    VideoDisplayProfile::SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
 }
 
 void VideoSetupWizard::DownloadSample(QString url, QString dest)
