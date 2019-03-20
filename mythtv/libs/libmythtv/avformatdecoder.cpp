@@ -3045,9 +3045,10 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
         if (!decoder->GetPlayer()->ReAllocateFrame(frame, type))
             return -1;
 
+    int max = planes(frame->codec);
     for (int i = 0; i < 3; i++)
     {
-        pic->data[i]     = frame->buf + frame->offsets[i];
+        pic->data[i]     = (i < max) ? (frame->buf + frame->offsets[i]) : nullptr;
         pic->linesize[i] = frame->pitches[i];
     }
 
