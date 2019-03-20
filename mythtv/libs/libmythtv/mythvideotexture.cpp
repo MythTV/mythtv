@@ -186,7 +186,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 {
                     size = QSize(size.width() >> 1, size.height() >> 1);
                     texture = CreateTexture(Context, size, Target,
-                                            QOpenGLTexture::UInt8, QOpenGLTexture::RG);
+                                  QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
                 }
                 break;
             default: break;
