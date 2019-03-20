@@ -272,10 +272,12 @@ class EITFixUp
     const QRegExp m_grYear; // Greek release year.
     const QRegExp m_grCountry; // Greek event country of origin.
     const QRegExp m_grlongEp; // Greek Episode
+    const QRegExp m_grSeason_as_RomanNumerals; // Greek Episode in Roman numerals
     const QRegExp m_grSeason; // Greek Season
     const QRegExp m_grSeries;
     const QRegExp m_grRealTitleinDescription; // The original title is often in the descr in parenthesis.
     const QRegExp m_grRealTitleinTitle; // The original title is often in the title in parenthesis.
+    const QRegExp m_grCommentsinTitle; // Sometimes esp. national stations include comments in the title eg "(ert arxeio)"
     const QRegExp m_grNotPreviouslyShown; // Not previously shown on TV
     const QRegExp m_grEpisodeAsSubtitle; // Description field: "^Episode: Lion in the cage. (Description follows)"
     const QRegExp m_grCategFood; // Greek category food
