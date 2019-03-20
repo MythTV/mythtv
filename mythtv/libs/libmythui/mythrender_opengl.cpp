@@ -136,6 +136,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_extraFeaturesUsed(kGLFeatNone),
     m_maxTextureSize(0),
     m_maxTextureUnits(0),
+    m_colorDepth(0),
     m_viewport(),
     m_activeTexture(0),
     m_activeTextureTarget(0),
@@ -276,6 +277,8 @@ bool MythRenderOpenGL::Init(void)
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxunits);
     m_maxTextureUnits = maxunits;
     m_maxTextureSize  = (maxtexsz) ? maxtexsz : 512;
+    QSurfaceFormat fmt = format();
+    m_colorDepth = qMin(fmt.redBufferSize(), qMin(fmt.greenBufferSize(), fmt.blueBufferSize()));
 
     // RGBA16 - available on ES via extension
     m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
@@ -359,6 +362,11 @@ void MythRenderOpenGL::DebugFeatures(void)
     // warnings
     if (m_maxTextureUnits < 3)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning: Insufficient texture units for some features.");
+}
+
+int MythRenderOpenGL::GetColorDepth(void) const
+{
+    return m_colorDepth;
 }
 
 int MythRenderOpenGL::GetMaxTextureSize(void) const

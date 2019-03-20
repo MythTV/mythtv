@@ -101,6 +101,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
     void  setWidget(QWidget *Widget);
     bool  Init(void);
+    int   GetColorDepth(void) const;
     int   GetMaxTextureSize(void) const;
     int   GetMaxTextureUnits(void) const;
     int   GetExtraFeatures(void) const;
@@ -208,6 +209,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int        m_extraFeaturesUsed;
     int        m_maxTextureSize;
     int        m_maxTextureUnits;
+    int        m_colorDepth;
 
     // State
     QRect      m_viewport;
