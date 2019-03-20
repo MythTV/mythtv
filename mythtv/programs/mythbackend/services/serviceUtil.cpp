@@ -619,7 +619,7 @@ void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
-            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
             if (marktype == 0)
             {
                 DTC::Cutting *pCutting = pCutList->AddNewCutting();
@@ -665,7 +665,7 @@ void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
-            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
             if (marktype == 0)
             {
                 DTC::Cutting *pCutting = pCutList->AddNewCutting();

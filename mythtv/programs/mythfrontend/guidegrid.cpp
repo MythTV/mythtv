@@ -1804,11 +1804,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             if (tempRect.bottom() + 2 >=  programRect.bottom())
                 tempRect.setBottom(programRect.bottom());
 
-            if (m_currentRow == row && (m_currentCol >= x) &&
-                (m_currentCol < (x + spread)))
-                isCurrent = true;
-            else
-                isCurrent = false;
+            isCurrent = m_currentRow == row && (m_currentCol >= x) &&
+                (m_currentCol < (x + spread));
 
             int recFlag;
             switch (pginfo->GetRecordingRuleType())

@@ -486,7 +486,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
             ShowUpcoming();
         else if (action == "1")
         {
-            if (m_titleGroup == true)
+            if (m_titleGroup)
             {
                 m_titleGroup = false;
                 m_reverseSort = true;
@@ -499,7 +499,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "2")
         {
-            if (m_titleGroup == false)
+            if (!m_titleGroup)
             {
                 m_titleGroup = true;
                 m_reverseSort = false;

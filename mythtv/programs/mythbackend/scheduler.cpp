@@ -5016,10 +5016,7 @@ static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
 // prefer dirs with more absolute free space over dirs with less
 static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
-    if (a->getFreeSpace() > b->getFreeSpace())
-        return true;
-
-    return false;
+    return a->getFreeSpace() > b->getFreeSpace();
 }
 
 // prefer dirs with less weight (disk I/O) over dirs with more weight.

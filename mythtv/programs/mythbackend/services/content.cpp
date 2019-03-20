@@ -855,10 +855,7 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
 
     outFile = outDir + "/" + filename;
 
-    if (GetMythDownloadManager()->download(sURL, outFile))
-        return true;
-
-    return false;
+    return GetMythDownloadManager()->download(sURL, outFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

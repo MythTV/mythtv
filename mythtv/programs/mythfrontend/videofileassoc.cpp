@@ -278,9 +278,7 @@ class FileAssocDialogPrivate
     {
         bool operator()(const UIDToFAPair &item)
         {
-            if (item.m_file_assoc && item.m_file_assoc->GetState() == against)
-                return true;
-            return false;
+            return item.m_file_assoc && item.m_file_assoc->GetState() == against;
         }
     };
 

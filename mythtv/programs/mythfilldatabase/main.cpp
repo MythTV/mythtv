@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
             QString warn = QString("Invalid entry in --refresh list: %1")
                                 .arg(*i);
 
-            bool enable = (*i).contains("not") ? false : true;
+            bool enable = !(*i).contains("not");
 
             if ((*i).contains("today"))
                 fill_data.SetRefresh(0, enable);

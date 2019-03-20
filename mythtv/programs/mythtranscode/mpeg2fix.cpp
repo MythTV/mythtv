@@ -830,7 +830,7 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
         }
     }
 
-    m_mkvfile = !strcmp(m_inputFC->iformat->name, "mkv") ? true : false;
+    m_mkvfile = strcmp(m_inputFC->iformat->name, "mkv") == 0;
 
     if (offset)
         av_seek_frame(m_inputFC, m_vid_id, offset, AVSEEK_FLAG_BYTE);

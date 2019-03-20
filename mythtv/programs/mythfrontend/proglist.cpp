@@ -239,7 +239,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             QuickRecord();
         else if (action == "1")
         {
-            if (m_titleSort == true)
+            if (m_titleSort)
             {
                 m_titleSort = false;
                 m_reverseSort = (m_type == plPreviouslyRecorded);
@@ -252,7 +252,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "2")
         {
-            if (m_titleSort == false)
+            if (!m_titleSort)
             {
                 m_titleSort = true;
                 m_reverseSort = false;

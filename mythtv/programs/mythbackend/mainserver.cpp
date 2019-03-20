@@ -265,12 +265,12 @@ MainServer::MainServer(bool master, int port,
                                             "BackendServerIP",
                                             QString(),
                                             gCoreContext->ResolveIPv4, true));
-        bool v4IsSet = config_v4.isNull() ? false : true;
+        bool v4IsSet = !config_v4.isNull();
         QHostAddress config_v6(gCoreContext->resolveSettingAddress(
                                             "BackendServerIP6",
                                             QString(),
                                             gCoreContext->ResolveIPv6, true));
-        bool v6IsSet = config_v6.isNull() ? false : true;
+        bool v6IsSet = !config_v6.isNull();
 
         if (v6IsSet && !listenAddrs.contains(config_v6))
             LOG(VB_GENERAL, LOG_WARNING, LOC +

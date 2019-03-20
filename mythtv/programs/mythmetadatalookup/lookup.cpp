@@ -29,13 +29,8 @@ LookerUpper::~LookerUpper()
 
 bool LookerUpper::StillWorking()
 {
-    if (m_metadataFactory->IsRunning() ||
-        m_busyRecList.count())
-    {
-        return true;
-    }
-
-    return false;
+    return m_metadataFactory->IsRunning() ||
+        m_busyRecList.count();
 }
 
 void LookerUpper::HandleSingleRecording(const uint chanid,

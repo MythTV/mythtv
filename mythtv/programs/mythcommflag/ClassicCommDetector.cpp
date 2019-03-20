@@ -1264,11 +1264,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     {
         value = frameInfo[curFrame].flagMask;
 
-        if (((curFrame + 1) <= m_framesProcessed) &&
-            (frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK))
-            nextFrameIsBlank = true;
-        else
-            nextFrameIsBlank = false;
+        nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
+            (frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK);
 
         if (value & COMM_FRAME_BLANK)
         {
