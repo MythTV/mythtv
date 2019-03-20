@@ -702,8 +702,7 @@ writeTemplate(QString tmplfile, const AVFrame *tmpl, QString datafile,
 TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
         EdgeDetector *ed, MythPlayer *player, int proglen,
         QString debugdir)
-    : FrameAnalyzer()
-    , m_pgmConverter(pgmc)
+    : m_pgmConverter(pgmc)
     , m_borderDetector(bd)
     , m_edgeDetector(ed)
     , m_debugdir(debugdir)

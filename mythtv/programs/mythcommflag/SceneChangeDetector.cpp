@@ -99,8 +99,7 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
 
 SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
         QString debugdir)
-    : FrameAnalyzer()
-    , m_histogramAnalyzer(ha)
+    : m_histogramAnalyzer(ha)
     , m_debugdata(debugdir + "/SceneChangeDetector.txt")
 {
     LOG(VB_COMMFLAG, LOG_INFO, "SceneChangeDetector");

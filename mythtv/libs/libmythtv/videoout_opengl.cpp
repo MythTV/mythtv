@@ -88,8 +88,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 }
 
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &profile)
-    : VideoOutput(),
-    gl_context_lock(QMutex::Recursive), gl_context(nullptr), gl_valid(true),
+    : gl_context_lock(QMutex::Recursive), gl_context(nullptr), gl_valid(true),
     gl_videochain(nullptr), gl_pipchain_active(nullptr),
     gl_parent_win(0),    gl_painter(nullptr), gl_created_painter(false),
     gl_opengl_profile(profile),

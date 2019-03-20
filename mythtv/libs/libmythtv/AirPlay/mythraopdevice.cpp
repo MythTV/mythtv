@@ -84,7 +84,7 @@ void MythRAOPDevice::Cleanup(void)
 }
 
 MythRAOPDevice::MythRAOPDevice()
-    : ServerPool(), m_lock(new QMutex(QMutex::Recursive))
+    : m_lock(new QMutex(QMutex::Recursive))
 {
     m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toLatin1());
 }

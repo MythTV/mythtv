@@ -59,7 +59,7 @@ public:
 
     TransferThread(const TransferMap &files, bool move, MythUIProgressDialog *dialog)
         : MThread("FileTransfer"),
-          m_move(move), m_files(files), m_failed(), m_dialog(dialog) {}
+          m_move(move), m_files(files), m_dialog(dialog) {}
 
     ImageSet GetResult(void) { return m_failed; }
 
@@ -150,14 +150,11 @@ static void WaitUntilDone(MThread &worker)
  */
 GalleryThumbView::GalleryThumbView(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_zoomWidgets(),
       m_popupStack(*GetMythMainWindow()->GetStack("popup stack")),
       m_mgr(ImageManagerFe::getInstance()),
       // This screen uses a single fixed view (Parent dir, ordered dirs, ordered images)
       m_view(new DirectoryView(kOrdered)),
       m_infoList(*this),
-      m_scanProgress(),         m_scanActive(),         m_menuState(),
-      m_pendingMap(),           m_thumbExists(),
       // Start in edit mode unless a password exists
       m_editsAllowed(gCoreContext->GetSetting("GalleryPassword").isEmpty())
 {

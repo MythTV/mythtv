@@ -831,7 +831,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
       m_defaultSaveFilename(""),
       m_inputToggled(false), m_lastMouseAction(""),
-      m_mouseKeyCount(0),    m_lastMouseActionTime(),
+      m_mouseKeyCount(0),
       m_horizontalScrollbar(nullptr), m_verticalScrollbar(nullptr)
 {
     SetCanTakeFocus(true);

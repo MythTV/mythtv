@@ -137,8 +137,7 @@ Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
 #define LOC QString("%1").arg(m_parent->Desc())
 
 Commands::Commands(MythExternControl * parent)
-    : m_thread()
-    , m_parent(parent)
+    : m_parent(parent)
     , m_apiVersion(-1)
 {
 }
@@ -503,7 +502,7 @@ void Commands::Run(void)
 }
 
 Buffer::Buffer(MythExternControl * parent)
-    : m_parent(parent), m_thread()
+    : m_parent(parent)
 {
     m_heartbeat = std::chrono::system_clock::now();
 }

@@ -7,7 +7,6 @@
 
 MythRect::MythRect(const QString &sX, const QString &sY, const QString &sWidth,
                    const QString &sHeight, const QString &baseRes)
-         : QRect()
 {
     setRect(sX,sY,sWidth,sHeight,baseRes);
 }

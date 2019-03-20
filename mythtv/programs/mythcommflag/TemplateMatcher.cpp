@@ -330,7 +330,7 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
 
 TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
                                  TemplateFinder *tf, QString debugdir) :
-    FrameAnalyzer(),      m_pgmConverter(pgmc),
+    m_pgmConverter(pgmc),
     m_edgeDetector(ed),   m_templateFinder(tf),
     m_debugdir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE

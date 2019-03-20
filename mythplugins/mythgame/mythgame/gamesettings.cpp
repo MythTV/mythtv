@@ -316,8 +316,7 @@ struct AllowMultipleRoms : public MythUICheckBoxSetting
 
 /// Settings for a game player
 GamePlayerSetting::GamePlayerSetting(QString name, uint id)
-    : GroupSetting()
-    , m_id(id)
+    : m_id(id)
 {
     setName(name);
 
@@ -355,7 +354,7 @@ void GamePlayerSetting::deleteEntry()
 
 // -----------------------------------------------------------------------
 
-GamePlayersList::GamePlayersList() : GroupSetting()
+GamePlayersList::GamePlayersList()
 {
     setLabel(tr("Game Players"));
 }

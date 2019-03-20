@@ -74,7 +74,6 @@ static bool is_abbrev(QString const& command,
 }
 
 NetworkControl::NetworkControl() :
-    ServerPool(),
     commandThread(new MThread("NetworkControl", this))
 {
     // Eventually this map should be in the jumppoints table

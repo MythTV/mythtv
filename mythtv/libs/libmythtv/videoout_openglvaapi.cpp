@@ -34,7 +34,7 @@ void VideoOutputOpenGLVAAPI::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()
-  : VideoOutputOpenGL(), m_ctx(nullptr), m_pauseBuffer(nullptr)
+  : m_ctx(nullptr), m_pauseBuffer(nullptr)
 {
 }
 

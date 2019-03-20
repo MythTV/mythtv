@@ -461,8 +461,7 @@ void MythImage::ConvertToYUV(void)
 }
 
 MythImageReader::MythImageReader(const QString &fileName)
-  : QImageReader(),
-    m_fileName(fileName)
+  : m_fileName(fileName)
 {
     if ((m_fileName.startsWith("http://")) ||
         (m_fileName.startsWith("https://")) ||

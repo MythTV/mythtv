@@ -80,7 +80,7 @@ class MediaServer : public MediaServerItem
   public:
     MediaServer()
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(), m_controlURL(QUrl()),
+       m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
        m_friendlyName(QString("Unknown"))
     {

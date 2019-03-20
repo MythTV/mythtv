@@ -13,11 +13,6 @@
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-MetaIOFLACVorbis::MetaIOFLACVorbis(void)
-    : MetaIOTagLib()
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *

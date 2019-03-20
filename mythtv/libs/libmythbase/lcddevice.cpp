@@ -38,8 +38,7 @@
 #define LOC QString("LCDdevice: ")
 
 LCD::LCD()
-    : QObject(),
-      m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
+    : m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
 {
     m_sendBuffer.clear(); m_lastCommand.clear();
     m_lcdShowMusicItems.clear(); m_lcdKeyString.clear();

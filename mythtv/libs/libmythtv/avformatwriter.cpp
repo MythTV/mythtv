@@ -39,7 +39,6 @@ extern "C" {
 #define LOC_WARN QString("AVFW(%1) Warning: ").arg(m_filename)
 
 AVFormatWriter::AVFormatWriter()
-    : FileWriterBase()
 {
     memset(&m_fmt, 0, sizeof(m_fmt));
 }

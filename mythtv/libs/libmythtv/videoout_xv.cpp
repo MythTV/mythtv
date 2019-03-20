@@ -135,8 +135,7 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
  *
  */
 VideoOutputXv::VideoOutputXv()
-    : VideoOutput(),
-      video_output_subtype(XVUnknown),
+    : video_output_subtype(XVUnknown),
       global_lock(QMutex::Recursive),
 
       XJ_win(0), XJ_curwin(0), disp(nullptr), XJ_letterbox_colour(0),

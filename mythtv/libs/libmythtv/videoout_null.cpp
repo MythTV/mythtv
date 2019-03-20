@@ -35,7 +35,7 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
 }
 
 VideoOutputNull::VideoOutputNull() :
-    VideoOutput(), global_lock(QMutex::Recursive)
+    global_lock(QMutex::Recursive)
 {
     LOG(VB_PLAYBACK, LOG_INFO, "VideoOutputNull()");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));

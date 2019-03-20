@@ -271,7 +271,7 @@ QList<int> DeviceManager::GetAbsentees()
 /*!
  \brief Constructor
 */
-ImageAdapterBase::ImageAdapterBase() : DeviceManager(),
+ImageAdapterBase::ImageAdapterBase() :
     m_imageFileExt(SupportedImages()),
     m_videoFileExt(SupportedVideos())
 {
@@ -1124,7 +1124,7 @@ class ReadMetaThread : public QRunnable
 {
 public:
     ReadMetaThread(ImagePtrK im, const QString &path)
-        : QRunnable(), m_im(im), m_path(path) {}
+        : m_im(im), m_path(path) {}
 
     void run() override // QRunnable
     {

@@ -82,23 +82,12 @@ ProgLister::ProgLister(
     m_extraArg(),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
-    m_selectedTime(),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
 
     m_searchType(kNoSearch),
 
     m_view("reverse time"),
     m_curView(-1),
-    m_viewList(),
-    m_viewTextList(),
-
-    m_itemList(),
-    m_itemListSave(),
-    m_schedList(),
-
-    m_typeList(),
-    m_genreList(),
-    m_stationList(),
 
     m_allowEvents(true),
     m_titleSort(false),
@@ -1059,7 +1048,7 @@ class plTitleSort : public plCompare
 class plPrevTitleSort : public plCompare
 {
   public:
-    plPrevTitleSort(void) : plCompare() {;}
+    plPrevTitleSort(void) {;}
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
@@ -1078,7 +1067,7 @@ class plPrevTitleSort : public plCompare
 class plTimeSort : public plCompare
 {
   public:
-    plTimeSort(void) : plCompare() {;}
+    plTimeSort(void) {;}
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {

@@ -242,7 +242,7 @@ MainServer::MainServer(bool master, int port,
                        Scheduler *sched, AutoExpire *_expirer) :
     m_encoderList(_tvList),
     m_ismaster(master), m_threadPool("ProcessRequestPool"),
-    m_sched(sched), m_expirer(_expirer), m_addChildInputLock()
+    m_sched(sched), m_expirer(_expirer)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);

@@ -265,7 +265,7 @@ void GallerySettings::ShowConfirmDialog()
         delete dialog;
 }
 
-GallerySettings::GallerySettings(bool enable) : GroupSetting()
+GallerySettings::GallerySettings(bool enable)
 {
     setLabel(TR("Gallery Settings"));
 

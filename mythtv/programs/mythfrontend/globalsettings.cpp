@@ -3925,7 +3925,6 @@ class ShutDownRebootSetting : public GroupSetting
 };
 
 ShutDownRebootSetting::ShutDownRebootSetting()
-    : GroupSetting()
 {
     setLabel(MainGeneralSettings::tr("Shutdown/Reboot Settings"));
     addChild(FrontendIdleTimeout());
@@ -4082,7 +4081,6 @@ class PlayBackScaling : public GroupSetting
 };
 
 PlayBackScaling::PlayBackScaling()
-    :GroupSetting()
 {
     setLabel(tr("Scaling"));
     addChild(m_VertScan = VertScanPercentage());
@@ -4470,7 +4468,6 @@ class GuiDimension : public GroupSetting
 };
 
 GuiDimension::GuiDimension()
-    :GroupSetting()
 {
     setLabel(AppearanceSettings::tr("GUI dimension"));
     addChild(m_width   = GuiWidth());
@@ -4585,8 +4582,7 @@ class ChannelCheckBoxSetting : public TransMythUICheckBoxSetting
 
 ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
         const QString &channum, const QString &channame)
-    :TransMythUICheckBoxSetting(),
-    m_channelId(chanid)
+    : m_channelId(chanid)
 {
     setLabel(QString("%1 %2").arg(channum).arg(channame));
     setHelpText(tr("Select/Unselect channels for this channel group"));
@@ -4594,8 +4590,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
-    :GroupSetting(),
-    m_groupId(groupId),
+    : m_groupId(groupId),
     m_groupName(nullptr)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
@@ -4753,7 +4748,6 @@ void ChannelGroupSetting::deleteEntry(void)
 
 
 ChannelGroupsSetting::ChannelGroupsSetting()
-    : GroupSetting()
 {
     setLabel(tr("Channel Groups"));
 }

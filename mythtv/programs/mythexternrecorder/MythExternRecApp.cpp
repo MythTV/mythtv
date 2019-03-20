@@ -33,8 +33,7 @@ MythExternRecApp::MythExternRecApp(const QString & command,
                                    const QString & conf_file,
                                    const QString & log_file,
                                    const QString & logging)
-    : QObject()
-    , m_fatal(false)
+    : m_fatal(false)
     , m_run(true)
     , m_streaming(false)
     , m_result(0)

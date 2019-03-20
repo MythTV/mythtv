@@ -33,7 +33,7 @@ using namespace std;
 // MainVisual
 
 MainVisual::MainVisual(MythUIVideo *visualizer)
-    : QObject(nullptr), MythTV::Visual(), m_visualizerVideo(visualizer)
+    : QObject(nullptr), m_visualizerVideo(visualizer)
 {
     setObjectName("MainVisual");
 

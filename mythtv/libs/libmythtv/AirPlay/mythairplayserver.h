@@ -75,7 +75,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     { return gMythAirplayServer; }
 
     MythAirplayServer()
-        : ServerPool(), m_lock(new QMutex(QMutex::Recursive)) {}
+        : m_lock(new QMutex(QMutex::Recursive)) {}
 
   private slots:
     void Start();

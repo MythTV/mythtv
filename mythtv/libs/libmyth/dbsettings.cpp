@@ -10,7 +10,6 @@
 #include "mythdbparams.h"
 
 DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
-    : GroupSetting()
 {
     m_DBhostOverride = DBhostOverride;
 

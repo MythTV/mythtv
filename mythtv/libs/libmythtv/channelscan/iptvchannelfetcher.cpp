@@ -34,8 +34,7 @@ IPTVChannelFetcher::IPTVChannelFetcher(
     m_scan_monitor(monitor),
     m_cardid(cardid),       m_inputname(inputname),
     m_sourceid(sourceid),   m_is_mpts(is_mpts),
-    m_thread(new MThread("IPTVChannelFetcher", this)),
-    m_lock()
+    m_thread(new MThread("IPTVChannelFetcher", this))
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Has ScanMonitor %1")
         .arg(monitor?"true":"false"));

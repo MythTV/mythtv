@@ -7,8 +7,7 @@
 
 
 Transition::Transition(QString name)
-    : QObject(),
-      m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000))
+    : m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000))
 {
     setObjectName(name);
 }
@@ -48,7 +47,6 @@ Transition &TransitionRegistry::Select(int setting)
  \param includeAnimations Whether to use animated transitions (zoom, rotate)
 */
 TransitionRegistry::TransitionRegistry(bool includeAnimations)
-    : m_immediate()
 {
     // Create all non-animated transitions to be used by Random
     m_map.insert(kBlendTransition, new TransitionBlend());

@@ -22,7 +22,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketServer::WebSocketServer() :
-    ServerPool(),
     m_threadPool("WebSocketServerPool")
 {
     setObjectName("WebSocketServer");

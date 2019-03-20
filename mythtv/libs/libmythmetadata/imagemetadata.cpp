@@ -297,7 +297,7 @@ protected:
    \param filePath Absolute image path
  */
 PictureMetaData::PictureMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_image(nullptr), m_exifData()
+    : ImageMetaData(filePath), m_image(nullptr)
 {
     try
     {

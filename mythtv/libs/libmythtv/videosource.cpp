@@ -1301,8 +1301,7 @@ class UseHDHomeRunDevice : public TransMythUICheckBoxSetting
 {
   public:
     explicit UseHDHomeRunDevice(QString &deviceid, QString &model,
-                                QString &ipaddr) :
-        TransMythUICheckBoxSetting()
+                                QString &ipaddr)
     {
         setLabel(QObject::tr("Use HDHomeRun %1 (%2 %3)")
                  .arg(deviceid).arg(model).arg(ipaddr));
@@ -2691,7 +2690,7 @@ class InputGroup : public TransMythUIComboBoxSetting
 {
   public:
     InputGroup(const CardInput &parent, uint group_num) :
-        TransMythUIComboBoxSetting(), m_cardInput(parent),
+        m_cardInput(parent),
         m_groupNum(group_num)
     {
         setLabel(QObject::tr("Input group") +
