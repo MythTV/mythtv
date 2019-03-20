@@ -76,7 +76,7 @@ ScreenSetup::ScreenSetup(MythScreenStack *parent, const QString &name,
                          SourceManager *srcman)
     : MythScreenType(parent, name),
       m_sourceManager(srcman ? srcman : new SourceManager()),
-      m_createdSrcMan(srcman ? false : true),
+      m_createdSrcMan(srcman == nullptr),
       m_helpText(nullptr),     m_activeList(nullptr),
       m_inactiveList(nullptr), m_finishButton(nullptr)
 {

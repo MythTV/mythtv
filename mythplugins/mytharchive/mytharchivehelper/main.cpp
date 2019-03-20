@@ -177,7 +177,7 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 
     if (nativeFormat)
     {
-        if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
+        if (mediaType == AD_DVD_RW && bEraseDVDRW)
         {
             command += " -use-the-force-luke -Z " + dvdDrive;
             command += " -V 'MythTV Archive' -R -J " + tempDirectory;
@@ -190,7 +190,7 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
     }
     else
     {
-        if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
+        if (mediaType == AD_DVD_RW && bEraseDVDRW)
         {
             command += " -dvd-compat -use-the-force-luke -Z " + dvdDrive;
             command += " -dvd-video -V 'MythTV DVD' " + tempDirectory + "/dvd";

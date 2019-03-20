@@ -831,7 +831,7 @@ void ImportMusicDialog::setTitleInitialCap(void)
     {
         if (title[x].isLetter())
         {
-            if (bFoundCap == false)
+            if (!bFoundCap)
             {
                 title[x] = title[x].toUpper();
                 bFoundCap = true;

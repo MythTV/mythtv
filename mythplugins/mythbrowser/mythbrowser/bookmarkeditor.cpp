@@ -106,7 +106,7 @@ void BookmarkEditor::Save()
 
     ResetHomepageFromDB();
 
-    bool isHomepage = (m_isHomepage->GetCheckState() == MythUIStateType::Full) ? true : false;
+    bool isHomepage = m_isHomepage->GetCheckState() == MythUIStateType::Full;
     InsertInDB(m_categoryEdit->GetText(), m_nameEdit->GetText(), m_urlEdit->GetText(), isHomepage );
     
     if (m_site)

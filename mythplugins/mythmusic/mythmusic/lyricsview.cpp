@@ -565,10 +565,7 @@ bool EditLyricsDialog::keyPressEvent(QKeyEvent *event)
         handled = false;
     }
 
-    if (MythScreenType::keyPressEvent(event))
-        return true;
-
-    return false;
+    return MythScreenType::keyPressEvent(event);
 }
 
 void EditLyricsDialog::loadLyrics(void)

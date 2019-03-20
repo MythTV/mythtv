@@ -37,10 +37,7 @@ const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
 
 bool Playlist::checkTrack(MusicMetadata::IdType trackID) const
 {
-    if (m_songs.contains(trackID))
-        return true;
-
-    return false;
+    return m_songs.contains(trackID);
 }
 
 void Playlist::copyTracks(Playlist *to_ptr, bool update_display)

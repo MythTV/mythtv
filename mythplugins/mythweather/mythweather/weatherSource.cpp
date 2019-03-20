@@ -321,8 +321,8 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
  * that wouldn't be good.
  */
 WeatherSource::WeatherSource(ScriptInfo *info)
-    : m_ready(info ? true : false),
-      m_inuse(info ? true : false),
+    : m_ready(info != nullptr),
+      m_inuse(info != nullptr),
       m_info(info),
       m_updateTimer(new QTimer(this))
 {

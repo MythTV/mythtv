@@ -96,10 +96,9 @@ time_t  g_lastDBKick = 0;
 // returns true if the ZM version >= the requested version
 bool checkVersion(int major, int minor, int revision)
 {
-    if (g_majorVersion >= major && g_minorVersion >= minor && g_revisionVersion >= revision)
-        return true;
-
-    return false;
+    return g_majorVersion    >= major &&
+           g_minorVersion    >= minor &&
+           g_revisionVersion >= revision;
 }
 
 void loadZMConfig(const string &configfile)
@@ -618,9 +617,7 @@ bool ZMServer::send(const string &s) const
 
     // send message
     status = ::send(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL);
-    if ( status == -1 )
-        return false;
-    return true;
+    return status != -1;
 }
 
 bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) const
@@ -640,10 +637,7 @@ bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) c
 
     // send data
     status = ::send(m_sock, buffer, dataLen, MSG_NOSIGNAL);
-    if ( status == -1 )
-        return false;
-
-    return true;
+    return status != -1;
 }
 
 void ZMServer::sendError(const string &error)

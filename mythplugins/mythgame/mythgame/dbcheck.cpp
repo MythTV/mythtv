@@ -126,10 +126,7 @@ static bool InitializeDatabase(void)
 ""
 };
     QString dbver = "";
-    if (!performActualUpdate(updates, "1011", dbver))
-        return false;
-
-    return true;
+    return performActualUpdate(updates, "1011", dbver);
 }
 
 bool UpgradeGameDatabaseSchema(void)

@@ -285,22 +285,16 @@ void NewsSite::process(void)
 
 static bool isImage(const QString &mimeType)
 {
-    if (mimeType == "image/png" || mimeType == "image/jpeg" ||
-        mimeType == "image/jpg" || mimeType == "image/gif" ||
-        mimeType == "image/bmp")
-        return true;
-
-    return false;
+    return mimeType == "image/png" || mimeType == "image/jpeg" ||
+           mimeType == "image/jpg" || mimeType == "image/gif" ||
+           mimeType == "image/bmp";
 }
 
 static bool isVideo(const QString &mimeType)
 {
-    if (mimeType == "video/mpeg" || mimeType == "video/x-ms-wmv" ||
-        mimeType == "application/x-troff-msvideo" || mimeType == "video/avi" ||
-        mimeType == "video/msvideo" || mimeType == "video/x-msvideo")
-        return true;
-
-    return false;
+    return mimeType == "video/mpeg" || mimeType == "video/x-ms-wmv" ||
+           mimeType == "application/x-troff-msvideo" || mimeType == "video/avi" ||
+           mimeType == "video/msvideo" || mimeType == "video/x-msvideo";
 }
 
 void NewsSite::parseRSS(QDomDocument domDoc)
