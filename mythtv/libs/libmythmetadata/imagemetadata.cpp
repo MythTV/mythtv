@@ -483,7 +483,7 @@ QString PictureMetaData::DecodeComment(std::string rawValue)
     Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
     if (comVal.charsetId() != Exiv2::CommentValue::undefined)
         rawValue = comVal.comment();
-    return QString::fromStdString(rawValue.c_str());
+    return QString::fromStdString(rawValue);
 }
 
 
