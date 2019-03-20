@@ -620,19 +620,19 @@ int main(int argc, char *argv[])
     found += updt.numRowsAffected();
     LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
-    if (true) // limit MSqlQuery's lifetime
+#if 1
+    // limit MSqlQuery's lifetime
+    MSqlQuery query2(MSqlQuery::InitCon());
+    query2.prepare("SELECT count(previouslyshown) "
+                   "FROM program WHERE previouslyshown = 1;");
+    if (query2.exec() && query2.next())
     {
-        MSqlQuery query2(MSqlQuery::InitCon());
-        query2.prepare("SELECT count(previouslyshown) "
-                      "FROM program WHERE previouslyshown = 1;");
-        if (query2.exec() && query2.next())
-        {
-            if (query2.value(0).toInt() != 0)
-                gCoreContext->SaveSettingOnHost("HaveRepeats", "1", nullptr);
-            else
-                gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);
-        }
+        if (query2.value(0).toInt() != 0)
+            gCoreContext->SaveSettingOnHost("HaveRepeats", "1", nullptr);
+        else
+            gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);
     }
+#endif
 
     LOG(VB_GENERAL, LOG_INFO, "\n"
             "===============================================================\n"

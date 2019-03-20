@@ -1129,32 +1129,31 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
 
-            if (false) // This is RMS of signal
-            {
-                magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
-            }
-            if (true) // This is pure magnitude of signal
-            {
-                magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
-            }
+#if 0
+            // This is RMS of signal
+            magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
+#else
+            // This is pure magnitude of signal
+            magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+#endif
 
-            if (false) // Take logs everywhere, and shift up to [0, ??]
+#if 0
+            // Take logs everywhere, and shift up to [0, ??]
+            if(magnitude_av > 0.0f)
             {
-                if(magnitude_av > 0.0f)
-                {
-                    magnitude_av = log(magnitude_av);
-                }
-                else
-                {
-                    magnitude_av = PIANO_MIN_VOL;
-                }
-                magnitude_av -= PIANO_MIN_VOL;
-
-                if (magnitude_av < 0.0f)
-                {
-                    magnitude_av = 0.0;
-                }
+                magnitude_av = log(magnitude_av);
             }
+            else
+            {
+                magnitude_av = PIANO_MIN_VOL;
+            }
+            magnitude_av -= PIANO_MIN_VOL;
+
+            if (magnitude_av < 0.0f)
+            {
+                magnitude_av = 0.0;
+            }
+#endif
 
             if (magnitude_av > (goertzel_data)0.01)
             {
