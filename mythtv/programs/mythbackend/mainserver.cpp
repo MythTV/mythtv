@@ -2155,7 +2155,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         delete *mit;
 
     QStringList outputlist(QString::number(destination.size()));
-    QMap<QString, QString> backendPortMap;
+    QMap<QString, int> backendPortMap;
     QString ip   = gCoreContext->GetBackendServerIP();
     int port = gCoreContext->GetBackendServerPort();
     QString host = gCoreContext->GetHostName();

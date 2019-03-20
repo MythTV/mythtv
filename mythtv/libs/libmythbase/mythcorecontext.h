@@ -83,9 +83,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QString GenMythURL(QString host = QString(), QString port = QString(),
-                       QString path = QString(), QString storageGroup = QString());
-
     QString GenMythURL(QString host = QString(), int port = 0,
                        QString path = QString(), QString storageGroup = QString());
 
