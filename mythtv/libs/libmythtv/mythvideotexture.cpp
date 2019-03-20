@@ -159,7 +159,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
                 texture = CreateTexture(Context, size, Target,
-                                        QOpenGLTexture::UInt8, QOpenGLTexture::Red);
+                              QOpenGLTexture::UInt8, QOpenGLTexture::Red, QOpenGLTexture::R8_UNorm);
                 break;
             case FMT_YUV420P10:
             case FMT_YUV420P12:
@@ -167,9 +167,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
                 texture = CreateTexture(Context, size, Target,
-                                        QOpenGLTexture::UInt8, QOpenGLTexture::RG,
-                                        QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge,
-                                        QOpenGLTexture::RG16_UNorm);
+                              QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
                 break;
             case FMT_YUY2:
                 size.setWidth(size.width() >> 1);
@@ -182,7 +180,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane == 0)
                 {
                     texture = CreateTexture(Context, size, Target,
-                                            QOpenGLTexture::UInt8, QOpenGLTexture::Red);
+                                  QOpenGLTexture::UInt8, QOpenGLTexture::Red, QOpenGLTexture::R8_UNorm);
                 }
                 else
                 {
@@ -301,9 +299,9 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
                                                   QOpenGLTexture::Target Target,
                                                   QOpenGLTexture::PixelType PixelType,
                                                   QOpenGLTexture::PixelFormat PixelFormat,
+                                                  QOpenGLTexture::TextureFormat Format,
                                                   QOpenGLTexture::Filter Filter,
-                                                  QOpenGLTexture::WrapMode Wrap,
-                                                  QOpenGLTexture::TextureFormat Format)
+                                                  QOpenGLTexture::WrapMode Wrap)
 {
     if (!Context)
         return nullptr;
@@ -454,9 +452,9 @@ MythVideoTexture* MythVideoTexture::CreateHelperTexture(MythRenderOpenGL *Contex
                                               QOpenGLTexture::Target2D,
                                               QOpenGLTexture::Float32,
                                               QOpenGLTexture::RGBA,
+                                              QOpenGLTexture::RGBA16_UNorm,
                                               QOpenGLTexture::Linear,
-                                              QOpenGLTexture::Repeat,
-                                              QOpenGLTexture::RGBA16_UNorm);
+                                              QOpenGLTexture::Repeat);
 
     float *buf = nullptr;
     buf = new float[texture->m_bufferSize];

@@ -36,9 +36,9 @@ class MythVideoTexture : public MythGLTexture
                                            QOpenGLTexture::Target Target = QOpenGLTexture::Target2D,
                                            QOpenGLTexture::PixelType PixelType = QOpenGLTexture::UInt8,
                                            QOpenGLTexture::PixelFormat PixelFormat = QOpenGLTexture::RGBA,
+                                           QOpenGLTexture::TextureFormat Format = QOpenGLTexture::NoFormat,
                                            QOpenGLTexture::Filter Filter = QOpenGLTexture::Linear,
-                                           QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge,
-                                           QOpenGLTexture::TextureFormat Format = QOpenGLTexture::NoFormat);
+                                           QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     static vector<MythVideoTexture*> CreateHardwareTextures(MythRenderOpenGL* Context,
                                                             VideoFrameType Type, VideoFrameType Format,
                                                             vector<QSize> Sizes, QOpenGLTexture::Target Target);
