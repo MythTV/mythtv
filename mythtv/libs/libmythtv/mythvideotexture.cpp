@@ -350,14 +350,25 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
                                          MythVideoTexture *Texture, int Plane)
 {
-    int pitch = Frame->pitches[Plane];
-    if (Frame->codec != FMT_YV12)
-        pitch = pitch >> 1;
-    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
-    Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
-                                static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
+    if (Context->GetExtraFeatures() & kGLExtSubimage)
+    {
+        int pitch = (Frame->codec == FMT_YV12) ? Frame->pitches[Plane] : Frame->pitches[Plane] >> 1;
+        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
+        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
+                                    static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
+        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    }
+    else
+    {
+        if (!Texture->m_data)
+            if (!CreateBuffer(Texture, Texture->m_bufferSize))
+                return;
+        int pitch = (Frame->codec == FMT_YV12) ? Texture->m_size.width() : Texture->m_size.width() << 1;
+        copyplane(Texture->m_data, pitch, Frame->buf + Frame->offsets[Plane],
+                  Frame->pitches[Plane], pitch, Texture->m_size.height());
+        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
+    }
     Texture->m_valid = true;
-    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture.
@@ -415,11 +426,24 @@ inline void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame, MythVideoTex
 inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
                                          MythVideoTexture *Texture, int Plane)
 {
-    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->pitches[Plane] >> 1 : Frame->pitches[Plane]);
-    Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
-                                static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
+    if (Context->GetExtraFeatures() & kGLExtSubimage)
+    {
+        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->pitches[Plane] >> 1 : Frame->pitches[Plane]);
+        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
+                                    static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
+        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    }
+    else
+    {
+        if (!Texture->m_data)
+            if (!CreateBuffer(Texture, Texture->m_bufferSize))
+                return;
+        int width = Plane ? Texture->m_size.width() << 1 : Texture->m_size.width();
+        copyplane(Texture->m_data, width, Frame->buf + Frame->offsets[Plane],
+                  Frame->pitches[Plane], width, Texture->m_size.height());
+        Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
+    }
     Texture->m_valid = true;
-    Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 }
 
 /// \brief Create a data buffer for holding CPU side texture data.

@@ -265,6 +265,18 @@ static inline void clear(VideoFrame *vf)
     }
 }
 
+static inline void copyplane(uint8_t* dst, int dst_pitch,
+                             const uint8_t* src, int src_pitch,
+                             int width, int height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        memcpy(dst, src, width);
+        src += src_pitch;
+        dst += dst_pitch;
+    }
+}
+
 static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
 {
     if (a && b && a->codec == b->codec &&

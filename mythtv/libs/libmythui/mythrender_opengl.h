@@ -33,7 +33,8 @@ typedef enum
     kGLAppleFence  = 0x0002,
     kGLBufferMap   = 0x0004,
     kGLExtRects    = 0x0008,
-    kGLExtRGBA16   = 0x0010
+    kGLExtRGBA16   = 0x0010,
+    kGLExtSubimage = 0x0020
 } GLFeatures;
 
 #define TEX_OFFSET 8
