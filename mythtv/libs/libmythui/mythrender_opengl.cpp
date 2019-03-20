@@ -130,11 +130,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
 #else
     // Check OpenGL version supported
-    QGLWidget *dummy = new QGLWidget;
-    dummy->makeCurrent();
-    QGLFormat qglFormat = dummy->format();
-    int openGLVersionFlags = qglFormat.openGLVersionFlags();
-    delete dummy;
+    int openGLVersionFlags = QGLFormat::openGLVersionFlags();
 #endif
 
 #ifdef USING_OPENGLES
