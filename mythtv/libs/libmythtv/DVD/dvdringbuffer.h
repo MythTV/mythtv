@@ -34,6 +34,7 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     friend class DVDRingBuffer;
 
   public:
+    MythDVDContext() = delete;    // Default constructor should not be called
     virtual ~MythDVDContext() = default;
 
     int64_t  GetStartPTS()          const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
@@ -47,10 +48,6 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
 
   protected:
     MythDVDContext(const dsi_t& dsi, const pci_t& pci);
-
-  private:
-    // Default constructor should not be called
-    MythDVDContext();
 
   protected:
     dsi_t          m_dsi;

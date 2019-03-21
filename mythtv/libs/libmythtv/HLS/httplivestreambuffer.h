@@ -45,7 +45,7 @@ class HLSRingBuffer : public RingBuffer
 public:
     explicit HLSRingBuffer(const QString &lfilename);
     HLSRingBuffer(const QString &lfilename, bool open);
-    virtual ~HLSRingBuffer() = default;
+    virtual ~HLSRingBuffer();
 
     bool IsOpen(void) const override; // RingBuffer
     long long GetReadPosition(void) const override; // RingBuffer

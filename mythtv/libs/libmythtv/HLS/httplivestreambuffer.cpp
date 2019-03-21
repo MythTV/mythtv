@@ -132,6 +132,8 @@ public:
 #endif
     }
 
+    ~HLSSegment() = default;
+
     HLSSegment(const HLSSegment &rhs)
     {
         *this = rhs;
