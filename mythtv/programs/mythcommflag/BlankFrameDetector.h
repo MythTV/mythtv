@@ -38,7 +38,7 @@ public:
 
 private:
     HistogramAnalyzer      *m_histogramAnalyzer;
-    float                   m_fps        {0.0f};
+    float                   m_fps        {0.0F};
 
     FrameAnalyzer::FrameMap m_blankMap;
     FrameAnalyzer::FrameMap m_breakMap;

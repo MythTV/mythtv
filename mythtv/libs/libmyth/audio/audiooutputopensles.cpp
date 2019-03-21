@@ -490,7 +490,7 @@ int AudioOutputOpenSLES::GetVolumeChannel(int channel) const
         }
         else
         {
-            volume = lroundf(expf(mb / (3*2000.0f)) * 100);
+            volume = lroundf(expf(mb / (3*2000.0F)) * 100);
         }
         VBAUDIO(QString("GetVolume(%1) %2 (%3)")
                         .arg(channel).arg(volume).arg(mb));
@@ -522,7 +522,7 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     else
     {
         // millibels from linear amplification
-        mb = lroundf(3 * 2000.f * log10f(vol));
+        mb = lroundf(3 * 2000.F * log10f(vol));
         if (mb < SL_MILLIBEL_MIN)
             mb = SL_MILLIBEL_MIN;
         else if (mb > 0)

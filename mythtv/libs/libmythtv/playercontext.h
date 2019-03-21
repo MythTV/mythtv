@@ -177,14 +177,14 @@ class MTV_PUBLIC PlayerContext
     int                 m_fftime             {0};
     int                 m_rewtime            {0};
     int                 m_jumptime           {0};
-    /** \brief Time stretch speed, 1.0f for normal playback.
+    /** \brief Time stretch speed, 1.0F for normal playback.
      *
-     *  Begins at 1.0f meaning normal playback, but can be increased
+     *  Begins at 1.0F meaning normal playback, but can be increased
      *  or decreased to speedup or slowdown playback.
      *  Ignored when doing Fast Forward or Rewind.
      */
-    float               m_tsNormal           {1.0f};
-    float               m_tsAlt              {1.5f};
+    float               m_tsNormal           {1.0F};
+    float               m_tsAlt              {1.5F};
 
     mutable QMutex      m_playingInfoLock    {QMutex::Recursive};
     mutable QMutex      m_deletePlayerLock   {QMutex::Recursive};

@@ -796,7 +796,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool              m_tryUnflaggedSkip {false};
 
     bool              m_smartForward {false};
-    float             m_ffRewRepos {1.0f};
+    float             m_ffRewRepos {1.0F};
     bool              m_ffRewReverse {false};
     vector<int>       m_ffRewSpeeds;
 

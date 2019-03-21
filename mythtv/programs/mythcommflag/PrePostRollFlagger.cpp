@@ -197,7 +197,7 @@ bool PrePostRollFlagger::go()
     {
         //float elapsed = flagTime.elapsed() / 1000.0;
 
-        //float flagFPS = (elapsed > 0.0f) ? (framesProcessed / elapsed) : 0.0f;
+        //float flagFPS = (elapsed > 0.0F) ? (framesProcessed / elapsed) : 0.0F;
 
         if (m_myTotalFrames)
             cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";

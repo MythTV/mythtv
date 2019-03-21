@@ -817,7 +817,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 .arg(position).arg(duration));
 
             /*
-            if (playing && playerspeed < 1.0f)
+            if (playing && playerspeed < 1.0F)
             {
                 SendReverseEvent(session, AP_EVENT_PLAYING);
                 QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,

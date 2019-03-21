@@ -18,7 +18,7 @@
 #include <mythlogging.h>
 #define LOC      QString("DispInfo: ")
 
-#define VALID_RATE(rate) ((rate) > 20.0f && (rate) < 200.0f)
+#define VALID_RATE(rate) ((rate) > 20.0F && (rate) < 200.0F)
 
 static float fix_rate(int video_rate)
 {
@@ -52,12 +52,12 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
         return ret;
 
     CFDictionaryRef ref = CGDisplayCurrentMode(disp);
-    float rate = 0.0f;
+    float rate = 0.0F;
     if (ref)
         rate = get_float_CF(ref, kCGDisplayRefreshRate);
 
     if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0f / rate;
+        ret.m_rate = 1000000.0F / rate;
     else
         ret.m_rate = fix_rate(video_rate);
 
@@ -93,7 +93,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
             case 59:  ret.m_rate = 16683; break; // 59.940Hz
             case 71:  ret.m_rate = 13903; break; // 71.928Hz
             case 119: ret.m_rate = 8342;  break; // 119.880Hz
-            default:  ret.m_rate = 1000000.0f / (float)rate;
+            default:  ret.m_rate = 1000000.0F / (float)rate;
         }
     }
     else
@@ -137,13 +137,13 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
         );
 
     if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0f / rate;
+        ret.m_rate = 1000000.0F / rate;
     else
         ret.m_rate = fix_rate(video_rate);
     ret.m_res = QSize((uint)width, (uint)height);
     ret.m_size = QSize((uint)width, (uint)height);
     if (xdpi > 0 && ydpi > 0)
-        ret.m_size = QSize((uint)width/xdpi*25.4f, (uint)height/ydpi*25.4f);
+        ret.m_size = QSize((uint)width/xdpi*25.4F, (uint)height/ydpi*25.4F);
 #endif
     return ret;
 }

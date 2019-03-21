@@ -815,7 +815,7 @@ void TestEITFixups::test64BitEnum(void)
 
     // did kFixGreekCategories = 1<<31 cause issues?
 #if 0
-    QCOMPARE(QString::number(1<<31, 16), QString::number(1u<<31, 16));
+    QCOMPARE(QString::number(1<<31, 16), QString::number(1U<<31, 16));
 #endif
     // two different flags, fixed version
     QVERIFY(!(1ULL<<31 & 1ULL<<32));

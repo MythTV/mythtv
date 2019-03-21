@@ -105,7 +105,7 @@ class MTV_PUBLIC DeleteMap
     QString       m_seekText;
     bool          m_changed             {true};
     int           m_seekamountpos       {4};
-    float         m_seekamount          {1.0f};
+    float         m_seekamount          {1.0F};
     PlayerContext *m_ctx                {nullptr};
     uint64_t      m_cachedTotalForOSD   {0};
 

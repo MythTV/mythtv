@@ -68,7 +68,7 @@ private:
     unsigned short         *m_matches           {nullptr};  /* matching pixels */
     unsigned char          *m_match             {nullptr};  /* boolean result: 1/0 */
 
-    float                   m_fps               {0.0f};
+    float                   m_fps               {0.0F};
     AVFrame                 m_cropped;                     /* pre-allocated buffer */
     FrameAnalyzer::FrameMap m_breakMap;                    /* frameno => nframes */
 

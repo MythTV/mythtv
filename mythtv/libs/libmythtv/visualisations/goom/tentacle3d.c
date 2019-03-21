@@ -5,7 +5,7 @@
 #include "goom_tools.h"
 #include "goomconfig.h"
 
-#define D 256.0f
+#define D 256.0F
 
 #define nbgrid 6
 #define definitionx 15
@@ -51,7 +51,7 @@ lighten (unsigned char value, float power)
 	float   t = (float) val * log10f(power) / 2.0F;
 
 	if (t > 0) {
-		val = (int) t; // (32.0f * log (t));
+		val = (int) t; // (32.0F * log (t));
 		if (val > 255)
 			val = 255;
 		if (val < 0)

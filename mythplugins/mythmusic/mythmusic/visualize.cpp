@@ -1139,7 +1139,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
 #if 0
             // Take logs everywhere, and shift up to [0, ??]
-            if(magnitude_av > 0.0f)
+            if(magnitude_av > 0.0F)
             {
                 magnitude_av = log(magnitude_av);
             }
@@ -1149,7 +1149,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
             }
             magnitude_av -= PIANO_MIN_VOL;
 
-            if (magnitude_av < 0.0f)
+            if (magnitude_av < 0.0F)
             {
                 magnitude_av = 0.0;
             }

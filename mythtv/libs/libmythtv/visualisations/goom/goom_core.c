@@ -165,7 +165,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	static int decay_ifs = 0;			// disparition de l'ifs
 	static int recay_ifs = 0;			// dédisparition de l'ifs
 
-#define SWITCHMULT (29.0f/30.0f)
+#define SWITCHMULT (29.0F/30.0F)
 #define SWITCHINCR 0x7f
 	static float switchMult = 1.0F;
 	static int switchIncr = SWITCHINCR;
@@ -674,7 +674,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 				for (i=0;i<speedvar;i++)
 					text[i]='*';
 				text[i]=0;
-				goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 50, text, 1.0f, 0);
+				goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 50, text, 1.0F, 0);
 			}
 			if (accelvar>0) {
 				for (i=0;i<accelvar;i++) {
@@ -684,16 +684,16 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 						text[i]='*';
 				}
 				text[i]=0;
-				goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 62, text, 1.0f, 0);
+				goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 62, text, 1.0F, 0);
 			}
 			if (agoom==20)
-				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 80, "GOOM",1.0f, 0);
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 80, "GOOM",1.0F, 0);
 			else if (agoom)
-				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 80, "goom",1.0f, 0);
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 80, "goom",1.0F, 0);
 			if (abiggoom==200)
-				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 100, "BGOOM",1.0f, 0);
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 100, "BGOOM",1.0F, 0);
 			else if (abiggoom)
-				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 100, "bgoom",1.0f, 0);
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 100, "bgoom",1.0F, 0);
 		}
 
 		update_message (message);
@@ -709,10 +709,10 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		}
 
 		if (displayTitle) {
-			goom_draw_text (p1 + c_offset,resolx,c_resoly, resolx / 2, c_resoly / 2 + 7, title, ((float) (190 - displayTitle) / 10.0f), 1);
+			goom_draw_text (p1 + c_offset,resolx,c_resoly, resolx / 2, c_resoly / 2 + 7, title, ((float) (190 - displayTitle) / 10.0F), 1);
 			displayTitle--;
 			if (displayTitle < 4)
-				goom_draw_text (p2 + c_offset,resolx,c_resoly, resolx / 2, c_resoly / 2 + 7, title, ((float) (190 - displayTitle) / 10.0f), 1);
+				goom_draw_text (p2 + c_offset,resolx,c_resoly, resolx / 2, c_resoly / 2 + 7, title, ((float) (190 - displayTitle) / 10.0F), 1);
 		}
 	}
 */

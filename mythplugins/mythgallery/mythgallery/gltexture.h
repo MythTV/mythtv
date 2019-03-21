@@ -42,7 +42,7 @@ class GLTexture
     void Deinit(void);
 
     void Bind(void);
-    void MakeQuad(float alpha = 1.0f, float scale = 1.0f);
+    void MakeQuad(float alpha = 1.0F, float scale = 1.0F);
     void SwapWidthHeight(void)
         { int tmp = width; width = height; height = tmp; }
 
@@ -69,8 +69,8 @@ class GLTexture
     ThumbItem *item   {nullptr};
     int        width  {512};
     int        height {512};
-    float      cx     {1.0f};
-    float      cy     {1.0f};
+    float      cx     {1.0F};
+    float      cy     {1.0F};
 };
 
 #endif // USING_OPENGL

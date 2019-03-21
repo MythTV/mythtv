@@ -1043,7 +1043,7 @@ void GLSingleView::EffectCube(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-//    float PI = 4.0f * atan(1.0F);
+//    float PI = 4.0F * atan(1.0F);
     float const znear = 3.0F;
 //     float theta = 2.0F * atan2(2.0F / 2.0F, znear);
 //     theta = theta * 180.0F/PI;

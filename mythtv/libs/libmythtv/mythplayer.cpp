@@ -5385,8 +5385,8 @@ uint64_t MythPlayer::GetCurrentFrameCount(void) const
 }
 
 // Finds the frame number associated with the given time offset.  A
-// positive offset or +0.0f indicate offset from the beginning.  A
-// negative offset or -0.0f indicate offset from the end.  Limit the
+// positive offset or +0.0F indicate offset from the beginning.  A
+// negative offset or -0.0F indicate offset from the end.  Limit the
 // result to within bounds of the video.
 uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
 {

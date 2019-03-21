@@ -168,7 +168,7 @@ MTV_PUBLIC VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt);
 class MTV_PUBLIC MythPictureDeinterlacer
 {
 public:
-    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0f);
+    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0F);
     ~MythPictureDeinterlacer();
     // Will deinterlace src into dst. If EAGAIN is returned, more frames
     // are needed to output a frame.

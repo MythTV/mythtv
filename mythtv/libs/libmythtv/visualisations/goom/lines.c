@@ -18,7 +18,7 @@ lighten (unsigned char value, float power)
 	float   t = (float) val * log10f(power) / 2.0F;
 
 	if (t > 0) {
-		val = (int) t; // (32.0f * log (t));
+		val = (int) t; // (32.0F * log (t));
 		if (val > 255)
 			val = 255;
 		if (val < 0)

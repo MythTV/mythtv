@@ -439,7 +439,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     m_size         = QSize(width, height);
     m_slice_count  = avctx->slice_count;
 
-    int mbs = ceil((double)width / 16.0f);
+    int mbs = ceil((double)width / 16.0F);
     if (((mbs == 49)  || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
          (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128)))
     {

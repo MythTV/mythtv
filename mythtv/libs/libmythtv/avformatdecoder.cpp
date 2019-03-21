@@ -3382,7 +3382,7 @@ void AvFormatDecoder::HandleGopStart(
             {
                 long long index       = m_positionMap.back().index;
                 long long totframes   = index * m_keyframedist;
-                uint length = (uint)((totframes * 1.0f) / m_fps);
+                uint length = (uint)((totframes * 1.0F) / m_fps);
                 m_parent->SetFileLength(length, totframes);
             }
 #endif

@@ -181,7 +181,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     int                 m_effectivedsp           {0}; // actual measured rate
 
     int                 m_usebttv                {1};
-    float               m_video_aspect           {1.33333f};
+    float               m_video_aspect           {1.33333F};
 
     bool                m_transcoding            {false};
 
