@@ -1,6 +1,38 @@
 #ifndef OPENGLVIDEOSHADERS_H
 #define OPENGLVIDEOSHADERS_H
 
+static const QString DefaultVertexShader =
+"attribute highp vec2 a_position;\n"
+"attribute highp vec2 a_texcoord0;\n"
+"varying   highp vec2 v_texcoord0;\n"
+"uniform   highp mat4 u_projection;\n"
+"void main()\n"
+"{\n"
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+"    v_texcoord0 = a_texcoord0;\n"
+"}\n";
+
+static const QString DefaultFragmentShader =
+"uniform sampler2D s_texture0;\n"
+"varying highp vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    highp vec4 color = texture2D(s_texture0, v_texcoord0);\n"
+"    gl_FragColor = vec4(color.rgb, 1.0);\n"
+"}\n";
+
+static const QString MediaCodecVertexShader =
+"attribute highp vec2 a_position;\n"
+"attribute highp vec2 a_texcoord0;\n"
+"varying   highp vec2 v_texcoord0;\n"
+"uniform   highp mat4 u_projection;\n"
+"uniform   highp mat4 u_transform;\n"
+"void main()\n"
+"{\n"
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+"    v_texcoord0 = (u_transform * vec4(a_texcoord0, 0.0, 1.0)).xy;\n"
+"}\n";
+
 #define SAMPLE_NV12 "\
 highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n\
 {\n\
@@ -92,17 +124,6 @@ SAMPLE_NV12
 "    }\n"
 "    gl_FragColor = vec4(current, 1.0) * m_colourMatrix;\n"
 "}\n"};
-
-static const QString DefaultVertexShader =
-"attribute highp vec2 a_position;\n"
-"attribute highp vec2 a_texcoord0;\n"
-"varying   highp vec2 v_texcoord0;\n"
-"uniform   highp mat4 u_projection;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
-"    v_texcoord0 = a_texcoord0;\n"
-"}\n";
 
 static const QString SelectColumn =
 "    if (fract(v_texcoord0.x * m_frameData.y) < 0.5)\n"
@@ -273,15 +294,6 @@ static const QString BicubicShader =
 "    tex00        = mix(tex00, tex01, parmy.z);\n"
 "    tex10        = mix(tex10, tex11, parmy.z);\n"
 "    gl_FragColor = mix(tex00, tex10, parmx.z);\n"
-"}\n";
-
-static const QString DefaultFragmentShader =
-"uniform sampler2D s_texture0;\n"
-"varying highp vec2 v_texcoord0;\n"
-"void main(void)\n"
-"{\n"
-"    highp vec4 color = texture2D(s_texture0, v_texcoord0);\n"
-"    gl_FragColor = vec4(color.rgb, 1.0);\n"
 "}\n";
 
 static const QString SampleYV12 =

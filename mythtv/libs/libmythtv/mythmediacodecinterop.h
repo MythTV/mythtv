@@ -32,6 +32,8 @@ class MythMediaCodecInterop : public MythOpenGLInterop
     QAndroidJniObject m_surface;
     QAndroidJniObject m_surfaceTexture;
     QAndroidJniObject m_surfaceListener;
+    jfloatArray       m_textureTransform;
+    QMatrix4x4        m_transform;
 };
 
 #endif // MYTHMEDIACODECINTEROP_H

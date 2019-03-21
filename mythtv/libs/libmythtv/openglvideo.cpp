@@ -265,6 +265,8 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     if ((Default == Type) || (!format_is_yuv(m_outputType)))
     {
         fragment = DefaultFragmentShader;
+        if (FMT_MEDIACODEC == m_inputType)
+            vertex = MediaCodecVertexShader;
     }
     // no interlaced shaders yet
     else if ((Progressive == Type) || (Interlaced == Type) || Deinterlacer.isEmpty())
@@ -580,6 +582,16 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
                 (m_inputType != newsourcetype) || (newsize != m_inputTextureSize))
             {
                 SetupFrameFormat(newsourcetype, newtargettype, newsize, newtargettexture);
+            }
+
+            // Set the texture transform for mediacodec
+            if (FMT_MEDIACODEC == m_inputType)
+            {
+                if (inputtextures[0]->m_transform && m_shaders[Default])
+                {
+                    m_render->EnableShaderProgram(m_shaders[Default]);
+                    m_shaders[Default]->setUniformValue("u_transform", *inputtextures[0]->m_transform);
+                }
             }
         }
         else

@@ -30,12 +30,18 @@ MythMediaCodecInterop::MythMediaCodecInterop(MythRenderOpenGL* Context)
     m_colourSpaceInitialised(false),
     m_surface(),
     m_surfaceTexture(),
-    m_surfaceListener()
+    m_surfaceListener(),
+    m_textureTransform(nullptr),
+    m_transform()
 {
+    jfloatArray transform = QAndroidJniEnvironment()->NewFloatArray(16);
+    m_textureTransform = jfloatArray(QAndroidJniEnvironment()->NewGlobalRef(transform));
+    QAndroidJniEnvironment()->DeleteLocalRef(transform);
 }
 
 MythMediaCodecInterop::~MythMediaCodecInterop()
 {
+    QAndroidJniEnvironment()->DeleteGlobalRef(m_textureTransform);
 }
 
 void* MythMediaCodecInterop::GetSurface(void)
@@ -161,5 +167,12 @@ vector<MythVideoTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Conte
 
     // Update texture
     m_surfaceTexture.callMethod<void>("updateTexImage");
+
+    // Retrieve and set transform
+    m_surfaceTexture.callMethod<void>("getTransformMatrix", "([F)V", m_textureTransform);
+    QAndroidJniEnvironment()->GetFloatArrayRegion(m_textureTransform, 0, 16, m_transform.data());
+    m_openglTextures[DUMMY_INTEROP_ID][0]->m_transform = &m_transform;
+    m_openglTextures[DUMMY_INTEROP_ID][0]->m_flip = false;
+
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
