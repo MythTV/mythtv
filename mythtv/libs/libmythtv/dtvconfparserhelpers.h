@@ -626,6 +626,12 @@ class DTVModulationSystem : public DTVParamHelper
     DTVModulationSystem& operator=(fe_delivery_system_t type)
         { value = type; return *this; }
 #endif
+    bool IsCompatible(const DTVModulationSystem &other) const
+        { return
+            (value == other.value) || 
+            (value == kModulationSystem_DVBT  && other.value == kModulationSystem_DVBT2) ||
+            (value == kModulationSystem_DVBT2 && other.value == kModulationSystem_DVBT);
+        }
 
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, s_confTable); }

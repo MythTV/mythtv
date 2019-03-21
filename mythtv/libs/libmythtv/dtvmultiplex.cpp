@@ -81,7 +81,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
                 m_guard_interval.IsCompatible(other.m_guard_interval) &&
                 m_trans_mode.IsCompatible(other.m_trans_mode)         &&
                 m_hierarchy.IsCompatible(other.m_hierarchy)           &&
-                (m_mod_sys == other.m_mod_sys);
+                m_mod_sys.IsCompatible(other.m_mod_sys);
         return
             (m_inversion      == other.m_inversion)      &&
             (m_bandwidth      == other.m_bandwidth)      &&
