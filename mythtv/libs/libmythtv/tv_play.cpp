@@ -2,13 +2,13 @@
 #include "tv_play.h"
 
 #include <algorithm>
+#include <cassert>
 #include <chrono> // for milliseconds
 #include <cmath>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdlib>
 #include <thread> // for sleep_for
-#include <assert.h>
 
 using namespace std;
 
