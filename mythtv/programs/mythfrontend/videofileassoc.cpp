@@ -269,7 +269,7 @@ class FileAssocDialogPrivate
         UIDToFAPair operator()(
                 const FileAssocDialogPrivate::FA_collection::value_type &from)
         {
-            return UIDToFAPair(from.first, from.second);
+            return {from.first, from.second};
         }
     };
 

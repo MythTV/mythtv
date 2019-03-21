@@ -852,7 +852,7 @@ QRect VideoOutput::GetVisibleOSDBounds(
     visible_aspect = themeaspect * (ova ? vs / ova : 1.F) * dispPixelAdj;
 
     font_scaling   = 1.0F;
-    return QRect(QPoint(0,0), dvr2);
+    return {QPoint(0,0), dvr2};
 }
 
 /**
@@ -868,7 +868,7 @@ QRect VideoOutput::GetTotalOSDBounds(void) const
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
                        dvr.height() & ~0x1);
 
-    return QRect(QPoint(0,0), dvr2);
+    return {QPoint(0,0), dvr2};
 }
 
 QRect VideoOutput::GetMHEGBounds(void)
@@ -877,8 +877,8 @@ QRect VideoOutput::GetMHEGBounds(void)
         return window.GetTotalOSDBounds();
 
     QRect dvr = window.GetDisplayVideoRect();
-    return QRect(QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
-                 QSize(dvr.width() & ~0x1, dvr.height() & ~0x1));
+    return {QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
+            QSize(dvr.width() & ~0x1, dvr.height() & ~0x1)};
 }
 
 bool VideoOutput::AllowPreviewEPG(void) const
@@ -1751,8 +1751,8 @@ QRect VideoOutput::GetSafeRect(void)
     QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0F);
     int safex = (int)((float)result.width()  * safeMargin);
     int safey = (int)((float)result.height() * safeMargin);
-    return QRect(result.left() + safex, result.top() + safey,
-                 result.width() - (2 * safex), result.height() - (2 * safey));
+    return {result.left() + safex, result.top() + safey,
+            result.width() - (2 * safex), result.height() - (2 * safey)};
 }
 
 void VideoOutput::SetPIPState(PIPState setting)

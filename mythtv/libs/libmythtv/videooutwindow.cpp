@@ -622,7 +622,7 @@ bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
  */
 QRect VideoOutWindow::GetTotalOSDBounds(void) const
 {
-    return QRect(QPoint(0, 0), video_disp_dim);
+    return {QPoint(0, 0), video_disp_dim};
 }
 
 /**
@@ -1024,7 +1024,7 @@ void VideoOutWindow::SetPIPState(PIPState setting)
 /// Correct for underalignment
 static QSize fix_alignment(QSize raw)
 {
-    return QSize((raw.width() + 15) & (~0xf), (raw.height() + 15) & (~0xf));
+    return {(raw.width() + 15) & (~0xf), (raw.height() + 15) & (~0xf)};
 }
 
 static float snap(float value, float snapto, float diff)

@@ -42,7 +42,7 @@ QRect UIEffects::GetExtent(const QSize &size)
         x = size.width() - zoomedWidth / 2; break;
     }
 
-    return QRect(x, y, zoomedWidth, zoomedHeight);
+    return {x, y, zoomedWidth, zoomedHeight};
 }
 
 void MythUIAnimation::Activate(void)

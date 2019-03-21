@@ -58,7 +58,7 @@ public:
                     tc1 = m_tcFirst;
             }
         }
-        return range_t(tc1, tc2);
+        return {tc1, tc2};
     }
 
     int Samples(const range_t &avail) const

@@ -2759,7 +2759,7 @@ QPoint MythUIButtonList::GetButtonPosition(int column, int row) const
     int y = m_contentsRect.y() +
             ((row - 1) * (m_itemHeight + m_itemVertSpacing));
 
-    return QPoint(x, y);
+    return {x, y};
 }
 
 void MythUIButtonList::CalculateVisibleItems(void)

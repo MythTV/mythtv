@@ -657,5 +657,5 @@ QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
     static int X[] = {0, 96, 255, 255};
-    return QColor(X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]);
+    return {X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]};
 }

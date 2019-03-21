@@ -752,7 +752,7 @@ QSize FormattedTextLine::CalcSize(float layoutSpacing) const
             width += leftPadding;
         isFirst = false;
     }
-    return QSize(width + rightPadding, height);
+    return {width + rightPadding, height};
 }
 
 // Normal font height is designed to be 1/20 of safe area height, with
@@ -1597,7 +1597,7 @@ static QSize CalcShadowOffsetPadding(MythFontProperties *mythfont)
         shadowWidth = max(shadowWidth, outlineSize);
         shadowHeight = max(shadowHeight, outlineSize);
     }
-    return QSize(shadowWidth + outlineSize, shadowHeight + outlineSize);
+    return {shadowWidth + outlineSize, shadowHeight + outlineSize};
 }
 
 QSize SubtitleScreen::CalcTextSize(const QString &text,
@@ -1612,7 +1612,7 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
     if (layoutSpacing > 0 && !text.trimmed().isEmpty())
         height = max(height, (int)(font->pixelSize() * layoutSpacing));
     height += CalcShadowOffsetPadding(mythfont).height();
-    return QSize(width, height);
+    return {width, height};
 }
 
 // Padding calculation is different depending on whether the padding

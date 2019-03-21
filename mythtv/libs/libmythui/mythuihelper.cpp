@@ -1707,7 +1707,7 @@ double MythUIHelper::GetPixelAspectRatio(void) const
 
 QSize MythUIHelper::GetBaseSize(void) const
 {
-    return QSize(d->m_baseWidth, d->m_baseHeight);
+    return {d->m_baseWidth, d->m_baseHeight};
 }
 
 void MythUIHelper::SetFontStretch(int stretch)

@@ -145,7 +145,7 @@ QSize MythXDisplay::GetDisplaySize(void)
     MythXLocker locker(this);
     int displayWidthPixel  = DisplayWidth( m_disp, m_screen_num);
     int displayHeightPixel = DisplayHeight(m_disp, m_screen_num);
-    return QSize(displayWidthPixel, displayHeightPixel);
+    return {displayWidthPixel, displayHeightPixel};
 }
 
 /**
@@ -158,7 +158,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
     MythXLocker locker(this);
     int displayWidthMM  = DisplayWidthMM( m_disp, m_screen_num);
     int displayHeightMM = DisplayHeightMM(m_disp, m_screen_num);
-    return QSize(displayWidthMM, displayHeightMM);
+    return {displayWidthMM, displayHeightMM};
 }
 
 float MythXDisplay::GetRefreshRate(void)

@@ -584,7 +584,7 @@ QSize MythUIType::GetMinSize(void) const
     if (!m_MinSize.isValid())
         return m_Area.size();
 
-    return QSize(m_MinSize.x(), m_MinSize.y());
+    return {m_MinSize.x(), m_MinSize.y()};
 }
 
 void MythUIType::SetArea(const MythRect &rect)

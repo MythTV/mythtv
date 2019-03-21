@@ -784,9 +784,8 @@ inline int MHIContext::ScaleY(int n, bool roundup) const
 
 inline QRect MHIContext::Scale(const QRect &r) const
 {
-    return QRect( m_displayRect.topLeft() +
-        QPoint(ScaleX(r.x()), ScaleY(r.y())),
-        QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) );
+    return { m_displayRect.topLeft() + QPoint(ScaleX(r.x()), ScaleY(r.y())),
+             QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) };
 }
 
 inline int MHIContext::ScaleVideoX(int n, bool roundup) const
@@ -801,9 +800,8 @@ inline int MHIContext::ScaleVideoY(int n, bool roundup) const
 
 inline QRect MHIContext::ScaleVideo(const QRect &r) const
 {
-    return QRect( m_videoRect.topLeft() +
-        QPoint(ScaleVideoX(r.x()), ScaleVideoY(r.y())),
-        QSize(ScaleVideoX(r.width(), true), ScaleVideoY(r.height(), true)) );
+    return { m_videoRect.topLeft() + QPoint(ScaleVideoX(r.x()), ScaleVideoY(r.y())),
+             QSize(ScaleVideoX(r.width(), true), ScaleVideoY(r.height(), true)) };
 }
 
 void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, bool bUnder /*=false*/)
@@ -1295,13 +1293,13 @@ static inline int FT2Point(FT_F26Dot6 fp)
 QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
 {
     if (!m_parent->IsFaceLoaded())
-        return QRect(0,0,0,0);
+        return {0,0,0,0};
 
     FT_Face face = m_parent->GetFontFace();
     FT_Error error = FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
     if (error)
-        return QRect(0,0,0,0);
+        return {0,0,0,0};
 
     int maxAscent  =  face->size->metrics.ascender;
     int maxDescent = -face->size->metrics.descender;
@@ -1362,7 +1360,7 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
         previous = glyphIndex;
     }
 
-    return QRect(0, -FT2Point(maxAscent), FT2Point(width), FT2Point(maxAscent + maxDescent));
+    return {0, -FT2Point(maxAscent), FT2Point(width), FT2Point(maxAscent + maxDescent)};
 }
 
 // Reset the image and fill it with transparent ink.

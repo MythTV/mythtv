@@ -353,7 +353,7 @@ QString MythRect::toString(bool details) const
 
 QRect MythRect::toQRect() const
 {
-    return QRect(x(),y(),width(),height());
+    return {x(),y(),width(),height()};
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -513,5 +513,5 @@ QString MythPoint::toString(bool details) const
 
 QPoint MythPoint::toQPoint() const
 {
-    return QPoint(x(),y());
+    return {x(),y()};
 }

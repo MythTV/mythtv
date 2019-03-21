@@ -121,7 +121,7 @@ static bool silence_ffmpeg_logging = false;
 
 static QSize get_video_dim(const AVCodecContext &ctx)
 {
-    return QSize(ctx.width >> ctx.lowres, ctx.height >> ctx.lowres);
+    return {ctx.width >> ctx.lowres, ctx.height >> ctx.lowres};
 }
 static float get_aspect(const AVCodecContext &ctx)
 {
