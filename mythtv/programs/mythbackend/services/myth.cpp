@@ -447,7 +447,7 @@ QString Myth::GetFormatTime(const QDateTime Time)
 
 QDateTime Myth::ParseISODateString(const QString& DateTimeString)
 {
-    QDateTime dateTime = QDateTime().fromString(DateTimeString, Qt::ISODate);
+    QDateTime dateTime = QDateTime::fromString(DateTimeString, Qt::ISODate);
 
     if (!dateTime.isValid())
         throw QString( "Unable to parse DateTimeString" );

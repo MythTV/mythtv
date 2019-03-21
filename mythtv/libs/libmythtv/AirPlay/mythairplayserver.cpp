@@ -1270,7 +1270,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
 
 void MythAirplayServer::PausePlayback(void)
 {
-    if (TV::IsTVRunning() && !TV::CurrentTVInstance()->IsPaused())
+    if (TV::IsTVRunning() && !TV::IsPaused())
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("Sending ACTION_PAUSE for %1")

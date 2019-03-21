@@ -416,7 +416,7 @@ void UPNPScanner::Start()
             this, SLOT(replyFinished(QNetworkReply*)));
 
     // listen for SSDP updates
-    SSDP::Instance()->AddListener(this);
+    SSDP::AddListener(this);
 
     // listen for subscriptions and events
     if (m_subscription)
@@ -449,7 +449,7 @@ void UPNPScanner::Stop(void)
     m_lock.lock();
 
     // stop listening
-    SSDP::Instance()->RemoveListener(this);
+    SSDP::RemoveListener(this);
     if (m_subscription)
         m_subscription->removeListener(this);
 
