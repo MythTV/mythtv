@@ -137,10 +137,6 @@ public:
         *this = rhs;
     }
 
-    ~HLSSegment()
-    {
-    }
-
     HLSSegment &operator=(const HLSSegment &rhs)
     {
         if (this == &rhs)

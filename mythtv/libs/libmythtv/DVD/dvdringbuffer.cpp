@@ -154,10 +154,6 @@ MythDVDContext::MythDVDContext(const dsi_t& dsi, const pci_t& pci) :
 {
 }
 
-MythDVDContext::~MythDVDContext()
-{
-}
-
 /** \brief Returns the duration of this VOBU in frames
  *  \sa GetNumFramesPresent
  */

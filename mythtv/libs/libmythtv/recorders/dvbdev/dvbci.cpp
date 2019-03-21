@@ -756,7 +756,7 @@ protected:
   int SendData(int Tag, int Length = 0, const uint8_t *Data = nullptr);
 public:
   cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc);
-  virtual ~cCiSession();
+  virtual ~cCiSession() = default;
   const cCiTransportConnection *Tc(void) { return m_tc; }
   int SessionId(void) { return sessionId; }
   int ResourceId(void) { return resourceId; }
@@ -769,10 +769,6 @@ cCiSession::cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc
   sessionId = SessionId;
   resourceId = ResourceId;
   m_tc = Tc;
-}
-
-cCiSession::~cCiSession()
-{
 }
 
 int cCiSession::GetTag(int &Length, const uint8_t **Data)

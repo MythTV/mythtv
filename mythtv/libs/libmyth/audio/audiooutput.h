@@ -58,7 +58,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         const QString &passthru_device = QString(),
         bool willsuspendpa = true);
 
-    AudioOutput() {}
+    AudioOutput() = default;
     virtual ~AudioOutput();
 
     // reconfigure sound out for new params

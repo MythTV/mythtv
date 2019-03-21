@@ -268,9 +268,7 @@ class PictureMetaData : public ImageMetaData
 {
 public:
     explicit PictureMetaData(const QString &filePath);
-    ~PictureMetaData()
-    { // libexiv2 closes file, cleans up via autoptrs
-    }
+    ~PictureMetaData() = default; // libexiv2 closes file, cleans up via autoptrs
 
     bool        IsValid() override // ImageMetaData
         { return m_image.get(); }

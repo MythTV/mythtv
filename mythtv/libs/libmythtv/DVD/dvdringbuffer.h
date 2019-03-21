@@ -34,7 +34,7 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     friend class DVDRingBuffer;
 
   public:
-    virtual ~MythDVDContext();
+    virtual ~MythDVDContext() = default;
 
     int64_t  GetStartPTS()          const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
     int64_t  GetEndPTS()            const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }

@@ -1094,10 +1094,6 @@ BurnMenu::BurnMenu(void)
     setObjectName("BurnMenu");
 }
 
-BurnMenu::~BurnMenu(void)
-{
-}
-
 void BurnMenu::start(void)
 {
     if (!gCoreContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))

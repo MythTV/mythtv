@@ -136,16 +136,6 @@ Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
 #undef LOC
 #define LOC QString("%1").arg(m_parent->Desc())
 
-Commands::Commands(MythExternControl * parent)
-    : m_parent(parent)
-    , m_apiVersion(-1)
-{
-}
-
-Commands::~Commands(void)
-{
-}
-
 void Commands::Close(void)
 {
     std::lock_guard<std::mutex> lock(m_parent->m_flow_mutex);
@@ -505,10 +495,6 @@ Buffer::Buffer(MythExternControl * parent)
     : m_parent(parent)
 {
     m_heartbeat = std::chrono::system_clock::now();
-}
-
-Buffer::~Buffer(void)
-{
 }
 
 bool Buffer::Fill(const QByteArray & buffer)

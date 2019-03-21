@@ -137,7 +137,7 @@ class BurnMenu : public QObject
 
   public:
     BurnMenu(void);
-    ~BurnMenu(void);
+    ~BurnMenu(void) = default;
 
     void start(void);
 

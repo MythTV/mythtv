@@ -366,51 +366,6 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     return true;
 }
 
-ChannelInsertInfo &ChannelInsertInfo::operator=(
-    const ChannelInsertInfo &other)
-{
-    m_db_mplexid         = other.m_db_mplexid;
-    m_source_id          = other.m_source_id;
-    m_channel_id         = other.m_channel_id;
-    m_callsign           = other.m_callsign;
-    m_service_name       = other.m_service_name;
-    m_chan_num           = other.m_chan_num;
-    m_service_id         = other.m_service_id;
-    m_atsc_major_channel = other.m_atsc_major_channel;
-    m_atsc_minor_channel = other.m_atsc_minor_channel;
-    m_use_on_air_guide   = other.m_use_on_air_guide;
-    m_hidden             = other.m_hidden;
-    m_hidden_in_guide    = other.m_hidden_in_guide;
-    m_freqid             = other.m_freqid;
-    m_icon               = other.m_icon;
-    m_format             = other.m_format;
-    m_xmltvid            = other.m_xmltvid;
-    m_default_authority  = other.m_default_authority;
-
-    // non-DB info
-    m_pat_tsid           = other.m_pat_tsid;
-    m_vct_tsid           = other.m_vct_tsid;
-    m_vct_chan_tsid      = other.m_vct_chan_tsid;
-    m_sdt_tsid           = other.m_sdt_tsid;
-    m_orig_netid         = other.m_orig_netid;
-    m_netid              = other.m_netid;
-    m_si_standard        = other.m_si_standard;
-    m_in_channels_conf   = other.m_in_channels_conf;
-    m_in_pat             = other.m_in_pat;
-    m_in_pmt             = other.m_in_pmt;
-    m_in_vct             = other.m_in_vct;
-    m_in_nit             = other.m_in_nit;
-    m_in_sdt             = other.m_in_sdt;
-    m_is_encrypted       = other.m_is_encrypted;
-    m_is_data_service    = other.m_is_data_service;
-    m_is_audio_service   = other.m_is_audio_service;
-    m_is_opencable       = other.m_is_opencable;
-    m_could_be_opencable = other.m_could_be_opencable;
-    m_decryption_status  = other.m_decryption_status;
-
-    return *this;
-}
-
 void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
 {
     if (other.m_db_mplexid && !m_db_mplexid)

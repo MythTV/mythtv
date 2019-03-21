@@ -884,16 +884,6 @@ QRegion MHText::GetOpaqueArea()
 }
 
 
-MHHyperText::MHHyperText(): MHInteractible(this)
-{
-
-}
-
-MHHyperText::~MHHyperText()
-{
-
-}
-
 void MHHyperText::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHText::Initialise(p, engine);

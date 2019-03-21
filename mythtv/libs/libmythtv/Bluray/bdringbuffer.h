@@ -29,7 +29,7 @@ class MTV_PUBLIC BDInfo
 
   public:
     explicit BDInfo(const QString &filename);
-   ~BDInfo(void);
+   ~BDInfo(void) = default;
     bool IsValid(void) const { return m_isValid; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
     QString GetLastError(void) const { return m_lastError; }

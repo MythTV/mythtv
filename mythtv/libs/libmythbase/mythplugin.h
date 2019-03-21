@@ -20,7 +20,7 @@ class MythPlugin : public QLibrary
   public:
     MythPlugin(const QString &libname, const QString &plugname)
         : QLibrary(libname), m_plugName(plugname) {}
-    virtual ~MythPlugin();
+    virtual ~MythPlugin() = default;
 
     // This method will call the mythplugin_init() function of the library.
     int init(const char *libversion);

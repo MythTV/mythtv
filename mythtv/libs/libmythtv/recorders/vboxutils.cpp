@@ -28,11 +28,6 @@ VBox::VBox(const QString &url)
     m_url = url;
 }
 
-VBox::~VBox(void)
-{
-}
-
-
 // static method
 QStringList VBox::probeDevices(void)
 {

@@ -215,10 +215,6 @@ BDInfo::BDInfo(const QString &filename)
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Done"));
 }
 
-BDInfo::~BDInfo(void)
-{
-}
-
 void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
                                  QString &name,
                                  QString &serialnum,

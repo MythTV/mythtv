@@ -101,10 +101,10 @@ class MHText : public MHVisible
 class MHHyperText : public MHText, public MHInteractible
 {
   public:
-    MHHyperText();
+    MHHyperText() : MHInteractible(this) {}
     const char *ClassName() override // MHText
         { return "HyperText"; }
-    virtual ~MHHyperText();
+    virtual ~MHHyperText() = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHText
     void PrintMe(FILE *fd, int nTabs) const override; // MHText
 
