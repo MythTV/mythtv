@@ -189,6 +189,12 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                                   QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
                 }
                 break;
+            case FMT_YUV422P:
+                if (plane > 0)
+                    size = QSize(size.width() >> 1, size.height());
+                texture = CreateTexture(Context, size, Target,
+                              QOpenGLTexture::UInt8, QOpenGLTexture::Red, QOpenGLTexture::R8_UNorm);
+                break;
             default: break;
         }
         if (texture)
@@ -284,6 +290,15 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 }
                 break;
             }
+            case FMT_YUV422P:
+            {
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_YUV422P: YV12ToYV12(Context, Frame, texture, i); break;
+                    default: break;
+                }
+                break;
+            }
             default: break;
         }
     }
@@ -352,7 +367,8 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoF
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
-        int pitch = (Frame->codec == FMT_YV12) ? Frame->pitches[Plane] : Frame->pitches[Plane] >> 1;
+        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P) ?
+                     Frame->pitches[Plane] : Frame->pitches[Plane] >> 1;
         Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
                                     static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
@@ -363,7 +379,8 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoF
         if (!Texture->m_data)
             if (!CreateBuffer(Texture, Texture->m_bufferSize))
                 return;
-        int pitch = (Frame->codec == FMT_YV12) ? Texture->m_size.width() : Texture->m_size.width() << 1;
+        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P) ?
+                     Texture->m_size.width() : Texture->m_size.width() << 1;
         copyplane(Texture->m_data, pitch, Frame->buf + Frame->offsets[Plane],
                   Frame->pitches[Plane], pitch, Texture->m_size.height());
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);

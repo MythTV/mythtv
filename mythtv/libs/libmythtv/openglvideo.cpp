@@ -271,6 +271,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     {
         switch (m_outputType)
         {
+            case FMT_YUV422P:
             case FMT_YUV420P10:
             case FMT_YUV420P12:
             case FMT_YUV420P16:
@@ -285,7 +286,8 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
     {
         uint bottom = (InterlacedBot == Type);
         if (FMT_YV12 == m_outputType || FMT_YUV420P10 == m_outputType ||
-            FMT_YUV420P12 == m_outputType || FMT_YUV420P16 == m_outputType)
+            FMT_YUV420P12 == m_outputType || FMT_YUV420P16 == m_outputType ||
+            FMT_YUV422P == m_outputType)
         {
             if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
             {
@@ -492,9 +494,8 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
         return;
     }
 
-    // Can we render this frame format - ideally this should be a check
-    // against format_is_yuv.
-    if (!format_is_yuv(Frame->codec) || Frame->codec == FMT_YUV422P)
+    // Can we render this frame format
+    if (!format_is_yuv(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame format is not supported");
         return;
