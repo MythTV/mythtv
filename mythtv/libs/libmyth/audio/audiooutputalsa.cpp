@@ -765,7 +765,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* See if we need to increase the prealloc'd buffer size
        If buffer_time is too small we could underrun - make 10% difference ok */
-    if (buffer_time * 1.10f < (float)original_buffer_time)
+    if (buffer_time * 1.10F < (float)original_buffer_time)
     {
         VBWARN(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
@@ -844,7 +844,7 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     else
     {
         retvol = (m_mixer.volrange != 0L) ? (mixervol - m_mixer.volmin) *
-                                            100.0f / m_mixer.volrange + 0.5f
+                                            100.0F / m_mixer.volrange + 0.5F
                                             : 0;
         retvol = max(retvol, 0);
         retvol = min(retvol, 100);

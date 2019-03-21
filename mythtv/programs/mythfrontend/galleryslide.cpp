@@ -458,9 +458,9 @@ void Slide::Zoom(int percentage)
 {
     // Sentinel indicates reset to default zoom
     float newZoom = (percentage == 0)
-            ? 1.0f
+            ? 1.0F
             : qMax(MIN_ZOOM,
-                   qMin(MAX_ZOOM, m_zoom * (1.0f + percentage / 100.0f)));
+                   qMin(MAX_ZOOM, m_zoom * (1.0F + percentage / 100.0F)));
     if (newZoom != m_zoom)
     {
         if (m_zoomAnimation)
@@ -488,7 +488,7 @@ void Slide::SetZoom(float zoom)
     // TODO
     // MythUIImage displaces widget or doesn't centre for some combinations of
     // zoom centre/cropping so frig centre for now.
-    m_Effects.m_centre = zoom < 1.0f ? UIEffects::Middle : UIEffects::TopLeft;
+    m_Effects.m_centre = zoom < 1.0F ? UIEffects::Middle : UIEffects::TopLeft;
 
     SetPan(m_pan);
 }
@@ -501,7 +501,7 @@ void Slide::SetZoom(float zoom)
 void Slide::Pan(QPoint offset)
 {
     // Panning only possible when zoomed in
-    if (m_zoom > 1.0f)
+    if (m_zoom > 1.0F)
     {
         QPoint start = m_pan;
 
@@ -542,7 +542,7 @@ void Slide::SetPan(QPoint pos)
     float wRatio    = float(imageArea.width()) / m_Area.width();
     float ratio     = qMax(hRatio, wRatio);
 
-    if (m_zoom != 0.0f)
+    if (m_zoom != 0.0F)
         ratio /= m_zoom;
 
     // Determine crop area

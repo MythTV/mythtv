@@ -935,7 +935,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                             video_disp_dim.height());
         float width = video_disp_dim.width();
         if (kGLUYVY == videoType)
-            width /= 2.0f;
+            width /= 2.0F;
 
         QRectF trect(QPoint(0, 0), QSize(width, trueheight));
 
@@ -956,7 +956,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             bool bot = (scan == kScan_Interlaced && topfieldfirst) ||
                        (scan == kScan_Intr2ndField && !topfieldfirst);
             bool first = filters.size() < 2;
-            float bob = (trueheight / (float)video_disp_dim.height()) / 4.0f;
+            float bob = (trueheight / (float)video_disp_dim.height()) / 4.0F;
             if ((top && !first) || (bot && first))
             {
                 trect.setBottom(trect.bottom() / 2);
@@ -1010,8 +1010,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             hardwareDeinterlacer == "openglbobdeint")
         {
             float bob = ((float)display.height() / (float)video_rect.height())
-                        / 2.0f;
-            float field = kScan_Interlaced ? -1.0f : 1.0f;
+                        / 2.0F;
+            float field = kScan_Interlaced ? -1.0F : 1.0F;
             bob = bob * (topfieldfirst ? field : -field);
             vrect.adjust(0, bob, 0, bob);
         }
@@ -1427,9 +1427,9 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
         string.replace("GLSL_TEXTURE", "texture2D");
     }
 
-    float lineHeight = 1.0f;
-    float colWidth   = 1.0f;
-    float yselect    = 1.0f;
+    float lineHeight = 1.0F;
+    float colWidth   = 1.0F;
+    float yselect    = 1.0F;
     float maxwidth   = inputTextureSize.width();
     float maxheight  = inputTextureSize.height();
     float yv12height = video_dim.height();
@@ -1445,11 +1445,11 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
         yv12height  = maxheight;
     }
 
-    float fieldSize = 1.0f / (lineHeight * 2.0f);
+    float fieldSize = 1.0F / (lineHeight * 2.0F);
 
     string.replace("%2", QString::number(fieldSize, 'f', 8));
     string.replace("%3", QString::number(lineHeight, 'f', 8));
-    string.replace("%4", QString::number(lineHeight * 2.0f, 'f', 8));
+    string.replace("%4", QString::number(lineHeight * 2.0F, 'f', 8));
     string.replace("%5", QString::number(colWidth, 'f', 8));
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));

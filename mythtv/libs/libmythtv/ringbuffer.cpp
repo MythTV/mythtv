@@ -385,7 +385,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     const uint KB512 = 512*1024;
 
     estbitrate     = (uint) max(abs(m_rawBitrate * m_playSpeed),
-                                0.5f * m_rawBitrate);
+                                0.5F * m_rawBitrate);
     estbitrate     = min(m_rawBitrate * 3, estbitrate);
     int const rbs  = (estbitrate > 18000) ? KB512 :
                      (estbitrate >  9000) ? KB256 :
@@ -407,7 +407,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     // minumum seconds of buffering before allowing read
     float secs_min = 0.3;
     // set the minimum buffering before allowing ffmpeg read
-    m_fillMin  = (uint) ((estbitrate * 1000 * secs_min) * 0.125f);
+    m_fillMin  = (uint) ((estbitrate * 1000 * secs_min) * 0.125F);
     // make this a multiple of ffmpeg block size..
     if (m_fillMin >= CHUNK || rbs >= CHUNK)
     {
@@ -450,7 +450,7 @@ bool RingBuffer::IsNearEnd(double /*fps*/, uint vvf) const
     m_posLock.unlock();
 
     // telecom kilobytes (i.e. 1000 per k not 1024)
-    uint   tmp = (uint) max(abs(m_rawBitrate * m_playSpeed), 0.5f * m_rawBitrate);
+    uint   tmp = (uint) max(abs(m_rawBitrate * m_playSpeed), 0.5F * m_rawBitrate);
     uint   kbits_per_sec = min(m_rawBitrate * 3, tmp);
     if (kbits_per_sec == 0)
         return false;
@@ -1352,7 +1352,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
     int ret = safe_read(buf, count);
     int elapsed = timer.elapsed();
     uint64_t bps = !elapsed ? 1000000001 :
-                   (uint64_t)(((float)ret * 8000.0f) / (float)elapsed);
+                   (uint64_t)(((float)ret * 8000.0F) / (float)elapsed);
     UpdateStorageRate(bps);
 
     m_posLock.lockForWrite();
@@ -1612,13 +1612,13 @@ QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
     if (rate >= 1000000)
     {
         msg = hz ? QObject::tr("%1MHz") : QObject::tr("%1Mbps");
-        bitrate  = (float)rate / (1000000.0f);
+        bitrate  = (float)rate / (1000000.0F);
         range = hz ? 3 : 1;
     }
     else if (rate >= 1000)
     {
         msg = hz ? QObject::tr("%1kHz") : QObject::tr("%1kbps");
-        bitrate = (float)rate / 1000.0f;
+        bitrate = (float)rate / 1000.0F;
         range = hz ? 1 : 0;
     }
     else
@@ -1646,7 +1646,7 @@ QString RingBuffer::GetAvailableBuffer(void)
 
     int avail = (m_rbwPos >= m_rbrPos) ? m_rbwPos - m_rbrPos
                                        : m_bufferSize - m_rbrPos + m_rbwPos;
-    return QString("%1%").arg(lroundf((float)avail / (float)m_bufferSize * 100.0f));
+    return QString("%1%").arg(lroundf((float)avail / (float)m_bufferSize * 100.0F));
 }
 
 uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)

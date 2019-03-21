@@ -788,12 +788,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     QString("---- DVDNAV_CELL_CHANGE - Cell "
                             "#%1 Menu %2 Length %3")
                       .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
-                      .arg((float)cell_event->cell_length / 90000.0f,0,'f',1));
+                      .arg((float)cell_event->cell_length / 90000.0F,0,'f',1));
                 QString still = stillTimer ? ((stillTimer < 0xff) ?
                     QString("Stillframe: %1 seconds").arg(stillTimer) :
                     QString("Infinite stillframe")) :
                     QString("Length: %1 seconds")
-                        .arg((float)m_pgcLength / 90000.0f, 0, 'f', 1);
+                        .arg((float)m_pgcLength / 90000.0F, 0, 'f', 1);
                 if (m_title == 0)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")
@@ -1097,9 +1097,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 // update player
                 int aspect = dvdnav_get_video_aspect(m_dvdnav);
                 if (aspect == 2) // 4:3
-                    m_forcedAspect = 4.0f / 3.0f;
+                    m_forcedAspect = 4.0F / 3.0F;
                 else if (aspect == 3) // 16:9
-                    m_forcedAspect = 16.0f / 9.0f;
+                    m_forcedAspect = 16.0F / 9.0F;
                 else
                     m_forcedAspect = -1;
                 int permission = dvdnav_get_video_scale_permission(m_dvdnav);
@@ -2082,7 +2082,7 @@ int DVDRingBuffer::GetTrack(uint type)
 
 uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
 {
-    uint8_t numChannels = 0u;
+    uint8_t numChannels = 0U;
 
     int physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 

@@ -59,7 +59,7 @@ void GLTexture::Bind(void)
 {
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(GetAngle(), 0.0f, 0.0f, 1.0f);
+    glRotatef(GetAngle(), 0.0F, 0.0F, 1.0F);
     glBindTexture(GL_TEXTURE_2D, tex);
 }
 
@@ -68,19 +68,19 @@ void GLTexture::MakeQuad(float alpha, float scale)
     Bind();
 
     glBegin(GL_QUADS);
-    glColor4f(1.0f, 1.0f, 1.0f, alpha);
+    glColor4f(1.0F, 1.0F, 1.0F, alpha);
 
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-GetTextureX() * scale, -GetTextureY() * scale, 0.0f);
+    glTexCoord2f(0.0F, 0.0F);
+    glVertex3f(-GetTextureX() * scale, -GetTextureY() * scale, 0.0F);
 
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(+GetTextureX() * scale, -GetTextureY() * scale, 0.0f);
+    glTexCoord2f(1.0F, 0.0F);
+    glVertex3f(+GetTextureX() * scale, -GetTextureY() * scale, 0.0F);
 
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(+GetTextureX() * scale, +GetTextureY() * scale, 0.0f);
+    glTexCoord2f(1.0F, 1.0F);
+    glVertex3f(+GetTextureX() * scale, +GetTextureY() * scale, 0.0F);
 
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(-GetTextureX() * scale, +GetTextureY() * scale, 0.0f);
+    glTexCoord2f(0.0F, 1.0F);
+    glVertex3f(-GetTextureX() * scale, +GetTextureY() * scale, 0.0F);
     glEnd();
 }
 

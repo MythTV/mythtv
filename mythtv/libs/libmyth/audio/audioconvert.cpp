@@ -78,8 +78,8 @@ static av_always_inline av_const long int lrintf(float x)
 
 static inline float clipcheck(float f)
 {
-    if (f > 1.0f) f = 1.0f;
-    else if (f < -1.0f) f = -1.0f;
+    if (f > 1.0F) f = 1.0F;
+    else if (f < -1.0F) f = -1.0F;
     return f;
 }
 
@@ -90,7 +90,7 @@ static inline float clipcheck(float f)
 static int toFloat8(float* out, const uchar* in, int len)
 {
     int i = 0;
-    float f = 1.0f / ((1<<7));
+    float f = 1.0F / ((1<<7));
 
 #if ARCH_X86
     if (sse_check() && len >= 16)
@@ -215,7 +215,7 @@ static int fromFloat8(uchar* out, const float* in, int len)
 static int toFloat16(float* out, const short* in, int len)
 {
     int i = 0;
-    float f = 1.0f / ((1<<15));
+    float f = 1.0F / ((1<<15));
 
 #if ARCH_X86
     if (sse_check() && len >= 16)
@@ -323,7 +323,7 @@ static int toFloat32(AudioFormat format, float* out, const int* in, int len)
 {
     int i = 0;
     int bits = AudioOutputSettings::FormatToBits(format);
-    float f = 1.0f / ((uint)(1<<(bits-1)));
+    float f = 1.0F / ((uint)(1<<(bits-1)));
     int shift = 32 - bits;
 
     if (format == FORMAT_S24LSB)
@@ -446,12 +446,12 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
     {
         float valf = *in++;
 
-        if (valf >= 1.0f)
+        if (valf >= 1.0F)
         {
             *out++ = (range - 128) << shift;
             continue;
         }
-        if (valf <= -1.0f)
+        if (valf <= -1.0F)
         {
             *out++ = (-range) << shift;
             continue;

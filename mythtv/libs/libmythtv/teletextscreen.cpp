@@ -154,7 +154,7 @@ void TeletextScreen::Pulse(void)
 
     if (m_player && m_player->GetVideoOutput())
     {
-        static const float kTextPadding = 0.96f;
+        static const float kTextPadding = 0.96F;
         QRect oldsafe = m_safeArea;
         m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
         m_colWidth = (int)((float)m_safeArea.width() / (float)kTeletextColumns);

@@ -32,7 +32,7 @@ bool ProfileItem::checkRange(QString key,
     bool match = true;
     bool isOK = true;
     if (isFloat)
-        ivalue = int(fvalue * 1000.0f);
+        ivalue = int(fvalue * 1000.0F);
     QString cmp = Get(key);
     if (!cmp.isEmpty())
     {
@@ -215,7 +215,7 @@ bool ProfileItem::IsValid(QString *reason) const
             *reason = QString("Invalid height condition");
         return false;
     }
-    checkRange("cond_framerate",1.0f,&isOK);
+    checkRange("cond_framerate",1.0F,&isOK);
     if (!isOK)
     {
         if (reason)
@@ -381,7 +381,7 @@ pref_map_t     VideoDisplayProfile::s_dec_name;
 safe_list_t    VideoDisplayProfile::s_safe_decoders;
 
 VideoDisplayProfile::VideoDisplayProfile()
-    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f)
+    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0F)
 {
     QMutexLocker locker(&s_safe_lock);
     init_statics();
@@ -418,7 +418,7 @@ void VideoDisplayProfile::SetInput(const QSize &size,
         last_size = size;
         change = true;
     }
-    if (framerate > 0.0f && framerate != last_rate)
+    if (framerate > 0.0F && framerate != last_rate)
     {
         last_rate = framerate;
         change = true;

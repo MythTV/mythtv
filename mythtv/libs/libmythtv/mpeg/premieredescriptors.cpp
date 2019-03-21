@@ -55,11 +55,11 @@ QDateTime PremiereContentTransmissionDescriptor::StartTimeUTC(uint index) const
     const float tmpB = (float)(1.0 / 30.6001);
 
     float mjdf = mjd;
-    int year  = (int) truncf((mjdf - 15078.2f) * tmpA);
+    int year  = (int) truncf((mjdf - 15078.2F) * tmpA);
     int month = (int) truncf(
-        (mjdf - 14956.1f - truncf(year * 365.25f)) * tmpB);
+        (mjdf - 14956.1F - truncf(year * 365.25F)) * tmpB);
     int day   = (int) truncf(
-        (mjdf - 14956.0f - truncf(year * 365.25f) - truncf(month * 30.6001f)));
+        (mjdf - 14956.0F - truncf(year * 365.25F) - truncf(month * 30.6001F)));
     int i     = (month == 14 || month == 15) ? 1 : 0;
 
     QDate date(1900 + year + i, month - 1 - i * 12, day);

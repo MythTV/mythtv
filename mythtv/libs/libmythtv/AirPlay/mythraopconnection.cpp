@@ -1338,9 +1338,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
                 if (name == "volume" && m_allowVolumeControl && m_audio)
                 {
-                    float volume = (param.toFloat() + 30.0f) * 100.0f / 30.0f;
-                    if (volume < 0.01f)
-                        volume = 0.0f;
+                    float volume = (param.toFloat() + 30.0F) * 100.0F / 30.0F;
+                    if (volume < 0.01F)
+                        volume = 0.0F;
                     LOG(VB_PLAYBACK, LOG_INFO,
                         LOC + QString("Setting volume to %1 (raw %3)")
                         .arg(volume).arg(param));
@@ -1405,7 +1405,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         int volume = (m_allowVolumeControl && m_audio) ?
                             m_audio->GetCurrentVolume() : 0;
                         responseData += QString("volume: %1\r\n")
-                            .arg(volume * 30.0f / 100.0f - 30.0f,1,'f',6,'0');
+                            .arg(volume * 30.0F / 100.0F - 30.0F,1,'f',6,'0');
                     }
                 }
             }

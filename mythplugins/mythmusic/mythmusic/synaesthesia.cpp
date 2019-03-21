@@ -601,20 +601,20 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
             unsigned int const r1 = *(ptrOutput++);
             unsigned int const r2 = *(ptrOutput++);
 
-            unsigned int const v = ((r1 & 0x000000f0ul) >> 4) |
-                                            ((r1 & 0x0000f000ul) >> 8) |
-                                            ((r1 & 0x00f00000ul) >> 12) |
-                                            ((r1 & 0xf0000000ul) >> 16);
+            unsigned int const v = ((r1 & 0x000000f0UL) >> 4) |
+                                   ((r1 & 0x0000f000UL) >> 8) |
+                                   ((r1 & 0x00f00000UL) >> 12) |
+                                   ((r1 & 0xf0000000UL) >> 16);
 
-            *(ptrTop++) = v | (((r2 & 0x000000f0ul) << 12) |
-                               ((r2 & 0x0000f000ul) << 8) |
-                               ((r2 & 0x00f00000ul) << 4) |
-                               ((r2 & 0xf0000000ul)));
+            *(ptrTop++) = v | (((r2 & 0x000000f0UL) << 12) |
+                               ((r2 & 0x0000f000UL) << 8) |
+                               ((r2 & 0x00f00000UL) << 4) |
+                               ((r2 & 0xf0000000UL)));
 
-            *(ptrBot++) = v | (((r2 & 0x000000f0ul) << 12) |
-                               ((r2 & 0x0000f000ul) << 8) |
-                               ((r2 & 0x00f00000ul) << 4) |
-                               ((r2 & 0xf0000000ul)));
+            *(ptrBot++) = v | (((r2 & 0x000000f0UL) << 12) |
+                               ((r2 & 0x0000f000UL) << 8) |
+                               ((r2 & 0x00f00000UL) << 4) |
+                               ((r2 & 0xf0000000UL)));
         } while (--i);
     }
 

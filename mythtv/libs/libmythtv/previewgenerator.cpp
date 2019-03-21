@@ -570,16 +570,16 @@ bool PreviewGenerator::SavePreview(const QString &filename,
     float ppw = max(desired_width, 0);
     float pph = max(desired_height, 0);
     bool desired_size_exactly_specified = true;
-    if ((ppw < 1.0f) && (pph < 1.0f))
+    if ((ppw < 1.0F) && (pph < 1.0F))
     {
         ppw = img.width();
         pph = img.height();
         desired_size_exactly_specified = false;
     }
 
-    aspect = (aspect <= 0.0f) ? ((float) width) / height : aspect;
-    pph = (pph < 1.0f) ? (ppw / aspect) : pph;
-    ppw = (ppw < 1.0f) ? (pph * aspect) : ppw;
+    aspect = (aspect <= 0.0F) ? ((float) width) / height : aspect;
+    pph = (pph < 1.0F) ? (ppw / aspect) : pph;
+    ppw = (ppw < 1.0F) ? (pph * aspect) : ppw;
 
     if (!desired_size_exactly_specified)
     {
@@ -589,8 +589,8 @@ bool PreviewGenerator::SavePreview(const QString &filename,
             ppw = (pph * aspect);
     }
 
-    ppw = max(1.0f, ppw);
-    pph = max(1.0f, pph);;
+    ppw = max(1.0F, ppw);
+    pph = max(1.0F, pph);;
 
     QImage small_img = img.scaled((int) ppw, (int) pph,
         Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

@@ -972,7 +972,7 @@ void PlaybackProfileItemConfig::framerateChanged(const QString &val)
     bool ok = true;
     QString oldvalue = m_item.Get("cond_framerate");
     m_item.Set("cond_framerate",val);
-    m_item.checkRange("cond_framerate", 25.0f, &ok);
+    m_item.checkRange("cond_framerate", 25.0F, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));

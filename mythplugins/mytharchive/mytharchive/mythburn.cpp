@@ -233,7 +233,7 @@ void MythBurn::loadEncoderProfiles()
     EncoderProfile *item = new EncoderProfile;
     item->name = "NONE";
     item->description = "";
-    item->bitrate = 0.0f;
+    item->bitrate = 0.0F;
     m_profileList.append(item);
 
     // find the encoding profiles

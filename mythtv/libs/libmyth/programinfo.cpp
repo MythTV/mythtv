@@ -380,7 +380,7 @@ ProgramInfo::ProgramInfo(
     m_recstartts(_recstartts),
     m_recendts(_recendts),
 
-    m_stars(clamp(_stars, 0.0f, 1.0f)),
+    m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastmodified(_lastmodified),
@@ -563,7 +563,7 @@ ProgramInfo::ProgramInfo(
     m_recstartts(_recstartts),
     m_recendts(_recendts),
 
-    m_stars(clamp(_stars, 0.0f, 1.0f)),
+    m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastmodified(m_startts),
@@ -975,7 +975,7 @@ void ProgramInfo::clear(void)
     m_recstartts = m_startts;
     m_recendts = m_startts;
 
-    m_stars = 0.0f;
+    m_stars = 0.0F;
 
     m_originalAirDate = QDate();
     m_lastmodified = m_startts;
@@ -1734,14 +1734,14 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["partnumber"] = m_partnumber ? QString::number(m_partnumber) : "";
     progMap["parttotal"] = m_parttotal ? QString::number(m_parttotal) : "";
 
-    QString star_str = (m_stars != 0.0f) ?
+    QString star_str = (m_stars != 0.0F) ?
         QObject::tr("%n star(s)", "", GetStars(star_range)) : "";
     progMap["stars"] = star_str;
     progMap["numstars"] = QString::number(GetStars(star_range));
 
-    if (m_stars != 0.0f && m_year)
+    if (m_stars != 0.0F && m_year)
         progMap["yearstars"] = QString("(%1, %2)").arg(m_year).arg(star_str);
-    else if (m_stars != 0.0f)
+    else if (m_stars != 0.0F)
         progMap["yearstars"] = QString("(%1)").arg(star_str);
     else if (m_year)
         progMap["yearstars"] = QString("(%1)").arg(m_year);
@@ -2005,7 +2005,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     m_recstartts   = MythDate::as_utc(query.value(24).toDateTime());
     m_recendts     = MythDate::as_utc(query.value(25).toDateTime());
 
-    m_stars        = clamp((float)query.value(23).toDouble(), 0.0f, 1.0f);
+    m_stars        = clamp((float)query.value(23).toDouble(), 0.0F, 1.0F);
 
     m_year         = query.value(26).toUInt();
     m_partnumber   = query.value(49).toUInt();

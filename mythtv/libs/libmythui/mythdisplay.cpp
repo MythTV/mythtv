@@ -22,7 +22,7 @@
 
 static float fix_rate(int video_rate)
 {
-    static const float default_rate = 1000000.0f / 60.0f;
+    static const float default_rate = 1000000.0F / 60.0F;
     float fixed = default_rate;
     if (video_rate > 0)
     {
@@ -106,7 +106,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
 
     float rate = disp->GetRefreshRate();
     if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0f / rate;
+        ret.m_rate = 1000000.0F / rate;
     else
         ret.m_rate = fix_rate(video_rate);
     ret.m_res  = disp->GetDisplaySize();

@@ -121,7 +121,7 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
     // In other words, divisible by 96.
-    static const uint kAudioRingBufferSize   = 10239936u;
+    static const uint kAudioRingBufferSize   = 10239936U;
 
  protected:
     // Following function must be called from subclass constructor
@@ -186,7 +186,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     bool              m_enc                        {false};
     bool              m_reenc                      {false};
 
-    float             m_stretchfactor              {1.0f};
+    float             m_stretchfactor              {1.0F};
     int               m_eff_stretchfactor          {100000}; // scaled to 100000 ase ffdsp is
     AudioOutputSource source;
 
@@ -234,7 +234,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     bool              m_needs_upmix               {false};
     bool              m_needs_downmix             {false};
     int               m_surround_mode             {QUALITY_LOW};
-    float             m_old_stretchfactor         {1.0f};
+    float             m_old_stretchfactor         {1.0F};
     int               m_volume                    {80};
     QString           m_volumeControl;
 

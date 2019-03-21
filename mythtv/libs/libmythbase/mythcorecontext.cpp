@@ -471,7 +471,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 break;
             }
 
-            setup_timeout = (int)(setup_timeout * 1.5f);
+            setup_timeout = (int)(setup_timeout * 1.5F);
         }
         else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
         {

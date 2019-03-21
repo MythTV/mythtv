@@ -619,7 +619,7 @@ uint MythRenderOpenGL::CreateHelperTexture(void)
 
     for (uint i = 0; i < width; i++)
     {
-        float x = (((float)i) + 0.5f) / (float)width;
+        float x = (((float)i) + 0.5F) / (float)width;
         StoreBicubicWeights(x, ref);
         ref += 4;
     }
@@ -972,7 +972,7 @@ void MythRenderOpenGL::Init2DState(void)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
     glClear(GL_COLOR_BUFFER_BIT);
     Flush(true);
 }

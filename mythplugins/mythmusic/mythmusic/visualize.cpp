@@ -937,9 +937,9 @@ void Piano::zero_analysis(void)
     for (key = 0; key < PIANO_N; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
-        m_piano_data[key].q2 = 0.0f;
-        m_piano_data[key].q1 = 0.0f;
-        m_piano_data[key].magnitude = 0.0f;
+        m_piano_data[key].q2 = 0.0F;
+        m_piano_data[key].q1 = 0.0F;
+        m_piano_data[key].magnitude = 0.0F;
         m_piano_data[key].max_magnitude_seen =
             (goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
 
@@ -1065,7 +1065,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
     if (node)
     {
-        piano_audio short_to_bounded = 32768.0f;
+        piano_audio short_to_bounded = 32768.0F;
 
         // Detect start of new song (current node more than 10s earlier than already seen)
         if (node->m_offset + 10000 < m_offset_processed)
@@ -1088,7 +1088,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             for (uint i = 0; i < n; i++)
             {
-                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0f / short_to_bounded;
+                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0F / short_to_bounded;
             }
         }
         else // This is only one channel of data

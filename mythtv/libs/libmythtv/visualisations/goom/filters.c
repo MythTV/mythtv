@@ -704,9 +704,9 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			buffratio = BUFFPOINTMASK;
 	}
 
-	if (switchMult != 1.0f) {
+	if (switchMult != 1.0F) {
 		buffratio =
-			(int) ((float) BUFFPOINTMASK * (1.0f - switchMult) +
+			(int) ((float) BUFFPOINTMASK * (1.0F - switchMult) +
 						 (float) buffratio * switchMult);
 	}
 

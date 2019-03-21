@@ -113,10 +113,10 @@ class VDPAUColor
     void SetColor(uint color)
     {
         m_color = color;
-        m_vdp_color.red   = (float)((m_color & 0xFF000000) >> 24) / 255.0f;
-        m_vdp_color.green = (float)((m_color & 0xFF0000) >> 16) / 255.0f;
-        m_vdp_color.blue  = (float)((m_color & 0xFF00) >> 8)/ 255.0f;
-        m_vdp_color.alpha = (float)( m_color & 0xFF) / 255.0f;
+        m_vdp_color.red   = (float)((m_color & 0xFF000000) >> 24) / 255.0F;
+        m_vdp_color.green = (float)((m_color & 0xFF0000) >> 16) / 255.0F;
+        m_vdp_color.blue  = (float)((m_color & 0xFF00) >> 8)/ 255.0F;
+        m_vdp_color.alpha = (float)( m_color & 0xFF) / 255.0F;
     }
 
     int      m_color {0};
@@ -1391,10 +1391,10 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     VdpColor color;
     if (!(red == 0 && green == 0 && blue == 0 && alpha == 0))
     {
-        color.red   = red   / 255.0f;
-        color.green = green / 255.0f;
-        color.blue  = blue  / 255.0f;
-        color.alpha = alpha / 255.0f;
+        color.red   = red   / 255.0F;
+        color.green = green / 255.0F;
+        color.blue  = blue  / 255.0F;
+        color.alpha = alpha / 255.0F;
     }
 
     INIT_ST

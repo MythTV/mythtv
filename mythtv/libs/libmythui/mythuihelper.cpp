@@ -109,9 +109,9 @@ public:
     QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
-    float m_wmult                            {1.0f};
-    float m_hmult                            {1.0f};
-    float m_pixelAspectRatio                 {-1.0f};
+    float m_wmult                            {1.0F};
+    float m_hmult                            {1.0F};
+    float m_pixelAspectRatio                 {-1.0F};
 
     // Drawable area of the full screen. May cover several screens,
     // or exclude windowing system fixtures (like Mac menu bar)
@@ -357,7 +357,7 @@ void MythUIHelperPrivate::StoreGUIsettings()
         font = QFont();
 
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPixelSize(lroundf(19.0f * m_hmult));
+    font.setPixelSize(lroundf(19.0F * m_hmult));
     int stretch = (int)(100 / GetPixelAspectRatio());
     font.setStretch(stretch); // QT
     m_fontStretch = stretch; // MythUI

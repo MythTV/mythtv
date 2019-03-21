@@ -49,7 +49,7 @@ class AirplayConnection
     }
     QTcpSocket  *m_controlSocket    {nullptr};
     QTcpSocket  *m_reverseSocket    {nullptr};
-    float        m_speed            {1.0f};
+    float        m_speed            {1.0F};
     double       m_position         {0.0};
 //  double       m_initial_position {-1.0};
     QUrl         m_url;

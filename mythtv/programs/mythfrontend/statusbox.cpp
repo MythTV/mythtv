@@ -1138,7 +1138,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     for (; it != prof2bps.end(); ++it)
     {
         const QString pro =
-                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0f));
+                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0F));
 
         long long bytesPerMin = ((*it) >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;

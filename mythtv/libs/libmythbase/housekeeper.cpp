@@ -381,7 +381,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
 
     // calculate probability that task should not have yet run
     // it's backwards, but it makes the math simplier
-    float prob = 1.0f - ((float)(elapsed - m_windowElapsed.first) /
+    float prob = 1.0F - ((float)(elapsed - m_windowElapsed.first) /
                     (float)(m_windowElapsed.second - m_windowElapsed.first));
     if (m_currentProb < prob)
         // more bad stuff

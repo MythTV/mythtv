@@ -283,8 +283,8 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
     if (channels < 1 || channels > 8 || !m_configure_succeeded)
         return;
 
-    bool willstretch = m_stretchfactor < 0.99f || m_stretchfactor > 1.01f;
-    m_eff_stretchfactor = lroundf(100000.0f * lstretchfactor);
+    bool willstretch = m_stretchfactor < 0.99F || m_stretchfactor > 1.01F;
+    m_eff_stretchfactor = lroundf(100000.0F * lstretchfactor);
 
     if (m_pSoundStretch)
     {
@@ -741,7 +741,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     // Turn on float conversion?
     if (m_need_resampler || m_needs_upmix || m_needs_downmix ||
-        m_stretchfactor != 1.0f || (internal_vol && SWVolume()) ||
+        m_stretchfactor != 1.0F || (internal_vol && SWVolume()) ||
         (m_enc && m_output_format != FORMAT_S16) ||
         !OutputSettings(m_enc || m_passthru)->IsSupportedFormat(m_output_format))
     {
@@ -861,7 +861,7 @@ void AudioOutputBase::KillAudio()
         delete m_pSoundStretch;
         m_pSoundStretch = nullptr;
         m_old_stretchfactor = m_stretchfactor;
-        m_stretchfactor = 1.0f;
+        m_stretchfactor = 1.0F;
     }
 
     if (m_encoder)

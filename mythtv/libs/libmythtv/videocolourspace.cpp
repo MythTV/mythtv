@@ -15,7 +15,7 @@ Matrix::Matrix(float m11, float m12, float m13, float m14,
     m[0][0] = m11; m[0][1] = m12; m[0][2] = m13; m[0][3] = m14;
     m[1][0] = m21; m[1][1] = m22; m[1][2] = m23; m[1][3] = m24;
     m[2][0] = m31; m[2][1] = m32; m[2][2] = m33; m[2][3] = m34;
-    m[3][0] = m[3][1] = m[3][2] = m[3][3] = 1.0f;
+    m[3][0] = m[3][1] = m[3][2] = m[3][3] = 1.0F;
 }
 
 Matrix::Matrix()
@@ -27,7 +27,7 @@ void Matrix::setToIdentity(void)
 {
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 4; j++)
-            m[i][j] = (i == j) ? 1.0f : 0.0f;
+            m[i][j] = (i == j) ? 1.0F : 0.0F;
 }
 
 void Matrix::scale(float val1, float val2, float val3)
@@ -86,8 +86,8 @@ void Matrix::debug(void)
 
 VideoColourSpace::VideoColourSpace(VideoCStd colour_std)
   : m_supported_attributes(kPictureAttributeSupported_None),
-    m_changed(false), m_studioLevels(false), m_brightness(0.0f),
-    m_contrast(1.0f), m_saturation(1.0f),    m_hue(0.0f),
+    m_changed(false), m_studioLevels(false), m_brightness(0.0F),
+    m_contrast(1.0F), m_saturation(1.0F),    m_hue(0.0F),
     m_colourSpace(colour_std)
 {
     m_db_settings[kPictureAttribute_Brightness] =
@@ -159,46 +159,46 @@ int VideoColourSpace::SetPictureAttribute(PictureAttribute attribute, int value)
 
 void VideoColourSpace::Update(void)
 {
-    float luma_range    = m_studioLevels ? 255.0f : 219.0f;
-    float chroma_range  = m_studioLevels ? 255.0f : 224.0f;
-    float luma_offset   = m_studioLevels ? 0.0f   : -16.0f / 255.0f;
-    float chroma_offset = -128.0f / 255.0f;
+    float luma_range    = m_studioLevels ? 255.0F : 219.0F;
+    float chroma_range  = m_studioLevels ? 255.0F : 224.0F;
+    float luma_offset   = m_studioLevels ? 0.0F   : -16.0F / 255.0F;
+    float chroma_offset = -128.0F / 255.0F;
 
     float uvcos         = m_saturation * cosf(m_hue);
     float uvsin         = m_saturation * sinf(m_hue);
-    float brightness    = m_brightness * 255.0f / luma_range;
-    float luma_scale    = 255.0f / luma_range;
-    float chroma_scale  = 255.0f / chroma_range;
+    float brightness    = m_brightness * 255.0F / luma_range;
+    float luma_scale    = 255.0F / luma_range;
+    float chroma_scale  = 255.0F / chroma_range;
 
     Matrix csc;
     switch (m_colourSpace)
     {
         case kCSTD_SMPTE_240M:
-            csc = Matrix(1.000f, ( 0.0000f * uvcos) + ( 1.5756f * uvsin),
-                                 ( 1.5756f * uvcos) - ( 0.0000f * uvsin), 0.0f,
-                         1.000f, (-0.2253f * uvcos) + ( 0.5000f * uvsin),
-                                 ( 0.5000f * uvcos) - (-0.2253f * uvsin), 0.0f,
-                         1.000f, ( 1.8270f * uvcos) + ( 0.0000f * uvsin),
-                                 ( 0.0000f * uvcos) - ( 1.8270f * uvsin), 0.0f);
+            csc = Matrix(1.000F, ( 0.0000F * uvcos) + ( 1.5756F * uvsin),
+                                 ( 1.5756F * uvcos) - ( 0.0000F * uvsin), 0.0F,
+                         1.000F, (-0.2253F * uvcos) + ( 0.5000F * uvsin),
+                                 ( 0.5000F * uvcos) - (-0.2253F * uvsin), 0.0F,
+                         1.000F, ( 1.8270F * uvcos) + ( 0.0000F * uvsin),
+                                 ( 0.0000F * uvcos) - ( 1.8270F * uvsin), 0.0F);
             break;
 
         case kCSTD_ITUR_BT_709:
-            csc = Matrix(1.000f, ( 0.0000f * uvcos) + ( 1.5701f * uvsin),
-                                 ( 1.5701f * uvcos) - ( 0.0000f * uvsin), 0.0f,
-                         1.000f, (-0.1870f * uvcos) + (-0.4664f * uvsin),
-                                 (-0.4664f * uvcos) - (-0.1870f * uvsin), 0.0f,
-                         1.000f, ( 1.8556f * uvcos) + ( 0.0000f * uvsin),
-                                 ( 0.0000f * uvcos) - ( 1.8556f * uvsin), 0.0f);
+            csc = Matrix(1.000F, ( 0.0000F * uvcos) + ( 1.5701F * uvsin),
+                                 ( 1.5701F * uvcos) - ( 0.0000F * uvsin), 0.0F,
+                         1.000F, (-0.1870F * uvcos) + (-0.4664F * uvsin),
+                                 (-0.4664F * uvcos) - (-0.1870F * uvsin), 0.0F,
+                         1.000F, ( 1.8556F * uvcos) + ( 0.0000F * uvsin),
+                                 ( 0.0000F * uvcos) - ( 1.8556F * uvsin), 0.0F);
             break;
 
         case kCSTD_ITUR_BT_601:
         default:
-            csc = Matrix(1.000f, ( 0.0000f * uvcos) + ( 1.4030f * uvsin),
-                                 ( 1.4030f * uvcos) - ( 0.0000f * uvsin), 0.0f,
-                         1.000f, (-0.3440f * uvcos) + (-0.7140f * uvsin),
-                                 (-0.7140f * uvcos) - (-0.3440f * uvsin), 0.0f,
-                         1.000f, ( 1.7730f * uvcos) + ( 0.0000f * uvsin),
-                                 ( 0.0000f * uvcos) - ( 1.7730f * uvsin), 0.0f);
+            csc = Matrix(1.000F, ( 0.0000F * uvcos) + ( 1.4030F * uvsin),
+                                 ( 1.4030F * uvcos) - ( 0.0000F * uvsin), 0.0F,
+                         1.000F, (-0.3440F * uvcos) + (-0.7140F * uvsin),
+                                 (-0.7140F * uvcos) - (-0.3440F * uvsin), 0.0F,
+                         1.000F, ( 1.7730F * uvcos) + ( 0.0000F * uvsin),
+                                 ( 0.0000F * uvcos) - ( 1.7730F * uvsin), 0.0F);
     }
 
     m_matrix.setToIdentity();
@@ -238,13 +238,13 @@ void VideoColourSpace::SetStudioLevels(bool studio)
 
 void VideoColourSpace::SetBrightness(int value)
 {
-    m_brightness = (value * 0.02f) - 1.0f;
+    m_brightness = (value * 0.02F) - 1.0F;
     Update();
 }
 
 void VideoColourSpace::SetContrast(int value)
 {
-    m_contrast = value * 0.02f;
+    m_contrast = value * 0.02F;
     Update();
 }
 
@@ -256,7 +256,7 @@ void VideoColourSpace::SetHue(int value)
 
 void VideoColourSpace::SetSaturation(int value)
 {
-    m_saturation = value * 0.02f;
+    m_saturation = value * 0.02F;
     Update();
 }
 

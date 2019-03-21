@@ -49,7 +49,7 @@ bool needToReportState(bool showprogress, bool isrecording, long long frameno)
 void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
         float fps, bool fullspeed)
 {
-    long usperframe = (long)(1000000.0f / fps);
+    long usperframe = (long)(1000000.0F / fps);
     struct timeval now, elapsed;
     long sleepus;
 

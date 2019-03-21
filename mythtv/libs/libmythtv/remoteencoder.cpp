@@ -164,7 +164,7 @@ float RemoteEncoder::GetFrameRate(void)
     strlist << "GET_FRAMERATE";
 
     bool ok = false;
-    float retval = 30.0f;
+    float retval = 30.0F;
 
     if (SendReceiveStringList(strlist, 1))
     {
@@ -183,7 +183,7 @@ float RemoteEncoder::GetFrameRate(void)
             "GetFrameRate(): SendReceiveStringList() failed");
     }
 
-    return (ok) ? retval : 30.0f;
+    return (ok) ? retval : 30.0F;
 }
 
 /** \fn RemoteEncoder::GetFramesWritten(void)

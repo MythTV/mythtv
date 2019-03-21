@@ -206,7 +206,7 @@ QString ImageView::GetRandomEffect(void) const
     tmpMap.remove("none");
     tmpMap.remove("Ken Burns (gl)");
     QStringList t = tmpMap.keys();
-    int i = (int) ( (float)(t.count()) * random() / (RAND_MAX + 1.0f) );
+    int i = (int) ( (float)(t.count()) * random() / (RAND_MAX + 1.0F) );
     return tmpMap[t[i]];
 }
 

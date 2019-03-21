@@ -1936,7 +1936,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDTVSigMon_WaitForSDT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
-        sm->SetRotorTarget(1.0f);
+        sm->SetRotorTarget(1.0F);
 
         if (EITscan)
         {
@@ -1973,7 +1973,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPAT |
                      SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
-        sm->SetRotorTarget(1.0f);
+        sm->SetRotorTarget(1.0F);
 
         if (EITscan)
         {
@@ -2546,7 +2546,7 @@ float TVRec::GetFramerate(void)
 
     if (m_recorder)
         return m_recorder->GetFrameRate();
-    return -1.0f;
+    return -1.0F;
 }
 
 /** \fn TVRec::GetFramesWritten()

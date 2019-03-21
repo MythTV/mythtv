@@ -383,7 +383,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     DecoderBase* dec = GetPlayer()->GetDecoder();
-    float video_aspect = dec ? dec->GetVideoAspect() : 4.0f / 3.0f;
+    float video_aspect = dec ? dec->GetVideoAspect() : 4.0F / 3.0F;
     float video_frame_rate = GetPlayer()->GetFrameRate();
     int newWidth = video_width;
     int newHeight = video_height;
@@ -421,17 +421,17 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         // If height or width are 0, then we need to calculate them
         if (newHeight == 0 && newWidth > 0)
-            newHeight = (int)(1.0f * newWidth / video_aspect);
+            newHeight = (int)(1.0F * newWidth / video_aspect);
         else if (newWidth == 0 && newHeight > 0)
-            newWidth = (int)(1.0f * newHeight * video_aspect);
+            newWidth = (int)(1.0F * newHeight * video_aspect);
         else if (newWidth == 0 && newHeight == 0)
         {
             newHeight = 480;
-            newWidth = (int)(1.0f * 480 * video_aspect);
+            newWidth = (int)(1.0F * 480 * video_aspect);
             if (newWidth > 640)
             {
                 newWidth = 640;
-                newHeight = (int)(1.0f * 640 / video_aspect);
+                newHeight = (int)(1.0F * 640 / video_aspect);
             }
         }
 
@@ -1049,8 +1049,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     // delta between the same video frame in input and output due to applying the cut list
     long long timecodeOffset = 0;
 
-    float rateTimeConv = arb->m_eff_audiorate / 1000.0f;
-    float vidFrameTime = 1000.0f / video_frame_rate;
+    float rateTimeConv = arb->m_eff_audiorate / 1000.0F;
+    float vidFrameTime = 1000.0F / video_frame_rate;
     int wait_recover = 0;
     VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
     bool is_key = false;

@@ -54,8 +54,8 @@ static void print(
 static float find_clock_diff(const QList<float> &list)
 {
     float min_diff = INT32_MAX;
-    float max_diff = 0.0f;
-    float avg_diff = 0.0f;
+    float max_diff = 0.0F;
+    float avg_diff = 0.0F;
     for (uint i = 1; i < uint(list.size()); i++)
     {
         float diff = list[i] - list[i-1];
@@ -65,15 +65,15 @@ static float find_clock_diff(const QList<float> &list)
     }
     if (list.size() >= 2)
         avg_diff /= (list.size() - 1);
-    if (avg_diff * 1.15f < max_diff)
+    if (avg_diff * 1.15F < max_diff)
     {
         LOG(VB_VBI, LOG_DEBUG, "max_diff too big");
-        return 0.0f;
+        return 0.0F;
     }
-    if (avg_diff * 0.85f > max_diff)
+    if (avg_diff * 0.85F > max_diff)
     {
         LOG(VB_VBI, LOG_DEBUG, "min_diff too small");
-        return 0.0f;
+        return 0.0F;
     }
 
     return avg_diff;
@@ -129,7 +129,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
                (m_rawMaximas[i+1] == m_rawMaximas[i] + 1)) i++;
         uint end_idx = m_rawMaximas[i];
         if (end_idx - start_idx > noise_flr_lg)
-            m_maximas.push_back((start_idx + end_idx) * 0.5f);
+            m_maximas.push_back((start_idx + end_idx) * 0.5F);
     }
 
     if (m_maximas.size() < 7)
@@ -145,8 +145,8 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     while (m_maximas.size() > 7 && dropped)
     {
         float min_diff = width * 8;
-        float max_diff = 0.0f;
-        float avg_diff = 0.0f;
+        float max_diff = 0.0F;
+        float avg_diff = 0.0F;
         for (uint i = 1; i < uint(m_maximas.size()); i++)
         {
             float diff = m_maximas[i] - m_maximas[i-1];
@@ -159,35 +159,35 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         avg_diff /= (m_maximas.size() - 3);
 
         dropped = false;
-        if (avg_diff * 1.1f < max_diff)
+        if (avg_diff * 1.1F < max_diff)
         {
             float last_diff = m_maximas.back() -
                               m_maximas[(uint)(m_maximas.size())-2];
-            if (last_diff*1.01f >= max_diff || last_diff > avg_diff * 1.2f)
+            if (last_diff*1.01F >= max_diff || last_diff > avg_diff * 1.2F)
             {
                 m_maximas.pop_back();
                 dropped = true;
             }
             float first_diff = m_maximas[1] - m_maximas[0];
-            if ((m_maximas.size() > 7) && (first_diff*1.01f >= max_diff))
+            if ((m_maximas.size() > 7) && (first_diff*1.01F >= max_diff))
             {
                 m_maximas.pop_front();
                 dropped = true;
             }
         }
 
-        if (avg_diff * 0.9f > min_diff)
+        if (avg_diff * 0.9F > min_diff)
         {
             float last_diff = m_maximas.back() -
                               m_maximas[(uint)(m_maximas.size())-2];
             if ((m_maximas.size() > 7) &&
-                (last_diff*0.99f <= min_diff || last_diff < avg_diff * 0.80f))
+                (last_diff*0.99F <= min_diff || last_diff < avg_diff * 0.80F))
             {
                 m_maximas.pop_back();
                 dropped = true;
             }
             float first_diff = m_maximas[1] - m_maximas[0];
-            if ((m_maximas.size() > 7) && (first_diff*0.99f <= min_diff))
+            if ((m_maximas.size() > 7) && (first_diff*0.99F <= min_diff))
             {
                 m_maximas.pop_front();
                 dropped = true;
@@ -210,7 +210,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         while ((i+1) < uint(m_rawMinimas.size()) &&
                (m_rawMinimas[i+1] == m_rawMinimas[i] + 1)) i++;
         uint end_idx = m_rawMinimas[i];
-        float center = (start_idx + end_idx) * 0.5f;
+        float center = (start_idx + end_idx) * 0.5F;
         if (end_idx - start_idx > noise_flr_lg &&
             center > m_maximas[0] && center < m_maximas.back())
         {
@@ -229,8 +229,8 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     // get the average clock rate in samples
     float maxima_avg_diff = find_clock_diff(m_maximas);
     float minima_avg_diff = find_clock_diff(m_minimas);
-    m_rate = (maxima_avg_diff * 7 + minima_avg_diff * 6) / 13.0f;
-    if (maxima_avg_diff == 0.0f || minima_avg_diff == 0.0f)
+    m_rate = (maxima_avg_diff * 7 + minima_avg_diff * 6) / 13.0F;
+    if (maxima_avg_diff == 0.0F || minima_avg_diff == 0.0F)
         return false;
 
     // get the estimated location of the first maxima
@@ -241,7 +241,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     m_start /= m_maximas.size();
     // then move it back by a third to make each sample
     // more or less in the center of each encoded byte.
-    m_start -= m_rate * 0.33f;
+    m_start -= m_rate * 0.33F;
 
     // if the last bit is after the last sample...
     // 7 clocks + 3 bits run in + 16 bits data

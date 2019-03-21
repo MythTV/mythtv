@@ -297,7 +297,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     if (popm)
     {
         int rating = popm->rating();
-        rating = lroundf(static_cast<float>(rating) / 255.0f * 10.0f);
+        rating = lroundf(static_cast<float>(rating) / 255.0F * 10.0F);
         metadata->setRating(rating);
         metadata->setPlaycount(popm->counter());
     }
@@ -906,7 +906,7 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
     if (!tag)
         return false;
 
-    int popmrating = lroundf(static_cast<float>(rating) / 10.0f * 255.0f);
+    int popmrating = lroundf(static_cast<float>(rating) / 10.0F * 255.0F);
 
     // MythTV Specific Rating Tag
     PopularimeterFrame *popm = findPOPM(tag, email);

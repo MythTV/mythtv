@@ -1348,14 +1348,14 @@ void NuppelVideoRecorder::DoV4L2(void)
         comp.gop_size = m_keyframedist;
         comp.max_b_frames = 0;
 
-        if (fabs(m_video_aspect - 1.33333f) < 0.01f)
+        if (fabs(m_video_aspect - 1.33333F) < 0.01F)
         {
             if (m_ntsc)
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_NTSC;
             else
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_PAL;
         }
-        else if (fabs(m_video_aspect - 1.77777f) < 0.01f)
+        else if (fabs(m_video_aspect - 1.77777F) < 0.01F)
         {
             if (m_ntsc)
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_16_9_NTSC;

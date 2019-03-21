@@ -125,7 +125,7 @@ static QSize get_video_dim(const AVCodecContext &ctx)
 }
 static float get_aspect(const AVCodecContext &ctx)
 {
-    float aspect_ratio = 0.0f;
+    float aspect_ratio = 0.0F;
 
     if (ctx.sample_aspect_ratio.num && ctx.height)
     {
@@ -134,31 +134,31 @@ static float get_aspect(const AVCodecContext &ctx)
         aspect_ratio /= (float) ctx.height;
     }
 
-    if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
+    if (aspect_ratio <= 0.0F || aspect_ratio > 6.0F)
     {
         if (ctx.height)
             aspect_ratio = (float)ctx.width / (float)ctx.height;
         else
-            aspect_ratio = 4.0f / 3.0f;
+            aspect_ratio = 4.0F / 3.0F;
     }
 
     return aspect_ratio;
 }
 static float get_aspect(H264Parser &p)
 {
-    static const float default_aspect = 4.0f / 3.0f;
+    static const float default_aspect = 4.0F / 3.0F;
     int asp = p.aspectRatio();
     switch (asp)
     {
         case 0: return default_aspect;
-        case 2: return 4.0f / 3.0f;
-        case 3: return 16.0f / 9.0f;
-        case 4: return 2.21f;
+        case 2: return 4.0F / 3.0F;
+        case 3: return 16.0F / 9.0F;
+        case 4: return 2.21F;
         default: break;
     }
 
-    float aspect_ratio = asp * 0.000001f;
-    if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
+    float aspect_ratio = asp * 0.000001F;
+    if (aspect_ratio <= 0.0F || aspect_ratio > 6.0F)
     {
         if (p.pictureHeight() && p.pictureWidth())
         {
@@ -675,7 +675,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     int seekDelta = desiredFrame - m_framesPlayed;
 
     // avoid using av_frame_seek if we are seeking frame-by-frame when paused
-    if (seekDelta >= 0 && seekDelta < 2 && !m_dorewind && m_parent->GetPlaySpeed() == 0.0f)
+    if (seekDelta >= 0 && seekDelta < 2 && !m_dorewind && m_parent->GetPlaySpeed() == 0.0F)
     {
         SeekReset(m_framesPlayed, seekDelta, false, true);
         m_parent->SetFramesPlayed(m_framesPlayed + 1);
@@ -1296,7 +1296,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)m_bitrate / 8 / 2;
-            float secs = ringBuffer->GetRealFileSize() * 1.0f / bytespersec;
+            float secs = ringBuffer->GetRealFileSize() * 1.0F / bytespersec;
             m_parent->SetFileLength((int)(secs),
                                     (int)(secs * static_cast<float>(m_fps)));
         }
@@ -1380,7 +1380,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
     float fps, avg_fps, codec_fps, container_fps, estimated_fps;
-    avg_fps = codec_fps = container_fps = estimated_fps = 0.0f;
+    avg_fps = codec_fps = container_fps = estimated_fps = 0.0F;
 
     if (stream->avg_frame_rate.den && stream->avg_frame_rate.num)
         avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
@@ -1388,7 +1388,7 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if (enc->time_base.den && enc->time_base.num) // tbc
         codec_fps = 1.0 / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
-    if (codec_fps > 121.0f && (enc->time_base.den > 10000) &&
+    if (codec_fps > 121.0F && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
@@ -1404,21 +1404,21 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
     if ((QString(m_ic->iformat->name).contains("matroska") ||
         QString(m_ic->iformat->name).contains("mov")) &&
-        avg_fps < 121.0f && avg_fps > 3.0f)
+        avg_fps < 121.0F && avg_fps > 3.0F)
         fps = avg_fps;
     else if (QString(m_ic->iformat->name).contains("avi") &&
-        container_fps < 121.0f && container_fps > 3.0f)
+        container_fps < 121.0F && container_fps > 3.0F)
         fps = container_fps; // avi uses container fps for timestamps
-    else if (codec_fps < 121.0f && codec_fps > 3.0f)
+    else if (codec_fps < 121.0F && codec_fps > 3.0F)
         fps = codec_fps;
-    else if (container_fps < 121.0f && container_fps > 3.0f)
+    else if (container_fps < 121.0F && container_fps > 3.0F)
         fps = container_fps;
-    else if (estimated_fps < 121.0f && estimated_fps > 3.0f)
+    else if (estimated_fps < 121.0F && estimated_fps > 3.0F)
         fps = estimated_fps;
-    else if (avg_fps < 121.0f && avg_fps > 3.0f)
+    else if (avg_fps < 121.0F && avg_fps > 3.0F)
         fps = avg_fps;
     else
-        fps = 30000.0f / 1001.0f; // 29.97 fps
+        fps = 30000.0F / 1001.0F; // 29.97 fps
 
     if (fps != m_fps)
     {
@@ -1764,8 +1764,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 "InitVideoCodec invalid dimensions, resetting decoder.");
             width  = 640;
             height = 480;
-            m_fps    = 29.97f;
-            m_current_aspect = 4.0f / 3.0f;
+            m_fps    = 29.97F;
+            m_current_aspect = 4.0F / 3.0F;
         }
 
         m_parent->SetKeyframeDistance(m_keyframedist);
@@ -3468,7 +3468,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     {
         bufptr = avpriv_find_start_code(bufptr, bufend, &m_start_code_state);
 
-        float aspect_override = -1.0f;
+        float aspect_override = -1.0F;
         if (ringBuffer->IsDVD())
             aspect_override = ringBuffer->DVD()->GetAspectOverride();
 
@@ -3488,13 +3488,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             if (stream->sample_aspect_ratio.num)
                 m_current_aspect = av_q2d(stream->sample_aspect_ratio) *
                     width / height;
-            if (aspect_override > 0.0f)
+            if (aspect_override > 0.0F)
                 m_current_aspect = aspect_override;
             float seqFPS = seq->fps();
 
             bool changed =
-                (seqFPS > static_cast<float>(m_fps)+0.01f) ||
-                (seqFPS < static_cast<float>(m_fps)-0.01f);
+                (seqFPS > static_cast<float>(m_fps)+0.01F) ||
+                (seqFPS < static_cast<float>(m_fps)-0.01F);
             changed |= (width  != (uint)m_current_width );
             changed |= (height != (uint)m_current_height);
 
@@ -3521,7 +3521,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 // fps debugging info
                 float avFPS = normalized_fps(stream, context);
-                if ((seqFPS > avFPS+0.01f) || (seqFPS < avFPS-0.01f))
+                if ((seqFPS > avFPS+0.01F) || (seqFPS < avFPS-0.01F))
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("avFPS(%1) != seqFPS(%2)")
@@ -3604,9 +3604,9 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool res_changed = ((width  != (uint)m_current_width) ||
                             (height != (uint)m_current_height));
         bool fps_changed =
-            (seqFPS > 0.0f) &&
-            ((seqFPS > static_cast<float>(m_fps) + 0.01f) ||
-             (seqFPS < static_cast<float>(m_fps) - 0.01f));
+            (seqFPS > 0.0F) &&
+            ((seqFPS > static_cast<float>(m_fps) + 0.01F) ||
+             (seqFPS < static_cast<float>(m_fps) - 0.01F));
 
         if (fps_changed || res_changed)
         {
@@ -3618,7 +3618,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_current_width  = width;
             m_current_height = height;
 
-            if (seqFPS > 0.0f)
+            if (seqFPS > 0.0F)
                 m_fps = seqFPS;
 
             m_gopset = false;
@@ -3633,7 +3633,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             // fps debugging info
             float avFPS = normalized_fps(stream, context);
-            if ((seqFPS > avFPS+0.01f) || (seqFPS < avFPS-0.01f))
+            if ((seqFPS > avFPS+0.01F) || (seqFPS < avFPS-0.01F))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("avFPS(%1) != seqFPS(%2)")
@@ -5048,7 +5048,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             // audio.
             if (m_skipaudio && m_selectedTrack[kTrackTypeVideo].m_av_stream_index > -1)
             {
-                if ((m_lastapts < m_lastvpts - (10.0f / m_fps)) || m_lastvpts == 0)
+                if ((m_lastapts < m_lastvpts - (10.0F / m_fps)) || m_lastvpts == 0)
                     break;
                 m_skipaudio = false;
             }

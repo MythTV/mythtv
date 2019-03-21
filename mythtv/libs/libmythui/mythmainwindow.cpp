@@ -138,8 +138,8 @@ class MythMainWindowPrivate
 
     int TranslateKeyNum(QKeyEvent *e);
 
-    float                m_wmult                {1.0f};
-    float                m_hmult                {1.0f};
+    float                m_wmult                {1.0F};
+    float                m_hmult                {1.0F};
     int                  m_screenwidth          {0};
     int                  m_screenheight         {0};
 

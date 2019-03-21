@@ -124,7 +124,7 @@ RecordingInfo::RecordingInfo(
 
     m_recpriority = _recpriority;
 
-    m_stars = clamp(_stars, 0.0f, 1.0f);
+    m_stars = clamp(_stars, 0.0F, 1.0F);
     m_originalAirDate = _originalAirDate;
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();

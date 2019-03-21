@@ -561,8 +561,8 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     m_userrating = (float)query.value(7).toDouble();
     if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
-    if (m_userrating > 10.0f)
-        m_userrating = 10.0f;
+    if (m_userrating > 10.0F)
+        m_userrating = 10.0F;
     m_length = query.value(8).toInt();
     m_playcount = query.value(9).toInt();
     m_filename = query.value(10).toString();
@@ -643,7 +643,7 @@ void VideoMetadataImp::saveToDatabase()
         m_inetref = VIDEO_INETREF_DEFAULT;
     if (isnan(m_userrating))
         m_userrating = 0.0;
-    if (m_userrating < -10.0f || m_userrating > 10.0f)
+    if (m_userrating < -10.0F || m_userrating > 10.0F)
         m_userrating = 0.0;
     if (m_releasedate.toString().isEmpty())
         m_releasedate = QDate::fromString("0000-00-00", "YYYY-MM-DD");

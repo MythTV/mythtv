@@ -65,7 +65,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual void Reconfigure(const AudioSettings &settings) = 0;
 
     virtual void SetStretchFactor(float factor);
-    virtual float GetStretchFactor(void) const { return 1.0f; }
+    virtual float GetStretchFactor(void) const { return 1.0F; }
     virtual int GetChannels(void) const { return 2; }
     virtual AudioFormat GetFormat(void) const { return FORMAT_S16; };
     virtual int GetBytesPerFrame(void) const { return 4; };

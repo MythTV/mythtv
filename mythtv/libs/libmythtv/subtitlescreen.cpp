@@ -1313,9 +1313,9 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     if (m_subScreen)
         m_subScreen->SetFontSize(pixelSize);
 
-    float xrange  = win.m_relative_pos ? 100.0f :
-                    (aspect > 1.4f) ? 210.0f : 160.0f;
-    float yrange  = win.m_relative_pos ? 100.0f : 75.0f;
+    float xrange  = win.m_relative_pos ? 100.0F :
+                    (aspect > 1.4F) ? 210.0F : 160.0F;
+    float yrange  = win.m_relative_pos ? 100.0F : 75.0F;
     float xmult   = (float)m_safeArea.width() / xrange;
     float ymult   = (float)m_safeArea.height() / yrange;
     uint anchor_x = (uint)(xmult * (float)win.m_anchor_horizontal);
@@ -1537,7 +1537,7 @@ void SubtitleScreen::Clear708Cache(uint64_t mask)
         if (wrapper)
         {
             int whichImageCache = wrapper->GetWhichImageCache();
-            if (whichImageCache != -1 && (mask & (1ul << whichImageCache)))
+            if (whichImageCache != -1 && (mask & (1UL << whichImageCache)))
             {
                 SetElementDeleted();
                 DeleteChild(child);
@@ -1846,8 +1846,8 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                     !display.width() || !display.height())
                 {
                     int sd_height = 576;
-                    if ((m_player->GetFrameRate() > 26.0f ||
-                         m_player->GetFrameRate() < 24.0f) && bottom <= 480)
+                    if ((m_player->GetFrameRate() > 26.0F ||
+                         m_player->GetFrameRate() < 24.0F) && bottom <= 480)
                         sd_height = 480;
                     int height = ((currentFrame->height <= sd_height) &&
                                   (bottom <= sd_height)) ? sd_height :
@@ -2236,7 +2236,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         if (!win.GetChanged())
             continue;
 
-        clearMask |= (1ul << i);
+        clearMask |= (1UL << i);
         win.ResetChanged();
         if (!win.GetExists() || !win.GetVisible())
             continue;

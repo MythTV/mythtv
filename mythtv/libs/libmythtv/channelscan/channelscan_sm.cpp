@@ -1793,7 +1793,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     {
         // always wait for rotor to finish
         GetDVBSignalMonitor()->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
-        GetDVBSignalMonitor()->SetRotorTarget(1.0f);
+        GetDVBSignalMonitor()->SetRotorTarget(1.0F);
     }
 #endif // USING_DVB
 

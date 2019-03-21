@@ -263,7 +263,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     QMap<uint, QList<uint64_t> > m_chapterMap;
 
     MythDVDPlayer  *m_parent                {nullptr};
-    float           m_forcedAspect          {-1.0f};
+    float           m_forcedAspect          {-1.0F};
 
     QMutex          m_contextLock           {QMutex::Recursive};
     MythDVDContext *m_context               {nullptr};

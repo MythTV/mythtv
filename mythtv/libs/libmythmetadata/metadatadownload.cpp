@@ -281,7 +281,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                 (hasArtwork &&
                  ((!foundMatchWithArt) ||
                   (((*i)->GetPopularity() > exactTitlePopularity)) ||
-                  ((exactTitlePopularity == 0.0f) && ((*i)->GetReleaseDate() > exactTitleDate)))))
+                  ((exactTitlePopularity == 0.0F) && ((*i)->GetReleaseDate() > exactTitleDate)))))
             {
                 exactTitleDate = (*i)->GetReleaseDate();
                 exactTitlePopularity = (*i)->GetPopularity();
