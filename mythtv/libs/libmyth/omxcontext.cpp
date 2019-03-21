@@ -1110,7 +1110,7 @@ const char *Command2String(OMX_COMMANDTYPE cmd)
             (_n) &= ~OMX_BUFFERFLAG_##_f;\
             (_l) << STR(_f);\
         }\
-    } while(0)
+    } while(false)
 
 QString HeaderFlags(OMX_U32 nFlags)
 {

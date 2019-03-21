@@ -1248,7 +1248,7 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
     return false;
 }
 
-#define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
+#define INT_TO_LIST(x)       do { list << QString::number(x); } while (false)
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
@@ -1259,15 +1259,15 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
                                  } else {                                 \
                                      INT_TO_LIST(kInvalidDateTime);       \
                                  }                                        \
-                             } while (0)
+                             } while (false)
 #endif
 
-#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (0)
+#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (false)
 
-#define STR_TO_LIST(x)       do { list << (x); } while (0)
-#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (0)
+#define STR_TO_LIST(x)       do { list << (x); } while (false)
+#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (false)
 
-#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (0)
+#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (false)
 
 /** \fn ProgramInfo::ToStringList(QStringList&) const
  *  \brief Serializes ProgramInfo into a QStringList which can be passed
@@ -1345,17 +1345,17 @@ void ProgramInfo::ToStringList(QStringList &list) const
                                    clear();                          \
                                    return false;                     \
                                }                                     \
-                               ts = *it++; } while (0)
+                               ts = *it++; } while (false)
 
-#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
-#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
+#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (false)
+#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (false)
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
          x = (ts.toUInt() == kInvalidDateTime ?                         \
               QDateTime() : MythDate::fromTime_t(ts.toUInt()));         \
-    } while (0)
+    } while (false)
 #else
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
@@ -1364,16 +1364,16 @@ void ProgramInfo::ToStringList(QStringList &list) const
          } else {                                                       \
               (x) = MythDate::fromSecsSinceEpoch(ts.toLongLong());      \
          }                                                              \
-    } while (0)
+    } while (false)
 #endif
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
-    } while (0)
+    } while (false)
 
-#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (0)
+#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (false)
 
-#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (0)
+#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (false)
 
 /** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
                                     QStringList::const_iterator)

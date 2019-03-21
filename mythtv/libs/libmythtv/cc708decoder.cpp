@@ -123,7 +123,7 @@ do { \
                       cc->m_temp_str_size[service_num]); \
         cc->m_temp_str_size[service_num] = 0; \
     } \
-} while (0)
+} while (false)
 
 static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
 {

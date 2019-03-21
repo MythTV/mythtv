@@ -749,7 +749,7 @@ void StatusBox::doScheduleStatus()
                                      .arg(statusText[rtype]);   \
             AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, fstate);\
         }                                                       \
-    } while (0)
+    } while (false)
     ADD_STATUS_LOG_LINE(RecStatus::Recording, "");
     ADD_STATUS_LOG_LINE(RecStatus::Tuning, "");
     ADD_STATUS_LOG_LINE(RecStatus::Failing, "error");

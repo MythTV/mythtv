@@ -215,7 +215,7 @@ static int has_codec_parameters(AVStream *st)
 #define FAIL(errmsg) do {                                     \
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + (errmsg));              \
     return 0;                                                 \
-} while (0)
+} while (false)
 
     switch (st->codecpar->codec_type)
     {

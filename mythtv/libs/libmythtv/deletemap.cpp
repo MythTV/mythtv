@@ -19,7 +19,7 @@
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot edit outside edit mode."); \
         return; \
     } \
-} while(0)
+} while(false)
 
 void DeleteMap::Push(const QString &undoMessage)
 {

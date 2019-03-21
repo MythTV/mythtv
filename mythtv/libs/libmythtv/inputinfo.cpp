@@ -9,7 +9,7 @@ void InputInfo::Clear(void)
     *this = blank;
 }
 
-#define NEXT() do { ++it; if (it == end) return false; } while (0)
+#define NEXT() do { ++it; if (it == end) return false; } while (false)
 bool InputInfo::FromStringList(QStringList::const_iterator &it,
                                QStringList::const_iterator end)
 {

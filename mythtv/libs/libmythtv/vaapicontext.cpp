@@ -27,7 +27,7 @@
       ok = arg1; \
       if (!ok) \
           LOG(VB_GENERAL, LOG_ERR, LOC + (arg2)); \
-  } while(0)
+  } while(false)
 
 QString profileToString(VAProfile profile);
 QString entryToString(VAEntrypoint entry);

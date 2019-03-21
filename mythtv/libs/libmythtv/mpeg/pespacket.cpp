@@ -103,7 +103,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
  */
 void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
 {
-#define INCR_CC(_CC_) do { (_CC_) = ((_CC_) + 1) & 0xf; } while (0)
+#define INCR_CC(_CC_) do { (_CC_) = ((_CC_) + 1) & 0xf; } while (false)
     uint last_byte_of_pesdata = Length() + 4 - 1;
     uint size = last_byte_of_pesdata + _pesdata - _fullbuffer;
 

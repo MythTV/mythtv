@@ -38,7 +38,7 @@ QString getVideoProps(unsigned char props);
 #else
     #define PRINT_EVENT(a)
 #endif
-#define TEST_AND_ADD(t,m,s) do{if ((t) & (m)) {(s) += " | "#m;(t) &= ~(m);}}while(0)
+#define TEST_AND_ADD(t,m,s) do{if ((t) & (m)) {(s) += " | "#m;(t) &= ~(m);}}while(false)
 
 QString getSubtitleType(unsigned char type)
 {

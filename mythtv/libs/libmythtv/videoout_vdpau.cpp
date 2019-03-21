@@ -24,7 +24,7 @@
   { \
       LOG(VB_GENERAL, LOG_ERR, LOC + QString("IsErrored() in %1").arg(Loc)); \
       return; \
-  } while(0)
+  } while(false)
 
 void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
 {
