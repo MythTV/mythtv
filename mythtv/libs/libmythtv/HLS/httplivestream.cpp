@@ -145,8 +145,7 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
 }
 
 HTTPLiveStream::HTTPLiveStream(int streamid)
-  : m_writing(false),
-    m_streamid(streamid)
+  : m_streamid(streamid)
 {
     LoadFromDB();
 }

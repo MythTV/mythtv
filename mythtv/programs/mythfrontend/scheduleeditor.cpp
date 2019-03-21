@@ -107,14 +107,8 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             FilterOptMixin(*this, recRule),
             StoreOptMixin(*this, recRule),
             PostProcMixin(*this, recRule),
-            m_recInfo(nullptr), m_recordingRule(recRule),
-            m_sendSig(false),
-            m_saveButton(nullptr), m_cancelButton(nullptr), m_rulesList(nullptr),
-            m_schedOptButton(nullptr), m_storeOptButton(nullptr),
-            m_postProcButton(nullptr), m_schedInfoButton(nullptr),
-            m_previewButton(nullptr), m_metadataButton(nullptr),
-            m_filtersButton(nullptr),
-            m_player(player), m_loaded(false), m_view(kMainView), m_child(nullptr)
+            m_recordingRule(recRule),
+            m_player(player),  m_view(kMainView)
 {
 }
 

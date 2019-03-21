@@ -192,7 +192,7 @@ class VDPAUVideoSurface : public VDPAUResource
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
     }
     VDPAUVideoSurface(uint id, QSize size, VdpChromaType type)
-      : VDPAUResource(id, size), m_type(type), m_needs_reset(false)
+      : VDPAUResource(id, size), m_type(type)
     {
         m_owner = QThread::currentThread();
         memset(&m_render, 0, sizeof(struct vdpau_render_state));

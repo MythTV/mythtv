@@ -263,8 +263,7 @@ public:
           m_verticalLayout(gs.m_verticalLayout),
           m_firstTime(gs.m_firstTime),
           m_lastTime(gs.m_lastTime),
-          m_proglists(proglists),
-          m_progPast(0)
+          m_proglists(proglists)
     {
         for (unsigned int i = m_firstRow;
              i < m_firstRow + m_numRows; ++i)

@@ -60,17 +60,16 @@ namespace
     }
 }
 
-ParentalLevel::ParentalLevel(Level pl) : m_level(pl),
-    m_hitlimit(false)
+ParentalLevel::ParentalLevel(Level pl) : m_level(pl)
 {
 }
 
-ParentalLevel::ParentalLevel(int pl) :  m_hitlimit(false)
+ParentalLevel::ParentalLevel(int pl)
 {
     m_level = toParentalLevel(pl);
 }
 
-ParentalLevel::ParentalLevel(const ParentalLevel &rhs) : m_hitlimit(false)
+ParentalLevel::ParentalLevel(const ParentalLevel &rhs)
 {
     *this = rhs;
 }

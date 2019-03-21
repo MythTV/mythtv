@@ -79,28 +79,11 @@ ProgLister::ProgLister(
     m_type(plPreviouslyRecorded),
     m_recid(recid),
     m_title(title),
-    m_extraArg(),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-
-    m_searchType(kNoSearch),
-
     m_view("reverse time"),
-    m_curView(-1),
-
-    m_allowEvents(true),
-    m_titleSort(false),
-    m_reverseSort(true),
-    m_useGenres(false),
-
-    m_schedText(nullptr),
-    m_curviewText(nullptr),
-    m_positionText(nullptr),
-    m_progList(nullptr),
-    m_messageText(nullptr),
-
-    m_allowViewDialog(true)
+    m_reverseSort(true)
 {
 }
 

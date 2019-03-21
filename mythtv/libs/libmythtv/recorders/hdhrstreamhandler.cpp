@@ -101,7 +101,6 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 HDHRStreamHandler::HDHRStreamHandler(const QString &device, int inputid,
                                      int majorid)
     : StreamHandler(device, inputid)
-    , m_tune_mode(hdhrTuneModeNone)
     , m_majorid(majorid)
 {
     setObjectName("HDHRStreamHandler");
