@@ -2469,7 +2469,7 @@ QString ProgramInfo::GetPlaybackURL(
     if (basename.isEmpty())
         return "";
 
-    bool checklocal = !gCoreContext->GetNumSetting("AlwaysStreamFiles", 0) ||
+    bool checklocal = !gCoreContext->GetBoolSetting("AlwaysStreamFiles", false) ||
                       forceCheckLocal;
 
     if (IsVideo())
