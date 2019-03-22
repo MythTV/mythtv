@@ -211,8 +211,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             encoders.appendChild(encoder);
 
             encoder.setAttribute("id"            , elink->GetInputID()      );
-            encoder.setAttribute("local"         , isLocal                  );
-            encoder.setAttribute("connected"     , elink->IsConnected()     );
+            encoder.setAttribute("local"         , static_cast<int>(isLocal));
+            encoder.setAttribute("connected"     , static_cast<int>(elink->IsConnected()));
             encoder.setAttribute("state"         , state                    );
             encoder.setAttribute("sleepstatus"   , elink->GetSleepStatus()  );
             //encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
@@ -725,9 +725,9 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
                                                            ? "local" : "remote";
                 QString sCardId   =  e.attribute( "id"       , "0"      );
                 QString sHostName =  e.attribute( "hostname" , "Unknown");
-                bool    bConnected=  e.attribute( "connected", "0"      ).toInt();
+                bool    bConnected=  static_cast<bool>(e.attribute( "connected", "0" ).toInt());
 
-                bool bIsLowOnFreeSpace=e.attribute( "lowOnFreeSpace", "0").toInt();
+                bool bIsLowOnFreeSpace=static_cast<bool>(e.attribute( "lowOnFreeSpace", "0").toInt());
 
                 QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
 
@@ -1512,7 +1512,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
     program.setAttribute( "subTitle"    , pInfo->GetSubtitle());
     program.setAttribute( "category"    , pInfo->GetCategory());
     program.setAttribute( "catType"     , pInfo->GetCategoryTypeString());
-    program.setAttribute( "repeat"      , pInfo->IsRepeat()   );
+    program.setAttribute( "repeat"      , static_cast<int>(pInfo->IsRepeat()));
 
     if (bDetails)
     {

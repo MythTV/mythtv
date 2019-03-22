@@ -588,7 +588,7 @@ void MythBurn::createConfigFile(const QString &filename)
 
         QDomElement file = doc.createElement("file");
         file.setAttribute("type", a->type.toLower() );
-        file.setAttribute("usecutlist", a->useCutlist);
+        file.setAttribute("usecutlist", static_cast<int>(a->useCutlist));
         file.setAttribute("filename", a->filename);
         file.setAttribute("encodingprofile", a->encoderProfile->name);
         if (a->editedDetails)
@@ -624,11 +624,11 @@ void MythBurn::createConfigFile(const QString &filename)
 
     // add the options to the xml file
     QDomElement options = doc.createElement("options");
-    options.setAttribute("createiso", m_bCreateISO);
-    options.setAttribute("doburn", m_bDoBurn);
+    options.setAttribute("createiso", static_cast<int>(m_bCreateISO));
+    options.setAttribute("doburn", static_cast<int>(m_bDoBurn));
     options.setAttribute("mediatype", m_archiveDestination.type);
     options.setAttribute("dvdrsize", (qint64)m_archiveDestination.freeSpace);
-    options.setAttribute("erasedvdrw", m_bEraseDvdRw);
+    options.setAttribute("erasedvdrw", static_cast<int>(m_bEraseDvdRw));
     options.setAttribute("savefilename", m_saveFilename);
     job.appendChild(options);
 
