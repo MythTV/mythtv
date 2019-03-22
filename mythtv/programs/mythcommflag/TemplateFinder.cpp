@@ -34,7 +34,8 @@ using namespace commDetector2;
 
 namespace {
 
-int writeJPG(QString prefix, const AVFrame *img, int imgheight)
+//returns true on success, false otherwise
+bool writeJPG(QString prefix, const AVFrame *img, int imgheight)
 {
     const int imgwidth = img->linesize[0];
     QFileInfo jpgfi(prefix + ".jpg");
@@ -47,24 +48,24 @@ int writeJPG(QString prefix, const AVFrame *img, int imgheight)
             if (pgm_write(img->data[0], imgwidth, imgheight,
                           pfname.constData()))
             {
-                return -1;
+                return false;
             }
         }
 
         QString cmd = QString("convert -quality 50 -resize 192x144 %1 %2")
                       .arg(pgmfile.fileName()).arg(jpgfi.filePath());
         if (myth_system(cmd) != GENERIC_EXIT_OK)
-            return -1;
+            return false;
 
         if (!pgmfile.remove())
         {
             LOG(VB_COMMFLAG, LOG_ERR, 
                 QString("TemplateFinder.writeJPG error removing %1 (%2)")
                     .arg(pgmfile.fileName()).arg(strerror(errno)));
-            return -1;
+            return false;
         }
     }
-    return 0;
+    return true;
 }
 
 int
@@ -442,7 +443,7 @@ bounding_box(const AVFrame *img, int imgheight,
     return 0;
 }
 
-int
+bool
 template_alloc(const unsigned int *scores, int width, int height,
         int minrow, int mincol, int maxrow1, int maxcol1, AVFrame *tmpl,
         int *ptmplrow, int *ptmplcol, int *ptmplwidth, int *ptmplheight,
@@ -470,7 +471,7 @@ template_alloc(const unsigned int *scores, int width, int height,
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("template_alloc av_image_alloc thresh (%1x%2) failed")
                 .arg(width).arg(height));
-        return -1;
+        return false;
     }
 
     sortedscores = new unsigned int[nn];
@@ -522,14 +523,14 @@ template_alloc(const unsigned int *scores, int width, int height,
         unsigned int maxscore = sortedscores[nn - 1];
         for (ii = 0; ii < nn; ii++)
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
-        int error = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
+        bool success = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
                 height);
         av_freep(&scored.data[0]);
-        if (error)
+        if (!success)
             goto free_thresh;
 
         /* Thresholded scores. */
-        if (writeJPG(debugdir + "/TemplateFinder-edgecounts", &thresh, height))
+        if (!writeJPG(debugdir + "/TemplateFinder-edgecounts", &thresh, height))
             goto free_thresh;
     }
 
@@ -564,15 +565,15 @@ template_alloc(const unsigned int *scores, int width, int height,
     delete []sortedscores;
     av_freep(&thresh.data[0]);
 
-    return 0;
+    return true;
 
 free_thresh:
     delete []sortedscores;
     av_freep(&thresh.data[0]);
-    return -1;
+    return false;
 }
 
-int
+bool
 analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
         const AVFrame *cropped, const AVFrame *edges, int cropheight,
         int croprow, int cropcol, bool debug_frames, QString debugdir)
@@ -588,7 +589,7 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
     heightsame = abs(lastheight - cropheight) <= delta ? 1 : 0;
 
     if (frameno > 0 && rowsame + colsame + widthsame + heightsame >= 3)
-        return 0;
+        return true;
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateFinder Frame %1: %2x%3@(%4,%5)")
@@ -607,22 +608,19 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
             .arg(debugdir).arg(frameno, 5, 10, QChar('0'));
 
         /* PGM greyscale image of frame. */
-        if (writeJPG(base, pgm, pgmheight))
-            goto error;
+        if (!writeJPG(base, pgm, pgmheight))
+            return false;
 
         /* Cropped template area of frame. */
-        if (writeJPG(base + "-cropped", cropped, cropheight))
-            goto error;
+        if (!writeJPG(base + "-cropped", cropped, cropheight))
+            return false;
 
         /* Edges of cropped template area of frame. */
-        if (writeJPG(base + "-edges", edges, cropheight))
-            goto error;
+        if (!writeJPG(base + "-edges", edges, cropheight))
+            return false;
     }
 
-    return 0;
-
-error:
-    return -1;
+    return true;
 }
 
 bool
@@ -958,7 +956,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
 
         if (m_debugLevel >= 2)
         {
-            if (analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
+            if (!analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
                         cropheight, croprow, cropcol, m_debug_frames, m_debugdir))
                 goto error;
         }
@@ -990,7 +988,7 @@ TemplateFinder::finished(long long nframes, bool final)
     (void)nframes;  /* gcc */
     if (!m_tmpl_done)
     {
-        if (template_alloc(scores, m_width, m_height,
+        if (!template_alloc(scores, m_width, m_height,
                     mincontentrow, mincontentcol,
                     maxcontentrow1, maxcontentcol1,
                     &m_tmpl, &m_tmplrow, &m_tmplcol, &m_tmplwidth, &m_tmplheight,

@@ -97,17 +97,15 @@ using namespace std;
 
 namespace {
 
-int delete_file_immediately(const QString &filename,
+bool delete_file_immediately(const QString &filename,
                             bool followLinks, bool checkexists)
 {
-    /* Return 0 for success, non-zero for error. */
+    /* Return true for success, false for error. */
     QFile checkFile(filename);
-    int success1, success2;
+    bool success1 = true, success2 = true;
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("About to delete file: %1").arg(filename));
-    success1 = true;
-    success2 = true;
     if (followLinks)
     {
         QFileInfo finfo(filename);
@@ -130,7 +128,7 @@ int delete_file_immediately(const QString &filename,
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error deleting '%1': %2")
                 .arg(filename).arg(strerror(errno)));
     }
-    return success1 && success2 ? 0 : -1;
+    return success1 && success2;
 }
 
 };
@@ -3558,7 +3556,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     QStringList::const_iterator it = slist.begin() + 2;
     RecordingInfo recinfo(it, slist.end());
 
-    int exists = 0;
+    bool exists = false;
 
     if (recinfo.HasPathname() && (m_ismaster) &&
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
@@ -3571,7 +3569,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
             exists = slave->CheckFile(&recinfo);
             slave->DecrRef();
 
-            QStringList outputlist( QString::number(exists) );
+            QStringList outputlist( QString::number(static_cast<int>(exists)) );
             if (exists)
                 outputlist << recinfo.GetPathname();
             else
@@ -3591,7 +3589,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
             pburl.clear();
     }
 
-    QStringList strlist( QString::number(exists) );
+    QStringList strlist( QString::number(static_cast<int>(exists)) );
     strlist << pburl;
     SendResponse(pbssock, strlist);
 }
