@@ -571,7 +571,7 @@ bool FileServerHandler::HandleQueryCheckFile(SocketHandler *socket,
     QStringList::const_iterator it = slist.begin() + 2;
     RecordingInfo recinfo(it, slist.end());
 
-    int exists = 0;
+    bool exists = false;
 
     QString pburl;
     if (recinfo.HasPathname())
@@ -582,7 +582,7 @@ bool FileServerHandler::HandleQueryCheckFile(SocketHandler *socket,
             pburl.clear();
     }
 
-    QStringList res(QString::number(exists));
+    QStringList res(QString::number(static_cast<int>(exists)));
     res << pburl;
     socket->WriteStringList(res);
     return true;

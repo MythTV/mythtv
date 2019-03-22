@@ -615,9 +615,9 @@ void CC708Pen::SetPenStyle(uint style)
     attr.m_pen_size   = k708AttrSizeStandard;
     attr.m_offset     = k708AttrOffsetNormal;
     attr.m_font_tag   = style2font[style];
-    attr.m_italics    = 0;
-    attr.m_underline  = 0;
-    attr.m_boldface   = 0;
+    attr.m_italics    = false;
+    attr.m_underline  = false;
+    attr.m_boldface   = false;
     attr.m_edge_type  = 0;
     attr.m_fg_color   = k708AttrColorWhite;
     attr.m_fg_opacity = k708AttrOpacitySolid;

@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     int found_chanid = 0;
     int found_infile = 0;
     int update_index = 1;
-    int isVideo = 0;
+    bool isVideo = false;
     bool passthru = false;
 
     MythTranscodeCommandLineParser cmdline;
