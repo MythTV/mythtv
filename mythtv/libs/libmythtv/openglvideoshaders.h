@@ -406,7 +406,7 @@ static const QString YV12RGBLinearBlendFragmentShader[2] = {
 "}\n"};
 
 #define KERNELYVU "\
-vec3 kernelYVU(in highp vec3 yvu, sampler2D texture11, sampler2D texture12, sampler2D texture13, sampler2D texture21, sampler2D texture22, sampler2D texture23)\n\
+highp vec3 kernelYVU(in highp vec3 yvu, sampler2D texture11, sampler2D texture12, sampler2D texture13, sampler2D texture21, sampler2D texture22, sampler2D texture23)\n\
 {\n\
     highp vec2 twoup   = v_texcoord0 - vec2(0.0, (2.0 * m_frameData.x));\n\
     highp vec2 twodown = v_texcoord0 + vec2(0.0, (2.0 * m_frameData.x));\n\
