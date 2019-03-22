@@ -76,7 +76,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
 
   public:
     explicit BDRingBuffer(const QString &lfilename);
-    virtual ~BDRingBuffer();
+    ~BDRingBuffer() override;
 
     bool IsStreamed(void) override { return true; } // RingBuffer
 

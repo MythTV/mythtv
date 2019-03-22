@@ -19,7 +19,7 @@ class AudioOutputJACK : public AudioOutputBase
 
   public:
     explicit AudioOutputJACK(const AudioSettings &settings);
-    virtual ~AudioOutputJACK();
+    ~AudioOutputJACK() override;
 
     // Volume control
     int GetVolumeChannel(int channel) const override; // VolumeBase

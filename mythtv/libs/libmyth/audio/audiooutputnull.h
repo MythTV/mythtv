@@ -22,8 +22,7 @@ class AudioOutputNULL : public AudioOutputBase
 {
   public:
     explicit AudioOutputNULL(const AudioSettings &settings);
-
-    virtual ~AudioOutputNULL();
+    ~AudioOutputNULL() override;
 
     void Reset(void) override; // AudioOutputBase
 

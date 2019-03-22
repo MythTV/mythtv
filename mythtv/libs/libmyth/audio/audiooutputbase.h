@@ -51,7 +51,7 @@ class AudioOutputBase : public AudioOutput, public MThread
  public:
     const char *quality_string(int q);
     explicit AudioOutputBase(const AudioSettings &settings);
-    virtual ~AudioOutputBase();
+    ~AudioOutputBase() override;
 
     AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true) override; // AudioOutput
     AudioOutputSettings* GetOutputSettingsUsers(bool digital = false) override; // AudioOutput

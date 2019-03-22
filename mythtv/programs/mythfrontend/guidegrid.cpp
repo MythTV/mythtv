@@ -270,7 +270,7 @@ public:
             for (int j = 0; j < MAX_DISPLAY_TIMES; ++j)
                 m_programInfos[i][j] = nullptr;
     }
-    virtual ~GuideUpdateProgramRow() = default;
+    ~GuideUpdateProgramRow() override = default;
     bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
         // Don't bother to do any work if the starting coordinates of

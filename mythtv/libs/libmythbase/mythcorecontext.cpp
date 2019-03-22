@@ -57,7 +57,7 @@ class MythCoreContextPrivate : public QObject
   public:
     MythCoreContextPrivate(MythCoreContext *lparent, QString binversion,
                            QObject *guicontext);
-   ~MythCoreContextPrivate();
+   ~MythCoreContextPrivate() override;
 
     bool WaitForWOL(int timeout_in_ms = INT_MAX);
 

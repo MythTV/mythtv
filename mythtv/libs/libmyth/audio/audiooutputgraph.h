@@ -14,7 +14,7 @@ class MPUBLIC AudioOutputGraph : public MythTV::Visual
 {
 public:
     AudioOutputGraph();
-    virtual ~AudioOutputGraph();
+    ~AudioOutputGraph() override;
 
     // Properties
     void SetPainter(MythPainter* /*painter*/);

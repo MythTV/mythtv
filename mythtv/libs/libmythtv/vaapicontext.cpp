@@ -103,7 +103,7 @@ class VAAPIDisplay : ReferenceCounter
         m_va_disp(nullptr), m_x_disp(nullptr),
         m_driver() { }
   public:
-   ~VAAPIDisplay()
+   ~VAAPIDisplay() override
     {
         if (m_va_disp)
         {

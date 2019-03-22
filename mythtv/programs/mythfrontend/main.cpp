@@ -171,7 +171,7 @@ namespace
             }
         }
 
-        ~RunSettingsCompletion() = default;
+        ~RunSettingsCompletion() override = default;
 
       private slots:
         void OnPasswordResultReady(bool passwordValid,

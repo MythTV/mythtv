@@ -70,7 +70,7 @@ class MythContextPrivate : public QObject
 
   public:
     MythContextPrivate(MythContext *lparent);
-   ~MythContextPrivate();
+   ~MythContextPrivate() override;
 
     bool Init        (bool gui,
                       bool prompt, bool noPrompt,

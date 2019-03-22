@@ -31,7 +31,7 @@ class PrivUdpSocket : public QUdpSocket
 public:
     PrivUdpSocket(QObject *parent, QNetworkAddressEntry host) :
         QUdpSocket(parent), m_host(host) { };
-    ~PrivUdpSocket() = default;
+    ~PrivUdpSocket() override = default;
     QNetworkAddressEntry host()
     {
         return m_host;

@@ -86,7 +86,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     void timeout(void);
 
   private:
-    virtual ~MythAirplayServer(void);
+    ~MythAirplayServer(void) override;
     void Teardown(void);
     void HandleResponse(APHTTPRequest *req, QTcpSocket *socket);
     QByteArray StatusToString(int status);

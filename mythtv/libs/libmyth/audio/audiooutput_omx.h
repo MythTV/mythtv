@@ -16,7 +16,7 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 {
   public:
     explicit AudioOutputOMX(const AudioSettings &settings);
-    virtual ~AudioOutputOMX();
+    ~AudioOutputOMX() override;
 
     // No copying
     AudioOutputOMX(const AudioOutputOMX&) = delete;

@@ -35,7 +35,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
     void deleteClient();
 
   private:
-    virtual ~MythRAOPDevice(void);
+    ~MythRAOPDevice(void) override;
     void Teardown(void);
     bool RegisterForBonjour(void);
 

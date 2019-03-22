@@ -70,7 +70,7 @@ class MythSystemLegacyWrapper : public MythSystem
         return wrapper;
     }
 
-    ~MythSystemLegacyWrapper(void)
+    ~MythSystemLegacyWrapper(void) override
     {
         Wait(0);
     }

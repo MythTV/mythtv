@@ -13,7 +13,7 @@ class AudioOutputOSS : public AudioOutputBase
 {
   public:
     explicit AudioOutputOSS(const AudioSettings &settings);
-    virtual ~AudioOutputOSS();
+    ~AudioOutputOSS() override;
 
     // Volume control
     int GetVolumeChannel(int channel) const override; // VolumeBase

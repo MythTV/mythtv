@@ -51,7 +51,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
   public:
     MythRAOPConnection(QObject *parent, QTcpSocket *socket, QByteArray id,
                        int port);
-   ~MythRAOPConnection();
+   ~MythRAOPConnection() override;
     bool Init(void);
     QTcpSocket *GetSocket()   { return m_socket;   }
     int         GetDataPort() { return m_dataPort; }

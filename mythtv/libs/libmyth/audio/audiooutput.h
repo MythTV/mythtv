@@ -59,7 +59,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         bool willsuspendpa = true);
 
     AudioOutput() = default;
-    virtual ~AudioOutput();
+    ~AudioOutput() override;
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;

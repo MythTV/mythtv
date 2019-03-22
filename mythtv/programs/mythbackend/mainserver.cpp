@@ -145,7 +145,7 @@ class ProcessRequestRunnable : public QRunnable
         m_sock->IncrRef();
     }
 
-    virtual ~ProcessRequestRunnable()
+    ~ProcessRequestRunnable() override
     {
         if (m_sock)
         {
@@ -174,7 +174,7 @@ class FreeSpaceUpdater : public QRunnable
     {
         m_lastRequest.start();
     }
-    ~FreeSpaceUpdater()
+    ~FreeSpaceUpdater() override
     {
         QMutexLocker locker(&m_parent.m_masterFreeSpaceListLock);
         m_parent.m_masterFreeSpaceListUpdater = nullptr;

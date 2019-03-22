@@ -35,7 +35,7 @@ class PBHEventHandler : public QObject
     {
         StorageGroup::ClearGroupToUseCache();
     }
-    ~PBHEventHandler()
+    ~PBHEventHandler() override
     {
         if (m_freeSpaceTimerId)
             killTimer(m_freeSpaceTimerId);

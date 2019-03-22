@@ -914,7 +914,7 @@ private:
   char *menuString;
 public:
   cCiApplicationInformation(int SessionId, cCiTransportConnection *Tc);
-  virtual ~cCiApplicationInformation();
+  ~cCiApplicationInformation() override;
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   bool EnterMenu(void);
   char *GetApplicationString() { return strdup(menuString); };
@@ -1211,7 +1211,7 @@ private:
   cCiEnquiry *enquiry;
 public:
   cCiMMI(int SessionId, cCiTransportConnection *Tc);
-  virtual ~cCiMMI();
+  ~cCiMMI() override;
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   bool HasUserIO(void) override { return menu || enquiry; } // cCiSession
   cCiMenu *Menu(void);

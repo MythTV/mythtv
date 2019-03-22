@@ -17,7 +17,7 @@ class WebSocketMythEvent : public WebSocketExtension
 
   public:
     WebSocketMythEvent();
-    virtual ~WebSocketMythEvent();
+    ~WebSocketMythEvent() override;
 
     bool HandleTextFrame(const WebSocketFrame &frame) override; // WebSocketExtension
     void customEvent(QEvent* /*event*/) override; // QObject

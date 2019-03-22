@@ -35,7 +35,7 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
 
   public:
     MythDVDContext() = delete;    // Default constructor should not be called
-    virtual ~MythDVDContext() = default;
+    ~MythDVDContext() override = default;
 
     int64_t  GetStartPTS()          const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
     int64_t  GetEndPTS()            const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
@@ -94,7 +94,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
   public:
     explicit DVDRingBuffer(const QString &lfilename);
-    virtual ~DVDRingBuffer();
+    ~DVDRingBuffer() override;
 
     // gets
     int  GetTitle(void)        const { return m_title;                  }

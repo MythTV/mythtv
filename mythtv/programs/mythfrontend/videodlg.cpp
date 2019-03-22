@@ -297,7 +297,7 @@ namespace
             //       Having it here causes a runtime error on windows
         }
 
-       ~FanartLoader()
+       ~FanartLoader() override
         {
             m_fanartTimer.stop();
             m_fanartTimer.disconnect(this);

@@ -246,7 +246,7 @@ class VDPAUVideoMixer : public VDPAUResource
         memset(&m_csc, 0, sizeof(VdpCSCMatrix));
     }
 
-   ~VDPAUVideoMixer()
+   ~VDPAUVideoMixer() override
     {
         delete m_noise_reduction;
         delete m_sharpness;
