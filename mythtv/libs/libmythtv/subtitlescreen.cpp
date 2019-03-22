@@ -2354,7 +2354,7 @@ bool SubtitleScreen::InitialiseAssLibrary(void)
             return false;
 
         ass_set_message_cb(m_assLibrary, myth_libass_log, nullptr);
-        ass_set_extract_fonts(m_assLibrary, true);
+        ass_set_extract_fonts(m_assLibrary, static_cast<int>(true));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialised libass object.");
     }
 
@@ -2465,7 +2465,7 @@ void SubtitleScreen::ResizeAssRenderer(void)
     // TODO this probably won't work properly for anamorphic content and XVideo
     ass_set_frame_size(m_assRenderer, m_safeArea.width(), m_safeArea.height());
     ass_set_margins(m_assRenderer, 0, 0, 0, 0);
-    ass_set_use_margins(m_assRenderer, true);
+    ass_set_use_margins(m_assRenderer, static_cast<int>(true));
     ass_set_font_scale(m_assRenderer, 1.0);
 }
 

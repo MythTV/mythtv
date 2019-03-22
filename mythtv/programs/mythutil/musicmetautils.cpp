@@ -284,7 +284,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         avcodec_parameters_to_context(avctx, st->codecpar);
         av_codec_set_pkt_timebase(avctx, st->time_base);
 
-        avcodec_string(buf, sizeof(buf), avctx, false);
+        avcodec_string(buf, sizeof(buf), avctx, static_cast<int>(false));
 
         switch (inputFC->streams[i]->codecpar->codec_type)
         {

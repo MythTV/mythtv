@@ -954,7 +954,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
         score--;
     }
 
-    return av_probe_input_format2(&probe, true, &score) != nullptr;
+    return av_probe_input_format2(&probe, static_cast<int>(true), &score) != nullptr;
 }
 
 void AvFormatDecoder::InitByteContext(bool forceseek)
@@ -1053,7 +1053,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "OpenFile -- begin");
 
-    fmt = av_probe_input_format(&probe, true);
+    fmt = av_probe_input_format(&probe, static_cast<int>(true));
     if (!fmt)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +

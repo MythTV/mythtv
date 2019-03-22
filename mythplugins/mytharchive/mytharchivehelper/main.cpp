@@ -1946,7 +1946,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
         buf[0]=0;
         if (avctx)
-            avcodec_string(buf, sizeof(buf), avctx, false);
+            avcodec_string(buf, sizeof(buf), avctx, static_cast<int>(false));
 
         switch (st->codecpar->codec_type)
         {
