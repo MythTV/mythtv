@@ -275,7 +275,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             if (m_bStop)
             {
                 m_player->DiscardVideoFrame(currentFrame);
-                return false;
+                return 0;
             }
         }
 

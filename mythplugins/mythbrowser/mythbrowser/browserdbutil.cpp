@@ -237,7 +237,7 @@ int GetCategoryList(QStringList &list)
     if (!query.exec())
     {
         MythDB::DBError("mythbrowser: get category list", query);
-        return false;
+        return 0;
     }
 
     while (query.next())
