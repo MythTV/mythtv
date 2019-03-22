@@ -953,6 +953,10 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             TransportScanItem &item = *m_current;
             item.m_tuning.m_frequency = item.freq_offset(m_current.offset());
 
+            if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT)
+            {
+                item.m_tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+            }
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
             {
                 if (m_dvbt2Tried)
@@ -1812,6 +1816,10 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     DTVMultiplex tuning = item.m_tuning;
     tuning.m_frequency = freq;
 
+    if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT)
+    {
+        tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+    }
     if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
     {
         if (m_dvbt2Tried)
