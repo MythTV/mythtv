@@ -619,7 +619,7 @@ bool RemoteEncoder::CheckChannel(QString channel)
     strlist << channel;
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
 
     return false;
 }
@@ -643,7 +643,7 @@ bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
     strlist << channelid;
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
 
     return false;
 }
@@ -671,7 +671,7 @@ bool RemoteEncoder::CheckChannelPrefix(
     is_extra_char_useful = strlist[2].toInt();
     needed_spacer = (strlist[3] == "X") ? "" : strlist[3];
 
-    return strlist[0].toInt();
+    return strlist[0].toInt() != 0;
 }
 
 static QString cleanup(const QString &str)
@@ -757,7 +757,7 @@ bool RemoteEncoder::SetChannelInfo(const InfoMap &infoMap)
     strlist << make_safe(infoMap["XMLTV"]);
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
 
     return false;
 }

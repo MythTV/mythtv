@@ -321,7 +321,7 @@ bool VBI608Extractor::ExtractCC(const VideoFrame *picframe, uint max_lines)
         }
     }
 
-    return found_cnt;
+    return found_cnt > 0;
 }
 
 bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)

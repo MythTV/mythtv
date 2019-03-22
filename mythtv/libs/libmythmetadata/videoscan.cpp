@@ -382,7 +382,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
             SendProgressEvent(++counter);
     }
 
-    return ret;
+    return ret > 0;
 }
 
 bool VideoScannerThread::buildFileList(const QString &directory,
