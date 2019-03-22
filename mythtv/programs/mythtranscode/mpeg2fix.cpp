@@ -162,7 +162,7 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
     {
         it = ++m_offset[idx].begin();
         if ((((*it).type == 0) && (pkt->pts >= (*it).pos_pts) /* PTS type */) ||
-            (((*it).type == 1) /* Pos type */ &&
+            (((*it).type) /* Pos type */ &&
              ((pkt->pos >= (*it).pos_pts) || (pkt->duration > (*it).framenum))))
         {
             m_offset[idx].pop_front();

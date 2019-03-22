@@ -105,7 +105,7 @@ bool RSSEditPopup::Create(void)
             m_thumbImage->Load();
         }
 
-        if (m_site->GetDownload() == 1)
+        if (m_site->GetDownload())
             m_download->SetCheckState(MythUIStateType::Full);
     }
 

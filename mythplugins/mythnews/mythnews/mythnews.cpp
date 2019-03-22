@@ -356,7 +356,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if (m_thumbnailImage && m_thumbnailImage->IsVisible())
                 m_thumbnailImage->Hide();
 
-            if (m_podcastImage && site->podcast() == 1)
+            if (m_podcastImage && site->podcast())
                 m_podcastImage->Show();
 
             if (!site->imageURL().isEmpty())

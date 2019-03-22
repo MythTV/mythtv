@@ -670,7 +670,7 @@ void MythDVDPlayer::GoToDVDProgram(bool direction)
 {
     if (!player_ctx->m_buffer->IsDVD())
         return;
-    if (direction == 0)
+    if (direction)
         player_ctx->m_buffer->DVD()->GoToPreviousProgram();
     else
         player_ctx->m_buffer->DVD()->GoToNextProgram();
