@@ -307,7 +307,7 @@ class ServiceID : public MythUISpinBoxSetting
   public:
     explicit ServiceID(const ChannelID &id)
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
-                               -1, UINT16_MAX, 1, true, "NULL")
+                               -1, UINT16_MAX, 1, 1, "NULL")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "ServiceID"));
 
