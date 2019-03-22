@@ -615,7 +615,7 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
                                ((r2 & 0x0000f000UL) << 8) |
                                ((r2 & 0x00f00000UL) << 4) |
                                ((r2 & 0xf0000000UL)));
-        } while (--i);
+        } while (--i > 0);
     }
 
     p->drawImage(0, 0, *m_outputImage);

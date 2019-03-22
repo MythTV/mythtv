@@ -469,7 +469,7 @@ void MusicFileScanner::cleanDB()
 
         } while (query.next());
 
-    } while (deletedCount);
+    } while (deletedCount > 0);
 
     // delete unused albumart_ids from music_albumart (embedded images)
     if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
