@@ -249,7 +249,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 artText.replace("&#8216;", "'");  // LEFT-SINGLE-QUOTE
                 artText.replace("&#8217;", "'");  // RIGHT-SINGLE-QUOTE
                 // Replace paragraph and break HTML with newlines
-                if( artText.indexOf(QRegExp("</(p|P)>")) )
+                if( artText.contains(QRegExp("</(p|P)>")) )
                 {
                     artText.replace( QRegExp("<(p|P)>"), "");
                     artText.replace( QRegExp("</(p|P)>"), "\n\n");
