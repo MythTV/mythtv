@@ -358,10 +358,11 @@ static bool extract_one_del(QStringList &list, uint &recordingID)
     list.pop_front();
     list.pop_front();
 
-    if (!recordingID)
+    if (recordingID == 0U) {
         LOG(VB_GENERAL, LOG_ERR, LOC + "extract_one_del() invalid entry");
-
-    return recordingID;
+        return false;
+    }
+    return true;
 }
 
 void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
