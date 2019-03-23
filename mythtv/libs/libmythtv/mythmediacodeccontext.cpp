@@ -35,25 +35,9 @@ void MythMediaCodecContext::DeviceContextFinished(AVHWDeviceContext *Context)
         return;
 
     if (gCoreContext->IsUIThread())
-    {
         interop->DecrRef();
-    }
     else
-    {
-        MythMainWindow *window = MythMainWindow::getMainWindow();
-        if (window)
-        {
-            QWaitCondition wait;
-            QMutex lock;
-            lock.lock();
-            MythCallbackEvent *event = new MythCallbackEvent(&DestroyInteropCallback, &wait, interop, nullptr);
-            QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
-            int count = 0;
-            while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
-                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms to destroy interop").arg(count));
-            lock.unlock();
-        }
-    }
+        MythMainWindow::HandleCallback("Destroy MediaCodec interop", &DestroyInteropCallback, interop, nullptr);
 }
 
 int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
@@ -148,25 +132,9 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
 {
     // Create hardware device and interop
     if (gCoreContext->IsUIThread())
-    {
         InitialiseDecoder(Context);
-    }
     else
-    {
-        MythMainWindow *window = MythMainWindow::getMainWindow();
-        if (window)
-        {
-            QWaitCondition wait;
-            QMutex lock;
-            lock.lock();
-            MythCallbackEvent *event = new MythCallbackEvent(&CreateDecoderCallback, &wait, Context, nullptr);
-            QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
-            int count = 0;
-            while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
-                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms to create decoder").arg(count));
-            lock.unlock();
-        }
-    }
+        MythMainWindow::HandleCallback("Create MediaCodec decoder", &CreateDecoderCallback, Context, nullptr);
 
     if (!Context->hw_device_ctx)
     {

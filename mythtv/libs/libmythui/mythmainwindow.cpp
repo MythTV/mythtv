@@ -1958,6 +1958,28 @@ void MythMainWindow::HandleTVPower(bool poweron)
 #endif
 }
 
+/// \brief Static convenience method to initiate a callback into the UI thread and wait for the result.
+void MythMainWindow::HandleCallback(const QString &Debug, MythCallbackEvent::Callback Function,
+                                    void *Opaque1, void *Opaque2)
+{
+    MythMainWindow *window = MythMainWindow::getMainWindow();
+    if (!window)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Callback failed - no MythMainWindow");
+        return;
+    }
+
+    QWaitCondition wait;
+    QMutex lock;
+    lock.lock();
+    MythCallbackEvent *event = new MythCallbackEvent(Function, &wait, Opaque1, Opaque2);
+    QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
+    int count = 0;
+    while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms for %2").arg(count).arg(Debug));
+    lock.unlock();
+}
+
 void MythMainWindow::AllowInput(bool allow)
 {
     d->m_AllowInput = allow;

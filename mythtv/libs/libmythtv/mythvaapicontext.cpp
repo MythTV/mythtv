@@ -39,25 +39,9 @@ void MythVAAPIContext::FramesContextFinished(AVHWFramesContext *Context)
 
     MythVAAPIInterop *interop = reinterpret_cast<MythVAAPIInterop*>(Context->user_opaque);
     if (interop && gCoreContext->IsUIThread())
-    {
         interop->DecrRef();
-    }
     else if (interop)
-    {
-        MythMainWindow *window = MythMainWindow::getMainWindow();
-        if (window)
-        {
-            QWaitCondition wait;
-            QMutex lock;
-            lock.lock();
-            MythCallbackEvent *event = new MythCallbackEvent(&DestroyInteropCallback, &wait, interop, nullptr);
-            QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
-            int count = 0;
-            while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
-                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms to destroy interop").arg(count));
-            lock.unlock();
-        }
-    }
+        MythMainWindow::HandleCallback("Destroy VAAPI interop", &DestroyInteropCallback, interop, nullptr);
 }
 
 void MythVAAPIContext::DeviceContextFinished(AVHWDeviceContext*)
@@ -439,25 +423,9 @@ int MythVAAPIContext::InitialiseDecoder(AVCodecContext *Context)
         return -1;
 
     if (gCoreContext->IsUIThread())
-    {
         InitialiseContext(Context);
-    }
     else
-    {
-        MythMainWindow *window = MythMainWindow::getMainWindow();
-        if (window)
-        {
-            QWaitCondition wait;
-            QMutex lock;
-            lock.lock();
-            MythCallbackEvent *event = new MythCallbackEvent(&InitialiseDecoderCallback, &wait, Context, nullptr);
-            QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
-            int count = 0;
-            while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
-                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms for context creation").arg(count));
-            lock.unlock();
-        }
-    }
+        MythMainWindow::HandleCallback("VAAPI context creation", &InitialiseDecoderCallback, Context, nullptr);
 
     return Context->hw_frames_ctx ? 0 : -1;
 }

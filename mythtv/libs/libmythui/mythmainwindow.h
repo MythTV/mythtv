@@ -83,6 +83,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
                      int lenMins=120, const QString& year="1895",
                      const QString &id="", bool useBookmarks = false);
     void HandleTVPower(bool poweron);
+    static void HandleCallback(const QString &Debug, MythCallbackEvent::Callback Function,
+                               void *Opaque1, void*Opaque2);
 
     void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;
