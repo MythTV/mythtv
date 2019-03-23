@@ -260,73 +260,19 @@ bool DVBChannel::Open(DVBChannel *who)
         return false;
     }
 
-    m_frontend_name     = info.name;
-    m_tunerType         = info.type;
-#if HAVE_FE_CAN_2G_MODULATION
-    if (info.caps & FE_CAN_2G_MODULATION)
-    {
-        if (m_tunerType == DTVTunerType::kTunerTypeDVBS1)
-            m_tunerType = DTVTunerType::kTunerTypeDVBS2;
-        else if (m_tunerType == DTVTunerType::kTunerTypeDVBT)
-            m_tunerType = DTVTunerType::kTunerTypeDVBT2;
-    }
-#endif // HAVE_FE_CAN_2G_MODULATION
+    m_frontend_name       = info.name;
     m_capabilities        = info.caps;
     m_frequency_minimum   = info.frequency_min;
     m_frequency_maximum   = info.frequency_max;
     m_symbol_rate_minimum = info.symbol_rate_min;
     m_symbol_rate_maximum = info.symbol_rate_max;
 
-#if DVB_API_VERSION >=5
-    unsigned int i;
-    struct dtv_property prop;
-    struct dtv_properties cmd;
-
-    memset(&prop, 0, sizeof(prop));
-    prop.cmd = DTV_API_VERSION;
-    cmd.num = 1;
-    cmd.props = &prop;
-    if (ioctl(m_fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("dvb api version %1.%2").arg((prop.u.data>>8)&0xff).arg((prop.u.data)&0xff));
-    }
-
-    memset(&prop, 0, sizeof(prop));
-    prop.cmd = DTV_ENUM_DELSYS;
-    cmd.num = 1;
-    cmd.props = &prop;
-
-    if (ioctl(m_fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
-    {
-        LOG(VB_RECORD, LOG_DEBUG, LOC +
-            QString("num props %1").arg(prop.u.buffer.len));
-        for (i = 0; i < prop.u.buffer.len; i++)
-        {
-            LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("delsys %1: %2 %3")
-                    .arg(i).arg(prop.u.buffer.data[i])
-                    .arg(DTVModulationSystem::toString(prop.u.buffer.data[i])));
-            switch (prop.u.buffer.data[i])
-            {
-                // TODO: not supported. you can have DVBC and DVBT on the same card
-                // The following are backwards compatible so its ok
-                case SYS_DVBS2:
-                    m_tunerType = DTVTunerType::kTunerTypeDVBS2;
-                    break;
-                case SYS_DVBT2:
-                    m_tunerType = DTVTunerType::kTunerTypeDVBT2;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-#endif
+    CardUtil::SetDeliverySystem(m_inputid, m_fd_frontend);
+    m_tunerType = CardUtil::GetTunerType(m_inputid);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Using DVB card %1, with frontend '%2'.")
-            .arg(m_device).arg(m_frontend_name));
+        QString("Frontend '%2' tunertype:%3 %4")
+            .arg(m_frontend_name).arg(m_tunerType).arg(m_tunerType.toString()));
 
     // Turn on the power to the LNB
     if (m_tunerType.IsDiSEqCSupported())
@@ -366,7 +312,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
 bool DVBChannel::IsOpen(void) const
 {
-    //Have to acquire the hw lock to prevent is_open being modified whilst we're searching it
+    // Have to acquire the hw lock to prevent is_open being modified whilst we're searching it
     QMutexLocker locker(&m_hw_lock);
     IsOpenMap::const_iterator it = m_is_open.find(this);
     return it != m_is_open.end();
@@ -1082,7 +1028,7 @@ bool DVBChannel::HasLock(bool *ok) const
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Getting Frontend status failed." + ENO);
+            "FE_READ_STATUS failed" + ENO);
     }
 
     if (ok)

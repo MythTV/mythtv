@@ -593,7 +593,7 @@ class DTVModulationSystem : public DTVParamHelper
     {
         // see fe_delivery_system in frontend.h
         kModulationSystem_UNDEFINED,
-        kModulationSystem_DVBC_ANNEX_AC,
+        kModulationSystem_DVBC_ANNEX_A,
         kModulationSystem_DVBC_ANNEX_B,
         kModulationSystem_DVBT,
         kModulationSystem_DSS,

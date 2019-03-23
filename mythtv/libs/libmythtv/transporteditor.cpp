@@ -260,6 +260,8 @@ void TransportListEditor::Load()
                 type = "(DVB-S)";
             if (CardUtil::QAM == m_cardtype)
                 type = "(DVB-C)";
+            if (CardUtil::DVBS2 == m_cardtype)
+                type = "(DVB-S2)";
 
             QString txt = QString("%1 %2 %3 %4 %5 %6 %7")
                 .arg(mod).arg(query.value(2).toString())

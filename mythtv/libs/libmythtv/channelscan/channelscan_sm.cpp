@@ -2184,6 +2184,10 @@ bool ChannelScanSM::AddToList(uint mplexid)
 
     TransportScanItem item(sourceid, sistandard, fn, mplexid, m_signalTimeout);
 
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+        QString("tunertype:%1 %2 sourceid:%3 sistandard:%4 fn:'%5' mplexid:%6")
+            .arg(tt).arg(tt.toString()).arg(sourceid).arg(sistandard).arg(fn).arg(mplexid));
+
     if (item.m_tuning.FillFromDB(tt, mplexid))
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + fn);
