@@ -714,11 +714,11 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
         CHECKERR(QString("Samplerate %1 Hz not available").arg(rate));
     }
 
-    /* set the buffer time */
-    err = snd_pcm_hw_params_get_buffer_size_min(params, &buffer_size_min);
-    err = snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
-    err = snd_pcm_hw_params_get_period_size_min(params, &period_size_min, nullptr);
-    err = snd_pcm_hw_params_get_period_size_max(params, &period_size_max, nullptr);
+    /* get the buffer parameters */
+    (void) snd_pcm_hw_params_get_buffer_size_min(params, &buffer_size_min);
+    (void) snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
+    (void) snd_pcm_hw_params_get_period_size_min(params, &period_size_min, nullptr);
+    (void) snd_pcm_hw_params_get_period_size_max(params, &period_size_max, nullptr);
     VBAUDIO(QString("Buffer size range from %1 to %2")
             .arg(buffer_size_min)
             .arg(buffer_size_max));
