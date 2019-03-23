@@ -2212,13 +2212,45 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {
     QString devname = QString(device);
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("DVB Device (%1)").arg(devname));
+    QString tmp = devname;
 
     if (DVB_DEV_FRONTEND == type)
         return devname;
     if (DVB_DEV_DVR == type)
-        return devname.replace(devname.indexOf("frontend"), 8, "dvr");
+    {
+        tmp = tmp.replace(devname.indexOf("frontend"), 8, "dvr");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend dvr number matches (%1)").arg(tmp));
+            return tmp;
+        }
+        else // use dvr0, allows multi-standard frontends which only have one dvr
+        {
+            devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
+            return devname;
+        }
+    }
     if (DVB_DEV_DEMUX == type)
-        return devname.replace(devname.indexOf("frontend"), 8, "demux");
+    {
+        tmp = tmp.replace(devname.indexOf("frontend"), 8, "demux");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend demux number matches (%1)").arg(tmp));
+            return tmp;
+        }
+        else // use demux0, allows multi-standard frontends, which only have one demux
+        {
+            devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
+            return devname;
+        }
+    }
     if (DVB_DEV_CA == type)
         return devname.replace(devname.indexOf("frontend"), 8, "ca");
     if (DVB_DEV_AUDIO == type)
@@ -2228,6 +2260,7 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 
     return "";
 }
+
 
 /**
  * If the device is valid, check if the model does DVB.
