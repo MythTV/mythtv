@@ -1293,7 +1293,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                               int64_t timecode, int /*in_frames*/)
 {
     int frames   = in_len / m_source_bytes_per_frame;
-    void *buffer = in_buffer;
     int bpf      = m_bytes_per_frame;
     int len      = in_len;
     bool music   = false;
@@ -1340,7 +1339,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         len = m_spdifenc->GetProcessedSize();
         if (len > 0)
         {
-            buffer = in_buffer = m_spdifenc->GetProcessedBuffer();
+            in_buffer = m_spdifenc->GetProcessedBuffer();
             m_spdifenc->Reset();
             frames = len / m_source_bytes_per_frame;
         }
@@ -1418,7 +1417,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     while(frames_remaining > 0)
     {
-        buffer = (char *)in_buffer + offset;
+        void *buffer = (char *)in_buffer + offset;
         frames = frames_remaining;
         len = frames * m_source_bytes_per_frame;
 
