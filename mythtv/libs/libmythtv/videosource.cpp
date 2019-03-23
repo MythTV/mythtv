@@ -2644,6 +2644,19 @@ class InputName : public MythUIComboBoxSetting
     };
 };
 
+class DeliverySystem : public GroupSetting
+{
+  public:
+    DeliverySystem()
+    {
+        setLabel(QObject::tr("Delivery system"));
+        setHelpText(QObject::tr(
+                        "This shows the delivery system (modulation), for instance DVB-T2, "
+                        "that you have selected when you configured the capture card. "
+                        "This must be the same as the modulation used by the video source. "));
+    };
+};
+
 class InputDisplayName : public MythUITextEditSetting
 {
   public:
@@ -2996,7 +3009,18 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
                                           _cardid, true));
     }
 
-    addChild(m_inputName);
+    // Delivery system for DVB, input name for other,
+    // same field capturecard/inputname for both
+    if ("DVB" == cardtype)
+    {
+        DeliverySystem *ds = new DeliverySystem();
+        ds->setValue(CardUtil::GetDeliverySystemFromDB(_cardid));
+        addChild(ds);
+    }
+    else
+    {
+        addChild(m_inputName);
+    }
     addChild(new InputDisplayName(*this));
     addChild(m_sourceId);
 
