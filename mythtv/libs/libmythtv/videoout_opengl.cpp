@@ -363,20 +363,20 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
             StopEmbedding();
         }
 
-        bool error = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                          0, window.GetDisplayVisibleRect(), m_newCodecId);
+        bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
+                       0, window.GetDisplayVisibleRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
         m_newAspect = 0.0f;
 
-        if (wasembedding && !error)
+        if (wasembedding && ok)
         {
             EmbedInWidget(oldrect);
             BestDeint();
         }
 
-        if (error)
+        if (!ok)
             return;
     }
 
