@@ -97,7 +97,6 @@ class OpenGLVideo : public QObject
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
     int            m_extraFeatures;       ///< OR'd list of extra, Myth specific features
     bool           m_resizing;
-    bool           m_forceResize;         ///< Global setting to force a resize stage
     GLenum         m_textureTarget;       ///< Some interops require custom texture targets
 };
 #endif // _OPENGL_VIDEO_H__

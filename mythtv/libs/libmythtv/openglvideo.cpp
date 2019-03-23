@@ -46,7 +46,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_features(),
     m_extraFeatures(0),
     m_resizing(false),
-    m_forceResize(false),
     m_textureTarget(QOpenGLTexture::Target2D)
 {
     if (!m_render || !m_videoColourSpace)
@@ -61,8 +60,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     // Set OpenGL feature support
     m_features      = m_render->GetFeatures();
     m_extraFeatures = m_render->GetExtraFeatures();
-
-    m_forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
     m_valid = true;
 }
 
@@ -629,8 +626,6 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         resize = (m_videoDispDim.height() > m_displayVideoRect.height()) && deinterlacing;
         // UYVY packed pixels must be sampled exactly
         resize |= (FMT_YUY2 == m_outputType);
-        // user forced
-        resize |= m_forceResize;
 
         if (!resize)
         {

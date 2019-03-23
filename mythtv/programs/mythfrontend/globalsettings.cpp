@@ -116,22 +116,6 @@ static HostSpinBoxSetting *AVSync2AdjustMS()
     return gc;
 }
 
-#ifdef USE_OPENGL_PAINTER
-static HostCheckBoxSetting *OpenGLExtraStage()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLExtraStage");
-
-    gc->setLabel(PlaybackSettings::tr("Extra stage of OpenGL Shading"));
-
-    gc->setHelpText(PlaybackSettings::tr("This may be needed if video is blank or distorted. "
-                                         "In particular, it may be needed on Fire TV 4K. "
-                                         "This may cause slowdown or dropped frames. By default this is disabled. "));
-    gc->setValue(false);
-
-    return gc;
-}
-#endif
-
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
@@ -4251,9 +4235,6 @@ void PlaybackSettings::Load(void)
     advanced->addChild(avsync2);
     avsync2->addTargetedChild("1",AVSync2AdjustMS());
 
-#ifdef USE_OPENGL_PAINTER
-    advanced->addChild(OpenGLExtraStage());
-#endif
     addChild(advanced);
 
     m_playbackProfiles = CurrentPlaybackProfile();
