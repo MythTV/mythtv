@@ -542,7 +542,6 @@ void AudioOutputOMX::WriteAudio(uchar *aubuf, int size)
         hdr->nFilledLen += cnt;
         aubuf += cnt;
         size -= cnt;
-        free -= cnt;
         m_pending.fetchAndAddRelaxed(cnt);
 
         hdr->nTimeStamp = S64_TO_TICKS(0);

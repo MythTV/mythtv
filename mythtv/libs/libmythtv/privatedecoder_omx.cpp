@@ -854,7 +854,6 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
         hdr->nFilledLen += cnt;
         buf += cnt;
         size -= cnt;
-        free -= cnt;
 
         hdr->nTimeStamp = Pts2Ticks(stream, pkt->pts);
         if (!m_bStartTime && (pkt->flags & AV_PKT_FLAG_KEY))
