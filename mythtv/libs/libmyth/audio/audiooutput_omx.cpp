@@ -208,12 +208,12 @@ bool AudioOutputOMX::OpenDevice(void)
 
     if (m_passthru || m_enc)
     {
-        nBitPerSample = 16;
         switch (m_codec)
         {
 #ifdef OMX_AUDIO_CodingDDP_Supported
           case AV_CODEC_ID_AC3:
           case AV_CODEC_ID_EAC3:
+            nBitPerSample = 16;
             fmt.eEncoding = OMX_AUDIO_CodingDDP;
             e = m_audiorender.SetParameter(OMX_IndexParamAudioPortFormat, &fmt);
             if (e != OMX_ErrorNone)
@@ -264,6 +264,7 @@ bool AudioOutputOMX::OpenDevice(void)
 
 #ifdef OMX_AUDIO_CodingDTS_Supported
           case AV_CODEC_ID_DTS:
+            nBitPerSample = 16;
             fmt.eEncoding = OMX_AUDIO_CodingDTS;
             e = m_audiorender.SetParameter(OMX_IndexParamAudioPortFormat, &fmt);
             if (e != OMX_ErrorNone)
