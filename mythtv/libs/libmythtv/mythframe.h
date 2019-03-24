@@ -263,6 +263,27 @@ static inline void clear(VideoFrame *vf)
         memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
         memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
     }
+    else if (FMT_YUV420P10 == vf->codec || FMT_YUV420P12 == vf->codec ||
+             FMT_YUV420P16 == vf->codec)
+    {
+        memset(vf->buf + vf->offsets[0], 0, vf->pitches[0] * vf->height);
+        if (vf->pitches[1] == vf->pitches[2])
+        {
+            int uv = (2 ^ (ColorDepth(vf->codec) - 1)) - 1;
+            unsigned char* buf1 = vf->buf + vf->offsets[1];
+            unsigned char* buf2 = vf->buf + vf->offsets[2];
+            for (int row = 0; row < uv_height; ++row)
+            {
+                for (int col = 0; col < vf->pitches[1]; col += 2)
+                {
+                    buf1[col]     = buf2[col]     = uv;
+                    buf1[col + 1] = buf2[col + 1] = 0;
+                }
+                buf1 += vf->pitches[1];
+                buf2 += vf->pitches[2];
+            }
+        }
+    }
 }
 
 static inline void copyplane(uint8_t* dst, int dst_pitch,

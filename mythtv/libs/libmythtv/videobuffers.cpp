@@ -944,6 +944,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
             {
                 m_allocatedArrays[i] = data;
                 init(Frame, Type, data, Frame->width, Frame->height, size);
+                clear(Frame);
                 LOG(VB_PLAYBACK, LOG_DEBUG, QString("Reallocated frame %1->%2")
                     .arg(format_description(old)).arg(format_description(Type)));
                 EndLock();
