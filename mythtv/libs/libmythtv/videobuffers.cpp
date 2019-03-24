@@ -930,32 +930,35 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
     {
         if (At(i) == Frame)
         {
-            // Free existing buffer
             av_freep(&Frame->qscale_table);
-            av_free(m_allocatedArrays[i]);
             Frame->qscale_table = nullptr;
-            m_allocatedArrays[i] = nullptr;
 
-            // Initialise new
             VideoFrameType old = Frame->codec;
-            uint size = buffersize(Type, Frame->width, Frame->height);
-            unsigned char *data = (unsigned char*)av_malloc(size + 64);
-            if (data)
+            int size = buffersize(Type, Frame->width, Frame->height);
+            unsigned char *buf = Frame->buf;
+            if (Frame->size != size)
             {
-                m_allocatedArrays[i] = data;
-                init(Frame, Type, data, Frame->width, Frame->height, size);
-                clear(Frame);
-                LOG(VB_PLAYBACK, LOG_DEBUG, QString("Reallocated frame %1->%2")
-                    .arg(format_description(old)).arg(format_description(Type)));
-                EndLock();
-                return true;
+                // Free existing buffer
+                av_free(m_allocatedArrays[i]);
+                m_allocatedArrays[i] = Frame->buf = nullptr;
+
+                // Initialise new
+                buf = (unsigned char*)av_malloc(size + 64);
+                if (!buf)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
+                    EndLock();
+                    return false;
+                }
             }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
-                EndLock();
-                return false;
-            }
+
+            m_allocatedArrays[i] = buf;
+            init(Frame, Type, buf, Frame->width, Frame->height, size);
+            clear(Frame);
+            LOG(VB_PLAYBACK, LOG_DEBUG, QString("Reallocated frame %1->%2")
+                .arg(format_description(old)).arg(format_description(Type)));
+            EndLock();
+            return true;
         }
     }
     EndLock();
