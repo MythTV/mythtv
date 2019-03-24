@@ -355,7 +355,6 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             *output++ = *rs++;
         }
         oc -= maxFrames;
-        outindex += maxFrames;
     }
     else        // channels == 6
     {
@@ -378,7 +377,6 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
                 *output++ = *rs++;
             }
             oc -= maxFrames;
-            outindex += maxFrames;
         }
         else
         {
@@ -398,7 +396,6 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
                 *output++ = *rs++;
             }
             oc -= maxFrames;
-            outindex += maxFrames;
         }
     }
     out_count = oc;
