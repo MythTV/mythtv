@@ -889,9 +889,13 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         cmdargs[i] = (char *)nullptr;
     }
     else
+    {
         LOG(VB_GENERAL, LOG_CRIT, LOC_ERR +
                         "Failed to allocate memory for cmdargs " +
                         ENO);
+        free(command);
+        return;
+    }
 
     char *directory = nullptr;
     QString dir = GetDirectory();
