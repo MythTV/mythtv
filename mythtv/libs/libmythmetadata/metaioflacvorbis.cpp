@@ -198,10 +198,9 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         // From what I can tell, FLAC::File maintains ownership of the Picture pointers, so no need to delete
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
-        for (TagLib::List<Picture *>::ConstIterator it = picList.begin();
-                it != picList.end(); it++)
+        for (auto it = picList.begin(); it != picList.end(); it++)
         {
-            if (pic->type() == artType)
+            if ((*it)->type() == artType)
             {
                 //found the type we were looking for
                 pic = *it;
