@@ -312,7 +312,6 @@ void MetadataImageDownload::run()
         {
             QCoreApplication::postEvent(m_parent,
                     new ImageDLFailureEvent(lookup));
-            errored = false;
         }
         lookup->SetDownloads(downloaded);
         QCoreApplication::postEvent(m_parent, new ImageDLEvent(lookup));
