@@ -1727,17 +1727,10 @@ QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
                                        const QString& header)
 {
     QNetworkCacheMetaData::RawHeaderList headers = cacheData.rawHeaders();
-    bool found = false;
-    QNetworkCacheMetaData::RawHeaderList::iterator it = headers.begin();
-    for (; !found && it != headers.end(); ++it)
-    {
-        if (QString((*it).first) == header)
-        {
-            found = true;
-            return QString((*it).second);
-        }
-    }
 
+    for (auto it = headers.begin(); it != headers.end(); ++it)
+        if (QString((*it).first) == header)
+            return QString((*it).second);
     return QString();
 }
 

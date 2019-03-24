@@ -94,7 +94,7 @@ static int decode(unsigned char *vbiline, int scale0, int scale1)
         i++;
     }
 
-    i = min[6] = min[5] - max[5] + max[6];
+    min[6] = min[5] - max[5] + max[6];
 
     if (clk != 7 || vbiline[max[3]] - vbiline[min[5]] < 45)     /* failure to locate clock lead-in */
         return -1;

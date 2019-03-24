@@ -139,8 +139,8 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 
         if (m_dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
         {
-            connected = true;              // Pretend to be connected
-            return true;                   // to reduce errors
+            // Pretend to be connected to reduce errors
+            return true;
         }
 
         // code to ensure that a link-local ip address has the scope
