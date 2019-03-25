@@ -810,7 +810,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
         if (query.size() == 0)
         {
             jobsAreRunning = false;
-            break;
+            continue;
         }
         if ((totalSlept % 5) == 0)
         {
