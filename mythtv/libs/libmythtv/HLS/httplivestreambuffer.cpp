@@ -336,6 +336,7 @@ public:
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("bad padding character (0x%1)").arg(pad, 0, 16, QLatin1Char('0')));
+            delete[] decrypted_data;
             return RET_ERROR;
         }
         aeslen = m_data.size() - pad;
