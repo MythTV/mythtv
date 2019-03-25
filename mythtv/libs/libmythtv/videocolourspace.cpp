@@ -275,6 +275,13 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         return false;
 
     int csp = Frame->colorspace;
+    // workaround for nvdec mpeg2
+    bool forced = false;
+    if (csp == AVCOL_SPC_RGB && format_is_yuv(Frame->codec))
+    {
+        forced = true;
+        csp = AVCOL_SPC_UNSPECIFIED;
+    }
     int depth = ColorDepth(Frame->codec);
     if (csp == AVCOL_SPC_UNSPECIFIED)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
@@ -283,6 +290,9 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     m_colourSpace = csp;
     m_colourSpaceDepth = depth;
 
+    if (forced)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
+            .arg(format_description(Frame->codec)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video colourspace: %1, depth %2 (Stream: %3)")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
         .arg(m_colourSpaceDepth)
