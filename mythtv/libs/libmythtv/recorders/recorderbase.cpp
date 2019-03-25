@@ -376,7 +376,14 @@ void RecorderBase::CheckForRingBufferSwitch(void)
     m_nextRingBufferLock.unlock();
 
     if (recq && m_tvrec)
+    {
+        // This call will free recq.
         m_tvrec->RingBufferChanged(m_ringBuffer, m_curRecording, recq);
+    }
+    else
+    {
+        delete recq;
+    }
 
     m_ringBufferCheckTimer.restart();
 }
