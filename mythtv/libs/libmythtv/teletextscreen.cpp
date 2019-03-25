@@ -340,13 +340,10 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 
     uint fgcolor    = kTTColorWhite;
     uint bgcolor    = kTTColorBlack;
-    uint newfgcolor = kTTColorWhite;
-    uint newbgcolor = kTTColorBlack;
 
     if (m_teletextReader->IsSubtitle() || m_teletextReader->IsTransparent())
     {
         bgcolor    = kTTColorTransparent;
-        newbgcolor = kTTColorTransparent;
 
         bool isBlank = true;
         for (uint i = (row == 1 ? 8 : 0); i < (uint) kTeletextColumns; i++)
@@ -363,6 +360,8 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             return;
     }
 
+    uint newfgcolor = fgcolor;
+    uint newbgcolor = bgcolor;
     SetForegroundColor(fgcolor);
     SetBackgroundColor(bgcolor);
 
