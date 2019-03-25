@@ -805,7 +805,6 @@ void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
     if (pip_state > kPIPOff)
     {
-        aspectMode = kAspect_Off;
         return;
     }
 

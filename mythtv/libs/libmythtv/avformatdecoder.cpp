@@ -2633,7 +2633,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
                         m_video_codec_id = nvdec_mcid;
-                        foundgpudecoder = true;
+                        //foundgpudecoder = true;
                     }
                 }
 #endif // USING_NVDEC
@@ -5028,8 +5028,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             QMutexLocker locker(avcodeclock);
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
-            audIdx = -1;
-            audSubIdx = -1;
             AutoSelectAudioTrack();
             audIdx = m_selectedTrack[kTrackTypeAudio].m_av_stream_index;
             audSubIdx = m_selectedTrack[kTrackTypeAudio].m_av_substream_index;

@@ -816,7 +816,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
             if (ret == 0)
                 frameFinished = true;
             if (ret == 0 || ret == AVERROR(EAGAIN))
-                ret = avcodec_send_packet(m_codecCtx, &pkt);
+                avcodec_send_packet(m_codecCtx, &pkt);
             if (requiredPTS != -1 && pkt.dts != AV_NOPTS_VALUE && pkt.dts < requiredPTS)
                 frameFinished = false;
 

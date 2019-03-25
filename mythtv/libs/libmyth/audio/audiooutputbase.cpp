@@ -1430,7 +1430,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                 offset += len;
             }
             // Convert to floats
-            len = AudioOutputUtil::toFloat(m_format, m_src_in, buffer, len);
+            AudioOutputUtil::toFloat(m_format, m_src_in, buffer, len);
         }
 
         frames_remaining -= frames;

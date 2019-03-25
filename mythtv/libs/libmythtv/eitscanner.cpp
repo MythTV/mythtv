@@ -173,7 +173,6 @@ void EITScanner::run(void)
 
     if (eitCount) /* some events have been handled since the last schedule request */
     {
-        eitCount = 0;
         RescheduleRecordings();
     }
 

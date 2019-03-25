@@ -1660,7 +1660,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                 if (ret == 0)
                     frameFinished = true;
                 if (ret == 0 || ret == AVERROR(EAGAIN))
-                    ret = avcodec_send_packet(codecCtx, &pkt);
+                    avcodec_send_packet(codecCtx, &pkt);
                 keyFrame = frame->key_frame;
 
                 while (!frameFinished || !keyFrame)
@@ -1677,7 +1677,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                         if (ret == 0)
                             frameFinished = true;
                         if (ret == 0 || ret == AVERROR(EAGAIN))
-                            ret = avcodec_send_packet(codecCtx, &pkt);
+                            avcodec_send_packet(codecCtx, &pkt);
                         keyFrame = frame->key_frame;
                     }
                 }
@@ -1736,7 +1736,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                                     if (ret == 0)
                                         frameFinished = true;
                                     if (ret == 0 || ret == AVERROR(EAGAIN))
-                                        ret = avcodec_send_packet(codecCtx, &pkt);
+                                        avcodec_send_packet(codecCtx, &pkt);
                                 }
                             }
                         }

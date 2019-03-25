@@ -991,7 +991,6 @@ int MythUIText::MoveCursor(int lines)
         newLine = lineCount - 1;
 
     lineNo = -1;
-    currPos = 0;
     layoutStartPos = 0;
 
     for (int x = 0; x < m_Layouts.count(); x++)

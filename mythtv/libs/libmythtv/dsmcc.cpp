@@ -234,8 +234,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     if (userInfoLength)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[dsmcc] DSI unexpected userInfo");
-        // cppcheck-suppress unreadVariable
-        off += userInfoLength;
+        // off += userInfoLength;
     }
 }
 
