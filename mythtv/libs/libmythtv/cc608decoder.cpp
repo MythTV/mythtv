@@ -224,15 +224,13 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
             // commit row number only when first text code
             // comes in
             if (m_newrow[mode])
-                len = NewRowCC(mode, len);
+                NewRowCC(mode, len);
 
             m_ccbuf[mode] += CharCC(b1);
-            len++;
             m_col[mode]++;
             if (b2 & 0x60)
             {
                 m_ccbuf[mode] += CharCC(b2);
-                len++;
                 m_col[mode]++;
             }
         }
@@ -321,7 +319,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     break;
                 case 0x01:          //midrow or char
                     if (m_newrow[mode])
-                        len = NewRowCC(mode, len);
+                        NewRowCC(mode, len);
 
                     switch (b2 & 0x70)
                     {
@@ -333,12 +331,10 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             // 16 possible values of b2.
                             m_ccbuf[mode] += ' ';
                             m_ccbuf[mode] += QChar(0x7000 + (b2 & 0xf));
-                            len = m_ccbuf[mode].length();
                             m_col[mode]++;
                             break;
                         case 0x30:      //special character..
                             m_ccbuf[mode] += specialchar[b2 & 0x0f];
-                            len++;
                             m_col[mode]++;
                             break;
                     }
@@ -353,7 +349,6 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     {
                         m_ccbuf[mode].remove(len - 1, 1);
                         m_ccbuf[mode] += extendedchar2[b2 - 0x20];
-                        len = m_ccbuf[mode].length();
                         break;
                     }
                     break;
@@ -367,7 +362,6 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     {
                         m_ccbuf[mode].remove(len - 1, 1);
                         m_ccbuf[mode] += extendedchar3[b2 - 0x20];
-                        len = m_ccbuf[mode].length();
                         break;
                     }
                     break;
@@ -389,13 +383,11 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                 m_ccbuf[mode].startsWith("\b"))
                             {
                                 m_ccbuf[mode] += '\b';
-                                len++;
                                 m_col[mode]--;
                             }
                             else
                             {
                                 m_ccbuf[mode].remove(len - 1, 1);
-                                len = m_ccbuf[mode].length();
                                 m_col[mode]--;
                             }
                             break;
@@ -545,14 +537,13 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     if (m_newrow[mode])
                     {
                         m_newcol[mode] += (b2 & 0x03);
-                        len = NewRowCC(mode, len);
+                        NewRowCC(mode, len);
                     }
                     else
                         // illegal?
                         for (x = 0; x < (b2 & 0x03); x++)
                         {
                             m_ccbuf[mode] += ' ';
-                            len++;
                             m_col[mode]++;
                         }
                     break;
@@ -1259,13 +1250,15 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
     else if (xds_class == 0x0d) // cont code: 0x0e
         handled = true; // undefined
 
-    if (DEBUG_XDS && !handled)
+    if (!handled)
     {
+#if DEBUG_XDS
         LOG(VB_VBI, LOG_INFO, QString("XDS: ") +
             QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
             .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
             .arg(xds_buf.size())
             .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
+#endif
     }
 }
 
