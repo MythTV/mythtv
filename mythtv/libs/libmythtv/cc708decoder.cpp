@@ -15,7 +15,8 @@
 #define DEBUG_CC_SERVICE_2     0
 #define DEBUG_CC_RAWPACKET     0
 #define DEBUG_CC_VALIDPACKET   0
-#define DEBUG_CC_SERVICE_BLOCK 0
+#define DEBUG_CC_DECODE        0
+#define DEBUG_CC_PARSE         0
 
 typedef enum
 {
@@ -40,7 +41,7 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
 {
     if (DTVCC_PACKET_START == cc_type)
     {
-#if 0
+#if DEBUG_CC_DECODE
         LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC ST data(0x%1 0x%2)")
                 .arg(data1,0,16).arg(data2,0,16));
 #endif
@@ -54,7 +55,7 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     }
     else if (DTVCC_PACKET_DATA == cc_type)
     {
-#if 0
+#if DEBUG_CC_DECODE
         LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC Ex data(0x%1 0x%2)")
                 .arg(data1,0,16).arg(data2,0,16));
 #endif
@@ -197,10 +198,10 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         dlc_loc = blk_size - 1;
     }
 
-#if 0
+#if DEBUG_CC_PARSE
     LOG(VB_VBI, LOG_ERR,
         QString("cc_ss delayed(%1) blk_start(%2) blk_size(%3)")
-            .arg(cc->delayed) .arg(blk_start) .arg(blk_size));
+            .arg(cc->delayed[service_num]) .arg(blk_start) .arg(blk_size));
 #endif
 
     for (i = (cc->delayed[service_num]) ? blk_size : blk_start;
@@ -492,7 +493,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     else
     {
         LOG(VB_VBI, LOG_ERR, QString("handle_cc_c1: (NOT HANDLED) "
-                "code(0x%1) i(%2) blk_size(%3)").arg(code, 2, 16, '0')
+                "code(0x%1) i(%2) blk_size(%3)").arg(code, 2, 16, QLatin1Char('0'))
                 .arg(i).arg(blk_size));
     }
 #endif
@@ -555,18 +556,25 @@ static int handle_cc_c3(CC708Reader* cc, uint service_num, int i)
     return i;
 }
 
-static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
+static bool rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
 {
-    uint min_new_size = block_size + cc->buf_size[service_num];
+    size_t min_new_size = block_size + cc->buf_size[service_num];
+    bool ret = true;
     if (min_new_size >= cc->buf_alloc[service_num])
     {
-        uint new_alloc    = cc->buf_alloc[service_num];
+        size_t new_alloc = cc->buf_alloc[service_num];
         for (uint i = 0; (i < 32) && (new_alloc <= min_new_size); i++)
             new_alloc *= 2;
-
-        cc->buf[service_num] =
-            (unsigned char*) realloc(cc->buf[service_num], new_alloc);
-        cc->buf_alloc[service_num] = (cc->buf[service_num]) ? new_alloc : 0;
+        void *new_buf = realloc(cc->buf[service_num], new_alloc);
+        if (new_buf)
+        {
+            cc->buf[service_num] = (uchar *)new_buf;
+            cc->buf_alloc[service_num] = new_alloc;
+        }
+        else
+        {
+            ret = false;
+        }
 
 #if DEBUG_CC_SERVICE_2
         LOG(VB_VBI, LOG_DEBUG, QString("rightsize_buf: srv %1 to %1 bytes")
@@ -579,12 +587,17 @@ static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
             .arg(min_new_size)
             .arg(service_num)
             .arg(cc->buf_alloc[service_num]));
+    return ret;
 }
 
 static void append_cc(CC708Reader* cc, uint service_num,
                       const unsigned char* blk_buf, int block_size)
 {
-    rightsize_buf(cc, service_num, block_size);
+    if (!rightsize_buf(cc, service_num, block_size))
+    {
+        // The buffer resize failed. Drop the new data.
+        return;
+    }
 
     memcpy(cc->buf[service_num] + cc->buf_size[service_num],
            blk_buf, block_size);
