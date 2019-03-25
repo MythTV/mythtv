@@ -376,7 +376,9 @@ class MTV_PUBLIC CardUtil
     static bool         IsDVBInputType(const QString &inputType);
     static QString      ProbeDVBFrontendName(const QString &device);
     static QStringList  ProbeDeliverySystems(const QString &device);
+    static DTVModulationSystem ProbeDeliverySystem(int fd_frontend);
     static DTVModulationSystem ProbeDeliverySystem(const QString &device);
+    static DTVTunerType ProbeTunerType(int fd_frontend);
     static DTVTunerType ProbeTunerType(const QString &device);
     static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
     static DTVTunerType GetTunerType(uint inputid);

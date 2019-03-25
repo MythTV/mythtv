@@ -800,6 +800,16 @@ DTVModulationSystem CardUtil::ProbeDeliverySystem(const QString &device)
         return delsys;
     }
 
+    delsys = ProbeDeliverySystem(fd_frontend);
+    close(fd_frontend);
+    return delsys;
+}
+
+// Get the currently configured delivery system from the device
+DTVModulationSystem CardUtil::ProbeDeliverySystem(int fd_frontend)
+{
+    DTVModulationSystem delsys;
+
 #ifdef USING_DVB
     struct dtv_property prop;
     struct dtv_properties cmd;
@@ -814,20 +824,27 @@ DTVModulationSystem CardUtil::ProbeDeliverySystem(const QString &device)
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("FE_GET_PROPERTY ioctl failed (%1)")
-                .arg(device) + ENO);
+            QString("FE_GET_PROPERTY ioctl failed (fd:%1)")
+                .arg(fd_frontend) + ENO);
         return delsys;
 	}
 
     delsys.Parse(DTVModulationSystem::toString(prop.u.data));
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("(%1) delsys:%2 %3")
-        .arg(device).arg(delsys).arg(delsys.toString()));
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("delsys:%1 %2")
+        .arg(delsys).arg(delsys.toString()));
 
 #endif // USING_DVB
 
-    close(fd_frontend);
     return delsys;
+}
+
+// Get the currently configured tuner type from the device
+DTVTunerType CardUtil::ProbeTunerType(int fd_frontend)
+{
+    DTVModulationSystem delsys = ProbeDeliverySystem(fd_frontend);
+    DTVTunerType tunertype = ConvertToTunerType(delsys);
+    return tunertype;
 }
 
 // Get the currently configured tuner type from the device
@@ -927,7 +944,10 @@ int CardUtil::SetDeliverySystem(uint inputid, int fd)
 
 #ifdef USING_DVB
     DTVModulationSystem delsys = GetDeliverySystem(inputid);
-    ret = SetDeliverySystem(inputid, delsys, fd);
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED != delsys)
+    {
+        ret = SetDeliverySystem(inputid, delsys, fd);
+    }
 #endif // USING_DVB
 
     return ret;

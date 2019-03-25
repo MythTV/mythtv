@@ -268,7 +268,7 @@ bool DVBChannel::Open(DVBChannel *who)
     m_symbol_rate_maximum = info.symbol_rate_max;
 
     CardUtil::SetDeliverySystem(m_inputid, m_fd_frontend);
-    m_tunerType = CardUtil::GetTunerType(m_inputid);
+    m_tunerType = CardUtil::ProbeTunerType(m_fd_frontend);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("Frontend '%2' tunertype:%3 %4")
