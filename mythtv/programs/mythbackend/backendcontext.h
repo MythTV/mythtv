@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QList>
 #include <QHostAddress>
+#include "mythsystemevent.h"
 
 class EncoderLink;
 class AutoExpire;
@@ -22,6 +23,7 @@ extern MediaServer *g_pUPnp;
 extern BackendContext *gBackendContext;
 extern QString      pidfile;
 extern QString      logfile;
+extern MythSystemEventHandler *sysEventHandler;
 
 class Frontend
 {
