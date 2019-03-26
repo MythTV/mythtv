@@ -263,13 +263,20 @@ void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
 void TestMPEGTables::ItemList_test (void)
 {
     ShortEventDescriptor descriptor(&eit_data_0000[26]);
-    QVERIFY  (descriptor.IsValid());
+    if (!descriptor.IsValid()) {
+        QFAIL("The eit_data_0000 descriptor is invalid");
+        return;
+    }
     QCOMPARE (descriptor.DescriptorTag(), (unsigned int) DescriptorID::short_event);
     QCOMPARE (descriptor.size(), (unsigned int) 194);
     QCOMPARE (descriptor.LanguageString(), QString("ger"));
     QVERIFY  (descriptor.Text().startsWith(QString("Krimiserie. ")));
 
     ExtendedEventDescriptor descriptor2(&eit_data_0000[26+descriptor.size()]);
+    if (!descriptor2.IsValid()) {
+        QFAIL("The eit_data_0000 descriptor2 is invalid");
+        return;
+    }
     QCOMPARE (descriptor2.DescriptorTag(), (unsigned int) DescriptorID::extended_event);
     /* tests for items start here */
     QCOMPARE (descriptor2.LengthOfItems(), (uint) 139);
@@ -306,6 +313,10 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
 void TestMPEGTables::ExtendedEventDescriptor_test (void)
 {
     ExtendedEventDescriptor desc(&eit_data_0000[16*13+12]);
+    if (!desc.IsValid()) {
+        QFAIL("The eit_data_0000 descriptor is invalid");
+        return;
+    }
     QCOMPARE (desc.LengthOfItems(), 139U);
     QMultiMap<QString,QString> items = desc.Items();
     QCOMPARE (items.count(), 5);
