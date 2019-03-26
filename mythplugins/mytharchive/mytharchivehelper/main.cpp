@@ -1274,7 +1274,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
-                int genreID = e.attribute("intid").toInt();
+                int genreID;
                 QString genre = e.attribute("genre");
 
                 // see if this genre already exists
@@ -1298,16 +1298,13 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                     query.prepare("SELECT intid FROM videogenre "
                             "WHERE genre = :GENRE");
                     query.bindValue(":GENRE", genre);
-                    if (query.exec() && query.next())
-                    {
-                        genreID = query.value(0).toInt();
-                    }
-                    else
+                    if (!query.exec() || !query.next())
                     {
                         LOG(VB_JOBQUEUE, LOG_ERR,
                             "Couldn't add genre to database");
                         continue;
                     }
+                    genreID = query.value(0).toInt();
                 }
 
                 // now link the genre to the videometadata
@@ -1347,7 +1344,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
-                int countryID = e.attribute("intid").toInt();
+                int countryID;
                 QString country = e.attribute("country");
 
                 // see if this country already exists
@@ -1371,16 +1368,13 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                     query.prepare("SELECT intid FROM videocountry "
                             "WHERE country = :COUNTRY");
                     query.bindValue(":COUNTRY", country);
-                    if (query.exec() && query.next())
-                    {
-                        countryID = query.value(0).toInt();
-                    }
-                    else
+                    if (!query.exec() || !query.next())
                     {
                         LOG(VB_JOBQUEUE, LOG_ERR,
                             "Couldn't add country to database");
                         continue;
                     }
+                    countryID = query.value(0).toInt();
                 }
 
                 // now link the country to the videometadata
@@ -1408,7 +1402,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     {
         n = nodeList.item(0);
         QDomElement e = n.toElement();
-        int categoryID = e.attribute("intid").toInt();
+        int categoryID;
         QString category = e.attribute("category");
         // see if this category already exists
         query.prepare("SELECT intid FROM videocategory "
