@@ -133,7 +133,6 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
                 pos = resync_stream(buffer, pos+1, len, packet_size);
                 if (pos < 0)
                 {
-                    offset = 0;
                     break;
                 }
             }
@@ -246,7 +245,6 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
                 pos = resync_stream(buffer, pos+1, len, packet_size);
                 if (pos < 0)
                 {
-                    offset = 0;
                     break;
                 }
             }
