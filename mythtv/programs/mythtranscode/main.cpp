@@ -534,6 +534,7 @@ int main(int argc, char *argv[])
         LOG(VB_GENERAL, LOG_ERR,
             QString("Attempted to transcode %1. Mythtranscode is currently "
                     "unable to transcode remote files.") .arg(infile));
+        delete pginfo;
         return GENERIC_EXIT_REMOTE_FILE;
     }
 
