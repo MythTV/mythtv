@@ -17,6 +17,7 @@
 #include "upnpcds.h"
 #include "upnpcmgr.h"
 #include "upnpmsrr.h"
+#include <websocket.h>
 
 class BonjourRegister;
 
@@ -35,6 +36,7 @@ class MediaServer : public UPnp
 #ifdef USING_LIBDNS_SD
     BonjourRegister     *m_bonjour   {nullptr};
 #endif
+    WebSocketServer     *m_webSocketServer {nullptr};
 
     protected:
 

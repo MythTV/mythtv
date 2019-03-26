@@ -13,7 +13,6 @@
 #include "internetContent.h"
 #include "mythdirs.h"
 #include "htmlserver.h"
-#include <websocket.h>
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -98,11 +97,11 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 #endif
     }
 
-    WebSocketServer *pWebSocketServer = new WebSocketServer();
+    m_webSocketServer = new WebSocketServer();
 
-    if (!pWebSocketServer->isListening())
+    if (!m_webSocketServer->isListening())
     {
-        if (!pWebSocketServer->listen(nWSPort))
+        if (!m_webSocketServer->listen(nWSPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: WebSocketServer Create Error");
         }
@@ -294,6 +293,7 @@ MediaServer::~MediaServer()
     gCoreContext->removeListener(this);
 #endif
 
+    delete m_webSocketServer;
     delete m_pHttpServer;
 
 #ifdef USING_LIBDNS_SD
