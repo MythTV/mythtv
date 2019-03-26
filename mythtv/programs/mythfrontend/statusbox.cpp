@@ -192,8 +192,6 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
         if (currentButton)
             currentItem = currentButton->GetText();
 
-        handled = true;
-
         if (action == "MENU")
         {
             if (currentItem == tr("Log Entries"))
