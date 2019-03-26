@@ -130,10 +130,12 @@ int main(int argc, char **argv)
         assigned_port = special_port;
     }
 
-    new LCDServer(assigned_port, startup_message, message_time);
+    LCDServer *server =
+        new LCDServer(assigned_port, startup_message, message_time);
 
     QCoreApplication::exec();
 
+    delete server;
     delete gContext;
 
     SignalHandler::Done();
