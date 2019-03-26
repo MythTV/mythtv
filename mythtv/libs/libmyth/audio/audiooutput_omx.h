@@ -14,13 +14,13 @@
 
 class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 {
-    // No copying
-    AudioOutputOMX(const AudioOutputOMX&);
-    AudioOutputOMX & operator =(const AudioOutputOMX&);
-
   public:
     explicit AudioOutputOMX(const AudioSettings &settings);
-    virtual ~AudioOutputOMX();
+    ~AudioOutputOMX() override;
+
+    // No copying
+    AudioOutputOMX(const AudioOutputOMX&) = delete;
+    AudioOutputOMX & operator =(const AudioOutputOMX&) = delete;
 
     // VolumeBase implementation
     int GetVolumeChannel(int channel) const override; // VolumeBase

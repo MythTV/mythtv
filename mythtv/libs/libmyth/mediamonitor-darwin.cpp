@@ -390,7 +390,7 @@ void MonitorThreadDarwin::run(void)
         // Run the run loop for interval (milliseconds) - this will
         // handle any disk arbitration appeared/dissappeared events
         CFRunLoopRunInMode(kCFRunLoopDefaultMode,
-                           (float) m_Interval / 1000.0f, false );
+                           (float) m_Interval / 1000.0F, false );
     }
 
     DAUnregisterCallback(daSession, (void(*))diskChangedCallback,     this);

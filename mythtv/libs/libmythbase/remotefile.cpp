@@ -1071,7 +1071,6 @@ int RemoteFile::Read(void *data, int size)
         if (!Resume())
         {
             LOG(VB_GENERAL, LOG_WARNING, "RemoteFile::Read(): Resume failed.");
-            sent = -1;
         }
         else
             LOG(VB_GENERAL, LOG_NOTICE, "RemoteFile::Read(): Resume success.");

@@ -77,7 +77,7 @@ void show_buf(uint8_t *buf, int length)
 
 
 
-int find_mpg_header(uint8_t head, uint8_t *buf, int length)
+int find_mpg_header(uint8_t head, const uint8_t *buf, int length)
 {
 
 	int c = 0;
@@ -113,7 +113,7 @@ int find_mpg_header(uint8_t head, uint8_t *buf, int length)
 }
 
 
-int find_any_header(uint8_t *head, uint8_t *buf, int length)
+int find_any_header(uint8_t *head, const uint8_t *buf, int length)
 {
 
 	int c = 0;
@@ -149,7 +149,7 @@ int find_any_header(uint8_t *head, uint8_t *buf, int length)
 }
 
 
-uint64_t trans_pts_dts(uint8_t *pts)
+uint64_t trans_pts_dts(const uint8_t *pts)
 {
 	uint64_t wts;
 	

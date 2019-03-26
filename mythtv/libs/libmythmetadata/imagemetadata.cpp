@@ -268,9 +268,7 @@ class PictureMetaData : public ImageMetaData
 {
 public:
     explicit PictureMetaData(const QString &filePath);
-    ~PictureMetaData()
-    { // libexiv2 closes file, cleans up via autoptrs
-    }
+    ~PictureMetaData() override = default; // libexiv2 closes file, cleans up via autoptrs
 
     bool        IsValid() override // ImageMetaData
         { return m_image.get(); }
@@ -297,7 +295,7 @@ protected:
    \param filePath Absolute image path
  */
 PictureMetaData::PictureMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_image(nullptr), m_exifData()
+    : ImageMetaData(filePath), m_image(nullptr)
 {
     try
     {
@@ -483,7 +481,7 @@ QString PictureMetaData::DecodeComment(std::string rawValue)
     Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
     if (comVal.charsetId() != Exiv2::CommentValue::undefined)
         rawValue = comVal.comment();
-    return QString::fromStdString(rawValue.c_str());
+    return QString::fromStdString(rawValue);
 }
 
 
@@ -496,7 +494,7 @@ class VideoMetaData : public ImageMetaData
 {
 public:
     explicit VideoMetaData(const QString &filePath);
-    ~VideoMetaData();
+    ~VideoMetaData() override;
 
     bool        IsValid() override  // ImageMetaData
         { return m_dict; }

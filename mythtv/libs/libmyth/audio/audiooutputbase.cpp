@@ -283,8 +283,8 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
     if (channels < 1 || channels > 8 || !m_configure_succeeded)
         return;
 
-    bool willstretch = m_stretchfactor < 0.99f || m_stretchfactor > 1.01f;
-    m_eff_stretchfactor = lroundf(100000.0f * lstretchfactor);
+    bool willstretch = m_stretchfactor < 0.99F || m_stretchfactor > 1.01F;
+    m_eff_stretchfactor = lroundf(100000.0F * lstretchfactor);
 
     if (m_pSoundStretch)
     {
@@ -731,17 +731,17 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         m_samplerate = samplerate_tmp;
         m_format = m_output_format = FORMAT_S16;
         m_source_bytes_per_frame = m_channels *
-            m_output_settings->SampleSize(m_format);
+            AudioOutputSettings::SampleSize(m_format);
     }
     else
     {
         m_source_bytes_per_frame = m_source_channels *
-            m_output_settings->SampleSize(m_format);
+            AudioOutputSettings::SampleSize(m_format);
     }
 
     // Turn on float conversion?
     if (m_need_resampler || m_needs_upmix || m_needs_downmix ||
-        m_stretchfactor != 1.0f || (internal_vol && SWVolume()) ||
+        m_stretchfactor != 1.0F || (internal_vol && SWVolume()) ||
         (m_enc && m_output_format != FORMAT_S16) ||
         !OutputSettings(m_enc || m_passthru)->IsSupportedFormat(m_output_format))
     {
@@ -754,14 +754,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
 
     m_bytes_per_frame =  m_processing ?
-        sizeof(float) : m_output_settings->SampleSize(m_format);
+        sizeof(float) : AudioOutputSettings::SampleSize(m_format);
     m_bytes_per_frame *= m_channels;
 
     if (m_enc)
         m_channels = 2; // But only post-encoder
 
     m_output_bytes_per_frame = m_channels *
-                             m_output_settings->SampleSize(m_output_format);
+                             AudioOutputSettings::SampleSize(m_output_format);
 
     VBGENERAL(
         QString("Opening audio device '%1' ch %2(%3) sr %4 sf %5 reenc %6")
@@ -861,7 +861,7 @@ void AudioOutputBase::KillAudio()
         delete m_pSoundStretch;
         m_pSoundStretch = nullptr;
         m_old_stretchfactor = m_stretchfactor;
-        m_stretchfactor = 1.0f;
+        m_stretchfactor = 1.0F;
     }
 
     if (m_encoder)
@@ -1237,7 +1237,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
 
     // Upmix to 6ch via FreeSurround
     // Calculate frame size of input
-    off =  m_processing ? sizeof(float) : m_output_settings->SampleSize(m_format);
+    off =  m_processing ? sizeof(float) : AudioOutputSettings::SampleSize(m_format);
     off *= m_source_channels;
 
     int i = 0;
@@ -1293,7 +1293,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                               int64_t timecode, int /*in_frames*/)
 {
     int frames   = in_len / m_source_bytes_per_frame;
-    void *buffer = in_buffer;
     int bpf      = m_bytes_per_frame;
     int len      = in_len;
     bool music   = false;
@@ -1340,7 +1339,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         len = m_spdifenc->GetProcessedSize();
         if (len > 0)
         {
-            buffer = in_buffer = m_spdifenc->GetProcessedBuffer();
+            in_buffer = m_spdifenc->GetProcessedBuffer();
             m_spdifenc->Reset();
             frames = len / m_source_bytes_per_frame;
         }
@@ -1367,7 +1366,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     {
         // Send original samples to any attached visualisations
         dispatchVisual((uchar *)in_buffer, len, timecode, m_source_channels,
-                       m_output_settings->FormatToBits(m_format));
+                       AudioOutputSettings::FormatToBits(m_format));
     }
 
     // Calculate amount of free space required in ringbuffer
@@ -1418,7 +1417,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     while(frames_remaining > 0)
     {
-        buffer = (char *)in_buffer + offset;
+        void *buffer = (char *)in_buffer + offset;
         frames = frames_remaining;
         len = frames * m_source_bytes_per_frame;
 
@@ -1431,7 +1430,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                 offset += len;
             }
             // Convert to floats
-            len = AudioOutputUtil::toFloat(m_format, m_src_in, buffer, len);
+            AudioOutputUtil::toFloat(m_format, m_src_in, buffer, len);
         }
 
         frames_remaining -= frames;
@@ -1586,13 +1585,13 @@ void AudioOutputBase::Status()
 
     if (m_source_bitrate == -1)
         m_source_bitrate = m_source_samplerate * m_source_channels *
-                         m_output_settings->FormatToBits(m_format);
+                         AudioOutputSettings::FormatToBits(m_format);
 
     if (ct / 1000 != m_current_seconds)
     {
         m_current_seconds = ct / 1000;
         OutputEvent e(m_current_seconds, ct, m_source_bitrate, m_source_samplerate,
-                      m_output_settings->FormatToBits(m_format), m_source_channels);
+                      AudioOutputSettings::FormatToBits(m_format), m_source_channels);
         dispatch(e);
     }
 }
@@ -1731,7 +1730,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
 
     int bdiff = kAudioRingBufferSize - m_raud;
 
-    int obytes = m_output_settings->SampleSize(m_output_format);
+    int obytes = AudioOutputSettings::SampleSize(m_output_format);
 
     if (obytes <= 0)
         return 0;

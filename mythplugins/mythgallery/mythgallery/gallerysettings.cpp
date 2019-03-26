@@ -294,7 +294,6 @@ static HostCheckBoxSetting *SlideshowRecursive()
 };
 
 GallerySettings::GallerySettings()
-    :GroupSetting()
 {
     setLabel(GallerySettings::tr("MythGallery Settings (General)"));
     addChild(MythGalleryDir());

@@ -358,10 +358,11 @@ static bool extract_one_del(QStringList &list, uint &recordingID)
     list.pop_front();
     list.pop_front();
 
-    if (!recordingID)
+    if (recordingID == 0U) {
         LOG(VB_GENERAL, LOG_ERR, LOC + "extract_one_del() invalid entry");
-
-    return recordingID;
+        return false;
+    }
+    return true;
 }
 
 void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
@@ -700,7 +701,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 
         desc = tr("There is/are %n recording(s) in this display "
                   "group, which consume(s) %1 GiB.", "", countInGroup)
-               .arg(groupSize / 1024.0f / 1024.0f / 1024.0f, 0, 'f', 2);
+               .arg(groupSize / 1024.0F / 1024.0F / 1024.0F, 0, 'f', 2);
     }
     else
     {

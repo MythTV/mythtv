@@ -104,7 +104,7 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     }
     else
     {
-        m_prog_data.HandlePrograms(id, proglist);
+        ProgramData::HandlePrograms(id, proglist);
     }
     return true;
 }

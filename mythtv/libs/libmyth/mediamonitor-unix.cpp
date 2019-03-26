@@ -158,10 +158,7 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
 
     endfsent();
 
-    if (m_Devices.isEmpty())
-        return false;
-
-    return true;
+    return !m_Devices.isEmpty();
 #else
     return false;
 #endif

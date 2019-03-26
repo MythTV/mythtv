@@ -107,7 +107,7 @@ static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
 /* Block to Stream (encoding)                         */
 /*                                                    */
 
-int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t /*bt8*/)
+int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t /*bt8*/)
 {
  int ci, co=1;
  int16_t ZZvalue;
@@ -278,7 +278,7 @@ fprintf(stdout, "\n\n");
 /* Stream to Block  (decoding)                        */
 /*                                                    */
 
-int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
+int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
 {
  uint32_t *qtbl = (uint32_t *)qtbla;
  int ci;
@@ -423,7 +423,7 @@ fprintf(stdout, "\n\n");
 
 #else
 
-int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
+int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t bt8)
 {
  register int ci, co=1, tmp;
  register int16_t ZZvalue;
@@ -481,7 +481,7 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  return (int)co;
 }
 
-int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, uint32_t *qtbla)
+int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t bt8, uint32_t *qtbla)
 {
  uint32_t *qtbl = (uint32_t *)qtbla;
  int ci=1, co=1, tmp;
@@ -2705,13 +2705,13 @@ int RTjpeg::SetQuality(int *quality)
     return 0;
 }
 
-int RTjpeg::SetFormat(int *fmt)
+int RTjpeg::SetFormat(const int *fmt)
 {
     f = *fmt;
     return 0;
 }
 
-int RTjpeg::SetSize(int *w, int *h)
+int RTjpeg::SetSize(const int *w, const int *h)
 {
     if ((*w < 0) || (*w > 65535))
         return -1;

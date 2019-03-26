@@ -38,8 +38,7 @@
 #define LOC QString("LCDdevice: ")
 
 LCD::LCD()
-    : QObject(),
-      m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
+    : m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
 {
     m_sendBuffer.clear(); m_lastCommand.clear();
     m_lcdShowMusicItems.clear(); m_lcdKeyString.clear();
@@ -65,7 +64,7 @@ LCD *LCD::m_lcd = nullptr;
 
 LCD *LCD::Get(void)
 {
-    if (m_enabled && m_lcd == nullptr && m_serverUnavailable == false)
+    if (m_enabled && m_lcd == nullptr && !m_serverUnavailable)
         m_lcd = new LCD;
     return m_lcd;
 }
@@ -93,7 +92,7 @@ void LCD::SetupLCD (void)
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
         LCD *lcd = LCD::Get();
-        if (lcd->connectToHost(lcd_host, lcd_port) == false)
+        if (!lcd->connectToHost(lcd_host, lcd_port))
         {
             delete m_lcd;
             m_lcd = nullptr;
@@ -176,7 +175,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         while (count < 10 && !m_connected);
     }
 
-    if (m_connected == false)
+    if (!m_connected)
         m_serverUnavailable = true;
 
     return m_connected;
@@ -466,7 +465,7 @@ void LCD::setChannelProgress(const QString &time, float value)
     if (!m_lcdReady || !m_lcdShowChannel)
         return;
 
-    value = std::min(std::max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0F, value), 1.0F);
     sendToServer(QString("SET_CHANNEL_PROGRESS %1 %2").arg(quotedString(time))
         .arg(value));
 }
@@ -476,7 +475,7 @@ void LCD::setGenericProgress(float value)
     if (!m_lcdReady || !m_lcdShowGeneric)
         return;
 
-    value = std::min(std::max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0F, value), 1.0F);
     sendToServer(QString("SET_GENERIC_PROGRESS 0 %1").arg(value));
 }
 
@@ -493,7 +492,7 @@ void LCD::setMusicProgress(const QString &time, float value)
     if (!m_lcdReady || !m_lcdShowMusic)
         return;
 
-    value = std::min(std::max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0F, value), 1.0F);
     sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + ' ' +
             QString().setNum(value));
 }
@@ -519,10 +518,10 @@ void LCD::setVolumeLevel(float value)
     if (!m_lcdReady || !m_lcdShowVolume)
         return;
 
-    if (value < 0.0f)
-        value = 0.0f;
-    else if (value > 1.0f)
-        value = 1.0f;
+    if (value < 0.0F)
+        value = 0.0F;
+    else if (value > 1.0F)
+        value = 1.0F;
 
     sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));
 }
@@ -538,7 +537,6 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
 void LCD::outputLEDs()
 {
     /* now implemented elsewhere for advanced icon control */
-    return;
 #if 0
     if (!lcd_ready)
         return;

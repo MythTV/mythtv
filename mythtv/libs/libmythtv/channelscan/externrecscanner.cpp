@@ -28,7 +28,6 @@ ExternRecChannelScanner::ExternRecChannelScanner(uint cardid,
     , m_inputname(inputname)
     , m_sourceid(sourceid)
     , m_thread(new MThread("ExternRecChannelScanner", this))
-    , m_lock()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Has ScanMonitor %1")
         .arg(monitor ? "true" : "false"));

@@ -27,7 +27,7 @@
       ok = arg1; \
       if (!ok) \
           LOG(VB_GENERAL, LOG_ERR, LOC + (arg2)); \
-  } while(0)
+  } while(false)
 
 QString profileToString(VAProfile profile);
 QString entryToString(VAEntrypoint entry);
@@ -103,7 +103,7 @@ class VAAPIDisplay : ReferenceCounter
         m_va_disp(nullptr), m_x_disp(nullptr),
         m_driver() { }
   public:
-   ~VAAPIDisplay()
+   ~VAAPIDisplay() override
     {
         if (m_va_disp)
         {
@@ -458,7 +458,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
         {
             int min = m_pictureAttributes[i].min_value;
             int max = m_pictureAttributes[i].max_value;
-            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0f) * (max - min));
+            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0F) * (max - min));
             m_pictureAttributes[i].value = val;
             found = true;
             break;

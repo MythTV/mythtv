@@ -60,7 +60,7 @@ static StandardSetting *ShutdownWithBE()
     return gc;
 }
 
-MythWelcomeSettings::MythWelcomeSettings() : GroupSetting()
+MythWelcomeSettings::MythWelcomeSettings()
 {
     setLabel(tr("MythWelcome Settings"));
 

@@ -79,39 +79,11 @@ ProgLister::ProgLister(
     m_type(plPreviouslyRecorded),
     m_recid(recid),
     m_title(title),
-    m_extraArg(),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
-    m_selectedTime(),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-
-    m_searchType(kNoSearch),
-
     m_view("reverse time"),
-    m_curView(-1),
-    m_viewList(),
-    m_viewTextList(),
-
-    m_itemList(),
-    m_itemListSave(),
-    m_schedList(),
-
-    m_typeList(),
-    m_genreList(),
-    m_stationList(),
-
-    m_allowEvents(true),
-    m_titleSort(false),
-    m_reverseSort(true),
-    m_useGenres(false),
-
-    m_schedText(nullptr),
-    m_curviewText(nullptr),
-    m_positionText(nullptr),
-    m_progList(nullptr),
-    m_messageText(nullptr),
-
-    m_allowViewDialog(true)
+    m_reverseSort(true)
 {
 }
 
@@ -250,7 +222,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             QuickRecord();
         else if (action == "1")
         {
-            if (m_titleSort == true)
+            if (m_titleSort)
             {
                 m_titleSort = false;
                 m_reverseSort = (m_type == plPreviouslyRecorded);
@@ -263,7 +235,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "2")
         {
-            if (m_titleSort == false)
+            if (!m_titleSort)
             {
                 m_titleSort = true;
                 m_reverseSort = false;
@@ -1059,7 +1031,7 @@ class plTitleSort : public plCompare
 class plPrevTitleSort : public plCompare
 {
   public:
-    plPrevTitleSort(void) : plCompare() {;}
+    plPrevTitleSort(void) {;}
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
@@ -1078,7 +1050,7 @@ class plPrevTitleSort : public plCompare
 class plTimeSort : public plCompare
 {
   public:
-    plTimeSort(void) : plCompare() {;}
+    plTimeSort(void) {;}
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {

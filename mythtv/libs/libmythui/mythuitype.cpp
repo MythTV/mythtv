@@ -584,7 +584,7 @@ QSize MythUIType::GetMinSize(void) const
     if (!m_MinSize.isValid())
         return m_Area.size();
 
-    return QSize(m_MinSize.x(), m_MinSize.y());
+    return {m_MinSize.x(), m_MinSize.y()};
 }
 
 void MythUIType::SetArea(const MythRect &rect)
@@ -975,7 +975,6 @@ bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
 
 void MythUIType::customEvent(QEvent * /*event*/)
 {
-    return;
 }
 
 /** \brief Mouse click/movement handler, receives mouse gesture events from the
@@ -994,7 +993,6 @@ bool MythUIType::gestureEvent(MythGestureEvent * /*event*/)
  */
 void MythUIType::mediaEvent(MythMediaEvent * /*event*/)
 {
-    return;
 }
 
 void MythUIType::LoseFocus(void)
@@ -1386,10 +1384,7 @@ void MythUIType::LoadNow(void)
  */
 bool MythUIType::ContainsPoint(const QPoint &point) const
 {
-    if (m_Area.contains(point))
-        return true;
-
-    return false;
+    return m_Area.contains(point);
 }
 
 MythPainter *MythUIType::GetPainter(void)

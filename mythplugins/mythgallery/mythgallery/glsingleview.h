@@ -118,8 +118,8 @@ class GLSingleView : public QGLWidget, public ImageView
 
   private:
     // General
-    float         m_source_x      {0.0f};
-    float         m_source_y      {0.0f};
+    float         m_source_x      {0.0F};
+    float         m_source_y      {0.0F};
     ScaleMax      m_scaleMax      {kScaleToFit};
 
     // Texture variables (for display and effects)
@@ -136,18 +136,18 @@ class GLSingleView : public QGLWidget, public ImageView
     int           m_effect_rotate_direction                {0};
     MythTimer     m_effect_frame_time;
     int           m_effect_transition_timeout              {2000};
-    float         m_effect_transition_timeout_inv          {1.0f / 2000};
+    float         m_effect_transition_timeout_inv          {1.0F / 2000};
 
     // Unshared effect state variables
     float         m_effect_flutter_points[40][40][3];
-    float         m_effect_cube_xrot                       {0.0f};
-    float         m_effect_cube_yrot                       {0.0f};
-    float         m_effect_cube_zrot                       {0.0f};
+    float         m_effect_cube_xrot                       {0.0F};
+    float         m_effect_cube_yrot                       {0.0F};
+    float         m_effect_cube_zrot                       {0.0F};
     float         m_effect_kenBurns_location_x[2];
     float         m_effect_kenBurns_location_y[2];
     int           m_effect_kenBurns_projection[2];
     MythTimer     m_effect_kenBurns_image_time[2];
-    float         m_effect_kenBurns_image_timeout          {0.0f};
+    float         m_effect_kenBurns_image_timeout          {0.0F};
     KenBurnsImageLoader *m_effect_kenBurns_imageLoadThread {nullptr};
     bool          m_effect_kenBurns_image_ready            {true};
     QImage        m_effect_kenBurns_image;

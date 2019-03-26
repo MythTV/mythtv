@@ -63,11 +63,6 @@ MythCodecContext::MythCodecContext() :
     priorPts[1] = 0;
 }
 
-MythCodecContext::~MythCodecContext()
-{
-
-}
-
 // static
 MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 {

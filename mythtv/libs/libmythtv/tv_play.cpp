@@ -2,13 +2,13 @@
 #include "tv_play.h"
 
 #include <algorithm>
+#include <cassert>
 #include <chrono> // for milliseconds
 #include <cmath>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdlib>
 #include <thread> // for sleep_for
-#include <assert.h>
 
 using namespace std;
 
@@ -1078,7 +1078,7 @@ void TV::InitFromDB(void)
     m_dbChannelFormat      = kv["ChannelFormat"];
     m_tryUnflaggedSkip     = kv["TryUnflaggedSkip"].toInt();
     m_smartForward         = kv["SmartForward"].toInt();
-    m_ffRewRepos           = kv["FFRewReposTime"].toFloat() * 0.01f;
+    m_ffRewRepos           = kv["FFRewReposTime"].toFloat() * 0.01F;
     m_ffRewReverse         = kv["FFRewReverse"].toInt();
 
     m_dbUseChannelGroups   = kv["BrowseChannelGroup"].toInt();
@@ -1234,7 +1234,7 @@ bool TV::Init(bool createWindow)
     mctx->m_ffRewState = 0;
     mctx->m_ffRewIndex = kInitFFRWSpeed;
     mctx->m_ffRewSpeed = 0;
-    mctx->m_tsNormal   = 1.0f;
+    mctx->m_tsNormal   = 1.0F;
     ReturnPlayerLock(mctx);
 
     m_sleepIndex = 0;
@@ -1624,7 +1624,7 @@ bool TV::LiveTV(bool showDialogs, const ChannelInfoList &selection)
         {
             m_idleTimerId = StartTimer(m_dbIdleTimeout, __LINE__);
             LOG(VB_GENERAL, LOG_INFO, QString("Using Idle Timer. %1 minutes")
-                    .arg(m_dbIdleTimeout*(1.0f/60000.0f)));
+                    .arg(m_dbIdleTimeout*(1.0F/60000.0F)));
         }
 
         ReturnPlayerLock(actx);
@@ -2094,8 +2094,8 @@ TVState TV::RemoveRecording(TVState state)
 #define TRANSITION(ASTATE,BSTATE) \
    ((ctxState == (ASTATE)) && (desiredNextState == (BSTATE)))
 
-#define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0)
-#define SET_LAST() do { nextState = ctxState; changed = true; } while(0)
+#define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(false)
+#define SET_LAST() do { nextState = ctxState; changed = true; } while(false)
 
 static QString tv_i18n(const QString &msg)
 {
@@ -3132,7 +3132,7 @@ bool TV::HandleLCDTimerEvent(void)
     LCD *lcd = LCD::Get();
     if (lcd)
     {
-        float progress = 0.0f;
+        float progress = 0.0F;
         QString lcd_time_string;
         bool showProgress = true;
 
@@ -3149,7 +3149,7 @@ bool TV::HandleLCDTimerEvent(void)
         {
             osdInfo info;
             if (actx->CalcPlayerSliderPosition(info)) {
-                progress = info.values["position"] * 0.001f;
+                progress = info.values["position"] * 0.001F;
 
                 lcd_time_string = info.text["playedtime"] + " / " + info.text["totaltime"];
                 // if the string is longer than the LCD width, remove all spaces
@@ -5105,7 +5105,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         }
         else
         {
-            float tmpSpeed = 1.0f;
+            float tmpSpeed = 1.0F;
             bool ok = false;
 
             if (tokens[2].contains(QRegExp("^\\-*\\d+x$")))
@@ -5145,7 +5145,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 if (paused)
                     DoTogglePause(ctx, true);
 
-                if (tmpSpeed == 0.0f)
+                if (tmpSpeed == 0.0F)
                 {
                     NormalSpeed(ctx);
                     StopFFRew(ctx);
@@ -5153,10 +5153,10 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     if (!paused)
                         DoTogglePause(ctx, true);
                 }
-                else if (tmpSpeed == 1.0f)
+                else if (tmpSpeed == 1.0F)
                 {
                     StopFFRew(ctx);
-                    ctx->m_tsNormal = 1.0f;
+                    ctx->m_tsNormal = 1.0F;
                     ChangeTimeStretch(ctx, 0, false);
                     return;
                 }
@@ -5180,7 +5180,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     if (ctx->m_ffRewState)
                         SetFFRew(ctx, index);
                 }
-                else if (0.48f <= tmpSpeed && tmpSpeed <= 2.0f) {
+                else if (0.48F <= tmpSpeed && tmpSpeed <= 2.0F) {
                     StopFFRew(ctx);
 
                     ctx->m_tsNormal = tmpSpeed;   // alter speed before display
@@ -5392,7 +5392,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
             ctx->LockDeletePlayer(__FILE__, __LINE__);
             long long fplay = 0;
-            float     rate  = 30.0f;
+            float     rate  = 30.0F;
             if (ctx->m_player)
             {
                 fplay = ctx->m_player->GetFramesPlayed();
@@ -6346,19 +6346,19 @@ void TV::DoPlay(PlayerContext *ctx)
 float TV::DoTogglePauseStart(PlayerContext *ctx)
 {
     if (!ctx)
-        return 0.0f;
+        return 0.0F;
 
     if (ctx->m_buffer && ctx->m_buffer->IsInDiscMenuOrStillFrame())
-        return 0.0f;
+        return 0.0F;
 
     ctx->m_ffRewSpeed = 0;
-    float time = 0.0f;
+    float time = 0.0F;
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->m_player)
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        return 0.0f;
+        return 0.0F;
     }
     if (ctx->m_player->IsPaused())
     {
@@ -6483,7 +6483,7 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
     if (!ctx || !ctx->m_buffer)
         return false;
 
-    if (time > -0.001f && time < +0.001f)
+    if (time > -0.001F && time < +0.001F)
         return false;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 seconds").arg(time));
@@ -6506,9 +6506,9 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 
     bool res = false;
 
-    if (time > 0.0f)
+    if (time > 0.0F)
         res = ctx->m_player->FastForward(time);
-    else if (time < 0.0f)
+    else if (time < 0.0F)
         res = ctx->m_player->Rewind(-time);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -6715,7 +6715,7 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
         }
         uint64_t total_frames = ctx->m_player->GetCurrentFrameCount();
         float dur = ctx->m_player->ComputeSecs(total_frames, honorCutlist);
-        time = max(0.0f, dur - time);
+        time = max(0.0F, dur - time);
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         DoSeek(ctx, time, tr("Jump To"), /*timeIsOffset*/false, honorCutlist);
     }
@@ -8156,7 +8156,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
             infoMap[QString("message%1").arg(i++)] = it->GetName();
 
     uint  sig  = 0;
-    float snr  = 0.0f;
+    float snr  = 0.0F;
     uint  ber  = 0xffffffff;
     int   pos  = -1;
     int   tuned = -1;
@@ -8227,7 +8227,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
 
     QString sigDesc = tr("Signal %1%").arg(sig,2);
-    if (snr > 0.0f)
+    if (snr > 0.0F)
         sigDesc += " | " + tr("S/N %1dB").arg(log10f(snr), 3, 'f', 1);
     if (ber != 0xffffffff)
         sigDesc += " | " + tr("BE %1", "Bit Errors").arg(ber, 2);
@@ -8597,7 +8597,7 @@ vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
         PlayerContext *actx = GetPlayer(lctx, i);
         if (actx)
             was_paused.push_back(ContextIsPaused(actx, __FILE__, __LINE__));
-        float time = 0.0f;
+        float time = 0.0F;
         if (pause[i] ^ was_paused.back())
             time = DoTogglePauseStart(GetPlayer(lctx,i));
         times.push_back(time);
@@ -8813,14 +8813,14 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up, int newvolume)
 
 void TV::ToggleTimeStretch(PlayerContext *ctx)
 {
-    if (ctx->m_tsNormal == 1.0f)
+    if (ctx->m_tsNormal == 1.0F)
     {
         ctx->m_tsNormal = ctx->m_tsAlt;
     }
     else
     {
         ctx->m_tsAlt = ctx->m_tsNormal;
-        ctx->m_tsNormal = 1.0f;
+        ctx->m_tsNormal = 1.0F;
     }
     ChangeTimeStretch(ctx, 0, false);
 }
@@ -8829,7 +8829,7 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
 {
     const float kTimeStretchMin = 0.5;
     const float kTimeStretchMax = 2.0;
-    float new_ts_normal = ctx->m_tsNormal + (0.05f * dir);
+    float new_ts_normal = ctx->m_tsNormal + (0.05F * dir);
     m_stretchAdjustment = allowEdit;
 
     if (new_ts_normal > kTimeStretchMax &&
@@ -9073,7 +9073,7 @@ void TV::ShowOSDSleep(void)
             "MythTV was set to sleep after %1 minutes and "
             "will exit in %d seconds.\n"
             "Do you wish to continue watching?")
-            .arg(m_sleepTimerTimeout * (1.0f/60000.0f));
+            .arg(m_sleepTimerTimeout * (1.0F/60000.0F));
 
         osd->DialogShow(OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout);
         osd->DialogAddButton(tr("Yes"), "DIALOG_SLEEP_YES_0");
@@ -9136,7 +9136,7 @@ void TV::ShowOSDIdle(void)
         QString message = tr(
             "MythTV has been idle for %1 minutes and "
             "will exit in %d seconds. Are you still watching?")
-            .arg(m_dbIdleTimeout * (1.0f/60000.0f));
+            .arg(m_dbIdleTimeout * (1.0F/60000.0F));
 
         osd->DialogShow(OSD_DLG_IDLE, message, kIdleTimerDialogTimeout);
         osd->DialogAddButton(tr("Yes"), "DIALOG_IDLE_YES_0");
@@ -10559,8 +10559,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         bool floatRead;
         float stretch = action.right(action.length() - 13).toFloat(&floatRead);
         if (floatRead &&
-            stretch <= 2.0f &&
-            stretch >= 0.48f)
+            stretch <= 2.0F &&
+            stretch >= 0.48F)
         {
             actx->m_tsNormal = stretch;   // alter speed before display
         }

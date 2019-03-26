@@ -66,7 +66,7 @@ void EITScanner::TeardownAll(void)
 void EITScanner::run(void)
 {
     static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
-    static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
+    static const float rt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
 
     m_lock.lock();
 
@@ -78,7 +78,7 @@ void EITScanner::run(void)
         m_lock.unlock();
         uint list_size = m_eitHelper->GetListSize();
 
-        float rate = 1.0f;
+        float rate = 1.0F;
         for (uint i = 0; i < 5; i++)
         {
             if (list_size >= sz[i])
@@ -173,7 +173,6 @@ void EITScanner::run(void)
 
     if (eitCount) /* some events have been handled since the last schedule request */
     {
-        eitCount = 0;
         RescheduleRecordings();
     }
 
@@ -206,7 +205,7 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
     m_channel     = channel;
 
     m_eitSource->SetEITHelper(m_eitHelper);
-    m_eitSource->SetEITRate(1.0f);
+    m_eitSource->SetEITRate(1.0F);
     m_eitHelper->SetChannelID(m_channel->GetChanID());
     m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(m_channel->GetChanID()));
 

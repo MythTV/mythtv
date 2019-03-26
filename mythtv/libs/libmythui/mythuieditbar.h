@@ -43,7 +43,7 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
     void CalcInverseRegions(void);
     void ClearImages(void);
 
-    float  m_editPosition {0.0f};
+    float  m_editPosition {0.0F};
     double m_total        {1.0};
     QList<QPair<float,float> > m_regions;
     QList<QPair<float,float> > m_invregions;

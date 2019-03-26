@@ -450,7 +450,7 @@ static void cleanup(VideoFilter *vf)
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                VideoFrameType outpixfmt,
-                               int *width, int *height, char *options,
+                               const int *width, const int *height, const char *options,
                                int threads)
 {
     unsigned int Param1, Param2, Param3, Param4;

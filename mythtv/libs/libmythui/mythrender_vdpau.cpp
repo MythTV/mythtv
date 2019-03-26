@@ -113,10 +113,10 @@ class VDPAUColor
     void SetColor(uint color)
     {
         m_color = color;
-        m_vdp_color.red   = (float)((m_color & 0xFF000000) >> 24) / 255.0f;
-        m_vdp_color.green = (float)((m_color & 0xFF0000) >> 16) / 255.0f;
-        m_vdp_color.blue  = (float)((m_color & 0xFF00) >> 8)/ 255.0f;
-        m_vdp_color.alpha = (float)( m_color & 0xFF) / 255.0f;
+        m_vdp_color.red   = (float)((m_color & 0xFF000000) >> 24) / 255.0F;
+        m_vdp_color.green = (float)((m_color & 0xFF0000) >> 16) / 255.0F;
+        m_vdp_color.blue  = (float)((m_color & 0xFF00) >> 8)/ 255.0F;
+        m_vdp_color.alpha = (float)( m_color & 0xFF) / 255.0F;
     }
 
     int      m_color {0};
@@ -192,7 +192,7 @@ class VDPAUVideoSurface : public VDPAUResource
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
     }
     VDPAUVideoSurface(uint id, QSize size, VdpChromaType type)
-      : VDPAUResource(id, size), m_type(type), m_needs_reset(false)
+      : VDPAUResource(id, size), m_type(type)
     {
         m_owner = QThread::currentThread();
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
@@ -246,7 +246,7 @@ class VDPAUVideoMixer : public VDPAUResource
         memset(&m_csc, 0, sizeof(VdpCSCMatrix));
     }
 
-   ~VDPAUVideoMixer()
+   ~VDPAUVideoMixer() override
     {
         delete m_noise_reduction;
         delete m_sharpness;
@@ -1391,10 +1391,10 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     VdpColor color;
     if (!(red == 0 && green == 0 && blue == 0 && alpha == 0))
     {
-        color.red   = red   / 255.0f;
-        color.green = green / 255.0f;
-        color.blue  = blue  / 255.0f;
-        color.alpha = alpha / 255.0f;
+        color.red   = red   / 255.0F;
+        color.green = green / 255.0F;
+        color.blue  = blue  / 255.0F;
+        color.alpha = alpha / 255.0F;
     }
 
     INIT_ST
@@ -1419,7 +1419,7 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
             CHECK_ST
             if (!ok)
             {
-                vdp_st = vdp_bitmap_surface_destroy(bitmap);
+                vdp_bitmap_surface_destroy(bitmap);
                 bitmap = VDP_INVALID_HANDLE;
             }
             else
@@ -1437,7 +1437,7 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
 
     if (createdBitmap)
     {
-        vdp_st = vdp_bitmap_surface_destroy(bitmap);
+        vdp_bitmap_surface_destroy(bitmap);
     }
 
     return ok;
@@ -1681,16 +1681,8 @@ bool MythRenderVDPAU::GetProcs(void)
         vdp_bitmap_surface_put_bits_native);
     GET_PROC(VDP_FUNC_ID_PREEMPTION_CALLBACK_REGISTER,
         vdp_preemption_callback_register);
-
-    vdp_st = vdp_get_proc_address(
-        m_device, VDP_FUNC_ID_GET_API_VERSION,
-        (void **)&vdp_get_api_version
-    );
-
-    vdp_st = vdp_get_proc_address(
-        m_device, VDP_FUNC_ID_GET_INFORMATION_STRING,
-        (void **)&vdp_get_information_string
-    );
+    GET_PROC(VDP_FUNC_ID_GET_API_VERSION, vdp_get_api_version);
+    GET_PROC(VDP_FUNC_ID_GET_INFORMATION_STRING, vdp_get_information_string);
 
     return ok;
 }

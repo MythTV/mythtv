@@ -980,8 +980,8 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
 #define TRANSITION(ASTATE,BSTATE) \
    ((m_internalState == (ASTATE)) && (m_desiredNextState == (BSTATE)))
-#define SET_NEXT() do { nextState = m_desiredNextState; changed = true; } while(0)
-#define SET_LAST() do { nextState = m_internalState; changed = true; } while(0)
+#define SET_NEXT() do { nextState = m_desiredNextState; changed = true; } while(false)
+#define SET_LAST() do { nextState = m_internalState; changed = true; } while(false)
 
 /** \fn TVRec::HandleStateChange(void)
  *  \brief Changes the internalState to the desiredNextState if possible.
@@ -1936,7 +1936,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDTVSigMon_WaitForSDT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
-        sm->SetRotorTarget(1.0f);
+        sm->SetRotorTarget(1.0F);
 
         if (EITscan)
         {
@@ -1973,7 +1973,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPAT |
                      SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
-        sm->SetRotorTarget(1.0f);
+        sm->SetRotorTarget(1.0F);
 
         if (EITscan)
         {
@@ -2355,7 +2355,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
                     fchanid.push_back(query.value(0).toUInt());
                     fchannum.push_back(query.value(1).toString());
                     finputid.push_back(query.value(2).toUInt());
-                    fspacer.push_back(spacers[j]);
+                    fspacer.emplace_back(spacers[j]);
 #if DEBUG_CHANNEL_PREFIX
                     LOG(VB_GENERAL, LOG_DEBUG,
                         QString("(%1,%2) Adding %3 rec %4")
@@ -2546,7 +2546,7 @@ float TVRec::GetFramerate(void)
 
     if (m_recorder)
         return m_recorder->GetFrameRate();
-    return -1.0f;
+    return -1.0F;
 }
 
 /** \fn TVRec::GetFramesWritten()
@@ -2635,7 +2635,7 @@ long long TVRec::GetMaxBitrate(void) const
     long long bitrate;
     if (m_genOpt.inputtype == "MPEG")
         bitrate = 10080000LL; // use DVD max bit rate
-    if (m_genOpt.inputtype == "HDPVR")
+    else if (m_genOpt.inputtype == "HDPVR")
         bitrate = 20200000LL; // Peek bit rate for HD-PVR
     else if (!CardUtil::IsEncoder(m_genOpt.inputtype))
         bitrate = 22200000LL; // 1080i

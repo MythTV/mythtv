@@ -46,16 +46,12 @@ static QString thePrefix = "the ";
 
 bool operator==(MusicMetadata& a, MusicMetadata& b)
 {
-    if (a.Filename() == b.Filename())
-        return true;
-    return false;
+    return a.Filename() == b.Filename();
 }
 
 bool operator!=(MusicMetadata& a, MusicMetadata& b)
 {
-    if (a.Filename() != b.Filename())
-        return true;
-    return false;
+    return a.Filename() != b.Filename();
 }
 
 // this ctor is for radio streams
@@ -945,7 +941,7 @@ QString MusicMetadata::Filename(bool find)
         return m_urls[0];
 
     // if not asked to find the file just return the raw filename from the DB
-    if (find == false)
+    if (!find)
         return m_filename;
 
     if (!m_actualFilename.isEmpty())
@@ -1684,10 +1680,7 @@ bool AllMusic::checkCDTrack(MusicMetadata *the_track)
     if (m_cdData.count() < 1)
         return false;
 
-    if (m_cdData.last()->FormatTitle() == the_track->FormatTitle())
-        return true;
-
-    return false;
+    return m_cdData.last()->FormatTitle() == the_track->FormatTitle();
 }
 
 MusicMetadata* AllMusic::getCDMetadata(int the_track)

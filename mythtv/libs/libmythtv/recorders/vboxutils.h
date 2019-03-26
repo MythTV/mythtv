@@ -14,7 +14,7 @@ class VBox
 {
   public:
     explicit VBox(const QString &url);
-    ~VBox(void);
+    ~VBox(void) = default;
 
     static QStringList probeDevices(void);
     static QString getIPFromVideoDevice(const QString &dev);

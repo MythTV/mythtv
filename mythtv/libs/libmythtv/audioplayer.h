@@ -117,7 +117,7 @@ class MTV_PUBLIC AudioPlayer
     AudioFormat  m_format            {FORMAT_NONE};
     int          m_samplerate        {44100};
     int          m_codec_profile     {0};
-    float        m_stretchfactor     {1.0f};
+    float        m_stretchfactor     {1.0F};
     bool         m_passthru          {false};
     QMutex       m_lock              {QMutex::Recursive};
     bool         m_muted_on_creation;

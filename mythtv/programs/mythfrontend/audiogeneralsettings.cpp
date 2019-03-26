@@ -105,8 +105,7 @@ void AudioConfigScreen::Init(void)
     settings->CheckConfiguration();
 }
 
-AudioConfigSettings::AudioConfigSettings() :
-    GroupSetting()
+AudioConfigSettings::AudioConfigSettings()
 {
     setLabel(tr("Audio System"));
 
@@ -760,7 +759,6 @@ void AudioTestThread::run()
 }
 
 AudioTest::AudioTest()
-    : GroupSetting()
 {
     int channels = 2;
 

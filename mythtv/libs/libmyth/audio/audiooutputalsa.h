@@ -13,7 +13,7 @@ class AudioOutputALSA : public AudioOutputBase
 {
   public:
     explicit AudioOutputALSA(const AudioSettings &settings);
-    virtual ~AudioOutputALSA();
+    ~AudioOutputALSA() override;
 
     // Volume control
     int GetVolumeChannel(int channel) const override; // VolumeBase

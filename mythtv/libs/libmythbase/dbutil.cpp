@@ -306,7 +306,7 @@ bool DBUtil::CheckTables(const bool repair, const QString &options)
     {
         LOG(VB_GENERAL, LOG_CRIT, QString("Found crashed database table(s): %1")
                                       .arg(tables.join(", ")));
-        if (repair == true)
+        if (repair)
             // If RepairTables() repairs the crashed tables, return true
             result = RepairTables(tables);
         else

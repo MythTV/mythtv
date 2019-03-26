@@ -34,7 +34,7 @@ void MythRenderOpenGL1::Init2DState(void)
     glDisable(GL_POLYGON_SMOOTH);
     glDisable(GL_LINE_SMOOTH);
     glDisable(GL_POINT_SMOOTH);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+    glColor4f(0.0F, 0.0F, 0.0F, 0.0F);
     MythRenderOpenGL::Init2DState();
 }
 
@@ -353,8 +353,8 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 
     if (fillBrush.style() != Qt::NoBrush)
     {
-        int a = 255 * (((float)alpha / 255.0f) *
-                       ((float)fillBrush.color().alpha() / 255.0f));
+        int a = 255 * (((float)alpha / 255.0F) *
+                       ((float)fillBrush.color().alpha() / 255.0F));
         SetColor(fillBrush.color().red(), fillBrush.color().green(),
                  fillBrush.color().blue(), a);
         GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, r);
@@ -364,8 +364,8 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 
     if (linePen.style() != Qt::NoPen)
     {
-        int a = 255 * (((float)alpha / 255.0f) *
-                       ((float)linePen.color().alpha() / 255.0f));
+        int a = 255 * (((float)alpha / 255.0F) *
+                       ((float)linePen.color().alpha() / 255.0F));
         SetColor(linePen.color().red(), linePen.color().green(),
                  linePen.color().blue(), a);
         // glLineWidth() requires its argument to be at least 1.

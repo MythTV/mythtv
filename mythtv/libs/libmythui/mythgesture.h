@@ -225,7 +225,7 @@ class MythGesture
     size_t m_min_points   {50};
     size_t m_max_sequence {20};
     int m_scale_ratio     {4};
-    float m_bin_percent   {0.07f};
+    float m_bin_percent   {0.07F};
     MythGestureEvent::Gesture m_last_gesture {MythGestureEvent::MaxGesture};
     QList <QPoint> m_points;
 

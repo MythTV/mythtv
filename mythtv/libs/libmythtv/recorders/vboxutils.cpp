@@ -28,11 +28,6 @@ VBox::VBox(const QString &url)
     m_url = url;
 }
 
-VBox::~VBox(void)
-{
-}
-
-
 // static method
 QStringList VBox::probeDevices(void)
 {
@@ -74,7 +69,7 @@ QStringList VBox::doUPNPSearch(void)
 {
     QStringList result;
 
-    SSDPCacheEntries *vboxes = SSDP::Instance()->Find(VBOX_URI);
+    SSDPCacheEntries *vboxes = SSDP::Find(VBOX_URI);
 
     if (!vboxes)
     {

@@ -139,8 +139,6 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
     }
 
     m_buffer.erase(m_buffer.begin(), m_buffer.begin() + sync_at);
-
-    return;
 }
 
 bool FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)

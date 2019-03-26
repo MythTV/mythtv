@@ -130,11 +130,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
 #else
     // Check OpenGL version supported
-    QGLWidget *dummy = new QGLWidget;
-    dummy->makeCurrent();
-    QGLFormat qglFormat = dummy->format();
-    int openGLVersionFlags = qglFormat.openGLVersionFlags();
-    delete dummy;
+    int openGLVersionFlags = QGLFormat::openGLVersionFlags();
 #endif
 
 #ifdef USING_OPENGLES
@@ -623,7 +619,7 @@ uint MythRenderOpenGL::CreateHelperTexture(void)
 
     for (uint i = 0; i < width; i++)
     {
-        float x = (((float)i) + 0.5f) / (float)width;
+        float x = (((float)i) + 0.5F) / (float)width;
         StoreBicubicWeights(x, ref);
         ref += 4;
     }
@@ -659,13 +655,13 @@ QSize MythRenderOpenGL::GetTextureSize(uint type, const QSize &size)
         h *= 2;
     }
 
-    return QSize(w, h);
+    return {w, h};
 }
 
 QSize MythRenderOpenGL::GetTextureSize(uint tex)
 {
     if (!m_textures.contains(tex))
-        return QSize();
+        return {};
     return m_textures[tex].m_size;
 }
 
@@ -976,7 +972,7 @@ void MythRenderOpenGL::Init2DState(void)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
     glClear(GL_COLOR_BUFFER_BIT);
     Flush(true);
 }

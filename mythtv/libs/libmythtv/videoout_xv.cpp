@@ -135,8 +135,7 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
  *
  */
 VideoOutputXv::VideoOutputXv()
-    : VideoOutput(),
-      video_output_subtype(XVUnknown),
+    : video_output_subtype(XVUnknown),
       global_lock(QMutex::Recursive),
 
       XJ_win(0), XJ_curwin(0), disp(nullptr), XJ_letterbox_colour(0),
@@ -1871,12 +1870,12 @@ int VideoOutputXv::SetXVPictureAttribute(PictureAttribute attribute, int newValu
 
     if (xv_set_defaults && range && (kPictureAttribute_Hue == attribute))
     {
-        float tmp = (((float)(port_def - port_min) / (float)range) * 100.0f);
+        float tmp = (((float)(port_def - port_min) / (float)range) * 100.0F);
         valAdj = lroundf(tmp);
     }
 
     int tmpval2 = (newValue + valAdj) % 100;
-    int tmpval3 = (int) roundf(range * 0.01f * tmpval2);
+    int tmpval3 = (int) roundf(range * 0.01F * tmpval2);
     int value   = min(tmpval3 + port_min, port_max);
 
     xv_set_attrib(disp, xv_port, cname, value);
@@ -1941,8 +1940,8 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
     const QRect display_video_rect   = window.GetDisplayVideoRect();
     const QRect display_visible_rect = window.GetDisplayVisibleRect();
     float video_aspect               = window.GetVideoAspect();
-    if (video_aspect < 0.01f)
-        video_aspect = 1.3333f;
+    if (video_aspect < 0.01F)
+        video_aspect = 1.3333F;
 
     const float pip_size             = (float)window.GetPIPSize();
     const float pipVideoAspect       = pipplayer->GetVideoAspect();
@@ -1950,7 +1949,7 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
     // adjust for aspect override modes...
     int letterXadj = 0;
     int letterYadj = 0;
-    float letterAdj = 1.0f;
+    float letterAdj = 1.0F;
     if (window.GetAspectOverride() != kAspect_Off)
     {
         letterXadj = max(-display_video_rect.left(), 0);
@@ -1965,8 +1964,8 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
     // adjust for the relative aspect ratios of pip and main video
     float aspectAdj  = pipVideoAspect / video_aspect;
 
-    int tmph = (int) ((float)video_disp_dim.height() * pip_size * 0.01f);
-    int tmpw = (int) ((float)video_disp_dim.width() * pip_size * 0.01f *
+    int tmph = (int) ((float)video_disp_dim.height() * pip_size * 0.01F);
+    int tmpw = (int) ((float)video_disp_dim.width() * pip_size * 0.01F *
                              aspectAdj * letterAdj);
     position.setWidth((tmpw >> 1) << 1);
     position.setHeight((tmph >> 1) << 1);

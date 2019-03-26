@@ -380,7 +380,7 @@ void NetSearch::SearchFinished(void)
         m_maxpage = m_pagenum;
     else
     {
-        if (((float)searchresults/returned + 0.999f) >=
+        if (((float)searchresults/returned + 0.999F) >=
             ((int)searchresults/returned + 1))
             m_maxpage = (searchresults/returned + 1);
         else

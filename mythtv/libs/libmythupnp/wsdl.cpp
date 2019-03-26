@@ -399,7 +399,7 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
         oNode.setAttribute( "minOccurs", 0       );
         oNode.setAttribute( "name"     , sTypeName + "Result" );
-        oNode.setAttribute( "nillable" , true    );   //-=>TODO: This may need to be determined by sParamType
+        oNode.setAttribute( "nillable" , static_cast<int>(true)    );   //-=>TODO: This may need to be determined by sParamType
 
         bool bCustomType = IsCustomType( sType );
 
@@ -445,7 +445,7 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
             oNode.setAttribute( "minOccurs", 0     );
             oNode.setAttribute( "name"     , sName );
-            oNode.setAttribute( "nillable" , true  );   //-=>TODO: This may need to be determined by sParamType
+            oNode.setAttribute( "nillable" , static_cast<int>(true)  );   //-=>TODO: This may need to be determined by sParamType
             oNode.setAttribute( "type"     , sPrefix + sParamType );
 
             oSeqNode.appendChild( oNode );
@@ -477,10 +477,7 @@ bool Wsdl::IsCustomType( QString &sTypeName )
             break;
     }
 
-    if ((id == -1) || (id < QMetaType::User)) 
-        return false;
-
-    return true;
+    return !((id == -1) || (id < QMetaType::User));
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -264,12 +264,11 @@ vector<ScanInfo> LoadScanList(void)
 
     while (query.next())
     {
-        list.push_back(
-            ScanInfo(query.value(0).toUInt(),
-                     query.value(1).toUInt(),
-                     query.value(2).toUInt(),
-                     (bool) query.value(3).toUInt(),
-                     MythDate::as_utc(query.value(4).toDateTime())));
+        list.emplace_back(query.value(0).toUInt(),
+                          query.value(1).toUInt(),
+                          query.value(2).toUInt(),
+                          (bool) query.value(3).toUInt(),
+                          MythDate::as_utc(query.value(4).toDateTime()));
     }
 
     return list;

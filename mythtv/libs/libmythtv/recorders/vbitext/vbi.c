@@ -322,7 +322,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
 // process one raw vbi line
 
 static int
-vbi_line(struct vbi *vbi, unsigned char *p)
+vbi_line(struct vbi *vbi, const unsigned char *p)
 {
     unsigned char data[43], min, max;
     int dt[256], hi[6], lo[6];
@@ -468,7 +468,6 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
            dl_remove(cl->node);
            break;
        }
-    return;
 }
 
 #ifdef USING_V4L2

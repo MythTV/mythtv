@@ -307,7 +307,7 @@ class ServiceID : public MythUISpinBoxSetting
   public:
     explicit ServiceID(const ChannelID &id)
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
-                               -1, UINT16_MAX, 1, true, "NULL")
+                               -1, UINT16_MAX, 1, 1, "NULL")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "ServiceID"));
 
@@ -530,7 +530,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         MythDB::DBError("sourceChanged -- supports eit", query);
     else
     {
-        supports_eit = (query.size()) ? false : true;
+        supports_eit = (query.size() == 0);
         while (query.next())
         {
             supports_eit |= CardUtil::IsEITCapable(
@@ -546,7 +546,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
             MythDB::DBError("sourceChanged -- eit only", query);
         else
         {
-            uses_eit_only = (query.size()) ? true : false;
+            uses_eit_only = (query.size() != 0);
             while (query.next())
             {
                 uses_eit_only &= (query.value(0).toString() == "eitonly");

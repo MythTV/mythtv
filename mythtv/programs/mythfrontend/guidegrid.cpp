@@ -263,15 +263,14 @@ public:
           m_verticalLayout(gs.m_verticalLayout),
           m_firstTime(gs.m_firstTime),
           m_lastTime(gs.m_lastTime),
-          m_proglists(proglists),
-          m_progPast(0)
+          m_proglists(proglists)
     {
         for (unsigned int i = m_firstRow;
              i < m_firstRow + m_numRows; ++i)
             for (int j = 0; j < MAX_DISPLAY_TIMES; ++j)
                 m_programInfos[i][j] = nullptr;
     }
-    virtual ~GuideUpdateProgramRow() = default;
+    ~GuideUpdateProgramRow() override = default;
     bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
         // Don't bother to do any work if the starting coordinates of
@@ -1804,11 +1803,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             if (tempRect.bottom() + 2 >=  programRect.bottom())
                 tempRect.setBottom(programRect.bottom());
 
-            if (m_currentRow == row && (m_currentCol >= x) &&
-                (m_currentCol < (x + spread)))
-                isCurrent = true;
-            else
-                isCurrent = false;
+            isCurrent = m_currentRow == row && (m_currentCol >= x) &&
+                (m_currentCol < (x + spread));
 
             int recFlag;
             switch (pginfo->GetRecordingRuleType())

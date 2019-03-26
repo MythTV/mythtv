@@ -87,8 +87,8 @@ class MPUBLIC MythDialog : public QFrame
 
     void keyPressEvent(QKeyEvent *e) override; // QWidget
 
-    float          m_dlgwmult     {0.0f};
-    float          m_dlghmult     {0.0f};
+    float          m_dlgwmult     {0.0F};
+    float          m_dlghmult     {0.0F};
     int            m_screenwidth  {0};
     int            m_screenheight {0};
     int            m_xbase        {0};

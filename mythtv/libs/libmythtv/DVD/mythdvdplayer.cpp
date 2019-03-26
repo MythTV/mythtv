@@ -32,11 +32,9 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
 bool MythDVDPlayer::HasReachedEof(void) const
 {
     EofState eof = GetEof();
-    if (eof != kEofStateNone && !allpaused)
-        return true;
     // DeleteMap and EditMode from the parent MythPlayer should not be
     // relevant here.
-    return false;
+    return eof != kEofStateNone && !allpaused;
 }
 
 void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)
@@ -324,10 +322,8 @@ bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
     if (!player_ctx->m_buffer->IsInDiscMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
-    if (player_ctx->m_buffer->IsDVD() &&
-        player_ctx->m_buffer->DVD()->IsInStillFrame())
-        return true;
-    return false;
+    return player_ctx->m_buffer->IsDVD() &&
+           player_ctx->m_buffer->DVD()->IsInStillFrame();
 }
 
 void MythDVDPlayer::SetBookmark(bool clear)
@@ -448,7 +444,7 @@ void MythDVDPlayer::ChangeSpeed(void)
         decoder->UpdateFramesPlayed();
     if (player_ctx->m_buffer->IsDVD())
     {
-        if (play_speed > 1.0f)
+        if (play_speed > 1.0F)
             player_ctx->m_buffer->DVD()->SetDVDSpeed(-1);
         else
             player_ctx->m_buffer->DVD()->SetDVDSpeed();
@@ -674,7 +670,7 @@ void MythDVDPlayer::GoToDVDProgram(bool direction)
 {
     if (!player_ctx->m_buffer->IsDVD())
         return;
-    if (direction == 0)
+    if (direction)
         player_ctx->m_buffer->DVD()->GoToPreviousProgram();
     else
         player_ctx->m_buffer->DVD()->GoToNextProgram();

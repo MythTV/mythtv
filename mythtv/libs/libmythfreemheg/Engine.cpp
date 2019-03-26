@@ -1208,31 +1208,19 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 
     if (strings[0] == "SceneCoordinateSystem" || strings[0] == "SCS")
     {
-        if (strings.count() >= 3 && strings[1] == "720" && strings[2] == "576")
-        {
-            return true;
-        }
-        return false;
+        return strings.count() >= 3 && strings[1] == "720" && strings[2] == "576";
 
         // I've also seen SceneCoordinateSystem(1,1)
     }
 
     if (strings[0] == "MultipleAudioStreams" || strings[0] == "MAS")
     {
-        if (strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1"))
-        {
-            return true;
-        }
-        return false;
+        return strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1");
     }
 
     if (strings[0] == "MultipleVideoStreams" || strings[0] == "MVS")
     {
-        if (strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1"))
-        {
-            return true;
-        }
-        return false;
+        return strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1");
     }
 
     // We're supposed to return true for all values of N
@@ -1247,11 +1235,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        if ((strings[1] == "4" && strings[2] == "3") || (strings[1] == "16" && strings[2] == "9"))
-        {
-            return true;
-        }
-        return false;
+        return (strings[1] == "4" && strings[2] == "3") || (strings[1] == "16" && strings[2] == "9");
     }
 
     // We're supposed to support these at least.  May also support(10,1440,1152)
@@ -1261,11 +1245,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
-        {
-            return true;
-        }
-        return false;
+        return (strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288");
     }
 
     if (strings[0] == "BitmapScaling" || strings[0] == "BSc")
@@ -1274,21 +1254,13 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
-        {
-            return true;
-        }
-        return false;
+        return (strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288");
     }
 
     // I think we only support the video fully on screen
     if (strings[0] == "VideoDecodeOffset" || strings[0] == "VDO")
     {
-        if (strings.count() >= 3 && strings[1] == "10" && strings[1] == "0")
-        {
-            return true;
-        }
-        return false;
+        return strings.count() >= 3 && strings[1] == "10" && strings[1] == "0";
     }
 
     // We support bitmaps that are partially off screen (don't we?)
@@ -1363,9 +1335,8 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
     }
     if (strings[0] == "HDGraphicsPlaneExtension" || strings[0] == "HDG") {
         if (strings.count() < 2) return false;
-        if (strings[1] == "0")
-            return true; // HDGraphicsPlaneExtension
-        return false;
+        // true if HDGraphicsPlaneExtension
+        return strings[1] == "0";
     }
 
     // Otherwise return false.

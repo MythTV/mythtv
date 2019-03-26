@@ -97,17 +97,15 @@ using namespace std;
 
 namespace {
 
-int delete_file_immediately(const QString &filename,
+bool delete_file_immediately(const QString &filename,
                             bool followLinks, bool checkexists)
 {
-    /* Return 0 for success, non-zero for error. */
+    /* Return true for success, false for error. */
     QFile checkFile(filename);
-    int success1, success2;
+    bool success1 = true, success2 = true;
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("About to delete file: %1").arg(filename));
-    success1 = true;
-    success2 = true;
     if (followLinks)
     {
         QFileInfo finfo(filename);
@@ -130,7 +128,7 @@ int delete_file_immediately(const QString &filename,
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error deleting '%1': %2")
                 .arg(filename).arg(strerror(errno)));
     }
-    return success1 && success2 ? 0 : -1;
+    return success1 && success2;
 }
 
 };
@@ -147,7 +145,7 @@ class ProcessRequestRunnable : public QRunnable
         m_sock->IncrRef();
     }
 
-    virtual ~ProcessRequestRunnable()
+    ~ProcessRequestRunnable() override
     {
         if (m_sock)
         {
@@ -176,7 +174,7 @@ class FreeSpaceUpdater : public QRunnable
     {
         m_lastRequest.start();
     }
-    ~FreeSpaceUpdater()
+    ~FreeSpaceUpdater() override
     {
         QMutexLocker locker(&m_parent.m_masterFreeSpaceListLock);
         m_parent.m_masterFreeSpaceListUpdater = nullptr;
@@ -242,7 +240,7 @@ MainServer::MainServer(bool master, int port,
                        Scheduler *sched, AutoExpire *_expirer) :
     m_encoderList(_tvList),
     m_ismaster(master), m_threadPool("ProcessRequestPool"),
-    m_sched(sched), m_expirer(_expirer), m_addChildInputLock()
+    m_sched(sched), m_expirer(_expirer)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
@@ -256,7 +254,7 @@ MainServer::MainServer(bool master, int port,
     m_mythserver = new MythServer();
     m_mythserver->setProxy(QNetworkProxy::NoProxy);
 
-    QList<QHostAddress> listenAddrs = m_mythserver->DefaultListen();
+    QList<QHostAddress> listenAddrs = MythServer::DefaultListen();
     if (!gCoreContext->GetBoolSetting("ListenOnAllIps",true))
     {
         // test to make sure listen addresses are available
@@ -265,12 +263,12 @@ MainServer::MainServer(bool master, int port,
                                             "BackendServerIP",
                                             QString(),
                                             gCoreContext->ResolveIPv4, true));
-        bool v4IsSet = config_v4.isNull() ? false : true;
+        bool v4IsSet = !config_v4.isNull();
         QHostAddress config_v6(gCoreContext->resolveSettingAddress(
                                             "BackendServerIP6",
                                             QString(),
                                             gCoreContext->ResolveIPv6, true));
-        bool v6IsSet = config_v6.isNull() ? false : true;
+        bool v6IsSet = !config_v6.isNull();
 
         if (v6IsSet && !listenAddrs.contains(config_v6))
             LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -2735,7 +2733,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     const size_t min_tps    = 8 * 1024 * 1024;
     const size_t calc_tps   = (size_t) (cards * 1.2 * (22200000LL / 8));
     const size_t tps = max(min_tps, calc_tps);
-    const size_t increment  = (size_t) (tps * (sleep_time * 0.001f));
+    const size_t increment  = (size_t) (tps * (sleep_time * 0.001F));
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("Truncating '%1' by %2 MB every %3 milliseconds")
@@ -2821,8 +2819,6 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
     QStringList outputlist( QString::number(result) );
     if (pbssock)
         SendResponse(pbssock, outputlist);
-
-    return;
 }
 
 void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
@@ -3158,17 +3154,15 @@ void MainServer::DoHandleUndeleteRecording(
 
 #if 0
     if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
-    {
 #endif
+    {
         recinfo.ApplyRecordRecGroupChange("Default");
         recinfo.UpdateLastDelete(false);
         recinfo.SaveAutoExpire(kDisableAutoExpire);
         if (m_sched)
             m_sched->RescheduleCheck(recinfo, "DoHandleUndelete");
         ret = 0;
-#if 0
     }
-#endif
 
     QStringList outputlist( QString::number(ret) );
     SendResponse(pbssock, outputlist);
@@ -3562,7 +3556,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     QStringList::const_iterator it = slist.begin() + 2;
     RecordingInfo recinfo(it, slist.end());
 
-    int exists = 0;
+    bool exists = false;
 
     if (recinfo.HasPathname() && (m_ismaster) &&
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
@@ -3575,7 +3569,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
             exists = slave->CheckFile(&recinfo);
             slave->DecrRef();
 
-            QStringList outputlist( QString::number(exists) );
+            QStringList outputlist( QString::number(static_cast<int>(exists)) );
             if (exists)
                 outputlist << recinfo.GetPathname();
             else
@@ -3595,7 +3589,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
             pburl.clear();
     }
 
-    QStringList strlist( QString::number(exists) );
+    QStringList strlist( QString::number(static_cast<int>(exists)) );
     strlist << pburl;
     SendResponse(pbssock, strlist);
 }
@@ -5625,8 +5619,6 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleCommBreakQuery(const QString &chanid,
@@ -5688,8 +5680,6 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 
@@ -5730,8 +5720,6 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
@@ -5752,8 +5740,6 @@ void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
     retlist << retvalue;
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleDownloadFile(const QStringList &command,
@@ -5850,8 +5836,6 @@ void MainServer::HandleSetSetting(QStringList &tokens,
 
     if (pbssock)
         SendResponse(pbssock, retlist);
-
-    return;
 }
 
 void MainServer::HandleScanVideos(PlaybackSock *pbs)

@@ -707,9 +707,7 @@ bool V4L2util::UserAdjustableResolution(void) const
     // I have not been able to come up with a way of querying the
     // driver to answer this question.
 
-    if (m_driverName == "hdpvr")
-        return false;
-    return true;
+    return m_driverName != "hdpvr";
 }
 
 int V4L2util::GetExtControl(int request, const QString& ctrl_desc) const
@@ -1013,7 +1011,7 @@ bool V4L2util::SetVolume(int volume)
 
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
-    int value = (int) ((range * volume * 0.01f) + qctrl.minimum);
+    int value = (int) ((range * volume * 0.01F) + qctrl.minimum);
     int ctrl_volume = std::min(qctrl.maximum, std::max(qctrl.minimum, value));
 
     // Set recording volume

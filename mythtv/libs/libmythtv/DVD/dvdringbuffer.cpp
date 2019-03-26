@@ -144,19 +144,13 @@ bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
     name   = m_name;
     serial = m_serialnumber;
-    if (name.isEmpty() && serial.isEmpty())
-        return false;
-    return true;
+    return !(name.isEmpty() && serial.isEmpty());
 }
 
 MythDVDContext::MythDVDContext(const dsi_t& dsi, const pci_t& pci) :
     ReferenceCounter("MythDVDContext"),
     m_dsi(dsi),
     m_pci(pci)
-{
-}
-
-MythDVDContext::~MythDVDContext()
 {
 }
 
@@ -790,12 +784,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     QString("---- DVDNAV_CELL_CHANGE - Cell "
                             "#%1 Menu %2 Length %3")
                       .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
-                      .arg((float)cell_event->cell_length / 90000.0f,0,'f',1));
+                      .arg((float)cell_event->cell_length / 90000.0F,0,'f',1));
                 QString still = stillTimer ? ((stillTimer < 0xff) ?
                     QString("Stillframe: %1 seconds").arg(stillTimer) :
                     QString("Infinite stillframe")) :
                     QString("Length: %1 seconds")
-                        .arg((float)m_pgcLength / 90000.0f, 0, 'f', 1);
+                        .arg((float)m_pgcLength / 90000.0F, 0, 'f', 1);
                 if (m_title == 0)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")
@@ -1099,9 +1093,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 // update player
                 int aspect = dvdnav_get_video_aspect(m_dvdnav);
                 if (aspect == 2) // 4:3
-                    m_forcedAspect = 4.0f / 3.0f;
+                    m_forcedAspect = 4.0F / 3.0F;
                 else if (aspect == 3) // 16:9
-                    m_forcedAspect = 16.0f / 9.0f;
+                    m_forcedAspect = 16.0F / 9.0F;
                 else
                     m_forcedAspect = -1;
                 int permission = dvdnav_get_video_scale_permission(m_dvdnav);
@@ -1400,9 +1394,7 @@ bool DVDRingBuffer::GoToMenu(const QString &str)
         return false;
 
     dvdnav_status_t ret = dvdnav_menu_call(m_dvdnav, menuid);
-    if (ret == DVDNAV_STATUS_OK)
-        return true;
-    return false;
+    return ret == DVDNAV_STATUS_OK;
 }
 
 /** \brief Attempts to back-up by trying to jump to the 'Go up' PGC,
@@ -1846,11 +1838,8 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
 
     m_hl_button.setCoords(hl.sx, hl.sy, hl.ex, hl.ey);
 
-    if (((hl.sx + hl.sy) > 0) &&
-            (hl.sx < videowidth && hl.sy < videoheight))
-        return true;
-
-    return false;
+    return ((hl.sx + hl.sy) > 0) &&
+            (hl.sx < videowidth && hl.sy < videoheight);
 }
 
 /** \brief clears the dvd menu button structures
@@ -2089,7 +2078,7 @@ int DVDRingBuffer::GetTrack(uint type)
 
 uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
 {
-    uint8_t numChannels = 0u;
+    uint8_t numChannels = 0U;
 
     int physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
@@ -2109,9 +2098,7 @@ bool DVDRingBuffer::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
     _name    = m_dvdname;
     _serial  = m_serialnumber;
-    if (_name.isEmpty() && _serial.isEmpty())
-        return false;
-    return true;
+    return !(_name.isEmpty() && _serial.isEmpty());
 }
 
 /** \brief Get a snapshot of the current DVD VM state
@@ -2180,8 +2167,9 @@ uint DVDRingBuffer::TitleTimeLeft(void)
 
 /** \brief converts palette values from YUV to RGB
  */
-void DVDRingBuffer::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
-                                        uint8_t *alpha)
+void DVDRingBuffer::guess_palette(uint32_t *rgba_palette,
+                                  const uint8_t *palette,
+                                  const uint8_t *alpha)
 {
     memset(rgba_palette, 0, 16);
 

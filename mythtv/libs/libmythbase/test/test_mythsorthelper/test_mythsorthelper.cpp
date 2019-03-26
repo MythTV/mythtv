@@ -63,6 +63,7 @@ void TestSortHelper::titles_timing(void)
     QBENCHMARK {
         QString title = sh->doTitle("The Flash");
     }
+    delete sh;
 }
 
 void TestSortHelper::pathnames_timing_data(void)
@@ -83,6 +84,7 @@ void TestSortHelper::pathnames_timing(void)
     QBENCHMARK {
         QString title = sh->doPathname("dvds/The Flash/Season 2/The Flash - S02E01.ts");
     }
+    delete sh;
 }
 
 void TestSortHelper::Variations_test(void)

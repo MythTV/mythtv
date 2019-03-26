@@ -145,8 +145,7 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
 }
 
 HTTPLiveStream::HTTPLiveStream(int streamid)
-  : m_writing(false),
-    m_streamid(streamid)
+  : m_streamid(streamid)
 {
     LoadFromDB();
 }
@@ -808,10 +807,7 @@ bool HTTPLiveStream::CheckStop(void)
         return false;
     }
 
-    if (query.value(0).toInt() == (int)kHLSStatusStopping)
-        return true;
-
-    return false;
+    return query.value(0).toInt() == (int)kHLSStatusStopping;
 }
 
 DTC::LiveStreamInfo *HTTPLiveStream::StartStream(void)

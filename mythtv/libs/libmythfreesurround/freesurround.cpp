@@ -41,7 +41,7 @@ using namespace std;
 static const unsigned default_block_size = SURROUND_BUFSIZE;
 // Gain of center and lfe channels in passive mode (sqrt 0.5)
 static const float center_level = 0.707107;
-static const float m3db = 0.7071067811865476f;           // 3dB  = SQRT(2)
+static const float m3db = 0.7071067811865476F;           // 3dB  = SQRT(2)
 static const float m6db = 0.5;                           // 6dB  = SQRT(4)
 static const float m7db = 0.44721359549996;              // 7dB  = SQRT(5)
 
@@ -251,7 +251,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                 float ls      = *samples++;
                 float rs      = *samples++;
                 bufs->l[ic]   = lt;
-                bufs->lfe[ic] = 0.0f;
+                bufs->lfe[ic] = 0.0F;
                 bufs->c[ic]   = c;
                 bufs->r[ic]   = rt;
                 bufs->ls[ic]  = ls;
@@ -355,7 +355,6 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             *output++ = *rs++;
         }
         oc -= maxFrames;
-        outindex += maxFrames;
     }
     else        // channels == 6
     {
@@ -378,7 +377,6 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
                 *output++ = *rs++;
             }
             oc -= maxFrames;
-            outindex += maxFrames;
         }
         else
         {
@@ -398,7 +396,6 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
                 *output++ = *rs++;
             }
             oc -= maxFrames;
-            outindex += maxFrames;
         }
     }
     out_count = oc;

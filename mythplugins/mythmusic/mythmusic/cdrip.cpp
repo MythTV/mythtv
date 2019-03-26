@@ -339,7 +339,7 @@ void CDRipperThread::run(void)
                 }
             }
 
-            if (!encoder.get())
+            if (!encoder)
             {
                 // This should never happen.
                 QApplication::postEvent(
@@ -1120,7 +1120,7 @@ void Ripper::startRipper(void)
 
 void Ripper::RipComplete(bool result)
 {
-    if (result == true)
+    if (result)
     {
         bool EjectCD = gCoreContext->GetBoolSetting("EjectCDAfterRipping", true);
         if (EjectCD)

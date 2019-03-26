@@ -1104,7 +1104,7 @@ void LCDProcClient::startMusic(QString artist, QString album, QString track)
     m_lcdTextItems->clear();
 
     QString aString;
-    m_musicProgress = 0.0f;
+    m_musicProgress = 0.0F;
     aString = artist;
     if ( m_lcdShowMusicItems == "ArtistAlbumTitle")
     {
@@ -1198,7 +1198,7 @@ void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
     m_busyProgress = false;
     m_busyPos = 1;
     m_busyDirection = 1;
-    m_busyIndicatorSize = 2.0f;
+    m_busyIndicatorSize = 2.0F;
     m_genericProgress = 0.0;
 
     // Todo, make scrolling definable in LCDTextItem
@@ -1705,10 +1705,10 @@ void LCDProcClient::setChannelProgress(const QString &time, float value)
     m_progress = value;
     m_channelTime = time;
 
-    if ( m_progress < 0.0f)
-        m_progress = 0.0f;
-    else if ( m_progress > 1.0f)
-        m_progress = 1.0f;
+    if ( m_progress < 0.0F)
+        m_progress = 0.0F;
+    else if ( m_progress > 1.0F)
+        m_progress = 1.0F;
 
     outputChannel();
 }
@@ -1720,10 +1720,10 @@ void LCDProcClient::setGenericProgress(bool b, float value)
 
     m_genericProgress = value;
 
-    if ( m_genericProgress < 0.0f)
-        m_genericProgress = 0.0f;
-    else if ( m_genericProgress > 1.0f)
-        m_genericProgress = 1.0f;
+    if ( m_genericProgress < 0.0F)
+        m_genericProgress = 0.0F;
+    else if ( m_genericProgress > 1.0F)
+        m_genericProgress = 1.0F;
 
     // Note, this will let us switch to/from busy indicator by
     // alternating between being passed true or false for b.
@@ -1756,10 +1756,10 @@ void LCDProcClient::setMusicProgress(QString time, float value)
     m_musicProgress = value;
     m_musicTime = time;
 
-    if ( m_musicProgress < 0.0f)
-        m_musicProgress = 0.0f;
-    else if ( m_musicProgress > 1.0f)
-        m_musicProgress = 1.0f;
+    if ( m_musicProgress < 0.0F)
+        m_musicProgress = 0.0F;
+    else if ( m_musicProgress > 1.0F)
+        m_musicProgress = 1.0F;
 
     outputMusic();
 }
@@ -1791,10 +1791,10 @@ void LCDProcClient::setVolumeLevel(float value)
 
     m_volumeLevel = value;
 
-    if ( m_volumeLevel < 0.0f)
-        m_volumeLevel = 0.0f;
-    if ( m_volumeLevel > 1.0f)
-        m_volumeLevel = 1.0f;
+    if ( m_volumeLevel < 0.0F)
+        m_volumeLevel = 0.0F;
+    if ( m_volumeLevel > 1.0F)
+        m_volumeLevel = 1.0F;
 
     outputVolume();
 }

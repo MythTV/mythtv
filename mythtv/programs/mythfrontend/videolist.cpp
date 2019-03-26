@@ -163,7 +163,7 @@ struct metadata_sort
 
 struct metadata_path_sort
 {
-    explicit metadata_path_sort(void) {}
+    explicit metadata_path_sort(void) = default;
 
     bool operator()(const VideoMetadata &lhs, const VideoMetadata &rhs)
     {

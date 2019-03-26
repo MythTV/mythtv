@@ -65,7 +65,7 @@ class MythBDPlayer : public MythPlayer
     // Disable screen grabs for Bluray
     void SeekForScreenGrab(uint64_t &/*number*/, uint64_t /*frameNum*/,
                            bool /*absolute*/) override // MythPlayer
-        { return; }
+        {}
 
   private:
     void    DisplayMenu(void);

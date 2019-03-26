@@ -37,7 +37,7 @@ extern "C" {
 class MTV_PUBLIC NvdecContext : public MythCodecContext
 {
   public:
-    NvdecContext(void);
+    NvdecContext(void) = default;
     static MythCodecID GetBestSupportedCodec(AVCodec **ppCodec,
                                              const QString &decoder,
                                              uint stream_type,

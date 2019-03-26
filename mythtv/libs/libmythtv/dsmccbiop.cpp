@@ -148,7 +148,7 @@ BiopMessage::~BiopMessage()
     free(m_objkind);
 }
 
-bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
+bool BiopMessage::ProcessMsgHdr(const unsigned char *data, unsigned long *curp)
 {
     const unsigned char *buf = data + (*curp);
     int off = 0;
@@ -214,7 +214,7 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
  */
 bool BiopMessage::ProcessDir(
     bool isSrg, DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
-    unsigned char *data, unsigned long *curp)
+    const unsigned char *data, unsigned long *curp)
 {
     int off = 0;
     const unsigned char * const buf = data + (*curp);

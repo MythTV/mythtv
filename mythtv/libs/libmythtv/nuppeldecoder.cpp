@@ -92,10 +92,8 @@ NuppelDecoder::~NuppelDecoder()
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
                               int /*testbufsize*/)
 {
-    if (!strncmp(testbuf, "NuppelVideo", 11) ||
-        !strncmp(testbuf, "MythTVVideo", 11))
-        return true;
-    return false;
+    return !strncmp(testbuf, "NuppelVideo", 11) ||
+           !strncmp(testbuf, "MythTVVideo", 11);
 }
 
 MythCodecID NuppelDecoder::GetVideoCodecID(void) const
@@ -1208,9 +1206,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 {
                     m_videosizetotal /= m_videoframesread;
 
-                    float bps = (m_videosizetotal * 8.0f / 1024.0f *
+                    float bps = (m_videosizetotal * 8.0F / 1024.0F *
                                  static_cast<float>(m_video_frame_rate));
-                    m_bitrate = (uint) (bps * 1.5f);
+                    m_bitrate = (uint) (bps * 1.5F);
 
                     ringBuffer->UpdateRawBitrate(GetRawBitrate());
                     m_setreadahead = true;

@@ -132,7 +132,7 @@ QString ThumbItem::GetDescription(const QString &status,
     info += "\n" + tr("Width: %n pixel(s)", "", sz.width());
     info += "\n" + tr("Height: %n pixel(s)", "", sz.height());
     info += "\n" + tr("Pixel Count: %1 megapixels")
-        .arg((float) sz.width() * sz.height() * (1.0f/1000000.0f), 0, 'f', 2);
+        .arg((float) sz.width() * sz.height() * (1.0F/1000000.0F), 0, 'f', 2);
     info += "\n" + tr("Rotation Angle: %n degree(s)", "", angle);
 
     return info;

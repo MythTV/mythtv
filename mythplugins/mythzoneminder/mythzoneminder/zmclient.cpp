@@ -57,10 +57,7 @@ bool ZMClient::setupZMClient(void)
         return false;
     }
 
-    if (!ZMClient::get()->connectToHost(zmserver_host, zmserver_port))
-        return false;
-
-    return true;
+    return ZMClient::get()->connectToHost(zmserver_host, zmserver_port);
 }
 
 bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
@@ -180,10 +177,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
     }
 
     // we should get "OK" from the server if everything is OK
-    if (strList[0] != "OK")
-        return false;
-
-    return true;
+    return strList[0] == "OK";
 }
 
 bool ZMClient::checkProtoVersion(void)

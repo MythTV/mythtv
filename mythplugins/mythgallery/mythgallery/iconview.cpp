@@ -664,9 +664,7 @@ static bool is_subdir(const QDir &parent, const QDir &subdir)
 {
     QString pstr = QDir::cleanPath(parent.path());
     QString cstr = QDir::cleanPath(subdir.path());
-    bool ret = !cstr.indexOf(pstr);
-
-    return ret;
+    return cstr.startsWith(pstr);
 }
 
 bool IconView::HandleSubDirEscape(const QString &parent)

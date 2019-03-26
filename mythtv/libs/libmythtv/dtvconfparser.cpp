@@ -41,22 +41,22 @@
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \
-    if (it == tokens.end()) return false; ++it; } while(0)
+    if (it == tokens.end()) return false; ++it; } while(false)
 
 #define PARSE_CONF(VAR) do { \
     if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
-        return false; } while(0)
+        return false; } while(false)
 
 #define PARSE_STR(VAR) do { \
-    if (it != tokens.end()) (VAR) = *it++; else return false; } while(0)
+    if (it != tokens.end()) (VAR) = *it++; else return false; } while(false)
 
 #define PARSE_UINT(VAR) do { \
     if (it != tokens.end()) \
-         (VAR) = (*it++).toUInt(); else return false; } while(0)
+         (VAR) = (*it++).toUInt(); else return false; } while(false)
 
 #define PARSE_UINT_1000(VAR) do { \
     if (it != tokens.end()) \
-         (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(0)
+         (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(false)
 
 
 QString DTVChannelInfo::toString() const

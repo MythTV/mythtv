@@ -433,7 +433,7 @@ class MPUBLIC ProgramInfo
     int     GetRecordingPriority2(void)   const { return m_recpriority2; }
     float   GetStars(void)                const { return m_stars;        }
     uint    GetStars(uint range_max)      const
-        { return (int)(m_stars * range_max + 0.5f); }
+        { return (int)(m_stars * range_max + 0.5F); }
 
     uint    GetRecordingID(void)              const { return m_recordedid; }
     RecStatus::Type GetRecordingStatus(void)    const
@@ -773,7 +773,7 @@ class MPUBLIC ProgramInfo
     QDateTime       m_recstartts        {m_startts};
     QDateTime       m_recendts          {m_startts};
 
-    float           m_stars             {0.0f}; ///< Rating, range [0..1]
+    float           m_stars             {0.0F}; ///< Rating, range [0..1]
     QDate           m_originalAirDate;
     QDateTime       m_lastmodified      {m_startts};
     QDateTime       m_lastInUseTime     {m_startts.addSecs(-4 * 60 * 60)};

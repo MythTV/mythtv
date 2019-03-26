@@ -220,10 +220,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
         tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
     }
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 /*!
@@ -300,7 +297,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     if (popm)
     {
         int rating = popm->rating();
-        rating = lroundf(static_cast<float>(rating) / 255.0f * 10.0f);
+        rating = lroundf(static_cast<float>(rating) / 255.0F * 10.0F);
         metadata->setRating(rating);
         metadata->setPlaycount(popm->counter());
     }
@@ -669,10 +666,7 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
     apic->setPicture(bytevector);
     apic->setDescription(QStringToTString(albumart->m_description));
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 /*!
@@ -726,10 +720,7 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
 
     tag->removeFrame(apic);
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 bool MetaIOID3::changeImageType(const QString &filename,
@@ -801,10 +792,7 @@ bool MetaIOID3::changeImageType(const QString &filename,
             break;
     }
 
-    if (!SaveFile())
-        return false;
-
-    return true;
+    return SaveFile();
 }
 
 /*!
@@ -918,7 +906,7 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
     if (!tag)
         return false;
 
-    int popmrating = lroundf(static_cast<float>(rating) / 10.0f * 255.0f);
+    int popmrating = lroundf(static_cast<float>(rating) / 10.0F * 255.0F);
 
     // MythTV Specific Rating Tag
     PopularimeterFrame *popm = findPOPM(tag, email);

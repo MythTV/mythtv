@@ -17,8 +17,8 @@
 
 
 // Min/max zoom extents available in slideshow
-#define MIN_ZOOM (0.1f)
-#define MAX_ZOOM (20.0f)
+#define MIN_ZOOM (0.1F)
+#define MAX_ZOOM (20.0F)
 
 class Slide;
 
@@ -46,7 +46,7 @@ signals:
 protected:
     bool  m_forwards {true}; //!< Play direction
     bool  m_running {false}; //!< True whilst animation is active
-    float m_speed   {0.0f};  //!< Real-time = 1.0, Double-speed = 2.0
+    float m_speed   {0.0F};  //!< Real-time = 1.0, Double-speed = 2.0
 };
 
 
@@ -190,7 +190,7 @@ private:
     ImagePtrK     m_data          {nullptr}; //!< The image currently loading/loaded
     //! The most recently requested image. Null for preloads. Differs from m_data when skipping
     ImagePtrK     m_waitingFor    {nullptr};
-    float         m_zoom          {1.0f};    //!< Current zoom, 1.0 = fullsize
+    float         m_zoom          {1.0F};    //!< Current zoom, 1.0 = fullsize
     //! Navigation that created this image, -1 = Prev, 0 = Update, 1 = Next
     int           m_direction     {0};
     Animation    *m_zoomAnimation {nullptr}; //!< Dedicated animation for zoom, if supported

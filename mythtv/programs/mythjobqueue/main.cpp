@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 #endif
     housekeeping->Start();
 
-    int exitCode = a.exec();
+    int exitCode = QCoreApplication::exec();
 
     delete sysEventHandler;
 

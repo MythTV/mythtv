@@ -24,7 +24,7 @@
   { \
       LOG(VB_GENERAL, LOG_ERR, LOC + QString("IsErrored() in %1").arg(Loc)); \
       return; \
-  } while(0)
+  } while(false)
 
 void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
 {
@@ -61,8 +61,8 @@ VideoOutputVDPAU::VideoOutputVDPAU()
     m_decoder(0),            m_pix_fmt(-1),
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
     m_pip_ready(false),      m_osd_painter(nullptr),
-    m_skip_chroma(false),    m_denoise(0.0f),
-    m_sharpen(0.0f),
+    m_skip_chroma(false),    m_denoise(0.0F),
+    m_sharpen(0.0F),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
 {
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
@@ -1234,8 +1234,8 @@ void VideoOutputVDPAU::RemovePIP(MythPlayer *pipplayer)
 void VideoOutputVDPAU::ParseOptions(void)
 {
     m_skip_chroma = false;
-    m_denoise     = 0.0f;
-    m_sharpen     = 0.0f;
+    m_denoise     = 0.0F;
+    m_sharpen     = 0.0F;
     m_colorspace  = VDP_COLOR_STANDARD_ITUR_BT_601;
     m_mixer_features = kVDPFeatNone;
 
@@ -1281,8 +1281,8 @@ void VideoOutputVDPAU::ParseOptions(void)
         }
         else if (name.contains("vdpaudenoise"))
         {
-            float tmp = std::max(0.0f, std::min(1.0f, opts.toFloat()));
-            if (tmp != 0.0f)
+            float tmp = std::max(0.0F, std::min(1.0F, opts.toFloat()));
+            if (tmp != 0.0F)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("VDPAU Denoise %1").arg(tmp,4,'f',2,'0'));
@@ -1292,8 +1292,8 @@ void VideoOutputVDPAU::ParseOptions(void)
         }
         else if (name.contains("vdpausharpen"))
         {
-            float tmp = std::max(-1.0f, std::min(1.0f, opts.toFloat()));
-            if (tmp != 0.0f)
+            float tmp = std::max(-1.0F, std::min(1.0F, opts.toFloat()));
+            if (tmp != 0.0F)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("VDPAU Sharpen %1").arg(tmp,4,'f',2,'0'));

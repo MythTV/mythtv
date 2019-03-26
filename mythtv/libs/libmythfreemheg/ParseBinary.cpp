@@ -146,7 +146,7 @@ MHParseNode *MHParseBinary::DoParse()
             ch = GetNextChar();
             tagNumber = (tagNumber << 7) | (ch & 0x7f);
         }
-        while (ch & 0x80);   // Top bit set means there's more to come.
+        while ((ch & 0x80) != 0);   // Top bit set means there's more to come.
     }
 
     // Next byte is the length.  If it is less than 128 it is the actual length, otherwise it

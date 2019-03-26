@@ -187,7 +187,7 @@ MHRgba MHVisible::GetColour(const MHColour &colour)
         }
     }
 
-    return MHRgba(red, green, blue, alpha);
+    return {red, green, blue, alpha};
 }
 
 // Get the visible region of this visible.  This is the area that needs to be drawn.

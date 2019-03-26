@@ -810,7 +810,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
         if (query.size() == 0)
         {
             jobsAreRunning = false;
-            break;
+            continue;
         }
         if ((totalSlept % 5) == 0)
         {
@@ -1106,10 +1106,7 @@ bool JobQueue::IsJobQueuedOrRunning(
 {
     int tmpStatus = GetJobStatus(jobType, chanid, recstartts);
 
-    if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE)))
-        return true;
-
-    return false;
+    return (tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE));
 }
 
 bool JobQueue::IsJobQueued(
@@ -1427,10 +1424,7 @@ bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
         return false;
     }
 
-    if (query.numRowsAffected() > 0)
-        return true;
-
-    return false;
+    return query.numRowsAffected() > 0;
 }
 
 bool JobQueue::AllowedToRun(JobQueueEntry job)

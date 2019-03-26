@@ -294,7 +294,6 @@ HostCheckBoxSetting *RatingsToPL()
 } // namespace
 
 VideoGeneralSettings::VideoGeneralSettings()
-    : GroupSetting()
 {
     setLabel(tr("General Settings"));
 

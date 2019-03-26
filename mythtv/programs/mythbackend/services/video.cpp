@@ -771,7 +771,7 @@ bool Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (update_required == true)
+    if (update_required)
         metadata->UpdateDatabase();
 
     return true;

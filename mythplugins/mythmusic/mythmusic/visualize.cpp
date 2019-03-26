@@ -937,17 +937,15 @@ void Piano::zero_analysis(void)
     for (key = 0; key < PIANO_N; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
-        m_piano_data[key].q2 = 0.0f;
-        m_piano_data[key].q1 = 0.0f;
-        m_piano_data[key].magnitude = 0.0f;
+        m_piano_data[key].q2 = 0.0F;
+        m_piano_data[key].q1 = 0.0F;
+        m_piano_data[key].magnitude = 0.0F;
         m_piano_data[key].max_magnitude_seen =
             (goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
 
         m_piano_data[key].samples_processed = 0;
     }
     m_offset_processed = 0;
-
-    return;
 }
 
 void Piano::resize(const QSize &newsize)
@@ -1031,8 +1029,6 @@ void Piano::resize(const QSize &newsize)
     {
         m_magnitude[key] = 0.0;
     }
-
-    return;
 }
 
 unsigned long Piano::getDesiredSamples(void)
@@ -1069,7 +1065,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
     if (node)
     {
-        piano_audio short_to_bounded = 32768.0f;
+        piano_audio short_to_bounded = 32768.0F;
 
         // Detect start of new song (current node more than 10s earlier than already seen)
         if (node->m_offset + 10000 < m_offset_processed)
@@ -1092,7 +1088,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             for (uint i = 0; i < n; i++)
             {
-                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0f / short_to_bounded;
+                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0F / short_to_bounded;
             }
         }
         else // This is only one channel of data
@@ -1133,32 +1129,31 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
 
-            if (false) // This is RMS of signal
-            {
-                magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
-            }
-            if (true) // This is pure magnitude of signal
-            {
-                magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
-            }
+#if 0
+            // This is RMS of signal
+            magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
+#else
+            // This is pure magnitude of signal
+            magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+#endif
 
-            if (false) // Take logs everywhere, and shift up to [0, ??]
+#if 0
+            // Take logs everywhere, and shift up to [0, ??]
+            if(magnitude_av > 0.0F)
             {
-                if(magnitude_av > 0.0f)
-                {
-                    magnitude_av = log(magnitude_av);
-                }
-                else
-                {
-                    magnitude_av = PIANO_MIN_VOL;
-                }
-                magnitude_av -= PIANO_MIN_VOL;
-
-                if (magnitude_av < 0.0f)
-                {
-                    magnitude_av = 0.0;
-                }
+                magnitude_av = log(magnitude_av);
             }
+            else
+            {
+                magnitude_av = PIANO_MIN_VOL;
+            }
+            magnitude_av -= PIANO_MIN_VOL;
+
+            if (magnitude_av < 0.0F)
+            {
+                magnitude_av = 0.0;
+            }
+#endif
 
             if (magnitude_av > (goertzel_data)0.01)
             {

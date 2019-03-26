@@ -22,7 +22,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketServer::WebSocketServer() :
-    ServerPool(),
     m_threadPool("WebSocketServerPool")
 {
     setObjectName("WebSocketServer");
@@ -868,40 +867,28 @@ bool WebSocketWorker::SendText(const QByteArray& message)
 
     QByteArray frame = CreateFrame(WebSocketFrame::kOpTextFrame, message);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendBinary(const QByteArray& data)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpBinaryFrame, data);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendPing(const QByteArray& payload)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpPing, payload);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendPong(const QByteArray& payload)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpPong, payload);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendClose(ErrorCode errCode,

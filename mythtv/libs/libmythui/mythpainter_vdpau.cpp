@@ -18,7 +18,7 @@
 #define LOC QString("VDPAU Painter: ")
 
 MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
-    MythPainter(), m_render(render)
+    m_render(render)
 {
     if (m_render)
         m_render->IncrRef();

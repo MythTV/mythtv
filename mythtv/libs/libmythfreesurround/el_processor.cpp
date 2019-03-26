@@ -219,7 +219,7 @@ private:
     // polar <-> cartesian coodinates conversion
     static inline float amplitude(const float cf[2]) { return sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
     static inline float phase(const float cf[2]) { return atan2(cf[1],cf[0]); }
-    static inline cfloat polar(float a, float p) { return cfloat(a*cos(p),a*sin(p)); }
+    static inline cfloat polar(float a, float p) { return {static_cast<float>(a*cos(p)),static_cast<float>(a*sin(p))}; }
     static inline float sqr(float x) { return x*x; }
     // the dreaded min/max
     static inline float min(float a, float b) { return a<b?a:b; }
@@ -425,7 +425,7 @@ private:
     }
 
     // filter the complex source signal and add it to target
-    void apply_filter(cfloat *signal, float *flt, float *target) {
+    void apply_filter(cfloat *signal, const float *flt, float *target) {
         // filter the signal
         unsigned f;
         for (f=0;f<=halfN;f++) {

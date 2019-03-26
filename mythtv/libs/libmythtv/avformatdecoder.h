@@ -377,7 +377,7 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo          m_audioIn;
     AudioInfo          m_audioOut;
 
-    float              m_fps                          {0.0f};
+    float              m_fps                          {0.0F};
     bool               m_codec_is_mpeg                {false};
     bool               m_processFrames                {true};
     bool               m_streams_changed              {false};

@@ -375,7 +375,7 @@ QString MPEGDescriptor::DescriptorTagString(void) const
 
 #define SET_STRING(DESC_NAME) do { \
     if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
-    if (d.IsValid()) str = d.toString(); } } while (0)
+    if (d.IsValid()) str = d.toString(); } } while (false)
 
 QString MPEGDescriptor::toString() const
 {

@@ -49,8 +49,8 @@ class VBI608Extractor
     QList<uint>  m_rawMaximas;
     QList<float> m_maximas;
     QList<float> m_minimas;
-    float        m_start       {0.0f};
-    float        m_rate        {0.0f};
+    float        m_start       {0.0F};
+    float        m_rate        {0.0F};
     uint16_t     m_code[2];
 };
 

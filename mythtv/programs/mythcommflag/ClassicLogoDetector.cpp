@@ -310,7 +310,7 @@ void ClassicLogoDetector::SetLogoMaskArea()
 
 
 void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
-    unsigned char* framePtr)
+    const unsigned char* framePtr)
 {
     char scrPixels[] = " .oxX";
 
@@ -425,10 +425,8 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
         (double)goodEdges / (double)testEdges : 0.0;
     double badEdgeRatio = (testNotEdges) ?
         (double)badEdges / (double)testNotEdges : 0.0;
-    if ((goodEdgeRatio > m_commDetectLogoGoodEdgeThreshold) &&
-        (badEdgeRatio < m_commDetectLogoBadEdgeThreshold))
-        return true;
-    return false;
+    return (goodEdgeRatio > m_commDetectLogoGoodEdgeThreshold) &&
+           (badEdgeRatio < m_commDetectLogoBadEdgeThreshold);
 }
 
 bool ClassicLogoDetector::pixelInsideLogo(unsigned int x, unsigned int y)

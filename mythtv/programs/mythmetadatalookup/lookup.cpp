@@ -29,13 +29,8 @@ LookerUpper::~LookerUpper()
 
 bool LookerUpper::StillWorking()
 {
-    if (m_metadataFactory->IsRunning() ||
-        m_busyRecList.count())
-    {
-        return true;
-    }
-
-    return false;
+    return m_metadataFactory->IsRunning() ||
+        m_busyRecList.count();
 }
 
 void LookerUpper::HandleSingleRecording(const uint chanid,
@@ -271,7 +266,7 @@ void LookerUpper::customEvent(QEvent *levent)
                         (hasArtwork &&
                          ((!foundMatchWithArt) ||
                           ((list[p]->GetPopularity() > exactTitlePopularity)) ||
-                          ((exactTitlePopularity == 0.0f) && (list[p]->GetReleaseDate() > exactTitleDate)))))
+                          ((exactTitlePopularity == 0.0F) && (list[p]->GetReleaseDate() > exactTitleDate)))))
                     {
                         // remember the most popular or most recently released exact match
                         exactTitleDate = list[p]->GetReleaseDate();

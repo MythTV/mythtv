@@ -78,7 +78,7 @@ void ShutdownMythSystemLegacy(void)
 
 MythSystemLegacyIOHandler::MythSystemLegacyIOHandler(bool read) :
     MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    m_pMap(PMap_t()),
     m_read(read)
 {
     FD_ZERO(&m_fds);
@@ -889,9 +889,13 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         cmdargs[i] = (char *)nullptr;
     }
     else
+    {
         LOG(VB_GENERAL, LOG_CRIT, LOC_ERR +
                         "Failed to allocate memory for cmdargs " +
                         ENO);
+        free(command);
+        return;
+    }
 
     char *directory = nullptr;
     QString dir = GetDirectory();

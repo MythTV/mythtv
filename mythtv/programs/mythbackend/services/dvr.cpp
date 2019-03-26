@@ -1734,7 +1734,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
     if (sJobArgs.isNull())
         sJobArgs = "";
 
-    int bReturn = JobQueue::QueueJob(jobType,
+    bool bReturn = JobQueue::QueueJob(jobType,
                                  ri.GetChanID(),
                                  ri.GetRecordingStartTime(),
                                  sJobArgs,

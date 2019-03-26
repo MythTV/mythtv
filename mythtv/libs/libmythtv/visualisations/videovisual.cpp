@@ -8,9 +8,7 @@ bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
 {
     if (!audio)
         return false;
-    if (render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1))
-        return true;
-    return false;
+    return render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1);
 }
 
 QStringList VideoVisual::GetVisualiserList(RenderType type)

@@ -37,13 +37,13 @@ extern FILE *__mhlogStream;
 do { \
     if (__level & __mhlogoptions) \
         __mhlog(__text); \
-} while (0)
+} while (false)
 
 #define MHERROR(__text) \
 do { \
     if (MHLogError & __mhlogoptions) \
         __mhlog(__text); \
     throw "Failed"; \
-} while (0)
+} while (false)
 
 #endif

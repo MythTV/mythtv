@@ -151,10 +151,7 @@ bool MusicFileScanner::IsArtFile(const QString &filename)
     QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
 
-    if (!extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1)
-        return true;
-
-    return false;
+    return !extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1;
 }
 
 bool MusicFileScanner::IsMusicFile(const QString &filename)
@@ -163,10 +160,7 @@ bool MusicFileScanner::IsMusicFile(const QString &filename)
     QString extension = fi.suffix().toLower();
     QString nameFilter = MetaIO::ValidFileExtensions;
 
-    if (!extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1)
-        return true;
-
-    return false;
+    return !extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1;
 }
 
 /*!
@@ -475,7 +469,7 @@ void MusicFileScanner::cleanDB()
 
         } while (query.next());
 
-    } while (deletedCount);
+    } while (deletedCount > 0);
 
     // delete unused albumart_ids from music_albumart (embedded images)
     if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
@@ -878,10 +872,7 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
 // static
 bool MusicFileScanner::IsRunning(void)
 {
-   if (gCoreContext->GetSetting("MusicScannerLastRunStatus", "") == "running")
-       return true;
-
-   return false;
+   return gCoreContext->GetSetting("MusicScannerLastRunStatus", "") == "running";
 }
 
 void MusicFileScanner::updateLastRunEnd(void)

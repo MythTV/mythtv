@@ -39,7 +39,6 @@ extern "C" {
 #define LOC_WARN QString("AVFW(%1) Warning: ").arg(m_filename)
 
 AVFormatWriter::AVFormatWriter()
-    : FileWriterBase()
 {
     memset(&m_fmt, 0, sizeof(m_fmt));
 }
@@ -216,11 +215,8 @@ bool AVFormatWriter::CloseFile(void)
 
 bool AVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    if ((m_bufferedVideoFrameTypes.isEmpty()) ||
-        (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I))
-        return true;
-
-    return false;
+    return (m_bufferedVideoFrameTypes.isEmpty()) ||
+           (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
 }
 
 int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)

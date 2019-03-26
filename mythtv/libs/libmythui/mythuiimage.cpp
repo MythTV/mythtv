@@ -141,13 +141,10 @@ class ImageLoader
     static bool SupportsAnimation(const QString &filename)
     {
         QString extension = filename.section('.', -1);
-        if (!filename.startsWith("myth://") &&
+        return !filename.startsWith("myth://") &&
             (extension == "gif" ||
              extension == "apng" ||
-             extension == "mng"))
-            return true;
-
-        return false;
+             extension == "mng");
     }
 
     /**
@@ -315,7 +312,7 @@ class ImageLoader
                 float wmult; // Width multipler
                 float hmult; // Height multipler
                 GetMythUI()->GetScreenSettings(wmult, hmult);
-                if (wmult != 1.0f || hmult != 1.0f)
+                if (wmult != 1.0F || hmult != 1.0F)
                 {
                     w = image->size().width() * wmult;
                     h = image->size().height() * hmult;
@@ -334,7 +331,7 @@ class ImageLoader
                     float wmult; // Width multipler
                     float hmult; // Height multipler
                     GetMythUI()->GetScreenSettings(wmult, hmult);
-                    if (wmult != 1.0f || hmult != 1.0f)
+                    if (wmult != 1.0F || hmult != 1.0F)
                     {
                         int width = newMaskImage->size().width() * wmult;
                         int height = newMaskImage->size().height() * hmult;
@@ -915,7 +912,6 @@ void MythUIImage::ForceSize(const QSize &size)
     SetSize(m_imageProperties.m_forceSize);
 
     Load();
-    return;
 }
 
 /**

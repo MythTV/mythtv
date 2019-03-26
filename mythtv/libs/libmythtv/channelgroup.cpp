@@ -8,14 +8,6 @@
 
 #define LOC QString("Channel Group: ")
 
-ChannelGroupItem& ChannelGroupItem::operator=(const ChannelGroupItem &other)
-{
-    m_grpid   = other.m_grpid;
-    m_name    = other.m_name;
-
-    return *this;
-}
-
 inline bool lt_group(const ChannelGroupItem &a, const ChannelGroupItem &b)
 {
     return QString::localeAwareCompare(a.m_name, b.m_name) < 0;

@@ -17,9 +17,7 @@ bool ControlRequestHandler::AnnounceSocket(void)
                         .arg(gCoreContext->GetHostName());
     QStringList strlist(ann);
     
-    if (!m_socket->Announce(strlist))
-        return false;
-    return true;
+    return m_socket->Announce(strlist);
 }
 
 /**

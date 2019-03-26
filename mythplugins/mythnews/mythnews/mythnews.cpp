@@ -249,7 +249,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 artText.replace("&#8216;", "'");  // LEFT-SINGLE-QUOTE
                 artText.replace("&#8217;", "'");  // RIGHT-SINGLE-QUOTE
                 // Replace paragraph and break HTML with newlines
-                if( artText.indexOf(QRegExp("</(p|P)>")) )
+                if( artText.contains(QRegExp("</(p|P)>")) )
                 {
                     artText.replace( QRegExp("<(p|P)>"), "");
                     artText.replace( QRegExp("</(p|P)>"), "\n\n");
@@ -356,7 +356,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if (m_thumbnailImage && m_thumbnailImage->IsVisible())
                 m_thumbnailImage->Hide();
 
-            if (m_podcastImage && site->podcast() == 1)
+            if (m_podcastImage && site->podcast())
                 m_podcastImage->Show();
 
             if (!site->imageURL().isEmpty())

@@ -49,7 +49,7 @@ class AirplayConnection
     }
     QTcpSocket  *m_controlSocket    {nullptr};
     QTcpSocket  *m_reverseSocket    {nullptr};
-    float        m_speed            {1.0f};
+    float        m_speed            {1.0F};
     double       m_position         {0.0};
 //  double       m_initial_position {-1.0};
     QUrl         m_url;
@@ -75,7 +75,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     { return gMythAirplayServer; }
 
     MythAirplayServer()
-        : ServerPool(), m_lock(new QMutex(QMutex::Recursive)) {}
+        : m_lock(new QMutex(QMutex::Recursive)) {}
 
   private slots:
     void Start();
@@ -86,7 +86,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     void timeout(void);
 
   private:
-    virtual ~MythAirplayServer(void);
+    ~MythAirplayServer(void) override;
     void Teardown(void);
     void HandleResponse(APHTTPRequest *req, QTcpSocket *socket);
     QByteArray StatusToString(int status);

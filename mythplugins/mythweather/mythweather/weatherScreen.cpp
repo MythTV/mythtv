@@ -239,10 +239,7 @@ QString WeatherScreen::prepareDataItem(const QString &key, const QString &value)
 
 bool WeatherScreen::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
-        return true;
-
-    return false;
+    return GetFocusWidget() && GetFocusWidget()->keyPressEvent(event);
 }
 
 /*

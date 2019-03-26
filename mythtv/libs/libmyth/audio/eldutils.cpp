@@ -164,10 +164,6 @@ ELD::ELD()
     m_e.eld_valid = false;
 }
 
-ELD::~ELD()
-{
-}
-
 ELD& ELD::operator=(const ELD &rhs)
 {
     if (this == &rhs)

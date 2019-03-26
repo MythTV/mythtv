@@ -138,8 +138,8 @@ class MythMainWindowPrivate
 
     int TranslateKeyNum(QKeyEvent *e);
 
-    float                m_wmult                {1.0f};
-    float                m_hmult                {1.0f};
+    float                m_wmult                {1.0F};
+    float                m_hmult                {1.0F};
     int                  m_screenwidth          {0};
     int                  m_screenheight         {0};
 
@@ -2047,7 +2047,7 @@ void MythMainWindow::JumpTo(const QString& destination, bool pop)
 
 bool MythMainWindow::DestinationExists(const QString& destination) const
 {
-    return (d->m_destinationMap.count(destination) > 0) ? true : false;
+    return d->m_destinationMap.count(destination) > 0;
 }
 
 QStringList MythMainWindow::EnumerateDestinations(void) const
@@ -2786,7 +2786,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             MythNotificationCenter::GetInstance()->Queue(mn);
             return;
         }
-        else if (message == "RECONNECT_SUCCESS" && d->m_standby == true)
+        else if (message == "RECONNECT_SUCCESS" && d->m_standby)
         {
             // If the connection to the master backend has just been (re-)established
             // but we're in standby, make sure the backend is not blocked from

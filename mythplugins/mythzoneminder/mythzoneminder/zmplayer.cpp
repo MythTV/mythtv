@@ -126,8 +126,7 @@ bool ZMPlayer::Create(void)
 
 void ZMPlayer::getEventInfo()
 {
-    if (m_frameTimer)
-        m_frameTimer->stop();
+    m_frameTimer->stop();
 
     if (*m_currentEvent == -1)
     {

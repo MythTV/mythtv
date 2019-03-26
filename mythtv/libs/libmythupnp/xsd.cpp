@@ -433,7 +433,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
             QString sNewPropName( metaProperty.name() );
 
             if (IsNillable( sType ))
-                oNode.setAttribute( "nillable" , true );   
+                oNode.setAttribute( "nillable" , static_cast<int>(true) );
 
             if (bCustomType)
             {

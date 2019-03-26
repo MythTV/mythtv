@@ -60,7 +60,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     MThread("Scheduler"),
     m_recordTable(tmptable),
     m_priorityTable("powerpriority"),
-    m_schedLock(),
     m_specsched(master_sched),
     m_tvList(tvList),
     m_doRun(runthread),
@@ -2881,7 +2880,7 @@ bool Scheduler::HandleRecording(
 
             // activate auto expirer
             if (m_expirer && recStatus == RecStatus::Tuning)
-                m_expirer->Update(ri.GetInputID(), fsID, false);
+                AutoExpire::Update(ri.GetInputID(), fsID, false);
         }
     }
 
@@ -5020,10 +5019,7 @@ static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
 // prefer dirs with more absolute free space over dirs with less
 static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
-    if (a->getFreeSpace() > b->getFreeSpace())
-        return true;
-
-    return false;
+    return a->getFreeSpace() > b->getFreeSpace();
 }
 
 // prefer dirs with less weight (disk I/O) over dirs with more weight.
@@ -5069,7 +5065,7 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
             .arg(recording_dir));
 
     if (m_expirer) // update auto expirer
-        m_expirer->Update(cardid, fsID, true);
+        AutoExpire::Update(cardid, fsID, true);
 }
 
 int Scheduler::FillRecordingDir(

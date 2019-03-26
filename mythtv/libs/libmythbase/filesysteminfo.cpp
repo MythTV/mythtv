@@ -26,8 +26,8 @@ using namespace std;
 #include "mythcoreutil.h"
 
 // for serialization
-#define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
-#define STR_TO_LIST(x)       do { list << (x); } while (0)
+#define INT_TO_LIST(x)       do { list << QString::number(x); } while (false)
+#define STR_TO_LIST(x)       do { list << (x); } while (false)
 
 // for deserialization
 #define NEXT_STR()        do { if (it == listend)                    \
@@ -36,10 +36,10 @@ using namespace std;
                                    clear();                          \
                                    return false;                     \
                                }                                     \
-                               ts = *it++; } while (0)
-#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
-#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
-#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (0)
+                               ts = *it++; } while (false)
+#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (false)
+#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (false)
+#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (false)
 
 #define LOC QString("FileSystemInfo: ")
 

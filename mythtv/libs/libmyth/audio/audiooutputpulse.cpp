@@ -318,7 +318,7 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 int AudioOutputPulseAudio::GetVolumeChannel(int channel) const
 {
     return (float)m_volume_control.values[channel] /
-           (float)PA_VOLUME_NORM * 100.0f;
+           (float)PA_VOLUME_NORM * 100.0F;
 }
 
 void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
@@ -333,7 +333,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
     }
 
     m_volume_control.values[channel] =
-        (float)volume / 100.0f * (float)PA_VOLUME_NORM;
+        (float)volume / 100.0F * (float)PA_VOLUME_NORM;
 
 // FIXME: This code did nothing at all so has been commented out for now
 //        until it's decided whether it was ever required
@@ -543,7 +543,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     {
         int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
         pa_cvolume_set(&m_volume_control, m_channels,
-                       (float)volume * (float)PA_VOLUME_NORM / 100.0f);
+                       (float)volume * (float)PA_VOLUME_NORM / 100.0F);
     }
     else
         pa_cvolume_reset(&m_volume_control, m_channels);

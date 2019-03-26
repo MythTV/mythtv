@@ -361,7 +361,6 @@ void AutoIncrementSetting::Save(void)
 }
 
 AutoIncrementSetting::AutoIncrementSetting(QString _table, QString _column) :
-    StandardSetting(),
     m_table(_table), m_column(_column)
 {
     setValue("0");

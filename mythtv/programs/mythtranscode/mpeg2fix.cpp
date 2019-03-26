@@ -162,7 +162,7 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
     {
         it = ++m_offset[idx].begin();
         if ((((*it).type == 0) && (pkt->pts >= (*it).pos_pts) /* PTS type */) ||
-            (((*it).type == 1) /* Pos type */ &&
+            (((*it).type) /* Pos type */ &&
              ((pkt->pos >= (*it).pos_pts) || (pkt->duration > (*it).framenum))))
         {
             m_offset[idx].pop_front();
@@ -433,7 +433,7 @@ int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
 
     if (pts1 > pts2)
     {
-        if ((uint64_t)(pts1 - pts2) > MAX_PTS/2ull)
+        if ((uint64_t)(pts1 - pts2) > MAX_PTS/2ULL)
             ret = -1;
         else 
             ret = 1;
@@ -442,7 +442,7 @@ int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
         ret = 0; 
     else
     {
-        if ((uint64_t)(pts2 - pts1) > MAX_PTS/2ull)
+        if ((uint64_t)(pts2 - pts1) > MAX_PTS/2ULL)
             ret = 2;
         else  
             ret = -2;
@@ -450,7 +450,7 @@ int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
     return ret;
 }
 
-int MPEG2fixup::FindMPEG2Header(uint8_t *buf, int size, uint8_t code)
+int MPEG2fixup::FindMPEG2Header(const uint8_t *buf, int size, uint8_t code)
 {
     int i;
 
@@ -830,7 +830,7 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
         }
     }
 
-    m_mkvfile = !strcmp(m_inputFC->iformat->name, "mkv") ? true : false;
+    m_mkvfile = strcmp(m_inputFC->iformat->name, "mkv") == 0;
 
     if (offset)
         av_seek_frame(m_inputFC, m_vid_id, offset, AVSEEK_FLAG_BYTE);

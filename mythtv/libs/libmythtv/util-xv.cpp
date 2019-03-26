@@ -211,10 +211,7 @@ bool xv_set_attrib(MythXDisplay *disp, int port, const char *name, int val)
     int ret;
     XLOCK(disp, ret = XvSetPortAttribute(disp->GetDisplay(),
                                          port, xv_atom, val));
-    if (Success != ret)
-        return false;
-
-    return true;
+    return Success == ret;
 }
 
 bool xv_get_attrib(MythXDisplay *disp, int port, const char *name, int &val)
@@ -227,8 +224,5 @@ bool xv_get_attrib(MythXDisplay *disp, int port, const char *name, int &val)
     int ret;
     XLOCK(disp, ret = XvGetPortAttribute(disp->GetDisplay(),
                                          port, xv_atom, &val));
-    if (Success != ret)
-        return false;
-
-    return true;
+    return Success == ret;
 }

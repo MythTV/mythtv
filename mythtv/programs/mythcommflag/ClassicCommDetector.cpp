@@ -563,7 +563,7 @@ bool ClassicCommDetector::go()
                 m_recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(m_framesProcessed / m_fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0f / m_player->GetFrameRate() * 1000000);
+            long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, nullptr);
@@ -721,7 +721,7 @@ void ClassicCommDetector::SetVideoParams(float aspect)
             .arg(aspect));
     // Default to Widescreen but use the same check as VideoOutput::MoveResize()
     // to determine if is normal 4:3 aspect
-    if (fabs(aspect - 1.333333f) < 0.1f)
+    if (fabs(aspect - 1.333333F) < 0.1F)
         newAspect = COMM_ASPECT_NORMAL;
 
     if (newAspect != m_currentAspect)
@@ -1264,11 +1264,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     {
         value = frameInfo[curFrame].flagMask;
 
-        if (((curFrame + 1) <= m_framesProcessed) &&
-            (frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK))
-            nextFrameIsBlank = true;
-        else
-            nextFrameIsBlank = false;
+        nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
+            (frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK);
 
         if (value & COMM_FRAME_BLANK)
         {

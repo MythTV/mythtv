@@ -683,11 +683,11 @@ QPoint MythUIGuideGrid::GetRowAndColumn(QPoint position)
 
             if (data->m_drawArea.contains(position))
             {
-                return QPoint(col, i);
+                return {col, i};
             }
         }
     }
-    return QPoint(-1,-1);
+    return {-1,-1};
 }
 
 void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,

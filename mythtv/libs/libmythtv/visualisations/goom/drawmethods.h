@@ -127,9 +127,6 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
                     yy = y >> 16;
                     p = &(data[(screenx * yy) + x]);
                     DRAWMETHOD;
-                    if (yy < (screeny - 1)) {
-                        p += screeny;
-                    }
                     y += dy;
                 }
 	}
@@ -159,9 +156,6 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
                     yy = y >> 16;
                     p = &(data[(screenx * yy) + x]);
                     DRAWMETHOD;
-                    if (yy < (screeny - 1)) {
-                        p += screeny;
-                    }
                     y += dy;
                 }
                 return;

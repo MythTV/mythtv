@@ -95,12 +95,12 @@ bool MythMediaDevice::closeDevice()
     int ret = close(m_DeviceHandle);
     m_DeviceHandle = -1;
 
-    return (ret != -1) ? true : false;
+    return ret != -1;
 }
 
 bool MythMediaDevice::isDeviceOpen() const
 {
-    return (m_DeviceHandle >= 0) ? true : false;
+    return m_DeviceHandle >= 0;
 }
 
 bool MythMediaDevice::performMountCmd(bool DoMount)

@@ -23,7 +23,7 @@ class MTV_PUBLIC ChannelGroupItem
     bool operator == (uint grpid) const
         { return m_grpid == grpid; }
 
-    ChannelGroupItem& operator=(const ChannelGroupItem&);
+    ChannelGroupItem& operator=(const ChannelGroupItem&) = default;
 
   public:
     uint    m_grpid;

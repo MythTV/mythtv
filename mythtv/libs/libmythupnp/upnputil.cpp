@@ -83,13 +83,8 @@ QString LookupUDN( const QString &sDeviceType )
 
 bool operator< ( TaskTime t1, TaskTime t2 )
 {
-    if ( (t1.tv_sec  < t2.tv_sec) || 
-        ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec < t2.tv_usec)))
-    {
-        return true;
-    }
-
-    return false;
+    return (t1.tv_sec  < t2.tv_sec) ||
+          ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec < t2.tv_usec));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -98,10 +93,7 @@ bool operator< ( TaskTime t1, TaskTime t2 )
 
 bool operator== ( TaskTime t1, TaskTime t2 )
 {
-    if ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec == t2.tv_usec))
-        return true;
-
-    return false;
+    return (t1.tv_sec == t2.tv_sec) && (t1.tv_usec == t2.tv_usec);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -11,9 +11,7 @@
 
 bool operator==(const RomInfo& a, const RomInfo& b)
 {
-    if (a.Romname() == b.Romname())
-        return true;
-    return false;
+    return a.Romname() == b.Romname();
 }
 
 void RomInfo::SaveToDatabase()

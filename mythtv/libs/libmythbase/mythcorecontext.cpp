@@ -57,7 +57,7 @@ class MythCoreContextPrivate : public QObject
   public:
     MythCoreContextPrivate(MythCoreContext *lparent, QString binversion,
                            QObject *guicontext);
-   ~MythCoreContextPrivate();
+   ~MythCoreContextPrivate() override;
 
     bool WaitForWOL(int timeout_in_ms = INT_MAX);
 
@@ -471,7 +471,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 break;
             }
 
-            setup_timeout = (int)(setup_timeout * 1.5f);
+            setup_timeout = (int)(setup_timeout * 1.5F);
         }
         else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
         {
@@ -739,10 +739,7 @@ bool MythCoreContext::IsFrontendOnly(void)
 
     SendReceiveStringList(strlist);
 
-    if (strlist[0] == "FALSE")
-        backendOnLocalhost = false;
-    else
-        backendOnLocalhost = true;
+    backendOnLocalhost = strlist[0] != "FALSE";
 
     return !backendOnLocalhost;
 }
@@ -894,7 +891,7 @@ QString MythCoreContext::GetSetting(const QString &key,
 bool MythCoreContext::GetBoolSetting(const QString &key, bool defaultval)
 {
     int result = GetNumSetting(key, static_cast<int>(defaultval));
-    return (result > 0) ? true : false;
+    return result > 0;
 }
 
 int MythCoreContext::GetNumSetting(const QString &key, int defaultval)
@@ -919,7 +916,7 @@ bool MythCoreContext::GetBoolSettingOnHost(const QString &key,
                                            bool defaultval)
 {
     int result = GetNumSettingOnHost(key, host, static_cast<int>(defaultval));
-    return (result > 0) ? true : false;
+    return result > 0;
 }
 
 int MythCoreContext::GetNumSettingOnHost(const QString &key,

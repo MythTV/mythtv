@@ -103,7 +103,7 @@ void surf3d_translate (surf3d *s) {
 	}
 }
 
-void grid3d_update (grid3d *g, float angle, float *vals, float dist) {
+void grid3d_update (grid3d *g, float angle, const float *vals, float dist) {
 	int i;
 	float cosa;
 	float sina;
@@ -111,18 +111,18 @@ void grid3d_update (grid3d *g, float angle, float *vals, float dist) {
 	v3d cam = s->center;
 	cam.z += dist;
 
-	SINCOS((angle/4.3f),sina,cosa);
-	cam.y += sina*2.0f;
+	SINCOS((angle/4.3F),sina,cosa);
+	cam.y += sina*2.0F;
 	SINCOS(angle,sina,cosa);
 
 	if (g->mode==0) {
 		if (vals)
 			for (i=0;i<g->defx;i++)
-				s->vertex[i].y = s->vertex[i].y*0.2f + vals[i]*0.8f;
+				s->vertex[i].y = s->vertex[i].y*0.2F + vals[i]*0.8F;
 
 		for (i=g->defx;i<s->nbvertex;i++) {
-			s->vertex[i].y *= 0.255f;
-			s->vertex[i].y += (s->vertex[i-g->defx].y * 0.777f);
+			s->vertex[i].y *= 0.255F;
+			s->vertex[i].y += (s->vertex[i-g->defx].y * 0.777F);
 		}
 	}
 

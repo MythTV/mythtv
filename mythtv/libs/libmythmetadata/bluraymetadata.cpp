@@ -30,10 +30,7 @@ bool BlurayMetadata::OpenDisc(void)
 
     m_bdnav = bd_open(m_path.toLatin1().data(), keyfilepath);
 
-    if (!m_bdnav)
-        return false;
-
-    return true;
+    return m_bdnav != nullptr;
 }
 
 bool BlurayMetadata::ParseDisc(void)

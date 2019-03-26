@@ -90,7 +90,7 @@ class DeviceDescrSetting : public TransTextEditSetting
 {
   public:
     explicit DeviceDescrSetting(DiSEqCDevDevice &device) :
-        TransTextEditSetting(), m_device(device)
+        m_device(device)
     {
         setLabel(DeviceTree::tr("Description"));
         QString help = DeviceTree::tr(
@@ -153,7 +153,7 @@ class SwitchTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
     explicit SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) :
-        TransMythUIComboBoxSetting(), m_switch(switch_dev)
+        m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Switch Type"));
         setHelpText(DeviceTree::tr("Select the type of switch from the list."));
@@ -200,7 +200,7 @@ class SwitchAddressSetting : public TransTextEditSetting
 {
   public:
     explicit SwitchAddressSetting(DiSEqCDevSwitch &switch_dev) :
-           TransTextEditSetting(), m_switch(switch_dev)
+        m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Address of switch"));
         setHelpText(DeviceTree::tr("The DiSEqC address of the switch."));
@@ -227,7 +227,7 @@ class SwitchPortsSetting : public TransTextEditSetting
 {
   public:
     explicit SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) :
-        TransTextEditSetting(), m_switch(switch_dev)
+        m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Number of ports"));
         setHelpText(DeviceTree::tr("The number of ports this switch has."));
@@ -333,7 +333,7 @@ class RotorTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
     explicit RotorTypeSetting(DiSEqCDevRotor &rotor) :
-        TransMythUIComboBoxSetting(), m_rotor(rotor)
+        m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Type"));
         setHelpText(DeviceTree::tr("Select the type of rotor from the list."));
@@ -364,7 +364,7 @@ class RotorLoSpeedSetting : public TransTextEditSetting
 {
   public:
     explicit RotorLoSpeedSetting(DiSEqCDevRotor &rotor) :
-        TransTextEditSetting(), m_rotor(rotor)
+        m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Low Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -394,7 +394,7 @@ class RotorHiSpeedSetting : public TransTextEditSetting
 {
   public:
     explicit RotorHiSpeedSetting(DiSEqCDevRotor &rotor) :
-        TransTextEditSetting(), m_rotor(rotor)
+        m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor High Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -468,11 +468,6 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     return pos;
 }
 
-RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) :
-    GroupSetting(), m_rotor(rotor)
-{
-}
-
 void RotorPosMap::Load(void)
 {
     m_posmap = m_rotor.GetPosMap();
@@ -488,7 +483,7 @@ class RotorPosTextEdit : public TransTextEditSetting
 {
 public:
     RotorPosTextEdit(const QString &label, uint id, const QString &value) :
-        TransTextEditSetting(), m_id(id)
+        m_id(id)
     {
         setLabel(label);
         setValue(value);
@@ -607,7 +602,7 @@ class SCRUserBandSetting : public TransMythUISpinBoxSetting
 class SCRFrequencySetting : public TransTextEditSetting
 {
   public:
-    explicit SCRFrequencySetting(DiSEqCDevSCR &scr) : TransTextEditSetting(), m_scr(scr)
+    explicit SCRFrequencySetting(DiSEqCDevSCR &scr) : m_scr(scr)
     {
         setLabel(DeviceTree::tr("Frequency (MHz)"));
         setHelpText(DeviceTree::tr("Unicable userband frequency (usually 1210, 1420, 1680 and 2040 MHz)"));
@@ -633,7 +628,7 @@ class SCRFrequencySetting : public TransTextEditSetting
 class SCRPINSetting : public TransTextEditSetting
 {
   public:
-    explicit SCRPINSetting(DiSEqCDevSCR &scr) : TransTextEditSetting(), m_scr(scr)
+    explicit SCRPINSetting(DiSEqCDevSCR &scr) : m_scr(scr)
     {
         setLabel(DeviceTree::tr("PIN code"));
         setHelpText(DeviceTree::tr("Unicable PIN code (-1 disabled, 0 - 255)"));
@@ -728,7 +723,7 @@ static uint FindPreset(const DiSEqCDevLNB &lnb)
 class LNBPresetSetting : public MythUIComboBoxSetting
 {
   public:
-    explicit LNBPresetSetting(DiSEqCDevLNB &lnb) : MythUIComboBoxSetting(), m_lnb(lnb)
+    explicit LNBPresetSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Preset"));
         QString help = DeviceTree::tr(
@@ -762,7 +757,7 @@ class LNBPresetSetting : public MythUIComboBoxSetting
 class LNBTypeSetting : public MythUIComboBoxSetting
 {
   public:
-    explicit LNBTypeSetting(DiSEqCDevLNB &lnb) : MythUIComboBoxSetting(), m_lnb(lnb)
+    explicit LNBTypeSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Type"));
         setHelpText(DeviceTree::tr("Select the type of LNB from the list."));
@@ -798,7 +793,7 @@ class LNBTypeSetting : public MythUIComboBoxSetting
 class LNBLOFSwitchSetting : public TransTextEditSetting
 {
   public:
-    explicit LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
+    explicit LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Switch (MHz)"));
         QString help = DeviceTree::tr(
@@ -827,7 +822,7 @@ class LNBLOFSwitchSetting : public TransTextEditSetting
 class LNBLOFLowSetting : public TransTextEditSetting
 {
   public:
-    explicit LNBLOFLowSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
+    explicit LNBLOFLowSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
         QString help = DeviceTree::tr(
@@ -857,7 +852,7 @@ class LNBLOFLowSetting : public TransTextEditSetting
 class LNBLOFHighSetting : public TransTextEditSetting
 {
   public:
-    explicit LNBLOFHighSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
+    explicit LNBLOFHighSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF High (MHz)"));
         QString help = DeviceTree::tr(
@@ -886,7 +881,7 @@ class LNBPolarityInvertedSetting : public MythUICheckBoxSetting
 {
   public:
     explicit LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) :
-        MythUICheckBoxSetting(), m_lnb(lnb)
+        m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Reversed"));
         QString help = DeviceTree::tr(
@@ -1006,11 +1001,6 @@ void LNBConfig::UpdateType(void)
 }
 
 //////////////////////////////////////// DeviceTree
-
-DeviceTree::DeviceTree(DiSEqCDevTree &tree) :
-    GroupSetting(), m_tree(tree)
-{
-}
 
 void DeviceTree::Load(void)
 {
@@ -1197,7 +1187,7 @@ class SwitchSetting : public MythUIComboBoxSetting
 {
   public:
     SwitchSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
+        : m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a port to use for this switch."));
@@ -1237,7 +1227,7 @@ class RotorSetting : public MythUIComboBoxSetting
 {
   public:
     RotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
+        : m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a satellite position."));
@@ -1330,7 +1320,7 @@ class SCRPositionSetting : public MythUIComboBoxSetting
 {
   public:
     SCRPositionSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
+        : m_node(node), m_settings(settings)
     {
         setLabel("Position");
         setHelpText(DeviceTree::tr("Unicable satellite position (A/B)"));

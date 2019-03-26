@@ -5,7 +5,6 @@
 #include "mythlogging.h"
 
 WebSocketMythEvent::WebSocketMythEvent()
-                   : WebSocketExtension()
 {
     setObjectName("WebSocketMythEvent");
     gCoreContext->addListener(this);

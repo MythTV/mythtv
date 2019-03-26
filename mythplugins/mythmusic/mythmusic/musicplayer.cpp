@@ -1312,13 +1312,13 @@ void MusicPlayer::setSpeed(float newspeed)
 
 void MusicPlayer::incSpeed()
 {
-    m_playSpeed += 0.05f;
+    m_playSpeed += 0.05F;
     setSpeed(m_playSpeed);
 }
 
 void MusicPlayer::decSpeed()
 {
-    m_playSpeed -= 0.05f;
+    m_playSpeed -= 0.05F;
     setSpeed(m_playSpeed);
 }
 

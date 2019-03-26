@@ -563,7 +563,7 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
 
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
-    int value = (int) ((range * m_audvolume * 0.01f) + qctrl.minimum);
+    int value = (int) ((range * m_audvolume * 0.01F) + qctrl.minimum);
     int ctrl_volume = min(qctrl.maximum, max(qctrl.minimum, value));
 
     // Set recording volume

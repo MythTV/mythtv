@@ -34,7 +34,8 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     friend class DVDRingBuffer;
 
   public:
-    virtual ~MythDVDContext();
+    MythDVDContext() = delete;    // Default constructor should not be called
+    ~MythDVDContext() override = default;
 
     int64_t  GetStartPTS()          const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
     int64_t  GetEndPTS()            const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
@@ -47,10 +48,6 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
 
   protected:
     MythDVDContext(const dsi_t& dsi, const pci_t& pci);
-
-  private:
-    // Default constructor should not be called
-    MythDVDContext();
 
   protected:
     dsi_t          m_dsi;
@@ -97,7 +94,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
   public:
     explicit DVDRingBuffer(const QString &lfilename);
-    virtual ~DVDRingBuffer();
+    ~DVDRingBuffer() override;
 
     // gets
     int  GetTitle(void)        const { return m_title;                  }
@@ -263,7 +260,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     QMap<uint, QList<uint64_t> > m_chapterMap;
 
     MythDVDPlayer  *m_parent                {nullptr};
-    float           m_forcedAspect          {-1.0f};
+    float           m_forcedAspect          {-1.0F};
 
     QMutex          m_contextLock           {QMutex::Recursive};
     MythDVDContext *m_context               {nullptr};
@@ -305,8 +302,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int get_nibble(const uint8_t *buf, int nibble_offset);
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                     const uint8_t *buf, int nibble_offset, int buf_size);
-    void guess_palette(uint32_t *rgba_palette,uint8_t *palette,
-                       uint8_t *alpha);
+    void guess_palette(uint32_t *rgba_palette,const uint8_t *palette,
+                       const uint8_t *alpha);
     int is_transp(const uint8_t *buf, int pitch, int n,
                   const uint8_t *transp_color);
     int find_smallest_bounding_rectangle(AVSubtitle *s);

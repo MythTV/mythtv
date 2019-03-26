@@ -53,7 +53,8 @@ class RotorPosMap : public GroupSetting
     Q_OBJECT
 
   public:
-    explicit RotorPosMap(DiSEqCDevRotor &rotor);
+    explicit RotorPosMap(DiSEqCDevRotor &rotor) :
+        m_rotor(rotor) { }
 
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
@@ -131,7 +132,8 @@ class DeviceTree : public GroupSetting
     Q_OBJECT
 
   public:
-    explicit DeviceTree(DiSEqCDevTree &tree);
+    explicit DeviceTree(DiSEqCDevTree &tree) :
+        m_tree(tree) { }
     void DeleteDevice(DeviceTypeSetting *devtype);
 
     void Load(void) override; // StandardSetting

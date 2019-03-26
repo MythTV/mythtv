@@ -76,8 +76,7 @@ int debug_level = 0;
 #define LOC_ERR  QString("LCDServer, Error: ")
 
 LCDServer::LCDServer(int port, QString message, int messageTime)
-    :QObject(),
-     m_lcd(new LCDProcClient(this)),
+    : m_lcd(new LCDProcClient(this)),
      m_serverPool(new ServerPool()),
      m_lastSocket(nullptr)
 {

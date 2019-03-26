@@ -41,7 +41,7 @@ class MTV_PUBLIC MythCodecContext
 {
   public:
     MythCodecContext(void);
-    virtual ~MythCodecContext();
+    virtual ~MythCodecContext() = default;
     static MythCodecContext* createMythCodecContext(MythCodecID codec);
     virtual int HwDecoderInit(AVCodecContext * /*ctx*/) { return 0; }
     void setStream(AVStream *initStream) { stream = initStream; }

@@ -48,7 +48,7 @@ inline int   clamp(int val, int minimum, int maximum)
 }
 inline float lerp(float r, float a, float b)
 {
-    return ((1.0f - r) * a) + (r * b);
+    return ((1.0F - r) * a) + (r * b);
 }
 inline int   lerp(float r, int a, int b)
 {

@@ -280,10 +280,7 @@ MythWebPage::~MythWebPage()
 
 bool MythWebPage::supportsExtension(Extension extension) const
 {
-    if (extension == QWebPage::ErrorPageExtension)
-        return true;
-
-    return false;
+    return extension == QWebPage::ErrorPageExtension;
 }
 
 bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
@@ -831,7 +828,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
       m_defaultSaveFilename(""),
       m_inputToggled(false), m_lastMouseAction(""),
-      m_mouseKeyCount(0),    m_lastMouseActionTime(),
+      m_mouseKeyCount(0),
       m_horizontalScrollbar(nullptr), m_verticalScrollbar(nullptr)
 {
     SetCanTakeFocus(true);
@@ -1148,7 +1145,7 @@ void MythUIWebBrowser::SetActive(bool active)
  */
 void MythUIWebBrowser::ZoomIn(void)
 {
-    SetZoom(m_zoom + 0.1f);
+    SetZoom(m_zoom + 0.1F);
 }
 
 /** \fn MythUIWebBrowser::ZoomOut(void)
@@ -1156,7 +1153,7 @@ void MythUIWebBrowser::ZoomIn(void)
  */
 void MythUIWebBrowser::ZoomOut(void)
 {
-    SetZoom(m_zoom - 0.1f);
+    SetZoom(m_zoom - 0.1F);
 }
 
 /** \fn MythUIWebBrowser::SetZoom(float)
@@ -1168,11 +1165,11 @@ void MythUIWebBrowser::SetZoom(float zoom)
     if (!m_browser)
         return;
 
-    if (zoom < 0.3f)
-        zoom = 0.3f;
+    if (zoom < 0.3F)
+        zoom = 0.3F;
 
-    if (zoom > 5.0f)
-        zoom = 5.0f;
+    if (zoom > 5.0F)
+        zoom = 5.0F;
 
     m_zoom = zoom;
     m_browser->setZoomFactor(m_zoom);

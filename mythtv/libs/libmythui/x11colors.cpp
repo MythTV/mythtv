@@ -784,5 +784,5 @@ QColor createColor(const QString &color)
     if (it != x11colormap.end())
         return it.value();
 
-    return QColor(color);
+    return {color};
 }

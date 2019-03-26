@@ -207,10 +207,7 @@ bool ExternalRecorder::PauseAndWait(int timeout)
 bool ExternalRecorder::StartStreaming(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "StartStreaming");
-    if (m_stream_handler && m_stream_handler->StartStreaming())
-        return true;
-
-    return false;
+    return m_stream_handler && m_stream_handler->StartStreaming();
 }
 
 bool ExternalRecorder::StopStreaming(void)

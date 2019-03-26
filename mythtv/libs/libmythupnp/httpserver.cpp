@@ -114,7 +114,7 @@ QString  HttpServer::s_platform;
 /////////////////////////////////////////////////////////////////////////////
 
 HttpServer::HttpServer() :
-    ServerPool(), m_sSharePath(GetShareDir()),
+    m_sSharePath(GetShareDir()),
     m_threadPool("HttpServerPool"), m_running(true),
     m_privateToken(QUuid::createUuid().toString()) // Cryptographically random and sufficiently long enough to act as a secure token
 {

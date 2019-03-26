@@ -44,7 +44,7 @@ void PlayerContext::TeardownPlayer(void)
     m_ffRewState = 0;
     m_ffRewIndex = 0;
     m_ffRewSpeed = 0;
-    m_tsNormal   = 1.0f;
+    m_tsNormal   = 1.0F;
 
     SetPlayer(nullptr);
     SetRecorder(nullptr);
@@ -330,7 +330,7 @@ bool PlayerContext::HandlePlayerSpeedChangeEOF(void)
         m_player->AtNormalSpeed())
     {
         // Speed got changed in player since we are close to the end of file
-        m_tsNormal = 1.0f;
+        m_tsNormal = 1.0F;
         return true;
     }
     return false;
@@ -762,17 +762,17 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
 QString PlayerContext::GetPlayMessage(void) const
 {
     QString mesg = QObject::tr("Play");
-    if (m_tsNormal != 1.0f)
+    if (m_tsNormal != 1.0F)
     {
-        if (m_tsNormal == 0.5f)
+        if (m_tsNormal == 0.5F)
             mesg += QString(" 1/2x");
-        else if (0.32f < m_tsNormal && m_tsNormal < 0.34f)
+        else if (0.32F < m_tsNormal && m_tsNormal < 0.34F)
             mesg += QString(" 1/3x");
-        else if (m_tsNormal == 0.25f)
+        else if (m_tsNormal == 0.25F)
             mesg += QString(" 1/4x");
-        else if (m_tsNormal == 0.125f)
+        else if (m_tsNormal == 0.125F)
             mesg += QString(" 1/8x");
-        else if (m_tsNormal == 0.0625f)
+        else if (m_tsNormal == 0.0625F)
             mesg += QString(" 1/16x");
         else
             mesg += QString(" %1x").arg(m_tsNormal);
@@ -873,8 +873,8 @@ void PlayerContext::SetPlayGroup(const QString &group)
     m_fftime       = PlayGroup::GetSetting(group, "skipahead", 30);
     m_rewtime      = PlayGroup::GetSetting(group, "skipback", 5);
     m_jumptime     = PlayGroup::GetSetting(group, "jump", 10);
-    m_tsNormal     = PlayGroup::GetSetting(group, "timestretch", 100) * 0.01f;
-    m_tsAlt        = (m_tsNormal == 1.0f) ? 1.5f : 1.0f;
+    m_tsNormal     = PlayGroup::GetSetting(group, "timestretch", 100) * 0.01F;
+    m_tsAlt        = (m_tsNormal == 1.0F) ? 1.5F : 1.0F;
 }
 
 void PlayerContext::SetPseudoLiveTV(

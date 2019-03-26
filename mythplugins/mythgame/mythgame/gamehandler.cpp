@@ -352,7 +352,6 @@ static void UpdateGameCounts(QStringList updatelist)
                     {
                         firstname = RomName;
                         lastrom = basename;
-                        diskcount = 1;
                     }
 
                     if (basename != GameName)

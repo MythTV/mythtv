@@ -245,7 +245,7 @@ void BackendSelection::Cancel(void)
 
 void BackendSelection::Load(void)
 {
-    SSDP::Instance()->AddListener(this);
+    SSDP::AddListener(this);
     SSDP::Instance()->PerformSearch(gBackendURI);
 }
 
@@ -320,7 +320,7 @@ void BackendSelection::customEvent(QEvent *event)
         if (message.startsWith("SSDP_ADD") &&
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
         {
-            DeviceLocation *devLoc = SSDP::Instance()->Find(URI, URN);
+            DeviceLocation *devLoc = SSDP::Find(URI, URN);
             if (devLoc)
             {
                 AddItem(devLoc);

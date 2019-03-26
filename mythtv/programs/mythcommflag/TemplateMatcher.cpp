@@ -193,7 +193,7 @@ int sort_ascending(const void *aa, const void *bb)
     return *(unsigned short*)aa - *(unsigned short*)bb;
 }
 
-long long matchspn(long long nframes, unsigned char *match, long long frameno,
+long long matchspn(long long nframes, const unsigned char *match, long long frameno,
                   unsigned char acceptval)
 {
     /*
@@ -330,7 +330,7 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
 
 TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
                                  TemplateFinder *tf, QString debugdir) :
-    FrameAnalyzer(),      m_pgmConverter(pgmc),
+    m_pgmConverter(pgmc),
     m_edgeDetector(ed),   m_templateFinder(tf),
     m_debugdir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE
@@ -736,11 +736,11 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
      *      can cause even more of the broadcast segment can be misidentified
      *      as part of the end of the commercial break.
      */
-    const int BLANK_NEARBY = (int)roundf(0.5f * m_fps);
+    const int BLANK_NEARBY = (int)roundf(0.5F * m_fps);
     const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * m_fps);
     const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * m_fps);
     const int TEMPLATE_REAPPEARS_LATE = (int)roundf(35 * m_fps);
-    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5f * m_fps);
+    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5F * m_fps);
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TemplateMatcher adjusting for blanks"));
 

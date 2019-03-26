@@ -601,7 +601,7 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
 {
     HRESULT dsresult;
     float dbAtten = 20 * log10((float)volume/100);
-    long dxVolume = (volume == 0) ? DSBVOLUME_MIN : (long)(100.0f * dbAtten);
+    long dxVolume = (volume == 0) ? DSBVOLUME_MIN : (long)(100.0F * dbAtten);
 
     if (m_UseSPDIF)
         return;

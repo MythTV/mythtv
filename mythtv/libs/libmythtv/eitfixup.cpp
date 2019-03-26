@@ -3070,7 +3070,7 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event) const
     if (event.m_description.indexOf (tmp) != -1)
     {
         float stars = tmp.cap(1).toFloat();
-        event.m_stars = stars / 10.0f;
+        event.m_stars = stars / 10.0F;
         event.m_description.replace (m_unitymediaImdbrating, "");
     }
 }

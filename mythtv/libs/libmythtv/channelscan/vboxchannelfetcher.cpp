@@ -293,8 +293,5 @@ bool VBoxChannelFetcher::SupportedTransmission(const QString& transType)
         return true;
 
     // for S2, T2, A and C the channel and tuner transmission types must match
-    if (transType != m_transType)
-        return false;
-
-    return true;
+    return transType == m_transType;
 }

@@ -236,7 +236,7 @@ class MusicPlayer : public QObject, public MythObservable
     ResumeMode   m_resumeModeEditor   {RESUME_OFF};
     ResumeMode   m_resumeModeRadio    {RESUME_TRACK};
 
-    float        m_playSpeed          {1.0f};
+    float        m_playSpeed          {1.0F};
 
     // notification
     bool m_showScannerNotifications   {true};

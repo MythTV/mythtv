@@ -111,7 +111,9 @@ PrivateDecoderOMX::PrivateDecoderOMX() :
     for (unsigned port = 0; port < m_videc.Ports(); ++port)
     {
         m_videc.ShowPortDef(port, LOG_DEBUG);
-        if (false) m_videc.ShowFormats(port, LOG_DEBUG);
+#if 0
+        m_videc.ShowFormats(port, LOG_DEBUG);
+#endif
     }
 }
 
@@ -852,7 +854,6 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
         hdr->nFilledLen += cnt;
         buf += cnt;
         size -= cnt;
-        free -= cnt;
 
         hdr->nTimeStamp = Pts2Ticks(stream, pkt->pts);
         if (!m_bStartTime && (pkt->flags & AV_PKT_FLAG_KEY))

@@ -197,7 +197,7 @@ bool PrePostRollFlagger::go()
     {
         //float elapsed = flagTime.elapsed() / 1000.0;
 
-        //float flagFPS = (elapsed > 0.0f) ? (framesProcessed / elapsed) : 0.0f;
+        //float flagFPS = (elapsed > 0.0F) ? (framesProcessed / elapsed) : 0.0F;
 
         if (m_myTotalFrames)
             cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
@@ -275,7 +275,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             if (m_bStop)
             {
                 m_player->DiscardVideoFrame(currentFrame);
-                return false;
+                return 0;
             }
         }
 
@@ -359,7 +359,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 m_recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(framesProcessed / m_fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0f / m_player->GetFrameRate() * 1000000);
+            long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, nullptr);

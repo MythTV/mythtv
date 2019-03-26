@@ -70,7 +70,7 @@ class MythContextPrivate : public QObject
 
   public:
     MythContextPrivate(MythContext *lparent);
-   ~MythContextPrivate();
+   ~MythContextPrivate() override;
 
     bool Init        (bool gui,
                       bool prompt, bool noPrompt,
@@ -1191,7 +1191,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
         }
     }
 
-    SSDPCacheEntries *backends = SSDP::Instance()->Find(gBackendURI);
+    SSDPCacheEntries *backends = SSDP::Find(gBackendURI);
 
     if (!backends)
     {
@@ -1267,7 +1267,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
+        pDevLoc = SSDP::Find( gBackendURI, USN );
 
         if (pDevLoc)
             break;

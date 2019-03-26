@@ -42,7 +42,7 @@ QRect UIEffects::GetExtent(const QSize &size)
         x = size.width() - zoomedWidth / 2; break;
     }
 
-    return QRect(x, y, zoomedWidth, zoomedHeight);
+    return {x, y, zoomedWidth, zoomedHeight};
 }
 
 void MythUIAnimation::Activate(void)
@@ -320,8 +320,8 @@ void MythUIAnimation::parsePosition(const QDomElement& element,
 void MythUIAnimation::parseZoom(const QDomElement& element,
                                 QVariant& startValue, QVariant& endValue)
 {
-    startValue = element.attribute("start", "0").toFloat() / 100.0f;
-    endValue = element.attribute("end", "0").toFloat() /100.0f;
+    startValue = element.attribute("start", "0").toFloat() / 100.0F;
+    endValue = element.attribute("end", "0").toFloat() /100.0F;
 }
 
 void MythUIAnimation::parseAngle(const QDomElement& element,

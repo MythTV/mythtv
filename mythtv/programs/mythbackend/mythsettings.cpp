@@ -503,7 +503,7 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             QString m_ecma_script  = e.attribute("ecma_script");
 
             bool tmpFoundGroup = false;
-            bool tmpIncludeAllChildren = false || includeAllChildren;
+            bool tmpIncludeAllChildren = includeAllChildren;
             if (group.isEmpty() || m_unique_label == group)
             {
                 mFoundGroup = true;

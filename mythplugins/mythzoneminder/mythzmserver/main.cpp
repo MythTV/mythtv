@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     bool debug = false;             // debug mode enabled
     bool daemon_mode = false;       // is daemon mode enabled
     int port = PORT;                // port we're listening on
-    string logfile = "";            // log file
+    string logfile;                 // log file
     string zmconfig = ZM_CONFIG;    // location of zoneminders config file
 
     //  Check command line arguments

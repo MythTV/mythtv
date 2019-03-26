@@ -380,7 +380,7 @@ ProgramInfo::ProgramInfo(
     m_recstartts(_recstartts),
     m_recendts(_recendts),
 
-    m_stars(clamp(_stars, 0.0f, 1.0f)),
+    m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastmodified(_lastmodified),
@@ -563,7 +563,7 @@ ProgramInfo::ProgramInfo(
     m_recstartts(_recstartts),
     m_recendts(_recendts),
 
-    m_stars(clamp(_stars, 0.0f, 1.0f)),
+    m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastmodified(m_startts),
@@ -975,7 +975,7 @@ void ProgramInfo::clear(void)
     m_recstartts = m_startts;
     m_recendts = m_startts;
 
-    m_stars = 0.0f;
+    m_stars = 0.0F;
 
     m_originalAirDate = QDate();
     m_lastmodified = m_startts;
@@ -1248,7 +1248,7 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
     return false;
 }
 
-#define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
+#define INT_TO_LIST(x)       do { list << QString::number(x); } while (false)
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
@@ -1259,15 +1259,15 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
                                  } else {                                 \
                                      INT_TO_LIST(kInvalidDateTime);       \
                                  }                                        \
-                             } while (0)
+                             } while (false)
 #endif
 
-#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (0)
+#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (false)
 
-#define STR_TO_LIST(x)       do { list << (x); } while (0)
-#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (0)
+#define STR_TO_LIST(x)       do { list << (x); } while (false)
+#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (false)
 
-#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (0)
+#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (false)
 
 /** \fn ProgramInfo::ToStringList(QStringList&) const
  *  \brief Serializes ProgramInfo into a QStringList which can be passed
@@ -1345,17 +1345,17 @@ void ProgramInfo::ToStringList(QStringList &list) const
                                    clear();                          \
                                    return false;                     \
                                }                                     \
-                               ts = *it++; } while (0)
+                               ts = *it++; } while (false)
 
-#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
-#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
+#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (false)
+#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (false)
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
          x = (ts.toUInt() == kInvalidDateTime ?                         \
               QDateTime() : MythDate::fromTime_t(ts.toUInt()));         \
-    } while (0)
+    } while (false)
 #else
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
@@ -1364,16 +1364,16 @@ void ProgramInfo::ToStringList(QStringList &list) const
          } else {                                                       \
               (x) = MythDate::fromSecsSinceEpoch(ts.toLongLong());      \
          }                                                              \
-    } while (0)
+    } while (false)
 #endif
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
-    } while (0)
+    } while (false)
 
-#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (0)
+#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (false)
 
-#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (0)
+#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (false)
 
 /** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
                                     QStringList::const_iterator)
@@ -1734,14 +1734,14 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["partnumber"] = m_partnumber ? QString::number(m_partnumber) : "";
     progMap["parttotal"] = m_parttotal ? QString::number(m_parttotal) : "";
 
-    QString star_str = (m_stars != 0.0f) ?
+    QString star_str = (m_stars != 0.0F) ?
         QObject::tr("%n star(s)", "", GetStars(star_range)) : "";
     progMap["stars"] = star_str;
     progMap["numstars"] = QString::number(GetStars(star_range));
 
-    if (m_stars != 0.0f && m_year)
+    if (m_stars != 0.0F && m_year)
         progMap["yearstars"] = QString("(%1, %2)").arg(m_year).arg(star_str);
-    else if (m_stars != 0.0f)
+    else if (m_stars != 0.0F)
         progMap["yearstars"] = QString("(%1)").arg(star_str);
     else if (m_year)
         progMap["yearstars"] = QString("(%1)").arg(m_year);
@@ -2005,7 +2005,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     m_recstartts   = MythDate::as_utc(query.value(24).toDateTime());
     m_recendts     = MythDate::as_utc(query.value(25).toDateTime());
 
-    m_stars        = clamp((float)query.value(23).toDouble(), 0.0f, 1.0f);
+    m_stars        = clamp((float)query.value(23).toDouble(), 0.0F, 1.0F);
 
     m_year         = query.value(26).toUInt();
     m_partnumber   = query.value(49).toUInt();
@@ -2237,11 +2237,8 @@ bool ProgramInfo::IsSameTitleStartTimeAndChannel(const ProgramInfo& other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    if (m_startts == other.m_startts &&
-        IsSameChannel(other))
-        return true;
-
-    return false;
+    return m_startts == other.m_startts &&
+        IsSameChannel(other);
 }
 
 /**
@@ -2254,12 +2251,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    if (IsSameChannel(other) &&
+    return IsSameChannel(other) &&
         m_startts < other.m_endts &&
-        m_endts > other.m_startts)
-        return true;
-
-    return false;
+        m_endts > other.m_startts;
 }
 
 /**
@@ -2270,12 +2264,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
  */
 bool ProgramInfo::IsSameChannel(const ProgramInfo& other) const
 {
-    if (m_chanid == other.m_chanid ||
+    return m_chanid == other.m_chanid ||
          (!m_chansign.isEmpty() &&
-          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0))
-        return true;
-
-    return false;
+          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0);
 }
 
 void ProgramInfo::CheckProgramIDAuthorities(void)
@@ -2478,7 +2469,7 @@ QString ProgramInfo::GetPlaybackURL(
     if (basename.isEmpty())
         return "";
 
-    bool checklocal = !gCoreContext->GetNumSetting("AlwaysStreamFiles", 0) ||
+    bool checklocal = !gCoreContext->GetBoolSetting("AlwaysStreamFiles", false) ||
                       forceCheckLocal;
 
     if (IsVideo())

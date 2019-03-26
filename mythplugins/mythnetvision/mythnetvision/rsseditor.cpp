@@ -105,7 +105,7 @@ bool RSSEditPopup::Create(void)
             m_thumbImage->Load();
         }
 
-        if (m_site->GetDownload() == 1)
+        if (m_site->GetDownload())
             m_download->SetCheckState(MythUIStateType::Full);
     }
 
@@ -138,12 +138,7 @@ void RSSEditPopup::ParseAndSave(void)
         QString author = m_authorEdit->GetText();
         QString link = m_urlEdit->GetText();
         QString filename = m_thumbImage->GetFilename();
-
-        bool download;
-        if (m_download->GetCheckState() == MythUIStateType::Full)
-            download = true;
-        else
-            download = false;
+        bool download = m_download->GetCheckState() == MythUIStateType::Full;
 
         removeFromDB(m_urlText, VIDEO_PODCAST);
 
@@ -249,12 +244,7 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
             }
         }
 
-        bool download;
-        if (m_download->GetCheckState() == MythUIStateType::Full)
-            download = true;
-        else
-            download = false;
-
+        bool download = m_download->GetCheckState() == MythUIStateType::Full;
         QDateTime updated = MythDate::current();
         QString filename("");
 

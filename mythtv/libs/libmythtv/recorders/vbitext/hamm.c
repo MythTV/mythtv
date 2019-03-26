@@ -196,7 +196,7 @@ static int hamm24cor[64] =
 
 
 int
-hamm8(unsigned char *p, int *err)
+hamm8(const unsigned char *p, int *err)
 {
     int a = hammtab[p[0]];
     *err += a;
@@ -204,7 +204,7 @@ hamm8(unsigned char *p, int *err)
 }
 
 int
-hamm16(unsigned char *p, int *err)
+hamm16(const unsigned char *p, int *err)
 {
     int a = hammtab[p[0]];
     int b = hammtab[p[1]];
@@ -214,7 +214,7 @@ hamm16(unsigned char *p, int *err)
 }
 
 int
-hamm24(unsigned char *p, int *err)
+hamm24(const unsigned char *p, int *err)
 {
     int e = hamm24par[0][p[0]] ^ hamm24par[1][p[1]] ^ hamm24par[2][p[2]];
     int x = hamm24val[p[0]] + p[1] % 128 * 16 + p[2] % 128 * 2048;

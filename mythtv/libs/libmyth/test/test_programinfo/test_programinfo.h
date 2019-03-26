@@ -70,7 +70,7 @@ class TestProgramInfo : public QObject
             MythDate::fromString ("2000-01-01 00:00:00"), /* rec start ts */
             MythDate::fromString ("2000-01-01 01:30:00"), /* rec end ts */
 
-            0.0f, /* stars */
+            0.0F, /* stars */
 
             year, /* year */
             (uint) 0, /* part number */

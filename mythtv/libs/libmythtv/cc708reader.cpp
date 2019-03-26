@@ -263,7 +263,7 @@ void CC708Reader::Delay(uint service_num, int tenths_of_seconds)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("Delay(%1, %2 seconds)")
-            .arg(service_num).arg(tenths_of_seconds * 0.1f));
+            .arg(service_num).arg(tenths_of_seconds * 0.1F));
 }
 
 void CC708Reader::DelayCancel(uint service_num)

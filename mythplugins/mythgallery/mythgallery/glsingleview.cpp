@@ -161,7 +161,7 @@ void GLSingleView::initializeGL(void)
     // Enable Texture Mapping
     glEnable(GL_TEXTURE_2D);
     // Clear The Background Color
-    glClearColor(0.0, 0.0, 0.0, 1.0f);
+    glClearColor(0.0, 0.0, 0.0, 1.0F);
 
     // Turn Blending On
     glEnable(GL_BLEND);
@@ -169,7 +169,7 @@ void GLSingleView::initializeGL(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Enable perspective vision
-    glClearDepth(1.0f);
+    glClearDepth(1.0F);
 
     GLint param;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &param);
@@ -279,8 +279,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-    float scrollX = 0.2f;
-    float scrollY = 0.2f;
+    float scrollX = 0.2F;
+    float scrollY = 0.2F;
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -301,13 +301,13 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMOUT")
         {
-            if (m_zoom > 0.5f)
+            if (m_zoom > 0.5F)
             {
-                SetZoom(m_zoom - 0.5f);
-                if (m_zoom > 1.0f)
+                SetZoom(m_zoom - 0.5F);
+                if (m_zoom > 1.0F)
                 {
-                    m_source_x   -= m_source_x / ((m_zoom + 0.5f) * 2.0f);
-                    m_source_y   -= m_source_y / ((m_zoom + 0.5f) * 2.0f);
+                    m_source_x   -= m_source_x / ((m_zoom + 0.5F) * 2.0F);
+                    m_source_y   -= m_source_y / ((m_zoom + 0.5F) * 2.0F);
 
                     checkPosition();
                 }
@@ -320,13 +320,13 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMIN")
         {
-            if (m_zoom < 4.0f)
+            if (m_zoom < 4.0F)
             {
-                SetZoom(m_zoom + 0.5f);
-                if (m_zoom > 1.0f)
+                SetZoom(m_zoom + 0.5F);
+                if (m_zoom > 1.0F)
                 {
-                    m_source_x   += m_source_x / (m_zoom * 2.0f);
-                    m_source_y   += m_source_y / (m_zoom * 2.0f);
+                    m_source_x   += m_source_x / (m_zoom * 2.0F);
+                    m_source_y   += m_source_y / (m_zoom * 2.0F);
 
                     checkPosition();
                 }
@@ -342,62 +342,62 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_source_x = 0;
             m_source_y = 0;
             if (m_zoom != 1)
-                SetZoom(1.0f);
+                SetZoom(1.0F);
         }
         else if (action == "SCROLLLEFT")
         {
-            if (m_zoom > 1.0f && m_source_x < m_zoom - 1.0f)
+            if (m_zoom > 1.0F && m_source_x < m_zoom - 1.0F)
             {
                 m_source_x += scrollX;
-                m_source_x  = min(m_source_x, m_zoom - 1.0f);
+                m_source_x  = min(m_source_x, m_zoom - 1.0F);
             }
         }
         else if (action == "SCROLLRIGHT")
         {
-            if (m_zoom > 1.0f && m_source_x > -m_zoom + 1.0f)
+            if (m_zoom > 1.0F && m_source_x > -m_zoom + 1.0F)
             {
                 m_source_x -= scrollX;
-                m_source_x  = max(m_source_x, -m_zoom + 1.0f);
+                m_source_x  = max(m_source_x, -m_zoom + 1.0F);
             }
         }
         else if (action == "SCROLLDOWN")
         {
-            if (m_zoom > 1.0f && m_source_y <  m_zoom - 1.0f)
+            if (m_zoom > 1.0F && m_source_y <  m_zoom - 1.0F)
             {
                 m_source_y += scrollY;
-                m_source_y  = min(m_source_y,  m_zoom - 1.0f);
+                m_source_y  = min(m_source_y,  m_zoom - 1.0F);
             }
         }
         else if (action == "SCROLLUP")
         {
-            if (m_zoom > 1.0f && m_source_y > -m_zoom + 1.0f)
+            if (m_zoom > 1.0F && m_source_y > -m_zoom + 1.0F)
             {
                 m_source_y -= scrollY;
-                m_source_y  = max(m_source_y, -m_zoom + 1.0f);
+                m_source_y  = max(m_source_y, -m_zoom + 1.0F);
             }
         }
         else if (action == "RECENTER")
         {
-            if (m_zoom > 1.0f)
+            if (m_zoom > 1.0F)
             {
-                m_source_x = 0.0f;
-                m_source_y = 0.0f;
+                m_source_x = 0.0F;
+                m_source_y = 0.0F;
             }
         }
         else if (action == "UPLEFT")
         {
-            if (m_zoom > 1.0f)
+            if (m_zoom > 1.0F)
             {
-                m_source_x  =  1.0f;
-                m_source_y  = -1.0f;
+                m_source_x  =  1.0F;
+                m_source_y  = -1.0F;
             }
         }
         else if (action == "LOWRIGHT")
         {
-            if (m_zoom > 1.0f)
+            if (m_zoom > 1.0F)
             {
-                m_source_x = -1.0f;
-                m_source_y =  1.0f;
+                m_source_x = -1.0F;
+                m_source_y =  1.0F;
             }
         }
         else if (action == "ROTRIGHT")
@@ -432,7 +432,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             m_source_x   = 0;
             m_source_y   = 0;
-            SetZoom(1.0f);
+            SetZoom(1.0F);
             m_info_show = wasInfo;
             m_info_show_short = true;
             m_slideshow_running = !wasRunning;
@@ -447,7 +447,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_scaleMax = (ScaleMax) ((m_scaleMax + 1) % kScaleMaxCount);
             m_source_x = 0;
             m_source_y = 0;
-            SetZoom(1.0f);
+            SetZoom(1.0F);
 
             int a = m_tex1First ? 0 : 1;
             m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
@@ -484,10 +484,10 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
 void  GLSingleView::checkPosition(void)
 {
-    m_source_x = max(m_source_x, -m_zoom + 1.0f);
-    m_source_y = max(m_source_y, -m_zoom + 1.0f);
-    m_source_x = min(m_source_x, m_zoom - 1.0f);
-    m_source_y = min(m_source_y, m_zoom - 1.0f);
+    m_source_x = max(m_source_x, -m_zoom + 1.0F);
+    m_source_y = max(m_source_y, -m_zoom + 1.0F);
+    m_source_x = min(m_source_x, m_zoom - 1.0F);
+    m_source_y = min(m_source_y, m_zoom - 1.0F);
 }
 
 void GLSingleView::paintTexture(void)
@@ -495,8 +495,8 @@ void GLSingleView::paintTexture(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glTranslatef(m_source_x, m_source_y, 0.0f);
-    glScalef(m_zoom, m_zoom, 1.0f);
+    glTranslatef(m_source_x, m_source_y, 0.0F);
+    glScalef(m_zoom, m_zoom, 1.0F);
 
     m_texItem[m_texCur].MakeQuad();
 
@@ -513,18 +513,18 @@ void GLSingleView::paintTexture(void)
         glBindTexture(GL_TEXTURE_2D, m_texInfo);
         glBegin(GL_QUADS);
         {
-            glColor4f(1.0f, 1.0f, 1.0f, 0.72f);
-            glTexCoord2f(0.0f, 0.0f);
-            glVertex3f(-0.75f, -0.75f, 0.0f);
+            glColor4f(1.0F, 1.0F, 1.0F, 0.72F);
+            glTexCoord2f(0.0F, 0.0F);
+            glVertex3f(-0.75F, -0.75F, 0.0F);
 
-            glTexCoord2f(1.0f, 0.0f);
-            glVertex3f(+0.75f, -0.75f, 0.0f);
+            glTexCoord2f(1.0F, 0.0F);
+            glVertex3f(+0.75F, -0.75F, 0.0F);
 
-            glTexCoord2f(1.0f, 1.0f);
-            glVertex3f(+0.75f, +0.75f, 0.0f);
+            glTexCoord2f(1.0F, 1.0F);
+            glVertex3f(+0.75F, +0.75F, 0.0F);
 
-            glTexCoord2f(0.0f, 1.0f);
-            glVertex3f(-0.75f, +0.75f, 0.0f);
+            glTexCoord2f(0.0F, 1.0F);
+            glVertex3f(-0.75F, +0.75F, 0.0F);
         }
         glEnd();
     }
@@ -534,9 +534,9 @@ void GLSingleView::DisplayNext(bool reset, bool loadImage)
 {
     if (reset)
     {
-        m_zoom     = 1.0f;
-        m_source_x = 0.0f;
-        m_source_y = 0.0f;
+        m_zoom     = 1.0F;
+        m_source_x = 0.0F;
+        m_source_y = 0.0F;
     }
 
     // Search for next item that hasn't been deleted.
@@ -571,9 +571,9 @@ void GLSingleView::DisplayPrev(bool reset, bool loadImage)
 {
     if (reset)
     {
-        m_zoom     = 1.0f;
-        m_source_x = 0.0f;
-        m_source_y = 0.0f;
+        m_zoom     = 1.0F;
+        m_source_x = 0.0F;
+        m_source_y = 0.0F;
     }
 
     // Search for next item that hasn't been deleted.
@@ -655,9 +655,9 @@ void GLSingleView::SetZoom(float zoom)
 void GLSingleView::SetTransitionTimeout(int timeout)
 {
     m_effect_transition_timeout = timeout;
-    m_effect_transition_timeout_inv = 1.0f;
+    m_effect_transition_timeout_inv = 1.0F;
     if (timeout)
-        m_effect_transition_timeout_inv = 1.0f / timeout;
+        m_effect_transition_timeout_inv = 1.0F / timeout;
 }
 
 int GLSingleView::GetNearestGLTextureSize(int v) const
@@ -728,7 +728,6 @@ void GLSingleView::EffectNone(void)
     paintTexture();
     m_effect_running = false;
     m_slideshow_frame_delay_state = -1;
-    return;
 }
 
 void GLSingleView::EffectBlend(void)
@@ -747,11 +746,11 @@ void GLSingleView::EffectBlend(void)
 
     glBegin(GL_QUADS);
     {
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f * t);
-        glVertex3f(-1.0f, -1.0f, 0.0f);
-        glVertex3f(+1.0f, -1.0f, 0.0f);
-        glVertex3f(+1.0f, +1.0f, 0.0f);
-        glVertex3f(-1.0f, +1.0f, 0.0f);
+        glColor4f(0.0F, 0.0F, 0.0F, 1.0F * t);
+        glVertex3f(-1.0F, -1.0F, 0.0F);
+        glVertex3f(+1.0F, -1.0F, 0.0F);
+        glVertex3f(+1.0F, +1.0F, 0.0F);
+        glVertex3f(-1.0F, +1.0F, 0.0F);
     }
     glEnd();
 
@@ -772,7 +771,7 @@ void GLSingleView::EffectZoomBlend(void)
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - t, 1.0f + (0.75f * t));
+    m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0F - t, 1.0F + (0.75F * t));
     m_texItem[m_texCur].MakeQuad(t);
 
     m_effect_current_frame++;
@@ -797,11 +796,11 @@ void GLSingleView::EffectRotate(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float rotate = 360.0f * t;
+    float rotate = 360.0F * t;
     glRotatef(((m_effect_rotate_direction == 0) ? -1 : 1) * rotate,
-              0.0f, 0.0f, 1.0f);
-    float scale = 1.0f * (1.0f - t);
-    glScalef(scale, scale, 1.0f);
+              0.0F, 0.0F, 1.0F);
+    float scale = 1.0F * (1.0F - t);
+    glScalef(scale, scale, 1.0F);
 
     m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
@@ -819,7 +818,7 @@ void GLSingleView::EffectBend(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = (int)((2.0f*random()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = (int)((2.0F*random()/(RAND_MAX+1.0F)));
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
@@ -827,10 +826,10 @@ void GLSingleView::EffectBend(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef(90.0f * t,
-              (m_effect_rotate_direction == 0) ? 1.0f : 0.0f,
-              (m_effect_rotate_direction == 1) ? 1.0f : 0.0f,
-              0.0f);
+    glRotatef(90.0F * t,
+              (m_effect_rotate_direction == 0) ? 1.0F : 0.0F,
+              (m_effect_rotate_direction == 1) ? 1.0F : 0.0F,
+              0.0F);
 
     m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
@@ -850,9 +849,9 @@ void GLSingleView::EffectFade(void)
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
     if (m_effect_frame_time.elapsed() <= m_effect_transition_timeout / 2)
-        m_texItem[(m_texCur) ? 0 : 1].MakeQuad(1.0f - (2.0f * t));
+        m_texItem[(m_texCur) ? 0 : 1].MakeQuad(1.0F - (2.0F * t));
     else
-        m_texItem[m_texCur].MakeQuad(2.0f * (t - 0.5f));
+        m_texItem[m_texCur].MakeQuad(2.0F * (t - 0.5F));
 
     m_effect_current_frame++;
 }
@@ -869,7 +868,7 @@ void GLSingleView::EffectInOut(void)
 
     if (m_effect_current_frame == 0)
     {
-        m_effect_rotate_direction = 1 + (int)((4.0f*random()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0F*random()/(RAND_MAX+1.0F)));
     }
 
     int  texnum  = m_texCur;
@@ -885,10 +884,10 @@ void GLSingleView::EffectInOut(void)
     glLoadIdentity();
 
     float tt = elapsed * m_effect_transition_timeout_inv;
-    float t = 2.0f * ((fadeout) ? (0.5f - tt) : (tt - 0.5f));
+    float t = 2.0F * ((fadeout) ? (0.5F - tt) : (tt - 0.5F));
 
     glScalef(t, t, 1);
-    t = 1.0f - t;
+    t = 1.0F - t;
     glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? t : -t) : 0,
                  (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? t : -t) : 0,
                  0);
@@ -909,17 +908,17 @@ void GLSingleView::EffectSlide(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = 1 + (int)((4.0f * random() / (RAND_MAX + 1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0F * random() / (RAND_MAX + 1.0F)));
 
     m_texItem[m_texCur].MakeQuad();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
-    float trans = 2.0f * t;
-    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? 1 : -1) * trans : 0.0f,
-                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? 1 : -1) * trans : 0.0f,
-                 0.0f);
+    float trans = 2.0F * t;
+    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? 1 : -1) * trans : 0.0F,
+                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? 1 : -1) * trans : 0.0F,
+                 0.0F);
 
     m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
@@ -945,11 +944,11 @@ void GLSingleView::EffectFlutter(void)
             for (int y = 0; y < 40; y++)
             {
                 m_effect_flutter_points[x][y][0] =
-                    (x / 20.0f - 1.0f) * ta.GetTextureX();
+                    (x / 20.0F - 1.0F) * ta.GetTextureX();
                 m_effect_flutter_points[x][y][1] =
-                    (y / 20.0f - 1.0f) * ta.GetTextureY();
+                    (y / 20.0F - 1.0F) * ta.GetTextureY();
                 m_effect_flutter_points[x][y][2] =
-                    sin((x / 20.0f - 1.0f) * static_cast<float>(M_PI) * 2.0f) / 5.0f;
+                    sin((x / 20.0F - 1.0F) * static_cast<float>(M_PI) * 2.0F) / 5.0F;
             }
         }
     }
@@ -957,20 +956,20 @@ void GLSingleView::EffectFlutter(void)
     m_texItem[m_texCur].MakeQuad();
 
     float t      = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
-    float rotate = 60.0f * t;
-    float scale  = 1.0f  - t;
+    float rotate = 60.0F * t;
+    float scale  = 1.0F  - t;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef(rotate, 1.0f, 0.0f, 0.0f);
+    glRotatef(rotate, 1.0F, 0.0F, 0.0F);
     glScalef(scale, scale, scale);
-    glTranslatef(t, t, 0.0f);
+    glTranslatef(t, t, 0.0F);
 
     ta.Bind();
 
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         float float_x, float_y, float_xb, float_yb;
         int x, y;
@@ -979,10 +978,10 @@ void GLSingleView::EffectFlutter(void)
         {
             for (y = 0; y < 39; y++)
             {
-                float_x = (float) x / 40.0f;
-                float_y = (float) y / 40.0f;
-                float_xb = (float) (x + 1) / 40.0f;
-                float_yb = (float) (y + 1) / 40.0f;
+                float_x = (float) x / 40.0F;
+                float_y = (float) y / 40.0F;
+                float_xb = (float) (x + 1) / 40.0F;
+                float_yb = (float) (y + 1) / 40.0F;
                 glTexCoord2f(float_x, float_y);
                 glVertex3f(m_effect_flutter_points[x][y][0],
                            m_effect_flutter_points[x][y][1],
@@ -1044,10 +1043,10 @@ void GLSingleView::EffectCube(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-//    float PI = 4.0f * atan(1.0f);
-    float const znear = 3.0f;
-//     float theta = 2.0f * atan2(2.0f / 2.0f, znear);
-//     theta = theta * 180.0f/PI;
+//    float PI = 4.0F * atan(1.0F);
+    float const znear = 3.0F;
+//     float theta = 2.0F * atan2(2.0F / 2.0F, znear);
+//     theta = theta * 180.0F/PI;
 
     glFrustum(-1, 1, -1, 1, znear, 10);
 
@@ -1062,10 +1061,10 @@ void GLSingleView::EffectCube(void)
     glLoadIdentity();
 
     float const elapsed = static_cast<float>(m_effect_frame_time.elapsed());
-    float const tmp     = (elapsed <= tot * 0.5f) ? elapsed : tot - elapsed;
-    float const trans   = 5.0f * tmp / tot;
+    float const tmp     = (elapsed <= tot * 0.5F) ? elapsed : tot - elapsed;
+    float const trans   = 5.0F * tmp / tot;
 
-    glTranslatef(0, 0, -znear - 1.0f - trans);
+    glTranslatef(0, 0, -znear - 1.0F - trans);
 
     glRotatef(m_effect_cube_xrot, 1, 0, 0);
     glRotatef(m_effect_cube_yrot, 0, 1, 0);
@@ -1074,7 +1073,7 @@ void GLSingleView::EffectCube(void)
 
     glBegin(GL_QUADS);
     {
-        GLfloat const v = 0.999f; // <1 to avoid conflicts along edges
+        GLfloat const v = 0.999F; // <1 to avoid conflicts along edges
 
         glColor4f(0, 0, 0, 1);
 
@@ -1197,13 +1196,13 @@ void GLSingleView::EffectCube(void)
         ;
     else if (elapsed < (tot - rotStart))
     {
-        m_effect_cube_xrot = 360.0f * (elapsed - rotStart) / (tot - 2.0f * rotStart);
-        m_effect_cube_yrot = 0.5f * m_effect_cube_xrot;
+        m_effect_cube_xrot = 360.0F * (elapsed - rotStart) / (tot - 2.0F * rotStart);
+        m_effect_cube_yrot = 0.5F * m_effect_cube_xrot;
     }
     else
     {
         m_effect_cube_xrot = 0;
-        m_effect_cube_yrot = 180.0f;
+        m_effect_cube_yrot = 180.0F;
     }
 
     m_effect_current_frame++;
@@ -1213,7 +1212,7 @@ void GLSingleView::EffectKenBurns(void)
 {
 
     float single_image_pct = 0.75;
-    float trans_pct = 1.0f - single_image_pct;
+    float trans_pct = 1.0F - single_image_pct;
     float scale_max, x_loc, y_loc;
     float scale_factor = 0;
 
@@ -1298,7 +1297,7 @@ void GLSingleView::EffectKenBurns(void)
                 FindRandXY(m_effect_kenBurns_location_x[m_texCur],
                            m_effect_kenBurns_location_y[m_texCur]);
                 m_effect_kenBurns_projection[m_texCur] =
-                    1 + (int)((2.0f * random() / (RAND_MAX + 1.0f)));
+                    1 + (int)((2.0F * random() / (RAND_MAX + 1.0F)));
             }
             else  //No item, must be 1 of the first two preloaded items
             {
@@ -1316,7 +1315,7 @@ void GLSingleView::EffectKenBurns(void)
             x_loc = m_effect_kenBurns_location_x[m_texCur] * t[m_texCur];
             y_loc = m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];
             scale_max = FindMaxScale(x_loc,y_loc);
-            scale_factor =     1.0f + (scale_max * s[m_texCur]);
+            scale_factor =     1.0F + (scale_max * s[m_texCur]);
         }
         else // Zoom out image
         {
@@ -1324,12 +1323,12 @@ void GLSingleView::EffectKenBurns(void)
             x_loc = m_effect_kenBurns_location_x[m_texCur] -  m_effect_kenBurns_location_x[m_texCur] * t[m_texCur];
             y_loc = m_effect_kenBurns_location_y[m_texCur] -  m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];
             scale_max = FindMaxScale(x_loc,y_loc);
-            scale_factor =     1.0f + scale_max -  (scale_max * t[m_texCur]);
+            scale_factor =     1.0F + scale_max -  (scale_max * t[m_texCur]);
         }
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glTranslatef(x_loc, y_loc, 0.0f);
+        glTranslatef(x_loc, y_loc, 0.0F);
 
         m_texItem[m_texCur].MakeQuad((effect_pct-single_image_pct)*4, scale_factor);
     }
@@ -1340,7 +1339,7 @@ void GLSingleView::EffectKenBurns(void)
         x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         scale_max = FindMaxScale(x_loc,y_loc);
-        scale_factor =     1.0f + (scale_max * s[m_texCur ? 0 : 1]);
+        scale_factor =     1.0F + (scale_max * s[m_texCur ? 0 : 1]);
     }
     else // Zoom out image
     {
@@ -1349,21 +1348,21 @@ void GLSingleView::EffectKenBurns(void)
         y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] -
             m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         scale_max = FindMaxScale(x_loc,y_loc);
-        scale_factor =     1.0f + scale_max -  (scale_max * t[m_texCur ? 0 : 1]);
+        scale_factor =     1.0F + scale_max -  (scale_max * t[m_texCur ? 0 : 1]);
     }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(x_loc, y_loc, 0.0f);
+    glTranslatef(x_loc, y_loc, 0.0F);
 
     if (effect_pct<= single_image_pct)
     {
         m_effect_kenBurns_new_image_started=false;
-        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f, scale_factor); //
+        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0F, scale_factor); //
     }
     else // Fade out image
     {
-        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - ((effect_pct-single_image_pct)*4), scale_factor);
+        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0F - ((effect_pct-single_image_pct)*4), scale_factor);
 
     }
 
@@ -1494,12 +1493,12 @@ float GLSingleView::FindMaxScale(float x_loc, float y_loc)
 void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
 {
     // Random number between .25 and .75
-    x_loc = (0.5f * random() / (RAND_MAX + 1.0f)) + 0.25f;
-    if ((int)(2.0f * random() / (RAND_MAX + 1.0f)) == 0)
+    x_loc = (0.5F * random() / (RAND_MAX + 1.0F)) + 0.25F;
+    if ((int)(2.0F * random() / (RAND_MAX + 1.0F)) == 0)
         x_loc = -1 * x_loc;
     // Random number between .25 and .75
-    y_loc = (0.5f * random() / (RAND_MAX + 1.0f)) + 0.25f;
-    if ((int)(2.0f * random() / (RAND_MAX + 1.0f)) == 0)
+    y_loc = (0.5F * random() / (RAND_MAX + 1.0F)) + 0.25F;
+    if ((int)(2.0F * random() / (RAND_MAX + 1.0F)) == 0)
         y_loc = -1 * y_loc;
 }
 

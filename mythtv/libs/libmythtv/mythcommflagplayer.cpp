@@ -147,8 +147,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
             if (totalFrames)
             {
-                float elapsed = flagTime.elapsed() * 0.001f;
-                int flagFPS = (elapsed > 0.0f) ?
+                float elapsed = flagTime.elapsed() * 0.001F;
+                int flagFPS = (elapsed > 0.0F) ?
                     (int)(myFramesPlayed / elapsed) : 0;
 
                 percentage = myFramesPlayed * 100 / totalFrames;

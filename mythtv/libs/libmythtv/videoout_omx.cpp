@@ -303,7 +303,9 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_render.Ports(); ++port)
     {
         m_render.ShowPortDef(port, LOG_DEBUG);
-        if (false) m_render.ShowFormats(port, LOG_DEBUG);
+#if 0
+        m_render.ShowFormats(port, LOG_DEBUG);
+#endif
     }
 
     if (OMX_ErrorNone != m_imagefx.Init(OMX_IndexParamImageInit))
@@ -316,7 +318,9 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_imagefx.Ports(); ++port)
     {
         m_imagefx.ShowPortDef(port, LOG_DEBUG);
-        if (false) m_imagefx.ShowFormats(port, LOG_DEBUG);
+#if 0
+        m_imagefx.ShowFormats(port, LOG_DEBUG);
+#endif
     }
 }
 
@@ -1144,8 +1148,8 @@ bool VideoOutputOMX::CreateBuffers(
     std::vector<YUVInfo> yuvinfo;
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
-        yuvinfo.push_back(YUVInfo(video_dim_disp.width(),
-            video_dim_disp.height(), nBufferSize, pitches, offsets));
+        yuvinfo.emplace_back(video_dim_disp.width(), video_dim_disp.height(),
+                             nBufferSize, pitches, offsets);
         void *buf = av_malloc(nBufferSize + 64);
         if (!buf)
         {
@@ -1232,10 +1236,7 @@ bool VideoOutputOMX::Start()
             return false;
     }
 
-    if (m_render.SetState(OMX_StateExecuting, 500) != OMX_ErrorNone)
-        return false;
-
-    return true;
+    return m_render.SetState(OMX_StateExecuting, 500) == OMX_ErrorNone;
 }
 
 bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)

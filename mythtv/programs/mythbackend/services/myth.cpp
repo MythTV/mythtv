@@ -447,7 +447,7 @@ QString Myth::GetFormatTime(const QDateTime Time)
 
 QDateTime Myth::ParseISODateString(const QString& DateTimeString)
 {
-    QDateTime dateTime = QDateTime().fromString(DateTimeString, Qt::ISODate);
+    QDateTime dateTime = QDateTime::fromString(DateTimeString, Qt::ISODate);
 
     if (!dateTime.isValid())
         throw QString( "Unable to parse DateTimeString" );
@@ -1104,7 +1104,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
         return false;
     }
 
-    if (sessionManager->CreateDigest("admin", sAdminPassword) !=
+    if (MythSessionManager::CreateDigest("admin", sAdminPassword) !=
             sessionManager->GetPasswordDigest("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1")

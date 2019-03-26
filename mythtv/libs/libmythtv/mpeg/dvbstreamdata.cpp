@@ -436,7 +436,7 @@ void DVBStreamData::ProcessSDT(uint tsid, const ServiceDescriptionTable *sdt)
 bool DVBStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
 {
     QMutexLocker locker(&_listener_lock);
-    bool want_eit = (_eit_rate >= 0.5f) && HasAnyEIT();
+    bool want_eit = (_eit_rate >= 0.5F) && HasAnyEIT();
     bool has_eit  = !in_use_pids.empty();
     return want_eit != has_eit;
 }
@@ -447,7 +447,7 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
 {
     QMutexLocker locker(&_listener_lock);
 
-    if ((_eit_rate >= 0.5f) && HasAnyEIT())
+    if ((_eit_rate >= 0.5F) && HasAnyEIT())
     {
         if (find(cur_pids.begin(), cur_pids.end(),
                  (uint) DVB_EIT_PID) == cur_pids.end())

@@ -34,18 +34,12 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
                        MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
-      m_Justification(Qt::AlignLeft | Qt::AlignTop),
       m_OrigDisplayRect(displayRect), m_AltDisplayRect(altDisplayRect),
       m_Canvas(0, 0, displayRect.width(), displayRect.height()),
-      m_drawRect(displayRect),        m_cursorPos(-1, -1),
+      m_drawRect(displayRect),
       m_Message(text.trimmed()),
-      m_CutMessage(""),               m_DefaultMessage(text),
-      m_Cutdown(Qt::ElideRight),      m_Font(new MythFontProperties()),
-      m_colorCycling(false),          m_startColor(),
-      m_endColor(),                   m_numSteps(0),
-      m_curStep(0),
-      m_curR(0.0),    m_curG(0.0),    m_curB(0.0),
-      m_incR(0.0),    m_incG(0.0),    m_incB(0.0)
+      m_DefaultMessage(text),
+      m_Font(new MythFontProperties())
 {
 #if 0 // Not currently used
     m_usingAltArea = false;
@@ -997,7 +991,6 @@ int MythUIText::MoveCursor(int lines)
         newLine = lineCount - 1;
 
     lineNo = -1;
-    currPos = 0;
     layoutStartPos = 0;
 
     for (int x = 0; x < m_Layouts.count(); x++)
@@ -1274,9 +1267,9 @@ void MythUIText::CycleColor(QColor startColor, QColor endColor, int numSteps)
     m_curG = startColor.green();
     m_curB = startColor.blue();
 
-    m_incR = (endColor.red()   * 1.0f - m_curR) / m_numSteps;
-    m_incG = (endColor.green() * 1.0f - m_curG) / m_numSteps;
-    m_incB = (endColor.blue()  * 1.0f - m_curB) / m_numSteps;
+    m_incR = (endColor.red()   * 1.0F - m_curR) / m_numSteps;
+    m_incG = (endColor.green() * 1.0F - m_curG) / m_numSteps;
+    m_incB = (endColor.blue()  * 1.0F - m_curB) / m_numSteps;
 
     m_colorCycling = true;
 }

@@ -174,7 +174,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting y to both maxes */
     *yo = HEIGHT/2;
-    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0f));
+    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0F));
     *xo = (int)((x-(WIDTH/2))/cos(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
@@ -184,7 +184,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *yo = -*yo;
-    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0f));
+    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0F));
     *xo = (int)((x-(WIDTH/2))/cos(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
@@ -195,7 +195,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting x to both maxes */
     *xo = WIDTH/2;
-    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0f));
+    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0F));
     *yo = (int)((y-(HEIGHT/2))/sin(*angle*(M_PI/180.0)));
 
     if (*yo >= -hd2 && *yo <= hd2) {
@@ -205,7 +205,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *xo = -*xo;
-    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0f));
+    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0F));
     *yo = (int)((y-(HEIGHT/2))/sin(*angle*(M_PI/180.0)));
 
     /* if this isn't right, it's out of our range and we don't care */

@@ -85,7 +85,7 @@ static void cleanup(VideoFilter *filter)
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                VideoFrameType outpixfmt,
-                               int *width, int *height, char *options,
+                               const int *width, const int *height, const char *options,
                                int threads)
 {
     (void) threads;

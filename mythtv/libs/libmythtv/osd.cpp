@@ -155,7 +155,7 @@ OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
     m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(nullptr),
     m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
     m_Refresh(false), m_Visible(false), m_UIScaleOverride(false),
-    m_SavedWMult(1.0f), m_SavedHMult(1.0f),   m_SavedUIRect(QRect()),
+    m_SavedWMult(1.0F), m_SavedHMult(1.0F),   m_SavedUIRect(QRect()),
     m_fontStretch(100), m_savedFontStretch(100),
     m_FunctionalType(kOSDFunctionalType_Default), m_FunctionalWindow(QString())
 {
@@ -648,7 +648,7 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
         }
     }
     if (start > -1 && end < 0)
-        bar->AddRegion((float)((double)start/(double)total), 1.0f);
+        bar->AddRegion((float)((double)start/(double)total), 1.0F);
 
     bar->Display();
 }

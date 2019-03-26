@@ -593,10 +593,7 @@ bool BufferedSocketDevice::CanReadLine()
 {
     ReadBytes();
 
-    if (( BytesAvailable() > 0 ) && m_bufRead.scanNewline( nullptr ) )
-        return true;
-
-    return false;
+    return ( BytesAvailable() > 0 ) && m_bufRead.scanNewline( nullptr );
 }
                                
 /////////////////////////////////////////////////////////////////////////////

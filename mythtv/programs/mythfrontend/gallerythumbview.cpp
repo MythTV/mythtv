@@ -59,7 +59,7 @@ public:
 
     TransferThread(const TransferMap &files, bool move, MythUIProgressDialog *dialog)
         : MThread("FileTransfer"),
-          m_move(move), m_files(files), m_failed(), m_dialog(dialog) {}
+          m_move(move), m_files(files), m_dialog(dialog) {}
 
     ImageSet GetResult(void) { return m_failed; }
 
@@ -150,14 +150,11 @@ static void WaitUntilDone(MThread &worker)
  */
 GalleryThumbView::GalleryThumbView(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_zoomWidgets(),
       m_popupStack(*GetMythMainWindow()->GetStack("popup stack")),
       m_mgr(ImageManagerFe::getInstance()),
       // This screen uses a single fixed view (Parent dir, ordered dirs, ordered images)
       m_view(new DirectoryView(kOrdered)),
       m_infoList(*this),
-      m_scanProgress(),         m_scanActive(),         m_menuState(),
-      m_pendingMap(),           m_thumbExists(),
       // Start in edit mode unless a password exists
       m_editsAllowed(gCoreContext->GetSetting("GalleryPassword").isEmpty())
 {
@@ -1919,7 +1916,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
     foreach(ImagePtr im, files)
     {
         // Replace base path with destination path
-        im->m_filePath = m_mgr.ConstructPath(destDir->m_filePath,
+        im->m_filePath = ImageManagerFe::ConstructPath(destDir->m_filePath,
                                              im->m_filePath.mid(basePathSize));
 
         transfers.insert(im, m_mgr.BuildTransferUrl(im->m_filePath,
@@ -1965,7 +1962,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
         dirPaths << relPath;
 
         // Replace base path with destination path
-        im->m_filePath = m_mgr.ConstructPath(destDir->m_filePath, relPath);
+        im->m_filePath = ImageManagerFe::ConstructPath(destDir->m_filePath, relPath);
 
         // Append dirs so that hidden state & cover is preserved for new dirs
         // Pre-existing dirs will take precedance over these.
@@ -2054,7 +2051,7 @@ void GalleryThumbView::Move()
     foreach(ImagePtrK im, images)
     {
         // Replace base path with destination path
-        QString newPath = m_mgr.ConstructPath(destDir->m_filePath,
+        QString newPath = ImageManagerFe::ConstructPath(destDir->m_filePath,
                                               im->m_filePath.mid(basePathSize));
 
         transfers.insert(im, m_mgr.BuildTransferUrl(newPath, aChild->IsLocal()));

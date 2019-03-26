@@ -101,7 +101,6 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 HDHRStreamHandler::HDHRStreamHandler(const QString &device, int inputid,
                                      int majorid)
     : StreamHandler(device, inputid)
-    , m_tune_mode(hdhrTuneModeNone)
     , m_majorid(majorid)
 {
     setObjectName("HDHRStreamHandler");
@@ -318,22 +317,22 @@ bool HDHRStreamHandler::Open(void)
             if (status_channel ==  "none")
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is not present");
-                m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
+                m_tuner_types.emplace_back(DTVTunerType::kTunerTypeATSC);
             }
             else
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is present");
-                m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeOCUR));
+                m_tuner_types.emplace_back(DTVTunerType::kTunerTypeOCUR);
             }
         }
         else if (QString(model).toLower().contains("dvb"))
         {
-            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBT));
-            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBC));
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBT);
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBC);
         }
         else
         {
-            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeATSC);
         }
 
         return true;

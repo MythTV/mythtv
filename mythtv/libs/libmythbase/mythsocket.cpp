@@ -71,8 +71,8 @@ static QString to_sample(const QByteArray &payload)
     QString sample("");
     for (uint i = 0; (i<60) && (i<(uint)payload.length()); i++)
     {
-        sample += QChar(payload.data()[i]).isPrint() ?
-            QChar(payload.data()[i]) : QChar('?');
+        sample += QChar(payload[i]).isPrint() ?
+            QChar(payload[i]) : QChar('?');
     }
     sample += (payload.length() > 60) ? "..." : "";
     return sample;
@@ -795,7 +795,6 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
     m_tcpSocket->flush();
 
     *ret = true;
-    return;
 }
 
 void MythSocket::ReadStringListReal(

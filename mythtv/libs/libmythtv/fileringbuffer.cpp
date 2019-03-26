@@ -218,7 +218,6 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         do
         {
             openAttempts++;
-            lasterror = 0;
 
             m_fd2 = open(m_filename.toLocal8Bit().constData(),
                        O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);

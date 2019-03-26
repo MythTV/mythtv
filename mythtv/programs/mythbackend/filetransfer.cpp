@@ -57,9 +57,7 @@ FileTransfer::~FileTransfer()
 
 bool FileTransfer::isOpen(void)
 {
-    if (m_rbuffer && m_rbuffer->IsOpen())
-        return true;
-    return false;
+    return m_rbuffer && m_rbuffer->IsOpen();
 }
 
 bool FileTransfer::ReOpen(QString newFilename)

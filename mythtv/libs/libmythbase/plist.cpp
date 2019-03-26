@@ -427,7 +427,7 @@ QVariant PList::ParseBinaryReal(quint8 *data)
     if (!count)
         return result;
 
-    count = 1ull << count;
+    count = 1ULL << count;
     if (count == sizeof(float))
     {
         convert_float(data, count);

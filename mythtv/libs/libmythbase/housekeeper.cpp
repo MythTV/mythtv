@@ -381,7 +381,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
 
     // calculate probability that task should not have yet run
     // it's backwards, but it makes the math simplier
-    float prob = 1.0f - ((float)(elapsed - m_windowElapsed.first) /
+    float prob = 1.0F - ((float)(elapsed - m_windowElapsed.first) /
                     (float)(m_windowElapsed.second - m_windowElapsed.first));
     if (m_currentProb < prob)
         // more bad stuff
@@ -413,18 +413,13 @@ bool PeriodicHouseKeeperTask::InWindow(QDateTime now)
         // something bad has happened. let's just move along
         return false;
 
-    if ((elapsed > m_windowElapsed.first) &&
-        (elapsed < m_windowElapsed.second))
-            return true;
-
-    return false;
+    return (elapsed > m_windowElapsed.first) &&
+           (elapsed < m_windowElapsed.second);
 }
 
 bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
 {
-    if (GetLastRun().secsTo(now) > m_windowElapsed.second)
-        return true;
-    return false;
+    return GetLastRun().secsTo(now) > m_windowElapsed.second;
 }
 
 /** \class DailyHouseKeeperTask
@@ -489,12 +484,9 @@ bool DailyHouseKeeperTask::InWindow(QDateTime now)
         return true;
 
     int hour = now.time().hour();
-    if (PastWindow(now) && (m_windowHour.first <= hour)
-                        && (m_windowHour.second > hour))
-        // we've missed the window, but we're within our time constraints
-        return true;
-
-    return false;
+    // true if we've missed the window, but we're within our time constraints
+    return PastWindow(now) && (m_windowHour.first <= hour)
+                        && (m_windowHour.second > hour);
 }
 
 /** \class HouseKeepingThread

@@ -397,6 +397,8 @@ void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
     m_cur_startts = pginfo.GetRecordingStartTime();
 
     m_curpos = ProgramIsAt(pginfo);
+    if (m_curpos < 0)
+        m_curpos = 0;
     m_switchid = -1;
 }
 
@@ -623,7 +625,7 @@ void LiveTVChain::JumpToNext(bool up, int pos)
     {
         QMutexLocker lock(&m_lock);
 
-        int current = m_curpos, switchto;
+        int current = m_curpos, switchto = m_curpos;
         bool discont = false, newtype = false;
 
         while (current >= 0 && current < m_chain.size())

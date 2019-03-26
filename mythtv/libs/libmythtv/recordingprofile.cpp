@@ -1288,7 +1288,7 @@ class ImageSize : public GroupSetting
               uint defaultwidth, uint maxwidth,
               bool transcoding = false) :
             MythUISpinBoxSetting(this, transcoding ? 0 : 160,
-                           maxwidth, 16, false,
+                           maxwidth, 16, 0,
                            transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "width")
         {
@@ -1315,7 +1315,7 @@ class ImageSize : public GroupSetting
                uint defaultheight, uint maxheight,
                bool transcoding = false):
             MythUISpinBoxSetting(this, transcoding ? 0 : 160,
-                           maxheight, 16, false,
+                           maxheight, 16, 0,
                            transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "height")
         {

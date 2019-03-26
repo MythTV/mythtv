@@ -440,7 +440,7 @@ int AudioOutputCA::GetVolumeChannel(int channel) const
     if (!AudioUnitGetParameter(d->mOutputUnit,
                                kHALOutputParam_Volume,
                                kAudioUnitScope_Global, 0, &volume))
-        return (int)lroundf(volume * 100.0f);
+        return (int)lroundf(volume * 100.0F);
 
     return 0;    // error case
 }
@@ -450,7 +450,7 @@ void AudioOutputCA::SetVolumeChannel(int channel, int volume)
     // FIXME: this only sets global volume
     (void)channel;
     AudioUnitSetParameter(d->mOutputUnit, kHALOutputParam_Volume,
-                          kAudioUnitScope_Global, 0, (volume * 0.01f), 0);
+                          kAudioUnitScope_Global, 0, (volume * 0.01F), 0);
 }
 
 // IOProc style callback for SPDIF audio output
