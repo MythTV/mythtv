@@ -1419,7 +1419,7 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
             CHECK_ST
             if (!ok)
             {
-                vdp_st = vdp_bitmap_surface_destroy(bitmap);
+                vdp_bitmap_surface_destroy(bitmap);
                 bitmap = VDP_INVALID_HANDLE;
             }
             else
@@ -1437,7 +1437,7 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
 
     if (createdBitmap)
     {
-        vdp_st = vdp_bitmap_surface_destroy(bitmap);
+        vdp_bitmap_surface_destroy(bitmap);
     }
 
     return ok;
@@ -1681,16 +1681,8 @@ bool MythRenderVDPAU::GetProcs(void)
         vdp_bitmap_surface_put_bits_native);
     GET_PROC(VDP_FUNC_ID_PREEMPTION_CALLBACK_REGISTER,
         vdp_preemption_callback_register);
-
-    vdp_st = vdp_get_proc_address(
-        m_device, VDP_FUNC_ID_GET_API_VERSION,
-        (void **)&vdp_get_api_version
-    );
-
-    vdp_st = vdp_get_proc_address(
-        m_device, VDP_FUNC_ID_GET_INFORMATION_STRING,
-        (void **)&vdp_get_information_string
-    );
+    GET_PROC(VDP_FUNC_ID_GET_API_VERSION, vdp_get_api_version);
+    GET_PROC(VDP_FUNC_ID_GET_INFORMATION_STRING, vdp_get_information_string);
 
     return ok;
 }
