@@ -2645,12 +2645,12 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     if (followLinks && finfo.isSymLink())
     {
         if (!finfo.exists() && deleteBrokenSymlinks)
-            err = unlink(fname.constData());
+            unlink(fname.constData());
         else
         {
             fd = OpenAndUnlink(linktext);
             if (fd >= 0)
-                err = unlink(fname.constData());
+                unlink(fname.constData());
         }
     }
     else if (!finfo.isSymLink())
