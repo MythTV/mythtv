@@ -92,8 +92,13 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
     SignalMonitor *signalMonitor = nullptr;
 
+    if (cardtype == "GuaranteedToFail")
+    {
+        // This lets all the conditionally compiled tests be set up as
+        // 'else if' statements
+    }
 #ifdef USING_DVB
-    if (CardUtil::IsDVBInputType(cardtype))
+    else if (CardUtil::IsDVBInputType(cardtype))
     {
         DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
         if (dvbc)
@@ -103,7 +108,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_V4L2
-    if ((cardtype.toUpper() == "HDPVR"))
+    else if ((cardtype.toUpper() == "HDPVR"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
@@ -120,7 +125,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_HDHOMERUN
-    if (cardtype.toUpper() == "HDHOMERUN")
+    else if (cardtype.toUpper() == "HDHOMERUN")
     {
         HDHRChannel *hdhrc = dynamic_cast<HDHRChannel*>(channel);
         if (hdhrc)
@@ -130,7 +135,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_CETON
-    if (cardtype.toUpper() == "CETON")
+    else if (cardtype.toUpper() == "CETON")
     {
         CetonChannel *cetonchan = dynamic_cast<CetonChannel*>(channel);
         if (cetonchan)
@@ -140,7 +145,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_IPTV
-    if (cardtype.toUpper() == "FREEBOX")
+    else if (cardtype.toUpper() == "FREEBOX")
     {
         IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
@@ -150,7 +155,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_VBOX
-    if (cardtype.toUpper() == "VBOX")
+    else if (cardtype.toUpper() == "VBOX")
     {
         IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
@@ -160,7 +165,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_FIREWIRE
-    if (cardtype.toUpper() == "FIREWIRE")
+    else if (cardtype.toUpper() == "FIREWIRE")
     {
         FirewireChannel *fc = dynamic_cast<FirewireChannel*>(channel);
         if (fc)
@@ -170,7 +175,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_ASI
-    if (cardtype.toUpper() == "ASI")
+    else if (cardtype.toUpper() == "ASI")
     {
         ASIChannel *fc = dynamic_cast<ASIChannel*>(channel);
         if (fc)
@@ -179,7 +184,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 #endif
 
-    if (cardtype.toUpper() == "EXTERNAL")
+    else if (cardtype.toUpper() == "EXTERNAL")
     {
         ExternalChannel *fc = dynamic_cast<ExternalChannel*>(channel);
         if (fc)
