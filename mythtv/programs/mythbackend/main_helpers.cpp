@@ -158,8 +158,11 @@ bool setupTVs(bool ismaster, bool &error)
 
     for (uint i = 0; i < cardids.size(); i++)
     {
-        if (hosts[i] == localhostname)
+        if (hosts[i] == localhostname) {
+            // No memory leak. The constructor for TVRec adds the item
+            // to the static map TVRec::s_inputs.
             new TVRec(cardids[i]);
+        }
     }
 
     for (uint i = 0; i < cardids.size(); i++)

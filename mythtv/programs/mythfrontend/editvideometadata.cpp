@@ -324,6 +324,8 @@ void EditMetadataDialog::fillWidgets()
         m_lengthSpin->SetValue(m_workingMetadata->GetLength());
     }
 
+    // No memory leak. MythUIButtonListItem adds the new item into
+    // m_categoryList.
     MythUIButtonListItem *button =
         new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
     const VideoCategory::entry_list &vcl =
@@ -331,6 +333,8 @@ void EditMetadataDialog::fillWidgets()
     for (VideoCategory::entry_list::const_iterator p = vcl.begin();
             p != vcl.end(); ++p)
     {
+        // No memory leak. MythUIButtonListItem adds the new item into
+        // m_categoryList.
         button = new MythUIButtonListItem(m_categoryList, p->second);
         button->SetData(p->first);
     }
@@ -339,6 +343,8 @@ void EditMetadataDialog::fillWidgets()
     for (ParentalLevel i = ParentalLevel::plLowest;
             i <= ParentalLevel::plHigh && i.good(); ++i)
     {
+        // No memory leak. MythUIButtonListItem adds the new item into
+        // m_levelList.
         button = new MythUIButtonListItem(m_levelList,
                                           tr("Level %1").arg(i.GetLevel()));
         button->SetData(i.GetLevel());
@@ -350,6 +356,8 @@ void EditMetadataDialog::fillWidgets()
     //  with all available videos.
     //
 
+    // No memory leak. MythUIButtonListItem adds the new item into
+    // m_childList.
     button = new MythUIButtonListItem(m_childList,tr("None"));
 
     // TODO: maybe make the title list have the same sort order

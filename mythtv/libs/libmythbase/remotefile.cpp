@@ -1202,6 +1202,13 @@ void RemoteFile::SetTimeout(bool fast)
 
     QMutexLocker locker(&m_lock);
 
+    // The m_controlSock variable is valid if the CheckConnection
+    // function returns true.  The local case has already been
+    // handled.  The CheckConnection function can call Resume which
+    // calls Close, which deletes m_controlSock.  However, the
+    // subsequent call to OpenInternal is guaranteed to recreate the
+    // socket or return false for a non-local connection, an this must
+    // be a non-local connection if this line of code is executed.
     if (!CheckConnection())
     {
         LOG(VB_NETWORK, LOG_ERR,

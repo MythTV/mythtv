@@ -505,6 +505,8 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         {
             if (p->m_file_assoc)
             {
+                // No memory leak. MythUIButtonListItem adds the new
+                // item into m_extensionList.
                 MythUIButtonListItem *new_item =
                         new MythUIButtonListItem(m_extensionList,
                                 p->m_file_assoc->GetExtension(),
