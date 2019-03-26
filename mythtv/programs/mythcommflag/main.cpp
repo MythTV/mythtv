@@ -387,7 +387,7 @@ static void print_comm_flag_output(
     else
         streamOutCommercialBreakList(*out, commBreakList);
 
-    if (output_filename != "-")
+    if (out != &cout)
         delete out;
 }
 
