@@ -36,7 +36,7 @@ static QString mode_to_format(int mode);
 
 V4LChannel::~V4LChannel(void)
 {
-    Close();
+    V4LChannel::Close();
 }
 
 bool V4LChannel::Init(QString &startchannel, bool setchan)

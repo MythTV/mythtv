@@ -64,7 +64,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::s_last_tuning = QDateTime::currentDateTime();
 
-#define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(DVBChannel::GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -125,7 +125,7 @@ DVBChannel::~DVBChannel()
     }
     s_master_map_lock.unlock();
 
-    Close();
+    DVBChannel::Close();
 
     // if we're the last one out delete dvbcam
     s_master_map_lock.lockForRead();

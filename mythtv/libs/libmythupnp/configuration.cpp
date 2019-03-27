@@ -33,7 +33,7 @@ XmlConfiguration::XmlConfiguration( const QString &sFileName )
     m_sPath     = GetConfDir();
     m_sFileName = sFileName;
     
-    Load();
+    XmlConfiguration::Load();
 }
 
 //////////////////////////////////////////////////////////////////////////////

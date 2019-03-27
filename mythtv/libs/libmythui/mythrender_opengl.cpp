@@ -178,16 +178,16 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice*
 {
     QWidget *w = dynamic_cast<QWidget*>(device);
     m_window = (w) ? w->windowHandle() : nullptr;
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
     setFormat(format);
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
   : MythRender(type), m_lock(QMutex::Recursive), m_window(nullptr)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
     setFormat(format);
 }
 #else
@@ -195,15 +195,15 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice*
                                    RenderType type)
   : QGLContext(format, device), MythRender(type), m_lock(QMutex::Recursive)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
   : QGLContext(format), MythRender(type), m_lock(QMutex::Recursive)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
 }
 #endif
 

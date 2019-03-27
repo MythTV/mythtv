@@ -13,11 +13,11 @@
 #include "channelutil.h"
 #include "mythdbcon.h"
 
-#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(CetonChannel::GetDevice())
 
 CetonChannel::~CetonChannel(void)
 {
-    Close();
+    CetonChannel::Close();
 }
 
 bool CetonChannel::Open(void)
@@ -45,7 +45,7 @@ void CetonChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing Ceton channel");
 
-    if (!IsOpen())
+    if (!CetonChannel::IsOpen())
         return; // this caller didn't have it open in the first place..
 
     CetonStreamHandler::Return(m_stream_handler, GetInputID());

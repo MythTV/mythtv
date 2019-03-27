@@ -162,7 +162,7 @@ class SegmentationDescriptor : public SpliceDescriptor
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
         _ptrs[2] = _ptrs[1] = _ptrs[0] = nullptr;
-        if (_data && !Parse())
+        if (_data && !SegmentationDescriptor::Parse())
             _data = nullptr;
     }
 

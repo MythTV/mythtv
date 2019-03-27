@@ -322,7 +322,7 @@ PeriodicHouseKeeperTask::PeriodicHouseKeeperTask(const QString &dbTag,
     HouseKeeperTask(dbTag, scope, startup), m_period(period), m_retry(retry),
     m_windowPercent(min, max), m_currentProb(1.0)
 {
-    CalculateWindow();
+    PeriodicHouseKeeperTask::CalculateWindow();
     if (m_retry == 0)
         m_retry = m_period;
 }
@@ -440,7 +440,7 @@ DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
     PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
     m_windowHour(0, 23)
 {
-    CalculateWindow();
+    DailyHouseKeeperTask::CalculateWindow();
 }
 
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag, int minhour,
@@ -448,7 +448,7 @@ DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag, int minhour,
     PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
     m_windowHour(minhour, maxhour)
 {
-    CalculateWindow();
+    DailyHouseKeeperTask::CalculateWindow();
 }
 
 void DailyHouseKeeperTask::CalculateWindow(void)

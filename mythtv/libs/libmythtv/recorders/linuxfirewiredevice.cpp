@@ -138,11 +138,11 @@ LinuxFirewireDevice::LinuxFirewireDevice(
 
 LinuxFirewireDevice::~LinuxFirewireDevice()
 {
-    if (IsPortOpen())
+    if (LinuxFirewireDevice::IsPortOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "ctor called with open port");
-        while (IsPortOpen())
-            ClosePort();
+        while (LinuxFirewireDevice::IsPortOpen())
+            LinuxFirewireDevice::ClosePort();
     }
 
     if (m_priv)

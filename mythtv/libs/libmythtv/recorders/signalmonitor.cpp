@@ -244,7 +244,7 @@ SignalMonitor::SignalMonitor(int _inputid, ChannelBase *_channel,
  */
 SignalMonitor::~SignalMonitor()
 {
-    Stop();
+    SignalMonitor::Stop();
     wait();
 }
 

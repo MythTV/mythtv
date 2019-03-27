@@ -438,7 +438,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     cc608_build_parity_table(m_cc608_parity_table);
 
-    SetIdrOnlyKeyframes(true);
+    AvFormatDecoder::SetIdrOnlyKeyframes(true);
     m_audioReadAhead = gCoreContext->GetNumSetting("AudioReadAhead", 100);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PlayerFlags: 0x%1, AudioReadAhead: %2 msec")

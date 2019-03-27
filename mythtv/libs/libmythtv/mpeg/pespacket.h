@@ -39,7 +39,7 @@ class MTV_PUBLIC PESPacket
           _psiOffset(0), _ccLast(255), _allocSize(0)
     {
         _badPacket = !VerifyCRC();
-        _pesdataSize = max(((int)Length())-1 + (HasCRC() ? 4 : 0), 0);
+        _pesdataSize = max(((int)Length())-1 + (PESPacket::HasCRC() ? 4 : 0), 0);
     }
 
   private:

@@ -301,7 +301,7 @@ PictureMetaData::PictureMetaData(const QString &filePath)
     {
         m_image = Exiv2::ImageFactory::open(filePath.toStdString());
 
-        if (IsValid())
+        if (PictureMetaData::IsValid())
         {
             m_image->readMetadata();
             m_exifData = m_image->exifData();
@@ -531,7 +531,7 @@ VideoMetaData::VideoMetaData(const QString &filePath)
     if (vidStream >= 0)
         m_dict  = m_context->streams[vidStream]->metadata;
 
-    if (!IsValid())
+    if (!VideoMetaData::IsValid())
         avformat_close_input(&m_context);
 }
 
@@ -541,7 +541,7 @@ VideoMetaData::VideoMetaData(const QString &filePath)
  */
 VideoMetaData::~VideoMetaData()
 {
-    if (IsValid())
+    if (VideoMetaData::IsValid())
         avformat_close_input(&m_context);
 }
 

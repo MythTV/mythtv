@@ -380,7 +380,7 @@ DatabaseLogger::~DatabaseLogger()
 {
     LOG(VB_GENERAL, LOG_INFO, "Removing database logging");
 
-    stopDatabaseAccess();
+    DatabaseLogger::stopDatabaseAccess();
 }
 
 DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)

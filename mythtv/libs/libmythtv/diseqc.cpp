@@ -1070,7 +1070,7 @@ DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
     for (uint i = 0; i < m_num_ports; i++)
         m_children[i] = nullptr;
 
-    Reset();
+    DiSEqCDevSwitch::Reset();
 }
 
 DiSEqCDevSwitch::~DiSEqCDevSwitch()

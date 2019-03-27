@@ -1430,7 +1430,7 @@ VBoxIP::VBoxIP()
 {
     setLabel(QObject::tr("IP Address"));
     setHelpText(QObject::tr("Device IP or ID of a VBox device. eg. '192.168.1.100' or 'vbox_3718'"));
-    setEnabled(false);
+    VBoxIP::setEnabled(false);
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
 };
@@ -1460,7 +1460,7 @@ VBoxTunerIndex::VBoxTunerIndex()
 {
     setLabel(QObject::tr("Tuner"));
     setHelpText(QObject::tr("Number and type of the tuner to use. eg '1-DVBT/T2'."));
-    setEnabled(false);
+    VBoxTunerIndex::setEnabled(false);
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
 };

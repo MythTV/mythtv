@@ -289,7 +289,7 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
-    OpenFile(lfilename);
+    BDRingBuffer::OpenFile(lfilename);
 }
 
 BDRingBuffer::~BDRingBuffer()

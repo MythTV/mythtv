@@ -48,7 +48,7 @@ const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 RecorderBase::RecorderBase(TVRec *rec)
     : m_tvrec(rec)
 {
-    ClearStatistics();
+    RecorderBase::ClearStatistics();
     QMutexLocker locker(avcodeclock);
 #if 0
     avcodec_init(); // init CRC's

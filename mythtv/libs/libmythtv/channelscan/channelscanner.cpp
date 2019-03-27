@@ -49,7 +49,7 @@ using namespace std;
 
 ChannelScanner::~ChannelScanner()
 {
-    Teardown();
+    ChannelScanner::Teardown();
 
     if (m_scanMonitor)
     {

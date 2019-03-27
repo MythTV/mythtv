@@ -49,7 +49,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     SetPositionMapType(MARK_GOP_BYFRAME);
     m_payload_buffer.reserve(TSPacket::kSize * (50 + 1));
 
-    ResetForNewFile();
+    DTVRecorder::ResetForNewFile();
 
     memset(m_stream_id,  0, sizeof(m_stream_id));
     memset(m_pid_status, 0, sizeof(m_pid_status));
@@ -65,7 +65,7 @@ DTVRecorder::~DTVRecorder(void)
 {
     StopRecording();
 
-    SetStreamData(nullptr);
+    DTVRecorder::SetStreamData(nullptr);
 
     if (m_input_pat)
     {
@@ -165,7 +165,7 @@ void DTVRecorder::ResetForNewFile(void)
     m_durationMapDelta.clear();
 
     locker.unlock();
-    ClearStatistics();
+    DTVRecorder::ClearStatistics();
 }
 
 void DTVRecorder::ClearStatistics(void)

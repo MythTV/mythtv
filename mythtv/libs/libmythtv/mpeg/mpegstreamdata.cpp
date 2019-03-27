@@ -63,13 +63,13 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
 {
     memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
 
-    AddListeningPID(MPEG_PAT_PID);
-    AddListeningPID(MPEG_CAT_PID);
+    MPEGStreamData::AddListeningPID(MPEG_PAT_PID);
+    MPEGStreamData::AddListeningPID(MPEG_CAT_PID);
 }
 
 MPEGStreamData::~MPEGStreamData()
 {
-    Reset(-1);
+    MPEGStreamData::Reset(-1);
     SetPATSingleProgram(nullptr);
     SetPMTSingleProgram(nullptr);
 

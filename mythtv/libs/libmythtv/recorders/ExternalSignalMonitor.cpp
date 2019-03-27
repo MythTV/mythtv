@@ -61,7 +61,7 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
 ExternalSignalMonitor::~ExternalSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    ExternalSignalMonitor::Stop();
     ExternalStreamHandler::Return(m_stream_handler, m_inputid);
 }
 

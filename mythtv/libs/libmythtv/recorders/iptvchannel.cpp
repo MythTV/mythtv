@@ -30,7 +30,7 @@ IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
 IPTVChannel::~IPTVChannel()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Close();
+    IPTVChannel::Close();
 }
 
 bool IPTVChannel::Open(void)

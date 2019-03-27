@@ -238,7 +238,7 @@ ScreenSaverX11::~ScreenSaverX11()
 {
     /* Ensure DPMS gets left as it was found. */
     if (d->DeactivatedDPMS())
-        Restore();
+        ScreenSaverX11::Restore();
 
     delete d;
 }

@@ -66,7 +66,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
 
 DTVSignalMonitor::~DTVSignalMonitor()
 {
-    SetStreamData(nullptr);
+    DTVSignalMonitor::SetStreamData(nullptr);
 }
 
 DTVChannel *DTVSignalMonitor::GetDTVChannel(void)

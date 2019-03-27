@@ -75,7 +75,7 @@ PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
     if (m_filter)
         av_bitstream_filter_close(m_filter);
 
-    Reset();
+    PrivateDecoderCrystalHD::Reset();
     if (!m_device)
         return;
 

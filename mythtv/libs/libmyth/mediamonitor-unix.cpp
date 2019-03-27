@@ -255,7 +255,7 @@ bool MediaMonitorUnix::CheckMountable(void)
                 else
                     pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
-                if (pDevice && !AddDevice(pDevice))
+                if (pDevice && !MediaMonitorUnix::AddDevice(pDevice))
                     pDevice->deleteLater();
             }
         }
@@ -708,7 +708,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         pDevice->setMountPath(mep->fs_file);
         if (pDevice->testMedia() == MEDIAERR_OK)
         {
-            if (AddDevice(pDevice))
+            if (MediaMonitorUnix::AddDevice(pDevice))
                 return true;
         }
         pDevice->deleteLater();

@@ -1549,7 +1549,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     m_playback(new HLSPlayback())
 {
     m_startReadAhead = false;
-    OpenFile(lfilename);
+    HLSRingBuffer::OpenFile(lfilename);
 }
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
@@ -1559,7 +1559,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
     m_startReadAhead = false;
     if (open)
     {
-        OpenFile(lfilename);
+        HLSRingBuffer::OpenFile(lfilename);
     }
 }
 

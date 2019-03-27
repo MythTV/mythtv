@@ -13,7 +13,7 @@
 #endif
 #include "firewirechannel.h"
 
-#define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(FirewireChannel::GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
                                  const FireWireDBOptions &firewire_opts) :
@@ -37,7 +37,7 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 
 FirewireChannel::~FirewireChannel()
 {
-    Close();
+    FirewireChannel::Close();
     delete m_device;
 }
 

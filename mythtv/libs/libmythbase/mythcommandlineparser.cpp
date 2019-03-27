@@ -1164,7 +1164,7 @@ MythCommandLineParser::MythCommandLineParser(QString appname) :
         m_verbose = true;
     }
 
-    LoadArguments();
+    MythCommandLineParser::LoadArguments();
 }
 
 MythCommandLineParser::~MythCommandLineParser()

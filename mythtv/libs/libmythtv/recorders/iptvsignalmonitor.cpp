@@ -39,7 +39,7 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
 IPTVSignalMonitor::~IPTVSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    IPTVSignalMonitor::Stop();
 }
 
 IPTVChannel *IPTVSignalMonitor::GetIPTVChannel(void)

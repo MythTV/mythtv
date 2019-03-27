@@ -104,7 +104,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &profile)
 VideoOutputOpenGL::~VideoOutputOpenGL()
 {
     gl_context_lock.lock();
-    TearDown();
+    VideoOutputOpenGL::TearDown();
 
     if (gl_context)
         gl_context->DecrRef();

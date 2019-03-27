@@ -155,15 +155,15 @@ MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
                                      RenderType type)
   : MythRenderOpenGL(format, device, type)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL2::ResetVars();
+    MythRenderOpenGL2::ResetProcs();
 }
 
 MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format, RenderType type)
   : MythRenderOpenGL(format, type)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL2::ResetVars();
+    MythRenderOpenGL2::ResetProcs();
 }
 
 MythRenderOpenGL2::~MythRenderOpenGL2()
@@ -171,7 +171,7 @@ MythRenderOpenGL2::~MythRenderOpenGL2()
     if (!isValid())
         return;
     makeCurrent();
-    DeleteOpenGLResources();
+    MythRenderOpenGL2::DeleteOpenGLResources();
     doneCurrent();
 }
 
@@ -912,7 +912,7 @@ void MythRenderOpenGL2::DeleteOpenGLResources(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
     DeleteDefaultShaders();
-    DeleteShaders();
+    MythRenderOpenGL2::DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();
 }
 

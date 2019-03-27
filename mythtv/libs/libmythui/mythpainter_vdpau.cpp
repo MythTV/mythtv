@@ -26,7 +26,7 @@ MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
 
 MythVDPAUPainter::~MythVDPAUPainter()
 {
-    Teardown();
+    MythVDPAUPainter::Teardown();
 }
 
 bool MythVDPAUPainter::InitVDPAU(QPaintDevice *parent)
@@ -53,7 +53,7 @@ void MythVDPAUPainter::Teardown(void)
 {
     MythPainter::Teardown();
 
-    FreeResources();
+    MythVDPAUPainter::FreeResources();
 
     m_ImageBitmapMap.clear();
     m_ImageExpireList.clear();

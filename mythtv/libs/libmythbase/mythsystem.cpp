@@ -72,7 +72,7 @@ class MythSystemLegacyWrapper : public MythSystem
 
     ~MythSystemLegacyWrapper(void) override
     {
-        Wait(0);
+        MythSystemLegacyWrapper::Wait(0);
     }
 
     uint GetFlags(void) const override // MythSystem

@@ -54,7 +54,7 @@ ASISignalMonitor::ASISignalMonitor(int db_cardnum,
 ASISignalMonitor::~ASISignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    ASISignalMonitor::Stop();
     ASIStreamHandler::Return(streamHandler, m_inputid);
 }
 

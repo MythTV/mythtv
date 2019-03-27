@@ -30,7 +30,7 @@ MythSignalingTimer::MythSignalingTimer(
 
 MythSignalingTimer::~MythSignalingTimer()
 {
-    stop();
+    MythSignalingTimer::stop();
     wait();
 }
 
