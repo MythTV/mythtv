@@ -575,6 +575,8 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
     for (uint i = 0; i < descs.size(); i++)
     {
         ConditionalAccessDescriptor cad(descs[i]);
+        if (!cad.IsValid())
+            continue;
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
 
@@ -601,9 +603,10 @@ bool ProgramMapTable::IsStreamEncrypted(uint pid) const
     for (uint j = 0; j < descs.size(); j++)
     {
         ConditionalAccessDescriptor cad(descs[j]);
+        if (!cad.IsValid())
+            continue;
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
-
 #if 0
         LOG(VB_GENERAL, LOG_INFO, "DTVsm: " + cad.toString());
 #endif
@@ -1120,6 +1123,8 @@ QString ProgramMapTable::GetLanguage(uint i) const
         return QString();
 
     ISO639LanguageDescriptor iso_lang(lang_desc);
+    if (!iso_lang.IsValid())
+        return "";
     return iso_lang.CanonicalLanguageString();
 }
 
@@ -1134,6 +1139,8 @@ uint ProgramMapTable::GetAudioType(uint i) const
         return 0;
 
     ISO639LanguageDescriptor iso_lang(lang_desc);
+    if (!iso_lang.IsValid())
+        return 0;
 
     // Hack for non-standard AD labelling on UK Satellite and Irish DTTV
     // Language string of 'nar' for narrative indicates an AD track

@@ -1900,6 +1900,8 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     for (uint j = 0; j < desc_list.size(); j++)
     {
         const CaptionServiceDescriptor csd(desc_list[j]);
+        if (!csd.IsValid())
+            continue;
         for (uint k = 0; k < csd.ServicesCount(); k++)
         {
             int lang = csd.CanonicalLanguageKey(k);
@@ -2011,6 +2013,8 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
         for (uint j = 0; j < desc_list.size(); j++)
         {
             const TeletextDescriptor td(desc_list[j]);
+            if (!td.IsValid())
+                continue;
             for (uint k = 0; k < td.StreamCount(); k++)
             {
                 int type = td.TeletextType(k);

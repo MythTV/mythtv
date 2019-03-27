@@ -298,15 +298,18 @@ static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
     if (bestShortEvent)
     {
         ShortEventDescriptor sed(bestShortEvent);
-        if (enc)
+        if (sed.IsValid())
         {
-            title    = sed.EventName(enc, enc_len);
-            subtitle = sed.Text(enc, enc_len);
-        }
-        else
-        {
-            title    = sed.EventName();
-            subtitle = sed.Text();
+            if (enc)
+            {
+                title    = sed.EventName(enc, enc_len);
+                subtitle = sed.Text(enc, enc_len);
+            }
+            else
+            {
+                title    = sed.EventName();
+                subtitle = sed.Text();
+            }
         }
     }
 
@@ -324,11 +327,13 @@ static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
         }
 
         ExtendedEventDescriptor eed(bestExtendedEvents[j]);
-        if (enc)
-            description += eed.Text(enc, enc_len);
-        else
-            description += eed.Text();
-
+        if (eed.IsValid())
+        {
+            if (enc)
+                description += eed.Text(enc, enc_len);
+            else
+                description += eed.Text();
+        }
         // add items from the decscriptor to the items
         items.unite (eed.Items());
     }
@@ -344,6 +349,8 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
     for (uint j = 0; j < components.size(); j++)
     {
         ComponentDescriptor component(components[j]);
+        if (!component.IsValid())
+            continue;
         video_properties |= component.VideoProperties();
         audio_properties |= component.AudioProperties();
         subtitle_type    |= component.SubtitleType();
@@ -417,7 +424,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         if (dish_event_name)
         {
             DishEventNameDescriptor dend(dish_event_name);
-            if (dend.HasName())
+            if (dend.IsValid() && dend.HasName())
                 title = dend.Name(descCompression);
 
             const unsigned char *dish_event_description =
@@ -534,90 +541,43 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             }
             else if (EITFixUp::kFixAUDescription & fix)//AU Freeview assigned genres
             {
+                static const char *AUGenres[] =
+                    {/* 0*/"Unknown", "Movie", "News", "Entertainment",
+                     /* 4*/"Sport", "Children", "Music", "Arts/Culture",
+                     /* 8*/"Current Affairs", "Education", "Infotainment",
+                     /*11*/"Special", "Comedy", "Drama", "Documentary",
+                     /*15*/"Unknown"};
                 ContentDescriptor content(content_data);
-                switch (content.Nibble1(0))
+                if (content.IsValid())
                 {
-                    case 0x01:
-                        category = "Movie";
-                        break;
-                    case 0x02:
-                        category = "News";
-                        break;
-                    case 0x03:
-                        category = "Entertainment";
-                        break;
-                    case 0x04:
-                        category = "Sport";
-                        break;
-                    case 0x05:
-                        category = "Children";
-                        break;
-                    case 0x06:
-                        category = "Music";
-                        break;
-                    case 0x07:
-                        category = "Arts/Culture";
-                        break;
-                    case 0x08:
-                        category = "Current Affairs";
-                        break;
-                    case 0x09:
-                        category = "Education";
-                        break;
-                    case 0x0A:
-                        category = "Infotainment";
-                        break;
-                    case 0x0B:
-                        category = "Special";
-                        break;
-                    case 0x0C:
-                        category = "Comedy";
-                        break;
-                    case 0x0D:
-                        category = "Drama";
-                        break;
-                    case 0x0E:
-                        category = "Documentary";
-                        break;
-                    default:
-                        category = "";
-                        break;
+                    category = AUGenres[content.Nibble1(0)];
+                    category_type = content.GetMythCategory(0);
                 }
-                category_type = content.GetMythCategory(0);
             }
             else if (EITFixUp::kFixGreekEIT & fix)//Greek
             {
+                static const char *GrGenres[] =
+                    {/* 0*/"Unknown",  "Ταινία", "Ενημερωτικό", "Unknown",
+                     /* 4*/"Αθλητικό", "Παιδικό", "Unknown", "Unknown",
+                     /* 8*/"Unknown", "Ντοκιμαντέρ", "Unknown", "Unknown",
+                     /*12*/"Unknown", "Unknown", "Unknown", "Unknown"};
                 ContentDescriptor content(content_data);
-                switch (content.Nibble2(0))
+                if (content.IsValid())
                 {
-                    case 0x01:
-                        category = "Ταινία";       // confirmed
-                        break;
-                    case 0x02:
-                        category = "Ενημερωτικό";  // confirmed
-                        break;
-                    case 0x04:
-                        category = "Αθλητικό";     // confirmed
-                        break;
-                    case 0x05:
-                        category = "Παιδικό";      // confirmed
-                        break;
-                    case 0x09:
-                        category = "Ντοκιμαντέρ";  // confirmed
-                        break;
-                    default:
-                        category = "";
-                        break;
+                    category = GrGenres[content.Nibble2(0)];
+                    category_type = content.GetMythCategory(2);
                 }
-                category_type = content.GetMythCategory(2);
             }
             else
             {
                 ContentDescriptor content(content_data);
-                category      = content.GetDescription(0);
+                if (content.IsValid())
+                {
+                    category      = content.GetDescription(0);
 #if 0 /* there is no category_type in DVB EIT */
-                category_type = content.GetMythCategory(0);
+                    category_type = content.GetMythCategory(0);
 #endif
+                }
             }
         }
 
@@ -626,6 +586,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         for (uint j = 0; j < contentIds.size(); j++)
         {
             DVBContentIdentifierDescriptor desc(contentIds[j]);
+            if (!desc.IsValid())
+                continue;
             for (uint k = 0; k < desc.CRIDCount(); k++)
             {
                 if (desc.ContentEncoding(k) == 0)
@@ -660,6 +622,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
             for (uint j = 0; j < private_data_specifiers.size(); j++) {
                 PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
+                if (!desc.IsValid())
+                    continue;
                 if (desc.PrivateDataSpecifier() == PrivateDataSpecifierID::UPC1) {
                     isUPC = true;
                 }
@@ -669,7 +633,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 desc_list_t subtitles = MPEGDescriptor::FindAll(list, PrivateDescriptorID::upc_event_episode_title);
                 for (uint j = 0; j < subtitles.size(); j++) {
                     PrivateUPCCablecomEpisodeTitleDescriptor desc(subtitles[j]);
-
+                    if (!desc.IsValid())
+                        continue;
                     subtitle = desc.Text();
                 }
             }
@@ -731,7 +696,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     {
         ContentDescriptor content(content_data);
         // fix events without real content data
-        if (content.Nibble(0)==0x00)
+        if (content.IsValid() && (content.Nibble(0)==0x00))
         {
             if(content.UserNibble(0)==0x1)
             {
@@ -767,6 +732,8 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     for(uint j=0; j< transmissions.size(); j++)
     {
         PremiereContentTransmissionDescriptor transmission(transmissions[j]);
+        if (!transmission.IsValid())
+            continue;
         uint networkid = transmission.OriginalNetworkID();
         uint tsid      = transmission.TSID();
         uint serviceid = transmission.ServiceID();

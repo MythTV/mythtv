@@ -128,12 +128,26 @@ QString SpliceDescriptor::toString(void) const
 {
     QString str;
 
+    if (!IsValid())
+        return "Invalid Splice Descriptor";
     if (SpliceDescriptorID::avail == DescriptorTag())
-        str = AvailDescriptor(_data).toString();
+    {
+        auto desc = AvailDescriptor(_data);
+        if (desc.IsValid())
+            str = desc.toString();
+    }
     else if (SpliceDescriptorID::dtmf == DescriptorTag())
-        str = DTMFDescriptor(_data).toString();
+    {
+        auto desc = DTMFDescriptor(_data);
+        if (desc.IsValid())
+            str = desc.toString();
+    }
     else if (SpliceDescriptorID::segmentation == DescriptorTag())
-        str = SegmentationDescriptor(_data).toString();
+    {
+        auto desc = SegmentationDescriptor(_data);
+        if (desc.IsValid())
+            str = desc.toString();
+    }
     else
     {
         str.append(QString("%1 Splice Descriptor (0x%2)")
@@ -144,7 +158,7 @@ QString SpliceDescriptor::toString(void) const
             str.append(QString(" 0x%1").arg(int(_data[i+2]), 0, 16));
     }
 
-    return str;
+    return str.isEmpty() ? "Invalid Splice Descriptor" : str;
 }
 
 /// Returns XML representation of string the TS Reader XML format.

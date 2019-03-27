@@ -506,6 +506,8 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
         {
             DefaultAuthorityDescriptor authority(def_auth);
             ServiceListDescriptor services(serv_list);
+            if (!authority.IsValid() || !services.IsValid())
+                continue;
 
             for (uint j = 0; j < services.ServiceCount(); ++j)
             {
@@ -546,6 +548,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
         if (def_auth)
         {
             DefaultAuthorityDescriptor authority(def_auth);
+            if (!authority.IsValid())
+                continue;
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("found default authority(SDTo) for service %1 %2 %3")
                     .arg(netid).arg(tsid).arg(serviceId));
@@ -1137,18 +1141,20 @@ static void update_info(ChannelInsertInfo &info,
     if (def_auth)
     {
         DefaultAuthorityDescriptor authority(def_auth);
-        LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
-                                          "authority(SDT) for service %1 %2 %3")
+        if (authority.IsValid())
+        {
+            LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
+                                               "authority(SDT) for service %1 %2 %3")
                 .arg(info.m_orig_netid).arg(info.m_sdt_tsid).arg(info.m_service_id));
-        info.m_default_authority = authority.DefaultAuthority();
+            info.m_default_authority = authority.DefaultAuthority();
+            return;
+        }
     }
-    else
-    {
-        uint64_t index = (uint64_t)info.m_orig_netid << 32 |
-                        info.m_sdt_tsid << 16 | info.m_service_id;
-        if (defAuthorities.contains(index))
-            info.m_default_authority = defAuthorities[index];
-    }
+
+    uint64_t index = (uint64_t)info.m_orig_netid << 32 |
+        info.m_sdt_tsid << 16 | info.m_service_id;
+    if (defAuthorities.contains(index))
+        info.m_default_authority = defAuthorities[index];
 }
 
 uint ChannelScanSM::GetCurrentTransportInfo(
@@ -1258,6 +1264,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         for (uint i = 0; i < descs.size(); ++i)
         {
             RegistrationDescriptor reg(descs[i]);
+            if (!reg.IsValid())
+                continue;
             if (reg.FormatIdentifierString() == "CUEI" ||
                 reg.FormatIdentifierString() == "SCTE")
                 info.m_could_be_opencable = true;
@@ -1348,6 +1356,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     if (desc)
                     {
                         DVBLogicalChannelDescriptor uklist(desc);
+                        if (!uklist.IsValid())
+                            continue;
                         for (uint j = 0; j < uklist.ChannelCount(); ++j)
                         {
                             ukChanNums[((qlonglong)info.m_orig_netid<<32) |
@@ -1366,7 +1376,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     if (desc)
                     {
                         DVBSimulcastChannelDescriptor scnlist(desc);
-
+                        if (!scnlist.IsValid())
+                            continue;
                         for (uint j = 0; j < scnlist.ChannelCount(); ++j)
                         {
                             scnChanNums[((qlonglong)info.m_orig_netid<<32) |

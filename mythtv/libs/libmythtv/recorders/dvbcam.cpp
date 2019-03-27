@@ -387,7 +387,7 @@ static void process_desc(cCiCaPmt &capmt,
         ConditionalAccessDescriptor cad(*it);
         for (uint q = 0; casids[q]; q++)
         {
-            if (cad.SystemID() != casids[q])
+            if (!cad.IsValid() || cad.SystemID() != casids[q])
                 continue;
 
             LOG(VB_DVBCAM, LOG_INFO, QString("DVBCam: Adding CA descriptor: "

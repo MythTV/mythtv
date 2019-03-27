@@ -70,8 +70,12 @@ QString NetworkInformationTable::NetworkName() const
             MPEGDescriptor::Find(parsed, DescriptorID::network_name);
 
         if (desc)
-            _cached_network_name = NetworkNameDescriptor(desc).Name();
-        else
+        {
+            auto nndesc = NetworkNameDescriptor(desc);
+            if (nndesc.IsValid())
+                _cached_network_name = nndesc.Name();
+        }
+        if (_cached_network_name.isEmpty())
             _cached_network_name = QString("Net ID 0x%1")
                 .arg(NetworkID(), 0, 16);
     }
