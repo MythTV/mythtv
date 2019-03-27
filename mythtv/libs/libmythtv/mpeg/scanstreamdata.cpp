@@ -8,7 +8,6 @@ ScanStreamData::ScanStreamData(bool no_default_pid) :
     MPEGStreamData(-1, -1, true),
     ATSCStreamData(-1, -1, -1, true),
     DVBStreamData(0, 0, -1, -1, true),
-    dvb_uk_freesat_si(false),
     m_no_default_pid(no_default_pid)
 {
     if (m_no_default_pid)
@@ -23,7 +22,7 @@ ScanStreamData::~ScanStreamData() { ; }
 bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
     // Treat BAT and SDTo as redundant unless they are on the FREESAT_SI_PID
-    if (dvb_uk_freesat_si &&
+    if (m_dvb_uk_freesat_si &&
         (psip.TableID() == TableID::BAT || psip.TableID() == TableID::SDTo))
         return pid != FREESAT_SI_PID;
 
@@ -57,7 +56,7 @@ void ScanStreamData::Reset(void)
     AddListeningPID(ATSC_PSIP_PID);
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
-    if (dvb_uk_freesat_si)
+    if (m_dvb_uk_freesat_si)
         AddListeningPID(FREESAT_SI_PID);
 }
 
