@@ -43,10 +43,11 @@ extern "C" {
 
 #if ARCH_X86
 
-static int has_sse2     = -1;
-static int has_sse3     = -1;
-static int has_ssse3    = -1;
-static int has_sse4     = -1;
+static bool features_detected = false;
+static bool has_sse2     = false;
+static bool has_sse3     = false;
+static bool has_ssse3    = false;
+static bool has_sse4     = false;
 
 #if defined _WIN32 && !defined __MINGW32__
 //  Windows
@@ -74,13 +75,8 @@ inline void cpuid(int CPUInfo[4],int InfoType)
 }
 #endif
 
-static inline bool sse2_check()
+static void cpu_detect_features()
 {
-    if (has_sse2 != -1)
-    {
-        return has_sse2;
-    }
-
     int info[4];
     cpuid(info, 0);
     int nIds = info[0];
@@ -94,49 +90,34 @@ static inline bool sse2_check()
         has_ssse3 = (info[2] & (1 <<  9)) != 0;
         has_sse4  = (info[2] & (1 << 19)) != 0;
     }
-    else
-    {
-        has_sse2  = 0;
-        has_sse3  = 0;
-        has_ssse3 = 0;
-        has_sse4  = 0;
-    }
+    features_detected = true;
+}
+
+static inline bool sse2_check()
+{
+    if (!features_detected)
+        cpu_detect_features();
     return has_sse2;
 }
 
 static inline bool sse3_check()
 {
-    if (has_sse3 != -1)
-    {
-        return has_sse3;
-    }
-
-    sse2_check();
-
+    if (!features_detected)
+        cpu_detect_features();
     return has_sse3;
 }
 
 static inline bool ssse3_check()
 {
-    if (has_ssse3 != -1)
-    {
-        return has_ssse3;
-    }
-
-    sse2_check();
-
+    if (!features_detected)
+        cpu_detect_features();
     return has_ssse3;
 }
 
 static inline bool sse4_check()
 {
-    if (has_sse4 != -1)
-    {
-        return has_sse4;
-    }
-
-    sse2_check();
-
+    if (!features_detected)
+        cpu_detect_features();
     return has_sse4;
 }
 
