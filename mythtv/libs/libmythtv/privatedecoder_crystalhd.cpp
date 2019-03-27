@@ -300,6 +300,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     }
 
     st = DtsSetColorSpace(m_device, m_pix_fmt);
+    CHECK_ST;
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set decoder output format");
@@ -307,6 +308,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     }
 
     st = DtsStartDecoder(m_device);
+    CHECK_ST;
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start decoder");
@@ -314,6 +316,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     }
 
     st = DtsStartCapture(m_device);
+    CHECK_ST;
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start capture");
