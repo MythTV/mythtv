@@ -5,7 +5,7 @@
 
 MythShutdownCommandLineParser::MythShutdownCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHSHUTDOWN)
-{ LoadArguments(); }
+{ MythShutdownCommandLineParser::LoadArguments(); }
 
 void MythShutdownCommandLineParser::LoadArguments(void)
 {

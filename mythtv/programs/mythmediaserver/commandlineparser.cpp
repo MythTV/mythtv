@@ -5,7 +5,7 @@
 
 MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMEDIASERVER)
-{ LoadArguments(); }
+{ MythMediaServerCommandLineParser::LoadArguments(); }
 
 QString MythMediaServerCommandLineParser::GetHelpHeader(void) const
 {

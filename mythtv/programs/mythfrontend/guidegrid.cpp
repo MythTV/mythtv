@@ -184,7 +184,7 @@ bool JumpToChannel::Update(void)
     }
 
     // prefix must be invalid.. reset entry..
-    deleteLater();
+    JumpToChannel::deleteLater();
     return false;
 }
 

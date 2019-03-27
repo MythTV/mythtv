@@ -5,7 +5,7 @@
 
 MythJobQueueCommandLineParser::MythJobQueueCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHJOBQUEUE)
-{ LoadArguments(); }
+{ MythJobQueueCommandLineParser::LoadArguments(); }
 
 QString MythJobQueueCommandLineParser::GetHelpHeader(void) const
 {

@@ -5,7 +5,7 @@
 
 MythLCDServerCommandLineParser::MythLCDServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHLCDSERVER)
-{ LoadArguments(); }
+{ MythLCDServerCommandLineParser::LoadArguments(); }
 
 void MythLCDServerCommandLineParser::LoadArguments(void)
 {

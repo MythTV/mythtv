@@ -5,7 +5,7 @@
 
 MythFillDatabaseCommandLineParser::MythFillDatabaseCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHFILLDATABASE)
-{ LoadArguments(); }
+{ MythFillDatabaseCommandLineParser::LoadArguments(); }
 
 void MythFillDatabaseCommandLineParser::LoadArguments(void)
 {
