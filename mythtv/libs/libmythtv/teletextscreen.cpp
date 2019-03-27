@@ -360,8 +360,6 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             return;
     }
 
-    uint newfgcolor = fgcolor;
-    uint newbgcolor = bgcolor;
     SetForegroundColor(fgcolor);
     SetBackgroundColor(bgcolor);
 
@@ -497,8 +495,8 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             }
         }
 
-        newfgcolor = fgcolor;
-        newbgcolor = bgcolor;
+        uint newfgcolor = fgcolor;
+        uint newbgcolor = bgcolor;
 
         SetForegroundColor(newfgcolor);
         SetBackgroundColor(newbgcolor);
