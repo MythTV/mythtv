@@ -60,7 +60,7 @@ SingleView::SingleView(
     m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
     m_slideshow_timer = new QTimer(this);
-    RegisterEffects();
+    SingleView::RegisterEffects();
 
     // --------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ SingleView::SingleView(
 
     // --------------------------------------------------------------------
 
-    Load();
+    SingleView::Load();
 
     // --------------------------------------------------------------------
 

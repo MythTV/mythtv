@@ -89,7 +89,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 
 VorbisEncoder::~VorbisEncoder()
 {
-    addSamples(nullptr, 0); //flush
+    VorbisEncoder::addSamples(nullptr, 0); //flush
     ogg_stream_clear(&m_os);
     vorbis_block_clear(&m_vb);
     vorbis_dsp_clear(&m_vd);

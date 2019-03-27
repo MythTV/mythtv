@@ -36,7 +36,7 @@ class MPUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
 
 MythFillNVCommandLineParser::MythFillNVCommandLineParser() :
     MythCommandLineParser("mythfillnetvision")
-{ LoadArguments(); }
+{ MythFillNVCommandLineParser::LoadArguments(); }
 
 void MythFillNVCommandLineParser::LoadArguments(void)
 {

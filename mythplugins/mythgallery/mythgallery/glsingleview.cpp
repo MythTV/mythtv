@@ -87,7 +87,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
     m_effect_kenBurns_projection[0] = m_effect_kenBurns_projection[1] = 0;
 
     m_slideshow_timer = new QTimer(this);
-    RegisterEffects();
+    GLSingleView::RegisterEffects();
 
     // --------------------------------------------------------------------
 

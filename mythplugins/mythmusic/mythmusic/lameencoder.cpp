@@ -118,7 +118,7 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
 
 LameEncoder::~LameEncoder()
 {
-    addSamples(nullptr, 0); //flush
+    LameEncoder::addSamples(nullptr, 0); //flush
 
     if (m_gf && m_out)
         lame_mp3_tags_fid (m_gf, m_out);

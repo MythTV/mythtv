@@ -2240,7 +2240,7 @@ class MPUBLIC MythArchiveHelperCommandLineParser : public MythCommandLineParser
 
 MythArchiveHelperCommandLineParser::MythArchiveHelperCommandLineParser() :
     MythCommandLineParser("mytharchivehelper")
-{ LoadArguments(); }
+{ MythArchiveHelperCommandLineParser::LoadArguments(); }
 
 void MythArchiveHelperCommandLineParser::LoadArguments(void)
 {
