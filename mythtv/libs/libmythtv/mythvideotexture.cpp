@@ -123,7 +123,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         texture->m_target      = Target;
         texture->m_size        = Sizes[plane];
         texture->m_totalSize   = Context->GetTextureSize(Sizes[plane], texture->m_target != QOpenGLTexture::TargetRectangle);
-        texture->m_vbo         = Context->CreateVBO(MythRenderOpenGL::kVertexSize);
+        texture->m_vbo         = Context->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
         result.push_back(texture);
     }
 
@@ -354,7 +354,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
     result->m_target      = Target;
     result->m_pixelFormat = PixelFormat;
     result->m_pixelType   = PixelType;
-    result->m_vbo         = Context->CreateVBO(MythRenderOpenGL::kVertexSize);
+    result->m_vbo         = Context->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
     result->m_totalSize   = Context->GetTextureSize(Size, result->m_target != QOpenGLTexture::TargetRectangle);
     result->m_bufferSize  = datasize;
     result->m_size        = Size;
@@ -363,7 +363,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 
 /// \brief Copy YV12 frame data to 'YV12' textures.
 inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
-                                         MythVideoTexture *Texture, int Plane)
+                                         MythVideoTexture *Texture, uint Plane)
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
@@ -441,7 +441,7 @@ inline void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame, MythVideoTex
 
 /// \brief Copy NV12 video frame data to 'NV12' textures.
 inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
-                                         MythVideoTexture *Texture, int Plane)
+                                         MythVideoTexture *Texture, uint Plane)
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {

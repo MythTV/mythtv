@@ -63,10 +63,10 @@ class MythVideoTexture : public MythGLTexture
 
   private:
     Q_DISABLE_COPY(MythVideoTexture)
-    static void YV12ToYV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, int Plane);
+    static void YV12ToYV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
     static void YV12ToYUYV   (const VideoFrame *Frame, MythVideoTexture* Texture);
     static void YV12ToYUYVHQ (const VideoFrame *Frame, MythVideoTexture* Texture);
-    static void NV12ToNV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, int Plane);
+    static void NV12ToNV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
     static bool CreateBuffer (MythVideoTexture* Texture, int Size);
     static void StoreBicubicWeights(float X, float *Dest);
 };
