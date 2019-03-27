@@ -150,7 +150,7 @@ V4L2encStreamHandler::V4L2encStreamHandler(const QString & device,
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("-- Failed to open %1: ")
             .arg(m_device) + ENO);
-        m_error = true;
+        m_bError = true;
         return;
     }
     LOG(VB_RECORD, LOG_INFO, LOC + QString("'%1' open").arg(m_device));
@@ -177,7 +177,7 @@ void V4L2encStreamHandler::run(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("run() -- Failed to open %1: ")
                 .arg(m_device) + ENO);
-            m_error = true;
+            m_bError = true;
             return;
         }
     }
@@ -238,7 +238,7 @@ void V4L2encStreamHandler::run(void)
         else if (m_drb->IsEOF())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "run() -- Device EOF detected");
-            m_error = true;
+            m_bError = true;
         }
         else
         {
