@@ -561,7 +561,6 @@ static void SSE_splitplanes(uint8_t *dstu, int dstu_pitch,
 #endif // ARCH_X86
 
 MythUSWCCopy::MythUSWCCopy(int width, bool nocache)
-    :m_cache(nullptr), m_size(0), m_uswc(-1)
 {
 #if ARCH_X86
     if (!nocache)
@@ -608,9 +607,9 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
         {
             MythTimer *timer;
 
-            if (m_uswc <= 0 && m_cache)
+            if ((m_uswc != uswcState::Use_SW) && m_cache)
             {
-                if (m_uswc < 0)
+                if (m_uswc == uswcState::Detect)
                 {
                     timer = new MythTimer(MythTimer::kStartRunning);
                 }
@@ -623,11 +622,11 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
                                 src->buf + src->offsets[1], src->pitches[1],
                                 m_cache, m_size,
                                 (width+1) / 2, (height+1) / 2);
-                if (m_uswc < 0)
+                if (m_uswc == uswcState::Detect)
                 {
                     // Measure how long standard method takes
                     // if shorter, use it in the future
-                    long duration = timer->nsecsElapsed();
+                    long sse_duration = timer->nsecsElapsed();
                     timer->restart();
                     copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
                               src->buf + src->offsets[0], src->pitches[0],
@@ -636,10 +635,14 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
                                     dst->buf + dst->offsets[2], dst->pitches[2],
                                     src->buf + src->offsets[1], src->pitches[1],
                                     (width+1) / 2, (height+1) / 2);
-                    m_uswc = timer->nsecsElapsed() < duration;
-                    if (m_uswc == 0)
+                    if (timer->nsecsElapsed() < sse_duration)
                     {
+                        m_uswc = uswcState::Use_SW;
                         LOG(VB_GENERAL, LOG_DEBUG, "Enabling USWC code acceleration");
+                    }
+                    else
+                    {
+                        m_uswc = uswcState::Use_SSE;
                     }
                     delete timer;
                 }
@@ -669,11 +672,11 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
     }
 
 #if ARCH_X86
-    if (sse2_check() && m_uswc <= 0 && m_cache)
+    if (sse2_check() && (m_uswc != uswcState::Use_SW) && m_cache)
     {
         MythTimer *timer;
 
-        if (m_uswc < 0)
+        if (m_uswc == uswcState::Detect)
         {
             timer = new MythTimer(MythTimer::kStartRunning);
         }
@@ -689,11 +692,11 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
                       src->buf + src->offsets[2], src->pitches[2],
                       m_cache, m_size,
                       (width+1) / 2, (height+1) / 2);
-        if (m_uswc < 0)
+        if (m_uswc == uswcState::Detect)
         {
             // Measure how long standard method takes
             // if shorter, use it in the future
-            long duration = timer->nsecsElapsed();
+            long sse_duration = timer->nsecsElapsed();
             timer->restart();
             copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
                       src->buf + src->offsets[0], src->pitches[0],
@@ -704,10 +707,14 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
             copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
                       src->buf + src->offsets[2], src->pitches[2],
                       (width+1) / 2, (height+1) / 2);
-            m_uswc = timer->nsecsElapsed() < duration;
-            if (m_uswc == 0)
+            if (timer->nsecsElapsed() < sse_duration)
             {
+                m_uswc = uswcState::Use_SW;
                 LOG(VB_GENERAL, LOG_DEBUG, "Enabling USWC code acceleration");
+            }
+            else
+            {
+                m_uswc = uswcState::Use_SSE;
             }
             delete timer;
         }
@@ -731,7 +738,7 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
  */
 void MythUSWCCopy::resetUSWCDetection(void)
 {
-    m_uswc = -1;
+    m_uswc = uswcState::Detect;
 }
 
 void MythUSWCCopy::allocateCache(int width)
@@ -747,7 +754,7 @@ void MythUSWCCopy::allocateCache(int width)
  */
 void MythUSWCCopy::setUSWC(bool uswc)
 {
-    m_uswc = !uswc;
+    m_uswc = uswc ? uswcState::Use_SW : uswcState::Use_SSE;
 }
 
 /**
