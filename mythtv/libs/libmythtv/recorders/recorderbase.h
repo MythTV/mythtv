@@ -112,6 +112,13 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     virtual void SetOption(const QString &name, int value);
 
+    /** \brief Set an specific boolean option.
+     *
+     *   This is a helper function to enforce type checking.
+     */
+    void SetBoolOption(const QString &name, bool value)
+        { SetOption(name, static_cast<int>(value)); }
+
     /** \brief Tells recorder which filters to use.
      *
      *   These filters are used by frame grabber encoders to lower

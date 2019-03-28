@@ -875,7 +875,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<HDHRChannel*>(channel))
         {
             recorder = new HDHRRecorder(tvrec, dynamic_cast<HDHRChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_HDHOMERUN
     }
@@ -885,7 +885,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<CetonChannel*>(channel))
         {
             recorder = new CetonRecorder(tvrec, dynamic_cast<CetonChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_CETON
     }
@@ -895,7 +895,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<DVBChannel*>(channel))
         {
             recorder = new DVBRecorder(tvrec, dynamic_cast<DVBChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_DVB
     }
@@ -922,7 +922,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<ASIChannel*>(channel))
         {
             recorder = new ASIRecorder(tvrec, dynamic_cast<ASIChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_ASI
     }
@@ -943,7 +943,7 @@ RecorderBase *RecorderBase::CreateRecorder(
 #if CONFIG_LIBMP3LAME && defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
-        recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
+        recorder->SetBoolOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L2
     }
     else if (genOpt.inputtype == "EXTERNAL")
