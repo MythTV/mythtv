@@ -601,7 +601,7 @@ bool WaitFor(MythConfirmationDialog *dialog)
     { block.exit(result ? 1 : 0); });
 
     // Block and return dialog result
-    return block.exec();
+    return block.exec() != 0;
 }
 
 /////////////////////////////////////////////////////////////////
