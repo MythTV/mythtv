@@ -481,7 +481,7 @@ bool MythSocket::Announce(const QStringList &new_announce)
     WriteStringList(new_announce);
 
     QStringList tmplist;
-    if (!ReadStringList(tmplist, true))
+    if (!ReadStringList(tmplist, MythSocket::kShortTimeout))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("\n\t\t\tCould not read string list from server %1:%2")
