@@ -533,7 +533,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
         }
     }
     if (!st)
-        return false;
+        return 0;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(m_ic->start_time,
