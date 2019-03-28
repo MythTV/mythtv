@@ -4375,7 +4375,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     if (gotSubtitles)
     {
         if (isForcedTrack)
-            subtitle.forced = true;
+            subtitle.forced = static_cast<int>(true);
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
             QString("subtl timecode %1 %2 %3 %4")
                 .arg(pkt->pts).arg(pkt->dts)

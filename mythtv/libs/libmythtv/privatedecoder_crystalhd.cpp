@@ -82,7 +82,7 @@ PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
     INIT_ST;
     if (m_device_type != BC_70015)
     {
-        st = DtsFlushRxCapture(m_device, false);
+        st = DtsFlushRxCapture(m_device, static_cast<int>(false));
         CHECK_ST;
     }
     st = DtsStopDecoder(m_device);
@@ -495,7 +495,7 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
         // TODO check for busy state
         INIT_ST;
-        st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
+        st = DtsProcInput(m_device, buf, size, chd_timestamp, static_cast<int>(false));
         CHECK_ST;
 
         if (free_buf)
@@ -609,7 +609,7 @@ void PrivateDecoderCrystalHD::FetchFrames(void)
 
         if (ok && valid && (out.PoutFlags & BC_POUT_FLAGS_PIB_VALID))
             FillFrame(&out);
-        st = DtsReleaseOutputBuffs(m_device, nullptr, false);
+        st = DtsReleaseOutputBuffs(m_device, nullptr, static_cast<int>(false));
         CHECK_ST;
     }
 }
