@@ -197,6 +197,11 @@ static int get_int_option(RecordingProfile *profile, const QString &name)
     return ret_int;
 }
 
+static int get_bool_option(RecordingProfile *profile, const QString &name)
+{
+    return static_cast<int>(get_int_option(profile, name));
+}
+
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
                                int timecode, int pagenr)
 {
@@ -650,7 +655,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         vidfilters = get_str_option(m_recProfile, "transcodefilters");
 
         if (encodingType == "MPEG-2" &&
-            get_int_option(m_recProfile, "transcodelossless"))
+            get_bool_option(m_recProfile, "transcodelossless"))
         {
             LOG(VB_GENERAL, LOG_NOTICE, "Switching to MPEG-2 transcoder.");
             SetPlayerContext(nullptr);
@@ -658,12 +663,12 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         // Recorder setup
-        if (get_int_option(m_recProfile, "transcodelossless"))
+        if (get_bool_option(m_recProfile, "transcodelossless"))
         {
             vidsetting = encodingType;
             audsetting = "MP3";
         }
-        else if (get_int_option(m_recProfile, "transcoderesize"))
+        else if (get_bool_option(m_recProfile, "transcoderesize"))
         {
             int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
