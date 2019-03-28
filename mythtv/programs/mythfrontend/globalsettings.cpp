@@ -612,7 +612,7 @@ static GlobalCheckBoxSetting *RerecordWatched()
 
 static GlobalSpinBoxSetting *RecordPreRoll()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record before start of show "
                                      "(secs)"));
@@ -630,7 +630,7 @@ static GlobalSpinBoxSetting *RecordPreRoll()
 
 static GlobalSpinBoxSetting *RecordOverTime()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record past end of show (secs)"));
 
@@ -678,7 +678,7 @@ static GlobalComboBoxSetting *OverTimeCategory()
 static GlobalSpinBoxSetting *CategoryOverTime()
 {
     GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CategoryOverTime",
-                                          0, 180, 60, true);
+                                          0, 180, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Record past end of show (mins)"));
 
@@ -714,7 +714,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_codecs       = new TransMythUIComboBoxSetting(true);
     m_framerate    = new TransTextEditSetting();
     m_decoder      = new TransMythUIComboBoxSetting();
-    m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, true);
+    m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
     m_skiploop     = new TransMythUICheckBoxSetting();
     m_vidrend      = new TransMythUIComboBoxSetting();
     m_osdrend      = new TransMythUIComboBoxSetting();
@@ -2091,7 +2091,7 @@ static HostComboBoxSetting *AdjustFill()
 
 static HostSpinBoxSetting *GuiWidth()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
@@ -2107,7 +2107,7 @@ static HostSpinBoxSetting *GuiWidth()
 
 static HostSpinBoxSetting *GuiHeight()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
@@ -2123,7 +2123,7 @@ static HostSpinBoxSetting *GuiHeight()
 
 static HostSpinBoxSetting *GuiOffsetX()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI X offset"));
 
@@ -2137,7 +2137,7 @@ static HostSpinBoxSetting *GuiOffsetX()
 
 static HostSpinBoxSetting *GuiOffsetY()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI Y offset"));
 
@@ -2212,7 +2212,7 @@ static HostSpinBoxSetting *VidModeWidth(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
-                               0, 3840, 16, true);
+                               0, 3840, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
@@ -2228,7 +2228,7 @@ static HostSpinBoxSetting *VidModeHeight(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
-                               0, 2160, 16, true);
+                               0, 2160, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
@@ -3539,7 +3539,7 @@ static HostCheckBoxSetting *LCDShowMenu()
 
 static HostSpinBoxSetting *LCDPopupTime()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, 1);
 
     gs->setLabel(LcdSettings::tr("Menu pop-up time"));
 
