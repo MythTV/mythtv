@@ -527,7 +527,9 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table (other)");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Service Description Table (other) for Transport ID %1")
+            .arg(tsid));
     LogLines(sdt->toString());
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;

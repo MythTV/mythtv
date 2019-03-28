@@ -69,7 +69,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     // try to find a valid channel if given start channel fails.
     QString msg1 = QString("Setting start channel '%1' failed, ")
         .arg(startchannel);
-    QString msg2 = "and we failed to find any suitible channels on any input.";
+    QString msg2 = "and we failed to find any suitable channels on any input.";
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
