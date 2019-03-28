@@ -291,12 +291,7 @@ namespace
         Q_OBJECT
 
       public:
-        FanartLoader()
-        {
-            // NOTE: Moved call to connect to first call of LoadImage/
-            //       Having it here causes a runtime error on windows
-        }
-
+        FanartLoader() = default;
        ~FanartLoader() override
         {
             m_fanartTimer.stop();

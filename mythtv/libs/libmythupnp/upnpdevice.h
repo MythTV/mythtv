@@ -173,8 +173,8 @@ class UPNP_PUBLIC UPnpDeviceDesc
 
     public:
 
-                 UPnpDeviceDesc();
-        virtual ~UPnpDeviceDesc();
+                 UPnpDeviceDesc() = default;
+        virtual ~UPnpDeviceDesc() = default;
 
         bool     Load       ( const QString &sFileName );
         bool     Load       ( const QDomDocument &xmlDevDesc );
