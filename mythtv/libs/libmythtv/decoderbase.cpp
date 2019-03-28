@@ -940,7 +940,7 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 int DecoderBase::SetTrack(uint type, int trackNo)
 {
     if (trackNo >= (int)m_tracks[type].size())
-        return false;
+        return -1;
 
     QMutexLocker locker(avcodeclock);
 
@@ -1010,14 +1010,14 @@ int DecoderBase::AutoSelectTrack(uint type)
     if ((m_currentTrack[type] >= 0) &&
         (m_currentTrack[type] < (int)numStreams))
     {
-        return true; // track already selected
+        return m_currentTrack[type]; // track already selected
     }
 
     if (!numStreams)
     {
         m_currentTrack[type] = -1;
         m_selectedTrack[type].m_av_stream_index = -1;
-        return false; // no tracks available
+        return -1; // no tracks available
     }
 
     int selTrack = (1 == numStreams) ? 0 : -1;

@@ -4449,7 +4449,7 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 
 int AvFormatDecoder::SetTrack(uint type, int trackNo)
 {
-    bool ret = DecoderBase::SetTrack(type, trackNo);
+    int ret = DecoderBase::SetTrack(type, trackNo);
 
     if (kTrackTypeAudio == type)
     {
@@ -4577,7 +4577,7 @@ bool AvFormatDecoder::SetAudioByComponentTag(int tag)
             if ((s->component_tag == tag) ||
                 ((tag <= 0) && s->component_tag <= 0))
             {
-                return SetTrack(kTrackTypeAudio, i);
+                return SetTrack(kTrackTypeAudio, i) != -1;
             }
         }
     }
