@@ -3317,7 +3317,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
         if (seen_708[i] && !m_ccX08_in_pmt[i+4])
         {
             StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                          i, false/*easy*/, true/*wide*/);
+                          i, 0, false/*easy*/, true/*wide*/);
             m_stream_tracks.push_back(si);
             m_stream_track_types.push_back(kTrackTypeCC708);
         }
@@ -3334,7 +3334,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
                 lang = iso639_str3_to_key("und");
 
             StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                          i+1, false/*easy*/, false/*wide*/);
+                          i+1, 0, false/*easy*/, false/*wide*/);
             m_stream_tracks.push_back(si);
             m_stream_track_types.push_back(kTrackTypeCC608);
         }
