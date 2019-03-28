@@ -485,6 +485,8 @@ void SubtitleFormat::Load(const QString &family,
         dynamic_cast<MythUIShape *>(baseParent->GetChild(prefix));
     if (!resultBG)
         resultBG = providerBaseShape;
+    else
+        delete providerBaseShape;
     MythFontProperties *testFont = negParent->GetFont(prefix);
     if (!testFont)
         testFont = negFont;
