@@ -2287,10 +2287,10 @@ static QString add_spacer(const QString &channel, const QString &spacer)
  *
  *   If the prefix matches any channel entirely (i.e. prefix == channum),
  *   then the inputid of the recorder it matches is returned in
- *   'is_complete_valid_channel_on_rec'; if it matches multiple recorders,
+ *   'complete_valid_channel_on_rec'; if it matches multiple recorders,
  *   and one of them is this recorder, this recorder is returned in
- *   'is_complete_valid_channel_on_rec'; if it isn't complete for any channel
- *    on any recorder 'is_complete_valid_channel_on_rec' is set to zero.
+ *   'complete_valid_channel_on_rec'; if it isn't complete for any channel
+ *    on any recorder 'complete_valid_channel_on_rec' is set to zero.
  *
  *   If adding another character could reduce the number of channels the
  *   prefix matches 'is_extra_char_useful' is set to true, otherwise it
@@ -2307,7 +2307,7 @@ static QString add_spacer(const QString &channel, const QString &spacer)
  *  \return true if this is a valid prefix for a channel, false otherwise
  */
 bool TVRec::CheckChannelPrefix(const QString &prefix,
-                               uint          &is_complete_valid_channel_on_rec,
+                               uint          &complete_valid_channel_on_rec,
                                bool          &is_extra_char_useful,
                                QString       &needed_spacer)
 {
@@ -2372,7 +2372,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     // Now process the lists for the info we need...
     is_extra_char_useful = false;
-    is_complete_valid_channel_on_rec = 0;
+    complete_valid_channel_on_rec = 0;
     needed_spacer.clear();
 
     if (fchanid.empty())
@@ -2383,7 +2383,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         needed_spacer = fspacer[0];
         bool nc       = (fchannum[0] != add_spacer(prefix, fspacer[0]));
 
-        is_complete_valid_channel_on_rec = (nc) ? 0 : finputid[0];
+        complete_valid_channel_on_rec = (nc) ? 0 : finputid[0];
         is_extra_char_useful             = nc;
         return true;
     }
@@ -2404,19 +2404,19 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     }
 
     // Are any of the channels complete w/o spacer?
-    // If so set is_complete_valid_channel_on_rec,
+    // If so set complete_valid_channel_on_rec,
     // with a preference for our inputid.
     for (uint i = 0; i < fchannum.size(); i++)
     {
         if (fchannum[i] == prefix)
         {
-            is_complete_valid_channel_on_rec = finputid[i];
+            complete_valid_channel_on_rec = finputid[i];
             if (finputid[i] == m_inputid)
                 break;
         }
     }
 
-    if (is_complete_valid_channel_on_rec)
+    if (complete_valid_channel_on_rec != 0)
         return true;
 
     // Add a spacer, if one is needed to select a valid channel.
@@ -2433,7 +2433,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {
             needed_spacer = fspacer[i];
-            is_complete_valid_channel_on_rec = finputid[i];
+            complete_valid_channel_on_rec = finputid[i];
             return true;
         }
     }
