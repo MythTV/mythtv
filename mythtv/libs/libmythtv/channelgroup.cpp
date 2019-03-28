@@ -13,7 +13,7 @@ inline bool lt_group(const ChannelGroupItem &a, const ChannelGroupItem &b)
     return QString::localeAwareCompare(a.m_name, b.m_name) < 0;
 }
 
-bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
+bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, bool delete_chan)
 {
     // Check if it already exists for that chanid...
     MSqlQuery query(MSqlQuery::InitCon());

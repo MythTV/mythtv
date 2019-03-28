@@ -467,7 +467,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
         int priority = ( blk_buf[i+1]  ) & 0x7;
         int col_lock = (blk_buf[i+1]>>3) & 0x1;
         int row_lock = (blk_buf[i+1]>>4) & 0x1;
-        int visible  = (blk_buf[i+1]>>5) & 0x1;
+        bool visible  = ((blk_buf[i+1]>>5) & 0x1) != 0;
         // param2
         int anchor_vertical = blk_buf[i+2] & 0x7f;
         int relative_pos = (blk_buf[i+2]>>7);
@@ -627,7 +627,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         return;
 
 #if DEBUG_CC_RAWPACKET
-    if (1)
+    if (true)
 #elif DEBUG_CAPTIONS
     if (len > pkt_size)
 #else

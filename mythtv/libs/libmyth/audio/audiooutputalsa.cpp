@@ -106,7 +106,7 @@ AudioOutputALSA::~AudioOutputALSA()
     KillAudio();
 }
 
-int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
+int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
 {
     QString real_device;
     QByteArray dev_ba;

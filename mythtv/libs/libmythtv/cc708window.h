@@ -186,7 +186,7 @@ class MTV_PUBLIC CC708Window
     CC708Window() = default;
     ~CC708Window();
 
-    void DefineWindow(int priority,         int visible,
+    void DefineWindow(int priority,         bool visible,
                       int anchor_point,     int relative_pos,
                       int anchor_vertical,  int anchor_horizontal,
                       int row_count,        int column_count,

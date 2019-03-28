@@ -40,7 +40,7 @@ class MTV_PUBLIC ChannelGroup
   public:
     // ChannelGroup 
     static ChannelGroupList  GetChannelGroups(bool includeEmpty = true);
-    static bool              ToggleChannel(uint chanid, int changrpid, int delete_chan);
+    static bool              ToggleChannel(uint chanid, int changrpid, bool delete_chan);
     static bool              AddChannel(uint chanid, int changrpid);
     static bool              DeleteChannel(uint chanid, int changrpid);
     static int               GetNextChannelGroup(const ChannelGroupList &sorted, int grpid);
