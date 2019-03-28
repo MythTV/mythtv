@@ -369,8 +369,10 @@ void DTVSignalMonitor::HandlePMT(uint /*program_num*/, const ProgramMapTable *pm
 
     for (uint i = 0; i < pmt->StreamCount(); i++)
     {
-        hasVideo += pmt->IsVideo(i, GetDTVChannel()->GetSIStandard());
-        hasAudio += pmt->IsAudio(i, GetDTVChannel()->GetSIStandard());
+        if (pmt->IsVideo(i, GetDTVChannel()->GetSIStandard()))
+            hasVideo++;
+        if (pmt->IsAudio(i, GetDTVChannel()->GetSIStandard()))
+            hasAudio++;
     }
 
     if ((hasVideo >= GetStreamData()->GetVideoStreamsRequired()) &&
