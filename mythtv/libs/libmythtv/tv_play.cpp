@@ -6622,7 +6622,7 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     }
     else
     {
-        if (m_smartForward & m_doSmartForward)
+        if (m_smartForward && m_doSmartForward)
             DoSeek(actx, actx->m_rewtime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/!(flags & kIgnoreCutlist));
