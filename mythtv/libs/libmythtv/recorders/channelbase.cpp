@@ -484,7 +484,7 @@ void ChannelBase::HandleScriptEnd(bool ok)
 int ChannelBase::GetChanID(void) const
 {
     if (!m_inputid)
-        return false;
+        return -1;
 
     int found   = 0;
     int visible = -1;
