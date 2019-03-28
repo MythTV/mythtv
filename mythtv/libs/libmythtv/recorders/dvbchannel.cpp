@@ -49,11 +49,7 @@
 #include "dvbcam.h"
 #include "tv_rec.h"
 
-// Returned by drivers on unsupported dvbv3 ioctl calls
-#ifndef ENOTSUPP
-#define ENOTSUPP 524
-#endif
-
+// Local functions
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
@@ -509,7 +505,6 @@ void DVBChannel::SetTimeOffset(double offset)
         m_dvbcam->SetTimeOffset(offset);
 }
 
-
 bool DVBChannel::Tune(const DTVMultiplex &tuning)
 {
     if (!m_inputid)
@@ -520,7 +515,6 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning)
     return Tune(tuning, false, false);
 }
 
-#if DVB_API_VERSION >= 5
 static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     DTVTunerType tuner_type, const DTVMultiplex &tuning, int intermediate_freq,
     bool can_fec_auto, bool do_tune = true)
@@ -624,8 +618,6 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
 
     return cmdseq;
 }
-#endif
-
 
 /*****************************************************************************
            Tuning functions for each of the five types of cards.
@@ -652,7 +644,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     DVBChannel *master = GetMasterLock();
     if (master != this)
     {
-        LOG(VB_CHANNEL, LOG_INFO, LOC + "tuning on slave channel");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning on slave channel");
         SetSIStandard(tuning.m_sistandard);
         bool ok = master->Tune(tuning, force_reset, false);
         ReturnMasterLock(master);
@@ -668,7 +660,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     if (m_tunerType.IsDiSEqCSupported() && !m_diseqc_tree)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "DVB-S needs device tree for LNB handling");
+            "DVB-S/S2 needs device tree for LNB handling");
         return false;
     }
 
@@ -763,7 +755,6 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             CheckFrequency(intermediate_freq);
         }
 
-#if DVB_API_VERSION >=5
         if (DTVTunerType::kTunerTypeDVBS2 == m_tunerType ||
             DTVTunerType::kTunerTypeDVBT2 == m_tunerType)
         {
@@ -814,7 +805,6 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             }
         }
         else
-#endif
         {
             struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(
                 m_tunerType, tuning, intermediate_freq, can_fec_auto);
@@ -1037,7 +1027,6 @@ bool DVBChannel::HasLock(bool *ok) const
     return status & FE_HAS_LOCK;
 }
 
-#if DVB_API_VERSION >=5
 // documented in dvbchannel.h
 double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
 {
@@ -1083,12 +1072,11 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
     }
     else
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            "Getting V5 Frontend signal strength failed." + ENO);
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            "Getting DVBv5 Frontend signal strength failed." + ENO);
     }
     return value;
 }
-#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetSignalStrength(bool *ok) const
@@ -1102,19 +1090,23 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     }
     ReturnMasterLock(master); // if we're the master we don't need this lock..
 
+    // Read signal strength from driver with DVBv5 API calls
+    bool tmpOk = false;
+    double result = GetSignalStrengthDVBv5(&tmpOk);
+    if (tmpOk)
+    {
+        if (ok)
+            *ok = tmpOk;
+        return result;
+    }
+    // If this failed we try the DVBv3 API call
+
     // We use uint16_t for sig because this is correct for DVB API 4.0,
     // and works better than the correct int16_t for the 3.x API
     uint16_t sig = 0;
-
     int ret = ioctl(m_fd_frontend, FE_READ_SIGNAL_STRENGTH, &sig);
     if (ret < 0)
     {
-#if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetSignalStrengthDVBv5(ok);
-        }
-#endif
         LOG(VB_RECORD, LOG_ERR, LOC +
             "Getting Frontend signal strength failed." + ENO);
     }
@@ -1125,7 +1117,6 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     return sig * (1.0 / 65535.0);
 }
 
-#if DVB_API_VERSION >=5
 // documented in dvbchannel.h
 double DVBChannel::GetSNRDVBv5(bool *ok) const
 {
@@ -1171,12 +1162,11 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Getting V5 Frontend signal/noise ratio failed." + ENO);
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            "Getting DVBv5 Frontend signal/noise ratio failed." + ENO);
     }
     return value;
 }
-#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetSNR(bool *ok) const
@@ -1190,20 +1180,24 @@ double DVBChannel::GetSNR(bool *ok) const
     }
     ReturnMasterLock(master); // if we're the master we don't need this lock..
 
+    // Read signal/noise ratio from driver with DVBv5 API calls
+    bool tmpOk = false;
+    double result = GetSNRDVBv5(&tmpOk);
+    if (tmpOk)
+    {
+        if (ok)
+            *ok = tmpOk;
+        return result;
+    }
+    // If this failed we try the DVBv3 API call
+
     // We use uint16_t for sig because this is correct for DVB API 4.0,
     // and works better than the correct int16_t for the 3.x API
-
     uint16_t snr = 0;
     int ret = ioctl(m_fd_frontend, FE_READ_SNR, &snr);
     if (ret < 0)
     {
-#if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetSNRDVBv5(ok);
-        }
-#endif
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_RECORD, LOG_ERR, LOC +
             "Getting Frontend signal/noise ratio failed." + ENO);
     }
 
@@ -1213,7 +1207,6 @@ double DVBChannel::GetSNR(bool *ok) const
     return snr * (1.0 / 65535.0);
 }
 
-#if DVB_API_VERSION >=5
 // documented in dvbchannel.h
 double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
 {
@@ -1245,12 +1238,11 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Getting V5 Frontend signal error rate failed." + ENO);
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            "Getting DVBv5 Frontend bit error rate failed." + ENO);
     }
     return value;
 }
-#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetBitErrorRate(bool *ok) const
@@ -1264,18 +1256,23 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     }
     ReturnMasterLock(master); // if we're the master we don't need this lock..
 
+    // Read bit error rate from driver with DVBv5 API calls
+    bool tmpOk = false;
+    double result = GetBitErrorRateDVBv5(&tmpOk);
+    if (tmpOk)
+    {
+        if (ok)
+            *ok = tmpOk;
+        return result;
+    }
+    // If this failed we try the DVBv3 API call
+
     uint32_t ber = 0;
     int ret = ioctl(m_fd_frontend, FE_READ_BER, &ber);
     if (ret < 0)
     {
-#if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetBitErrorRateDVBv5(ok);
-        }
-#endif
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Getting Frontend signal error rate failed." + ENO);
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            "Getting Frontend bit error rate failed." + ENO);
     }
 
     if (ok)
@@ -1284,7 +1281,6 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     return (double) ber;
 }
 
-#if DVB_API_VERSION >=5
 // documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
 {
@@ -1309,12 +1305,11 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Getting V5 Frontend uncorrected block count failed." + ENO);
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            "Getting DVBv5 Frontend uncorrected block count failed." + ENO);
     }
     return value;
 }
-#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
@@ -1328,16 +1323,21 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
     }
     ReturnMasterLock(master); // if we're the master we don't need this lock..
 
+    // Read uncorrected block count from driver with DVBv5 API calls
+    bool tmpOk = false;
+    double result = GetUncorrectedBlockCountDVBv5(&tmpOk);
+    if (tmpOk)
+    {
+        if (ok)
+            *ok = tmpOk;
+        return result;
+    }
+    // If this failed we try the DVBv3 API call
+
     uint32_t ublocks = 0;
     int ret = ioctl(m_fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ublocks);
     if (ret < 0)
     {
-#if DVB_API_VERSION >=5
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetUncorrectedBlockCountDVBv5(ok);
-        }
-#endif
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend uncorrected block count failed." + ENO);
     }
