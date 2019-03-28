@@ -3241,7 +3241,7 @@ void ProgramInfo::SaveAutoExpire(AutoExpireType autoExpire, bool updateDelete)
     else if (updateDelete)
         UpdateLastDelete(true);
 
-    set_flag(m_programflags, FL_AUTOEXP, (uint)autoExpire);
+    set_flag(m_programflags, FL_AUTOEXP, autoExpire != kDisableAutoExpire);
 
     SendUpdateEvent();
 }
