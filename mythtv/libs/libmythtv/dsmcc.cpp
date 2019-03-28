@@ -230,7 +230,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     }
 
     unsigned short userInfoLength = (data[off] << 8) | data[off+1];
-    off += 2;
+    // off += 2;
     if (userInfoLength)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[dsmcc] DSI unexpected userInfo");
