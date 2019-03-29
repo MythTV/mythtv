@@ -31,7 +31,7 @@ bool TSStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (tspacket.Scrambled())
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "ProcessTSPacket: Scrambled.");
 
-    for (uint j = 0; j < _ts_writing_listeners.size(); j++)
+    for (size_t j = 0; j < _ts_writing_listeners.size(); j++)
         _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
 
     return true;

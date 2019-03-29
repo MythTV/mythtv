@@ -84,7 +84,7 @@ QString DisplayResScreen::toString() const
 {
     QString str = QString("%1:%2:%3:%4:%5")
         .arg(m_width).arg(m_height).arg(m_width_mm).arg(m_height_mm).arg(m_aspect);
-    for (uint i=0; i<m_refreshRates.size(); ++i)
+    for (size_t i=0; i<m_refreshRates.size(); ++i)
         str.append(QString(":%1").arg(m_refreshRates[i]));
     return str;
 }
@@ -92,7 +92,7 @@ QString DisplayResScreen::toString() const
 QStringList DisplayResScreen::Convert(const DisplayResVector& dsr)
 {
     QStringList slist;
-    for (uint i=0; i<dsr.size(); ++i)
+    for (size_t i=0; i<dsr.size(); ++i)
         slist += dsr[i].toString();
     return slist;
 }
@@ -128,7 +128,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
     }
 
     // Amend vector with custom list
-    for (uint i=0; i<dsr.size(); ++i)
+    for (size_t i=0; i<dsr.size(); ++i)
     {
         if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height())
         {
@@ -141,7 +141,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                          precision < 1.0;
                          precision *= 10.0)
                     {
-                        for (uint j=0; j < rates.size(); ++j)
+                        for (size_t j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(videorate,rates[j], precision) ||
@@ -161,7 +161,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                          precision *= 10.0)
                     {
                         double rounded = round(videorate);
-                        for (uint j=0; j < rates.size(); ++j)
+                        for (size_t j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(rounded,rates[j], precision) ||

@@ -156,7 +156,7 @@ bool setupTVs(bool ismaster, bool &error)
 
     QWriteLocker tvlocker(&TVRec::s_inputsLock);
 
-    for (uint i = 0; i < cardids.size(); i++)
+    for (size_t i = 0; i < cardids.size(); i++)
     {
         if (hosts[i] == localhostname) {
             // No memory leak. The constructor for TVRec adds the item
@@ -165,7 +165,7 @@ bool setupTVs(bool ismaster, bool &error)
         }
     }
 
-    for (uint i = 0; i < cardids.size(); i++)
+    for (size_t i = 0; i < cardids.size(); i++)
     {
         uint    cardid = cardids[i];
         QString host   = hosts[i];

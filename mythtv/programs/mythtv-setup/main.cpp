@@ -461,7 +461,7 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
             cerr << "Valid cards: " << endl;
-            for (uint i = 0; i < cardids.size(); i++)
+            for (size_t i = 0; i < cardids.size(); i++)
             {
                 fprintf(stderr, "%5u: %s %s\n",
                         cardids[i],
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
         vector<ScanInfo> scans = LoadScanList();
 
         cout<<" scanid cardid sourceid processed        date"<<endl;
-        for (uint i = 0; i < scans.size(); i++)
+        for (size_t i = 0; i < scans.size(); i++)
         {
             printf("%5i %6i %8i %8s    %20s\n",
                    scans[i].m_scanid,   scans[i].m_cardid,

@@ -1295,7 +1295,7 @@ void DTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat,
     pat->tsheader()->SetContinuityCounter(next_cc);
     pat->GetAsTSPackets(m_scratch, next_cc);
 
-    for (uint i = 0; i < m_scratch.size(); ++i)
+    for (size_t i = 0; i < m_scratch.size(); ++i)
         DTVRecorder::BufferedWrite(m_scratch[i], insert);
 }
 
@@ -1409,7 +1409,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
     pmt->tsheader()->SetContinuityCounter(next_cc);
     pmt->GetAsTSPackets(m_scratch, next_cc);
 
-    for (uint i = 0; i < m_scratch.size(); ++i)
+    for (size_t i = 0; i < m_scratch.size(); ++i)
         DTVRecorder::BufferedWrite(m_scratch[i], insert);
 }
 

@@ -143,7 +143,7 @@ void StereoScope::resize( const QSize &newsize )
 {
     m_size = newsize;
 
-    uint os = m_magnitudes.size();
+    auto os = m_magnitudes.size();
     m_magnitudes.resize( m_size.width() * 2 );
     for ( ; os < m_magnitudes.size(); os++ )
         m_magnitudes[os] = 0.0;

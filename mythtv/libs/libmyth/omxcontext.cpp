@@ -259,7 +259,7 @@ OMX_ERRORTYPE OMXComponent::Init(OMX_INDEXTYPE type)
     m_portdefs.resize(port.nPorts);
 
     // Read the default port definitions
-    for (unsigned i = 0; i < port.nPorts; ++i)
+    for (size_t i = 0; i < port.nPorts; ++i)
     {
         e = GetPortDef(i);
         if (OMX_ErrorNone != e)

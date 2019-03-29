@@ -130,7 +130,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
     if (cardtypes.empty())
         return CardUtil::ERROR_PROBE;
 
-    for (uint i = 1; i < cardtypes.size(); i++)
+    for (size_t i = 1; i < cardtypes.size(); i++)
     {
         CardUtil::INPUT_TYPES typeA = cardtypes[i - 1];
         typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;

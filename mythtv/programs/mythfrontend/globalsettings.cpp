@@ -294,7 +294,7 @@ static GlobalComboBoxSetting *CommercialSkipMethod()
 
     deque<int> tmp = GetPreferredSkipTypeCombinations();
 
-    for (uint i = 0; i < tmp.size(); ++i)
+    for (size_t i = 0; i < tmp.size(); ++i)
         bc->addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
 
     return bc;
@@ -1171,7 +1171,7 @@ void PlaybackProfileConfig::InitUI(StandardSetting *parent)
 
     connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
 
-    for (uint i = 0; i < m_items.size(); ++i)
+    for (size_t i = 0; i < m_items.size(); ++i)
         InitProfileItem(i, parent);
 }
 
@@ -2250,7 +2250,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
                                           "watching a video."));
 
     const vector<DisplayResScreen> scr = GetVideoModes();
-    for (uint i=0; i<scr.size(); ++i)
+    for (size_t i=0; i<scr.size(); ++i)
     {
         int w = scr[i].Width(), h = scr[i].Height();
         QString sel = QString("%1x%2").arg(w).arg(h);
@@ -2294,7 +2294,7 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     const vector<DisplayResScreen> scr = GetVideoModes();
 
-    for (uint i=0; i<scr.size(); ++i)
+    for (size_t i=0; i<scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
         gc->addSelection(sel, sel);
@@ -2313,7 +2313,7 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     int hz50 = -1, hz60 = -1;
     const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Auto"), "0");
-    for (uint i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
         QString sel = QString::number((double) list[i], 'f', 3);
         addSelection(sel + " Hz", sel, sel == previousValue);

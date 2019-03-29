@@ -373,7 +373,7 @@ void SignalMonitor::run(void)
 void SignalMonitor::AddListener(SignalMonitorListener *listener)
 {
     QMutexLocker locker(&m_listenerLock);
-    for (uint i = 0; i < m_listeners.size(); i++)
+    for (size_t i = 0; i < m_listeners.size(); i++)
     {
         if (m_listeners[i] == listener)
             return;
@@ -386,7 +386,7 @@ void SignalMonitor::RemoveListener(SignalMonitorListener *listener)
     QMutexLocker locker(&m_listenerLock);
 
     vector<SignalMonitorListener*> new_listeners;
-    for (uint i = 0; i < m_listeners.size(); i++)
+    for (size_t i = 0; i < m_listeners.size(); i++)
     {
         if (m_listeners[i] != listener)
             new_listeners.push_back(m_listeners[i]);
@@ -403,7 +403,7 @@ void SignalMonitor::SendMessage(
     m_statusLock.unlock();
 
     QMutexLocker locker(&m_listenerLock);
-    for (uint i = 0; i < m_listeners.size(); i++)
+    for (size_t i = 0; i < m_listeners.size(); i++)
     {
         SignalMonitorListener *listener = m_listeners[i];
         DVBSignalMonitorListener *dvblistener =
@@ -455,7 +455,7 @@ void SignalMonitor::UpdateValues(void)
 void SignalMonitor::SendMessageAllGood(void)
 {
     QMutexLocker locker(&m_listenerLock);
-    for (uint i = 0; i < m_listeners.size(); i++)
+    for (size_t i = 0; i < m_listeners.size(); i++)
         m_listeners[i]->AllGood();
 }
 

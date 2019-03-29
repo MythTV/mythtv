@@ -1052,7 +1052,7 @@ void Scheduler::BuildListMaps(void)
 
 void Scheduler::ClearListMaps(void)
 {
-    for (uint i = 0; i < m_conflictlists.size(); ++i)
+    for (size_t i = 0; i < m_conflictlists.size(); ++i)
         m_conflictlists[i]->clear();
     m_titlelistmap.clear();
     m_recordidlistmap.clear();
@@ -1937,7 +1937,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     uint inputid = rcinfo->GetInputID();
     vector<uint> &inputids = m_sinputinfomap[inputid].m_conflicting_inputs;
     vector<uint> &group_inputs = m_sinputinfomap[inputid].m_group_inputs;
-    for (uint i = 0; i < inputids.size(); i++)
+    for (size_t i = 0; i < inputids.size(); i++)
     {
         if (!m_tvList->contains(inputids[i]))
         {

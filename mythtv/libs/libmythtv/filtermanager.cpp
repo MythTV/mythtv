@@ -243,7 +243,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     }
 
     ifmt = inpixfmt;
-    for (uint i = 0; i < FiltInfoChain.size(); i++)
+    for (size_t i = 0; i < FiltInfoChain.size(); i++)
     {
         S1 = S2 = S3 = nullptr;
         FI = FiltInfoChain[i];
@@ -374,7 +374,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         FiltChain = nullptr;
     }
 
-    for (uint i = 0; i < FiltInfoChain.size(); i++)
+    for (size_t i = 0; i < FiltInfoChain.size(); i++)
     {
         QByteArray tmp = OptsList[i].toLocal8Bit();
         NewFilt = LoadFilter(FiltInfoChain[i], FmtList[i]->in,

@@ -83,7 +83,7 @@ bool LinuxAVCInfo::SendAVCCommand(
         return false;
 
     uint32_t cmdbuf[1024];
-    for (uint i = 0; i < cmd.size(); i+=4)
+    for (size_t i = 0; i < cmd.size(); i+=4)
         cmdbuf[i>>2] = cmd[i]<<24 | cmd[i+1]<<16 | cmd[i+2]<<8 | cmd[i+3];
 
     uint result_length = 0;

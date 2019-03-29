@@ -397,7 +397,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
       // Other
       m_helper(this)
 {
-    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
         m_artImage[i] = nullptr;
         m_artTimer[i] = new QTimer(this);
@@ -475,7 +475,7 @@ PlaybackBox::~PlaybackBox(void)
     gCoreContext->removeListener(this);
     PreviewGeneratorQueue::RemoveListener(this);
 
-    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
         m_artTimer[i]->disconnect(this);
         m_artTimer[i] = nullptr;
@@ -779,7 +779,7 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
     disp_flag_stat[7] = pginfo->IsInUsePlaying();
     disp_flag_stat[8] = pginfo->GetProgramFlags() & FL_TRANSCODED;
 
-    for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
+    for (size_t i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
         item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 }
 
@@ -862,7 +862,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
 
         // Handle artwork
         QString arthost;
-        for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+        for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
         {
             if (!m_artImage[i])
                 continue;
@@ -2483,7 +2483,7 @@ bool PlaybackBox::Play(
         return false;
     }
 
-    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
         if (!m_artImage[i])
             continue;
@@ -3085,7 +3085,7 @@ MythMenu* PlaybackBox::createJobMenu()
         SLOT(doBeginUserJob4()),        SLOT(doBeginUserJob4()),
     };
 
-    for (uint i = 0; i < sizeof(add) / sizeof(bool); i++)
+    for (size_t i = 0; i < sizeof(add) / sizeof(bool); i++)
     {
         if (!add[i])
             continue;

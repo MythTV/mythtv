@@ -54,7 +54,7 @@ QString CarrierDefinitionSubtable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str += MPEGDescriptor(desc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -156,7 +156,7 @@ QString ModulationModeSubtable::toStringXML(uint indent_level) const
         return str + " />";
 
     str += ">\n";
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str += MPEGDescriptor(desc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -243,7 +243,7 @@ QString SCTENetworkInformationTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str += MPEGDescriptor(desc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -448,7 +448,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
 
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
-        for (uint j = 0; j < desc.size(); j++)
+        for (size_t j = 0; j < desc.size(); j++)
         {
             str += MPEGDescriptor(desc[j], 300)
                 .toStringXML(indent_level + 2) + "\n";
@@ -518,7 +518,7 @@ QString ShortVirtualChannelTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str += MPEGDescriptor(desc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -556,7 +556,7 @@ QString SCTESystemTimeTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str += MPEGDescriptor(desc[i], 300)
             .toStringXML(indent_level + 1) + "\n";

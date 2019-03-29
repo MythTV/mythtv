@@ -1096,7 +1096,7 @@ QString CC608Decoder::GetProgramType(bool future) const
     const vector<uint> &program_type = m_xds_program_type[(future) ? 1 : 0];
     QString tmp = "";
 
-    for (uint i = 0; i < program_type.size(); i++)
+    for (size_t i = 0; i < program_type.size(); i++)
     {
         if (i != 0)
             tmp += ", ";
@@ -1266,7 +1266,7 @@ bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
 {
     /* Check the checksum for validity of the packet. */
     int sum = 0;
-    for (uint i = 0; i < xds_buf.size() - 1; i++)
+    for (size_t i = 0; i < xds_buf.size() - 1; i++)
         sum += xds_buf[i];
 
     if ((((~sum) & 0x7f) + 1) != xds_buf[xds_buf.size() - 1])
@@ -1340,7 +1340,7 @@ bool CC608Decoder::XDSPacketParseProgram(
     else if ((b2 == 0x04) && (xds_buf.size() >= 6))
     {
         vector<uint> program_type;
-        for (uint i = 2; i < xds_buf.size() - 2; i++)
+        for (size_t i = 2; i < xds_buf.size() - 2; i++)
         {
             int cur = xds_buf[i] - 0x20;
             if (cur >= 0 && cur < 96)

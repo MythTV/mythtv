@@ -729,7 +729,7 @@ void ProgLister::FillViewList(const QString &view)
             0, true, "channum, chanid");
         ChannelUtil::SortChannels(channels, m_channelOrdering, true);
 
-        for (uint i = 0; i < channels.size(); ++i)
+        for (size_t i = 0; i < channels.size(); ++i)
         {
             QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
@@ -1434,7 +1434,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
         RestoreSelection(selected, offset);
     else if (m_selectedTime.isValid())
     {
-        uint i;
+        size_t i;
         for (i = 0; i < m_itemList.size(); ++i)
         {
             if (m_selectedTime <= m_itemList[i]->GetScheduledStartTime())

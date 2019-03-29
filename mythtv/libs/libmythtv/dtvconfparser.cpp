@@ -292,7 +292,7 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
 
 void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
 {
-    for (uint i = 0; i < m_channels.size(); i++)
+    for (size_t i = 0; i < m_channels.size(); i++)
     {
         if (m_channels[i] == mux)
         {

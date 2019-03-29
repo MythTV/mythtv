@@ -185,7 +185,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     if (opt == "mpeg2streamtype")
     {
         bool found = false;
-        for (unsigned int i = 0; i < sizeof(s_streamType) / sizeof(char*); i++)
+        for (size_t i = 0; i < sizeof(s_streamType) / sizeof(char*); i++)
         {
             if (QString(s_streamType[i]) == value)
             {
@@ -715,7 +715,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
     }
     control_description_lock.unlock();
 
-    for (uint i = 0; i < ext_ctrls.size(); i++)
+    for (size_t i = 0; i < ext_ctrls.size(); i++)
     {
         struct v4l2_ext_controls ctrls;
         memset(&ctrls, 0, sizeof(struct v4l2_ext_controls));

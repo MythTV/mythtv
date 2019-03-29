@@ -2837,7 +2837,7 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
             ProgramList schedList;
             bool hasConflicts = false;
             LoadFromScheduler(schedList, hasConflicts);
-            for( uint n = 0; n < schedList.size(); n++)
+            for( size_t n = 0; n < schedList.size(); n++)
             {
                 ProgramInfo *pInfo = schedList[n];
                 if ((pInfo->GetRecordingStatus() == RecStatus::Tuning ||
@@ -4362,7 +4362,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
 
         vector<uint> infogroups;
         CardUtil::GetInputInfo(info, &infogroups);
-        for (uint i = 0; i < infogroups.size(); ++i)
+        for (size_t i = 0; i < infogroups.size(); ++i)
             groupids[info.m_inputid].insert(infogroups[i]);
 
         InputInfo busyinfo;
@@ -4426,7 +4426,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     // Return the results in livetvorder.
     stable_sort(freeinputs.begin(), freeinputs.end(), comp_livetvorder);
     QStringList strlist;
-    for (uint i = 0; i < freeinputs.size(); ++i)
+    for (size_t i = 0; i < freeinputs.size(); ++i)
     {
         LOG(VB_CHANNEL, LOG_INFO,
             LOC + QString("Input %1 is available on %2/%3")

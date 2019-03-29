@@ -5225,7 +5225,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
     const QDateTime *time_dtr[] =
         { &m_recstartts, &m_recendts, &m_startts, &m_endts, };
-    for (uint i = 0; i < sizeof(time_str)/sizeof(char*); i++)
+    for (size_t i = 0; i < sizeof(time_str)/sizeof(char*); i++)
     {
         str.replace(QString("%%1%").arg(time_str[i]),
                     (time_dtr[i]->toLocalTime()).toString("yyyyMMddhhmmss"));

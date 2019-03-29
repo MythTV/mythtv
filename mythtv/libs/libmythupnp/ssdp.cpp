@@ -266,7 +266,7 @@ void SSDP::run()
 
         FD_ZERO( &read_set );
 
-        for (uint nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
+        for (size_t nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
         {
             if (m_Sockets[nIdx] != nullptr && m_Sockets[nIdx]->socket() >= 0)
             {

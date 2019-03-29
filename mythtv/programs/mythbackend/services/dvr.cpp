@@ -105,7 +105,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 
     QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
 
-    for( unsigned int n = 0; n < progList.size(); n++)
+    for(size_t n = 0; n < progList.size(); n++)
     {
         ProgramInfo *pInfo = progList[ n ];
 

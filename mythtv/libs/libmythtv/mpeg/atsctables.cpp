@@ -91,7 +91,7 @@ QString MasterGuideTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TableDescriptors(i),
                                       TableDescriptorsLength(i));
-            for (uint j = 0; j < desc.size(); j++)
+            for (size_t j = 0; j < desc.size(); j++)
                 str.append(QString("  %1\n")
                            .arg(MPEGDescriptor(desc[j]).toString()));
         }
@@ -104,7 +104,7 @@ QString MasterGuideTable::toString(void) const
             MPEGDescriptor::Parse(GlobalDescriptors(),
                                   GlobalDescriptorsLength());
         str.append(QString("count: %1\n").arg(desc.size()));
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
         {
             str.append(QString("    %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
@@ -130,7 +130,7 @@ QString MasterGuideTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(GlobalDescriptors(), GlobalDescriptorsLength());
-    for (uint i = 0; i < gdesc.size(); i++)
+    for (size_t i = 0; i < gdesc.size(); i++)
     {
         str += MPEGDescriptor(gdesc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -159,7 +159,7 @@ QString MasterGuideTable::toStringXML(uint indent_level) const
             MPEGDescriptor::Parse(
                 TableDescriptors(i), TableDescriptorsLength(i));
         str += (desc.empty()) ? " />\n" : ">\n";
-        for (uint j = 0; j < desc.size(); j++)
+        for (size_t j = 0; j < desc.size(); j++)
         {
             str += MPEGDescriptor(desc[j], 300)
                 .toStringXML(indent_level + 2) + "\n";
@@ -226,7 +226,7 @@ QString VirtualChannelTable::toString(void) const
             MPEGDescriptor::Parse(GlobalDescriptors(),
                                   GlobalDescriptorsLength());
         str.append(QString("count: %1\n").arg(desc.size()));
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
         {
             str.append(QString(" %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
@@ -268,7 +268,7 @@ QString VirtualChannelTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(GlobalDescriptors(), GlobalDescriptorsLength());
-    for (uint i = 0; i < gdesc.size(); i++)
+    for (size_t i = 0; i < gdesc.size(); i++)
     {
         str += MPEGDescriptor(gdesc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -293,7 +293,7 @@ QString VirtualChannelTable::ChannelStringXML(
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str += MPEGDescriptor(desc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -374,7 +374,7 @@ QString TerrestrialVirtualChannelTable::ChannelString(uint chan) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
         str.append(QString("count:%1\n").arg(desc.size()));
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
         {
             str.append(QString("    %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
@@ -437,7 +437,7 @@ QString CableVirtualChannelTable::ChannelString(uint chan) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
         str.append(QString("count:%1\n").arg(desc.size()));
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
             str.append(QString("    %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
     }
@@ -463,7 +463,7 @@ QString EventInformationTable::toString(void) const
         {
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
-            for (uint j=0; j<desc.size(); j++)
+            for (size_t j=0; j<desc.size(); j++)
                 str.append(QString("%1\n")
                            .arg(MPEGDescriptor(desc[j]).toString()));
         }

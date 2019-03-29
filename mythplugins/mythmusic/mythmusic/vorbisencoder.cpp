@@ -103,7 +103,6 @@ VorbisEncoder::~VorbisEncoder()
 
 int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
 {
-    int i;
     long realsamples = 0;
     signed char *chars = (signed char *)bytes;
 
@@ -114,7 +113,7 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     float** buffer = vorbis_analysis_buffer(&m_vd, realsamples);
 
-    for (i = 0; i < realsamples; i++) 
+    for (long i = 0; i < realsamples; i++)
     {
         buffer[0][i] = ((chars[i * 4 + 1] << 8) |
                         (chars[i * 4] & 0xff)) / 32768.0F;

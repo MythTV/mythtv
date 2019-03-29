@@ -34,7 +34,7 @@ BumpScope::~BumpScope()
 {
     delete [] m_rgb_buf;
     delete m_image;
-    for (unsigned int i = 0; i < m_phongdat.size(); i++)
+    for (size_t i = 0; i < m_phongdat.size(); i++)
         m_phongdat[i].resize(0);
     m_phongdat.resize(0);
 }
@@ -65,7 +65,7 @@ void BumpScope::resize(const QSize &newsize)
     m_y = m_height;
 
     m_phongdat.resize(m_phongrad * 2);
-    for (unsigned int i = 0; i < m_phongdat.size(); i++)
+    for (size_t i = 0; i < m_phongdat.size(); i++)
         m_phongdat[i].resize(m_phongrad * 2);
 
     generate_phongdat();

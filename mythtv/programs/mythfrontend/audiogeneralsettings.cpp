@@ -1096,8 +1096,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerControl()
 
     gc->setLabel(tr("Mixer controls"));
 
-    for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*);
-         ++i)
+    for (size_t i = 0; i < sizeof(MixerControlControls) / sizeof(char*); ++i)
     {
         gc->addSelection(tr(MixerControlControls[i]),
                          MixerControlControls[i]);

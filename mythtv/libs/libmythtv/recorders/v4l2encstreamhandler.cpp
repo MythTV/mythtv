@@ -819,7 +819,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, const QString &value)
         m_vbi_device = value;
     else if (opt == "mpeg2streamtype")
     {
-        for (uint i = 0; i < sizeof(s_stream_types) / sizeof(char*); ++i)
+        for (size_t i = 0; i < sizeof(s_stream_types) / sizeof(char*); ++i)
         {
             if (QString(s_stream_types[i]) == value)
             {

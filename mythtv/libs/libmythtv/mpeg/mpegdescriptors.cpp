@@ -115,7 +115,7 @@ const unsigned char *MPEGDescriptor::FindBestMatch(
     uint match_pri = UINT_MAX;
     int  unmatched_idx = -1;
 
-    uint i = (desc_tag == DescriptorID::short_event) ? 0 : parsed.size();
+    size_t i = (desc_tag == DescriptorID::short_event) ? 0 : parsed.size();
     for (; i < parsed.size(); i++)
     {
         if (DescriptorID::short_event == parsed[i][0])
@@ -160,7 +160,7 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     int  match_key = 0;
     int  unmatched_idx = -1;
 
-    uint i = (desc_tag == DescriptorID::extended_event) ? 0 : parsed.size();
+    size_t i = (desc_tag == DescriptorID::extended_event) ? 0 : parsed.size();
     for (; i < parsed.size(); i++)
     {
         if (DescriptorID::extended_event == parsed[i][0])
@@ -197,7 +197,7 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     if (match_pri == UINT_MAX)
         return tmp;
 
-    for (uint j = 0; j < parsed.size(); j++)
+    for (size_t j = 0; j < parsed.size(); j++)
     {
         if ((DescriptorID::extended_event == desc_tag) &&
             (DescriptorID::extended_event == parsed[j][0]))

@@ -360,7 +360,8 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 	{352, 480}, /* 525 lines, 6.75 MHz (D2, 1/2 D1, CVD, DVD) */
 	{352, 240}  /* 525  lines. 6.75 MHz, 1 field (D4, VCD, DSS, DVD) */
     };
-    unsigned int width, height, pix_width, pix_height, i, DAR_16_9;
+    unsigned int width, height, pix_width, pix_height, DAR_16_9;
+    size_t i;
 
     *pixel_width = sequence->pixel_width;
     *pixel_height = sequence->pixel_height;

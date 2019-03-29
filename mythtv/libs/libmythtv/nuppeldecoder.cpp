@@ -442,7 +442,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 {
                     QMutexLocker locker(&m_positionMapLock);
-                    for (uint i = 0; i < m_positionMap.size(); i++)
+                    for (size_t i = 0; i < m_positionMap.size(); i++)
                     {
                         long long adj = m_positionMap[i].adjFrame;
 

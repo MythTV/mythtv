@@ -509,7 +509,7 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
 
     ctm.start();
     frm_pos_map_t posMap;
-    for (uint i = 0; i < m_positionMap.size(); i++)
+    for (size_t i = 0; i < m_positionMap.size(); i++)
     {
         if (m_positionMap[i].index < first)
             continue;
@@ -904,7 +904,7 @@ QStringList DecoderBase::GetTracks(uint type) const
 
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < m_tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         list += GetTrackDesc(type, i);
 
     return list;
@@ -976,7 +976,7 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 {
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < m_tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         if (info.m_stream_id == m_tracks[type][i].m_stream_id)
             return false;
 

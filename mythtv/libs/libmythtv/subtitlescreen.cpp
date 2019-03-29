@@ -1327,7 +1327,7 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     m_xAnchor = anchor_x;
     m_yAnchor = anchor_y;
 
-    for (uint i = 0; i < list.size(); i++)
+    for (size_t i = 0; i < list.size(); i++)
     {
         if (list[i]->y >= (uint)m_lines.size())
             m_lines.resize(list[i]->y + 1);

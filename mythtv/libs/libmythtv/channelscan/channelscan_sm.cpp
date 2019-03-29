@@ -319,7 +319,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
         return false;
     }
 
-    for (uint i = 0; i < multiplexes.size(); ++i)
+    for (size_t i = 0; i < multiplexes.size(); ++i)
         AddToList(multiplexes[i]);
 
     m_extendScanList = follow_nit;
@@ -666,7 +666,7 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
 
     vector<DTVTunerType> tts = chan->GetTunerTypes();
 
-    for (uint i = 0; i < tts.size(); ++i)
+    for (size_t i = 0; i < tts.size(); ++i)
     {
         if (tts[i] == type)
             return type;
@@ -693,7 +693,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                   nit->TransportDescriptorsLength(i));
 
-        for (uint j = 0; j < list.size(); ++j)
+        for (size_t j = 0; j < list.size(); ++j)
         {
             int mplexid = -1;
             uint64_t frequency = 0;
@@ -778,7 +778,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     // Grab PAT tables
     pat_vec_t pattmp = sd->GetCachedPATs();
     QMap<uint,bool> tsid_checked;
-    for (uint i = 0; i < pattmp.size(); ++i)
+    for (size_t i = 0; i < pattmp.size(); ++i)
     {
         uint tsid = pattmp[i]->TransportStreamID();
         if (tsid_checked[tsid])
@@ -833,7 +833,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     sdt_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
-    for (uint i = 0; i < sdttmp.size(); ++i)
+    for (size_t i = 0; i < sdttmp.size(); ++i)
     {
         uint tsid = sdttmp[i]->TSID();
         if (tsid_checked[tsid])
@@ -1205,7 +1205,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // channels.conf
     const DTVChannelInfoList &echan = (*trans_info).m_expectedChannels;
-    for (uint i = 0; i < echan.size(); ++i)
+    for (size_t i = 0; i < echan.size(); ++i)
     {
         uint pnum = echan[i].m_serviceid;
         PCM_INFO_INIT("mpeg");
@@ -1261,7 +1261,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (uint i = 0; i < descs.size(); ++i)
+        for (size_t i = 0; i < descs.size(); ++i)
         {
             RegistrationDescriptor reg(descs[i]);
             if (!reg.IsValid())
@@ -2251,7 +2251,7 @@ bool ChannelScanSM::CheckImportedList(
         return true;
 
     bool found = false;
-    for (uint i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("comparing %1 %2 against %3 %4")

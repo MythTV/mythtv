@@ -153,7 +153,7 @@ int main(int argc, char **argv)
     }
 
 #ifndef _WIN32
-    for (int i = UNUSED_FILENO; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+    for (long i = UNUSED_FILENO; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
     QCoreApplication a(argc, argv);
 #else

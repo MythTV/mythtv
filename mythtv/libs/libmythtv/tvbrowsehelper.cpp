@@ -514,7 +514,7 @@ void TVBrowseHelper::run()
             {
                 if (!chanids.empty())
                 {
-                    for (uint i = 0; i < chanids.size(); i++)
+                    for (size_t i = 0; i < chanids.size(); i++)
                     {
                         if (m_tv->IsTunable(ctx, chanids[i]))
                         {

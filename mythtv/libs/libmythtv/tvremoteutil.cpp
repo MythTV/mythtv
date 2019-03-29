@@ -193,7 +193,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         return nullptr;
     }
 
-    uint i;
+    size_t i;
     for (i = 0; i < inputs.size(); ++i)
         if (inputs[i].m_inputid == (uint)inputid)
             break;
@@ -208,7 +208,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
     {
         // Try to find the next input with a different name.  If one
         // doesn't exist, just return the current one.
-        uint j = i;
+        size_t j = i;
         do
         {
             i = (i + 1) % inputs.size();
@@ -233,7 +233,7 @@ vector<uint> RemoteRequestFreeRecorderList(uint excluded_input)
         RemoteRequestFreeInputInfo(excluded_input);
 
     vector<uint> inputids;
-    for (uint j = 0; j < inputs.size(); j++)
+    for (size_t j = 0; j < inputs.size(); j++)
         inputids.push_back(inputs[j].m_inputid);
 
     LOG(VB_CHANNEL, LOG_INFO,
@@ -251,7 +251,7 @@ vector<uint> RemoteRequestFreeInputList(uint excluded_input)
         RemoteRequestFreeInputInfo(excluded_input);
 
     vector<uint> inputids;
-    for (uint j = 0; j < inputs.size(); j++)
+    for (size_t j = 0; j < inputs.size(); j++)
         inputids.push_back(inputs[j].m_inputid);
 
     LOG(VB_CHANNEL, LOG_INFO,
@@ -273,7 +273,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
          recIter != qualifiedRecorders.end(); ++recIter)
     {
         uint inputid = (*recIter).toUInt();
-        for (uint i = 0; i < inputs.size(); ++i)
+        for (size_t i = 0; i < inputs.size(); ++i)
         {
             if (inputs[i].m_inputid == inputid)
             {
@@ -408,7 +408,7 @@ bool RemoteGetRecordingStatus(
     if (tunerList)
         tunerList->clear();
 
-    for (uint i = 0; i < inputlist.size(); i++)
+    for (size_t i = 0; i < inputlist.size(); i++)
     {
         QString     status      = "";
         uint        inputid     = inputlist[i];

@@ -85,7 +85,7 @@ QString ScanStreamData::GetSIStandard(QString guess) const
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (uint i = 0; i < descs.size(); i++)
+        for (size_t i = 0; i < descs.size(); i++)
         {
             RegistrationDescriptor reg(descs[i]);
             if (!reg.IsValid())

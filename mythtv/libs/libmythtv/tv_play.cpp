@@ -1048,7 +1048,7 @@ void TV::InitFromDB(void)
     kv["LiveTVScreenPressKeyMap"]     = "P,Up,Z,S,Left,Return,Return,Right,A,Down,Q,F";
 
     int ff_rew_def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
-    for (uint i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
+    for (size_t i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
         kv[QString("FFRewSpeed%1").arg(i)] = QString::number(ff_rew_def[i]);
 
     MythDB::getMythDB()->GetSettings(kv);
@@ -1104,7 +1104,7 @@ void TV::InitFromDB(void)
         }
     }
 
-    for (uint i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
+    for (size_t i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
         m_ffRewSpeeds.push_back(kv[QString("FFRewSpeed%1").arg(i)].toInt());
 
     // process it..
@@ -1659,7 +1659,7 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
     }
     else if (!selection.empty())
     {
-        for (uint i = 0; i < selection.size(); i++)
+        for (size_t i = 0; i < selection.size(); i++)
         {
             uint    chanid  = selection[i].m_chanid;
             QString channum = selection[i].m_channum;
@@ -1828,7 +1828,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             vector<uint> input_grps =
                 CardUtil::GetInputGroups((*it).info->GetInputID());
 
-            for (uint i = 0; i < input_grps.size(); i++)
+            for (size_t i = 0; i < input_grps.size(); i++)
             {
                 if (find(busy_input_grps.begin(), busy_input_grps.end(),
                          input_grps[i]) !=  busy_input_grps.end())
@@ -3043,7 +3043,7 @@ void TV::timerEvent(QTimerEvent *te)
                     QString("Serious hardware decoder error detected. "
                             "Disabling hardware decoders."));
                 m_noHardwareDecoders = true;
-                for (uint i = 0; i < m_player.size(); i++)
+                for (size_t i = 0; i < m_player.size(); i++)
                     m_player[i]->SetNoHardwareDecoders();
                 RestartMainPlayer(mctx);
             }
@@ -3058,7 +3058,7 @@ void TV::timerEvent(QTimerEvent *te)
             error = true;
         }
 
-        for (uint i = 0; i < m_player.size(); i++)
+        for (size_t i = 0; i < m_player.size(); i++)
         {
             PlayerContext *ctx2 = GetPlayer(mctx, i);
             if (error || ctx2->IsErrored())
@@ -5140,7 +5140,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             if (ok)
             {
                 float searchSpeed = fabs(tmpSpeed);
-                unsigned int index;
+                size_t index;
 
                 if (paused)
                     DoTogglePause(ctx, true);
@@ -5712,7 +5712,7 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
 
 int TV::find_player_index(const PlayerContext *ctx) const
 {
-    for (uint i = 0; i < m_player.size(); i++)
+    for (size_t i = 0; i < m_player.size(); i++)
         if (GetPlayer(ctx, i) == ctx)
             return i;
     return -1;
@@ -5978,7 +5978,7 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
         return;
     }
 
-    for (uint i = 0; i < m_player.size(); i++)
+    for (size_t i = 0; i < m_player.size(); i++)
     {
         PlayerContext *ctx = GetPlayer(mctx, i);
         if (!ctx->IsPlayerPlaying())
@@ -6007,7 +6007,7 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
     else
     {
         GetPlayer(mctx, 0)->SetPIPState(kPIPOff);
-        for (uint i = 1; i < m_player.size(); i++)
+        for (size_t i = 1; i < m_player.size(); i++)
         {
             GetPlayer(mctx, i)->SetPIPState(kPIPonTV);
             GetPlayer(mctx, i)->SetNullVideo(true);
@@ -6096,7 +6096,7 @@ bool TV::IsPIPSupported(const PlayerContext *ctx) const
 vector<long long> TV::TeardownAllPlayers(PlayerContext *lctx)
 {
     vector<long long> pos;
-    for (uint i = 0; i < m_player.size(); i++)
+    for (size_t i = 0; i < m_player.size(); i++)
     {
         const PlayerContext *ctx = GetPlayer(lctx, i);
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6104,7 +6104,7 @@ vector<long long> TV::TeardownAllPlayers(PlayerContext *lctx)
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
 
-    for (uint i = 0; i < m_player.size(); i++)
+    for (size_t i = 0; i < m_player.size(); i++)
     {
         PlayerContext *ctx = GetPlayer(lctx, i);
         ctx->PIPTeardown();
@@ -6189,7 +6189,7 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
         return;
     }
 
-    for (uint i = 1; i < m_player.size(); i++)
+    for (size_t i = 1; i < m_player.size(); i++)
     {
         PlayerContext *pipctx = GetPlayer(lctx, i);
 
@@ -7119,7 +7119,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     uint sourceid = info["sourceid"].toUInt();
 
     vector<InputInfo> inputs = RemoteRequestFreeInputInfo(cardid);
-    for (uint i = 0; i < inputs.size(); i++)
+    for (size_t i = 0; i < inputs.size(); i++)
     {
         // prefer the current card's input in sources list
         if ((sources.find(inputs[i].m_sourceid) == sources.end()) ||
@@ -7299,7 +7299,7 @@ void TV::SwitchInputs(PlayerContext *ctx,
                 ScheduleStateChange(ctx);
                 ok = true;
                 ctx->PushPreviousChannel();
-                for (uint i = 1; i < m_player.size(); i++)
+                for (size_t i = 1; i < m_player.size(); i++)
                     PIPAddPlayer(mctx2, GetPlayer(ctx, i));
 
                 SetSpeedChangeTimer(25, __LINE__);
@@ -7820,7 +7820,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
 void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
 {
-    for (uint i = 0; i < options.size(); i++)
+    for (size_t i = 0; i < options.size(); i++)
     {
         uint    chanid  = options[i].m_chanid;
         QString channum = options[i].m_channum;
@@ -8472,7 +8472,7 @@ QSet<uint> TV::IsTunableOn(
 
     vector<InputInfo> inputs = RemoteRequestFreeInputInfo(excluded_input);
 
-    for (uint j = 0; j < inputs.size(); j++)
+    for (size_t j = 0; j < inputs.size(); j++)
     {
         if (inputs[j].m_sourceid != sourceid)
             continue;
@@ -9532,7 +9532,7 @@ void TV::customEvent(QEvent *e)
                               timeuntil, hasrec, haslater);
         }
 
-        for (uint i = 1; i < m_player.size(); i++)
+        for (size_t i = 1; i < m_player.size(); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
             if (ctx->m_recorder && ctx->GetCardID() == cardnum)
@@ -10129,7 +10129,7 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
 
     LOG(VB_PLAYBACK, LOG_DEBUG, loc + " -- begin");
 
-    for (uint i = 0; i < m_player.size(); i++)
+    for (size_t i = 0; i < m_player.size(); i++)
         ClearOSD(GetPlayer(lctx,i));
 
     m_playerActive = new_index;
@@ -10713,7 +10713,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     }
     else if (PxPHandleAction(actx, QStringList(action)))
     {
-        for (uint i = 0; i < m_player.size(); i++)
+        for (size_t i = 0; i < m_player.size(); i++)
             ClearOSD(GetPlayer(actx,i));
         actx = GetPlayer(actx,-1); // "NEXTPIPWINDOW" changes active context..
     }
@@ -11451,7 +11451,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             {140, "1.4", tr("1.4x")},
             {150, "1.5", tr("1.5x")},
         };
-        for (uint i = 0; i < sizeof(speeds) / sizeof(*speeds); ++i)
+        for (size_t i = 0; i < sizeof(speeds) / sizeof(*speeds); ++i)
         {
             QString action = prefix + speeds[i].suffix;
             active = (m_tvmSpeedX100 == speeds[i].speedX100);
@@ -11489,7 +11489,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
             static uint cas_ord[] = { 0, 2, 1 };
-            for (uint i = 0; i < sizeof(cas_ord)/sizeof(cas_ord[0]); i++)
+            for (size_t i = 0; i < sizeof(cas_ord)/sizeof(cas_ord[0]); i++)
             {
                 const CommSkipMode mode = (CommSkipMode) cas_ord[i];
                 QString action = prefix + QString::number(cas_ord[i]);

@@ -311,7 +311,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     pendlock.unlock();
     statelock.unlock();
-    for (uint i = 0; i < inputids.size(); i++)
+    for (size_t i = 0; i < inputids.size(); i++)
         RemoteRecordPending(inputids[i], rcinfo, secsleft, hasLater);
     statelock.relock();
     pendlock.relock();
@@ -360,7 +360,7 @@ void TVRec::CancelNextRecording(bool cancel)
     if (cancel)
     {
         vector<uint> &inputids = (*it).possibleConflicts;
-        for (uint i = 0; i < inputids.size(); i++)
+        for (size_t i = 0; i < inputids.size(); i++)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("CancelNextRecording -- inputid 0x%1")
@@ -480,7 +480,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         vector<TVState> states;
 
         // Stop remote recordings if needed
-        for (uint i = 0; i < inputids.size(); i++)
+        for (size_t i = 0; i < inputids.size(); i++)
         {
             InputInfo busy_input;
             bool is_busy = RemoteIsBusy(inputids[i], busy_input);
@@ -2406,7 +2406,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     // Are any of the channels complete w/o spacer?
     // If so set complete_valid_channel_on_rec,
     // with a preference for our inputid.
-    for (uint i = 0; i < fchannum.size(); i++)
+    for (size_t i = 0; i < fchannum.size(); i++)
     {
         if (fchannum[i] == prefix)
         {
@@ -2428,7 +2428,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     // If it isn't useful to wait for more characters,
     // then try to commit to any true match immediately.
-    for (uint i = 0; i < ((is_extra_char_useful) ? 0 : fchanid.size()); i++)
+    for (size_t i = 0; i < ((is_extra_char_useful) ? 0 : fchanid.size()); i++)
     {
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {

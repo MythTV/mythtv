@@ -1897,7 +1897,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
     desc_list.insert(desc_list.end(), desc_list2.begin(), desc_list2.end());
 
-    for (uint j = 0; j < desc_list.size(); j++)
+    for (size_t j = 0; j < desc_list.size(); j++)
     {
         const CaptionServiceDescriptor csd(desc_list[j]);
         if (!csd.IsValid())
@@ -2010,7 +2010,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::teletext);
 
-        for (uint j = 0; j < desc_list.size(); j++)
+        for (size_t j = 0; j < desc_list.size(); j++)
         {
             const TeletextDescriptor td(desc_list[j]);
             if (!td.IsValid())
@@ -2089,7 +2089,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::data_broadcast_id);
 
-        for (uint j = 0; j < desc_list.size(); j++)
+        for (size_t j = 0; j < desc_list.size(); j++)
         {
             const unsigned char *desc = desc_list[j];
             desc++; // Skip tag
@@ -4569,7 +4569,7 @@ void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
 
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)
 {
-    for (uint i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
+    for (size_t i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
     {
         AVStream *s  = m_ic->streams[m_tracks[kTrackTypeAudio][i].m_av_stream_index];
         if (s)
@@ -4633,7 +4633,7 @@ static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 {
     vector<int> ret;
 
-    for (uint i = 0; i < tracks.size(); i++)
+    for (size_t i = 0; i < tracks.size(); i++)
     {
         if (tracks[i].m_audio_type == type)
             ret.push_back(i);
@@ -4866,7 +4866,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         if (selTrack < 0 && numStreams)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select default track");
-            for (uint i = 0; i < atracks.size(); i++) {
+            for (size_t i = 0; i < atracks.size(); i++) {
                 int idx = atracks[i].m_av_stream_index;
                 if (m_ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT)
                 {

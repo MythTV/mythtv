@@ -1053,14 +1053,14 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         // bind correct textures
         uint textures[4]; // NB
         uint texture_count = 0;
-        for (uint i = 0; i < inputs.size(); i++)
+        for (size_t i = 0; i < inputs.size(); i++)
             textures[texture_count++] = inputs[i];
 
         if (!referenceTextures.empty() &&
             hardwareDeinterlacing &&
             (type == kGLFilterYUV2RGB || type == kGLFilterYV12RGB))
         {
-            for (uint i = 0; i < referenceTextures.size(); i++)
+            for (size_t i = 0; i < referenceTextures.size(); i++)
                 textures[texture_count++] = referenceTextures[i];
         }
 
@@ -1129,7 +1129,7 @@ void OpenGLVideo::DeleteTextures(vector<GLuint> *textures)
     if ((*textures).empty())
         return;
 
-    for (uint i = 0; i < (*textures).size(); i++)
+    for (size_t i = 0; i < (*textures).size(); i++)
         gl_context->DeleteTexture((*textures)[i]);
     (*textures).clear();
 }
@@ -1140,7 +1140,7 @@ void OpenGLVideo::SetTextureFilters(vector<GLuint> *textures,
     if (textures->empty())
         return;
 
-    for (uint i = 0; i < textures->size(); i++)
+    for (size_t i = 0; i < textures->size(); i++)
         gl_context->SetTextureFilters((*textures)[i], filt, wrap);
 }
 

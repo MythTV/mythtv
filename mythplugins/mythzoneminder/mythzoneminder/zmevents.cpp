@@ -181,7 +181,7 @@ void ZMEvents::updateUIList()
 
     m_eventGrid->Reset();
 
-    for (uint i = 0; i < m_eventList->size(); i++)
+    for (size_t i = 0; i < m_eventList->size(); i++)
     {
         Event *event = m_eventList->at(i);
 
