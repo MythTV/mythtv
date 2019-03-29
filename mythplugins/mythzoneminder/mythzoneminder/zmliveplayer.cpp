@@ -224,7 +224,7 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
             changePlayerMonitor(action.toInt());
         else if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else
             handled = false;
@@ -236,7 +236,7 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ZMLivePlayer::showMenu()
+void ZMLivePlayer::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
