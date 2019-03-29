@@ -412,7 +412,7 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 static void copy_matrix (mpeg2dec_t * mpeg2dec, int index)
 {
     if (memcmp (mpeg2dec->quantizer_matrix[index],
-		mpeg2dec->new_quantizer_matrix[index], 64)) {
+		mpeg2dec->new_quantizer_matrix[index], 64) != 0) {
 	memcpy (mpeg2dec->quantizer_matrix[index],
 		mpeg2dec->new_quantizer_matrix[index], 64);
 	mpeg2dec->scaled[index] = -1;
@@ -428,8 +428,8 @@ static void finalize_matrix (mpeg2dec_t * mpeg2dec)
 	if (mpeg2dec->copy_matrix & (1 << i))
 	    copy_matrix (mpeg2dec, i);
 	if ((mpeg2dec->copy_matrix & (4 << i)) &&
-	    memcmp (mpeg2dec->quantizer_matrix[i],
-		    mpeg2dec->new_quantizer_matrix[i+2], 64)) {
+	    (memcmp (mpeg2dec->quantizer_matrix[i],
+                     mpeg2dec->new_quantizer_matrix[i+2], 64) != 0)) {
 	    copy_matrix (mpeg2dec, i + 2);
 	    decoder->chroma_quantizer[i] = decoder->quantizer_prescale[i+2];
 	} else if (mpeg2dec->copy_matrix & (5 << i))
