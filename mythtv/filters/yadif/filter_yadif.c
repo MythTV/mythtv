@@ -412,12 +412,12 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
         int score;
 
 #define CHECK(j)\
-    {   score= ABS(cur[-refs-1+j] - cur[+refs-1-j])\
-                 + ABS(cur[-refs  +j] - cur[+refs  -j])\
-                 + ABS(cur[-refs+1+j] - cur[+refs+1-j]);\
+    {   score= ABS(cur[-refs-1+(j)] - cur[+refs-1-(j)])\
+                 + ABS(cur[-refs  +(j)] - cur[+refs  -(j)])\
+                 + ABS(cur[-refs+1+(j)] - cur[+refs+1-(j)]);\
         if (score < spatial_score){\
             spatial_score= score;\
-            spatial_pred= (cur[-refs  +j] + cur[+refs  -j])>>1;\
+            spatial_pred= (cur[-refs  +(j)] + cur[+refs  -(j)])>>1;\
 
         CHECK(-1) CHECK(-2) }} }}
         CHECK( 1) CHECK( 2) }} }}
