@@ -686,11 +686,11 @@ QString MythUIFileBrowser::FormatSize(int size)
     QString filesize("%L1 %2");
 
     if (size < 1000000)
-        filesize = filesize.arg((double)(size / 1000)).arg("KB");
+        filesize = filesize.arg((double)size /       1000.0, 0, 'f', 0).arg("KB");
     else if (size < 1000000000)
-        filesize = filesize.arg((double)(size / 1000000)).arg("MB");
+        filesize = filesize.arg((double)size /    1000000.0, 0, 'f', 1).arg("MB");
     else
-        filesize = filesize.arg((double)(size / 1000000000)).arg("GB");
+        filesize = filesize.arg((double)size / 1000000000.0, 0, 'f', 1).arg("GB");
 
     return filesize;
 }
