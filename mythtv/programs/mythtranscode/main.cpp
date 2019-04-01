@@ -162,9 +162,9 @@ int main(int argc, char *argv[])
     frm_pos_map_t durMap; ///< duration from beginning of keyframes
     int AudioTrackNo = -1;
 
-    int found_starttime = 0;
-    int found_chanid = 0;
-    int found_infile = 0;
+    bool found_starttime = false;
+    bool found_chanid = false;
+    bool found_infile = false;
     int update_index = 1;
     bool isVideo = false;
     bool passthru = false;
@@ -208,19 +208,19 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("starttime"))
     {
         starttime = cmdline.toDateTime("starttime");
-        found_starttime = 1;
+        found_starttime = true;
     }
     if (cmdline.toBool("chanid"))
     {
         chanid = cmdline.toUInt("chanid");
-        found_chanid = 1;
+        found_chanid = true;
     }
     if (cmdline.toBool("jobid"))
         jobID = cmdline.toInt("jobid");
     if (cmdline.toBool("inputfile"))
     {
         infile = cmdline.toString("inputfile");
-        found_infile = 1;
+        found_infile = true;
     }
     if (cmdline.toBool("video"))
         isVideo = true;
@@ -397,8 +397,8 @@ int main(int argc, char *argv[])
     {
         if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
         {
-            found_starttime = 1;
-            found_chanid = 1;
+            found_starttime = true;
+            found_chanid = true;
         }
         else
         {
