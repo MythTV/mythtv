@@ -874,7 +874,7 @@ void GLSingleView::EffectInOut(void)
     int  texnum  = m_texCur;
     bool fadeout = false;
     float const elapsed = m_effect_frame_time.elapsed();
-    if (elapsed <= m_effect_transition_timeout / 2)
+    if (elapsed <= m_effect_transition_timeout / 2.0F)
     {
         texnum  = (m_texCur) ? 0 : 1;
         fadeout = true;

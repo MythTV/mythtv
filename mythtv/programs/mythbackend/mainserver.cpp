@@ -2731,7 +2731,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     // Time between truncation steps in milliseconds
     const size_t sleep_time = 500;
     const size_t min_tps    = 8 * 1024 * 1024;
-    const size_t calc_tps   = (size_t) (cards * 1.2 * (22200000LL / 8));
+    const size_t calc_tps   = (size_t) (cards * 1.2 * (22200000LL / 8.0));
     const size_t tps = max(min_tps, calc_tps);
     const size_t increment  = (size_t) (tps * (sleep_time * 0.001F));
 

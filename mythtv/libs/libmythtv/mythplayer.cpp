@@ -4666,7 +4666,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             HandleArbSeek(true);
             deleteMap.SetSeekAmount(old_seekamount);
         }
-#define FFREW_MULTICOUNT 10
+#define FFREW_MULTICOUNT 10.0F
         else if (action == ACTION_BIGJUMPREW)
         {
             if (seekamount == 0)

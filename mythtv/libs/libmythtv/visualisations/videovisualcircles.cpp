@@ -37,7 +37,8 @@ void VideoVisualCircles::DrawPriv(MythPainter *painter, QPaintDevice* device)
 
 bool VideoVisualCircles::InitialisePriv(void)
 {
-    m_range = (m_area.height() / 2) / (m_scale.range() -10);
+    m_range = (static_cast<double>(m_area.height()) / 2.0)
+        / (m_scale.range() - 10);
     m_scaleFactor = 10.0;
     m_falloff = 1.0;
 
