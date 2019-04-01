@@ -344,7 +344,7 @@ int mythfile_stat(const char *path, struct stat *buf)
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_stat('%1', %2)")
             .arg(path).arg((long long)buf));
 
-    if (!strncmp(path, "myth://", 7))
+    if (strncmp(path, "myth://", 7) == 0)
     {
         bool res = RemoteFile::Exists(path, buf);
         if (res)
@@ -376,7 +376,7 @@ int mythfile_exists(const char *path, const char *file)
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_exists('%1', '%2')")
             .arg(path).arg(file));
 
-    if (!strncmp(path, "myth://", 7))
+    if (strncmp(path, "myth://", 7) == 0)
         return RemoteFile::Exists(QString("%1/%2").arg(path).arg(file));
 
     return QFile::exists(QString("%1/%2").arg(path).arg(file));

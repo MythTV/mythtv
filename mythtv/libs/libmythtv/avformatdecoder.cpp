@@ -1065,7 +1065,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-    if (!strcmp(fmt->name, "mpegts") &&
+    if (strcmp(fmt->name, "mpegts") == 0 &&
         gCoreContext->GetBoolSetting("FFMPEGTS", false))
     {
         AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
@@ -1168,7 +1168,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         err = avformat_open_input(&m_ic, filename, fmt, nullptr);
         if (err < 0)
         {
-            if (!strcmp(fmt->name, "mpegts"))
+            if (strcmp(fmt->name, "mpegts") == 0)
             {
                 fmt = av_find_input_format("mpegts-ffmpeg");
                 if (fmt)
@@ -1222,8 +1222,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     // we need to ignore it as we don't handle single frames or images in place of video
     // TODO: display single frame
     QString extension = QFileInfo(fnames).suffix();
-    if (!strcmp(fmt->name, "mp3") || !strcmp(fmt->name, "flac") ||
-        !strcmp(fmt->name, "ogg") ||
+    if (strcmp(fmt->name, "mp3") == 0 || strcmp(fmt->name, "flac") == 0 ||
+        strcmp(fmt->name, "ogg") == 0 ||
         !extension.compare("m4a", Qt::CaseInsensitive))
     {
         novideo = true;
@@ -1311,7 +1311,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         m_keyframedist = 15;
         m_positionMapType = MARK_GOP_BYFRAME;
 
-        if (!strcmp(fmt->name, "avi"))
+        if (strcmp(fmt->name, "avi") == 0)
         {
             // avi keyframes are too irregular
             m_keyframedist = 1;

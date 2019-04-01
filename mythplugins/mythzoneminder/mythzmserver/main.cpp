@@ -74,18 +74,18 @@ int main(int argc, char **argv)
     //  Check command line arguments
     for (int argpos = 1; argpos < argc; ++argpos)
     {
-        if (!strcmp(argv[argpos],"-d") ||
-             !strcmp(argv[argpos],"--daemon"))
+        if (strcmp(argv[argpos],"-d") == 0 ||
+             strcmp(argv[argpos],"--daemon") == 0)
         {
             daemon_mode = true;
         }
-        else if (!strcmp(argv[argpos],"-n") ||
-                  !strcmp(argv[argpos],"--nodaemon"))
+        else if (strcmp(argv[argpos],"-n") == 0 ||
+                  strcmp(argv[argpos],"--nodaemon") == 0)
         {
             daemon_mode = false;
         }
-        else if (!strcmp(argv[argpos],"-p") ||
-                  !strcmp(argv[argpos],"--port"))
+        else if (strcmp(argv[argpos],"-p") == 0 ||
+                  strcmp(argv[argpos],"--port") == 0)
         {
             if (argc > argpos)
             {
@@ -104,8 +104,8 @@ int main(int argc, char **argv)
                 return EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(argv[argpos],"-l") ||
-                  !strcmp(argv[argpos],"--logfile"))
+        else if (strcmp(argv[argpos],"-l") == 0 ||
+                  strcmp(argv[argpos],"--logfile") == 0)
         {
             if (argc > argpos)
             {
@@ -124,8 +124,8 @@ int main(int argc, char **argv)
                 return EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(argv[argpos],"-c") ||
-                  !strcmp(argv[argpos],"--zmconfig"))
+        else if (strcmp(argv[argpos],"-c") == 0 ||
+                  strcmp(argv[argpos],"--zmconfig") == 0)
         {
             if (argc > argpos)
             {
@@ -144,8 +144,8 @@ int main(int argc, char **argv)
                 return EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(argv[argpos],"-v") ||
-                  !strcmp(argv[argpos],"--verbose"))
+        else if (strcmp(argv[argpos],"-v") == 0 ||
+                  strcmp(argv[argpos],"--verbose") == 0)
         {
             debug = true;
         }
