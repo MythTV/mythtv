@@ -1031,13 +1031,17 @@ class DVBCardNum : public CaptureCardComboBoxSetting
     }
 };
 
-class DVBCardType : public GroupSetting
+// Use capturecard/inputname to store the delivery system selection of the card
+class DVBCardType : public CaptureCardComboBoxSetting
 {
   public:
-    DVBCardType()
+    explicit DVBCardType(const CaptureCard &parent) :
+        CaptureCardComboBoxSetting(parent, false, "inputname")
     {
-        setLabel(QObject::tr("Subtype"));
-        setEnabled(false);
+        setLabel(QObject::tr("Delivery system"));
+        setHelpText(
+            QObject::tr("If your card supports more than one delivery system "
+                        "then you can select here the one that you want to use."));
     };
 };
 
@@ -2639,6 +2643,19 @@ class InputName : public MythUIComboBoxSetting
     };
 };
 
+class DeliverySystem : public GroupSetting
+{
+  public:
+    DeliverySystem()
+    {
+        setLabel(QObject::tr("Delivery system"));
+        setHelpText(QObject::tr(
+                        "This shows the delivery system (modulation), for instance DVB-T2, "
+                        "that you have selected when you configured the capture card. "
+                        "This must be the same as the modulation used by the video source. "));
+    };
+};
+
 class InputDisplayName : public MythUITextEditSetting
 {
   public:
@@ -2991,7 +3008,18 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
                                           _cardid, true));
     }
 
-    addChild(m_inputName);
+    // Delivery system for DVB, input name for other,
+    // same field capturecard/inputname for both
+    if ("DVB" == cardtype)
+    {
+        DeliverySystem *ds = new DeliverySystem();
+        ds->setValue(CardUtil::GetDeliverySystemFromDB(_cardid));
+        addChild(ds);
+    }
+    else
+    {
+        addChild(m_inputName);
+    }
     addChild(new InputDisplayName(*this));
     addChild(m_sourceId);
 
@@ -3709,6 +3737,25 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         default:
             break;
     }
+
+    // Create selection list of all delivery systems of this card
+    {
+        m_cardType->clearSelections();
+        QStringList delsys = CardUtil::ProbeDeliverySystems(videodevice);
+        QStringList::iterator it = delsys.begin();
+        if (it != delsys.end())
+        {
+            m_cardType->setValue(*it);
+        }
+        for (; it != delsys.end(); it++)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("DVBCardType: add deliverysystem:%1")
+                .arg(*it));
+
+            m_cardType->addSelection(*it, *it);
+        }
+    }
+#
 #else
     m_cardType->setValue(QString("Recompile with DVB-Support!"));
 #endif
@@ -3758,7 +3805,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
 
     m_cardNum  = new DVBCardNum(m_parent);
     m_cardName = new DVBCardName();
-    m_cardType = new DVBCardType();
+    m_cardType = new DVBCardType(m_parent);
 
     m_signalTimeout = new SignalTimeout(m_parent, 500, 250);
     m_channelTimeout = new ChannelTimeout(m_parent, 3000, 1750);

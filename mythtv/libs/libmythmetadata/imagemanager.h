@@ -255,7 +255,8 @@ protected:
 
 private:
     //! Host of SG
-    QString m_hostname, m_hostport;
+    QString m_hostname;
+    int m_hostport;
     //! Images storage group.
     // Marked mutable as storagegroup.h does not enforce const-correctness
     mutable StorageGroup m_sg;

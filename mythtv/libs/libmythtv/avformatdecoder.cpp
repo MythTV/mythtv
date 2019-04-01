@@ -954,6 +954,8 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
         score--;
     }
 
+    memset(probe.buf + probe.buf_size, 0, AVPROBE_PADDING_SIZE);
+
     return av_probe_input_format2(&probe, static_cast<int>(true), &score) != nullptr;
 }
 
@@ -1050,6 +1052,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         probe.buf_size = testbufsize;
     else
         probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
+
+    memset(probe.buf + probe.buf_size, 0, AVPROBE_PADDING_SIZE);
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "OpenFile -- begin");
 

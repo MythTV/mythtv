@@ -54,6 +54,17 @@ class MTV_PUBLIC DTVMultiplex
         const QString &symbol_rate,  const QString &fec_inner,
         const QString &modulation,   const QString &polarity);
 
+    bool ParseDVB_S(
+        const QString &frequency,    const QString &inversion,
+        const QString &symbol_rate,  const QString &fec_inner,
+        const QString &modulation,   const QString &polarity);
+
+    bool ParseDVB_C(
+        const QString &frequency,    const QString &inversion,
+        const QString &symbol_rate,  const QString &fec_inner,
+        const QString &modulation,   const QString &polarity,
+        const QString &mod_sys);
+
     bool ParseDVB_S2(
         const QString &frequency,    const QString &inversion,
         const QString &symbol_rate,  const QString &fec_inner,
@@ -84,15 +95,15 @@ class MTV_PUBLIC DTVMultiplex
     uint64_t         m_symbolrate {0};
     DTVInversion     m_inversion;
     DTVBandwidth     m_bandwidth;
-    DTVCodeRate      m_hp_code_rate;  ///< High Priority FEC rate
-    DTVCodeRate      m_lp_code_rate;  ///< Low Priority FEC rate
+    DTVCodeRate      m_hp_code_rate;    ///< High Priority FEC rate
+    DTVCodeRate      m_lp_code_rate;    ///< Low Priority FEC rate
     DTVModulation    m_modulation;
     DTVTransmitMode  m_trans_mode;
     DTVGuardInterval m_guard_interval;
     DTVHierarchy     m_hierarchy;
     DTVPolarity      m_polarity;
-    DTVCodeRate      m_fec; ///< Inner Forward Error Correction rate
-    DTVModulationSystem m_mod_sys; ///< modulation system (only DVB-S or DVB-S2 atm)
+    DTVCodeRate      m_fec;             ///< Inner Forward Error Correction rate
+    DTVModulationSystem m_mod_sys;      ///< Modulation system
     DTVRollOff       m_rolloff;
 
     // Optional additional info

@@ -120,19 +120,22 @@ class DescriptorID
         announcement_support        = 0x6E, /* partial */
         application_signalling      = 0x6F,
 
-        adaptation_field_data       = 0x70, /* partial */
-        service_identifier          = 0x71,
-        service_availability        = 0x72, /* partial */
-        default_authority           = 0x73, /* implemented */
-        related_content             = 0x74,
-        tva_id                      = 0x75,
-        dvb_content_identifier      = 0x76, /* partial */
-        time_slice_fec_identifier   = 0x77,
-        ecm_repetition_rate         = 0x78,
-        s2_delivery_system          = 0x79,
-        eac3                        = 0x7A,
-        dts                         = 0x7B,
-        aac                         = 0x7C,
+        adaptation_field_data          = 0x70, /* partial */
+        service_identifier             = 0x71,
+        service_availability           = 0x72, /* partial */
+        default_authority              = 0x73, /* implemented */
+        related_content                = 0x74,
+        tva_id                         = 0x75,
+        dvb_content_identifier         = 0x76, /* partial */
+        time_slice_fec_identifier      = 0x77,
+        ecm_repetition_rate            = 0x78,
+        s2_satellite_delivery_system   = 0x79,
+        eac3                           = 0x7A,
+        dts                            = 0x7B,
+        aac                            = 0x7C,
+        xait_location                  = 0x7D,
+        fta_content_management         = 0x7E,
+        t2_terrestrial_delivery_system = 0x7F,
 
         // ATSC
         atsc_stuffing               = 0x80,

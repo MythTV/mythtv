@@ -1283,11 +1283,12 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,season,episode,"
                    "category,seriesid,programid,inetref,findid,recordid,"
-                   "station,rectype,recstatus,duplicate,reactivate,future) "
+                   "station,rectype,recstatus,duplicate,reactivate,generic,"
+                   "future) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,:SEASON,"
                    ":EPISODE,:CATEGORY,:SERIESID,:PROGRAMID,:INETREF,"
                    ":FINDID,:RECORDID,:STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,"
-                   ":REACTIVATE,:FUTURE);");
+                   ":REACTIVATE,:GENERIC,:FUTURE);");
     result.bindValue(":CHANID", m_chanid);
     result.bindValue(":START", m_startts);
     result.bindValue(":END", m_endts);
@@ -1307,6 +1308,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", 0);
+    result.bindValue(":GENERIC", IsGeneric());
     result.bindValue(":FUTURE", future);
 
     if (!result.exec())

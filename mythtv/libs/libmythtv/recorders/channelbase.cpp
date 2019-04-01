@@ -69,7 +69,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     // try to find a valid channel if given start channel fails.
     QString msg1 = QString("Setting start channel '%1' failed, ")
         .arg(startchannel);
-    QString msg2 = "and we failed to find any suitible channels on any input.";
+    QString msg2 = "and we failed to find any suitable channels on any input.";
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
@@ -562,15 +562,14 @@ bool ChannelBase::InitializeInput(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("InitializeInputs", query);
+        MythDB::DBError("ChannelBase::InitializeInput", query);
         return false;
     }
     if (!query.size())
     {
-        LOG(VB_GENERAL, LOG_ERR, "InitializeInputs(): "
-            "\n\t\t\tCould not get inputs for the capturecard."
-            "\n\t\t\tPerhaps you have forgotten to bind video"
-            "\n\t\t\tsources to your card's inputs?");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("No capturecard record in database for input %1")
+            .arg(m_inputid));
         return false;
     }
 
@@ -581,6 +580,14 @@ bool ChannelBase::InitializeInput(void)
     m_startChanNum = query.value(2).toString();
     m_externalChanger = query.value(3).toString();
     m_tuneToChannel = query.value(4).toString();
+
+    if (0 == m_sourceid)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("No video source defined for input %1")
+            .arg(m_inputid));
+            return false;
+    }
 
     m_channels = ChannelUtil::GetChannels(m_sourceid, false);
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");

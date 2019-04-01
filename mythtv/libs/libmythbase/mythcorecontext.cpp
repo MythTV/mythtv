@@ -744,11 +744,6 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
-QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
-{
-    return GenMythURL(host,port.toInt(),path,storageGroup);
-}
-
 QString MythCoreContext::GenMythURL(QString host, int port, QString path, QString storageGroup)
 {
     QUrl ret;

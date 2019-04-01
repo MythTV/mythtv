@@ -740,10 +740,10 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
         QString msg = QString("write -> %1 %2")
             .arg(m_tcpSocket->socketDescriptor(), 2).arg(payload.data());
 
-        if (logLevel < LOG_DEBUG && msg.length() > 88)
+        if (logLevel < LOG_DEBUG && msg.length() > 128)
         {
-            msg.truncate(85);
-            msg += "...";
+            msg.truncate(127);
+            msg += "…";
         }
         LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }
@@ -928,22 +928,22 @@ void MythSocket::ReadStringListReal(
 
     QString str = QString::fromUtf8(utf8.data());
 
-    QByteArray payload;
-    payload = payload.setNum(str.length());
-    payload += "        ";
-    payload.truncate(8);
-    payload += str;
-
     if (VERBOSE_LEVEL_CHECK(VB_NETWORK, LOG_INFO))
     {
+        QByteArray payload;
+        payload = payload.setNum(str.length());
+        payload += "        ";
+        payload.truncate(8);
+        payload += utf8.data();
+
         QString msg = QString("read  <- %1 %2")
             .arg(m_tcpSocket->socketDescriptor(), 2)
             .arg(payload.data());
 
-        if (logLevel < LOG_DEBUG && msg.length() > 88)
+        if (logLevel < LOG_DEBUG && msg.length() > 128)
         {
-            msg.truncate(85);
-            msg += "...";
+            msg.truncate(127);
+            msg += "…";
         }
         LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }

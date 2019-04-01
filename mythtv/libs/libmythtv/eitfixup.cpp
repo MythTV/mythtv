@@ -198,24 +198,28 @@ EITFixUp::EITFixUp()
       m_HTML("</?EM>", Qt::CaseInsensitive),
       m_grReplay("\\([ΕE]\\)"),
       m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
-      m_grActors("(?:[Ππ]α[ιί]ζουν:|[Μμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
+      m_grActors("(?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
       // cap(1) actors, just names
       m_grFixnofullstopActors("(\\w\\s(Παίζουν:|Πρωταγων))"),
       m_grFixnofullstopDirectors("((\\w\\s(Σκηνοθ[εέ]))"),
-      m_grPeopleSeparator("(,\\s+)"),
-      m_grDirector("(?:Σκηνοθεσία: |Σκηνοθέτης: )(\\w+\\s\\w+\\s?)(?:\\W?)"),
-      m_grPres("(?:Παρουσ[ιί]αση:(?:\\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\\sο|\\sη)|Με τ(?:ον |ην )(?:[\\s|:|ο|η])*(?:\\b)*)([-\\w\\s]+(?:,[-\\w\\s]+)*)(?:\\W?)"),
+      m_grPeopleSeparator("([,-]\\s+)"),
+      m_grDirector("(?:Σκηνοθεσία: |Σκηνοθέτης: |Σκηνοθέτης - Επιμέλεια: )(\\w+\\s\\w+\\s?)(?:\\W?)"),
+      m_grPres("(?:Παρουσ[ιί]αση:(?:\\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\\sο|\\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\\sο|\\sη)|Με τ(?:ον |ην )(?:[\\s|:|ο|η])*(?:\\b)*)([-\\w\\s]+(?:,[-\\w\\s]+)*)(?:\\W?)"),
       m_grYear("(?:\\W?)(?:\\s?παραγωγ[ηή]ς|\\s?-|,)\\s*([1-2]{1}[0-9]{3})(?:-\\d{1,4})?",Qt::CaseInsensitive),
       m_grCountry("(?:\\W|\\b)(?:(ελλην|τουρκ|αμερικ[αά]ν|γαλλ|αγγλ|βρεττ?αν|γερμαν|ρωσσ?|ιταλ|ελβετ|σουηδ|ισπαν|πορτογαλ|μεξικ[αά]ν|κιν[εέ]ζικ|ιαπων|καναδ|βραζιλι[αά]ν)(ικ[ηή][ςσ]))",Qt::CaseInsensitive),
       m_grlongEp("\\b(?:Επ.|επεισ[οό]διο:?)\\s*(\\d+)(?:\\W?)",Qt::CaseInsensitive),
-      m_grSeason("(?:-\\s)?\\b((\\D{1,2})(?:')?|(\\d{1,2})(?:ος|ου)?)(?:\\sκ[υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
-      m_grRealTitleinDescription("(?:^\\()([\\w\\s\\d\\D-]+)(?:\\))(?:\\s*)"),
+      m_grSeason_as_RomanNumerals(",\\s*([MDCLXVIΙΧ]+)$",Qt::CaseInsensitive),
+      m_grSeason("(?:\\W-?)*(?:\\(-\\s*)?\\b(([Α-Ω]{1,2})(?:'|΄)?|(\\d{1,2})(?:ος|ου|oς|os)?)(?:\\s*κ[υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
+      m_grRealTitleinDescription("(?:^\\()([A-Za-z\\s\\d-]+)(?:\\))(?:\\s*)"),
       // cap1 = real title
       // cap0 = real title in parentheses.
-      m_grRealTitleinTitle("(?:\\()([\\w\\s\\d\\D-]+)(?:\\))(?:\\s*$)*"),
+      m_grRealTitleinTitle("(?:\\()([A-Za-z\\s\\d-]+)(?:\\))(?:\\s*$)*"),
       // cap1 = real title
       // cap0 = real title in parentheses.
-      m_grNotPreviouslyShown("(?:\\b[Α1]['η]?\\s*(?:τηλεοπτικ[ηή]\\s*)?(?:μετ[αά]δοση|προβολ[ηή]))(?:\\W?)"),
+      m_grCommentsinTitle("(?:\\()([Α-Ωα-ω\\s\\d-]+)(?:\\))(?:\\s*$)*"),
+      // cap1 = real title
+      // cap0 = real title in parentheses.
+      m_grNotPreviouslyShown("(?:\\W?)(?:-\\s*)*(?:\\b[Α1]['΄η]?\\s*(?:τηλεοπτικ[ηή]\\s*)?(?:μετ[αά]δοση|προβολ[ηή]))(?:\\W?)",Qt::CaseInsensitive),
       // Try to exctract Greek categories from keywords in description.
       m_grEpisodeAsSubtitle("(?:^Επεισ[οό]διο:\\s?)([\\w\\s-,']+)\\.(?:\\s)?"),
       m_grCategFood("(?:\\W)?(?:εκπομπ[ηή]\\W)?(Γαστρονομ[ιί]α[σς]?|μαγειρικ[ηή][σς]?|chef|συνταγ[εέηή]|διατροφ|wine|μ[αά]γειρα[σς]?)(?:\\W)?",Qt::CaseInsensitive),
@@ -2552,6 +2556,8 @@ void EITFixUp::FixGreekSubtitle(DBEventEIT &event) const
 
 void EITFixUp::FixGreekEIT(DBEventEIT &event) const
 {
+    int position1;
+    int position2;
     //Live show
     int position;
     QRegExp tmpRegEx;
@@ -2567,7 +2573,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     if (position != -1)
     {
         event.m_previouslyshown = false;
-        event.m_title = event.m_title.replace(m_grNotPreviouslyShown.cap(0), "");
+        event.m_title = event.m_title.replace(m_grNotPreviouslyShown, "");
     }
 
     // Greek Replay (Ε)
@@ -2579,6 +2585,23 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         event.m_previouslyshown = true;
         event.m_title = event.m_title.replace(tmpRegEx, "");
     }
+
+    // Check for (HD) in the decription
+    position = event.m_description.indexOf("(HD)");
+    if (position != -1)
+    {
+        event.m_description = event.m_description.replace("(HD)", "");
+        event.m_videoProps |= VID_HDTV;
+    }
+
+    // Check for (Full HD) in the decription
+    position = event.m_description.indexOf("(Full HD)");
+    if (position != -1)
+    {
+        event.m_description = event.m_description.replace("(Full HD)", "");
+        event.m_videoProps |= VID_HDTV;
+    }
+
 
     tmpRegEx = m_grFixnofullstopActors;
     position = event.m_description.indexOf(tmpRegEx);
@@ -2639,37 +2662,6 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         event.m_description.replace(tmpRegEx.cap(0), "");
     }
 
-/*
-
-    tmpRegEx = m_grDirector;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
-    {
-        // director is captured in cap(1).Due to sometimes miswritten data in
-        // eit, e.g no fullstop present(!)
-        QString tmpDirectorsString = tmpRegEx.cap(1);
-        // look for actors in director string (lack of fullstop, etc)
-        tmpRegEx = m_grActors;
-        int actposition = tmpDirectorsString.indexOf(tmpRegEx);
-        if (actposition != -1)
-        {
-            tmpDirectorsString = tmpDirectorsString.replace(tmpRegEx,"");
-        }
-        const QStringList directors =
-            tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = directors.begin();
-        for (; it != directors.end(); ++it)
-        {
-            tmpDirectorsString = it->split(":").last().trimmed().
-                    remove(QRegExp("\\.$"));
-            if (tmpDirectorsString != "")
-                event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
-
-        }
-        event.m_description.replace(tmpRegEx.cap(0), "");
-       // directorPresent = true;
-    }
-*/
     //Try to find presenter
     tmpRegEx = m_grPres;
     position = event.m_description.indexOf(tmpRegEx);
@@ -2709,6 +2701,8 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     event.m_description = event.m_description.trimmed();
     event.m_title       = event.m_title.trimmed();
     event.m_subtitle    = event.m_subtitle.trimmed();
+    // Remove " ."
+    event.m_description = event.m_description.replace(" .",".").trimmed();
 
     //find country of origin and remove it from description.
     tmpRegEx = m_grCountry;
@@ -2724,9 +2718,8 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     QRegExp tmpSeries = m_grSeason;
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
-    int position1 = tmpSeries.indexIn(event.m_title);
-    int position2 = tmpSeries.indexIn(event.m_description);
-    if ((position1 != -1) || (position2 != -1))
+    if ((position1 = tmpSeries.indexIn(event.m_title)) != -1
+          || (position2 = tmpSeries.indexIn(event.m_description)) != -1)
     {
         if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
         {
@@ -2756,6 +2749,73 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         if (position2 != -1)
             event.m_description.replace(tmpSeries.cap(0),"");
     }
+    // If Season is in Roman Numerals (I,II,etc)
+    tmpSeries = m_grSeason_as_RomanNumerals;
+    if ((position1 = tmpSeries.indexIn(event.m_title)) != -1
+          || (position2 = tmpSeries.indexIn(event.m_description)) != -1)
+    {
+        if (!tmpSeries.isEmpty()) //number
+        {
+            // make sure I replace greek Ι with english I
+            QString romanSeries = tmpSeries.cap(1).replace("Ι","I").toUpper();
+            if (romanSeries == "I")
+                event.m_season = 1;
+            else if (romanSeries == "II")
+                event.m_season = 2;
+            else if (romanSeries== "III")
+                event.m_season = 3;
+            else if (romanSeries == "IV")
+                event.m_season = 4;
+            else if (romanSeries == "V")
+                event.m_season = 5;
+            else if (romanSeries== "VI")
+                event.m_season = 6;
+            else if (romanSeries == "VII")
+                event.m_season = 7;
+            else if (romanSeries == "VIII")
+                event.m_season = 8;
+            else if (romanSeries == "IX")
+                event.m_season = 9;
+            else if (romanSeries == "X")
+                event.m_season = 10;
+            else if (romanSeries == "XI")
+                event.m_season = 11;
+            else if (romanSeries == "XII")
+                event.m_season = 12;
+            else if (romanSeries == "XII")
+                event.m_season = 13;
+            else if (romanSeries == "XIV")
+                event.m_season = 14;
+            else if (romanSeries == "XV")
+                event.m_season = 15;
+            else if (romanSeries == "XVI")
+                event.m_season = 16;
+            else if (romanSeries == "XVII")
+                event.m_season = 17;
+            else if (romanSeries == "XIII")
+                event.m_season = 18;
+            else if (romanSeries == "XIX")
+                event.m_season = 19;
+            else if (romanSeries == "XX")
+                event.m_season = 20;
+        }
+        series = true;
+        if (position1 != -1)
+        {
+            event.m_title.replace(tmpSeries.cap(0),"");
+            event.m_title = event.m_title.trimmed();
+            if (event.m_title.right(1) == ",")
+               event.m_title.chop(1);
+        }
+        if (position2 != -1)
+        {
+            event.m_description.replace(tmpSeries.cap(0),"");
+            event.m_description = event.m_description.trimmed();
+            if (event.m_description.right(1) == ",")
+               event.m_description.chop(1);
+        }
+    }
+
 
     QRegExp tmpEpisode = m_grlongEp;
     //tmpEpisode.setMinimal(true);
@@ -2775,6 +2835,17 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
             if (0 == event.m_season)
                 event.m_season = 1;
         }
+    }
+    // Sometimes, especially on greek national tv, they include comments in the
+    // title, e.g "connection to ert1", "ert archives".
+    // Because they obscure the real title, I'll isolate and remove them.
+
+    QRegExp tmpComment = m_grCommentsinTitle;
+    tmpComment.setMinimal(true);
+    position = event.m_title.indexOf(tmpComment);
+    if (position != -1)
+    {
+        event.m_title.replace(tmpComment.cap(0),"");
     }
 
     // Sometimes the real (mostly English) title of a movie or series is

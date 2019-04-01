@@ -347,7 +347,7 @@ void ChannelScanSM::LogLines(const QString& string) const
 {
     QStringList lines = string.split('\n');
     for (int i = 0; i < lines.size(); ++i)
-        LOG(VB_CHANSCAN, LOG_INFO, lines[i]);
+        LOG(VB_CHANSCAN, LOG_DEBUG, lines[i]);
 }
 
 void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
@@ -529,7 +529,9 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table (other)");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Service Description Table (other) for Transport ID %1")
+            .arg(tsid));
     LogLines(sdt->toString());
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
@@ -699,7 +701,13 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             uint64_t frequency = 0;
             const MPEGDescriptor desc(list[j]);
             uint tag = desc.DescriptorTag();
+            uint length = desc.DescriptorLength();
+            QString tagString = desc.DescriptorTagString();
+
             DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
+
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("ts-loop j:%1 tag:%2 %3 length:%4")
+                .arg(j).arg(tag).arg(tagString).arg(length));
 
             switch (tag)
             {
@@ -924,11 +932,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         }
     }
 
-    // append transports from the NIT to the scan list
+    // Append transports from the NIT to the scan list
     if (transport_tune_complete && m_extendScanList &&
         !m_currentInfo->m_nits.empty())
     {
-        // append delivery system descriptos to scan list
+        // Update transport with delivery system descriptors from the NIT
         nit_vec_t::const_iterator it = m_currentInfo->m_nits.begin();
         while (it != m_currentInfo->m_nits.end())
         {
@@ -956,6 +964,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
             TransportScanItem &item = *m_current;
             item.m_tuning.m_frequency = item.freq_offset(m_current.offset());
+
+            item.m_tuning.m_mod_sys.Parse(m_inputName);
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                QString("%1(%2) m_inputName: %3 ").arg(__FUNCTION__).arg(__LINE__).arg(m_inputName) +
+                QString("m_mod_sys:%1 %2").arg(item.m_tuning.m_mod_sys).arg(item.m_tuning.m_mod_sys.toString()));
 
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
             {
@@ -1088,7 +1101,9 @@ static void update_info(ChannelInsertInfo &info,
         (sdt->OriginalNetworkID() ==   222) ||
 #endif
         // ERT (GR) from the private temporary allocation, see #9592:comment:17
-        (sdt->OriginalNetworkID() == 65330)
+        (sdt->OriginalNetworkID() == 65330) ||
+        // Digitenne (NL) see #13427
+        (sdt->OriginalNetworkID() == 8720)
     );
     // HACK end -- special exception for these networks
 
@@ -1821,6 +1836,10 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     DTVMultiplex tuning = item.m_tuning;
     tuning.m_frequency = freq;
 
+    if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT)
+    {
+        tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+    }
     if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
     {
         if (m_dvbt2Tried)
@@ -1919,6 +1938,15 @@ bool ChannelScanSM::ScanTransports(
     const QString &table_start,
     const QString &table_end)
 {
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+        QString("%1: ").arg(__FUNCTION__) +
+        QString("SourceID:%1 ").arg(SourceID) +
+        QString("std:%1 ").arg(std) +
+        QString("modulation:%1 ").arg(modulation) +
+        QString("country:%1 ").arg(country) +
+        QString("table_start:%1 ").arg(table_start) +
+        QString("table_end:%1 ").arg(table_end));
+
     QString name("");
     if (m_scanning)
         return false;
@@ -2184,6 +2212,10 @@ bool ChannelScanSM::AddToList(uint mplexid)
     tt = GuessDTVTunerType(tt);
 
     TransportScanItem item(sourceid, sistandard, fn, mplexid, m_signalTimeout);
+
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+        QString("tunertype:%1 %2 sourceid:%3 sistandard:%4 fn:'%5' mplexid:%6")
+            .arg(tt).arg(tt.toString()).arg(sourceid).arg(sistandard).arg(fn).arg(mplexid));
 
     if (item.m_tuning.FillFromDB(tt, mplexid))
     {

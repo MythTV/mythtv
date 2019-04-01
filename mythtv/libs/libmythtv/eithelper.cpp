@@ -1387,6 +1387,7 @@ static void init_fixup(FixupMap &fix)
     fix[  100LL << 32 |  8492LL << 16 ] = // Ant1,Alpha,Art,10E
     fix[  102LL << 32 |  8492LL << 16 ] = // Mega,Star,SKAI,M.tv
     fix[  320LL << 32 |  8492LL << 16 ] = // Astra,Thessalia,TRT,TV10,ZEYS
+        EITFixUp::kEFixForceISO8859_7 |
         EITFixUp::kFixGreekEIT |
         EITFixUp::kFixGreekCategories;
     fix[    2LL << 32 |  8492LL << 16 ] = // N1,Nplus,NHD,Vouli
@@ -1394,6 +1395,16 @@ static void init_fixup(FixupMap &fix)
         EITFixUp::kFixGreekSubtitle |     // Subtitle has too much info and is
         EITFixUp::kFixGreekEIT |              // cut in db. Will move to descr.
         EITFixUp::kFixGreekCategories;
+
+    //DVB-S & S2 Greek Nova Provider
+    // Hotbird 11823H DVB-S
+    fix[ 5500LL << 32 |  318LL << 16 ] = EITFixUp::kEFixForceISO8859_7;
+    // Hotbird 11938H DVB-S
+    fix[ 6100LL << 32 |  318LL << 16 ] = EITFixUp::kEFixForceISO8859_7;
+    // Hotbird 12130H DVB-S2
+    fix[ 7100LL << 32 |  318LL << 16 ] = EITFixUp::kEFixForceISO8859_7;
+    // Hotbird 12169H DVB-S2
+    fix[ 7300LL << 32 |  318LL << 16 ] = EITFixUp::kEFixForceISO8859_7;
 
     // DVB-S Star One C2 70W (Brazil)
     // it has original_network_id = 1 like Astra on 19.2E, but transport_id does

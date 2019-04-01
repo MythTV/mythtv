@@ -573,12 +573,13 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     return devs;
 }
 
-QString CardUtil::ProbeDVBType(const QString &device)
+// Get the list of delivery systems from the card
+QStringList CardUtil::ProbeDeliverySystems(const QString &device)
 {
-    QString ret = "ERROR_UNKNOWN";
+    QStringList delsys;
 
     if (device.isEmpty())
-        return ret;
+        return delsys;
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
@@ -587,32 +588,11 @@ QString CardUtil::ProbeDVBType(const QString &device)
     int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Can't open DVB frontend (%1) for %2.")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Can't open DVB frontend (%1) for %2.")
                 .arg(dvbdev).arg(device) + ENO);
-        return ret;
+        return delsys;
     }
-
-    struct dvb_frontend_info info;
-    memset(&info, 0, sizeof(info));
-    int err = ioctl(fd_frontend, FE_GET_INFO, &info);
-    if (err < 0)
-    {
-        close(fd_frontend);
-        LOG(VB_GENERAL, LOG_ERR, QString("FE_GET_INFO ioctl failed (%1)")
-                                         .arg(dvbdev) + ENO);
-        return ret;
-    }
-
-    DTVTunerType type(info.type);
-#if HAVE_FE_CAN_2G_MODULATION
-    if (info.caps & FE_CAN_2G_MODULATION)
-    {
-        if (type == DTVTunerType::kTunerTypeDVBS1)
-            type = DTVTunerType::kTunerTypeDVBS2;
-        else if (type == DTVTunerType::kTunerTypeDVBT)
-            type = DTVTunerType::kTunerTypeDVBT2;
-    }
-#endif // HAVE_FE_CAN_2G_MODULATION
 
 #if DVB_API_VERSION >=5
     unsigned int i;
@@ -620,33 +600,68 @@ QString CardUtil::ProbeDVBType(const QString &device)
     struct dtv_properties cmd;
 
     memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_API_VERSION;
+    cmd.num = 1;
+    cmd.props = &prop;
+    if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("(%1) ").arg(dvbdev) +
+            QString("dvb api version %1.%2").arg((prop.u.data>>8)&0xff).arg((prop.u.data)&0xff));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("(%1) FE_GET_PROPERTY ioctl failed")
+            .arg(dvbdev) + ENO);
+        close(fd_frontend);
+        return delsys;
+    }
+
+    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_ENUM_DELSYS;
     cmd.num = 1;
     cmd.props = &prop;
-
     if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
         for (i = 0; i < prop.u.buffer.len; i++)
         {
-            switch (prop.u.buffer.data[i])
-            {
-                // TODO: not supported. you can have DVBC and DVBT on the same card
-                // The following are backwards compatible so its ok
-                case SYS_DVBS2:
-                    type = DTVTunerType::kTunerTypeDVBS2;
-                    break;
-                case SYS_DVBT2:
-                    type = DTVTunerType::kTunerTypeDVBT2;
-                    break;
-                default:
-                    break;
-            }
+            delsys.push_back(DTVModulationSystem::toString(prop.u.buffer.data[i]));
         }
+        QStringList::iterator it = delsys.begin();
+        QString msg = "Delivery systems:";
+        for (; it != delsys.end(); it++)
+        {
+            msg += " ";
+            msg += *it;
+        }
+        LOG(VB_GENERAL, LOG_INFO, QString("CardUtil: (%1) ")
+            .arg(dvbdev) + msg);
     }
-#endif
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("FE_GET_PROPERTY ioctl failed (%1)")
+            .arg(dvbdev) + ENO);
+    }
+#endif  // DVB_API_VERSION >= 5
     close(fd_frontend);
+#endif  // USING_DVB
 
+    return delsys;
+}
+
+QString CardUtil::ProbeDVBType(const QString &device)
+{
+    QString ret = "ERROR_UNKNOWN";
+
+    if (device.isEmpty())
+        return ret;
+
+#ifdef USING_DVB
+    DTVTunerType type = ProbeTunerType(device);
     ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
+
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("(%1) tuner type:%2 %3")
+        .arg(device).arg(type).arg(ret));
 #endif // USING_DVB
 
     return ret;
@@ -718,6 +733,131 @@ uint CardUtil::GetMinSignalMonitoringDelay(const QString &device)
     return 25;
 }
 
+
+DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)
+{
+    DTVTunerType tunertype;
+
+    switch (delsys)
+    {
+        case DTVModulationSystem::kModulationSystem_DVBS:
+            tunertype = DTVTunerType::kTunerTypeDVBS1;
+            break;
+        case DTVModulationSystem::kModulationSystem_DVBS2:
+            tunertype = DTVTunerType::kTunerTypeDVBS2;
+            break;
+        case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A:
+            tunertype = DTVTunerType::kTunerTypeDVBC;
+            break;
+        case DTVModulationSystem::kModulationSystem_DVBT:
+            tunertype = DTVTunerType::kTunerTypeDVBT;
+            break;
+        case DTVModulationSystem::kModulationSystem_DVBT2:
+            tunertype = DTVTunerType::kTunerTypeDVBT2;
+            break;
+        case DTVModulationSystem::kModulationSystem_ATSC:
+            tunertype = DTVTunerType::kTunerTypeATSC;
+            break;
+        default:
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("TODO Add to switch case delivery system:%2 %3")
+                    .arg(delsys).arg(delsys.toString()));
+            break;
+    }
+
+    return tunertype;
+}
+
+// Get the currently configured delivery system from the database
+DTVModulationSystem CardUtil::GetDeliverySystem(uint inputid)
+{
+    QString delsys_db = GetDeliverySystemFromDB(inputid);
+    DTVModulationSystem delsys;
+    delsys.Parse(delsys_db);
+    return delsys;
+}
+
+// Get the currently configured tuner type from the database
+DTVTunerType CardUtil::GetTunerType(uint inputid)
+{
+    DTVModulationSystem delsys = GetDeliverySystem(inputid);
+    DTVTunerType tunertype = ConvertToTunerType(delsys);
+    return tunertype;
+}
+
+// Get the currently configured delivery system from the device
+DTVModulationSystem CardUtil::ProbeDeliverySystem(const QString &device)
+{
+    DTVModulationSystem delsys;
+
+    QByteArray dev = device.toLatin1();
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
+    if (fd_frontend < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("open failed (%1)")
+                .arg(device) + ENO);
+        return delsys;
+    }
+
+    delsys = ProbeDeliverySystem(fd_frontend);
+    close(fd_frontend);
+    return delsys;
+}
+
+// Get the currently configured delivery system from the device
+DTVModulationSystem CardUtil::ProbeDeliverySystem(int fd_frontend)
+{
+    DTVModulationSystem delsys;
+
+#ifdef USING_DVB
+    struct dtv_property prop;
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_DELIVERY_SYSTEM;
+    // prop.u.data = delsys;
+    cmd.num = 1;
+    cmd.props = &prop;
+
+    int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
+    if (ret < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("FE_GET_PROPERTY ioctl failed (fd:%1)")
+                .arg(fd_frontend) + ENO);
+        return delsys;
+	}
+
+    delsys.Parse(DTVModulationSystem::toString(prop.u.data));
+
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("delsys:%1 %2")
+        .arg(delsys).arg(delsys.toString()));
+
+#endif // USING_DVB
+
+    return delsys;
+}
+
+// Get the currently configured tuner type from the device
+DTVTunerType CardUtil::ProbeTunerType(int fd_frontend)
+{
+    DTVModulationSystem delsys = ProbeDeliverySystem(fd_frontend);
+    DTVTunerType tunertype = ConvertToTunerType(delsys);
+    return tunertype;
+}
+
+// Get the currently configured tuner type from the device
+DTVTunerType CardUtil::ProbeTunerType(const QString &device)
+{
+    DTVModulationSystem delsys = ProbeDeliverySystem(device);
+    DTVTunerType tunertype = ConvertToTunerType(delsys);
+    return tunertype;
+}
+
+// Get the delivery system from database table capturecard
+// and configure the tuner accordingly.
+// Return the tuner type corresponding with the modulation system.
 QString CardUtil::ProbeSubTypeName(uint inputid)
 {
     QString type = GetRawInputType(inputid);
@@ -729,15 +869,119 @@ QString CardUtil::ProbeSubTypeName(uint inputid)
     if (device.isEmpty())
         return "ERROR_OPEN";
 
-    return ProbeDVBType(device);
+    DTVModulationSystem delsys = GetDeliverySystem(inputid);
+    DTVTunerType tunertype = ConvertToTunerType(delsys);
+    if (DTVTunerType::kTunerTypeUnknown != tunertype)
+    {
+        SetDeliverySystem(inputid, delsys);
+    }
+
+    QString subtype = "ERROR_UNKNOWN";
+    if (DTVTunerType::kTunerTypeUnknown != tunertype)
+    {
+        subtype = tunertype.toString();
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("[%1] delsys:%2 %3 tunertype:%4 %5 subtype:%6")
+        .arg(inputid).arg(delsys).arg(delsys.toString())
+        .arg(tunertype).arg(tunertype.toString()).arg(subtype));
+
+    return subtype;
 }
 
 /// \brief Returns true iff the input_type is one of the DVB types.
 bool CardUtil::IsDVBInputType(const QString &inputType)
 {
     QString t = inputType.toUpper();
-    return (t == "DVB") || (t == "QAM") || (t == "QPSK") ||
-        (t == "OFDM") || (t == "ATSC") || (t == "DVB_S2");
+    return (t == "DVB") || (t == "QPSK") || (t == "QAM") || (t == "OFDM") ||
+        (t == "ATSC") || (t == "DVB_S2") || (t == "DVB_T2");
+}
+
+int CardUtil::SetDeliverySystem(uint inputid)
+{
+    int ret = -1;
+
+#ifdef USING_DVB
+    DTVModulationSystem delsys = GetDeliverySystem(inputid);
+    ret = SetDeliverySystem(inputid, delsys);
+#endif // USING_DVB
+
+    return ret;
+}
+
+int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys)
+{
+    int ret = -1;
+
+#ifdef USING_DVB
+    QString device = GetVideoDevice(inputid);
+
+    if (device.isEmpty())
+        return ret;
+
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    QByteArray dev = dvbdev.toLatin1();
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
+    if (fd_frontend < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("open failed (%1)")
+                .arg(dvbdev) + ENO);
+        return errno;
+    }
+    ret = SetDeliverySystem(inputid, delsys, fd_frontend);
+
+    close(fd_frontend);
+#endif // USING_DVB
+
+    return ret;
+}
+
+// Get delivery system from the database and write it to the card
+int CardUtil::SetDeliverySystem(uint inputid, int fd)
+{
+    int ret = -1;
+
+#ifdef USING_DVB
+    DTVModulationSystem delsys = GetDeliverySystem(inputid);
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED != delsys)
+    {
+        ret = SetDeliverySystem(inputid, delsys, fd);
+    }
+#endif // USING_DVB
+
+    return ret;
+}
+
+// Write the delivery system to the card
+int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd)
+{
+    int ret = -1;
+
+#ifdef USING_DVB
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("[%1] fd:%2 delsys:%3 %4")
+        .arg(inputid).arg(fd).arg(delsys).arg(delsys.toString()));
+
+    struct dtv_property prop;
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_DELIVERY_SYSTEM;
+    prop.u.data = delsys;
+    cmd.num = 1;
+    cmd.props = &prop;
+
+    ret = ioctl(fd, FE_SET_PROPERTY, &cmd);
+    if (ret < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("[%1] FE_SET_PROPERTY ioctl failed")
+                .arg(inputid) + ENO);
+        return ret;
+	}
+#endif // USING_DVB
+
+    return ret;
 }
 
 QString get_on_input(const QString &to_get, uint inputid)
@@ -1249,7 +1493,7 @@ QString CardUtil::GetDisplayName(uint inputid)
         return QString();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname, cardid, cardtype, inputname "
+    query.prepare("SELECT displayname, cardid, inputname "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
@@ -1260,8 +1504,8 @@ QString CardUtil::GetDisplayName(uint inputid)
     {
         QString result = query.value(0).toString();
         if (result.isEmpty())
-            result = QString("%1: %2/%3").arg(query.value(1).toInt())
-                .arg(query.value(2).toString()).arg(query.value(3).toString());
+            result = QString("%1: %2").arg(query.value(1).toInt())
+                .arg(query.value(2).toString());
         return result;
     }
 
@@ -2212,13 +2456,45 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {
     QString devname = QString(device);
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("DVB Device (%1)").arg(devname));
+    QString tmp = devname;
 
     if (DVB_DEV_FRONTEND == type)
         return devname;
     if (DVB_DEV_DVR == type)
-        return devname.replace(devname.indexOf("frontend"), 8, "dvr");
+    {
+        tmp = tmp.replace(devname.indexOf("frontend"), 8, "dvr");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend dvr number matches (%1)").arg(tmp));
+            return tmp;
+        }
+        else // use dvr0, allows multi-standard frontends which only have one dvr
+        {
+            devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
+            return devname;
+        }
+    }
     if (DVB_DEV_DEMUX == type)
-        return devname.replace(devname.indexOf("frontend"), 8, "demux");
+    {
+        tmp = tmp.replace(devname.indexOf("frontend"), 8, "demux");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend demux number matches (%1)").arg(tmp));
+            return tmp;
+        }
+        else // use demux0, allows multi-standard frontends, which only have one demux
+        {
+            devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
+            return devname;
+        }
+    }
     if (DVB_DEV_CA == type)
         return devname.replace(devname.indexOf("frontend"), 8, "ca");
     if (DVB_DEV_AUDIO == type)
@@ -2228,6 +2504,7 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 
     return "";
 }
+
 
 /**
  * If the device is valid, check if the model does DVB.

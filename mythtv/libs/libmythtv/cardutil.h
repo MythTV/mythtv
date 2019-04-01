@@ -14,6 +14,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythtvexp.h"
+#include "dtvconfparserhelpers.h"
 
 class InputInfo;
 class CardInput;
@@ -275,6 +276,8 @@ class MTV_PUBLIC CardUtil
         { return get_on_input("audiodevice", inputid); }
     static QString      GetVBIDevice(uint inputid)
         { return get_on_input("vbidevice", inputid); }
+    static QString      GetDeliverySystemFromDB(uint inputid)
+        { return get_on_input("inputname", inputid); }          // use capturecard/inputname for now
 
     static QString      GetHostname(uint inputid)
         { return get_on_input("hostname", inputid); }
@@ -372,11 +375,23 @@ class MTV_PUBLIC CardUtil
         { return "DVB" == GetRawInputType(inputid); }
     static bool         IsDVBInputType(const QString &inputType);
     static QString      ProbeDVBFrontendName(const QString &device);
+    static QStringList  ProbeDeliverySystems(const QString &device);
+    static DTVModulationSystem ProbeDeliverySystem(int fd_frontend);
+    static DTVModulationSystem ProbeDeliverySystem(const QString &device);
+    static DTVTunerType ProbeTunerType(int fd_frontend);
+    static DTVTunerType ProbeTunerType(const QString &device);
+    static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
+    static DTVTunerType GetTunerType(uint inputid);
+    static DTVModulationSystem GetDeliverySystem(uint inputid);
     static QString      ProbeDVBType(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
     static uint         GetMinSignalMonitoringDelay(const QString &device);
     static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
     static InputNames   GetConfiguredDVBInputs(const QString &device);
+    static int          SetDeliverySystem(uint inputid);
+    static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys);
+    static int          SetDeliverySystem(uint inputid, int fd);
+    static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd);
 
     // V4L info
     static bool         hasV4L2(int videofd);

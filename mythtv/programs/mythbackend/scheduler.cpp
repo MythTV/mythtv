@@ -262,8 +262,10 @@ static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
     if (aprec != bprec)
         return aprec < bprec;
 
-    if (a->GetFindID() != b->GetFindID())
-        return a->GetFindID() > b->GetFindID();
+    // If all else is equal, use the rule with higher priority.
+    if (a->GetRecordingPriority() != b->GetRecordingPriority())
+        return a->GetRecordingPriority() > b->GetRecordingPriority();
+
     return a->GetRecordingRuleID() < b->GetRecordingRuleID();
 }
 
@@ -4461,8 +4463,9 @@ void Scheduler::AddNewRecords(void)
         "    capturecard.hostname, recordmatch.oldrecstatus, NULL, "//43-45
         "    oldrecstatus.future, capturecard.schedorder, " //46-47
         "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, " //48-50
-        "    c.mplexid, capturecard.displayname, ") +      //51-52
-        pwrpri + QString(                                  //53
+        "    c.mplexid, capturecard.displayname,         "//51-52
+        "    p.season, p.episode, p.totalepisodes, ") +   //53-55
+        pwrpri + QString(                                  //56
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
         "INNER JOIN program AS p "
@@ -4536,9 +4539,9 @@ void Scheduler::AddNewRecords(void)
             result.value(5).toString(),//subtitle
             QString(),//sortsubtitle
             result.value(6).toString(),//description
-            0, // season
-            0, // episode
-            0, // total episodes
+            result.value(53).toInt(), // season
+            result.value(54).toInt(), // episode
+            result.value(55).toInt(), // total episodes
             result.value(48).toString(),//synidcatedepisode
             result.value(11).toString(),//category
 
@@ -4607,7 +4610,7 @@ void Scheduler::AddNewRecords(void)
             p->SetRecordingStatus(p->m_oldrecstatus);
         }
 
-        p->SetRecordingPriority2(result.value(53).toInt());
+        p->SetRecordingPriority2(result.value(56).toInt());
 
         // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
