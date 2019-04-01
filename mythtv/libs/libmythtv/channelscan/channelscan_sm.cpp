@@ -319,7 +319,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
         return false;
     }
 
-    for (uint i = 0; i < multiplexes.size(); ++i)
+    for (size_t i = 0; i < multiplexes.size(); ++i)
         AddToList(multiplexes[i]);
 
     m_extendScanList = follow_nit;
@@ -506,6 +506,8 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
         {
             DefaultAuthorityDescriptor authority(def_auth);
             ServiceListDescriptor services(serv_list);
+            if (!authority.IsValid() || !services.IsValid())
+                continue;
 
             for (uint j = 0; j < services.ServiceCount(); ++j)
             {
@@ -548,6 +550,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
         if (def_auth)
         {
             DefaultAuthorityDescriptor authority(def_auth);
+            if (!authority.IsValid())
+                continue;
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("found default authority(SDTo) for service %1 %2 %3")
                     .arg(netid).arg(tsid).arg(serviceId));
@@ -664,7 +668,7 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
 
     vector<DTVTunerType> tts = chan->GetTunerTypes();
 
-    for (uint i = 0; i < tts.size(); ++i)
+    for (size_t i = 0; i < tts.size(); ++i)
     {
         if (tts[i] == type)
             return type;
@@ -691,7 +695,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                   nit->TransportDescriptorsLength(i));
 
-        for (uint j = 0; j < list.size(); ++j)
+        for (size_t j = 0; j < list.size(); ++j)
         {
             int mplexid = -1;
             uint64_t frequency = 0;
@@ -782,7 +786,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     // Grab PAT tables
     pat_vec_t pattmp = sd->GetCachedPATs();
     QMap<uint,bool> tsid_checked;
-    for (uint i = 0; i < pattmp.size(); ++i)
+    for (size_t i = 0; i < pattmp.size(); ++i)
     {
         uint tsid = pattmp[i]->TransportStreamID();
         if (tsid_checked[tsid])
@@ -837,7 +841,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     sdt_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
-    for (uint i = 0; i < sdttmp.size(); ++i)
+    for (size_t i = 0; i < sdttmp.size(); ++i)
     {
         uint tsid = sdttmp[i]->TSID();
         if (tsid_checked[tsid])
@@ -1152,18 +1156,20 @@ static void update_info(ChannelInsertInfo &info,
     if (def_auth)
     {
         DefaultAuthorityDescriptor authority(def_auth);
-        LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
-                                          "authority(SDT) for service %1 %2 %3")
+        if (authority.IsValid())
+        {
+            LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
+                                               "authority(SDT) for service %1 %2 %3")
                 .arg(info.m_orig_netid).arg(info.m_sdt_tsid).arg(info.m_service_id));
-        info.m_default_authority = authority.DefaultAuthority();
+            info.m_default_authority = authority.DefaultAuthority();
+            return;
+        }
     }
-    else
-    {
-        uint64_t index = (uint64_t)info.m_orig_netid << 32 |
-                        info.m_sdt_tsid << 16 | info.m_service_id;
-        if (defAuthorities.contains(index))
-            info.m_default_authority = defAuthorities[index];
-    }
+
+    uint64_t index = (uint64_t)info.m_orig_netid << 32 |
+        info.m_sdt_tsid << 16 | info.m_service_id;
+    if (defAuthorities.contains(index))
+        info.m_default_authority = defAuthorities[index];
 }
 
 uint ChannelScanSM::GetCurrentTransportInfo(
@@ -1214,7 +1220,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // channels.conf
     const DTVChannelInfoList &echan = (*trans_info).m_expectedChannels;
-    for (uint i = 0; i < echan.size(); ++i)
+    for (size_t i = 0; i < echan.size(); ++i)
     {
         uint pnum = echan[i].m_serviceid;
         PCM_INFO_INIT("mpeg");
@@ -1270,9 +1276,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (uint i = 0; i < descs.size(); ++i)
+        for (size_t i = 0; i < descs.size(); ++i)
         {
             RegistrationDescriptor reg(descs[i]);
+            if (!reg.IsValid())
+                continue;
             if (reg.FormatIdentifierString() == "CUEI" ||
                 reg.FormatIdentifierString() == "SCTE")
                 info.m_could_be_opencable = true;
@@ -1363,6 +1371,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     if (desc)
                     {
                         DVBLogicalChannelDescriptor uklist(desc);
+                        if (!uklist.IsValid())
+                            continue;
                         for (uint j = 0; j < uklist.ChannelCount(); ++j)
                         {
                             ukChanNums[((qlonglong)info.m_orig_netid<<32) |
@@ -1381,7 +1391,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     if (desc)
                     {
                         DVBSimulcastChannelDescriptor scnlist(desc);
-
+                        if (!scnlist.IsValid())
+                            continue;
                         for (uint j = 0; j < scnlist.ChannelCount(); ++j)
                         {
                             scnChanNums[((qlonglong)info.m_orig_netid<<32) |
@@ -2272,7 +2283,7 @@ bool ChannelScanSM::CheckImportedList(
         return true;
 
     bool found = false;
-    for (uint i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("comparing %1 %2 against %3 %4")

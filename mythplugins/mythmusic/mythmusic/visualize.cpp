@@ -143,7 +143,7 @@ void StereoScope::resize( const QSize &newsize )
 {
     m_size = newsize;
 
-    uint os = m_magnitudes.size();
+    auto os = m_magnitudes.size();
     m_magnitudes.resize( m_size.width() * 2 );
     for ( ; os < m_magnitudes.size(); os++ )
         m_magnitudes[os] = 0.0;
@@ -196,12 +196,11 @@ bool StereoScope::process( VisualNode *node )
 #endif
             for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
-                double tmpL = ( ( node->m_left ?
-                       double( node->m_left[s] ) : 0.) *
-                     double( m_size.height() / 4 ) ) / 32768.;
-                double tmpR = ( ( node->m_right ?
-                       double( node->m_right[s]) : 0.) *
-                     double( m_size.height() / 4 ) ) / 32768.;
+                double adjHeight = static_cast<double>(m_size.height()) / 4.0;
+                double tmpL = ( ( node->m_left ? static_cast<double>(node->m_left[s]) : 0.) *
+                                adjHeight ) / 32768.0;
+                double tmpR = ( ( node->m_right ? static_cast<double>(node->m_right[s]) : 0.) *
+                                adjHeight ) / 32768.0;
                 if (tmpL > 0)
                     valL = (tmpL > valL) ? tmpL : valL;
                 else
@@ -276,8 +275,8 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     double r, g, b, per;
 
     // left
-    per = double( m_magnitudes[ i ] * 2 ) /
-          double( m_size.height() / 4 );
+    per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
+          ( static_cast<double>(m_size.height()) / 4.0 );
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -311,13 +310,16 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 #else
     p->setPen(Qt::red);
 #endif
-    p->drawLine( i - 1, (int)((m_size.height() / 4) + m_magnitudes[i - 1]),
-             i, (int)((m_size.height() / 4) + m_magnitudes[i]));
+    double adjHeight = static_cast<double>(m_size.height()) / 4.0;
+    p->drawLine( i - 1,
+                 (int)(adjHeight + m_magnitudes[i - 1]),
+                 i,
+                 (int)(adjHeight + m_magnitudes[i]));
 
 #if TWOCOLOUR
     // right
-    per = double( m_magnitudes[ i + m_size.width() ] * 2 ) /
-          double( m_size.height() / 4 );
+    per = ( static_cast<double>(m_magnitudes[ i + m_size.width() ]) * 2 ) /
+          adjHeight;
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -351,10 +353,11 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 #else
     p->setPen(Qt::red);
 #endif
-    p->drawLine( i - 1, (int)((m_size.height() * 3 / 4) +
-             m_magnitudes[i + m_size.width() - 1]),
-             i, (int)((m_size.height() * 3 / 4) +
-                     m_magnitudes[i + m_size.width()]));
+    adjHeight = static_cast<double>(m_size.height()) * 3.0 / 4.0;
+    p->drawLine( i - 1,
+                 (int)(adjHeight + m_magnitudes[i + m_size.width() - 1]),
+                 i,
+                 (int)(adjHeight + m_magnitudes[i + m_size.width()]));
     }
 
     return true;
@@ -402,9 +405,9 @@ bool MonoScope::process( VisualNode *node )
 #endif
             for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
-                double tmp = ( double( node->m_left[s] ) +
-                        (node->m_right ? double( node->m_right[s] ) : 0) *
-                        double( m_size.height() / 2 ) ) / 65536.;
+                double tmp = ( static_cast<double>(node->m_left[s]) +
+                               (node->m_right ? static_cast<double>(node->m_right[s]) : 0.0) *
+                               ( static_cast<double>(m_size.height()) / 2.0 ) ) / 65536.0;
                 if (tmp > 0)
                 {
                     val = (tmp > val) ? tmp : val;
@@ -495,8 +498,11 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 #else
         p->setPen(Qt::red);
 #endif
-        p->drawLine( i - 1, (int)(m_size.height() / 2 + m_magnitudes[ i - 1 ]),
-                     i, (int)(m_size.height() / 2 + m_magnitudes[ i ] ));
+        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
+        p->drawLine( i - 1,
+                     (int)(adjHeight + m_magnitudes[ i - 1 ]),
+                     i,
+                     (int)(adjHeight + m_magnitudes[ i ] ));
     }
 
     return true;
@@ -621,7 +627,8 @@ void Spectrum::resize(const QSize &newsize)
         m_magnitudes[os] = 0.0;
     }
 
-    m_scaleFactor = double( m_size.height() / 2 ) / log( (double)(FFTW_N) );
+    m_scaleFactor = ( static_cast<double>(m_size.height()) / 2.0 ) /
+                    log( static_cast<double>(FFTW_N) );
 }
 
 template<typename T> T sq(T a) { return a*a; };
@@ -668,9 +675,11 @@ bool Spectrum::process(VisualNode *node)
         tmp = 2 * sq(real(m_rout[index])); // + sq(real(m_rout[FFTW_N - index]));
         double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
-        if (magL > m_size.height() / 2)
+
+        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
+        if (magL > adjHeight)
         {
-            magL = m_size.height() / 2;
+            magL = adjHeight;
         }
         if (magL < magnitudesp[i])
         {
@@ -686,9 +695,9 @@ bool Spectrum::process(VisualNode *node)
             magL = 1.;
         }
 
-        if (magR > m_size.height() / 2)
+        if (magR > adjHeight)
         {
-            magR = m_size.height() / 2;
+            magR = adjHeight;
         }
         if (magR < magnitudesp[i + m_scale.range()])
         {

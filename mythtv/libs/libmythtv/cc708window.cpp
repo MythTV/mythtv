@@ -106,7 +106,7 @@ const uint k708AttrOpacityFlash       = 1;
 const uint k708AttrOpacityTranslucent = 2;
 const uint k708AttrOpacityTransparent = 3;
 
-void CC708Window::DefineWindow(int _priority,         int _visible,
+void CC708Window::DefineWindow(int _priority,         bool _visible,
                                int _anchor_point,     int _relative_pos,
                                int _anchor_vertical,  int _anchor_horizontal,
                                int _row_count,        int _column_count,

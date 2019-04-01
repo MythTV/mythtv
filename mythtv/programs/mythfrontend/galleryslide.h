@@ -92,7 +92,7 @@ class GroupAnimation : public AbstractAnimation
 {
 public:
     GroupAnimation() : AbstractAnimation()            {}
-    virtual ~GroupAnimation()                        { Clear(); }
+    virtual ~GroupAnimation()                         { GroupAnimation::Clear(); }
     void Pulse(int interval) override                     = 0; // AbstractAnimation
     void Start(bool forwards, float speed = 1.0) override = 0; // AbstractAnimation
     void SetSpeed(float speed) override                   = 0; // AbstractAnimation

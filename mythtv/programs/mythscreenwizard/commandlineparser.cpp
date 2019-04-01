@@ -5,7 +5,7 @@
 
 MythScreenWizardCommandLineParser::MythScreenWizardCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHSCREENWIZARD)
-{ LoadArguments(); }
+{ MythScreenWizardCommandLineParser::LoadArguments(); }
 
 QString MythScreenWizardCommandLineParser::GetHelpHeader(void) const
 {

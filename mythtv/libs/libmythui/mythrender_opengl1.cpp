@@ -8,15 +8,15 @@
 MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device)
   : MythRenderOpenGL(format, device, kRenderOpenGL1)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL1::ResetVars();
+    MythRenderOpenGL1::ResetProcs();
 }
 
 MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format)
   : MythRenderOpenGL(format, kRenderOpenGL1)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL1::ResetVars();
+    MythRenderOpenGL1::ResetProcs();
 }
 
 MythRenderOpenGL1::~MythRenderOpenGL1()
@@ -24,7 +24,7 @@ MythRenderOpenGL1::~MythRenderOpenGL1()
     if (!isValid())
         return;
     makeCurrent();
-    DeleteOpenGLResources();
+    MythRenderOpenGL1::DeleteOpenGLResources();
     doneCurrent();
 }
 
@@ -239,7 +239,7 @@ void MythRenderOpenGL1::SetShaderParams(uint obj, const QMatrix4x4 &m,
 void MythRenderOpenGL1::DeleteOpenGLResources(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
-    DeleteShaders();
+    MythRenderOpenGL1::DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();
 }
 

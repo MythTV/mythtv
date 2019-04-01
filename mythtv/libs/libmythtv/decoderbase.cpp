@@ -509,7 +509,7 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
 
     ctm.start();
     frm_pos_map_t posMap;
-    for (uint i = 0; i < m_positionMap.size(); i++)
+    for (size_t i = 0; i < m_positionMap.size(); i++)
     {
         if (m_positionMap[i].index < first)
             continue;
@@ -904,7 +904,7 @@ QStringList DecoderBase::GetTracks(uint type) const
 
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < m_tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         list += GetTrackDesc(type, i);
 
     return list;
@@ -940,7 +940,7 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 int DecoderBase::SetTrack(uint type, int trackNo)
 {
     if (trackNo >= (int)m_tracks[type].size())
-        return false;
+        return -1;
 
     QMutexLocker locker(avcodeclock);
 
@@ -976,7 +976,7 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 {
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < m_tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         if (info.m_stream_id == m_tracks[type][i].m_stream_id)
             return false;
 
@@ -1010,14 +1010,14 @@ int DecoderBase::AutoSelectTrack(uint type)
     if ((m_currentTrack[type] >= 0) &&
         (m_currentTrack[type] < (int)numStreams))
     {
-        return true; // track already selected
+        return m_currentTrack[type]; // track already selected
     }
 
     if (!numStreams)
     {
         m_currentTrack[type] = -1;
         m_selectedTrack[type].m_av_stream_index = -1;
-        return false; // no tracks available
+        return -1; // no tracks available
     }
 
     int selTrack = (1 == numStreams) ? 0 : -1;

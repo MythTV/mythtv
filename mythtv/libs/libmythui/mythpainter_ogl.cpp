@@ -31,7 +31,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
 MythOpenGLPainter::~MythOpenGLPainter()
 {
     Teardown();
-    FreeResources();
+    MythOpenGLPainter::FreeResources();
 }
 
 void MythOpenGLPainter::FreeResources(void)

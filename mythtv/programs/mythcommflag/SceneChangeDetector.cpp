@@ -55,7 +55,7 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
      * in relative frequencies of the dominant colors.
      */
     unsigned short diff = 0;
-    for (unsigned int ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
+    for (size_t ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
         diff += abs((*sc1)[ii].frequency - (*sc2)[ii].frequency) +
             abs((*sc1)[ii].color - (*sc2)[ii].color);
     return diff;
@@ -177,10 +177,10 @@ SceneChangeDetector::finished(long long nframes, bool final)
 
     const HistogramAnalyzer::Histogram *histogram =
         m_histogramAnalyzer->getHistograms();
-    for (unsigned int frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
         scenechange_data_init(&m_scdata[frameno], &histogram[frameno]);
     m_scdiff[0] = 0;
-    for (unsigned int frameno = 1; frameno < nframes; frameno++)
+    for (long long frameno = 1; frameno < nframes; frameno++)
         m_scdiff[frameno] = scenechange_data_diff(&m_scdata[frameno - 1],
                 &m_scdata[frameno]);
 

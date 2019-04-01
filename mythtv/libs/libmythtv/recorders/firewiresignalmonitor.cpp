@@ -66,7 +66,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(int db_cardnum,
 FirewireSignalMonitor::~FirewireSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    FirewireSignalMonitor::Stop();
 }
 
 /** \fn FirewireSignalMonitor::Stop(void)

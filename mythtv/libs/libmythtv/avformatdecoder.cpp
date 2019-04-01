@@ -438,7 +438,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     cc608_build_parity_table(m_cc608_parity_table);
 
-    SetIdrOnlyKeyframes(true);
+    AvFormatDecoder::SetIdrOnlyKeyframes(true);
     m_audioReadAhead = gCoreContext->GetNumSetting("AudioReadAhead", 100);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PlayerFlags: 0x%1, AudioReadAhead: %2 msec")
@@ -533,7 +533,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
         }
     }
     if (!st)
-        return false;
+        return 0;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(m_ic->start_time,
@@ -1901,9 +1901,11 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
     desc_list.insert(desc_list.end(), desc_list2.begin(), desc_list2.end());
 
-    for (uint j = 0; j < desc_list.size(); j++)
+    for (size_t j = 0; j < desc_list.size(); j++)
     {
         const CaptionServiceDescriptor csd(desc_list[j]);
+        if (!csd.IsValid())
+            continue;
         for (uint k = 0; k < csd.ServicesCount(); k++)
         {
             int lang = csd.CanonicalLanguageKey(k);
@@ -2012,9 +2014,11 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::teletext);
 
-        for (uint j = 0; j < desc_list.size(); j++)
+        for (size_t j = 0; j < desc_list.size(); j++)
         {
             const TeletextDescriptor td(desc_list[j]);
+            if (!td.IsValid())
+                continue;
             for (uint k = 0; k < td.StreamCount(); k++)
             {
                 int type = td.TeletextType(k);
@@ -2089,7 +2093,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::data_broadcast_id);
 
-        for (uint j = 0; j < desc_list.size(); j++)
+        for (size_t j = 0; j < desc_list.size(); j++)
         {
             const unsigned char *desc = desc_list[j];
             desc++; // Skip tag
@@ -3317,7 +3321,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
         if (seen_708[i] && !m_ccX08_in_pmt[i+4])
         {
             StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                          i, false/*easy*/, true/*wide*/);
+                          i, 0, false/*easy*/, true/*wide*/);
             m_stream_tracks.push_back(si);
             m_stream_track_types.push_back(kTrackTypeCC708);
         }
@@ -3334,7 +3338,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
                 lang = iso639_str3_to_key("und");
 
             StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                          i+1, false/*easy*/, false/*wide*/);
+                          i+1, 0, false/*easy*/, false/*wide*/);
             m_stream_tracks.push_back(si);
             m_stream_track_types.push_back(kTrackTypeCC608);
         }
@@ -4375,7 +4379,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     if (gotSubtitles)
     {
         if (isForcedTrack)
-            subtitle.forced = true;
+            subtitle.forced = static_cast<int>(true);
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
             QString("subtl timecode %1 %2 %3 %4")
                 .arg(pkt->pts).arg(pkt->dts)
@@ -4449,7 +4453,7 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 
 int AvFormatDecoder::SetTrack(uint type, int trackNo)
 {
-    bool ret = DecoderBase::SetTrack(type, trackNo);
+    int ret = DecoderBase::SetTrack(type, trackNo);
 
     if (kTrackTypeAudio == type)
     {
@@ -4569,7 +4573,7 @@ void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
 
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)
 {
-    for (uint i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
+    for (size_t i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
     {
         AVStream *s  = m_ic->streams[m_tracks[kTrackTypeAudio][i].m_av_stream_index];
         if (s)
@@ -4577,7 +4581,7 @@ bool AvFormatDecoder::SetAudioByComponentTag(int tag)
             if ((s->component_tag == tag) ||
                 ((tag <= 0) && s->component_tag <= 0))
             {
-                return SetTrack(kTrackTypeAudio, i);
+                return SetTrack(kTrackTypeAudio, i) != -1;
             }
         }
     }
@@ -4633,7 +4637,7 @@ static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 {
     vector<int> ret;
 
-    for (uint i = 0; i < tracks.size(); i++)
+    for (size_t i = 0; i < tracks.size(); i++)
     {
         if (tracks[i].m_audio_type == type)
             ret.push_back(i);
@@ -4866,7 +4870,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         if (selTrack < 0 && numStreams)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select default track");
-            for (uint i = 0; i < atracks.size(); i++) {
+            for (size_t i = 0; i < atracks.size(); i++) {
                 int idx = atracks[i].m_av_stream_index;
                 if (m_ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT)
                 {

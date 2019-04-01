@@ -69,7 +69,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
     if (m_blocks[ddb->m_block_number])
     {
         QString s;
-        for (unsigned i = 0; i < m_blocks.size(); ++i)
+        for (size_t i = 0; i < m_blocks.size(); ++i)
             s += m_blocks[i] ? '+' : 'X';
 
         LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module %1 block %2 dup: %3")
@@ -101,7 +101,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         return nullptr;
 
     uint curp = 0;
-    for (uint i = 0; i < m_blocks.size(); i++)
+    for (size_t i = 0; i < m_blocks.size(); i++)
     {
         QByteArray *block = m_blocks[i];
         m_blocks[i] = nullptr;

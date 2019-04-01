@@ -1,0 +1,3 @@
+/home/david/Projects/MythTV/mythtv-me-master/mythplugins/mytharchive/mytharchive/videoselector.cpp:545:26: warning: loop variable has narrower type 'uint' (aka 'unsigned int') than iteration's upper bound 'std::vector::size_type' (aka 'unsigned long') [bugprone-too-small-loop-variable]
+        for (uint y = 0; y < m_videoList->size(); y++)
+

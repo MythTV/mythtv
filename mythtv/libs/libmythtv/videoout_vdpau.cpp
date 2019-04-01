@@ -300,7 +300,7 @@ void VideoOutputVDPAU::DeleteBuffers(void)
         m_render->DestroyVideoMixer(m_video_mixer);
     m_video_mixer = 0;
     m_checked_surface_ownership = false;
-    DiscardFrames(true);
+    VideoOutputVDPAU::DiscardFrames(true);
     DeleteVideoSurfaces();
     vbuffers.Reset();
     vbuffers.DeleteBuffers();

@@ -40,7 +40,7 @@ VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()
 
 VideoOutputOpenGLVAAPI::~VideoOutputOpenGLVAAPI()
 {
-    TearDown();
+    VideoOutputOpenGLVAAPI::TearDown();
 }
 
 void VideoOutputOpenGLVAAPI::TearDown(void)

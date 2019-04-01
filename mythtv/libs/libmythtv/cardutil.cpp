@@ -1263,9 +1263,9 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     // copy input group linkages
     vector<uint> src_grps = CardUtil::GetInputGroups(src_inputid);
     vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
-    for (uint j = 0; j < dst_grps.size(); j++)
+    for (size_t j = 0; j < dst_grps.size(); j++)
         CardUtil::UnlinkInputGroup(dst_inputid, dst_grps[j]);
-    for (uint j = 0; j < src_grps.size(); j++)
+    for (size_t j = 0; j < src_grps.size(); j++)
         CardUtil::LinkInputGroup(dst_inputid, src_grps[j]);
 
     // clone diseqc_config (just points to the same diseqc_tree row)
@@ -2311,7 +2311,7 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
 bool CardUtil::DeleteInput(uint inputid)
 {
     vector<uint> childids = GetChildInputIDs(inputid);
-    for (uint i = 0; i < childids.size(); ++i)
+    for (size_t i = 0; i < childids.size(); ++i)
     {
         if (!DeleteInput(childids[i]))
         {

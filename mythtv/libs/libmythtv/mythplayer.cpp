@@ -3938,7 +3938,7 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     PIPLocation ols[] =
         { kPIPTopLeft, kPIPTopRight, kPIPBottomLeft, kPIPBottomRight };
 
-    for (uint i = 0; i < sizeof(ols)/sizeof(PIPLocation); i++)
+    for (size_t i = 0; i < sizeof(ols)/sizeof(PIPLocation); i++)
     {
         PIPMap::const_iterator it = pip_players.begin();
         for (; it != pip_players.end() && (*it != ols[i]); ++it);
@@ -4666,7 +4666,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             HandleArbSeek(true);
             deleteMap.SetSeekAmount(old_seekamount);
         }
-#define FFREW_MULTICOUNT 10
+#define FFREW_MULTICOUNT 10.0F
         else if (action == ACTION_BIGJUMPREW)
         {
             if (seekamount == 0)

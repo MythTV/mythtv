@@ -280,13 +280,13 @@ class MPUBLIC ProgramInfo
                 QStringList::const_iterator  end)
     {
         if (!FromStringList(it, end))
-            clear();
+            ProgramInfo::clear();
     }
     explicit ProgramInfo(const QStringList &list)
     {
         QStringList::const_iterator it = list.begin();
         if (!FromStringList(it, list.end()))
-            clear();
+            ProgramInfo::clear();
     }
 
     bool operator==(const ProgramInfo& rhs);

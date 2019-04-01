@@ -360,8 +360,6 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             return;
     }
 
-    uint newfgcolor = fgcolor;
-    uint newbgcolor = bgcolor;
     SetForegroundColor(fgcolor);
     SetBackgroundColor(bgcolor);
 
@@ -492,13 +490,13 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 
             if (ttpage)
             {
-                bool has_flof = ttpage->floflink[flof_link_count - 1];
+                bool has_flof = ttpage->floflink[flof_link_count - 1] != 0;
                 ch = (has_flof) ? ch : ' ';
             }
         }
 
-        newfgcolor = fgcolor;
-        newbgcolor = bgcolor;
+        uint newfgcolor = fgcolor;
+        uint newbgcolor = bgcolor;
 
         SetForegroundColor(newfgcolor);
         SetBackgroundColor(newbgcolor);
@@ -531,7 +529,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
     Q_UNUSED(blink);
 }
 
-void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
+void TeletextScreen::DrawCharacter(int x, int y, QChar ch, bool doubleheight)
 {
     QString line = ch;
     if (line == " ")
@@ -604,7 +602,7 @@ void TeletextScreen::DrawRect(int row, QRect rect)
     painter.end();
 }
 
-void TeletextScreen::DrawMosaic(int x, int y, int code, int doubleheight)
+void TeletextScreen::DrawMosaic(int x, int y, int code, bool doubleheight)
 {
     int row = y;
     x *= m_colWidth;
@@ -637,10 +635,10 @@ void TeletextScreen::DrawStatus(void)
         for (int i = 0; i < 40; ++i)
             DrawBackground(i, 0);
 
-    DrawCharacter(1, 0, 'P', 0);
-    DrawCharacter(2, 0, m_teletextReader->GetPageInput(0), 0);
-    DrawCharacter(3, 0, m_teletextReader->GetPageInput(1), 0);
-    DrawCharacter(4, 0, m_teletextReader->GetPageInput(2), 0);
+    DrawCharacter(1, 0, 'P', false);
+    DrawCharacter(2, 0, m_teletextReader->GetPageInput(0), false);
+    DrawCharacter(3, 0, m_teletextReader->GetPageInput(1), false);
+    DrawCharacter(4, 0, m_teletextReader->GetPageInput(2), false);
 
     const TeletextSubPage *ttpage = m_teletextReader->FindSubPage();
 
@@ -649,7 +647,7 @@ void TeletextScreen::DrawStatus(void)
         QString str = QObject::tr("Page Not Available",
                                   "Requested Teletext page not available");
         for (int i = 0; (i < 30) && i < str.length(); i++)
-            DrawCharacter(i+10, 0, str[i], 0);
+            DrawCharacter(i+10, 0, str[i], false);
 
         return;
     }
@@ -677,9 +675,9 @@ void TeletextScreen::DrawStatus(void)
         DrawBackground(x * 3 + 8, 0);
         DrawBackground(x * 3 + 9, 0);
 
-        DrawCharacter(x * 3 + 7, 0, str[x * 3], 0);
-        DrawCharacter(x * 3 + 8, 0, str[x * 3 + 1], 0);
-        DrawCharacter(x * 3 + 9, 0, str[x * 3 + 2], 0);
+        DrawCharacter(x * 3 + 7, 0, str[x * 3], false);
+        DrawCharacter(x * 3 + 8, 0, str[x * 3 + 1], false);
+        DrawCharacter(x * 3 + 9, 0, str[x * 3 + 2], false);
     }
 }
 

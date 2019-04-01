@@ -49,9 +49,9 @@ inline uint32_t Len2Blocks(uint32_t len)
 }
 
 DVDStream::DVDStream(const QString& filename)
-: RingBuffer(kRingBuffer_File)
+    : RingBuffer(kRingBuffer_File)
 {
-    OpenFile(filename);
+    DVDStream::OpenFile(filename);
 }
 
 DVDStream::~DVDStream()

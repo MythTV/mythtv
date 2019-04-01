@@ -16,7 +16,7 @@ ICRingBuffer::ICRingBuffer(const QString &url, RingBuffer *parent)
   : RingBuffer(kRingBufferType), m_parent(parent)
 {
     m_startReadAhead = true;
-    OpenFile(url);
+    ICRingBuffer::OpenFile(url);
 }
 
 ICRingBuffer::~ICRingBuffer()

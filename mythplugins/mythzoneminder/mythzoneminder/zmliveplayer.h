@@ -70,7 +70,7 @@ class ZMLivePlayer : public MythScreenType
     bool keyPressEvent(QKeyEvent *) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
-    void showMenu();
+    void ShowMenu() override; // MythScreenType
 
     void setMonitorLayout(int layout, bool restore = false);
 

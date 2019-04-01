@@ -2645,12 +2645,12 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     if (followLinks && finfo.isSymLink())
     {
         if (!finfo.exists() && deleteBrokenSymlinks)
-            err = unlink(fname.constData());
+            unlink(fname.constData());
         else
         {
             fd = OpenAndUnlink(linktext);
             if (fd >= 0)
-                err = unlink(fname.constData());
+                unlink(fname.constData());
         }
     }
     else if (!finfo.isSymLink())
@@ -2731,7 +2731,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     // Time between truncation steps in milliseconds
     const size_t sleep_time = 500;
     const size_t min_tps    = 8 * 1024 * 1024;
-    const size_t calc_tps   = (size_t) (cards * 1.2 * (22200000LL / 8));
+    const size_t calc_tps   = (size_t) (cards * 1.2 * (22200000LL / 8.0));
     const size_t tps = max(min_tps, calc_tps);
     const size_t increment  = (size_t) (tps * (sleep_time * 0.001F));
 
@@ -2837,7 +2837,7 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
             ProgramList schedList;
             bool hasConflicts = false;
             LoadFromScheduler(schedList, hasConflicts);
-            for( uint n = 0; n < schedList.size(); n++)
+            for( size_t n = 0; n < schedList.size(); n++)
             {
                 ProgramInfo *pInfo = schedList[n];
                 if ((pInfo->GetRecordingStatus() == RecStatus::Tuning ||
@@ -4362,7 +4362,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
 
         vector<uint> infogroups;
         CardUtil::GetInputInfo(info, &infogroups);
-        for (uint i = 0; i < infogroups.size(); ++i)
+        for (size_t i = 0; i < infogroups.size(); ++i)
             groupids[info.m_inputid].insert(infogroups[i]);
 
         InputInfo busyinfo;
@@ -4426,7 +4426,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     // Return the results in livetvorder.
     stable_sort(freeinputs.begin(), freeinputs.end(), comp_livetvorder);
     QStringList strlist;
-    for (uint i = 0; i < freeinputs.size(); ++i)
+    for (size_t i = 0; i < freeinputs.size(); ++i)
     {
         LOG(VB_CHANNEL, LOG_INFO,
             LOC + QString("Input %1 is available on %2/%3")
@@ -4759,15 +4759,15 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         QString needed_spacer;
         QString prefix        = slist[2];
-        uint    is_complete_valid_channel_on_rec = 0;
+        uint    complete_valid_channel_on_rec    = 0;
         bool    is_extra_char_useful             = false;
 
         bool match = enc->CheckChannelPrefix(
-            prefix, is_complete_valid_channel_on_rec,
+            prefix, complete_valid_channel_on_rec,
             is_extra_char_useful, needed_spacer);
 
         retlist << QString::number((int)match);
-        retlist << QString::number(is_complete_valid_channel_on_rec);
+        retlist << QString::number(complete_valid_channel_on_rec);
         retlist << QString::number((int)is_extra_char_useful);
         retlist << ((needed_spacer.isEmpty()) ? QString("X") : needed_spacer);
     }

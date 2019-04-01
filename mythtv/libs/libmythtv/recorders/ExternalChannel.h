@@ -18,7 +18,8 @@ class ExternalChannel : public DTVChannel
 {
   public:
     ExternalChannel(TVRec *parent, const QString & device)
-        : DTVChannel(parent), m_device(device), m_loc(GetDevice()) {}
+        : DTVChannel(parent), m_device(device),
+          m_loc(ExternalChannel::GetDevice()) {}
     ~ExternalChannel(void);
 
     // Commands

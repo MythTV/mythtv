@@ -24,13 +24,13 @@ typedef struct {
 #define V3D_TO_V2D(v3,v2,width,height,distance) \
 { \
 	int Xp, Yp; \
-  if (v3.z > 2) { \
-	 F2I((distance * v3.x / v3.z),Xp) ; \
- 	 F2I((distance * v3.y / v3.z),Yp) ; \
- 	 v2.x = Xp + (width>>1); \
-	 v2.y = -Yp + (height>>1); \
+  if ((v3).z > 2) { \
+	 F2I(((distance) * (v3).x / (v3).z),Xp) ; \
+	 F2I(((distance) * (v3).y / (v3).z),Yp) ; \
+	 (v2).x = Xp + ((width)>>1); \
+	 (v2).y = -Yp + ((height)>>1); \
   } \
-  else v2.x=v2.y=-666; \
+  else (v2).x=(v2).y=-666; \
 }
 
 /*
@@ -39,9 +39,9 @@ typedef struct {
  */
 #define Y_ROTATE_V3D(vi,vf,sina,cosa)\
 {\
- vf.x = vi.x * cosa - vi.z * sina;\
- vf.z = vi.x * sina + vi.z * cosa;\
- vf.y = vi.y;\
+ (vf).x = (vi).x * (cosa) - (vi).z * (sina);\
+ (vf).z = (vi).x * (sina) + (vi).z * (cosa);\
+ (vf).y = (vi).y;\
 }
 
 /*
@@ -49,11 +49,11 @@ typedef struct {
  */
 #define TRANSLATE_V3D(vsrc,vdest)\
 {\
- vdest.x += vsrc.x;\
- vdest.y += vsrc.y;\
- vdest.z += vsrc.z;\
+ (vdest).x += (vsrc).x;\
+ (vdest).y += (vsrc).y;\
+ (vdest).z += (vsrc).z;\
 }
 
-#define MUL_V3D(lf,v) {v.x*=lf;v.y*=lf;v.z*=lf;}
+#define MUL_V3D(lf,v) {(v).x*=(lf);(v).y*=(lf);(v).z*=(lf);}
 
 #endif

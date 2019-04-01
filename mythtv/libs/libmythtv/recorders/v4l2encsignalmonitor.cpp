@@ -64,7 +64,7 @@ V4L2encSignalMonitor::V4L2encSignalMonitor(int db_cardnum,
 V4L2encSignalMonitor::~V4L2encSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    V4L2encSignalMonitor::Stop();
     if (m_stream_handler)
         V4L2encStreamHandler::Return(m_stream_handler, m_inputid);
 }

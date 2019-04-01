@@ -266,7 +266,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
         range_max.push_back(pid_max);
     }
 
-    for (uint i = 0; i < range_min.size(); i++)
+    for (size_t i = 0; i < range_min.size(); i++)
     {
         filter += filt_str(range_min[i]);
         if (range_min[i] != range_max[i])

@@ -75,7 +75,7 @@ public:
     bool  open(OpenMode mode) override; // QIODevice
     bool  open(int mode)
     {
-        return open((OpenMode)mode);
+        return MSocketDevice::open((OpenMode)mode);
     }
 
     void  close() override; // QIODevice

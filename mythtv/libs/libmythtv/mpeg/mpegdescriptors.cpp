@@ -115,12 +115,14 @@ const unsigned char *MPEGDescriptor::FindBestMatch(
     uint match_pri = UINT_MAX;
     int  unmatched_idx = -1;
 
-    uint i = (desc_tag == DescriptorID::short_event) ? 0 : parsed.size();
+    size_t i = (desc_tag == DescriptorID::short_event) ? 0 : parsed.size();
     for (; i < parsed.size(); i++)
     {
         if (DescriptorID::short_event == parsed[i][0])
         {
             ShortEventDescriptor sed(parsed[i]);
+            if (!sed.IsValid())
+                continue;
             QMap<uint,uint>::const_iterator it =
                 langPrefs.find(sed.CanonicalLanguageKey());
 
@@ -141,8 +143,11 @@ const unsigned char *MPEGDescriptor::FindBestMatch(
     if ((desc_tag == DescriptorID::short_event) && (unmatched_idx >= 0))
     {
         ShortEventDescriptor sed(parsed[unmatched_idx]);
-        langPrefs[sed.CanonicalLanguageKey()] = maxPriority(langPrefs) + 1;
-        return parsed[unmatched_idx];
+        if (sed.IsValid())
+        {
+            langPrefs[sed.CanonicalLanguageKey()] = maxPriority(langPrefs) + 1;
+            return parsed[unmatched_idx];
+        }
     }
 
     return nullptr;
@@ -155,12 +160,14 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     int  match_key = 0;
     int  unmatched_idx = -1;
 
-    uint i = (desc_tag == DescriptorID::extended_event) ? 0 : parsed.size();
+    size_t i = (desc_tag == DescriptorID::extended_event) ? 0 : parsed.size();
     for (; i < parsed.size(); i++)
     {
         if (DescriptorID::extended_event == parsed[i][0])
         {
             ExtendedEventDescriptor eed(parsed[i]);
+            if (!eed.IsValid())
+                continue;
             QMap<uint,uint>::const_iterator it =
                 langPrefs.find(eed.CanonicalLanguageKey());
 
@@ -179,21 +186,24 @@ desc_list_t MPEGDescriptor::FindBestMatches(
         (match_key == 0) && (unmatched_idx >= 0))
     {
         ExtendedEventDescriptor eed(parsed[unmatched_idx]);
-        langPrefs[eed.CanonicalLanguageKey()] = maxPriority(langPrefs) + 1;
-        match_key = eed.LanguageKey();
+        if (eed.IsValid())
+        {
+            langPrefs[eed.CanonicalLanguageKey()] = maxPriority(langPrefs) + 1;
+            match_key = eed.LanguageKey();
+        }
     }
 
     desc_list_t tmp;
     if (match_pri == UINT_MAX)
         return tmp;
 
-    for (uint j = 0; j < parsed.size(); j++)
+    for (size_t j = 0; j < parsed.size(); j++)
     {
         if ((DescriptorID::extended_event == desc_tag) &&
             (DescriptorID::extended_event == parsed[j][0]))
         {
             ExtendedEventDescriptor eed(parsed[j]);
-            if (eed.LanguageKey() == match_key)
+            if (eed.IsValid() && (eed.LanguageKey() == match_key))
                 tmp.push_back(parsed[j]);
         }
     }
@@ -381,7 +391,9 @@ QString MPEGDescriptor::toString() const
 {
     QString str;
 
-    if (DescriptorID::registration == DescriptorTag())
+    if (!IsValid())
+        str = "Invalid Descriptor";
+    else if (DescriptorID::registration == DescriptorTag())
         SET_STRING(RegistrationDescriptor);
     else if (DescriptorID::iso_639_language == DescriptorTag())
         SET_STRING(ISO639LanguageDescriptor);
@@ -439,7 +451,7 @@ QString MPEGDescriptor::toString() const
     else if (PrivateDescriptorID::dvb_simulcast_channel_descriptor == DescriptorTag())
         SET_STRING(DVBSimulcastChannelDescriptor);
     /// POSSIBLY UNSAFE ! -- end
-    else if (IsValid())
+    else
     {
         str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")
             .arg(DescriptorTagString())
@@ -448,10 +460,6 @@ QString MPEGDescriptor::toString() const
         //for (uint i=0; i<DescriptorLength(); i++)
         //    str.append(QString(" 0x%1").arg(int(_data[i+2]), 0, 16));
         str.append(hexdump());
-    }
-    else
-    {
-        str = "Invalid Descriptor";
     }
     return str;
 }

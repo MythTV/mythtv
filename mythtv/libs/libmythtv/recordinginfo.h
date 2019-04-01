@@ -194,9 +194,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
   public:
     RecordingInfo &operator=(const RecordingInfo &other)
-        { clone(other); return *this; }
+        { RecordingInfo::clone(other); return *this; }
     RecordingInfo &operator=(const ProgramInfo &other)
-        { clone(other); return *this; }
+        { RecordingInfo::clone(other); return *this; }
     virtual void clone(const RecordingInfo &other,
                        bool ignore_non_serialized_data = false);
     void clone(const ProgramInfo &other,

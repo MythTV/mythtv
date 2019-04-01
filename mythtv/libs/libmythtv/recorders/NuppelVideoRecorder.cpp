@@ -856,7 +856,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
 void NuppelVideoRecorder::ResizeVideoBuffers(void)
 {
-    for (unsigned int i = 0; i < videobuffer.size(); i++)
+    for (size_t i = 0; i < videobuffer.size(); i++)
     {
         delete [] (videobuffer[i]->buffer);
         videobuffer[i]->buffer = new unsigned char[m_video_buffer_size];

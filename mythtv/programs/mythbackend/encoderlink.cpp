@@ -929,19 +929,19 @@ bool EncoderLink::ShouldSwitchToAnotherInput(const QString &channelid)
  */
 bool EncoderLink::CheckChannelPrefix(
     const QString &prefix,
-    uint          &is_complete_valid_channel_on_rec,
+    uint          &complete_valid_channel_on_rec,
     bool          &is_extra_char_useful,
     QString       &needed_spacer)
 {
     if (m_local)
     {
         return m_tv->CheckChannelPrefix(
-            prefix, is_complete_valid_channel_on_rec,
+            prefix, complete_valid_channel_on_rec,
             is_extra_char_useful, needed_spacer);
     }
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: CheckChannelPrefix");
-    is_complete_valid_channel_on_rec = false;
+    complete_valid_channel_on_rec    = 0;
     is_extra_char_useful             = false;
     needed_spacer                    = "";
     return false;

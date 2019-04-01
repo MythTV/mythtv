@@ -156,13 +156,16 @@ bool setupTVs(bool ismaster, bool &error)
 
     QWriteLocker tvlocker(&TVRec::s_inputsLock);
 
-    for (uint i = 0; i < cardids.size(); i++)
+    for (size_t i = 0; i < cardids.size(); i++)
     {
-        if (hosts[i] == localhostname)
+        if (hosts[i] == localhostname) {
+            // No memory leak. The constructor for TVRec adds the item
+            // to the static map TVRec::s_inputs.
             new TVRec(cardids[i]);
+        }
     }
 
-    for (uint i = 0; i < cardids.size(); i++)
+    for (size_t i = 0; i < cardids.size(); i++)
     {
         uint    cardid = cardids[i];
         QString host   = hosts[i];
@@ -233,6 +236,9 @@ void cleanup(void)
 
     if (gCoreContext)
         gCoreContext->SetExiting();
+
+    delete sysEventHandler;
+    sysEventHandler = nullptr;
 
     delete housekeeping;
     housekeeping = nullptr;
@@ -589,7 +595,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
-    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    sysEventHandler = new MythSystemEventHandler();
 
     if (ismaster)
     {
@@ -605,10 +611,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
-    {
-        delete sysEventHandler;
         return GENERIC_EXIT_SETUP_ERROR;
-    }
 
     Scheduler *sched = nullptr;
     if (ismaster)
@@ -733,8 +736,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
     be_sd_notify("STOPPING=1\nSTATUS=Exiting");
-
-    delete sysEventHandler;
 
     return exitCode;
 }

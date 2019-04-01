@@ -78,6 +78,7 @@ void ExitPrompter::handleExit()
             LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
             delete dia;
             quit();
+            return;
         }
 
         dia->SetReturnEvent(this, "problemprompt");

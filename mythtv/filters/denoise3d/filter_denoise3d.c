@@ -23,7 +23,7 @@
 #define PARAM2_DEFAULT 3.0
 #define PARAM3_DEFAULT 6.0
 
-#define LowPass(Prev, Curr, Coef) (Curr + Coef[Prev - Curr])
+#define LowPass(Prev, Curr, Coef) ((Curr) + (Coef)[(Prev) - (Curr)])
 
 #undef ABS
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )

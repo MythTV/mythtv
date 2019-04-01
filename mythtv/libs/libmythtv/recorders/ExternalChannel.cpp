@@ -12,8 +12,8 @@
 
 ExternalChannel::~ExternalChannel(void)
 {
-    if (IsOpen())
-        Close();
+    if (ExternalChannel::IsOpen())
+        ExternalChannel::Close();
 }
 
 bool ExternalChannel::Open(void)
@@ -57,7 +57,7 @@ void ExternalChannel::Close()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
 
-    if (IsOpen())
+    if (ExternalChannel::IsOpen())
     {
         ExternalStreamHandler::Return(m_stream_handler, GetInputID());
         m_stream_handler = nullptr;

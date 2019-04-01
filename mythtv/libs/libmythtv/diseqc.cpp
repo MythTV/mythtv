@@ -1070,7 +1070,7 @@ DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
     for (uint i = 0; i < m_num_ports; i++)
         m_children[i] = nullptr;
 
-    Reset();
+    DiSEqCDevSwitch::Reset();
 }
 
 DiSEqCDevSwitch::~DiSEqCDevSwitch()
@@ -1338,7 +1338,7 @@ bool DiSEqCDevSwitch::Store(void) const
 
     // chain to children
     bool success = true;
-    for (uint ch = 0; ch < m_children.size(); ch++)
+    for (size_t ch = 0; ch < m_children.size(); ch++)
     {
         if (m_children[ch])
             success &= m_children[ch]->Store();

@@ -435,7 +435,7 @@ void ProgFinder::updateTimesList()
     {
         QString itemText;
         QDateTime starttime;
-        for (uint i = 0; i < m_showData.size(); ++i)
+        for (size_t i = 0; i < m_showData.size(); ++i)
         {
             starttime = m_showData[i]->GetScheduledStartTime();
             itemText = MythDate::toString(starttime,

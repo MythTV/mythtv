@@ -241,7 +241,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
     VideoFrame *frame = nullptr;
 
     // Try to get a frame not being used by the decoder
-    for (uint i = 0; i < m_available.size(); i++)
+    for (size_t i = 0; i < m_available.size(); i++)
     {
         frame = m_available.dequeue();
         if (m_decode.contains(frame))
@@ -809,7 +809,7 @@ void VideoBuffers::DeleteBuffers()
         av_freep(&m_buffers[i].qscale_table);
     }
 
-    for (uint i = 0; i < m_allocatedArrays.size(); i++)
+    for (size_t i = 0; i < m_allocatedArrays.size(); i++)
         av_free(m_allocatedArrays[i]);
     m_allocatedArrays.clear();
 }

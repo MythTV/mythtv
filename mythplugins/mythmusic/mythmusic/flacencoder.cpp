@@ -85,7 +85,7 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
 
 FlacEncoder::~FlacEncoder()
 {
-    addSamples(nullptr, 0); // flush buffer
+    FlacEncoder::addSamples(nullptr, 0); // flush buffer
 
     if (encoder)
     {

@@ -1484,16 +1484,14 @@ void LCDProcClient::scrollMenuText()
     // list so we know how many above and below to display
     unsigned int selectedItem = 0;
     unsigned int counter = 0;
-    bool oneSelected = false;
 
     while (it != m_lcdMenuItems->end())
     {
         curItem = &(*it);
         ++it;
-        if (curItem->isSelected() && !oneSelected)
+        if (curItem->isSelected())
         {
             selectedItem = counter + 1;
-            oneSelected  = true;
             break;
         }
         ++counter;
@@ -1968,8 +1966,6 @@ void LCDProcClient::outputRecStatus(void)
     if (!m_lcdReady || !m_isRecording || !m_lcdShowRecstatus )
         return;
 
-    int listTime;
-
     if ( m_isTimeVisible || !m_lcdShowTime )
     {
         // switch to the rec status screen
@@ -1979,7 +1975,6 @@ void LCDProcClient::outputRecStatus(void)
         m_timeTimer->stop();
         m_scrollWTimer->stop();
         m_scrollListTimer->stop();
-        listTime = LCD_RECSTATUS_TIME;
         m_isTimeVisible = false;
         m_activeScreen = "RecStatus";
 
@@ -2008,6 +2003,7 @@ void LCDProcClient::outputRecStatus(void)
 
     QString aString, status;
     QStringList list;
+    int listTime;
 
     TunerStatus tuner = m_tunerList[m_lcdTunerNo];
 

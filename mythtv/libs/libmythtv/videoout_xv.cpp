@@ -410,7 +410,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* _disp, Window root,
     int port = -1;
 
     // find an Xv port
-    for (uint j = 0; j < req.size(); ++j)
+    for (size_t j = 0; j < req.size(); ++j)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("@ j=%1 Looking for flag[s]: %2 %3")
@@ -629,7 +629,7 @@ bool VideoOutputXv::InitXVideo()
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
-    for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
+    for (size_t i = 0; i < sizeof(ids)/sizeof(int); i++)
     {
         if (has_format(formats, format_cnt, ids[i]))
         {
@@ -1282,7 +1282,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         }
     }
 
-    for (uint i = 0; i < XJ_shm_infos.size(); i++)
+    for (size_t i = 0; i < XJ_shm_infos.size(); i++)
     {
         MythXLocker lock(disp);
         XShmDetach(d, XJ_shm_infos[i]);

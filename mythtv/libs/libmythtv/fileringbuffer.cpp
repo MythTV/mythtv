@@ -82,7 +82,7 @@ FileRingBuffer::FileRingBuffer(const QString &lfilename,
     }
     else if (timeout_ms >= 0)
     {
-        OpenFile(m_filename, timeout_ms);
+        FileRingBuffer::OpenFile(m_filename, timeout_ms);
     }
 }
 

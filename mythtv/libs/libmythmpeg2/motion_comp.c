@@ -63,14 +63,14 @@ void mpeg2_mc_init (uint32_t accel)
 	mpeg2_mc = mpeg2_mc_c;
 }
 
-#define avg2(a,b) ((a+b+1)>>1)
-#define avg4(a,b,c,d) ((a+b+c+d+2)>>2)
+#define avg2(a,b) (((a)+(b)+1)>>1)
+#define avg4(a,b,c,d) (((a)+(b)+(c)+(d)+2)>>2)
 
 #define predict_o(i) (ref[i])
-#define predict_x(i) (avg2 (ref[i], ref[i+1]))
+#define predict_x(i) (avg2 (ref[i], ref[(i)+1]))
 #define predict_y(i) (avg2 (ref[i], (ref+stride)[i]))
-#define predict_xy(i) (avg4 (ref[i], ref[i+1], \
-			     (ref+stride)[i], (ref+stride)[i+1]))
+#define predict_xy(i) (avg4 (ref[i], ref[(i)+1], \
+			     (ref+stride)[i], (ref+stride)[(i)+1]))
 
 #define put(predictor,i) dest[i] = predictor (i)
 #define avg(predictor,i) dest[i] = avg2 (predictor (i), dest[i])

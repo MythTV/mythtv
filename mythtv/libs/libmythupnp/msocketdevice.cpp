@@ -165,7 +165,7 @@ MSocketDevice::MSocketDevice(int socket, Type type)
            this, socket, type);
 #endif
     init();
-    setSocket(socket, type);
+    MSocketDevice::setSocket(socket, type);
 }
 
 /*!
@@ -188,7 +188,7 @@ MSocketDevice::MSocketDevice(Type type)
            this, type);
 #endif
     init();
-    setSocket(createNewSocket(), type);
+    MSocketDevice::setSocket(createNewSocket(), type);
 }
 
 /*!
@@ -217,7 +217,7 @@ MSocketDevice::MSocketDevice(Type type, Protocol protocol, int /*dummy*/)
            this, type);
 #endif
     init();
-    setSocket(createNewSocket(), type);
+    MSocketDevice::setSocket(createNewSocket(), type);
 }
 
 /*!
@@ -225,7 +225,7 @@ MSocketDevice::MSocketDevice(Type type, Protocol protocol, int /*dummy*/)
 */
 MSocketDevice::~MSocketDevice()
 {
-    close();
+    MSocketDevice::close();
     delete d;
     d = nullptr;
 #if defined(MSOCKETDEVICE_DEBUG)
@@ -310,7 +310,7 @@ int MSocketDevice::socket() const
 void MSocketDevice::setSocket(int socket, Type type)
 {
     if (fd != -1)     // close any open socket
-        close();
+        MSocketDevice::close();
 
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice::setSocket: socket %x, type %d", socket, type);

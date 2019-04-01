@@ -228,7 +228,7 @@ bool ChannelBase::IsInputAvailable(
     chanid_restriction = 0;
 
     vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputid);
-    for (uint i = 0; i < inputids.size(); ++i)
+    for (size_t i = 0; i < inputids.size(); ++i)
     {
         if (RemoteIsBusy(inputids[i], info))
         {
@@ -484,7 +484,7 @@ void ChannelBase::HandleScriptEnd(bool ok)
 int ChannelBase::GetChanID(void) const
 {
     if (!m_inputid)
-        return false;
+        return -1;
 
     int found   = 0;
     int visible = -1;

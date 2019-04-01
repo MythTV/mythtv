@@ -34,7 +34,7 @@ BumpScope::~BumpScope()
 {
     delete [] m_rgb_buf;
     delete m_image;
-    for (unsigned int i = 0; i < m_phongdat.size(); i++)
+    for (size_t i = 0; i < m_phongdat.size(); i++)
         m_phongdat[i].resize(0);
     m_phongdat.resize(0);
 }
@@ -65,7 +65,7 @@ void BumpScope::resize(const QSize &newsize)
     m_y = m_height;
 
     m_phongdat.resize(m_phongrad * 2);
-    for (unsigned int i = 0; i < m_phongdat.size(); i++)
+    for (size_t i = 0; i < m_phongdat.size(); i++)
         m_phongdat[i].resize(m_phongrad * 2);
 
     generate_phongdat();
@@ -99,13 +99,16 @@ void BumpScope::generate_cmap(unsigned int color)
         for (uint i = 255; i > 0; i--)
         {
              uint r, g, b;
-             r = (unsigned int)(((double)(100 * red / 255) * m_intense1[i] + m_intense2[i]));
+             r = (unsigned int)((100 * static_cast<double>(red) / 255)
+                                * m_intense1[i] + m_intense2[i]);
              if (r > 255)
                  r = 255;
-             g = (unsigned int)(((double)(100 * green / 255) * m_intense1[i] + m_intense2[i]));
+             g = (unsigned int)((100 * static_cast<double>(green) / 255)
+                                * m_intense1[i] + m_intense2[i]);
              if (g > 255)
                  g = 255;
-             b = (unsigned int)(((double)(100 * blue / 255) * m_intense1[i] + m_intense2[i]));
+             b = (unsigned int)((100 * static_cast<double>(blue) / 255)
+                                * m_intense1[i] + m_intense2[i]);
              if (b > 255)
                  b = 255;
 
@@ -174,8 +177,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting y to both maxes */
     *yo = HEIGHT/2;
-    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0F));
-    *xo = (int)((x-(WIDTH/2))/cos(*angle*(M_PI/180.0)));
+    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
+    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
         *xd = (*xo>0)?-1:1;
@@ -184,8 +187,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *yo = -*yo;
-    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0F));
-    *xo = (int)((x-(WIDTH/2))/cos(*angle*(M_PI/180.0)));
+    *angle = (int)(asin((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
+    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
         *xd = (*xo>0)?-1:1;
@@ -195,8 +198,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting x to both maxes */
     *xo = WIDTH/2;
-    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0F));
-    *yo = (int)((y-(HEIGHT/2))/sin(*angle*(M_PI/180.0)));
+    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/(M_PI_F/180.0F));
+    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI/180.0)));
 
     if (*yo >= -hd2 && *yo <= hd2) {
         *yd = (*yo>0)?-1:1;
@@ -205,8 +208,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *xo = -*xo;
-    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0F));
-    *yo = (int)((y-(HEIGHT/2))/sin(*angle*(M_PI/180.0)));
+    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/(M_PI_F/180.0F));
+    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI/180.0)));
 
     /* if this isn't right, it's out of our range and we don't care */
     *yd = (*yo>0)?-1:1;
@@ -399,8 +402,8 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
             m_was_moving = 1;
         }
 
-        m_ilx = (int)(m_width / 2 + cos(m_iangle * (M_PI / 180.0)) * m_ixo);
-        m_ily = (int)(m_height / 2 + sin(m_iangle * (M_PI / 180.0)) * m_iyo);
+        m_ilx = (int)(m_width / 2.0F + cosf(m_iangle * (M_PI / 180.0)) * m_ixo);
+        m_ily = (int)(m_height / 2.0F + sinf(m_iangle * (M_PI / 180.0)) * m_iyo);
 
         m_iangle += 2;
         if (m_iangle >= 360)

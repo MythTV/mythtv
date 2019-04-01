@@ -1127,7 +1127,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
         setLabel(QObject::tr("GUID"));
 #ifdef USING_FIREWIRE
         vector<AVCInfo> list = FirewireDevice::GetSTBList();
-        for (uint i = 0; i < list.size(); i++)
+        for (size_t i = 0; i < list.size(); i++)
         {
             QString guid = list[i].GetGUIDString();
             guid_to_avcinfo[guid] = list[i];
@@ -1434,7 +1434,7 @@ VBoxIP::VBoxIP()
 {
     setLabel(QObject::tr("IP Address"));
     setHelpText(QObject::tr("Device IP or ID of a VBox device. eg. '192.168.1.100' or 'vbox_3718'"));
-    setEnabled(false);
+    VBoxIP::setEnabled(false);
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
 };
@@ -1464,7 +1464,7 @@ VBoxTunerIndex::VBoxTunerIndex()
 {
     setLabel(QObject::tr("Tuner"));
     setHelpText(QObject::tr("Number and type of the tuner to use. eg '1-DVBT/T2'."));
-    setEnabled(false);
+    VBoxTunerIndex::setEnabled(false);
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateDevices(const QString&)));
 };
@@ -1576,7 +1576,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
     QString usestr = QString(" -- ");
     usestr += QObject::tr("Warning: already in use");
 
-    for (uint i = 0; i < devs.size(); i++)
+    for (size_t i = 0; i < devs.size(); i++)
     {
         const QString dev = devs[i];
         QString desc = dev + (in_use[devs[i]] ? usestr : "");
@@ -2523,7 +2523,7 @@ void CaptureCard::Save(void)
     if (CardUtil::IsTunerSharingCapable(type))
     {
         vector<uint> clones = CardUtil::GetChildInputIDs(cardid);
-        for (uint i = 0; i < clones.size(); i++)
+        for (size_t i = 0; i < clones.size(); i++)
             CardUtil::CloneCard(cardid, clones[i]);
     }
 }
@@ -2808,7 +2808,7 @@ void InputGroup::Load(void)
     // add selections to combobox
     clearSelections();
     uint index = 0;
-    for (uint i = 0; i < names.size(); i++)
+    for (size_t i = 0; i < names.size(); i++)
     {
         bool sel = (m_groupId == grpid[i]);
         index = (sel) ? i : index;
@@ -2905,10 +2905,10 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(channels, order);
     bool has_visible = false;
-    for (uint i = 0; i < channels.size() && !has_visible; i++)
+    for (size_t i = 0; i < channels.size() && !has_visible; i++)
         has_visible |= channels[i].m_visible;
 
-    for (uint i = 0; i < channels.size(); i++)
+    for (size_t i = 0; i < channels.size(); i++)
     {
         const QString channum = channels[i].m_channum;
         bool sel = channum == startChan;
@@ -3331,7 +3331,7 @@ void CardInput::Save(void)
     vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
 
     // Delete old clone cards as required.
-    for (uint i = cardids.size() + 1;
+    for (size_t i = cardids.size() + 1;
          (i > icount) && !cardids.empty(); --i)
     {
         CardUtil::DeleteInput(cardids.back());
@@ -3339,13 +3339,13 @@ void CardInput::Save(void)
     }
 
     // Clone this config to existing clone cards.
-    for (uint i = 0; i < cardids.size(); ++i)
+    for (size_t i = 0; i < cardids.size(); ++i)
     {
         CardUtil::CloneCard(cardid, cardids[i]);
     }
 
     // Create new clone cards as required.
-    for (uint i = cardids.size() + 1; i < icount; i++)
+    for (size_t i = cardids.size() + 1; i < icount; i++)
     {
         CardUtil::CloneCard(cardid, 0);
     }

@@ -30,7 +30,7 @@ QString NetworkInformationTable::toString(void) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(NetworkDescriptors(),
                                   NetworkDescriptorsLength());
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
             str.append(QString("  %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
     }
@@ -50,7 +50,7 @@ QString NetworkInformationTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
-            for (uint j = 0; j < desc.size(); j++)
+            for (size_t j = 0; j < desc.size(); j++)
                 str.append(QString("    %1\n")
                            .arg(MPEGDescriptor(desc[j]).toString()));
         }
@@ -70,8 +70,12 @@ QString NetworkInformationTable::NetworkName() const
             MPEGDescriptor::Find(parsed, DescriptorID::network_name);
 
         if (desc)
-            _cached_network_name = NetworkNameDescriptor(desc).Name();
-        else
+        {
+            auto nndesc = NetworkNameDescriptor(desc);
+            if (nndesc.IsValid())
+                _cached_network_name = nndesc.Name();
+        }
+        if (_cached_network_name.isEmpty())
             _cached_network_name = QString("Net ID 0x%1")
                 .arg(NetworkID(), 0, 16);
     }
@@ -126,7 +130,7 @@ QString ServiceDescriptionTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(ServiceDescriptors(i),
                                       ServiceDescriptorsLength(i));
-            for (uint j = 0; j < desc.size(); j++)
+            for (size_t j = 0; j < desc.size(); j++)
             {
                 // Descriptors 0x80 to 0xFE are user defined, see
                 // Final draft ETSI EN 300 468 v1.13.1 (2012-04)
@@ -206,7 +210,7 @@ QString BouquetAssociationTable::toString(void) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(BouquetDescriptors(),
                                   BouquetDescriptorsLength());
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
             str.append(QString("  %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
     }
@@ -226,7 +230,7 @@ QString BouquetAssociationTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
-            for (uint j = 0; j < desc.size(); j++)
+            for (size_t j = 0; j < desc.size(); j++)
                 str.append(QString("    %1\n")
                            .arg(MPEGDescriptor(desc[j]).toString()));
         }

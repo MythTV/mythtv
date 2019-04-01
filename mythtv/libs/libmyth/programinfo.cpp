@@ -237,7 +237,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
  */
 ProgramInfo::ProgramInfo(uint _recordedid)
 {
-    clear();
+    ProgramInfo::clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -257,7 +257,7 @@ ProgramInfo::ProgramInfo(uint _recordedid)
         LOG(VB_GENERAL, LOG_CRIT, LOC +
             QString("Failed to find recorded entry for %1.")
             .arg(_recordedid));
-        clear();
+        ProgramInfo::clear();
     }
 
     ensureSortFields();
@@ -268,7 +268,7 @@ ProgramInfo::ProgramInfo(uint _recordedid)
  */
 ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts)
 {
-    clear();
+    ProgramInfo::clear();
 
     LoadProgramFromRecorded(_chanid, _recstartts);
     ensureSortFields();
@@ -706,7 +706,7 @@ ProgramInfo::ProgramInfo(
  */
 ProgramInfo::ProgramInfo(const QString &_pathname)
 {
-    clear();
+    ProgramInfo::clear();
     if (_pathname.isEmpty())
     {
         return;
@@ -721,7 +721,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname)
         return;
     }
 
-    clear();
+    ProgramInfo::clear();
 
     QDateTime cur = MythDate::current();
     m_recstartts = m_startts = cur.addSecs(-4 * 60 * 60 - 1);
@@ -753,7 +753,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
                          uint _year,
                          const QString &_programid)
 {
-    clear();
+    ProgramInfo::clear();
 
     m_title = _title;
     m_sortTitle = _sortTitle;
@@ -788,7 +788,7 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
                          const QDateTime &_startts,
                          const QDateTime &_endts)
 {
-    clear();
+    ProgramInfo::clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1899,7 +1899,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
 {
     if (!_chanid || !_recstartts.isValid())
     {
-        clear();
+        ProgramInfo::clear();
         return false;
     }
 
@@ -1914,13 +1914,13 @@ bool ProgramInfo::LoadProgramFromRecorded(
     if (!query.exec())
     {
         MythDB::DBError("LoadProgramFromRecorded", query);
-        clear();
+        ProgramInfo::clear();
         return false;
     }
 
     if (!query.next())
     {
-        clear();
+        ProgramInfo::clear();
         return false;
     }
 
@@ -3241,7 +3241,7 @@ void ProgramInfo::SaveAutoExpire(AutoExpireType autoExpire, bool updateDelete)
     else if (updateDelete)
         UpdateLastDelete(true);
 
-    set_flag(m_programflags, FL_AUTOEXP, (uint)autoExpire);
+    set_flag(m_programflags, FL_AUTOEXP, autoExpire != kDisableAutoExpire);
 
     SendUpdateEvent();
 }
@@ -5225,7 +5225,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
     const QDateTime *time_dtr[] =
         { &m_recstartts, &m_recendts, &m_startts, &m_endts, };
-    for (uint i = 0; i < sizeof(time_str)/sizeof(char*); i++)
+    for (size_t i = 0; i < sizeof(time_str)/sizeof(char*); i++)
     {
         str.replace(QString("%%1%").arg(time_str[i]),
                     (time_dtr[i]->toLocalTime()).toString("yyyyMMddhhmmss"));

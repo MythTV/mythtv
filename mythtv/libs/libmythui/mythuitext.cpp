@@ -66,7 +66,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_textCursor = -1;
     m_EnableInitiator = true;
 
-    SetArea(displayRect);
+    MythUIText::SetArea(displayRect);
     m_FontStates.insert("default", font);
     *m_Font = m_FontStates["default"];
 }

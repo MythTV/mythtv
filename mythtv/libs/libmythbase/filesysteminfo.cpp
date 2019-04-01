@@ -45,7 +45,7 @@ using namespace std;
 
 FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 {
-    clone(other);
+    FileSystemInfo::clone(other);
 }
 
 FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,

@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 
 // ANSI C headers
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -519,7 +520,7 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
        return -1;
     }
 
-    vbi->bpb = bpb * FAC + 0.5;
+    vbi->bpb = lround(bpb * FAC);
     vbi->soc = soc;
     vbi->eoc = eoc;
     vbi->bp8bl = 0.97 * 8*bpb; // -3% tolerance

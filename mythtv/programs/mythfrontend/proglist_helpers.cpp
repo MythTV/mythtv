@@ -524,7 +524,7 @@ void EditPowerSearchPopup::initLists(void)
     ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "callsign");
     ChannelUtil::SortChannels(channels, channelOrdering, true);
 
-    for (uint i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 

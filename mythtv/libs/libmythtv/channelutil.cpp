@@ -449,7 +449,7 @@ vector<uint> ChannelUtil::CreateMultiplexes(
 
         uint tsid  = nit->TSID(i);
         uint netid = nit->OriginalNetworkID(i);
-        for (uint j = 0; j < list.size(); ++j)
+        for (size_t j = 0; j < list.size(); ++j)
         {
             const MPEGDescriptor desc(list[j]);
             handle_transport_desc(muxes, desc, sourceid, tsid, netid);
@@ -2258,7 +2258,7 @@ void ChannelUtil::SortChannels(ChannelInfoList &list, const QString &order,
     {
         ChannelInfoList tmp;
         tmp.push_back(list[0]);
-        for (uint i = 1; i < list.size(); i++)
+        for (size_t i = 1; i < list.size(); i++)
         {
             if ((cs && lt_callsign(tmp.back(), list[i])) ||
                 (!cs && lt_smart(tmp.back(), list[i])))

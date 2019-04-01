@@ -111,7 +111,7 @@ struct
     int exc_type##x GCCATTR_UNUSED; exc_s##x.prev = EXC.last; \
     EXC.last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
 
-#define exc_catch(x,t) else if (t == exc_type##x)
+#define exc_catch(x,t) else if ((t) == exc_type##x)
 
 #define exc_end(x) else __exc_throw(exc_type##x); EXC.last = exc_s##x.prev; } while (0)
 
@@ -199,7 +199,7 @@ static void xxfwrite(FILE * stream, const eu8 * ptr, size_t size)
     }
 }
 
-#define xxfwriteCS(f, s) xxfwrite(f, CUS s, sizeof s - 1)
+#define xxfwriteCS(f, s) xxfwrite(f, CUS s, sizeof (s) - 1)
 
 static void yuv2rgb(int y,   int cr,  int cb,
             eu8 * r, eu8 * g, eu8 * b)  

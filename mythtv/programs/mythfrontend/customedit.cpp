@@ -133,6 +133,8 @@ void CustomEdit::loadData(void)
             rule.subtitle = result.value(2).toString();
             rule.description = result.value(3).toString();
 
+            // No memory leak. MythUIButtonListItem adds the new item
+            // into m_ruleList.
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_ruleList, rule.title,
                                          qVariantFromValue(rule));

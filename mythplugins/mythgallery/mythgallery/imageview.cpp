@@ -104,7 +104,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     ThumbList fileList, dirList;
     LoadAlbumRunnable::filterDirectories(itemList, fileList, dirList);
-    AddItems(fileList);
+    ImageView::AddItems(fileList);
 
     if (recurse)
     {

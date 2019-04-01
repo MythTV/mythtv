@@ -64,15 +64,17 @@ static void CECSourceActivatedCallback(void *adapter, cec_logical_address addres
 class CECAdapterPriv
 {
   public:
+#if CEC_LIB_VERSION_MAJOR < 2
     CECAdapterPriv()
      {
-#if CEC_LIB_VERSION_MAJOR < 2
         // libcec1 has this as a POD struct, with no
         // automatic initialisation.
         // And no .Clear() method...
         memset(&m_callbacks, 0, sizeof(m_callbacks));
-#endif
     }
+#else
+    CECAdapterPriv() = default;
+#endif
 
     bool Open(void)
     {

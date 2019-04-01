@@ -5,7 +5,7 @@
 
 MythWelcomeCommandLineParser::MythWelcomeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHWELCOME)
-{ LoadArguments(); }
+{ MythWelcomeCommandLineParser::LoadArguments(); }
 
 QString MythWelcomeCommandLineParser::GetHelpHeader(void) const
 {

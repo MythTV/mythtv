@@ -5,7 +5,7 @@
 
 MythAVTestCommandLineParser::MythAVTestCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
-{ LoadArguments(); }
+{ MythCommandLineParser::LoadArguments(); }
 
 QString MythAVTestCommandLineParser::GetHelpHeader(void) const
 {

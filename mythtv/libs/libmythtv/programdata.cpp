@@ -74,7 +74,7 @@ DBPerson::DBPerson(const QString &role, const QString &name) :
 {
     if (!role.isEmpty())
     {
-        for (uint i = 0; i < sizeof(roles) / sizeof(char *); i++)
+        for (size_t i = 0; i < sizeof(roles) / sizeof(char *); i++)
         {
             if (role == QString(roles[i]))
                 m_role = (Role) i;
@@ -488,7 +488,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
     int overlap = 0;
     int duration = m_starttime.secsTo(m_endtime);
 
-    for (uint i = 0; i < programs.size(); i++)
+    for (size_t i = 0; i < programs.size(); i++)
     {
         int mv = 0;
         int duration_loop = programs[i].m_starttime.secsTo(programs[i].m_endtime);
@@ -560,7 +560,7 @@ uint DBEvent::UpdateDB(
 {
     // Adjust/delete overlaps;
     bool ok = true;
-    for (uint i = 0; i < p.size(); i++)
+    for (size_t i = 0; i < p.size(); i++)
     {
         if (i != (uint)match)
             ok &= MoveOutOfTheWayDB(q, chanid, p[i]);
@@ -748,7 +748,7 @@ uint DBEvent::UpdateDB(
 
     if (m_credits)
     {
-        for (uint i = 0; i < m_credits->size(); i++)
+        for (size_t i = 0; i < m_credits->size(); i++)
             (*m_credits)[i].InsertDB(query, chanid, m_starttime);
     }
 
@@ -1069,7 +1069,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (m_credits)
     {
-        for (uint i = 0; i < m_credits->size(); i++)
+        for (size_t i = 0; i < m_credits->size(); i++)
             (*m_credits)[i].InsertDB(query, chanid, m_starttime);
     }
 
@@ -1238,7 +1238,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (m_credits)
     {
-        for (uint i = 0; i < m_credits->size(); ++i)
+        for (size_t i = 0; i < m_credits->size(); ++i)
             (*m_credits)[i].InsertDB(query, chanid, m_starttime);
     }
 
@@ -1301,7 +1301,7 @@ bool ProgramData::ClearDataBySource(
     vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
 
     bool ok = true;
-    for (uint i = 0; i < chanids.size(); i++)
+    for (size_t i = 0; i < chanids.size(); i++)
         ok &= ClearDataByChannel(chanids[i], from, to, use_channel_time_offset);
 
     return ok;
@@ -1437,7 +1437,7 @@ void ProgramData::HandlePrograms(
 
         FixProgramList(sortlist);
 
-        for (uint i = 0; i < chanids.size(); ++i)
+        for (size_t i = 0; i < chanids.size(); ++i)
         {
             HandlePrograms(query, chanids[i], sortlist, unchanged, updated);
         }

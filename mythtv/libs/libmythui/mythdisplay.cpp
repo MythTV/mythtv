@@ -26,7 +26,7 @@ static float fix_rate(int video_rate)
     float fixed = default_rate;
     if (video_rate > 0)
     {
-        fixed = video_rate / 2;
+        fixed = static_cast<float>(video_rate) / 2.0F;
         if (fixed < default_rate)
             fixed = default_rate;
     }

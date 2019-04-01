@@ -5,7 +5,7 @@
 
 MythCommFlagCommandLineParser::MythCommFlagCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHCOMMFLAG)
-{ LoadArguments(); }
+{ MythCommFlagCommandLineParser::LoadArguments(); }
 
 void MythCommFlagCommandLineParser::LoadArguments(void)
 {

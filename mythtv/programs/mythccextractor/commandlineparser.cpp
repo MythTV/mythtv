@@ -4,7 +4,7 @@
 MythCCExtractorCommandLineParser::MythCCExtractorCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHCCEXTRACTOR)
 {
-    LoadArguments();
+    MythCCExtractorCommandLineParser::LoadArguments();
 }
 
 void MythCCExtractorCommandLineParser::LoadArguments(void)

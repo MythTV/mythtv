@@ -5,7 +5,7 @@
 
 MythBackendCommandLineParser::MythBackendCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHBACKEND)
-{ LoadArguments(); }
+{ MythBackendCommandLineParser::LoadArguments(); }
 
 void MythBackendCommandLineParser::LoadArguments(void)
 {

@@ -469,7 +469,7 @@ VideoOutput::~VideoOutput()
 
     ShutdownPipResize();
 
-    ShutdownVideoResize();
+    VideoOutput::ShutdownVideoResize();
 
     delete m_deintFilter;
     delete m_deintFiltMan;

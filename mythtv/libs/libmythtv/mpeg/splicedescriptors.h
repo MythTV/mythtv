@@ -97,7 +97,7 @@ class SpliceDescriptor
     const unsigned char *_data;
 };
 
-class AvailDescriptor : SpliceDescriptor
+class AvailDescriptor : public SpliceDescriptor
 {
   public:
     AvailDescriptor(const unsigned char *data, int len = 300) :
@@ -123,7 +123,7 @@ class AvailDescriptor : SpliceDescriptor
     }
 };
 
-class DTMFDescriptor : SpliceDescriptor
+class DTMFDescriptor : public SpliceDescriptor
 {
   public:
     DTMFDescriptor(const unsigned char *data, int len = 300) :
@@ -155,14 +155,14 @@ class DTMFDescriptor : SpliceDescriptor
     }
 };
 
-class SegmentationDescriptor : SpliceDescriptor
+class SegmentationDescriptor : public SpliceDescriptor
 {
   public:
     SegmentationDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
         _ptrs[2] = _ptrs[1] = _ptrs[0] = nullptr;
-        if (_data && !Parse())
+        if (_data && !SegmentationDescriptor::Parse())
             _data = nullptr;
     }
 

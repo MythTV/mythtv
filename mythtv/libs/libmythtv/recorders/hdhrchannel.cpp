@@ -28,7 +28,7 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(HDHRChannel::GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),
@@ -39,7 +39,7 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
 
 HDHRChannel::~HDHRChannel(void)
 {
-    Close();
+    HDHRChannel::Close();
     DeregisterForMaster(m_device_id);
 }
 
@@ -78,7 +78,7 @@ void HDHRChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing HDHR channel");
 
-    if (!IsOpen())
+    if (!HDHRChannel::IsOpen())
         return; // this caller didn't have it open in the first place..
 
     HDHRStreamHandler::Return(m_stream_handler, GetInputID());

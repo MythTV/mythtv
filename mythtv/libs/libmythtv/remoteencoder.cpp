@@ -656,7 +656,7 @@ bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
  */
 bool RemoteEncoder::CheckChannelPrefix(
     const QString &prefix,
-    uint          &is_complete_valid_channel_on_rec,
+    uint          &complete_valid_channel_on_rec,
     bool          &is_extra_char_useful,
     QString       &needed_spacer)
 {
@@ -667,7 +667,7 @@ bool RemoteEncoder::CheckChannelPrefix(
     if (!SendReceiveStringList(strlist, 4))
         return false;
 
-    is_complete_valid_channel_on_rec = strlist[1].toInt();
+    complete_valid_channel_on_rec = strlist[1].toInt();
     is_extra_char_useful = strlist[2].toInt();
     needed_spacer = (strlist[3] == "X") ? "" : strlist[3];
 

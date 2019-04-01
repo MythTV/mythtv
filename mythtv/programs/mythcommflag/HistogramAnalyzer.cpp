@@ -60,7 +60,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
                     .arg(filename).arg(frameno));
             goto error;
         }
-        for (unsigned int ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
+        for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
         {
             if ((nitems = fscanf(fp, "%20x", &counter[ii])) != 1)
             {
@@ -84,7 +84,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
         fcol[frameno] = colval;
         fwidth[frameno] = widthval;
         fheight[frameno] = heightval;
-        for (unsigned int ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
+        for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
             histogram[frameno][ii] = counter[ii];
         monochromatic[frameno] = !widthval || !heightval ? 1 : 0;
         /*

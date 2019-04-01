@@ -159,7 +159,7 @@ FreeSurround::~FreeSurround()
 
 uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
 {
-    int i = 0;
+    uint i = 0;
     int ic = in_count;
     int bs = block_size/2;
     bool process = true;

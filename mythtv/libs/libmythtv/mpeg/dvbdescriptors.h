@@ -2111,12 +2111,15 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
 
         memset ((void *) m_crid, 0, sizeof(m_crid));
 
-        while (_data[1] >= position)
+        if (IsValid())
         {
-           size_t length = _data[position+1];
-           m_crid[count] = &_data[position];
-           count++;
-           position+=length+2;
+            while (_data[1] >= position)
+            {
+                size_t length = _data[position+1];
+                m_crid[count] = &_data[position];
+                count++;
+                position+=length+2;
+            }
         }
         m_cridCount = count;
     }

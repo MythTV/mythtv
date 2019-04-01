@@ -51,7 +51,7 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
 CetonSignalMonitor::~CetonSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    CetonSignalMonitor::Stop();
     CetonStreamHandler::Return(m_streamHandler, m_inputid);
 }
 

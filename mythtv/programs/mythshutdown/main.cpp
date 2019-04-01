@@ -912,7 +912,7 @@ int main(int argc, char **argv)
         if (res == 0)
         {
              // Nothing to stop a shutdown (eg. recording in progress).
-             res = setScheduledWakeupTime();
+             setScheduledWakeupTime();
              res = shutdown();
         }
 

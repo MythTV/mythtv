@@ -66,7 +66,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
 
 DTVSignalMonitor::~DTVSignalMonitor()
 {
-    SetStreamData(nullptr);
+    DTVSignalMonitor::SetStreamData(nullptr);
 }
 
 DTVChannel *DTVSignalMonitor::GetDTVChannel(void)
@@ -178,7 +178,7 @@ void DTVSignalMonitor::UpdateListeningForEIT(void)
     if (GetStreamData()->HasEITPIDChanges(m_eit_pids) &&
         GetStreamData()->GetEITPIDChanges(m_eit_pids, add_eit, del_eit))
     {
-        for (uint i = 0; i < del_eit.size(); i++)
+        for (size_t i = 0; i < del_eit.size(); i++)
         {
             uint_vec_t::iterator it;
             it = find(m_eit_pids.begin(), m_eit_pids.end(), del_eit[i]);
@@ -187,7 +187,7 @@ void DTVSignalMonitor::UpdateListeningForEIT(void)
             GetStreamData()->RemoveListeningPID(del_eit[i]);
         }
 
-        for (uint i = 0; i < add_eit.size(); i++)
+        for (size_t i = 0; i < add_eit.size(); i++)
         {
             m_eit_pids.push_back(add_eit[i]);
             GetStreamData()->AddListeningPID(add_eit[i]);
@@ -369,8 +369,10 @@ void DTVSignalMonitor::HandlePMT(uint /*program_num*/, const ProgramMapTable *pm
 
     for (uint i = 0; i < pmt->StreamCount(); i++)
     {
-        hasVideo += pmt->IsVideo(i, GetDTVChannel()->GetSIStandard());
-        hasAudio += pmt->IsAudio(i, GetDTVChannel()->GetSIStandard());
+        if (pmt->IsVideo(i, GetDTVChannel()->GetSIStandard()))
+            hasVideo++;
+        if (pmt->IsAudio(i, GetDTVChannel()->GetSIStandard()))
+            hasAudio++;
     }
 
     if ((hasVideo >= GetStreamData()->GetVideoStreamsRequired()) &&

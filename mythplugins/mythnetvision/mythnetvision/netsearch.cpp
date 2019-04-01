@@ -380,11 +380,9 @@ void NetSearch::SearchFinished(void)
         m_maxpage = m_pagenum;
     else
     {
-        if (((float)searchresults/returned + 0.999F) >=
-            ((int)searchresults/returned + 1))
-            m_maxpage = (searchresults/returned + 1);
-        else
-            m_maxpage = (searchresults/returned);
+        m_maxpage = searchresults / returned; // Whole pages
+        if (searchresults % returned != 0)    // Partial page?
+            m_maxpage++;
     }
     if (m_pageText && m_maxpage > 0 && m_pagenum > 0 && returned > 0)
         m_pageText->SetText(QString("%1 / %2")

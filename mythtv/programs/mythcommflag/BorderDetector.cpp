@@ -129,8 +129,6 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
 
     top = false;
     bottom = false;
-    left = false;
-    right = false;
 
     minrow = VERTMARGIN;
     maxrow1 = pgmheight - VERTMARGIN;   /* maxrow + 1 */
