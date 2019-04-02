@@ -2128,11 +2128,8 @@ void Scheduler::run(void)
                     statuschanged = true;
                     startIter = m_reclist.begin();
                 }
-                int elapsed = t.elapsed();
-                int seconds = elapsed / 1000;
-                if (elapsed % 1000) // round up
-                    seconds++;
-                schedRunTime = max(static_cast<int>(seconds * 1.5 + 2),
+                int elapsed = (t.elapsed() + 999) / 1000;
+                schedRunTime = max(static_cast<int>(elapsed * 1.5 + 2),
                                    schedRunTime);
             }
 
