@@ -580,6 +580,7 @@ bool ServerPool::bind(QStringList addrstr, quint16 port, bool requireall)
 
 bool ServerPool::bind(quint16 port, bool requireall)
 {
+    // cppcheck-suppress invalidFunctionArgBool
     return bind(DefaultListen(), port, requireall);
 }
 
