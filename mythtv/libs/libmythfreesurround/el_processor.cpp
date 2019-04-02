@@ -227,7 +227,7 @@ private:
     static inline float clamp(float x) { return max(-1,min(1,x)); }
 
     // handle the output buffering for overlapped calls of block_decode
-    void add_output(float *input1[2], float *input2[2], float center_width, float dimension, float adaption_rate, bool result=false) {
+    void add_output(float *input1[2], float *input2[2], float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
         // add the windowed data to the last 1/2 of the output buffer
         float *out[6] = {&outbuf[0][0],&outbuf[1][0],&outbuf[2][0],&outbuf[3][0],&outbuf[4][0],&outbuf[5][0]};
         block_decode(input1,input2,out,center_width,dimension,adaption_rate);
