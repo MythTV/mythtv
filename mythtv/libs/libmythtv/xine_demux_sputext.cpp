@@ -72,7 +72,7 @@
 #define FORMAT_SUBRIP09   12
 #define FORMAT_MPL2       13 /*Mplayer sub 2 ?*/
 
-static int eol(char p) {
+static bool eol(char p) {
   return (p=='\r' || p=='\n' || p=='\0');
 }
 
