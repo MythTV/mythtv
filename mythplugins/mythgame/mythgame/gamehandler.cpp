@@ -71,7 +71,7 @@ void GameHandler::updateSettings(GameHandler *handler)
         handler->m_gametype = query.value(5).toString();
         handler->m_validextensions = query.value(6).toString().trimmed()
                                         .remove(" ").split(",", QString::SkipEmptyParts);
-        handler->m_spandisks = query.value(7).toInt();
+        handler->m_spandisks = query.value(7).toBool();
     }
 }
 

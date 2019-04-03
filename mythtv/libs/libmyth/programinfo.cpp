@@ -4988,7 +4988,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "MarkAsInUse -- select query failed");
     }
-    else if (query.value(0).toUInt())
+    else if (query.value(0).toBool())
     {
         query.prepare(
             "UPDATE inuseprograms "
@@ -5572,7 +5572,7 @@ bool LoadFromProgram( ProgramList &destination,
                 query.value(22).toUInt(), // findid
 
                 query.value(11).toInt() == COMM_DETECT_COMMFREE, // commfree
-                query.value(10).toInt(), // repeat
+                query.value(10).toBool(), // repeat
                 query.value(23).toInt(), // videoprop
                 query.value(24).toInt(), // audioprop
                 query.value(25).toInt(), // subtitletypes
@@ -5764,7 +5764,7 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
             RecordingType(query.value(16).toInt()),
             query.value(15).toUInt(),
 
-            query.value(19).toInt()));
+            query.value(19).toBool()));
     }
 
     return true;

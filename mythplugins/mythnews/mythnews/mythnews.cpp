@@ -177,7 +177,7 @@ void MythNews::loadSites(void)
 #else
         QDateTime time = MythDate::fromSecsSinceEpoch(query.value(3).toLongLong());
 #endif
-        bool podcast = query.value(4).toInt();
+        bool podcast = query.value(4).toBool();
         m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
     }
     std::sort(m_NewsSites.begin(), m_NewsSites.end(), NewsSite::sortByName);

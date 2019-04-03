@@ -1675,7 +1675,7 @@ bool TVRec::GetDevices(uint inputid,
     if (!test.isEmpty())
         gen_opts.inputtype = test;
 
-    gen_opts.skip_btaudio = query.value(5).toUInt();
+    gen_opts.skip_btaudio = query.value(5).toBool();
 
     gen_opts.signal_timeout  = (uint) max(query.value(6).toInt(), 0);
     gen_opts.channel_timeout = (uint) max(query.value(7).toInt(), 0);
@@ -1686,13 +1686,13 @@ bool TVRec::GetDevices(uint inputid,
     if (table_timeout < 100)
         gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
 
-    gen_opts.wait_for_seqstart = query.value(8).toUInt();
+    gen_opts.wait_for_seqstart = query.value(8).toBool();
 
     // DVB options
     uint dvboff = 9;
-    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toUInt();
+    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toBool();
     dvb_opts.dvb_tuning_delay = query.value(dvboff + 1).toUInt();
-    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toUInt();
+    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toBool();
 
     // Firewire options
     uint fireoff = dvboff + 3;

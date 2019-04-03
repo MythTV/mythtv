@@ -561,7 +561,7 @@ RSSSite* findByURL(const QString& url, ArticleType type)
         QString author = query.value(2).toString();
         QString description = query.value(3).toString();
         QString outurl = query.value(4).toString();
-        bool download = query.value(5).toInt();
+        bool download = query.value(5).toBool();
         QDateTime updated; query.value(6).toDate();
 
         tmp = new RSSSite(title, QString(), image, type, description,
@@ -595,7 +595,7 @@ RSSSite::rssList findAllDBRSSByType(ArticleType type)
         QString description = query.value(2).toString();
         QString url = query.value(3).toString();
         QString author = query.value(4).toString();
-        bool download = query.value(5).toInt();
+        bool download = query.value(5).toBool();
         QDateTime updated; query.value(6).toDate();
         tmp.append(new RSSSite(title, QString(), image, type, description, url,
                        author, download, updated));
@@ -627,7 +627,7 @@ RSSSite::rssList findAllDBRSS()
         QString description = query.value(3).toString();
         QString url = query.value(4).toString();
         QString author = query.value(5).toString();
-        bool download = query.value(6).toInt();
+        bool download = query.value(6).toBool();
         QDateTime updated; query.value(7).toDate();
         tmp.append(new RSSSite(title, QString(),
                                image, type, description, url,

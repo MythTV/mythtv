@@ -233,7 +233,7 @@ void LiveTVChain::ReloadAll(const QStringList &data)
                     MythDate::as_utc(query.value(1).toDateTime());
                 entry.endtime =
                     MythDate::as_utc(query.value(2).toDateTime());
-                entry.discontinuity = query.value(3).toInt();
+                entry.discontinuity = query.value(3).toBool();
                 entry.hostprefix = query.value(5).toString();
                 entry.inputtype = query.value(6).toString();
                 entry.channum = query.value(7).toString();

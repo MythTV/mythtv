@@ -4426,7 +4426,7 @@ void Scheduler::AddNewRecords(void)
 
     while (result.next())
     {
-        if (result.value(0).toInt())
+        if (result.value(0).toBool())
         {
             QString sclause = result.value(1).toString();
             sclause.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
@@ -4577,10 +4577,10 @@ void Scheduler::AddNewRecords(void)
             QDate::fromString(result.value(32).toString(), Qt::ISODate),
             //originalAirDate
 
-            result.value(20).toInt(),//repeat
+            result.value(20).toBool(),//repeat
 
             RecStatus::Type(result.value(37).toInt()),//oldrecstatus
-            result.value(38).toInt(),//reactivate
+            result.value(38).toBool(),//reactivate
 
             recordid,
             result.value(34).toUInt(),//parentid
@@ -4597,7 +4597,7 @@ void Scheduler::AddNewRecords(void)
             result.value(40).toUInt(),//subtitleType
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
-            result.value(46).toInt(),//future
+            result.value(46).toBool(),//future
             result.value(47).toInt(),//schedorder
             mplexid,                 //mplexid
             result.value(24).toUInt(), //sgroupid
@@ -4673,7 +4673,7 @@ void Scheduler::AddNewRecords(void)
         // Check for RecStatus::CurrentRecording and RecStatus::PreviousRecording
         if (p->GetRecordingRuleType() == kDontRecord)
             newrecstatus = RecStatus::DontRecord;
-        else if (result.value(15).toInt() && !p->IsReactivated())
+        else if (result.value(15).toBool() && !p->IsReactivated())
             newrecstatus = RecStatus::PreviousRecording;
         else if (p->GetRecordingRuleType() != kSingleRecord &&
                  p->GetRecordingRuleType() != kOverrideRecord &&
@@ -4685,7 +4685,7 @@ void Scheduler::AddNewRecords(void)
             if ((dupin & kDupsNewEpi) && p->IsRepeat())
                 newrecstatus = RecStatus::Repeat;
 
-            if ((dupin & kDupsInOldRecorded) && result.value(10).toInt())
+            if ((dupin & kDupsInOldRecorded) && result.value(10).toBool())
             {
                 if (result.value(44).toInt() == RecStatus::NeverRecord)
                     newrecstatus = RecStatus::NeverRecord;
@@ -4693,11 +4693,11 @@ void Scheduler::AddNewRecords(void)
                     newrecstatus = RecStatus::PreviousRecording;
             }
 
-            if ((dupin & kDupsInRecorded) && result.value(14).toInt())
+            if ((dupin & kDupsInRecorded) && result.value(14).toBool())
                 newrecstatus = RecStatus::CurrentRecording;
         }
 
-        bool inactive = result.value(33).toInt();
+        bool inactive = result.value(33).toBool();
         if (inactive)
             newrecstatus = RecStatus::Inactive;
 

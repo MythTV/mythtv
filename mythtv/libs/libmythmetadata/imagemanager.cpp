@@ -523,7 +523,7 @@ ImageItem *ImageDb<FS>::CreateImage(const MSqlQuery &query) const
     im->m_size          = query.value(6).toInt();
     im->m_extension     = query.value(7).toString();
     im->m_date          = query.value(8).toUInt();
-    im->m_isHidden      = query.value(9).toInt();
+    im->m_isHidden      = query.value(9).toBool();
     im->m_orientation   = query.value(10).toInt();
     im->m_userThumbnail = FS::ImageId(query.value(11).toInt());
     im->m_comment       = query.value(12).toString();

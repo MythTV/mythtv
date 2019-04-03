@@ -136,7 +136,7 @@ DTC::CaptureCardList* Capture::GetCaptureCardList( const QString &sHostName,
         pCaptureCard->setSchedOrder        ( query.value(38).toUInt()     );
         pCaptureCard->setLiveTVOrder       ( query.value(39).toUInt()     );
         pCaptureCard->setRecLimit          ( query.value(40).toUInt()     );
-        pCaptureCard->setSchedGroup        ( query.value(41).toInt()      );
+        pCaptureCard->setSchedGroup        ( query.value(41).toBool()     );
     }
 
     return pList;
@@ -224,7 +224,7 @@ DTC::CaptureCard* Capture::GetCaptureCard( int nCardId )
         pCaptureCard->setSchedOrder        ( query.value(38).toUInt()     );
         pCaptureCard->setLiveTVOrder       ( query.value(39).toUInt()     );
         pCaptureCard->setRecLimit          ( query.value(40).toUInt()     );
-        pCaptureCard->setSchedGroup        ( query.value(41).toInt()      );
+        pCaptureCard->setSchedGroup        ( query.value(41).toBool()     );
     }
 
     return pCaptureCard;

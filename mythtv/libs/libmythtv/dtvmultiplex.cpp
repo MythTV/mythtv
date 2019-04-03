@@ -581,7 +581,7 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             query.value(4).toString(),   query.value(5).toString(),
             query.value(6).toUInt(),
             query.value(7).toUInt(),     query.value(8).toUInt(),
-            query.value(9).toUInt(),    !query.value(10).toUInt(),
+            query.value(9).toBool(),    !query.value(10).toBool(),
             false,
             query.value(11).toString(),  query.value(12).toString(),
             query.value(13).toString(),  query.value(14).toString(),

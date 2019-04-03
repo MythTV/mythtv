@@ -306,7 +306,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
     {
         while (query.next())
         {
-            encoder &= !query.value(0).toInt() && !query.value(1).toInt();
+            encoder &= !query.value(0).toBool() && !query.value(1).toBool();
             has_any_chan = true;
         }
     }

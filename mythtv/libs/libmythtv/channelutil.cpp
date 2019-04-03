@@ -1650,8 +1650,8 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
     if (query.next())
     {
         QString xmltvid = query.value(0).toString();
-        bool useeit     = query.value(1).toInt();
-        bool visible    = query.value(2).toInt();
+        bool useeit     = query.value(1).toBool();
+        bool visible    = query.value(2).toBool();
 
         if (!xmltvid.isEmpty())
         {
@@ -2066,7 +2066,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
 
     while (query.next())
     {
-        if (query.value(0).toString().isEmpty() || !query.value(2).toUInt())
+        if (query.value(0).toString().isEmpty() || !query.value(2).toBool())
             continue; // skip if channum blank, or chanid empty
 
         ChannelInfo chan(
