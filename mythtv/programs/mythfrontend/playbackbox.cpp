@@ -4458,8 +4458,8 @@ void PlaybackBox::saveViewChanges()
     if (m_viewMask == VIEW_NONE)
         m_viewMask = VIEW_TITLES;
     gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
-    gCoreContext->SaveSetting("PlaybackWatchList",
-                                            (bool)(m_viewMask & VIEW_WATCHLIST));
+    gCoreContext->SaveBoolSetting("PlaybackWatchList",
+                                            (m_viewMask & VIEW_WATCHLIST) != 0);
 }
 
 void PlaybackBox::showGroupFilter(void)
