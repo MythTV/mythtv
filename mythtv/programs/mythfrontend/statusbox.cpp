@@ -5,6 +5,7 @@ using namespace std;
 
 #include <QRegExp>
 #include <QHostAddress>
+#include <QNetworkInterface>
 
 #include "mythcorecontext.h"
 #include "filesysteminfo.h"
@@ -1252,9 +1253,8 @@ void StatusBox::doMachineStatus()
         m_iconState->DisplayState("machine");
     m_logList->Reset();
     QString machineStr = tr("Machine Status shows some operating system "
-                            "statistics of this machine");
-    if (!m_isBackendActive)
-        machineStr.append(" " + tr("and the MythTV server"));
+                            "statistics of this machine and the MythTV "
+                            "server.");
 
     if (m_helpText)
         m_helpText->SetText(machineStr);
@@ -1272,13 +1272,41 @@ void StatusBox::doMachineStatus()
         line = tr("This machine:");
     AddLogLine(line, machineStr);
 
+    // Hostname & IP
+    line = "   " + tr("Hostname") + ": " + gCoreContext->GetHostName();
+    line.append(", " + tr("IP") + ": ");
+    QString sep = "";
+    foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
+    {
+        QNetworkInterface::InterfaceFlags f = iface.flags();
+        if (!(f & QNetworkInterface::IsUp))
+            continue;
+        if (!(f & QNetworkInterface::IsRunning))
+            continue;
+        if (f & QNetworkInterface::IsLoopBack)
+            continue;
+
+        foreach(QNetworkAddressEntry addr, iface.addressEntries())
+        {
+            if (addr.ip().protocol() == QAbstractSocket::IPv4Protocol ||
+                addr.ip().protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                line += sep + addr.ip().toString();
+                if (sep.isEmpty())
+                    sep = ", ";
+            }
+        }
+        line += "";
+    }
+    AddLogLine(line, machineStr);
+
     // uptime
     if (!getUptime(uptime))
         uptime = 0;
     line = uptimeStr(uptime);
 
     // weighted average loads
-    line.append(".   " + tr("Load") + ": ");
+    line.append(", " + tr("Load") + ": ");
 
 #if defined(_WIN32) || defined(Q_OS_ANDROID)
     line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
@@ -1320,13 +1348,18 @@ void StatusBox::doMachineStatus()
         line = tr("MythTV server") + ':';
         AddLogLine(line, machineStr);
 
+        // Hostname & IP
+        line = "   " + tr("Hostname") + ": " + gCoreContext->GetSetting("MasterServerName");
+        line.append(", " + tr("IP") + ": " + gCoreContext->GetSetting("MasterServerIP"));
+        AddLogLine(line, machineStr);
+
         // uptime
         if (!RemoteGetUptime(uptime))
             uptime = 0;
         line = uptimeStr(uptime);
 
         // weighted average loads
-        line.append(".   " + tr("Load") + ": ");
+        line.append(", " + tr("Load") + ": ");
         float floads[3];
         if (RemoteGetLoad(floads))
         {
