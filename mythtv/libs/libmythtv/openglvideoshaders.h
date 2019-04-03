@@ -1,6 +1,8 @@
 #ifndef OPENGLVIDEOSHADERS_H
 #define OPENGLVIDEOSHADERS_H
 
+#include <QString>
+
 static const QString DefaultVertexShader =
 "attribute highp vec2 a_position;\n"
 "attribute highp vec2 a_texcoord0;\n"
@@ -33,14 +35,28 @@ static const QString MediaCodecVertexShader =
 "    v_texcoord0 = (u_transform * vec4(a_texcoord0, 0.0, 1.0)).xy;\n"
 "}\n";
 
-#define SAMPLE_NV12 "\
-highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n\
-{\n\
-    highp vec3 yuv;\n\
-    yuv.r  = texture2D(texture1, texcoord).r;\n\
-    yuv.gb = texture2D(texture2, texcoord%NV12_UV_RECT%).rg;\n\
-    return yuv;\n\
-}\n"
+static const QString SampleNV12 =
+"highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"
+"{\n"
+"    highp vec3 yuv;\n"
+"    yuv.r  = texture2D(texture1, texcoord).r;\n"
+"    yuv.gb = texture2D(texture2, texcoord%NV12_UV_RECT%).rg;\n"
+"    return yuv;\n"
+"}\n";
+
+// N.B. This always downsamples to 8bit. I can't get the dot product to work correctly
+// but is only used by CUDA interop - so may be related to how CUDA transfers data internally.
+static const QString SampleNV12HDR =
+"uniform highp vec2 m_scaler;\n"
+"highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"
+"{\n"
+"    highp vec3 yuv;\n"
+"    yuv.r = dot(texture2D(texture1, texcoord).rg, vec2(0.0, 1.0));\n" // <-- needs to be m_scaler
+"    highp vec4 uv = texture2D(texture2, texcoord%NV12_UV_RECT%);\n"
+"    yuv.g = dot(uv.rg, vec2(0.0, 1.0));\n"
+"    yuv.b = dot(uv.ba, vec2(0.0, 1.0));\n"
+"    return yuv;\n"
+"}\n";
 
 static const QString NV12FragmentShader =
 "// NV12 FragmentShader\n"
@@ -49,7 +65,7 @@ static const QString NV12FragmentShader =
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLE_NV12
+"%NV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp vec3 yuv = sampleNV12(s_texture0, s_texture1, v_texcoord0);\n"
@@ -63,7 +79,7 @@ static const QString NV12OneFieldFragmentShader[2] = {
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLE_NV12
+"%NV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp float field = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * m_frameData.w))) * m_frameData.x, m_frameData.z);\n"
@@ -77,7 +93,7 @@ SAMPLE_NV12
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLE_NV12
+"%NV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp float field = max(v_texcoord0.y + (step(0.5, 1.0 - fract(v_texcoord0.y * m_frameData.w))) * m_frameData.x, 0.0);\n"
@@ -93,7 +109,7 @@ static const QString NV12LinearBlendFragmentShader[2] = {
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLE_NV12
+"%NV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp vec3 current = sampleNV12(s_texture0, s_texture1, v_texcoord0);\n"
@@ -112,7 +128,7 @@ SAMPLE_NV12
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
-SAMPLE_NV12
+"%NV12SAMPLER%"
 "void main(void)\n"
 "{\n"
 "    highp vec3 current = sampleNV12(s_texture0, s_texture1, v_texcoord0);\n"

@@ -189,6 +189,20 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                                   QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
                 }
                 break;
+            case FMT_P010:
+            case FMT_P016:
+                if (plane == 0)
+                {
+                    texture = CreateTexture(Context, size, Target,
+                                  QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
+                }
+                else
+                {
+                    size = QSize(size.width() >> 1, size.height() >> 1);
+                    texture = CreateTexture(Context, size, Target,
+                                  QOpenGLTexture::UInt8, QOpenGLTexture::RGBA, QOpenGLTexture::RGBA8_UNorm);
+                }
+                break;
             case FMT_YUV422P:
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height());
@@ -286,6 +300,17 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 switch (texture->m_frameFormat)
                 {
                     case FMT_NV12:   NV12ToNV12(Context, Frame, texture, i); break;
+                    default: break;
+                }
+                break;
+            }
+            case FMT_P010:
+            case FMT_P016:
+            {
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_P010:
+                    case FMT_P016: NV12ToNV12(Context, Frame, texture, i); break;
                     default: break;
                 }
                 break;

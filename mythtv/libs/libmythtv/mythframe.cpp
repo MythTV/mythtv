@@ -49,6 +49,8 @@ const char* format_description(VideoFrameType Type)
         case FMT_YUY2:       return "YUY2";
         case FMT_NV12:       return "NV12";
         case FMT_YUYVHQ:     return "YUYVHQ";
+        case FMT_P010:       return "P010";
+        case FMT_P016:       return "P016";
         case FMT_YUV420P10:  return "YUV420P10";
         case FMT_YUV420P12:  return "YUV420P12";
         case FMT_YUV420P16:  return "YUV420P16";
@@ -806,8 +808,10 @@ int ColorDepth(int Format)
 {
     switch (Format)
     {
+        case FMT_P010:
         case FMT_YUV420P10: return 10;
         case FMT_YUV420P12: return 12;
+        case FMT_P016:
         case FMT_YUV420P16: return 16;
         default: break;
     }

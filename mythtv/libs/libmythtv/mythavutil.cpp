@@ -28,6 +28,10 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
     {
         case FMT_NV12:
             return AV_PIX_FMT_NV12;
+        case FMT_P010:
+            return AV_PIX_FMT_P010;
+        case FMT_P016:
+            return AV_PIX_FMT_P016;
         case FMT_YUV422P:
             return AV_PIX_FMT_YUV422P;
         case FMT_BGRA:
@@ -58,6 +62,10 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
             return FMT_YV12;
         case AV_PIX_FMT_NV12:
             return FMT_NV12;
+        case AV_PIX_FMT_P010:
+            return FMT_P010;
+        case AV_PIX_FMT_P016:
+            return FMT_P016;
         case AV_PIX_FMT_YUV420P10:
             return FMT_YUV420P10;
         case AV_PIX_FMT_YUV420P12:

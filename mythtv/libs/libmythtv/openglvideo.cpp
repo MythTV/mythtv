@@ -108,8 +108,8 @@ void OpenGLVideo::UpdateShaderParameters(void)
                          maxheight - lineheight,                          /* maxheight  */
                          m_inputTextureSize.height() / 2.0f               /* fieldsize  */);
 
-    int range = (1 << ColorDepth(m_inputType)) - 1;
-    QVector2D scaler = QVector2D(1.0, 256.0) *255.0 / (float)range;
+    int range = (1 << ColorDepth(m_outputType)) - 1;
+    QVector2D scaler = QVector2D(1.0, 256.0) * 255.0 / static_cast<float>(range);
     for (int i = Progressive; i < ShaderCount; ++i)
     {
         if (m_shaders[i])
@@ -203,7 +203,7 @@ bool OpenGLVideo::AddDeinterlacer(QString Deinterlacer)
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_render->GetMaxTextureUnits();
     uint refstocreate = kernel ? 2 : 0;
-    int totaltextures = planes(m_outputType) * static_cast<int>(refstocreate + 1);
+    int totaltextures = static_cast<int>(planes(m_outputType)) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for '%1' (%2 < %3)")
@@ -275,6 +275,8 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
             case FMT_YUV420P12:
             case FMT_YUV420P16:
             case FMT_YV12:  fragment = YV12RGBFragmentShader; cost = 3; break;
+            case FMT_P010:
+            case FMT_P016:
             case FMT_NV12:  fragment = NV12FragmentShader;    cost = 2; break;
             case FMT_YUY2:
             case FMT_YUYVHQ:
@@ -309,7 +311,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
                 cost = 3;
             }
         }
-        else if (FMT_NV12 == m_outputType)
+        else if (FMT_NV12 == m_outputType || FMT_P010 == m_outputType || FMT_P016 == m_outputType)
         {
             if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
             {
@@ -358,9 +360,10 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         }
     }
 
-    // Set correct YV12 sampler
-    int depth = ColorDepth(m_inputType);
+    // Set correct YUV depth sampler
+    int depth = ColorDepth(m_outputType);
     fragment.replace("%YV12SAMPLER%", depth > 8 ? SampleYV12HDR : SampleYV12);
+    fragment.replace("%NV12SAMPLER%", depth > 8 ? SampleNV12HDR : SampleNV12);
 
     fragment.replace("SELECT_COLUMN", (FMT_YUY2 == m_outputType) ? SelectColumn : "");
     // update packing code so this can be removed

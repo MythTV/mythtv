@@ -28,9 +28,13 @@ typedef enum FrameType_
     FMT_NV12,
     FMT_YUYVHQ, // temporary
     // these are all endian dependent and higher bit depth
+    // YV12 variants
     FMT_YUV420P10,
     FMT_YUV420P12,
     FMT_YUV420P16,
+    // NV12 variants
+    FMT_P010,
+    FMT_P016,
     // hardware formats
     FMT_VDPAU,
     FMT_VAAPI,
@@ -56,7 +60,8 @@ static inline int format_is_yuv(VideoFrameType Type)
     return (Type == FMT_YV12) || (Type == FMT_YUV422P) ||
            (Type == FMT_YUY2) || (Type == FMT_NV12) ||
            (Type == FMT_YUYVHQ) || (Type == FMT_YUV420P10) ||
-           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16);
+           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16) ||
+           (Type == FMT_P010) || (Type == FMT_P016);
 }
 
 typedef struct VideoFrame_
@@ -90,6 +95,7 @@ typedef struct VideoFrame_
     int offsets[3]; ///< Y, U, & V offsets
 
     int pix_fmt;
+    int sw_pix_fmt;
     int directrendering; ///< 1 if managed by FFmpeg
     int colorspace;
 } VideoFrame;
@@ -161,6 +167,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->forcekey         = 0;
     vf->dummy            = 0;
     vf->pix_fmt          = 0;
+    vf->sw_pix_fmt       = -1; // AV_PIX_FMT_NONE
     vf->directrendering  = 1;
     vf->colorspace       = 1; // BT.709
 
@@ -197,6 +204,12 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
         {
             vf->pitches[0] = width_aligned;
             vf->pitches[1] = width_aligned;
+            vf->pitches[2] = 0;
+        }
+        else if (FMT_P010 == _codec || FMT_P016 == _codec)
+        {
+            vf->pitches[0] = width_aligned << 1;
+            vf->pitches[1] = width_aligned << 1;
             vf->pitches[2] = 0;
         }
         else
@@ -239,6 +252,12 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = 0;
         }
+        else if (FMT_P010 == _codec || FMT_P016 == _codec)
+        {
+            vf->offsets[0] = 0;
+            vf->offsets[1] = (width_aligned << 1) * _height;
+            vf->offsets[2] = 0;
+        }
         else
         {
             vf->offsets[0] = vf->offsets[1] = vf->offsets[2] = 0;
@@ -252,16 +271,17 @@ static inline void clear(VideoFrame *vf)
         return;
 
     int uv_height = (vf->height+1) >> 1;
+    int uv = (2 ^ (ColorDepth(vf->codec) - 1)) - 1;
     if (FMT_YV12 == vf->codec)
     {
-        memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
-        memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
-        memset(vf->buf + vf->offsets[2], 127, vf->pitches[2] * uv_height);
+        memset(vf->buf + vf->offsets[0],         0, vf->pitches[0] * vf->height);
+        memset(vf->buf + vf->offsets[1], uv & 0xff, vf->pitches[1] * uv_height);
+        memset(vf->buf + vf->offsets[2], uv & 0xff, vf->pitches[2] * uv_height);
     }
     else if (FMT_NV12 == vf->codec)
     {
-        memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
-        memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
+        memset(vf->buf + vf->offsets[0],         0, vf->pitches[0] * vf->height);
+        memset(vf->buf + vf->offsets[1], uv & 0xff, vf->pitches[1] * uv_height);
     }
     else if (FMT_YUV420P10 == vf->codec || FMT_YUV420P12 == vf->codec ||
              FMT_YUV420P16 == vf->codec)
@@ -269,19 +289,36 @@ static inline void clear(VideoFrame *vf)
         memset(vf->buf + vf->offsets[0], 0, vf->pitches[0] * vf->height);
         if (vf->pitches[1] == vf->pitches[2])
         {
-            int uv = (2 ^ (ColorDepth(vf->codec) - 1)) - 1;
+            unsigned char uv1 = (uv & 0xff00) >> 8;
+            unsigned char uv2 = (uv & 0x00ff);
             unsigned char* buf1 = vf->buf + vf->offsets[1];
             unsigned char* buf2 = vf->buf + vf->offsets[2];
             for (int row = 0; row < uv_height; ++row)
             {
                 for (int col = 0; col < vf->pitches[1]; col += 2)
                 {
-                    buf1[col]     = buf2[col]     = uv;
-                    buf1[col + 1] = buf2[col + 1] = 0;
+                    buf1[col]     = buf2[col]     = uv1;
+                    buf1[col + 1] = buf2[col + 1] = uv2;
                 }
                 buf1 += vf->pitches[1];
                 buf2 += vf->pitches[2];
             }
+        }
+    }
+    else if (FMT_P010 == vf->codec || FMT_P016 == vf->codec)
+    {
+        memset(vf->buf + vf->offsets[0], 0, vf->pitches[0] * vf->height);
+        unsigned char uv1 = (uv & 0xff00) >> 8;
+        unsigned char uv2 = (uv & 0x00ff);
+        unsigned char* buf = vf->buf + vf->offsets[1];
+        for (int row = 0; row < uv_height; ++row)
+        {
+            for (int col = 0; col < vf->pitches[1]; col += 4)
+            {
+                buf[col]     = buf[col + 2] = uv1;
+                buf[col + 1] = buf[col + 3] = uv2;
+            }
+            buf += vf->pitches[1];
         }
     }
 }
@@ -343,6 +380,8 @@ static inline uint planes(VideoFrameType Type)
         case FMT_YUV420P10:
         case FMT_YUV420P12:
         case FMT_YUV420P16: return 3;
+        case FMT_P010:
+        case FMT_P016:
         case FMT_NV12:      return 2;
         case FMT_YUY2:
         case FMT_YUYVHQ:
@@ -379,6 +418,8 @@ static inline int bitsperpixel(VideoFrameType type)
         case FMT_NV12:
             res = 12;
             break;
+        case FMT_P010:
+        case FMT_P016:
         case FMT_YUV420P10: // NB stored in 16bits
         case FMT_YUV420P12: // NB stored in 16bits
         case FMT_YUV420P16:
