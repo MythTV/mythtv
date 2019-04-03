@@ -660,7 +660,7 @@ bool WakeOnLAN(QString MAC)
 bool MythWakeup(const QString &wakeUpCommand, uint flags, uint timeout)
 {
     if (!IsMACAddress(wakeUpCommand))
-        return !myth_system(wakeUpCommand, flags, timeout);
+        return myth_system(wakeUpCommand, flags, timeout) == 0U;
 
     return WakeOnLAN(wakeUpCommand);
 }
