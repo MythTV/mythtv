@@ -210,8 +210,8 @@ bool PreviewGenerator::Run(void)
     QTime tm = QTime::currentTime();
     bool ok = false;
     QString command = GetAppBinDir() + "mythpreviewgen";
-    bool local_ok = ((IsLocal() || !!(m_mode & kForceLocal)) &&
-                     (!!(m_mode & kLocal)) &&
+    bool local_ok = ((IsLocal() || ((m_mode & kForceLocal) != 0)) &&
+                     ((m_mode & kLocal) != 0) &&
                      QFileInfo(command).isExecutable());
     if (!local_ok)
     {

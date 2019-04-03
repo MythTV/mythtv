@@ -1942,7 +1942,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     program_info->Reload();
 
     bool useCutlist = program_info->HasCutlist() &&
-        !!(GetJobFlags(jobID) & JOB_USE_CUTLIST);
+        ((GetJobFlags(jobID) & JOB_USE_CUTLIST) != 0);
 
     uint transcoder = program_info->QueryTranscoderID();
     QString profilearg =

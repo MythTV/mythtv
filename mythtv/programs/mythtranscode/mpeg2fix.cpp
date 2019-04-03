@@ -1317,7 +1317,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     // End HACK
 
     SetRepeat(pkt->data, pkt->size, info->display_picture->nb_fields,
-              !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST));
+              ((info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST) != 0U));
 
     avcodec_free_context(&c);
 

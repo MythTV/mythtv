@@ -74,11 +74,11 @@ bool V4LChannel::Open(void)
         return false;
     }
 
-    m_has_stream_io  = !!(capabilities & V4L2_CAP_STREAMING);
-    m_has_std_io     = !!(capabilities & V4L2_CAP_READWRITE);
-    m_has_async_io   = !!(capabilities & V4L2_CAP_ASYNCIO);
-    m_has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
-    m_has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
+    m_has_stream_io  = ((capabilities & V4L2_CAP_STREAMING)          != 0U);
+    m_has_std_io     = ((capabilities & V4L2_CAP_READWRITE)          != 0U);
+    m_has_async_io   = ((capabilities & V4L2_CAP_ASYNCIO)            != 0U);
+    m_has_tuner      = ((capabilities & V4L2_CAP_TUNER)              != 0U);
+    m_has_sliced_vbi = ((capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U);
 
     if (m_driver_name == "bttv" || m_driver_name == "cx8800" || m_driver_name == "cx88_blackbird"
         || m_driver_name == "saa7164")
