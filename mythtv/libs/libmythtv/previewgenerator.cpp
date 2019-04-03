@@ -292,7 +292,7 @@ bool PreviewGenerator::Run(void)
             }
 
             QFileInfo fi(outname);
-            ok = (fi.exists() && fi.isReadable() && fi.size());
+            ok = (fi.exists() && fi.isReadable() && (fi.size() != 0));
             if (ok)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preview process ran ok.");
