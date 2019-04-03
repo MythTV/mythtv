@@ -197,9 +197,9 @@ static int get_int_option(RecordingProfile *profile, const QString &name)
     return ret_int;
 }
 
-static int get_bool_option(RecordingProfile *profile, const QString &name)
+static bool get_bool_option(RecordingProfile *profile, const QString &name)
 {
-    return static_cast<int>(get_int_option(profile, name));
+    return get_int_option(profile, name) != 0;
 }
 
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
