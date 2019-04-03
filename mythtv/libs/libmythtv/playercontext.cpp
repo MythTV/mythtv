@@ -403,8 +403,8 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     else
     {
         QString subfn = m_buffer->GetSubtitleFilename();
-        bool isInProgress =
-            desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
+        bool isInProgress = (desiredState == kState_WatchingRecording ||
+                             desiredState == kState_WatchingLiveTV);
         if (!subfn.isEmpty() && player->GetSubReader())
             player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
     }
