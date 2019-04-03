@@ -110,6 +110,13 @@ typedef enum PictureAttributeSupported
     kPictureAttributeSupported_Volume       = 0x20,
 } PictureAttributeSupported;
 
+#define ALL_PICTURE_ATTRIBUTES static_cast<PictureAttributeSupported> \
+    (kPictureAttributeSupported_Brightness | \
+     kPictureAttributeSupported_Contrast | \
+     kPictureAttributeSupported_Colour | \
+     kPictureAttributeSupported_Hue | \
+     kPictureAttributeSupported_StudioLevels)
+
 typedef enum StereoscopicMode
 {
     kStereoscopicModeNone,

@@ -64,14 +64,7 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
     if (ColourSpace)
     {
         if (m_openglTextures.isEmpty())
-        {
-            ColourSpace->SetSupportedAttributes(static_cast<PictureAttributeSupported>
-                                               (kPictureAttributeSupported_Brightness |
-                                                kPictureAttributeSupported_Contrast |
-                                                kPictureAttributeSupported_Colour |
-                                                kPictureAttributeSupported_Hue |
-                                                kPictureAttributeSupported_StudioLevels));
-        }
+            ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
         ColourSpace->UpdateColourSpace(Frame);
     }
 
