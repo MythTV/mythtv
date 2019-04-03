@@ -76,7 +76,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
         m_status_complete = scanEvent->intValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
-        m_status_lock = scanEvent->intValue();
+        m_status_lock = scanEvent->boolValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
         m_status_snr = scanEvent->intValue() / 65535.0;
 #if THESE_ARE_CURRENTLY_IGNORED
