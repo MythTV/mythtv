@@ -371,6 +371,10 @@ int mythfile_stat_fd(int fileID, struct stat *buf)
     return mythfile_stat(filename.toLocal8Bit().constData(), buf);
 }
 
+/*
+ * This function exists for the use of dvd_reader.c, thus the return
+ * value of int instead of bool.  C doesn't have a bool type.
+ */
 int mythfile_exists(const char *path, const char *file)
 {
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_exists('%1', '%2')")
