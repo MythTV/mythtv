@@ -143,7 +143,7 @@ bool ActionSet::Replace(const ActionID &id,
 bool ActionSet::SetModifiedFlag(const ActionID &id, bool modified)
 {
     if (!modified)
-        return m_modified.removeAll(id);
+        return m_modified.removeAll(id) != 0;
 
     if (!IsModified(id))
     {

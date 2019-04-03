@@ -463,7 +463,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
             //QKeyEvent key(QEvent::KeyPress, keycode, modifiers);
             character = QChar(keycode);
 
-            if (modifiers & Qt::ShiftModifier != 0U)
+            if ((modifiers & Qt::ShiftModifier) != 0U)
                 character = character.toUpper();
             else
                 character = character.toLower();

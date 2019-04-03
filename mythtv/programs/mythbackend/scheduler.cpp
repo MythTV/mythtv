@@ -1123,8 +1123,8 @@ bool Scheduler::FindNextConflict(
         bool mplexid_ok =
             (p->m_sgroupid != q->m_sgroupid ||
              m_sinputinfomap[p->m_sgroupid].m_schedgroup) &&
-            ((p->m_mplexid && p->m_mplexid == q->m_mplexid) ||
-             (!p->m_mplexid && p->GetChanID() == q->GetChanID()));
+            (((p->m_mplexid != 0U) && p->m_mplexid == q->m_mplexid) ||
+             ((p->m_mplexid == 0U) && p->GetChanID() == q->GetChanID()));
 
         if (p->GetRecordingEndTime() == q->GetRecordingStartTime() ||
             p->GetRecordingStartTime() == q->GetRecordingEndTime())
@@ -1929,8 +1929,8 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     if (is_busy &&
         (rcinfo->GetRecordingStatus() == RecStatus::Pending ||
          !m_sinputinfomap[rcinfo->GetInputID()].m_schedgroup ||
-         ((!busy_input.m_mplexid || busy_input.m_mplexid != rcinfo->m_mplexid) &&
-          (busy_input.m_mplexid || busy_input.m_chanid != rcinfo->GetChanID()))))
+         (((busy_input.m_mplexid == 0U) || busy_input.m_mplexid != rcinfo->m_mplexid) &&
+          ((busy_input.m_mplexid != 0U) || busy_input.m_chanid != rcinfo->GetChanID()))))
     {
         return true;
     }
@@ -2906,7 +2906,7 @@ void Scheduler::HandleRecordingStatusChange(
         ((recStatus != RecStatus::Tuning &&
           recStatus != RecStatus::Recording) ||
          m_schedAfterStartMap[ri.GetRecordingRuleID()] ||
-         (ri.GetParentRecordingRuleID() &&
+         ((ri.GetParentRecordingRuleID() != 0U) &&
           m_schedAfterStartMap[ri.GetParentRecordingRuleID()]));
     ri.AddHistory(doSchedAfterStart);
 
@@ -3064,7 +3064,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
             .arg(ri.GetTitle()));
     }
 
-    return bestid;
+    return bestid != 0U;
 }
 
 void Scheduler::HandleIdleShutdown(
@@ -4646,7 +4646,7 @@ void Scheduler::AddNewRecords(void)
         RecStatus::Type newrecstatus = RecStatus::Unknown;
         // Check for RecStatus::Offline
         if ((m_doRun || m_specsched) &&
-            (!cardMap.contains(p->GetInputID()) || !p->m_schedorder))
+            (!cardMap.contains(p->GetInputID()) || (p->m_schedorder == 0)))
         {
             newrecstatus = RecStatus::Offline;
             if (p->m_schedorder == 0 &&

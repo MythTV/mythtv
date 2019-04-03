@@ -192,7 +192,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             }
             else
             {
-                isLocked = tuner.signal;
+                isLocked = (tuner.signal != 0);
             }
         }
     }

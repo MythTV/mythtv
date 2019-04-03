@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
 
     if (doScan)
     {
-        bool okCardID = scanCardId;
+        bool okCardID = scanCardId != 0U;
 
         if (scanInputName.isEmpty())
             scanInputName = CardUtil::GetInputName(scanCardId);

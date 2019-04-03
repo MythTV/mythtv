@@ -256,7 +256,7 @@ bool V4LChannel::InitializeInputs(void)
         .arg(m_tuneToChannel)
         .arg(mode_to_format(m_videoModeV4L2)));
 
-    return valid_cnt;
+    return valid_cnt != 0U;
 }
 
 /** \fn V4LChannel::SetFormat(const QString &format)

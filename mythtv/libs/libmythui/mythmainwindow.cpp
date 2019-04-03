@@ -259,11 +259,11 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
                 (keynum > 0x7f) &&
                 (keynum != Qt::Key_Backtab))
                 modnum |= Qt::SHIFT;
-            if (modifiers & Qt::ControlModifier != 0U)
+            if ((modifiers & Qt::ControlModifier) != 0U)
                 modnum |= Qt::CTRL;
-            if (modifiers & Qt::MetaModifier != 0U)
+            if ((modifiers & Qt::MetaModifier) != 0U)
                 modnum |= Qt::META;
-            if (modifiers & Qt::AltModifier != 0U)
+            if ((modifiers & Qt::AltModifier) != 0U)
                 modnum |= Qt::ALT;
             modnum &= ~Qt::UNICODE_ACCEL;
             return (keynum |= modnum);

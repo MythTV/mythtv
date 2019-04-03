@@ -4967,7 +4967,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         QStringList::const_iterator it = slist.begin() + 4;
         ProgramInfo pginfo(it, slist.end());
 
-        enc->RecordPending(&pginfo, secsleft, haslater);
+        enc->RecordPending(&pginfo, secsleft, haslater != 0);
 
         retlist << "OK";
     }

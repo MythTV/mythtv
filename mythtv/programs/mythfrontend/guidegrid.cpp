@@ -392,7 +392,7 @@ public:
     static bool IsLoading(GuideGrid *guide)
     {
         QMutexLocker locker(&s_lock);
-        return s_loading[guide];
+        return s_loading[guide] != 0U;
     }
     static void Wait(GuideGrid *guide)
     {

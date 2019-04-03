@@ -139,7 +139,7 @@ void PlayerSettings::toggleAlt()
     if (m_altCheck->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
 
-    m_altPlayerEdit->SetVisible(checkstate);
+    m_altPlayerEdit->SetVisible(checkstate != 0);
 }
 
 void PlayerSettings::fillRegionList()

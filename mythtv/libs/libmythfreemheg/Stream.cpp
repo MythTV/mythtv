@@ -247,7 +247,7 @@ void MHStream::SetCounterPosition(int pos, MHEngine *engine)
 
 void MHStream::SetSpeed(int speed, MHEngine *engine)
 {
-    engine->GetContext()->StreamPlay(speed);
+    engine->GetContext()->StreamPlay(speed != 0);
 }
 
 void MHAudio::Initialise(MHParseNode *p, MHEngine *engine)

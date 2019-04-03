@@ -90,7 +90,7 @@ static inline uint extract_endtime(uint64_t sig)
 
 static inline bool modified(uint64_t sig)
 {
-    return sig >> 63;
+    return (sig >> 63) != 0U;
 }
 
 static void replace_in_db(QStringList &value_clauses,

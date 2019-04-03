@@ -96,7 +96,7 @@ void DTVRecorder::SetOption(const QString &name, int value)
     if (name == "wait_for_seqstart")
         m_wait_for_keyframe_option = (value == 1);
     else if (name == "recordmpts")
-        m_record_mpts = value;
+        m_record_mpts = (value != 0);
     else
         RecorderBase::SetOption(name, value);
 }

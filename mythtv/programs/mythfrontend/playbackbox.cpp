@@ -1785,7 +1785,7 @@ bool PlaybackBox::UpdateUILists(void)
                     if (p->GetRecordingRuleID())
                         recidEpisodes[p->GetRecordingRuleID()] += 1;
                     if (recidEpisodes[p->GetRecordingRuleID()] == 1 ||
-                            !p->GetRecordingRuleID())
+                            (p->GetRecordingRuleID() == 0U))
                     {
                         m_progLists[m_watchGroupLabel].push_front(p);
                         m_progLists[m_watchGroupLabel].setAutoDelete(false);

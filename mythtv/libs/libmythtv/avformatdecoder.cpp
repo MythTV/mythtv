@@ -692,7 +692,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     ts += (long long)seekts;
 
     // XXX figure out how to do snapping in this case
-    bool exactseeks = !DecoderBase::GetSeekSnap();
+    bool exactseeks = DecoderBase::GetSeekSnap() == 0U;
 
     int flags = (m_dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 
@@ -864,7 +864,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // we predict whether the situation is hopeless, i.e. the total
     // skipping would take longer than giveUpPredictionMs, and if so,
     // stop skipping right away.
-    bool exactSeeks = !GetSeekSnap();
+    bool exactSeeks = GetSeekSnap() == 0U;
     const int maxSeekTimeMs = 200;
     int profileFrames = 0;
     MythTimer begin(MythTimer::kStartRunning);
@@ -1224,7 +1224,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     QString extension = QFileInfo(fnames).suffix();
     if (strcmp(fmt->name, "mp3") == 0 || strcmp(fmt->name, "flac") == 0 ||
         strcmp(fmt->name, "ogg") == 0 ||
-        !extension.compare("m4a", Qt::CaseInsensitive))
+        (extension.compare("m4a", Qt::CaseInsensitive) == 0))
     {
         novideo = true;
     }
@@ -4996,7 +4996,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         // detect switches between stereo and dual languages
         bool wasDual = audSubIdx != -1;
-        bool isDual = ctx->avcodec_dual_language;
+        bool isDual = ctx->avcodec_dual_language != 0;
         if ((wasDual && !isDual) || (!wasDual &&  isDual))
         {
             SetupAudioStreamSubIndexes(audIdx);
@@ -5535,7 +5535,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
         }
     }
 
-    return GetTrackCount(kTrackTypeVideo);
+    return GetTrackCount(kTrackTypeVideo) != 0U;
 }
 
 bool AvFormatDecoder::GenerateDummyVideoFrames(void)

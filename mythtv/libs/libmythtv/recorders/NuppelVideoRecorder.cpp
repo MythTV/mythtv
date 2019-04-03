@@ -221,7 +221,7 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "hardwaremjpegvdecimation")
         m_hmjpg_vdecimation = value;
     else if (opt == "audiocompression")
-        m_compressaudio = value;
+        m_compressaudio = (value != 0);
     else if (opt == "mp3quality")
         m_mp3quality = value;
     else if (opt == "samplerate")
@@ -233,7 +233,7 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "inpixfmt")
         m_inpixfmt = (VideoFrameType)value;
     else if (opt == "skipbtaudio")
-        m_skip_btaudio = value;
+        m_skip_btaudio = (value != 0);
     else if (opt == "volume")
         m_volume = value;
     else

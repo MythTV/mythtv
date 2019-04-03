@@ -417,7 +417,7 @@ bool MSocketDevice::atEnd() const
 */
 bool MSocketDevice::broadcast() const
 {
-    return option(Broadcast);
+    return option(Broadcast) != 0;
 }
 
 /*!
@@ -439,7 +439,7 @@ void MSocketDevice::setBroadcast(bool enable)
 */
 bool MSocketDevice::addressReusable() const
 {
-    return option(ReuseAddress);
+    return option(ReuseAddress) != 0;
 }
 
 
@@ -469,7 +469,7 @@ void MSocketDevice::setAddressReusable(bool enable)
 */
 bool MSocketDevice::keepalive() const
 {
-    return option(Keepalive);
+    return option(Keepalive) != 0;
 }
 
 /*!

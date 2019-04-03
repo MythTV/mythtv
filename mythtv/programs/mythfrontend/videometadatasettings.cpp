@@ -149,5 +149,5 @@ void MetadataSettings::toggleTrailers()
     if (m_randomTrailerCheck->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
 
-    m_trailerSpin->SetVisible(checkstate);
+    m_trailerSpin->SetVisible(checkstate != 0);
 }

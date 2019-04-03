@@ -53,7 +53,7 @@ class SubtitleLoadHelper : public QRunnable
     static bool IsLoading(TextSubtitles *target)
     {
         QMutexLocker locker(&s_lock);
-        return s_loading[target];
+        return s_loading[target] != 0U;
     }
 
     static void Wait(TextSubtitles *target)
@@ -359,7 +359,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
 
     LOG(VB_VBI, LOG_INFO, QString("Found %1 subtitles in file '%2'")
         .arg(sub_data.num).arg(fileName));
-    target.SetFrameBasedTiming(!sub_data.uses_time);
+    target.SetFrameBasedTiming(sub_data.uses_time == 0);
     target.Clear();
 
     // convert the subtitles to our own format, free the original structures

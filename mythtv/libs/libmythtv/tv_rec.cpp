@@ -2530,7 +2530,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
             (32767 == busy_input->m_mplexid) ? 0 : busy_input->m_mplexid;
     }
 
-    return busy_input->m_inputid;
+    return busy_input->m_inputid != 0U;
 }
 
 

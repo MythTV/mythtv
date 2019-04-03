@@ -392,7 +392,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
                 pginfo->m_genres.append(cat);
             }
-            else if (info.tagName() == "date" && !pginfo->m_airdate)
+            else if (info.tagName() == "date" && (pginfo->m_airdate == 0U))
             {
                 // Movie production year
                 QString date = getFirstText(info);
