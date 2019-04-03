@@ -32,11 +32,14 @@ Checks: '-*,
         # Cant fix due to missing LIB_EXT1 extensions. ,
        -clang-analyzer-security.insecureAPI.strcpy,
 
-
     clang-diagnostic-error,
 
     bugprone-*,
-       -bugprone-argument-comment,
+        # Not investigated yet. ,
+        bugprone-argument-comment,
+
+        # A handful of warnings
+       -bugprone-integer-division,
 
         # Bunch of warnings.... ,
        -bugprone-narrowing-conversions,
@@ -49,16 +52,32 @@ Checks: '-*,
         # Half dozen errors, all in SQL statements. ,
        -bugprone-suspicious-missing-comma,
 
+    misc-*,
+
+        # Cases exist. Need to add getters/setters to classes. ,
+       -misc-non-private-member-variables-in-classes,
+
+        # Complains about code like "RAND () % 3 - RAND () % 3", not
+        # understanding that RAND() doesnt always return the same
+        # value. ,
+        #
+        # Two spots that check (id == -1) || (id < x) which is
+        # redundant. ,
+       -misc-redundant-expression,
+
+        # Cases exist. Need evaluation. ,
+       -misc-throw-by-value-catch-by-reference,
+
     modernize-*,
 
         # Lots of changes to be done. ,
-       -modernize-avoid-c-arrays,
+        modernize-avoid-c-arrays,
 
         # Not investigated yet. ,
        -modernize-loop-convert,
 
         # Lots of changes to be done. ,
-       -modernize-pass-by-value,
+        modernize-pass-by-value,
 
         # Run again.  Seems like should do more.  Supposedly presence
         # of *any* of \\, \<squote>, \<dquote>, \?, octal, hex. ,
@@ -69,10 +88,6 @@ Checks: '-*,
 
         # Not investigated yet. ,
        -modernize-use-auto,
-
-        # There are a couple of system header files that cause false
-        # positives. ,
-       -modernize-use-bool-literals,
 
         # One weirdness in videooutput_xv.cpp.  Making the proposed
         # change causes one of the programs to fail in the link stage. ,
@@ -87,7 +102,9 @@ Checks: '-*,
         ## C++17 modernize-unary-static-assert,
         ## C++17 modernize-use-nodiscard,
 
-  readability-*,
+    performance-*,
+
+    readability-*,
 
         # Not investigated yet. ,
        -readability-braces-around-statements,
@@ -140,13 +157,16 @@ CheckOptions:
   - key:      modernize-make-unique.IgnoreMacros
     value:    '0'
   - key:      modernize-use-bool-literals.IgnoreMacros
-    value:    '0'
+    value:    '1'
   - key:      modernize-use-default-member-init.IgnoreMacros
     value:    '0'
   - key:      modernize-use-equals-default.IgnoreMacros
     value:    '0'
   - key:      modernize-use-using.IgnoreMacros
     value:    '0'
+
+  - key:      performance-inefficient-vector-operation.VectorLikeClasses
+    value:    ::std::vector,QList,QByteArrayList,QItemSelection,QQueue,QStringList
 
   - key:      readability-braces-around-statements.ShortStatementLines
     value:    '2'
