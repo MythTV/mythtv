@@ -410,7 +410,7 @@ static bool performUpdateSeries(const char **updates)
 
     while (thequery != nullptr)
     {
-        if (strlen(thequery) && !query.exec(thequery))
+        if ((strlen(thequery) != 0U) && !query.exec(thequery))
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"

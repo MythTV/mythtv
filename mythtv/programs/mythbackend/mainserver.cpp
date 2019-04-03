@@ -5156,7 +5156,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     localStr = "1"; // Assume local
                     bSize = 0;
 
-                    if (!statfs(currentDir.toLocal8Bit().constData(), &statbuf))
+                    if (statfs(currentDir.toLocal8Bit().constData(), &statbuf) == 0)
                     {
 #if CONFIG_DARWIN
                         char *fstypename = statbuf.f_fstypename;
