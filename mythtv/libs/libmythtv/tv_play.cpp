@@ -8675,7 +8675,7 @@ void TV::DoEditSchedule(int editType)
     pause_active |= !isLiveTV && (!m_dbContinueEmbedded || isNearEnd);
     pause_active |= paused;
     vector<bool> do_pause;
-    do_pause.insert(do_pause.begin(), true, !m_player.empty());
+    do_pause.insert(do_pause.begin(), 1, !m_player.empty());
     int actx_index = find_player_index(actx);
     if (actx_index < 0)
     {
