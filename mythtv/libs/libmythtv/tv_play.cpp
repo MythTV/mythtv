@@ -4576,7 +4576,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
 
             int rate   = m_sigMonMode ? 0 : 100;
-            int notify = m_sigMonMode ? 0 : 1;
+            bool notify = m_sigMonMode ? false : true;
 
             PauseLiveTV(ctx);
             ctx->m_recorder->SetSignalMonitoringRate(rate, notify);
@@ -9513,13 +9513,14 @@ void TV::customEvent(QEvent *e)
 
     if (message.startsWith("ASK_RECORDING "))
     {
-        int timeuntil = 0, hasrec = 0, haslater = 0;
+        int timeuntil = 0;
+        bool hasrec = false, haslater = false;
         if (tokens.size() >= 5)
         {
             cardnum   = tokens[1].toUInt();
             timeuntil = tokens[2].toInt();
-            hasrec    = tokens[3].toInt();
-            haslater  = tokens[4].toInt();
+            hasrec    = (tokens[3].toInt() != 0);
+            haslater  = (tokens[4].toInt() != 0);
         }
         LOG(VB_GENERAL, LOG_DEBUG,
             LOC + message + QString(" hasrec: %1 haslater: %2")
