@@ -595,7 +595,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     uint buttonversion = 0;
     AVSubtitle *dvdSubtitle = player_ctx->m_buffer->DVD()->GetMenuSubtitle(buttonversion);
-    bool numbuttons    = player_ctx->m_buffer->DVD()->NumMenuButtons();
+    bool numbuttons    = player_ctx->m_buffer->DVD()->NumMenuButtons() != 0;
 
     bool expired = false;
 

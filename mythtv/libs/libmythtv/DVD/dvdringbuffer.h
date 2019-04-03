@@ -156,7 +156,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool RestoreDVDStateSnapshot(QString& state);
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (m_part == 0); }
-    bool EndOfTitle(void)   { return ((!m_titleParts) ||
+    bool EndOfTitle(void)   { return ((m_titleParts == 0) ||
                                      (m_part == (m_titleParts - 1)) ||
                                      (m_titleParts == 1)); }
 
