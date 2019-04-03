@@ -10,14 +10,12 @@ class VideoVisualGoom : public VideoVisual
     VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd);
     virtual ~VideoVisualGoom() override;
 
-    void Draw(const QRect &area, MythPainter *painter,
-              QPaintDevice* device) override; // VideoVisual
-    QString Name(void) override // VideoVisual
-        { return m_hd ? "Goom HD" : "Goom"; }
+    // VideoVisual
+    void Draw(const QRect &area, MythPainter *painter, QPaintDevice* device) override;
+    QString Name(void) override { return m_hd ? "Goom HD" : "Goom"; }
 
   private:
     unsigned int  *m_buffer;
-    uint           m_vdpauSurface;
     MythGLTexture *m_glSurface;
     bool           m_hd;
 };

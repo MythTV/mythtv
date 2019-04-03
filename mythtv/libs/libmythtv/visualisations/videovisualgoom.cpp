@@ -6,10 +6,6 @@
 #include "mythrender_opengl.h"
 #endif
 
-#ifdef USING_VDPAU
-#include "mythrender_vdpau.h"
-#endif
-
 extern "C" {
 #include "goom/goom_tools.h"
 #include "goom/goom_core.h"
@@ -18,7 +14,10 @@ extern "C" {
 #include "videovisualgoom.h"
 
 VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd)
-  : VideoVisual(audio, render), m_buffer(nullptr), m_vdpauSurface(0), m_glSurface(nullptr), m_hd(hd)
+  : VideoVisual(audio, render),
+    m_buffer(nullptr),
+    m_glSurface(nullptr),
+    m_hd(hd)
 {
     int max_width  = m_hd ? 1200 : 600;
     int max_height = m_hd ? 800  : 400;
@@ -41,17 +40,6 @@ VideoVisualGoom::~VideoVisualGoom()
         if (glrender)
             glrender->DeleteTexture(m_glSurface);
         m_glSurface = nullptr;
-    }
-#endif
-
-#ifdef USING_VDPAU
-    if (m_vdpauSurface && m_render &&
-       (m_render->Type() == kRenderVDPAU))
-    {
-        MythRenderVDPAU *render = static_cast<MythRenderVDPAU*>(m_render);
-        if (render)
-            render->DestroyBitmapSurface(m_vdpauSurface);
-        m_vdpauSurface = 0;
     }
 #endif
 
@@ -120,28 +108,6 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         return;
     }
 #endif
-
-#ifdef USING_VDPAU
-    if (m_render->Type() == kRenderVDPAU)
-    {
-        MythRenderVDPAU *render = static_cast<MythRenderVDPAU*>(m_render);
-
-        if (!m_vdpauSurface && render)
-            m_vdpauSurface = render->CreateBitmapSurface(m_area.size());
-
-        if (m_vdpauSurface && render && m_buffer)
-        {
-            if (m_buffer != last)
-            {
-                void    *plane[1] = { m_buffer };
-                uint32_t pitch[1] = { static_cast<uint32_t>(m_area.width() * 4) };
-                render->UploadBitmap(m_vdpauSurface, plane, pitch);
-            }
-            render->DrawBitmap(m_vdpauSurface, 0, nullptr, nullptr, kVDPBlendNull, 255, 255, 255, 255);
-        }
-        return;
-    }
-#endif
 }
 
 static class VideoVisualGoomFactory : public VideoVisualFactory
@@ -161,8 +127,7 @@ static class VideoVisualGoomFactory : public VideoVisualFactory
 
     bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
-        return (type == kRenderVDPAU ||
-                type == kRenderOpenGL);
+        return (type == kRenderOpenGL);
     }
 } VideoVisualGoomFactory;
 
@@ -183,7 +148,6 @@ static class VideoVisualGoomHDFactory : public VideoVisualFactory
 
     bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
-        return (type == kRenderVDPAU ||
-                type == kRenderOpenGL);
+        return (type == kRenderOpenGL);
     }
 } VideoVisualGoomHDFactory;
