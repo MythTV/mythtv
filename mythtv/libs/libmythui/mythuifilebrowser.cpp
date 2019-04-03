@@ -536,7 +536,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         MFileInfo finfo(dataName, m_storageGroupDir);
 
         if ((tokens[0] == "dir") &&
-            (m_typeFilter & (QDir::Dirs | QDir::AllDirs)))
+            ((m_typeFilter & (QDir::Dirs | QDir::AllDirs)) != 0))
         {
             type = "folder";
             finfo.setIsDir(true);
@@ -544,7 +544,7 @@ void MythUIFileBrowser::updateRemoteFileList()
             finfo.setSize(0);
         }
         else if ((tokens[0] == "sgdir") &&
-                 (m_typeFilter & (QDir::Dirs | QDir::AllDirs)))
+                 ((m_typeFilter & (QDir::Dirs | QDir::AllDirs)) != 0))
         {
             type = "folder";
             finfo.setIsDir(true);
@@ -552,7 +552,7 @@ void MythUIFileBrowser::updateRemoteFileList()
             finfo.setSize(0);
         }
         else if ((tokens[0] == "file") &&
-                 (m_typeFilter & QDir::Files))
+                 ((m_typeFilter & QDir::Files) != 0))
         {
             finfo.setIsDir(false);
             finfo.setSize(tokens[2].toInt());

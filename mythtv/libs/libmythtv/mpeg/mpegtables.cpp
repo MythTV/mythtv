@@ -624,7 +624,7 @@ bool ProgramMapTable::IsStillPicture(QString sistandard) const
         if (IsVideo(i, sistandard))
         {
             return StreamInfoLength(i) > 2 &&
-                   (StreamInfo(i)[2] & STILL_PICTURE_FLAG);
+                   ((StreamInfo(i)[2] & STILL_PICTURE_FLAG) != 0);
         }
     }
     return false;
@@ -1303,20 +1303,20 @@ bool SpliceInformationTable::Parse(void)
         for (uint i = 0; i < splice_count; i++)
         {
             _ptrs0.push_back(cur);
-            bool event_cancel = cur[4] & 0x80;
+            bool event_cancel = (cur[4] & 0x80) != 0;
             if (event_cancel)
             {
                 _ptrs1.push_back(nullptr);
                 cur += 5;
                 continue;
             }
-            bool program_slice = cur[5] & 0x40;
+            bool program_slice = (cur[5] & 0x40) != 0;
             uint component_count = cur[6];
             _ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
         }
         if (splice_count)
         {
-            bool duration = _ptrs0.back()[5] & 0x2;
+            bool duration = (_ptrs0.back()[5] & 0x2) != 0;
             _epilog = _ptrs1.back() + ((duration) ? 9 : 4);
         }
         else
@@ -1327,16 +1327,16 @@ bool SpliceInformationTable::Parse(void)
     else if (kSCTSpliceInsert == type)
     {
         _ptrs1.push_back(pesdata() + 14);
-        bool splice_cancel = pesdata()[18] & 0x80;
+        bool splice_cancel = (pesdata()[18] & 0x80) != 0;
         if (splice_cancel)
         {
             _epilog = pesdata() + 19;
         }
         else
         {
-            bool program_splice = pesdata()[19] & 0x40;
-            bool duration = pesdata()[19] & 0x20;
-            bool splice_immediate = pesdata()[19] & 0x10;
+            bool program_splice = (pesdata()[19] & 0x40) != 0;
+            bool duration = (pesdata()[19] & 0x20) != 0;
+            bool splice_immediate = (pesdata()[19] & 0x10) != 0;
             const unsigned char *cur = pesdata() + 20;
             if (program_splice && !splice_immediate)
             {

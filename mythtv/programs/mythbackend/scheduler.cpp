@@ -4685,7 +4685,7 @@ void Scheduler::AddNewRecords(void)
             if ((dupin & kDupsNewEpi) && p->IsRepeat())
                 newrecstatus = RecStatus::Repeat;
 
-            if ((dupin & kDupsInOldRecorded) && result.value(10).toBool())
+            if (((dupin & kDupsInOldRecorded) != 0) && result.value(10).toBool())
             {
                 if (result.value(44).toInt() == RecStatus::NeverRecord)
                     newrecstatus = RecStatus::NeverRecord;
@@ -4693,7 +4693,7 @@ void Scheduler::AddNewRecords(void)
                     newrecstatus = RecStatus::PreviousRecording;
             }
 
-            if ((dupin & kDupsInRecorded) && result.value(14).toBool())
+            if (((dupin & kDupsInRecorded) != 0) && result.value(14).toBool())
                 newrecstatus = RecStatus::CurrentRecording;
         }
 

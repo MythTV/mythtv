@@ -303,7 +303,7 @@ bool ShortVirtualChannelTable::Parse(void)
     }
     else if (kVirtualChannelMap == TableSubtype())
     {
-        bool descriptors_included = pesdata()[7] & 0x20;
+        bool descriptors_included = (pesdata()[7] & 0x20) != 0;
         uint number_of_vc_records = pesdata()[13];
         const unsigned char *next = pesdata() + 14;
         if (!descriptors_included)

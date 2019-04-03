@@ -2056,7 +2056,7 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
         av_dict_get(m_ic->streams[av_stream_index]->metadata, "language", nullptr,
                     0);
     bool forced =
-      m_ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED;
+      (m_ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED) != 0;
     int lang = metatag ? get_canonical_lang(metatag->value) :
                          iso639_str3_to_key("und");
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -2368,7 +2368,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (par->codec_type == AVMEDIA_TYPE_SUBTITLE)
         {
-            bool forced = m_ic->streams[strm]->disposition & AV_DISPOSITION_FORCED;
+            bool forced = (m_ic->streams[strm]->disposition & AV_DISPOSITION_FORCED) != 0;
             int lang = GetSubtitleLanguage(subtitleStreamCount, strm);
             int lang_indx = lang_sub_cnt[lang]++;
             subtitleStreamCount++;
@@ -3194,7 +3194,7 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte)
     //cc_data() {
     // reserved                1 0.0   1
     // process_cc_data_flag    1 0.1   bslbf
-    bool process_cc_data = buf[0] & 0x40;
+    bool process_cc_data = (buf[0] & 0x40) != 0;
     if (!process_cc_data)
         return; // early exit if process_cc_data_flag false
 
@@ -3219,7 +3219,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
     for (uint cur = 0; cur + 3 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
-        bool cc_valid = cc_code & 0x04;
+        bool cc_valid = (cc_code & 0x04) != 0U;
 
         uint data1    = buf[cur+1];
         uint data2    = buf[cur+2];

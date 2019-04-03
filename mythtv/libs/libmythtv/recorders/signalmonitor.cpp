@@ -267,7 +267,7 @@ bool SignalMonitor::HasFlags(uint64_t _flags) const
 
 bool SignalMonitor::HasAnyFlag(uint64_t _flags) const
 {
-    return (m_flags & _flags);
+    return (m_flags & _flags) != 0U;
 }
 
 /** \fn SignalMonitor::Start()

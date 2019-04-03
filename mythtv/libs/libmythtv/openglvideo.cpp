@@ -155,10 +155,10 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     SetViewPort(masterViewportSize);
 
-    bool glsl    = gl_features & kGLSL;
-    bool shaders = glsl || (gl_features & kGLExtFragProg);
-    bool fbos    = gl_features & kGLExtFBufObj;
-    bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
+    bool glsl    = (gl_features & kGLSL) != 0U;
+    bool shaders = glsl || ((gl_features & kGLExtFragProg) != 0U);
+    bool fbos    = (gl_features & kGLExtFBufObj) != 0U;
+    bool ycbcr   = ((gl_features & kGLMesaYCbCr) != 0U) || ((gl_features & kGLAppleYCbCr) != 0U);
     VideoType fallback = shaders ? (glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLHQUYV) : ycbcr ? kGLYCbCr : kGLRGBA;
 
     // check for feature support
@@ -736,7 +736,7 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     uint tmp_tex = 0;
-    bool use_pbo = gl_features & kGLExtPBufObj;
+    bool use_pbo = (gl_features & kGLExtPBufObj) != 0U;
     if (kGLYCbCr == videoType)
     {
         uint type = (gl_features & kGLMesaYCbCr) ? GL_YCBCR_MESA : GL_YCBCR_422_APPLE;

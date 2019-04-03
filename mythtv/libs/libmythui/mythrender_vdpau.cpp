@@ -806,8 +806,8 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
     VdpBool enable = VDP_TRUE;
     const VdpBool enables[6] = { enable, enable, enable, enable, enable, enable };
 
-    bool temporal = (features & kVDPFeatTemporal) ||
-                    (features & kVDPFeatSpatial);
+    bool temporal = ((features & kVDPFeatTemporal) != 0U) ||
+                    ((features & kVDPFeatSpatial) != 0U);
     if (temporal)
     {
         feat[count] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;

@@ -1709,7 +1709,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if ((jobType & JOB_USERJOB) &&
+    if (((jobType & JOB_USERJOB) != 0) &&
          gCoreContext->GetSetting(sJobName, "").isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been defined.")

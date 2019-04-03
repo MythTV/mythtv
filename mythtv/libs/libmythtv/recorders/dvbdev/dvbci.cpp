@@ -452,7 +452,7 @@ int cCiTransportConnection::RecvTPDU(void)
      switch (m_state) {
        case stIDLE:     break;
        case stCREATION: if (m_tpdu->Tag() == T_CTC_REPLY) {
-                           m_dataAvailable = m_tpdu->Status() & DATA_INDICATOR;
+                           m_dataAvailable = ((m_tpdu->Status() & DATA_INDICATOR) != 0);
                            m_state = stACTIVE;
                            m_lastResponse = m_tpdu->Tag();
                            }
@@ -468,7 +468,7 @@ int cCiTransportConnection::RecvTPDU(void)
                                              break;
                           default: return ERROR;
                           }
-                        m_dataAvailable = m_tpdu->Status() & DATA_INDICATOR;
+                        m_dataAvailable = ((m_tpdu->Status() & DATA_INDICATOR) != 0);
                         m_lastResponse = m_tpdu->Tag();
                         break;
        case stDELETION: if (m_tpdu->Tag() == T_DTC_REPLY) {
@@ -624,7 +624,7 @@ bool cCiTransportLayer::ModuleReady(int Slot)
   ca_slot_info_t sinfo;
   sinfo.num = Slot;
   if (ioctl(m_fd, CA_GET_SLOT_INFO, &sinfo) != -1)
-     return sinfo.flags & CA_CI_MODULE_READY;
+     return (sinfo.flags & CA_CI_MODULE_READY) != 0U;
   esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
   return false;
 }
@@ -1316,7 +1316,7 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                uint8_t blind = *d++;
                //XXX GetByte()???
                l--;
-               enquiry->m_blind = blind & EF_BLIND;
+               enquiry->m_blind = ((blind & EF_BLIND) != 0);
                enquiry->m_expectedLength = *d++;
                l--;
                // I really wonder why there is no text length field here...

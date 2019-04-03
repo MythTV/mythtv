@@ -407,7 +407,7 @@ bool V4LChannel::Tune(uint64_t frequency)
     ioctlval = ioctl(m_videofd, VIDIOC_G_MODULATOR, &mod);
     if (ioctlval >= 0)
     {
-        isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
+        isTunerCapLow = ((mod.capability & V4L2_TUNER_CAP_LOW) != 0U);
         LOG(VB_CHANNEL, LOG_INFO,
             QString("  name: %1").arg((char *)mod.name));
         LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));

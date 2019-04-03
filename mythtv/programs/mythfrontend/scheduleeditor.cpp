@@ -2220,7 +2220,7 @@ void FilterOptMixin::Load(void)
     for (Idesc = m_descriptions.begin(), idx = 0;
          Idesc != m_descriptions.end(); ++Idesc, ++idx)
     {
-        bool active = m_rule->m_filter & (1 << idx);
+        bool active = (m_rule->m_filter & (1 << idx)) != 0U;
         if (m_filtersList)
         {
             if (not_empty)

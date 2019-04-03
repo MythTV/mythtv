@@ -1606,7 +1606,7 @@ again:
 
         frame = vbuf.index;
         if (m_go7007)
-            forcekey = vbuf.flags & V4L2_BUF_FLAG_KEYFRAME;
+            forcekey = ((vbuf.flags & V4L2_BUF_FLAG_KEYFRAME) != 0U);
 
         if (!m_request_pause)
         {

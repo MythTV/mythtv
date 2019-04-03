@@ -165,8 +165,8 @@ void ChromaKeyOSD::BlendOrCopy(uint32_t colour, const QRect &rect)
     dst_stride = dst_stride >> 2;
 
 #ifdef MMX
-    bool odd_start      = rect.left() & 0x1;
-    bool odd_end        = (rect.left() + rect.width()) & 0x1;
+    bool odd_start      = (rect.left() & 0x1) != 0;
+    bool odd_end        = ((rect.left() + rect.width()) & 0x1) != 0;
     static mmx_t mask   = {MMX_MASK};
     static mmx_t zero   = {0x0000000000000000LL};
     uint32_t *src_start = (uint32_t*)src;

@@ -3741,8 +3741,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
 
-    bool livetv = request.flags & kFlagLiveTV;
-    bool antadj = request.flags & kFlagAntennaAdjust;
+    bool livetv = (request.flags & kFlagLiveTV) != 0U;
+    bool antadj = (request.flags & kFlagAntennaAdjust) != 0U;
     bool use_sm = !mpts_only && SignalMonitor::IsRequired(m_genOpt.inputtype);
     bool use_dr = use_sm && (livetv || antadj);
     bool has_dummy = false;
@@ -3779,7 +3779,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         LOG(VB_RECORD, LOG_INFO, LOC + "Starting Signal Monitor");
         bool error = false;
         if (!SetupSignalMonitor(
-                !antadj, request.flags & kFlagEITScan, livetv || antadj))
+                !antadj, (request.flags & kFlagEITScan) != 0U, livetv || antadj))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup signal monitor");
             if (m_signalMonitor)

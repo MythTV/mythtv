@@ -188,7 +188,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // OSD stuff
       osd(nullptr), reinit_osd(false), osdLock(QMutex::Recursive),
       // Audio
-      audio(this, (flags & kAudioMuted)),
+      audio(this, (flags & kAudioMuted) != 0),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Filters
@@ -1412,7 +1412,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
-    bool newTextDesired = textDisplayMode & kDisplayAllTextCaptions;
+    bool newTextDesired = (textDisplayMode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (osd_msg || newTextDesired)
         textDesired = newTextDesired;
@@ -1452,7 +1452,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    bool newTextDesired = mode & kDisplayAllTextCaptions;
+    bool newTextDesired = (mode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (osd_msg || newTextDesired)
         textDesired = newTextDesired;
@@ -1511,7 +1511,7 @@ bool MythPlayer::ToggleCaptions(uint type)
     uint origMode = textDisplayMode;
 
     if (textDisplayMode)
-        DisableCaptions(textDisplayMode, origMode & mode);
+        DisableCaptions(textDisplayMode, (origMode & mode) != 0U);
     if (origMode & mode)
         return textDisplayMode;
     if (mode)
@@ -5999,7 +5999,7 @@ void MythPlayer::ToggleNightMode(void)
     int b = videoOutput->GetPictureAttribute(kPictureAttribute_Brightness);
     int c = 0;
     bool has_contrast = (videoOutput->GetSupportedPictureAttributes() &
-                         kPictureAttributeSupported_Contrast);
+                         kPictureAttributeSupported_Contrast) != 0;
     if (has_contrast)
         c = videoOutput->GetPictureAttribute(kPictureAttribute_Contrast);
 

@@ -505,7 +505,7 @@ ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
     if (!themeinfo)
         return nullptr;
 
-    if (themeinfo->GetName().isEmpty() || !(themeinfo->GetType() & THEME_UI))
+    if (themeinfo->GetName().isEmpty() || ((themeinfo->GetType() & THEME_UI) == 0))
     {
         delete themeinfo;
         return nullptr;

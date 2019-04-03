@@ -310,12 +310,12 @@ static int64_t extract_timestamp(
     if (bytes_left < 4)
         return -1LL;
 
-    bool has_pts = bufptr[3] & 0x80;
+    bool has_pts = (bufptr[3] & 0x80) != 0;
     int offset = 5;
     if (((kExtractPTS == pts_or_dts) && !has_pts) || (offset + 5 > bytes_left))
         return -1LL;
 
-    bool has_dts = bufptr[3] & 0x40;
+    bool has_dts = (bufptr[3] & 0x40) != 0;
     if (kExtractDTS == pts_or_dts)
     {
         if (!has_dts)
@@ -514,7 +514,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
         // last GOP or SEQ stream_id, then pretend this picture
         // is a keyframe. We may get artifacts but at least
         // we will be able to skip frames.
-        hasKeyFrame = !(m_frames_seen_count & 0xf);
+        hasKeyFrame = ((m_frames_seen_count & 0xf) == 0U);
         hasKeyFrame &= (m_last_gop_seen + maxKFD) < m_frames_seen_count;
         hasKeyFrame &= (m_last_seq_seen + maxKFD) < m_frames_seen_count;
     }
@@ -1128,7 +1128,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             // last GOP or SEQ stream_id, then pretend this picture
             // is a keyframe. We may get artifacts but at least
             // we will be able to skip frames.
-            hasKeyFrame = !(m_frames_seen_count & 0xf);
+            hasKeyFrame = ((m_frames_seen_count & 0xf) == 0U);
             hasKeyFrame &= (m_last_gop_seen + maxKFD) < m_frames_seen_count;
             hasKeyFrame &= (m_last_seq_seen + maxKFD) < m_frames_seen_count;
         }

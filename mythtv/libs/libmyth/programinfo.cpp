@@ -2054,8 +2054,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
     set_flag(m_programflags, FL_BOOKMARK,      query.value(40).toBool());
     set_flag(m_programflags, FL_WATCHED,       query.value(41).toBool());
     set_flag(m_programflags, FL_EDITING,
-             (m_programflags & FL_REALLYEDITING) ||
-             (m_programflags & FL_COMMPROCESSING));
+             ((m_programflags & FL_REALLYEDITING) != 0U) ||
+             ((m_programflags & FL_COMMPROCESSING) != 0U));
 
     m_properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
                     (query.value(43).toUInt() << kVideoPropertyOffset)    |
@@ -2939,7 +2939,7 @@ void ProgramInfo::SaveWatched(bool watched)
  */
 bool ProgramInfo::QueryIsEditing(void) const
 {
-    bool editing = m_programflags & FL_REALLYEDITING;
+    bool editing = (m_programflags & FL_REALLYEDITING) != 0U;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2979,8 +2979,8 @@ void ProgramInfo::SaveEditing(bool edit)
         MythDB::DBError("Edit status update", query);
 
     set_flag(m_programflags, FL_REALLYEDITING, edit);
-    set_flag(m_programflags, FL_EDITING, ((m_programflags & FL_REALLYEDITING) ||
-                                          (m_programflags & COMM_FLAG_PROCESSING)));
+    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
 
     SendUpdateEvent();
 }
@@ -3188,8 +3188,8 @@ void ProgramInfo::SaveCommFlagged(CommFlagStatus flag)
 
     set_flag(m_programflags, FL_COMMFLAG,       COMM_FLAG_DONE == flag);
     set_flag(m_programflags, FL_COMMPROCESSING, COMM_FLAG_PROCESSING == flag);
-    set_flag(m_programflags, FL_EDITING, ((m_programflags & FL_REALLYEDITING) ||
-                                          (m_programflags & COMM_FLAG_PROCESSING)));
+    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
     SendUpdateEvent();
 }
 
@@ -5929,7 +5929,7 @@ bool LoadFromRecorded(
         if (inUseMap.contains(key))
             flags |= inUseMap[key];
 
-        if (flags & FL_COMMPROCESSING &&
+        if (((flags & FL_COMMPROCESSING) != 0U) &&
             (isJobRunning.find(key) == isJobRunning.end()))
         {
             flags &= ~FL_COMMPROCESSING;
@@ -5937,8 +5937,8 @@ bool LoadFromRecorded(
         }
 
         set_flag(flags, FL_EDITING,
-                 (flags & FL_REALLYEDITING) ||
-                 (flags & COMM_FLAG_PROCESSING));
+                 ((flags & FL_REALLYEDITING) != 0U) ||
+                 ((flags & COMM_FLAG_PROCESSING) != 0U));
 
         // User/metadata defined season from recorded
         uint season = query.value(3).toUInt();

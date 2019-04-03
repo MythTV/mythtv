@@ -504,7 +504,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
             return;
         }
         frame.m_opCode = (WebSocketFrame::OpCode)opCode;
-        frame.m_isMasked = (header.at(1) >> 7) & 0xFE;
+        frame.m_isMasked = (((header.at(1) >> 7) & 0xFE) != 0);
 
         if (frame.m_isMasked)
             headerSize += 4; // Add 4 bytes for the mask

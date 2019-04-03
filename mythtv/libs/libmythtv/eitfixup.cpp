@@ -281,7 +281,7 @@ void EITFixUp::Fix(DBEventEIT &event) const
         FixPBS(event);
 
     if (kFixComHem & event.m_fixup)
-        FixComHem(event, kFixSubtitle & event.m_fixup);
+        FixComHem(event, (kFixSubtitle & event.m_fixup) != 0U);
 
     if (kFixAUStar & event.m_fixup)
         FixAUStar(event);

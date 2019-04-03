@@ -636,9 +636,9 @@ void ClassicCommDetector::GetCommercialBreakList(frm_dir_map_t &marks)
 
     CleanupFrameInfo();
 
-    bool blank = COMM_DETECT_BLANK & m_commDetectMethod;
-    bool scene = COMM_DETECT_SCENE & m_commDetectMethod;
-    bool logo  = COMM_DETECT_LOGO  & m_commDetectMethod;
+    bool blank = (COMM_DETECT_BLANK & m_commDetectMethod) != 0;
+    bool scene = (COMM_DETECT_SCENE & m_commDetectMethod) != 0;
+    bool logo  = (COMM_DETECT_LOGO  & m_commDetectMethod) != 0;
 
     if (COMM_DETECT_OFF == m_commDetectMethod)
         return;
@@ -1265,7 +1265,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         value = frameInfo[curFrame].flagMask;
 
         nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
-            (frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK);
+            ((frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK) != 0);
 
         if (value & COMM_FRAME_BLANK)
         {
@@ -1839,10 +1839,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             uint64_t lastStartLower = it.key();
             uint64_t lastStartUpper = it.key();
             while ((lastStartLower > 0) &&
-                   (frameInfo[lastStartLower - 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastStartLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartLower--;
             while ((lastStartUpper < (m_framesProcessed - (2 * m_fps))) &&
-                   (frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartUpper++;
             uint64_t adj = (lastStartUpper - lastStartLower) / 2;
             if (adj > MAX_BLANK_FRAMES)
@@ -1860,10 +1860,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             uint64_t lastEndLower = it.key();
             uint64_t lastEndUpper = it.key();
             while ((lastEndUpper < (m_framesProcessed - (2 * m_fps))) &&
-                   (frameInfo[lastEndUpper + 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastEndUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndUpper++;
             while ((lastEndLower > 0) &&
-                   (frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndLower--;
             uint64_t adj = (lastEndUpper - lastEndLower) / 2;
             if (adj > MAX_BLANK_FRAMES)
@@ -2436,7 +2436,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
             value = frameInfo[i].flagMask;
             frameInfo[i].flagMask = value & ~COMM_FRAME_BLANK;
 
-            if (( !(frameInfo[i].flagMask & COMM_FRAME_BLANK)) &&
+            if (( (frameInfo[i].flagMask & COMM_FRAME_BLANK) == 0) &&
                 (frameInfo[i].avgBrightness < newThreshold))
             {
                 frameInfo[i].flagMask = value | COMM_FRAME_BLANK;
@@ -2458,12 +2458,12 @@ void ClassicCommDetector::CleanupFrameInfo(void)
 
         before = 0;
         for (int offset = 1; offset <= 10; offset++)
-            if (frameInfo[i - offset].flagMask & COMM_FRAME_LOGO_PRESENT)
+            if ((frameInfo[i - offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 before++;
 
         after = 0;
         for (int offset = 1; offset <= 10; offset++)
-            if (frameInfo[i + offset].flagMask & COMM_FRAME_LOGO_PRESENT)
+            if ((frameInfo[i + offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 after++;
 
         value = frameInfo[i].flagMask;
@@ -2494,7 +2494,7 @@ void ClassicCommDetector::GetLogoCommBreakMap(show_map_t &map)
     for (uint64_t curFrame = 1 ; curFrame <= m_framesProcessed; curFrame++)
     {
         bool CurrentFrameLogo =
-            (frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT);
+            (frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT) != 0;
 
         if (!PrevFrameLogo && CurrentFrameLogo)
             map[curFrame] = MARK_START;

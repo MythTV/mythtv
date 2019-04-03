@@ -299,8 +299,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-    bool inPlaylist = flags & kStartTVInPlayList;
-    bool initByNetworkCommand = flags & kStartTVByNetworkCommand;
+    bool inPlaylist = (flags & kStartTVInPlayList) != 0U;
+    bool initByNetworkCommand = (flags & kStartTVByNetworkCommand) != 0U;
     bool quitAll = false;
     bool showDialogs = true;
     bool playCompleted = false;
@@ -311,9 +311,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     if (tvrec)
     {
         curProgram = new ProgramInfo(*tvrec);
-        curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
-        curProgram->SetIgnoreProgStart(flags & kStartTVIgnoreProgStart);
-        curProgram->SetAllowLastPlayPos(flags & kStartTVAllowLastPlayPos);
+        curProgram->SetIgnoreBookmark((flags & kStartTVIgnoreBookmark) != 0U);
+        curProgram->SetIgnoreProgStart((flags & kStartTVIgnoreProgStart) != 0U);
+        curProgram->SetAllowLastPlayPos((flags & kStartTVAllowLastPlayPos) != 0U);
     }
 
     GetMythMainWindow()->PauseIdleTimer(true);
@@ -6571,7 +6571,7 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     if (HasQueuedInput())
     {
         DoArbSeek(actx, static_cast<ArbSeekWhence>(flags & kWhenceMask),
-                  !(flags & kIgnoreCutlist));
+                  (flags & kIgnoreCutlist) == 0);
     }
     else if (ContextIsPaused(actx, __FILE__, __LINE__))
     {
@@ -6584,7 +6584,7 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                 float time = direction;
                 DoSeek(actx, time, message,
                        /*timeIsOffset*/true,
-                       /*honorCutlist*/!(flags & kIgnoreCutlist));
+                       /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
             }
             else
             {
@@ -6618,18 +6618,18 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                 m_doSmartForward = true;
             DoSeek(actx, -actx->m_rewtime, tr("Skip Back"),
                    /*timeIsOffset*/true,
-                   /*honorCutlist*/!(flags & kIgnoreCutlist));
+                   /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
     }
     else
     {
         if (m_smartForward && m_doSmartForward)
             DoSeek(actx, actx->m_rewtime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
-                   /*honorCutlist*/!(flags & kIgnoreCutlist));
+                   /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
         else
             DoSeek(actx, actx->m_fftime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
-                   /*honorCutlist*/!(flags & kIgnoreCutlist));
+                   /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
     }
     UpdateNavDialog(actx);
     return true;

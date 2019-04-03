@@ -1897,7 +1897,7 @@ bool CardUtil::hasV4L2(int videofd)
     memset(&vcap, 0, sizeof(vcap));
 
     return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
-            (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE));
+            ((vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE) != 0U));
 #else // if !USING_V4L2
     return false;
 #endif // !USING_V4L2

@@ -791,7 +791,7 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
     bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
-    bool require_a  = m_service_requirements & kRequireAudio;
+    bool require_a  = (m_service_requirements & kRequireAudio) != 0;
 
     for (size_t i = 0; i < transports.size(); ++i)
     {

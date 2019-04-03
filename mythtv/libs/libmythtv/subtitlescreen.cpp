@@ -1114,7 +1114,7 @@ static QString extract_cc608(QString &text, int &color,
     if (text.length() >= 1 && text[0] >= 0x7000)
     {
         int op = text[0].unicode() - 0x7000;
-        isUnderline = (op & 0x1);
+        isUnderline = ((op & 0x1) != 0);
         switch (op & ~1)
         {
         case 0x0e:

@@ -423,13 +423,13 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
 
     // Translate these external settings into mask values
     if (gCoreContext->GetBoolSetting("PlaybackWatchList", true) &&
-        !(m_viewMask & VIEW_WATCHLIST))
+        ((m_viewMask & VIEW_WATCHLIST) == 0))
     {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_WATCHLIST);
         gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
     else if (! gCoreContext->GetBoolSetting("PlaybackWatchList", true) &&
-             m_viewMask & VIEW_WATCHLIST)
+             ((m_viewMask & VIEW_WATCHLIST) != 0))
     {
         m_viewMask = (ViewMask)(m_viewMask & ~VIEW_WATCHLIST);
         gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
@@ -438,7 +438,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
     // This setting is deprecated in favour of viewmask, this just ensures the
     // that it is converted over when upgrading from earlier versions
     if (gCoreContext->GetBoolSetting("LiveTVInAllPrograms",false) &&
-        !(m_viewMask & VIEW_LIVETVGRP))
+        ((m_viewMask & VIEW_LIVETVGRP) == 0))
     {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_LIVETVGRP);
         gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
@@ -774,10 +774,10 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
     disp_flag_stat[2] = pginfo->IsPreserved();
     disp_flag_stat[3] = pginfo->HasCutlist();
     disp_flag_stat[4] = pginfo->IsAutoExpirable();
-    disp_flag_stat[5] = pginfo->GetProgramFlags() & FL_EDITING;
+    disp_flag_stat[5] = ((pginfo->GetProgramFlags() & FL_EDITING) != 0U);
     disp_flag_stat[6] = pginfo->IsBookmarkSet();
     disp_flag_stat[7] = pginfo->IsInUsePlaying();
-    disp_flag_stat[8] = pginfo->GetProgramFlags() & FL_TRANSCODED;
+    disp_flag_stat[8] = ((pginfo->GetProgramFlags() & FL_TRANSCODED) != 0U);
 
     for (size_t i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
         item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
@@ -1112,7 +1112,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     {
         iconImage = dynamic_cast<MythUIImage *>(GetChild(it.key()));
         if (iconImage)
-            iconImage->SetVisible(flags & (*it));
+            iconImage->SetVisible((flags & (*it)) != 0U);
 
         iconState = dynamic_cast<MythUIStateType *>(GetChild(it.key()));
         if (iconState)
@@ -1745,7 +1745,7 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             // Show categories
-            if ((m_viewMask & VIEW_CATEGORIES) && !p->GetCategory().isEmpty())
+            if (((m_viewMask & VIEW_CATEGORIES) != 0) && !p->GetCategory().isEmpty())
             {
                 QString catl = p->GetCategory().toLower();
                 sortedList[catl] = p->GetCategory();
@@ -1753,7 +1753,7 @@ bool PlaybackBox::UpdateUILists(void)
                 m_progLists[catl].setAutoDelete(false);
             }
 
-            if ((m_viewMask & VIEW_SEARCHES) &&
+            if (((m_viewMask & VIEW_SEARCHES) != 0) &&
                     !searchRule[p->GetRecordingRuleID()].isEmpty() &&
                     p->GetTitle() != searchRule[p->GetRecordingRuleID()])
             {   // Show search rules
@@ -3530,7 +3530,7 @@ void PlaybackBox::Delete(DeleteFlags flags)
         if (flags & kIgnore)
             continue;
 
-        RemoveProgram(recordingID, flags & kForgetHistory, flags & kForce);
+        RemoveProgram(recordingID, (flags & kForgetHistory) != 0, (flags & kForce) != 0);
 
         if (!(flags & kAllRemaining))
             break;
@@ -4143,7 +4143,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 }
             }
 
-            bool forceDelete = me->ExtraDataList()[1].toUInt() != 0u;
+            bool forceDelete = me->ExtraDataList()[1].toUInt() != 0U;
             if (!forceDelete)
             {
                 m_delList = me->ExtraDataList();
