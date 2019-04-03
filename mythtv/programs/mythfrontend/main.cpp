@@ -1134,7 +1134,7 @@ static void TVMenuCallback(void *data, QString &selection)
     else if (sel == "video_settings_general")
     {
         RunSettingsCompletion::Create(gCoreContext->
-                GetNumSetting("VideoAggressivePC", 0));
+                GetBoolSetting("VideoAggressivePC", false));
     }
     else if (sel == "video_settings_player")
     {

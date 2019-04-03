@@ -507,7 +507,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "dependssetting")
             {
-                addit = GetMythDB()->GetNumSetting(getFirstText(info));
+                addit = GetMythDB()->GetBoolSetting(getFirstText(info));
             }
             else if (info.tagName() == "dependjumppoint")
             {
