@@ -976,7 +976,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         // Expects hide flag, comma-delimited file/dir ids
         QStringList reply = (listline.size() == 3)
                 ? ImageManagerBe::getInstance()->
-                  HandleHide(listline[1].toInt(), listline[2])
+                  HandleHide(listline[1].toInt() != 0, listline[2])
                 : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
@@ -1005,7 +1005,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         // Expects destination path, rescan flag, list of dir names
         QStringList reply = (listline.size() >= 4)
                 ? ImageManagerBe::getInstance()->
-                  HandleDirs(listline[1], listline[2].toInt(), listline.mid(3))
+                  HandleDirs(listline[1], listline[2].toInt() != 0, listline.mid(3))
                 : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
@@ -1916,10 +1916,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         bool usereadahead = true;
         int timeout_ms = 2000;
         if (commands.size() > 3)
-            writemode = commands[3].toInt();
+            writemode = (commands[3].toInt() != 0);
 
         if (commands.size() > 4)
-            usereadahead = commands[4].toInt();
+            usereadahead = (commands[4].toInt() != 0);
 
         if (commands.size() > 5)
             timeout_ms = commands[5].toInt();
@@ -3551,7 +3551,7 @@ void MainServer::HandleQueryTimeZone(PlaybackSock *pbs)
 void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
-    bool checkSlaves = slist[1].toInt();
+    bool checkSlaves = slist[1].toInt() != 0;
 
     QStringList::const_iterator it = slist.begin() + 2;
     RecordingInfo recinfo(it, slist.end());
@@ -3878,7 +3878,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     bool fileNamesOnly = false;
 
     if (sList.size() >= 5)
-        fileNamesOnly = sList.at(4).toInt();
+        fileNamesOnly = (sList.at(4).toInt() != 0);
 
     bool slaveUnreachable = false;
 
@@ -4618,7 +4618,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         chain->SetHostSocket(pbssock);
 
-        enc->SpawnLiveTV(chain, slist[3].toInt(), slist[4]);
+        enc->SpawnLiveTV(chain, slist[3].toInt() != 0, slist[4]);
         retlist << "OK";
     }
     else if (command == "STOP_LIVETV")
@@ -4716,7 +4716,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_COLOUR")
     {
         int  type = slist[2].toInt();
-        bool up   = slist[3].toInt();
+        bool up   = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Colour, up);
         retlist << QString::number(ret);
@@ -4724,7 +4724,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_CONTRAST")
     {
         int  type = slist[2].toInt();
-        bool up   = slist[3].toInt();
+        bool up   = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Contrast, up);
         retlist << QString::number(ret);
@@ -4732,7 +4732,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_BRIGHTNESS")
     {
         int  type= slist[2].toInt();
-        bool up  = slist[3].toInt();
+        bool up  = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Brightness, up);
         retlist << QString::number(ret);
@@ -4740,7 +4740,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_HUE")
     {
         int  type= slist[2].toInt();
-        bool up  = slist[3].toInt();
+        bool up  = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Hue, up);
         retlist << QString::number(ret);
@@ -7108,7 +7108,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     }
     else if (command == "SET_TIMEOUT")
     {
-        bool fast = slist[2].toInt();
+        bool fast = slist[2].toInt() != 0;
         ft->SetTimeout(fast);
         retlist << "OK";
     }
@@ -8309,7 +8309,7 @@ void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
 {
     if (event.ExtraDataCount() > 0 && m_sched)
     {
-        bool needsReschedule = event.ExtraData(0).toUInt();
+        bool needsReschedule = event.ExtraData(0).toUInt() != 0U;
         for (int i = 1; i < event.ExtraDataCount(); i++)
             m_sched->SlaveDisconnected(event.ExtraData(i).toUInt());
 

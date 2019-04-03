@@ -180,7 +180,7 @@ void RomInfo::setField(QString field, QString data)
     else if (field == "year")
         m_year = data;
     else if (field == "favorite")
-        m_favorite = data.toInt();
+        m_favorite = (data.toInt() != 0);
     else if (field == "rompath")
         m_rompath = data;
     else if (field == "screenshot")

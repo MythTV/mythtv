@@ -262,7 +262,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
                 bool dirsOnly = true;
                 if (request->m_mapParams.contains("dirsOnly"))
-                    dirsOnly = request->m_mapParams["dirsOnly"].toInt();
+                    dirsOnly = (request->m_mapParams["dirsOnly"].toInt() != 0);
 
                 if (!dirsOnly)
                 {

@@ -2717,7 +2717,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             {
                 bool usebookmark = true;
                 if (me->ExtraDataCount() >= 12)
-                    usebookmark = me->ExtraData(11).toInt();
+                    usebookmark = (me->ExtraData(11).toInt() != 0);
                 HandleMedia("Internal", me->ExtraData(0),
                     me->ExtraData(1), me->ExtraData(2),
                     me->ExtraData(3), me->ExtraData(4),

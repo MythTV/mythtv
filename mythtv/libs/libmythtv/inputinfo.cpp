@@ -31,7 +31,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
     m_recPriority   = (*it).toInt(); NEXT();
     m_scheduleOrder = (*it).toUInt(); NEXT();
-    m_quickTune     = (*it).toUInt(); NEXT();
+    m_quickTune     = ((*it).toUInt() != 0U); NEXT();
     m_chanid        = (*it).toUInt(); ++it;
 
     return true;

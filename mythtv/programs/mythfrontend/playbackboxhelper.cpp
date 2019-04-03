@@ -185,8 +185,8 @@ bool PBHEventHandler::event(QEvent *e)
             while (list.size() >= 3)
             {
                 uint      recordingID   = list[0].toUInt();
-                bool      forceDelete   = list[1].toUInt();
-                bool      forgetHistory = list[2].toUInt();
+                bool      forceDelete   = list[1].toUInt() != 0U;
+                bool      forgetHistory = list[2].toUInt() != 0U;
 
                 bool ok = RemoteDeleteRecording( recordingID, forceDelete,
                                                  forgetHistory);

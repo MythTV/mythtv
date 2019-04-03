@@ -1356,7 +1356,7 @@ QStringList ImageHandler<DBFS>::HandleDbCreate(QStringList defs) const
 
         im.m_type          = aDef[1].toInt();
         im.m_filePath      = aDef[2];
-        im.m_isHidden      = aDef[3].toInt();
+        im.m_isHidden      = (aDef[3].toInt() != 0);
         im.m_orientation   = aDef[4].toInt();
         im.m_userThumbnail = idMap.value(aDef[5]);
 

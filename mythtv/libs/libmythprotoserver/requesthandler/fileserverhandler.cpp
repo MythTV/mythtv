@@ -219,10 +219,10 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         timeout_ms      = commands[5].toInt();
         [[clang::fallthrough]];
       case 5:
-        usereadahead    = commands[4].toInt();
+        usereadahead    = (commands[4].toInt() != 0);
         [[clang::fallthrough]];
       case 4:
-        writemode       = commands[3].toInt();
+        writemode       = (commands[3].toInt() != 0);
         [[clang::fallthrough]];
       default:
         hostname        = commands[2];
@@ -817,7 +817,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
 
     bool fileNamesOnly = false;
     if (slist.size() == 5)
-        fileNamesOnly = slist[4].toInt();
+        fileNamesOnly = (slist[4].toInt() != 0);
     else if (slist.size() != 4)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
@@ -1040,7 +1040,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         }
         else
         {
-            bool fast = slist[2].toInt();
+            bool fast = slist[2].toInt() != 0;
             ft->SetTimeout(fast);
             res << "OK";
         }

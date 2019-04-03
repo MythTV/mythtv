@@ -1063,26 +1063,26 @@ void TV::InitFromDB(void)
     m_dbIdleTimeout        = kv["LiveTVIdleTimeout"].toInt() * 60 * 1000;
     db_browse_max_forward  = kv["BrowseMaxForward"].toInt() * 60;
     m_dbPlaybackExitPrompt = kv["PlaybackExitPrompt"].toInt();
-    m_dbAutoSetWatched     = kv["AutomaticSetWatched"].toInt();
-    m_dbEndOfRecExitPrompt = kv["EndOfRecordingExitPrompt"].toInt();
-    m_dbJumpPreferOsd      = kv["JumpToProgramOSD"].toInt();
-    m_dbUseGuiSizeForTv    = kv["GuiSizeForTV"].toInt();
-    m_dbClearSavedPosition = kv["ClearSavedPosition"].toInt();
-    m_dbRunJobsOnRemote    = kv["JobsRunOnRecordHost"].toInt();
-    m_dbContinueEmbedded   = kv["ContinueEmbeddedTVPlay"].toInt();
-    m_dbUseFixedSize       = kv["UseFixedWindowSize"].toInt();
-    m_dbBrowseAlways       = kv["PersistentBrowseMode"].toInt();
-    m_dbBrowseAllTuners    = kv["BrowseAllTuners"].toInt();
+    m_dbAutoSetWatched     = (kv["AutomaticSetWatched"].toInt() != 0);
+    m_dbEndOfRecExitPrompt = (kv["EndOfRecordingExitPrompt"].toInt() != 0);
+    m_dbJumpPreferOsd      = (kv["JumpToProgramOSD"].toInt() != 0);
+    m_dbUseGuiSizeForTv    = (kv["GuiSizeForTV"].toInt() != 0);
+    m_dbClearSavedPosition = (kv["ClearSavedPosition"].toInt() != 0);
+    m_dbRunJobsOnRemote    = (kv["JobsRunOnRecordHost"].toInt() != 0);
+    m_dbContinueEmbedded   = (kv["ContinueEmbeddedTVPlay"].toInt() != 0);
+    m_dbUseFixedSize       = (kv["UseFixedWindowSize"].toInt() != 0);
+    m_dbBrowseAlways       = (kv["PersistentBrowseMode"].toInt() != 0);
+    m_dbBrowseAllTuners    = (kv["BrowseAllTuners"].toInt() != 0);
     db_channel_ordering    = kv["ChannelOrdering"];
     m_baseFilters         += kv["CustomFilters"];
     m_dbChannelFormat      = kv["ChannelFormat"];
-    m_tryUnflaggedSkip     = kv["TryUnflaggedSkip"].toInt();
-    m_smartForward         = kv["SmartForward"].toInt();
+    m_tryUnflaggedSkip     = (kv["TryUnflaggedSkip"].toInt() != 0);
+    m_smartForward         = (kv["SmartForward"].toInt() != 0);
     m_ffRewRepos           = kv["FFRewReposTime"].toFloat() * 0.01F;
-    m_ffRewReverse         = kv["FFRewReverse"].toInt();
+    m_ffRewReverse         = (kv["FFRewReverse"].toInt() != 0);
 
-    m_dbUseChannelGroups   = kv["BrowseChannelGroup"].toInt();
-    m_dbRememberLastChannelGroup = kv["ChannelGroupRememberLast"].toInt();
+    m_dbUseChannelGroups   = (kv["BrowseChannelGroup"].toInt() != 0);
+    m_dbRememberLastChannelGroup = (kv["ChannelGroupRememberLast"].toInt() != 0);
     m_channelGroupId       = kv["ChannelGroupDefault"].toInt();
 
     QString beVBI          = kv["VbiFormat"];
@@ -10484,7 +10484,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         }
         else if (valid && desc[0] == "EDITING")
         {
-            HandleOSDAlreadyEditing(actx, desc[1], desc[2].toInt());
+            HandleOSDAlreadyEditing(actx, desc[1], desc[2].toInt() != 0);
         }
         else if (valid && desc[0] == "ASKALLOW")
         {

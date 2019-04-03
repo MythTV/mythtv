@@ -333,7 +333,7 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
     if (SendReceiveStringList(strlist, 2))
     {
         pginfo->SetPathname(strlist[1]);
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
     }
 
     return false;
@@ -359,7 +359,7 @@ bool PlaybackSock::IsBusy(int capturecardnum, InputInfo *busy_input,
     if (!strlist.isEmpty())
     {
         QStringList::const_iterator it = strlist.begin();
-        state = (*it).toInt();
+        state = ((*it).toInt() != 0);
 
         if (busy_input)
         {

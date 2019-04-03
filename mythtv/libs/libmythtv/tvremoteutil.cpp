@@ -391,7 +391,7 @@ bool RemoteIsBusy(uint inputid, InputInfo &busy_input)
         return true;
 
     QStringList::const_iterator it = strlist.begin();
-    bool state = (*it).toInt();
+    bool state = (*it).toInt() != 0;
     ++it;
     if (!busy_input.FromStringList(it, strlist.end()))
         state = true; // if there was an error pretend that the input is busy.

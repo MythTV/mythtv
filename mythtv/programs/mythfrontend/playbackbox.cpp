@@ -4143,7 +4143,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 }
             }
 
-            bool forceDelete = me->ExtraDataList()[1].toUInt();
+            bool forceDelete = me->ExtraDataList()[1].toUInt() != 0u;
             if (!forceDelete)
             {
                 m_delList = me->ExtraDataList();

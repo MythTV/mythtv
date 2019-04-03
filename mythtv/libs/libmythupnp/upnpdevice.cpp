@@ -290,7 +290,7 @@ void UPnpDeviceDesc::SetBoolValue( const QDomNode &n, bool &nValue )
         if (!oText.isNull())
         {
             QString s = oText.nodeValue();
-            nValue = (s == "yes" || s == "true" || s.toInt());
+            nValue = (s == "yes" || s == "true" || (s.toInt() != 0));
         }
     }
 }

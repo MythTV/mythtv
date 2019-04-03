@@ -624,7 +624,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
     }
 
     bool bOK;
-    bool busy = tokens[1].toInt(&bOK);
+    bool busy = tokens[1].toInt(&bOK) != 0;
     if (!bOK)
     {
         LOG(VB_GENERAL, LOG_ERR,

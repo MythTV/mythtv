@@ -3175,7 +3175,7 @@ void CardInput::CreateNewInputGroupSlot(const QString& name)
     m_inputGrp0->Load();
     m_inputGrp1->Load();
 
-    if (!m_inputGrp0->getValue().toUInt())
+    if (m_inputGrp0->getValue().toUInt() == 0U)
     {
         m_inputGrp0->setValue(
             m_inputGrp0->getValueIndex(QString::number(inputgroupid)));

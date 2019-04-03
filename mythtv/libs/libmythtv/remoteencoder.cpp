@@ -133,7 +133,7 @@ bool RemoteEncoder::IsRecording(bool *ok)
     if (ok)
         *ok = true;
 
-    return strlist[0].toInt();
+    return strlist[0].toInt() != 0;
 }
 
 ProgramInfo *RemoteEncoder::GetRecording(void)
@@ -668,7 +668,7 @@ bool RemoteEncoder::CheckChannelPrefix(
         return false;
 
     complete_valid_channel_on_rec = strlist[1].toInt();
-    is_extra_char_useful = strlist[2].toInt();
+    is_extra_char_useful = (strlist[2].toInt() != 0);
     needed_spacer = (strlist[3] == "X") ? "" : strlist[3];
 
     return strlist[0].toInt() != 0;

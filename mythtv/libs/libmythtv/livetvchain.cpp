@@ -791,7 +791,7 @@ bool LiveTVChain::entriesFromStringList(const QStringList &items)
             ok = entry.endtime.isValid();
         }
         if (ok && itemIdx < numItems)
-            entry.discontinuity = items[itemIdx++].toInt(&ok);
+            entry.discontinuity = (items[itemIdx++].toInt(&ok) != 0);
         if (ok && itemIdx < numItems)
             entry.hostprefix = items[itemIdx++];
         if (ok && itemIdx < numItems)

@@ -65,7 +65,7 @@ QString XMLParseBase::getFirstText(QDomElement &element)
 bool XMLParseBase::parseBool(const QString &text)
 {
     QString s = text.toLower();
-    return (s == "yes" || s == "true" || s.toInt());
+    return (s == "yes" || s == "true" || (s.toInt() != 0));
 }
 
 bool XMLParseBase::parseBool(QDomElement &element)

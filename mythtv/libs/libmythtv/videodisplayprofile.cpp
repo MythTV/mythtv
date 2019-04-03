@@ -343,13 +343,13 @@ QString ProfileItem::toString(void) const
     QString codecs    = Get("cond_codecs");
     QString decoder   = Get("pref_decoder");
     uint    max_cpus  = Get("pref_max_cpus").toUInt();
-    bool    skiploop  = Get("pref_skiploop").toInt();
+    bool    skiploop  = Get("pref_skiploop").toInt() != 0;
     QString renderer  = Get("pref_videorenderer");
     QString osd       = Get("pref_osdrenderer");
     QString deint0    = Get("pref_deint0");
     QString deint1    = Get("pref_deint1");
     QString filter    = Get("pref_filters");
-    bool    osdfade   = Get("pref_osdfade").toInt();
+    bool    osdfade   = Get("pref_osdfade").toInt() != 0;
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
