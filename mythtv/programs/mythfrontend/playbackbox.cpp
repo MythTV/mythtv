@@ -4926,7 +4926,8 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
     RecordingRule record;
     record.LoadTemplate("Default");
-    uint defaultAutoExpire = record.m_autoExpire;
+    AutoExpireType defaultAutoExpire =
+        record.m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire;
 
     if (m_op_on_playlist)
     {
@@ -4940,7 +4941,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
             if ((p->GetRecordingGroup() == "LiveTV") &&
                 (newRecGroup != "LiveTV"))
             {
-                p->SaveAutoExpire((AutoExpireType)defaultAutoExpire);
+                p->SaveAutoExpire(defaultAutoExpire);
             }
             else if ((p->GetRecordingGroup() != "LiveTV") &&
                      (newRecGroup == "LiveTV"))
@@ -4962,7 +4963,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
         return;
 
     if ((p->GetRecordingGroup() == "LiveTV") && (newRecGroup != "LiveTV"))
-        p->SaveAutoExpire((AutoExpireType)defaultAutoExpire);
+        p->SaveAutoExpire(defaultAutoExpire);
     else if ((p->GetRecordingGroup() != "LiveTV") && (newRecGroup == "LiveTV"))
         p->SaveAutoExpire(kLiveTVAutoExpire);
 
