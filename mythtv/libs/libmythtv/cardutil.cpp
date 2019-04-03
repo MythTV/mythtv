@@ -2470,13 +2470,12 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
                 QString("Adapter Frontend dvr number matches (%1)").arg(tmp));
             return tmp;
         }
-        else // use dvr0, allows multi-standard frontends which only have one dvr
-        {
-            devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
-            return devname;
-        }
+
+        // use dvr0, allows multi-standard frontends which only have one dvr
+        devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
+        return devname;
     }
     if (DVB_DEV_DEMUX == type)
     {
@@ -2487,13 +2486,12 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
                 QString("Adapter Frontend demux number matches (%1)").arg(tmp));
             return tmp;
         }
-        else // use demux0, allows multi-standard frontends, which only have one demux
-        {
-            devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
-            return devname;
-        }
+
+        // use demux0, allows multi-standard frontends, which only have one demux
+        devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
+        return devname;
     }
     if (DVB_DEV_CA == type)
         return devname.replace(devname.indexOf("frontend"), 8, "ca");
