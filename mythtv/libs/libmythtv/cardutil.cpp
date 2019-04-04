@@ -856,6 +856,8 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
 
     delsys.Parse(DTVModulationSystem::toString(prop.u.data));
 
+#else
+    Q_UNUSED(fd_frontend);
 #endif // USING_DVB
 
     return delsys;
@@ -1004,6 +1006,8 @@ int CardUtil::SetDeliverySystem(uint inputid)
     {
         ret = SetDeliverySystem(inputid, delsys);
     }
+#else
+    Q_UNUSED(inputid);
 #endif // USING_DVB
 
     return ret;
@@ -1032,6 +1036,9 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys)
     ret = SetDeliverySystem(inputid, delsys, fd_frontend);
 
     close(fd_frontend);
+#else
+    Q_UNUSED(inputid);
+    Q_UNUSED(delsys);
 #endif // USING_DVB
 
     return ret;
@@ -1048,6 +1055,9 @@ int CardUtil::SetDeliverySystem(uint inputid, int fd)
     {
         ret = SetDeliverySystem(inputid, delsys, fd);
     }
+#else
+    Q_UNUSED(inputid);
+    Q_UNUSED(fd);
 #endif // USING_DVB
 
     return ret;
@@ -1080,6 +1090,10 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd
                 .arg(inputid) + ENO);
         return ret;
 	}
+#else
+    Q_UNUSED(inputid);
+    Q_UNUSED(delsys);
+    Q_UNUSED(fd);
 #endif // USING_DVB
 
     return ret;
