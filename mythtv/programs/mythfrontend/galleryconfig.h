@@ -24,7 +24,7 @@ signals:
     void ExclusionsChanged();
 
 public:
-    GallerySettings(bool enable);
+    explicit GallerySettings(bool enable);
 };
 
 #endif // GALLERYCONFIG_H

@@ -146,7 +146,7 @@ QString TreeNodeData::GetPrefix(void) const
 /// metadata sort function
 struct metadata_sort
 {
-    metadata_sort(const VideoFilterSettings &vfs) : m_vfs(vfs) {}
+    explicit metadata_sort(const VideoFilterSettings &vfs) : m_vfs(vfs) {}
 
     bool operator()(const VideoMetadata *lhs, const VideoMetadata *rhs)
     {
