@@ -22,5 +22,5 @@
 #define SINCOS(f,s,c) \
   __asm__ __volatile__ ("fsincos" : "=t" (c), "=u" (s) : "0" (f))
 #else
-#define SINCOS(f,s,c) {(s)=sin(f);(c)=cos(f);}
+#define SINCOS(f,s,c) {(s)=sinf(f);(c)=cosf(f);}
 #endif
