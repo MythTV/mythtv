@@ -1891,6 +1891,8 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         ep_name=series_season_ep[1] # Leave the episode name alone
 
     series = search_for_series(t, series_name, opts.language)
+    if t2usable:
+        series2 = search_for_series(t2, series_name, 'en')
     season_ep_num = series.fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
         for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
@@ -1898,6 +1900,8 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
                 if xmlFlag:
                     # get more detailed episode info
                     t.getDetailedEpisodeInfo(series['id'], episode['airedSeason'], episode)
+                    if t2usable:
+                        t2.getDetailedEpisodeInfo(series['id'], episode['airedSeason'], episode)
                     convert_series_to_xml(t, series_season_ep, season_ep_num)
                     displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
                     return 0
@@ -2062,6 +2066,15 @@ def convert_series_to_xml(t, series_season_ep, ep_info):
     exml = dicttoxml(t.shows[show_id], custom_root='data', item_func=series_ep_item_func, attr_type=False)
     t.seriesInfoTree = eTree.XML(exml)
     t.seriesInfoTree.append(eTree.XML(sxml))
+    #print(t['data'])
+    #print(t2['data'])
+    if t2usable:
+        sxml2 = eTree.XML(dicttoxml(t2.shows[show_id].data, custom_root='series', item_func=series_ep_item_func, attr_type=False))
+        for element in t.seriesInfoTree.iter():
+            if element.tag == '_banners':
+                bannerselement = element
+        for newelement in sxml2.find('_banners').iter():
+            bannerselement.extend(newelement)
     t.baseXsltDir = xslt.baseXsltPath
 
 def initializeXslt(language):
@@ -2456,10 +2469,26 @@ def main():
                 print(key_value)
         return 0 # The Series list option (-M) is the only option honoured when used
 
+    global t2usable
+    t2usable = False
+    if (not opts.language == 'en'):
+        t2usable = True
+        global t2
+        t2 = Tvdb(banners=True,
+                 debug = opts.debug,
+                 cache = cache_dir,
+                 actors = True,
+                 language = 'en',
+                 apikey=tvdb_account.apikey,    # thetvdb.com API key requested by MythTV
+                 username=tvdb_account.username,
+                 userkey=tvdb_account.account_identifier)
+
     # Fetch TV series collection information
     if opts.collection:
         try:
             t._getShowData(series_season_ep[0], opts.language)
+            if t2usable:
+                t2._getShowData(series_season_ep[0], 'en')
         except tvdb_shownotfound:
             return 0 # No matching series
         except Exception as e:
@@ -2469,6 +2498,17 @@ def main():
         convert_series_to_xml(t, series_season_ep, None)
         displayCollectionXML(t)
         return 0 # The TV Series collection option (-C) is the only option honoured when used
+
+    if (opts.numbers == False and opts.num_seasons == True):
+        t2._getShowData(series_season_ep[0], 'en')
+    else:
+        opts2 = deepcopy(opts)
+        opts2.language = 'en'
+        if t2usable:
+            if (opts.numbers == True and opts.num_seasons == False):
+                y=[]
+                y.append(series_season_ep[0])
+                searchseries(t2, opts2, y)
 
     # Verify that thetvdb.com has the desired series_season_ep.
     # Exit this module if series_season_ep is not found
@@ -2611,6 +2651,10 @@ def main():
         for p in get_graphics(t, opts, series_season_ep, poster_type, single_option, opts.language):
             all_posters = all_posters+p+u','
             season_poster_found = True
+        if season_poster_found == False:
+            for p in get_graphics(t2, opts2, series_season_ep, poster_type, single_option, 'en'):
+                all_posters = all_posters+p+u','
+                season_poster_found = True
         if season_poster_found == False: # If there were no season posters get the series top poster
             series_name=''
             key = series_season_ep[0].lower()
