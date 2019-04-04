@@ -1708,9 +1708,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     int ret = m_mythcodecctx->HwDecoderInit(enc);
     if (ret < 0)
     {
-        char error[AV_ERROR_MAX_STRING_SIZE];
         if (ret < 0)
         {
+            char error[AV_ERROR_MAX_STRING_SIZE];
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("HwDecoderInit unable to initialize hardware decoder: %1 (%2)")
                 .arg(av_make_error_string(error, sizeof(error), ret))
@@ -3722,7 +3722,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
     int retryCount = 0;
-    int ret = 0, gotpicture = 0;
+    int gotpicture = 0;
     AVCodecContext *context = gCodecMap->getCodecContext(curstream);
     MythAVFrame mpa_pic;
     if (!mpa_pic)
@@ -3736,9 +3736,9 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
     bool tryAgain = true;
     bool sentPacket = false;
-    int ret2 = 0;
     while (tryAgain)
     {
+        int ret, ret2 = 0;
         tryAgain = false;
         gotpicture = 0;
         avcodeclock->lock();

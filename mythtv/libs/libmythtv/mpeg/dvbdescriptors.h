@@ -2107,12 +2107,12 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::dvb_content_identifier)
     {
         size_t count  = 0;
-        uint8_t position = 2; /// position points to the first byte of the "sub"descriptor
 
         memset ((void *) m_crid, 0, sizeof(m_crid));
 
         if (IsValid())
         {
+            uint8_t position = 2; /// position points to the first byte of the "sub"descriptor
             while (_data[1] >= position)
             {
                 size_t length = _data[position+1];

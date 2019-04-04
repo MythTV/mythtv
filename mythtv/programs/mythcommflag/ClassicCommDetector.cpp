@@ -1180,22 +1180,16 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     FrameBlock *fblock;
     FrameBlock *fbp;
-    int value = 0;
     int curBlock = 0;
     int maxBlock = 0;
     int lastScore = 0;
-    int thisScore = 0;
-    int nextScore = 0;
     uint64_t curFrame = 0;
     int64_t  breakStart = 0;
     uint64_t lastStart = 0;
     uint64_t lastEnd = 0;
     int64_t firstLogoFrame = -1;
-    bool nextFrameIsBlank = false;
     bool lastFrameWasBlank = false;
-    uint64_t formatFrames = 0;
     int format = COMM_FORMAT_NORMAL;
-    uint64_t aspectFrames = 0;
     int aspect = COMM_ASPECT_NORMAL;
     QString msg;
     uint64_t formatCounts[COMM_FORMAT_MAX];
@@ -1224,6 +1218,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     if (m_decoderFoundAspectChanges)
     {
+        uint64_t aspectFrames = 0;
         for (int64_t i = m_preRoll;
              i < ((int64_t)m_framesProcessed - (int64_t)m_postRoll); i++)
         {
@@ -1249,6 +1244,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (frameInfo[i].format < COMM_FORMAT_MAX))
                 formatCounts[frameInfo[i].format]++;
 
+        uint64_t formatFrames = 0;
         for(int i = 0; i < COMM_FORMAT_MAX; i++)
         {
             if (formatCounts[i] > formatFrames)
@@ -1262,9 +1258,9 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     while (curFrame <= m_framesProcessed)
     {
-        value = frameInfo[curFrame].flagMask;
+        int value = frameInfo[curFrame].flagMask;
 
-        nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
+        bool nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
             ((frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK) != 0);
 
         if (value & COMM_FRAME_BLANK)
@@ -1529,7 +1525,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
         if ((curBlock > 0) && (curBlock < maxBlock))
         {
-            nextScore = fblock[curBlock + 1].score;
+            int nextScore = fblock[curBlock + 1].score;
 
             if ((lastScore < 0) && (nextScore < 0) && (fbp->length < 35))
             {
@@ -1642,7 +1638,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
-        thisScore = fbp->score;
+        int thisScore = fbp->score;
 
         if ((breakStart >= 0) &&
             ((fbp->end - breakStart) > (m_commDetectMaxCommBreakLength * m_fps)))

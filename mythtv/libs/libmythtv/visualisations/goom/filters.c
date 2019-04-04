@@ -411,7 +411,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
              unsigned int lprevX, unsigned int lprevY,
              const signed int *lbrutS, const signed int *lbrutD)
 {
-	int     myPos, myPos2;
+	int     myPos;
 	Color   couleur;
 //	unsigned int coefv, coefh;
 
@@ -429,6 +429,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 		int     lcoeffs;
 
 		int     brutSmypos = lbrutS[myPos];
+                int     myPos2;
 
 		myPos2 = myPos + 1;
 
@@ -503,7 +504,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 {
 	register Uint x, y;
 
-	static char reverse = 0;			// vitesse inversé..(zoom out)
 	static unsigned char pertedec = 8;
 	static char firstTime = 1;
 
@@ -543,6 +543,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	/** changement de config **/
 	if (zf) {
+                static char reverse = 0;			// vitesse inversé..(zoom out)
 		reverse = zf->reverse;
 		vitesse = zf->vitesse;
 		if (reverse)
@@ -567,7 +568,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 		// generation d'une table de sinus
 		if (firstTime) {
 			unsigned short us;
-			int     yofs;
 
 			firstTime = 0;
 			generatePrecalCoef ();
@@ -585,6 +585,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			/** modif here by jeko : plus de multiplications **/
 			{
 				int     yperte = 0;
+                                int     yofs;
 
 				for (y = 0, yofs = 0; y < resy; y++, yofs += resx) {
 					int     xofs = yofs << 1;
