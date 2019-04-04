@@ -42,8 +42,8 @@ void AbstractAnimation::Start(bool forwards, float speed)
  \param curve Easing curve governing animation
  \param centre Zoom centre
 */
-void Animation::Set(QVariant from, QVariant to, int duration,
-                    QEasingCurve curve, UIEffects::Centre centre)
+void Animation::Set(const QVariant& from, const QVariant& to, int duration,
+                    const QEasingCurve& curve, UIEffects::Centre centre)
 {
     setStartValue(from);
     setEndValue(to);
@@ -284,7 +284,7 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
  \param name Slide name
  \param image Theme MythUIImage to clone
 */
-Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
+Slide::Slide(MythUIType *parent, const QString& name, MythUIImage *image)
     : MythUIImage(parent, name)
 {
     // Clone from image
@@ -366,7 +366,7 @@ QChar Slide::GetDebugState() const
  has loaded
  \return bool True if the requested image is already loaded
 */
-bool Slide::LoadSlide(ImagePtrK im, int direction, bool notifyCompletion)
+bool Slide::LoadSlide(const ImagePtrK& im, int direction, bool notifyCompletion)
 {
     m_direction  = direction;
     m_waitingFor = notifyCompletion ? im : ImagePtrK();
@@ -657,7 +657,7 @@ QString SlideBuffer::BufferState()
  \param direction Navigation causing the load
  \return bool True if image is already loaded
 */
-bool SlideBuffer::Load(ImagePtrK im, int direction)
+bool SlideBuffer::Load(const ImagePtrK& im, int direction)
 {
     if (!im)
         return false;
@@ -682,7 +682,7 @@ bool SlideBuffer::Load(ImagePtrK im, int direction)
  \brief Load an image in next available slide
  \param im Image to load
 */
-void SlideBuffer::Preload(ImagePtrK im)
+void SlideBuffer::Preload(const ImagePtrK& im)
 {
     if (!im)
         return;
@@ -732,7 +732,7 @@ void SlideBuffer::ReleaseCurrent()
  \param reason Debug text describing reason for test
  \return int Number of slides available for display
 */
-void SlideBuffer::Flush(Slide *slide, QString reason)
+void SlideBuffer::Flush(Slide *slide, const QString& reason)
 {
     QMutexLocker lock(&m_mutexQ);
 

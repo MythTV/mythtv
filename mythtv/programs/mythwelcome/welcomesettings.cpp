@@ -8,7 +8,7 @@
 
 #define TR MythWelcomeSettings::tr
 
-static StandardSetting *DailyWakeupStart(QString n)
+static StandardSetting *DailyWakeupStart(const QString& n)
 {
     auto gc = new GlobalTimeBoxSetting("DailyWakeupStartPeriod" + n, "00:00");
     gc->setLabel(TR("Period %1 start time").arg(n));
@@ -18,7 +18,7 @@ static StandardSetting *DailyWakeupStart(QString n)
     return gc;
 }
 
-static StandardSetting *DailyWakeupEnd(QString n)
+static StandardSetting *DailyWakeupEnd(const QString& n)
 {
     auto *gc = new GlobalTimeBoxSetting("DailyWakeupEndPeriod" + n, "00:00");
     gc->setLabel(TR("Period %1 end time").arg(n));
@@ -28,7 +28,7 @@ static StandardSetting *DailyWakeupEnd(QString n)
     return gc;
 }
 
-static StandardSetting *DailyWakeup(QString n)
+static StandardSetting *DailyWakeup(const QString& n)
 {
     auto gc = new GroupSetting();
 

@@ -44,7 +44,7 @@ class ThemeChooser : public MythScreenType
     void saveAndReload(MythUIButtonListItem *item);
 
   protected slots:
-    void popupClosed(QString which, int result);
+    void popupClosed(const QString& which, int result);
     void saveAndReload(void);
     void toggleFullscreenPreview(void);
     void toggleThemeUpdateNotifications(void);

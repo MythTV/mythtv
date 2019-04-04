@@ -26,7 +26,7 @@ class Transition : public QObject
 {
     Q_OBJECT
 public:
-    explicit Transition(QString name);
+    explicit Transition(const QString& name);
     virtual ~Transition()              = default;
 
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);

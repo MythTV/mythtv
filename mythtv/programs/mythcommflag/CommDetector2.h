@@ -24,7 +24,7 @@ class SceneChangeDetector;
 namespace commDetector2 {
 
 QString debugDirectory(int chanid, const QDateTime& recstartts);
-void createDebugDirectory(QString dirname, QString comment);
+void createDebugDirectory(const QString& dirname, const QString& comment);
 QString frameToTimestamp(long long frameno, float fps);
 QString frameToTimestampms(long long frameno, float fps);
 QString strftimeval(const struct timeval *tv);

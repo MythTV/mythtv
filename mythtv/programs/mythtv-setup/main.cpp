@@ -177,7 +177,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 }
 
-static bool RunMenu(QString themedir, QString themename)
+static bool RunMenu(const QString& themedir, const QString& themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     menu = new MythThemedMenu(

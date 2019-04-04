@@ -56,7 +56,7 @@ using namespace std;
 bool debugConflicts = false;
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-                     QString tmptable, Scheduler *master_sched) :
+                     const QString& tmptable, Scheduler *master_sched) :
     MThread("Scheduler"),
     m_recordTable(tmptable),
     m_priorityTable("powerpriority"),
@@ -1443,7 +1443,7 @@ void Scheduler::SchedNewRecords(void)
 // Perform the first pass for scheduling new recordings for programs
 // in the same priority sublevel.  For each program/starttime, choose
 // the first one with the highest affinity that doesn't conflict.
-void Scheduler::SchedNewFirstPass(RecIter &start, RecIter end,
+void Scheduler::SchedNewFirstPass(RecIter &start, const RecIter& end,
                                   int recpriority, int recpriority2)
 {
     RecIter &i = start;
@@ -1521,7 +1521,7 @@ void Scheduler::SchedNewFirstPass(RecIter &start, RecIter end,
 // Perform the retry passes for scheduling new recordings.  For each
 // unscheduled program, try to move the conflicting programs to
 // another time or tuner using the given constraints.
-void Scheduler::SchedNewRetryPass(RecIter start, RecIter end,
+void Scheduler::SchedNewRetryPass(const RecIter& start, const RecIter& end,
                                   bool samePriority, bool livetv)
 {
     RecList retry_list;
@@ -3601,7 +3601,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     }
 }
 
-bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
+bool Scheduler::WakeUpSlave(const QString& slaveHostname, bool setWakingStatus)
 {
     if (slaveHostname == gCoreContext->GetHostName())
     {

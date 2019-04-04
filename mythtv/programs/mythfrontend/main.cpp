@@ -531,7 +531,7 @@ static void startCustomPriority(void)
         delete custom;
 }
 
-static void startPlaybackWithGroup(QString recGroup = "")
+static void startPlaybackWithGroup(const QString& recGroup = "")
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -1221,7 +1221,7 @@ static void handleExit(bool prompt)
         qApp->quit();
 }
 
-static bool RunMenu(QString themedir, QString themename)
+static bool RunMenu(const QString& themedir, const QString& themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     g_menu = new MythThemedMenu(QString(tmp.constData()), "mainmenu.xml",

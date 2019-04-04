@@ -2122,7 +2122,7 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
  * Returns programinfo (title, subtitle, description, category, chanid,
  * channum, callsign, channel.name, fileURL, \e et \e cetera)
  */
-void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
+void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QString playbackhost = pbs->getHostname();
@@ -3756,7 +3756,7 @@ void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
 }
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
-                                            QString tmptable, int recordid)
+                                            const QString& tmptable, int recordid)
 {
     MythSocket *pbssock = pbs->getSocket();
 
@@ -5055,7 +5055,7 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
     SendResponse(pbs->getSocket(), retlist);
 }
 
-int MainServer::GetfsID(QList<FileSystemInfo>::iterator fsInfo)
+int MainServer::GetfsID(const QList<FileSystemInfo>::iterator& fsInfo)
 {
     QString fskey = fsInfo->getHostname() + ":" + fsInfo->getPath();
     QMutexLocker lock(&m_fsIDcacheLock);
@@ -5500,7 +5500,7 @@ bool MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
     return HandleDeleteFile(slist[1], slist[2], pbs);
 }
 
-bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
+bool MainServer::HandleDeleteFile(const QString& filename, const QString& storagegroup,
                                   PlaybackSock *pbs)
 {
     StorageGroup sgroup(storagegroup, "", false);

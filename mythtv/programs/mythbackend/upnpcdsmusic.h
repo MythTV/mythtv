@@ -51,16 +51,16 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
         bool             LoadArtists(const UPnpCDSRequest *pRequest,
                                      UPnpCDSExtensionResults *pResults,
-                                     IDTokenMap tokens);
+                                     const IDTokenMap& tokens);
         bool             LoadAlbums(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens);
+                                    const IDTokenMap& tokens);
         bool             LoadGenres(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens);
+                                    const IDTokenMap& tokens);
         bool             LoadTracks(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens);
+                                    const IDTokenMap& tokens);
 
         // Common code helpers
         QString BuildWhereClause( QStringList clauses,

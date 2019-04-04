@@ -1190,7 +1190,7 @@ static QString uptimeStr(time_t uptime)
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)
  *  \brief Fills in recordingProfilesBPS w/ average bitrate from recorded table
  */
-void StatusBox::getActualRecordedBPS(QString hostnames)
+void StatusBox::getActualRecordedBPS(const QString& hostnames)
 {
     recordingProfilesBPS.clear();
 

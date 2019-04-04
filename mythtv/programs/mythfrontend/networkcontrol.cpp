@@ -1679,7 +1679,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     return result;
 }
 
-QString NetworkControl::listRecordings(QString chanid, QString starttime)
+QString NetworkControl::listRecordings(const QString& chanid, const QString& starttime)
 {
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());

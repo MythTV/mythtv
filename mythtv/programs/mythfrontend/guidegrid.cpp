@@ -103,7 +103,7 @@ void JumpToChannel::deleteLater(void)
 }
 
 
-static bool has_action(QString action, const QStringList &actions)
+static bool has_action(const QString& action, const QStringList &actions)
 {
     QStringList::const_iterator it;
     for (it = actions.begin(); it != actions.end(); ++it)
@@ -302,7 +302,7 @@ public:
     }
 
 private:
-    void fillProgramRowInfosWith(int row, QDateTime start,
+    void fillProgramRowInfosWith(int row, const QDateTime& start,
                                  ProgramList *proglist);
 
     const unsigned int m_firstRow;
@@ -1626,7 +1626,7 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
 }
 
 void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
-                                                    QDateTime start,
+                                                    const QDateTime& start,
                                                     ProgramList *proglist)
 {
     if (row < 0 || row >= m_channelCount ||
@@ -2492,7 +2492,7 @@ void GuideGrid::moveUpDown(MoveVector movement)
     updateChannels();
 }
 
-void GuideGrid::moveToTime(QDateTime datetime)
+void GuideGrid::moveToTime(const QDateTime& datetime)
 {
     if (!datetime.isValid())
         return;

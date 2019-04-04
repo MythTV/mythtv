@@ -1,5 +1,7 @@
 #include "galleryslideview.h"
 
+#include <utility>
+
 #include "mythmainwindow.h"
 #include "mythuitext.h"
 #include "mythdialogbox.h"
@@ -726,7 +728,7 @@ void GallerySlideView::PlayVideo()
 */
 void GallerySlideView::SetStatus(QString msg, bool delay)
 {
-    m_statusText = msg;
+    m_statusText = std::move(msg);
     if (m_uiStatus)
     {
         if (delay)

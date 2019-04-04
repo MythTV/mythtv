@@ -518,7 +518,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
  //      somehow do so with the minimum number of queries and code duplication
 bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
                            UPnpCDSExtensionResults* pResults,
-                           IDTokenMap tokens)
+                           const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -605,7 +605,7 @@ bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSTv::LoadDates(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -672,7 +672,7 @@ bool UPnpCDSTv::LoadDates(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSTv::LoadGenres( const UPnpCDSRequest* pRequest,
                             UPnpCDSExtensionResults* pResults,
-                            IDTokenMap tokens)
+                            const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -743,7 +743,7 @@ bool UPnpCDSTv::LoadGenres( const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSTv::LoadRecGroups(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -815,7 +815,7 @@ bool UPnpCDSTv::LoadRecGroups(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSTv::LoadChannels(const UPnpCDSRequest* pRequest,
                              UPnpCDSExtensionResults* pResults,
-                             IDTokenMap tokens)
+                             const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 

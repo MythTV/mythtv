@@ -1,4 +1,5 @@
 #include <QStringList>
+#include <utility>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ PlaybackSock::PlaybackSock(
     QString localhostname = gCoreContext->GetHostName();
 
     m_sock = lsock;
-    m_hostname = lhostname;
+    m_hostname = std::move(lhostname);
     m_eventsMode = eventsMode;
     m_ip = "";
 
@@ -250,7 +251,7 @@ QStringList PlaybackSock::GetSGFileQuery(QString &host, QString &groupname,
     return strlist;
 }
 
-QString PlaybackSock::GetFileHash(QString filename, QString storageGroup)
+QString PlaybackSock::GetFileHash(const QString& filename, const QString& storageGroup)
 {
     QStringList strlist(QString("QUERY_FILE_HASH"));
     strlist << filename
@@ -511,7 +512,7 @@ int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
     return -1;
 }
 
-void PlaybackSock::SetNextLiveTVDir(int capturecardnum, QString dir)
+void PlaybackSock::SetNextLiveTVDir(int capturecardnum, const QString& dir)
 {
     QStringList strlist(QString("SET_NEXT_LIVETV_DIR %1 %2")
                             .arg(capturecardnum)

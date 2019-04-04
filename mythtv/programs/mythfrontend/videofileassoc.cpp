@@ -1,9 +1,10 @@
 #include <algorithm>
-#include <random>
-#include <vector>
+#include <functional>   //mem_fun
 #include <iterator>
 #include <map>
-#include <functional>   //mem_fun
+#include <random>
+#include <utility>
+#include <vector>
 
 #include "mythlogging.h"
 #include "mythmainwindow.h"
@@ -191,7 +192,7 @@ class FileAssocDialogPrivate
         }
     }
 
-    bool AddExtension(QString newExtension, UIDToFAPair::UID_type &new_id)
+    bool AddExtension(const QString& newExtension, UIDToFAPair::UID_type &new_id)
     {
         if (newExtension.length())
         {
@@ -455,7 +456,7 @@ void FileAssocDialog::OnNewExtensionPressed()
 void FileAssocDialog::OnNewExtensionComplete(QString newExtension)
 {
     UIDToFAPair::UID_type new_sel = 0;
-    if (m_private->AddExtension(newExtension, new_sel))
+    if (m_private->AddExtension(std::move(newExtension), new_sel))
     {
         m_private->SetSelectionOverride(new_sel);
         UpdateScreen(true);

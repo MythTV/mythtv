@@ -21,7 +21,7 @@ class Transcode : public QObject
         const QString &outputname,
         const QString &profileName,
         bool honorCutList, bool framecontrol, int jobID,
-        QString fifodir, bool fifo_info, bool cleanCut, frm_dir_map_t &deleteMap,
+        const QString& fifodir, bool fifo_info, bool cleanCut, frm_dir_map_t &deleteMap,
         int AudioTrackNo, bool passthru = false);
     void ShowProgress(bool val) { showprogress = val; }
     void SetRecorderOptions(QString options) { recorderOptions = options; }
@@ -39,7 +39,7 @@ class Transcode : public QObject
     void DisableAudioOnlyHLS(void) { hlsDisableAudioOnly = true; }
 
   private:
-    bool GetProfile(QString profileName, QString encodingType, int height,
+    bool GetProfile(const QString& profileName, const QString& encodingType, int height,
                     int frameRate);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
     void SetPlayerContext(PlayerContext*);

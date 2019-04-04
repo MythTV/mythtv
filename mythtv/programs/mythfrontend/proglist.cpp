@@ -10,8 +10,9 @@ using namespace std;
 
 // Qt
 #include <QCoreApplication>
-#include <QRegExp>
 #include <QLocale>
+#include <QRegExp>
+#include <utility>
 
 // MythTV
 #include "mythmiscutil.h"
@@ -504,7 +505,7 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
     if (m_viewList.empty() || m_viewTextList.empty())
         return;
 
-    m_searchTime = searchTime;
+    m_searchTime = std::move(searchTime);
     m_curView = 0;
     m_viewList[m_curView] = MythDate::toString(m_searchTime,
                                                  MythDate::kDateTimeFull | MythDate::kSimplify);
@@ -513,7 +514,7 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
     LoadInBackground();
 }
 
-void ProgLister::SetViewFromList(QString item)
+void ProgLister::SetViewFromList(const QString& item)
 {
     m_curView = m_viewTextList.indexOf(item);
     if (m_curView >= 0)

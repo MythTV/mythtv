@@ -1,6 +1,7 @@
 // ANSI C headers
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <utility>
 
 // MythTV headers
 #include "mythcorecontext.h"    /* gContext */
@@ -384,7 +385,7 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     m_debugLevel = gCoreContext->GetNumSetting("BlankFrameDetectorDebugLevel", 0);
 
     if (m_debugLevel >= 1)
-        createDebugDirectory(debugdir,
+        createDebugDirectory(std::move(debugdir),
             QString("BlankFrameDetector debugLevel %1").arg(m_debugLevel));
 }
 

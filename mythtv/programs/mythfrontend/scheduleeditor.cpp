@@ -2,9 +2,10 @@
 #include "scheduleeditor.h"
 
 // QT
-#include <QString>
-#include <QHash>
 #include <QCoreApplication>
+#include <QHash>
+#include <QString>
+#include <utility>
 
 // Libmyth
 #include "mythcorecontext.h"
@@ -322,7 +323,7 @@ void ScheduleEditor::Load()
 
 void ScheduleEditor::LoadTemplate(QString name)
 {
-    m_recordingRule->LoadTemplate(name);
+    m_recordingRule->LoadTemplate(std::move(name));
     Load();
     emit templateLoaded();
 }
@@ -1361,7 +1362,7 @@ void MetadataOptions::Load()
     SetTextFromMaps();
 }
 
-void MetadataOptions::CreateBusyDialog(QString title)
+void MetadataOptions::CreateBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;
@@ -1386,12 +1387,12 @@ void MetadataOptions::PerformQuery()
     m_metadataFactory->Lookup(lookup);
 }
 
-void MetadataOptions::OnSearchListSelection(RefCountHandler<MetadataLookup> lookup)
+void MetadataOptions::OnSearchListSelection(const RefCountHandler<MetadataLookup>& lookup)
 {
     QueryComplete(lookup);
 }
 
-void MetadataOptions::OnImageSearchListSelection(ArtworkInfo info,
+void MetadataOptions::OnImageSearchListSelection(const ArtworkInfo& info,
                                                  VideoArtworkType type)
 {
     QString msg = tr("Downloading selected artwork...");

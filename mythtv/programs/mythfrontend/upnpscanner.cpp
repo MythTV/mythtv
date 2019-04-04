@@ -8,6 +8,7 @@
 
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
@@ -87,7 +88,7 @@ class MediaServer : public MediaServerItem
     }
     explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(URL), m_controlURL(QUrl()),
+       m_URL(std::move(URL)), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
        m_friendlyName(QString("Unknown"))
     {

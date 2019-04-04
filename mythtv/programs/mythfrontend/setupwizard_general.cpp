@@ -279,7 +279,7 @@ bool GeneralSetupWizard::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void GeneralSetupWizard::CreateBusyDialog(QString message)
+void GeneralSetupWizard::CreateBusyDialog(const QString& message)
 {
     if (m_busyPopup)
         return;

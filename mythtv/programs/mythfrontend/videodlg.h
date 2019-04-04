@@ -48,8 +48,8 @@ class VideoDialog : public MythScreenType
     static VideoListDeathDelayPtr &GetSavedVideoList();
 
   public:
-    VideoDialog(MythScreenStack *lparent, QString lname,
-            VideoListPtr video_list, DialogType type,
+    VideoDialog(MythScreenStack *lparent, const QString& lname,
+            const VideoListPtr& video_list, DialogType type,
             BrowseType browse);
     ~VideoDialog();
 
@@ -60,7 +60,7 @@ class VideoDialog : public MythScreenType
     void searchStart();
 
   public slots:
-    void searchComplete(QString string);
+    void searchComplete(const QString& string);
 
   protected slots:
     void Init() override; /// Called after the screen is created by MythScreenStack
@@ -112,7 +112,7 @@ class VideoDialog : public MythScreenType
     MythMenu* CreateSettingsMenu();
     MythMenu* CreateMetadataBrowseMenu();
 
-    void popupClosed(QString which, int result);
+    void popupClosed(const QString& which, int result);
 
     void PromptToScan();
 
@@ -132,7 +132,7 @@ class VideoDialog : public MythScreenType
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
-    void OnVideoSearchListSelection(RefCountHandler<MetadataLookup> lookup);
+    void OnVideoSearchListSelection(const RefCountHandler<MetadataLookup>& lookup);
 
     void doVideoScan();
 
@@ -150,10 +150,10 @@ class VideoDialog : public MythScreenType
 
     virtual void loadData();
     void fetchVideos();
-    QString RemoteImageCheck(QString host, QString filename);
+    QString RemoteImageCheck(const QString& host, const QString& filename);
     QString GetCoverImage(MythGenericTree *node);
-    QString GetFirstImage(MythGenericTree *node, QString type,
-                          QString gpnode = QString(), int levels = 0);
+    QString GetFirstImage(MythGenericTree *node, const QString& type,
+                          const QString& gpnode = QString(), int levels = 0);
     QString GetImageFromFolder(VideoMetadata *metadata);
     QString GetScreenshot(MythGenericTree *node);
     QString GetBanner(MythGenericTree *node);
@@ -170,7 +170,7 @@ class VideoDialog : public MythScreenType
     void createBusyDialog(const QString &title);
     void createFetchDialog(VideoMetadata *metadata);
     void dismissFetchDialog(VideoMetadata *metadata, bool ok);
-    void createOkDialog(QString title);
+    void createOkDialog(const QString& title);
 
     void SwitchLayout(DialogType type, BrowseType browse);
 
@@ -220,7 +220,7 @@ class VideoListDeathDelay : public QObject
     Q_OBJECT
 
   public:
-    explicit VideoListDeathDelay(VideoDialog::VideoListPtr toSave);
+    explicit VideoListDeathDelay(const VideoDialog::VideoListPtr& toSave);
     ~VideoListDeathDelay();
 
     VideoDialog::VideoListPtr GetSaved();

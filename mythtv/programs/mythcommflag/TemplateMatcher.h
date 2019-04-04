@@ -33,7 +33,7 @@ class TemplateMatcher : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed, TemplateFinder *tf,
-            QString debugdir);
+            const QString& debugdir);
     ~TemplateMatcher(void);
 
     /* FrameAnalyzer interface. */

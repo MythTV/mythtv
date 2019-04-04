@@ -368,7 +368,7 @@ bool UPnpCDSVideo::LoadChildren(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadSeries(const UPnpCDSRequest* pRequest,
                           UPnpCDSExtensionResults* pResults,
-                          IDTokenMap tokens)
+                          const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -444,7 +444,7 @@ bool UPnpCDSVideo::LoadSeries(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadSeasons(const UPnpCDSRequest* pRequest,
                                UPnpCDSExtensionResults* pResults,
-                               IDTokenMap tokens)
+                               const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -534,7 +534,7 @@ bool UPnpCDSVideo::LoadMovies(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadGenres(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -606,7 +606,7 @@ bool UPnpCDSVideo::LoadGenres(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 

@@ -101,7 +101,7 @@ next_pixel:
     return 0;
 }
 
-bool readMatches(QString filename, unsigned short *matches, long long nframes)
+bool readMatches(const QString& filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -134,7 +134,7 @@ error:
     return false;
 }
 
-bool writeMatches(QString filename, unsigned short *matches, long long nframes)
+bool writeMatches(const QString& filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -329,7 +329,7 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
 };  /* namespace */
 
 TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
-                                 TemplateFinder *tf, QString debugdir) :
+                                 TemplateFinder *tf, const QString& debugdir) :
     m_pgmConverter(pgmc),
     m_edgeDetector(ed),   m_templateFinder(tf),
     m_debugdir(debugdir),

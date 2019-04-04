@@ -1,12 +1,14 @@
 #include "gallerytransitions.h"
 
+#include <utility>
+
 #include "mythcorecontext.h"
 
 
 #define LOC QString("Transition: ")
 
 
-Transition::Transition(QString name)
+Transition::Transition(const QString& name)
     : m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000))
 {
     setObjectName(name);
@@ -140,7 +142,7 @@ void TransitionNone::Start(Slide &from, Slide &to,
              log messages.
 */
 GroupTransition::GroupTransition(GroupAnimation *animation, QString name)
-    : Transition(name), m_animation(animation)
+    : Transition(std::move(name)), m_animation(animation)
 {
     // Complete transition when the group finishes
     connect(m_animation, SIGNAL(finished()), this, SLOT(Finished()));

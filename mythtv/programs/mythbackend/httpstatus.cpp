@@ -701,7 +701,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
+int HttpStatus::PrintEncoderStatus( QTextStream &os, const QDomElement& encoders )
 {
     int     nNumEncoders = 0;
 
@@ -845,7 +845,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
+int HttpStatus::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
 {
     QDateTime qdtNow          = MythDate::current();
 
@@ -976,7 +976,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintFrontends( QTextStream &os, QDomElement frontends )
+int HttpStatus::PrintFrontends( QTextStream &os, const QDomElement& frontends )
 {
     if (frontends.isNull())
         return( 0 );
@@ -1014,7 +1014,7 @@ int HttpStatus::PrintFrontends( QTextStream &os, QDomElement frontends )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintBackends( QTextStream &os, QDomElement backends )
+int HttpStatus::PrintBackends( QTextStream &os, const QDomElement& backends )
 {
     if (backends.isNull())
         return( 0 );
@@ -1053,7 +1053,7 @@ int HttpStatus::PrintBackends( QTextStream &os, QDomElement backends )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
+int HttpStatus::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
 {
     if (jobs.isNull())
         return( 0 );
@@ -1194,7 +1194,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
+int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
 {
     QString   sRep;
 
@@ -1440,7 +1440,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
     return( 1 );
 }
 
-int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
+int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, const QDomElement& info )
 {
     if (info.isNull())
         return( 0 );

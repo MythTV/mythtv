@@ -578,7 +578,7 @@ void ThemeChooser::showPopupMenu(void)
                                SLOT(toggleThemeUpdateNotifications()));
 }
 
-void ThemeChooser::popupClosed(QString which, int result)
+void ThemeChooser::popupClosed(const QString& which, int result)
 {
     (void)which;
     (void)result;

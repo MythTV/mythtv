@@ -62,7 +62,7 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
 }
 
 bool
-writeData(QString filename, const unsigned short *scdiff, long long nframes)
+writeData(const QString& filename, const unsigned short *scdiff, long long nframes)
 {
     FILE            *fp;
     long long       frameno;
@@ -98,7 +98,7 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
 };  /* namespace */
 
 SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
-        QString debugdir)
+        const QString& debugdir)
     : m_histogramAnalyzer(ha)
     , m_debugdata(debugdir + "/SceneChangeDetector.txt")
 {

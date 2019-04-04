@@ -122,7 +122,7 @@ class NetworkControl : public ServerPool, public QRunnable
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
     void customEvent(QEvent *e) override; // QObject
 
-    QString listRecordings(QString chanid = "", QString starttime = "");
+    QString listRecordings(const QString& chanid = "", const QString& starttime = "");
     QString listSchedule(const QString& chanID = "") const;
     QString listChannels(const uint start, const uint limit) const;
     QString saveScreenshot(NetworkCommand *nc);

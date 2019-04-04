@@ -36,7 +36,7 @@ bool ProgDetails::Create(void)
     return true;
 }
 
-QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
+QString ProgDetails::getRatings(bool recorded, uint chanid, const QDateTime& startts)
 {
     QString table = (recorded) ? "recordedrating" : "programrating";
     QString sel = QString(

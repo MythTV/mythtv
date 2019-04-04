@@ -245,7 +245,7 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QString   GetFormatDate( const QDateTime Date,
+        QString   GetFormatDate( const QDateTime& Date,
                                  bool            ShortDate = false )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
@@ -253,7 +253,7 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QString   GetFormatDateTime( const QDateTime DateTime,
+        QString   GetFormatDateTime( const QDateTime& DateTime,
                                      bool            ShortDate = false )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
@@ -261,7 +261,7 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QString   GetFormatTime( const QDateTime Time )
+        QString   GetFormatTime( const QDateTime& Time )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
                 return m_obj.GetFormatTime( Time );

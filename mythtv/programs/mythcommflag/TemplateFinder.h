@@ -32,7 +32,7 @@ class TemplateFinder : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     TemplateFinder(PGMConverter *pgmc, BorderDetector *bd, EdgeDetector *ed,
-            MythPlayer *player, int proglen, QString debugdir);
+            MythPlayer *player, int proglen, const QString& debugdir);
     ~TemplateFinder(void);
 
     /* FrameAnalyzer interface. */

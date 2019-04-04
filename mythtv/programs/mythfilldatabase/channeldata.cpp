@@ -25,7 +25,7 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
-static void get_atsc_stuff(QString channum, int sourceid, int freqid,
+static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,
                            int &major, int &minor, long long &freq)
 {
     major = freqid;

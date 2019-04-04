@@ -457,7 +457,7 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
 
 bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -549,7 +549,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
 
 bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens)
+                               const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -632,7 +632,7 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
 
 bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
-                              IDTokenMap tokens )
+                              const IDTokenMap& tokens )
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -704,7 +704,7 @@ bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
 
 bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 

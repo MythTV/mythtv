@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QFileInfo>
+#include <utility>
 
 #include "filetransfer.h"
 #include "ringbuffer.h"
@@ -66,7 +67,7 @@ bool FileTransfer::ReOpen(QString newFilename)
         return false;
 
     if (m_rbuffer)
-        return m_rbuffer->ReOpen(newFilename);
+        return m_rbuffer->ReOpen(std::move(newFilename));
 
     return false;
 }

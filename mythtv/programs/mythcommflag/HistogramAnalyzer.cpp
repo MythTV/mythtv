@@ -24,7 +24,7 @@ using namespace frameAnalyzer;
 namespace {
 
 bool
-readData(QString filename, float *mean, unsigned char *median, float *stddev,
+readData(const QString& filename, float *mean, unsigned char *median, float *stddev,
         int *frow, int *fcol, int *fwidth, int *fheight,
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
@@ -105,7 +105,7 @@ error:
 }
 
 bool
-writeData(QString filename, float *mean, unsigned char *median, float *stddev,
+writeData(const QString& filename, float *mean, unsigned char *median, float *stddev,
         int *frow, int *fcol, int *fwidth, int *fheight,
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
@@ -137,7 +137,7 @@ writeData(QString filename, float *mean, unsigned char *median, float *stddev,
 };  /* namespace */
 
 HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
-        QString debugdir)
+        const QString& debugdir)
     : m_pgmConverter(pgmc)
     , m_borderDetector(bd)
 #ifdef PGM_CONVERT_GREYSCALE

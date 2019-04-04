@@ -380,7 +380,7 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     return nullptr;
 }
 
-PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
+PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
                          TV *player, bool /*showTV*/)
     : ScheduleCommon(parent, name),
       m_titleChaff(" \\(.*\\)$"),
@@ -2382,7 +2382,7 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     PlayFromBookmarkOrProgStart(item);
 }
 
-void PlaybackBox::popupClosed(QString which, int result)
+void PlaybackBox::popupClosed(const QString& which, int result)
 {
     m_menuDialog = nullptr;
 
@@ -3580,7 +3580,7 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(const ProgramInfo &pginfo)
 }
 
 ProgramInfo *PlaybackBox::FindProgramInUILists(uint recordingID,
-                                               QString recgroup)
+                                               const QString& recgroup)
 {
     // LiveTV ProgramInfo's are not in the aggregated list
     ProgramList::iterator _it[2] = {
@@ -5389,7 +5389,7 @@ void RecMetadataEdit::QueryComplete(MetadataLookup *lookup)
     }
 }
 
-void RecMetadataEdit::OnSearchListSelection(RefCountHandler<MetadataLookup> lookup)
+void RecMetadataEdit::OnSearchListSelection(const RefCountHandler<MetadataLookup>& lookup)
 {
     QueryComplete(lookup);
 }

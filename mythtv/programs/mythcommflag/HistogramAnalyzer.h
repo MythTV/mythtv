@@ -19,7 +19,7 @@ class HistogramAnalyzer
 public:
     /* Ctor/dtor. */
     HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
-            QString debugdir);
+            const QString& debugdir);
     ~HistogramAnalyzer();
 
     enum FrameAnalyzer::analyzeFrameResult MythPlayerInited(

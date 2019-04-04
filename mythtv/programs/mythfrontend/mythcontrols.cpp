@@ -626,7 +626,7 @@ void MythControls::GrabKey(void)
  *  TODO FIXME This code needs work to deal with multiple
  *             binding conflicts.
  */
-void MythControls::AddKeyToAction(QString key, bool ignoreconflict)
+void MythControls::AddKeyToAction(const QString& key, bool ignoreconflict)
 {
     QString     action  = GetCurrentAction();
     QString     context = GetCurrentContext();
