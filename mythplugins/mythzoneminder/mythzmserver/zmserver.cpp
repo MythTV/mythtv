@@ -1000,7 +1000,7 @@ void ZMServer::handleGetMonitorStatus(void)
     send(outStr);
 }
 
-string ZMServer::runCommand(string command)
+string ZMServer::runCommand(const string& command)
 {
     string outStr;
     FILE *fd = popen(command.c_str(), "r");

@@ -698,7 +698,7 @@ void ImportMusicDialog::chooseBackend(void)
     popupStack->AddScreen(searchDlg);
 }
 
-void ImportMusicDialog::setSaveHost(QString host)
+void ImportMusicDialog::setSaveHost(const QString& host)
 {
     gCoreContext->SaveSetting("MythMusicLastImportHost", host);
 

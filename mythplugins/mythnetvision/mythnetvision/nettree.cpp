@@ -591,7 +591,7 @@ void NetTree::FillTree()
 }
 
 void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
-                               QString dirthumb, QList<ResultItem*> videos)
+                               const QString& dirthumb, QList<ResultItem*> videos)
 {
     MythGenericTree *folder = nullptr;
 

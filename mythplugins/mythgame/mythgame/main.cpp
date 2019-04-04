@@ -61,7 +61,7 @@ static void GameCallback(void *data, QString &selection)
 
 }
 
-static int runMenu(QString which_menu)
+static int runMenu(const QString& which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 

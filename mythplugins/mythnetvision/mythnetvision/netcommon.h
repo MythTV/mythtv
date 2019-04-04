@@ -9,9 +9,9 @@
 #include <mythscreentype.h>
 
 // Generic Data Formatting
-QString GetThumbnailFilename(QString url, QString title);
+QString GetThumbnailFilename(const QString& url, const QString& title);
 QString GetMythXMLURL(void);
-QUrl GetMythXMLSearch(QString url, QString query,
-                      QString grabber, QString pagenum);
+QUrl GetMythXMLSearch(const QString& url, const QString& query,
+                      const QString& grabber, const QString& pagenum);
 
 #endif // NETCOMMON_H_

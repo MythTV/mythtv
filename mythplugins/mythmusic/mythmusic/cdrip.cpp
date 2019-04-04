@@ -16,12 +16,13 @@ using namespace std;
 // Qt includes
 #include <QApplication>
 #include <QDir>
-#include <QRegExp>
-#include <QKeyEvent>
 #include <QEvent>
 #include <QFile>
-#include <QUrl>
+#include <QKeyEvent>
+#include <QRegExp>
 #include <QTimer>
+#include <QUrl>
+#include <utility>
 
 // MythTV plugin includes
 #include <mythcontext.h>
@@ -168,7 +169,7 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
     MThread("CDRipper"),
     m_parent(parent),
-    m_CDdevice(device), m_quality(quality),
+    m_CDdevice(std::move(device)), m_quality(quality),
     m_tracks(tracks)
 {
 #ifdef WIN32 // libcdio needs the drive letter with no path
@@ -518,7 +519,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 Ripper::Ripper(MythScreenStack *parent, QString device) :
     MythScreenType(parent, "ripcd"),
     m_tracks(new QVector<RipTrack*>),
-    m_CDdevice(device)
+    m_CDdevice(std::move(device))
 {
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
@@ -725,7 +726,7 @@ void Ripper::chooseBackend(void)
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setSaveHost(QString host)
+void Ripper::setSaveHost(const QString& host)
 {
     gCoreContext->SaveSetting("MythMusicLastRipHost", host);
 
@@ -1261,7 +1262,7 @@ void Ripper::searchArtist()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setArtist(QString artist)
+void Ripper::setArtist(const QString& artist)
 {
     m_artistEdit->SetText(artist);
 }
@@ -1285,7 +1286,7 @@ void Ripper::searchAlbum()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setAlbum(QString album)
+void Ripper::setAlbum(const QString& album)
 {
     m_albumEdit->SetText(album);
 }
@@ -1314,7 +1315,7 @@ void Ripper::searchGenre()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setGenre(QString genre)
+void Ripper::setGenre(const QString& genre)
 {
     m_genreEdit->SetText(genre);
 }

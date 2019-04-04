@@ -1,5 +1,6 @@
 // qt
 #include <QKeyEvent>
+#include <utility>
 
 // mythtv
 #include <mythcontext.h>
@@ -548,7 +549,7 @@ void EditMetadataDialog::searchArtist()
     popupStack->AddScreen(searchDlg);
 }
 
-void EditMetadataDialog::setArtist(QString artist)
+void EditMetadataDialog::setArtist(const QString& artist)
 {
     m_artistEdit->SetText(artist);
     updateArtistImage();
@@ -593,7 +594,7 @@ void EditMetadataDialog::searchCompilationArtist()
     popupStack->AddScreen(searchDlg);
 }
 
-void EditMetadataDialog::setCompArtist(QString compArtist)
+void EditMetadataDialog::setCompArtist(const QString& compArtist)
 {
     m_compArtistEdit->SetText(compArtist);
 }
@@ -618,7 +619,7 @@ void EditMetadataDialog::searchAlbum()
     popupStack->AddScreen(searchDlg);
 }
 
-void EditMetadataDialog::setAlbum(QString album)
+void EditMetadataDialog::setAlbum(const QString& album)
 {
     m_albumEdit->SetText(album);
     updateAlbumImage();
@@ -669,7 +670,7 @@ void EditMetadataDialog::searchGenre()
     popupStack->AddScreen(searchDlg);
 }
 
-void EditMetadataDialog::setGenre(QString genre)
+void EditMetadataDialog::setGenre(const QString& genre)
 {
     m_genreEdit->SetText(genre);
     updateGenreImage();
@@ -1294,7 +1295,7 @@ class CopyImageThread: public MThread
 {
   public:
     explicit CopyImageThread(QStringList strList) :
-            MThread("CopyImage"), m_strList(strList) {}
+            MThread("CopyImage"), m_strList(std::move(strList)) {}
 
     void run() override // MThread
     {

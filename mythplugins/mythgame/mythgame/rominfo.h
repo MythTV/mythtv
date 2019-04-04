@@ -5,7 +5,7 @@
 #include <QString>
 #include <QList>
 
-int romInDB(QString rom, QString gametype);
+int romInDB(const QString& rom, const QString& gametype);
 
 class RomInfo
 {
@@ -139,7 +139,7 @@ class RomInfo
     QString getExtension();
     QString toString();
 
-    void setField(QString field, QString data);
+    void setField(const QString& field, const QString& data);
     void fillData();
 
     void SaveToDatabase();

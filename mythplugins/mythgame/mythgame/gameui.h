@@ -37,7 +37,7 @@ class GameUI : public MythScreenType
     void nodeChanged(MythGenericTree* node);
     void itemClicked(MythUIButtonListItem* item);
     void showImages(void);
-    void searchComplete(QString);
+    void searchComplete(const QString&);
     void gameSearch(MythGenericTree *node = nullptr,
                      bool automode = false);
     void OnGameSearchListSelection(RefCountHandler<MetadataLookup> lookup);
@@ -56,7 +56,7 @@ class GameUI : public MythScreenType
     void searchStart(void);
     void toggleFavorite(void);
     void customEvent(QEvent *event) override; // MythUIType
-    void createBusyDialog(QString title);
+    void createBusyDialog(const QString& title);
 
     QString getFillSql(MythGenericTree* node) const;
     QString getChildLevelString(MythGenericTree *node) const;

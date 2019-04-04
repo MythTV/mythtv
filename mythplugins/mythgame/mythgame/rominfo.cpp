@@ -111,7 +111,7 @@ void RomInfo::DeleteFromDatabase()
 }
 
 // Return the count of how many times this appears in the db already
-int romInDB(QString rom, QString gametype)
+int romInDB(const QString& rom, const QString& gametype)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -169,7 +169,7 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     return false;
 }
 
-void RomInfo::setField(QString field, QString data)
+void RomInfo::setField(const QString& field, const QString& data)
 {
     if (field == "system")
         m_system = data;

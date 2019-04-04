@@ -94,10 +94,10 @@ class ImportNative : public MythScreenType
     void searchChanNo(void);
     void searchName(void);
     void searchCallsign(void);
-    void gotChanID(QString value);
-    void gotChanNo(QString value);
-    void gotName(QString value);
-    void gotCallsign(QString value);
+    void gotChanID(const QString& value);
+    void gotChanNo(const QString& value);
+    void gotName(const QString& value);
+    void gotCallsign(const QString& value);
 
   private:
     void findChannelMatch(const QString &chanid, const QString &chanNo,

@@ -55,7 +55,7 @@ class MythBurn : public MythScreenType
   public:
     MythBurn(MythScreenStack *parent, 
              MythScreenType *destinationScreen, MythScreenType *themeScreen,
-             ArchiveDestination archiveDestination, QString name);
+             ArchiveDestination archiveDestination, const QString& name);
 
     ~MythBurn(void);
 

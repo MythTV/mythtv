@@ -8,7 +8,7 @@
 #undef Z_NULL
 #define Z_NULL nullptr
 
-static int calcOffset(QString GameType, uLong filesize) {
+static int calcOffset(const QString& GameType, uLong filesize) {
     int result;
     uLong rom_size;
 
@@ -49,7 +49,7 @@ static QString crcStr(uLong crc)
 }
 
 // Return the crc32 info for this rom. (ripped mostly from the old neshandler.cpp source)
-QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
+QString crcinfo(const QString& romname, const QString& GameType, QString *key, RomDBMap *romDB)
 {
     // Get CRC of file
     char block[32768] = "";

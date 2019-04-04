@@ -77,7 +77,7 @@ bool DcrawHandler::read(QImage *image)
     return loaded;
 }
 
-int DcrawHandler::loadThumbnail(QImage *image, QString fileName)
+int DcrawHandler::loadThumbnail(QImage *image, const QString& fileName)
 {
     QStringList arguments;
     arguments << "-e" << "-c";

@@ -26,7 +26,7 @@
 
 DVDThemeSelector::DVDThemeSelector(
     MythScreenStack *parent, MythScreenType *destinationScreen,
-    ArchiveDestination archiveDestination, QString name) :
+    ArchiveDestination archiveDestination, const QString& name) :
     MythScreenType(parent, name, true),
     m_destinationScreen(destinationScreen),
     m_archiveDestination(archiveDestination),

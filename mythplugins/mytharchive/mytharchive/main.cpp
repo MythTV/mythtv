@@ -283,7 +283,7 @@ static void ArchiveCallback(void *data, QString &selection)
     }
 }
 
-static int runMenu(QString which_menu)
+static int runMenu(const QString& which_menu)
 {
     // find the 'mainmenu' MythThemedMenu so we can use the callback from it
     MythThemedMenu *mainMenu = nullptr;

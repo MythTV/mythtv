@@ -166,7 +166,7 @@ void NetEditorBase::ParsedData()
     FillGrabberButtonList();
 }
 
-void NetEditorBase::CreateBusyDialog(QString title)
+void NetEditorBase::CreateBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;

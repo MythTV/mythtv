@@ -297,7 +297,7 @@ static bool isVideo(const QString &mimeType)
            mimeType == "video/msvideo" || mimeType == "video/x-msvideo";
 }
 
-void NewsSite::parseRSS(QDomDocument domDoc)
+void NewsSite::parseRSS(const QDomDocument& domDoc)
 {
     QMutexLocker locker(&m_lock);
 
@@ -453,7 +453,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
     }
 }
 
-void NewsSite::parseAtom(QDomDocument domDoc)
+void NewsSite::parseAtom(const QDomDocument& domDoc)
 {
     QDomNodeList entries = domDoc.elementsByTagName("entry");
 

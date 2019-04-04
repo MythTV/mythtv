@@ -24,7 +24,7 @@
 #include "themeselector.h"
 
 SelectDestination::SelectDestination(
-    MythScreenStack *parent, bool nativeMode, QString name) :
+    MythScreenStack *parent, bool nativeMode, const QString& name) :
     MythScreenType(parent, name),
     m_nativeMode(nativeMode)
 {
@@ -290,7 +290,7 @@ void SelectDestination::handleFind(void)
         mainStack->AddScreen(selector);
 }
 
-void SelectDestination::fileFinderClosed(QString filename)
+void SelectDestination::fileFinderClosed(const QString& filename)
 {
     if (filename != "")
     {

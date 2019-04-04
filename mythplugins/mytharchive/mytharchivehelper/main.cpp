@@ -1547,7 +1547,7 @@ static int doImportArchive(const QString &inFile, int chanID)
     return na.doImportArchive(inFile, chanID);
 }
 
-static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
+static int grabThumbnail(const QString& inFile, const QString& thumbList, const QString& outFile, int frameCount)
 {
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("grabThumbnail(): Opening '%1'")
@@ -1890,7 +1890,7 @@ static int64_t getFrameCount(const QString &filename, float fps)
     return totframes;
 }
 
-static int getFileInfo(QString inFile, QString outFile, int lenMethod)
+static int getFileInfo(const QString& inFile, const QString& outFile, int lenMethod)
 {
     // Open recording
     LOG(VB_JOBQUEUE , LOG_INFO, QString("getFileInfo(): Opening '%1'")
@@ -2177,7 +2177,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     return 0;
 }
 
-static int getDBParamters(QString outFile)
+static int getDBParamters(const QString& outFile)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
@@ -2203,7 +2203,7 @@ static int getDBParamters(QString outFile)
     return 0;
 }
 
-static int isRemote(QString filename)
+static int isRemote(const QString& filename)
 {
     if (filename.startsWith("myth://"))
         return 3;

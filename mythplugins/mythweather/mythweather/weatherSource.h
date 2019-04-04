@@ -36,10 +36,10 @@ class WeatherSource : public QObject
 
   public:
     static ScriptInfo *ProbeScript(const QFileInfo &fi);
-    static QStringList ProbeTypes(QString    workingDirectory,
-                                  QString    program);
-    static bool ProbeTimeouts(QString        workingDirectory,
-                              QString        program,
+    static QStringList ProbeTypes(const QString&    workingDirectory,
+                                  const QString&    program);
+    static bool ProbeTimeouts(const QString&        workingDirectory,
+                              const QString&        program,
                               uint          &updateTimeout,
                               uint          &scriptTimeout);
     static bool ProbeInfo(ScriptInfo &scriptInfo);

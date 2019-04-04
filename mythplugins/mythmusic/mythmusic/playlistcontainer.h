@@ -58,7 +58,7 @@ class PlaylistContainer
     void            deletePlaylist(int kill_me);
     void            renamePlaylist(int index, QString new_name);
 
-    bool            nameIsUnique(QString a_name, int which_id);
+    bool            nameIsUnique(const QString& a_name, int which_id);
 
     void            clearActive();
 

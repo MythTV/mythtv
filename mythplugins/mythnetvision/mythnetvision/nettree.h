@@ -65,7 +65,7 @@ class NetTree : public NetBase
                           QDomElement& domElem);
     void BuildGenericTree(MythGenericTree *dst,
                           QStringList paths,
-                          QString dirthumb,
+                          const QString& dirthumb,
                           QList<ResultItem*> videos);
 
     void AddFileNode(MythGenericTree *where_to_add,

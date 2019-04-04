@@ -60,7 +60,7 @@ VisualBase::~VisualBase()
 }
 
 
-void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning, int fontSize)
+void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, const QString& warning, int fontSize)
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);

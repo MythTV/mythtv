@@ -30,11 +30,12 @@
 using namespace std;
 
 // Qt headers
-#include <QTimer>
-#include <QImage>
 #include <QDir>
+#include <QImage>
 #include <QPainter>
+#include <QTimer>
 #include <qbuffer.h>
+#include <utility>
 
 // MythTV plugin headers
 #include <mythcontext.h>
@@ -75,7 +76,7 @@ void GLSDialog::closeEvent(QCloseEvent *e)
     accept();
 }
 
-GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
+GLSingleView::GLSingleView(const ThumbList& itemList, int *pos, int slideShow,
                            int sortorder, QWidget *parent)
     : QGLWidget(parent),
       ImageView(itemList, pos, slideShow, sortorder)
@@ -1478,7 +1479,7 @@ void GLSingleView::createTexInfo(void)
 
 void GLSingleView::LoadImage(QImage image, QSize origSize)
 {
-    m_effect_kenBurns_image = image;
+    m_effect_kenBurns_image = std::move(image);
     m_effect_kenBurns_orig_image_size = origSize;
 }
 

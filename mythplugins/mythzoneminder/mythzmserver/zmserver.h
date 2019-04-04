@@ -207,7 +207,7 @@ class ZMServer
     long long getDiskSpace(const string &filename, long long &total, long long &used);
     void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
-    string runCommand(string command);
+    string runCommand(const string& command);
     void getMonitorStatus(const string &id, const string &type,
                           const string &device, const string &host,
                           const string &channel, const string &function,

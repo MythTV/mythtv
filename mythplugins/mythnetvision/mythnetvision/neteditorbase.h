@@ -45,7 +45,7 @@ class NetEditorBase : public MythScreenType
     bool                   m_changed    {false};
 
   protected:
-    void CreateBusyDialog(QString title);
+    void CreateBusyDialog(const QString& title);
 
     virtual bool InsertInDB(GrabberScript *script) = 0;
     virtual bool RemoveFromDB(GrabberScript *script) = 0;

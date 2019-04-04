@@ -99,8 +99,8 @@ class NewsSite : public QObject
     void retrieve(void);
     void stop(void);
     void process(void);
-    void parseRSS(QDomDocument domDoc);
-    void parseAtom(QDomDocument domDoc);
+    void parseRSS(const QDomDocument& domDoc);
+    void parseAtom(const QDomDocument& domDoc);
     static inline bool sortByName(NewsSite *a, NewsSite *b)
         { return naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 

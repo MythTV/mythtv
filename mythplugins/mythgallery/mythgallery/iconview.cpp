@@ -1384,7 +1384,7 @@ void IconView::HandleMkDir(void)
             SLOT(DoMkDir(QString)), Qt::QueuedConnection);
 }
 
-void IconView::DoMkDir(QString folderName)
+void IconView::DoMkDir(const QString& folderName)
 {
     QDir cdir(m_currDir);
     cdir.mkdir(folderName);
@@ -1414,7 +1414,7 @@ void IconView::HandleRename(void)
             SLOT(DoRename(QString)), Qt::QueuedConnection);
 }
 
-void IconView::DoRename(QString folderName)
+void IconView::DoRename(const QString& folderName)
 {
     if (folderName.isEmpty() || folderName == "." || folderName == "..")
         return;

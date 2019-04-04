@@ -47,7 +47,7 @@ using namespace std;
 template<typename T> T sq(T val) { return val * val; }
 
 SingleView::SingleView(
-    ThumbList       itemList,  int *pos,
+    const ThumbList& itemList, int *pos,
     int             slideShow, int sortorder,
     MythMainWindow *parent,
     const char *name)
