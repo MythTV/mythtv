@@ -2030,9 +2030,9 @@ bool CardUtil::GetV4LInfo(
 #ifdef USING_V4L1
     else // Fallback to V4L1 query
     {
-        struct video_capability capability;
-        if (ioctl(videofd, VIDIOCGCAP, &capability) >= 0)
-            input = QString::fromLatin1((const char*)capability.name);
+        struct video_capability capability2;
+        if (ioctl(videofd, VIDIOCGCAP, &capability2) >= 0)
+            input = QString::fromLatin1((const char*)capability2.name);
     }
 #endif // USING_V4L1
 #endif // USING_V4L2

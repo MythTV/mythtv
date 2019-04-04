@@ -749,8 +749,8 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         int i = 0;
         for (; i < decoder->m_decoded_frames.size(); i++)
         {
-            int64_t pts = decoder->m_decoded_frames[i].pts;
-            if (pts != (int64_t)AV_NOPTS_VALUE && time > pts)
+            int64_t pts2 = decoder->m_decoded_frames[i].pts;
+            if (pts2 != (int64_t)AV_NOPTS_VALUE && time > pts2)
             {
                 found = true;
                 break;

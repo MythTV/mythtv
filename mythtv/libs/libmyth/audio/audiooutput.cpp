@@ -529,10 +529,10 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
             for (QMap<int, QString>::const_iterator i = dxdevs->begin();
                  i != dxdevs->end(); ++i)
             {
-                QString desc = i.value();
-                QString devname = QString("DirectX:%1").arg(desc);
+                QString devdesc = i.value();
+                QString devname = QString("DirectX:%1").arg(devdesc);
 
-                adc = GetAudioDeviceConfig(devname, desc);
+                adc = GetAudioDeviceConfig(devname, devdesc);
                 if (!adc)
                     continue;
                 list->append(*adc);

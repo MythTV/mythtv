@@ -51,8 +51,8 @@ DTC::ChannelIconList* ChannelIcon::LookupChannelIcon ( const QString    &Query,
 
     // query http://services.mythtv.org/channel-icon/lookup
     QByteArray data;
-    QString url = QString("http://services.mythtv.org/channel-icon/lookup?%1=%2").arg(FieldName).arg(Query);
-    if (!GetMythDownloadManager()->download(url, &data))
+    QString lookupUrl = QString("http://services.mythtv.org/channel-icon/lookup?%1=%2").arg(FieldName).arg(Query);
+    if (!GetMythDownloadManager()->download(lookupUrl, &data))
     {
         //throw( QString("Download from services.mythtv.org failed."));
         return pChannelIcons;
@@ -97,8 +97,8 @@ DTC::ChannelIconList* ChannelIcon::SearchChannelIcon ( const QString &Query )
 
     // query http://services.mythtv.org/channel-icon/search
     QByteArray data;
-    QString url = QString("http://services.mythtv.org/channel-icon/search?s=%1").arg(Query);
-    if (!GetMythDownloadManager()->download(url, &data))
+    QString searchUrl = QString("http://services.mythtv.org/channel-icon/search?s=%1").arg(Query);
+    if (!GetMythDownloadManager()->download(searchUrl, &data))
         return pChannelIcons;
 
     // ----------------------------------------------------------------------
