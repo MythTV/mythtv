@@ -184,9 +184,9 @@ class LinkageDescriptor : public MPEGDescriptor
     //    target_event_id      16   9.0
     uint TargetEventID(void) const { return (_data[9]<<8) | _data[10]; }
     //    target_listed         1  11.0
-    bool IsTargetListed(void) const { return _data[11]&0x80; }
+    bool IsTargetListed(void) const { return ( _data[11]&0x80 ) != 0; }
     //    event_simulcast       1  11.1
-    bool IsEventSimulcast(void) const { return _data[11]&0x40; }
+    bool IsEventSimulcast(void) const { return ( _data[11]&0x40 ) != 0; }
     //    reserved              6  11.2
     // }
     //      for (i=0;i<N;i++)
@@ -819,7 +819,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     double OrbitalPositionFloat()  const
         { return ((double) OrbitalPosition()) / 10.0; }
     /// west_east_flag          1   8.0
-    bool IsEast(void)             const { return (_data[8]&0x80); }
+    bool IsEast(void)             const { return ( (_data[8]&0x80) ) != 0; }
     bool IsWest(void)             const { return !IsEast(); }
     // polarization             2   8.1
     uint Polarization(void)       const { return (_data[8]>>5)&0x3; }
@@ -931,7 +931,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return (Bandwidth() <= kBandwidth5Mhz) ? bs[Bandwidth()] : "auto";
     }
     // priority                 1   6.3
-    bool HighPriority(void) const { return _data[6] & 0x10; }
+    bool HighPriority(void) const { return ( _data[6] & 0x10 ) != 0; }
     // time_slicing_indicator   1   6.4
     bool IsTimeSlicingIndicatorUsed(void) const { return !(_data[6] & 0x08); }
     // MPE-FEC_indicator        1   6.5
@@ -972,7 +972,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         static QString hs[] = { "n", "1", "2", "4", "a", "a", "a", "a" };
         return hs[Hierarchy()];
     }
-    bool NativeInterleaver(void) const { return _data[7] & 0x20; }
+    bool NativeInterleaver(void) const { return ( _data[7] & 0x20 ) != 0; }
     uint Alpha(void) const
     {
         uint i = (_data[7]>>3) & 0x3;
@@ -1987,13 +1987,13 @@ class AC3Descriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // component_type_flag      1   2.0
-    bool HasComponentType(void) const { return _data[2] & 0x80; }
+    bool HasComponentType(void) const { return ( _data[2] & 0x80 ) != 0; }
     // bsid_flag                1   2.1
-    bool HasBSID(void) const { return _data[2] & 0x40; }
+    bool HasBSID(void) const { return ( _data[2] & 0x40 ) != 0; }
     // mainid_flag              1   2.2
-    bool HasMainID(void) const { return _data[2] & 0x20; }
+    bool HasMainID(void) const { return ( _data[2] & 0x20 ) != 0; }
     // asvc_flag                1   2.3
-    bool HasASVC(void) const { return _data[2] & 0x10; }
+    bool HasASVC(void) const { return ( _data[2] & 0x10 ) != 0; }
     // reserved_flags           4   2.4
     // if (component_type_flag == 1)
     //   { component_type       8 uimsbf }

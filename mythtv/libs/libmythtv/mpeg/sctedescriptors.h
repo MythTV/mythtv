@@ -38,7 +38,7 @@ class FrameRateDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x82
     // descriptor_length        8   1.0
     // multiple_frame_rate_flag 1   2.0
-    bool MultipleFrameRates(void) const { return _data[2] & 0x80; }
+    bool MultipleFrameRates(void) const { return ( _data[2] & 0x80 ) != 0; }
     // frame_rate_code          4   2.1
     uint FrameRateCode(void) const { return (_data[2] >> 3) & 0xF; }
     /// returns maximum frame rate in video
@@ -88,9 +88,9 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x83
     // descriptor_length        8   1.0
     // catalog_mode_flag        1   2.0
-    bool CatalogModeFlag(void) const { return _data[2] & 0x80; }
+    bool CatalogModeFlag(void) const { return ( _data[2] & 0x80 ) != 0; }
     // video_includes_setup     1   2.1
-    bool VideoIncludesSetup(void) const { return _data[2] & 0x40; }
+    bool VideoIncludesSetup(void) const { return ( _data[2] & 0x40 ) != 0; }
     // reserved                 6   2.2
 
     QString toString(void) const override // MPEGDescriptor
@@ -188,7 +188,7 @@ class FrequencySpecificationDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x90
     // descriptor_length        8   1.0
     // frequency_unit           1   2.0
-    bool FrequencyUnit(void) const { return _data[2] & 0x80; }
+    bool FrequencyUnit(void) const { return ( _data[2] & 0x80 ) != 0; }
     uint FrequencyUnitHz(void) const
         { return FrequencyUnit() ? 10000 : 125000; }
     // carrier_frequency       15   2.1

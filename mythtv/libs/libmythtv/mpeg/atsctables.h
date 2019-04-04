@@ -732,7 +732,7 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     //   reserved               2  14.1          3
     //   DS_day_of_month        5  14.3
     //   DS_hour                8  15.0
-    bool InDaylightSavingsTime()     const { return pesdata()[14]&0x80; }
+    bool InDaylightSavingsTime()     const { return ( pesdata()[14]&0x80 ) != 0; }
     uint DayDaylightSavingsStarts()  const { return pesdata()[14]&0x1f; }
     uint HourDaylightSavingsStarts() const { return pesdata()[15]; }
     // for (I = 0;I< N;I++) { descriptor() }

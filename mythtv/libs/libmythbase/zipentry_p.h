@@ -71,8 +71,8 @@ public:
 
 	bool lhEntryChecked;		// Is true if the local header record for this entry has been parsed
 
-	inline bool isEncrypted() const { return gpFlag[0] & 0x01; }
-	inline bool hasDataDescriptor() const { return gpFlag[0] & 0x08; }
+	inline bool isEncrypted() const { return ( gpFlag[0] & 0x01 ) != 0; }
+	inline bool hasDataDescriptor() const { return ( gpFlag[0] & 0x08 ) != 0; }
 };
 
 #endif // OSDAB_ZIPENTRY_P__H

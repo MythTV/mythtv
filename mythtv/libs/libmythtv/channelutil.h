@@ -33,8 +33,8 @@ class pid_cache_item_t
     uint GetTableID(void) const
         { return (m_sid_tid&0x100) ? 0 : GetID(); }
     uint GetID(void) const { return m_sid_tid & 0xff; }
-    bool IsPCRPID(void) const { return m_sid_tid&0x200; }
-    bool IsPermanent(void) const { return m_sid_tid&0x10000; }
+    bool IsPCRPID(void) const { return ( m_sid_tid&0x200 ) != 0; }
+    bool IsPermanent(void) const { return ( m_sid_tid&0x10000 ) != 0; }
     uint GetComposite(void) const { return m_sid_tid; }
   private:
     uint m_pid     {0};

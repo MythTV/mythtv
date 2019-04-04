@@ -181,13 +181,13 @@ class SegmentationDescriptor : public SpliceDescriptor
             QChar(_data[8]) + QChar(_data[9]);
     }
     // segmentation_event_cancel_indicator 1 10.0
-    bool IsSegmentationEventCancel(void) const { return _data[10] & 0x80; }
+    bool IsSegmentationEventCancel(void) const { return ( _data[10] & 0x80 ) != 0; }
     // reserved                 7  10.1
     // if (segmentation_event_cancel_indicator == ‘0’) {
     //   program_seg_flag       1  11.0
-    bool IsProgramSegmentation(void) const { return _data[11] & 0x80; }
+    bool IsProgramSegmentation(void) const { return ( _data[11] & 0x80 ) != 0; }
     //   seg_duration_flag      1  11.1
-    bool HasSegmentationDuration(void) const { return _data[11] & 0x40; }
+    bool HasSegmentationDuration(void) const { return ( _data[11] & 0x40 ) != 0; }
     //   reserved               6  11.2
     //   if (program_segmentation_flag == ‘0’) {
     //     component_count      8  12

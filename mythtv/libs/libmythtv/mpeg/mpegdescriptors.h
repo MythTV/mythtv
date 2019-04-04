@@ -358,21 +358,21 @@ class AVCVideoDescriptor : public MPEGDescriptor
     // profile_idc              8   2.0
     uint ProfileIDC(void)         const { return _data[2]; }
     // constraint_set0_flag     1   3.0
-    bool ConstaintSet0(void)      const { return _data[3]&0x80; }
+    bool ConstaintSet0(void)      const { return ( _data[3]&0x80 ) != 0; }
     // constraint_set1_flag     1   3.1
-    bool ConstaintSet1(void)      const { return _data[3]&0x40; }
+    bool ConstaintSet1(void)      const { return ( _data[3]&0x40 ) != 0; }
     // constraint_set2_flag     1   3.2
-    bool ConstaintSet2(void)      const { return _data[3]&0x20; }
+    bool ConstaintSet2(void)      const { return ( _data[3]&0x20 ) != 0; }
     // AVC_compatible_flags     5   3.3
     uint AVCCompatible(void)      const { return _data[3]&0x1f; }
     // level_idc                8   4.0
     uint LevelIDC(void)           const { return _data[4]; }
     // AVC_still_present        1   5.0
-    bool AVCStill(void)           const { return _data[5]&0x80; }
+    bool AVCStill(void)           const { return ( _data[5]&0x80 ) != 0; }
     // AVC_24_hour_picture_flag 1   5.1
-    bool AVC24HourPicture(void)   const { return _data[5]&0x40; }
+    bool AVC24HourPicture(void)   const { return ( _data[5]&0x40 ) != 0; }
     bool FramePackingSEINotPresentFlag(void)
-                                  const { return _data[5]&0x20; }
+                                  const { return ( _data[5]&0x20 ) != 0; }
     // reserved 6 bslbf
     QString toString() const override; // MPEGDescriptor
 };
@@ -387,7 +387,7 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x
     // descriptor_length        8   1.0
     // hrd_management_valid     1   2.0
-    bool HRDManagementValid(void)      const { return _data[2]&0x80; }
+    bool HRDManagementValid(void)      const { return ( _data[2]&0x80 ) != 0; }
     // reserved                 6   2.1
     // picture_and_timing_info_present 1 2.7
     bool HasPictureAndTimingInfo(void) const { return _data[2]&0x01;}
@@ -420,7 +420,7 @@ class HEVCVideoDescriptor : public MPEGDescriptor
     // profile_space                     2   2.0
     uint ProfileSpace(void)       const { return _data[2]&0xC0 >> 6; }
     // tier_flag                         1   2.2
-    bool Tier(void)               const { return _data[2]&0x20; }
+    bool Tier(void)               const { return ( _data[2]&0x20 ) != 0; }
     // profile_idc                       5   2.3
     uint ProfileIDC(void)         const { return _data[2] >> 3; }
     // profile_compatibility_indication 32   3.0
