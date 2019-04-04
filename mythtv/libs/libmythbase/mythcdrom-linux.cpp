@@ -633,7 +633,6 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                     return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                 }
                 return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
-                break;
             }
             case CDS_AUDIO:
                 LOG(VB_MEDIA, LOG_DEBUG, "found an audio disk");
@@ -641,7 +640,6 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 m_Status = MEDIASTAT_NOTMOUNTED;
                 m_MediaType = MEDIATYPE_AUDIO;
                 return setStatus(MEDIASTAT_USEABLE, OpenedHere);
-                break;
             case CDS_MIXED:
                 LOG(VB_MEDIA, LOG_DEBUG, "found a mixed CD");
                 // Note: Mixed mode CDs require an explixit mount call
