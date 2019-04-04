@@ -60,6 +60,9 @@ class NuppelDecoder : public DecoderBase
     MythCodecID GetVideoCodecID(void) const override; // DecoderBase
 
   private:
+    NuppelDecoder(const NuppelDecoder &) = delete;            // not copyable
+    NuppelDecoder &operator=(const NuppelDecoder &) = delete; // not copyable
+
     inline bool ReadFileheader(struct rtfileheader *fh);
     inline bool ReadFrameheader(struct rtframeheader *fh);
 

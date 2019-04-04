@@ -50,6 +50,9 @@ class MTV_PUBLIC Jitterometer
     QString GetCPUStat(void);
 
  private:
+    Jitterometer(const Jitterometer &) = delete;            // not copyable
+    Jitterometer &operator=(const Jitterometer &) = delete; // not copyable
+
     int                 m_count           {0};
     int                 m_num_cycles;
     struct timeval      m_starttime;

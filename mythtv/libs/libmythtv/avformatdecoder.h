@@ -187,6 +187,10 @@ class AvFormatDecoder : public DecoderBase
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
+  private:
+    AvFormatDecoder(const AvFormatDecoder &) = delete;            // not copyable
+    AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 

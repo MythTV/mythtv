@@ -27,6 +27,10 @@ class VDALibrary
     CFStringRef           *decoderConfigAVCCData;
     QLibrary *m_lib;
     bool      m_valid;
+
+private:
+    VDALibrary(const VDALibrary &) = delete;            // not copyable
+    VDALibrary &operator=(const VDALibrary &) = delete; // not copyable
 };
 
 class VDAFrame

@@ -102,7 +102,7 @@ public:
 
 class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 {
-    Q_OBJECT
+    Q_OBJECT;
 
   public:
     // Use this function to instantiate a guidegrid instance.
@@ -176,6 +176,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void updateJumpToChannel(void);
 
   private:
+
+    Q_DISABLE_COPY(GuideGrid);
 
     enum MoveVector {
         kScrollUp,

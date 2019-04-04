@@ -162,6 +162,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     LoggingItem(const char *_file, const char *_function,
                 int _line, LogLevel_t _level, LoggingType _type);
     ~LoggingItem();
+    Q_DISABLE_COPY(LoggingItem);
 };
 
 /// \brief The logging thread that consumes the logging queue and dispatches
@@ -182,6 +183,7 @@ class LoggerThread : public QObject, public MThread
     void handleItem(LoggingItem *item);
     void fillItem(LoggingItem *item);
   private:
+    Q_DISABLE_COPY(LoggerThread);
     QWaitCondition *m_waitNotEmpty {nullptr};
                                     ///< Condition variable for waiting
                                     ///  for the queue to not be empty

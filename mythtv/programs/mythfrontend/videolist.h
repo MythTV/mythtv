@@ -54,6 +54,9 @@ class VideoList
     void InvalidateCache();
 
   private:
+    VideoList(const VideoList &) = delete;            // not copyable
+    VideoList &operator=(const VideoList &) = delete; // not copyable
+
     class VideoListImp *m_imp;
 };
 

@@ -33,6 +33,10 @@ class HLSStreamHandler : public IPTVStreamHandler
 
     void run(void) override; // MThread
 
+  private:
+    HLSStreamHandler(const HLSStreamHandler &) = delete;            // not copyable
+    HLSStreamHandler &operator=(const HLSStreamHandler &) = delete; // not copyable
+
   protected:
     HLSReader*     m_hls        {nullptr};
     uint8_t*       m_readbuffer {nullptr};

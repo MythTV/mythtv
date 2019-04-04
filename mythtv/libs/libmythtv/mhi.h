@@ -261,6 +261,10 @@ class MHIText : public MHTextDisplay
  */
 class MHIBitmap : public MHBitmapDisplay
 {
+  private:
+    MHIBitmap(const MHIBitmap &) = delete;            // not copyable
+    MHIBitmap &operator=(const MHIBitmap &) = delete; // not copyable
+
   public:
     MHIBitmap(MHIContext *parent, bool tiled);
     virtual ~MHIBitmap();

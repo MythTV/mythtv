@@ -82,6 +82,10 @@ class AudioOutputWinPrivate
     static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
                                      DWORD dwParam1, DWORD dwParam2);
 
+  private:
+    AudioOutputWinPrivate(const AudioOutputWinPrivate &) = delete;            // not copyable
+    AudioOutputWinPrivate &operator=(const AudioOutputWinPrivate &) = delete; // not copyable
+
   public:
     HWAVEOUT  m_hWaveOut {nullptr};
     WAVEHDR  *m_WaveHdrs {nullptr};

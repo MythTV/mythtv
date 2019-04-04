@@ -73,6 +73,10 @@ int dfd_no_data_notification(void *callback_data);
 
 class DFDPriv
 {
+private:
+    DFDPriv(const DFDPriv &) = delete;            // not copyable
+    DFDPriv &operator=(const DFDPriv &) = delete; // not copyable
+
   public:
     DFDPriv()
     {
