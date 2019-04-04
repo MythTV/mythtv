@@ -358,6 +358,7 @@ void EditMetadataDialog::fillWidgets()
 
     // No memory leak. MythUIButtonListItem adds the new item into
     // m_childList.
+    // cppcheck-suppress unreadVariable
     button = new MythUIButtonListItem(m_childList,tr("None"));
 
     // TODO: maybe make the title list have the same sort order

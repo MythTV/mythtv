@@ -1124,8 +1124,11 @@ void H264Parser::decode_SEI(GetBitContext *gb)
         {
           case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = get_ue_golomb(gb);
+            // cppcheck-suppress unreadVariable
             exact_match_flag = (get_bits1(gb) != 0u);
+            // cppcheck-suppress unreadVariable
             broken_link_flag = (get_bits1(gb) != 0u);
+            // cppcheck-suppress unreadVariable
             changing_group_slice_idc = get_bits(gb, 2);
             au_contains_keyframe_message = (recovery_frame_cnt == 0);
             if ((size - 12) > 0)

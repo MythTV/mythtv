@@ -451,8 +451,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QStringList::const_iterator sit = strlist.begin();
     while (sit != strlist.end())
     {
+        // cppcheck-suppress unreadVariable
         hostname   = *(sit++);
         directory  = *(sit++);
+        // cppcheck-suppress unreadVariable
         isLocalstr = *(sit++);
         fsID       = *(sit++);
         ++sit; // ignore dirID

@@ -62,7 +62,6 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         {
             bool okToSave = false;
             QString checkResult;
-            QString fn = GetShareDir() + "backend-config/";
 
             if (request->m_sBaseUrl == "/Config/Database")
             {

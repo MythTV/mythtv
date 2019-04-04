@@ -305,8 +305,6 @@ QString PlaybackBox::extract_job_state(const ProgramInfo &pginfo)
 
 QString PlaybackBox::extract_commflag_state(const ProgramInfo &pginfo)
 {
-    QString job = "default";
-
     // commflagged can be yes, no or processing
     if (m_jobQueue.IsJobRunning(JOB_COMMFLAG, pginfo.GetChanID(),
                                 pginfo.GetRecordingStartTime()))
@@ -4464,8 +4462,6 @@ void PlaybackBox::saveViewChanges()
 
 void PlaybackBox::showGroupFilter(void)
 {
-    QString dispGroup = ProgramInfo::i18n(m_recGroup);
-
     QStringList groupNames;
     QStringList displayNames;
     QStringList groups;
@@ -4475,7 +4471,6 @@ void PlaybackBox::showGroupFilter(void)
 
     m_recGroupType.clear();
 
-    uint items = 0;
     uint totalItems = 0;
 
     // Add the group entries
@@ -4491,8 +4486,8 @@ void PlaybackBox::showGroupFilter(void)
     {
         while (query.next())
         {
-            dispGroup = query.value(0).toString();
-            items     = query.value(1).toInt();
+            QString dispGroup = query.value(0).toString();
+            uint    items     = query.value(1).toInt();
 
             if ((dispGroup != "LiveTV" || (m_viewMask & VIEW_LIVETVGRP)) &&
                 (dispGroup != "Deleted"))
@@ -4526,8 +4521,8 @@ void PlaybackBox::showGroupFilter(void)
         int unknownCount = 0;
         while (query.next())
         {
-            items     = query.value(1).toInt();
-            dispGroup = query.value(0).toString();
+            uint    items     = query.value(1).toInt();
+            QString dispGroup = query.value(0).toString();
             if (dispGroup.isEmpty())
             {
                 unknownCount += items;
@@ -4548,8 +4543,8 @@ void PlaybackBox::showGroupFilter(void)
 
         if (unknownCount > 0)
         {
-            dispGroup = tr("Unknown");
-            items     = unknownCount;
+            QString dispGroup = tr("Unknown");
+            uint    items     = unknownCount;
             displayGroups += tr("%1 [%n item(s)]", nullptr, items).arg(dispGroup);
             groups += dispGroup;
 
@@ -5014,7 +5009,6 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     if (!item)
         return;
 
-    QString recgroup = item->GetData().toString();
     QString currentPassword = getRecGroupPassword(m_recGroup);
 
     PasswordChange *pwChanger = new PasswordChange(m_popupStack,

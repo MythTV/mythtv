@@ -485,7 +485,6 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     OpenGLFilter *temp = new OpenGLFilter();
 
     temp->numInputs = 1;
-    GLuint program = 0;
 
     if (filter == kGLFilterBicubic)
     {
@@ -501,7 +500,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         (((filter != kGLFilterNone) && (filter != kGLFilterResize)) ||
          ((gl_features & kGLSL) && (filter == kGLFilterResize))))
     {
-        program = AddFragmentProgram(filter);
+        GLuint program = AddFragmentProgram(filter);
         if (!program)
             success = false;
         else

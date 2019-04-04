@@ -792,11 +792,6 @@ static void mmx_i420_2vuy(
     int y_stride, int u_stride, int v_stride,
     int h_size, int v_size)
 {
-    const uint8_t *py1 = py;
-    const uint8_t *py2 = py;
-    const uint8_t *pu1 = pu;
-    const uint8_t *pv1 = pv;
-
     int x,y;
 
     if ((h_size % 16) || (v_size % 2))
@@ -813,10 +808,10 @@ static void mmx_i420_2vuy(
     {
         uint8_t *pi1 = image + 2*y * vuy_stride;
         uint8_t *pi2 = image + 2*y * vuy_stride + vuy_stride;
-        py1 = py + 2*y * y_stride;
-        py2 = py + 2*y * y_stride + y_stride;
-        pu1 = pu + y * u_stride;
-        pv1 = pv + y * v_stride;
+        const uint8_t *py1 = py + 2*y * y_stride;
+        const uint8_t *py2 = py + 2*y * y_stride + y_stride;
+        const uint8_t *pu1 = pu + y * u_stride;
+        const uint8_t *pv1 = pv + y * v_stride;
 
         for (x = 0; x < h_size / 16; x++)
         {

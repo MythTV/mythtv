@@ -485,7 +485,6 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 {
     bestmatch = -1;
     int match_val = INT_MIN;
-    int overlap = 0;
     int duration = m_starttime.secsTo(m_endtime);
 
     for (size_t i = 0; i < programs.size(); i++)
@@ -502,6 +501,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 
         /* determine overlap of both programs
          * we don't know which one starts first */
+        int overlap;
         if (m_starttime < programs[i].m_starttime)
             overlap = programs[i].m_starttime.secsTo(m_endtime);
         else if (m_starttime > programs[i].m_starttime)

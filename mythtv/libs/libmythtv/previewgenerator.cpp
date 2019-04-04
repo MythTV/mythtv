@@ -206,7 +206,6 @@ bool PreviewGenerator::RunReal(void)
 bool PreviewGenerator::Run(void)
 {
     QString msg;
-    QDateTime dtm = MythDate::current();
     QTime tm = QTime::currentTime();
     bool ok = false;
     QString command = GetAppBinDir() + "mythpreviewgen";

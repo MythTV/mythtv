@@ -3696,7 +3696,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         return;
     }
 
-    QString input   = request.input;
     QString channum = request.channel;
 
     bool ok1;

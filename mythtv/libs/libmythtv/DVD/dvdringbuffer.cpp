@@ -680,7 +680,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
-    bool            bReprocessing = false;
+    bool            bReprocessing;
     bool            waiting      = false;
 
     if (m_gotStop)

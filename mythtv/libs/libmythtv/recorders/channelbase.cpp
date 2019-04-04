@@ -797,7 +797,6 @@ ChannelBase *ChannelBase::CreateChannel(
         return nullptr;
     }
 
-    QString input = CardUtil::GetInputName(tvrec->GetInputId());
     QString channum = startchannel;
     channel->Init(channum, setchan);
 

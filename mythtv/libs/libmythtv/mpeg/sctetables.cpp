@@ -269,7 +269,6 @@ QString NetworkTextTable::toString(void) const
 QString NetworkTextTable::toStringXML(uint indent_level) const
 {
     QString indent_0 = xml_indent(indent_level);
-    QString indent_1 = xml_indent(indent_level + 1);
 
     QString str = indent_0 + "<NetworkTextSection ";
     str += QString("iso_639_language_code=\"%1\" ").arg(LanguageString());

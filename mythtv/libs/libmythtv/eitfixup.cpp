@@ -430,8 +430,6 @@ QString EITFixUp::AddDVBEITAuthority(uint chanid, const QString &id)
  */
 void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 {
-    QString tmp;
-
     // A 0x0D character is present between the content
     // and the subtitle if its present
     int position = event.m_description.indexOf(0x0D);
@@ -508,7 +506,6 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     position = event.m_description.indexOf(m_bellYear);
     if (position != -1 && !event.m_category.isEmpty())
     {
-        tmp = "";
         // Parse out the year
         bool ok;
         uint y = event.m_description.mid(position + 1, 4).toUInt(&ok);
@@ -522,7 +519,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
         // Get the actors if they exist
         if (position > 3)
         {
-            tmp = event.m_description.left(position-3);
+            QString tmp = event.m_description.left(position-3);
             QStringList actors =
                 tmp.split(m_bellActors, QString::SkipEmptyParts);
             QStringList::const_iterator it = actors.begin();

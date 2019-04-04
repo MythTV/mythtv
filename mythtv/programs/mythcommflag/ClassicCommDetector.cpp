@@ -411,7 +411,6 @@ bool ClassicCommDetector::go()
     float flagFPS;
     long long  currentFrameNumber = 0LL;
     float aspect = m_player->GetVideoAspect();
-    float newAspect = aspect;
     int prevpercent = -1;
 
     SetVideoParams(aspect);
@@ -433,7 +432,7 @@ bool ClassicCommDetector::go()
         //when the aspect ratio changes.
         //In order to not change too many things at a time, I"m using basic
         //polling for now.
-        newAspect = currentFrame->aspect;
+        float newAspect = currentFrame->aspect;
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);

@@ -882,6 +882,7 @@ void PlaybackProfileItemConfig::Load(void)
     QStringList::const_iterator itr = decr.begin();
     QStringList::const_iterator itn = decn.begin();
     m_decoder->clearSelections();
+    m_decoder->setHelpText(dech);
     for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
     {
         m_decoder->addSelection(*itn, *itr, (*itr == pdecoder));

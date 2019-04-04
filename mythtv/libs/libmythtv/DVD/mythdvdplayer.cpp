@@ -379,7 +379,6 @@ uint64_t MythDVDPlayer::GetBookmark(void)
     if (gCoreContext->IsDatabaseIgnored() || !player_ctx->m_buffer->IsDVD())
         return 0;
 
-    QStringList dvdbookmark = QStringList();
     QString name;
     QString serialid;
     uint64_t frames = 0;
@@ -392,7 +391,7 @@ uint64_t MythDVDPlayer::GetBookmark(void)
             return 0;
         }
 
-        dvdbookmark = player_ctx->m_playingInfo->QueryDVDBookmark(serialid);
+        QStringList dvdbookmark = player_ctx->m_playingInfo->QueryDVDBookmark(serialid);
 
         if (!dvdbookmark.empty())
         {

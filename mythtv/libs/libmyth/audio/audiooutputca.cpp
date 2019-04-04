@@ -937,7 +937,7 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
     }
 
     // iterate through the ranges and add the minimum, maximum, and common rates in between
-    UInt32 theFirstIndex = 0, theLastIndex = 0;
+    UInt32 theFirstIndex, theLastIndex = 0;
     for(UInt32 i = 0; i < listSize / sizeof(AudioValueRange); i++)
     {
         theFirstIndex = theLastIndex;

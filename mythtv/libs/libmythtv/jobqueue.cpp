@@ -1687,7 +1687,6 @@ bool JobQueue::InJobRunWindow(QDateTime jobstarttsRaw)
 void JobQueue::ProcessJob(const JobQueueEntry& job)
 {
     int jobID = job.id;
-    QString name = QString("jobqueue%1%2").arg(jobID).arg(random());
 
     if (!MSqlQuery::testDBConnection())
     {

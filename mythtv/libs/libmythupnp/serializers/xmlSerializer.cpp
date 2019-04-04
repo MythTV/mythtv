@@ -250,10 +250,8 @@ void XmlSerializer::RenderList( const QString &sName, const QVariantList &list )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::RenderStringList( const QString &sName, const QStringList &list )
+void XmlSerializer::RenderStringList( const QString &/*sName*/, const QStringList &list )
 {
-    QString sItemName = GetItemName( sName );
-
     QListIterator< QString > it( list );
 
     while (it.hasNext())

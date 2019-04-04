@@ -2158,8 +2158,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     bool ok = false;
     if (TRANSITION(kState_None, kState_WatchingLiveTV))
     {
-        QString name = "";
-
         ctx->m_lastSignalUIInfo.clear();
 
         ctx->m_recorder->Setup();
@@ -10401,7 +10399,9 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, const QString& action)
  */
 void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap) const
 {
+#if 0
     const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
+#endif
 
     // fill in uninitialized and unchanged fields from XDS
     ChannelEditXDSFill(ctx, infoMap);

@@ -123,8 +123,6 @@ bool FillData::GrabData(const Source& source, int offset)
 
     QString filename = QString(tempfilename);
 
-    QString home = QDir::homePath();
-
     QString configfile;
 
     MSqlQuery query1(MSqlQuery::InitCon());

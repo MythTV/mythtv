@@ -2489,9 +2489,7 @@ void CaptureCard::deleteEntry(void)
 void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
-    QString init_type = CardUtil::GetRawInputType(init_cardid);
     QString init_dev = CardUtil::GetVideoDevice(init_cardid);
-    QString init_input = CardUtil::GetInputName(init_cardid);
 
     ////////
 
@@ -3322,7 +3320,6 @@ void CardInput::loadByInput(int _cardid, const QString& _inputname)
 void CardInput::Save(void)
 {
     uint cardid = m_id->getValue().toUInt();
-    QString init_input = CardUtil::GetInputName(cardid);
     GroupSetting::Save();
     m_externalInputSettings->Store(getInputID());
 

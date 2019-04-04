@@ -2552,6 +2552,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (codec_is_vdpau(vdpau_mcid))
                 {
                     m_video_codec_id = vdpau_mcid;
+                    // cppcheck-suppress unreadVariable
                     foundgpudecoder = true;
                 }
 #endif // USING_VDPAU
@@ -2587,6 +2588,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     {
                         m_video_codec_id = dxva2_mcid;
                         enc->pix_fmt = pix_fmt;
+                        // cppcheck-suppress unreadVariable
                         foundgpudecoder = true;
                     }
                 }

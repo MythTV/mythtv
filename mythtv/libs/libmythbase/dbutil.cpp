@@ -520,7 +520,6 @@ bool DBUtil::CreateTemporaryDBConf(
     bool ok = true;
     filename = createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX");
     const QByteArray     tmpfile     = filename.toLocal8Bit();
-    const DatabaseParams dbParams    = gCoreContext->GetDatabaseParams();
 
     FILE *fp = fopen(tmpfile.constData(), "w");
     if (!fp)

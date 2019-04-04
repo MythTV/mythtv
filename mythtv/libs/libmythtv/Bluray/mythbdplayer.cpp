@@ -414,7 +414,6 @@ uint64_t MythBDPlayer::GetBookmark(void)
     if (gCoreContext->IsDatabaseIgnored() || !player_ctx->m_buffer->IsBD())
         return 0;
 
-    QStringList bdbookmark = QStringList();
     QString name;
     QString serialid;
     uint64_t frames = 0;
@@ -429,7 +428,7 @@ uint64_t MythBDPlayer::GetBookmark(void)
             return 0;
         }
 
-        bdbookmark = player_ctx->m_playingInfo->QueryBDBookmark(serialid);
+        QStringList bdbookmark = player_ctx->m_playingInfo->QueryBDBookmark(serialid);
 
         if (!bdbookmark.empty())
         {

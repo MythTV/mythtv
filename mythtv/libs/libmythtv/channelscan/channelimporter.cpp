@@ -1318,6 +1318,7 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
         if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
             break;
     }
+    // cppcheck-suppress unreadVariable
     last_free_chan_num_map[chan.m_source_id] = last_free_chan_num;
 
     return chan_num;

@@ -600,7 +600,6 @@ void VideoOutputD3D::ShowPIP(VideoFrame */*frame*/,
     }
 
     QRect position = GetPIPRect(loc, pipplayer);
-    QRect dvr = window.GetDisplayVisibleRect();
 
     m_pip_ready[pipplayer] = false;
     D3D9Image *m_pip = m_pips[pipplayer];

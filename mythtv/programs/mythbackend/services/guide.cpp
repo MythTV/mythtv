@@ -95,8 +95,10 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                        "AND program.starttime >= :STARTDATELIMIT "
                        "AND program.manualid = 0"; // Omit 'manual' recordings scheds
 
+#if 0
     QString sGroupBy = "program.starttime, channel.channum,"
                        "channel.callsign, program.title";
+#endif
 
     QString sOrderBy = "program.starttime";
 

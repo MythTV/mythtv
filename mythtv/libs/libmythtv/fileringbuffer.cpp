@@ -343,16 +343,14 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             dirName = m_filename.left(dirPos);
         }
 
-        QString baseName  = tmpSubName;
-        QString extension = tmpSubName;
         QStringList auxFiles;
 
         int suffixPos = tmpSubName.lastIndexOf(QChar('.'));
         if (suffixPos > 0)
         {
-            baseName = tmpSubName.left(suffixPos);
+            QString baseName = tmpSubName.left(suffixPos);
             int extnleng = tmpSubName.size() - baseName.size() - 1;
-            extension = tmpSubName.right(extnleng);
+            QString extension = tmpSubName.right(extnleng);
 
             if (is_subtitle_possible(extension))
             {

@@ -418,6 +418,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     {
         if (IsAudioNeeded())
         {
+            // cppcheck-suppress unreadVariable
             QString errMsg = audio->ReinitAudio();
         }
     }
@@ -820,13 +821,14 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
 
     if (m_tvchain)
     {
+#if 0
         QString seed = QString("");
 
         if (IsPIP())
             seed = "PIP";
 
         seed += gCoreContext->GetHostName();
-
+#endif
         m_tvchain->InitializeNewChain(gCoreContext->GetHostName());
     }
 }

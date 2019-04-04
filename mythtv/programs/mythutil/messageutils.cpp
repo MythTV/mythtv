@@ -56,7 +56,6 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
 {
     QHostAddress address = QHostAddress::Broadcast;
     unsigned short port = 6948;
-    QString name = cmdline.GetPassthrough();
     bool notification = cmdline.toBool("notification");
     QString text /* = "message" */ ;
     QString timeout = "0";

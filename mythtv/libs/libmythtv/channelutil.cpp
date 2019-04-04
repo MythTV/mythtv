@@ -2143,8 +2143,6 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     static QMutex sepExprLock;
     static const QRegExp sepExpr(ChannelUtil::kATSCSeparators);
 
-    int cmp = 0;
-
     bool isIntA, isIntB;
     int a_int   = a.m_channum.toUInt(&isIntA);
     int b_int   = b.m_channum.toUInt(&isIntB);
@@ -2197,6 +2195,7 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     {
         int a_maj = (!a_minor && isIntA) ? a_int : a_major;
         int b_maj = (!b_minor && isIntB) ? b_int : b_major;
+        int cmp;
         if ((cmp = a_maj - b_maj))
             return cmp < 0;
 
@@ -2207,7 +2206,7 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     if (isIntA && isIntB)
     {
         // both channels have a numeric channum
-        cmp = a_int - b_int;
+        int cmp = a_int - b_int;
         if (cmp)
             return cmp < 0;
     }
@@ -2219,7 +2218,7 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     else
     {
         // neither of channels have a numeric channum
-        cmp = naturalCompare(a.m_channum, b.m_channum);
+        int cmp = naturalCompare(a.m_channum, b.m_channum);
         if (cmp)
             return cmp < 0;
     }

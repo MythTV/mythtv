@@ -2154,7 +2154,6 @@ void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
 
     QStringList outputlist(QString::number(destination.size()));
     QMap<QString, int> backendPortMap;
-    QString ip   = gCoreContext->GetBackendServerIP();
     int port = gCoreContext->GetBackendServerPort();
     QString host = gCoreContext->GetHostName();
 
@@ -2343,12 +2342,14 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     m_deletelock.lock();
 
+#if 0
     QString logInfo = QString("recording id %1 (chanid %2 at %3)")
         .arg(ds->m_recordedid)
         .arg(ds->m_chanid)
         .arg(ds->m_recstartts.toString(Qt::ISODate));
 
     QString name = QString("deleteThread%1%2").arg(getpid()).arg(random());
+#endif
     QFile checkFile(ds->m_filename);
 
     if (!MSqlQuery::testDBConnection())
@@ -2500,14 +2501,11 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
             QString("Error querying recordedfiles for %1.") .arg(logInfo));
     }
 
-    QString basename;
-    QString hostname;
-    QString storagegroup;
     while (query.next())
     {
-        basename = query.value(0).toString();
-        hostname = query.value(1).toString();
-        storagegroup = query.value(2).toString();
+        QString basename = query.value(0).toString();
+        //QString hostname = query.value(1).toString();
+        //QString storagegroup = query.value(2).toString();
         bool deleteInDB = false;
 
         if (basename == QFileInfo(ds->m_filename).fileName())
@@ -2626,7 +2624,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
                            bool deleteBrokenSymlinks)
 {
     QFileInfo finfo(filename);
-    int fd = -1, err = 0;
+    int fd = -1;
     QString linktext = "";
     QByteArray fname = filename.toLocal8Bit();
 
@@ -2659,7 +2657,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     }
     else // just delete symlinks immediately
     {
-        err = unlink(fname.constData());
+        int err = unlink(fname.constData());
         if (err == 0)
             return -2; // valid result, not an error condition
     }
@@ -3090,8 +3088,10 @@ void MainServer::DoHandleDeleteRecording(
     }
     else
     {
+#if 0
         QString logInfo = QString("chanid %1")
             .arg(recinfo.toString(ProgramInfo::kRecordingKey));
+#endif
 
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("ERROR when trying to delete file: %1. File doesn't "
@@ -5251,7 +5251,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
     maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     QList<FileSystemInfo>::iterator it1, it2;
-    int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
@@ -5265,7 +5264,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         {
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
-            bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
+            int bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
             int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
             int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
             if (diffSize < 0)

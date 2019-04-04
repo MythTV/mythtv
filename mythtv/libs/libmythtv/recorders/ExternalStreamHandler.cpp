@@ -491,7 +491,6 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
 {
     QMutexLocker locker(&s_handlers_lock);
 
-    QString devname = ref->m_device;
     int majorid = ref->m_majorid;
 
     QMap<int, uint>::iterator rit = s_handlers_refcnt.find(majorid);

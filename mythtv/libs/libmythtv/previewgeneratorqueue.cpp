@@ -245,11 +245,10 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             outputfile = (*it++);
         if (it != list.end())
             time = (*it++).toLongLong();
-        QString fn;
         if (it != list.end())
         {
             bool time_fmt_sec = (*it++).toInt() != 0;
-            fn = GeneratePreviewImage(evinfo, outputsize, outputfile,
+            GeneratePreviewImage(evinfo, outputsize, outputfile,
                                       time, time_fmt_sec, token);
         }
         return true;
