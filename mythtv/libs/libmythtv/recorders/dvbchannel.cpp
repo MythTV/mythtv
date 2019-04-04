@@ -229,8 +229,8 @@ bool DVBChannel::Open(DVBChannel *who)
     }
     ReturnMasterLock(master); // if we're the master we don't need this lock..
 
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
-    QByteArray devn = devname.toLatin1();
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
+    QByteArray devn = dvbdev.toLatin1();
 
     for (int tries = 1; ; ++tries)
     {
@@ -268,7 +268,7 @@ bool DVBChannel::Open(DVBChannel *who)
     m_symbol_rate_minimum = info.symbol_rate_min;
     m_symbol_rate_maximum = info.symbol_rate_max;
 
-    CardUtil::SetDeliverySystem(m_inputid, m_fd_frontend);
+    CardUtil::SetDefaultDeliverySystem(m_inputid, m_fd_frontend);
     m_tunerType = CardUtil::ProbeTunerType(m_fd_frontend);
 
     LOG(VB_RECORD, LOG_INFO, LOC +

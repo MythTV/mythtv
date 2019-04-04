@@ -375,9 +375,10 @@ class MTV_PUBLIC CardUtil
         { return "DVB" == GetRawInputType(inputid); }
     static bool         IsDVBInputType(const QString &inputType);
     static QString      ProbeDVBFrontendName(const QString &device);
+    static QStringList  ProbeDeliverySystems(int fd_frontend);
     static QStringList  ProbeDeliverySystems(const QString &device);
-    static DTVModulationSystem ProbeDeliverySystem(int fd_frontend);
-    static DTVModulationSystem ProbeDeliverySystem(const QString &device);
+    static DTVModulationSystem ProbeCurrentDeliverySystem(int fd_frontend);
+    static DTVModulationSystem ProbeCurrentDeliverySystem(const QString &device);
     static DTVTunerType ProbeTunerType(int fd_frontend);
     static DTVTunerType ProbeTunerType(const QString &device);
     static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
@@ -388,6 +389,7 @@ class MTV_PUBLIC CardUtil
     static uint         GetMinSignalMonitoringDelay(const QString &device);
     static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
     static InputNames   GetConfiguredDVBInputs(const QString &device);
+    static int          SetDefaultDeliverySystem(uint inputid, int fd);
     static int          SetDeliverySystem(uint inputid);
     static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys);
     static int          SetDeliverySystem(uint inputid, int fd);
