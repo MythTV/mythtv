@@ -104,7 +104,7 @@ bool CetonRTSP::ProcessRequest(
     {
         for(int i = 0; i < headers->count(); i++)
         {
-            QString header = headers->at(i);
+            const QString& header = headers->at(i);
             requestHeaders.append(header);
         }
     }

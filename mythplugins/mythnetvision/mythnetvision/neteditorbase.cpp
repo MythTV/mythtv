@@ -171,7 +171,7 @@ void NetEditorBase::CreateBusyDialog(QString title)
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "mythvideobusydialog");

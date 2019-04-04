@@ -1199,7 +1199,7 @@ class dirhandler : public DirectoryHandler
     {
         (void) file_name;
         (void) extension;
-        QString file_string(fq_file_name);
+        const QString& file_string(fq_file_name);
 
         VideoMetadataListManager::VideoMetadataPtr myData(
             new VideoMetadata(file_string));

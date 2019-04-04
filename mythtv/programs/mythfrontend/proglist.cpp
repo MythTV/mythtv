@@ -392,7 +392,7 @@ void ProgLister::UpdateKeywordInDB(const QString &text, const QString &oldValue)
 
     if (newview < 0)
     {
-        QString qphrase = text;
+        const QString& qphrase = text;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -843,7 +843,7 @@ void ProgLister::FillViewList(const QString &view)
 
             if (m_curView < 0)
             {
-                QString qphrase = view;
+                const QString& qphrase = view;
 
                 MSqlQuery query2(MSqlQuery::InitCon());
                 query2.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -1652,7 +1652,7 @@ void ProgLister::customEvent(QEvent *event)
     else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (m_allowViewDialog && message == "CHOOSE_VIEW")
             ShowChooseViewMenu();

@@ -35,7 +35,7 @@ VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname, ui
     QStringList list = videoDev.split('-');
     if (list.count() == 3)
     {
-        QString tunerType = list.at(2);
+        const QString& tunerType = list.at(2);
         if (tunerType == "DVBT")
             m_transType = "T";
         else if (tunerType == "DVBT/T2")
@@ -165,7 +165,7 @@ void VBoxChannelFetcher::run(void)
     vbox_chan_map_t::const_iterator it = m_channels->begin();
     for (uint i = 1; it != m_channels->end(); ++it, ++i)
     {
-        QString channum   = it.key();
+        const QString& channum   = it.key();
         QString name      = (*it).m_name;
         QString xmltvid   = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
         uint serviceID    = (*it).m_serviceID;

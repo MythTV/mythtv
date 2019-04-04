@@ -125,7 +125,7 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     for (i = extras.begin(); i != extras.end(); ++i)
     {
         QString kv_name = i.key();
-        QString kv_value = i.value();
+        const QString& kv_value = i.value();
 
         kv_name.replace("--", "");
         cerr << "name: " << kv_name.toLocal8Bit().constData()

@@ -121,7 +121,7 @@ bool MHIContext::LoadFont(QString name)
     if (!errorC)
         return true;
 
-    QString fullnameD = name;
+    const QString& fullnameD = name;
     QByteArray fnameD = fullnameD.toLatin1();
     FT_Error errorD = FT_New_Face(ft_library, fnameD.constData(), 0, &m_face);
     if (!errorD)

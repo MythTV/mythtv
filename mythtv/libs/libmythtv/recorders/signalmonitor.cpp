@@ -399,7 +399,7 @@ void SignalMonitor::SendMessage(
     SignalMonitorMessageType type, const SignalMonitorValue &value)
 {
     m_statusLock.lock();
-    SignalMonitorValue val = value;
+    const SignalMonitorValue& val = value;
     m_statusLock.unlock();
 
     QMutexLocker locker(&m_listenerLock);

@@ -738,7 +738,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
 
     for (int i = 0; i < list.size(); ++i)
     {
-        QFileInfo fileInfo = list.at(i);
+        const QFileInfo& fileInfo = list.at(i);
 
         if (fileInfo.fileName().contains(partialKey))
         {

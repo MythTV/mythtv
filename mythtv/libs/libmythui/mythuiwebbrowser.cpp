@@ -245,7 +245,7 @@ void BrowserApi::customEvent(QEvent *e)
     if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (!message.startsWith("MUSIC_CONTROL"))
             return;

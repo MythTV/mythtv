@@ -1366,7 +1366,7 @@ void MetadataOptions::CreateBusyDialog(QString title)
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "metaoptsdialog");
@@ -1649,7 +1649,7 @@ void MetadataOptions::HandleDownloadedImages(MetadataLookup *lookup)
     for (DownloadMap::const_iterator i = map.begin(); i != map.end(); ++i)
     {
         VideoArtworkType type = i.key();
-        ArtworkInfo info = i.value();
+        const ArtworkInfo& info = i.value();
 
         if (type == kArtworkCoverart)
             m_artworkMap.replace(kArtworkCoverart, info);

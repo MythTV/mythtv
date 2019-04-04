@@ -1000,7 +1000,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
         for (int nIdx = 0; nIdx < previewFiles.size(); nIdx++)
         {
-            QFileInfo previewFile = previewFiles.at(nIdx);
+            const QFileInfo& previewFile = previewFiles.at(nIdx);
             QString oldFileName = previewFile.absoluteFilePath();
 
             // Delete previews if cutlist was applied.  They will be re-created as

@@ -1863,7 +1863,7 @@ void GuideGrid::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message == "SCHEDULE_CHANGE")
         {

@@ -1862,7 +1862,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         }
         else
         {
-            QString inskey = keybind;
+            const QString& inskey = keybind;
 
             query.prepare("INSERT INTO keybindings (context, action, "
                           "description, keylist, hostname) VALUES "
@@ -2000,7 +2000,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
         }
         else
         {
-            QString inskey = keybind;
+            const QString& inskey = keybind;
 
             query.prepare("INSERT INTO jumppoints (destination, description, "
                           "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
@@ -2797,7 +2797,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::MythUserMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (!message.isEmpty())
             ShowOkPopup(message);

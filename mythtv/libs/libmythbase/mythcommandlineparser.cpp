@@ -2531,7 +2531,7 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
 
     if (!m_namedArgs.contains(key))
     {
-        QVariant val(value);
+        const QVariant& val(value);
         arg = new CommandLineArg(key, val.type(), val);
         m_namedArgs.insert(key, arg);
     }

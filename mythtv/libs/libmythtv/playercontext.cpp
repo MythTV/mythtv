@@ -515,7 +515,7 @@ void PlayerContext::PushPreviousChannel(void)
     if (m_prevChan.empty() ||
         curChan != m_prevChan[m_prevChan.size() - 1])
     {
-        QString chan = curChan;
+        const QString& chan = curChan;
         m_prevChan.push_back(chan);
     }
 }

@@ -97,7 +97,7 @@ QString SignalMonitorValue::GetShortName(void) const
 bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
 {
     m_name = _name;
-    QString longString = _longString;
+    const QString& longString = _longString;
 
     if (m_name.isEmpty() || longString.isEmpty())
         return false;

@@ -1141,9 +1141,9 @@ void MainServer::customEvent(QEvent *e)
         {
             bool ok = true;
             uint recordingID  = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
-            QString filename  = me->ExtraData(1); // outFileName
-            QString msg       = me->ExtraData(2);
-            QString datetime  = me->ExtraData(3);
+            const QString& filename  = me->ExtraData(1); // outFileName
+            const QString& msg       = me->ExtraData(2);
+            const QString& datetime  = me->ExtraData(3);
 
             if (message == "PREVIEW_QUEUED")
             {
@@ -1170,7 +1170,7 @@ void MainServer::customEvent(QEvent *e)
 
                 for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
                 {
-                    QString token = me->ExtraData(i);
+                    const QString& token = me->ExtraData(i);
                     extra.push_back(token);
                     RequestedBy::iterator it = m_previewRequestedBy.find(token);
                     if (it != m_previewRequestedBy.end())
@@ -1201,15 +1201,15 @@ void MainServer::customEvent(QEvent *e)
 
         if (message == "PREVIEW_FAILED" && me->ExtraDataCount() >= 5)
         {
-            QString pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
-            QString msg       = me->ExtraData(2);
+            const QString& pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
+            const QString& msg       = me->ExtraData(2);
 
             QStringList extra("ERROR");
             extra.push_back(pginfokey);
             extra.push_back(msg);
             for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
             {
-                QString token = me->ExtraData(i);
+                const QString& token = me->ExtraData(i);
                 extra.push_back(token);
                 RequestedBy::iterator it = m_previewRequestedBy.find(token);
                 if (it != m_previewRequestedBy.end())
@@ -1402,7 +1402,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("RESCHEDULE_RECORDINGS") && m_sched)
         {
-            QStringList request = me->ExtraDataList();
+            const QStringList& request = me->ExtraDataList();
             m_sched->Reschedule(request);
             return;
         }
@@ -1447,7 +1447,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("LIVETV_EXITED"))
         {
-            QString chainid = me->ExtraData();
+            const QString& chainid = me->ExtraData();
             LiveTVChain *chain = GetExistingChain(chainid);
             if (chain)
                 DeleteChain(chain);

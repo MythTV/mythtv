@@ -352,7 +352,7 @@ void GalleryThumbView::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent  *me    = static_cast<MythEvent *>(event);
-        QString     mesg  = me->Message();
+        const QString&     mesg  = me->Message();
         QStringList extra = me->ExtraDataList();
 
         // Internal messages contain a hostname. Ignore other FE messages

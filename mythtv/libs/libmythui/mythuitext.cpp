@@ -135,7 +135,7 @@ void MythUIText::ResetMap(const InfoMap &map)
 
 void MythUIText::SetText(const QString &text)
 {
-    QString newtext = text;
+    const QString& newtext = text;
 
     if (!m_Layouts.isEmpty() && newtext == m_Message)
         return;

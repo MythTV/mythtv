@@ -828,7 +828,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
 
     QMutexLocker locker(&eitList_lock);
     QString title = event.m_title;
-    QString subtitle = ett;
+    const QString& subtitle = ett;
     db_events.enqueue(new DBEventEIT(chanid, title, subtitle,
                                      starttime, endtime,
                                      fixup.value(atsc_key), subtitle_type,

@@ -307,10 +307,10 @@ void BackendSelection::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me      = static_cast<MythEvent *>(event);
-        QString    message = me->Message();
-        QString    URI     = me->ExtraData(0);
-        QString    URN     = me->ExtraData(1);
-        QString    URL     = me->ExtraData(2);
+        const QString&    message = me->Message();
+        const QString&    URI     = me->ExtraData(0);
+        const QString&    URN     = me->ExtraData(1);
+        const QString&    URL     = me->ExtraData(2);
 
 
         LOG(VB_UPNP, LOG_DEBUG,

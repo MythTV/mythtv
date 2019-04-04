@@ -184,7 +184,7 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         throw QString( "EndTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime;
-    QDateTime dtEndTime = rawEndTime;
+    const QDateTime& dtEndTime = rawEndTime;
 
     if (!rawEndTime.isNull() && dtEndTime < dtStartTime)
         throw QString( "EndTime is before StartTime");

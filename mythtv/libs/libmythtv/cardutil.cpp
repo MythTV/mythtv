@@ -160,7 +160,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
             return false;
         }
 
-        QString ip_address = parts.at(0);
+        const QString& ip_address = parts.at(0);
 
         QStringList tuner_parts = parts.at(1).split(".");
         if (tuner_parts.size() != 2)

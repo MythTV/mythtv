@@ -790,7 +790,7 @@ void NetTree::UpdateCurrentItem(void)
         }
         else
         {
-            QString url = thumb;
+            const QString& url = thumb;
             QString title2;
             if (m_type == DLG_TREE)
                 title2 = m_siteMap->GetItemCurrent()->GetText();

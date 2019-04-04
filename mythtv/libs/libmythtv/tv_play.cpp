@@ -9667,7 +9667,7 @@ void TV::customEvent(QEvent *e)
     if (message.startsWith("SIGNAL"))
     {
         cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
-        QStringList signalList = me->ExtraDataList();
+        const QStringList& signalList = me->ExtraDataList();
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
@@ -12281,7 +12281,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
             {
                 const ProgramList &plist = *Iprog;
                 uint progIndex = (uint) plist.size();
-                QString group = Iprog.key();
+                const QString& group = Iprog.key();
 
                 if (plist[0]->GetRecordingGroup() != currecgroup)
                     SetLastProgram(plist[0]);

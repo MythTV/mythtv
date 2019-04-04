@@ -163,8 +163,8 @@ DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
     if (!sEndTime.isNull() && !sEndTime.isValid())
         throw QString("EndTime is invalid");
 
-    QDateTime dtStartTime = sStartTime;
-    QDateTime dtEndTime   = sEndTime;
+    const QDateTime& dtStartTime = sStartTime;
+    const QDateTime& dtEndTime   = sEndTime;
 
     if (!sEndTime.isNull() && dtEndTime < dtStartTime)
         throw QString("EndTime is before StartTime");

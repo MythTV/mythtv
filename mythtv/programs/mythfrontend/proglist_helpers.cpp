@@ -131,7 +131,7 @@ void PhrasePopup::deleteClicked(void)
         return;
 
     QString text = m_list[view];
-    QString qphrase = text;
+    const QString& qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM keyword "
@@ -312,7 +312,7 @@ void PowerSearchPopup::deleteClicked(void)
         return;
 
     QString text = m_list[view];
-    QString qphrase = text;
+    const QString& qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM keyword "

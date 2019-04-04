@@ -304,7 +304,7 @@ void V4LChannel::SetFreqTable(const int index)
 
 int V4LChannel::SetFreqTable(const QString &tablename)
 {
-    QString name = tablename;
+    const QString& name = tablename;
     bool use_default = (name.toLower() == "default" || name.isEmpty());
 
     int i = 0;

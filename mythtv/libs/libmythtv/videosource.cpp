@@ -1361,9 +1361,9 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     {
         QString dev = *it;
         QStringList devinfo = dev.split(" ");
-        QString devid = devinfo.at(0);
-        QString devip = devinfo.at(1);
-        QString model = devinfo.at(2);
+        const QString& devid = devinfo.at(0);
+        const QString& devip = devinfo.at(1);
+        const QString& model = devinfo.at(2);
 
         HDHomeRunDevice tmpdevice;
         tmpdevice.model    = model;
@@ -1556,7 +1556,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
     vector<QString> devs;
     QMap<QString, bool> in_use;
 
-    QString current = cur;
+    const QString& current = cur;
 
     VBoxDeviceList::iterator it = m_deviceList->begin();
     for (; it != m_deviceList->end(); ++it)
@@ -1903,10 +1903,10 @@ void VBoxConfigurationGroup::FillDeviceList(void)
     {
         QString dev = *it;
         QStringList devinfo = dev.split(" ");
-        QString id = devinfo.at(0);
-        QString ip = devinfo.at(1);
-        QString tunerNo = devinfo.at(2);
-        QString tunerType = devinfo.at(3);
+        const QString& id = devinfo.at(0);
+        const QString& ip = devinfo.at(1);
+        const QString& tunerNo = devinfo.at(2);
+        const QString& tunerType = devinfo.at(3);
 
         VBoxDevice tmpdevice;
         tmpdevice.deviceid   = id;

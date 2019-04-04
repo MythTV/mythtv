@@ -432,7 +432,7 @@ bool PreviewGenerator::event(QEvent *e)
     if (!ours)
         return false;
 
-    QString pginfokey = me->ExtraData(1);
+    const QString& pginfokey = me->ExtraData(1);
 
     QMutexLocker locker(&m_previewLock);
     m_gotReply = true;

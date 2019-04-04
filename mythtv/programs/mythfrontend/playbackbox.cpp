@@ -3990,7 +3990,7 @@ void PlaybackBox::customEvent(QEvent *event)
     else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message.startsWith("RECORDING_LIST_CHANGE"))
         {
@@ -4169,7 +4169,7 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             for (uint i = 4; i < (uint) me->ExtraDataCount(); i++)
             {
-                QString token = me->ExtraData(i);
+                const QString& token = me->ExtraData(i);
                 QSet<QString>::iterator it = m_preview_tokens.find(token);
                 if (it != m_preview_tokens.end())
                     m_preview_tokens.erase(it);
@@ -4275,8 +4275,8 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             VideoArtworkType type       = (VideoArtworkType) me->ExtraData(2).toInt();
             uint             recordingID = me->ExtraData(3).toUInt();
-            QString          group      = me->ExtraData(4);
-            QString          fn         = me->ExtraData(5);
+            const QString&   group       = me->ExtraData(4);
+            const QString&   fn          = me->ExtraData(5);
 
             if (recordingID)
             {

@@ -372,8 +372,8 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         }
         case kOrderByFilename:
         {
-            QString lhsfn = lhs.GetSortFilename();
-            QString rhsfn = rhs.GetSortFilename();
+            const QString& lhsfn = lhs.GetSortFilename();
+            const QString& rhsfn = rhs.GetSortFilename();
             ret = naturalCompare(lhsfn, rhsfn) < 0;
             break;
         }

@@ -257,7 +257,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                                 const GalleryFilter& flt, bool recurse,
                                 ThumbHash *itemHash, ThumbGenerator* thumbGen)
 {
-    QString blah = dir;
+    const QString& blah = dir;
     QDir d(blah);
     QString currDir = d.absolutePath();
     QStringList splitFD;

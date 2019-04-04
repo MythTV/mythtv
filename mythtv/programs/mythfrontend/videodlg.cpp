@@ -1408,7 +1408,7 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
 {
     QString icon_file;
-    QString host = metadata->GetHost();
+    const QString& host = metadata->GetHost();
     QFileInfo fullpath(metadata->GetFilename());
     QDir dir = fullpath.dir();
     QString prefix = QDir::cleanPath(dir.path());
@@ -1480,7 +1480,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
                     QUrl sgurl = *iter;
                     QString path = sgurl.path();
 
-                    QString subdir = prefix;
+                    const QString& subdir = prefix;
 
                     path = path + "/" + subdir;
                     QStringList tmpList;
@@ -1697,7 +1697,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                 }
                                 else
                                 {
-                                    QString test_file = metadata->GetCoverFile();
+                                    const QString& test_file = metadata->GetCoverFile();
                                     if (!test_file.isEmpty() &&
                                         !IsDefaultCoverFile(test_file))
                                     {
@@ -1794,8 +1794,8 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                 if (metadata)
                 {
                     QString test_file;
-                    QString host = metadata->GetHost();
-                    QString title = metadata->GetTitle();
+                    const QString& host = metadata->GetHost();
+                    const QString& title = metadata->GetTitle();
 
                     if (type == "Coverart" && !host.isEmpty() &&
                         !metadata->GetCoverFile().startsWith("/"))
@@ -2103,7 +2103,7 @@ void VideoDialog::createBusyDialog(const QString &title)
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "mythvideobusydialog");
@@ -2184,7 +2184,7 @@ void VideoDialog::dismissFetchDialog(VideoMetadata *metadata, bool ok)
  */
 void VideoDialog::createOkDialog(QString title)
 {
-    QString message = title;
+    const QString& message = title;
 
     MythConfirmationDialog *okPopup =
             new MythConfirmationDialog(m_popupStack, message, false);

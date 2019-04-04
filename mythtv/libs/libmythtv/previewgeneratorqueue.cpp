@@ -258,10 +258,10 @@ bool PreviewGeneratorQueue::event(QEvent *e)
         me->Message() == "PREVIEW_FAILED")
     {
         uint recordedingID = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
-        QString filename   = me->ExtraData(1); // outFileName
-        QString msg        = me->ExtraData(2);
-        QString datetime   = me->ExtraData(3);
-        QString token      = me->ExtraData(4);
+        const QString& filename   = me->ExtraData(1); // outFileName
+        const QString& msg        = me->ExtraData(2);
+        const QString& datetime   = me->ExtraData(3);
+        const QString& token      = me->ExtraData(4);
 
         {
             QMutexLocker locker(&m_lock);
