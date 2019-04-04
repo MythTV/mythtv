@@ -37,7 +37,7 @@ class MPUBLIC StorageGroupListEditor :
 
 public slots:
     void ShowNewGroupDialog(void);
-    void CreateNewGroup(QString name);
+    void CreateNewGroup(const QString& name);
 };
 
 class StorageGroupDirStorage : public SimpleDBStorage

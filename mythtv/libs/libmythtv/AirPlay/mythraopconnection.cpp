@@ -1,7 +1,8 @@
-#include <QTimer>
 #include <QTcpSocket>
-#include <QtEndian>
 #include <QTextStream>
+#include <QTimer>
+#include <QtEndian>
+#include <utility>
 
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -63,7 +64,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
   : QObject(parent),
     m_socket(socket),
-    m_hardwareId(id),
+    m_hardwareId(std::move(id)),
     m_dataPort(port)
 {
     m_id = GetNotificationCenter()->Register(this);
@@ -224,7 +225,7 @@ bool MythRAOPConnection::Init(void)
  * Socket incoming data signal handler
  * use for audio, control and timing socket
  */
-void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress /*peer*/,
+void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer*/,
                                       quint16 /*port*/)
 {
     // restart the idle timer

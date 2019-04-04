@@ -851,7 +851,7 @@ void MHEngine::PutBehind(const MHRoot *p, const MHRoot *pRef)
 // Draw a region of the screen.  This attempts to minimise the drawing by eliminating items
 // that are completely obscured by items above them.  We have to take into account the
 // transparency of items since items higher up the stack may be semi-transparent.
-void MHEngine::DrawRegion(QRegion toDraw, int nStackPos)
+void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 {
     if (toDraw.isEmpty())
     {
@@ -898,7 +898,7 @@ void MHEngine::DrawDisplay(QRegion toDraw)
 
 // An area of the screen needs to be redrawn.  We simply remember this and redraw it
 // in one go when the timer expires.
-void MHEngine::Redraw(QRegion region)
+void MHEngine::Redraw(const QRegion& region)
 {
     m_redrawRegion += region;
 }
@@ -1481,7 +1481,7 @@ int __mhlogoptions = MHLogError;
 FILE *__mhlogStream = nullptr;
 
 // The MHEG engine calls this when it needs to log something.
-void __mhlog(QString logtext)
+void __mhlog(const QString& logtext)
 {
     QByteArray tmp = logtext.toLatin1();
     fprintf(__mhlogStream, "[freemheg] %s\n", tmp.constData());

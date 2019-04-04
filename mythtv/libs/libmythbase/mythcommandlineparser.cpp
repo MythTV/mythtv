@@ -42,17 +42,18 @@ using namespace std;
 #endif
 
 // Qt headers
+#include <QCoreApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QSize>
+#include <QString>
+#include <QTextStream>
 #include <QVariant>
 #include <QVariantList>
 #include <QVariantMap>
-#include <QString>
-#include <QCoreApplication>
-#include <QTextStream>
-#include <QDateTime>
+#include <utility>
 
 #include "mythcommandlineparser.h"
 #include "mythcorecontext.h"
@@ -167,11 +168,11 @@ const char* NamedOptType(int type)
  *  that can be used on the command line, and should be reported in --help
  *  printouts
  */
-CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
+CommandLineArg::CommandLineArg(const QString& name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
-    m_name(name), m_type(type), m_default(def),
-    m_help(help), m_longhelp(longhelp)
+    m_name(name), m_type(type), m_default(std::move(def)),
+    m_help(std::move(help)), m_longhelp(std::move(longhelp))
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -184,9 +185,9 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
  *  is intended for use in supplementary data storage for information not
  *  supplied directly on the command line.
  */
-CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
+CommandLineArg::CommandLineArg(const QString& name, QVariant::Type type, QVariant def)
   : ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
-    m_name(name), m_type(type), m_default(def)
+    m_name(name), m_type(type), m_default(std::move(def))
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -200,7 +201,7 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
  *  line arguments, and is reconciled with the proper argument of the same
  *  name prior to parsing inputs.
  */
-CommandLineArg::CommandLineArg(QString name) :
+CommandLineArg::CommandLineArg(const QString& name) :
     ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
     m_name(name)
 {
@@ -245,7 +246,7 @@ int CommandLineArg::GetKeywordLength(void) const
  *  that the function is being called by the parent argument, and help should
  *  be output.
  */
-QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
+QString CommandLineArg::GetHelpString(int off, const QString& group, bool force) const
 {
     QString helpstr;
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
@@ -418,7 +419,7 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
  *  value, meaning this can only be used on a boolean, integer, and string
  *  arguments. All other will return false.
  */
-bool CommandLineArg::Set(QString opt)
+bool CommandLineArg::Set(const QString& opt)
 {
     m_usedKeyword = opt;
 
@@ -451,7 +452,7 @@ bool CommandLineArg::Set(QString opt)
 
 /** \brief Set option as provided on command line with value
  */
-bool CommandLineArg::Set(QString opt, QByteArray val)
+bool CommandLineArg::Set(const QString& opt, const QByteArray& val)
 {
     QVariantList vlist;
     QList<QByteArray> blist;
@@ -536,7 +537,7 @@ bool CommandLineArg::Set(QString opt, QByteArray val)
  */
 CommandLineArg* CommandLineArg::SetParentOf(QString opt)
 {
-    m_children << new CommandLineArg(opt);
+    m_children << new CommandLineArg(std::move(opt));
     return this;
 }
 
@@ -554,7 +555,7 @@ CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
  */
 CommandLineArg* CommandLineArg::SetParent(QString opt)
 {
-    m_parents << new CommandLineArg(opt);
+    m_parents << new CommandLineArg(std::move(opt));
     return this;
 }
 
@@ -572,7 +573,7 @@ CommandLineArg* CommandLineArg::SetParent(QStringList opts)
  */
 CommandLineArg* CommandLineArg::SetChildOf(QString opt)
 {
-    m_parents << new CommandLineArg(opt);
+    m_parents << new CommandLineArg(std::move(opt));
     return this;
 }
 
@@ -590,7 +591,7 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
  */
 CommandLineArg* CommandLineArg::SetChild(QString opt)
 {
-    m_children << new CommandLineArg(opt);
+    m_children << new CommandLineArg(std::move(opt));
     return this;
 }
 
@@ -606,7 +607,7 @@ CommandLineArg* CommandLineArg::SetChild(QStringList opts)
 
 /** \brief Set argument as parent of given child and mark as required
  */
-CommandLineArg* CommandLineArg::SetRequiredChild(QString opt)
+CommandLineArg* CommandLineArg::SetRequiredChild(const QString& opt)
 {
     m_children << new CommandLineArg(opt);
     m_requires << new CommandLineArg(opt);
@@ -628,7 +629,7 @@ CommandLineArg* CommandLineArg::SetRequiredChild(QStringList opts)
 
 /** \brief Set argument as child required by given parent
  */
-CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
+CommandLineArg* CommandLineArg::SetRequiredChildOf(const QString& opt)
 {
     m_parents << new CommandLineArg(opt);
     m_requiredby << new CommandLineArg(opt);
@@ -652,7 +653,7 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
  */
 CommandLineArg* CommandLineArg::SetRequires(QString opt)
 {
-    m_requires << new CommandLineArg(opt);
+    m_requires << new CommandLineArg(std::move(opt));
     return this;
 }
 
@@ -670,7 +671,7 @@ CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
  */
 CommandLineArg* CommandLineArg::SetBlocks(QString opt)
 {
-    m_blocks << new CommandLineArg(opt);
+    m_blocks << new CommandLineArg(std::move(opt));
     return this;
 }
 
@@ -701,7 +702,7 @@ CommandLineArg* CommandLineArg::SetRemoved(QString remstr, QString remver)
     if (remstr.isEmpty())
         remstr = "and is no longer available in this version.";
     m_removed = remstr;
-    m_removedversion = remver;
+    m_removedversion = std::move(remver);
     return this;
 }
 
@@ -1155,7 +1156,7 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
 /** \brief Default constructor for MythCommandLineArg class
  */
 MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(appname)
+    m_appname(std::move(appname))
 {
     char *verbose = getenv("VERBOSE_PARSER");
     if (verbose != nullptr)
@@ -1221,7 +1222,7 @@ MythCommandLineParser::~MythCommandLineParser()
  * </table>
  */
 CommandLineArg* MythCommandLineParser::add(QStringList arglist,
-        QString name, QVariant::Type type, QVariant def,
+        const QString& name, QVariant::Type type, QVariant def,
         QString help, QString longhelp)
 {
     CommandLineArg *arg;
@@ -1230,7 +1231,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         arg = m_namedArgs[name];
     else
     {
-        arg = new CommandLineArg(name, type, def, help, longhelp);
+        arg = new CommandLineArg(name, type, std::move(def), std::move(help), std::move(longhelp));
         m_namedArgs.insert(name, arg);
     }
 
@@ -1929,7 +1930,7 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
  *  stored or default value. For all other types, this will return whether
  *  the argument was supplied on the command line or not.
  */
-bool MythCommandLineParser::toBool(QString key) const
+bool MythCommandLineParser::toBool(const QString& key) const
 {
     if (!m_namedArgs.contains(key))
         return false;
@@ -1949,7 +1950,7 @@ bool MythCommandLineParser::toBool(QString key) const
 /** \brief Returns stored QVariant as an integer, falling to default
  *  if not provided
  */
-int MythCommandLineParser::toInt(QString key) const
+int MythCommandLineParser::toInt(const QString& key) const
 {
     int val = 0;
     if (!m_namedArgs.contains(key))
@@ -1974,7 +1975,7 @@ int MythCommandLineParser::toInt(QString key) const
 /** \brief Returns stored QVariant as an unsigned integer, falling to
  *  default if not provided
  */
-uint MythCommandLineParser::toUInt(QString key) const
+uint MythCommandLineParser::toUInt(const QString& key) const
 {
     uint val = 0;
     if (!m_namedArgs.contains(key))
@@ -1999,7 +2000,7 @@ uint MythCommandLineParser::toUInt(QString key) const
 /** \brief Returns stored QVariant as a long integer, falling to
  *  default if not provided
  */
-long long MythCommandLineParser::toLongLong(QString key) const
+long long MythCommandLineParser::toLongLong(const QString& key) const
 {
     long long val = 0;
     if (!m_namedArgs.contains(key))
@@ -2024,7 +2025,7 @@ long long MythCommandLineParser::toLongLong(QString key) const
 /** \brief Returns stored QVariant as double floating point value, falling
  *  to default if not provided
  */
-double MythCommandLineParser::toDouble(QString key) const
+double MythCommandLineParser::toDouble(const QString& key) const
 {
     double val = 0.0;
     if (!m_namedArgs.contains(key))
@@ -2049,7 +2050,7 @@ double MythCommandLineParser::toDouble(QString key) const
 /** \brief Returns stored QVariant as a QSize value, falling
  *  to default if not provided
  */
-QSize MythCommandLineParser::toSize(QString key) const
+QSize MythCommandLineParser::toSize(const QString& key) const
 {
     QSize val(0,0);
     if (!m_namedArgs.contains(key))
@@ -2074,7 +2075,7 @@ QSize MythCommandLineParser::toSize(QString key) const
 /** \brief Returns stored QVariant as a QString, falling
  *  to default if not provided
  */
-QString MythCommandLineParser::toString(QString key) const
+QString MythCommandLineParser::toString(const QString& key) const
 {
     QString val("");
     if (!m_namedArgs.contains(key))
@@ -2103,7 +2104,7 @@ QString MythCommandLineParser::toString(QString key) const
  *  if not provided. Optional separator can be specified to split result
  *  if stored value is a QString.
  */
-QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
+QStringList MythCommandLineParser::toStringList(const QString& key, const QString& sep) const
 {
     QVariant varval;
     QStringList val;
@@ -2133,7 +2134,7 @@ QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
 /** \brief Returns stored QVariant as a QMap, falling
  *  to default if not provided
  */
-QMap<QString,QString> MythCommandLineParser::toMap(QString key) const
+QMap<QString,QString> MythCommandLineParser::toMap(const QString& key) const
 {
     QMap<QString, QString> val;
     QMap<QString, QVariant> tmp;
@@ -2166,7 +2167,7 @@ QMap<QString,QString> MythCommandLineParser::toMap(QString key) const
 /** \brief Returns stored QVariant as a QDateTime, falling
  *  to default if not provided
  */
-QDateTime MythCommandLineParser::toDateTime(QString key) const
+QDateTime MythCommandLineParser::toDateTime(const QString& key) const
 {
     QDateTime val;
     if (!m_namedArgs.contains(key))
@@ -2525,7 +2526,7 @@ LogLevel_t MythCommandLineParser::GetLogLevel(void)
  *  spawn a new definition store value in. Argument is subsequently marked
  *  as being provided on the command line.
  */
-bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
+bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
 {
     CommandLineArg *arg;
 
@@ -2555,7 +2556,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     // Setup the defaults
     verboseString = "";
     verboseMask   = 0;
-    verboseArgParse(mask);
+    verboseArgParse(std::move(mask));
 
     if (toBool("verbose"))
     {

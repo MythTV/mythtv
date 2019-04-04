@@ -51,6 +51,7 @@
 
 
 #include <QMutexLocker>
+#include <utility>
 
 #include "mythevent.h"
 #include "mythdbcon.h"
@@ -113,7 +114,7 @@ bool HouseKeeperTask::CheckRun(QDateTime now)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Checking to run %1").arg(GetTag()));
     bool check = false;
-    if (!m_confirm && !m_running && (check = DoCheckRun(now)))
+    if (!m_confirm && !m_running && (check = DoCheckRun(std::move(now))))
         // if m_confirm is already set, the task is already in the queue
         // and should not be queued a second time
         m_confirm = true;

@@ -28,7 +28,7 @@ class MBASE_PUBLIC MThreadPool
     static void StopAllPools(void);
     static void ShutdownAllPools(void);
 
-    void start(QRunnable *runnable, QString debugName, int priority = 0);
+    void start(QRunnable *runnable, const QString& debugName, int priority = 0);
     bool tryStart(QRunnable *runnable, QString debugName);
 
     void startReserved(QRunnable *runnable, QString debugName,
@@ -45,7 +45,7 @@ class MBASE_PUBLIC MThreadPool
     void waitForDone(void);
 
   private:
-    bool TryStartInternal(QRunnable*, QString, bool);
+    bool TryStartInternal(QRunnable*, const QString&, bool);
     void NotifyAvailable(MPoolThread*);
     void NotifyDone(MPoolThread*);
     void ReleaseThread(void);

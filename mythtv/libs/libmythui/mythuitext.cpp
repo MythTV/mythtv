@@ -1253,7 +1253,7 @@ void MythUIText::Pulse(void)
     }
 }
 
-void MythUIText::CycleColor(QColor startColor, QColor endColor, int numSteps)
+void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor, int numSteps)
 {
     if (!GetPainter()->SupportsAnimation())
         return;

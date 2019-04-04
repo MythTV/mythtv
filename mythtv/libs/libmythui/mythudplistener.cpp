@@ -60,7 +60,7 @@ void MythUDPListener::Disable(void)
     m_socketPool = nullptr;
 }
 
-void MythUDPListener::Process(const QByteArray &buf, QHostAddress /*sender*/,
+void MythUDPListener::Process(const QByteArray &buf, const QHostAddress& /*sender*/,
                               quint16 /*senderPort*/)
 {
     QString errorMsg;

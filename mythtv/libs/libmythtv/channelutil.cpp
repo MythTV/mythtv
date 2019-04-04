@@ -5,11 +5,12 @@
 #include <set>
 using namespace std;
 
-#include <QRegExp>
-#include <QImage>
 #include <QFile>
-#include <QReadWriteLock>
 #include <QHash>
+#include <QImage>
+#include <QReadWriteLock>
+#include <QRegExp>
+#include <utility>
 
 #include "channelutil.h"
 #include "mythdb.h"
@@ -21,7 +22,7 @@ using namespace std;
 
 const QString ChannelUtil::kATSCSeparators = "(_|-|#|\\.)";
 
-static uint get_dtv_multiplex(uint     db_source_id,  QString sistandard,
+static uint get_dtv_multiplex(uint     db_source_id,  const QString& sistandard,
                               uint64_t frequency,
                               // DVB specific
                               uint     transport_id,
@@ -75,17 +76,17 @@ static uint get_dtv_multiplex(uint     db_source_id,  QString sistandard,
 }
 
 static uint insert_dtv_multiplex(
-    int         db_source_id,  QString     sistandard,
-    uint64_t    frequency,     QString     modulation,
+    int         db_source_id,  const QString& sistandard,
+    uint64_t    frequency,     const QString& modulation,
     // DVB specific
     int         transport_id,  int         network_id,
     int         symbol_rate,   signed char bandwidth,
     signed char polarity,      signed char inversion,
     signed char trans_mode,
-    QString     inner_FEC,     QString      constellation,
-    signed char hierarchy,     QString      hp_code_rate,
-    QString     lp_code_rate,  QString      guard_interval,
-    QString     mod_sys,       QString      rolloff)
+    const QString& inner_FEC,   const QString& constellation,
+    signed char    hierarchy,   const QString& hp_code_rate,
+    const QString& lp_code_rate, const QString& guard_interval,
+    const QString& mod_sys,     const QString& rolloff)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -373,8 +374,8 @@ uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
                                   int  transport_id,  int     network_id)
 {
     return CreateMultiplex(
-        sourceid,           sistandard,
-        frequency,          modulation,
+        sourceid,           std::move(sistandard),
+        frequency,          std::move(modulation),
         transport_id,       network_id,
         -1,                 -1,
         -1,                 -1,
@@ -399,17 +400,17 @@ uint ChannelUtil::CreateMultiplex(
     QString     mod_sys,      QString     rolloff)
 {
     return insert_dtv_multiplex(
-        sourceid,           sistandard,
-        freq,               modulation,
+        sourceid,           std::move(sistandard),
+        freq,               std::move(modulation),
         // DVB specific
         transport_id,       network_id,
         symbol_rate,        bandwidth,
         polarity,           inversion,
         trans_mode,
-        inner_FEC,          constellation,
-        hierarchy,          hp_code_rate,
-        lp_code_rate,       guard_interval,
-        mod_sys,            rolloff);
+        std::move(inner_FEC),    std::move(constellation),
+        hierarchy,               std::move(hp_code_rate),
+        std::move(lp_code_rate), std::move(guard_interval),
+        std::move(mod_sys),      std::move(rolloff));
 }
 
 uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
@@ -1128,7 +1129,7 @@ vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
 }
 
 bool ChannelUtil::SetChannelValue(const QString &field_name,
-                                  QString        value,
+                                  const QString& value,
                                   uint           sourceid,
                                   const QString &channum)
 {
@@ -1147,7 +1148,7 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
 }
 
 bool ChannelUtil::SetChannelValue(const QString &field_name,
-                                  QString        value,
+                                  const QString& value,
                                   int            chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1529,7 +1530,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     if (!freqid.isEmpty())
         query.bindValue(":FREQID",    freqid);
 
-    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
+    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : std::move(format);
     tvformat = tvformat.isNull() ? "" : tvformat;
     query.bindValue(":TVFORMAT", tvformat);
 
@@ -1562,16 +1563,16 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 bool use_on_air_guide,
                                 bool hidden,
                                 bool hidden_in_guide,
-                                QString freqid,
-                                QString icon,
+                                const QString& freqid,
+                                const QString& icon,
                                 QString format,
-                                QString xmltvid,
-                                QString default_authority)
+                                const QString& xmltvid,
+                                const QString& default_authority)
 {
     if (!channel_id)
         return false;
 
-    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
+    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : std::move(format);
     bool set_channum = !chan_num.isEmpty() && chan_num != "-1";
     QString qstr = QString(
         "UPDATE channel "
@@ -2379,8 +2380,8 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                                           uint sourceID,
                                           uint channelGroupID,
                                           bool liveTVOnly,
-                                          QString callsign,
-                                          QString channum)
+                                          const QString& callsign,
+                                          const QString& channum)
 {
     ChannelInfoList channelList;
 

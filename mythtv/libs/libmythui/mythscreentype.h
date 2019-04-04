@@ -102,7 +102,7 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     void LoadInBackground(QString message = "");
     void ReloadInBackground(void);
 
-    void OpenBusyPopup(QString message = "");
+    void OpenBusyPopup(const QString& message = "");
     void CloseBusyPopup(void);
     void SetBusyPopupMessage(const QString &message);
     void ResetBusyPopup(void);

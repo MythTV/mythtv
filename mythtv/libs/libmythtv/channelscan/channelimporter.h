@@ -181,8 +181,8 @@ class MTV_PUBLIC ChannelImporter
         const ChannelInsertInfo         &chan);
 
     OkCancelType ShowManualChannelPopup(
-        MythMainWindow *parent, QString title,
-        QString message, QString &text);
+        MythMainWindow *parent, const QString& title,
+        const QString& message, QString &text);
 
     static void FixUpOpenCable(ScanDTVTransportList &transports);
 

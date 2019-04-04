@@ -123,7 +123,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control,
                        VideoType Type,
-                       QString options)
+                       const QString& options)
 {
     if (!glcontext)
         return false;
@@ -670,7 +670,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
  */
 
 uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
-                                     QString deint, FrameScanType field)
+                                     const QString& deint, FrameScanType field)
 {
     if (!gl_context)
         return 0;
@@ -1341,7 +1341,7 @@ static const QString bicubic =
 "LRP result.color, parmx.b, a, c;\n";
 
 QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
-                                      QString deint, FrameScanType field)
+                                      const QString& deint, FrameScanType field)
 {
     QString ret =
         "!!ARBfp1.0\n"
@@ -1824,7 +1824,7 @@ KERNELYVU
 
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
-                                    QString deint, FrameScanType field)
+                                    const QString& deint, FrameScanType field)
 {
     uint bottom = field == kScan_Intr2ndField;
     vertex = YUV2RGBVertexShader;

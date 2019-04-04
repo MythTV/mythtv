@@ -21,7 +21,7 @@ extern "C" {
  *                         Use "adts" for ADTS encpsulation (AAC)
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
-SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecID codec_id)
+SPDIFEncoder::SPDIFEncoder(const QString& muxer, AVCodecID codec_id)
 {
     memset(&m_buffer, 0, sizeof(m_buffer));
 

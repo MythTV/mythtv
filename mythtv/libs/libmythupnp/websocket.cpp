@@ -69,7 +69,7 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
                                  qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-                                 , QSslConfiguration sslConfig
+                                 , const QSslConfiguration& sslConfig
 #endif
                                  )
                 :
@@ -101,7 +101,7 @@ void WebSocketWorkerThread::run(void)
 WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
                                  qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-                                 , QSslConfiguration sslConfig
+                                 , const QSslConfiguration& sslConfig
 #endif
                                  )
                 : m_eventLoop(new QEventLoop()),

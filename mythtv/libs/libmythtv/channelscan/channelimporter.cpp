@@ -8,6 +8,7 @@
 
 #include <QTextStream>
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -1487,7 +1488,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 updateDialog->AddButton(tr("Update manually"));
                 updateDialog->AddButton(tr("Ignore all"));
                 QObject::connect(updateDialog, &MythDialogBox::Closed,
-                                 [&](QString /*resultId*/, int result)
+                                 [&](const QString& /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1537,8 +1538,8 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 }
 
 OkCancelType ChannelImporter::ShowManualChannelPopup(
-    MythMainWindow *parent, QString title,
-    QString message, QString &text)
+    MythMainWindow *parent, const QString& title,
+    const QString& message, QString &text)
 {
     int dc = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
@@ -1578,7 +1579,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
                              [&](QString result)
                              {
                                  dc = 0;
-                                 text = result;
+                                 text = std::move(result);
                              });
             QObject::connect(textEdit, &MythTextInputDialog::Exiting,
                              [&]()

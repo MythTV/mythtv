@@ -45,7 +45,7 @@ class MTV_PUBLIC ChannelGroup
     static bool              DeleteChannel(uint chanid, int changrpid);
     static int               GetNextChannelGroup(const ChannelGroupList &sorted, int grpid);
     static QString           GetChannelGroupName(int grpid);
-    static int               GetChannelGroupId(QString changroupname);
+    static int               GetChannelGroupId(const QString& changroupname);
 
   private:
 

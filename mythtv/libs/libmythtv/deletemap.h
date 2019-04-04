@@ -46,14 +46,14 @@ class MTV_PUBLIC DeleteMap
     void SetMap(const frm_dir_map_t &map);
     void LoadCommBreakMap(frm_dir_map_t &map);
     void SaveMap(bool isAutoSave = false);
-    void LoadMap(QString undoMessage = "");
+    void LoadMap(const QString& undoMessage = "");
     bool LoadAutoSaveMap(void);
     void CleanMap(void);
 
-    void Clear(QString undoMessage = "");
+    void Clear(const QString& undoMessage = "");
     void ReverseAll(void);
     void NewCut(uint64_t frame);
-    void Delete(uint64_t frame, QString undoMessage);
+    void Delete(uint64_t frame, const QString& undoMessage);
     void MoveRelative(uint64_t frame, bool right);
     void Move(uint64_t frame, uint64_t to);
 

@@ -42,8 +42,8 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 
     void DestroyChain(void);
 
-    void AppendNewProgram(ProgramInfo *pginfo, QString channum,
-                          QString inputname, bool discont);
+    void AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
+                          const QString& inputname, bool discont);
     void FinishedRecording(ProgramInfo *pginfo);
     void DeleteProgram(ProgramInfo *pginfo);
 

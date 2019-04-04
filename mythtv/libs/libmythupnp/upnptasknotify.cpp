@@ -53,8 +53,8 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
-                                    QString        sNT,
-                                    QString        sUDN )
+                                    const QString& sNT,
+                                    const QString& sUDN )
 {
     QString sUSN;
 

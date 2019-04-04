@@ -13,7 +13,7 @@ class PlayGroupDBStorage : public SimpleDBStorage
   public:
     PlayGroupDBStorage(StandardSetting *_setting,
                        const PlayGroupConfig &_parent,
-                       QString          _name) :
+                       const QString&   _name) :
         SimpleDBStorage(_setting, "playgroup", _name), parent(_parent)
     {
     }

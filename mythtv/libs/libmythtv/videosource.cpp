@@ -16,14 +16,15 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QTextStream>
-#include <QStringList>
 #include <QCursor>
-#include <QLayout>
-#include <QFile>
-#include <QMap>
-#include <QDir>
 #include <QDateTime>
+#include <QDir>
+#include <QFile>
+#include <QLayout>
+#include <QMap>
+#include <QStringList>
+#include <QTextStream>
+#include <utility>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -471,7 +472,7 @@ class UseEIT : public MythUICheckBoxSetting
 };
 
 XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
-                                           QString _grabber,
+                                           const QString& _grabber,
                                            StandardSetting *_setting) :
     m_parent(_parent), m_grabber(_grabber)
 {
@@ -654,8 +655,8 @@ class VideoDevice : public CaptureCardComboBoxSetting
     VideoDevice(const CaptureCard &parent,
                 uint    minor_min = 0,
                 uint    minor_max = UINT_MAX,
-                QString card      = QString(),
-                QString driver    = QString()) :
+                const QString& card      = QString(),
+                const QString& driver    = QString()) :
         CaptureCardComboBoxSetting(parent, true, "videodevice")
     {
         setLabel(QObject::tr("Video device"));
@@ -696,7 +697,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
 
     uint fillSelectionsFromDir(const QDir& dir,
                                uint minor_min, uint minor_max,
-                               QString card, QString driver,
+                               const QString& card, const QString& driver,
                                bool allow_duplicates)
     {
         uint cnt = 0;
@@ -1384,7 +1385,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
 #endif
 }
 
-void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(QString devices)
+void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(const QString& devices)
 {
     QStringList devstrs = devices.split(",");
     for (int i = 0; i < devstrs.size(); ++i)
@@ -3304,7 +3305,7 @@ void CardInput::loadByID(int inputid)
     GroupSetting::Load();
 }
 
-void CardInput::loadByInput(int _cardid, QString _inputname)
+void CardInput::loadByInput(int _cardid, const QString& _inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardid FROM capturecard "
@@ -3764,7 +3765,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
                                          QString dev, QString type) :
     CaptureCardComboBoxSetting(parent, false, "audiodevice"),
-    m_lastDevice(dev), m_lastCardType(type)
+    m_lastDevice(std::move(dev)), m_lastCardType(std::move(type))
 {
     setLabel(QObject::tr("Audio input"));
     setHelpText(QObject::tr("If there is more than one audio input, "

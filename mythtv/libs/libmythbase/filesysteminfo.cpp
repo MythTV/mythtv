@@ -21,6 +21,7 @@ using namespace std;
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <utility>
 
 #include "filesysteminfo.h"
 #include "mythcoreutil.h"
@@ -50,13 +51,13 @@ FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 
 FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,
         int fsid, int groupid, int blksize, int64_t total, int64_t used) :
-    m_hostname(hostname), m_path(path), m_local(local), m_fsid(fsid),
+    m_hostname(std::move(hostname)), m_path(std::move(path)), m_local(local), m_fsid(fsid),
     m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used)
 {
 }
 
 FileSystemInfo::FileSystemInfo(QStringList::const_iterator &it,
-                   QStringList::const_iterator end)
+                   const QStringList::const_iterator& end)
 {
     FromStringList(it, end);
 }
@@ -119,7 +120,7 @@ bool FileSystemInfo::FromStringList(const QStringList &slist)
 }
 
 bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
-                             QStringList::const_iterator listend)
+                             const QStringList::const_iterator& listend)
 {
     QString listerror = LOC + "FromStringList, not enough items in list.";
     QString ts;

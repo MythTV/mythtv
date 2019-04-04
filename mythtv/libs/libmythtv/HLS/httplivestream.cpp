@@ -31,6 +31,7 @@
 #include <QIODevice>
 #include <QRunnable>
 #include <QUrl>
+#include <utility>
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
@@ -94,7 +95,7 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
                                uint32_t bitrate, uint32_t abitrate,
                                uint16_t maxSegments, uint16_t segmentSize,
                                uint32_t aobitrate, int32_t srate)
-  : m_sourceFile(srcFile),
+  : m_sourceFile(std::move(srcFile)),
     m_segmentSize(segmentSize),  m_maxSegments(maxSegments),
     m_height(height),            m_width(width),
     m_bitrate(bitrate),
@@ -610,7 +611,7 @@ bool HTTPLiveStream::UpdateStatus(HTTPLiveStreamStatus status)
     return false;
 }
 
-bool HTTPLiveStream::UpdateStatusMessage(QString message)
+bool HTTPLiveStream::UpdateStatusMessage(const QString& message)
 {
     if (m_streamid == -1)
         return false;

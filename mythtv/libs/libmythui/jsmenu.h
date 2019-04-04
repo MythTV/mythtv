@@ -88,8 +88,8 @@ class JoystickMenuThread : public MThread
 
     void ButtonUp(int button);
     void AxisChange(int axis, int value);
-    void EmitKey(QString code);
-    bool ReadConfig(QString config_file);
+    void EmitKey(const QString& code);
+    bool ReadConfig(const QString& config_file);
     void Stop(void) { m_bStop = true; }
 
   private:

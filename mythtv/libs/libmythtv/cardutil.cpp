@@ -1031,9 +1031,9 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */
-vector<uint> CardUtil::GetInputIDs(QString videodevice,
-                                   QString rawtype,
-                                   QString inputname,
+vector<uint> CardUtil::GetInputIDs(const QString& videodevice,
+                                   const QString& rawtype,
+                                   const QString& inputname,
                                    QString hostname)
 {
     vector<uint> list;
@@ -2066,7 +2066,7 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
     return list;
 }
 
-QStringList CardUtil::ProbeVideoInputs(QString device, QString inputtype)
+QStringList CardUtil::ProbeVideoInputs(const QString& device, const QString& inputtype)
 {
     QStringList ret;
 
@@ -2080,7 +2080,7 @@ QStringList CardUtil::ProbeVideoInputs(QString device, QString inputtype)
     return ret;
 }
 
-QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
+QStringList CardUtil::ProbeAudioInputs(const QString& device, const QString& inputtype)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeAudioInputs(%1,%2)")
                                    .arg(device).arg(inputtype));
@@ -2093,7 +2093,7 @@ QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
     return ret;
 }
 
-QStringList CardUtil::ProbeV4LVideoInputs(QString device)
+QStringList CardUtil::ProbeV4LVideoInputs(const QString& device)
 {
     bool ok;
     QStringList ret;
@@ -2124,7 +2124,7 @@ QStringList CardUtil::ProbeV4LVideoInputs(QString device)
     return ret;
 }
 
-QStringList CardUtil::ProbeV4LAudioInputs(QString device)
+QStringList CardUtil::ProbeV4LAudioInputs(const QString& device)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeV4LAudioInputs(%1)").arg(device));
 
@@ -2157,7 +2157,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(QString device)
     return ret;
 }
 
-QStringList CardUtil::ProbeDVBInputs(QString device)
+QStringList CardUtil::ProbeDVBInputs(const QString& device)
 {
     QStringList ret;
 
@@ -2638,12 +2638,12 @@ QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
 }
 
 #ifdef USING_ASI
-static QString sys_dev(uint device_num, QString dev)
+static QString sys_dev(uint device_num, const QString& dev)
 {
     return QString("/sys/class/asi/asirx%1/%2").arg(device_num).arg(dev);
 }
 
-static QString read_sys(QString sys_dev)
+static QString read_sys(const QString& sys_dev)
 {
     QFile f(sys_dev);
     f.open(QIODevice::ReadOnly);
@@ -2652,7 +2652,7 @@ static QString read_sys(QString sys_dev)
     return sdba;
 }
 
-static bool write_sys(QString sys_dev, QString str)
+static bool write_sys(const QString& sys_dev, const QString& str)
 {
     QFile f(sys_dev);
     f.open(QIODevice::WriteOnly);

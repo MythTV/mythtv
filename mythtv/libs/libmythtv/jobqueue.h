@@ -137,14 +137,14 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static bool QueueRecordingJobs(
         const RecordingInfo&, int jobTypes = JOB_NONE);
     static bool QueueJob(int jobType, uint chanid,
-                         const QDateTime &recstartts, QString args = "",
-                         QString comment = "", QString host = "",
+                         const QDateTime &recstartts, const QString& args = "",
+                         const QString& comment = "", QString host = "",
                          int flags = 0, int status = JOB_QUEUED,
                          QDateTime schedruntime = QDateTime());
 
     static bool QueueJobs(int jobTypes, uint chanid,
-                         const QDateTime &recstartts, QString args = "",
-                         QString comment = "", QString host = "");
+                         const QDateTime &recstartts, const QString& args = "",
+                         const QString& comment = "", const QString& host = "");
 
     static int GetJobID(int jobType, uint chanid,
                         const QDateTime &recstartts);
@@ -159,12 +159,12 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
                               const QDateTime &recstartts, int newCmds);
     static bool ChangeJobFlags(int jobID, int newFlags);
     static bool ChangeJobStatus(int jobID, int newStatus,
-                                QString comment = "");
-    static bool ChangeJobHost(int jobID, QString newHostname);
+                                const QString& comment = "");
+    static bool ChangeJobHost(int jobID, const QString& newHostname);
     static bool ChangeJobComment(int jobID,
-                                 QString comment = "");
+                                 const QString& comment = "");
     static bool ChangeJobArgs(int jobID,
-                              QString args = "");
+                              const QString& args = "");
     static bool IsJobQueuedOrRunning(int jobType, uint chanid,
                                      const QDateTime &recstartts);
     int GetRunningJobID(uint chanid, const QDateTime &recstartts);
@@ -181,7 +181,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static bool StopJob(int jobID);
     static bool DeleteJob(int jobID);
     static bool SafeDeleteJob(int jobID, int jobType, int chanid,
-                              QDateTime recstartts);
+                              const QDateTime& recstartts);
 
     static enum JobCmds GetJobCmd(int jobID);
     static enum JobFlags GetJobFlags(int jobID);
@@ -225,9 +225,9 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     void run(void) override; // QRunnable
     void ProcessQueue(void);
 
-    void ProcessJob(JobQueueEntry job);
+    void ProcessJob(const JobQueueEntry& job);
 
-    bool AllowedToRun(JobQueueEntry job);
+    bool AllowedToRun(const JobQueueEntry& job);
 
     static bool InJobRunWindow(int orStartsWithinMins = 0);
 

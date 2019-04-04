@@ -272,7 +272,7 @@ void BackendSelection::Manual(void)
     CloseWithDecision(kManualConfigure);
 }
 
-void BackendSelection::RemoveItem(QString USN)
+void BackendSelection::RemoveItem(const QString& USN)
 {
     m_mutex.lock();
 

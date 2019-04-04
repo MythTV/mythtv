@@ -62,7 +62,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
 
   private slots:
     void readClient(void);
-    void udpDataReady(QByteArray buf, QHostAddress peer, quint16 port);
+    void udpDataReady(QByteArray buf, const QHostAddress& peer, quint16 port);
     void timeout(void);
     void audioRetry(void);
     void newEventClient(QTcpSocket *client);

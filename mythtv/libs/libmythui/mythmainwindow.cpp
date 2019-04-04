@@ -6,6 +6,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -96,7 +97,7 @@ using namespace std;
 class KeyContext
 {
   public:
-    void AddMapping(int key, QString action)
+    void AddMapping(int key, const QString& action)
     {
         m_actionMap[key].append(action);
     }
@@ -896,7 +897,7 @@ void MythMainWindow::GrabWindow(QImage &image)
  * other than the UI thread, and to wait for the screenshot before returning.
  * It is used by mythweb for the remote access screenshots
  */
-void MythMainWindow::doRemoteScreenShot(QString filename, int x, int y)
+void MythMainWindow::doRemoteScreenShot(const QString& filename, int x, int y)
 {
     // This will be running in the UI thread, as is required by QPixmap
     QStringList args;
@@ -912,7 +913,7 @@ void MythMainWindow::RemoteScreenShot(QString filename, int x, int y)
 {
     // This will be running in a non-UI thread and is used to trigger a
     // function in the UI thread, and waits for completion of that handler
-    emit signalRemoteScreenShot(filename, x, y);
+    emit signalRemoteScreenShot(std::move(filename), x, y);
 }
 
 bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
@@ -954,7 +955,7 @@ bool MythMainWindow::ScreenShot(int w, int h, QString filename)
         h = img.height();
 
     img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    return SaveScreenShot(img, filename);
+    return SaveScreenShot(img, std::move(filename));
 }
 
 bool MythMainWindow::event(QEvent *e)
@@ -989,7 +990,7 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
+void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 {
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
@@ -2018,7 +2019,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
     }
 
     JumpData jd =
-        { callback, destination, description, exittomain, localAction };
+        { callback, destination, description, exittomain, std::move(localAction) };
     d->m_destinationMap[destination] = jd;
 
     BindJump(destination, keybind);

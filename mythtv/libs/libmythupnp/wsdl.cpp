@@ -350,8 +350,8 @@ QDomElement Wsdl::CreateBindingOperation( MethodInfo    &oInfo,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement Wsdl::CreateMessage( QString       sMsgName, 
-                                 QString       sTypeName )
+QDomElement Wsdl::CreateMessage( const QString& sMsgName,
+                                 const QString& sTypeName )
 {
     QDomElement oMsg = createElement( "message" );
 

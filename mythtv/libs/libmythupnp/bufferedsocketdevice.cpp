@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 #include "mythtimer.h"
 #include "bufferedsocketdevice.h"
@@ -133,7 +134,7 @@ void BufferedSocketDevice::SetSocketDevice( MSocketDevice *pSocket )
 void BufferedSocketDevice::SetDestAddress(
     QHostAddress hostAddress, quint16 nPort)
 {
-    m_DestHostAddress = hostAddress;
+    m_DestHostAddress = std::move(hostAddress);
     m_nDestPort       = nPort;
 }
 

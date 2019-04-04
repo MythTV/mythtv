@@ -82,7 +82,7 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
+SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
                                    ChannelBase *channel,
                                    bool release_stream)
 {

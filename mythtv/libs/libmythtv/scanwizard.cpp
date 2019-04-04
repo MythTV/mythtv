@@ -32,11 +32,13 @@
 #include "scanwizardconfig.h"
 #include "channelscanner_gui.h"
 #include "scanwizard.h"
-#include "sourceutil.h"
-#include "videosource.h"
-#include "scaninfo.h"
+
 #include "channelimporter.h"
 #include "mythlogging.h"
+#include "scaninfo.h"
+#include "sourceutil.h"
+#include "videosource.h"
+#include <utility>
 
 #define LOC QString("SWiz: ")
 
@@ -45,7 +47,7 @@ ScanWizard::ScanWizard(uint    default_sourceid,
                        QString default_inputname) :
     m_scannerPane(new ChannelScannerGUI())
 {
-    SetupConfig(default_sourceid, default_cardid, default_inputname);
+    SetupConfig(default_sourceid, default_cardid, std::move(default_inputname));
     ButtonStandardSetting *scanButton = new ButtonStandardSetting(tr("Scan"));
     connect(scanButton, SIGNAL(clicked()), SLOT(Scan()));
     addChild(scanButton);

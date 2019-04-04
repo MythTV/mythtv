@@ -415,7 +415,7 @@ void TestEITFixups::testUKMarvel()
     delete event2;
 }
 
-DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QString subtitle, QString description)
+DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, const QString& title, const QString& subtitle, const QString& description)
 {
     DBEventEIT *event = new DBEventEIT (1, // channel id
                                        title, // title

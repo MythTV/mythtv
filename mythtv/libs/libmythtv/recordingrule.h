@@ -42,11 +42,11 @@ class MTV_PUBLIC RecordingRule
     void ensureSortFields(void);
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
-    bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
+    bool LoadBySearch(RecSearchType lsearch, const QString& textname, const QString& forwhat,
                       QString joininfo = "", ProgramInfo *pginfo = nullptr);
-    bool LoadTemplate(QString category, QString categoryType = "Default");
+    bool LoadTemplate(const QString& category, const QString& categoryType = "Default");
 
-    bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,
+    bool ModifyPowerSearchByID(int rid, const QString& textname, QString forwhat,
                                QString joininfo = "");
     bool MakeOverride(void);
     bool MakeTemplate(QString category);
@@ -55,7 +55,7 @@ class MTV_PUBLIC RecordingRule
     bool Delete(bool sendSig = true);
 
     bool IsLoaded() const { return m_loaded; }
-    void UseTempTable(bool usetemp, QString table = "record_tmp");
+    void UseTempTable(bool usetemp, const QString& table = "record_tmp");
     static unsigned GetDefaultFilter(void);
 
     void ToMap(InfoMap &infoMap) const;

@@ -54,7 +54,7 @@ class MultiplexID : public AutoIncrementSetting
     QString GetColumnName(void) const { return m_column; }
 };
 
-static QString pp_modulation(QString mod)
+static QString pp_modulation(const QString& mod)
 {
     if (mod.endsWith("vsb"))
         return mod.left(mod.length() - 3) + "-VSB";
@@ -360,7 +360,7 @@ void TransportListEditor::Menu(TransportSetting *transport)
 class MuxDBStorage : public SimpleDBStorage
 {
   protected:
-    MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, QString _name) :
+    MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, const QString& _name) :
         SimpleDBStorage(_setting, "dtv_multiplex", _name), mplexid(_id)
     {
     }

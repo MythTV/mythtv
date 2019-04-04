@@ -19,6 +19,7 @@ using namespace std;
 #include <QMap>                         // for QMap<>::iterator, etc
 #include <QThread>                      // for QThread, etc
 #include <QtCore/qnumeric.h>            // for qIsNaN
+#include <utility>
 
 // MythTV headers
 #include "mthread.h"
@@ -829,7 +830,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
-                                FrameScanType scan, QString codecName)
+                                FrameScanType scan, const QString& codecName)
 {
     bool paramsChanged = false;
 
@@ -4870,7 +4871,7 @@ bool MythPlayer::IsEmbedding(void)
 bool MythPlayer::GetScreenShot(int width, int height, QString filename)
 {
     if (videoOutput)
-        return videoOutput->GetScreenShot(width, height, filename);
+        return videoOutput->GetScreenShot(width, height, std::move(filename));
     return false;
 }
 

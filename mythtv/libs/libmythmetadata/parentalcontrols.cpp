@@ -320,7 +320,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     }
 
   private slots:
-    void OnPasswordEntered(QString password)
+    void OnPasswordEntered(const QString& password)
     {
         m_passwordOK = false;
 

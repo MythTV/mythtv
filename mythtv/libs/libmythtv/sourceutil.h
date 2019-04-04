@@ -31,18 +31,18 @@ class MTV_PUBLIC SourceUtil
     static bool    IsCableCardPresent(uint sourceid);
     static bool    IsAnySourceScanable(void);
     static bool    UpdateChannelsFromListings(
-        uint sourceid, QString inputtype = QString(), bool wait = false);
+        uint sourceid, const QString& inputtype = QString(), bool wait = false);
 
-    static bool    UpdateSource( uint sourceid, QString sourcename,
-                                 QString grabber, QString userid,
-                                 QString freqtable, QString lineupid,
-                                 QString password, bool useeit,
-                                 QString configpath, int nitid);
-    static int     CreateSource( QString sourcename,
-                                 QString grabber, QString userid,
-                                 QString freqtable, QString lineupid,
-                                 QString password, bool useeit,
-                                 QString configpath, int nitid);
+    static bool    UpdateSource( uint sourceid, const QString& sourcename,
+                                 const QString& grabber, const QString& userid,
+                                 const QString& freqtable, const QString& lineupid,
+                                 const QString& password, bool useeit,
+                                 const QString& configpath, int nitid);
+    static int     CreateSource( const QString& sourcename,
+                                 const QString& grabber, const QString& userid,
+                                 const QString& freqtable, const QString& lineupid,
+                                 const QString& password, bool useeit,
+                                 const QString& configpath, int nitid);
     static bool    DeleteSource(uint sourceid);
     static bool    DeleteAllSources(void);
 };

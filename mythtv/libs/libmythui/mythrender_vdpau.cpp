@@ -6,6 +6,7 @@
 #include <thread> // for sleep_for
 
 #include <QSize>
+#include <utility>
 
 #include "mthread.h"
 #include "mythlogging.h"
@@ -570,7 +571,7 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
 
         img = img.scaled(width, height, Qt::KeepAspectRatio,
                          Qt::SmoothTransformation);
-        success = window->SaveScreenShot(img, filename);
+        success = window->SaveScreenShot(img, std::move(filename));
     }
     delete [] buffer;
     return success;

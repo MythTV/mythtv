@@ -161,7 +161,7 @@ class MTV_PUBLIC MythPlayer
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps,
-           FrameScanType scan = kScan_Ignore, QString codecName = QString());
+           FrameScanType scan = kScan_Ignore, const QString& codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);

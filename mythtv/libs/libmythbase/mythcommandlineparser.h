@@ -18,10 +18,10 @@ class MythCommandLineParser;
 class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 {
   public:
-    CommandLineArg(QString name, QVariant::Type type, QVariant def,
+    CommandLineArg(const QString& name, QVariant::Type type, QVariant def,
                    QString help, QString longhelp);
-    CommandLineArg(QString name, QVariant::Type type, QVariant def);
-    explicit CommandLineArg(QString name);
+    CommandLineArg(const QString& name, QVariant::Type type, QVariant def);
+    explicit CommandLineArg(const QString& name);
    ~CommandLineArg() = default;
 
     CommandLineArg* SetGroup(const QString &group)    { m_group = group;
@@ -31,12 +31,12 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QString         GetName(void) const             { return m_name; }
     QString         GetUsedKeyword(void) const      { return m_usedKeyword; }
     int             GetKeywordLength(void) const;
-    QString         GetHelpString(int off, QString group = "",
+    QString         GetHelpString(int off, const QString& group = "",
                                   bool force = false) const;
     QString         GetLongHelpString(QString keyword) const;
 
-    bool            Set(QString opt);
-    bool            Set(QString opt, QByteArray val);
+    bool            Set(const QString& opt);
+    bool            Set(const QString& opt, const QByteArray& val);
     void            Set(QVariant val)               { m_stored = val;
                                                       m_given = true; }
 
@@ -50,9 +50,9 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetChildOf(QString opt);
     CommandLineArg* SetChildOf(QStringList opts);
 
-    CommandLineArg* SetRequiredChild(QString opt);
+    CommandLineArg* SetRequiredChild(const QString& opt);
     CommandLineArg* SetRequiredChild(QStringList opt);
-    CommandLineArg* SetRequiredChildOf(QString opt);
+    CommandLineArg* SetRequiredChildOf(const QString& opt);
     CommandLineArg* SetRequiredChildOf(QStringList opt);
 
     CommandLineArg* SetRequires(QString opt);
@@ -233,7 +233,7 @@ class MBASE_PUBLIC MythCommandLineParser
           { return add(arglist, name, type,
                        QVariant(type), help, longhelp); }
     // anything else with default
-    CommandLineArg* add(QStringList arglist, QString name, QVariant::Type type,
+    CommandLineArg* add(QStringList arglist, const QString& name, QVariant::Type type,
              QVariant def, QString help, QString longhelp);
 
     QVariant                operator[](const QString &name);
@@ -246,18 +246,18 @@ class MBASE_PUBLIC MythCommandLineParser
     LogLevel_t              GetLogLevel(void);
     QString                 GetAppName(void) const { return m_appname; }
 
-    bool                    toBool(QString key) const;
-    int                     toInt(QString key) const;
-    uint                    toUInt(QString key) const;
-    long long               toLongLong(QString key) const;
-    double                  toDouble(QString key) const;
-    QSize                   toSize(QString key) const;
-    QString                 toString(QString key) const;
-    QStringList             toStringList(QString key, QString sep = "") const;
-    QMap<QString,QString>   toMap(QString key) const;
-    QDateTime               toDateTime(QString key) const;
+    bool                    toBool(const QString& key) const;
+    int                     toInt(const QString& key) const;
+    uint                    toUInt(const QString& key) const;
+    long long               toLongLong(const QString& key) const;
+    double                  toDouble(const QString& key) const;
+    QSize                   toSize(const QString& key) const;
+    QString                 toString(const QString& key) const;
+    QStringList             toStringList(const QString& key, const QString& sep = "") const;
+    QMap<QString,QString>   toMap(const QString& key) const;
+    QDateTime               toDateTime(const QString& key) const;
 
-    bool                    SetValue(const QString &key, QVariant value);
+    bool                    SetValue(const QString &key, const QVariant& value);
     int                     ConfigureLogging(QString mask = "general",
                                              unsigned int progress = 0);
     void                    ApplySettingsOverride(void);

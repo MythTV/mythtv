@@ -3,9 +3,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <QReadLocker>
 #include <QString>
 #include <QWriteLocker>
-#include <QReadLocker>
+#include <utility>
 
 #include "mythmiscutil.h"
 #include "mythdb.h"
@@ -739,11 +740,11 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
 
 bool FileServerHandler::DeleteFile(QString filename, QString storagegroup)
 {
-    return HandleDeleteFile(nullptr, filename, storagegroup);
+    return HandleDeleteFile(nullptr, std::move(filename), std::move(storagegroup));
 }
 
 bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
-                                QString filename, QString storagegroup)
+                                const QString& filename, const QString& storagegroup)
 {
     StorageGroup sgroup(storagegroup, "", false);
     QStringList res;

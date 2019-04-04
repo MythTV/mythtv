@@ -511,7 +511,7 @@ void ProgramMapTable::AppendStream(
  *  \param i index of stream
  *  \param sistandard standard to use in determining if this is a A/V stream
  */
-bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
+bool ProgramMapTable::IsVideo(uint i, const QString& sistandard) const
 {
     if (StreamID::IsVideo(StreamType(i)))
         return true;
@@ -533,7 +533,7 @@ bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
  *  \param i index of stream
  *  \param sistandard standard to use in determining if this is a A/V stream
  */
-bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
+bool ProgramMapTable::IsAudio(uint i, const QString& sistandard) const
 {
     if (StreamID::IsAudio(StreamType(i)))
         return true;
@@ -549,7 +549,7 @@ bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
  *  \brief Returns true iff PMT contains CA descriptor for a vid/aud stream.
  *  \param sistandard standard to use in determining if this is a A/V stream
  */
-bool ProgramMapTable::IsEncrypted(QString sistandard) const
+bool ProgramMapTable::IsEncrypted(const QString& sistandard) const
 {
     bool encrypted = IsProgramEncrypted();
 
@@ -615,7 +615,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint pid) const
     return encrypted != 0;
 }
 
-bool ProgramMapTable::IsStillPicture(QString sistandard) const
+bool ProgramMapTable::IsStillPicture(const QString& sistandard) const
 {
     static const unsigned char STILL_PICTURE_FLAG = 0x01;
 
@@ -1151,7 +1151,7 @@ uint ProgramMapTable::GetAudioType(uint i) const
     return iso_lang.AudioType();
 }
 
-QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
+QString ProgramMapTable::StreamDescription(uint i, const QString& sistandard) const
 {
     desc_list_t list;
 

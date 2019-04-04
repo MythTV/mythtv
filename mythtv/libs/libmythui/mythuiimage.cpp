@@ -378,7 +378,7 @@ class ImageLoader
 
     static AnimationFrames *LoadAnimatedImage(MythPainter *painter,
                                                // Must be a copy for thread safety
-                                              ImageProperties imProps,
+                                              const ImageProperties& imProps,
                                               ImageCacheMode cacheMode,
                                                // Included only to check address, could be
                                                // replaced by generating a unique value for

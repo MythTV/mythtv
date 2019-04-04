@@ -1,10 +1,11 @@
 // C headers
+#include <chrono> // for milliseconds
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <sched.h> // for sched_yield
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 // MythTV headers
 
@@ -2172,7 +2173,7 @@ DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
  *      RemoteEncoder::ShouldSwitchToAnotherInput(QString),
  *      CheckChannel(QString)
  */
-bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
+bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid)
 {
     QString msg("");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2260,7 +2261,7 @@ bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
  *      CheckChannel(ChannelBase*,const QString&,QString&),
  *      ShouldSwitchToAnotherInput(QString)
  */
-bool TVRec::CheckChannel(QString name) const
+bool TVRec::CheckChannel(const QString& name) const
 {
     if (!m_channel)
         return false;
@@ -2666,7 +2667,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     m_tvChain->SetInputType(m_genOpt.inputtype);
 
     m_ispip = pip;
-    m_liveTVStartChannel = startchan;
+    m_liveTVStartChannel = std::move(startchan);
 
     // Change to WatchingLiveTV
     ChangeState(kState_WatchingLiveTV);
@@ -2934,7 +2935,7 @@ void TVRec::RecorderPaused(void)
 /**
  *  \brief Toggles whether the current channel should be on our favorites list.
  */
-void TVRec::ToggleChannelFavorite(QString changroupname)
+void TVRec::ToggleChannelFavorite(const QString& changroupname)
 {
     QMutexLocker lock(&m_stateChangeLock);
 
@@ -3069,7 +3070,7 @@ QString TVRec::SetInput(QString input)
  *  \param requestType tells us what kind of request to actually send to
  *                     the tuning thread, kFlagDetect is usually sufficient
  */
-void TVRec::SetChannel(QString name, uint requestType)
+void TVRec::SetChannel(const QString& name, uint requestType)
 {
     QMutexLocker locker1(&m_setChannelLock);
     QMutexLocker locker2(&m_stateChangeLock);
@@ -3309,9 +3310,9 @@ bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
 }
 
 bool TVRec::SetChannelInfo(uint chanid, uint sourceid,
-                           QString oldchannum,
-                           QString callsign, QString channum,
-                           QString channame, QString xmltvid)
+                           const QString& oldchannum,
+                           const QString& callsign, const QString& channum,
+                           const QString& channame, const QString& xmltvid)
 {
     if (!chanid || !sourceid || channum.isEmpty())
         return false;
@@ -4514,7 +4515,7 @@ void TVRec::SetNextLiveTVDir(QString dir)
 {
     QMutexLocker lock(&m_nextLiveTVDirLock);
 
-    m_nextLiveTVDir = dir;
+    m_nextLiveTVDir = std::move(dir);
     m_triggerLiveTVDir.wakeAll();
 }
 

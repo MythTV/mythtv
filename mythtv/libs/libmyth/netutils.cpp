@@ -307,7 +307,7 @@ bool removeGrabberFromDB(const QString &commandline, const bool &search)
     return (query.numRowsAffected() > 0);
 }
 
-bool markTreeUpdated(GrabberScript* script, QDateTime curTime)
+bool markTreeUpdated(GrabberScript* script, const QDateTime& curTime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE internetcontent SET updated = :UPDATED "
@@ -848,7 +848,7 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle,
     return ret;
 }
 
-QString GetDownloadFilename(QString title, QString url)
+QString GetDownloadFilename(const QString& title, const QString& url)
 {
     QByteArray urlarr(url.toLatin1());
     quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());

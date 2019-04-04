@@ -2,7 +2,9 @@
 
 // MythTV headers
 #include "streamhandler.h"
+
 #include "threadedfilewriter.h"
+#include <utility>
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -63,7 +65,7 @@ void StreamHandler::AddListener(MPEGStreamData *data,
         m_needs_buffering      |= needs_buffering;
     }
 
-    m_stream_data_list[data] = output_file;
+    m_stream_data_list[data] = std::move(output_file);
 
     m_listener_lock.unlock();
 

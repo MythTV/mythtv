@@ -171,7 +171,7 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessIconList( const QDomNode& oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
           !oNode.isNull();
@@ -200,7 +200,7 @@ void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
           !oNode.isNull();
@@ -234,7 +234,7 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessDeviceList( QDomNode    oListNode,
+void UPnpDeviceDesc::ProcessDeviceList( const QDomNode&    oListNode,
                                         UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();

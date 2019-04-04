@@ -201,7 +201,7 @@ static const QString kSubAttrOutlinecolor("outlinecolor");
 static const QString kSubAttrOutlinesize ("outlinesize");
 static const QString kSubAttrOutlinealpha("outlinealpha");
 
-static QString srtColorString(QColor color)
+static QString srtColorString(const QColor& color)
 {
     return QString("#%1%2%3")
         .arg(color.red(),   2, 16, QLatin1Char('0'))
@@ -1905,7 +1905,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
                                              QRect &bbox, bool top,
                                              QRect &display, int forced,
-                                             QString imagename,
+                                             const QString& imagename,
                                              long long displayuntil,
                                              long long late)
 {

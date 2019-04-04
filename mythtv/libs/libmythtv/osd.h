@@ -177,15 +177,15 @@ class OSD
     void SetGraph(const QString &window, const QString &graph, int64_t timecode);
     bool IsWindowVisible(const QString &window);
 
-    bool DialogVisible(QString window = QString());
+    bool DialogVisible(const QString& window = QString());
     bool DialogHandleKeypress(QKeyEvent *e);
     bool DialogHandleGesture(MythGestureEvent *e);
     void DialogQuit(void);
     void DialogShow(const QString &window, const QString &text = "",
           int updatefor = 0);
     void DialogSetText(const QString &text);
-    void DialogBack(QString text = "", QVariant data = 0, bool exit = false);
-    void DialogAddButton(QString text, QVariant data,
+    void DialogBack(const QString& text = "", const QVariant& data = 0, bool exit = false);
+    void DialogAddButton(const QString& text, QVariant data,
                          bool menu = false, bool current = false);
     void DialogGetText(InfoMap &map);
 
@@ -268,7 +268,7 @@ class OsdNavigation : public MythScreenType
     int m_maxGroupNum;
     bool m_IsVolumeControl;
 
-    void sendResult(int result, QString action);
+    void sendResult(int result, const QString& action);
 
   public slots:
     void GeneralAction(void);

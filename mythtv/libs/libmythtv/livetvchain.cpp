@@ -61,8 +61,8 @@ void LiveTVChain::LoadFromExistingChain(const QString &id)
     ReloadAll();
 }
 
-void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
-                                   QString inputname, bool discont)
+void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
+                                   const QString& inputname, bool discont)
 {
     QMutexLocker lock(&m_lock);
 

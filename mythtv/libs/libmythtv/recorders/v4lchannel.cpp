@@ -475,7 +475,7 @@ bool V4LChannel::Retune(void)
     return true;
 }
 
-QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
+QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -497,7 +497,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     return fmt;
 }
 
-bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
+bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
 {
     if (!m_inputid || m_inputNumV4L < 0)
         return false;

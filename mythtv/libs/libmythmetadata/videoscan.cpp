@@ -1,9 +1,10 @@
 
 #include "videoscan.h"
 
-#include <QImageReader>
 #include <QApplication>
+#include <QImageReader>
 #include <QUrl>
+#include <utility>
 
 // libmythbase
 #include "mythevent.h"
@@ -411,7 +412,7 @@ void VideoScannerThread::SendProgressEvent(uint progress, uint total,
         return;
 
     ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       messsage);
+                                                       std::move(messsage));
     QApplication::postEvent(m_dialog, pue);
 }
 

@@ -29,7 +29,7 @@ META_PUBLIC void CheckedSet( MythUIType *container, const QString &itemName,
 
 META_PUBLIC void CheckedSet( MythUIImage *uiItem, const QString &filename);
 
-META_PUBLIC QStringList GetVideoDirsByHost(QString host);
+META_PUBLIC QStringList GetVideoDirsByHost(const QString& host);
 META_PUBLIC QStringList GetVideoDirs();
 
 META_PUBLIC bool IsDefaultCoverFile(const QString &coverfile);

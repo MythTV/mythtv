@@ -1017,8 +1017,8 @@ void ProgramInfo::clear(void)
  *  Compare two QStrings when they can either be initialized to
  *  "Default" or to the empty string.
  */
-bool qstringEqualOrDefault(QString a, QString b);
-bool qstringEqualOrDefault(const QString a, const QString b)
+bool qstringEqualOrDefault(const QString& a, const QString& b);
+bool qstringEqualOrDefault(const QString& a, const QString& b)
 {
     if (a == b)
         return true;
@@ -1387,7 +1387,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
  */
 
 bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
-                                 QStringList::const_iterator  listend)
+                                 const QStringList::const_iterator&  listend)
 {
     QString listerror = LOC + "FromStringList, not enough items in list.";
     QString ts;
@@ -1843,7 +1843,7 @@ bool ProgramInfo::IsGeneric(void) const
          && m_catType == kCategorySeries);
 }
 
-QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
+QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QString& grp)
     const
 {
     QString str;
@@ -4872,7 +4872,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
  *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
  *        call and so should not be called from the UI thread.
  */
-void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
+void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
 {
     if (!IsRecording())
         return;

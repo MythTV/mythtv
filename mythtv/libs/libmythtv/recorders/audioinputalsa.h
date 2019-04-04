@@ -57,7 +57,7 @@ class AudioInputALSA : public AudioInput
     bool PrepSwParams(void);
     int  PcmRead(void* buf, uint nbytes);
     bool Recovery(int err);
-    bool AlsaBad(int op_result, QString errmsg);
+    bool AlsaBad(int op_result, const QString& errmsg);
 
     QByteArray          alsa_device;
     snd_pcm_t*          pcm_handle       {nullptr};

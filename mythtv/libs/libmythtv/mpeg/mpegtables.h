@@ -733,19 +733,19 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         { _ptrs[i][0] = type; }
 
     // helper methods
-    bool IsVideo(uint i, QString sistandard) const;
-    bool IsAudio(uint i, QString sistandard) const;
-    bool IsEncrypted(QString sistandard) const;
+    bool IsVideo(uint i, const QString& sistandard) const;
+    bool IsAudio(uint i, const QString& sistandard) const;
+    bool IsEncrypted(const QString& sistandard) const;
     bool IsProgramEncrypted(void) const;
     bool IsStreamEncrypted(uint pid) const;
     /// Returns true iff PMT contains a still-picture video stream
-    bool IsStillPicture(QString sistandard) const;
+    bool IsStillPicture(const QString& sistandard) const;
     /// Returns a string representation of type at stream index i
     QString StreamTypeString(uint i) const
         { return StreamID::toString(StreamType(i)); }
     /// Returns a better (and more expensive) string representation
     /// of type at stream index i than StreamTypeString(uint)
-    QString StreamDescription(uint i, QString sistandard) const;
+    QString StreamDescription(uint i, const QString& sistandard) const;
     /// Returns the cannonical language if we find the iso639 descriptor
     QString GetLanguage(uint i) const;
     /// Returns the audio type from the iso 639 descriptor

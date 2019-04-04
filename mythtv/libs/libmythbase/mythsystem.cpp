@@ -25,10 +25,11 @@
 #include <csignal> // for SIGXXX
 
 // Qt headers
-#include <QStringList>
 #include <QByteArray>
 #include <QIODevice>
 #include <QRegExp>
+#include <QStringList>
+#include <utility>
 
 // MythTV headers
 #include "mythsystemlegacy.h"
@@ -43,7 +44,7 @@ class MythSystemLegacyWrapper : public MythSystem
     static MythSystemLegacyWrapper *Create(
         const QStringList &args,
         uint flags,
-        QString startPath,
+        const QString& startPath,
         Priority /*cpuPriority*/,
         Priority /*diskPriority*/)
     {
@@ -210,17 +211,17 @@ MythSystem *MythSystem::Create(
     Priority diskPriority)
 {
     return MythSystemLegacyWrapper::Create(
-        args, flags, startPath, cpuPriority, diskPriority);
+        args, flags, std::move(startPath), cpuPriority, diskPriority);
 }
 
 MythSystem *MythSystem::Create(
-    QString args,
+    const QString& args,
     uint flags,
     QString startPath,
     Priority cpuPriority,
     Priority diskPriority)
 {
     return MythSystem::Create(
-        args.split(QRegExp("\\s+")), flags, startPath,
+        args.split(QRegExp("\\s+")), flags, std::move(startPath),
         cpuPriority, diskPriority);
 }

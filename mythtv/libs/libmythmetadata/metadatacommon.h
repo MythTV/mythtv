@@ -145,11 +145,11 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         const QString &collectionref,
         const QString &tmsref,
         const QString &imdb,
-        const PeopleMap people,
+        const PeopleMap& people,
         const QStringList &studios,
         const QString &homepage,
         const QString &trailerURL,
-        const ArtworkMap artwork,
+        const ArtworkMap& artwork,
         DownloadMap downloads);
 
     //ProgramInfo Constructor
@@ -221,9 +221,9 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         const uint runtime,
         const uint runtimesecs,
         const QString &inetref,
-        const PeopleMap people,
+        const PeopleMap& people,
         const QString &trailerURL,
-        const ArtworkMap artwork,
+        const ArtworkMap& artwork,
         DownloadMap downloads);
 
     void toMap(InfoMap &map);
@@ -485,8 +485,8 @@ META_PUBLIC MetadataLookup *ParseMetadataItem(const QDomElement &item,
                                               bool passseas = true);
 META_PUBLIC MetadataLookup *ParseMetadataMovieNFO(const QDomElement &item,
                                                   MetadataLookup *lookup);
-META_PUBLIC PeopleMap ParsePeople(QDomElement people);
-META_PUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
+META_PUBLIC PeopleMap ParsePeople(const QDomElement& people);
+META_PUBLIC ArtworkMap ParseArtwork(const QDomElement& artwork);
 
 META_PUBLIC int editDistance(const QString &s, const QString &t);
 META_PUBLIC QString nearestName(const QString &actual,

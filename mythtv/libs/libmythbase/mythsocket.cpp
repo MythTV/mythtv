@@ -608,7 +608,7 @@ void MythSocket::IsDataAvailableReal(bool *ret) const
     m_dataAvailable.fetchAndStoreOrdered((*ret) ? 1 : 0);
 }
 
-void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
+void MythSocket::ConnectToHostReal(const QHostAddress& _addr, quint16 port, bool *ret)
 {
     if (m_tcpSocket->state() == QAbstractSocket::ConnectedState)
     {

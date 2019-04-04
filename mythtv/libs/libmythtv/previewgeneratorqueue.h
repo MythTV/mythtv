@@ -92,7 +92,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     static void GetPreviewImage(const ProgramInfo&, const QSize&,
                                 const QString &outputfile,
                                 long long time, bool in_seconds,
-                                QString token);
+                                const QString& token);
     static void AddListener(QObject*);
     static void RemoveListener(QObject*);
 
@@ -104,11 +104,11 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize&,
                                  const QString &outputfile,
                                  long long time, bool in_seconds,
-                                 QString token);
+                                 const QString& token);
 
     void GetInfo(const QString &key, uint &queue_depth, uint &token_cnt);
     void SetPreviewGenerator(const QString &key, PreviewGenerator *g);
-    void IncPreviewGeneratorPriority(const QString &key, QString token);
+    void IncPreviewGeneratorPriority(const QString &key, const QString& token);
     void UpdatePreviewGeneratorThreads(void);
     bool IsGeneratingPreview(const QString &key) const;
     uint IncPreviewGeneratorAttempts(const QString &key);

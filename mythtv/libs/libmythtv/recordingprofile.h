@@ -76,7 +76,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
 
   public:
     // initializers
-    explicit RecordingProfile(QString profName = QString());
+    explicit RecordingProfile(const QString& profName = QString());
     virtual ~RecordingProfile(void);
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype,
@@ -162,7 +162,7 @@ class RecordingProfileEditor :
 
   public slots:
     void ShowNewProfileDialog();
-    void CreateNewProfile(QString);
+    void CreateNewProfile(const QString&);
 
   protected:
     int             group;

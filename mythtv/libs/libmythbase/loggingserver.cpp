@@ -143,7 +143,7 @@ FileLogger::~FileLogger()
     }
 }
 
-FileLogger *FileLogger::create(QString filename, QMutex *mutex)
+FileLogger *FileLogger::create(const QString& filename, QMutex *mutex)
 {
     QByteArray ba = filename.toLocal8Bit();
     const char *file = ba.constData();
@@ -383,7 +383,7 @@ DatabaseLogger::~DatabaseLogger()
     DatabaseLogger::stopDatabaseAccess();
 }
 
-DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)
+DatabaseLogger *DatabaseLogger::create(const QString& table, QMutex *mutex)
 {
     QByteArray ba = table.toLocal8Bit();
     const char *tble = ba.constData();

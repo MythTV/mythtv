@@ -410,7 +410,7 @@ public:
     void SetVisibility(bool showHidden)
     { m_showHidden = showHidden; SetRefinementClause(); }
 
-    int  GetImages(ImageIdList ids, ImageList &files, ImageList &dirs) const;
+    int  GetImages(const ImageIdList& ids, ImageList &files, ImageList &dirs) const;
     int  GetChildren(int id, ImageList &files, ImageList &dirs) const;
     int  GetDirectory(int id, ImagePtr &parent,
                       ImageList &files, ImageList &dirs) const;
@@ -465,9 +465,9 @@ public:
     void        RequestMetaData(int id);
     QString     IgnoreDirs(const QString &excludes);
     QString     MakeDir(int, const QStringList &names, bool rescan = true);
-    QString     RenameFile(ImagePtrK im, const QString &name);
+    QString     RenameFile(const ImagePtrK& im, const QString &name);
     QString     CreateImages(int, const ImageListK &images);
-    QString     MoveDbImages(ImagePtrK destDir, ImageListK &images, const QString &);
+    QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &);
     QString     DeleteFiles(const ImageIdList &);
     void        ClearStorageGroup();
     void        CloseDevices(int devId = DEVICE_INVALID, bool eject = false);
@@ -483,8 +483,8 @@ public:
 
     // UI helper functions
     void SetDateFormat(const QString &format)    { m_dateFormat = format; }
-    QString LongDateOf(ImagePtrK) const;
-    QString ShortDateOf(ImagePtrK) const;
+    QString LongDateOf(const ImagePtrK&) const;
+    QString ShortDateOf(const ImagePtrK&) const;
     QString DeviceCaption(ImageItemK &im) const;
     QString CrumbName(ImageItemK &im, bool getPath = false) const;
 

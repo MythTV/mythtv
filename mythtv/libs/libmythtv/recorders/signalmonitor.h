@@ -37,7 +37,7 @@ class SignalMonitor : protected MThread
     /// Returns true iff the card type supports signal monitoring.
     static inline bool IsRequired(const QString &cardtype);
     static inline bool IsSupported(const QString &cardtype);
-    static SignalMonitor *Init(QString cardtype, int db_cardnum,
+    static SignalMonitor *Init(const QString& cardtype, int db_cardnum,
                                ChannelBase *channel,
                                bool release_stream);
     virtual ~SignalMonitor();

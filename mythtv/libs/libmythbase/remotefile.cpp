@@ -337,7 +337,7 @@ bool RemoteFile::OpenInternal()
     return true;
 }
 
-bool RemoteFile::ReOpen(QString newFilename)
+bool RemoteFile::ReOpen(const QString& newFilename)
 {
     if (isLocal())
     {

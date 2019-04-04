@@ -232,7 +232,7 @@ class META_PUBLIC MusicMetadata
 
     QDateTime LastPlay() const { return m_lastplay; }
     void setLastPlay();
-    void setLastPlay(QDateTime lastPlay);
+    void setLastPlay(const QDateTime& lastPlay);
 
     int PlayCount() const { return m_playcount; }
     void incPlayCount();
@@ -290,7 +290,7 @@ class META_PUBLIC MusicMetadata
     static MusicMetadata *createFromFilename(const QString &filename);
     static MusicMetadata *createFromID(int trackid);
     static void setArtistAndTrackFormats();
-    static QStringList fillFieldList(QString field);
+    static QStringList fillFieldList(const QString& field);
     static bool updateStreamList(void);
 
     // this looks for any image available - preferring a front cover if available

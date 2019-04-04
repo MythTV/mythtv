@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
+#include <utility>
 
 #include "mythlogging.h"
 
@@ -23,10 +24,10 @@
 /////////////////////////////////////////////////////////////////////
 MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
 {
-    init(fileName, sgDir, isDir, size);
+    init(std::move(fileName), std::move(sgDir), isDir, size);
 }
 
-void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
+void MFileInfo::init(const QString& fileName, QString sgDir, bool isDir,
                      qint64 size)
 {
     m_fileName = fileName;
@@ -38,7 +39,7 @@ void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
         QUrl qurl(fileName);
         m_hostName = qurl.host();
         m_storageGroup = qurl.userName();
-        m_storageGroupDir = sgDir;
+        m_storageGroupDir = std::move(sgDir);
         m_subDir = qurl.path();
 
         if (!qurl.fragment().isEmpty())

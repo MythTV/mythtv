@@ -1,7 +1,8 @@
 #include "imagemanager.h"
 
-#include <QRunnable>
 #include <QImageReader>
+#include <QRunnable>
+#include <utility>
 
 #include "dbaccess.h"  // for FileAssociations
 #include "mthreadpool.h"
@@ -84,7 +85,7 @@ public:
      \brief Clears all files and sub-dirs within a directory
      \param path Dir to clear
     */
-    void RemoveDirContents(QString path)
+    void RemoveDirContents(const QString& path)
     {
         QDir(path).removeRecursively();
     }
@@ -1124,7 +1125,7 @@ class ReadMetaThread : public QRunnable
 {
 public:
     ReadMetaThread(ImagePtrK im, const QString &path)
-        : m_im(im), m_path(path) {}
+        : m_im(std::move(im)), m_path(path) {}
 
     void run() override // QRunnable
     {
@@ -1818,7 +1819,7 @@ int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
  \param[in,out] dirs List of dirs, filtered & ordered iaw current settings.
  \return int Number of images
 */
-int ImageDbReader::GetImages(ImageIdList ids,
+int ImageDbReader::GetImages(const ImageIdList& ids,
                              ImageList &files, ImageList &dirs) const
 {
     // Ids are either all local or all remote. GALLERY_DB_ID not valid
@@ -2188,7 +2189,7 @@ QString ImageManagerFe::MakeDir(int parent, const QStringList &names, bool resca
  * \param  name New name of the file/dir (basename only, no path or extension)
  * \return QString Error message, if not empty
  */
-QString ImageManagerFe::RenameFile(ImagePtrK im, const QString &name)
+QString ImageManagerFe::RenameFile(const ImagePtrK& im, const QString &name)
 {
     if (!im->IsLocal())
     {
@@ -2252,7 +2253,7 @@ QString ImageManagerFe::CreateImages(int destId, const ImageListK &images)
  * \param srcPath Original parent path
  * \return QString Error message
  */
-QString ImageManagerFe::MoveDbImages(ImagePtrK destDir, ImageListK &images,
+QString ImageManagerFe::MoveDbImages(const ImagePtrK& destDir, ImageListK &images,
                                      const QString &srcPath)
 {
     QStringList idents;
@@ -2309,7 +2310,7 @@ QString ImageManagerFe::DeleteFiles(const ImageIdList &ids)
  \param im Image or dir
  \return QString Time or date string formatted as per Myth general settings
 */
-QString ImageManagerFe::LongDateOf(ImagePtrK im) const
+QString ImageManagerFe::LongDateOf(const ImagePtrK& im) const
 {
     if (im->m_id == GALLERY_DB_ID)
         return "";
@@ -2343,7 +2344,7 @@ QString ImageManagerFe::LongDateOf(ImagePtrK im) const
  \param im Image or dir
  \return QString Date formatted as per Gallery caption date format.
 */
-QString ImageManagerFe::ShortDateOf(ImagePtrK im) const
+QString ImageManagerFe::ShortDateOf(const ImagePtrK& im) const
 {
     if (im->m_id == GALLERY_DB_ID)
         return "";

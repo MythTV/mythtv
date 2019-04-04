@@ -65,7 +65,7 @@ class MTV_PUBLIC HTTPLiveStream
     bool UpdateSizeInfo(uint16_t width, uint16_t height,
                         uint16_t srcwidth, uint16_t srcheight);
     bool UpdateStatus(HTTPLiveStreamStatus status);
-    bool UpdateStatusMessage(QString message);
+    bool UpdateStatusMessage(const QString& message);
     bool UpdatePercentComplete(int percent);
 
     QString StatusToString(HTTPLiveStreamStatus status);

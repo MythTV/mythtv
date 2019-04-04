@@ -132,7 +132,7 @@ void HTTPTSStreamHandler::run(void)
 #undef  LOC
 #define LOC QString("HTTPReader(%1): ").arg(m_url)
 
-bool HTTPReader::DownloadStream(const QUrl url)
+bool HTTPReader::DownloadStream(const QUrl& url)
 {
     m_url = url.toString();
 

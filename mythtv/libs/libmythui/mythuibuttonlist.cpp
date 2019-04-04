@@ -6,6 +6,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QKeyEvent>
+#include <utility>
 
 // libmyth headers
 #include "mythlogging.h"
@@ -1536,7 +1537,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         emit DependChanged(true);
 }
 
-void MythUIButtonList::SetValueByData(QVariant data)
+void MythUIButtonList::SetValueByData(const QVariant& data)
 {
     if (!m_initialized)
         Init();
@@ -1680,7 +1681,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemAt(int pos) const
     return m_itemList.at(pos);
 }
 
-MythUIButtonListItem *MythUIButtonList::GetItemByData(QVariant data)
+MythUIButtonListItem *MythUIButtonList::GetItemByData(const QVariant& data)
 {
     if (!m_initialized)
         Init();
@@ -3217,7 +3218,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
 
     m_parent    = lbtype;
     m_text      = text;
-    m_data      = data;
+    m_data      = std::move(data);
 
     m_image     = nullptr;
 
@@ -3557,7 +3558,7 @@ void MythUIButtonListItem::setEnabled(bool flag)
 
 void MythUIButtonListItem::SetData(QVariant data)
 {
-    m_data = data;
+    m_data = std::move(data);
 }
 
 QVariant MythUIButtonListItem::GetData()

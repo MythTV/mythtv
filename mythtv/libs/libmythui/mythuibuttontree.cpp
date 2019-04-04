@@ -4,6 +4,7 @@
 
 // Qt headers
 #include <QDomDocument>
+#include <utility>
 
 // Mythdb headers
 #include "mythlogging.h"
@@ -253,7 +254,7 @@ void MythUIButtonTree::Reset(void)
  */
 bool MythUIButtonTree::SetNodeById(QList<int> route)
 {
-    MythGenericTree *node = m_rootNode->findNode(route);
+    MythGenericTree *node = m_rootNode->findNode(std::move(route));
 
     if (node && node->isSelectable())
     {

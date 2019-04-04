@@ -29,18 +29,18 @@ static QPair<QHostAddress, int> kLinkLocal6 =
 class PrivUdpSocket : public QUdpSocket
 {
 public:
-    PrivUdpSocket(QObject *parent, QNetworkAddressEntry host) :
+    PrivUdpSocket(QObject *parent, const QNetworkAddressEntry& host) :
         QUdpSocket(parent), m_host(host) { };
     ~PrivUdpSocket() override = default;
     QNetworkAddressEntry host()
     {
         return m_host;
     };
-    bool contains(QHostAddress addr)
+    bool contains(const QHostAddress& addr)
     {
         return contains(m_host, addr);
     };
-    static bool contains(QNetworkAddressEntry host, QHostAddress addr)
+    static bool contains(const QNetworkAddressEntry& host, const QHostAddress& addr)
     {
         if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
             addr.isInSubnet(kLinkLocal6) &&

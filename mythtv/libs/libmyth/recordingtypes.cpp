@@ -98,7 +98,7 @@ QString toRawString(RecordingType rectype)
     }
 }
 
-RecordingType recTypeFromString(QString type)
+RecordingType recTypeFromString(const QString& type)
 {
     if (type.toLower() == "not recording" || type.toLower() == "not")
         return kNotRecording;
@@ -203,7 +203,7 @@ QString toRawString(RecordingDupInType recdupin)
     }
 }
 
-RecordingDupInType dupInFromString(QString type)
+RecordingDupInType dupInFromString(const QString& type)
 {
     if (type.toLower() == "current recordings" || type.toLower() == "current")
         return kDupsInRecorded;
@@ -273,7 +273,7 @@ QString toRawString(RecordingDupMethodType duptype)
     }
 }
 
-RecordingDupMethodType dupMethodFromString(QString type)
+RecordingDupMethodType dupMethodFromString(const QString& type)
 {
     if (type.toLower() == "none")
         return kDupCheckNone;
@@ -309,7 +309,7 @@ QString toRawString(RecSearchType searchtype)
     }
 }
 
-RecSearchType searchTypeFromString(QString type)
+RecSearchType searchTypeFromString(const QString& type)
 {
     if (type.toLower() == "none")
         return kNoSearch;

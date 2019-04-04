@@ -51,7 +51,7 @@ class MBASE_PUBLIC ThreadedFileWriter
     ~ThreadedFileWriter();
 
     bool Open(void);
-    bool ReOpen(QString newFilename = "");
+    bool ReOpen(const QString& newFilename = "");
 
     long long Seek(long long pos, int whence);
     int Write(const void *data, uint count);

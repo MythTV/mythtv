@@ -14,7 +14,7 @@
 
 #define LOC      QString("ThemeInfo: ")
 
-ThemeInfo::ThemeInfo(QString theme)
+ThemeInfo::ThemeInfo(const QString& theme)
           :XMLParseBase()
 {
     QString themeNoTrailingSlash = theme;

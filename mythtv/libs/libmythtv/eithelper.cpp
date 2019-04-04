@@ -237,7 +237,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
     elist.insert(ett->EventID(), ATSCEtt(next_ett_text));
 }
 
-static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
+static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
                                         QMap<uint,uint> languagePreferences,
                                         QString &title, QString &subtitle,
                                         QString &description, QMap<QString,QString> &items)
@@ -339,7 +339,7 @@ static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
     }
 }
 
-static inline void parse_dvb_component_descriptors(desc_list_t list,
+static inline void parse_dvb_component_descriptors(const desc_list_t& list,
                                                    unsigned char &subtitle_type,
                                                    unsigned char &audio_properties,
                                                    unsigned char &video_properties)

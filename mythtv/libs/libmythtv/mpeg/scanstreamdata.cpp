@@ -60,7 +60,7 @@ void ScanStreamData::Reset(void)
         AddListeningPID(FREESAT_SI_PID);
 }
 
-QString ScanStreamData::GetSIStandard(QString guess) const
+QString ScanStreamData::GetSIStandard(const QString& guess) const
 {
     if (HasCachedMGT())
         return "atsc";

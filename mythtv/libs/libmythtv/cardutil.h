@@ -252,9 +252,9 @@ class MTV_PUBLIC CardUtil
         return list[0];
     }
 
-    static vector<uint> GetInputIDs(QString videodevice = QString(),
-                                    QString rawtype     = QString(),
-                                    QString inputname   = QString(),
+    static vector<uint> GetInputIDs(const QString& videodevice = QString(),
+                                    const QString& rawtype     = QString(),
+                                    const QString& inputname   = QString(),
                                     QString hostname    = QString());
 
     static uint         GetChildInputCount(uint inputid);
@@ -341,10 +341,10 @@ class MTV_PUBLIC CardUtil
 
     static QString      ProbeSubTypeName(uint inputid);
 
-    static QStringList  ProbeVideoInputs(QString device,
-                                         QString inputtype = QString());
-    static QStringList  ProbeAudioInputs(QString device,
-                                         QString inputtype = QString());
+    static QStringList  ProbeVideoInputs(const QString& device,
+                                         const QString& inputtype = QString());
+    static QStringList  ProbeAudioInputs(const QString& device,
+                                         const QString& inputtype = QString());
     static void         GetDeviceInputNames(const QString      &device,
                                             const QString      &inputtype,
                                             QStringList        &inputs);
@@ -424,9 +424,9 @@ class MTV_PUBLIC CardUtil
                                    QString *error = nullptr);
 
   private:
-    static QStringList  ProbeV4LVideoInputs(QString device);
-    static QStringList  ProbeV4LAudioInputs(QString device);
-    static QStringList  ProbeDVBInputs(QString device);
+    static QStringList  ProbeV4LVideoInputs(const QString& device);
+    static QStringList  ProbeV4LAudioInputs(const QString& device);
+    static QStringList  ProbeDVBInputs(const QString& device);
     static QMap <QString,QStringList> s_videoDeviceCache;
 };
 

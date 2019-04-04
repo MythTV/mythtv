@@ -378,7 +378,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                             const QStringList &actions,
                             bool isDVD, bool isDVDStillFrame);
     bool BrowseHandleAction(PlayerContext*, const QStringList &actions);
-    void OSDDialogEvent(int result, QString text, QString action);
+    void OSDDialogEvent(int result, const QString& text, QString action);
     bool PxPHandleAction(PlayerContext*,const QStringList &actions);
     bool ToggleHandleAction(PlayerContext*,
                             const QStringList &actions, bool isDVD);
@@ -605,7 +605,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                                CommSkipMode skipMode = kCommSkipOff);
 
     // Transcode
-    void DoQueueTranscode(PlayerContext*, QString profile);
+    void DoQueueTranscode(PlayerContext*, const QString& profile);
 
     // Bookmarks
     bool IsBookmarkAllowed(const PlayerContext*) const;
@@ -617,8 +617,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void ToggleOSDDebug(PlayerContext*);
     void UpdateOSDDebug(const PlayerContext *ctx);
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
-    void UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
-                         QString value, int type, QString units,
+    void UpdateOSDStatus(const PlayerContext *ctx, const QString& title, const QString& desc,
+                         const QString& value, int type, const QString& units,
                          int position = 0,
                          enum OSDTimeout timeout = kOSDTimeout_Med);
     void UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
@@ -684,52 +684,52 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                              const QString &action = QString(""));
 
     // Manual zoom mode
-    void SetManualZoom(const PlayerContext *, bool zoomON, QString desc);
+    void SetManualZoom(const PlayerContext *, bool zoomON, const QString& desc);
     bool ManualZoomHandleAction(PlayerContext *actx,
                                 const QStringList &actions);
 
     // Channel editing support
     void StartChannelEditMode(PlayerContext*);
-    bool HandleOSDChannelEdit(PlayerContext*, QString action);
+    bool HandleOSDChannelEdit(PlayerContext*, const QString& action);
     void ChannelEditAutoFill(const PlayerContext*, InfoMap&) const;
     void ChannelEditXDSFill(const PlayerContext*, InfoMap&) const;
 
     // General dialog handling
     bool DialogIsVisible(PlayerContext *ctx, const QString &dialog);
-    void HandleOSDInfo(PlayerContext *ctx, QString action);
+    void HandleOSDInfo(PlayerContext *ctx, const QString& action);
     void ShowNoRecorderDialog(const PlayerContext*,
                               NoRecorderMsg msgType = kNoRecorders);
 
     // AskAllow dialog handling
     void ShowOSDAskAllow(PlayerContext *ctx);
-    void HandleOSDAskAllow(PlayerContext *ctx, QString action);
+    void HandleOSDAskAllow(PlayerContext *ctx, const QString& action);
     void AskAllowRecording(PlayerContext*, const QStringList&, int, bool, bool);
 
     // Program editing support
     void ShowOSDCutpoint(PlayerContext *ctx, const QString &type);
-    bool HandleOSDCutpoint(PlayerContext *ctx, QString action);
+    bool HandleOSDCutpoint(PlayerContext *ctx, const QString& action);
     void StartProgramEditMode(PlayerContext*);
 
     // Already editing dialog
     void ShowOSDAlreadyEditing(PlayerContext *ctx);
-    void HandleOSDAlreadyEditing(PlayerContext *ctx, QString action,
+    void HandleOSDAlreadyEditing(PlayerContext *ctx, const QString& action,
                                  bool was_paused);
 
     // Sleep dialog handling
     void ShowOSDSleep(void);
-    void HandleOSDSleep(PlayerContext *ctx, QString action);
+    void HandleOSDSleep(PlayerContext *ctx, const QString& action);
     void SleepDialogTimeout(void);
 
     // Idle dialog handling
     void ShowOSDIdle(void);
-    void HandleOSDIdle(PlayerContext *ctx, QString action);
+    void HandleOSDIdle(PlayerContext *ctx, const QString& action);
     void IdleDialogTimeout(void);
 
     // Exit/delete dialog handling
     void ShowOSDStopWatchingRecording(PlayerContext *ctx);
-    void ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
+    void ShowOSDPromptDeleteRecording(PlayerContext *ctx, const QString& title,
                                       bool force = false);
-    bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
+    bool HandleOSDVideoExit(PlayerContext *ctx, const QString& action);
 
     // Navigation Dialog
     void StartOsdNavigation(PlayerContext *ctx);

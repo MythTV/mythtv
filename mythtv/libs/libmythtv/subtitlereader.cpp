@@ -110,7 +110,7 @@ QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)
     return result;
 }
 
-void SubtitleReader::AddRawTextSubtitle(QStringList list, uint64_t duration)
+void SubtitleReader::AddRawTextSubtitle(const QStringList& list, uint64_t duration)
 {
     if (!m_RawTextSubtitlesEnabled || list.empty())
         return;

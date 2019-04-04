@@ -67,7 +67,7 @@ class BackendSelection : public MythScreenType
     void Init(void) override; // MythScreenType
     bool ConnectBackend(DeviceLocation *dev);
     void AddItem(DeviceLocation *dev);
-    void RemoveItem(QString USN);
+    void RemoveItem(const QString& USN);
     bool TryDBfromURL(const QString &error, QString URL);
     void PromptForPassword(void);
     void CloseWithDecision(Decision);

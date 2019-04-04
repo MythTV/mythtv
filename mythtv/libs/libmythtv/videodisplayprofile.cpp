@@ -1,5 +1,6 @@
 // -*- Mode: c++ -*-
 #include <algorithm>
+#include <utility>
 using namespace std;
 
 #include "videodisplayprofile.h"
@@ -18,15 +19,15 @@ using namespace std;
 
 bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
 {
-    return checkRange(key, fvalue, 0, true, ok);
+    return checkRange(std::move(key), fvalue, 0, true, ok);
 }
 
 bool ProfileItem::checkRange(QString key, int ivalue, bool *ok) const
 {
-    return checkRange(key, 0.0, ivalue, false, ok);
+    return checkRange(std::move(key), 0.0, ivalue, false, ok);
 }
 
-bool ProfileItem::checkRange(QString key,
+bool ProfileItem::checkRange(const QString& key,
     float fvalue, int ivalue, bool isFloat, bool *ok) const
 {
     bool match = true;
@@ -856,7 +857,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
 }
 
 
-QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
+QString VideoDisplayProfile::GetDecoderHelp(const QString& decoder)
 {
     QString msg = QObject::tr("Processing method used to decode video.");
 
@@ -1127,8 +1128,8 @@ void VideoDisplayProfile::DeleteProfiles(const QString &hostname)
 // Old style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
-    QString cmp0, uint width0, uint height0,
-    QString cmp1, uint width1, uint height1,
+    const QString& cmp0, uint width0, uint height0,
+    const QString& cmp1, uint width1, uint height1,
     QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
     QString osdrenderer, bool osdfade,
     QString deint0, QString deint1, QString filters)
@@ -1155,18 +1156,18 @@ void VideoDisplayProfile::CreateProfile(
     CreateProfile(
         groupid, priority,
         width, height, QString(),
-        decoder, max_cpus, skiploop, videorenderer,
-        osdrenderer, osdfade,
-        deint0, deint1, filters);
+        std::move(decoder), max_cpus, skiploop, std::move(videorenderer),
+        std::move(osdrenderer), osdfade,
+        std::move(deint0), std::move(deint1), std::move(filters));
 }
 
 // New Style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
-    QString width, QString height, QString codecs,
-    QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-    QString osdrenderer, bool osdfade,
-    QString deint0, QString deint1, QString filters)
+    const QString& width, const QString& height, const QString& codecs,
+    const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+    const QString& osdrenderer, bool osdfade,
+    const QString& deint0, const QString& deint1, const QString& filters)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

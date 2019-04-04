@@ -146,7 +146,7 @@ void PreviewGeneratorQueue::GetPreviewImage(
     const QSize &outputsize,
     const QString &outputfile,
     long long time, bool in_seconds,
-    QString token)
+    const QString& token)
 {
     if (!s_pgq)
         return;
@@ -416,7 +416,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     const QSize &size,
     const QString &outputfile,
     long long time, bool in_seconds,
-    QString token)
+    const QString& token)
 {
     QString key = QString("%1_%2x%3_%4%5")
         .arg(pginfo.GetBasename()).arg(size.width()).arg(size.height())
@@ -614,7 +614,7 @@ void PreviewGeneratorQueue::GetInfo(
  * \param[in] token
  */
 void PreviewGeneratorQueue::IncPreviewGeneratorPriority(
-    const QString &key, QString token)
+    const QString &key, const QString& token)
 {
     QMutexLocker locker(&m_lock);
     m_queue.removeAll(key);

@@ -1,8 +1,9 @@
 // qt
-#include <QString>
 #include <QCoreApplication>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QString>
+#include <utility>
 
 #include "mythdirs.h"
 #include "mythcontext.h"
@@ -404,7 +405,7 @@ void Search::slotProcessSearchExit(uint exitcode)
 
 void Search::SetData(QByteArray data)
 {
-    m_data = data;
+    m_data = std::move(data);
     m_document.setContent(m_data, true);
 
 }

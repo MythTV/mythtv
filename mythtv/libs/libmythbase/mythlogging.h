@@ -76,17 +76,17 @@ extern MBASE_PUBLIC QStringList logPropagateArgList;
 extern MBASE_PUBLIC QString     logPropagateArgs;
 extern MBASE_PUBLIC QString     verboseString;
 
-MBASE_PUBLIC void logStart(QString logfile, int progress = 0, int quiet = 0,
+MBASE_PUBLIC void logStart(const QString& logfile, int progress = 0, int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
                            bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);
 MBASE_PUBLIC bool logPropagateQuiet(void);
 
-MBASE_PUBLIC int  syslogGetFacility(QString facility);
-MBASE_PUBLIC LogLevel_t logLevelGet(QString level);
+MBASE_PUBLIC int  syslogGetFacility(const QString& facility);
+MBASE_PUBLIC LogLevel_t logLevelGet(const QString& level);
 MBASE_PUBLIC QString logLevelGetName(LogLevel_t level);
-MBASE_PUBLIC int verboseArgParse(QString arg);
+MBASE_PUBLIC int verboseArgParse(const QString& arg);
 
 /// Verbose helper function for ENO macro
 MBASE_PUBLIC QString logStrerror(int errnum);

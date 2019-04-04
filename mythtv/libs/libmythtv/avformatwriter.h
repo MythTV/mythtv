@@ -29,7 +29,7 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
                         long long timecode, int pagenr) override; // FileWriterBase
 
     bool NextFrameIsKeyFrame(void);
-    bool ReOpen(QString filename);
+    bool ReOpen(const QString& filename);
 
   private:
     AVStream *AddVideoStream(void);

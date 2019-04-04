@@ -13,7 +13,7 @@
 
 ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenStack *lparent,
-    const ArtworkList list,
+    const ArtworkList& list,
     const VideoArtworkType type) :
 
     MythScreenType(lparent, "videosearchresultspopup"),

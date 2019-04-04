@@ -84,7 +84,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     void ReadStringListReal(QStringList *list, uint timeoutMS, bool *ret);
     void WriteStringListReal(const QStringList *list, bool *ret);
-    void ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret);
+    void ConnectToHostReal(const QHostAddress& addr, quint16 port, bool *ret);
     void DisconnectFromHostReal(void);
 
     void WriteReal(const char*, int size, int *ret);

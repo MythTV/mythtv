@@ -495,8 +495,8 @@ class MPUBLIC ProgramInfo
         kRecordingKey,
         kSchedulingKey,
     } Verbosity;
-    QString toString(Verbosity v = kLongDescription, QString sep = ":",
-                     QString grp = "\"") const;
+    QString toString(Verbosity v = kLongDescription, const QString& sep = ":",
+                     const QString& grp = "\"") const;
 
     // Quick sets
     void SetTitle(const QString &t, const QString &st = nullptr);
@@ -620,7 +620,7 @@ class MPUBLIC ProgramInfo
     void SaveMarkupFlag(MarkTypes type) const;
     void ClearMarkupFlag(MarkTypes type) const { ClearMarkupMap(type); }
     void UpdateLastDelete(bool setTime) const;
-    void MarkAsInUse(bool inuse, QString usedFor = "");
+    void MarkAsInUse(bool inuse, const QString& usedFor = "");
     void UpdateInUseMark(bool force = false);
     void SaveSeasonEpisode(uint seas, uint ep);
     void SaveInetRef(const QString &inet);
@@ -721,7 +721,7 @@ class MPUBLIC ProgramInfo
         const uint chanid, const QDateTime &recstartts);
 
     bool FromStringList(QStringList::const_iterator &it,
-                        QStringList::const_iterator  end);
+                        const QStringList::const_iterator&  end);
 
     static void QueryMarkupMap(
         const QString &video_pathname,

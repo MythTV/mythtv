@@ -429,7 +429,7 @@ int AVFormatWriter::WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int 
     return 1;
 }
 
-bool AVFormatWriter::ReOpen(QString filename)
+bool AVFormatWriter::ReOpen(const QString& filename)
 {
     bool result = m_ringBuffer->ReOpen(filename);
 
