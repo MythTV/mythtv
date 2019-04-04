@@ -2553,8 +2553,6 @@ void EITFixUp::FixGreekSubtitle(DBEventEIT &event) const
 
 void EITFixUp::FixGreekEIT(DBEventEIT &event) const
 {
-    int position1;
-    int position2;
     //Live show
     int position;
     QRegExp tmpRegEx;
@@ -2715,8 +2713,9 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     QRegExp tmpSeries = m_grSeason;
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
-    if ((position1 = tmpSeries.indexIn(event.m_title)) != -1
-          || (position2 = tmpSeries.indexIn(event.m_description)) != -1)
+    int position1 = tmpSeries.indexIn(event.m_title);
+    int position2 = tmpSeries.indexIn(event.m_description);
+    if ((position1 != -1) || (position2 != -1))
     {
         if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
         {
