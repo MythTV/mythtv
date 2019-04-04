@@ -100,6 +100,7 @@ QStringList DisplayResScreen::Convert(const DisplayResVector& dsr)
 DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 {
     std::vector<DisplayResScreen> dsr;
+    dsr.reserve(slist.size());
     for (int i=0; i<slist.size(); ++i)
         dsr.emplace_back(slist[i]);
     return dsr;

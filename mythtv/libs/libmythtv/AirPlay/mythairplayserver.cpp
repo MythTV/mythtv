@@ -152,8 +152,8 @@ QString GenerateNonce(void)
     return nonce;
 }
 
-QByteArray DigestMd5Response(QString response, QString option,
-                             QString nonce, QString password,
+QByteArray DigestMd5Response(const QString& response, const QString& option,
+                             const QString& nonce, const QString& password,
                              QByteArray &auth)
 {
     int authStart       = response.indexOf("response=\"") + 10;
@@ -222,7 +222,7 @@ class APHTTPRequest
         Check();
     }
 
-    QByteArray GetQueryValue(QByteArray key)
+    QByteArray GetQueryValue(const QByteArray& key)
     {
         for (int i = 0; i < m_queries.size(); i++)
             if (m_queries[i].first == key)
@@ -972,8 +972,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 }
 
 void MythAirplayServer::SendResponse(QTcpSocket *socket,
-                                     int status, QByteArray header,
-                                     QByteArray content_type, QString body)
+                                     int status, const QByteArray& header,
+                                     const QByteArray& content_type, const QString& body)
 {
     if (!socket || !m_incoming.contains(socket) ||
         socket->state() != QAbstractSocket::ConnectedState)

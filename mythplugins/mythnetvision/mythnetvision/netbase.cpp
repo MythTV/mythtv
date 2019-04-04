@@ -112,7 +112,7 @@ void NetBase::ShowWebVideo()
 
     if (!item->GetPlayer().isEmpty())
     {
-        QString cmd = item->GetPlayer();
+        const QString& cmd = item->GetPlayer();
         QStringList args = item->GetPlayerArguments();
         if (args.empty())
         {

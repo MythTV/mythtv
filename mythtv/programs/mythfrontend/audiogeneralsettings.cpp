@@ -10,8 +10,9 @@
 
 // Qt headers
 #include <QCoreApplication>
-#include <QEvent>
 #include <QDir>
+#include <QEvent>
+#include <utility>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -597,8 +598,8 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                  AudioOutputSettings &settings,
                                  bool hd) :
     MThread("AudioTest"),
-    m_parent(parent), m_channels(channels), m_device(main),
-    m_passthrough(passthrough), m_hd(hd)
+    m_parent(parent), m_channels(channels), m_device(std::move(main)),
+    m_passthrough(std::move(passthrough)), m_hd(hd)
 {
     m_format = hd ? settings.BestSupportedFormat() : FORMAT_S16;
     m_samplerate = hd ? settings.BestSupportedRate() : 48000;

@@ -443,7 +443,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
     QString character;
     // Compose key handling
     // Enter composition mode
-    if ((modifiers & Qt::GroupSwitchModifier) &&
+    if (((modifiers & Qt::GroupSwitchModifier) != 0U) &&
         (keynum >= Qt::Key_Dead_Grave) && (keynum <= Qt::Key_Dead_Horn))
     {
         m_composeKey = keynum;
@@ -463,7 +463,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
             //QKeyEvent key(QEvent::KeyPress, keycode, modifiers);
             character = QChar(keycode);
 
-            if (modifiers & Qt::ShiftModifier)
+            if ((modifiers & Qt::ShiftModifier) != 0U)
                 character = character.toUpper();
             else
                 character = character.toLower();

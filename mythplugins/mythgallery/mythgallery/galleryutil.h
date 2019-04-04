@@ -65,8 +65,8 @@ class GalleryUtil
     static void PlayVideo(const QString &filename);
 
   private:
-    static bool CopyDirectory(const QFileInfo src, QFileInfo &dst);
-    static bool MoveDirectory(const QFileInfo src, QFileInfo &dst);
+    static bool CopyDirectory(const QFileInfo& src, QFileInfo &dst);
+    static bool MoveDirectory(const QFileInfo& src, QFileInfo &dst);
     static bool DeleteDirectory(const QFileInfo &dir);
     static bool RenameDirectory(const QString &currDir, const QString &oldName,
                                 const QString &newName);

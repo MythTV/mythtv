@@ -131,7 +131,7 @@ QStringList VBox::doUPNPSearch(void)
             {
                 // add a device in the format ID IP TUNERNO TUNERTYPE
                 // eg vbox_3718 192.168.1.204 1 DVBT/T2
-                QString tuner = tuners.at(x);
+                const QString& tuner = tuners.at(x);
                 QString device = QString("%1 %2 %3").arg(id).arg(ip).arg(tuner);
                 result << device;
                 LOG(VB_GENERAL, LOG_INFO, QString("Found VBox - %1").arg(device));
@@ -180,7 +180,7 @@ QString VBox::getIPFromVideoDevice(const QString& dev)
             continue;
         }
 
-        QString vboxID = vboxItems.at(0);
+        const QString& vboxID = vboxItems.at(0);
         QString vboxIP = vboxItems.at(1);
 
         if (vboxID == id)

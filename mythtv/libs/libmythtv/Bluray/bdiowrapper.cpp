@@ -131,7 +131,7 @@ static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmod
 
     int fd;
     int intMode = O_RDONLY;
-    if (!strcasecmp(cmode, "wb"))
+    if (strcasecmp(cmode, "wb") == 0)
         intMode = O_WRONLY;
 
     if ((fd = mythfile_open(filename, intMode)) >= 0)

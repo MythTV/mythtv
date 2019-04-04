@@ -86,16 +86,16 @@ class LCDProcClient : public QObject
     void scrollWidgets(void);
 
   private:
-    void outputCenteredText(QString theScreen, QString theText,
-                            QString widget = "topWidget", int row = 1);
+    void outputCenteredText(const QString& theScreen, QString theText,
+                            const QString& widget = "topWidget", int row = 1);
 
-    void outputLeftText(QString theScreen, QString theText,
-                        QString widget = "topWidget", int row = 1);
-    void outputRightText(QString theScreen, QString theText,
-                         QString widget = "topWidget", int row = 1);
+    void outputLeftText(const QString& theScreen, QString theText,
+                        const QString& widget = "topWidget", int row = 1);
+    void outputRightText(const QString& theScreen, QString theText,
+                         const QString& widget = "topWidget", int row = 1);
 
-    void outputScrollerText(QString theScreen, QString theText,
-                         QString widget = "scroller", int top = 1, int bottom = 1);
+    void outputScrollerText(const QString& theScreen, const QString& theText,
+                         const QString& widget = "scroller", int top = 1, int bottom = 1);
 
     QStringList formatScrollerText(const QString &text);
     void outputText(QList<LCDTextItem> *textItems);
@@ -115,17 +115,17 @@ class LCDProcClient : public QObject
                              QString theWidget = "topWidget", int theRow = 1);
 
     // Scroll 1 or more widgets on a screen
-    void assignScrollingWidgets(QString theText, QString theScreen,
-                             QString theWidget = "topWidget", int theRow = 1);
+    void assignScrollingWidgets(const QString& theText, const QString& theScreen,
+                             const QString& theWidget = "topWidget", int theRow = 1);
     void formatScrollingWidgets(void);
 
     void startTime();
-    void startMusic(QString artist, QString album, QString track);
-    void startChannel(QString channum, QString title, QString subtitle);
+    void startMusic(QString artist, const QString& album, const QString& track);
+    void startChannel(const QString& channum, const QString& title, const QString& subtitle);
     void startGeneric(QList<LCDTextItem> * textItems);
     void startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
                    bool popMenu);
-    void startVolume(QString app_name);
+    void startVolume(const QString& app_name);
     void showStartupMessage(void);
 
     void setWidth(unsigned int);

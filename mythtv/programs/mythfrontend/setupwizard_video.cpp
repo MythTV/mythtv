@@ -195,7 +195,7 @@ void VideoSetupWizard::testHDVideo(void)
         playVideoTest(desc, title, hdtestfile);
 }
 
-void VideoSetupWizard::playVideoTest(QString desc, QString title, QString file)
+void VideoSetupWizard::playVideoTest(const QString& desc, const QString& title, const QString& file)
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
@@ -206,7 +206,7 @@ void VideoSetupWizard::playVideoTest(QString desc, QString title, QString file)
     VideoDisplayProfile::SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
 }
 
-void VideoSetupWizard::DownloadSample(QString url, QString dest)
+void VideoSetupWizard::DownloadSample(const QString& url, const QString& dest)
 {
     initProgressDialog();
     m_downloadFile = RemoteDownloadFile(url, "Temp", dest);

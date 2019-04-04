@@ -115,7 +115,7 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
 }
 
 
-void GalleryFilter::dumpFilter(QString src)
+void GalleryFilter::dumpFilter(const QString& src)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Dumping GalleryFilter from: %1")
                       .arg(src));

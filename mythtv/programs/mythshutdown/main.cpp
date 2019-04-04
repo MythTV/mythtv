@@ -206,7 +206,7 @@ static bool isRunning(const char *program)
     return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
-static QDateTime getDailyWakeupTime(QString sPeriod)
+static QDateTime getDailyWakeupTime(const QString& sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime, "hh:mm");

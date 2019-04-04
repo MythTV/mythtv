@@ -56,8 +56,8 @@ class META_PUBLIC MetadataDownload : public MThread
 
     void run() override; // MThread
 
-    QString getMXMLPath(QString filename);
-    QString getNFOPath(QString filename);
+    QString getMXMLPath(const QString& filename);
+    QString getNFOPath(const QString& filename);
 
   private:
     // Video handling
@@ -73,13 +73,13 @@ class META_PUBLIC MetadataDownload : public MThread
                                       bool withArt) const;
     MetadataLookup*     findBestMatch(MetadataLookupList list,
                                       const QString &originaltitle) const;
-    MetadataLookupList  runGrabber(QString cmd, QStringList args,
+    MetadataLookupList  runGrabber(const QString& cmd, const QStringList& args,
                                    MetadataLookup* lookup,
                                    bool passseas = true);
-    MetadataLookupList  readMXML(QString MXMLpath,
+    MetadataLookupList  readMXML(const QString& MXMLpath,
                                  MetadataLookup* lookup,
                                  bool passseas = true);
-    MetadataLookupList  readNFO(QString NFOpath, MetadataLookup* lookup);
+    MetadataLookupList  readNFO(const QString& NFOpath, MetadataLookup* lookup);
 
     QObject            *m_parent {nullptr};
     MetadataLookupList  m_lookupList;

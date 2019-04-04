@@ -63,7 +63,7 @@ QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
 
     if (!artpath.startsWith('/') && pathname.startsWith("myth://"))
     {
-        QString workURL = pathname;
+        const QString& workURL = pathname;
         QUrl baseURL(workURL);
         baseURL.setUserName(type);
         QString finalURL =

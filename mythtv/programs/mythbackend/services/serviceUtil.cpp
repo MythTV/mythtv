@@ -249,7 +249,7 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillChannelGroup(DTC::ChannelGroup* pGroup, ChannelGroupItem pGroupItem)
+void FillChannelGroup(DTC::ChannelGroup* pGroup, const ChannelGroupItem& pGroupItem)
 {
     if (!pGroup)
         return;
@@ -395,7 +395,7 @@ void FillGenreList(DTC::GenreList* pGenreList, int videoID)
 
 void FillVideoMetadataInfo (
                       DTC::VideoMetadataInfo *pVideoMetadataInfo,
-                      VideoMetadataListManager::VideoMetadataPtr pMetadata,
+                      const VideoMetadataListManager::VideoMetadataPtr& pMetadata,
                       bool          bDetails)
 {
     pVideoMetadataInfo->setId(pMetadata->GetID());
@@ -517,7 +517,7 @@ void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
+void FillInputInfo(DTC::Input* input, const InputInfo& inputInfo)
 {
     input->setId(inputInfo.m_inputid);
     input->setInputName(inputInfo.m_name);

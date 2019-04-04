@@ -8,6 +8,7 @@
 
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
@@ -87,7 +88,7 @@ class MediaServer : public MediaServerItem
     }
     explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(URL), m_controlURL(QUrl()),
+       m_URL(std::move(URL)), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
        m_friendlyName(QString("Unknown"))
     {
@@ -643,7 +644,7 @@ void UPNPScanner::customEvent(QEvent *event)
 
     // UPnP events
     MythEvent *me  = static_cast<MythEvent *>(event);
-    QString    ev  = me->Message();
+    const QString&    ev  = me->Message();
 
     if (ev == "UPNP_STARTSCAN")
     {
@@ -655,8 +656,8 @@ void UPNPScanner::customEvent(QEvent *event)
         if (me->ExtraDataCount() == 2)
         {
             QUrl url;
-            QString usn = me->ExtraData(0);
-            QString objectid = me->ExtraData(1);
+            const QString& usn = me->ExtraData(0);
+            const QString& objectid = me->ExtraData(1);
             m_lock.lock();
             if (m_servers.contains(usn))
             {

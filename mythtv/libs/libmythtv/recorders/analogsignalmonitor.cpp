@@ -30,7 +30,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
         if (!CardUtil::GetV4LInfo(videofd, m_card, m_driver, m_version, caps))
             return;
 
-        m_usingv4l2 = !!(caps & V4L2_CAP_VIDEO_CAPTURE);
+        m_usingv4l2 = ((caps & V4L2_CAP_VIDEO_CAPTURE) != 0U);
         LOG(VB_RECORD, LOG_INFO, QString("card '%1' driver '%2' version '%3'")
                 .arg(m_card).arg(m_driver).arg(m_version));
     }
@@ -192,7 +192,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             }
             else
             {
-                isLocked = tuner.signal;
+                isLocked = (tuner.signal != 0);
             }
         }
     }

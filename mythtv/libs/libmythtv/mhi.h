@@ -58,7 +58,7 @@ class MHIContext : public MHContext, public QRunnable
     void Restart(int chanid, int sourceid, bool isLive);
     // Offer a key press.  Returns true if it accepts it.
     // This will depend on the current profile.
-    bool OfferKey(QString key);
+    bool OfferKey(const QString& key);
     /// Update the display
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
@@ -159,7 +159,7 @@ class MHIContext : public MHContext, public QRunnable
 
     FT_Face GetFontFace(void) { return m_face; }
     bool IsFaceLoaded(void) { return m_face_loaded; }
-    bool LoadFont(QString name);
+    bool LoadFont(const QString& name);
     bool ImageUpdated(void) { return m_updated; }
 
     static const int StdDisplayWidth = 720;

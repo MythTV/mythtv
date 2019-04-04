@@ -135,7 +135,7 @@ bool JoystickMenuThread::Init(QString &config_file)
  *                                  move that axis into the range and the
  *                                  keystring is sent
  */
-bool JoystickMenuThread::ReadConfig(QString config_file)
+bool JoystickMenuThread::ReadConfig(const QString& config_file)
 {
     FILE *fp;
 
@@ -288,7 +288,7 @@ void JoystickMenuThread::run(void)
 /**
  *  \brief Send a keyevent to the main UI loop with the appropriate keycode
  */
-void JoystickMenuThread::EmitKey(QString code)
+void JoystickMenuThread::EmitKey(const QString& code)
 {
     QKeySequence a(code);
 

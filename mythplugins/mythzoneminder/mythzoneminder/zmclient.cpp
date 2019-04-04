@@ -309,7 +309,7 @@ void ZMClient::updateMonitorStatus(void)
             mon->zmaStatus = strList[x * 7 + 5];
             mon->events = strList[x * 7 + 6].toInt();
             mon->function = strList[x * 7 + 7];
-            mon->enabled = strList[x * 7 + 8].toInt();
+            mon->enabled = (strList[x * 7 + 8].toInt() != 0);
         }
     }
 }

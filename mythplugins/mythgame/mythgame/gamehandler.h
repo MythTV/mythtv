@@ -63,27 +63,27 @@ class GameHandler : public QObject
     static GameHandler *getHandler(uint i);
     static GameHandler *newHandler(QString name);
     static uint count(void);
-    void InitMetaDataMap(QString GameType);
-    void GetMetadata(GameHandler *handler, QString rom,
+    void InitMetaDataMap(const QString& GameType);
+    void GetMetadata(GameHandler *handler, const QString& rom,
                              QString* Genre, QString* Year, QString* Country,
                              QString* CRC32, QString* GameName,
                              QString* Plot, QString* Publisher, QString* Version,
                              QString* Fanart, QString* Boxart);
 
-    void promptForRemoval(GameScan scan);
+    void promptForRemoval(const GameScan& scan);
     void UpdateGameDB(GameHandler *handler);
     void VerifyGameDB(GameHandler *handler);
 
     void clearAllGameData(void);
 
-    static int buildFileCount(QString directory, GameHandler *handler);
-    void buildFileList(QString directory, GameHandler *handler,
+    static int buildFileCount(const QString& directory, GameHandler *handler);
+    void buildFileList(const QString& directory, GameHandler *handler,
                        int* filecount);
 
     void processGames(GameHandler *);
     static void processAllGames(void);
     static void registerHandler(GameHandler *);
-    static void Launchgame(RomInfo *romdata, QString systemname);
+    static void Launchgame(RomInfo *romdata, const QString& systemname);
     static void EditSettings(RomInfo *romdata);
     static void EditSystemSettings(RomInfo *romdata);
     static RomInfo* CreateRomInfo(RomInfo* parent);
@@ -105,7 +105,7 @@ class GameHandler : public QObject
     void clearAllMetadata(void);
 
     static GameHandler* GetHandler(RomInfo *rominfo);
-    static GameHandler* GetHandlerByName(QString systemname);
+    static GameHandler* GetHandlerByName(const QString& systemname);
 
   protected:
     void customEvent(QEvent *event) override; // QObject
@@ -128,7 +128,7 @@ class GameHandler : public QObject
     bool m_KeepAll         {false};
 
   private:
-    void CreateProgress(QString message);
+    void CreateProgress(const QString& message);
     static GameHandler *s_newInstance;
 
     MythUIProgressDialog *m_progressDlg {nullptr};

@@ -133,13 +133,13 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 		tmp = lcycle - (M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F));
 	}
 	
-	if (fabs(tmp-rot) > fabs(tmp-(rot+2.0F*M_PI_F))) {
+	if (fabsf(tmp-rot) > fabsf(tmp-(rot+2.0F*M_PI_F))) {
 		rot = (tmp + 15.0F*(rot+2*M_PI_F)) / 16.0F;
 		if (rot>2.0F*M_PI_F)
 			rot -= 2.0F*M_PI_F;
 		*rotangle = rot;
 	}
-	else if (fabs(tmp-rot) > fabs(tmp-(rot-2.0F*M_PI_F))) {
+	else if (fabsf(tmp-rot) > fabsf(tmp-(rot-2.0F*M_PI_F))) {
 		rot = (tmp + 15.0F*(rot-2.0F*M_PI_F)) / 16.0F;
 		if (rot<0.0F)
 			rot += 2.0F*M_PI_F;

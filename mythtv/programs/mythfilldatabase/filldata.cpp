@@ -109,7 +109,7 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     return true;
 }
 
-bool FillData::GrabData(Source source, int offset)
+bool FillData::GrabData(const Source& source, int offset)
 {
     QString xmltv_grabber = source.xmltvgrabber;
 

@@ -55,7 +55,7 @@ class MMulticastSocketDevice : public MSocketDevice
         memset(&m_imr, 0, sizeof(struct ip_mreq));
     }
 
-    MMulticastSocketDevice(QString sAddress, quint16 nPort, u_char ttl = 0);
+    MMulticastSocketDevice(const QString& sAddress, quint16 nPort, u_char ttl = 0);
 
     virtual ~MMulticastSocketDevice();
 

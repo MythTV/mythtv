@@ -14,9 +14,10 @@
 #include <cstdlib>
 #include <thread> // for sleep_for
 
-#include <QStringList>
-#include <QFile>
 #include <QDateTime>
+#include <QFile>
+#include <QStringList>
+#include <utility>
 
 #include "upnp.h"
 #include "upnptasksearch.h"
@@ -46,10 +47,10 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
                                 QString      sUDN ) :
     Task("UPnpSearchTask")
 {
-    m_PeerAddress = peerAddress;
+    m_PeerAddress = std::move(peerAddress);
     m_nPeerPort   = nPeerPort;
-    m_sST         = sST;
-    m_sUDN        = sUDN;
+    m_sST         = std::move(sST);
+    m_sUDN        = std::move(sUDN);
     m_nServicePort= nServicePort;
     m_nMaxAge     = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
 
@@ -60,8 +61,8 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
-                              QString         sST,
-                              QString         sUDN )
+                              const QString&  sST,
+                              const QString&  sUDN )
 {
     QString sUSN;
 

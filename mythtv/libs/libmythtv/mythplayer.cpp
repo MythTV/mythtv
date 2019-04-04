@@ -19,6 +19,7 @@ using namespace std;
 #include <QMap>                         // for QMap<>::iterator, etc
 #include <QThread>                      // for QThread, etc
 #include <QtCore/qnumeric.h>            // for qIsNaN
+#include <utility>
 
 // MythTV headers
 #include "mthread.h"
@@ -188,7 +189,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // OSD stuff
       osd(nullptr), reinit_osd(false), osdLock(QMutex::Recursive),
       // Audio
-      audio(this, (flags & kAudioMuted)),
+      audio(this, (flags & kAudioMuted) != 0),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Filters
@@ -829,7 +830,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
-                                FrameScanType scan, QString codecName)
+                                FrameScanType scan, const QString& codecName)
 {
     bool paramsChanged = false;
 
@@ -1412,7 +1413,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
-    bool newTextDesired = textDisplayMode & kDisplayAllTextCaptions;
+    bool newTextDesired = (textDisplayMode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (osd_msg || newTextDesired)
         textDesired = newTextDesired;
@@ -1452,7 +1453,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    bool newTextDesired = mode & kDisplayAllTextCaptions;
+    bool newTextDesired = (mode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (osd_msg || newTextDesired)
         textDesired = newTextDesired;
@@ -1511,7 +1512,7 @@ bool MythPlayer::ToggleCaptions(uint type)
     uint origMode = textDisplayMode;
 
     if (textDisplayMode)
-        DisableCaptions(textDisplayMode, origMode & mode);
+        DisableCaptions(textDisplayMode, (origMode & mode) != 0U);
     if (origMode & mode)
         return textDisplayMode;
     if (mode)
@@ -3173,8 +3174,8 @@ void MythPlayer::JumpToProgram(void)
         pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
     QString subfn = player_ctx->m_buffer->GetSubtitleFilename();
     TVState desiredState = player_ctx->GetState();
-    bool isInProgress =
-        desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
+    bool isInProgress = (desiredState == kState_WatchingRecording ||
+                         desiredState == kState_WatchingLiveTV);
     if (GetSubReader())
         GetSubReader()->LoadExternalSubtitles(subfn, isInProgress &&
                                               !subfn.isEmpty());
@@ -4870,7 +4871,7 @@ bool MythPlayer::IsEmbedding(void)
 bool MythPlayer::GetScreenShot(int width, int height, QString filename)
 {
     if (videoOutput)
-        return videoOutput->GetScreenShot(width, height, filename);
+        return videoOutput->GetScreenShot(width, height, std::move(filename));
     return false;
 }
 
@@ -5999,7 +6000,7 @@ void MythPlayer::ToggleNightMode(void)
     int b = videoOutput->GetPictureAttribute(kPictureAttribute_Brightness);
     int c = 0;
     bool has_contrast = (videoOutput->GetSupportedPictureAttributes() &
-                         kPictureAttributeSupported_Contrast);
+                         kPictureAttributeSupported_Contrast) != 0;
     if (has_contrast)
         c = videoOutput->GetPictureAttribute(kPictureAttribute_Contrast);
 

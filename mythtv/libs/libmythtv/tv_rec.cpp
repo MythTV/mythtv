@@ -1,10 +1,11 @@
 // C headers
+#include <chrono> // for milliseconds
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <sched.h> // for sched_yield
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 // MythTV headers
 
@@ -1675,7 +1676,7 @@ bool TVRec::GetDevices(uint inputid,
     if (!test.isEmpty())
         gen_opts.inputtype = test;
 
-    gen_opts.skip_btaudio = query.value(5).toUInt();
+    gen_opts.skip_btaudio = query.value(5).toBool();
 
     gen_opts.signal_timeout  = (uint) max(query.value(6).toInt(), 0);
     gen_opts.channel_timeout = (uint) max(query.value(7).toInt(), 0);
@@ -1686,13 +1687,13 @@ bool TVRec::GetDevices(uint inputid,
     if (table_timeout < 100)
         gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
 
-    gen_opts.wait_for_seqstart = query.value(8).toUInt();
+    gen_opts.wait_for_seqstart = query.value(8).toBool();
 
     // DVB options
     uint dvboff = 9;
-    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toUInt();
+    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toBool();
     dvb_opts.dvb_tuning_delay = query.value(dvboff + 1).toUInt();
-    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toUInt();
+    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toBool();
 
     // Firewire options
     uint fireoff = dvboff + 3;
@@ -2172,7 +2173,7 @@ DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
  *      RemoteEncoder::ShouldSwitchToAnotherInput(QString),
  *      CheckChannel(QString)
  */
-bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
+bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid)
 {
     QString msg("");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2260,7 +2261,7 @@ bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
  *      CheckChannel(ChannelBase*,const QString&,QString&),
  *      ShouldSwitchToAnotherInput(QString)
  */
-bool TVRec::CheckChannel(QString name) const
+bool TVRec::CheckChannel(const QString& name) const
 {
     if (!m_channel)
         return false;
@@ -2530,7 +2531,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
             (32767 == busy_input->m_mplexid) ? 0 : busy_input->m_mplexid;
     }
 
-    return busy_input->m_inputid;
+    return busy_input->m_inputid != 0U;
 }
 
 
@@ -2666,7 +2667,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     m_tvChain->SetInputType(m_genOpt.inputtype);
 
     m_ispip = pip;
-    m_liveTVStartChannel = startchan;
+    m_liveTVStartChannel = std::move(startchan);
 
     // Change to WatchingLiveTV
     ChangeState(kState_WatchingLiveTV);
@@ -2934,7 +2935,7 @@ void TVRec::RecorderPaused(void)
 /**
  *  \brief Toggles whether the current channel should be on our favorites list.
  */
-void TVRec::ToggleChannelFavorite(QString changroupname)
+void TVRec::ToggleChannelFavorite(const QString& changroupname)
 {
     QMutexLocker lock(&m_stateChangeLock);
 
@@ -3069,7 +3070,7 @@ QString TVRec::SetInput(QString input)
  *  \param requestType tells us what kind of request to actually send to
  *                     the tuning thread, kFlagDetect is usually sufficient
  */
-void TVRec::SetChannel(QString name, uint requestType)
+void TVRec::SetChannel(const QString& name, uint requestType)
 {
     QMutexLocker locker1(&m_setChannelLock);
     QMutexLocker locker2(&m_stateChangeLock);
@@ -3309,9 +3310,9 @@ bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
 }
 
 bool TVRec::SetChannelInfo(uint chanid, uint sourceid,
-                           QString oldchannum,
-                           QString callsign, QString channum,
-                           QString channame, QString xmltvid)
+                           const QString& oldchannum,
+                           const QString& callsign, const QString& channum,
+                           const QString& channame, const QString& xmltvid)
 {
     if (!chanid || !sourceid || channum.isEmpty())
         return false;
@@ -3741,8 +3742,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
 
-    bool livetv = request.flags & kFlagLiveTV;
-    bool antadj = request.flags & kFlagAntennaAdjust;
+    bool livetv = (request.flags & kFlagLiveTV) != 0U;
+    bool antadj = (request.flags & kFlagAntennaAdjust) != 0U;
     bool use_sm = !mpts_only && SignalMonitor::IsRequired(m_genOpt.inputtype);
     bool use_dr = use_sm && (livetv || antadj);
     bool has_dummy = false;
@@ -3779,7 +3780,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         LOG(VB_RECORD, LOG_INFO, LOC + "Starting Signal Monitor");
         bool error = false;
         if (!SetupSignalMonitor(
-                !antadj, request.flags & kFlagEITScan, livetv || antadj))
+                !antadj, (request.flags & kFlagEITScan) != 0U, livetv || antadj))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup signal monitor");
             if (m_signalMonitor)
@@ -4514,7 +4515,7 @@ void TVRec::SetNextLiveTVDir(QString dir)
 {
     QMutexLocker lock(&m_nextLiveTVDirLock);
 
-    m_nextLiveTVDir = dir;
+    m_nextLiveTVDir = std::move(dir);
     m_triggerLiveTVDir.wakeAll();
 }
 

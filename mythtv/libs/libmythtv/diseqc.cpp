@@ -368,7 +368,7 @@ bool DiSEqCDevTree::Load(uint cardid)
         return m_root;
     }
 
-    if (query.value(0).toUInt())
+    if (query.value(0).toBool())
     {
         m_root = DiSEqCDevDevice::CreateById(
             *this, query.value(0).toUInt());
@@ -2447,7 +2447,7 @@ bool DiSEqCDevLNB::Load(void)
         m_lof_switch = query.value(1).toInt();
         m_lof_hi     = query.value(2).toInt();
         m_lof_lo     = query.value(3).toInt();
-        m_pol_inv    = query.value(4).toUInt();
+        m_pol_inv    = query.value(4).toBool();
         m_repeat     = query.value(5).toUInt();
     }
 

@@ -4807,7 +4807,7 @@ void ChannelGroupsSetting::ShowNewGroupDialog()
     }
 }
 
-void ChannelGroupsSetting::CreateNewGroup(QString name)
+void ChannelGroupsSetting::CreateNewGroup(const QString& name)
 {
     ChannelGroupSetting *button = new ChannelGroupSetting(name,-1);
     button->setLabel(name);

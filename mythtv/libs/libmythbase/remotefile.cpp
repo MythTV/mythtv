@@ -337,7 +337,7 @@ bool RemoteFile::OpenInternal()
     return true;
 }
 
-bool RemoteFile::ReOpen(QString newFilename)
+bool RemoteFile::ReOpen(const QString& newFilename)
 {
     if (isLocal())
     {
@@ -367,7 +367,7 @@ bool RemoteFile::ReOpen(QString newFilename)
 
     bool retval = false;
     if (!strlist.isEmpty())
-        retval = strlist[0].toInt();
+        retval = (strlist[0].toInt() != 0);
 
     return retval;
 }
@@ -1157,7 +1157,7 @@ long long RemoteFile::GetRealFileSize(void)
         {
             if (strlist.count() >= 2)
             {
-                m_completed = strlist[1].toInt();
+                m_completed = (strlist[1].toInt() != 0);
             }
             m_filesize = size;
         }

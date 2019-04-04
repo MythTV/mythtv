@@ -8,6 +8,7 @@ using namespace std;
 // Qt headers
 #include <QCoreApplication>
 #include <QDir>
+#include <utility>
 
 // MythTV headers
 #include "mythmiscutil.h"
@@ -37,7 +38,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
 
-static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, QString mapfile,
+static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, const QString& mapfile,
                        ProgramInfo *pginfo)
 {
     if (pginfo && mapfile.isEmpty())
@@ -106,7 +107,7 @@ static int CheckJobQueue()
     return 0;
 }
 
-static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
+static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
                             QString hostname, bool usecutlist)
 {
     RecordingInfo recinfo(*pginfo);
@@ -115,7 +116,7 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
 
     if (JobQueue::QueueJob(JOB_TRANSCODE, pginfo->GetChanID(),
                            pginfo->GetRecordingStartTime(),
-                           hostname, "", "",
+                           std::move(hostname), "", "",
                            usecutlist ? JOB_USE_CUTLIST : 0))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
@@ -741,7 +742,7 @@ int main(int argc, char *argv[])
     return exitcode;
 }
 
-static int transUnlink(QString filename, ProgramInfo *pginfo)
+static int transUnlink(const QString& filename, ProgramInfo *pginfo)
 {
     QString hostname = pginfo->GetHostname();
 
@@ -1000,7 +1001,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
         for (int nIdx = 0; nIdx < previewFiles.size(); nIdx++)
         {
-            QFileInfo previewFile = previewFiles.at(nIdx);
+            const QFileInfo& previewFile = previewFiles.at(nIdx);
             QString oldFileName = previewFile.absoluteFilePath();
 
             // Delete previews if cutlist was applied.  They will be re-created as

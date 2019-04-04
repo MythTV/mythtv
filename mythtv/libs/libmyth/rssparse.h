@@ -194,7 +194,7 @@ class MPUBLIC Parse : public QObject
     Parse() = default;
     virtual ~Parse() = default;
 
-    ResultItem::resultList parseRSS(QDomDocument domDoc);
+    ResultItem::resultList parseRSS(const QDomDocument& domDoc);
     ResultItem* ParseItem(const QDomElement& item) const;
 
     QString GetLink(const QDomElement&) const;

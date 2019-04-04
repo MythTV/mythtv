@@ -71,7 +71,7 @@ bool ProgInfoList::Hide()
  \param name
  \param value
 */
-void ProgInfoList::CreateButton(QString name, QString value)
+void ProgInfoList::CreateButton(const QString& name, const QString& value)
 {
     if (value.isEmpty())
         return;

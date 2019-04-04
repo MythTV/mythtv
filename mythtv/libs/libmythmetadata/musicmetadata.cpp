@@ -3,11 +3,12 @@
 
 // qt
 #include <QApplication>
-#include <QRegExp>
 #include <QDateTime>
 #include <QDir>
-#include <QScopedPointer>
 #include <QDomDocument>
+#include <QRegExp>
+#include <QScopedPointer>
+#include <utility>
 
 // mythtv
 #include "mythcontext.h"
@@ -58,17 +59,17 @@ bool operator!=(MusicMetadata& a, MusicMetadata& b)
 MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription,
                              UrlList lurls, QString llogourl, QString lgenre, QString lmetaformat,
                              QString lcountry, QString llanguage, QString lformat)
-         :  m_genre(lgenre),
-            m_format(lformat),
+         :  m_genre(std::move(lgenre)),
+            m_format(std::move(lformat)),
             m_id(lid),
             m_filename(lurls[0]),
-            m_broadcaster(lbroadcaster),
-            m_channel(lchannel),
-            m_description(ldescription),
-            m_logoUrl(llogourl),
-            m_metaFormat(lmetaformat),
-            m_country(lcountry),
-            m_language(llanguage)
+            m_broadcaster(std::move(lbroadcaster)),
+            m_channel(std::move(lchannel)),
+            m_description(std::move(ldescription)),
+            m_logoUrl(std::move(llogourl)),
+            m_metaFormat(std::move(lmetaformat)),
+            m_country(std::move(lcountry)),
+            m_language(std::move(llanguage))
 {
     for (int x = 0; x < STREAMURLCOUNT; x++)
         m_urls[x] = lurls[x];
@@ -1156,7 +1157,7 @@ void MusicMetadata::incRating()
     m_changed = true;
 }
 
-void MusicMetadata::setLastPlay(QDateTime lastPlay)
+void MusicMetadata::setLastPlay(const QDateTime& lastPlay)
 {
     m_templastplay = MythDate::as_utc(lastPlay);
     m_changed = true;
@@ -1191,7 +1192,7 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
     m_changed = true;
 }
 
-QStringList MusicMetadata::fillFieldList(QString field)
+QStringList MusicMetadata::fillFieldList(const QString& field)
 {
     QStringList searchList;
     searchList.clear();

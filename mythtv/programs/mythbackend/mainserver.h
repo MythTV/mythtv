@@ -171,9 +171,9 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
                         const QString &src, const QString &dst);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
-    bool HandleDeleteFile(QString filename, QString storagegroup,
+    bool HandleDeleteFile(const QString& filename, const QString& storagegroup,
                           PlaybackSock *pbs = nullptr);
-    void HandleQueryRecordings(QString type, PlaybackSock *pbs);
+    void HandleQueryRecordings(const QString& type, PlaybackSock *pbs);
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
@@ -199,7 +199,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryGuideDataThrough(PlaybackSock *pbs);
-    void HandleGetPendingRecordings(PlaybackSock *pbs, QString table = "", int recordid=-1);
+    void HandleGetPendingRecordings(PlaybackSock *pbs, const QString& table = "", int recordid=-1);
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
     void HandleGetExpiringRecordings(PlaybackSock *pbs);
@@ -283,7 +283,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QString LocalFilePath(const QString &path, const QString &wantgroup);
 
-    int GetfsID(QList<FileSystemInfo>::iterator fsInfo);
+    int GetfsID(const QList<FileSystemInfo>::iterator& fsInfo);
 
     void DoTruncateThread(DeleteStruct *ds);
     void DoDeleteThread(DeleteStruct *ds);

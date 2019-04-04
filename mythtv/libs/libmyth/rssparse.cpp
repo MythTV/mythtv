@@ -709,7 +709,7 @@ const QString Parse::s_GeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
 const QString Parse::s_MediaRSS = "http://search.yahoo.com/mrss/";
 const QString Parse::s_MythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
 
-ResultItem::resultList Parse::parseRSS(QDomDocument domDoc)
+ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc)
 {
     ResultItem::resultList vList;
 

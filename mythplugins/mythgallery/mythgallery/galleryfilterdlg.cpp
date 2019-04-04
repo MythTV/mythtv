@@ -66,7 +66,7 @@ void FilterScanThread::run()
     RunEpilog();
 }
 
-GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
+GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, const QString& name,
                                          GalleryFilter *filter)
     : MythScreenType(parent, name)
 {

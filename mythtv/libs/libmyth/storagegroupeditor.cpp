@@ -1,10 +1,11 @@
 // Qt headers
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QRegExp>
 #include <QUrl>
 #include <QVector>
-#include <QCoreApplication>
+#include <utility>
 
 // MythTV headers
 #include "storagegroupeditor.h"
@@ -19,7 +20,7 @@
 /****************************************************************************/
 
 StorageGroupEditor::StorageGroupEditor(QString group) :
-    m_group(group)
+    m_group(std::move(group))
 {
     SetLabel();
 }
@@ -483,7 +484,7 @@ void StorageGroupListEditor::ShowNewGroupDialog()
     }
 }
 
-void StorageGroupListEditor::CreateNewGroup(QString name)
+void StorageGroupListEditor::CreateNewGroup(const QString& name)
 {
     StorageGroupEditor *button = new StorageGroupEditor(name);
     button->setLabel(name + tr(" Storage Group Directories"));

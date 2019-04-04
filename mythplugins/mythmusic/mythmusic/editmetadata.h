@@ -77,10 +77,10 @@ class EditMetadataDialog : public EditMetadataCommon
     void searchAlbum(void);
     void searchGenre(void);
 
-    void setArtist(QString artist);
-    void setCompArtist(QString compArtist);
-    void setAlbum(QString album);
-    void setGenre(QString genre);
+    void setArtist(const QString& artist);
+    void setCompArtist(const QString& compArtist);
+    void setAlbum(const QString& album);
+    void setGenre(const QString& genre);
     void ratingSpinChanged(MythUIButtonListItem *item);
 
     void artistLostFocus(void);

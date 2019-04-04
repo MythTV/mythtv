@@ -68,17 +68,17 @@ bool BlurayMetadata::ParseDisc(void)
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(m_bdnav);
     if (discinfo)
     {
-        m_topMenuSupported   = discinfo->top_menu_supported;
-        m_firstPlaySupported = discinfo->first_play_supported;
+        m_topMenuSupported   = (discinfo->top_menu_supported != 0U);
+        m_firstPlaySupported = (discinfo->first_play_supported != 0U);
         m_numHDMVTitles = discinfo->num_hdmv_titles;
         m_numBDJTitles = discinfo->num_bdj_titles;
         m_numUnsupportedTitles = discinfo->num_unsupported_titles;
-        m_aacsDetected = discinfo->aacs_detected;
-        m_libaacsDetected = discinfo->libaacs_detected;
-        m_aacsHandled = discinfo->aacs_handled;
-        m_bdplusDetected = discinfo->bdplus_detected;
-        m_libbdplusDetected = discinfo->libbdplus_detected;
-        m_bdplusHandled = discinfo->bdplus_handled;
+        m_aacsDetected = (discinfo->aacs_detected != 0U);
+        m_libaacsDetected = (discinfo->libaacs_detected != 0U);
+        m_aacsHandled = (discinfo->aacs_handled != 0U);
+        m_bdplusDetected = (discinfo->bdplus_detected != 0U);
+        m_libbdplusDetected = (discinfo->libbdplus_detected != 0U);
+        m_bdplusHandled = (discinfo->bdplus_handled != 0U);
     }
 
     return true;

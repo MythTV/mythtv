@@ -122,7 +122,7 @@ void Serializer::SerializeObjectProperties( const QObject *pObject )
                 bool bHash = false;
 
                 if (ReadPropertyMetadata( pObject, 
-                                          sPropName, 
+                                          sPropName,
                                           "transient").toLower() != "true" )
                 {
                     bHash = true;
@@ -147,8 +147,8 @@ void Serializer::SerializeObjectProperties( const QObject *pObject )
 /////////////////////////////////////////////////////////////////////////////
 
 QString Serializer::ReadPropertyMetadata( const QObject *pObject, 
-                                                QString  sPropName, 
-                                                QString  sKey )
+                                                const QString&  sPropName,
+                                                const QString&  sKey )
 {
     const QMetaObject *pMeta = pObject->metaObject();
 

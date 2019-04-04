@@ -78,7 +78,7 @@ FIFOWriter::~FIFOWriter()
     delete [] m_fbmaxcount;
 }
 
-bool FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
+bool FIFOWriter::FIFOInit(int id, const QString& desc, const QString& name, long size,
                          int num_bufs)
 {
     if (id < 0 || id >= m_num_fifos)

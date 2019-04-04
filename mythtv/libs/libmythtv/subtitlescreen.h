@@ -216,7 +216,7 @@ private:
     void DisplayAVSubtitles(void);
     int  DisplayScaledAVSubtitles(const AVSubtitleRect *rect, QRect &bbox,
                                   bool top, QRect &display, int forced,
-                                  QString imagename,
+                                  const QString& imagename,
                                   long long displayuntil, long long late);
     void DisplayTextSubtitles(void);
     void DisplayRawTextSubtitles(void);

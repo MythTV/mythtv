@@ -92,8 +92,8 @@ NuppelDecoder::~NuppelDecoder()
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
                               int /*testbufsize*/)
 {
-    return !strncmp(testbuf, "NuppelVideo", 11) ||
-           !strncmp(testbuf, "MythTVVideo", 11);
+    return strncmp(testbuf, "NuppelVideo", 11) == 0 ||
+           strncmp(testbuf, "MythTVVideo", 11) == 0;
 }
 
 MythCodecID NuppelDecoder::GetVideoCodecID(void) const

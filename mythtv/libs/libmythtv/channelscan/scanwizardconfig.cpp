@@ -22,7 +22,7 @@
 
 void ScanWizard::SetupConfig(
     uint    default_sourceid,  uint default_cardid,
-    QString default_inputname)
+    const QString& default_inputname)
 {
     m_videoSource = new VideoSourceSelector(
                     default_sourceid, CardUtil::GetScanableInputTypes(), false);

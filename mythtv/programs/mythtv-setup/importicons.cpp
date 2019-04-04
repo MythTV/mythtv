@@ -258,7 +258,7 @@ void ImportIconsWizard::itemChanged(MythUIButtonListItem *item)
         m_previewtitle->SetText(item->GetText("iconname"));
 }
 
-bool ImportIconsWizard::initialLoad(QString name)
+bool ImportIconsWizard::initialLoad(const QString& name)
 {
 
     QString dirpath = GetConfDir();

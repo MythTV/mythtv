@@ -722,7 +722,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 /*
  * DBus UDisk AddDevice handler
  */
-void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
+void MediaMonitorUnix::deviceAdded( const QDBusObjectPath& o)
 {
     LOG(VB_MEDIA, LOG_INFO, LOC + ":deviceAdded " + o.path());
 
@@ -745,7 +745,7 @@ void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
 /*
  * DBus UDisk RemoveDevice handler
  */
-void MediaMonitorUnix::deviceRemoved( QDBusObjectPath o)
+void MediaMonitorUnix::deviceRemoved( const QDBusObjectPath& o)
 {
     LOG(VB_MEDIA, LOG_INFO, LOC + "deviceRemoved " + o.path());
 #if 0 // This fails because the DeviceFile has just been deleted

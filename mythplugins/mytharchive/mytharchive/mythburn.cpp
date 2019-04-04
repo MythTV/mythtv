@@ -45,7 +45,7 @@ using namespace std;
 MythBurn::MythBurn(MythScreenStack   *parent,
                    MythScreenType    *destinationScreen,
                    MythScreenType    *themeScreen,
-                   ArchiveDestination archiveDestination, QString name) :
+                   ArchiveDestination archiveDestination, const QString& name) :
     MythScreenType(parent, name),
     m_destinationScreen(destinationScreen),
     m_themeScreen(themeScreen),

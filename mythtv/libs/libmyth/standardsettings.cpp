@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QThread>
+#include <utility>
 
 #include <mythcontext.h>
 #include <mythmainwindow.h>
@@ -361,7 +362,7 @@ void AutoIncrementSetting::Save(void)
 }
 
 AutoIncrementSetting::AutoIncrementSetting(QString _table, QString _column) :
-    m_table(_table), m_column(_column)
+    m_table(std::move(_table)), m_column(std::move(_column))
 {
     setValue("0");
 }

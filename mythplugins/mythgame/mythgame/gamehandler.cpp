@@ -3,9 +3,10 @@
 #include "rominfo.h"
 #include "rom_metadata.h"
 
-#include <QRegExp>
 #include <QDir>
 #include <QList>
+#include <QRegExp>
+#include <utility>
 
 #include <mythdb.h>
 #include <mythdbcon.h>
@@ -71,7 +72,7 @@ void GameHandler::updateSettings(GameHandler *handler)
         handler->m_gametype = query.value(5).toString();
         handler->m_validextensions = query.value(6).toString().trimmed()
                                         .remove(" ").split(",", QString::SkipEmptyParts);
-        handler->m_spandisks = query.value(7).toInt();
+        handler->m_spandisks = query.value(7).toBool();
     }
 }
 
@@ -80,7 +81,7 @@ GameHandler* GameHandler::s_newInstance = nullptr;
 GameHandler* GameHandler::newHandler(QString name)
 {
     s_newInstance = new GameHandler();
-    s_newInstance->m_systemname = name;
+    s_newInstance->m_systemname = std::move(name);
 
     updateSettings(s_newInstance);
 
@@ -94,7 +95,7 @@ uint GameHandler::count(void)
     return handlers->count();
 }
 
-void GameHandler::InitMetaDataMap(QString GameType)
+void GameHandler::InitMetaDataMap(const QString& GameType)
 {
     QString key;
 
@@ -132,7 +133,7 @@ void GameHandler::InitMetaDataMap(QString GameType)
             QString("Loaded %1 items from romDB Database") .arg(m_romDB.count()));
 }
 
-void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre, QString* Year,
+void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString* Genre, QString* Year,
                               QString* Country, QString* CRC32, QString* GameName,
                               QString *Plot, QString *Publisher, QString *Version,
                               QString* Fanart, QString* Boxart)
@@ -184,7 +185,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
 }
 
-static void purgeGameDB(QString filename, QString RomPath)
+static void purgeGameDB(const QString& filename, const QString& RomPath)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Purging %1 - %2").arg(RomPath)
             .arg(filename));
@@ -206,7 +207,7 @@ static void purgeGameDB(QString filename, QString RomPath)
 
 }
 
-void GameHandler::promptForRemoval(GameScan scan)
+void GameHandler::promptForRemoval(const GameScan& scan)
 {
     QString filename = scan.Rom();
     QString RomPath = scan.RomFullPath();
@@ -238,7 +239,7 @@ void GameHandler::promptForRemoval(GameScan scan)
         delete removalPopup;
 }
 
-static void updateDisplayRom(QString romname, int display, QString Systemname)
+static void updateDisplayRom(const QString& romname, int display, const QString& Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET display = :DISPLAY "
@@ -253,7 +254,7 @@ static void updateDisplayRom(QString romname, int display, QString Systemname)
 
 }
 
-static void updateDiskCount(QString romname, int diskcount, QString GameType)
+static void updateDiskCount(const QString& romname, int diskcount, const QString& GameType)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET diskcount = :DISKCOUNT "
@@ -268,7 +269,7 @@ static void updateDiskCount(QString romname, int diskcount, QString GameType)
 
 }
 
-static void updateGameName(QString romname, QString GameName, QString Systemname)
+static void updateGameName(const QString& romname, const QString& GameName, const QString& Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET GameName = :GAMENAME "
@@ -548,7 +549,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
 
 // Recurse through the directory and gather a count on how many files there are to process.
 // This is used for the progressbar info.
-int GameHandler::buildFileCount(QString directory, GameHandler *handler)
+int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
 {
     int filecount = 0;
     QDir RomDir(directory);
@@ -612,7 +613,7 @@ void GameHandler::clearAllGameData(void)
         delete clearPopup;
 }
 
-void GameHandler::buildFileList(QString directory, GameHandler *handler,
+void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
                                 int* filecount)
 {
     QDir RomDir(directory);
@@ -796,7 +797,7 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
     return nullptr;
 }
 
-GameHandler* GameHandler::GetHandlerByName(QString systemname)
+GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
 {
     if (systemname.isEmpty() || systemname.isNull())
         return nullptr;
@@ -815,7 +816,7 @@ GameHandler* GameHandler::GetHandlerByName(QString systemname)
     return nullptr;
 }
 
-void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
+void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
 {
     GameHandler *handler;
 
@@ -987,7 +988,7 @@ void GameHandler::clearAllMetadata(void)
                           "delete gamemetadata", query);
 }
 
-void GameHandler::CreateProgress(QString message)
+void GameHandler::CreateProgress(const QString& message)
 {
     if (m_progressDlg)
         return;

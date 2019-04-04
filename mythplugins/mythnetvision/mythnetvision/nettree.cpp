@@ -591,7 +591,7 @@ void NetTree::FillTree()
 }
 
 void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
-                               QString dirthumb, QList<ResultItem*> videos)
+                               const QString& dirthumb, QList<ResultItem*> videos)
 {
     MythGenericTree *folder = nullptr;
 
@@ -790,7 +790,7 @@ void NetTree::UpdateCurrentItem(void)
         }
         else
         {
-            QString url = thumb;
+            const QString& url = thumb;
             QString title2;
             if (m_type == DLG_TREE)
                 title2 = m_siteMap->GetItemCurrent()->GetText();

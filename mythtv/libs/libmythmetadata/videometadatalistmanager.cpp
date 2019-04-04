@@ -67,7 +67,7 @@ class VideoMetadataListManagerImp
     }
 
   private:
-    bool purge_entry(VideoMetadataPtr metadata)
+    bool purge_entry(const VideoMetadataPtr& metadata)
     {
         if (metadata)
         {

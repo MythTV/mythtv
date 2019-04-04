@@ -145,7 +145,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
 #else
-    if ((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) &&
+    if (((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) != 0) &&
         (painter.contains(OPENGL2_PAINTER) || painter.contains(AUTO_PAINTER) ||
          painter.isEmpty()))
     {
@@ -677,7 +677,7 @@ void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
     if (!m_textures.contains(tex))
         return;
 
-    bool mipmaps = (m_exts_used & kGLMipMaps) &&
+    bool mipmaps = ((m_exts_used & kGLMipMaps) != 0U) &&
                    !IsRectTexture(m_textures[tex].m_type);
     if (filt == GL_LINEAR_MIPMAP_LINEAR && !mipmaps)
         filt = GL_LINEAR;

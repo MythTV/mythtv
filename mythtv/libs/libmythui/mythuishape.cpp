@@ -7,10 +7,11 @@
 using namespace std;
 
 // qt
+#include <QColor>
 #include <QDomDocument>
 #include <QPainter>
 #include <QSize>
-#include <QColor>
+#include <utility>
 
 // myth
 #include "mythlogging.h"
@@ -40,12 +41,12 @@ void MythUIShape::SetCropRect(const MythRect &rect)
 
 void MythUIShape::SetFillBrush(QBrush fill)
 {
-    m_fillBrush = fill;
+    m_fillBrush = std::move(fill);
 }
 
 void MythUIShape::SetLinePen(QPen pen)
 {
-    m_linePen = pen;
+    m_linePen = std::move(pen);
 }
 
 /**

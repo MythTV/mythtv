@@ -109,17 +109,17 @@ class META_PUBLIC MetadataFactory : public QObject
            bool getimages = true, bool allowgeneric = false);
     void Lookup(MetadataLookup *lookup);
 
-    MetadataLookupList SynchronousLookup(QString title,
-                                         QString subtitle,
-                                         QString inetref,
+    MetadataLookupList SynchronousLookup(const QString& title,
+                                         const QString& subtitle,
+                                         const QString& inetref,
                                          int season,
                                          int episode,
-                                         QString grabber,
+                                         const QString& grabber,
                                          bool allowgeneric = false);
     MetadataLookupList SynchronousLookup(MetadataLookup *lookup);
 
     void VideoScan();
-    void VideoScan(QStringList hosts);
+    void VideoScan(const QStringList& hosts);
 
     bool IsRunning() { return m_lookupthread->isRunning() ||
                               m_imagedownload->isRunning() ||
@@ -131,7 +131,7 @@ class META_PUBLIC MetadataFactory : public QObject
 
     void customEvent(QEvent *levent) override; // QObject
 
-    void OnMultiResult(MetadataLookupList list);
+    void OnMultiResult(const MetadataLookupList& list);
     void OnSingleResult(MetadataLookup *lookup);
     void OnNoResult(MetadataLookup *lookup);
     void OnImageResult(MetadataLookup *lookup);

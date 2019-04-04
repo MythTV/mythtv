@@ -61,8 +61,8 @@ void LiveTVChain::LoadFromExistingChain(const QString &id)
     ReloadAll();
 }
 
-void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
-                                   QString inputname, bool discont)
+void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
+                                   const QString& inputname, bool discont)
 {
     QMutexLocker lock(&m_lock);
 
@@ -233,7 +233,7 @@ void LiveTVChain::ReloadAll(const QStringList &data)
                     MythDate::as_utc(query.value(1).toDateTime());
                 entry.endtime =
                     MythDate::as_utc(query.value(2).toDateTime());
-                entry.discontinuity = query.value(3).toInt();
+                entry.discontinuity = query.value(3).toBool();
                 entry.hostprefix = query.value(5).toString();
                 entry.inputtype = query.value(6).toString();
                 entry.channum = query.value(7).toString();
@@ -791,7 +791,7 @@ bool LiveTVChain::entriesFromStringList(const QStringList &items)
             ok = entry.endtime.isValid();
         }
         if (ok && itemIdx < numItems)
-            entry.discontinuity = items[itemIdx++].toInt(&ok);
+            entry.discontinuity = (items[itemIdx++].toInt(&ok) != 0);
         if (ok && itemIdx < numItems)
             entry.hostprefix = items[itemIdx++];
         if (ok && itemIdx < numItems)

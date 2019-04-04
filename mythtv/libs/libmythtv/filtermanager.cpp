@@ -190,7 +190,7 @@ const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
     return finfo;
 }
 
-FilterChain *FilterManager::LoadFilters(QString Filters,
+FilterChain *FilterManager::LoadFilters(const QString& Filters,
                                         VideoFrameType &inpixfmt,
                                         VideoFrameType &outpixfmt, int &width,
                                         int &height, int &bufsize,

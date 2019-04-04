@@ -438,7 +438,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         for (QMap<QString, QString>::const_iterator i = alsadevs->begin();
              i != alsadevs->end(); ++i)
         {
-            QString key = i.key();
+            const QString& key = i.key();
             QString desc = i.value();
             QString devname = QString("ALSA:%1").arg(key);
 

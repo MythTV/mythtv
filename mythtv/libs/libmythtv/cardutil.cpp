@@ -160,7 +160,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
             return false;
         }
 
-        QString ip_address = parts.at(0);
+        const QString& ip_address = parts.at(0);
 
         QStringList tuner_parts = parts.at(1).split(".");
         if (tuner_parts.size() != 2)
@@ -1132,9 +1132,9 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */
-vector<uint> CardUtil::GetInputIDs(QString videodevice,
-                                   QString rawtype,
-                                   QString inputname,
+vector<uint> CardUtil::GetInputIDs(const QString& videodevice,
+                                   const QString& rawtype,
+                                   const QString& inputname,
                                    QString hostname)
 {
     vector<uint> list;
@@ -1998,7 +1998,7 @@ bool CardUtil::hasV4L2(int videofd)
     memset(&vcap, 0, sizeof(vcap));
 
     return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
-            (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE));
+            ((vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE) != 0U));
 #else // if !USING_V4L2
     return false;
 #endif // !USING_V4L2
@@ -2167,7 +2167,7 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
     return list;
 }
 
-QStringList CardUtil::ProbeVideoInputs(QString device, QString inputtype)
+QStringList CardUtil::ProbeVideoInputs(const QString& device, const QString& inputtype)
 {
     QStringList ret;
 
@@ -2181,7 +2181,7 @@ QStringList CardUtil::ProbeVideoInputs(QString device, QString inputtype)
     return ret;
 }
 
-QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
+QStringList CardUtil::ProbeAudioInputs(const QString& device, const QString& inputtype)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeAudioInputs(%1,%2)")
                                    .arg(device).arg(inputtype));
@@ -2194,7 +2194,7 @@ QStringList CardUtil::ProbeAudioInputs(QString device, QString inputtype)
     return ret;
 }
 
-QStringList CardUtil::ProbeV4LVideoInputs(QString device)
+QStringList CardUtil::ProbeV4LVideoInputs(const QString& device)
 {
     bool ok;
     QStringList ret;
@@ -2225,7 +2225,7 @@ QStringList CardUtil::ProbeV4LVideoInputs(QString device)
     return ret;
 }
 
-QStringList CardUtil::ProbeV4LAudioInputs(QString device)
+QStringList CardUtil::ProbeV4LAudioInputs(const QString& device)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeV4LAudioInputs(%1)").arg(device));
 
@@ -2258,7 +2258,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(QString device)
     return ret;
 }
 
-QStringList CardUtil::ProbeDVBInputs(QString device)
+QStringList CardUtil::ProbeDVBInputs(const QString& device)
 {
     QStringList ret;
 
@@ -2571,13 +2571,12 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
                 QString("Adapter Frontend dvr number matches (%1)").arg(tmp));
             return tmp;
         }
-        else // use dvr0, allows multi-standard frontends which only have one dvr
-        {
-            devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
-            return devname;
-        }
+
+        // use dvr0, allows multi-standard frontends which only have one dvr
+        devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
+        return devname;
     }
     if (DVB_DEV_DEMUX == type)
     {
@@ -2588,13 +2587,12 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
                 QString("Adapter Frontend demux number matches (%1)").arg(tmp));
             return tmp;
         }
-        else // use demux0, allows multi-standard frontends, which only have one demux
-        {
-            devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
-            return devname;
-        }
+
+        // use demux0, allows multi-standard frontends, which only have one demux
+        devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
+        return devname;
     }
     if (DVB_DEV_CA == type)
         return devname.replace(devname.indexOf("frontend"), 8, "ca");
@@ -2741,12 +2739,12 @@ QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
 }
 
 #ifdef USING_ASI
-static QString sys_dev(uint device_num, QString dev)
+static QString sys_dev(uint device_num, const QString& dev)
 {
     return QString("/sys/class/asi/asirx%1/%2").arg(device_num).arg(dev);
 }
 
-static QString read_sys(QString sys_dev)
+static QString read_sys(const QString& sys_dev)
 {
     QFile f(sys_dev);
     f.open(QIODevice::ReadOnly);
@@ -2755,7 +2753,7 @@ static QString read_sys(QString sys_dev)
     return sdba;
 }
 
-static bool write_sys(QString sys_dev, QString str)
+static bool write_sys(const QString& sys_dev, const QString& str)
 {
     QFile f(sys_dev);
     f.open(QIODevice::WriteOnly);

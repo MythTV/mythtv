@@ -186,7 +186,7 @@ class HttpWorker : public QRunnable
      */
     HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-               , QSslConfiguration sslConfig
+               , const QSslConfiguration& sslConfig
 #endif
     );
 

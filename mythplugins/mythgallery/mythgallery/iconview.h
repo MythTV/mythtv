@@ -104,9 +104,9 @@ class IconView : public MythScreenType
     void HandleMkDir(void);
     void HandleRename(void);
 
-    void DoMkDir(QString folderName);
+    void DoMkDir(const QString& folderName);
     void DoDeleteMarked(bool doDelete);
-    void DoRename(QString folderName);
+    void DoRename(const QString& folderName);
     void DoDeleteCurrent(bool doDelete);
 
   private:

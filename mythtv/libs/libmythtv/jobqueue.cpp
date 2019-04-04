@@ -516,7 +516,7 @@ bool JobQueue::QueueRecordingJobs(const RecordingInfo &recinfo, int jobTypes)
 }
 
 bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
-                        QString args, QString comment, QString host,
+                        const QString& args, const QString& comment, QString host,
                         int flags, int status, QDateTime schedruntime)
 {
     int tmpStatus = JOB_UNKNOWN;
@@ -600,7 +600,7 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
 }
 
 bool JobQueue::QueueJobs(int jobTypes, uint chanid, const QDateTime &recstartts,
-                         QString args, QString comment, QString host)
+                         const QString& args, const QString& comment, const QString& host)
 {
     if (gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false))
     {
@@ -879,7 +879,7 @@ bool JobQueue::DeleteJob(int jobID)
 }
 
 bool JobQueue::SafeDeleteJob(int jobID, int jobType, int chanid,
-                             QDateTime recstartts)
+                             const QDateTime& recstartts)
 {
     if (jobID < 0)
         return false;
@@ -984,7 +984,7 @@ bool JobQueue::ChangeJobFlags(int jobID, int newFlags)
     return true;
 }
 
-bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
+bool JobQueue::ChangeJobStatus(int jobID, int newStatus, const QString& comment)
 {
     if (jobID < 0)
         return false;
@@ -1011,7 +1011,7 @@ bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
     return true;
 }
 
-bool JobQueue::ChangeJobComment(int jobID, QString comment)
+bool JobQueue::ChangeJobComment(int jobID, const QString& comment)
 {
     if (jobID < 0)
         return false;
@@ -1036,7 +1036,7 @@ bool JobQueue::ChangeJobComment(int jobID, QString comment)
     return true;
 }
 
-bool JobQueue::ChangeJobArgs(int jobID, QString args)
+bool JobQueue::ChangeJobArgs(int jobID, const QString& args)
 {
     if (jobID < 0)
         return false;
@@ -1086,7 +1086,7 @@ bool JobQueue::IsJobStatusQueued(int status)
 bool JobQueue::IsJobStatusRunning(int status)
 {
     return ((status != JOB_UNKNOWN) && (status != JOB_QUEUED) &&
-            (!(status & JOB_DONE)));
+            ((status & JOB_DONE) == 0));
 }
 
 bool JobQueue::IsJobRunning(int jobType,
@@ -1106,7 +1106,7 @@ bool JobQueue::IsJobQueuedOrRunning(
 {
     int tmpStatus = GetJobStatus(jobType, chanid, recstartts);
 
-    return (tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE));
+    return (tmpStatus != JOB_UNKNOWN) && ((tmpStatus & JOB_DONE) == 0);
 }
 
 bool JobQueue::IsJobQueued(
@@ -1395,7 +1395,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     return jobCount;
 }
 
-bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
+bool JobQueue::ChangeJobHost(int jobID, const QString& newHostname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1427,7 +1427,7 @@ bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
     return query.numRowsAffected() > 0;
 }
 
-bool JobQueue::AllowedToRun(JobQueueEntry job)
+bool JobQueue::AllowedToRun(const JobQueueEntry& job)
 {
     QString allowSetting;
 
@@ -1684,7 +1684,7 @@ bool JobQueue::InJobRunWindow(QDateTime jobstarttsRaw)
     return true;
 }
 
-void JobQueue::ProcessJob(JobQueueEntry job)
+void JobQueue::ProcessJob(const JobQueueEntry& job)
 {
     int jobID = job.id;
     QString name = QString("jobqueue%1%2").arg(jobID).arg(random());
@@ -1942,7 +1942,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     program_info->Reload();
 
     bool useCutlist = program_info->HasCutlist() &&
-        !!(GetJobFlags(jobID) & JOB_USE_CUTLIST);
+        ((GetJobFlags(jobID) & JOB_USE_CUTLIST) != 0);
 
     uint transcoder = program_info->QueryTranscoderID();
     QString profilearg =

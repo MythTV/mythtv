@@ -376,9 +376,9 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     uint32_t capabilities = 0;
     if (CardUtil::GetV4LInfo(m_chanfd, m_card, m_driver, m_version, capabilities))
     {
-        m_supports_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
-        supports_tuner      = !!(capabilities & V4L2_CAP_TUNER);
-        supports_audio      = !!(capabilities & V4L2_CAP_AUDIO);
+        m_supports_sliced_vbi = ((capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U);
+        supports_tuner        = ((capabilities & V4L2_CAP_TUNER) != 0U);
+        supports_audio        = ((capabilities & V4L2_CAP_AUDIO) != 0U);
         /// Determine hacks needed for specific drivers & driver versions
         if (m_driver == "hdpvr")
         {

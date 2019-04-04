@@ -65,7 +65,7 @@ void DeleteThread::run(void)
     RunEpilog();
 }
 
-bool DeleteThread::AddFile(QString path)
+bool DeleteThread::AddFile(const QString& path)
 {
     // check if a file exists, and add to the list of new files to be deleted
     QFileInfo finfo(path);

@@ -20,7 +20,7 @@ class MBASE_PUBLIC FileSystemInfo
     FileSystemInfo(QString hostname, QString path, bool local, int fsid,
              int groupid, int blksize, int64_t total, int64_t used);
     FileSystemInfo(QStringList::const_iterator &it,
-            QStringList::const_iterator end);
+            const QStringList::const_iterator& end);
     explicit FileSystemInfo(const QStringList &slist);
 
     virtual ~FileSystemInfo(void) = default;
@@ -65,7 +65,7 @@ class MBASE_PUBLIC FileSystemInfo
   private:
     bool        FromStringList(const QStringList &slist);
     bool        FromStringList(QStringList::const_iterator &it,
-                               QStringList::const_iterator listend);
+                               const QStringList::const_iterator& listend);
 
     QString m_hostname;
     QString m_path;

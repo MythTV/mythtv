@@ -377,7 +377,7 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
             {
                 continue;
             }
-            bool has_pts = bufptr[3] & 0x80;
+            bool has_pts = (bufptr[3] & 0x80) != 0;
             if (has_pts && (bytes_left > 5+5))
             {
                 int i = 5;

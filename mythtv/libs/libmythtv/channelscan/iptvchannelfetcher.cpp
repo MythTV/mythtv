@@ -152,7 +152,7 @@ void IPTVChannelFetcher::run(void)
         fbox_chan_map_t::const_iterator it = m_channels.begin();
         for (uint i = 1; it != m_channels.end(); ++it, ++i)
         {
-            QString channum = it.key();
+            const QString& channum = it.key();
             QString name    = (*it).m_name;
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
             uint programnumber = (*it).m_programNumber;

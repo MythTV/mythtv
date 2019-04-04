@@ -26,7 +26,7 @@
 
 DVDThemeSelector::DVDThemeSelector(
     MythScreenStack *parent, MythScreenType *destinationScreen,
-    ArchiveDestination archiveDestination, QString name) :
+    ArchiveDestination archiveDestination, const QString& name) :
     MythScreenType(parent, name, true),
     m_destinationScreen(destinationScreen),
     m_archiveDestination(archiveDestination),
@@ -136,7 +136,7 @@ void DVDThemeSelector::getThemeList(void)
 
         for (int x = 0; x < list.size(); x++)
         {
-            QFileInfo fi = list.at(x);
+            const QFileInfo& fi = list.at(x);
             if (QFile::exists(themeDir + fi.fileName() + "/preview.png"))
             {
                 theme_list.append(fi.fileName());

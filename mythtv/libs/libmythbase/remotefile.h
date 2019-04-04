@@ -24,7 +24,7 @@ class MBASE_PUBLIC RemoteFile
                const QStringList *possibleAuxiliaryFiles = nullptr);
    ~RemoteFile();
 
-    bool ReOpen(QString newFilename);
+    bool ReOpen(const QString& newFilename);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 

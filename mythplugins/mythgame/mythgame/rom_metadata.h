@@ -46,6 +46,6 @@ typedef QMap <QString, RomData> RomDBMap;
 
 QString crcStr(int crc);
 
-QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB);
+QString crcinfo(const QString& romname, const QString& GameType, QString *key, RomDBMap *romDB);
 
 #endif

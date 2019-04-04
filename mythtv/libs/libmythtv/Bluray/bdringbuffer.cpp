@@ -672,8 +672,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     if (discinfo)
     {
-        m_topMenuSupported   = discinfo->top_menu_supported;
-        m_firstPlaySupported = discinfo->first_play_supported;
+        m_topMenuSupported   = (discinfo->top_menu_supported != 0U);
+        m_firstPlaySupported = (discinfo->first_play_supported != 0U);
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "*** Blu-ray Disc Information ***");
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("First Play Supported: %1")
@@ -1414,23 +1414,23 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_PG_TEXTST:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_PG_TEXTST %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_PGTextSTEnabled = ev.param;
+            m_PGTextSTEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_AUDIO:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SECONDARY_AUDIO %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_secondaryAudioEnabled = ev.param;
+            m_secondaryAudioEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_VIDEO:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SECONDARY_VIDEO %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_secondaryVideoEnabled = ev.param;
+            m_secondaryVideoEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_VIDEO_SIZE:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_SECONDARY_VIDEO_SIZE %1")
                     .arg(ev.param==0 ? "PIP" : "fullscreen"));
-            m_secondaryVideoIsFullscreen = ev.param;
+            m_secondaryVideoIsFullscreen = (ev.param != 0U);
             break;
 
         /* status */

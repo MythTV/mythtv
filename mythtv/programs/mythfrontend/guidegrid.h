@@ -192,7 +192,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void moveLeftRight(MoveVector movement);
     void moveUpDown(MoveVector movement);
-    void moveToTime(QDateTime datetime);
+    void moveToTime(const QDateTime& datetime);
 
     void ShowMenu(void) override; // MythScreenType
     void ShowRecordingMenu(void);

@@ -27,7 +27,7 @@ MBASE_PUBLIC bool telnet(const QString &host, int port);
 MBASE_PUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
 MBASE_PUBLIC QString createTempFile(
     QString name_template = "/tmp/mythtv_XXXXXX", bool dir = false);
-MBASE_PUBLIC bool makeFileAccessible(QString filename);
+MBASE_PUBLIC bool makeFileAccessible(const QString& filename);
 
 MBASE_PUBLIC QString getResponse(const QString &query, const QString &def);
 MBASE_PUBLIC int     intResponse(const QString &query, int def);
@@ -64,12 +64,12 @@ static inline QString xml_bool_to_string(bool val)
 
 MBASE_PUBLIC QString xml_indent(uint level);
 
-MBASE_PUBLIC bool IsMACAddress(QString MAC);
-MBASE_PUBLIC bool WakeOnLAN(QString MAC);
+MBASE_PUBLIC bool IsMACAddress(const QString& MAC);
+MBASE_PUBLIC bool WakeOnLAN(const QString& MAC);
 MBASE_PUBLIC bool MythWakeup(const QString &wakeUpCommand,
     uint flags = kMSNone, uint timeout = 0);
 
-MBASE_PUBLIC QString FileHash(QString filename);
+MBASE_PUBLIC QString FileHash(const QString& filename);
 
 /// Is A/V Sync destruction daemon is running on this host?
 MBASE_PUBLIC bool IsPulseAudioRunning(void);

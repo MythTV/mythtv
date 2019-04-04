@@ -4,6 +4,7 @@
 #include <thread> // for sleep_for
 
 #include <QApplication>
+#include <utility>
 
 #include "compat.h"
 
@@ -24,7 +25,7 @@ class ShellThread: public MThread
 {
 public:
     ShellThread(QString cmd, QString path)
-        : MThread("Import"), m_command(cmd), m_path(path) {}
+        : MThread("Import"), m_command(std::move(cmd)), m_path(std::move(path)) {}
 
     int GetResult(void) { return m_result; }
 
@@ -352,7 +353,7 @@ void GalleryThumbView::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent  *me    = static_cast<MythEvent *>(event);
-        QString     mesg  = me->Message();
+        const QString&     mesg  = me->Message();
         QStringList extra = me->ExtraDataList();
 
         // Internal messages contain a hostname. Ignore other FE messages
@@ -785,7 +786,7 @@ void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
  \param index Thumbnail index in buttonlist item (Dirs use 4 thumbnails)
  \return QString URL of thumbnail
 */
-QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, ImagePtrK im,
+QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, const ImagePtrK& im,
                                          ImageIdList &request, int index)
 {
     ThumbPair thumb(im->m_thumbNails.at(index));
@@ -813,7 +814,7 @@ QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, ImagePtrK i
  \param index Index of the thumbnail on the button
 */
 void GalleryThumbView::UpdateThumbnail(MythUIButtonListItem *button,
-                                       ImagePtrK im, const QString &url,
+                                       const ImagePtrK& im, const QString &url,
                                        int index)
 {
     if (im->m_thumbNails.size() == 1)
@@ -1677,7 +1678,7 @@ void GalleryThumbView::ShowHidden(bool show)
  \param msg Text to display
  \param event Event label
 */
-void GalleryThumbView::ShowDialog(QString msg, QString event)
+void GalleryThumbView::ShowDialog(const QString& msg, const QString& event)
 {
     MythConfirmationDialog *popup =
             new MythConfirmationDialog(&m_popupStack, msg, true);

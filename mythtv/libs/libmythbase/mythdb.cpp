@@ -487,7 +487,7 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
         if (*dit)
             continue;
 
-        QString key = dit.key();
+        const QString& key = dit.key();
         if (!key.contains("'"))
         {
             keylist += QString("'%1',").arg(key);

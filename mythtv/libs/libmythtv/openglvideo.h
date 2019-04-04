@@ -50,7 +50,7 @@ class OpenGLVideo
               QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
               bool viewport_control,  VideoType type,
-              QString options);
+              const QString& options);
 
     uint GetInputTexture(void) const;
     uint GetTextureType(void) const;
@@ -91,15 +91,15 @@ class OpenGLVideo
     bool OptimiseFilters(void);
     bool AddFrameBuffer(uint &framebuffer, uint &texture, QSize vid_size);
     uint AddFragmentProgram(OpenGLFilterType name,
-                            QString deint = QString(),
+                            const QString& deint = QString(),
                             FrameScanType field = kScan_Progressive);
     uint CreateVideoTexture(QSize size, QSize &tex_size);
     QString GetProgramString(OpenGLFilterType name,
-                             QString deint = QString(),
+                             const QString& deint = QString(),
                              FrameScanType field = kScan_Progressive);
     void GetProgramStrings(QString &vertex, QString &fragment,
                            OpenGLFilterType filter,
-                           QString deint = QString(),
+                           const QString& deint = QString(),
                            FrameScanType field = kScan_Progressive);
     void CustomiseProgramString(QString &string);
     static QString FilterToString(OpenGLFilterType filter);

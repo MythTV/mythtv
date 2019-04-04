@@ -160,7 +160,7 @@ class WebSocketWorkerThread : public QRunnable
     WebSocketWorkerThread(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
                           PoolServerType type
 #ifndef QT_NO_OPENSSL
-                          , QSslConfiguration sslConfig
+                          , const QSslConfiguration& sslConfig
 #endif
                         );
     virtual ~WebSocketWorkerThread() = default;
@@ -209,7 +209,7 @@ class WebSocketWorker : public QObject
     WebSocketWorker(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
                     PoolServerType type
 #ifndef QT_NO_OPENSSL
-                    , QSslConfiguration sslConfig
+                    , const QSslConfiguration& sslConfig
 #endif
                     );
     virtual ~WebSocketWorker();

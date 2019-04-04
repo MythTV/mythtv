@@ -37,9 +37,9 @@ class BrowserApi : public QObject
     void SetVolume(int volumn);
     int GetVolume(void);
 
-    void PlayFile(QString filename);
+    void PlayFile(const QString& filename);
     void PlayTrack(int trackID);
-    void PlayURL(QString url);
+    void PlayURL(const QString& url);
 
     QString GetMetadata(void);
 
@@ -139,10 +139,10 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     void Init(void);
 
-    void LoadPage(QUrl url);
+    void LoadPage(const QUrl& url);
     void SetHtml(const QString &html, const QUrl &baseUrl = QUrl());
 
-    void LoadUserStyleSheet(QUrl url);
+    void LoadUserStyleSheet(const QUrl& url);
 
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType
     void Pulse(void) override; // MythUIType

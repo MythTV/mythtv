@@ -35,7 +35,7 @@ using namespace commDetector2;
 namespace {
 
 //returns true on success, false otherwise
-bool writeJPG(QString prefix, const AVFrame *img, int imgheight)
+bool writeJPG(const QString& prefix, const AVFrame *img, int imgheight)
 {
     const int imgwidth = img->linesize[0];
     QFileInfo jpgfi(prefix + ".jpg");
@@ -447,7 +447,7 @@ bool
 template_alloc(const unsigned int *scores, int width, int height,
         int minrow, int mincol, int maxrow1, int maxcol1, AVFrame *tmpl,
         int *ptmplrow, int *ptmplcol, int *ptmplwidth, int *ptmplheight,
-        bool debug_edgecounts, QString debugdir)
+        bool debug_edgecounts, const QString& debugdir)
 {
     /*
      * TUNABLE:
@@ -576,7 +576,7 @@ free_thresh:
 bool
 analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
         const AVFrame *cropped, const AVFrame *edges, int cropheight,
-        int croprow, int cropcol, bool debug_frames, QString debugdir)
+        int croprow, int cropcol, bool debug_frames, const QString& debugdir)
 {
     static const int    delta = 24;
     static int          lastrow, lastcol, lastwidth, lastheight;
@@ -624,8 +624,8 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
 }
 
 bool
-readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
-        QString tmplfile, AVFrame *tmpl, bool *pvalid)
+readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, int *pheight,
+        const QString& tmplfile, AVFrame *tmpl, bool *pvalid)
 {
     QFile dfile(datafile);
     QFileInfo dfileinfo(dfile);
@@ -665,7 +665,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
 }
 
 void
-writeDummyTemplate(QString datafile)
+writeDummyTemplate(const QString& datafile)
 {
     /* Leave a 0-byte file. */
     QFile dfile(datafile);
@@ -676,7 +676,7 @@ writeDummyTemplate(QString datafile)
 }
 
 bool
-writeTemplate(QString tmplfile, const AVFrame *tmpl, QString datafile,
+writeTemplate(const QString& tmplfile, const AVFrame *tmpl, const QString& datafile,
         int row, int col, int width, int height)
 {
     QFile tfile(tmplfile);
@@ -699,7 +699,7 @@ writeTemplate(QString tmplfile, const AVFrame *tmpl, QString datafile,
 
 TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
         EdgeDetector *ed, MythPlayer *player, int proglen,
-        QString debugdir)
+        const QString& debugdir)
     : m_pgmConverter(pgmc)
     , m_borderDetector(bd)
     , m_edgeDetector(ed)

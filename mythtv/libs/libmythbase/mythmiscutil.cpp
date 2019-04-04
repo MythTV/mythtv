@@ -420,7 +420,7 @@ QString createTempFile(QString name_template, bool dir)
  *
  *  \param filename   Path of file to make accessible
  */
-bool makeFileAccessible(QString filename)
+bool makeFileAccessible(const QString& filename)
 {
     QByteArray fname = filename.toLatin1();
     int ret = chmod(fname.constData(), 0666);
@@ -528,7 +528,7 @@ QString getSymlinkTarget(const QString &start_file,
     return (!fi.isSymLink()) ? cur_file : QString();
 }
 
-bool IsMACAddress(QString MAC)
+bool IsMACAddress(const QString& MAC)
 {
     QStringList tokens = MAC.split(':');
     if (tokens.size() != 6)
@@ -574,7 +574,7 @@ bool IsMACAddress(QString MAC)
     return true;
 }
 
-QString FileHash(QString filename)
+QString FileHash(const QString& filename)
 {
     QFile file(filename);
     QFileInfo fileinfo(file);
@@ -615,7 +615,7 @@ QString FileHash(QString filename)
     return output;
 }
 
-bool WakeOnLAN(QString MAC)
+bool WakeOnLAN(const QString& MAC)
 {
     char msg[1024] = "\xFF\xFF\xFF\xFF\xFF\xFF";
     int  msglen = 6;
@@ -660,7 +660,7 @@ bool WakeOnLAN(QString MAC)
 bool MythWakeup(const QString &wakeUpCommand, uint flags, uint timeout)
 {
     if (!IsMACAddress(wakeUpCommand))
-        return !myth_system(wakeUpCommand, flags, timeout);
+        return myth_system(wakeUpCommand, flags, timeout) == 0U;
 
     return WakeOnLAN(wakeUpCommand);
 }

@@ -262,7 +262,7 @@ QString LogViewer::getSetting(const QString &key)
     return QString("");
 }
 
-bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
+bool LogViewer::loadFile(const QString& filename, QStringList &list, int startline)
 {
     bool strip = !(filename.endsWith("progress.log") || filename.endsWith("mythburn.log"));
 

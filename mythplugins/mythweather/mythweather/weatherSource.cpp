@@ -19,8 +19,8 @@
 #include "weatherScreen.h"
 #include "weatherSource.h"
 
-QStringList WeatherSource::ProbeTypes(QString workingDirectory,
-                                      QString program)
+QStringList WeatherSource::ProbeTypes(const QString& workingDirectory,
+                                      const QString& program)
 {
     QStringList arguments("-t");
     const QString loc = QString("WeatherSource::ProbeTypes(%1 %2): ")
@@ -58,8 +58,8 @@ QStringList WeatherSource::ProbeTypes(QString workingDirectory,
     return types;
 }
 
-bool WeatherSource::ProbeTimeouts(QString  workingDirectory,
-                                  QString  program,
+bool WeatherSource::ProbeTimeouts(const QString&  workingDirectory,
+                                  const QString&  program,
                                   uint    &updateTimeout,
                                   uint    &scriptTimeout)
 {

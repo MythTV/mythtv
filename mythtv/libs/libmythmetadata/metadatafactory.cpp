@@ -178,12 +178,12 @@ void MetadataFactory::Lookup(MetadataLookup *lookup)
         m_lookupthread->addLookup(lookup);
 }
 
-META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
-                                                      QString subtitle,
-                                                      QString inetref,
+META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(const QString& title,
+                                                      const QString& subtitle,
+                                                      const QString& inetref,
                                                       int season,
                                                       int episode,
-                                                      QString grabber,
+                                                      const QString& grabber,
                                                       bool allowgeneric)
 {
     MetadataLookup *lookup = new MetadataLookup();
@@ -254,7 +254,7 @@ void MetadataFactory::VideoScan()
     VideoScan(hosts);
 }
 
-void MetadataFactory::VideoScan(QStringList hosts)
+void MetadataFactory::VideoScan(const QStringList& hosts)
 {
     if (IsRunning())
         return;
@@ -266,7 +266,7 @@ void MetadataFactory::VideoScan(QStringList hosts)
     m_videoscanner->start();
 }
 
-void MetadataFactory::OnMultiResult(MetadataLookupList list)
+void MetadataFactory::OnMultiResult(const MetadataLookupList& list)
 {
     if (list.isEmpty())
         return;

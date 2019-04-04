@@ -95,7 +95,7 @@ void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
     }
 }
 
-bool Transcode::GetProfile(QString profileName, QString encodingType,
+bool Transcode::GetProfile(const QString& profileName, const QString& encodingType,
                            int height, int frameRate)
 {
     if (profileName.toLower() == "autodetect")
@@ -197,9 +197,9 @@ static int get_int_option(RecordingProfile *profile, const QString &name)
     return ret_int;
 }
 
-static int get_bool_option(RecordingProfile *profile, const QString &name)
+static bool get_bool_option(RecordingProfile *profile, const QString &name)
 {
-    return static_cast<int>(get_int_option(profile, name));
+    return get_int_option(profile, name) != 0;
 }
 
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
@@ -214,7 +214,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                              const QString &outputname,
                              const QString &profileName,
                              bool honorCutList, bool framecontrol,
-                             int jobID, QString fifodir,
+                             int jobID, const QString& fifodir,
                              bool fifo_info, bool cleanCut,
                              frm_dir_map_t &deleteMap,
                              int AudioTrackNo,

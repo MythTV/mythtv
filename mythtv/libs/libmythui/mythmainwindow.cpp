@@ -6,6 +6,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -96,7 +97,7 @@ using namespace std;
 class KeyContext
 {
   public:
-    void AddMapping(int key, QString action)
+    void AddMapping(int key, const QString& action)
     {
         m_actionMap[key].append(action);
     }
@@ -255,15 +256,15 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
         if ((modifiers = e->modifiers()) != Qt::NoModifier)
         {
             int modnum = Qt::NoModifier;
-            if ((modifiers & Qt::ShiftModifier) &&
+            if (((modifiers & Qt::ShiftModifier) != 0U) &&
                 (keynum > 0x7f) &&
                 (keynum != Qt::Key_Backtab))
                 modnum |= Qt::SHIFT;
-            if (modifiers & Qt::ControlModifier)
+            if ((modifiers & Qt::ControlModifier) != 0U)
                 modnum |= Qt::CTRL;
-            if (modifiers & Qt::MetaModifier)
+            if ((modifiers & Qt::MetaModifier) != 0U)
                 modnum |= Qt::META;
-            if (modifiers & Qt::AltModifier)
+            if ((modifiers & Qt::AltModifier) != 0U)
                 modnum |= Qt::ALT;
             modnum &= ~Qt::UNICODE_ACCEL;
             return (keynum |= modnum);
@@ -896,7 +897,7 @@ void MythMainWindow::GrabWindow(QImage &image)
  * other than the UI thread, and to wait for the screenshot before returning.
  * It is used by mythweb for the remote access screenshots
  */
-void MythMainWindow::doRemoteScreenShot(QString filename, int x, int y)
+void MythMainWindow::doRemoteScreenShot(const QString& filename, int x, int y)
 {
     // This will be running in the UI thread, as is required by QPixmap
     QStringList args;
@@ -912,7 +913,7 @@ void MythMainWindow::RemoteScreenShot(QString filename, int x, int y)
 {
     // This will be running in a non-UI thread and is used to trigger a
     // function in the UI thread, and waits for completion of that handler
-    emit signalRemoteScreenShot(filename, x, y);
+    emit signalRemoteScreenShot(std::move(filename), x, y);
 }
 
 bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
@@ -954,7 +955,7 @@ bool MythMainWindow::ScreenShot(int w, int h, QString filename)
         h = img.height();
 
     img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    return SaveScreenShot(img, filename);
+    return SaveScreenShot(img, std::move(filename));
 }
 
 bool MythMainWindow::event(QEvent *e)
@@ -989,7 +990,7 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
+void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 {
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
@@ -1862,7 +1863,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         }
         else
         {
-            QString inskey = keybind;
+            const QString& inskey = keybind;
 
             query.prepare("INSERT INTO keybindings (context, action, "
                           "description, keylist, hostname) VALUES "
@@ -2000,7 +2001,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
         }
         else
         {
-            QString inskey = keybind;
+            const QString& inskey = keybind;
 
             query.prepare("INSERT INTO jumppoints (destination, description, "
                           "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
@@ -2018,7 +2019,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
     }
 
     JumpData jd =
-        { callback, destination, description, exittomain, localAction };
+        { callback, destination, description, exittomain, std::move(localAction) };
     d->m_destinationMap[destination] = jd;
 
     BindJump(destination, keybind);
@@ -2717,7 +2718,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             {
                 bool usebookmark = true;
                 if (me->ExtraDataCount() >= 12)
-                    usebookmark = me->ExtraData(11).toInt();
+                    usebookmark = (me->ExtraData(11).toInt() != 0);
                 HandleMedia("Internal", me->ExtraData(0),
                     me->ExtraData(1), me->ExtraData(2),
                     me->ExtraData(3), me->ExtraData(4),
@@ -2797,7 +2798,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::MythUserMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (!message.isEmpty())
             ShowOkPopup(message);

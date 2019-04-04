@@ -976,7 +976,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         // Expects hide flag, comma-delimited file/dir ids
         QStringList reply = (listline.size() == 3)
                 ? ImageManagerBe::getInstance()->
-                  HandleHide(listline[1].toInt(), listline[2])
+                  HandleHide(listline[1].toInt() != 0, listline[2])
                 : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
@@ -1005,7 +1005,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         // Expects destination path, rescan flag, list of dir names
         QStringList reply = (listline.size() >= 4)
                 ? ImageManagerBe::getInstance()->
-                  HandleDirs(listline[1], listline[2].toInt(), listline.mid(3))
+                  HandleDirs(listline[1], listline[2].toInt() != 0, listline.mid(3))
                 : QStringList("ERROR") << "Bad: " << listline;
 
         SendResponse(pbs->getSocket(), reply);
@@ -1141,9 +1141,9 @@ void MainServer::customEvent(QEvent *e)
         {
             bool ok = true;
             uint recordingID  = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
-            QString filename  = me->ExtraData(1); // outFileName
-            QString msg       = me->ExtraData(2);
-            QString datetime  = me->ExtraData(3);
+            const QString& filename  = me->ExtraData(1); // outFileName
+            const QString& msg       = me->ExtraData(2);
+            const QString& datetime  = me->ExtraData(3);
 
             if (message == "PREVIEW_QUEUED")
             {
@@ -1170,7 +1170,7 @@ void MainServer::customEvent(QEvent *e)
 
                 for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
                 {
-                    QString token = me->ExtraData(i);
+                    const QString& token = me->ExtraData(i);
                     extra.push_back(token);
                     RequestedBy::iterator it = m_previewRequestedBy.find(token);
                     if (it != m_previewRequestedBy.end())
@@ -1201,15 +1201,15 @@ void MainServer::customEvent(QEvent *e)
 
         if (message == "PREVIEW_FAILED" && me->ExtraDataCount() >= 5)
         {
-            QString pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
-            QString msg       = me->ExtraData(2);
+            const QString& pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
+            const QString& msg       = me->ExtraData(2);
 
             QStringList extra("ERROR");
             extra.push_back(pginfokey);
             extra.push_back(msg);
             for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
             {
-                QString token = me->ExtraData(i);
+                const QString& token = me->ExtraData(i);
                 extra.push_back(token);
                 RequestedBy::iterator it = m_previewRequestedBy.find(token);
                 if (it != m_previewRequestedBy.end())
@@ -1402,7 +1402,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("RESCHEDULE_RECORDINGS") && m_sched)
         {
-            QStringList request = me->ExtraDataList();
+            const QStringList& request = me->ExtraDataList();
             m_sched->Reschedule(request);
             return;
         }
@@ -1447,7 +1447,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().startsWith("LIVETV_EXITED"))
         {
-            QString chainid = me->ExtraData();
+            const QString& chainid = me->ExtraData();
             LiveTVChain *chain = GetExistingChain(chainid);
             if (chain)
                 DeleteChain(chain);
@@ -1916,10 +1916,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         bool usereadahead = true;
         int timeout_ms = 2000;
         if (commands.size() > 3)
-            writemode = commands[3].toInt();
+            writemode = (commands[3].toInt() != 0);
 
         if (commands.size() > 4)
-            usereadahead = commands[4].toInt();
+            usereadahead = (commands[4].toInt() != 0);
 
         if (commands.size() > 5)
             timeout_ms = commands[5].toInt();
@@ -2122,7 +2122,7 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
  * Returns programinfo (title, subtitle, description, category, chanid,
  * channum, callsign, channel.name, fileURL, \e et \e cetera)
  */
-void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
+void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QString playbackhost = pbs->getHostname();
@@ -3551,7 +3551,7 @@ void MainServer::HandleQueryTimeZone(PlaybackSock *pbs)
 void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
-    bool checkSlaves = slist[1].toInt();
+    bool checkSlaves = slist[1].toInt() != 0;
 
     QStringList::const_iterator it = slist.begin() + 2;
     RecordingInfo recinfo(it, slist.end());
@@ -3756,7 +3756,7 @@ void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
 }
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
-                                            QString tmptable, int recordid)
+                                            const QString& tmptable, int recordid)
 {
     MythSocket *pbssock = pbs->getSocket();
 
@@ -3878,7 +3878,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     bool fileNamesOnly = false;
 
     if (sList.size() >= 5)
-        fileNamesOnly = sList.at(4).toInt();
+        fileNamesOnly = (sList.at(4).toInt() != 0);
 
     bool slaveUnreachable = false;
 
@@ -4618,7 +4618,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         chain->SetHostSocket(pbssock);
 
-        enc->SpawnLiveTV(chain, slist[3].toInt(), slist[4]);
+        enc->SpawnLiveTV(chain, slist[3].toInt() != 0, slist[4]);
         retlist << "OK";
     }
     else if (command == "STOP_LIVETV")
@@ -4716,7 +4716,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_COLOUR")
     {
         int  type = slist[2].toInt();
-        bool up   = slist[3].toInt();
+        bool up   = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Colour, up);
         retlist << QString::number(ret);
@@ -4724,7 +4724,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_CONTRAST")
     {
         int  type = slist[2].toInt();
-        bool up   = slist[3].toInt();
+        bool up   = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Contrast, up);
         retlist << QString::number(ret);
@@ -4732,7 +4732,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_BRIGHTNESS")
     {
         int  type= slist[2].toInt();
-        bool up  = slist[3].toInt();
+        bool up  = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Brightness, up);
         retlist << QString::number(ret);
@@ -4740,7 +4740,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_HUE")
     {
         int  type= slist[2].toInt();
-        bool up  = slist[3].toInt();
+        bool up  = slist[3].toInt() != 0;
         int  ret = enc->ChangePictureAttribute(
             (PictureAdjustType) type, kPictureAttribute_Hue, up);
         retlist << QString::number(ret);
@@ -4967,7 +4967,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         QStringList::const_iterator it = slist.begin() + 4;
         ProgramInfo pginfo(it, slist.end());
 
-        enc->RecordPending(&pginfo, secsleft, haslater);
+        enc->RecordPending(&pginfo, secsleft, haslater != 0);
 
         retlist << "OK";
     }
@@ -5055,7 +5055,7 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
     SendResponse(pbs->getSocket(), retlist);
 }
 
-int MainServer::GetfsID(QList<FileSystemInfo>::iterator fsInfo)
+int MainServer::GetfsID(const QList<FileSystemInfo>::iterator& fsInfo)
 {
     QString fskey = fsInfo->getHostname() + ":" + fsInfo->getPath();
     QMutexLocker lock(&m_fsIDcacheLock);
@@ -5156,7 +5156,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     localStr = "1"; // Assume local
                     bSize = 0;
 
-                    if (!statfs(currentDir.toLocal8Bit().constData(), &statbuf))
+                    if (statfs(currentDir.toLocal8Bit().constData(), &statbuf) == 0)
                     {
 #if CONFIG_DARWIN
                         char *fstypename = statbuf.f_fstypename;
@@ -5500,7 +5500,7 @@ bool MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
     return HandleDeleteFile(slist[1], slist[2], pbs);
 }
 
-bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
+bool MainServer::HandleDeleteFile(const QString& filename, const QString& storagegroup,
                                   PlaybackSock *pbs)
 {
     StorageGroup sgroup(storagegroup, "", false);
@@ -7108,7 +7108,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     }
     else if (command == "SET_TIMEOUT")
     {
-        bool fast = slist[2].toInt();
+        bool fast = slist[2].toInt() != 0;
         ft->SetTimeout(fast);
         retlist << "OK";
     }
@@ -8309,7 +8309,7 @@ void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
 {
     if (event.ExtraDataCount() > 0 && m_sched)
     {
-        bool needsReschedule = event.ExtraData(0).toUInt();
+        bool needsReschedule = event.ExtraData(0).toUInt() != 0U;
         for (int i = 1; i < event.ExtraDataCount(); i++)
             m_sched->SlaveDisconnected(event.ExtraData(i).toUInt());
 

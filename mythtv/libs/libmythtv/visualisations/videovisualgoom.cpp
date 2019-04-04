@@ -105,7 +105,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         if (!m_surface && glrender && m_buffer)
         {
             m_surface = glrender->CreateTexture(m_area.size(),
-                                  glrender->GetFeatures() & kGLExtPBufObj, 0,
+                                  (glrender->GetFeatures() & kGLExtPBufObj) != 0U, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
         }
@@ -114,7 +114,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         {
             if (m_buffer != last)
             {
-                bool copy = glrender->GetFeatures() & kGLExtPBufObj;
+                bool copy = (glrender->GetFeatures() & kGLExtPBufObj) != 0U;
                 void* buf = glrender->GetTextureBuffer(m_surface, copy);
                 if (copy)
                     memcpy(buf, m_buffer, m_area.width() * m_area.height() * 4);

@@ -261,7 +261,7 @@ bool DeleteMap::IsEmpty(void) const
 }
 
 /// Clears the deleteMap.
-void DeleteMap::Clear(QString undoMessage)
+void DeleteMap::Clear(const QString& undoMessage)
 {
     if (!undoMessage.isEmpty())
         Push(undoMessage);
@@ -358,7 +358,7 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
 }
 
 /// Remove the mark at the given frame.
-void DeleteMap::Delete(uint64_t frame, QString undoMessage)
+void DeleteMap::Delete(uint64_t frame, const QString& undoMessage)
 {
     EDIT_CHECK;
     if (m_deleteMap.isEmpty())
@@ -738,7 +738,7 @@ void DeleteMap::LoadCommBreakMap(frm_dir_map_t &map)
 }
 
 /// Loads the delete map from the database.
-void DeleteMap::LoadMap(QString undoMessage)
+void DeleteMap::LoadMap(const QString& undoMessage)
 {
     if (!m_ctx || !m_ctx->m_playingInfo || gCoreContext->IsDatabaseIgnored())
         return;

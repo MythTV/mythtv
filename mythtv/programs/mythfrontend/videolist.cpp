@@ -3,9 +3,10 @@
 #include <map>
 using namespace std;
 
-#include <QScopedPointer>
 #include <QFileInfo>
 #include <QList>
+#include <QScopedPointer>
+#include <utility>
 
 #include "mythcontext.h"
 #include "mythdate.h"
@@ -38,7 +39,7 @@ class TreeNodeDataPrivate
     }
 
     TreeNodeDataPrivate(QString path, QString host, QString prefix) :
-        m_metadata(nullptr), m_host(host), m_path(path), m_prefix(prefix)
+        m_metadata(nullptr), m_host(std::move(host)), m_path(std::move(path)), m_prefix(std::move(prefix))
     {
     }
 
@@ -81,7 +82,7 @@ TreeNodeData::TreeNodeData(VideoMetadata *metadata)
 
 TreeNodeData::TreeNodeData(QString path, QString host, QString prefix)
 {
-    m_d = new TreeNodeDataPrivate(path, host, prefix);
+    m_d = new TreeNodeDataPrivate(std::move(path), std::move(host), std::move(prefix));
 }
 
 TreeNodeData::TreeNodeData(const TreeNodeData &other) : m_d(nullptr)
@@ -270,13 +271,13 @@ struct to_metadata_ptr
 
 static MythGenericTree *AddDirNode(
     MythGenericTree *where_to_add,
-    QString name, QString fqPath, bool add_up_dirs,
+    const QString& name, QString fqPath, bool add_up_dirs,
     QString host = "", QString prefix = "")
 {
     // Add the subdir node...
     MythGenericTree *sub_node =
         where_to_add->addNode(name, kSubFolder, false);
-    sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath, host, prefix)));
+    sub_node->SetData(QVariant::fromValue(TreeNodeData(std::move(fqPath), std::move(host), std::move(prefix))));
     sub_node->SetText(name, "title");
     sub_node->DisplayState("subfolder", "nodetype");
 
@@ -292,7 +293,7 @@ static MythGenericTree *AddDirNode(
     return sub_node;
 }
 
-static int AddFileNode(MythGenericTree *where_to_add, QString name,
+static int AddFileNode(MythGenericTree *where_to_add, const QString& name,
                        VideoMetadata *metadata)
 {
     MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
@@ -1199,7 +1200,7 @@ class dirhandler : public DirectoryHandler
     {
         (void) file_name;
         (void) extension;
-        QString file_string(fq_file_name);
+        const QString& file_string(fq_file_name);
 
         VideoMetadataListManager::VideoMetadataPtr myData(
             new VideoMetadata(file_string));

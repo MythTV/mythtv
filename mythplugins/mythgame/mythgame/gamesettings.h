@@ -26,7 +26,7 @@ class GamePlayerSetting : public GroupSetting
 {
     Q_OBJECT
 public:
-    GamePlayerSetting(QString name, uint id = 0);
+    GamePlayerSetting(const QString& name, uint id = 0);
 
     void Save()         override;                   // StandardSetting
     bool canDelete()    override { return true; }   // GroupSetting
@@ -45,7 +45,7 @@ public:
 private:
     void Load() override; // StandardSetting
     void NewPlayerDialog();
-    void CreateNewPlayer(QString name);
+    void CreateNewPlayer(const QString& name);
 };
 
 #endif

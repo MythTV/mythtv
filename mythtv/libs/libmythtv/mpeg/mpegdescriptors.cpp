@@ -328,7 +328,7 @@ const char *descriptor_tag_strings[256] =
     /* 0xF0-0xFF */ EMPTY_STR_16
 };
 
-static void comma_list_append(QString &str, QString extra)
+static void comma_list_append(QString &str, const QString& extra)
 {
     if (str.isEmpty())
         str = extra;

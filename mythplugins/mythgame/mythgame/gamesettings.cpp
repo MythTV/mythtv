@@ -222,7 +222,7 @@ protected:
 /// Base for Game textual settings
 struct TextEdit : public MythUITextEditSetting
 {
-    explicit TextEdit(const PlayerId &parent, QString column) :
+    explicit TextEdit(const PlayerId &parent, const QString& column) :
         MythUITextEditSetting(new GameDBStorage(this, parent, column))
     {}
 };
@@ -315,7 +315,7 @@ struct AllowMultipleRoms : public MythUICheckBoxSetting
 };
 
 /// Settings for a game player
-GamePlayerSetting::GamePlayerSetting(QString name, uint id)
+GamePlayerSetting::GamePlayerSetting(const QString& name, uint id)
     : m_id(id)
 {
     setName(name);
@@ -410,7 +410,7 @@ void GamePlayersList::NewPlayerDialog()
         delete nameDialog;
 }
 
-void GamePlayersList::CreateNewPlayer(QString name)
+void GamePlayersList::CreateNewPlayer(const QString& name)
 {
     if (name.isEmpty())
         return;

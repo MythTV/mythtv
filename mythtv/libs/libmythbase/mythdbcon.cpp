@@ -4,14 +4,15 @@
 #include <cstdlib>
 
 // Qt
-#include <QVector>
-#include <QSqlDriver>
+#include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QSemaphore>
+#include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
-#include <QElapsedTimer>
-#include <QCoreApplication>
+#include <QVector>
+#include <utility>
 
 // MythTV
 #include "compat.h"
@@ -33,8 +34,8 @@
 
 static const uint kPurgeTimeout = 60 * 60;
 
-bool TestDatabase(QString dbHostName,
-                  QString dbUserName,
+bool TestDatabase(const QString& dbHostName,
+                  const QString& dbUserName,
                   QString dbPassword,
                   QString dbName,
                   int dbPort)
@@ -50,9 +51,9 @@ bool TestDatabase(QString dbHostName,
         return ret;
 
     DatabaseParams dbparms;
-    dbparms.dbName = dbName;
+    dbparms.dbName = std::move(dbName);
     dbparms.dbUserName = dbUserName;
-    dbparms.dbPassword = dbPassword;
+    dbparms.dbPassword = std::move(dbPassword);
     dbparms.dbHostName = dbHostName;
     dbparms.dbPort = dbPort;
 
@@ -435,7 +436,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     }
 }
 
-MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
+MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, const QString& name)
 {
     if (!dbcon)
         return nullptr;

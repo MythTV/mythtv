@@ -49,7 +49,7 @@ class BookmarkEditor : public MythScreenType
 
   private slots:
     void slotFindCategory(void);
-    void slotCategoryFound(QString category);
+    void slotCategoryFound(const QString& category);
 
     void Save(void);
     void Exit(void);

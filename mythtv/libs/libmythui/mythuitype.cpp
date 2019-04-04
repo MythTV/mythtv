@@ -3,9 +3,10 @@
 #include "mythuitype.h"
 
 // QT headers
+#include <QDomDocument>
 #include <QEvent>
 #include <QKeyEvent>
-#include <QDomDocument>
+#include <utility>
 
 // XML headers
 #include "xmlparsebase.h"
@@ -1400,7 +1401,7 @@ MythPainter *MythUIType::GetPainter(void)
 
 void MythUIType::SetDependsMap(QMap<QString, QString> dependsMap)
 {
-    m_dependsMap = dependsMap;
+    m_dependsMap = std::move(dependsMap);
 }
 
 void MythUIType::SetReverseDependence(MythUIType *dependee, bool reverse)

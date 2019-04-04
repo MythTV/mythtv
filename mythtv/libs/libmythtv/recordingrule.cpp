@@ -1,6 +1,8 @@
 
 #include "recordingrule.h"
 
+#include <utility>
+
 // libmythbase
 #include "mythdb.h"
 
@@ -215,8 +217,8 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
  *  \param pginfo   A pointer to an existing ProgramInfo structure.
  *  \return True if search data was successfully loaded.
  */
-bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
-                                 QString forwhat, QString joininfo,
+bool RecordingRule::LoadBySearch(RecSearchType lsearch, const QString& textname,
+                                 const QString& forwhat, QString joininfo,
                                  ProgramInfo *pginfo)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -256,7 +258,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
         m_title = ltitle;
         m_sortTitle = nullptr;
-        m_subtitle = m_sortSubtitle = joininfo;
+        m_subtitle = m_sortSubtitle = std::move(joininfo);
         m_description = forwhat;
 
         if (pginfo)
@@ -275,7 +277,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     return true;
 }
 
-bool RecordingRule::LoadTemplate(QString category, QString categoryType)
+bool RecordingRule::LoadTemplate(const QString& category, const QString& categoryType)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recordid, category, "
@@ -338,7 +340,7 @@ bool RecordingRule::MakeTemplate(QString category)
     return true;
 }
 
-bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
+bool RecordingRule::ModifyPowerSearchByID(int rid, const QString& textname,
                                           QString forwhat, QString joininfo)
 {
     if (rid <= 0)
@@ -352,8 +354,8 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
                                        .arg(tr("Power Search"));
     m_title = ltitle;
     m_sortTitle = nullptr;
-    m_subtitle = m_sortSubtitle = joininfo;
-    m_description = forwhat;
+    m_subtitle = m_sortSubtitle = std::move(joininfo);
+    m_description = std::move(forwhat);
 
     ensureSortFields();
     m_loaded = true;
@@ -666,7 +668,7 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
         infoMap["template"] = m_template;
 }
 
-void RecordingRule::UseTempTable(bool usetemp, QString table)
+void RecordingRule::UseTempTable(bool usetemp, const QString& table)
 {
     MSqlQuery query(MSqlQuery::SchedCon());
 

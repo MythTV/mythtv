@@ -46,7 +46,7 @@ class SingleView : public MythDialog, public ImageView
     Q_OBJECT
     
   public:
-    SingleView(ThumbList itemList, int *pos, int slideShow, int sortorder,
+    SingleView(const ThumbList& itemList, int *pos, int slideShow, int sortorder,
                MythMainWindow *parent, const char *name="SingleView");
     ~SingleView();
 

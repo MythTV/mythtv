@@ -1,8 +1,9 @@
 // qt
-#include <QString>
 #include <QCoreApplication>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QString>
+#include <utility>
 
 #include "mythdirs.h"
 #include "mythcontext.h"
@@ -268,7 +269,7 @@ void Search::executeSearch(const QString &script, const QString &query,
     connect(m_searchProcess, SIGNAL(error(uint)),
             this, SLOT(slotProcessSearchExit(uint)));
 
-    QString cmd = script;
+    const QString& cmd = script;
 
     QStringList args;
 
@@ -279,7 +280,7 @@ void Search::executeSearch(const QString &script, const QString &query,
     }
 
     args.append("-S");
-    QString term = query;
+    const QString& term = query;
     args.append(MythSystemLegacy::ShellEscape(term));
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -404,7 +405,7 @@ void Search::slotProcessSearchExit(uint exitcode)
 
 void Search::SetData(QByteArray data)
 {
-    m_data = data;
+    m_data = std::move(data);
     m_document.setContent(m_data, true);
 
 }

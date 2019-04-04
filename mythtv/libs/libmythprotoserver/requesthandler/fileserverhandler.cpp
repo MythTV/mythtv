@@ -3,9 +3,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <QReadLocker>
 #include <QString>
 #include <QWriteLocker>
-#include <QReadLocker>
+#include <utility>
 
 #include "mythmiscutil.h"
 #include "mythdb.h"
@@ -219,10 +220,10 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         timeout_ms      = commands[5].toInt();
         [[clang::fallthrough]];
       case 5:
-        usereadahead    = commands[4].toInt();
+        usereadahead    = (commands[4].toInt() != 0);
         [[clang::fallthrough]];
       case 4:
-        writemode       = commands[3].toInt();
+        writemode       = (commands[3].toInt() != 0);
         [[clang::fallthrough]];
       default:
         hostname        = commands[2];
@@ -739,11 +740,11 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
 
 bool FileServerHandler::DeleteFile(QString filename, QString storagegroup)
 {
-    return HandleDeleteFile(nullptr, filename, storagegroup);
+    return HandleDeleteFile(nullptr, std::move(filename), std::move(storagegroup));
 }
 
 bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
-                                QString filename, QString storagegroup)
+                                const QString& filename, const QString& storagegroup)
 {
     StorageGroup sgroup(storagegroup, "", false);
     QStringList res;
@@ -817,7 +818,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
 
     bool fileNamesOnly = false;
     if (slist.size() == 5)
-        fileNamesOnly = slist[4].toInt();
+        fileNamesOnly = (slist[4].toInt() != 0);
     else if (slist.size() != 4)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
@@ -1040,7 +1041,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         }
         else
         {
-            bool fast = slist[2].toInt();
+            bool fast = slist[2].toInt() != 0;
             ft->SetTimeout(fast);
             res << "OK";
         }

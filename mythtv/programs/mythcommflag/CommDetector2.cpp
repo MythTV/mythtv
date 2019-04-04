@@ -231,7 +231,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
     return m_debugdir;
 }
 
-void createDebugDirectory(QString dirname, QString comment)
+void createDebugDirectory(const QString& dirname, const QString& comment)
 {
     QDir qdir(dirname);
     if (qdir.exists())

@@ -889,7 +889,7 @@ int RecordingInfo::getRecordID(void)
 }
 
 bool RecordingInfo::QueryRecordedIdForKey(int & recordedid,
-                                          uint chanid, QDateTime recstartts)
+                                          uint chanid, const QDateTime& recstartts)
 {
     if (chanid < 1)
     {
@@ -928,7 +928,7 @@ bool RecordingInfo::QueryRecordedIdForKey(int & recordedid,
  *
  *  \param ext    File extension for recording
  */
-void RecordingInfo::StartedRecording(QString ext)
+void RecordingInfo::StartedRecording(const QString& ext)
 {
     QString dirname = m_pathname;
 

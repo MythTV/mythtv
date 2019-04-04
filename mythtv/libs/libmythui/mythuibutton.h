@@ -57,7 +57,7 @@ class MUI_PUBLIC MythUIButton : public MythUIType
     void Finalize(void) override; // MythUIType
 
     void SetInitialStates(void);
-    void SetState(QString state);
+    void SetState(const QString& state);
 
     QString m_Message;
     QString m_ValueText;

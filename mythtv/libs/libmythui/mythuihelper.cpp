@@ -738,7 +738,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
 
     for (int i = 0; i < list.size(); ++i)
     {
-        QFileInfo fileInfo = list.at(i);
+        const QFileInfo& fileInfo = list.at(i);
 
         if (fileInfo.fileName().contains(partialKey))
         {
@@ -793,7 +793,7 @@ QString MythUIHelper::GetThemeCacheDir(void)
  * \param url The resource being read.
  * \returns The path name of the appropriate cache directory.
  */
-QString MythUIHelper::GetCacheDirByUrl(QString url)
+QString MythUIHelper::GetCacheDirByUrl(const QString& url)
 {
     if (url.startsWith("myth:") || url.startsWith("-"))
         return GetThumbnailDir();
@@ -895,7 +895,7 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
  *
  * \param dirname The directory to prune.
  */
-void MythUIHelper::PruneCacheDir(QString dirname)
+void MythUIHelper::PruneCacheDir(const QString& dirname)
 {
     int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
     if (days == -1) {
@@ -1377,7 +1377,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     return foundit;
 }
 
-MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
+MythImage *MythUIHelper::LoadCacheImage(QString srcfile, const QString& label,
                                         MythPainter *painter,
                                         ImageCacheMode cacheMode)
 {
@@ -1624,7 +1624,7 @@ QString MythUIHelper::GetX11Display(void)
     return x11_display;
 }
 
-void MythUIHelper::AddCurrentLocation(QString location)
+void MythUIHelper::AddCurrentLocation(const QString& location)
 {
     QMutexLocker locker(&m_locationLock);
 

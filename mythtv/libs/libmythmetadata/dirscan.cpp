@@ -151,7 +151,7 @@ namespace
         for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
         {
             QStringList fInfo = p->split("::");
-            QString type = fInfo.at(0);
+            const QString& type = fInfo.at(0);
             QString fileName = fInfo.at(1);
 
             if (type == "nop")

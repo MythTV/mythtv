@@ -123,7 +123,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control,
                        VideoType Type,
-                       QString options)
+                       const QString& options)
 {
     if (!glcontext)
         return false;
@@ -155,10 +155,10 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     SetViewPort(masterViewportSize);
 
-    bool glsl    = gl_features & kGLSL;
-    bool shaders = glsl || (gl_features & kGLExtFragProg);
-    bool fbos    = gl_features & kGLExtFBufObj;
-    bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
+    bool glsl    = (gl_features & kGLSL) != 0U;
+    bool shaders = glsl || ((gl_features & kGLExtFragProg) != 0U);
+    bool fbos    = (gl_features & kGLExtFBufObj) != 0U;
+    bool ycbcr   = ((gl_features & kGLMesaYCbCr) != 0U) || ((gl_features & kGLAppleYCbCr) != 0U);
     VideoType fallback = shaders ? (glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLHQUYV) : ycbcr ? kGLYCbCr : kGLRGBA;
 
     // check for feature support
@@ -288,7 +288,8 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 
     // we always need at least one filter (i.e. a resize that simply blits the texture
     // to screen)
-    resize_down |= !filters.count(kGLFilterYUV2RGB) && !filters.count(kGLFilterYV12RGB);
+    resize_down |= ((filters.count(kGLFilterYUV2RGB) == 0U) &&
+                    (filters.count(kGLFilterYV12RGB) == 0U));
 
     // Extra stage needed on Fire Stick 4k, maybe others, because of blank screen when playing.
     resize_down |= forceResize;
@@ -669,7 +670,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
  */
 
 uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
-                                     QString deint, FrameScanType field)
+                                     const QString& deint, FrameScanType field)
 {
     if (!gl_context)
         return 0;
@@ -736,7 +737,7 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     uint tmp_tex = 0;
-    bool use_pbo = gl_features & kGLExtPBufObj;
+    bool use_pbo = (gl_features & kGLExtPBufObj) != 0U;
     if (kGLYCbCr == videoType)
     {
         uint type = (gl_features & kGLMesaYCbCr) ? GL_YCBCR_MESA : GL_YCBCR_422_APPLE;
@@ -1340,7 +1341,7 @@ static const QString bicubic =
 "LRP result.color, parmx.b, a, c;\n";
 
 QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
-                                      QString deint, FrameScanType field)
+                                      const QString& deint, FrameScanType field)
 {
     QString ret =
         "!!ARBfp1.0\n"
@@ -1823,7 +1824,7 @@ KERNELYVU
 
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
-                                    QString deint, FrameScanType field)
+                                    const QString& deint, FrameScanType field)
 {
     uint bottom = field == kScan_Intr2ndField;
     vertex = YUV2RGBVertexShader;

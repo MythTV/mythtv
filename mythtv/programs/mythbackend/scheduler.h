@@ -49,7 +49,7 @@ class Scheduler : public MThread, public MythScheduler
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-              QString tmptable = "record", Scheduler *master_sched = nullptr);
+              const QString& tmptable = "record", Scheduler *master_sched = nullptr);
     ~Scheduler();
 
     void Stop(void);
@@ -172,9 +172,9 @@ class Scheduler : public MThread, public MythScheduler
     bool TryAnotherShowing(RecordingInfo *p,  bool samePriority,
                            bool livetv = false);
     void SchedNewRecords(void);
-    void SchedNewFirstPass(RecIter &start, RecIter end,
+    void SchedNewFirstPass(RecIter &start, const RecIter& end,
                            int recpriority, int recpriority2);
-    void SchedNewRetryPass(RecIter start, RecIter end,
+    void SchedNewRetryPass(const RecIter& start, const RecIter& end,
                            bool samePriority, bool livetv = false);
     void SchedLiveTV(void);
     void PruneRedundants(void);
@@ -186,7 +186,7 @@ class Scheduler : public MThread, public MythScheduler
                              bool &blockShutdown, uint logmask);
     void ShutdownServer(int prerollseconds, QDateTime &idleSince);
     void PutInactiveSlavesToSleep(void);
-    bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
+    bool WakeUpSlave(const QString& slaveHostname, bool setWakingStatus = true);
     void WakeUpSlaves(void);
 
     int FillRecordingDir(const QString &title,

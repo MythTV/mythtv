@@ -608,7 +608,7 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
     return res;
 }
 
-QString MythUIVirtualKeyboard::getKeyText(KeyDefinition key)
+QString MythUIVirtualKeyboard::getKeyText(const KeyDefinition& key)
 {
 
     if (m_shift)

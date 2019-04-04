@@ -166,12 +166,12 @@ void NetEditorBase::ParsedData()
     FillGrabberButtonList();
 }
 
-void NetEditorBase::CreateBusyDialog(QString title)
+void NetEditorBase::CreateBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "mythvideobusydialog");

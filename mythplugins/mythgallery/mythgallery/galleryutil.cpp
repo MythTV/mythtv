@@ -257,7 +257,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                                 const GalleryFilter& flt, bool recurse,
                                 ThumbHash *itemHash, ThumbGenerator* thumbGen)
 {
-    QString blah = dir;
+    const QString& blah = dir;
     QDir d(blah);
     QString currDir = d.absolutePath();
     QStringList splitFD;
@@ -636,7 +636,7 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
     return sz;
 }
 
-bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
+bool GalleryUtil::CopyDirectory(const QFileInfo& src, QFileInfo &dst)
 {
     QDir srcDir(src.absoluteFilePath());
 
@@ -665,7 +665,7 @@ bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
     return ok;
 }
 
-bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
+bool GalleryUtil::MoveDirectory(const QFileInfo& src, QFileInfo &dst)
 {
     QDir srcDir(src.absoluteFilePath());
 

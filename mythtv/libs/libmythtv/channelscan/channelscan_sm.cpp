@@ -1968,7 +1968,7 @@ bool ChannelScanSM::ScanTransports(
             .arg(std).arg(modulation).arg(country).arg(tables.size()));
 
     QString start = table_start;
-    QString end   = table_end;
+    const QString& end   = table_end;
     freq_table_list_t::iterator it = tables.begin();
     for (; it != tables.end(); ++it)
     {

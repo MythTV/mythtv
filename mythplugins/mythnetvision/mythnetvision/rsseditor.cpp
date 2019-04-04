@@ -442,7 +442,7 @@ void RSSEditor::SlotItemChanged()
     {
         if (m_image)
         {
-            QString thumb = site->GetImage();
+            const QString& thumb = site->GetImage();
 
             m_image->Reset();
 

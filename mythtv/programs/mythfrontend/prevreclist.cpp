@@ -78,8 +78,8 @@ PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
     {
         // Get sort options if this is not a filtered list
         int flags = gCoreContext->GetNumSetting("PrevRecSortFlags",fDefault);
-        m_titleGroup = flags & fTitleGroup;
-        m_reverseSort = flags & fReverseSort;
+        m_titleGroup = ((flags & fTitleGroup) != 0);
+        m_reverseSort = ((flags & fReverseSort) != 0);
 
     }
 }

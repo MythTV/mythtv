@@ -1,7 +1,8 @@
 // Qt headers
-#include <QLocale>
 #include <QCoreApplication>
+#include <QLocale>
 #include <QMetaType>
+#include <utility>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -73,17 +74,17 @@ MetadataLookup::MetadataLookup(
     const QString &collectionref,
     const QString &tmsref,
     const QString &imdb,
-    const PeopleMap people,
+    const PeopleMap& people,
     const QStringList &studios,
     const QString &homepage,
     const QString &trailerURL,
-    const ArtworkMap artwork,
+    const ArtworkMap& artwork,
     DownloadMap downloads) :
     ReferenceCounter("MetadataLookup"),
 
     m_type(type),
     m_subtype(subtype),
-    m_data(data),
+    m_data(std::move(data)),
     m_step(step),
     m_automatic(automatic),
     m_handleimages(handleimages),
@@ -144,7 +145,7 @@ MetadataLookup::MetadataLookup(
     m_homepage(homepage),
     m_trailerURL(trailerURL),
     m_artwork(artwork),
-    m_downloads(downloads)
+    m_downloads(std::move(downloads))
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
     m_base_title = title;
@@ -196,7 +197,7 @@ MetadataLookup::MetadataLookup(
 
     m_type(type),
     m_subtype(subtype),
-    m_data(data),
+    m_data(std::move(data)),
     m_step(step),
     m_automatic(automatic),
     m_handleimages(handleimages),
@@ -269,15 +270,15 @@ MetadataLookup::MetadataLookup(
     const uint runtime,
     const uint runtimesecs,
     const QString &inetref,
-    const PeopleMap people,
+    const PeopleMap& people,
     const QString &trailerURL,
-    const ArtworkMap artwork,
+    const ArtworkMap& artwork,
     DownloadMap downloads) :
     ReferenceCounter("MetadataLookup"),
 
     m_type(type),
     m_subtype(subtype),
-    m_data(data),
+    m_data(std::move(data)),
     m_step(step),
     m_automatic(automatic),
     m_handleimages(handleimages),
@@ -303,7 +304,7 @@ MetadataLookup::MetadataLookup(
     m_people(people),
     m_trailerURL(trailerURL),
     m_artwork(artwork),
-    m_downloads(downloads)
+    m_downloads(std::move(downloads))
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
     m_base_title = title;
@@ -1195,7 +1196,7 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
         inetref, people, trailer, artwork, DownloadMap());
 }
 
-PeopleMap ParsePeople(QDomElement people)
+PeopleMap ParsePeople(const QDomElement& people)
 {
     PeopleMap ret;
 
@@ -1253,7 +1254,7 @@ PeopleMap ParsePeople(QDomElement people)
     return ret;
 }
 
-ArtworkMap ParseArtwork(QDomElement artwork)
+ArtworkMap ParseArtwork(const QDomElement& artwork)
 {
     ArtworkMap ret;
 

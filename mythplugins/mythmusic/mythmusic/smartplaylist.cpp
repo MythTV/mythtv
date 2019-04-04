@@ -4,9 +4,10 @@
 using namespace std;
 
 // qt
-#include <QSqlDriver>
 #include <QKeyEvent>
+#include <QSqlDriver>
 #include <QSqlField>
+#include <utility>
 
 // mythtv
 #include <mythcontext.h>
@@ -84,7 +85,7 @@ static SmartPLOperator SmartPLOperators[] =
 static int SmartPLOperatorsCount = sizeof(SmartPLOperators) / sizeof(SmartPLOperators[0]);
 static int SmartPLFieldsCount = sizeof(SmartPLFields) / sizeof(SmartPLFields[0]);
 
-static SmartPLOperator *lookupOperator(QString name)
+static SmartPLOperator *lookupOperator(const QString& name)
 {
     for (int x = 0; x < SmartPLOperatorsCount; x++)
     {
@@ -94,7 +95,7 @@ static SmartPLOperator *lookupOperator(QString name)
     return nullptr;
 }
 
-static SmartPLField *lookupField(QString name)
+static SmartPLField *lookupField(const QString& name)
 {
     for (int x = 0; x < SmartPLFieldsCount; x++)
     {
@@ -145,7 +146,7 @@ static QString evaluateDateValue(QString sDate)
     return sDate;
 }
 
-QString getCriteriaSQL(QString fieldName, QString operatorName,
+QString getCriteriaSQL(const QString& fieldName, QString operatorName,
                        QString value1, QString value2)
 {
     QString result;
@@ -163,7 +164,7 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     result = Field->sqlName;
 
     SmartPLOperator *Operator;
-    Operator = lookupOperator(operatorName);
+    Operator = lookupOperator(std::move(operatorName));
     if (!Operator)
     {
         return QString();
@@ -238,7 +239,7 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     return result;
 }
 
-QString getOrderBySQL(QString orderByFields)
+QString getOrderBySQL(const QString& orderByFields)
 {
     if (orderByFields.isEmpty())
         return QString();
@@ -275,7 +276,7 @@ QString getOrderBySQL(QString orderByFields)
 QString getSQLFieldName(QString fieldName)
 {
     SmartPLField *Field;
-    Field = lookupField(fieldName);
+    Field = lookupField(std::move(fieldName));
     if (!Field)
     {
         return "";
@@ -790,7 +791,7 @@ void SmartPlaylistEditor::saveClicked(void)
     Close();
 }
 
-void SmartPlaylistEditor::newSmartPlaylist(QString category)
+void SmartPlaylistEditor::newSmartPlaylist(const QString& category)
 {
     m_categorySelector->SetValue(category);
     m_titleEdit->Reset();
@@ -802,7 +803,7 @@ void SmartPlaylistEditor::newSmartPlaylist(QString category)
     updateMatches();
 }
 
-void SmartPlaylistEditor::editSmartPlaylist(QString category, QString name)
+void SmartPlaylistEditor::editSmartPlaylist(const QString& category, const QString& name)
 {
     m_originalCategory = category;
     m_originalName = name;
@@ -811,7 +812,7 @@ void SmartPlaylistEditor::editSmartPlaylist(QString category, QString name)
     updateMatches();
 }
 
-void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
+void SmartPlaylistEditor::loadFromDatabase(const QString& category, const QString& name)
 {
     // load smartplaylist from database
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
@@ -953,7 +954,7 @@ void SmartPlaylistEditor::renameCategory(const QString &category)
     m_categorySelector->SetValue(category);
 }
 
-QString SmartPlaylistEditor::getSQL(QString fields)
+QString SmartPlaylistEditor::getSQL(const QString& fields)
 {
     QString sql, whereClause, orderByClause, limitClause;
     sql = "SELECT " + fields + " FROM music_songs "
@@ -1047,7 +1048,7 @@ void SmartPlaylistEditor::orderByClicked(void)
     popupStack->AddScreen(orderByDialog);
 }
 
-void SmartPlaylistEditor::orderByChanged(QString orderBy)
+void SmartPlaylistEditor::orderByChanged(const QString& orderBy)
 {
     if (m_orderBySelector->MoveToNamedPosition(orderBy))
         return;
@@ -1082,10 +1083,10 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
 }
 
 // static function to delete a smartplaylist and any associated smartplaylist items
-bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
+bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, const QString& name)
 {
     // get categoryid
-    int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
+    int categoryid = SmartPlaylistEditor::lookupCategoryID(std::move(category));
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1132,7 +1133,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
 
 // static function to delete all smartplaylists belonging to the given category
 // will also delete any associated smartplaylist items
-bool SmartPlaylistEditor::deleteCategory(QString category)
+bool SmartPlaylistEditor::deleteCategory(const QString& category)
 {
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1165,7 +1166,7 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
 }
 
 // static function to lookup the categoryid given its name
-int SmartPlaylistEditor::lookupCategoryID(QString category)
+int SmartPlaylistEditor::lookupCategoryID(const QString& category)
 {
     int ID;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1582,7 +1583,7 @@ void CriteriaRowEditor::valueButtonClicked(void)
     popupStack->AddScreen(searchDlg);
 }
 
-void CriteriaRowEditor::setValue(QString value)
+void CriteriaRowEditor::setValue(const QString& value)
 {
     if (GetFocusWidget() && GetFocusWidget() == m_value1Button)
         m_value1Edit->SetText(value);
@@ -1609,7 +1610,7 @@ void CriteriaRowEditor::editDate(void)
     popupStack->AddScreen(dateDlg);
 }
 
-void CriteriaRowEditor::setDate(QString date)
+void CriteriaRowEditor::setDate(const QString& date)
 {
     if (GetFocusWidget() && GetFocusWidget() == m_value1Button)
     {
@@ -1739,7 +1740,7 @@ void SmartPLResultViewer::showTrackInfo(void)
     popupStack->AddScreen(dlg);
 }
 
-void SmartPLResultViewer::setSQL(QString sql)
+void SmartPLResultViewer::setSQL(const QString& sql)
 {
     m_trackList->Reset();;
 

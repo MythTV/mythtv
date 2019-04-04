@@ -250,7 +250,7 @@ QString ChannelGroup::GetChannelGroupName(int grpid)
     return "";
 }
 
-int ChannelGroup::GetChannelGroupId(QString changroupname)
+int ChannelGroup::GetChannelGroupId(const QString& changroupname)
 {
     // All Channels
     if (changroupname == "All Channels")

@@ -46,8 +46,8 @@ class MTV_PUBLIC MythCodecContext
     virtual int HwDecoderInit(AVCodecContext * /*ctx*/) { return 0; }
     void setStream(AVStream *initStream) { stream = initStream; }
     virtual int FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame);
-    static QStringList GetDeinterlacers(QString decodername);
-    static bool isCodecDeinterlacer(QString decodername);
+    static QStringList GetDeinterlacers(const QString& decodername);
+    static bool isCodecDeinterlacer(const QString& decodername);
     virtual QStringList GetDeinterlacers(void) { return QStringList(); }
     virtual QString GetDeinterlaceFilter() { return QString(); }
     void setPlayer(MythPlayer *tPlayer) { player = tPlayer; }

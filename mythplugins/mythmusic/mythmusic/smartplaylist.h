@@ -27,11 +27,11 @@ enum SmartPLFieldType
 };
 
 // used by playlist.cpp
-QString getCriteriaSQL(QString fieldName, QString operatorName,
+QString getCriteriaSQL(const QString& fieldName, QString operatorName,
                        QString value1, QString value2);
 
 QString getSQLFieldName(QString fieldName);
-QString getOrderBySQL(QString orderByFields);
+QString getOrderBySQL(const QString& orderByFields);
 
 // used by playbackbox.cpp
 QString formattedFieldValue(const QVariant &value);
@@ -82,15 +82,15 @@ class SmartPlaylistEditor : public MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
-    QString getSQL(QString fields);
+    QString getSQL(const QString& fields);
     QString getWhereClause(void);
     QString getOrderByClause(void);
     void getCategoryAndName(QString &category, QString &name);
-    void newSmartPlaylist(QString category);
-    void editSmartPlaylist(QString category, QString name);
-    static bool deleteSmartPlaylist(QString category, QString name);
-    static bool deleteCategory(QString category);
-    static int  lookupCategoryID(QString category);
+    void newSmartPlaylist(const QString& category);
+    void editSmartPlaylist(const QString& category, const QString& name);
+    static bool deleteSmartPlaylist(QString category, const QString& name);
+    static bool deleteCategory(const QString& category);
+    static int  lookupCategoryID(const QString& category);
 
   signals:
     void smartPLChanged(const QString &category, const QString &name);
@@ -118,11 +118,11 @@ class SmartPlaylistEditor : public MythScreenType
     void deleteCriteria(void);
     void doDeleteCriteria(bool doit);
     void criteriaChanged();
-    void orderByChanged(QString orderBy);
+    void orderByChanged(const QString& orderBy);
 
   private:
     void getSmartPlaylistCategories(void);
-    void loadFromDatabase(QString category, QString name);
+    void loadFromDatabase(const QString& category, const QString& name);
 
     QList<SmartPLCriteriaRow*> m_criteriaRows {nullptr};
     SmartPLCriteriaRow* m_tempCriteriaRow     {nullptr};
@@ -165,8 +165,8 @@ class CriteriaRowEditor : public MythScreenType
     void operatorChanged(void);
     void valueEditChanged(void);
     void valueButtonClicked(void);
-    void setValue(QString value);
-    void setDate(QString date);
+    void setValue(const QString& value);
+    void setDate(const QString& date);
     void saveClicked(void);
 
   signals:
@@ -221,7 +221,7 @@ class SmartPLResultViewer : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void setSQL(QString sql);
+    void setSQL(const QString& sql);
 
   private slots:
     void trackVisible(MythUIButtonListItem *item);

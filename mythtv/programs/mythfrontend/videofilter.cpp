@@ -372,8 +372,8 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         }
         case kOrderByFilename:
         {
-            QString lhsfn = lhs.GetSortFilename();
-            QString rhsfn = rhs.GetSortFilename();
+            const QString& lhsfn = lhs.GetSortFilename();
+            const QString& rhsfn = rhs.GetSortFilename();
             ret = naturalCompare(lhsfn, rhsfn) < 0;
             break;
         }
@@ -397,7 +397,7 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
     return ret;
 }
 
-void VideoFilterSettings::setTextFilter(QString val)
+void VideoFilterSettings::setTextFilter(const QString& val)
 {
     m_changed_state |= kFilterTextFilterChanged;
     if (m_re_season.indexIn(val) != -1)
@@ -451,7 +451,7 @@ void VideoFilterSettings::setTextFilter(QString val)
 /////////////////////////////////
 // VideoFilterDialog
 /////////////////////////////////
-VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, QString lname,
+VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, const QString& lname,
         VideoList *video_list) : MythScreenType(lparent, lname),
     m_videoList(*video_list)
 {

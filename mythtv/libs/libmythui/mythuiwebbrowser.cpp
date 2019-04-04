@@ -196,7 +196,7 @@ int BrowserApi::GetVolume(void)
     return -1;
 }
 
-void BrowserApi::PlayFile(QString filename)
+void BrowserApi::PlayFile(const QString& filename)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
                  .arg(gCoreContext->GetHostName()).arg(filename));
@@ -210,7 +210,7 @@ void BrowserApi::PlayTrack(int trackID)
     gCoreContext->dispatch(me);
 }
 
-void BrowserApi::PlayURL(QString url)
+void BrowserApi::PlayURL(const QString& url)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
                  .arg(gCoreContext->GetHostName()).arg(url));
@@ -245,7 +245,7 @@ void BrowserApi::customEvent(QEvent *e)
     if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (!message.startsWith("MUSIC_CONTROL"))
             return;
@@ -1036,7 +1036,7 @@ MythUIWebBrowser::~MythUIWebBrowser()
  *  \brief Loads the specified url and displays it.
  *  \param url The url to load
  */
-void MythUIWebBrowser::LoadPage(QUrl url)
+void MythUIWebBrowser::LoadPage(const QUrl& url)
 {
     if (!m_browser)
         return;
@@ -1066,7 +1066,7 @@ void MythUIWebBrowser::SetHtml(const QString &html, const QUrl &baseUrl)
  *  \brief Sets the specified user style sheet.
  *  \param url The url to the style sheet
  */
-void MythUIWebBrowser::LoadUserStyleSheet(QUrl url)
+void MythUIWebBrowser::LoadUserStyleSheet(const QUrl& url)
 {
     if (!m_browser)
         return;

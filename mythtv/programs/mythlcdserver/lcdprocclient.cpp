@@ -17,6 +17,7 @@
 #include <QCoreApplication>
 #include <QEvent>
 #include <QTimer>
+#include <utility>
 
 // mythtv
 #include "mythcontext.h"
@@ -664,7 +665,7 @@ void LCDProcClient::removeStartupMessage(void)
 
 void LCDProcClient::setStartupMessage(QString msg, uint messagetime)
 {
-    m_startupMessage = msg;
+    m_startupMessage = std::move(msg);
     m_startupShowTime = messagetime;
 }
 
@@ -895,7 +896,7 @@ void LCDProcClient::outputText(QList<LCDTextItem> *textItems)
     }
 }
 
-void LCDProcClient::outputCenteredText(QString theScreen, QString theText, QString widget,
+void LCDProcClient::outputCenteredText(const QString& theScreen, QString theText, const QString& widget,
                              int row)
 {
     QString aString;
@@ -918,7 +919,7 @@ void LCDProcClient::outputCenteredText(QString theScreen, QString theText, QStri
     sendToServer(aString);
 }
 
-void LCDProcClient::outputLeftText(QString theScreen, QString theText, QString widget,
+void LCDProcClient::outputLeftText(const QString& theScreen, QString theText, const QString& widget,
                          int row)
 {
     QString aString;
@@ -932,7 +933,7 @@ void LCDProcClient::outputLeftText(QString theScreen, QString theText, QString w
     sendToServer(aString);
 }
 
-void LCDProcClient::outputRightText(QString theScreen, QString theText, QString widget,
+void LCDProcClient::outputRightText(const QString& theScreen, QString theText, const QString& widget,
                           int row)
 {
     QString aString;
@@ -955,10 +956,10 @@ void LCDProcClient::outputRightText(QString theScreen, QString theText, QString 
 void LCDProcClient::assignScrollingList(QStringList theList, QString theScreen,
                               QString theWidget, int theRow)
 {
-    m_scrollListScreen = theScreen;
-    m_scrollListWidget = theWidget;
+    m_scrollListScreen = std::move(theScreen);
+    m_scrollListWidget = std::move(theWidget);
     m_scrollListRow = theRow;
-    m_scrollListItems = theList;
+    m_scrollListItems = std::move(theList);
 
     m_scrollListItem = 0;
     scrollList();
@@ -972,8 +973,8 @@ void LCDProcClient::assignScrollingList(QStringList theList, QString theScreen,
 //    - After assigning the last text, call: formatScrollingWidgets()
 // That's it ;-)
 
-void LCDProcClient::assignScrollingWidgets(QString theText, QString theScreen,
-                              QString theWidget, int theRow)
+void LCDProcClient::assignScrollingWidgets(const QString& theText, const QString& theScreen,
+                              const QString& theWidget, int theRow)
 {
     m_scrollScreen = theScreen;
 
@@ -1079,7 +1080,7 @@ void LCDProcClient::scrollWidgets()
         m_scrollPosition = m_lcdWidth;
 }
 
-void LCDProcClient::startMusic(QString artist, QString album, QString track)
+void LCDProcClient::startMusic(QString artist, const QString& album, const QString& track)
 {
     // Playing music displays:
     // For 1-line displays:
@@ -1105,7 +1106,7 @@ void LCDProcClient::startMusic(QString artist, QString album, QString track)
 
     QString aString;
     m_musicProgress = 0.0F;
-    aString = artist;
+    aString = std::move(artist);
     if ( m_lcdShowMusicItems == "ArtistAlbumTitle")
     {
         aString += " [";
@@ -1135,7 +1136,7 @@ void LCDProcClient::startMusic(QString artist, QString album, QString track)
       setPriority("Music", HIGH);
 }
 
-void LCDProcClient::startChannel(QString channum, QString title, QString subtitle)
+void LCDProcClient::startChannel(const QString& channum, const QString& title, const QString& subtitle)
 {
     QString aString;
 
@@ -1243,7 +1244,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
 
     // Write out the app name
     if ( m_lcdHeight > 1)
-        outputCenteredText("Menu", app_name, "topWidget", 1);
+        outputCenteredText("Menu", std::move(app_name), "topWidget", 1);
 
     QList<LCDMenuItem>::iterator it = menuItems->begin();
     LCDMenuItem *curItem;
@@ -1677,7 +1678,7 @@ void LCDProcClient::scrollMenuText()
         m_menuScrollTimer->stop();
 }
 
-void LCDProcClient::startVolume(QString app_name)
+void LCDProcClient::startVolume(const QString& app_name)
 {
     if ( m_lcdShowVolume )
       setPriority("Volume", TOP);
@@ -1752,7 +1753,7 @@ void LCDProcClient::setMusicProgress(QString time, float value)
         return;
 
     m_musicProgress = value;
-    m_musicTime = time;
+    m_musicTime = std::move(time);
 
     if ( m_musicProgress < 0.0F)
         m_musicProgress = 0.0F;
@@ -2087,8 +2088,8 @@ void LCDProcClient::outputRecStatus(void)
     m_lcdTunerNo++;
 }
 
-void LCDProcClient::outputScrollerText(QString theScreen, QString theText,
-                             QString widget, int top, int bottom)
+void LCDProcClient::outputScrollerText(const QString& theScreen, const QString& theText,
+                             const QString& widget, int top, int bottom)
 {
     QString aString;
     aString =  "widget_set " + theScreen + " " + widget;
@@ -2295,7 +2296,7 @@ void LCDProcClient::switchToChannel(QString channum, QString title, QString subt
     if (debug_level > 1)
         LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToChannel");
 
-    startChannel(channum, title, subtitle);
+    startChannel(std::move(channum), std::move(title), std::move(subtitle));
 }
 
 void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name,
@@ -2307,7 +2308,7 @@ void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name
     if (debug_level > 1)
         LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToMenu");
 
-    startMenu(menuItems, app_name, popMenu);
+    startMenu(menuItems, std::move(app_name), popMenu);
 }
 
 void LCDProcClient::switchToGeneric(QList<LCDTextItem> *textItems)
@@ -2332,7 +2333,7 @@ void LCDProcClient::switchToVolume(QString app_name)
     if (debug_level > 1)
         LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToVolume");
 
-    startVolume(app_name);
+    startVolume(std::move(app_name));
 }
 
 void LCDProcClient::switchToNothing()

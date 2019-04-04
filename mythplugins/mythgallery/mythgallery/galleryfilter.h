@@ -69,7 +69,7 @@ class GalleryFilter
         m_changed_state = false;
         return ret;
     }
-    void dumpFilter(QString src);
+    void dumpFilter(const QString& src);
 
   private:
     QString      m_dirFilter;

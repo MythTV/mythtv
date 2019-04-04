@@ -30,7 +30,7 @@
 #define MHASSERT(f)          Q_ASSERT(f)
 
 extern int __mhlogoptions;
-extern void __mhlog(QString logtext);
+extern void __mhlog(const QString& logtext);
 extern FILE *__mhlogStream;
 
 #define MHLOG(__level,__text) \

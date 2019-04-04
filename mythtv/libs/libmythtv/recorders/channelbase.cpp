@@ -505,7 +505,7 @@ int ChannelBase::GetChanID(void) const
 
     while (query.next())
     {
-        if (query.value(1).toInt())
+        if (query.value(1).toBool())
         {
             ++found;
             visible = query.value(0).toInt();

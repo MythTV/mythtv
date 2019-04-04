@@ -29,7 +29,7 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
 
     MFileInfo &operator=(const MFileInfo &other);
 
-    void init(QString fileName = "", QString sgDir = "", bool isDir = false,
+    void init(const QString& fileName = "", QString sgDir = "", bool isDir = false,
               qint64 size = 0);
 
     QString fileName(void) const;

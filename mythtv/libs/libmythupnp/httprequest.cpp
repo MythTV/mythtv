@@ -471,7 +471,7 @@ qint64 HTTPRequest::SendResponse( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-qint64 HTTPRequest::SendResponseFile( QString sFileName )
+qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
 {
     qint64      nBytes  = 0;
     long long   llSize  = 0;

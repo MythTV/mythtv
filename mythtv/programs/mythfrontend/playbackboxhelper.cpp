@@ -185,8 +185,8 @@ bool PBHEventHandler::event(QEvent *e)
             while (list.size() >= 3)
             {
                 uint      recordingID   = list[0].toUInt();
-                bool      forceDelete   = list[1].toUInt();
-                bool      forgetHistory = list[2].toUInt();
+                bool      forceDelete   = list[1].toUInt() != 0U;
+                bool      forgetHistory = list[2].toUInt() != 0U;
 
                 bool ok = RemoteDeleteRecording( recordingID, forceDelete,
                                                  forgetHistory);
@@ -242,7 +242,7 @@ bool PBHEventHandler::event(QEvent *e)
         }
         if (me->Message() == "GET_PREVIEW")
         {
-            QString token = me->ExtraData(0);
+            const QString& token = me->ExtraData(0);
             bool check_avail = (bool) me->ExtraData(1).toInt();
             QStringList list = me->ExtraDataList();
             QStringList::const_iterator it = list.begin()+2;
@@ -276,7 +276,7 @@ bool PBHEventHandler::event(QEvent *e)
         }
         else if (me->Message() == "LOCATE_ARTWORK")
         {
-            QString                inetref    = me->ExtraData(0);
+            const QString&         inetref    = me->ExtraData(0);
             uint                   season     = me->ExtraData(1).toUInt();
             const VideoArtworkType type       = (VideoArtworkType)me->ExtraData(2).toInt();
 #if 0 /* const ref for an unused variable doesn't make much sense either */

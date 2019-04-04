@@ -11,7 +11,7 @@ class EditRomInfoDialog : public MythScreenType
 
   public:
      EditRomInfoDialog(MythScreenStack *parent,
-                       QString name,
+                       const QString& name,
                        RomInfo *romInfo);
 
     ~EditRomInfoDialog();
@@ -35,9 +35,9 @@ class EditRomInfoDialog : public MythScreenType
 
   private:
     void fillWidgets();
-    void SetScreenshot(QString file);
-    void SetFanart(QString file);
-    void SetBoxart(QString file);
+    void SetScreenshot(const QString& file);
+    void SetFanart(const QString& file);
+    void SetBoxart(const QString& file);
 
   private:
     RomInfo             *m_workingRomInfo   {nullptr};

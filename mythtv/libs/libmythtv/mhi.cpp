@@ -101,7 +101,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
 }
 
 // Load the font.  Copied, generally, from OSD::LoadFont.
-bool MHIContext::LoadFont(QString name)
+bool MHIContext::LoadFont(const QString& name)
 {
     QString fullnameA = GetConfDir() + "/" + name;
     QByteArray fnameA = fullnameA.toLatin1();
@@ -121,7 +121,7 @@ bool MHIContext::LoadFont(QString name)
     if (!errorC)
         return true;
 
-    QString fullnameD = name;
+    const QString& fullnameD = name;
     QByteArray fnameD = fullnameD.toLatin1();
     FT_Error errorD = FT_New_Face(ft_library, fnameD.constData(), 0, &m_face);
     if (!errorD)
@@ -615,7 +615,7 @@ MHKeyLookup::MHKeyLookup()
 // Called from tv_play when a key is pressed.
 // If it is one in the current profile we queue it for the engine
 // and return true otherwise we return false.
-bool MHIContext::OfferKey(QString key)
+bool MHIContext::OfferKey(const QString& key)
 {
     static const MHKeyLookup s_keymap;
     int action = s_keymap.Find(key, m_keyProfile);

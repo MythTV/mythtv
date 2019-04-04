@@ -510,7 +510,7 @@ QString SSDP::GetHeaderValue( const QStringMap &headers,
 /////////////////////////////////////////////////////////////////////////////
 
 bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders, 
-                                 QHostAddress      peerAddress,
+                                 const QHostAddress& peerAddress,
                                  quint16           peerPort )
 {
     QString sMAN = GetHeaderValue( sHeaders, "MAN", "" );
@@ -774,7 +774,7 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 //                  
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
+void SSDPExtension::GetFile( HTTPRequest *pRequest, const QString& sFileName )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
 

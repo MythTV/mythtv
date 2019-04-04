@@ -28,6 +28,7 @@ using namespace std;
 #include <winsock2.h>
 #else
 #include <clocale>
+#include <utility>
 #endif
 
 #include "compat.h"
@@ -122,7 +123,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
                                                QObject *guicontext)
     : m_parent(lparent),
       m_GUIcontext(guicontext), m_GUIobject(nullptr),
-      m_appBinaryVersion(binversion),
+      m_appBinaryVersion(std::move(binversion)),
       m_sockLock(QMutex::NonRecursive),
       m_serverSock(nullptr), m_eventSock(nullptr),
       m_WOLInProgress(false),
@@ -744,7 +745,7 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
-QString MythCoreContext::GenMythURL(QString host, int port, QString path, QString storageGroup)
+QString MythCoreContext::GenMythURL(const QString& host, int port, QString path, const QString& storageGroup)
 {
     QUrl ret;
 

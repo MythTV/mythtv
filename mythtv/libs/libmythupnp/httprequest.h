@@ -218,7 +218,7 @@ class UPNP_PUBLIC HTTPRequest
         void            FormatRawResponse   ( const QString &sXML );
 
         qint64          SendResponse    ( void );
-        qint64          SendResponseFile( QString sFileName );
+        qint64          SendResponseFile( const QString& sFileName );
 
         void            SetResponseHeader ( const QString &sKey,
                                             const QString &sValue,

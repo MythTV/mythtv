@@ -505,7 +505,7 @@ ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
     if (!themeinfo)
         return nullptr;
 
-    if (themeinfo->GetName().isEmpty() || !(themeinfo->GetType() & THEME_UI))
+    if (themeinfo->GetName().isEmpty() || ((themeinfo->GetType() & THEME_UI) == 0))
     {
         delete themeinfo;
         return nullptr;
@@ -578,7 +578,7 @@ void ThemeChooser::showPopupMenu(void)
                                SLOT(toggleThemeUpdateNotifications()));
 }
 
-void ThemeChooser::popupClosed(QString which, int result)
+void ThemeChooser::popupClosed(const QString& which, int result)
 {
     (void)which;
     (void)result;

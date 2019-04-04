@@ -4,6 +4,7 @@
 
 // QT headers
 #include <QMap>                         // for QMap
+#include <utility>
 
 // MythTV headers
 #include "mythcorecontext.h"
@@ -41,7 +42,7 @@
  */
 EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
                          QString lhostname)
-    : m_inputid(inputid), m_sock(lsock), m_hostname(lhostname)
+    : m_inputid(inputid), m_sock(lsock), m_hostname(std::move(lhostname))
 {
     m_endRecordingTime = MythDate::current().addDays(-2);
     m_startRecordingTime = m_endRecordingTime;
@@ -692,7 +693,7 @@ void EncoderLink::CancelNextRecording(bool cancel)
 void EncoderLink::SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan)
 {
     if (m_local)
-        m_tv->SpawnLiveTV(chain, pip, startchan);
+        m_tv->SpawnLiveTV(chain, pip, std::move(startchan));
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SpawnLiveTV");
 }
@@ -753,7 +754,7 @@ void EncoderLink::SetLiveRecording(int recording)
 /**
  *  \brief Tells TVRec where to put the next LiveTV recording.
  */
-void EncoderLink::SetNextLiveTVDir(QString dir)
+void EncoderLink::SetNextLiveTVDir(const QString& dir)
 {
     if (m_local)
         m_tv->SetNextLiveTVDir(dir);
@@ -792,7 +793,7 @@ QString EncoderLink::GetInput(void) const
 QString EncoderLink::SetInput(QString input)
 {
     if (m_local)
-        return m_tv->SetInput(input);
+        return m_tv->SetInput(std::move(input));
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetInput");
     return QString();
@@ -806,7 +807,7 @@ QString EncoderLink::SetInput(QString input)
 void EncoderLink::ToggleChannelFavorite(QString changroup)
 {
     if (m_local)
-        m_tv->ToggleChannelFavorite(changroup);
+        m_tv->ToggleChannelFavorite(std::move(changroup));
     else
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: ToggleChannelFavorite");
@@ -996,8 +997,9 @@ bool EncoderLink::SetChannelInfo(uint chanid, uint sourceid,
         return false;
     }
 
-    return m_tv->SetChannelInfo(chanid, sourceid, oldchannum,
-                              callsign, channum, channame, xmltv);
+    return m_tv->SetChannelInfo(chanid, sourceid, std::move(oldchannum),
+                                std::move(callsign), std::move(channum),
+                                std::move(channame), std::move(xmltv));
 }
 
 bool EncoderLink::AddChildInput(uint childid)

@@ -38,7 +38,7 @@ class GalleryFilterDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    GalleryFilterDialog(MythScreenStack *parent, QString name,
+    GalleryFilterDialog(MythScreenStack *parent, const QString& name,
                         GalleryFilter *filter);
     ~GalleryFilterDialog();
 

@@ -1,5 +1,6 @@
 // Qt
 #include <QCoreApplication>
+#include <utility>
 
 // libmyth
 #include "mythlogging.h"
@@ -1164,7 +1165,7 @@ bool OSD::HasWindow(const QString &window)
     return m_Children.contains(window);
 }
 
-bool OSD::DialogVisible(QString window)
+bool OSD::DialogVisible(const QString& window)
 {
     if (!m_Dialog || window.isEmpty())
         return m_Dialog;
@@ -1274,7 +1275,7 @@ void OSD::DialogSetText(const QString &text)
         dialog->SetText(text);
 }
 
-void OSD::DialogBack(QString text, QVariant data, bool exit)
+void OSD::DialogBack(const QString& text, const QVariant& data, bool exit)
 {
     MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
@@ -1285,11 +1286,11 @@ void OSD::DialogBack(QString text, QVariant data, bool exit)
     }
 }
 
-void OSD::DialogAddButton(QString text, QVariant data, bool menu, bool current)
+void OSD::DialogAddButton(const QString& text, QVariant data, bool menu, bool current)
 {
     MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
-        dialog->AddButton(text, data, menu, current);
+        dialog->AddButton(text, std::move(data), menu, current);
 }
 
 void OSD::DialogGetText(InfoMap &map)
@@ -1583,7 +1584,7 @@ void OsdNavigation::ShowMenu(void)
     sendResult(100,"MENU");
 }
 
-void OsdNavigation::sendResult(int result, QString action)
+void OsdNavigation::sendResult(int result, const QString& action)
 {
     if (!m_retObject)
         return;

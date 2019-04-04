@@ -67,7 +67,7 @@ class TVBrowseHelper : public MThread
                    uint     browse_max_forward,
                    bool     browse_all_tuners,
                    bool     use_channel_groups,
-                   QString  db_channel_ordering);
+                   const QString&  db_channel_ordering);
 
     virtual ~TVBrowseHelper()
     {

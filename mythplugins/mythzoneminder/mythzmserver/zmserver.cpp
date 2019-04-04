@@ -1000,7 +1000,7 @@ void ZMServer::handleGetMonitorStatus(void)
     send(outStr);
 }
 
-string ZMServer::runCommand(string command)
+string ZMServer::runCommand(const string& command)
 {
     string outStr;
     FILE *fd = popen(command.c_str(), "r");
@@ -1898,7 +1898,7 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
     // Now perform db update && (re)start/stop daemons as required.
     MONITOR *monitor = m_monitorMap[atoi(monitorID.c_str())];
     string oldFunction = monitor->m_function;
-    string newFunction = function;
+    const string& newFunction = function;
     int oldEnabled  = monitor->m_enabled;
     int newEnabled  = atoi(enabled.c_str());
     monitor->m_function = newFunction;

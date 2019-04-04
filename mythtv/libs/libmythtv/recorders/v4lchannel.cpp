@@ -74,11 +74,11 @@ bool V4LChannel::Open(void)
         return false;
     }
 
-    m_has_stream_io  = !!(capabilities & V4L2_CAP_STREAMING);
-    m_has_std_io     = !!(capabilities & V4L2_CAP_READWRITE);
-    m_has_async_io   = !!(capabilities & V4L2_CAP_ASYNCIO);
-    m_has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
-    m_has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
+    m_has_stream_io  = ((capabilities & V4L2_CAP_STREAMING)          != 0U);
+    m_has_std_io     = ((capabilities & V4L2_CAP_READWRITE)          != 0U);
+    m_has_async_io   = ((capabilities & V4L2_CAP_ASYNCIO)            != 0U);
+    m_has_tuner      = ((capabilities & V4L2_CAP_TUNER)              != 0U);
+    m_has_sliced_vbi = ((capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U);
 
     if (m_driver_name == "bttv" || m_driver_name == "cx8800" || m_driver_name == "cx88_blackbird"
         || m_driver_name == "saa7164")
@@ -256,7 +256,7 @@ bool V4LChannel::InitializeInputs(void)
         .arg(m_tuneToChannel)
         .arg(mode_to_format(m_videoModeV4L2)));
 
-    return valid_cnt;
+    return valid_cnt != 0U;
 }
 
 /** \fn V4LChannel::SetFormat(const QString &format)
@@ -304,7 +304,7 @@ void V4LChannel::SetFreqTable(const int index)
 
 int V4LChannel::SetFreqTable(const QString &tablename)
 {
-    QString name = tablename;
+    const QString& name = tablename;
     bool use_default = (name.toLower() == "default" || name.isEmpty());
 
     int i = 0;
@@ -407,7 +407,7 @@ bool V4LChannel::Tune(uint64_t frequency)
     ioctlval = ioctl(m_videofd, VIDIOC_G_MODULATOR, &mod);
     if (ioctlval >= 0)
     {
-        isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
+        isTunerCapLow = ((mod.capability & V4L2_TUNER_CAP_LOW) != 0U);
         LOG(VB_CHANNEL, LOG_INFO,
             QString("  name: %1").arg((char *)mod.name));
         LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));
@@ -475,7 +475,7 @@ bool V4LChannel::Retune(void)
     return true;
 }
 
-QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
+QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -497,7 +497,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     return fmt;
 }
 
-bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
+bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
 {
     if (!m_inputid || m_inputNumV4L < 0)
         return false;

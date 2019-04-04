@@ -88,7 +88,7 @@ class UPNP_PUBLIC SSDP : public MThread
     protected:
 
         bool    ProcessSearchRequest ( const QStringMap &sHeaders,
-                                       QHostAddress  peerAddress,
+                                       const QHostAddress&  peerAddress,
                                        quint16       peerPort );
         bool    ProcessSearchResponse( const QStringMap &sHeaders );
         bool    ProcessNotify        ( const QStringMap &sHeaders );
@@ -153,7 +153,7 @@ class SSDPExtension : public HttpServerExtension
         SSDPMethod GetMethod( const QString &sURI );
 
         void       GetDeviceDesc( HTTPRequest *pRequest );
-        void       GetFile      ( HTTPRequest *pRequest, QString sFileName );
+        void       GetFile      ( HTTPRequest *pRequest, const QString& sFileName );
         void       GetDeviceList( HTTPRequest *pRequest );
 
     public:

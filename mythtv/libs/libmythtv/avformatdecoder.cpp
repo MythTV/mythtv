@@ -692,7 +692,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     ts += (long long)seekts;
 
     // XXX figure out how to do snapping in this case
-    bool exactseeks = !DecoderBase::GetSeekSnap();
+    bool exactseeks = DecoderBase::GetSeekSnap() == 0U;
 
     int flags = (m_dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 
@@ -864,7 +864,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // we predict whether the situation is hopeless, i.e. the total
     // skipping would take longer than giveUpPredictionMs, and if so,
     // stop skipping right away.
-    bool exactSeeks = !GetSeekSnap();
+    bool exactSeeks = GetSeekSnap() == 0U;
     const int maxSeekTimeMs = 200;
     int profileFrames = 0;
     MythTimer begin(MythTimer::kStartRunning);
@@ -1065,7 +1065,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-    if (!strcmp(fmt->name, "mpegts") &&
+    if (strcmp(fmt->name, "mpegts") == 0 &&
         gCoreContext->GetBoolSetting("FFMPEGTS", false))
     {
         AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
@@ -1168,7 +1168,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         err = avformat_open_input(&m_ic, filename, fmt, nullptr);
         if (err < 0)
         {
-            if (!strcmp(fmt->name, "mpegts"))
+            if (strcmp(fmt->name, "mpegts") == 0)
             {
                 fmt = av_find_input_format("mpegts-ffmpeg");
                 if (fmt)
@@ -1222,9 +1222,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     // we need to ignore it as we don't handle single frames or images in place of video
     // TODO: display single frame
     QString extension = QFileInfo(fnames).suffix();
-    if (!strcmp(fmt->name, "mp3") || !strcmp(fmt->name, "flac") ||
-        !strcmp(fmt->name, "ogg") ||
-        !extension.compare("m4a", Qt::CaseInsensitive))
+    if (strcmp(fmt->name, "mp3") == 0 || strcmp(fmt->name, "flac") == 0 ||
+        strcmp(fmt->name, "ogg") == 0 ||
+        (extension.compare("m4a", Qt::CaseInsensitive) == 0))
     {
         novideo = true;
     }
@@ -1311,7 +1311,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         m_keyframedist = 15;
         m_positionMapType = MARK_GOP_BYFRAME;
 
-        if (!strcmp(fmt->name, "avi"))
+        if (strcmp(fmt->name, "avi") == 0)
         {
             // avi keyframes are too irregular
             m_keyframedist = 1;
@@ -2056,7 +2056,7 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
         av_dict_get(m_ic->streams[av_stream_index]->metadata, "language", nullptr,
                     0);
     bool forced =
-      m_ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED;
+      (m_ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED) != 0;
     int lang = metatag ? get_canonical_lang(metatag->value) :
                          iso639_str3_to_key("und");
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -2368,7 +2368,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (par->codec_type == AVMEDIA_TYPE_SUBTITLE)
         {
-            bool forced = m_ic->streams[strm]->disposition & AV_DISPOSITION_FORCED;
+            bool forced = (m_ic->streams[strm]->disposition & AV_DISPOSITION_FORCED) != 0;
             int lang = GetSubtitleLanguage(subtitleStreamCount, strm);
             int lang_indx = lang_sub_cnt[lang]++;
             subtitleStreamCount++;
@@ -3194,7 +3194,7 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte)
     //cc_data() {
     // reserved                1 0.0   1
     // process_cc_data_flag    1 0.1   bslbf
-    bool process_cc_data = buf[0] & 0x40;
+    bool process_cc_data = (buf[0] & 0x40) != 0;
     if (!process_cc_data)
         return; // early exit if process_cc_data_flag false
 
@@ -3219,7 +3219,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
     for (uint cur = 0; cur + 3 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
-        bool cc_valid = cc_code & 0x04;
+        bool cc_valid = (cc_code & 0x04) != 0U;
 
         uint data1    = buf[cur+1];
         uint data2    = buf[cur+2];
@@ -4996,7 +4996,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         // detect switches between stereo and dual languages
         bool wasDual = audSubIdx != -1;
-        bool isDual = ctx->avcodec_dual_language;
+        bool isDual = ctx->avcodec_dual_language != 0;
         if ((wasDual && !isDual) || (!wasDual &&  isDual))
         {
             SetupAudioStreamSubIndexes(audIdx);
@@ -5535,7 +5535,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
         }
     }
 
-    return GetTrackCount(kTrackTypeVideo);
+    return GetTrackCount(kTrackTypeVideo) != 0U;
 }
 
 bool AvFormatDecoder::GenerateDummyVideoFrames(void)

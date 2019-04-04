@@ -69,7 +69,7 @@ class AutoExpire : public QObject
    ~AutoExpire();
 
     void CalcParams(void);
-    void PrintExpireList(QString expHost = "ALL");
+    void PrintExpireList(const QString& expHost = "ALL");
 
     uint64_t GetDesiredSpace(int fsID) const;
 

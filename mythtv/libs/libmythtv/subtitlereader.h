@@ -50,7 +50,7 @@ class SubtitleReader
     void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);
 
     QStringList GetRawTextSubtitles(uint64_t &duration);
-    void AddRawTextSubtitle(QStringList list, uint64_t duration);
+    void AddRawTextSubtitle(const QStringList& list, uint64_t duration);
     void ClearRawTextSubtitles(void);
 
   private:

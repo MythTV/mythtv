@@ -1017,8 +1017,8 @@ void ProgramInfo::clear(void)
  *  Compare two QStrings when they can either be initialized to
  *  "Default" or to the empty string.
  */
-bool qstringEqualOrDefault(QString a, QString b);
-bool qstringEqualOrDefault(const QString a, const QString b)
+bool qstringEqualOrDefault(const QString& a, const QString& b);
+bool qstringEqualOrDefault(const QString& a, const QString& b)
 {
     if (a == b)
         return true;
@@ -1387,7 +1387,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
  */
 
 bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
-                                 QStringList::const_iterator  listend)
+                                 const QStringList::const_iterator&  listend)
 {
     QString listerror = LOC + "FromStringList, not enough items in list.";
     QString ts;
@@ -1843,7 +1843,7 @@ bool ProgramInfo::IsGeneric(void) const
          && m_catType == kCategorySeries);
 }
 
-QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
+QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QString& grp)
     const
 {
     QString str;
@@ -2054,8 +2054,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
     set_flag(m_programflags, FL_BOOKMARK,      query.value(40).toBool());
     set_flag(m_programflags, FL_WATCHED,       query.value(41).toBool());
     set_flag(m_programflags, FL_EDITING,
-             (m_programflags & FL_REALLYEDITING) ||
-             (m_programflags & FL_COMMPROCESSING));
+             ((m_programflags & FL_REALLYEDITING) != 0U) ||
+             ((m_programflags & FL_COMMPROCESSING) != 0U));
 
     m_properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
                     (query.value(43).toUInt() << kVideoPropertyOffset)    |
@@ -2939,7 +2939,7 @@ void ProgramInfo::SaveWatched(bool watched)
  */
 bool ProgramInfo::QueryIsEditing(void) const
 {
-    bool editing = m_programflags & FL_REALLYEDITING;
+    bool editing = (m_programflags & FL_REALLYEDITING) != 0U;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2979,8 +2979,8 @@ void ProgramInfo::SaveEditing(bool edit)
         MythDB::DBError("Edit status update", query);
 
     set_flag(m_programflags, FL_REALLYEDITING, edit);
-    set_flag(m_programflags, FL_EDITING, ((m_programflags & FL_REALLYEDITING) ||
-                                          (m_programflags & COMM_FLAG_PROCESSING)));
+    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
 
     SendUpdateEvent();
 }
@@ -3188,8 +3188,8 @@ void ProgramInfo::SaveCommFlagged(CommFlagStatus flag)
 
     set_flag(m_programflags, FL_COMMFLAG,       COMM_FLAG_DONE == flag);
     set_flag(m_programflags, FL_COMMPROCESSING, COMM_FLAG_PROCESSING == flag);
-    set_flag(m_programflags, FL_EDITING, ((m_programflags & FL_REALLYEDITING) ||
-                                          (m_programflags & COMM_FLAG_PROCESSING)));
+    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
     SendUpdateEvent();
 }
 
@@ -4872,7 +4872,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
  *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
  *        call and so should not be called from the UI thread.
  */
-void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
+void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
 {
     if (!IsRecording())
         return;
@@ -4988,7 +4988,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "MarkAsInUse -- select query failed");
     }
-    else if (query.value(0).toUInt())
+    else if (query.value(0).toBool())
     {
         query.prepare(
             "UPDATE inuseprograms "
@@ -5572,7 +5572,7 @@ bool LoadFromProgram( ProgramList &destination,
                 query.value(22).toUInt(), // findid
 
                 query.value(11).toInt() == COMM_DETECT_COMMFREE, // commfree
-                query.value(10).toInt(), // repeat
+                query.value(10).toBool(), // repeat
                 query.value(23).toInt(), // videoprop
                 query.value(24).toInt(), // audioprop
                 query.value(25).toInt(), // subtitletypes
@@ -5764,7 +5764,7 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
             RecordingType(query.value(16).toInt()),
             query.value(15).toUInt(),
 
-            query.value(19).toInt()));
+            query.value(19).toBool()));
     }
 
     return true;
@@ -5929,7 +5929,7 @@ bool LoadFromRecorded(
         if (inUseMap.contains(key))
             flags |= inUseMap[key];
 
-        if (flags & FL_COMMPROCESSING &&
+        if (((flags & FL_COMMPROCESSING) != 0U) &&
             (isJobRunning.find(key) == isJobRunning.end()))
         {
             flags &= ~FL_COMMPROCESSING;
@@ -5937,8 +5937,8 @@ bool LoadFromRecorded(
         }
 
         set_flag(flags, FL_EDITING,
-                 (flags & FL_REALLYEDITING) ||
-                 (flags & COMM_FLAG_PROCESSING));
+                 ((flags & FL_REALLYEDITING) != 0U) ||
+                 ((flags & COMM_FLAG_PROCESSING) != 0U));
 
         // User/metadata defined season from recorded
         uint season = query.value(3).toUInt();

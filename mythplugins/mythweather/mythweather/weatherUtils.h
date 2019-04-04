@@ -79,7 +79,7 @@ Q_DECLARE_METATYPE(ScreenListInfo *);
 typedef QMap<QString, ScreenListInfo> ScreenListMap;
 
 ScreenListMap loadScreens();
-QStringList loadScreen(QDomElement ScreenListInfo);
+QStringList loadScreen(const QDomElement& ScreenListInfo);
 bool doLoadScreens(const QString &filename, ScreenListMap &screens);
 
 #endif

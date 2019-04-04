@@ -464,7 +464,7 @@ QStringList DBUtil::GetTables(const QStringList &engines)
  *                   desired
  *  \return QString name
  */
-QString DBUtil::CreateBackupFilename(QString prefix, QString extension)
+QString DBUtil::CreateBackupFilename(const QString& prefix, const QString& extension)
 {
     QString time = MythDate::toString(MythDate::current(), MythDate::kFilename);
     return QString("%1-%2%3").arg(prefix).arg(time).arg(extension);

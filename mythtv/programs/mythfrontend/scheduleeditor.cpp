@@ -2,9 +2,10 @@
 #include "scheduleeditor.h"
 
 // QT
-#include <QString>
-#include <QHash>
 #include <QCoreApplication>
+#include <QHash>
+#include <QString>
+#include <utility>
 
 // Libmyth
 #include "mythcorecontext.h"
@@ -322,7 +323,7 @@ void ScheduleEditor::Load()
 
 void ScheduleEditor::LoadTemplate(QString name)
 {
-    m_recordingRule->LoadTemplate(name);
+    m_recordingRule->LoadTemplate(std::move(name));
     Load();
     emit templateLoaded();
 }
@@ -1361,12 +1362,12 @@ void MetadataOptions::Load()
     SetTextFromMaps();
 }
 
-void MetadataOptions::CreateBusyDialog(QString title)
+void MetadataOptions::CreateBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "metaoptsdialog");
@@ -1386,12 +1387,12 @@ void MetadataOptions::PerformQuery()
     m_metadataFactory->Lookup(lookup);
 }
 
-void MetadataOptions::OnSearchListSelection(RefCountHandler<MetadataLookup> lookup)
+void MetadataOptions::OnSearchListSelection(const RefCountHandler<MetadataLookup>& lookup)
 {
     QueryComplete(lookup);
 }
 
-void MetadataOptions::OnImageSearchListSelection(ArtworkInfo info,
+void MetadataOptions::OnImageSearchListSelection(const ArtworkInfo& info,
                                                  VideoArtworkType type)
 {
     QString msg = tr("Downloading selected artwork...");
@@ -1649,7 +1650,7 @@ void MetadataOptions::HandleDownloadedImages(MetadataLookup *lookup)
     for (DownloadMap::const_iterator i = map.begin(); i != map.end(); ++i)
     {
         VideoArtworkType type = i.key();
-        ArtworkInfo info = i.value();
+        const ArtworkInfo& info = i.value();
 
         if (type == kArtworkCoverart)
             m_artworkMap.replace(kArtworkCoverart, info);
@@ -2220,7 +2221,7 @@ void FilterOptMixin::Load(void)
     for (Idesc = m_descriptions.begin(), idx = 0;
          Idesc != m_descriptions.end(); ++Idesc, ++idx)
     {
-        bool active = m_rule->m_filter & (1 << idx);
+        bool active = (m_rule->m_filter & (1 << idx)) != 0U;
         if (m_filtersList)
         {
             if (not_empty)

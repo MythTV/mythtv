@@ -30,7 +30,7 @@ LookerUpper::~LookerUpper()
 bool LookerUpper::StillWorking()
 {
     return m_metadataFactory->IsRunning() ||
-        m_busyRecList.count();
+        (m_busyRecList.count() != 0);
 }
 
 void LookerUpper::HandleSingleRecording(const uint chanid,

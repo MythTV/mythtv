@@ -62,7 +62,7 @@ StandardSetting *GallerySettings::DirOrder()
     return gc;
 }
 
-static void AddFormat(HostComboBoxSetting* gc, const QDateTime date, const QString format)
+static void AddFormat(HostComboBoxSetting* gc, const QDateTime& date, const QString& format)
 { gc->addSelection(gCoreContext->GetQLocale().toString(date, format), format); }
 
 StandardSetting *GallerySettings::DateFormat()

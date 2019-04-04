@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QRunnable>
+#include <utility>
 
 #include "mythcorecontext.h"
 #include "mythobservable.h"
@@ -309,7 +310,7 @@ void MythScreenType::LoadInBackground(QString message)
 
     m_ScreenStack->AllowReInit();
 
-    OpenBusyPopup(message);
+    OpenBusyPopup(std::move(message));
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(*this);
     MThreadPool::globalInstance()->start(loadTask, "ScreenLoad");
@@ -334,7 +335,7 @@ void MythScreenType::ReloadInBackground(void)
     LoadInBackground();
 }
 
-void MythScreenType::OpenBusyPopup(QString message)
+void MythScreenType::OpenBusyPopup(const QString& message)
 {
     if (m_BusyPopup)
         return;

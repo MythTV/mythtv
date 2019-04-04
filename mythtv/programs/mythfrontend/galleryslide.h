@@ -68,9 +68,9 @@ public:
           m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
     void Pulse(int interval) override; // AbstractAnimation
-    void Set(QVariant from, QVariant to,
+    void Set(const QVariant& from, const QVariant& to,
              int duration = 500,
-             QEasingCurve curve = QEasingCurve::InOutCubic,
+             const QEasingCurve& curve = QEasingCurve::InOutCubic,
              UIEffects::Centre = UIEffects::Middle);
     void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
 
@@ -156,11 +156,11 @@ class Slide : public MythUIImage
 {
     Q_OBJECT
 public:
-    Slide(MythUIType *parent, QString name, MythUIImage *image);
+    Slide(MythUIType *parent, const QString& name, MythUIImage *image);
     ~Slide();
 
     void      Clear();
-    bool      LoadSlide(ImagePtrK im, int direction = 0, bool notifyCompletion = false);
+    bool      LoadSlide(const ImagePtrK& im, int direction = 0, bool notifyCompletion = false);
     ImagePtrK GetImageData() const  { return m_data; }
     void      Zoom(int percentage);
     void      SetZoom(float);
@@ -220,8 +220,8 @@ public:
 
     void   Initialise(MythUIImage &image);
     void   Teardown();
-    bool   Load(ImagePtrK im, int direction);
-    void   Preload(ImagePtrK im);
+    bool   Load(const ImagePtrK& im, int direction);
+    void   Preload(const ImagePtrK& im);
     void   ReleaseCurrent();
     Slide &GetCurrent()
     {
@@ -240,7 +240,7 @@ signals:
     void SlideReady(int count);
 
 private slots:
-    void Flush(Slide*, QString reason = "Loaded");
+    void Flush(Slide*, const QString& reason = "Loaded");
 
 protected:
     QString BufferState();

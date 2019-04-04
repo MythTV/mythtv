@@ -82,7 +82,7 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
+SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
                                    ChannelBase *channel,
                                    bool release_stream)
 {
@@ -267,7 +267,7 @@ bool SignalMonitor::HasFlags(uint64_t _flags) const
 
 bool SignalMonitor::HasAnyFlag(uint64_t _flags) const
 {
-    return (m_flags & _flags);
+    return (m_flags & _flags) != 0U;
 }
 
 /** \fn SignalMonitor::Start()
@@ -399,7 +399,7 @@ void SignalMonitor::SendMessage(
     SignalMonitorMessageType type, const SignalMonitorValue &value)
 {
     m_statusLock.lock();
-    SignalMonitorValue val = value;
+    const SignalMonitorValue& val = value;
     m_statusLock.unlock();
 
     QMutexLocker locker(&m_listenerLock);

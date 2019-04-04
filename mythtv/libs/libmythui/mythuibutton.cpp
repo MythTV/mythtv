@@ -89,7 +89,7 @@ void MythUIButton::Disable()
     SetState("disabled");
 }
 
-void MythUIButton::SetState(QString state)
+void MythUIButton::SetState(const QString& state)
 {
     if (m_state == state)
         return;

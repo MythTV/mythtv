@@ -135,7 +135,7 @@ void MythUIText::ResetMap(const InfoMap &map)
 
 void MythUIText::SetText(const QString &text)
 {
-    QString newtext = text;
+    const QString& newtext = text;
 
     if (!m_Layouts.isEmpty() && newtext == m_Message)
         return;
@@ -851,7 +851,7 @@ void MythUIText::FillCutMessage(void)
     }
 
     // If any of hcenter|vcenter|Justify, center it all, then adjust
-    if (m_Justification & (Qt::AlignCenter|Qt::AlignJustify))
+    if ((m_Justification & (Qt::AlignCenter|Qt::AlignJustify)) != 0U)
     {
         m_drawRect.moveCenter(m_Area.center());
         min_rect.moveCenter(m_Area.center());
@@ -1253,7 +1253,7 @@ void MythUIText::Pulse(void)
     }
 }
 
-void MythUIText::CycleColor(QColor startColor, QColor endColor, int numSteps)
+void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor, int numSteps)
 {
     if (!GetPainter()->SupportsAnimation())
         return;

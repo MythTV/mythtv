@@ -201,7 +201,7 @@ static const QString kSubAttrOutlinecolor("outlinecolor");
 static const QString kSubAttrOutlinesize ("outlinesize");
 static const QString kSubAttrOutlinealpha("outlinealpha");
 
-static QString srtColorString(QColor color)
+static QString srtColorString(const QColor& color)
 {
     return QString("#%1%2%3")
         .arg(color.red(),   2, 16, QLatin1Char('0'))
@@ -1114,7 +1114,7 @@ static QString extract_cc608(QString &text, int &color,
     if (text.length() >= 1 && text[0] >= 0x7000)
     {
         int op = text[0].unicode() - 0x7000;
-        isUnderline = (op & 0x1);
+        isUnderline = ((op & 0x1) != 0);
         switch (op & ~1)
         {
         case 0x0e:
@@ -1905,7 +1905,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
                                              QRect &bbox, bool top,
                                              QRect &display, int forced,
-                                             QString imagename,
+                                             const QString& imagename,
                                              long long displayuntil,
                                              long long late)
 {

@@ -202,7 +202,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
-    void ToggleChannelFavorite(QString);
+    void ToggleChannelFavorite(const QString&);
 
     void SetLiveRecording(int recording);
 
@@ -213,15 +213,15 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
         { SetChannel(QString("NextChannel %1").arg((int)dir)); }
-    void SetChannel(QString name, uint requestType = kFlagDetect);
+    void SetChannel(const QString& name, uint requestType = kFlagDetect);
     bool QueueEITChannelChange(const QString &name);
 
     int SetSignalMonitoringRate(int rate, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
-    bool CheckChannel(QString name) const;
-    bool ShouldSwitchToAnotherInput(QString chanid);
+    bool CheckChannel(const QString& name) const;
+    bool ShouldSwitchToAnotherInput(const QString& chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
@@ -233,9 +233,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool GetChannelInfo(uint &chanid, uint &sourceid,
                         QString &callsign, QString &channum,
                         QString &channame, QString &xmltvid) const;
-    bool SetChannelInfo(uint chanid, uint sourceid, QString oldchannum,
-                        QString callsign, QString channum,
-                        QString channame, QString xmltvid);
+    bool SetChannelInfo(uint chanid, uint sourceid, const QString& oldchannum,
+                        const QString& callsign, const QString& channum,
+                        const QString& channame, const QString& xmltvid);
 
     /// \brief Returns the inputid
     uint GetInputId(void) { return m_inputid; }

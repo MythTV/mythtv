@@ -224,7 +224,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     RecordingRule *GetRecordingRule(void);
     int getRecordID(void);
     static bool QueryRecordedIdForKey(int & recordedid,
-                                      uint chanid, QDateTime recstartts);
+                                      uint chanid, const QDateTime& recstartts);
     int GetAutoRunJobs(void) const;
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void) const;
@@ -246,7 +246,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void SetDupHistory(void);//pi
 
     // Used to update database with recording info
-    void StartedRecording(QString ext);
+    void StartedRecording(const QString& ext);
     void FinishedRecording(bool allowReRecord);
     void UpdateRecordingEnd(void);//pi
     void ReactivateRecording(void);//pi

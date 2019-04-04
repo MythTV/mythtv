@@ -107,7 +107,7 @@ class MythControls : public MythScreenType
     void RightPressed(MythUIButtonListItem*);
     void ActionButtonPressed();
     void RefreshKeyInformation(void);
-    void AddKeyToAction(QString key, bool ignoreconflict = false);
+    void AddKeyToAction(const QString& key, bool ignoreconflict = false);
 
   private:
     void ShowMenu(void) override; // MythScreenType

@@ -60,7 +60,7 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlers_lock);
 
-    QString devkey = devname;
+    const QString& devkey = devname;
 
     QMap<QString,V4L2encStreamHandler*>::iterator it = s_handlers.find(devkey);
 

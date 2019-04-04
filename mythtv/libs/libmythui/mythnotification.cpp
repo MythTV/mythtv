@@ -76,7 +76,7 @@ bool MythNotification::FromStringList(void)
             .arg(type).arg(Type()));
         return false;
     }
-    m_fullScreen  = (*Istr++).toInt();
+    m_fullScreen  = ((*Istr++).toInt() != 0);
     m_description = *Istr++;
     m_duration    = (*Istr++).toInt();
     m_style       = *Istr++;

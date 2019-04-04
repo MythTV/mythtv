@@ -113,7 +113,7 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
     return true;
 }
 
-QStringList loadScreen(QDomElement ScreenListInfo)
+QStringList loadScreen(const QDomElement& ScreenListInfo)
 {
 
     QStringList typesList;

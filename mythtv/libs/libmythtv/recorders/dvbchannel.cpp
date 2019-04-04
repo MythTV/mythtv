@@ -346,7 +346,7 @@ void DVBChannel::CheckFrequency(uint64_t frequency) const
 void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 {
     if ((tuning.m_inversion == DTVInversion::kInversionAuto) &&
-        !(m_capabilities & FE_CAN_INVERSION_AUTO))
+        ((m_capabilities & FE_CAN_INVERSION_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "'Auto' inversion parameter unsupported by this driver, "
@@ -409,28 +409,28 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
     }
 
     if ((tuning.m_bandwidth == DTVBandwidth::kBandwidthAuto) &&
-        !(m_capabilities & FE_CAN_BANDWIDTH_AUTO))
+        ((m_capabilities & FE_CAN_BANDWIDTH_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "'Auto' bandwidth parameter unsupported by this driver.");
     }
 
     if ((tuning.m_trans_mode == DTVTransmitMode::kTransmissionModeAuto) &&
-        !(m_capabilities & FE_CAN_TRANSMISSION_MODE_AUTO))
+        ((m_capabilities & FE_CAN_TRANSMISSION_MODE_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "'Auto' transmission_mode parameter unsupported by this driver.");
     }
 
     if ((tuning.m_guard_interval == DTVGuardInterval::kGuardIntervalAuto) &&
-        !(m_capabilities & FE_CAN_GUARD_INTERVAL_AUTO))
+        ((m_capabilities & FE_CAN_GUARD_INTERVAL_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "'Auto' guard_interval parameter unsupported by this driver.");
     }
 
     if ((tuning.m_hierarchy == DTVHierarchy::kHierarchyAuto) &&
-        !(m_capabilities & FE_CAN_HIERARCHY_AUTO))
+        ((m_capabilities & FE_CAN_HIERARCHY_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "'Auto' hierarchy parameter unsupported by this driver. ");
@@ -453,15 +453,15 @@ bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
     const uint64_t caps = m_capabilities;
     return
         ((DTVCodeRate::kFECNone == rate))                            ||
-        ((DTVCodeRate::kFEC_1_2 == rate) && (caps & FE_CAN_FEC_1_2)) ||
-        ((DTVCodeRate::kFEC_2_3 == rate) && (caps & FE_CAN_FEC_2_3)) ||
-        ((DTVCodeRate::kFEC_3_4 == rate) && (caps & FE_CAN_FEC_3_4)) ||
-        ((DTVCodeRate::kFEC_4_5 == rate) && (caps & FE_CAN_FEC_4_5)) ||
-        ((DTVCodeRate::kFEC_5_6 == rate) && (caps & FE_CAN_FEC_5_6)) ||
-        ((DTVCodeRate::kFEC_6_7 == rate) && (caps & FE_CAN_FEC_6_7)) ||
-        ((DTVCodeRate::kFEC_7_8 == rate) && (caps & FE_CAN_FEC_7_8)) ||
-        ((DTVCodeRate::kFEC_8_9 == rate) && (caps & FE_CAN_FEC_8_9)) ||
-        ((DTVCodeRate::kFECAuto == rate) && (caps & FE_CAN_FEC_AUTO));
+        ((DTVCodeRate::kFEC_1_2 == rate) && ((caps & FE_CAN_FEC_1_2) != 0U)) ||
+        ((DTVCodeRate::kFEC_2_3 == rate) && ((caps & FE_CAN_FEC_2_3) != 0U)) ||
+        ((DTVCodeRate::kFEC_3_4 == rate) && ((caps & FE_CAN_FEC_3_4) != 0U)) ||
+        ((DTVCodeRate::kFEC_4_5 == rate) && ((caps & FE_CAN_FEC_4_5) != 0U)) ||
+        ((DTVCodeRate::kFEC_5_6 == rate) && ((caps & FE_CAN_FEC_5_6) != 0U)) ||
+        ((DTVCodeRate::kFEC_6_7 == rate) && ((caps & FE_CAN_FEC_6_7) != 0U)) ||
+        ((DTVCodeRate::kFEC_7_8 == rate) && ((caps & FE_CAN_FEC_7_8) != 0U)) ||
+        ((DTVCodeRate::kFEC_8_9 == rate) && ((caps & FE_CAN_FEC_8_9) != 0U)) ||
+        ((DTVCodeRate::kFECAuto == rate) && ((caps & FE_CAN_FEC_AUTO) != 0U));
 }
 
 /**
@@ -473,20 +473,20 @@ bool DVBChannel::CheckModulation(DTVModulation modulation) const
     const uint64_t      c = m_capabilities;
 
     return
-        ((DTVModulation::kModulationQPSK    == m) && (c & FE_CAN_QPSK))     ||
+        ((DTVModulation::kModulationQPSK    == m) && ((c & FE_CAN_QPSK) != 0U))     ||
 #if HAVE_FE_CAN_2G_MODULATION
-        ((DTVModulation::kModulation8PSK    == m) && (c & FE_CAN_2G_MODULATION)) ||
-        ((DTVModulation::kModulation16APSK  == m) && (c & FE_CAN_2G_MODULATION)) ||
-        ((DTVModulation::kModulation32APSK  == m) && (c & FE_CAN_2G_MODULATION)) ||
+        ((DTVModulation::kModulation8PSK    == m) && ((c & FE_CAN_2G_MODULATION) != 0U)) ||
+        ((DTVModulation::kModulation16APSK  == m) && ((c & FE_CAN_2G_MODULATION) != 0U)) ||
+        ((DTVModulation::kModulation32APSK  == m) && ((c & FE_CAN_2G_MODULATION) != 0U)) ||
 #endif //HAVE_FE_CAN_2G_MODULATION
-        ((DTVModulation::kModulationQAM16   == m) && (c & FE_CAN_QAM_16))   ||
-        ((DTVModulation::kModulationQAM32   == m) && (c & FE_CAN_QAM_32))   ||
-        ((DTVModulation::kModulationQAM64   == m) && (c & FE_CAN_QAM_64))   ||
-        ((DTVModulation::kModulationQAM128  == m) && (c & FE_CAN_QAM_128))  ||
-        ((DTVModulation::kModulationQAM256  == m) && (c & FE_CAN_QAM_256))  ||
-        ((DTVModulation::kModulationQAMAuto == m) && (c & FE_CAN_QAM_AUTO)) ||
-        ((DTVModulation::kModulation8VSB    == m) && (c & FE_CAN_8VSB))     ||
-        ((DTVModulation::kModulation16VSB   == m) && (c & FE_CAN_16VSB));
+        ((DTVModulation::kModulationQAM16   == m) && ((c & FE_CAN_QAM_16) != 0U))   ||
+        ((DTVModulation::kModulationQAM32   == m) && ((c & FE_CAN_QAM_32) != 0U))   ||
+        ((DTVModulation::kModulationQAM64   == m) && ((c & FE_CAN_QAM_64) != 0U))   ||
+        ((DTVModulation::kModulationQAM128  == m) && ((c & FE_CAN_QAM_128) != 0U))  ||
+        ((DTVModulation::kModulationQAM256  == m) && ((c & FE_CAN_QAM_256) != 0U))  ||
+        ((DTVModulation::kModulationQAMAuto == m) && ((c & FE_CAN_QAM_AUTO) != 0U)) ||
+        ((DTVModulation::kModulation8VSB    == m) && ((c & FE_CAN_8VSB) != 0U))     ||
+        ((DTVModulation::kModulation16VSB   == m) && ((c & FE_CAN_16VSB) != 0U));
 }
 
 /** \fn DVBChannel::SetPMT(const ProgramMapTable*)
@@ -1029,7 +1029,7 @@ bool DVBChannel::HasLock(bool *ok) const
     if (ok)
         *ok = (0 == ret);
 
-    return status & FE_HAS_LOCK;
+    return (status & FE_HAS_LOCK) != 0;
 }
 
 // documented in dvbchannel.h

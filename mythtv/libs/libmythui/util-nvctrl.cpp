@@ -31,7 +31,7 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask);
 static char *find_modeline(char *modeName, char *pModeLines,
                            int ModeLineLen);
 static int extract_id_string(char *str);
-static int modeline_is_interlaced(char *modeLine);
+static bool modeline_is_interlaced(char *modeLine);
 #endif
 
 #define LOC QString("NVCtrl: ")
@@ -128,8 +128,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
         return -1;
     }
 
-    ret = XNVCTRLQueryVersion(dpy, &major, &minor);
-    if (ret != True)
+    ret = (XNVCTRLQueryVersion(dpy, &major, &minor) != 0);
+    if (!ret)
     {
         LOG(VB_GUI, LOG_INFO,
             QString("The NV-CONTROL X extension does not exist on '%1'.")
@@ -138,7 +138,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         return -1;
     }
 
-    ret = XNVCTRLQueryAttribute(dpy, screen, 0, NV_CTRL_DYNAMIC_TWINVIEW, &twinview);
+    ret = (XNVCTRLQueryAttribute(dpy, screen, 0, NV_CTRL_DYNAMIC_TWINVIEW, &twinview) != 0);
 
     if (!ret)
     {
@@ -159,8 +159,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
      * basic information about each X screen
      */
 
-    ret = XNVCTRLQueryAttribute(dpy, screen, 0,
-                                NV_CTRL_CONNECTED_DISPLAYS, &display_devices);
+    ret = (XNVCTRLQueryAttribute(dpy, screen, 0,
+                                NV_CTRL_CONNECTED_DISPLAYS, &display_devices) != 0);
 
     if (!ret)
     {
@@ -172,9 +172,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     /* first, we query the MetaModes on this X screen */
 
-    ret = XNVCTRLQueryBinaryData(dpy, screen, 0, // n/a
+    ret = (XNVCTRLQueryBinaryData(dpy, screen, 0, // n/a
                            NV_CTRL_BINARY_DATA_METAMODES,
-                           (unsigned char **)&pMetaModes, &MetaModeLen);
+                           (unsigned char **)&pMetaModes, &MetaModeLen) != 0);
     if (!ret)
     {
         LOG(VB_GUI, LOG_ERR,
@@ -194,9 +194,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
     {
         if (!(display_devices & mask)) continue;
 
-        ret = XNVCTRLQueryBinaryData(dpy, screen, mask,
+        ret = (XNVCTRLQueryBinaryData(dpy, screen, mask,
                                NV_CTRL_BINARY_DATA_MODELINES,
-                               (unsigned char **)&str, &len);
+                               (unsigned char **)&str, &len) != 0);
         if (!ret)
         {
             LOG(VB_GUI, LOG_ERR,
@@ -452,7 +452,8 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
 static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
 {
     char *start, *beginQuote, *endQuote;
-    int j, match = 0;
+    int j;
+    bool match = false;
 
     start = pModeLines;
 
@@ -532,7 +533,7 @@ static int extract_id_string(char *str)
 /*
  * modeline_is_interlaced() - return true if the Modeline is Interlaced, false otherwise.
  */
-static int modeline_is_interlaced(char *modeLine)
+static bool modeline_is_interlaced(char *modeLine)
 {
     return (strstr(modeLine, "Interlace") != nullptr);
 }

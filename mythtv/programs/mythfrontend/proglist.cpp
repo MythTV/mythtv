@@ -10,8 +10,9 @@ using namespace std;
 
 // Qt
 #include <QCoreApplication>
-#include <QRegExp>
 #include <QLocale>
+#include <QRegExp>
+#include <utility>
 
 // MythTV
 #include "mythmiscutil.h"
@@ -392,7 +393,7 @@ void ProgLister::UpdateKeywordInDB(const QString &text, const QString &oldValue)
 
     if (newview < 0)
     {
-        QString qphrase = text;
+        const QString& qphrase = text;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -504,7 +505,7 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
     if (m_viewList.empty() || m_viewTextList.empty())
         return;
 
-    m_searchTime = searchTime;
+    m_searchTime = std::move(searchTime);
     m_curView = 0;
     m_viewList[m_curView] = MythDate::toString(m_searchTime,
                                                  MythDate::kDateTimeFull | MythDate::kSimplify);
@@ -513,7 +514,7 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
     LoadInBackground();
 }
 
-void ProgLister::SetViewFromList(QString item)
+void ProgLister::SetViewFromList(const QString& item)
 {
     m_curView = m_viewTextList.indexOf(item);
     if (m_curView >= 0)
@@ -843,7 +844,7 @@ void ProgLister::FillViewList(const QString &view)
 
             if (m_curView < 0)
             {
-                QString qphrase = view;
+                const QString& qphrase = view;
 
                 MSqlQuery query2(MSqlQuery::InitCon());
                 query2.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -1652,7 +1653,7 @@ void ProgLister::customEvent(QEvent *event)
     else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (m_allowViewDialog && message == "CHOOSE_VIEW")
             ShowChooseViewMenu();

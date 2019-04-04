@@ -18,8 +18,8 @@ class BonjourRegister;
 #define AIRPLAY_HARDWARE_ID_SIZE 6
 QString     AirPlayHardwareId(void);
 QString     GenerateNonce(void);
-QByteArray  DigestMd5Response(QString response, QString option,
-                              QString nonce, QString password,
+QByteArray  DigestMd5Response(const QString& response, const QString& option,
+                              const QString& nonce, const QString& password,
                               QByteArray &auth);
 
 enum AirplayEvent
@@ -97,8 +97,8 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     QString GetMacAddress();
     bool SendReverseEvent(QByteArray &session, AirplayEvent event);
     void SendResponse(QTcpSocket *socket,
-                      int status, QByteArray header,
-                      QByteArray content_type, QString body);
+                      int status, const QByteArray& header,
+                      const QByteArray& content_type, const QString& body);
 
     void deleteConnection(QTcpSocket *socket);
     void DisconnectAllClients(const QByteArray &session);

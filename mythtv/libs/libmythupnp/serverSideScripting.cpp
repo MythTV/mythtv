@@ -222,7 +222,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QVariantMap array;
         for (; it != mapParams.end(); ++it)
         {
-            QString key = it.key();
+            const QString& key = it.key();
             QVariant value = QVariant(it.value());
 
             // PHP Style parameter array

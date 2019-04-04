@@ -266,7 +266,7 @@ freq_table_list_t get_matching_freq_tables(
 }
 
 long long get_center_frequency(
-    QString format, QString modulation, QString country, int freqid)
+    const QString& format, const QString& modulation, const QString& country, int freqid)
 {
     QMutexLocker locker(&frequencies_lock);
     init_freq_tables();
@@ -289,7 +289,7 @@ long long get_center_frequency(
 }
 
 int get_closest_freqid(
-    QString format, QString modulation, QString country, long long centerfreq)
+    const QString& format, QString modulation, const QString& country, long long centerfreq)
 {
     modulation = (modulation == "8vsb") ? "vsb8" : modulation;
 

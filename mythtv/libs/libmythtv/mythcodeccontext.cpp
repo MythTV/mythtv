@@ -84,7 +84,7 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 }
 
 // static
-QStringList MythCodecContext::GetDeinterlacers(QString decodername)
+QStringList MythCodecContext::GetDeinterlacers(const QString& decodername)
 {
     QStringList ret;
 #ifdef USING_VAAPI2
@@ -145,7 +145,7 @@ QStringList MythCodecContext::GetDeinterlacers(QString decodername)
     return ret;
 }
 // static - Find if a deinterlacer is codec-provided
-bool MythCodecContext::isCodecDeinterlacer(QString decodername)
+bool MythCodecContext::isCodecDeinterlacer(const QString& decodername)
 {
     return (decodername.startsWith("vaapi2")
             || decodername.startsWith("nvdec") );

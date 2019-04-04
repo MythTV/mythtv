@@ -16,8 +16,8 @@
 
 #define REUSE_CONNECTION 1
 
-MBASE_PUBLIC bool TestDatabase(QString dbHostName,
-                               QString dbUserName,
+MBASE_PUBLIC bool TestDatabase(const QString& dbHostName,
+                               const QString& dbUserName,
                                QString dbPassword,
                                QString dbName = "mythconverg",
                                int     dbPort = 3306);
@@ -68,7 +68,7 @@ class MBASE_PUBLIC MDBManager
     MSqlDatabase *getChannelCon(void);
 
   private:
-    MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
+    MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, const QString& name);
 
     QMutex m_lock;
     typedef QList<MSqlDatabase*> DBList;

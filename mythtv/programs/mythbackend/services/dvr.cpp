@@ -163,8 +163,8 @@ DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
     if (!sEndTime.isNull() && !sEndTime.isValid())
         throw QString("EndTime is invalid");
 
-    QDateTime dtStartTime = sStartTime;
-    QDateTime dtEndTime   = sEndTime;
+    const QDateTime& dtStartTime = sStartTime;
+    const QDateTime& dtEndTime   = sEndTime;
 
     if (!sEndTime.isNull() && dtEndTime < dtStartTime)
         throw QString("EndTime is before StartTime");
@@ -1709,7 +1709,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if ((jobType & JOB_USERJOB) &&
+    if (((jobType & JOB_USERJOB) != 0) &&
          gCoreContext->GetSetting(sJobName, "").isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been defined.")

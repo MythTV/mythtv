@@ -549,7 +549,7 @@ void ImportNative::searchChanID()
     showList(tr("Select a channel id"), s, SLOT(gotChanID(QString)));
 }
 
-void ImportNative::gotChanID(QString value)
+void ImportNative::gotChanID(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "
@@ -575,7 +575,7 @@ void ImportNative::searchChanNo()
     showList(tr("Select a channel number"), s, SLOT(gotChanNo(QString)));
 }
 
-void ImportNative::gotChanNo(QString value)
+void ImportNative::gotChanNo(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "
@@ -601,7 +601,7 @@ void ImportNative::searchName()
     showList(tr("Select a channel name"), s, SLOT(gotName(QString)));
 }
 
-void ImportNative::gotName(QString value)
+void ImportNative::gotName(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "
@@ -627,7 +627,7 @@ void ImportNative::searchCallsign()
     showList(tr("Select a Callsign"), s, SLOT(gotCallsign(QString)));
 }
 
-void ImportNative::gotCallsign(QString value)
+void ImportNative::gotCallsign(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "

@@ -77,7 +77,7 @@ class Source : public MythUIComboBoxSetting
         fillSelections();
         StandardSetting::Load();
 
-        if (default_sourceid && !getValue().toUInt())
+        if (default_sourceid && (getValue().toUInt() == 0U))
         {
             uint which = sourceid_to_index[default_sourceid];
             if (which)
@@ -673,7 +673,7 @@ void ChannelOptionsRawTS::Save(void)
     {
         bool ok;
         uint pid = m_pids[i]->getValue().toUInt(&ok, 0);
-        if (!ok || !m_sids[i]->getValue().toUInt())
+        if (!ok || (m_sids[i]->getValue().toUInt() == 0U))
             continue;
 
         pid_cache.push_back(

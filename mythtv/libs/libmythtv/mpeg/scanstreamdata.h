@@ -29,7 +29,7 @@ class MTV_PUBLIC ScanStreamData :
                           uint_vec_t& /*del_pids*/) const override // ATSCStreamData
         { return false; }
 
-    QString GetSIStandard(QString guess = "mpeg") const;
+    QString GetSIStandard(const QString& guess = "mpeg") const;
 
     void SetFreesatAdditionalSI(bool freesat_si);
 

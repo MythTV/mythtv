@@ -69,7 +69,7 @@ class UPnpNotifyTask : public Task
         virtual ~UPnpNotifyTask() = default;
 
         void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
-        void     SendNotifyMsg( MSocketDevice *pSocket, QString sNT, QString sUDN );
+        void     SendNotifyMsg( MSocketDevice *pSocket, const QString& sNT, const QString& sUDN );
 
     public:
 

@@ -145,7 +145,7 @@ void BookmarkEditor::slotFindCategory(void)
     popupStack->AddScreen(m_searchDialog);
 }
 
-void BookmarkEditor::slotCategoryFound(QString category)
+void BookmarkEditor::slotCategoryFound(const QString& category)
 {
     m_categoryEdit->SetText(category);
 }

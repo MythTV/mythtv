@@ -298,7 +298,7 @@ void GameUI::showImages(void)
         m_boxImage->Load();
 }
 
-void GameUI::searchComplete(QString string)
+void GameUI::searchComplete(const QString& string)
 {
     if (!m_gameUITree->GetCurrentNode())
         return;
@@ -929,12 +929,12 @@ void GameUI::gameSearch(MythGenericTree *node,
     }
 }
 
-void GameUI::createBusyDialog(QString title)
+void GameUI::createBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "mythgamebusydialog");

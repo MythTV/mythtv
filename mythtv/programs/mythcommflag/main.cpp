@@ -128,7 +128,7 @@ static QString get_filename(ProgramInfo *program_info)
     return filename;
 }
 
-static int QueueCommFlagJob(uint chanid, QDateTime starttime, bool rebuild)
+static int QueueCommFlagJob(uint chanid, const QDateTime& starttime, bool rebuild)
 {
     QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
@@ -177,7 +177,7 @@ static int QueueCommFlagJob(uint chanid, QDateTime starttime, bool rebuild)
     return GENERIC_EXIT_DB_ERROR;
 }
 
-static int CopySkipListToCutList(uint chanid, QDateTime starttime)
+static int CopySkipListToCutList(uint chanid, const QDateTime& starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
@@ -204,7 +204,7 @@ static int CopySkipListToCutList(uint chanid, QDateTime starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int ClearSkipList(uint chanid, QDateTime starttime)
+static int ClearSkipList(uint chanid, const QDateTime& starttime)
 {
     QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
@@ -225,7 +225,7 @@ static int ClearSkipList(uint chanid, QDateTime starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int SetCutList(uint chanid, QDateTime starttime, QString newCutList)
+static int SetCutList(uint chanid, const QDateTime& starttime, QString newCutList)
 {
     frm_dir_map_t cutlist;
 
@@ -258,7 +258,7 @@ static int SetCutList(uint chanid, QDateTime starttime, QString newCutList)
     return GENERIC_EXIT_OK;
 }
 
-static int GetMarkupList(QString list, uint chanid, QDateTime starttime)
+static int GetMarkupList(const QString& list, uint chanid, const QDateTime& starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
@@ -655,7 +655,7 @@ static void UpdateFileSize(ProgramInfo *program_info)
         program_info->SaveFilesize(size);
 }
 
-static bool IsMarked(uint chanid, QDateTime starttime)
+static bool IsMarked(uint chanid, const QDateTime& starttime)
 {
     MSqlQuery mark_query(MSqlQuery::InitCon());
     mark_query.prepare("SELECT commflagged, count(rm.type) "
@@ -973,7 +973,7 @@ static int FlagCommercials( uint chanid, const QDateTime &starttime,
     return FlagCommercials(&pginfo, jobid, outputfilename, true, fullSpeed);
 }
 
-static int FlagCommercials(QString filename, int jobid,
+static int FlagCommercials(const QString& filename, int jobid,
                             const QString &outputfilename, bool useDB,
                             bool fullSpeed)
 {
@@ -1054,7 +1054,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
     return GENERIC_EXIT_OK;
 }
 
-static int RebuildSeekTable(QString filename, int jobid, bool writefile = false)
+static int RebuildSeekTable(const QString& filename, int jobid, bool writefile = false)
 {
     if (progress)
     {
@@ -1065,7 +1065,7 @@ static int RebuildSeekTable(QString filename, int jobid, bool writefile = false)
     return RebuildSeekTable(&pginfo, jobid, writefile);
 }
 
-static int RebuildSeekTable(uint chanid, QDateTime starttime, int jobid, bool writefile = false)
+static int RebuildSeekTable(uint chanid, const QDateTime& starttime, int jobid, bool writefile = false)
 {
     ProgramInfo pginfo(chanid, starttime);
     if (progress)

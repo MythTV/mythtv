@@ -32,7 +32,7 @@
 //static const QString _Location = QObject::tr("Metadata Editor");
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
-        QString lname, VideoMetadata *source_metadata,
+        const QString& lname, VideoMetadata *source_metadata,
         const VideoMetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata),
     m_metaCache(cache)
@@ -285,12 +285,12 @@ namespace
     const QString CEID_NEWCATEGORY = "newcategory";
 }
 
-void EditMetadataDialog::createBusyDialog(QString title)
+void EditMetadataDialog::createBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "mythvideobusydialog");
@@ -507,7 +507,7 @@ void EditMetadataDialog::NewCategoryPopup()
 
 }
 
-void EditMetadataDialog::AddCategory(QString category)
+void EditMetadataDialog::AddCategory(const QString& category)
 {
     int id = VideoCategory::GetCategory().add(category);
     m_workingMetadata->SetCategoryID(id);
@@ -669,7 +669,7 @@ void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
         m_popupStack->AddScreen(resultsdialog);
 }
 
-void EditMetadataDialog::OnSearchListSelection(ArtworkInfo info, VideoArtworkType type)
+void EditMetadataDialog::OnSearchListSelection(const ArtworkInfo& info, VideoArtworkType type)
 {
     QString msg = tr("Downloading selected artwork...");
     createBusyDialog(msg);

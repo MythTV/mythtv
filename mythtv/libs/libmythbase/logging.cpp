@@ -34,6 +34,7 @@ using namespace std;
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <utility>
 #if HAVE_GETTIMEOFDAY
 #include <sys/time.h>
 #endif
@@ -246,8 +247,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
-    m_filename(filename), m_progress(progress), m_quiet(quiet),
-    m_tablename(table), m_facility(facility), m_pid(getpid())
+    m_filename(std::move(filename)), m_progress(progress), m_quiet(quiet),
+    m_tablename(std::move(table)), m_facility(facility), m_pid(getpid())
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != nullptr)
@@ -716,7 +717,7 @@ bool logPropagateQuiet(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
-void logStart(QString logfile, int progress, int quiet, int facility,
+void logStart(const QString& logfile, int progress, int quiet, int facility,
               LogLevel_t level, bool dblog, bool propagate)
 {
     if (logThread && logThread->isRunning())
@@ -801,7 +802,7 @@ void loggingDeregisterThread(void)
 /// \brief  Map a syslog facility name back to the enumerated value
 /// \param  facility    QString containing the facility name
 /// \return Syslog facility as enumerated type.  Negative if not found.
-int syslogGetFacility(QString facility)
+int syslogGetFacility(const QString& facility)
 {
 #ifdef _WIN32
     LOG(VB_GENERAL, LOG_NOTICE,
@@ -829,7 +830,7 @@ int syslogGetFacility(QString facility)
 /// \brief  Map a log level name back to the enumerated value
 /// \param  level   QString containing the log level name
 /// \return Log level as enumerated type.  LOG_UNKNOWN if not found.
-LogLevel_t logLevelGet(QString level)
+LogLevel_t logLevelGet(const QString& level)
 {
     QMutexLocker locker(&loglevelMapMutex);
     if (!verboseInitialized)
@@ -886,7 +887,7 @@ void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
     name = name.toLower();
     item->name = name;
     item->additive = additive;
-    item->helpText = helptext;
+    item->helpText = std::move(helptext);
 
     verboseMap.insert(name, item);
 }
@@ -980,7 +981,7 @@ void verboseHelp(void)
 /// \brief  Parse the --verbose commandline argument and set the verbose level
 /// \param  arg the commandline argument following "--verbose"
 /// \return an exit code.  GENERIC_EXIT_OK if all is well.
-int verboseArgParse(QString arg)
+int verboseArgParse(const QString& arg)
 {
     QString option;
     int     idx;
