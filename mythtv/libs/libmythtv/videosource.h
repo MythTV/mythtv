@@ -670,7 +670,7 @@ class CardInputDBStorage : public SimpleDBStorage
   public:
     CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
-                       QString          _name) :
+                       const QString&   _name) :
         SimpleDBStorage(_user, "capturecard", _name), m_parent(_parent)
     {
     }

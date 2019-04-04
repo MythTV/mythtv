@@ -19,7 +19,7 @@ class RecordingProfileStorage : public SimpleDBStorage
   public:
     RecordingProfileStorage(StandardSetting *_setting,
                             const RecordingProfile &parentProfile,
-                            QString name) :
+                            const QString& name) :
         SimpleDBStorage(_setting, "recordingprofiles", name),
         m_parent(parentProfile)
     {

@@ -24,24 +24,24 @@ class MTV_PUBLIC FileWriterBase
 
     virtual bool SwitchToNextFile(void) { return false; }
 
-    void SetFilename(QString fname)     { m_filename = fname; }
-    void SetContainer(QString cont)     { m_container = cont; }
-    void SetVideoCodec(QString codec)   { m_videoCodec = codec; }
+    void SetFilename(const QString& fname)     { m_filename = fname; }
+    void SetContainer(const QString& cont)     { m_container = cont; }
+    void SetVideoCodec(const QString& codec)   { m_videoCodec = codec; }
     void SetVideoBitrate(int bitrate)   { m_videoBitrate = bitrate; }
     void SetWidth(int width)            { m_width = width; }
     void SetHeight(int height)          { m_height = height; }
     void SetAspect(float aspect)        { m_aspect = aspect; }
     void SetFramerate(double rate)      { m_frameRate = rate; }
     void SetKeyFrameDist(int dist)      { m_keyFrameDist = dist; }
-    void SetAudioCodec(QString codec)   { m_audioCodec = codec; }
+    void SetAudioCodec(const QString& codec)   { m_audioCodec = codec; }
     void SetAudioBitrate(int bitrate)   { m_audioBitrate = bitrate; }
     void SetAudioChannels(int channels) { m_audioChannels = channels; }
     void SetAudioFrameRate(int rate)    { m_audioFrameRate = rate; }
     void SetAudioFormat(AudioFormat f)  { m_audioFormat = f; }
     void SetThreadCount(int count)      { m_encodingThreadCount = count; }
     void SetTimecodeOffset(long long o) { m_startingTimecodeOffset = o; }
-    void SetEncodingPreset(QString preset) { m_encodingPreset = preset; }
-    void SetEncodingTune(QString tune)  { m_encodingTune = tune; }
+    void SetEncodingPreset(const QString& preset) { m_encodingPreset = preset; }
+    void SetEncodingTune(const QString& tune)  { m_encodingTune = tune; }
 
     long long GetFramesWritten(void)  const { return m_framesWritten; }
     long long GetTimecodeOffset(void) const { return m_startingTimecodeOffset; }

@@ -19,7 +19,8 @@ class QWidget;
 class ChannelID : public GroupSetting
 {
   public:
-    ChannelID(QString field = "chanid", QString table = "channel") :
+    ChannelID(const QString& field = "chanid",
+              const QString& table = "channel") :
         m_field(field), m_table(table)
     {
         setVisible(false);
@@ -92,7 +93,7 @@ protected:
 class ChannelDBStorage : public SimpleDBStorage
 {
   public:
-    ChannelDBStorage(StorageUser *_user, const ChannelID &_id, QString _name) :
+    ChannelDBStorage(StorageUser *_user, const ChannelID &_id, const QString& _name) :
         SimpleDBStorage(_user, "channel", _name), m_id(_id) { }
 
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage

@@ -40,7 +40,7 @@ class DeleteStruct
 {
     friend class MainServer;
   public:
-    DeleteStruct(MainServer *ms, QString filename, QString title,
+    DeleteStruct(MainServer *ms, const QString& filename, const QString& title,
                  uint chanid, QDateTime recstartts, QDateTime recendts,
                  uint recordedId,
                  bool forceMetadataDelete) : 
@@ -51,7 +51,7 @@ class DeleteStruct
     {
     }
 
-    DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
+    DeleteStruct(MainServer *ms, const QString& filename, int fd, off_t size) :
         m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)
     {
     }
@@ -72,7 +72,7 @@ class DeleteStruct
 class DeleteThread : public QRunnable, public DeleteStruct
 {
   public:
-    DeleteThread(MainServer *ms, QString filename, QString title, uint chanid,
+    DeleteThread(MainServer *ms, const QString& filename, const QString& title, uint chanid,
                  QDateTime recstartts, QDateTime recendts, uint recordingId,
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
@@ -85,7 +85,7 @@ class DeleteThread : public QRunnable, public DeleteStruct
 class TruncateThread : public QRunnable, public DeleteStruct
 {
   public:
-    TruncateThread(MainServer *ms, QString filename, int fd, off_t size) :
+    TruncateThread(MainServer *ms, const QString& filename, int fd, off_t size) :
                 DeleteStruct(ms, filename, fd, size)  {}
     void start(void)
         { MThreadPool::globalInstance()->start(this, "Truncate"); }
@@ -95,7 +95,8 @@ class TruncateThread : public QRunnable, public DeleteStruct
 class RenameThread : public QRunnable
 {
 public:
-    RenameThread(MainServer &ms, PlaybackSock &pbs, QString src, QString dst)
+    RenameThread(MainServer &ms, PlaybackSock &pbs,
+                 const QString& src, const QString& dst)
         : m_ms(ms), m_pbs(pbs), m_src(src), m_dst(dst) {}
     void run(void) override; // QRunnable
 

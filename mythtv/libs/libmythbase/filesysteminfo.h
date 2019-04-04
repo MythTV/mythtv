@@ -44,8 +44,8 @@ class MBASE_PUBLIC FileSystemInfo
     int64_t     getFreeSpace(void)    const { return m_total-m_used; }
 
     // information puts
-    void setHostname(QString hostname)      { m_hostname = hostname; }
-    void setPath(QString path)              { m_path = path; }
+    void setHostname(const QString& hostname) { m_hostname = hostname; }
+    void setPath(const QString& path)         { m_path = path; }
     void setLocal(bool local = true)        { m_local = local; }
     void setFSysID(int id)                  { m_fsid = id; }
     void setGroupID(int id)                 { m_grpid = id; }

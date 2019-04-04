@@ -324,7 +324,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     class SleepTimerInfo
     {
       public:
-        SleepTimerInfo(QString str, unsigned long secs)
+        SleepTimerInfo(const QString& str, unsigned long secs)
             : dispString(str), seconds(secs) { ; }
         QString   dispString;
         unsigned long seconds;

@@ -125,7 +125,7 @@ class PlaybackBox : public ScheduleCommon
     bool keyPressEvent(QKeyEvent *) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon
 
-    void setInitialRecGroup(QString initialGroup) { m_recGroup = initialGroup; }
+    void setInitialRecGroup(const QString& initialGroup) { m_recGroup = initialGroup; }
     static void * RunPlaybackBox(void *player, bool);
 
   public slots:
@@ -525,7 +525,7 @@ class PasswordChange : public MythScreenType
     Q_OBJECT
 
   public:
-    PasswordChange(MythScreenStack *lparent, QString oldpassword)
+    PasswordChange(MythScreenStack *lparent, const QString& oldpassword)
         : MythScreenType(lparent, "passwordchanger"),
           m_oldPassword(oldpassword){}
 

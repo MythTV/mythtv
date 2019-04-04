@@ -18,7 +18,7 @@ class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
-                QString item_name, unsigned int item_indent  = 0,
+                const QString& item_name, unsigned int item_indent  = 0,
                 bool item_scroll = false) :
             m_selected(item_selected),  m_checked(item_checked),
             m_name(item_name),          m_scroll(item_scroll),
@@ -35,7 +35,7 @@ class MBASE_PUBLIC LCDMenuItem
 
     void setChecked(CHECKED_STATE value) { m_checked = value; }
     void setSelected(bool value) { m_selected = value; }
-    void setItemName(QString value) { m_name = value; }
+    void setItemName(const QString& value) { m_name = value; }
     void setScroll(bool value) { m_scroll = value; }
     void setIndent(unsigned int value) { m_indent = value; }
     void setScrollPos(unsigned int value) { m_scrollPosition = value; }

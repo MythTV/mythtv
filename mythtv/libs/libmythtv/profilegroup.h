@@ -15,7 +15,7 @@ class ProfileGroupStorage : public SimpleDBStorage
   public:
     ProfileGroupStorage(StorageUser        *_user,
                         const ProfileGroup &_parentProfile,
-                        QString             _name) :
+                        const QString&      _name) :
         SimpleDBStorage(_user, "profilegroups", _name),
         m_parent(_parentProfile)
     {

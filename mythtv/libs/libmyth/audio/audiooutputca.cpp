@@ -90,7 +90,7 @@ public:
     AudioDeviceID GetDefaultOutputDevice();
     int  GetTotalOutputChannels();
     QString *GetName();
-    AudioDeviceID GetDeviceWithName(QString deviceName);
+    AudioDeviceID GetDeviceWithName(const QString& deviceName);
 
     bool OpenDevice();
     int  OpenAnalog();
@@ -119,13 +119,13 @@ public:
                                  AudioStreamBasicDescription format);
 
     // TODO: Convert these to macros!
-    void  Debug(QString msg)
+    void  Debug(const QString& msg)
     {   LOG(VB_AUDIO, LOG_INFO,      "CoreAudioData::" + msg);   }
 
-    void  Error(QString msg)
+    void  Error(const QString& msg)
     {    LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:" + msg);   }
 
-    void  Warn (QString msg)
+    void  Warn (const QString& msg)
     {    LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:" + msg);   }
 
     AudioOutputCA  *mCA            {nullptr}; // We could subclass, but this ends up tidier
@@ -527,7 +527,7 @@ CoreAudioData::CoreAudioData(AudioOutputCA *parent, QString deviceName) :
           .arg(mDeviceID));
 }
 
-AudioDeviceID CoreAudioData::GetDeviceWithName(QString deviceName)
+AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
 {
     UInt32 size = 0;
     AudioDeviceID deviceID = 0;

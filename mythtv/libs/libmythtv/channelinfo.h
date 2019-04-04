@@ -124,33 +124,33 @@ class MTV_PUBLIC ChannelInsertInfo
   public:
     ChannelInsertInfo(void) = default;
     ChannelInsertInfo(
-        uint    _db_mplexid,         uint    _source_id,
-        uint    _channel_id,         QString _callsign,
-        QString _service_name,       QString _chan_num,
-        uint    _service_id,
+        uint           _db_mplexid,         uint           _source_id,
+        uint           _channel_id,         const QString& _callsign,
+        const QString& _service_name,       const QString& _chan_num,
+        uint           _service_id,
 
-        uint    _atsc_major_channel, uint    _atsc_minor_channel,
-        bool    _use_on_air_guide,   bool    _hidden,
-        bool    _hidden_in_guide,
+        uint           _atsc_major_channel, uint           _atsc_minor_channel,
+        bool           _use_on_air_guide,   bool           _hidden,
+        bool           _hidden_in_guide,
 
-        QString _freqid,             QString _icon,
-        QString _format,             QString _xmltvid,
+        const QString& _freqid,             const QString& _icon,
+        const QString& _format,             const QString& _xmltvid,
 
-        uint    _pat_tsid,           uint    _vct_tsid,
-        uint    _vct_chan_tsid,      uint    _sdt_tsid,
+        uint           _pat_tsid,           uint           _vct_tsid,
+        uint           _vct_chan_tsid,      uint           _sdt_tsid,
 
-        uint    _orig_netid,         uint    _netid,
+        uint           _orig_netid,         uint           _netid,
 
-        QString _si_standard,
+        const QString& _si_standard,
 
-        bool    _in_channels_conf,   bool    _in_pat,
-        bool    _in_pmt,             bool    _in_vct,
-        bool    _in_nit,             bool    _in_sdt,
+        bool           _in_channels_conf,   bool           _in_pat,
+        bool           _in_pmt,             bool           _in_vct,
+        bool           _in_nit,             bool           _in_sdt,
 
-        bool    _is_encrypted,       bool    _is_data_service,
-        bool    _is_audio_service,   bool    _is_opencable,
-        bool    _could_be_opencable, int     _decryption_status,
-        QString _default_authority) :
+        bool           _is_encrypted,       bool           _is_data_service,
+        bool           _is_audio_service,   bool           _is_opencable,
+        bool           _could_be_opencable, int            _decryption_status,
+        const QString& _default_authority) :
     m_db_mplexid(_db_mplexid),
     m_source_id(_source_id),
     m_channel_id(_channel_id),

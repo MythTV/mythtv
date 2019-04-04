@@ -24,14 +24,14 @@ class Transcode : public QObject
         const QString& fifodir, bool fifo_info, bool cleanCut, frm_dir_map_t &deleteMap,
         int AudioTrackNo, bool passthru = false);
     void ShowProgress(bool val) { showprogress = val; }
-    void SetRecorderOptions(QString options) { recorderOptions = options; }
+    void SetRecorderOptions(const QString& options) { recorderOptions = options; }
     void SetAVFMode(void) { avfMode = true; }
     void SetHLSMode(void) { hlsMode = true; }
     void SetHLSStreamID(int streamid) { hlsStreamID = streamid; }
     void SetHLSMaxSegments(int segments) { hlsMaxSegments = segments; }
-    void SetCMDContainer(QString container) { cmdContainer = container; }
-    void SetCMDAudioCodec(QString codec) { cmdAudioCodec = codec; }
-    void SetCMDVideoCodec(QString codec) { cmdVideoCodec = codec; }
+    void SetCMDContainer(const QString& container) { cmdContainer = container; }
+    void SetCMDAudioCodec(const QString& codec) { cmdAudioCodec = codec; }
+    void SetCMDVideoCodec(const QString& codec) { cmdVideoCodec = codec; }
     void SetCMDHeight(int height) { cmdHeight = height; }
     void SetCMDWidth(int width) { cmdWidth = width; }
     void SetCMDBitrate(int bitrate) { cmdBitrate = bitrate; }

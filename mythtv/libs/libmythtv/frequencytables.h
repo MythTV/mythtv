@@ -38,7 +38,7 @@ int get_closest_freqid(
 class FrequencyTable
 {
   public:
-    FrequencyTable(QString                 _name_format,
+    FrequencyTable(const QString&          _name_format,
                    int                     _name_offset,
                    uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
@@ -51,7 +51,7 @@ class FrequencyTable
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   QString                 _name_format,
+                   const QString&          _name_format,
                    int                     _name_offset,
                    DTVInversion::Types     _inversion,
                    DTVBandwidth::Types     _bandwidth,
@@ -76,7 +76,7 @@ class FrequencyTable
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   QString                 _name_format,
+                   const QString&          _name_format,
                    int                     _name_offset,
                    DTVCodeRate::Types      _fec_inner,
                    DTVModulation::Types    _modulation,

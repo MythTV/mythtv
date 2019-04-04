@@ -85,7 +85,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
      *            some indexing.  A token isn't required, but is strongly
      *            suggested.
      */
-    static void GetPreviewImage(const ProgramInfo &pginfo, QString token)
+    static void GetPreviewImage(const ProgramInfo &pginfo, const QString& token)
     {
         GetPreviewImage(pginfo, QSize(0,0), "", -1, true, token);
     }

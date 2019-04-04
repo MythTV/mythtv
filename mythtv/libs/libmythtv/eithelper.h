@@ -23,7 +23,7 @@ class MSqlQuery;
 class ATSCEvent
 {
   public:
-    ATSCEvent(uint a, uint b, uint c, QString d,
+    ATSCEvent(uint a, uint b, uint c, const QString& d,
               const unsigned char *e, uint f)
         : m_start_time(a), m_length(b), m_etm(c), m_desc_length(f), m_title(d), m_desc(e),
           m_scan_time(time(nullptr)) {}
@@ -51,7 +51,8 @@ class ATSCEvent
 class ATSCEtt
 {
   public:
-    explicit ATSCEtt(QString text) : m_ett_text(text), m_scan_time(time(nullptr)) {}
+    explicit ATSCEtt(const QString& text) :
+        m_ett_text(text), m_scan_time(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to
