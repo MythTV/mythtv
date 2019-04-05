@@ -875,7 +875,7 @@ QString ProgramMapTable::toString(void) const
     QString str =
         QString("Program Map Section"
                 "\n%1"
-                "      pnum(%2) pid(0x%3) pcrpid(%4)\n")
+                "      pnum(%2) pid(0x%3) pcrpid(0x%4)\n")
         .arg(PSIPTable::toString())
         .arg(ProgramNumber())
         .arg(tsheader()->PID(),0,16)
