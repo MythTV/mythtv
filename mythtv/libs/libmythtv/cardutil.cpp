@@ -620,7 +620,7 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
 
     QStringList::iterator it = delsys.begin();
     QString msg = "Delivery systems:";
-    for (; it != delsys.end(); it++)
+    for (; it != delsys.end(); ++it)
     {
         msg += " ";
         msg += *it;
