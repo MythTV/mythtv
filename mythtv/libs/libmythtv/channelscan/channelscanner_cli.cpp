@@ -92,11 +92,13 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     QString msg;
     if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
-        msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
-                    m_status_complete, static_cast<double>(m_status_snr),
-                    (m_status_lock) ? "l" : "L",
-                    m_status_text.toLatin1().constData(),
-                    m_status_last_log.toLatin1().constData(), "");
+        msg = QString("%1% S/N %2 %3 : %4 (%5) %6")
+            .arg(m_status_complete, 3)
+            .arg(m_status_snr, 3, 'f', 1)
+            .arg((m_status_lock) ? "l" : "L")
+            .arg(qPrintable(m_status_text))
+            .arg(qPrintable(m_status_last_log))
+            .arg("", 20);
     }
     //cout<<msg.toLatin1().constData()<<endl;
 

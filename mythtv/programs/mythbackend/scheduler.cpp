@@ -555,14 +555,13 @@ void Scheduler::FillRecordListFromDB(uint recordid)
         return;
     }
 
-    QString msg;
-    msg.sprintf("Speculative scheduled %d items in %.1f "
-                "= %.2f match + %.2f check + %.2f place",
-                (int)m_reclist.size(),
-                static_cast<double>(matchTime + checkTime + placeTime),
-                static_cast<double>(matchTime),
-                static_cast<double>(checkTime),
-                static_cast<double>(placeTime));
+    QString msg = QString("Speculative scheduled %1 items in %2 "
+                          "= %3 match + %4 check + %5 place")
+        .arg(m_reclist.size())
+        .arg(matchTime + checkTime + placeTime, 0, 'f', 1)
+        .arg(matchTime, 0, 'f', 2)
+        .arg(checkTime, 0, 'f', 2)
+        .arg(placeTime, 0, 'f', 2);
     LOG(VB_GENERAL, LOG_INFO, msg);
 }
 
@@ -2444,13 +2443,13 @@ bool Scheduler::HandleReschedule(void)
         return false;
     }
 
-    msg.sprintf("Scheduled %d items in %.1f "
-                "= %.2f match + %.2f check + %.2f place",
-                (int)m_reclist.size(),
-                static_cast<double>(matchTime + checkTime + placeTime),
-                static_cast<double>(matchTime),
-                static_cast<double>(checkTime),
-                static_cast<double>(placeTime));
+    msg = QString("Scheduled %1 items in %2 "
+                  "= %3 match + %4 check + %5 place")
+        .arg(m_reclist.size())
+        .arg(matchTime + checkTime + placeTime, 0, 'f', 1)
+        .arg(matchTime, 0, 'f', 2)
+        .arg(checkTime, 0, 'f', 2)
+        .arg(placeTime, 0, 'f', 2);
     LOG(VB_GENERAL, LOG_INFO, msg);
 
     // Write changed entries to oldrecorded.

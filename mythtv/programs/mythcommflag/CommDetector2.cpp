@@ -258,7 +258,6 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
 QString frameToTimestamp(long long frameno, float fps)
 {
     int         ms, ss, mm, hh;
-    QString     ts;
 
     ms = (int)roundf(frameno / fps * 1000);
 
@@ -273,13 +272,13 @@ QString frameToTimestamp(long long frameno, float fps)
     hh = mm / 60;
     mm %= 60;
 
-    return ts.sprintf("%d:%02d:%02d", hh, mm, ss);
+    return QString("%1:%2:%3")
+        .arg(hh).arg(mm, 2, QChar('0')) .arg(ss, 2, QChar('0'));
 }
 
 QString frameToTimestampms(long long frameno, float fps)
 {
     int         ms, ss, mm;
-    QString     ts;
 
     ms = (int)roundf(frameno / fps * 1000);
 
@@ -289,13 +288,14 @@ QString frameToTimestampms(long long frameno, float fps)
     mm = ss / 60;
     ss %= 60;
 
-    return ts.sprintf("%d:%02d.%03d", mm, ss, ms);
+    return QString("%1:%2:%3")
+        .arg(mm).arg(ss, 2, QChar(QChar('0'))).arg(ms, 2, QChar(QChar('0')));
 }
 
 QString strftimeval(const struct timeval *tv)
 {
-    QString str;
-    return str.sprintf("%ld.%06ld", tv->tv_sec, tv->tv_usec);
+    return QString("%1.%2")
+        .arg(tv->tv_sec).arg(tv->tv_usec, 6, QChar(QChar('0')));
 }
 
 };  /* namespace */
