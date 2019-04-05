@@ -229,7 +229,7 @@ void MThread::ThreadSetup(const QString &name)
     loggingRegisterThread(name);
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     qsrand(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
-#else
+#elif QT_VERSION < QT_VERSION_CHECK(5,10,0)
     qsrand(MythDate::current().toSecsSinceEpoch() ^ QTime::currentTime().msec());
 #endif
 }

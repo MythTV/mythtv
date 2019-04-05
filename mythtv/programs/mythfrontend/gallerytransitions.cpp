@@ -4,6 +4,9 @@
 
 #include "mythcorecontext.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+#include <QRandomGenerator>
+#endif
 
 #define LOC QString("Transition: ")
 
@@ -408,7 +411,11 @@ void TransitionSpin::Finalise()
 void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 {
     // Select a random peer.
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+    int rand = QRandomGenerator::global()->bounded(m_peers.size());
+#else
     int rand = qrand() % m_peers.size();
+#endif
     m_current = m_peers[rand];
     // Invoke peer
     connect(m_current, SIGNAL(finished()), this, SLOT(Finished()));

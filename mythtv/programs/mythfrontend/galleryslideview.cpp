@@ -38,8 +38,10 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     connect(&m_updateTransition, SIGNAL(finished()),
             this, SLOT(TransitionComplete()), Qt::QueuedConnection);
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     // Seed random generator for random transitions
     qsrand(QTime::currentTime().msec());
+#endif
 
     // Initialise slideshow timer
     m_timer.setSingleShot(true);
