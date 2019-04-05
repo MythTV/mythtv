@@ -63,7 +63,9 @@ class VideoPerformanceTest
         ctx = new PlayerContext("VideoPerformanceTest");
         ctx->SetRingBuffer(rb);
         ctx->SetPlayer(mp);
-        ctx->SetPlayingInfo(new ProgramInfo(file));
+        ProgramInfo *pinfo = new ProgramInfo(file);
+        ctx->SetPlayingInfo(pinfo); // makes a copy
+        delete pinfo;
         mp->SetPlayerInfo(nullptr, GetMythMainWindow(), ctx);
 
         FrameScanType scan = deinterlace ? kScan_Interlaced : kScan_Progressive;
