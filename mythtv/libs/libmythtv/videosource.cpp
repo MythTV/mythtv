@@ -1370,6 +1370,9 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         tmpdevice.model    = model;
         tmpdevice.cardip   = devip;
         tmpdevice.deviceid = devid;
+        // Fully specify object.  Checkboxes will be added later when
+        // the configuration group is created.
+        tmpdevice.checkbox = nullptr;
         m_deviceList[tmpdevice.deviceid] = tmpdevice;
     }
 
