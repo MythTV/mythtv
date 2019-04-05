@@ -118,6 +118,7 @@ void TestMPEGTables::pat_test(void)
     ProgramAssociationTable* pat4 = new ProgramAssociationTable(PSIPTable((unsigned char*)&si_data4));
     QCOMPARE (pat4->CalcCRC(), (uint) 0xFFFFFFFF);
     QVERIFY (pat4->VerifyCRC());
+    delete pat4;
 }
 
 void TestMPEGTables::dvbdate(void)
