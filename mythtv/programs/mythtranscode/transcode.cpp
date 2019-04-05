@@ -906,6 +906,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!newFrame)
         {
             // OOM
+            delete hls;
             return REENCODE_ERROR;
         }
         if (nonAligned)
