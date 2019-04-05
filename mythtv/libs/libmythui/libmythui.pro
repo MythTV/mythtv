@@ -92,13 +92,6 @@ INSTALLS += inc
 #	level settings.pro)
 #
 
-using_vdpau {
-    DEFINES += USING_VDPAU
-    HEADERS += mythpainter_vdpau.h   mythrender_vdpau.h
-    SOURCES += mythpainter_vdpau.cpp mythrender_vdpau.cpp
-    LIBS += -lvdpau
-}
-
 using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h

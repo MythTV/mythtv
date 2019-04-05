@@ -29,6 +29,22 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("vtb-dec"))
         (*opts.safe_renderers)["vtb-dec"].append("null");
 #endif
+#ifdef USING_VDPAU
+    if (opts.decoders->contains("vdpau-dec"))
+        (*opts.safe_renderers)["vdpau-dec"].append("null");
+#endif
+#ifdef USING_NVDEC
+    if (opts.decoders->contains("nvdec-dec"))
+        (*opts.safe_renderers)["nvdec-dec"].append("null");
+#endif
+#ifdef USING_VAAPI2
+    if (opts.decoders->contains("vaapi-dec"))
+        (*opts.safe_renderers)["vaapi-dec"].append("null");
+#endif
+#ifdef USING_MEDIACODEC
+    if (opts.decoders->contains("mediacodec-dec"))
+        (*opts.safe_renderers)["mediacodec-dec"].append("null");
+#endif
     opts.priorities->insert("null", 10);
 }
 

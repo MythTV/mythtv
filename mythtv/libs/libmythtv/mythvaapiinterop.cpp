@@ -672,7 +672,7 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
     if (!m_openglTextures.isEmpty() && InitEGL() && display)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting DRM buffers");
-        QHash<GLuint, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
+        QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
@@ -708,14 +708,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     if (ColourSpace)
     {
         if (m_openglTextures.isEmpty())
-        {
-            ColourSpace->SetSupportedAttributes(static_cast<PictureAttributeSupported>
-                                               (kPictureAttributeSupported_Brightness |
-                                                kPictureAttributeSupported_Contrast |
-                                                kPictureAttributeSupported_Colour |
-                                                kPictureAttributeSupported_Hue |
-                                                kPictureAttributeSupported_StudioLevels));
-        }
+            ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
         ColourSpace->UpdateColourSpace(Frame);
     }
 

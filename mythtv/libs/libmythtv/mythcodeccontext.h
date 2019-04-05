@@ -26,6 +26,14 @@
 #ifndef MYTHCODECONTEXT_H
 #define MYTHCODECONTEXT_H
 
+// Qt
+#include <QMutex>
+#include <QStringList>
+
+// MythTV
+#include "mythtvexp.h"
+#include "mythcodecid.h"
+
 struct AVCodecContext;
 struct AVFrame;
 struct AVStream;
@@ -33,9 +41,6 @@ struct AVFilterContext;
 struct AVFilterGraph;
 struct AVBufferRef;
 class MythPlayer;
-
-#include "mythtvexp.h"
-#include "mythcodecid.h"
 
 class MTV_PUBLIC MythCodecContext
 {

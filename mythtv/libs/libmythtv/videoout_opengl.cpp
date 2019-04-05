@@ -47,6 +47,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
         (*Options.safe_renderers)["mediacodec-dec"].append(safe);
     if (Options.decoders->contains("vaapi-dec"))
         (*Options.safe_renderers)["vaapi-dec"].append(safe);
+    if (Options.decoders->contains("vdpau-dec"))
+        (*Options.safe_renderers)["vdpau-dec"].append(safe);
     if (Options.decoders->contains("nvdec-dec"))
         (*Options.safe_renderers)["nvdec-dec"].append(safe);
     if (Options.decoders->contains("vtb-dec"))
@@ -70,7 +72,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     (*Options.osds)["opengl-yv12"].append("opengl2");
     Options.priorities->insert("opengl-yv12", 65);
 
-#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC)
+#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC)
     Options.renderers->append("opengl-hw");
     (*Options.deints)["opengl-hw"].append("none");
     (*Options.osds)["opengl-hw"].append("opengl2");
@@ -89,6 +91,14 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
 #ifdef USING_MEDIACODEC
     if (Options.decoders->contains("mediacodec"))
         (*Options.safe_renderers)["mediacodec"].append("opengl-hw");
+#endif
+#ifdef USING_VDPAU
+    if (Options.decoders->contains("vdpau"))
+        (*Options.safe_renderers)["vdpau"].append("opengl-hw");
+#endif
+#ifdef USING_NVDEC
+    if (Options.decoders->contains("nvdec"))
+        (*Options.safe_renderers)["nvdec"].append("opengl-hw");
 #endif
 }
 
@@ -339,6 +349,10 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
         return vbuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1);
     else if (codec_is_vtb(CodecID))
         return vbuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
+    else if (codec_is_vdpau(CodecID))
+        return vbuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1);
+    else if (codec_is_nvdec(CodecID))
+        return vbuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
     return vbuffers.CreateBuffers(FMT_YV12, Size, false, 1, 12, 4, 2);
 }
 
@@ -669,12 +683,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 
 void VideoOutputOpenGL::InitPictureAttributes(void)
 {
-    videoColourSpace.SetSupportedAttributes(static_cast<PictureAttributeSupported>
-                                       (kPictureAttributeSupported_Brightness |
-                                        kPictureAttributeSupported_Contrast |
-                                        kPictureAttributeSupported_Colour |
-                                        kPictureAttributeSupported_Hue |
-                                        kPictureAttributeSupported_StudioLevels));
+    videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
 }
 
 bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &OverrideFilter)

@@ -37,10 +37,6 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 
-#ifdef USING_VDPAU
-#include "videoout_vdpau.h"
-#endif
-
 #ifdef __linux__
 #include <linux/rtc.h>
 #endif
@@ -88,9 +84,6 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
         s_forceskip = 0;
     }
 
-#ifdef USING_VDPAU
-//    TESTVIDEOSYNC(VDPAUVideoSync);
-#endif
 #ifndef _WIN32
     TESTVIDEOSYNC(DRMVideoSync);
 #endif // _WIN32

@@ -13,6 +13,12 @@
 #ifdef USING_MEDIACODEC
 #include "mythmediacodeccontext.h"
 #endif
+#ifdef USING_VDPAU
+#include "mythvdpauinterop.h"
+#endif
+#ifdef USING_NVDEC
+#include "mythnvdecinterop.h"
+#endif
 
 #define LOC QString("OpenGLInterop: ")
 
@@ -24,6 +30,8 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     if (InteropType == VTBOPENGL)    return "VTB OpenGL";
     if (InteropType == VTBSURFACE)   return "VTB IOSurface";
     if (InteropType == MEDIACODEC)   return "MediaCodec Surface";
+    if (InteropType == VDPAU)        return "VDPAU";
+    if (InteropType == NVDEC)        return "NVDEC";
     return "Unsupported";
 }
 
@@ -42,6 +50,14 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
 #endif
 #ifdef USING_MEDIACODEC
     else if (codec_is_mediacodec(CodecId) /*&& (GetInteropType(CodecId) != Unsupported)*/)
+        result << "opengl-hw";
+#endif
+#ifdef USING_VDPAU
+    else if (codec_is_vdpau_hw(CodecId) && (GetInteropType(CodecId) != Unsupported))
+        result << "opengl-hw";
+#endif
+#ifdef USING_NVDEC
+    else if (codec_is_nvdec(CodecId) && (GetInteropType(CodecId) != Unsupported))
         result << "opengl-hw";
 #endif
     return result;
@@ -67,6 +83,14 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
 #ifdef USING_MEDIACODEC
     if (codec_is_mediacodec(CodecId))
         supported = MEDIACODEC;
+#endif
+#ifdef USING_VDPAU
+    if (codec_is_vdpau_hw(CodecId))
+        supported = MythVDPAUInterop::GetInteropType(CodecId);
+#endif
+#ifdef USING_NVDEC
+    if (codec_is_nvdec(CodecId))
+        supported = MythNVDECInterop::GetInteropType(CodecId);
 #endif
 
     if (Unsupported == supported)
@@ -101,6 +125,14 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if ((Frame->codec == FMT_MEDIACODEC) && (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC))
         validhwcodec = true;
 #endif
+#ifdef USING_VDPAU
+    if ((Frame->codec == FMT_VDPAU) && (Frame->pix_fmt == AV_PIX_FMT_VDPAU))
+        validhwcodec = true;
+#endif
+#ifdef USING_NVDEC
+    if ((Frame->codec == FMT_NVDEC) && (Frame->pix_fmt == AV_PIX_FMT_CUDA))
+        validhwcodec = true;
+#endif
 
     if (!(validhwframe && validhwcodec))
     {
@@ -118,10 +150,20 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
         AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
         if (!buffer || (buffer && !buffer->data))
             return result;
-        AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
-        if (!frames || (frames && !frames->user_opaque))
-            return result;
-        interop = reinterpret_cast<MythOpenGLInterop*>(frames->user_opaque);
+        if (Frame->codec == FMT_NVDEC)
+        {
+            AVHWDeviceContext* context = reinterpret_cast<AVHWDeviceContext*>(buffer->data);
+            if (!context || (context && !context->user_opaque))
+                return result;
+            interop = reinterpret_cast<MythOpenGLInterop*>(context->user_opaque);
+        }
+        else
+        {
+            AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
+            if (!frames || (frames && !frames->user_opaque))
+                return result;
+            interop = reinterpret_cast<MythOpenGLInterop*>(frames->user_opaque);
+        }
     }
 
     if (interop)
@@ -131,7 +173,8 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
 }
 
 MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType)
-  : ReferenceCounter("GLInterop", true),
+  : QObject(),
+    ReferenceCounter("GLInterop", true),
     m_context(Context),
     m_type(InteropType),
     m_openglTextures(),
@@ -146,7 +189,7 @@ MythOpenGLInterop::~MythOpenGLInterop()
     {
         OpenGLLocker locker(m_context);
         LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting textures");
-        QHash<GLuint, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
+        QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();

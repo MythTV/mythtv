@@ -219,9 +219,14 @@ typedef enum
                                (id < kCodec_VDPAU_END))
 #define codec_is_vdpau_hw(id) ((codec_is_vdpau(id) && \
                                 (id != kCodec_H263_VDPAU) && \
-                                (id != kCodec_VP8_VDPAU)))
+                                (id != kCodec_VP8_VDPAU) && \
+                                (id != kCodec_VP9_VDPAU)))
 #define codec_is_vdpau_dec(id)((id > kCodec_VDPAU_DEC_BEGIN) && \
                                (id < kCodec_VDPAU_DEC_END))
+#define codec_is_vdpau_dechw(id) ((codec_is_vdpau_dec(id) && \
+                                  (id != kCodec_H263_VDPAU_DEC) && \
+                                  (id != kCodec_VP8_VDPAU_DEC) && \
+                                  (id != kCodec_VP9_VDPAU)))
 
 #define codec_is_vaapi(id)    ((id > kCodec_VAAPI_BEGIN) && \
                                (id < kCodec_VAAPI_END))
@@ -274,7 +279,7 @@ int mpeg_version(int codec_id);
 #define CODEC_IS_MPEG(id)     (mpeg_version(id) && mpeg_version(id) <= 2)
 #define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id))
 #ifdef USING_VDPAU
-#define CODEC_IS_VDPAU(codec) (codec && codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
+#define CODEC_IS_VDPAU(codec, enc) (codec && (enc->pix_fmt == AV_PIX_FMT_VDPAU))
 #else
 #define CODEC_IS_VDPAU(codec) (0)
 #endif

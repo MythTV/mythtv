@@ -839,12 +839,15 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     {
         s_dec_name["ffmpeg"]         = QObject::tr("Standard");
         s_dec_name["macaccel"]       = QObject::tr("Mac hardware acceleration");
-        s_dec_name["vdpau"]          = QObject::tr("NVidia VDPAU acceleration");
+        s_dec_name["vdpau"]          = QObject::tr("NVIDIA VDPAU acceleration");
+        s_dec_name["vdpau-dec"]      = QObject::tr("NVIDIA VDPAU acceleration (decode only)");
         s_dec_name["vaapi"]          = QObject::tr("VAAPI acceleration");
         s_dec_name["vaapi-dec"]      = QObject::tr("VAAPI acceleration (decode only)");
         s_dec_name["dxva2"]          = QObject::tr("Windows hardware acceleration");
+        s_dec_name["mediacodec"]     = QObject::tr("Android MediaCodec acceleration");
         s_dec_name["mediacodec-dec"] = QObject::tr("Android MediaCodec acceleration (decode only)");
-        s_dec_name["nvdec-dec"]      = QObject::tr("NVidia NVDEC acceleration (decode only)");
+        s_dec_name["nvdec"]          = QObject::tr("NVIDIA NVDEC acceleration");
+        s_dec_name["nvdec-dec"]      = QObject::tr("NVIDIA NVDEC acceleration (decode only)");
     }
 
     QString ret = decoder;
@@ -905,7 +908,7 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
     if (decoder == "nvdec-dec")
         msg += QObject::tr(
             "Nvdec uses the new NVDEC API to "
-            "accelerate video decoding on NVidia Graphics Adapters. ");
+            "accelerate video decoding on NVIDIA Graphics Adapters. ");
 
     return msg;
 }
@@ -1344,39 +1347,6 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
     }
 #endif
 
-#ifdef USING_VDPAU
-    if (!profiles.contains("VDPAU High Quality")) {
-        (void) QObject::tr("VDPAU High Quality", "Sample: VDPAU high quality");
-        groupid = CreateProfileGroup("VDPAU High Quality", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vdpau", 1, true, "vdpau", "vdpau", true,
-                      "vdpauadvanceddoublerate", "vdpauadvanced",
-                      "vdpaucolorspace=auto");
-    }
-
-    if (!profiles.contains("VDPAU Normal")) {
-        (void) QObject::tr("VDPAU Normal", "Sample: VDPAU average quality");
-        groupid = CreateProfileGroup("VDPAU Normal", hostname);
-        CreateProfile(groupid, 1, ">=", 0, 720, "", 0, 0,
-                      "vdpau", 1, true, "vdpau", "vdpau", true,
-                      "vdpaubasicdoublerate", "vdpaubasic",
-                      "vdpaucolorspace=auto");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "vdpau", 1, true, "vdpau", "vdpau", true,
-                      "vdpauadvanceddoublerate", "vdpauadvanced",
-                      "vdpaucolorspace=auto");
-    }
-
-    if (!profiles.contains("VDPAU Slim")) {
-        (void) QObject::tr("VDPAU Slim", "Sample: VDPAU low power GPU");
-        groupid = CreateProfileGroup("VDPAU Slim", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vdpau", 1, true, "vdpau", "vdpau", true,
-                      "vdpaubobdeint", "vdpauonefield",
-                      "vdpauskipchroma,vdpaucolorspace=auto");
-    }
-#endif
-
 #ifdef USING_OPENGL_VIDEO
     if (!profiles.contains("OpenGL High Quality")) {
         (void) QObject::tr("OpenGL High Quality",
@@ -1539,12 +1509,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "content before using OpenGL for color conversion, scaling, picture"
             " controls and optionally deinterlacing. CPU load is higher "
             "particularly on embedded systems.");
-    }
-
-    if (renderer == "vdpau")
-    {
-        msg = QObject::tr(
-            "This is the only video renderer for NVidia VDPAU decoding.");
     }
 
     if (renderer == "opengl-hw")

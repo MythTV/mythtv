@@ -277,7 +277,7 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     int csp = Frame->colorspace;
     // workaround for nvdec mpeg2
     bool forced = false;
-    if (csp == AVCOL_SPC_RGB && format_is_yuv(Frame->codec))
+    if (csp == AVCOL_SPC_RGB && (format_is_yuv(Frame->codec) || Frame->codec == FMT_NVDEC))
     {
         forced = true;
         csp = AVCOL_SPC_UNSPECIFIED;

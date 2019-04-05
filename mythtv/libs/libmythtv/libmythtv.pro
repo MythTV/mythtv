@@ -420,7 +420,7 @@ using_frontend {
     SOURCES += videocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
 
-   using_opengl | using_vdpau : !win32-msvc* {
+   using_opengl : !win32-msvc* {
         # Goom
         HEADERS += visualisations/goom/filters.h
         HEADERS += visualisations/goom/goomconfig.h
@@ -462,8 +462,12 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += videoout_vdpau.h
-        SOURCES += videoout_vdpau.cpp
+        HEADERS += mythvdpauinterop.h
+        HEADERS += mythvdpaucontext.h
+        HEADERS += mythvdpauhelper.h
+        SOURCES += mythvdpauinterop.cpp
+        SOURCES += mythvdpaucontext.cpp
+        SOURCES += mythvdpauhelper.cpp
         LIBS += -lvdpau
     }
 
@@ -504,7 +508,12 @@ using_frontend {
     using_nvdec {
         DEFINES += USING_NVDEC
         HEADERS += nvdeccontext.h
+        HEADERS += mythnvdecinterop.h
+        HEADERS += mythnvdeccontext.h
         SOURCES += nvdeccontext.cpp
+        SOURCES += mythnvdecinterop.cpp
+        SOURCES += mythnvdeccontext.cpp
+        INCLUDEPATH += ../../external/nv-codec-headers/include
     }
 
     using_mediacodec {

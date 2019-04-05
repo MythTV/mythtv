@@ -27,10 +27,6 @@
 #include "videoout_opengl.h"
 #endif
 
-#ifdef USING_VDPAU
-#include "videoout_vdpau.h"
-#endif
-
 #ifdef USING_OPENMAX
 #include "videoout_omx.h"
 #endif
@@ -78,10 +74,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
     VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
 #endif // USING_OPENGL_VIDEO
 
-#ifdef USING_VDPAU
-    VideoOutputVDPAU::GetRenderOptions(opts);
-#endif // USING_VDPAU
-
 #ifdef USING_OPENMAX
     VideoOutputOMX::GetRenderOptions(opts, cpudeints);
 #endif // USING_OPENMAX
@@ -118,11 +110,6 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputOpenGL::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_OPENGL_VIDEO
-
-#ifdef USING_VDPAU
-        renderers += VideoOutputVDPAU::
-            GetAllowedRenderers(codec_id, video_dim_disp);
-#endif // USING_VDPAU
 
 #ifdef USING_OPENMAX
         renderers += VideoOutputOMX::
@@ -181,11 +168,6 @@ VideoOutput *VideoOutput::Create(
         else if (renderer.contains("opengl"))
             vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
-
-#ifdef USING_VDPAU
-        else if (renderer == "vdpau")
-            vo = new VideoOutputVDPAU();
-#endif // USING_VDPAU
 
 #ifdef USING_OPENMAX
         else if (renderer == VideoOutputOMX::kName)

@@ -139,6 +139,8 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat)
 {
     switch (PixelFormat)
     {
+        case FMT_VDPAU: return 28;
+        case FMT_NVDEC: return 8;
         case FMT_VTB:   return 24;
         case FMT_VAAPI: return 24;
         case FMT_DXVA2: return 30;
@@ -249,15 +251,16 @@ void VideoBuffers::SetPrebuffering(bool Normal)
 
 void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
-#if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI)
+#if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC)
     if ((Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX) || (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC) ||
-        (Frame->pix_fmt == AV_PIX_FMT_VAAPI))
+        (Frame->pix_fmt == AV_PIX_FMT_VAAPI) || (Frame->pix_fmt == AV_PIX_FMT_VDPAU) ||
+        (Frame->pix_fmt == AV_PIX_FMT_CUDA))
     {
         AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
-#ifdef USING_VAAPI
+#if defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC)
         ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
         if (ref)
             av_buffer_unref(&ref);

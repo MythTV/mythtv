@@ -42,7 +42,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
     QString             m_vaVendor;
 };
 
-class MythVAAPIInteropGLX : public QObject, public MythVAAPIInterop
+class MythVAAPIInteropGLX : public MythVAAPIInterop
 {
     Q_OBJECT
 

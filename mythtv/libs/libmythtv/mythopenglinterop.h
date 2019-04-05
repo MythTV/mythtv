@@ -1,6 +1,9 @@
 #ifndef MYTHOPENGLINTEROP_H
 #define MYTHOPENGLINTEROP_H
 
+// Qt
+#include <QObject>
+
 // MythTV
 #include "mythrender_opengl.h"
 #include "referencecounter.h"
@@ -17,8 +20,10 @@ class VideoColourSpace;
 
 #define DUMMY_INTEROP_ID 1
 
-class MythOpenGLInterop : public ReferenceCounter
+class MythOpenGLInterop : public QObject, public ReferenceCounter
 {
+    Q_OBJECT
+
   public:
 
     enum Type
@@ -29,7 +34,9 @@ class MythOpenGLInterop : public ReferenceCounter
         VAAPIEGLDRM  = 3,
         VTBOPENGL    = 4,
         VTBSURFACE   = 5,
-        MEDIACODEC   = 6
+        MEDIACODEC   = 6,
+        VDPAU        = 7,
+        NVDEC
     };
 
     static QStringList GetAllowedRenderers   (MythCodecID CodecId);
@@ -52,7 +59,7 @@ class MythOpenGLInterop : public ReferenceCounter
   protected:
     MythRenderOpenGL   *m_context;
     Type                m_type;
-    QHash<GLuint, vector<MythVideoTexture*> > m_openglTextures;
+    QHash<unsigned long long, vector<MythVideoTexture*> > m_openglTextures;
     QSize               m_openglTextureSize;
 };
 
