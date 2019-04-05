@@ -99,6 +99,7 @@ void TestSortHelper::Variations_test(void)
     QVERIFY(sh->doTitle("The Blob") != "blob, the");
     QVERIFY(sh->doPathname("/video/recordings/The Flash/Season 1/The Flash - S01E01.ts")
             == "/video/recordings/The Flash/Season 1/The Flash - S01E01.ts");
+    delete sh;
 
     // Case insensitive, keep prefixes
     sh = new MythSortHelper(Qt::CaseInsensitive, SortPrefixKeep, "");
@@ -110,6 +111,7 @@ void TestSortHelper::Variations_test(void)
     QVERIFY(sh->doTitle("The Blob") != "blob, the");
     QVERIFY(sh->doPathname("/video/recordings/The Flash/Season 1/The Flash - S01E01.ts")
             == "/video/recordings/the flash/season 1/the flash - s01e01.ts");
+    delete sh;
 
     // Case sensitive, strip prefixes
     sh = new MythSortHelper(Qt::CaseSensitive, SortPrefixRemove, "");
@@ -121,6 +123,7 @@ void TestSortHelper::Variations_test(void)
     QVERIFY(sh->doTitle("The Sting") != "sting, the");
     QVERIFY(sh->doPathname("/video/recordings/The Flash/Season 1/The Flash - S01E01.ts")
             == "/video/recordings/Flash/Season 1/Flash - S01E01.ts");
+    delete sh;
 
     // Case insensitive, strip prefixes
     sh = new MythSortHelper(Qt::CaseInsensitive, SortPrefixRemove, "");
@@ -132,6 +135,7 @@ void TestSortHelper::Variations_test(void)
     QVERIFY(sh->doTitle("The Thing") != "thing, the");
     QVERIFY(sh->doPathname("/video/recordings/The Flash/Season 1/The Flash - S01E01.ts")
             == "/video/recordings/flash/season 1/flash - s01e01.ts");
+    delete sh;
 
     // Case insensitive, prefixes to end
     sh = new MythSortHelper(Qt::CaseInsensitive, SortPrefixToEnd, "");
@@ -141,6 +145,7 @@ void TestSortHelper::Variations_test(void)
     QVERIFY(sh->doTitle("The Flash") != "flash");
     QVERIFY(sh->doPathname("/video/recordings/The Flash/Season 1/The Flash - S01E01.ts")
             == "/video/recordings/flash, the/season 1/flash - s01e01.ts, the");
+    delete sh;
 
     // Case insensitive, strip prefixes, exclusions
     sh = new MythSortHelper(Qt::CaseInsensitive, SortPrefixRemove, "A to Z;The Jetsons");
@@ -154,6 +159,7 @@ void TestSortHelper::Variations_test(void)
             == "/video/recordings/the jetsons/season 1/the jetsons - s01e01.ts");
     QVERIFY(sh->doPathname("/video/recordings/The Flinstones/Season 1/The Flinstones - S01E01.ts")
             == "/video/recordings/flinstones/season 1/flinstones - s01e01.ts");
+    delete sh;
 }
 
 QTEST_APPLESS_MAIN(TestSortHelper)
