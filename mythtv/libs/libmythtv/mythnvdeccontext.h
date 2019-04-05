@@ -24,10 +24,6 @@ class MythNVDECContext
     static enum AVPixelFormat GetFormat  (AVCodecContext *Contextconst, const AVPixelFormat *PixFmt);
     static int  GetBuffer                (AVCodecContext *Context,
                                           AVFrame *Frame, int Flags);
-    static void ReleaseBuffer            (void *Opaque, uint8_t *Data);
-    static void DeviceContextFinished    (AVHWDeviceContext *Context);
-    static void CreateDecoderCallback    (void *Wait, void *Context, void*);
-    static void DestroyInteropCallback   (void *Wait, void *Interop, void*);
     static int  InitialiseDecoder        (AVCodecContext *Context);
 };
 

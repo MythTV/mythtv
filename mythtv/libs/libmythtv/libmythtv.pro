@@ -412,6 +412,7 @@ using_frontend {
     HEADERS += videooutwindow.h         videocolourspace.h
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
+    HEADERS += mythhwcontext.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp
@@ -419,6 +420,7 @@ using_frontend {
     SOURCES += videooutwindow.cpp       util-osd.cpp
     SOURCES += videocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
+    SOURCES += mythhwcontext.cpp
 
    using_opengl : !win32-msvc* {
         # Goom

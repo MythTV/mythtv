@@ -1576,7 +1576,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VDPAU
     if (CODEC_IS_VDPAU(codec1, enc) && codec_is_vdpau_hw(m_video_codec_id))
     {
-        enc->get_buffer2     = MythVDPAUContext::GetBuffer;
+        enc->get_buffer2     = MythHWContext::GetBuffer;
         enc->get_format      = MythVDPAUContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
@@ -1598,7 +1598,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VAAPI
     if (CODEC_IS_VAAPI(codec1, enc) && codec_is_vaapi(m_video_codec_id))
     {
-        enc->get_buffer2     = MythVAAPIContext::GetBuffer;
+        enc->get_buffer2     = MythHWContext::GetBuffer;
         enc->get_format      = MythVAAPIContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
@@ -3978,12 +3978,12 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 #ifdef USING_VTB
         // VideoToolBox does not call get_buffer2 - so initialise the frame now
         if (mpa_pic->format == AV_PIX_FMT_VIDEOTOOLBOX)
-            if (MythVTBContext::InitialiseBuffer(context, mpa_pic, 0) >= 0)
+            if (MythHWContext::GetBuffer2(context, mpa_pic, 0) >= 0)
                 picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
 #endif
 #ifdef USING_MEDIACODEC
         if (mpa_pic->format == AV_PIX_FMT_MEDIACODEC)
-            if (MythMediaCodecContext::GetBuffer(context, mpa_pic, 0) >= 0)
+            if (MythHWContext::GetBuffer2(context, mpa_pic, 0) >= 0)
                 picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
 #endif
 #ifdef USING_NVDEC

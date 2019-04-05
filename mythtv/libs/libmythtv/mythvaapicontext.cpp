@@ -21,34 +21,6 @@ extern "C" {
 
 #define LOC QString("VAAPIDec: ")
 
-void MythVAAPIContext::DestroyInteropCallback(void *Wait, void *Interop, void *)
-{
-    MythOpenGLInterop *interop = static_cast<MythOpenGLInterop*>(Interop);
-    QWaitCondition    *wait    = static_cast<QWaitCondition*>(Wait);
-    if (interop)
-        interop->DecrRef();
-    if (wait)
-        wait->wakeAll();
-}
-
-void MythVAAPIContext::FramesContextFinished(AVHWFramesContext *Context)
-{
-    if (!Context)
-        return;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI frames context destroyed");
-
-    MythVAAPIInterop *interop = reinterpret_cast<MythVAAPIInterop*>(Context->user_opaque);
-    if (interop && gCoreContext->IsUIThread())
-        interop->DecrRef();
-    else if (interop)
-        MythMainWindow::HandleCallback("Destroy VAAPI interop", &DestroyInteropCallback, interop, nullptr);
-}
-
-void MythVAAPIContext::DeviceContextFinished(AVHWDeviceContext*)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI device context destroyed");
-}
-
 VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
 {
     if (!Codec)
@@ -242,98 +214,51 @@ enum AVPixelFormat MythVAAPIContext::GetFormat(struct AVCodecContext *Context,
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
-            if (MythVAAPIContext::InitialiseDecoder(Context) >= 0)
+            if (MythHWContext::InitialiseDecoder(Context, MythVAAPIContext::InitialiseContext, "VAAPI context creation") >= 0)
                 return *PixFmt;
         PixFmt++;
     }
     return ret;
 }
 
-int MythVAAPIContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
-{
-    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
-    VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
-
-    // set fields required for directrendering
-    for (int i = 0; i < 4; i++)
-    {
-        Frame->data[i]     = nullptr;
-        Frame->linesize[i] = 0;
-    }
-    Frame->opaque           = videoframe;
-    videoframe->pix_fmt     = Context->pix_fmt;
-    Frame->reordered_opaque = Context->reordered_opaque;
-
-    int ret = avcodec_default_get_buffer2(Context, Frame, Flags);
-    if (ret < 0)
-        return ret;
-
-    // avcodec_default_get_buffer2 will retrieve an AVBufferRef from the pool of
-    // VAAPI surfaces stored within AVHWFramesContext. The pointer to VASurfaceID is stored
-    // in Frame->data[3]. Store this in VideoFrame::buf for MythVAAPIInterop to use.
-    videoframe->buf = Frame->data[3];
-    // Frame->buf(0) also contains a reference to the buffer. Take an additional reference to this
-    // buffer to retain the surface until it has been displayed (otherwise it is
-    // reused once the decoder is finished with it).
-    videoframe->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
-    // frame->hw_frames_ctx contains a reference to the AVHWFramesContext. Take an additional
-    // reference to ensure AVHWFramesContext is not released until we are finished with it.
-    // This also contains the underlying MythOpenGLInterop class reference.
-    videoframe->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->hw_frames_ctx));
-
-    // Set release method
-    Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
-                                     MythVAAPIContext::ReleaseBuffer, avfd, 0);
-    return ret;
-}
-
-void MythVAAPIContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
-{
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Opaque);
-    VideoFrame *frame = reinterpret_cast<VideoFrame*>(Data);
-    if (decoder && decoder->GetPlayer())
-        decoder->GetPlayer()->DeLimboFrame(frame);
-}
-
-void MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
+int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 {
     if (!Context || !gCoreContext->IsUIThread())
-        return;
+        return -1;
 
     MythCodecID vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
     MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(vaapiid);
     if (type == MythOpenGLInterop::Unsupported)
-        return;
+        return -1;
 
     MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
-        return;
+        return -1;
 
     AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
     if (!hwdeviceref || (hwdeviceref && !hwdeviceref->data))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI hardware device context");
-        return;
+        return -1;
     }
 
     // set hardware device context - just needs a display
     AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
-        return;
+        return -1;
     AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
     if (!vaapidevicectx)
-        return;
+        return -1;
 
     MythVAAPIInterop *interop = MythVAAPIInterop::Create(render, type);
     if (!interop->GetDisplay())
     {
         interop->DecrRef();
         av_buffer_unref(&hwdeviceref);
-        return;
+        return -1;
     }
 
-    // set the display and ensure it is closed when the device context is finished
-    hwdevicecontext->free   = &MythVAAPIContext::DeviceContextFinished;
+    // set the display
     vaapidevicectx->display = interop->GetDisplay();
 
     // initialise hardware device context
@@ -343,7 +268,7 @@ void MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI hardware context");
         av_buffer_unref(&hwdeviceref);
         interop->DecrRef();
-        return;
+        return res;
     }
 
     // allocate the hardware frames context for FFmpeg
@@ -353,7 +278,7 @@ void MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI hardware frames context");
         av_buffer_unref(&hwdeviceref);
         interop->DecrRef();
-        return;
+        return -1;
     }
 
     // setup the frames context
@@ -392,40 +317,18 @@ void MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
     hw_frames_ctx->user_opaque       = interop;
-    hw_frames_ctx->free              = &MythVAAPIContext::FramesContextFinished;
+    hw_frames_ctx->free              = &MythHWContext::FramesContextFinished;
     res = av_hwframe_ctx_init(Context->hw_frames_ctx);
     if (res < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI frames context");
         av_buffer_unref(&hwdeviceref);
         av_buffer_unref(&(Context->hw_frames_ctx));
-        return;
+        return res;
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces")
         .arg(vaapi_frames_ctx->nb_surfaces));
     av_buffer_unref(&hwdeviceref);
-}
-
-void MythVAAPIContext::InitialiseDecoderCallback(void* Wait, void* Context, void*)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Hardware decoder callback");
-    QWaitCondition* wait    = reinterpret_cast<QWaitCondition*>(Wait);
-    AVCodecContext* context = reinterpret_cast<AVCodecContext*>(Context);
-    InitialiseContext(context);
-    if (wait)
-        wait->wakeAll();
-}
-
-int MythVAAPIContext::InitialiseDecoder(AVCodecContext *Context)
-{
-    if (!Context)
-        return -1;
-
-    if (gCoreContext->IsUIThread())
-        InitialiseContext(Context);
-    else
-        MythMainWindow::HandleCallback("VAAPI context creation", &InitialiseDecoderCallback, Context, nullptr);
-
-    return Context->hw_frames_ctx ? 0 : -1;
+    return 0;
 }

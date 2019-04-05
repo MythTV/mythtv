@@ -27,14 +27,6 @@ class MythVTBContext : public MythCodecContext
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
 
-    // Direct rendering only
-    static int  InitialiseBuffer         (struct AVCodecContext *Context,
-                                          AVFrame *Frame, int Flags);
-    static void ReleaseBuffer            (void *Opaque, uint8_t *Data);
-    static void DeviceContextFinished    (AVHWDeviceContext *Context);
-    static void CreateDecoderCallback    (void *Wait, void *Context, void*);
-    static void DestroyInteropCallback   (void *Wait, void *Interop, void*);
-
   private:
     static bool CheckDecoderSupport      (uint StreamType, AVCodec **Codec);
     static int  InitialiseDecoder        (AVCodecContext *Context);

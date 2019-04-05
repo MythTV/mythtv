@@ -3,6 +3,7 @@
 #include "mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythnvdecinterop.h"
+#include "mythhwcontext.h"
 #include "mythnvdeccontext.h"
 
 #define LOC QString("NVDEC: ")
@@ -54,40 +55,6 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext*,
     return failure;
 }
 
-void MythNVDECContext::DestroyInteropCallback(void *Wait, void *Interop, void*)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Destroy interop callback");
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Interop);
-    if (interop)
-        interop->DecrRef();
-    if (wait)
-        wait->wakeAll();
-}
-
-void MythNVDECContext::DeviceContextFinished(AVHWDeviceContext* Context)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Device context finished");
-    MythNVDECInterop *interop = reinterpret_cast<MythNVDECInterop*>(Context->user_opaque);
-    if (!interop)
-        return;
-    if (gCoreContext->IsUIThread())
-        interop->DecrRef();
-    else
-        MythMainWindow::HandleCallback("Destroy NVDEC interop", &DestroyInteropCallback, interop, nullptr);
-}
-
-void MythNVDECContext::CreateDecoderCallback(void *Wait, void *Context, void*)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Create decoder callback");
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    AVCodecContext *context = reinterpret_cast<AVCodecContext*>(Context);
-    if (context)
-        MythNVDECContext::InitialiseDecoder(context);
-    if (wait)
-        wait->wakeAll();
-}
-
 int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
 {
     if (!gCoreContext->IsUIThread() || !Context)
@@ -123,7 +90,7 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     }
 
     AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    hwdevicecontext->free = &MythNVDECContext::DeviceContextFinished;
+    hwdevicecontext->free = &MythHWContext::DeviceContextFinished;
     hwdevicecontext->user_opaque = interop;
     Context->hw_device_ctx = hwdeviceref;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created CUDA device context");
@@ -132,11 +99,8 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
 
 int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
 {
-    if (gCoreContext->IsUIThread())
-        return InitialiseDecoder(Context);
-
-    MythMainWindow::HandleCallback("Create NVDEC decoder", &CreateDecoderCallback, Context, nullptr);
-    return Context->hw_device_ctx ? 0 : -1;
+    return MythHWContext::InitialiseDecoder2(Context, MythNVDECContext::InitialiseDecoder,
+                                             "Create NVDEC decoder");
 }
 
 enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AVPixelFormat *PixFmt)
@@ -202,14 +166,6 @@ int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
 
     // Set the release method
     Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
-                                     MythNVDECContext::ReleaseBuffer, avfd, 0);
+                                     MythHWContext::ReleaseBuffer, avfd, 0);
     return 0;
-}
-
-void MythNVDECContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
-{
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Opaque);
-    VideoFrame *frame = reinterpret_cast<VideoFrame*>(Data);
-    if (decoder && decoder->GetPlayer())
-        decoder->GetPlayer()->DeLimboFrame(frame);
 }
