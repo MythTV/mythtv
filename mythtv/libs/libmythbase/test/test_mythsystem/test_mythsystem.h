@@ -195,6 +195,9 @@ class TestMythSystem: public QObject
         MythSystem *ptr = MythSystem::Create(
             "sleep 10", kMSAutoCleanup | kMSRunBackground);
         QVERIFY(!ptr);
+
+        // Shouldn't return a pointer, but if it does, delete it.
+        delete ptr;
     }
 
     // TODO kMSDisableUDPListener -- disable MythMessage UDP listener
