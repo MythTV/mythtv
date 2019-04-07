@@ -13,7 +13,7 @@ class PlayGroupDBStorage : public SimpleDBStorage
   public:
     PlayGroupDBStorage(StandardSetting *_setting,
                        const PlayGroupConfig &_parent,
-                       QString          _name) :
+                       const QString&   _name) :
         SimpleDBStorage(_setting, "playgroup", _name), parent(_parent)
     {
     }
@@ -54,7 +54,7 @@ class SkipAhead : public MythUISpinBoxSetting
   public:
     explicit SkipAhead(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipahead"),
-                             0, 600, 5, true, PlayGroupConfig::tr("(default)"))
+                             0, 600, 5, 1, PlayGroupConfig::tr("(default)"))
 
     {
         setLabel(PlayGroupConfig::tr("Skip ahead (seconds)"));
@@ -68,7 +68,7 @@ class SkipBack : public MythUISpinBoxSetting
   public:
     explicit SkipBack(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipback"),
-                             0, 600, 5, true, PlayGroupConfig::tr("(default)"))
+                             0, 600, 5, 1, PlayGroupConfig::tr("(default)"))
     {
         setLabel(PlayGroupConfig::tr("Skip back (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip backward on "
@@ -81,7 +81,7 @@ class JumpMinutes : public MythUISpinBoxSetting
   public:
     explicit JumpMinutes(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "jump"),
-                             0, 30, 10, true, PlayGroupConfig::tr("(default)"))
+                             0, 30, 10, 1, PlayGroupConfig::tr("(default)"))
     {
         setLabel(PlayGroupConfig::tr("Jump amount (minutes)"));
         setHelpText(PlayGroupConfig::tr("How many minutes to jump forward or "
@@ -95,7 +95,7 @@ class TimeStretch : public MythUISpinBoxSetting
   public:
     explicit TimeStretch(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "timestretch"),
-                             45, 200, 5, false,
+                             45, 200, 5, 0,
                              PlayGroupConfig::tr("(default)"))
     {
         setValue(45);

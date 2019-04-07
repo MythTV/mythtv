@@ -310,12 +310,12 @@ bool PulseHandler::SuspendInternal(bool suspend)
     m_pending_operations = 2;
     pa_operation *operation_sink =
         pa_context_suspend_sink_by_index(
-            m_ctx, PA_INVALID_INDEX, suspend, OperationCallback, this);
+            m_ctx, PA_INVALID_INDEX, static_cast<int>(suspend), OperationCallback, this);
     pa_operation_unref(operation_sink);
 
     pa_operation *operation_source =
         pa_context_suspend_source_by_index(
-            m_ctx, PA_INVALID_INDEX, suspend, OperationCallback, this);
+            m_ctx, PA_INVALID_INDEX, static_cast<int>(suspend), OperationCallback, this);
     pa_operation_unref(operation_source);
 
     // run the loop manually and wait for the callbacks

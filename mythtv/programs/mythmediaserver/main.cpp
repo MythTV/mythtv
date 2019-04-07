@@ -163,11 +163,10 @@ int main(int argc, char *argv[])
     ms_sd_notify("STATUS=");
     ms_sd_notify("READY=1");
 
-    int exitCode = a.exec();
+    int exitCode = QCoreApplication::exec();
 
     ms_sd_notify("STOPPING=1\nSTATUS=Exiting");
-    if (sysEventHandler)
-        delete sysEventHandler;
+    delete sysEventHandler;
 
     return exitCode ? exitCode : GENERIC_EXIT_OK;
 }

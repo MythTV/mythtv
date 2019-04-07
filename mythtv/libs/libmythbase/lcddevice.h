@@ -18,7 +18,7 @@ class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
-                QString item_name, unsigned int item_indent  = 0,
+                const QString& item_name, unsigned int item_indent  = 0,
                 bool item_scroll = false) :
             m_selected(item_selected),  m_checked(item_checked),
             m_name(item_name),          m_scroll(item_scroll),
@@ -35,7 +35,7 @@ class MBASE_PUBLIC LCDMenuItem
 
     void setChecked(CHECKED_STATE value) { m_checked = value; }
     void setSelected(bool value) { m_selected = value; }
-    void setItemName(QString value) { m_name = value; }
+    void setItemName(const QString& value) { m_name = value; }
     void setScroll(bool value) { m_scroll = value; }
     void setIndent(unsigned int value) { m_indent = value; }
     void setScrollPos(unsigned int value) { m_scrollPosition = value; }
@@ -204,7 +204,7 @@ class MBASE_PUBLIC LCD : public QObject
     void setAudioFormatLEDs(enum LCDAudioFormatSet acodec, bool on);
     void setVideoFormatLEDs(enum LCDVideoFormatSet vcodec, bool on);
     void setVideoSrcLEDs(enum LCDVideoSourceSet vsrc, bool on);
-    void setFunctionLEDs(enum LCDFunctionSet video, bool on);
+    void setFunctionLEDs(enum LCDFunctionSet func, bool on);
     void setTunerLEDs(enum LCDTunerSet tuner, bool on);
     void setVariousLEDs(enum LCDVariousFlags various, bool on);
 
@@ -227,7 +227,7 @@ class MBASE_PUBLIC LCD : public QObject
     // While watching Live/Recording/Pause Buffer, occasionaly describe how
     // much of the program has been seen (between 0.0 and 1.0)
     // (e.g. [current time - start time] / [end time - start time]  )
-    void setChannelProgress(const QString &time, float percentViewed);
+    void setChannelProgress(const QString &time, float value);
 
     // Show the Menu
     // QPtrList is a pointer to a bunch of menu items
@@ -244,7 +244,7 @@ class MBASE_PUBLIC LCD : public QObject
     /** \brief Update the generic progress bar.
         \param generic_progress a value between 0 and 1.0
     */
-    void setGenericProgress(float generic_progress);
+    void setGenericProgress(float value);
 
     /** \brief Update the generic screen to display a busy spinner.
         \note The LCD busy spinner only 'moves' when this is called
@@ -253,7 +253,7 @@ class MBASE_PUBLIC LCD : public QObject
     void setGenericBusy();
 
     // Do a music progress bar with the generic level between 0 and 1.0
-    void setMusicProgress(const QString &time, float generic_progress);
+    void setMusicProgress(const QString &time, float value);
 
     /** \brief Set music player's repeat properties
         \param repeat the state of repeat
@@ -269,7 +269,7 @@ class MBASE_PUBLIC LCD : public QObject
     void switchToVolume(const QString &app_name);
 
     // Do a progress bar with the volume level between 0 and 1.0
-    void setVolumeLevel(float volume_level);
+    void setVolumeLevel(float value);
 
     // If some other process should be getting all the LCDd screen time (e.g.
     // mythMusic) we can use this to try and prevent and screens from showing

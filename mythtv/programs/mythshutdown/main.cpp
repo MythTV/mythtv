@@ -206,7 +206,7 @@ static bool isRunning(const char *program)
     return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
-static QDateTime getDailyWakeupTime(QString sPeriod)
+static QDateTime getDailyWakeupTime(const QString& sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime, "hh:mm");
@@ -912,7 +912,7 @@ int main(int argc, char **argv)
         if (res == 0)
         {
              // Nothing to stop a shutdown (eg. recording in progress).
-             res = setScheduledWakeupTime();
+             setScheduledWakeupTime();
              res = shutdown();
         }
 

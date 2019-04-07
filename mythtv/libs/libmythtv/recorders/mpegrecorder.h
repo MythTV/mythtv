@@ -21,7 +21,7 @@ class MpegRecorder : public V4LRecorder,
     void TeardownAll(void);
 
     void SetOption(const QString &opt, int value) override; // DTVRecorder
-    void SetOption(const QString &name, const QString &value) override; // DTVRecorder
+    void SetOption(const QString &opt, const QString &value) override; // DTVRecorder
     void SetVideoFilters(QString&) override {} // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,

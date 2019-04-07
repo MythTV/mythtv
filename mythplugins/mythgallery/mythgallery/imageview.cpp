@@ -104,7 +104,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     ThumbList fileList, dirList;
     LoadAlbumRunnable::filterDirectories(itemList, fileList, dirList);
-    AddItems(fileList);
+    ImageView::AddItems(fileList);
 
     if (recurse)
     {
@@ -206,7 +206,7 @@ QString ImageView::GetRandomEffect(void) const
     tmpMap.remove("none");
     tmpMap.remove("Ken Burns (gl)");
     QStringList t = tmpMap.keys();
-    int i = (int) ( (float)(t.count()) * random() / (RAND_MAX + 1.0f) );
+    int i = (int) ( (float)(t.count()) * random() / (RAND_MAX + 1.0F) );
     return tmpMap[t[i]];
 }
 
@@ -355,10 +355,7 @@ double ImageView::GetSeasonalWeight(ThumbItem *item) {
             LEADING_BETA_SHAPE - 1);
         return weight;
     }
-    else
-    {
-        return DEFAULT_WEIGHT;
-    }
+    return DEFAULT_WEIGHT;
 }
 
 ImageView::LoadAlbumRunnable::LoadAlbumRunnable(

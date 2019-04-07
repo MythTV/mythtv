@@ -28,6 +28,7 @@ using namespace std;
 #include <winsock2.h>
 #else
 #include <clocale>
+#include <utility>
 #endif
 
 #include "compat.h"
@@ -57,9 +58,9 @@ class MythCoreContextPrivate : public QObject
   public:
     MythCoreContextPrivate(MythCoreContext *lparent, QString binversion,
                            QObject *guicontext);
-   ~MythCoreContextPrivate();
+   ~MythCoreContextPrivate() override;
 
-    bool WaitForWOL(int timeout_ms = INT_MAX);
+    bool WaitForWOL(int timeout_in_ms = INT_MAX);
 
   public:
     MythCoreContext *m_parent;
@@ -122,7 +123,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
                                                QObject *guicontext)
     : m_parent(lparent),
       m_GUIcontext(guicontext), m_GUIobject(nullptr),
-      m_appBinaryVersion(binversion),
+      m_appBinaryVersion(std::move(binversion)),
       m_sockLock(QMutex::NonRecursive),
       m_serverSock(nullptr), m_eventSock(nullptr),
       m_WOLInProgress(false),
@@ -471,7 +472,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 break;
             }
 
-            setup_timeout = (int)(setup_timeout * 1.5f);
+            setup_timeout = (int)(setup_timeout * 1.5F);
         }
         else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
         {
@@ -739,20 +740,12 @@ bool MythCoreContext::IsFrontendOnly(void)
 
     SendReceiveStringList(strlist);
 
-    if (strlist[0] == "FALSE")
-        backendOnLocalhost = false;
-    else
-        backendOnLocalhost = true;
+    backendOnLocalhost = strlist[0] != "FALSE";
 
     return !backendOnLocalhost;
 }
 
-QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
-{
-    return GenMythURL(host,port.toInt(),path,storageGroup);
-}
-
-QString MythCoreContext::GenMythURL(QString host, int port, QString path, QString storageGroup)
+QString MythCoreContext::GenMythURL(const QString& host, int port, QString path, const QString& storageGroup)
 {
     QUrl ret;
 
@@ -899,7 +892,7 @@ QString MythCoreContext::GetSetting(const QString &key,
 bool MythCoreContext::GetBoolSetting(const QString &key, bool defaultval)
 {
     int result = GetNumSetting(key, static_cast<int>(defaultval));
-    return (result > 0) ? true : false;
+    return result > 0;
 }
 
 int MythCoreContext::GetNumSetting(const QString &key, int defaultval)
@@ -924,7 +917,7 @@ bool MythCoreContext::GetBoolSettingOnHost(const QString &key,
                                            bool defaultval)
 {
     int result = GetNumSettingOnHost(key, host, static_cast<int>(defaultval));
-    return (result > 0) ? true : false;
+    return result > 0;
 }
 
 int MythCoreContext::GetNumSettingOnHost(const QString &key,
@@ -1649,7 +1642,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
         return false;
     }
-    else if (strlist[0] == "REJECT" && strlist.size() >= 2)
+    if (strlist[0] == "REJECT" && strlist.size() >= 2)
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Protocol version or token mismatch "
                                           "(frontend=%1/%2,backend=%3/\?\?)\n")
@@ -1666,7 +1659,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
         return false;
     }
-    else if (strlist[0] == "ACCEPT")
+    if (strlist[0] == "ACCEPT")
     {
         if (!d->m_announcedProtocol)
         {
@@ -1794,7 +1787,7 @@ void MythCoreContext::ReInitLocale(void)
     QLocale::setDefault(d->m_locale->ToQLocale());
 }
 
-const QLocale MythCoreContext::GetQLocale(void)
+QLocale MythCoreContext::GetQLocale(void)
 {
     if (!d->m_locale)
         InitLocale();

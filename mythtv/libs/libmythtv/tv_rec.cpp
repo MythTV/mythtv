@@ -1,10 +1,11 @@
 // C headers
+#include <chrono> // for milliseconds
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <sched.h> // for sched_yield
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 // MythTV headers
 
@@ -54,7 +55,7 @@ QMap<uint,TVRec*> TVRec::s_inputs;
 static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
-static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*);
+static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/);
 static int eit_start_rand(int eitTransportTimeout);
 
 /** \class TVRec
@@ -311,7 +312,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     pendlock.unlock();
     statelock.unlock();
-    for (uint i = 0; i < inputids.size(); i++)
+    for (size_t i = 0; i < inputids.size(); i++)
         RemoteRecordPending(inputids[i], rcinfo, secsleft, hasLater);
     statelock.relock();
     pendlock.relock();
@@ -324,8 +325,7 @@ void TVRec::SetPseudoLiveTVRecording(RecordingInfo *pi)
 {
     RecordingInfo *old_rec = m_pseudoLiveTVRecording;
     m_pseudoLiveTVRecording = pi;
-    if (old_rec)
-        delete old_rec;
+    delete old_rec;
 }
 
 /** \fn TVRec::GetRecordEndTime(const ProgramInfo*) const
@@ -361,7 +361,7 @@ void TVRec::CancelNextRecording(bool cancel)
     if (cancel)
     {
         vector<uint> &inputids = (*it).possibleConflicts;
-        for (uint i = 0; i < inputids.size(); i++)
+        for (size_t i = 0; i < inputids.size(); i++)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("CancelNextRecording -- inputid 0x%1")
@@ -481,7 +481,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         vector<TVState> states;
 
         // Stop remote recordings if needed
-        for (uint i = 0; i < inputids.size(); i++)
+        for (size_t i = 0; i < inputids.size(); i++)
         {
             InputInfo busy_input;
             bool is_busy = RemoteIsBusy(inputids[i], busy_input);
@@ -981,8 +981,8 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
 #define TRANSITION(ASTATE,BSTATE) \
    ((m_internalState == (ASTATE)) && (m_desiredNextState == (BSTATE)))
-#define SET_NEXT() do { nextState = m_desiredNextState; changed = true; } while(0)
-#define SET_LAST() do { nextState = m_internalState; changed = true; } while(0)
+#define SET_NEXT() do { nextState = m_desiredNextState; changed = true; } while(false)
+#define SET_LAST() do { nextState = m_internalState; changed = true; } while(false)
 
 /** \fn TVRec::HandleStateChange(void)
  *  \brief Changes the internalState to the desiredNextState if possible.
@@ -1199,7 +1199,7 @@ static bool get_use_eit(uint inputid)
         MythDB::DBError("get_use_eit", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toBool();
     return false;
 }
@@ -1219,7 +1219,7 @@ static bool is_dishnet_eit(uint inputid)
         MythDB::DBError("is_dishnet_eit", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toBool();
     return false;
 }
@@ -1239,7 +1239,7 @@ static int num_inputs(void)
         MythDB::DBError("num_inputs", query);
         return -1;
     }
-    else if (query.next())
+    if (query.next())
         return query.value(0).toInt();
     return -1;
 }
@@ -1676,7 +1676,7 @@ bool TVRec::GetDevices(uint inputid,
     if (!test.isEmpty())
         gen_opts.inputtype = test;
 
-    gen_opts.skip_btaudio = query.value(5).toUInt();
+    gen_opts.skip_btaudio = query.value(5).toBool();
 
     gen_opts.signal_timeout  = (uint) max(query.value(6).toInt(), 0);
     gen_opts.channel_timeout = (uint) max(query.value(7).toInt(), 0);
@@ -1687,13 +1687,13 @@ bool TVRec::GetDevices(uint inputid,
     if (table_timeout < 100)
         gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
 
-    gen_opts.wait_for_seqstart = query.value(8).toUInt();
+    gen_opts.wait_for_seqstart = query.value(8).toBool();
 
     // DVB options
     uint dvboff = 9;
-    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toUInt();
+    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toBool();
     dvb_opts.dvb_tuning_delay = query.value(dvboff + 1).toUInt();
-    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toUInt();
+    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toBool();
 
     // Firewire options
     uint fireoff = dvboff + 3;
@@ -1937,7 +1937,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDTVSigMon_WaitForSDT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
-        sm->SetRotorTarget(1.0f);
+        sm->SetRotorTarget(1.0F);
 
         if (EITscan)
         {
@@ -1974,7 +1974,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPAT |
                      SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
-        sm->SetRotorTarget(1.0f);
+        sm->SetRotorTarget(1.0F);
 
         if (EITscan)
         {
@@ -2173,7 +2173,7 @@ DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
  *      RemoteEncoder::ShouldSwitchToAnotherInput(QString),
  *      CheckChannel(QString)
  */
-bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
+bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid)
 {
     QString msg("");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2261,7 +2261,7 @@ bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
  *      CheckChannel(ChannelBase*,const QString&,QString&),
  *      ShouldSwitchToAnotherInput(QString)
  */
-bool TVRec::CheckChannel(QString name) const
+bool TVRec::CheckChannel(const QString& name) const
 {
     if (!m_channel)
         return false;
@@ -2288,10 +2288,10 @@ static QString add_spacer(const QString &channel, const QString &spacer)
  *
  *   If the prefix matches any channel entirely (i.e. prefix == channum),
  *   then the inputid of the recorder it matches is returned in
- *   'is_complete_valid_channel_on_rec'; if it matches multiple recorders,
+ *   'complete_valid_channel_on_rec'; if it matches multiple recorders,
  *   and one of them is this recorder, this recorder is returned in
- *   'is_complete_valid_channel_on_rec'; if it isn't complete for any channel
- *    on any recorder 'is_complete_valid_channel_on_rec' is set to zero.
+ *   'complete_valid_channel_on_rec'; if it isn't complete for any channel
+ *    on any recorder 'complete_valid_channel_on_rec' is set to zero.
  *
  *   If adding another character could reduce the number of channels the
  *   prefix matches 'is_extra_char_useful' is set to true, otherwise it
@@ -2308,7 +2308,7 @@ static QString add_spacer(const QString &channel, const QString &spacer)
  *  \return true if this is a valid prefix for a channel, false otherwise
  */
 bool TVRec::CheckChannelPrefix(const QString &prefix,
-                               uint          &is_complete_valid_channel_on_rec,
+                               uint          &complete_valid_channel_on_rec,
                                bool          &is_extra_char_useful,
                                QString       &needed_spacer)
 {
@@ -2356,7 +2356,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
                     fchanid.push_back(query.value(0).toUInt());
                     fchannum.push_back(query.value(1).toString());
                     finputid.push_back(query.value(2).toUInt());
-                    fspacer.push_back(spacers[j]);
+                    fspacer.emplace_back(spacers[j]);
 #if DEBUG_CHANNEL_PREFIX
                     LOG(VB_GENERAL, LOG_DEBUG,
                         QString("(%1,%2) Adding %3 rec %4")
@@ -2373,7 +2373,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     // Now process the lists for the info we need...
     is_extra_char_useful = false;
-    is_complete_valid_channel_on_rec = 0;
+    complete_valid_channel_on_rec = 0;
     needed_spacer.clear();
 
     if (fchanid.empty())
@@ -2384,7 +2384,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         needed_spacer = fspacer[0];
         bool nc       = (fchannum[0] != add_spacer(prefix, fspacer[0]));
 
-        is_complete_valid_channel_on_rec = (nc) ? 0 : finputid[0];
+        complete_valid_channel_on_rec = (nc) ? 0 : finputid[0];
         is_extra_char_useful             = nc;
         return true;
     }
@@ -2405,19 +2405,19 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     }
 
     // Are any of the channels complete w/o spacer?
-    // If so set is_complete_valid_channel_on_rec,
+    // If so set complete_valid_channel_on_rec,
     // with a preference for our inputid.
-    for (uint i = 0; i < fchannum.size(); i++)
+    for (size_t i = 0; i < fchannum.size(); i++)
     {
         if (fchannum[i] == prefix)
         {
-            is_complete_valid_channel_on_rec = finputid[i];
+            complete_valid_channel_on_rec = finputid[i];
             if (finputid[i] == m_inputid)
                 break;
         }
     }
 
-    if (is_complete_valid_channel_on_rec)
+    if (complete_valid_channel_on_rec != 0)
         return true;
 
     // Add a spacer, if one is needed to select a valid channel.
@@ -2429,12 +2429,12 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     // If it isn't useful to wait for more characters,
     // then try to commit to any true match immediately.
-    for (uint i = 0; i < ((is_extra_char_useful) ? 0 : fchanid.size()); i++)
+    for (size_t i = 0; i < ((is_extra_char_useful) ? 0 : fchanid.size()); i++)
     {
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {
             needed_spacer = fspacer[i];
-            is_complete_valid_channel_on_rec = finputid[i];
+            complete_valid_channel_on_rec = finputid[i];
             return true;
         }
     }
@@ -2531,7 +2531,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
             (32767 == busy_input->m_mplexid) ? 0 : busy_input->m_mplexid;
     }
 
-    return busy_input->m_inputid;
+    return busy_input->m_inputid != 0U;
 }
 
 
@@ -2547,7 +2547,7 @@ float TVRec::GetFramerate(void)
 
     if (m_recorder)
         return m_recorder->GetFrameRate();
-    return -1.0f;
+    return -1.0F;
 }
 
 /** \fn TVRec::GetFramesWritten()
@@ -2636,7 +2636,7 @@ long long TVRec::GetMaxBitrate(void) const
     long long bitrate;
     if (m_genOpt.inputtype == "MPEG")
         bitrate = 10080000LL; // use DVD max bit rate
-    if (m_genOpt.inputtype == "HDPVR")
+    else if (m_genOpt.inputtype == "HDPVR")
         bitrate = 20200000LL; // Peek bit rate for HD-PVR
     else if (!CardUtil::IsEncoder(m_genOpt.inputtype))
         bitrate = 22200000LL; // 1080i
@@ -2667,7 +2667,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     m_tvChain->SetInputType(m_genOpt.inputtype);
 
     m_ispip = pip;
-    m_liveTVStartChannel = startchan;
+    m_liveTVStartChannel = std::move(startchan);
 
     // Change to WatchingLiveTV
     ChangeState(kState_WatchingLiveTV);
@@ -2935,7 +2935,7 @@ void TVRec::RecorderPaused(void)
 /**
  *  \brief Toggles whether the current channel should be on our favorites list.
  */
-void TVRec::ToggleChannelFavorite(QString changroupname)
+void TVRec::ToggleChannelFavorite(const QString& changroupname)
 {
     QMutexLocker lock(&m_stateChangeLock);
 
@@ -3070,7 +3070,7 @@ QString TVRec::SetInput(QString input)
  *  \param requestType tells us what kind of request to actually send to
  *                     the tuning thread, kFlagDetect is usually sufficient
  */
-void TVRec::SetChannel(QString name, uint requestType)
+void TVRec::SetChannel(const QString& name, uint requestType)
 {
     QMutexLocker locker1(&m_setChannelLock);
     QMutexLocker locker2(&m_stateChangeLock);
@@ -3310,9 +3310,9 @@ bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
 }
 
 bool TVRec::SetChannelInfo(uint chanid, uint sourceid,
-                           QString oldchannum,
-                           QString callsign, QString channum,
-                           QString channame, QString xmltvid)
+                           const QString& oldchannum,
+                           const QString& callsign, const QString& channum,
+                           const QString& channame, const QString& xmltvid)
 {
     if (!chanid || !sourceid || channum.isEmpty())
         return false;
@@ -3479,7 +3479,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
  */
 void TVRec::HandleTuning(void)
 {
-    if (m_tuningRequests.size())
+    if (!m_tuningRequests.empty())
     {
         TuningRequest request = m_tuningRequests.front();
         LOG(VB_RECORD, LOG_INFO, LOC +
@@ -3696,7 +3696,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         return;
     }
 
-    QString input   = request.input;
     QString channum = request.channel;
 
     bool ok1;
@@ -3727,11 +3726,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                 m_tuningRequests.enqueue(TuningRequest(kFlagKillRec));
             return;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to set channel to %1.").arg(channum));
-        }
+
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to set channel to %1.").arg(channum));
     }
 
 
@@ -3744,8 +3741,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
 
-    bool livetv = request.flags & kFlagLiveTV;
-    bool antadj = request.flags & kFlagAntennaAdjust;
+    bool livetv = (request.flags & kFlagLiveTV) != 0U;
+    bool antadj = (request.flags & kFlagAntennaAdjust) != 0U;
     bool use_sm = !mpts_only && SignalMonitor::IsRequired(m_genOpt.inputtype);
     bool use_dr = use_sm && (livetv || antadj);
     bool has_dummy = false;
@@ -3782,7 +3779,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         LOG(VB_RECORD, LOG_INFO, LOC + "Starting Signal Monitor");
         bool error = false;
         if (!SetupSignalMonitor(
-                !antadj, request.flags & kFlagEITScan, livetv | antadj))
+                !antadj, (request.flags & kFlagEITScan) != 0U, livetv || antadj))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup signal monitor");
             if (m_signalMonitor)
@@ -4517,7 +4514,7 @@ void TVRec::SetNextLiveTVDir(QString dir)
 {
     QMutexLocker lock(&m_nextLiveTVDirLock);
 
-    m_nextLiveTVDir = dir;
+    m_nextLiveTVDir = std::move(dir);
     m_triggerLiveTVDir.wakeAll();
 }
 
@@ -4799,16 +4796,14 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
             "Failed to create new RB.");
         return nullptr;
     }
-    else
-    {
-        m_recorder->SetNextRecording(ri, rb);
-        SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
-        m_recordEndTime = GetRecordEndTime(ri);
-        m_switchingBuffer = true;
-        ri->SetRecordingStatus(RecStatus::Recording);
-        LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
-        return ri;
-    }
+
+    m_recorder->SetNextRecording(ri, rb);
+    SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
+    m_recordEndTime = GetRecordEndTime(ri);
+    m_switchingBuffer = true;
+    ri->SetRecordingStatus(RecStatus::Recording);
+    LOG(VB_RECORD, LOG_INFO, LOC + "SwitchRecordingRingBuffer -> done");
+    return ri;
 }
 
 TVRec* TVRec::GetTVRec(uint inputid)

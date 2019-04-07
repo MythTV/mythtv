@@ -29,7 +29,7 @@ class MTV_PUBLIC BDInfo
 
   public:
     explicit BDInfo(const QString &filename);
-   ~BDInfo(void);
+   ~BDInfo(void) = default;
     bool IsValid(void) const { return m_isValid; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
     QString GetLastError(void) const { return m_lastError; }
@@ -52,8 +52,8 @@ class BDOverlay
 {
   public:
     BDOverlay() = default;
-    explicit BDOverlay(const bd_overlay_s * const overlay);
-    explicit BDOverlay(const bd_argb_overlay_s * const overlay);
+    explicit BDOverlay(const bd_overlay_s * overlay);
+    explicit BDOverlay(const bd_argb_overlay_s * overlay);
 
     void    setPalette(const BD_PG_PALETTE_ENTRY *palette);
     void    wipe();
@@ -76,7 +76,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
 
   public:
     explicit BDRingBuffer(const QString &lfilename);
-    virtual ~BDRingBuffer();
+    ~BDRingBuffer() override;
 
     bool IsStreamed(void) override { return true; } // RingBuffer
 
@@ -93,8 +93,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
 
     void ClearOverlays(void);
     BDOverlay* GetOverlay(void);
-    void SubmitOverlay(const bd_overlay_s * const overlay);
-    void SubmitARGBOverlay(const bd_argb_overlay_s * const overlay);
+    void SubmitOverlay(const bd_overlay_s * overlay);
+    void SubmitARGBOverlay(const bd_argb_overlay_s * overlay);
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void);

@@ -67,7 +67,7 @@ class MTV_PUBLIC ProfileItem
     // Other
     bool checkRange(QString key, float fvalue, bool *ok = nullptr) const;
     bool checkRange(QString key, int ivalue, bool *ok = nullptr) const;
-    bool checkRange(QString key,
+    bool checkRange(const QString& key,
         float fvalue, int ivalue, bool isFloat, bool *ok = nullptr) const;
     bool IsMatch(const QSize &size, float framerate, const QString &codecName) const;
     bool IsValid(QString *reason = nullptr) const;
@@ -129,7 +129,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetDecoders(void);
     static QStringList GetDecoderNames(void);
     static QString     GetDecoderName(const QString &decoder);
-    static QString     GetDecoderHelp(QString decoder = QString());
+    static QString     GetDecoderHelp(const QString& decoder = QString());
 
     static QString     GetDefaultProfileName(const QString &hostname);
     static void        SetDefaultProfileName(const QString &profilename,
@@ -140,23 +140,23 @@ class MTV_PUBLIC VideoDisplayProfile
 
     static bool        DeleteProfileGroup(const QString &groupname,
                                           const QString &hostname);
-    static uint        CreateProfileGroup(const QString &groupname,
+    static uint        CreateProfileGroup(const QString &profilename,
                                           const QString &hostname);
 
     static void        CreateProfile(
-        uint grpid, uint priority,
-        QString cmp0, uint width0, uint height0,
-        QString cmp1, uint width1, uint height1,
+        uint groupid, uint priority,
+        const QString& cmp0, uint width0, uint height0,
+        const QString& cmp1, uint width1, uint height1,
         QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
         QString osdrenderer, bool osdfade,
         QString deint0, QString deint1, QString filters);
 
     static void CreateProfile(
         uint groupid, uint priority,
-        QString width, QString height, QString codecs,
-        QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-        QString osdrenderer, bool osdfade,
-        QString deint0, QString deint1, QString filters);
+        const QString& width, const QString& height, const QString& codecs,
+        const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+        const QString& osdrenderer, bool osdfade,
+        const QString& deint0, const QString& deint1, const QString& filters);
 
     static void        DeleteProfiles(const QString &hostname);
     static void        CreateProfiles(const QString &hostname);

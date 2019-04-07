@@ -43,7 +43,7 @@ class FirewireRecorder :
     bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
     // Implements TSDataListener
-    void AddData(const unsigned char *data, uint dataSize) override; // TSDataListener
+    void AddData(const unsigned char *data, uint len) override; // TSDataListener
 
     bool ProcessTSPacket(const TSPacket &tspacket) override; // DTVRecorder
 

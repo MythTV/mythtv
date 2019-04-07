@@ -51,6 +51,7 @@
 
 
 #include <QMutexLocker>
+#include <utility>
 
 #include "mythevent.h"
 #include "mythdbcon.h"
@@ -113,7 +114,7 @@ bool HouseKeeperTask::CheckRun(QDateTime now)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Checking to run %1").arg(GetTag()));
     bool check = false;
-    if (!m_confirm && !m_running && (check = DoCheckRun(now)))
+    if (!m_confirm && !m_running && (check = DoCheckRun(std::move(now))))
         // if m_confirm is already set, the task is already in the queue
         // and should not be queued a second time
         m_confirm = true;
@@ -322,7 +323,7 @@ PeriodicHouseKeeperTask::PeriodicHouseKeeperTask(const QString &dbTag,
     HouseKeeperTask(dbTag, scope, startup), m_period(period), m_retry(retry),
     m_windowPercent(min, max), m_currentProb(1.0)
 {
-    CalculateWindow();
+    PeriodicHouseKeeperTask::CalculateWindow();
     if (m_retry == 0)
         m_retry = m_period;
 }
@@ -381,7 +382,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
 
     // calculate probability that task should not have yet run
     // it's backwards, but it makes the math simplier
-    float prob = 1.0f - ((float)(elapsed - m_windowElapsed.first) /
+    float prob = 1.0F - ((float)(elapsed - m_windowElapsed.first) /
                     (float)(m_windowElapsed.second - m_windowElapsed.first));
     if (m_currentProb < prob)
         // more bad stuff
@@ -413,18 +414,13 @@ bool PeriodicHouseKeeperTask::InWindow(QDateTime now)
         // something bad has happened. let's just move along
         return false;
 
-    if ((elapsed > m_windowElapsed.first) &&
-        (elapsed < m_windowElapsed.second))
-            return true;
-
-    return false;
+    return (elapsed > m_windowElapsed.first) &&
+           (elapsed < m_windowElapsed.second);
 }
 
 bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
 {
-    if (GetLastRun().secsTo(now) > m_windowElapsed.second)
-        return true;
-    return false;
+    return GetLastRun().secsTo(now) > m_windowElapsed.second;
 }
 
 /** \class DailyHouseKeeperTask
@@ -445,7 +441,7 @@ DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
     PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
     m_windowHour(0, 23)
 {
-    CalculateWindow();
+    DailyHouseKeeperTask::CalculateWindow();
 }
 
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag, int minhour,
@@ -453,7 +449,7 @@ DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag, int minhour,
     PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
     m_windowHour(minhour, maxhour)
 {
-    CalculateWindow();
+    DailyHouseKeeperTask::CalculateWindow();
 }
 
 void DailyHouseKeeperTask::CalculateWindow(void)
@@ -489,12 +485,9 @@ bool DailyHouseKeeperTask::InWindow(QDateTime now)
         return true;
 
     int hour = now.time().hour();
-    if (PastWindow(now) && (m_windowHour.first <= hour)
-                        && (m_windowHour.second > hour))
-        // we've missed the window, but we're within our time constraints
-        return true;
-
-    return false;
+    // true if we've missed the window, but we're within our time constraints
+    return PastWindow(now) && (m_windowHour.first <= hour)
+                        && (m_windowHour.second > hour);
 }
 
 /** \class HouseKeepingThread

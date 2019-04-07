@@ -185,7 +185,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     if (opt == "mpeg2streamtype")
     {
         bool found = false;
-        for (unsigned int i = 0; i < sizeof(s_streamType) / sizeof(char*); i++)
+        for (size_t i = 0; i < sizeof(s_streamType) / sizeof(char*); i++)
         {
             if (QString(s_streamType[i]) == value)
             {
@@ -376,9 +376,9 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     uint32_t capabilities = 0;
     if (CardUtil::GetV4LInfo(m_chanfd, m_card, m_driver, m_version, capabilities))
     {
-        m_supports_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
-        supports_tuner      = !!(capabilities & V4L2_CAP_TUNER);
-        supports_audio      = !!(capabilities & V4L2_CAP_AUDIO);
+        m_supports_sliced_vbi = ((capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U);
+        supports_tuner        = ((capabilities & V4L2_CAP_TUNER) != 0U);
+        supports_audio        = ((capabilities & V4L2_CAP_AUDIO) != 0U);
         /// Determine hacks needed for specific drivers & driver versions
         if (m_driver == "hdpvr")
         {
@@ -563,7 +563,7 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
 
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
-    int value = (int) ((range * m_audvolume * 0.01f) + qctrl.minimum);
+    int value = (int) ((range * m_audvolume * 0.01F) + qctrl.minimum);
     int ctrl_volume = min(qctrl.maximum, max(qctrl.minimum, value));
 
     // Set recording volume
@@ -715,7 +715,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
     }
     control_description_lock.unlock();
 
-    for (uint i = 0; i < ext_ctrls.size(); i++)
+    for (size_t i = 0; i < ext_ctrls.size(); i++)
     {
         struct v4l2_ext_controls ctrls;
         memset(&ctrls, 0, sizeof(struct v4l2_ext_controls));
@@ -1218,8 +1218,7 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 
     bool ret = DTVRecorder::ProcessTSPacket(tspacket);
 
-    if (tspacket_fake)
-        delete tspacket_fake;
+    delete tspacket_fake;
 
     return ret;
 }

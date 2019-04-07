@@ -1,7 +1,8 @@
-#include <QTimer>
 #include <QTcpSocket>
-#include <QtEndian>
 #include <QTextStream>
+#include <QTimer>
+#include <QtEndian>
+#include <utility>
 
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -63,7 +64,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
   : QObject(parent),
     m_socket(socket),
-    m_hardwareId(id),
+    m_hardwareId(std::move(id)),
     m_dataPort(port)
 {
     m_id = GetNotificationCenter()->Register(this);
@@ -224,7 +225,7 @@ bool MythRAOPConnection::Init(void)
  * Socket incoming data signal handler
  * use for audio, control and timing socket
  */
-void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress /*peer*/,
+void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer*/,
                                       quint16 /*port*/)
 {
     // restart the idle timer
@@ -852,7 +853,7 @@ void MythRAOPConnection::readClient(void)
         }
         while (!line.isNull());
 
-        if (m_incomingHeaders.size() == 0)
+        if (m_incomingHeaders.empty())
             return;
 
         if (!stream.atEnd())
@@ -876,10 +877,7 @@ void MythRAOPConnection::readClient(void)
         m_incomingPartial = true;
         return;
     }
-    else
-    {
-        m_incomingPartial = false;
-    }
+    m_incomingPartial = false;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Content(%1) = %2")
         .arg(m_incomingContent.size()).arg(m_incomingContent.constData()));
 
@@ -1341,9 +1339,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
                 if (name == "volume" && m_allowVolumeControl && m_audio)
                 {
-                    float volume = (param.toFloat() + 30.0f) * 100.0f / 30.0f;
-                    if (volume < 0.01f)
-                        volume = 0.0f;
+                    float volume = (param.toFloat() + 30.0F) * 100.0F / 30.0F;
+                    if (volume < 0.01F)
+                        volume = 0.0F;
                     LOG(VB_PLAYBACK, LOG_INFO,
                         LOC + QString("Setting volume to %1 (raw %3)")
                         .arg(volume).arg(param));
@@ -1408,7 +1406,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         int volume = (m_allowVolumeControl && m_audio) ?
                             m_audio->GetCurrentVolume() : 0;
                         responseData += QString("volume: %1\r\n")
-                            .arg(volume * 30.0f / 100.0f - 30.0f,1,'f',6,'0');
+                            .arg(volume * 30.0F / 100.0F - 30.0F,1,'f',6,'0');
                     }
                 }
             }
@@ -1542,15 +1540,15 @@ QStringList MythRAOPConnection::splitLines(const QByteArray &lines)
 /**
  * stringFromSeconds:
  *
- * Usage: stringFromSeconds(seconds)
+ * Usage: stringFromSeconds(timeInSeconds)
  * Description: create a string in the format HH:mm:ss from a duration in seconds
  * HH: will not be displayed if there's less than one hour
  */
-QString MythRAOPConnection::stringFromSeconds(int time)
+QString MythRAOPConnection::stringFromSeconds(int timeInSeconds)
 {
-    int   hour    = time / 3600;
-    int   minute  = (time - hour * 3600) / 60;
-    int seconds   = time - hour * 3600 - minute * 60;
+    int hour    = timeInSeconds / 3600;
+    int minute  = (timeInSeconds - hour * 3600) / 60;
+    int seconds = timeInSeconds - hour * 3600 - minute * 60;
     QString str;
 
     if (hour)
@@ -1759,7 +1757,6 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
     m_eventClients.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteEventClient()));
-    return;
 }
 
 void MythRAOPConnection::deleteEventClient(void)

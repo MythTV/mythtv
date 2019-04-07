@@ -157,7 +157,7 @@ void MythSystemLegacy::SetCommand(const QString &command,
     }
 
     // check for execute rights
-    if (!GetSetting("UseShell") && access(command.toUtf8().constData(), X_OK))
+    if (!GetSetting("UseShell") && (access(command.toUtf8().constData(), X_OK)) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MythSystemLegacy(%1) command not executable, ")
@@ -360,10 +360,10 @@ void MythSystemLegacy::ProcessFlags(uint flags)
     if (GetSetting("IsInUI"))
     {
         // Check for UI-only locks
-        m_settings["BlockInputDevs"] = !(flags & kMSDontBlockInputDevs);
-        m_settings["DisableDrawing"] = !(flags & kMSDontDisableDrawing);
-        m_settings["ProcessEvents"]  = flags & kMSProcessEvents;
-        m_settings["DisableUDP"]     = flags & kMSDisableUDPListener;
+        m_settings["BlockInputDevs"] = ((flags & kMSDontBlockInputDevs) == 0U);
+        m_settings["DisableDrawing"] = ((flags & kMSDontDisableDrawing) == 0U);
+        m_settings["ProcessEvents"]  = ((flags & kMSProcessEvents)      != 0U);
+        m_settings["DisableUDP"]     = ((flags & kMSDisableUDPListener) != 0U);
     }
 
     if (flags & kMSStdIn)

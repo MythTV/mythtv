@@ -39,7 +39,7 @@ class AudioInputOSS : public AudioInput
         bool Stop(void) override; // AudioInput
 
         int GetBlockSize(void) override; // AudioInput
-        int GetSamples(void *buffer, uint num_samples) override; // AudioInput
+        int GetSamples(void *buffer, uint num_bytes) override; // AudioInput
         int GetNumReadyBytes(void) override; // AudioInput
 
     private:

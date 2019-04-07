@@ -211,13 +211,13 @@ bool ImportRecorder::Open(void)
 
         return false;
     }
-    else if (!f.isReadable())
+    if (!f.isReadable())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("'%1' is not readable").arg(fn));
         return false;
     }
-    else if (!f.size())
+    if (!f.size())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("'%1' is empty").arg(fn));

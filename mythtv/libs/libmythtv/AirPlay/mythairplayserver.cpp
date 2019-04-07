@@ -152,8 +152,8 @@ QString GenerateNonce(void)
     return nonce;
 }
 
-QByteArray DigestMd5Response(QString response, QString option,
-                             QString nonce, QString password,
+QByteArray DigestMd5Response(const QString& response, const QString& option,
+                             const QString& nonce, const QString& password,
                              QByteArray &auth)
 {
     int authStart       = response.indexOf("response=\"") + 10;
@@ -222,7 +222,7 @@ class APHTTPRequest
         Check();
     }
 
-    QByteArray GetQueryValue(QByteArray key)
+    QByteArray GetQueryValue(const QByteArray& key)
     {
         for (int i = 0; i < m_queries.size(); i++)
             if (m_queries[i].first == key)
@@ -501,7 +501,6 @@ void MythAirplayServer::Start(void)
         m_serviceRefresh->start(2000);
     }
     m_valid = true;
-    return;
 }
 
 void MythAirplayServer::timeout(void)
@@ -725,9 +724,9 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         GetNotificationCenter()->Queue(n);
     }
 
-    double position    = 0.0f;
-    double duration    = 0.0f;
-    float  playerspeed = 0.0f;
+    double position    = 0.0F;
+    double duration    = 0.0F;
+    float  playerspeed = 0.0F;
     bool   playing     = false;
     QString pathname;
     GetPlayerStatus(playing, playerspeed, position, duration, pathname);
@@ -818,7 +817,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 .arg(position).arg(duration));
 
             /*
-            if (playing && playerspeed < 1.0f)
+            if (playing && playerspeed < 1.0F)
             {
                 SendReverseEvent(session, AP_EVENT_PLAYING);
                 QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
@@ -883,9 +882,9 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         float rate = req->GetQueryValue("value").toFloat();
         m_connections[session].m_speed = rate;
 
-        if (rate < 1.0f)
+        if (rate < 1.0F)
         {
-            if (playerspeed > 0.0f)
+            if (playerspeed > 0.0F)
             {
                 PausePlayback();
             }
@@ -893,7 +892,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         }
         else
         {
-            if (playerspeed < 1.0f)
+            if (playerspeed < 1.0F)
             {
                 UnpausePlayback();
             }
@@ -905,7 +904,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/play")
     {
         QByteArray file;
-        double start_pos = 0.0f;
+        double start_pos = 0.0F;
         if (req->GetHeaders().contains("Content-Type") &&
             req->GetHeaders()["Content-Type"] == "application/x-apple-binary-plist")
         {
@@ -963,9 +962,9 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             body.replace("%1", QString("%1").arg(duration, 0, 'f', 6, '0'));
             body.replace("%2", QString("%1").arg(duration, 0, 'f', 6, '0')); // cached
             body.replace("%3", QString("%1").arg(position, 0, 'f', 6, '0'));
-            body.replace("%4", playerspeed > 0.0f ? "1.0" : "0.0");
+            body.replace("%4", playerspeed > 0.0F ? "1.0" : "0.0");
             LOG(VB_GENERAL, LOG_DEBUG, body);
-            SendReverseEvent(session, playerspeed > 0.0f ? AP_EVENT_PLAYING :
+            SendReverseEvent(session, playerspeed > 0.0F ? AP_EVENT_PLAYING :
                                                            AP_EVENT_PAUSED);
         }
     }
@@ -973,8 +972,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 }
 
 void MythAirplayServer::SendResponse(QTcpSocket *socket,
-                                     int status, QByteArray header,
-                                     QByteArray content_type, QString body)
+                                     int status, const QByteArray& header,
+                                     const QByteArray& content_type, const QString& body)
 {
     if (!socket || !m_incoming.contains(socket) ||
         socket->state() != QAbstractSocket::ConnectedState)
@@ -1123,9 +1122,9 @@ void MythAirplayServer::StopSession(const QByteArray &session)
         return;
     }
     cnx.m_stopped = true;
-    double position    = 0.0f;
-    double duration    = 0.0f;
-    float  playerspeed = 0.0f;
+    double position    = 0.0F;
+    double duration    = 0.0F;
+    float  playerspeed = 0.0F;
     bool   playing     = false;
     QString pathname;
     GetPlayerStatus(playing, playerspeed, position, duration, pathname);
@@ -1271,7 +1270,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
 
 void MythAirplayServer::PausePlayback(void)
 {
-    if (TV::IsTVRunning() && !TV::CurrentTVInstance()->IsPaused())
+    if (TV::IsTVRunning() && !TV::IsPaused())
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("Sending ACTION_PAUSE for %1")

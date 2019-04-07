@@ -110,7 +110,7 @@ bool DisplayRes::Initialize(void)
     // Find maximum resolution, needed for initializing X11 window
     const DisplayResVector& screens = GetVideoModes();
 
-    for (uint i = 0; i < screens.size(); ++i)
+    for (size_t i = 0; i < screens.size(); ++i)
     {
         m_maxWidth = std::max(m_maxWidth, screens[i].Width());
         m_maxHeight = std::max(m_maxHeight, screens[i].Height());
@@ -235,7 +235,7 @@ bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
     return SwitchToGUI(CUSTOM_GUI);
 }
 
-const std::vector<double> DisplayRes::GetRefreshRates(int width,
+std::vector<double> DisplayRes::GetRefreshRates(int width,
         int height) const
 {
     double tr;
@@ -259,7 +259,7 @@ const std::vector<double> DisplayRes::GetRefreshRates(int width,
  *   class if needed, and returns a copy of vector returned by
  *   DisplayRes::GetVideoModes(void).
  */
-const DisplayResVector GetVideoModes(void)
+DisplayResVector GetVideoModes(void)
 {
     DisplayRes *display_res = DisplayRes::GetDisplayRes();
 

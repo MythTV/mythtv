@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-int hamm8(unsigned char *p, int *err);
-int hamm16(unsigned char *p, int *err);
-int hamm24(unsigned char *p, int *err);
+int hamm8(const unsigned char *p, int *err);
+int hamm16(const unsigned char *p, int *err);
+int hamm24(const unsigned char *p, int *err);
 int chk_parity(unsigned char *p, int n);
 
 #ifdef __cplusplus

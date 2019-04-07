@@ -87,7 +87,7 @@ class AudioOutputDXPrivate
         HINSTANCE            m_dsound_dll   {nullptr};
         LPDIRECTSOUND        m_dsobject     {nullptr};
         LPDIRECTSOUNDBUFFER  m_dsbuffer     {nullptr};
-        bool                 m_playStarted  {false];
+        bool                 m_playStarted  {false};
         DWORD                m_writeCursor  {0};
         GUID                 m_deviceGUID;
         GUID                *m_chosenGUID   {nullptr};
@@ -601,7 +601,7 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
 {
     HRESULT dsresult;
     float dbAtten = 20 * log10((float)volume/100);
-    long dxVolume = (volume == 0) ? DSBVOLUME_MIN : (long)(100.0f * dbAtten);
+    long dxVolume = (volume == 0) ? DSBVOLUME_MIN : (long)(100.0F * dbAtten);
 
     if (m_UseSPDIF)
         return;

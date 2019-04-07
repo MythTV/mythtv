@@ -113,7 +113,7 @@ class EncoderLink
     void StopLiveTV(void);
     void PauseRecorder(void);
     void SetLiveRecording(int);
-    void SetNextLiveTVDir(QString dir);
+    void SetNextLiveTVDir(const QString& dir);
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);

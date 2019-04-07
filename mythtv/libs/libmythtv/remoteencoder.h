@@ -45,7 +45,7 @@ class MTV_PUBLIC RemoteEncoder
     void FillDurationMap(int64_t start, int64_t end,
                          frm_pos_map_t &durationMap);
     void StopPlaying(void);
-    void SpawnLiveTV(QString chainid, bool pip, QString startchan);
+    void SpawnLiveTV(const QString& chainid, bool pip, const QString& startchan);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void FinishRecording(void);
@@ -54,18 +54,18 @@ class MTV_PUBLIC RemoteEncoder
 
     void SetLiveRecording(bool recording);
     QString GetInput(void);
-    QString SetInput(QString);
+    QString SetInput(const QString&);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(
         PictureAdjustType type, PictureAttribute attr, bool up);
     void ChangeChannel(int channeldirection);
     void ChangeDeinterlacer(int deint_mode);
-    void ToggleChannelFavorite(QString);
-    void SetChannel(QString channel);
+    void ToggleChannelFavorite(const QString&);
+    void SetChannel(const QString& channel);
     int  SetSignalMonitoringRate(int rate, bool notifyFrontend = true);
-    uint GetSignalLockTimeout(QString input);
-    bool CheckChannel(QString channel);
-    bool ShouldSwitchToAnotherCard(QString channelid);
+    uint GetSignalLockTimeout(const QString& input);
+    bool CheckChannel(const QString& channel);
+    bool ShouldSwitchToAnotherCard(const QString& channelid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc, 

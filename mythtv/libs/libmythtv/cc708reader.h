@@ -34,7 +34,7 @@ class CC708Reader
     // Window settings
     virtual void SetCurrentWindow(uint service_num, int window_id);
     virtual void DefineWindow(uint service_num,     int window_id,
-                              int priority,         int visible,
+                              int priority,         bool visible,
                               int anchor_point,     int relative_pos,
                               int anchor_vertical,  int anchor_horizontal,
                               int row_count,        int column_count,

@@ -118,10 +118,7 @@ MHRoot *MHRoot::FindByObjectNo(int n)
     {
         return this;
     }
-    else
-    {
-        return nullptr;
-    }
+    return nullptr;
 }
 
 void MHGetAvailabilityStatus::Initialise(MHParseNode *p, MHEngine *engine)

@@ -1,8 +1,9 @@
-#include <QImageReader>
 #include <QApplication>
-#include <QThread>
+#include <QImageReader>
 #include <QStringList>
+#include <QThread>
 #include <QUrl>
+#include <utility>
 
 #include <mythcontext.h>
 #include <mythmainwindow.h>
@@ -129,7 +130,7 @@ void GameScannerThread::updateDB()
 
 bool GameScannerThread::buildFileList()
 {
-    if (m_handlers.size() == 0)
+    if (m_handlers.empty())
         return false;
 
     int counter = 0;
@@ -175,13 +176,13 @@ bool GameScannerThread::buildFileList()
 }
 
 void GameScannerThread::SendProgressEvent(uint progress, uint total,
-                                           QString messsage)
+                                          QString message)
 {
     if (!m_dialog)
         return;
 
     ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       messsage);
+                                                       std::move(message));
     QApplication::postEvent(m_dialog, pue);
 }
 
@@ -224,7 +225,7 @@ void GameScanner::doScan(QList<GameHandler*> handlers)
         m_scanThread->SetProgressDialog(progressDlg);
     }
 
-    m_scanThread->SetHandlers(handlers);
+    m_scanThread->SetHandlers(std::move(handlers));
     m_scanThread->start();
 }
 

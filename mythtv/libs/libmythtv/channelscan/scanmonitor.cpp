@@ -106,23 +106,23 @@ void ScanMonitor::ScanPercentComplete(int pct)
     post_event(this, ScannerEvent::SetPercentComplete, tmp);
 }
 
-void ScanMonitor::ScanAppendTextToLog(const QString &str)
+void ScanMonitor::ScanAppendTextToLog(const QString &status)
 {
-    post_event(this, ScannerEvent::AppendTextToLog, str);
+    post_event(this, ScannerEvent::AppendTextToLog, status);
 }
 
-void ScanMonitor::ScanUpdateStatusText(const QString &str)
+void ScanMonitor::ScanUpdateStatusText(const QString &status)
 {
     QString msg = tr("Scanning");
-    if (!str.isEmpty())
-        msg = QString("%1 %2").arg(msg).arg(str);
+    if (!status.isEmpty())
+        msg = QString("%1 %2").arg(msg).arg(status);
 
     post_event(this, ScannerEvent::SetStatusText, msg);
 }
 
-void ScanMonitor::ScanUpdateStatusTitleText(const QString &str)
+void ScanMonitor::ScanUpdateStatusTitleText(const QString &status)
 {
-    post_event(this, ScannerEvent::SetStatusTitleText, str);
+    post_event(this, ScannerEvent::SetStatusTitleText, status);
 }
 
 void ScanMonitor::ScanErrored(const QString &error)

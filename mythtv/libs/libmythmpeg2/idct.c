@@ -60,9 +60,9 @@ do {					\
 #else
 #define BUTTERFLY(t0,t1,W0,W1,d0,d1)	\
 do {					\
-    int tmp = W0 * (d0 + d1);		\
-    t0 = tmp + (W1 - W0) * d1;		\
-    t1 = tmp - (W1 + W0) * d0;		\
+    int tmp = (W0) * ((d0) + (d1));		\
+    (t0) = tmp + ((W1) - (W0)) * (d1);		\
+    (t1) = tmp - ((W1) + (W0)) * (d0);		\
 } while (0)
 #endif
 

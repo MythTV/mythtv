@@ -132,13 +132,11 @@ public:
 #endif
     }
 
+    ~HLSSegment() = default;
+
     HLSSegment(const HLSSegment &rhs)
     {
         *this = rhs;
-    }
-
-    ~HLSSegment()
-    {
     }
 
     HLSSegment &operator=(const HLSSegment &rhs)
@@ -338,6 +336,7 @@ public:
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("bad padding character (0x%1)").arg(pad, 0, 16, QLatin1Char('0')));
+            delete[] decrypted_data;
             return RET_ERROR;
         }
         aeslen = m_data.size() - pad;
@@ -588,7 +587,6 @@ public:
                 break;
             }
         }
-        return;
     }
 
     void RemoveSegment(int segnum, bool willdelete = true)
@@ -601,8 +599,8 @@ public:
             delete segment;
         }
         m_segments.removeAt(segnum);
-        return;
     }
+
     void RemoveListSegments(QMap<HLSSegment*,bool> &table)
     {
         QMap<HLSSegment*,bool>::iterator it;
@@ -1551,7 +1549,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     m_playback(new HLSPlayback())
 {
     m_startReadAhead = false;
-    OpenFile(lfilename);
+    HLSRingBuffer::OpenFile(lfilename);
 }
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
@@ -1561,7 +1559,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
     m_startReadAhead = false;
     if (open)
     {
-        OpenFile(lfilename);
+        HLSRingBuffer::OpenFile(lfilename);
     }
 }
 
@@ -1599,10 +1597,7 @@ void HLSRingBuffer::FreeStreamsList(StreamsList *streams) const
     {
         HLSStream *hls;
         hls = GetStream(i, streams);
-        if (hls)
-        {
-            delete hls;
-        }
+        delete hls;
     }
     if (streams != &m_streams)
     {
@@ -1982,7 +1977,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
     else if (attr.startsWith(QLatin1String("AES-128")))
     {
         QString uri, iv;
-        if (m_aesmsg == false)
+        if (!m_aesmsg)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "playback of AES-128 encrypted HTTP Live media detected.");
@@ -2156,7 +2151,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     }
 
     /* Is it a meta index file ? */
-    bool meta = buffer->indexOf("#EXT-X-STREAM-INF") < 0 ? false : true;
+    bool meta = buffer->indexOf("#EXT-X-STREAM-INF") >= 0;
 
     int err = RET_OK;
 

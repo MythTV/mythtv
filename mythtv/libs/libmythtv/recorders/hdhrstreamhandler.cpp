@@ -101,7 +101,6 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 HDHRStreamHandler::HDHRStreamHandler(const QString &device, int inputid,
                                      int majorid)
     : StreamHandler(device, inputid)
-    , m_tune_mode(hdhrTuneModeNone)
     , m_majorid(majorid)
 {
     setObjectName("HDHRStreamHandler");
@@ -267,7 +266,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
         range_max.push_back(pid_max);
     }
 
-    for (uint i = 0; i < range_min.size(); i++)
+    for (size_t i = 0; i < range_min.size(); i++)
     {
         filter += filt_str(range_min[i]);
         if (range_min[i] != range_max[i])
@@ -318,22 +317,22 @@ bool HDHRStreamHandler::Open(void)
             if (status_channel ==  "none")
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is not present");
-                m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
+                m_tuner_types.emplace_back(DTVTunerType::kTunerTypeATSC);
             }
             else
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is present");
-                m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeOCUR));
+                m_tuner_types.emplace_back(DTVTunerType::kTunerTypeOCUR);
             }
         }
         else if (QString(model).toLower().contains("dvb"))
         {
-            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBT));
-            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBC));
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBT);
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBC);
         }
         else
         {
-            m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeATSC);
         }
 
         return true;
@@ -481,21 +480,21 @@ bool HDHRStreamHandler::IsConnected(void) const
     return (m_hdhomerun_device != nullptr);
 }
 
-bool HDHRStreamHandler::TuneChannel(const QString &chn)
+bool HDHRStreamHandler::TuneChannel(const QString &chanid)
 {
     m_tune_mode = hdhrTuneModeFrequency;
 
     QString current = TunerGet("channel");
-    if (current == chn)
+    if (current == chanid)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Not Re-Tuning channel %1")
-                .arg(chn));
+                .arg(chanid));
         return true;
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning channel %1 (was %2)")
-            .arg(chn).arg(current));
-    return !TunerSet("channel", chn).isEmpty();
+            .arg(chanid).arg(current));
+    return !TunerSet("channel", chanid).isEmpty();
 }
 
 bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
@@ -526,11 +525,8 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
             .arg(vchn));
         return true;
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
-            .arg(vchn).arg(current));
-    }
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
+        .arg(vchn).arg(current));
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet("vchannel", vchn).isEmpty();

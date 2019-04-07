@@ -315,7 +315,7 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
         // a different page number but the same magazine number.  The same
         // setting shall be used for all page headers in the service.
 
-        bool isMagazineSerialMode = flags & TP_MAGAZINE_SERIAL;
+        bool isMagazineSerialMode = (flags & TP_MAGAZINE_SERIAL) != 0;
         if (!(isMagazineSerialMode) && m != magazine)
         {
             continue;   // in parallel mode only process magazine
@@ -518,7 +518,7 @@ void TeletextReader::HeaderUpdated(
     if (page_ptr == nullptr)
         return;
 
-    if (m_curpage_showheader == false)
+    if (!m_curpage_showheader)
         return;
 
     m_header_changed = true;

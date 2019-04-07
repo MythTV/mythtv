@@ -24,7 +24,7 @@ static bool parse_chan_info(const QString   &rawdata,
                             QString         &channum,
                             uint            &lineNum);
 
-static bool parse_extinf(const QString &data,
+static bool parse_extinf(const QString &line,
                          QString       &channum,
                          QString       &name);
 
@@ -34,8 +34,7 @@ IPTVChannelFetcher::IPTVChannelFetcher(
     m_scan_monitor(monitor),
     m_cardid(cardid),       m_inputname(inputname),
     m_sourceid(sourceid),   m_is_mpts(is_mpts),
-    m_thread(new MThread("IPTVChannelFetcher", this)),
-    m_lock()
+    m_thread(new MThread("IPTVChannelFetcher", this))
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Has ScanMonitor %1")
         .arg(monitor?"true":"false"));
@@ -153,7 +152,7 @@ void IPTVChannelFetcher::run(void)
         fbox_chan_map_t::const_iterator it = m_channels.begin();
         for (uint i = 1; it != m_channels.end(); ++it, ++i)
         {
-            QString channum = it.key();
+            const QString& channum = it.key();
             QString name    = (*it).m_name;
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
             uint programnumber = (*it).m_programNumber;
@@ -477,7 +476,7 @@ static bool parse_extinf(const QString &line,
         name = chanNumName5.cap(2).simplified();
         bool ok;
         int channel_number = channum.toInt (&ok);
-        if ((ok == true) && (channel_number > 0))
+        if (ok && (channel_number > 0))
         {
             return true;
         }

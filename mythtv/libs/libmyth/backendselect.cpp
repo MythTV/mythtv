@@ -15,9 +15,9 @@
 
 BackendSelection::BackendSelection(
     MythScreenStack *parent, DatabaseParams *params,
-    Configuration *conf, bool exitOnFinish) :
+    Configuration *pConfig, bool exitOnFinish) :
     MythScreenType(parent, "BackEnd Selection"),
-    m_DBparams(params), m_pConfig(conf), m_exitOnFinish(exitOnFinish)
+    m_DBparams(params), m_pConfig(pConfig), m_exitOnFinish(exitOnFinish)
 {
     if (exitOnFinish)
     {
@@ -245,7 +245,7 @@ void BackendSelection::Cancel(void)
 
 void BackendSelection::Load(void)
 {
-    SSDP::Instance()->AddListener(this);
+    SSDP::AddListener(this);
     SSDP::Instance()->PerformSearch(gBackendURI);
 }
 
@@ -272,7 +272,7 @@ void BackendSelection::Manual(void)
     CloseWithDecision(kManualConfigure);
 }
 
-void BackendSelection::RemoveItem(QString USN)
+void BackendSelection::RemoveItem(const QString& USN)
 {
     m_mutex.lock();
 
@@ -307,10 +307,10 @@ void BackendSelection::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me      = static_cast<MythEvent *>(event);
-        QString    message = me->Message();
-        QString    URI     = me->ExtraData(0);
-        QString    URN     = me->ExtraData(1);
-        QString    URL     = me->ExtraData(2);
+        const QString&    message = me->Message();
+        const QString&    URI     = me->ExtraData(0);
+        const QString&    URN     = me->ExtraData(1);
+        const QString&    URL     = me->ExtraData(2);
 
 
         LOG(VB_UPNP, LOG_DEBUG,
@@ -320,7 +320,7 @@ void BackendSelection::customEvent(QEvent *event)
         if (message.startsWith("SSDP_ADD") &&
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
         {
-            DeviceLocation *devLoc = SSDP::Instance()->Find(URI, URN);
+            DeviceLocation *devLoc = SSDP::Find(URI, URN);
             if (devLoc)
             {
                 AddItem(devLoc);

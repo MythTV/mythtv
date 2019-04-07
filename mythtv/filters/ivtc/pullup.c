@@ -13,7 +13,7 @@
 
 
 #if HAVE_MMX
-static int diff_y_mmx(unsigned char *a, unsigned char *b, int s)
+static int diff_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 {
 	int ret;
         __asm__ volatile (
@@ -61,7 +61,7 @@ static int diff_y_mmx(unsigned char *a, unsigned char *b, int s)
 	return ret;
 }
 
-static int licomb_y_mmx(unsigned char *a, unsigned char *b, int s)
+static int licomb_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 {
 	int ret;
         __asm__ volatile (
@@ -151,7 +151,7 @@ static int licomb_y_mmx(unsigned char *a, unsigned char *b, int s)
 	return ret;
 }
 
-static int var_y_mmx(unsigned char *a, unsigned char *b, int s)
+static int var_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 {
     (void) b;
 	int ret;
@@ -202,17 +202,18 @@ static int var_y_mmx(unsigned char *a, unsigned char *b, int s)
 
 #define ABS(a) (((a)^((a)>>31))-((a)>>31))
 
-static int diff_y(unsigned char *a, unsigned char *b, int s)
+static int diff_y(const unsigned char *a, const unsigned char *b, int s)
 {
 	int i, j, diff=0;
 	for (i=4; i; i--) {
-		for (j=0; j<8; j++) diff += ABS(a[j]-b[j]);
+		for (j=0; j<8; j++)
+                        diff += ABS(a[j]-b[j]);
 		a+=s; b+=s;
 	}
 	return diff;
 }
 
-static int licomb_y(unsigned char *a, unsigned char *b, int s)
+static int licomb_y(const unsigned char *a, const unsigned char *b, int s)
 {
 	int i, j, diff=0;
 	for (i=4; i; i--) {
@@ -224,10 +225,10 @@ static int licomb_y(unsigned char *a, unsigned char *b, int s)
 	return diff;
 }
 
-static int qpcomb_y(unsigned char *a, unsigned char *b, int s)
+static int qpcomb_y(const unsigned char *a, const unsigned char *b, int s)
     __attribute__ ((unused)); /* <- to suppress compiler warning */
 
-static int qpcomb_y(unsigned char *a, unsigned char *b, int s)
+static int qpcomb_y(const unsigned char *a, const unsigned char *b, int s)
 {
 	int i, j, diff=0;
 	for (i=4; i; i--) {
@@ -239,7 +240,7 @@ static int qpcomb_y(unsigned char *a, unsigned char *b, int s)
 }
 
 #if 0
-static int licomb_y_test(unsigned char *a, unsigned char *b, int s)
+static int licomb_y_test(const unsigned char *a, const unsigned char *b, int s)
 {
 	int c = licomb_y(a,b,s);
 	int m = licomb_y_mmx(a,b,s);
@@ -248,7 +249,7 @@ static int licomb_y_test(unsigned char *a, unsigned char *b, int s)
 }
 #endif
 
-static int var_y(unsigned char *a, unsigned char *b, int s)
+static int var_y(const unsigned char *a, const unsigned char *b, int s)
 {
 	int i, j, var=0;
 	for (i=3; i; i--) {
@@ -335,7 +336,7 @@ struct pullup_buffer *pullup_get_buffer(struct pullup_context *c, int parity)
 static void compute_metric(struct pullup_context *c,
 	struct pullup_field *fa, int pa,
 	struct pullup_field *fb, int pb,
-	int (*func)(unsigned char *, unsigned char *, int), int *dest)
+	int (*func)(const unsigned char *, const unsigned char *, int), int *dest)
 {
 	unsigned char *a, *b;
 	int x, y;
@@ -596,7 +597,7 @@ static int decide_frame_length(struct pullup_context *c)
 			&& (f0->affinity != 1 || f1->affinity != -1) )
 			return 1;
 		if (f1->affinity == 1) return 1;
-		else return 2;
+                return 2;
 	case 3:
 		if (f2->affinity == 1) return 2;
 		else return 3;
@@ -606,7 +607,7 @@ static int decide_frame_length(struct pullup_context *c)
 		else if (f1->affinity == -1) return 2; /* covers 6 */
 		else if (f2->affinity == -1) { /* covers 2 */
 			if (f0->affinity == 1) return 3;
-			else return 1;
+                        return 1;
 		}
 		else return 2; /* the remaining 6 */
 	}

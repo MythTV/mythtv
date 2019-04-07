@@ -21,7 +21,7 @@ class XMLTVParser
 
     ChannelInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
     ProgInfo *parseProgram(QDomElement &element);
-    bool parseFile(QString filename, ChannelInfoList *chanlist,
+    bool parseFile(const QString& filename, ChannelInfoList *chanlist,
                    QMap<QString, QList<ProgInfo> > *proglist);
 
   private:

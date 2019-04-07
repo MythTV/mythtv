@@ -45,11 +45,11 @@ void MythPainter::Teardown(void)
     m_allocatedImages.clear();
 }
 
-void MythPainter::SetClipRect(const QRect &)
+void MythPainter::SetClipRect(const QRect & /*clipRect*/)
 {
 }
 
-void MythPainter::SetClipRegion(const QRegion &)
+void MythPainter::SetClipRegion(const QRegion & /*clipRegion*/)
 {
 }
 

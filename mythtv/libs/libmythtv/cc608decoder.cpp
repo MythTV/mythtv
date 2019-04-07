@@ -87,8 +87,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
 
 CC608Decoder::~CC608Decoder(void)
 {
-    if (m_rbuf)
-        delete [] m_rbuf;
+    delete [] m_rbuf;
 }
 
 void CC608Decoder::FormatCC(int tc, int code1, int code2)
@@ -207,8 +206,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     {
         if (m_ignore_time_code)
             return;
-        else
-           goto skip;
+        goto skip;
     }
 
     if (XDSDecode(field, b1, b2))
@@ -226,15 +224,13 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
             // commit row number only when first text code
             // comes in
             if (m_newrow[mode])
-                len = NewRowCC(mode, len);
+                NewRowCC(mode, len);
 
             m_ccbuf[mode] += CharCC(b1);
-            len++;
             m_col[mode]++;
             if (b2 & 0x60)
             {
                 m_ccbuf[mode] += CharCC(b2);
-                len++;
                 m_col[mode]++;
             }
         }
@@ -323,7 +319,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     break;
                 case 0x01:          //midrow or char
                     if (m_newrow[mode])
-                        len = NewRowCC(mode, len);
+                        NewRowCC(mode, len);
 
                     switch (b2 & 0x70)
                     {
@@ -335,12 +331,10 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             // 16 possible values of b2.
                             m_ccbuf[mode] += ' ';
                             m_ccbuf[mode] += QChar(0x7000 + (b2 & 0xf));
-                            len = m_ccbuf[mode].length();
                             m_col[mode]++;
                             break;
                         case 0x30:      //special character..
                             m_ccbuf[mode] += specialchar[b2 & 0x0f];
-                            len++;
                             m_col[mode]++;
                             break;
                     }
@@ -355,7 +349,6 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     {
                         m_ccbuf[mode].remove(len - 1, 1);
                         m_ccbuf[mode] += extendedchar2[b2 - 0x20];
-                        len = m_ccbuf[mode].length();
                         break;
                     }
                     break;
@@ -369,7 +362,6 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     {
                         m_ccbuf[mode].remove(len - 1, 1);
                         m_ccbuf[mode] += extendedchar3[b2 - 0x20];
-                        len = m_ccbuf[mode].length();
                         break;
                     }
                     break;
@@ -391,13 +383,11 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                 m_ccbuf[mode].startsWith("\b"))
                             {
                                 m_ccbuf[mode] += '\b';
-                                len++;
                                 m_col[mode]--;
                             }
                             else
                             {
                                 m_ccbuf[mode].remove(len - 1, 1);
-                                len = m_ccbuf[mode].length();
                                 m_col[mode]--;
                             }
                             break;
@@ -547,14 +537,13 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     if (m_newrow[mode])
                     {
                         m_newcol[mode] += (b2 & 0x03);
-                        len = NewRowCC(mode, len);
+                        NewRowCC(mode, len);
                     }
                     else
                         // illegal?
                         for (x = 0; x < (b2 & 0x03); x++)
                         {
                             m_ccbuf[mode] += ' ';
-                            len++;
                             m_col[mode]++;
                         }
                     break;
@@ -605,10 +594,7 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
             m_lastcode[field] = -1;
             return 1;
         }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 
     // bttv-0.9 VBI reads are pretty reliable (1 read/33367us).
@@ -1110,7 +1096,7 @@ QString CC608Decoder::GetProgramType(bool future) const
     const vector<uint> &program_type = m_xds_program_type[(future) ? 1 : 0];
     QString tmp = "";
 
-    for (uint i = 0; i < program_type.size(); i++)
+    for (size_t i = 0; i < program_type.size(); i++)
     {
         if (i != 0)
             tmp += ", ";
@@ -1126,33 +1112,33 @@ QString CC608Decoder::GetXDS(const QString &key) const
 
     if (key == "ratings")
         return QString::number(GetRatingSystems(false));
-    else if (key.startsWith("has_rating_"))
+    if (key.startsWith("has_rating_"))
         return ((1<<key.right(1).toUInt()) & GetRatingSystems(false))?"1":"0";
-    else if (key.startsWith("rating_"))
+    if (key.startsWith("rating_"))
         return GetRatingString(key.right(1).toUInt(), false);
 
-    else if (key == "future_ratings")
+    if (key == "future_ratings")
         return QString::number(GetRatingSystems(true));
-    else if (key.startsWith("has_future_rating_"))
+    if (key.startsWith("has_future_rating_"))
         return ((1<<key.right(1).toUInt()) & GetRatingSystems(true))?"1":"0";
-    else if (key.startsWith("future_rating_"))
+    if (key.startsWith("future_rating_"))
         return GetRatingString(key.right(1).toUInt(), true);
 
-    else if (key == "programname")
+    if (key == "programname")
         return GetProgramName(false);
-    else if (key == "future_programname")
+    if (key == "future_programname")
         return GetProgramName(true);
 
-    else if (key == "programtype")
+    if (key == "programtype")
         return GetProgramType(false);
-    else if (key == "future_programtype")
+    if (key == "future_programtype")
         return GetProgramType(true);
 
-    else if (key == "callsign")
+    if (key == "callsign")
         return m_xds_net_call;
-    else if (key == "channame")
+    if (key == "channame")
         return m_xds_net_name;
-    else if (key == "tsid")
+    if (key == "tsid")
         return QString::number(m_xds_tsid);
 
     return QString();
@@ -1264,13 +1250,15 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
     else if (xds_class == 0x0d) // cont code: 0x0e
         handled = true; // undefined
 
-    if (DEBUG_XDS && !handled)
+    if (!handled)
     {
+#if DEBUG_XDS
         LOG(VB_VBI, LOG_INFO, QString("XDS: ") +
             QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
             .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
             .arg(xds_buf.size())
             .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
+#endif
     }
 }
 
@@ -1278,7 +1266,7 @@ bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
 {
     /* Check the checksum for validity of the packet. */
     int sum = 0;
-    for (uint i = 0; i < xds_buf.size() - 1; i++)
+    for (size_t i = 0; i < xds_buf.size() - 1; i++)
         sum += xds_buf[i];
 
     if ((((~sum) & 0x7f) + 1) != xds_buf[xds_buf.size() - 1])
@@ -1352,7 +1340,7 @@ bool CC608Decoder::XDSPacketParseProgram(
     else if ((b2 == 0x04) && (xds_buf.size() >= 6))
     {
         vector<uint> program_type;
-        for (uint i = 2; i < xds_buf.size() - 2; i++)
+        for (size_t i = 2; i < xds_buf.size() - 2; i++)
         {
             int cur = xds_buf[i] - 0x20;
             if (cur >= 0 && cur < 96)

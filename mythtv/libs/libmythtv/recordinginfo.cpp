@@ -124,7 +124,7 @@ RecordingInfo::RecordingInfo(
 
     m_recpriority = _recpriority;
 
-    m_stars = clamp(_stars, 0.0f, 1.0f);
+    m_stars = clamp(_stars, 0.0F, 1.0F);
     m_originalAirDate = _originalAirDate;
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
@@ -889,7 +889,7 @@ int RecordingInfo::getRecordID(void)
 }
 
 bool RecordingInfo::QueryRecordedIdForKey(int & recordedid,
-                                          uint chanid, QDateTime recstartts)
+                                          uint chanid, const QDateTime& recstartts)
 {
     if (chanid < 1)
     {
@@ -928,7 +928,7 @@ bool RecordingInfo::QueryRecordedIdForKey(int & recordedid,
  *
  *  \param ext    File extension for recording
  */
-void RecordingInfo::StartedRecording(QString ext)
+void RecordingInfo::StartedRecording(const QString& ext)
 {
     QString dirname = m_pathname;
 
@@ -1283,11 +1283,12 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,season,episode,"
                    "category,seriesid,programid,inetref,findid,recordid,"
-                   "station,rectype,recstatus,duplicate,reactivate,future) "
+                   "station,rectype,recstatus,duplicate,reactivate,generic,"
+                   "future) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,:SEASON,"
                    ":EPISODE,:CATEGORY,:SERIESID,:PROGRAMID,:INETREF,"
                    ":FINDID,:RECORDID,:STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,"
-                   ":REACTIVATE,:FUTURE);");
+                   ":REACTIVATE,:GENERIC,:FUTURE);");
     result.bindValue(":CHANID", m_chanid);
     result.bindValue(":START", m_startts);
     result.bindValue(":END", m_endts);
@@ -1307,6 +1308,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", 0);
+    result.bindValue(":GENERIC", IsGeneric());
     result.bindValue(":FUTURE", future);
 
     if (!result.exec())

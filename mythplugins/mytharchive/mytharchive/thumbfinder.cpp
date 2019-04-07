@@ -353,7 +353,7 @@ QString ThumbFinder::createThumbDir(void)
     if (!dir.exists())
     {
         dir.mkdir(thumbDir);
-        if( chmod(qPrintable(thumbDir), 0777) )
+        if( chmod(qPrintable(thumbDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions"
                                      " on thumb directory: " + ENO);
     }
@@ -366,7 +366,7 @@ QString ThumbFinder::createThumbDir(void)
     }
 
     dir.mkdir(path);
-    if( chmod(qPrintable(path), 0777) )
+    if( chmod(qPrintable(path), 0777) != 0 )
         LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions on "
                                  "thumb directory: %1" + ENO);
 
@@ -458,7 +458,7 @@ bool ThumbFinder::getThumbImages()
     m_frameFile = m_thumbDir + "/title.jpg";
     ThumbImage *thumb = nullptr;
 
-    if (m_thumbList.size() > 0)
+    if (!m_thumbList.empty())
     {
         // use the thumb details in the thumbList if already available
         thumb = m_thumbList.at(0);
@@ -779,7 +779,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
     av_init_packet(&pkt);
 
-    int frameFinished = 0;
+    bool frameFinished = false;
     int keyFrame;
     int frameCount = 0;
     bool gotKeyFrame = false;
@@ -811,12 +811,12 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
                 m_firstIFramePTS = pkt.dts;
 
             av_frame_unref(m_frame);
-            frameFinished = 0;
+            frameFinished = false;
             int ret = avcodec_receive_frame(m_codecCtx, m_frame);
             if (ret == 0)
-                frameFinished = 1;
+                frameFinished = true;
             if (ret == 0 || ret == AVERROR(EAGAIN))
-                ret = avcodec_send_packet(m_codecCtx, &pkt);
+                avcodec_send_packet(m_codecCtx, &pkt);
             if (requiredPTS != -1 && pkt.dts != AV_NOPTS_VALUE && pkt.dts < requiredPTS)
                 frameFinished = false;
 
@@ -863,8 +863,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
 void ThumbFinder::closeAVCodec()
 {
-    if (m_outputbuf)
-        delete[] m_outputbuf;
+    delete[] m_outputbuf;
 
     // close the codec
     gCodecMap->freeCodecContext

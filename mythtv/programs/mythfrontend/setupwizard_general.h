@@ -30,7 +30,7 @@ class GeneralSetupWizard : public MythScreenType
     void OnDeletePromptReturn(bool submit);
 
   private:
-    void CreateBusyDialog(QString message);
+    void CreateBusyDialog(const QString& message);
 
     MythUIButton     *m_submitButton    {nullptr};
     MythUIButton     *m_viewButton      {nullptr};

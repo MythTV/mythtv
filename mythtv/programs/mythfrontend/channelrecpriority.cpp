@@ -202,7 +202,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     }
 }
 
-void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
+void ChannelRecPriority::applyChannelRecPriorityChange(const QString& chanid,
                                                  const QString &newrecpriority)
 {
     MSqlQuery query(MSqlQuery::InitCon());

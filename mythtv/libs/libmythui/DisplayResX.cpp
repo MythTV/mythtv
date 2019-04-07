@@ -29,7 +29,7 @@ bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
     h_mm   = info.m_size.height();
     w_pix  = info.m_res.width();
     h_pix  = info.m_res.height();
-    rate   = 1000000.0f / info.m_rate;
+    rate   = 1000000.0F / info.m_rate;
     par    = 1.0;
 
     if (w_mm > 0 && h_mm > 0 && w_pix > 0 && h_pix > 0)
@@ -61,7 +61,7 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
         // Search real xrandr rate for desired_rate
         finalrate = (short) rate;
 
-        for (uint i = 0; i < m_videoModes.size(); i++)
+        for (size_t i = 0; i < m_videoModes.size(); i++)
         {
             if ((m_videoModes[i].Width() == width) &&
                     (m_videoModes[i].Height() == height))
@@ -145,7 +145,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
     {
         // Update existing DisplayResScreen vector, and update it with
         // new frequencies
-        for (uint i = 0; i < m_videoModes.size(); i++)
+        for (size_t i = 0; i < m_videoModes.size(); i++)
         {
             DisplayResScreen scr = m_videoModes[i];
             int w = scr.Width();

@@ -4,8 +4,8 @@
 // MythTV headers
 #include <standardsettings.h>
 
-const QString GetGameTypeName(const QString &GameType);
-const QString GetGameTypeExtensions(const QString &GameType);
+QString GetGameTypeName(const QString &GameType);
+QString GetGameTypeExtensions(const QString &GameType);
 
 struct MPUBLIC GameGeneralSettings : public GroupSetting
 {
@@ -26,7 +26,7 @@ class GamePlayerSetting : public GroupSetting
 {
     Q_OBJECT
 public:
-    GamePlayerSetting(QString name, uint id = 0);
+    GamePlayerSetting(const QString& name, uint id = 0);
 
     void Save()         override;                   // StandardSetting
     bool canDelete()    override { return true; }   // GroupSetting
@@ -45,7 +45,7 @@ public:
 private:
     void Load() override; // StandardSetting
     void NewPlayerDialog();
-    void CreateNewPlayer(QString name);
+    void CreateNewPlayer(const QString& name);
 };
 
 #endif

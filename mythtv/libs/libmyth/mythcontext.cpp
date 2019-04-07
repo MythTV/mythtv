@@ -70,12 +70,12 @@ class MythContextPrivate : public QObject
 
   public:
     MythContextPrivate(MythContext *lparent);
-   ~MythContextPrivate();
+   ~MythContextPrivate() override;
 
-    bool Init        (const bool gui,
-                      const bool prompt, const bool noPrompt,
-                      const bool ignoreDB);
-    bool FindDatabase(const bool prompt, const bool noPrompt);
+    bool Init        (bool gui,
+                      bool prompt, bool noPrompt,
+                      bool ignoreDB);
+    bool FindDatabase(bool prompt, bool noAutodetect);
 
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
@@ -90,11 +90,11 @@ class MythContextPrivate : public QObject
     void    ResetDatabase(void);
 
     int     ChooseBackend(const QString &error);
-    int     UPnPautoconf(const int milliSeconds = 2000);
+    int     UPnPautoconf(int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
-    bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
+    bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    checkPort(QString &host, int port, int wakeupTime);
+    bool    checkPort(QString &host, int port, int timeLimit);
     void    processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
@@ -102,12 +102,12 @@ class MythContextPrivate : public QObject
 
 
   protected:
-    bool event(QEvent*) override; // QObject
+    bool event(QEvent* /*e*/) override; // QObject
 
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup(void);
 
-    void ShowVersionMismatchPopup(uint remoteVersion);
+    void ShowVersionMismatchPopup(uint remote_version);
 
   public slots:
     void OnCloseDialog();
@@ -248,17 +248,13 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 MythContextPrivate::~MythContextPrivate()
 {
-    if (m_pConfig)
-        delete m_pConfig;
+    delete m_pConfig;
     if (GetNotificationCenter() && m_registration > 0)
     {
         GetNotificationCenter()->UnRegister(this, m_registration, true);
     }
 
-    if (m_loop)
-    {
-        delete m_loop;
-    }
+    delete m_loop;
 
     if (m_ui)
         DestroyMythUI();
@@ -542,7 +538,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.LoadDefaults();
 
     m_DBparams.localHostName = m_pConfig->GetValue("LocalHostName", "");
-    m_DBparams.dbHostPing = m_pConfig->GetValue(kDefaultDB + "PingHost", true);
+    m_DBparams.dbHostPing = m_pConfig->GetBoolValue(kDefaultDB + "PingHost", true);
     m_DBparams.dbHostName = m_pConfig->GetValue(kDefaultDB + "Host", "");
     m_DBparams.dbUserName = m_pConfig->GetValue(kDefaultDB + "UserName", "");
     m_DBparams.dbPassword = m_pConfig->GetValue(kDefaultDB + "Password", "");
@@ -550,7 +546,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.dbPort = m_pConfig->GetValue(kDefaultDB + "Port", 0);
 
     m_DBparams.wolEnabled =
-        m_pConfig->GetValue(kDefaultWOL + "Enabled", false);
+        m_pConfig->GetBoolValue(kDefaultWOL + "Enabled", false);
     m_DBparams.wolReconnect =
         m_pConfig->GetValue(kDefaultWOL + "SQLReconnectWaitTime", 0);
     m_DBparams.wolRetry =
@@ -655,7 +651,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->SetValue(
             "LocalHostName", params.localHostName);
 
-        m_pConfig->SetValue(
+        m_pConfig->SetBoolValue(
             kDefaultDB + "PingHost", params.dbHostPing);
 
         // If dbHostName is an IPV6 address with scope,
@@ -679,7 +675,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->SetValue(
             kDefaultDB + "Port", params.dbPort);
 
-        m_pConfig->SetValue(
+        m_pConfig->SetBoolValue(
             kDefaultWOL + "Enabled", params.wolEnabled);
         m_pConfig->SetValue(
             kDefaultWOL + "SQLReconnectWaitTime", params.wolReconnect);
@@ -1195,7 +1191,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
         }
     }
 
-    SSDPCacheEntries *backends = SSDP::Instance()->Find(gBackendURI);
+    SSDPCacheEntries *backends = SSDP::Find(gBackendURI);
 
     if (!backends)
     {
@@ -1271,7 +1267,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
+        pDevLoc = SSDP::Find( gBackendURI, USN );
 
         if (pDevLoc)
             break;

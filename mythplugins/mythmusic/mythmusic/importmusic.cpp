@@ -698,7 +698,7 @@ void ImportMusicDialog::chooseBackend(void)
     popupStack->AddScreen(searchDlg);
 }
 
-void ImportMusicDialog::setSaveHost(QString host)
+void ImportMusicDialog::setSaveHost(const QString& host)
 {
     gCoreContext->SaveSetting("MythMusicLastImportHost", host);
 
@@ -831,7 +831,7 @@ void ImportMusicDialog::setTitleInitialCap(void)
     {
         if (title[x].isLetter())
         {
-            if (bFoundCap == false)
+            if (!bFoundCap)
             {
                 title[x] = title[x].toUpper();
                 bFoundCap = true;
@@ -1006,7 +1006,7 @@ void ImportCoverArtDialog::selectorChanged()
 
 void ImportCoverArtDialog::copyPressed()
 {
-    if (m_filelist.size() > 0)
+    if (!m_filelist.empty())
     {
         if (!RemoteFile::CopyFile(m_filelist[m_currentFile], m_saveFilename, true))
         {
@@ -1088,7 +1088,7 @@ void ImportCoverArtDialog::scanDirectory()
 
 void ImportCoverArtDialog::updateStatus()
 {
-    if (m_filelist.size() > 0)
+    if (!m_filelist.empty())
     {
         if (m_currentText)
             //: %1 is the current position of the file being copied,
@@ -1152,20 +1152,20 @@ void ImportCoverArtDialog::updateStatus()
 
 void ImportCoverArtDialog::updateTypeSelector()
 {
-    if (m_filelist.size() == 0)
+    if (m_filelist.empty())
         return;
 
     QString filename = m_filelist[m_currentFile];
     QFileInfo fi(filename);
     filename = fi.fileName();
 
-    if (filename.contains("front", Qt::CaseInsensitive) > 0)
+    if (filename.contains("front", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("Front Cover"));
-    else if (filename.contains("back", Qt::CaseInsensitive) > 0)
+    else if (filename.contains("back", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("Back Cover"));
-    else if (filename.contains("inlay", Qt::CaseInsensitive) > 0)
+    else if (filename.contains("inlay", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("Inlay"));
-    else if (filename.contains("cd", Qt::CaseInsensitive) > 0)
+    else if (filename.contains("cd", Qt::CaseInsensitive))
         m_typeList->SetValue(tr("CD"));
     else
         m_typeList->SetValue(tr("<Unknown>"));

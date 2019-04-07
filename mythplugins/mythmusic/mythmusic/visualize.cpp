@@ -60,7 +60,7 @@ VisualBase::~VisualBase()
 }
 
 
-void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning, int fontSize)
+void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, const QString& warning, int fontSize)
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
@@ -81,8 +81,7 @@ LogScale::LogScale(int maxscale, int maxrange)
 
 LogScale::~LogScale()
 {
-    if (m_indices)
-        delete [] m_indices;
+    delete [] m_indices;
 }
 
 void LogScale::setMax(int maxscale, int maxrange)
@@ -93,8 +92,7 @@ void LogScale::setMax(int maxscale, int maxrange)
     m_s = maxscale;
     m_r = maxrange;
 
-    if (m_indices)
-        delete [] m_indices;
+    delete [] m_indices;
 
     double alpha;
     long double domain = (long double) maxscale;
@@ -145,7 +143,7 @@ void StereoScope::resize( const QSize &newsize )
 {
     m_size = newsize;
 
-    uint os = m_magnitudes.size();
+    auto os = m_magnitudes.size();
     m_magnitudes.resize( m_size.width() * 2 );
     for ( ; os < m_magnitudes.size(); os++ )
         m_magnitudes[os] = 0.0;
@@ -198,12 +196,11 @@ bool StereoScope::process( VisualNode *node )
 #endif
             for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
-                double tmpL = ( ( node->m_left ?
-                       double( node->m_left[s] ) : 0.) *
-                     double( m_size.height() / 4 ) ) / 32768.;
-                double tmpR = ( ( node->m_right ?
-                       double( node->m_right[s]) : 0.) *
-                     double( m_size.height() / 4 ) ) / 32768.;
+                double adjHeight = static_cast<double>(m_size.height()) / 4.0;
+                double tmpL = ( ( node->m_left ? static_cast<double>(node->m_left[s]) : 0.) *
+                                adjHeight ) / 32768.0;
+                double tmpR = ( ( node->m_right ? static_cast<double>(node->m_right[s]) : 0.) *
+                                adjHeight ) / 32768.0;
                 if (tmpL > 0)
                     valL = (tmpL > valL) ? tmpL : valL;
                 else
@@ -278,8 +275,8 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     double r, g, b, per;
 
     // left
-    per = double( m_magnitudes[ i ] * 2 ) /
-          double( m_size.height() / 4 );
+    per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
+          ( static_cast<double>(m_size.height()) / 4.0 );
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -313,13 +310,16 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 #else
     p->setPen(Qt::red);
 #endif
-    p->drawLine( i - 1, (int)((m_size.height() / 4) + m_magnitudes[i - 1]),
-             i, (int)((m_size.height() / 4) + m_magnitudes[i]));
+    double adjHeight = static_cast<double>(m_size.height()) / 4.0;
+    p->drawLine( i - 1,
+                 (int)(adjHeight + m_magnitudes[i - 1]),
+                 i,
+                 (int)(adjHeight + m_magnitudes[i]));
 
 #if TWOCOLOUR
     // right
-    per = double( m_magnitudes[ i + m_size.width() ] * 2 ) /
-          double( m_size.height() / 4 );
+    per = ( static_cast<double>(m_magnitudes[ i + m_size.width() ]) * 2 ) /
+          adjHeight;
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -353,10 +353,11 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 #else
     p->setPen(Qt::red);
 #endif
-    p->drawLine( i - 1, (int)((m_size.height() * 3 / 4) +
-             m_magnitudes[i + m_size.width() - 1]),
-             i, (int)((m_size.height() * 3 / 4) +
-                     m_magnitudes[i + m_size.width()]));
+    adjHeight = static_cast<double>(m_size.height()) * 3.0 / 4.0;
+    p->drawLine( i - 1,
+                 (int)(adjHeight + m_magnitudes[i + m_size.width() - 1]),
+                 i,
+                 (int)(adjHeight + m_magnitudes[i + m_size.width()]));
     }
 
     return true;
@@ -404,9 +405,9 @@ bool MonoScope::process( VisualNode *node )
 #endif
             for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
-                double tmp = ( double( node->m_left[s] ) +
-                        (node->m_right ? double( node->m_right[s] ) : 0) *
-                        double( m_size.height() / 2 ) ) / 65536.;
+                double tmp = ( static_cast<double>(node->m_left[s]) +
+                               (node->m_right ? static_cast<double>(node->m_right[s]) : 0.0) *
+                               ( static_cast<double>(m_size.height()) / 2.0 ) ) / 65536.0;
                 if (tmp > 0)
                 {
                     val = (tmp > val) ? tmp : val;
@@ -497,8 +498,11 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 #else
         p->setPen(Qt::red);
 #endif
-        p->drawLine( i - 1, (int)(m_size.height() / 2 + m_magnitudes[ i - 1 ]),
-                     i, (int)(m_size.height() / 2 + m_magnitudes[ i ] ));
+        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
+        p->drawLine( i - 1,
+                     (int)(adjHeight + m_magnitudes[ i - 1 ]),
+                     i,
+                     (int)(adjHeight + m_magnitudes[ i ] ));
     }
 
     return true;
@@ -623,7 +627,8 @@ void Spectrum::resize(const QSize &newsize)
         m_magnitudes[os] = 0.0;
     }
 
-    m_scaleFactor = double( m_size.height() / 2 ) / log( (double)(FFTW_N) );
+    m_scaleFactor = ( static_cast<double>(m_size.height()) / 2.0 ) /
+                    log( static_cast<double>(FFTW_N) );
 }
 
 template<typename T> T sq(T a) { return a*a; };
@@ -670,9 +675,11 @@ bool Spectrum::process(VisualNode *node)
         tmp = 2 * sq(real(m_rout[index])); // + sq(real(m_rout[FFTW_N - index]));
         double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
-        if (magL > m_size.height() / 2)
+
+        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
+        if (magL > adjHeight)
         {
-            magL = m_size.height() / 2;
+            magL = adjHeight;
         }
         if (magL < magnitudesp[i])
         {
@@ -688,9 +695,9 @@ bool Spectrum::process(VisualNode *node)
             magL = 1.;
         }
 
-        if (magR > m_size.height() / 2)
+        if (magR > adjHeight)
         {
-            magR = m_size.height() / 2;
+            magR = adjHeight;
         }
         if (magR < magnitudesp[i + m_scale.range()])
         {
@@ -939,17 +946,15 @@ void Piano::zero_analysis(void)
     for (key = 0; key < PIANO_N; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
-        m_piano_data[key].q2 = 0.0f;
-        m_piano_data[key].q1 = 0.0f;
-        m_piano_data[key].magnitude = 0.0f;
+        m_piano_data[key].q2 = 0.0F;
+        m_piano_data[key].q1 = 0.0F;
+        m_piano_data[key].magnitude = 0.0F;
         m_piano_data[key].max_magnitude_seen =
             (goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
 
         m_piano_data[key].samples_processed = 0;
     }
     m_offset_processed = 0;
-
-    return;
 }
 
 void Piano::resize(const QSize &newsize)
@@ -1033,8 +1038,6 @@ void Piano::resize(const QSize &newsize)
     {
         m_magnitude[key] = 0.0;
     }
-
-    return;
 }
 
 unsigned long Piano::getDesiredSamples(void)
@@ -1071,7 +1074,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
     if (node)
     {
-        piano_audio short_to_bounded = 32768.0f;
+        piano_audio short_to_bounded = 32768.0F;
 
         // Detect start of new song (current node more than 10s earlier than already seen)
         if (node->m_offset + 10000 < m_offset_processed)
@@ -1094,7 +1097,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             for (uint i = 0; i < n; i++)
             {
-                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0f / short_to_bounded;
+                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0F / short_to_bounded;
             }
         }
         else // This is only one channel of data
@@ -1135,32 +1138,31 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
 
-            if (false) // This is RMS of signal
-            {
-                magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
-            }
-            if (true) // This is pure magnitude of signal
-            {
-                magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
-            }
+#if 0
+            // This is RMS of signal
+            magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
+#else
+            // This is pure magnitude of signal
+            magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+#endif
 
-            if (false) // Take logs everywhere, and shift up to [0, ??]
+#if 0
+            // Take logs everywhere, and shift up to [0, ??]
+            if(magnitude_av > 0.0F)
             {
-                if(magnitude_av > 0.0f)
-                {
-                    magnitude_av = log(magnitude_av);
-                }
-                else
-                {
-                    magnitude_av = PIANO_MIN_VOL;
-                }
-                magnitude_av -= PIANO_MIN_VOL;
-
-                if (magnitude_av < 0.0f)
-                {
-                    magnitude_av = 0.0;
-                }
+                magnitude_av = log(magnitude_av);
             }
+            else
+            {
+                magnitude_av = PIANO_MIN_VOL;
+            }
+            magnitude_av -= PIANO_MIN_VOL;
+
+            if (magnitude_av < 0.0F)
+            {
+                magnitude_av = 0.0;
+            }
+#endif
 
             if (magnitude_av > (goertzel_data)0.01)
             {

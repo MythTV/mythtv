@@ -42,7 +42,7 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     void SetRelativeSize(float rSize) { m_relativeSize = rSize; }
     float GetRelativeSize(void) const { return m_relativeSize; }
     void SetPixelSize(float size);
-    void SetPointSize(uint size);
+    void SetPointSize(uint points);
     void Rescale(void);
     void Rescale(int height);
     void AdjustStretch(int stretch);

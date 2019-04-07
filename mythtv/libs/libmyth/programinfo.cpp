@@ -237,7 +237,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
  */
 ProgramInfo::ProgramInfo(uint _recordedid)
 {
-    clear();
+    ProgramInfo::clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -257,7 +257,7 @@ ProgramInfo::ProgramInfo(uint _recordedid)
         LOG(VB_GENERAL, LOG_CRIT, LOC +
             QString("Failed to find recorded entry for %1.")
             .arg(_recordedid));
-        clear();
+        ProgramInfo::clear();
     }
 
     ensureSortFields();
@@ -268,7 +268,7 @@ ProgramInfo::ProgramInfo(uint _recordedid)
  */
 ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts)
 {
-    clear();
+    ProgramInfo::clear();
 
     LoadProgramFromRecorded(_chanid, _recstartts);
     ensureSortFields();
@@ -380,7 +380,7 @@ ProgramInfo::ProgramInfo(
     m_recstartts(_recstartts),
     m_recendts(_recendts),
 
-    m_stars(clamp(_stars, 0.0f, 1.0f)),
+    m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastmodified(_lastmodified),
@@ -563,7 +563,7 @@ ProgramInfo::ProgramInfo(
     m_recstartts(_recstartts),
     m_recendts(_recendts),
 
-    m_stars(clamp(_stars, 0.0f, 1.0f)),
+    m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastmodified(m_startts),
@@ -706,7 +706,7 @@ ProgramInfo::ProgramInfo(
  */
 ProgramInfo::ProgramInfo(const QString &_pathname)
 {
-    clear();
+    ProgramInfo::clear();
     if (_pathname.isEmpty())
     {
         return;
@@ -721,7 +721,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname)
         return;
     }
 
-    clear();
+    ProgramInfo::clear();
 
     QDateTime cur = MythDate::current();
     m_recstartts = m_startts = cur.addSecs(-4 * 60 * 60 - 1);
@@ -753,7 +753,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
                          uint _year,
                          const QString &_programid)
 {
-    clear();
+    ProgramInfo::clear();
 
     m_title = _title;
     m_sortTitle = _sortTitle;
@@ -788,7 +788,7 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
                          const QDateTime &_startts,
                          const QDateTime &_endts)
 {
-    clear();
+    ProgramInfo::clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -975,7 +975,7 @@ void ProgramInfo::clear(void)
     m_recstartts = m_startts;
     m_recendts = m_startts;
 
-    m_stars = 0.0f;
+    m_stars = 0.0F;
 
     m_originalAirDate = QDate();
     m_lastmodified = m_startts;
@@ -1017,8 +1017,8 @@ void ProgramInfo::clear(void)
  *  Compare two QStrings when they can either be initialized to
  *  "Default" or to the empty string.
  */
-bool qstringEqualOrDefault(const QString a, const QString b);
-bool qstringEqualOrDefault(const QString a, const QString b)
+bool qstringEqualOrDefault(const QString& a, const QString& b);
+bool qstringEqualOrDefault(const QString& a, const QString& b)
 {
     if (a == b)
         return true;
@@ -1248,7 +1248,7 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
     return false;
 }
 
-#define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
+#define INT_TO_LIST(x)       do { list << QString::number(x); } while (false)
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
@@ -1259,15 +1259,15 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
                                  } else {                                 \
                                      INT_TO_LIST(kInvalidDateTime);       \
                                  }                                        \
-                             } while (0)
+                             } while (false)
 #endif
 
-#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (0)
+#define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (false)
 
-#define STR_TO_LIST(x)       do { list << (x); } while (0)
-#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (0)
+#define STR_TO_LIST(x)       do { list << (x); } while (false)
+#define DATE_TO_LIST(x)      do { list << (x).toString(Qt::ISODate); } while (false)
 
-#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (0)
+#define FLOAT_TO_LIST(x)     do { list << QString("%1").arg(x); } while (false)
 
 /** \fn ProgramInfo::ToStringList(QStringList&) const
  *  \brief Serializes ProgramInfo into a QStringList which can be passed
@@ -1345,17 +1345,17 @@ void ProgramInfo::ToStringList(QStringList &list) const
                                    clear();                          \
                                    return false;                     \
                                }                                     \
-                               ts = *it++; } while (0)
+                               ts = *it++; } while (false)
 
-#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
-#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
+#define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (false)
+#define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (false)
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
          x = (ts.toUInt() == kInvalidDateTime ?                         \
               QDateTime() : MythDate::fromTime_t(ts.toUInt()));         \
-    } while (0)
+    } while (false)
 #else
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
@@ -1364,16 +1364,16 @@ void ProgramInfo::ToStringList(QStringList &list) const
          } else {                                                       \
               (x) = MythDate::fromSecsSinceEpoch(ts.toLongLong());      \
          }                                                              \
-    } while (0)
+    } while (false)
 #endif
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
-    } while (0)
+    } while (false)
 
-#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (0)
+#define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (false)
 
-#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (0)
+#define FLOAT_FROM_LIST(x)   do { NEXT_STR(); (x) = ts.toFloat(); } while (false)
 
 /** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
                                     QStringList::const_iterator)
@@ -1387,7 +1387,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
  */
 
 bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
-                                 QStringList::const_iterator  listend)
+                                 const QStringList::const_iterator&  listend)
 {
     QString listerror = LOC + "FromStringList, not enough items in list.";
     QString ts;
@@ -1734,14 +1734,14 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["partnumber"] = m_partnumber ? QString::number(m_partnumber) : "";
     progMap["parttotal"] = m_parttotal ? QString::number(m_parttotal) : "";
 
-    QString star_str = (m_stars != 0.0f) ?
+    QString star_str = (m_stars != 0.0F) ?
         QObject::tr("%n star(s)", "", GetStars(star_range)) : "";
     progMap["stars"] = star_str;
     progMap["numstars"] = QString::number(GetStars(star_range));
 
-    if (m_stars != 0.0f && m_year)
+    if (m_stars != 0.0F && m_year)
         progMap["yearstars"] = QString("(%1, %2)").arg(m_year).arg(star_str);
-    else if (m_stars != 0.0f)
+    else if (m_stars != 0.0F)
         progMap["yearstars"] = QString("(%1)").arg(star_str);
     else if (m_year)
         progMap["yearstars"] = QString("(%1)").arg(m_year);
@@ -1843,7 +1843,7 @@ bool ProgramInfo::IsGeneric(void) const
          && m_catType == kCategorySeries);
 }
 
-QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
+QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QString& grp)
     const
 {
     QString str;
@@ -1899,7 +1899,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
 {
     if (!_chanid || !_recstartts.isValid())
     {
-        clear();
+        ProgramInfo::clear();
         return false;
     }
 
@@ -1914,13 +1914,13 @@ bool ProgramInfo::LoadProgramFromRecorded(
     if (!query.exec())
     {
         MythDB::DBError("LoadProgramFromRecorded", query);
-        clear();
+        ProgramInfo::clear();
         return false;
     }
 
     if (!query.next())
     {
-        clear();
+        ProgramInfo::clear();
         return false;
     }
 
@@ -2005,7 +2005,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     m_recstartts   = MythDate::as_utc(query.value(24).toDateTime());
     m_recendts     = MythDate::as_utc(query.value(25).toDateTime());
 
-    m_stars        = clamp((float)query.value(23).toDouble(), 0.0f, 1.0f);
+    m_stars        = clamp((float)query.value(23).toDouble(), 0.0F, 1.0F);
 
     m_year         = query.value(26).toUInt();
     m_partnumber   = query.value(49).toUInt();
@@ -2054,8 +2054,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
     set_flag(m_programflags, FL_BOOKMARK,      query.value(40).toBool());
     set_flag(m_programflags, FL_WATCHED,       query.value(41).toBool());
     set_flag(m_programflags, FL_EDITING,
-             (m_programflags & FL_REALLYEDITING) ||
-             (m_programflags & FL_COMMPROCESSING));
+             ((m_programflags & FL_REALLYEDITING) != 0U) ||
+             ((m_programflags & FL_COMMPROCESSING) != 0U));
 
     m_properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
                     (query.value(43).toUInt() << kVideoPropertyOffset)    |
@@ -2237,11 +2237,8 @@ bool ProgramInfo::IsSameTitleStartTimeAndChannel(const ProgramInfo& other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    if (m_startts == other.m_startts &&
-        IsSameChannel(other))
-        return true;
-
-    return false;
+    return m_startts == other.m_startts &&
+        IsSameChannel(other);
 }
 
 /**
@@ -2254,12 +2251,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    if (IsSameChannel(other) &&
+    return IsSameChannel(other) &&
         m_startts < other.m_endts &&
-        m_endts > other.m_startts)
-        return true;
-
-    return false;
+        m_endts > other.m_startts;
 }
 
 /**
@@ -2270,12 +2264,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
  */
 bool ProgramInfo::IsSameChannel(const ProgramInfo& other) const
 {
-    if (m_chanid == other.m_chanid ||
+    return m_chanid == other.m_chanid ||
          (!m_chansign.isEmpty() &&
-          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0))
-        return true;
-
-    return false;
+          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0);
 }
 
 void ProgramInfo::CheckProgramIDAuthorities(void)
@@ -2478,7 +2469,7 @@ QString ProgramInfo::GetPlaybackURL(
     if (basename.isEmpty())
         return "";
 
-    bool checklocal = !gCoreContext->GetNumSetting("AlwaysStreamFiles", 0) ||
+    bool checklocal = !gCoreContext->GetBoolSetting("AlwaysStreamFiles", false) ||
                       forceCheckLocal;
 
     if (IsVideo())
@@ -2491,12 +2482,12 @@ QString ProgramInfo::GetPlaybackURL(
         QString path = url.path();
         QString host = url.toString(QUrl::RemovePath).mid(7);
         QStringList list = host.split(":", QString::SkipEmptyParts);
-        if (list.size())
+        if (!list.empty())
         {
             host = list[0];
             list = host.split("@", QString::SkipEmptyParts);
             QString group;
-            if (list.size() > 0 && list.size() < 3)
+            if (!list.empty() && list.size() < 3)
             {
                 host  = list.size() == 1 ? list[0]   : list[1];
                 group = list.size() == 1 ? QString() : list[0];
@@ -2526,7 +2517,7 @@ QString ProgramInfo::GetPlaybackURL(
                 QString("GetPlaybackURL: File is local: '%1'") .arg(tmpURL));
             return tmpURL;
         }
-        else if (m_hostname == gCoreContext->GetHostName())
+        if (m_hostname == gCoreContext->GetHostName())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("GetPlaybackURL: '%1' should be local, but it can "
@@ -2948,7 +2939,7 @@ void ProgramInfo::SaveWatched(bool watched)
  */
 bool ProgramInfo::QueryIsEditing(void) const
 {
-    bool editing = m_programflags & FL_REALLYEDITING;
+    bool editing = (m_programflags & FL_REALLYEDITING) != 0U;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2988,8 +2979,8 @@ void ProgramInfo::SaveEditing(bool edit)
         MythDB::DBError("Edit status update", query);
 
     set_flag(m_programflags, FL_REALLYEDITING, edit);
-    set_flag(m_programflags, FL_EDITING, ((m_programflags & FL_REALLYEDITING) ||
-                                          (m_programflags & COMM_FLAG_PROCESSING)));
+    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
 
     SendUpdateEvent();
 }
@@ -3197,8 +3188,8 @@ void ProgramInfo::SaveCommFlagged(CommFlagStatus flag)
 
     set_flag(m_programflags, FL_COMMFLAG,       COMM_FLAG_DONE == flag);
     set_flag(m_programflags, FL_COMMPROCESSING, COMM_FLAG_PROCESSING == flag);
-    set_flag(m_programflags, FL_EDITING, ((m_programflags & FL_REALLYEDITING) ||
-                                          (m_programflags & COMM_FLAG_PROCESSING)));
+    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
     SendUpdateEvent();
 }
 
@@ -3250,7 +3241,7 @@ void ProgramInfo::SaveAutoExpire(AutoExpireType autoExpire, bool updateDelete)
     else if (updateDelete)
         UpdateLastDelete(true);
 
-    set_flag(m_programflags, FL_AUTOEXP, (uint)autoExpire);
+    set_flag(m_programflags, FL_AUTOEXP, autoExpire != kDisableAutoExpire);
 
     SendUpdateEvent();
 }
@@ -4638,13 +4629,13 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
     }
 }
 
-void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
+void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     LOG(VB_RECORD, LOG_INFO,
         QString("SaveVideoProperties(0x%1, 0x%2)")
-        .arg(mask,2,16,QChar('0')).arg(vid_flags,2,16,QChar('0')));
+        .arg(mask,2,16,QChar('0')).arg(video_property_flags,2,16,QChar('0')));
 
     query.prepare(
         "UPDATE recordedprogram "
@@ -4652,7 +4643,7 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
         "WHERE chanid = :CHANID AND starttime = :STARTTIME");
 
     query.bindValue(":OTHERFLAGS", ~mask);
-    query.bindValue(":FLAGS",      vid_flags);
+    query.bindValue(":FLAGS",      video_property_flags);
     query.bindValue(":CHANID",     m_chanid);
     query.bindValue(":STARTTIME",  m_startts);
     if (!query.exec())
@@ -4663,7 +4654,7 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= ~mask;
-    videoproperties |= vid_flags;
+    videoproperties |= video_property_flags;
     m_properties &= ~kVideoPropertyMask;
     m_properties |= videoproperties << kVideoPropertyOffset;
 
@@ -4854,7 +4845,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
 
             if (testFile.isFile())
                 return testFile.path();
-            else if (testFile.isDir())
+            if (testFile.isDir())
                 return testFile.filePath();
         }
         else
@@ -4881,7 +4872,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
  *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
  *        call and so should not be called from the UI thread.
  */
-void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
+void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
 {
     if (!IsRecording())
         return;
@@ -4997,7 +4988,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "MarkAsInUse -- select query failed");
     }
-    else if (query.value(0).toUInt())
+    else if (query.value(0).toBool())
     {
         query.prepare(
             "UPDATE inuseprograms "
@@ -5096,11 +5087,8 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
         input   = query.value(1).toString();
         return true;
     }
-    else
-    {
-        MythDB::DBError("GetChannel(ProgInfo...)", query);
-        return false;
-    }
+    MythDB::DBError("GetChannel(ProgInfo...)", query);
+    return false;
 }
 
 static int init_tr(void)
@@ -5237,7 +5225,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
     const QDateTime *time_dtr[] =
         { &m_recstartts, &m_recendts, &m_startts, &m_endts, };
-    for (uint i = 0; i < sizeof(time_str)/sizeof(char*); i++)
+    for (size_t i = 0; i < sizeof(time_str)/sizeof(char*); i++)
     {
         str.replace(QString("%%1%").arg(time_str[i]),
                     (time_dtr[i]->toLocalTime()).toString("yyyyMMddhhmmss"));
@@ -5584,7 +5572,7 @@ bool LoadFromProgram( ProgramList &destination,
                 query.value(22).toUInt(), // findid
 
                 query.value(11).toInt() == COMM_DETECT_COMMFREE, // commfree
-                query.value(10).toInt(), // repeat
+                query.value(10).toBool(), // repeat
                 query.value(23).toInt(), // videoprop
                 query.value(24).toInt(), // audioprop
                 query.value(25).toInt(), // subtitletypes
@@ -5624,7 +5612,7 @@ ProgramInfo* LoadProgramFromProgram(const uint chanid,
 
     LoadFromProgram( progList, sSQL, bindings, schedList );
 
-    if (progList.size() == 0)
+    if (progList.empty())
         return progInfo;
 
     // progList is an Auto-delete deque, the object will be deleted with the
@@ -5776,7 +5764,7 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
             RecordingType(query.value(16).toInt()),
             query.value(15).toUInt(),
 
-            query.value(19).toInt()));
+            query.value(19).toBool()));
     }
 
     return true;
@@ -5941,7 +5929,7 @@ bool LoadFromRecorded(
         if (inUseMap.contains(key))
             flags |= inUseMap[key];
 
-        if (flags & FL_COMMPROCESSING &&
+        if (((flags & FL_COMMPROCESSING) != 0U) &&
             (isJobRunning.find(key) == isJobRunning.end()))
         {
             flags &= ~FL_COMMPROCESSING;
@@ -5949,8 +5937,8 @@ bool LoadFromRecorded(
         }
 
         set_flag(flags, FL_EDITING,
-                 (flags & FL_REALLYEDITING) ||
-                 (flags & COMM_FLAG_PROCESSING));
+                 ((flags & FL_REALLYEDITING) != 0U) ||
+                 ((flags & COMM_FLAG_PROCESSING) != 0U));
 
         // User/metadata defined season from recorded
         uint season = query.value(3).toUInt();

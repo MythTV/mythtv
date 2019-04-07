@@ -197,7 +197,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
 
 void ExportNative::handleNextPage()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         ShowOkPopup(tr("You need to add at least one item to archive!"));
         return;
@@ -224,7 +224,7 @@ void ExportNative::updateArchiveList(void)
 {
     m_archiveButtonList->Reset();
 
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         m_titleText->Reset();
         m_datetimeText->Reset();
@@ -403,11 +403,11 @@ void ExportNative::createConfigFile(const QString &filename)
 
     // add the options to the xml file
     QDomElement options = doc.createElement("options");
-    options.setAttribute("createiso", m_bCreateISO);
-    options.setAttribute("doburn", m_bDoBurn);
+    options.setAttribute("createiso", static_cast<int>(m_bCreateISO));
+    options.setAttribute("doburn", static_cast<int>(m_bDoBurn));
     options.setAttribute("mediatype", m_archiveDestination.type);
     options.setAttribute("dvdrsize", (qint64)m_archiveDestination.freeSpace);
-    options.setAttribute("erasedvdrw", m_bEraseDvdRw);
+    options.setAttribute("erasedvdrw", static_cast<int>(m_bEraseDvdRw));
     options.setAttribute("savedirectory", m_saveFilename);
     job.appendChild(options);
 

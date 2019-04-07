@@ -259,7 +259,7 @@ OMX_ERRORTYPE OMXComponent::Init(OMX_INDEXTYPE type)
     m_portdefs.resize(port.nPorts);
 
     // Read the default port definitions
-    for (unsigned i = 0; i < port.nPorts; ++i)
+    for (size_t i = 0; i < port.nPorts; ++i)
     {
         e = GetPortDef(i);
         if (OMX_ErrorNone != e)
@@ -622,7 +622,7 @@ OMX_ERRORTYPE OMXComponent::GetComponent(OMXComponent *cmpnt, const QRegExp &re,
 */
 //static
 OMX_ERRORTYPE OMXComponent::EventCB(
-    OMX_IN OMX_HANDLETYPE,
+    OMX_IN OMX_HANDLETYPE /*pHandle*/,
     OMX_IN OMX_PTR pAppData,
     OMX_IN OMX_EVENTTYPE eEvent,
     OMX_IN OMX_U32 nData1,
@@ -635,7 +635,7 @@ OMX_ERRORTYPE OMXComponent::EventCB(
 
 //static
 OMX_ERRORTYPE OMXComponent::EmptyBufferCB(
-    OMX_IN OMX_HANDLETYPE,
+    OMX_IN OMX_HANDLETYPE /*pHandle*/,
     OMX_IN OMX_PTR pAppData,
     OMX_IN OMX_BUFFERHEADERTYPE *hdr)
 {
@@ -645,7 +645,7 @@ OMX_ERRORTYPE OMXComponent::EmptyBufferCB(
 
 //static
 OMX_ERRORTYPE OMXComponent::FillBufferCB(
-    OMX_IN OMX_HANDLETYPE,
+    OMX_IN OMX_HANDLETYPE /*pHandle*/,
     OMX_IN OMX_PTR pAppData,
     OMX_IN OMX_BUFFERHEADERTYPE *hdr)
 {
@@ -744,9 +744,11 @@ OMX_ERRORTYPE OMXComponentCtx::Event( OMXComponent &cmpnt,
         break;
 
       case OMX_EventBufferFlag:
-        if (0) LOG(VB_PLAYBACK, LOG_DEBUG, LOCB(cmpnt) + QString(
+#if 0
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOCB(cmpnt) + QString(
                 "EventBufferFlag: port=%1 flags=%2")
             .arg(nData1).arg(HeaderFlags(nData2)) );
+#endif
         break;
 
       case OMX_EventResourcesAcquired:
@@ -1108,7 +1110,7 @@ const char *Command2String(OMX_COMMANDTYPE cmd)
             (_n) &= ~OMX_BUFFERFLAG_##_f;\
             (_l) << STR(_f);\
         }\
-    } while(0)
+    } while(false)
 
 QString HeaderFlags(OMX_U32 nFlags)
 {

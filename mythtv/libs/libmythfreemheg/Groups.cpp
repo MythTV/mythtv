@@ -348,7 +348,7 @@ MHRoot *MHGroup::FindByObjectNo(int n)
 }
 
 // Set up a timer or cancel a timer.
-void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *)
+void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * /*engine*/)
 {
     // First remove any existing timer with the same Id.
     for (int i = 0; i < m_Timers.size(); i++)
@@ -818,7 +818,7 @@ void MHSendEvent::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-void MHSendEvent::PrintArgs(FILE *fd, int) const
+void MHSendEvent::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     m_EventSource.PrintMe(fd, 0);
     QByteArray tmp = MHLink::EventTypeToString(m_EventType).toLatin1();

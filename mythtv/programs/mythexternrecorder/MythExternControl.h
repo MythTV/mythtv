@@ -41,7 +41,7 @@ class Buffer : QObject
     enum constants {MAX_QUEUE = 500};
 
     Buffer(MythExternControl * parent);
-    ~Buffer(void);
+    ~Buffer(void) = default;
     void Start(void) {
         m_thread = std::thread(&Buffer::Run, this);
     }
@@ -75,8 +75,10 @@ class Commands : public QObject
     Q_OBJECT
 
   public:
-    Commands(MythExternControl * parent);
-    ~Commands(void);
+    Commands(MythExternControl * parent)
+        : m_parent(parent)
+        , m_apiVersion(-1) {}
+    ~Commands(void) = default;
     void Start(void) {
         m_thread = std::thread(&Commands::Run, this);
     }
@@ -85,8 +87,8 @@ class Commands : public QObject
             m_thread.join();
     }
 
-    bool SendStatus(const QString & cmd, const QString & status);
-    bool SendStatus(const QString & cmd, const QString & serial,
+    bool SendStatus(const QString & command, const QString & status);
+    bool SendStatus(const QString & command, const QString & serial,
                     const QString & status);
     bool ProcessCommand(const QString & cmd);
 
@@ -149,7 +151,7 @@ class MythExternControl : public QObject
 
   public slots:
     void SetDescription(const QString & desc) { m_desc = desc; }
-    void SendMessage(const QString & command, const QString & serial,
+    void SendMessage(const QString & cmd, const QString & serial,
                      const QString & msg);
     void ErrorMessage(const QString & msg);
     void Opened(void);

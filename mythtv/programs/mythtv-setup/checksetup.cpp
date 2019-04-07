@@ -74,7 +74,7 @@ bool checkStoragePaths(QStringList &probs)
         MythDB::DBError("checkStoragePaths", query);
         return false;
     }
-    else if (query.size() < 1)
+    if (query.size() < 1)
     {
         if (gCoreContext->IsMasterHost())
         {
@@ -88,8 +88,7 @@ bool checkStoragePaths(QStringList &probs)
             LOG(VB_GENERAL, LOG_ERR, trMesg);
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QDir checkDir("");
@@ -132,7 +131,7 @@ bool checkImageStoragePaths(QStringList &probs)
         MythDB::DBError("checkImageStoragePaths", query);
         return false;
     }
-    else if (query.size() < 1)
+    if (query.size() < 1)
     {
         return false;
     }
@@ -192,6 +191,15 @@ bool checkChannelPresets(QStringList &probs)
         int cardid    = query.value(0).toInt();
         QString startchan = query.value(1).toString();
         int sourceid  = query.value(2).toInt();
+
+        if (0 == sourceid)
+        {
+            probs.push_back(QObject::tr("Card %1 (type %2) is not connected "
+                            "to a video source.")
+                    .arg(cardid).arg(query.value(3).toString()));
+            problemFound = true;
+            continue;
+        }
 
         if (query.value(1).toString().isEmpty())    // Logic from tv_rec.cpp
             startchan = "3";

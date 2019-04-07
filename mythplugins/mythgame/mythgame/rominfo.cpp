@@ -11,9 +11,7 @@
 
 bool operator==(const RomInfo& a, const RomInfo& b)
 {
-    if (a.Romname() == b.Romname())
-        return true;
-    return false;
+    return a.Romname() == b.Romname();
 }
 
 void RomInfo::SaveToDatabase()
@@ -113,7 +111,7 @@ void RomInfo::DeleteFromDatabase()
 }
 
 // Return the count of how many times this appears in the db already
-int romInDB(QString rom, QString gametype)
+int romInDB(const QString& rom, const QString& gametype)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -171,7 +169,7 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     return false;
 }
 
-void RomInfo::setField(QString field, QString data)
+void RomInfo::setField(const QString& field, const QString& data)
 {
     if (field == "system")
         m_system = data;
@@ -182,7 +180,7 @@ void RomInfo::setField(QString field, QString data)
     else if (field == "year")
         m_year = data;
     else if (field == "favorite")
-        m_favorite = data.toInt();
+        m_favorite = (data.toInt() != 0);
     else if (field == "rompath")
         m_rompath = data;
     else if (field == "screenshot")
@@ -214,7 +212,7 @@ void RomInfo::setField(QString field, QString data)
 
 void RomInfo::setFavorite(bool updateDatabase)
 {
-    m_favorite = 1 - m_favorite;
+    m_favorite = !m_favorite;
 
     if (updateDatabase)
     {

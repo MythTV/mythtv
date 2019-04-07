@@ -23,7 +23,7 @@ class MSqlQuery;
 class ATSCEvent
 {
   public:
-    ATSCEvent(uint a, uint b, uint c, QString d,
+    ATSCEvent(uint a, uint b, uint c, const QString& d,
               const unsigned char *e, uint f)
         : m_start_time(a), m_length(b), m_etm(c), m_desc_length(f), m_title(d), m_desc(e),
           m_scan_time(time(nullptr)) {}
@@ -51,7 +51,8 @@ class ATSCEvent
 class ATSCEtt
 {
   public:
-    explicit ATSCEtt(QString text) : m_ett_text(text), m_scan_time(time(nullptr)) {}
+    explicit ATSCEtt(const QString& text) :
+        m_ett_text(text), m_scan_time(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to
@@ -112,7 +113,7 @@ class EITHelper
     void AddETT(uint atsc_major, uint atsc_minor,
                 const ExtendedTextTable     *ett);
     void AddEIT(const DVBEventInformationTable *eit);
-    void AddEIT(const PremiereContentInformationTable *eit);
+    void AddEIT(const PremiereContentInformationTable *cit);
 #else // if !USING_BACKEND
     void AddEIT(uint, uint, const EventInformationTable*) {}
     void AddETT(uint, uint, const ExtendedTextTable*) {}
@@ -128,7 +129,7 @@ class EITHelper
     // only ATSC
     uint GetChanID(uint atsc_major, uint atsc_minor);
     // only DVB
-    uint GetChanID(uint serviceid, uint networkid, uint transportid);
+    uint GetChanID(uint serviceid, uint networkid, uint tsid);
     // any DTV
     uint GetChanID(uint program_number);
 

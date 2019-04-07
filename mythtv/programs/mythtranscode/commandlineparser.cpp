@@ -5,7 +5,7 @@
 
 MythTranscodeCommandLineParser::MythTranscodeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTRANSCODE)
-{ LoadArguments(); }
+{ MythTranscodeCommandLineParser::LoadArguments(); }
 
 void MythTranscodeCommandLineParser::LoadArguments(void)
 {

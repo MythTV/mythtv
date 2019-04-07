@@ -53,7 +53,7 @@ void CC708Reader::SetCurrentWindow(uint service_num, int window_id)
 
 void CC708Reader::DefineWindow(
     uint service_num,     int window_id,
-    int priority,         int visible,
+    int priority,         bool visible,
     int anchor_point,     int relative_pos,
     int anchor_vertical,  int anchor_horizontal,
     int row_count,        int column_count,
@@ -62,7 +62,7 @@ void CC708Reader::DefineWindow(
 {
     if (m_parent && m_parent->GetDecoder())
     {
-        StreamInfo si(-1, 0, 0, service_num, false, false);
+        StreamInfo si(-1, 0, 0, service_num, 0, false, false);
         m_parent->GetDecoder()->InsertTrack(kTrackTypeCC708, si);
     }
 
@@ -263,7 +263,7 @@ void CC708Reader::Delay(uint service_num, int tenths_of_seconds)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("Delay(%1, %2 seconds)")
-            .arg(service_num).arg(tenths_of_seconds * 0.1f));
+            .arg(service_num).arg(tenths_of_seconds * 0.1F));
 }
 
 void CC708Reader::DelayCancel(uint service_num)

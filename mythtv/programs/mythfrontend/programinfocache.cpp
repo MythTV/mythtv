@@ -94,7 +94,7 @@ void ProgramInfoCache::Load(const bool updateUI)
 bool ProgramInfoCache::IsLoadInProgress(void) const
 {
     QMutexLocker locker(&m_lock);
-    return m_loads_in_progress;
+    return m_loads_in_progress != 0U;
 }
 
 void ProgramInfoCache::WaitForLoadToComplete(void) const

@@ -24,8 +24,8 @@ class ViewScheduleDiff : public MythScreenType
 {
     Q_OBJECT
   public:
-    ViewScheduleDiff(MythScreenStack *parent, QString altTbl,
-                     int recordid = -1, QString ltitle = "")
+    ViewScheduleDiff(MythScreenStack *parent, const QString& altTbl,
+                     int recordid = -1, const QString& ltitle = "")
         : MythScreenType(parent, "ViewScheduleDiff"),
           m_altTable(altTbl), m_title(ltitle),
           m_recordid(recordid) {}

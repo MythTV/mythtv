@@ -8,7 +8,7 @@
 #include "goom_tools.h"
 
 void
-ifs_update (guint32 * data, guint32 * back, int width, int height,
+ifs_update (guint32 * data, const guint32 * back, int width, int height,
 						int increment)
 {
 	static int couleur = 0xc0c0c0c0;
@@ -25,7 +25,6 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 
 	int     nbpt;
 	IFSPoint *points;
-	int     i;
 
 	int     couleursl = couleur;
 
@@ -41,7 +40,7 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 	{
 		unsigned char *tmp = (unsigned char *) &couleursl;
 
-		for (i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			*tmp = (*tmp) >> cycle10;
 			tmp++;
 		}
@@ -53,7 +52,7 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 #ifdef MMX
 	movd_m2r (couleursl, mm1);
 	punpckldq_r2r (mm1, mm1);
-	for (i = 0; i < nbpt; i += increment) {
+	for (int i = 0; i < nbpt; i += increment) {
 		int     x = points[i].x;
 		int     y = points[i].y;
 
@@ -66,18 +65,18 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 	}
 	emms();/*__asm__ __volatile__ ("emms");*/
 #else
-	for (i = 0; i < nbpt; i += increment) {
+	for (int i = 0; i < nbpt; i += increment) {
 		int     x = (int) points[i].x & 0x7fffffff;
 		int     y = (int) points[i].y & 0x7fffffff;
 
 		if ((x < width) && (y < height)) {
 			int     pos = x + (int) (y * width);
-			int     tra = 0, i = 0;
+			int     tra = 0;
 			unsigned char *bra = (unsigned char *) &back[pos];
 			unsigned char *dra = (unsigned char *) &data[pos];
 			unsigned char *cra = (unsigned char *) &couleursl;
 
-			for (; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
 				tra = *cra;
 				tra += *bra;
 				if (tra > 255)

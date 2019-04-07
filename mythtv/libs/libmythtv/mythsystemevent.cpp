@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QRunnable>
+#include <utility>
 
 #include "mythcorecontext.h"
 #include "mthreadpool.h"
@@ -34,7 +35,7 @@ class SystemEventThread : public QRunnable
      *  \param eventName Optional System Event name for this command
      */
     SystemEventThread(const QString &cmd, QString eventName = "")
-      : m_command(cmd), m_event(eventName) {};
+      : m_command(cmd), m_event(std::move(eventName)) {};
 
     /** \fn SystemEventThread::run()
      *  \brief Runs the System Event handler command

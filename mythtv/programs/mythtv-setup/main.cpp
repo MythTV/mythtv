@@ -177,7 +177,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 }
 
-static bool RunMenu(QString themedir, QString themename)
+static bool RunMenu(const QString& themedir, const QString& themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     menu = new MythThemedMenu(
@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
 
     if (doScan)
     {
-        bool okCardID = scanCardId;
+        bool okCardID = scanCardId != 0U;
 
         if (scanInputName.isEmpty())
             scanInputName = CardUtil::GetInputName(scanCardId);
@@ -461,7 +461,7 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
             cerr << "Valid cards: " << endl;
-            for (uint i = 0; i < cardids.size(); i++)
+            for (size_t i = 0; i < cardids.size(); i++)
             {
                 fprintf(stderr, "%5u: %s %s\n",
                         cardids[i],
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
         vector<ScanInfo> scans = LoadScanList();
 
         cout<<" scanid cardid sourceid processed        date"<<endl;
-        for (uint i = 0; i < scans.size(); i++)
+        for (size_t i = 0; i < scans.size(); i++)
         {
             printf("%5i %6i %8i %8s    %20s\n",
                    scans[i].m_scanid,   scans[i].m_cardid,

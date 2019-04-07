@@ -35,7 +35,7 @@ class MTV_PUBLIC FIFOWriter
     FIFOWriter(const FIFOWriter& rhs);
    ~FIFOWriter(void);
 
-    int FIFOInit(int id, QString desc, QString name, long size, int num_bufs);
+    bool FIFOInit(int id, const QString& desc, const QString& name, long size, int num_bufs);
     void FIFOWrite(int id, void *buf, long size);
     void FIFODrain(void);
 

@@ -161,7 +161,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     friend class MythSystemLegacyPrivate;
 
     // FIXME: This should be an independent function living elsewhere
-    static QString ShellEscape(const QString &str);
+    static QString ShellEscape(const QString &in);
 
     // FIXME: Do we really need to expose Qt signals?
     //        If so why are they lower case?

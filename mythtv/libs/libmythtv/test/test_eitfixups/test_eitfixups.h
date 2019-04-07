@@ -49,5 +49,5 @@ class TestEITFixups : public QObject
     void test64BitEnum(void);
 
   private:
-    static DBEventEIT *SimpleDBEventEIT (FixupValue fix, QString title, QString subtitle, QString description);
+    static DBEventEIT *SimpleDBEventEIT (FixupValue fix, const QString& title, const QString& subtitle, const QString& description);
 };

@@ -187,7 +187,7 @@ public:
 
 protected:
     void         SetDirectory(int);
-    void         LoadDirThumbs(ImageItem &, int limit, int level = 0);
+    void         LoadDirThumbs(ImageItem &, int thumbsNeeded, int level = 0);
     void         PopulateThumbs(ImageItem &, int thumbsNeeded,
                                 const ImageList &files, const ImageList &dirs,
                                 int level = 0);

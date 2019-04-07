@@ -12,8 +12,9 @@ struct fsattab {
 
 #include "freesat_tables.h"
 
-QString freesat_huffman_to_string(const unsigned char *src, uint size)
+QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
 {
+    const unsigned char *src = compressed;
     struct fsattab *fsat_table;
     unsigned int *fsat_index;
 
@@ -110,5 +111,5 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
 
         return QString::fromUtf8(uncompressed, p);
     }
-    else return QString("");
+    return QString("");
 }

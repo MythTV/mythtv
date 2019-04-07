@@ -506,7 +506,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     }
 
     // PiPs/PBPs
-    if (m_openGLVideoPiPs.size())
+    if (!m_openGLVideoPiPs.empty())
     {
         QMap<MythPlayer*,OpenGLVideo*>::iterator it = m_openGLVideoPiPs.begin();
         for (; it != m_openGLVideoPiPs.end(); ++it)

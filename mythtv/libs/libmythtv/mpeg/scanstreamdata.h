@@ -29,21 +29,21 @@ class MTV_PUBLIC ScanStreamData :
                           uint_vec_t& /*del_pids*/) const override // ATSCStreamData
         { return false; }
 
-    QString GetSIStandard(QString guess = "mpeg") const;
+    QString GetSIStandard(const QString& guess = "mpeg") const;
 
     void SetFreesatAdditionalSI(bool freesat_si);
 
   private:
     bool DeleteCachedTable(PSIPTable *psip) const override; // ATSCStreamData
-    /// listen for addiotional Freesat service information
-    int dvb_uk_freesat_si;
+    /// listen for additional Freesat service information
+    bool m_dvb_uk_freesat_si {false};
     bool m_no_default_pid;
 };
 
 inline void ScanStreamData::SetFreesatAdditionalSI(bool freesat_si)
 {
     QMutexLocker locker(&_listener_lock);
-    dvb_uk_freesat_si = freesat_si;
+    m_dvb_uk_freesat_si = freesat_si;
     if (freesat_si)
         AddListeningPID(FREESAT_SI_PID);
     else

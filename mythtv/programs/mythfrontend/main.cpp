@@ -171,7 +171,7 @@ namespace
             }
         }
 
-        ~RunSettingsCompletion() = default;
+        ~RunSettingsCompletion() override = default;
 
       private slots:
         void OnPasswordResultReady(bool passwordValid,
@@ -531,7 +531,7 @@ static void startCustomPriority(void)
         delete custom;
 }
 
-static void startPlaybackWithGroup(QString recGroup = "")
+static void startPlaybackWithGroup(const QString& recGroup = "")
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -791,26 +791,24 @@ static void playDisc()
 
             return;
         }
-        else
+
+        if (command_string.contains("%d"))
         {
-            if (command_string.contains("%d"))
-            {
-                //
-                //  Need to do device substitution
-                //
-                command_string =
-                        command_string.replace(QRegExp("%d"), dvd_device);
-            }
-            gCoreContext->emitTVPlaybackStarted();
-            GetMythMainWindow()->PauseIdleTimer(true);
-            myth_system(command_string);
-            gCoreContext->emitTVPlaybackStopped();
-            GetMythMainWindow()->PauseIdleTimer(false);
-            if (GetMythMainWindow())
-            {
-                GetMythMainWindow()->raise();
-                GetMythMainWindow()->activateWindow();
-            }
+            //
+            //  Need to do device substitution
+            //
+            command_string =
+                command_string.replace(QRegExp("%d"), dvd_device);
+        }
+        gCoreContext->emitTVPlaybackStarted();
+        GetMythMainWindow()->PauseIdleTimer(true);
+        myth_system(command_string);
+        gCoreContext->emitTVPlaybackStopped();
+        GetMythMainWindow()->PauseIdleTimer(false);
+        if (GetMythMainWindow())
+        {
+            GetMythMainWindow()->raise();
+            GetMythMainWindow()->activateWindow();
         }
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -1134,7 +1132,7 @@ static void TVMenuCallback(void *data, QString &selection)
     else if (sel == "video_settings_general")
     {
         RunSettingsCompletion::Create(gCoreContext->
-                GetNumSetting("VideoAggressivePC", 0));
+                GetBoolSetting("VideoAggressivePC", false));
     }
     else if (sel == "video_settings_player")
     {
@@ -1221,7 +1219,7 @@ static void handleExit(bool prompt)
         qApp->quit();
 }
 
-static bool RunMenu(QString themedir, QString themename)
+static bool RunMenu(const QString& themedir, const QString& themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     g_menu = new MythThemedMenu(QString(tmp.constData()), "mainmenu.xml",
@@ -2251,10 +2249,7 @@ int main(int argc, char **argv)
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete housekeeping;
-
-    if (themeUpdateChecker)
-        delete themeUpdateChecker;
-
+    delete themeUpdateChecker;
     delete sysEventHandler;
 
     g_pmanager->DestroyAllPlugins();
@@ -2263,9 +2258,7 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-
     return ret;
-
 }
 
 void handleSIGUSR1(void)

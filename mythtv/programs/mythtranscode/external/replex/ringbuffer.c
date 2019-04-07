@@ -442,7 +442,7 @@ int dummy_add(dummy_buffer *dbuf, uint64_t time, uint32_t size)
 	if (ring_write(&dbuf->data_index, (uint8_t *)&size, sizeof(uint32_t)) < 0) 
 		return -3;
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, " - %d = "%d", size, dummy_space(dbuf));
+	LOG(VB_GENERAL, LOG_INFO, " - %d = %d", size, dummy_space(dbuf));
 #endif
 	return size;
 }
@@ -458,7 +458,7 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 		if (ring_peek(&dbuf->time_index,(uint8_t *) &rtime, 
 			      sizeof(uint64_t), 0)<0){
 			if (dsize) break;
-			else return -1;
+			return -1;
 		}
 		if (ptscmp(rtime,time) < 0){
 			ring_read(&dbuf->time_index,(uint8_t *) &rtime, 

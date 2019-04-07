@@ -215,10 +215,6 @@ BDInfo::BDInfo(const QString &filename)
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Done"));
 }
 
-BDInfo::~BDInfo(void)
-{
-}
-
 void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
                                  QString &name,
                                  QString &serialnum,
@@ -284,9 +280,7 @@ bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
     name   = m_name;
     serial = m_serialnumber;
-    if (name.isEmpty() && serial.isEmpty())
-        return false;
-    return true;
+    return !(name.isEmpty() && serial.isEmpty());
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
@@ -295,7 +289,7 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
-    OpenFile(lfilename);
+    BDRingBuffer::OpenFile(lfilename);
 }
 
 BDRingBuffer::~BDRingBuffer()
@@ -678,8 +672,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     if (discinfo)
     {
-        m_topMenuSupported   = discinfo->top_menu_supported;
-        m_firstPlaySupported = discinfo->first_play_supported;
+        m_topMenuSupported   = (discinfo->top_menu_supported != 0U);
+        m_firstPlaySupported = (discinfo->first_play_supported != 0U);
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "*** Blu-ray Disc Information ***");
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("First Play Supported: %1")
@@ -826,7 +820,7 @@ uint64_t BDRingBuffer::GetChapterStartTime(uint32_t chapter)
         return 0;
     QMutexLocker locker(&m_infoLock);
     return (uint64_t)((long double)m_currentTitleInfo->chapters[chapter].start /
-                                   90000.0f);
+                                   90000.0F);
 }
 
 uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
@@ -835,7 +829,7 @@ uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
         return 0;
     QMutexLocker locker(&m_infoLock);
     return (uint64_t)((long double)(m_currentTitleInfo->chapters[chapter].start *
-                                    GetFrameRate()) / 90000.0f);
+                                    GetFrameRate()) / 90000.0F);
 }
 
 int BDRingBuffer::GetCurrentTitle(void)
@@ -856,7 +850,7 @@ int BDRingBuffer::GetTitleDuration(int title)
     if (!info)
         return 0;
 
-    int duration = ((info->duration) / 90000.0f);
+    int duration = ((info->duration) / 90000.0F);
     return duration;
 }
 
@@ -1420,23 +1414,23 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_PG_TEXTST:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_PG_TEXTST %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_PGTextSTEnabled = ev.param;
+            m_PGTextSTEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_AUDIO:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SECONDARY_AUDIO %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_secondaryAudioEnabled = ev.param;
+            m_secondaryAudioEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_VIDEO:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SECONDARY_VIDEO %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_secondaryVideoEnabled = ev.param;
+            m_secondaryVideoEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_VIDEO_SIZE:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_SECONDARY_VIDEO_SIZE %1")
                     .arg(ev.param==0 ? "PIP" : "fullscreen"));
-            m_secondaryVideoIsFullscreen = ev.param;
+            m_secondaryVideoIsFullscreen = (ev.param != 0U);
             break;
 
         /* status */
@@ -1549,15 +1543,15 @@ bool BDRingBuffer::StartFromBeginning(void)
     return true;
 }
 
-bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
+bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serialnum)
 {
     if (!m_bdnav)
         return false;
 
-    name   = m_name;
-    serial = m_serialNumber;
+    name      = m_name;
+    serialnum = m_serialNumber;
 
-    return !serial.isEmpty();
+    return !serialnum.isEmpty();
 }
 
 /** \brief Get a snapshot of the current BD state
@@ -1680,10 +1674,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
     {
         case BD_OVERLAY_INIT:    /* init overlay plane. Size and position of plane in x,y,w,h */
             /* init overlay plane. Size of plane in w,h */
-            if (osd)
-            {
-                delete osd;
-            }
+            delete osd;
             osd = new BDOverlay(overlay);
             break;
 
@@ -1773,9 +1764,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
     {
         case BD_ARGB_OVERLAY_INIT:
             /* init overlay plane. Size of plane in w,h */
-            if (osd)
-                delete osd;
-
+            delete osd;
             osd = new BDOverlay(overlay);
             break;
 

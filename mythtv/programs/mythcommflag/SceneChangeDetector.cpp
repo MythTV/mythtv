@@ -55,14 +55,14 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
      * in relative frequencies of the dominant colors.
      */
     unsigned short diff = 0;
-    for (unsigned int ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
+    for (size_t ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
         diff += abs((*sc1)[ii].frequency - (*sc2)[ii].frequency) +
             abs((*sc1)[ii].color - (*sc2)[ii].color);
     return diff;
 }
 
 bool
-writeData(QString filename, const unsigned short *scdiff, long long nframes)
+writeData(const QString& filename, const unsigned short *scdiff, long long nframes)
 {
     FILE            *fp;
     long long       frameno;
@@ -98,9 +98,8 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
 };  /* namespace */
 
 SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
-        QString debugdir)
-    : FrameAnalyzer()
-    , m_histogramAnalyzer(ha)
+        const QString& debugdir)
+    : m_histogramAnalyzer(ha)
     , m_debugdata(debugdir + "/SceneChangeDetector.txt")
 {
     LOG(VB_COMMFLAG, LOG_INFO, "SceneChangeDetector");
@@ -122,10 +121,8 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
 
 void SceneChangeDetector::deleteLater(void)
 {
-    if (m_scdata)
-        delete []m_scdata;
-    if (m_scdiff)
-        delete []m_scdiff;
+    delete []m_scdata;
+    delete []m_scdiff;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -180,10 +177,10 @@ SceneChangeDetector::finished(long long nframes, bool final)
 
     const HistogramAnalyzer::Histogram *histogram =
         m_histogramAnalyzer->getHistograms();
-    for (unsigned int frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
         scenechange_data_init(&m_scdata[frameno], &histogram[frameno]);
     m_scdiff[0] = 0;
-    for (unsigned int frameno = 1; frameno < nframes; frameno++)
+    for (long long frameno = 1; frameno < nframes; frameno++)
         m_scdiff[frameno] = scenechange_data_diff(&m_scdata[frameno - 1],
                 &m_scdata[frameno]);
 

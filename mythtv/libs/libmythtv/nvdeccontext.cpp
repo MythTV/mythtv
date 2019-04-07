@@ -37,12 +37,6 @@ extern "C" {
 
 #define LOC QString("NVDEC: ")
 
-NvdecContext::NvdecContext() :
-    MythCodecContext()
-{
-
-}
-
 MythCodecID NvdecContext::GetBestSupportedCodec(
     AVCodec **ppCodec,
     const QString &decoder,

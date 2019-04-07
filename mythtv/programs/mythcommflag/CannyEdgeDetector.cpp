@@ -63,12 +63,9 @@ CannyEdgeDetector::~CannyEdgeDetector(void)
     av_freep(&m_convolved.data[0]);
     av_freep(&m_s2.data[0]);
     av_freep(&m_s1.data[0]);
-    if (m_sgmsorted)
-        delete []m_sgmsorted;
-    if (m_sgm)
-        delete []m_sgm;
-    if (m_mask)
-        delete []m_mask;
+    delete []m_sgmsorted;
+    delete []m_sgm;
+    delete []m_mask;
 }
 
 int

@@ -10,7 +10,6 @@
 #include "mythdbparams.h"
 
 DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
-    : GroupSetting()
 {
     m_DBhostOverride = DBhostOverride;
 
@@ -108,14 +107,14 @@ DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
                              "reconnect to the database server."));
     addChild(m_wolEnabled);
 
-    m_wolReconnect = new TransMythUISpinBoxSetting(0, 60, 1, true);
+    m_wolReconnect = new TransMythUISpinBoxSetting(0, 60, 1, 1);
     m_wolReconnect->setLabel(DatabaseSettings::tr("Reconnect time"));
     m_wolReconnect->setHelpText(
         DatabaseSettings::tr("The time in seconds to wait for "
                              "the server to wake up."));
     m_wolEnabled->addTargetedChild("1", m_wolReconnect);
 
-    m_wolRetry = new TransMythUISpinBoxSetting(1, 10, 1, true);
+    m_wolRetry = new TransMythUISpinBoxSetting(1, 10, 1, 1);
     m_wolRetry->setLabel(DatabaseSettings::tr("Retry attempts"));
     m_wolRetry->setHelpText(
         DatabaseSettings::tr("The number of retries to wake the "

@@ -28,7 +28,7 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(HDHRChannel::GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),
@@ -39,7 +39,7 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
 
 HDHRChannel::~HDHRChannel(void)
 {
-    Close();
+    HDHRChannel::Close();
     DeregisterForMaster(m_device_id);
 }
 
@@ -78,7 +78,7 @@ void HDHRChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing HDHR channel");
 
-    if (!IsOpen())
+    if (!HDHRChannel::IsOpen())
         return; // this caller didn't have it open in the first place..
 
     HDHRStreamHandler::Return(m_stream_handler, GetInputID());
@@ -105,15 +105,15 @@ static QString format_modulation(const DTVMultiplex &tuning)
 {
     if (DTVModulation::kModulationQAM256 == tuning.m_modulation)
         return "qam256";
-    else if (DTVModulation::kModulationQAM128 == tuning.m_modulation)
+    if (DTVModulation::kModulationQAM128 == tuning.m_modulation)
         return "qam128";
-    else if (DTVModulation::kModulationQAM64 == tuning.m_modulation)
+    if (DTVModulation::kModulationQAM64 == tuning.m_modulation)
         return "qam64";
-    else if (DTVModulation::kModulationQAM16 == tuning.m_modulation)
+    if (DTVModulation::kModulationQAM16 == tuning.m_modulation)
         return "qam16";
-    else if (DTVModulation::kModulationDQPSK == tuning.m_modulation)
+    if (DTVModulation::kModulationDQPSK == tuning.m_modulation)
         return "qpsk";
-    else if (DTVModulation::kModulation8VSB == tuning.m_modulation)
+    if (DTVModulation::kModulation8VSB == tuning.m_modulation)
         return "8vsb";
 
     return "auto";
@@ -125,9 +125,8 @@ static QString format_dvbt(const DTVMultiplex &tuning, const QString &mod)
 
     if ((QChar('a') == b) || (mod == "auto"))
         return "auto"; // uses bandwidth from channel map
-    else if (QChar('a') != b)
+    if (QChar('a') != b)
         return QString("t%1%2").arg(b).arg(mod);
-
     return QString("auto%1t").arg(b);
 }
 
@@ -137,10 +136,9 @@ static QString format_dvbc(const DTVMultiplex &tuning, const QString &mod)
 
     if ((QChar('a') == b) || (mod == "auto"))
         return "auto"; // uses bandwidth from channel map
-    else if ((QChar('a') != b) && (tuning.m_symbolrate > 0))
+    if ((QChar('a') != b) && (tuning.m_symbolrate > 0))
         return QString("a%1%2-%3")
             .arg(b).arg(mod).arg(tuning.m_symbolrate/1000);
-
     return QString("auto%1c").arg(b);
 }
 
@@ -152,9 +150,9 @@ static QString get_tune_spec(
     if (DTVTunerType::kTunerTypeATSC == tunerType)
         // old atsc firmware does no recognize "auto"
         return (mod == "auto") ? "qam" : mod;
-    else if (DTVTunerType::kTunerTypeDVBC == tunerType)
+    if (DTVTunerType::kTunerTypeDVBC == tunerType)
         return format_dvbc(tuning, mod);
-    else if (DTVTunerType::kTunerTypeDVBT == tunerType)
+    if (DTVTunerType::kTunerTypeDVBT == tunerType)
         return format_dvbt(tuning, mod);
 
     return "auto";

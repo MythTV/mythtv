@@ -137,7 +137,7 @@ class ImportIconsWizard : public MythScreenType
     /*! \brief attempt the inital load of the TV channel information
      * \return true if successful
      */
-    bool initialLoad(QString name="");
+    bool initialLoad(const QString& name="");
 
     /*! \brief attempts to move the iteration on one/more than one
      * \return true if we can go again or false if we cannot

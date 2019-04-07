@@ -10,8 +10,9 @@
 
 // Qt headers
 #include <QCoreApplication>
-#include <QEvent>
 #include <QDir>
+#include <QEvent>
+#include <utility>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -105,8 +106,7 @@ void AudioConfigScreen::Init(void)
     settings->CheckConfiguration();
 }
 
-AudioConfigSettings::AudioConfigSettings() :
-    GroupSetting()
+AudioConfigSettings::AudioConfigSettings()
 {
     setLabel(tr("Audio System"));
 
@@ -261,7 +261,7 @@ void AudioConfigSettings::AudioRescan()
     UpdateCapabilities();
 }
 
-void AudioConfigSettings::UpdateVisibility(StandardSetting *)
+void AudioConfigSettings::UpdateVisibility(StandardSetting * /*setting*/)
 {
     if (!m_MaxAudioChannels || !m_AudioUpmix || !m_AudioUpmixType)
         return;
@@ -598,8 +598,8 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                  AudioOutputSettings &settings,
                                  bool hd) :
     MThread("AudioTest"),
-    m_parent(parent), m_channels(channels), m_device(main),
-    m_passthrough(passthrough), m_hd(hd)
+    m_parent(parent), m_channels(channels), m_device(std::move(main)),
+    m_passthrough(std::move(passthrough)), m_hd(hd)
 {
     m_format = hd ? settings.BestSupportedFormat() : FORMAT_S16;
     m_samplerate = hd ? settings.BestSupportedRate() : 48000;
@@ -622,8 +622,7 @@ AudioTestThread::~AudioTestThread()
 {
     cancel();
     wait();
-    if (m_audioOutput)
-        delete m_audioOutput;
+    delete m_audioOutput;
 }
 
 void AudioTestThread::cancel()
@@ -761,7 +760,6 @@ void AudioTestThread::run()
 }
 
 AudioTest::AudioTest()
-    : GroupSetting()
 {
     int channels = 2;
 
@@ -1099,8 +1097,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerControl()
 
     gc->setLabel(tr("Mixer controls"));
 
-    for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*);
-         ++i)
+    for (size_t i = 0; i < sizeof(MixerControlControls) / sizeof(char*); ++i)
     {
         gc->addSelection(tr(MixerControlControls[i]),
                          MixerControlControls[i]);

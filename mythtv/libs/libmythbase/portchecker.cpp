@@ -100,6 +100,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
         else
             return false;
     }
+    // cppcheck-suppress unreadVariable
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
 #ifndef _WIN32
     QListIterator<QNetworkInterface> iCard = cards;

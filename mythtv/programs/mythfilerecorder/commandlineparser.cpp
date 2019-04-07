@@ -5,7 +5,7 @@
 
 MythFileRecorderCommandLineParser::MythFileRecorderCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
-{ LoadArguments(); }
+{ MythFileRecorderCommandLineParser::LoadArguments(); }
 
 QString MythFileRecorderCommandLineParser::GetHelpHeader(void) const
 {

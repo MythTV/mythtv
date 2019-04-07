@@ -18,8 +18,8 @@ typedef QList<MythSettingBase*> MythSettingList;
 class MythSettingGroup : public MythSettingBase
 {
   public:
-    MythSettingGroup(QString hlabel, QString ulabel,
-                     QString script = "") :
+    MythSettingGroup(const QString& hlabel, const QString& ulabel,
+                     const QString& script = "") :
         m_human_label(hlabel), m_unique_label(ulabel), m_ecma_script(script) {}
 
     QString ToHTML(uint) const override; // MythSettingBase
@@ -59,24 +59,26 @@ class MythSetting : public MythSettingBase
         kInvalidDataType,
     } DataType;
 
-    MythSetting(QString _value, QString _default_data, SettingType _stype,
-                QString _label, QString _help_text, DataType _dtype) :
+    MythSetting(const QString& _value, const QString& _default_data,
+                SettingType _stype, const QString& _label,
+                const QString& _help_text, DataType _dtype) :
         m_value(_value), m_data(_default_data), m_default_data(_default_data),
         m_stype(_stype), m_label(_label), m_help_text(_help_text), m_dtype(_dtype)
     {
     }
 
-    MythSetting(QString _value, QString _default_data, SettingType _stype,
-            QString _label, QString _help_text, DataType _dtype,
-            QStringList _data_list, QStringList _display_list) :
+    MythSetting(const QString& _value, const QString& _default_data,
+                SettingType _stype, const QString& _label,
+                const QString& _help_text, DataType _dtype,
+                const QStringList& _data_list, const QStringList& _display_list) :
         m_value(_value), m_data(_default_data), m_default_data(_default_data),
         m_stype(_stype), m_label(_label), m_help_text(_help_text), m_dtype(_dtype),
         m_data_list(_data_list), m_display_list(_display_list)
     {
     }
 
-    MythSetting(QString _value, QString _default_data, SettingType _stype,
-                QString _label, QString _help_text, DataType _dtype,
+    MythSetting(const QString& _value, const QString& _default_data, SettingType _stype,
+                const QString& _label, const QString& _help_text, DataType _dtype,
                 long long _range_min, long long _range_max) :
         m_value(_value), m_data(_default_data), m_default_data(_default_data),
         m_stype(_stype), m_label(_label), m_help_text(_help_text), m_dtype(_dtype),
@@ -84,11 +86,11 @@ class MythSetting : public MythSettingBase
     {
     }
 
-    MythSetting(QString _value, QString _default_data, SettingType _stype,
-                QString _label, QString _help_text, DataType _dtype,
-                QStringList _data_list, QStringList _display_list,
+    MythSetting(const QString& _value, const QString& _default_data, SettingType _stype,
+                const QString& _label, const QString& _help_text, DataType _dtype,
+                const QStringList& _data_list, const QStringList& _display_list,
                 long long _range_min, long long _range_max,
-                QString _placeholder) :
+                const QString& _placeholder) :
         m_value(_value), m_data(_default_data), m_default_data(_default_data),
         m_stype(_stype), m_label(_label), m_help_text(_help_text), m_dtype(_dtype),
         m_data_list(_data_list), m_display_list(_display_list),

@@ -380,11 +380,9 @@ void NetSearch::SearchFinished(void)
         m_maxpage = m_pagenum;
     else
     {
-        if (((float)searchresults/returned + 0.999f) >=
-            ((int)searchresults/returned + 1))
-            m_maxpage = (searchresults/returned + 1);
-        else
-            m_maxpage = (searchresults/returned);
+        m_maxpage = searchresults / returned; // Whole pages
+        if (searchresults % returned != 0)    // Partial page?
+            m_maxpage++;
     }
     if (m_pageText && m_maxpage > 0 && m_pagenum > 0 && returned > 0)
         m_pageText->SetText(QString("%1 / %2")
@@ -396,7 +394,7 @@ void NetSearch::SearchFinished(void)
     SetFocusWidget(m_searchResultList);
 }
 
-void NetSearch::SearchTimeout(Search *)
+void NetSearch::SearchTimeout(Search * /*item*/)
 {
     CloseBusyPopup();
 

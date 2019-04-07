@@ -201,7 +201,7 @@ static const QString kSubAttrOutlinecolor("outlinecolor");
 static const QString kSubAttrOutlinesize ("outlinesize");
 static const QString kSubAttrOutlinealpha("outlinealpha");
 
-static QString srtColorString(QColor color)
+static QString srtColorString(const QColor& color)
 {
     return QString("#%1%2%3")
         .arg(color.red(),   2, 16, QLatin1Char('0'))
@@ -358,8 +358,7 @@ QString SubtitleFormat::MakePrefix(const QString &family,
 {
     if (family == kSubFamily708)
         return family + "_" + QString::number(attr.m_font_tag & 0x7);
-    else
-        return family;
+    return family;
 }
 
 void SubtitleFormat::CreateProviderDefault(const QString &family,
@@ -486,6 +485,8 @@ void SubtitleFormat::Load(const QString &family,
         dynamic_cast<MythUIShape *>(baseParent->GetChild(prefix));
     if (!resultBG)
         resultBG = providerBaseShape;
+    else
+        delete providerBaseShape;
     MythFontProperties *testFont = negParent->GetFont(prefix);
     if (!testFont)
         testFont = negFont;
@@ -753,7 +754,7 @@ QSize FormattedTextLine::CalcSize(float layoutSpacing) const
             width += leftPadding;
         isFirst = false;
     }
-    return QSize(width + rightPadding, height);
+    return {width + rightPadding, height};
 }
 
 // Normal font height is designed to be 1/20 of safe area height, with
@@ -1113,7 +1114,7 @@ static QString extract_cc608(QString &text, int &color,
     if (text.length() >= 1 && text[0] >= 0x7000)
     {
         int op = text[0].unicode() - 0x7000;
-        isUnderline = (op & 0x1);
+        isUnderline = ((op & 0x1) != 0);
         switch (op & ~1)
         {
         case 0x0e:
@@ -1314,9 +1315,9 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     if (m_subScreen)
         m_subScreen->SetFontSize(pixelSize);
 
-    float xrange  = win.m_relative_pos ? 100.0f :
-                    (aspect > 1.4f) ? 210.0f : 160.0f;
-    float yrange  = win.m_relative_pos ? 100.0f : 75.0f;
+    float xrange  = win.m_relative_pos ? 100.0F :
+                    (aspect > 1.4F) ? 210.0F : 160.0F;
+    float yrange  = win.m_relative_pos ? 100.0F : 75.0F;
     float xmult   = (float)m_safeArea.width() / xrange;
     float ymult   = (float)m_safeArea.height() / yrange;
     uint anchor_x = (uint)(xmult * (float)win.m_anchor_horizontal);
@@ -1326,7 +1327,7 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     m_xAnchor = anchor_x;
     m_yAnchor = anchor_y;
 
-    for (uint i = 0; i < list.size(); i++)
+    for (size_t i = 0; i < list.size(); i++)
     {
         if (list[i]->y >= (uint)m_lines.size())
             m_lines.resize(list[i]->y + 1);
@@ -1538,7 +1539,7 @@ void SubtitleScreen::Clear708Cache(uint64_t mask)
         if (wrapper)
         {
             int whichImageCache = wrapper->GetWhichImageCache();
-            if (whichImageCache != -1 && (mask & (1ul << whichImageCache)))
+            if (whichImageCache != -1 && (mask & (1UL << whichImageCache)))
             {
                 SetElementDeleted();
                 DeleteChild(child);
@@ -1598,7 +1599,7 @@ static QSize CalcShadowOffsetPadding(MythFontProperties *mythfont)
         shadowWidth = max(shadowWidth, outlineSize);
         shadowHeight = max(shadowHeight, outlineSize);
     }
-    return QSize(shadowWidth + outlineSize, shadowHeight + outlineSize);
+    return {shadowWidth + outlineSize, shadowHeight + outlineSize};
 }
 
 QSize SubtitleScreen::CalcTextSize(const QString &text,
@@ -1613,7 +1614,7 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
     if (layoutSpacing > 0 && !text.trimmed().isEmpty())
         height = max(height, (int)(font->pixelSize() * layoutSpacing));
     height += CalcShadowOffsetPadding(mythfont).height();
-    return QSize(width, height);
+    return {width, height};
 }
 
 // Padding calculation is different depending on whether the padding
@@ -1824,7 +1825,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             AVSubtitleRect* rect = subtitle.rects[i];
 
             bool displaysub = true;
-            if (subs->m_buffers.size() > 0 &&
+            if (!subs->m_buffers.empty() &&
                 subs->m_buffers.front().end_display_time <
                 currentFrame->timecode)
             {
@@ -1847,8 +1848,8 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                     !display.width() || !display.height())
                 {
                     int sd_height = 576;
-                    if ((m_player->GetFrameRate() > 26.0f ||
-                         m_player->GetFrameRate() < 24.0f) && bottom <= 480)
+                    if ((m_player->GetFrameRate() > 26.0F ||
+                         m_player->GetFrameRate() < 24.0F) && bottom <= 480)
                         sd_height = 480;
                     int height = ((currentFrame->height <= sd_height) &&
                                   (bottom <= sd_height)) ? sd_height :
@@ -1904,7 +1905,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
                                              QRect &bbox, bool top,
                                              QRect &display, int forced,
-                                             QString imagename,
+                                             const QString& imagename,
                                              long long displayuntil,
                                              long long late)
 {
@@ -2237,7 +2238,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         if (!win.GetChanged())
             continue;
 
-        clearMask |= (1ul << i);
+        clearMask |= (1UL << i);
         win.ResetChanged();
         if (!win.GetExists() || !win.GetVisible())
             continue;
@@ -2258,7 +2259,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
     {
         Clear708Cache(clearMask);
     }
-    if (addList.size())
+    if (!addList.empty())
         m_qInited.append(addList);
 }
 
@@ -2355,7 +2356,7 @@ bool SubtitleScreen::InitialiseAssLibrary(void)
             return false;
 
         ass_set_message_cb(m_assLibrary, myth_libass_log, nullptr);
-        ass_set_extract_fonts(m_assLibrary, true);
+        ass_set_extract_fonts(m_assLibrary, static_cast<int>(true));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialised libass object.");
     }
 
@@ -2466,7 +2467,7 @@ void SubtitleScreen::ResizeAssRenderer(void)
     // TODO this probably won't work properly for anamorphic content and XVideo
     ass_set_frame_size(m_assRenderer, m_safeArea.width(), m_safeArea.height());
     ass_set_margins(m_assRenderer, 0, 0, 0, 0);
-    ass_set_use_margins(m_assRenderer, true);
+    ass_set_use_margins(m_assRenderer, static_cast<int>(true));
     ass_set_font_scale(m_assRenderer, 1.0);
 }
 

@@ -6,6 +6,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -86,7 +87,7 @@ using namespace std;
 class KeyContext
 {
   public:
-    void AddMapping(int key, QString action)
+    void AddMapping(int key, const QString& action)
     {
         m_actionMap[key].append(action);
     }
@@ -128,8 +129,8 @@ class MythMainWindowPrivate
 
     int TranslateKeyNum(QKeyEvent *e);
 
-    float                m_wmult                {1.0f};
-    float                m_hmult                {1.0f};
+    float                m_wmult                {1.0F};
+    float                m_hmult                {1.0F};
     int                  m_screenwidth          {0};
     int                  m_screenheight         {0};
 
@@ -245,15 +246,15 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
         if ((modifiers = e->modifiers()) != Qt::NoModifier)
         {
             int modnum = Qt::NoModifier;
-            if ((modifiers & Qt::ShiftModifier) &&
+            if (((modifiers & Qt::ShiftModifier) != 0U) &&
                 (keynum > 0x7f) &&
                 (keynum != Qt::Key_Backtab))
                 modnum |= Qt::SHIFT;
-            if (modifiers & Qt::ControlModifier)
+            if ((modifiers & Qt::ControlModifier) != 0U)
                 modnum |= Qt::CTRL;
-            if (modifiers & Qt::MetaModifier)
+            if ((modifiers & Qt::MetaModifier) != 0U)
                 modnum |= Qt::META;
-            if (modifiers & Qt::AltModifier)
+            if ((modifiers & Qt::AltModifier) != 0U)
                 modnum |= Qt::ALT;
             modnum &= ~Qt::UNICODE_ACCEL;
             return (keynum |= modnum);
@@ -569,8 +570,7 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_LIBCEC
-    if (d->m_cecAdapter)
-        delete d->m_cecAdapter;
+    delete d->m_cecAdapter;
 #endif
 
     delete d->m_NC;
@@ -885,7 +885,7 @@ void MythMainWindow::GrabWindow(QImage &image)
  * other than the UI thread, and to wait for the screenshot before returning.
  * It is used by mythweb for the remote access screenshots
  */
-void MythMainWindow::doRemoteScreenShot(QString filename, int x, int y)
+void MythMainWindow::doRemoteScreenShot(const QString& filename, int x, int y)
 {
     // This will be running in the UI thread, as is required by QPixmap
     QStringList args;
@@ -901,7 +901,7 @@ void MythMainWindow::RemoteScreenShot(QString filename, int x, int y)
 {
     // This will be running in a non-UI thread and is used to trigger a
     // function in the UI thread, and waits for completion of that handler
-    emit signalRemoteScreenShot(filename, x, y);
+    emit signalRemoteScreenShot(std::move(filename), x, y);
 }
 
 bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
@@ -943,7 +943,7 @@ bool MythMainWindow::ScreenShot(int w, int h, QString filename)
         h = img.height();
 
     img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    return SaveScreenShot(img, filename);
+    return SaveScreenShot(img, std::move(filename));
 }
 
 bool MythMainWindow::event(QEvent *e)
@@ -978,7 +978,7 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
+void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 {
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
@@ -1475,6 +1475,7 @@ void MythMainWindow::ExitToMainMenu(void)
     bool jumpdone = !(d->m_popwindows);
 
     d->m_exitingtomain = true;
+
     MythScreenStack *toplevel = GetMainStack();
     if (toplevel && d->m_popwindows)
     {
@@ -1503,8 +1504,7 @@ void MythMainWindow::ExitToMainMenu(void)
             }
             return;
         }
-        else
-            jumpdone = true;
+        jumpdone = true;
     }
 
     if (jumpdone)
@@ -1711,7 +1711,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         }
         else
         {
-            QString inskey = keybind;
+            const QString& inskey = keybind;
 
             query.prepare("INSERT INTO keybindings (context, action, "
                           "description, keylist, hostname) VALUES "
@@ -1849,7 +1849,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
         }
         else
         {
-            QString inskey = keybind;
+            const QString& inskey = keybind;
 
             query.prepare("INSERT INTO jumppoints (destination, description, "
                           "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
@@ -1867,7 +1867,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
     }
 
     JumpData jd =
-        { callback, destination, description, exittomain, localAction };
+        { callback, destination, description, exittomain, std::move(localAction) };
     d->m_destinationMap[destination] = jd;
 
     BindJump(destination, keybind);
@@ -1896,7 +1896,7 @@ void MythMainWindow::JumpTo(const QString& destination, bool pop)
 
 bool MythMainWindow::DestinationExists(const QString& destination) const
 {
-    return (d->m_destinationMap.count(destination) > 0) ? true : false;
+    return d->m_destinationMap.count(destination) > 0;
 }
 
 QStringList MythMainWindow::EnumerateDestinations(void) const
@@ -2030,18 +2030,16 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                     // waiting for release of key.
                     return true; // discard the key press
                 }
-                else
-                {
-                    // expired log press - generate long key
-                    newEvent = new QKeyEvent(QEvent::KeyPress, keycode,
-                        ke->modifiers() | Qt::MetaModifier, ke->nativeScanCode(),
-                        ke->nativeVirtualKey(), ke->nativeModifiers(),
-                        ke->text(), false,1);
-                    *e = newEvent;
-                    sNewEvent.reset(newEvent);
-                    d->m_longPressTime = 0;   // indicate we have generated the long press
-                    return false;
-                }
+
+                // expired log press - generate long key
+                newEvent = new QKeyEvent(QEvent::KeyPress, keycode,
+                                         ke->modifiers() | Qt::MetaModifier, ke->nativeScanCode(),
+                                         ke->nativeVirtualKey(), ke->nativeModifiers(),
+                                         ke->text(), false,1);
+                *e = newEvent;
+                sNewEvent.reset(newEvent);
+                d->m_longPressTime = 0;   // indicate we have generated the long press
+                return false;
             }
             // If we got a keycode different from the long press keycode it
             // may have been injected by a jump point. Ignore it.
@@ -2061,7 +2059,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                 LOG(VB_GUI, LOG_ERR, QString("TranslateKeyPress Long Press Invalid Response"));
                 return true;
             }
-            if (actions.size()>0 && actions[0].startsWith("LONGPRESS"))
+            if (!actions.empty() && actions[0].startsWith("LONGPRESS"))
             {
                 // Beginning of a press
                 d->m_longPressKeyCode = keycode;
@@ -2092,12 +2090,10 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                     d->m_longPressKeyCode = 0;
                     return false;
                 }
-                else
-                {
-                    // end of long press
-                    d->m_longPressKeyCode = 0;
-                    return true;
-                }
+
+                // end of long press
+                d->m_longPressKeyCode = 0;
+                return true;
             }
             break;
         }
@@ -2107,7 +2103,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
     return false;
 }
 
-bool MythMainWindow::eventFilter(QObject *, QEvent *e)
+bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 {
     MythGestureEvent *ge;
 
@@ -2579,7 +2575,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             {
                 bool usebookmark = true;
                 if (me->ExtraDataCount() >= 12)
-                    usebookmark = me->ExtraData(11).toInt();
+                    usebookmark = (me->ExtraData(11).toInt() != 0);
                 HandleMedia("Internal", me->ExtraData(0),
                     me->ExtraData(1), me->ExtraData(2),
                     me->ExtraData(3), me->ExtraData(4),
@@ -2648,7 +2644,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             MythNotificationCenter::GetInstance()->Queue(mn);
             return;
         }
-        else if (message == "RECONNECT_SUCCESS" && d->m_standby == true)
+        else if (message == "RECONNECT_SUCCESS" && d->m_standby)
         {
             // If the connection to the master backend has just been (re-)established
             // but we're in standby, make sure the backend is not blocked from
@@ -2659,7 +2655,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::MythUserMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (!message.isEmpty())
             ShowOkPopup(message);

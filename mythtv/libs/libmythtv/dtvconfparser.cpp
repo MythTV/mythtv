@@ -41,22 +41,22 @@
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \
-    if (it == tokens.end()) return false; else ++it; } while(0)
+    if (it == tokens.end()) return false; ++it; } while(false)
 
 #define PARSE_CONF(VAR) do { \
     if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
-        return false; } while(0)
+        return false; } while(false)
 
 #define PARSE_STR(VAR) do { \
-    if (it != tokens.end()) (VAR) = *it++; else return false; } while(0)
+    if (it != tokens.end()) (VAR) = *it++; else return false; } while(false)
 
 #define PARSE_UINT(VAR) do { \
     if (it != tokens.end()) \
-         (VAR) = (*it++).toUInt(); else return false; } while(0)
+         (VAR) = (*it++).toUInt(); else return false; } while(false)
 
 #define PARSE_UINT_1000(VAR) do { \
     if (it != tokens.end()) \
-         (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(0)
+         (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(false)
 
 
 QString DTVChannelInfo::toString() const
@@ -84,7 +84,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         QStringList list = line.split(":", QString::SkipEmptyParts);
 
-        if (list.size() < 1)
+        if (list.empty())
             continue;
 
         QString str = list[0];
@@ -292,7 +292,7 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
 
 void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
 {
-    for (uint i = 0; i < m_channels.size(); i++)
+    for (size_t i = 0; i < m_channels.size(); i++)
     {
         if (m_channels[i] == mux)
         {

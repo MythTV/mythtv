@@ -46,19 +46,19 @@ class UPnpCDSTv : public UPnpCDSExtension
                                IDTokenMap tokens );
         bool  LoadTitles     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadDates      ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadGenres     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadChannels   ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadRecGroups  ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadMovies     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
                                IDTokenMap tokens );

@@ -386,7 +386,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 {
 	FRACTAL *F = Root;
 	int     i, j;
-	F_PT    x, y, xo, yo;
+	F_PT    x, y;
 	SIMI   *Cur, *Simi;
 
 	for (Cur = F->Components, i = F->Nb_Simi; i; --i, Cur++) {
@@ -407,6 +407,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	Cur_F = F;
 	Buf = F->Buffer2;
 	for (Cur = F->Components, i = F->Nb_Simi; i; --i, Cur++) {
+        F_PT xo, yo;
 		xo = Cur->Cx;
 		yo = Cur->Cy;
 		for (Simi = F->Components, j = F->Nb_Simi; j; --j, Simi++) {
@@ -455,7 +456,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 
 
 IFSPoint *
-draw_ifs ( /* ModeInfo * mi */ int *nbpt)
+draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 {
 	int     i;
 	DBL     u, uu, v, vv, u0, u1, u2, u3;
@@ -525,7 +526,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbpt)
 	F->Col++;
 
 	/* #1 code added by JeKo */
-	(*nbpt) = Cur_Pt;
+	(*nbPoints) = Cur_Pt;
 	return F->Buffer2;
 	/* #1 end */
 }

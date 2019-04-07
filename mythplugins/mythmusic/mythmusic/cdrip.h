@@ -120,9 +120,9 @@ class Ripper : public MythScreenType
     void searchArtist(void);
     void searchAlbum(void);
     void searchGenre(void);
-    void setArtist(QString artist);
-    void setAlbum(QString album);
-    void setGenre(QString genre);
+    void setArtist(const QString& artist);
+    void setAlbum(const QString& album);
+    void setGenre(const QString& genre);
     void RipComplete(bool result);
     void toggleTrackActive(MythUIButtonListItem *);
     void showEditMetadataDialog(MythUIButtonListItem *);
@@ -131,7 +131,7 @@ class Ripper : public MythScreenType
     void metadataChanged(void);
     void showEditMetadataDialog(void);
     void chooseBackend(void);
-    void setSaveHost(QString host);
+    void setSaveHost(const QString& host);
 
   signals:
     void ripFinished(void);

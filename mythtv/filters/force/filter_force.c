@@ -27,8 +27,8 @@ new_force_template (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 }
 
 static VideoFilter *
-new_force_yv12 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options, int threads)
+new_force_yv12 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, const int *width,
+            const int *height, const char *options, int threads)
 {
     (void) width;
     (void) height;
@@ -39,8 +39,8 @@ new_force_yv12 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
 }
 
 static VideoFilter *
-new_force_yuv422p (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options, int threads)
+new_force_yuv422p (VideoFrameType inpixfmt, VideoFrameType outpixfmt, const int *width,
+            const int *height, const char *options, int threads)
 {
     (void) width;
     (void) height;
@@ -51,8 +51,8 @@ new_force_yuv422p (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width
 }
 
 static VideoFilter *
-new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options, int threads)
+new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, const int *width,
+            const int *height, const char *options, int threads)
 {
     (void) width;
     (void) height;
@@ -63,8 +63,8 @@ new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
 }
 
 static VideoFilter *
-new_force_argb32 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options, int threads)
+new_force_argb32 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, const int *width,
+            const int *height, const char *options, int threads)
 {
     (void) width;
     (void) height;

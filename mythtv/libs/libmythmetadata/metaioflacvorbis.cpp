@@ -13,11 +13,6 @@
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-MetaIOFLACVorbis::MetaIOFLACVorbis(void)
-    : MetaIOTagLib()
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *
@@ -92,8 +87,7 @@ bool MetaIOFLACVorbis::write(const QString &filename, MusicMetadata* mdata)
     bool result = flacfile->save();
     restoreTimeStamps();
 
-    if (flacfile)
-        delete flacfile;
+    delete flacfile;
 
     return (result);
 }
@@ -198,10 +192,9 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         // From what I can tell, FLAC::File maintains ownership of the Picture pointers, so no need to delete
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
-        for (TagLib::List<Picture *>::ConstIterator it = picList.begin();
-                it != picList.end(); it++)
+        for (auto it = picList.begin(); it != picList.end(); it++)
         {
-            if (pic->type() == artType)
+            if ((*it)->type() == artType)
             {
                 //found the type we were looking for
                 pic = *it;
@@ -521,11 +514,11 @@ QString MetaIOFLACVorbis::getExtFromMimeType(const QString &mimeType)
 {
     if (mimeType == "image/png")
         return QString(".png");
-    else if (mimeType == "image/jpeg" || mimeType == "image/jpg")
+    if (mimeType == "image/jpeg" || mimeType == "image/jpg")
         return QString(".jpg");
-    else if (mimeType == "image/gif")
+    if (mimeType == "image/gif")
         return QString(".gif");
-    else if (mimeType == "image/bmp")
+    if (mimeType == "image/bmp")
         return QString(".bmp");
 
     LOG(VB_GENERAL, LOG_ERR,

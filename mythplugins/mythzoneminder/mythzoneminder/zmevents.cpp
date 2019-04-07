@@ -33,8 +33,7 @@ Q_DECLARE_METATYPE(Event*);
 
 ZMEvents::~ZMEvents()
 {
-    if (m_eventList)
-        delete m_eventList;
+    delete m_eventList;
 
     // remember how the user wants to display the event list
     gCoreContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
@@ -182,7 +181,7 @@ void ZMEvents::updateUIList()
 
     m_eventGrid->Reset();
 
-    for (uint i = 0; i < m_eventList->size(); i++)
+    for (size_t i = 0; i < m_eventList->size(); i++)
     {
         Event *event = m_eventList->at(i);
 
@@ -308,8 +307,7 @@ void ZMEvents::deletePressed(void)
             zm->deleteEvent(event->eventID());
 
         MythUIButtonListItem *item = m_eventGrid->GetItemCurrent();
-        if (item)
-            delete item;
+        delete item;
 
         vector<Event*>::iterator it;
         for (it = m_eventList->begin(); it != m_eventList->end(); ++it)

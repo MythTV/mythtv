@@ -77,7 +77,7 @@ class Source : public MythUIComboBoxSetting
         fillSelections();
         StandardSetting::Load();
 
-        if (default_sourceid && !getValue().toUInt())
+        if (default_sourceid && (getValue().toUInt() == 0U))
         {
             uint which = sourceid_to_index[default_sourceid];
             if (which)
@@ -307,7 +307,7 @@ class ServiceID : public MythUISpinBoxSetting
   public:
     explicit ServiceID(const ChannelID &id)
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
-                               -1, UINT16_MAX, 1, true, "NULL")
+                               -1, UINT16_MAX, 1, 1, "NULL")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "ServiceID"));
 
@@ -328,8 +328,7 @@ class ServiceID : public MythUISpinBoxSetting
     {
         if (StandardSetting::getValue().toInt() == -1)
             return QString();
-        else
-            return StandardSetting::getValue();
+        return StandardSetting::getValue();
     }
 };
 
@@ -351,7 +350,7 @@ class CommMethod : public MythUIComboBoxSetting
         tmp.push_front(COMM_DETECT_UNINIT);
         tmp.push_back(COMM_DETECT_COMMFREE);
 
-        for (uint i = 0; i < tmp.size(); i++)
+        for (size_t i = 0; i < tmp.size(); i++)
             addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
     }
 };
@@ -531,7 +530,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         MythDB::DBError("sourceChanged -- supports eit", query);
     else
     {
-        supports_eit = (query.size()) ? false : true;
+        supports_eit = (query.size() == 0);
         while (query.next())
         {
             supports_eit |= CardUtil::IsEITCapable(
@@ -547,7 +546,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
             MythDB::DBError("sourceChanged -- eit only", query);
         else
         {
-            uses_eit_only = (query.size()) ? true : false;
+            uses_eit_only = (query.size() != 0);
             while (query.next())
             {
                 uses_eit_only &= (query.value(0).toString() == "eitonly");
@@ -674,7 +673,7 @@ void ChannelOptionsRawTS::Save(void)
     {
         bool ok;
         uint pid = m_pids[i]->getValue().toUInt(&ok, 0);
-        if (!ok || !m_sids[i]->getValue().toUInt())
+        if (!ok || (m_sids[i]->getValue().toUInt() == 0U))
             continue;
 
         pid_cache.push_back(

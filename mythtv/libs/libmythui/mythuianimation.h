@@ -20,9 +20,9 @@ class UIEffects
         float x = xoff + rect.left();
         float y = yoff + rect.top();
         if (Middle == m_centre || Top == m_centre || Bottom == m_centre)
-            x += rect.width() / 2.0f;
+            x += rect.width() / 2.0F;
         if (Middle == m_centre || Left == m_centre || Right == m_centre)
-            y += rect.height() / 2.0f;
+            y += rect.height() / 2.0F;
         if (Right == m_centre || TopRight == m_centre || BottomRight == m_centre)
             x += rect.width();
         if (Bottom == m_centre || BottomLeft == m_centre || BottomRight == m_centre)
@@ -33,9 +33,9 @@ class UIEffects
     QRect GetExtent(const QSize &size);
 
     int    m_alpha  {255};
-    float  m_hzoom  {1.0f};
-    float  m_vzoom  {1.0f};
-    float  m_angle  {0.0f};
+    float  m_hzoom  {1.0F};
+    float  m_vzoom  {1.0F};
+    float  m_angle  {0.0F};
     Centre m_centre {Middle};
 };
 

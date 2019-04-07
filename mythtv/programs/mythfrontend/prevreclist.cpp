@@ -78,8 +78,8 @@ PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
     {
         // Get sort options if this is not a filtered list
         int flags = gCoreContext->GetNumSetting("PrevRecSortFlags",fDefault);
-        m_titleGroup = flags & fTitleGroup;
-        m_reverseSort = flags & fReverseSort;
+        m_titleGroup = ((flags & fTitleGroup) != 0);
+        m_reverseSort = ((flags & fReverseSort) != 0);
 
     }
 }
@@ -303,7 +303,7 @@ void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
     ProgramList *progData, bool isShows)
 {
     bnList->Reset();
-    for (uint i = 0; i < progData->size(); ++i)
+    for (size_t i = 0; i < progData->size(); ++i)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(bnList, "", QVariant::fromValue((*progData)[i]));
@@ -336,7 +336,7 @@ void PrevRecordedList::updateInfo(void)
     if (m_help2Text)
         m_help2Text->Reset();
 
-    if (m_showData.size() > 0)
+    if (!m_showData.empty())
     {
         InfoMap infoMap;
         m_showData[m_showList->GetCurrentPos()]->ToMap(infoMap,true);
@@ -486,7 +486,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
             ShowUpcoming();
         else if (action == "1")
         {
-            if (m_titleGroup == true)
+            if (m_titleGroup)
             {
                 m_titleGroup = false;
                 m_reverseSort = true;
@@ -499,7 +499,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "2")
         {
-            if (m_titleGroup == false)
+            if (!m_titleGroup)
             {
                 m_titleGroup = true;
                 m_reverseSort = false;
@@ -632,8 +632,7 @@ void PrevRecordedList::customEvent(QEvent *event)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to delete recording rule");
             }
-            if (record)
-                delete record;
+            delete record;
         }
         else
         {

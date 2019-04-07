@@ -60,7 +60,7 @@ static uint ELFHash(const QByteArray &ba)
     return h;
 }
 
-static QString getFirstText(QDomElement element)
+static QString getFirstText(const QDomElement& element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
          dname = dname.nextSibling())
@@ -392,13 +392,13 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
                 pginfo->m_genres.append(cat);
             }
-            else if (info.tagName() == "date" && !pginfo->m_airdate)
+            else if (info.tagName() == "date" && (pginfo->m_airdate == 0U))
             {
                 // Movie production year
                 QString date = getFirstText(info);
                 pginfo->m_airdate = date.left(4).toUInt();
             }
-            else if (info.tagName() == "star-rating" && pginfo->m_stars == 0.0f)
+            else if (info.tagName() == "star-rating" && pginfo->m_stars == 0.0F)
             {
                 QDomNodeList values = info.elementsByTagName("value");
                 QDomElement item;
@@ -428,7 +428,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     stars = getFirstText(item);
                     float num = stars.section('/', 0, 0).toFloat() + 1;
                     float den = stars.section('/', 1, 1).toFloat() + 1;
-                    if (0.0f < den)
+                    if (0.0F < den)
                         rating = num/den;
                 }
 
@@ -649,7 +649,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 }
 
 bool XMLTVParser::parseFile(
-    QString filename, ChannelInfoList *chanlist,
+    const QString& filename, ChannelInfoList *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
 {
     QDomDocument doc;

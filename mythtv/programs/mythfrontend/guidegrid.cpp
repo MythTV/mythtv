@@ -103,7 +103,7 @@ void JumpToChannel::deleteLater(void)
 }
 
 
-static bool has_action(QString action, const QStringList &actions)
+static bool has_action(const QString& action, const QStringList &actions)
 {
     QStringList::const_iterator it;
     for (it = actions.begin(); it != actions.end(); ++it)
@@ -182,11 +182,10 @@ bool JumpToChannel::Update(void)
         m_listener->GoTo(start, cur);
         return true;
     }
-    else
-    { // prefix must be invalid.. reset entry..
-        deleteLater();
-        return false;
-    }
+
+    // prefix must be invalid.. reset entry..
+    JumpToChannel::deleteLater();
+    return false;
 }
 
 // GuideStatus is used for transferring the relevant read-only data
@@ -264,15 +263,14 @@ public:
           m_verticalLayout(gs.m_verticalLayout),
           m_firstTime(gs.m_firstTime),
           m_lastTime(gs.m_lastTime),
-          m_proglists(proglists),
-          m_progPast(0)
+          m_proglists(proglists)
     {
         for (unsigned int i = m_firstRow;
              i < m_firstRow + m_numRows; ++i)
             for (int j = 0; j < MAX_DISPLAY_TIMES; ++j)
                 m_programInfos[i][j] = nullptr;
     }
-    virtual ~GuideUpdateProgramRow() = default;
+    ~GuideUpdateProgramRow() override = default;
     bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
         // Don't bother to do any work if the starting coordinates of
@@ -304,7 +302,7 @@ public:
     }
 
 private:
-    void fillProgramRowInfosWith(int row, QDateTime start,
+    void fillProgramRowInfosWith(int row, const QDateTime& start,
                                  ProgramList *proglist);
 
     const unsigned int m_firstRow;
@@ -394,7 +392,7 @@ public:
     static bool IsLoading(GuideGrid *guide)
     {
         QMutexLocker locker(&s_lock);
-        return s_loading[guide];
+        return s_loading[guide] != 0U;
     }
     static void Wait(GuideGrid *guide)
     {
@@ -677,7 +675,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     if (handled)
         return true;
 
-    if (actions.size())
+    if (!actions.empty())
     {
         QMutexLocker locker(&m_jumpToChannelLock);
 
@@ -1060,7 +1058,7 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
 
 static bool SelectionIsTunable(const ChannelInfoList &selection)
 {
-    for (uint i = 0; i < selection.size(); ++i)
+    for (size_t i = 0; i < selection.size(); ++i)
     {
         if (TV::IsTunable(selection[i].m_chanid))
             return true;
@@ -1253,7 +1251,7 @@ uint GuideGrid::GetAlternateChannelIndex(
             continue;
 
         bool isAlt = true;
-        for (uint j = 0; j < proglist.size(); ++j)
+        for (size_t j = 0; j < proglist.size(); ++j)
         {
             isAlt &= proglist[j]->IsSameTitleTimeslotAndChannel(*ch_proglist[j]);
         }
@@ -1298,7 +1296,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
     if (proglist.empty())
         return selected;
 
-    for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
+    for (size_t i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const ChannelInfo *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
@@ -1308,7 +1306,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
         }
     }
 
-    for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
+    for (size_t i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const ChannelInfo *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
@@ -1318,7 +1316,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
         }
     }
 
-    for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
+    for (size_t i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const ChannelInfo *ci = GetChannelInfo(idx, i);
         if ((i != si) && (ci->m_callsign != ch->m_callsign))
@@ -1327,7 +1325,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
         }
     }
 
-    for (uint i = 1; i < sel.size(); ++i)
+    for (size_t i = 1; i < sel.size(); ++i)
     {
         const ChannelInfo *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
         const ProgramList ch_proglist = GetProgramList(ch->m_chanid);
@@ -1336,7 +1334,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
             continue;
 
         bool isAlt = true;
-        for (uint j = 0; j < proglist.size(); ++j)
+        for (size_t j = 0; j < proglist.size(); ++j)
         {
             isAlt &= proglist[j]->IsSameTitleTimeslotAndChannel(*ch_proglist[j]);
         }
@@ -1375,7 +1373,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     QMap<QString,uint_list_t> channum_to_index_map;
     QMap<QString,uint_list_t> callsign_to_index_map;
 
-    for (uint i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         uint chan = i;
         if (m_sortReverse)
@@ -1383,8 +1381,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
             chan = channels.size() - i - 1;
         }
 
-        bool ndup = channum_to_index_map[channels[chan].m_channum].size();
-        bool cdup = callsign_to_index_map[channels[chan].m_callsign].size();
+        bool ndup = !channum_to_index_map[channels[chan].m_channum].empty();
+        bool cdup = !callsign_to_index_map[channels[chan].m_callsign].empty();
 
         if (ndup && cdup)
             continue;
@@ -1401,10 +1399,10 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     }
 
     // handle duplicates
-    for (uint i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         const uint_list_t &ndups = channum_to_index_map[channels[i].m_channum];
-        for (uint j = 0; j < ndups.size(); ++j)
+        for (size_t j = 0; j < ndups.size(); ++j)
         {
             if (channels[i].m_chanid   != m_channelInfos[ndups[j]][0].m_chanid &&
                 channels[i].m_callsign == m_channelInfos[ndups[j]][0].m_callsign)
@@ -1412,7 +1410,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         }
 
         const uint_list_t &cdups = callsign_to_index_map[channels[i].m_callsign];
-        for (uint j = 0; j < cdups.size(); ++j)
+        for (size_t j = 0; j < cdups.size(); ++j)
         {
             if (channels[i].m_chanid != m_channelInfos[cdups[j]][0].m_chanid)
                 m_channelInfos[cdups[j]].push_back(channels[i]);
@@ -1451,7 +1449,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     i = (chanid) ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); ++i)
     {
-        for (uint j = 1; j < m_channelInfos[i].size(); ++j)
+        for (size_t j = 1; j < m_channelInfos[i].size(); ++j)
         {
             if (m_channelInfos[i][j].m_chanid == chanid)
                 return i;
@@ -1470,7 +1468,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); ++i)
     {
-        for (uint j = 1; j < m_channelInfos[i].size(); ++j)
+        for (size_t j = 1; j < m_channelInfos[i].size(); ++j)
         {
             if (m_channelInfos[i][j].m_channum == channum)
                 return i;
@@ -1484,7 +1482,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     QVector<int> idxList;
     for (i = 0; i < GetChannelCount(); ++i)
     {
-        for (uint j = 0; j < m_channelInfos[i].size(); ++j)
+        for (size_t j = 0; j < m_channelInfos[i].size(); ++j)
         {
             list.push_back(m_channelInfos[i][j]);
             idxList.push_back(i);
@@ -1628,7 +1626,7 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
 }
 
 void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
-                                                    QDateTime start,
+                                                    const QDateTime& start,
                                                     ProgramList *proglist)
 {
     if (row < 0 || row >= m_channelCount ||
@@ -1805,11 +1803,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             if (tempRect.bottom() + 2 >=  programRect.bottom())
                 tempRect.setBottom(programRect.bottom());
 
-            if (m_currentRow == row && (m_currentCol >= x) &&
-                (m_currentCol < (x + spread)))
-                isCurrent = true;
-            else
-                isCurrent = false;
+            isCurrent = m_currentRow == row && (m_currentCol >= x) &&
+                (m_currentCol < (x + spread));
 
             int recFlag;
             switch (pginfo->GetRecordingRuleType())
@@ -1868,7 +1863,7 @@ void GuideGrid::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message == "SCHEDULE_CHANGE")
         {
@@ -2307,7 +2302,7 @@ void GuideGrid::ChannelGroupMenu(int mode)
             menuPopup->AddButton(QObject::tr("All Channels"));
         }
 
-        for (uint i = 0; i < channels.size(); ++i)
+        for (size_t i = 0; i < channels.size(); ++i)
         {
             menuPopup->AddButton(channels[i].m_name);
         }
@@ -2328,8 +2323,7 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     {
       if (m_changrpid == -1)
           return;
-      else
-          grpid = m_changrpid;
+      grpid = m_changrpid;
     }
 
     // Get current channel id, and make sure it exists...
@@ -2498,7 +2492,7 @@ void GuideGrid::moveUpDown(MoveVector movement)
     updateChannels();
 }
 
-void GuideGrid::moveToTime(QDateTime datetime)
+void GuideGrid::moveToTime(const QDateTime& datetime)
 {
     if (!datetime.isValid())
         return;
@@ -2597,7 +2591,7 @@ void GuideGrid::channelUpdate(void)
 
     ChannelInfoList sel = GetSelection();
 
-    if (sel.size())
+    if (!sel.empty())
     {
         PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
         m_player->ChangeChannel(ctx, sel);

@@ -25,10 +25,11 @@
 #include <csignal> // for SIGXXX
 
 // Qt headers
-#include <QStringList>
 #include <QByteArray>
 #include <QIODevice>
 #include <QRegExp>
+#include <QStringList>
+#include <utility>
 
 // MythTV headers
 #include "mythsystemlegacy.h"
@@ -43,7 +44,7 @@ class MythSystemLegacyWrapper : public MythSystem
     static MythSystemLegacyWrapper *Create(
         const QStringList &args,
         uint flags,
-        QString startPath,
+        const QString& startPath,
         Priority /*cpuPriority*/,
         Priority /*diskPriority*/)
     {
@@ -70,9 +71,9 @@ class MythSystemLegacyWrapper : public MythSystem
         return wrapper;
     }
 
-    ~MythSystemLegacyWrapper(void)
+    ~MythSystemLegacyWrapper(void) override
     {
-        Wait(0);
+        MythSystemLegacyWrapper::Wait(0);
     }
 
     uint GetFlags(void) const override // MythSystem
@@ -109,9 +110,7 @@ class MythSystemLegacyWrapper : public MythSystem
         timeout_ms = (timeout_ms >= 1000) ? timeout_ms + 500 :
             ((timeout_ms == 0) ? 0 : 1000);
         uint legacy_wait_ret = m_legacy->Wait(timeout_ms / 1000);
-        if (GENERIC_EXIT_RUNNING == legacy_wait_ret)
-            return false;
-        return true;
+        return GENERIC_EXIT_RUNNING != legacy_wait_ret;
     }
 
     /// Returns the standard input stream for the program
@@ -212,17 +211,17 @@ MythSystem *MythSystem::Create(
     Priority diskPriority)
 {
     return MythSystemLegacyWrapper::Create(
-        args, flags, startPath, cpuPriority, diskPriority);
+        args, flags, std::move(startPath), cpuPriority, diskPriority);
 }
 
 MythSystem *MythSystem::Create(
-    QString args,
+    const QString& args,
     uint flags,
     QString startPath,
     Priority cpuPriority,
     Priority diskPriority)
 {
     return MythSystem::Create(
-        args.split(QRegExp("\\s+")), flags, startPath,
+        args.split(QRegExp("\\s+")), flags, std::move(startPath),
         cpuPriority, diskPriority);
 }

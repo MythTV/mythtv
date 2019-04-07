@@ -115,7 +115,7 @@ bool V4L2util::HasStreaming(void) const
 
 bool V4L2util::HasSlicedVBI(void) const
 {
-    return m_capabilities & V4L2_CAP_SLICED_VBI_CAPTURE;
+    return (m_capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U;
 }
 
 void V4L2util::bitmask_toString(QString& result, uint32_t flags,
@@ -684,12 +684,12 @@ bool V4L2util::GetResolution(int& width, int& height) const
 
 bool V4L2util::HasTuner(void) const
 {
-    return m_capabilities & V4L2_CAP_TUNER;
+    return (m_capabilities & V4L2_CAP_TUNER) != 0U;
 }
 
 bool V4L2util::HasAudioSupport(void) const
 {
-    return m_capabilities & V4L2_CAP_AUDIO;
+    return (m_capabilities & V4L2_CAP_AUDIO) != 0U;
 }
 
 bool V4L2util::IsEncoder(void) const
@@ -707,9 +707,7 @@ bool V4L2util::UserAdjustableResolution(void) const
     // I have not been able to come up with a way of querying the
     // driver to answer this question.
 
-    if (m_driverName == "hdpvr")
-        return false;
-    return true;
+    return m_driverName != "hdpvr";
 }
 
 int V4L2util::GetExtControl(int request, const QString& ctrl_desc) const
@@ -1013,7 +1011,7 @@ bool V4L2util::SetVolume(int volume)
 
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
-    int value = (int) ((range * volume * 0.01f) + qctrl.minimum);
+    int value = (int) ((range * volume * 0.01F) + qctrl.minimum);
     int ctrl_volume = std::min(qctrl.maximum, std::max(qctrl.minimum, value));
 
     // Set recording volume

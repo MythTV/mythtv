@@ -276,7 +276,7 @@ bool MythGesture::record(const QPoint & pt)
     if (((uint)m_points.size() >= m_max_points) || !recording())
         return false;
 
-    if (m_points.size() == 0)
+    if (m_points.empty())
     {
         m_points.push_back(pt);
         return true;

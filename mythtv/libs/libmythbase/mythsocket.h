@@ -41,9 +41,9 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
                   bool error_dialog_desired = false);
     bool IsValidated(void) const { return m_isValidated; }
 
-    bool Announce(const QStringList &strlist);
+    bool Announce(const QStringList &new_announce);
     QStringList GetAnnounce(void) const { return m_announce; }
-    void SetAnnounce(const QStringList &strlist);
+    void SetAnnounce(const QStringList &new_announce);
     bool IsAnnounced(void) const { return m_isAnnounced; }
 
     void SetReadyReadCallbackEnabled(bool enabled)
@@ -84,7 +84,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     void ReadStringListReal(QStringList *list, uint timeoutMS, bool *ret);
     void WriteStringListReal(const QStringList *list, bool *ret);
-    void ConnectToHostReal(QHostAddress address, quint16 port, bool *ret);
+    void ConnectToHostReal(const QHostAddress& addr, quint16 port, bool *ret);
     void DisconnectFromHostReal(void);
 
     void WriteReal(const char*, int size, int *ret);

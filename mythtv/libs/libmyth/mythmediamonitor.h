@@ -99,7 +99,7 @@ class MPUBLIC MediaMonitor : public QObject
     bool shouldIgnore(const MythMediaDevice *device);
     bool eventFilter(QObject *obj, QEvent *event) override; // QObject
 
-    const QString listDevices(void);
+    QString listDevices(void);
 
     static QString defaultDevice(const QString &setting,
                                  const QString &label,

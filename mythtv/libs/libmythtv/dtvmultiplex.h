@@ -45,7 +45,7 @@ class MTV_PUBLIC DTVMultiplex
     bool ParseDVB_T(
         const QString &frequency,   const QString &inversion,
         const QString &bandwidth,   const QString &coderate_hp,
-        const QString &coderate_lp, const QString &constellation,
+        const QString &coderate_lp, const QString &modulation,
         const QString &trans_mode,  const QString &guard_interval,
         const QString &hierarchy);
 
@@ -53,6 +53,17 @@ class MTV_PUBLIC DTVMultiplex
         const QString &frequency,    const QString &inversion,
         const QString &symbol_rate,  const QString &fec_inner,
         const QString &modulation,   const QString &polarity);
+
+    bool ParseDVB_S(
+        const QString &frequency,    const QString &inversion,
+        const QString &symbol_rate,  const QString &fec_inner,
+        const QString &modulation,   const QString &polarity);
+
+    bool ParseDVB_C(
+        const QString &frequency,    const QString &inversion,
+        const QString &symbol_rate,  const QString &fec_inner,
+        const QString &modulation,   const QString &polarity,
+        const QString &mod_sys);
 
     bool ParseDVB_S2(
         const QString &frequency,    const QString &inversion,
@@ -63,18 +74,18 @@ class MTV_PUBLIC DTVMultiplex
     bool ParseDVB_T2(
         const QString &frequency,   const QString &inversion,
         const QString &bandwidth,   const QString &coderate_hp,
-        const QString &coderate_lp, const QString &constellation,
+        const QString &coderate_lp, const QString &modulation,
         const QString &trans_mode,  const QString &guard_interval,
         const QString &hierarchy,   const QString &mod_sys);
 
     bool ParseTuningParams(
         DTVTunerType type,
-        QString frequency,    QString inversion,      QString symbolrate,
-        QString fec,          QString polarity,
-        QString hp_code_rate, QString lp_code_rate,   QString constellation,
-        QString trans_mode,   QString guard_interval, QString hierarchy,
-        QString modulation,   QString bandwidth,      QString mod_sys,
-        QString rolloff);
+        const QString& frequency,    const QString& inversion,      const QString& symbolrate,
+        const QString& fec,          const QString& polarity,
+        const QString& hp_code_rate, const QString& lp_code_rate,   const QString& ofdm_modulation,
+        const QString& trans_mode,   const QString& guard_interval, const QString& hierarchy,
+        const QString& modulation,   const QString& bandwidth,      const QString& mod_sys,
+        const QString& rolloff);
 
     QString toString() const;
 
@@ -84,15 +95,15 @@ class MTV_PUBLIC DTVMultiplex
     uint64_t         m_symbolrate {0};
     DTVInversion     m_inversion;
     DTVBandwidth     m_bandwidth;
-    DTVCodeRate      m_hp_code_rate;  ///< High Priority FEC rate
-    DTVCodeRate      m_lp_code_rate;  ///< Low Priority FEC rate
+    DTVCodeRate      m_hp_code_rate;    ///< High Priority FEC rate
+    DTVCodeRate      m_lp_code_rate;    ///< Low Priority FEC rate
     DTVModulation    m_modulation;
     DTVTransmitMode  m_trans_mode;
     DTVGuardInterval m_guard_interval;
     DTVHierarchy     m_hierarchy;
     DTVPolarity      m_polarity;
-    DTVCodeRate      m_fec; ///< Inner Forward Error Correction rate
-    DTVModulationSystem m_mod_sys; ///< modulation system (only DVB-S or DVB-S2 atm)
+    DTVCodeRate      m_fec;             ///< Inner Forward Error Correction rate
+    DTVModulationSystem m_mod_sys;      ///< Modulation system
     DTVRollOff       m_rolloff;
 
     // Optional additional info
@@ -117,7 +128,7 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
         DTVTunerType type,
         QString frequency,    QString inversion,      QString symbolrate,
         QString fec,          QString polarity,
-        QString hp_code_rate, QString lp_code_rate,   QString constellation,
+        QString hp_code_rate, QString lp_code_rate,   QString ofdm_modulation,
         QString trans_mode,   QString guard_interval, QString hierarchy,
         QString modulation,   QString bandwidth,
         QString mod_sys,      QString rolloff);

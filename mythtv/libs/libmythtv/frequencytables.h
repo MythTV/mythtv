@@ -30,15 +30,15 @@ freq_table_list_t get_matching_freq_tables(
     const QString &format, const QString &modulation, const QString &country);
 
 MTV_PUBLIC long long get_center_frequency(
-    QString format, QString modulation, QString country, int freqid);
+    const QString& format, const QString& modulation, const QString& country, int freqid);
 
 int get_closest_freqid(
-    QString format, QString modulation, QString country, long long centerfreq);
+    const QString& format, QString modulation, const QString& country, long long centerfreq);
 
 class FrequencyTable
 {
   public:
-    FrequencyTable(QString                 _name_format,
+    FrequencyTable(const QString&          _name_format,
                    int                     _name_offset,
                    uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
@@ -51,7 +51,7 @@ class FrequencyTable
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   QString                 _name_format,
+                   const QString&          _name_format,
                    int                     _name_offset,
                    DTVInversion::Types     _inversion,
                    DTVBandwidth::Types     _bandwidth,
@@ -76,7 +76,7 @@ class FrequencyTable
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   QString                 _name_format,
+                   const QString&          _name_format,
                    int                     _name_offset,
                    DTVCodeRate::Types      _fec_inner,
                    DTVModulation::Types    _modulation,

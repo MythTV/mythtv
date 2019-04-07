@@ -64,7 +64,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
   // The following are moved from deleted class ScanWizardConfig
   public:
     void SetupConfig(uint default_sourceid, uint default_cardid,
-        QString default_inputname);
+        const QString& default_inputname);
 
     uint    GetSourceID(void)     const;
     uint    GetScanID(void)       const { return m_scanConfig->GetScanID(); }

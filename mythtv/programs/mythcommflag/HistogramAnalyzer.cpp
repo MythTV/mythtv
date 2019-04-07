@@ -24,7 +24,7 @@ using namespace frameAnalyzer;
 namespace {
 
 bool
-readData(QString filename, float *mean, unsigned char *median, float *stddev,
+readData(const QString& filename, float *mean, unsigned char *median, float *stddev,
         int *frow, int *fcol, int *fwidth, int *fheight,
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
@@ -60,7 +60,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
                     .arg(filename).arg(frameno));
             goto error;
         }
-        for (unsigned int ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
+        for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
         {
             if ((nitems = fscanf(fp, "%20x", &counter[ii])) != 1)
             {
@@ -84,7 +84,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
         fcol[frameno] = colval;
         fwidth[frameno] = widthval;
         fheight[frameno] = heightval;
-        for (unsigned int ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
+        for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
             histogram[frameno][ii] = counter[ii];
         monochromatic[frameno] = !widthval || !heightval ? 1 : 0;
         /*
@@ -105,7 +105,7 @@ error:
 }
 
 bool
-writeData(QString filename, float *mean, unsigned char *median, float *stddev,
+writeData(const QString& filename, float *mean, unsigned char *median, float *stddev,
         int *frow, int *fcol, int *fwidth, int *fheight,
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
@@ -137,7 +137,7 @@ writeData(QString filename, float *mean, unsigned char *median, float *stddev,
 };  /* namespace */
 
 HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
-        QString debugdir)
+        const QString& debugdir)
     : m_pgmConverter(pgmc)
     , m_borderDetector(bd)
 #ifdef PGM_CONVERT_GREYSCALE
@@ -166,26 +166,16 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
 
 HistogramAnalyzer::~HistogramAnalyzer()
 {
-    if (m_monochromatic)
-        delete []m_monochromatic;
-    if (m_mean)
-        delete []m_mean;
-    if (m_median)
-        delete []m_median;
-    if (m_stddev)
-        delete []m_stddev;
-    if (m_frow)
-        delete []m_frow;
-    if (m_fcol)
-        delete []m_fcol;
-    if (m_fwidth)
-        delete []m_fwidth;
-    if (m_fheight)
-        delete []m_fheight;
-    if (m_histogram)
-        delete []m_histogram;
-    if (m_buf)
-        delete []m_buf;
+    delete []m_monochromatic;
+    delete []m_mean;
+    delete []m_median;
+    delete []m_stddev;
+    delete []m_frow;
+    delete []m_fcol;
+    delete []m_fwidth;
+    delete []m_fheight;
+    delete []m_histogram;
+    delete []m_buf;
 }
 
 enum FrameAnalyzer::analyzeFrameResult

@@ -57,10 +57,7 @@ bool ZMClient::setupZMClient(void)
         return false;
     }
 
-    if (!ZMClient::get()->connectToHost(zmserver_host, zmserver_port))
-        return false;
-
-    return true;
+    return ZMClient::get()->connectToHost(zmserver_host, zmserver_port);
 }
 
 bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
@@ -156,7 +153,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
     }
 
     // sanity check
-    if (strList.size() < 1)
+    if (strList.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
         return false;
@@ -180,10 +177,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
     }
 
     // we should get "OK" from the server if everything is OK
-    if (strList[0] != "OK")
-        return false;
-
-    return true;
+    return strList[0] == "OK";
 }
 
 bool ZMClient::checkProtoVersion(void)
@@ -258,8 +252,7 @@ ZMClient::~ZMClient()
         m_zmclientReady = false;
     }
 
-    if (m_retryTimer)
-        delete m_retryTimer;
+    delete m_retryTimer;
 }
 
 void ZMClient::getServerStatus(QString &status, QString &cpuStat, QString &diskStat)
@@ -316,7 +309,7 @@ void ZMClient::updateMonitorStatus(void)
             mon->zmaStatus = strList[x * 7 + 5];
             mon->events = strList[x * 7 + 6].toInt();
             mon->function = strList[x * 7 + 7];
-            mon->enabled = strList[x * 7 + 8].toInt();
+            mon->enabled = (strList[x * 7 + 8].toInt() != 0);
         }
     }
 }
@@ -731,7 +724,7 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
     strList << QString::number(monitorID);
     if (!sendReceiveStringList(strList))
     {
-        if (strList.size() < 1)
+        if (strList.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
             return 0;
@@ -743,11 +736,8 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
         {
             return 0;
         }
-        else
-        {
-            status = strList[0];
-            return 0;
-        }
+        status = strList[0];
+        return 0;
     }
 
     // sanity check
@@ -916,12 +906,12 @@ void ZMClient::doGetMonitorList(void)
     }
 }
 
-void ZMClient::setMonitorFunction(const int monitorID, const QString &function, const int enabled)
+void ZMClient::setMonitorFunction(const int monitorID, const QString &function, const bool enabled)
 {
     QStringList strList("SET_MONITOR_FUNCTION");
     strList << QString::number(monitorID);
     strList << function;
-    strList << QString::number(enabled);
+    strList << QString::number(static_cast<int>(enabled));
 
     if (!sendReceiveStringList(strList))
         return;

@@ -23,7 +23,7 @@ class MTV_PUBLIC ChannelGroupItem
     bool operator == (uint grpid) const
         { return m_grpid == grpid; }
 
-    ChannelGroupItem& operator=(const ChannelGroupItem&);
+    ChannelGroupItem& operator=(const ChannelGroupItem&) = default;
 
   public:
     uint    m_grpid;
@@ -40,12 +40,12 @@ class MTV_PUBLIC ChannelGroup
   public:
     // ChannelGroup 
     static ChannelGroupList  GetChannelGroups(bool includeEmpty = true);
-    static bool              ToggleChannel(uint chanid, int changrpid, int delete_chan);
+    static bool              ToggleChannel(uint chanid, int changrpid, bool delete_chan);
     static bool              AddChannel(uint chanid, int changrpid);
     static bool              DeleteChannel(uint chanid, int changrpid);
     static int               GetNextChannelGroup(const ChannelGroupList &sorted, int grpid);
     static QString           GetChannelGroupName(int grpid);
-    static int               GetChannelGroupId(QString changroupname);
+    static int               GetChannelGroupId(const QString& changroupname);
 
   private:
 

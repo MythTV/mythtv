@@ -77,7 +77,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         return;
     }
 
-    if (m_player->GetVideoAspect() > 1.5f)
+    if (m_player->GetVideoAspect() > 1.5F)
     {
         if (m_detectLetterboxDetectedMode != m_detectLetterboxDefaultMode)
         {

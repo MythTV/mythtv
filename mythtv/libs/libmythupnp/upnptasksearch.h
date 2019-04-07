@@ -59,8 +59,8 @@ class UPnpSearchTask : public Task
 
         void     ProcessDevice ( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendMsg       ( MSocketDevice  *pSocket,
-                                 QString         sST,
-                                 QString         sUDN );
+                                 const QString&  sST,
+                                 const QString&  sUDN );
 
     public:
 

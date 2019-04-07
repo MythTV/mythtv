@@ -78,10 +78,10 @@ bool BrowserConfig::Create()
 void BrowserConfig::slotSave(void)
 {
     float zoom = m_zoomEdit->GetText().toFloat();
-    if (zoom > 5.0f)
-        zoom = 5.0f;
-    if (zoom < 0.3f)
-        zoom = 0.3f; 
+    if (zoom > 5.0F)
+        zoom = 5.0F;
+    if (zoom < 0.3F)
+        zoom = 0.3F; 
     gCoreContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
     gCoreContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
     int checkstate = 0;

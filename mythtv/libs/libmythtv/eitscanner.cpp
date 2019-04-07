@@ -66,7 +66,7 @@ void EITScanner::TeardownAll(void)
 void EITScanner::run(void)
 {
     static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
-    static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
+    static const float rt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
 
     m_lock.lock();
 
@@ -78,7 +78,7 @@ void EITScanner::run(void)
         m_lock.unlock();
         uint list_size = m_eitHelper->GetListSize();
 
-        float rate = 1.0f;
+        float rate = 1.0F;
         for (uint i = 0; i < 5; i++)
         {
             if (list_size >= sz[i])
@@ -145,7 +145,7 @@ void EITScanner::run(void)
 
             m_activeScanNextTrig = MythDate::current()
                 .addSecs(m_activeScanTrigTime);
-            if (m_activeScanChannels.size())
+            if (!m_activeScanChannels.empty())
             {
                 ++m_activeScanNextChan;
                 m_activeScanNextChanIndex =
@@ -173,7 +173,6 @@ void EITScanner::run(void)
 
     if (eitCount) /* some events have been handled since the last schedule request */
     {
-        eitCount = 0;
         RescheduleRecordings();
     }
 
@@ -206,7 +205,7 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
     m_channel     = channel;
 
     m_eitSource->SetEITHelper(m_eitHelper);
-    m_eitSource->SetEITRate(1.0f);
+    m_eitSource->SetEITRate(1.0F);
     m_eitHelper->SetChannelID(m_channel->GetChanID());
     m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(m_channel->GetChanID()));
 
@@ -275,7 +274,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
     // Start at a random channel. This is so that multiple cards with
     // the same source don't all scan the same channels in the same
     // order when the backend is first started up.
-    if (m_activeScanChannels.size())
+    if (!m_activeScanChannels.empty())
     {
         // The start channel is random.  From now on, start on the
         // next channel.  This makes sure the immediately following

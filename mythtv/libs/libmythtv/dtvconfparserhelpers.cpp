@@ -448,7 +448,7 @@ const char *DTVPolarity::s_dbStr[DTVPolarity::kDBStrCnt] =
 const DTVParamHelperStruct DTVModulationSystem::s_confTable[] =
 {
     { "SYS_UNDEFINED",     kModulationSystem_UNDEFINED     },
-    { "SYS_DVBC_ANNEX_AC", kModulationSystem_DVBC_ANNEX_AC },
+    { "SYS_DVBC_ANNEX_A",  kModulationSystem_DVBC_ANNEX_A  },
     { "SYS_DVBC_ANNEX_B",  kModulationSystem_DVBC_ANNEX_B  },
     { "SYS_DVBT",          kModulationSystem_DVBT          },
     { "SYS_DVBT2",         kModulationSystem_DVBT2         },
@@ -478,49 +478,49 @@ const DTVParamHelperStruct DTVModulationSystem::s_vdrTable[] =
 
 const DTVParamHelperStruct DTVModulationSystem::s_parseTable[] =
 {
-    { "UNDEFINED", kModulationSystem_UNDEFINED     },
-    { "DVBC_AC",   kModulationSystem_DVBC_ANNEX_AC },
-    { "DVBC_B",    kModulationSystem_DVBC_ANNEX_B  },
-    { "DVB-T",     kModulationSystem_DVBT          },
-    { "DVB-T2",    kModulationSystem_DVBT2         },
-    { "DSS",       kModulationSystem_DSS           },
-    { "DVB-S",     kModulationSystem_DVBS          },
-    { "DVB-S2",    kModulationSystem_DVBS2         },
-    { "DVBH",      kModulationSystem_DVBH          },
-    { "ISDBT",     kModulationSystem_ISDBT         },
-    { "ISDBS",     kModulationSystem_ISDBS         },
-    { "ISDBC",     kModulationSystem_ISDBC         },
-    { "ATSC",      kModulationSystem_ATSC          },
-    { "ATSCMH",    kModulationSystem_ATSCMH        },
-    { "DMBTH",     kModulationSystem_DMBTH         },
-    { "CMMB",      kModulationSystem_CMMB          },
-    { "DAB",       kModulationSystem_DAB           },
-    { "TURBO",     kModulationSystem_TURBO         },
-    { "DVBC_C",    kModulationSystem_DVBC_ANNEX_C  },
-    { nullptr,     kModulationSystem_UNDEFINED     },
+    { "UNDEFINED",    kModulationSystem_UNDEFINED     },
+    { "DVB-C/A",      kModulationSystem_DVBC_ANNEX_A  },
+    { "DVB-C/B",      kModulationSystem_DVBC_ANNEX_B  },
+    { "DVB-T",        kModulationSystem_DVBT          },
+    { "DSS",          kModulationSystem_DSS           },
+    { "DVB-S",        kModulationSystem_DVBS          },
+    { "DVB-S2",       kModulationSystem_DVBS2         },
+    { "DVBH",         kModulationSystem_DVBH          },
+    { "ISDBT",        kModulationSystem_ISDBT         },
+    { "ISDBS",        kModulationSystem_ISDBS         },
+    { "ISDBC",        kModulationSystem_ISDBC         },
+    { "ATSC",         kModulationSystem_ATSC          },
+    { "ATSCMH",       kModulationSystem_ATSCMH        },
+    { "DMBTH",        kModulationSystem_DMBTH         },
+    { "CMMB",         kModulationSystem_CMMB          },
+    { "DAB",          kModulationSystem_DAB           },
+    { "DVB-T2",       kModulationSystem_DVBT2         },
+    { "TURBO",        kModulationSystem_TURBO         },
+    { "DVB-C/C",      kModulationSystem_DVBC_ANNEX_C  },
+    { nullptr,        kModulationSystem_UNDEFINED     },
 };
 
 const char *DTVModulationSystem::s_dbStr[DTVModulationSystem::kDBStrCnt] =
 {
-    "UNDEFINED", ///< kModulationSystem_UNDEFINED
-    "DVBCAC",    ///< kModulationSystem_DVBC_ANNEX_AC
-    "DVBC_B",    ///< kModulationSystem_DVBC_ANNEX_B
-    "DVB-T",     ///< kModulationSystem_DVBT
-    "DSS",       ///< kModulationSystem_DSS
-    "DVB-S",     ///< kModulationSystem_DVBS
-    "DVB-S2",    ///< kModulationSystem_DVBS2
-    "DVBH",      ///< kModulationSystem_DVBH
-    "ISDBT",     ///< kModulationSystem_ISDBT
-    "ISDBS",     ///< kModulationSystem_ISDBS
-    "ISDBC",     ///< kModulationSystem_ISDBC
-    "ATSC",      ///< kModulationSystem_ATSC
-    "ATSCMH",    ///< kModulationSystem_ATSCMH
-    "DMBTH",     ///< kModulationSystem_DMBTH
-    "CMMB",      ///< kModulationSystem_CMMB
-    "DAB",       ///< kModulationSystem_DAB
-    "DVB-T2",    ///< kModulationSystem_DVBT2
-    "TURBO",     ///< kModulationSystem_TURBO
-    "DVBC-C",    ///< kModulationSystem_DVBC_ANNEX_C
+    "UNDEFINED",     ///< kModulationSystem_UNDEFINED
+    "DVB-C/A",       ///< kModulationSystem_DVBC_ANNEX_A
+    "DVB-C/B",       ///< kModulationSystem_DVBC_ANNEX_B
+    "DVB-T",         ///< kModulationSystem_DVBT
+    "DSS",           ///< kModulationSystem_DSS
+    "DVB-S",         ///< kModulationSystem_DVBS
+    "DVB-S2",        ///< kModulationSystem_DVBS2
+    "DVBH",          ///< kModulationSystem_DVBH
+    "ISDBT",         ///< kModulationSystem_ISDBT
+    "ISDBS",         ///< kModulationSystem_ISDBS
+    "ISDBC",         ///< kModulationSystem_ISDBC
+    "ATSC",          ///< kModulationSystem_ATSC
+    "ATSCMH",        ///< kModulationSystem_ATSCMH
+    "DMBTH",         ///< kModulationSystem_DMBTH
+    "CMMB",          ///< kModulationSystem_CMMB
+    "DAB",           ///< kModulationSystem_DAB
+    "DVB-T2",        ///< kModulationSystem_DVBT2
+    "TURBO",         ///< kModulationSystem_TURBO
+    "DVB-C/C",       ///< kModulationSystem_DVBC_ANNEX_C
 };
 
 const DTVParamHelperStruct DTVRollOff::s_confTable[] =

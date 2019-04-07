@@ -33,8 +33,8 @@ class pid_cache_item_t
     uint GetTableID(void) const
         { return (m_sid_tid&0x100) ? 0 : GetID(); }
     uint GetID(void) const { return m_sid_tid & 0xff; }
-    bool IsPCRPID(void) const { return m_sid_tid&0x200; }
-    bool IsPermanent(void) const { return m_sid_tid&0x10000; }
+    bool IsPCRPID(void) const { return ( m_sid_tid&0x200 ) != 0; }
+    bool IsPermanent(void) const { return ( m_sid_tid&0x10000 ) != 0; }
     uint GetComposite(void) const { return m_sid_tid; }
   private:
     uint m_pid     {0};
@@ -131,11 +131,11 @@ class MTV_PUBLIC ChannelUtil
                                  bool use_on_air_guide,
                                  bool hidden,
                                  bool hidden_in_guide,
-                                 QString freqid  = QString(),
-                                 QString icon    = QString(),
+                                 const QString& freqid  = QString(),
+                                 const QString& icon    = QString(),
                                  QString format  = QString(),
-                                 QString xmltvid = QString(),
-                                 QString default_authority = QString());
+                                 const QString& xmltvid = QString(),
+                                 const QString& default_authority = QString());
 
     static bool    CreateIPTVTuningData(
         uint channel_id, const IPTVTuningData &tuning)
@@ -224,8 +224,8 @@ class MTV_PUBLIC ChannelUtil
                                         uint sourceID = 0,
                                         uint channelGroupID = 0,
                                         bool liveTVOnly = false,
-                                        QString callsign = "",
-                                        QString channum = "");
+                                        const QString& callsign = "",
+                                        const QString& channum = "");
 
     /**
      * \deprecated Use LoadChannels instead
@@ -270,7 +270,7 @@ class MTV_PUBLIC ChannelUtil
                                       uint           sourceid,
                                       const QString &channum);
 
-    static bool    IsOnSameMultiplex(uint sourceid,
+    static bool    IsOnSameMultiplex(uint srcid,
                                      const QString &new_channum,
                                      const QString &old_channum);
 
@@ -292,28 +292,28 @@ class MTV_PUBLIC ChannelUtil
      * \brief Returns the channel-number string of the given channel.
      * \param chanid primary key for channel record
      */
-    static QString GetChanNum(int chanid);
+    static QString GetChanNum(int chan_id);
 
     /**
      * \brief Returns the listings time offset in minutes for given channel.
      * \param chanid primary key for channel record
      */
-    static int     GetTimeOffset(int chanid);
+    static int     GetTimeOffset(int chan_id);
     static int     GetSourceID(int mplexid);
     static uint    GetSourceIDForChannel(uint chanid);
 
-    static QStringList GetInputTypes(uint chandid);
+    static QStringList GetInputTypes(uint chanid);
 
     static bool    GetCachedPids(uint chanid, pid_cache_t &pid_cache);
 
     // Misc sets
     static bool    SetChannelValue(const QString &field_name,
-                                   QString        value,
+                                   const QString& value,
                                    uint           sourceid,
                                    const QString &channum);
 
     static bool    SetChannelValue(const QString &field_name,
-                                   QString        value,
+                                   const QString& value,
                                    int            chanid);
 
     static bool    SaveCachedPids(uint chanid,
@@ -329,7 +329,7 @@ class MTV_PUBLIC ChannelUtil
     static ChannelInfoList GetChannelsInternal(
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
-    static QString GetChannelStringField(int chanid, const QString &field);
+    static QString GetChannelStringField(int chan_id, const QString &field);
 };
 
 #endif // CHANUTIL_H

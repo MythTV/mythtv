@@ -27,7 +27,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-static bool performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], const QString& version,
                                 QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -237,14 +237,12 @@ int GetCategoryList(QStringList &list)
     if (!query.exec())
     {
         MythDB::DBError("mythbrowser: get category list", query);
-        return false;
+        return 0;
     }
-    else
+
+    while (query.next())
     {
-        while (query.next())
-        {
-            list << query.value(0).toString();
-        }
+        list << query.value(0).toString();
     }
 
     return list.size();

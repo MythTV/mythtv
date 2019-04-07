@@ -39,7 +39,6 @@ extern "C" {
 #define LOC_WARN QString("AVFW(%1) Warning: ").arg(m_filename)
 
 AVFormatWriter::AVFormatWriter()
-    : FileWriterBase()
 {
     memset(&m_fmt, 0, sizeof(m_fmt));
 }
@@ -216,11 +215,8 @@ bool AVFormatWriter::CloseFile(void)
 
 bool AVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    if ((m_bufferedVideoFrameTypes.isEmpty()) ||
-        (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I))
-        return true;
-
-    return false;
+    return (m_bufferedVideoFrameTypes.isEmpty()) ||
+           (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
 }
 
 int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
@@ -398,7 +394,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     long long tc = timecode;
 
-    if (m_bufferedAudioFrameTimes.size())
+    if (!m_bufferedAudioFrameTimes.empty())
         tc = m_bufferedAudioFrameTimes.takeFirst();
 
     if (m_startingTimecodeOffset == -1)
@@ -433,7 +429,7 @@ int AVFormatWriter::WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int 
     return 1;
 }
 
-bool AVFormatWriter::ReOpen(QString filename)
+bool AVFormatWriter::ReOpen(const QString& filename)
 {
     bool result = m_ringBuffer->ReOpen(filename);
 

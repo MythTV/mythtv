@@ -218,10 +218,10 @@ int Orientation::Apply(int transform)
 */
 int Orientation::FromRotation(const QString &degrees)
 {
-    if      (degrees ==   "0") return 1;
-    else if (degrees ==  "90") return 6;
-    else if (degrees == "180") return 3;
-    else if (degrees == "270") return 8;
+    if (degrees ==   "0") return 1;
+    if (degrees ==  "90") return 6;
+    if (degrees == "180") return 3;
+    if (degrees == "270") return 8;
     return 0;
 }
 
@@ -268,9 +268,7 @@ class PictureMetaData : public ImageMetaData
 {
 public:
     explicit PictureMetaData(const QString &filePath);
-    ~PictureMetaData()
-    { // libexiv2 closes file, cleans up via autoptrs
-    }
+    ~PictureMetaData() override = default; // libexiv2 closes file, cleans up via autoptrs
 
     bool        IsValid() override // ImageMetaData
         { return m_image.get(); }
@@ -297,13 +295,13 @@ protected:
    \param filePath Absolute image path
  */
 PictureMetaData::PictureMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_image(nullptr), m_exifData()
+    : ImageMetaData(filePath), m_image(nullptr)
 {
     try
     {
         m_image = Exiv2::ImageFactory::open(filePath.toStdString());
 
-        if (IsValid())
+        if (PictureMetaData::IsValid())
         {
             m_image->readMetadata();
             m_exifData = m_image->exifData();
@@ -483,7 +481,7 @@ QString PictureMetaData::DecodeComment(std::string rawValue)
     Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
     if (comVal.charsetId() != Exiv2::CommentValue::undefined)
         rawValue = comVal.comment();
-    return QString::fromStdString(rawValue.c_str());
+    return QString::fromStdString(rawValue);
 }
 
 
@@ -496,7 +494,7 @@ class VideoMetaData : public ImageMetaData
 {
 public:
     explicit VideoMetaData(const QString &filePath);
-    ~VideoMetaData();
+    ~VideoMetaData() override;
 
     bool        IsValid() override  // ImageMetaData
         { return m_dict; }
@@ -533,7 +531,7 @@ VideoMetaData::VideoMetaData(const QString &filePath)
     if (vidStream >= 0)
         m_dict  = m_context->streams[vidStream]->metadata;
 
-    if (!IsValid())
+    if (!VideoMetaData::IsValid())
         avformat_close_input(&m_context);
 }
 
@@ -543,7 +541,7 @@ VideoMetaData::VideoMetaData(const QString &filePath)
  */
 VideoMetaData::~VideoMetaData()
 {
-    if (IsValid())
+    if (VideoMetaData::IsValid())
         avformat_close_input(&m_context);
 }
 

@@ -62,7 +62,6 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         {
             bool okToSave = false;
             QString checkResult;
-            QString fn = GetShareDir() + "backend-config/";
 
             if (request->m_sBaseUrl == "/Config/Database")
             {
@@ -200,7 +199,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 entries = sgroup.GetFileInfoList(parts[1]);
             }
 
-            if (entries.size())
+            if (!entries.empty())
             {
                 QTextStream os(&request->m_response);
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
@@ -262,7 +261,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
                 bool dirsOnly = true;
                 if (request->m_mapParams.contains("dirsOnly"))
-                    dirsOnly = request->m_mapParams["dirsOnly"].toInt();
+                    dirsOnly = (request->m_mapParams["dirsOnly"].toInt() != 0);
 
                 if (!dirsOnly)
                 {

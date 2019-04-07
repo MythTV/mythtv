@@ -880,22 +880,9 @@ QRegion MHText::GetOpaqueArea()
     {
         return QRegion();
     }
-    else
-    {
-        return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
-    }
+    return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
 }
 
-
-MHHyperText::MHHyperText(): MHInteractible(this)
-{
-
-}
-
-MHHyperText::~MHHyperText()
-{
-
-}
 
 void MHHyperText::Initialise(MHParseNode *p, MHEngine *engine)
 {

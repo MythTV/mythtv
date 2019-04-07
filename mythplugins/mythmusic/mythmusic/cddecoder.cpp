@@ -135,8 +135,7 @@ void CdDecoder::writeBlock()
             }
             break;
         }
-        else
-            ::usleep(output()->GetAudioBufferedTime()<<9);
+        ::usleep(output()->GetAudioBufferedTime()<<9);
     }
 }
 
@@ -386,11 +385,8 @@ void CdDecoder::run()
             // audiobuffer is reasonably populated
             if (fill < (thresh << 6))
                 break;
-            else
-            {
-                // Wait for half of the buffer to drain
-                ::usleep(output()->GetAudioBufferedTime()<<9);
-            }
+            // Wait for half of the buffer to drain
+            ::usleep(output()->GetAudioBufferedTime()<<9);
         }
 
         // write a block if there's sufficient space for it

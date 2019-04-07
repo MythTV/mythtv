@@ -35,7 +35,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual void setHelpText(const QString &str) { m_helptext = str; }
     QString getHelpText(void) const { return m_helptext; }
 
-    virtual void setName(const QString &str);
+    virtual void setName(const QString &name);
     QString getName(void) const { return m_name; }
     StandardSetting * byName(const QString &name);
 
@@ -397,7 +397,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     void setValue(const QString&) override; // StandardSetting
     virtual void setValue(bool value);
     using StandardSetting::setValue;
-    bool boolValue();
+    bool boolValue() { return m_settingValue == "1"; }
 
   signals:
     void valueChanged(bool);

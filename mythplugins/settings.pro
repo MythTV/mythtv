@@ -97,3 +97,8 @@ win32 {
     MOC_DIR         = moc
     OBJECTS_DIR     = obj
 }
+
+using_compdb:contains(CC, clang) {
+    QMAKE_CFLAGS += "-MJ $@.json"
+    QMAKE_CXXFLAGS += "-MJ $@.json"
+}

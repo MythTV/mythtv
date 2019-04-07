@@ -14,11 +14,11 @@ class NewsArticle
     typedef vector<NewsArticle> List;
 
     NewsArticle(const QString &title,
-                const QString &desc, const QString &artURL,
+                const QString &desc, const QString &articleURL,
                 const QString &thumbnail, const QString &mediaURL,
                 const QString &enclosure);
     NewsArticle(const QString &title,
-                const QString &desc, const QString &artURL);
+                const QString &desc, const QString &articleURL);
     explicit NewsArticle(const QString &title);
 
     NewsArticle() = default;

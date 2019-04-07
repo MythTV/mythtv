@@ -51,7 +51,7 @@ class GalleryUtil
                               const GalleryFilter& flt, bool recurse,
                               ThumbHash *itemHash, ThumbGenerator *thumbGen);
 
-    static QSize ScaleToDest(const QSize &sz, const QSize &dest, ScaleMax scaleMax);
+    static QSize ScaleToDest(const QSize &src, const QSize &dest, ScaleMax scaleMax);
 
     static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
         { if (move) return Move(src, dst); else return Copy(src, dst); }
@@ -65,8 +65,8 @@ class GalleryUtil
     static void PlayVideo(const QString &filename);
 
   private:
-    static bool CopyDirectory(const QFileInfo src, QFileInfo &dst);
-    static bool MoveDirectory(const QFileInfo src, QFileInfo &dst);
+    static bool CopyDirectory(const QFileInfo& src, QFileInfo &dst);
+    static bool MoveDirectory(const QFileInfo& src, QFileInfo &dst);
     static bool DeleteDirectory(const QFileInfo &dir);
     static bool RenameDirectory(const QString &currDir, const QString &oldName,
                                 const QString &newName);

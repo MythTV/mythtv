@@ -8,9 +8,7 @@ bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
 {
     if (!audio)
         return false;
-    if (render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1))
-        return true;
-    return false;
+    return render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1);
 }
 
 QStringList VideoVisual::GetVisualiserList(RenderType type)
@@ -39,7 +37,7 @@ VideoVisual* VideoVisual::Create(const QString &name,
     {
         if (name.isEmpty())
             return factory->Create(audio, render);
-        else if (factory->name() == name)
+        if (factory->name() == name)
             return factory->Create(audio, render);
     }
     return nullptr;

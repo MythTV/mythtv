@@ -53,7 +53,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 {
     Q_OBJECT
   public:
-    MythCoreContext(const QString &binversion, QObject *eventHandler);
+    MythCoreContext(const QString &binversion, QObject *guiContext);
     virtual ~MythCoreContext();
 
     bool Init(void);
@@ -83,11 +83,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QString GenMythURL(QString host = QString(), QString port = QString(),
-                       QString path = QString(), QString storageGroup = QString());
-
-    QString GenMythURL(QString host = QString(), int port = 0,
-                       QString path = QString(), QString storageGroup = QString());
+    QString GenMythURL(const QString& host = QString(), int port = 0,
+                       QString path = QString(), const QString& storageGroup = QString());
 
     QString GetMasterHostPrefix(const QString &storageGroup = QString(),
                                 const QString &path = QString());
@@ -145,6 +142,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetSetting(const QString &key, const QString &defaultval = "");
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
+    void SaveBoolSetting(const QString &key, bool newValue)
+        { SaveSetting(key, static_cast<int>(newValue)); }
 
     // Convenience setting query methods
     bool GetBoolSetting(const QString &key, bool defaultval = false);
@@ -153,7 +152,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     bool GetNumSetting(const QString &key, bool defaultvalue) = delete;
     double GetFloatSetting(const QString &key, double defaultval = 0.0);
     void GetResolutionSetting(const QString &type, int &width, int &height,
-                              double& forced_aspect, double &refreshrate,
+                              double& forced_aspect, double &refresh_rate,
                               int index=-1);
     void GetResolutionSetting(const QString &type, int &width, int &height,
                               int index=-1);
@@ -197,7 +196,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                            ResolveType = ResolveAny,
                            bool keepscope = false) const;
     bool CheckSubnet(const QAbstractSocket *socket);
-    bool CheckSubnet(const QHostAddress &addr);
+    bool CheckSubnet(const QHostAddress &peer);
 
     void ClearSettingsCache(const QString &myKey = QString(""));
     void ActivateSettingsCache(bool activate = true);
@@ -209,7 +208,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void InitLocale(void);
     void ReInitLocale(void);
     MythLocale *GetLocale(void) const;
-    const QLocale GetQLocale(void);
+    QLocale GetQLocale(void);
     void SaveLocaleDefaults(void);
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);

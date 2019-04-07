@@ -65,7 +65,7 @@ class MHText : public MHVisible
     static int GetStartCorner(const char *str);
 
     // Display function.
-    void Display(MHEngine *d) override; // MHVisible
+    void Display(MHEngine *engine) override; // MHVisible
     QRegion GetOpaqueArea() override; // MHVisible
 
   protected:
@@ -101,10 +101,10 @@ class MHText : public MHVisible
 class MHHyperText : public MHText, public MHInteractible
 {
   public:
-    MHHyperText();
+    MHHyperText() : MHInteractible(this) {}
     const char *ClassName() override // MHText
         { return "HyperText"; }
-    virtual ~MHHyperText();
+    virtual ~MHHyperText() = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHText
     void PrintMe(FILE *fd, int nTabs) const override; // MHText
 

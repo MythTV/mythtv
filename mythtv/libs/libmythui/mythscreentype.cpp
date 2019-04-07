@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QRunnable>
+#include <utility>
 
 #include "mythcorecontext.h"
 #include "mythobservable.h"
@@ -186,11 +187,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.begin();
-                }
+                looped = true;
+                it = m_FocusWidgetList.begin();
             }
         }
     }
@@ -214,11 +212,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.end() - 1;
-                }
+                looped = true;
+                it = m_FocusWidgetList.end() - 1;
             }
         }
     }
@@ -233,7 +228,7 @@ void MythScreenType::BuildFocusList(void)
 
     AddFocusableChildrenToList(m_FocusWidgetList);
 
-    if (m_FocusWidgetList.size() > 0)
+    if (!m_FocusWidgetList.empty())
         SetFocusWidget();
 }
 
@@ -315,7 +310,7 @@ void MythScreenType::LoadInBackground(QString message)
 
     m_ScreenStack->AllowReInit();
 
-    OpenBusyPopup(message);
+    OpenBusyPopup(std::move(message));
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(*this);
     MThreadPool::globalInstance()->start(loadTask, "ScreenLoad");
@@ -340,7 +335,7 @@ void MythScreenType::ReloadInBackground(void)
     LoadInBackground();
 }
 
-void MythScreenType::OpenBusyPopup(QString message)
+void MythScreenType::OpenBusyPopup(const QString& message)
 {
     if (m_BusyPopup)
         return;
@@ -559,7 +554,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
  * Do not use.
  *
  */
-void MythScreenType::CreateCopy(MythUIType *)
+void MythScreenType::CreateCopy(MythUIType * /*parent*/)
 {
     LOG(VB_GENERAL, LOG_ERR, "CreateCopy called on screentype - bad.");
 }

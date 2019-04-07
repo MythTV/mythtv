@@ -34,7 +34,8 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     friend class DVDRingBuffer;
 
   public:
-    virtual ~MythDVDContext();
+    MythDVDContext() = delete;    // Default constructor should not be called
+    ~MythDVDContext() override = default;
 
     int64_t  GetStartPTS()          const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
     int64_t  GetEndPTS()            const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
@@ -47,10 +48,6 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
 
   protected:
     MythDVDContext(const dsi_t& dsi, const pci_t& pci);
-
-  private:
-    // Default constructor should not be called
-    MythDVDContext();
 
   protected:
     dsi_t          m_dsi;
@@ -97,7 +94,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
   public:
     explicit DVDRingBuffer(const QString &lfilename);
-    virtual ~DVDRingBuffer();
+    ~DVDRingBuffer() override;
 
     // gets
     int  GetTitle(void)        const { return m_title;                  }
@@ -129,7 +126,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
-    void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id, uint32_t startTime);
+    void GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id, uint32_t startTime);
 
     uint32_t AdjustTimestamp(uint32_t timestamp);
     int64_t AdjustTimestamp(int64_t timestamp);
@@ -145,10 +142,10 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool HandleAction(const QStringList &actions, int64_t pts) override; // RingBuffer
 
     // Subtitles
-    uint GetSubtitleLanguage(int key);
+    uint GetSubtitleLanguage(int id);
     int GetSubtitleTrackNum(uint stream_id);
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
-                         const uint8_t * buf, int buf_size, uint32_t startTime);
+                         const uint8_t * spu_pkt, int buf_size, uint32_t startTime);
 
     uint GetAudioLanguage(int idx);
     int  GetAudioTrackNum(uint stream_id);
@@ -159,7 +156,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool RestoreDVDStateSnapshot(QString& state);
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (m_part == 0); }
-    bool EndOfTitle(void)   { return ((!m_titleParts) ||
+    bool EndOfTitle(void)   { return ((m_titleParts == 0) ||
                                      (m_part == (m_titleParts - 1)) ||
                                      (m_titleParts == 1)); }
 
@@ -263,7 +260,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     QMap<uint, QList<uint64_t> > m_chapterMap;
 
     MythDVDPlayer  *m_parent                {nullptr};
-    float           m_forcedAspect          {-1.0f};
+    float           m_forcedAspect          {-1.0F};
 
     QMutex          m_contextLock           {QMutex::Recursive};
     MythDVDContext *m_context               {nullptr};
@@ -305,8 +302,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int get_nibble(const uint8_t *buf, int nibble_offset);
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                     const uint8_t *buf, int nibble_offset, int buf_size);
-    void guess_palette(uint32_t *rgba_palette,uint8_t *palette,
-                       uint8_t *alpha);
+    void guess_palette(uint32_t *rgba_palette,const uint8_t *palette,
+                       const uint8_t *alpha);
     int is_transp(const uint8_t *buf, int pitch, int n,
                   const uint8_t *transp_color);
     int find_smallest_bounding_rectangle(AVSubtitle *s);

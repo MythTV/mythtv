@@ -146,7 +146,7 @@ void PreviewGeneratorQueue::GetPreviewImage(
     const QSize &outputsize,
     const QString &outputfile,
     long long time, bool in_seconds,
-    QString token)
+    const QString& token)
 {
     if (!s_pgq)
         return;
@@ -245,23 +245,22 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             outputfile = (*it++);
         if (it != list.end())
             time = (*it++).toLongLong();
-        QString fn;
         if (it != list.end())
         {
             bool time_fmt_sec = (*it++).toInt() != 0;
-            fn = GeneratePreviewImage(evinfo, outputsize, outputfile,
+            GeneratePreviewImage(evinfo, outputsize, outputfile,
                                       time, time_fmt_sec, token);
         }
         return true;
     }
-    else if (me->Message() == "PREVIEW_SUCCESS" ||
-             me->Message() == "PREVIEW_FAILED")
+    if (me->Message() == "PREVIEW_SUCCESS" ||
+        me->Message() == "PREVIEW_FAILED")
     {
         uint recordedingID = me->ExtraData(0).toUInt(); // pginfo->GetRecordingID()
-        QString filename   = me->ExtraData(1); // outFileName
-        QString msg        = me->ExtraData(2);
-        QString datetime   = me->ExtraData(3);
-        QString token      = me->ExtraData(4);
+        const QString& filename   = me->ExtraData(1); // outFileName
+        const QString& msg        = me->ExtraData(2);
+        const QString& datetime   = me->ExtraData(3);
+        const QString& token      = me->ExtraData(4);
 
         {
             QMutexLocker locker(&m_lock);
@@ -416,7 +415,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     const QSize &size,
     const QString &outputfile,
     long long time, bool in_seconds,
-    QString token)
+    const QString& token)
 {
     QString key = QString("%1_%2x%3_%4%5")
         .arg(pginfo.GetBasename()).arg(size.width()).arg(size.height())
@@ -494,28 +493,27 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
 
         bool preview_exists = previewLastModified.isValid();
 
-        if (false)
-        {
-            QString alttext = (bookmark_ts.isValid()) ? QString() :
-                QString("\n\t\t\tcmp_ts:               %1")
-                .arg(cmp_ts.toString(Qt::ISODate));
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("previewLastModified:  %1\n\t\t\t"
-                        "bookmark_ts:          %2%3\n\t\t\t"
-                        "pginfo.lastmodified:  %4")
-                    .arg(previewLastModified.toString(Qt::ISODate))
-                    .arg(bookmark_ts.toString(Qt::ISODate))
-                    .arg(alttext)
-                    .arg(pginfo.GetLastModifiedTime(MythDate::ISODate)) +
-                QString("Title: %1\n\t\t\t")
-                    .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)) +
-                QString("File  '%1' \n\t\t\tCache '%2'")
-                    .arg(filename).arg(ret_file) +
-                QString("\n\t\t\tPreview Exists: %1, Bookmark Updated: %2, "
-                        "Need Preview: %3")
-                    .arg(preview_exists).arg(bookmark_updated)
-                    .arg((bookmark_updated || !preview_exists)));
-        }
+#if 0
+        QString alttext = (bookmark_ts.isValid()) ? QString() :
+            QString("\n\t\t\tcmp_ts:               %1")
+            .arg(cmp_ts.toString(Qt::ISODate));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("previewLastModified:  %1\n\t\t\t"
+                    "bookmark_ts:          %2%3\n\t\t\t"
+                    "pginfo.lastmodified:  %4")
+                .arg(previewLastModified.toString(Qt::ISODate))
+                .arg(bookmark_ts.toString(Qt::ISODate))
+                .arg(alttext)
+                .arg(pginfo.GetLastModifiedTime(MythDate::ISODate)) +
+            QString("Title: %1\n\t\t\t")
+                .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)) +
+            QString("File  '%1' \n\t\t\tCache '%2'")
+                .arg(filename).arg(ret_file) +
+            QString("\n\t\t\tPreview Exists: %1, Bookmark Updated: %2, "
+                    "Need Preview: %3")
+                .arg(preview_exists).arg(bookmark_updated)
+                .arg((bookmark_updated || !preview_exists)));
+#endif
 
         needs_gen = bookmark_updated || !preview_exists;
 
@@ -615,7 +613,7 @@ void PreviewGeneratorQueue::GetInfo(
  * \param[in] token
  */
 void PreviewGeneratorQueue::IncPreviewGeneratorPriority(
-    const QString &key, QString token)
+    const QString &key, const QString& token)
 {
     QMutexLocker locker(&m_lock);
     m_queue.removeAll(key);

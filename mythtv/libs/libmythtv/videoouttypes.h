@@ -257,10 +257,10 @@ inline float get_aspect_override(AspectOverrideMode aspectmode, float orig)
     float ret = orig;
     switch (aspectmode)
     {
-        case kAspect_4_3:    ret = 4.0f  / 3.0f; break;
-        case kAspect_14_9:   ret = 14.0f / 9.0f; break;
-        case kAspect_16_9:   ret = 16.0f / 9.0f; break;
-        case kAspect_2_35_1: ret = 2.35f       ; break;
+        case kAspect_4_3:    ret = 4.0F  / 3.0F; break;
+        case kAspect_14_9:   ret = 14.0F / 9.0F; break;
+        case kAspect_16_9:   ret = 16.0F / 9.0F; break;
+        case kAspect_2_35_1: ret = 2.35F       ; break;
         case kAspect_Toggle:
         case kAspect_Off:
         case kAspect_END: break;

@@ -190,7 +190,7 @@ class DiSEqCDevDevice
                                       uint        devid);
     static DiSEqCDevDevice *CreateByType(DiSEqCDevTree &tree,
                                       dvbdev_t    type,
-                                      uint        devid = 0);
+                                      uint        dev_id = 0);
 
   protected:
     void SetDeviceID(uint devid)       const { m_devid    = devid;   }
@@ -294,7 +294,7 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
 {
   public:
     DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
-        : DiSEqCDevDevice(tree, devid) { Reset(); }
+        : DiSEqCDevDevice(tree, devid) { DiSEqCDevRotor::Reset(); }
     ~DiSEqCDevRotor();
 
     // Commands
@@ -374,7 +374,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
 {
   public:
     DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
-        : DiSEqCDevDevice(tree, devid) { Reset(); }
+        : DiSEqCDevDevice(tree, devid) { DiSEqCDevSCR::Reset(); }
     ~DiSEqCDevSCR();
 
     // Commands
@@ -439,7 +439,7 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
 {
   public:
     DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
-        : DiSEqCDevDevice(tree, devid) { Reset(); }
+        : DiSEqCDevDevice(tree, devid) { DiSEqCDevLNB::Reset(); }
 
     // Commands
     bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) override; // DiSEqCDevDevice

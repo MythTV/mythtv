@@ -48,7 +48,7 @@ const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 RecorderBase::RecorderBase(TVRec *rec)
     : m_tvrec(rec)
 {
-    ClearStatistics();
+    RecorderBase::ClearStatistics();
     QMutexLocker locker(avcodeclock);
 #if 0
     avcodec_init(); // init CRC's
@@ -118,8 +118,7 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
     else
         m_curRecording = nullptr;
 
-    if (oldrec)
-        delete oldrec;
+    delete oldrec;
 }
 
 void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
@@ -147,8 +146,7 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
     if (ri)
         m_nextRecording = new RecordingInfo(*ri);
 
-    if (m_nextRingBuffer)
-        delete m_nextRingBuffer;
+    delete m_nextRingBuffer;
     m_nextRingBuffer = rb;
 }
 
@@ -378,7 +376,14 @@ void RecorderBase::CheckForRingBufferSwitch(void)
     m_nextRingBufferLock.unlock();
 
     if (recq && m_tvrec)
+    {
+        // This call will free recq.
         m_tvrec->RingBufferChanged(m_ringBuffer, m_curRecording, recq);
+    }
+    else
+    {
+        delete recq;
+    }
 
     m_ringBufferCheckTimer.restart();
 }
@@ -870,7 +875,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<HDHRChannel*>(channel))
         {
             recorder = new HDHRRecorder(tvrec, dynamic_cast<HDHRChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_HDHOMERUN
     }
@@ -880,7 +885,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<CetonChannel*>(channel))
         {
             recorder = new CetonRecorder(tvrec, dynamic_cast<CetonChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_CETON
     }
@@ -890,7 +895,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<DVBChannel*>(channel))
         {
             recorder = new DVBRecorder(tvrec, dynamic_cast<DVBChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_DVB
     }
@@ -917,7 +922,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<ASIChannel*>(channel))
         {
             recorder = new ASIRecorder(tvrec, dynamic_cast<ASIChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_ASI
     }
@@ -938,7 +943,7 @@ RecorderBase *RecorderBase::CreateRecorder(
 #if CONFIG_LIBMP3LAME && defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
-        recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
+        recorder->SetBoolOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L2
     }
     else if (genOpt.inputtype == "EXTERNAL")

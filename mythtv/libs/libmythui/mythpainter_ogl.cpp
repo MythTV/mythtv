@@ -164,10 +164,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
             m_ImageExpireList.push_back(Image);
             return m_imageToTextureMap[Image];
         }
-        else
-        {
-            DeleteFormatImagePriv(Image);
-        }
+        DeleteFormatImagePriv(Image);
     }
 
     Image->SetChanged(false);

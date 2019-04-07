@@ -22,7 +22,8 @@ class MediaServerItem
 {
   public:
     MediaServerItem() : m_scanned(false) { }
-    MediaServerItem(QString id, QString parent, QString name, QString url)
+    MediaServerItem(const QString& id, const QString& parent,
+                    const QString& name, const QString& url)
       : m_id(id), m_parentid(parent), m_name(name), m_url(url) { }
     QString NextUnbrowsed(void);
     MediaServerItem* Find(QString &id);

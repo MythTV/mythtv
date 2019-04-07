@@ -3,9 +3,10 @@
 #include "mythuitype.h"
 
 // QT headers
+#include <QDomDocument>
 #include <QEvent>
 #include <QKeyEvent>
-#include <QDomDocument>
+#include <utility>
 
 // XML headers
 #include "xmlparsebase.h"
@@ -461,7 +462,8 @@ int MythUIType::CalcAlpha(int alphamod)
     return (int)(m_Effects.m_alpha * (alphamod / 255.0));
 }
 
-void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
+void MythUIType::DrawSelf(MythPainter * /*p*/, int /*xoffset*/, int /*yoffset*/,
+                          int /*alphaMod*/, QRect /*clipRect*/)
 {
 }
 
@@ -583,7 +585,7 @@ QSize MythUIType::GetMinSize(void) const
     if (!m_MinSize.isValid())
         return m_Area.size();
 
-    return QSize(m_MinSize.x(), m_MinSize.y());
+    return {m_MinSize.x(), m_MinSize.y()};
 }
 
 void MythUIType::SetArea(const MythRect &rect)
@@ -974,7 +976,6 @@ bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
 
 void MythUIType::customEvent(QEvent * /*event*/)
 {
-    return;
 }
 
 /** \brief Mouse click/movement handler, receives mouse gesture events from the
@@ -993,7 +994,6 @@ bool MythUIType::gestureEvent(MythGestureEvent * /*event*/)
  */
 void MythUIType::mediaEvent(MythMediaEvent * /*event*/)
 {
-    return;
 }
 
 void MythUIType::LoseFocus(void)
@@ -1043,7 +1043,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
         }
     }
 
-    if (m_dependsValue.size() > 0)
+    if (!m_dependsValue.empty())
         visible = m_dependsValue[0].second;
     for (int i = 1; i <  m_dependsValue.size(); i++)
     {
@@ -1128,14 +1128,14 @@ void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
-int MythUIType::NormX(const int x)
+int MythUIType::NormX(const int width)
 {
-    return GetMythMainWindow()->NormX(x);
+    return GetMythMainWindow()->NormX(width);
 }
 
-int MythUIType::NormY(const int y)
+int MythUIType::NormY(const int height)
 {
-    return GetMythMainWindow()->NormY(y);
+    return GetMythMainWindow()->NormY(height);
 }
 
 /**
@@ -1198,7 +1198,7 @@ void MythUIType::CopyFrom(MythUIType *base)
  *  \brief Copy the state of this widget to the one given, it must be of the
  *         same type.
  */
-void MythUIType::CreateCopy(MythUIType *)
+void MythUIType::CreateCopy(MythUIType * /*parent*/)
 {
     // Calling CreateCopy on base type is not valid
 }
@@ -1385,10 +1385,7 @@ void MythUIType::LoadNow(void)
  */
 bool MythUIType::ContainsPoint(const QPoint &point) const
 {
-    if (m_Area.contains(point))
-        return true;
-
-    return false;
+    return m_Area.contains(point);
 }
 
 MythPainter *MythUIType::GetPainter(void)
@@ -1404,7 +1401,7 @@ MythPainter *MythUIType::GetPainter(void)
 
 void MythUIType::SetDependsMap(QMap<QString, QString> dependsMap)
 {
-    m_dependsMap = dependsMap;
+    m_dependsMap = std::move(dependsMap);
 }
 
 void MythUIType::SetReverseDependence(MythUIType *dependee, bool reverse)

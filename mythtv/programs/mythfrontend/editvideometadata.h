@@ -22,7 +22,7 @@ class EditMetadataDialog : public MythScreenType
 
   public:
      EditMetadataDialog(MythScreenStack *lparent,
-                       QString lname,
+                       const QString& lname,
                        VideoMetadata *source_metadata,
                        const VideoMetadataListManager &cache);
     ~EditMetadataDialog();
@@ -33,7 +33,7 @@ class EditMetadataDialog : public MythScreenType
     void fillWidgets();
 
   protected:
-    void createBusyDialog(QString title);
+    void createBusyDialog(const QString& title);
 
   signals:
     void Finished();
@@ -65,7 +65,7 @@ class EditMetadataDialog : public MythScreenType
     void FindScreenshot();
     void FindTrailer();
     void NewCategoryPopup();
-    void AddCategory(QString category);
+    void AddCategory(const QString& category);
     void SetCoverArt(QString file);
     void SetBanner(QString file);
     void SetFanart(QString file);
@@ -76,7 +76,7 @@ class EditMetadataDialog : public MythScreenType
     void FindNetBanner();
     void FindNetFanart();
     void FindNetScreenshot();
-    void OnSearchListSelection(ArtworkInfo info,
+    void OnSearchListSelection(const ArtworkInfo& info,
                                VideoArtworkType type);
 
   private:

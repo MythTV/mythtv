@@ -58,8 +58,6 @@ class VideoSetupWizard : public MythScreenType
     MythUIButton        *m_nextButton                 {nullptr};
     MythUIButton        *m_prevButton                 {nullptr};
 
-    VideoDisplayProfile *m_vdp                        {nullptr};
-
   private slots:
     void slotNext(void);
     void slotPrevious(void);
@@ -67,11 +65,11 @@ class VideoSetupWizard : public MythScreenType
 
     void testSDVideo(void);
     void testHDVideo(void);
-    void playVideoTest(QString desc,
-                       QString title,
-                       QString file);
+    void playVideoTest(const QString& desc,
+                       const QString& title,
+                       const QString& file);
 
-    void DownloadSample(QString url, QString dest);
+    void DownloadSample(const QString& url, const QString& dest);
 };
 
 #endif

@@ -54,7 +54,7 @@ class FileLogger : public LoggerBase
     ~FileLogger();
     bool logmsg(LoggingItem *item) override; // LoggerBase
     void reopen(void) override; // LoggerBase
-    static FileLogger *create(QString filename, QMutex *mutex);
+    static FileLogger *create(const QString& filename, QMutex *mutex);
   private:
     bool m_opened {false}; ///< true when the logfile is opened
     int  m_fd     {-1};    ///< contains the file descriptor for the logfile
@@ -106,7 +106,7 @@ class DatabaseLogger : public LoggerBase
     bool logmsg(LoggingItem *item) override; // LoggerBase
     void reopen(void) override { }; // LoggerBase
     void stopDatabaseAccess(void) override; // LoggerBase
-    static DatabaseLogger *create(QString table, QMutex *mutex);
+    static DatabaseLogger *create(const QString& table, QMutex *mutex);
   protected:
     bool logqmsg(MSqlQuery &query, LoggingItem *item);
     void prepare(MSqlQuery &query);
@@ -182,6 +182,9 @@ class DBLoggerThread : public MThread
         return (m_queue->size() >= MAX_QUEUE_LEN);
     }
   private:
+    DBLoggerThread(const DBLoggerThread &) = delete;            // not copyable
+    DBLoggerThread &operator=(const DBLoggerThread &) = delete; // not copyable
+
     DatabaseLogger *m_logger {nullptr};///< The associated logger instance
     QMutex m_queueMutex;               ///< Mutex for protecting the queue
     QQueue<LoggingItem *> *m_queue {nullptr}; ///< Queue of LoggingItems to insert

@@ -35,7 +35,7 @@ public:
         : m_text(t), m_format(formatting), m_parent(p) {}
     FormattedTextChunk(void) = default;
 
-    QSize CalcSize(float layoutSpacing = 0.0f) const;
+    QSize CalcSize(float layoutSpacing = 0.0F) const;
     void CalcPadding(bool isFirst, bool isLast, int &left, int &right) const;
     bool Split(FormattedTextChunk &newChunk);
     QString ToLogString(void) const;
@@ -59,7 +59,7 @@ public:
     FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
         : m_xIndent(x), m_yIndent(y), m_origX(o_x), m_origY(o_y) {}
 
-    QSize CalcSize(float layoutSpacing = 0.0f) const;
+    QSize CalcSize(float layoutSpacing = 0.0F) const;
 
     QList<FormattedTextChunk> chunks;
     int m_xIndent {-1}; // -1 means TBD i.e. centered
@@ -216,7 +216,7 @@ private:
     void DisplayAVSubtitles(void);
     int  DisplayScaledAVSubtitles(const AVSubtitleRect *rect, QRect &bbox,
                                   bool top, QRect &display, int forced,
-                                  QString imagename,
+                                  const QString& imagename,
                                   long long displayuntil, long long late);
     void DisplayTextSubtitles(void);
     void DisplayRawTextSubtitles(void);

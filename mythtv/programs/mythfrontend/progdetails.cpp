@@ -36,7 +36,7 @@ bool ProgDetails::Create(void)
     return true;
 }
 
-QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
+QString ProgDetails::getRatings(bool recorded, uint chanid, const QDateTime& startts)
 {
     QString table = (recorded) ? "recordedrating" : "programrating";
     QString sel = QString(
@@ -414,8 +414,8 @@ void ProgDetails::loadPage(void)
     /* see #7810, was hardcoded to 4 star system, when every theme
      * uses 10 stars / 5 stars with half stars
      */
-        if (stars > 0.0f)
-            attr += tr("%n star(s)", "", roundf(stars * 10.0f)) + ", ";
+        if (stars > 0.0F)
+            attr += tr("%n star(s)", "", roundf(stars * 10.0F)) + ", ";
     }
     if (!colorcode.isEmpty())
         attr += colorcode + ", ";
@@ -821,11 +821,11 @@ void ProgDetails::loadPage(void)
 
         if (query.exec() && query.next())
         {
-            recordingProfile = m_progInfo.i18n(query.value(0).toString());
+            recordingProfile = ProgramInfo::i18n(query.value(0).toString());
         }
-        recordingGroup = m_progInfo.i18n(m_progInfo.GetRecordingGroup());
-        storageGroup   = m_progInfo.i18n(m_progInfo.GetStorageGroup());
-        playbackGroup  = m_progInfo.i18n(m_progInfo.GetPlaybackGroup());
+        recordingGroup = ProgramInfo::i18n(m_progInfo.GetRecordingGroup());
+        storageGroup   = ProgramInfo::i18n(m_progInfo.GetStorageGroup());
+        playbackGroup  = ProgramInfo::i18n(m_progInfo.GetPlaybackGroup());
     }
     else if (m_progInfo.GetRecordingRuleID())
     {

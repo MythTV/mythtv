@@ -247,7 +247,7 @@ void ProgFinder::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message == "SCHEDULE_CHANGE")
         {
@@ -375,7 +375,7 @@ void ProgFinder::updateInfo(void)
     }
     else if (GetFocusWidget() == m_timesList)
     {
-        if (m_showData.size() == 0)
+        if (m_showData.empty())
         {
             ResetMap(m_infoMap);
             if (m_help1Text)
@@ -431,11 +431,11 @@ void ProgFinder::updateTimesList()
 
     m_timesList->Reset();
 
-    if (m_showData.size() > 0)
+    if (!m_showData.empty())
     {
         QString itemText;
         QDateTime starttime;
-        for (uint i = 0; i < m_showData.size(); ++i)
+        for (size_t i = 0; i < m_showData.size(); ++i)
         {
             starttime = m_showData[i]->GetScheduledStartTime();
             itemText = MythDate::toString(starttime,
@@ -970,7 +970,7 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
        searchChar = s_searchChars[0];
 
 
-  if (searchChar.contains('@'))
+   if (searchChar.contains('@'))
    {
        where = "SELECT DISTINCT title FROM program "
                "LEFT JOIN channel ON program.chanid = channel.chanid "

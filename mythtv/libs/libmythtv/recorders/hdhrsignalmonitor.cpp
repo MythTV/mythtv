@@ -62,7 +62,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    HDHRSignalMonitor::Stop();
     HDHRStreamHandler::Return(streamHandler, m_inputid);
 }
 

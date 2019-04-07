@@ -17,7 +17,7 @@ class HistogramAnalyzer;
 class SceneChangeDetector : public FrameAnalyzer
 {
 public:
-    SceneChangeDetector(HistogramAnalyzer *ha, QString debugdir);
+    SceneChangeDetector(HistogramAnalyzer *ha, const QString& debugdir);
     virtual void deleteLater(void);
 
     /* FrameAnalyzer interface. */
@@ -45,7 +45,7 @@ public:
 
   private:
     HistogramAnalyzer       *m_histogramAnalyzer {nullptr};
-    float                   m_fps                {0.0f};
+    float                   m_fps                {0.0F};
 
     /* per-frame info */
     SceneChangeData         *m_scdata            {nullptr};

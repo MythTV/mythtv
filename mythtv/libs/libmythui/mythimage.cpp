@@ -282,9 +282,7 @@ bool MythImage::Load(MythImageReader *reader)
         return true;
     }
 
-    if (im)
-        delete im;
-
+    delete im;
     return false;
 }
 
@@ -361,8 +359,7 @@ bool MythImage::Load(const QString &filename)
         delete im;
         return true;
     }
-    else
-        LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
+    LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
 
     return false;
 }
@@ -464,8 +461,7 @@ void MythImage::ConvertToYUV(void)
 }
 
 MythImageReader::MythImageReader(const QString &fileName)
-  : QImageReader(),
-    m_fileName(fileName)
+  : m_fileName(fileName)
 {
     if ((m_fileName.startsWith("http://")) ||
         (m_fileName.startsWith("https://")) ||

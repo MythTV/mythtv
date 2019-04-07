@@ -19,7 +19,7 @@
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot edit outside edit mode."); \
         return; \
     } \
-} while(0)
+} while(false)
 
 void DeleteMap::Push(const QString &undoMessage)
 {
@@ -261,7 +261,7 @@ bool DeleteMap::IsEmpty(void) const
 }
 
 /// Clears the deleteMap.
-void DeleteMap::Clear(QString undoMessage)
+void DeleteMap::Clear(const QString& undoMessage)
 {
     if (!undoMessage.isEmpty())
         Push(undoMessage);
@@ -358,7 +358,7 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
 }
 
 /// Remove the mark at the given frame.
-void DeleteMap::Delete(uint64_t frame, QString undoMessage)
+void DeleteMap::Delete(uint64_t frame, const QString& undoMessage)
 {
     EDIT_CHECK;
     if (m_deleteMap.isEmpty())
@@ -508,8 +508,8 @@ void DeleteMap::MoveRelative(uint64_t frame, bool right)
             // instead, "move" this mark onto itself
             return;
         }
-        else if (((MARK_CUT_START == type) && right) ||
-                 ((MARK_CUT_END == type) && !right))
+        if (((MARK_CUT_START == type) && right) ||
+            ((MARK_CUT_END == type) && !right))
         {
             // If on a mark, don't collapse a cut region to 0;
             // instead, delete the region
@@ -517,7 +517,7 @@ void DeleteMap::MoveRelative(uint64_t frame, bool right)
             Delete(frame, tr("Delete"));
             return;
         }
-        else if (MARK_PLACEHOLDER == type)
+        if (MARK_PLACEHOLDER == type)
         {
             // Delete the temporary mark before putting a real mark at its
             // location
@@ -586,9 +586,7 @@ bool DeleteMap::IsInDelete(uint64_t frame) const
         lastframe = it.key();
     }
 
-    if (lasttype == MARK_CUT_START && lastframe <= frame)
-        return true;
-    return false;
+    return lasttype == MARK_CUT_START && lastframe <= frame;
 }
 
 /**
@@ -740,7 +738,7 @@ void DeleteMap::LoadCommBreakMap(frm_dir_map_t &map)
 }
 
 /// Loads the delete map from the database.
-void DeleteMap::LoadMap(QString undoMessage)
+void DeleteMap::LoadMap(const QString& undoMessage)
 {
     if (!m_ctx || !m_ctx->m_playingInfo || gCoreContext->IsDatabaseIgnored())
         return;

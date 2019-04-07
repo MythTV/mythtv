@@ -106,14 +106,11 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete m_ringBuffer;
         m_ringBuffer = nullptr;
     }
-    if (m_rtjc)
-        delete m_rtjc;
-    if (m_mp3buf)
-        delete [] m_mp3buf;
+    delete m_rtjc;
+    delete [] m_mp3buf;
     if (m_gf)
         lame_close(m_gf);
-    if (m_strm)
-        delete [] m_strm;
+    delete [] m_strm;
     if (m_audio_device)
     {
         delete m_audio_device;
@@ -127,21 +124,21 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete m_seektable;
     }
 
-    while (videobuffer.size() > 0)
+    while (!videobuffer.empty())
     {
         struct vidbuffertype *vb = videobuffer.back();
         delete [] vb->buffer;
         delete vb;
         videobuffer.pop_back();
     }
-    while (audiobuffer.size() > 0)
+    while (!audiobuffer.empty())
     {
         struct audbuffertype *ab = audiobuffer.back();
         delete [] ab->buffer;
         delete ab;
         audiobuffer.pop_back();
     }
-    while (textbuffer.size() > 0)
+    while (!textbuffer.empty())
     {
         struct txtbuffertype *tb = textbuffer.back();
         delete [] tb->buffer;
@@ -155,12 +152,9 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_free_context(&m_mpa_vidctx);
     }
 
-    if (m_videoFilters)
-        delete m_videoFilters;
-    if (m_filtMan)
-        delete m_filtMan;
-    if (m_ccd)
-        delete m_ccd;
+    delete m_videoFilters;
+    delete m_filtMan;
+    delete m_ccd;
 }
 
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
@@ -227,7 +221,7 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "hardwaremjpegvdecimation")
         m_hmjpg_vdecimation = value;
     else if (opt == "audiocompression")
-        m_compressaudio = value;
+        m_compressaudio = (value != 0);
     else if (opt == "mp3quality")
         m_mp3quality = value;
     else if (opt == "samplerate")
@@ -239,7 +233,7 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "inpixfmt")
         m_inpixfmt = (VideoFrameType)value;
     else if (opt == "skipbtaudio")
-        m_skip_btaudio = value;
+        m_skip_btaudio = (value != 0);
     else if (opt == "volume")
         m_volume = value;
     else
@@ -770,8 +764,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 void NuppelVideoRecorder::InitFilters(void)
 {
     int btmp = m_video_buffer_size;
-    if (m_videoFilters)
-        delete m_videoFilters;
+    delete m_videoFilters;
 
     QString tmpVideoFilterList;
 
@@ -863,7 +856,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
 void NuppelVideoRecorder::ResizeVideoBuffers(void)
 {
-    for (unsigned int i = 0; i < videobuffer.size(); i++)
+    for (size_t i = 0; i < videobuffer.size(); i++)
     {
         delete [] (videobuffer[i]->buffer);
         videobuffer[i]->buffer = new unsigned char[m_video_buffer_size];
@@ -1271,22 +1264,20 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
                     "v4l2: Unable to set desired format");
                 return false;
             }
-            else
+
+            // we need to convert the buffer - we can't deal with uyvy
+            // directly.
+            if (m_inpixfmt == FMT_YUV422P)
             {
-                // we need to convert the buffer - we can't deal with uyvy
-                // directly.
-                if (m_inpixfmt == FMT_YUV422P)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "v4l2: uyvy format supported, but yuv422 requested.");
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "v4l2: unfortunately, this converter hasn't been "
-                        "written yet, exiting");
-                    return false;
-                }
-                LOG(VB_RECORD, LOG_INFO, LOC +
-                    "v4l2: format set, getting uyvy from v4l, converting");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "v4l2: uyvy format supported, but yuv422 requested.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "v4l2: unfortunately, this converter hasn't been "
+                    "written yet, exiting");
+                return false;
             }
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                "v4l2: format set, getting uyvy from v4l, converting");
         }
         else
         {
@@ -1357,14 +1348,14 @@ void NuppelVideoRecorder::DoV4L2(void)
         comp.gop_size = m_keyframedist;
         comp.max_b_frames = 0;
 
-        if (fabs(m_video_aspect - 1.33333f) < 0.01f)
+        if (fabs(m_video_aspect - 1.33333F) < 0.01F)
         {
             if (m_ntsc)
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_NTSC;
             else
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_PAL;
         }
-        else if (fabs(m_video_aspect - 1.77777f) < 0.01f)
+        else if (fabs(m_video_aspect - 1.77777F) < 0.01F)
         {
             if (m_ntsc)
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_16_9_NTSC;
@@ -1615,7 +1606,7 @@ again:
 
         frame = vbuf.index;
         if (m_go7007)
-            forcekey = vbuf.flags & V4L2_BUF_FLAG_KEYFRAME;
+            forcekey = ((vbuf.flags & V4L2_BUF_FLAG_KEYFRAME) != 0U);
 
         if (!m_request_pause)
         {
@@ -1915,7 +1906,6 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
     if (m_act_video_buffer >= m_video_buffer_count)
         m_act_video_buffer = 0; // cycle to begin of buffer
     videobuffer[act]->freeToEncode = 1; // set last to prevent race
-    return;
 }
 
 inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)

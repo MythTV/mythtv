@@ -62,7 +62,7 @@ StandardSetting *GallerySettings::DirOrder()
     return gc;
 }
 
-static void AddFormat(HostComboBoxSetting* gc, const QDateTime date, const QString format)
+static void AddFormat(HostComboBoxSetting* gc, const QDateTime& date, const QString& format)
 { gc->addSelection(gCoreContext->GetQLocale().toString(date, format), format); }
 
 StandardSetting *GallerySettings::DateFormat()
@@ -265,7 +265,7 @@ void GallerySettings::ShowConfirmDialog()
         delete dialog;
 }
 
-GallerySettings::GallerySettings(bool enable) : GroupSetting()
+GallerySettings::GallerySettings(bool enable)
 {
     setLabel(TR("Gallery Settings"));
 

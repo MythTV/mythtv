@@ -133,7 +133,7 @@ bool RemoteEncoder::IsRecording(bool *ok)
     if (ok)
         *ok = true;
 
-    return strlist[0].toInt();
+    return strlist[0].toInt() != 0;
 }
 
 ProgramInfo *RemoteEncoder::GetRecording(void)
@@ -164,7 +164,7 @@ float RemoteEncoder::GetFrameRate(void)
     strlist << "GET_FRAMERATE";
 
     bool ok = false;
-    float retval = 30.0f;
+    float retval = 30.0F;
 
     if (SendReceiveStringList(strlist, 1))
     {
@@ -183,7 +183,7 @@ float RemoteEncoder::GetFrameRate(void)
             "GetFrameRate(): SendReceiveStringList() failed");
     }
 
-    return (ok) ? retval : 30.0f;
+    return (ok) ? retval : 30.0F;
 }
 
 /** \fn RemoteEncoder::GetFramesWritten(void)
@@ -355,7 +355,7 @@ void RemoteEncoder::StopPlaying(void)
  *  \sa TVRec::SpawnLiveTV(LiveTVChain*,bool,QString),
  *      EncoderLink::SpawnLiveTV(LiveTVChain*,bool,QString)
  */
-void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip, QString startchan)
+void RemoteEncoder::SpawnLiveTV(const QString& chainId, bool pip, const QString& startchan)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum));
     strlist << "SPAWN_LIVETV";
@@ -427,7 +427,7 @@ QString RemoteEncoder::GetInput(void)
     return "Error";
 }
 
-QString RemoteEncoder::SetInput(QString input)
+QString RemoteEncoder::SetInput(const QString& input)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum) );
     strlist << "SET_INPUT";
@@ -443,7 +443,7 @@ QString RemoteEncoder::SetInput(QString input)
     return (m_lastinput.isEmpty()) ? "Error" : m_lastinput;
 }
 
-void RemoteEncoder::ToggleChannelFavorite(QString changroupname)
+void RemoteEncoder::ToggleChannelFavorite(const QString& changroupname)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum) );
     strlist << "TOGGLE_CHANNEL_FAVORITE";
@@ -465,7 +465,7 @@ void RemoteEncoder::ChangeChannel(int channeldirection)
     m_lastinput = "";
 }
 
-void RemoteEncoder::SetChannel(QString channel)
+void RemoteEncoder::SetChannel(const QString& channel)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum) );
     strlist << "SET_CHANNEL";
@@ -507,7 +507,7 @@ int RemoteEncoder::SetSignalMonitoringRate(int rate, bool notifyFrontend)
     return 0;
 }
 
-uint RemoteEncoder::GetSignalLockTimeout(QString input)
+uint RemoteEncoder::GetSignalLockTimeout(const QString& input)
 {
     QMutexLocker locker(&m_lock);
 
@@ -612,14 +612,14 @@ void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
  *      EncoderLink::CheckChannel(const QString&),
  *      ShouldSwitchToAnotherCard(QString)
  */
-bool RemoteEncoder::CheckChannel(QString channel)
+bool RemoteEncoder::CheckChannel(const QString& channel)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum) );
     strlist << "CHECK_CHANNEL";
     strlist << channel;
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
 
     return false;
 }
@@ -633,7 +633,7 @@ bool RemoteEncoder::CheckChannel(QString channel)
  *          false otherwise.
  *  \sa CheckChannel(const QString&)
  */
-bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
+bool RemoteEncoder::ShouldSwitchToAnotherCard(const QString& channelid)
 {
     // this function returns true if the channelid is not a valid
     // channel on the current recorder. It queries to server in order
@@ -643,7 +643,7 @@ bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
     strlist << channelid;
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
 
     return false;
 }
@@ -656,7 +656,7 @@ bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
  */
 bool RemoteEncoder::CheckChannelPrefix(
     const QString &prefix,
-    uint          &is_complete_valid_channel_on_rec,
+    uint          &complete_valid_channel_on_rec,
     bool          &is_extra_char_useful,
     QString       &needed_spacer)
 {
@@ -667,11 +667,11 @@ bool RemoteEncoder::CheckChannelPrefix(
     if (!SendReceiveStringList(strlist, 4))
         return false;
 
-    is_complete_valid_channel_on_rec = strlist[1].toInt();
-    is_extra_char_useful = strlist[2].toInt();
+    complete_valid_channel_on_rec = strlist[1].toInt();
+    is_extra_char_useful = (strlist[2].toInt() != 0);
     needed_spacer = (strlist[3] == "X") ? "" : strlist[3];
 
-    return strlist[0].toInt();
+    return strlist[0].toInt() != 0;
 }
 
 static QString cleanup(const QString &str)
@@ -757,7 +757,7 @@ bool RemoteEncoder::SetChannelInfo(const InfoMap &infoMap)
     strlist << make_safe(infoMap["XMLTV"]);
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return strlist[0].toInt() != 0;
 
     return false;
 }

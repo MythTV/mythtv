@@ -36,7 +36,7 @@ class MPUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
 
 MythFillNVCommandLineParser::MythFillNVCommandLineParser() :
     MythCommandLineParser("mythfillnetvision")
-{ LoadArguments(); }
+{ MythFillNVCommandLineParser::LoadArguments(); }
 
 void MythFillNVCommandLineParser::LoadArguments(void)
 {
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
         treeloop.exec();
     }
 
-    if ((refreshall || refreshrss) && findAllDBRSS().count())
+    if ((refreshall || refreshrss) && !findAllDBRSS().empty())
     {
         QEventLoop rssloop;
 

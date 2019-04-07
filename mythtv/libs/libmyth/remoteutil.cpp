@@ -430,7 +430,7 @@ int RemoteGetRecordingMask(void)
     return mask;
 }
 
-bool RemoteGetFileList(QString host, QString path, QStringList* list,
+bool RemoteGetFileList(const QString& host, const QString& path, QStringList* list,
                        QString sgroup, bool fileNamesOnly)
 {
 

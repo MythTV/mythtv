@@ -60,7 +60,7 @@ const uint ThreadedFileWriter::kMaxBlockSize    = 1 * 1024 * 1024;
  *
  *  \param newFilename optional name of new file to open
  */
-bool ThreadedFileWriter::ReOpen(QString newFilename)
+bool ThreadedFileWriter::ReOpen(const QString& newFilename)
 {
     Flush();
 

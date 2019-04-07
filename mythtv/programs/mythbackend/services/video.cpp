@@ -195,7 +195,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
                                          Inetref, Season, Episode,
                                          GrabberType, AllowGeneric);
 
-    if ( !list.size() )
+    if ( list.empty() )
         return pVideoLookups;
 
     //MetadataLookupList is a reference counted list.
@@ -435,7 +435,7 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
     pBlurayInfo->setBDPlusHandled(bdmeta->GetBDPlusHandled());
 
     QStringList thumbs = bdmeta->GetThumbnails();
-    if (thumbs.size())
+    if (!thumbs.empty())
         pBlurayInfo->setThumbPath(thumbs.at(0));
 
     delete bdmeta;
@@ -771,7 +771,7 @@ bool Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (update_required == true)
+    if (update_required)
         metadata->UpdateDatabase();
 
     return true;

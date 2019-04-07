@@ -49,7 +49,7 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
 }
 
 VideoOutputNull::VideoOutputNull() :
-    VideoOutput(), global_lock(QMutex::Recursive)
+    global_lock(QMutex::Recursive)
 {
     LOG(VB_PLAYBACK, LOG_INFO, "VideoOutputNull()");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
@@ -210,11 +210,11 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     framesPlayed = buffer->frameNumber + 1;
 }
 
-void VideoOutputNull::Show(FrameScanType )
+void VideoOutputNull::Show(FrameScanType  /*scan*/)
 {
 }
 
-void VideoOutputNull::DrawUnusedRects(bool)
+void VideoOutputNull::DrawUnusedRects(bool /*sync*/)
 {
 }
 

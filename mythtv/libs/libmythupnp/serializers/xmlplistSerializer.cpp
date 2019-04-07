@@ -24,15 +24,6 @@
 
 #define XMLPLIST_SERIALIZER_VERSION "1.0"
 
-XmlPListSerializer::XmlPListSerializer(QIODevice *pDevice)
- : XmlSerializer( pDevice, QString("") )
-{
-}
-
-XmlPListSerializer::~XmlPListSerializer()
-{
-}
-
 void XmlPListSerializer::BeginSerialize(QString &/*sName*/)
 {
     m_pXmlWriter->setAutoFormatting(true);

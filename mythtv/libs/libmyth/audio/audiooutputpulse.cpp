@@ -157,12 +157,9 @@ bool AudioOutputPulseAudio::OpenDevice()
         VBERROR(fn_log_tag + "invalid sample spec");
         return false;
     }
-    else
-    {
-        char spec[PA_SAMPLE_SPEC_SNPRINT_MAX];
-        pa_sample_spec_snprint(spec, sizeof(spec), &m_sample_spec);
-        VBAUDIO(fn_log_tag + QString("using sample spec %1").arg(spec));
-    }
+    char spec[PA_SAMPLE_SPEC_SNPRINT_MAX];
+    pa_sample_spec_snprint(spec, sizeof(spec), &m_sample_spec);
+    VBAUDIO(fn_log_tag + QString("using sample spec %1").arg(spec));
 
     if(!pa_channel_map_init_auto(&m_channel_map, m_channels, PA_CHANNEL_MAP_WAVEEX))
     {
@@ -321,7 +318,7 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 int AudioOutputPulseAudio::GetVolumeChannel(int channel) const
 {
     return (float)m_volume_control.values[channel] /
-           (float)PA_VOLUME_NORM * 100.0f;
+           (float)PA_VOLUME_NORM * 100.0F;
 }
 
 void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
@@ -336,7 +333,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
     }
 
     m_volume_control.values[channel] =
-        (float)volume / 100.0f * (float)PA_VOLUME_NORM;
+        (float)volume / 100.0F * (float)PA_VOLUME_NORM;
 
 // FIXME: This code did nothing at all so has been commented out for now
 //        until it's decided whether it was ever required
@@ -546,7 +543,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     {
         int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
         pa_cvolume_set(&m_volume_control, m_channels,
-                       (float)volume * (float)PA_VOLUME_NORM / 100.0f);
+                       (float)volume * (float)PA_VOLUME_NORM / 100.0F);
     }
     else
         pa_cvolume_reset(&m_volume_control, m_channels);

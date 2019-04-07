@@ -224,7 +224,7 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
             changePlayerMonitor(action.toInt());
         else if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else
             handled = false;
@@ -236,7 +236,7 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ZMLivePlayer::showMenu()
+void ZMLivePlayer::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -433,7 +433,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
         {
             if (x <= monList.size())
             {
-                QString s = monList.at(x - 1);
+                const QString& s = monList.at(x - 1);
                 int monID = s.toInt(); 
 
                 // try to find a monitor that matches the monID

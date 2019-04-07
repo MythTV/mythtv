@@ -10,8 +10,9 @@ using namespace std;
 
 // Qt
 #include <QCoreApplication>
-#include <QRegExp>
 #include <QLocale>
+#include <QRegExp>
+#include <utility>
 
 // MythTV
 #include "mythmiscutil.h"
@@ -79,39 +80,11 @@ ProgLister::ProgLister(
     m_type(plPreviouslyRecorded),
     m_recid(recid),
     m_title(title),
-    m_extraArg(),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
-    m_selectedTime(),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-
-    m_searchType(kNoSearch),
-
     m_view("reverse time"),
-    m_curView(-1),
-    m_viewList(),
-    m_viewTextList(),
-
-    m_itemList(),
-    m_itemListSave(),
-    m_schedList(),
-
-    m_typeList(),
-    m_genreList(),
-    m_stationList(),
-
-    m_allowEvents(true),
-    m_titleSort(false),
-    m_reverseSort(true),
-    m_useGenres(false),
-
-    m_schedText(nullptr),
-    m_curviewText(nullptr),
-    m_positionText(nullptr),
-    m_progList(nullptr),
-    m_messageText(nullptr),
-
-    m_allowViewDialog(true)
+    m_reverseSort(true)
 {
 }
 
@@ -250,7 +223,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             QuickRecord();
         else if (action == "1")
         {
-            if (m_titleSort == true)
+            if (m_titleSort)
             {
                 m_titleSort = false;
                 m_reverseSort = (m_type == plPreviouslyRecorded);
@@ -263,7 +236,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "2")
         {
-            if (m_titleSort == false)
+            if (!m_titleSort)
             {
                 m_titleSort = true;
                 m_reverseSort = false;
@@ -420,7 +393,7 @@ void ProgLister::UpdateKeywordInDB(const QString &text, const QString &oldValue)
 
     if (newview < 0)
     {
-        QString qphrase = text;
+        const QString& qphrase = text;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -532,7 +505,7 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
     if (m_viewList.empty() || m_viewTextList.empty())
         return;
 
-    m_searchTime = searchTime;
+    m_searchTime = std::move(searchTime);
     m_curView = 0;
     m_viewList[m_curView] = MythDate::toString(m_searchTime,
                                                  MythDate::kDateTimeFull | MythDate::kSimplify);
@@ -541,7 +514,7 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
     LoadInBackground();
 }
 
-void ProgLister::SetViewFromList(QString item)
+void ProgLister::SetViewFromList(const QString& item)
 {
     m_curView = m_viewTextList.indexOf(item);
     if (m_curView >= 0)
@@ -757,7 +730,7 @@ void ProgLister::FillViewList(const QString &view)
             0, true, "channum, chanid");
         ChannelUtil::SortChannels(channels, m_channelOrdering, true);
 
-        for (uint i = 0; i < channels.size(); ++i)
+        for (size_t i = 0; i < channels.size(); ++i)
         {
             QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
@@ -871,7 +844,7 @@ void ProgLister::FillViewList(const QString &view)
 
             if (m_curView < 0)
             {
-                QString qphrase = view;
+                const QString& qphrase = view;
 
                 MSqlQuery query2(MSqlQuery::InitCon());
                 query2.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -1059,7 +1032,7 @@ class plTitleSort : public plCompare
 class plPrevTitleSort : public plCompare
 {
   public:
-    plPrevTitleSort(void) : plCompare() {;}
+    plPrevTitleSort(void) {;}
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
@@ -1078,7 +1051,7 @@ class plPrevTitleSort : public plCompare
 class plTimeSort : public plCompare
 {
   public:
-    plTimeSort(void) : plCompare() {;}
+    plTimeSort(void) {;}
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
@@ -1462,7 +1435,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
         RestoreSelection(selected, offset);
     else if (m_selectedTime.isValid())
     {
-        uint i;
+        size_t i;
         for (i = 0; i < m_itemList.size(); ++i)
         {
             if (m_selectedTime <= m_itemList[i]->GetScheduledStartTime())
@@ -1656,8 +1629,7 @@ void ProgLister::customEvent(QEvent *event)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to delete recording rule");
             }
-            if (record)
-                delete record;
+            delete record;
         }
         else
         {
@@ -1681,7 +1653,7 @@ void ProgLister::customEvent(QEvent *event)
     else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (m_allowViewDialog && message == "CHOOSE_VIEW")
             ShowChooseViewMenu();

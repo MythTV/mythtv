@@ -75,7 +75,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     ComponentCB FreeBuffersCB, UseBuffersCB;
 
     void CreatePauseFrame(void);
-    bool SetVideoRect(const QRect &disp_rect, const QRect &vid_rect);
+    bool SetVideoRect(const QRect &d_rect, const QRect &vid_rect);
     bool CreateBuffers(const QSize&, const QSize&);
     void DeleteBuffers();
     bool Start();

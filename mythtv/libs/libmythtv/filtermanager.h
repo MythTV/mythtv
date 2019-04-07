@@ -42,7 +42,7 @@ class FilterManager
                             int &height, const char *opts,
                             int max_threads);
 
-    FilterChain *LoadFilters(QString filters, VideoFrameType &inpixfmt,
+    FilterChain *LoadFilters(const QString& filters, VideoFrameType &inpixfmt,
                              VideoFrameType &outpixfmt, int &width,
                              int &height, int &bufsize,
                              int max_threads = 1);

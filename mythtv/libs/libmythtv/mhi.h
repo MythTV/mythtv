@@ -58,7 +58,7 @@ class MHIContext : public MHContext, public QRunnable
     void Restart(int chanid, int sourceid, bool isLive);
     // Offer a key press.  Returns true if it accepts it.
     // This will depend on the current profile.
-    bool OfferKey(QString key);
+    bool OfferKey(const QString& key);
     /// Update the display
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
@@ -82,7 +82,7 @@ class MHIContext : public MHContext, public QRunnable
 
     // Set the input register.  This sets the keys that are to be handled
     // by MHEG.  Flushes the key queue.
-    void SetInputRegister(int nReg) override; // MHContext
+    void SetInputRegister(int num) override; // MHContext
 
     /// An area of the screen/image needs to be redrawn.
     void RequireRedraw(const QRegion &region) override; // MHContext
@@ -98,12 +98,12 @@ class MHIContext : public MHContext, public QRunnable
     MHDLADisplay *CreateDynamicLineArt(
         bool isBoxed, MHRgba lineColour, MHRgba fillColour) override; // MHContext
     MHTextDisplay *CreateText(void) override; // MHContext
-    MHBitmapDisplay *CreateBitmap(bool tiling) override; // MHContext
+    MHBitmapDisplay *CreateBitmap(bool tiled) override; // MHContext
     /// Additional drawing functions.
     void DrawRect(int xPos, int yPos, int width, int height,
                   MHRgba colour) override; // MHContext
     void DrawBackground(const QRegion &reg) override; // MHContext
-    void DrawVideo(const QRect &videoRect, const QRect &displayRect) override; // MHContext
+    void DrawVideo(const QRect &videoRect, const QRect &dispRect) override; // MHContext
 
     void DrawImage(int x, int y, const QRect &rect, const QImage &image,
         bool bScaled = false, bool bUnder = false);
@@ -159,7 +159,7 @@ class MHIContext : public MHContext, public QRunnable
 
     FT_Face GetFontFace(void) { return m_face; }
     bool IsFaceLoaded(void) { return m_face_loaded; }
-    bool LoadFont(QString name);
+    bool LoadFont(const QString& name);
     bool ImageUpdated(void) { return m_updated; }
 
     static const int StdDisplayWidth = 720;
@@ -261,6 +261,10 @@ class MHIText : public MHTextDisplay
  */
 class MHIBitmap : public MHBitmapDisplay
 {
+  private:
+    MHIBitmap(const MHIBitmap &) = delete;            // not copyable
+    MHIBitmap &operator=(const MHIBitmap &) = delete; // not copyable
+
   public:
     MHIBitmap(MHIContext *parent, bool tiled);
     virtual ~MHIBitmap();

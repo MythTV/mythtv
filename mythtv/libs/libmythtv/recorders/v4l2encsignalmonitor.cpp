@@ -64,7 +64,7 @@ V4L2encSignalMonitor::V4L2encSignalMonitor(int db_cardnum,
 V4L2encSignalMonitor::~V4L2encSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    V4L2encSignalMonitor::Stop();
     if (m_stream_handler)
         V4L2encStreamHandler::Return(m_stream_handler, m_inputid);
 }
@@ -171,7 +171,7 @@ bool V4L2encSignalMonitor::HasLock(void)
     if (m_strength >= 0)
         m_strength = m_v4l2.GetSignalStrength();
     if (m_strength < 0)
-        return (true || StableResolution() == 100);
+        return (true /* || StableResolution() == 100 */);
 
     return m_strength > 50;
 }
@@ -199,11 +199,8 @@ int V4L2encSignalMonitor::StableResolution(void)
                 .arg(width).arg(height));
             return 100;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Device wedged?");
-            return 0;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Device wedged?");
+        return 0;
     }
 
     if (m_width == width)

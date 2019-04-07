@@ -112,6 +112,11 @@ class MBASE_PUBLIC MThread
     static void GetAllRunningThreadNames(QStringList &list);
 
     static const int kDefaultStartTimeout;
+
+  private:
+    MThread(const MThread &) = delete;            // not copyable
+    MThread &operator=(const MThread &) = delete; // not copyable
+
   protected:
     /// \brief Runs the Qt event loop unless we have a QRunnable,
     ///        in which case we run the runnable run instead.

@@ -33,7 +33,7 @@
 extern volatile guint32 resolx;
 extern volatile guint32 c_resoly;
 
-void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
+void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, const signed int *brutS, const signed int *brutD);
 
 /* Prototype to keep gcc from spewing warnings */
 static void select_zoom_filter (void);
@@ -148,8 +148,8 @@ void generatePrecalCoef (void);
 void calculatePXandPY (int x, int y, int *px, int *py);
 void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
 void setPixelRGB_ (Uint * buffer, Uint x, Color c);
-inline void getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c);
-void getPixelRGB_ (Uint * buffer, Uint x, Color * c);
+inline void getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c);
+void getPixelRGB_ (const Uint * buffer, Uint x, Color * c);
 
 void
 generatePrecalCoef ()
@@ -359,7 +359,7 @@ setPixelRGB_ (Uint * buffer, Uint x, Color c)
 
 
 inline void
-getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
+getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 {
 //    register unsigned char *tmp8;
 	unsigned int i;
@@ -380,7 +380,7 @@ getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
 
 
 /*inline*/ void
-getPixelRGB_ (Uint * buffer, Uint x, Color * c)
+getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
 {
 	register unsigned char *tmp8;
 
@@ -409,9 +409,9 @@ getPixelRGB_ (Uint * buffer, Uint x, Color * c)
 
 void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
              unsigned int lprevX, unsigned int lprevY,
-             signed int *lbrutS, signed int *lbrutD)
+             const signed int *lbrutS, const signed int *lbrutD)
 {
-	int     myPos, myPos2;
+	int     myPos;
 	Color   couleur;
 //	unsigned int coefv, coefh;
 
@@ -429,6 +429,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 		int     lcoeffs;
 
 		int     brutSmypos = lbrutS[myPos];
+                int     myPos2;
 
 		myPos2 = myPos + 1;
 
@@ -503,7 +504,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 {
 	register Uint x, y;
 
-	static char reverse = 0;			// vitesse inversé..(zoom out)
 	static unsigned char pertedec = 8;
 	static char firstTime = 1;
 
@@ -543,6 +543,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	/** changement de config **/
 	if (zf) {
+                static char reverse = 0;			// vitesse inversé..(zoom out)
 		reverse = zf->reverse;
 		vitesse = zf->vitesse;
 		if (reverse)
@@ -567,7 +568,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 		// generation d'une table de sinus
 		if (firstTime) {
 			unsigned short us;
-			int     yofs;
 
 			firstTime = 0;
 			generatePrecalCoef ();
@@ -585,6 +585,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			/** modif here by jeko : plus de multiplications **/
 			{
 				int     yperte = 0;
+                                int     yofs;
 
 				for (y = 0, yofs = 0; y < resy; y++, yofs += resx) {
 					int     xofs = yofs << 1;
@@ -704,9 +705,9 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			buffratio = BUFFPOINTMASK;
 	}
 
-	if (switchMult != 1.0f) {
+	if (switchMult != 1.0F) {
 		buffratio =
-			(int) ((float) BUFFPOINTMASK * (1.0f - switchMult) +
+			(int) ((float) BUFFPOINTMASK * (1.0F - switchMult) +
 						 (float) buffratio * switchMult);
 	}
 

@@ -344,7 +344,7 @@ int mythfile_stat(const char *path, struct stat *buf)
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_stat('%1', %2)")
             .arg(path).arg((long long)buf));
 
-    if (!strncmp(path, "myth://", 7))
+    if (strncmp(path, "myth://", 7) == 0)
     {
         bool res = RemoteFile::Exists(path, buf);
         if (res)
@@ -371,12 +371,16 @@ int mythfile_stat_fd(int fileID, struct stat *buf)
     return mythfile_stat(filename.toLocal8Bit().constData(), buf);
 }
 
+/*
+ * This function exists for the use of dvd_reader.c, thus the return
+ * value of int instead of bool.  C doesn't have a bool type.
+ */
 int mythfile_exists(const char *path, const char *file)
 {
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_exists('%1', '%2')")
             .arg(path).arg(file));
 
-    if (!strncmp(path, "myth://", 7))
+    if (strncmp(path, "myth://", 7) == 0)
         return RemoteFile::Exists(QString("%1/%2").arg(path).arg(file));
 
     return QFile::exists(QString("%1/%2").arg(path).arg(file));

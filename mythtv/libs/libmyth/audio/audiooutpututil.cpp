@@ -101,7 +101,7 @@ void AudioOutputUtil::MonoToStereo(void *dst, const void *src, int samples)
 void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
                                    bool music, bool upmix)
 {
-    float g     = volume / 100.0f;
+    float g     = volume / 100.0F;
     float *fptr = (float *)buf;
     int samples = len >> 2;
     int i       = 0;
@@ -111,13 +111,13 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
 
     // Try to ~ match stereo volume when upmixing
     if (upmix)
-        g *= 1.5f;
+        g *= 1.5F;
 
     // Music is relatively loud
     if (music)
-        g *= 0.4f;
+        g *= 0.4F;
 
-    if (g == 1.0f)
+    if (g == 1.0F)
         return;
 
 #if ARCH_X86

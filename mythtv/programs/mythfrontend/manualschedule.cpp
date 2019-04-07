@@ -66,7 +66,7 @@ bool ManualSchedule::Create(void)
     ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
-    for (uint i = 0; i < channels.size(); i++)
+    for (size_t i = 0; i < channels.size(); i++)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelLong);
 

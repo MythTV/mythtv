@@ -162,7 +162,7 @@ void MythUIScrollBar::CreateCopy(MythUIType *parent)
     scrollbar->CopyFrom(this);
 }
 
-void MythUIScrollBar::timerEvent(QTimerEvent *)
+void MythUIScrollBar::timerEvent(QTimerEvent * /*event*/)
 {
     if (m_timerId)
         killTimer(m_timerId);

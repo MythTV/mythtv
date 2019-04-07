@@ -16,10 +16,7 @@ using namespace std;
 namespace {
 class VolumeWriteBackThread : public MThread
 {
-    VolumeWriteBackThread(const VolumeWriteBackThread &);
-    VolumeWriteBackThread & operator =(const VolumeWriteBackThread &);
-    VolumeWriteBackThread() : MThread("VolumeWriteBack") 
-    { }
+    VolumeWriteBackThread() : MThread("VolumeWriteBack") { }
 
   public:
     // Singleton
@@ -29,6 +26,9 @@ class VolumeWriteBackThread : public MThread
         static VolumeWriteBackThread *s_instance = new VolumeWriteBackThread;
         return s_instance;
     }
+
+    VolumeWriteBackThread(const VolumeWriteBackThread &) = delete;
+    VolumeWriteBackThread & operator =(const VolumeWriteBackThread &) = delete;
 
     void SetVolume(int value)
     {

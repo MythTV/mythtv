@@ -5,7 +5,7 @@
 
 MythExternRecorderCommandLineParser::MythExternRecorderCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHEXTERNRECORDER)
-{ LoadArguments(); }
+{ MythExternRecorderCommandLineParser::LoadArguments(); }
 
 QString MythExternRecorderCommandLineParser::GetHelpHeader(void) const
 {

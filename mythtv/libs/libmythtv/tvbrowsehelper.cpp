@@ -24,7 +24,7 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
     int min         = minutes % 60;
 
     tMin = TV::tr("%n minute(s)", "", minutes);
-    tHrsMin.sprintf("%d:%02d", hours, min);
+    tHrsMin = QString("%1:%2").arg(hours).arg(min, 2, QChar('0'));
 }
 
 TVBrowseHelper::TVBrowseHelper(
@@ -32,7 +32,7 @@ TVBrowseHelper::TVBrowseHelper(
     uint     browse_max_forward,
     bool     browse_all_tuners,
     bool     use_channel_groups,
-    QString  db_channel_ordering) :
+    const QString&  db_channel_ordering) :
     MThread("TVBrowseHelper"),
     m_tv(tv),
     m_dbBrowseMaxForward(browse_max_forward),
@@ -92,11 +92,8 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
         }
         return true;
     }
-    else
-    {
-        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        return false;
-    }
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    return false;
 }
 
 /** \brief Ends channel browsing.
@@ -181,7 +178,6 @@ void TVBrowseHelper::BrowseChannel(PlayerContext *ctx, const QString &channum)
     if (!ctx->m_recorder || !ctx->m_lastCardid)
         return;
 
-    QString inputname = ctx->m_recorder->GetInput();
     uint    inputid   = ctx->m_lastCardid;
     uint    sourceid  = CardUtil::GetSourceID(inputid);
     if (sourceid)
@@ -517,7 +513,7 @@ void TVBrowseHelper::run()
             {
                 if (!chanids.empty())
                 {
-                    for (uint i = 0; i < chanids.size(); i++)
+                    for (size_t i = 0; i < chanids.size(); i++)
                     {
                         if (m_tv->IsTunable(ctx, chanids[i]))
                         {

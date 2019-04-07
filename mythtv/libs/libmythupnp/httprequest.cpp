@@ -471,7 +471,7 @@ qint64 HTTPRequest::SendResponse( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-qint64 HTTPRequest::SendResponseFile( QString sFileName )
+qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
 {
     qint64      nBytes  = 0;
     long long   llSize  = 0;
@@ -660,7 +660,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     // Set out file position to requested start location.
     // ----------------------------------------------------------------------
 
-    if ( pDevice->seek( llStart ) == false)
+    if ( !pDevice->seek( llStart ))
         return -1;
 
     char   aBuffer[ SENDFILE_BUFFER_SIZE ];
@@ -2084,13 +2084,11 @@ bool HTTPRequest::DigestAuthentication()
 
         return true;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
-        LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
-                                .arg(paramMap["response"])
-                                .arg(QString(kd)));
-    }
+
+    LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
+    LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
+                            .arg(paramMap["response"])
+                            .arg(QString(kd)));
 
     return false;
 }
@@ -2112,7 +2110,7 @@ bool HTTPRequest::Authenticated()
 
     if (oList[0].compare( "basic", Qt::CaseInsensitive ) == 0)
         return BasicAuthentication();
-    else if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
+    if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
         return DigestAuthentication();
 
     return false;
@@ -2191,12 +2189,11 @@ QString HTTPRequest::GetHostName()
         {
             return hostname.section("]:", 0 , 0);
         }
-        else if (hostname.contains(":")) // IPv4 port
+        if (hostname.contains(":")) // IPv4 port
         {
             return hostname.section(":", 0 , 0);
         }
-        else
-            return hostname;
+        return hostname;
     }
 
     return GetHostAddress();
@@ -2383,26 +2380,24 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
     {
         if (msecs == 0)
             return( m_pSocket->read( pData, nMaxLen ));
-        else
+
+        bool bTimeout = false;
+        MythTimer timer;
+        timer.start();
+        while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
         {
-            bool bTimeout = false;
-            MythTimer timer;
-            timer.start();
-            while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
+            bTimeout = !(m_pSocket->waitForReadyRead( msecs ));
+
+            if ( timer.elapsed() >= msecs )
             {
-                bTimeout = !(m_pSocket->waitForReadyRead( msecs ));
-
-                if ( timer.elapsed() >= msecs )
-                {
-                    bTimeout = true;
-                    LOG(VB_HTTP, LOG_INFO, "BufferedSocketDeviceRequest::ReadBlock() - Exceeded Total Elapsed Wait Time." );
-                }
+                bTimeout = true;
+                LOG(VB_HTTP, LOG_INFO, "BufferedSocketDeviceRequest::ReadBlock() - Exceeded Total Elapsed Wait Time." );
             }
-
-            // Just return what we have even if timed out.
-
-            return( m_pSocket->read( pData, nMaxLen ));
         }
+
+        // Just return what we have even if timed out.
+
+        return( m_pSocket->read( pData, nMaxLen ));
     }
 
     return( -1 );

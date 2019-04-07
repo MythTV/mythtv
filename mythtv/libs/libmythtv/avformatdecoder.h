@@ -160,8 +160,8 @@ class AvFormatDecoder : public DecoderBase
     void GetChapterTimes(QList<long long> &times) override; // DecoderBase
     int  GetCurrentChapter(long long framesPlayed) override; // DecoderBase
     long long GetChapter(int chapter) override; // DecoderBase
-    bool DoRewind(long long desiredFrame, bool doflush = true) override; // DecoderBase
-    bool DoFastForward(long long desiredFrame, bool doflush = true) override; // DecoderBase
+    bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
+    bool DoFastForward(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
         { m_h264_parser->use_I_forKeyframes(!value); }
 
@@ -186,15 +186,19 @@ class AvFormatDecoder : public DecoderBase
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
+  private:
+    AvFormatDecoder(const AvFormatDecoder &) = delete;            // not copyable
+    AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
     int AutoSelectTrack(uint type) override; // DecoderBase
 
-    void ScanATSCCaptionStreams(int av_stream_index);
+    void ScanATSCCaptionStreams(int av_index);
     void UpdateATSCCaptionTracks(void);
     void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
-    void ScanTeletextCaptions(int av_stream_index);
+    void ScanTeletextCaptions(int av_index);
     void ScanRawTextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
     int  AutoSelectAudioTrack(void);
@@ -247,7 +251,7 @@ class AvFormatDecoder : public DecoderBase
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
 
     inline bool DecoderWillDownmix(const AVCodecContext *ctx);
-    bool DoPassThrough(const AVCodecParameters *ctx, bool withProfile=true);
+    bool DoPassThrough(const AVCodecParameters *par, bool withProfile=true);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);
     void RemoveAudioStreams();
@@ -376,7 +380,7 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo          m_audioIn;
     AudioInfo          m_audioOut;
 
-    float              m_fps                          {0.0f};
+    float              m_fps                          {0.0F};
     bool               m_codec_is_mpeg                {false};
     bool               m_processFrames                {true};
     bool               m_streams_changed              {false};

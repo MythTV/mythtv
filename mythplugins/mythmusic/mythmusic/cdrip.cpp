@@ -16,12 +16,13 @@ using namespace std;
 // Qt includes
 #include <QApplication>
 #include <QDir>
-#include <QRegExp>
-#include <QKeyEvent>
 #include <QEvent>
 #include <QFile>
-#include <QUrl>
+#include <QKeyEvent>
+#include <QRegExp>
 #include <QTimer>
+#include <QUrl>
+#include <utility>
 
 // MythTV plugin includes
 #include <mythcontext.h>
@@ -159,7 +160,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
 }
 
 #ifdef HAVE_CDIO
-static void paranoia_cb(long, paranoia_cb_mode_t)
+static void paranoia_cb(long /*status*/, paranoia_cb_mode_t /*mode*/)
 {
 }
 #endif // HAVE_CDIO
@@ -168,7 +169,7 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
     MThread("CDRipper"),
     m_parent(parent),
-    m_CDdevice(device), m_quality(quality),
+    m_CDdevice(std::move(device)), m_quality(quality),
     m_tracks(tracks)
 {
 #ifdef WIN32 // libcdio needs the drive letter with no path
@@ -202,7 +203,7 @@ void CDRipperThread::run(void)
 {
     RunProlog();
 
-    if (m_tracks->size() <= 0)
+    if (m_tracks->empty())
     {
         RunEpilog();
         return;
@@ -339,7 +340,7 @@ void CDRipperThread::run(void)
                 }
             }
 
-            if (!encoder.get())
+            if (!encoder)
             {
                 // This should never happen.
                 QApplication::postEvent(
@@ -518,7 +519,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 Ripper::Ripper(MythScreenStack *parent, QString device) :
     MythScreenType(parent, "ripcd"),
     m_tracks(new QVector<RipTrack*>),
-    m_CDdevice(device)
+    m_CDdevice(std::move(device))
 {
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
@@ -552,8 +553,7 @@ Ripper::~Ripper(void)
     QString command = "rm -f " + GetConfDir() + "/tmp/RipTemp/*";
     myth_system(command);
 
-    if (m_decoder)
-        delete m_decoder;
+    delete m_decoder;
 
 #ifndef _WIN32
     // if the MediaMonitor was active when we started then restart it
@@ -726,7 +726,7 @@ void Ripper::chooseBackend(void)
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setSaveHost(QString host)
+void Ripper::setSaveHost(const QString& host)
 {
     gCoreContext->SaveSetting("MythMusicLastRipHost", host);
 
@@ -834,9 +834,7 @@ void Ripper::scanCD(void)
     }
 #endif // HAVE_CDIO
 
-    if (m_decoder)
-        delete m_decoder;
-
+    delete m_decoder;
     m_decoder = new CdDecoder("cda", nullptr, nullptr);
     if (m_decoder)
         m_decoder->setDevice(m_CDdevice);
@@ -948,7 +946,7 @@ void Ripper::artistChanged()
 {
     QString newartist = m_artistEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -977,7 +975,7 @@ void Ripper::albumChanged()
 {
     QString newalbum = m_albumEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -994,7 +992,7 @@ void Ripper::genreChanged()
 {
     QString newgenre = m_genreEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1011,7 +1009,7 @@ void Ripper::yearChanged()
 {
     QString newyear = m_yearEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1028,7 +1026,7 @@ void Ripper::compilationChanged(bool state)
 {
     if (!state)
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the ablum...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1047,7 +1045,7 @@ void Ripper::compilationChanged(bool state)
     }
     else
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the album...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1079,7 +1077,7 @@ void Ripper::switchTitlesAndArtists()
 
     // Switch title and artist for each track
     QString tmp;
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int track = 0; track < m_tracks->size(); ++track)
         {
@@ -1123,7 +1121,7 @@ void Ripper::startRipper(void)
 
 void Ripper::RipComplete(bool result)
 {
-    if (result == true)
+    if (result)
     {
         bool EjectCD = gCoreContext->GetBoolSetting("EjectCDAfterRipping", true);
         if (EjectCD)
@@ -1264,7 +1262,7 @@ void Ripper::searchArtist()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setArtist(QString artist)
+void Ripper::setArtist(const QString& artist)
 {
     m_artistEdit->SetText(artist);
 }
@@ -1288,7 +1286,7 @@ void Ripper::searchAlbum()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setAlbum(QString album)
+void Ripper::setAlbum(const QString& album)
 {
     m_albumEdit->SetText(album);
 }
@@ -1317,7 +1315,7 @@ void Ripper::searchGenre()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setGenre(QString genre)
+void Ripper::setGenre(const QString& genre)
 {
     m_genreEdit->SetText(genre);
 }
@@ -1482,9 +1480,7 @@ void Ripper::customEvent(QEvent* event)
 
 RipStatus::~RipStatus(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 }
@@ -1639,9 +1635,7 @@ void RipStatus::customEvent(QEvent *event)
 
 void RipStatus::startRip(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     m_ripperThread = new CDRipperThread(this, m_CDdevice, m_tracks, m_quality);
     m_ripperThread->start();
 }

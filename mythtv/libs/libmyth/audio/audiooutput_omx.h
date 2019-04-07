@@ -14,13 +14,13 @@
 
 class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 {
-    // No copying
-    AudioOutputOMX(const AudioOutputOMX&);
-    AudioOutputOMX & operator =(const AudioOutputOMX&);
-
   public:
     explicit AudioOutputOMX(const AudioSettings &settings);
-    virtual ~AudioOutputOMX();
+    ~AudioOutputOMX() override;
+
+    // No copying
+    AudioOutputOMX(const AudioOutputOMX&) = delete;
+    AudioOutputOMX & operator =(const AudioOutputOMX&) = delete;
 
     // VolumeBase implementation
     int GetVolumeChannel(int channel) const override; // VolumeBase
@@ -38,8 +38,8 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
 
   private:
     // OMXComponentCtx implementation
-    OMX_ERRORTYPE EmptyBufferDone (OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
-    void ReleaseBuffers(OMXComponent&) override; // OMXComponentCtx
+    OMX_ERRORTYPE EmptyBufferDone (OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE* /*hdr*/) override; // OMXComponentCtx
+    void ReleaseBuffers(OMXComponent& /*cmpnt*/) override; // OMXComponentCtx
 
   private:
     // implementation

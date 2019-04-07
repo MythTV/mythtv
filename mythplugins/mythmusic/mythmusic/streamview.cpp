@@ -1063,7 +1063,7 @@ void SearchStream::doUpdateStreams(void)
         if (!doneWhere)
         {
             sql += "WHERE channel LIKE " + QString("'%%1%'").arg(channel);
-            doneWhere = true;
+            // doneWhere = true;
         }
         else
             sql += "AND channel LIKE " + QString("'%%1%' ").arg(channel);

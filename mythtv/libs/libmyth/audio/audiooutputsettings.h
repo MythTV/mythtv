@@ -53,7 +53,7 @@ class MPUBLIC AudioOutputSettings
     public:
         explicit AudioOutputSettings(bool invalid = false);
         ~AudioOutputSettings();
-        AudioOutputSettings& operator=(const AudioOutputSettings&);
+        AudioOutputSettings& operator=(const AudioOutputSettings& /*rhs*/);
         AudioOutputSettings *GetCleaned(bool newcopy = false);
         AudioOutputSettings *GetUsers(bool newcopy = false);
 
@@ -88,25 +88,25 @@ class MPUBLIC AudioOutputSettings
              * - FEATURE_DTSHD
              */
         bool canFeature(DigitalFeature arg)
-        { return m_features & arg; };
+        { return (m_features & arg) != 0U; };
         bool canFeature(unsigned int arg)
-        { return m_features & arg; };
+        { return (m_features & arg) != 0U; };
 
             /**
              * return true if device can or may support AC3
              * (deprecated, see canFeature())
              */
-        bool canAC3()                   { return m_features & FEATURE_AC3; };
+        bool canAC3()                   { return canFeature(FEATURE_AC3); };
             /**
              * return true if device can or may support DTS
              * (deprecated, see canFeature())
              */
-        bool canDTS()                   { return m_features & FEATURE_DTS; };
+        bool canDTS()                   { return canFeature(FEATURE_DTS); };
             /**
              * return true if device supports multichannels PCM
              * (deprecated, see canFeature())
              */
-        bool canLPCM()                  { return m_features & FEATURE_LPCM; };
+        bool canLPCM()                  { return canFeature(FEATURE_LPCM); };
             /**
              * return true if class instance is marked invalid.
              * if true, you can not assume any of the other method returned

@@ -40,8 +40,8 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
     bool HandleQueryFileHash(SocketHandler *socket, QStringList &slist);
 
     bool HandleDeleteFile(SocketHandler *socket, QStringList &slist);
-    bool HandleDeleteFile(SocketHandler *socket, QString filename,
-                          QString storagegroup);
+    bool HandleDeleteFile(SocketHandler *socket, const QString& filename,
+                          const QString& storagegroup);
     bool HandleDeleteFile(QString filename, QString storagegroup);
     bool HandleDeleteFile(DeleteHandler *handler);
     

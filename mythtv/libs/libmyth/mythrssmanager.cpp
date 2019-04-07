@@ -116,7 +116,6 @@ RSSSite::RSSSite(const QString& title,
                   const QString& author,
                   const bool& download,
                   const QDateTime& updated) :
-    QObject(),
     m_title(title), m_sortTitle(sortTitle), m_image(image), m_type(type),
     m_description(description), m_url(url), m_author(author),
     m_download(download), m_updated(updated)

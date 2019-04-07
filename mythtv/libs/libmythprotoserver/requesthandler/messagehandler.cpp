@@ -3,7 +3,7 @@
 
 #include "requesthandler/messagehandler.h"
 
-MessageHandler::MessageHandler(void) : SocketRequestHandler()
+MessageHandler::MessageHandler(void)
 {
     if (!gCoreContext)
     {

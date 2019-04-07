@@ -65,7 +65,7 @@ class ExternalStreamHandler : public StreamHandler
                      TOO_FAST_SIZE = TS_PACKET_SIZE * 32768 };
 
   public:
-    static ExternalStreamHandler *Get(const QString &devicename,
+    static ExternalStreamHandler *Get(const QString &devname,
                                       int inputid, int majorid);
     static void Return(ExternalStreamHandler * & ref, int inputid);
 
@@ -101,7 +101,7 @@ class ExternalStreamHandler : public StreamHandler
                         int timeout = 4000 /* ms */,uint retry_cnt = 3);
     bool ProcessVer1(const QString & cmd, QString & result,
                      int timeout /* ms */, uint retry_cnt);
-    bool ProcessVer2(const QString & cmd, QString & result,
+    bool ProcessVer2(const QString & command, QString & result,
                      int timeout /* ms */, uint retry_cnt);
 
   private:

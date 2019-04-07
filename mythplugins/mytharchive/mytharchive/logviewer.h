@@ -34,7 +34,7 @@ class LogViewer : public MythScreenType
     void updateClicked(void);
     void updateTimerTimeout(void);
     void toggleAutoUpdate(void);
-    bool loadFile(QString filename, QStringList &list, int startline);
+    bool loadFile(const QString& filename, QStringList &list, int startline);
     void showProgressLog(void);
     void showFullLog(void);
     void ShowMenu(void) override; // MythScreenType

@@ -78,6 +78,9 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
         QString GetContentType() override; // Serializer
 
+    private:
+        XmlSerializer(const XmlSerializer &) = delete;            // not copyable
+        XmlSerializer &operator=(const XmlSerializer &) = delete; // not copyable
 };
 
 #endif

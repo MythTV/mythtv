@@ -18,7 +18,7 @@ void    init_ifs (int width, int height);
 
 // draw an ifs on the buffer (which size is width * height)
 // increment means that we draw 1/increment of the ifs's points
-void    ifs_update (guint32 * buffer, guint32 * back, int width, int height, int increment);
+void    ifs_update (guint32 * data, const guint32 * back, int width, int height, int increment);
 
 // free all ifs's data.
 void    release_ifs (void);

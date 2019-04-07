@@ -177,7 +177,7 @@ void MythNews::loadSites(void)
 #else
         QDateTime time = MythDate::fromSecsSinceEpoch(query.value(3).toLongLong());
 #endif
-        bool podcast = query.value(4).toInt();
+        bool podcast = query.value(4).toBool();
         m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
     }
     std::sort(m_NewsSites.begin(), m_NewsSites.end(), NewsSite::sortByName);
@@ -197,7 +197,7 @@ void MythNews::loadSites(void)
 
     if (m_nositesText)
     {
-        if (m_NewsSites.size() == 0)
+        if (m_NewsSites.empty())
             m_nositesText->Show();
         else
             m_nositesText->Hide();
@@ -249,7 +249,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 artText.replace("&#8216;", "'");  // LEFT-SINGLE-QUOTE
                 artText.replace("&#8217;", "'");  // RIGHT-SINGLE-QUOTE
                 // Replace paragraph and break HTML with newlines
-                if( artText.indexOf(QRegExp("</(p|P)>")) )
+                if( artText.contains(QRegExp("</(p|P)>")) )
                 {
                     artText.replace( QRegExp("<(p|P)>"), "");
                     artText.replace( QRegExp("</(p|P)>"), "\n\n");
@@ -356,7 +356,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if (m_thumbnailImage && m_thumbnailImage->IsVisible())
                 m_thumbnailImage->Hide();
 
-            if (m_podcastImage && site->podcast() == 1)
+            if (m_podcastImage && site->podcast())
                 m_podcastImage->Show();
 
             if (!site->imageURL().isEmpty())
@@ -400,12 +400,12 @@ QString MythNews::formatSize(long long bytes, int prec)
         double sizeGB = sizeKB/(1024*1024*1024.0);
         return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024*1024) // Gigabytes
+    if (sizeKB>1024*1024) // Gigabytes
     {
         double sizeGB = sizeKB/(1024*1024.0);
         return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024) // Megabytes
+    if (sizeKB>1024) // Megabytes
     {
         double sizeMB = sizeKB/1024.0;
         return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
@@ -593,20 +593,18 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
             GetMythMainWindow()->HandleMedia("WebBrowser", cmdUrl);
             return;
         }
-        else
-        {
-            QString cmd = m_browser;
-            cmd.replace("%ZOOM%", m_zoom);
-            cmd.replace("%URL%", cmdUrl);
-            cmd.replace('\'', "%27");
-            cmd.replace("&","\\&");
-            cmd.replace(";","\\;");
 
-            GetMythMainWindow()->AllowInput(false);
-            myth_system(cmd, kMSDontDisableDrawing);
-            GetMythMainWindow()->AllowInput(true);
-            return;
-        }
+        QString cmd = m_browser;
+        cmd.replace("%ZOOM%", m_zoom);
+        cmd.replace("%URL%", cmdUrl);
+        cmd.replace('\'', "%27");
+        cmd.replace("&","\\&");
+        cmd.replace(";","\\;");
+
+        GetMythMainWindow()->AllowInput(false);
+        myth_system(cmd, kMSDontDisableDrawing);
+        GetMythMainWindow()->AllowInput(true);
+        return;
     }
 
     playVideo(article);
@@ -677,7 +675,7 @@ void MythNews::ShowMenu(void)
 
         m_menuPopup->AddButton(tr("Manage Feeds"));
         m_menuPopup->AddButton(tr("Add Feed"));
-        if (m_NewsSites.size() > 0)
+        if (!m_NewsSites.empty())
         {
             m_menuPopup->AddButton(tr("Edit Feed"));
             m_menuPopup->AddButton(tr("Delete Feed"));

@@ -58,7 +58,7 @@ class MPUBLIC ZMClient : public QObject
     void getCameraList(QStringList &cameraList);
     void getEventDates(const QString &monitorName, bool oldestFirst, 
                        QStringList &dateList);
-    void setMonitorFunction(const int monitorID, const QString &function, const int enabled);
+    void setMonitorFunction(const int monitorID, const QString &function, const bool enabled);
     bool updateAlarmStates(void);
 
     bool isMiniPlayerEnabled(void) { return m_isMiniPlayerEnabled; }

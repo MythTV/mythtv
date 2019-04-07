@@ -110,13 +110,13 @@ class META_PUBLIC MetadataImageDownload : public MThread
     QMutex                     m_mutex;
 };
 
-META_PUBLIC QString getDownloadFilename(QString title, QString url);
+META_PUBLIC QString getDownloadFilename(const QString& title, const QString& url);
 META_PUBLIC QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
-                                    QString url);
+                                    const QString& url);
 
 META_PUBLIC QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type);
-META_PUBLIC QString getStorageGroupURL(VideoArtworkType type, QString host);
-META_PUBLIC QString getLocalStorageGroupPath(VideoArtworkType type, QString host);
+META_PUBLIC QString getStorageGroupURL(VideoArtworkType type, const QString& host);
+META_PUBLIC QString getLocalStorageGroupPath(VideoArtworkType type, const QString& host);
 META_PUBLIC QString getStorageGroupName(VideoArtworkType type);
 
 META_PUBLIC void cleanThumbnailCacheDir(void);

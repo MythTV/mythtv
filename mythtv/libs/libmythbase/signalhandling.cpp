@@ -145,8 +145,7 @@ void SignalHandler::Init(QList<int> &signallist, QObject *parent)
 void SignalHandler::Done(void)
 {
     QMutexLocker locker(&s_singletonLock);
-    if (s_singleton)
-        delete s_singleton;
+    delete s_singleton;
 }
 
 

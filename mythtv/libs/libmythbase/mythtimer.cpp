@@ -98,7 +98,7 @@ int MythTimer::elapsed(void) const
     }
 
     qint64 e = m_timer.elapsed();
-    if (!m_timer.isMonotonic() && (e > 86300000))
+    if (!QElapsedTimer::isMonotonic() && (e > 86300000))
     {
         const_cast<MythTimer*>(this)->start();
         e = 0;

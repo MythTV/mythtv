@@ -58,8 +58,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
 {
     QMutexLocker locker(&m_lock);
 
-    if (m_buffer)
-        delete[] m_buffer;
+    delete[] m_buffer;
 
     m_videodevice   = streamName;
     m_videodevice   = m_videodevice.isNull() ? "" : m_videodevice;
@@ -407,7 +406,7 @@ bool DeviceReadBuffer::HandlePausing(void)
         usleep(5000);
         return false;
     }
-    else if (IsPaused())
+    if (IsPaused())
     {
         Reset(m_videodevice, m_stream_fd);
         SetPaused(false);
@@ -467,7 +466,7 @@ bool DeviceReadBuffer::Poll(void) const
             LOG(VB_GENERAL, LOG_ERR, LOC + "poll eof (POLLHUP)");
             break;
         }
-        else if (polls[0].revents & POLLNVAL)
+        if (polls[0].revents & POLLNVAL)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "poll error" + ENO);
             m_error = true;
@@ -489,7 +488,7 @@ bool DeviceReadBuffer::Poll(void) const
         {
             if (ret > 0)
                 break; // we have data to read :)
-            else if (ret < 0)
+            if (ret < 0)
             {
                 if ((EOVERFLOW == errno))
                     break; // we have an error to handle
@@ -517,7 +516,7 @@ bool DeviceReadBuffer::Poll(void) const
         {
             char dummy[128];
             int cnt = (m_wake_pipe_flags[0] & O_NONBLOCK) ? 128 : 1;
-            cnt = ::read(m_wake_pipe[0], dummy, cnt);
+            ::read(m_wake_pipe[0], dummy, cnt);
         }
 
         if (m_poll_timeout_is_error && (timer.elapsed() >= (int)m_max_poll_wait))
@@ -597,7 +596,7 @@ bool DeviceReadBuffer::CheckForErrors(
         usleep(500);
         return false;
     }
-    else if (len == 0)
+    if (len == 0)
     {
         if (++errcnt > 5)
         {

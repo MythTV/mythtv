@@ -91,12 +91,12 @@ class ImageView
 
   protected:
     QSize                  m_screenSize                  {640,480};
-    float                  m_wmult                       {1.0f};
-    float                  m_hmult                       {1.0f};
+    float                  m_wmult                       {1.0F};
+    float                  m_hmult                       {1.0F};
     int                    m_pos;
     int                   *m_savedPos                    {nullptr};
     int                    m_movieState                  {0};
-    float                  m_zoom                        {1.0f};
+    float                  m_zoom                        {1.0F};
 
     bool                   m_info_show                   {false};
     bool                   m_info_show_short             {false};

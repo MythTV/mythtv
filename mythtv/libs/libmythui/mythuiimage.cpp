@@ -141,13 +141,10 @@ class ImageLoader
     static bool SupportsAnimation(const QString &filename)
     {
         QString extension = filename.section('.', -1);
-        if (!filename.startsWith("myth://") &&
+        return !filename.startsWith("myth://") &&
             (extension == "gif" ||
              extension == "apng" ||
-             extension == "mng"))
-            return true;
-
-        return false;
+             extension == "mng");
     }
 
     /**
@@ -315,7 +312,7 @@ class ImageLoader
                 float wmult; // Width multipler
                 float hmult; // Height multipler
                 GetMythUI()->GetScreenSettings(wmult, hmult);
-                if (wmult != 1.0f || hmult != 1.0f)
+                if (wmult != 1.0F || hmult != 1.0F)
                 {
                     w = image->size().width() * wmult;
                     h = image->size().height() * hmult;
@@ -334,7 +331,7 @@ class ImageLoader
                     float wmult; // Width multipler
                     float hmult; // Height multipler
                     GetMythUI()->GetScreenSettings(wmult, hmult);
-                    if (wmult != 1.0f || hmult != 1.0f)
+                    if (wmult != 1.0F || hmult != 1.0F)
                     {
                         int width = newMaskImage->size().width() * wmult;
                         int height = newMaskImage->size().height() * hmult;
@@ -381,7 +378,7 @@ class ImageLoader
 
     static AnimationFrames *LoadAnimatedImage(MythPainter *painter,
                                                // Must be a copy for thread safety
-                                              ImageProperties imProps,
+                                              const ImageProperties& imProps,
                                               ImageCacheMode cacheMode,
                                                // Included only to check address, could be
                                                // replaced by generating a unique value for
@@ -449,8 +446,8 @@ class ImageLoadEvent : public QEvent
 
     const MythUIImage *GetParent() const    { return m_parent; }
     MythImage *GetImage() const       { return m_image; }
-    const QString GetBasefile() const { return m_basefile; }
-    const QString GetFilename() const { return m_filename; }
+    QString GetBasefile() const { return m_basefile; }
+    QString GetFilename() const { return m_filename; }
     int GetNumber() const             { return m_number; }
     AnimationFrames *GetAnimationFrames() const { return m_images; }
     bool GetAbortState() const        { return m_aborted; }
@@ -886,11 +883,11 @@ void MythUIImage::SetAnimationFrames(AnimationFrames frames)
         delays.append((*it).second);
     }
 
-    if (images.size())
+    if (!images.empty())
     {
         SetImages(&images);
 
-        if (m_Delay < 0  && delays.size())
+        if (m_Delay < 0  && !delays.empty())
             SetDelays(delays);
     }
     else
@@ -915,7 +912,6 @@ void MythUIImage::ForceSize(const QSize &size)
     SetSize(m_imageProperties.m_forceSize);
 
     Load();
-    return;
 }
 
 /**
@@ -1211,7 +1207,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 {
     m_ImagesLock.lock();
 
-    if (m_Images.size() > 0)
+    if (!m_Images.empty())
     {
         d->m_UpdateLock.lockForWrite();
 
@@ -1348,7 +1344,7 @@ bool MythUIImage::ParseElement(
             {
                 if ((*it).isEmpty())
                 {
-                    if (delays.size())
+                    if (!delays.empty())
                         delays.append(delays[delays.size()-1]);
                     else
                         delays.append(0); // Default 0ms delay before first image
@@ -1359,7 +1355,7 @@ bool MythUIImage::ParseElement(
                 }
             }
 
-            if (delays.size())
+            if (!delays.empty())
             {
                 m_Delay = delays[0];
                 SetDelays(delays);
@@ -1670,7 +1666,7 @@ void MythUIImage::FindRandomImage(void)
     QStringList imageList = imageDir.entryList();
     QString randFile;
 
-    if (imageList.size())
+    if (!imageList.empty())
     {
         // try to find a different image
         do

@@ -38,8 +38,7 @@ class Reconnect : public QRunnable
     }
 };
 
-BackendConnectionManager::BackendConnectionManager() :
-    QObject()
+BackendConnectionManager::BackendConnectionManager()
 {
     setObjectName("BackendConnectionManager");
     gCoreContext->addListener(this);
@@ -67,7 +66,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message == "BACKEND_SOCKETS_CLOSED")
         {

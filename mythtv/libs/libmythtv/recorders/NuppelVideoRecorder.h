@@ -79,7 +79,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
 
-    void SetOption(const QString &name, int value) override; // DTVRecorder
+    void SetOption(const QString &opt, int value) override; // DTVRecorder
     void SetOption(const QString &name, const QString &value) override; // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,
@@ -171,7 +171,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     int                 m_height                 {240};
     int                 m_pip_mode               {0};
     int                 m_compression            {1};
-    int                 m_compressaudio          {1};
+    bool                m_compressaudio          {true};
     AudioInput         *m_audio_device           {nullptr};
     unsigned long long  m_audiobytes             {0};
     int                 m_audio_channels         {2}; 
@@ -181,7 +181,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     int                 m_effectivedsp           {0}; // actual measured rate
 
     int                 m_usebttv                {1};
-    float               m_video_aspect           {1.33333f};
+    float               m_video_aspect           {1.33333F};
 
     bool                m_transcoding            {false};
 

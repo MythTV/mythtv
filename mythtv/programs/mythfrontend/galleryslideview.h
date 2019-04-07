@@ -47,7 +47,7 @@ private:
     void Zoom(int = 0);
     void Pan(QPoint = QPoint(0, 0));
     void SetStatus(QString msg, bool delay = false);
-    void ClearStatus(Slide &next);
+    void ClearStatus(Slide &slide);
 
 private slots:
     void ShowPrevSlide(int inc = 1);

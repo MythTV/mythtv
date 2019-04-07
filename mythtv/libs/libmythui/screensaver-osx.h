@@ -17,6 +17,10 @@ public:
 
 protected:
     class ScreenSaverOSXPrivate *d {nullptr};
+
+private:
+    ScreenSaverOSX(const ScreenSaverOSX &) = delete;            // not copyable
+    ScreenSaverOSX &operator=(const ScreenSaverOSX &) = delete; // not copyable
 };
 
 #endif // MYTH_SCREENSAVER_OSX_H

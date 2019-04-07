@@ -101,7 +101,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
 }
 
 // Load the font.  Copied, generally, from OSD::LoadFont.
-bool MHIContext::LoadFont(QString name)
+bool MHIContext::LoadFont(const QString& name)
 {
     QString fullnameA = GetConfDir() + "/" + name;
     QByteArray fnameA = fullnameA.toLatin1();
@@ -121,7 +121,7 @@ bool MHIContext::LoadFont(QString name)
     if (!errorC)
         return true;
 
-    QString fullnameD = name;
+    const QString& fullnameD = name;
     QByteArray fnameD = fullnameD.toLatin1();
     FT_Error errorD = FT_New_Face(ft_library, fnameD.constData(), 0, &m_face);
     if (!errorD)
@@ -615,7 +615,7 @@ MHKeyLookup::MHKeyLookup()
 // Called from tv_play when a key is pressed.
 // If it is one in the current profile we queue it for the engine
 // and return true otherwise we return false.
-bool MHIContext::OfferKey(QString key)
+bool MHIContext::OfferKey(const QString& key)
 {
     static const MHKeyLookup s_keymap;
     int action = s_keymap.Find(key, m_keyProfile);
@@ -668,7 +668,7 @@ void MHIContext::SetInputRegister(int num)
 int MHIContext::GetICStatus()
 {
    // 0= Active, 1= Inactive, 2= Disabled
-    return m_ic.status();
+    return MHInteractionChannel::status();
 }
 
 // Called by the video player to redraw the image.
@@ -761,7 +761,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 // An area of the screen/image needs to be redrawn.
 // Called from the MHEG engine.
 // We always redraw the whole scene.
-void MHIContext::RequireRedraw(const QRegion &)
+void MHIContext::RequireRedraw(const QRegion & /*region*/)
 {
     m_updated = false;
     m_display_lock.lock();
@@ -784,9 +784,8 @@ inline int MHIContext::ScaleY(int n, bool roundup) const
 
 inline QRect MHIContext::Scale(const QRect &r) const
 {
-    return QRect( m_displayRect.topLeft() +
-        QPoint(ScaleX(r.x()), ScaleY(r.y())),
-        QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) );
+    return { m_displayRect.topLeft() + QPoint(ScaleX(r.x()), ScaleY(r.y())),
+             QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) };
 }
 
 inline int MHIContext::ScaleVideoX(int n, bool roundup) const
@@ -801,9 +800,8 @@ inline int MHIContext::ScaleVideoY(int n, bool roundup) const
 
 inline QRect MHIContext::ScaleVideo(const QRect &r) const
 {
-    return QRect( m_videoRect.topLeft() +
-        QPoint(ScaleVideoX(r.x()), ScaleVideoY(r.y())),
-        QSize(ScaleVideoX(r.width(), true), ScaleVideoY(r.height(), true)) );
+    return { m_videoRect.topLeft() + QPoint(ScaleVideoX(r.x()), ScaleVideoY(r.y())),
+             QSize(ScaleVideoX(r.width(), true), ScaleVideoY(r.height(), true)) };
 }
 
 void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, bool bUnder /*=false*/)
@@ -892,9 +890,9 @@ bool MHIContext::LoadChannelCache()
         MythDB::DBError("MHIContext::LoadChannelCache", query);
         return false;
     }
-    else if (!query.isActive())
+    if (!query.isActive())
         return false;
-    else while (query.next())
+    while (query.next())
     {
         int nid = query.value(0).toInt();
         int sid = query.value(1).toInt();
@@ -915,70 +913,73 @@ int MHIContext::GetChannelIndex(const QString &str)
 {
     int nResult = -1;
 
-    do if (str.startsWith("dvb://"))
+    do
     {
-        QStringList list = str.mid(6).split('.');
-        if (list.size() != 3)
-            break; // Malformed.
-        // The various fields are expressed in hexadecimal.
-        // Convert them to decimal for the DB.
-        bool ok;
-        int netID = list[0].toInt(&ok, 16);
-        if (!ok)
-            break;
-        int transportID = !list[1].isEmpty() ? list[1].toInt(&ok, 16) : -1;
-        if (!ok)
-            break;
-        int serviceID = list[2].toInt(&ok, 16);
-        if (!ok)
-            break;
-
-        QMutexLocker locker(&m_channelMutex);
-        if (m_channelCache.isEmpty())
-            LoadChannelCache();
-
-        ChannelCache_t::const_iterator it = m_channelCache.find(
-            Key_t(netID,serviceID) );
-        if (it == m_channelCache.end())
-            break;
-        else if (transportID < 0)
-            nResult = Cid(it);
-        else do
+        if (str.startsWith("dvb://"))
         {
-            if (Tid(it) == transportID)
-            {
-                nResult = Cid(it);
+            QStringList list = str.mid(6).split('.');
+            if (list.size() != 3)
+                break; // Malformed.
+            // The various fields are expressed in hexadecimal.
+            // Convert them to decimal for the DB.
+            bool ok;
+            int netID = list[0].toInt(&ok, 16);
+            if (!ok)
                 break;
+            int transportID = !list[1].isEmpty() ? list[1].toInt(&ok, 16) : -1;
+            if (!ok)
+                break;
+            int serviceID = list[2].toInt(&ok, 16);
+            if (!ok)
+                break;
+
+            QMutexLocker locker(&m_channelMutex);
+            if (m_channelCache.isEmpty())
+                LoadChannelCache();
+
+            ChannelCache_t::const_iterator it = m_channelCache.find(
+                Key_t(netID,serviceID) );
+            if (it == m_channelCache.end())
+                break;
+            if (transportID < 0)
+                nResult = Cid(it);
+            else do
+            {
+                if (Tid(it) == transportID)
+                {
+                    nResult = Cid(it);
+                    break;
+                }
             }
+            while (++it != m_channelCache.end());
         }
-        while (++it != m_channelCache.end());
-    }
-    else if (str.startsWith("rec://svc/lcn/"))
-    {
-        // I haven't seen this yet so this is untested.
-        bool ok;
-        int channelNo = str.mid(14).toInt(&ok); // Decimal integer
-        if (!ok)
-            break;
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT chanid "
-                      "FROM channel "
-                      "WHERE channum = :CHAN AND "
-                      "      channel.sourceid = :SOURCEID");
-        query.bindValue(":CHAN", channelNo);
-        query.bindValue(":SOURCEID", m_currentSource);
-        if (query.exec() && query.isActive() && query.next())
-            nResult = query.value(0).toInt();
-    }
-    else if (str == "rec://svc/cur")
-        nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
-    else if (str == "rec://svc/def")
-        nResult = m_currentChannel;
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("[mhi] GetChannelIndex -- Unrecognized URL %1")
-            .arg(str));
+        else if (str.startsWith("rec://svc/lcn/"))
+        {
+            // I haven't seen this yet so this is untested.
+            bool ok;
+            int channelNo = str.mid(14).toInt(&ok); // Decimal integer
+            if (!ok)
+                break;
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT chanid "
+                          "FROM channel "
+                          "WHERE channum = :CHAN AND "
+                          "      channel.sourceid = :SOURCEID");
+            query.bindValue(":CHAN", channelNo);
+            query.bindValue(":SOURCEID", m_currentSource);
+            if (query.exec() && query.isActive() && query.next())
+                nResult = query.value(0).toInt();
+        }
+        else if (str == "rec://svc/cur")
+            nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
+        else if (str == "rec://svc/def")
+            nResult = m_currentChannel;
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("[mhi] GetChannelIndex -- Unrecognized URL %1")
+                .arg(str));
+        }
     }
     while (false);
 
@@ -1292,13 +1293,13 @@ static inline int FT2Point(FT_F26Dot6 fp)
 QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
 {
     if (!m_parent->IsFaceLoaded())
-        return QRect(0,0,0,0);
+        return {0,0,0,0};
 
     FT_Face face = m_parent->GetFontFace();
     FT_Error error = FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
     if (error)
-        return QRect(0,0,0,0);
+        return {0,0,0,0};
 
     int maxAscent  =  face->size->metrics.ascender;
     int maxDescent = -face->size->metrics.descender;
@@ -1359,7 +1360,7 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
         previous = glyphIndex;
     }
 
-    return QRect(0, -FT2Point(maxAscent), FT2Point(width), FT2Point(maxAscent + maxDescent));
+    return {0, -FT2Point(maxAscent), FT2Point(width), FT2Point(maxAscent + maxDescent)};
 }
 
 // Reset the image and fill it with transparent ink.

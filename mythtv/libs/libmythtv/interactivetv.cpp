@@ -4,8 +4,9 @@
  */
 
 // Qt headers
-#include <QString>
 #include <QImage>
+#include <QString>
+#include <utility>
 
 // MythTV headers
 #include "interactivetv.h"
@@ -64,7 +65,7 @@ void InteractiveTV::Reinit(const QRect &videoRect, const QRect &dispRect, float 
 
 bool InteractiveTV::OfferKey(QString key)
 {
-    return m_context->OfferKey(key);
+    return m_context->OfferKey(std::move(key));
 }
 
 void InteractiveTV::GetInitialStreams(int &audioTag, int &videoTag)

@@ -11,7 +11,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnptaskevent.h"
+
 #include "mythlogging.h"
+#include <utility>
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -30,7 +32,7 @@ UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
                               QByteArray  *pPayload ) :
     Task("UPnpEventTask")
 {
-    m_PeerAddress = peerAddress;
+    m_PeerAddress = std::move(peerAddress);
     m_nPeerPort   = nPeerPort;
     m_pPayload    = pPayload;  // We take ownership of this pointer.
 } 
@@ -41,8 +43,7 @@ UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
 
 UPnpEventTask::~UPnpEventTask()  
 { 
-    if (m_pPayload != nullptr)
-        delete m_pPayload;
+    delete m_pPayload;
 }
 
 /////////////////////////////////////////////////////////////////////////////

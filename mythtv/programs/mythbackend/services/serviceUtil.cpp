@@ -249,7 +249,7 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillChannelGroup(DTC::ChannelGroup* pGroup, ChannelGroupItem pGroupItem)
+void FillChannelGroup(DTC::ChannelGroup* pGroup, const ChannelGroupItem& pGroupItem)
 {
     if (!pGroup)
         return;
@@ -395,7 +395,7 @@ void FillGenreList(DTC::GenreList* pGenreList, int videoID)
 
 void FillVideoMetadataInfo (
                       DTC::VideoMetadataInfo *pVideoMetadataInfo,
-                      VideoMetadataListManager::VideoMetadataPtr pMetadata,
+                      const VideoMetadataListManager::VideoMetadataPtr& pMetadata,
                       bool          bDetails)
 {
     pVideoMetadataInfo->setId(pMetadata->GetID());
@@ -517,7 +517,7 @@ void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
+void FillInputInfo(DTC::Input* input, const InputInfo& inputInfo)
 {
     input->setId(inputInfo.m_inputid);
     input->setInputName(inputInfo.m_name);
@@ -619,7 +619,7 @@ void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
-            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
             if (marktype == 0)
             {
                 DTC::Cutting *pCutting = pCutList->AddNewCutting();
@@ -665,7 +665,7 @@ void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
-            bool isend = ((*it) == MARK_CUT_END || (*it) == MARK_COMM_END) ? true : false;
+            bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
             if (marktype == 0)
             {
                 DTC::Cutting *pCutting = pCutList->AddNewCutting();

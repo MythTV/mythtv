@@ -40,30 +40,6 @@ int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpDeviceDesc::UPnpDeviceDesc()
-{
-    // Static initialisation order fiasco: Logging isn't available yet
-#if 0
-    LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Constructor");
-#endif
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpDeviceDesc::~UPnpDeviceDesc()
-{
-    // FIXME: Using this causes crashes
-#if 0
-    LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Destructor");
-#endif
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 bool UPnpDeviceDesc::Load( const QString &sFileName )
 {
     // ----------------------------------------------------------------------
@@ -195,7 +171,7 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessIconList( const QDomNode& oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
           !oNode.isNull();
@@ -224,7 +200,7 @@ void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
           !oNode.isNull();
@@ -258,7 +234,7 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessDeviceList( QDomNode    oListNode,
+void UPnpDeviceDesc::ProcessDeviceList( const QDomNode&    oListNode,
                                         UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
@@ -314,7 +290,7 @@ void UPnpDeviceDesc::SetBoolValue( const QDomNode &n, bool &nValue )
         if (!oText.isNull())
         {
             QString s = oText.nodeValue();
-            nValue = (s == "yes" || s == "true" || s.toInt());
+            nValue = (s == "yes" || s == "true" || (s.toInt() != 0));
         }
     }
 }

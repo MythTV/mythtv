@@ -99,7 +99,7 @@ class NetworkControl : public ServerPool, public QRunnable
     ~NetworkControl();
 
   private slots:
-    void newConnection(QTcpSocket *socket);
+    void newConnection(QTcpSocket *client);
     void receiveCommand(QString &command);
     void deleteClient(void);
 
@@ -122,7 +122,7 @@ class NetworkControl : public ServerPool, public QRunnable
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
     void customEvent(QEvent *e) override; // QObject
 
-    QString listRecordings(QString chanid = "", QString starttime = "");
+    QString listRecordings(const QString& chanid = "", const QString& starttime = "");
     QString listSchedule(const QString& chanID = "") const;
     QString listChannels(const uint start, const uint limit) const;
     QString saveScreenshot(NetworkCommand *nc);

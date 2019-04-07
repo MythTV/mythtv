@@ -106,7 +106,7 @@ AudioOutputALSA::~AudioOutputALSA()
     KillAudio();
 }
 
-int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
+int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
 {
     QString real_device;
     QByteArray dev_ba;
@@ -407,7 +407,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     /* Check if name or description contains information
        to know if device can accept passthrough or not */
     QMap<QString, QString> *alsadevs = GetDevices("pcm");
-    while(1)
+    while (true)
     {
         QString real_device = ((passthrough && m_discretedigital) ?
                                m_passthru_device : m_main_device);
@@ -714,11 +714,11 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
         CHECKERR(QString("Samplerate %1 Hz not available").arg(rate));
     }
 
-    /* set the buffer time */
-    err = snd_pcm_hw_params_get_buffer_size_min(params, &buffer_size_min);
-    err = snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
-    err = snd_pcm_hw_params_get_period_size_min(params, &period_size_min, nullptr);
-    err = snd_pcm_hw_params_get_period_size_max(params, &period_size_max, nullptr);
+    /* get the buffer parameters */
+    (void) snd_pcm_hw_params_get_buffer_size_min(params, &buffer_size_min);
+    (void) snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
+    (void) snd_pcm_hw_params_get_period_size_min(params, &period_size_min, nullptr);
+    (void) snd_pcm_hw_params_get_period_size_max(params, &period_size_max, nullptr);
     VBAUDIO(QString("Buffer size range from %1 to %2")
             .arg(buffer_size_min)
             .arg(buffer_size_max));
@@ -765,7 +765,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* See if we need to increase the prealloc'd buffer size
        If buffer_time is too small we could underrun - make 10% difference ok */
-    if (buffer_time * 1.10f < (float)original_buffer_time)
+    if (buffer_time * 1.10F < (float)original_buffer_time)
     {
         VBWARN(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
@@ -844,7 +844,7 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     else
     {
         retvol = (m_mixer.volrange != 0L) ? (mixervol - m_mixer.volmin) *
-                                            100.0f / m_mixer.volrange + 0.5f
+                                            100.0F / m_mixer.volrange + 0.5F
                                             : 0;
         retvol = max(retvol, 0);
         retvol = min(retvol, 100);

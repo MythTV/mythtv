@@ -56,7 +56,7 @@ void AudioPlayer::AddVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (uint i = 0; i < m_visuals.size(); i++)
+    for (size_t i = 0; i < m_visuals.size(); i++)
         m_audioOutput->addVisual(m_visuals[i]);
 }
 
@@ -66,7 +66,7 @@ void AudioPlayer::RemoveVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (uint i = 0; i < m_visuals.size(); i++)
+    for (size_t i = 0; i < m_visuals.size(); i++)
         m_audioOutput->removeVisual(m_visuals[i]);
 }
 
@@ -76,7 +76,7 @@ void AudioPlayer::ResetVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (uint i = 0; i < m_visuals.size(); i++)
+    for (size_t i = 0; i < m_visuals.size(); i++)
         m_visuals[i]->prepare();
 }
 
@@ -282,7 +282,7 @@ bool AudioPlayer::SetMuted(bool mute)
         LOG(VB_AUDIO, LOG_INFO, QString("muting sound %1").arg(IsMuted()));
         return true;
     }
-    else if (m_audioOutput && !m_no_audio_out && is_muted && !mute &&
+    if (m_audioOutput && !m_no_audio_out && is_muted && !mute &&
              (kMuteOff == SetMuteState(kMuteOff)))
     {
         LOG(VB_AUDIO, LOG_INFO, QString("unmuting sound %1").arg(IsMuted()));
@@ -475,16 +475,14 @@ bool AudioPlayer::NeedDecodingBeforePassthrough(void)
 {
     if (!m_audioOutput)
         return true;
-    else
-        return m_audioOutput->NeedDecodingBeforePassthrough();
+    return m_audioOutput->NeedDecodingBeforePassthrough();
 }
 
 int64_t AudioPlayer::LengthLastData(void)
 {
     if (!m_audioOutput)
         return 0;
-    else
-        return m_audioOutput->LengthLastData();
+    return m_audioOutput->LengthLastData();
 }
 
 bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
@@ -519,16 +517,14 @@ bool AudioPlayer::CanProcess(AudioFormat fmt)
 {
     if (!m_audioOutput)
         return false;
-    else
-        return m_audioOutput->CanProcess(fmt);
+    return m_audioOutput->CanProcess(fmt);
 }
 
 uint32_t AudioPlayer::CanProcess(void)
 {
     if (!m_audioOutput)
         return 0;
-    else
-        return m_audioOutput->CanProcess();
+    return m_audioOutput->CanProcess();
 }
 
 /**
@@ -550,6 +546,5 @@ int AudioPlayer::DecodeAudio(AVCodecContext *ctx,
         data_size = 0;
         return 0;
     }
-    else
-        return m_audioOutput->DecodeAudio(ctx, buffer, data_size, pkt);
+    return m_audioOutput->DecodeAudio(ctx, buffer, data_size, pkt);
 }

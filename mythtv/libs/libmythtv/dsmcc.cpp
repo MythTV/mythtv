@@ -230,12 +230,11 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     }
 
     unsigned short userInfoLength = (data[off] << 8) | data[off+1];
-    off += 2;
+    // off += 2;
     if (userInfoLength)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[dsmcc] DSI unexpected userInfo");
-        // cppcheck-suppress unreadVariable
-        off += userInfoLength;
+        // off += userInfoLength;
     }
 }
 
@@ -302,7 +301,6 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
     dii.m_private_data_len = (data[off] << 8) | data[off + 1];
 
     car->AddModuleInfo(&dii, this, streamTag);
-    return;
 }
 
 // DSI or DII message.
@@ -435,8 +433,6 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Data Block ModID %1 Pos %2"
             " unknown carousel %3")
             .arg(ddb.m_module_id).arg(ddb.m_block_number).arg(download_id));
-
-    return;
 }
 
 void Dsmcc::ProcessSectionDesc(const unsigned char *data, int length)

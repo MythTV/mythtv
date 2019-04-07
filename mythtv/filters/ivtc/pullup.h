@@ -59,9 +59,9 @@ struct pullup_context
 	struct pullup_field *first, *last, *head;
 	struct pullup_buffer *buffers;
 	int nbuffers;
-	int (*diff)(unsigned char *, unsigned char *, int);
-	int (*comb)(unsigned char *, unsigned char *, int);
-	int (*var)(unsigned char *, unsigned char *, int);
+	int (*diff)(const unsigned char *, const unsigned char *, int);
+	int (*comb)(const unsigned char *, const unsigned char *, int);
+	int (*var)(const unsigned char *, const unsigned char *, int);
 	int metric_w, metric_h, metric_len, metric_offset;
 	struct pullup_frame *frame;
 };

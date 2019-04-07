@@ -60,7 +60,7 @@ void MythUDPListener::Disable(void)
     m_socketPool = nullptr;
 }
 
-void MythUDPListener::Process(const QByteArray &buf, QHostAddress /*sender*/,
+void MythUDPListener::Process(const QByteArray &buf, const QHostAddress& /*sender*/,
                               quint16 /*senderPort*/)
 {
     QString errorMsg;
@@ -109,7 +109,7 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress /*sender*/,
     QString description = "";
     QString extra = "";
     QString progress_text = "";
-    float progress = -1.0f;
+    float progress = -1.0F;
     bool fullscreen = false;
     bool error = false;
     int visibility = 0;
@@ -148,7 +148,7 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress /*sender*/,
                 bool ok;
                 progress = e.text().toFloat(&ok);
                 if (!ok)
-                    progress = -1.0f;
+                    progress = -1.0F;
             }
             else
             {

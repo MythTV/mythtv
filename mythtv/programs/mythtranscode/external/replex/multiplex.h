@@ -87,7 +87,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start);
 void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok);
 void finish_mpg(multiplex_t *mx);
 void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
-		     audio_frame_t *extframe, int *exttype, int *exttypcnt,
+		     audio_frame_t *extframe, int *exttype, const int *exttypcnt,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
 		     int (*fill_buffers)(void *p, int f),
 		     ringbuffer *vrbuffer, ringbuffer *index_vrbuffer,	

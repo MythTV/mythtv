@@ -27,7 +27,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-static bool performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], const QString& version,
                                 QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -126,10 +126,7 @@ static bool InitializeDatabase(void)
 ""
 };
     QString dbver = "";
-    if (!performActualUpdate(updates, "1011", dbver))
-        return false;
-
-    return true;
+    return performActualUpdate(updates, "1011", dbver);
 }
 
 bool UpgradeGameDatabaseSchema(void)

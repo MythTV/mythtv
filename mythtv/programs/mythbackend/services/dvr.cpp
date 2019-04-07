@@ -105,7 +105,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 
     QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
 
-    for( unsigned int n = 0; n < progList.size(); n++)
+    for(size_t n = 0; n < progList.size(); n++)
     {
         ProgramInfo *pInfo = progList[ n ];
 
@@ -163,8 +163,8 @@ DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
     if (!sEndTime.isNull() && !sEndTime.isValid())
         throw QString("EndTime is invalid");
 
-    QDateTime dtStartTime = sStartTime;
-    QDateTime dtEndTime   = sEndTime;
+    const QDateTime& dtStartTime = sStartTime;
+    const QDateTime& dtEndTime   = sEndTime;
 
     if (!sEndTime.isNull() && dtEndTime < dtStartTime)
         throw QString("EndTime is before StartTime");
@@ -380,8 +380,7 @@ bool Dvr::StopRecording(int RecordedId)
         gCoreContext->dispatch(me);
         return true;
     }
-    else
-        throw QString("RecordedId %1 not found").arg(RecordedId);
+    throw QString("RecordedId %1 not found").arg(RecordedId);
 
     return false;
 }
@@ -477,12 +476,11 @@ long Dvr::GetSavedBookmark( int RecordedId,
         ri.QueryKeyFramePosition(&offset, position, isend);
         return offset;
     }
-    else if (offsettype.toLower() == "duration"){
+    if (offsettype.toLower() == "duration"){
         ri.QueryKeyFrameDuration(&offset, position, isend);
         return offset;
     }
-    else
-        return position;
+    return position;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1074,23 +1072,23 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
 }
 
 uint Dvr::AddRecordSchedule   (
-                               QString   sTitle,
-                               QString   sSubtitle,
-                               QString   sDescription,
-                               QString   sCategory,
+                               const QString&   sTitle,
+                               const QString&   sSubtitle,
+                               const QString&   sDescription,
+                               const QString&   sCategory,
                                QDateTime recstarttsRaw,
                                QDateTime recendtsRaw,
-                               QString   sSeriesId,
-                               QString   sProgramId,
+                               const QString&   sSeriesId,
+                               const QString&   sProgramId,
                                int       nChanId,
-                               QString   sStation,
+                               const QString&   sStation,
                                int       nFindDay,
                                QTime     tFindTime,
                                int       nParentId,
                                bool      bInactive,
                                uint      nSeason,
                                uint      nEpisode,
-                               QString   sInetref,
+                               const QString&   sInetref,
                                QString   sType,
                                QString   sSearchType,
                                int       nRecPriority,
@@ -1231,7 +1229,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  bool      bInactive,
                                  uint      nSeason,
                                  uint      nEpisode,
-                                 QString   sInetref,
+                                 const QString&   sInetref,
                                  QString   sType,
                                  QString   sSearchType,
                                  int       nRecPriority,
@@ -1711,7 +1709,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if ((jobType & JOB_USERJOB) &&
+    if (((jobType & JOB_USERJOB) != 0) &&
          gCoreContext->GetSetting(sJobName, "").isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been defined.")
@@ -1736,7 +1734,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
     if (sJobArgs.isNull())
         sJobArgs = "";
 
-    int bReturn = JobQueue::QueueJob(jobType,
+    bool bReturn = JobQueue::QueueJob(jobType,
                                  ri.GetChanID(),
                                  ri.GetRecordingStartTime(),
                                  sJobArgs,

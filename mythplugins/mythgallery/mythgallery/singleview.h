@@ -46,7 +46,7 @@ class SingleView : public MythDialog, public ImageView
     Q_OBJECT
     
   public:
-    SingleView(ThumbList itemList, int *pos, int slideShow, int sortorder,
+    SingleView(const ThumbList& itemList, int *pos, int slideShow, int sortorder,
                MythMainWindow *parent, const char *name="SingleView");
     ~SingleView();
 
@@ -130,15 +130,15 @@ class SingleView : public MythDialog, public ImageView
     int           m_effect_i         {0};       ///< misc effects iterator
     int           m_effect_j         {0};       ///< misc effects iterator
     int           m_effect_framerate {0};       ///< timeout between effects
-    float         m_effect_delta2_x  {0.0f};
-    float         m_effect_delta2_y  {0.0f};
-    float         m_effect_alpha     {0.0f};
+    float         m_effect_delta2_x  {0.0F};
+    float         m_effect_delta2_y  {0.0F};
+    float         m_effect_alpha     {0.0F};
 
     // Unshared effect state variables
     QPoint        m_effect_spiral_tmp0                  {0,0};
     QPoint        m_effect_spiral_tmp1                  {0,0};
     vector<int>   m_effect_meltdown_y_disp;
-    float         m_effect_multi_circle_out_delta_alpha {0.0f};
+    float         m_effect_multi_circle_out_delta_alpha {0.0F};
     QPolygon      m_effect_milti_circle_out_points      {4};
     QPolygon      m_effect_circle_out_points            {4};
 };

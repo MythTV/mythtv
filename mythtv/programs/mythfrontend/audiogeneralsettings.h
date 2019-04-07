@@ -127,7 +127,7 @@ class AudioDeviceComboBox : public HostComboBoxSetting
 class ChannelChangedEvent : public QEvent
 {
   public:
-    ChannelChangedEvent(QString channame, bool fulltest) :
+    ChannelChangedEvent(const QString& channame, bool fulltest) :
         QEvent(kEventType), m_channel(channame), m_fulltest(fulltest) {}
     ~ChannelChangedEvent() = default;
 

@@ -84,9 +84,9 @@ class SpliceDescriptor
 
     static desc_list_t Parse(const unsigned char *data, uint len);
     static desc_list_t ParseAndExclude(const unsigned char *data, uint len,
-                                       int descriptorid);
+                                       int excluded_descid);
     static desc_list_t ParseOnlyInclude(const unsigned char *data, uint len,
-                                        int descriptorid);
+                                        int excluded_descid);
 
     static const unsigned char *Find(const desc_list_t &parsed, uint desc_tag);
     static desc_list_t FindAll(const desc_list_t &parsed, uint desc_tag);
@@ -97,7 +97,7 @@ class SpliceDescriptor
     const unsigned char *_data;
 };
 
-class AvailDescriptor : SpliceDescriptor
+class AvailDescriptor : public SpliceDescriptor
 {
   public:
     AvailDescriptor(const unsigned char *data, int len = 300) :
@@ -123,7 +123,7 @@ class AvailDescriptor : SpliceDescriptor
     }
 };
 
-class DTMFDescriptor : SpliceDescriptor
+class DTMFDescriptor : public SpliceDescriptor
 {
   public:
     DTMFDescriptor(const unsigned char *data, int len = 300) :
@@ -155,14 +155,14 @@ class DTMFDescriptor : SpliceDescriptor
     }
 };
 
-class SegmentationDescriptor : SpliceDescriptor
+class SegmentationDescriptor : public SpliceDescriptor
 {
   public:
     SegmentationDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
         _ptrs[2] = _ptrs[1] = _ptrs[0] = nullptr;
-        if (_data && !Parse())
+        if (_data && !SegmentationDescriptor::Parse())
             _data = nullptr;
     }
 
@@ -181,13 +181,13 @@ class SegmentationDescriptor : SpliceDescriptor
             QChar(_data[8]) + QChar(_data[9]);
     }
     // segmentation_event_cancel_indicator 1 10.0
-    bool IsSegmentationEventCancel(void) const { return _data[10] & 0x80; }
+    bool IsSegmentationEventCancel(void) const { return ( _data[10] & 0x80 ) != 0; }
     // reserved                 7  10.1
     // if (segmentation_event_cancel_indicator == ‘0’) {
     //   program_seg_flag       1  11.0
-    bool IsProgramSegmentation(void) const { return _data[11] & 0x80; }
+    bool IsProgramSegmentation(void) const { return ( _data[11] & 0x80 ) != 0; }
     //   seg_duration_flag      1  11.1
-    bool HasSegmentationDuration(void) const { return _data[11] & 0x40; }
+    bool HasSegmentationDuration(void) const { return ( _data[11] & 0x40 ) != 0; }
     //   reserved               6  11.2
     //   if (program_segmentation_flag == ‘0’) {
     //     component_count      8  12

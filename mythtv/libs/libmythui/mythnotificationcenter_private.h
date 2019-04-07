@@ -178,7 +178,7 @@ public:
     // UI methods
     void AdjustYPosition(void);
     void AdjustIndex(int by, bool set=false);
-    void SetIndex(int value);
+    void SetIndex(int index);
     int  GetHeight(void);
 
     enum Content {
@@ -206,7 +206,7 @@ public:
     QString                     m_description;
     QString                     m_extra;
     int                         m_duration        {-1};
-    float                       m_progress        {-1.0f};
+    float                       m_progress        {-1.0F};
     QString                     m_progresstext;
     bool                        m_fullscreen      {false};
     bool                        m_added           {false};

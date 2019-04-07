@@ -85,7 +85,7 @@ class ThumbFinder : public MythScreenType
     MythAVCopy       m_copy;
     QScopedPointer<MythPictureDeinterlacer> m_deinterlacer;
 
-    float            m_fps               {0.0f};
+    float            m_fps               {0.0F};
     unsigned char   *m_outputbuf         {nullptr};
     QString          m_frameFile;
     int              m_frameWidth        { 0};

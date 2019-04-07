@@ -247,7 +247,7 @@ void MHStream::SetCounterPosition(int pos, MHEngine *engine)
 
 void MHStream::SetSpeed(int speed, MHEngine *engine)
 {
-    engine->GetContext()->StreamPlay(speed);
+    engine->GetContext()->StreamPlay(speed != 0);
 }
 
 void MHAudio::Initialise(MHParseNode *p, MHEngine *engine)
@@ -442,7 +442,7 @@ void MHVideo::SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *eng
 }
 
 // Added action in UK MHEG.
-void MHVideo::GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *)
+void MHVideo::GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine * /*engine*/)
 {
     pXOffset->SetVariableValue(m_nXDecodeOffset);
     pYOffset->SetVariableValue(m_nYDecodeOffset);

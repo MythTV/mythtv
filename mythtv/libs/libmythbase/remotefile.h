@@ -24,7 +24,7 @@ class MBASE_PUBLIC RemoteFile
                const QStringList *possibleAuxiliaryFiles = nullptr);
    ~RemoteFile();
 
-    bool ReOpen(QString newFilename);
+    bool ReOpen(const QString& newFilename);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
@@ -41,9 +41,9 @@ class MBASE_PUBLIC RemoteFile
     static QStringList FindFileList(const QString &filename, const QString &host,
                                     const QString &storageGroup, bool useRegex = false,
                                     bool allowFallback = false);
-    static bool CopyFile(const QString &src, const QString &dest,
+    static bool CopyFile(const QString &src, const QString &dst,
                          bool overwrite = false, bool verify = false);
-    static bool MoveFile(const QString &src, const QString &dest,
+    static bool MoveFile(const QString &src, const QString &dst,
                          bool overwrite = false);
 
     int Write(const void *data, int size);

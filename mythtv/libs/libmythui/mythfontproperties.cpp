@@ -134,7 +134,7 @@ void MythFontProperties::Rescale(void)
 
 void MythFontProperties::AdjustStretch(int stretch)
 {
-    int newStretch = lroundf((float)m_stretch * ((float)stretch / 100.0f));
+    int newStretch = lroundf((float)m_stretch * ((float)stretch / 100.0F));
 
     if (newStretch <= 0)
         newStretch = 1;
@@ -151,7 +151,7 @@ void MythFontProperties::SetPixelSize(float size)
 
 void MythFontProperties::SetPointSize(uint points)
 {
-    float pixels = (float)points / 72.0f * 100.0f;
+    float pixels = (float)points / 72.0F * 100.0F;
     SetPixelSize(pixels);
 }
 
@@ -418,7 +418,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         delete newFont;
         return nullptr;
     }
-    else if (pixelsize > 0)
+    if (pixelsize > 0)
     {
         newFont->SetPixelSize(pixelsize);
     }

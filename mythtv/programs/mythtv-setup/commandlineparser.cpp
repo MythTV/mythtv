@@ -5,7 +5,7 @@
 
 MythTVSetupCommandLineParser::MythTVSetupCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTV_SETUP)
-{ LoadArguments(); }
+{ MythTVSetupCommandLineParser::LoadArguments(); }
 
 QString MythTVSetupCommandLineParser::GetHelpHeader(void) const
 {

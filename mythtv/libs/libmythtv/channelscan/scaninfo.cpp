@@ -32,7 +32,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
 
     // Delete very old scans
     const vector<ScanInfo> list = LoadScanList();
-    for (uint i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
         if (list[i].m_scandate > MythDate::current().addDays(-14))
             continue;
@@ -63,7 +63,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
     if (!scanid)
         return scanid;
 
-    for (uint i = 0; i < scan.size(); ++i)
+    for (size_t i = 0; i < scan.size(); ++i)
         scan[i].SaveScan(scanid);
 
     return scanid;
@@ -264,12 +264,11 @@ vector<ScanInfo> LoadScanList(void)
 
     while (query.next())
     {
-        list.push_back(
-            ScanInfo(query.value(0).toUInt(),
-                     query.value(1).toUInt(),
-                     query.value(2).toUInt(),
-                     (bool) query.value(3).toUInt(),
-                     MythDate::as_utc(query.value(4).toDateTime())));
+        list.emplace_back(query.value(0).toUInt(),
+                          query.value(1).toUInt(),
+                          query.value(2).toUInt(),
+                          (bool) query.value(3).toUInt(),
+                          MythDate::as_utc(query.value(4).toDateTime()));
     }
 
     return list;

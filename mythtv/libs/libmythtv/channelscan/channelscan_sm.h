@@ -101,11 +101,11 @@ class ChannelScanSM : public MPEGStreamListener,
     void StopScanner(void);
 
     bool ScanTransports(
-        int src, const QString &std, const QString &mod, const QString &table,
+        int SourceID, const QString &std, const QString &mod, const QString &country,
         const QString &table_start = QString(),
         const QString &table_end   = QString());
     bool ScanTransportsStartingOn(
-        int sourceid, const QMap<QString,QString> &valueMap);
+        int sourceid, const QMap<QString,QString> &startChan);
     bool ScanTransport(uint mplexid, bool follow_nit);
     bool ScanCurrentTransport(const QString &sistandard);
     bool ScanForChannels(

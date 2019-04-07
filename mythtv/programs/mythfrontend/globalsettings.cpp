@@ -279,7 +279,7 @@ static GlobalComboBoxSetting *CommercialSkipMethod()
 
     deque<int> tmp = GetPreferredSkipTypeCombinations();
 
-    for (uint i = 0; i < tmp.size(); ++i)
+    for (size_t i = 0; i < tmp.size(); ++i)
         bc->addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
 
     return bc;
@@ -597,7 +597,7 @@ static GlobalCheckBoxSetting *RerecordWatched()
 
 static GlobalSpinBoxSetting *RecordPreRoll()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record before start of show "
                                      "(secs)"));
@@ -615,7 +615,7 @@ static GlobalSpinBoxSetting *RecordPreRoll()
 
 static GlobalSpinBoxSetting *RecordOverTime()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record past end of show (secs)"));
 
@@ -663,7 +663,7 @@ static GlobalComboBoxSetting *OverTimeCategory()
 static GlobalSpinBoxSetting *CategoryOverTime()
 {
     GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CategoryOverTime",
-                                          0, 180, 60, true);
+                                          0, 180, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Record past end of show (mins)"));
 
@@ -699,7 +699,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_codecs       = new TransMythUIComboBoxSetting(true);
     m_framerate    = new TransTextEditSetting();
     m_decoder      = new TransMythUIComboBoxSetting();
-    m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, true);
+    m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
     m_skiploop     = new TransMythUICheckBoxSetting();
     m_vidrend      = new TransMythUIComboBoxSetting();
     m_osdrend      = new TransMythUIComboBoxSetting();
@@ -867,6 +867,7 @@ void PlaybackProfileItemConfig::Load(void)
     QStringList::const_iterator itr = decr.begin();
     QStringList::const_iterator itn = decn.begin();
     m_decoder->clearSelections();
+    m_decoder->setHelpText(dech);
     for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
     {
         m_decoder->addSelection(*itn, *itr, (*itr == pdecoder));
@@ -957,7 +958,7 @@ void PlaybackProfileItemConfig::framerateChanged(const QString &val)
     bool ok = true;
     QString oldvalue = m_item.Get("cond_framerate");
     m_item.Set("cond_framerate",val);
-    m_item.checkRange("cond_framerate", 25.0f, &ok);
+    m_item.checkRange("cond_framerate", 25.0F, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));
@@ -1156,7 +1157,7 @@ void PlaybackProfileConfig::InitUI(StandardSetting *parent)
 
     connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
 
-    for (uint i = 0; i < m_items.size(); ++i)
+    for (size_t i = 0; i < m_items.size(); ++i)
         InitProfileItem(i, parent);
 }
 
@@ -1255,22 +1256,22 @@ void PlaybackProfileConfig::ReloadSettings(void)
     setChanged(true);
 }
 
-void PlaybackProfileConfig::swap(int i, int j)
+void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
         profile->Save();
     }
 
-    QString pri_i = QString::number(m_items[i].GetPriority());
-    QString pri_j = QString::number(m_items[j].GetPriority());
+    QString pri_i = QString::number(m_items[indexA].GetPriority());
+    QString pri_j = QString::number(m_items[indexB].GetPriority());
 
-    ProfileItem item = m_items[j];
-    m_items[j] = m_items[i];
-    m_items[i] = item;
+    ProfileItem item = m_items[indexB];
+    m_items[indexB] = m_items[indexA];
+    m_items[indexA] = item;
 
-    m_items[i].Set("pref_priority", pri_i);
-    m_items[j].Set("pref_priority", pri_j);
+    m_items[indexA].Set("pref_priority", pri_i);
+    m_items[indexB].Set("pref_priority", pri_j);
 
     ReloadSettings();
 }
@@ -2076,7 +2077,7 @@ static HostComboBoxSetting *AdjustFill()
 
 static HostSpinBoxSetting *GuiWidth()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
@@ -2092,7 +2093,7 @@ static HostSpinBoxSetting *GuiWidth()
 
 static HostSpinBoxSetting *GuiHeight()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
@@ -2108,7 +2109,7 @@ static HostSpinBoxSetting *GuiHeight()
 
 static HostSpinBoxSetting *GuiOffsetX()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI X offset"));
 
@@ -2122,7 +2123,7 @@ static HostSpinBoxSetting *GuiOffsetX()
 
 static HostSpinBoxSetting *GuiOffsetY()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI Y offset"));
 
@@ -2197,7 +2198,7 @@ static HostSpinBoxSetting *VidModeWidth(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
-                               0, 3840, 16, true);
+                               0, 3840, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
@@ -2213,7 +2214,7 @@ static HostSpinBoxSetting *VidModeHeight(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
-                               0, 2160, 16, true);
+                               0, 2160, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
@@ -2235,7 +2236,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
                                           "watching a video."));
 
     const vector<DisplayResScreen> scr = GetVideoModes();
-    for (uint i=0; i<scr.size(); ++i)
+    for (size_t i=0; i<scr.size(); ++i)
     {
         int w = scr[i].Width(), h = scr[i].Height();
         QString sel = QString("%1x%2").arg(w).arg(h);
@@ -2243,7 +2244,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (scr.size() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
+    if (!scr.empty() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
         int w = 0, h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
@@ -2279,7 +2280,7 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     const vector<DisplayResScreen> scr = GetVideoModes();
 
-    for (uint i=0; i<scr.size(); ++i)
+    for (size_t i=0; i<scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
         gc->addSelection(sel, sel);
@@ -2298,7 +2299,7 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     int hz50 = -1, hz60 = -1;
     const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Auto"), "0");
-    for (uint i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
         QString sel = QString::number((double) list[i], 'f', 3);
         addSelection(sel + " Hz", sel, sel == previousValue);
@@ -2319,10 +2320,10 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
             setValue(hz50+1);
     }
 
-    setEnabled(list.size());
+    setEnabled(!list.empty());
 }
 
-const vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
+vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
     const QString &res)
 {
     QStringList slist = res.split("x");
@@ -3524,7 +3525,7 @@ static HostCheckBoxSetting *LCDShowMenu()
 
 static HostSpinBoxSetting *LCDPopupTime()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, 1);
 
     gs->setLabel(LcdSettings::tr("Menu pop-up time"));
 
@@ -3902,7 +3903,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
   private slots:
-    void childChanged(StandardSetting *) override; // StandardSetting
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
   private:
     StandardSetting *m_overrideExitMenu {nullptr};
     StandardSetting *m_haltCommand      {nullptr};
@@ -3910,7 +3911,6 @@ class ShutDownRebootSetting : public GroupSetting
 };
 
 ShutDownRebootSetting::ShutDownRebootSetting()
-    : GroupSetting()
 {
     setLabel(MainGeneralSettings::tr("Shutdown/Reboot Settings"));
     addChild(FrontendIdleTimeout());
@@ -3921,7 +3921,7 @@ ShutDownRebootSetting::ShutDownRebootSetting()
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting *)
+void ShutDownRebootSetting::childChanged(StandardSetting * /*setting*/)
 {
     switch (m_overrideExitMenu->getValue().toInt())
     {
@@ -4021,7 +4021,7 @@ MainGeneralSettings::MainGeneralSettings()
 }
 
 #ifdef USING_LIBCEC
-void MainGeneralSettings::cecChanged(bool)
+void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_CECPowerOnTVAllowed->boolValue())
         m_CECPowerOnTVOnStart->setEnabled(true);
@@ -4057,7 +4057,7 @@ class PlayBackScaling : public GroupSetting
     void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
   private slots:
-    void childChanged(StandardSetting *) override; // StandardSetting
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
     StandardSetting *m_VertScan  {nullptr};
@@ -4067,7 +4067,6 @@ class PlayBackScaling : public GroupSetting
 };
 
 PlayBackScaling::PlayBackScaling()
-    :GroupSetting()
 {
     setLabel(tr("Scaling"));
     addChild(m_VertScan = VertScanPercentage());
@@ -4101,7 +4100,7 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
                 .arg(m_YScan->getValue()), "value");
 }
 
-void PlayBackScaling::childChanged(StandardSetting *)
+void PlayBackScaling::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }
@@ -4446,7 +4445,7 @@ class GuiDimension : public GroupSetting
         void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
     private slots:
-        void childChanged(StandardSetting *) override; // StandardSetting
+        void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
         StandardSetting *m_width   {nullptr};
         StandardSetting *m_height  {nullptr};
@@ -4455,7 +4454,6 @@ class GuiDimension : public GroupSetting
 };
 
 GuiDimension::GuiDimension()
-    :GroupSetting()
 {
     setLabel(AppearanceSettings::tr("GUI dimension"));
     addChild(m_width   = GuiWidth());
@@ -4488,7 +4486,7 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
                       .arg(m_offsetY->getValue()), "value");
 }
 
-void GuiDimension::childChanged(StandardSetting *)
+void GuiDimension::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }
@@ -4570,8 +4568,7 @@ class ChannelCheckBoxSetting : public TransMythUICheckBoxSetting
 
 ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
         const QString &channum, const QString &channame)
-    :TransMythUICheckBoxSetting(),
-    m_channelId(chanid)
+    : m_channelId(chanid)
 {
     setLabel(QString("%1 %2").arg(channum).arg(channame));
     setHelpText(tr("Select/Unselect channels for this channel group"));
@@ -4579,8 +4576,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
-    :GroupSetting(),
-    m_groupId(groupId),
+    : m_groupId(groupId),
     m_groupName(nullptr)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
@@ -4738,7 +4734,6 @@ void ChannelGroupSetting::deleteEntry(void)
 
 
 ChannelGroupsSetting::ChannelGroupsSetting()
-    : GroupSetting()
 {
     setLabel(tr("Channel Groups"));
 }
@@ -4798,7 +4793,7 @@ void ChannelGroupsSetting::ShowNewGroupDialog()
     }
 }
 
-void ChannelGroupsSetting::CreateNewGroup(QString name)
+void ChannelGroupsSetting::CreateNewGroup(const QString& name)
 {
     ChannelGroupSetting *button = new ChannelGroupSetting(name,-1);
     button->setLabel(name);

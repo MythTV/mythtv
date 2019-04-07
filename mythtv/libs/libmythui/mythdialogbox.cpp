@@ -2,12 +2,13 @@
 #include "mythdialogbox.h"
 
 #include <QCoreApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
-#include <QDateTime>
-#include <QDate>
 #include <QTime>
+#include <utility>
 
 #include "mythlogging.h"
 #include "mythdate.h"
@@ -45,9 +46,7 @@ MythMenu::~MythMenu(void)
     {
         MythMenuItem *item = m_menuItems.takeFirst();
 
-        if (item->m_subMenu)
-            delete item->m_subMenu;
-
+        delete item->m_subMenu;
         delete item;
     }
 }
@@ -60,7 +59,7 @@ void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu
 
 void MythMenu::AddItem(const QString &title, QVariant data, MythMenu *subMenu, bool selected, bool checked)
 {
-    MythMenuItem *item = new MythMenuItem(title, data, checked, subMenu);
+    MythMenuItem *item = new MythMenuItem(title, std::move(data), checked, subMenu);
     AddItem(item, selected, subMenu);
 }
 
@@ -99,7 +98,7 @@ void MythMenu::SetSelectedByTitle(const QString& title)
     }
 }
 
-void MythMenu::SetSelectedByData(QVariant data)
+void MythMenu::SetSelectedByData(const QVariant& data)
 {
     QList<MythMenuItem*>::iterator it = m_menuItems.begin();
     for ( ; it < m_menuItems.end(); ++it)
@@ -281,13 +280,13 @@ void MythDialogBox::SetReturnEvent(QObject *retobject,
 void MythDialogBox::SetBackAction(const QString &text, QVariant data)
 {
     m_backtext = text;
-    m_backdata = data;
+    m_backdata = std::move(data);
 }
 
 void MythDialogBox::SetExitAction(const QString &text, QVariant data)
 {
     m_exittext = text;
-    m_exitdata = data;
+    m_exitdata = std::move(data);
 }
 
 void MythDialogBox::SetText(const QString &text)
@@ -300,7 +299,7 @@ void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
                               bool setCurrent)
 {
     MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
-    button->SetData(data);
+    button->SetData(std::move(data));
     button->setDrawArrow(newMenu);
 
     if (setCurrent)
@@ -409,7 +408,7 @@ bool MythDialogBox::gestureEvent(MythGestureEvent *event)
     return handled;
 }
 
-void MythDialogBox::SendEvent(int res, QString text, QVariant data)
+void MythDialogBox::SendEvent(int res, const QString& text, const QVariant& data)
 {
     if (m_currentMenu)
     {
@@ -603,7 +602,7 @@ bool WaitFor(MythConfirmationDialog *dialog)
     { block.exit(result ? 1 : 0); });
 
     // Block and return dialog result
-    return block.exec();
+    return block.exec() != 0;
 }
 
 /////////////////////////////////////////////////////////////////
@@ -721,7 +720,7 @@ void MythSpinBoxDialog::SetRange(int low, int high, int step, uint pageMultiple)
 /**
  *
  */
-void MythSpinBoxDialog::AddSelection(QString label, int value)
+void MythSpinBoxDialog::AddSelection(const QString& label, int value)
 {
     m_spinBox->AddSelection(value, label);
 }
@@ -910,7 +909,7 @@ MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
                                          QDateTime startTime,
                                          int rangeLimit)
     : MythScreenType(parent, "timepopup"),
-        m_message(message), m_startTime(startTime),
+        m_message(message), m_startTime(std::move(startTime)),
         m_resolution(resolutionFlags), m_rangeLimit(rangeLimit),
         m_dateList(nullptr), m_timeList(nullptr), m_retObject(nullptr)
 {

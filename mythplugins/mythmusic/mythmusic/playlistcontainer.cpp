@@ -4,6 +4,8 @@
 #include <compat.h>
 #include <mythlogging.h>
 
+#include <utility>
+
 // mythmusic
 #include "playlist.h"
 #include "playlistcontainer.h"
@@ -42,10 +44,8 @@ PlaylistContainer::~PlaylistContainer()
     delete m_playlistsLoader;
     m_playlistsLoader = nullptr;
 
-    if (m_activePlaylist)
-        delete m_activePlaylist;
-    if (m_streamPlaylist)
-        delete m_streamPlaylist;
+    delete m_activePlaylist;
+    delete m_streamPlaylist;
     if (m_allPlaylists)
     {
         while (!m_allPlaylists->empty())
@@ -191,7 +191,7 @@ void PlaylistContainer::createNewPlaylist(QString name)
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
-    new_list->savePlaylist(name, m_myHost);
+    new_list->savePlaylist(std::move(name), m_myHost);
 
     m_allPlaylists->push_back(new_list);
 }
@@ -202,7 +202,7 @@ void PlaylistContainer::copyNewPlaylist(QString name)
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
-    new_list->savePlaylist(name, m_myHost);
+    new_list->savePlaylist(std::move(name), m_myHost);
 
     m_allPlaylists->push_back(new_list);
     m_activePlaylist->copyTracks(new_list, false);
@@ -226,7 +226,7 @@ void PlaylistContainer::renamePlaylist(int index, QString new_name)
     Playlist *list_to_rename = getPlaylist(index);
     if (list_to_rename)
     {
-        list_to_rename->setName(new_name);
+        list_to_rename->setName(std::move(new_name));
         list_to_rename->changed();
     }
 }
@@ -279,7 +279,7 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
     return tr("Something is Wrong");
 }
 
-bool PlaylistContainer::nameIsUnique(QString a_name, int which_id)
+bool PlaylistContainer::nameIsUnique(const QString& a_name, int which_id)
 {
     if (a_name == DEFAULT_PLAYLIST_NAME)
         return false;

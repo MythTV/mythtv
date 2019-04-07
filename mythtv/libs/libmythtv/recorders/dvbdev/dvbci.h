@@ -177,6 +177,8 @@ private:
   bool CloseSession(int SessionId);
   int CloseAllSessions(int Slot);
   cLlCiHandler(int Fd, int NumSlots);
+  cLlCiHandler(const cLlCiHandler &) = delete;            // not copyable
+  cLlCiHandler &operator=(const cLlCiHandler &) = delete; // not copyable
 public:
   virtual ~cLlCiHandler();
   int NumSlots(void) override // cCiHandler

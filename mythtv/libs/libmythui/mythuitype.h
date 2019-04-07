@@ -109,7 +109,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     /// Convenience method, calls SetPosition(const MythPoint&)
     /// Override that instead to change functionality.
     void SetPosition(int x, int y);
-    virtual void SetPosition(const MythPoint &pos);
+    virtual void SetPosition(const MythPoint &point);
     virtual MythPoint GetPosition(void) const;
     virtual void SetSize(const QSize &size);
     virtual void SetMinSize(const MythPoint &size);
@@ -118,7 +118,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void AdjustMinArea(int delta_x, int delta_y,
                                int delta_w, int delta_h);
     virtual void VanishSibling(void);
-    virtual void SetMinAreaParent(MythRect actual_area, MythRect full_area,
+    virtual void SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
                                   MythUIType *child);
     virtual void SetMinArea(const MythRect & rect);
     virtual MythRect GetArea(void) const;

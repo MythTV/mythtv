@@ -185,7 +185,7 @@ class ScriptableGuide : public QObject
             )
         }
 
-        QStringList GetStoredSearches( QString Type )
+        QStringList GetStoredSearches( const QString& Type )
         {
             SCRIPT_CATCH_EXCEPTION( QStringList(),
                 return m_obj.GetStoredSearches( Type );

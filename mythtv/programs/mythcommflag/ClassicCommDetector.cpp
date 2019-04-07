@@ -83,8 +83,7 @@ static QString toStringFrameAspects(int aspect, bool verbose)
 {
     if (verbose)
         return (COMM_ASPECT_NORMAL == aspect) ? "normal" : " wide ";
-    else
-        return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
+    return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
 }
 
 static QString toStringFrameFormats(int format, bool verbose)
@@ -412,7 +411,6 @@ bool ClassicCommDetector::go()
     float flagFPS;
     long long  currentFrameNumber = 0LL;
     float aspect = m_player->GetVideoAspect();
-    float newAspect = aspect;
     int prevpercent = -1;
 
     SetVideoParams(aspect);
@@ -434,7 +432,7 @@ bool ClassicCommDetector::go()
         //when the aspect ratio changes.
         //In order to not change too many things at a time, I"m using basic
         //polling for now.
-        newAspect = currentFrame->aspect;
+        float newAspect = currentFrame->aspect;
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);
@@ -464,8 +462,8 @@ bool ClassicCommDetector::go()
 
             GetCommercialBreakList(commBreakMap);
 
-            if ((commBreakMap.size() == 0) &&
-                (m_lastSentCommBreakMap.size() == 0))
+            if ((commBreakMap.empty()) &&
+                (m_lastSentCommBreakMap.empty()))
             {
                 mapsAreIdentical = true;
             }
@@ -564,7 +562,7 @@ bool ClassicCommDetector::go()
                 m_recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(m_framesProcessed / m_fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0f / m_player->GetFrameRate() * 1000000);
+            long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, nullptr);
@@ -637,9 +635,9 @@ void ClassicCommDetector::GetCommercialBreakList(frm_dir_map_t &marks)
 
     CleanupFrameInfo();
 
-    bool blank = COMM_DETECT_BLANK & m_commDetectMethod;
-    bool scene = COMM_DETECT_SCENE & m_commDetectMethod;
-    bool logo  = COMM_DETECT_LOGO  & m_commDetectMethod;
+    bool blank = (COMM_DETECT_BLANK & m_commDetectMethod) != 0;
+    bool scene = (COMM_DETECT_SCENE & m_commDetectMethod) != 0;
+    bool logo  = (COMM_DETECT_LOGO  & m_commDetectMethod) != 0;
 
     if (COMM_DETECT_OFF == m_commDetectMethod)
         return;
@@ -722,7 +720,7 @@ void ClassicCommDetector::SetVideoParams(float aspect)
             .arg(aspect));
     // Default to Widescreen but use the same check as VideoOutput::MoveResize()
     // to determine if is normal 4:3 aspect
-    if (fabs(aspect - 1.333333f) < 0.1f)
+    if (fabs(aspect - 1.333333F) < 0.1F)
         newAspect = COMM_ASPECT_NORMAL;
 
     if (newAspect != m_currentAspect)
@@ -879,8 +877,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             if (rowMax[y] > m_commDetectBoxBrightness)
                 break;
-            else
-                topDarkRow = y;
+            topDarkRow = y;
         }
 
         for(int y = m_commDetectBorder; y < (m_height - m_commDetectBorder);
@@ -896,8 +893,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             if (colMax[x] > m_commDetectBoxBrightness)
                 break;
-            else
-                leftDarkCol = x;
+            leftDarkCol = x;
         }
 
         for(int x = m_commDetectBorder; x < (m_width - m_commDetectBorder);
@@ -1060,7 +1056,7 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
 
     frm_dir_map_t newMap;
 
-    if (a.size())
+    if (!a.empty())
     {
         frm_dir_map_t::const_iterator it = a.begin();
         for (; it != a.end(); ++it)
@@ -1176,6 +1172,23 @@ void ClassicCommDetector::UpdateFrameBlock(FrameBlock *fbp,
         fbp->aspectMatch++;
 }
 
+#define FORMAT_MSG(first, fbp)                                          \
+    msgformat.arg((first), 5)                                           \
+        .arg((int)((fbp)->start / m_fps) / 60, 3)                       \
+        .arg((int)(((fbp)->start / m_fps )) % 60, 2, QChar('0'))        \
+        .arg((fbp)->start, 6)                                           \
+        .arg((fbp)->end, 6)                                             \
+        .arg((fbp)->frames, 6)                                          \
+        .arg((fbp)->length, 7, 'f', 2)                                  \
+        .arg((fbp)->bfCount, 3)                                         \
+        .arg((fbp)->logoCount, 6)                                       \
+        .arg((fbp)->ratingCount, 6)                                     \
+        .arg((fbp)->scCount, 6)                                         \
+        .arg((fbp)->scRate, 5, 'f', 2)                                  \
+        .arg((fbp)->formatMatch, 6)                                     \
+        .arg((fbp)->aspectMatch, 6)                                     \
+        .arg((fbp)->score, 5);
+
 
 void ClassicCommDetector::BuildAllMethodsCommList(void)
 {
@@ -1183,23 +1196,18 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     FrameBlock *fblock;
     FrameBlock *fbp;
-    int value = 0;
     int curBlock = 0;
     int maxBlock = 0;
     int lastScore = 0;
-    int thisScore = 0;
-    int nextScore = 0;
     uint64_t curFrame = 0;
     int64_t  breakStart = 0;
     uint64_t lastStart = 0;
     uint64_t lastEnd = 0;
     int64_t firstLogoFrame = -1;
-    bool nextFrameIsBlank = false;
     bool lastFrameWasBlank = false;
-    uint64_t formatFrames = 0;
     int format = COMM_FORMAT_NORMAL;
-    uint64_t aspectFrames = 0;
     int aspect = COMM_ASPECT_NORMAL;
+    QString msgformat("%1 %2:%3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15");
     QString msg;
     uint64_t formatCounts[COMM_FORMAT_MAX];
     frm_dir_map_t tmpCommMap;
@@ -1227,6 +1235,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     if (m_decoderFoundAspectChanges)
     {
+        uint64_t aspectFrames = 0;
         for (int64_t i = m_preRoll;
              i < ((int64_t)m_framesProcessed - (int64_t)m_postRoll); i++)
         {
@@ -1252,6 +1261,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (frameInfo[i].format < COMM_FORMAT_MAX))
                 formatCounts[frameInfo[i].format]++;
 
+        uint64_t formatFrames = 0;
         for(int i = 0; i < COMM_FORMAT_MAX; i++)
         {
             if (formatCounts[i] > formatFrames)
@@ -1265,13 +1275,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     while (curFrame <= m_framesProcessed)
     {
-        value = frameInfo[curFrame].flagMask;
+        int value = frameInfo[curFrame].flagMask;
 
-        if (((curFrame + 1) <= m_framesProcessed) &&
-            (frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK))
-            nextFrameIsBlank = true;
-        else
-            nextFrameIsBlank = false;
+        bool nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
+            ((frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK) != 0);
 
         if (value & COMM_FRAME_BLANK)
         {
@@ -1341,14 +1348,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     {
         fbp = &fblock[curBlock];
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
-                    "%5.2f %6d %6d %5d",
-                    curBlock, (int)(fbp->start / m_fps) / 60,
-                    (int)((fbp->start / m_fps )) % 60,
-                    fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
-                    fbp->scCount, fbp->scRate, fbp->formatMatch,
-                    fbp->aspectMatch, fbp->score);
+        msg = FORMAT_MSG(curBlock, fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
         if (fbp->frames > m_fps)
@@ -1494,14 +1494,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             fbp->score -= 20;
         }
 
-        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
-                    "%5.2f %6d %6d %5d",
-                    (int)(fbp->start / m_fps) / 60,
-                    (int)((fbp->start / m_fps )) % 60,
-                    fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
-                    fbp->scCount, fbp->scRate, fbp->formatMatch,
-                    fbp->aspectMatch, fbp->score);
+        msg = FORMAT_MSG("NOW", fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
         lastScore = fbp->score;
@@ -1523,19 +1516,12 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     {
         fbp = &fblock[curBlock];
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
-                    "%5.2f %6d %6d %5d",
-                    curBlock, (int)(fbp->start / m_fps) / 60,
-                    (int)((fbp->start / m_fps )) % 60,
-                    fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
-                    fbp->scCount, fbp->scRate, fbp->formatMatch,
-                    fbp->aspectMatch, fbp->score);
+        msg = FORMAT_MSG(curBlock, fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
         if ((curBlock > 0) && (curBlock < maxBlock))
         {
-            nextScore = fblock[curBlock + 1].score;
+            int nextScore = fblock[curBlock + 1].score;
 
             if ((lastScore < 0) && (nextScore < 0) && (fbp->length < 35))
             {
@@ -1620,14 +1606,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             }
         }
 
-        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
-                    "%5.2f %6d %6d %5d",
-                    (int)(fbp->start / m_fps) / 60,
-                    (int)((fbp->start / m_fps )) % 60,
-                    fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
-                    fbp->scCount, fbp->scRate, fbp->formatMatch,
-                    fbp->aspectMatch, fbp->score);
+        msg = FORMAT_MSG("NOW", fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
         lastScore = fbp->score;
@@ -1648,7 +1627,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
-        thisScore = fbp->score;
+        int thisScore = fbp->score;
 
         if ((breakStart >= 0) &&
             ((fbp->end - breakStart) > (m_commDetectMaxCommBreakLength * m_fps)))
@@ -1798,14 +1777,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             breakStart = -1;
         }
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
-                    "%5.2f %6d %6d %5d",
-                    curBlock, (int)(fbp->start / m_fps) / 60,
-                    (int)((fbp->start / m_fps )) % 60,
-                    fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
-                    fbp->scCount, fbp->scRate, fbp->formatMatch,
-                    fbp->aspectMatch, thisScore);
+        msg = FORMAT_MSG(curBlock, fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
         // cppcheck-suppress unreadVariable
@@ -1845,10 +1817,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             uint64_t lastStartLower = it.key();
             uint64_t lastStartUpper = it.key();
             while ((lastStartLower > 0) &&
-                   (frameInfo[lastStartLower - 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastStartLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartLower--;
             while ((lastStartUpper < (m_framesProcessed - (2 * m_fps))) &&
-                   (frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartUpper++;
             uint64_t adj = (lastStartUpper - lastStartLower) / 2;
             if (adj > MAX_BLANK_FRAMES)
@@ -1866,10 +1838,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             uint64_t lastEndLower = it.key();
             uint64_t lastEndUpper = it.key();
             while ((lastEndUpper < (m_framesProcessed - (2 * m_fps))) &&
-                   (frameInfo[lastEndUpper + 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastEndUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndUpper++;
             while ((lastEndLower > 0) &&
-                   (frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK))
+                   ((frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndLower--;
             uint64_t adj = (lastEndUpper - lastEndLower) / 2;
             if (adj > MAX_BLANK_FRAMES)
@@ -2284,8 +2256,9 @@ void ClassicCommDetector::DumpMap(frm_dir_map_t &map)
         int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                            (hour * 60 * 60 * my_fps));
         int my_sec = (int)(frame / my_fps);
-        msg.sprintf("%7ld : %d (%02d:%02d:%02d.%02d) (%d)",
-                    (long)frame, flag, hour, min, sec, frm, my_sec);
+        msg = QString("%1 : %2 (%3:%4:%5.%6) (%7)")
+            .arg(frame, 7).arg(flag).arg(hour, 2, QChar('0')).arg(min, 2, QChar('0'))
+            .arg(sec, 2, QChar('0')).arg(frm, 2, QChar('0')).arg(my_sec);
         LOG(VB_COMMFLAG, LOG_INFO, msg);
     }
     LOG(VB_COMMFLAG, LOG_INFO,
@@ -2327,7 +2300,7 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
         ++it;
     }
 
-    if (map.size() == 0)
+    if (map.empty())
         return;
 
     // delete any segments less than 'length' frames in length
@@ -2442,7 +2415,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
             value = frameInfo[i].flagMask;
             frameInfo[i].flagMask = value & ~COMM_FRAME_BLANK;
 
-            if (( !(frameInfo[i].flagMask & COMM_FRAME_BLANK)) &&
+            if (( (frameInfo[i].flagMask & COMM_FRAME_BLANK) == 0) &&
                 (frameInfo[i].avgBrightness < newThreshold))
             {
                 frameInfo[i].flagMask = value | COMM_FRAME_BLANK;
@@ -2464,12 +2437,12 @@ void ClassicCommDetector::CleanupFrameInfo(void)
 
         before = 0;
         for (int offset = 1; offset <= 10; offset++)
-            if (frameInfo[i - offset].flagMask & COMM_FRAME_LOGO_PRESENT)
+            if ((frameInfo[i - offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 before++;
 
         after = 0;
         for (int offset = 1; offset <= 10; offset++)
-            if (frameInfo[i + offset].flagMask & COMM_FRAME_LOGO_PRESENT)
+            if ((frameInfo[i + offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 after++;
 
         value = frameInfo[i].flagMask;
@@ -2500,7 +2473,7 @@ void ClassicCommDetector::GetLogoCommBreakMap(show_map_t &map)
     for (uint64_t curFrame = 1 ; curFrame <= m_framesProcessed; curFrame++)
     {
         bool CurrentFrameLogo =
-            (frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT);
+            (frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT) != 0;
 
         if (!PrevFrameLogo && CurrentFrameLogo)
             map[curFrame] = MARK_START;

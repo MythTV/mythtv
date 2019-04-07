@@ -33,7 +33,7 @@ using namespace std;
 // MainVisual
 
 MainVisual::MainVisual(MythUIVideo *visualizer)
-    : QObject(nullptr), MythTV::Visual(), m_visualizerVideo(visualizer)
+    : QObject(nullptr), m_visualizerVideo(visualizer)
 {
     setObjectName("MainVisual");
 
@@ -59,8 +59,7 @@ MainVisual::~MainVisual()
     m_updateTimer->stop();
     delete m_updateTimer;
 
-    if (m_vis)
-        delete m_vis;
+    delete m_vis;
 
     while (!m_nodes.empty())
         delete m_nodes.takeLast();

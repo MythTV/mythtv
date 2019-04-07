@@ -22,7 +22,7 @@
 
 void ScanWizard::SetupConfig(
     uint    default_sourceid,  uint default_cardid,
-    QString default_inputname)
+    const QString& default_inputname)
 {
     m_videoSource = new VideoSourceSelector(
                     default_sourceid, CardUtil::GetScanableInputTypes(), false);
@@ -69,17 +69,17 @@ ServiceRequirements ScanWizard::GetServiceRequirements(void) const
 
 bool ScanWizard::DoFreeToAirOnly(void) const
 {
-    return m_ftaOnly->getValue().toInt();
+    return m_ftaOnly->boolValue();
 }
 
 bool ScanWizard::DoAddFullTS(void) const
 {
-    return m_addFullTS->getValue().toInt();
+    return m_addFullTS->boolValue();
 }
 
 bool ScanWizard::DoTestDecryption(void) const
 {
-    return m_trustEncSI->getValue().toInt();
+    return m_trustEncSI->boolValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////

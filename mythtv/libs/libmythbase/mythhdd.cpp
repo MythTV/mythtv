@@ -85,7 +85,7 @@ MythMediaStatus MythHDD::checkMedia(void)
 }
 
 //virtual
-MythMediaError MythHDD::eject(bool)
+MythMediaError MythHDD::eject(bool /*open_close*/)
 {
     setStatus(MEDIASTAT_UNPLUGGED);
     return MEDIAERR_UNSUPPORTED;

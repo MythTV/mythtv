@@ -49,9 +49,9 @@ inline uint32_t Len2Blocks(uint32_t len)
 }
 
 DVDStream::DVDStream(const QString& filename)
-: RingBuffer(kRingBuffer_File)
+    : RingBuffer(kRingBuffer_File)
 {
-    OpenFile(filename);
+    DVDStream::OpenFile(filename);
 }
 
 DVDStream::~DVDStream()
@@ -106,10 +106,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             m_rwLock.unlock();
             return false;
         }
-        else
-        {
-            m_list.append(BlockRange(0, Len2Blocks(len), 0));
-        }
+        m_list.append(BlockRange(0, Len2Blocks(len), 0));
     }
     else
     {

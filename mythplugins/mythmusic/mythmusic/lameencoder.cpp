@@ -118,14 +118,13 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
 
 LameEncoder::~LameEncoder()
 {
-    addSamples(nullptr, 0); //flush
+    LameEncoder::addSamples(nullptr, 0); //flush
 
     if (m_gf && m_out)
         lame_mp3_tags_fid (m_gf, m_out);
     if (m_gf)
         lame_close(m_gf);
-    if (m_mp3buf)
-        delete[] m_mp3buf;
+    delete[] m_mp3buf;
 
     // Need to close the file here.
     if (m_out)

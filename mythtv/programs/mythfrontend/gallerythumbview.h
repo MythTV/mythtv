@@ -47,9 +47,9 @@ private:
     void    UpdateScanProgress(const QString &, int, int);
     void    StartSlideshow(ImageSlideShowType mode);
     void    SelectZoomWidget(int change);
-    QString CheckThumbnail(MythUIButtonListItem *, ImagePtrK,
-                           ImageIdList &required, int);
-    void    UpdateThumbnail(MythUIButtonListItem *, ImagePtrK,
+    QString CheckThumbnail(MythUIButtonListItem *, const ImagePtrK&,
+                           ImageIdList &request, int);
+    void    UpdateThumbnail(MythUIButtonListItem *, const ImagePtrK&,
                             const QString &url, int);
     void    MenuMain();
     void    MenuShow(MythMenu *);
@@ -60,7 +60,7 @@ private:
     void    MenuSlideshow(MythMenu *);
     bool    DirSelectUp();
     void    DirSelectDown();
-    void    ShowDialog(QString, QString = "");
+    void    ShowDialog(const QString&, const QString& = "");
 
 private slots:
     void    LoadData(int);

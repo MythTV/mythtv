@@ -122,8 +122,8 @@ class Channel : public ChannelServices
                                                            const QString &/*UserId*/,
                                                            const QString &/*Password*/ ) override; // ChannelServices
 
-        int                       FetchChannelsFromSource( const uint SourceId,
-                                                           const uint CardId,
+        int                       FetchChannelsFromSource( uint       SourceId,
+                                                           uint       CardId,
                                                            bool       WaitForFinish ) override; // ChannelServices
 
         /* Multiplex Methods */

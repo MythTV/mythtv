@@ -82,7 +82,7 @@ FileRingBuffer::FileRingBuffer(const QString &lfilename,
     }
     else if (timeout_ms >= 0)
     {
-        OpenFile(m_filename, timeout_ms);
+        FileRingBuffer::OpenFile(m_filename, timeout_ms);
     }
 }
 
@@ -218,7 +218,6 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         do
         {
             openAttempts++;
-            lasterror = 0;
 
             m_fd2 = open(m_filename.toLocal8Bit().constData(),
                        O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
@@ -344,16 +343,14 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             dirName = m_filename.left(dirPos);
         }
 
-        QString baseName  = tmpSubName;
-        QString extension = tmpSubName;
         QStringList auxFiles;
 
         int suffixPos = tmpSubName.lastIndexOf(QChar('.'));
         if (suffixPos > 0)
         {
-            baseName = tmpSubName.left(suffixPos);
+            QString baseName = tmpSubName.left(suffixPos);
             int extnleng = tmpSubName.size() - baseName.size() - 1;
-            extension = tmpSubName.right(extnleng);
+            QString extension = tmpSubName.right(extnleng);
 
             if (is_subtitle_possible(extension))
             {
@@ -380,7 +377,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         else
         {
             QStringList aux = m_remotefile->GetAuxiliaryFiles();
-            if (aux.size())
+            if (!aux.empty())
                 m_subtitleFilename = dirName + "/" + aux[0];
         }
     }

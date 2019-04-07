@@ -74,7 +74,7 @@ DBPerson::DBPerson(const QString &role, const QString &name) :
 {
     if (!role.isEmpty())
     {
-        for (uint i = 0; i < sizeof(roles) / sizeof(char *); i++)
+        for (size_t i = 0; i < sizeof(roles) / sizeof(char *); i++)
         {
             if (role == QString(roles[i]))
                 m_role = (Role) i;
@@ -304,23 +304,21 @@ uint DBEvent::UpdateDB(
                 .arg(programs[i].m_title.left(35)));
         return UpdateDB(query, chanid, programs, i);
     }
-    else
-    {
-        // If we are here then either we have a match but the match is
-        // not good enough (the "i >= 0" case) or we did not find
-        // a match at all.
-        if (i >= 0)
-        {
-            LOG(VB_EIT, LOG_DEBUG,
-                QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
-                    .arg(i).arg(match).arg(m_title.left(35))
-                    .arg(programs[i].m_title.left(35)));
-        }
 
-        // Move the overlapping programs out of the way and
-        // insert the new program.
-        return UpdateDB(query, chanid, programs, -1);
+    // If we are here then either we have a match but the match is
+    // not good enough (the "i >= 0" case) or we did not find
+    // a match at all.
+    if (i >= 0)
+    {
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
+                .arg(i).arg(match).arg(m_title.left(35))
+                .arg(programs[i].m_title.left(35)));
     }
+
+    // Move the overlapping programs out of the way and
+    // insert the new program.
+    return UpdateDB(query, chanid, programs, -1);
 }
 
 // Get all programs in the database that overlap with our new program.
@@ -460,7 +458,7 @@ static int score_match(const QString &a, const QString &b)
 {
     if (a.isEmpty() || b.isEmpty())
         return 0;
-    else if (a == b)
+    if (a == b)
         return 1000;
 
     QString A = a.simplified().toUpper();
@@ -487,10 +485,9 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 {
     bestmatch = -1;
     int match_val = INT_MIN;
-    int overlap = 0;
     int duration = m_starttime.secsTo(m_endtime);
 
-    for (uint i = 0; i < programs.size(); i++)
+    for (size_t i = 0; i < programs.size(); i++)
     {
         int mv = 0;
         int duration_loop = programs[i].m_starttime.secsTo(programs[i].m_endtime);
@@ -504,6 +501,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 
         /* determine overlap of both programs
          * we don't know which one starts first */
+        int overlap;
         if (m_starttime < programs[i].m_starttime)
             overlap = programs[i].m_starttime.secsTo(m_endtime);
         else if (m_starttime > programs[i].m_starttime)
@@ -562,7 +560,7 @@ uint DBEvent::UpdateDB(
 {
     // Adjust/delete overlaps;
     bool ok = true;
-    for (uint i = 0; i < p.size(); i++)
+    for (size_t i = 0; i < p.size(); i++)
     {
         if (i != (uint)match)
             ok &= MoveOutOfTheWayDB(q, chanid, p[i]);
@@ -682,7 +680,7 @@ uint DBEvent::UpdateDB(
         lparttotal  = m_parttotal;
     }
 
-    bool lpreviouslyshown = m_previouslyshown | match.m_previouslyshown;
+    bool lpreviouslyshown = m_previouslyshown || match.m_previouslyshown;
 
     uint32_t llistingsource = m_listingsource | match.m_listingsource;
 
@@ -721,10 +719,10 @@ uint DBEvent::UpdateDB(
     query.bindValue(":CATTYPE",     lcattype);
     query.bindValue(":STARTTIME",   m_starttime);
     query.bindValue(":ENDTIME",     m_endtime);
-    query.bindValue(":CC",          (lsubtype & SUB_HARDHEAR) ? true : false);
-    query.bindValue(":HASSUBTITLES",(lsubtype & SUB_NORMAL)   ? true : false);
-    query.bindValue(":STEREO",      (laudio   & AUD_STEREO)   ? true : false);
-    query.bindValue(":HDTV",        (lvideo   & VID_HDTV)     ? true : false);
+    query.bindValue(":CC",          (lsubtype & SUB_HARDHEAR) != 0);
+    query.bindValue(":HASSUBTITLES",(lsubtype & SUB_NORMAL) != 0);
+    query.bindValue(":STEREO",      (laudio   & AUD_STEREO) != 0);
+    query.bindValue(":HDTV",        (lvideo   & VID_HDTV) != 0);
     query.bindValue(":SUBTYPE",     lsubtype);
     query.bindValue(":AUDIOPROP",   laudio);
     query.bindValue(":VIDEOPROP",   lvideo);
@@ -750,7 +748,7 @@ uint DBEvent::UpdateDB(
 
     if (m_credits)
     {
-        for (uint i = 0; i < m_credits->size(); i++)
+        for (size_t i = 0; i < m_credits->size(); i++)
             (*m_credits)[i].InsertDB(query, chanid, m_starttime);
     }
 
@@ -848,11 +846,7 @@ static bool program_exists(MSqlQuery &query, uint chanid, const QDateTime &st)
     {
         MythDB::DBError("program_exists", query);
     }
-    if (query.next())
-    {
-        return true;
-    }
-    return false;
+    return query.next();
 }
 
 static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
@@ -943,7 +937,7 @@ bool DBEvent::MoveOutOfTheWayDB(
                     .arg(prog.m_endtime.toString(Qt::ISODate)));
         return delete_program(query, chanid, prog.m_starttime);
     }
-    else if (prog.m_starttime < m_starttime && prog.m_endtime > m_starttime)
+    if (prog.m_starttime < m_starttime && prog.m_endtime > m_starttime)
     {
         // Old program starts before, but ends during or after our new program.
         // Adjust the end time of the old program to the start time
@@ -958,7 +952,7 @@ bool DBEvent::MoveOutOfTheWayDB(
                               prog.m_starttime, // Keep the start time
                               m_starttime);     // New end time is our start time
     }
-    else if (prog.m_starttime < m_endtime && prog.m_endtime > m_endtime)
+    if (prog.m_starttime < m_endtime && prog.m_endtime > m_endtime)
     {
         // Old program starts during, but ends after our new program.
         // Adjust the starttime of the old program to the end time
@@ -1029,10 +1023,10 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":CATTYPE",     cattype);
     query.bindValue(":STARTTIME",   m_starttime);
     query.bindValue(":ENDTIME",     m_endtime);
-    query.bindValue(":CC",          (m_subtitleType & SUB_HARDHEAR) ? true : false);
-    query.bindValue(":STEREO",      (m_audioProps   & AUD_STEREO)   ? true : false);
-    query.bindValue(":HDTV",        (m_videoProps   & VID_HDTV)     ? true : false);
-    query.bindValue(":HASSUBTITLES",(m_subtitleType & SUB_NORMAL)   ? true : false);
+    query.bindValue(":CC",          (m_subtitleType & SUB_HARDHEAR) != 0);
+    query.bindValue(":STEREO",      (m_audioProps   & AUD_STEREO) != 0);
+    query.bindValue(":HDTV",        (m_videoProps   & VID_HDTV) != 0);
+    query.bindValue(":HASSUBTITLES",(m_subtitleType & SUB_NORMAL) != 0);
     query.bindValue(":SUBTYPES",    m_subtitleType);
     query.bindValue(":AUDIOPROP",   m_audioProps);
     query.bindValue(":VIDEOPROP",   m_videoProps);
@@ -1075,7 +1069,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (m_credits)
     {
-        for (uint i = 0; i < m_credits->size(); i++)
+        for (size_t i = 0; i < m_credits->size(); i++)
             (*m_credits)[i].InsertDB(query, chanid, m_starttime);
     }
 
@@ -1192,13 +1186,13 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":STARTTIME",   m_starttime);
     query.bindValue(":ENDTIME",     denullify(m_endtime));
     query.bindValue(":CC",
-                    (m_subtitleType & SUB_HARDHEAR) ? true : false);
+                    (m_subtitleType & SUB_HARDHEAR) != 0);
     query.bindValue(":STEREO",
-                    (m_audioProps   & AUD_STEREO)   ? true : false);
+                    (m_audioProps   & AUD_STEREO) != 0);
     query.bindValue(":HDTV",
-                    (m_videoProps   & VID_HDTV)     ? true : false);
+                    (m_videoProps   & VID_HDTV) != 0);
     query.bindValue(":HASSUBTITLES",
-                    (m_subtitleType & SUB_NORMAL)   ? true : false);
+                    (m_subtitleType & SUB_NORMAL) != 0);
     query.bindValue(":SUBTYPES",    m_subtitleType);
     query.bindValue(":AUDIOPROP",   m_audioProps);
     query.bindValue(":VIDEOPROP",   m_videoProps);
@@ -1244,7 +1238,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (m_credits)
     {
-        for (uint i = 0; i < m_credits->size(); ++i)
+        for (size_t i = 0; i < m_credits->size(); ++i)
             (*m_credits)[i].InsertDB(query, chanid, m_starttime);
     }
 
@@ -1307,7 +1301,7 @@ bool ProgramData::ClearDataBySource(
     vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
 
     bool ok = true;
-    for (uint i = 0; i < chanids.size(); i++)
+    for (size_t i = 0; i < chanids.size(); i++)
         ok &= ClearDataByChannel(chanids[i], from, to, use_channel_time_offset);
 
     return ok;
@@ -1443,7 +1437,7 @@ void ProgramData::HandlePrograms(
 
         FixProgramList(sortlist);
 
-        for (uint i = 0; i < chanids.size(); ++i)
+        for (size_t i = 0; i < chanids.size(); ++i)
         {
             HandlePrograms(query, chanids[i], sortlist, unchanged, updated);
         }

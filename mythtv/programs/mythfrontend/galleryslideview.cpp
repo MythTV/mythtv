@@ -1,5 +1,7 @@
 #include "galleryslideview.h"
 
+#include <utility>
+
 #include "mythmainwindow.h"
 #include "mythuitext.h"
 #include "mythdialogbox.h"
@@ -209,7 +211,7 @@ void GallerySlideView::customEvent(QEvent *event)
     if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me      = static_cast<MythEvent *>(event);
-        QString    message = me->Message();
+        const QString&    message = me->Message();
 
         QStringList extra = me->ExtraDataList();
 
@@ -726,7 +728,7 @@ void GallerySlideView::PlayVideo()
 */
 void GallerySlideView::SetStatus(QString msg, bool delay)
 {
-    m_statusText = msg;
+    m_statusText = std::move(msg);
     if (m_uiStatus)
     {
         if (delay)

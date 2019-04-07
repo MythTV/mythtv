@@ -78,14 +78,15 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QWaitCondition>
-#include <QMutexLocker>
-#include <QRunnable>
-#include <QMutex>
 #include <QList>
-#include <QPair>
 #include <QMap>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QPair>
+#include <QRunnable>
 #include <QSet>
+#include <QWaitCondition>
+#include <utility>
 
 // MythTV headers
 #include "mthreadpool.h"
@@ -178,7 +179,7 @@ class MPoolThread : public MThread
         if (m_do_run && (m_runnable == nullptr))
         {
             m_runnable = runnable;
-            m_runnable_name = runnableName;
+            m_runnable_name = std::move(runnableName);
             m_reserved = reserved;
             m_wait.wakeAll();
             return true;
@@ -341,7 +342,7 @@ void MThreadPool::ShutdownAllPools(void)
     }
 }
 
-void MThreadPool::start(QRunnable *runnable, QString debugName, int priority)
+void MThreadPool::start(QRunnable *runnable, const QString& debugName, int priority)
 {
     QMutexLocker locker(&m_priv->m_lock);
     if (TryStartInternal(runnable, debugName, false))
@@ -377,18 +378,18 @@ void MThreadPool::startReserved(
             left = waitForAvailMS - t.elapsed();
         }
     }
-    TryStartInternal(runnable, debugName, true);
+    TryStartInternal(runnable, std::move(debugName), true);
 }
 
 
 bool MThreadPool::tryStart(QRunnable *runnable, QString debugName)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    return TryStartInternal(runnable, debugName, false);
+    return TryStartInternal(runnable, std::move(debugName), false);
 }
 
 bool MThreadPool::TryStartInternal(
-    QRunnable *runnable, QString debugName, bool reserved)
+    QRunnable *runnable, const QString& debugName, bool reserved)
 {
     if (!m_priv->m_running)
         return false;
@@ -411,14 +412,12 @@ bool MThreadPool::TryStartInternal(
         {
             return true;
         }
-        else
-        {
-            if (reserved)
-                m_priv->m_reserve_thread--;
-            thread->Shutdown();
-            m_priv->m_running_threads.remove(thread);
-            m_priv->m_delete_threads.push_front(thread);
-        }
+
+        if (reserved)
+            m_priv->m_reserve_thread--;
+        thread->Shutdown();
+        m_priv->m_running_threads.remove(thread);
+        m_priv->m_delete_threads.push_front(thread);
     }
 
     if (reserved ||
@@ -434,16 +433,14 @@ bool MThreadPool::TryStartInternal(
         {
             return true;
         }
-        else
-        {
-            // Thread failed to run, OOM?
-            // QThread will print an error, so we don't have to
-            if (reserved)
-                m_priv->m_reserve_thread--;
-            thread->Shutdown();
-            m_priv->m_running_threads.remove(thread);
-            m_priv->m_delete_threads.push_front(thread);
-        }
+
+        // Thread failed to run, OOM?
+        // QThread will print an error, so we don't have to
+        if (reserved)
+            m_priv->m_reserve_thread--;
+        thread->Shutdown();
+        m_priv->m_running_threads.remove(thread);
+        m_priv->m_delete_threads.push_front(thread);
     }
 
     return false;

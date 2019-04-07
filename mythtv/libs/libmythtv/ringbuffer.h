@@ -266,7 +266,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     volatile bool          m_recentSeek       {true}; // not protected by rwLock
     bool                   m_setSwitchToNext  {false};
     uint                   m_rawBitrate       {8000};
-    float                  m_playSpeed        {1.0f};
+    float                  m_playSpeed        {1.0F};
     int                    m_fillThreshold    {65536};
     int                    m_fillMin          {-1};
     int                    m_readBlockSize    {CHUNK};

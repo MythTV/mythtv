@@ -36,8 +36,8 @@ class UPNP_PUBLIC Xsd : public QDomDocument
     protected:
 
         QString     ReadPropertyMetadata ( QObject *pObject, 
-                                           QString  sPropName, 
-                                           QString  sKey );
+                                           const QString&  sPropName,
+                                           const QString&  sKey );
                                          
         bool        RenderXSD            ( HTTPRequest *pRequest,
                                            QObject     *pClass );
@@ -62,7 +62,7 @@ class UPNP_PUBLIC Xsd : public QDomDocument
     public:
 
         bool GetXSD    ( HTTPRequest *pRequest, QString sTypeName );
-        bool GetEnumXSD( HTTPRequest *pRequest, QString sEnumName );
+        bool GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName );
 
         static QString ConvertTypeToXSD( const QString &sType, bool bCustomType = false );
 };

@@ -14,7 +14,7 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     AvFormatDecoderDVD(MythPlayer *parent, const ProgramInfo &pginfo,
                        PlayerFlags flags)
         : AvFormatDecoder(parent, pginfo, flags) {}
-    virtual ~AvFormatDecoderDVD();
+    ~AvFormatDecoderDVD() override;
     void Reset(bool reset_video_data, bool seek_reset, bool reset_file) override; // AvFormatDecoder
     void UpdateFramesPlayed(void) override; // AvFormatDecoder
     bool GetFrame(DecodeType Type, bool &Retry) override; // AvFormatDecoder

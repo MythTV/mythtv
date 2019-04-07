@@ -29,7 +29,7 @@ const GameTypes GameTypeList[MAX_GAME_TYPES] =
     { QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
 };
 
-const QString GetGameTypeName(const QString &GameType)
+QString GetGameTypeName(const QString &GameType)
 {
     QString result = "";
 
@@ -44,7 +44,7 @@ const QString GetGameTypeName(const QString &GameType)
     return result;
 }
 
-const QString GetGameTypeExtensions(const QString &GameType)
+QString GetGameTypeExtensions(const QString &GameType)
 {
     QString result = "";
 
@@ -222,7 +222,7 @@ protected:
 /// Base for Game textual settings
 struct TextEdit : public MythUITextEditSetting
 {
-    explicit TextEdit(const PlayerId &parent, QString column) :
+    explicit TextEdit(const PlayerId &parent, const QString& column) :
         MythUITextEditSetting(new GameDBStorage(this, parent, column))
     {}
 };
@@ -315,9 +315,8 @@ struct AllowMultipleRoms : public MythUICheckBoxSetting
 };
 
 /// Settings for a game player
-GamePlayerSetting::GamePlayerSetting(QString name, uint id)
-    : GroupSetting()
-    , m_id(id)
+GamePlayerSetting::GamePlayerSetting(const QString& name, uint id)
+    : m_id(id)
 {
     setName(name);
 
@@ -355,7 +354,7 @@ void GamePlayerSetting::deleteEntry()
 
 // -----------------------------------------------------------------------
 
-GamePlayersList::GamePlayersList() : GroupSetting()
+GamePlayersList::GamePlayersList()
 {
     setLabel(tr("Game Players"));
 }
@@ -411,7 +410,7 @@ void GamePlayersList::NewPlayerDialog()
         delete nameDialog;
 }
 
-void GamePlayersList::CreateNewPlayer(QString name)
+void GamePlayersList::CreateNewPlayer(const QString& name)
 {
     if (name.isEmpty())
         return;

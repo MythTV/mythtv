@@ -40,6 +40,9 @@ class DarwinFirewireDevice : public FirewireDevice
     static vector<AVCInfo> GetSTBList(void);
 
   private:
+    DarwinFirewireDevice(const DarwinFirewireDevice &) = delete;            // not copyable
+    DarwinFirewireDevice &operator=(const DarwinFirewireDevice &) = delete; // not copyable
+
     void StartController(void);
     void StopController(void);
 

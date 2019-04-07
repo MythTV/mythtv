@@ -15,12 +15,12 @@
 //#define F2I(dbl,i) 
 //{double d = dbl + _double2fixmagic; i = ((int*)&d)[iman_] >> _shiftamt; }
 //#else
-#define F2I(dbl,i) i=(int)dbl;
+#define F2I(dbl,i) i=(int)(dbl);
 //#endif
 
 #if 0
 #define SINCOS(f,s,c) \
   __asm__ __volatile__ ("fsincos" : "=t" (c), "=u" (s) : "0" (f))
 #else
-#define SINCOS(f,s,c) {s=sin(f);c=cos(f);}
+#define SINCOS(f,s,c) {(s)=sinf(f);(c)=cosf(f);}
 #endif

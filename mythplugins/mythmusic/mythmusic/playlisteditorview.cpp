@@ -104,8 +104,7 @@ PlaylistEditorView::~PlaylistEditorView()
         delete m_deleteList.at(x);
     m_deleteList.clear();
 
-    if (m_rootNode)
-        delete m_rootNode;
+    delete m_rootNode;
 }
 
 bool PlaylistEditorView::Create(void)
@@ -513,11 +512,11 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                             m_mainvisual->prepare();
                             m_mainvisual->mutex()->unlock();
                         }
-                     }
-                     else
-                     {
-                         handled = false;
-                     }
+                    }
+                    else
+                    {
+                        handled = false;
+                    }
                  }
              }
         }
@@ -1429,6 +1428,8 @@ void PlaylistEditorView::getSmartPlaylistCategories(MusicGenericTree *node)
         {
             while (query.next())
             {
+                // No memory leak. MusicGenericTree adds the new node
+                // into a list of nodes maintained by its parent.
                 MusicGenericTree *newnode =
                     new MusicGenericTree(node, query.value(1).toString(), "smartplaylistcategory");
                 newnode->setInt(query.value(0).toInt());
@@ -1455,6 +1456,8 @@ void PlaylistEditorView::getSmartPlaylists(MusicGenericTree *node)
         {
             while (query.next())
             {
+                // No memory leak. MusicGenericTree adds the new node
+                // into a list of nodes maintained by its parent.
                 MusicGenericTree *newnode =
                     new MusicGenericTree(node, query.value(1).toString(), "smartplaylist");
                 newnode->setInt(query.value(0).toInt());
@@ -1586,6 +1589,8 @@ void PlaylistEditorView::getPlaylists(MusicGenericTree *node)
     for (int x =0; x < playlists->count(); x++)
     {
         Playlist *playlist = playlists->at(x);
+        // No memory leak. MusicGenericTree adds the new node
+        // into a list of nodes maintained by its parent.
         MusicGenericTree *newnode =
                 new MusicGenericTree(node, playlist->getName(), "playlist");
         newnode->setInt(playlist->getID());

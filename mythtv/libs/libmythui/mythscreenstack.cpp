@@ -31,7 +31,7 @@ MythScreenStack::~MythScreenStack()
     while (!m_Children.isEmpty())
     {
         MythScreenType *child = m_Children.back();
-        PopScreen(child, false, true); // Don't fade, do delete
+        MythScreenStack::PopScreen(child, false, true); // Don't fade, do delete
     }
 }
 
@@ -133,7 +133,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
     m_topScreen = nullptr;
 
-    RecalculateDrawOrder();
+    MythScreenStack::RecalculateDrawOrder();
 
     // If we're fading it, we still want to draw it.
     if (screen && !m_DrawOrder.contains(screen))
@@ -381,11 +381,9 @@ QString MythScreenStack::GetLocation(bool fullPath) const
         }
         return path;
     }
-    else
-    {
-        if (m_topScreen)
-            return m_topScreen->objectName();
-    }
+
+    if (m_topScreen)
+        return m_topScreen->objectName();
 
     return QString();
 }

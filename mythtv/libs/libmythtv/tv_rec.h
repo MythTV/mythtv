@@ -111,7 +111,7 @@ class TuningRequest
     TuningRequest(uint f, RecordingInfo *p) :
         flags(f), program(p),
         majorChan(0), minorChan(0), progNum(-1) {;}
-    TuningRequest(uint f, QString ch, QString in = QString()) :
+    TuningRequest(uint f, const QString& ch, const QString& in = QString()) :
         flags(f), program(nullptr), channel(ch),
         input(in), majorChan(0), minorChan(0), progNum(-1) {;}
 
@@ -161,7 +161,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
-    RecStatus::Type StartRecording(ProgramInfo *rcinfo);
+    RecStatus::Type StartRecording(ProgramInfo *pginfo);
     RecStatus::Type GetRecordingStatus(void) const;
 
     void StopRecording(bool killFile = false);
@@ -202,7 +202,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
-    void ToggleChannelFavorite(QString);
+    void ToggleChannelFavorite(const QString&);
 
     void SetLiveRecording(int recording);
 
@@ -213,29 +213,29 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
         { SetChannel(QString("NextChannel %1").arg((int)dir)); }
-    void SetChannel(QString name, uint requestType = kFlagDetect);
+    void SetChannel(const QString& name, uint requestType = kFlagDetect);
     bool QueueEITChannelChange(const QString &name);
 
     int SetSignalMonitoringRate(int rate, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
-    bool CheckChannel(QString name) const;
-    bool ShouldSwitchToAnotherInput(QString chanid);
+    bool CheckChannel(const QString& name) const;
+    bool ShouldSwitchToAnotherInput(const QString& chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
                         QString &desc,        QString &category,
                         QString &starttime,   QString &endtime,
                         QString &callsign,    QString &iconpath,
-                        QString &channelname, uint    &chanid,
+                        QString &channum,     uint    &chanid,
                         QString &seriesid,    QString &programid);
     bool GetChannelInfo(uint &chanid, uint &sourceid,
                         QString &callsign, QString &channum,
                         QString &channame, QString &xmltvid) const;
-    bool SetChannelInfo(uint chanid, uint sourceid, QString oldchannum,
-                        QString callsign, QString channum,
-                        QString channame, QString xmltvid);
+    bool SetChannelInfo(uint chanid, uint sourceid, const QString& oldchannum,
+                        const QString& callsign, const QString& channum,
+                        const QString& channame, const QString& xmltvid);
 
     /// \brief Returns the inputid
     uint GetInputId(void) { return m_inputid; }
@@ -270,7 +270,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     static bool GetDevices(uint inputid,
                            uint &parentid,
-                           GeneralDBOptions   &general_opts,
+                           GeneralDBOptions   &gen_opts,
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
@@ -279,7 +279,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);
 
-    bool CreateChannel(const QString &startChanNum,
+    bool CreateChannel(const QString &startchannel,
                        bool enter_power_save_mode);
     void CloseChannel(void);
     DTVChannel *GetDTVChannel(void);

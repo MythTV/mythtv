@@ -45,7 +45,7 @@ class InputSelector : public TransMythUIComboBoxSetting
 
     QString GetInputName(void) const;
 
-    static bool Parse(const QString &cardids_inputname,
+    static bool Parse(const QString &cardid_inputname,
                       uint          &cardid,
                       QString       &inputname);
 

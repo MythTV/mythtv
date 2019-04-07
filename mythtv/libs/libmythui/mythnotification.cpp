@@ -76,7 +76,7 @@ bool MythNotification::FromStringList(void)
             .arg(type).arg(Type()));
         return false;
     }
-    m_fullScreen  = (*Istr++).toInt();
+    m_fullScreen  = ((*Istr++).toInt() != 0);
     m_description = *Istr++;
     m_duration    = (*Istr++).toInt();
     m_style       = *Istr++;
@@ -128,20 +128,17 @@ MythNotification::Type MythNotification::TypeFromString(const QString &type)
     {
         return MythNotification::Error;
     }
-    else if (type == "warning")
+    if (type == "warning")
     {
         return MythNotification::Warning;
     }
-    else if (type == "check")
+    if (type == "check")
     {
         return MythNotification::Check;
     }
-    else if (type == "busy")
+    if (type == "busy")
     {
         return MythNotification::Busy;
     }
-    else
-    {
-        return MythNotification::New;
-    }
+    return MythNotification::New;
 }

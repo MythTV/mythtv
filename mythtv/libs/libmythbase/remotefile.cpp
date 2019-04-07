@@ -69,11 +69,11 @@ static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlis
     return ok;
 }
 
-RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
-                       int _timeout_ms,
+RemoteFile::RemoteFile(const QString &url, bool write, bool usereadahead,
+                       int timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
-    m_path(_path),
-    m_usereadahead(useRA),  m_timeout_ms(_timeout_ms),
+    m_path(url),
+    m_usereadahead(usereadahead),  m_timeout_ms(timeout_ms),
     m_writemode(write)
 {
     if (m_writemode)
@@ -337,7 +337,7 @@ bool RemoteFile::OpenInternal()
     return true;
 }
 
-bool RemoteFile::ReOpen(QString newFilename)
+bool RemoteFile::ReOpen(const QString& newFilename)
 {
     if (isLocal())
     {
@@ -367,7 +367,7 @@ bool RemoteFile::ReOpen(QString newFilename)
 
     bool retval = false;
     if (!strlist.isEmpty())
-        retval = strlist[0].toInt();
+        retval = (strlist[0].toInt() != 0);
 
     return retval;
 }
@@ -827,11 +827,7 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         m_sock->Reset();
         return strlist[0].toLongLong();
     }
-    else
-    {
-        m_lastposition = 0LL;
-    }
-
+    m_lastposition = 0LL;
     return -1;
 }
 
@@ -1075,7 +1071,6 @@ int RemoteFile::Read(void *data, int size)
         if (!Resume())
         {
             LOG(VB_GENERAL, LOG_WARNING, "RemoteFile::Read(): Resume failed.");
-            sent = -1;
         }
         else
             LOG(VB_GENERAL, LOG_NOTICE, "RemoteFile::Read(): Resume success.");
@@ -1162,7 +1157,7 @@ long long RemoteFile::GetRealFileSize(void)
         {
             if (strlist.count() >= 2)
             {
-                m_completed = strlist[1].toInt();
+                m_completed = (strlist[1].toInt() != 0);
             }
             m_filesize = size;
         }
@@ -1207,6 +1202,13 @@ void RemoteFile::SetTimeout(bool fast)
 
     QMutexLocker locker(&m_lock);
 
+    // The m_controlSock variable is valid if the CheckConnection
+    // function returns true.  The local case has already been
+    // handled.  The CheckConnection function can call Resume which
+    // calls Close, which deletes m_controlSock.  However, the
+    // subsequent call to OpenInternal is guaranteed to recreate the
+    // socket or return false for a non-local connection, an this must
+    // be a non-local connection if this line of code is executed.
     if (!CheckConnection())
     {
         LOG(VB_NETWORK, LOG_ERR,
@@ -1370,7 +1372,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
 
         if (gCoreContext->SendReceiveStringList(strList))
         {
-            if (strList.size() > 0 && !strList[0].isEmpty() &&
+            if (!strList.empty() && !strList[0].isEmpty() &&
                 strList[0] != "NOT FOUND" && !strList[0].startsWith("ERROR: "))
                 return strList;
         }

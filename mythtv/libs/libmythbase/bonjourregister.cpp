@@ -18,8 +18,11 @@ BonjourRegister::BonjourRegister(QObject *parent)
 
 BonjourRegister::~BonjourRegister()
 {
-    if (m_socket)
+    if (m_socket) {
         m_socket->setEnabled(false);
+        m_socket->deleteLater();
+        m_socket = nullptr;
+    }
 
     if (m_dnssref)
     {
@@ -30,8 +33,6 @@ BonjourRegister::~BonjourRegister()
     }
     m_dnssref = nullptr;
 
-    m_socket->deleteLater();
-    m_socket = nullptr;
     delete m_lock;
     m_lock = nullptr;
 }

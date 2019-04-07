@@ -123,7 +123,7 @@ class MPEG2fixup
                void (*update_func)(float) = nullptr, int (*check_func)() = nullptr);
     ~MPEG2fixup();
     int Start();
-    void AddRangeList(QStringList cutlist, int type);
+    void AddRangeList(QStringList rangelist, int type);
     void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
     int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
@@ -141,18 +141,18 @@ class MPEG2fixup
     MPEG2replex m_rx;
 
   private:
-    int FindMPEG2Header(uint8_t *buf, int size, uint8_t code);
+    int FindMPEG2Header(const uint8_t *buf, int size, uint8_t code);
     void InitReplex();
     void FrameInfo(MPEG2frame *f);
     int AddFrame(MPEG2frame *f);
-    bool InitAV(QString inputfile, const char *type, int64_t offset);
+    bool InitAV(const QString& inputfile, const char *type, int64_t offset);
     void ScanAudio();
     int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
     void WriteFrame(QString filename, MPEG2frame *f);
-    void WriteFrame(QString filename, AVPacket *pkt);
-    void WriteYUV(QString filename, const mpeg2_info_t *info);
-    void WriteData(QString filename, uint8_t *data, int size);
-    bool BuildFrame(AVPacket *pkt, QString fname);
+    void WriteFrame(const QString& filename, AVPacket *pkt);
+    void WriteYUV(const QString& filename, const mpeg2_info_t *info);
+    void WriteData(const QString& filename, uint8_t *data, int size);
+    bool BuildFrame(AVPacket *pkt, const QString& fname);
     MPEG2frame *GetPoolFrame(AVPacket *pkt);
     MPEG2frame *GetPoolFrame(MPEG2frame *f);
     int GetFrame(AVPacket *pkt);
@@ -160,7 +160,7 @@ class MPEG2fixup
     void SetRepeat(MPEG2frame *vf, int nb_fields, bool topff);
     void SetRepeat(uint8_t *ptr, int size, int fields, bool topff);
     MPEG2frame *FindFrameNum(int frameNum);
-    void RenumberFrames(int frame_pos, int delta);
+    void RenumberFrames(int start_pos, int delta);
     void StoreSecondary();
     int  PlaybackSecondary();
     MPEG2frame *DecodeToFrame(int frameNum, int skip_reset);
@@ -238,7 +238,7 @@ class MPEG2fixup
     int64_t         m_ptsIncrement;
     bool            m_mkvfile;
 
-    int             m_discard       {0};
+    bool            m_discard       {false};
     //control options
     int             m_no_repeat, m_fix_PTS, m_maxframes;
     QString         m_infile;

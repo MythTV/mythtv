@@ -14,7 +14,7 @@
 
 #define LOC      QString("ThemeInfo: ")
 
-ThemeInfo::ThemeInfo(QString theme)
+ThemeInfo::ThemeInfo(const QString& theme)
           :XMLParseBase()
 {
     QString themeNoTrailingSlash = theme;
@@ -242,10 +242,7 @@ bool ThemeInfo::parseThemeInfo()
 
 bool ThemeInfo::IsWide() const
 {
-    if (m_aspect == "16:9" || m_aspect == "16:10")
-        return true;
-
-    return false;
+    return m_aspect == "16:9" || m_aspect == "16:10";
 }
 
 void ThemeInfo::ToMap(InfoMap &infoMap) const

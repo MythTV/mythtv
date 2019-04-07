@@ -13,11 +13,11 @@
 #include "channelutil.h"
 #include "mythdbcon.h"
 
-#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(CetonChannel::GetDevice())
 
 CetonChannel::~CetonChannel(void)
 {
-    Close();
+    CetonChannel::Close();
 }
 
 bool CetonChannel::Open(void)
@@ -45,7 +45,7 @@ void CetonChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing Ceton channel");
 
-    if (!IsOpen())
+    if (!CetonChannel::IsOpen())
         return; // this caller didn't have it open in the first place..
 
     CetonStreamHandler::Return(m_stream_handler, GetInputID());
@@ -55,8 +55,7 @@ bool CetonChannel::EnterPowerSavingMode(void)
 {
     if (IsOpen())
         return m_stream_handler->EnterPowerSavingMode();
-    else
-        return true;
+    return true;
 }
 
 bool CetonChannel::IsOpen(void) const
@@ -74,10 +73,10 @@ static QString format_modulation(const DTVMultiplex &tuning)
 {
     if (DTVModulation::kModulationQAM256 == tuning.m_modulation)
         return "qam_256";
-    else if (DTVModulation::kModulationQAM64 == tuning.m_modulation)
+    if (DTVModulation::kModulationQAM64 == tuning.m_modulation)
         return "qam_64";
     //note...ceton also supports NTSC-M, but not sure what to use that for
-    else if (DTVModulation::kModulation8VSB == tuning.m_modulation)
+    if (DTVModulation::kModulation8VSB == tuning.m_modulation)
         return "8vsb";
 
     return "unknown";

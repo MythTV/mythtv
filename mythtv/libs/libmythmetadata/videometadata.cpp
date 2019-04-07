@@ -410,7 +410,7 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
 
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList contents = d.entryInfoList();
-    if (!contents.size())
+    if (contents.empty())
     {
         return d.rmdir(dirName);
     }
@@ -561,8 +561,8 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     m_userrating = (float)query.value(7).toDouble();
     if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
-    if (m_userrating > 10.0f)
-        m_userrating = 10.0f;
+    if (m_userrating > 10.0F)
+        m_userrating = 10.0F;
     m_length = query.value(8).toInt();
     m_playcount = query.value(9).toInt();
     m_filename = query.value(10).toString();
@@ -643,7 +643,7 @@ void VideoMetadataImp::saveToDatabase()
         m_inetref = VIDEO_INETREF_DEFAULT;
     if (isnan(m_userrating))
         m_userrating = 0.0;
-    if (m_userrating < -10.0f || m_userrating > 10.0f)
+    if (m_userrating < -10.0F || m_userrating > 10.0F)
         m_userrating = 0.0;
     if (m_releasedate.toString().isEmpty())
         m_releasedate = QDate::fromString("0000-00-00", "YYYY-MM-DD");
@@ -827,7 +827,7 @@ void VideoMetadataImp::updateGenres()
     genre_list::iterator genre = m_genres.begin();
     while (genre != m_genres.end())
     {
-        if (genre->second.trimmed().length())
+        if (!genre->second.trimmed().isEmpty())
         {
             genre->first = VideoGenre::getGenre().add(genre->second);
             VideoGenreMap::getGenreMap().add(m_id, genre->first);
@@ -848,7 +848,7 @@ void VideoMetadataImp::updateCountries()
     country_list::iterator country = m_countries.begin();
     while (country != m_countries.end())
     {
-        if (country->second.trimmed().length())
+        if (!country->second.trimmed().isEmpty())
         {
             country->first = VideoCountry::getCountry().add(country->second);
             VideoCountryMap::getCountryMap().add(m_id, country->first);
@@ -869,7 +869,7 @@ void VideoMetadataImp::updateCast()
     cast_list::iterator cast = m_cast.begin();
     while (cast != m_cast.end())
     {
-        if (cast->second.trimmed().length())
+        if (!cast->second.trimmed().isEmpty())
         {
             cast->first = VideoCast::GetCast().add(cast->second);
             VideoCastMap::getCastMap().add(m_id, cast->first);
@@ -1131,11 +1131,11 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
         // Return requested value
         if (position == 1 && !title.isEmpty())
             return title.trimmed();
-        else if (position == 2)
+        if (position == 2)
             return season.trimmed();
-        else if (position == 3)
+        if (position == 3)
             return episode.trimmed();
-        else if (position == 4)
+        if (position == 4)
             return subtitle.trimmed();
     }
     else if (position == 1)
@@ -1810,14 +1810,10 @@ bool VideoMetadata::sortBefore(const VideoMetadata &rhs) const
 
 bool operator==(const VideoMetadata& a, const VideoMetadata& b)
 {
-    if (a.GetFilename() == b.GetFilename())
-        return true;
-    return false;
+    return a.GetFilename() == b.GetFilename();
 }
 
 bool operator!=(const VideoMetadata& a, const VideoMetadata& b)
 {
-    if (a.GetFilename() != b.GetFilename())
-        return true;
-    return false;
+    return a.GetFilename() != b.GetFilename();
 }

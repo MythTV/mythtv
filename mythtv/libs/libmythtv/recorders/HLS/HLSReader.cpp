@@ -820,11 +820,9 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
             m_seq_lock.unlock();
             return false;
         }
-        else
-        {
-            m_cur_seq = m_segments.front().Sequence();
-            m_segments.pop_front();
-        }
+
+        m_cur_seq = m_segments.front().Sequence();
+        m_segments.pop_front();
 
         m_seq_lock.unlock();
 
@@ -865,7 +863,7 @@ uint HLSReader::PercentBuffered(void) const
     if (m_playlist_size == 0 || m_segments.size() > m_playlist_size)
         return 0;
     return (static_cast<float>(m_playlist_size - m_segments.size()) /
-            static_cast<float>(m_playlist_size)) * 100.0f;
+            static_cast<float>(m_playlist_size)) * 100.0F;
 }
 
 int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,

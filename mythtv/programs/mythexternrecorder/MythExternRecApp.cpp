@@ -33,8 +33,7 @@ MythExternRecApp::MythExternRecApp(const QString & command,
                                    const QString & conf_file,
                                    const QString & log_file,
                                    const QString & logging)
-    : QObject()
-    , m_fatal(false)
+    : m_fatal(false)
     , m_run(true)
     , m_streaming(false)
     , m_result(0)
@@ -292,7 +291,7 @@ Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
 
 void MythExternRecApp::GetChannel(const QString & serial, const QString & func)
 {
-    if (m_channels_ini.isEmpty() || m_channels.size() == 0)
+    if (m_channels_ini.isEmpty() || m_channels.empty())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
         emit SendMessage("FirstChannel", serial,

@@ -335,7 +335,7 @@ void Frontend::InitialiseActions(void)
 bool Frontend::SendKey(const QString &sKey)
 {
     int keyCode;
-    int ret = false;
+    bool ret = false;
     QObject *keyDest = nullptr;
     QKeyEvent *event = nullptr;
     QMap <QString, int> keyMap;
@@ -430,7 +430,7 @@ bool Frontend::SendKey(const QString &sKey)
     }
     else if (sKey.size() == 1)
         {
-            keyCode = (int) sKey.toLatin1().data()[0] & 0x7f;
+            keyCode = (int) sKey.toLatin1()[0] & 0x7f;
             ret = true;
         }
     else

@@ -452,7 +452,7 @@ int cCiTransportConnection::RecvTPDU(void)
      switch (m_state) {
        case stIDLE:     break;
        case stCREATION: if (m_tpdu->Tag() == T_CTC_REPLY) {
-                           m_dataAvailable = m_tpdu->Status() & DATA_INDICATOR;
+                           m_dataAvailable = ((m_tpdu->Status() & DATA_INDICATOR) != 0);
                            m_state = stACTIVE;
                            m_lastResponse = m_tpdu->Tag();
                            }
@@ -468,7 +468,7 @@ int cCiTransportConnection::RecvTPDU(void)
                                              break;
                           default: return ERROR;
                           }
-                        m_dataAvailable = m_tpdu->Status() & DATA_INDICATOR;
+                        m_dataAvailable = ((m_tpdu->Status() & DATA_INDICATOR) != 0);
                         m_lastResponse = m_tpdu->Tag();
                         break;
        case stDELETION: if (m_tpdu->Tag() == T_DTC_REPLY) {
@@ -526,19 +526,19 @@ int cCiTransportConnection::CreateConnection(void)
            _connected=true;
            return OK;
         // the following is a workaround for CAMs that don't quite follow the specs...
-        } else {
-           for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
-               dsyslog("CAM: retrying to establish connection");
-               if (RecvTPDU() == T_CTC_REPLY) {
-                  dsyslog("CAM: connection established");
-                  _connected=true;
-                  return OK;
-                  }
-               }
-           return ERROR;
-           }
         }
+
+        for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
+            dsyslog("CAM: retrying to establish connection");
+            if (RecvTPDU() == T_CTC_REPLY) {
+                dsyslog("CAM: connection established");
+                _connected=true;
+                return OK;
+            }
+        }
+        return ERROR;
      }
+  }
   return ERROR;
 }
 
@@ -614,8 +614,7 @@ bool cCiTransportLayer::ResetSlot(int Slot)
      dbgprotocol("ok.\n");
      return true;
      }
-  else
-     esyslog("ERROR: can't reset CAM slot %d: %m", Slot);
+  esyslog("ERROR: can't reset CAM slot %d: %m", Slot);
   dbgprotocol("failed!\n");
   return false;
 }
@@ -625,9 +624,8 @@ bool cCiTransportLayer::ModuleReady(int Slot)
   ca_slot_info_t sinfo;
   sinfo.num = Slot;
   if (ioctl(m_fd, CA_GET_SLOT_INFO, &sinfo) != -1)
-     return sinfo.flags & CA_CI_MODULE_READY;
-  else
-     esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
+     return (sinfo.flags & CA_CI_MODULE_READY) != 0U;
+  esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
   return false;
 }
 
@@ -758,7 +756,7 @@ protected:
   int SendData(int Tag, int Length = 0, const uint8_t *Data = nullptr);
 public:
   cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc);
-  virtual ~cCiSession();
+  virtual ~cCiSession() = default;
   const cCiTransportConnection *Tc(void) { return m_tc; }
   int SessionId(void) { return sessionId; }
   int ResourceId(void) { return resourceId; }
@@ -771,10 +769,6 @@ cCiSession::cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc
   sessionId = SessionId;
   resourceId = ResourceId;
   m_tc = Tc;
-}
-
-cCiSession::~cCiSession()
-{
 }
 
 int cCiSession::GetTag(int &Length, const uint8_t **Data)
@@ -920,7 +914,7 @@ private:
   char *menuString;
 public:
   cCiApplicationInformation(int SessionId, cCiTransportConnection *Tc);
-  virtual ~cCiApplicationInformation();
+  ~cCiApplicationInformation() override;
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   bool EnterMenu(void);
   char *GetApplicationString() { return strdup(menuString); };
@@ -1217,7 +1211,7 @@ private:
   cCiEnquiry *enquiry;
 public:
   cCiMMI(int SessionId, cCiTransportConnection *Tc);
-  virtual ~cCiMMI();
+  ~cCiMMI() override;
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   bool HasUserIO(void) override { return menu || enquiry; } // cCiSession
   cCiMenu *Menu(void);
@@ -1255,8 +1249,7 @@ char *cCiMMI::GetText(int &Length, const uint8_t **Data)
      dbgprotocol("%d: <== Text Last '%s'\n", SessionId(), s);
      return s;
      }
-  else
-     esyslog("CI MMI: unexpected text tag: %06X", Tag);
+  esyslog("CI MMI: unexpected text tag: %06X", Tag);
   return nullptr;
 }
 
@@ -1323,7 +1316,7 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                uint8_t blind = *d++;
                //XXX GetByte()???
                l--;
-               enquiry->m_blind = blind & EF_BLIND;
+               enquiry->m_blind = ((blind & EF_BLIND) != 0);
                enquiry->m_expectedLength = *d++;
                l--;
                // I really wonder why there is no text length field here...
@@ -1581,11 +1574,10 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
             {
                 if (Caps.slot_type & CA_CI_LINK)
                     return new cLlCiHandler(fd_ca, NumSlots);
-                else if (Caps.slot_type & CA_CI)
+                if (Caps.slot_type & CA_CI)
                     return new cHlCiHandler(fd_ca, NumSlots);
-                else
-                    isyslog("CAM doesn't support either high or low level CI,"
-                            " Caps.slot_type=%i", Caps.slot_type);
+                isyslog("CAM doesn't support either high or low level CI,"
+                        " Caps.slot_type=%i", Caps.slot_type);
             }
             else
                 esyslog("ERROR: no CAM slots found");
@@ -1698,10 +1690,9 @@ bool cLlCiHandler::CloseSession(int SessionId)
      Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_OK);
      return true;
      }
-  else {
-     esyslog("ERROR: unknown session id: %d", SessionId);
-     Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_NOT_ALLOCATED);
-     }
+
+  esyslog("ERROR: unknown session id: %d", SessionId);
+  Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_NOT_ALLOCATED);
   return false;
 }
 
@@ -1959,7 +1950,7 @@ bool cHlCiHandler::Process(void)
     return result;
 }
 
-bool cHlCiHandler::EnterMenu(int)
+bool cHlCiHandler::EnterMenu(int /*Slot*/)
 {
     return false;
 }
@@ -1974,12 +1965,12 @@ cCiEnquiry *cHlCiHandler::GetEnquiry(void)
     return nullptr;
 }
 
-const unsigned short *cHlCiHandler::GetCaSystemIds(int)
+const unsigned short *cHlCiHandler::GetCaSystemIds(int /*Slot*/)
 {
     return m_caSystemIds;
 }
 
-bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
+bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
 {
     cMutexLock MutexLock(&m_mutex);
     struct ca_msg msg;
@@ -2005,7 +1996,7 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
     return true;
 }
 
-bool cHlCiHandler::Reset(int)
+bool cHlCiHandler::Reset(int /*Slot*/)
 {
     if ((ioctl(m_fdCa, CA_RESET)) < 0) {
         esyslog("ioctl CA_RESET failed.");
@@ -2016,8 +2007,5 @@ bool cHlCiHandler::Reset(int)
 
 bool cHlCiHandler::NeedCaPmt(void)
 {
-    if(m_state == 1)
-        return true;
-
-    return false;
+    return m_state == 1;
 }

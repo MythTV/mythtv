@@ -85,14 +85,14 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
      *            some indexing.  A token isn't required, but is strongly
      *            suggested.
      */
-    static void GetPreviewImage(const ProgramInfo &pginfo, QString token)
+    static void GetPreviewImage(const ProgramInfo &pginfo, const QString& token)
     {
         GetPreviewImage(pginfo, QSize(0,0), "", -1, true, token);
     }
     static void GetPreviewImage(const ProgramInfo&, const QSize&,
                                 const QString &outputfile,
                                 long long time, bool in_seconds,
-                                QString token);
+                                const QString& token);
     static void AddListener(QObject*);
     static void RemoveListener(QObject*);
 
@@ -104,11 +104,11 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize&,
                                  const QString &outputfile,
                                  long long time, bool in_seconds,
-                                 QString token);
+                                 const QString& token);
 
-    void GetInfo(const QString &key, uint &queue_depth, uint &preview_tokens);
+    void GetInfo(const QString &key, uint &queue_depth, uint &token_cnt);
     void SetPreviewGenerator(const QString &key, PreviewGenerator *g);
-    void IncPreviewGeneratorPriority(const QString &key, QString token);
+    void IncPreviewGeneratorPriority(const QString &key, const QString& token);
     void UpdatePreviewGeneratorThreads(void);
     bool IsGeneratingPreview(const QString &key) const;
     uint IncPreviewGeneratorAttempts(const QString &key);
@@ -118,7 +118,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
 
     void SendEvent(const ProgramInfo &pginfo,
                    const QString     &eventname,
-                   const QString     &fn,
+                   const QString     &filename,
                    const QString     &token,
                    const QString     &msg,
                    const QDateTime   &dt);

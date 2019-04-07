@@ -1,10 +1,12 @@
 
 #include "recordingprofile.h"
+
 #include "cardutil.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "v4l2util.h"
+#include <utility>
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -21,7 +23,7 @@ class CodecParamStorage : public SimpleDBStorage
   protected:
     CodecParamStorage(StandardSetting *_setting,
                       const RecordingProfile &parentProfile,
-                      QString name) :
+                      const QString& name) :
         SimpleDBStorage(_setting, "codecparams", "value"),
         m_parent(parentProfile), codecname(name)
     {
@@ -131,7 +133,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
         QString val = getValue();
 
         clearSelections();
-        for (uint i = 0; i < rates.size(); i++)
+        for (size_t i = 0; i < rates.size(); i++)
         {
             if (allowed_rate[rates[i]])
                 addSelection(QString::number(rates[i]));
@@ -145,7 +147,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
     }
 
     void addSelection(const QString &label,
-                      QString        value  = QString(),
+                      const QString& value  = QString(),
                       bool           select = false)
     {
         QString val = value.isEmpty() ? label : value;
@@ -383,7 +385,7 @@ class BitrateMode : public MythUIComboBoxSetting, public CodecParamStorage
     BitrateMode(const RecordingProfile& parent,
                 QString setting = "mpeg2bitratemode") :
         MythUIComboBoxSetting(this),
-        CodecParamStorage(this, parent, setting)
+        CodecParamStorage(this, parent, std::move(setting))
     {
         setLabel(QObject::tr("Bitrate Mode"));
 
@@ -768,7 +770,7 @@ class AverageBitrate : public MythUISpinBoxSetting, public CodecParamStorage
                    uint default_br = 4500, uint increment = 100,
                    QString label = QString()) :
         MythUISpinBoxSetting(this, min_br, max_br, increment),
-        CodecParamStorage(this, parent, setting)
+        CodecParamStorage(this, parent, std::move(setting))
     {
         if (label.isEmpty())
             label = QObject::tr("Avg. Bitrate (kb/s)");
@@ -789,7 +791,7 @@ class PeakBitrate : public MythUISpinBoxSetting, public CodecParamStorage
                 uint default_br = 6000, uint increment = 100,
                 QString label = QString()) :
         MythUISpinBoxSetting(this, min_br, max_br, increment),
-        CodecParamStorage(this, parent, setting)
+        CodecParamStorage(this, parent, std::move(setting))
     {
         if (label.isEmpty())
             label = QObject::tr("Max. Bitrate (kb/s)");
@@ -1129,7 +1131,7 @@ class VideoCompressionSettings : public GroupSetting
 #endif // USING_V4L2
     }
 
-    void selectCodecs(QString groupType)
+    void selectCodecs(const QString& groupType)
     {
         if (!groupType.isNull())
         {
@@ -1288,7 +1290,7 @@ class ImageSize : public GroupSetting
               uint defaultwidth, uint maxwidth,
               bool transcoding = false) :
             MythUISpinBoxSetting(this, transcoding ? 0 : 160,
-                           maxwidth, 16, false,
+                           maxwidth, 16, 0,
                            transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "width")
         {
@@ -1315,7 +1317,7 @@ class ImageSize : public GroupSetting
                uint defaultheight, uint maxheight,
                bool transcoding = false):
             MythUISpinBoxSetting(this, transcoding ? 0 : 160,
-                           maxheight, 16, false,
+                           maxheight, 16, 0,
                            transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "height")
         {
@@ -1336,7 +1338,7 @@ class ImageSize : public GroupSetting
     };
 
     ImageSize(const RecordingProfile &parent,
-              QString tvFormat, QString profName)
+              const QString& tvFormat, const QString& profName)
     {
         setLabel(QObject::tr("Image size"));
 
@@ -1376,7 +1378,7 @@ class ImageSize : public GroupSetting
 };
 
 // id and name will be deleted by ConfigurationGroup's destructor
-RecordingProfile::RecordingProfile(QString profName)
+RecordingProfile::RecordingProfile(const QString& profName)
     : m_id(new ID()),
       m_name(new Name(*this)),
       m_profileName(profName)
@@ -1425,13 +1427,13 @@ RecordingProfile::~RecordingProfile(void)
 #endif
 }
 
-void RecordingProfile::ResizeTranscode(const QString &)
+void RecordingProfile::ResizeTranscode(const QString & /*val*/)
 {
     if (m_imageSize)
         m_imageSize->setEnabled(m_trResize->boolValue());
 }
 
-void RecordingProfile::SetLosslessTranscode(const QString &)
+void RecordingProfile::SetLosslessTranscode(const QString & /*val*/)
 {
     bool lossless = m_trLossless->boolValue();
     bool show_size = (lossless) ? false : m_trResize->boolValue();
@@ -1588,8 +1590,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                 QStringList::iterator Idev = devices.begin();
                 for ( ; Idev != devices.end(); ++Idev)
                 {
-                    if (m_v4l2util)
-                        delete m_v4l2util;
+                    delete m_v4l2util;
                     m_v4l2util = new V4L2util(*Idev);
                     if (m_v4l2util->IsOpen() &&
                         m_v4l2util->DriverName() == type.mid(5))
@@ -1653,7 +1654,7 @@ void RecordingProfile::setCodecTypes()
 }
 
 RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
-    group(id), labelName(profName)
+    group(id), labelName(std::move(profName))
 {
     if (!labelName.isEmpty())
         setLabel(labelName);
@@ -1689,7 +1690,7 @@ void RecordingProfileEditor::ShowNewProfileDialog()
     }
 }
 
-void RecordingProfileEditor::CreateNewProfile(QString profName)
+void RecordingProfileEditor::CreateNewProfile(const QString& profName)
 {
    MSqlQuery query(MSqlQuery::InitCon());
    query.prepare(
@@ -1759,7 +1760,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
         MythDB::DBError("RecordingProfile::fillSelections 1", result);
         return;
     }
-    else if (!result.next())
+    if (!result.next())
     {
         return;
     }
@@ -1833,7 +1834,7 @@ QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
         MythDB::DBError("RecordingProfile::GetProfileMap()", query);
         return profiles;
     }
-    else if (!query.next())
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "RecordingProfile::fillselections, Warning: "

@@ -65,7 +65,6 @@ QMap<DecoderBase*,uint> RebuildSaver::s_cnt;
 bool MythCommFlagPlayer::RebuildSeekTable(
     bool showPercentage, StatusCallback cb, void* cbData)
 {
-    int percentage = 0;
     uint64_t myFramesPlayed = 0, pmap_first = 0,  pmap_last  = 0;
 
     killdecoder = false;
@@ -147,11 +146,11 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
             if (totalFrames)
             {
-                float elapsed = flagTime.elapsed() * 0.001f;
-                int flagFPS = (elapsed > 0.0f) ?
+                float elapsed = flagTime.elapsed() * 0.001F;
+                int flagFPS = (elapsed > 0.0F) ?
                     (int)(myFramesPlayed / elapsed) : 0;
 
-                percentage = myFramesPlayed * 100 / totalFrames;
+                int percentage = myFramesPlayed * 100 / totalFrames;
                 if (cb)
                     (*cb)(percentage, cbData);
 

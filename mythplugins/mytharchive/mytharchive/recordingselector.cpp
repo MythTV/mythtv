@@ -51,9 +51,7 @@ class GetRecordingListThread : public MThread
 
 RecordingSelector::~RecordingSelector(void)
 {
-    if (m_recordingList)
-        delete m_recordingList;
-
+    delete m_recordingList;
     while (!m_selectedList.isEmpty())
         delete m_selectedList.takeFirst();
 }
@@ -519,7 +517,7 @@ void RecordingSelector::updateSelectedList()
     for (int x = 0; x < m_archiveList->size(); x++)
     {
         ArchiveItem *a = m_archiveList->at(x);
-        for (uint y = 0; y < m_recordingList->size(); y++)
+        for (size_t y = 0; y < m_recordingList->size(); y++)
         {
             ProgramInfo *p = m_recordingList->at(y);
             if (p->GetPlaybackURL(false, true) == a->filename)

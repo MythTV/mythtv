@@ -106,7 +106,7 @@ const uint k708AttrOpacityFlash       = 1;
 const uint k708AttrOpacityTranslucent = 2;
 const uint k708AttrOpacityTransparent = 3;
 
-void CC708Window::DefineWindow(int _priority,         int _visible,
+void CC708Window::DefineWindow(int _priority,         bool _visible,
                                int _anchor_point,     int _relative_pos,
                                int _anchor_vertical,  int _anchor_horizontal,
                                int _row_count,        int _column_count,
@@ -353,7 +353,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
             // create a chunk to preserve spacing between lines.
             if (!inTrailingSpaces || !createdString)
             {
-                int allSpaces = (inLeadingSpaces || inTrailingSpaces);
+                bool allSpaces = (inLeadingSpaces || inTrailingSpaces);
                 int length = allSpaces ? 0 : m_column_count - strStart;
                 if (length)
                     createdNonblankStrings = true;
@@ -615,9 +615,9 @@ void CC708Pen::SetPenStyle(uint style)
     attr.m_pen_size   = k708AttrSizeStandard;
     attr.m_offset     = k708AttrOffsetNormal;
     attr.m_font_tag   = style2font[style];
-    attr.m_italics    = 0;
-    attr.m_underline  = 0;
-    attr.m_boldface   = 0;
+    attr.m_italics    = false;
+    attr.m_underline  = false;
+    attr.m_boldface   = false;
     attr.m_edge_type  = 0;
     attr.m_fg_color   = k708AttrColorWhite;
     attr.m_fg_opacity = k708AttrOpacitySolid;
@@ -650,12 +650,12 @@ bool CC708CharacterAttribute::operator==(
             (m_edge_color == other.m_edge_color));
 }
 
-QColor CC708CharacterAttribute::ConvertToQColor(uint c)
+QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
 {
     // Color is expressed in 6 bits, 2 each for red, green, and blue.
     // U.S. ATSC programs seem to use just the higher-order bit,
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
     static int X[] = {0, 96, 255, 255};
-    return QColor(X[(c>>4)&3], X[(c>>2)&3], X[c&3]);
+    return {X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]};
 }

@@ -124,24 +124,22 @@ bool BiopMessage::Process(DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
         LOG(VB_DSMCC, LOG_DEBUG, "[biop] Processing file");
         return ProcessFile(cachep, filecache, data, curp);
     }
-    else if (strcmp(m_objkind, "dir") == 0)
+    if (strcmp(m_objkind, "dir") == 0)
     {
         LOG(VB_DSMCC, LOG_DEBUG, "[biop] Processing directory");
         return ProcessDir(false, cachep, filecache, data, curp);
     }
-    else if (strcmp(m_objkind, "srg") == 0)
+    if (strcmp(m_objkind, "srg") == 0)
     {
         LOG(VB_DSMCC, LOG_DEBUG, "[biop] Processing gateway");
         return ProcessDir(true, cachep, filecache, data, curp);
     }
-    else
-    {
-        /* Error */
-        LOG(VB_DSMCC, LOG_WARNING, QString("Unknown or unsupported format %1%2%3%4")
-                .arg(m_objkind[0]).arg(m_objkind[1])
-                .arg(m_objkind[2]).arg(m_objkind[3]));
-        return false;
-    }
+
+    /* Error */
+    LOG(VB_DSMCC, LOG_WARNING, QString("Unknown or unsupported format %1%2%3%4")
+        .arg(m_objkind[0]).arg(m_objkind[1])
+        .arg(m_objkind[2]).arg(m_objkind[3]));
+    return false;
 }
 
 BiopMessage::~BiopMessage()
@@ -150,7 +148,7 @@ BiopMessage::~BiopMessage()
     free(m_objkind);
 }
 
-bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
+bool BiopMessage::ProcessMsgHdr(const unsigned char *data, unsigned long *curp)
 {
     const unsigned char *buf = data + (*curp);
     int off = 0;
@@ -216,7 +214,7 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
  */
 bool BiopMessage::ProcessDir(
     bool isSrg, DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
-    unsigned char *data, unsigned long *curp)
+    const unsigned char *data, unsigned long *curp)
 {
     int off = 0;
     const unsigned char * const buf = data + (*curp);

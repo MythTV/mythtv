@@ -326,7 +326,7 @@ bool AudioInputALSA::Recovery(int err)
     return isgood;
 }
 
-bool AudioInputALSA::AlsaBad(int op_result, QString errmsg)
+bool AudioInputALSA::AlsaBad(int op_result, const QString& errmsg)
 {   // (op_result < 0) => return true
     bool bad = (op_result < 0);
     if (bad)

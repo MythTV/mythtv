@@ -116,7 +116,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
  */
 DVBSignalMonitor::~DVBSignalMonitor()
 {
-    Stop();
+    DVBSignalMonitor::Stop();
     DVBStreamHandler::Return(streamHandler, m_inputid);
 }
 

@@ -73,6 +73,10 @@ int dfd_no_data_notification(void *callback_data);
 
 class DFDPriv
 {
+private:
+    DFDPriv(const DFDPriv &) = delete;            // not copyable
+    DFDPriv &operator=(const DFDPriv &) = delete; // not copyable
+
   public:
     DFDPriv()
     {
@@ -668,9 +672,9 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
         it = m_priv->m_devices.find(guid);
     }
 
-    io_object_t &item = *((io_object_t*) pitem);
     if (it != m_priv->m_devices.end())
     {
+        io_object_t &item = *((io_object_t*) pitem);
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Updating 0x%1").arg(guid, 0, 16));
         (*it)->Update(guid, this, m_priv->m_notify_port,

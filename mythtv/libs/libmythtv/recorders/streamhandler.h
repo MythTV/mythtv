@@ -57,7 +57,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
   public:
     virtual void AddListener(MPEGStreamData *data,
                              bool allow_section_reader = false,
-                             bool needs_drb            = false,
+                             bool needs_buffering      = false,
                              QString output_file       = QString());
     virtual void RemoveListener(MPEGStreamData *data);
     bool IsRunning(void) const;

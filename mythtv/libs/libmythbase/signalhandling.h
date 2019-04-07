@@ -30,7 +30,7 @@ class MBASE_PUBLIC SignalHandler: public QObject
     static void Init(QList<int> &signallist, QObject *parent = nullptr);
     static void Done(void);
 
-    static void SetHandler(int signal, SigHandlerFunc handler);
+    static void SetHandler(int signum, SigHandlerFunc handler);
 
     static bool IsExiting(void) { return s_exit_program; }
 
@@ -45,7 +45,7 @@ class MBASE_PUBLIC SignalHandler: public QObject
   private:
     SignalHandler(QList<int> &signallist, QObject *parent);
     ~SignalHandler();
-    void SetHandlerPrivate(int signal, SigHandlerFunc handler);
+    void SetHandlerPrivate(int signum, SigHandlerFunc handler);
 
     static int s_sigFd[2];
     static volatile bool s_exit_program;

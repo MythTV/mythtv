@@ -164,7 +164,7 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
         }
     }
 
-    if (allowFallback && !m_dirlist.size())
+    if (allowFallback && m_dirlist.empty())
     {
         QString msg = "Unable to find any Storage Group Directories.  ";
         QString tmpDir = gCoreContext->GetSetting("RecordFilePrefix");
@@ -366,13 +366,7 @@ bool StorageGroup::FileExists(const QString &filename)
     if (badPath)
         return false;
 
-    bool result = false;
-
-    QFile checkFile(filename);
-    if (checkFile.exists(filename))
-        result = true;
-
-    return result;
+    return QFile::exists(filename);
 }
 
 
@@ -646,7 +640,7 @@ QString StorageGroup::FindFileDir(const QString &filename)
         curDir++;
     }
 
-    if (m_groupname.isEmpty() || (m_allowFallback == false))
+    if (m_groupname.isEmpty() || !m_allowFallback)
     {
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =
@@ -686,7 +680,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     if (m_allowFallback)
         nextDir = kDefaultStorageDir;
 
-    if (m_dirlist.size())
+    if (!m_dirlist.empty())
         nextDir = m_dirlist[0];
 
     QDir checkDir("");

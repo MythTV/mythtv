@@ -428,15 +428,15 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
                    !IsFindApplicable(recinfo)) &&
                   recinfo.GetCategoryType() == ProgramInfo::kCategorySeries &&
                   recinfo.GetProgramID().contains(QRegExp("0000$"))) &&
-                ((!(dupmethod & kDupCheckNone) &&
+                ((((dupmethod & kDupCheckNone) == 0) &&
                   !recinfo.GetProgramID().isEmpty() &&
                   (recinfo.GetFindID() != 0 ||
                    !IsFindApplicable(recinfo))) ||
-                 ((dupmethod & kDupCheckSub) &&
+                 (((dupmethod & kDupCheckSub) != 0) &&
                   !recinfo.GetSubtitle().isEmpty()) ||
-                 ((dupmethod & kDupCheckDesc) &&
+                 (((dupmethod & kDupCheckDesc) != 0) &&
                   !recinfo.GetDescription().isEmpty()) ||
-                 ((dupmethod & kDupCheckSubThenDesc) &&
+                 (((dupmethod & kDupCheckSubThenDesc) != 0) &&
                   (!recinfo.GetSubtitle().isEmpty() ||
                    !recinfo.GetDescription().isEmpty())) ))
             {

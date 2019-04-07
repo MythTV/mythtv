@@ -33,7 +33,7 @@ class LCDServer : public QObject
 
     LCDServer(int port, QString message, int messageTime);
 
-    void sendKeyPress(QString key_pressed);
+    void sendKeyPress(const QString& key_pressed);
 
   signals:
 

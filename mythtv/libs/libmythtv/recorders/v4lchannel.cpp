@@ -36,7 +36,7 @@ static QString mode_to_format(int mode);
 
 V4LChannel::~V4LChannel(void)
 {
-    Close();
+    V4LChannel::Close();
 }
 
 bool V4LChannel::Init(QString &startchannel, bool setchan)
@@ -74,11 +74,11 @@ bool V4LChannel::Open(void)
         return false;
     }
 
-    m_has_stream_io  = !!(capabilities & V4L2_CAP_STREAMING);
-    m_has_std_io     = !!(capabilities & V4L2_CAP_READWRITE);
-    m_has_async_io   = !!(capabilities & V4L2_CAP_ASYNCIO);
-    m_has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
-    m_has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
+    m_has_stream_io  = ((capabilities & V4L2_CAP_STREAMING)          != 0U);
+    m_has_std_io     = ((capabilities & V4L2_CAP_READWRITE)          != 0U);
+    m_has_async_io   = ((capabilities & V4L2_CAP_ASYNCIO)            != 0U);
+    m_has_tuner      = ((capabilities & V4L2_CAP_TUNER)              != 0U);
+    m_has_sliced_vbi = ((capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U);
 
     if (m_driver_name == "bttv" || m_driver_name == "cx8800" || m_driver_name == "cx88_blackbird"
         || m_driver_name == "saa7164")
@@ -122,34 +122,34 @@ static int format_to_mode(const QString &fmt)
 {
     if (fmt == "PAL-BG")
         return V4L2_STD_PAL_BG;
-    else if (fmt == "PAL-D")
+    if (fmt == "PAL-D")
         return V4L2_STD_PAL_D;
-    else if (fmt == "PAL-DK")
+    if (fmt == "PAL-DK")
         return V4L2_STD_PAL_DK;
-    else if (fmt == "PAL-I")
+    if (fmt == "PAL-I")
         return V4L2_STD_PAL_I;
-    else if (fmt == "PAL-60")
+    if (fmt == "PAL-60")
         return V4L2_STD_PAL_60;
-    else if (fmt == "SECAM")
+    if (fmt == "SECAM")
         return V4L2_STD_SECAM;
-    else if (fmt == "SECAM-D")
+    if (fmt == "SECAM-D")
         return V4L2_STD_SECAM_D;
-    else if (fmt == "SECAM-DK")
-            return V4L2_STD_SECAM_DK;
-    else if (fmt == "PAL-NC")
+    if (fmt == "SECAM-DK")
+        return V4L2_STD_SECAM_DK;
+    if (fmt == "PAL-NC")
         return V4L2_STD_PAL_Nc;
-    else if (fmt == "PAL-M")
+    if (fmt == "PAL-M")
         return V4L2_STD_PAL_M;
-    else if (fmt == "PAL-N")
+    if (fmt == "PAL-N")
         return V4L2_STD_PAL_N;
-    else if (fmt == "NTSC-JP")
+    if (fmt == "NTSC-JP")
         return V4L2_STD_NTSC_M_JP;
         // generics...
-    else if (fmt.startsWith("NTSC"))
+    if (fmt.startsWith("NTSC"))
         return V4L2_STD_NTSC;
-    else if (fmt.startsWith("ATSC"))
+    if (fmt.startsWith("ATSC"))
         return V4L2_STD_NTSC; // We've dropped V4L ATSC support...
-    else if (fmt.startsWith("PAL"))
+    if (fmt.startsWith("PAL"))
         return V4L2_STD_PAL;
     return V4L2_STD_NTSC;
 }
@@ -158,54 +158,54 @@ static QString mode_to_format(int mode)
 {
     if (mode == V4L2_STD_NTSC)
         return "NTSC";
-    else if (mode == V4L2_STD_NTSC_M_JP)
+    if (mode == V4L2_STD_NTSC_M_JP)
         return "NTSC-JP";
-    else if (mode == V4L2_STD_PAL)
+    if (mode == V4L2_STD_PAL)
         return "PAL";
-    else if (mode == V4L2_STD_PAL_60)
+    if (mode == V4L2_STD_PAL_60)
         return "PAL-60";
-    else if (mode == V4L2_STD_PAL_BG)
+    if (mode == V4L2_STD_PAL_BG)
         return "PAL-BG";
-    else if (mode == V4L2_STD_PAL_D)
+    if (mode == V4L2_STD_PAL_D)
         return "PAL-D";
-    else if (mode == V4L2_STD_PAL_DK)
+    if (mode == V4L2_STD_PAL_DK)
         return "PAL-DK";
-    else if (mode == V4L2_STD_PAL_I)
+    if (mode == V4L2_STD_PAL_I)
         return "PAL-I";
-    else if (mode == V4L2_STD_PAL_M)
+    if (mode == V4L2_STD_PAL_M)
         return "PAL-M";
-    else if (mode == V4L2_STD_PAL_N)
+    if (mode == V4L2_STD_PAL_N)
         return "PAL-N";
-    else if (mode == V4L2_STD_PAL_Nc)
+    if (mode == V4L2_STD_PAL_Nc)
         return "PAL-NC";
-    else if (mode == V4L2_STD_SECAM)
+    if (mode == V4L2_STD_SECAM)
         return "SECAM";
-    else if (mode == V4L2_STD_SECAM_D)
+    if (mode == V4L2_STD_SECAM_D)
         return "SECAM-D";
     // generic..
-    else if ((V4L2_STD_NTSC_M      == mode) ||
-             (V4L2_STD_NTSC_443    == mode) ||
-             (V4L2_STD_NTSC_M_KR   == mode))
+    if ((V4L2_STD_NTSC_M      == mode) ||
+        (V4L2_STD_NTSC_443    == mode) ||
+        (V4L2_STD_NTSC_M_KR   == mode))
         return "NTSC";
-    else if ((V4L2_STD_PAL_B       == mode) ||
-             (V4L2_STD_PAL_B1      == mode) ||
-             (V4L2_STD_PAL_G       == mode) ||
-             (V4L2_STD_PAL_H       == mode) ||
-             (V4L2_STD_PAL_D1      == mode) ||
-             (V4L2_STD_PAL_K       == mode))
+    if ((V4L2_STD_PAL_B       == mode) ||
+        (V4L2_STD_PAL_B1      == mode) ||
+        (V4L2_STD_PAL_G       == mode) ||
+        (V4L2_STD_PAL_H       == mode) ||
+        (V4L2_STD_PAL_D1      == mode) ||
+        (V4L2_STD_PAL_K       == mode))
         return "PAL";
-    else if ((V4L2_STD_SECAM_B     == mode) ||
-             (V4L2_STD_SECAM_DK    == mode) ||
-             (V4L2_STD_SECAM_G     == mode) ||
-             (V4L2_STD_SECAM_H     == mode) ||
-             (V4L2_STD_SECAM_K     == mode) ||
-             (V4L2_STD_SECAM_K1    == mode) ||
-             (V4L2_STD_SECAM_L     == mode) ||
-             (V4L2_STD_SECAM_LC    == mode))
+    if ((V4L2_STD_SECAM_B     == mode) ||
+        (V4L2_STD_SECAM_DK    == mode) ||
+        (V4L2_STD_SECAM_G     == mode) ||
+        (V4L2_STD_SECAM_H     == mode) ||
+        (V4L2_STD_SECAM_K     == mode) ||
+        (V4L2_STD_SECAM_K1    == mode) ||
+        (V4L2_STD_SECAM_L     == mode) ||
+        (V4L2_STD_SECAM_LC    == mode))
         return "SECAM";
-    else if ((V4L2_STD_ATSC        == mode) ||
-             (V4L2_STD_ATSC_8_VSB  == mode) ||
-             (V4L2_STD_ATSC_16_VSB == mode))
+    if ((V4L2_STD_ATSC        == mode) ||
+        (V4L2_STD_ATSC_8_VSB  == mode) ||
+        (V4L2_STD_ATSC_16_VSB == mode))
     {
         // We've dropped V4L ATSC support, but this still needs to be
         // returned here so we will change the mode if the device is
@@ -256,7 +256,7 @@ bool V4LChannel::InitializeInputs(void)
         .arg(m_tuneToChannel)
         .arg(mode_to_format(m_videoModeV4L2)));
 
-    return valid_cnt;
+    return valid_cnt != 0U;
 }
 
 /** \fn V4LChannel::SetFormat(const QString &format)
@@ -304,7 +304,7 @@ void V4LChannel::SetFreqTable(const int index)
 
 int V4LChannel::SetFreqTable(const QString &tablename)
 {
-    QString name = tablename;
+    const QString& name = tablename;
     bool use_default = (name.toLower() == "default" || name.isEmpty());
 
     int i = 0;
@@ -407,7 +407,7 @@ bool V4LChannel::Tune(uint64_t frequency)
     ioctlval = ioctl(m_videofd, VIDIOC_G_MODULATOR, &mod);
     if (ioctlval >= 0)
     {
-        isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
+        isTunerCapLow = ((mod.capability & V4L2_TUNER_CAP_LOW) != 0U);
         LOG(VB_CHANNEL, LOG_INFO,
             QString("  name: %1").arg((char *)mod.name));
         LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));
@@ -475,7 +475,7 @@ bool V4LChannel::Retune(void)
     return true;
 }
 
-QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
+QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -497,7 +497,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     return fmt;
 }
 
-bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
+bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
 {
     if (!m_inputid || m_inputNumV4L < 0)
         return false;
@@ -585,11 +585,11 @@ static int get_v4l2_attribute(const QString &db_col_name)
 {
     if ("brightness" == db_col_name)
         return V4L2_CID_BRIGHTNESS;
-    else if ("contrast" == db_col_name)
+    if ("contrast" == db_col_name)
         return V4L2_CID_CONTRAST;
-    else if ("colour" == db_col_name)
+    if ("colour" == db_col_name)
         return V4L2_CID_SATURATION;
-    else if ("hue" == db_col_name)
+    if ("hue" == db_col_name)
         return V4L2_CID_HUE;
     return -1;
 }

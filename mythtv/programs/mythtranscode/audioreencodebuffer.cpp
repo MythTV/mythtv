@@ -66,16 +66,15 @@ AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
                                          int audio_channels, bool passthru)
   : m_initpassthru(passthru)
 {
-    Reset();
+    AudioReencodeBuffer::Reset();
     const AudioSettings settings(audio_format, audio_channels, AV_CODEC_ID_NONE, 0, false);
-    Reconfigure(settings);
+    AudioReencodeBuffer::Reconfigure(settings);
 }
 
 AudioReencodeBuffer::~AudioReencodeBuffer()
 {
-    Reset();
-    if (m_saveBuffer)
-        delete m_saveBuffer;
+    AudioReencodeBuffer::Reset();
+    delete m_saveBuffer;
 }
 
 /**

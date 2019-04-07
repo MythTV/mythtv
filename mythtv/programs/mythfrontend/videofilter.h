@@ -189,7 +189,7 @@ class VideoFilterSettings
     }
 
     QString getTextFilter() const { return m_textfilter; }
-    void setTextFilter(QString val);
+    void setTextFilter(const QString& val);
 
     ParentalLevel::Level getParentalLevel() const { return m_parental_level; }
     void setParentalLevel(ParentalLevel::Level parental_level)
@@ -277,7 +277,7 @@ class VideoFilterDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    VideoFilterDialog( MythScreenStack *lparent, QString lname,
+    VideoFilterDialog( MythScreenStack *lparent, const QString& lname,
                        VideoList *video_list);
     ~VideoFilterDialog();
 

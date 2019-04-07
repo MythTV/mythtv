@@ -153,9 +153,9 @@ class UPNP_PUBLIC UPnpDeviceDesc
 
         void    _InternalLoad( QDomNode  oNode, UPnpDevice *pCurDevice );
 
-        void     ProcessIconList   ( QDomNode oListNode, UPnpDevice *pDevice );
-        void     ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice );
-        void     ProcessDeviceList ( QDomNode oListNode, UPnpDevice *pDevice );
+        void     ProcessIconList   ( const QDomNode& oListNode, UPnpDevice *pDevice );
+        void     ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice );
+        void     ProcessDeviceList ( const QDomNode& oListNode, UPnpDevice *pDevice );
 
         void     OutputDevice( QTextStream &os,
                                UPnpDevice *pDevice,
@@ -173,8 +173,8 @@ class UPNP_PUBLIC UPnpDeviceDesc
 
     public:
 
-                 UPnpDeviceDesc();
-        virtual ~UPnpDeviceDesc();
+                 UPnpDeviceDesc() = default;
+        virtual ~UPnpDeviceDesc() = default;
 
         bool     Load       ( const QString &sFileName );
         bool     Load       ( const QDomDocument &xmlDevDesc );

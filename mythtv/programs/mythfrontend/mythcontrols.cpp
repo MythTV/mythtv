@@ -261,7 +261,7 @@ void MythControls::Close()
  *  \brief Refreshes the right list when an item in the
  *         left list is selected
  */
-void MythControls::LeftSelected(MythUIButtonListItem*)
+void MythControls::LeftSelected(MythUIButtonListItem* /*item*/)
 {
     UpdateRightList();
 }
@@ -270,7 +270,7 @@ void MythControls::LeftSelected(MythUIButtonListItem*)
  *  \brief Refreshes key information when an item in the
  *         right list is selected
  */
-void MythControls::RightSelected(MythUIButtonListItem*)
+void MythControls::RightSelected(MythUIButtonListItem* /*item*/)
 {
     RefreshKeyInformation();
 }
@@ -626,7 +626,7 @@ void MythControls::GrabKey(void)
  *  TODO FIXME This code needs work to deal with multiple
  *             binding conflicts.
  */
-void MythControls::AddKeyToAction(QString key, bool ignoreconflict)
+void MythControls::AddKeyToAction(const QString& key, bool ignoreconflict)
 {
     QString     action  = GetCurrentAction();
     QString     context = GetCurrentContext();

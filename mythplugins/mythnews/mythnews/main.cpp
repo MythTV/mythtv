@@ -30,11 +30,8 @@ static int RunNews(void)
         mainStack->AddScreen(mythnews);
         return 0;
     }
-    else
-    {
-        delete mythnews;
-        return -1;
-    }
+    delete mythnews;
+    return -1;
 }
 
 static void runNews(void)
@@ -92,11 +89,8 @@ int mythplugin_config(void)
         mainStack->AddScreen(mythnewsconfig);
         return 0;
     }
-    else
-    {
-        delete mythnewsconfig;
-        return -1;
-    }
+    delete mythnewsconfig;
+    return -1;
 }
 
 

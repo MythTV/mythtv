@@ -129,7 +129,7 @@ VideoOutput *VideoOutput::Create(
 
     VideoDisplayProfile *vprof = new VideoDisplayProfile();
 
-    if (renderers.size() > 0)
+    if (!renderers.empty())
     {
         vprof->SetInput(video_dim_disp, video_prate, codecName);
         QString tmp = vprof->GetVideoRenderer();
@@ -379,26 +379,21 @@ VideoOutput::~VideoOutput()
 {
     if (osd_image)
         osd_image->DecrRef();
-    if (osd_painter)
-        delete osd_painter;
-    if (invalid_osd_painter)
-        delete invalid_osd_painter;
+    delete osd_painter;
+    delete invalid_osd_painter;
     invalid_osd_painter = nullptr;
 
     ShutdownPipResize();
 
-    ShutdownVideoResize();
+    VideoOutput::ShutdownVideoResize();
 
-    if (m_deintFilter)
-        delete m_deintFilter;
-    if (m_deintFiltMan)
-        delete m_deintFiltMan;
-    if (db_vdisp_profile)
-        delete db_vdisp_profile;
+    delete m_deintFilter;
+    delete m_deintFiltMan;
+    delete db_vdisp_profile;
 
     ResizeForGui();
     if (display_res)
-        display_res->Unlock();
+        DisplayRes::Unlock();
 }
 
 /**
@@ -649,7 +644,7 @@ void VideoOutput::GetDeinterlacers(QStringList &deinterlacers)
     if (!db_vdisp_profile)
         return;
     QString rend = db_vdisp_profile->GetActualVideoRenderer();
-    deinterlacers = db_vdisp_profile->GetDeinterlacers(rend);
+    deinterlacers = VideoDisplayProfile::GetDeinterlacers(rend);
 }
 
 /**
@@ -761,17 +756,17 @@ QRect VideoOutput::GetVisibleOSDBounds(
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
                        dvr.height() & ~0x1);
 
-    float dispPixelAdj = 1.0f;
+    float dispPixelAdj = 1.0F;
     if (dvr2.height() && dvr2.width())
         dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
 
     float ova = window.GetOverridenVideoAspect();
     QRect vr = window.GetVideoRect();
-    float vs = vr.height() ? (float)vr.width() / vr.height() : 1.f;
-    visible_aspect = themeaspect * (ova ? vs / ova : 1.f) * dispPixelAdj;
+    float vs = vr.height() ? (float)vr.width() / vr.height() : 1.F;
+    visible_aspect = themeaspect * (ova ? vs / ova : 1.F) * dispPixelAdj;
 
-    font_scaling   = 1.0f;
-    return QRect(QPoint(0,0), dvr2);
+    font_scaling   = 1.0F;
+    return { QPoint(0,0), dvr2 };
 }
 
 /**
@@ -787,7 +782,7 @@ QRect VideoOutput::GetTotalOSDBounds(void) const
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
                        dvr.height() & ~0x1);
 
-    return QRect(QPoint(0,0), dvr2);
+    return { QPoint(0,0), dvr2 };
 }
 
 QRect VideoOutput::GetMHEGBounds(void)
@@ -796,8 +791,8 @@ QRect VideoOutput::GetMHEGBounds(void)
         return window.GetTotalOSDBounds();
 
     QRect dvr = window.GetDisplayVideoRect();
-    return QRect(QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
-                 QSize(dvr.width() & ~0x1, dvr.height() & ~0x1));
+    return {QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
+            QSize(dvr.width() & ~0x1, dvr.height() & ~0x1)};
 }
 
 /**
@@ -1579,7 +1574,7 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
         QRect vid_rec = window.GetVideoRect();
 
         hscale = image_aspect / pixel_aspect;
-        if (hscale < 0.99f || hscale > 1.01f)
+        if (hscale < 0.99F || hscale > 1.01F)
         {
             vid_rec.setLeft(lroundf((float)vid_rec.left() * hscale));
             vid_rec.setWidth(lroundf((float)vid_rec.width() * hscale));
@@ -1603,7 +1598,7 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
     }
 
     hscale = pixel_aspect / image_aspect;
-    if (hscale < 0.99f || hscale > 1.01f)
+    if (hscale < 0.99F || hscale > 1.01F)
     {
         result.setLeft(lroundf((float)rect1.left() * hscale));
         result.setWidth(lroundf((float)rect1.width() * hscale));
@@ -1621,13 +1616,13 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
  */
 QRect VideoOutput::GetSafeRect(void)
 {
-    static const float safeMargin = 0.05f;
+    static const float safeMargin = 0.05F;
     float dummy;
-    QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0f);
+    QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0F);
     int safex = (int)((float)result.width()  * safeMargin);
     int safey = (int)((float)result.height() * safeMargin);
-    return QRect(result.left() + safex, result.top() + safey,
-                 result.width() - (2 * safex), result.height() - (2 * safey));
+    return { result.left() + safex, result.top() + safey,
+             result.width() - (2 * safex), result.height() - (2 * safey) };
 }
 
 void VideoOutput::SetPIPState(PIPState setting)

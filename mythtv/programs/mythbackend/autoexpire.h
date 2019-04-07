@@ -64,12 +64,12 @@ class AutoExpire : public QObject
 
     friend class ExpireThread;
   public:
-    explicit AutoExpire(QMap<int, EncoderLink *> *encoderList);
+    explicit AutoExpire(QMap<int, EncoderLink *> *tvList);
     AutoExpire() = default;
    ~AutoExpire();
 
     void CalcParams(void);
-    void PrintExpireList(QString expHost = "ALL");
+    void PrintExpireList(const QString& expHost = "ALL");
 
     uint64_t GetDesiredSpace(int fsID) const;
 

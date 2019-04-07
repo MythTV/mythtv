@@ -236,13 +236,12 @@ static void CleanupGreedyHDeintFilter(VideoFilter * filter)
 
 static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
                                        VideoFrameType outpixfmt,
-                                       int *width, int *height, char *options,
+                                       const int *width, const int *height, const char *options,
                                        int threads)
 {
     ThisFilter *filter;
     (void) inpixfmt;
     (void) outpixfmt;
-    (void) height;
     (void) options;
     (void) threads;
 

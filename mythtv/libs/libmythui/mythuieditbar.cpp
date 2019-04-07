@@ -32,7 +32,7 @@ void MythUIEditBar::SetEditPosition(double position)
 {
     float newpos = position / m_total;
 
-    if (newpos < 0.0f || newpos > 1.0f)
+    if (newpos < 0.0F || newpos > 1.0F)
         return;
 
     bool changed = m_editPosition != newpos;
@@ -151,10 +151,10 @@ void MythUIEditBar::Display(void)
                                              cutarea.height()));
         }
 
-        if (cuttoleft && (region.second < 1.0f))
+        if (cuttoleft && (region.second < 1.0F))
             AddMark(leftshape, leftimage, right, true);
 
-        if (cuttoright && (region.first > 0.0f))
+        if (cuttoright && (region.first > 0.0F))
             AddMark(rightshape, rightimage, left, false);
     }
 
@@ -184,10 +184,10 @@ void MythUIEditBar::Display(void)
                                              keeparea.height()));
         }
 
-        if (keeptoleft && (region.second < 1.0f))
+        if (keeptoleft && (region.second < 1.0F))
             AddMark(leftshape, leftimage, right, true);
 
-        if (keeptoright && (region.first > 0.0f))
+        if (keeptoright && (region.first > 0.0F))
             AddMark(rightshape, rightimage, left, false);
     }
 
@@ -266,7 +266,7 @@ void MythUIEditBar::CalcInverseRegions(void)
     m_invregions.clear();
 
     bool first = true;
-    float start = 0.0f;
+    float start = 0.0F;
     QListIterator<QPair<float, float> > regions(m_regions);
 
     while (regions.hasNext())
@@ -275,7 +275,7 @@ void MythUIEditBar::CalcInverseRegions(void)
 
         if (first)
         {
-            if (region.first > 0.0f)
+            if (region.first > 0.0F)
                 m_invregions.append(qMakePair(start, region.first));
 
             start = region.second;
@@ -288,13 +288,13 @@ void MythUIEditBar::CalcInverseRegions(void)
         }
     }
 
-    if (start < 1.0f)
-        m_invregions.append(qMakePair(start, 1.0f));
+    if (start < 1.0F)
+        m_invregions.append(qMakePair(start, 1.0F));
 }
 
 void MythUIEditBar::ClearImages(void)
 {
-    while (m_images.size())
+    while (!m_images.empty())
         DeleteChild(m_images.takeFirst());
     SetRedraw();
 }

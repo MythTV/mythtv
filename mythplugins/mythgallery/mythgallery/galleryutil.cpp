@@ -257,7 +257,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                                 const GalleryFilter& flt, bool recurse,
                                 ThumbHash *itemHash, ThumbGenerator* thumbGen)
 {
-    QString blah = dir;
+    const QString& blah = dir;
     QDir d(blah);
     QString currDir = d.absolutePath();
     QStringList splitFD;
@@ -269,7 +269,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
     // Create .thumbcache dir if neccesary
     if (thumbGen)
-        thumbGen->getThumbcacheDir(currDir);
+        ThumbGenerator::getThumbcacheDir(currDir);
 
     QFileInfoList list = d.entryInfoList(GetMediaFilter(),
                                          QDir::Files | QDir::AllDirs |
@@ -438,12 +438,9 @@ QDateTime GalleryUtil::GetTimestamp(const QString &filePath)
                         // Found one, done
                         break;
                     }
-                    else
-                    {
-                        LOG(VB_FILE, LOG_ERR, LOC +
-                            QString("Could not parse exif timestamp from '%1'")
-                            .arg(filePath));
-                    }
+                    LOG(VB_FILE, LOG_ERR, LOC +
+                        QString("Could not parse exif timestamp from '%1'")
+                        .arg(filePath));
                 }
             }
             exif_data_free(data);
@@ -639,7 +636,7 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
     return sz;
 }
 
-bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
+bool GalleryUtil::CopyDirectory(const QFileInfo& src, QFileInfo &dst)
 {
     QDir srcDir(src.absoluteFilePath());
 
@@ -668,7 +665,7 @@ bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
     return ok;
 }
 
-bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
+bool GalleryUtil::MoveDirectory(const QFileInfo& src, QFileInfo &dst)
 {
     QDir srcDir(src.absoluteFilePath());
 

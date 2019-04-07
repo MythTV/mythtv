@@ -104,12 +104,12 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     }
     else
     {
-        m_prog_data.HandlePrograms(id, proglist);
+        ProgramData::HandlePrograms(id, proglist);
     }
     return true;
 }
 
-bool FillData::GrabData(Source source, int offset)
+bool FillData::GrabData(const Source& source, int offset)
 {
     QString xmltv_grabber = source.xmltvgrabber;
 
@@ -122,8 +122,6 @@ bool FillData::GrabData(Source source, int offset)
     }
 
     QString filename = QString(tempfilename);
-
-    QString home = QDir::homePath();
 
     QString configfile;
 
@@ -228,7 +226,6 @@ bool FillData::GrabData(Source source, int offset)
 bool FillData::Run(SourceList &sourcelist)
 {
     SourceList::iterator it;
-    SourceList::iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -289,9 +286,9 @@ bool FillData::Run(SourceList &sourcelist)
             updateLastRunEnd();
             continue;
         }
-        else if (xmltv_grabber.trimmed().isEmpty() ||
-                 xmltv_grabber == "/bin/true" ||
-                 xmltv_grabber == "none")
+        if (xmltv_grabber.trimmed().isEmpty() ||
+            xmltv_grabber == "/bin/true" ||
+            xmltv_grabber == "none")
         {
             LOG(VB_GENERAL, LOG_INFO, 
                 QString("Source %1 configured with no grabber. Nothing to do.")

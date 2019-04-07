@@ -39,12 +39,6 @@ extern "C" {
 
 #define LOC QString("VAAPI2: ")
 
-Vaapi2Context::Vaapi2Context() :
-    MythCodecContext()
-{
-
-}
-
 Vaapi2Context::~Vaapi2Context()
 {
     CloseFilters();

@@ -8,6 +8,7 @@
 
 #include <QTextStream>
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -89,7 +90,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     if (m_do_delete)
     {
         ScanDTVTransportList trans = transports;
-        for (uint i = 0; i < db_trans.size(); ++i)
+        for (size_t i = 0; i < db_trans.size(); ++i)
             trans.push_back(db_trans[i]);
         uint deleted_count = DeleteChannels(trans);
         if (deleted_count)
@@ -146,9 +147,9 @@ uint ChannelImporter::DeleteChannels(
     vector<uint> off_air_list;
     QMap<uint,bool> deleted;
 
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
             bool was_in_db = chan.m_db_mplexid && chan.m_channel_id;
@@ -176,7 +177,7 @@ uint ChannelImporter::DeleteChannels(
 
     if (kDeleteAll == action)
     {
-        for (uint k = 0; k < off_air_list.size(); ++k)
+        for (size_t k = 0; k < off_air_list.size(); ++k)
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
             ChannelUtil::DeleteChannel(
@@ -186,7 +187,7 @@ uint ChannelImporter::DeleteChannels(
     }
     else if (kDeleteInvisibleAll == action)
     {
-        for (uint k = 0; k < off_air_list.size(); ++k)
+        for (size_t k = 0; k < off_air_list.size(); ++k)
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
             int chanid = transports[i].m_channels[j].m_channel_id;
@@ -203,15 +204,15 @@ uint ChannelImporter::DeleteChannels(
 
     // TODO delete encrypted channels when m_fta_only set
 
-    if (deleted.size() == 0)
+    if (deleted.empty())
         return 0;
 
     // Create a new transports list without the deleted channels
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
         newlist.push_back(transports[i]);
         newlist.back().m_channels.clear();
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             if (!deleted.contains(i<<16|j))
             {
@@ -383,14 +384,14 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
 
     // insert all channels with non-conflicting channum
     // and complete tuning information.
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
         bool created_new_transport = false;
         ScanDTVTransport new_transport;
         bool created_filter_transport = false;
         ScanDTVTransport filter_transport;
 
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
 
@@ -593,14 +594,14 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
 
     // update all channels with non-conflicting channum
     // and complete tuning information.
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
         bool created_transport = false;
         ScanDTVTransport new_transport;
         bool created_filter_transport = false;
         ScanDTVTransport filter_transport;
 
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
 
@@ -751,12 +752,12 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 
     vector<bool> ignore;
     ignore.resize(transports.size());
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
         if (ignore[i])
             continue;
 
-        for (uint j = i+1; j < transports.size(); ++j)
+        for (size_t j = i+1; j < transports.size(); ++j)
         {
             if (!transports[i].IsEqual(
                     tuner_type, transports[j], 500 * freq_mult))
@@ -764,10 +765,10 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
                 continue;
             }
 
-            for (uint k = 0; k < transports[j].m_channels.size(); ++k)
+            for (size_t k = 0; k < transports[j].m_channels.size(); ++k)
             {
                 bool found_same = false;
-                for (uint l = 0; l < transports[i].m_channels.size(); ++l)
+                for (size_t l = 0; l < transports[i].m_channels.size(); ++l)
                 {
                     if (transports[j].m_channels[k].IsSameChannel(
                             transports[i].m_channels[l]))
@@ -791,12 +792,12 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
     bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
-    bool require_a  = m_service_requirements & kRequireAudio;
+    bool require_a  = (m_service_requirements & kRequireAudio) != 0;
 
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
         ChannelInsertInfoList filtered;
-        for (uint k = 0; k < transports[i].m_channels.size(); ++k)
+        for (size_t k = 0; k < transports[i].m_channels.size(); ++k)
         {
             if (m_fta_only && transports[i].m_channels[k].m_is_encrypted &&
                 transports[i].m_channels[k].m_decryption_status != kEncDecrypted)
@@ -868,17 +869,17 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         bool newt_found = false;
         QMap<uint,bool> found_chan;
 
-        for (uint i = 0; i < transports.size(); ++i)
+        for (size_t i = 0; i < transports.size(); ++i)
         {
             if (!transports[i].IsEqual(tuner_type, newt, 500 * freq_mult, true))
                 continue;
 
             transports[i].m_mplex = mplexid;
             newt_found = true;
-            for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+            for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
             {
                 ChannelInsertInfo &chan = transports[i].m_channels[j];
-                for (uint k = 0; k < newt.m_channels.size(); ++k)
+                for (size_t k = 0; k < newt.m_channels.size(); ++k)
                 {
                     if (newt.m_channels[k].IsSameChannel(chan, true))
                     {
@@ -905,13 +906,13 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
             ScanDTVTransport tmp = newt;
             tmp.m_channels.clear();
 
-            for (uint k = 0; k < newt.m_channels.size(); ++k)
+            for (size_t k = 0; k < newt.m_channels.size(); ++k)
             {
                 if (!found_chan[k])
                     tmp.m_channels.push_back(newt.m_channels[k]);
             }
 
-            if (tmp.m_channels.size())
+            if (!tmp.m_channels.empty())
                 not_in_scan.push_back(tmp);
         }
     }
@@ -922,9 +923,9 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 void ChannelImporter::FixUpOpenCable(ScanDTVTransportList &transports)
 {
     ChannelImporterBasicStats info;
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo &chan = transports[i].m_channels[j];
             if (((chan.m_could_be_opencable && (chan.m_si_standard == "mpeg")) ||
@@ -940,9 +941,9 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
     const ScanDTVTransportList &transports)
 {
     ChannelImporterBasicStats info;
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             const ChannelInsertInfo &chan = transports[i].m_channels[j];
             int enc = (chan.m_is_encrypted) ?
@@ -981,9 +982,9 @@ ChannelImporterUniquenessStats ChannelImporter::CollectUniquenessStats(
 {
     ChannelImporterUniquenessStats stats;
 
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             const ChannelInsertInfo &chan = transports[i].m_channels[j];
             stats.m_unique_prognum +=
@@ -1144,8 +1145,8 @@ QString ChannelImporter::FormatChannels(
 {
     QString msg;
 
-    for (uint i = 0; i < transports.size(); ++i)
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+    for (size_t i = 0; i < transports.size(); ++i)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
             msg += FormatChannel(transports[i], transports[i].m_channels[j],
                                  &info) + "\n";
 
@@ -1243,9 +1244,9 @@ void ChannelImporter::CountChannels(
     ChannelType type, uint &new_chan, uint &old_chan)
 {
     new_chan = old_chan = 0;
-    for (uint i = 0; i < transports.size(); ++i)
+    for (size_t i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].m_channels.size(); ++j)
+        for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
             if (IsType(info, chan, type))
@@ -1317,6 +1318,7 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
         if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
             break;
     }
+    // cppcheck-suppress unreadVariable
     last_free_chan_num_map[chan.m_source_id] = last_free_chan_num;
 
     return chan_num;
@@ -1343,7 +1345,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 //                  deleteDialog->AddButton(tr("Handle manually"));
                 deleteDialog->AddButton(tr("Ignore all"));
                 QObject::connect(deleteDialog, &MythDialogBox::Closed,
-                                 [&](const QString &, int result)
+                                 [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1387,12 +1389,10 @@ ChannelImporter::QueryUserDelete(const QString &msg)
                 action = (4 == val) ? kDeleteIgnoreAll : action;
                 break;
             }
-            else
-            {
-                //cout << "Please enter either 1, 2, 3 or 4:" << endl;
-                cout << tr("Please enter either 1, 2 or 4:")
-                    .toLatin1().constData() << endl;//
-            }
+
+            //cout << "Please enter either 1, 2, 3 or 4:" << endl;
+            cout << tr("Please enter either 1, 2 or 4:")
+                .toLatin1().constData() << endl;//
         }
     }
 
@@ -1419,7 +1419,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 insertDialog->AddButton(tr("Insert manually"));
                 insertDialog->AddButton(tr("Ignore all"));
                 QObject::connect(insertDialog, &MythDialogBox::Closed,
-                                 [&](const QString &, int result)
+                                 [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1459,11 +1459,9 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 action = (3 == val) ? kInsertIgnoreAll : action;
                 break;
             }
-            else
-            {
-                cout << tr("Please enter either 1, 2, or 3:")
-                    .toLatin1().constData() << endl;
-            }
+
+            cout << tr("Please enter either 1, 2, or 3:")
+                .toLatin1().constData() << endl;
         }
     }
 
@@ -1491,7 +1489,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 updateDialog->AddButton(tr("Update manually"));
                 updateDialog->AddButton(tr("Ignore all"));
                 QObject::connect(updateDialog, &MythDialogBox::Closed,
-                                 [&](QString, int result)
+                                 [&](const QString& /*resultId*/, int result)
                                  {
                                      ret = result;
                                      m_eventLoop.quit();
@@ -1531,11 +1529,9 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 action = (3 == val) ? kUpdateIgnoreAll : action;
                 break;
             }
-            else
-            {
-                cout << tr("Please enter either 1, 2, or 3:")
-                    .toLatin1().constData() << endl;
-            }
+
+            cout << tr("Please enter either 1, 2, or 3:")
+                .toLatin1().constData() << endl;
         }
     }
 
@@ -1543,8 +1539,8 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 }
 
 OkCancelType ChannelImporter::ShowManualChannelPopup(
-    MythMainWindow *parent, QString title,
-    QString message, QString &text)
+    MythMainWindow *parent, const QString& title,
+    const QString& message, QString &text)
 {
     int dc = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
@@ -1558,7 +1554,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed,
-                         [&](const QString &, int result)
+                         [&](const QString & /*resultId*/, int result)
                          {
                              dc = result;
                              m_eventLoop.quit();
@@ -1584,7 +1580,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
                              [&](QString result)
                              {
                                  dc = 0;
-                                 text = result;
+                                 text = std::move(result);
                              });
             QObject::connect(textEdit, &MythTextInputDialog::Exiting,
                              [&]()

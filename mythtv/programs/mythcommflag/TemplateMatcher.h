@@ -33,7 +33,7 @@ class TemplateMatcher : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed, TemplateFinder *tf,
-            QString debugdir);
+            const QString& debugdir);
     ~TemplateMatcher(void);
 
     /* FrameAnalyzer interface. */
@@ -51,7 +51,7 @@ public:
     /* TemplateMatcher interface. */
     int templateCoverage(long long nframes, bool final) const;
     const FrameAnalyzer::FrameMap *getBreaks(void) const { return &m_breakMap; }
-    int adjustForBlanks(const BlankFrameDetector *bf, long long nframes);
+    int adjustForBlanks(const BlankFrameDetector *blankFrameDetector, long long nframes);
     int computeBreaks(FrameMap *breaks);
 
 private:
@@ -68,7 +68,7 @@ private:
     unsigned short         *m_matches           {nullptr};  /* matching pixels */
     unsigned char          *m_match             {nullptr};  /* boolean result: 1/0 */
 
-    float                   m_fps               {0.0f};
+    float                   m_fps               {0.0F};
     AVFrame                 m_cropped;                     /* pre-allocated buffer */
     FrameAnalyzer::FrameMap m_breakMap;                    /* frameno => nframes */
 

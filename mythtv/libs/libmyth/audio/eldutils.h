@@ -41,8 +41,8 @@ class MPUBLIC ELD
   public:
     ELD(const char *buf, int size);
     ELD();
-    ~ELD();
-    ELD& operator=(const ELD&);
+    ~ELD()= default;
+    ELD& operator=(const ELD& /*rhs*/);
     void show();
     QString eld_version_name();
     QString edid_version_name();

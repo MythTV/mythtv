@@ -1,5 +1,5 @@
 /* Prototypes to keep gcc from spewing warnings */
-void    zoom_filter_mmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
+void    zoom_filter_mmx (int prevX, int prevY, const unsigned int *expix1, unsigned int *expix2, const int *brutS, const int *brutD, int buffratio, int precalCoef[16][16]);
 int 	zoom_filter_mmx_supported (void);
 
 #ifdef MMX
@@ -22,8 +22,8 @@ int zoom_filter_mmx_supported () {
 }
 
 void zoom_filter_mmx (int prevX, int prevY,
-                      unsigned int *expix1, unsigned int *expix2,
-                      int *brutS, int *brutD, int buffratio,
+                      const unsigned int *expix1, unsigned int *expix2,
+                      const int *brutS, const int *brutD, int buffratio,
                       int precalCoef[16][16])
 {
     unsigned int ax = (prevX-1)<<PERTEDEC, ay = (prevY-1)<<PERTEDEC;
@@ -135,8 +135,8 @@ int zoom_filter_mmx_supported () {
 }
 
 void zoom_filter_mmx (int prevX, int prevY,
-                      unsigned int *expix1, unsigned int *expix2,
-                      int *brutS, int *brutD, int buffratio,
+                      const unsigned int *expix1, unsigned int *expix2,
+                      const int *brutS, const int *brutD, int buffratio,
                       int precalCoef[16][16])
 {
     (void)prevX;

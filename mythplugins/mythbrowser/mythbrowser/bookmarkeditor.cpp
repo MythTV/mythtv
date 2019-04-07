@@ -106,7 +106,7 @@ void BookmarkEditor::Save()
 
     ResetHomepageFromDB();
 
-    bool isHomepage = (m_isHomepage->GetCheckState() == MythUIStateType::Full) ? true : false;
+    bool isHomepage = m_isHomepage->GetCheckState() == MythUIStateType::Full;
     InsertInDB(m_categoryEdit->GetText(), m_nameEdit->GetText(), m_urlEdit->GetText(), isHomepage );
     
     if (m_site)
@@ -145,7 +145,7 @@ void BookmarkEditor::slotFindCategory(void)
     popupStack->AddScreen(m_searchDialog);
 }
 
-void BookmarkEditor::slotCategoryFound(QString category)
+void BookmarkEditor::slotCategoryFound(const QString& category)
 {
     m_categoryEdit->SetText(category);
 }

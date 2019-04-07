@@ -71,7 +71,7 @@ class PlaybackSock : public ReferenceCounter
                               QString &directory, bool fileNamesOnly);
     QStringList GetSGFileQuery(QString &host, QString &groupname,
                                QString &filename);
-    QString GetFileHash(QString filename, QString storageGroup);
+    QString GetFileHash(const QString& filename, const QString& storageGroup);
     QStringList GetFindFile(const QString &host, const QString &filename,
                             const QString &storageGroup, bool useRegex);
 
@@ -99,7 +99,7 @@ class PlaybackSock : public ReferenceCounter
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
-    void SetNextLiveTVDir(int capturecardnum, QString dir);
+    void SetNextLiveTVDir(int capturecardnum, const QString& dir);
     void CancelNextRecording(int capturecardnum, bool cancel);
 
     QStringList ForwardRequest(const QStringList&);

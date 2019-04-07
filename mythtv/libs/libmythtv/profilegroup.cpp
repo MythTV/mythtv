@@ -202,9 +202,7 @@ bool ProfileGroup::allowedGroupName(void)
                             .arg(getName()).arg(m_host->getValue());
     result.prepare(querystr);
 
-    if (result.exec() && result.next())
-        return false;
-    return true;
+    return !(result.exec() && result.next());
 }
 
 void ProfileGroup::getHostNames(QStringList *hostnames)

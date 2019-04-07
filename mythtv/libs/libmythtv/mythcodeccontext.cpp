@@ -69,11 +69,6 @@ MythCodecContext::MythCodecContext() :
     priorPts[1] = 0;
 }
 
-MythCodecContext::~MythCodecContext()
-{
-
-}
-
 // static
 MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 {
@@ -103,7 +98,7 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 }
 
 // static
-QStringList MythCodecContext::GetDeinterlacers(QString decodername)
+QStringList MythCodecContext::GetDeinterlacers(const QString& decodername)
 {
     QStringList ret;
 #ifdef USING_VAAPI2
@@ -164,7 +159,7 @@ QStringList MythCodecContext::GetDeinterlacers(QString decodername)
     return ret;
 }
 // static - Find if a deinterlacer is codec-provided
-bool MythCodecContext::isCodecDeinterlacer(QString decodername)
+bool MythCodecContext::isCodecDeinterlacer(const QString& decodername)
 {
     return (decodername.startsWith("vaapi-dec")
             || decodername.startsWith("nvdec-dec") );
@@ -178,7 +173,7 @@ int MythCodecContext::FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame)
 {
     int ret = 0;
 
-    while (1)
+    while (true)
     {
         if (filter_graph)
         {
@@ -257,13 +252,10 @@ bool MythCodecContext::setDeinterlacer(bool enable, QString name)
     {
         if (deinterlacername.isEmpty())
             return true;
-        else
-        {
-            deinterlacername.clear();
-            doublerate = false;
-            filtersInitialized = false;
-            return true;
-        }
+        deinterlacername.clear();
+        doublerate = false;
+        filtersInitialized = false;
+        return true;
     }
 
     // Code to enable or change interlace

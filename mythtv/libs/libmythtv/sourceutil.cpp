@@ -56,7 +56,7 @@ QString SourceUtil::GetSourceName(uint sourceid)
         MythDB::DBError("SourceUtil::GetSourceName()", query);
         return QString();
     }
-    else if (!query.next())
+    if (!query.next())
     {
         return QString();
     }
@@ -306,7 +306,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
     {
         while (query.next())
         {
-            encoder &= !query.value(0).toInt() && !query.value(1).toInt();
+            encoder &= !query.value(0).toBool() && !query.value(1).toBool();
             has_any_chan = true;
         }
     }
@@ -360,7 +360,7 @@ bool SourceUtil::IsAnySourceScanable(void)
     return false;
 }
 
-bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString inputtype, bool wait)
+bool SourceUtil::UpdateChannelsFromListings(uint sourceid, const QString& inputtype, bool wait)
 {
     if (wait)
     {
@@ -400,11 +400,11 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString inputtype, bo
     return true;
 }
 
-bool SourceUtil::UpdateSource( uint sourceid, QString sourcename,
-                               QString grabber, QString userid,
-                               QString freqtable, QString lineupid,
-                               QString password, bool useeit,
-                               QString configpath, int nitid)
+bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
+                               const QString& grabber, const QString& userid,
+                               const QString& freqtable, const QString& lineupid,
+                               const QString& password, bool useeit,
+                               const QString& configpath, int nitid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -433,11 +433,11 @@ bool SourceUtil::UpdateSource( uint sourceid, QString sourcename,
     return true;
 }
 
-int SourceUtil::CreateSource( QString sourcename,
-                               QString grabber, QString userid,
-                               QString freqtable, QString lineupid,
-                               QString password, bool useeit,
-                               QString configpath, int nitid)
+int SourceUtil::CreateSource( const QString& sourcename,
+                               const QString& grabber, const QString& userid,
+                               const QString& freqtable, const QString& lineupid,
+                               const QString& password, bool useeit,
+                               const QString& configpath, int nitid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

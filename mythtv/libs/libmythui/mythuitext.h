@@ -76,7 +76,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetFontProperties(const MythFontProperties &fontProps);
     const MythFontProperties* GetFontProperties() { return m_Font; }
 
-    void CycleColor(QColor startColor, QColor endColor, int numSteps);
+    void CycleColor(const QColor& startColor, const QColor& endColor, int numSteps);
     void StopCycling();
 
     int GetJustification(void);

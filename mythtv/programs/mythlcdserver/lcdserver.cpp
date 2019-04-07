@@ -58,10 +58,11 @@
 #include <cstdlib>
 
 #include <QCoreApplication>
-#include <QStringList>
-#include <QRegExp>
 #include <QDir>
 #include <QList>
+#include <QRegExp>
+#include <QStringList>
+#include <utility>
 
 #include "mythdate.h"
 #include "mythcontext.h"
@@ -76,8 +77,7 @@ int debug_level = 0;
 #define LOC_ERR  QString("LCDServer, Error: ")
 
 LCDServer::LCDServer(int port, QString message, int messageTime)
-    :QObject(),
-     m_lcd(new LCDProcClient(this)),
+    : m_lcd(new LCDProcClient(this)),
      m_serverPool(new ServerPool()),
      m_lastSocket(nullptr)
 {
@@ -100,7 +100,7 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
     }
 
     if (m_lcd)
-        m_lcd->setStartupMessage(message, messageTime);
+        m_lcd->setStartupMessage(std::move(message), messageTime);
 }
 
 void LCDServer::newConnection(QTcpSocket *socket)
@@ -292,7 +292,7 @@ void LCDServer::sendMessage(QTcpSocket *where, const QString &what)
     where->write(tmp.constData(), tmp.length());
 }
 
-void LCDServer::sendKeyPress(QString key_pressed)
+void LCDServer::sendKeyPress(const QString& key_pressed)
 {
     if (debug_level > 0)
         LOG(VB_GENERAL, LOG_INFO, "LCDServer:: send key press: " + key_pressed);
@@ -625,7 +625,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
     }
 
     bool bOK;
-    bool busy = tokens[1].toInt(&bOK);
+    bool busy = tokens[1].toInt(&bOK) != 0;
     if (!bOK)
     {
         LOG(VB_GENERAL, LOG_ERR,

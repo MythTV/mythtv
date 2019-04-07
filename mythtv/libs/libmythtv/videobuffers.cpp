@@ -277,7 +277,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType EnqueueTo)
     VideoFrame *frame = nullptr;
 
     // Try to get a frame not being used by the decoder
-    for (uint i = 0; i < m_available.size(); i++)
+    for (size_t i = 0; i < m_available.size(); i++)
     {
         frame = m_available.dequeue();
         if (m_decode.contains(frame))
@@ -496,7 +496,7 @@ VideoFrame *VideoBuffers::Head(BufferType Type)
     frame_queue_t *queue = Queue(Type);
     if (!queue)
         return nullptr;
-    if (queue->size())
+    if (!queue->empty())
         return queue->head();
     return nullptr;
 }
@@ -507,7 +507,7 @@ VideoFrame *VideoBuffers::Tail(BufferType Type)
     frame_queue_t *queue = Queue(Type);
     if (!queue)
         return nullptr;
-    if (queue->size())
+    if (!queue->empty())
         return queue->tail();
     return nullptr;
 }
@@ -912,7 +912,7 @@ void VideoBuffers::DeleteBuffers(void)
         av_freep(&m_buffers[i].qscale_table);
     }
 
-    for (uint i = 0; i < m_allocatedArrays.size(); i++)
+    for (size_t i = 0; i < m_allocatedArrays.size(); i++)
         av_free(m_allocatedArrays[i]);
     m_allocatedArrays.clear();
 }
@@ -989,7 +989,7 @@ QString VideoBuffers::GetStatus(uint Num) const
         unsigned long long x = to_bitmap(m_decode, count);
         for (uint i = 0; i < Num; i++)
         {
-            unsigned long long mask = 1ull << i;
+            unsigned long long mask = 1Ull << i;
             QString tmp("");
             if (a & mask)
                 tmp += (x & mask) ? "a" : "A";

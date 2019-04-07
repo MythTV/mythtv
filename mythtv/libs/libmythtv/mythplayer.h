@@ -161,7 +161,7 @@ class MTV_PUBLIC MythPlayer
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps,
-           FrameScanType scan = kScan_Ignore, QString codecName = QString());
+           FrameScanType scan = kScan_Ignore, const QString& codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
@@ -220,7 +220,7 @@ class MTV_PUBLIC MythPlayer
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     EofState GetEof(void) const;
     bool    IsErrored(void) const;
-    bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
+    bool    IsPlaying(uint wait_in_msec = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);
@@ -527,7 +527,7 @@ class MTV_PUBLIC MythPlayer
     // Closed caption and teletext stuff
     void ResetCaptions(void);
     bool ToggleCaptions(void);
-    bool ToggleCaptions(uint mode);
+    bool ToggleCaptions(uint type);
     bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
     void SetCaptionsEnabled(bool, bool osd_msg=true);
     bool GetCaptionsEnabled(void);
@@ -626,7 +626,7 @@ class MTV_PUBLIC MythPlayer
     void AVSync2(VideoFrame *buffer);
     void  ResetAVSync(void);
     int64_t AVSyncGetAudiotime(void);
-    void  SetFrameInterval(FrameScanType scan, double speed);
+    void  SetFrameInterval(FrameScanType scan, double frame_period);
     void  FallbackDeint(void);
     void WaitForTime(int64_t framedue);
 

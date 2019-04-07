@@ -410,7 +410,7 @@ static bool performUpdateSeries(const char **updates)
 
     while (thequery != nullptr)
     {
-        if (strlen(thequery) && !query.exec(thequery))
+        if ((strlen(thequery) != 0U) && !query.exec(thequery))
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"
@@ -606,7 +606,7 @@ static bool doUpgradeTVDatabaseSchema(void)
                                  "Unable to upgrade database.");
         return false;
     }
-    else if (dbver.toInt() <  1244)
+    if (dbver.toInt() <  1244)
     {
         LOG(VB_GENERAL, LOG_ERR, "Your database version is too old to upgrade "
                                  "with this version of MythTV. You will need "
@@ -992,70 +992,68 @@ nullptr
                             select);
             return false;
         }
-        else
+
+        MSqlQuery update(MSqlQuery::InitCon());
+        while (select.next())
         {
-            MSqlQuery update(MSqlQuery::InitCon());
-            while (select.next())
+            QString hostname = select.value(0).toString();
+            QString individual_mute = select.value(1).toString();
+
+            if ("1" == individual_mute)
             {
-                QString hostname = select.value(0).toString();
-                QString individual_mute = select.value(1).toString();
+                update.prepare("DELETE FROM keybindings "
+                               " WHERE action = 'CYCLEAUDIOCHAN' AND "
+                               "       hostname = :HOSTNAME AND "
+                               "       context IN ('TV Frontend', "
+                               "                   'TV Playback')");
 
-                if ("1" == individual_mute)
+                update.bindValue(":HOSTNAME", hostname);
+
+                if (!update.exec())
                 {
-                    update.prepare("DELETE FROM keybindings "
-                                   " WHERE action = 'CYCLEAUDIOCHAN' AND "
-                                   "       hostname = :HOSTNAME AND "
-                                   "       context IN ('TV Frontend', "
-                                   "                   'TV Playback')");
-
-                    update.bindValue(":HOSTNAME", hostname);
-
-                    if (!update.exec())
-                    {
-                        MythDB::DBError("Unable to update keybindings",
-                                         update);
-                        return false;
-                    }
-
-                    update.prepare("UPDATE keybindings "
-                                   "   SET action = 'CYCLEAUDIOCHAN', "
-                                   "       description = 'Cycle audio channels'"
-                                   " WHERE action = 'MUTE' AND "
-                                   "       hostname = :HOSTNAME AND "
-                                   "       context IN ('TV Frontend', "
-                                   "                   'TV Playback')");
-
-                    update.bindValue(":HOSTNAME", hostname);
-
-                    if (!update.exec())
-                    {
-                        MythDB::DBError("Unable to update keybindings",
-                                         update);
-                        return false;
-                    }
-
-                    update.prepare("REPLACE INTO keybindings "
-                                   " VALUES (:CONTEXT, 'MUTE', 'Mute', "
-                                   "         '', :HOSTNAME)");
-
-                    update.bindValue(":CONTEXT", "TV Playback");
-                    update.bindValue(":HOSTNAME", hostname);
-                    if (!update.exec())
-                    {
-                        MythDB::DBError("Unable to update keybindings",
-                                         update);
-                        return false;
-                    }
-                    update.bindValue(":CONTEXT", "TV Frontend");
-                    update.bindValue(":HOSTNAME", hostname);
-                    if (!update.exec())
-                    {
-                        MythDB::DBError("Unable to update keybindings",
-                                         update);
-                        return false;
-                    }
-
+                    MythDB::DBError("Unable to update keybindings",
+                                    update);
+                    return false;
                 }
+
+                update.prepare("UPDATE keybindings "
+                               "   SET action = 'CYCLEAUDIOCHAN', "
+                               "       description = 'Cycle audio channels'"
+                               " WHERE action = 'MUTE' AND "
+                               "       hostname = :HOSTNAME AND "
+                               "       context IN ('TV Frontend', "
+                               "                   'TV Playback')");
+
+                update.bindValue(":HOSTNAME", hostname);
+
+                if (!update.exec())
+                {
+                    MythDB::DBError("Unable to update keybindings",
+                                    update);
+                    return false;
+                }
+
+                update.prepare("REPLACE INTO keybindings "
+                               " VALUES (:CONTEXT, 'MUTE', 'Mute', "
+                               "         '', :HOSTNAME)");
+
+                update.bindValue(":CONTEXT", "TV Playback");
+                update.bindValue(":HOSTNAME", hostname);
+                if (!update.exec())
+                {
+                    MythDB::DBError("Unable to update keybindings",
+                                    update);
+                    return false;
+                }
+                update.bindValue(":CONTEXT", "TV Frontend");
+                update.bindValue(":HOSTNAME", hostname);
+                if (!update.exec())
+                {
+                    MythDB::DBError("Unable to update keybindings",
+                                    update);
+                    return false;
+                }
+
             }
         }
 
@@ -1086,69 +1084,63 @@ nullptr
                             query);
             return false;
         }
-        else
+
+        MSqlQuery bindings(MSqlQuery::InitCon());
+        while (query.next())
         {
-            MSqlQuery bindings(MSqlQuery::InitCon());
-            while (query.next())
+            QString EPGEnableJumpToChannel = query.value(0).toString();
+
+            if ("1" == EPGEnableJumpToChannel)
             {
-                QString EPGEnableJumpToChannel = query.value(0).toString();
+                bindings.prepare("SELECT action, context, hostname, keylist "
+                                 " FROM keybindings "
+                                 " WHERE action IN ('DAYLEFT', "
+                                 " 'DAYRIGHT', 'TOGGLEEPGORDER') AND "
+                                 " context IN ('TV Frontend', "
+                                 " 'TV Playback')");
 
-                if ("1" == EPGEnableJumpToChannel)
+                if (!bindings.exec())
                 {
-                    bindings.prepare("SELECT action, context, hostname, keylist "
-                                     " FROM keybindings "
-                                     " WHERE action IN ('DAYLEFT', "
-                                     " 'DAYRIGHT', 'TOGGLEEPGORDER') AND "
-                                     " context IN ('TV Frontend', "
-                                     " 'TV Playback')");
+                    MythDB::DBError("Unable to update keybindings",
+                                    bindings);
+                    return false;
+                }
+                while (bindings.next())
+                {
+                    QString action = bindings.value(0).toString();
+                    QString context = bindings.value(1).toString();
+                    QString hostname = bindings.value(2).toString();
+                    QStringList oldKeylist = bindings.value(3).toString().split(',');
+                    QStringList newKeyList;
 
-                    if (!bindings.exec())
+                    QStringList::iterator it;
+                    for (it = oldKeylist.begin(); it != oldKeylist.end();++it)
+                    {
+                        bool ok = false;
+                        int num = (*it).toInt(&ok);
+                        if (!ok && num >= 0 && num <= 9)
+                            newKeyList << (*it);
+                    }
+                    QString keyList = newKeyList.join(",");
+
+                    MSqlQuery update(MSqlQuery::InitCon());
+                    update.prepare("UPDATE keybindings "
+                                   "   SET keylist = :KEYLIST "
+                                   " WHERE action = :ACTION "
+                                   " AND   context = :CONTEXT "
+                                   " AND   hostname = :HOSTNAME");
+
+                    update.bindValue(":KEYLIST", keyList);
+                    update.bindValue(":ACTION", action);
+                    update.bindValue(":CONTEXT", context);
+                    update.bindValue(":HOSTNAME", hostname);
+
+                    if (!update.exec())
                     {
                         MythDB::DBError("Unable to update keybindings",
-                                         bindings);
+                                        update);
                         return false;
                     }
-                    else
-                    {
-                        while (bindings.next())
-                        {
-                            QString action = bindings.value(0).toString();
-                            QString context = bindings.value(1).toString();
-                            QString hostname = bindings.value(2).toString();
-                            QStringList oldKeylist = bindings.value(3).toString().split(',');
-                            QStringList newKeyList;
-
-                            QStringList::iterator it;
-                            for (it = oldKeylist.begin(); it != oldKeylist.end();++it)
-                            {
-                                bool ok = false;
-                                int num = (*it).toInt(&ok);
-                                if (!ok && num >= 0 && num <= 9)
-                                    newKeyList << (*it);
-                            }
-                            QString keyList = newKeyList.join(",");
-
-                            MSqlQuery update(MSqlQuery::InitCon());
-                            update.prepare("UPDATE keybindings "
-                                           "   SET keylist = :KEYLIST "
-                                           " WHERE action = :ACTION "
-                                           " AND   context = :CONTEXT "
-                                           " AND   hostname = :HOSTNAME");
-
-                            update.bindValue(":KEYLIST", keyList);
-                            update.bindValue(":ACTION", action);
-                            update.bindValue(":CONTEXT", context);
-                            update.bindValue(":HOSTNAME", hostname);
-
-                            if (!update.exec())
-                            {
-                                MythDB::DBError("Unable to update keybindings",
-                                                update);
-                                return false;
-                            }
-                        }
-                    }
-
                 }
             }
         }
@@ -2113,7 +2105,7 @@ nullptr
             "       CONCAT(startdate, ' ', starttime), "
             "       CONCAT(enddate, ' ', endtime) FROM record",
         };
-        for (uint i = 0; i < sizeof(pre_sql)/sizeof(char*); i++)
+        for (size_t i = 0; i < sizeof(pre_sql)/sizeof(char*); i++)
             updates_ba.push_back(QByteArray(pre_sql[i]));
 
         // Convert various DATETIME fields from local time to UTC
@@ -2128,7 +2120,7 @@ nullptr
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
-            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            for (size_t i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
                          QString("UPDATE %1 "
@@ -2141,7 +2133,7 @@ nullptr
                          .arg(order).toLocal8Bit());
             }
 
-            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            for (size_t i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
                           QString("UPDATE %1 "
@@ -2184,7 +2176,7 @@ nullptr
             "DROP TABLE recordupdate",
         };
 
-        for (uint i = 0; i < sizeof(post_sql)/sizeof(char*); i++)
+        for (size_t i = 0; i < sizeof(post_sql)/sizeof(char*); i++)
             updates_ba.push_back(QByteArray(post_sql[i]));
 
         // Convert update ByteArrays to NULL terminated char**
@@ -2220,7 +2212,7 @@ nullptr
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
-            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            for (size_t i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
                      QString("UPDATE %1 "
@@ -2230,7 +2222,7 @@ nullptr
                      .arg(with_endtime[i]).arg(order).toLocal8Bit());
             }
 
-            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            for (size_t i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
                       QString("UPDATE %1 "

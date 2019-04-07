@@ -54,7 +54,7 @@ class MultiplexID : public AutoIncrementSetting
     QString GetColumnName(void) const { return m_column; }
 };
 
-static QString pp_modulation(QString mod)
+static QString pp_modulation(const QString& mod)
 {
     if (mod.endsWith("vsb"))
         return mod.left(mod.length() - 3) + "-VSB";
@@ -87,11 +87,8 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         MythDB::DBError("TransportWizard()", query);
         return CardUtil::ERROR_PROBE;
     }
-    else
-    {
-        while (query.next())
-            cardids.push_back(query.value(0).toUInt());
-    }
+    while (query.next())
+        cardids.push_back(query.value(0).toUInt());
 
     if (cardids.empty())
     {
@@ -133,7 +130,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
     if (cardtypes.empty())
         return CardUtil::ERROR_PROBE;
 
-    for (uint i = 1; i < cardtypes.size(); i++)
+    for (size_t i = 1; i < cardtypes.size(); i++)
     {
         CardUtil::INPUT_TYPES typeA = cardtypes[i - 1];
         typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;
@@ -263,6 +260,8 @@ void TransportListEditor::Load()
                 type = "(DVB-S)";
             if (CardUtil::QAM == m_cardtype)
                 type = "(DVB-C)";
+            if (CardUtil::DVBS2 == m_cardtype)
+                type = "(DVB-S2)";
 
             QString txt = QString("%1 %2 %3 %4 %5 %6 %7")
                 .arg(mod).arg(query.value(2).toString())
@@ -361,7 +360,7 @@ void TransportListEditor::Menu(TransportSetting *transport)
 class MuxDBStorage : public SimpleDBStorage
 {
   protected:
-    MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, QString _name) :
+    MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, const QString& _name) :
         SimpleDBStorage(_setting, "dtv_multiplex", _name), mplexid(_id)
     {
     }

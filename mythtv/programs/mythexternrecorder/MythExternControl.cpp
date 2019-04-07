@@ -136,17 +136,6 @@ Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
 #undef LOC
 #define LOC QString("%1").arg(m_parent->Desc())
 
-Commands::Commands(MythExternControl * parent)
-    : m_thread()
-    , m_parent(parent)
-    , m_apiVersion(-1)
-{
-}
-
-Commands::~Commands(void)
-{
-}
-
 void Commands::Close(void)
 {
     std::lock_guard<std::mutex> lock(m_parent->m_flow_mutex);
@@ -206,21 +195,21 @@ void Commands::NextChannel(const QString & serial)
     emit m_parent->NextChannel(serial);
 }
 
-bool Commands::SendStatus(const QString & command, const QString & msg)
+bool Commands::SendStatus(const QString & command, const QString & status)
 {
-    int len = write(2, msg.toUtf8().constData(), msg.size());
+    int len = write(2, status.toUtf8().constData(), status.size());
     write(2, "\n", 1);
 
-    if (len != msg.size())
+    if (len != status.size())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
-            .arg(command).arg(len).arg(msg.size()).arg(msg));
+            .arg(command).arg(len).arg(status.size()).arg(status));
         return false;
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-        .arg(command).arg(msg));
+        .arg(command).arg(status));
 
     m_parent->ClearError();
     return true;
@@ -464,7 +453,7 @@ void Commands::Run(void)
             LOG(VB_RECORD, LOG_ERR, LOC + "poll eof (POLLHUP)");
             break;
         }
-        else if (polls[0].revents & POLLNVAL)
+        if (polls[0].revents & POLLNVAL)
         {
             m_parent->Fatal("poll error");
             return;
@@ -503,13 +492,9 @@ void Commands::Run(void)
 }
 
 Buffer::Buffer(MythExternControl * parent)
-    : m_parent(parent), m_thread()
+    : m_parent(parent)
 {
     m_heartbeat = std::chrono::system_clock::now();
-}
-
-Buffer::~Buffer(void)
-{
 }
 
 bool Buffer::Fill(const QByteArray & buffer)

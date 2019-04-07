@@ -275,7 +275,7 @@ int MythCDROMLinux::SCSIstatus()
             "but drive is actually closed with a disc");
         return CDS_DISC_OK;
     }
-    else if (es->door_open)
+    if (es->door_open)
     {
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - tray is definitely open");
@@ -315,23 +315,27 @@ MythMediaError MythCDROMLinux::ejectCDROM(bool open_close)
 
         return (res == 0) ? MEDIAERR_OK : MEDIAERR_FAILED;
     }
-    else
-    {
-        LOG(VB_MEDIA, LOG_DEBUG, LOC + ":eject - Loading CDROM");
-        // If the tray is empty, this will fail (Input/Output error)
-        int res = ioctl(m_DeviceHandle, CDROMCLOSETRAY);
 
-        if (res < 0)
-            LOG(VB_MEDIA, LOG_DEBUG, "CDROMCLOSETRAY ioctl failed" + ENO);
+    LOG(VB_MEDIA, LOG_DEBUG, LOC + ":eject - Loading CDROM");
+    // If the tray is empty, this will fail (Input/Output error)
+    int res = ioctl(m_DeviceHandle, CDROMCLOSETRAY);
 
-        // This allows us to catch any drives that the OS has problems
-        // detecting the status of (some always report OPEN when empty)
-        if (driveStatus() == CDS_TRAY_OPEN)
-            return MEDIAERR_FAILED;
-        else
-            return MEDIAERR_OK;
-    }
+    if (res < 0)
+        LOG(VB_MEDIA, LOG_DEBUG, "CDROMCLOSETRAY ioctl failed" + ENO);
+
+    // This allows us to catch any drives that the OS has problems
+    // detecting the status of (some always report OPEN when empty)
+    if (driveStatus() == CDS_TRAY_OPEN)
+        return MEDIAERR_FAILED;
+    return MEDIAERR_OK;
 }
+
+struct StHandle {
+    const int m_fd;
+    explicit StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
+    ~StHandle() { close(m_fd); }
+    operator int() const { return m_fd; }
+};
 
 // This is copied from eject.c by Jeff Tranter (tranter@pobox.com)
 MythMediaError MythCDROMLinux::ejectSCSI()
@@ -346,12 +350,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     const unsigned DRIVER_OK = 0;
 
     // ALLOW_MEDIUM_REMOVAL requires r/w access so re-open the device
-    struct StHandle {
-        const int m_fd;
-        explicit StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
-        ~StHandle() { close(m_fd); }
-        operator int() const { return m_fd; }
-    } fd(qPrintable(m_DevicePath));
+    struct StHandle fd(qPrintable(m_DevicePath));
 
     LOG(VB_MEDIA, LOG_DEBUG, LOC + ":ejectSCSI");
     if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000))
@@ -375,7 +374,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO allowRmBlk ioctl failed" + ENO);
 	    return MEDIAERR_FAILED;
     }
-    else if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
+    if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO allowRmBlk failed");
 	    return MEDIAERR_FAILED;
@@ -387,7 +386,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(start) ioctl failed" + ENO);
 	    return MEDIAERR_FAILED;
     }
-    else if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
+    if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(start) failed");
 	    return MEDIAERR_FAILED;
@@ -399,7 +398,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(eject) ioctl failed" + ENO);
 	    return MEDIAERR_FAILED;
     }
-    else if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
+    if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(eject) failed");
 	    return MEDIAERR_FAILED;
@@ -434,8 +433,7 @@ MythMediaError MythCDROMLinux::testMedia()
                                      m_DevicePath +  "' : " +ENO);
             if (errno == EBUSY)
                 return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
-            else
-                return MEDIAERR_FAILED;
+            return MEDIAERR_FAILED;
         }
         LOG(VB_MEDIA, LOG_DEBUG, LOC + ":testMedia - Opened device");
         OpenedHere = true;
@@ -577,7 +575,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                         m_DeviceHandle, ((char*)&buf) + readin, 2048 - readin);
                     if ((rr < 0) && ((EAGAIN == errno) || (EINTR == errno)))
                         continue;
-                    else if (rr < 0)
+                    if (rr < 0)
                         break;
                     readin += rr;
                 }
@@ -628,15 +626,13 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                     m_Status = MEDIASTAT_NOTMOUNTED;
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
                 }
-                else if (m_MediaType == MEDIATYPE_DVD)
+                if (m_MediaType == MEDIATYPE_DVD)
                 {
                     // pretend we're NOTMOUNTED so setStatus emits a signal
                     m_Status = MEDIASTAT_NOTMOUNTED;
                     return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                 }
-                else
-                    return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
-                break;
+                return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
             }
             case CDS_AUDIO:
                 LOG(VB_MEDIA, LOG_DEBUG, "found an audio disk");
@@ -644,7 +640,6 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 m_Status = MEDIASTAT_NOTMOUNTED;
                 m_MediaType = MEDIATYPE_AUDIO;
                 return setStatus(MEDIASTAT_USEABLE, OpenedHere);
-                break;
             case CDS_MIXED:
                 LOG(VB_MEDIA, LOG_DEBUG, "found a mixed CD");
                 // Note: Mixed mode CDs require an explixit mount call

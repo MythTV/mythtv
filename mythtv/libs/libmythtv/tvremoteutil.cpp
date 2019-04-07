@@ -16,8 +16,7 @@ uint RemoteGetFlags(uint inputid)
         const TVRec *rec = TVRec::GetTVRec(inputid);
         if (rec)
             return rec->GetFlags();
-        else
-            return 0;
+        return 0;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -35,8 +34,7 @@ uint RemoteGetState(uint inputid)
         const TVRec *rec = TVRec::GetTVRec(inputid);
         if (rec)
             return rec->GetState();
-        else
-            return kState_ChangingState;
+        return kState_ChangingState;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -59,8 +57,7 @@ bool RemoteRecordPending(uint inputid, const ProgramInfo *pginfo,
             rec->RecordPending(pginfo, secsleft, hasLater);
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -85,8 +82,7 @@ bool RemoteStopLiveTV(uint inputid)
             rec->StopLiveTV();
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -108,8 +104,7 @@ bool RemoteStopRecording(uint inputid)
             rec->StopRecording();
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -198,7 +193,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         return nullptr;
     }
 
-    uint i;
+    size_t i;
     for (i = 0; i < inputs.size(); ++i)
         if (inputs[i].m_inputid == (uint)inputid)
             break;
@@ -213,7 +208,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
     {
         // Try to find the next input with a different name.  If one
         // doesn't exist, just return the current one.
-        uint j = i;
+        size_t j = i;
         do
         {
             i = (i + 1) % inputs.size();
@@ -238,7 +233,7 @@ vector<uint> RemoteRequestFreeRecorderList(uint excluded_input)
         RemoteRequestFreeInputInfo(excluded_input);
 
     vector<uint> inputids;
-    for (uint j = 0; j < inputs.size(); j++)
+    for (size_t j = 0; j < inputs.size(); j++)
         inputids.push_back(inputs[j].m_inputid);
 
     LOG(VB_CHANNEL, LOG_INFO,
@@ -256,7 +251,7 @@ vector<uint> RemoteRequestFreeInputList(uint excluded_input)
         RemoteRequestFreeInputInfo(excluded_input);
 
     vector<uint> inputids;
-    for (uint j = 0; j < inputs.size(); j++)
+    for (size_t j = 0; j < inputs.size(); j++)
         inputids.push_back(inputs[j].m_inputid);
 
     LOG(VB_CHANNEL, LOG_INFO,
@@ -278,7 +273,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
          recIter != qualifiedRecorders.end(); ++recIter)
     {
         uint inputid = (*recIter).toUInt();
-        for (uint i = 0; i < inputs.size(); ++i)
+        for (size_t i = 0; i < inputs.size(); ++i)
         {
             if (inputs[i].m_inputid == inputid)
             {
@@ -380,16 +375,14 @@ bool RemoteIsBusy(uint inputid, InputInfo &busy_input)
         const TVRec *rec = TVRec::GetTVRec(inputid);
         if (rec)
             return rec->IsBusy(&busy_input);
-        else
-        {
-            // Note this value is intentionally different than the
-            // non-backend, error value below.  There is a small
-            // window when adding an input where an input can exist in
-            // the database, but not yet have a TVRec.  In such cases,
-            // we don't want it to be considered busy and block other
-            // actions.
-            return false;
-        }
+
+        // Note this value is intentionally different than the
+        // non-backend, error value below.  There is a small
+        // window when adding an input where an input can exist in
+        // the database, but not yet have a TVRec.  In such cases,
+        // we don't want it to be considered busy and block other
+        // actions.
+        return false;
     }
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
@@ -398,7 +391,7 @@ bool RemoteIsBusy(uint inputid, InputInfo &busy_input)
         return true;
 
     QStringList::const_iterator it = strlist.begin();
-    bool state = (*it).toInt();
+    bool state = (*it).toInt() != 0;
     ++it;
     if (!busy_input.FromStringList(it, strlist.end()))
         state = true; // if there was an error pretend that the input is busy.
@@ -415,7 +408,7 @@ bool RemoteGetRecordingStatus(
     if (tunerList)
         tunerList->clear();
 
-    for (uint i = 0; i < inputlist.size(); i++)
+    for (size_t i = 0; i < inputlist.size(); i++)
     {
         QString     status      = "";
         uint        inputid     = inputlist[i];

@@ -59,7 +59,7 @@ class Content : public ContentServices
         DTC::ArtworkInfoList*
                             GetRecordingArtworkList( int              RecordedId,
                                                      int              ChanId,
-                                                     const QDateTime &StartTime  ) override; // ContentServices
+                                                     const QDateTime &recstarttsRaw  ) override; // ContentServices
 
         DTC::ArtworkInfoList*
                             GetProgramArtworkList( const QString &Inetref,
@@ -72,7 +72,7 @@ class Content : public ContentServices
 
         QFileInfo           GetPreviewImage     ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &StartTime,
+                                                  const QDateTime &recstarttsRaw,
                                                   int              Width,
                                                   int              Height,
                                                   int              SecsIn,
@@ -80,7 +80,7 @@ class Content : public ContentServices
 
         QFileInfo           GetRecording        ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &StartTime ) override; // ContentServices
+                                                  const QDateTime &recstarttsRaw ) override; // ContentServices
 
         QFileInfo           GetMusic            ( int Id ) override; // ContentServices
         QFileInfo           GetVideo            ( int Id ) override; // ContentServices
@@ -104,7 +104,7 @@ class Content : public ContentServices
 
         DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              RecordedId,
                                                           int              ChanId,
-                                                          const QDateTime &StartTime,
+                                                          const QDateTime &recstarttsRaw,
                                                           int              MaxSegments,
                                                           int              Width,
                                                           int              Height,

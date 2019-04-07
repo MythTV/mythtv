@@ -37,10 +37,7 @@ const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
 
 bool Playlist::checkTrack(MusicMetadata::IdType trackID) const
 {
-    if (m_songs.contains(trackID))
-        return true;
-
-    return false;
+    return m_songs.contains(trackID);
 }
 
 void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
@@ -532,7 +529,7 @@ void Playlist::getStats(uint *trackCount, uint *totalLength, uint currenttrack, 
     *totalLength = total / 1000;
 }
 
-void Playlist::loadPlaylist(QString a_name, QString a_host)
+void Playlist::loadPlaylist(const QString& a_name, const QString& a_host)
 {
     QString thequery;
     QString rawSonglist;
@@ -589,7 +586,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     shuffleTracks(MusicPlayer::SHUFFLE_OFF);
 }
 
-void Playlist::loadPlaylistByID(int id, QString a_host)
+void Playlist::loadPlaylistByID(int id, const QString& a_host)
 {
     QString rawSonglist;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -645,7 +642,7 @@ void Playlist::resync(void)
     }
 }
 
-void Playlist::fillSongsFromSonglist(QString songList)
+void Playlist::fillSongsFromSonglist(const QString& songList)
 {
     MusicMetadata::IdType id;
     bool badTrack = false;
@@ -692,7 +689,7 @@ void Playlist::fillSongsFromSonglist(QString songList)
         gPlayer->activePlaylistChanged(-1, false);
 }
 
-void Playlist::fillSonglistFromQuery(QString whereClause,
+void Playlist::fillSonglistFromQuery(const QString& whereClause,
                                      bool removeDuplicates,
                                      InsertPLOption insertOption,
                                      int currentTrackID)
@@ -898,7 +895,7 @@ QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
     return rawList;
 }
 
-void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
+void Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QString& name,
                                              bool removeDuplicates,
                                              InsertPLOption insertOption,
                                              int currentTrackID)
@@ -996,7 +993,7 @@ void Playlist::changed(void)
         savePlaylist(m_name, gCoreContext->GetHostName());
 }
 
-void Playlist::savePlaylist(QString a_name, QString a_host)
+void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
 {
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Saving playlist: " + a_name);
 

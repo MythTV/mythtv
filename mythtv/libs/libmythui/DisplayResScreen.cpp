@@ -18,39 +18,39 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr)
-    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(rr)
+                                   const std::vector<double>& refreshRate)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(refreshRate)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr,
-                                   const std::map<double, short>& rr2)
-: realRates(rr2), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
-  m_refreshRates(rr), m_custom(true)
+                                   const std::vector<double>& refreshRate,
+                                   const std::map<double, short>& realrates)
+: realRates(realrates), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
+  m_refreshRates(refreshRate), m_custom(true)
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const double* rr, uint rr_length)
+                                   const double* refreshRate, uint rr_length)
     : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        m_refreshRates.push_back(rr[i]);
+        m_refreshRates.push_back(refreshRate[i]);
 
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const short* rr, uint rr_length)
+                                   const short* refreshRate, uint rr_length)
     : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh)
 {
     SetAspectRatio(-1.0);
     for (uint i = 0; i < rr_length; ++i)
-        m_refreshRates.push_back((double)rr[i]);
+        m_refreshRates.push_back((double)refreshRate[i]);
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
@@ -84,7 +84,7 @@ QString DisplayResScreen::toString() const
 {
     QString str = QString("%1:%2:%3:%4:%5")
         .arg(m_width).arg(m_height).arg(m_width_mm).arg(m_height_mm).arg(m_aspect);
-    for (uint i=0; i<m_refreshRates.size(); ++i)
+    for (size_t i=0; i<m_refreshRates.size(); ++i)
         str.append(QString(":%1").arg(m_refreshRates[i]));
     return str;
 }
@@ -92,7 +92,7 @@ QString DisplayResScreen::toString() const
 QStringList DisplayResScreen::Convert(const DisplayResVector& dsr)
 {
     QStringList slist;
-    for (uint i=0; i<dsr.size(); ++i)
+    for (size_t i=0; i<dsr.size(); ++i)
         slist += dsr[i].toString();
     return slist;
 }
@@ -100,6 +100,7 @@ QStringList DisplayResScreen::Convert(const DisplayResVector& dsr)
 DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 {
     std::vector<DisplayResScreen> dsr;
+    dsr.reserve(slist.size());
     for (int i=0; i<slist.size(); ++i)
         dsr.emplace_back(slist[i]);
     return dsr;
@@ -108,11 +109,8 @@ DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 //compares if the double f1 is equal with f2 and returns 1 if true and 0 if false
 bool DisplayResScreen::compare_rates(double f1, double f2, double precision)
 {
-    if (((f1 - precision) < f2) &&
-        ((f1 + precision) > f2))
-        return true;
-    else
-        return false;
+    return ((f1 - precision) < f2) &&
+           ((f1 + precision) > f2);
 }
 
 int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
@@ -131,12 +129,12 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
     }
 
     // Amend vector with custom list
-    for (uint i=0; i<dsr.size(); ++i)
+    for (size_t i=0; i<dsr.size(); ++i)
     {
         if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height())
         {
             const std::vector<double>& rates = dsr[i].RefreshRates();
-            if (rates.size() && videorate != 0)
+            if (!rates.empty() && videorate != 0)
             {
                 while (!end)
                 {
@@ -144,7 +142,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                          precision < 1.0;
                          precision *= 10.0)
                     {
-                        for (uint j=0; j < rates.size(); ++j)
+                        for (size_t j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(videorate,rates[j], precision) ||
@@ -164,7 +162,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                          precision *= 10.0)
                     {
                         double rounded = round(videorate);
-                        for (uint j=0; j < rates.size(); ++j)
+                        for (size_t j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(rounded,rates[j], precision) ||

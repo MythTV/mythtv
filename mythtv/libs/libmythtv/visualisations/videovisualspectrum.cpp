@@ -176,7 +176,8 @@ bool VideoVisualSpectrum::InitialisePriv(void)
     for (int i = 0, x = 0; i < m_rects.size(); i++, x+= m_barWidth)
         m_rects[i].setRect(x, m_area.height() / 2, m_barWidth - 1, 1);
 
-    m_scaleFactor = double(m_area.height() / 2) / log((double)(FFTW_N));
+    m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0)
+        / log((double)(FFTW_N));
     m_falloff = (double)m_area.height() / 150.0;
 
     LOG(VB_GENERAL, LOG_INFO, DESC +

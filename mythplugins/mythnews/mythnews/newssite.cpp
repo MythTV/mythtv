@@ -20,7 +20,6 @@ NewsSite::NewsSite(const QString   &name,
                    const QString   &url,
                    const QDateTime &updated,
                    const bool       podcast) :
-    QObject(),
     m_name(name),  m_url(url), m_urlReq(url),
     m_updated(updated),
     m_destDir(GetConfDir()+"/MythNews"),
@@ -191,30 +190,28 @@ void NewsSite::customEvent(QEvent *event)
                     emit finished(this);
                     return;
                 }
+
+                m_updateErrorString.clear();
+                //m_data = data;
+
+                if (m_name.isEmpty())
+                {
+                    m_state = NewsSite::WriteFailed;
+                }
                 else
                 {
-                    m_updateErrorString.clear();
-                    //m_data = data;
-
-                    if (m_name.isEmpty())
+                    if (QFile::exists(filename))
                     {
-                        m_state = NewsSite::WriteFailed;
+                        m_updated = MythDate::current();
+                        m_state = NewsSite::Success;
                     }
                     else
                     {
-                        if (QFile::exists(filename))
-                        {
-                            m_updated = MythDate::current();
-                            m_state = NewsSite::Success;
-                        }
-                        else
-                        {
-                            m_state = NewsSite::WriteFailed;
-                        }
+                        m_state = NewsSite::WriteFailed;
                     }
-
-                    emit finished(this);
                 }
+
+                emit finished(this);
             }
         }
     }
@@ -276,41 +273,31 @@ void NewsSite::process(void)
         xmlFile.close();
         return;
     }
-    else if (rootName == "feed")
+    if (rootName == "feed")
     {
         parseAtom(domDoc);
         xmlFile.close();
         return;
     }
-    else {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "XML-file is not valid RSS-feed");
-        m_errorString += tr("XML-file is not valid RSS-feed");
-        return;
-    }
-
+    LOG(VB_GENERAL, LOG_ERR, LOC + "XML-file is not valid RSS-feed");
+    m_errorString += tr("XML-file is not valid RSS-feed");
 }
 
 static bool isImage(const QString &mimeType)
 {
-    if (mimeType == "image/png" || mimeType == "image/jpeg" ||
-        mimeType == "image/jpg" || mimeType == "image/gif" ||
-        mimeType == "image/bmp")
-        return true;
-
-    return false;
+    return mimeType == "image/png" || mimeType == "image/jpeg" ||
+           mimeType == "image/jpg" || mimeType == "image/gif" ||
+           mimeType == "image/bmp";
 }
 
 static bool isVideo(const QString &mimeType)
 {
-    if (mimeType == "video/mpeg" || mimeType == "video/x-ms-wmv" ||
-        mimeType == "application/x-troff-msvideo" || mimeType == "video/avi" ||
-        mimeType == "video/msvideo" || mimeType == "video/x-msvideo")
-        return true;
-
-    return false;
+    return mimeType == "video/mpeg" || mimeType == "video/x-ms-wmv" ||
+           mimeType == "application/x-troff-msvideo" || mimeType == "video/avi" ||
+           mimeType == "video/msvideo" || mimeType == "video/x-msvideo";
 }
 
-void NewsSite::parseRSS(QDomDocument domDoc)
+void NewsSite::parseRSS(const QDomDocument& domDoc)
 {
     QMutexLocker locker(&m_lock);
 
@@ -466,7 +453,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
     }
 }
 
-void NewsSite::parseAtom(QDomDocument domDoc)
+void NewsSite::parseAtom(const QDomDocument& domDoc)
 {
     QDomNodeList entries = domDoc.elementsByTagName("entry");
 

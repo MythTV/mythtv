@@ -51,7 +51,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
   public:
     MythRAOPConnection(QObject *parent, QTcpSocket *socket, QByteArray id,
                        int port);
-   ~MythRAOPConnection();
+   ~MythRAOPConnection() override;
     bool Init(void);
     QTcpSocket *GetSocket()   { return m_socket;   }
     int         GetDataPort() { return m_dataPort; }
@@ -62,7 +62,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
 
   private slots:
     void readClient(void);
-    void udpDataReady(QByteArray buf, QHostAddress peer, quint16 port);
+    void udpDataReady(QByteArray buf, const QHostAddress& peer, quint16 port);
     void timeout(void);
     void audioRetry(void);
     void newEventClient(QTcpSocket *client);
@@ -105,7 +105,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     // utility functions
     int64_t     AudioCardLatency(void);
     QStringList splitLines(const QByteArray &lines);
-    QString     stringFromSeconds(int seconds);
+    QString     stringFromSeconds(int timeInSeconds);
     uint64_t    framesToMs(uint64_t frames);
 
     // notification functions

@@ -96,7 +96,7 @@ bool MythNewsEditor::Create(void)
         m_nameEdit->SetText(m_site->name());
         m_urlEdit->SetText(m_site->url());
         m_iconEdit->SetText(m_site->imageURL());
-        if (m_site->podcast() == 1)
+        if (m_site->podcast())
            m_podcastCheck->SetCheckState(MythUIStateType::Full);
     }
 

@@ -19,6 +19,7 @@ using namespace std;
 #include <QMap>                         // for QMap<>::iterator, etc
 #include <QThread>                      // for QThread, etc
 #include <QtCore/qnumeric.h>            // for qIsNaN
+#include <utility>
 
 // MythTV headers
 #include "mthread.h"
@@ -65,7 +66,7 @@ extern "C" {
 #define round(x) ((int) ((x) + 0.5))
 #endif
 
-static unsigned dbg_ident(const MythPlayer*);
+static unsigned dbg_ident(const MythPlayer* /*player*/);
 
 #define LOC      QString("Player(%1): ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)
@@ -161,7 +162,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       m_latestVideoTimecode(-1),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
-      video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
+      video_frame_rate(29.97F), video_aspect(4.0F / 3.0F),
       forced_video_aspect(-1),
       resetScan(kScan_Ignore), m_scan(kScan_Interlaced),
       m_scan_locked(false), m_scan_tracker(0), m_scan_initialized(false),
@@ -188,7 +189,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // OSD stuff
       osd(nullptr), reinit_osd(false), osdLock(QMutex::Recursive),
       // Audio
-      audio(this, (flags & kAudioMuted)),
+      audio(this, (flags & kAudioMuted) != 0),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Filters
@@ -197,12 +198,12 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       videoFilters(nullptr),        FiltMan(new FilterManager()),
 
       forcePositionMapSync(false),  pausedBeforeEdit(false),
-      speedBeforeEdit(1.0f),
+      speedBeforeEdit(1.0F),
       // Playback (output) speed control
       decoder_lock(QMutex::Recursive),
-      next_play_speed(1.0f),        next_normal_speed(true),
-      play_speed(1.0f),             normal_speed(true),
-      frame_interval((int)(1000000.0f / 30)), m_frame_interval(0),
+      next_play_speed(1.0F),        next_normal_speed(true),
+      play_speed(1.0F),             normal_speed(true),
+      frame_interval((int)(1000000.0F / 30)), m_frame_interval(0),
       m_fpsMultiplier(1),
       ffrew_skip(1),ffrew_adjust(0),
       fileChanged(false),
@@ -238,8 +239,8 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     memset(&tc_wrap,    0, sizeof(tc_wrap));
     max_diverge = float(gCoreContext->GetFloatSetting
         ("PlayerMaxDiverge", 3.0));
-    if (max_diverge < 1.0f)
-        max_diverge = 1.0f;
+    if (max_diverge < 1.0F)
+        max_diverge = 1.0F;
 
     playerThread = QThread::currentThread();
 #ifdef Q_OS_ANDROID
@@ -547,7 +548,7 @@ void MythPlayer::ReinitOSD(void)
         QRect visible, total;
         float aspect, scaling;
         videoOutput->GetOSDBounds(total, visible, aspect,
-                                  scaling, 1.0f);
+                                  scaling, 1.0F);
         if (osd)
         {
             osd->SetPainter(videoOutput->GetOSDPainter());
@@ -826,7 +827,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
-                                FrameScanType scan, QString codecName)
+                                FrameScanType scan, const QString& codecName)
 {
     bool paramsChanged = false;
 
@@ -848,7 +849,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         }
         else
         {
-            float temp_speed = (play_speed == 0.0f) ?
+            float temp_speed = (play_speed == 0.0F) ?
                 audio.GetStretchFactor() : play_speed;
             SetFrameInterval(kScan_Progressive,
                              1.0 / (video_frame_rate * static_cast<double>(temp_speed)));
@@ -880,7 +881,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
 void MythPlayer::SetFrameRate(double fps)
 {
     video_frame_rate = fps;
-    float temp_speed = (play_speed == 0.0f) ?
+    float temp_speed = (play_speed == 0.0F) ?
         audio.GetStretchFactor() : play_speed;
     SetFrameInterval(kScan_Progressive,
                      1.0 / (video_frame_rate * static_cast<double>(temp_speed)));
@@ -1000,7 +1001,7 @@ int MythPlayer::OpenFile(uint retries)
         delete[] testbuf;
         return -1;
     }
-    else if (decoder->IsErrored())
+    if (decoder->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
         SetDecoder(nullptr);
@@ -1426,7 +1427,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     QMutexLocker locker(&osdLock);
 
-    bool newTextDesired = textDisplayMode & kDisplayAllTextCaptions;
+    bool newTextDesired = (textDisplayMode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (osd_msg || newTextDesired)
         textDesired = newTextDesired;
@@ -1466,7 +1467,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    bool newTextDesired = mode & kDisplayAllTextCaptions;
+    bool newTextDesired = (mode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (osd_msg || newTextDesired)
         textDesired = newTextDesired;
@@ -1525,7 +1526,7 @@ bool MythPlayer::ToggleCaptions(uint type)
     uint origMode = textDisplayMode;
 
     if (textDisplayMode)
-        DisableCaptions(textDisplayMode, origMode & mode);
+        DisableCaptions(textDisplayMode, (origMode & mode) != 0U);
     if (origMode & mode)
         return textDisplayMode;
     if (mode)
@@ -1761,7 +1762,7 @@ bool MythPlayer::HasCaptionTrack(int mode)
     {
         return true;
     }
-    else if (!(mode == kDisplayTextSubtitle) &&
+    if (!(mode == kDisplayTextSubtitle) &&
                decoder->GetTrackCount(toTrackType(mode)))
     {
         return true;
@@ -1909,7 +1910,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         disp_timecode = buffer->disp_timecode;
     }
 
-    float diverge = 0.0f;
+    float diverge = 0.0F;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
     int vsync_delay_clock = 0;
     //int64_t currentaudiotime = 0;
@@ -1930,7 +1931,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     if (avsync_next > 0)
         avsync_next--;
     else {
-        int divisor = int(abs(diverge) - max_diverge - 1.0f);
+        int divisor = int(abs(diverge) - max_diverge - 1.0F);
         if (divisor < 1)
             divisor=1;
         avsync_next = avsync_interval/divisor;
@@ -2259,7 +2260,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             videotimecode = maxtcval + maxtcframes * frame_interval/1000;
         }
 
-        if (play_speed > 0.0f)
+        if (play_speed > 0.0F)
             framedue = rtcbase + videotimecode * playspeed1000;
         else
             framedue = unow + frame_interval / 2;
@@ -2605,7 +2606,7 @@ void MythPlayer::CheckAspectRatio(VideoFrame* frame)
     if (!frame)
         return;
 
-    if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0f)
+    if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0F)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Video Aspect ratio changed from %1 to %2")
@@ -2708,7 +2709,7 @@ void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
     if (!videoOutput)
         return;
 
-    bool normal = play_speed > 0.99f && play_speed < 1.01f && normal_speed;
+    bool normal = play_speed > 0.99F && play_speed < 1.01F && normal_speed;
     videofiltersLock.lock();
 
     bool hwset = decoder->GetMythCodecContext()->setDeinterlacer(true, overridefilter);
@@ -2742,7 +2743,7 @@ void MythPlayer::VideoStart(void)
         osdLock.lock();
         osd = new OSD(this, m_tv, videoOutput->GetOSDPainter());
 
-        videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0f);
+        videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
         osd->Init(visible, aspect);
         videoOutput->InitOSD(osd);
         osd->EnableSubtitles(kDisplayNone);
@@ -2796,7 +2797,7 @@ void MythPlayer::VideoStart(void)
     EnableFrameRateMonitor();
     refreshrate = frame_interval;
 
-    float temp_speed = (play_speed == 0.0f) ? audio.GetStretchFactor() : play_speed;
+    float temp_speed = (play_speed == 0.0F) ? audio.GetStretchFactor() : play_speed;
     int fr_int = (1000000.0 / video_frame_rate / static_cast<double>(temp_speed));
     int rf_int = MythDisplay::GetDisplayInfo(fr_int).Rate();
 
@@ -3188,8 +3189,8 @@ void MythPlayer::JumpToProgram(void)
         pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
     QString subfn = player_ctx->m_buffer->GetSubtitleFilename();
     TVState desiredState = player_ctx->GetState();
-    bool isInProgress =
-        desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
+    bool isInProgress = (desiredState == kState_WatchingRecording ||
+                         desiredState == kState_WatchingLiveTV);
     if (GetSubReader())
         GetSubReader()->LoadExternalSubtitles(subfn, isInProgress &&
                                               !subfn.isEmpty());
@@ -3401,10 +3402,10 @@ void MythPlayer::EventLoop(void)
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     // Disable timestretch if we are too close to the end of the buffer
-    if (ffrew_skip == 1 && (play_speed > 1.0f) && IsNearEnd())
+    if (ffrew_skip == 1 && (play_speed > 1.0F) && IsNearEnd())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Near end, Slowing down playback.");
-        Play(1.0f, true, true);
+        Play(1.0F, true, true);
     }
 
     if (isDummy && player_ctx->m_tvchain && player_ctx->m_tvchain->HasNext())
@@ -3442,7 +3443,7 @@ void MythPlayer::EventLoop(void)
     if (ffrew_skip > 1 && (CalcMaxFFTime(100, false) < 100))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Near end, stopping fastforward.");
-        Play(1.0f, true, true);
+        Play(1.0F, true, true);
     }
 
     // Disable rewind if we are too close to the beginning of the buffer
@@ -3450,7 +3451,7 @@ void MythPlayer::EventLoop(void)
         (framesPlayed <= keyframedist))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Near start, stopping rewind.");
-        float stretch = (ffrew_skip > 0) ? 1.0f : audio.GetStretchFactor();
+        float stretch = (ffrew_skip > 0) ? 1.0F : audio.GetStretchFactor();
         Play(stretch, true, true);
     }
 
@@ -3990,7 +3991,7 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     PIPLocation ols[] =
         { kPIPTopLeft, kPIPTopRight, kPIPBottomLeft, kPIPBottomRight };
 
-    for (uint i = 0; i < sizeof(ols)/sizeof(PIPLocation); i++)
+    for (size_t i = 0; i < sizeof(ols)/sizeof(PIPLocation); i++)
     {
         PIPMap::const_iterator it = pip_players.begin();
         for (; it != pip_players.end() && (*it != ols[i]); ++it);
@@ -4139,35 +4140,35 @@ bool MythPlayer::UpdateFFRewSkip(void)
 {
     bool skip_changed;
 
-    float temp_speed = (play_speed == 0.0f) ?
+    float temp_speed = (play_speed == 0.0F) ?
         audio.GetStretchFactor() : play_speed;
-    if (play_speed >= 0.0f && play_speed <= 3.0f)
+    if (play_speed >= 0.0F && play_speed <= 3.0F)
     {
         skip_changed = (ffrew_skip != 1);
         if (decoder)
             m_fpsMultiplier = decoder->GetfpsMultiplier();
         frame_interval = (int) (1000000.0 / video_frame_rate / static_cast<double>(temp_speed))
           / m_fpsMultiplier;
-        ffrew_skip = (play_speed != 0.0f);
+        ffrew_skip = (play_speed != 0.0F);
     }
     else
     {
         skip_changed = true;
         frame_interval = 200000;
-        frame_interval = (fabs(play_speed) >=   3.0f) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=   5.0f) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=   8.0f) ? 250250 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  10.0f) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  16.0f) ? 187687 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  20.0f) ? 150150 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  30.0f) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  60.0f) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >= 120.0f) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >= 180.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   3.0F) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   5.0F) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   8.0F) ? 250250 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  10.0F) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  16.0F) ? 187687 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  20.0F) ? 150150 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  30.0F) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  60.0F) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >= 120.0F) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >= 180.0F) ? 133466 : frame_interval;
         float ffw_fps = fabs(static_cast<double>(play_speed)) * video_frame_rate;
-        float dis_fps = 1000000.0f / frame_interval;
+        float dis_fps = 1000000.0F / frame_interval;
         ffrew_skip = (int)ceil(ffw_fps / dis_fps);
-        ffrew_skip = play_speed < 0.0f ? -ffrew_skip : ffrew_skip;
+        ffrew_skip = play_speed < 0.0F ? -ffrew_skip : ffrew_skip;
         ffrew_adjust = 0;
     }
 
@@ -4186,7 +4187,7 @@ void MythPlayer::ChangeSpeed(void)
     if (skip_changed && videoOutput)
     {
         videoOutput->SetPrebuffering(ffrew_skip == 1);
-        if (play_speed != 0.0f && !(last_speed == 0.0f && ffrew_skip == 1))
+        if (play_speed != 0.0F && !(last_speed == 0.0F && ffrew_skip == 1))
             DoJumpToFrame(framesPlayed + fftime - rewindtime, kInaccuracyFull);
     }
 
@@ -4202,7 +4203,7 @@ void MythPlayer::ChangeSpeed(void)
 
         // If using bob deinterlace, turn on or off if we
         // changed to or from synchronous playback speed.
-        bool play_1 = play_speed > 0.99f && play_speed < 1.01f && normal_speed;
+        bool play_1 = play_speed > 0.99F && play_speed < 1.01F && normal_speed;
         bool inter  = (kScan_Interlaced   == m_scan  ||
                        kScan_Intr2ndField == m_scan);
 
@@ -4346,8 +4347,8 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
     }
     else
     {
-        float secsMax = secsWritten - 2.f * maxtime;
-        if (secsMax <= 0.f)
+        float secsMax = secsWritten - 2.F * maxtime;
+        if (secsMax <= 0.F)
             ret = 0;
         else if (secsMax < secsPlayed + ff)
             ret = TranslatePositionMsToFrame(1000 * secsMax, true)
@@ -4686,7 +4687,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
                 DoRewind(1, kInaccuracyNone);
             else if (seekamount > 0)
                 // Use fully-accurate seeks for less than 1 second.
-                DoRewindSecs(seekamount, seekamount < 1.0f ? kInaccuracyNone :
+                DoRewindSecs(seekamount, seekamount < 1.0F ? kInaccuracyNone :
                              kInaccuracyEditor, false);
             else
                 HandleArbSeek(false);
@@ -4697,7 +4698,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
                 DoFastForward(1, kInaccuracyNone);
             else if (seekamount > 0)
                 // Use fully-accurate seeks for less than 1 second.
-                DoFastForwardSecs(seekamount, seekamount < 1.0f ? kInaccuracyNone :
+                DoFastForwardSecs(seekamount, seekamount < 1.0F ? kInaccuracyNone :
                              kInaccuracyEditor, false);
             else
                 HandleArbSeek(true);
@@ -4725,7 +4726,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             HandleArbSeek(true);
             deleteMap.SetSeekAmount(old_seekamount);
         }
-#define FFREW_MULTICOUNT 10
+#define FFREW_MULTICOUNT 10.0F
         else if (action == ACTION_BIGJUMPREW)
         {
             if (seekamount == 0)
@@ -4929,7 +4930,7 @@ bool MythPlayer::IsEmbedding(void)
 bool MythPlayer::GetScreenShot(int width, int height, QString filename)
 {
     if (videoOutput)
-        return videoOutput->GetScreenShot(width, height, filename);
+        return videoOutput->GetScreenShot(width, height, std::move(filename));
     return false;
 }
 
@@ -5010,7 +5011,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
         // This is probably an audio file, just return a grey frame.
         vw = 640;
         vh = 480;
-        ar = 4.0f / 3.0f;
+        ar = 4.0F / 3.0F;
 
         bufflen = vw * vh * 4;
         outputbuf = new unsigned char[bufflen];
@@ -5449,8 +5450,8 @@ uint64_t MythPlayer::GetCurrentFrameCount(void) const
 }
 
 // Finds the frame number associated with the given time offset.  A
-// positive offset or +0.0f indicate offset from the beginning.  A
-// negative offset or -0.0f indicate offset from the end.  Limit the
+// positive offset or +0.0F indicate offset from the beginning.  A
+// negative offset or -0.0F indicate offset from the end.  Limit the
 // result to within bounds of the video.
 uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
 {
@@ -5579,7 +5580,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         secsplayed = min(playbackLen, max(secsplayed, 0));
 
         if (playbackLen > 0)
-            pos = (int)(1000.0f * (secsplayed / (float)playbackLen));
+            pos = (int)(1000.0F * (secsplayed / (float)playbackLen));
 
         info.values.insert(relPrefix + "secondsplayed", secsplayed);
         info.values.insert(relPrefix + "totalseconds", playbackLen);
@@ -6063,7 +6064,7 @@ void MythPlayer::ToggleNightMode(void)
     int b = videoOutput->GetPictureAttribute(kPictureAttribute_Brightness);
     int c = 0;
     bool has_contrast = (videoOutput->GetSupportedPictureAttributes() &
-                         kPictureAttributeSupported_Contrast);
+                         kPictureAttributeSupported_Contrast) != 0;
     if (has_contrast)
         c = videoOutput->GetPictureAttribute(kPictureAttribute_Contrast);
 
@@ -6181,14 +6182,13 @@ void MythPlayer::syncWithAudioStretch()
     if (decoder && audio.HasAudioOut())
     {
         float stretch = audio.GetStretchFactor();
-        disable_passthrough |= (stretch < 0.99f) || (stretch > 1.01f);
+        disable_passthrough |= (stretch < 0.99F) || (stretch > 1.01F);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Stretch Factor %1, %2 passthru ")
             .arg(audio.GetStretchFactor())
             .arg((disable_passthrough) ? "disable" : "allow"));
         SetDisablePassThrough(disable_passthrough);
     }
-    return;
 }
 
 void MythPlayer::SetDisablePassThrough(bool disabled)

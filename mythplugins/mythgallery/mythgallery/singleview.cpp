@@ -47,7 +47,7 @@ using namespace std;
 template<typename T> T sq(T val) { return val * val; }
 
 SingleView::SingleView(
-    ThumbList       itemList,  int *pos,
+    const ThumbList& itemList, int *pos,
     int             slideShow, int sortorder,
     MythMainWindow *parent,
     const char *name)
@@ -60,7 +60,7 @@ SingleView::SingleView(
     m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
     m_slideshow_timer = new QTimer(this);
-    RegisterEffects();
+    SingleView::RegisterEffects();
 
     // --------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ SingleView::SingleView(
 
     // --------------------------------------------------------------------
 
-    Load();
+    SingleView::Load();
 
     // --------------------------------------------------------------------
 
@@ -147,7 +147,7 @@ SingleView::~SingleView()
     gCoreContext->SaveSetting("GalleryScaleMax", m_scaleMax);
 }
 
-void SingleView::paintEvent(QPaintEvent *)
+void SingleView::paintEvent(QPaintEvent * /*e*/)
 {
     if (1 == m_movieState)
     {
@@ -248,7 +248,7 @@ void SingleView::paintEvent(QPaintEvent *)
                 }
             }
 
-            if (m_zoom != 1.0f)
+            if (m_zoom != 1.0F)
             {
                 QPainter p(&pix);
                 p.initFrom(this);
@@ -348,10 +348,10 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMOUT")
         {
-            if (m_zoom > 0.5f)
+            if (m_zoom > 0.5F)
             {
-                SetZoom(m_zoom - 0.5f);
-                if (m_zoom > 1.0f)
+                SetZoom(m_zoom - 0.5F);
+                if (m_zoom > 1.0F)
                 {
                     m_source_loc.setY(m_source_loc.y() - (m_screenheight / 4));
                     m_source_loc.setX(m_source_loc.x() - (m_screenwidth / 4));
@@ -363,10 +363,10 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMIN")
         {
-            if (m_zoom < 4.0f)
+            if (m_zoom < 4.0F)
             {
-                SetZoom(m_zoom + 0.5f);
-                if (m_zoom > 1.0f)
+                SetZoom(m_zoom + 0.5F);
+                if (m_zoom > 1.0F)
                 {
                     m_source_loc.setY(m_source_loc.y() + (m_screenheight / 4));
                     m_source_loc.setX(m_source_loc.x() + (m_screenwidth / 4));
@@ -379,12 +379,12 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         else if (action == "FULLSIZE")
         {
             m_source_loc = QPoint(0, 0);
-            if (m_zoom != 1.0f)
-                SetZoom(1.0f);
+            if (m_zoom != 1.0F)
+                SetZoom(1.0F);
         }
         else if (action == "SCROLLLEFT")
         {
-            if (m_zoom > 1.0f)
+            if (m_zoom > 1.0F)
             {
                 m_source_loc.setX(m_source_loc.x() - scrollX);
                 m_source_loc.setX(
@@ -393,7 +393,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SCROLLRIGHT")
         {
-            if (m_zoom > 1.0f && m_pixmap)
+            if (m_zoom > 1.0F && m_pixmap)
             {
                 m_source_loc.setX(m_source_loc.x() + scrollX);
                 m_source_loc.setX(min(m_source_loc.x(),
@@ -402,7 +402,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SCROLLDOWN")
         {
-            if (m_zoom > 1.0f && m_pixmap)
+            if (m_zoom > 1.0F && m_pixmap)
             {
                 m_source_loc.setY(m_source_loc.y() + scrollY);
                 m_source_loc.setY(min(m_source_loc.y(),
@@ -411,7 +411,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SCROLLUP")
         {
-            if (m_zoom > 1.0f)
+            if (m_zoom > 1.0F)
             {
                 m_source_loc.setY(m_source_loc.y() - scrollY);
                 m_source_loc.setY(
@@ -420,7 +420,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "RECENTER")
         {
-            if (m_zoom > 1.0f && m_pixmap)
+            if (m_zoom > 1.0F && m_pixmap)
             {
                 m_source_loc = QPoint(
                     (m_pixmap->width()  - m_screenwidth)  >> 1,
@@ -429,14 +429,14 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "UPLEFT")
         {
-            if (m_zoom > 1.0f)
+            if (m_zoom > 1.0F)
             {
                 m_source_loc = QPoint(0,0);
             }
         }
         else if (action == "LOWRIGHT")
         {
-            if (m_zoom > 1.0f && m_pixmap)
+            if (m_zoom > 1.0F && m_pixmap)
             {
                 m_source_loc = QPoint(
                     m_pixmap->width()  - scrollX - m_screenwidth,
@@ -468,7 +468,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                  action == "RANDOMSHOW" || action == "SEASONALSHOW")
         {
             m_source_loc = QPoint(0, 0);
-            m_zoom = 1.0f;
+            m_zoom = 1.0F;
             m_angle = 0;
             m_info_show = wasInfo;
             m_info_show_short = true;
@@ -483,7 +483,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         {
             m_scaleMax = (ScaleMax) ((m_scaleMax + 1) % kScaleMaxCount);
             m_source_loc = QPoint(0, 0);
-            SetZoom(1.0f);
+            SetZoom(1.0F);
         }
         else
         {
@@ -522,7 +522,7 @@ void SingleView::DisplayNext(bool reset, bool loadImage)
     if (reset)
     {
         m_angle = 0;
-        m_zoom = 1.0f;
+        m_zoom = 1.0F;
         m_source_loc = QPoint(0, 0);
     }
 
@@ -555,7 +555,7 @@ void SingleView::DisplayPrev(bool reset, bool loadImage)
     if (reset)
     {
         m_angle = 0;
-        m_zoom = 1.0f;
+        m_zoom = 1.0F;
         m_source_loc = QPoint(0, 0);
     }
 
@@ -767,7 +767,6 @@ void SingleView::EffectNone(void)
     m_effect_running = false;
     m_slideshow_frame_delay_state = -1;
     update();
-    return;
 }
 
 void SingleView::EffectChessboard(void)
@@ -898,8 +897,8 @@ void SingleView::EffectGrowing(void)
     {
         m_effect_bounds = QRect(width() >> 1, height() >> 1, width(), height());
         m_effect_i = 0;
-        m_effect_delta2_x = m_effect_bounds.x() * 0.01f;
-        m_effect_delta2_y = m_effect_bounds.y() * 0.01f;
+        m_effect_delta2_x = m_effect_bounds.x() * 0.01F;
+        m_effect_delta2_y = m_effect_bounds.y() * 0.01F;
     }
 
     m_effect_bounds.moveTopLeft(
@@ -1060,8 +1059,8 @@ void SingleView::EffectIncomingEdges(void)
     {
         m_effect_bounds.setSize(size());
         m_effect_delta1 = QPoint(m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
-        m_effect_delta2_x = m_effect_delta1.x() * 0.01f;
-        m_effect_delta2_y = m_effect_delta1.y() * 0.01f;
+        m_effect_delta2_x = m_effect_delta1.x() * 0.01F;
+        m_effect_delta2_y = m_effect_delta1.y() * 0.01F;
         m_effect_i = 0;
         m_effect_subtype = random() & 1;
     }
@@ -1137,8 +1136,8 @@ void SingleView::EffectMultiCircleOut(void)
         m_effect_milti_circle_out_points.setPoint(
             3, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
 
-        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f +
-                           sq(m_effect_bounds.height()) * 0.5f);
+        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0F +
+                           sq(m_effect_bounds.height()) * 0.5F);
         m_effect_i = (random() & 0xf) + 2;
         m_effect_multi_circle_out_delta_alpha = M_PI * 2 / m_effect_i;
         m_effect_alpha = m_effect_multi_circle_out_delta_alpha;
@@ -1261,8 +1260,8 @@ void SingleView::EffectCircleOut(void)
             3, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
 
         m_effect_delta2_x = M_PI / 16;  // divisor must be powers of 8
-        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f +
-                           sq(m_effect_bounds.height()) * 0.5f);
+        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0F +
+                           sq(m_effect_bounds.height()) * 0.5F);
     }
 
     if (m_effect_alpha < 0)
@@ -1351,7 +1350,6 @@ void SingleView::EffectNoise(void)
     m_slideshow_frame_delay_state = -1;
     m_effect_running = false;
     update();
-    return;
 }
 
 void SingleView::SlideTimeout(void)

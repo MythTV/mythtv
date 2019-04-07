@@ -161,19 +161,19 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     virtual void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
     virtual void SetValue(const QString &value) { MoveToNamedPosition(value); }
-    void SetValueByData(QVariant data);
+    void SetValueByData(const QVariant& data);
     virtual int  GetIntValue() const;
     virtual QString  GetValue() const;
     QVariant GetDataValue() const;
     MythRect GetButtonArea(void) const;
 
     void SetItemCurrent(MythUIButtonListItem* item);
-    void SetItemCurrent(int pos, int topPos = -1);
+    void SetItemCurrent(int current, int topPos = -1);
     MythUIButtonListItem* GetItemCurrent() const;
     MythUIButtonListItem* GetItemFirst() const;
     MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item) const;
     MythUIButtonListItem* GetItemAt(int pos) const;
-    MythUIButtonListItem* GetItemByData(QVariant data);
+    MythUIButtonListItem* GetItemByData(const QVariant& data);
 
     uint ItemWidth(void);
     uint ItemHeight(void);

@@ -165,7 +165,7 @@ MSocketDevice::MSocketDevice(int socket, Type type)
            this, socket, type);
 #endif
     init();
-    setSocket(socket, type);
+    MSocketDevice::setSocket(socket, type);
 }
 
 /*!
@@ -188,7 +188,7 @@ MSocketDevice::MSocketDevice(Type type)
            this, type);
 #endif
     init();
-    setSocket(createNewSocket(), type);
+    MSocketDevice::setSocket(createNewSocket(), type);
 }
 
 /*!
@@ -208,7 +208,7 @@ MSocketDevice::MSocketDevice(Type type)
 
     \sa blocking() protocol()
 */
-MSocketDevice::MSocketDevice(Type type, Protocol protocol, int)
+MSocketDevice::MSocketDevice(Type type, Protocol protocol, int /*dummy*/)
         : fd(-1), t(type), p(0), pp(0), e(NoError),
         d(new MSocketDevicePrivate(protocol))
 {
@@ -217,7 +217,7 @@ MSocketDevice::MSocketDevice(Type type, Protocol protocol, int)
            this, type);
 #endif
     init();
-    setSocket(createNewSocket(), type);
+    MSocketDevice::setSocket(createNewSocket(), type);
 }
 
 /*!
@@ -225,7 +225,7 @@ MSocketDevice::MSocketDevice(Type type, Protocol protocol, int)
 */
 MSocketDevice::~MSocketDevice()
 {
-    close();
+    MSocketDevice::close();
     delete d;
     d = nullptr;
 #if defined(MSOCKETDEVICE_DEBUG)
@@ -310,7 +310,7 @@ int MSocketDevice::socket() const
 void MSocketDevice::setSocket(int socket, Type type)
 {
     if (fd != -1)     // close any open socket
-        close();
+        MSocketDevice::close();
 
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice::setSocket: socket %x, type %d", socket, type);
@@ -417,7 +417,7 @@ bool MSocketDevice::atEnd() const
 */
 bool MSocketDevice::broadcast() const
 {
-    return option(Broadcast);
+    return option(Broadcast) != 0;
 }
 
 /*!
@@ -439,7 +439,7 @@ void MSocketDevice::setBroadcast(bool enable)
 */
 bool MSocketDevice::addressReusable() const
 {
-    return option(ReuseAddress);
+    return option(ReuseAddress) != 0;
 }
 
 
@@ -469,7 +469,7 @@ void MSocketDevice::setAddressReusable(bool enable)
 */
 bool MSocketDevice::keepalive() const
 {
-    return option(Keepalive);
+    return option(Keepalive) != 0;
 }
 
 /*!

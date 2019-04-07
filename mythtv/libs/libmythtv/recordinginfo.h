@@ -118,7 +118,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         RecordingDupMethodType dupmethod,
 
         uint sourceid,
-        uint cardid,
+        uint inputid,
 
         uint findid,
 
@@ -194,9 +194,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
   public:
     RecordingInfo &operator=(const RecordingInfo &other)
-        { clone(other); return *this; }
+        { RecordingInfo::clone(other); return *this; }
     RecordingInfo &operator=(const ProgramInfo &other)
-        { clone(other); return *this; }
+        { RecordingInfo::clone(other); return *this; }
     virtual void clone(const RecordingInfo &other,
                        bool ignore_non_serialized_data = false);
     void clone(const ProgramInfo &other,
@@ -224,7 +224,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     RecordingRule *GetRecordingRule(void);
     int getRecordID(void);
     static bool QueryRecordedIdForKey(int & recordedid,
-                                      uint chanid, QDateTime recstartts);
+                                      uint chanid, const QDateTime& recstartts);
     int GetAutoRunJobs(void) const;
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void) const;
@@ -246,14 +246,14 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void SetDupHistory(void);//pi
 
     // Used to update database with recording info
-    void StartedRecording(QString ext);
+    void StartedRecording(const QString& ext);
     void FinishedRecording(bool allowReRecord);
     void UpdateRecordingEnd(void);//pi
     void ReactivateRecording(void);//pi
     void ApplyRecordRecID(void);//pi
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
     void ApplyRecordRecGroupChange(int newrecgroupid);
-    void ApplyRecordPlayGroupChange(const QString &newrecgroup);
+    void ApplyRecordPlayGroupChange(const QString &newplaygroup);
     void ApplyStorageGroupChange(const QString &newstoragegroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,
                                    const QString &newSubtitle,
@@ -270,7 +270,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void LoadRecordingFile();
     RecordingFile *GetRecordingFile() const { return m_recordingFile; }
     void SaveFilesize(uint64_t fsize) override; // ProgramInfo
-    void SetFilesize( uint64_t sz ) override; // ProgramInfo
+    void SetFilesize( uint64_t fsize ) override; // ProgramInfo
     uint64_t GetFilesize(void) const override; // ProgramInfo
 
     RecStatus::Type m_oldrecstatus      {RecStatus::Unknown};

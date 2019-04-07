@@ -86,7 +86,7 @@ bool MythXDisplay::Open(void)
 {
     MythXLocker locker(this);
 
-    QString dispStr = GetMythUI()->GetX11Display();
+    QString dispStr = MythUIHelper::GetX11Display();
     const char *dispCStr = nullptr;
     if (!dispStr.isEmpty())
         dispCStr = dispStr.toLatin1().constData();
@@ -145,7 +145,7 @@ QSize MythXDisplay::GetDisplaySize(void)
     MythXLocker locker(this);
     int displayWidthPixel  = DisplayWidth( m_disp, m_screen_num);
     int displayHeightPixel = DisplayHeight(m_disp, m_screen_num);
-    return QSize(displayWidthPixel, displayHeightPixel);
+    return {displayWidthPixel, displayHeightPixel};
 }
 
 /**
@@ -158,7 +158,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
     MythXLocker locker(this);
     int displayWidthMM  = DisplayWidthMM( m_disp, m_screen_num);
     int displayHeightMM = DisplayHeightMM(m_disp, m_screen_num);
-    return QSize(displayWidthMM, displayHeightMM);
+    return {displayWidthMM, displayHeightMM};
 }
 
 float MythXDisplay::GetRefreshRate(void)

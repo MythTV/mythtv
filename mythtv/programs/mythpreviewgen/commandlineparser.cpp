@@ -5,7 +5,7 @@
 
 MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHPREVIEWGEN)
-{ LoadArguments(); }
+{ MythPreviewGeneratorCommandLineParser::LoadArguments(); }
 
 void MythPreviewGeneratorCommandLineParser::LoadArguments(void)
 {

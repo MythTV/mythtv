@@ -133,7 +133,6 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
                 pos = resync_stream(buffer, pos+1, len, packet_size);
                 if (pos < 0)
                 {
-                    offset = 0;
                     break;
                 }
             }
@@ -246,7 +245,6 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
                 pos = resync_stream(buffer, pos+1, len, packet_size);
                 if (pos < 0)
                 {
-                    offset = 0;
                     break;
                 }
             }
@@ -379,7 +377,7 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
             {
                 continue;
             }
-            bool has_pts = bufptr[3] & 0x80;
+            bool has_pts = (bufptr[3] & 0x80) != 0;
             if (has_pts && (bytes_left > 5+5))
             {
                 int i = 5;

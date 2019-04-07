@@ -12,6 +12,7 @@ MediaServer *g_pUPnp      = nullptr;
 BackendContext *gBackendContext = nullptr;
 QString      pidfile;
 QString      logfile;
+MythSystemEventHandler *sysEventHandler = nullptr;
 
 BackendContext::~BackendContext()
 {

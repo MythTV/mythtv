@@ -109,9 +109,9 @@ public:
     QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
-    float m_wmult                            {1.0f};
-    float m_hmult                            {1.0f};
-    float m_pixelAspectRatio                 {-1.0f};
+    float m_wmult                            {1.0F};
+    float m_hmult                            {1.0F};
+    float m_pixelAspectRatio                 {-1.0F};
 
     // Drawable area of the full screen. May cover several screens,
     // or exclude windowing system fixtures (like Mac menu bar)
@@ -357,7 +357,7 @@ void MythUIHelperPrivate::StoreGUIsettings()
         font = QFont();
 
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPixelSize(lroundf(19.0f * m_hmult));
+    font.setPixelSize(lroundf(19.0F * m_hmult));
     int stretch = (int)(100 / GetPixelAspectRatio());
     font.setStretch(stretch); // QT
     m_fontStretch = stretch; // MythUI
@@ -608,7 +608,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 #endif
 	    ) >=
            d->m_maxCacheSize.fetchAndAddOrdered(0) &&
-           d->m_imageCache.size())
+           !d->m_imageCache.empty())
     {
         QMap<QString, MythImage *>::iterator it = d->m_imageCache.begin();
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
@@ -738,7 +738,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
 
     for (int i = 0; i < list.size(); ++i)
     {
-        QFileInfo fileInfo = list.at(i);
+        const QFileInfo& fileInfo = list.at(i);
 
         if (fileInfo.fileName().contains(partialKey))
         {
@@ -793,7 +793,7 @@ QString MythUIHelper::GetThemeCacheDir(void)
  * \param url The resource being read.
  * \returns The path name of the appropriate cache directory.
  */
-QString MythUIHelper::GetCacheDirByUrl(QString url)
+QString MythUIHelper::GetCacheDirByUrl(const QString& url)
 {
     if (url.startsWith("myth:") || url.startsWith("-"))
         return GetThumbnailDir();
@@ -895,7 +895,7 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
  *
  * \param dirname The directory to prune.
  */
-void MythUIHelper::PruneCacheDir(QString dirname)
+void MythUIHelper::PruneCacheDir(const QString& dirname)
 {
     int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
     if (days == -1) {
@@ -1377,7 +1377,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     return foundit;
 }
 
-MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
+MythImage *MythUIHelper::LoadCacheImage(QString srcfile, const QString& label,
                                         MythPainter *painter,
                                         ImageCacheMode cacheMode)
 {
@@ -1624,7 +1624,7 @@ QString MythUIHelper::GetX11Display(void)
     return x11_display;
 }
 
-void MythUIHelper::AddCurrentLocation(QString location)
+void MythUIHelper::AddCurrentLocation(const QString& location)
 {
     QMutexLocker locker(&m_locationLock);
 
@@ -1707,7 +1707,7 @@ double MythUIHelper::GetPixelAspectRatio(void) const
 
 QSize MythUIHelper::GetBaseSize(void) const
 {
-    return QSize(d->m_baseWidth, d->m_baseHeight);
+    return {d->m_baseWidth, d->m_baseHeight};
 }
 
 void MythUIHelper::SetFontStretch(int stretch)

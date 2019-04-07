@@ -69,10 +69,8 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
 
 NuppelDecoder::~NuppelDecoder()
 {
-    if (m_rtjd)
-        delete m_rtjd;
-    if (m_ffmpeg_extradata)
-        delete [] m_ffmpeg_extradata;
+    delete m_rtjd;
+    delete [] m_ffmpeg_extradata;
     if (m_buf)
         av_freep(&m_buf);
     if (m_buf2)
@@ -92,12 +90,10 @@ NuppelDecoder::~NuppelDecoder()
 }
 
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
-                              int)
+                              int /*testbufsize*/)
 {
-    if (!strncmp(testbuf, "NuppelVideo", 11) ||
-        !strncmp(testbuf, "MythTVVideo", 11))
-        return true;
-    return false;
+    return strncmp(testbuf, "NuppelVideo", 11) == 0 ||
+           strncmp(testbuf, "MythTVVideo", 11) == 0;
 }
 
 MythCodecID NuppelDecoder::GetVideoCodecID(void) const
@@ -158,7 +154,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 
 int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                             char testbuf[kDecoderProbeBufferSize],
-                            int)
+                            int /*testbufsize*/)
 {
     (void)testbuf;
 
@@ -446,7 +442,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 {
                     QMutexLocker locker(&m_positionMapLock);
-                    for (uint i = 0; i < m_positionMap.size(); i++)
+                    for (size_t i = 0; i < m_positionMap.size(); i++)
                     {
                         long long adj = m_positionMap[i].adjFrame;
 
@@ -1210,9 +1206,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool&)
                 {
                     m_videosizetotal /= m_videoframesread;
 
-                    float bps = (m_videosizetotal * 8.0f / 1024.0f *
+                    float bps = (m_videosizetotal * 8.0F / 1024.0F *
                                  static_cast<float>(m_video_frame_rate));
-                    m_bitrate = (uint) (bps * 1.5f);
+                    m_bitrate = (uint) (bps * 1.5F);
 
                     ringBuffer->UpdateRawBitrate(GetRawBitrate());
                     m_setreadahead = true;

@@ -22,7 +22,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketServer::WebSocketServer() :
-    ServerPool(),
     m_threadPool("WebSocketServerPool")
 {
     setObjectName("WebSocketServer");
@@ -70,7 +69,7 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
                                  qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-                                 , QSslConfiguration sslConfig
+                                 , const QSslConfiguration& sslConfig
 #endif
                                  )
                 :
@@ -102,7 +101,7 @@ void WebSocketWorkerThread::run(void)
 WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
                                  qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-                                 , QSslConfiguration sslConfig
+                                 , const QSslConfiguration& sslConfig
 #endif
                                  )
                 : m_eventLoop(new QEventLoop()),
@@ -505,7 +504,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
             return;
         }
         frame.m_opCode = (WebSocketFrame::OpCode)opCode;
-        frame.m_isMasked = (header.at(1) >> 7) & 0xFE;
+        frame.m_isMasked = (((header.at(1) >> 7) & 0xFE) != 0);
 
         if (frame.m_isMasked)
             headerSize += 4; // Add 4 bytes for the mask
@@ -608,7 +607,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
                 SendClose(kCloseProtocolError, "Control frames MUST NOT be fragmented");
                 return;
             }
-            else if (frame.m_payloadSize > 125)
+            if (frame.m_payloadSize > 125)
             {
                 SendClose(kCloseProtocolError, "Control frames MUST NOT have payload greater than 125 bytes");
                 return;
@@ -868,40 +867,28 @@ bool WebSocketWorker::SendText(const QByteArray& message)
 
     QByteArray frame = CreateFrame(WebSocketFrame::kOpTextFrame, message);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendBinary(const QByteArray& data)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpBinaryFrame, data);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendPing(const QByteArray& payload)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpPing, payload);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendPong(const QByteArray& payload)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpPong, payload);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendClose(ErrorCode errCode,

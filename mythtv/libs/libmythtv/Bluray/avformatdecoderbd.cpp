@@ -16,8 +16,7 @@ bool AvFormatDecoderBD::IsValidStream(int streamid)
 {
     if (ringBuffer && ringBuffer->IsBD())
         return ringBuffer->BD()->IsValidStream(streamid);
-    else
-        return AvFormatDecoder::IsValidStream(streamid);
+    return AvFormatDecoder::IsValidStream(streamid);
 }
 
 void AvFormatDecoderBD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
@@ -153,6 +152,7 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
     {
+#if 0
         int diffTime = (int)ceil((desiredFrame - m_framesPlayed) / m_fps);
         long long desiredTimePos = ringBuffer->BD()->GetCurrentTime() +
                         diffTime;
@@ -163,6 +163,7 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
 
         if (desiredTimePos < 0)
             desiredTimePos = 0;
+#endif
         return (desiredFrame * 90000LL / m_fps);
     }
     return current_speed;

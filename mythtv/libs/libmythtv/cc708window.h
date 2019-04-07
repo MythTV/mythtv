@@ -78,9 +78,9 @@ class CC708CharacterAttribute
     uint   m_text_tag        {0};
     uint   m_font_tag        {0};                    // system font
     uint   m_edge_type       {k708AttrEdgeNone};
-    uint   m_underline       {false};
-    uint   m_italics         {false};
-    uint   m_boldface        {false};
+    bool   m_underline       {false};
+    bool   m_italics         {false};
+    bool   m_boldface        {false};
 
     uint   m_fg_color        {k708AttrColorWhite};   // will be overridden
     uint   m_fg_opacity      {k708AttrOpacitySolid}; // solid
@@ -186,7 +186,7 @@ class MTV_PUBLIC CC708Window
     CC708Window() = default;
     ~CC708Window();
 
-    void DefineWindow(int priority,         int visible,
+    void DefineWindow(int priority,         bool visible,
                       int anchor_point,     int relative_pos,
                       int anchor_vertical,  int anchor_horizontal,
                       int row_count,        int column_count,

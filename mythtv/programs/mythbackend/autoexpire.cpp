@@ -792,7 +792,7 @@ void AutoExpire::FillExpireList(pginfolist_t &expireList)
 /** \fn AutoExpire::PrintExpireList(QString)
  *  \brief Prints a summary of the files that can be deleted.
  */
-void AutoExpire::PrintExpireList(QString expHost)
+void AutoExpire::PrintExpireList(const QString& expHost)
 {
     pginfolist_t expireList;
 

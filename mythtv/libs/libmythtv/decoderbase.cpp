@@ -33,14 +33,12 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
 
 DecoderBase::~DecoderBase()
 {
-    if (m_playbackinfo)
-        delete m_playbackinfo;
+    delete m_playbackinfo;
 }
 
 void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
 {
-    if (m_playbackinfo)
-        delete m_playbackinfo;
+    delete m_playbackinfo;
     m_playbackinfo = new ProgramInfo(pginfo);
 }
 
@@ -72,7 +70,8 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
     }
 }
 
-void DecoderBase::SeekReset(long long, uint, bool, bool)
+void DecoderBase::SeekReset(long long /*newkey*/, uint /*skipFrames*/,
+                            bool /*doFlush*/, bool /*discardFrames*/)
 {
     m_readAdjust = 0;
 }
@@ -451,7 +450,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
             return true;
         }
-        else if (value > desired_value)
+        if (value > desired_value)
             upper = i;
         else
             lower = i;
@@ -510,7 +509,7 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
 
     ctm.start();
     frm_pos_map_t posMap;
-    for (uint i = 0; i < m_positionMap.size(); i++)
+    for (size_t i = 0; i < m_positionMap.size(); i++)
     {
         if (m_positionMap[i].index < first)
             continue;
@@ -906,7 +905,7 @@ QStringList DecoderBase::GetTracks(uint type) const
 
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < m_tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         list += GetTrackDesc(type, i);
 
     return list;
@@ -935,17 +934,14 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 
     if (!lang)
         return type_msg + QString(" %1").arg(hnum);
-    else
-    {
-        QString lang_msg = iso639_key_toName(lang);
-        return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
-    }
+    QString lang_msg = iso639_key_toName(lang);
+    return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
 }
 
 int DecoderBase::SetTrack(uint type, int trackNo)
 {
     if (trackNo >= (int)m_tracks[type].size())
-        return false;
+        return -1;
 
     QMutexLocker locker(avcodeclock);
 
@@ -981,7 +977,7 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 {
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < m_tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         if (info.m_stream_id == m_tracks[type][i].m_stream_id)
             return false;
 
@@ -1015,14 +1011,14 @@ int DecoderBase::AutoSelectTrack(uint type)
     if ((m_currentTrack[type] >= 0) &&
         (m_currentTrack[type] < (int)numStreams))
     {
-        return true; // track already selected
+        return m_currentTrack[type]; // track already selected
     }
 
     if (!numStreams)
     {
         m_currentTrack[type] = -1;
         m_selectedTrack[type].m_av_stream_index = -1;
-        return false; // no tracks available
+        return -1; // no tracks available
     }
 
     int selTrack = (1 == numStreams) ? 0 : -1;
@@ -1249,11 +1245,8 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
             .arg(key).arg(fallback_ratio).arg(key2).arg(val2));
         return val2;
     }
-    else
-    {
-        key2 = upper.key();
-        val2 = upper.value();
-    }
+    key2 = upper.key();
+    val2 = upper.value();
     if (key1 == key2) // this happens for an exact keyframe match
         return val2; // can also set key2 = key1 + 1 avoid dividing by zero
 

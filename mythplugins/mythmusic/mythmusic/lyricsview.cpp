@@ -287,7 +287,7 @@ bool LyricsView::keyPressEvent(QKeyEvent *event)
         // are pressed turn off auto scroll
         if (GetFocusWidget() == m_lyricsList)
         {
-            handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+            GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
             if (actions.contains("UP") || actions.contains("DOWN") ||
                 actions.contains("PAGEUP") || actions.contains("PAGEDOWN"))
                 m_autoScroll = false;
@@ -555,21 +555,15 @@ bool EditLyricsDialog::keyPressEvent(QKeyEvent *event)
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
-        handled = true;
 
         if (action == "ESCAPE" && somethingChanged())
         {
             cancelPressed();
             return true;
         }
-        else
-            handled = false;
     }
 
-    if (MythScreenType::keyPressEvent(event))
-        return true;
-
-    return false;
+    return MythScreenType::keyPressEvent(event);
 }
 
 void EditLyricsDialog::loadLyrics(void)

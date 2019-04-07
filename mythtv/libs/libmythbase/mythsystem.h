@@ -101,7 +101,7 @@ class MBASE_PUBLIC MythSystem
         Priority diskPriority = kInheritPriority);
 
     static MythSystem *Create(
-        QString args,
+        const QString& args,
         uint flags = kMSNone,
         QString startPath = QString(),
         Priority cpuPriority = kInheritPriority,

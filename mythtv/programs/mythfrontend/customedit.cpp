@@ -133,6 +133,8 @@ void CustomEdit::loadData(void)
             rule.subtitle = result.value(2).toString();
             rule.description = result.value(3).toString();
 
+            // No memory leak. MythUIButtonListItem adds the new item
+            // into m_ruleList.
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_ruleList, rule.title,
                                          qVariantFromValue(rule));
@@ -726,7 +728,7 @@ void CustomEdit::storeClicked(void)
     QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
                                        .arg(m_titleEdit->GetText());
 
-    if (m_subtitleEdit->GetText().length())
+    if (!m_subtitleEdit->GetText().isEmpty())
         msg += m_subtitleEdit->GetText() + "\n\n";
 
     msg += m_descriptionEdit->GetText();

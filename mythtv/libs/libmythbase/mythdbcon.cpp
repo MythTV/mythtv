@@ -4,14 +4,15 @@
 #include <cstdlib>
 
 // Qt
-#include <QVector>
-#include <QSqlDriver>
+#include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QSemaphore>
+#include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
-#include <QElapsedTimer>
-#include <QCoreApplication>
+#include <QVector>
+#include <utility>
 
 // MythTV
 #include "compat.h"
@@ -33,8 +34,8 @@
 
 static const uint kPurgeTimeout = 60 * 60;
 
-bool TestDatabase(QString dbHostName,
-                  QString dbUserName,
+bool TestDatabase(const QString& dbHostName,
+                  const QString& dbUserName,
                   QString dbPassword,
                   QString dbName,
                   int dbPort)
@@ -50,9 +51,9 @@ bool TestDatabase(QString dbHostName,
         return ret;
 
     DatabaseParams dbparms;
-    dbparms.dbName = dbName;
+    dbparms.dbName = std::move(dbName);
     dbparms.dbUserName = dbUserName;
-    dbparms.dbPassword = dbPassword;
+    dbparms.dbPassword = std::move(dbPassword);
     dbparms.dbHostName = dbHostName;
     dbparms.dbPort = dbPort;
 
@@ -139,18 +140,16 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 
         if (m_dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
         {
-            connected = true;              // Pretend to be connected
-            return true;                   // to reduce errors
+            // Pretend to be connected to reduce errors
+            return true;
         }
-        else
-        {
-            // code to ensure that a link-local ip address has the scope
-            int port = 3306;
-            if (m_dbparms.dbPort)
-                port = m_dbparms.dbPort;
-            PortChecker::resolveLinkLocal(m_dbparms.dbHostName, port);
-            m_db.setHostName(m_dbparms.dbHostName);
-        }
+
+        // code to ensure that a link-local ip address has the scope
+        int port = 3306;
+        if (m_dbparms.dbPort)
+            port = m_dbparms.dbPort;
+        PortChecker::resolveLinkLocal(m_dbparms.dbHostName, port);
+        m_db.setHostName(m_dbparms.dbHostName);
 
         if (m_dbparms.dbPort)
             m_db.setPort(m_dbparms.dbPort);
@@ -437,7 +436,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     }
 }
 
-MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
+MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, const QString& name)
 {
     if (!dbcon)
         return nullptr;

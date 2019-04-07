@@ -104,7 +104,7 @@ class XMLTV_generic_config: public GroupSetting
     Q_OBJECT
 
   public:
-    XMLTV_generic_config(const VideoSource& _parent, QString _grabber,
+    XMLTV_generic_config(const VideoSource& _parent, const QString& _grabber,
                          StandardSetting *_setting);
 
     void Save(void) override; // StandardSetting
@@ -337,7 +337,7 @@ class HDHomeRunConfigurationGroup : public GroupSetting
 
   public:
     HDHomeRunConfigurationGroup(CaptureCard &parent, CardType &cardtype);
-    void SetDeviceCheckBoxes(QString devices);
+    void SetDeviceCheckBoxes(const QString& devices);
     QString GetDeviceCheckBoxes(void);
 
   private:
@@ -562,7 +562,7 @@ class DVBConfigurationGroup : public GroupSetting
     void Save(void) override; // StandardSetting
 
   public slots:
-    void probeCard(const QString& cardNumber);
+    void probeCard(const QString& videodevice);
     void reloadDiseqcTree(const QString &device);
 
   private:
@@ -670,7 +670,7 @@ class CardInputDBStorage : public SimpleDBStorage
   public:
     CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
-                       QString          _name) :
+                       const QString&   _name) :
         SimpleDBStorage(_user, "capturecard", _name), m_parent(_parent)
     {
     }
@@ -787,7 +787,7 @@ class CardInput : public GroupSetting
     int getInputID(void) const { return m_id->intValue(); };
 
     void loadByID(int id);
-    void loadByInput(int cardid, QString input);
+    void loadByInput(int cardid, const QString& inputname);
     QString getSourceName(void) const;
 
     void Save(void) override; // StandardSetting

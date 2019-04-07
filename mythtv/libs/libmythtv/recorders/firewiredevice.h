@@ -214,7 +214,7 @@ class FirewireDevice
 
     // Statics
     static bool IsSTBSupported(const QString &model);
-    static QString GetModelName(uint vendorid, uint modelid);
+    static QString GetModelName(uint vendor_id, uint model_id);
     static vector<AVCInfo> GetSTBList(void);
 
   protected:

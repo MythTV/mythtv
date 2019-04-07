@@ -115,7 +115,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         return nullptr;
 #endif
     }
-    else if (main_device.startsWith("NULL"))
+    if (main_device.startsWith("NULL"))
     {
         return new AudioOutputNULL(settings);
     }
@@ -320,11 +320,8 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     {
         if (!willsuspendpa)
             return nullptr;
-        else
-        {
-            QString msg = tr("Invalid or unuseable audio device");
-            return new AudioOutput::AudioDeviceConfig(name, msg);
-        }
+        QString msg = tr("Invalid or unuseable audio device");
+        return new AudioOutput::AudioDeviceConfig(name, msg);
     }
 
     QString capabilities = desc;
@@ -441,7 +438,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         for (QMap<QString, QString>::const_iterator i = alsadevs->begin();
              i != alsadevs->end(); ++i)
         {
-            QString key = i.key();
+            const QString& key = i.key();
             QString desc = i.value();
             QString devname = QString("ALSA:%1").arg(key);
 
@@ -532,10 +529,10 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
             for (QMap<int, QString>::const_iterator i = dxdevs->begin();
                  i != dxdevs->end(); ++i)
             {
-                QString desc = i.value();
-                QString devname = QString("DirectX:%1").arg(desc);
+                QString devdesc = i.value();
+                QString devname = QString("DirectX:%1").arg(devdesc);
 
-                adc = GetAudioDeviceConfig(devname, desc);
+                adc = GetAudioDeviceConfig(devname, devdesc);
                 if (!adc)
                     continue;
                 list->append(*adc);

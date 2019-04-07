@@ -87,8 +87,7 @@ AudioSettings::AudioSettings(
 
 AudioSettings::~AudioSettings()
 {
-    if (m_custom)
-        delete m_custom;
+    delete m_custom;
 }
 
 void AudioSettings::FixPassThrough(void)

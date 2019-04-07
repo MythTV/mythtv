@@ -175,7 +175,7 @@ MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
         // Wait in local event loop so events are processed
         QEventLoop block;
         connect(dlg,    &MythDialogBox::Closed,
-                &block, [&](QString, int result) { block.exit(result); });
+                &block, [&](const QString& /*resultId*/, int result) { block.exit(result); });
 
         // Block until dialog closes
         btnIndex = block.exec();

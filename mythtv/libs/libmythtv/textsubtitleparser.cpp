@@ -53,7 +53,7 @@ class SubtitleLoadHelper : public QRunnable
     static bool IsLoading(TextSubtitles *target)
     {
         QMutexLocker locker(&s_lock);
-        return s_loading[target];
+        return s_loading[target] != 0U;
     }
 
     static void Wait(TextSubtitles *target)
@@ -108,43 +108,35 @@ public:
         }
     }
     ~RemoteFileWrapper() {
-        if (m_remoteFile)
-            delete m_remoteFile;
-        if (m_localFile)
-            delete m_localFile;
+        delete m_remoteFile;
+        delete m_localFile;
     }
     bool isOpen(void) const {
         if (m_isRemote)
             return m_remoteFile->isOpen();
-        else
-            return m_localFile;
+        return m_localFile;
     }
     long long GetFileSize(void) const {
         if (m_isRemote)
             return m_remoteFile->GetFileSize();
-        else
-        {
-            if (m_localFile)
-                return m_localFile->size();
-            else
-                return 0;
-        }
+        if (m_localFile)
+            return m_localFile->size();
+        return 0;
     }
     int Read(void *data, int size) {
         if (m_isRemote)
             return m_remoteFile->Read(data, size);
-        else
+        if (m_localFile)
         {
-            if (m_localFile)
-            {
-                QDataStream stream(m_localFile);
-                return stream.readRawData(static_cast<char*>(data), size);
-            }
-            else
-                return 0;
+            QDataStream stream(m_localFile);
+            return stream.readRawData(static_cast<char*>(data), size);
         }
+        return 0;
     }
 private:
+    RemoteFileWrapper(const RemoteFileWrapper &) = delete;            // not copyable
+    RemoteFileWrapper &operator=(const RemoteFileWrapper &) = delete; // not copyable
+
     bool m_isRemote;
     RemoteFile *m_remoteFile;
     QFile *m_localFile;
@@ -370,7 +362,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
 
     LOG(VB_VBI, LOG_INFO, QString("Found %1 subtitles in file '%2'")
         .arg(sub_data.num).arg(fileName));
-    target.SetFrameBasedTiming(!sub_data.uses_time);
+    target.SetFrameBasedTiming(sub_data.uses_time == 0);
     target.Clear();
 
     // convert the subtitles to our own format, free the original structures

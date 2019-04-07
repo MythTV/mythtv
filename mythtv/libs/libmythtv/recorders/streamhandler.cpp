@@ -2,7 +2,9 @@
 
 // MythTV headers
 #include "streamhandler.h"
+
 #include "threadedfilewriter.h"
+#include <utility>
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -63,7 +65,7 @@ void StreamHandler::AddListener(MPEGStreamData *data,
         m_needs_buffering      |= needs_buffering;
     }
 
-    m_stream_data_list[data] = output_file;
+    m_stream_data_list[data] = std::move(output_file);
 
     m_listener_lock.unlock();
 
@@ -261,7 +263,7 @@ void StreamHandler::UpdateListeningForEIT(void)
         if (sd->HasEITPIDChanges(m_eit_pids) &&
             sd->GetEITPIDChanges(m_eit_pids, add_eit, del_eit))
         {
-            for (uint i = 0; i < del_eit.size(); i++)
+            for (size_t i = 0; i < del_eit.size(); i++)
             {
                 uint_vec_t::iterator it2;
                 it2 = find(m_eit_pids.begin(), m_eit_pids.end(), del_eit[i]);
@@ -270,7 +272,7 @@ void StreamHandler::UpdateListeningForEIT(void)
                 sd->RemoveListeningPID(del_eit[i]);
             }
 
-            for (uint i = 0; i < add_eit.size(); i++)
+            for (size_t i = 0; i < add_eit.size(); i++)
             {
                 m_eit_pids.push_back(add_eit[i]);
                 sd->AddListeningPID(add_eit[i]);

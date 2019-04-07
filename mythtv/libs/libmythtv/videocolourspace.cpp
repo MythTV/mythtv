@@ -48,11 +48,11 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     ReferenceCounter("Colour"),
     m_supportedAttributes(kPictureAttributeSupported_None),
     m_studioLevels(false),
-    m_brightness(0.0f),
-    m_contrast(1.0f),
-    m_saturation(1.0f),
-    m_hue(0.0f),
-    m_alpha(1.0f),
+    m_brightness(0.0F),
+    m_contrast(1.0F),
+    m_saturation(1.0F),
+    m_hue(0.0F),
+    m_alpha(1.0F),
     m_colourSpace(AVCOL_SPC_UNSPECIFIED),
     m_colourSpaceDepth(8),
     m_updatesDisabled(true),
@@ -172,47 +172,47 @@ void VideoColourSpace::Update(void)
     std::vector<float> rgb;
     switch (static_cast<AVColorSpace>(m_colourSpace))
     {
-        case AVCOL_SPC_RGB:        rgb = { 1.0000f, 1.0000f, 1.0000f }; break;
-        case AVCOL_SPC_BT709:      rgb = { 0.2126f, 0.7152f, 0.0722f }; break;
-        case AVCOL_SPC_FCC:        rgb = { 0.30f,   0.59f,   0.11f   }; break;
+        case AVCOL_SPC_RGB:        rgb = { 1.0000F, 1.0000F, 1.0000F }; break;
+        case AVCOL_SPC_BT709:      rgb = { 0.2126F, 0.7152F, 0.0722F }; break;
+        case AVCOL_SPC_FCC:        rgb = { 0.30F,   0.59F,   0.11F   }; break;
         case AVCOL_SPC_BT470BG:
-        case AVCOL_SPC_SMPTE170M:  rgb = { 0.299f,  0.587f,  0.114f  }; break;
-        case AVCOL_SPC_SMPTE240M:  rgb = { 0.212f,  0.701f,  0.087f  }; break;
-        case AVCOL_SPC_YCOCG:      rgb = { 0.25f,   0.5f,    0.25f   }; break;
+        case AVCOL_SPC_SMPTE170M:  rgb = { 0.299F,  0.587F,  0.114F  }; break;
+        case AVCOL_SPC_SMPTE240M:  rgb = { 0.212F,  0.701F,  0.087F  }; break;
+        case AVCOL_SPC_YCOCG:      rgb = { 0.25F,   0.5F,    0.25F   }; break;
         case AVCOL_SPC_BT2020_CL:
-        case AVCOL_SPC_BT2020_NCL: rgb = { 0.2627f, 0.6780f, 0.0593f }; break;
+        case AVCOL_SPC_BT2020_NCL: rgb = { 0.2627F, 0.6780F, 0.0593F }; break;
         case AVCOL_SPC_UNSPECIFIED:
         case AVCOL_SPC_RESERVED:
         case AVCOL_SPC_SMPTE2085:
         case AVCOL_SPC_CHROMA_DERIVED_CL:
         case AVCOL_SPC_CHROMA_DERIVED_NCL:
         case AVCOL_SPC_ICTCP:
-        default:                  rgb = { 0.2126f, 0.7152f, 0.0722f }; //Rec.709
+        default:                  rgb = { 0.2126F, 0.7152F, 0.0722F }; //Rec.709
     }
 
-    float bs = rgb[2] == 1.0f ? 0.0f : 0.5f / (rgb[2] - 1.0f);
-    float rs = rgb[0] == 1.0f ? 0.0f : 0.5f / (rgb[0] - 1.0f);
-    QMatrix4x4 rgb2yuv(      rgb[0],      rgb[1],      rgb[2], 0.0f,
-                        bs * rgb[0], bs * rgb[1],        0.5f, 0.0f,
-                               0.5f, rs * rgb[1], rs * rgb[2], 0.0f,
-                               0.0f,        0.0f,        0.0f, m_alpha);
+    float bs = rgb[2] == 1.0F ? 0.0F : 0.5F / (rgb[2] - 1.0F);
+    float rs = rgb[0] == 1.0F ? 0.0F : 0.5F / (rgb[0] - 1.0F);
+    QMatrix4x4 rgb2yuv(      rgb[0],      rgb[1],      rgb[2], 0.0F,
+                        bs * rgb[0], bs * rgb[1],        0.5F, 0.0F,
+                               0.5F, rs * rgb[1], rs * rgb[2], 0.0F,
+                               0.0F,        0.0F,        0.0F, m_alpha);
 
     // TODO check AVCOL_SPC_RGB
     if (m_colourSpace == AVCOL_SPC_YCOCG)
     {
-        rgb2yuv = QMatrix4x4(0.25f, 0.50f,  0.25f, 0.0f,
-                            -0.25f, 0.50f, -0.25f, 0.0f,
-                             0.50f, 0.00f, -0.50f, 0.0f,
-                             0.00f, 0.00f,  0.00f, m_alpha);
+        rgb2yuv = QMatrix4x4(0.25F, 0.50F,  0.25F, 0.0F,
+                            -0.25F, 0.50F, -0.25F, 0.0F,
+                             0.50F, 0.00F, -0.50F, 0.0F,
+                             0.00F, 0.00F,  0.00F, m_alpha);
     }
     QMatrix4x4 yuv2rgb = rgb2yuv.inverted();
 
     // scale the chroma values for saturation
-    yuv2rgb.scale(1.0f, m_saturation, m_saturation);
+    yuv2rgb.scale(1.0F, m_saturation, m_saturation);
     // rotate the chroma for hue - this is a rotation around the 'Y' (luminance) axis
-    yuv2rgb.rotate(m_hue, 1.0f, 0.0f, 0.0f);
+    yuv2rgb.rotate(m_hue, 1.0F, 0.0F, 0.0F);
     // denormalise chroma
-    yuv2rgb.translate(0.0f, -0.5f, -0.5f);
+    yuv2rgb.translate(0.0F, -0.5F, -0.5F);
     // Levels adjustment
     // If using limited/studio levels - this is a no-op.
     // For level expansion, this expands to the full, unadulterated RGB range
@@ -228,9 +228,9 @@ void VideoColourSpace::Update(void)
     float blacklevel   =  16 << (m_colourSpaceDepth - 8);
     float lumapeak     = 235 << (m_colourSpaceDepth - 8);
     float chromapeak   = 240 << (m_colourSpaceDepth - 8);
-    float luma_scale   = m_studioLevels ? 1.0f : depth / (lumapeak - blacklevel);
-    float chroma_scale = m_studioLevels ? 1.0f : depth / (chromapeak - blacklevel);
-    float offset       = m_studioLevels ? 0.0f : -blacklevel / depth;
+    float luma_scale   = m_studioLevels ? 1.0F : depth / (lumapeak - blacklevel);
+    float chroma_scale = m_studioLevels ? 1.0F : depth / (chromapeak - blacklevel);
+    float offset       = m_studioLevels ? 0.0F : -blacklevel / depth;
 
     setToIdentity();
     translate(m_brightness, m_brightness, m_brightness);
@@ -310,13 +310,13 @@ void VideoColourSpace::SetStudioLevels(bool Studio)
 
 void VideoColourSpace::SetBrightness(int Value)
 {
-    m_brightness = (Value * 0.02f) - 1.0f;
+    m_brightness = (Value * 0.02F) - 1.0F;
     Update();
 }
 
 void VideoColourSpace::SetContrast(int Value)
 {
-    m_contrast = Value * 0.02f;
+    m_contrast = Value * 0.02F;
     Update();
 }
 
@@ -328,7 +328,7 @@ void VideoColourSpace::SetHue(int Value)
 
 void VideoColourSpace::SetSaturation(int Value)
 {
-    m_saturation = Value * 0.02f;
+    m_saturation = Value * 0.02F;
     Update();
 }
 

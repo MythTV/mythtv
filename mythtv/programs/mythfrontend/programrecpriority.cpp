@@ -113,16 +113,14 @@ class TitleSort
         {
             if (m_reverse)
                 return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
-            else
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
         }
 
         if (a->GetSortSubtitle() != b->GetSortSubtitle())
         {
             if (m_reverse)
                 return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
-            else
-                return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
         }
 
         int finalA = a->GetRecordingPriority();
@@ -132,8 +130,7 @@ class TitleSort
         {
             if (m_reverse)
                 return finalA < finalB;
-            else
-                return finalA > finalB;
+            return finalA > finalB;
         }
 
         int typeA = RecTypePrecedence(a->m_recType);
@@ -143,16 +140,14 @@ class TitleSort
         {
             if (m_reverse)
                 return typeA > typeB;
-            else
-                return typeA < typeB;
+            return typeA < typeB;
         }
 
         if (m_reverse)
             return (a->GetRecordingRuleID() >
                     b->GetRecordingRuleID());
-        else
-            return (a->GetRecordingRuleID() <
-                    b->GetRecordingRuleID());
+        return (a->GetRecordingRuleID() <
+                b->GetRecordingRuleID());
     }
 
   private:
@@ -174,8 +169,7 @@ class ProgramRecPrioritySort
         {
             if (m_reverse)
                 return finalA < finalB;
-            else
-                return finalA > finalB;
+            return finalA > finalB;
         }
 
         int typeA = RecTypePrecedence(a->m_recType);
@@ -185,16 +179,14 @@ class ProgramRecPrioritySort
         {
             if (m_reverse)
                 return typeA > typeB;
-            else
-                return typeA < typeB;
+            return typeA < typeB;
         }
 
         if (m_reverse)
             return (a->GetRecordingRuleID() >
                     b->GetRecordingRuleID());
-        else
-            return (a->GetRecordingRuleID() <
-                    b->GetRecordingRuleID());
+        return (a->GetRecordingRuleID() <
+                b->GetRecordingRuleID());
     }
 
   private:
@@ -216,8 +208,7 @@ class ProgramRecTypeSort
         {
             if (m_reverse)
                 return (typeA > typeB);
-            else
-                return (typeA < typeB);
+            return (typeA < typeB);
         }
 
         int finalA = a->GetRecordingPriority();
@@ -227,16 +218,14 @@ class ProgramRecTypeSort
         {
             if (m_reverse)
                 return finalA < finalB;
-            else
-                return finalA > finalB;
+            return finalA > finalB;
         }
 
         if (m_reverse)
             return (a->GetRecordingRuleID() >
                     b->GetRecordingRuleID());
-        else
-            return (a->GetRecordingRuleID() <
-                    b->GetRecordingRuleID());
+        return (a->GetRecordingRuleID() <
+                b->GetRecordingRuleID());
     }
 
   private:
@@ -260,16 +249,14 @@ class ProgramCountSort
         {
             if (m_reverse)
                 return countA < countB;
-            else
-                return countA > countB;
+            return countA > countB;
         }
 
         if (recCountA != recCountB)
         {
             if (m_reverse)
                 return recCountA < recCountB;
-            else
-                return recCountA > recCountB;
+            return recCountA > recCountB;
         }
 
         if (m_reverse)
@@ -278,12 +265,9 @@ class ProgramCountSort
                 return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
             return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
-        else
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
-        }
+        if (a->GetSortTitle() != b->GetSortTitle())
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+        return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
     }
 
   private:
@@ -307,16 +291,14 @@ class ProgramRecCountSort
         {
             if (m_reverse)
                 return recCountA < recCountB;
-            else
-                return recCountA > recCountB;
+            return recCountA > recCountB;
         }
 
         if (countA != countB)
         {
             if (m_reverse)
                 return countA < countB;
-            else
-                return countA > countB;
+            return countA > countB;
         }
 
         if (m_reverse)
@@ -325,12 +307,9 @@ class ProgramRecCountSort
                 return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
             return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
-        else
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
-        }
+        if (a->GetSortTitle() != b->GetSortTitle())
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+        return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
     }
 
   private:
@@ -352,8 +331,7 @@ class ProgramLastRecordSort
         {
             if (m_reverse)
                 return lastRecA < lastRecB;
-            else
-                return lastRecA > lastRecB;
+            return lastRecA > lastRecB;
         }
 
         if (m_reverse)
@@ -362,12 +340,9 @@ class ProgramLastRecordSort
                 return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
             return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
-        else
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
-        }
+        if (a->GetSortTitle() != b->GetSortTitle())
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+        return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
     }
 
   private:
@@ -389,8 +364,7 @@ class ProgramAvgDelaySort
         {
             if (m_reverse)
                 return avgA > avgB;
-            else
-                return avgA < avgB;
+            return avgA < avgB;
         }
 
         if (m_reverse)
@@ -399,12 +373,9 @@ class ProgramAvgDelaySort
                 return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
             return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
-        else
-        {
-            if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
-        }
+        if (a->GetSortTitle() != b->GetSortTitle())
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+        return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
     }
 
   private:

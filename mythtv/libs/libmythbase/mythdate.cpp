@@ -183,9 +183,9 @@ QString toString(const QDate &date, uint format)
             QDate now = current().toLocalTime().date();
             if ((format & kSimplify) && (now == date))
                 result = QCoreApplication::translate("(Common)", "Today");
-            else if ((format & kSimplify) && (now.addDays(-1) == date))
+            else if (((format & kSimplify) != 0U) && (now.addDays(-1) == date))
                 result = QCoreApplication::translate("(Common)", "Yesterday");
-            else if ((format & kSimplify) && (now.addDays(1) == date))
+            else if (((format & kSimplify) != 0U) && (now.addDays(1) == date))
                 result = QCoreApplication::translate("(Common)", "Tomorrow");
         }
 

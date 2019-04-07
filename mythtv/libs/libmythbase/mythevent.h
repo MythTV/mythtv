@@ -3,6 +3,7 @@
 
 #include <QStringList>
 #include <QEvent>
+#include <utility>
 #include "mythtypes.h"
 #include "mythbaseexp.h"
 
@@ -19,35 +20,35 @@ class MBASE_PUBLIC MythEvent : public QEvent
     { }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int type, const QString lmessage) : QEvent((QEvent::Type)type),
-            m_message(lmessage),    m_extradata("empty")
+    MythEvent(int type, QString lmessage) : QEvent((QEvent::Type)type),
+        m_message(::std::move(lmessage)),    m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int type, const QString lmessage, const QStringList &lextradata)
+    MythEvent(int type, QString lmessage, const QStringList &lextradata)
            : QEvent((QEvent::Type)type),
-            m_message(lmessage),    m_extradata(lextradata)
+            m_message(::std::move(lmessage)),    m_extradata(lextradata)
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    explicit MythEvent(const QString lmessage) : QEvent(MythEventMessage),
-            m_message(lmessage),    m_extradata("empty")
+    explicit MythEvent(QString lmessage) : QEvent(MythEventMessage),
+            m_message(::std::move(lmessage)),    m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(const QString lmessage, const QStringList &lextradata)
+    MythEvent(QString lmessage, const QStringList &lextradata)
            : QEvent(MythEventMessage),
-           m_message(lmessage),    m_extradata(lextradata)
+           m_message(::std::move(lmessage)),    m_extradata(lextradata)
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(const QString lmessage, const QString lextradata)
+    MythEvent(QString lmessage, const QString lextradata)
            : QEvent(MythEventMessage),
-           m_message(lmessage),    m_extradata(lextradata)
+           m_message(::std::move(lmessage)),    m_extradata(lextradata)
     {
     }
 

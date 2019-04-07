@@ -33,7 +33,7 @@ class DeviceReaderCB
 class DeviceReadBuffer : protected MThread
 {
   public:
-    DeviceReadBuffer(DeviceReaderCB *callback,
+    DeviceReadBuffer(DeviceReaderCB *cb,
                      bool use_poll = true,
                      bool error_exit_on_poll_timeout = true);
    ~DeviceReadBuffer();
@@ -79,7 +79,7 @@ class DeviceReadBuffer : protected MThread
     uint GetUnused(void) const;
     uint GetContiguousUnused(void) const;
 
-    bool CheckForErrors(ssize_t read_len, size_t requested_len, uint &err_cnt);
+    bool CheckForErrors(ssize_t read_len, size_t requested_len, uint &errcnt);
     void ReportStats(void);
 
     QString                 m_videodevice;

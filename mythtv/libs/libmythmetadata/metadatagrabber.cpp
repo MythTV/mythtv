@@ -1,10 +1,11 @@
 // Qt headers
-#include <QMap>
-#include <QDir>
-#include <QMutex>
-#include <QRegExp>
 #include <QDateTime>
+#include <QDir>
+#include <QMap>
+#include <QMutex>
 #include <QMutexLocker>
+#include <QRegExp>
+#include <utility>
 
 // MythTV headers
 #include "metadatagrabber.h"
@@ -43,9 +44,9 @@ static GrabberOpts GrabberOptsMaker(QString thepath, QString thesetting, QString
 {
     GrabberOpts opts;
 
-    opts.path = thepath;
-    opts.setting = thesetting;
-    opts.def = thedefault;
+    opts.path = std::move(thepath);
+    opts.setting = std::move(thesetting);
+    opts.def = std::move(thedefault);
 
     return opts;
 }
@@ -411,10 +412,7 @@ bool MetaGrabberScript::Test(void)
     MythSystemLegacy grabber(m_fullcommand, args, kMSStdOut);
 
     grabber.Run();
-    if (grabber.Wait() != GENERIC_EXIT_OK)
-        return false;
-
-    return true;
+    return grabber.Wait() == GENERIC_EXIT_OK;
 }
 
 // TODO

@@ -211,8 +211,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             encoders.appendChild(encoder);
 
             encoder.setAttribute("id"            , elink->GetInputID()      );
-            encoder.setAttribute("local"         , isLocal                  );
-            encoder.setAttribute("connected"     , elink->IsConnected()     );
+            encoder.setAttribute("local"         , static_cast<int>(isLocal));
+            encoder.setAttribute("connected"     , static_cast<int>(elink->IsConnected()));
             encoder.setAttribute("state"         , state                    );
             encoder.setAttribute("sleepstatus"   , elink->GetSleepStatus()  );
             //encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
@@ -451,8 +451,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QStringList::const_iterator sit = strlist.begin();
     while (sit != strlist.end())
     {
+        // cppcheck-suppress unreadVariable
         hostname   = *(sit++);
         directory  = *(sit++);
+        // cppcheck-suppress unreadVariable
         isLocalstr = *(sit++);
         fsID       = *(sit++);
         ++sit; // ignore dirID
@@ -701,7 +703,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
+int HttpStatus::PrintEncoderStatus( QTextStream &os, const QDomElement& encoders )
 {
     int     nNumEncoders = 0;
 
@@ -725,9 +727,9 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
                                                            ? "local" : "remote";
                 QString sCardId   =  e.attribute( "id"       , "0"      );
                 QString sHostName =  e.attribute( "hostname" , "Unknown");
-                bool    bConnected=  e.attribute( "connected", "0"      ).toInt();
+                bool    bConnected=  static_cast<bool>(e.attribute( "connected", "0" ).toInt());
 
-                bool bIsLowOnFreeSpace=e.attribute( "lowOnFreeSpace", "0").toInt();
+                bool bIsLowOnFreeSpace=static_cast<bool>(e.attribute( "lowOnFreeSpace", "0").toInt());
 
                 QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
 
@@ -845,7 +847,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
+int HttpStatus::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
 {
     QDateTime qdtNow          = MythDate::current();
 
@@ -976,7 +978,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintFrontends( QTextStream &os, QDomElement frontends )
+int HttpStatus::PrintFrontends( QTextStream &os, const QDomElement& frontends )
 {
     if (frontends.isNull())
         return( 0 );
@@ -1014,7 +1016,7 @@ int HttpStatus::PrintFrontends( QTextStream &os, QDomElement frontends )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintBackends( QTextStream &os, QDomElement backends )
+int HttpStatus::PrintBackends( QTextStream &os, const QDomElement& backends )
 {
     if (backends.isNull())
         return( 0 );
@@ -1053,7 +1055,7 @@ int HttpStatus::PrintBackends( QTextStream &os, QDomElement backends )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
+int HttpStatus::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
 {
     if (jobs.isNull())
         return( 0 );
@@ -1194,7 +1196,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
+int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
 {
     QString   sRep;
 
@@ -1440,7 +1442,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
     return( 1 );
 }
 
-int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
+int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, const QDomElement& info )
 {
     if (info.isNull())
         return( 0 );
@@ -1512,7 +1514,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
     program.setAttribute( "subTitle"    , pInfo->GetSubtitle());
     program.setAttribute( "category"    , pInfo->GetCategory());
     program.setAttribute( "catType"     , pInfo->GetCategoryTypeString());
-    program.setAttribute( "repeat"      , pInfo->IsRepeat()   );
+    program.setAttribute( "repeat"      , static_cast<int>(pInfo->IsRepeat()));
 
     if (bDetails)
     {

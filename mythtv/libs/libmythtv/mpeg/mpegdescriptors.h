@@ -120,19 +120,22 @@ class DescriptorID
         announcement_support        = 0x6E, /* partial */
         application_signalling      = 0x6F,
 
-        adaptation_field_data       = 0x70, /* partial */
-        service_identifier          = 0x71,
-        service_availability        = 0x72, /* partial */
-        default_authority           = 0x73, /* implemented */
-        related_content             = 0x74,
-        tva_id                      = 0x75,
-        dvb_content_identifier      = 0x76, /* partial */
-        time_slice_fec_identifier   = 0x77,
-        ecm_repetition_rate         = 0x78,
-        s2_delivery_system          = 0x79,
-        eac3                        = 0x7A,
-        dts                         = 0x7B,
-        aac                         = 0x7C,
+        adaptation_field_data          = 0x70, /* partial */
+        service_identifier             = 0x71,
+        service_availability           = 0x72, /* partial */
+        default_authority              = 0x73, /* implemented */
+        related_content                = 0x74,
+        tva_id                         = 0x75,
+        dvb_content_identifier         = 0x76, /* partial */
+        time_slice_fec_identifier      = 0x77,
+        ecm_repetition_rate            = 0x78,
+        s2_satellite_delivery_system   = 0x79,
+        eac3                           = 0x7A,
+        dts                            = 0x7B,
+        aac                            = 0x7C,
+        xait_location                  = 0x7D,
+        fta_content_management         = 0x7E,
+        t2_terrestrial_delivery_system = 0x7F,
 
         // ATSC
         atsc_stuffing               = 0x80,
@@ -258,9 +261,9 @@ class MTV_PUBLIC MPEGDescriptor
     
     static desc_list_t Parse(const unsigned char *data, uint len);
     static desc_list_t ParseAndExclude(const unsigned char *data, uint len,
-                                       int descriptorid);
+                                       int excluded_descid);
     static desc_list_t ParseOnlyInclude(const unsigned char *data, uint len,
-                                        int descriptorid);
+                                        int excluded_descid);
 
     static const unsigned char *Find(const desc_list_t &parsed, uint desc_tag);
     static desc_list_t FindAll(const desc_list_t &parsed, uint desc_tag);
@@ -286,7 +289,7 @@ class RegistrationDescriptor : public MPEGDescriptor
     {
         // The HD-PVR outputs a registration descriptor with a length
         // of 8 rather than 4, so we accept any length >= 4, not just 4.
-        if (DescriptorLength() < 4)
+        if (IsValid() && DescriptorLength() < 4)
             _data = nullptr;
     }
 
@@ -355,21 +358,21 @@ class AVCVideoDescriptor : public MPEGDescriptor
     // profile_idc              8   2.0
     uint ProfileIDC(void)         const { return _data[2]; }
     // constraint_set0_flag     1   3.0
-    bool ConstaintSet0(void)      const { return _data[3]&0x80; }
+    bool ConstaintSet0(void)      const { return ( _data[3]&0x80 ) != 0; }
     // constraint_set1_flag     1   3.1
-    bool ConstaintSet1(void)      const { return _data[3]&0x40; }
+    bool ConstaintSet1(void)      const { return ( _data[3]&0x40 ) != 0; }
     // constraint_set2_flag     1   3.2
-    bool ConstaintSet2(void)      const { return _data[3]&0x20; }
+    bool ConstaintSet2(void)      const { return ( _data[3]&0x20 ) != 0; }
     // AVC_compatible_flags     5   3.3
     uint AVCCompatible(void)      const { return _data[3]&0x1f; }
     // level_idc                8   4.0
     uint LevelIDC(void)           const { return _data[4]; }
     // AVC_still_present        1   5.0
-    bool AVCStill(void)           const { return _data[5]&0x80; }
+    bool AVCStill(void)           const { return ( _data[5]&0x80 ) != 0; }
     // AVC_24_hour_picture_flag 1   5.1
-    bool AVC24HourPicture(void)   const { return _data[5]&0x40; }
+    bool AVC24HourPicture(void)   const { return ( _data[5]&0x40 ) != 0; }
     bool FramePackingSEINotPresentFlag(void)
-                                  const { return _data[5]&0x20; }
+                                  const { return ( _data[5]&0x20 ) != 0; }
     // reserved 6 bslbf
     QString toString() const override; // MPEGDescriptor
 };
@@ -384,7 +387,7 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x
     // descriptor_length        8   1.0
     // hrd_management_valid     1   2.0
-    bool HRDManagementValid(void)      const { return _data[2]&0x80; }
+    bool HRDManagementValid(void)      const { return ( _data[2]&0x80 ) != 0; }
     // reserved                 6   2.1
     // picture_and_timing_info_present 1 2.7
     bool HasPictureAndTimingInfo(void) const { return _data[2]&0x01;}
@@ -417,7 +420,7 @@ class HEVCVideoDescriptor : public MPEGDescriptor
     // profile_space                     2   2.0
     uint ProfileSpace(void)       const { return _data[2]&0xC0 >> 6; }
     // tier_flag                         1   2.2
-    bool Tier(void)               const { return _data[2]&0x20; }
+    bool Tier(void)               const { return ( _data[2]&0x20 ) != 0; }
     // profile_idc                       5   2.3
     uint ProfileIDC(void)         const { return _data[2] >> 3; }
     // profile_compatibility_indication 32   3.0

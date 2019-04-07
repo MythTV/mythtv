@@ -774,7 +774,7 @@ QColor createColor(const QString &color)
         { "lightgreen", 144, 238, 144}
         };
 
-        for (unsigned int i = 0; i < (sizeof(cmap) / sizeof(cmap[0])); i++)
+        for (size_t i = 0; i < (sizeof(cmap) / sizeof(cmap[0])); i++)
             x11colormap[QString(cmap[i].name)] = QColor(cmap[i].r,
                                                         cmap[i].g,
                                                         cmap[i].b);
@@ -784,5 +784,5 @@ QColor createColor(const QString &color)
     if (it != x11colormap.end())
         return it.value();
 
-    return QColor(color);
+    return {color};
 }

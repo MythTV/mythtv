@@ -30,7 +30,7 @@ class MythQtPainter : public MythPainter
 
     void SetClipRect(const QRect &clipRect) override; // MythPainter
 
-    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
                    int alpha) override; // MythPainter
 
   protected:

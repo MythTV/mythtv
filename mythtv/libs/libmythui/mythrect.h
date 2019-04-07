@@ -54,7 +54,7 @@ class MUI_PUBLIC MythRect : public QRect
     void moveTopLeft(const MythPoint &point);
     void moveLeft(const QString &sX);
     void moveLeft(int X) { QRect::moveLeft(X); }
-    void moveTop(const QString &sX);
+    void moveTop(const QString &sY);
     void moveTop(int Y) { QRect::moveTop(Y); }
 
     QString toString(bool details = false) const;
@@ -64,10 +64,10 @@ class MUI_PUBLIC MythRect : public QRect
     bool parsePosition(float &percent, int &offset, int &absolute,
                        const QString &value, bool is_size);
 
-    float m_percentWidth  {0.0f};
-    float m_percentHeight {0.0f};
-    float m_percentX      {0.0f};
-    float m_percentY      {0.0f};
+    float m_percentWidth  {0.0F};
+    float m_percentHeight {0.0F};
+    float m_percentX      {0.0F};
+    float m_percentY      {0.0F};
     int   m_offsetWidth   {0};
     int   m_offsetHeight  {0};
     int   m_offsetX       {0};
@@ -115,8 +115,8 @@ class MUI_PUBLIC MythPoint : public QPoint
     bool parsePosition(float &percent, int &offset, int &absolute,
                        const QString &value);
 
-    float m_percentX    {0.0f};
-    float m_percentY    {0.0f};
+    float m_percentX    {0.0F};
+    float m_percentY    {0.0F};
     int   m_offsetX     {0};
     int   m_offsetY     {0};
 

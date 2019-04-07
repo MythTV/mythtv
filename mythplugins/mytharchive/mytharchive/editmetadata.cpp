@@ -75,7 +75,3 @@ void EditMetadataDialog::cancelPressed(void)
     emit haveResult(false, m_sourceMetadata);
     Close();
 }
-
-EditMetadataDialog::~EditMetadataDialog()
-{
-}

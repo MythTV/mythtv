@@ -53,7 +53,7 @@ class StatusBox : public MythScreenType
                      const QString & state = "",
                      const QString & data = "");
 
-    void getActualRecordedBPS(QString hostnames);
+    void getActualRecordedBPS(const QString& hostnames);
 
     MythUIText        *m_helpText        {nullptr};
     MythUIText        *m_justHelpText    {nullptr};

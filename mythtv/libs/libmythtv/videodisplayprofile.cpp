@@ -1,5 +1,6 @@
 // -*- Mode: c++ -*-
 #include <algorithm>
+#include <utility>
 using namespace std;
 
 #include "videodisplayprofile.h"
@@ -18,21 +19,21 @@ using namespace std;
 
 bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
 {
-    return checkRange(key, fvalue, 0, true, ok);
+    return checkRange(std::move(key), fvalue, 0, true, ok);
 }
 
 bool ProfileItem::checkRange(QString key, int ivalue, bool *ok) const
 {
-    return checkRange(key, 0.0, ivalue, false, ok);
+    return checkRange(std::move(key), 0.0, ivalue, false, ok);
 }
 
-bool ProfileItem::checkRange(QString key,
+bool ProfileItem::checkRange(const QString& key,
     float fvalue, int ivalue, bool isFloat, bool *ok) const
 {
     bool match = true;
     bool isOK = true;
     if (isFloat)
-        ivalue = int(fvalue * 1000.0f);
+        ivalue = int(fvalue * 1000.0F);
     QString cmp = Get(key);
     if (!cmp.isEmpty())
     {
@@ -177,7 +178,7 @@ bool ProfileItem::IsMatch(const QSize &size,
     if (!cmp.isEmpty())
     {
         QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-        if (clist.size() > 0)
+        if (!clist.empty())
             match &= clist.contains(codecName,Qt::CaseInsensitive);
     }
 
@@ -215,7 +216,7 @@ bool ProfileItem::IsValid(QString *reason) const
             *reason = QString("Invalid height condition");
         return false;
     }
-    checkRange("cond_framerate",1.0f,&isOK);
+    checkRange("cond_framerate",1.0F,&isOK);
     if (!isOK)
     {
         if (reason)
@@ -343,13 +344,13 @@ QString ProfileItem::toString(void) const
     QString codecs    = Get("cond_codecs");
     QString decoder   = Get("pref_decoder");
     uint    max_cpus  = Get("pref_max_cpus").toUInt();
-    bool    skiploop  = Get("pref_skiploop").toInt();
+    bool    skiploop  = Get("pref_skiploop").toInt() != 0;
     QString renderer  = Get("pref_videorenderer");
     QString osd       = Get("pref_osdrenderer");
     QString deint0    = Get("pref_deint0");
     QString deint1    = Get("pref_deint1");
     QString filter    = Get("pref_filters");
-    bool    osdfade   = Get("pref_osdfade").toInt();
+    bool    osdfade   = Get("pref_osdfade").toInt() != 0;
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
@@ -381,7 +382,7 @@ pref_map_t     VideoDisplayProfile::s_dec_name;
 safe_list_t    VideoDisplayProfile::s_safe_decoders;
 
 VideoDisplayProfile::VideoDisplayProfile()
-    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f)
+    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0F)
 {
     QMutexLocker locker(&s_safe_lock);
     init_statics();
@@ -418,7 +419,7 @@ void VideoDisplayProfile::SetInput(const QSize &size,
         last_size = size;
         change = true;
     }
-    if (framerate > 0.0f && framerate != last_rate)
+    if (framerate > 0.0F && framerate != last_rate)
     {
         last_rate = framerate;
         change = true;
@@ -721,7 +722,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 ok = false;
                 continue;
             }
-            else if (query.next())
+            if (query.next())
             {
                 (*it).SetProfileID(query.value(0).toUInt() + 1);
             }
@@ -763,7 +764,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 ok = false;
                 continue;
             }
-            else if (query.next() && (1 == query.value(0).toUInt()))
+            if (query.next() && (1 == query.value(0).toUInt()))
             {
                 if (lit->isEmpty())
                 {
@@ -858,7 +859,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
 }
 
 
-QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
+QString VideoDisplayProfile::GetDecoderHelp(const QString& decoder)
 {
     QString msg = QObject::tr("Processing method used to decode video.");
 
@@ -917,94 +918,94 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
 {
     if ("none" == short_name)
         return QObject::tr("None");
-    else if ("linearblend" == short_name)
+    if ("linearblend" == short_name)
         return QObject::tr("Linear blend");
-    else if ("kerneldeint" == short_name)
+    if ("kerneldeint" == short_name)
         return QObject::tr("Kernel");
-    else if ("kerneldoubleprocessdeint" == short_name)
+    if ("kerneldoubleprocessdeint" == short_name)
         return QObject::tr("Kernel (2x)");
-    else if ("greedyhdeint" == short_name)
+    if ("greedyhdeint" == short_name)
         return QObject::tr("Greedy HighMotion");
-    else if ("greedyhdoubleprocessdeint" == short_name)
+    if ("greedyhdoubleprocessdeint" == short_name)
         return QObject::tr("Greedy HighMotion (2x)");
-    else if ("yadifdeint" == short_name)
+    if ("yadifdeint" == short_name)
         return QObject::tr("Yadif");
-    else if ("yadifdoubleprocessdeint" == short_name)
+    if ("yadifdoubleprocessdeint" == short_name)
         return QObject::tr("Yadif (2x)");
-    else if ("bobdeint" == short_name)
+    if ("bobdeint" == short_name)
         return QObject::tr("Bob (2x)");
-    else if ("onefield" == short_name)
+    if ("onefield" == short_name)
         return QObject::tr("One field");
-    else if ("fieldorderdoubleprocessdeint" == short_name)
+    if ("fieldorderdoubleprocessdeint" == short_name)
         return QObject::tr("Interlaced (2x)");
-    else if ("opengllinearblend" == short_name)
+    if ("opengllinearblend" == short_name)
         return QObject::tr("Linear blend (HW-GL)");
-    else if ("openglkerneldeint" == short_name)
+    if ("openglkerneldeint" == short_name)
         return QObject::tr("Kernel (HW-GL)");
-    else if ("openglbobdeint" == short_name)
+    if ("openglbobdeint" == short_name)
         return QObject::tr("Bob (2x, HW-GL)");
-    else if ("openglonefield" == short_name)
+    if ("openglonefield" == short_name)
         return QObject::tr("One field (HW-GL)");
-    else if ("opengldoubleratekerneldeint" == short_name)
+    if ("opengldoubleratekerneldeint" == short_name)
         return QObject::tr("Kernel (2x, HW-GL)");
-    else if ("opengldoubleratelinearblend" == short_name)
+    if ("opengldoubleratelinearblend" == short_name)
         return QObject::tr("Linear blend (2x, HW-GL)");
-    else if ("opengldoubleratefieldorder" == short_name)
+    if ("opengldoubleratefieldorder" == short_name)
         return QObject::tr("Interlaced (2x, HW-GL)");
-    else if ("vdpauonefield" == short_name)
+    if ("vdpauonefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
-    else if ("vdpaubobdeint" == short_name)
+    if ("vdpaubobdeint" == short_name)
         return QObject::tr("Bob (2x, HW)");
-    else if ("vdpaubasic" == short_name)
+    if ("vdpaubasic" == short_name)
         return QObject::tr("Temporal (1x, HW)");
-    else if ("vdpaubasicdoublerate" == short_name)
+    if ("vdpaubasicdoublerate" == short_name)
         return QObject::tr("Temporal (2x, HW)");
-    else if ("vdpauadvanced" == short_name)
+    if ("vdpauadvanced" == short_name)
         return QObject::tr("Advanced (1x, HW)");
-    else if ("vdpauadvanceddoublerate" == short_name)
+    if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, HW)");
 #ifdef USING_OPENMAX
-    else if ("openmaxadvanced" == short_name)
+    if ("openmaxadvanced" == short_name)
         return QObject::tr("Advanced (HW)");
-    else if ("openmaxfast" == short_name)
+    if ("openmaxfast" == short_name)
         return QObject::tr("Fast (HW)");
-    else if ("openmaxlinedouble" == short_name)
+    if ("openmaxlinedouble" == short_name)
         return QObject::tr("Line double (HW)");
 #endif // def USING_OPENMAX
 #ifdef USING_VAAPI2
-    else if ("vaapi2default" == short_name)
+    if ("vaapi2default" == short_name)
         return QObject::tr("Advanced (HW-VA)");
-    else if ("vaapi2bob" == short_name)
+    if ("vaapi2bob" == short_name)
         return QObject::tr("Bob (HW-VA)");
-    else if ("vaapi2weave" == short_name)
+    if ("vaapi2weave" == short_name)
         return QObject::tr("Weave (HW-VA)");
-    else if ("vaapi2motion_adaptive" == short_name)
+    if ("vaapi2motion_adaptive" == short_name)
         return QObject::tr("Motion Adaptive (HW-VA)");
-    else if ("vaapi2motion_compensated" == short_name)
+    if ("vaapi2motion_compensated" == short_name)
         return QObject::tr("Motion Compensated (HW-VA)");
-    else if ("vaapi2doubleratedefault" == short_name)
+    if ("vaapi2doubleratedefault" == short_name)
         return QObject::tr("Advanced (2x, HW-VA)");
-    else if ("vaapi2doubleratebob" == short_name)
+    if ("vaapi2doubleratebob" == short_name)
         return QObject::tr("Bob (2x, HW-VA)");
-    else if ("vaapi2doublerateweave" == short_name)
+    if ("vaapi2doublerateweave" == short_name)
         return QObject::tr("Weave (2x, HW-VA)");
-    else if ("vaapi2doubleratemotion_adaptive" == short_name)
+    if ("vaapi2doubleratemotion_adaptive" == short_name)
         return QObject::tr("Motion Adaptive (2x, HW-VA)");
-    else if ("vaapi2doubleratemotion_compensated" == short_name)
+    if ("vaapi2doubleratemotion_compensated" == short_name)
         return QObject::tr("Motion Compensated (2x, HW-VA)");
 #endif
 #ifdef USING_NVDEC
-    else if ("nvdecweave" == short_name)
+    if ("nvdecweave" == short_name)
         return QObject::tr("Weave (HW-NV)");
-    else if ("nvdecbob" == short_name)
+    if ("nvdecbob" == short_name)
         return QObject::tr("Bob (HW-NV)");
-    else if ("nvdecadaptive" == short_name)
+    if ("nvdecadaptive" == short_name)
         return QObject::tr("Adaptive (HW-NV)");
-    else if ("nvdecdoublerateweave" == short_name)
+    if ("nvdecdoublerateweave" == short_name)
         return QObject::tr("Weave (2x, HW-NV)");
-    else if ("nvdecdoubleratebob" == short_name)
+    if ("nvdecdoubleratebob" == short_name)
         return QObject::tr("Bob (2x, HW-NV)");
-    else if ("nvdecdoublerateadaptive" == short_name)
+    if ("nvdecdoublerateadaptive" == short_name)
         return QObject::tr("Adaptive (2x, HW-NV)");
 #endif // USING_NVDEC
 
@@ -1042,7 +1043,7 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 
     if (tmp.isEmpty())
     {
-        if (profiles.size())
+        if (!profiles.empty())
             tmp = profiles[0];
 
         tmp = (profiles.contains("Normal")) ? "Normal" : tmp;
@@ -1118,8 +1119,8 @@ void VideoDisplayProfile::DeleteProfiles(const QString &hostname)
 // Old style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
-    QString cmp0, uint width0, uint height0,
-    QString cmp1, uint width1, uint height1,
+    const QString& cmp0, uint width0, uint height0,
+    const QString& cmp1, uint width1, uint height1,
     QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
     QString osdrenderer, bool osdfade,
     QString deint0, QString deint1, QString filters)
@@ -1146,18 +1147,18 @@ void VideoDisplayProfile::CreateProfile(
     CreateProfile(
         groupid, priority,
         width, height, QString(),
-        decoder, max_cpus, skiploop, videorenderer,
-        osdrenderer, osdfade,
-        deint0, deint1, filters);
+        std::move(decoder), max_cpus, skiploop, std::move(videorenderer),
+        std::move(osdrenderer), osdfade,
+        std::move(deint0), std::move(deint1), std::move(filters));
 }
 
 // New Style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
-    QString width, QString height, QString codecs,
-    QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-    QString osdrenderer, bool osdfade,
-    QString deint0, QString deint1, QString filters)
+    const QString& width, const QString& height, const QString& codecs,
+    const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+    const QString& osdrenderer, bool osdfade,
+    const QString& deint0, const QString& deint1, const QString& filters)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

@@ -184,8 +184,5 @@ bool isNewTune(const QString& artist, const QString& album, const QString& title
         return true;
     }
 
-    if (query.size() > 0)
-        return false;
-
-    return true;
+    return query.size() <= 0;
 }

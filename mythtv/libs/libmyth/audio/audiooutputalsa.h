@@ -13,7 +13,7 @@ class AudioOutputALSA : public AudioOutputBase
 {
   public:
     explicit AudioOutputALSA(const AudioSettings &settings);
-    virtual ~AudioOutputALSA();
+    ~AudioOutputALSA() override;
 
     // Volume control
     int GetVolumeChannel(int channel) const override; // VolumeBase
@@ -29,7 +29,7 @@ class AudioOutputALSA : public AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool passthrough) override; // AudioOutputBase
 
   private:
-    int TryOpenDevice(int open_mode, int try_ac3);
+    int TryOpenDevice(int open_mode, bool try_ac3);
     int GetPCMInfo(int &card, int &device, int &subdevice);
     bool IncPreallocBufferSize(int requested, int buffer_time);
     inline int SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,

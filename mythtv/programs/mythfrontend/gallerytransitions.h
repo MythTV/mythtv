@@ -26,7 +26,7 @@ class Transition : public QObject
 {
     Q_OBJECT
 public:
-    explicit Transition(QString name);
+    explicit Transition(const QString& name);
     virtual ~Transition()              = default;
 
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
@@ -155,7 +155,7 @@ class TransitionRandom : public Transition
 {
     Q_OBJECT
 public:
-    explicit TransitionRandom(QList<Transition*> peers)
+    explicit TransitionRandom(const QList<Transition*>& peers)
         : Transition(Transition::tr("Random")), m_peers(peers) {}
     void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0) override; // Transition
     void SetSpeed(float speed) override // Transition

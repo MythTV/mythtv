@@ -9,7 +9,7 @@ static bool             frequencies_initialized = false;
 static QMutex           frequencies_lock;
 static freq_table_map_t frequencies;
 
-static void init_freq_tables(freq_table_map_t&);
+static void init_freq_tables(freq_table_map_t& /*fmap*/);
 static freq_table_list_t get_matching_freq_tables_internal(
     const QString &format, const QString &modulation, const QString &country);
 
@@ -83,14 +83,14 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
 
 TransportScanItem::TransportScanItem(uint sourceid,
                                      const QString &std,
-                                     const QString &fn,
-                                     uint fnum,
+                                     const QString &strFmt,
+                                     uint freqNum,
                                      uint freq,
                                      const FrequencyTable &ft,
-                                     uint tuneTO)
-    : m_mplexid(0),         m_friendlyName(fn),
-      m_friendlyNum(fnum),  m_sourceID(sourceid),
-      m_timeoutTune(tuneTO)
+                                     uint timeoutTune)
+    : m_mplexid(0),           m_friendlyName(strFmt),
+      m_friendlyNum(freqNum), m_sourceID(sourceid),
+      m_timeoutTune(timeoutTune)
 {
     memset(m_freqOffsets, 0, sizeof(int)*3);
 
@@ -259,14 +259,14 @@ freq_table_list_t get_matching_freq_tables(
         get_matching_freq_tables_internal(format, modulation, country);
 
     freq_table_list_t new_list;
-    for (uint i = 0; i < list.size(); i++)
+    for (size_t i = 0; i < list.size(); i++)
         new_list.push_back(new FrequencyTable(*list[i]));
 
     return new_list;
 }
 
 long long get_center_frequency(
-    QString format, QString modulation, QString country, int freqid)
+    const QString& format, const QString& modulation, const QString& country, int freqid)
 {
     QMutexLocker locker(&frequencies_lock);
     init_freq_tables();
@@ -274,7 +274,7 @@ long long get_center_frequency(
     freq_table_list_t list =
         get_matching_freq_tables_internal(format, modulation, country);
 
-    for (uint i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
         int min_freqid = list[i]->m_nameOffset;
         int max_freqid = min_freqid +
@@ -289,14 +289,14 @@ long long get_center_frequency(
 }
 
 int get_closest_freqid(
-    QString format, QString modulation, QString country, long long centerfreq)
+    const QString& format, QString modulation, const QString& country, long long centerfreq)
 {
     modulation = (modulation == "8vsb") ? "vsb8" : modulation;
 
     freq_table_list_t list =
         get_matching_freq_tables_internal(format, modulation, country);
 
-    for (uint i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
         int min_freqid = list[i]->m_nameOffset;
         int max_freqid = min_freqid +

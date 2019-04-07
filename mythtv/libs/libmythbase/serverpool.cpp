@@ -29,18 +29,18 @@ static QPair<QHostAddress, int> kLinkLocal6 =
 class PrivUdpSocket : public QUdpSocket
 {
 public:
-    PrivUdpSocket(QObject *parent, QNetworkAddressEntry host) :
+    PrivUdpSocket(QObject *parent, const QNetworkAddressEntry& host) :
         QUdpSocket(parent), m_host(host) { };
-    ~PrivUdpSocket() = default;
+    ~PrivUdpSocket() override = default;
     QNetworkAddressEntry host()
     {
         return m_host;
     };
-    bool contains(QHostAddress addr)
+    bool contains(const QHostAddress& addr)
     {
         return contains(m_host, addr);
     };
-    static bool contains(QNetworkAddressEntry host, QHostAddress addr)
+    static bool contains(const QNetworkAddressEntry& host, const QHostAddress& addr)
     {
         if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
             addr.isInSubnet(kLinkLocal6) &&
@@ -98,12 +98,12 @@ void ServerPool::SelectDefaultListen(bool force)
                                            "BackendServerIP",
                                            QString(),
                                            gCoreContext->ResolveIPv4, true));
-    bool v4IsSet = config_v4.isNull() ? true : false;
+    bool v4IsSet = config_v4.isNull();
     QHostAddress config_v6(gCoreContext->resolveSettingAddress(
                                            "BackendServerIP6",
                                            QString(),
                                            gCoreContext->ResolveIPv6, true));
-    bool v6IsSet = config_v6.isNull() ? true : false;
+    bool v6IsSet = config_v6.isNull();
     bool allowLinkLocal = gCoreContext->GetBoolSetting("AllowLinkLocal", true);
 
     // loop through all available interfaces
@@ -125,7 +125,7 @@ void ServerPool::SelectDefaultListen(bool force)
                     // already defined, skip
                     continue;
 
-                else if (!config_v4.isNull() && (ip == config_v4))
+                if (!config_v4.isNull() && (ip == config_v4))
                 {
                     // IPv4 address is defined, add it
                     LOG(VB_GENERAL, LOG_DEBUG,
@@ -204,7 +204,7 @@ void ServerPool::SelectDefaultListen(bool force)
                     // already defined, skip
                     continue;
 
-                else if ((!config_v6.isNull()) && (ip == config_v6))
+                if ((!config_v6.isNull()) && (ip == config_v6))
                 {
                 // IPv6 address is defined, add it
                     LOG(VB_GENERAL, LOG_DEBUG,
@@ -456,7 +456,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         }
     }
 
-    if (m_tcpServers.size() == 0)
+    if (m_tcpServers.empty())
         return false;
 
     m_listening = true;
@@ -562,7 +562,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         }
     }
 
-    if (m_udpSockets.size() == 0)
+    if (m_udpSockets.empty())
         return false;
 
     m_listening = true;
@@ -580,13 +580,14 @@ bool ServerPool::bind(QStringList addrstr, quint16 port, bool requireall)
 
 bool ServerPool::bind(quint16 port, bool requireall)
 {
+    // cppcheck-suppress invalidFunctionArgBool
     return bind(DefaultListen(), port, requireall);
 }
 
 qint64 ServerPool::writeDatagram(const char * data, qint64 size,
                                  const QHostAddress &addr, quint16 port)
 {
-    if (!m_listening || m_udpSockets.size() == 0)
+    if (!m_listening || m_udpSockets.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "Trying to write datagram to disconnected "
                             "ServerPool instance.");
@@ -759,14 +760,12 @@ int ServerPool::tryListeningPort(QTcpServer *server, int baseport,
             {
                 break;
             }
-            else
+
+            // did we fail because IPv6 isn't available?
+            QAbstractSocket::SocketError err = server->serverError();
+            if (err == QAbstractSocket::UnsupportedSocketOperationError)
             {
-                // did we fail because IPv6 isn't available?
-                QAbstractSocket::SocketError err = server->serverError();
-                if (err == QAbstractSocket::UnsupportedSocketOperationError)
-                {
-                    ipv6 = false;
-                }
+                ipv6 = false;
             }
         }
         if (!ipv6)
@@ -825,14 +824,12 @@ int ServerPool::tryBindingPort(QUdpSocket *socket, int baseport,
             {
                 break;
             }
-            else
+
+            // did we fail because IPv6 isn't available?
+            QAbstractSocket::SocketError err = socket->error();
+            if (err == QAbstractSocket::UnsupportedSocketOperationError)
             {
-                // did we fail because IPv6 isn't available?
-                QAbstractSocket::SocketError err = socket->error();
-                if (err == QAbstractSocket::UnsupportedSocketOperationError)
-                {
-                    ipv6 = false;
-                }
+                ipv6 = false;
             }
         }
         if (!ipv6)

@@ -1,9 +1,10 @@
 
 #include "videoscan.h"
 
-#include <QImageReader>
 #include <QApplication>
+#include <QImageReader>
 #include <QUrl>
+#include <utility>
 
 // libmythbase
 #include "mythevent.h"
@@ -129,7 +130,7 @@ void VideoScannerThread::SetDirs(QStringList dirs)
                 iter = dirs.erase(iter);
                 continue;
             }
-            else if ((host == master) &&  (!mdirs.contains(path)))
+            if ((host == master) &&  (!mdirs.contains(path)))
                 // collect paths defined on master backend so other
                 // online backends can be set to fall through to them
                 mdirs.append(path);
@@ -382,7 +383,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
             SendProgressEvent(++counter);
     }
 
-    return ret;
+    return ret > 0;
 }
 
 bool VideoScannerThread::buildFileList(const QString &directory,
@@ -411,7 +412,7 @@ void VideoScannerThread::SendProgressEvent(uint progress, uint total,
         return;
 
     ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       messsage);
+                                                       std::move(messsage));
     QApplication::postEvent(m_dialog, pue);
 }
 
@@ -474,7 +475,7 @@ void VideoScanner::doScanAll()
 void VideoScanner::finishedScan()
 {
     QStringList failedHosts = m_scanThread->GetOfflineSGHosts();
-    if (failedHosts.size() > 0)
+    if (!failedHosts.empty())
     {
         QString hosts = failedHosts.join(" ");
         QString msg = tr("Failed to Scan SG Video Hosts:\n\n%1\n\n"

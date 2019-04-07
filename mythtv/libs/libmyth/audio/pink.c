@@ -46,7 +46,7 @@ void initialize_pink_noise( pink_noise_t *pink, int num_rows )
     pink->pink_index_mask = (1<<num_rows) - 1;
 /* Calculate maximum possible signed random value. Extra 1 for white noise always added. */
     pmax = (num_rows + 1) * (1<<(PINK_RANDOM_BITS-1));
-    pink->pink_scalar = 1.0f / pmax;
+    pink->pink_scalar = 1.0F / pmax;
 /* Initialize rows. */
     for( i=0; i<num_rows; i++ ) pink->pink_rows[i] = 0;
     pink->pink_running_sum = 0;

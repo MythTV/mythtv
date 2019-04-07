@@ -123,7 +123,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
             m_thumbGen(new ThumbGenerator(this, 0, 0)),
             m_childCountThread(new ChildCountThread(this))
 {
-    m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_showcaption = gCoreContext->GetBoolSetting("GalleryOverlayCaption", false);
     m_sortorder = gCoreContext->GetNumSetting("GallerySortOrder", 0);
     m_useOpenGL = gCoreContext->GetBoolSetting("SlideshowUseOpenGL", false);
     m_recurse = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
@@ -357,17 +357,15 @@ void IconView::SetupMediaMonitor(void)
             mon->Unlock(m_currDevice);
             return;
         }
-        else
-        {
-//             DialogBox *dlg = new DialogBox(GetMythMainWindow(),
-//                              tr("Failed to mount device: ") +
-//                              m_currDevice->getDevicePath() + "\n\n" +
-//                              tr("Showing the default MythGallery directory."));
-//             dlg->AddButton(tr("OK"));
-//             dlg->exec();
-//             dlg->deleteLater();
-            mon->Unlock(m_currDevice);
-        }
+
+//      DialogBox *dlg = new DialogBox(GetMythMainWindow(),
+//                       tr("Failed to mount device: ") +
+//                       m_currDevice->getDevicePath() + "\n\n" +
+//                       tr("Showing the default MythGallery directory."));
+//      dlg->AddButton(tr("OK"));
+//      dlg->exec();
+//      dlg->deleteLater();
+        mon->Unlock(m_currDevice);
     }
 #endif // _WIN32
 }
@@ -666,9 +664,7 @@ static bool is_subdir(const QDir &parent, const QDir &subdir)
 {
     QString pstr = QDir::cleanPath(parent.path());
     QString cstr = QDir::cleanPath(subdir.path());
-    bool ret = !cstr.indexOf(pstr);
-
-    return ret;
+    return cstr.startsWith(pstr);
 }
 
 bool IconView::HandleSubDirEscape(const QString &parent)
@@ -1104,7 +1100,7 @@ void IconView::ReloadSettings(void)
     gCoreContext->ClearSettingsCache();
 
     // reload settings
-    m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_showcaption = gCoreContext->GetBoolSetting("GalleryOverlayCaption", false);
     m_sortorder   = gCoreContext->GetNumSetting("GallerySortOrder", 0);
     m_useOpenGL   = gCoreContext->GetBoolSetting("SlideshowUseOpenGL", false);
     m_recurse     = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
@@ -1217,8 +1213,7 @@ void IconView::HandleImport(void)
         importdir.rmdir(importdir.absolutePath());
         return;
     }
-    else
-        ShowOkPopup(tr("Found %n image(s)", "", importdir.count()));
+    ShowOkPopup(tr("Found %n image(s)", "", importdir.count()));
 
     LoadDirectory(m_currDir);
 }
@@ -1389,7 +1384,7 @@ void IconView::HandleMkDir(void)
             SLOT(DoMkDir(QString)), Qt::QueuedConnection);
 }
 
-void IconView::DoMkDir(QString folderName)
+void IconView::DoMkDir(const QString& folderName)
 {
     QDir cdir(m_currDir);
     cdir.mkdir(folderName);
@@ -1419,7 +1414,7 @@ void IconView::HandleRename(void)
             SLOT(DoRename(QString)), Qt::QueuedConnection);
 }
 
-void IconView::DoRename(QString folderName)
+void IconView::DoRename(const QString& folderName)
 {
     if (folderName.isEmpty() || folderName == "." || folderName == "..")
         return;

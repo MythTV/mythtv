@@ -20,13 +20,6 @@
 
 using namespace std;
 
-MythPlugin::~MythPlugin()
-{
-    // Commented out because it causes segfaults... dtk 2008-10-08
-    //if (isLoaded())
-    //    unload();
-}
-
 int MythPlugin::init(const char *libversion)
 {
     typedef int (*PluginInitFunc)(const char *);

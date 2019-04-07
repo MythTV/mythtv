@@ -87,7 +87,7 @@ class MHEngine: public MHEG {
     // Look up an object by its object reference.  In nearly all cases we want to throw
     // an exception if it isn't found.  In a very few cases where we don't fail this
     // returns nullptr if it isn't there.
-    MHRoot *FindObject(const MHObjectRef &objr, bool failOnNotFound = true);
+    MHRoot *FindObject(const MHObjectRef &oRef, bool failOnNotFound = true);
 
     // Called when an event is triggered.  Either queues the event or finds a link that matches.
     void EventTriggered(MHRoot *pSource, enum EventType ev)
@@ -100,7 +100,7 @@ class MHEngine: public MHEG {
     // Display stack and draw functions.
     void AddToDisplayStack(MHVisible *pVis);
     void RemoveFromDisplayStack(MHVisible *pVis);
-    void Redraw(QRegion region); // Request a redraw.
+    void Redraw(const QRegion& region); // Request a redraw.
     // Functions to alter the Z-order.
     void BringToFront(const MHRoot *pVis);
     void SendToBack(const MHRoot *pVis);
@@ -166,7 +166,7 @@ class MHEngine: public MHEG {
   protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);
     MHGroup *ParseProgram(QByteArray &text);
-    void DrawRegion(QRegion toDraw, int nStackPos);
+    void DrawRegion(const QRegion& toDraw, int nStackPos);
 
     QRegion m_redrawRegion; // The accumulation of repaints when the screen is locked.
 

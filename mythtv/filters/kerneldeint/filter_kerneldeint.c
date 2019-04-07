@@ -68,17 +68,17 @@ typedef struct ThisFilter
     int       double_rate;
     int       double_call;
     void (*line_filter)(uint8_t *dst, int width, int start_width,
-                        uint8_t *src1, uint8_t *src2, uint8_t *src3,
-                        uint8_t *src4, uint8_t *src5);
+                        const uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
+                        const uint8_t *src4, const uint8_t *src5);
     void (*line_filter_fast)(uint8_t *dst, int width, int start_width,
-                             uint8_t *src1, uint8_t *src2, uint8_t *src3,
-                             uint8_t *src4, uint8_t *src5);
+                             uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
+                             const uint8_t *src4, const uint8_t *src5);
     TF_STRUCT;
 } ThisFilter;
 
 static void line_filter_c_fast(uint8_t *dst, int width, int start_width,
-                           uint8_t *buf, uint8_t *src2, uint8_t *src3,
-                           uint8_t *src4, uint8_t *src5)
+                           uint8_t *buf, const uint8_t *src2, const uint8_t *src3,
+                           const uint8_t *src4, const uint8_t *src5)
 {
     for (int X = start_width; X < width; X++)
     {
@@ -92,8 +92,8 @@ static void line_filter_c_fast(uint8_t *dst, int width, int start_width,
 }
 
 static void line_filter_c(uint8_t *dst, int width, int start_width,
-                          uint8_t *src1, uint8_t *src2, uint8_t *src3,
-                          uint8_t *src4, uint8_t *src5)
+                          const uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
+                          const uint8_t *src4, const uint8_t *src5)
 {
     int X;
     for (X = start_width; X < width; X++)
@@ -108,8 +108,8 @@ static void line_filter_c(uint8_t *dst, int width, int start_width,
 }
 
 #if HAVE_MMX
-static inline void mmx_start(uint8_t *src1, uint8_t *src2,
-                             uint8_t *src3, uint8_t *src4,
+static inline void mmx_start(const uint8_t *src1, const uint8_t *src2,
+                             const uint8_t *src3, const uint8_t *src4,
                              int X)
 {
     movq_m2r (src2[X], mm0);
@@ -142,7 +142,7 @@ static inline void mmx_start(uint8_t *src1, uint8_t *src2,
     punpckhbw_m2r (mm_cpool[0], mm3);
 }
 
-static inline void mmx_end(uint8_t *src3, uint8_t *src5,
+static inline void mmx_end(const uint8_t *src3, const uint8_t *src5,
                            uint8_t *dst, int X)
 {
     punpcklbw_m2r (mm_cpool[0], mm4);
@@ -177,8 +177,8 @@ static inline void mmx_end(uint8_t *src3, uint8_t *src5,
 }
 
 static void line_filter_mmx_fast(uint8_t *dst, int width, int start_width,
-                                 uint8_t *buf, uint8_t *src2, uint8_t *src3,
-                                 uint8_t *src4, uint8_t *src5)
+                                 uint8_t *buf, const uint8_t *src2, const uint8_t *src3,
+                                 const uint8_t *src4, const uint8_t *src5)
 {
     int X;
     for (X = start_width; X < width - 7; X += 8)
@@ -192,8 +192,8 @@ static void line_filter_mmx_fast(uint8_t *dst, int width, int start_width,
 }
 
 static void line_filter_mmx(uint8_t *dst, int width, int start_width,
-                            uint8_t *src1, uint8_t *src2, uint8_t *src3,
-                            uint8_t *src4, uint8_t *src5)
+                            const uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
+                            const uint8_t *src4, const uint8_t *src5)
 {
     int X;
     for (X = start_width; X < width - 7; X += 8)
@@ -533,12 +533,11 @@ static void CleanupKernelDeintFilter(VideoFilter *f)
 
 static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
                                          VideoFrameType outpixfmt,
-                                         int *width, int *height,
-                                         char *options, int threads)
+                                         const int *width, const int *height,
+                                         const char *options, int threads)
 {
     ThisFilter *filter;
     (void) options;
-    (void) height;
     (void) threads;
 
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)

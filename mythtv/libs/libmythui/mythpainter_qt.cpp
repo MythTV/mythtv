@@ -124,7 +124,7 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
     if (qim->NeedsRegen())
         qim->RegeneratePixmap();
 
-    m_painter->setOpacity(static_cast<float>(alpha) / 255.0f);
+    m_painter->setOpacity(static_cast<float>(alpha) / 255.0F);
     m_painter->drawPixmap(r.topLeft(), *(qim->GetPixmap()), src);
     m_painter->setOpacity(1.0);
 }

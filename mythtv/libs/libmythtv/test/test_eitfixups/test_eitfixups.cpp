@@ -38,7 +38,7 @@ QString getVideoProps(unsigned char props);
 #else
     #define PRINT_EVENT(a)
 #endif
-#define TEST_AND_ADD(t,m,s) do{if ((t) & (m)) {(s) += " | "#m;(t) &= ~(m);}}while(0)
+#define TEST_AND_ADD(t,m,s) do{if ((t) & (m)) {(s) += " | "#m;(t) &= ~(m);}}while(false)
 
 QString getSubtitleType(unsigned char type)
 {
@@ -171,8 +171,8 @@ void TestEITFixups::testUKFixups1()
     fixup.Fix(event1);
 
     PRINT_EVENT(event1);
-    QCOMPARE(event1.m_episode,       3u);
-    QCOMPARE(event1.m_totalepisodes, 5u);
+    QCOMPARE(event1.m_episode,       3U);
+    QCOMPARE(event1.m_totalepisodes, 5U);
 }
 
 void TestEITFixups::testUKFixups2()
@@ -191,8 +191,8 @@ void TestEITFixups::testUKFixups2()
 
     fixup.Fix(event2);
     PRINT_EVENT(event2);
-    QCOMPARE(event2.m_season,  3u);
-    QCOMPARE(event2.m_episode, 1u);
+    QCOMPARE(event2.m_season,  3U);
+    QCOMPARE(event2.m_episode, 1U);
 }
 
 void TestEITFixups::testUKFixups3()
@@ -211,10 +211,10 @@ void TestEITFixups::testUKFixups3()
 
     fixup.Fix(event3);
     PRINT_EVENT(event3);
-    QCOMPARE(event3.m_season,     1u);
-    QCOMPARE(event3.m_episode,    2u);
-    QCOMPARE(event3.m_partnumber, (uint16_t)2u);
-    QCOMPARE(event3.m_parttotal,  (uint16_t)2u);
+    QCOMPARE(event3.m_season,     1U);
+    QCOMPARE(event3.m_episode,    2U);
+    QCOMPARE(event3.m_partnumber, (uint16_t)2U);
+    QCOMPARE(event3.m_parttotal,  (uint16_t)2U);
 }
 
 void TestEITFixups::testUKFixups4()
@@ -233,8 +233,8 @@ void TestEITFixups::testUKFixups4()
 
     fixup.Fix(event4);
     PRINT_EVENT(event4);
-    QCOMPARE(event4.m_season,  1u);
-    QCOMPARE(event4.m_episode, 39u);
+    QCOMPARE(event4.m_season,  1U);
+    QCOMPARE(event4.m_episode, 39U);
 }
 
 void TestEITFixups::testUKFixups5()
@@ -253,8 +253,8 @@ void TestEITFixups::testUKFixups5()
 
     fixup.Fix(event5);
     PRINT_EVENT(event5);
-    QCOMPARE(event5.m_episode,       12u);
-    QCOMPARE(event5.m_totalepisodes, 26u);
+    QCOMPARE(event5.m_episode,       12U);
+    QCOMPARE(event5.m_totalepisodes, 26U);
     QCOMPARE(event5.m_subtitleType,  (unsigned char)SUB_NORMAL);
     QCOMPARE(event5.m_subtitle,      QString("Whirlwind"));
     QCOMPARE(event5.m_description,   QString("Acclaimed documentary series about World War II. This episode focuses on the Allied bombing campaign which inflicted grievous damage upon Germany, both day and night."));
@@ -276,8 +276,8 @@ void TestEITFixups::testUKFixups6()
 
     fixup.Fix(event6);
     PRINT_EVENT(event6);
-    QCOMPARE(event6.m_season,       4u);
-    QCOMPARE(event6.m_episode,      3u);
+    QCOMPARE(event6.m_season,       4U);
+    QCOMPARE(event6.m_episode,      3U);
     QCOMPARE(event6.m_subtitleType, (unsigned char)SUB_SIGNED);
     QCOMPARE(event6.m_subtitle,     QString("The Things We Do for Love"));
     QCOMPARE(event6.m_description,  QString("When a beautiful woman is found dead in a car park, the list of suspects leads Jack Frost (David Jason) into the heart of a religious community.  S4 Ep3"));
@@ -299,8 +299,8 @@ void TestEITFixups::testUKFixups7()
 
     fixup.Fix(event7);
     PRINT_EVENT(event7);
-    QCOMPARE(event7.m_episode,       2u);
-    QCOMPARE(event7.m_totalepisodes, 3u);
+    QCOMPARE(event7.m_episode,       2U);
+    QCOMPARE(event7.m_totalepisodes, 3U);
     QCOMPARE(event7.m_subtitleType,  (unsigned char)SUB_NORMAL);
     QCOMPARE(event7.m_audioProps,    (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
     QCOMPARE(event7.m_title,         QString("Suffragettes Forever!"));
@@ -327,7 +327,7 @@ void TestEITFixups::testUKFixups8()
     QCOMPARE(event8.m_subtitleType, (unsigned char)SUB_NORMAL);
     QCOMPARE(event8.m_audioProps,   (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
     QCOMPARE(event8.m_description,  QString("Three unconnected Brooklyn cops wind up at the same deadly location. Contains very strong language, sexual content and some violence."));
-    QCOMPARE(event8.m_airdate,      (uint16_t)2009u);
+    QCOMPARE(event8.m_airdate,      (uint16_t)2009U);
 }
 
 void TestEITFixups::testUKFixups9()
@@ -415,7 +415,7 @@ void TestEITFixups::testUKMarvel()
     delete event2;
 }
 
-DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QString subtitle, QString description)
+DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, const QString& title, const QString& subtitle, const QString& description)
 {
     DBEventEIT *event = new DBEventEIT (1, // channel id
                                        title, // title
@@ -429,7 +429,7 @@ DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, QString title, QS
                                        SUB_UNKNOWN,
                                        AUD_STEREO,
                                        VID_UNKNOWN,
-                                       0.0f, // star rating
+                                       0.0F, // star rating
                                        "", // series id
                                        "", // program id
                                        0, // season
@@ -623,8 +623,8 @@ void TestEITFixups::testSkyEpisodes()
     fixup.Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_description, QString("Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? Ab 12 Jahren"));
-    QCOMPARE(event->m_season,   4u);
-    QCOMPARE(event->m_episode, 16u);
+    QCOMPARE(event->m_season,   4U);
+    QCOMPARE(event->m_episode, 16U);
     /* FixPremiere should scrape the credits, too! */
     QVERIFY(event->HasCredits());
 
@@ -639,8 +639,8 @@ void TestEITFixups::testSkyEpisodes()
     fixup.Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
-    QCOMPARE(event2->m_season,  0u);
-    QCOMPARE(event2->m_episode, 0u);
+    QCOMPARE(event2->m_season,  0U);
+    QCOMPARE(event2->m_episode, 0U);
 
     delete event2;
 
@@ -653,8 +653,8 @@ void TestEITFixups::testSkyEpisodes()
     fixup.Fix(*event3);
     PRINT_EVENT(*event3);
     QCOMPARE(event3->m_description, QString("Ab 12 Jahren"));
-    QCOMPARE(event3->m_season,  0u);
-    QCOMPARE(event3->m_episode, 0u);
+    QCOMPARE(event3->m_season,  0U);
+    QCOMPARE(event3->m_episode, 0U);
 
     delete event3;
 
@@ -666,8 +666,8 @@ void TestEITFixups::testSkyEpisodes()
     fixup.Fix(*event4);
     PRINT_EVENT(*event4);
     QCOMPARE(event4->m_description, QString("Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. Ab 16 Jahren"));
-    QCOMPARE(event4->m_season,  0u);
-    QCOMPARE(event4->m_episode, 0u);
+    QCOMPARE(event4->m_season,  0U);
+    QCOMPARE(event4->m_episode, 0U);
     QCOMPARE(event4->m_airdate,  (unsigned short) 2011);
     QVERIFY(event4->HasCredits());
 
@@ -681,8 +681,8 @@ void TestEITFixups::testSkyEpisodes()
     fixup.Fix(*event5);
     PRINT_EVENT(*event5);
     QCOMPARE(event5->m_description, QString("Lauries Auszug setzt Red zu, denn er hat ... ist."));
-    QCOMPARE(event5->m_season,  2u);
-    QCOMPARE(event5->m_episode, 11u);
+    QCOMPARE(event5->m_season,  2U);
+    QCOMPARE(event5->m_episode, 11U);
     QCOMPARE(event5->m_airdate,  (unsigned short) 1999);
     QVERIFY(event5->HasCredits());
 
@@ -715,7 +715,7 @@ void TestEITFixups::testUnitymedia()
     QCOMPARE(event->m_credits->size(), (size_t)3);
     QVERIFY(event->m_subtitle.isEmpty());
     QCOMPARE(event->m_description, QString("Beschreibung ..."));
-    QCOMPARE(event->m_stars, 0.89f);
+    QCOMPARE(event->m_stars, 0.89F);
     QCOMPARE(event->m_items.count(), 1);
 
     delete event;
@@ -730,7 +730,7 @@ void TestEITFixups::testUnitymedia()
     fixup.Fix(*event);
     PRINT_EVENT(*event);
 
-    QCOMPARE(event->m_stars, 0.89f);
+    QCOMPARE(event->m_stars, 0.89F);
 
     delete event;
 }
@@ -805,22 +805,22 @@ void TestEITFixups::test64BitEnum(void)
     QCOMPARE((FixupValue)((uint32_t)EITFixUp::kFixUnitymedia), (FixupValue)EITFixUp::kFixNone);
 
     FixupMap   fixes;
-    fixes[0xFFFFull<<32] = EITFixUp::kFixDisneyChannel;
-    fixes[0xFFFFull<<32] |= EITFixUp::kFixATV;
+    fixes[0xFFFFULL<<32] = EITFixUp::kFixDisneyChannel;
+    fixes[0xFFFFULL<<32] |= EITFixUp::kFixATV;
     FixupValue fix;
     fix = EITFixUp::kFixGenericDVB;
-    fix |= fixes.value(0xFFFFull<<32);
+    fix |= fixes.value(0xFFFFULL<<32);
     QCOMPARE(fix, EITFixUp::kFixGenericDVB | EITFixUp::kFixDisneyChannel | EITFixUp::kFixATV);
     QVERIFY(EITFixUp::kFixATV & fix);
 
     // did kFixGreekCategories = 1<<31 cause issues?
 #if 0
-    QCOMPARE(QString::number(1<<31, 16), QString::number(1u<<31, 16));
+    QCOMPARE(QString::number(1<<31, 16), QString::number(1U<<31, 16));
 #endif
     // two different flags, fixed version
-    QVERIFY(!(1ull<<31 & 1ull<<32));
+    QVERIFY(!(1ULL<<31 & 1ULL<<32));
     // oops, this is true, so setting the old kFixGreekCategories also set all flags following it
-    QVERIFY(1<<31 & 1ull<<32);
+    QVERIFY(1<<31 & 1ULL<<32);
 }
 
 QTEST_APPLESS_MAIN(TestEITFixups)

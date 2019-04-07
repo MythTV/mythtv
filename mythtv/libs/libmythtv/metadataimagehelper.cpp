@@ -20,7 +20,7 @@ namespace {
     }
 }
 
-ArtworkMap GetArtwork(QString inetref,
+ArtworkMap GetArtwork(const QString& inetref,
                       uint season,
                       bool strict)
 {
@@ -129,7 +129,7 @@ bool SetArtwork(const QString &inetref,
 bool SetArtwork(const QString &inetref,
                        uint season,
                        const QString &host,
-                       const ArtworkMap map)
+                       const ArtworkMap& map)
 {
     if (inetref.isEmpty())
         return false;

@@ -49,7 +49,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     SetPositionMapType(MARK_GOP_BYFRAME);
     m_payload_buffer.reserve(TSPacket::kSize * (50 + 1));
 
-    ResetForNewFile();
+    DTVRecorder::ResetForNewFile();
 
     memset(m_stream_id,  0, sizeof(m_stream_id));
     memset(m_pid_status, 0, sizeof(m_pid_status));
@@ -65,7 +65,7 @@ DTVRecorder::~DTVRecorder(void)
 {
     StopRecording();
 
-    SetStreamData(nullptr);
+    DTVRecorder::SetStreamData(nullptr);
 
     if (m_input_pat)
     {
@@ -96,14 +96,14 @@ void DTVRecorder::SetOption(const QString &name, int value)
     if (name == "wait_for_seqstart")
         m_wait_for_keyframe_option = (value == 1);
     else if (name == "recordmpts")
-        m_record_mpts = value;
+        m_record_mpts = (value != 0);
     else
         RecorderBase::SetOption(name, value);
 }
 
 void DTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                         const QString &videodev,
-                                        const QString&, const QString&)
+                                        const QString& /*audiodev*/, const QString& /*vbidev*/)
 {
     SetOption("videodevice", videodev);
     DTVRecorder::SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
@@ -165,7 +165,7 @@ void DTVRecorder::ResetForNewFile(void)
     m_durationMapDelta.clear();
 
     locker.unlock();
-    ClearStatistics();
+    DTVRecorder::ClearStatistics();
 }
 
 void DTVRecorder::ClearStatistics(void)
@@ -210,8 +210,7 @@ void DTVRecorder::SetStreamData(MPEGStreamData *data)
 
     MPEGStreamData *old_data = m_stream_data;
     m_stream_data = data;
-    if (old_data)
-        delete old_data;
+    delete old_data;
 
     if (m_stream_data)
         InitStreamData();
@@ -311,12 +310,12 @@ static int64_t extract_timestamp(
     if (bytes_left < 4)
         return -1LL;
 
-    bool has_pts = bufptr[3] & 0x80;
+    bool has_pts = (bufptr[3] & 0x80) != 0;
     int offset = 5;
     if (((kExtractPTS == pts_or_dts) && !has_pts) || (offset + 5 > bytes_left))
         return -1LL;
 
-    bool has_dts = bufptr[3] & 0x40;
+    bool has_dts = (bufptr[3] & 0x40) != 0;
     if (kExtractDTS == pts_or_dts)
     {
         if (!has_dts)
@@ -338,7 +337,7 @@ static QDateTime ts_to_qdatetime(
 {
     if (pts < pts_first)
         pts += 0x1FFFFFFFFLL;
-    QDateTime dt = pts_first_dt;
+    const QDateTime& dt = pts_first_dt;
     return dt.addMSecs((pts - pts_first)/90);
 }
 
@@ -515,7 +514,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
         // last GOP or SEQ stream_id, then pretend this picture
         // is a keyframe. We may get artifacts but at least
         // we will be able to skip frames.
-        hasKeyFrame = !(m_frames_seen_count & 0xf);
+        hasKeyFrame = ((m_frames_seen_count & 0xf) == 0U);
         hasKeyFrame &= (m_last_gop_seen + maxKFD) < m_frames_seen_count;
         hasKeyFrame &= (m_last_seq_seen + maxKFD) < m_frames_seen_count;
     }
@@ -697,7 +696,7 @@ void DTVRecorder::UpdateFramesWritten(void)
             .arg(m_total_duration));
 }
 
-bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
+bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)
 {
     bool hasKeyFrame = false;
     if (!m_ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
@@ -1129,7 +1128,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             // last GOP or SEQ stream_id, then pretend this picture
             // is a keyframe. We may get artifacts but at least
             // we will be able to skip frames.
-            hasKeyFrame = !(m_frames_seen_count & 0xf);
+            hasKeyFrame = ((m_frames_seen_count & 0xf) == 0U);
             hasKeyFrame &= (m_last_gop_seen + maxKFD) < m_frames_seen_count;
             hasKeyFrame &= (m_last_seq_seen + maxKFD) < m_frames_seen_count;
         }
@@ -1296,7 +1295,7 @@ void DTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat,
     pat->tsheader()->SetContinuityCounter(next_cc);
     pat->GetAsTSPackets(m_scratch, next_cc);
 
-    for (uint i = 0; i < m_scratch.size(); ++i)
+    for (size_t i = 0; i < m_scratch.size(); ++i)
         DTVRecorder::BufferedWrite(m_scratch[i], insert);
 }
 
@@ -1410,7 +1409,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
     pmt->tsheader()->SetContinuityCounter(next_cc);
     pmt->GetAsTSPackets(m_scratch, next_cc);
 
-    for (uint i = 0; i < m_scratch.size(); ++i)
+    for (size_t i = 0; i < m_scratch.size(); ++i)
         DTVRecorder::BufferedWrite(m_scratch[i], insert);
 }
 

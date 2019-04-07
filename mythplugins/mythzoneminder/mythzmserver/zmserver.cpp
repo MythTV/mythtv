@@ -79,14 +79,14 @@
 #define ZM_SUBPIX_ORDER_ARGB 10
 
 MYSQL   g_dbConn;
-string  g_zmversion = "";
-string  g_password = "";
-string  g_server = "";
-string  g_database = "";
-string  g_webPath = "";
-string  g_user = "";
-string  g_webUser = "";
-string  g_binPath = "";
+string  g_zmversion;
+string  g_password;
+string  g_server;
+string  g_database;
+string  g_webPath;
+string  g_user;
+string  g_webUser;
+string  g_binPath;
 int     g_majorVersion = 0;
 int     g_minorVersion = 0;
 int     g_revisionVersion = 0;
@@ -96,10 +96,9 @@ time_t  g_lastDBKick = 0;
 // returns true if the ZM version >= the requested version
 bool checkVersion(int major, int minor, int revision)
 {
-    if (g_majorVersion >= major && g_minorVersion >= minor && g_revisionVersion >= revision)
-        return true;
-
-    return false;
+    return g_majorVersion    >= major &&
+           g_minorVersion    >= minor &&
+           g_revisionVersion >= revision;
 }
 
 void loadZMConfig(const string &configfile)
@@ -366,7 +365,7 @@ bool MONITOR::isValid(void)
 
 string MONITOR::getIdStr(void)
 {
-    if (m_id == "")
+    if (m_id.empty())
     {
         std::stringstream out;
         out << m_mon_id;
@@ -403,8 +402,7 @@ int MONITOR::getSubpixelOrder(void)
     {
         if (m_bytes_per_pixel == 1)
             return ZM_SUBPIX_ORDER_NONE;
-        else
-            return ZM_SUBPIX_ORDER_RGB;
+        return ZM_SUBPIX_ORDER_RGB;
     }
 
     if (m_shared_data26)
@@ -439,7 +437,7 @@ ZMServer::ZMServer(int sock, bool debug)
     m_shmKey = 0x7a6d2000;
     string setting = getZMSetting("ZM_SHM_KEY");
 
-    if (setting != "")
+    if (!setting.empty())
     {
         unsigned long long tmp = m_shmKey;
         sscanf(setting.c_str(), "%20llx", &tmp);
@@ -501,7 +499,7 @@ ZMServer::ZMServer(int sock, bool debug)
 
 ZMServer::~ZMServer()
 {
-    for (uint x = 0; x < m_monitors.size(); x++)
+    for (size_t x = 0; x < m_monitors.size(); x++)
     {
         MONITOR *mon = m_monitors.at(x);
         if (mon->m_mapFile != -1)
@@ -525,7 +523,7 @@ ZMServer::~ZMServer()
 
 void ZMServer::tokenize(const string &command, vector<string> &tokens)
 {
-    string token = "";
+    string token;
     tokens.clear();
     string::size_type startPos = 0;
     string::size_type endPos = 0;
@@ -619,10 +617,7 @@ bool ZMServer::send(const string &s) const
 
     // send message
     status = ::send(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL);
-    if ( status == -1 )
-        return false;
-    else
-        return true;
+    return status != -1;
 }
 
 bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) const
@@ -642,15 +637,12 @@ bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) c
 
     // send data
     status = ::send(m_sock, buffer, dataLen, MSG_NOSIGNAL);
-    if ( status == -1 )
-        return false;
-
-    return true;
+    return status != -1;
 }
 
 void ZMServer::sendError(const string &error)
 {
-    string outStr("");
+    string outStr;
     ADD_STR(outStr, string("ERROR - ") + error);
     send(outStr);
 }
@@ -659,7 +651,7 @@ void ZMServer::handleHello()
 {
     // just send OK so the client knows all is well
     // followed by the protocol version we understand
-    string outStr("");
+    string outStr;
     ADD_STR(outStr, "OK");
     ADD_STR(outStr, ZM_PROTOCOL_VERSION);
     send(outStr);
@@ -697,7 +689,7 @@ long long ZMServer::getDiskSpace(const string &filename, long long &total, long 
 
 void ZMServer::handleGetServerStatus(void)
 {
-    string outStr("");
+    string outStr;
     ADD_STR(outStr, "OK")
 
     // server status
@@ -722,7 +714,7 @@ void ZMServer::handleGetServerStatus(void)
     long long total, used;
     string eventsDir = g_webPath + "/events/";
     getDiskSpace(eventsDir, total, used);
-    sprintf(buf, "%d%%", (int) ((100.0f / ((float) total / used))));
+    sprintf(buf, "%d%%", (int) ((100.0F / ((float) total / used))));
     ADD_STR(outStr, buf)
 
     send(outStr);
@@ -730,7 +722,7 @@ void ZMServer::handleGetServerStatus(void)
 
 void ZMServer::handleGetAlarmStates(void)
 {
-    string outStr("");
+    string outStr;
     ADD_STR(outStr, "OK")
 
     // add the monitor count
@@ -752,7 +744,7 @@ void ZMServer::handleGetAlarmStates(void)
 
 void ZMServer::handleGetEventList(vector<string> tokens)
 {
-    string outStr("");
+    string outStr;
 
     if (tokens.size() != 5)
     {
@@ -846,7 +838,7 @@ void ZMServer::handleGetEventList(vector<string> tokens)
 
 void ZMServer::handleGetEventDates(vector<string> tokens)
 {
-    string outStr("");
+    string outStr;
 
     if (tokens.size() != 3)
     {
@@ -913,7 +905,7 @@ void ZMServer::handleGetEventDates(vector<string> tokens)
 
 void ZMServer::handleGetMonitorStatus(void)
 {
-    string outStr("");
+    string outStr;
     ADD_STR(outStr, "OK")
 
     // get monitor list
@@ -952,9 +944,9 @@ void ZMServer::handleGetMonitorStatus(void)
             string function = row[6];
             string enabled = row[7];
             string name = row[1];
-            string events = "";
-            string zmcStatus = "";
-            string zmaStatus = "";
+            string events;
+            string zmcStatus;
+            string zmaStatus;
             getMonitorStatus(id, type, device, host, channel, function,
                              zmcStatus, zmaStatus, enabled);
             MYSQL_RES *res2;
@@ -1008,9 +1000,9 @@ void ZMServer::handleGetMonitorStatus(void)
     send(outStr);
 }
 
-string ZMServer::runCommand(string command)
+string ZMServer::runCommand(const string& command)
 {
-    string outStr("");
+    string outStr;
     FILE *fd = popen(command.c_str(), "r");
     char buffer[100];
 
@@ -1092,12 +1084,12 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
         cout << "Getting frame " << frameNo << " for event " << eventID
              << " on monitor " << monitorID  << " event time is " << eventTime << endl;
 
-    string outStr("");
+    string outStr;
 
     ADD_STR(outStr, "OK")
 
     // try to find the frame file
-    string filepath("");
+    string filepath;
     char str[100];
 
     if (m_useDeepStorage)
@@ -1163,7 +1155,7 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     MYSQL_RES *res;
     MYSQL_ROW row = nullptr;
 
-    string sql("");
+    string sql;
     sql += "SELECT FrameId FROM Frames ";
     sql += "WHERE EventID = " + eventID + " ";
     sql += "AND Type = 'Alarm' ";
@@ -1230,9 +1222,9 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 
     mysql_free_result(res);
 
-    string outStr("");
-    string filepath("");
-    string frameFile("");
+    string outStr;
+    string filepath;
+    string frameFile;
 
     if (m_useDeepStorage)
         filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
@@ -1314,7 +1306,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     if (m_debug)
         cout << "Getting live frame from monitor: " << monitorID << endl;
 
-    string outStr("");
+    string outStr;
 
     ADD_STR(outStr, "OK")
 
@@ -1366,7 +1358,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
 void ZMServer::handleGetFrameList(vector<string> tokens)
 {
     string eventID;
-    string outStr("");
+    string outStr;
 
     if (tokens.size() != 2)
     {
@@ -1383,7 +1375,7 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
     MYSQL_RES *res;
     MYSQL_ROW row;
-    string sql("");
+    string sql;
 
     // check to see what type of event this is
     sql += "SELECT Cause, Length, Frames FROM Events ";
@@ -1480,13 +1472,13 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
 void ZMServer::handleGetCameraList(void)
 {
-    string outStr("");
+    string outStr;
 
     ADD_STR(outStr, "OK")
 
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (uint x = 0; x < m_monitors.size(); x++)
+    for (size_t x = 0; x < m_monitors.size(); x++)
     {
         ADD_STR(outStr, m_monitors.at(x)->m_name)
     }
@@ -1496,7 +1488,7 @@ void ZMServer::handleGetCameraList(void)
 
 void ZMServer::handleGetMonitorList(void)
 {
-    string outStr("");
+    string outStr;
 
     ADD_STR(outStr, "OK")
 
@@ -1505,7 +1497,7 @@ void ZMServer::handleGetMonitorList(void)
 
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (uint x = 0; x < m_monitors.size(); x++)
+    for (size_t x = 0; x < m_monitors.size(); x++)
     {
         MONITOR *mon = m_monitors.at(x);
 
@@ -1534,7 +1526,7 @@ void ZMServer::handleGetMonitorList(void)
 void ZMServer::handleDeleteEvent(vector<string> tokens)
 {
     string eventID;
-    string outStr("");
+    string outStr;
 
     if (tokens.size() != 2)
     {
@@ -1549,7 +1541,7 @@ void ZMServer::handleDeleteEvent(vector<string> tokens)
 
     ADD_STR(outStr, "OK")
 
-    string sql("");
+    string sql;
     sql += "DELETE FROM Events WHERE Id = " + eventID;
 
     if (mysql_query(&g_dbConn, sql.c_str()))
@@ -1570,15 +1562,15 @@ void ZMServer::handleDeleteEvent(vector<string> tokens)
 
 void ZMServer::handleDeleteEventList(vector<string> tokens)
 {
-    string eventList("");
-    string outStr("");
+    string eventList;
+    string outStr;
 
     vector<string>::iterator it = tokens.begin();
     if (it != tokens.end())
         ++it;
     while (it != tokens.end())
     {
-        if (eventList == "")
+        if (eventList.empty())
             eventList = (*it);
         else
             eventList += "," + (*it);
@@ -1589,7 +1581,7 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
     if (m_debug)
         cout << "Deleting events: " << eventList << endl;
 
-    string sql("");
+    string sql;
     sql += "DELETE FROM Events WHERE Id IN (" + eventList + ")";
 
     if (mysql_query(&g_dbConn, sql.c_str()))
@@ -1605,7 +1597,7 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
 
 void ZMServer::handleRunZMAudit(void)
 {
-    string outStr("");
+    string outStr;
 
     // run zmaudit.pl to clean up orphaned db entries etc
     string command(g_binPath + "/zmaudit.pl &");
@@ -1866,7 +1858,7 @@ string ZMServer::getZMSetting(const string &setting)
 
 void ZMServer::handleSetMonitorFunction(vector<string> tokens)
 {
-    string outStr("");
+    string outStr;
 
     if (tokens.size() != 4)
     {
@@ -1906,7 +1898,7 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
     // Now perform db update && (re)start/stop daemons as required.
     MONITOR *monitor = m_monitorMap[atoi(monitorID.c_str())];
     string oldFunction = monitor->m_function;
-    string newFunction = function;
+    const string& newFunction = function;
     int oldEnabled  = monitor->m_enabled;
     int newEnabled  = atoi(enabled.c_str());
     monitor->m_function = newFunction;
@@ -1967,8 +1959,8 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
 
 void ZMServer::zmcControl(MONITOR *monitor, const string &mode)
 {
-    string zmcArgs = "";
-    string sql = "";
+    string zmcArgs;
+    string sql;
     sql += "SELECT count(if(Function!='None',1,NULL)) as ActiveCount ";
     sql += "FROM Monitors ";
 

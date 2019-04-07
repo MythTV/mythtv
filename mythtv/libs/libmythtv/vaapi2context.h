@@ -37,8 +37,8 @@ extern "C" {
 class MTV_PUBLIC Vaapi2Context : public MythCodecContext
 {
   public:
-    Vaapi2Context(void);
-    ~Vaapi2Context();
+    Vaapi2Context(void) = default;
+    ~Vaapi2Context() override;
     static MythCodecID GetBestSupportedCodec(AVCodec **ppCodec,
                                              const QString &decoder,
                                              uint stream_type,

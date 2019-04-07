@@ -23,7 +23,7 @@
 #define PARAM2_DEFAULT 3.0
 #define PARAM3_DEFAULT 6.0
 
-#define LowPass(Prev, Curr, Coef) (Curr + Coef[Prev - Curr])
+#define LowPass(Prev, Curr, Coef) ((Curr) + (Coef)[(Prev) - (Curr)])
 
 #undef ABS
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
@@ -47,7 +47,7 @@ typedef struct ThisFilter
     uint8_t coefs[4][512];
 
     void (*filtfunc)(uint8_t*, uint8_t*, uint8_t*,
-                     int, int, uint8_t*, uint8_t*);
+                     int, int, const uint8_t*, const uint8_t*);
 
     TF_STRUCT;
 } ThisFilter;
@@ -68,7 +68,7 @@ static void denoise(uint8_t *Frame,
                     uint8_t *FramePrev,
                     uint8_t *Line,
                     int W, int H,
-                    uint8_t *Spatial, uint8_t *Temporal)
+                    const uint8_t *Spatial, const uint8_t *Temporal)
 {
     uint8_t prev;
     int X, Y;
@@ -106,7 +106,7 @@ static void denoiseMMX(uint8_t *Frame,
                        uint8_t *FramePrev,
                        uint8_t *Line,
                        int W, int H,
-                       uint8_t *Spatial, uint8_t *Temporal)
+                       const uint8_t *Spatial, const uint8_t *Temporal)
 {
     int X, i;
     uint8_t *LineCur = Frame;
@@ -382,7 +382,7 @@ static void Denoise3DFilterCleanup(VideoFilter *filter)
 
 static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
                                        VideoFrameType outpixfmt,
-                                       int *width, int *height, char *options,
+                                       const int *width, const int *height, const char *options,
                                        int threads)
 {
     double LumSpac   = PARAM1_DEFAULT;

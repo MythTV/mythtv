@@ -57,7 +57,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void SetArrow(int, const QString &file);
     void LoadImage(int, const QString &file);
     void SetProgramInfo(int row, int col, const QRect &area,
-                        const QString &title, const QString &category,
+                        const QString &title, const QString &genre,
                         int arrow, int recType, int recStat, bool selected);
     void ResetData();
     void ResetRow(int row);

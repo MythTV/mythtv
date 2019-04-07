@@ -17,8 +17,8 @@
 
 
 // Min/max zoom extents available in slideshow
-#define MIN_ZOOM (0.1f)
-#define MAX_ZOOM (20.0f)
+#define MIN_ZOOM (0.1F)
+#define MAX_ZOOM (20.0F)
 
 class Slide;
 
@@ -46,7 +46,7 @@ signals:
 protected:
     bool  m_forwards {true}; //!< Play direction
     bool  m_running {false}; //!< True whilst animation is active
-    float m_speed   {0.0f};  //!< Real-time = 1.0, Double-speed = 2.0
+    float m_speed   {0.0F};  //!< Real-time = 1.0, Double-speed = 2.0
 };
 
 
@@ -68,9 +68,9 @@ public:
           m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
     void Pulse(int interval) override; // AbstractAnimation
-    void Set(QVariant from, QVariant to,
+    void Set(const QVariant& from, const QVariant& to,
              int duration = 500,
-             QEasingCurve curve = QEasingCurve::InOutCubic,
+             const QEasingCurve& curve = QEasingCurve::InOutCubic,
              UIEffects::Centre = UIEffects::Middle);
     void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
 
@@ -92,7 +92,7 @@ class GroupAnimation : public AbstractAnimation
 {
 public:
     GroupAnimation() : AbstractAnimation()            {}
-    virtual ~GroupAnimation()                        { Clear(); }
+    virtual ~GroupAnimation()                         { GroupAnimation::Clear(); }
     void Pulse(int interval) override                     = 0; // AbstractAnimation
     void Start(bool forwards, float speed = 1.0) override = 0; // AbstractAnimation
     void SetSpeed(float speed) override                   = 0; // AbstractAnimation
@@ -156,16 +156,16 @@ class Slide : public MythUIImage
 {
     Q_OBJECT
 public:
-    Slide(MythUIType *parent, QString name, MythUIImage *image);
+    Slide(MythUIType *parent, const QString& name, MythUIImage *image);
     ~Slide();
 
     void      Clear();
-    bool      LoadSlide(ImagePtrK im, int direction = 0, bool waiting = false);
+    bool      LoadSlide(const ImagePtrK& im, int direction = 0, bool notifyCompletion = false);
     ImagePtrK GetImageData() const  { return m_data; }
     void      Zoom(int percentage);
     void      SetZoom(float);
-    void      Pan(QPoint distance);
-    void      SetPan(QPoint value);
+    void      Pan(QPoint offset);
+    void      SetPan(QPoint pos);
     bool      CanZoomIn() const     { return m_zoom < MAX_ZOOM; }
     bool      CanZoomOut() const    { return m_zoom > MIN_ZOOM; }
     bool      IsEmpty() const       { return m_state == kEmpty || !m_waitingFor; }
@@ -190,7 +190,7 @@ private:
     ImagePtrK     m_data          {nullptr}; //!< The image currently loading/loaded
     //! The most recently requested image. Null for preloads. Differs from m_data when skipping
     ImagePtrK     m_waitingFor    {nullptr};
-    float         m_zoom          {1.0f};    //!< Current zoom, 1.0 = fullsize
+    float         m_zoom          {1.0F};    //!< Current zoom, 1.0 = fullsize
     //! Navigation that created this image, -1 = Prev, 0 = Update, 1 = Next
     int           m_direction     {0};
     Animation    *m_zoomAnimation {nullptr}; //!< Dedicated animation for zoom, if supported
@@ -220,8 +220,8 @@ public:
 
     void   Initialise(MythUIImage &image);
     void   Teardown();
-    bool   Load(ImagePtrK im, int direction);
-    void   Preload(ImagePtrK im);
+    bool   Load(const ImagePtrK& im, int direction);
+    void   Preload(const ImagePtrK& im);
     void   ReleaseCurrent();
     Slide &GetCurrent()
     {
@@ -240,7 +240,7 @@ signals:
     void SlideReady(int count);
 
 private slots:
-    void Flush(Slide*, QString reason = "Loaded");
+    void Flush(Slide*, const QString& reason = "Loaded");
 
 protected:
     QString BufferState();

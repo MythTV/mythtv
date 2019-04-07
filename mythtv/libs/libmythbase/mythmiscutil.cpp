@@ -69,8 +69,7 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysinfo() error");
         return false;
     }
-    else
-        uptime = sinfo.uptime;
+    uptime = sinfo.uptime;
 
 #elif defined(__FreeBSD__) || CONFIG_DARWIN
 
@@ -88,8 +87,7 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
     }
-    else
-        uptime = time(nullptr) - bootTime.tv_sec;
+    uptime = time(nullptr) - bootTime.tv_sec;
 #elif defined(_WIN32)
     uptime = ::GetTickCount() / 1000;
 #else
@@ -237,9 +235,8 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
                   .arg(timeout*1000).arg(host);
 
-    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents) != GENERIC_EXIT_OK)
-        return false;
+    return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                         kMSProcessEvents) == GENERIC_EXIT_OK;
 #else
     QString addrstr =
         gCoreContext->resolveAddress(host, gCoreContext->ResolveAny, true);
@@ -255,12 +252,9 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
                   .arg(pingcmd).arg(timeoutparam).arg(timeout).arg(host);
 
-    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents) != GENERIC_EXIT_OK)
-      return false;
+    return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                         kMSProcessEvents) == GENERIC_EXIT_OK;
 #endif
-
-    return true;
 }
 
 /**
@@ -426,7 +420,7 @@ QString createTempFile(QString name_template, bool dir)
  *
  *  \param filename   Path of file to make accessible
  */
-bool makeFileAccessible(QString filename)
+bool makeFileAccessible(const QString& filename)
 {
     QByteArray fname = filename.toLatin1();
     int ret = chmod(fname.constData(), 0666);
@@ -534,7 +528,7 @@ QString getSymlinkTarget(const QString &start_file,
     return (!fi.isSymLink()) ? cur_file : QString();
 }
 
-bool IsMACAddress(QString MAC)
+bool IsMACAddress(const QString& MAC)
 {
     QStringList tokens = MAC.split(':');
     if (tokens.size() != 6)
@@ -580,7 +574,7 @@ bool IsMACAddress(QString MAC)
     return true;
 }
 
-QString FileHash(QString filename)
+QString FileHash(const QString& filename)
 {
     QFile file(filename);
     QFileInfo fileinfo(file);
@@ -621,7 +615,7 @@ QString FileHash(QString filename)
     return output;
 }
 
-bool WakeOnLAN(QString MAC)
+bool WakeOnLAN(const QString& MAC)
 {
     char msg[1024] = "\xFF\xFF\xFF\xFF\xFF\xFF";
     int  msglen = 6;
@@ -666,7 +660,7 @@ bool WakeOnLAN(QString MAC)
 bool MythWakeup(const QString &wakeUpCommand, uint flags, uint timeout)
 {
     if (!IsMACAddress(wakeUpCommand))
-        return !myth_system(wakeUpCommand, flags, timeout);
+        return myth_system(wakeUpCommand, flags, timeout) == 0U;
 
     return WakeOnLAN(wakeUpCommand);
 }
@@ -925,7 +919,7 @@ void setHttpProxy(void)
         // via myth_system(command), by setting HTTP_PROXY
         QString url;
 
-        if (p.user().length())
+        if (!p.user().isEmpty())
             url = "http://%1:%2@%3:%4",
             url = url.arg(p.user()).arg(p.password());
         else
@@ -1134,19 +1128,19 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
                 {
                     break;
                 }
-                else if (!currA->isDigit())
+                if (!currA->isDigit())
                 {
                     return +1;
                 }
-                else if (!currB->isDigit())
+                if (!currB->isDigit())
                 {
                     return -1;
                 }
-                else if (*currA < *currB)
+                if (*currA < *currB)
                 {
                     return -1;
                 }
-                else if (*currA > *currB)
+                if (*currA > *currB)
                 {
                     return + 1;
                 }
@@ -1176,29 +1170,23 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
                     }
                     break;
                 }
-                else if (!currA->isDigit())
+                if (!currA->isDigit())
                 {
                     if (isFirstRun)
                     {
                         return *currA < *currB ? -1 : +1;
                     }
-                    else
-                    {
-                        return -1;
-                    }
+                    return -1;
                 }
-                else if (!currB->isDigit())
+                if (!currB->isDigit())
                 {
                     if (isFirstRun)
                     {
                         return *currA < *currB ? -1 : +1;
                     }
-                    else
-                    {
-                        return +1;
-                    }
+                    return +1;
                 }
-                else if ((*currA < *currB) && (weight == 0))
+                if ((*currA < *currB) && (weight == 0))
                 {
                     weight = -1;
                 }

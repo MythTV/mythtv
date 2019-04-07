@@ -338,11 +338,8 @@ nullptr
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, finalVideoDatabaseVersion, dbver,
-                             MythVideoVersionName))
-        return false;
-
-    return true;
+    return performActualUpdate(updates, finalVideoDatabaseVersion, dbver,
+                               MythVideoVersionName);
 }
 
 bool doUpgradeVideoDatabaseSchema(void)

@@ -97,7 +97,7 @@ class MUI_PUBLIC MythMenu
                  bool checked = false);
 
     void SetSelectedByTitle(const QString &title);
-    void SetSelectedByData(QVariant data);
+    void SetSelectedByData(const QVariant& data);
 
     void SetParent(MythMenu *parent) { m_parentMenu = parent; }
 
@@ -175,7 +175,7 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     void Closed(QString, int);
 
   protected:
-    void SendEvent(int res, QString text = "", QVariant data = 0);
+    void SendEvent(int res, const QString& text = "", const QVariant& data = 0);
     void updateMenu(void);
 
     MythUIText       *m_titlearea   {nullptr};
@@ -302,7 +302,7 @@ class MUI_PUBLIC MythSpinBoxDialog : public MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void SetRange(int low, int high, int step, uint pageMultiple=5);
-    void AddSelection(QString label, int value);
+    void AddSelection(const QString& label, int value);
     void SetValue(const QString & value);
     void SetValue(int value);
 
@@ -406,7 +406,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
     MythTimeInputDialog(MythScreenStack *parent, const QString &message,
                         int resolutionFlags,
                         QDateTime startTime = QDateTime::currentDateTime(),
-                        int dayLimit = 14);
+                        int rangeLimit = 14);
 
     bool Create() override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);

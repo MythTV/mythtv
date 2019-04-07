@@ -58,18 +58,12 @@ unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()
 void ClassicLogoDetector::deleteLater(void)
 {
     m_commDetector = nullptr;
-    if (m_edgeMask)
-        delete [] m_edgeMask;
-    if (m_logoFrame)
-        delete [] m_logoFrame;
-    if (m_logoMask)
-        delete [] m_logoMask;
-    if (m_logoCheckMask)
-        delete [] m_logoCheckMask;
-    if (m_logoMaxValues)
-        delete [] m_logoMaxValues;
-    if (m_logoMinValues)
-        delete [] m_logoMinValues;
+    delete [] m_edgeMask;
+    delete [] m_logoFrame;
+    delete [] m_logoMask;
+    delete [] m_logoCheckMask;
+    delete [] m_logoMaxValues;
+    delete [] m_logoMinValues;
 
     LogoDetectorBase::deleteLater();
 }
@@ -316,7 +310,7 @@ void ClassicLogoDetector::SetLogoMaskArea()
 
 
 void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
-    unsigned char* framePtr)
+    const unsigned char* framePtr)
 {
     char scrPixels[] = " .oxX";
 
@@ -431,11 +425,8 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
         (double)goodEdges / (double)testEdges : 0.0;
     double badEdgeRatio = (testNotEdges) ?
         (double)badEdges / (double)testNotEdges : 0.0;
-    if ((goodEdgeRatio > m_commDetectLogoGoodEdgeThreshold) &&
-        (badEdgeRatio < m_commDetectLogoBadEdgeThreshold))
-        return true;
-    else
-        return false;
+    return (goodEdgeRatio > m_commDetectLogoGoodEdgeThreshold) &&
+           (badEdgeRatio < m_commDetectLogoBadEdgeThreshold);
 }
 
 bool ClassicLogoDetector::pixelInsideLogo(unsigned int x, unsigned int y)

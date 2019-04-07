@@ -195,6 +195,7 @@ class ScheduleEditor : public ScheduleCommon,
     void Close(void) override; // MythScreenType
 
   private:
+    Q_DISABLE_COPY(ScheduleEditor);
     void Load(void) override; // MythScreenType
     void LoadTemplate(QString name);
     void DeleteRule(void);
@@ -368,8 +369,8 @@ class MetadataOptions : public SchedEditChild
     void SelectOnlineCoverart();
     void SelectOnlineBanner();
     void QueryComplete(MetadataLookup *lookup);
-    void OnSearchListSelection(RefCountHandler<MetadataLookup> lookup);
-    void OnImageSearchListSelection(ArtworkInfo info,
+    void OnSearchListSelection(const RefCountHandler<MetadataLookup>& lookup);
+    void OnImageSearchListSelection(const ArtworkInfo& info,
                                VideoArtworkType type);
     void OnArtworkSearchDone(MetadataLookup *lookup);
     void FindNetArt(VideoArtworkType type);
@@ -380,7 +381,7 @@ class MetadataOptions : public SchedEditChild
     void Load(void) override; // SchedEditChild
     void Save(void) override; // SchedEditChild
 
-    void CreateBusyDialog(QString title);
+    void CreateBusyDialog(const QString& title);
     void FindImagePopup(const QString &prefix,
                         const QString &prefixAlt,
                         QObject &inst,

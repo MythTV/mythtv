@@ -53,7 +53,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {
-        if ( pRequest->m_sBaseUrl.startsWith("/") == false)
+        if ( !pRequest->m_sBaseUrl.startsWith("/"))
             return( false );
 
         if ((pRequest->m_eType != RequestTypeGet) &&
@@ -95,7 +95,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
             }
         }
 
-        if (bStorageGroupFile || oInfo.exists() == true )
+        if (bStorageGroupFile || oInfo.exists() )
         {
             QString sResName = oInfo.canonicalFilePath();
 

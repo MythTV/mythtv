@@ -202,8 +202,8 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 
 const char *DRMVideoSync::s_dri_dev = "/dev/dri/card0";
 
-DRMVideoSync::DRMVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
+DRMVideoSync::DRMVideoSync(VideoOutput *vo, int refresh_interval) :
+    VideoSync(vo, refresh_interval)
 {
     m_dri_fd = -1;
 }
@@ -297,8 +297,8 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 
 #ifdef __linux__
 #define RTCRATE 1024
-RTCVideoSync::RTCVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
+RTCVideoSync::RTCVideoSync(VideoOutput *vo, int refresh_interval) :
+    VideoSync(vo, refresh_interval)
 {
     m_rtcfd = -1;
 }

@@ -48,12 +48,12 @@ class MHUnimplementedAction: public MHElemAction
     {
         MHLOG(MHLogWarning, QString("WARN Unimplemented action %1").arg(m_nTag) );
     }
-    void Initialise(MHParseNode *, MHEngine *) override {} // MHElemAction
+    void Initialise(MHParseNode * /*p*/, MHEngine * /*engine*/) override {} // MHElemAction
     void PrintMe(FILE *fd, int /*nTabs*/) const override // MHElemAction
     {
         fprintf(fd, "****Missing action %d\n", m_nTag);
     }
-    void Perform(MHEngine *) override // MHElemAction
+    void Perform(MHEngine * /*engine*/) override // MHElemAction
     {
         MHERROR(QString("Unimplemented action %1").arg(m_nTag));
     }
