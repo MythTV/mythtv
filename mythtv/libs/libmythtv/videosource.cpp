@@ -2290,7 +2290,9 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     connect(m_device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
 
-    probeCard(m_device->getValue());
+    const QString &device_name = m_device->getValue();
+    if (!device_name.isEmpty())
+        probeCard(device_name);
 }
 
 void V4L2encGroup::probeCard(const QString &device_name)
