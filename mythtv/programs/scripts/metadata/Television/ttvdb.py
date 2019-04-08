@@ -1891,8 +1891,6 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         ep_name=series_season_ep[1] # Leave the episode name alone
 
     series = search_for_series(t, series_name, opts.language)
-    if t2usable:
-        series2 = search_for_series(t2, series_name, 'en')
     season_ep_num = series.fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
         for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
@@ -1900,8 +1898,6 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
                 if xmlFlag:
                     # get more detailed episode info
                     t.getDetailedEpisodeInfo(series['id'], episode['airedSeason'], episode)
-                    if t2usable:
-                        t2.getDetailedEpisodeInfo(series['id'], episode['airedSeason'], episode)
                     convert_series_to_xml(t, series_season_ep, season_ep_num)
                     displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
                     return 0
@@ -2471,7 +2467,7 @@ def main():
 
     global t2usable
     t2usable = False
-    if (not opts.language == 'en'):
+    if (not opts.language == 'en' and not opts.numbers):
         t2usable = True
         global t2
         t2 = Tvdb(banners=True,
@@ -2505,10 +2501,8 @@ def main():
         opts2 = deepcopy(opts)
         opts2.language = 'en'
         if t2usable:
-            if (opts.numbers == True and opts.num_seasons == False):
-                y=[]
-                y.append(series_season_ep[0])
-                searchseries(t2, opts2, y)
+            if opts.numbers == False and opts.num_seasons == False:
+                searchseries(t2, opts2, series_season_ep)
 
     # Verify that thetvdb.com has the desired series_season_ep.
     # Exit this module if series_season_ep is not found
