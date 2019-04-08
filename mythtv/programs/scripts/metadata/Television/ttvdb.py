@@ -2070,11 +2070,19 @@ def convert_series_to_xml(t, series_season_ep, ep_info):
 
     if t2usable:
         sxml2 = eTree.XML(dicttoxml(t2.shows[show_id].data, custom_root='series', item_func=series_ep_item_func, attr_type=False))
+        bannerelementfound=False
         for element in t.seriesInfoTree.iter():
             if element.tag == '_banners':
                 bannerselement = element
-        for newelement in sxml2.find('_banners').iter():
-            bannerselement.extend(newelement)
+                bannerelementfound=True
+        test=sxml2.find('_banners')
+        if bannerelementfound:
+            for newelement in sxml2.find('_banners').iter():
+                bannerselement.extend(newelement)
+        else:
+            series = t.seriesInfoTree.find('series')
+            series.append(sxml2.find('_banners'))
+
     t.baseXsltDir = xslt.baseXsltPath
 
 def initializeXslt(language):
@@ -2582,6 +2590,8 @@ def main():
         else:
             if opts.xml and len(series_season_ep) == 3:
                 t.getDetailedEpisodeInfo(list(t.shows.values())[0].data['id'], series_season_ep[1], series_season_ep[2])
+                if t2usable:
+                    t2.getDetailedEpisodeInfo(list(t2.shows.values())[0].data['id'], series_season_ep[1], series_season_ep[2])
                 convert_series_to_xml(t, series_season_ep, seriesfound)
                 displaySeriesXML(t, series_season_ep)
                 return 0
