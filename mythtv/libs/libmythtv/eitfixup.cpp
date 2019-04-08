@@ -144,6 +144,8 @@ EITFixUp::EITFixUp()
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
+      m_fiAgeLimit("\\(((1?[0-9]?)|[ST])\\)$"),
+      m_fiFilm("^(Film|Elokuva): "),
       m_dePremiereLength("\\s?[0-9]+\\sMin\\."),
       m_dePremiereAirdate("\\s?([^\\s^\\.]+)\\s((?:1|2)[0-9]{3})\\."),
       m_dePremiereCredits("\\sVon\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s([^\\.]*)\\."),
@@ -1928,6 +1930,21 @@ void EITFixUp::FixFI(DBEventEIT &event) const
         event.audioProps |= AUD_STEREO;
         event.description = event.description.replace(m_Stereo, "");
     }
+
+    // Remove age limit in parenthesis at end of title
+    position = event.title.indexOf(m_fiAgeLimit);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_fiAgeLimit, "");
+    }
+
+    // Remove Film or Elokuva at start of title
+    position = event.title.indexOf(m_fiFilm);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_fiFilm, "");
+    }
+
 }
 
 /** \fn EITFixUp::FixPremiere(DBEventEIT&) const
