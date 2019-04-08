@@ -1892,6 +1892,11 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
 
     series = search_for_series(t, series_name, opts.language)
     season_ep_num = series.fuzzysearch(ep_name, 'episodename')
+    
+    if len(season_ep_num) == 0:
+        series = search_for_series(t2, series_name, 'en')
+        season_ep_num = series.fuzzysearch(ep_name, 'episodename')
+
     if len(season_ep_num) != 0:
         for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
 #            if episode.distance == 0: # exact match
@@ -2467,7 +2472,7 @@ def main():
 
     global t2usable
     t2usable = False
-    if (not opts.language == 'en' and not opts.numbers):
+    if (not opts.language == 'en'):
         t2usable = True
         global t2
         t2 = Tvdb(banners=True,
@@ -2503,6 +2508,10 @@ def main():
         if t2usable:
             if opts.numbers == False and opts.num_seasons == False:
                 searchseries(t2, opts2, series_season_ep)
+            elif opts.numbers == True and opts.num_seasons == False:
+                x2=[]
+                x2.append(series_season_ep[0]) # Only use series name in check
+                seriesfound=searchseries(t, opts2, x2)
 
     # Verify that thetvdb.com has the desired series_season_ep.
     # Exit this module if series_season_ep is not found
