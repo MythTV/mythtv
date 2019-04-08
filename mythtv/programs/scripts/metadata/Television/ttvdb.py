@@ -2067,8 +2067,7 @@ def convert_series_to_xml(t, series_season_ep, ep_info):
     exml = dicttoxml(t.shows[show_id], custom_root='data', item_func=series_ep_item_func, attr_type=False)
     t.seriesInfoTree = eTree.XML(exml)
     t.seriesInfoTree.append(eTree.XML(sxml))
-    #print(t['data'])
-    #print(t2['data'])
+
     if t2usable:
         sxml2 = eTree.XML(dicttoxml(t2.shows[show_id].data, custom_root='series', item_func=series_ep_item_func, attr_type=False))
         for element in t.seriesInfoTree.iter():
