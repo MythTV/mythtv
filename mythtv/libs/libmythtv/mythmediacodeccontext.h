@@ -2,6 +2,7 @@
 #define MYTHMEDIACODECCONTEXT_H
 
 // MythTV
+#include "mythhwcontext.h"
 #include "mythcodeccontext.h"
 
 // FFmpeg
