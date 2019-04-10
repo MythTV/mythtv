@@ -4250,6 +4250,7 @@ bool MythPlayer::DoRewind(uint64_t frames, double inaccuracy)
     uint64_t seeksnap_wanted = UINT64_MAX;
     if (inaccuracy != kInaccuracyFull)
         seeksnap_wanted = frames * inaccuracy;
+    ClearBeforeSeek(frames);
     WaitForSeek(desiredFrame, seeksnap_wanted);
     rewindtime = 0;
     ClearAfterSeek();
@@ -4444,6 +4445,7 @@ bool MythPlayer::DoFastForward(uint64_t frames, double inaccuracy)
     uint64_t seeksnap_wanted = UINT64_MAX;
     if (inaccuracy != kInaccuracyFull)
         seeksnap_wanted = frames * inaccuracy;
+    ClearBeforeSeek(frames);
     WaitForSeek(desiredFrame, seeksnap_wanted);
     fftime = 0;
     ClearAfterSeek(false);
@@ -4570,6 +4572,32 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
         ctx->setDeinterlacer(false);
         ctx->setDeinterlacer(true, currdeint);
     }
+}
+
+/*! \brief Discard video frames prior to seeking
+ * \note This is only used for MediaCodec surface rendering where the decoder will stall
+ * waiting for buffers if we do not free those buffers first. This is currently
+ * only an issue for recordings and livetv as the decoder is not paused before seeking when
+ * using a position map.
+ * \note watchingrecording does not appear to be accurate - so is currently ignored.
+*/
+void MythPlayer::ClearBeforeSeek(uint64_t Frames)
+{
+#ifdef USING_MEDIACODEC
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("ClearBeforeSeek: decoder %1 frames %2 recording %3 livetv %4")
+       .arg(m_codecName).arg(Frames).arg(watchingrecording).arg(livetv));
+
+    if ((Frames < 2) || !videoOutput /*|| !(livetv || watchingrecording)*/)
+        return;
+
+    decoder_change_lock.lock();
+    MythCodecID codec = decoder ? decoder->GetVideoCodecID() : kCodec_NONE;
+    decoder_change_lock.unlock();
+    if (codec_is_mediacodec(codec))
+        videoOutput->DiscardFrames(true);
+#else
+    Q_UNUSED(Frames);
+#endif
 }
 
 void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx)
