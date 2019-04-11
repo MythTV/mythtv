@@ -604,8 +604,8 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
     cmd.props = &prop;
     if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("(%1) ").arg(dvbdev) +
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("CardUtil(%1): ").arg(dvbdev) +
             QString("dvb api version %1.%2").arg((prop.u.data>>8)&0xff).arg((prop.u.data)&0xff));
     }
     else
@@ -625,7 +625,7 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
         msg += " ";
         msg += *it;
     }
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("(%1) ").arg(dvbdev) + msg);
+    LOG(VB_GENERAL, LOG_INFO, QString("CardUtil(%1): ").arg(dvbdev) + msg);
 
 #endif  // DVB_API_VERSION >= 5
     close(fd_frontend);
@@ -822,9 +822,8 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(const QString &device)
 
     delsys = ProbeCurrentDeliverySystem(fd_frontend);
 
-    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("(%1) delsys:%1 %2")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("CardUtil(%1): delsys:%2 %3")
         .arg(device).arg(delsys).arg(delsys.toString()));
-
 
     close(fd_frontend);
     return delsys;
@@ -914,7 +913,7 @@ QString CardUtil::ProbeSubTypeName(uint inputid)
         subtype = tunertype.toString();
     }
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_DEBUG,
         QString("CardUtil[%1]: delsys:%2 tunertype:%3 subtype:%4")
             .arg(inputid).arg(delsys.toString())
             .arg(tunertype.toString()).arg(subtype));

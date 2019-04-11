@@ -3752,7 +3752,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         }
         for (; it != delsys.end(); it++)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("DVBCardType: add deliverysystem:%1")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
                 .arg(*it));
 
             m_cardType->addSelection(*it, *it);
