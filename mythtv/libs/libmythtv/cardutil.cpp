@@ -1942,7 +1942,8 @@ vector<uint> CardUtil::GetConflictingInputs(uint inputid)
     {
         inputids.push_back(query.value(0).toUInt());
         LOG(VB_RECORD, LOG_INFO,
-            LOC + QString("GetConflictingInputs() got input %1").arg(inputids.back()));
+            QString("CardUtil[%1]: GetConflictingInputs() got input %2")
+                .arg(inputid).arg(inputids.back()));
     }
 
     return inputids;
