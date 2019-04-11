@@ -115,6 +115,7 @@ void ChannelScanner::Scan(
     bool           do_follow_nit,
     bool           do_test_decryption,
     bool           do_fta_only,
+    bool           do_lcn_only,
     bool           do_add_full_ts,
     ServiceRequirements service_requirements,
     // stuff needed for particular scans
@@ -127,6 +128,7 @@ void ChannelScanner::Scan(
     const QString &tbl_end   /* FullScan optional */)
 {
     m_freeToAirOnly = do_fta_only;
+    m_channelNumbersOnly = do_lcn_only;
     m_addFullTS = do_add_full_ts;
     m_serviceRequirements = service_requirements;
     m_sourceid = sourceid;

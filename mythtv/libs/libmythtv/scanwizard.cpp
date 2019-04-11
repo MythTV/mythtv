@@ -137,6 +137,7 @@ void ScanWizard::Scan()
         ScanDTVTransportList transports = LoadScan(scanid);
         ChannelImporter ci(true, true, true, true, false,
                            DoFreeToAirOnly(),
+                           DoChannelNumbersOnly(),
                            GetServiceRequirements());
         ci.Process(transports, sourceid);
     }
@@ -179,6 +180,7 @@ void ScanWizard::Scan()
             GetInputName(),           GetSourceID(),
             DoIgnoreSignalTimeout(),  DoFollowNIT(),
             DoTestDecryption(),       DoFreeToAirOnly(),
+            DoChannelNumbersOnly(),
             DoAddFullTS(),            GetServiceRequirements(),
             // stuff needed for particular scans
             GetMultiplex(),         start_chan,

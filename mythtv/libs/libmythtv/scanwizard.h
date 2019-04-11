@@ -87,9 +87,10 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
         { return m_scanConfig->DoIgnoreSignalTimeout(); }
     bool    DoFollowNIT(void) const
         { return m_scanConfig->DoFollowNIT(); }
-    bool    DoFreeToAirOnly(void)  const;
-    bool    DoAddFullTS(void)      const;
-    bool    DoTestDecryption(void) const;
+    bool    DoFreeToAirOnly(void)       const;
+    bool    DoChannelNumbersOnly(void)  const;
+    bool    DoAddFullTS(void)           const;
+    bool    DoTestDecryption(void)      const;
 
   protected:
     VideoSourceSelector *m_videoSource {nullptr};
@@ -98,6 +99,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     ScanOptionalConfig  *m_scanConfig  {nullptr};
     DesiredServices     *m_services    {nullptr};
     FreeToAirOnly       *m_ftaOnly     {nullptr};
+    ChannelNumbersOnly  *m_lcnOnly     {nullptr};
     AddFullTS           *m_addFullTS   {nullptr};
     TrustEncSISetting   *m_trustEncSI  {nullptr};
 // End of members moved from ScanWizardConfig
