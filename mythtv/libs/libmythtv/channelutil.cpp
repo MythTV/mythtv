@@ -1511,11 +1511,11 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
 
     query.prepare(qstr);
 
-    query.bindValue(":CHANID",    new_channel_id);
-    query.bindValue(":CHANNUM",   chanNum);
-    query.bindValue(":SOURCEID",  db_sourceid);
-    query.bindValue(":CALLSIGN",  callsign);
-    query.bindValue(":NAME",      service_name);
+    query.bindValue      (":CHANID",    new_channel_id);
+    query.bindValueNoNull(":CHANNUM",   chanNum);
+    query.bindValue      (":SOURCEID",  db_sourceid);
+    query.bindValueNoNull(":CALLSIGN",  callsign);
+    query.bindValueNoNull(":NAME",      service_name);
 
     if (db_mplexid > 0)
         query.bindValue(":MPLEXID",   db_mplexid);
@@ -1531,17 +1531,10 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         query.bindValue(":FREQID",    freqid);
 
     QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : std::move(format);
-    tvformat = tvformat.isNull() ? "" : tvformat;
-    query.bindValue(":TVFORMAT", tvformat);
-
-    icon = (icon.isNull()) ? "" : icon;
-    query.bindValue(":ICON", icon);
-
-    xmltvid = (xmltvid.isNull()) ? "" : xmltvid;
-    query.bindValue(":XMLTVID", xmltvid);
-
-    default_authority = (default_authority.isNull()) ? "" : default_authority;
-    query.bindValue(":AUTHORITY", default_authority);
+    query.bindValueNoNull(":TVFORMAT", tvformat);
+    query.bindValueNoNull(":ICON", icon);
+    query.bindValueNoNull(":XMLTVID", xmltvid);
+    query.bindValueNoNull(":AUTHORITY", default_authority);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1599,9 +1592,9 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     if (set_channum)
         query.bindValue(":CHANNUM", chan_num);
 
-    query.bindValue(":SOURCEID",  source_id);
-    query.bindValue(":CALLSIGN",  callsign);
-    query.bindValue(":NAME",      service_name);
+    query.bindValue      (":SOURCEID",  source_id);
+    query.bindValueNoNull(":CALLSIGN",  callsign);
+    query.bindValueNoNull(":NAME",      service_name);
 
     query.bindValue(":MPLEXID",   db_mplexid);
 
