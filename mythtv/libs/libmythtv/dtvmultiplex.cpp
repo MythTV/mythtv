@@ -227,6 +227,7 @@ bool DTVMultiplex::ParseDVB_S(
 {
     bool ok = ParseDVB_S_and_C(_frequency, _inversion, _symbol_rate,
                                _fec_inner, _modulation, _polarity);
+    m_mod_sys = DTVModulationSystem::kModulationSystem_DVBS;
     return ok;
 }
 
@@ -241,7 +242,9 @@ bool DTVMultiplex::ParseDVB_C(
 
     m_mod_sys.Parse(_mod_sys);
     if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_mod_sys)
+    {
         m_mod_sys = DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A;
+    }
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("%1 ").arg(__FUNCTION__) +
@@ -335,7 +338,9 @@ bool DTVMultiplex::ParseDVB_T2(
     }
 
     if (m_mod_sys == DTVModulationSystem::kModulationSystem_UNDEFINED)
+    {
         m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+    }
 
     if ((DTVModulationSystem::kModulationSystem_DVBT  != m_mod_sys) &&
         (DTVModulationSystem::kModulationSystem_DVBT2 != m_mod_sys))
@@ -530,10 +535,11 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
 
             const CableDeliverySystemDescriptor cd(desc);
 
-            return ParseDVB_S_and_C(
+            return ParseDVB_C(
                     QString::number(cd.FrequencyHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
-                    cd.ModulationString(),               QString());
+                    cd.ModulationString(),               QString(),
+                    "DVB-C/A");
         }
         default:
             LOG(VB_CHANSCAN, LOG_ERR, LOC +
