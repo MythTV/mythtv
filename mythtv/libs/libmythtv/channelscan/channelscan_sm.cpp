@@ -965,7 +965,6 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             TransportScanItem &item = *m_current;
             item.m_tuning.m_frequency = item.freq_offset(m_current.offset());
 
-            item.m_tuning.m_mod_sys.Parse(m_inputName);
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 QString("%1(%2) m_inputName: %3 ").arg(__FUNCTION__).arg(__LINE__).arg(m_inputName) +
                 QString("m_mod_sys:%1 %2").arg(item.m_tuning.m_mod_sys).arg(item.m_tuning.m_mod_sys.toString()));
