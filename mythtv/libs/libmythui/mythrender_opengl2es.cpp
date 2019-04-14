@@ -20,6 +20,8 @@ void MythRenderOpenGL2ES::InitProcs()
     // GLSL ES precision qualifiers
     m_qualifiers = "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
                    "precision highp float;\n"
+                   "#else\n"
+                   "precision mediump float;\n"
                    "#endif\n";
 
     // Default OpenGL ES 2.0
