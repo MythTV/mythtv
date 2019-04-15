@@ -474,7 +474,6 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new Name(id));
 
     Source *source = new Source(id, default_sourceid);
-    source->Load();
 
     Channum *channum = new Channum(id);
     addChild(channum);
