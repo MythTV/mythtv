@@ -507,6 +507,10 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(this, SIGNAL(signalSetDrawEnabled(bool)),
             this, SLOT(SetDrawEnabled(bool)),
             Qt::BlockingQueuedConnection);
+#ifdef Q_OS_ANDROID
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
+            this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
+#endif
 
     // We need to listen for playback start/end events
     gCoreContext->addListener(this);
@@ -3133,4 +3137,19 @@ void MythMainWindow::DisableIdleTimer(bool disableIdle)
         QMetaObject::invokeMethod(d->m_idleTimer, "start");
 }
 
+void MythMainWindow::onApplicationStateChange(Qt::ApplicationState state)
+{
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Application State Changed to %1").arg(state));
+    switch (state)
+    {
+        case Qt::ApplicationState::ApplicationActive:
+            PopDrawDisabled();
+            break;
+        case Qt::ApplicationState::ApplicationSuspended:
+            PushDrawDisabled();
+            break;
+        default:
+            break;
+    }
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

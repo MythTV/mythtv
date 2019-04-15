@@ -150,6 +150,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void animate();
     void doRemoteScreenShot(const QString& filename, int x, int y);
     void SetDrawEnabled(bool enable);
+    void onApplicationStateChange(Qt::ApplicationState state);
 
   signals:
     void signalRemoteScreenShot(QString filename, int x, int y);
