@@ -797,7 +797,6 @@ class CardInput : public GroupSetting
     void channelScanner();
     void sourceFetch();
     void SetSourceID(const QString &sourceid);
-    void UpdateSchedGroup(const QString &value);
     void CreateNewInputGroupSlot(const QString &name);
 
   private:

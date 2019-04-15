@@ -153,7 +153,7 @@ class SchedGroup : public MythUICheckBoxSetting
         MythUICheckBoxSetting(new CardInputDBStorage(this, parent, "schedgroup"))
     {
         setLabel(QObject::tr("Schedule as group"));
-        setValue(false);
+        setValue(true);
         setHelpText(
             QObject::tr(
                 "Schedule all virtual inputs on this device as a group.  "
@@ -3090,9 +3090,6 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
             this,       SLOT(  SetSourceID (const QString&)));
     connect(ingrpbtn,   SIGNAL(clicked()),
             this,       SLOT(  CreateNewInputGroup()));
-    if (m_schedGroup)
-        connect(m_instanceCount, SIGNAL(valueChanged(const QString &)),
-                this,            SLOT(UpdateSchedGroup(const QString &)));
 }
 
 CardInput::~CardInput()
@@ -3112,14 +3109,6 @@ void CardInput::SetSourceID(const QString &sourceid)
     m_scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
     m_srcFetch->setEnabled(enable);
-}
-
-void CardInput::UpdateSchedGroup(const QString &val)
-{
-    int value = val.toInt();
-    if (value <= 1)
-        m_schedGroup->setValue(false);
-    m_schedGroup->setEnabled(value > 1);
 }
 
 QString CardInput::getSourceName(void) const
