@@ -1500,12 +1500,14 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
+#if defined(USING_VAAPI2) || defined(USING_NVDEC)
 static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 {
     return fmt == AV_PIX_FMT_VAAPI_MOCO ||
            fmt == AV_PIX_FMT_VAAPI_IDCT ||
            fmt == AV_PIX_FMT_VAAPI_VLD;
 }
+#endif
 
 #ifdef USING_VAAPI
 // Declared separately to allow attribute
@@ -3041,9 +3043,11 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
+#if defined(USING_VAAPI2) || defined(USING_NVDEC)
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
+#endif
 
 #ifdef USING_VDPAU
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)

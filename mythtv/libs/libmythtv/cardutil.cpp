@@ -628,6 +628,7 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
 // Get the list of all supported delivery systems from the card
 QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
 {
+    Q_UNUSED(fd_frontend);
     QStringList delsyslist;
 
 #ifdef USING_DVB
