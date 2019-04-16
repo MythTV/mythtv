@@ -35,6 +35,8 @@ void ScanWizard::SetupConfig(
     m_addFullTS = new AddFullTS();
     m_trustEncSI = new TrustEncSISetting();
 
+    setLabel(tr("Channel Scan"));
+
     addChild(m_services);
     addChild(m_ftaOnly);
     addChild(m_lcnOnly);
