@@ -83,7 +83,8 @@ class TestMythSystem: public QObject
     {
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(
-                QString("echo %1").arg(__FUNCTION__), kMSStdOut));
+                QString("echo %1; sleep 1").arg(__FUNCTION__),
+                kMSStdOut | kMSRunShell));
         cmd->Wait();
         QVERIFY(QString(cmd->GetStandardOutputStream()->readAll())
                 .contains(__FUNCTION__));
@@ -128,8 +129,8 @@ class TestMythSystem: public QObject
     void stdout_works(void)
     {
         QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(QString("echo %1").arg(__FUNCTION__),
-                               kMSStdOut));
+            MythSystem::Create(QString("echo %1; sleep 1").arg(__FUNCTION__),
+                               kMSStdOut | kMSRunShell));
         cmd->Wait();
         QVERIFY(cmd->GetExitCode() == 0);
         QVERIFY(cmd->GetStandardOutputStream());
@@ -142,7 +143,7 @@ class TestMythSystem: public QObject
     void stderr_works(void)
     {
         QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(QString("echo %1 >&2").arg(__FUNCTION__),
+            MythSystem::Create(QString("echo %1 >&2; sleep 1").arg(__FUNCTION__),
                                kMSRunShell | kMSStdErr));
         cmd->Wait();
         QVERIFY(cmd->GetExitCode() == 0);
@@ -156,7 +157,7 @@ class TestMythSystem: public QObject
     void shell_used_when_requested(void)
     {
         QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi",
+            MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi; sleep 1",
                                kMSRunShell | kMSStdOut));
         cmd->Wait();
         QVERIFY(QString(cmd->GetStandardOutputStream()->readAll())
@@ -166,7 +167,7 @@ class TestMythSystem: public QObject
     void shell_not_used_when_not_requested(void)
     {
         QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi",
+            MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi; sleep 1",
                                kMSStdOut));
         cmd->Wait();
         QVERIFY(!QString(cmd->GetStandardOutputStream()->readAll())
