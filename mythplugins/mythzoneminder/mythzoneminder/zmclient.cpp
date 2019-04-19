@@ -924,10 +924,13 @@ void ZMClient::saveNotificationMonitors(void)
     for (int x = 0; x < m_monitorList.count(); x++)
     {
         Monitor *mon = m_monitorList.at(x);
-        if (!s.isEmpty())
-            s += QString(",%1").arg(mon->id);
-        else
-            s = QString("%1").arg(mon->id);
+        if (mon->showNotifications)
+        {
+            if (!s.isEmpty())
+                s += QString(",%1").arg(mon->id);
+            else
+                s = QString("%1").arg(mon->id);
+        }
     }
 
     gCoreContext->SaveSetting("ZoneMinderNotificationMonitors", s);
