@@ -88,6 +88,7 @@ using namespace std;
 #include "taskqueue.h"
 #include "cleanupguard.h"
 #include "standardsettings.h"
+#include "settingshelper.h"
 
 // Video
 #include "cleanup.h"
@@ -129,6 +130,8 @@ static MythThemedMenu *g_menu;
 
 static MediaRenderer  *g_pUPnp   = nullptr;
 static MythPluginManager *g_pmanager = nullptr;
+
+static SettingsHelper *g_settingsHelper = nullptr;
 
 static void handleExit(bool prompt);
 static void resetAllKeys(void);
@@ -297,6 +300,12 @@ namespace
         {
             delete g_pmanager;
             g_pmanager = nullptr;
+        }
+
+        if (g_settingsHelper)
+        {
+            delete g_settingsHelper;
+            g_settingsHelper = nullptr;
         }
 
         delete gContext;
@@ -882,9 +891,10 @@ static void TVMenuCallback(void *data, QString &selection)
 
     if (sel.startsWith("settings ") || sel == "video_settings_general")
     {
-        GetMythUI()->AddCurrentLocation("Setup");
-        gCoreContext->ActivateSettingsCache(false);
-        GetMythMainWindow()->HidePainterWindow();
+        if (!g_settingsHelper)
+            g_settingsHelper = new SettingsHelper;
+
+        g_settingsHelper->RunProlog(sel);
     }
 
     if (sel == "tv_watch_live")
@@ -1144,6 +1154,8 @@ static void TVMenuCallback(void *data, QString &selection)
 
         if (ps->Create())
             mainStack->AddScreen(ps);
+        else
+            delete ps;
     }
     else if (sel == "video_settings_metadata")
     {
@@ -1153,6 +1165,8 @@ static void TVMenuCallback(void *data, QString &selection)
 
         if (ms->Create())
             mainStack->AddScreen(ms);
+        else
+            delete ms;
     }
     else if (sel == "video_settings_associations")
     {
@@ -1192,19 +1206,13 @@ static void TVMenuCallback(void *data, QString &selection)
 
     if (sel.startsWith("settings ") || sel == "video_settings_general")
     {
-        GetMythUI()->RemoveCurrentLocation();
-
-        gCoreContext->ActivateSettingsCache(true);
-
-        // tell the backend the settings may have changed
-        gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
-        // tell the frontend the settings may have changed
-        gCoreContext->dispatch(MythEvent(QString("CLEAR_SETTINGS_CACHE")));
-
-        if (sel == "settings general" ||
-            sel == "settings generalrecpriorities")
-            ScheduledRecording::ReschedulePlace("TVMenuCallback");
-        GetMythMainWindow()->ShowPainterWindow();
+        if (g_settingsHelper)
+        {
+            qApp->connect(GetMythMainWindow()->GetMainStack()->GetTopScreen(),
+                          SIGNAL(Exiting()),
+                          g_settingsHelper,
+                          SLOT(RunEpilog()));
+        }
     }
 }
 
