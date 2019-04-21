@@ -346,6 +346,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
+  protected slots:
+    void onApplicationStateChange(Qt::ApplicationState state);
+
   private:
     TV();
    ~TV();
@@ -932,10 +935,12 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// true if video chromakey and frame should not be drawn
     bool          m_disableDrawUnusedRects {false};
 
-    // embedded status
+    // embedded and suspended status
     bool         m_isEmbedded {false};       ///< are we currently embedded
     bool         m_ignoreKeyPresses {false}; ///< should we ignore keypresses
     vector<bool> m_savedPause;      ///< saved pause state before embedding
+    bool         m_suspended {false};///< are we currently suspended
+    vector<bool> m_suspendedPause;  ///< saved pause state before suspending
 
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.
