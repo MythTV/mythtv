@@ -109,9 +109,11 @@ class MHOctetString
     MHOctetString(const char *str, int nLen = -1); // From character string
     MHOctetString(const unsigned char *str, int nLen); // From byte vector
     MHOctetString(const MHOctetString &str, int nOffset=0, int nLen=-1); // Substring
+    MHOctetString(const MHOctetString& o) { Copy(o); }
     virtual ~MHOctetString();
 
     void Copy(const MHOctetString &str);
+    MHOctetString& operator=(const MHOctetString& o) {Copy(o); return *this; }
     int Size() const { return m_nLength; }
     // Comparison - returns <0, =0, >0 depending on the ordering.
     int Compare(const MHOctetString &str) const;
@@ -153,6 +155,8 @@ class MHObjectRef
     void Copy(const MHObjectRef &objr);
     static MHObjectRef Null;
 
+    MHObjectRef& operator=(const MHObjectRef&) = default;
+
     // Sometimes the object reference is optional.  This tests if it has been set
     bool IsSet() const { return (m_nObjectNo != 0 || m_GroupId.Size() != 0); }
     void PrintMe(FILE *fd, int nTabs) const;
@@ -168,6 +172,9 @@ class MHContentRef
 {
   public:
     MHContentRef() {}
+
+    MHContentRef& operator=(const MHContentRef&) = default;
+
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const { m_ContentRef.PrintMe(fd, nTabs); }
     void Copy(const MHContentRef &cr) { m_ContentRef.Copy(cr.m_ContentRef); }
@@ -272,6 +279,8 @@ class MHUnion
     MHUnion(const MHOctetString &strVal) : m_Type(U_String) { m_StrVal.Copy(strVal); }
     MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef) { m_ObjRefVal.Copy(objVal); };
     MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef) { m_ContentRefVal.Copy(cnVal); }
+
+    MHUnion& operator=(const MHUnion&) = default;
 
     void GetValueFrom(const MHParameter &value, MHEngine *engine); // Copies the argument, getting the value of an indirect args.
     QString Printable() const;

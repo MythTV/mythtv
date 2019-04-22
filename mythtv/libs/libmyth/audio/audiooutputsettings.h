@@ -52,6 +52,7 @@ class MPUBLIC AudioOutputSettings
 {
     public:
         explicit AudioOutputSettings(bool invalid = false);
+        AudioOutputSettings(const AudioOutputSettings&) = default;
         ~AudioOutputSettings();
         AudioOutputSettings& operator=(const AudioOutputSettings& /*rhs*/);
         AudioOutputSettings *GetCleaned(bool newcopy = false);
