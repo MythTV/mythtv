@@ -4,56 +4,32 @@
 #include "videocolourspace.h"
 #include "mythnvdecinterop.h"
 
-// FFmpeg
-extern "C" {
-#include "libavutil/hwcontext_cuda_internal.h"
-#include "libavutil/hwcontext_cuda.h"
-}
-
 #define LOC QString("NVDECInterop: ")
 
-#define CUDA_CHECK(CUDA_CALL) { CUresult res = CUDA_CALL; if (res != CUDA_SUCCESS) { \
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("CUDA error: %1").arg(res)); }}
-
-/*! \brief A simple wrapper around resources allocated by the given CUDA context.
- *
- * \note This does not currently release m_resource as the CUDA context is released
- * before AVHWDeviceContext::free is called. This may be the reason why OpenGL
- * rendering is broken after using NVDEC direct rendering - but seems unlikely.
- */
-class NVDECData
-{
-  public:
-    NVDECData(CUarray Array, CUgraphicsResource Resource, AVCUDADeviceContext* Context)
-      : m_array(Array),
-        m_resource(Resource),
-        m_context(Context)
-    {
-    }
-
-   ~NVDECData()
-    {
-        if (m_context && m_context->cuda_ctx && m_context->internal && m_context->internal->cuda_dl)
-        {
-            CUcontext dummy;
-            CUDA_CHECK(m_context->internal->cuda_dl->cuCtxPushCurrent(m_context->cuda_ctx));
-            CUDA_CHECK(m_context->internal->cuda_dl->cuGraphicsUnregisterResource(m_resource));
-            CUDA_CHECK(m_context->internal->cuda_dl->cuCtxPopCurrent(&dummy));
-        }
-    }
-
-    CUarray m_array;
-    CUgraphicsResource m_resource;
-    AVCUDADeviceContext* m_context;
-};
+#define CUDA_CHECK(CUDA_CALL) \
+{ \
+    CUresult res = CUDA_CALL; \
+    if (res != CUDA_SUCCESS) { \
+        const char * desc; \
+        m_cudaFuncs->cuGetErrorString(res, &desc); \
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("CUDA error %1 (%2)").arg(res).arg(desc)); \
+    } \
+}
 
 MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
-  : MythOpenGLInterop(Context, NVDEC)
+  : MythOpenGLInterop(Context, NVDEC),
+    m_cudaContext(),
+    m_cudaFuncs(nullptr)
 {
+    InitialiseCuda();
 }
 
 MythNVDECInterop::~MythNVDECInterop()
 {
+    CUcontext dummy;
+    if (m_cudaContext && m_cudaFuncs)
+        CUDA_CHECK(m_cudaFuncs->cuCtxPushCurrent(m_cudaContext));
+
     if (!m_openglTextures.isEmpty())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting CUDA resources");
@@ -64,14 +40,36 @@ MythNVDECInterop::~MythNVDECInterop()
             vector<MythVideoTexture*>::iterator it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
-                // see comment in NVDECData
-                NVDECData *data = reinterpret_cast<NVDECData*>((*it2)->m_data);
-                if (data)
-                    delete data;
+                QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
+                // Don't error check here - for some reason the context is deemed destroyed but pop/destroy below
+                // work fine
+                if (m_cudaFuncs && data && data->second)
+                    m_cudaFuncs->cuGraphicsUnregisterResource(&(data->second));
+                delete data;
                 (*it2)->m_data = nullptr;
             }
         }
     }
+
+    if (m_cudaFuncs)
+    {
+        if (m_cudaContext)
+        {
+            CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
+            CUDA_CHECK(m_cudaFuncs->cuCtxDestroy(m_cudaContext));
+        }
+        cuda_free_functions(&m_cudaFuncs);
+    }
+}
+
+bool MythNVDECInterop::IsValid(void)
+{
+    return m_cudaFuncs && m_cudaContext;
+}
+
+CUcontext MythNVDECInterop::GetCUDAContext(void)
+{
+    return m_cudaContext;
 }
 
 MythNVDECInterop* MythNVDECInterop::Create(MythRenderOpenGL *Context)
@@ -85,7 +83,6 @@ MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(MythCodecID CodecId, My
 {
     if (!codec_is_nvdec(CodecId) || !gCoreContext->IsUIThread())
         return Unsupported;
-
     if (!Context)
         Context = MythRenderOpenGL::GetOpenGLRender();
     if (!Context)
@@ -97,7 +94,7 @@ MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(MythCodecID CodecId, My
  *
  * \note This is not zero copy - although the copy will be extremely fast.
  * It may be marginally quicker to implement a custom FFmpeg buffer pool that allocates
- * textures and maps the texture storage to a CUdeviceptr (if that is possible). Alternativel
+ * textures and maps the texture storage to a CUdeviceptr (if that is possible). Alternatively
  * EGL interopability may also be useful.
 */
 vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
@@ -106,7 +103,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
                                                     FrameScanType)
 {
     vector<MythVideoTexture*> result;
-    if (!Frame)
+    if (!Frame || !m_cudaContext || !m_cudaFuncs)
         return result;
 
     if (Context && (Context != m_context))
@@ -139,22 +136,13 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         return result;
     }
 
-    AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-    if (!buffer || (buffer && !buffer->data))
-        return result;
-    AVHWDeviceContext* context = reinterpret_cast<AVHWDeviceContext*>(buffer->data);
-    AVCUDADeviceContext *devicecontext = reinterpret_cast<AVCUDADeviceContext*>(context->hwctx);
-    if (!devicecontext)
-        return result;
-
-    CudaFunctions *cu = devicecontext->internal->cuda_dl;
     CUdeviceptr cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->buf);
-    if (!cu || !cudabuffer)
+    if (!cudabuffer)
         return result;
 
     // make the CUDA context current
     CUcontext dummy;
-    CUDA_CHECK(cu->cuCtxPushCurrent(devicecontext->cuda_ctx));
+    CUDA_CHECK(m_cudaFuncs->cuCtxPushCurrent(m_cudaContext));
 
     // create and map textures for a new buffer
     VideoFrameType type = (Frame->sw_pix_fmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
@@ -169,7 +157,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
                     m_context, FMT_NVDEC, type, sizes, QOpenGLTexture::Target2D);
         if (textures.empty())
         {
-            CUDA_CHECK(cu->cuCtxPopCurrent(&dummy));
+            CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
             return result;
         }
 
@@ -194,12 +182,12 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
             CUarray array;
             CUgraphicsResource graphicsResource = nullptr;
-            CUDA_CHECK(cu->cuGraphicsGLRegisterImage(&graphicsResource, tex->m_textureId,
+            CUDA_CHECK(m_cudaFuncs->cuGraphicsGLRegisterImage(&graphicsResource, tex->m_textureId,
                                           QOpenGLTexture::Target2D, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD));
-            CUDA_CHECK(cu->cuGraphicsMapResources(1, &graphicsResource, nullptr));
-            CUDA_CHECK(cu->cuGraphicsSubResourceGetMappedArray(&array, graphicsResource, 0, 0));
-            CUDA_CHECK(cu->cuGraphicsUnmapResources(1, &graphicsResource, nullptr));
-            tex->m_data = reinterpret_cast<unsigned char*>(new NVDECData(array, graphicsResource, devicecontext));
+            CUDA_CHECK(m_cudaFuncs->cuGraphicsMapResources(1, &graphicsResource, nullptr));
+            CUDA_CHECK(m_cudaFuncs->cuGraphicsSubResourceGetMappedArray(&array, graphicsResource, 0, 0));
+            CUDA_CHECK(m_cudaFuncs->cuGraphicsUnmapResources(1, &graphicsResource, nullptr));
+            tex->m_data = reinterpret_cast<unsigned char*>(new QPair<CUarray,CUgraphicsResource>(array, graphicsResource));
         }
         MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         m_openglTextures.insert(cudabuffer, textures);
@@ -207,7 +195,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
     if (!m_openglTextures.contains(cudabuffer))
     {
-        CUDA_CHECK(cu->cuCtxPopCurrent(&dummy));
+        CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
         return result;
     }
 
@@ -217,20 +205,73 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     result = m_openglTextures[cudabuffer];
     for (uint i = 0; i < result.size(); ++i)
     {
-        NVDECData *data = reinterpret_cast<NVDECData*>(result[i]->m_data);
+        QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(result[i]->m_data);
         CUDA_MEMCPY2D cpy;
         memset(&cpy, 0, sizeof(cpy));
         cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
         cpy.srcDevice     = cudabuffer + static_cast<CUdeviceptr>(Frame->offsets[i]);
         cpy.srcPitch      = static_cast<size_t>(Frame->pitches[i]);
         cpy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
-        cpy.dstArray      = data->m_array;
+        cpy.dstArray      = data->first;
         cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (hdr ? 2 : 1);
         cpy.Height        = static_cast<size_t>(result[i]->m_size.height());
-        CUDA_CHECK(cu->cuMemcpy2D(&cpy));
+        CUDA_CHECK(m_cudaFuncs->cuMemcpy2D(&cpy));
     }
 
-    CUDA_CHECK(cu->cuCtxPopCurrent(&dummy));
+    CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
     return result;
 }
 
+/*! \brief Initialise a CUDA context
+ * \note We do not use the FFmpeg internal context creation as the created context
+ * is deleted before we have a chance to cleanup our own CUDA resources.
+*/
+bool MythNVDECInterop::InitialiseCuda(void)
+{
+    if (!m_context)
+        return false;
+
+    OpenGLLocker locker(m_context);
+
+    // retrieve CUDA entry points
+    if (cuda_load_functions(&m_cudaFuncs, nullptr) != 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load functions");
+        return false;
+    }
+
+    // create a CUDA context for the current device
+    CUdevice cudevice;
+    CUcontext dummy;
+    CUresult res = m_cudaFuncs->cuInit(0);
+    if (res != CUDA_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise CUDA API");
+        return false;
+    }
+
+    unsigned int devicecount;
+    res = m_cudaFuncs->cuGLGetDevices(&devicecount, &cudevice, 1, CU_GL_DEVICE_LIST_ALL);
+    if (res != CUDA_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get CUDA device");
+        return false;
+    }
+
+    if (devicecount < 1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No CUDA devices");
+        return false;
+    }
+
+    res = m_cudaFuncs->cuCtxCreate(&m_cudaContext, CU_CTX_SCHED_BLOCKING_SYNC, cudevice);
+    if (res != CUDA_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create CUDA context");
+        return false;
+    }
+
+    m_cudaFuncs->cuCtxPopCurrent(&dummy);
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Created CUDA context");
+    return true;
+}

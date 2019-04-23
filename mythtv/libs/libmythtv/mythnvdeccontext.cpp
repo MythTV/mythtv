@@ -37,7 +37,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext*,
             QString name = QString((*Codec)->name) + "_cuvid";
             if (name == "mpeg2video_cuvid")
                 name = "mpeg2_cuvid";
-            AVCodec *codec = avcodec_find_decoder_by_name (name.toLocal8Bit());
+            AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
             if (codec)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
@@ -73,25 +73,39 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     if (type == MythOpenGLInterop::Unsupported)
         return -1;
 
-    // Allocate the device context
-    AVBufferRef* hwdeviceref = nullptr;
-    if (av_hwdevice_ctx_create(&hwdeviceref, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0) < 0)
+    // Create interop (and CUDA context)
+    MythNVDECInterop *interop = MythNVDECInterop::Create(render);
+    if (!interop)
+        return -1;
+    if (!interop->IsValid())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create device context");
+        interop->DecrRef();
         return -1;
     }
 
-    // Set release method and interop
-    MythNVDECInterop *interop = MythNVDECInterop::Create(render);
-    if (!interop)
+    // Allocate the device context
+    AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_CUDA);
+    if (!hwdeviceref)
     {
+        interop->DecrRef();
+        return -1;
+    }
+
+    // Set release method, interop and CUDA context
+    AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    hwdevicecontext->free = &MythHWContext::DeviceContextFinished;
+    hwdevicecontext->user_opaque = interop;
+    AVCUDADeviceContext *devicehwctx = reinterpret_cast<AVCUDADeviceContext*>(hwdevicecontext->hwctx);
+    devicehwctx->cuda_ctx = interop->GetCUDAContext();
+    devicehwctx->stream = nullptr;
+
+    if (av_hwdevice_ctx_init(hwdeviceref) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init CUDA hw device");
         av_buffer_unref(&hwdeviceref);
         return -1;
     }
 
-    AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    hwdevicecontext->free = &MythHWContext::DeviceContextFinished;
-    hwdevicecontext->user_opaque = interop;
     Context->hw_device_ctx = hwdeviceref;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created CUDA device context");
     return 0;
@@ -108,9 +122,19 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_CUDA)
-            if (HwDecoderInit(Context) >= 0)
+        {
+            if (!Context->hw_device_ctx)
+            {
+                if (HwDecoderInit(Context) >= 0)
+                    return *PixFmt;
+            }
+            else
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-using CUDA context");
                 return *PixFmt;
+            }
         PixFmt++;
+        }
     }
     return AV_PIX_FMT_NONE;
 }
