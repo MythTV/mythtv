@@ -238,7 +238,7 @@ class VideoOutput
     virtual void UpdatePauseFrame(int64_t &disp_timecode) = 0;
 
     /// \brief Tells the player to resize the video frame (used for ITV)
-    void SetVideoResize(const QRect &videoRect);
+    void SetVideoResize(const QRect &VideoRect);
 
     void SetVideoScalingAllowed(bool change);
 
@@ -330,8 +330,6 @@ class VideoOutput
     VideoFrame pip_tmp_image;
 
     // Video resizing (for ITV)
-    bool    vsz_enabled;
-    QRect   vsz_desired_display_rect;
     QSize   vsz_display_size;
     QSize   vsz_video_size;
     unsigned char      *vsz_tmp_buf;

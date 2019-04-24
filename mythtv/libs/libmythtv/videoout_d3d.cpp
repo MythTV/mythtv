@@ -346,7 +346,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     m_render_valid = m_render->Test(m_render_reset);
     if (m_render_valid)
     {
-        QRect dvr = vsz_enabled ? vsz_desired_display_rect :
+        QRect dvr = window.GetITVResizing() ? window.GetITVDisplayRect() :
                                   window.GetDisplayVideoRect();
         bool ok = m_render->ClearBuffer();
         if (ok && !dummy)

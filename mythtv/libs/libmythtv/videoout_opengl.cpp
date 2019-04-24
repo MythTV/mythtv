@@ -498,12 +498,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
 
     // video
     if (m_openGLVideo && !dummy)
-    {
-        m_openGLVideo->SetVideoRects(vsz_enabled ? vsz_desired_display_rect :
-                                                  window.GetDisplayVideoRect(),
-                                    window.GetVideoRect());
         m_openGLVideo->PrepareFrame(Frame, topfieldfirst, Scan, m_stereo);
-    }
 
     // PiPs/PBPs
     if (!m_openGLVideoPiPs.empty())

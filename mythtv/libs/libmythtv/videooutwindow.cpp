@@ -81,6 +81,9 @@ VideoOutWindow::VideoOutWindow() :
     m_displayVisibleRect(0, 0, 0, 0),
     m_tmpDisplayVisibleRect(0, 0, 0, 0),
     m_embeddingRect(QRect()),
+    // ITV resizing
+    m_itvResizing(false),
+    m_itvDisplayVideoRect(),
     // Various state variables
     m_embedding(false),
     m_bottomLine(false),
@@ -147,12 +150,16 @@ void VideoOutWindow::MoveResize(void)
     ApplySnapToVideoRect();
     PrintMoveResizeDebug();
 
-    // TODO fine tune when these are emitted
+    // Interactive TV (MHEG) embedding
+    if (m_itvResizing)
+        m_displayVideoRect = m_itvDisplayVideoRect;
+
+    // TODO fine tune when these are emitted - it is not enough to just check whether the values
+    // have changed
     emit VideoSizeChanged(m_videoDim, m_videoDispDim);
     emit VideoRectsChanged(m_displayVideoRect, m_videoRect);
     emit VisibleRectChanged(m_displayVisibleRect);
 }
-
 
 /*!  \brief Apply scales and moves for "Overscan" and "Underscan" DB settings.
  *
@@ -623,6 +630,21 @@ void VideoOutWindow::SetVideoDim(QSize Dim)
 void VideoOutWindow::SetDisplayVisibleRect(QRect Rect)
 {
     m_displayVisibleRect = Rect;
+}
+
+void VideoOutWindow::SetITVResize(QRect Rect)
+{
+    if (Rect.isEmpty())
+    {
+        m_itvResizing = false;
+        m_itvDisplayVideoRect = QRect();
+    }
+    else
+    {
+        m_itvResizing = true;
+        m_itvDisplayVideoRect = Rect;
+    }
+    MoveResize();
 }
 
 /**

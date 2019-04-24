@@ -56,6 +56,7 @@ class VideoOutWindow : public QObject
     void SetPIPState            (PIPState Setting);
     void SetVideoDim            (QSize Dim);
     void SetDisplayVisibleRect  (QRect Rect);
+    void SetITVResize           (QRect Rect);
 
     // Gets
     bool     IsEmbedding(void)             const { return m_embedding; }
@@ -72,6 +73,8 @@ class VideoOutWindow : public QObject
     QRect    GetEmbeddingRect(void)        const { return m_embeddingRect; }
     bool     UsingXinerama(void)           const { return m_usingXinerama; }
     bool     UsingGuiSize(void)            const { return m_dbUseGUISize; }
+    bool     GetITVResizing(void)          const { return m_itvResizing; }
+    QRect    GetITVDisplayRect(void)       const { return m_itvDisplayVideoRect; }
     QString  GetZoomString(void)           const;
     AspectOverrideMode GetAspectOverride(void) const { return m_videoAspectOverrideMode; }
     AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
@@ -136,6 +139,10 @@ class VideoOutWindow : public QObject
     QRect   m_tmpDisplayVisibleRect;
     /// Embedded video rectangle
     QRect   m_embeddingRect;
+
+    // Interactive TV (MHEG) video embedding
+    bool    m_itvResizing;
+    QRect   m_itvDisplayVideoRect;
 
     /// State variables
     bool    m_embedding;

@@ -328,10 +328,10 @@ VideoOutput::VideoOutput() :
     pip_scaling_context(nullptr),
 
     // Video resizing (for ITV)
-    vsz_enabled(false),
-    vsz_desired_display_rect(0,0,0,0),  vsz_display_size(0,0),
+    vsz_display_size(0,0),
     vsz_video_size(0,0),
-    vsz_tmp_buf(nullptr),               vsz_scale_context(nullptr),
+    vsz_tmp_buf(nullptr),
+    vsz_scale_context(nullptr),
 
     // Deinterlacing
     m_deinterlacing(false),             m_deintfiltername("linearblend"),
@@ -1127,7 +1127,6 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
 
     ShutdownVideoResize();
 
-    vsz_enabled      = true;
     vsz_video_size   = inDim;
     vsz_display_size = outDim;
 
@@ -1145,10 +1144,12 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
 
 void VideoOutput::ResizeVideo(VideoFrame *frame)
 {
-    if (vsz_desired_display_rect.isNull() || frame->codec !=  FMT_YV12)
+    if (frame->codec !=  FMT_YV12)
+        return;
+    QRect resize = window.GetITVDisplayRect();
+    if (resize.isEmpty())
         return;
 
-    QRect resize = vsz_desired_display_rect;
     QSize frameDim(frame->width, frame->height);
 
     // if resize is outside existing frame, abort
@@ -1160,16 +1161,16 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
 
     if (abort)
     {
-        ShutdownVideoResize();
-        vsz_desired_display_rect = QRect();
+        QRect dummy;
+        SetVideoResize(dummy);
         return;
     }
 
     DoVideoResize(frameDim, resize.size());
     if (!vsz_tmp_buf)
     {
-        ShutdownVideoResize();
-        vsz_desired_display_rect = QRect();
+        QRect dummy;
+        SetVideoResize(dummy);
         return;
     }
 
@@ -1268,7 +1269,6 @@ void VideoOutput::ShutdownVideoResize(void)
 
     vsz_video_size   = QSize(0,0);
     vsz_display_size = QSize(0,0);
-    vsz_enabled      = false;
 }
 
 void VideoOutput::ClearDummyFrame(VideoFrame *frame)
@@ -1280,18 +1280,11 @@ void VideoOutput::ClearDummyFrame(VideoFrame *frame)
     clear(frame);
 }
 
-void VideoOutput::SetVideoResize(const QRect &videoRect)
+void VideoOutput::SetVideoResize(const QRect &VideoRect)
 {
-    if (videoRect.isEmpty())
-    {
+    if (VideoRect.isEmpty())
         ShutdownVideoResize();
-        vsz_desired_display_rect = QRect();
-    }
-    else
-    {
-        vsz_enabled = true;
-        vsz_desired_display_rect = videoRect;
-    }
+    window.SetITVResize(VideoRect);
 }
 
 /**
@@ -1365,7 +1358,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     if (!osd || !frame)
         return false;
 
-    if (vsz_enabled)
+    if (window.GetITVResizing())
         ResizeVideo(frame);
 
     if (!osd_painter)
