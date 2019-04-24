@@ -143,8 +143,6 @@ class VideoOutput
                               FilterChain *filterList,
                               const PIPMap &pipPlayers,
                               FrameScanType scan = kScan_Ignore) = 0;
-    /// \brief Tells video output that a full repaint is needed.
-    void ExposeEvent(void);
 
     PictureAttributeSupported GetSupportedPictureAttributes(void)
         { return videoColourSpace.SupportedAttributes(); }
@@ -165,9 +163,9 @@ class VideoOutput
     virtual void* GetDecoderContext(unsigned char*, uint8_t*&) { return nullptr; }
 
     /// \brief Sets the number of frames played
-    virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
+    virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; }
     /// \brief Returns the number of frames played
-    virtual long long GetFramesPlayed(void) { return framesPlayed; };
+    virtual long long GetFramesPlayed(void) { return framesPlayed; }
 
     /// \brief Returns true if a fatal error has been encountered.
     bool IsErrored() const { return errorState != kError_None; }
@@ -245,7 +243,7 @@ class VideoOutput
     void SetVideoScalingAllowed(bool change);
 
     /// \brief Tells the player to flip the video frames for proper display
-    virtual void SetVideoFlip(void) { };
+    virtual void SetVideoFlip(void) { }
 
     /// \brief returns QRect of PIP based on PIPLocation
     virtual QRect GetPIPRect(PIPLocation location,

@@ -30,7 +30,6 @@ class VideoOutputOpenGL : public VideoOutput
                       float Aspect, MythCodecID CodecId, bool &AspectOnly) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;
     void DrawUnusedRects(bool) override { }
-    void MoveResize(void) override;
     void InitPictureAttributes(void) override;
     void EmbedInWidget(const QRect &Rect) override;
     void StopEmbedding(void) override;

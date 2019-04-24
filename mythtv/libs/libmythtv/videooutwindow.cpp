@@ -83,7 +83,6 @@ VideoOutWindow::VideoOutWindow() :
     m_embeddingRect(QRect()),
     // Various state variables
     m_embedding(false),
-    m_needRepaint(false),
     m_bottomLine(false),
     m_pipState(kPIPOff)
 {
@@ -147,7 +146,6 @@ void VideoOutWindow::MoveResize(void)
     ApplyManualScaleAndMove();
     ApplySnapToVideoRect();
     PrintMoveResizeDebug();
-    m_needRepaint = true;
 
     // TODO fine tune when these are emitted
     emit VideoSizeChanged(m_videoDim, m_videoDispDim);
@@ -625,11 +623,6 @@ void VideoOutWindow::SetVideoDim(QSize Dim)
 void VideoOutWindow::SetDisplayVisibleRect(QRect Rect)
 {
     m_displayVisibleRect = Rect;
-}
-
-void VideoOutWindow::SetNeedRepaint(bool NeedRepaint)
-{
-    m_needRepaint = NeedRepaint;
 }
 
 /**

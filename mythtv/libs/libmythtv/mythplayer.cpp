@@ -447,8 +447,6 @@ void MythPlayer::UnpauseVideo(void)
 {
     videoPauseLock.lock();
     videoPaused = false;
-    if (videoOutput)
-        videoOutput->ExposeEvent();
     videoPauseLock.unlock();
 }
 
@@ -4940,12 +4938,6 @@ void MythPlayer::SaveBottomLine(void)
 {
     if (videoOutput)
         videoOutput->SaveBottomLine();
-}
-
-void MythPlayer::ExposeEvent(void)
-{
-    if (videoOutput)
-        videoOutput->ExposeEvent();
 }
 
 bool MythPlayer::IsEmbedding(void)

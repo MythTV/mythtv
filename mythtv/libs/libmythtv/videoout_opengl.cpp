@@ -652,16 +652,6 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
     return allowed;
 }
 
-void VideoOutputOpenGL::MoveResize(void)
-{
-    VideoOutput::MoveResize();
-    if (m_openGLVideo)
-    {
-        m_openGLVideo->SetVideoRects(vsz_enabled ? vsz_desired_display_rect : window.GetDisplayVideoRect(),
-                                     window.GetVideoRect());
-    }
-}
-
 void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 {
     vbuffers.BeginLock(kVideoBuffer_used);

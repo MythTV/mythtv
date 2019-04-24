@@ -56,7 +56,6 @@ class VideoOutWindow : public QObject
     void SetPIPState            (PIPState Setting);
     void SetVideoDim            (QSize Dim);
     void SetDisplayVisibleRect  (QRect Rect);
-    void SetNeedRepaint         (bool NeedRepaint);
 
     // Gets
     bool     IsEmbedding(void)             const { return m_embedding; }
@@ -77,7 +76,6 @@ class VideoOutWindow : public QObject
     AspectOverrideMode GetAspectOverride(void) const { return m_videoAspectOverrideMode; }
     AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
     float    GetVideoAspect(void)          const { return m_videoAspect; }
-    bool     IsRepaintNeeded(void)         const { return m_needRepaint; }
     float    GetDisplayAspect(void)        const { return m_displayAspect;  }
     QRect    GetTmpDisplayVisibleRect(void) const { return m_tmpDisplayVisibleRect; }
     QRect    GetVisibleOSDBounds(float &VisibleAspect, float &FontScaling, float ThemeAspect) const;
@@ -141,7 +139,6 @@ class VideoOutWindow : public QObject
 
     /// State variables
     bool    m_embedding;
-    bool    m_needRepaint;
     bool    m_bottomLine;
     PIPState m_pipState;
 

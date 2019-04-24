@@ -2501,7 +2501,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             m_weDisabledGUI = true;
             GetMythMainWindow()->PushDrawDisabled();
         }
-        DrawUnusedRects();
         // we no longer need the contents of myWindow
         if (m_myWindow)
             m_myWindow->DeleteAllChildren();
@@ -3619,7 +3618,6 @@ bool TV::event(QEvent *e)
         case QEvent::Paint:
         case QEvent::UpdateRequest:
         case QEvent::Enter:
-            DrawUnusedRects();
             return true;
         default:
             break;
@@ -8564,27 +8562,6 @@ void TV::StopEmbedding(void)
     ReturnPlayerLock(ctx);
 }
 
-void TV::DrawUnusedRects(void)
-{
-    if (m_disableDrawUnusedRects)
-        return;
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-
-    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    for (uint i = 0; mctx && (i < m_player.size()); i++)
-    {
-        PlayerContext *ctx = GetPlayer(mctx, i);
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->m_player)
-            ctx->m_player->ExposeEvent();
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
-    ReturnPlayerLock(mctx);
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
-}
-
 vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
 {
     vector<bool> was_paused;
@@ -8733,9 +8710,6 @@ void TV::DoEditSchedule(int editType)
             break;
         }
     }
-
-    // If the video is paused, don't paint its unused rects & chromakey
-    m_disableDrawUnusedRects = pause_active;
 
     // We are embedding in a mythui window so assuming no one
     // else has disabled painting show the MythUI window again.
@@ -9740,7 +9714,6 @@ void TV::customEvent(QEvent *e)
         }
 
         DoSetPauseState(actx, m_savedPause); // Restore pause states
-        m_disableDrawUnusedRects = false;
 
         if (!m_weDisabledGUI)
         {
@@ -9749,7 +9722,6 @@ void TV::customEvent(QEvent *e)
         }
 
         qApp->processEvents();
-        DrawUnusedRects();
 
         m_isEmbedded = false;
         m_ignoreKeyPresses = false;

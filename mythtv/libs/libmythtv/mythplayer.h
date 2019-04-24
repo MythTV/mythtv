@@ -403,7 +403,6 @@ class MTV_PUBLIC MythPlayer
     // Windowing stuff
     void EmbedInWidget(QRect rect);
     void StopEmbedding(void);
-    void ExposeEvent(void);
     bool IsEmbedding(void);
     void WindowResized(const QSize &new_size);
 

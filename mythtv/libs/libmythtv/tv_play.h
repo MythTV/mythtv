@@ -419,7 +419,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool IsTunable(const PlayerContext*, uint chanid);
     static QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
     void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
-    void DrawUnusedRects(void);
     void DoEditSchedule(int editType = kScheduleProgramGuide);
     QString GetRecordingGroup(int player_idx) const;
     void ChangeVolume(PlayerContext*, bool up, int newvolume = -1);
@@ -929,8 +928,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     QRect         m_savedGuiBounds;
     /// true if this instance disabled MythUI drawing.
     bool          m_weDisabledGUI {false};
-    /// true if video chromakey and frame should not be drawn
-    bool          m_disableDrawUnusedRects {false};
 
     // embedded status
     bool         m_isEmbedded {false};       ///< are we currently embedded

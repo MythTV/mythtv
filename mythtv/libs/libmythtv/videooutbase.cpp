@@ -1282,8 +1282,7 @@ void VideoOutput::ClearDummyFrame(VideoFrame *frame)
 
 void VideoOutput::SetVideoResize(const QRect &videoRect)
 {
-    if (!videoRect.isValid()    ||
-         videoRect.width()  < 1 || videoRect.height() < 1)
+    if (videoRect.isEmpty())
     {
         ShutdownVideoResize();
         vsz_desired_display_rect = QRect();
@@ -1307,7 +1306,7 @@ void VideoOutput::SetVideoScalingAllowed(bool change)
 #define THREADED_OSD_RENDER 1
 #endif
 
-#if THREADED_OSD_RENDER
+#ifdef THREADED_OSD_RENDER
 class OsdRender : public QRunnable
 {
   public:
@@ -1431,7 +1430,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     if (!changed && frame->codec != FMT_YV12)
         return show;
 
-#if THREADED_OSD_RENDER
+#ifdef THREADED_OSD_RENDER
     QSize video_dim = window.GetVideoDim();
     static MThreadPool s_pool("OsdRender");
 
@@ -1657,11 +1656,6 @@ bool VideoOutput::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
 bool VideoOutput::IsEmbedding(void)
 {
     return window.IsEmbedding();
-}
-
-void VideoOutput::ExposeEvent(void)
-{
-    window.SetNeedRepaint(true);
 }
 
 /**
