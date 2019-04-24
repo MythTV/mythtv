@@ -14,11 +14,6 @@ extern "C" {
 
 #define LOC QString("VDPAUDec: ")
 
-MythVDPAUContext::MythVDPAUContext(MythCodecID CodecID)
-  : m_codecID(CodecID)
-{
-}
-
 int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 {
     if (!gCoreContext->IsUIThread() || !Context)
