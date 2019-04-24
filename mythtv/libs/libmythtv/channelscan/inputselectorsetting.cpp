@@ -53,7 +53,8 @@ void InputSelector::Load(void)
         "FROM capturecard, videosource "
         "WHERE capturecard.sourceid = videosource.sourceid AND "
         "      hostname             = :HOSTNAME            AND "
-        "      capturecard.sourceid = :SOURCEID");
+        "      capturecard.sourceid = :SOURCEID            AND "
+        "      capturecard.parentid = 0");
 
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query.bindValue(":SOURCEID", m_sourceid);

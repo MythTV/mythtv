@@ -70,6 +70,7 @@ ScanCountry::ScanCountry()
     addSelection(QObject::tr("Greece"),         "gr", country == "gr");
     addSelection(QObject::tr("Israel"),         "il", country == "il");
     addSelection(QObject::tr("Italy"),          "it", country == "it");
+    addSelection(QObject::tr("Netherlands"),    "nl", country == "nl");
     addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
     addSelection(QObject::tr("Spain"),          "es", country == "es");
     addSelection(QObject::tr("Sweden"),         "se", country == "se");

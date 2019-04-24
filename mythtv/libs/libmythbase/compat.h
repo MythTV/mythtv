@@ -143,8 +143,15 @@
 #if defined(__cplusplus) && defined(_WIN32)
 #   include <QtGlobal>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+    #include <QRandomGenerator>
+    static inline void srandom(unsigned int /*seed*/) { }
+    static inline long int random(void)
+        { return QRandomGenerator::global()->generate64(); }
+#else
     static inline void srandom(unsigned int seed) { qsrand(seed); }
     static inline long int random(void) { return qrand(); }
+#endif
 
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0

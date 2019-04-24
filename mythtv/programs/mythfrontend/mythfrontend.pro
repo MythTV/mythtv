@@ -52,6 +52,7 @@ HEADERS += gallerythumbview.h           galleryslideview.h
 HEADERS += galleryconfig.h              galleryviews.h
 HEADERS += galleryslide.h               gallerytransitions.h
 HEADERS += galleryinfo.h                prevreclist.h
+HEADERS += settingshelper.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp

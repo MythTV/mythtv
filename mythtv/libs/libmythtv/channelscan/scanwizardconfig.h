@@ -43,6 +43,7 @@ class ScanNetwork;
 class IgnoreSignalTimeout;
 class DesiredServices;
 class FreeToAirOnly;
+class ChannelNumbersOnly;
 class AddFullTS;
 class TrustEncSISetting;
 

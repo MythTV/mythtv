@@ -274,6 +274,7 @@ int main(int argc, char *argv[])
     bool    expertMode = false;
     uint    scanImport = 0;
     bool    scanFTAOnly = false;
+    bool    scanLCNOnly = false;
     bool    addFullTS = false;
     ServiceRequirements scanServiceRequirements = kRequireAV;
     uint    scanCardId = 0;
@@ -363,6 +364,8 @@ int main(int argc, char *argv[])
         scanImport = cmdline.toUInt("importscan");
     if (cmdline.toBool("ftaonly"))
         scanFTAOnly = true;
+    if (cmdline.toBool("lcnonly"))
+        scanLCNOnly = true;
     if (cmdline.toBool("addfullts"))
         addFullTS = true;
     if (cmdline.toBool("servicetype"))
@@ -518,6 +521,7 @@ int main(int argc, char *argv[])
                          /* follow_nit */            true,
                          /* test decryption */       true,
                          scanFTAOnly,
+                         scanLCNOnly,
                          addFullTS,
                          scanServiceRequirements,
                          // stuff needed for particular scans
@@ -552,7 +556,7 @@ int main(int argc, char *argv[])
         {
             ScanDTVTransportList list = LoadScan(scanImport);
             ChannelImporter ci(false, true, true, true, false,
-                               scanFTAOnly, scanServiceRequirements);
+                               scanFTAOnly, scanLCNOnly, scanServiceRequirements);
             ci.Process(list);
         }
         cout<<"*** SCAN IMPORT END ***"<<endl;

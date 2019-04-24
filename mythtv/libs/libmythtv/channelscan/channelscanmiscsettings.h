@@ -120,6 +120,22 @@ class FreeToAirOnly : public TransMythUICheckBoxSetting
     };
 };
 
+class ChannelNumbersOnly : public TransMythUICheckBoxSetting
+{
+  public:
+    ChannelNumbersOnly()
+    {
+        setValue(false);
+        setLabel(QObject::tr("Logical Channel Numbers required"));
+        setHelpText(
+            QObject::tr(
+                "If set, only services with a Logical Channel Number will "
+                "be added during the scan. This will filter out services "
+                "for set-top-box firmware download and video-on-demand "
+                "that can be present on DVB-C networks."));
+    };
+};
+
 class AddFullTS : public TransMythUICheckBoxSetting
 {
   public:

@@ -88,7 +88,8 @@ class TestMythSystemLegacy: public QObject
 
     void constructed_command_is_run(void)
     {
-        MythSystemLegacy cmd(QString("echo %1").arg(__FUNCTION__), kMSStdOut);
+        MythSystemLegacy cmd(QString("echo %1; sleep 1").arg(__FUNCTION__),
+                             kMSStdOut | kMSRunShell);
         Go(cmd);
         QVERIFY(QString(cmd.ReadAll()).contains(__FUNCTION__));
     }
@@ -139,7 +140,8 @@ class TestMythSystemLegacy: public QObject
     // kMSStdOut             -- allow access to stdout
     void stdout_works(void)
     {
-        MythSystemLegacy cmd(QString("echo %1").arg(__FUNCTION__), kMSStdOut);
+        MythSystemLegacy cmd(QString("echo %1; sleep 1").arg(__FUNCTION__),
+                             kMSStdOut | kMSRunShell);
         Go(cmd);
         QVERIFY(cmd.GetStatus() == 0);
         QVERIFY(QString(cmd.ReadAll()).contains(__FUNCTION__));
@@ -148,7 +150,7 @@ class TestMythSystemLegacy: public QObject
     // kMSStdErr             -- allow access to stderr
     void stderr_works(void)
     {
-        MythSystemLegacy cmd(QString("echo %1 >&2").arg(__FUNCTION__),
+        MythSystemLegacy cmd(QString("echo %1 >&2; sleep 1").arg(__FUNCTION__),
                        kMSRunShell | kMSStdErr);
         Go(cmd);
         QVERIFY(cmd.GetStatus() == 0);
@@ -158,7 +160,7 @@ class TestMythSystemLegacy: public QObject
     // kMSRunShell           -- run process through shell
     void shell_used_when_requested(void)
     {
-        MythSystemLegacy cmd("if [ x != y ] ; then echo X ; else echo Y ; fi",
+        MythSystemLegacy cmd("if [ x != y ] ; then echo X ; else echo Y ; fi; sleep 1",
                        kMSRunShell | kMSStdOut);
         Go(cmd);
         QVERIFY(QString(cmd.ReadAll()).contains("X"));
@@ -166,7 +168,7 @@ class TestMythSystemLegacy: public QObject
 
     void shell_not_used_when_not_requested(void)
     {
-        MythSystemLegacy cmd("if [ x != y ] ; then echo X ; else echo Y ; fi",
+        MythSystemLegacy cmd("if [ x != y ] ; then echo X ; else echo Y ; fi; sleep 1",
                        kMSStdOut);
         Go(cmd);
         QVERIFY(!QString(cmd.ReadAll()).contains("X"));

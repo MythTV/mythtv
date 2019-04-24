@@ -166,6 +166,9 @@ public:
         QList<RefCountHandler<T> >::operator=(other);
         return *this;
     }
+
+    RefCountedList<T>() = default;
+    RefCountedList<T>(const RefCountedList<T>&) = default;
 };
 
 typedef RefCountedList<ReferenceCounter> ReferenceCounterList;

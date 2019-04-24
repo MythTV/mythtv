@@ -95,6 +95,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
                 m_recStat(o.m_recStat)
         {}
 
+        UIGTCon& operator=(const UIGTCon&) = default;
+
         QRect m_drawArea;
         QString m_title;
         QString m_category;

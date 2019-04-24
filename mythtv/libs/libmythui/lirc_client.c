@@ -1866,6 +1866,12 @@ int lirc_nextcode(struct lirc_state *state, char **code)
 	}
 	/* copy first line to buffer (code) and move remaining chars to
 	   state->lirc_buffers start */
+
+        // Cppcheck doesn't parse the previous loop properly.  The
+        // only way for the loop to exit and execute the next line of
+        // code is if end becomes non-null.
+        //
+        // cppcheck-suppress nullPointerArithmeticRedundantCheck
 	end++;
 	end_len=strlen(end);
 	c=end[0];

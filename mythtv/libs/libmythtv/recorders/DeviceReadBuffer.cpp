@@ -83,16 +83,17 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     m_buffer        = new (nothrow) unsigned char[m_size + m_dev_read_size];
     m_readPtr       = m_buffer;
     m_writePtr      = m_buffer;
-    m_endPtr        = m_buffer + m_size;
 
     // Initialize buffer, if it exists
     if (!m_buffer)
     {
+        m_endPtr = nullptr;
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to allocate buffer of size %1 = %2 + %3")
                 .arg(m_size+m_dev_read_size).arg(m_size).arg(m_dev_read_size));
         return false;
     }
+    m_endPtr = m_buffer + m_size;
     memset(m_buffer, 0xFF, m_size + m_read_quanta);
 
     // Initialize statistics

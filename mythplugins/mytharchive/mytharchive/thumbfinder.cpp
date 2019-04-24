@@ -256,10 +256,8 @@ void ThumbFinder::loadCutList()
     ProgramInfo *progInfo = getProgramInfoForFile(m_archiveItem->filename);
 
     if (progInfo && m_archiveItem->hasCutlist)
-    {
         progInfo->QueryCutList(m_deleteMap);
-        delete progInfo;
-    }
+    delete progInfo;
 
     if (m_deleteMap.isEmpty())
     {

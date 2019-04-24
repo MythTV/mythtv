@@ -78,6 +78,10 @@ using namespace std;
 #include "mythpainter_d3d9.h"
 #endif
 
+#ifdef Q_OS_ANDROID
+#include <QtAndroid>
+#endif
+
 #define GESTURE_TIMEOUT 1000
 #define STANDBY_TIMEOUT 90 // Minutes
 #define LONGPRESS_INTERVAL 1000
@@ -498,6 +502,10 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(this, SIGNAL(signalSetDrawEnabled(bool)),
             this, SLOT(SetDrawEnabled(bool)),
             Qt::BlockingQueuedConnection);
+#ifdef Q_OS_ANDROID
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
+            this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
+#endif
 
     // We need to listen for playback start/end events
     gCoreContext->addListener(this);
@@ -1190,6 +1198,10 @@ void MythMainWindow::DelayedAction(void)
 {
     setFixedSize(QSize(d->m_screenwidth, d->m_screenheight));
     Show();
+
+#ifdef Q_OS_ANDROID
+    QtAndroid::hideSplashScreen();
+#endif
 }
 
 void MythMainWindow::InitKeys()
@@ -2993,4 +3005,19 @@ void MythMainWindow::DisableIdleTimer(bool disableIdle)
         QMetaObject::invokeMethod(d->m_idleTimer, "start");
 }
 
+void MythMainWindow::onApplicationStateChange(Qt::ApplicationState state)
+{
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Application State Changed to %1").arg(state));
+    switch (state)
+    {
+        case Qt::ApplicationState::ApplicationActive:
+            PopDrawDisabled();
+            break;
+        case Qt::ApplicationState::ApplicationSuspended:
+            PushDrawDisabled();
+            break;
+        default:
+            break;
+    }
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

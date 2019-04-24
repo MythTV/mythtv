@@ -198,7 +198,7 @@ bool Scheduler::VerifyCards(void)
         else if (!subquery.next())
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("Listings source '%1' is defined, "
+                QString("Video source '%1' is defined, "
                         "but is not attached to a card input.")
                     .arg(query.value(1).toString()));
         }

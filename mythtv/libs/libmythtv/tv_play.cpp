@@ -1003,6 +1003,11 @@ TV::TV(void)
 
     InitFromDB();
 
+#ifdef Q_OS_ANDROID
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
+            this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
+#endif
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Finished creating TV object");
 }
 
@@ -13379,6 +13384,38 @@ QString TV::GetLiveTVIndex(const PlayerContext *ctx) const
     (void)ctx;
     return QString();
 #endif
+}
+
+void TV::onApplicationStateChange(Qt::ApplicationState state)
+{
+    switch (state)
+    {
+        case Qt::ApplicationState::ApplicationActive:
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, "Resuming playback");
+            PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+            SetBookmark(ctx, true);
+            DoSetPauseState(ctx, m_suspendedPause);
+            ReturnPlayerLock(ctx);
+            m_suspended = false;
+            break;
+        }
+        case Qt::ApplicationState::ApplicationSuspended:
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, "Suspending playback");
+            m_suspended = true;
+            PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+            vector<bool> do_pause;
+            for (uint i = 0; i < m_player.size(); i++)
+                do_pause.push_back(true);
+            m_suspendedPause = DoSetPauseState(ctx, do_pause);
+            SetBookmark(ctx, false);
+            ReturnPlayerLock(ctx);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

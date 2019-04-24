@@ -1876,11 +1876,13 @@ static int64_t getFrameCount(const QString &filename, float fps)
             {
                 // keyframedist should be set in the fileheader so no
                 // need to try to determine it in this case
+                delete progInfo;
                 return 0;
             }
         }
     }
 
+    delete progInfo;
     if (posMap.empty())
         return 0; // no position map in recording
 

@@ -36,6 +36,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
                           const QString &desc) :
             m_name(name), m_desc(desc),
             m_settings(AudioOutputSettings(true)) { };
+        AudioDeviceConfig(const AudioDeviceConfig &) = default;
+        AudioDeviceConfig(AudioDeviceConfig &&) = default;
+        AudioDeviceConfig &operator= (const AudioDeviceConfig &) = default;
+        AudioDeviceConfig &operator= (AudioDeviceConfig &&) = default;
     };
 
     typedef QVector<AudioDeviceConfig> ADCVect;

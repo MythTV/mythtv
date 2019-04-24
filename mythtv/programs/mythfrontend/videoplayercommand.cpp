@@ -63,6 +63,7 @@ struct VideoPlayProc
 
   public:
     virtual ~VideoPlayProc() = default;
+    VideoPlayProc(const VideoPlayProc&) = default;
 
     // returns true if item played
     virtual bool Play() const = 0;

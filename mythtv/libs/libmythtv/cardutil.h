@@ -374,26 +374,30 @@ class MTV_PUBLIC CardUtil
     static bool         IsDVB(uint inputid)
         { return "DVB" == GetRawInputType(inputid); }
     static bool         IsDVBInputType(const QString &inputType);
-    static QString      ProbeDVBFrontendName(const QString &device);
-    static QStringList  ProbeDeliverySystems(int fd_frontend);
     static QStringList  ProbeDeliverySystems(const QString &device);
-    static DTVModulationSystem ProbeCurrentDeliverySystem(int fd_frontend);
-    static DTVModulationSystem ProbeCurrentDeliverySystem(const QString &device);
-    static DTVTunerType ProbeTunerType(int fd_frontend);
-    static DTVTunerType ProbeTunerType(const QString &device);
-    static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
-    static DTVTunerType GetTunerType(uint inputid);
-    static DTVModulationSystem GetDeliverySystem(uint inputid);
+    static QStringList  ProbeDeliverySystems(int fd_frontend);
     static QString      ProbeDVBType(const QString &device);
+    static QString      ProbeDVBFrontendName(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
     static uint         GetMinSignalMonitoringDelay(const QString &device);
-    static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
-    static InputNames   GetConfiguredDVBInputs(const QString &device);
+    static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
+    static DTVTunerType GetTunerType(uint inputid);
+    static DTVTunerType ProbeTunerType(int fd_frontend);
+    static DTVTunerType ProbeTunerType(const QString &device);
+    static DTVModulationSystem GetDeliverySystem(uint inputid);
+    static DTVModulationSystem ProbeCurrentDeliverySystem(const QString &device);
+    static DTVModulationSystem ProbeCurrentDeliverySystem(int fd_frontend);
+    static DTVModulationSystem ProbeBestDeliverySystem(uint inputid, int fd);
+    static DTVModulationSystem GetOrProbeDeliverySystem(uint inputid, int fd);
     static int          SetDefaultDeliverySystem(uint inputid, int fd);
     static int          SetDeliverySystem(uint inputid);
     static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys);
     static int          SetDeliverySystem(uint inputid, int fd);
     static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd);
+    static int          OpenVideoDevice(int inputid);
+    static int          OpenVideoDevice(const QString &device);
+    static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
+    static InputNames   GetConfiguredDVBInputs(const QString &device);
 
     // V4L info
     static bool         hasV4L2(int videofd);

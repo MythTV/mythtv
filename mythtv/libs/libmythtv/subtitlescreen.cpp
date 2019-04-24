@@ -483,10 +483,11 @@ void SubtitleFormat::Load(const QString &family,
         resultFont = providerBaseFont;
     MythUIShape *resultBG =
         dynamic_cast<MythUIShape *>(baseParent->GetChild(prefix));
+
+    // The providerBaseShape object is not leaked here.  It is added
+    // to a list of children in its base class constructor.
     if (!resultBG)
         resultBG = providerBaseShape;
-    else
-        delete providerBaseShape;
     MythFontProperties *testFont = negParent->GetFont(prefix);
     if (!testFont)
         testFont = negFont;

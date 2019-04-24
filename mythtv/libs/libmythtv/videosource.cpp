@@ -153,7 +153,7 @@ class SchedGroup : public MythUICheckBoxSetting
         MythUICheckBoxSetting(new CardInputDBStorage(this, parent, "schedgroup"))
     {
         setLabel(QObject::tr("Schedule as group"));
-        setValue(false);
+        setValue(true);
         setHelpText(
             QObject::tr(
                 "Schedule all virtual inputs on this device as a group.  "
@@ -1370,6 +1370,9 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         tmpdevice.model    = model;
         tmpdevice.cardip   = devip;
         tmpdevice.deviceid = devid;
+        // Fully specify object.  Checkboxes will be added later when
+        // the configuration group is created.
+        tmpdevice.checkbox = nullptr;
         m_deviceList[tmpdevice.deviceid] = tmpdevice;
     }
 
@@ -2290,7 +2293,9 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     connect(m_device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
 
-    probeCard(m_device->getValue());
+    const QString &device_name = m_device->getValue();
+    if (!device_name.isEmpty())
+        probeCard(device_name);
 }
 
 void V4L2encGroup::probeCard(const QString &device_name)
@@ -3085,9 +3090,6 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
             this,       SLOT(  SetSourceID (const QString&)));
     connect(ingrpbtn,   SIGNAL(clicked()),
             this,       SLOT(  CreateNewInputGroup()));
-    if (m_schedGroup)
-        connect(m_instanceCount, SIGNAL(valueChanged(const QString &)),
-                this,            SLOT(UpdateSchedGroup(const QString &)));
 }
 
 CardInput::~CardInput()
@@ -3107,14 +3109,6 @@ void CardInput::SetSourceID(const QString &sourceid)
     m_scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
     m_srcFetch->setEnabled(enable);
-}
-
-void CardInput::UpdateSchedGroup(const QString &val)
-{
-    int value = val.toInt();
-    if (value <= 1)
-        m_schedGroup->setValue(false);
-    m_schedGroup->setEnabled(value > 1);
 }
 
 QString CardInput::getSourceName(void) const
@@ -3747,7 +3741,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         }
         for (; it != delsys.end(); it++)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("DVBCardType: add deliverysystem:%1")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
                 .arg(*it));
 
             m_cardType->addSelection(*it, *it);

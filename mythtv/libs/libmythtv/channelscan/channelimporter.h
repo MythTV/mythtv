@@ -76,11 +76,16 @@ class MTV_PUBLIC ChannelImporter
   public:
     ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
-                    bool fta_only, ServiceRequirements service_requirements,
+                    bool fta_only, bool lcn_only,
+                    ServiceRequirements service_requirements,
                     bool success = false) :
-        m_use_gui(gui), m_is_interactive(interactive),
+        m_use_gui(gui),
+        m_is_interactive(interactive),
         m_do_delete(_delete),
-        m_do_insert(insert), m_do_save(save), m_fta_only(fta_only),
+        m_do_insert(insert),
+        m_do_save(save),
+        m_fta_only(fta_only),
+        m_lcn_only(lcn_only),
         m_success(success),
         m_service_requirements(service_requirements) { }
 
@@ -133,6 +138,7 @@ class MTV_PUBLIC ChannelImporter
 
     void CleanupDuplicates(ScanDTVTransportList &transports) const;
     void FilterServices(ScanDTVTransportList &transports) const;
+    void FilterChannelNumber(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;
 
@@ -228,6 +234,8 @@ class MTV_PUBLIC ChannelImporter
     bool                m_do_save;
     /// Only FreeToAir (non-encrypted) channels desired post scan?
     bool                m_fta_only;
+    /// Only services with logical channel numbers desired post scan?
+    bool                m_lcn_only;
     /// To pass information IPTV channel scan succeeded
     bool                m_success {false};
     /// Services desired post scan
