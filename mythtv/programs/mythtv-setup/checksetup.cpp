@@ -177,7 +177,7 @@ bool checkChannelPresets(QStringList &probs)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT cardid, startchan, sourceid, inputname"
+    query.prepare("SELECT cardid, startchan, sourceid, inputname, parentid"
                   " FROM capturecard;");
 
     if (!query.exec() || !query.isActive())
@@ -191,6 +191,11 @@ bool checkChannelPresets(QStringList &probs)
         int cardid    = query.value(0).toInt();
         QString startchan = query.value(1).toString();
         int sourceid  = query.value(2).toInt();
+        int parentid = query.value(4).toInt();
+
+        // Warnings only for real devices
+        if (parentid != 0)
+            continue;
 
         if (0 == sourceid)
         {
