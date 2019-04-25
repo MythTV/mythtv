@@ -376,6 +376,7 @@ class MTV_PUBLIC CardUtil
     static bool         IsDVBInputType(const QString &inputType);
     static QStringList  ProbeDeliverySystems(const QString &device);
     static QStringList  ProbeDeliverySystems(int fd_frontend);
+    static QString      ProbeDefaultDeliverySystem(const QString &device);
     static QString      ProbeDVBType(const QString &device);
     static QString      ProbeDVBFrontendName(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
@@ -387,7 +388,7 @@ class MTV_PUBLIC CardUtil
     static DTVModulationSystem GetDeliverySystem(uint inputid);
     static DTVModulationSystem ProbeCurrentDeliverySystem(const QString &device);
     static DTVModulationSystem ProbeCurrentDeliverySystem(int fd_frontend);
-    static DTVModulationSystem ProbeBestDeliverySystem(uint inputid, int fd);
+    static DTVModulationSystem ProbeBestDeliverySystem(int fd);
     static DTVModulationSystem GetOrProbeDeliverySystem(uint inputid, int fd);
     static int          SetDefaultDeliverySystem(uint inputid, int fd);
     static int          SetDeliverySystem(uint inputid);
