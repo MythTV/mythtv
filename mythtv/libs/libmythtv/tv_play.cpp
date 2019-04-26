@@ -606,7 +606,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", ACTION_LISTRECORDEDEPISODES, QT_TRANSLATE_NOOP("MythControls",
             "List recorded episodes"), "");
     /*
-     * TODO when consolidating database version 1348 into initialize, you can delete
+     * TODO DB update needs to perform the necessary conversion and delete
      * the following upgrade code and replace bkmKeys and togBkmKeys  with "" in the
      * REG_KEY for ACTION_SETBOOKMARK and ACTION_TOGGLEBOOKMARK.
      */
