@@ -3432,7 +3432,7 @@ nullptr
     if (dbver == "1349")
     {
         const char *updates[] = {
-            "DELETE FROM settings WHERE value='AltClearSavedPosition';",
+            // Incorrect DB update removed
             nullptr
         };
         if (!performActualUpdate(updates, "1350", dbver))
