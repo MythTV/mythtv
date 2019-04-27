@@ -1063,7 +1063,7 @@ class DVBNoSeqStart : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_wait_for_seqstart"))
     {
-        setLabel(QObject::tr("Wait for SEQ start header."));
+        setLabel(QObject::tr("Wait for SEQ start header"));
         setValue(true);
         setHelpText(
             QObject::tr("If enabled, drop packets from the start of a DVB "
