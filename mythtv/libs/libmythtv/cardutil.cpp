@@ -702,19 +702,24 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
     QString ret = "ERROR_UNKNOWN";
 
 #ifdef USING_DVB
-    int fd_frontend = OpenVideoDevice(device);
-    if  (fd_frontend > 0)
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    QByteArray dev = dvbdev.toLatin1();
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
+    if (fd_frontend < 0)
+        return "ERROR_OPEN";
+
+    struct dvb_frontend_info info;
+    memset(&info, 0, sizeof(info));
+    int err = ioctl(fd_frontend, FE_GET_INFO, &info);
+    if (err < 0)
     {
-        struct dvb_frontend_info info;
-        memset(&info, 0, sizeof(info));
-        int err = ioctl(fd_frontend, FE_GET_INFO, &info);
-        ret = err < 0 ? "ERROR_PROBE" : info.name;
         close(fd_frontend);
+        return "ERROR_PROBE";
     }
-    else
-    {
-        ret = "ERROR_OPEN";
-    }
+
+    ret = info.name;
+
+    close(fd_frontend);
 #else
     Q_UNUSED(device);
 #endif // USING_DVB
