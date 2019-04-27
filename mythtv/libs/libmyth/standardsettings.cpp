@@ -182,7 +182,7 @@ bool StandardSetting::haveChanged()
     if (m_haveChanged)
     {
         LOG(VB_GENERAL, LOG_DEBUG,
-            QString("Setting %1 changed to %2").arg(getLabel())
+            QString("Setting '%1' changed to %2").arg(getLabel())
             .arg(getValue()));
         return true;
     }
