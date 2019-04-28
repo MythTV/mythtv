@@ -1970,7 +1970,12 @@ void MythMainWindow::HandleTVPower(bool poweron)
 #endif
 }
 
-/// \brief Static convenience method to initiate a callback into the UI thread and wait for the result.
+/*! \brief Static convenience method to initiate a callback into the UI thread and wait for the result.
+ *
+ * \note We never time out the wait condition as there is currently no safe way of cancelling the callback
+ * and hence ensuring the QWaitCondition and QMutex are still valid if the callback is processed late. Instead
+ * we must ensure QCoreApplication::processEvents is called in a timely manner.
+*/
 void MythMainWindow::HandleCallback(const QString &Debug, MythCallbackEvent::Callback Function,
                                     void *Opaque1, void *Opaque2)
 {
@@ -1987,7 +1992,7 @@ void MythMainWindow::HandleCallback(const QString &Debug, MythCallbackEvent::Cal
     MythCallbackEvent *event = new MythCallbackEvent(Function, &wait, Opaque1, Opaque2);
     QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
     int count = 0;
-    while (!wait.wait(&lock, 100) && ((count += 100) < 1100))
+    while (!wait.wait(&lock, 100) && (count += 100))
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1ms for %2").arg(count).arg(Debug));
     lock.unlock();
 }
