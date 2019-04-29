@@ -34,6 +34,7 @@ DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ./recorders/HLS
+DEPENDPATH  += ./mheg
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -543,19 +544,19 @@ using_frontend {
 
     using_mheg {
         # DSMCC stuff
-        HEADERS += dsmcc.h                  dsmcccache.h
-        HEADERS += dsmccbiop.h              dsmccobjcarousel.h
-        HEADERS += dsmccreceiver.h
-        SOURCES += dsmcc.cpp                dsmcccache.cpp
-        SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
+        HEADERS += mheg/dsmcc.h             mheg/dsmcccache.h
+        HEADERS += mheg/dsmccbiop.h         mheg/dsmccobjcarousel.h
+        HEADERS += mheg/dsmccreceiver.h
+        SOURCES += mheg/dsmcc.cpp           mheg/dsmcccache.cpp
+        SOURCES += mheg/dsmccbiop.cpp       mheg/dsmccobjcarousel.cpp
 
          # MHEG interaction channel
-        HEADERS += mhegic.h
-        SOURCES += mhegic.cpp
+        HEADERS += mheg/mhegic.h
+        SOURCES += mheg/mhegic.cpp
 
         # MHEG/MHI stuff
-        HEADERS += interactivetv.h          mhi.h
-        SOURCES += interactivetv.cpp        mhi.cpp
+        HEADERS += mheg/interactivetv.h     mheg/mhi.h
+        SOURCES += mheg/interactivetv.cpp   mheg/mhi.cpp
         DEFINES += USING_MHEG
     }
 
