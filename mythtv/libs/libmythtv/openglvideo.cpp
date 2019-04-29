@@ -72,13 +72,7 @@ OpenGLVideo::~OpenGLVideo()
         return;
 
     m_render->makeCurrent();
-
-    if (m_frameBuffer)
-        m_render->DeleteFramebuffer(m_frameBuffer);
-    if (m_frameBufferTexture)
-        m_render->DeleteTexture(m_frameBufferTexture);
     ResetFrameFormat();
-
     m_render->doneCurrent();
     m_render->DecrRef();
 }
@@ -128,8 +122,6 @@ void OpenGLVideo::SetMasterViewport(QSize Size)
 
 void OpenGLVideo::SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim)
 {
-    if ((m_videoDim == VideoDim) && (m_videoDispDim == VideoDispDim))
-        return;
     m_videoDim = VideoDim;
     m_videoDispDim = VideoDispDim;
 }
@@ -469,6 +461,10 @@ void OpenGLVideo::ResetFrameFormat(void)
     m_textureTarget = QOpenGLTexture::Target2D;
     m_inputTextureSize = QSize();
     m_hardwareDeinterlacer = QString();
+    m_render->DeleteFramebuffer(m_frameBuffer);
+    m_render->DeleteTexture(m_frameBufferTexture);
+    m_frameBuffer = nullptr;
+    m_frameBufferTexture = nullptr;
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
