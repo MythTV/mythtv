@@ -8,7 +8,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "videoout_d3d.h"
 #include "osd.h"
-#include "filtermanager.h"
 #include "fourcc.h"
 #include "videodisplayprofile.h"
 #include "mythmainwindow.h"
@@ -476,7 +475,6 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
 }
 
 void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                  FilterChain *filterList,
                                   const PIPMap &pipPlayers,
                                   FrameScanType scan)
 {
@@ -513,27 +511,11 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (frame)
         dummy = frame->dummy;
-    bool deint_proc = m_deinterlacing && (m_deintFilter != nullptr) &&
-                      !dummy;
-
-    if (filterList && !gpu && !dummy)
-        filterList->ProcessFrame(frame);
 
     bool safepauseframe = pauseframe && !IsBobDeint() && !gpu;
-    if (deint_proc && m_deinterlaceBeforeOSD &&
-       (!pauseframe || safepauseframe))
-    {
-        m_deintFilter->ProcessFrame(frame, scan);
-    }
 
     if (!window.IsEmbedding())
         ShowPIPs(frame, pipPlayers);
-
-    if ((!pauseframe || safepauseframe) &&
-        deint_proc && !m_deinterlaceBeforeOSD)
-    {
-        m_deintFilter->ProcessFrame(frame, scan);
-    }
 
     // Test the device
     m_render_valid |= m_render->Test(m_render_reset);

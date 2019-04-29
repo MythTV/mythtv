@@ -22,7 +22,7 @@ class VideoOutputOpenGL : public VideoOutput
               WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId) override;
 
     void PrepareFrame(VideoFrame *Frame, FrameScanType, OSD *Osd) override;
-    void ProcessFrame(VideoFrame *Frame, OSD *Osd, FilterChain *FilterList,
+    void ProcessFrame(VideoFrame *Frame, OSD *Osd,
                       const PIPMap &PiPPlayers, FrameScanType Scan) override;
     void Show(FrameScanType ) override;
     void ClearAfterSeek(void) override;

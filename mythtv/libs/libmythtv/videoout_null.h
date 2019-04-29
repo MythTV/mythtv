@@ -32,7 +32,6 @@ class VideoOutputNull : public VideoOutput
     void DrawUnusedRects(bool sync = true) override; // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,

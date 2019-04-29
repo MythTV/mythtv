@@ -111,7 +111,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # libmythtv proper
 
 # Headers needed by frontend & backend
-HEADERS += filter.h                 format.h
+HEADERS += format.h
 HEADERS += mythframe.h
 
 # Misc. needed by backend/frontend
@@ -121,7 +121,7 @@ HEADERS += dbcheck.h
 HEADERS += videodbcheck.h
 HEADERS += tvremoteutil.h           tv.h
 HEADERS += jobqueue.h
-HEADERS += filtermanager.h          recordingprofile.h
+HEADERS += recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
 HEADERS += videometadatautil.h
@@ -151,7 +151,7 @@ SOURCES += dbcheck.cpp
 SOURCES += videodbcheck.cpp
 SOURCES += tvremoteutil.cpp         tv.cpp
 SOURCES += jobqueue.cpp
-SOURCES += filtermanager.cpp        recordingprofile.cpp
+SOURCES += recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
 SOURCES += videometadatautil.cpp

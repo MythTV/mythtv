@@ -4,7 +4,6 @@
 #include "mythplayer.h"
 #include "videooutbase.h"
 #include "videodisplayprofile.h"
-#include "filtermanager.h"
 #include "osd.h"
 #include "mythuihelper.h"
 #include "mythrender_opengl.h"
@@ -358,8 +357,8 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
-                                     FilterChain *FilterList,const PIPMap &PiPPlayers,
-                                     FrameScanType Scan)
+                                     const PIPMap &PiPPlayers,
+                                     FrameScanType)
 {
     if (!m_render)
         return;
@@ -400,22 +399,12 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
 
     bool swframe   = Frame ? !format_is_hw(Frame->codec) : false;
     bool dummy     = Frame ? Frame->dummy : false;
-    bool deintproc = m_deinterlacing && (m_deintFilter != nullptr);
-
-    if (FilterList && swframe && !dummy)
-        FilterList->ProcessFrame(Frame);
-
-    if (swframe && deintproc && !dummy && m_deinterlaceBeforeOSD)
-        m_deintFilter->ProcessFrame(Frame, Scan);
 
     if (!window.IsEmbedding())
     {
         m_openGLVideoPiPActive = nullptr;
         ShowPIPs(Frame, PiPPlayers);
     }
-
-    if (swframe && deintproc && !dummy && !m_deinterlaceBeforeOSD)
-        m_deintFilter->ProcessFrame(Frame, Scan);
 
     if (m_openGLVideo && swframe && !dummy)
         m_openGLVideo->ProcessFrame(Frame);
@@ -687,18 +676,6 @@ bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &Overrid
         m_openGLVideo->SetDeinterlacing(false);
         VideoOutput::SetupDeinterlace(Interlaced, OverrideFilter);
         return m_deinterlacing;
-    }
-
-    // clear any non hardware filters
-    if (m_deintFiltMan)
-    {
-        delete m_deintFiltMan;
-        m_deintFiltMan = nullptr;
-    }
-    if (m_deintFilter)
-    {
-        delete m_deintFilter;
-        m_deintFilter = nullptr;
     }
 
     if (m_videoProfile.contains("hw"))

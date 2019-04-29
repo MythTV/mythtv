@@ -40,8 +40,6 @@ class RemoteEncoder;
 class MythSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
-class FilterManager;
-class FilterChain;
 class VideoSync;
 class LiveTVChain;
 class TV;
@@ -166,7 +164,6 @@ class MTV_PUBLIC MythPlayer
     void SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx);
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played);
-    void SetVideoFilters(const QString &overridefilter);
     void SetEof(EofState eof);
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
@@ -579,7 +576,6 @@ class MTV_PUBLIC MythPlayer
 
   protected:
     // Private initialization stuff
-    void InitFilters(void);
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height);
     virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
@@ -809,15 +805,6 @@ class MTV_PUBLIC MythPlayer
     volatile bool  pip_active;
     volatile bool  pip_visible;
     PIPLocation    pip_default_loc;
-
-    // Filters
-    QMutex   videofiltersLock;
-    QString  videoFiltersForProgram;
-    QString  videoFiltersOverride;
-    int      postfilt_width;  ///< Post-Filter (output) width
-    int      postfilt_height; ///< Post-Filter (output) height
-    FilterChain   *videoFilters;
-    FilterManager *FiltMan;
 
     // Commercial filtering
     CommBreakMap   commBreakMap;

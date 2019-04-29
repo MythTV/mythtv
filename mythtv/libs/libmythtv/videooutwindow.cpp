@@ -38,8 +38,6 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#include "filtermanager.h"
-
 static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);

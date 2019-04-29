@@ -4,7 +4,6 @@
 #define VIDEOOUTBASE_H_
 
 #include "mythframe.h"
-#include "filter.h"
 
 #include <QSize>
 #include <QRect>
@@ -31,8 +30,6 @@ class MythYUVAPainter;
 class MythImage;
 class MythPlayer;
 class OSD;
-class FilterChain;
-class FilterManager;
 class AudioPlayer;
 class MythRender;
 
@@ -143,7 +140,6 @@ class VideoOutput
 
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
-                              FilterChain *filterList,
                               const PIPMap &pipPlayers,
                               FrameScanType scan = kScan_Ignore) = 0;
 
@@ -341,9 +337,6 @@ class VideoOutput
     // Deinterlacing
     bool           m_deinterlacing;
     QString        m_deintfiltername;
-    FilterManager *m_deintFiltMan;
-    FilterChain   *m_deintFilter;
-    bool           m_deinterlaceBeforeOSD;
 
     /// VideoBuffers instance used to track video output buffers.
     VideoBuffers vbuffers;

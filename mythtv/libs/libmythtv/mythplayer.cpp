@@ -30,7 +30,6 @@ using namespace std;
 #include "interactivescreen.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "filtermanager.h"
 #include "livetvchain.h"
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
@@ -217,10 +216,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       audio(this, (flags & kAudioMuted) != 0),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
-      // Filters
-      videoFiltersForProgram(""),   videoFiltersOverride(""),
-      postfilt_width(0),            postfilt_height(0),
-      videoFilters(nullptr),        FiltMan(new FilterManager()),
 
       forcePositionMapSync(false),  pausedBeforeEdit(false),
       speedBeforeEdit(1.0F),
@@ -310,7 +305,7 @@ MythPlayer::~MythPlayer(void)
         interactiveTV = nullptr;
     }
 
-    MythMultiLocker locker({&osdLock, &vidExitLock, &videofiltersLock});
+    MythMultiLocker locker({&osdLock, &vidExitLock});
 
     if (osd)
     {
@@ -324,18 +319,6 @@ MythPlayer::~MythPlayer(void)
     {
         delete decoderThread;
         decoderThread = nullptr;
-    }
-
-    if (FiltMan)
-    {
-        delete FiltMan;
-        FiltMan = nullptr;
-    }
-
-    if (videoFilters)
-    {
-        delete videoFilters;
-        videoFilters = nullptr;
     }
 
     if (videosync)
@@ -482,9 +465,6 @@ void MythPlayer::SetPlayingInfo(const ProgramInfo &pginfo)
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     player_ctx->SetPlayingInfo(&pginfo);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    SetVideoFilters("");
-    InitFilters();
 }
 
 void MythPlayer::SetPlaying(bool is_playing)
@@ -550,8 +530,6 @@ bool MythPlayer::InitVideo(void)
     if (decoder && decoder->GetVideoInverted())
         videoOutput->SetVideoFlip();
 
-    InitFilters();
-
     return true;
 }
 
@@ -609,7 +587,7 @@ void MythPlayer::ReinitVideo(void)
 
     bool aspect_only = false;
     {
-        MythMultiLocker locker({&osdLock, &vidExitLock, &videofiltersLock});
+        MythMultiLocker locker({&osdLock, &vidExitLock});
 
         videoOutput->SetVideoFrameRate(video_frame_rate);
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
@@ -643,15 +621,10 @@ void MythPlayer::ReinitVideo(void)
     }
 
     if (!aspect_only)
-    {
         ClearAfterSeek();
-        InitFilters();
-    }
 
     if (textDisplayMode)
-    {
         EnableSubtitles(true);
-    }
 }
 
 static inline QString toQString(FrameScanType scan) {
@@ -777,8 +750,6 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 
 void MythPlayer::SetScanType(FrameScanType scan)
 {
-    QMutexLocker locker(&videofiltersLock);
-
     if (!is_current_thread(playerThread))
     {
         resetScan = scan;
@@ -1093,71 +1064,6 @@ void MythPlayer::SetFramesPlayed(uint64_t played)
         videoOutput->SetFramesPlayed(played);
 }
 
-void MythPlayer::SetVideoFilters(const QString &override)
-{
-    videoFiltersOverride = override;
-    videoFiltersForProgram = player_ctx->GetFilters(
-                             (FlagIsSet(kVideoIsNull)) ? "onefield" : "");
-}
-
-void MythPlayer::InitFilters(void)
-{
-    QString filters = "";
-    if (videoOutput)
-        filters = videoOutput->GetFilters();
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("InitFilters() vo '%1' prog '%2' over '%3'")
-            .arg(filters).arg(videoFiltersForProgram)
-            .arg(videoFiltersOverride));
-
-    if (!videoFiltersForProgram.isEmpty())
-    {
-        if (videoFiltersForProgram[0] != '+')
-        {
-            filters = videoFiltersForProgram;
-        }
-        else
-        {
-            if ((filters.length() > 1) && (!filters.endsWith(",")))
-                filters += ",";
-            filters += videoFiltersForProgram.mid(1);
-        }
-    }
-
-    if (!videoFiltersOverride.isEmpty())
-        filters = videoFiltersOverride;
-
-    AvFormatDecoder *afd = dynamic_cast<AvFormatDecoder *>(decoder);
-    if (afd && afd->GetVideoInverted() && !filters.contains("vflip"))
-        filters += ",vflip";
-
-    videofiltersLock.lock();
-
-    if (videoFilters)
-    {
-        delete videoFilters;
-        videoFilters = nullptr;
-    }
-
-    if (!filters.isEmpty())
-    {
-        VideoFrameType itmp = FMT_YV12;
-        VideoFrameType otmp = FMT_YV12;
-        int btmp;
-        postfilt_width = video_dim.width();
-        postfilt_height = video_dim.height();
-
-        videoFilters = FiltMan->LoadFilters(
-            filters, itmp, otmp, postfilt_width, postfilt_height, btmp);
-    }
-
-    videofiltersLock.unlock();
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadFilters('%1'..) -> 0x%2")
-            .arg(filters).arg((uint64_t)videoFilters,0,16));
-}
-
 /** \fn MythPlayer::GetFreeVideoFrames(void)
  *  \brief Returns the number of frames available for decoding onto.
  */
@@ -1292,13 +1198,7 @@ VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
 
     vidExitLock.lock();
     if (videoOutput)
-    {
         retval = videoOutput->GetLastShownFrame();
-        videofiltersLock.lock();
-        if (videoFilters && player_ctx->IsPIP())
-            videoFilters->ProcessFrame(retval);
-        videofiltersLock.unlock();
-    }
 
     if (!retval)
         vidExitLock.unlock();
@@ -2002,9 +1902,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         // into frames that were not being displayed, thereby causing
         // interruptions and slowdowns.
         osdLock.lock();
-        videofiltersLock.lock();
-        videoOutput->ProcessFrame(buffer, osd, videoFilters, pip_players, ps);
-        videofiltersLock.unlock();
+        videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
         osdLock.unlock();
     }
 
@@ -2059,13 +1957,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 kScan_Interlaced : kScan_Intr2ndField;
             osdLock.lock();
             if (m_double_process && ps != kScan_Progressive)
-            {
-                videofiltersLock.lock();
-                videoOutput->ProcessFrame(
-                        buffer, osd, videoFilters, pip_players, ps);
-                videofiltersLock.unlock();
-            }
-
+                videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
@@ -2350,9 +2242,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     if (buffer && !dropframe)
     {
         osdLock.lock();
-        videofiltersLock.lock();
-        videoOutput->ProcessFrame(buffer, osd, videoFilters, pip_players, ps);
-        videofiltersLock.unlock();
+        videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
         osdLock.unlock();
     }
 
@@ -2366,7 +2256,6 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         avsync_audiopaused = true;
         audio.Pause(true);
     }
-
 
     if (dropframe)
         numdroppedframes++;
@@ -2404,13 +2293,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 kScan_Interlaced : kScan_Intr2ndField;
             osdLock.lock();
             if (m_double_process && ps != kScan_Progressive)
-            {
-                videofiltersLock.lock();
-                videoOutput->ProcessFrame(
-                        buffer, osd, videoFilters, pip_players, ps);
-                videofiltersLock.unlock();
-            }
-
+                videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
@@ -2482,9 +2365,7 @@ void MythPlayer::DisplayPauseFrame(void)
 
     FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
     osdLock.lock();
-    videofiltersLock.lock();
-    videoOutput->ProcessFrame(nullptr, osd, videoFilters, pip_players);
-    videofiltersLock.unlock();
+    videoOutput->ProcessFrame(nullptr, osd, pip_players);
     videoOutput->PrepareFrame(nullptr, scan, osd);
     osdLock.unlock();
     videoOutput->Show(scan);
@@ -2729,8 +2610,6 @@ void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
         return;
 
     bool normal = play_speed > 0.99F && play_speed < 1.01F && normal_speed;
-    videofiltersLock.lock();
-
     bool hwset = decoder->GetMythCodecContext()->setDeinterlacer(true, overridefilter);
     if (hwset)
     {
@@ -2749,7 +2628,6 @@ void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
       && (!CanSupportDoubleRate() || !normal))
         FallbackDeint();
 
-    videofiltersLock.unlock();
 }
 
 void MythPlayer::VideoStart(void)
@@ -4226,7 +4104,6 @@ void MythPlayer::ChangeSpeed(void)
         bool inter  = (kScan_Interlaced   == m_scan  ||
                        kScan_Intr2ndField == m_scan);
 
-        videofiltersLock.lock();
         bool doublerate = m_double_framerate || decoder->GetMythCodecContext()->getDoubleRate();
         if (doublerate && !play_1)
         {
@@ -4242,7 +4119,6 @@ void MythPlayer::ChangeSpeed(void)
             if (!hwdeint)
                 videoOutput->BestDeint();
         }
-        videofiltersLock.unlock();
         m_double_framerate = videoOutput->NeedsDoubleFramerate();
         m_double_process = videoOutput->IsExtraProcessingRequired();
     }
@@ -5345,18 +5221,6 @@ bool MythPlayer::TranscodeGetNextFrame(
     if (GetEof() != kEofStateNone)
       return false;
     is_key = decoder->IsLastFrameKey();
-
-    videofiltersLock.lock();
-    if (videoFilters)
-    {
-        FrameScanType ps = m_scan;
-        if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
-            ps = kScan_Progressive;
-
-        videoFilters->ProcessFrame(videoOutput->GetLastDecodedFrame(), ps);
-    }
-    videofiltersLock.unlock();
-
     return true;
 }
 

@@ -25,7 +25,6 @@ class VideoOutputD3D : public VideoOutput
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan) override; // VideoOutput
     void Show(FrameScanType ) override; // VideoOutput

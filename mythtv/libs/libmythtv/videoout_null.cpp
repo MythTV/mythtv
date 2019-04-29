@@ -243,7 +243,6 @@ void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
 }
 
 void VideoOutputNull::ProcessFrame(VideoFrame */*frame*/, OSD */*osd*/,
-                                   FilterChain */*filterList*/,
                                    const PIPMap &/*pipPlayers*/,
                                    FrameScanType /*scan*/)
 {

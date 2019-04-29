@@ -50,7 +50,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 
     // VideoOutput implementation
     void PrepareFrame(VideoFrame*, FrameScanType, OSD*) override;
-    void ProcessFrame(VideoFrame*, OSD*, FilterChain*, const PIPMap&, FrameScanType) override;
+    void ProcessFrame(VideoFrame*, OSD*, const PIPMap&, FrameScanType) override;
     void Show(FrameScanType) override;
     void MoveResizeWindow(QRect) override;
     void DrawUnusedRects(bool) override;

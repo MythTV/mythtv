@@ -32,9 +32,9 @@ using namespace std;
 #include "v4lrecorder.h"
 #include "format.h"
 #include "cc608decoder.h"
-#include "filter.h"
 #include "lzo/lzo1x.h"
 #include "mthread.h"
+#include "mythframe.h"
 
 #include "mythtvexp.h"
 
@@ -44,8 +44,6 @@ struct video_audio;
 class RTjpeg;
 class RingBuffer;
 class ChannelBase;
-class FilterManager;
-class FilterChain;
 class AudioInput;
 class NuppelVideoRecorder;
 
@@ -137,7 +135,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void WriteFileHeader(void);
 
     void InitBuffers(void);
-    void InitFilters(void);   
     void ResizeVideoBuffers(void);
 
     bool MJPEGInit(void);
@@ -266,10 +263,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     int                 m_mb_decision            {FF_MB_DECISION_SIMPLE};
     /// Number of threads to use for MPEG-2 and MPEG-4 encoding
     int                 m_encoding_thread_count  {1};
-
-    QString             m_videoFilterList;
-    FilterChain        *m_videoFilters           {nullptr};
-    FilterManager      *m_filtMan                {nullptr};
 
     VideoFrameType      m_inpixfmt               {FMT_YV12};
     AVPixelFormat       m_picture_format         {AV_PIX_FMT_YUV420P};

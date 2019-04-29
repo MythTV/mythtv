@@ -41,8 +41,6 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
-
-#include "filtermanager.h"
 #include "videodisplayprofile.h"
 #include "videobuffers.h"
 
@@ -577,10 +575,6 @@ bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &overridefi
     m_deintfiltername = deintfiltername;
     m_deinterlacing = interlaced;
 
-    // Remove non-openmax filters
-    delete m_deintFiltMan, m_deintFiltMan = nullptr;
-    delete m_deintFilter, m_deintFilter = nullptr;
-
     LOG(VB_PLAYBACK, LOG_INFO, LOC + __func__ + " switching " +
         (interlaced ? "on" : "off") + " '" +  deintfiltername + "'");
 
@@ -749,9 +743,7 @@ void VideoOutputOMX::UpdatePauseFrame(int64_t &disp_timecode)
  */
 // pure virtual
 void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                  FilterChain *filterList,
-                                  const PIPMap &pipPlayers,
-                                  FrameScanType scan)
+                                  const PIPMap &pipPlayers, FrameScanType)
 {
     if (IsErrored())
     {
@@ -769,18 +761,9 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(frame, &av_pause_frame);
     }
 
-    if (filterList)
-        filterList->ProcessFrame(frame);
-
-    if (m_deinterlacing && m_deintFilter && m_deinterlaceBeforeOSD)
-        m_deintFilter->ProcessFrame(frame, scan);
-
     ShowPIPs(frame, pipPlayers);
     if (osd && !window.IsEmbedding())
         DisplayOSD(frame, osd);
-
-    if (m_deinterlacing && m_deintFilter && !m_deinterlaceBeforeOSD)
-        m_deintFilter->ProcessFrame(frame, scan);
 }
 
 // tells show what frame to be show, do other last minute stuff

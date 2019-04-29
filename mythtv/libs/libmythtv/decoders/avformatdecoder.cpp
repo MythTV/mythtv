@@ -4072,7 +4072,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->dummy            = 0;
         picframe->directrendering  = m_directrendering ? 1 : 0;
         picframe->colorspace       = mpa_pic->colorspace;
-
+        picframe->pix_fmt          = mpa_pic->format;
         m_parent->ReleaseNextVideoFrame(picframe, temppts);
     }
 

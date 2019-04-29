@@ -1,7 +1,7 @@
 include config.mak
 
 MAKE_SUBDIRS = external
-QT_SUBDIRS   = libs filters html programs themes i18n locales
+QT_SUBDIRS   = libs html programs themes i18n locales
 
 ifdef CONFIG_BINDINGS_PERL
     MAKE_SUBDIRS += bindings/perl
@@ -43,8 +43,7 @@ libs/libmythbase/version.h:	version.sh force
 
 # explicit subdir dependencies
 libs: external
-filters: libs
-programs: libs filters
+programs: libs
 
 
 subdirs: $(SUBDIRS)
@@ -54,7 +53,6 @@ settings.pro: config.mak
 
 # explicit prerequisites for qmake generated makefiles
 libs/Makefile: libs/libs.pro
-filters/Makefile: filters/filters.pro
 html/Makefile: html/html.pro
 programs/Makefile: programs/programs.pro
 themes/Makefile: themes/themes.pro

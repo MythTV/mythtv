@@ -616,8 +616,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         arb->m_audioFrameSize = avfw->GetAudioFrameSize() * arb->m_channels * 2;
 
-        GetPlayer()->SetVideoFilters(
-            gCoreContext->GetSetting("HTTPLiveStreamFilters", "yadif=1:-1:1"));
+        //GetPlayer()->SetVideoFilters(
+        //    gCoreContext->GetSetting("HTTPLiveStreamFilters", "yadif=1:-1:1"));
     }
 #if CONFIG_LIBMP3LAME 
     else if (fifodir.isEmpty())
@@ -672,7 +672,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
-            GetPlayer()->SetVideoFilters(vidfilters);
+            //GetPlayer()->SetVideoFilters(vidfilters);
             newWidth = get_int_option(m_recProfile, "width");
             newHeight = get_int_option(m_recProfile, "height");
 
@@ -704,7 +704,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(newWidth).arg(newHeight));
         }
         else  // lossy and no resize
-            GetPlayer()->SetVideoFilters(vidfilters);
+        {
+            //GetPlayer()->SetVideoFilters(vidfilters);
+        }
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
         nvr->SetOption("inpixfmt", FMT_YV12);

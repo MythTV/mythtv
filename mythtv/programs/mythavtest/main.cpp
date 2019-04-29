@@ -154,7 +154,7 @@ class VideoPerformanceTest
 
             if (!decodeonly)
             {
-                vo->ProcessFrame(frame, nullptr, nullptr, dummy, scan);
+                vo->ProcessFrame(frame, nullptr, dummy, scan);
                 vo->PrepareFrame(frame, scan, nullptr);
                 vo->Show(scan);
 

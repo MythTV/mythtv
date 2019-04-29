@@ -393,8 +393,6 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     player->AdjustAudioTimecodeOffset(
                 0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
 
-    player->SetVideoFilters((m_useNullVideo) ? "onefield" : "");
-
     bool isWatchingRecording = (desiredState == kState_WatchingRecording);
     player->SetWatchingRecording(isWatchingRecording);
 

@@ -39,8 +39,6 @@ extern "C" {
 #include "libavutil/imgutils.h"
 }
 
-#include "filtermanager.h"
-
 #include "videooutbase.h"
 
 #define LOC QString("VideoOutput: ")
@@ -49,19 +47,7 @@ static QString to_comma_list(const QStringList &list);
 
 void VideoOutput::GetRenderOptions(render_opts &opts)
 {
-    FilterManager fm;
     QStringList cpudeints;
-    cpudeints += "onefield";
-    cpudeints += "linearblend";
-    cpudeints += "kerneldeint";
-    cpudeints += "kerneldoubleprocessdeint";
-    if (fm.GetFilterInfo("greedyhdeint"))
-        cpudeints += "greedyhdeint";
-    if (fm.GetFilterInfo("greedyhdoubleprocessdeint"))
-        cpudeints += "greedyhdoubleprocessdeint";
-    cpudeints += "yadifdeint";
-    cpudeints += "yadifdoubleprocessdeint";
-    cpudeints += "fieldorderdoubleprocessdeint";
     cpudeints += "none";
 
     VideoOutputNull::GetRenderOptions(opts, cpudeints);
@@ -334,9 +320,8 @@ VideoOutput::VideoOutput() :
     vsz_scale_context(nullptr),
 
     // Deinterlacing
-    m_deinterlacing(false),             m_deintfiltername("linearblend"),
-    m_deintFiltMan(nullptr),            m_deintFilter(nullptr),
-    m_deinterlaceBeforeOSD(true),
+    m_deinterlacing(false),
+    m_deintfiltername("linearblend"),
 
     // Various state variables
     errorState(kError_None),            framesPlayed(0),
@@ -387,8 +372,6 @@ VideoOutput::~VideoOutput()
 
     VideoOutput::ShutdownVideoResize();
 
-    delete m_deintFilter;
-    delete m_deintFiltMan;
     delete db_vdisp_profile;
 
     ResizeForGui();
@@ -458,13 +441,6 @@ void VideoOutput::SetVideoFrameRate(float playback_fps)
  */
 bool VideoOutput::SetDeinterlacingEnabled(bool enable)
 {
-    if (enable && m_deinterlacing)
-        return m_deinterlacing;
-
-    // if enable and no deinterlacer allocated, attempt allocate one
-    if (enable && (!m_deintFiltMan || !m_deintFilter))
-        return SetupDeinterlace(enable);
-
     m_deinterlacing = enable;
     return m_deinterlacing;
 }
@@ -492,42 +468,20 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
             return true;
     }
 
-    if (m_deintFiltMan)
-    {
-        delete m_deintFiltMan;
-        m_deintFiltMan = nullptr;
-    }
-    if (m_deintFilter)
-    {
-        delete m_deintFilter;
-        m_deintFilter = nullptr;
-    }
-
     m_deinterlacing = interlaced;
 
     if (m_deinterlacing)
     {
-        m_deinterlaceBeforeOSD = true;
-
-        VideoFrameType itmp = FMT_YV12;
-        VideoFrameType otmp = FMT_YV12;
-
         if (db_vdisp_profile)
-            m_deintfiltername =
-                db_vdisp_profile->GetFilteredDeint(overridefilter);
+            m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
         else
             m_deintfiltername = "";
-
-        m_deintFilter = nullptr;
-        m_deintFiltMan = nullptr;
 
         if (MythCodecContext::isCodecDeinterlacer(m_deintfiltername))
         {
             m_deinterlacing = false;
             return false;
         }
-
-        m_deintFiltMan = new FilterManager;
 
         if (!m_deintfiltername.isEmpty())
         {
@@ -539,35 +493,10 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
                         .arg(m_deintfiltername));
                 m_deintfiltername.clear();
             }
-            else
-            {
-                int btmp;
-                int threads = db_vdisp_profile ?
-                                db_vdisp_profile->GetMaxCPUs() : 1;
-                const QSize video_dim = window.GetVideoDim();
-                int width  = video_dim.width();
-                int height = video_dim.height();
-                m_deintFilter = m_deintFiltMan->LoadFilters(
-                    m_deintfiltername, itmp, otmp,
-                    width, height, btmp, threads);
-                window.SetVideoDim(QSize(width, height));
-            }
-        }
-
-        if (m_deintFilter == nullptr)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Couldn't load deinterlace filter %1")
-                    .arg(m_deintfiltername));
-            m_deinterlacing = false;
-            m_deintfiltername = "";
         }
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using deinterlace method %1")
                                    .arg(m_deintfiltername));
-
-        if (m_deintfiltername == "bobdeint")
-            m_deinterlaceBeforeOSD = false;
     }
 
     return m_deinterlacing;

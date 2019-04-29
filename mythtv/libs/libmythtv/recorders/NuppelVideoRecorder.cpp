@@ -24,7 +24,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "NuppelVideoRecorder.h"
 #include "channelbase.h"
-#include "filtermanager.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "tv_play.h"
@@ -88,7 +87,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
 {
     m_channelObj = channel;
     m_seektable = new vector<struct seektable_entry>;
-    m_filtMan = new FilterManager;
     m_ccd = new CC608Decoder(this);
 
     SetPositionMapType(MARK_KEYFRAME);
@@ -152,8 +150,6 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_free_context(&m_mpa_vidctx);
     }
 
-    delete m_videoFilters;
-    delete m_filtMan;
     delete m_ccd;
 }
 
@@ -368,10 +364,8 @@ bool NuppelVideoRecorder::IsPaused(bool holding_lock) const
     return ret;
 }
 
-void NuppelVideoRecorder::SetVideoFilters(QString &filters)
+void NuppelVideoRecorder::SetVideoFilters(QString&)
 {
-    m_videoFilterList = filters;
-    InitFilters();
 }
 
 bool NuppelVideoRecorder::IsRecording(void)
@@ -632,7 +626,6 @@ void NuppelVideoRecorder::Initialize(void)
     m_audiobytes = 0;
 
     InitBuffers();
-    InitFilters();
 }
 
 int NuppelVideoRecorder::AudioInit(bool skipdevice)
@@ -759,36 +752,6 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "MJPEG not supported by device");
     return false;
-}
-
-void NuppelVideoRecorder::InitFilters(void)
-{
-    int btmp = m_video_buffer_size;
-    delete m_videoFilters;
-
-    QString tmpVideoFilterList;
-
-    m_w_out = m_width;
-    m_h_out = m_height;
-    VideoFrameType tmp = FMT_YV12;
-
-    if (m_correct_bttv && !m_videoFilterList.contains("adjust"))
-    {
-        if (m_videoFilterList.isEmpty())
-            tmpVideoFilterList = "adjust";
-        else
-            tmpVideoFilterList = "adjust," + m_videoFilterList;
-    }
-    else
-        tmpVideoFilterList = m_videoFilterList;
-
-    m_videoFilters = m_filtMan->LoadFilters(tmpVideoFilterList, m_inpixfmt, tmp,
-                                        m_w_out, m_h_out, btmp);
-    if (m_video_buffer_size && btmp != m_video_buffer_size)
-    {
-        m_video_buffer_size = btmp;
-        ResizeVideoBuffers();
-    }
 }
 
 void NuppelVideoRecorder::InitBuffers(void)
@@ -1017,8 +980,7 @@ void NuppelVideoRecorder::run(void)
 
     if (m_usingv4l2)
     {
-        m_inpixfmt = FMT_NONE;
-        InitFilters();
+        m_inpixfmt = FMT_NONE;;
         DoV4L2();
     }
     else
@@ -1977,9 +1939,6 @@ void NuppelVideoRecorder::WriteHeader(void)
 {
     struct rtframeheader frameheader;
 
-    if (!m_videoFilters)
-        InitFilters();
-
     WriteFileHeader();
 
     memset(&frameheader, 0, sizeof(frameheader));
@@ -2811,9 +2770,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         frameheader.keyframe=0;
         m_frameofgop=0;
     }
-
-    if (m_videoFilters)
-        m_videoFilters->ProcessFrame(frame);
 
     if (m_useavcodec)
     {
