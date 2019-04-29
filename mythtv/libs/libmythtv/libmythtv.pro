@@ -559,10 +559,6 @@ using_frontend {
         DEFINES += USING_MHEG
     }
 
-    # C stuff
-    HEADERS += blend.h
-    SOURCES += blend.c
-
     DEFINES += USING_FRONTEND
 }
 
