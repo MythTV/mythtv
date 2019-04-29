@@ -51,7 +51,7 @@ class PaneExistingScanImport : public GroupSetting
         setting->addTargetedChildren(target, {this, m_scanSelect});
     }
 
-    virtual void load(void)
+    void Load(void) override // GroupSetting
     {
         m_scanSelect->clearSelections();
         if (!m_sourceid)
@@ -77,7 +77,7 @@ class PaneExistingScanImport : public GroupSetting
     void SetSourceID(uint sourceid)
     {
         m_sourceid = sourceid;
-        load();
+        Load();
     }
 
     uint GetScanID(void) const { return m_scanSelect->getValue().toUInt(); }
