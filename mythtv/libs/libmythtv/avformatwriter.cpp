@@ -125,8 +125,10 @@ bool AVFormatWriter::Init(void)
     if (m_container == "mpegts")
         m_ctx->packet_size = 2324;
 
-    snprintf(m_ctx->filename, sizeof(m_ctx->filename), "%s",
-             m_filename.toLatin1().constData());
+    QByteArray filename = m_filename.toLatin1();
+    size_t size = static_cast<size_t>(filename.size());
+    m_ctx->url = static_cast<char*>(av_malloc(size));
+    memcpy(m_ctx->url, filename.constData(), size);
 
     if (m_fmt.video_codec != AV_CODEC_ID_NONE)
         m_videoStream = AddVideoStream();
