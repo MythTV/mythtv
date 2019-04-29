@@ -882,7 +882,7 @@ bool NCPrivate::Queue(const MythNotification &notification)
         {
             LOG(VB_GENERAL, LOG_DEBUG, LOC +
                 QString("Queue: 0x%1, not registered for id (%2)")
-                .arg((size_t)parent, QT_POINTER_SIZE, 16)
+                .arg((size_t)parent, QT_POINTER_SIZE, 16, QChar('0'))
                 .arg(id));
             id = -1;
         }
@@ -1038,7 +1038,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("UnRegister: 0x%1, no such registration (%2)")
-            .arg((size_t)from, QT_POINTER_SIZE, 16)
+            .arg((size_t)from, QT_POINTER_SIZE, 16, QChar('0'))
             .arg(id));
         return;
     }
@@ -1047,7 +1047,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("UnRegister: 0x%1, not registered for id (%2")
-            .arg((size_t)from, QT_POINTER_SIZE, 16)
+            .arg((size_t)from, QT_POINTER_SIZE, 16, QChar('0'))
             .arg(id));
     }
 

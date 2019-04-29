@@ -20,7 +20,7 @@ using namespace std;
 #include "atsctables.h"
 
 //#define DEBUG_MPEG_RADIO // uncomment to strip video streams from TS stream
-#define LOC QString("MPEGStream[%1](0x%2): ").arg(_cardid).arg((intptr_t)this, QT_POINTER_SIZE, 16)
+#define LOC QString("MPEGStream[%1](0x%2): ").arg(_cardid).arg((intptr_t)this, QT_POINTER_SIZE, 16, QChar('0'))
 
 /** \class MPEGStreamData
  *  \brief Encapsulates data about MPEG stream and emits events for each table.
