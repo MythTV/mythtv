@@ -28,13 +28,12 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ./mpeg ./channelscan ./visualisations
+DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ./recorders/HLS
-DEPENDPATH  += ./mheg
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -364,19 +363,21 @@ using_frontend {
     SOURCES += textsubtitleparser.cpp   xine_demux_sputext.cpp
 
     # A/V decoders
-    HEADERS += decoderbase.h
-    HEADERS += nuppeldecoder.h          avformatdecoder.h
-    HEADERS += privatedecoder.h
-    HEADERS += mythcodeccontext.h
-    SOURCES += decoderbase.cpp
-    SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
-    SOURCES += privatedecoder.cpp
-    SOURCES += mythcodeccontext.cpp
+    HEADERS += decoders/decoderbase.h
+    HEADERS += decoders/nuppeldecoder.h
+    HEADERS += decoders/avformatdecoder.h
+    HEADERS += decoders/privatedecoder.h
+    HEADERS += decoders/mythcodeccontext.h
+    SOURCES += decoders/decoderbase.cpp
+    SOURCES += decoders/nuppeldecoder.cpp
+    SOURCES += decoders/avformatdecoder.cpp
+    SOURCES += decoders/privatedecoder.cpp
+    SOURCES += decoders/mythcodeccontext.cpp
 
     using_openmax {
         DEFINES += USING_OPENMAX
-        HEADERS += privatedecoder_omx.h
-        SOURCES += privatedecoder_omx.cpp
+        HEADERS += decoders/privatedecoder_omx.h
+        SOURCES += decoders/privatedecoder_omx.cpp
         HEADERS += videoout_omx.h
         SOURCES += videoout_omx.cpp
         contains( HAVE_OPENMAX_BROADCOM, yes ) {

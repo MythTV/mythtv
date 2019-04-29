@@ -31,7 +31,7 @@ using namespace std;
 #include "channelgroup.h"
 #include "mythtimer.h"
 #include "osd.h"
-#include "decoderbase.h"
+#include "decoders/decoderbase.h"
 
 class QEvent;
 class QKeyEvent;

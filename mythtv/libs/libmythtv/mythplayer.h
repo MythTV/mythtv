@@ -21,7 +21,7 @@
 #include "subtitlereader.h"
 #include "cc608reader.h"
 #include "cc708reader.h"
-#include "decoderbase.h"
+#include "decoders/decoderbase.h"
 #include "deletemap.h"
 #include "commbreakmap.h"
 #include "audioplayer.h"

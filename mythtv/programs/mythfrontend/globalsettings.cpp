@@ -38,7 +38,7 @@
 #include "mythuihelper.h"
 #include "mythuidefines.h"
 #include "langsettings.h"
-#include "mythcodeccontext.h"
+#include "decoders/mythcodeccontext.h"
 #include "mythsorthelper.h"
 #ifdef USE_OPENGL_PAINTER
 #include "mythrender_opengl.h"
