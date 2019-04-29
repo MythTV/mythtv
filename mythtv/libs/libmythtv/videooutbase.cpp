@@ -667,7 +667,8 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
                                const QSize &video_dim_disp,
                                float        aspect,
                                MythCodecID  myth_codec_id,
-                               bool        &/*aspect_only*/)
+                               bool        &/*aspect_only*/,
+                               MythMultiLocker*)
 {
     window.InputChanged(video_dim_buf, video_dim_disp, aspect);
 

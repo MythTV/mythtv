@@ -1,4 +1,8 @@
+// Qt
+#include <QWaitCondition>
+
 // MythTV
+#include "mythmainwindow.h"
 #include "videooutbase.h"
 #include "videocolourspace.h"
 #include "mythrender_opengl.h"
@@ -63,12 +67,26 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
     return result;
 }
 
+void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *CodecId, void *Result)
+{
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Check interop callback");
+    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    MythCodecID *codecid = reinterpret_cast<MythCodecID*>(CodecId);
+    MythOpenGLInterop::Type *result = reinterpret_cast<MythOpenGLInterop::Type*>(Result);
+
+    if (codecid && result)
+        *result = MythOpenGLInterop::GetInteropType(*codecid);
+    if (wait)
+        wait->wakeAll();
+}
+
 MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
 {
     Type supported = Unsupported;
     if (!gCoreContext->IsUIThread())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "GetInteropType called from the wrong thread");
+        MythMainWindow::HandleCallback("interop check", MythOpenGLInterop::GetInteropTypeCallback,
+                                       &CodecId, &supported);
         return supported;
     }
 

@@ -43,6 +43,8 @@ struct ImgReSampleContext;
 struct SwsContext;
 }
 
+class MythMultiLocker;
+
 class VideoOutput
 {
   public:
@@ -96,7 +98,8 @@ class VideoOutput
                               const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  myth_codec_id,
-                              bool        &aspect_changed);
+                              bool        &aspect_changed,
+                              MythMultiLocker* Locks);
 
     virtual void VideoAspectRatioChanged(float aspect);
 

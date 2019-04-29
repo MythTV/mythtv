@@ -248,7 +248,8 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
 }
 
 bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
-                                     float Aspect, MythCodecID CodecId, bool &AspectOnly)
+                                     float Aspect, MythCodecID CodecId, bool &AspectOnly,
+                                     MythMultiLocker* Locks)
 {
     QSize currentvideodim     = window.GetVideoDim();
     QSize currentvideodispdim = window.GetVideoDispDim();
@@ -275,11 +276,11 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
     // fail fast if we don't know how to display the codec
     if (!codec_sw_copy(CodecId))
     {
-        if (!gCoreContext->IsUIThread())
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Cannot check interop support from this thread");
-        }
-        else if (MythOpenGLInterop::GetInteropType(CodecId) == MythOpenGLInterop::Unsupported)
+        // MythOpenGLInterop::GetInteropType will block if we don't release our current locks
+        Locks->Unlock();
+        MythOpenGLInterop::Type support = MythOpenGLInterop::GetInteropType(CodecId);
+        Locks->Relock();
+        if (support == MythOpenGLInterop::Unsupported)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
             errorState = kError_Unknown;

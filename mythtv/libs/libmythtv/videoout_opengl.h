@@ -27,7 +27,8 @@ class VideoOutputOpenGL : public VideoOutput
     void Show(FrameScanType ) override;
     void ClearAfterSeek(void) override;
     bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
-                      float Aspect, MythCodecID CodecId, bool &AspectOnly) override;
+                      float Aspect, MythCodecID CodecId, bool &AspectOnly,
+                      MythMultiLocker* Locks) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;
     void DrawUnusedRects(bool) override { }
     void InitPictureAttributes(void) override;

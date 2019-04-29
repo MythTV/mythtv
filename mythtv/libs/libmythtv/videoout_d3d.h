@@ -34,7 +34,8 @@ class VideoOutputD3D : public VideoOutput
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      bool        &aspect_only) override; // VideoOutput
+                      bool        &aspect_only,
+                      MythMultiLocker *Locks) override; // VideoOutput
     void MoveResizeWindow(QRect new_rect) override {;} // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
     void DrawUnusedRects(bool) override {;} // VideoOutput

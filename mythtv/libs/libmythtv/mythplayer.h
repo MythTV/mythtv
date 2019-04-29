@@ -119,6 +119,21 @@ class DecoderThread : public MThread
     bool        m_start_paused;
 };
 
+class MythMultiLocker
+{
+  public:
+    MythMultiLocker(std::initializer_list<QMutex*> Locks);
+    MythMultiLocker() = delete;
+   ~MythMultiLocker();
+
+    void Unlock(void);
+    void Relock(void);
+
+  private:
+    Q_DISABLE_COPY(MythMultiLocker)
+    QVector<QMutex*> m_locks;
+};
+
 class MTV_PUBLIC MythPlayer
 {
     Q_DECLARE_TR_FUNCTIONS(MythPlayer)

@@ -25,7 +25,8 @@ class VideoOutputNull : public VideoOutput
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      bool        &aspect_only) override; // VideoOutput
+                      bool        &aspect_only,
+                      MythMultiLocker* Locks) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     void DrawUnusedRects(bool sync = true) override; // VideoOutput

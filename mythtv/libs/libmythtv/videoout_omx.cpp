@@ -479,7 +479,8 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
     const QSize &video_dim_disp,    // video display size
     float        aspect,            // w/h of presented video
     MythCodecID  av_codec_id,       // video codec
-    bool        &aspect_only )      // Out: true if aspect only changed
+    bool        &aspect_only,       // Out: true if aspect only changed
+    MythMultiLocker* Locks)
 {
     QSize cursize = window.GetVideoDim();
 
@@ -513,7 +514,7 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
     }
 
     VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
-                              aspect, av_codec_id, aspect_only);
+                              aspect, av_codec_id, aspect_only, Locks);
 
     m_imagefx.Shutdown();
     m_render.Shutdown();

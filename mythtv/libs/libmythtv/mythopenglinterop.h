@@ -41,6 +41,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
 
     static QStringList GetAllowedRenderers   (MythCodecID CodecId);
     static Type        GetInteropType        (MythCodecID CodecId);
+    static void        GetInteropTypeCallback(void *Wait, void *CodecId, void* Result);
     static vector<MythVideoTexture*> Retrieve(MythRenderOpenGL *Context,
                                               VideoColourSpace *ColourSpace,
                                               VideoFrame *Frame,
