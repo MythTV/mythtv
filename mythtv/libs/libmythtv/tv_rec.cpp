@@ -1734,7 +1734,7 @@ QString TVRec::GetStartChannel(uint inputid)
         startchan = query.value(0).toString();
         if (!startchan.isEmpty())
         {
-            LOG(VB_CHANNEL, LOG_INFO, LOC2 + QString("Start channel: %1.")
+            LOG(VB_CHANNEL, LOG_INFO, LOC2 + QString("Start channel: %1")
                     .arg(startchan));
             return startchan;
         }

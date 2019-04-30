@@ -272,8 +272,8 @@ bool DVBChannel::Open(DVBChannel *who)
     m_tunerType = CardUtil::ProbeTunerType(m_fd_frontend);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Frontend '%2' tunertype:%3 %4")
-            .arg(m_frontend_name).arg(m_tunerType).arg(m_tunerType.toString()));
+        QString("Frontend '%2' tunertype: %3")
+            .arg(m_frontend_name).arg(m_tunerType.toString()));
 
     // Turn on the power to the LNB
     if (m_tunerType.IsDiSEqCSupported())
@@ -834,7 +834,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
     SetSIStandard(tuning.m_sistandard);
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tune(): Frequency tuning successful.");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tune(): Frequency tuning successful");
 
     return true;
 }

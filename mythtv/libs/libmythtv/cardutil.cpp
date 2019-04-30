@@ -1148,7 +1148,7 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd
 #ifdef USING_DVB
     LOG(VB_GENERAL, LOG_INFO,
         QString("CardUtil[%1]: ").arg(inputid) +
-        QString("Using delivery system: %1").arg(delsys.toString()));
+        QString("Set delivery system: %1").arg(delsys.toString()));
 
     struct dtv_property prop;
     struct dtv_properties cmd;
