@@ -1,10 +1,12 @@
+#include "config.h"
 #include "rom_metadata.h"
 
 #include <QFile>
 
 #include <mythcontext.h>
 
-#include <minizip/unzip.h>
+#include "zlib.h"
+#include MINIZIP_UNZIP_H
 #undef Z_NULL
 #define Z_NULL nullptr
 
