@@ -33,8 +33,11 @@
 // default port to listen on
 #define PORT 6548
 
-// default location of zoneminders config file
-#define ZM_CONFIG "/etc/zm.conf"
+// default location of zoneminders default config file
+#define ZM_CONFIG "/etc/zm/zm.conf"
+
+// default location of zoneminders override config file
+#define ZM_OVERRIDECONFIG "/etc/zm/conf.d/01-system-paths.conf"
 
 // Care should be taken to keep these in sync with the exit codes in
 // libmythbase/exitcodes.h (which is not included here to keep this code 
@@ -69,7 +72,8 @@ int main(int argc, char **argv)
     bool daemon_mode = false;       // is daemon mode enabled
     int port = PORT;                // port we're listening on
     string logfile;                 // log file
-    string zmconfig = ZM_CONFIG;    // location of zoneminders config file
+    string zmconfig = ZM_CONFIG;    // location of zoneminders default config file
+    string zmoverideconfig = ZM_OVERRIDECONFIG;  // location of zoneminders override config file
 
     //  Check command line arguments
     for (int argpos = 1; argpos < argc; ++argpos)
@@ -144,6 +148,26 @@ int main(int argc, char **argv)
                 return EXIT_INVALID_CMDLINE;
             }
         }
+        else if (strcmp(argv[argpos],"-o") == 0 ||
+                  strcmp(argv[argpos],"--zmoverrideconfig") == 0)
+        {
+            if (argc > argpos)
+            {
+                zmconfig = argv[argpos+1];
+                if (zmconfig[0] == '-')
+                {
+                    cerr << "Invalid or missing argument to -o/--zmoverrideconfig option\n";
+                    return EXIT_INVALID_CMDLINE;
+                }
+
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -o/--zmoverrideconfig option\n";
+                return EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (strcmp(argv[argpos],"-v") == 0 ||
                   strcmp(argv[argpos],"--verbose") == 0)
         {
@@ -156,7 +180,8 @@ int main(int argc, char **argv)
                     "-p or --port number        A port number to listen on (default is 6548) " << endl <<
                     "-d or --daemon             Runs mythzmserver as a daemon " << endl <<
                     "-n or --nodaemon           Does not run mythzmserver as a daemon (default)" << endl <<
-                    "-c or --zmconfig           Location of zoneminders config file (default is " << ZM_CONFIG << ")" << endl <<
+                    "-c or --zmconfig           Location of zoneminders default config file (default is " << ZM_CONFIG << ")" << endl <<
+                    "-o or --zmoverrideconfig   Location of zoneminders override config file (default is " << ZM_OVERRIDECONFIG << ")" << endl <<
                     "-l or --logfile filename   Writes STDERR and STDOUT messages to filename" << endl <<
                     "-v or --verbose            Prints more debug output" << endl;
             return EXIT_INVALID_CMDLINE;
@@ -204,19 +229,34 @@ int main(int argc, char **argv)
 
     map<int, ZMServer*> serverList; // list of ZMServers
 
-    // load the config
+    // load the default config
     loadZMConfig(zmconfig);
 
-    // we support version 1.24.0 or later
-    sscanf(g_zmversion.c_str(), "%10d.%10d.%10d", &g_majorVersion, &g_minorVersion, &g_revisionVersion);
-    if (checkVersion(1, 24, 0))
+    // load the override config
+    loadZMConfig(zmoverideconfig);
+
+    // check we have a version (default to 1.32.3 if not found)
+    if (g_zmversion.length() == 0)
     {
-        cout << "ZM is version '" << g_zmversion << "'" << endl;
+        cout << "ZM version not found. Assuming at least v1.32.0 is installed" << endl;
+        g_majorVersion = 1;
+        g_minorVersion = 32;
+        g_revisionVersion = 3;
     }
     else
     {
-        cout << "This version of ZM is to old you need 1.24.0 or later '" << g_zmversion << "'" << endl;
-        return EXIT_VERSION_ERROR;
+        sscanf(g_zmversion.c_str(), "%10d.%10d.%10d", &g_majorVersion, &g_minorVersion, &g_revisionVersion);
+
+        // we support version 1.24.0 or later
+        if (checkVersion(1, 24, 0))
+        {
+            cout << "ZM is version '" << g_zmversion << "'" << endl;
+        }
+        else
+        {
+            cout << "This version of ZM is to old you need 1.24.0 or later '" << g_zmversion << "'" << endl;
+            return EXIT_VERSION_ERROR;
+        }
     }
 
     // connect to the DB
