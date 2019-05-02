@@ -1533,6 +1533,8 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 else if (info.m_atsc_major_channel > 0)
                     info.m_callsign =
                         QString("MPTS_%1").arg(info.m_atsc_major_channel);
+                else if (info.m_pat_tsid > 0)
+                    info.m_callsign = QString("MPTS_%1").arg(info.m_pat_tsid);
                 else if (info.m_service_id > 0)
                     info.m_callsign = QString("MPTS_%1").arg(info.m_service_id);
                 else if (!info.m_chan_num.isEmpty())
