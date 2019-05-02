@@ -920,7 +920,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                 m_scanMonitor->ScanAppendTextToLog(msg_tr);
             }
 
-            QString msg = LOC + QString("Program %1").arg(it.key());
+            QString msg = QString("Program %1").arg(it.key());
             if (kEncEncrypted == *it)
                 msg = msg + " -- Encrypted";
             else if (kEncDecrypted == *it)
@@ -1448,7 +1448,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("GetChannelList: set chan_num '%1'").arg(info.m_chan_num));
+            QString("GetChannelList: set chan_num '%1' for '%2'")
+                .arg(info.m_chan_num).arg(info.m_callsign));
     }
 
     // Get QAM/SCTE/MPEG channel numbers
