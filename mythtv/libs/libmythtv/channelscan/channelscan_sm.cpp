@@ -1523,6 +1523,10 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 dbchan_it = pnum_to_dbchan.begin();
                 ChannelInsertInfo info = *dbchan_it;
 
+                // Use transport stream ID as (fake) service ID
+                // to use in callsign and as channel number
+                info.m_service_id = info.m_pat_tsid;
+
                 if (tuner_type == DTVTunerType::kTunerTypeASI)
                     info.m_callsign = QString("MPTS_%1")
                                     .arg(CardUtil::GetDisplayName(cardid));
@@ -1533,8 +1537,6 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 else if (info.m_atsc_major_channel > 0)
                     info.m_callsign =
                         QString("MPTS_%1").arg(info.m_atsc_major_channel);
-                else if (info.m_pat_tsid > 0)
-                    info.m_callsign = QString("MPTS_%1").arg(info.m_pat_tsid);
                 else if (info.m_service_id > 0)
                     info.m_callsign = QString("MPTS_%1").arg(info.m_service_id);
                 else if (!info.m_chan_num.isEmpty())
@@ -1543,9 +1545,9 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                     info.m_callsign = "MPTS_UNKNOWN";
 
                 info.m_service_name = info.m_callsign;
-                info.m_service_id = 0;
                 info.m_atsc_minor_channel = 0;
                 info.m_format = "MPTS";
+                info.m_use_on_air_guide = false;
                 item.m_channels.push_back(info);
             }
 
