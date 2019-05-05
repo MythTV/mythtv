@@ -1299,7 +1299,7 @@ void ChannelImporter::CountChannels(
  * Compute a suggested channel number based on various aspects of the
  * channel information. Check to see if this channel number conflicts
  * with an existing channel number. If so, fall back to incrementing a
- * per-source number to fund an unused value.
+ * per-source number to find an unused value.
  *
  * \param info       Unused.
  * \param transport  Unused.
