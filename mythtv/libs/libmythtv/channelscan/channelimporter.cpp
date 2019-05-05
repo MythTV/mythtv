@@ -401,7 +401,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
 
-            bool filter = false, handle = false;
+            bool asked = false;
+            bool filter = false;
+            bool handle = false;
             if (!chan.m_channel_id && (kInsertIgnoreAll == action) &&
                 IsType(info, chan, type))
             {
@@ -431,6 +433,10 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 else if (kOCTCancel == rc)
                 {
                     handle = false;
+                }
+                else if (kOCTOk == rc)
+                {
+                    asked = true;
                 }
             }
 
@@ -470,7 +476,8 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.m_chan_num, chan.m_source_id);
                 }
 
-                if (m_is_interactive &&
+                // Only ask if not already asked before with kInsertManual
+                if (m_is_interactive && !asked &&
                     (conflicting || (kChannelTypeConflictingFirst <= type)))
                 {
                     OkCancelType rc =
