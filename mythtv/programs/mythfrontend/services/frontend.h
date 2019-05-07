@@ -34,7 +34,7 @@ class Frontend : public FrontendServices
     bool                 SendAction(const QString &Action,
                                     const QString &Value,
                                     uint Width, uint Height) override; // FrontendServices
-    virtual bool         PlayRecording(int RecordedId, int ChanId,
+    bool                 PlayRecording(int RecordedId, int ChanId,
                                        const QDateTime &StartTime) override; // FrontendServices
     bool                 PlayLiveTV(int ChanId) override; // FrontendServices
     bool                 PlayVideo(const QString &Id, bool UseBookmark) override; // FrontendServices
