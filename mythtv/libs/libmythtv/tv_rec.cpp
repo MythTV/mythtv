@@ -3738,6 +3738,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     {
         // Not using a signal monitor, so just set the status to recording
         SetRecordingStatus(RecStatus::Recording, __LINE__);
+        if (m_curRecording)
+        {
+            m_curRecording->SetRecordingStatus(RecStatus::Recording);
+        }
     }
 
 
