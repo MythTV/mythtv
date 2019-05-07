@@ -33,15 +33,6 @@
 // libmythbase headers
 #include "mythplugin.h"
 
-MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
-                                         const QString &name)
-    : MythScreenType(parent, name),
-      m_callback(nullptr), m_callbackdata(nullptr),
-      m_killable(false), m_loaded(false), m_titleState(nullptr),
-      m_watermarkState(nullptr), m_buttonList(nullptr), m_descriptionText(nullptr)
-{
-}
-
 bool MythThemedMenuState::Create(void)
 {
     if (!LoadWindowFromXML("menu-ui.xml", "mainmenu", this))
@@ -100,9 +91,7 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
 MythThemedMenu::MythThemedMenu(const QString &/*cdir*/, const QString &menufile,
                                MythScreenStack *parent, const QString &name,
                                bool /*allowreorder*/, MythThemedMenuState *state)
-    : MythThemedMenuState(parent, name),
-      m_state(state), m_allocedstate(false), m_foundtheme(false),
-      m_ignorekeys(false), m_wantpop(false), m_menuPopup(nullptr)
+    : MythThemedMenuState(parent, name), m_state(state)
 {
     if (!m_state)
     {
@@ -518,7 +507,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "dependssetting")
             {
-                addit = GetMythDB()->GetNumSetting(getFirstText(info));
+                addit = GetMythDB()->GetBoolSetting(getFirstText(info));
             }
             else if (info.tagName() == "dependjumppoint")
             {
@@ -746,43 +735,37 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
     QFile file(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetMenuThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetShareDir() + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = "../mythfrontend/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetShareDir() + "themes/defaultmenu/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-    else
-        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
+    LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     return QString();
 }
@@ -808,7 +791,7 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 
         return false;
     }
-    else if (action.startsWith("EXECTV "))
+    if (action.startsWith("EXECTV "))
     {
         QString rest = action.right(action.length() - 7).trimmed();
         if (cbs && cbs->exec_program_tv)
@@ -883,7 +866,6 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 bool MythThemedMenu::findDepends(const QString &fileList)
 {
     QStringList files = fileList.split(" ");
-    QString filename;
     MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
 
     for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
@@ -905,10 +887,7 @@ bool MythThemedMenu::findDependsExec(const QString &filename)
 {
     QFileInfo filename_info(filename);
 
-    if (filename_info.exists() && filename_info.isFile() && filename_info.isExecutable())
-        return true;
-
-    return false;
+    return filename_info.exists() && filename_info.isFile() && filename_info.isExecutable();
 }
 
 /** \brief Queries the user for a password to enter a part of MythTV

@@ -34,7 +34,7 @@ using std::vector;
 
 #define SLOC(a) QString("MythSocket(%1:%2): ") \
     .arg((intptr_t)(a), 0, 16)                 \
-    .arg(a->GetSocketDescriptor())
+    .arg((a)->GetSocketDescriptor())
 #define LOC SLOC(this)
 
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
@@ -71,8 +71,8 @@ static QString to_sample(const QByteArray &payload)
     QString sample("");
     for (uint i = 0; (i<60) && (i<(uint)payload.length()); i++)
     {
-        sample += QChar(payload.data()[i]).isPrint() ?
-            QChar(payload.data()[i]) : QChar('?');
+        sample += QChar(payload[i]).isPrint() ?
+            QChar(payload[i]) : QChar('?');
     }
     sample += (payload.length() > 60) ? "..." : "";
     return sample;
@@ -82,16 +82,8 @@ MythSocket::MythSocket(
     qt_socket_fd_t socket, MythSocketCBs *cb, bool use_shared_thread) :
     ReferenceCounter(QString("MythSocket(%1)").arg(socket)),
     m_tcpSocket(new QTcpSocket()),
-    m_thread(nullptr),
-    m_socketDescriptor(-1),
-    m_peerPort(-1),
     m_callback(cb),
-    m_useSharedThread(use_shared_thread),
-    m_disableReadyReadCallback(false),
-    m_connected(false),
-    m_dataAvailable(0),
-    m_isValidated(false),
-    m_isAnnounced(false)
+    m_useSharedThread(use_shared_thread)
 {
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("MythSocket(%1, 0x%2) ctor")
         .arg(socket).arg((intptr_t)(cb),0,16));
@@ -108,8 +100,7 @@ MythSocket::MythSocket(
             m_useSharedThread = false;
             return;
         }
-        else
-            ConnectHandler(); // already called implicitly above?
+        ConnectHandler(); // already called implicitly above?
     }
 
     // Use direct connections so m_tcpSocket can be used
@@ -304,14 +295,14 @@ void MythSocket::CallReadyReadHandler(void)
 }
 
 bool MythSocket::ConnectToHost(
-    const QHostAddress &hadr, quint16 port)
+    const QHostAddress &address, quint16 port)
 {
     bool ret = false;
     QMetaObject::invokeMethod(
         this, "ConnectToHostReal",
         (QThread::currentThread() != m_thread->qthread()) ?
         Qt::BlockingQueuedConnection : Qt::DirectConnection,
-        Q_ARG(QHostAddress, hadr),
+        Q_ARG(QHostAddress, address),
         Q_ARG(quint16, port),
         Q_ARG(bool*, &ret));
     return ret;
@@ -490,7 +481,7 @@ bool MythSocket::Announce(const QStringList &new_announce)
     WriteStringList(new_announce);
 
     QStringList tmplist;
-    if (!ReadStringList(tmplist, true))
+    if (!ReadStringList(tmplist, MythSocket::kShortTimeout))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("\n\t\t\tCould not read string list from server %1:%2")
@@ -617,7 +608,7 @@ void MythSocket::IsDataAvailableReal(bool *ret) const
     m_dataAvailable.fetchAndStoreOrdered((*ret) ? 1 : 0);
 }
 
-void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
+void MythSocket::ConnectToHostReal(const QHostAddress& _addr, quint16 port, bool *ret)
 {
     if (m_tcpSocket->state() == QAbstractSocket::ConnectedState)
     {
@@ -749,10 +740,10 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
         QString msg = QString("write -> %1 %2")
             .arg(m_tcpSocket->socketDescriptor(), 2).arg(payload.data());
 
-        if (logLevel < LOG_DEBUG && msg.length() > 88)
+        if (logLevel < LOG_DEBUG && msg.length() > 128)
         {
-            msg.truncate(85);
-            msg += "...";
+            msg.truncate(127);
+            msg += "…";
         }
         LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }
@@ -804,7 +795,6 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
     m_tcpSocket->flush();
 
     *ret = true;
-    return;
 }
 
 void MythSocket::ReadStringListReal(
@@ -938,22 +928,22 @@ void MythSocket::ReadStringListReal(
 
     QString str = QString::fromUtf8(utf8.data());
 
-    QByteArray payload;
-    payload = payload.setNum(str.length());
-    payload += "        ";
-    payload.truncate(8);
-    payload += str;
-
     if (VERBOSE_LEVEL_CHECK(VB_NETWORK, LOG_INFO))
     {
+        QByteArray payload;
+        payload = payload.setNum(str.length());
+        payload += "        ";
+        payload.truncate(8);
+        payload += utf8.data();
+
         QString msg = QString("read  <- %1 %2")
             .arg(m_tcpSocket->socketDescriptor(), 2)
             .arg(payload.data());
 
-        if (logLevel < LOG_DEBUG && msg.length() > 88)
+        if (logLevel < LOG_DEBUG && msg.length() > 128)
         {
-            msg.truncate(85);
-            msg += "...";
+            msg.truncate(127);
+            msg += "…";
         }
         LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }

@@ -8,7 +8,8 @@
 class MBASE_PUBLIC PList
 {
   public:
-    explicit PList(const QByteArray &data);
+    explicit PList(const QByteArray &data)
+        { ParseBinaryPList(data); }
 
     QVariant GetValue(const QString &key);
     QString  ToString(void);
@@ -35,12 +36,12 @@ class MBASE_PUBLIC PList
     void ArrayToXML(const QVariant &data, QXmlStreamWriter &xml);
 
     QVariant m_result;
-    quint8  *m_data;
-    quint8  *m_offsetTable;
-    quint64  m_rootObj;
-    quint64  m_numObjs;
-    quint8   m_offsetSize;
-    quint8   m_parmSize;
+    quint8  *m_data        {nullptr};
+    quint8  *m_offsetTable {nullptr};
+    quint64  m_rootObj     {0};
+    quint64  m_numObjs     {0};
+    quint8   m_offsetSize  {0};
+    quint8   m_parmSize    {0};
 };
 
 #endif // PLIST_H

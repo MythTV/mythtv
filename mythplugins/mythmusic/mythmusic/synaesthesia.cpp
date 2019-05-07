@@ -29,24 +29,7 @@ using namespace std;
 #include "mainvisual.h"
 #include "synaesthesia.h"
 
-Synaesthesia::Synaesthesia(void) :
-    m_size(0,0),
-
-    m_maxStarRadius(1),
-    m_fadeMode(Stars),
-    m_pointsAreDiamonds(true),
-    m_brightnessTwiddler(0.3),
-    m_starSize(0.5),
-
-    m_outWidth(0),
-    m_outHeight(0),
-
-    m_outputImage(nullptr),
-
-    m_fgRedSlider(0.0),  m_fgGreenSlider(0.5),
-    m_bgRedSlider(0.75), m_bgGreenSlider(0.4),
-
-    m_energy_avg(80.0)
+Synaesthesia::Synaesthesia(void)
 {
     m_fps = 29;
 
@@ -57,8 +40,7 @@ Synaesthesia::Synaesthesia(void) :
 
 Synaesthesia::~Synaesthesia()
 {
-    if (m_outputImage)
-        delete m_outputImage;
+    delete m_outputImage;
 }
 
 void Synaesthesia::setupPalette(void)
@@ -110,10 +92,10 @@ void Synaesthesia::setupPalette(void)
             if (blue > 255) { excess += blue - 255; blue = 255; }
         }
 
-        double scale = (0.5 + (red + green + blue) / 768.0) / 1.5;
-        red *= scale;
-        green *= scale;
-        blue *= scale;
+        double scale2 = (0.5 + (red + green + blue) / 768.0) / 1.5;
+        red *= scale2;
+        green *= scale2;
+        blue *= scale2;
 
         m_palette[i * 3 + 0] = sBOUND(int(red));
         m_palette[i * 3 + 1] = sBOUND(int(green));
@@ -133,8 +115,7 @@ void Synaesthesia::resize(const QSize &newsize)
     m_outWidth = m_size.width();
     m_outHeight = m_size.height();
 
-    if (m_outputImage)
-        delete m_outputImage;
+    delete m_outputImage;
 
     m_size.setHeight(m_size.height() * 2);
     m_outputImage = new QImage(m_size, QImage::Format_Indexed8);
@@ -347,29 +328,29 @@ void Synaesthesia::fadeWave(void)
     for (y = 1, start = m_outWidth * 2 + 2, end = m_outWidth * 4 - 2; 
          y < m_outHeight - 1; y++, start += step, end += step) 
     {
-        int i = start;
+        int i2 = start;
         do
         {
-            short j = short((int(lastOutput[i - 2]) +
-                             int(lastOutput[i + 2]) +
-                             int(lastOutput[i - step]) +
-                             int(lastOutput[i + step])) >> 2) +
-                lastOutput[i];
-            if (!j)
+            short j2 = short((int(lastOutput[i2 - 2]) +
+                              int(lastOutput[i2 + 2]) +
+                              int(lastOutput[i2 - step]) +
+                              int(lastOutput[i2 + step])) >> 2) +
+                lastOutput[i2];
+            if (!j2)
             {
-                output[i] = 0;
+                output[i2] = 0;
             }
             else
             {
-                j = j - lastLastOutput[i] - 1;
-                if (j < 0)
-                    output[i] = 0;
-                else if (j & (255*256))
-                    output[i] = 255;
+                j2 = j2 - lastLastOutput[i2] - 1;
+                if (j2 < 0)
+                    output[i2] = 0;
+                else if (j2 & (255*256))
+                    output[i2] = 255;
                 else
-                    output[i] = j;
+                    output[i2] = j2;
             }
-        } while(++i < end);
+        } while(++i2 < end);
     }
 }
 
@@ -424,28 +405,28 @@ void Synaesthesia::fadeHeat(void)
     for(y = 1, start = m_outWidth * 2 + 2, end = m_outWidth * 4 - 2; 
         y < m_outHeight - 1; y++, start += step, end += step) 
     {
-        int i = start;
+        int i2 = start;
         do
         {
-            short j = short((int(lastOutput[i - 2]) +
-                             int(lastOutput[i + 2]) +
-                             int(lastOutput[i - step]) +
-                             int(lastOutput[i + step])) >> 2) +
-                lastOutput[i];
-            if (!j)
-                output[i] = 0;
+            short j2 = short((int(lastOutput[i2 - 2]) +
+                              int(lastOutput[i2 + 2]) +
+                              int(lastOutput[i2 - step]) +
+                              int(lastOutput[i2 + step])) >> 2) +
+                lastOutput[i2];
+            if (!j2)
+                output[i2] = 0;
             else
             {
-                j = j - lastLastOutput[i] +
-                    ((lastLastOutput[i] - lastOutput[i]) >> 2) - 1;
-                if (j < 0) 
-                    output[i] = 0;
-                else if (j & (255*256))
-                    output[i] = 255;
+                j2 = j2 - lastLastOutput[i2] +
+                    ((lastLastOutput[i2] - lastOutput[i2]) >> 2) - 1;
+                if (j2 < 0)
+                    output[i2] = 0;
+                else if (j2 & (255*256))
+                    output[i2] = 255;
                 else
-                    output[i] = j;
+                    output[i2] = j2;
             }
-        } while(++i < end);
+        } while(++i2 < end);
     }
 }
 
@@ -476,17 +457,17 @@ bool Synaesthesia::process(VisualNode *node)
     int brightFactor = int(Brightness * m_brightnessTwiddler / (m_starSize + 0.01));
 
     int numSamps = NumSamples;
-    if (node->length < NumSamples)
-        numSamps = node->length;
+    if (node->m_length < NumSamples)
+        numSamps = node->m_length;
 
     memset(x, 0, sizeof(x));
     memset(y, 0, sizeof(y));
 
     for (i = 0; i < numSamps; i++) 
     {
-        x[i] = node->left[i];
-        if (node->right)
-            y[i] = node->right[i];
+        x[i] = node->m_left[i];
+        if (node->m_right)
+            y[i] = node->m_right[i];
         else
             y[i] = x[i];
     }
@@ -620,21 +601,21 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
             unsigned int const r1 = *(ptrOutput++);
             unsigned int const r2 = *(ptrOutput++);
 
-            unsigned int const v = ((r1 & 0x000000f0ul) >> 4) |
-                                            ((r1 & 0x0000f000ul) >> 8) |
-                                            ((r1 & 0x00f00000ul) >> 12) |
-                                            ((r1 & 0xf0000000ul) >> 16);
+            unsigned int const v = ((r1 & 0x000000f0UL) >> 4) |
+                                   ((r1 & 0x0000f000UL) >> 8) |
+                                   ((r1 & 0x00f00000UL) >> 12) |
+                                   ((r1 & 0xf0000000UL) >> 16);
 
-            *(ptrTop++) = v | (((r2 & 0x000000f0ul) << 12) |
-                               ((r2 & 0x0000f000ul) << 8) |
-                               ((r2 & 0x00f00000ul) << 4) |
-                               ((r2 & 0xf0000000ul)));
+            *(ptrTop++) = v | (((r2 & 0x000000f0UL) << 12) |
+                               ((r2 & 0x0000f000UL) << 8) |
+                               ((r2 & 0x00f00000UL) << 4) |
+                               ((r2 & 0xf0000000UL)));
 
-            *(ptrBot++) = v | (((r2 & 0x000000f0ul) << 12) |
-                               ((r2 & 0x0000f000ul) << 8) |
-                               ((r2 & 0x00f00000ul) << 4) |
-                               ((r2 & 0xf0000000ul)));
-        } while (--i);
+            *(ptrBot++) = v | (((r2 & 0x000000f0UL) << 12) |
+                               ((r2 & 0x0000f000UL) << 8) |
+                               ((r2 & 0x00f00000UL) << 4) |
+                               ((r2 & 0xf0000000UL)));
+        } while (--i > 0);
     }
 
     p->drawImage(0, 0, *m_outputImage);
@@ -645,20 +626,20 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
 static class SynaesthesiaFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "Synaesthesia");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent,  const QString &pluginName) const
+    VisualBase *create(MainVisual *parent,  const QString &pluginName) const override // VisFactory
     {
         (void)parent;
         (void)pluginName;

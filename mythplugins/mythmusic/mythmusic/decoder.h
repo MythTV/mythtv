@@ -29,19 +29,20 @@ class AudioOutput;
 class DecoderEvent : public MythEvent
 {
   public:
-    explicit DecoderEvent(Type t) : MythEvent(t), error_msg(nullptr) { ; }
+    explicit DecoderEvent(Type type) : MythEvent(type) { ; }
 
-    explicit DecoderEvent(QString *e) : MythEvent(Error), error_msg(e) { ; }
+    explicit DecoderEvent(QString *e) : MythEvent(Error), m_error_msg(e) { ; }
 
     ~DecoderEvent()
     {
-        if (error_msg)
-            delete error_msg;
+        if (m_error_msg)
+            delete m_error_msg;
     }
 
-    const QString *errorMessage() const { return error_msg; }
+    const QString *errorMessage() const { return m_error_msg; }
 
-    virtual MythEvent *clone(void) const { return new DecoderEvent(*this); }
+    MythEvent *clone(void) const override // MythEvent
+        { return new DecoderEvent(*this); }
 
     static Type Decoding;
     static Type Stopped;
@@ -49,18 +50,17 @@ class DecoderEvent : public MythEvent
     static Type Error;
 
   private:
-    DecoderEvent(const DecoderEvent &o) : MythEvent(o), error_msg(nullptr)
+    DecoderEvent(const DecoderEvent &o) : MythEvent(o)
     {
-        if (o.error_msg)
+        if (o.m_error_msg)
         {
-            error_msg = new QString(*o.error_msg);
-            error_msg->detach();
+            m_error_msg = new QString(*o.m_error_msg);
         }
     }
     DecoderEvent &operator=(const DecoderEvent&);
 
   private:
-    QString *error_msg;
+    QString *m_error_msg {nullptr};
 };
 
 class Decoder : public MThread, public MythObservable
@@ -93,16 +93,17 @@ class Decoder : public MThread, public MythObservable
     static Decoder *create(const QString &, AudioOutput *, bool = false);
 
   protected:
-    Decoder(DecoderFactory *, AudioOutput *);
+    Decoder(DecoderFactory *d, AudioOutput *o)
+        : MThread("MythMusicDecoder"), m_fctry(d), m_out(o) {}
     QMutex* getMutex(void) { return &m_mtx; }
     void error(const QString &);
 
     QString m_url;
 
   private:
-    DecoderFactory *m_fctry;
+    DecoderFactory *m_fctry {nullptr};
 
-    AudioOutput *m_out;
+    AudioOutput *m_out {nullptr};
 
     QMutex m_mtx;
     QWaitCondition m_cnd;
@@ -124,10 +125,10 @@ class CdDecoderFactory : public DecoderFactory
     Q_DECLARE_TR_FUNCTIONS(CdDecoderFactory);
 
 public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, AudioOutput *, bool);
+    bool supports(const QString &) const override; // DecoderFactory
+    const QString &extension() const override; // DecoderFactory
+    const QString &description() const override; // DecoderFactory
+    Decoder *create(const QString &, AudioOutput *, bool) override; // DecoderFactory
 };
 
 class avfDecoderFactory : public DecoderFactory
@@ -135,10 +136,10 @@ class avfDecoderFactory : public DecoderFactory
     Q_DECLARE_TR_FUNCTIONS(avfDecoderFactory);
 
 public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, AudioOutput *, bool);
+    bool supports(const QString &) const override; // DecoderFactory
+    const QString &extension() const override; // DecoderFactory
+    const QString &description() const override; // DecoderFactory
+    Decoder *create(const QString &, AudioOutput *, bool) override; // DecoderFactory
 };
 
 #endif

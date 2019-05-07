@@ -39,88 +39,72 @@ extern "C" {
 
 NuppelDecoder::NuppelDecoder(MythPlayer *parent,
                              const ProgramInfo &pginfo)
-    : DecoderBase(parent, pginfo),
-      rtjd(nullptr), video_width(0), video_height(0), video_size(0),
-      video_frame_rate(0.0f), audio_samplerate(44100),
-#if HAVE_BIGENDIAN
-      audio_bits_per_sample(0),
-#endif
-      ffmpeg_extradatasize(0), ffmpeg_extradata(nullptr), usingextradata(false),
-      disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
-      directframe(nullptr),         decoded_video_frame(nullptr),
-      mpa_vidcodec(nullptr), mpa_vidctx(nullptr), mpa_audcodec(nullptr), mpa_audctx(nullptr),
-      directrendering(false),
-      lastct('1'), strm(nullptr), buf(nullptr), buf2(nullptr),
-      videosizetotal(0), videoframesread(0), setreadahead(false)
+    : DecoderBase(parent, pginfo)
 {
     // initialize structures
-    memset(&fileheader, 0, sizeof(rtfileheader));
-    memset(&frameheader, 0, sizeof(rtframeheader));
-    memset(&extradata, 0, sizeof(extendeddata));
-    planes[0] = planes[1] = planes[2] = nullptr;
+    memset(&m_fileheader, 0, sizeof(rtfileheader));
+    memset(&m_frameheader, 0, sizeof(rtframeheader));
+    memset(&m_extradata, 0, sizeof(extendeddata));
+    m_planes[0] = m_planes[1] = m_planes[2] = nullptr;
     m_audioSamples = (uint8_t *)av_mallocz(AudioOutputUtil::MAX_SIZE_BUFFER);
 
     // set parent class variables
-    positionMapType = MARK_KEYFRAME;
-    lastKey = 0;
-    framesPlayed = 0;
-    getrawframes = false;
-    getrawvideo = false;
+    m_positionMapType = MARK_KEYFRAME;
+    m_lastKey = 0;
+    m_framesPlayed = 0;
+    m_getrawframes = false;
+    m_getrawvideo = false;
 
-    rtjd = new RTjpeg();
+    m_rtjd = new RTjpeg();
     int format = RTJ_YUV420;
-    rtjd->SetFormat(&format);
+    m_rtjd->SetFormat(&format);
 
     if (lzo_init() != LZO_E_OK)
     {
         LOG(VB_GENERAL, LOG_ERR, "NuppelDecoder: lzo_init() failed, aborting");
-        errored = true;
+        m_errored = true;
         return;
     }
 }
 
 NuppelDecoder::~NuppelDecoder()
 {
-    if (rtjd)
-        delete rtjd;
-    if (ffmpeg_extradata)
-        delete [] ffmpeg_extradata;
-    if (buf)
-        av_freep(&buf);
-    if (buf2)
-        av_freep(&buf2);
-    if (strm)
-        av_freep(&strm);
+    delete m_rtjd;
+    delete [] m_ffmpeg_extradata;
+    if (m_buf)
+        av_freep(&m_buf);
+    if (m_buf2)
+        av_freep(&m_buf2);
+    if (m_strm)
+        av_freep(&m_strm);
 
     av_freep(&m_audioSamples);
 
-    while (!StoredData.empty())
+    while (!m_storedData.empty())
     {
-        delete StoredData.front();
-        StoredData.pop_front();
+        delete m_storedData.front();
+        m_storedData.pop_front();
     }
     CloseAVCodecVideo();
     CloseAVCodecAudio();
 }
 
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
-                              int)
+                              int /*testbufsize*/)
 {
-    if (!strncmp(testbuf, "NuppelVideo", 11) ||
-        !strncmp(testbuf, "MythTVVideo", 11))
-        return true;
-    return false;
+    return strncmp(testbuf, "NuppelVideo", 11) == 0 ||
+           strncmp(testbuf, "MythTVVideo", 11) == 0;
 }
 
 MythCodecID NuppelDecoder::GetVideoCodecID(void) const
 {
     MythCodecID value = kCodec_NONE;
-    if (mpa_vidcodec)
+    if (m_mpa_vidcodec)
     {
-        if (QString(mpa_vidcodec->name) == "mpeg4")
+        if (QString(m_mpa_vidcodec->name) == "mpeg4")
             value = kCodec_NUV_MPEG4;
     }
-    else if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
+    else if (m_usingextradata && m_extradata.video_fourcc == FOURCC_DIVX)
         value = kCodec_NUV_MPEG4;
     else
         value = kCodec_NUV_RTjpeg;
@@ -129,8 +113,8 @@ MythCodecID NuppelDecoder::GetVideoCodecID(void) const
 
 QString NuppelDecoder::GetRawEncodingType(void)
 {
-    if (mpa_vidctx)
-        return ff_codec_id_string(mpa_vidctx->codec_id);
+    if (m_mpa_vidctx)
+        return ff_codec_id_string(m_mpa_vidctx->codec_id);
     return QString();
 }
 
@@ -170,31 +154,31 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 
 int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                             char testbuf[kDecoderProbeBufferSize],
-                            int)
+                            int /*testbufsize*/)
 {
     (void)testbuf;
 
     ringBuffer = rbuffer;
-    disablevideo = novideo;
-    tracks[kTrackTypeVideo].clear();
+    m_disablevideo = novideo;
+    m_tracks[kTrackTypeVideo].clear();
     StreamInfo si(0, 0, 0, 0, 0);
-    tracks[kTrackTypeVideo].push_back(si);
-    selectedTrack[kTrackTypeVideo] = si;
+    m_tracks[kTrackTypeVideo].push_back(si);
+    m_selectedTrack[kTrackTypeVideo] = si;
 
     struct rtframeheader frameheader;
     long long startpos = 0;
     int foundit = 0;
     char *space;
 
-    if (!ReadFileheader(&fileheader))
+    if (!ReadFileheader(&m_fileheader))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error reading file: %1").arg(ringBuffer->GetFilename()));
         return -1;
     }
 
-    while ((QString(fileheader.finfo) != "NuppelVideo") &&
-           (QString(fileheader.finfo) != "MythTVVideo"))
+    while ((QString(m_fileheader.finfo) != "NuppelVideo") &&
+           (QString(m_fileheader.finfo) != "MythTVVideo"))
     {
         ringBuffer->Seek(startpos, SEEK_SET);
         char dummychar;
@@ -202,7 +186,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         startpos = ringBuffer->GetReadPosition();
 
-        if (!ReadFileheader(&fileheader))
+        if (!ReadFileheader(&m_fileheader))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error reading file: %1")
                     .arg(ringBuffer->GetFilename()));
@@ -217,19 +201,19 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
     }
 
-    if (fileheader.aspect > .999 && fileheader.aspect < 1.001)
-        fileheader.aspect = 4.0 / 3;
-    current_aspect = fileheader.aspect;
+    if (m_fileheader.aspect > .999 && m_fileheader.aspect < 1.001)
+        m_fileheader.aspect = 4.0 / 3;
+    m_current_aspect = m_fileheader.aspect;
 
-    GetPlayer()->SetKeyframeDistance(fileheader.keyframedist);
-    GetPlayer()->SetVideoParams(fileheader.width, fileheader.height,
-                                fileheader.fps);
+    GetPlayer()->SetKeyframeDistance(m_fileheader.keyframedist);
+    GetPlayer()->SetVideoParams(m_fileheader.width, m_fileheader.height,
+                                m_fileheader.fps);
 
-    video_width = fileheader.width;
-    video_height = fileheader.height;
-    video_size = video_height * video_width * 3 / 2;
-    keyframedist = fileheader.keyframedist;
-    video_frame_rate = fileheader.fps;
+    m_video_width = m_fileheader.width;
+    m_video_height = m_fileheader.height;
+    m_video_size = m_video_height * m_video_width * 3 / 2;
+    m_keyframedist = m_fileheader.keyframedist;
+    m_video_frame_rate = m_fileheader.fps;
 
     if (!ReadFrameheader(&frameheader))
     {
@@ -242,21 +226,21 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-    space = new char[video_size];
+    space = new char[m_video_size];
 
     if (frameheader.comptype == 'F')
     {
-        ffmpeg_extradatasize = frameheader.packetlength;
-        if (ffmpeg_extradatasize > 0)
+        m_ffmpeg_extradatasize = frameheader.packetlength;
+        if (m_ffmpeg_extradatasize > 0)
         {
-            ffmpeg_extradata = new uint8_t[ffmpeg_extradatasize];
-            if (frameheader.packetlength != ringBuffer->Read(ffmpeg_extradata,
+            m_ffmpeg_extradata = new uint8_t[m_ffmpeg_extradatasize];
+            if (frameheader.packetlength != ringBuffer->Read(m_ffmpeg_extradata,
                                                      frameheader.packetlength))
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     "File not big enough for first frame data");
-                delete [] ffmpeg_extradata;
-                ffmpeg_extradata = nullptr;
+                delete [] m_ffmpeg_extradata;
+                m_ffmpeg_extradata = nullptr;
                 delete [] space;
                 return -1;
             }
@@ -274,12 +258,12 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
     }
 
-    if ((video_height & 1) == 1)
+    if ((m_video_height & 1) == 1)
     {
-        video_height--;
+        m_video_height--;
         LOG(VB_GENERAL, LOG_ERR,
             QString("Incompatible video height, reducing to %1")
-                .arg( video_height));
+                .arg( m_video_height));
     }
 
     startpos = ringBuffer->GetReadPosition();
@@ -294,9 +278,9 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
         else
         {
-            ringBuffer->Read(&extradata, frameheader.packetlength);
+            ringBuffer->Read(&m_extradata, frameheader.packetlength);
 #if HAVE_BIGENDIAN
-            struct extendeddata *ed = &extradata;
+            struct extendeddata *ed = &m_extradata;
             ed->version                 = bswap_32(ed->version);
             ed->video_fourcc            = bswap_32(ed->video_fourcc);
             ed->audio_fourcc            = bswap_32(ed->audio_fourcc);
@@ -315,17 +299,17 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             ed->seektable_offset        = bswap_64(ed->seektable_offset);
             ed->keyframeadjust_offset   = bswap_64(ed->keyframeadjust_offset);
 #endif
-            usingextradata = true;
+            m_usingextradata = true;
             ReadFrameheader(&frameheader);
         }
     }
 
-    if (usingextradata && extradata.seektable_offset > 0)
+    if (m_usingextradata && m_extradata.seektable_offset > 0)
     {
         long long currentpos = ringBuffer->GetReadPosition();
         struct rtframeheader seek_frameheader;
 
-        int seekret = ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
+        int seekret = ringBuffer->Seek(m_extradata.seektable_offset, SEEK_SET);
         if (seekret == -1)
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -372,22 +356,22 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     offset += sizeof(struct seektable_entry);
 
                     PosMapEntry e = {ste.keyframe_number,
-                                     ste.keyframe_number * keyframedist,
+                                     ste.keyframe_number * m_keyframedist,
                                      ste.file_offset};
                     m_positionMap.push_back(e);
-                    uint64_t frame_num = ste.keyframe_number * keyframedist;
+                    uint64_t frame_num = ste.keyframe_number * m_keyframedist;
                     m_frameToDurMap[frame_num] =
-                        frame_num * 1000 / video_frame_rate;
+                        frame_num * 1000 / m_video_frame_rate;
                     m_durToFrameMap[m_frameToDurMap[frame_num]] = frame_num;
                 }
-                hasFullPositionMap = true;
-                totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
-                                     video_frame_rate);
-                totalFrames = (long long)ste.keyframe_number * keyframedist;
+                m_hasFullPositionMap = true;
+                m_totalLength = (int)((ste.keyframe_number * m_keyframedist * 1.0) /
+                                     m_video_frame_rate);
+                m_totalFrames = (long long)ste.keyframe_number * m_keyframedist;
 
                 m_positionMapLock.unlock();
 
-                GetPlayer()->SetFileLength(totalLength, totalFrames);
+                GetPlayer()->SetFileLength(m_totalLength, m_totalFrames);
 
                 delete [] seekbuf;
             }
@@ -398,13 +382,13 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         ringBuffer->Seek(currentpos, SEEK_SET);
     }
 
-    if (usingextradata && extradata.keyframeadjust_offset > 0 &&
-        hasFullPositionMap)
+    if (m_usingextradata && m_extradata.keyframeadjust_offset > 0 &&
+        m_hasFullPositionMap)
     {
         long long currentpos = ringBuffer->GetReadPosition();
         struct rtframeheader kfa_frameheader;
 
-        int kfa_ret = ringBuffer->Seek(extradata.keyframeadjust_offset,
+        int kfa_ret = ringBuffer->Seek(m_extradata.keyframeadjust_offset,
                                        SEEK_SET);
         if (kfa_ret == -1)
         {
@@ -448,17 +432,17 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     keyFrameAdjustMap[kfate.keyframe_number] = kfate.adjust;
                     adjust += kfate.adjust;
                 }
-                hasKeyFrameAdjustTable = true;
+                m_hasKeyFrameAdjustTable = true;
 
-                totalLength -= (int)(adjust / video_frame_rate);
-                totalFrames -= adjust;
-                GetPlayer()->SetFileLength(totalLength, totalFrames);
+                m_totalLength -= (int)(adjust / m_video_frame_rate);
+                m_totalFrames -= adjust;
+                GetPlayer()->SetFileLength(m_totalLength, m_totalFrames);
 
                 adjust = 0;
 
                 {
                     QMutexLocker locker(&m_positionMapLock);
-                    for (uint i = 0; i < m_positionMap.size(); i++)
+                    for (size_t i = 0; i < m_positionMap.size(); i++)
                     {
                         long long adj = m_positionMap[i].adjFrame;
 
@@ -504,20 +488,20 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     foundit = 0;
 
-    effdsp = audio_samplerate * 100;
-    m_audio->SetEffDsp(effdsp);
+    m_effdsp = m_audio_samplerate * 100;
+    m_audio->SetEffDsp(m_effdsp);
 
-    if (usingextradata)
+    if (m_usingextradata)
     {
-        effdsp = extradata.audio_sample_rate * 100;
-        m_audio->SetEffDsp(effdsp);
-        audio_samplerate = extradata.audio_sample_rate;
+        m_effdsp = m_extradata.audio_sample_rate * 100;
+        m_audio->SetEffDsp(m_effdsp);
+        m_audio_samplerate = m_extradata.audio_sample_rate;
 #if HAVE_BIGENDIAN
         // Why only if using extradata?
-        audio_bits_per_sample = extradata.audio_bits_per_sample;
+        m_audio_bits_per_sample = m_extradata.audio_bits_per_sample;
 #endif
         AudioFormat format = FORMAT_NONE;
-        switch (extradata.audio_bits_per_sample)
+        switch (m_extradata.audio_bits_per_sample)
         {
             case 8:  format = FORMAT_U8;  break;
             case 16: format = FORMAT_S16; break;
@@ -525,9 +509,9 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             case 32: format = FORMAT_S32; break;
         }
 
-        m_audio->SetAudioParams(format, extradata.audio_channels,
-                                extradata.audio_channels,
-                                AV_CODEC_ID_NONE, extradata.audio_sample_rate,
+        m_audio->SetAudioParams(format, m_extradata.audio_channels,
+                                m_extradata.audio_channels,
+                                AV_CODEC_ID_NONE, m_extradata.audio_sample_rate,
                                 false /* AC3/DTS pass through */);
         m_audio->ReinitAudio();
         foundit = 1;
@@ -539,10 +523,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             if (frameheader.comptype == 'A')
             {
-                effdsp = frameheader.timecode;
-                if (effdsp > 0)
+                m_effdsp = frameheader.timecode;
+                if (m_effdsp > 0)
                 {
-                    m_audio->SetEffDsp(effdsp);
+                    m_audio->SetEffDsp(m_effdsp);
                     foundit = 1;
                     continue;
                 }
@@ -588,34 +572,34 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     delete [] space;
 
-    setreadahead = false;
+    m_setreadahead = false;
 
     // mpeg4 encodes are small enough that this shouldn't matter
-    if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
-        setreadahead = true;
+    if (m_usingextradata && m_extradata.video_fourcc == FOURCC_DIVX)
+        m_setreadahead = true;
 
-    bitrate = 0;
+    m_bitrate = 0;
     unsigned min_bitrate = 1000;
-    if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
+    if (m_usingextradata && m_extradata.video_fourcc == FOURCC_DIVX)
     {
         // Use video bitrate, ignore negligible audio bitrate
-        bitrate = extradata.lavc_bitrate / 1000;
+        m_bitrate = m_extradata.lavc_bitrate / 1000;
     }
-    bitrate = max(bitrate, min_bitrate); // set minimum 1 Mb/s to be safe
+    m_bitrate = max(m_bitrate, min_bitrate); // set minimum 1 Mb/s to be safe
     LOG(VB_PLAYBACK, LOG_INFO,
-        QString("Setting bitrate to %1 Kb/s").arg(bitrate));
+        QString("Setting bitrate to %1 Kb/s").arg(m_bitrate));
 
     ringBuffer->UpdateRawBitrate(GetRawBitrate());
 
-    videosizetotal = 0;
-    videoframesread = 0;
+    m_videosizetotal = 0;
+    m_videoframesread = 0;
 
     ringBuffer->Seek(startpos, SEEK_SET);
 
-    buf = (unsigned char*)av_malloc(video_size);
-    strm = (unsigned char*)av_malloc(video_size * 2);
+    m_buf = (unsigned char*)av_malloc(m_video_size);
+    m_strm = (unsigned char*)av_malloc(m_video_size * 2);
 
-    if (hasFullPositionMap)
+    if (m_hasFullPositionMap)
         return 1;
 
     if (SyncPositionMap())
@@ -640,15 +624,15 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
     for (i = 0; i < 3; i++)
     {
-        pic->data[i] = nd->directframe->buf + nd->directframe->offsets[i];
-        pic->linesize[i] = nd->directframe->pitches[i];
+        pic->data[i] = nd->m_directframe->buf + nd->m_directframe->offsets[i];
+        pic->linesize[i] = nd->m_directframe->pitches[i];
     }
 
-    pic->opaque = nd->directframe;
+    pic->opaque = nd->m_directframe;
 
     // Set release method
     AVBufferRef *buffer =
-        av_buffer_create((uint8_t*)nd->directframe, 0, release_nuppel_buffer, nd, 0);
+        av_buffer_create((uint8_t*)nd->m_directframe, 0, release_nuppel_buffer, nd, 0);
     pic->buf[0] = buffer;
 
     return 0;
@@ -656,12 +640,12 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
 bool NuppelDecoder::InitAVCodecVideo(int codec)
 {
-    if (mpa_vidcodec)
+    if (m_mpa_vidcodec)
         CloseAVCodecVideo();
 
-    if (usingextradata)
+    if (m_usingextradata)
     {
-        switch(extradata.video_fourcc)
+        switch(m_extradata.video_fourcc)
         {
             case FOURCC_DIVX: codec = AV_CODEC_ID_MPEG4;      break;
             case FOURCC_WMV1: codec = AV_CODEC_ID_WMV1;       break;
@@ -678,51 +662,51 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
             default: codec = -1;
         }
     }
-    mpa_vidcodec = avcodec_find_decoder((enum AVCodecID)codec);
+    m_mpa_vidcodec = avcodec_find_decoder((enum AVCodecID)codec);
 
-    if (!mpa_vidcodec)
+    if (!m_mpa_vidcodec)
     {
-        if (usingextradata)
+        if (m_usingextradata)
             LOG(VB_GENERAL, LOG_ERR,
                 QString("couldn't find video codec (%1)")
-                    .arg(extradata.video_fourcc));
+                    .arg(m_extradata.video_fourcc));
         else
             LOG(VB_GENERAL, LOG_ERR, "couldn't find video codec");
         return false;
     }
 
-    if (mpa_vidcodec->capabilities & AV_CODEC_CAP_DR1 && codec != AV_CODEC_ID_MJPEG)
-        directrendering = true;
+    if (m_mpa_vidcodec->capabilities & AV_CODEC_CAP_DR1 && codec != AV_CODEC_ID_MJPEG)
+        m_directrendering = true;
 
-    if (mpa_vidctx)
-        avcodec_free_context(&mpa_vidctx);
+    if (m_mpa_vidctx)
+        avcodec_free_context(&m_mpa_vidctx);
 
-    mpa_vidctx = avcodec_alloc_context3(nullptr);
+    m_mpa_vidctx = avcodec_alloc_context3(nullptr);
 
-    mpa_vidctx->codec_id = (enum AVCodecID)codec;
-    mpa_vidctx->codec_type = AVMEDIA_TYPE_VIDEO;
-    mpa_vidctx->width = video_width;
-    mpa_vidctx->height = video_height;
-    mpa_vidctx->err_recognition = AV_EF_CRCCHECK | AV_EF_BITSTREAM |
+    m_mpa_vidctx->codec_id = (enum AVCodecID)codec;
+    m_mpa_vidctx->codec_type = AVMEDIA_TYPE_VIDEO;
+    m_mpa_vidctx->width = m_video_width;
+    m_mpa_vidctx->height = m_video_height;
+    m_mpa_vidctx->err_recognition = AV_EF_CRCCHECK | AV_EF_BITSTREAM |
                                   AV_EF_BUFFER;
-    mpa_vidctx->bits_per_coded_sample = 12;
+    m_mpa_vidctx->bits_per_coded_sample = 12;
 
-    if (directrendering)
+    if (m_directrendering)
     {
-        // mpa_vidctx->flags |= CODEC_FLAG_EMU_EDGE;
-        mpa_vidctx->draw_horiz_band = nullptr;
-        mpa_vidctx->get_buffer2 = get_nuppel_buffer;
-        mpa_vidctx->opaque = (void *)this;
+        // m_mpa_vidctx->flags |= CODEC_FLAG_EMU_EDGE;
+        m_mpa_vidctx->draw_horiz_band = nullptr;
+        m_mpa_vidctx->get_buffer2 = get_nuppel_buffer;
+        m_mpa_vidctx->opaque = (void *)this;
     }
-    if (ffmpeg_extradatasize > 0)
+    if (m_ffmpeg_extradatasize > 0)
     {
-        av_opt_set_int(mpa_vidctx, "extern_huff", 1, 0);
-        mpa_vidctx->extradata = ffmpeg_extradata;
-        mpa_vidctx->extradata_size = ffmpeg_extradatasize;
+        av_opt_set_int(m_mpa_vidctx, "extern_huff", 1, 0);
+        m_mpa_vidctx->extradata = m_ffmpeg_extradata;
+        m_mpa_vidctx->extradata_size = m_ffmpeg_extradatasize;
     }
 
     QMutexLocker locker(avcodeclock);
-    if (avcodec_open2(mpa_vidctx, mpa_vidcodec, nullptr) < 0)
+    if (avcodec_open2(m_mpa_vidctx, m_mpa_vidcodec, nullptr) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc video codec");
         return false;
@@ -735,46 +719,46 @@ void NuppelDecoder::CloseAVCodecVideo(void)
 {
     QMutexLocker locker(avcodeclock);
 
-    if (mpa_vidcodec && mpa_vidctx)
-        avcodec_free_context(&mpa_vidctx);
+    if (m_mpa_vidcodec && m_mpa_vidctx)
+        avcodec_free_context(&m_mpa_vidctx);
 }
 
 bool NuppelDecoder::InitAVCodecAudio(int codec)
 {
-    if (mpa_audcodec)
+    if (m_mpa_audcodec)
         CloseAVCodecAudio();
 
-    if (usingextradata)
+    if (m_usingextradata)
     {
-        switch(extradata.audio_fourcc)
+        switch(m_extradata.audio_fourcc)
         {
             case FOURCC_LAME: codec = AV_CODEC_ID_MP3;        break;
             case FOURCC_AC3 : codec = AV_CODEC_ID_AC3;        break;
             default: codec = -1;
         }
     }
-    mpa_audcodec = avcodec_find_decoder((enum AVCodecID)codec);
+    m_mpa_audcodec = avcodec_find_decoder((enum AVCodecID)codec);
 
-    if (!mpa_audcodec)
+    if (!m_mpa_audcodec)
     {
-        if (usingextradata)
+        if (m_usingextradata)
             LOG(VB_GENERAL, LOG_ERR, QString("couldn't find audio codec (%1)")
-                    .arg(extradata.audio_fourcc));
+                    .arg(m_extradata.audio_fourcc));
         else
             LOG(VB_GENERAL, LOG_ERR, "couldn't find audio codec");
         return false;
     }
 
-    if (mpa_audctx)
-        avcodec_free_context(&mpa_audctx);
+    if (m_mpa_audctx)
+        avcodec_free_context(&m_mpa_audctx);
 
-    mpa_audctx = avcodec_alloc_context3(nullptr);
+    m_mpa_audctx = avcodec_alloc_context3(nullptr);
 
-    mpa_audctx->codec_id = (enum AVCodecID)codec;
-    mpa_audctx->codec_type = AVMEDIA_TYPE_AUDIO;
+    m_mpa_audctx->codec_id = (enum AVCodecID)codec;
+    m_mpa_audctx->codec_type = AVMEDIA_TYPE_AUDIO;
 
     QMutexLocker locker(avcodeclock);
-    if (avcodec_open2(mpa_audctx, mpa_audcodec, nullptr) < 0)
+    if (avcodec_open2(m_mpa_audctx, m_mpa_audcodec, nullptr) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc audio codec");
         return false;
@@ -787,8 +771,8 @@ void NuppelDecoder::CloseAVCodecAudio(void)
 {
     QMutexLocker locker(avcodeclock);
 
-    if (mpa_audcodec && mpa_audctx)
-        avcodec_free_context(&mpa_audctx);
+    if (m_mpa_audcodec && m_mpa_audctx)
+        avcodec_free_context(&m_mpa_audctx);
 }
 
 static void CopyToVideo(unsigned char *buf, int video_width,
@@ -805,19 +789,19 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     lzo_uint out_len;
     int compoff = 0;
 
-    directframe = frame;
+    m_directframe = frame;
 
-    if (!buf2)
+    if (!m_buf2)
     {
-        buf2 = (unsigned char*)av_malloc(video_size + 64);
-        planes[0] = buf;
-        planes[1] = planes[0] + video_width * video_height;
-        planes[2] = planes[1] + (video_width * video_height) / 4;
+        m_buf2 = (unsigned char*)av_malloc(m_video_size + 64);
+        m_planes[0] = m_buf;
+        m_planes[1] = m_planes[0] + m_video_width * m_video_height;
+        m_planes[2] = m_planes[1] + (m_video_width * m_video_height) / 4;
     }
 
     if (frameheader->comptype == 'N')
     {
-        memset(frame->buf, 0, frame->pitches[0] * video_height);
+        memset(frame->buf, 0, frame->pitches[0] * m_video_height);
         memset(frame->buf + frame->offsets[1], 127,
                frame->pitches[1] * frame->height / 2);
         memset(frame->buf + frame->offsets[2], 127,
@@ -827,14 +811,14 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
     if (frameheader->comptype == 'L')
     {
-        switch(lastct)
+        switch(m_lastct)
         {
             case '0': case '3':
-                CopyToVideo(buf2, video_width, video_height, frame);
+                CopyToVideo(m_buf2, m_video_width, m_video_height, frame);
                 break;
             case '1': case '2':
             default:
-                CopyToVideo(buf, video_width, video_height, frame);
+                CopyToVideo(m_buf, m_video_width, m_video_height, frame);
                 break;
         }
         return true;
@@ -844,11 +828,11 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     if (frameheader->comptype == '2' || frameheader->comptype == '3')
         compoff=0;
 
-    lastct = frameheader->comptype;
+    m_lastct = frameheader->comptype;
 
     if (!compoff)
     {
-        int r = lzo1x_decompress(lstrm, frameheader->packetlength, buf2, &out_len,
+        int r = lzo1x_decompress(lstrm, frameheader->packetlength, m_buf2, &out_len,
                               nullptr);
         if (r != LZO_E_OK)
         {
@@ -858,31 +842,31 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
     if (frameheader->comptype == '0')
     {
-        CopyToVideo(lstrm, video_width, video_height, frame);
+        CopyToVideo(lstrm, m_video_width, m_video_height, frame);
         return true;
     }
 
     if (frameheader->comptype == '3')
     {
-        CopyToVideo(buf2, video_width, video_height, frame);
+        CopyToVideo(m_buf2, m_video_width, m_video_height, frame);
         return true;
     }
 
     if (frameheader->comptype == '2' || frameheader->comptype == '1')
     {
         if (compoff)
-            rtjd->Decompress((int8_t*)lstrm, planes);
+            m_rtjd->Decompress((int8_t*)lstrm, m_planes);
         else
-            rtjd->Decompress((int8_t*)buf2, planes);
+            m_rtjd->Decompress((int8_t*)m_buf2, m_planes);
 
-        CopyToVideo(buf, video_width, video_height, frame);
+        CopyToVideo(m_buf, m_video_width, m_video_height, frame);
     }
     else
     {
-        if (!mpa_vidcodec)
+        if (!m_mpa_vidcodec)
             InitAVCodecVideo(frameheader->comptype - '3');
 
-        if (!mpa_vidctx)
+        if (!m_mpa_vidctx)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "NULL mpa_vidctx");
             return false;
@@ -906,14 +890,14 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             //  into separate routines or separate threads.
             //  Also now that it always consumes a whole buffer some code
             //  in the caller may be able to be optimized.
-            int ret = avcodec_receive_frame(mpa_vidctx, mpa_pic);
+            int ret = avcodec_receive_frame(m_mpa_vidctx, mpa_pic);
             if (ret == 0)
                 gotpicture = true;
             if (ret == AVERROR(EAGAIN))
                 ret = 0;
             if (ret == 0)
-                ret = avcodec_send_packet(mpa_vidctx, &pkt);
-            directframe = nullptr;
+                ret = avcodec_send_packet(m_mpa_vidctx, &pkt);
+            m_directframe = nullptr;
             // The code assumes that there is always space to add a new
             // packet. This seems risky but has always worked.
             // It should actually check if (ret == AVERROR(EAGAIN)) and then keep
@@ -936,7 +920,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 /* XXX: Broken
         if (mpa_pic->qscale_table != nullptr && mpa_pic->qstride > 0)
         {
-            int tablesize = mpa_pic->qstride * ((video_height + 15) / 16);
+            int tablesize = mpa_pic->qstride * ((m_video_height + 15) / 16);
 
             if (frame->qstride != mpa_pic->qstride ||
                 frame->qscale_table == nullptr)
@@ -953,11 +937,11 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         }
 */
 
-        if (directrendering)
+        if (m_directrendering)
             return true;
 
         AVFrame *tmp = mpa_pic;
-        copyFrame.Copy(frame, (AVFrame*)tmp, mpa_vidctx->pix_fmt);
+        m_copyFrame.Copy(frame, tmp, m_mpa_vidctx->pix_fmt);
     }
 
     return true;
@@ -982,22 +966,22 @@ void NuppelDecoder::StoreRawData(unsigned char *newstrm)
     unsigned char *strmcpy;
     if (newstrm)
     {
-        strmcpy = new unsigned char[frameheader.packetlength];
-        memcpy(strmcpy, newstrm, frameheader.packetlength);
+        strmcpy = new unsigned char[m_frameheader.packetlength];
+        memcpy(strmcpy, newstrm, m_frameheader.packetlength);
     }
     else
         strmcpy = nullptr;
 
-    StoredData.push_back(new RawDataList(frameheader, strmcpy));
+    m_storedData.push_back(new RawDataList(m_frameheader, strmcpy));
 }
 
-// The return value is the number of bytes in StoredData before the 'SV' frame
+// The return value is the number of bytes in storedData before the 'SV' frame
 long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
     long sync_offset = 0;
 
-    list<RawDataList*>::iterator it = StoredData.begin();
-    for ( ; it != StoredData.end(); ++it)
+    list<RawDataList*>::iterator it = m_storedData.begin();
+    for ( ; it != m_storedData.end(); ++it)
     {
         RawDataList *data = *it;
         if (data->frameheader.frametype == 'S' &&
@@ -1016,9 +1000,9 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
                                     long timecodeOffset)
 {
-    while (!StoredData.empty())
+    while (!m_storedData.empty())
     {
-        RawDataList *data = StoredData.front();
+        RawDataList *data = m_storedData.front();
 
         if (data->frameheader.frametype != 'S')
             data->frameheader.timecode -= timecodeOffset;
@@ -1029,17 +1013,17 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
             if (data->packet)
                 rb->Write(data->packet, data->frameheader.packetlength);
         }
-        StoredData.pop_front();
+        m_storedData.pop_front();
         delete data;
     }
 }
 
 void NuppelDecoder::ClearStoredData()
 {
-    while (!StoredData.empty())
+    while (!m_storedData.empty())
     {
-        RawDataList *data = StoredData.front();
-        StoredData.pop_front();
+        RawDataList *data = m_storedData.front();
+        m_storedData.pop_front();
         delete data;
     }
 }
@@ -1047,22 +1031,21 @@ void NuppelDecoder::ClearStoredData()
 bool NuppelDecoder::GetFrame(DecodeType decodetype)
 {
     bool gotvideo = false;
-    bool ret = false;
     int seeklen = 0;
     AVPacket pkt;
 
-    decoded_video_frame = nullptr;
+    m_decoded_video_frame = nullptr;
 
     while (!gotvideo)
     {
         long long currentposition = ringBuffer->GetReadPosition();
-        if (waitingForChange && currentposition + 4 >= readAdjust)
+        if (m_waitingForChange && currentposition + 4 >= m_readAdjust)
         {
             FileChanged();
             currentposition = ringBuffer->GetReadPosition();
         }
 
-        if (!ReadFrameheader(&frameheader))
+        if (!ReadFrameheader(&m_frameheader))
         {
             SetEof(true);
             return false;
@@ -1070,7 +1053,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
 
         if (!ringBuffer->LiveMode() &&
-            ((frameheader.frametype == 'Q') || (frameheader.frametype == 'K')))
+            ((m_frameheader.frametype == 'Q') || (m_frameheader.frametype == 'K')))
         {
             SetEof(true);
             return false;
@@ -1078,7 +1061,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
         bool framesearch = false;
 
-        while (!isValidFrametype(frameheader.frametype))
+        while (!isValidFrametype(m_frameheader.frametype))
         {
             if (!framesearch)
                 LOG(VB_GENERAL, LOG_INFO, "Searching for frame header.");
@@ -1087,7 +1070,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
             ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
-            if (!ReadFrameheader(&frameheader))
+            if (!ReadFrameheader(&m_frameheader))
             {
                 SetEof(true);
                 return false;
@@ -1095,7 +1078,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             seeklen = 1;
         }
 
-        if (frameheader.frametype == 'M')
+        if (m_frameheader.frametype == 'M')
         {
             int sizetoskip = sizeof(rtfileheader) - sizeof(rtframeheader);
             char *dummy = new char[sizetoskip + 1];
@@ -1111,34 +1094,34 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (frameheader.frametype == 'R')
+        if (m_frameheader.frametype == 'R')
         {
-            if (getrawframes)
+            if (m_getrawframes)
                 StoreRawData(nullptr);
             continue; // the R-frame has no data packet
         }
 
-        if (frameheader.frametype == 'S')
+        if (m_frameheader.frametype == 'S')
         {
-            if (frameheader.comptype == 'A')
+            if (m_frameheader.comptype == 'A')
             {
-                if (frameheader.timecode > 2000000 &&
-                    frameheader.timecode < 5500000)
+                if (m_frameheader.timecode > 2000000 &&
+                    m_frameheader.timecode < 5500000)
                 {
-                    effdsp = frameheader.timecode;
-                    m_audio->SetEffDsp(effdsp);
+                    m_effdsp = m_frameheader.timecode;
+                    m_audio->SetEffDsp(m_effdsp);
                 }
             }
-            else if (frameheader.comptype == 'V')
+            else if (m_frameheader.comptype == 'V')
             {
-                lastKey = frameheader.timecode;
-                framesPlayed = (frameheader.timecode > 0 ?
-                                frameheader.timecode - 1 : 0);
+                m_lastKey = m_frameheader.timecode;
+                m_framesPlayed = (m_frameheader.timecode > 0 ?
+                                m_frameheader.timecode - 1 : 0);
 
-                if (!hasFullPositionMap)
+                if (!m_hasFullPositionMap)
                 {
                     long long last_index = 0;
-                    long long this_index = lastKey / keyframedist;
+                    long long this_index = m_lastKey / m_keyframedist;
 
                     QMutexLocker locker(&m_positionMapLock);
                     if (!m_positionMap.empty())
@@ -1146,30 +1129,30 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                     if (this_index > last_index)
                     {
-                        PosMapEntry e = {this_index, lastKey, currentposition};
+                        PosMapEntry e = {this_index, m_lastKey, currentposition};
                         m_positionMap.push_back(e);
-                        m_frameToDurMap[lastKey] =
-                            lastKey * 1000 / video_frame_rate;
-                        m_durToFrameMap[m_frameToDurMap[lastKey]] = lastKey;
+                        m_frameToDurMap[m_lastKey] =
+                            m_lastKey * 1000 / m_video_frame_rate;
+                        m_durToFrameMap[m_frameToDurMap[m_lastKey]] = m_lastKey;
                     }
                 }
             }
-            if (getrawframes)
+            if (m_getrawframes)
                 StoreRawData(nullptr);
         }
 
-        if (frameheader.packetlength > 0)
+        if (m_frameheader.packetlength > 0)
         {
-            if (frameheader.packetlength > 10485760) // arbitrary 10MB limit
+            if (m_frameheader.packetlength > 10485760) // arbitrary 10MB limit
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Broken packet: %1 %2")
-                        .arg(frameheader.frametype)
-                        .arg(frameheader.packetlength));
+                        .arg(m_frameheader.frametype)
+                        .arg(m_frameheader.packetlength));
                 SetEof(true);
                 return false;
             }
-            if (ringBuffer->Read(strm, frameheader.packetlength) !=
-                frameheader.packetlength)
+            if (ringBuffer->Read(m_strm, m_frameheader.packetlength) !=
+                m_frameheader.packetlength)
             {
                 SetEof(true);
                 return false;
@@ -1178,11 +1161,11 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         else
             continue;
 
-        if (frameheader.frametype == 'V')
+        if (m_frameheader.frametype == 'V')
         {
             if (!(kDecodeVideo & decodetype))
             {
-                framesPlayed++;
+                m_framesPlayed++;
                 gotvideo = true;
                 continue;
             }
@@ -1191,74 +1174,74 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             if (!buf)
                 continue;
 
-            ret = DecodeFrame(&frameheader, strm, buf);
+            bool ret = DecodeFrame(&m_frameheader, m_strm, buf);
             if (!ret)
             {
                 GetPlayer()->DiscardVideoFrame(buf);
                 continue;
             }
 
-            buf->aspect = current_aspect;
-            buf->frameNumber = framesPlayed;
+            buf->aspect = m_current_aspect;
+            buf->frameNumber = m_framesPlayed;
             buf->dummy = 0;
-            GetPlayer()->ReleaseNextVideoFrame(buf, frameheader.timecode);
+            GetPlayer()->ReleaseNextVideoFrame(buf, m_frameheader.timecode);
 
             // We need to make the frame available ourselves
             // if we are not using ffmpeg/avlib.
-            if (directframe)
+            if (m_directframe)
                 GetPlayer()->DeLimboFrame(buf);
 
-            decoded_video_frame = buf;
+            m_decoded_video_frame = buf;
             gotvideo = true;
-            if (getrawframes && getrawvideo)
-                StoreRawData(strm);
-            framesPlayed++;
+            if (m_getrawframes && m_getrawvideo)
+                StoreRawData(m_strm);
+            m_framesPlayed++;
 
-            if (!setreadahead)
+            if (!m_setreadahead)
             {
-                videosizetotal += frameheader.packetlength;
-                videoframesread++;
+                m_videosizetotal += m_frameheader.packetlength;
+                m_videoframesread++;
 
-                if (videoframesread > 15)
+                if (m_videoframesread > 15)
                 {
-                    videosizetotal /= videoframesread;
+                    m_videosizetotal /= m_videoframesread;
 
-                    float bps = (videosizetotal * 8.0f / 1024.0f *
-                                 video_frame_rate);
-                    bitrate = (uint) (bps * 1.5f);
+                    float bps = (m_videosizetotal * 8.0F / 1024.0F *
+                                 static_cast<float>(m_video_frame_rate));
+                    m_bitrate = (uint) (bps * 1.5F);
 
                     ringBuffer->UpdateRawBitrate(GetRawBitrate());
-                    setreadahead = true;
+                    m_setreadahead = true;
                 }
             }
             continue;
         }
 
-        if (frameheader.frametype=='A' && (kDecodeAudio & decodetype))
+        if (m_frameheader.frametype=='A' && (kDecodeAudio & decodetype))
         {
-            if ((frameheader.comptype == '3') || (frameheader.comptype == 'A'))
+            if ((m_frameheader.comptype == '3') || (m_frameheader.comptype == 'A'))
             {
-                if (getrawframes)
-                    StoreRawData(strm);
+                if (m_getrawframes)
+                    StoreRawData(m_strm);
 
-                if (!mpa_audcodec)
+                if (!m_mpa_audcodec)
                 {
-                    if (frameheader.comptype == '3')
+                    if (m_frameheader.comptype == '3')
                         InitAVCodecAudio(AV_CODEC_ID_MP3);
-                    else if (frameheader.comptype == 'A')
+                    else if (m_frameheader.comptype == 'A')
                         InitAVCodecAudio(AV_CODEC_ID_AC3);
                     else
                     {
                         LOG(VB_GENERAL, LOG_ERR, LOC + QString("GetFrame: "
                                 "Unknown audio comptype of '%1', skipping")
-                                .arg(frameheader.comptype));
+                                .arg(m_frameheader.comptype));
                         return false;
                     }
                 }
 
                 av_init_packet(&pkt);
-                pkt.data = strm;
-                pkt.size = frameheader.packetlength;
+                pkt.data = m_strm;
+                pkt.size = m_frameheader.packetlength;
 
                 QMutexLocker locker(avcodeclock);
 
@@ -1266,7 +1249,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 {
                     int data_size = 0;
 
-                    int ret = m_audio->DecodeAudio(mpa_audctx, m_audioSamples,
+                    int ret = m_audio->DecodeAudio(m_mpa_audctx, m_audioSamples,
                                                data_size, &pkt);
                     if (ret < 0)
                     {
@@ -1280,56 +1263,56 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                         continue;
 
                     m_audio->AddAudioData((char *)m_audioSamples, data_size,
-                                          frameheader.timecode, 0);
+                                          m_frameheader.timecode, 0);
                 }
             }
             else
             {
-                getrawframes = false;
+                m_getrawframes = false;
 #if HAVE_BIGENDIAN
                 // Why endian correct the audio buffer here?
                 // Don't big-endian clients have to do it in audiooutBlah.cpp?
-                if (audio_bits_per_sample == 16) {
+                if (m_audio_bits_per_sample == 16) {
                     // swap bytes
-                    for (int i = 0; i < (frameheader.packetlength & ~1); i+=2) {
+                    for (int i = 0; i < (m_frameheader.packetlength & ~1); i+=2) {
                         char tmp;
-                        tmp = strm[i+1];
-                        strm[i+1] = strm[i];
-                        strm[i] = tmp;
+                        tmp = m_strm[i+1];
+                        m_strm[i+1] = m_strm[i];
+                        m_strm[i] = tmp;
                     }
                 }
 #endif
                 LOG(VB_PLAYBACK, LOG_DEBUG, QString("A audio timecode %1")
-                                              .arg(frameheader.timecode));
-                m_audio->AddAudioData((char *)strm, frameheader.packetlength,
-                                      frameheader.timecode, 0);
+                                              .arg(m_frameheader.timecode));
+                m_audio->AddAudioData((char *)m_strm, m_frameheader.packetlength,
+                                      m_frameheader.timecode, 0);
             }
         }
 
-        if (frameheader.frametype == 'T' && (kDecodeVideo & decodetype))
+        if (m_frameheader.frametype == 'T' && (kDecodeVideo & decodetype))
         {
-            if (getrawframes)
-                StoreRawData(strm);
+            if (m_getrawframes)
+                StoreRawData(m_strm);
 
-            GetPlayer()->GetCC608Reader()->AddTextData(strm, frameheader.packetlength,
-                                  frameheader.timecode, frameheader.comptype);
+            GetPlayer()->GetCC608Reader()->AddTextData(m_strm, m_frameheader.packetlength,
+                                  m_frameheader.timecode, m_frameheader.comptype);
         }
 
-        if (frameheader.frametype == 'S' && frameheader.comptype == 'M')
+        if (m_frameheader.frametype == 'S' && m_frameheader.comptype == 'M')
         {
-            unsigned char *eop = strm + frameheader.packetlength;
-            unsigned char *cur = strm;
+            unsigned char *eop = m_strm + m_frameheader.packetlength;
+            unsigned char *cur = m_strm;
 
             struct rtfileheader tmphead;
             struct rtfileheader *fh = &tmphead;
 
-            memcpy(fh, cur, min((int)sizeof(*fh), frameheader.packetlength));
+            memcpy(fh, cur, min((int)sizeof(*fh), m_frameheader.packetlength));
 
             while (QString(fh->finfo) != "MythTVVideo" &&
-                   cur + frameheader.packetlength <= eop)
+                   cur + m_frameheader.packetlength <= eop)
             {
                 cur++;
-                memcpy(fh, cur, min((int)sizeof(*fh), frameheader.packetlength));
+                memcpy(fh, cur, min((int)sizeof(*fh), m_frameheader.packetlength));
             }
 
             if (QString(fh->finfo) == "MythTVVideo")
@@ -1347,20 +1330,20 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 fh->keyframedist  = bswap_32(fh->keyframedist);
 #endif
 
-                fileheader = *fh;
+                m_fileheader = *fh;
 
-                if (fileheader.aspect > .999 && fileheader.aspect < 1.001)
-                    fileheader.aspect = 4.0 / 3;
-                current_aspect = fileheader.aspect;
+                if (m_fileheader.aspect > .999 && m_fileheader.aspect < 1.001)
+                    m_fileheader.aspect = 4.0 / 3;
+                m_current_aspect = m_fileheader.aspect;
 
-                GetPlayer()->SetKeyframeDistance(fileheader.keyframedist);
-                GetPlayer()->SetVideoParams(fileheader.width, fileheader.height,
-                                            fileheader.fps);
+                GetPlayer()->SetKeyframeDistance(m_fileheader.keyframedist);
+                GetPlayer()->SetVideoParams(m_fileheader.width, m_fileheader.height,
+                                            m_fileheader.fps);
             }
         }
     }
 
-    framesRead = framesPlayed;
+    m_framesRead = m_framesPlayed;
 
     return true;
 }
@@ -1378,17 +1361,17 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
 
     DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 
-    if (mpa_vidcodec && doFlush)
-        avcodec_flush_buffers(mpa_vidctx);
+    if (m_mpa_vidcodec && doFlush)
+        avcodec_flush_buffers(m_mpa_vidctx);
 
     if (discardFrames)
         GetPlayer()->DiscardVideoFrames(doFlush);
 
-    for (;(skipFrames > 0) && !ateof; skipFrames--)
+    for (;(skipFrames > 0) && !m_ateof; skipFrames--)
     {
         GetFrame(kDecodeAV);
-        if (decoded_video_frame)
-            GetPlayer()->DiscardVideoFrame(decoded_video_frame);
+        if (m_decoded_video_frame)
+            GetPlayer()->DiscardVideoFrame(m_decoded_video_frame);
     }
 }
 

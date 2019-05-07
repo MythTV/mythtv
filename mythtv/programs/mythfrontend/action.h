@@ -39,10 +39,7 @@ class Action
 {
   public:
     /// \brief Create a new empty action.
-    explicit Action(const QString &description) : m_description(description)
-    {
-        m_description.detach();
-    }
+    explicit Action(const QString &description) : m_description(description) {}
     Action(const QString &description, const QString &keys);
 
     // Commands
@@ -57,20 +54,10 @@ class Action
 
     // Gets
     /// \brief Returns the action description. (note: not threadsafe)
-    QString     GetDescription(void) const
-    {
-        QString desc = m_description;
-        desc.detach();
-        return desc;
-    }
+    QString     GetDescription(void) const { return m_description; }
     /// \brief Returns the key sequence(s) that trigger this action.
     ///        (note: not threadsafe)
-    QStringList GetKeys(void)        const
-    {
-        QStringList keys = m_keys;
-        keys.detach();
-        return keys;
-    }
+    QStringList GetKeys(void)        const { return m_keys; }
     /// \brief Returns comma delimited string of key bindings
     QString     GetKeyString(void)   const { return m_keys.join(","); }
     /// \brief Returns true iff the action has no keys
@@ -103,18 +90,9 @@ class ActionID
      *  \param action The action's name
      */
     ActionID(const QString &context, const QString &action)
-        : m_context(context), m_action(action)
-    {
-        m_context.detach();
-        m_action.detach();
-    }
-
+        : m_context(context), m_action(action) {}
     ActionID(const ActionID &other)
-        : m_context(other.m_context), m_action(other.m_action)
-    {
-        m_context.detach();
-        m_action.detach();
-    }
+        : m_context(other.m_context), m_action(other.m_action) {}
 
     ActionID& operator=(const ActionID &rhs)
     {
@@ -124,20 +102,10 @@ class ActionID
     }
 
     /// \brief Returns the context name.
-    QString GetContext(void) const
-    {
-        QString tmp = m_context;
-        tmp.detach();
-        return tmp;
-    }
+    QString GetContext(void) const { return m_context; }
 
     /// \brief Returns the action name.
-    QString GetAction(void)  const
-    {
-        QString tmp = m_action;
-        tmp.detach();
-        return tmp;
-    }
+    QString GetAction(void)  const { return m_action; }
 
     bool operator==(const ActionID &other) const
     {

@@ -47,25 +47,6 @@
 #define LOC QString("MythControls: ")
 #define LOC_ERR QString("MythControls, Error: ")
 
-/**
- *  \brief Creates a new MythControls wizard
- *  \param parent Pointer to the screen stack
- *  \param name The name of the window
- */
-MythControls::MythControls(MythScreenStack *parent, const char *name)
-    : MythScreenType (parent, name)
-{
-    m_currentView = kActionsByContext;
-    m_leftList = m_rightList = nullptr;
-    m_description = m_leftDescription = m_rightDescription = nullptr;
-    m_bindings = nullptr;
-
-    m_leftListType  = kContextList;
-    m_rightListType = kActionList;
-
-    m_menuPopup = nullptr;
-}
-
 MythControls::~MythControls()
 {
     Teardown();
@@ -280,7 +261,7 @@ void MythControls::Close()
  *  \brief Refreshes the right list when an item in the
  *         left list is selected
  */
-void MythControls::LeftSelected(MythUIButtonListItem*)
+void MythControls::LeftSelected(MythUIButtonListItem* /*item*/)
 {
     UpdateRightList();
 }
@@ -289,7 +270,7 @@ void MythControls::LeftSelected(MythUIButtonListItem*)
  *  \brief Refreshes key information when an item in the
  *         right list is selected
  */
-void MythControls::RightSelected(MythUIButtonListItem*)
+void MythControls::RightSelected(MythUIButtonListItem* /*item*/)
 {
     RefreshKeyInformation();
 }
@@ -311,8 +292,7 @@ void MythControls::SetListContents(
     QStringList::const_iterator it = contents.begin();
     for (; it != contents.end(); ++it)
     {
-        QString tmp = *it; tmp.detach();
-        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, tmp);
+        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, *it);
         item->setDrawArrow(arrows);
     }
 }
@@ -413,9 +393,7 @@ QString MythControls::GetCurrentAction(void)
     {
         if (m_leftList && m_leftList->GetItemCurrent())
         {
-            QString tmp = m_leftList->GetItemCurrent()->GetText();
-            tmp.detach();
-            return tmp;
+            return m_leftList->GetItemCurrent()->GetText();
         }
         return QString();
     }
@@ -430,7 +408,6 @@ QString MythControls::GetCurrentAction(void)
     if (kContextList == m_leftListType &&
         kActionList  == m_rightListType)
     {
-        desc.detach();
         return desc;
     }
 
@@ -536,7 +513,6 @@ void MythControls::LoadData(const QString &hostname)
     for (; it != m_sortedContexts.end(); ++it)
     {
         QString ctx_name = *it;
-        ctx_name.detach();
         QStringList actions = m_bindings->GetActions(ctx_name);
         actions.sort();
         m_contexts.insert(ctx_name, actions);
@@ -650,7 +626,7 @@ void MythControls::GrabKey(void)
  *  TODO FIXME This code needs work to deal with multiple
  *             binding conflicts.
  */
-void MythControls::AddKeyToAction(QString key, bool ignoreconflict)
+void MythControls::AddKeyToAction(const QString& key, bool ignoreconflict)
 {
     QString     action  = GetCurrentAction();
     QString     context = GetCurrentContext();

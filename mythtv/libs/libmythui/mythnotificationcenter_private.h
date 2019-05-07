@@ -129,8 +129,8 @@ private:
     int RemoveScreen(MythNotificationScreen *screen);
     void RefreshScreenPosition(int from = 0);
 
-    MythNotificationScreenStack            *m_originalScreenStack;
-    MythNotificationScreenStack            *m_screenStack;
+    MythNotificationScreenStack            *m_originalScreenStack {nullptr};
+    MythNotificationScreenStack            *m_screenStack         {nullptr};
     QList<MythNotification*>                m_notifications;
     QList<MythNotificationScreen*>        m_screens;
     QList<MythNotificationScreen*>        m_deletedScreens;
@@ -139,7 +139,7 @@ private:
     QMap<int,bool>                          m_unregistered;
     QMap<int, void*>                        m_clients;
     QMutex                                  m_lock;
-    int                                     m_currentId;
+    int                                     m_currentId           {0};
     QMap<MythNotificationScreen*, MythNotificationScreen*> m_converted;
 };
 
@@ -157,12 +157,12 @@ public:
     
     virtual ~MythNotificationScreen();
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     // These two methods are declared by MythScreenType and their signatures
     // should not be changed
-    virtual bool Create(void);
-    virtual void Init(void);
+    bool Create(void) override; // MythScreenType
+    void Init(void)  override; // MythScreenType
 
     void SetNotification(MythNotification &notification);
 
@@ -178,7 +178,7 @@ public:
     // UI methods
     void AdjustYPosition(void);
     void AdjustIndex(int by, bool set=false);
-    void SetIndex(int value);
+    void SetIndex(int index);
     int  GetHeight(void);
 
     enum Content {
@@ -205,32 +205,33 @@ public:
     QString                     m_origin;
     QString                     m_description;
     QString                     m_extra;
-    int                         m_duration;
-    float                       m_progress;
+    int                         m_duration        {-1};
+    float                       m_progress        {-1.0F};
     QString                     m_progresstext;
-    bool                        m_fullscreen;
-    bool                        m_added;
-    bool                        m_created;
-    uint32_t                    m_content;
-    uint32_t                    m_update;
-    MythNotification::Type      m_type;
-    MythUIImage                *m_artworkImage;
-    MythUIText                 *m_titleText;
-    MythUIText                 *m_originText;
-    MythUIText                 *m_descriptionText;
-    MythUIText                 *m_extraText;
-    MythUIText                 *m_progresstextText;
-    MythUIProgressBar          *m_progressBar;
-    MythUIStateType            *m_errorState;
-    MythUIStateType            *m_mediaState;
-    QDateTime                   m_creation, m_expiry;
-    int                         m_index;
+    bool                        m_fullscreen      {false};
+    bool                        m_added           {false};
+    bool                        m_created         {false};
+    uint32_t                    m_content         {kNone};
+    uint32_t                    m_update          {(uint32_t)kAll};
+    MythNotification::Type      m_type            {MythNotification::New};
+    MythUIImage                *m_artworkImage    {nullptr};
+    MythUIText                 *m_titleText       {nullptr};
+    MythUIText                 *m_originText      {nullptr};
+    MythUIText                 *m_descriptionText {nullptr};
+    MythUIText                 *m_extraText       {nullptr};
+    MythUIText                 *m_progresstextText{nullptr};
+    MythUIProgressBar          *m_progressBar     {nullptr};
+    MythUIStateType            *m_errorState      {nullptr};
+    MythUIStateType            *m_mediaState      {nullptr};
+    QDateTime                   m_creation;
+    QDateTime                   m_expiry;
+    int                         m_index           {0};
     MythPoint                   m_position;
-    QTimer                     *m_timer;
+    QTimer                     *m_timer           {nullptr};
     QString                     m_style;
-    VNMask                      m_visibility;
-    MythNotification::Priority  m_priority;
-    bool                        m_refresh;
+    VNMask                      m_visibility      {(VNMask)MythNotification::kAll};
+    MythNotification::Priority  m_priority        {MythNotification::kDefault};
+    bool                        m_refresh         {true};
 };
 
 //// class MythScreenNotificationStack
@@ -264,11 +265,11 @@ public:
 
     static const int kFadeVal = 20;
 
-    virtual void PopScreen(MythScreenType *screen, bool allowFade = true,
-                           bool deleteScreen = true);
-    virtual MythScreenType *GetTopScreen(void) const;
+    void PopScreen(MythScreenType *screen, bool allowFade = true,
+                   bool deleteScreen = true) override; // MythScreenStack
+    MythScreenType *GetTopScreen(void) const override; // MythScreenStack
 private:
-    NCPrivate *m_owner;
+    NCPrivate *m_owner {nullptr};
 
 };
 

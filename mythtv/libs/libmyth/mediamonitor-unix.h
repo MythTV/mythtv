@@ -18,21 +18,21 @@ class MediaMonitorUnix : public MediaMonitor
 #if CONFIG_QTDBUS
     Q_OBJECT
   public slots:
-    Q_NOREPLY void deviceAdded(QDBusObjectPath);
-    Q_NOREPLY void deviceRemoved(QDBusObjectPath);
+    Q_NOREPLY void deviceAdded(const QDBusObjectPath&);
+    Q_NOREPLY void deviceRemoved(const QDBusObjectPath&);
 #endif
 
   public:
     MediaMonitorUnix(QObject *par, unsigned long interval, bool allowEject);
 #if !CONFIG_QTDBUS
-    virtual void deleteLater(void);
+    void deleteLater(void) override; // MediaMonitor
 #endif
 
   protected:
     ~MediaMonitorUnix() = default;
 
 #if !CONFIG_QTDBUS
-    virtual void CheckDeviceNotifications(void);
+    void CheckDeviceNotifications(void) override; // MediaMonitor
 #endif
     bool CheckFileSystemTable(void);
     bool CheckMountable(void);
@@ -41,17 +41,17 @@ class MediaMonitorUnix : public MediaMonitor
     bool FindPartitions(const QString &dev, bool checkPartitions);
 #endif
 
-    virtual bool AddDevice(MythMediaDevice* pDevice);
+    bool AddDevice(MythMediaDevice* pDevice) override; // MediaMonitor
     bool AddDevice(struct fstab* mep);
 
 #if !CONFIG_QTDBUS
     QString GetDeviceFile(const QString &sysfs);
 #endif
 
-    virtual QStringList GetCDROMBlockDevices(void);
+    QStringList GetCDROMBlockDevices(void) override; // MediaMonitor
 
   protected:
-    int                          m_fifo;
+    int                          m_fifo {-1};
     static const char           *kUDEV_FIFO;
 };
 

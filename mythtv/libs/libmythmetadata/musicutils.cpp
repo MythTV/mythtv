@@ -78,7 +78,7 @@ QString filenameFromMetadata(MusicMetadata *track)
 {
     QString filename;
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
-    bool no_ws = gCoreContext->GetNumSetting("NoWhitespace", 0);
+    bool no_ws = gCoreContext->GetBoolSetting("NoWhitespace", false);
 
     QRegExp rx_ws("\\s{1,}");
     QRegExp rx("(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
@@ -184,8 +184,5 @@ bool isNewTune(const QString& artist, const QString& album, const QString& title
         return true;
     }
 
-    if (query.size() > 0)
-        return false;
-
-    return true;
+    return query.size() <= 0;
 }

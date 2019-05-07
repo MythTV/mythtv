@@ -33,12 +33,14 @@ class ExportNative : public MythScreenType
 
   public:
     ExportNative(MythScreenStack *parent, MythScreenType *previousScreen,
-                 ArchiveDestination archiveDestination, QString name);
-
+                 ArchiveDestination archiveDestination, QString name)
+        : MythScreenType(parent, name),
+          m_previousScreen(previousScreen),
+          m_archiveDestination(archiveDestination) {}
     ~ExportNative(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void createConfigFile(const QString &filename);
 
@@ -51,7 +53,7 @@ class ExportNative : public MythScreenType
     void handleAddVideo(void);
 
     void titleChanged(MythUIButtonListItem *item);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void removeItem(void);
     void selectorClosed(bool ok);
 
@@ -64,35 +66,35 @@ class ExportNative : public MythScreenType
     void getArchiveListFromDB(void);
     void runScript();
 
-    MythScreenType    *m_previousScreen;
+    MythScreenType    *m_previousScreen     {nullptr};
 
     ArchiveDestination m_archiveDestination;
-    uint               m_usedSpace;
+    uint               m_usedSpace          {0};
 
     QList<ArchiveItem *> m_archiveList;
 
-    bool    m_bCreateISO;
-    bool    m_bDoBurn;
-    bool    m_bEraseDvdRw;
+    bool    m_bCreateISO                    {false};
+    bool    m_bDoBurn                       {false};
+    bool    m_bEraseDvdRw                   {false};
     QString m_saveFilename;
 
-    MythUIButtonList  *m_archiveButtonList;
-    MythUIButton      *m_nextButton;
-    MythUIButton      *m_prevButton;
-    MythUIButton      *m_cancelButton;
-    MythUIButton      *m_addrecordingButton;
-    MythUIButton      *m_addvideoButton;
-    MythUIText        *m_freespaceText;
-    MythUIText        *m_titleText;
-    MythUIText        *m_datetimeText;
-    MythUIText        *m_descriptionText;
-    MythUIText        *m_filesizeText;
-    MythUIText        *m_nofilesText;
-    MythUIText        *m_maxsizeText;
-    MythUIText        *m_minsizeText;
-    MythUIText        *m_currsizeText;
-    MythUIText        *m_currsizeErrText;
-    MythUIProgressBar *m_sizeBar;
+    MythUIButtonList  *m_archiveButtonList  {nullptr};
+    MythUIButton      *m_nextButton         {nullptr};
+    MythUIButton      *m_prevButton         {nullptr};
+    MythUIButton      *m_cancelButton       {nullptr};
+    MythUIButton      *m_addrecordingButton {nullptr};
+    MythUIButton      *m_addvideoButton     {nullptr};
+    MythUIText        *m_freespaceText      {nullptr};
+    MythUIText        *m_titleText          {nullptr};
+    MythUIText        *m_datetimeText       {nullptr};
+    MythUIText        *m_descriptionText    {nullptr};
+    MythUIText        *m_filesizeText       {nullptr};
+    MythUIText        *m_nofilesText        {nullptr};
+    MythUIText        *m_maxsizeText        {nullptr};
+    MythUIText        *m_minsizeText        {nullptr};
+    MythUIText        *m_currsizeText       {nullptr};
+    MythUIText        *m_currsizeErrText    {nullptr};
+    MythUIProgressBar *m_sizeBar            {nullptr};
 };
 
 #endif

@@ -17,12 +17,12 @@ class MythD3DVertexBuffer
 {
   public:
     explicit MythD3DVertexBuffer(IDirect3DTexture9* tex = nullptr) :
-        m_color(0xFFFFFFFF), m_dest(QRect(QPoint(0,0),QSize(0,0))),
+        m_dest(QRect(QPoint(0,0),QSize(0,0))),
         m_src(QRect(QPoint(0,0),QSize(0,0))), m_texture(tex)
     {
     }
 
-    uint32_t           m_color;
+    uint32_t           m_color {0xFFFFFFFF};
     QRect              m_dest;
     QRect              m_src;
     IDirect3DTexture9 *m_texture;
@@ -63,8 +63,7 @@ typedef struct
 } VERTEX;
 
 D3D9Image::D3D9Image(MythRenderD3D9 *render, QSize size, bool video)
-  : m_size(size), m_valid(false), m_render(render), m_vertexbuffer(nullptr),
-    m_texture(nullptr), m_surface(nullptr)
+  : m_size(size), m_render(render)
 {
     if (m_render)
     {
@@ -161,10 +160,6 @@ QRect D3D9Image::GetRect(void)
 #define D3DFVF_VERTEX        (D3DFVF_XYZRHW|D3DFVF_DIFFUSE)
 #define D3DLOC QString("MythRenderD3D9: ")
 
-D3D9Locker::D3D9Locker(MythRenderD3D9 *render) : m_render(render)
-{
-}
-
 D3D9Locker::~D3D9Locker()
 {
     if (m_render)
@@ -184,19 +179,6 @@ IDirect3DDevice9* D3D9Locker::Acquire(void)
 void* MythRenderD3D9::ResolveAddress(const char* lib, const char* proc)
 {
     return QLibrary::resolve(lib, proc);
-}
-
-MythRenderD3D9::MythRenderD3D9(void)
-  : MythRender(kRenderDirect3D9),
-    m_d3d(nullptr), m_rootD3DDevice(nullptr),
-    m_adaptor_fmt(D3DFMT_UNKNOWN),
-    m_videosurface_fmt(D3DFMT_UNKNOWN),
-    m_surface_fmt(D3DFMT_UNKNOWN), m_texture_fmt(D3DFMT_UNKNOWN),
-    m_rect_vertexbuffer(nullptr), m_default_surface(nullptr), m_current_surface(nullptr),
-    m_lock(QMutex::Recursive),
-    m_blend(true), m_multi_texturing(true), m_texture_vertices(true),
-    m_deviceManager(nullptr), m_deviceHandle(nullptr), m_deviceManagerToken(0)
-{
 }
 
 MythRenderD3D9::~MythRenderD3D9(void)
@@ -472,7 +454,7 @@ bool MythRenderD3D9::ClearBuffer(void)
         return false;
 
     HRESULT hr = dev->Clear(0, nullptr, D3DCLEAR_TARGET,
-                            D3DCOLOR_ARGB(0, 0, 0, 0), 1.0f, 0);
+                            D3DCOLOR_ARGB(0, 0, 0, 0), 1.0F, 0);
     if (FAILED(hr))
     {
         LOG(VB_GENERAL, LOG_ERR, D3DLOC + "Clear() failed.");
@@ -628,24 +610,24 @@ void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color, int alpha)
 
     p_vertices[0].x       = (float)rect.left();
     p_vertices[0].y       = (float)rect.top();
-    p_vertices[0].z       = 0.0f;
+    p_vertices[0].z       = 0.0F;
     p_vertices[0].diffuse = clr;
-    p_vertices[0].rhw     = 1.0f;
+    p_vertices[0].rhw     = 1.0F;
     p_vertices[1].x       = (float)(rect.left() + rect.width());
     p_vertices[1].y       = (float)rect.top();
-    p_vertices[1].z       = 0.0f;
+    p_vertices[1].z       = 0.0F;
     p_vertices[1].diffuse = clr;
-    p_vertices[1].rhw     = 1.0f;
+    p_vertices[1].rhw     = 1.0F;
     p_vertices[2].x       = (float)(rect.left() + rect.width());
     p_vertices[2].y       = (float)(rect.top() + rect.height());
-    p_vertices[2].z       = 0.0f;
+    p_vertices[2].z       = 0.0F;
     p_vertices[2].diffuse = clr;
-    p_vertices[2].rhw     = 1.0f;
+    p_vertices[2].rhw     = 1.0F;
     p_vertices[3].x       = (float)rect.left();
     p_vertices[3].y       = (float)(rect.top() + rect.height());
-    p_vertices[3].z       = 0.0f;
+    p_vertices[3].z       = 0.0F;
     p_vertices[3].diffuse = clr;
-    p_vertices[3].rhw     = 1.0f;
+    p_vertices[3].rhw     = 1.0F;
 
     hr = m_rect_vertexbuffer->Unlock();
     if (FAILED(hr))
@@ -1052,38 +1034,38 @@ bool MythRenderD3D9::UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
 
     p_vertices[0].x       = (float)dest.left();
     p_vertices[0].y       = (float)dest.top();
-    p_vertices[0].z       = 0.0f;
+    p_vertices[0].z       = 0.0F;
     p_vertices[0].diffuse = color;
-    p_vertices[0].rhw     = 1.0f;
-    p_vertices[0].t1u     = ((float)src.left() - 0.5f) / (float)norm.width();
-    p_vertices[0].t1v     = ((float)src.top() - 0.5f) / (float)norm.height();
+    p_vertices[0].rhw     = 1.0F;
+    p_vertices[0].t1u     = ((float)src.left() - 0.5F) / (float)norm.width();
+    p_vertices[0].t1v     = ((float)src.top() - 0.5F) / (float)norm.height();
 
     p_vertices[1].x       = (float)(dest.left() + dest.width());
     p_vertices[1].y       = (float)dest.top();
-    p_vertices[1].z       = 0.0f;
+    p_vertices[1].z       = 0.0F;
     p_vertices[1].diffuse = color;
-    p_vertices[1].rhw     = 1.0f;
-    p_vertices[1].t1u     = ((float)(src.left() + src.width()) - 0.5f) /
+    p_vertices[1].rhw     = 1.0F;
+    p_vertices[1].t1u     = ((float)(src.left() + src.width()) - 0.5F) /
                             (float)norm.width();
-    p_vertices[1].t1v     = ((float)src.top() - 0.5f) / (float)norm.height();
+    p_vertices[1].t1v     = ((float)src.top() - 0.5F) / (float)norm.height();
 
     p_vertices[2].x       = (float)(dest.left() + dest.width());
     p_vertices[2].y       = (float)(dest.top() + dest.height());
-    p_vertices[2].z       = 0.0f;
+    p_vertices[2].z       = 0.0F;
     p_vertices[2].diffuse = color;
-    p_vertices[2].rhw     = 1.0f;
-    p_vertices[2].t1u     = ((float)(src.left() + src.width()) - 0.5f) /
+    p_vertices[2].rhw     = 1.0F;
+    p_vertices[2].t1u     = ((float)(src.left() + src.width()) - 0.5F) /
                             (float)norm.width();
-    p_vertices[2].t1v     = ((float)(src.top() + src.height()) - 0.5f) /
+    p_vertices[2].t1v     = ((float)(src.top() + src.height()) - 0.5F) /
                             (float)norm.height();
 
     p_vertices[3].x       = (float)dest.left();
     p_vertices[3].y       = (float)(dest.top() + dest.height());
-    p_vertices[3].z       = 0.0f;
+    p_vertices[3].z       = 0.0F;
     p_vertices[3].diffuse = color;
-    p_vertices[3].rhw     = 1.0f;
-    p_vertices[3].t1u     = ((float)src.left() - 0.5f) / (float)norm.width();
-    p_vertices[3].t1v     = ((float)(src.top() + src.height()) - 0.5f) /
+    p_vertices[3].rhw     = 1.0F;
+    p_vertices[3].t1u     = ((float)src.left() - 0.5F) / (float)norm.width();
+    p_vertices[3].t1v     = ((float)(src.top() + src.height()) - 0.5F) /
                             (float)norm.height();
 
     p_vertices[0].t2u     = p_vertices[0].t1u;

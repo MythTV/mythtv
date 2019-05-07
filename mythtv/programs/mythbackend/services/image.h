@@ -36,19 +36,19 @@ public:
 
 public:
     QString                     GetImageInfo                ( int   id,
-                                                              const QString &tag );
+                                                              const QString &tag ) override; // ImageServices
 
-    DTC::ImageMetadataInfoList* GetImageInfoList            ( int   id );
+    DTC::ImageMetadataInfoList* GetImageInfoList            ( int   id ) override; // ImageServices
 
-    bool                        RemoveImage        ( int   id );
+    bool                        RemoveImage        ( int   id ) override; // ImageServices
     bool                        RenameImage        ( int   id,
-                                                     const QString &newName );
+                                                     const QString &newName ) override; // ImageServices
 
-    bool                        StartSync          ( void );
-    bool                        StopSync           ( void );
-    DTC::ImageSyncInfo*         GetSyncStatus      ( void );
+    bool                        StartSync          ( void ) override; // ImageServices
+    bool                        StopSync           ( void ) override; // ImageServices
+    DTC::ImageSyncInfo*         GetSyncStatus      ( void ) override; // ImageServices
 
-    bool                        CreateThumbnail    (int   id);
+    bool                        CreateThumbnail    (int   id) override; // ImageServices
 
 };
 

@@ -16,8 +16,7 @@ bool AvFormatDecoderBD::IsValidStream(int streamid)
 {
     if (ringBuffer && ringBuffer->IsBD())
         return ringBuffer->BD()->IsValidStream(streamid);
-    else
-        return AvFormatDecoder::IsValidStream(streamid);
+    return AvFormatDecoder::IsValidStream(streamid);
 }
 
 void AvFormatDecoderBD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
@@ -31,8 +30,8 @@ void AvFormatDecoderBD::UpdateFramesPlayed(void)
     if (!ringBuffer->IsBD())
         return;
 
-    long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
-    framesPlayed = framesRead = currentpos ;
+    long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * m_fps);
+    m_framesPlayed = m_framesRead = currentpos ;
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
@@ -42,7 +41,7 @@ bool AvFormatDecoderBD::DoRewindSeek(long long desiredFrame)
         return false;
 
     ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
-    framesPlayed = framesRead = lastKey = desiredFrame + 1;
+    m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
     return true;
 }
 
@@ -53,7 +52,7 @@ void AvFormatDecoderBD::DoFastForwardSeek(long long desiredFrame, bool &needflus
 
     ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
     needflush    = true;
-    framesPlayed = framesRead = lastKey = desiredFrame + 1;
+    m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
 }
 
 void AvFormatDecoderBD::StreamChangeCheck(void)
@@ -87,10 +86,10 @@ int AvFormatDecoderBD::GetSubtitleLanguage(uint subtitle_index,
 {
     (void)subtitle_index;
     if (ringBuffer && ringBuffer->IsBD() &&
-        stream_index < ic->nb_streams &&
-        ic->streams[stream_index] != nullptr)
+        stream_index < m_ic->nb_streams &&
+        m_ic->streams[stream_index] != nullptr)
     {
-        return ringBuffer->BD()->GetSubtitleLanguage(ic->streams[stream_index]->id);
+        return ringBuffer->BD()->GetSubtitleLanguage(m_ic->streams[stream_index]->id);
     }
 
     return iso639_str3_to_key("und");
@@ -100,10 +99,10 @@ int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
 {
     (void)audio_index;
     if (ringBuffer && ringBuffer->IsBD() &&
-        stream_index < ic->nb_streams &&
-        ic->streams[stream_index] != nullptr)
+        stream_index < m_ic->nb_streams &&
+        m_ic->streams[stream_index] != nullptr)
     {
-        return ringBuffer->BD()->GetAudioLanguage(ic->streams[stream_index]->id);
+        return ringBuffer->BD()->GetAudioLanguage(m_ic->streams[stream_index]->id);
     }
 
     return iso639_str3_to_key("und");
@@ -153,7 +152,8 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
     {
-        int diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
+#if 0
+        int diffTime = (int)ceil((desiredFrame - m_framesPlayed) / m_fps);
         long long desiredTimePos = ringBuffer->BD()->GetCurrentTime() +
                         diffTime;
         if (diffTime <= 0)
@@ -163,7 +163,8 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
 
         if (desiredTimePos < 0)
             desiredTimePos = 0;
-        return (desiredFrame * 90000LL / fps);
+#endif
+        return (desiredFrame * 90000LL / m_fps);
     }
     return current_speed;
 }

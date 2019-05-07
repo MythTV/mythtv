@@ -43,8 +43,8 @@ enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, Ev
 class MHRoot  
 {
   public:
-    MHRoot(): m_fAvailable(false), m_fRunning(false) {}
-    MHRoot(const MHRoot &/*ref*/): m_fAvailable(false), m_fRunning(false) {}
+    MHRoot() {}
+    MHRoot(const MHRoot &/*ref*/) {}
     virtual ~MHRoot() {}
     // Initialise - set up the item from the parse tree.
     virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
@@ -204,8 +204,8 @@ class MHRoot
 
     virtual const char *ClassName() = 0; // For debugging messages.
   protected:
-    bool m_fAvailable; // Set once Preparation has completed.
-    bool m_fRunning; // Set once Activation has completed.
+    bool m_fAvailable {false}; // Set once Preparation has completed.
+    bool m_fRunning   {false}; // Set once Activation has completed.
 
     friend class MHEngine;
 };
@@ -215,10 +215,11 @@ class MHGetAvailabilityStatus: public MHElemAction
 {
   public:
     MHGetAvailabilityStatus(): MHElemAction(":GetAvailabilityStatus")  {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_ResultVar.PrintMe(fd, 0); }
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
+        { m_ResultVar.PrintMe(fd, 0); }
     MHObjectRef m_ResultVar;
 };
 
@@ -227,7 +228,8 @@ class MHGetRunningStatus: public MHActionObjectRef
 {
   public:
     MHGetRunningStatus(): MHActionObjectRef(":GetRunningStatus")  {}
-    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) { pResult->SetVariableValue(pTarget->GetRunningStatus());}
+    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+        { pResult->SetVariableValue(pTarget->GetRunningStatus());}
 };
 
 #endif

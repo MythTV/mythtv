@@ -27,16 +27,19 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     class AudioDeviceConfig
     {
       public:
-        QString name;
-        QString desc;
-        AudioOutputSettings settings;
+        QString             m_name;
+        QString             m_desc;
+        AudioOutputSettings m_settings;
         AudioDeviceConfig(void) :
-            name(QString()), desc(QString()),
-            settings(AudioOutputSettings(true)) { };
+            m_settings(AudioOutputSettings(true)) { };
         AudioDeviceConfig(const QString &name,
                           const QString &desc) :
-            name(name), desc(desc),
-            settings(AudioOutputSettings(true)) { };
+            m_name(name), m_desc(desc),
+            m_settings(AudioOutputSettings(true)) { };
+        AudioDeviceConfig(const AudioDeviceConfig &) = default;
+        AudioDeviceConfig(AudioDeviceConfig &&) = default;
+        AudioDeviceConfig &operator= (const AudioDeviceConfig &) = default;
+        AudioDeviceConfig &operator= (AudioDeviceConfig &&) = default;
     };
 
     typedef QVector<AudioDeviceConfig> ADCVect;
@@ -48,8 +51,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(
-        const QString &audiodevice, const QString &passthrudevice,
-        AudioFormat format, int channels, int codec, int samplerate,
+        const QString &main_device, const QString &passthru_device,
+        AudioFormat format, int channels, AVCodecID codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
         int upmixer_startup = 0, AudioOutputSettings *custom = nullptr);
     static AudioOutput *OpenAudio(AudioSettings &settings,
@@ -59,17 +62,14 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         const QString &passthru_device = QString(),
         bool willsuspendpa = true);
 
-    AudioOutput() :
-        VolumeBase(),             OutputListeners(),
-        pulsewassuspended(false), _frame(nullptr) {}
-
-    virtual ~AudioOutput();
+    AudioOutput() = default;
+    ~AudioOutput() override;
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
 
     virtual void SetStretchFactor(float factor);
-    virtual float GetStretchFactor(void) const { return 1.0f; }
+    virtual float GetStretchFactor(void) const { return 1.0F; }
     virtual int GetChannels(void) const { return 2; }
     virtual AudioFormat GetFormat(void) const { return FORMAT_S16; };
     virtual int GetBytesPerFrame(void) const { return 4; };
@@ -77,7 +77,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
     virtual AudioOutputSettings* GetOutputSettingsUsers(bool digital = true);
     virtual bool CanPassthrough(int samplerate, int channels,
-                                int codec, int profile) const;
+                                AVCodecID codec, int profile) const;
     virtual bool CanDownmix(void) const { return false; };
 
     // dsprate is in 100 * samples/second
@@ -138,10 +138,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     /// report amount of audio buffered in milliseconds.
     virtual int64_t GetAudioBufferedTime(void) { return 0; }
 
-    virtual void SetSourceBitrate(int ) { }
+    virtual void SetSourceBitrate(int /*rate*/ ) { }
 
-    QString GetError(void)   const { return lastError; }
-    QString GetWarning(void) const { return lastWarn; }
+    QString GetError(void)   const { return m_lastError; }
+    QString GetWarning(void) const { return m_lastWarn; }
 
     virtual void GetBufferStatus(uint &fill, uint &total)
         { fill = total = 0; }
@@ -154,7 +154,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual bool IsUpmixing(void)   { return false; }
     virtual bool ToggleUpmix(void)  { return false; }
     virtual bool CanUpmix(void)     { return false; }
-    bool PulseStatus(void) { return pulsewassuspended; }
+    bool PulseStatus(void) { return m_pulsewassuspended; }
 
     /**
      * \param fmt The audio format in question.
@@ -198,10 +198,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     void ClearError(void);
     void ClearWarning(void);
 
-    QString lastError;
-    QString lastWarn;
-    bool pulsewassuspended;
-    AVFrame *_frame;
+    QString m_lastError;
+    QString m_lastWarn;
+    bool    m_pulsewassuspended {false};
+    AVFrame *m_frame            {nullptr};
 };
 
 #endif

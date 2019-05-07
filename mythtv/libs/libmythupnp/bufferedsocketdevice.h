@@ -39,16 +39,16 @@ class BufferedSocketDevice
 {
     protected:
 
-        MSocketDevice          *m_pSocket;
+        MSocketDevice          *m_pSocket             {nullptr};
 
-        qulonglong              m_nMaxReadBufferSize; 
-        qint64                  m_nWriteSize;          ///< write total buf size
-        qint64                  m_nWriteIndex;         ///< write index
+        qulonglong              m_nMaxReadBufferSize  {0};
+        qint64                  m_nWriteSize          {0}; ///< write total buf size
+        qint64                  m_nWriteIndex         {0}; ///< write index
 
-        bool                    m_bHandleSocketDelete;
+        bool                    m_bHandleSocketDelete {true};
 
         QHostAddress            m_DestHostAddress;
-        quint16                 m_nDestPort;
+        quint16                 m_nDestPort           {0};
 
         MMembuf                 m_bufRead;
         deque<QByteArray*>      m_bufWrite;

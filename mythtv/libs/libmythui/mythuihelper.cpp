@@ -12,13 +12,13 @@
 #include <QFileInfo>
 #include <QApplication>
 #include <QPainter>
-#include <QDesktopWidget>
 #include <QStyleFactory>
 #include <QSize>
 #include <QFile>
 #include <QAtomicInt>
 #include <QEventLoop>
 #include <QTimer>
+#include <QScreen>
 
 // mythbase headers
 #include "mythdirs.h"
@@ -103,67 +103,78 @@ public:
     double GetPixelAspectRatio(void);
     void WaitForScreenChange(void) const;
 
-    bool      m_themeloaded;       ///< Do we have a palette and pixmap to use?
+    bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
     QString   m_themepathname;
     QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
-    float m_wmult, m_hmult;
-    float m_pixelAspectRatio;
+    float m_wmult                            {1.0F};
+    float m_hmult                            {1.0F};
+    float m_pixelAspectRatio                 {-1.0F};
 
     // Drawable area of the full screen. May cover several screens,
     // or exclude windowing system fixtures (like Mac menu bar)
-    int m_xbase, m_ybase;
-    int m_height, m_width;
+    int m_xbase                              {0};
+    int m_ybase                              {0};
+    int m_height                             {0};
+    int m_width                              {0};
 
     // Dimensions of the theme
-    int m_baseWidth, m_baseHeight;
-    bool m_isWide;
+    int m_baseWidth                          {800};
+    int m_baseHeight                         {600};
+    bool m_isWide                            {false};
 
-    QMap<QString, MythImage *> imageCache;
+    QMap<QString, MythImage *> m_imageCache;
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    QMap<QString, uint> CacheTrack;
+    QMap<QString, uint> m_cacheTrack;
 #else
-    QMap<QString, qint64> CacheTrack;
+    QMap<QString, qint64> m_cacheTrack;
 #endif
-    QMutex *m_cacheLock;
+    QMutex *m_cacheLock                      {nullptr};
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    QAtomicInt m_cacheSize;
-    QAtomicInt m_maxCacheSize;
+    QAtomicInt m_cacheSize                   {0};
+    QAtomicInt m_maxCacheSize                {30 * 1024 * 1024};
 #else
-    QAtomicInteger<qint64> m_cacheSize;
-    QAtomicInteger<qint64> m_maxCacheSize;
+    // This change is because of the QImage change from byteCount() to
+    // sizeInBytes(), the latter returning a 64bit value.
+    QAtomicInteger<qint64> m_cacheSize       {0};
+    QAtomicInteger<qint64> m_maxCacheSize    {30 * 1024 * 1024};
 #endif
 
     // The part of the screen(s) allocated for the GUI. Unless
     // overridden by the user, defaults to drawable area above.
-    int m_screenxbase, m_screenybase;
+    int m_screenxbase                        {0};
+    int m_screenybase                        {0};
 
     // The part of the screen(s) allocated for the GUI. Unless
     // overridden by the user, defaults to drawable area above.
-    int m_screenwidth, m_screenheight;
+    int m_screenwidth                        {0};
+    int m_screenheight                       {0};
 
     // Command-line GUI size, which overrides both the above sets of sizes
-    static int x_override, y_override, w_override, h_override;
+    static int x_override;
+    static int y_override;
+    static int w_override;
+    static int h_override;
 
-    QString themecachedir;
+    QString m_themecachedir;
     QString m_userThemeDir;
 
-    ScreenSaverControl *screensaver;
-    bool screensaverEnabled;
+    ScreenSaverControl *m_screensaver        {nullptr};
+    bool                m_screensaverEnabled {false};
 
-    DisplayRes *display_res;
-    bool screenSetup;
+    DisplayRes  *m_display_res               {nullptr};
+    bool         m_screenSetup               {false};
 
-    MThreadPool *m_imageThreadPool;
+    MThreadPool *m_imageThreadPool           {nullptr};
 
     MythUIMenuCallbacks callbacks;
 
-    MythUIHelper *parent;
+    MythUIHelper *parent                     {nullptr};
 
-    int m_fontStretch;
+    int m_fontStretch                        {100};
 
     QStringList m_searchPaths;
 };
@@ -174,16 +185,9 @@ int MythUIHelperPrivate::w_override = -1;
 int MythUIHelperPrivate::h_override = -1;
 
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
-    : m_themeloaded(false),
-      m_wmult(1.0), m_hmult(1.0), m_pixelAspectRatio(-1.0),
-      m_xbase(0), m_ybase(0), m_height(0), m_width(0),
-      m_baseWidth(800), m_baseHeight(600), m_isWide(false),
-      m_cacheLock(new QMutex(QMutex::Recursive)),
-      m_cacheSize(0), m_maxCacheSize(30 * 1024 * 1024),
-      m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
-      screensaver(nullptr), screensaverEnabled(false), display_res(nullptr),
-      screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
-      parent(p), m_fontStretch(100)
+    : m_cacheLock(new QMutex(QMutex::Recursive)),
+      m_imageThreadPool(new MThreadPool("MythUIHelper")),
+      parent(p)
 {
     callbacks.exec_program = nullptr;
     callbacks.exec_program_tv = nullptr;
@@ -194,7 +198,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
 {
-    QMutableMapIterator<QString, MythImage *> i(imageCache);
+    QMutableMapIterator<QString, MythImage *> i(m_imageCache);
 
     while (i.hasNext())
     {
@@ -204,22 +208,22 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
         i.remove();
     }
 
-    CacheTrack.clear();
+    m_cacheTrack.clear();
 
     delete m_cacheLock;
     delete m_imageThreadPool;
-    delete screensaver;
+    delete m_screensaver;
 
-    if (display_res)
+    if (m_display_res)
         DisplayRes::SwitchToDesktop();
 }
 
 void MythUIHelperPrivate::Init(void)
 {
-    screensaver = new ScreenSaverControl();
+    m_screensaver = new ScreenSaverControl();
     GetScreenBounds();
     StoreGUIsettings();
-    screenSetup = true;
+    m_screenSetup = true;
 
     StorageGroup sgroup("Themes", gCoreContext->GetHostName());
     m_userThemeDir = sgroup.GetFirstDir(true);
@@ -228,91 +232,64 @@ void MythUIHelperPrivate::Init(void)
 /**
  * \brief Get screen size from Qt, respecting for user's multiple screen prefs
  *
- * If the windowing system environment has multiple screens
- * (%e.g. Xinerama or Mac OS X), QApplication::desktop()->%width() will span
- * all of them, so we usually need to get the geometry of a specific screen.
+ * If the windowing system environment has multiple screens, then use
+ * QScreen::virtualSize() to get the size of the virtual desktop.
+ * Otherwise QScreen::size() or QScreen::availableSize() will provide
+ * the size of an individual screen.
  */
 void MythUIHelperPrivate::GetScreenBounds()
 {
-    QDesktopWidget *desktop = QApplication::desktop();
-    bool             hasXinerama = MythDisplay::GetNumberXineramaScreens() > 1;
-    int              numScreens  = desktop->numScreens();
-    int              screen;
-
-    if (hasXinerama)
+    foreach (QScreen *screen, qGuiApp->screens())
     {
-        LOG(VB_GUI, LOG_INFO, LOC +
-            QString("Total desktop dim: %1x%2, over %3 screen[s].")
-            .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
+        QRect dim = screen->geometry();
+        QString extra = MythDisplay::GetExtraScreenInfo(screen);
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1 dim: %2x%3 %4")
+            .arg(screen->name())
+            .arg(dim.width()).arg(dim.height())
+            .arg(extra));
     }
 
-    if (numScreens > 1)
+    QScreen *primary = qGuiApp->primaryScreen();
+    LOG(VB_GUI, LOG_INFO, LOC +
+        QString("Primary screen: %1.").arg(primary->name()));
+
+    int numScreens = MythDisplay::GetNumberOfScreens();
+    QSize dim = primary->virtualSize();
+    LOG(VB_GUI, LOG_INFO, LOC +
+        QString("Total desktop dim: %1x%2, over %3 screen[s].")
+        .arg(dim.width()).arg(dim.height()).arg(numScreens));
+
+    if (MythDisplay::SpanAllScreens())
     {
-        for (screen = 0; screen < numScreens; ++screen)
-        {
-            QRect dim = desktop->screenGeometry(screen);
-            LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1 dim: %2x%3.")
-                .arg(screen).arg(dim.width()).arg(dim.height()));
-        }
-    }
-
-    screen = desktop->primaryScreen();
-    LOG(VB_GUI, LOG_INFO, LOC + QString("Primary screen: %1.").arg(screen));
-
-    if (hasXinerama)
-        screen = GetMythDB()->GetNumSetting("XineramaScreen", screen);
-
-    if (screen == -1)       // Special case - span all screens
-    {
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Using entire desktop."));
         m_xbase  = 0;
         m_ybase  = 0;
-        m_width  = desktop->width();
-        m_height = desktop->height();
-
-        LOG(VB_GUI, LOG_INFO, LOC +
-            QString("Using all %1 screens. ").arg(numScreens) +
-            QString("Dimensions: %1x%2").arg(m_width).arg(m_height));
-
+        m_width  = dim.width();
+        m_height = dim.height();
         return;
     }
 
-    if (hasXinerama)        // User specified a single screen
+    QRect bounds;
+    QScreen *screen = MythDisplay::GetScreen();
+    if (GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
     {
-        if (screen < 0 || screen >= numScreens)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("Xinerama screen %1 was specified,"
-                        " but only %2 available, so using screen 0.")
-                .arg(screen).arg(numScreens));
-            screen = 0;
-        }
+        LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
+        // This doesn't include the area occupied by the
+        // Windows taskbar, or the Mac OS X menu bar and Dock
+        bounds = screen->availableGeometry();
     }
-
-
+    else
     {
-        QRect bounds;
-
-        bool inWindow = GetMythDB()->GetNumSetting("RunFrontendInWindow", 0);
-
-        if (inWindow)
-            LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
-
-        if (inWindow)
-            // This doesn't include the area occupied by the
-            // Windows taskbar, or the Mac OS X menu bar and Dock
-            bounds = desktop->availableGeometry(screen);
-        else
-            bounds = desktop->screenGeometry(screen);
-
-        m_xbase  = bounds.x();
-        m_ybase  = bounds.y();
-        m_width  = bounds.width();
-        m_height = bounds.height();
-
-        LOG(VB_GUI, LOG_INFO, LOC + QString("Using screen %1, %2x%3 at %4,%5")
-            .arg(screen).arg(m_width).arg(m_height)
-            .arg(m_xbase).arg(m_ybase));
+        bounds = screen->geometry();
     }
+    m_xbase  = bounds.x();
+    m_ybase  = bounds.y();
+    m_width  = bounds.width();
+    m_height = bounds.height();
+
+    LOG(VB_GUI, LOG_INFO, LOC + QString("Using screen %1, %2x%3 at %4,%5")
+        .arg(screen->name()).arg(m_width).arg(m_height)
+        .arg(m_xbase).arg(m_ybase));
 }
 
 /**
@@ -382,7 +359,7 @@ void MythUIHelperPrivate::StoreGUIsettings()
         font = QFont();
 
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPixelSize((int)((19.0f * m_hmult) + 0.5f));
+    font.setPixelSize(lroundf(19.0F * m_hmult));
     int stretch = (int)(100 / GetPixelAspectRatio());
     font.setStretch(stretch); // QT
     m_fontStretch = stretch; // MythUI
@@ -394,7 +371,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
 {
     if (m_pixelAspectRatio < 0)
     {
-        if (!display_res)
+        if (!m_display_res)
         {
             DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
 
@@ -404,7 +381,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
                 m_pixelAspectRatio = 1.0;
         }
         else
-            m_pixelAspectRatio = display_res->GetPixelAspectRatio();
+            m_pixelAspectRatio = m_display_res->GetPixelAspectRatio();
     }
 
     return m_pixelAspectRatio;
@@ -415,14 +392,14 @@ void MythUIHelperPrivate::WaitForScreenChange(void) const
     // Wait for screen signal change, so we later get updated screen resolution
     QEventLoop loop;
     QTimer timer;
-    QDesktopWidget *desktop = QApplication::desktop();
+    QScreen *screen = MythDisplay::GetScreen();
 
     timer.setSingleShot(true);
     QObject::connect(&timer, SIGNAL(timeout()),
                      &loop, SLOT(quit()));
-    QObject::connect(desktop, SIGNAL(resized(int)),
+    QObject::connect(screen, SIGNAL(geometryChanged(const QRect&)),
                      &loop, SLOT(quit()));
-    QObject::connect(desktop, SIGNAL(workAreaResized(int)),
+    QObject::connect(screen, SIGNAL(availableGeometryChanged(const QRect&)),
                      &loop, SLOT(quit()));
     timer.start(300); //300ms maximum wait
     loop.exec();
@@ -467,7 +444,7 @@ MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
 
 bool MythUIHelper::IsScreenSetup(void)
 {
-    return d->screenSetup;
+    return d->m_screenSetup;
 }
 
 bool MythUIHelper::IsTopScreenInitialized(void)
@@ -478,19 +455,19 @@ bool MythUIHelper::IsTopScreenInitialized(void)
 void MythUIHelper::LoadQtConfig(void)
 {
     gCoreContext->ResetLanguage();
-    d->themecachedir.clear();
+    d->m_themecachedir.clear();
 
-    if (GetMythDB()->GetNumSetting("UseVideoModes", 0))
+    if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
     {
         DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
 
         if (dispRes)
         {
-            d->display_res = dispRes;
+            d->m_display_res = dispRes;
             // Make sure DisplayRes has current context info
-            d->display_res->Initialize();
+            d->m_display_res->Initialize();
             // Switch to desired GUI resolution
-            if (d->display_res->SwitchToGUI())
+            if (d->m_display_res->SwitchToGUI())
             {
                 d->WaitForScreenChange();
             }
@@ -539,7 +516,7 @@ void MythUIHelper::UpdateImageCache(void)
 {
     QMutexLocker locker(d->m_cacheLock);
 
-    QMutableMapIterator<QString, MythImage *> i(d->imageCache);
+    QMutableMapIterator<QString, MythImage *> i(d->m_imageCache);
 
     while (i.hasNext())
     {
@@ -549,7 +526,7 @@ void MythUIHelper::UpdateImageCache(void)
         i.remove();
     }
 
-    d->CacheTrack.clear();
+    d->m_cacheTrack.clear();
 
     d->m_cacheSize.fetchAndStoreOrdered(0);
 
@@ -562,15 +539,15 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 {
     QMutexLocker locker(d->m_cacheLock);
 
-    if (d->imageCache.contains(url))
+    if (d->m_imageCache.contains(url))
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        d->CacheTrack[url] = MythDate::current().toTime_t();
+        d->m_cacheTrack[url] = MythDate::current().toTime_t();
 #else
-        d->CacheTrack[url] = MythDate::current().toSecsSinceEpoch();
+        d->m_cacheTrack[url] = MythDate::current().toSecsSinceEpoch();
 #endif
-        d->imageCache[url]->IncrRef();
-        return d->imageCache[url];
+        d->m_imageCache[url]->IncrRef();
+        return d->m_imageCache[url];
     }
 
     /*
@@ -633,9 +610,9 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 #endif
 	    ) >=
            d->m_maxCacheSize.fetchAndAddOrdered(0) &&
-           d->imageCache.size())
+           !d->m_imageCache.empty())
     {
-        QMap<QString, MythImage *>::iterator it = d->imageCache.begin();
+        QMap<QString, MythImage *>::iterator it = d->m_imageCache.begin();
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         uint oldestTime = MythDate::current().toTime_t();
 #else
@@ -645,13 +622,13 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
         int count = 0;
 
-        for (; it != d->imageCache.end(); ++it)
+        for (; it != d->m_imageCache.end(); ++it)
         {
-            if (d->CacheTrack[it.key()] < oldestTime)
+            if (d->m_cacheTrack[it.key()] < oldestTime)
             {
                 if ((2 == it.value()->IncrRef()) && (it.value() != im))
                 {
-                    oldestTime = d->CacheTrack[it.key()];
+                    oldestTime = d->m_cacheTrack[it.key()];
                     oldestKey = it.key();
                     count++;
                 }
@@ -675,10 +652,10 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 		     )
                 .arg(oldestKey));
 
-            d->imageCache[oldestKey]->SetIsInCache(false);
-            d->imageCache[oldestKey]->DecrRef();
-            d->imageCache.remove(oldestKey);
-            d->CacheTrack.remove(oldestKey);
+            d->m_imageCache[oldestKey]->SetIsInCache(false);
+            d->m_imageCache[oldestKey]->DecrRef();
+            d->m_imageCache.remove(oldestKey);
+            d->m_cacheTrack.remove(oldestKey);
         }
         else
         {
@@ -686,16 +663,16 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         }
     }
 
-    QMap<QString, MythImage *>::iterator it = d->imageCache.find(url);
+    QMap<QString, MythImage *>::iterator it = d->m_imageCache.find(url);
 
-    if (it == d->imageCache.end())
+    if (it == d->m_imageCache.end())
     {
         im->IncrRef();
-        d->imageCache[url] = im;
+        d->m_imageCache[url] = im;
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        d->CacheTrack[url] = MythDate::current().toTime_t();
+        d->m_cacheTrack[url] = MythDate::current().toTime_t();
 #else
-        d->CacheTrack[url] = MythDate::current().toSecsSinceEpoch();
+        d->m_cacheTrack[url] = MythDate::current().toSecsSinceEpoch();
 #endif
 
         im->SetIsInCache(true);
@@ -712,23 +689,23 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("MythUIHelper::CacheImage : Cache Count = :%1: size :%2:")
-        .arg(d->imageCache.count())
+        .arg(d->m_imageCache.count())
         .arg(d->m_cacheSize.fetchAndAddRelaxed(0)));
 
-    return d->imageCache[url];
+    return d->m_imageCache[url];
 }
 
 void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 {
     QMutexLocker locker(d->m_cacheLock);
-    QMap<QString, MythImage *>::iterator it = d->imageCache.find(url);
+    QMap<QString, MythImage *>::iterator it = d->m_imageCache.find(url);
 
-    if (it != d->imageCache.end())
+    if (it != d->m_imageCache.end())
     {
-        d->imageCache[url]->SetIsInCache(false);
-        d->imageCache[url]->DecrRef();
-        d->imageCache.remove(url);
-        d->CacheTrack.remove(url);
+        d->m_imageCache[url]->SetIsInCache(false);
+        d->m_imageCache[url]->DecrRef();
+        d->m_imageCache.remove(url);
+        d->m_cacheTrack.remove(url);
     }
 
     QString dstfile;
@@ -747,10 +724,10 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
     partialKey.replace('/', '-');
 
     d->m_cacheLock->lock();
-    QList<QString> imageCacheKeys = d->imageCache.keys();
+    QList<QString> m_imageCacheKeys = d->m_imageCache.keys();
     d->m_cacheLock->unlock();
 
-    for (it = imageCacheKeys.begin(); it != imageCacheKeys.end(); ++it)
+    for (it = m_imageCacheKeys.begin(); it != m_imageCacheKeys.end(); ++it)
     {
         if ((*it).contains(partialKey))
             RemoveFromCacheByURL(*it);
@@ -763,7 +740,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
 
     for (int i = 0; i < list.size(); ++i)
     {
-        QFileInfo fileInfo = list.at(i);
+        const QFileInfo& fileInfo = list.at(i);
 
         if (fileInfo.fileName().contains(partialKey))
         {
@@ -783,7 +760,7 @@ bool MythUIHelper::IsImageInCache(const QString &url)
 {
     QMutexLocker locker(d->m_cacheLock);
 
-    if (d->imageCache.contains(url))
+    if (d->m_imageCache.contains(url))
         return true;
 
     if (QFileInfo(url).exists())
@@ -818,7 +795,7 @@ QString MythUIHelper::GetThemeCacheDir(void)
  * \param url The resource being read.
  * \returns The path name of the appropriate cache directory.
  */
-QString MythUIHelper::GetCacheDirByUrl(QString url)
+QString MythUIHelper::GetCacheDirByUrl(const QString& url)
 {
     if (url.startsWith("myth:") || url.startsWith("-"))
         return GetThumbnailDir();
@@ -827,11 +804,11 @@ QString MythUIHelper::GetCacheDirByUrl(QString url)
 
 void MythUIHelper::ClearOldImageCache(void)
 {
-    d->themecachedir = GetThemeCacheDir();
+    d->m_themecachedir = GetThemeCacheDir();
 
-    QString themecachedir = d->themecachedir;
+    QString themecachedir = d->m_themecachedir;
 
-    d->themecachedir += '/';
+    d->m_themecachedir += '/';
 
     QDir dir(GetThemeBaseCacheDir());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
@@ -920,7 +897,7 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
  *
  * \param dirname The directory to prune.
  */
-void MythUIHelper::PruneCacheDir(QString dirname)
+void MythUIHelper::PruneCacheDir(const QString& dirname)
 {
     int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
     if (days == -1) {
@@ -1402,7 +1379,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     return foundit;
 }
 
-MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
+MythImage *MythUIHelper::LoadCacheImage(QString srcfile, const QString& label,
                                         MythPainter *painter,
                                         ImageCacheMode cacheMode)
 {
@@ -1431,11 +1408,11 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
         QMutexLocker locker(d->m_cacheLock);
 
-        if (d->imageCache.contains(label) &&
-            d->CacheTrack[label] + kImageCacheTimeout > now)
+        if (d->m_imageCache.contains(label) &&
+            d->m_cacheTrack[label] + kImageCacheTimeout > now)
         {
-            d->imageCache[label]->IncrRef();
-            return d->imageCache[label];
+            d->m_imageCache[label]->IncrRef();
+            return d->m_imageCache[label];
         }
     }
 
@@ -1599,42 +1576,42 @@ void MythUIHelper::ResetScreensaver(void)
 
 void MythUIHelper::DoDisableScreensaver(void)
 {
-    if (d->screensaver)
+    if (d->m_screensaver)
     {
-        d->screensaver->Disable();
-        d->screensaverEnabled = false;
+        d->m_screensaver->Disable();
+        d->m_screensaverEnabled = false;
     }
 }
 
 void MythUIHelper::DoRestoreScreensaver(void)
 {
-    if (d->screensaver)
+    if (d->m_screensaver)
     {
-        d->screensaver->Restore();
-        d->screensaverEnabled = true;
+        d->m_screensaver->Restore();
+        d->m_screensaverEnabled = true;
     }
 }
 
 void MythUIHelper::DoResetScreensaver(void)
 {
-    if (d->screensaver)
+    if (d->m_screensaver)
     {
-        d->screensaver->Reset();
-        d->screensaverEnabled = false;
+        d->m_screensaver->Reset();
+        d->m_screensaverEnabled = false;
     }
 }
 
 bool MythUIHelper::GetScreensaverEnabled(void)
 {
-    return d->screensaverEnabled;
+    return d->m_screensaverEnabled;
 }
 
 bool MythUIHelper::GetScreenIsAsleep(void)
 {
-    if (!d->screensaver)
+    if (!d->m_screensaver)
         return false;
 
-    return d->screensaver->Asleep();
+    return d->m_screensaver->Asleep();
 }
 
 /// This needs to be set before MythUIHelper is initialized so
@@ -1642,17 +1619,14 @@ bool MythUIHelper::GetScreenIsAsleep(void)
 void MythUIHelper::SetX11Display(const QString &display)
 {
     x11_display = display;
-    x11_display.detach();
 }
 
 QString MythUIHelper::GetX11Display(void)
 {
-    QString ret = x11_display;
-    ret.detach();
-    return ret;
+    return x11_display;
 }
 
-void MythUIHelper::AddCurrentLocation(QString location)
+void MythUIHelper::AddCurrentLocation(const QString& location)
 {
     QMutexLocker locker(&m_locationLock);
 
@@ -1735,7 +1709,7 @@ double MythUIHelper::GetPixelAspectRatio(void) const
 
 QSize MythUIHelper::GetBaseSize(void) const
 {
-    return QSize(d->m_baseWidth, d->m_baseHeight);
+    return {d->m_baseWidth, d->m_baseHeight};
 }
 
 void MythUIHelper::SetFontStretch(int stretch)

@@ -30,11 +30,13 @@ class MHGroup;
 class MHParseText: public MHParseBase
 {
   public:
-    MHParseText(QByteArray &program);
+    MHParseText(QByteArray &program)
+        : m_String((unsigned char *)malloc(100)),
+          m_data(program) {}
     virtual ~MHParseText();
 
     // Parse the text and return a pointer to the parse tree
-    virtual MHParseNode *Parse();
+    MHParseNode *Parse() override; // MHParseBase
 
   private:
     void GetNextChar();
@@ -42,19 +44,22 @@ class MHParseText: public MHParseBase
     MHParseNode *DoParse();
     void Error(const char *str);
 
-    int m_lineCount;
+    int            m_lineCount     {1};
 
-    enum { PTTag, PTInt, PTString, PTEnum, PTStartSection, PTEndSection, PTStartSeq, PTEndSeq, PTNull, PTEOF, PTBool } m_nType;
+    enum ParseTextType { PTTag, PTInt, PTString, PTEnum, PTStartSection,
+                         PTEndSection, PTStartSeq, PTEndSeq, PTNull,
+                         PTEOF, PTBool };
+    ParseTextType  m_nType         {PTNull};
 
-    int m_ch;
-    int m_nTag;
-    int m_nInt;
-    bool m_fBool;
-    unsigned char *m_String;
-    int m_nStringLength;
+    int            m_ch            {0};
+    int            m_nTag          {0};
+    int            m_nInt          {0};
+    bool           m_fBool         {false};
+    unsigned char *m_String        {nullptr};
+    int            m_nStringLength {0};
 
-    unsigned int m_p; // Count of bytes read
-    QByteArray m_data;
+    unsigned int   m_p             {0}; // Count of bytes read
+    QByteArray     m_data;
 };
 
 #endif

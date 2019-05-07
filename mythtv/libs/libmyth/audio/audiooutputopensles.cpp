@@ -37,21 +37,21 @@ using namespace std;
     }
 
 
-#define Destroy(a) (*a)->Destroy(a);
-#define SetPlayState(a, b) (*a)->SetPlayState(a, b)
-#define RegisterCallback(a, b, c) (*a)->RegisterCallback(a, b, c)
-#define GetInterface(a, b, c) (*a)->GetInterface(a, b, c)
-#define Realize(a, b) (*a)->Realize(a, b)
-#define CreateOutputMix(a, b, c, d, e) (*a)->CreateOutputMix(a, b, c, d, e)
+#define Destroy(a) (*(a))->Destroy(a);
+#define SetPlayState(a, b) (*(a))->SetPlayState(a, b)
+#define RegisterCallback(a, b, c) (*(a))->RegisterCallback(a, b, c)
+#define GetInterface(a, b, c) (*(a))->GetInterface(a, b, c)
+#define Realize(a, b) (*(a))->Realize(a, b)
+#define CreateOutputMix(a, b, c, d, e) (*(a))->CreateOutputMix(a, b, c, d, e)
 #define CreateAudioPlayer(a, b, c, d, e, f, g) \
-    (*a)->CreateAudioPlayer(a, b, c, d, e, f, g)
-#define Enqueue(a, b, c) (*a)->Enqueue(a, b, c)
-#define Clear(a) (*a)->Clear(a)
-#define GetState(a, b) (*a)->GetState(a, b)
-#define SetPositionUpdatePeriod(a, b) (*a)->SetPositionUpdatePeriod(a, b)
-#define SetVolumeLevel(a, b) (*a)->SetVolumeLevel(a, b)
-#define GetVolumeLevel(a, b) (*a)->GetVolumeLevel(a, b)
-#define SetMute(a, b) (*a)->SetMute(a, b)
+    (*(a))->CreateAudioPlayer(a, b, c, d, e, f, g)
+#define Enqueue(a, b, c) (*(a))->Enqueue(a, b, c)
+#define Clear(a) (*(a))->Clear(a)
+#define GetState(a, b) (*(a))->GetState(a, b)
+#define SetPositionUpdatePeriod(a, b) (*(a))->SetPositionUpdatePeriod(a, b)
+#define SetVolumeLevel(a, b) (*(a))->SetVolumeLevel(a, b)
+#define GetVolumeLevel(a, b) (*(a))->GetVolumeLevel(a, b)
+#define SetMute(a, b) (*(a))->SetMute(a, b)
 
 int GetNativeOutputSampleRate(void);
 
@@ -85,16 +85,16 @@ bool AudioOutputOpenSLES::CreateEngine()
 {
     SLresult result;
 
-    p_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
-    if (p_so_handle == nullptr)
+    m_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
+    if (m_so_handle == nullptr)
     {
         VBERROR("Error: Failed to load libOpenSLES");
         Close();
         return false;
     }
 
-    slCreateEnginePtr = (slCreateEngine_t)dlsym(p_so_handle, "slCreateEngine");
-    if (slCreateEnginePtr == nullptr)
+    m_slCreateEnginePtr = (slCreateEngine_t)dlsym(m_so_handle, "slCreateEngine");
+    if (m_slCreateEnginePtr == nullptr)
     {
         VBERROR("Error: Failed to load symbol slCreateEngine");
         Close();
@@ -103,42 +103,42 @@ bool AudioOutputOpenSLES::CreateEngine()
 
 #define OPENSL_DLSYM(dest, name)                       \
     do {                                                       \
-        const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(p_so_handle, "SL_IID_" name);        \
+        const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(m_so_handle, "SL_IID_" name);        \
         if (sym == nullptr)                             \
         {                                                      \
             LOG(VB_GENERAL, LOG_ERR, "AOOSLES Error: Failed to load symbol SL_IID_" name); \
             Close();  \
             return false;   \
         }                                                      \
-        dest = *sym;                                           \
+        (dest) = *sym;                                         \
     } while(0)
 
-    OPENSL_DLSYM(SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
-    OPENSL_DLSYM(SL_IID_ENGINE, "ENGINE");
-    OPENSL_DLSYM(SL_IID_PLAY, "PLAY");
-    OPENSL_DLSYM(SL_IID_VOLUME, "VOLUME");
+    OPENSL_DLSYM(m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
+    OPENSL_DLSYM(m_SL_IID_ENGINE, "ENGINE");
+    OPENSL_DLSYM(m_SL_IID_PLAY, "PLAY");
+    OPENSL_DLSYM(m_SL_IID_VOLUME, "VOLUME");
 #undef OPENSL_DLSYM
 
     // create engine
-    result = slCreateEnginePtr(&engineObject, 0, nullptr, 0, nullptr, nullptr);
+    result = m_slCreateEnginePtr(&m_engineObject, 0, nullptr, 0, nullptr, nullptr);
     CHECK_OPENSL_ERROR("Failed to create engine");
 
     // realize the engine in synchronous mode
-    result = Realize(engineObject, SL_BOOLEAN_FALSE);
+    result = Realize(m_engineObject, SL_BOOLEAN_FALSE);
     CHECK_OPENSL_ERROR("Failed to realize engine");
 
     // get the engine interface, needed to create other objects
-    result = GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+    result = GetInterface(m_engineObject, m_SL_IID_ENGINE, &m_engineEngine);
     CHECK_OPENSL_ERROR("Failed to get the engine interface");
 
     // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids1[] = { SL_IID_VOLUME };
+    const SLInterfaceID ids1[] = { m_SL_IID_VOLUME };
     const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = CreateOutputMix(engineEngine, &outputMixObject, 1, ids1, req1);
+    result = CreateOutputMix(m_engineEngine, &m_outputMixObject, 1, ids1, req1);
     CHECK_OPENSL_ERROR("Failed to create output mix");
 
     // realize the output mix in synchronous mode
-    result = Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    result = Realize(m_outputMixObject, SL_BOOLEAN_FALSE);
     CHECK_OPENSL_ERROR("Failed to realize output mix");
 
     return true;
@@ -157,9 +157,9 @@ bool AudioOutputOpenSLES::StartPlayer()
     SLDataFormat_PCM format_pcm;
     format_pcm.formatType       = SL_DATAFORMAT_PCM;
     format_pcm.numChannels      = 2;
-    format_pcm.samplesPerSec    = ((SLuint32) samplerate * 1000) ;
+    format_pcm.samplesPerSec    = ((SLuint32) m_samplerate * 1000) ;
     format_pcm.endianness       = SL_BYTEORDER_LITTLEENDIAN;
-    switch (output_format)
+    switch (m_output_format)
     {
         case FORMAT_U8:     format_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_8;  break;
         case FORMAT_S16:    format_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16; break;
@@ -173,7 +173,7 @@ bool AudioOutputOpenSLES::StartPlayer()
         // case FORMAT_FLT:    format_pcm.bitsPerSample    = SL_PCMSAMPLEFORMAT_FIXED_32; break;
 #endif
         default:
-            Error(QObject::tr("Unknown sample format: %1").arg(output_format));
+            Error(QObject::tr("Unknown sample format: %1").arg(m_output_format));
             return false;
     }
     format_pcm.containerSize    = format_pcm.bitsPerSample;
@@ -184,16 +184,16 @@ bool AudioOutputOpenSLES::StartPlayer()
     // configure audio sink
     SLDataLocator_OutputMix loc_outmix = {
         SL_DATALOCATOR_OUTPUTMIX,
-        outputMixObject
+        m_outputMixObject
     };
     SLDataSink audioSnk = {&loc_outmix, nullptr};
 
     //create audio player
-    const SLInterfaceID ids2[] = { SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_VOLUME };
+    const SLInterfaceID ids2[] = { m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, m_SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
-    if (GetNativeOutputSampleRate() >= samplerate) { // FIXME
-        result = CreateAudioPlayer(engineEngine, &playerObject, &audioSrc,
+    if (GetNativeOutputSampleRate() >= m_samplerate) { // FIXME
+        result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
                                     &audioSnk, sizeof(ids2) / sizeof(*ids2),
                                     ids2, req2);
     } else {
@@ -209,46 +209,46 @@ bool AudioOutputOpenSLES::StartPlayer()
         /* Try again with a more sensible samplerate */
         //fmt->i_rate = 44100;
         format_pcm.samplesPerSec = ((SLuint32) 48000 * 1000) ;
-        result = CreateAudioPlayer(engineEngine, &playerObject, &audioSrc,
+        result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
                 &audioSnk, sizeof(ids2) / sizeof(*ids2),
                 ids2, req2);
     }
     CHECK_OPENSL_ERROR("Failed to create audio player");
 
-    result = Realize(playerObject, SL_BOOLEAN_FALSE);
+    result = Realize(m_playerObject, SL_BOOLEAN_FALSE);
     CHECK_OPENSL_ERROR("Failed to realize player object.");
 
-    result = GetInterface(playerObject, SL_IID_PLAY, &playerPlay);
+    result = GetInterface(m_playerObject, m_SL_IID_PLAY, &m_playerPlay);
     CHECK_OPENSL_ERROR("Failed to get player interface.");
 
-    result = GetInterface(playerObject, SL_IID_VOLUME, &volumeItf);
+    result = GetInterface(m_playerObject, m_SL_IID_VOLUME, &m_volumeItf);
     CHECK_OPENSL_ERROR("failed to get volume interface.");
 
-    result = GetInterface(playerObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
-                                                  &playerBufferQueue);
+    result = GetInterface(m_playerObject, m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+                                                  &m_playerBufferQueue);
     CHECK_OPENSL_ERROR("Failed to get buff queue interface");
 
-    result = RegisterCallback(playerBufferQueue,
+    result = RegisterCallback(m_playerBufferQueue,
         &AudioOutputOpenSLES::SPlayedCallback,
                                    (void*)this);
     CHECK_OPENSL_ERROR("Failed to register buff queue callback.");
 
     // set the player's state to playing
-    result = SetPlayState(playerPlay, SL_PLAYSTATE_PLAYING);
+    result = SetPlayState(m_playerPlay, SL_PLAYSTATE_PLAYING);
     CHECK_OPENSL_ERROR("Failed to switch to playing state");
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
-    uint32_t samplesPerBuf = OPENSLES_BUFLEN * samplerate / 1000;
-    buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * bytes_per_frame);
-    if (!buf)
+    uint32_t samplesPerBuf = OPENSLES_BUFLEN * m_samplerate / 1000;
+    m_buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * m_bytes_per_frame);
+    if (!m_buf)
     {
         Stop();
         return false;
     }
 
-    started = false;
-    bufWriteIndex = 0;
-    bufWriteBase = 0;
+    m_started = false;
+    m_bufWriteIndex = 0;
+    m_bufWriteBase = 0;
 
 
     // we want 16bit signed data native endian.
@@ -257,9 +257,9 @@ bool AudioOutputOpenSLES::StartPlayer()
 
 /* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
     to avoid too heavy resampling */
-    //SetPositionUpdatePeriod(playerPlay, 25000);
-    //SetPositionUpdatePeriod(playerPlay, 40);
-    SetPositionUpdatePeriod(playerPlay, POSITIONUPDATEPERIOD);
+    //SetPositionUpdatePeriod(m_playerPlay, 25000);
+    //SetPositionUpdatePeriod(m_playerPlay, 40);
+    SetPositionUpdatePeriod(m_playerPlay, POSITIONUPDATEPERIOD);
 
     return true;
 }
@@ -267,18 +267,18 @@ bool AudioOutputOpenSLES::StartPlayer()
 bool AudioOutputOpenSLES::Stop()
 {
     SLresult       result;
-    if (playerObject)
+    if (m_playerObject)
     {
         // set the player's state to playing
-        result = SetPlayState(playerPlay, SL_PLAYSTATE_STOPPED);
+        result = SetPlayState(m_playerPlay, SL_PLAYSTATE_STOPPED);
         CHECK_OPENSL_ERROR("Failed to switch to not playing state");
-        Destroy(playerObject);
-        playerObject = nullptr;
+        Destroy(m_playerObject);
+        m_playerObject = nullptr;
     }
-    if (buf)
+    if (m_buf)
     {
-        free(buf);
-        buf = nullptr;
+        free(m_buf);
+        m_buf = nullptr;
     }
     return true;
 }
@@ -300,20 +300,20 @@ bool AudioOutputOpenSLES::Open()
 void AudioOutputOpenSLES::Close()
 {
     Stop();
-    if (outputMixObject)
+    if (m_outputMixObject)
     {
-        Destroy(outputMixObject);
-        outputMixObject = nullptr;
+        Destroy(m_outputMixObject);
+        m_outputMixObject = nullptr;
     }
-    if (engineObject)
+    if (m_engineObject)
     {
-        Destroy(engineObject);
-        engineObject = nullptr;
+        Destroy(m_engineObject);
+        m_engineObject = nullptr;
     }
-    if (p_so_handle)
+    if (m_so_handle)
     {
-        dlclose(p_so_handle);
-        p_so_handle = nullptr;
+        dlclose(m_so_handle);
+        m_so_handle = nullptr;
     }
 }
 
@@ -321,10 +321,10 @@ void AudioOutputOpenSLES::Close()
 
 AudioOutputOpenSLES::AudioOutputOpenSLES(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    nativeOutputSampleRate(GetNativeOutputSampleRate())
+    m_nativeOutputSampleRate(GetNativeOutputSampleRate())
 {
     InitSettings(settings);
-    if (settings.init)
+    if (settings.m_init)
         Reconfigure(settings);
 }
 
@@ -372,12 +372,12 @@ bool AudioOutputOpenSLES::OpenDevice(void)
     }
 
     // fragments are 10ms worth of samples
-    fragment_size = OPENSLES_BUFLEN * output_bytes_per_frame * samplerate / 1000;
+    m_fragment_size = OPENSLES_BUFLEN * m_output_bytes_per_frame * m_samplerate / 1000;
     // OpenSLES buffer holds 10 fragments = 80ms worth of samples
-    soundcard_buffer_size = OPENSLES_BUFFERS * fragment_size;
+    m_soundcard_buffer_size = OPENSLES_BUFFERS * m_fragment_size;
 
     VBAUDIO(QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
-            .arg(OPENSLES_BUFFERS).arg(fragment_size).arg(soundcard_buffer_size));
+            .arg(OPENSLES_BUFFERS).arg(m_fragment_size).arg(m_soundcard_buffer_size));
 
     return true;
 }
@@ -395,19 +395,19 @@ void AudioOutputOpenSLES::SPlayedCallback(SLAndroidSimpleBufferQueueItf caller, 
 
 void AudioOutputOpenSLES::PlayedCallback(SLAndroidSimpleBufferQueueItf caller)
 {
-    assert (caller == playerBufferQueue);
+    assert (caller == m_playerBufferQueue);
 
     VBAUDIO(QString("Freed"));
 
-    lock.lock();
-    started = true;
-    lock.unlock();
+    m_lock.lock();
+    m_started = true;
+    m_lock.unlock();
 }
 
 int AudioOutputOpenSLES::GetNumberOfBuffersQueued() const
 {
     SLAndroidSimpleBufferQueueState st;
-    SLresult res = GetState(playerBufferQueue, &st);
+    SLresult res = GetState(m_playerBufferQueue, &st);
     if (res != SL_RESULT_SUCCESS) {
         VBERROR(QString("Could not query buffer queue state in %1 (%2)").arg(__func__).arg(res));
         return -1;
@@ -433,37 +433,37 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
             continue;
         }
 
-        if (size < (fragment_size + bufWriteIndex))
+        if (size < (m_fragment_size + m_bufWriteIndex))
         {
-            memcpy(&buf[bufWriteBase + bufWriteIndex], buffer, size);
+            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, size);
             size = 0;
             // no more to do so exit now, dont have a full buffer
             break;
         }
         else
         {
-            memcpy(&buf[bufWriteBase + bufWriteIndex], buffer, fragment_size - bufWriteIndex);
-            size -= fragment_size - bufWriteIndex;
+            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, m_fragment_size - m_bufWriteIndex);
+            size -= m_fragment_size - m_bufWriteIndex;
         }
 
-        SLresult r = Enqueue(playerBufferQueue, &buf[bufWriteBase], fragment_size);
-        VBAUDIO(QString("Enqueue %1").arg(bufWriteBase));
+        SLresult r = Enqueue(m_playerBufferQueue, &m_buf[m_bufWriteBase], m_fragment_size);
+        VBAUDIO(QString("Enqueue %1").arg(m_bufWriteBase));
 
         if (r != SL_RESULT_SUCCESS)
         {
             // should never happen so show a log
             VBERROR(QString("error %1 when writing %2 bytes %3")
                     .arg(r)
-                    .arg(fragment_size)
+                    .arg(m_fragment_size)
                     .arg((r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : ""));
             // toss the remaining data, we got bigger problems
             return;
         }
         // update pointers for next time only if the data was queued correctly
-        bufWriteBase += fragment_size;
-        if (bufWriteBase >= (fragment_size * OPENSLES_BUFFERS))
-            bufWriteBase = 0;
-        bufWriteIndex = 0;
+        m_bufWriteBase += m_fragment_size;
+        if (m_bufWriteBase >= (m_fragment_size * OPENSLES_BUFFERS))
+            m_bufWriteBase = 0;
+        m_bufWriteIndex = 0;
     }
 }
 
@@ -474,14 +474,14 @@ int AudioOutputOpenSLES::GetBufferedOnSoundcard(void) const
     {
         return 0;
     }
-    return numBufferesQueued * fragment_size + bufWriteIndex;
+    return numBufferesQueued * m_fragment_size + m_bufWriteIndex;
 }
 
 int AudioOutputOpenSLES::GetVolumeChannel(int channel) const
 {
     SLmillibel mb = 0;
     int volume = 0;
-    SLresult r = GetVolumeLevel(volumeItf, &mb);
+    SLresult r = GetVolumeLevel(m_volumeItf, &mb);
     if (r == SL_RESULT_SUCCESS)
     {
         if (mb <= SL_MILLIBEL_MIN)
@@ -490,7 +490,7 @@ int AudioOutputOpenSLES::GetVolumeChannel(int channel) const
         }
         else
         {
-            volume = lroundf(expf(mb / (3*2000.0f)) * 100);
+            volume = lroundf(expf(mb / (3*2000.0F)) * 100);
         }
         VBAUDIO(QString("GetVolume(%1) %2 (%3)")
                         .arg(channel).arg(volume).arg(mb));
@@ -522,14 +522,14 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     else
     {
         // millibels from linear amplification
-        mb = lroundf(3 * 2000.f * log10f(vol));
+        mb = lroundf(3 * 2000.F * log10f(vol));
         if (mb < SL_MILLIBEL_MIN)
             mb = SL_MILLIBEL_MIN;
         else if (mb > 0)
             mb = 0; // maximum supported level could be higher: GetMaxVolumeLevel */
     }
 
-    SLresult r = SetVolumeLevel(volumeItf, mb);
+    SLresult r = SetVolumeLevel(m_volumeItf, mb);
     if (r == SL_RESULT_SUCCESS)
     {
         VBAUDIO(QString("SetVolume(%1) %2(%3)")

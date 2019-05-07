@@ -37,13 +37,6 @@
 #include "TokenGroup.h"
 #include "Logging.h"
 
-MHGroup::MHGroup()
-{
-    m_nOrigGCPriority = 127; // Default.
-    m_fIsApp = false;
-    m_nLastId = 0;
-}
-
 MHGroup::~MHGroup()
 {
     while (!m_Timers.isEmpty())
@@ -355,7 +348,7 @@ MHRoot *MHGroup::FindByObjectNo(int n)
 }
 
 // Set up a timer or cancel a timer.
-void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *)
+void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * /*engine*/)
 {
     // First remove any existing timer with the same Id.
     for (int i = 0; i < m_Timers.size(); i++)
@@ -438,22 +431,6 @@ void MHGroup::MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine)
     // Set the object reference result to the newly constructed ref.
     pRef->SetVariableValue(pClone->m_ObjectReference);
     pClone->Preparation(engine); // Prepare the clone.
-}
-
-MHApplication::MHApplication()
-{
-    m_fIsApp = true;
-    m_nCharSet = 0;
-    m_nTextCHook = 0;
-    m_nIPCHook = 0;
-    m_nStrCHook = 0;
-    m_nBitmapCHook = 0;
-    m_nLineArtCHook = 0;
-    m_tuneinfo = 0;
-
-    m_pCurrentScene = nullptr;
-    m_nLockCount = 0;
-    m_fRestarting = false;
 }
 
 MHApplication::~MHApplication()
@@ -743,21 +720,6 @@ int MHApplication::FindOnStack(const MHRoot *pVis) // Returns the index on the s
     return -1; // Not there
 }
 
-MHScene::MHScene()
-{
-    m_fIsApp = false;
-
-    m_nEventReg = 0;
-    m_nSceneCoordX = 0;
-    m_nSceneCoordY = 0;
-
-    // TODO: In UK MHEG 1.06 the aspect ratio is optional and if not specified "the
-    // scene has no aspect ratio".
-    m_nAspectRatioW = 4;
-    m_nAspectRatioH = 3;
-    m_fMovingCursor = false;
-}
-
 void MHScene::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHGroup::Initialise(p, engine);
@@ -856,7 +818,7 @@ void MHSendEvent::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-void MHSendEvent::PrintArgs(FILE *fd, int) const
+void MHSendEvent::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     m_EventSource.PrintMe(fd, 0);
     QByteArray tmp = MHLink::EventTypeToString(m_EventType).toLatin1();

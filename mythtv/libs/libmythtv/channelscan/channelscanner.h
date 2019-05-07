@@ -65,7 +65,7 @@ class MTV_PUBLIC ChannelScanner
     friend class ScanMonitor;
 
   public:
-    ChannelScanner();
+    ChannelScanner() = default;
     virtual ~ChannelScanner();
 
     void Scan(int            scantype,
@@ -76,6 +76,7 @@ class MTV_PUBLIC ChannelScanner
               bool           do_follow_nit,
               bool           do_test_decryption,
               bool           do_fta_only,
+              bool           do_lcn_only,
               bool           do_add_full_ts,
               ServiceRequirements service_requirements,
               // stuff needed for particular scans
@@ -113,35 +114,38 @@ class MTV_PUBLIC ChannelScanner
     virtual void InformUser(const QString &/*error*/) = 0;
 
   protected:
-    ScanMonitor        *scanMonitor;
-    ChannelBase        *channel;
+    ScanMonitor             *m_scanMonitor         {nullptr};
+    ChannelBase             *m_channel             {nullptr};
 
     // Low level channel scanners
-    ChannelScanSM      *sigmonScanner;
-    IPTVChannelFetcher *iptvScanner;
+    ChannelScanSM           *m_sigmonScanner       {nullptr};
+    IPTVChannelFetcher      *m_iptvScanner         {nullptr};
 
     /// imported channels
-    DTVChannelList      channels;
-    fbox_chan_map_t     iptv_channels;
+    DTVChannelList           m_channels;
+    fbox_chan_map_t          m_iptv_channels;
 
     // vbox support
 #ifdef USING_VBOX
-    VBoxChannelFetcher *vboxScanner;
+    VBoxChannelFetcher      *m_vboxScanner         {nullptr};
 #endif
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    ExternRecChannelScanner *m_ExternRecScanner;
+    ExternRecChannelScanner *m_ExternRecScanner    {nullptr};
 #endif
 
     /// Only fta channels desired post scan?
-    bool                freeToAirOnly;
+    bool                     m_freeToAirOnly       {false};
+
+    /// Only channels with logical channel numbers desired post scan?
+    bool                     m_channelNumbersOnly  {false};
 
     /// Add MPTS "full transport stream" channels
-    bool                addFullTS;
+    bool                     m_addFullTS           {false};
 
-    int                 m_sourceid;
+    int                      m_sourceid            {-1};
 
     /// Services desired post scan
-    ServiceRequirements serviceRequirements;
+    ServiceRequirements      m_serviceRequirements {kRequireAV};
 };
 
 #endif // _CHANNEL_SCANNER_H_

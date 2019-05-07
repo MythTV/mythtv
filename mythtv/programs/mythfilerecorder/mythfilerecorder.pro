@@ -19,6 +19,5 @@ HEADERS += commandlineparser.h
 SOURCES += mythfilerecorder.cpp
 SOURCES += commandlineparser.cpp
 
-#The following line was inserted by qt3to4
 QT += xml sql network
 

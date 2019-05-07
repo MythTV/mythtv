@@ -36,7 +36,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
   public:
     MusicGenericTree(MusicGenericTree *parent, const QString &name,
                      const QString &action = "",
-                     MythUIButtonListItem::CheckState state = MythUIButtonListItem::CantCheck,
+                     MythUIButtonListItem::CheckState check = MythUIButtonListItem::CantCheck,
                      bool showArrow = true);
     virtual ~MusicGenericTree() = default;
 
@@ -47,14 +47,13 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
 
     void setDrawArrow(bool flag);
 
-    MythUIButtonListItem *CreateListButton(MythUIButtonList *list);
+    MythUIButtonListItem *CreateListButton(MythUIButtonList *list) override; // MythGenericTree
 
   protected:
     QString  m_action;
-    QPointer<MusicButtonItem> m_buttonItem;
-    MythUIButtonListItem::CheckState m_check;
-    bool     m_showArrow;
-    //bool     m_active;
+    QPointer<MusicButtonItem> m_buttonItem {nullptr};
+    MythUIButtonListItem::CheckState m_check {MythUIButtonListItem::CantCheck};
+    bool     m_showArrow {true};
 };
 
 Q_DECLARE_METATYPE(MusicGenericTree*);
@@ -67,15 +66,15 @@ class PlaylistEditorView : public MusicCommon
                        const QString &layout, bool restorePosition = false);
     ~PlaylistEditorView(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
     void saveTreePosition(void);
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
 
   private slots:
     void treeItemClicked(MythUIButtonListItem *item);
@@ -110,13 +109,13 @@ class PlaylistEditorView : public MusicCommon
 
   private:
     QString                 m_layout;
-    bool                    m_restorePosition;
-    MusicGenericTree       *m_rootNode;
+    bool                    m_restorePosition {false};
+    MusicGenericTree       *m_rootNode        {nullptr};
     QList<MetadataPtrList*> m_deleteList;
 
-    MythUIButtonTree *m_playlistTree;
-    MythUIText       *m_breadcrumbsText;
-    MythUIText       *m_positionText;
+    MythUIButtonTree *m_playlistTree          {nullptr};
+    MythUIText       *m_breadcrumbsText       {nullptr};
+    MythUIText       *m_positionText          {nullptr};
 };
 
 #endif

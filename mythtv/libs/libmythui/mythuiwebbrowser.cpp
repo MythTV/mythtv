@@ -2,9 +2,6 @@
  * \file mythuiwebbrowser.cpp
  * \author Paul Harrison <pharrison@mythtv.org>
  * \brief Provide a web browser widget.
- *
- * This requires qt4.6.0 or later to function properly.
- *
  */
 
 #include "mythuiwebbrowser.h"
@@ -199,7 +196,7 @@ int BrowserApi::GetVolume(void)
     return -1;
 }
 
-void BrowserApi::PlayFile(QString filename)
+void BrowserApi::PlayFile(const QString& filename)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
                  .arg(gCoreContext->GetHostName()).arg(filename));
@@ -213,7 +210,7 @@ void BrowserApi::PlayTrack(int trackID)
     gCoreContext->dispatch(me);
 }
 
-void BrowserApi::PlayURL(QString url)
+void BrowserApi::PlayURL(const QString& url)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
                  .arg(gCoreContext->GetHostName()).arg(url));
@@ -245,10 +242,10 @@ QString BrowserApi::GetMetadata(void)
 
 void BrowserApi::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (!message.startsWith("MUSIC_CONTROL"))
             return;
@@ -283,10 +280,7 @@ MythWebPage::~MythWebPage()
 
 bool MythWebPage::supportsExtension(Extension extension) const
 {
-    if (extension == QWebPage::ErrorPageExtension)
-        return true;
-
-    return false;
+    return extension == QWebPage::ErrorPageExtension;
 }
 
 bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
@@ -356,7 +350,6 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
     setPage(m_webpage);
 
     m_parentBrowser = parentBrowser;
-    m_busyPopup = nullptr;
 
     connect(page(), SIGNAL(unsupportedContent(QNetworkReply *)),
             this, SLOT(handleUnsupportedContent(QNetworkReply *)));
@@ -368,9 +361,6 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
     m_api = new BrowserApi(this);
     m_api->setWebView(this);
-
-    m_downloadAndPlay = false;
-    m_downloadReply = nullptr;
 }
 
 MythWebView::~MythWebView(void)
@@ -430,7 +420,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
                 QWebView::keyPressEvent(event);
                 return;
             }
-            else if (action == "PREVIOUSLINK")
+            if (action == "PREVIOUSLINK")
             {
                 QKeyEvent shiftTabKey(event->type(), Qt::Key_Tab,
                                       event->modifiers() | Qt::ShiftModifier,
@@ -440,7 +430,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
                 QWebView::keyPressEvent(event);
                 return;
             }
-            else if (action == "FOLLOWLINK")
+            if (action == "FOLLOWLINK")
             {
                 QKeyEvent returnKey(event->type(), Qt::Key_Return,
                                     event->modifiers(), QString(),
@@ -649,7 +639,7 @@ void MythWebView::customEvent(QEvent *event)
             }
         }
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -678,8 +668,8 @@ void MythWebView::customEvent(QEvent *event)
                 else if (m_downloadAndPlay)
                     GetMythMainWindow()->HandleMedia("Internal", filename);
 
-                MythEvent me(QString("BROWSER_DOWNLOAD_FINISHED"), args);
-                gCoreContext->dispatch(me);
+                MythEvent me2(QString("BROWSER_DOWNLOAD_FINISHED"), args);
+                gCoreContext->dispatch(me2);
             }
         }
     }
@@ -791,8 +781,6 @@ QWebView *MythWebView::createWindow(QWebPage::WebWindowType /* type */)
  * \class MythUIWebBrowser
  * \brief Provide a web browser widget.
  *
- * Uses QtWebKit and so requires Qt4.4.0 or later.
- *
  * This widget can display HTML documents from the net, a file or passed to it
  * as a QString.
  *
@@ -840,7 +828,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
       m_defaultSaveFilename(""),
       m_inputToggled(false), m_lastMouseAction(""),
-      m_mouseKeyCount(0),    m_lastMouseActionTime(),
+      m_mouseKeyCount(0),
       m_horizontalScrollbar(nullptr), m_verticalScrollbar(nullptr)
 {
     SetCanTakeFocus(true);
@@ -1002,7 +990,7 @@ void MythUIWebBrowser::Init(void)
                                                      false);
     }
 
-    if (!gCoreContext->GetNumSetting("WebBrowserEnableJavascript",1))
+    if (!gCoreContext->GetBoolSetting("WebBrowserEnableJavascript",true))
     {
         LOG(VB_GENERAL, LOG_INFO, "MythUIWebBrowser: disabling JavaScript");
         QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);
@@ -1048,7 +1036,7 @@ MythUIWebBrowser::~MythUIWebBrowser()
  *  \brief Loads the specified url and displays it.
  *  \param url The url to load
  */
-void MythUIWebBrowser::LoadPage(QUrl url)
+void MythUIWebBrowser::LoadPage(const QUrl& url)
 {
     if (!m_browser)
         return;
@@ -1078,7 +1066,7 @@ void MythUIWebBrowser::SetHtml(const QString &html, const QUrl &baseUrl)
  *  \brief Sets the specified user style sheet.
  *  \param url The url to the style sheet
  */
-void MythUIWebBrowser::LoadUserStyleSheet(QUrl url)
+void MythUIWebBrowser::LoadUserStyleSheet(const QUrl& url)
 {
     if (!m_browser)
         return;
@@ -1157,7 +1145,7 @@ void MythUIWebBrowser::SetActive(bool active)
  */
 void MythUIWebBrowser::ZoomIn(void)
 {
-    SetZoom(m_zoom + 0.1);
+    SetZoom(m_zoom + 0.1F);
 }
 
 /** \fn MythUIWebBrowser::ZoomOut(void)
@@ -1165,7 +1153,7 @@ void MythUIWebBrowser::ZoomIn(void)
  */
 void MythUIWebBrowser::ZoomOut(void)
 {
-    SetZoom(m_zoom - 0.1);
+    SetZoom(m_zoom - 0.1F);
 }
 
 /** \fn MythUIWebBrowser::SetZoom(float)
@@ -1177,11 +1165,11 @@ void MythUIWebBrowser::SetZoom(float zoom)
     if (!m_browser)
         return;
 
-    if (zoom < 0.3)
-        zoom = 0.3f;
+    if (zoom < 0.3F)
+        zoom = 0.3F;
 
-    if (zoom > 5.0)
-        zoom = 5.0;
+    if (zoom > 5.0F)
+        zoom = 5.0F;
 
     m_zoom = zoom;
     m_browser->setZoomFactor(m_zoom);
@@ -1276,8 +1264,7 @@ QIcon MythUIWebBrowser::GetIcon(void)
     {
         return QWebSettings::iconForUrl(m_browser->url());
     }
-    else
-        return QIcon();
+    return QIcon();
 }
 
 /** \fn MythUIWebBrowser::GetUrl(void)
@@ -1290,8 +1277,7 @@ QUrl MythUIWebBrowser::GetUrl(void)
     {
         return m_browser->url();
     }
-    else
-        return QUrl();
+    return QUrl();
 }
 
 /** \fn MythUIWebBrowser::GetTitle(void)
@@ -1302,8 +1288,7 @@ QString MythUIWebBrowser::GetTitle(void)
 {
     if (m_browser)
         return m_browser->title();
-    else
-        return QString("");
+    return QString("");
 }
 
 /** \fn MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
@@ -1317,8 +1302,7 @@ QVariant MythUIWebBrowser::evaluateJavaScript(const QString &scriptSource)
         QWebFrame *frame = m_browser->page()->currentFrame();
         return frame->evaluateJavaScript(scriptSource);
     }
-    else
-        return QVariant();
+    return QVariant();
 }
 
 void MythUIWebBrowser::Scroll(int dx, int dy)
@@ -1386,7 +1370,7 @@ void MythUIWebBrowser::slotIconChanged(void)
 
 void MythUIWebBrowser::slotScrollBarShowing(void)
 {
-    bool wasActive = (m_wasActive | m_active);
+    bool wasActive = (m_wasActive || m_active);
     SetActive(false);
     m_wasActive = wasActive;
 }
@@ -1403,7 +1387,7 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType * /* screen */)
         SetActive(m_wasActive);
     else
     {
-        bool wasActive = (m_wasActive | m_active);
+        bool wasActive = (m_wasActive || m_active);
         SetActive(false);
         m_wasActive = wasActive;
     }

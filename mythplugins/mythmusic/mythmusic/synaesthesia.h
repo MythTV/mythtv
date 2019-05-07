@@ -22,10 +22,11 @@ public:
     Synaesthesia(void);
     virtual ~Synaesthesia();
 
-    void resize(const QSize &size);
-    bool process(VisualNode *node);
-    bool draw(QPainter *p, const QColor &back);
-    void handleKeyPress(const QString &action) {(void) action;}
+    void resize(const QSize &size) override; // VisualBase
+    bool process(VisualNode *node) override; // VisualBase
+    bool draw(QPainter *p, const QColor &back) override; // VisualBase
+    void handleKeyPress(const QString &action) override // VisualBase
+        {(void) action;}
 
 private:
     void setupPalette(void);
@@ -45,28 +46,31 @@ private:
     void fadeFade(void);
     void fade(void);
 
-    QSize m_size;
+    QSize m_size                 {0,0};
 
     double m_cosTable[NumSamples];
     double m_negSinTable[NumSamples];
-    int m_bitReverse[NumSamples];
-    int m_scaleDown[256];
-    int m_maxStarRadius;
-    int m_fadeMode;
-    bool m_pointsAreDiamonds;
-    double m_brightnessTwiddler;
-    double m_starSize;
+    int    m_bitReverse[NumSamples];
+    int    m_scaleDown[256];
+    int    m_maxStarRadius       {1};
+    int    m_fadeMode            {Stars};
+    bool   m_pointsAreDiamonds   {true};
+    double m_brightnessTwiddler  {0.3};
+    double m_starSize            {0.5};
 
-    int m_outWidth;
-    int m_outHeight;
+    int    m_outWidth            {0};
+    int    m_outHeight           {0};
 
     Bitmap<unsigned short> m_outputBmp, m_lastOutputBmp, m_lastLastOutputBmp;
-    QImage *m_outputImage;
+    QImage *m_outputImage        {nullptr};
 
     unsigned char m_palette[768];
-    double m_fgRedSlider, m_fgGreenSlider, m_bgRedSlider, m_bgGreenSlider;
+    double m_fgRedSlider         {0.0};
+    double m_fgGreenSlider       {0.5};
+    double m_bgRedSlider         {0.75};
+    double m_bgGreenSlider       {0.4};
 
-    double m_energy_avg;
+    double m_energy_avg          {80.0};
 };
 
 #endif // SYNAETHESIA

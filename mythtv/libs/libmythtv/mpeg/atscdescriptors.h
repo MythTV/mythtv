@@ -120,7 +120,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
     //   reserved              14  4.2      0x3fff
     //}                            6.0
     bool Parse(void);
-    QString toString() const;
+    QString toString() const override; // MPEGDescriptor
 
   private:
     int Index(int i, int j) const { return (i<<8) | (j & 0xff); }
@@ -174,7 +174,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     // }
 
     bool Parse(void);
-    QString toString() const;
+    QString toString() const override; // MPEGDescriptor
   protected:
     int Index(int i, int j) const { return (i<<8)|(j&0xff); }
     const unsigned char *Offset(int i, int j) const
@@ -196,7 +196,7 @@ class ComponentNameDescriptor : public MPEGDescriptor
     {
         return MultipleStringStructure(_data+2);
     }
-    QString toString() const
+    QString toString() const override // MPEGDescriptor
     {
         return QString("Component Name Descriptor %1")
             .arg(ComponentNameStrings().toString());
@@ -308,7 +308,7 @@ class AudioStreamDescriptor : public MPEGDescriptor
     //   additional_info[i] N×8 bslbf
     // }
 
-    QString toString() const;
+    QString toString() const override; // MPEGDescriptor
 };
 
 /** \class ContentIdentifierDescriptor
@@ -344,7 +344,7 @@ class ExtendedChannelNameDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::extended_channel_name) { }
     MultipleStringStructure LongChannelName(void) const;
     QString LongChannelNameString(void) const;
-    QString toString() const;
+    QString toString() const override; // MPEGDescriptor
 };
 
 #endif

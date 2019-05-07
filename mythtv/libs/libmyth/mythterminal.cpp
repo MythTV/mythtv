@@ -19,6 +19,7 @@
  */
 
 #include <cinttypes>
+#include <utility>
 
 // MythTV headers
 #include "mythlogging.h"
@@ -29,10 +30,9 @@
 
 MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
                            QStringList _arguments) :
-    MythScreenType(parent, "terminal"), m_lock(QMutex::Recursive),
-    m_running(false), m_process(new QProcess()), m_program(_program),
-    m_arguments(_arguments), m_currentLine(nullptr), m_output(nullptr),
-    m_textEdit(nullptr), m_enterButton(nullptr)
+    MythScreenType(parent, "terminal"),
+    m_process(new QProcess()), m_program(std::move(_program)),
+    m_arguments(std::move(_arguments))
 {
     m_process->setProcessChannelMode(QProcess::MergedChannels);
     connect(m_process, SIGNAL(readyRead()),

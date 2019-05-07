@@ -41,31 +41,31 @@ class Myth : public MythServices
 
     public:
 
-        DTC::ConnectionInfo* GetConnectionInfo  ( const QString   &Pin );
+        DTC::ConnectionInfo* GetConnectionInfo  ( const QString   &Pin ) override; // MythServices
 
-        QString             GetHostName         ( );
-        QStringList         GetHosts            ( );
-        QStringList         GetKeys             ( );
+        QString             GetHostName         ( ) override; // MythServices
+        QStringList         GetHosts            ( ) override; // MythServices
+        QStringList         GetKeys             ( ) override; // MythServices
 
         DTC::StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
-                                                         const QString   &HostName );
+                                                         const QString   &HostName ) override; // MythServices
 
         bool                AddStorageGroupDir  ( const QString   &GroupName,
                                                   const QString   &DirName,
-                                                  const QString   &HostName );
+                                                  const QString   &HostName ) override; // MythServices
 
         bool                RemoveStorageGroupDir( const QString   &GroupName,
                                                    const QString   &DirName,
-                                                   const QString   &HostName );
+                                                   const QString   &HostName ) override; // MythServices
 
-        DTC::TimeZoneInfo*  GetTimeZone         ( );
+        DTC::TimeZoneInfo*  GetTimeZone         ( ) override; // MythServices
 
-        QString             GetFormatDate       ( const QDateTime Date,
-                                                  bool            ShortDate );
-        QString             GetFormatDateTime   ( const QDateTime DateTime,
-                                                  bool            ShortDate );
-        QString             GetFormatTime       ( const QDateTime Time );
-        QDateTime           ParseISODateString  ( const QString   &DateTime );
+        QString             GetFormatDate       ( QDateTime       Date,
+                                                  bool            ShortDate ) override; // MythServices
+        QString             GetFormatDateTime   ( QDateTime       DateTime,
+                                                  bool            ShortDate ) override; // MythServices
+        QString             GetFormatTime       ( QDateTime       Time ) override; // MythServices
+        QDateTime           ParseISODateString  ( const QString   &DateTime ) override; // MythServices
 
         DTC::LogMessageList* GetLogs            ( const QString   &HostName,
                                                   const QString   &Application,
@@ -79,35 +79,35 @@ class Myth : public MythServices
                                                   const QDateTime &ToTime,
                                                   const QString   &Level,
                                                   const QString   &MsgContains
-                                                );
+                                                ) override; // MythServices
 
 
-        DTC::FrontendList*  GetFrontends        ( bool OnLine );
+        DTC::FrontendList*  GetFrontends        ( bool OnLine ) override; // MythServices
 
         QString             GetSetting          ( const QString   &HostName,
                                                   const QString   &Key,
-                                                  const QString   &Default );
+                                                  const QString   &Default ) override; // MythServices
 
-        DTC::SettingList*   GetSettingList      ( const QString   &HostName );
+        DTC::SettingList*   GetSettingList      ( const QString   &HostName ) override; // MythServices
 
         bool                PutSetting          ( const QString   &HostName,
                                                   const QString   &Key,
-                                                  const QString   &Value   );
+                                                  const QString   &Value   ) override; // MythServices
 
         bool                ChangePassword      ( const QString   &UserName,
                                                   const QString   &OldPassword,
-                                                  const QString   &NewPassword );
+                                                  const QString   &NewPassword ) override; // MythServices
 
         bool                TestDBSettings      ( const QString &HostName,
                                                   const QString &UserName,
                                                   const QString &Password,
                                                   const QString &DBName,
-                                                  int   dbPort);
+                                                  int   dbPort) override; // MythServices
 
         bool                SendMessage         ( const QString &Message,
                                                   const QString &Address,
                                                   int   udpPort,
-                                                  int   Timeout);
+                                                  int   Timeout) override; // MythServices
 
         bool                SendNotification    ( bool  Error,
                                                   const QString &Type,
@@ -123,32 +123,32 @@ class Myth : public MythServices
                                                   uint  Visibility,
                                                   uint  Priority,
                                                   const QString &Address,
-                                                  int   udpPort );
+                                                  int   udpPort ) override; // MythServices
 
-        bool                BackupDatabase      ( void );
+        bool                BackupDatabase      ( void ) override; // MythServices
 
-        bool                CheckDatabase       ( bool Repair );
+        bool                CheckDatabase       ( bool Repair ) override; // MythServices
 
-        bool                ProfileSubmit       ( void );
+        bool                ProfileSubmit       ( void ) override; // MythServices
 
-        bool                ProfileDelete       ( void );
+        bool                ProfileDelete       ( void ) override; // MythServices
 
-        QString             ProfileURL          ( void );
+        QString             ProfileURL          ( void ) override; // MythServices
 
-        QString             ProfileUpdated      ( void );
+        QString             ProfileUpdated      ( void ) override; // MythServices
 
-        QString             ProfileText         ( void );
+        QString             ProfileText         ( void ) override; // MythServices
 
-        DTC::BackendInfo*   GetBackendInfo      ( void );
+        DTC::BackendInfo*   GetBackendInfo      ( void ) override; // MythServices
 
         bool                ManageDigestUser    ( const QString &Action,
                                                   const QString &UserName,
                                                   const QString &Password,
                                                   const QString &NewPassword,
-                                                  const QString &AdminPassword );
+                                                  const QString &AdminPassword ) override; // MythServices
 
         bool                ManageUrlProtection  ( const QString &Services,
-                                                   const QString &AdminPassword );
+                                                   const QString &AdminPassword ) override; // MythServices
 };
 
 // --------------------------------------------------------------------------
@@ -245,7 +245,7 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QString   GetFormatDate( const QDateTime Date,
+        QString   GetFormatDate( const QDateTime& Date,
                                  bool            ShortDate = false )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
@@ -253,7 +253,7 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QString   GetFormatDateTime( const QDateTime DateTime,
+        QString   GetFormatDateTime( const QDateTime& DateTime,
                                      bool            ShortDate = false )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
@@ -261,7 +261,7 @@ class ScriptableMyth : public QObject
             )
         }
 
-        QString   GetFormatTime( const QDateTime Time )
+        QString   GetFormatTime( const QDateTime& Time )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
                 return m_obj.GetFormatTime( Time );

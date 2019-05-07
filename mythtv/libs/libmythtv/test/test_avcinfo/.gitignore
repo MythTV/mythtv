@@ -1,0 +1,4 @@
+test_avcinfo
+*.gcda
+*.gcno
+*.gcov

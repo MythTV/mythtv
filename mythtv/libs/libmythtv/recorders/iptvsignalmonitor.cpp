@@ -7,7 +7,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("IPTVSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 /** \brief Initializes signal lock and signal values.
  *
@@ -26,12 +26,11 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      bool _release_stream,
                                      uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      m_streamHandlerStarted(false), m_locked(false)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-    signalLock.SetValue(0);
-    signalStrength.SetValue(0);
+    m_signalLock.SetValue(0);
+    m_signalStrength.SetValue(0);
 }
 
 /** \fn IPTVSignalMonitor::~IPTVSignalMonitor()
@@ -40,12 +39,12 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
 IPTVSignalMonitor::~IPTVSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    IPTVSignalMonitor::Stop();
 }
 
 IPTVChannel *IPTVSignalMonitor::GetIPTVChannel(void)
 {
-    return dynamic_cast<IPTVChannel*>(channel);
+    return dynamic_cast<IPTVChannel*>(m_channel);
 }
 
 /** \fn IPTVSignalMonitor::Stop(void)
@@ -69,7 +68,7 @@ void IPTVSignalMonitor::SetStreamData(MPEGStreamData *data)
 void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("HandlePAT pn: %1")
-        .arg(programNumber));
+        .arg(m_programNumber));
     DTVSignalMonitor::HandlePAT(pat);
 }
 
@@ -81,14 +80,14 @@ void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
  */
 void IPTVSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (!m_locked && GetIPTVChannel()->IsOpen())
     {
-        QMutexLocker locker(&statusLock);
-        signalLock.SetValue(1);
-        signalStrength.SetValue(100);
+        QMutexLocker locker(&m_statusLock);
+        m_signalLock.SetValue(1);
+        m_signalStrength.SetValue(100);
         m_locked = true;
     }
 
@@ -96,7 +95,7 @@ void IPTVSignalMonitor::UpdateValues(void)
     if (IsAllGood())
         SendMessageAllGood();
 
-    update_done = true;
+    m_update_done = true;
 
     if (m_streamHandlerStarted)
         return;

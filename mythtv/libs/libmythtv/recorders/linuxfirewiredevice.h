@@ -28,15 +28,15 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     ~LinuxFirewireDevice();
 
     // Commands
-    virtual bool OpenPort(void);
-    virtual bool ClosePort(void);
-    virtual bool ResetBus(void);
+    bool OpenPort(void) override; // FirewireDevice
+    bool ClosePort(void) override; // FirewireDevice
+    bool ResetBus(void) override; // FirewireDevice
 
-    virtual void AddListener(TSDataListener*);
-    virtual void RemoveListener(TSDataListener*);
+    void AddListener(TSDataListener*) override; // FirewireDevice
+    void RemoveListener(TSDataListener*) override; // FirewireDevice
 
     // Gets
-    virtual bool IsPortOpen(void) const;
+    bool IsPortOpen(void) const override; // FirewireDevice
 
     // Signal from driver
     void SignalReset(uint generation);
@@ -66,7 +66,7 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
     void PrintDropped(uint dropped_packets);
 
     bool SetAVStreamBufferSize(uint size_in_bytes);
@@ -79,9 +79,9 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     void UpdateDeviceListItem(uint64_t guid, void *pitem);
     vector<AVCInfo> GetSTBListPrivate(void);
 
-    virtual bool SendAVCCommand(const vector<uint8_t> &cmd,
-                                vector<uint8_t>       &result,
-                                int                    retry_cnt);
+    bool SendAVCCommand(const vector<uint8_t> &cmd,
+                        vector<uint8_t>       &result,
+                        int                    retry_cnt) override; // FirewireDevice
 
     LinuxAVCInfo *GetInfoPtr(void);
     const LinuxAVCInfo *GetInfoPtr(void) const;
@@ -89,10 +89,10 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     void HandleBusReset(void);
 
   private:
-    uint                     m_bufsz;
-    bool                     m_db_reset_disabled;
-    bool                     m_use_p2p;
-    LFDPriv                 *m_priv;
+    uint     m_bufsz;
+    bool     m_db_reset_disabled {false};
+    bool     m_use_p2p;
+    LFDPriv *m_priv              {nullptr};
 };
 
 #endif // _LINUX_FIREWIRE_DEVICE_H_

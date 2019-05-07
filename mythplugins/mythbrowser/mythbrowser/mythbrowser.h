@@ -22,8 +22,8 @@ class MythBrowser : public MythScreenType
     MythBrowser(MythScreenStack *parent, QStringList &urlList);
     ~MythBrowser();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void setDefaultSaveDirectory(const QString &saveDir) { m_defaultSaveDir = saveDir; }
     void setDefaultSaveFilename(const QString &saveFile) { m_defaultSaveFilename = saveFile; }
@@ -67,25 +67,25 @@ class MythBrowser : public MythScreenType
 
     QStringList               m_urlList;
 
-    MythUIButtonList         *m_pageList;
+    MythUIButtonList         *m_pageList      {nullptr};
     QList<WebPage*>           m_browserList;
-    MythUIProgressBar        *m_progressBar;
-    MythUIText               *m_titleText;
-    MythUIText               *m_statusText;
-    MythUIButton             *m_backButton;
-    MythUIButton             *m_forwardButton;
-    MythUIButton             *m_exitButton;
+    MythUIProgressBar        *m_progressBar   {nullptr};
+    MythUIText               *m_titleText     {nullptr};
+    MythUIText               *m_statusText    {nullptr};
+    MythUIButton             *m_backButton    {nullptr};
+    MythUIButton             *m_forwardButton {nullptr};
+    MythUIButton             *m_exitButton    {nullptr};
 
-    int       m_currentBrowser;
+    int       m_currentBrowser                {-1};
     QUrl      m_url;
     QString   m_defaultSaveDir;
     QString   m_defaultSaveFilename;
 
     Bookmark  m_editBookmark;
 
-    MythDialogBox *m_menuPopup;
+    MythDialogBox *m_menuPopup                {nullptr};
 
-    MythImage     *m_defaultFavIcon;
+    MythImage     *m_defaultFavIcon           {nullptr};
 
     friend class WebPage;
 };

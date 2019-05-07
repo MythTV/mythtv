@@ -26,8 +26,8 @@
   { \
       ok = arg1; \
       if (!ok) \
-          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
-  } while(0)
+          LOG(VB_GENERAL, LOG_ERR, LOC + (arg2)); \
+  } while(false)
 
 QString profileToString(VAProfile profile);
 QString entryToString(VAEntrypoint entry);
@@ -103,7 +103,7 @@ class VAAPIDisplay : ReferenceCounter
         m_va_disp(nullptr), m_x_disp(nullptr),
         m_driver() { }
   public:
-   ~VAAPIDisplay()
+   ~VAAPIDisplay() override
     {
         if (m_va_disp)
         {
@@ -183,7 +183,7 @@ class VAAPIDisplay : ReferenceCounter
         return ok;
     }
 
-    virtual int DecrRef(void)
+    int DecrRef(void) override // ReferenceCounter
     {
         QMutexLocker locker(&s_VAAPIDisplayLock);
 
@@ -200,9 +200,7 @@ class VAAPIDisplay : ReferenceCounter
 
     QString GetDriver(void)
     {
-        QString ret = m_driver;
-        m_driver.detach();
-        return ret;
+        return m_driver;
     }
 
     static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type, bool noreuse)
@@ -316,10 +314,8 @@ VAAPIContext::~VAAPIContext()
         }
     }
 
-    if (m_surfaces)
-        delete [] m_surfaces;
-    if (m_surfaceData)
-        delete [] m_surfaceData;
+    delete [] m_surfaces;
+    delete [] m_surfaceData;
 
     if (m_display)
     {
@@ -462,7 +458,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
         {
             int min = m_pictureAttributes[i].min_value;
             int max = m_pictureAttributes[i].max_value;
-            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0) * (max - min));
+            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0F) * (max - min));
             m_pictureAttributes[i].value = val;
             found = true;
             break;
@@ -872,9 +868,9 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
 
     int field = VA_FRAME_PICTURE;
     if (scan == kScan_Interlaced)
-        field = VA_TOP_FIELD;
-    else if (scan == kScan_Intr2ndField)
         field = VA_BOTTOM_FIELD;
+    else if (scan == kScan_Intr2ndField)
+        field = VA_TOP_FIELD;
 
     m_display->m_x_disp->Lock();
     INIT_ST;

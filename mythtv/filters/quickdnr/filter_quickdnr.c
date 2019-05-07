@@ -284,7 +284,6 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
     // filter the leftovers from the mmx rutine
     for (i = 0; i < 3; i++)
     {
-        int thr1[3], thr2[3], height[3];
         uint8_t *avg8[3], *buf8[3];
         int end, beg;
 
@@ -407,13 +406,13 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
     // filter the leftovers from the mmx rutine
     for (i = 0; i < 3; i++)
     {
-        int thr1[3], thr2[3], height[3];
+        int thr1a[3], thr2a[3], heighta[3];
         uint8_t *avg8[3], *buf8[3];
         int end, beg;
 
-        init_vars(tf, frame, thr1, thr2, height, avg8, buf8);
+        init_vars(tf, frame, thr1a, thr2a, heighta, avg8, buf8);
 
-        end = height[i] * frame->pitches[i];
+        end = heighta[i] * frame->pitches[i];
         beg = end & ~0x7;
 
         if (beg == end)
@@ -422,7 +421,7 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
         for (y = beg; y < end; y++)
         {
             int t = abs(avg8[i][y] - buf8[i][y]);
-            if (t < thr1[i])
+            if (t < thr1a[i])
             {
                 if (t > thr2[i])
                     avg8[i][y] = (avg8[i][y] + buf8[i][y]) >> 1;
@@ -451,7 +450,7 @@ static void cleanup(VideoFilter *vf)
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                VideoFrameType outpixfmt,
-                               int *width, int *height, char *options,
+                               const int *width, const int *height, const char *options,
                                int threads)
 {
     unsigned int Param1, Param2, Param3, Param4;

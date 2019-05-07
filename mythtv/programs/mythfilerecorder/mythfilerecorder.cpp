@@ -155,7 +155,7 @@ void Streamer::SendBytes(void)
 
 
 Commands::Commands(void) : m_streamer(nullptr), m_timeout(10), m_run(true),
-    m_eof(false)
+    m_eof(0)
 {
     setObjectName("Command");
 }
@@ -171,8 +171,7 @@ bool Commands::send_status(const QString & status) const
             .arg(len).arg(status.size()).arg(status));
         return false;
     }
-    else
-        LOG(VB_RECORD, LOG_DEBUG, "Status: " + status);
+    LOG(VB_RECORD, LOG_DEBUG, "Status: " + status);
     return true;
 }
 
@@ -228,7 +227,7 @@ bool Commands::process_command(QString & cmd)
         }
         else
         {
-        if (m_eof.loadAcquire() != 0)
+            if (m_eof.loadAcquire() != 0)
                 send_status("ERR:End of file");
             else
             {
@@ -340,7 +339,7 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
             LOG(VB_RECORD, LOG_ERR, LOC + "poll eof (POLLHUP)");
             break;
         }
-        else if (polls[0].revents & POLLNVAL)
+        if (polls[0].revents & POLLNVAL)
         {
             LOG(VB_RECORD, LOG_ERR, LOC + "poll error");
             return false;
@@ -419,7 +418,7 @@ int main(int argc, char *argv[])
     QString filename = "";
     if (!cmdline.toString("infile").isEmpty())
         filename = cmdline.toString("infile");
-    else if (cmdline.GetArgs().size() >= 1)
+    else if (!cmdline.GetArgs().empty())
         filename = cmdline.GetArgs()[0];
 
     Commands recorder;

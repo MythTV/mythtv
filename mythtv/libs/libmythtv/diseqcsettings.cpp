@@ -39,7 +39,7 @@ static GlobalTextEditSetting *DiSEqCLongitude(void)
 class DeviceTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
-    DeviceTypeSetting() : m_device(nullptr)
+    DeviceTypeSetting()
     {
         setLabel(DeviceTree::tr("Device Type"));
         addSelection(DeviceTree::tr("Unconnected"),
@@ -54,7 +54,7 @@ class DeviceTypeSetting : public TransMythUIComboBoxSetting
                      QString::number((uint) DiSEqCDevDevice::kTypeLNB));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         if (m_device)
         {
@@ -81,7 +81,7 @@ class DeviceTypeSetting : public TransMythUIComboBoxSetting
     }
 
   private:
-    DiSEqCDevDevice *m_device;
+    DiSEqCDevDevice *m_device {nullptr};
 };
 
 //////////////////////////////////////// DeviceDescrSetting
@@ -90,7 +90,7 @@ class DeviceDescrSetting : public TransTextEditSetting
 {
   public:
     explicit DeviceDescrSetting(DiSEqCDevDevice &device) :
-        TransTextEditSetting(), m_device(device)
+        m_device(device)
     {
         setLabel(DeviceTree::tr("Description"));
         QString help = DeviceTree::tr(
@@ -99,13 +99,13 @@ class DeviceDescrSetting : public TransTextEditSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(m_device.GetDescription());
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_device.SetDescription(getValue());
     }
@@ -132,13 +132,13 @@ class DeviceRepeatSetting : public TransMythUISpinBoxSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(m_device.GetRepeatCount());
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_device.SetRepeatCount(getValue().toUInt());
     }
@@ -153,7 +153,7 @@ class SwitchTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
     explicit SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) :
-        TransMythUIComboBoxSetting(), m_switch(switch_dev)
+        m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Switch Type"));
         setHelpText(DeviceTree::tr("Select the type of switch from the list."));
@@ -178,13 +178,13 @@ class SwitchTypeSetting : public TransMythUIComboBoxSetting
                      QString::number((uint) DiSEqCDevSwitch::kTypeLegacySW64));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(getValueIndex(QString::number((uint) m_switch.GetType())));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_switch.SetType((DiSEqCDevSwitch::dvbdev_switch_t)
                          getValue().toUInt());
@@ -200,19 +200,19 @@ class SwitchAddressSetting : public TransTextEditSetting
 {
   public:
     explicit SwitchAddressSetting(DiSEqCDevSwitch &switch_dev) :
-           TransTextEditSetting(), m_switch(switch_dev)
+        m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Address of switch"));
         setHelpText(DeviceTree::tr("The DiSEqC address of the switch."));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString("0x%1").arg(m_switch.GetAddress(), 0, 16));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_switch.SetAddress(getValue().toUInt(nullptr, 16));
     }
@@ -227,19 +227,19 @@ class SwitchPortsSetting : public TransTextEditSetting
 {
   public:
     explicit SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) :
-        TransTextEditSetting(), m_switch(switch_dev)
+        m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Number of ports"));
         setHelpText(DeviceTree::tr("The number of ports this switch has."));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_switch.GetNumPorts()));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_switch.SetNumPorts(getValue().toUInt());
     }
@@ -333,7 +333,7 @@ class RotorTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
     explicit RotorTypeSetting(DiSEqCDevRotor &rotor) :
-        TransMythUIComboBoxSetting(), m_rotor(rotor)
+        m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Type"));
         setHelpText(DeviceTree::tr("Select the type of rotor from the list."));
@@ -343,13 +343,13 @@ class RotorTypeSetting : public TransMythUIComboBoxSetting
                      QString::number((uint) DiSEqCDevRotor::kTypeDiSEqC_1_3));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(getValueIndex(QString::number((uint)m_rotor.GetType())));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_rotor.SetType((DiSEqCDevRotor::dvbdev_rotor_t)getValue().toUInt());
     }
@@ -364,7 +364,7 @@ class RotorLoSpeedSetting : public TransTextEditSetting
 {
   public:
     explicit RotorLoSpeedSetting(DiSEqCDevRotor &rotor) :
-        TransTextEditSetting(), m_rotor(rotor)
+        m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Low Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -373,13 +373,13 @@ class RotorLoSpeedSetting : public TransTextEditSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_rotor.GetLoSpeed()));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_rotor.SetLoSpeed(getValue().toDouble());
     }
@@ -394,7 +394,7 @@ class RotorHiSpeedSetting : public TransTextEditSetting
 {
   public:
     explicit RotorHiSpeedSetting(DiSEqCDevRotor &rotor) :
-        TransTextEditSetting(), m_rotor(rotor)
+        m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor High Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -403,13 +403,13 @@ class RotorHiSpeedSetting : public TransTextEditSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_rotor.GetHiSpeed()));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_rotor.SetHiSpeed(getValue().toDouble());
     }
@@ -468,11 +468,6 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     return pos;
 }
 
-RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) :
-    GroupSetting(), m_rotor(rotor)
-{
-}
-
 void RotorPosMap::Load(void)
 {
     m_posmap = m_rotor.GetPosMap();
@@ -488,13 +483,13 @@ class RotorPosTextEdit : public TransTextEditSetting
 {
 public:
     RotorPosTextEdit(const QString &label, uint id, const QString &value) :
-        TransTextEditSetting(), m_id(id)
+        m_id(id)
     {
         setLabel(label);
         setValue(value);
     }
 
-    void updateButton(MythUIButtonListItem *item)
+    void updateButton(MythUIButtonListItem *item) override // MythUITextEditSetting
     {
         TransTextEditSetting::updateButton(item);
         if (getValue().isEmpty())
@@ -587,13 +582,13 @@ class SCRUserBandSetting : public TransMythUISpinBoxSetting
         setHelpText(DeviceTree::tr("Unicable userband ID (0-7) or sometimes (1-8)"));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(m_scr.GetUserBand());
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_scr.SetUserBand(intValue());
     }
@@ -607,19 +602,19 @@ class SCRUserBandSetting : public TransMythUISpinBoxSetting
 class SCRFrequencySetting : public TransTextEditSetting
 {
   public:
-    explicit SCRFrequencySetting(DiSEqCDevSCR &scr) : TransTextEditSetting(), m_scr(scr)
+    explicit SCRFrequencySetting(DiSEqCDevSCR &scr) : m_scr(scr)
     {
         setLabel(DeviceTree::tr("Frequency (MHz)"));
         setHelpText(DeviceTree::tr("Unicable userband frequency (usually 1210, 1420, 1680 and 2040 MHz)"));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_scr.GetFrequency()));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_scr.SetFrequency(getValue().toUInt());
     }
@@ -633,19 +628,19 @@ class SCRFrequencySetting : public TransTextEditSetting
 class SCRPINSetting : public TransTextEditSetting
 {
   public:
-    explicit SCRPINSetting(DiSEqCDevSCR &scr) : TransTextEditSetting(), m_scr(scr)
+    explicit SCRPINSetting(DiSEqCDevSCR &scr) : m_scr(scr)
     {
         setLabel(DeviceTree::tr("PIN code"));
         setHelpText(DeviceTree::tr("Unicable PIN code (-1 disabled, 0 - 255)"));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_scr.GetPIN()));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_scr.SetPIN(getValue().toInt());
     }
@@ -728,7 +723,7 @@ static uint FindPreset(const DiSEqCDevLNB &lnb)
 class LNBPresetSetting : public MythUIComboBoxSetting
 {
   public:
-    explicit LNBPresetSetting(DiSEqCDevLNB &lnb) : MythUIComboBoxSetting(), m_lnb(lnb)
+    explicit LNBPresetSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Preset"));
         QString help = DeviceTree::tr(
@@ -743,13 +738,13 @@ class LNBPresetSetting : public MythUIComboBoxSetting
         addSelection(DeviceTree::tr("Custom"), QString::number(i));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(FindPreset(m_lnb));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
     }
 
@@ -762,7 +757,7 @@ class LNBPresetSetting : public MythUIComboBoxSetting
 class LNBTypeSetting : public MythUIComboBoxSetting
 {
   public:
-    explicit LNBTypeSetting(DiSEqCDevLNB &lnb) : MythUIComboBoxSetting(), m_lnb(lnb)
+    explicit LNBTypeSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Type"));
         setHelpText(DeviceTree::tr("Select the type of LNB from the list."));
@@ -778,13 +773,13 @@ class LNBTypeSetting : public MythUIComboBoxSetting
                      QString::number((uint) DiSEqCDevLNB::kTypeBandstacked));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(getValueIndex(QString::number((uint) m_lnb.GetType())));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_lnb.SetType((DiSEqCDevLNB::dvbdev_lnb_t) getValue().toUInt());
     }
@@ -798,7 +793,7 @@ class LNBTypeSetting : public MythUIComboBoxSetting
 class LNBLOFSwitchSetting : public TransTextEditSetting
 {
   public:
-    explicit LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
+    explicit LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Switch (MHz)"));
         QString help = DeviceTree::tr(
@@ -807,13 +802,13 @@ class LNBLOFSwitchSetting : public TransTextEditSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_lnb.GetLOFSwitch() / 1000));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_lnb.SetLOFSwitch(getValue().toUInt() * 1000);
     }
@@ -827,7 +822,7 @@ class LNBLOFSwitchSetting : public TransTextEditSetting
 class LNBLOFLowSetting : public TransTextEditSetting
 {
   public:
-    explicit LNBLOFLowSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
+    explicit LNBLOFLowSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
         QString help = DeviceTree::tr(
@@ -837,13 +832,13 @@ class LNBLOFLowSetting : public TransTextEditSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_lnb.GetLOFLow() / 1000));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_lnb.SetLOFLow(getValue().toUInt() * 1000);
     }
@@ -857,7 +852,7 @@ class LNBLOFLowSetting : public TransTextEditSetting
 class LNBLOFHighSetting : public TransTextEditSetting
 {
   public:
-    explicit LNBLOFHighSetting(DiSEqCDevLNB &lnb) : TransTextEditSetting(), m_lnb(lnb)
+    explicit LNBLOFHighSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF High (MHz)"));
         QString help = DeviceTree::tr(
@@ -867,13 +862,13 @@ class LNBLOFHighSetting : public TransTextEditSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(QString::number(m_lnb.GetLOFHigh() / 1000));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_lnb.SetLOFHigh(getValue().toUInt() * 1000);
     }
@@ -886,7 +881,7 @@ class LNBPolarityInvertedSetting : public MythUICheckBoxSetting
 {
   public:
     explicit LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) :
-        MythUICheckBoxSetting(), m_lnb(lnb)
+        m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Reversed"));
         QString help = DeviceTree::tr(
@@ -897,13 +892,13 @@ class LNBPolarityInvertedSetting : public MythUICheckBoxSetting
         setHelpText(help);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         setValue(m_lnb.IsPolarityInverted());
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_lnb.SetPolarityInverted(boolValue());
     }
@@ -1006,11 +1001,6 @@ void LNBConfig::UpdateType(void)
 }
 
 //////////////////////////////////////// DeviceTree
-
-DeviceTree::DeviceTree(DiSEqCDevTree &tree) :
-    GroupSetting(), m_tree(tree)
-{
-}
 
 void DeviceTree::Load(void)
 {
@@ -1197,7 +1187,7 @@ class SwitchSetting : public MythUIComboBoxSetting
 {
   public:
     SwitchSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
+        : m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a port to use for this switch."));
@@ -1214,14 +1204,14 @@ class SwitchSetting : public MythUIComboBoxSetting
         }
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         double value = m_settings.GetValue(m_node.GetDeviceID());
         setValue((uint)value);
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
@@ -1237,7 +1227,7 @@ class RotorSetting : public MythUIComboBoxSetting
 {
   public:
     RotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
+        : m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a satellite position."));
@@ -1247,7 +1237,7 @@ class RotorSetting : public MythUIComboBoxSetting
             m_posmap = rotor->GetPosMap();
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         clearSelections();
 
@@ -1260,7 +1250,7 @@ class RotorSetting : public MythUIComboBoxSetting
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
@@ -1300,7 +1290,7 @@ class USALSRotorSetting : public GroupSetting
         addChild(new RotorConfig(static_cast<DiSEqCDevRotor&>(node), this));
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         double  val  = m_settings.GetValue(m_node.GetDeviceID());
         QString hemi;
@@ -1310,7 +1300,7 @@ class USALSRotorSetting : public GroupSetting
         GroupSetting::Load();
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         QString val = QString::number(numeric->getValue().toDouble());
         val += hemisphere->getValue();
@@ -1330,7 +1320,7 @@ class SCRPositionSetting : public MythUIComboBoxSetting
 {
   public:
     SCRPositionSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : MythUIComboBoxSetting(), m_node(node), m_settings(settings)
+        : m_node(node), m_settings(settings)
     {
         setLabel("Position");
         setHelpText(DeviceTree::tr("Unicable satellite position (A/B)"));
@@ -1340,14 +1330,14 @@ class SCRPositionSetting : public MythUIComboBoxSetting
                      QString::number((uint)DiSEqCDevSCR::kTypeScrPosB), false);
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         double value = m_settings.GetValue(m_node.GetDeviceID());
         setValue(getValueIndex(QString::number((uint)value)));
         setChanged(false);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }

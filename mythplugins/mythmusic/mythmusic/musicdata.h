@@ -21,11 +21,9 @@ class SendStringListThread : public QRunnable
 {
   public:
     explicit SendStringListThread(const QStringList &strList)
-    {
-        m_strList = strList;
-    }
+        : m_strList(strList) {}
 
-    void run()
+    void run() override // QRunnable
     {
         gCoreContext->SendReceiveStringList(m_strList);
     }
@@ -42,7 +40,7 @@ class MusicData : public QObject
 
   public:
 
-    MusicData();
+    MusicData() = default;
     ~MusicData();
 
     void scanMusic(void);
@@ -52,10 +50,10 @@ class MusicData : public QObject
     void reloadMusic(void);
 
   public:
-    PlaylistContainer  *all_playlists;
-    AllMusic           *all_music;
-    AllStream          *all_streams;
-    bool                initialized;
+    PlaylistContainer  *m_all_playlists {nullptr};
+    AllMusic           *m_all_music     {nullptr};
+    AllStream          *m_all_streams   {nullptr};
+    bool                m_initialized   {false};
 };
 
 // This global variable contains the MusicData instance for the application

@@ -26,33 +26,33 @@ class DVBSignalMonitor: public DTVSignalMonitor
                      kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB);
     virtual ~DVBSignalMonitor();
 
-    virtual QStringList GetStatusList(void) const;
-    void Stop(void);
+    QStringList GetStatusList(void) const override; // DTVSignalMonitor
+    void Stop(void) override; // SignalMonitor
 
-    virtual void SetRotorTarget(float target);
-    virtual void GetRotorStatus(bool &was_moving, bool &is_moving);
-    virtual void SetRotorValue(int val)
+    void SetRotorTarget(float target) override; // DTVSignalMonitor
+    void GetRotorStatus(bool &was_moving, bool &is_moving) override; // DTVSignalMonitor
+    void SetRotorValue(int val) override // DTVSignalMonitor
     {
-        QMutexLocker locker(&statusLock);
+        QMutexLocker locker(&m_statusLock);
         rotorPosition.SetValue(val);
     }
 
-    virtual void EmitStatus(void);
+    void EmitStatus(void) override; // SignalMonitor
 
     // MPEG
-    virtual void HandlePMT(uint, const ProgramMapTable*);
+    void HandlePMT(uint, const ProgramMapTable*) override; // DTVSignalMonitor
 
     // ATSC Main
-    virtual void HandleSTT(const SystemTimeTable*);
+    void HandleSTT(const SystemTimeTable*) override; // DTVSignalMonitor
 
     // DVB Main
-    virtual void HandleTDT(const TimeDateTable*);
+    void HandleTDT(const TimeDateTable*) override; // DTVSignalMonitor
 
   protected:
     DVBSignalMonitor(void);
     DVBSignalMonitor(const DVBSignalMonitor&);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     void EmitDVBSignals(void);
 
     DVBChannel *GetDVBChannel(void);

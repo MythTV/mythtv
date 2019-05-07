@@ -9,9 +9,7 @@ using namespace std;
 #include "cc608reader.h"
 
 CC608Reader::CC608Reader(MythPlayer *parent)
-  : m_parent(parent),   m_enabled(false), m_readPosition(0),
-    m_writePosition(0), m_maxTextSize(0), m_ccMode(CC_CC1),
-    m_ccPageNum(0x888)
+  : m_parent(parent)
 {
     memset(&m_inputBuffers, 0, sizeof(m_inputBuffers));
     m_maxTextSize = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
@@ -80,8 +78,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
             m_state[streamIdx].m_changed = false;
             return &m_state[streamIdx].m_output;
         }
-        else
-            return &m_state[MAXOUTBUFFERS - 1].m_output;
+        return &m_state[MAXOUTBUFFERS - 1].m_output;
     }
 
     VideoFrame *last = nullptr;
@@ -151,10 +148,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
         m_state[streamIdx].m_changed = false;
         return &m_state[streamIdx].m_output;
     }
-    else
-    {
-        return &m_state[MAXOUTBUFFERS - 1].m_output;
-    }
+    return &m_state[MAXOUTBUFFERS - 1].m_output;
 }
 
 void CC608Reader::SetMode(int mode)
@@ -373,7 +367,7 @@ void CC608Reader::Update608Text(
     int visible = 0;
 
     m_state[streamIdx].m_output.lock.lock();
-    if (m_state[streamIdx].m_output.buffers.size() && (scroll || replace))
+    if (!m_state[streamIdx].m_output.buffers.empty() && (scroll || replace))
     {
         CC608Text *cc;
 

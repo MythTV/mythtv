@@ -8,6 +8,7 @@ using namespace std;
 // Qt headers
 #include <QCoreApplication>
 #include <QDir>
+#include <utility>
 
 // MythTV headers
 #include "mythmiscutil.h"
@@ -37,7 +38,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
 
-static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, QString mapfile,
+static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, const QString& mapfile,
                        ProgramInfo *pginfo)
 {
     if (pginfo && mapfile.isEmpty())
@@ -92,8 +93,8 @@ static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
 static void UpdateJobQueue(float percent_done)
 {
     JobQueue::ChangeJobComment(glbl_jobID,
-                               QString("%1% " + QObject::tr("Completed"))
-                               .arg(percent_done, 0, 'f', 1));
+                               QString("%1% ").arg(percent_done, 0, 'f', 1) +
+                               QObject::tr("Completed"));
 }
 
 static int CheckJobQueue()
@@ -106,7 +107,7 @@ static int CheckJobQueue()
     return 0;
 }
 
-static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
+static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
                             QString hostname, bool usecutlist)
 {
     RecordingInfo recinfo(*pginfo);
@@ -115,7 +116,7 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
 
     if (JobQueue::QueueJob(JOB_TRANSCODE, pginfo->GetChanID(),
                            pginfo->GetRecordingStartTime(),
-                           hostname, "", "",
+                           std::move(hostname), "", "",
                            usecutlist ? JOB_USE_CUTLIST : 0))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
@@ -162,11 +163,11 @@ int main(int argc, char *argv[])
     frm_pos_map_t durMap; ///< duration from beginning of keyframes
     int AudioTrackNo = -1;
 
-    int found_starttime = 0;
-    int found_chanid = 0;
-    int found_infile = 0;
+    bool found_starttime = false;
+    bool found_chanid = false;
+    bool found_infile = false;
     int update_index = 1;
-    int isVideo = 0;
+    bool isVideo = false;
     bool passthru = false;
 
     MythTranscodeCommandLineParser cmdline;
@@ -208,19 +209,19 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("starttime"))
     {
         starttime = cmdline.toDateTime("starttime");
-        found_starttime = 1;
+        found_starttime = true;
     }
     if (cmdline.toBool("chanid"))
     {
         chanid = cmdline.toUInt("chanid");
-        found_chanid = 1;
+        found_chanid = true;
     }
     if (cmdline.toBool("jobid"))
         jobID = cmdline.toInt("jobid");
     if (cmdline.toBool("inputfile"))
     {
         infile = cmdline.toString("inputfile");
-        found_infile = 1;
+        found_infile = true;
     }
     if (cmdline.toBool("video"))
         isVideo = true;
@@ -304,8 +305,8 @@ int main(int argc, char *argv[])
                                                      .arg(cur.key()));
                         return GENERIC_EXIT_INVALID_CMDLINE;
                     }
-                    else if ( (prev.value() == MARK_CUT_START) &&
-                              ((cur.key() - prev.key()) < 2) )
+                    if ( (prev.value() == MARK_CUT_START) &&
+                         ((cur.key() - prev.key()) < 2) )
                     {
                         LOG(VB_GENERAL, LOG_WARNING, QString("Discarding "
                                           "insufficiently long cut: %1-%2")
@@ -397,8 +398,8 @@ int main(int argc, char *argv[])
     {
         if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
         {
-            found_starttime = 1;
-            found_chanid = 1;
+            found_starttime = true;
+            found_chanid = true;
         }
         else
         {
@@ -534,6 +535,7 @@ int main(int argc, char *argv[])
         LOG(VB_GENERAL, LOG_ERR,
             QString("Attempted to transcode %1. Mythtranscode is currently "
                     "unable to transcode remote files.") .arg(infile));
+        delete pginfo;
         return GENERIC_EXIT_REMOTE_FILE;
     }
 
@@ -740,7 +742,7 @@ int main(int argc, char *argv[])
     return exitcode;
 }
 
-static int transUnlink(QString filename, ProgramInfo *pginfo)
+static int transUnlink(const QString& filename, ProgramInfo *pginfo)
 {
     QString hostname = pginfo->GetHostname();
 
@@ -774,7 +776,7 @@ static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
     frm_dir_map_t delMap = *deleteMap;
     bool withinCut = false;
     bool firstMark = true;
-    while (delMap.count() && delMap.begin().key() <= oldBookmark)
+    while (!delMap.empty() && delMap.begin().key() <= oldBookmark)
     {
         uint64_t key = delMap.begin().key();
         MarkTypes mark = delMap.begin().value();
@@ -940,11 +942,11 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                     .arg(tmpfile).arg(newfile) + ENO);
         }
 
-        if (!gCoreContext->GetNumSetting("SaveTranscoding", 0) || forceDelete)
+        if (!gCoreContext->GetBoolSetting("SaveTranscoding", false) || forceDelete)
         {
             int err;
             bool followLinks =
-                gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
+                gCoreContext->GetBoolSetting("DeletesFollowLinks", false);
 
             LOG(VB_FILE, LOG_INFO,
                 QString("mythtranscode: About to unlink/delete file: %1")
@@ -999,7 +1001,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
         for (int nIdx = 0; nIdx < previewFiles.size(); nIdx++)
         {
-            QFileInfo previewFile = previewFiles.at(nIdx);
+            const QFileInfo& previewFile = previewFiles.at(nIdx);
             QString oldFileName = previewFile.absoluteFilePath();
 
             // Delete previews if cutlist was applied.  They will be re-created as

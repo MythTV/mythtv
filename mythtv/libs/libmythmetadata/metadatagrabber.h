@@ -29,7 +29,7 @@ enum GrabberType {
 class META_PUBLIC MetaGrabberScript
 {
   public:
-    MetaGrabberScript();
+    MetaGrabberScript() = default;
     explicit MetaGrabberScript(const QDomElement &dom);
     explicit MetaGrabberScript(const QString &path);
     MetaGrabberScript(const QString &path, const QDomElement &dom);
@@ -83,12 +83,12 @@ class META_PUBLIC MetaGrabberScript
     QString m_thumbnail;
     QString m_fullcommand;
     QString m_command;
-    GrabberType m_type;
+    GrabberType m_type    {kGrabberInvalid};
     QString m_typestring;
     QString m_description;
     QStringList m_accepts;
-    float m_version;
-    bool m_valid;
+    float m_version       {0.0};
+    bool  m_valid         {false};
 
     void ParseGrabberVersion(const QDomElement &item);
     MetadataLookupList RunGrabber(const QStringList &args, MetadataLookup *lookup, bool passseas);

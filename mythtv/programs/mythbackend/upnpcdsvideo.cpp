@@ -282,10 +282,9 @@ bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
             pResults->m_nTotalMatches = 1;
             return true;
         }
-        else
-            LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSTV::LoadMetadata: Requested "
-                                             "object cannot be found: %1")
-                                               .arg(pRequest->m_sObjectId));
+        LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSTV::LoadMetadata: Requested "
+                                         "object cannot be found: %1")
+                                           .arg(pRequest->m_sObjectId));
     }
     else if (currentToken == "series")
     {
@@ -330,39 +329,35 @@ bool UPnpCDSVideo::LoadChildren(const UPnpCDSRequest* pRequest,
         pResults->m_nTotalMatches = GetRoot()->GetChildCount();
         return true;
     }
-    else if (currentToken == "series")
+    if (currentToken == "series")
     {
          if (!tokens["series"].isEmpty())
              return LoadSeasons(pRequest, pResults, tokens);
-         else
-             return LoadSeries(pRequest, pResults, tokens);
+         return LoadSeries(pRequest, pResults, tokens);
     }
-    else if (currentToken == "season")
+    if (currentToken == "season")
     {
          if (!tokens["season"].isEmpty() && tokens["season"].toInt() >= 0) // Season 0 is valid
              return LoadVideos(pRequest, pResults, tokens);
-         else
-             return LoadSeasons(pRequest, pResults, tokens);
+         return LoadSeasons(pRequest, pResults, tokens);
     }
-    else if (currentToken == "genre")
+    if (currentToken == "genre")
     {
         if (!tokens["genre"].isEmpty())
             return LoadVideos(pRequest, pResults, tokens);
-        else
-            return LoadGenres(pRequest, pResults, tokens);
+        return LoadGenres(pRequest, pResults, tokens);
     }
-    else if (currentToken == "movie")
+    if (currentToken == "movie")
     {
          return LoadMovies(pRequest, pResults, tokens);
     }
-    else if (currentToken == "video")
+    if (currentToken == "video")
     {
         return LoadVideos(pRequest, pResults, tokens);
     }
-    else
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("UPnpCDSVideo::LoadChildren(): "
-                    "Unhandled metadata request for '%1'.").arg(currentToken));
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("UPnpCDSVideo::LoadChildren(): "
+                "Unhandled metadata request for '%1'.").arg(currentToken));
 
     return false;
 }
@@ -373,7 +368,7 @@ bool UPnpCDSVideo::LoadChildren(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadSeries(const UPnpCDSRequest* pRequest,
                           UPnpCDSExtensionResults* pResults,
-                          IDTokenMap tokens)
+                          const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -449,7 +444,7 @@ bool UPnpCDSVideo::LoadSeries(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadSeasons(const UPnpCDSRequest* pRequest,
                                UPnpCDSExtensionResults* pResults,
-                               IDTokenMap tokens)
+                               const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -539,7 +534,7 @@ bool UPnpCDSVideo::LoadMovies(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadGenres(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -611,7 +606,7 @@ bool UPnpCDSVideo::LoadGenres(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 

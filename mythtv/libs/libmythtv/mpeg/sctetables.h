@@ -130,7 +130,7 @@ class ModulationModeSubtable
     uint InnerCodingMode(void) const { return _beg[0] & 0xf; }
     QString InnerCodingModeString(void) const;
     //     split_bitstream_mode 1   1.0+_beg
-    bool SplitBitstreamMode(void) const { return _beg[1] & 0x80; }
+    bool SplitBitstreamMode(void) const { return ( _beg[1] & 0x80 ) != 0; }
     //     zero                2    1.1+_beg
     //     modulation_format   5    1.3+_beg
     enum // Table 5.9
@@ -244,8 +244,8 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     // CRC_32                  32
 
     bool Parse(void);
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
     vector<const unsigned char*> _ptrs;
@@ -318,8 +318,8 @@ class MTV_PUBLIC NetworkTextTable : public PSIPTable
     // CRC_32                  32
 
     void Parse(void) const;
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 class MTV_PUBLIC DefinedChannelsMapSubtable
@@ -335,7 +335,7 @@ class MTV_PUBLIC DefinedChannelsMapSubtable
     uint DCMDataLength(void) const { return _data[9] & 0x7f; }
     //   for (i=0; i<DCM_data_length; i++) {
     //      range_defined       1  10.0+i
-    bool RangeDefined(uint i) const { return _data[10+i] & 0x80; }
+    bool RangeDefined(uint i) const { return ( _data[10+i] & 0x80 ) != 0; }
     //      channels_count      7  10.1+i
     uint ChannelsCount(uint i) const { return _data[10+i] & 0x7f; }
     //   }
@@ -356,10 +356,10 @@ class VirtualChannelMapSubtable
 
     //   zero                   2  7.0
     //   descriptors_included   1  7.2
-    bool DescriptorsIncluded(void) const { return _data[7] & 0x20; }
+    bool DescriptorsIncluded(void) const { return ( _data[7] & 0x20 ) != 0; }
     //   zero                   5  7.3
     //   splice                 1  8.0
-    bool Splice(void) const { return _data[8] & 0x80; }
+    bool Splice(void) const { return ( _data[8] & 0x80 ) != 0; }
     //   zero                   7  8.1
     //   activation_time       32  9.0
     uint ActivationTimeRaw(void) const
@@ -389,7 +389,7 @@ class VirtualChannelMapSubtable
     uint VirtualChannelNumber(uint i) const
         { return ((_ptrs[i][0]<<8) | _ptrs[i][1]) & 0xfff; }
     //     application_virtual_channel 1 2.0+_ptrs[i]
-    bool ApplicationVirtualChannel(uint i) const { return _ptrs[i][1] & 0x80; }
+    bool ApplicationVirtualChannel(uint i) const { return ( _ptrs[i][1] & 0x80 ) != 0; }
     //     zero                 1 2.1+_ptrs[i]
     //     path_select          1 2.2+_ptrs[i]
     enum // Table 5.18 path select
@@ -436,7 +436,7 @@ class VirtualChannelMapSubtable
     //     } else {
     //       CDS_reference      8 5.0+_ptrs[i]
     //       scrambled          1 6.0+_ptrs[i]
-    bool Scrambled(uint i) const { return _ptrs[i][6] & 0x80; }
+    bool Scrambled(uint i) const { return ( _ptrs[i][6] & 0x80 ) != 0; }
     //       zero               3 6.1+_ptrs[i]
     //       video_standard     4 6.4+_ptrs[i]
     enum // Table 5.21 video standard
@@ -555,8 +555,8 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     // CRC_32                  32
 
     bool Parse(void);
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
     vector<const unsigned char*> _ptrs;
@@ -625,8 +625,8 @@ class MTV_PUBLIC SCTESystemTimeTable : public PSIPTable
 
     // CRC_32                  32
 
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 // PIM = 0xC0 -- Program Information Message (57 2003) PMT PID
@@ -643,9 +643,9 @@ class MTV_PUBLIC ProgramInformationMessageTable : public PSIPTable
         assert(TableID::PIM == TableID());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // PSIPTable
         { return "Program Information Message\n"; }
-    QString toStringXML(uint /*indent_level*/) const
+    QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<ProgramInformationMessage />"; }
 };
 
@@ -663,9 +663,9 @@ class MTV_PUBLIC ProgramNameMessageTable : public PSIPTable
         assert(TableID::PNM == TableID());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // PSIPTable
         { return "Program Name Message\n"; }
-    QString toStringXML(uint /*indent_level*/) const
+    QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<ProgramNameMessage />"; }
 };
 
@@ -683,8 +683,8 @@ class MTV_PUBLIC AggregateDataEventTable : public PSIPTable
         assert(TableID::ADET == TableID());
     }
 
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 

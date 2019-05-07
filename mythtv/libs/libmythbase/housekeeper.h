@@ -71,10 +71,10 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     void            QueryLast(void);
 
     QString             m_dbTag;
-    bool                m_confirm;
+    bool                m_confirm {false};
     HouseKeeperScope    m_scope;
     HouseKeeperStartup  m_startup;
-    bool                m_running;
+    bool                m_running {false};
 
     QDateTime   m_lastRun;
     QDateTime   m_lastSuccess;
@@ -87,11 +87,11 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
     PeriodicHouseKeeperTask(const QString &dbTag, int period, float min=0.5,
                             float max=1.1, int retry=0, HouseKeeperScope scope=kHKGlobal,
                             HouseKeeperStartup startup=kHKNormal);
-    virtual bool DoCheckRun(QDateTime now);
+    bool DoCheckRun(QDateTime now) override; // HouseKeeperTask
     virtual bool InWindow(QDateTime now);
     virtual bool PastWindow(QDateTime now);
-    virtual QDateTime UpdateLastRun(QDateTime last, bool successful=true);
-    virtual void SetLastRun(QDateTime last, bool successful=true);
+    QDateTime UpdateLastRun(QDateTime last, bool successful=true) override; // HouseKeeperTask
+    void SetLastRun(QDateTime last, bool successful=true) override; // HouseKeeperTask
     virtual void SetWindow(float min, float max);
 
   protected:
@@ -114,10 +114,10 @@ class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
                          HouseKeeperScope scope=kHKGlobal,
                          HouseKeeperStartup startup=kHKNormal);
     virtual void SetHourWindow(int min, int max);
-    virtual bool InWindow(QDateTime now);
+    bool InWindow(QDateTime now) override; // PeriodicHouseKeeperTask
 
   protected:
-    virtual void CalculateWindow(void);
+    void CalculateWindow(void) override; // PeriodicHouseKeeperTask
 
   private:
     QPair<int, int> m_windowHour;
@@ -130,7 +130,7 @@ class HouseKeepingThread : public MThread
         MThread("HouseKeeping"), m_idle(true), m_keepRunning(true),
         m_parent(p) {}
    ~HouseKeepingThread() = default;
-    virtual void run(void);
+    void run(void) override; // MThread
     void Discard(void)                  { m_keepRunning = false;        }
     bool isIdle(void)                   { return m_idle;                }
     void Wake(void)                     { m_waitCondition.wakeAll();    }
@@ -158,7 +158,7 @@ class MBASE_PUBLIC HouseKeeper : public QObject
     void StartThread(void);
     HouseKeeperTask* GetQueuedTask(void);
 
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
   public slots:
     void Run(void);

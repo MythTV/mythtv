@@ -22,7 +22,6 @@
 
 #include <cmath>
 
-#include <QDesktopWidget>
 #include <QApplication>
 
 #include "mythconfig.h"
@@ -46,32 +45,32 @@ static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
 
-const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 4.0f;
-const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 4.0f;
-const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.25f;
-const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25f;
+const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 4.0F;
+const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 4.0F;
+const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.25F;
+const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25F;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow() :
     // DB settings
-    db_move(0, 0), db_scale_horiz(0.0f), db_scale_vert(0.0f),
+    db_move(0, 0), db_scale_horiz(0.0F), db_scale_vert(0.0F),
     db_pip_size(26),
     db_scaling_allowed(true),
 
-    using_xinerama(false), screen_num(0), screen_geom(0, 0, 1024, 768),
+    using_xinerama(false), screen_geom(0, 0, 1024, 768),
 
     // Manual Zoom
-    mz_scale_v(1.0f), mz_scale_h(1.0f), mz_move(0, 0),
+    mz_scale_v(1.0F), mz_scale_h(1.0F), mz_move(0, 0),
 
     // Physical dimensions
-    display_dim(400, 300), display_aspect(1.3333f),
+    display_dim(400, 300), display_aspect(1.3333F),
 
     // Video dimensions
     video_dim(640, 480),     video_disp_dim(640, 480),
-    video_dim_act(640, 480), video_aspect(1.3333f),
+    video_dim_act(640, 480), video_aspect(1.3333F),
 
     // Aspect override
-    overriden_video_aspect(1.3333f), aspectoverride(kAspect_Off),
+    overriden_video_aspect(1.3333F), aspectoverride(kAspect_Off),
 
     // Adjust Fill
     adjustfill(kAdjustFill_Off),
@@ -85,13 +84,14 @@ VideoOutWindow::VideoOutWindow() :
 
     // Various state variables
     embedding(false), needrepaint(false),
-    allowpreviewepg(true), pip_state(kPIPOff)
+    allowpreviewepg(true), bottomline(false),
+    pip_state(kPIPOff)
 {
     db_pip_size = gCoreContext->GetNumSetting("PIPSize", 26);
 
     db_move = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
-    db_use_gui_size = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
+    db_use_gui_size = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 
     populateGeometry();
 }
@@ -99,25 +99,23 @@ VideoOutWindow::VideoOutWindow() :
 void VideoOutWindow::populateGeometry(void)
 {
     qApp->processEvents();
-    QDesktopWidget *desktop = nullptr;
-    if (qobject_cast<QApplication*>(qApp))
-        desktop = QApplication::desktop();
+    if (not qobject_cast<QApplication*>(qApp))
+        return;
 
-    if (desktop)
+    QScreen *screen = MythDisplay::GetScreen();
+    if (MythDisplay::SpanAllScreens())
     {
-        screen_num = desktop->primaryScreen();
-        using_xinerama  = MythDisplay::GetNumberXineramaScreens() > 1;
-        if (using_xinerama)
-        {
-            screen_num = gCoreContext->GetNumSetting("XineramaScreen", screen_num);
-            if (screen_num >= desktop->screenCount())
-                screen_num = 0;
-        }
-
-        screen_geom = desktop->geometry();
-        if (screen_num >= 0)
-            screen_geom = desktop->screenGeometry(screen_num);
+        using_xinerama = true;
+        screen_geom = screen->virtualGeometry();
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Window using all screens %2x%3")
+            .arg(screen_geom.width()).arg(screen_geom.height()));
+        return;
     }
+
+    screen_geom = screen->geometry();
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Window using screen %2 %3x%4")
+        .arg(screen->name())
+        .arg(screen_geom.width()).arg(screen_geom.height()));
 }
 
 /**
@@ -149,7 +147,7 @@ void VideoOutWindow::MoveResize(void)
     ApplyLetterboxing();
     ApplyManualScaleAndMove();
     if ((db_scale_vert == 0) && (db_scale_horiz == 0) &&
-        (mz_scale_v == 1.0f) && (mz_scale_h == 1.0f))
+        (mz_scale_v == 1.0F) && (mz_scale_h == 1.0F))
     {
         ApplySnapToVideoRect();
     }
@@ -172,7 +170,7 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
     if (db_scale_vert > 0)
     {
         // Veritcal overscan. Move the Y start point in original image.
-        float tmp = 1.0f - 2.0f * db_scale_vert;
+        float tmp = 1.0F - 2.0F * db_scale_vert;
         video_rect.moveTop((int) round(video_rect.height() * db_scale_vert));
         video_rect.setHeight((int) round(video_rect.height() * tmp));
 
@@ -199,7 +197,7 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
         // Vertical underscan. Move the starting Y point in the display window.
         // Use the abolute value of scan factor.
         float vscanf = fabs(db_scale_vert);
-        float tmp = 1.0f - 2.0f * vscanf;
+        float tmp = 1.0F - 2.0F * vscanf;
 
         display_video_rect.moveTop(
             (int) round(display_visible_rect.height() * vscanf) +
@@ -230,7 +228,7 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
     // Horizontal.. comments, same as vertical...
     if (db_scale_horiz > 0)
     {
-        float tmp = 1.0f - 2.0f * db_scale_horiz;
+        float tmp = 1.0F - 2.0F * db_scale_horiz;
         video_rect.moveLeft(
             (int) round(video_disp_dim.width() * db_scale_horiz));
         video_rect.setWidth((int) round(video_disp_dim.width() * tmp));
@@ -251,7 +249,7 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
     else if (db_scale_horiz < 0)
     {
         float hscanf = fabs(db_scale_horiz);
-        float tmp = 1.0f - 2.0f * hscanf;
+        float tmp = 1.0F - 2.0F * hscanf;
 
         display_video_rect.moveLeft(
             (int) round(display_visible_rect.width() * hscanf) +
@@ -281,7 +279,7 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
  */
 void VideoOutWindow::ApplyManualScaleAndMove(void)
 {
-    if ((mz_scale_v != 1.0f) || (mz_scale_h != 1.0f))
+    if ((mz_scale_v != 1.0F) || (mz_scale_h != 1.0F))
     {
         QSize newsz = QSize((int) (display_video_rect.width() * mz_scale_h),
                             (int) (display_video_rect.height() * mz_scale_v));
@@ -311,7 +309,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
 {
     float disp_aspect = fix_aspect(GetDisplayAspect());
     float aspect_diff = disp_aspect - overriden_video_aspect;
-    bool aspects_match = abs(aspect_diff / disp_aspect) <= 0.02f;
+    bool aspects_match = abs(aspect_diff / disp_aspect) <= 0.02F;
     bool nomatch_with_fill =
         !aspects_match && ((kAdjustFill_HorizontalStretch == adjustfill) ||
                            (kAdjustFill_VerticalStretch   == adjustfill));
@@ -321,7 +319,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
     if (nomatch_with_fill && (disp_aspect > overriden_video_aspect))
     {
         float pixNeeded = ((disp_aspect / overriden_video_aspect)
-                           * (float) display_video_rect.height()) + 0.5f;
+                           * (float) display_video_rect.height()) + 0.5F;
 
         display_video_rect.moveTop(
             display_video_rect.top() +
@@ -333,7 +331,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
     {
         float pixNeeded =
             ((overriden_video_aspect / disp_aspect) *
-             (float) display_video_rect.width()) + 0.5f;
+             (float) display_video_rect.width()) + 0.5F;
 
         display_video_rect.moveLeft(
             display_video_rect.left() +
@@ -345,7 +343,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
     {
         float pixNeeded =
             ((overriden_video_aspect / disp_aspect) *
-             (float) display_video_rect.width()) + 0.5f;
+             (float) display_video_rect.width()) + 0.5F;
 
         display_video_rect.moveLeft(
             display_video_rect.left() +
@@ -356,7 +354,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
     else if (nomatch_without_fill)
     {
         float pixNeeded = ((disp_aspect / overriden_video_aspect) *
-                           (float) display_video_rect.height()) + 0.5f;
+                           (float) display_video_rect.height()) + 0.5F;
 
         display_video_rect.moveTop(
             display_video_rect.top() +
@@ -454,7 +452,7 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
         return;
 
     float ydiff = abs(display_video_rect.height() - video_rect.height());
-    if ((ydiff / display_video_rect.height()) < 0.05)
+    if ((ydiff / display_video_rect.height()) < 0.05F)
     {
         display_video_rect.moveTop(
             display_video_rect.top() +
@@ -469,7 +467,7 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
     }
 
     float xdiff = abs(display_video_rect.width() - video_rect.width());
-    if ((xdiff / display_video_rect.width()) < 0.05)
+    if ((xdiff / display_video_rect.width()) < 0.05F)
     {
         display_video_rect.moveLeft(
             display_video_rect.left() +
@@ -624,7 +622,7 @@ bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
  */
 QRect VideoOutWindow::GetTotalOSDBounds(void) const
 {
-    return QRect(QPoint(0, 0), video_disp_dim);
+    return {QPoint(0, 0), video_disp_dim};
 }
 
 /**
@@ -637,7 +635,7 @@ QRect VideoOutWindow::GetTotalOSDBounds(void) const
 void VideoOutWindow::ToggleAdjustFill(AdjustFillMode adjustFill)
 {
     if (adjustFill == kAdjustFill_Toggle)
-        adjustFill = (AdjustFillMode) ((int) (adjustfill + 1) % kAdjustFill_END);
+        adjustFill = (AdjustFillMode) ((adjustfill + 1) % kAdjustFill_END);
 
     adjustfill = adjustFill;
 
@@ -652,15 +650,15 @@ void VideoOutWindow::SetVideoScalingAllowed(bool change)
     if (change)
     {
         db_scale_vert =
-            gCoreContext->GetNumSetting("VertScanPercentage", 0) * 0.01f;
+            gCoreContext->GetNumSetting("VertScanPercentage", 0) * 0.01F;
         db_scale_horiz =
-            gCoreContext->GetNumSetting("HorizScanPercentage", 0) * 0.01f;
+            gCoreContext->GetNumSetting("HorizScanPercentage", 0) * 0.01F;
         db_scaling_allowed = true;
     }
     else
     {
-        db_scale_vert = 0.0f;
-        db_scale_horiz = 0.0f;
+        db_scale_vert = 0.0F;
+        db_scale_horiz = 0.0F;
         db_scaling_allowed = false;
     }
 
@@ -752,11 +750,11 @@ QRect VideoOutWindow::GetVisibleOSDBounds(
         (uint) floor(video_disp_dim.width()  - (right_overflow * dv_w)),
         (uint) floor(video_disp_dim.height() - (lower_overflow * dv_h)));
     // adjust for overscan
-    if ((db_scale_vert > 0.0f) || (db_scale_horiz > 0.0f))
+    if ((db_scale_vert > 0.0F) || (db_scale_horiz > 0.0F))
     {
         QRect v(tl, br);
-        float xs = (db_scale_horiz > 0.0f) ? db_scale_horiz : 0.0f;
-        float ys = (db_scale_vert > 0.0f) ? db_scale_vert : 0.0f;
+        float xs = (db_scale_horiz > 0.0F) ? db_scale_horiz : 0.0F;
+        float ys = (db_scale_vert > 0.0F) ? db_scale_vert : 0.0F;
         QPoint s((int)(v.width() * xs), (int)(v.height() * ys));
         tl += s;
         br -= s;
@@ -772,26 +770,26 @@ QRect VideoOutWindow::GetVisibleOSDBounds(
     // set the physical aspect ratio of the displayable area
     const float dispPixelAdj = display_visible_rect.width() ?
         (GetDisplayAspect() * display_visible_rect.height())
-                / display_visible_rect.width() : 1.f;
+                / display_visible_rect.width() : 1.F;
 
     float vs = video_rect.height() ? (float)video_rect.width() /
-                video_rect.height() : 1.f;
+                video_rect.height() : 1.F;
     visible_aspect = themeaspect / dispPixelAdj *
-        (overriden_video_aspect ? vs / overriden_video_aspect : 1.f);
+        (overriden_video_aspect ? vs / overriden_video_aspect : 1.F);
 
-    if (themeaspect > 0.0f)
+    if (themeaspect > 0.0F)
     {
         // now adjust for scaling of the video on the size
-        float tmp = sqrtf(2.0f/(sq(visible_aspect / themeaspect) + 1.0f));
-        if (tmp > 0.0f)
-            font_scaling = 1.0f / tmp;
+        float tmp = sqrtf(2.0F/(sq(visible_aspect / themeaspect) + 1.0F));
+        if (tmp > 0.0F)
+            font_scaling = 1.0F / tmp;
         // now adjust for aspect ratio effect on font size
         // (should be in osd.cpp?)
         font_scaling *= sqrtf(overriden_video_aspect / themeaspect);
     }
 
     if (isPBP)
-        font_scaling *= 0.65f;
+        font_scaling *= 0.65F;
 
     return vb;
 }
@@ -807,14 +805,12 @@ void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
     if (pip_state > kPIPOff)
     {
-        aspectMode = kAspect_Off;
         return;
     }
 
     if (aspectMode == kAspect_Toggle)
     {
-        aspectMode = (AspectOverrideMode) ((int) (aspectoverride + 1)
-                                           % kAspect_END);
+        aspectMode = (AspectOverrideMode) ((aspectoverride + 1) % kAspect_END);
     }
 
     aspectoverride = aspectMode;
@@ -830,8 +826,8 @@ QRect VideoOutWindow::GetPIPRect(
 {
     QRect position;
 
-    float pipVideoAspect = pipplayer ? (float) pipplayer->GetVideoAspect()
-        : (4.0f / 3.0f);
+    float pipVideoAspect = pipplayer ? pipplayer->GetVideoAspect()
+        : (4.0F / 3.0F);
     int tmph = (display_visible_rect.height() * db_pip_size) / 100;
     float pixel_adj = 1;
     if (do_pixel_adj)
@@ -875,8 +871,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
     const float zf = 0.02;
     if (kZoomHome == direction)
     {
-        mz_scale_v = 1.0f;
-        mz_scale_h = 1.0f;
+        mz_scale_v = 1.0F;
+        mz_scale_h = 1.0F;
         mz_move = QPoint(0, 0);
     }
     else if (kZoomIn == direction)
@@ -944,8 +940,53 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
     else if (kZoomRight == direction && (mz_move.x() > -kManualZoomMaxMove))
         mz_move.setX(mz_move.x() - 2);
 
-    mz_scale_v = snap(mz_scale_v, 1.0f, zf / 2);
-    mz_scale_h = snap(mz_scale_h, 1.0f, zf / 2);
+    mz_scale_v = snap(mz_scale_v, 1.0F, zf / 2);
+    mz_scale_h = snap(mz_scale_h, 1.0F, zf / 2);
+}
+
+void VideoOutWindow::ToggleMoveBottomLine(void)
+{
+    if (bottomline)
+    {
+        mz_move.setX(0);
+        mz_move.setY(0);
+        mz_scale_h = 1.0;
+        mz_scale_v = 1.0;
+        bottomline = false;
+    }
+    else
+    {
+        const float zf = 0.02;
+
+        int x = gCoreContext->GetNumSetting("OSDMoveXBottomLine", 0);
+        mz_move.setX(x);
+
+        int y = gCoreContext->GetNumSetting("OSDMoveYBottomLine", 5);
+        mz_move.setY(y);
+
+        double h = static_cast<double>
+                   (gCoreContext->GetNumSetting("OSDScaleHBottomLine", 100)) /
+                   100.0;
+        mz_scale_h = snap(h, 1.0F, zf / 2);
+
+        double v = static_cast<double>
+                   (gCoreContext->GetNumSetting("OSDScaleVBottomLine", 112)) /
+                   100.0;
+        mz_scale_v = snap(v, 1.0F, zf / 2);
+
+        bottomline = true;
+    }
+
+    MoveResize();
+}
+
+void VideoOutWindow::SaveBottomLine(void)
+{
+    gCoreContext->SaveSetting("OSDMoveXBottomLine", GetMzMove().x());
+    gCoreContext->SaveSetting("OSDMoveYBottomLine", GetMzMove().y());
+
+    gCoreContext->SaveSetting("OSDScaleHBottomLine", GetMzScaleH() * 100.0F);
+    gCoreContext->SaveSetting("OSDScaleVBottomLine", GetMzScaleV() * 100.0F);
 }
 
 QString VideoOutWindow::GetZoomString(void) const
@@ -961,12 +1002,12 @@ QString VideoOutWindow::GetZoomString(void) const
 static float fix_aspect(float raw)
 {
     // Check if close to 4:3
-    if (fabs(raw - 1.333333f) < 0.05f)
-        raw = 1.333333f;
+    if (fabs(raw - 1.333333F) < 0.05F)
+        raw = 1.333333F;
 
     // Check if close to 16:9
-    if (fabs(raw - 1.777777f) < 0.05f)
-        raw = 1.777777f;
+    if (fabs(raw - 1.777777F) < 0.05F)
+        raw = 1.777777F;
 
     return raw;
 }
@@ -982,7 +1023,7 @@ void VideoOutWindow::SetPIPState(PIPState setting)
 /// Correct for underalignment
 static QSize fix_alignment(QSize raw)
 {
-    return QSize((raw.width() + 15) & (~0xf), (raw.height() + 15) & (~0xf));
+    return {(raw.width() + 15) & (~0xf), (raw.height() + 15) & (~0xf)};
 }
 
 static float snap(float value, float snapto, float diff)

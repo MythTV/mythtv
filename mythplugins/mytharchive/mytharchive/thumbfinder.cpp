@@ -86,22 +86,9 @@ int SeekAmountsCount = sizeof(SeekAmounts) / sizeof(SeekAmounts[0]);
 ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
                          const QString &menuTheme)
             :MythScreenType(parent, "ThumbFinder"),
-    m_inputFC(nullptr),        m_codecCtx(nullptr),
-    m_codec(nullptr),
-    m_fps(0.0),                m_outputbuf(nullptr),
-    m_frameWidth(0),           m_frameHeight(0),
-    m_videostream(0),          m_currentSeek(0),
-    m_startTime(-1),           m_startPTS(-1),
-    m_currentPTS(-1),          m_firstIFramePTS(-1),
-    m_frameTime(0),            m_updateFrame(false),
-    m_finalDuration(0),        m_offset(0),
     m_archiveItem(archiveItem),
     m_thumbCount(getChapterCount(menuTheme)),
-    m_thumbDir(createThumbDir()),
-    m_frameButton(nullptr),    m_saveButton(nullptr),
-    m_cancelButton(nullptr),   m_frameImage(nullptr),
-    m_positionImage(nullptr),  m_imageGrid(nullptr),
-    m_seekAmountText(nullptr), m_currentPosText(nullptr)
+    m_thumbDir(createThumbDir())
 {
     // copy thumbList so we can abandon changes if required
     m_thumbList.clear();
@@ -188,7 +175,7 @@ bool ThumbFinder::keyPressEvent(QKeyEvent *event)
 
         if (action == "ESCAPE")
         {
-            showMenu();
+            ShowMenu();
             return true;
         }
 
@@ -269,10 +256,8 @@ void ThumbFinder::loadCutList()
     ProgramInfo *progInfo = getProgramInfoForFile(m_archiveItem->filename);
 
     if (progInfo && m_archiveItem->hasCutlist)
-    {
         progInfo->QueryCutList(m_deleteMap);
-        delete progInfo;
-    }
+    delete progInfo;
 
     if (m_deleteMap.isEmpty())
     {
@@ -366,7 +351,7 @@ QString ThumbFinder::createThumbDir(void)
     if (!dir.exists())
     {
         dir.mkdir(thumbDir);
-        if( chmod(qPrintable(thumbDir), 0777) )
+        if( chmod(qPrintable(thumbDir), 0777) != 0 )
             LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions"
                                      " on thumb directory: " + ENO);
     }
@@ -374,12 +359,12 @@ QString ThumbFinder::createThumbDir(void)
     QString path;
     for (int x = 1; dir.exists(); x++)
     {
-        path = QString(thumbDir + "/%1").arg(x);
+        path = thumbDir + QString("/%1").arg(x);
         dir.setPath(path);
     }
 
     dir.mkdir(path);
-    if( chmod(qPrintable(path), 0777) )
+    if( chmod(qPrintable(path), 0777) != 0 )
         LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions on "
                                  "thumb directory: %1" + ENO);
 
@@ -471,7 +456,7 @@ bool ThumbFinder::getThumbImages()
     m_frameFile = m_thumbDir + "/title.jpg";
     ThumbImage *thumb = nullptr;
 
-    if (m_thumbList.size() > 0)
+    if (!m_thumbList.empty())
     {
         // use the thumb details in the thumbList if already available
         thumb = m_thumbList.at(0);
@@ -498,7 +483,7 @@ bool ThumbFinder::getThumbImages()
 
     for (int x = 1; x <= m_thumbCount; x++)
     {
-        m_frameFile = QString(m_thumbDir + "/chapter-%1.jpg").arg(x);
+        m_frameFile = m_thumbDir + QString("/chapter-%1.jpg").arg(x);
 
         thumb = nullptr;
 
@@ -792,7 +777,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
     av_init_packet(&pkt);
 
-    int frameFinished = 0;
+    bool frameFinished = false;
     int keyFrame;
     int frameCount = 0;
     bool gotKeyFrame = false;
@@ -805,7 +790,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
             keyFrame = pkt.flags & AV_PKT_FLAG_KEY;
 
-            if (m_startPTS == -1 && pkt.dts != (int64_t)AV_NOPTS_VALUE)
+            if (m_startPTS == -1 && pkt.dts != AV_NOPTS_VALUE)
             {
                 m_startPTS = pkt.dts;
                 m_frameTime = pkt.duration;
@@ -824,13 +809,13 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
                 m_firstIFramePTS = pkt.dts;
 
             av_frame_unref(m_frame);
-            frameFinished = 0;
+            frameFinished = false;
             int ret = avcodec_receive_frame(m_codecCtx, m_frame);
             if (ret == 0)
-                frameFinished = 1;
+                frameFinished = true;
             if (ret == 0 || ret == AVERROR(EAGAIN))
-                ret = avcodec_send_packet(m_codecCtx, &pkt);
-            if (requiredPTS != -1 && pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts < requiredPTS)
+                avcodec_send_packet(m_codecCtx, &pkt);
+            if (requiredPTS != -1 && pkt.dts != AV_NOPTS_VALUE && pkt.dts < requiredPTS)
                 frameFinished = false;
 
             m_currentPTS = pkt.dts;
@@ -876,8 +861,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
 void ThumbFinder::closeAVCodec()
 {
-    if (m_outputbuf)
-        delete[] m_outputbuf;
+    delete[] m_outputbuf;
 
     // close the codec
     gCodecMap->freeCodecContext
@@ -887,7 +871,7 @@ void ThumbFinder::closeAVCodec()
     m_inputFC.Close();
 }
 
-void ThumbFinder::showMenu()
+void ThumbFinder::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");

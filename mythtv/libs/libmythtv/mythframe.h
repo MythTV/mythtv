@@ -73,6 +73,12 @@ typedef struct VideoFrame_
 
 #ifdef __cplusplus
 
+enum class uswcState {
+    Detect,
+    Use_SSE,
+    Use_SW
+};
+
 class MTV_PUBLIC MythUSWCCopy
 {
 public:
@@ -87,9 +93,9 @@ public:
 private:
     void allocateCache(int width);
 
-    uint8_t* m_cache;
-    int m_size;
-    int m_uswc;
+    uint8_t*  m_cache {nullptr};
+    int       m_size  {0};
+    uswcState m_uswc  {uswcState::Detect};
 };
 
 void MTV_PUBLIC framecopy(VideoFrame *dst, const VideoFrame *src,
@@ -99,7 +105,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
                         const int *p = nullptr,
                         const int *o = nullptr,
-                        float _aspect = -1.0f, double _rate = -1.0f,
+                        float _aspect = -1.0F, double _rate = -1.0F,
                         int _aligned = 64);
 static inline void clear(VideoFrame *vf);
 static inline bool compatible(const VideoFrame *a,

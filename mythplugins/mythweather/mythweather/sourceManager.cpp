@@ -305,10 +305,7 @@ bool SourceManager::findPossibleSources(QStringList types,
             sources.append(si);
     }
 
-    if (sources.count())
-        return true;
-
-    return false;
+    return sources.count() != 0;
 }
 
 bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
@@ -394,6 +391,4 @@ void SourceManager::recurseDirs( QDir dir )
             }
         }
     }
-
-    return;
 }

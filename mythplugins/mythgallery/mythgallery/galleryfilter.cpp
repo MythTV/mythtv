@@ -12,10 +12,7 @@
 #include "galleryfilter.h"
 #include "galleryutil.h"
 
-GalleryFilter::GalleryFilter(bool loaddefaultsettings) :
-    m_dirFilter(""), m_typeFilter(kTypeFilterAll),
-    m_sort(kSortOrderUnsorted),
-    m_changed_state(0)
+GalleryFilter::GalleryFilter(bool loaddefaultsettings)
 {
     // do nothing yet
     if (loaddefaultsettings)
@@ -28,9 +25,7 @@ GalleryFilter::GalleryFilter(bool loaddefaultsettings) :
     }
 }
 
-GalleryFilter::GalleryFilter(const GalleryFilter &gfs) :
-    m_dirFilter(""), m_typeFilter(kTypeFilterAll),
-    m_sort(kSortOrderUnsorted), m_changed_state(0)
+GalleryFilter::GalleryFilter(const GalleryFilter &gfs)
 {
     *this = gfs;
 }
@@ -120,7 +115,7 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
 }
 
 
-void GalleryFilter::dumpFilter(QString src)
+void GalleryFilter::dumpFilter(const QString& src)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Dumping GalleryFilter from: %1")
                       .arg(src));

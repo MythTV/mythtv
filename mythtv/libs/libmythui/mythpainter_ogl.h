@@ -20,37 +20,42 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 
     void SetTarget(int new_target)       { target = new_target;      }
     void SetSwapControl(bool swap)       { swapControl = swap;       } 
-    virtual QString GetName(void)        { return QString("OpenGL"); }
-    virtual bool SupportsAnimation(void) { return true;              }
-    virtual bool SupportsAlpha(void)     { return true;              }
-    virtual bool SupportsClipping(void)  { return false;             }
-    virtual void FreeResources(void);
-    virtual void Begin(QPaintDevice *parent);
-    virtual void End();
+    QString GetName(void) override // MythPainter
+        { return QString("OpenGL"); }
+    bool SupportsAnimation(void) override // MythPainter
+        { return true; }
+    bool SupportsAlpha(void) override // MythPainter
+        { return true; }
+    bool SupportsClipping(void) override // MythPainter
+        { return false; }
+    void FreeResources(void) override; // MythPainter
+    void Begin(QPaintDevice *parent) override; // MythPainter
+    void End() override; // MythPainter
 
-    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                           int alpha);
-    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
-                          const QPen &linePen, int alpha);
-    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
-                               const QBrush &fillBrush, const QPen &linePen,
-                               int alpha);
+    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
+                   int alpha) override; // MythPainter
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen, int alpha) override; // MythPainter
+    void DrawRoundRect(const QRect &area, int cornerRadius,
+                       const QBrush &fillBrush, const QPen &linePen,
+                       int alpha) override; // MythPainter
 
-    virtual void PushTransformation(const UIEffects &fx, QPointF center = QPointF());
-    virtual void PopTransformation(void);
+    void PushTransformation(const UIEffects &fx, QPointF center = QPointF()) override; // MythPainter
+    void PopTransformation(void) override; // MythPainter
     void       DeleteTextures(void);
 
   protected:
-    virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
-    virtual void DeleteFormatImagePriv(MythImage *im);
+    MythImage* GetFormatImagePriv(void) override // MythPainter
+        { return new MythImage(this); }
+    void DeleteFormatImagePriv(MythImage *im) override; // MythPainter
 
     void       ClearCache(void);
     int        GetTextureFromCache(MythImage *im);
 
-    QWidget          *realParent;
-    MythRenderOpenGL *realRender;
-    int               target;
-    bool              swapControl;
+    QWidget          *realParent  {nullptr};
+    MythRenderOpenGL *realRender  {nullptr};
+    int               target      {0};
+    bool              swapControl {true};
 
     QMap<MythImage *, uint>    m_ImageIntMap;
     std::list<MythImage *>     m_ImageExpireList;

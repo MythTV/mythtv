@@ -8,14 +8,9 @@
 #include "tv_actions.h"    // for ACTION_MENUBLUE, etc
 #include "mythlogging.h"
 
-#define MAGAZINE(page) (page / 256)
+#define MAGAZINE(page) ((page) / 256)
 
 TeletextReader::TeletextReader()
-  : m_curpage(0x100),           m_cursubpage(-1),
-    m_curpage_showheader(true), m_curpage_issubtitle(false),
-    m_transparent(false),       m_revealHidden(false),
-    m_header_changed(false),    m_page_changed(false),
-    m_fetchpage(0),             m_fetchsubpage(0)
 {
     memset(m_pageinput, 0, sizeof(m_pageinput));
     memset(m_header,    0, sizeof(m_header));
@@ -320,7 +315,7 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
         // a different page number but the same magazine number.  The same
         // setting shall be used for all page headers in the service.
 
-        bool isMagazineSerialMode = flags & TP_MAGAZINE_SERIAL;
+        bool isMagazineSerialMode = (flags & TP_MAGAZINE_SERIAL) != 0;
         if (!(isMagazineSerialMode) && m != magazine)
         {
             continue;   // in parallel mode only process magazine
@@ -523,7 +518,7 @@ void TeletextReader::HeaderUpdated(
     if (page_ptr == nullptr)
         return;
 
-    if (m_curpage_showheader == false)
+    if (!m_curpage_showheader)
         return;
 
     m_header_changed = true;

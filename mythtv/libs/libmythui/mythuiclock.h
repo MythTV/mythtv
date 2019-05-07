@@ -28,14 +28,14 @@ class MUI_PUBLIC MythUIClock : public MythUIText
     MythUIClock(MythUIType *parent, const QString &name);
    ~MythUIClock();
 
-    virtual void Pulse(void);
-    virtual void SetText(const QString &text);
+    void Pulse(void) override; // MythUIText
+    void SetText(const QString &text) override; // MythUIText
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIText
+    void CopyFrom(MythUIType *base) override; // MythUIText
+    void CreateCopy(MythUIType *parent) override; // MythUIText
 
     QString GetTimeText(void);
 
@@ -43,11 +43,11 @@ class MUI_PUBLIC MythUIClock : public MythUIText
     QDateTime m_nextUpdate;
 
     QString m_Format;
-    QString m_TimeFormat;
-    QString m_DateFormat;
-    QString m_ShortDateFormat;
+    QString m_TimeFormat      {"h:mm ap"};
+    QString m_DateFormat      {"ddd d MMM yyyy"};
+    QString m_ShortDateFormat {"ddd M/d"};
 
-    bool m_Flash;
+    bool    m_Flash           {false};
 };
 
 #endif

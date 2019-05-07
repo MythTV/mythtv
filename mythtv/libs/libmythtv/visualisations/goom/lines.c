@@ -15,19 +15,17 @@ static inline unsigned char
 lighten (unsigned char value, float power)
 {
 	int     val = value;
-	float   t = (float) val * log10(power) / 2.0;
+	float   t = (float) val * log10f(power) / 2.0F;
 
 	if (t > 0) {
-		val = (int) t; // (32.0f * log (t));
+		val = (int) t; // (32.0F * log (t));
 		if (val > 255)
 			val = 255;
 		if (val < 0)
 			val = 0;
 		return val;
 	}
-	else {
-		return 0;
-	}
+        return 0;
 }
 
 static void
@@ -53,27 +51,27 @@ genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 	switch (id) {
 	case GML_HLINE:
 		for (i = 0; i < 512; i++) {
-			l[i].x = ((float) i * rx) / 512.0f;
+			l[i].x = ((float) i * rx) / 512.0F;
 			l[i].y = param;
-			l[i].angle = M_PI / 2.0f;
+			l[i].angle = M_PI_F / 2.0F;
 		}
 		return;
 	case GML_VLINE:
 		for (i = 0; i < 512; i++) {
-			l[i].y = ((float) i * ry) / 512.0f;
+			l[i].y = ((float) i * ry) / 512.0F;
 			l[i].x = param;
-			l[i].angle = 0.0f;
+			l[i].angle = 0.0F;
 		}
 		return;
 	case GML_CIRCLE:
 		for (i = 0; i < 512; i++) {
 			float   cosa, sina;
 
-			l[i].angle = 2.0f * M_PI * (float) i / 512.0f;
-			cosa = param * cos (l[i].angle);
-			sina = param * sin (l[i].angle);
-			l[i].x = ((float) rx / 2.0f) + cosa;
-			l[i].y = (float) ry / 2.0f + sina;
+			l[i].angle = 2.0F * M_PI_F * (float) i / 512.0F;
+			cosa = param * cosf (l[i].angle);
+			sina = param * sinf (l[i].angle);
+			l[i].x = ((float) rx / 2.0F) + cosa;
+			l[i].y = (float) ry / 2.0F + sina;
 		}
 		return;
 	}
@@ -121,10 +119,10 @@ goom_lines_move (GMLine * l)
 	unsigned char *c1, *c2;
 
 	for (i = 0; i < 512; i++) {
-		l->points[i].x = (l->points2[i].x + 39.0f * l->points[i].x) / 40.0f;
-		l->points[i].y = (l->points2[i].y + 39.0f * l->points[i].y) / 40.0f;
+		l->points[i].x = (l->points2[i].x + 39.0F * l->points[i].x) / 40.0F;
+		l->points[i].y = (l->points2[i].y + 39.0F * l->points[i].y) / 40.0F;
 		l->points[i].angle =
-			(l->points2[i].angle + 39.0f * l->points[i].angle) / 40.0f;
+			(l->points2[i].angle + 39.0F * l->points[i].angle) / 40.0F;
 	}
 
 	c1 = (unsigned char *) &l->color;
@@ -140,16 +138,16 @@ goom_lines_move (GMLine * l)
 	}
 
 	l->power += l->powinc;
-	if (l->power < 1.1f) {
-		l->power = 1.1f;
-		l->powinc = (float) (iRAND (20) + 10) / 300.0f;
+	if (l->power < 1.1F) {
+		l->power = 1.1F;
+		l->powinc = (float) (iRAND (20) + 10) / 300.0F;
 	}
-	if (l->power > 17.5f) {
-		l->power = 17.5f;
-		l->powinc = -(float) (iRAND (20) + 10) / 300.0f;
+	if (l->power > 17.5F) {
+		l->power = 17.5F;
+		l->powinc = -(float) (iRAND (20) + 10) / 300.0F;
 	}
 
-	l->amplitude = (99.0f * l->amplitude + l->amplitudeF) / 100.0f;
+	l->amplitude = (99.0F * l->amplitude + l->amplitudeF) / 100.0F;
 }
 
 void
@@ -182,7 +180,7 @@ goom_lines_init (int rx, int ry,
 	l->IDdest = IDdest;
 	l->param = paramD;
 	
-	l->amplitude = l->amplitudeF = 1.0f;
+	l->amplitude = l->amplitudeF = 1.0F;
 
 	genline (IDsrc, paramS, l->points, rx, ry);
 	genline (IDdest, paramD, l->points2, rx, ry);
@@ -193,10 +191,10 @@ goom_lines_init (int rx, int ry,
 	l->screenX = rx;
 	l->screenY = ry;
 
-	l->power = 0.0f;
-	l->powinc = 0.01f;
+	l->power = 0.0F;
+	l->powinc = 0.01F;
 
-	goom_lines_switch_to (l, IDdest, paramD, 1.0f, coulD);
+	goom_lines_switch_to (l, IDdest, paramD, 1.0F, coulD);
 
 	return l;
 }
@@ -211,15 +209,15 @@ goom_lines_free (GMLine ** l)
 }
 
 void
-goom_lines_draw (GMLine * line, gint16 data[512], unsigned int *p)
+goom_lines_draw (GMLine * line, const gint16 data[512], unsigned int *p)
 {
 	if (line != NULL) {
 		int     i, x1, y1;
 		guint32 color = line->color;
 		GMUnitPointer *pt = &(line->points[0]);
 
-		float   cosa = cos (pt->angle) / 1000.0f;
-		float   sina = sin (pt->angle) / 1000.0f;
+		float   cosa = cosf (pt->angle) / 1000.0F;
+		float   sina = sinf (pt->angle) / 1000.0F;
 
 		lightencolor ((int *)&color, line->power);
 
@@ -227,14 +225,13 @@ goom_lines_draw (GMLine * line, gint16 data[512], unsigned int *p)
 		y1 = (int) (pt->y + sina * line->amplitude * data[0]);
 
 		for (i = 1; i < 512; i++) {
-			int     x2, y2;
-			GMUnitPointer *pt = &(line->points[i]);
+			pt = &(line->points[i]);
 
-			float   cosa = cos (pt->angle) / 1000.0f;
-			float   sina = sin (pt->angle) / 1000.0f;
+			cosa = cosf (pt->angle) / 1000.0F;
+			sina = sinf (pt->angle) / 1000.0F;
 
-			x2 = (int) (pt->x + cosa * line->amplitude * data[i]);
-			y2 = (int) (pt->y + sina * line->amplitude * data[i]);
+			int x2 = (int) (pt->x + cosa * line->amplitude * data[i]);
+			int y2 = (int) (pt->y + sina * line->amplitude * data[i]);
 
 			draw_line ((int *)p, x1, y1, x2, y2, color, line->screenX, line->screenY);
 			DRAWMETHOD_DONE ();

@@ -23,30 +23,31 @@ class MythCommFlagPlayer;
 class ImportRecorder : public DTVRecorder
 {
   public:
-    explicit ImportRecorder(TVRec*);
-    ~ImportRecorder();
+    explicit ImportRecorder(TVRec*rec) : DTVRecorder(rec) {}
+    ~ImportRecorder() = default;
 
     // RecorderBase
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     void Close(void);
 
-    void InitStreamData(void) {}
+    void InitStreamData(void) override {} // DTVRecorder
 
-    virtual long long GetFramesWritten(void);
-    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const {return nullptr;}
+    long long GetFramesWritten(void) override; // DTVRecorder
+    RecordingQuality *GetRecordingQuality(const RecordingInfo*) const override // DTVRecorder
+        {return nullptr;}
     void UpdateRecSize();
 
   private:
-    int             _import_fd;
-    MythCommFlagPlayer *m_cfp;
-    long long m_nfc;
+    int                 m_import_fd {-1};
+    MythCommFlagPlayer *m_cfp       {nullptr};
+    long long           m_nfc       {0};
 };
 
 #endif // _IMPORT_RECORDER_H_

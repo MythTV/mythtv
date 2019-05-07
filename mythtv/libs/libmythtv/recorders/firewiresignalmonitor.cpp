@@ -15,7 +15,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("FireSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 void FirewireTableMonitorThread::run(void)
 {
@@ -27,8 +27,8 @@ void FirewireTableMonitorThread::run(void)
 const uint FirewireSignalMonitor::kPowerTimeout  = 3000; /* ms */
 const uint FirewireSignalMonitor::kBufferTimeout = 5000; /* ms */
 
-QMap<void*,uint> FirewireSignalMonitor::pat_keys;
-QMutex           FirewireSignalMonitor::pat_keys_lock;
+QMap<void*,uint> FirewireSignalMonitor::s_pat_keys;
+QMutex           FirewireSignalMonitor::s_pat_keys_lock;
 
 /** \fn FirewireSignalMonitor::FirewireSignalMonitor(int,FirewireChannel*,uint64_t)
  *  \brief Initializes signal lock and signal values.
@@ -48,20 +48,15 @@ FirewireSignalMonitor::FirewireSignalMonitor(int db_cardnum,
                                              FirewireChannel *_channel,
                                              bool _release_stream,
                                              uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      dtvMonitorRunning(false),
-      tableMonitorThread(nullptr),
-      stb_needs_retune(true),
-      stb_needs_to_wait_for_pat(false),
-      stb_needs_to_wait_for_power(false)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
-    signalStrength.SetThreshold(65);
+    m_signalStrength.SetThreshold(65);
 
     AddFlags(kSigMon_WaitForSig);
 
-    stb_needs_retune =
+    m_stb_needs_retune =
         (FirewireDevice::kAVCPowerOff == _channel->GetPowerState());
 }
 
@@ -71,7 +66,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(int db_cardnum,
 FirewireSignalMonitor::~FirewireSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
+    FirewireSignalMonitor::Stop();
 }
 
 /** \fn FirewireSignalMonitor::Stop(void)
@@ -81,12 +76,12 @@ void FirewireSignalMonitor::Stop(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
-    if (tableMonitorThread)
+    if (m_tableMonitorThread)
     {
-        dtvMonitorRunning = false;
-        tableMonitorThread->wait();
-        delete tableMonitorThread;
-        tableMonitorThread = nullptr;
+        m_dtvMonitorRunning = false;
+        m_tableMonitorThread->wait();
+        delete m_tableMonitorThread;
+        m_tableMonitorThread = nullptr;
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
@@ -95,13 +90,13 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 {
     AddFlags(kDTVSigMon_PATSeen);
 
-    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(channel);
+    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!fwchan)
         return;
 
     bool crc_bogus = !fwchan->GetFirewireDevice()->IsSTBBufferCleared();
-    if (crc_bogus && stb_needs_to_wait_for_pat &&
-        (stb_wait_for_pat_timer.elapsed() < (int)kBufferTimeout))
+    if (crc_bogus && m_stb_needs_to_wait_for_pat &&
+        (m_stb_wait_for_pat_timer.elapsed() < (int)kBufferTimeout))
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePAT() ignoring PAT");
         uint tsid = pat->TransportStreamID();
@@ -109,10 +104,10 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         return;
     }
 
-    if (crc_bogus && stb_needs_to_wait_for_pat)
+    if (crc_bogus && m_stb_needs_to_wait_for_pat)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Wait for valid PAT timed out");
-        stb_needs_to_wait_for_pat = false;
+        m_stb_needs_to_wait_for_pat = false;
     }
 
     DTVSignalMonitor::HandlePAT(pat);
@@ -136,17 +131,17 @@ void FirewireSignalMonitor::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 
 void FirewireSignalMonitor::RunTableMonitor(void)
 {
-    stb_needs_to_wait_for_pat = true;
-    stb_wait_for_pat_timer.start();
-    dtvMonitorRunning = true;
+    m_stb_needs_to_wait_for_pat = true;
+    m_stb_wait_for_pat_timer.start();
+    m_dtvMonitorRunning = true;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- begin");
 
-    FirewireChannel *lchan = dynamic_cast<FirewireChannel*>(channel);
+    FirewireChannel *lchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!lchan)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
-        while (dtvMonitorRunning)
+        while (m_dtvMonitorRunning)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err end");
@@ -158,7 +153,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->OpenPort();
     dev->AddListener(this);
 
-    while (dtvMonitorRunning && GetStreamData())
+    while (m_dtvMonitorRunning && GetStreamData())
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- shutdown ");
@@ -166,7 +161,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->RemoveListener(this);
     dev->ClosePort();
 
-    while (dtvMonitorRunning)
+    while (m_dtvMonitorRunning)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- end");
@@ -174,7 +169,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
 
 void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
 {
-    if (!dtvMonitorRunning)
+    if (!m_dtvMonitorRunning)
         return;
 
     if (GetStreamData())
@@ -193,28 +188,28 @@ void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
  */
 void FirewireSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
-    if (dtvMonitorRunning)
+    if (m_dtvMonitorRunning)
     {
         EmitStatus();
         if (IsAllGood())
             SendMessageAllGood();
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
-    if (stb_needs_to_wait_for_power &&
-        (stb_wait_for_power_timer.elapsed() < (int)kPowerTimeout))
+    if (m_stb_needs_to_wait_for_power &&
+        (m_stb_wait_for_power_timer.elapsed() < (int)kPowerTimeout))
     {
         return;
     }
-    stb_needs_to_wait_for_power = false;
+    m_stb_needs_to_wait_for_power = false;
 
-    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(channel);
+    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!fwchan)
         return;
 
@@ -232,8 +227,8 @@ void FirewireSignalMonitor::UpdateValues(void)
             {
                 AddFlags(kFWSigMon_PowerSeen);
                 fwchan->SetPowerState(true);
-                stb_wait_for_power_timer.start();
-                stb_needs_to_wait_for_power = true;
+                m_stb_wait_for_power_timer.start();
+                m_stb_needs_to_wait_for_power = true;
             }
             else
             {
@@ -255,25 +250,25 @@ void FirewireSignalMonitor::UpdateValues(void)
     bool isLocked = !HasFlags(kFWSigMon_WaitForPower) ||
         HasFlags(kFWSigMon_WaitForPower | kFWSigMon_PowerMatch);
 
-    if (isLocked && stb_needs_retune)
+    if (isLocked && m_stb_needs_retune)
     {
         fwchan->Retune();
-        isLocked = stb_needs_retune = false;
+        isLocked = m_stb_needs_retune = false;
     }
 
     SignalMonitor::UpdateValues();
 
     {
-        QMutexLocker locker(&statusLock);
-        if (!scriptStatus.IsGood())
+        QMutexLocker locker(&m_statusLock);
+        if (!m_scriptStatus.IsGood())
             return;
     }
 
     // Set SignalMonitorValues from info from card.
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(isLocked ? 100 : 0);
-        signalLock.SetValue(isLocked ? 1 : 0);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(isLocked ? 100 : 0);
+        m_signalLock.SetValue(isLocked ? 1 : 0);
     }
 
     EmitStatus();
@@ -287,17 +282,17 @@ void FirewireSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        tableMonitorThread = new FirewireTableMonitorThread(this);
+        m_tableMonitorThread = new FirewireTableMonitorThread(this);
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Waiting for table monitor to start");
 
-        while (!dtvMonitorRunning)
+        while (!m_dtvMonitorRunning)
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Table monitor started");
     }
 
-    update_done = true;
+    m_update_done = true;
 }

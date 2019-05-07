@@ -110,7 +110,7 @@ class OutputStream : public QObject, public QScriptable
         }
 
     private:
-        QTextStream *m_pTextStream;
+        QTextStream *m_pTextStream {nullptr};
 };
 
 #endif

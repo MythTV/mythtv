@@ -33,7 +33,7 @@
 extern volatile guint32 resolx;
 extern volatile guint32 c_resoly;
 
-void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
+void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, const signed int *brutS, const signed int *brutD);
 
 /* Prototype to keep gcc from spewing warnings */
 static void select_zoom_filter (void);
@@ -148,8 +148,8 @@ void generatePrecalCoef (void);
 void calculatePXandPY (int x, int y, int *px, int *py);
 void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
 void setPixelRGB_ (Uint * buffer, Uint x, Color c);
-inline void getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c);
-void getPixelRGB_ (Uint * buffer, Uint x, Color * c);
+inline void getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c);
+void getPixelRGB_ (const Uint * buffer, Uint x, Color * c);
 
 void
 generatePrecalCoef ()
@@ -359,7 +359,7 @@ setPixelRGB_ (Uint * buffer, Uint x, Color c)
 
 
 inline void
-getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
+getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 {
 //    register unsigned char *tmp8;
 	unsigned int i;
@@ -380,7 +380,7 @@ getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
 
 
 /*inline*/ void
-getPixelRGB_ (Uint * buffer, Uint x, Color * c)
+getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
 {
 	register unsigned char *tmp8;
 
@@ -407,52 +407,55 @@ getPixelRGB_ (Uint * buffer, Uint x, Color * c)
 }
 
 
-void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD)
+void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
+             unsigned int lprevX, unsigned int lprevY,
+             const signed int *lbrutS, const signed int *lbrutD)
 {
-	int     myPos, myPos2;
+	int     myPos;
 	Color   couleur;
 //	unsigned int coefv, coefh;
 
-	unsigned int ax = (prevX - 1) << PERTEDEC, ay = (prevY - 1) << PERTEDEC;
+	unsigned int ax = (lprevX - 1) << PERTEDEC, ay = (lprevY - 1) << PERTEDEC;
 
-	int     bufsize = prevX * prevY * 2;
-	int     bufwidth = prevX;
+	int     bufsize = lprevX * lprevY * 2;
+	int     bufwidth = lprevX;
 
-	expix1[0]=expix1[prevX-1]=expix1[prevX*prevY-1]=expix1[prevX*prevY-prevX]=0;
+	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
 
 	for (myPos = 0; myPos < bufsize; myPos += 2) {
 		Color   col1, col2, col3, col4;
 		int     c1, c2, c3, c4, px, py;
 		int     pos;
-		int     coeffs;
+		int     lcoeffs;
 
-		int     brutSmypos = brutS[myPos];
+		int     brutSmypos = lbrutS[myPos];
+                int     myPos2;
 
 		myPos2 = myPos + 1;
 
-		px = brutSmypos + (((brutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
-		brutSmypos = brutS[myPos2];
-		py = brutSmypos + (((brutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		px = brutSmypos + (((lbrutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		brutSmypos = lbrutS[myPos2];
+		py = brutSmypos + (((lbrutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 
                 if (px < 0)
                     px = 0;
                 if (py < 0)
                     py = 0;
 
-		pos = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC));
+		pos = ((px >> PERTEDEC) + lprevX * (py >> PERTEDEC));
 		// coef en modulo 15
-		coeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
+		lcoeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
 
 		if ((py >= (int)ay) || (px >= (int)ax)) {
-			pos = coeffs = 0;
+			pos = lcoeffs = 0;
 		}
 		
-		getPixelRGB_ (expix1, pos, &col1);
-		getPixelRGB_ (expix1, pos + 1, &col2);
-		getPixelRGB_ (expix1, pos + bufwidth, &col3);
-		getPixelRGB_ (expix1, pos + bufwidth + 1, &col4);
+		getPixelRGB_ (lexpix1, pos, &col1);
+		getPixelRGB_ (lexpix1, pos + 1, &col2);
+		getPixelRGB_ (lexpix1, pos + bufwidth, &col3);
+		getPixelRGB_ (lexpix1, pos + bufwidth + 1, &col4);
 
-		c1 = coeffs;
+		c1 = lcoeffs;
 		c2 = (c1 & 0x0000ff00) >> 8;
 		c3 = (c1 & 0x00ff0000) >> 16;
 		c4 = (c1 & 0xff000000) >> 24;
@@ -473,7 +476,7 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 			couleur.b -= 5;
 		couleur.b >>= 8;
 
-		setPixelRGB_ (expix2, myPos >> 1, couleur);
+		setPixelRGB_ (lexpix2, myPos >> 1, couleur);
 	}
 }
 
@@ -501,7 +504,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 {
 	register Uint x, y;
 
-	static char reverse = 0;			// vitesse inversé..(zoom out)
 	static unsigned char pertedec = 8;
 	static char firstTime = 1;
 
@@ -541,6 +543,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	/** changement de config **/
 	if (zf) {
+                static char reverse = 0;			// vitesse inversé..(zoom out)
 		reverse = zf->reverse;
 		vitesse = zf->vitesse;
 		if (reverse)
@@ -565,7 +568,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 		// generation d'une table de sinus
 		if (firstTime) {
 			unsigned short us;
-			int     yofs;
 
 			firstTime = 0;
 			generatePrecalCoef ();
@@ -583,6 +585,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			/** modif here by jeko : plus de multiplications **/
 			{
 				int     yperte = 0;
+                                int     yofs;
 
 				for (y = 0, yofs = 0; y < resy; y++, yofs += resx) {
 					int     xofs = yofs << 1;
@@ -702,9 +705,9 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			buffratio = BUFFPOINTMASK;
 	}
 
-	if (switchMult != 1.0f) {
+	if (switchMult != 1.0F) {
 		buffratio =
-			(int) ((float) BUFFPOINTMASK * (1.0f - switchMult) +
+			(int) ((float) BUFFPOINTMASK * (1.0F - switchMult) +
 						 (float) buffratio * switchMult);
 	}
 
@@ -733,8 +736,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 void
 pointFilter (Uint * pix1, Color c, float t1, float t2, float t3, float t4, Uint cycle)
 {
-	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cos ((float) cycle / t3)));
-	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sin ((float) cycle / t4)));
+	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
+	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
 
 	if ((x > 1) && (y > 1) && (x < resolx - 2) && (y < c_resoly - 2)) {
 		setPixelRGB (pix1, x + 1, y, c);

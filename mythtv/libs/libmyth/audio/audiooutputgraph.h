@@ -14,10 +14,10 @@ class MPUBLIC AudioOutputGraph : public MythTV::Visual
 {
 public:
     AudioOutputGraph();
-    virtual ~AudioOutputGraph();
+    ~AudioOutputGraph() override;
 
     // Properties
-    void SetPainter(MythPainter*);
+    void SetPainter(MythPainter* /*painter*/);
     void SetSampleRate(unsigned sample_rate);
     void SetSampleCount(unsigned sample_count);
 
@@ -32,15 +32,19 @@ public:
 
     // MythTV::Visual implementation
 public:
-    virtual void add(const void *b, unsigned long b_len, unsigned long timecode, int chnls, int bits);
-    virtual void prepare();
+    void add(const void *b, unsigned long b_len, unsigned long timecode,
+             int channels, int bits) override; // Visual
+    void prepare() override; // Visual
 
     // Implementation
 private:
-    MythPainter *m_painter;
-    int m_dBsilence, m_dBquiet, m_dBLoud, m_dbMax;
+    MythPainter *m_painter   {nullptr};
+    int          m_dBsilence {-72};
+    int          m_dBquiet   {-60};
+    int          m_dBLoud    {-12};
+    int          m_dbMax     {-6};
     class Buffer;
-    Buffer * const m_buffer;
+    Buffer * const m_buffer {nullptr};
     QMutex mutable m_mutex;
 };
 

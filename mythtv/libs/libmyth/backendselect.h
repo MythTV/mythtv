@@ -52,9 +52,9 @@ class BackendSelection : public MythScreenType
                      Configuration *pConfig, bool exitOnFinish = false);
     virtual ~BackendSelection();
 
-    bool Create(void);
-    virtual void Close(void);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    void Close(void) override; // MythScreenType
+    void customEvent(QEvent *event) override; // QObject
 
   protected slots:
     void Accept(void);
@@ -63,33 +63,33 @@ class BackendSelection : public MythScreenType
     void Cancel(void);  ///< Linked to 'Cancel' button
 
   private:
-    void Load(void);
-    void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
     bool ConnectBackend(DeviceLocation *dev);
     void AddItem(DeviceLocation *dev);
-    void RemoveItem(QString URN);
+    void RemoveItem(const QString& USN);
     bool TryDBfromURL(const QString &error, QString URL);
     void PromptForPassword(void);
     void CloseWithDecision(Decision);
 
-    DatabaseParams *m_DBparams;
-    Configuration  *m_pConfig;
-    bool m_exitOnFinish;
-    ItemMap m_devices;
+    DatabaseParams   *m_DBparams        {nullptr};
+    Configuration    *m_pConfig         {nullptr};
+    bool              m_exitOnFinish;
+    ItemMap           m_devices;
 
-    MythUIButtonList *m_backendList;
-    MythUIButton *m_manualButton;
-    MythUIButton *m_saveButton;
-    MythUIButton *m_cancelButton;
-    //MythUIButton *m_searchButton;
+    MythUIButtonList *m_backendList     {nullptr};
+    MythUIButton     *m_manualButton    {nullptr};
+    MythUIButton     *m_saveButton      {nullptr};
+    MythUIButton     *m_cancelButton    {nullptr};
+    //MythUIButton   *m_searchButton    {nullptr};
 
-    QString m_pinCode;
-    QString m_USN;
+    QString           m_pinCode;
+    QString           m_USN;
 
-    QMutex  m_mutex;
+    QMutex            m_mutex;
 
-    BackendDecision m_backendDecision;
-    QEventLoop *m_loop;
+    BackendDecision   m_backendDecision {kCancelConfigure};
+    QEventLoop       *m_loop            {nullptr};
 };
 
 Q_DECLARE_METATYPE(DeviceLocation*)

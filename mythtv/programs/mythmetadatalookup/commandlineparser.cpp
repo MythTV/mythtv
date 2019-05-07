@@ -6,7 +6,7 @@
 
 MythMetadataLookupCommandLineParser::MythMetadataLookupCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMETADATALOOKUP)
-{ LoadArguments(); }
+{ MythMetadataLookupCommandLineParser::LoadArguments(); }
 
 void MythMetadataLookupCommandLineParser::LoadArguments(void)
 {

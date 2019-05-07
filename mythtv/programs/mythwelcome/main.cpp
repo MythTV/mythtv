@@ -1,25 +1,14 @@
-#include <cstdlib>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
-
 // Qt
 #include <QApplication>
-#include <QFileInfo>
-#include <QDir>
 
 // MythTV
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "mythtranslation.h"
-#include "mythdbcon.h"
 #include "exitcodes.h"
 #include "compat.h"
 #include "lcddevice.h"
 #include "commandlineparser.h"
-#include "tv.h"
 #include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
@@ -32,6 +21,13 @@
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+#define mw_sd_notify(x) \
+    (void)sd_notify(0, x);
+#else
+#define mw_sd_notify(x)
+#endif
 
 static void initKeys(void)
 {
@@ -122,40 +118,37 @@ int main(int argc, char **argv)
     mainWindow->DisableIdleTimer();
 
     initKeys();
+    // Provide systemd ready notification (for type=notify units)
+    mw_sd_notify("READY=1");
 
+    MythScreenStack *mainStack = mainWindow->GetMainStack();
+
+    MythScreenType *screen;
     if (bShowSettings)
-    {
-        MythShutdownSettings settings;
-        settings.exec();
-    }
+        screen = new StandardSettingDialog(mainStack, "shutdown",
+                                           new MythShutdownSettings());
     else
+        screen = new WelcomeDialog(mainStack, "mythwelcome");
+
+    bool ok = screen->Create();
+    if (ok)
     {
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        mainStack->AddScreen(screen, false);
 
-        WelcomeDialog *welcome = new WelcomeDialog(mainStack, "mythwelcome");
-
-        if (welcome->Create())
-            mainStack->AddScreen(welcome, false);
-        else
-        {
-            DestroyMythMainWindow();
-            delete gContext;
-            SignalHandler::Done();
-            return -1;
-        }
-
-        do
-        {
-            qApp->processEvents();
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        } while (mainStack->TotalScreens() > 0);
+        // Block by running an event loop until last screen is removed
+        QEventLoop block;
+        QObject::connect(mainStack, &MythScreenStack::topScreenChanged,
+                         &block, [&](MythScreenType* _screen)
+        { if (!_screen) block.quit(); });
+        block.exec();
     }
 
+    mw_sd_notify("STOPPING=1\nSTATUS=Exiting");
     DestroyMythMainWindow();
 
     delete gContext;
 
     SignalHandler::Done();
 
-    return 0;
+    return ok ? 0 : -1;
 }

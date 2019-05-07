@@ -28,19 +28,19 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
     protected:
 
-        virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
-        virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
+        bool IsBrowseRequestForUs( UPnpCDSRequest *pRequest ) override; // UPnpCDSExtension
+        bool IsSearchRequestForUs( UPnpCDSRequest *pRequest ) override; // UPnpCDSExtension
 
-        virtual void             CreateRoot ( );
+        void CreateRoot ( ) override; // UPnpCDSExtension
 
-        virtual bool             LoadMetadata( const UPnpCDSRequest *pRequest,
-                                                UPnpCDSExtensionResults *pResults,
-                                                IDTokenMap tokens,
-                                                QString currentToken );
-        virtual bool             LoadChildren( const UPnpCDSRequest *pRequest,
-                                               UPnpCDSExtensionResults *pResults,
-                                               IDTokenMap tokens,
-                                               QString currentToken );
+        bool LoadMetadata( const UPnpCDSRequest *pRequest,
+                            UPnpCDSExtensionResults *pResults,
+                            IDTokenMap tokens,
+                            QString currentToken ) override; // UPnpCDSExtension
+        bool LoadChildren( const UPnpCDSRequest *pRequest,
+                           UPnpCDSExtensionResults *pResults,
+                           IDTokenMap tokens,
+                           QString currentToken ) override; // UPnpCDSExtension
 
     private:
 
@@ -51,16 +51,16 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
         bool             LoadArtists(const UPnpCDSRequest *pRequest,
                                      UPnpCDSExtensionResults *pResults,
-                                     IDTokenMap tokens);
+                                     const IDTokenMap& tokens);
         bool             LoadAlbums(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens);
+                                    const IDTokenMap& tokens);
         bool             LoadGenres(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens);
+                                    const IDTokenMap& tokens);
         bool             LoadTracks(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens);
+                                    const IDTokenMap& tokens);
 
         // Common code helpers
         QString BuildWhereClause( QStringList clauses,

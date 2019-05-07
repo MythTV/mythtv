@@ -62,7 +62,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
     QString GetToken(void) const { return m_token; }
 
-    void run(void); // MThread
+    void run(void) override; // MThread
     bool Run(void);
 
     void AttachSignals(QObject*);
@@ -99,7 +99,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     static QString CreateAccessibleFilename(
         const QString &pathname, const QString &outFileName);
 
-    virtual bool event(QEvent *e); // QObject
+    bool event(QEvent *e) override; // QObject
     bool SaveOutFile(const QByteArray &data, const QDateTime &dt);
 
   protected:
@@ -108,20 +108,20 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     ProgramInfo        m_programInfo;
 
     Mode               m_mode;
-    QObject           *m_listener;
+    QObject           *m_listener      {nullptr};
     QString            m_pathname;
 
     /// tells us whether to use time as seconds or frame number
-    bool               m_timeInSeconds;
+    bool               m_timeInSeconds {true};
     /// snapshot time in seconds or frame number, depending on timeInSeconds
-    long long          m_captureTime;
+    long long          m_captureTime   {-1};
     QString            m_outFileName;
-    QSize              m_outSize;
-    QString            m_outFormat;
+    QSize              m_outSize       {0,0};
+    QString            m_outFormat     {"PNG"};
 
     QString            m_token;
-    bool               m_gotReply;
-    bool               m_pixmapOk;
+    bool               m_gotReply      {false};
+    bool               m_pixmapOk      {false};
 };
 
 #endif // PREVIEW_GENERATOR_H_

@@ -40,7 +40,7 @@ case "${SOURCE_VERSION}" in
             # " (tag: v0.28.1)"
             hash="$SOURCE_VERSION"
             # This extracts after the last comma inside the parens:
-            BRANCH=$(echo "${BRANCH}" | sed 's/ (\(.*, \)\{0,1\}\(.*\))/\2/')
+            BRANCH=$(echo "${BRANCH}" | sed -e 's/ (\(.*, \)\{0,1\}\(.*\))/\2/' -e 's,origin/,,')
             # Create a suitable version (hash is no good)
             SOURCE_VERSION="$BRANCH"
             SOURCE_VERSION=`echo "$SOURCE_VERSION" | sed "s/tag: *//"`

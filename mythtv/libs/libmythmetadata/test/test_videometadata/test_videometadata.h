@@ -339,17 +339,39 @@ class Testvideometadata: public QObject
     void ProgramWithInetref ()
     {
         QSKIP ("Might connect to the database or call the installed metadata grabbers.");
-        ProgramInfo proginfo = ProgramInfo ("", "", "Test Movie", "", "", 0, 0, "tmdb3.py_1234", 0, 0, "");
+        ProgramInfo proginfo = ProgramInfo ("", "", "Test Movie", "", "", "",
+                                            "", 0, 0, "tmdb3.py_1234", 0, 0, "");
         RecordingInfo recinfo(proginfo);
         QCOMPARE (recinfo.GetInetRef(), QString("tmdb3.py_1234"));
         QCOMPARE (GuessLookupType (&recinfo), kProbableMovie);
 
-        proginfo = ProgramInfo ("", "", "Test Series", "Test Episode", "", 1, 15, "ttvdb.py_1234", 0, 0, "");
+        proginfo = ProgramInfo ("", "", "Test Series", "", "Test Episode", "",
+                                "", 1, 15, "ttvdb.py_1234", 0, 0, "");
         recinfo = proginfo;
         QCOMPARE (recinfo.GetInetRef(), QString("ttvdb.py_1234"));
         QCOMPARE (GuessLookupType (&recinfo), kProbableTelevision);
 
         //QCOMPARE (GuessLookupType (QString ("tmdb3.py_1234")), kProbableMovie);
         //QCOMPARE (GuessLookupType (QString ("ttvdb.py_1234")), kProbableTelevision);
+    }
+
+    void testEmbeddedFilnameToMetadata ()
+    {
+        QSKIP ("Tries to connect to the database.");
+        VideoMetadata obj = VideoMetadata(QString ("Series Title/Season 1/02x03 Episode Title.mp4"));
+        QCOMPARE (obj.GetTitle(), QString ("Series Title"));
+        QCOMPARE (obj.GetSortTitle(), QString ("series title"));
+        QCOMPARE (obj.GetSubtitle(), QString ("Episode Title"));
+        QCOMPARE (obj.GetSortSubtitle(), QString ("episode title"));
+        QCOMPARE (obj.GetSeason(), 2);
+        QCOMPARE (obj.GetEpisode(), 3);
+
+        obj = VideoMetadata(QString ("The Series Title/Season 1/02x03 The Episode Title.mp4"));
+        QCOMPARE (obj.GetTitle(), QString ("The Series Title"));
+        QCOMPARE (obj.GetSortTitle(), QString ("series title"));
+        QCOMPARE (obj.GetSubtitle(), QString ("The Episode Title"));
+        QCOMPARE (obj.GetSortSubtitle(), QString ("episode title"));
+        QCOMPARE (obj.GetSeason(), 2);
+        QCOMPARE (obj.GetEpisode(), 3);
     }
 };

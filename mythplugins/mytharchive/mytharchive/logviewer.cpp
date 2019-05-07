@@ -21,8 +21,6 @@
 #include "archiveutil.h"
 #include "logviewer.h"
 
-const int DEFAULT_UPDATE_TIME = 5;
-
 void showLogViewer(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -79,31 +77,18 @@ void showLogViewer(void)
 }
 
 LogViewer::LogViewer(MythScreenStack *parent) :
-    MythScreenType(parent, "logviewer"),
-    m_autoUpdate(false),
-    m_updateTime(DEFAULT_UPDATE_TIME),
-    m_updateTimer(nullptr),
-    m_currentLog(),
-    m_progressLog(),
-    m_fullLog(),
-    m_logList(nullptr),
-    m_logText(nullptr),
-    m_exitButton(nullptr),
-    m_cancelButton(nullptr),
-    m_updateButton(nullptr)
+    MythScreenType(parent, "logviewer")
 {
     m_updateTime = gCoreContext->GetNumSetting(
         "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
-    m_autoUpdate = gCoreContext->GetNumSetting("LogViewerAutoUpdate", 1);
+    m_autoUpdate = gCoreContext->GetBoolSetting("LogViewerAutoUpdate", true);
 }
 
 LogViewer::~LogViewer(void)
 {
     gCoreContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
     gCoreContext->SaveSetting("LogViewerAutoUpdate", m_autoUpdate ? "1" : "0");
-
-    if (m_updateTimer)
-        delete m_updateTimer;
+    delete m_updateTimer;
 }
 
 bool LogViewer::Create(void)
@@ -165,7 +150,7 @@ bool LogViewer::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
-            showMenu();
+            ShowMenu();
         else
             handled = false;
     }
@@ -220,7 +205,7 @@ void LogViewer::updateClicked(void)
     QStringList list;
     loadFile(m_currentLog, list, m_logList->GetCount());
 
-    if (list.size() > 0)
+    if (!list.empty())
     {
         bool bUpdateCurrent =
                 (m_logList->GetCount() == m_logList->GetCurrentPos() + 1) ||
@@ -277,7 +262,7 @@ QString LogViewer::getSetting(const QString &key)
     return QString("");
 }
 
-bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
+bool LogViewer::loadFile(const QString& filename, QStringList &list, int startline)
 {
     bool strip = !(filename.endsWith("progress.log") || filename.endsWith("mythburn.log"));
 
@@ -345,7 +330,7 @@ void LogViewer::showFullLog(void)
     updateClicked();
 }
 
-void LogViewer::showMenu()
+void LogViewer::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");

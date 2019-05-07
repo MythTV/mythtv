@@ -135,8 +135,7 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
  *
  */
 VideoOutputXv::VideoOutputXv()
-    : VideoOutput(),
-      video_output_subtype(XVUnknown),
+    : video_output_subtype(XVUnknown),
       global_lock(QMutex::Recursive),
 
       XJ_win(0), XJ_curwin(0), disp(nullptr), XJ_letterbox_colour(0),
@@ -156,7 +155,7 @@ VideoOutputXv::VideoOutputXv()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "ctor");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 
-    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
 }
 
@@ -321,16 +320,14 @@ void VideoOutputXv::MoveResizeWindow(QRect new_rect)
 class XvAttributes
 {
   public:
-    XvAttributes() :
-        xv_flags(0), feature_flags(0) {}
+    XvAttributes() = default;
     XvAttributes(const QString &a, uint b, uint c) :
-        description(a), xv_flags(b), feature_flags(c)
-        { description.detach(); }
+        description(a), xv_flags(b), feature_flags(c) {}
 
   public:
     QString description;
-    uint    xv_flags;
-    uint    feature_flags;
+    uint    xv_flags {0};
+    uint    feature_flags {0};
 
     static const uint kFeatureNone      = 0x00;
     static const uint kFeatureChromakey = 0x01;
@@ -359,7 +356,7 @@ void VideoOutputXv::UngrabXvPort(MythXDisplay *disp, int port)
  *
  * \return port number if it succeeds, else -1.
  */
-int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
+int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* _disp, Window root,
                                       MythCodecID /*mcodecid*/,
                                       uint width, uint height,
                                       bool &xvsetdefaults,
@@ -387,7 +384,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     db_vdisp_profile->SetInput(QSize(width, height));
     if (db_vdisp_profile->GetOSDRenderer() == "chromakey")
     {
-        uint end = req.size();
+        end = req.size();
         for (uint i = 0; i < end; i++)
         {
             req.push_back(req[i]);
@@ -399,7 +396,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     XvAdaptorInfo *ai = nullptr;
     uint p_num_adaptors = 0;
     int ret = Success;
-    XLOCK(disp, ret = XvQueryAdaptors(disp->GetDisplay(), root,
+    XLOCK(_disp, ret = XvQueryAdaptors(_disp->GetDisplay(), root,
                                      &p_num_adaptors, &ai));
     if (Success != ret)
     {
@@ -413,7 +410,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     int port = -1;
 
     // find an Xv port
-    for (uint j = 0; j < req.size(); ++j)
+    for (size_t j = 0; j < req.size(); ++j)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("@ j=%1 Looking for flag[s]: %2 %3")
@@ -433,45 +430,44 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                     "Missing XVideo flags, rejecting.");
                 continue;
             }
-            else
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XVideo flags...");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XVideo flags...");
 
             const XvPortID firstPort = ai[i].base_id;
             const XvPortID lastPort = ai[i].base_id + ai[i].num_ports - 1;
             XvPortID p = 0;
 
             if ((req[j].feature_flags & XvAttributes::kFeaturePicCtrl) &&
-                (!xv_is_attrib_supported(disp, firstPort, "XV_BRIGHTNESS")))
+                (!xv_is_attrib_supported(_disp, firstPort, "XV_BRIGHTNESS")))
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     "Missing XV_BRIGHTNESS, rejecting.");
                 continue;
             }
-            else if (req[j].feature_flags & XvAttributes::kFeaturePicCtrl)
+            if (req[j].feature_flags & XvAttributes::kFeaturePicCtrl)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_BRIGHTNESS...");
 
             if ((req[j].feature_flags & XvAttributes::kFeatureChromakey) &&
-                (!xv_is_attrib_supported(disp, firstPort, "XV_COLORKEY")))
+                (!xv_is_attrib_supported(_disp, firstPort, "XV_COLORKEY")))
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     "Missing XV_COLORKEY, rejecting.");
                 continue;
             }
-            else if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
+            if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_COLORKEY...");
 
             for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
             {
-                disp->Lock();
-                ret = XvGrabPort(disp->GetDisplay(), p, CurrentTime);
+                _disp->Lock();
+                ret = XvGrabPort(_disp->GetDisplay(), p, CurrentTime);
                 if (Success == ret)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("Grabbed xv port %1").arg(p));
                     port = p;
-                    xvsetdefaults = add_open_xv_port(disp, p);
+                    xvsetdefaults = add_open_xv_port(_disp, p);
                 }
-                disp->Unlock();
+                _disp->Unlock();
             }
         }
 
@@ -482,7 +478,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                 QString("XV_SET_DEFAULTS is %1supported on this port")
                     .arg(xvsetdefaults ? "" : "not "));
 
-            bool xv_vsync = xv_is_attrib_supported(disp, port,
+            bool xv_vsync = xv_is_attrib_supported(_disp, port,
                                                    "XV_SYNC_TO_VBLANK");
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("XV_SYNC_TO_VBLANK %1supported")
@@ -491,7 +487,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("XVideo Sync to VBlank %1set")
-                        .arg(xv_set_attrib(disp, port, "XV_SYNC_TO_VBLANK", 1) ?
+                        .arg(xv_set_attrib(_disp, port, "XV_SYNC_TO_VBLANK", 1) ?
                              "" : "NOT "));
             }
 
@@ -504,7 +500,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
 
     // free list of Xv ports
     if (ai)
-        XLOCK(disp, XvFreeAdaptorInfo(ai));
+        XLOCK(_disp, XvFreeAdaptorInfo(ai));
 
     if ((port != -1) && adaptor_name)
         *adaptor_name = lastAdaptorName;
@@ -633,7 +629,7 @@ bool VideoOutputXv::InitXVideo()
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
-    for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
+    for (size_t i = 0; i < sizeof(ids)/sizeof(int); i++)
     {
         if (has_format(formats, format_cnt, ids[i]))
         {
@@ -794,7 +790,7 @@ bool VideoOutputXv::CreateOSD(void)
 do { \
     if (test) \
     { \
-        LOG(VB_GENERAL, LOG_ERR, LOC + msg + " Exiting playback."); \
+        LOG(VB_GENERAL, LOG_ERR, LOC + (msg) + " Exiting playback."); \
         errorState = kError_Unknown; \
         return false; \
     } \
@@ -820,21 +816,21 @@ bool VideoOutputXv::InitSetupBuffers(void)
                                 video_codec_id, disp, XJ_curwin);
     QString     renderer;
 
-    QString tmp = db_vdisp_profile->GetVideoRenderer();
+    QString tmp1 = db_vdisp_profile->GetVideoRenderer();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "InitSetupBuffers() " +
         QString("render: %1, allowed: %2")
-            .arg(tmp).arg(toCommaList(renderers)));
+            .arg(tmp1).arg(toCommaList(renderers)));
 
-    if (renderers.contains(tmp))
-        renderer = tmp;
+    if (renderers.contains(tmp1))
+        renderer = tmp1;
     else if (renderers.empty())
         XV_INIT_FATAL_ERROR_TEST(false, "Failed to find a video renderer");
     else
     {
-        QString tmp;
+        QString tmp2;
         QStringList::const_iterator it = renderers.begin();
         for (; it != renderers.end(); ++it)
-            tmp += *it + ",";
+            tmp2 += *it + ",";
 
         renderer = renderers[0];
 
@@ -842,7 +838,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
             QString("Desired video renderer '%1' not available.\n\t\t\t"
                     "codec '%2' makes '%3' available, using '%4' instead.")
                 .arg(db_vdisp_profile->GetVideoRenderer())
-                .arg(toString(video_codec_id)).arg(tmp).arg(renderer));
+                .arg(toString(video_codec_id)).arg(tmp2).arg(renderer));
         db_vdisp_profile->SetVideoRenderer(renderer);
     }
 
@@ -853,8 +849,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
 
     if (!ok && window.GetPIPState() == kPIPOff)
     {
-        use_xv     |= (bool) renderers.contains("xv-blit");
-        use_shm    |= (bool) renderers.contains("xshm");
+        use_xv     |= renderers.contains("xv-blit");
+        use_shm    |= renderers.contains("xshm");
         ok = InitVideoBuffers(use_xv, use_shm);
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
@@ -1088,8 +1084,8 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                             img->pitches, img->offsets);
                 if (xv_chroma == GUID_YV12_PLANAR)
                 {
-                    swap(tmp.pitches[1], tmp.pitches[2]);
-                    swap(tmp.offsets[1], tmp.offsets[2]);
+                    swap(tmp.m_pitches[1], tmp.m_pitches[2]);
+                    swap(tmp.m_offsets[1], tmp.m_offsets[2]);
                 }
 
                 XJ_yuv_infos.push_back(tmp);
@@ -1286,7 +1282,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         }
     }
 
-    for (uint i = 0; i < XJ_shm_infos.size(); i++)
+    for (size_t i = 0; i < XJ_shm_infos.size(); i++)
     {
         MythXLocker lock(disp);
         XShmDetach(d, XJ_shm_infos[i]);
@@ -1294,8 +1290,8 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
             xv_buffers[(unsigned char*) XJ_shm_infos[i]->shmaddr];
         if (image)
         {
-            if ((XImage*)image == (XImage*)XJ_non_xv_image)
-                XDestroyImage((XImage*)XJ_non_xv_image);
+            if ((XImage*)image == XJ_non_xv_image)
+                XDestroyImage(XJ_non_xv_image);
             else
                 XFree(image);
         }
@@ -1450,7 +1446,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         unsigned char *sbuf = (unsigned char*)av_malloc(size);
 
         av_image_fill_arrays(image_out.data, image_out.linesize,
-            (uint8_t *)sbuf, AV_PIX_FMT_YUV420P,
+            sbuf, AV_PIX_FMT_YUV420P,
             out_width, out_height, IMAGE_ALIGN);
         AVPictureFill(&image_in, buffer);
         QMutexLocker locker(&lock);
@@ -1521,7 +1517,7 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
     if (dispyoff < 0)
     {
         dest_y_incr = -dispyoff;
-        src_y_incr = (int) (dest_y_incr * imgh / disphoff);
+        src_y_incr = dest_y_incr * imgh / disphoff;
         xv_src_y_incr -= (int) (0.5 * dest_y_incr * imgh / disphoff);
     }
 
@@ -1874,12 +1870,12 @@ int VideoOutputXv::SetXVPictureAttribute(PictureAttribute attribute, int newValu
 
     if (xv_set_defaults && range && (kPictureAttribute_Hue == attribute))
     {
-        float tmp = (((float)(port_def - port_min) / (float)range) * 100.0);
-        valAdj = (int)(tmp + 0.5);
+        float tmp = (((float)(port_def - port_min) / (float)range) * 100.0F);
+        valAdj = lroundf(tmp);
     }
 
     int tmpval2 = (newValue + valAdj) % 100;
-    int tmpval3 = (int) roundf(range * 0.01f * tmpval2);
+    int tmpval3 = (int) roundf(range * 0.01F * tmpval2);
     int value   = min(tmpval3 + port_min, port_max);
 
     xv_set_attrib(disp, xv_port, cname, value);
@@ -1944,8 +1940,8 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
     const QRect display_video_rect   = window.GetDisplayVideoRect();
     const QRect display_visible_rect = window.GetDisplayVisibleRect();
     float video_aspect               = window.GetVideoAspect();
-    if (video_aspect < 0.01f)
-        video_aspect = 1.3333f;
+    if (video_aspect < 0.01F)
+        video_aspect = 1.3333F;
 
     const float pip_size             = (float)window.GetPIPSize();
     const float pipVideoAspect       = pipplayer->GetVideoAspect();
@@ -1953,7 +1949,7 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
     // adjust for aspect override modes...
     int letterXadj = 0;
     int letterYadj = 0;
-    float letterAdj = 1.0f;
+    float letterAdj = 1.0F;
     if (window.GetAspectOverride() != kAspect_Off)
     {
         letterXadj = max(-display_video_rect.left(), 0);
@@ -1968,8 +1964,8 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
     // adjust for the relative aspect ratios of pip and main video
     float aspectAdj  = pipVideoAspect / video_aspect;
 
-    int tmph = (int) ((float)video_disp_dim.height() * pip_size * 0.01f);
-    int tmpw = (int) ((float)video_disp_dim.width() * pip_size * 0.01f *
+    int tmph = (int) ((float)video_disp_dim.height() * pip_size * 0.01F);
+    int tmpw = (int) ((float)video_disp_dim.width() * pip_size * 0.01F *
                              aspectAdj * letterAdj);
     position.setWidth((tmpw >> 1) << 1);
     position.setHeight((tmph >> 1) << 1);

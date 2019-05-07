@@ -78,7 +78,7 @@ static HostFileBrowserSetting *MythArchiveDVDLocation()
 
     gc->setHelpText(ArchiveSettings::tr("Which DVD drive to use when burning "
                                         "discs."));
-    gc->SetTypeFilter(QDir::AllDirs | QDir::Hidden);
+    gc->SetTypeFilter(QDir::AllDirs | QDir::Files | QDir::System | QDir::Hidden);
     return gc;
 };
 

@@ -149,7 +149,7 @@ typedef enum
     kThemeLast,
 } DishThemeType;
 
-QString dish_theme_type_to_string(uint category_type);
+QString dish_theme_type_to_string(uint theme_type);
 DishThemeType string_to_dish_theme_type(const QString &type);
 
 class DishContentDescriptor : public ContentDescriptor
@@ -160,7 +160,7 @@ class DishContentDescriptor : public ContentDescriptor
 
     DishThemeType GetTheme(void) const;
     QString GetCategory(void) const;
-    QString toString() const;
+    QString toString() const override; // ContentDescriptor
 
   private:
     static void Init(void);

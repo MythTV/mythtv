@@ -7,86 +7,104 @@
 #include "filtermanager.h"
 #include "osd.h"
 #include "mythuihelper.h"
-#include "openglvideo.h"
 #include "mythrender_opengl.h"
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
 
 #define LOC      QString("VidOutGL: ")
 
+/*! \brief Generate the list of available OpenGL profiles
+ *
+ * \note This could be improved by eliminating unsupported profiles at run time -
+ * but it is currently called statically and hence options would be fixed and unable
+ * to reflect changes in UI render device.
+*/
 void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
                                          QStringList &cpudeints)
 {
-    // full featured profile
-    opts.renderers->append("opengl");
-    opts.deints->insert("opengl", cpudeints);
-    (*opts.deints)["opengl"].append("opengllinearblend");
-    (*opts.deints)["opengl"].append("openglonefield");
-    (*opts.deints)["opengl"].append("openglkerneldeint");
-    (*opts.deints)["opengl"].append("bobdeint");
-    (*opts.deints)["opengl"].append("openglbobdeint");
-    (*opts.deints)["opengl"].append("opengldoubleratelinearblend");
-    (*opts.deints)["opengl"].append("opengldoubleratekerneldeint");
-    (*opts.deints)["opengl"].append("opengldoubleratefieldorder");
-    (*opts.osds)["opengl"].append("opengl2");
-    (*opts.safe_renderers)["dummy"].append("opengl");
-    (*opts.safe_renderers)["nuppel"].append("opengl");
+    QStringList gldeints;
+    gldeints << "opengllinearblend" <<
+                "openglonefield" <<
+                "openglkerneldeint" <<
+                "openglbobdeint" <<
+                "opengldoubleratelinearblend" <<
+                "opengldoubleratekerneldeint" <<
+                "opengldoubleratefieldorder";
+
+    QStringList safe;
+    safe << "opengl" << "opengl-lite" << "opengl-yv12" << "opengl-hquyv" << "opengl-rgba";
+
+    // all profiles can handle all software frames
+    (*opts.safe_renderers)["dummy"].append(safe);
+    (*opts.safe_renderers)["nuppel"].append(safe);
     if (opts.decoders->contains("ffmpeg"))
-        (*opts.safe_renderers)["ffmpeg"].append("opengl");
+        (*opts.safe_renderers)["ffmpeg"].append(safe);
     if (opts.decoders->contains("vda"))
-        (*opts.safe_renderers)["vda"].append("opengl");
+        (*opts.safe_renderers)["vda"].append(safe);
     if (opts.decoders->contains("crystalhd"))
-        (*opts.safe_renderers)["crystalhd"].append("opengl");
+        (*opts.safe_renderers)["crystalhd"].append(safe);
     if (opts.decoders->contains("openmax"))
-        (*opts.safe_renderers)["openmax"].append("opengl");
+        (*opts.safe_renderers)["openmax"].append(safe);
     if (opts.decoders->contains("mediacodec"))
-    {
-        (*opts.safe_renderers)["mediacodec"].append("opengl");
-        (*opts.safe_renderers)["mediacodec"].append("opengl-lite");
-    }
+        (*opts.safe_renderers)["mediacodec"].append(safe);
     if (opts.decoders->contains("vaapi2"))
-        (*opts.safe_renderers)["vaapi2"].append("opengl");
+        (*opts.safe_renderers)["vaapi2"].append(safe);
+    if (opts.decoders->contains("nvdec"))
+        (*opts.safe_renderers)["nvdec"].append(safe);
+
+    // OpenGL UYVY
+    opts.renderers->append("opengl");
+    opts.deints->insert("opengl", cpudeints + gldeints);
+    (*opts.deints)["opengl"].append("bobdeint");
+    (*opts.osds)["opengl"].append("opengl2");
     opts.priorities->insert("opengl", 65);
 
-    // lite profile - no colourspace control, GPU deinterlacing
+    // OpenGL HQ UYV
+    opts.renderers->append("opengl-hquyv");
+    opts.deints->insert("opengl-hquyv", cpudeints + gldeints);
+    (*opts.deints)["opengl-hquyv"].append("bobdeint");
+    (*opts.osds)["opengl-hquyv"].append("opengl2");
+    opts.priorities->insert("opengl-hquyv", 60);
+
+    // OpenGL YV12
+    opts.renderers->append("opengl-yv12");
+    opts.deints->insert("opengl-yv12", cpudeints + gldeints);
+    (*opts.deints)["opengl-yv12"].append("bobdeint");
+    (*opts.osds)["opengl-yv12"].append("opengl2");
+    opts.priorities->insert("opengl-yv12", 65);
+
+    // lite (YCbCr) profile - no colourspace control, GPU deinterlacing
     opts.renderers->append("opengl-lite");
     opts.deints->insert("opengl-lite", cpudeints);
     (*opts.deints)["opengl-lite"].append("bobdeint");
     (*opts.osds)["opengl-lite"].append("opengl2");
-    (*opts.safe_renderers)["dummy"].append("opengl-lite");
-    (*opts.safe_renderers)["nuppel"].append("opengl-lite");
-    if (opts.decoders->contains("ffmpeg"))
-        (*opts.safe_renderers)["ffmpeg"].append("opengl-lite");
-    if (opts.decoders->contains("vda"))
-        (*opts.safe_renderers)["vda"].append("opengl-lite");
-    if (opts.decoders->contains("crystalhd"))
-        (*opts.safe_renderers)["crystalhd"].append("opengl-lite");
-    if (opts.decoders->contains("openmax"))
-        (*opts.safe_renderers)["openmax"].append("opengl-lite");
-    opts.priorities->insert("opengl", 60);
+    opts.priorities->insert("opengl-lite", 50);
+
+    // software fallback
+    opts.renderers->append("opengl-rgba");
+    opts.deints->insert("opengl-rgba", cpudeints);
+    (*opts.osds)["opengl-rgba"].append("opengl2");
+    opts.priorities->insert("opengl-rgba", 10);
 }
 
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &profile)
-    : VideoOutput(),
-    gl_context_lock(QMutex::Recursive), gl_context(nullptr), gl_valid(true),
+    : gl_context_lock(QMutex::Recursive), gl_context(nullptr), gl_valid(true),
     gl_videochain(nullptr), gl_pipchain_active(nullptr),
     gl_parent_win(0),    gl_painter(nullptr), gl_created_painter(false),
-    gl_opengl_lite(false)
+    gl_opengl_profile(profile),
+    gl_opengl_type(OpenGLVideo::StringToType(profile))
 {
-    if (profile.contains("lite"))
-        gl_opengl_lite = true;
-
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
     av_pause_frame.buf = nullptr;
 
-    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
 }
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
 {
     gl_context_lock.lock();
-    TearDown();
+    VideoOutputOpenGL::TearDown();
 
     if (gl_context)
         gl_context->DecrRef();
@@ -168,8 +186,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
         // deleted while image load thread is still busy
         // loading images with that painter
         gl_painter->Teardown();
-        if (invalid_osd_painter)
-            delete invalid_osd_painter;
+        delete invalid_osd_painter;
         invalid_osd_painter = gl_painter;
     }
     else if (gl_painter)
@@ -245,10 +262,7 @@ bool VideoOutputOpenGL::Init(const QSize &video_dim_buf,
 void VideoOutputOpenGL::SetProfile(void)
 {
     if (db_vdisp_profile)
-    {
-        db_vdisp_profile->SetVideoRenderer(
-                    gl_opengl_lite ? "opengl-lite" : "opengl");
-    }
+        db_vdisp_profile->SetVideoRenderer(gl_opengl_profile);
 }
 
 bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
@@ -278,7 +292,8 @@ bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
 
     if (!codec_is_std(av_codec_id)
         && !codec_is_mediacodec(av_codec_id)
-        && !codec_is_vaapi2(av_codec_id))
+        && !codec_is_vaapi2(av_codec_id)
+        && !codec_is_nvdec(av_codec_id))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
         errorState = kError_Unknown;
@@ -420,16 +435,22 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
     QString options = GetFilters();
-    if (gl_opengl_lite)
-        options += " preferycbcr";
+    OpenGLVideo::VideoType type = codec_sw_copy(video_codec_id) ? gl_opengl_type : OpenGLVideo::kGLGPU;
     success = gl_videochain->Init(gl_context, &videoColourSpace,
                                   window.GetVideoDim(),
                                   window.GetVideoDispDim(), dvr,
                                   window.GetDisplayVideoRect(),
                                   window.GetVideoRect(), true,
-                                  options, !codec_sw_copy(video_codec_id));
+                                  type, options);
     if (success)
     {
+        // check if the profile changed
+        if (codec_sw_copy(video_codec_id))
+        {
+            gl_opengl_type    = gl_videochain->GetType();
+            gl_opengl_profile = OpenGLVideo::TypeToString(gl_opengl_type);
+        }
+
         bool temp_deinterlacing = m_deinterlacing;
         if (!m_deintfiltername.isEmpty() &&
             !m_deintfiltername.contains("opengl"))
@@ -595,16 +616,21 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
 
     OpenGLLocker ctx_lock(gl_context);
 
+    bool dummy = false;
+    gl_context_lock.lock();
+    if (buffer)
+    {
+        framesPlayed = buffer->frameNumber + 1;
+        dummy = buffer->dummy;
+    }
+    gl_context_lock.unlock();
+
     if (!buffer)
     {
         buffer = vbuffers.GetScratchFrame();
         if (m_deinterlacing && !IsBobDeint())
             t = kScan_Interlaced;
     }
-
-    gl_context_lock.lock();
-    framesPlayed = buffer->frameNumber + 1;
-    gl_context_lock.unlock();
 
     gl_context->BindFramebuffer(0);
     if (db_letterbox_colour == kLetterBoxColour_Gray25)
@@ -656,7 +682,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     // video
-    if (gl_videochain && !buffer->dummy)
+    if (gl_videochain && !dummy)
     {
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
@@ -666,7 +692,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     // PiPs/PBPs
-    if (gl_pipchains.size())
+    if (!gl_pipchains.empty())
     {
         QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
         for (; it != gl_pipchains.end(); ++it)
@@ -720,9 +746,6 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 
     gl_context->Flush(false);
-
-    if (vbuffers.GetScratchFrame() == buffer)
-        vbuffers.SetLastShownFrameToScratch();
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
@@ -738,23 +761,22 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
         gl_context->swapBuffers();
 }
 
-QStringList VideoOutputOpenGL::GetAllowedRenderers(
-    MythCodecID myth_codec_id, const QSize &video_dim)
+/*! \brief Generate a list of supported OpenGL profiles.
+ *
+ * \note This list could be filtered based upon current feature support. This
+ * would however assume an OpenGL render device (not currently a given) but more
+ * importantly, filtering out a selected profile encourages the display profile
+ * code to use a higher priority, non-OpenGL renderer (such as VDPAU). By not
+ * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
+ * alternative.
+*/
+QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID myth_codec_id, const QSize& /*video_dim*/)
 {
-    (void) video_dim;
-
     QStringList list;
+    if (!codec_sw_copy(myth_codec_id) || getenv("NO_OPENGL"))
+        return list;
 
-    if (codec_is_std(myth_codec_id) && !getenv("NO_OPENGL"))
-    {
-        list << "opengl" << "opengl-lite";
-    }
-    else if ((codec_is_mediacodec(myth_codec_id) || codec_is_vaapi2(myth_codec_id))
-            && !getenv("NO_OPENGL"))
-    {
-        list << "opengl";
-    }
-
+    list << "opengl" << "opengl-lite" << "opengl-yv12" << "opengl-hquyv" << "opengl-rgba";
     return list;
 }
 
@@ -952,13 +974,11 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         QString options = GetFilters();
-        if (gl_opengl_lite)
-            options += " preferycbcr";
         bool success = gl_pipchain->Init(gl_context, &videoColourSpace,
                      pipVideoDim, pipVideoDim,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                     false, options, false);
+                     false, gl_opengl_type, options);
         QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
         if (!success)
@@ -976,13 +996,11 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
         delete gl_pipchain;
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         QString options = GetFilters();
-        if (gl_opengl_lite)
-            options += " preferycbcr";
         bool success = gl_pipchain->Init(
             gl_context, &videoColourSpace,
             pipVideoDim, pipVideoDim, dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
-            false, options, false);
+            false, gl_opengl_type, options);
 
         QSize viewport = window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
@@ -1014,8 +1032,7 @@ void VideoOutputOpenGL::RemovePIP(MythPlayer *pipplayer)
     OpenGLLocker ctx_lock(gl_context);
 
     OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
-    if (gl_pipchain)
-        delete gl_pipchain;
+    delete gl_pipchain;
     gl_pip_ready.remove(pipplayer);
     gl_pipchains.remove(pipplayer);
 }
@@ -1045,10 +1062,16 @@ void VideoOutputOpenGL::StopEmbedding(void)
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
 {
-    if (filtername.contains("opengl") && !gl_opengl_lite)
+    // anything OpenGL when using shaders
+    if (filtername.contains("opengl") &&
+        ((OpenGLVideo::kGLRGBA != gl_opengl_type) && (OpenGLVideo::kGLYCbCr != gl_opengl_type) &&
+         (OpenGLVideo::kGLGPU != gl_opengl_type)))
+    {
         return true;
+    }
 
-    if (filtername.contains("bobdeint"))
+    // anything software based
+    if (!filtername.contains("vdpau") && !filtername.contains("vaapi") && (OpenGLVideo::kGLGPU != gl_opengl_type))
         return true;
 
     return VideoOutput::ApproveDeintFilter(filtername);

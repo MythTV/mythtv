@@ -122,27 +122,21 @@ public:
     {
         m_duration      = mduration; /* seconds */
         m_id            = id;
-        m_bitrate       = 0;
         m_url           = uri;
-        m_played        = 0;
         m_title         = title;
 #ifdef USING_LIBCRYPTO
-        m_keyloaded     = false;
         m_psz_key_path  = current_key_path;
         memset(&m_aeskey, 0, sizeof(m_aeskey));
 #else
         Q_UNUSED(current_key_path);
 #endif
-        m_downloading   = false;
     }
+
+    ~HLSSegment() = default;
 
     HLSSegment(const HLSSegment &rhs)
     {
         *this = rhs;
-    }
-
-    ~HLSSegment()
-    {
     }
 
     HLSSegment &operator=(const HLSSegment &rhs)
@@ -342,6 +336,7 @@ public:
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("bad padding character (0x%1)").arg(pad, 0, 16, QLatin1Char('0')));
+            delete[] decrypted_data;
             return RET_ERROR;
         }
         aeslen = m_data.size() - pad;
@@ -378,21 +373,21 @@ public:
     }
 private:
     AES_KEY     m_aeskey;       // AES-128 key
-    bool        m_keyloaded;
+    bool        m_keyloaded {false};
     QString     m_psz_key_path; // URL key path
 #endif
 
 private:
     int         m_id;           // unique sequence number
     int         m_duration;     // segment duration (seconds)
-    uint64_t    m_bitrate;      // bitrate of segment's content (bits per second)
+    uint64_t    m_bitrate {0};  // bitrate of segment's content (bits per second)
     QString     m_title;        // human-readable informative title of the media segment
 
     QString     m_url;
     QByteArray  m_data;         // raw data
-    int32_t     m_played;       // bytes counter of data already read from segment
+    int32_t     m_played  {0};  // bytes counter of data already read from segment
     QMutex      m_lock;
-    bool        m_downloading;
+    bool        m_downloading {false};
 };
 
 /* stream class */
@@ -404,16 +399,8 @@ public:
     {
         m_id            = mid;
         m_bitrate       = bitrate;
-        m_targetduration= -1;   // not known yet
-        m_size          = 0LL;
-        m_duration      = 0LL;
-        m_live          = true;
-        m_startsequence = 0;    // default is 0
-        m_version       = 1;    // default protocol version
-        m_cache         = true;
         m_url           = uri;
 #ifdef USING_LIBCRYPTO
-        m_ivloaded      = false;
         memset(m_AESIV, 0, sizeof(m_AESIV));
 #endif
     }
@@ -600,7 +587,6 @@ public:
                 break;
             }
         }
-        return;
     }
 
     void RemoveSegment(int segnum, bool willdelete = true)
@@ -613,8 +599,8 @@ public:
             delete segment;
         }
         m_segments.removeAt(segnum);
-        return;
     }
+
     void RemoveListSegments(QMap<HLSSegment*,bool> &table)
     {
         QMap<HLSSegment*,bool>::iterator it;
@@ -865,34 +851,33 @@ public:
 
 private:
     QString     m_keypath;              // URL path of the encrypted key
-    bool        m_ivloaded;
+    bool        m_ivloaded       {false};
     uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
 #endif
 
 private:
     int         m_id;                   // program id
-    int         m_version;              // protocol version should be 1
-    int         m_startsequence;        // media starting sequence number
-    int         m_targetduration;       // maximum duration per segment (s)
+    int         m_version        {1};   // protocol version should be 1
+    int         m_startsequence  {0};   // media starting sequence number
+    int         m_targetduration {-1};  // maximum duration per segment (s)
     uint64_t    m_bitrate;              // bitrate of stream content (bits per second)
-    uint64_t    m_size;                 // stream length is calculated by taking the sum
+    uint64_t    m_size           {0LL}; // stream length is calculated by taking the sum
                                         // foreach segment of (segment->duration * hls->bitrate/8)
-    int64_t     m_duration;             // duration of the stream in seconds
-    bool        m_live;
+    int64_t     m_duration       {0LL}; // duration of the stream in seconds
+    bool        m_live           {true};
 
     QList<HLSSegment*> m_segments;      // list of segments
     QString     m_url;                  // uri to m3u8
     QMutex      m_lock;
-    bool        m_cache;                // allow caching
+    bool        m_cache          {true};// allow caching
 };
 
 // Playback Stream Information
 class HLSPlayback
 {
 public:
-    HLSPlayback(void) : m_offset(0), m_stream(0), m_segment(0)
-    {
-    }
+    HLSPlayback(void) = default;
+
     /* offset is only used from main thread, no need for locking */
     uint64_t Offset(void) const
     {
@@ -933,9 +918,9 @@ public:
     }
 
 private:
-    uint64_t        m_offset;   // current offset in media
-    int             m_stream;   // current HLSStream
-    int             m_segment;  // current segment for playback
+    uint64_t        m_offset {0};   // current offset in media
+    int             m_stream {0};   // current HLSStream
+    int             m_segment {0};  // current segment for playback
     QMutex          m_lock;
 };
 
@@ -944,9 +929,7 @@ class StreamWorker : public MThread
 {
 public:
     StreamWorker(HLSRingBuffer *parent, int startup, int buffer) : MThread("HLSStream"),
-        m_parent(parent), m_interrupted(false), m_bandwidth(0), m_stream(0),
-        m_segment(startup), m_buffer(buffer),
-        m_sumbandwidth(0.0), m_countbandwidth(0)
+        m_parent(parent), m_segment(startup), m_buffer(buffer)
     {
     }
     void Cancel(void)
@@ -1109,7 +1092,7 @@ public:
     }
 
 protected:
-    void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
 
@@ -1251,17 +1234,18 @@ protected:
     }
 
 private:
-    HLSRingBuffer  *m_parent;
-    bool            m_interrupted;
-    int64_t         m_bandwidth;// measured average download bandwidth (bits per second)
-    int             m_stream;   // current HLSStream
+    HLSRingBuffer  *m_parent         {nullptr};
+    bool            m_interrupted    {false};
+                    // measured average download bandwidth (bits per second)
+    int64_t         m_bandwidth      {0};
+    int             m_stream         {0};// current HLSStream
     int             m_segment;  // current segment for downloading
     int             m_buffer;   // buffer kept between download and playback
     QMap<int,int>   m_segmap;   // segment with streamid used for download
     mutable QMutex  m_lock;
     QWaitCondition  m_waitcond;
-    double          m_sumbandwidth;
-    int             m_countbandwidth;
+    double          m_sumbandwidth   {0.0};
+    int             m_countbandwidth {0};
 };
 
 // Playlist Refresh Thread
@@ -1269,11 +1253,7 @@ class PlaylistWorker : public MThread
 {
 public:
     PlaylistWorker(HLSRingBuffer *parent, int64_t wait) : MThread("HLSStream"),
-        m_parent(parent), m_interrupted(false), m_retries(0)
-    {
-        m_wakeup    = wait;
-        m_wokenup   = false;
-    }
+        m_parent(parent), m_wakeup(wait) {}
     void Cancel()
     {
         m_interrupted = true;
@@ -1318,7 +1298,7 @@ public:
     }
 
 protected:
-    void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
 
@@ -1555,39 +1535,31 @@ private:
     }
 
     // private variable members
-    HLSRingBuffer * m_parent;
-    bool            m_interrupted;
+    HLSRingBuffer * m_parent      {nullptr};
+    bool            m_interrupted {false};
     int64_t         m_wakeup;       // next reload time
-    int             m_retries;      // number of consecutive failures
-    bool            m_wokenup;
+    int             m_retries     {0}; // number of consecutive failures
+    bool            m_wokenup     {false};
     QMutex          m_lock;
     QWaitCondition  m_waitcond;
 };
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     RingBuffer(kRingBuffer_HLS),
-    m_playback(new HLSPlayback()),
-    m_meta(false),          m_error(false),         m_aesmsg(false),
-    m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(nullptr),m_playlistworker(nullptr), m_fd(nullptr),
-    m_interrupted(false),   m_killed(false)
+    m_playback(new HLSPlayback())
 {
-    startreadahead = false;
-    OpenFile(lfilename);
+    m_startReadAhead = false;
+    HLSRingBuffer::OpenFile(lfilename);
 }
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
     RingBuffer(kRingBuffer_HLS),
-    m_playback(new HLSPlayback()),
-    m_meta(false),          m_error(false),         m_aesmsg(false),
-    m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(nullptr),m_playlistworker(nullptr), m_fd(nullptr),
-    m_interrupted(false),   m_killed(false)
+    m_playback(new HLSPlayback())
 {
-    startreadahead = false;
+    m_startReadAhead = false;
     if (open)
     {
-        OpenFile(lfilename);
+        HLSRingBuffer::OpenFile(lfilename);
     }
 }
 
@@ -1595,7 +1567,7 @@ HLSRingBuffer::~HLSRingBuffer()
 {
     KillReadAheadThread();
 
-    QWriteLocker lock(&rwlock);
+    QWriteLocker lock(&m_rwLock);
 
     m_killed = true;
 
@@ -1625,10 +1597,7 @@ void HLSRingBuffer::FreeStreamsList(StreamsList *streams) const
     {
         HLSStream *hls;
         hls = GetStream(i, streams);
-        if (hls)
-        {
-            delete hls;
-        }
+        delete hls;
     }
     if (streams != &m_streams)
     {
@@ -1775,7 +1744,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
         QUrl url = filename;
         isHLS =
         url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive) ||
-        QString(url.query( QUrl::FullyEncoded )).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
+        url.query( QUrl::FullyEncoded ).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
     }
     return isHLS;
 }
@@ -1787,7 +1756,7 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr) co
     if (p < 0)
         return QString();
 
-    QStringList list = QStringList(line.mid(p+1).split(','));
+    QStringList list = line.mid(p+1).split(',');
     QStringList::iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
@@ -1836,7 +1805,7 @@ int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &
     if (p < 0)
         return RET_ERROR;
 
-    QStringList list = QStringList(line.mid(p+1).split(','));
+    QStringList list = line.mid(p+1).split(',');
 
     /* read duration */
     if (list.isEmpty())
@@ -2008,7 +1977,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
     else if (attr.startsWith(QLatin1String("AES-128")))
     {
         QString uri, iv;
-        if (m_aesmsg == false)
+        if (!m_aesmsg)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "playback of AES-128 encrypted HTTP Live media detected.");
@@ -2182,7 +2151,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     }
 
     /* Is it a meta index file ? */
-    bool meta = buffer->indexOf("#EXT-X-STREAM-INF") < 0 ? false : true;
+    bool meta = buffer->indexOf("#EXT-X-STREAM-INF") >= 0;
 
     int err = RET_OK;
 
@@ -2303,9 +2272,9 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 err = ParseDiscontinuity(hls, line);
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
-                int version;
-                err = ParseVersion(line, version);
-                hls->SetVersion(version);
+                int version2;
+                err = ParseVersion(line, version2);
+                hls->SetVersion(version2);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ENDLIST")))
                 err = ParseEndList(hls);
@@ -2542,26 +2511,26 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
  */
 bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
-    QWriteLocker lock(&rwlock);
+    QWriteLocker lock(&m_rwLock);
 
-    safefilename = lfilename;
-    filename = lfilename;
+    m_safeFilename = lfilename;
+    m_filename = lfilename;
 
     QByteArray buffer;
-    if (!downloadURL(filename, &buffer))
+    if (!downloadURL(m_filename, &buffer))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("Couldn't open URL %1").arg(filename));
+            QString("Couldn't open URL %1").arg(m_filename));
         return false;   // can't download file
     }
     if (!IsHTTPLiveStreaming(&buffer))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("%1 isn't a HTTP Live Streaming URL").arg(filename));
+            QString("%1 isn't a HTTP Live Streaming URL").arg(m_filename));
         return false;
     }
     // let's go
-    m_m3u8 = filename;
+    m_m3u8 = m_filename;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HTTP Live Streaming (%1)")
         .arg(m_m3u8));
 
@@ -2569,7 +2538,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     if (ParseM3U8(&buffer, &m_streams) != RET_OK || m_streams.isEmpty())
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("An error occurred reading M3U8 playlist (%1)").arg(filename));
+            QString("An error occurred reading M3U8 playlist (%1)").arg(m_filename));
         m_error = true;
         return false;
     }
@@ -2807,7 +2776,7 @@ int HLSRingBuffer::DurationForBytes(uint size)
 
 long long HLSRingBuffer::GetRealFileSizeInternal(void) const
 {
-    QReadLocker lock(&rwlock);
+    QReadLocker lock(&m_rwLock);
     return SizeMedia();
 }
 
@@ -2823,7 +2792,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
 
     int64_t starting = mdate();
 
-    QWriteLocker lock(&poslock);
+    QWriteLocker lock(&m_posLock);
 
     int totalsize = SizeMedia();
     int64_t where;

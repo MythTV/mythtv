@@ -22,7 +22,7 @@ using namespace std;
 MythFlashPlayer::MythFlashPlayer(MythScreenStack *parent,
                          QStringList &urlList)
     : MythScreenType (parent, "mythflashplayer"),
-      m_browser(nullptr), m_url(urlList[0])
+      m_url(urlList[0])
 {
     m_fftime       = PlayGroup::GetSetting("Default", "skipahead", 30);
     m_rewtime      = PlayGroup::GetSetting("Default", "skipback", 5);

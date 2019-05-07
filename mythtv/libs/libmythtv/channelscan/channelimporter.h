@@ -34,44 +34,39 @@ class ChannelImporterBasicStats
   public:
     ChannelImporterBasicStats()
     {
-        memset(atsc_channels, 0, sizeof(atsc_channels));
-        memset(dvb_channels,  0, sizeof(dvb_channels));
-        memset(scte_channels, 0, sizeof(scte_channels));
-        memset(mpeg_channels, 0, sizeof(mpeg_channels));
-        memset(ntsc_channels, 0, sizeof(ntsc_channels));
+        memset(m_atsc_channels, 0, sizeof(m_atsc_channels));
+        memset(m_dvb_channels,  0, sizeof(m_dvb_channels));
+        memset(m_scte_channels, 0, sizeof(m_scte_channels));
+        memset(m_mpeg_channels, 0, sizeof(m_mpeg_channels));
+        memset(m_ntsc_channels, 0, sizeof(m_ntsc_channels));
     }
 
     // totals
-    uint atsc_channels[3];
-    uint dvb_channels [3];
-    uint scte_channels[3];
-    uint mpeg_channels[3];
-    uint ntsc_channels[3];
+    uint m_atsc_channels[3];
+    uint m_dvb_channels [3];
+    uint m_scte_channels[3];
+    uint m_mpeg_channels[3];
+    uint m_ntsc_channels[3];
 
     // per channel counts
-    QMap<uint,uint>    prognum_cnt;
-    QMap<uint,uint>    atscnum_cnt;
-    QMap<uint,uint>    atscmin_cnt;
-    QMap<uint,uint>    atscmaj_cnt;
-    QMap<QString,uint> channum_cnt;
+    QMap<uint,uint>    m_prognum_cnt;
+    QMap<uint,uint>    m_atscnum_cnt;
+    QMap<uint,uint>    m_atscmin_cnt;
+    QMap<uint,uint>    m_atscmaj_cnt;
+    QMap<QString,uint> m_channum_cnt;
 };
 
 class ChannelImporterUniquenessStats
 {
   public:
-    ChannelImporterUniquenessStats() :
-        unique_prognum(0), unique_atscnum(0),
-        unique_atscmin(0), unique_channum(0),
-        unique_total(0),   max_atscmajcnt(0)
-    {
-    }
+    ChannelImporterUniquenessStats() = default;
 
-    uint unique_prognum;
-    uint unique_atscnum;
-    uint unique_atscmin;
-    uint unique_channum;
-    uint unique_total;
-    uint max_atscmajcnt;
+    uint m_unique_prognum {0};
+    uint m_unique_atscnum {0};
+    uint m_unique_atscmin {0};
+    uint m_unique_channum {0};
+    uint m_unique_total   {0};
+    uint m_max_atscmajcnt {0};
 };
 
 class MTV_PUBLIC ChannelImporter
@@ -81,11 +76,16 @@ class MTV_PUBLIC ChannelImporter
   public:
     ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
-                    bool fta_only, ServiceRequirements service_requirements,
+                    bool fta_only, bool lcn_only,
+                    ServiceRequirements service_requirements,
                     bool success = false) :
-        use_gui(gui), is_interactive(interactive),
-        do_delete(_delete),
-        do_insert(insert), do_save(save), m_fta_only(fta_only),
+        m_use_gui(gui),
+        m_is_interactive(interactive),
+        m_do_delete(_delete),
+        m_do_insert(insert),
+        m_do_save(save),
+        m_fta_only(fta_only),
+        m_lcn_only(lcn_only),
         m_success(success),
         m_service_requirements(service_requirements) { }
 
@@ -138,6 +138,7 @@ class MTV_PUBLIC ChannelImporter
 
     void CleanupDuplicates(ScanDTVTransportList &transports) const;
     void FilterServices(ScanDTVTransportList &transports) const;
+    void FilterChannelNumber(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;
 
@@ -186,8 +187,8 @@ class MTV_PUBLIC ChannelImporter
         const ChannelInsertInfo         &chan);
 
     OkCancelType ShowManualChannelPopup(
-        MythMainWindow *parent, QString title,
-        QString message, QString &text);
+        MythMainWindow *parent, const QString& title,
+        const QString& message, QString &text);
 
     static void FixUpOpenCable(ScanDTVTransportList &transports);
 
@@ -226,19 +227,21 @@ class MTV_PUBLIC ChannelImporter
         ChannelType type, uint &new_chan, uint &old_chan);
 
   private:
-    bool use_gui;
-    bool is_interactive;
-    bool do_delete;
-    bool do_insert;
-    bool do_save;
+    bool                m_use_gui;
+    bool                m_is_interactive;
+    bool                m_do_delete;
+    bool                m_do_insert;
+    bool                m_do_save;
     /// Only FreeToAir (non-encrypted) channels desired post scan?
-    bool m_fta_only;
+    bool                m_fta_only;
+    /// Only services with logical channel numbers desired post scan?
+    bool                m_lcn_only;
     /// To pass information IPTV channel scan succeeded
-    bool m_success;
+    bool                m_success {false};
     /// Services desired post scan
     ServiceRequirements m_service_requirements;
 
-    QEventLoop m_eventLoop;
+    QEventLoop          m_eventLoop;
 };
 
 #endif // _CHANNEL_IMPORTER_H_

@@ -10,21 +10,22 @@ class PlayerSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    PlayerSettings(MythScreenStack *parent, const char *name = nullptr);
+    PlayerSettings(MythScreenStack *parent, const char *name = nullptr)
+        : MythScreenType(parent, name) {}
     ~PlayerSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
 private:
-    MythUIButtonList   *m_resumeMode;
-    MythUIButtonList   *m_resumeModeEditor;
-    MythUIButtonList   *m_resumeModeRadio;
-    MythUIButtonList   *m_exitAction;
-    MythUIButtonList   *m_jumpAction;
-    MythUICheckBox     *m_autoLookupCD;
-    MythUICheckBox     *m_autoPlayCD;
-    MythUIButton       *m_saveButton;
-    MythUIButton       *m_cancelButton;
+    MythUIButtonList   *m_resumeMode       {nullptr};
+    MythUIButtonList   *m_resumeModeEditor {nullptr};
+    MythUIButtonList   *m_resumeModeRadio  {nullptr};
+    MythUIButtonList   *m_exitAction       {nullptr};
+    MythUIButtonList   *m_jumpAction       {nullptr};
+    MythUICheckBox     *m_autoLookupCD     {nullptr};
+    MythUICheckBox     *m_autoPlayCD       {nullptr};
+    MythUIButton       *m_saveButton       {nullptr};
+    MythUIButton       *m_cancelButton     {nullptr};
 
 private slots:
     void slotSave(void);

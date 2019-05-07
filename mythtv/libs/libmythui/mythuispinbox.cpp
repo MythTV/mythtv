@@ -7,14 +7,9 @@
 #include "mythuitext.h"
 
 // QT headers
-#include <QDomDocument>
 #include <QCoreApplication>
-
-MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
-    : MythUIButtonList(parent, name), m_hasTemplate(false),
-      m_moveAmount(0), m_low(0), m_high(0), m_step(0)
-{
-}
+#include <QDomDocument>
+#include <utility>
 
 /**
  * \brief Set the lower and upper bounds of the spinbox, the interval and page
@@ -221,7 +216,11 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
     if (handled)
         return true;
 
-    QString initialEntry = GetItemCurrent()->GetText();
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (item == nullptr)
+        return MythUIButtonList::keyPressEvent(event);
+
+    QString initialEntry = item->GetText();
     bool doEntry = false;
 
     // Only invoke the entry dialog if the entry is a number
@@ -245,7 +244,7 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
             break;
         }
     }
-    if (actions.size() == 0 && event->text() == "-")
+    if (actions.empty() && event->text() == "-")
     {
         if (!m_hasTemplate)
             initialEntry = "-";
@@ -260,8 +259,7 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
 
     if (handled)
         return true;
-    else
-        return MythUIButtonList::keyPressEvent(event);
+    return MythUIButtonList::keyPressEvent(event);
 }
 
 void MythUISpinBox::ShowEntryDialog(QString initialEntry)
@@ -269,7 +267,7 @@ void MythUISpinBox::ShowEntryDialog(QString initialEntry)
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     SpinBoxEntryDialog *dlg = new SpinBoxEntryDialog(popupStack, "SpinBoxEntryDialog",
-        this, initialEntry, m_low, m_high, m_step);
+        this, std::move(initialEntry), m_low, m_high, m_step);
 
     if (dlg->Create())
         popupStack->AddScreen(dlg);
@@ -284,7 +282,7 @@ SpinBoxEntryDialog::SpinBoxEntryDialog(MythScreenStack *parent, const char *name
         int low, int high, int step)
     : MythScreenType(parent, name, false),
         m_parentList(parentList),
-        m_searchText(searchText),
+        m_searchText(std::move(searchText)),
         m_entryEdit(nullptr),
         m_cancelButton(nullptr),
         m_okButton(nullptr),

@@ -64,11 +64,8 @@ Eventing::Eventing(const QString &sExtensionName,
     HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(sEventMethodName),
     m_nSubscriptionDuration(
-        UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800)),
-    m_nHoldCount(0),
-    m_pInitializeSubscriber(nullptr)
+        UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800))
 {
-    m_sEventMethodName.detach();
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }
 
@@ -247,13 +244,13 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
         pInfo = new SubscriberInfo( sCallBack, nDuration );
 
-        Subscribers::iterator it = m_Subscribers.find(pInfo->sUUID);
+        Subscribers::iterator it = m_Subscribers.find(pInfo->m_sUUID);
         if (it != m_Subscribers.end())
         {
             delete *it;
             m_Subscribers.erase(it);
         }
-        m_Subscribers[pInfo->sUUID] = pInfo;
+        m_Subscribers[pInfo->m_sUUID] = pInfo;
 
         // Use PostProcess Hook to Send Initial FULL Notification...
         //      *** Must send this response first then notify.
@@ -279,10 +276,10 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
     if (pInfo != nullptr)
     {
         pRequest->m_mapRespHeaders[ "SID"    ] = QString( "uuid:%1" )
-                                                    .arg( pInfo->sUUID );
+                                                    .arg( pInfo->m_sUUID );
 
         pRequest->m_mapRespHeaders[ "TIMEOUT"] = QString( "Second-%1" )
-                                                    .arg( pInfo->nDuration );
+                                                    .arg( pInfo->m_nDuration );
 
         pRequest->m_nResponseStatus = 200;
 
@@ -340,7 +337,7 @@ void Eventing::Notify()
             continue;
         }
 
-        if (tt < (*it)->ttExpires)
+        if (tt < (*it)->m_ttExpires)
         {
             // Subscription not expired yet. Send event notification.
             NotifySubscriber(*it);
@@ -375,7 +372,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
     // Build Body... Only send if there are changes
     // ----------------------------------------------------------------------
 
-    uint nCount = BuildNotifyBody(tsBody, pInfo->ttLastNotified);
+    uint nCount = BuildNotifyBody(tsBody, pInfo->m_ttLastNotified);
     if (nCount)
     {
 
@@ -390,18 +387,18 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         // Build Message Header 
         // ----------------------------------------------------------------------
 
-        int     nPort = (pInfo->qURL.port()>=0) ? pInfo->qURL.port() : 80;
-        QString sHost = QString( "%1:%2" ).arg( pInfo->qURL.host() )
+        int     nPort = (pInfo->m_qURL.port()>=0) ? pInfo->m_qURL.port() : 80;
+        QString sHost = QString( "%1:%2" ).arg( pInfo->m_qURL.host() )
                                           .arg( nPort );
 
-        tsMsg << "NOTIFY " << pInfo->qURL.path() << " HTTP/1.1\r\n";
+        tsMsg << "NOTIFY " << pInfo->m_qURL.path() << " HTTP/1.1\r\n";
         tsMsg << "HOST: " << sHost << "\r\n";
         tsMsg << "CONTENT-TYPE: \"text/xml\"\r\n";
         tsMsg << "Content-Length: " << QString::number( aBody.size() ) << "\r\n";
         tsMsg << "NT: upnp:event\r\n";
         tsMsg << "NTS: upnp:propchange\r\n";
-        tsMsg << "SID: uuid:" << pInfo->sUUID << "\r\n";
-        tsMsg << "SEQ: " << QString::number( pInfo->nKey ) << "\r\n";
+        tsMsg << "SID: uuid:" << pInfo->m_sUUID << "\r\n";
+        tsMsg << "SEQ: " << QString::number( pInfo->m_nKey ) << "\r\n";
         tsMsg << "\r\n";
         tsMsg << aBody;
         tsMsg << flush;
@@ -415,7 +412,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
                 .arg( sHost ).arg(nCount));
 
         UPnpEventTask *pEventTask = 
-            new UPnpEventTask(QHostAddress( pInfo->qURL.host() ),
+            new UPnpEventTask(QHostAddress( pInfo->m_qURL.host() ),
                               nPort, pBuffer );
 
         TaskQueue::Instance()->AddTask( 250, pEventTask );
@@ -428,7 +425,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         pInfo->IncrementKey();
 
-        gettimeofday( (&pInfo->ttLastNotified), nullptr );
+        gettimeofday( (&pInfo->m_ttLastNotified), nullptr );
     }
 }
 

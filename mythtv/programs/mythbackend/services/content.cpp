@@ -36,7 +36,7 @@
 #include "storagegroup.h"
 #include "programinfo.h"
 #include "previewgenerator.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "httprequest.h"
 #include "serviceUtil.h"
 #include "mythdate.h"
@@ -855,10 +855,7 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
 
     outFile = outDir + "/" + filename;
 
-    if (GetMythDownloadManager()->download(sURL, outFile))
-        return true;
-
-    return false;
+    return GetMythDownloadManager()->download(sURL, outFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

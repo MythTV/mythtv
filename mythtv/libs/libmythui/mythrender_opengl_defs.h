@@ -2,17 +2,18 @@
 #define MYTHRENDER_OPENGL_DEFS_H_
 
 // OpenGL ES 2.0 workarounds
-#ifndef GL_TEXTURE_1D
-#define GL_TEXTURE_1D 0x0DE0
-#endif
 #ifndef GL_RGBA
 #define GL_RGBA 0x1908
 #endif
-#ifndef GL_BGRA
-#define GL_BGRA  GL_RGBA
-#endif
 #ifndef GL_RGBA8
 #define GL_RGBA8 GL_RGBA
+#endif
+#ifndef GL_RGBA16
+#ifdef GL_EXT_texture_norm16
+#define GL_RGBA16 GL_RGBA16_EXT
+#else
+#define GL_RGBA16 0x805B
+#endif
 #endif
 // end workarounds
 
@@ -111,10 +112,6 @@
 #ifndef APIENTRY
 #define APIENTRY
 #endif
-
-typedef void (APIENTRY * MYTH_GLTEXIMAGE1DPROC)
-    (GLenum target, GLint level, GLenum internalformat, GLsizei width,
-     GLint border, GLenum format, GLenum type, const GLvoid *pixels);
 
 typedef void (APIENTRY * MYTH_GLACTIVETEXTUREPROC)
     (GLenum texture);

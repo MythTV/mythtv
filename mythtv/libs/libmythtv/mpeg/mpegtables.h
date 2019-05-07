@@ -194,7 +194,7 @@ class MTV_PUBLIC StreamID
     static uint Normalize(uint stream_id, const desc_list_t &desc,
                           const QString &sistandard);
     static const char* toString(uint streamID);
-    static QString GetDescription(uint streamID);
+    static QString GetDescription(uint stream_id);
 };
 
 enum
@@ -479,9 +479,9 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     uint TableID(void) const { return StreamID(); }
 
     // section_syntax_ind   1       1.0       8   ATSC -- should always be 1
-    bool SectionSyntaxIndicator(void) const { return pesdata()[1] & 0x80; }
+    bool SectionSyntaxIndicator(void) const { return ( pesdata()[1] & 0x80 ) != 0; }
     // private_indicator    1       1.1       9
-    bool PrivateIndicator(void) const { return pesdata()[1] & 0x40; }
+    bool PrivateIndicator(void) const { return ( pesdata()[1] & 0x40 ) != 0; }
     // reserved             2       1.2      10
 
     // section_length      12       1.4      12   always less than 0x3fd
@@ -544,7 +544,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     // Only for real ATSC PSIP tables.
     void SetATSCProtocolVersion(int ver) { pesdata()[8] = ver; }
 
-    bool HasCRC(void) const;
+    bool HasCRC(void) const override; // PESPacket
     bool HasSectionNumber(void) const;
 
     bool VerifyPSIP(bool verify_crc) const;
@@ -638,8 +638,8 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
         return 0;
     }
 
-    virtual QString toString(void) const;
-    virtual QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
     static ProgramAssociationTable* CreateBlank(bool smallPacket = true);
@@ -733,19 +733,19 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         { _ptrs[i][0] = type; }
 
     // helper methods
-    bool IsVideo(uint i, QString sistandard) const;
-    bool IsAudio(uint i, QString sistandard) const;
-    bool IsEncrypted(QString sistandard) const;
+    bool IsVideo(uint i, const QString& sistandard) const;
+    bool IsAudio(uint i, const QString& sistandard) const;
+    bool IsEncrypted(const QString& sistandard) const;
     bool IsProgramEncrypted(void) const;
     bool IsStreamEncrypted(uint pid) const;
     /// Returns true iff PMT contains a still-picture video stream
-    bool IsStillPicture(QString sistandard) const;
+    bool IsStillPicture(const QString& sistandard) const;
     /// Returns a string representation of type at stream index i
     QString StreamTypeString(uint i) const
         { return StreamID::toString(StreamType(i)); }
     /// Returns a better (and more expensive) string representation
     /// of type at stream index i than StreamTypeString(uint)
-    QString StreamDescription(uint i, QString sistandard) const;
+    QString StreamDescription(uint i, const QString& sistandard) const;
     /// Returns the cannonical language if we find the iso639 descriptor
     QString GetLanguage(uint i) const;
     /// Returns the audio type from the iso 639 descriptor
@@ -773,11 +773,11 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         SetProgramInfoLength(0);
         _ptrs.clear();
     }
-    void AppendStream(uint pid, uint type, unsigned char* si = nullptr, uint il = 0);
+    void AppendStream(uint pid, uint type, unsigned char* streamInfo = nullptr, uint infoLength = 0);
 
     void Parse(void) const;
-    virtual QString toString(void) const;
-    virtual QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
     // unsafe sets
   private:
     void SetStreamInfoLength(uint i, uint length)
@@ -842,8 +842,8 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
         { return SectionLength() - PSIP_OFFSET; }
     const unsigned char *Descriptors(void) const { return psipdata(); }
 
-    virtual QString toString(void) const;
-    virtual QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 
     // CRC_32 32 rpchof
 };
@@ -853,7 +853,7 @@ class MTV_PUBLIC SpliceTimeView
   public:
     explicit SpliceTimeView(const unsigned char *data) : _data(data) { }
     //   time_specified_flag    1  0.0
-    bool IsTimeSpecified(void) const { return _data[0] & 0x80; }
+    bool IsTimeSpecified(void) const { return ( _data[0] & 0x80 ) != 0; }
     //   if (time_specified_flag == 1)
     //     reserved             6  0.1
     //     pts_time            33  0.6
@@ -941,17 +941,17 @@ class MTV_PUBLIC SpliceInsertView
                 (_ptrs1[0][2] <<  8) | (_ptrs1[0][3]));
     }
     //   splice_event_cancel    1    4.0 + _ptrs1[0]
-    bool IsSpliceEventCancel(void) const { return _ptrs1[0][4] & 0x80; }
+    bool IsSpliceEventCancel(void) const { return ( _ptrs1[0][4] & 0x80 ) != 0; }
     //   reserved               7    4.1 + _ptrs1[0]
     //   if (splice_event_cancel_indicator == 0) {
     //     out_of_network_flag  1    5.0 + _ptrs1[0]
-    bool IsOutOfNetwork(void) const { return _ptrs1[0][5] & 0x80; }
+    bool IsOutOfNetwork(void) const { return ( _ptrs1[0][5] & 0x80 ) != 0; }
     //     program_splice_flag  1    5.1 + _ptrs1[0]
-    bool IsProgramSplice(void) const { return _ptrs1[0][5] & 0x40; }
+    bool IsProgramSplice(void) const { return ( _ptrs1[0][5] & 0x40 ) != 0; }
     //     duration_flag        1    5.2 + _ptrs1[0]
-    bool IsDuration(void) const { return _ptrs1[0][5] & 0x20; }
+    bool IsDuration(void) const { return ( _ptrs1[0][5] & 0x20 ) != 0; }
     //     splice_immediate_flag 1   5.3 + _ptrs1[0]
-    bool IsSpliceImmediate(void) const { return _ptrs1[0][5] & 0x20; }
+    bool IsSpliceImmediate(void) const { return ( _ptrs1[0][5] & 0x20 ) != 0; }
     //     reserved             4    5.4 + _ptrs1[0]
     //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
     //       splice_time()   8-38    6.0 + _ptrs1[0]
@@ -1019,7 +1019,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     uint SpliceProtocolVersion(void) const { return pesdata()[3]; }
     void SetSpliceProtocolVersion(uint ver) { pesdata()[3] = ver; }
     // encrypted_packet         1   4.0
-    bool IsEncryptedPacket(void) const { return pesdata()[4] & 0x80; }
+    bool IsEncryptedPacket(void) const { return ( pesdata()[4] & 0x80 ) != 0; }
     void SetEncryptedPacket(bool val)
     {
         pesdata()[4] = (pesdata()[4] & ~0x80) | ((val) ? 0x80 : 0);
@@ -1152,8 +1152,9 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     SpliceInformationTable *GetDecrypted(const QString &codeWord) const;
     bool Parse(void);
 
-    virtual QString toString(void) const { return toString(-1LL, -1LL); }
-    virtual QString toStringXML(uint indent_level) const
+    QString toString(void) const override // PSIPTable
+        { return toString(-1LL, -1LL); }
+    QString toStringXML(uint indent_level) const override // PSIPTable
         { return toStringXML(indent_level, -1LL, -1LL); }
 
     QString toString(int64_t first, int64_t last) const;
@@ -1163,7 +1164,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     vector<const unsigned char*> _ptrs0;
     vector<const unsigned char*> _ptrs1;
     const unsigned char *_epilog;
-    int scte_pid;
+    int scte_pid {0};
 };
 
 /** \class AdaptationFieldControl
@@ -1188,7 +1189,7 @@ class MTV_PUBLIC AdaptationFieldControl
     /** discontinuity_indicator
      *  (time base may change)               1   1.0
      */
-    bool Discontinuity(void) const      { return _data[1] & 0x80; }
+    bool Discontinuity(void) const      { return ( _data[1] & 0x80 ) != 0; }
     // random_access_indicator (?)           1   1.1
     bool RandomAccess(void) const       { return bool(_data[1] & 0x40); }
     // elementary_stream_priority_indicator  1   1.2

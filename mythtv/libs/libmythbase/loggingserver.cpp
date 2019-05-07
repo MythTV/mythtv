@@ -27,7 +27,7 @@ using namespace std;
 
 #include <cstdlib>
 #ifndef _WIN32
-#include <syslog.h>
+#include <mythsyslog.h>
 #if CONFIG_SYSTEMD_JOURNAL
 #define SD_JOURNAL_SUPPRESS_LOCATION 1
 #include <systemd/sd-journal.h>
@@ -57,21 +57,10 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
-#ifndef NOLOGSERVER
-// nzmqt
-#include "nzmqt.hpp"
-#endif
-
 static QMutex                      loggerMapMutex;
 static QMap<QString, LoggerBase *> loggerMap;
 
-LogServerThread                    *logServerThread = nullptr;
 LogForwardThread                   *logForwardThread = nullptr;
-
-static QMutex                       logThreadStartedMutex;
-static QWaitCondition               logThreadStarted;
-static bool                         logThreadFinished = false;
-static bool                         logThreadStarting = true;
 
 typedef QList<LoggerBase *> LoggerList;
 
@@ -86,7 +75,6 @@ typedef QMap<LoggerBase *, ClientList *> RevClientMap;
 
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;
-
 static QAtomicInt                   logClientCount;
 
 static QMutex                       logRevClientMapMutex;
@@ -95,11 +83,6 @@ static RevClientMap                 logRevClientMap;
 static QMutex                       logMsgListMutex;
 static LogMessageList               logMsgList;
 static QWaitCondition               logMsgListNotEmpty;
-
-static ClientList                   logClientToDel;
-static QMutex                       logClientToDelMutex;
-
-static QAtomicInt                   msgsSinceHeartbeat;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
@@ -138,7 +121,7 @@ LoggerBase::~LoggerBase()
 /// \brief FileLogger constructor
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
-        LoggerBase(filename), m_opened(false), m_fd(-1), m_zmqSock(nullptr)
+        LoggerBase(filename)
 {
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
@@ -158,17 +141,9 @@ FileLogger::~FileLogger()
         m_fd = -1;
         m_opened = false;
     }
-
-#ifndef NOLOGSERVER
-    m_zmqSock->unsubscribeFrom(QByteArray(""));
-    m_zmqSock->setLinger(0);
-    m_zmqSock->disconnect(this);
-    m_zmqSock->close();
-    m_zmqSock->deleteLater();
-#endif
 }
 
-FileLogger *FileLogger::create(QString filename, QMutex *mutex)
+FileLogger *FileLogger::create(const QString& filename, QMutex *mutex)
 {
     QByteArray ba = filename.toLocal8Bit();
     const char *file = ba.constData();
@@ -183,12 +158,6 @@ FileLogger *FileLogger::create(QString filename, QMutex *mutex)
     // inserts into loggerMap
     logger = new FileLogger(file);
     mutex->lock();
-
-    if (!logger->setupZMQSocket())
-    {
-        delete logger;
-        return nullptr;
-    }
 
     ClientList *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
@@ -262,36 +231,11 @@ bool FileLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-bool FileLogger::setupZMQSocket(void)
-{
-#ifndef NOLOGSERVER
-    try
-    {
-        nzmqt::ZMQContext *ctx = logForwardThread->getZMQContext();
-        m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
-        connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-                this, SLOT(receivedMessage(const QList<QByteArray>&)),
-                Qt::QueuedConnection);
-        m_zmqSock->subscribeTo(QByteArray(""));
-        m_zmqSock->connectTo("inproc://loggers");
-    }
-    catch (nzmqt::ZMQException &e)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Exception during socket setup: %1")
-            .arg(e.what()));
-        m_zmqSock = NULL;
-        return false;
-    }
-#endif
-    return true;
-}
-
-
 #ifndef _WIN32
-/// \brief SyslogLogger constructor
-/// \param facility Syslog facility to use in logging
+/// \brief SyslogLogger constructor \param facility Syslog facility to
+/// use in logging
 SyslogLogger::SyslogLogger(bool open) :
-    LoggerBase(nullptr), m_opened(false), m_zmqSock(nullptr)
+    LoggerBase(nullptr)
 {
     if (open)
     {
@@ -308,14 +252,6 @@ SyslogLogger::~SyslogLogger()
     LOG(VB_GENERAL, LOG_INFO, "Removing syslogging");
     if (m_opened)
         closelog();
-
-#ifndef NOLOGSERVER
-    m_zmqSock->unsubscribeFrom(QByteArray(""));
-    m_zmqSock->setLinger(0);
-    m_zmqSock->disconnect(this);
-    m_zmqSock->close();
-    m_zmqSock->deleteLater();
-#endif
 }
 
 SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
@@ -332,12 +268,6 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
     logger = new SyslogLogger(open);
     mutex->lock();
 
-    if (!logger->setupZMQSocket())
-    {
-        delete logger;
-        return nullptr;
-    }
-
     ClientList *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
     return logger;
@@ -348,24 +278,6 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
 /// \param item LoggingItem containing the log message to process
 bool SyslogLogger::logmsg(LoggingItem *item)
 {
-#if CONFIG_SYSTEMD_JOURNAL
-    if (item->facility() == SYSTEMD_JOURNAL_FACILITY)
-    {
-        sd_journal_send(
-            "MESSAGE=%s", item->rawMessage(),
-            "PRIORITY=%d", item->level(),
-            "CODE_FILE=%s", item->rawFile(),
-            "CODE_LINE=%d", item->line(),
-            "CODE_FUNC=%s", item->rawFunction(),
-            "SYSLOG_IDENTIFIER=%s", item->rawAppName(),
-            "SYSLOG_PID=%d", item->pid(),
-            "MYTH_THREAD=%s", item->rawThreadName(),
-	    NULL
-        );
-        return true;
-    }
-    else
-#endif
     if (!m_opened || item->facility() <= 0)
         return false;
 
@@ -387,58 +299,58 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-bool SyslogLogger::setupZMQSocket(void)
+#if CONFIG_SYSTEMD_JOURNAL
+/// \brief JournalLogger constructor
+JournalLogger::JournalLogger() :
+    LoggerBase(nullptr)
 {
-#ifndef NOLOGSERVER
-    try
-    {
-        nzmqt::ZMQContext *ctx = logForwardThread->getZMQContext();
-        m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
-        connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-                this, SLOT(receivedMessage(const QList<QByteArray>&)),
-                Qt::QueuedConnection);
-        m_zmqSock->subscribeTo(QByteArray(""));
-        m_zmqSock->connectTo("inproc://loggers");
-    }
-    catch (nzmqt::ZMQException &e)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Exception during socket setup: %1")
-            .arg(e.what()));
-        m_zmqSock = NULL;
-        return false;
-    }
-#endif
+    LOG(VB_GENERAL, LOG_INFO, "Added journal logging");
+}
+
+/// \brief JournalLogger deconstructor.
+JournalLogger::~JournalLogger()
+{
+    LOG(VB_GENERAL, LOG_INFO, "Removing journal logging");
+}
+
+JournalLogger *JournalLogger::create(QMutex *mutex)
+{
+    JournalLogger *logger =
+        dynamic_cast<JournalLogger *>(loggerMap.value("", nullptr));
+
+    if (logger)
+        return logger;
+
+    // Need to add a new FileLogger
+    mutex->unlock();
+    // inserts into loggerMap
+    logger = new JournalLogger();
+    mutex->lock();
+
+    ClientList *clients = new ClientList;
+    logRevClientMap.insert(logger, clients);
+    return logger;
+}
+
+
+/// \brief Process a log message, logging to syslog
+/// \param item LoggingItem containing the log message to process
+bool JournalLogger::logmsg(LoggingItem *item)
+{
+    sd_journal_send(
+        "MESSAGE=%s", item->rawMessage(),
+        "PRIORITY=%d", item->level(),
+        "CODE_FILE=%s", item->rawFile(),
+        "CODE_LINE=%d", item->line(),
+        "CODE_FUNC=%s", item->rawFunction(),
+        "SYSLOG_IDENTIFIER=%s", item->rawAppName(),
+        "SYSLOG_PID=%d", item->pid(),
+        "MYTH_THREAD=%s", item->rawThreadName(),
+        NULL
+        );
     return true;
 }
-#else
-
-// Windows doesn't have syslog support
-
-SyslogLogger::SyslogLogger() :
-    LoggerBase(NULL), m_opened(false), m_zmqSock(NULL)
-{
-}
-
-SyslogLogger::~SyslogLogger()
-{
-}
-
-SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
-{
-    return NULL;
-}
-
-bool SyslogLogger::logmsg(LoggingItem *item)
-{
-    (void)item;
-    return false;
-}
-
-bool SyslogLogger::setupZMQSocket(void)
-{
-    return false;
-}
-
+#endif
 #endif
 
 const int DatabaseLogger::kMinDisabledTime = 1000;
@@ -446,8 +358,7 @@ const int DatabaseLogger::kMinDisabledTime = 1000;
 /// \brief DatabaseLogger constructor
 /// \param table C-string of the database table to log to
 DatabaseLogger::DatabaseLogger(const char *table) :
-    LoggerBase(table), m_opened(false), m_loggingTableExists(false),
-    m_zmqSock(nullptr)
+    LoggerBase(table)
 {
     m_query = QString(
         "INSERT INTO %1 "
@@ -462,9 +373,6 @@ DatabaseLogger::DatabaseLogger(const char *table) :
 
     m_thread = new DBLoggerThread(this);
     m_thread->start();
-
-    m_opened = true;
-    m_disabled = false;
 }
 
 /// \brief DatabaseLogger deconstructor
@@ -472,18 +380,10 @@ DatabaseLogger::~DatabaseLogger()
 {
     LOG(VB_GENERAL, LOG_INFO, "Removing database logging");
 
-    stopDatabaseAccess();
-
-#ifndef NOLOGSERVER
-    m_zmqSock->unsubscribeFrom(QByteArray(""));
-    m_zmqSock->setLinger(0);
-    m_zmqSock->disconnect(this);
-    m_zmqSock->close();
-    m_zmqSock->deleteLater();
-#endif
+    DatabaseLogger::stopDatabaseAccess();
 }
 
-DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)
+DatabaseLogger *DatabaseLogger::create(const QString& table, QMutex *mutex)
 {
     QByteArray ba = table.toLocal8Bit();
     const char *tble = ba.constData();
@@ -498,12 +398,6 @@ DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)
     // inserts into loggerMap
     logger = new DatabaseLogger(tble);
     mutex->lock();
-
-    if (!logger->setupZMQSocket())
-    {
-        delete logger;
-        return nullptr;
-    }
 
     ClientList *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
@@ -560,30 +454,6 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-bool DatabaseLogger::setupZMQSocket(void)
-{
-#ifndef NOLOGSERVER
-    try
-    {
-        nzmqt::ZMQContext *ctx = logForwardThread->getZMQContext();
-        m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
-        connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-                this, SLOT(receivedMessage(const QList<QByteArray>&)),
-                Qt::QueuedConnection);
-        m_zmqSock->subscribeTo(QByteArray(""));
-        m_zmqSock->connectTo("inproc://loggers");
-    }
-    catch (nzmqt::ZMQException &e)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Exception during socket setup: %1")
-            .arg(e.what()));
-        m_zmqSock = NULL;
-        return false;
-    }
-#endif
-    return true;
-}
-
 
 /// \brief Actually insert a log message from the queue into the database
 /// \param query    The database insert query to use
@@ -617,11 +487,7 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
         // previous error (to avoid spamming the log).
         QSqlError err = query.lastError();
         if ((err.type() != 1
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-             || err.number() != -1
-#else
              || !err.nativeErrorCode().isEmpty()
-#endif
                 ) &&
             (!m_errorLoggingTime.isValid() ||
              (m_errorLoggingTime.elapsed() > 1000)))
@@ -671,14 +537,11 @@ bool DatabaseLogger::tableExists(const QString &table)
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        QString sql = "SELECT INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME "
+        QString sql = "SELECT COLUMN_NAME "
                       "  FROM INFORMATION_SCHEMA.COLUMNS "
-                      " WHERE INFORMATION_SCHEMA.COLUMNS.TABLE_SCHEMA = "
-                      "       DATABASE() "
-                      "   AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = "
-                      "       :TABLENAME "
-                      "   AND INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = "
-                      "       :COLUMNNAME;";
+                      " WHERE TABLE_SCHEMA = DATABASE() "
+                      "   AND TABLE_NAME = :TABLENAME "
+                      "   AND COLUMN_NAME = :COLUMNNAME;";
         if (query.prepare(sql))
         {
             query.bindValue(":TABLENAME", table);
@@ -696,7 +559,7 @@ bool DatabaseLogger::tableExists(const QString &table)
 DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
     MThread("DBLogger"), m_logger(logger),
     m_queue(new QQueue<LoggingItem *>),
-    m_wait(new QWaitCondition()), m_aborted(false)
+    m_wait(new QWaitCondition())
 {
 }
 
@@ -820,344 +683,9 @@ void logSigHup(void)
 #endif
 
 
-/// \brief LogServerThread constructor.
-LogServerThread::LogServerThread() :
-    MThread("LogServer"), m_zmqContext(nullptr), m_zmqInSock(nullptr),
-    m_heartbeatTimer(nullptr)
-{
-    moveToThread(qthread());
-}
-
-/// \brief LogServerThread destructor.
-LogServerThread::~LogServerThread()
-{
-    stop();
-    wait();
-}
-
-/// \brief Run the logging thread.  This thread reads from ZeroMQ (TCP:35327)
-///        and handles distributing the LoggingItems to each logger instance
-///        via ZeroMQ (inproc).
-void LogServerThread::run(void)
-{
-    RunProlog();
-
-    logThreadFinished = false;
-    QMutexLocker locker(&logThreadStartedMutex);
-
-    qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
-
-    bool abortThread = false;
-
-#ifndef NOLOGSERVER
-    m_zmqContext = nzmqt::createDefaultContext(NULL);
-    nzmqt::PollingZMQContext *ctx = static_cast<nzmqt::PollingZMQContext *>
-                                        (m_zmqContext);
-    ctx->setInterval(100);
-    ctx->start();
-
-    try
-    {
-        m_zmqInSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_ROUTER);
-        connect(m_zmqInSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-                this, SLOT(receivedMessage(const QList<QByteArray>&)),
-                Qt::QueuedConnection);
-        m_zmqInSock->bindTo("tcp://127.0.0.1:35327");
-        m_zmqInSock->bindTo("inproc://mylogs");
-    }
-    catch (nzmqt::ZMQException &e)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Exception during socket setup: %1")
-            .arg(e.what()));
-        abortThread = true;
-    }
-#endif
-
-    // cppcheck-suppress knownConditionTrueFalse
-    if (!abortThread)
-    {
-        logForwardThread = new LogForwardThread();
-        logForwardThread->start();
-
-        connect(logForwardThread, SIGNAL(pingClient(QString)),
-                this, SLOT(pingClient(QString)), Qt::QueuedConnection);
-
-        // cerr << "wake all" << endl;
-        logThreadStarting = false;
-        locker.unlock();
-        logThreadStarted.wakeAll();
-        // cerr << "unlock" << endl;
-
-        msgsSinceHeartbeat = 0;
-#ifndef NOLOGSERVER
-        m_heartbeatTimer = new MythSignalingTimer(this,
-                                                  SLOT(checkHeartBeats()));
-        m_heartbeatTimer->start(1000);
-#endif
-
-        exec();
-    }
-
-    logThreadFinished = true;
-
-#ifndef NOLOGSERVER
-    if (m_heartbeatTimer)
-    {
-        m_heartbeatTimer->stop();
-        delete m_heartbeatTimer;
-    }
-
-    if (m_zmqInSock)
-    {
-        m_zmqInSock->setLinger(0);
-        m_zmqInSock->close();
-    }
-#endif
-
-    if (logForwardThread)
-    {
-        logForwardThread->stop();
-        delete logForwardThread;
-        logForwardThread = nullptr;
-    }
-
-#ifndef NOLOGSERVER
-    delete m_zmqContext;
-    m_zmqContext = NULL;
-#endif
-
-    RunEpilog();
-
-    if (abortThread)
-    {
-        // cerr << "wake all" << endl;
-        logThreadStarting = false;
-        locker.unlock();
-        logThreadStarted.wakeAll();
-        qApp->processEvents();
-        // cerr << "unlock" << endl;
-    }
-}
-
-/// \brief  Sends a ping message to the given client
-/// \param clientId The clientID for the logging client we wish to ping
-void LogServerThread::pingClient(QString clientId)
-{
-#ifndef NOLOGSERVER
-    LogMessage msg;
-    // cout << "ping " << clientId.toLocal8Bit().constData() << endl;
-    QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
-    msg << clientBa << QByteArray("");
-    m_zmqInSock->sendMessage(msg);
-#else
-    Q_UNUSED(clientId)
-#endif
-}
-
-
-/// \brief  Handles heartbeat checking once a second.  If a client is not heard
-///         from for at least 1 second, send it a heartbeat message which it
-///         should send back.  If we haven't heard from it in 5s, shut down its
-///         logging.
-void LogServerThread::checkHeartBeats(void)
-{
-#ifndef NOLOGSERVER
-    qlonglong epoch;
-
-    // cout << "pre-lock 1" << endl;
-    QMutexLocker lock(&logClientMapMutex);
-    // cout << "pre-lock 2" << endl;
-    QMutexLocker lock2(&logClientToDelMutex);
-    loggingGetTimeStamp(&epoch, NULL);
-
-    // cout << "msgcount " << msgsSinceHeartbeat << endl;
-    msgsSinceHeartbeat = 0;
-
-    ClientMap::iterator it = logClientMap.begin();
-    for( ; it != logClientMap.end(); ++it )
-    {
-        QString clientId        = it.key();
-        LoggerListItem *logItem = it.value();
-        qlonglong age = epoch - logItem->epoch;
-
-        if (age > 5)
-        {
-            logClientToDel.append(clientId);
-        }
-        else
-        {
-            // cout << "age " << age << " " << clientId.toLocal8Bit().constData() << endl;
-            pingClient(clientId);
-        }
-    }
-#endif
-}
-
-/// \brief  Handles messages received from logging clients
-/// \param  msg    The message received (can be multi-part)
-void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
-{
-    LogMessage *message = new LogMessage(msg);
-    QMutexLocker lock(&logMsgListMutex);
-
-    bool wasEmpty = logMsgList.isEmpty();
-    logMsgList.append(message);
-
-    if (wasEmpty)
-        logMsgListNotEmpty.wakeAll();
-}
-
-/// \brief Stop the thread
-void LogServerThread::stop(void)
-{
-    quit();
-}
-
-/// \brief  Entry point to start logging for the application.  This will
-///         start up all of the threads needed.
-/// \return TRUE on success, FALSE on failure
-///
-/// \todo   Implement the following parameters to customise behaviour?...
-/// \\param  logfile Filename of the logfile to create.  Empty if no file.
-/// \\param  progress    non-zero if progress output will be sent to the console.
-///                     This squelches all messages less important than LOG_ERR
-///                     on the console
-/// \\param  quiet       quiet level requested (squelches all console output)
-/// \\param  facility    Syslog facility to use.  -1 to disable syslog output
-/// \\param  level       Minimum logging level to put into the logs
-/// \\param  dblog       true if database logging is requested
-/// \\param  propagate   true if the logfile path needs to be propagated to child
-///                     processes.
-bool logServerStart(void)
-{
-    if (logServerThread && logServerThread->isRunning())
-        return true;
-
-    logThreadStarting = true;
-
-    if (!logServerThread)
-        logServerThread = new LogServerThread();
-
-    // cerr << "starting server" << endl;
-    QMutexLocker locker(&logThreadStartedMutex);
-    logServerThread->start();
-    logThreadStarted.wait(locker.mutex());
-    locker.unlock();
-    // cerr << "done starting server" << endl;
-
-    usleep(10000);
-    return (logServerThread && logServerThread->isRunning());
-}
-
-/// \brief  Entry point for stopping logging for an application
-void logServerStop(void)
-{
-    if (logServerThread)
-    {
-        logServerThread->stop();
-        logServerThread->wait();
-    }
-
-    QMutexLocker locker(&loggerMapMutex);
-    QMap<QString, LoggerBase *>::iterator it;
-    for (it = loggerMap.begin(); it != loggerMap.end(); ++it)
-    {
-        it.value()->stopDatabaseAccess();
-    }
-}
-
-void logServerWait(void)
-{
-    // cerr << "waiting" << endl;
-    QMutexLocker locker(&logThreadStartedMutex);
-    while (!logThreadStarted.wait(locker.mutex(), 100) && logThreadStarting);
-    locker.unlock();
-    // cerr << "done waiting" << endl;
-}
-
-void FileLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-#ifndef NOLOGSERVER
-    // Filter on the clientId
-    QByteArray clientBa = msg.first();
-    QString clientId = QString(clientBa.toHex());
-
-    {
-        QMutexLocker locker(&logRevClientMapMutex);
-
-        ClientList *clients = logRevClientMap.value(this, NULL);
-        if (!clients || !clients->contains(clientId))
-            return;
-    }
-#endif
-
-    QByteArray json     = msg.at(1);
-    LoggingItem *item   = LoggingItem::create(json);
-    logmsg(item);
-    item->DecrRef();
-}
-
-#ifndef _WIN32
-void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-#ifndef NOLOGSERVER
-    // Filter on the clientId
-    QByteArray clientBa = msg.first();
-    QString clientId = QString(clientBa.toHex());
-
-    {
-        QMutexLocker locker(&logRevClientMapMutex);
-
-        ClientList *clients = logRevClientMap.value(this, NULL);
-        if (!clients || !clients->contains(clientId))
-            return;
-    }
-#endif
-
-    QByteArray json     = msg.at(1);
-    LoggingItem *item   = LoggingItem::create(json);
-    logmsg(item);
-    item->DecrRef();
-}
-
-#else
-
-// Windows doesn't have syslog support
-
-void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-    (void)msg;
-}
-
-#endif
-
-void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-#ifndef NOLOGSERVER
-    // Filter on the clientId
-    QByteArray clientBa = msg.first();
-    QString clientId = QString(clientBa.toHex());
-
-    {
-        QMutexLocker locker(&logRevClientMapMutex);
-
-        ClientList *clients = logRevClientMap.value(this, NULL);
-        if (!clients || !clients->contains(clientId))
-            return;
-    }
-#endif
-
-    QByteArray json     = msg.at(1);
-    LoggingItem *item   = LoggingItem::create(json);
-    logmsg(item);
-    item->DecrRef();
-}
-
-
 /// \brief LogForwardThread constructor.
 LogForwardThread::LogForwardThread() :
-    MThread("LogForward"), m_aborted(false), m_zmqContext(nullptr),
-    m_zmqPubSock(nullptr), m_shutdownTimer(nullptr)
+    MThread("LogForward")
 {
     moveToThread(qthread());
 }
@@ -1180,22 +708,6 @@ void LogForwardThread::run(void)
             Qt::QueuedConnection);
 
     qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
-
-#ifndef NOLOGSERVER
-    m_zmqContext = nzmqt::createDefaultContext(NULL);
-    nzmqt::PollingZMQContext *ctx = static_cast<nzmqt::PollingZMQContext *>
-                                        (m_zmqContext);
-    ctx->setInterval(100);
-    ctx->start();
-
-    m_zmqPubSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_PUB, this);
-    m_zmqPubSock->bindTo("inproc://loggers");
-
-    m_shutdownTimer = new MythSignalingTimer(this,
-                                             SLOT(shutdownTimerExpired()));
-    LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
-    m_shutdownTimer->start(5*60*1000);
-#endif
 
     while (!m_aborted)
     {
@@ -1230,22 +742,7 @@ void LogForwardThread::run(void)
                 lock.relock();
             }
         }
-
-        expireClients();
     }
-
-#ifndef NOLOGSERVER
-    m_zmqPubSock->setLinger(0);
-    m_zmqPubSock->close();
-
-    if (m_shutdownTimer)
-    {
-        if (m_shutdownTimer->isActive())
-            m_shutdownTimer->stop();
-        delete m_shutdownTimer;
-        m_shutdownTimer = NULL;
-    }
-#endif
 
     LoggerList loggers;
 
@@ -1260,79 +757,9 @@ void LogForwardThread::run(void)
         delete logger;
     }
 
-#ifndef NOLOGSERVER
-    delete m_zmqContext;
-#endif
-
     RunEpilog();
 }
 
-
-/// \brief  Fires off when no clients are left (other than the current daemon)
-///         for 5 minutes.
-void LogForwardThread::shutdownTimerExpired(void)
-{
-#ifndef NOLOGSERVER
-    m_shutdownTimer->stop();
-    delete m_shutdownTimer;
-    m_shutdownTimer = NULL;
-
-    LOG(VB_GENERAL, LOG_INFO, "Shutting down because of idleness");
-    msleep(500);
-    qApp->quit();
-#endif
-}
-
-/// \brief Expire any clients in the delete list
-void LogForwardThread::expireClients(void)
-{
-#ifndef NOLOGSERVER
-    QMutexLocker lock(&logClientMapMutex);
-    QMutexLocker lock2(&logRevClientMapMutex);
-    QMutexLocker lock3(&logClientToDelMutex);
-
-    while (!logClientToDel.isEmpty())
-    {
-        QString clientId = logClientToDel.takeFirst();
-        logClientCount.deref();
-        LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1 (#%2)")
-            .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
-        LoggerListItem *item = logClientMap.take(clientId);
-        if (!item)
-            continue;
-        LoggerList *list = item->list;
-        delete item;
-
-        while (!list->isEmpty())
-        {
-            LoggerBase *logger = list->takeFirst();
-            ClientList *clientList = logRevClientMap.value(logger, NULL);
-            if (!clientList || clientList->size() == 1)
-            {
-                if (clientList)
-                {
-                    logRevClientMap.remove(logger);
-                    delete clientList;
-                }
-                delete logger;
-                continue;
-            }
-
-            clientList->removeAll(clientId);
-        }
-        delete list;
-    }
-
-    // TODO FIXME: This is not thread-safe!
-    // just this daemon left
-    if (logClientCount.fetchAndAddOrdered(0) == 1 &&
-        m_shutdownTimer && !m_shutdownTimer->isActive())
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
-        m_shutdownTimer->start(5*60*1000);
-    }
-#endif
-}
 
 /// \brief  SIGHUP handler - reopen all open logfiles for logrollers
 void LogForwardThread::handleSigHup(void)
@@ -1364,8 +791,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     }
 #endif
 
-    msgsSinceHeartbeat.ref();
-
     // First section is the client id
     QByteArray clientBa = msg->first();
     QString clientId = QString(clientBa.toHex());
@@ -1374,20 +799,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
     if (json.size() == 0)
     {
-        // This is either a ping response or a first gasp
-        logClientMapMutex.lock();
-        LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
-        logClientMapMutex.unlock();
-        if (!logItem)
-        {
-            // Send an initial ping so the client knows we are in the house
-            emit pingClient(clientId);
-        }
-        else
-        {
-            // cout << "pong " << clientId.toLocal8Bit().constData() << endl;
-            loggingGetTimeStamp(&logItem->epoch, nullptr);
-        }
+        // cout << "invalid msg, no json data " << qPrintable(clientId) << endl;
         return;
     }
 
@@ -1407,16 +819,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         LOG(VB_FILE, LOG_DEBUG, QString("New Logging Client: ID: %1 (#%2)")
             .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
 
-#ifndef NOLOGSERVER
-        // TODO FIXME This is not thread-safe!
-        if (logClientCount.fetchAndAddOrdered(0) > 1 && m_shutdownTimer &&
-            m_shutdownTimer->isActive())
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Aborting shutdown timer");
-            m_shutdownTimer->stop();
-        }
-#endif
-
         QMutexLocker lock2(&loggerMapMutex);
         QMutexLocker lock3(&logRevClientMapMutex);
 
@@ -1426,7 +828,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
         // FileLogger from logFile
         QString logfile = item->logFile();
-        logfile.detach();
         if (!logfile.isEmpty())
         {
             logger = FileLogger::create(logfile, lock2.mutex());
@@ -1443,15 +844,9 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 #ifndef _WIN32
         // SyslogLogger from facility
         int facility = item->facility();
-#if CONFIG_SYSTEMD_JOURNAL
-        if ((facility > 0) || (facility == SYSTEMD_JOURNAL_FACILITY))
-        {
-            logger = SyslogLogger::create(lock2.mutex(), facility > 0);
-#else
         if (facility > 0)
         {
             logger = SyslogLogger::create(lock2.mutex());
-#endif
 
             ClientList *clients = logRevClientMap.value(logger);
 
@@ -1461,6 +856,22 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
             if (logger && loggers)
                 loggers->insert(0, logger);
         }
+
+#if CONFIG_SYSTEMD_JOURNAL
+        // Journal Logger
+        if (facility == SYSTEMD_JOURNAL_FACILITY)
+        {
+            logger = JournalLogger::create(lock2.mutex());
+
+            ClientList *clients = logRevClientMap.value(logger);
+
+            if (clients)
+                clients->insert(0, clientId);
+
+            if (logger && loggers)
+                loggers->insert(0, logger);
+        }
+#endif
 #endif
 
         // DatabaseLogger from table
@@ -1486,9 +897,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         item->DecrRef();
     }
 
-#ifndef NOLOGSERVER
-    m_zmqPubSock->sendMessage(*msg);
-#else
     if (logItem && logItem->list && !logItem->list->isEmpty())
     {
         LoggerList::iterator it = logItem->list->begin();
@@ -1501,13 +909,49 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         }
         item->DecrRef();
     }
-#endif
 }
 
 /// \brief Stop the thread by setting the abort flag
 void LogForwardThread::stop(void)
 {
     m_aborted = true;
+}
+
+bool logForwardStart(void)
+{
+    logForwardThread = new LogForwardThread();
+    logForwardThread->start();
+
+    usleep(10000);
+    return (logForwardThread && logForwardThread->isRunning());
+}
+
+void logForwardStop(void)
+{
+    if (!logForwardThread)
+        return;
+
+    logForwardThread->stop();
+    delete logForwardThread;
+    logForwardThread = nullptr;
+
+    QMutexLocker locker(&loggerMapMutex);
+    for (auto it = loggerMap.begin(); it != loggerMap.end(); ++it)
+    {
+        it.value()->stopDatabaseAccess();
+    }
+}
+
+void logForwardMessage(const QList<QByteArray> &msg)
+{
+    LogMessage *message = new LogMessage(msg);
+    QMutexLocker lock(&logMsgListMutex);
+
+    bool wasEmpty = logMsgList.isEmpty();
+    logMsgList.append(message);
+
+    if (wasEmpty)
+        logMsgListNotEmpty.wakeAll();
 }
 
 /*

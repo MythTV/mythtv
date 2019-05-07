@@ -5,7 +5,7 @@
 
 MythLCDServerCommandLineParser::MythLCDServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHLCDSERVER)
-{ LoadArguments(); }
+{ MythLCDServerCommandLineParser::LoadArguments(); }
 
 void MythLCDServerCommandLineParser::LoadArguments(void)
 {
@@ -15,13 +15,13 @@ void MythLCDServerCommandLineParser::LoadArguments(void)
     addLogging();
     //addPIDFile();
 
-    add(QStringList( QStringList() << "-p" << "--port" ), "port", 6545, "listen port",
+    add(QStringList{"-p", "--port"}, "port", 6545, "listen port",
             "This is the port MythLCDServer will listen on for events.");
-    add(QStringList( QStringList() << "-m" << "--startupmessage" ), "message", "",
+    add(QStringList{"-m", "--startupmessage"}, "message", "",
             "Message to display on startup.", "");
-    add(QStringList( QStringList() << "-t" << "--messagetime"), "messagetime", 30,
+    add(QStringList{"-t", "--messagetime"}, "messagetime", 30,
             "Message display duration (in seconds)", "");
-    add(QStringList( QStringList() << "-x" << "--debuglevel" ), "debug", 0,
+    add(QStringList{"-x", "--debuglevel"}, "debug", 0,
             "debug verbosity", "Control debugging verbosity, values from 0-10");
 
     add("--nodaemon", "nodaemon", false, "", "")

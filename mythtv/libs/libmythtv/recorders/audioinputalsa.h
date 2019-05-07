@@ -33,31 +33,36 @@ typedef int snd_pcm_uframes_t;
 class AudioInputALSA : public AudioInput
 {
   public:
-    explicit AudioInputALSA(const QString &device);
+    explicit AudioInputALSA(const QString &device)
+        : AudioInput(device)
+        , alsa_device(device.right(device.size()-5).toLatin1()) {}
     ~AudioInputALSA() { Close(); };
 
-    bool Open(uint sample_bits, uint sample_rate, uint channels);
-    inline bool IsOpen(void) { return (pcm_handle != nullptr); }
-    void Close(void);
+    bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
+    inline bool IsOpen(void) override // AudioInput
+        { return (pcm_handle != nullptr); }
+    void Close(void) override; // AudioInput
 
-    bool Start(void) { return (pcm_handle != nullptr); }
-    bool Stop(void);
+    bool Start(void) override // AudioInput
+        { return (pcm_handle != nullptr); }
+    bool Stop(void) override; // AudioInput
 
-    inline int GetBlockSize(void) { return myth_block_bytes; };
-    int GetSamples(void* buf, uint nbytes);
-    int GetNumReadyBytes(void);
+    inline int GetBlockSize(void) override // AudioInput
+        { return myth_block_bytes; };
+    int GetSamples(void* buf, uint nbytes) override; // AudioInput
+    int GetNumReadyBytes(void) override; // AudioInput
 
   private:
     bool PrepHwParams(void);
     bool PrepSwParams(void);
     int  PcmRead(void* buf, uint nbytes);
     bool Recovery(int err);
-    bool AlsaBad(int op_result, QString errmsg);
+    bool AlsaBad(int op_result, const QString& errmsg);
 
     QByteArray          alsa_device;
-    snd_pcm_t*          pcm_handle;
-    snd_pcm_uframes_t   period_size;
-    int                 myth_block_bytes;
+    snd_pcm_t*          pcm_handle       {nullptr};
+    snd_pcm_uframes_t   period_size      {0};
+    int                 myth_block_bytes {0};
 };
 #endif /* _AUDIOINPUTALSA_H_ */
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

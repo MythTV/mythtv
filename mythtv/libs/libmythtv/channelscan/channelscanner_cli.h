@@ -35,33 +35,33 @@
 
 // MythTV headers
 #include "mythtvexp.h"
-#include "settings.h"
 #include "channelscanner.h"
 
 class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
 {
   public:
-    ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk);
-    virtual ~ChannelScannerCLI();
+    ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk)
+        : m_onlysavescan(doScanSaveOnly), m_interactive(promptsOk) {}
+    virtual ~ChannelScannerCLI() = default;
 
-    virtual void HandleEvent(const ScannerEvent *scanEvent);
+    void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
 
-    bool IsDone(void) const { return done; }
+    bool IsDone(void) const { return m_done; }
 
   protected:
-    virtual void InformUser(const QString &error);
+    void InformUser(const QString &error) override; // ChannelScanner
     virtual void Process(const ScanDTVTransportList&);
-    virtual void MonitorProgress(bool lock, bool strength,
-                                 bool snr, bool rotor);
+    void MonitorProgress(bool lock, bool strength,
+                         bool snr, bool rotor) override; // ChannelScanner
   private:
-    bool    done;
-    bool    onlysavescan;
-    bool    interactive;
-    bool    status_lock;
-    uint    status_complete;
-    float   status_snr;
-    QString status_text;
-    QString status_last_log;
+    bool    m_done            {false};
+    bool    m_onlysavescan;
+    bool    m_interactive;
+    bool    m_status_lock     {false};
+    uint    m_status_complete {0};
+    float   m_status_snr      {0.0};
+    QString m_status_text;
+    QString m_status_last_log;
 };
 
 #endif // _CHANNEL_SCANNER_CLI_H_

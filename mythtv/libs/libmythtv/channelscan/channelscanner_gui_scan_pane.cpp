@@ -34,22 +34,6 @@
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 
-ChannelScannerGUIScanPane::ChannelScannerGUIScanPane(
-    bool lock, bool strength,
-    bool snr, bool rotorpos,
-    MythScreenStack *parent)
-    : MythScreenType(parent, "channelscanner"),
-      m_showSignalLock(lock),        m_showSignalStrength(strength),
-      m_showSignalNoise(snr),        m_showRotorPos(rotorpos),
-      m_signalStrengthBar(nullptr),  m_signalNoiseBar(nullptr),
-      m_rotatorPositionBar(nullptr), m_progressBar(nullptr),
-      m_statusText(nullptr),         m_scanProgressText(nullptr),
-      m_signalLockedText(nullptr),   m_signalStrengthText(nullptr),
-      m_signalNoiseText(nullptr),    m_rotatorPositionText(nullptr),
-      m_progressText(nullptr),       m_log(nullptr)
-{
-}
-
 bool ChannelScannerGUIScanPane::Create()
 {
     if (!XMLParseBase::LoadWindowFromXML("config-ui.xml", "channelscanner",

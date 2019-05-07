@@ -95,9 +95,7 @@ QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
     {
         if (type == table->value)
         {
-            QString tmp = table->name;
-            tmp.detach();
-            return tmp;
+            return table->name;
         }
     }
     return QString();
@@ -123,11 +121,6 @@ uint DiSEqCDevDevice::TableFromString(const QString   &type,
  *  Represents a single possible configuration
  *  of a given network of DVB-S devices.
  */
-
-DiSEqCDevSettings::DiSEqCDevSettings()
-    : m_input_id((uint) -1)
-{
-}
 
 /** \fn DiSEqCDevSettings::Load(uint)
  *  \brief Loads configuration chain from DB for specified card input id.
@@ -238,7 +231,7 @@ void DiSEqCDevSettings::SetValue(uint devid, double value)
  *  \brief Main DVB-S device interface.
  */
 
-DiSEqCDevTrees DiSEqCDev::m_trees;
+DiSEqCDevTrees DiSEqCDev::s_trees;
 
 /** \fn DiSEqCDev::FindTree(uint)
  *  \brief Retrieve device tree.
@@ -246,7 +239,7 @@ DiSEqCDevTrees DiSEqCDev::m_trees;
  */
 DiSEqCDevTree *DiSEqCDev::FindTree(uint cardid)
 {
-    return m_trees.FindTree(cardid);
+    return s_trees.FindTree(cardid);
 }
 
 /** \fn DiSEqCDev::InvalidateTrees(void)
@@ -254,7 +247,7 @@ DiSEqCDevTree *DiSEqCDev::FindTree(uint cardid)
  */
 void DiSEqCDev::InvalidateTrees(void)
 {
-    m_trees.InvalidateTrees();
+    s_trees.InvalidateTrees();
 }
 
 //////////////////////////////////////// DiSEqCDevTrees
@@ -308,13 +301,6 @@ void DiSEqCDevTrees::InvalidateTrees(void)
  */
 
 const uint DiSEqCDevTree::kFirstFakeDiSEqCID = 0xf0000000;
-
-DiSEqCDevTree::DiSEqCDevTree() :
-    m_fd_frontend(-1), m_root(nullptr),
-    m_previous_fake_diseqcid(kFirstFakeDiSEqCID)
-{
-    Reset();
-}
 
 DiSEqCDevTree::~DiSEqCDevTree()
 {
@@ -382,7 +368,7 @@ bool DiSEqCDevTree::Load(uint cardid)
         return m_root;
     }
 
-    if (query.value(0).toUInt())
+    if (query.value(0).toBool())
     {
         m_root = DiSEqCDevDevice::CreateById(
             *this, query.value(0).toUInt());
@@ -649,8 +635,7 @@ void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
 
     m_root = root;
 
-    if (old_root)
-        delete old_root;
+    delete old_root;
 }
 
 #ifdef USING_DVB
@@ -883,18 +868,6 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[5] =
 };
 
 
-/**
- *  \param tree Parent reference to tree object.
- *  \param devid Device ID of this node.
- */
-DiSEqCDevDevice::DiSEqCDevDevice(DiSEqCDevTree &tree, uint devid)
-    : m_devid(devid),           m_dev_type(kTypeLNB),
-                                m_tree(tree),
-      m_parent(nullptr),        m_ordinal(0),
-      m_repeat(1)
-{
-}
-
 DiSEqCDevDevice::~DiSEqCDevDevice()
 {
     if (IsRealDeviceID())
@@ -940,7 +913,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateById(DiSEqCDevTree &tree, uint devid)
         MythDB::DBError("DiSEqCDevDevice::CreateById", query);
         return nullptr;
     }
-    else if (!query.next())
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "CreateById failed to find dtv dev " +
                 QString("%1").arg(devid));
@@ -1090,16 +1063,14 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[9] =
 };
 
 DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeTone), m_address(DISEQC_ADR_SW_ALL),
-      m_num_ports(2)
+    : DiSEqCDevDevice(tree, devid)
 {
     m_children.resize(m_num_ports);
 
     for (uint i = 0; i < m_num_ports; i++)
         m_children[i] = nullptr;
 
-    Reset();
+    DiSEqCDevSwitch::Reset();
 }
 
 DiSEqCDevSwitch::~DiSEqCDevSwitch()
@@ -1271,7 +1242,7 @@ bool DiSEqCDevSwitch::Load(void)
         MythDB::DBError("DiSEqCDevSwitch::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type = SwitchTypeFromString(query.value(0).toString());
         m_address = query.value(1).toUInt();
@@ -1367,7 +1338,7 @@ bool DiSEqCDevSwitch::Store(void) const
 
     // chain to children
     bool success = true;
-    for (uint ch = 0; ch < m_children.size(); ch++)
+    for (size_t ch = 0; ch < m_children.size(); ch++)
     {
         if (m_children[ch])
             success &= m_children[ch]->Store();
@@ -1739,22 +1710,9 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevRotor::RotorTypeTable[] =
     { nullptr, kTypeDiSEqC_1_3 }
 };
 
-DiSEqCDevRotor::DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeDiSEqC_1_3),
-      m_speed_hi(2.5),          m_speed_lo(1.9),
-      m_child(nullptr),
-      m_last_position(0.0),     m_desired_azimuth(0.0),
-      m_reset(true),            m_move_time(0.0),
-      m_last_pos_known(false),  m_last_azimuth(0.0)
-{
-    Reset();
-}
-
 DiSEqCDevRotor::~DiSEqCDevRotor()
 {
-    if (m_child)
-        delete m_child;
+    delete m_child;
 }
 
 bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
@@ -1815,7 +1773,7 @@ bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings,
     return false;
 }
 
-DiSEqCDevDevice *DiSEqCDevRotor::GetSelectedChild(const DiSEqCDevSettings&) const
+DiSEqCDevDevice *DiSEqCDevRotor::GetSelectedChild(const DiSEqCDevSettings& /*settings*/) const
 {
     return m_child;
 }
@@ -1827,8 +1785,7 @@ bool DiSEqCDevRotor::SetChild(uint ordinal, DiSEqCDevDevice *device)
 
     DiSEqCDevDevice *old_child = m_child;
     m_child = nullptr;
-    if (old_child)
-        delete old_child;
+    delete old_child;
 
     m_child = device;
     if (m_child)
@@ -1883,7 +1840,7 @@ bool DiSEqCDevRotor::Load(void)
         MythDB::DBError("DiSEqCDevRotor::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type     = RotorTypeFromString(query.value(0).toString());
         m_speed_hi = query.value(2).toDouble();
@@ -1920,7 +1877,7 @@ bool DiSEqCDevRotor::Load(void)
         MythDB::DBError("DiSEqCDevRotor::Load 2", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         uint child_dev_id = query.value(0).toUInt();
         SetChild(0, CreateById(m_tree, child_dev_id));
@@ -2064,7 +2021,8 @@ void DiSEqCDevRotor::SetPosMap(const uint_to_dbl_t &inv_posmap)
         m_posmap[*it] = it.key();
 }
 
-bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
+bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings& /*setttings*/,
+                                  const DTVMultiplex& /*tuning*/,
                                   double angle)
 {
     // determine stored position from position map
@@ -2083,7 +2041,8 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
                               m_repeat, 1, &index);
 }
 
-bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
+bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings& /*settings*/,
+                                  const DTVMultiplex& /*tuning*/,
                                   double angle)
 {
     double azimuth = CalculateAzimuth(angle);
@@ -2108,8 +2067,8 @@ double DiSEqCDevRotor::CalculateAzimuth(double angle) const
     // http://www.angelfire.com/trek/ismail/theory.html
 
     // Earth Station Latitude and Longitude in radians
-    double P  = gCoreContext->GetSetting("Latitude",  "").toFloat() * TO_RADS;
-    double Ue = gCoreContext->GetSetting("Longitude", "").toFloat() * TO_RADS;
+    double P  = gCoreContext->GetSetting("Latitude",  "").toDouble() * TO_RADS;
+    double Ue = gCoreContext->GetSetting("Longitude", "").toDouble() * TO_RADS;
 
     // Satellite Longitude in radians
     double Us = angle * TO_RADS;
@@ -2160,20 +2119,9 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSCR::SCRPositionTable[3] =
     { QString(),      kTypeScrPosA },
 };
 
-DiSEqCDevSCR::DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid)
-    , m_scr_userband(0)
-    , m_scr_frequency(1400)
-    , m_scr_pin(-1)
-    , m_child(nullptr)
-{
-    Reset();
-}
-
 DiSEqCDevSCR::~DiSEqCDevSCR()
 {
-    if (m_child)
-        delete m_child;
+    delete m_child;
 }
 
 void DiSEqCDevSCR::Reset(void)
@@ -2214,7 +2162,7 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("SCR: Tuning to %1kHz, %2, %3 using UB=%4, FREQ=%5MHz, POS=%6%7")
-            .arg(tuning.frequency)
+            .arg(tuning.m_frequency)
             .arg(high_band ? "HiBand" : "LoBand")
             .arg(horizontal ? "H" : "V")
             .arg(m_scr_userband)
@@ -2242,9 +2190,8 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     {
         data[2] = m_scr_pin;
         return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
-    } else {
-        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
     }
+    return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
 }
 
 bool DiSEqCDevSCR::PowerOff(void) const
@@ -2272,9 +2219,8 @@ bool DiSEqCDevSCR::PowerOff(void) const
     {
         data[2] = m_scr_pin;
         return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
-    } else {
-        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
     }
+    return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
 }
 
 bool DiSEqCDevSCR::SendCommand(uint cmd, uint repeats, uint data_len,
@@ -2325,7 +2271,7 @@ bool DiSEqCDevSCR::Load(void)
         MythDB::DBError("DiSEqCDevSCR::Load 1", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_scr_userband  = query.value(0).toUInt();
         m_scr_frequency = query.value(1).toUInt();
@@ -2351,7 +2297,7 @@ bool DiSEqCDevSCR::Load(void)
         MythDB::DBError("DiSEqCDevSCR::Load 2", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         uint child_dev_id = query.value(0).toUInt();
         SetChild(0, CreateById(m_tree, child_dev_id));
@@ -2428,8 +2374,7 @@ bool DiSEqCDevSCR::SetChild(uint ordinal, DiSEqCDevDevice *device)
 
     DiSEqCDevDevice *old_child = m_child;
     m_child = nullptr;
-    if (old_child)
-        delete old_child;
+    delete old_child;
 
     m_child = device;
     if (m_child)
@@ -2456,16 +2401,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevLNB::LNBTypeTable[5] =
     { QString(),      kTypeVoltageAndToneControl },
 };
 
-DiSEqCDevLNB::DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
-    : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeVoltageAndToneControl), m_lof_switch(11700000),
-      m_lof_hi(10600000),       m_lof_lo(9750000),
-      m_pol_inv(false)
-{
-    Reset();
-}
-
-bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
+bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings& /*settings*/, const DTVMultiplex &tuning)
 {
     // set tone for bandselect
     if (m_type == kTypeVoltageAndToneControl)
@@ -2474,7 +2410,7 @@ bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
     return true;
 }
 
-uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings&,
+uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings& /*settings*/,
                               const DTVMultiplex &tuning) const
 {
     uint voltage = SEC_VOLTAGE_18;
@@ -2505,13 +2441,13 @@ bool DiSEqCDevLNB::Load(void)
         MythDB::DBError("DiSEqCDevLNB::Load", query);
         return false;
     }
-    else if (query.next())
+    if (query.next())
     {
         m_type       = LNBTypeFromString(query.value(0).toString());
         m_lof_switch = query.value(1).toInt();
         m_lof_hi     = query.value(2).toInt();
         m_lof_lo     = query.value(3).toInt();
-        m_pol_inv    = query.value(4).toUInt();
+        m_pol_inv    = query.value(4).toBool();
         m_repeat     = query.value(5).toUInt();
     }
 
@@ -2593,7 +2529,7 @@ bool DiSEqCDevLNB::IsHighBand(const DTVMultiplex &tuning) const
     switch (m_type)
     {
         case kTypeVoltageAndToneControl:
-            return (tuning.frequency > m_lof_switch);
+            return (tuning.m_frequency > m_lof_switch);
         case kTypeBandstacked:
             return IsHorizontal(tuning);
         default:
@@ -2610,7 +2546,7 @@ bool DiSEqCDevLNB::IsHighBand(const DTVMultiplex &tuning) const
  */
 bool DiSEqCDevLNB::IsHorizontal(const DTVMultiplex &tuning) const
 {
-    QString pol = tuning.polarity.toString().toLower();
+    QString pol = tuning.m_polarity.toString().toLower();
     return (pol == "h" || pol == "l") ^ IsPolarityInverted();
 }
 
@@ -2625,7 +2561,7 @@ uint32_t DiSEqCDevLNB::GetIntermediateFrequency(
 {
     (void) tuning;
 
-    uint64_t abs_freq = tuning.frequency;
+    uint64_t abs_freq = tuning.m_frequency;
     uint lof = (IsHighBand(tuning)) ? m_lof_hi : m_lof_lo;
 
     return (lof > abs_freq) ? (lof - abs_freq) : (abs_freq - lof);

@@ -32,24 +32,8 @@ MythImage::MythImage(MythPainter *parent, const char *name) :
         LOG(VB_GENERAL, LOG_ERR, "Image created without parent!");
 
     m_Parent = parent;
-
-    m_Changed = false;
-
-    m_isGradient = false;
-    m_gradBegin = QColor("#000000");
-    m_gradEnd = QColor("#FFFFFF");
-    m_gradAlpha = 255;
-    m_gradDirection = FillTopToBottom;
-
-    m_isOriented = false;
-    m_isReflected = false;
-    m_isYUV = false;
-
-    m_imageId = 0;
-
     m_FileName = "";
 
-    m_cached = false;
     if (!s_ui)
         s_ui = GetMythUI();
 }
@@ -243,9 +227,10 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     {
         if (shear < 0)
             newpainter.drawImage(mirrorImage.width()-width(), 0,
-                                 copy(0,0,width(),height()));
+                                 *(static_cast<QImage*>(this)));
         else
-            newpainter.drawImage(0, 0, copy(0,0,width(),height()));
+            newpainter.drawImage(0, 0,
+                                 *(static_cast<QImage*>(this)));
 
         newpainter.drawImage(0, height()+spacing, mirrorImage);
     }
@@ -253,9 +238,9 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     {
         if (shear < 0)
             newpainter.drawImage(0, mirrorImage.height()-height(),
-                                 copy(0,0,width(),height()));
+                                 *(static_cast<QImage*>(this)));
         else
-            newpainter.drawImage(0, 0, copy(0,0,width(),height()));
+            newpainter.drawImage(0, 0, *(static_cast<QImage*>(this)));
 
         newpainter.drawImage(width()+spacing, 0, mirrorImage);
     }
@@ -297,9 +282,7 @@ bool MythImage::Load(MythImageReader *reader)
         return true;
     }
 
-    if (im)
-        delete im;
-
+    delete im;
     return false;
 }
 
@@ -376,8 +359,7 @@ bool MythImage::Load(const QString &filename)
         delete im;
         return true;
     }
-    else
-        LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
+    LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
 
     return false;
 }
@@ -479,8 +461,7 @@ void MythImage::ConvertToYUV(void)
 }
 
 MythImageReader::MythImageReader(const QString &fileName)
-  : QImageReader(),
-    m_fileName(fileName), m_networkReply(nullptr)
+  : m_fileName(fileName)
 {
     if ((m_fileName.startsWith("http://")) ||
         (m_fileName.startsWith("https://")) ||

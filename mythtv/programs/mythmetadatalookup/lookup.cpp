@@ -29,13 +29,8 @@ LookerUpper::~LookerUpper()
 
 bool LookerUpper::StillWorking()
 {
-    if (m_metadataFactory->IsRunning() ||
-        m_busyRecList.count())
-    {
-        return true;
-    }
-
-    return false;
+    return m_metadataFactory->IsRunning() ||
+        (m_busyRecList.count() != 0);
 }
 
 void LookerUpper::HandleSingleRecording(const uint chanid,
@@ -241,7 +236,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (!mfmr)
             return;
 
-        MetadataLookupList list = mfmr->results;
+        MetadataLookupList list = mfmr->m_results;
 
         if (list.count() > 1)
         {
@@ -257,9 +252,9 @@ void LookerUpper::customEvent(QEvent *levent)
 
                 if (pginfo && (QString::compare(pginfo->GetTitle(), list[p]->GetBaseTitle(), Qt::CaseInsensitive)) == 0)
                 {
-                    bool hasArtwork = (((list[p]->GetArtwork(kArtworkFanart)).size() != 0) ||
-                                       ((list[p]->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                                       ((list[p]->GetArtwork(kArtworkBanner)).size() != 0));
+                    bool hasArtwork = ((!(list[p]->GetArtwork(kArtworkFanart)).empty()) ||
+                                       (!(list[p]->GetArtwork(kArtworkCoverart)).empty()) ||
+                                       (!(list[p]->GetArtwork(kArtworkBanner)).empty()));
 
                     // After the first exact match, prefer any more popular one.
                     // Most of the Movie database entries have Popularity fields.
@@ -271,7 +266,7 @@ void LookerUpper::customEvent(QEvent *levent)
                         (hasArtwork &&
                          ((!foundMatchWithArt) ||
                           ((list[p]->GetPopularity() > exactTitlePopularity)) ||
-                          ((exactTitlePopularity == 0.0) && (list[p]->GetReleaseDate() > exactTitleDate)))))
+                          ((exactTitlePopularity == 0.0F) && (list[p]->GetReleaseDate() > exactTitleDate)))))
                     {
                         // remember the most popular or most recently released exact match
                         exactTitleDate = list[p]->GetReleaseDate();
@@ -290,7 +285,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     m_busyRecList.removeAll(pginfo);
                     return;
                 }
-                else if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
+                if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
                          (list[p])->GetYear() != 0 &&
                          pginfo->GetYearOfInitialRelease() == (list[p])->GetYear())
                 {
@@ -301,11 +296,8 @@ void LookerUpper::customEvent(QEvent *levent)
                         m_busyRecList.removeAll(pginfo);
                         return;
                     }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_INFO, "Matched from multiple results based on year. ");
-                        yearindex = p;
-                    }
+                    LOG(VB_GENERAL, LOG_INFO, "Matched from multiple results based on year. ");
+                    yearindex = p;
                 }
             }
 
@@ -352,7 +344,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (!mfsr)
             return;
 
-        MetadataLookup *lookup = mfsr->result;
+        MetadataLookup *lookup = mfsr->m_result;
 
         if (!lookup)
             return;
@@ -422,7 +414,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (!mfnr)
             return;
 
-        MetadataLookup *lookup = mfnr->result;
+        MetadataLookup *lookup = mfnr->m_result;
 
         if (!lookup)
             return;

@@ -21,9 +21,6 @@
 #include <QString>
 #include <QDateTime>
 
-// zm
-#include "../mythzmserver/zmserver.h"
-
 /// Event details
 class Event
 {
@@ -81,6 +78,15 @@ class Event
     /// to/from UTC would consume significant CPU cycles.
     QDateTime m_startTime;
 };
+
+typedef enum
+{
+    IDLE,
+    PREALARM,
+    ALARM,
+    ALERT,
+    TAPE
+} State;
 
 // event frame details
 typedef struct

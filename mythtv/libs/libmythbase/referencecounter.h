@@ -54,7 +54,7 @@ class MBASE_PUBLIC ReferenceCounter
     /// reference counting you need to print the messages to the
     /// console by modifying IncrRef() and DecrRef().
     bool m_logDebug;
-    QAtomicInt m_referenceCount;
+    QAtomicInt m_referenceCount {1};
 };
 
 /** \brief This decrements the reference on destruction.
@@ -73,7 +73,7 @@ class MBASE_PUBLIC ReferenceLocker
             m_counter->DecrRef();
     }
   private:
-    ReferenceCounter *m_counter;
+    ReferenceCounter *m_counter {nullptr};
 };
 
 #endif

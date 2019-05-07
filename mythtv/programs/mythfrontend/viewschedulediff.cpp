@@ -19,16 +19,6 @@
 
 using namespace std;
 
-ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
-                                   int recordidDiff, QString title)
-        : MythScreenType(parent, "ViewScheduleDiff"),
-            m_inEvent(false), m_inFill(false),
-            m_altTable(altTable), m_title(title),
-            m_conflictList(nullptr), m_titleText(nullptr),
-            m_noChangesText(nullptr), m_recordid(recordidDiff)
-{
-}
-
 bool ViewScheduleDiff::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "schedulediff", this))
@@ -152,22 +142,19 @@ static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
     {
         if (a->GetRecordingStartTime() > b->GetRecordingStartTime())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
     {
         if (a->GetRecordingEndTime() > b->GetRecordingEndTime())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
     {
         if (a->GetChannelSchedulingID() < b->GetChannelSchedulingID())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     if (a->GetRecordingPriority() != b->GetRecordingPriority() &&
         (a->GetRecordingStatus() == RecStatus::WillRecord ||
@@ -177,8 +164,7 @@ static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
     {
         if (a->GetRecordingPriority() < b->GetRecordingPriority())
             return 1;
-        else
-            return -1;
+        return -1;
     }
     return 0;
 }
@@ -241,8 +227,8 @@ void ViewScheduleDiff::fillList(void)
     m_recList.clear();
     while (pa != m_recListAfter.end() || pb != m_recListBefore.end())
     {
-        s.before = (pb != m_recListBefore.end()) ? *pb : nullptr;
-        s.after  = (pa != m_recListAfter.end())  ? *pa : nullptr;
+        s.m_before = (pb != m_recListBefore.end()) ? *pb : nullptr;
+        s.m_after  = (pa != m_recListAfter.end())  ? *pa : nullptr;
 
         if (pa == m_recListAfter.end())
         {
@@ -262,18 +248,18 @@ void ViewScheduleDiff::fillList(void)
                     break;
                 case -1: // pb BEFORE pa
                     ++pb;
-                    s.after = nullptr;
+                    s.m_after = nullptr;
                     break;
                 case 1: // pa BEFORE pb
-                    s.before = nullptr;
+                    s.m_before = nullptr;
                     ++pa;
                     break;
             }
         }
 
-        if (s.before && s.after &&
-            (s.before->GetInputID() == s.after->GetInputID()) &&
-            (s.before->GetRecordingStatus() == s.after->GetRecordingStatus()))
+        if (s.m_before && s.m_after &&
+            (s.m_before->GetInputID() == s.m_after->GetInputID()) &&
+            (s.m_before->GetRecordingStatus() == s.m_after->GetRecordingStatus()))
         {
             continue;
         }
@@ -286,12 +272,12 @@ void ViewScheduleDiff::fillList(void)
 
 void ViewScheduleDiff::updateUIList(void)
 {
-    for (uint i = 0; i < m_recList.size(); i++)
+    for (size_t i = 0; i < m_recList.size(); i++)
     {
         class ProgramStruct s = m_recList[i];
-        class ProgramInfo *pginfo = s.after;
+        class ProgramInfo *pginfo = s.m_after;
         if (!pginfo)
-            pginfo = s.before;
+            pginfo = s.m_before;
 
         MythUIButtonListItem *item = new MythUIButtonListItem(
             m_conflictList, "", qVariantFromValue(pginfo));
@@ -304,16 +290,16 @@ void ViewScheduleDiff::updateUIList(void)
         item->DisplayState(state, "status");
         item->SetTextFromMap(infoMap, state);
 
-        if (s.before)
-            item->SetText(RecStatus::toString(s.before->GetRecordingStatus(),
-                                   s.before->GetInputID()), "statusbefore",
+        if (s.m_before)
+            item->SetText(RecStatus::toString(s.m_before->GetRecordingStatus(),
+                                   s.m_before->GetInputID()), "statusbefore",
                           state);
         else
             item->SetText("-", "statusbefore");
 
-        if (s.after)
-            item->SetText(RecStatus::toString(s.after->GetRecordingStatus(),
-                                   s.after->GetInputID()), "statusafter",
+        if (s.m_after)
+            item->SetText(RecStatus::toString(s.m_after->GetRecordingStatus(),
+                                   s.m_after->GetInputID()), "statusafter",
                           state);
         else
             item->SetText("-", "statusafter");
@@ -350,8 +336,7 @@ ProgramInfo *ViewScheduleDiff::CurrentProgram()
 
     ProgramStruct s = m_recList[pos];
 
-    if (s.after)
-        return s.after;
-    else
-        return s.before;
+    if (s.m_after)
+        return s.m_after;
+    return s.m_before;
 }

@@ -25,35 +25,35 @@ class NetSearch : public NetBase
     NetSearch(MythScreenStack *parent, const char *name = nullptr);
     ~NetSearch();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void PopulateResultList(ResultItem::resultList list);
 
   protected:
-    virtual ResultItem *GetStreamItem();
+    ResultItem *GetStreamItem() override; // NetBase
 
   private:
-    virtual void Load();
+    void Load() override; // MythScreenType
 
-    MythUIButtonList   *m_searchResultList;
-    MythUIButtonList   *m_siteList;
-    MythUITextEdit     *m_search;
+    MythUIButtonList   *m_searchResultList {nullptr};
+    MythUIButtonList   *m_siteList         {nullptr};
+    MythUITextEdit     *m_search           {nullptr};
 
-    MythUIText         *m_pageText;
-    MythUIText         *m_noSites;
+    MythUIText         *m_pageText         {nullptr};
+    MythUIText         *m_noSites          {nullptr};
 
-    MythUIProgressBar  *m_progress;
-    MythConfirmationDialog *m_okPopup;
+    MythUIProgressBar  *m_progress         {nullptr};
+    MythConfirmationDialog *m_okPopup      {nullptr};
 
-    QNetworkAccessManager *m_netSearch;
-    QNetworkReply         *m_reply;
+    QNetworkAccessManager *m_netSearch     {nullptr};
+    QNetworkReply         *m_reply         {nullptr};
 
     QString             m_currentSearch;
-    int                 m_currentGrabber;
+    int                 m_currentGrabber   {0};
     QString             m_currentCmd;
-    uint                m_pagenum;
-    uint                m_maxpage;
+    uint                m_pagenum          {0};
+    uint                m_maxpage          {0};
     QString             m_mythXML;
 
     RSSSite::rssList    m_rssList;
@@ -62,7 +62,7 @@ class NetSearch : public NetBase
     QString m_prevPageToken;
 
   private slots:
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void GetMoreResults();
     void GetLastResults();
     void SkipPagesBack();
@@ -73,12 +73,12 @@ class NetSearch : public NetBase
     void DoSearch(void);
     void SearchFinished(void);
     void SearchTimeout(Search *item);
-    void LoadData(void);
+    void LoadData(void) override; // NetBase
     void FillGrabberButtonList(void);
     void SlotItemChanged(void);
     void SetTextAndThumbnail(MythUIButtonListItem *btn, ResultItem *item);
     void SetThumbnail(MythUIButtonListItem *btn);
-    void customEvent(QEvent *levent);
+    void customEvent(QEvent *levent) override; // NetBase
 };
 
 #endif

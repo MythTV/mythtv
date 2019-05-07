@@ -124,6 +124,44 @@ typedef struct
     uint8_t control_state[256];
 } SharedData26;
 
+// shared data for ZM version 1.32.x
+typedef struct
+{
+    uint32_t size;
+    uint32_t last_write_index;
+    uint32_t last_read_index;
+    uint32_t state;
+    uint64_t last_event;
+    uint32_t action;
+    int32_t brightness;
+    int32_t hue;
+    int32_t colour;
+    int32_t contrast;
+    int32_t alarm_x;
+    int32_t alarm_y;
+    uint8_t valid;
+    uint8_t active;
+    uint8_t signal;
+    uint8_t format;
+    uint32_t imagesize;
+    uint32_t epadding1;
+     union {
+      time_t startup_time;
+      uint64_t extrapad1;
+    };
+    union {
+      time_t last_write_time;
+      uint64_t extrapad2;
+    };
+    union {
+      time_t last_read_time;
+      uint64_t extrapad3;
+    };
+    uint8_t control_state[256];
+
+    char alarm_cause[256];
+} SharedData32;
+
 typedef enum { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF } TriggerState;
 
 // Triggerdata for ZM version 1.24.x and 1.25.x
@@ -137,7 +175,7 @@ typedef struct
     char trigger_showtext[256];
 } TriggerData;
 
-// Triggerdata for ZM version 1.26.x
+// Triggerdata for ZM version 1.26.x and 1.32.x
 typedef struct
 {
     uint32_t size;
@@ -149,10 +187,19 @@ typedef struct
     char trigger_showtext[256];
 } TriggerData26;
 
+// VideoStoreData for ZM version 1.32.x
+typedef struct
+{
+    uint32_t size;
+    uint64_t current_event;
+    char event_file[4096];
+    timeval recording;
+} VideoStoreData;
+
 class MONITOR
 {
   public:
-    MONITOR();
+    MONITOR() = default;
 
     void initMonitor(bool debug, const string &mmapPath, int shmKey);
 
@@ -164,29 +211,30 @@ class MONITOR
     int getState(void);
     int getFrameSize(void);
 
-    string name;
-    string type;
-    string function;
-    int enabled;
-    string device;
-    string host;
-    int image_buffer_count;
-    int width;
-    int height;
-    int bytes_per_pixel;
-    int mon_id;
-    unsigned char *shared_images;
-    int last_read;
-    string status;
-    int palette;
-    int controllable;
-    int trackMotion;
-    int mapFile;
-    void *shm_ptr;
+    string         m_name               {""};
+    string         m_type               {""};
+    string         m_function           {""};
+    int            m_enabled            {0};
+    string         m_device             {""};
+    string         m_host               {""};
+    int            m_image_buffer_count {0};
+    int            m_width              {0};
+    int            m_height             {0};
+    int            m_bytes_per_pixel    {3};
+    int            m_mon_id             {0};
+    unsigned char *m_shared_images      {nullptr};
+    int            m_last_read          {0};
+    string         m_status             {""};
+    int            m_palette            {0};
+    int            m_controllable       {0};
+    int            m_trackMotion        {0};
+    int            m_mapFile            {-1};
+    void          *m_shm_ptr            {nullptr};
   private:
-    SharedData *shared_data;
-    SharedData26 *shared_data26;
-    string id;
+    SharedData    *m_shared_data        {nullptr};
+    SharedData26  *m_shared_data26      {nullptr};
+    SharedData32  *m_shared_data32      {nullptr};
+    string         m_id                 {""};
 };
 
 class ZMServer
@@ -207,7 +255,7 @@ class ZMServer
     long long getDiskSpace(const string &filename, long long &total, long long &used);
     void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
-    string runCommand(string command);
+    string runCommand(const string& command);
     void getMonitorStatus(const string &id, const string &type,
                           const string &device, const string &host,
                           const string &channel, const string &function,

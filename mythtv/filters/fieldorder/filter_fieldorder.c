@@ -117,7 +117,7 @@ static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
 }
 
 static void filter_func(struct ThisFilter *p, uint8_t *dst,
-                        int dst_offsets[3], int dst_stride[3], int width,
+                        int dst_offsets[3], const int dst_stride[3], int width,
                         int height, int parity, int tff, int dirty)
 {
     int i, y;
@@ -192,13 +192,12 @@ static void CleanupFieldorderDeintFilter(VideoFilter * filter)
 
 static VideoFilter *FieldorderDeintFilter(VideoFrameType inpixfmt,
                                           VideoFrameType outpixfmt,
-                                          int *width, int *height,
-                                          char *options, int threads)
+                                          const int *width, const int *height,
+                                          const char *options, int threads)
 {
     ThisFilter *filter;
     (void) inpixfmt;
     (void) outpixfmt;
-    (void) height;
     (void) options;
     (void) threads;
 

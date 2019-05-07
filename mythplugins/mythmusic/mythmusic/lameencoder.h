@@ -49,21 +49,22 @@ class LameEncoder : public Encoder
     LameEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata,
                 bool vbr = false);
    ~LameEncoder();
-    int addSamples(int16_t *bytes, unsigned int len);
+    int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:
     int init_encoder(lame_global_flags *gf, int quality, bool vbr);
     void init_id3tags(lame_global_flags *gf);
 
-    int bits;
-    int channels;
-    int bytes_per_sample;
-    int samples_per_channel; 
+    int m_bits                {16};
+    int m_channels            {2};
+    int m_bytes_per_sample    {m_channels * m_bits / 8};
+    int m_samples_per_channel {0};
 
-    int mp3buf_size;
-    char *mp3buf;
+                              // worst-case estimate
+    int   m_mp3buf_size       {(int)(1.25 * 16384 + 7200)};
+    char *m_mp3buf            {nullptr};
 
-    lame_global_flags *gf;
+    lame_global_flags *m_gf   {nullptr};
 };
 
 #endif

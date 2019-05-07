@@ -12,19 +12,6 @@
 #include "proglist.h"
 #include "mythdate.h"
 
-PhrasePopup::PhrasePopup(MythScreenStack *parentStack,
-                         ProgLister *parent,
-                         RecSearchType searchType,
-                         const QStringList &list,
-                         const QString &currentValue) :
-    MythScreenType(parentStack, "phrasepopup"),
-    m_parent(parent), m_searchType(searchType),  m_list(list),
-    m_titleText(nullptr), m_phraseList(nullptr), m_phraseEdit(nullptr),
-    m_okButton(nullptr), m_deleteButton(nullptr), m_recordButton(nullptr)
-{
-    m_currentValue = currentValue;
-}
-
 bool PhrasePopup::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "phrasepopup", this))
@@ -144,7 +131,7 @@ void PhrasePopup::deleteClicked(void)
         return;
 
     QString text = m_list[view];
-    QString qphrase = text;
+    const QString& qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM keyword "
@@ -173,9 +160,8 @@ void PhrasePopup::deleteClicked(void)
 void PhrasePopup::recordClicked(void)
 {
     QString text = m_phraseEdit->GetText();
-    bool genreflag = false;
-
     QString what = text;
+    QString fromgenre;
 
     if (text.trimmed().isEmpty())
         return;
@@ -192,7 +178,10 @@ void PhrasePopup::recordClicked(void)
             return;
 
         MSqlBindings bindings;
-        genreflag = m_parent->PowerStringToSQL(text, what, bindings);
+        if (m_parent->PowerStringToSQL(text, what, bindings))
+            fromgenre = QString("LEFT JOIN programgenres ON "
+                                "program.chanid = programgenres.chanid AND "
+                                "program.starttime = programgenres.starttime ");
 
         if (what.isEmpty())
             return;
@@ -202,17 +191,7 @@ void PhrasePopup::recordClicked(void)
 
     RecordingRule *record = new RecordingRule();
 
-    if (genreflag)
-    {
-        QString fromgenre = QString("LEFT JOIN programgenres ON "
-                                    "program.chanid = programgenres.chanid AND "
-                                    "program.starttime = programgenres.starttime ");
-        record->LoadBySearch(m_searchType, text, what, fromgenre);
-    }
-    else
-    {
-        record->LoadBySearch(m_searchType, text, what);
-    }
+    record->LoadBySearch(m_searchType, text, what, fromgenre);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
@@ -226,19 +205,6 @@ void PhrasePopup::recordClicked(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
-                                   ProgLister *parent,
-                                   RecSearchType searchType,
-                                   const QStringList &list,
-                                   const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup"),
-      m_parent(parent), m_searchType(searchType), m_list(list),
-      m_currentValue(currentValue),
-      m_titleText(nullptr), m_phraseList(nullptr), m_phraseEdit(nullptr),
-      m_editButton(nullptr), m_deleteButton(nullptr), m_recordButton(nullptr)
-{
-}
 
 bool PowerSearchPopup::Create()
 {
@@ -346,7 +312,7 @@ void PowerSearchPopup::deleteClicked(void)
         return;
 
     QString text = m_list[view];
-    QString qphrase = text;
+    const QString& qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM keyword "
@@ -375,9 +341,8 @@ void PowerSearchPopup::deleteClicked(void)
 void PowerSearchPopup::recordClicked(void)
 {
     QString text = m_phraseList->GetValue();
-    bool genreflag = false;
-
     QString what = text;
+    QString fromgenre;
 
     if (text.trimmed().isEmpty())
         return;
@@ -394,7 +359,11 @@ void PowerSearchPopup::recordClicked(void)
             return;
 
         MSqlBindings bindings;
-        genreflag = m_parent->PowerStringToSQL(text, what, bindings);
+        if (m_parent->PowerStringToSQL(text, what, bindings))
+            fromgenre = QString(
+                "LEFT JOIN programgenres ON "
+                "program.chanid = programgenres.chanid AND "
+                "program.starttime = programgenres.starttime ");
 
         if (what.isEmpty())
             return;
@@ -404,18 +373,7 @@ void PowerSearchPopup::recordClicked(void)
 
     RecordingRule *record = new RecordingRule();
 
-    if (genreflag)
-    {
-        QString fromgenre = QString(
-            "LEFT JOIN programgenres ON "
-            "program.chanid = programgenres.chanid AND "
-            "program.starttime = programgenres.starttime ");
-        record->LoadBySearch(m_searchType, text, what, fromgenre);
-    }
-    else
-    {
-        record->LoadBySearch(m_searchType, text, what);
-    }
+    record->LoadBySearch(m_searchType, text, what, fromgenre);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
@@ -434,10 +392,7 @@ void PowerSearchPopup::recordClicked(void)
 EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
                                            ProgLister *parent,
                                            const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup"),
-        m_titleEdit(nullptr), m_subtitleEdit(nullptr), m_descEdit(nullptr),
-        m_categoryList(nullptr), m_genreList(nullptr), m_channelList(nullptr),
-        m_okButton(nullptr)
+    : MythScreenType(parentStack, "phrasepopup")
 {
     m_parent = parent;
 
@@ -569,11 +524,11 @@ void EditPowerSearchPopup::initLists(void)
     ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "callsign");
     ChannelUtil::SortChannels(channels, channelOrdering, true);
 
-    for (uint i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
-        m_parent->m_viewList << QString::number(channels[i].chanid);
+        m_parent->m_viewList << QString::number(channels[i].m_chanid);
         m_parent->m_viewTextList << chantext;
 
         MythUIButtonListItem *item =
@@ -583,8 +538,8 @@ void EditPowerSearchPopup::initLists(void)
         channels[i].ToMap(chanmap);
         item->SetTextFromMap(chanmap);
 
-        m_channels << channels[i].callsign;
-        if (channels[i].callsign == field[5])
+        m_channels << channels[i].m_callsign;
+        if (channels[i].m_callsign == field[5])
             m_channelList->SetItemCurrent(m_channelList->GetCount() - 1);
     }
 }

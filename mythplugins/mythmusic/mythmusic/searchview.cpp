@@ -17,9 +17,7 @@
 #include "searchview.h"
 
 SearchView::SearchView(MythScreenStack *parent, MythScreenType *parentScreen)
-         :MusicCommon(parent, parentScreen,"searchview"),
-            m_playTrack(false), m_fieldList(nullptr), m_criteriaEdit(nullptr),
-            m_matchesText(nullptr), m_tracksList(nullptr)
+         :MusicCommon(parent, parentScreen,"searchview")
 {
     m_currentView = MV_SEARCH;
 }
@@ -92,7 +90,7 @@ void SearchView::customEvent(QEvent *event)
         if (!mpe)
             return;
 
-        int trackID = mpe->TrackID;
+        int trackID = mpe->m_trackID;
 
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
@@ -139,7 +137,7 @@ void SearchView::customEvent(QEvent *event)
         if (!mpe)
             return;
 
-        uint trackID = mpe->TrackID;
+        uint trackID = mpe->m_trackID;
 
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
@@ -252,9 +250,6 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
     }
 
     if (!handled && MusicCommon::keyPressEvent(event))
-        handled = true;
-
-    if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
 
     return handled;
@@ -411,7 +406,7 @@ void SearchView::updateTracksList(void)
     {
         int trackid = query.value(0).toInt();
 
-        MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackid);
+        MusicMetadata *mdata = gMusicData->m_all_music->getMetadata(trackid);
         if (mdata)
         {
             MythUIButtonListItem *newitem = new MythUIButtonListItem(m_tracksList, "");

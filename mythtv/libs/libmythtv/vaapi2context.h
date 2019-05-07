@@ -37,15 +37,20 @@ extern "C" {
 class MTV_PUBLIC Vaapi2Context : public MythCodecContext
 {
   public:
-    Vaapi2Context(void);
+    Vaapi2Context(void) = default;
+    ~Vaapi2Context();
     static MythCodecID GetBestSupportedCodec(AVCodec **ppCodec,
                                              const QString &decoder,
                                              uint stream_type,
                                              AVPixelFormat &pix_fmt);
-    int HwDecoderInit(AVCodecContext *ctx);
-    virtual QString GetDeinterlaceFilter(void);
-    virtual bool isValidDeinterlacer(QString /*name*/ );
-    virtual QStringList GetDeinterlacers(void);
+    int HwDecoderInit(AVCodecContext *ctx) override; // MythCodecContext
+    QString GetDeinterlaceFilter(void) override; // MythCodecContext
+    bool isValidDeinterlacer(QString /*name*/ ) override; // MythCodecContext
+    QStringList GetDeinterlacers(void) override; // MythCodecContext
+
+  protected:
+    int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame) override; // MythCodecContext
+    void CloseFilters();
 
 };
 

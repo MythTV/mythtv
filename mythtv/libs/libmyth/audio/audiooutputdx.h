@@ -16,19 +16,19 @@ class AudioOutputDX : public AudioOutputBase
     explicit AudioOutputDX(const AudioSettings &settings);
     virtual ~AudioOutputDX();
 
-    virtual int  GetVolumeChannel(int channel) const;
-    virtual void SetVolumeChannel(int channel, int volume);
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
     static QMap<int, QString> *GetDXDevices(void);
 
   protected:
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *buffer, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(bool passthrough);
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *buffer, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
+    AudioOutputSettings* GetOutputSettings(bool passthrough) override; // AudioOutputBase
 
   protected:
-    AudioOutputDXPrivate *m_priv;
+    AudioOutputDXPrivate *m_priv {nullptr};
     bool                  m_UseSPDIF;
 };
 

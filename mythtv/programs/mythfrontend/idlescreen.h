@@ -17,9 +17,9 @@ class IdleScreen : public MythScreenType
     explicit IdleScreen(MythScreenStack *parent);
     virtual ~IdleScreen();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
 
   public slots:
@@ -28,28 +28,28 @@ class IdleScreen : public MythScreenType
     bool UpdateScheduledList();
 
   protected:
-    void Load(void);
-    void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   private:
     bool CheckConnectionToServer(void);
     bool PendingSchedUpdate() const             { return m_pendingSchedUpdate; }
     void SetPendingSchedUpdate(bool newState)   { m_pendingSchedUpdate = newState; }
 
-    QTimer        *m_updateScreenTimer;
+    QTimer           *m_updateScreenTimer     {nullptr};
 
-    MythUIStateType  *m_statusState;
-    MythUIButtonList *m_currentRecordings;
-    MythUIButtonList *m_nextRecordings;
-    MythUIButtonList *m_conflictingRecordings;
-    MythUIText       *m_conflictWarning;
+    MythUIStateType  *m_statusState           {nullptr};
+    MythUIButtonList *m_currentRecordings     {nullptr};
+    MythUIButtonList *m_nextRecordings        {nullptr};
+    MythUIButtonList *m_conflictingRecordings {nullptr};
+    MythUIText       *m_conflictWarning       {nullptr};
 
-    int             m_secondsToShutdown;
+    int             m_secondsToShutdown       {-1};
 
     QMutex          m_schedUpdateMutex;
-    bool            m_pendingSchedUpdate;
+    bool            m_pendingSchedUpdate      {false};
     ProgramList     m_scheduledList;
-    bool            m_hasConflicts;
+    bool            m_hasConflicts            {false};
 };
 
 #endif

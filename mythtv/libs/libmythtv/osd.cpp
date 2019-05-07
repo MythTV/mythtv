@@ -1,5 +1,6 @@
 // Qt
 #include <QCoreApplication>
+#include <utility>
 
 // libmyth
 #include "mythlogging.h"
@@ -155,11 +156,11 @@ OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
     m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(nullptr),
     m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
     m_Refresh(false), m_Visible(false), m_UIScaleOverride(false),
-    m_SavedWMult(1.0f), m_SavedHMult(1.0f),   m_SavedUIRect(QRect()),
+    m_SavedWMult(1.0F), m_SavedHMult(1.0F),   m_SavedUIRect(QRect()),
     m_fontStretch(100), m_savedFontStretch(100),
     m_FunctionalType(kOSDFunctionalType_Default), m_FunctionalWindow(QString())
 {
-    SetTimeouts(3000, 5000, 10000);
+    SetTimeouts(3000, 5000, 13000);
 }
 
 OSD::~OSD()
@@ -178,7 +179,7 @@ void OSD::TearDown(void)
 bool OSD::Init(const QRect &rect, float font_aspect)
 {
     m_Rect = rect;
-    m_fontStretch = (int)((font_aspect * 100) + 0.5f);
+    m_fontStretch = lroundf(font_aspect * 100);
     OverrideUIScale();
     LoadWindows();
     RevertUIScale();
@@ -254,7 +255,7 @@ void OSD::RevertUIScale(void)
 bool OSD::Reinit(const QRect &rect, float font_aspect)
 {
     m_Refresh = true;
-    int new_stretch = (int)((font_aspect * 100) + 0.5f);
+    int new_stretch = lroundf(font_aspect * 100);
     if ((rect == m_Rect) && (new_stretch == m_fontStretch))
         return true;
     if (m_Dialog && m_Dialog->objectName() == OSD_DLG_NAVIGATE
@@ -598,7 +599,7 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
         return;
 
     bar->ClearRegions();
-    if (!map.size() || total < 1)
+    if (map.empty() || total < 1)
     {
         bar->Display();
         return;
@@ -648,7 +649,7 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
         }
     }
     if (start > -1 && end < 0)
-        bar->AddRegion((float)((double)start/(double)total), 1.0f);
+        bar->AddRegion((float)((double)start/(double)total), 1.0F);
 
     bar->Display();
 }
@@ -942,10 +943,15 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
 
     // assist yuv blending with some friendly alignments
     QRegion aligned;
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     QVector<QRect> rects = visible.rects();
     for (int i = 0; i < rects.size(); i++)
     {
-        QRect r   = rects[i];
+        const QRect& r = rects[i];
+#else
+    for (const QRect& r : visible)
+    {
+#endif
         int left  = r.left() & ~(alignx - 1);
         int top   = r.top()  & ~(aligny - 1);
         int right = (r.left() + r.width());
@@ -1159,7 +1165,7 @@ bool OSD::HasWindow(const QString &window)
     return m_Children.contains(window);
 }
 
-bool OSD::DialogVisible(QString window)
+bool OSD::DialogVisible(const QString& window)
 {
     if (!m_Dialog || window.isEmpty())
         return m_Dialog;
@@ -1269,7 +1275,7 @@ void OSD::DialogSetText(const QString &text)
         dialog->SetText(text);
 }
 
-void OSD::DialogBack(QString text, QVariant data, bool exit)
+void OSD::DialogBack(const QString& text, const QVariant& data, bool exit)
 {
     MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
@@ -1280,11 +1286,11 @@ void OSD::DialogBack(QString text, QVariant data, bool exit)
     }
 }
 
-void OSD::DialogAddButton(QString text, QVariant data, bool menu, bool current)
+void OSD::DialogAddButton(const QString& text, QVariant data, bool menu, bool current)
 {
     MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
-        dialog->AddButton(text, data, menu, current);
+        dialog->AddButton(text, std::move(data), menu, current);
 }
 
 void OSD::DialogGetText(InfoMap &map)
@@ -1547,7 +1553,7 @@ bool OsdNavigation::keyPressEvent(QKeyEvent *event)
     if (!handled)
     {
         QStringList actions;
-        bool handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
+        handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1578,7 +1584,7 @@ void OsdNavigation::ShowMenu(void)
     sendResult(100,"MENU");
 }
 
-void OsdNavigation::sendResult(int result, QString action)
+void OsdNavigation::sendResult(int result, const QString& action)
 {
     if (!m_retObject)
         return;

@@ -392,11 +392,10 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			}
 		} 
 	} while(!done);
-	return;
 }
 
 
-static uint32_t scr_base_ps(uint8_t *scr)
+static uint32_t scr_base_ps(const uint8_t *scr)
 {
 	uint32_t base = 0;
 	uint8_t *buf = (uint8_t *)&base;
@@ -419,7 +418,7 @@ static uint32_t scr_base_ps(uint8_t *scr)
 	return base;
 }
 
-static uint16_t scr_ext_ps(uint8_t *scr)
+static uint16_t scr_ext_ps(const uint8_t *scr)
 {
 	short ext = 0;
 
@@ -584,15 +583,14 @@ static int write_ps_header(uint8_t *buf,
 		cwrite_ps(buf, &p, PS_HEADER_L2);
 		kill_ps(&p);
 		return PS_HEADER_L2;
-	} else {
-		cwrite_ps(buf, &p, PS_HEADER_L1);
-		kill_ps(&p);
-		return PS_HEADER_L1;
 	}
+        cwrite_ps(buf, &p, PS_HEADER_L1);
+        kill_ps(&p);
+        return PS_HEADER_L1;
 }
 
 
-static void get_pespts(uint8_t *spts,uint8_t *pts)
+static void get_pespts(const uint8_t *spts,uint8_t *pts)
 {
 	//Make sure to set the 1st 4 bits properly
         pts[0] = 0x01 |

@@ -164,7 +164,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool DownloadYUVFrame(uint id, void* const planes[3], uint32_t pitches[3]);
     bool DrawBitmap(uint id, uint target, const QRect *src,
                     const QRect *dst, VDPBlendType blendi = kVDPBlendNormal,
-                    int alpha = 0, int red = 0, int blue = 0, int green = 0);
+                    int alpha = 0, int red = 0, int green = 0, int blue = 0);
     bool DrawLayer(uint id, uint target);
 
     int   GetBitmapSize(uint id);
@@ -210,21 +210,21 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
 
   private:
     VdpRect                          m_rect;
-    bool                             m_preempted;
-    bool                             m_recreating;
-    bool                             m_recreated;
-    bool                             m_reset_video_surfaces;
-    QMutex                           m_render_lock;
-    QMutex                           m_decode_lock;
-    MythXDisplay                    *m_display;
-    WId                              m_window;
-    VdpDevice                        m_device;
-    uint                             m_surface;
-    VdpPresentationQueue             m_flipQueue;
-    VdpPresentationQueueTarget       m_flipTarget;
-    bool                             m_flipReady;
-    uint                             m_colorKey;
-    bool                             m_flipFrames;
+    bool                             m_preempted   {false};
+    bool                             m_recreating  {false};
+    bool                             m_recreated   {false};
+    bool                             m_reset_video_surfaces {false};
+    QMutex                           m_render_lock {QMutex::Recursive};
+    QMutex                           m_decode_lock {QMutex::Recursive};
+    MythXDisplay                    *m_display     {nullptr};
+    WId                              m_window      {0};
+    VdpDevice                        m_device      {0};
+    uint                             m_surface     {0};
+    VdpPresentationQueue             m_flipQueue   {0};
+    VdpPresentationQueueTarget       m_flipTarget  {0};
+    bool                             m_flipReady   {false};
+    uint                             m_colorKey    {0};
+    bool                             m_flipFrames  {false};
 
     QVector<uint>                    m_surfaces;
     QHash<uint, VDPAUOutputSurface>  m_outputSurfaces;
@@ -235,49 +235,49 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     QHash<VdpVideoSurface, uint>     m_videoSurfaceHash;
     QHash<uint, VDPAULayer>          m_layers;
 
-    VdpGetProcAddress               *vdp_get_proc_address;
-    VdpGetErrorString               *vdp_get_error_string;
-    VdpDeviceDestroy                *vdp_device_destroy;
-    VdpGetApiVersion                *vdp_get_api_version;
-    VdpGetInformationString         *vdp_get_information_string;
-    VdpVideoSurfaceCreate           *vdp_video_surface_create;
-    VdpVideoSurfaceDestroy          *vdp_video_surface_destroy;
-    VdpVideoSurfaceGetBitsYCbCr     *vdp_video_surface_put_bits_y_cb_cr;
-    VdpVideoSurfaceGetParameters    *vdp_video_surface_get_parameters;
-    VdpVideoSurfacePutBitsYCbCr     *vdp_video_surface_get_bits_y_cb_cr;
-    VdpOutputSurfacePutBitsNative   *vdp_output_surface_put_bits_native;
-    VdpOutputSurfaceCreate          *vdp_output_surface_create;
-    VdpOutputSurfaceDestroy         *vdp_output_surface_destroy;
-    VdpOutputSurfaceRenderBitmapSurface *vdp_output_surface_render_bitmap_surface;
-    VdpOutputSurfaceGetParameters   *vdp_output_surface_get_parameters;
-    VdpOutputSurfaceGetBitsNative   *vdp_output_surface_get_bits_native;
-    VdpOutputSurfaceRenderOutputSurface *vdp_output_surface_render_output_surface;
-    VdpVideoMixerCreate             *vdp_video_mixer_create;
-    VdpVideoMixerSetFeatureEnables  *vdp_video_mixer_set_feature_enables;
-    VdpVideoMixerDestroy            *vdp_video_mixer_destroy;
-    VdpVideoMixerRender             *vdp_video_mixer_render;
-    VdpVideoMixerSetAttributeValues *vdp_video_mixer_set_attribute_values;
-    VdpGenerateCSCMatrix            *vdp_generate_csc_matrix;
-    VdpVideoMixerQueryFeatureSupport *vdp_video_mixer_query_feature_support;
-    VdpPresentationQueueTargetDestroy *vdp_presentation_queue_target_destroy;
-    VdpPresentationQueueCreate      *vdp_presentation_queue_create;
-    VdpPresentationQueueDestroy     *vdp_presentation_queue_destroy;
-    VdpPresentationQueueDisplay     *vdp_presentation_queue_display;
+    VdpGetProcAddress               *vdp_get_proc_address {nullptr};
+    VdpGetErrorString               *vdp_get_error_string {nullptr};
+    VdpDeviceDestroy                *vdp_device_destroy {nullptr};
+    VdpGetApiVersion                *vdp_get_api_version {nullptr};
+    VdpGetInformationString         *vdp_get_information_string {nullptr};
+    VdpVideoSurfaceCreate           *vdp_video_surface_create {nullptr};
+    VdpVideoSurfaceDestroy          *vdp_video_surface_destroy {nullptr};
+    VdpVideoSurfaceGetBitsYCbCr     *vdp_video_surface_put_bits_y_cb_cr {nullptr};
+    VdpVideoSurfaceGetParameters    *vdp_video_surface_get_parameters {nullptr};
+    VdpVideoSurfacePutBitsYCbCr     *vdp_video_surface_get_bits_y_cb_cr {nullptr};
+    VdpOutputSurfacePutBitsNative   *vdp_output_surface_put_bits_native {nullptr};
+    VdpOutputSurfaceCreate          *vdp_output_surface_create {nullptr};
+    VdpOutputSurfaceDestroy         *vdp_output_surface_destroy {nullptr};
+    VdpOutputSurfaceRenderBitmapSurface *vdp_output_surface_render_bitmap_surface {nullptr};
+    VdpOutputSurfaceGetParameters   *vdp_output_surface_get_parameters {nullptr};
+    VdpOutputSurfaceGetBitsNative   *vdp_output_surface_get_bits_native {nullptr};
+    VdpOutputSurfaceRenderOutputSurface *vdp_output_surface_render_output_surface {nullptr};
+    VdpVideoMixerCreate             *vdp_video_mixer_create {nullptr};
+    VdpVideoMixerSetFeatureEnables  *vdp_video_mixer_set_feature_enables {nullptr};
+    VdpVideoMixerDestroy            *vdp_video_mixer_destroy {nullptr};
+    VdpVideoMixerRender             *vdp_video_mixer_render {nullptr};
+    VdpVideoMixerSetAttributeValues *vdp_video_mixer_set_attribute_values {nullptr};
+    VdpGenerateCSCMatrix            *vdp_generate_csc_matrix {nullptr};
+    VdpVideoMixerQueryFeatureSupport *vdp_video_mixer_query_feature_support {nullptr};
+    VdpPresentationQueueTargetDestroy *vdp_presentation_queue_target_destroy {nullptr};
+    VdpPresentationQueueCreate      *vdp_presentation_queue_create {nullptr};
+    VdpPresentationQueueDestroy     *vdp_presentation_queue_destroy {nullptr};
+    VdpPresentationQueueDisplay     *vdp_presentation_queue_display {nullptr};
     VdpPresentationQueueBlockUntilSurfaceIdle
-                                    *vdp_presentation_queue_block_until_surface_idle;
+                                    *vdp_presentation_queue_block_until_surface_idle {nullptr};
     VdpPresentationQueueTargetCreateX11
-                                    *vdp_presentation_queue_target_create_x11;
-    VdpPresentationQueueGetTime     *vdp_presentation_queue_get_time;
+                                    *vdp_presentation_queue_target_create_x11 {nullptr};
+    VdpPresentationQueueGetTime     *vdp_presentation_queue_get_time {nullptr};
     VdpPresentationQueueSetBackgroundColor
-                                    *vdp_presentation_queue_set_background_color;
-    VdpDecoderCreate                *vdp_decoder_create;
-    VdpDecoderDestroy               *vdp_decoder_destroy;
-    VdpDecoderRender                *vdp_decoder_render;
-    VdpDecoderQueryCapabilities     *vdp_decoder_query_capabilities;
-    VdpBitmapSurfaceCreate          *vdp_bitmap_surface_create;
-    VdpBitmapSurfaceDestroy         *vdp_bitmap_surface_destroy;
-    VdpBitmapSurfacePutBitsNative   *vdp_bitmap_surface_put_bits_native;
-    VdpPreemptionCallbackRegister   *vdp_preemption_callback_register;
+                                    *vdp_presentation_queue_set_background_color {nullptr};
+    VdpDecoderCreate                *vdp_decoder_create {nullptr};
+    VdpDecoderDestroy               *vdp_decoder_destroy {nullptr};
+    VdpDecoderRender                *vdp_decoder_render {nullptr};
+    VdpDecoderQueryCapabilities     *vdp_decoder_query_capabilities {nullptr};
+    VdpBitmapSurfaceCreate          *vdp_bitmap_surface_create {nullptr};
+    VdpBitmapSurfaceDestroy         *vdp_bitmap_surface_destroy {nullptr};
+    VdpBitmapSurfacePutBitsNative   *vdp_bitmap_surface_put_bits_native {nullptr};
+    VdpPreemptionCallbackRegister   *vdp_preemption_callback_register {nullptr};
 };
 
 #endif

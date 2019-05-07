@@ -13,20 +13,6 @@
 #include "bluraymetadata.h"
 #include "mythdirs.h"
 
-BlurayMetadata::BlurayMetadata(const QString &path) :
-    m_bdnav(nullptr),
-    m_title(QString()),          m_alttitle(QString()),
-    m_language(QString()),       m_discnumber(0),
-    m_disctotal(0),              m_path(path),
-    m_images(QStringList()),     m_topMenuSupported(false),
-    m_firstPlaySupported(false), m_numHDMVTitles(0),
-    m_numBDJTitles(0),           m_numUnsupportedTitles(0),
-    m_aacsDetected(false),       m_libaacsDetected(false),
-    m_aacsHandled(false),        m_bdplusDetected(false),
-    m_libbdplusDetected(false),  m_bdplusHandled(false)
-{
-}
-
 BlurayMetadata::~BlurayMetadata()
 {
     if (m_bdnav)
@@ -44,10 +30,7 @@ bool BlurayMetadata::OpenDisc(void)
 
     m_bdnav = bd_open(m_path.toLatin1().data(), keyfilepath);
 
-    if (!m_bdnav)
-        return false;
-
-    return true;
+    return m_bdnav != nullptr;
 }
 
 bool BlurayMetadata::ParseDisc(void)
@@ -85,17 +68,17 @@ bool BlurayMetadata::ParseDisc(void)
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(m_bdnav);
     if (discinfo)
     {
-        m_topMenuSupported   = discinfo->top_menu_supported;
-        m_firstPlaySupported = discinfo->first_play_supported;
+        m_topMenuSupported   = (discinfo->top_menu_supported != 0U);
+        m_firstPlaySupported = (discinfo->first_play_supported != 0U);
         m_numHDMVTitles = discinfo->num_hdmv_titles;
         m_numBDJTitles = discinfo->num_bdj_titles;
         m_numUnsupportedTitles = discinfo->num_unsupported_titles;
-        m_aacsDetected = discinfo->aacs_detected;
-        m_libaacsDetected = discinfo->libaacs_detected;
-        m_aacsHandled = discinfo->aacs_handled;
-        m_bdplusDetected = discinfo->bdplus_detected;
-        m_libbdplusDetected = discinfo->libbdplus_detected;
-        m_bdplusHandled = discinfo->bdplus_handled;
+        m_aacsDetected = (discinfo->aacs_detected != 0U);
+        m_libaacsDetected = (discinfo->libaacs_detected != 0U);
+        m_aacsHandled = (discinfo->aacs_handled != 0U);
+        m_bdplusDetected = (discinfo->bdplus_detected != 0U);
+        m_libbdplusDetected = (discinfo->libbdplus_detected != 0U);
+        m_bdplusHandled = (discinfo->bdplus_handled != 0U);
     }
 
     return true;

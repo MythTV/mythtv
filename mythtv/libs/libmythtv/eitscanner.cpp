@@ -20,7 +20,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("EITScanner: ")
-#define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
+#define LOC_ID QString("EITScanner[%1]: ").arg(m_cardnum)
 
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.
@@ -29,39 +29,34 @@
  *
  */
 
-EITScanner::EITScanner(uint _cardnum)
-    : channel(nullptr),           eitSource(nullptr),
-      eitHelper(new EITHelper()), eventThread(new MThread("EIT", this)),
-      exitThread(false),
-      rec(nullptr),               activeScan(false),
-      activeScanStopped(true),    activeScanTrigTime(0),
-      activeScanNextChanIndex(random()),
-      cardnum(_cardnum)
+EITScanner::EITScanner(uint cardnum)
+    : m_eitHelper(new EITHelper()), m_eventThread(new MThread("EIT", this)),
+      m_cardnum(cardnum)
 {
     QStringList langPref = iso639_get_language_list();
-    eitHelper->SetLanguagePreferences(langPref);
+    m_eitHelper->SetLanguagePreferences(langPref);
 
-    eventThread->start(QThread::IdlePriority);
+    m_eventThread->start(QThread::IdlePriority);
 }
 
 void EITScanner::TeardownAll(void)
 {
     StopActiveScan();
-    if (!exitThread)
+    if (!m_exitThread)
     {
-        lock.lock();
-        exitThread = true;
-        exitThreadCond.wakeAll();
-        lock.unlock();
+        m_lock.lock();
+        m_exitThread = true;
+        m_exitThreadCond.wakeAll();
+        m_lock.unlock();
     }
-    eventThread->wait();
-    delete eventThread;
-    eventThread = nullptr;
+    m_eventThread->wait();
+    delete m_eventThread;
+    m_eventThread = nullptr;
 
-    if (eitHelper)
+    if (m_eitHelper)
     {
-        delete eitHelper;
-        eitHelper = nullptr;
+        delete m_eitHelper;
+        m_eitHelper = nullptr;
     }
 }
 
@@ -71,19 +66,19 @@ void EITScanner::TeardownAll(void)
 void EITScanner::run(void)
 {
     static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
-    static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
+    static const float rt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
 
-    lock.lock();
+    m_lock.lock();
 
     MythTimer t;
     uint eitCount = 0;
 
-    while (!exitThread)
+    while (!m_exitThread)
     {
-        lock.unlock();
-        uint list_size = eitHelper->GetListSize();
+        m_lock.unlock();
+        uint list_size = m_eitHelper->GetListSize();
 
-        float rate = 1.0f;
+        float rate = 1.0F;
         for (uint i = 0; i < 5; i++)
         {
             if (list_size >= sz[i])
@@ -93,14 +88,14 @@ void EITScanner::run(void)
             }
         }
 
-        lock.lock();
-        if (eitSource)
-            eitSource->SetEITRate(rate);
-        lock.unlock();
+        m_lock.lock();
+        if (m_eitSource)
+            m_eitSource->SetEITRate(rate);
+        m_lock.unlock();
 
         if (list_size)
         {
-            eitCount += eitHelper->ProcessEvents();
+            eitCount += m_eitHelper->ProcessEvents();
             t.start();
         }
 
@@ -108,7 +103,7 @@ void EITScanner::run(void)
         // we are in passive scan
         // and there have been updated events since the last scheduler run
         // but not in the last 60 seconds
-        if (!activeScan && eitCount && (t.elapsed() > 60 * 1000))
+        if (!m_activeScan && eitCount && (t.elapsed() > 60 * 1000))
         {
             LOG(VB_EIT, LOG_INFO,
                 LOC_ID + QString("Added %1 EIT Events").arg(eitCount));
@@ -117,7 +112,7 @@ void EITScanner::run(void)
         }
 
         // Is it time to move to the next transport in active scan?
-        if (activeScan && (MythDate::current() > activeScanNextTrig))
+        if (m_activeScan && (MythDate::current() > m_activeScanNextTrig))
         {
             // if there have been any new events, tell scheduler to run.
             if (eitCount)
@@ -128,63 +123,62 @@ void EITScanner::run(void)
                 RescheduleRecordings();
             }
 
-            if (activeScanNextChan == activeScanChannels.end())
+            if (m_activeScanNextChan == m_activeScanChannels.end())
             {
-                activeScanNextChan = activeScanChannels.begin();
-                activeScanNextChanIndex = 0;
+                m_activeScanNextChan = m_activeScanChannels.begin();
+                m_activeScanNextChanIndex = 0;
             }
 
-            if (!(*activeScanNextChan).isEmpty())
+            if (!(*m_activeScanNextChan).isEmpty())
             {
-                eitHelper->WriteEITCache();
-                if (rec->QueueEITChannelChange(*activeScanNextChan))
+                m_eitHelper->WriteEITCache();
+                if (rec->QueueEITChannelChange(*m_activeScanNextChan))
                 {
-                    eitHelper->SetChannelID(ChannelUtil::GetChanID(
-                        rec->GetSourceID(), *activeScanNextChan));
+                    m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
+                        rec->GetSourceID(), *m_activeScanNextChan));
                     LOG(VB_EIT, LOG_INFO,
                         LOC_ID + QString("Now looking for EIT data on "
                                          "multiplex of channel %1")
-                        .arg(*activeScanNextChan));
+                        .arg(*m_activeScanNextChan));
                 }
             }
 
-            activeScanNextTrig = MythDate::current()
-                .addSecs(activeScanTrigTime);
-            if (activeScanChannels.size())
+            m_activeScanNextTrig = MythDate::current()
+                .addSecs(m_activeScanTrigTime);
+            if (!m_activeScanChannels.empty())
             {
-                ++activeScanNextChan;
-                activeScanNextChanIndex =
-                    (activeScanNextChanIndex+1) % activeScanChannels.size();
+                ++m_activeScanNextChan;
+                m_activeScanNextChanIndex =
+                    (m_activeScanNextChanIndex+1) % m_activeScanChannels.size();
             }
 
             // 24 hours ago
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-            eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
+            m_eitHelper->PruneEITCache(m_activeScanNextTrig.toTime_t() - 86400);
 #else
-            eitHelper->PruneEITCache(activeScanNextTrig.toSecsSinceEpoch() - 86400);
+            m_eitHelper->PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
 #endif
         }
 
-        lock.lock();
-        if ((activeScan || activeScanStopped) && !exitThread)
-            exitThreadCond.wait(&lock, 400); // sleep up to 400 ms.
+        m_lock.lock();
+        if ((m_activeScan || m_activeScanStopped) && !m_exitThread)
+            m_exitThreadCond.wait(&m_lock, 400); // sleep up to 400 ms.
 
-        if (!activeScan && !activeScanStopped)
+        if (!m_activeScan && !m_activeScanStopped)
         {
-            activeScanStopped = true;
-            activeScanCond.wakeAll();
+            m_activeScanStopped = true;
+            m_activeScanCond.wakeAll();
         }
     }
 
     if (eitCount) /* some events have been handled since the last schedule request */
     {
-        eitCount = 0;
         RescheduleRecordings();
     }
 
-    activeScanStopped = true;
-    activeScanCond.wakeAll();
-    lock.unlock();
+    m_activeScanStopped = true;
+    m_activeScanCond.wakeAll();
+    m_lock.unlock();
 }
 
 /** \fn EITScanner::RescheduleRecordings(void)
@@ -195,25 +189,25 @@ void EITScanner::run(void)
  */
 void EITScanner::RescheduleRecordings(void)
 {
-    eitHelper->RescheduleRecordings();
+    m_eitHelper->RescheduleRecordings();
 }
 
 /** \fn EITScanner::StartPassiveScan(ChannelBase*, EITSource*, bool)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
  */
-void EITScanner::StartPassiveScan(ChannelBase *_channel,
-                                  EITSource *_eitSource)
+void EITScanner::StartPassiveScan(ChannelBase *channel,
+                                  EITSource *eitSource)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
-    eitSource     = _eitSource;
-    channel       = _channel;
+    m_eitSource   = eitSource;
+    m_channel     = channel;
 
-    eitSource->SetEITHelper(eitHelper);
-    eitSource->SetEITRate(1.0f);
-    eitHelper->SetChannelID(channel->GetChanID());
-    eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(channel->GetChanID()));
+    m_eitSource->SetEITHelper(m_eitHelper);
+    m_eitSource->SetEITRate(1.0F);
+    m_eitHelper->SetChannelID(m_channel->GetChanID());
+    m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(m_channel->GetChanID()));
 
     LOG(VB_EIT, LOG_INFO, LOC_ID + "Started passive scan.");
 }
@@ -223,25 +217,25 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
  */
 void EITScanner::StopPassiveScan(void)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
-    if (eitSource)
+    if (m_eitSource)
     {
-        eitSource->SetEITHelper(nullptr);
-        eitSource  = nullptr;
+        m_eitSource->SetEITHelper(nullptr);
+        m_eitSource  = nullptr;
     }
-    channel = nullptr;
+    m_channel = nullptr;
 
-    eitHelper->WriteEITCache();
-    eitHelper->SetChannelID(0);
-    eitHelper->SetSourceID(0);
+    m_eitHelper->WriteEITCache();
+    m_eitHelper->SetChannelID(0);
+    m_eitHelper->SetSourceID(0);
 }
 
 void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 {
     rec = _rec;
 
-    if (activeScanChannels.isEmpty())
+    if (m_activeScanChannels.isEmpty())
     {
         // TODO get input name and use it in crawl.
         MSqlQuery query(MSqlQuery::InitCon());
@@ -268,53 +262,53 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         }
 
         while (query.next())
-            activeScanChannels.push_back(query.value(0).toString());
+            m_activeScanChannels.push_back(query.value(0).toString());
 
-        activeScanNextChan = activeScanChannels.begin();
+        m_activeScanNextChan = m_activeScanChannels.begin();
     }
 
     LOG(VB_EIT, LOG_INFO, LOC_ID +
         QString("StartActiveScan called with %1 multiplexes")
-            .arg(activeScanChannels.size()));
+            .arg(m_activeScanChannels.size()));
 
     // Start at a random channel. This is so that multiple cards with
     // the same source don't all scan the same channels in the same
     // order when the backend is first started up.
-    if (activeScanChannels.size())
+    if (!m_activeScanChannels.empty())
     {
         // The start channel is random.  From now on, start on the
         // next channel.  This makes sure the immediately following
         // channels get scanned in a timely manner if we keep erroring
         // out on the previous channel.
-        activeScanNextChanIndex =
-            (activeScanNextChanIndex+1) % activeScanChannels.size();
-        activeScanNextChan =
-            activeScanChannels.begin() + activeScanNextChanIndex;
+        m_activeScanNextChanIndex =
+            (m_activeScanNextChanIndex+1) % m_activeScanChannels.size();
+        m_activeScanNextChan =
+            m_activeScanChannels.begin() + m_activeScanNextChanIndex;
 
-        activeScanNextTrig = MythDate::current();
-        activeScanTrigTime = max_seconds_per_source;
+        m_activeScanNextTrig = MythDate::current();
+        m_activeScanTrigTime = max_seconds_per_source;
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
-        activeScanTrigTime += random() % 29;
-        activeScanStopped = false;
-        activeScan = true;
+        m_activeScanTrigTime += random() % 29;
+        m_activeScanStopped = false;
+        m_activeScan = true;
     }
 }
 
 void EITScanner::StopActiveScan(void)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
-    activeScanStopped = false;
-    activeScan = false;
-    exitThreadCond.wakeAll();
+    m_activeScanStopped = false;
+    m_activeScan = false;
+    m_exitThreadCond.wakeAll();
 
     locker.unlock();
     StopPassiveScan();
     locker.relock();
 
-    while (!activeScan && !activeScanStopped)
-        activeScanCond.wait(&lock, 100);
+    while (!m_activeScan && !m_activeScanStopped)
+        m_activeScanCond.wait(&m_lock, 100);
 
     rec = nullptr;
 }

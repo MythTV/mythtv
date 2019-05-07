@@ -30,20 +30,21 @@ class AudioInputOSS : public AudioInput
         explicit AudioInputOSS(const QString &device);
         ~AudioInputOSS() { Close(); };
 
-        bool Open(uint sample_bits, uint sample_rate, uint channels);
-        inline bool IsOpen(void) { return (dsp_fd > -1); }
-        void Close(void);
+        bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
+        inline bool IsOpen(void) override // AudioInput
+            { return (dsp_fd > -1); }
+        void Close(void) override; // AudioInput
 
-        bool Start(void);
-        bool Stop(void);
+        bool Start(void) override; // AudioInput
+        bool Stop(void) override; // AudioInput
 
-        int GetBlockSize(void);
-        int GetSamples(void *buffer, uint num_samples);
-        int GetNumReadyBytes(void);
+        int GetBlockSize(void) override; // AudioInput
+        int GetSamples(void *buffer, uint num_bytes) override; // AudioInput
+        int GetNumReadyBytes(void) override; // AudioInput
 
     private:
         QByteArray m_device_name;
-        int dsp_fd;
+    int dsp_fd {-1};
 };
 #endif /* _AUDIOINPUTOSS_H_ */
 

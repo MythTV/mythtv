@@ -22,7 +22,7 @@
 #include "asistreamhandler.h"
 
 #define LOC QString("ASISigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+    .arg(m_inputid).arg(m_channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -42,11 +42,10 @@ ASISignalMonitor::ASISignalMonitor(int db_cardnum,
                                    ASIChannel *_channel,
                                    bool _release_stream,
                                    uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      streamHandlerStarted(false), streamHandler(nullptr)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-    streamHandler = ASIStreamHandler::Get(_channel->GetDevice());
+    streamHandler = ASIStreamHandler::Get(_channel->GetDevice(), m_inputid);
 }
 
 /** \fn ASISignalMonitor::~ASISignalMonitor()
@@ -55,8 +54,8 @@ ASISignalMonitor::ASISignalMonitor(int db_cardnum,
 ASISignalMonitor::~ASISignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
-    ASIStreamHandler::Return(streamHandler);
+    ASISignalMonitor::Stop();
+    ASIStreamHandler::Return(streamHandler, m_inputid);
 }
 
 /** \fn ASISignalMonitor::Stop(void)
@@ -75,7 +74,7 @@ void ASISignalMonitor::Stop(void)
 
 ASIChannel *ASISignalMonitor::GetASIChannel(void)
 {
-    return dynamic_cast<ASIChannel*>(channel);
+    return dynamic_cast<ASIChannel*>(m_channel);
 }
 
 /** \fn ASISignalMonitor::UpdateValues(void)
@@ -86,7 +85,7 @@ ASIChannel *ASISignalMonitor::GetASIChannel(void)
  */
 void ASISignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
     if (streamHandlerStarted)
@@ -97,16 +96,16 @@ void ASISignalMonitor::UpdateValues(void)
 
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
     // Set SignalMonitorValues from info from card.
     bool isLocked = true;
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(100);
-        signalLock.SetValue(1);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(100);
+        m_signalLock.SetValue(1);
     }
 
     EmitStatus();
@@ -124,5 +123,5 @@ void ASISignalMonitor::UpdateValues(void)
         streamHandlerStarted = true;
     }
 
-    update_done = true;
+    m_update_done = true;
 }

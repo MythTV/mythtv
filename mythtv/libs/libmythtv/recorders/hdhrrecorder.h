@@ -19,24 +19,25 @@ class HDHRStreamHandler;
 class HDHRRecorder : public DTVRecorder
 {
   public:
-    HDHRRecorder(TVRec *rec, HDHRChannel *channel);
+    HDHRRecorder(TVRec *rec, HDHRChannel *channel)
+        : DTVRecorder(rec), m_channel(channel) {}
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
-    bool IsOpen(void) const { return _stream_handler; }
+    bool IsOpen(void) const { return m_stream_handler; }
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
-    QString GetSIStandard(void) const;
+    QString GetSIStandard(void) const override; // DTVRecorder
 
   private:
     void ReaderPaused(int fd);
-    bool PauseAndWait(int timeout = 100);
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
   private:
-    HDHRChannel       *_channel;
-    HDHRStreamHandler *_stream_handler;
+    HDHRChannel       *m_channel        {nullptr};
+    HDHRStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif

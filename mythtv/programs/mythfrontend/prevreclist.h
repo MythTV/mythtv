@@ -33,12 +33,12 @@ class PrevRecordedList : public ScheduleCommon
     explicit PrevRecordedList(MythScreenStack *parent, uint recid = 0,
                         const QString &title = QString());
     ~PrevRecordedList();
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void ShowItemMenu(void);
     void updateInfo(void);
     void showListLoseFocus(void);
@@ -51,8 +51,8 @@ class PrevRecordedList : public ScheduleCommon
     void ShowDeleteOldEpisodeMenu(void);
 
   protected:
-    void Init(void);
-    void Load(void);
+    void Init(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
 
     bool LoadTitles(void);
     bool LoadDates(void);
@@ -63,29 +63,29 @@ class PrevRecordedList : public ScheduleCommon
     void LoadShowsByTitle(void);
     void LoadShowsByDate(void);
 
-    ProgramInfo *GetCurrentProgram(void) const;
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     // Left hand list - titles or dates
     ProgramList m_titleData;
-    MythUIButtonList *m_titleList;
+    MythUIButtonList *m_titleList      {nullptr};
     // Right hand list - show details
     ProgramList m_showData;
-    MythUIButtonList *m_showList;
-    // MythUIStateType *m_groupByState;
+    MythUIButtonList *m_showList       {nullptr};
+    // MythUIStateType *m_groupByState {nullptr};
 
-    MythUIText       *m_curviewText;
-    MythUIText       *m_help1Text;
-    MythUIText       *m_help2Text;
+    MythUIText       *m_curviewText    {nullptr};
+    MythUIText       *m_help1Text      {nullptr};
+    MythUIText       *m_help2Text      {nullptr};
 
     InfoMap m_infoMap;
 
-    bool              m_titleGroup;
-    bool              m_reverseSort;
-    bool              m_allowEvents;
-    uint              m_recid;
+    bool              m_titleGroup     {true};
+    bool              m_reverseSort    {false};
+    bool              m_allowEvents    {true};
+    uint              m_recid          {0};
     QString           m_title;
     QString           m_where;
-    bool              m_loadShows;
+    bool              m_loadShows      {false};
 };
 
 #endif

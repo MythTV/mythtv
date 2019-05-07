@@ -100,23 +100,27 @@ struct
     int  buflen;
 } EXC /* = { 0 }*/ ;
 
-#define exc_try do { struct exc__state exc_s; int exc_type GCCATTR_UNUSED; \
-    exc_s.prev = EXC.last; EXC.last = &exc_s; if ((exc_type = setjmp(exc_s.env)) == 0)
+// These macros now all take a parameter 'x' to specify a recursion
+// level.  This will then generate unique variable names for each
+// level of recursion, preventing the compiler from complaining about
+// shadowed variables.
+#define exc_try(x) do { struct exc__state exc_s##x; int exc_type##x GCCATTR_UNUSED; \
+    exc_s##x.prev = EXC.last; EXC.last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
 
-#define exc_ftry do { struct exc__state exc_s, *exc_p = EXC.last; \
-    int exc_type GCCATTR_UNUSED; exc_s.prev = EXC.last; \
-    EXC.last = &exc_s; if ((exc_type = setjmp(exc_s.env)) == 0)
+#define exc_ftry(x) do { struct exc__state exc_s##x, *exc_p##x = EXC.last;    \
+    int exc_type##x GCCATTR_UNUSED; exc_s##x.prev = EXC.last; \
+    EXC.last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
 
-#define exc_catch(t) else if (t == exc_type)
+#define exc_catch(x,t) else if ((t) == exc_type##x)
 
-#define exc_end else __exc_throw(exc_type); EXC.last = exc_s.prev; } while (0)
+#define exc_end(x) else __exc_throw(exc_type##x); EXC.last = exc_s##x.prev; } while (0)
 
-#define exc_return for (EXC.last = exc_p;;) return
+#define exc_return(x) for (EXC.last = exc_p##x;) return
 
-#define exc_fthrow for (EXC.last = exc_p;;) ex_throw
+#define exc_fthrow(x) for (EXC.last = exc_p##x;) ex_throw
 
 #define exc_catchall else
-#define exc_endall EXC.last = exc_s.prev; } while (0)
+#define exc_endall(x) EXC.last = exc_s##x.prev; } while (0)
 
 static void __exc_throw(int type) /* protoadd GCCATTR_NORETURN */ 
 {
@@ -195,7 +199,7 @@ static void xxfwrite(FILE * stream, const eu8 * ptr, size_t size)
     }
 }
 
-#define xxfwriteCS(f, s) xxfwrite(f, CUS s, sizeof s - 1)
+#define xxfwriteCS(f, s) xxfwrite(f, CUS s, sizeof (s) - 1)
 
 static void yuv2rgb(int y,   int cr,  int cb,
             eu8 * r, eu8 * g, eu8 * b)  
@@ -663,7 +667,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
     /*sprintf(transparent,
       "%02x%02x%02x", palette[0][0], palette[0][1], palette[0][2]); */
 
-    exc_try 
+    exc_try(1)
     {
         eu32 volatile lastendpts = 0;
 
@@ -682,15 +686,15 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
             ctrl = data + pack - 4;
             xxfread(sfh, ctrl, size - pack);
 
-            exc_try 
+            exc_try(2)
             {
                 if (memcmp(xxfread(sfh, (unsigned char *)junk, 2),
                            "SP", 2) != 0)
                 exc_throw(MiscError, "Syncword missing. XXX bailing out."); 
             }
-            exc_catch (EOFIndicator)
+            exc_catch (2,EOFIndicator)
             last = true;
-            exc_end;
+            exc_end(2);
             {
                 time_t ct;
                 BoundStr bs;
@@ -815,14 +819,14 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
             }
         }
     }
-    exc_catch (EOFIndicator) 
+    exc_catch (1,EOFIndicator)
     {
         size_t len = write(1, sptsstr, strlen(sptsstr));
         if (len != strlen(sptsstr))
             printf("ERROR: write failed");
         return;
     }
-    exc_end;
+    exc_end(1);
 }
 
 #if 0
@@ -877,7 +881,7 @@ static bool samepalette(char * filename, eu8 palette[16][3])
 
 int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 {
-    exc_try 
+    exc_try(1)
     {
         int i;
         eu8 yuvpalette[16][3], rgbpalette[16][3];
@@ -985,7 +989,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 
         return 1;
     }
-    exc_endall;
+    exc_endall(1);
 
     return 0; 
 }

@@ -36,7 +36,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "remoteencoder.h"
 #include "encoderlink.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "mainserver.h"
 #include "compat.h"
 #include "mythlogging.h"
@@ -50,7 +50,7 @@ extern AutoExpire *expirer;
 /** If calculated desired space for 10 min freq is > SPACE_TOO_BIG_KB
  *  then we use 5 min expire frequency.
  */
-#define SPACE_TOO_BIG_KB 3*1024*1024
+#define SPACE_TOO_BIG_KB (3*1024*1024)
 
 /// \brief This calls AutoExpire::RunExpirer() from within a new thread.
 void ExpireThread::run(void)
@@ -70,26 +70,12 @@ void ExpireThread::run(void)
  *  \param tvList    EncoderLink list of all recorders
  */
 AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList) :
-    encoderList(tvList),
-    expire_thread(new ExpireThread(this)),
-    desired_freq(15),
-    expire_thread_run(true),
-    main_server(nullptr)
+    m_encoderList(tvList),
+    m_expire_thread(new ExpireThread(this)),
+    m_expire_thread_run(true)
 {
-    expire_thread->start();
+    m_expire_thread->start();
     gCoreContext->addListener(this);
-}
-
-/** \fn AutoExpire::AutoExpire()
- *  \brief Creates AutoExpire class
- */
-AutoExpire::AutoExpire() :
-    encoderList(nullptr),
-    expire_thread(nullptr),
-    desired_freq(15),
-    expire_thread_run(false),
-    main_server(nullptr)
-{
 }
 
 /** \fn AutoExpire::~AutoExpire()
@@ -98,22 +84,22 @@ AutoExpire::AutoExpire() :
 AutoExpire::~AutoExpire()
 {
     {
-        QMutexLocker locker(&instance_lock);
-        expire_thread_run = false;
-        instance_cond.wakeAll();
+        QMutexLocker locker(&m_instance_lock);
+        m_expire_thread_run = false;
+        m_instance_cond.wakeAll();
     }
 
     {
-        QMutexLocker locker(&update_lock);
-        update_queue.clear();
+        QMutexLocker locker(&m_update_lock);
+        m_update_queue.clear();
     }
 
-    if (expire_thread)
+    if (m_expire_thread)
     {
         gCoreContext->removeListener(this);
-        expire_thread->wait();
-        delete expire_thread;
-        expire_thread = nullptr;
+        m_expire_thread->wait();
+        delete m_expire_thread;
+        m_expire_thread = nullptr;
     }
 }
 
@@ -124,9 +110,9 @@ AutoExpire::~AutoExpire()
 
 uint64_t AutoExpire::GetDesiredSpace(int fsID) const
 {
-    QMutexLocker locker(&instance_lock);
-    if (desired_space.contains(fsID))
-        return desired_space[fsID];
+    QMutexLocker locker(&m_instance_lock);
+    if (m_desired_space.contains(fsID))
+        return m_desired_space[fsID];
     return 0;
 }
 
@@ -139,10 +125,19 @@ void AutoExpire::CalcParams()
 
     QList<FileSystemInfo> fsInfos;
 
-    instance_lock.lock();
-    if (main_server)
-        main_server->GetFilesystemInfos(fsInfos);
-    instance_lock.unlock();
+    m_instance_lock.lock();
+    if (m_main_server)
+    {
+        // The scheduler relies on something forcing the mainserver
+        // fsinfos cache to get updated periodically.  Currently, that
+        // is done here.  Don't remove or change this invocation
+        // without handling that issue too.  It is done this way
+        // because the scheduler thread can't afford to be blocked by
+        // an unresponsive, remote filesystem and the autoexpirer
+        // thrad can.
+        m_main_server->GetFilesystemInfos(fsInfos, false);
+    }
+    m_instance_lock.unlock();
 
     if (fsInfos.empty())
     {
@@ -162,14 +157,14 @@ void AutoExpire::CalcParams()
     // we use this copying on purpose. The used_encoders map ensures
     // that every encoder writes only to one fs.
     // Copying the data minimizes the time the lock is held
-    instance_lock.lock();
-    QMap<int, int>::const_iterator ueit = used_encoders.begin();
-    while (ueit != used_encoders.end())
+    m_instance_lock.lock();
+    QMap<int, int>::const_iterator ueit = m_used_encoders.begin();
+    while (ueit != m_used_encoders.end())
     {
         fsEncoderMap[*ueit].push_back(ueit.key());
         ++ueit;
     }
-    instance_lock.unlock();
+    m_instance_lock.unlock();
 
     QList<FileSystemInfo>::iterator fsit;
     for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
@@ -198,7 +193,7 @@ void AutoExpire::CalcParams()
                 fsEncoderMap[fsit->getFSysID()].begin();
             for (; encit != fsEncoderMap[fsit->getFSysID()].end(); ++encit)
             {
-                EncoderLink *enc = *(encoderList->find(*encit));
+                EncoderLink *enc = *(m_encoderList->find(*encit));
 
                 if (!enc->IsConnected() || !enc->IsBusy())
                 {
@@ -206,16 +201,16 @@ void AutoExpire::CalcParams()
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Cardid %1: is not recoding, removing it "
                                 "from used list.").arg(*encit));
-                    instance_lock.lock();
-                    used_encoders.remove(*encit);
-                    instance_lock.unlock();
+                    m_instance_lock.lock();
+                    m_used_encoders.remove(*encit);
+                    m_instance_lock.unlock();
                     continue;
                 }
 
                 uint64_t maxBitrate = enc->GetMaxBitrate();
                 if (maxBitrate==0)
                     maxBitrate = 19500000LL;
-                thisKBperMin += (((uint64_t)maxBitrate)*((uint64_t)15))>>11;
+                thisKBperMin += (maxBitrate*((uint64_t)15))>>11;
                 LOG(VB_FILE, LOG_INFO, QString("    Cardid %1: max bitrate "
                         "%2 Kb/sec, fsID %3 max is now %4 KB/min")
                         .arg(enc->GetInputID())
@@ -252,16 +247,16 @@ void AutoExpire::CalcParams()
             .arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
 
     // lock class and save these parameters.
-    instance_lock.lock();
-    desired_freq = expireFreq;
+    m_instance_lock.lock();
+    m_desired_freq = expireFreq;
     // write per file system needed space back, use safety of 33%
     QMap<int, uint64_t>::iterator it = fsMap.begin();
     while (it != fsMap.end())
     {
-        desired_space[it.key()] = (*it + *it/3) * expireFreq + extraKB;
+        m_desired_space[it.key()] = (*it + *it/3) * expireFreq + extraKB;
         ++it;
     }
-    instance_lock.unlock();
+    m_instance_lock.unlock();
 }
 
 /** \brief This contains the main loop for the auto expire process.
@@ -278,34 +273,34 @@ void AutoExpire::RunExpirer(void)
     QDateTime curTime;
     QDateTime next_expire = MythDate::current().addSecs(60);
 
-    QMutexLocker locker(&instance_lock);
+    QMutexLocker locker(&m_instance_lock);
 
     // wait a little for main server to come up and things to settle down
     Sleep(20 * 1000);
 
     timer.start();
 
-    while (expire_thread_run)
+    while (m_expire_thread_run)
     {
-        TVRec::inputsLock.lockForRead();
+        TVRec::s_inputsLock.lockForRead();
 
         curTime = MythDate::current();
         // recalculate auto expire parameters
         if (curTime >= next_expire)
         {
-            update_lock.lock();
-            while (!update_queue.empty())
+            m_update_lock.lock();
+            while (!m_update_queue.empty())
             {
-                UpdateEntry ue = update_queue.dequeue();
-                if (ue.encoder > 0)
-                    used_encoders[ue.encoder] = ue.fsID;
+                UpdateEntry ue = m_update_queue.dequeue();
+                if (ue.m_encoder > 0)
+                    m_used_encoders[ue.m_encoder] = ue.m_fsID;
             }
-            update_lock.unlock();
+            m_update_lock.unlock();
 
             locker.unlock();
             CalcParams();
             locker.relock();
-            if (!expire_thread_run)
+            if (!m_expire_thread_run)
                 break;
         }
         timer.restart();
@@ -321,7 +316,7 @@ void AutoExpire::RunExpirer(void)
         {
             LOG(VB_FILE, LOG_INFO, LOC + "Running now!");
             next_expire =
-                MythDate::current().addSecs(desired_freq * 60);
+                MythDate::current().addSecs(m_desired_freq * 60);
 
             ExpireLiveTV(emNormalLiveTVPrograms);
 
@@ -336,7 +331,7 @@ void AutoExpire::RunExpirer(void)
             ExpireRecordings();
         }
 
-        TVRec::inputsLock.unlock();
+        TVRec::s_inputsLock.unlock();
 
         Sleep(60 * 1000 - timer.elapsed());
     }
@@ -355,9 +350,9 @@ void AutoExpire::Sleep(int sleepTime)
 
     QDateTime little_tm = MythDate::current().addMSecs(sleepTime);
     int timeleft = sleepTime;
-    while (expire_thread_run && (timeleft > 0))
+    while (m_expire_thread_run && (timeleft > 0))
     {
-        instance_cond.wait(&instance_lock, timeleft);
+        m_instance_cond.wait(&m_instance_lock, timeleft);
         timeleft = MythDate::current().secsTo(little_tm) * 1000;
     }
 }
@@ -414,8 +409,8 @@ void AutoExpire::ExpireRecordings(void)
 
     LOG(VB_FILE, LOG_INFO, LOC + "ExpireRecordings()");
 
-    if (main_server)
-        main_server->GetFilesystemInfos(fsInfos);
+    if (m_main_server)
+        m_main_server->GetFilesystemInfos(fsInfos, true);
 
     if (fsInfos.empty())
     {
@@ -508,11 +503,11 @@ void AutoExpire::ExpireRecordings(void)
         }
 
         if (max((int64_t)0LL, fsit->getFreeSpace()) <
-            desired_space[fsit->getFSysID()])
+            m_desired_space[fsit->getFSysID()])
         {
             LOG(VB_FILE, LOG_INFO,
                 QString("    Not Enough Free Space!  We want %1 MB")
-                    .arg(desired_space[fsit->getFSysID()] / 1024));
+                    .arg(m_desired_space[fsit->getFSysID()] / 1024));
 
             QMap<QString, int> dirList;
             QList<FileSystemInfo>::iterator fsit2;
@@ -537,7 +532,7 @@ void AutoExpire::ExpireRecordings(void)
             pginfolist_t::iterator it = expireList.begin();
             while ((it != expireList.end()) &&
                    (max((int64_t)0LL, fsit->getFreeSpace()) <
-                    desired_space[fsit->getFSysID()]))
+                    m_desired_space[fsit->getFSysID()]))
             {
                 ProgramInfo *p = *it;
                 ++it;
@@ -550,8 +545,8 @@ void AutoExpire::ExpireRecordings(void)
                 {
                     bool foundFile = false;
                     QMap<int, EncoderLink *>::Iterator eit =
-                         encoderList->begin();
-                    while (eit != encoderList->end())
+                         m_encoderList->begin();
+                    while (eit != m_encoderList->end())
                     {
                         EncoderLink *el = *eit;
                         eit++;
@@ -563,7 +558,7 @@ void AutoExpire::ExpireRecordings(void)
                             if (el->IsConnected())
                                 foundFile = el->CheckFile(p);
 
-                            eit = encoderList->end();
+                            eit = m_encoderList->end();
                         }
                     }
 
@@ -738,7 +733,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
                     // allow re-record if auto expired
                     RecordingInfo recInfo(chanid, startts);
-                    if (gCoreContext->GetNumSetting("RerecordWatched", 0) ||
+                    if (gCoreContext->GetBoolSetting("RerecordWatched", false) ||
                         !recInfo.IsWatched())
                     {
                         recInfo.ForgetHistory();
@@ -797,7 +792,7 @@ void AutoExpire::FillExpireList(pginfolist_t &expireList)
 /** \fn AutoExpire::PrintExpireList(QString)
  *  \brief Prints a summary of the files that can be deleted.
  */
-void AutoExpire::PrintExpireList(QString expHost)
+void AutoExpire::PrintExpireList(const QString& expHost)
 {
     pginfolist_t expireList;
 
@@ -841,7 +836,7 @@ void AutoExpire::PrintExpireList(QString expHost)
  */
 void AutoExpire::GetAllExpiring(QStringList &strList)
 {
-    QMutexLocker lockit(&instance_lock);
+    QMutexLocker lockit(&m_instance_lock);
     pginfolist_t expireList;
 
     UpdateDontExpireSet();
@@ -866,7 +861,7 @@ void AutoExpire::GetAllExpiring(QStringList &strList)
  */
 void AutoExpire::GetAllExpiring(pginfolist_t &list)
 {
-    QMutexLocker lockit(&instance_lock);
+    QMutexLocker lockit(&m_instance_lock);
     pginfolist_t expireList;
 
     UpdateDontExpireSet();
@@ -919,21 +914,21 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         case emOldestFirst:
             msg = "Adding programs expirable in Oldest First order";
             where = "autoexpire > 0";
-            if (gCoreContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+            if (gCoreContext->GetBoolSetting("AutoExpireWatchedPriority", false))
                 orderby = "recorded.watched DESC, ";
             orderby += "starttime ASC";
             break;
         case emLowestPriorityFirst:
             msg = "Adding programs expirable in Lowest Priority First order";
             where = "autoexpire > 0";
-            if (gCoreContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+            if (gCoreContext->GetBoolSetting("AutoExpireWatchedPriority", false))
                 orderby = "recorded.watched DESC, ";
             orderby += "recorded.recpriority ASC, starttime ASC";
             break;
         case emWeightedTimePriority:
             msg = "Adding programs expirable in Weighted Time Priority order";
             where = "autoexpire > 0";
-            if (gCoreContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+            if (gCoreContext->GetBoolSetting("AutoExpireWatchedPriority", false))
                 orderby = "recorded.watched DESC, ";
             orderby += QString("DATE_ADD(starttime, INTERVAL '%1' * "
                                         "recorded.recpriority DAY) ASC")
@@ -1064,24 +1059,24 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
     {
         if (encoder > 0)
         {
-            expirer->instance_lock.lock();
-            expirer->used_encoders[encoder] = fsID;
-            expirer->instance_lock.unlock();
+            expirer->m_instance_lock.lock();
+            expirer->m_used_encoders[encoder] = fsID;
+            expirer->m_instance_lock.unlock();
         }
         expirer->CalcParams();
-        expirer->instance_cond.wakeAll();
+        expirer->m_instance_cond.wakeAll();
     }
     else
     {
-        expirer->update_lock.lock();
-        expirer->update_queue.append(UpdateEntry(encoder, fsID));
-        expirer->update_lock.unlock();
+        expirer->m_update_lock.lock();
+        expirer->m_update_queue.append(UpdateEntry(encoder, fsID));
+        expirer->m_update_lock.unlock();
     }
 }
 
 void AutoExpire::UpdateDontExpireSet(void)
 {
-    dont_expire_set.clear();
+    m_dont_expire_set.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1104,7 +1099,7 @@ void AutoExpire::UpdateDontExpireSet(void)
         {
             QString key = QString("%1_%2")
                 .arg(chanid).arg(recstartts.toString(Qt::ISODate));
-            dont_expire_set.insert(key);
+            m_dont_expire_set.insert(key);
             LOG(VB_FILE, LOG_INFO, QString("    %1 at %2 in use by %3 on %4")
                     .arg(chanid)
                     .arg(recstartts.toString(Qt::ISODate))
@@ -1121,7 +1116,7 @@ bool AutoExpire::IsInDontExpireSet(
     QString key = QString("%1_%2")
         .arg(chanid).arg(recstartts.toString(Qt::ISODate));
 
-    return (dont_expire_set.find(key) != dont_expire_set.end());
+    return (m_dont_expire_set.find(key) != m_dont_expire_set.end());
 }
 
 bool AutoExpire::IsInExpireList(

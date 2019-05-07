@@ -73,72 +73,62 @@ const int k708MaxColumns = 64; // 6-bit field in DefineWindow
 class CC708CharacterAttribute
 {
   public:
-    uint pen_size;
-    uint offset;
-    uint text_tag;
-    uint font_tag;
-    uint edge_type;
-    uint underline;
-    uint italics;
-    uint boldface;
+    uint   m_pen_size        {k708AttrSizeStandard};
+    uint   m_offset          {k708AttrOffsetNormal};
+    uint   m_text_tag        {0};
+    uint   m_font_tag        {0};                    // system font
+    uint   m_edge_type       {k708AttrEdgeNone};
+    bool   m_underline       {false};
+    bool   m_italics         {false};
+    bool   m_boldface        {false};
 
-    uint fg_color;
-    uint fg_opacity;
-    uint bg_color;
-    uint bg_opacity;
-    uint edge_color;
+    uint   m_fg_color        {k708AttrColorWhite};   // will be overridden
+    uint   m_fg_opacity      {k708AttrOpacitySolid}; // solid
+    uint   m_bg_color        {k708AttrColorBlack};
+    uint   m_bg_opacity      {k708AttrOpacitySolid};
+    uint   m_edge_color      {k708AttrColorBlack};
 
-    QColor actual_fg_color; // if !isValid(), then convert fg_color
+    QColor m_actual_fg_color; // if !isValid(), then convert m_fg_color
 
     CC708CharacterAttribute(bool isItalic = false,
                             bool isBold = false,
                             bool isUnderline = false,
                             QColor fgColor = QColor()) :
-        pen_size(k708AttrSizeStandard),
-        offset(k708AttrOffsetNormal),
-        text_tag(0), // "dialog", ignored
-        font_tag(0), // system font
-        edge_type(k708AttrEdgeNone),
-        underline(isUnderline),
-        italics(isItalic),
-        boldface(isBold),
-        fg_color(k708AttrColorWhite), // will be overridden
-        fg_opacity(k708AttrOpacitySolid), // solid
-        bg_color(k708AttrColorBlack),
-        bg_opacity(k708AttrOpacitySolid),
-        edge_color(k708AttrColorBlack),
-        actual_fg_color(fgColor)
+        m_underline(isUnderline),
+        m_italics(isItalic),
+        m_boldface(isBold),
+        m_actual_fg_color(fgColor)
     {
     }
 
     static QColor ConvertToQColor(uint eia708color);
     QColor GetFGColor(void) const
     {
-        QColor fg = (actual_fg_color.isValid() ?
-                     actual_fg_color : ConvertToQColor(fg_color));
+        QColor fg = (m_actual_fg_color.isValid() ?
+                     m_actual_fg_color : ConvertToQColor(m_fg_color));
         fg.setAlpha(GetFGAlpha());
         return fg;
     }
     QColor GetBGColor(void) const
     {
-        QColor bg = ConvertToQColor(bg_color);
+        QColor bg = ConvertToQColor(m_bg_color);
         bg.setAlpha(GetBGAlpha());
         return bg;
     }
-    QColor GetEdgeColor(void) const { return ConvertToQColor(edge_color); }
+    QColor GetEdgeColor(void) const { return ConvertToQColor(m_edge_color); }
 
     uint GetFGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
         static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
-        return alpha[fg_opacity & 0x3];
+        return alpha[m_fg_opacity & 0x3];
     }
 
     uint GetBGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
         static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
-        return alpha[bg_opacity & 0x3];
+        return alpha[m_bg_opacity & 0x3];
     }
 
     bool operator==(const CC708CharacterAttribute &other) const;
@@ -149,36 +139,36 @@ class CC708CharacterAttribute
 class CC708Pen
 {
   public:
-    CC708Pen() : row(0), column(0) {}
+    CC708Pen() = default;
     void SetPenStyle(uint style);
     void SetAttributes(int pen_size,
                        int offset,       int text_tag,  int font_tag,
                        int edge_type,    int underline, int italics)
     {
-        attr.pen_size  = pen_size;
-        attr.offset    = offset;
-        attr.text_tag  = text_tag;
-        attr.font_tag  = font_tag;
-        attr.edge_type = edge_type;
-        attr.underline = underline;
-        attr.italics   = italics;
-        attr.boldface  = 0;
+        attr.m_pen_size  = pen_size;
+        attr.m_offset    = offset;
+        attr.m_text_tag  = text_tag;
+        attr.m_font_tag  = font_tag;
+        attr.m_edge_type = edge_type;
+        attr.m_underline = underline;
+        attr.m_italics   = italics;
+        attr.m_boldface  = 0;
     }
   public:
     CC708CharacterAttribute attr;
 
-    uint row;
-    uint column;
+    uint m_row    {0};
+    uint m_column {0};
 };
 
 class CC708Window;
 class CC708Character
 {
   public:
-    CC708Character() : character(' ') {}
+    CC708Character() = default;
     explicit CC708Character(const CC708Window &win);
-    CC708CharacterAttribute attr;
-    QChar character;
+    CC708CharacterAttribute m_attr;
+    QChar                   m_character {' '};
 };
 
 class CC708String
@@ -193,10 +183,10 @@ class CC708String
 class MTV_PUBLIC CC708Window
 {
  public:
-    CC708Window();
+    CC708Window() = default;
     ~CC708Window();
 
-    void DefineWindow(int priority,         int visible,
+    void DefineWindow(int priority,         bool visible,
                       int anchor_point,     int relative_pos,
                       int anchor_vertical,  int anchor_horizontal,
                       int row_count,        int column_count,
@@ -214,15 +204,15 @@ class MTV_PUBLIC CC708Window
 
     bool IsPenValid(void) const
     {
-        return ((pen.row < true_row_count) &&
-                (pen.column < true_column_count));
+        return ((m_pen.m_row < m_true_row_count) &&
+                (m_pen.m_column < m_true_column_count));
     }
     CC708Character &GetCCChar(void) const;
     vector<CC708String*> GetStrings(void) const;
     void DisposeStrings(vector<CC708String*> &strings) const;
     QColor GetFillColor(void) const
     {
-        QColor fill = CC708CharacterAttribute::ConvertToQColor(fill_color);
+        QColor fill = CC708CharacterAttribute::ConvertToQColor(m_fill_color);
         fill.setAlpha(GetFillAlpha());
         return fill;
     }
@@ -230,57 +220,57 @@ class MTV_PUBLIC CC708Window
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
         static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
-        return alpha[fill_opacity & 0x3];
+        return alpha[m_fill_opacity & 0x3];
     }
 
  private:
     void Scroll(int row, int col);
 
  public:
-    uint priority;
+    uint            m_priority          {0};
  private:
-    bool m_visible;
+    bool            m_visible           {false};
  public:
     enum {
         kAnchorUpperLeft  = 0, kAnchorUpperCenter, kAnchorUpperRight,
         kAnchorCenterLeft = 3, kAnchorCenter,      kAnchorCenterRight,
         kAnchorLowerLeft  = 6, kAnchorLowerCenter, kAnchorLowerRight,
     };
-    uint anchor_point;
-    uint relative_pos;
-    uint anchor_vertical;
-    uint anchor_horizontal;
-    uint row_count;
-    uint column_count;
-    uint row_lock;
-    uint column_lock;
-    uint pen_style;
-    uint window_style;
+    uint            m_anchor_point      {0};
+    uint            m_relative_pos      {0};
+    uint            m_anchor_vertical   {0};
+    uint            m_anchor_horizontal {0};
+    uint            m_row_count         {0};
+    uint            m_column_count      {0};
+    uint            m_row_lock          {0};
+    uint            m_column_lock       {0};
+//  uint            m_pen_style         {0};
+//  uint            m_window_style      {0};
 
-    uint fill_color;
-    uint fill_opacity;
-    uint border_color;
-    uint border_type;
-    uint scroll_dir;
-    uint print_dir;
-    uint effect_dir;
-    uint display_effect;
-    uint effect_speed;
-    uint justify;
-    uint word_wrap;
+    uint            m_fill_color        {0};
+    uint            m_fill_opacity      {0};
+    uint            m_border_color      {0};
+    uint            m_border_type       {0};
+    uint            m_scroll_dir        {0};
+    uint            m_print_dir         {0};
+    uint            m_effect_dir        {0};
+    uint            m_display_effect    {0};
+    uint            m_effect_speed      {0};
+    uint            m_justify           {0};
+    uint            m_word_wrap         {0};
 
     // These are akin to the capacity of a vector, which is always >=
     // the current size.
-    uint true_row_count;
-    uint true_column_count;
+    uint            m_true_row_count    {0};
+    uint            m_true_column_count {0};
 
-    CC708Character *text;
-    CC708Pen        pen;
+    CC708Character *m_text              {nullptr};
+    CC708Pen        m_pen;
 
  private:
     /// set to false when DeleteWindow is called on the window.
-    bool            m_exists;
-    bool            m_changed;
+    bool            m_exists            {false};
+    bool            m_changed           {true};
 
  public:
     bool GetExists(void) const { return m_exists; }
@@ -306,17 +296,17 @@ class MTV_PUBLIC CC708Window
     {
         m_changed = false;
     }
-    mutable QMutex  lock;
+    mutable QMutex  m_lock {QMutex::Recursive};
 };
 
 class CC708Service
 {
   public:
-    CC708Service() { current_window = 0; }
+    CC708Service() = default;
 
   public:
-    uint current_window;
-    CC708Window windows[k708MaxWindows];
+    uint        m_current_window {0};
+    CC708Window m_windows[k708MaxWindows];
 };
 
 #endif // _CC708_WINDOW_

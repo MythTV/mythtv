@@ -22,7 +22,8 @@ class ProgramInfoCache
 {
     friend class ProgramInfoLoader;
   public:
-    explicit ProgramInfoCache(QObject *o);
+    explicit ProgramInfoCache(QObject *o)
+        : m_listener(o) {}
     ~ProgramInfoCache();
 
     void ScheduleLoad(const bool updateUI = true);
@@ -55,10 +56,10 @@ class ProgramInfoCache
 
     mutable QMutex          m_lock;
     Cache                   m_cache;
-    vector<ProgramInfo*>   *m_next_cache;
-    QObject                *m_listener;
-    bool                    m_load_is_queued;
-    uint                    m_loads_in_progress;
+    vector<ProgramInfo*>   *m_next_cache        {nullptr};
+    QObject                *m_listener          {nullptr};
+    bool                    m_load_is_queued    {false};
+    uint                    m_loads_in_progress {0};
     mutable QWaitCondition  m_load_wait;
 };
 

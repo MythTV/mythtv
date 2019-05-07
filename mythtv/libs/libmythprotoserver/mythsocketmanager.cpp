@@ -35,7 +35,7 @@ class ProcessRequestRunnable : public QRunnable
         m_sock->IncrRef();
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         m_parent.ProcessRequest(m_sock);
         m_sock->DecrRef();
@@ -271,14 +271,11 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
             
             return;
         }
-        else
-        {
-            LOG(VB_SOCKET, LOG_ERR, LOC +
-                "Use of socket attempted before announcement.");
-            listline.clear();
-            listline << "ERROR" << "socket has not been announced";
-            sock->WriteStringList(listline);
-        }
+        LOG(VB_SOCKET, LOG_ERR, LOC +
+            "Use of socket attempted before announcement.");
+        listline.clear();
+        listline << "ERROR" << "socket has not been announced";
+        sock->WriteStringList(listline);
         return;
     }
 

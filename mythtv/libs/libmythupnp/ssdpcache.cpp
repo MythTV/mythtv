@@ -363,28 +363,27 @@ void SSDPCache::Add( const QString &sURI,
     if (pEntry == nullptr)
     {
         QUrl url = sLocation;
-        PortChecker checker;
         QString host = url.host();
         QString hostport = QString("%1:%2").arg(host).arg(url.port(80));
         // Check if the port can be reached. If not we won't use it.
         // Keep a cache of good and bad URLs found so as not to
         // overwhelm the thread will portchecker requests.
         // Allow up to 3 atempts before a port is finally treated as bad.
-        if (badUrlList.count(hostport) < 3)
+        if (m_badUrlList.count(hostport) < 3)
         {
             bool isGoodUrl = false;
-            if (goodUrlList.contains(hostport))
+            if (m_goodUrlList.contains(hostport))
                 isGoodUrl = true;
             else
             {
                 PortChecker checker;
                 if (checker.checkPort(host, url.port(80), 5000))
                 {
-                    goodUrlList.append(hostport);
+                    m_goodUrlList.append(hostport);
                     isGoodUrl=true;
                 }
                 else
-                    badUrlList.append(hostport);
+                    m_badUrlList.append(hostport);
             }
             // Only add if the device can be connected
             if (isGoodUrl)

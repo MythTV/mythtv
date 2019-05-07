@@ -174,7 +174,7 @@
 #define UNZIP_VERSION_STRICT 0x14
 
 //! CRC32 routine
-#define CRC32(c, b) crcTable[((int)c^b) & 0xff] ^ (c >> 8)
+#define CRC32(c, b) crcTable[((int)(c)^(b)) & 0xff] ^ ((c) >> 8)
 
 //! Checks if some file has been already extracted.
 #define UNZIP_CHECK_FOR_VALID_DATA \
@@ -182,17 +182,14 @@
 		if (headers != nullptr)\
 		{\
 			qDebug() << "Corrupted zip archive. Some files might be extracted.";\
-			ec = headers->size() != 0 ? UnZip::PartiallyCorrupted : UnZip::Corrupted;\
+			ec = headers->empty() ? UnZip::Corrupted : UnZip::PartiallyCorrupted;\
 			break;\
 		}\
-		else\
-		{\
-			delete device;\
-			device = nullptr;\
-			qDebug() << "Corrupted or invalid zip archive";\
-			ec = UnZip::Corrupted;\
-			break;\
-		}\
+                delete device;                                  \
+                device = nullptr;                               \
+                qDebug() << "Corrupted or invalid zip archive"; \
+                ec = UnZip::Corrupted;                          \
+                break;                                          \
 	}
 
 
@@ -1299,7 +1296,7 @@ quint16 UnzipPrivate::getUShort(const unsigned char* data, quint32 offset) const
 int UnzipPrivate::decryptByte(quint32 key2) const
 {
 	quint16 temp = ((quint16)(key2) & 0xffff) | 2;
-	return (int)(((temp * (temp ^ 1)) >> 8) & 0xff);
+	return ((temp * (temp ^ 1)) >> 8) & 0xff;
 }
 
 /*!

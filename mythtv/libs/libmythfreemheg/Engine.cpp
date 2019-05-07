@@ -47,10 +47,6 @@ MHEG *MHCreateEngine(MHContext *context)
 
 MHEngine::MHEngine(MHContext *context): m_Context(context)
 {
-    m_fInTransition = false;
-    m_fBooting = true;
-    m_Interacting = nullptr;
-
     // Required for BBC Freeview iPlayer
     MHPSEntry *pEntry = new MHPSEntry;
     pEntry->m_FileName.Copy("ram://bbcipstr");
@@ -175,9 +171,10 @@ int MHEngine::RunAll()
         {
             MHAsynchEvent *pEvent = m_EventQueue.dequeue();
             MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1 from %2")
-                  .arg(MHLink::EventTypeToString(pEvent->eventType))
-                  .arg(pEvent->pEventSource->m_ObjectReference.Printable()));
-            CheckLinks(pEvent->pEventSource->m_ObjectReference, pEvent->eventType, pEvent->eventData);
+                  .arg(MHLink::EventTypeToString(pEvent->m_eventType))
+                  .arg(pEvent->m_pEventSource->m_ObjectReference.Printable()));
+            CheckLinks(pEvent->m_pEventSource->m_ObjectReference,
+                       pEvent->m_eventType, pEvent->m_eventData);
             delete pEvent;
         }
     }
@@ -691,9 +688,9 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
         {
             // Asynchronous events.  Add to the event queue.
             MHAsynchEvent *pEvent = new MHAsynchEvent;
-            pEvent->pEventSource = pSource;
-            pEvent->eventType = ev;
-            pEvent->eventData = evData;
+            pEvent->m_pEventSource = pSource;
+            pEvent->m_eventType = ev;
+            pEvent->m_eventData = evData;
             m_EventQueue.enqueue(pEvent);
         }
         break;
@@ -773,7 +770,7 @@ void MHEngine::BringToFront(const MHRoot *p)
 
     MHVisible *pVis = (MHVisible *)p; // Can now safely cast it.
     CurrentApp()->m_DisplayStack.RemoveAt(nPos); // Remove it from its present posn
-    CurrentApp()->m_DisplayStack.Append((MHVisible *)pVis); // Push it on the top.
+    CurrentApp()->m_DisplayStack.Append(pVis); // Push it on the top.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -847,14 +844,14 @@ void MHEngine::PutBehind(const MHRoot *p, const MHRoot *pRef)
         nRef--;    // The position of the reference may have shifted
     }
 
-    CurrentApp()->m_DisplayStack.InsertAt((MHVisible *)pVis, nRef); // Shift the reference and anything above up.
+    CurrentApp()->m_DisplayStack.InsertAt(pVis, nRef); // Shift the reference and anything above up.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
 // Draw a region of the screen.  This attempts to minimise the drawing by eliminating items
 // that are completely obscured by items above them.  We have to take into account the
 // transparency of items since items higher up the stack may be semi-transparent.
-void MHEngine::DrawRegion(QRegion toDraw, int nStackPos)
+void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 {
     if (toDraw.isEmpty())
     {
@@ -901,7 +898,7 @@ void MHEngine::DrawDisplay(QRegion toDraw)
 
 // An area of the screen needs to be redrawn.  We simply remember this and redraw it
 // in one go when the timer expires.
-void MHEngine::Redraw(QRegion region)
+void MHEngine::Redraw(const QRegion& region)
 {
     m_redrawRegion += region;
 }
@@ -1047,10 +1044,7 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
             delete pContent;
             return;
         }
-        else
-        {
-            ++it;
-        }
+        ++it;
     }
 }
 
@@ -1214,40 +1208,19 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 
     if (strings[0] == "SceneCoordinateSystem" || strings[0] == "SCS")
     {
-        if (strings.count() >= 3 && strings[1] == "720" && strings[2] == "576")
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return strings.count() >= 3 && strings[1] == "720" && strings[2] == "576";
 
         // I've also seen SceneCoordinateSystem(1,1)
     }
 
     if (strings[0] == "MultipleAudioStreams" || strings[0] == "MAS")
     {
-        if (strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1");
     }
 
     if (strings[0] == "MultipleVideoStreams" || strings[0] == "MVS")
     {
-        if (strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return strings.count() >= 2 && (strings[1] == "0" || strings[1] == "1");
     }
 
     // We're supposed to return true for all values of N
@@ -1262,14 +1235,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        else if ((strings[1] == "4" && strings[2] == "3") || (strings[1] == "16" && strings[2] == "9"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (strings[1] == "4" && strings[2] == "3") || (strings[1] == "16" && strings[2] == "9");
     }
 
     // We're supposed to support these at least.  May also support(10,1440,1152)
@@ -1279,14 +1245,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        else if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288");
     }
 
     if (strings[0] == "BitmapScaling" || strings[0] == "BSc")
@@ -1295,27 +1254,13 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
-        else if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288");
     }
 
     // I think we only support the video fully on screen
     if (strings[0] == "VideoDecodeOffset" || strings[0] == "VDO")
     {
-        if (strings.count() >= 3 && strings[1] == "10" && strings[1] == "0")
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return strings.count() >= 3 && strings[1] == "10" && strings[1] == "0";
     }
 
     // We support bitmaps that are partially off screen (don't we?)
@@ -1325,14 +1270,11 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else if (strings.count() >= 2 && (strings[1] == "4" || strings[1] == "6"))
+        if (strings.count() >= 2 && (strings[1] == "4" || strings[1] == "6"))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     if (strings[0] == "UKEngineProfile" || strings[0] == "UniversalEngineProfile" || strings[0] == "UEP")
@@ -1393,9 +1335,8 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
     }
     if (strings[0] == "HDGraphicsPlaneExtension" || strings[0] == "HDG") {
         if (strings.count() < 2) return false;
-        if (strings[1] == "0")
-            return true; // HDGraphicsPlaneExtension
-        return false;
+        // true if HDGraphicsPlaneExtension
+        return strings[1] == "0";
     }
 
     // Otherwise return false.
@@ -1411,10 +1352,7 @@ int MHEngine::GetDefaultCharSet()
     {
         return pApp->m_nCharSet;
     }
-    else
-    {
-        return 10;    // UK MHEG default.
-    }
+    return 10;    // UK MHEG default.
 }
 
 void MHEngine::GetDefaultBGColour(MHColour &colour)
@@ -1495,10 +1433,7 @@ int MHEngine::GetDefaultTextCHook()
     {
         return pApp->m_nTextCHook;
     }
-    else
-    {
-        return 10;    // UK MHEG default.
-    }
+    return 10;    // UK MHEG default.
 }
 
 int MHEngine::GetDefaultStreamCHook()
@@ -1509,10 +1444,7 @@ int MHEngine::GetDefaultStreamCHook()
     {
         return pApp->m_nStrCHook;
     }
-    else
-    {
-        return 10;    // UK MHEG default.
-    }
+    return 10;    // UK MHEG default.
 }
 
 int MHEngine::GetDefaultBitmapCHook()
@@ -1523,10 +1455,7 @@ int MHEngine::GetDefaultBitmapCHook()
     {
         return pApp->m_nBitmapCHook;
     }
-    else
-    {
-        return 4;    // UK MHEG default - PNG bitmap
-    }
+    return 4;    // UK MHEG default - PNG bitmap
 }
 
 void MHEngine::GetDefaultFontAttrs(MHOctetString &str)
@@ -1552,7 +1481,7 @@ int __mhlogoptions = MHLogError;
 FILE *__mhlogStream = nullptr;
 
 // The MHEG engine calls this when it needs to log something.
-void __mhlog(QString logtext)
+void __mhlog(const QString& logtext)
 {
     QByteArray tmp = logtext.toLatin1();
     fprintf(__mhlogStream, "[freemheg] %s\n", tmp.constData());

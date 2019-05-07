@@ -1,7 +1,8 @@
-#include <QTimer>
 #include <QTcpSocket>
-#include <QtEndian>
 #include <QTextStream>
+#include <QTimer>
+#include <QtEndian>
+#include <utility>
 
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -61,31 +62,10 @@ public:
 
 MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
-  : QObject(parent),       m_watchdogTimer(nullptr), m_socket(socket),
-    m_textStream(nullptr), m_hardwareId(id),
-    m_incomingHeaders(),   m_incomingContent(),      m_incomingPartial(false),
-    m_incomingSize(0),
-    m_dataSocket(nullptr),                           m_dataPort(port),
-    m_clientControlSocket(nullptr),                  m_clientControlPort(0),
-    m_clientTimingSocket(nullptr),                   m_clientTimingPort(0),
-    m_eventServer(nullptr),                          m_eventPort(-1),
-    m_audio(nullptr),      m_codec(nullptr),         m_codeccontext(nullptr),
-    m_channels(2),         m_sampleSize(16),         m_frameRate(44100),
-    m_framesPerPacket(352),m_dequeueAudioTimer(nullptr),
-    m_queueLength(0),      m_streamingStarted(false),
-    m_allowVolumeControl(true),
-    //audio sync
-    m_seqNum(0),
-    m_lastSequence(0),     m_lastTimestamp(0),
-    m_currentTimestamp(0), m_nextSequence(0),        m_nextTimestamp(0),
-    m_bufferLength(0),     m_timeLastSync(0),
-    m_cardLatency(-1),     m_adjustedLatency(-1),    m_audioStarted(false),
-    // clock sync
-    m_masterTimeStamp(0),  m_deviceTimeStamp(0),     m_networkLatency(0),
-    m_clockSkew(0),
-    m_audioTimer(nullptr),
-    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
-    m_firstsend(false),    m_playbackStarted(false)
+  : QObject(parent),
+    m_socket(socket),
+    m_hardwareId(std::move(id)),
+    m_dataPort(port)
 {
     m_id = GetNotificationCenter()->Register(this);
     memset(&m_aesKey, 0, sizeof(m_aesKey));
@@ -228,7 +208,7 @@ bool MythRAOPConnection::Init(void)
         return false;
 
     // use internal volume control
-    m_allowVolumeControl = gCoreContext->GetNumSetting("MythControlsVolume", 1);
+    m_allowVolumeControl = gCoreContext->GetBoolSetting("MythControlsVolume", true);
 
     // start the watchdog timer to auto delete the client after a period of inactivity
     m_watchdogTimer = new QTimer();
@@ -245,7 +225,7 @@ bool MythRAOPConnection::Init(void)
  * Socket incoming data signal handler
  * use for audio, control and timing socket
  */
-void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress /*peer*/,
+void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer*/,
                                       quint16 /*port*/)
 {
     // restart the idle timer
@@ -397,7 +377,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
 
     if (m_audioStarted)
     {
-        currentLatency = (int64_t)audiots - (int64_t)m_currentTimestamp;
+        currentLatency = audiots - (int64_t)m_currentTimestamp;
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -589,7 +569,7 @@ bool MythRAOPConnection::GetPacketType(const QByteArray &buf, uint8_t &type,
         return false;
     }
 
-    type = (char)buf[1];
+    type = buf[1];
     // Is it first sync packet?
     if ((uint8_t)buf[0] == 0x90 && type == FIRSTSYNC)
     {
@@ -741,7 +721,7 @@ void MythRAOPConnection::ProcessAudio()
             {
                 AudioData *data = &(*it);
                 int offset = 0;
-                int frames = 0;
+                int framecnt = 0;
 
                 if (m_adjustedLatency > 0)
                 {
@@ -750,17 +730,17 @@ void MythRAOPConnection::ProcessAudio()
                         m_audio->GetBytesPerFrame();
                     if (offset > data->length)
                         offset = data->length;
-                    frames = offset / m_audio->GetBytesPerFrame();
-                    m_adjustedLatency -= framesToMs(frames+1);
+                    framecnt = offset / m_audio->GetBytesPerFrame();
+                    m_adjustedLatency -= framesToMs(framecnt+1);
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("ProcessAudio: Dropping %1 frames to catch up "
                                 "(%2ms to go)")
-                        .arg(frames).arg(m_adjustedLatency));
-                    timestamp += framesToMs(frames);
+                        .arg(framecnt).arg(m_adjustedLatency));
+                    timestamp += framesToMs(framecnt);
                 }
                 m_audio->AddData((char *)data->data + offset,
                                  data->length - offset,
-                                 timestamp, frames);
+                                 timestamp, framecnt);
                 timestamp += m_audio->LengthLastData();
             }
             i++;
@@ -873,7 +853,7 @@ void MythRAOPConnection::readClient(void)
         }
         while (!line.isNull());
 
-        if (m_incomingHeaders.size() == 0)
+        if (m_incomingHeaders.empty())
             return;
 
         if (!stream.atEnd())
@@ -897,10 +877,7 @@ void MythRAOPConnection::readClient(void)
         m_incomingPartial = true;
         return;
     }
-    else
-    {
-        m_incomingPartial = false;
-    }
+    m_incomingPartial = false;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Content(%1) = %2")
         .arg(m_incomingContent.size()).arg(m_incomingContent.constData()));
 
@@ -947,7 +924,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             .arg(RTPseq).arg(RTPtimestamp));
     }
 
-    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    if (gCoreContext->GetBoolSetting("AirPlayPasswordEnabled", false))
     {
         if (m_nonce.isEmpty())
         {
@@ -1113,8 +1090,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             {
                 m_audioFormat.clear();
                 QString format = line.mid(7).trimmed();
-                QList<QString> fmts = format.split(' ');
-                foreach (QString fmt, fmts)
+                QList<QString> formats = format.split(' ');
+                foreach (QString fmt, formats)
                     m_audioFormat.append(fmt.toInt());
 
                 foreach (int fmt, m_audioFormat)
@@ -1362,9 +1339,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
                 if (name == "volume" && m_allowVolumeControl && m_audio)
                 {
-                    float volume = (param.toFloat() + 30.0f) * 100.0f / 30.0f;
-                    if (volume < 0.01f)
-                        volume = 0.0f;
+                    float volume = (param.toFloat() + 30.0F) * 100.0F / 30.0F;
+                    if (volume < 0.01F)
+                        volume = 0.0F;
                     LOG(VB_PLAYBACK, LOG_INFO,
                         LOC + QString("Setting volume to %1 (raw %3)")
                         .arg(volume).arg(param));
@@ -1429,7 +1406,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         int volume = (m_allowVolumeControl && m_audio) ?
                             m_audio->GetCurrentVolume() : 0;
                         responseData += QString("volume: %1\r\n")
-                            .arg(volume * 30.0f / 100.0f - 30.0f,1,'f',6,'0');
+                            .arg(volume * 30.0F / 100.0F - 30.0F,1,'f',6,'0');
                     }
                 }
             }
@@ -1563,15 +1540,15 @@ QStringList MythRAOPConnection::splitLines(const QByteArray &lines)
 /**
  * stringFromSeconds:
  *
- * Usage: stringFromSeconds(seconds)
+ * Usage: stringFromSeconds(timeInSeconds)
  * Description: create a string in the format HH:mm:ss from a duration in seconds
  * HH: will not be displayed if there's less than one hour
  */
-QString MythRAOPConnection::stringFromSeconds(int time)
+QString MythRAOPConnection::stringFromSeconds(int timeInSeconds)
 {
-    int   hour    = time / 3600;
-    int   minute  = (time - hour * 3600) / 60;
-    int seconds   = time - hour * 3600 - minute * 60;
+    int hour    = timeInSeconds / 3600;
+    int minute  = (timeInSeconds - hour * 3600) / 60;
+    int seconds = timeInSeconds - hour * 3600 - minute * 60;
     QString str;
 
     if (hour)
@@ -1691,12 +1668,12 @@ bool MythRAOPConnection::OpenAudioDevice(void)
 {
     CloseAudioDevice();
 
-    QString passthru = gCoreContext->GetNumSetting("PassThruDeviceOverride", false)
+    QString passthru = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false)
                         ? gCoreContext->GetSetting("PassThruOutputDevice") : QString();
     QString device = gCoreContext->GetSetting("AudioOutputDevice");
 
     m_audio = AudioOutput::OpenAudio(device, passthru, FORMAT_S16, m_channels,
-                                     0, m_frameRate, AUDIOOUTPUT_MUSIC,
+                                     AV_CODEC_ID_NONE, m_frameRate, AUDIOOUTPUT_MUSIC,
                                      m_allowVolumeControl, false);
     if (!m_audio)
     {
@@ -1780,7 +1757,6 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
     m_eventClients.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteEventClient()));
-    return;
 }
 
 void MythRAOPConnection::deleteEventClient(void)
@@ -1796,7 +1772,7 @@ void MythRAOPConnection::SendNotification(bool update)
 {
     QImage image = m_artwork.isEmpty() ? QImage() : QImage::fromData(m_artwork);
     int duration  =
-        (float)(m_progressEnd-m_progressStart) / m_frameRate + 0.5f;
+        lroundf(static_cast<float>(m_progressEnd-m_progressStart) / m_frameRate);
     int position =
         (m_progressCurrent-m_progressStart) / m_frameRate;
 
@@ -1815,7 +1791,7 @@ void MythRAOPConnection::SendNotification(bool update)
     n->SetId(m_id);
     n->SetParent(this);
     n->SetDuration(5);
-    n->SetFullScreen(gCoreContext->GetNumSetting("AirPlayFullScreen"));
+    n->SetFullScreen(gCoreContext->GetBoolSetting("AirPlayFullScreen"));
     GetNotificationCenter()->Queue(*n);
     m_firstsend = true;
     delete n;

@@ -4,6 +4,7 @@
 
 // Qt headers
 #include <QDomDocument>
+#include <utility>
 
 // Mythdb headers
 #include "mythlogging.h"
@@ -15,19 +16,6 @@
 MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    m_initialized = false;
-
-    m_numLists = 1;
-    m_visibleLists = 0;
-    m_currentDepth = m_oldDepth = m_depthOffset = 0;
-    m_rootNode = m_currentNode = nullptr;
-    m_listSpacing = 0;
-    m_activeList = nullptr;
-    m_activeListID = 0;
-
-    m_active = true;
-
-    m_listTemplate = nullptr;
     SetCanTakeFocus(true);
 
     connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
@@ -266,7 +254,7 @@ void MythUIButtonTree::Reset(void)
  */
 bool MythUIButtonTree::SetNodeById(QList<int> route)
 {
-    MythGenericTree *node = m_rootNode->findNode(route);
+    MythGenericTree *node = m_rootNode->findNode(std::move(route));
 
     if (node && node->isSelectable())
     {

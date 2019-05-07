@@ -1,9 +1,10 @@
 #include <algorithm>
-#include <random>
-#include <vector>
+#include <functional>   //mem_fun
 #include <iterator>
 #include <map>
-#include <functional>   //mem_fun
+#include <random>
+#include <utility>
+#include <vector>
 
 #include "mythlogging.h"
 #include "mythmainwindow.h"
@@ -46,7 +47,7 @@ namespace
         }
 
         explicit FileAssociationWrap(const FileAssociations::file_association &fa) :
-            m_fa(fa), m_state(efsNONE) {}
+            m_fa(fa) {}
 
         unsigned int GetIDx(void) const { return m_fa.id; }
         QString GetExtension(void) const { return m_fa.extension; }
@@ -108,7 +109,7 @@ namespace
 
       private:
         FileAssociations::file_association m_fa;
-        FA_State m_state;
+        FA_State m_state {efsNONE};
     };
 
     class BlockSignalsGuard
@@ -140,13 +141,13 @@ namespace
     {
         typedef unsigned int UID_type;
 
-        UIDToFAPair() : m_uid(0), m_file_assoc(nullptr) {}
+        UIDToFAPair() = default;
 
         UIDToFAPair(UID_type uid, FileAssociationWrap *assoc) :
             m_uid(uid), m_file_assoc(assoc) {}
 
-        UID_type m_uid;
-        FileAssociationWrap *m_file_assoc;
+        UID_type m_uid {0};
+        FileAssociationWrap *m_file_assoc {nullptr};
     };
 
 
@@ -168,7 +169,7 @@ class FileAssocDialogPrivate
     typedef std::vector<UIDToFAPair> UIReadyList_type;
 
   public:
-    FileAssocDialogPrivate() : m_nextFAID(0), m_selectionOverride(0)
+    FileAssocDialogPrivate()
     {
         LoadFileAssociations();
     }
@@ -191,7 +192,7 @@ class FileAssocDialogPrivate
         }
     }
 
-    bool AddExtension(QString newExtension, UIDToFAPair::UID_type &new_id)
+    bool AddExtension(const QString& newExtension, UIDToFAPair::UID_type &new_id)
     {
         if (newExtension.length())
         {
@@ -269,7 +270,7 @@ class FileAssocDialogPrivate
         UIDToFAPair operator()(
                 const FileAssocDialogPrivate::FA_collection::value_type &from)
         {
-            return UIDToFAPair(from.first, from.second);
+            return {from.first, from.second};
         }
     };
 
@@ -278,9 +279,7 @@ class FileAssocDialogPrivate
     {
         bool operator()(const UIDToFAPair &item)
         {
-            if (item.m_file_assoc && item.m_file_assoc->GetState() == against)
-                return true;
-            return false;
+            return item.m_file_assoc && item.m_file_assoc->GetState() == against;
         }
     };
 
@@ -320,17 +319,16 @@ class FileAssocDialogPrivate
 
   private:
     FA_collection m_fileAssociations;
-    UIDToFAPair::UID_type m_nextFAID;
-    UIDToFAPair::UID_type m_selectionOverride;
+    UIDToFAPair::UID_type m_nextFAID          {0};
+    UIDToFAPair::UID_type m_selectionOverride {0};
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 FileAssocDialog::FileAssocDialog(MythScreenStack *screenParent,
         const QString &lname) :
-    MythScreenType(screenParent, lname), m_commandEdit(nullptr),
-    m_extensionList(nullptr), m_defaultCheck(nullptr), m_ignoreCheck(nullptr), m_doneButton(nullptr),
-    m_newButton(nullptr), m_deleteButton(nullptr), m_private(new FileAssocDialogPrivate)
+    MythScreenType(screenParent, lname),
+    m_private(new FileAssocDialogPrivate)
 {
 }
 
@@ -458,7 +456,7 @@ void FileAssocDialog::OnNewExtensionPressed()
 void FileAssocDialog::OnNewExtensionComplete(QString newExtension)
 {
     UIDToFAPair::UID_type new_sel = 0;
-    if (m_private->AddExtension(newExtension, new_sel))
+    if (m_private->AddExtension(std::move(newExtension), new_sel))
     {
         m_private->SetSelectionOverride(new_sel);
         UpdateScreen(true);
@@ -508,6 +506,8 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         {
             if (p->m_file_assoc)
             {
+                // No memory leak. MythUIButtonListItem adds the new
+                // item into m_extensionList.
                 MythUIButtonListItem *new_item =
                         new MythUIButtonListItem(m_extensionList,
                                 p->m_file_assoc->GetExtension(),

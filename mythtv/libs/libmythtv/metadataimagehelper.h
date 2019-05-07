@@ -31,7 +31,7 @@ typedef QList< ArtworkInfo > ArtworkList;
 
 typedef QMultiMap< VideoArtworkType, ArtworkInfo > ArtworkMap;
 
-MTV_PUBLIC ArtworkMap GetArtwork(QString inetref,
+MTV_PUBLIC ArtworkMap GetArtwork(const QString& inetref,
                                        uint season,
                                        bool strict = false);
 MTV_PUBLIC bool SetArtwork(const QString &inetref,
@@ -43,7 +43,7 @@ MTV_PUBLIC bool SetArtwork(const QString &inetref,
 MTV_PUBLIC bool SetArtwork(const QString &inetref,
                                    uint season,
                                    const QString &host,
-                                   const ArtworkMap map);
+                                   const ArtworkMap& map);
 
 Q_DECLARE_METATYPE(VideoArtworkType)
 Q_DECLARE_METATYPE(ArtworkInfo)

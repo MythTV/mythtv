@@ -13,16 +13,11 @@
 #include "channelutil.h"
 #include "mythdbcon.h"
 
-#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
-
-CetonChannel::CetonChannel(TVRec *parent, const QString &device) :
-    DTVChannel(parent), _device_id(device), _stream_handler(nullptr)
-{
-}
+#define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(CetonChannel::GetDevice())
 
 CetonChannel::~CetonChannel(void)
 {
-    Close();
+    CetonChannel::Close();
 }
 
 bool CetonChannel::Open(void)
@@ -32,10 +27,10 @@ bool CetonChannel::Open(void)
     if (IsOpen())
         return true;
 
-    _stream_handler = CetonStreamHandler::Get(_device_id);
+    m_stream_handler = CetonStreamHandler::Get(m_device_id, GetInputID());
 
-    tunerType = DTVTunerType::kTunerTypeATSC;
-    _tuner_types.push_back(tunerType);
+    m_tunerType = DTVTunerType::kTunerTypeATSC;
+    m_tuner_types.push_back(m_tunerType);
 
     if (!InitializeInput())
     {
@@ -43,46 +38,45 @@ bool CetonChannel::Open(void)
         return false;
     }
 
-    return _stream_handler->IsConnected();
+    return m_stream_handler->IsConnected();
 }
 
 void CetonChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing Ceton channel");
 
-    if (!IsOpen())
+    if (!CetonChannel::IsOpen())
         return; // this caller didn't have it open in the first place..
 
-    CetonStreamHandler::Return(_stream_handler);
+    CetonStreamHandler::Return(m_stream_handler, GetInputID());
 }
 
 bool CetonChannel::EnterPowerSavingMode(void)
 {
     if (IsOpen())
-        return _stream_handler->EnterPowerSavingMode();
-    else
-        return true;
+        return m_stream_handler->EnterPowerSavingMode();
+    return true;
 }
 
 bool CetonChannel::IsOpen(void) const
 {
-      return _stream_handler;
+      return m_stream_handler;
 }
 
 /// This is used when the tuner type is kTunerTypeOCUR
 bool CetonChannel::Tune(const QString &freqid, int /*finetune*/)
 {
-    return _stream_handler->TuneVChannel(freqid);
+    return m_stream_handler->TuneVChannel(freqid);
 }
 
 static QString format_modulation(const DTVMultiplex &tuning)
 {
-    if (DTVModulation::kModulationQAM256 == tuning.modulation)
+    if (DTVModulation::kModulationQAM256 == tuning.m_modulation)
         return "qam_256";
-    else if (DTVModulation::kModulationQAM64 == tuning.modulation)
+    if (DTVModulation::kModulationQAM64 == tuning.m_modulation)
         return "qam_64";
     //note...ceton also supports NTSC-M, but not sure what to use that for
-    else if (DTVModulation::kModulation8VSB == tuning.modulation)
+    if (DTVModulation::kModulation8VSB == tuning.m_modulation)
         return "8vsb";
 
     return "unknown";
@@ -93,11 +87,11 @@ bool CetonChannel::Tune(const DTVMultiplex &tuning)
     QString modulation = format_modulation(tuning);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tuning to %1 %2")
-        .arg(tuning.frequency).arg(modulation));
+        .arg(tuning.m_frequency).arg(modulation));
 
-    if (_stream_handler->TuneFrequency(tuning.frequency, modulation))
+    if (m_stream_handler->TuneFrequency(tuning.m_frequency, modulation))
     {
-        SetSIStandard(tuning.sistandard);
+        SetSIStandard(tuning.m_sistandard);
         return true;
     }
 
@@ -110,10 +104,10 @@ bool CetonChannel::SetChannelByString(const QString &channum)
 
     if (ok)
     {
-        if (_stream_handler->IsCableCardInstalled())
-            currentProgramNum = _stream_handler->GetProgramNumber();
+        if (m_stream_handler->IsCableCardInstalled())
+            m_currentProgramNum = m_stream_handler->GetProgramNumber();
         else
-            _stream_handler->TuneProgram(currentProgramNum);
+            m_stream_handler->TuneProgram(m_currentProgramNum);
     }
     return ok;
 }

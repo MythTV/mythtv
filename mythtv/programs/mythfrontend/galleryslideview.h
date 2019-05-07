@@ -26,19 +26,19 @@ class GallerySlideView : public MythScreenType
 public:
     GallerySlideView(MythScreenStack *parent, const char *name, bool editsAllowed);
     ~GallerySlideView();
-    bool Create();
+    bool Create() override; // MythScreenType
 
 public slots:
     void Start(ImageSlideShowType type, int parentId, int selectedId = 0);
-    void Close();
-    void Pulse();
+    void Close() override; // MythScreenType
+    void Pulse() override; // MythScreenType
 
 signals:
     void ImageSelected(int);
 
 private:
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *);
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *) override; // MythUIType
     void MenuMain();
     void MenuTransforms(MythMenu &);
     void Suspend();
@@ -47,7 +47,7 @@ private:
     void Zoom(int = 0);
     void Pan(QPoint = QPoint(0, 0));
     void SetStatus(QString msg, bool delay = false);
-    void ClearStatus(Slide &next);
+    void ClearStatus(Slide &slide);
 
 private slots:
     void ShowPrevSlide(int inc = 1);
@@ -68,28 +68,31 @@ private slots:
 
 private:
     // Theme widgets
-    MythUIImage *m_uiImage;
-    MythUIText  *m_uiStatus, *m_uiSlideCount, *m_uiCaptionText, *m_uiHideCaptions;
+    MythUIImage *m_uiImage        {nullptr};
+    MythUIText  *m_uiStatus       {nullptr};
+    MythUIText  *m_uiSlideCount   {nullptr};
+    MythUIText  *m_uiCaptionText  {nullptr};
+    MythUIText  *m_uiHideCaptions {nullptr};
 
     ImageManagerFe &m_mgr;  //!< Manages the images
-    FlatView       *m_view; //!< List of images comprising the slideshow
+    FlatView       *m_view        {nullptr}; //!< List of images comprising the slideshow
 
     TransitionRegistry m_availableTransitions; //!< Transitions available
     Transition        &m_transition;           //!< Selected transition
     //! Instant transition that is always used for start-up & image updates
     TransitionNone     m_updateTransition;
 
-    SlideBuffer m_slides;        //!< A queue of slides used to display images.
-    InfoList    m_infoList;      //!< Image details overlay
-    int         m_slideShowTime; //!< Time to display a slide in a slideshow
-    QTimer      m_timer;         //!< Slide duration timer
-    QTimer      m_delay;         //!< Status delay timer
-    QString     m_statusText;    //!< Text to display as status
-    bool        m_playing;       //!< True when slideshow is running
-    bool        m_suspended;     //!< True when transition is running or video playing
-    bool        m_showCaptions;  //!< If true, captions are shown
-    bool        m_transitioning; //!< True when a transition is in progress
-    bool        m_editsAllowed;  //!< True when edits are enabled
+    SlideBuffer m_slides;                  //!< A queue of slides used to display images.
+    InfoList    m_infoList;                //!< Image details overlay
+    int         m_slideShowTime   {3000};  //!< Time to display a slide in a slideshow
+    QTimer      m_timer;                   //!< Slide duration timer
+    QTimer      m_delay;                   //!< Status delay timer
+    QString     m_statusText;              //!< Text to display as status
+    bool        m_playing         {false}; //!< True when slideshow is running
+    bool        m_suspended       {false}; //!< True when transition is running or video playing
+    bool        m_showCaptions    {true};  //!< If true, captions are shown
+    bool        m_transitioning   {false}; //!< True when a transition is in progress
+    bool        m_editsAllowed    {false}; //!< True when edits are enabled
 };
 
 #endif // GALLERYWIDGET_H

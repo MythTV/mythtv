@@ -38,28 +38,7 @@
 #define LOC QString("LCDdevice: ")
 
 LCD::LCD()
-    : QObject(),
-      m_socket(nullptr),              m_socketLock(QMutex::Recursive),
-      m_hostname("localhost"),        m_port(6545),
-      m_connected(false),
-
-      m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this)),
-
-      m_lcdWidth(0),                 m_lcdHeight(0),
-
-      m_lcdReady(false),             m_lcdShowTime(false),
-      m_lcdShowMenu(false),          m_lcdShowGeneric(false),
-      m_lcdShowMusic(false),         m_lcdShowChannel(false),
-      m_lcdShowVolume(false),        m_lcdShowRecStatus(false),
-      m_lcdBacklightOn(false),       m_lcdHeartbeatOn(false),
-
-      m_lcdPopupTime(0),
-
-      m_lcdShowMusicItems(),
-      m_lcdKeyString(),
-
-      m_lcdLedMask(0),
-      GetLEDMask(nullptr)
+    : m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
 {
     m_sendBuffer.clear(); m_lastCommand.clear();
     m_lcdShowMusicItems.clear(); m_lcdKeyString.clear();
@@ -85,7 +64,7 @@ LCD *LCD::m_lcd = nullptr;
 
 LCD *LCD::Get(void)
 {
-    if (m_enabled && m_lcd == nullptr && m_serverUnavailable == false)
+    if (m_enabled && m_lcd == nullptr && !m_serverUnavailable)
         m_lcd = new LCD;
     return m_lcd;
 }
@@ -104,7 +83,7 @@ void LCD::SetupLCD (void)
 
     lcd_host = GetMythDB()->GetSetting("LCDServerHost", "localhost");
     lcd_port = GetMythDB()->GetNumSetting("LCDServerPort", 6545);
-    m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0);
+    m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false);
 
     // workaround a problem with Ubuntu not resolving localhost properly
     if (lcd_host == "localhost")
@@ -113,7 +92,7 @@ void LCD::SetupLCD (void)
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
         LCD *lcd = LCD::Get();
-        if (lcd->connectToHost(lcd_host, lcd_port) == false)
+        if (!lcd->connectToHost(lcd_host, lcd_port))
         {
             delete m_lcd;
             m_lcd = nullptr;
@@ -136,7 +115,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     m_port = lport;
 
     // Don't even try to connect if we're currently disabled.
-    if (!(m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0)))
+    if (!(m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false)))
     {
         m_connected = false;
         m_serverUnavailable = true;
@@ -170,9 +149,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                     "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
                                            .arg(count));
 
-            if (m_socket)
-                delete m_socket;
-
+            delete m_socket;
             m_socket = new QTcpSocket();
 
             QObject::connect(m_socket, SIGNAL(readyRead()),
@@ -198,7 +175,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         while (count < 10 && !m_connected);
     }
 
-    if (m_connected == false)
+    if (!m_connected)
         m_serverUnavailable = true;
 
     return m_connected;
@@ -243,7 +220,7 @@ void LCD::sendToServerSlot(const QString &someText)
     if (m_connected)
     {
         LOG(VB_NETWORK, LOG_DEBUG, LOC +
-            QString(LOC + "Sending to Server: %1").arg(someText));
+            QString("Sending to Server: %1").arg(someText));
 
         // Just stream the text out the socket
         os << someText << "\n";
@@ -488,7 +465,7 @@ void LCD::setChannelProgress(const QString &time, float value)
     if (!m_lcdReady || !m_lcdShowChannel)
         return;
 
-    value = std::min(std::max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0F, value), 1.0F);
     sendToServer(QString("SET_CHANNEL_PROGRESS %1 %2").arg(quotedString(time))
         .arg(value));
 }
@@ -498,7 +475,7 @@ void LCD::setGenericProgress(float value)
     if (!m_lcdReady || !m_lcdShowGeneric)
         return;
 
-    value = std::min(std::max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0F, value), 1.0F);
     sendToServer(QString("SET_GENERIC_PROGRESS 0 %1").arg(value));
 }
 
@@ -515,7 +492,7 @@ void LCD::setMusicProgress(const QString &time, float value)
     if (!m_lcdReady || !m_lcdShowMusic)
         return;
 
-    value = std::min(std::max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0F, value), 1.0F);
     sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + ' ' +
             QString().setNum(value));
 }
@@ -541,10 +518,10 @@ void LCD::setVolumeLevel(float value)
     if (!m_lcdReady || !m_lcdShowVolume)
         return;
 
-    if (value < 0.0)
-        value = 0.0;
-    else if (value > 1.0)
-        value = 1.0;
+    if (value < 0.0F)
+        value = 0.0F;
+    else if (value > 1.0F)
+        value = 1.0F;
 
     sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));
 }
@@ -560,7 +537,6 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
 void LCD::outputLEDs()
 {
     /* now implemented elsewhere for advanced icon control */
-    return;
 #if 0
     if (!lcd_ready)
         return;

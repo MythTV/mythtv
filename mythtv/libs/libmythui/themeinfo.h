@@ -21,7 +21,7 @@ typedef enum {
 class MUI_PUBLIC ThemeInfo : public XMLParseBase
 {
   public:
-    explicit ThemeInfo(QString theme);
+    explicit ThemeInfo(const QString& theme);
     ~ThemeInfo() = default;
 
     bool IsWide() const;
@@ -50,15 +50,15 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
     QString   m_themeurl;
     QFileInfo m_theme;
     QString   m_baseTheme;
-    int       m_type;
+    int       m_type         {THEME_UNKN};
     QString   m_aspect;
-    QSize     m_baseres;
+    QSize     m_baseres      {800,600};
     QString   m_name;
     QString   m_previewpath;
     QString   m_description;
     QString   m_errata;
-    int       m_majorver;
-    int       m_minorver;
+    int       m_majorver     {0};
+    int       m_minorver     {0};
 
     QString   m_authorName;
     QString   m_authorEmail;

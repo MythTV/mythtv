@@ -29,8 +29,8 @@ typedef vector<unsigned char*>                uchar_vector_t;
 
 const QString& DebugString(const VideoFrame *frame, bool short_str=false);
 const QString& DebugString(uint str_num, bool short_str=false);
-const QString DebugString(const frame_queue_t& list);
-const QString DebugString(const vector<const VideoFrame*>& list);
+QString DebugString(const frame_queue_t& list);
+QString DebugString(const vector<const VideoFrame*>& list);
 
 enum BufferType
 {
@@ -47,21 +47,21 @@ enum BufferType
 class YUVInfo
 {
   public:
-    YUVInfo(uint w, uint h, uint size, const int *p, const int *o,
+    YUVInfo(uint w, uint h, uint sz, const int *p, const int *o,
             int aligned = 64);
 
   public:
-    uint width;
-    uint height;
-    uint size;
-    uint pitches[3];
-    uint offsets[3];
+    uint m_width;
+    uint m_height;
+    uint m_size;
+    uint m_pitches[3];
+    uint m_offsets[3];
 };
 
 class MTV_PUBLIC VideoBuffers
 {
   public:
-    VideoBuffers();
+    VideoBuffers() = default;
     virtual ~VideoBuffers();
 
     void Init(uint numdecode, bool extra_for_pause,
@@ -87,7 +87,7 @@ class MTV_PUBLIC VideoBuffers
     void DoneDisplayingFrame(VideoFrame *frame);
     void DiscardFrame(VideoFrame *frame);
 
-    VideoFrame *At(uint i) { return &buffers[i]; }
+    VideoFrame *At(uint i) { return &m_buffers[i]; }
     VideoFrame *Dequeue(BufferType);
     VideoFrame *Head(BufferType); // peek at next dequeue
     VideoFrame *Tail(BufferType); // peek at last enqueue
@@ -97,28 +97,28 @@ class MTV_PUBLIC VideoBuffers
     void Remove(BufferType, VideoFrame *); // multiple buffer types ok
     frame_queue_t::iterator begin_lock(BufferType); // this locks VideoBuffer
     frame_queue_t::iterator end(BufferType);
-    void end_lock() { global_lock.unlock(); } // this unlocks VideoBuffer
+    void end_lock() { m_globalLock.unlock(); } // this unlocks VideoBuffer
     uint Size(BufferType type) const;
     bool Contains(BufferType type, VideoFrame*) const;
 
     VideoFrame *GetScratchFrame(void);
-    VideoFrame *GetLastDecodedFrame(void) { return At(vpos); }
-    VideoFrame *GetLastShownFrame(void) { return At(rpos); }
+    VideoFrame *GetLastDecodedFrame(void) { return At(m_vpos); }
+    VideoFrame *GetLastShownFrame(void) { return At(m_rpos); }
     void SetLastShownFrameToScratch(void);
 
     uint ValidVideoFrames(void) const { return Size(kVideoBuffer_used); }
     uint FreeVideoFrames(void) const { return Size(kVideoBuffer_avail); }
     bool EnoughFreeFrames(void) const
-        { return Size(kVideoBuffer_avail) >= needfreeframes; }
+        { return Size(kVideoBuffer_avail) >= m_needFreeFrames; }
     bool EnoughDecodedFrames(void) const
-        { return Size(kVideoBuffer_used) >= needprebufferframes; }
+        { return Size(kVideoBuffer_used) >= m_needPrebufferFrames; }
     bool EnoughPrebufferedFrames(void) const
-        { return Size(kVideoBuffer_used) >= keepprebufferframes; }
+        { return Size(kVideoBuffer_used) >= m_keepPrebufferFrames; }
 
-    const VideoFrame *At(uint i) const { return &buffers[i]; }
-    const VideoFrame *GetLastDecodedFrame(void) const { return At(vpos); }
-    const VideoFrame *GetLastShownFrame(void) const { return At(rpos); }
-    uint  Size() const { return buffers.size(); }
+    const VideoFrame *At(uint i) const { return &m_buffers[i]; }
+    const VideoFrame *GetLastDecodedFrame(void) const { return At(m_vpos); }
+    const VideoFrame *GetLastShownFrame(void) const { return At(m_rpos); }
+    uint  Size() const { return m_buffers.size(); }
 
     void Clear(uint i);
     void Clear(void);
@@ -130,26 +130,31 @@ class MTV_PUBLIC VideoBuffers
 
     QString GetStatus(int n=-1) const; // debugging method
   private:
-    frame_queue_t         *Queue(BufferType type);
-    const frame_queue_t   *Queue(BufferType type) const;
-    VideoFrame            *GetNextFreeFrameInternal(BufferType enqueue_to);
+    frame_queue_t       *Queue(BufferType type);
+    const frame_queue_t *Queue(BufferType type) const;
+    VideoFrame          *GetNextFreeFrameInternal(BufferType enqueue_to);
 
-    frame_queue_t          available, used, limbo, pause, displayed, decode, finished;
-    vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
-    frame_vector_t         buffers;
-    uchar_vector_t         allocated_arrays;  // for DeleteBuffers
+    frame_queue_t        m_available;
+    frame_queue_t        m_used;
+    frame_queue_t        m_limbo;
+    frame_queue_t        m_pause;
+    frame_queue_t        m_displayed;
+    frame_queue_t        m_decode;
+    frame_queue_t        m_finished;
+    vbuffer_map_t        m_vbufferMap; // videobuffers to buffer's index
+    frame_vector_t       m_buffers;
+    uchar_vector_t       m_allocatedArrays;  // for DeleteBuffers
 
-    uint                   needfreeframes;
-    uint                   needprebufferframes;
-    uint                   needprebufferframes_normal;
-    uint                   needprebufferframes_small;;
-    uint                   keepprebufferframes;
-    bool                   createdpauseframe;
+    uint                 m_needFreeFrames            {0};
+    uint                 m_needPrebufferFrames       {0};
+    uint                 m_needPrebufferFramesNormal {0};
+    uint                 m_needPrebufferFramesSmall  {0};
+    uint                 m_keepPrebufferFrames       {0};
+    bool                 m_createdPauseFrame         {false};
+    uint                 m_rpos                      {0};
+    uint                 m_vpos                      {0};
 
-    uint                   rpos;
-    uint                   vpos;
-
-    mutable QMutex         global_lock;
+    mutable QMutex       m_globalLock                {QMutex::Recursive};
 };
 
 #endif // __VIDEOBUFFERS_H__

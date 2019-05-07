@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QRunnable>
+#include <utility>
 
 #include "mythcorecontext.h"
 #include "mythobservable.h"
@@ -33,7 +34,7 @@ class SemaphoreLocker
             m_lock->release();
     }
   private:
-    QSemaphore *m_lock;
+    QSemaphore *m_lock {nullptr};
 };
 
 QEvent::Type ScreenLoadCompletionEvent::kEventType =
@@ -45,7 +46,7 @@ class ScreenLoadTask : public QRunnable
     explicit ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
 
   private:
-    void run(void)
+    void run(void) override // QRunnable
     {
         m_parent.Load();
         m_parent.m_IsLoaded = true;
@@ -58,17 +59,11 @@ class ScreenLoadTask : public QRunnable
 
 MythScreenType::MythScreenType(
     MythScreenStack *parent, const QString &name, bool fullscreen) :
-    MythUIComposite(parent, name), m_LoadLock(1)
+    MythUIComposite(parent, name)
 {
     m_FullScreen = fullscreen;
-    m_CurrentFocusWidget = nullptr;
 
     m_ScreenStack = parent;
-    m_BusyPopup = nullptr;
-    m_IsDeleting = false;
-    m_IsLoading = false;
-    m_IsLoaded = false;
-    m_IsInitialized = false;
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
@@ -80,17 +75,9 @@ MythScreenType::MythScreenType(
 
 MythScreenType::MythScreenType(
     MythUIType *parent, const QString &name, bool fullscreen) :
-    MythUIComposite(parent, name), m_LoadLock(1)
+    MythUIComposite(parent, name)
 {
     m_FullScreen = fullscreen;
-    m_CurrentFocusWidget = nullptr;
-
-    m_ScreenStack = nullptr;
-    m_BusyPopup = nullptr;
-    m_IsDeleting = false;
-    m_IsLoading = false;
-    m_IsLoaded = false;
-    m_IsInitialized = false;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
@@ -200,11 +187,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.begin();
-                }
+                looped = true;
+                it = m_FocusWidgetList.begin();
             }
         }
     }
@@ -228,11 +212,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             {
                 if (looped)
                     return false;
-                else
-                {
-                    looped = true;
-                    it = m_FocusWidgetList.end() - 1;
-                }
+                looped = true;
+                it = m_FocusWidgetList.end() - 1;
             }
         }
     }
@@ -247,7 +228,7 @@ void MythScreenType::BuildFocusList(void)
 
     AddFocusableChildrenToList(m_FocusWidgetList);
 
-    if (m_FocusWidgetList.size() > 0)
+    if (!m_FocusWidgetList.empty())
         SetFocusWidget();
 }
 
@@ -329,7 +310,7 @@ void MythScreenType::LoadInBackground(QString message)
 
     m_ScreenStack->AllowReInit();
 
-    OpenBusyPopup(message);
+    OpenBusyPopup(std::move(message));
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(*this);
     MThreadPool::globalInstance()->start(loadTask, "ScreenLoad");
@@ -354,7 +335,7 @@ void MythScreenType::ReloadInBackground(void)
     LoadInBackground();
 }
 
-void MythScreenType::OpenBusyPopup(QString message)
+void MythScreenType::OpenBusyPopup(const QString& message)
 {
     if (m_BusyPopup)
         return;
@@ -573,7 +554,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
  * Do not use.
  *
  */
-void MythScreenType::CreateCopy(MythUIType *)
+void MythScreenType::CreateCopy(MythUIType * /*parent*/)
 {
     LOG(VB_GENERAL, LOG_ERR, "CreateCopy called on screentype - bad.");
 }

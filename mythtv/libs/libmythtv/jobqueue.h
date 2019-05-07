@@ -132,19 +132,19 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
   public:
     explicit JobQueue(bool master);
     ~JobQueue(void);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e)  override; // QObject
 
     static bool QueueRecordingJobs(
         const RecordingInfo&, int jobTypes = JOB_NONE);
     static bool QueueJob(int jobType, uint chanid,
-                         const QDateTime &recstartts, QString args = "",
-                         QString comment = "", QString host = "",
+                         const QDateTime &recstartts, const QString& args = "",
+                         const QString& comment = "", QString host = "",
                          int flags = 0, int status = JOB_QUEUED,
                          QDateTime schedruntime = QDateTime());
 
     static bool QueueJobs(int jobTypes, uint chanid,
-                         const QDateTime &recstartts, QString args = "",
-                         QString comment = "", QString host = "");
+                         const QDateTime &recstartts, const QString& args = "",
+                         const QString& comment = "", const QString& host = "");
 
     static int GetJobID(int jobType, uint chanid,
                         const QDateTime &recstartts);
@@ -159,12 +159,12 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
                               const QDateTime &recstartts, int newCmds);
     static bool ChangeJobFlags(int jobID, int newFlags);
     static bool ChangeJobStatus(int jobID, int newStatus,
-                                QString comment = "");
-    static bool ChangeJobHost(int jobID, QString newHostname);
+                                const QString& comment = "");
+    static bool ChangeJobHost(int jobID, const QString& newHostname);
     static bool ChangeJobComment(int jobID,
-                                 QString comment = "");
+                                 const QString& comment = "");
     static bool ChangeJobArgs(int jobID,
-                              QString args = "");
+                              const QString& args = "");
     static bool IsJobQueuedOrRunning(int jobType, uint chanid,
                                      const QDateTime &recstartts);
     int GetRunningJobID(uint chanid, const QDateTime &recstartts);
@@ -181,7 +181,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static bool StopJob(int jobID);
     static bool DeleteJob(int jobID);
     static bool SafeDeleteJob(int jobID, int jobType, int chanid,
-                              QDateTime recstartts);
+                              const QDateTime& recstartts);
 
     static enum JobCmds GetJobCmd(int jobID);
     static enum JobFlags GetJobFlags(int jobID);
@@ -222,16 +222,16 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
         int jobID;
     } JobThreadStruct;
 
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
     void ProcessQueue(void);
 
-    void ProcessJob(JobQueueEntry job);
+    void ProcessJob(const JobQueueEntry& job);
 
-    bool AllowedToRun(JobQueueEntry job);
+    bool AllowedToRun(const JobQueueEntry& job);
 
-    static bool InJobRunWindow(int orStartingWithinMins = 0);
+    static bool InJobRunWindow(int orStartsWithinMins = 0);
 
-    void StartChildJob(void *(*start_routine)(void *), int jobID);
+    void StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID);
 
     QString GetJobDescription(int jobType);
     QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
@@ -251,25 +251,25 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static void *UserJobThread(void *param);
     void DoUserJobThread(int jobID);
 
-    QString m_hostname;
+    QString                    m_hostname;
 
-    int jobsRunning;
-    int jobQueueCPU;
+    int                        m_jobsRunning         {0};
+    int                        m_jobQueueCPU         {0};
 
-    ProgramInfo *m_pginfo;
+    ProgramInfo               *m_pginfo              {nullptr};
 
-    QMutex controlFlagsLock;
-    QMap<QString, int *> jobControlFlags;
+//  QMutex                     m_controlFlagsLock;
+//  QMap<QString, int *>       m_jobControlFlags;
 
-    QMutex *runningJobsLock;
-    QMap<int, RunningJobInfo> runningJobs;
+    QMutex                    *m_runningJobsLock     {nullptr};
+    QMap<int, RunningJobInfo>  m_runningJobs;
 
-    bool isMaster;
+    bool                       m_isMaster;
 
-    MThread *queueThread;
-    QWaitCondition queueThreadCond;
-    QMutex queueThreadCondLock;
-    bool processQueue;
+    MThread                   *m_queueThread         {nullptr};
+    QWaitCondition             m_queueThreadCond;
+    QMutex                     m_queueThreadCondLock;
+    bool                       m_processQueue        {false};
 };
 
 #endif

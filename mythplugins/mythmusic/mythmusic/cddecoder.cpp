@@ -14,7 +14,7 @@
 #include <QString>
 
 // libcdio
-#include <cdio/cdda.h>
+// cdda already included via cddecoder.h
 #include <cdio/logging.h>
 
 // MythTV
@@ -92,22 +92,7 @@ public:
 
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
-    Decoder(d, o),
-    m_inited(false),   m_user_stop(false),
-    m_devicename(""),
-    m_stat(DecoderEvent::Error),
-    m_output_buf(nullptr),
-    m_output_at(0),    m_bks(0),
-    m_bksFrames(0),    m_decodeBytes(0),
-    m_finish(false),
-    m_freq(0),         m_bitrate(0),
-    m_chan(0),
-    m_seekTime(-1.),
-    m_settracknum(-1), m_tracknum(0),
-    m_cdio(nullptr),   m_device(nullptr), m_paranoia(nullptr),
-    m_start(CDIO_INVALID_LSN),
-    m_end(CDIO_INVALID_LSN),
-    m_curpos(CDIO_INVALID_LSN)
+    Decoder(d, o)
 {
     setURL(file);
 }
@@ -150,8 +135,7 @@ void CdDecoder::writeBlock()
             }
             break;
         }
-        else
-            ::usleep(output()->GetAudioBufferedTime()<<9);
+        ::usleep(output()->GetAudioBufferedTime()<<9);
     }
 }
 
@@ -401,11 +385,8 @@ void CdDecoder::run()
             // audiobuffer is reasonably populated
             if (fill < (thresh << 6))
                 break;
-            else
-            {
-                // Wait for half of the buffer to drain
-                ::usleep(output()->GetAudioBufferedTime()<<9);
-            }
+            // Wait for half of the buffer to drain
+            ::usleep(output()->GetAudioBufferedTime()<<9);
         }
 
         // write a block if there's sufficient space for it

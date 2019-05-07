@@ -37,14 +37,9 @@ using namespace std;
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
                    vector<Event *> *eventList, int *currentEvent)
          :MythScreenType(parent, name),
-          m_activeFrameImage(nullptr), m_frameImageFS(nullptr), m_frameImage(nullptr),
-          m_noEventsText(nullptr), m_eventText(nullptr),
-          m_cameraText(nullptr), m_frameText(nullptr), m_dateText(nullptr),
-          m_playButton(nullptr), m_deleteButton(nullptr), m_nextButton(nullptr),
-          m_prevButton(nullptr), m_currentEvent(currentEvent),
+          m_currentEvent(currentEvent),
           m_eventList(eventList), m_frameList(new vector<Frame*>),
-          m_frameTimer(new QTimer(this)), m_curFrame(0),
-          m_paused(false), m_fullScreen(false), m_image(nullptr)
+          m_frameTimer(new QTimer(this))
 {
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
@@ -56,8 +51,7 @@ ZMPlayer::~ZMPlayer()
 
     m_frameTimer->deleteLater();
 
-    if (m_frameList)
-        delete m_frameList;
+    delete m_frameList;
 }
 
 void ZMPlayer::stopPlayer(void)
@@ -132,8 +126,7 @@ bool ZMPlayer::Create(void)
 
 void ZMPlayer::getEventInfo()
 {
-    if (m_frameTimer)
-        m_frameTimer->stop();
+    m_frameTimer->stop();
 
     if (*m_currentEvent == -1)
     {
@@ -152,11 +145,9 @@ void ZMPlayer::getEventInfo()
 
         return;
     }
-    else
-    {
-        if (m_noEventsText)
-            m_noEventsText->SetVisible(false);
-    }
+
+    if (m_noEventsText)
+        m_noEventsText->SetVisible(false);
 
     Event *event = m_eventList->at(*m_currentEvent);
     if (!event)
@@ -164,7 +155,7 @@ void ZMPlayer::getEventInfo()
 
     m_curFrame = 1;
 
-    m_eventText->SetText(QString(event->eventName() + " (%1/%2)")
+    m_eventText->SetText(event->eventName() + QString(" (%1/%2)")
             .arg((*m_currentEvent) + 1)
             .arg(m_eventList->size()));
     m_cameraText->SetText(event->monitorName());
@@ -355,7 +346,7 @@ void ZMPlayer::prevPressed()
 
 void ZMPlayer::updateFrame(void)
 {
-    if (!m_frameList->size())
+    if (m_frameList->empty())
         return;
 
     m_frameTimer->stop();

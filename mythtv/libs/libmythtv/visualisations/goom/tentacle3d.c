@@ -5,13 +5,13 @@
 #include "goom_tools.h"
 #include "goomconfig.h"
 
-#define D 256.0f
+#define D 256.0F
 
 #define nbgrid 6
 #define definitionx 15
 #define definitionz 45
 
-static float cycle = 0.0f;
+static float cycle = 0.0F;
 static grid3d *grille[nbgrid];
 static float *vals;
 
@@ -48,19 +48,17 @@ static inline unsigned char
 lighten (unsigned char value, float power)
 {
 	int     val = value;
-	float   t = (float) val * log10(power) / 2.0;
+	float   t = (float) val * log10f(power) / 2.0F;
 
 	if (t > 0) {
-		val = (int) t; // (32.0f * log (t));
+		val = (int) t; // (32.0F * log (t));
 		if (val > 255)
 			val = 255;
 		if (val < 0)
 			val = 0;
 		return val;
 	}
-	else {
-		return 0;
-	}
+        return 0;
 }
 
 static void
@@ -79,7 +77,7 @@ lightencolor (int *col, float power)
 }
 
 // retourne x>>s , en testant le signe de x
-#define ShiftRight(_x,_s) ((_x<0) ? -(-_x>>_s) : (_x>>_s))
+#define ShiftRight(_x,_s) (((_x)<0) ? -(-(_x)>>(_s)) : ((_x)>>(_s)))
 
 static
 int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigned int incr) {
@@ -96,13 +94,13 @@ int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigne
 	return (src&mask)|color;
 }
 
-static void pretty_move (float cycle, float *dist,float *dist2, float *rotangle) {
-	static float distt = 10.0f;
-	static float distt2 = 0.0f;
-	static float rot = 0.0f; // entre 0 et 2 * M_PI
+static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle) {
+	static float distt = 10.0F;
+	static float distt2 = 0.0F;
+	static float rot = 0.0F; // entre 0 et 2 * M_PI
 	static int happens = 0;
 	float tmp;
-	static int rotation = 0;
+        static int rotation = 0;
 	static int lock = 0;
 
 	if (happens)
@@ -114,47 +112,44 @@ static void pretty_move (float cycle, float *dist,float *dist2, float *rotangle)
 	else lock --;
 //	happens = 1;
 	
-	tmp = happens?8.0f:0;
-	*dist2 = distt2 = (tmp + 15.0f*distt2)/16.0f;
+	tmp = happens?8.0F:0;
+	*dist2 = distt2 = (tmp + 15.0F*distt2)/16.0F;
 
-	tmp = 30+D-90.0f*(1.0f+sin(cycle*19/20));
+	tmp = 30+D-90.0F*(1.0F+sinf(lcycle*19/20));
 	if (happens)
-		tmp *= 0.6f;
+		tmp *= 0.6F;
 
-	*dist = distt = (tmp + 3.0f*distt)/4.0f;
+	*dist = distt = (tmp + 3.0F*distt)/4.0F;
 
 	if (!happens){
-		tmp = M_PI*sin(cycle)/32+3*M_PI/2;
+		tmp = M_PI_F*sinf(lcycle)/32+3*M_PI_F/2;
 	}
 	else {
 		rotation = iRAND(500)?rotation:iRAND(2);
 		if (rotation)
-			cycle *= 2.0f*M_PI;
+			lcycle *= 2.0F*M_PI_F;
 		else
-			cycle *= -1.0f*M_PI;
-		tmp = cycle - (M_PI*2.0) * floor(cycle/(M_PI*2.0));
+			lcycle *= -1.0F*M_PI_F;
+		tmp = lcycle - (M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F));
 	}
 	
-	if (fabs(tmp-rot) > fabs(tmp-(rot+2.0*M_PI))) {
-		rot = (tmp + 15.0f*(rot+2*M_PI)) / 16.0f;
-		if (rot>2.0*M_PI)
-			rot -= 2.0*M_PI;
+	if (fabsf(tmp-rot) > fabsf(tmp-(rot+2.0F*M_PI_F))) {
+		rot = (tmp + 15.0F*(rot+2*M_PI_F)) / 16.0F;
+		if (rot>2.0F*M_PI_F)
+			rot -= 2.0F*M_PI_F;
 		*rotangle = rot;
 	}
-	else if (fabs(tmp-rot) > fabs(tmp-(rot-2.0*M_PI))) {
-		rot = (tmp + 15.0f*(rot-2.0*M_PI)) / 16.0f;
-		if (rot<0.0f)
-			rot += 2.0*M_PI;
+	else if (fabsf(tmp-rot) > fabsf(tmp-(rot-2.0F*M_PI_F))) {
+		rot = (tmp + 15.0F*(rot-2.0F*M_PI_F)) / 16.0F;
+		if (rot<0.0F)
+			rot += 2.0F*M_PI_F;
 		*rotangle = rot;
 	}
 	else
-		*rotangle = rot = (tmp + 15.0f*rot) / 16.0f;
+		*rotangle = rot = (tmp + 15.0F*rot) / 16.0F;
 }
 
 void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit) {
-	int tmp;
-	int tmp2;
-	
 	static int colors[] = {
 		(0x18<<(ROUGE*8))|(0x4c<<(VERT*8))|(0x2f<<(BLEU*8)),
 		(0x48<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x6f<<(BLEU*8)),
@@ -162,23 +157,23 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 	
 	static int col = (0x28<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x5f<<(BLEU*8));
 	static int dstcol = 0;
-	static float lig = 1.15f;
-	static float ligs = 0.1f;
+	static float lig = 1.15F;
+	static float ligs = 0.1F;
 
 	int color;
 	int colorlow;
 
 	float dist,dist2,rotangle;
 
-	if ((!drawit) && (ligs>0.0f))
+	if ((!drawit) && (ligs>0.0F))
 		ligs = -ligs;
 
 	lig += ligs;
 
-	if (lig > 1.01f) {
-		if ((lig>10.0f) | (lig<1.1f)) ligs = -ligs;
+	if (lig > 1.01F) {
+		if ((lig>10.0F) | (lig<1.1F)) ligs = -ligs;
 		
-		if ((lig<6.3f)&&(iRAND(30)==0))
+		if ((lig<6.3F)&&(iRAND(30)==0))
 			dstcol=iRAND(3);
 
 		col = evolutecolor(col,colors[dstcol],0xff,0x01);
@@ -189,34 +184,34 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 		color = col;
 		colorlow = col;
 		
-		lightencolor(&color,lig * 2.0f + 2.0f);
-		lightencolor(&colorlow,(lig/3.0f)+0.67f);
+		lightencolor(&color,lig * 2.0F + 2.0F);
+		lightencolor(&colorlow,(lig/3.0F)+0.67F);
 
-		rapport = 1.0f + 2.0f * (rapport - 1.0f);
-                rapport *= 1.2f;
-		if (rapport > 1.12f)
-			rapport = 1.12f;
+		rapport = 1.0F + 2.0F * (rapport - 1.0F);
+                rapport *= 1.2F;
+		if (rapport > 1.12F)
+			rapport = 1.12F;
 		
 		pretty_move (cycle,&dist,&dist2,&rotangle);
 
-		for (tmp=0;tmp<nbgrid;tmp++) {
-			for (tmp2=0;tmp2<definitionx;tmp2++) {
+		for (int tmp=0;tmp<nbgrid;tmp++) {
+			for (int tmp2=0;tmp2<definitionx;tmp2++) {
 				float val = (float)(ShiftRight(data[0][iRAND(511)],10)) * rapport;
 				vals[tmp2] = val;
 			}
 			
 			grid3d_update (grille[tmp],rotangle, vals, dist2);
 		}
-		cycle+=0.01f;
-		for (tmp=0;tmp<nbgrid;tmp++)
+		cycle+=0.01F;
+		for (int tmp=0;tmp<nbgrid;tmp++)
 			grid3d_draw (grille[tmp],color,colorlow,dist,buf,back,W,H);
 	}
 	else {
-		lig = 1.05f;
-		if (ligs < 0.0f)
+		lig = 1.05F;
+		if (ligs < 0.0F)
 			ligs = -ligs;
 		pretty_move (cycle,&dist,&dist2,&rotangle);
-		cycle+=0.1f;
+		cycle+=0.1F;
 		if (cycle > 1000)
 			cycle = 0;
 	}

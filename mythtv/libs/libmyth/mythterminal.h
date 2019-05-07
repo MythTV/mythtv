@@ -23,12 +23,12 @@ class MPUBLIC MythTerminal : public MythScreenType
     Q_OBJECT
 
   public:
-    MythTerminal(MythScreenStack *stack, QString program,
+    MythTerminal(MythScreenStack *parent, QString program,
                  QStringList arguments);
     virtual void deleteLater(void)
         { TeardownAll(); MythScreenType::deleteLater(); }
-    virtual void Init(void);
-    virtual bool Create(void);
+    void Init(void) override; // MythScreenType
+    bool Create(void) override; // MythScreenType
 
   public slots:
     void Start(void);
@@ -44,15 +44,15 @@ class MPUBLIC MythTerminal : public MythScreenType
     virtual ~MythTerminal() { TeardownAll(); }
     void TeardownAll(void);
 
-    mutable QMutex         m_lock;
-    bool                   m_running;
-    QProcess              *m_process;
+    mutable QMutex         m_lock        {QMutex::Recursive};
+    bool                   m_running     {false};
+    QProcess              *m_process     {nullptr};
     QString                m_program;
     QStringList            m_arguments;
-    MythUIButtonListItem  *m_currentLine;
-    MythUIButtonList      *m_output;
-    MythUITextEdit        *m_textEdit;
-    MythUIButton          *m_enterButton;
+    MythUIButtonListItem  *m_currentLine {nullptr};
+    MythUIButtonList      *m_output      {nullptr};
+    MythUITextEdit        *m_textEdit    {nullptr};
+    MythUIButton          *m_enterButton {nullptr};
 };
 
 #endif // MYTH_TERMINAL_H

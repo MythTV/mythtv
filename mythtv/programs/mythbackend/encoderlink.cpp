@@ -4,6 +4,7 @@
 
 // QT headers
 #include <QMap>                         // for QMap
+#include <utility>
 
 // MythTV headers
 #include "mythcorecontext.h"
@@ -11,7 +12,7 @@
 #include "playbacksock.h"
 #include "tv_rec.h"
 #include "mythdate.h"
-#include "backendutil.h"
+#include "requesthandler/fileserverutil.h"
 #include "compat.h"
 #include "referencecounter.h"
 #include "inputinfo.h"                  // for InputInfo
@@ -41,16 +42,14 @@
  */
 EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
                          QString lhostname)
-    : m_inputid(inputid), sock(lsock), hostname(lhostname),
-      tv(nullptr), local(false), locked(false),
-      sleepStatus(sStatus_Undefined), chanid(0)
+    : m_inputid(inputid), m_sock(lsock), m_hostname(std::move(lhostname))
 {
-    endRecordingTime = MythDate::current().addDays(-2);
-    startRecordingTime = endRecordingTime;
+    m_endRecordingTime = MythDate::current().addDays(-2);
+    m_startRecordingTime = m_endRecordingTime;
 
-    sleepStatusTime = MythDate::current();
-    lastSleepTime   = MythDate::current();
-    lastWakeTime    = MythDate::current();
+    m_sleepStatusTime = MythDate::current();
+    m_lastSleepTime   = MythDate::current();
+    m_lastWakeTime    = MythDate::current();
 
     HasSockAndIncrRef();
 }
@@ -59,16 +58,14 @@ EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
  *  \brief This is the EncoderLink constructor for local recorders.
  */
 EncoderLink::EncoderLink(int inputid, TVRec *ltv)
-    : m_inputid(inputid), sock(nullptr),
-      tv(ltv), local(true), locked(false),
-      sleepStatus(sStatus_Undefined), chanid(0)
+    : m_inputid(inputid), m_tv(ltv), m_local(true)
 {
-    endRecordingTime = MythDate::current().addDays(-2);
-    startRecordingTime = endRecordingTime;
+    m_endRecordingTime = MythDate::current().addDays(-2);
+    m_startRecordingTime = m_endRecordingTime;
 
-    sleepStatusTime = MythDate::current();
-    lastSleepTime   = MythDate::current();
-    lastWakeTime    = MythDate::current();
+    m_sleepStatusTime = MythDate::current();
+    m_lastSleepTime   = MythDate::current();
+    m_lastWakeTime    = MythDate::current();
 }
 
 /** \fn EncoderLink::~EncoderLink()
@@ -77,10 +74,10 @@ EncoderLink::EncoderLink(int inputid, TVRec *ltv)
  */
 EncoderLink::~EncoderLink(void)
 {
-    if (tv)
+    if (m_tv)
     {
-        delete tv;
-        tv = nullptr;
+        delete m_tv;
+        m_tv = nullptr;
     }
     SetSocket(nullptr);
 }
@@ -90,10 +87,10 @@ EncoderLink::~EncoderLink(void)
  */
 bool EncoderLink::HasSockAndIncrRef()
 {
-    QMutexLocker locker(&sockLock);
-    if (sock)
+    QMutexLocker locker(&m_sockLock);
+    if (m_sock)
     {
-        sock->IncrRef();
+        m_sock->IncrRef();
         return true;
     }
     return false;
@@ -104,10 +101,10 @@ bool EncoderLink::HasSockAndIncrRef()
  */
 bool EncoderLink::HasSockAndDecrRef()
 {
-    QMutexLocker locker(&sockLock);
-    if (sock)
+    QMutexLocker locker(&m_sockLock);
+    if (m_sock)
     {
-        sock->DecrRef();
+        m_sock->DecrRef();
         return true;
     }
     return false;
@@ -124,7 +121,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
     {
         lsock->IncrRef();
 
-        if (gCoreContext->GetSettingOnHost("SleepCommand", hostname).isEmpty())
+        if (gCoreContext->GetSettingOnHost("SleepCommand", m_hostname).isEmpty())
             SetSleepStatus(sStatus_Undefined);
         else
             SetSleepStatus(sStatus_Awake);
@@ -138,7 +135,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
     }
 
     HasSockAndDecrRef();
-    sock = lsock;
+    m_sock = lsock;
 }
 
 /** \fn EncoderLink::SetSleepStatus(SleepStatus)
@@ -146,8 +143,8 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
  */
 void EncoderLink::SetSleepStatus(SleepStatus newStatus)
 {
-    sleepStatus     = newStatus;
-    sleepStatusTime = MythDate::current();
+    m_sleepStatus     = newStatus;
+    m_sleepStatusTime = MythDate::current();
 }
 
 /** \fn EncoderLink::IsBusy(InputInfo*,int)
@@ -157,13 +154,13 @@ void EncoderLink::SetSleepStatus(SleepStatus newStatus)
  */
 bool EncoderLink::IsBusy(InputInfo *busy_input, int time_buffer)
 {
-    if (local)
-        return tv->IsBusy(busy_input, time_buffer);
+    if (m_local)
+        return m_tv->IsBusy(busy_input, time_buffer);
 
     if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        return sock->IsBusy(m_inputid, busy_input, time_buffer);
+        ReferenceLocker rlocker(m_sock);
+        return m_sock->IsBusy(m_inputid, busy_input, time_buffer);
     }
 
     return false;
@@ -203,12 +200,12 @@ TVState EncoderLink::GetState(void)
     if (!IsConnected())
         return retval;
 
-    if (local)
-        retval = tv->GetState();
+    if (m_local)
+        retval = m_tv->GetState();
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        retval = (TVState)sock->GetEncoderState(m_inputid);
+        ReferenceLocker rlocker(m_sock);
+        retval = (TVState)m_sock->GetEncoderState(m_inputid);
     }
     else
         LOG(VB_GENERAL, LOG_ERR, QString("Broken for input: %1")
@@ -228,12 +225,12 @@ uint EncoderLink::GetFlags(void)
     if (!IsConnected())
         return retval;
 
-    if (local)
-        retval = tv->GetFlags();
+    if (m_local)
+        retval = m_tv->GetFlags();
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        retval = sock->GetEncoderState(m_inputid);
+        ReferenceLocker rlocker(m_sock);
+        retval = m_sock->GetEncoderState(m_inputid);
     }
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "GetFlags failed");
@@ -248,8 +245,8 @@ uint EncoderLink::GetFlags(void)
  */
 bool EncoderLink::IsRecording(const ProgramInfo *rec)
 {
-    return (rec->GetChanID() == chanid &&
-            rec->GetRecordingStartTime() == startRecordingTime);
+    return (rec->GetChanID() == m_chanid &&
+            rec->GetRecordingStartTime() == m_startRecordingTime);
 }
 
 /** \fn EncoderLink::MatchesRecording(const ProgramInfo *rec)
@@ -265,13 +262,13 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     bool retval = false;
     ProgramInfo *tvrec = nullptr;
 
-    if (local)
+    if (m_local)
     {
         while (kState_ChangingState == GetState())
             std::this_thread::sleep_for(std::chrono::microseconds(100));
 
         if (IsBusyRecording())
-            tvrec = tv->GetRecording();
+            tvrec = m_tv->GetRecording();
 
         if (tvrec)
         {
@@ -283,8 +280,8 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     {
         if (HasSockAndIncrRef())
         {
-            ReferenceLocker rlocker(sock);
-            retval = sock->EncoderIsRecording(m_inputid, rec);
+            ReferenceLocker rlocker(m_sock);
+            retval = m_sock->EncoderIsRecording(m_inputid, rec);
         }
     }
 
@@ -302,12 +299,12 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
 void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft,
                                 bool hasLater)
 {
-    if (local)
-        tv->RecordPending(rec, secsleft, hasLater);
+    if (m_local)
+        m_tv->RecordPending(rec, secsleft, hasLater);
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        sock->RecordPending(m_inputid, rec, secsleft, hasLater);
+        ReferenceLocker rlocker(m_sock);
+        m_sock->RecordPending(m_inputid, rec, secsleft, hasLater);
     }
 }
 
@@ -321,7 +318,7 @@ bool EncoderLink::WouldConflict(const ProgramInfo *rec)
     if (!IsConnected())
         return true;
 
-    if (rec->GetRecordingStartTime() < endRecordingTime)
+    if (rec->GetRecordingStartTime() < m_endRecordingTime)
         return true;
 
     return false;
@@ -332,8 +329,8 @@ bool EncoderLink::CheckFile(ProgramInfo *pginfo)
 {
     if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        return sock->CheckFile(pginfo);
+        ReferenceLocker rlocker(m_sock);
+        return m_sock->CheckFile(pginfo);
     }
 
     pginfo->SetPathname(GetPlaybackURL(pginfo));
@@ -349,8 +346,8 @@ void EncoderLink::GetDiskSpace(QStringList &o_strlist)
 {
     if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        sock->GetDiskSpace(o_strlist);
+        ReferenceLocker rlocker(m_sock);
+        m_sock->GetDiskSpace(o_strlist);
     }
 }
 
@@ -362,12 +359,12 @@ void EncoderLink::GetDiskSpace(QStringList &o_strlist)
  */
 long long EncoderLink::GetMaxBitrate()
 {
-    if (local)
-        return tv->GetMaxBitrate();
-    else if (HasSockAndIncrRef())
+    if (m_local)
+        return m_tv->GetMaxBitrate();
+    if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        return sock->GetMaxBitrate(m_inputid);
+        ReferenceLocker rlocker(m_sock);
+        return m_sock->GetMaxBitrate(m_inputid);
     }
 
     return -1;
@@ -389,12 +386,12 @@ long long EncoderLink::GetMaxBitrate()
  */
 int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
 {
-    if (local)
-        return tv->SetSignalMonitoringRate(rate, notifyFrontend);
-    else if (HasSockAndIncrRef())
+    if (m_local)
+        return m_tv->SetSignalMonitoringRate(rate, notifyFrontend);
+    if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        return sock->SetSignalMonitoringRate(m_inputid, rate,
+        ReferenceLocker rlocker(m_sock);
+        return m_sock->SetSignalMonitoringRate(m_inputid, rate,
                                              notifyFrontend);
     }
     return -1;
@@ -406,11 +403,11 @@ bool EncoderLink::GoToSleep(void)
 {
     if (IsLocal() || !HasSockAndIncrRef())
         return false;
-    ReferenceLocker rlocker(sock);
+    ReferenceLocker rlocker(m_sock);
 
-    lastSleepTime = MythDate::current();
+    m_lastSleepTime = MythDate::current();
 
-    return sock->GoToSleep();
+    return m_sock->GoToSleep();
 }
 
 /** \brief Lock the tuner for exclusive use.
@@ -419,10 +416,10 @@ bool EncoderLink::GoToSleep(void)
  */
 int EncoderLink::LockTuner()
 {
-    if (locked)
+    if (m_locked)
         return -2;
 
-    locked = true;
+    m_locked = true;
     return m_inputid;
 }
 
@@ -436,16 +433,16 @@ RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
 {
     RecStatus::Type retval = RecStatus::Aborted;
 
-    endRecordingTime = rec->GetRecordingEndTime();
-    startRecordingTime = rec->GetRecordingStartTime();
-    chanid = rec->GetChanID();
+    m_endRecordingTime = rec->GetRecordingEndTime();
+    m_startRecordingTime = rec->GetRecordingStartTime();
+    m_chanid = rec->GetChanID();
 
-    if (local)
-        retval = tv->StartRecording(rec);
+    if (m_local)
+        retval = m_tv->StartRecording(rec);
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        retval = sock->StartRecording(m_inputid, rec);
+        ReferenceLocker rlocker(m_sock);
+        retval = m_sock->StartRecording(m_inputid, rec);
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
@@ -457,9 +454,9 @@ RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
         retval != RecStatus::Tuning &&
         retval != RecStatus::Failing)
     {
-        endRecordingTime = MythDate::current().addDays(-2);
-        startRecordingTime = endRecordingTime;
-        chanid = 0;
+        m_endRecordingTime = MythDate::current().addDays(-2);
+        m_startRecordingTime = m_endRecordingTime;
+        m_chanid = 0;
     }
 
     return retval;
@@ -469,12 +466,12 @@ RecStatus::Type EncoderLink::GetRecordingStatus(void)
 {
     RecStatus::Type retval = RecStatus::Aborted;
 
-    if (local)
-        retval = tv->GetRecordingStatus();
+    if (m_local)
+        retval = m_tv->GetRecordingStatus();
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        retval = sock->GetRecordingStatus(m_inputid);
+        ReferenceLocker rlocker(m_sock);
+        retval = m_sock->GetRecordingStatus(m_inputid);
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
@@ -486,9 +483,9 @@ RecStatus::Type EncoderLink::GetRecordingStatus(void)
         retval != RecStatus::Tuning &&
         retval != RecStatus::Failing)
     {
-        endRecordingTime = MythDate::current().addDays(-2);
-        startRecordingTime = endRecordingTime;
-        chanid = 0;
+        m_endRecordingTime = MythDate::current().addDays(-2);
+        m_startRecordingTime = m_endRecordingTime;
+        m_chanid = 0;
     }
 
     return retval;
@@ -504,12 +501,12 @@ ProgramInfo *EncoderLink::GetRecording(void)
 {
     ProgramInfo *info = nullptr;
 
-    if (local)
-        info = tv->GetRecording();
+    if (m_local)
+        info = m_tv->GetRecording();
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        info = sock->GetRecording(m_inputid);
+        ReferenceLocker rlocker(m_sock);
+        info = m_sock->GetRecording(m_inputid);
     }
 
     return info;
@@ -522,13 +519,13 @@ ProgramInfo *EncoderLink::GetRecording(void)
  */
 void EncoderLink::StopRecording(bool killFile)
 {
-    endRecordingTime = MythDate::current().addDays(-2);
-    startRecordingTime = endRecordingTime;
-    chanid = 0;
+    m_endRecordingTime = MythDate::current().addDays(-2);
+    m_startRecordingTime = m_endRecordingTime;
+    m_chanid = 0;
 
-    if (local)
+    if (m_local)
     {
-        tv->StopRecording(killFile);
+        m_tv->StopRecording(killFile);
         return;
     }
 }
@@ -540,15 +537,12 @@ void EncoderLink::StopRecording(bool killFile)
  */
 void EncoderLink::FinishRecording(void)
 {
-    if (local)
+    if (m_local)
     {
-        tv->FinishRecording();
+        m_tv->FinishRecording();
         return;
     }
-    else
-    {
-        endRecordingTime = MythDate::current().addDays(-2);
-    }
+    m_endRecordingTime = MythDate::current().addDays(-2);
 }
 
 /** \fn EncoderLink::IsReallyRecording()
@@ -558,8 +552,8 @@ void EncoderLink::FinishRecording(void)
  */
 bool EncoderLink::IsReallyRecording(void)
 {
-    if (local)
-        return tv->IsReallyRecording();
+    if (m_local)
+        return m_tv->IsReallyRecording();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: IsReallyRecording");
     return false;
@@ -574,8 +568,8 @@ bool EncoderLink::IsReallyRecording(void)
  */
 float EncoderLink::GetFramerate(void)
 {
-    if (local)
-        return tv->GetFramerate();
+    if (m_local)
+        return m_tv->GetFramerate();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetFramerate");
     return -1;
@@ -590,8 +584,8 @@ float EncoderLink::GetFramerate(void)
  */
 long long EncoderLink::GetFramesWritten(void)
 {
-    if (local)
-        return tv->GetFramesWritten();
+    if (m_local)
+        return m_tv->GetFramesWritten();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetFramesWritten");
     return -1;
@@ -605,8 +599,8 @@ long long EncoderLink::GetFramesWritten(void)
  */
 long long EncoderLink::GetFilePosition(void)
 {
-    if (local)
-        return tv->GetFilePosition();
+    if (m_local)
+        return m_tv->GetFilePosition();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetFilePosition");
     return -1;
@@ -620,8 +614,8 @@ long long EncoderLink::GetFilePosition(void)
  */
 int64_t EncoderLink::GetKeyframePosition(uint64_t desired)
 {
-    if (local)
-        return tv->GetKeyframePosition(desired);
+    if (m_local)
+        return m_tv->GetKeyframePosition(desired);
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetKeyframePosition");
     return -1;
@@ -630,27 +624,27 @@ int64_t EncoderLink::GetKeyframePosition(uint64_t desired)
 bool EncoderLink::GetKeyframePositions(
     int64_t start, int64_t end, frm_pos_map_t &map)
 {
-    if (!local)
+    if (!m_local)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: GetKeyframePositions");
         return false;
     }
 
-    return tv->GetKeyframePositions(start, end, map);
+    return m_tv->GetKeyframePositions(start, end, map);
 }
 
 bool EncoderLink::GetKeyframeDurations(
     int64_t start, int64_t end, frm_pos_map_t &map)
 {
-    if (!local)
+    if (!m_local)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: GetKeyframeDurations");
         return false;
     }
 
-    return tv->GetKeyframeDurations(start, end, map);
+    return m_tv->GetKeyframeDurations(start, end, map);
 }
 
 /** \fn EncoderLink::FrontendReady()
@@ -660,8 +654,8 @@ bool EncoderLink::GetKeyframeDurations(
  */
 void EncoderLink::FrontendReady(void)
 {
-    if (local)
-        tv->FrontendReady();
+    if (m_local)
+        m_tv->FrontendReady();
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: FrontendReady");
 }
@@ -676,12 +670,12 @@ void EncoderLink::FrontendReady(void)
  */
 void EncoderLink::CancelNextRecording(bool cancel)
 {
-    if (local)
-        tv->CancelNextRecording(cancel);
+    if (m_local)
+        m_tv->CancelNextRecording(cancel);
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        sock->CancelNextRecording(m_inputid, cancel);
+        ReferenceLocker rlocker(m_sock);
+        m_sock->CancelNextRecording(m_inputid, cancel);
     }
 }
 
@@ -698,8 +692,8 @@ void EncoderLink::CancelNextRecording(bool cancel)
  */
 void EncoderLink::SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan)
 {
-    if (local)
-        tv->SpawnLiveTV(chain, pip, startchan);
+    if (m_local)
+        m_tv->SpawnLiveTV(chain, pip, std::move(startchan));
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SpawnLiveTV");
 }
@@ -709,8 +703,8 @@ void EncoderLink::SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan)
  */
 QString EncoderLink::GetChainID(void)
 {
-    if (local)
-        return tv->GetChainID();
+    if (m_local)
+        return m_tv->GetChainID();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SpawnLiveTV");
     return "";
@@ -723,8 +717,8 @@ QString EncoderLink::GetChainID(void)
  */
 void EncoderLink::StopLiveTV(void)
 {
-    if (local)
-        tv->StopLiveTV();
+    if (m_local)
+        m_tv->StopLiveTV();
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: StopLiveTV");
 }
@@ -737,8 +731,8 @@ void EncoderLink::StopLiveTV(void)
  */
 void EncoderLink::PauseRecorder(void)
 {
-    if (local)
-        tv->PauseRecorder();
+    if (m_local)
+        m_tv->PauseRecorder();
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: PauseRecorder");
 }
@@ -750,8 +744,8 @@ void EncoderLink::PauseRecorder(void)
  */
 void EncoderLink::SetLiveRecording(int recording)
 {
-    if (local)
-        tv->SetLiveRecording(recording);
+    if (m_local)
+        m_tv->SetLiveRecording(recording);
     else
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: SetLiveRecording");
@@ -760,14 +754,14 @@ void EncoderLink::SetLiveRecording(int recording)
 /**
  *  \brief Tells TVRec where to put the next LiveTV recording.
  */
-void EncoderLink::SetNextLiveTVDir(QString dir)
+void EncoderLink::SetNextLiveTVDir(const QString& dir)
 {
-    if (local)
-        tv->SetNextLiveTVDir(dir);
+    if (m_local)
+        m_tv->SetNextLiveTVDir(dir);
     else if (HasSockAndIncrRef())
     {
-        ReferenceLocker rlocker(sock);
-        sock->SetNextLiveTVDir(m_inputid, dir);
+        ReferenceLocker rlocker(m_sock);
+        m_sock->SetNextLiveTVDir(m_inputid, dir);
     }
 }
 
@@ -779,8 +773,8 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
  */
 QString EncoderLink::GetInput(void) const
 {
-    if (local)
-        return tv->GetInput();
+    if (m_local)
+        return m_tv->GetInput();
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetInput");
     return QString();
@@ -798,8 +792,8 @@ QString EncoderLink::GetInput(void) const
  */
 QString EncoderLink::SetInput(QString input)
 {
-    if (local)
-        return tv->SetInput(input);
+    if (m_local)
+        return m_tv->SetInput(std::move(input));
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetInput");
     return QString();
@@ -812,8 +806,8 @@ QString EncoderLink::SetInput(QString input)
  */
 void EncoderLink::ToggleChannelFavorite(QString changroup)
 {
-    if (local)
-        tv->ToggleChannelFavorite(changroup);
+    if (m_local)
+        m_tv->ToggleChannelFavorite(std::move(changroup));
     else
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: ToggleChannelFavorite");
@@ -827,8 +821,8 @@ void EncoderLink::ToggleChannelFavorite(QString changroup)
  */
 void EncoderLink::ChangeChannel(ChannelChangeDirection channeldirection)
 {
-    if (local)
-        tv->ChangeChannel(channeldirection);
+    if (m_local)
+        m_tv->ChangeChannel(channeldirection);
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: ChangeChannel");
 }
@@ -842,8 +836,8 @@ void EncoderLink::ChangeChannel(ChannelChangeDirection channeldirection)
  */
 void EncoderLink::SetChannel(const QString &name)
 {
-    if (local)
-        tv->SetChannel(name);
+    if (m_local)
+        m_tv->SetChannel(name);
     else
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetChannel");
 }
@@ -858,14 +852,14 @@ void EncoderLink::SetChannel(const QString &name)
  */
 int EncoderLink::GetPictureAttribute(PictureAttribute attr)
 {
-    if (!local)
+    if (!m_local)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: GetPictureAttribute");
         return -1;
     }
 
-    return tv->GetPictureAttribute(attr);
+    return m_tv->GetPictureAttribute(attr);
 }
 
 /** \fn EncoderLink::ChangePictureAttribute(PictureAdjustType,PictureAttribute,bool)
@@ -880,14 +874,14 @@ int EncoderLink::ChangePictureAttribute(PictureAdjustType type,
                                         PictureAttribute  attr,
                                         bool              direction)
 {
-    if (!local)
+    if (!m_local)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Should be local only query: ChangePictureAttribute");
         return -1;
     }
 
-    return tv->ChangePictureAttribute(type, attr, direction);
+    return m_tv->ChangePictureAttribute(type, attr, direction);
 }
 
 /** \fn EncoderLink::CheckChannel(const QString&)
@@ -901,8 +895,8 @@ int EncoderLink::ChangePictureAttribute(PictureAdjustType type,
  */
 bool EncoderLink::CheckChannel(const QString &name)
 {
-    if (local)
-        return tv->CheckChannel(name);
+    if (m_local)
+        return m_tv->CheckChannel(name);
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: CheckChannel");
     return false;
@@ -919,8 +913,8 @@ bool EncoderLink::CheckChannel(const QString &name)
  */
 bool EncoderLink::ShouldSwitchToAnotherInput(const QString &channelid)
 {
-    if (local)
-        return tv->ShouldSwitchToAnotherInput(channelid);
+    if (m_local)
+        return m_tv->ShouldSwitchToAnotherInput(channelid);
 
     LOG(VB_GENERAL, LOG_ERR,
         "Should be local only query: ShouldSwitchToAnotherInput");
@@ -936,19 +930,19 @@ bool EncoderLink::ShouldSwitchToAnotherInput(const QString &channelid)
  */
 bool EncoderLink::CheckChannelPrefix(
     const QString &prefix,
-    uint          &is_complete_valid_channel_on_rec,
+    uint          &complete_valid_channel_on_rec,
     bool          &is_extra_char_useful,
     QString       &needed_spacer)
 {
-    if (local)
+    if (m_local)
     {
-        return tv->CheckChannelPrefix(
-            prefix, is_complete_valid_channel_on_rec,
+        return m_tv->CheckChannelPrefix(
+            prefix, complete_valid_channel_on_rec,
             is_extra_char_useful, needed_spacer);
     }
 
     LOG(VB_GENERAL, LOG_ERR, "Should be local only query: CheckChannelPrefix");
-    is_complete_valid_channel_on_rec = false;
+    complete_valid_channel_on_rec    = 0;
     is_extra_char_useful             = false;
     needed_spacer                    = "";
     return false;
@@ -967,9 +961,9 @@ void EncoderLink::GetNextProgram(BrowseDirection direction,
                                  QString &channelname, uint    &_chanid,
                                  QString &seriesid,    QString &programid)
 {
-    if (local)
+    if (m_local)
     {
-        tv->GetNextProgram(direction,
+        m_tv->GetNextProgram(direction,
                            title, subtitle, desc, category, starttime,
                            endtime, callsign, iconpath, channelname,
                            _chanid, seriesid, programid);
@@ -982,13 +976,13 @@ bool EncoderLink::GetChannelInfo(uint &chanid, uint &sourceid,
                                  QString &callsign, QString &channum,
                                  QString &channame, QString &xmltv) const
 {
-    if (!local)
+    if (!m_local)
     {
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetChannelInfo");
         return false;
     }
 
-    return tv->GetChannelInfo(chanid, sourceid,
+    return m_tv->GetChannelInfo(chanid, sourceid,
                               callsign, channum, channame, xmltv);
 }
 
@@ -997,25 +991,26 @@ bool EncoderLink::SetChannelInfo(uint chanid, uint sourceid,
                                  QString callsign, QString channum,
                                  QString channame, QString xmltv)
 {
-    if (!local)
+    if (!m_local)
     {
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetChannelInfo");
         return false;
     }
 
-    return tv->SetChannelInfo(chanid, sourceid, oldchannum,
-                              callsign, channum, channame, xmltv);
+    return m_tv->SetChannelInfo(chanid, sourceid, std::move(oldchannum),
+                                std::move(callsign), std::move(channum),
+                                std::move(channame), std::move(xmltv));
 }
 
 bool EncoderLink::AddChildInput(uint childid)
 {
-    if (local)
+    if (m_local)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Called on local recorder");
         return false;
     }
 
-    bool retval = sock->AddChildInput(childid);
+    bool retval = m_sock->AddChildInput(childid);
     return retval;
 }
 

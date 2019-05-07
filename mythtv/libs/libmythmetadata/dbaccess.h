@@ -16,7 +16,7 @@ class META_PUBLIC SingleValue
 
   public:
     int add(const QString &name);
-    bool get(int id, QString &value);
+    bool get(int id, QString &category);
     void remove(int id);
     bool exists(int id);
     bool exists(const QString &name);
@@ -25,11 +25,11 @@ class META_PUBLIC SingleValue
     void load_data();
 
   protected:
-    explicit SingleValue(SingleValueImp *imp);
+    explicit SingleValue(SingleValueImp *imp) : m_imp(imp) {}
     virtual ~SingleValue();
 
   private:
-    SingleValueImp *m_imp;
+    SingleValueImp *m_imp {nullptr};
 };
 
 class MultiValueImp;
@@ -55,11 +55,11 @@ class META_PUBLIC MultiValue
     void load_data();
 
   protected:
-    explicit MultiValue(MultiValueImp *imp);
+    explicit MultiValue(MultiValueImp *imp)  : m_imp(imp) {}
     virtual ~MultiValue() = default;
 
   private:
-    MultiValueImp *m_imp;
+    MultiValueImp *m_imp {nullptr};
 };
 
 class META_PUBLIC VideoCategory : public SingleValue
@@ -137,16 +137,18 @@ class META_PUBLIC FileAssociations
   public:
     struct META_PUBLIC file_association
     {
-        unsigned int id;
+        unsigned int id     {0};
         QString extension;
         QString playcommand;
-        bool ignore;
-        bool use_default;
+        bool ignore         {false};
+        bool use_default    {false};
 
-        file_association();
+        file_association() = default;
         file_association(unsigned int l_id, const QString &ext,
                          const QString &playcmd, bool l_ignore,
-                         bool l_use_default);
+                         bool l_use_default)
+            : id(l_id), extension(ext), playcommand(playcmd),
+              ignore(l_ignore), use_default(l_use_default) {}
     };
     typedef std::vector<file_association> association_list;
     typedef std::vector<std::pair<QString, bool> > ext_ignore_list;
@@ -171,7 +173,7 @@ class META_PUBLIC FileAssociations
     ~FileAssociations();
 
   private:
-    class FileAssociationsImp *m_imp;
+    class FileAssociationsImp *m_imp {nullptr};
 };
 
 #endif // DBACCESS_H_

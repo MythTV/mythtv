@@ -16,12 +16,12 @@ struct DriverOption;
 class MTV_PUBLIC V4L2util
 {
   public:
-    V4L2util(void);
+    V4L2util(void) = default;
     explicit V4L2util(const QString& dev_name);
     V4L2util(const QString& dev_name, const QString& vbi_dev_name);
     ~V4L2util(void);
 
-    bool Open(const QString& device_name, const QString& vbi_device_name = "");
+    bool Open(const QString& dev_name, const QString& vbi_dev_name = "");
     void Close(void);
     int  FD(void) const { return m_fd; }
 
@@ -42,9 +42,9 @@ class MTV_PUBLIC V4L2util
     bool IsEncoder(void) const;
     bool UserAdjustableResolution(void) const;
 
-    QString DriverName(void)  const { return m_driver_name; }
-    QString CardName(void)    const { return m_card_name; }
-    QString ProfileName(void) const { return "V4L2:" + m_driver_name; }
+    QString DriverName(void)  const { return m_driverName; }
+    QString CardName(void)    const { return m_cardName; }
+    QString ProfileName(void) const { return "V4L2:" + m_driverName; }
 
     int  GetStreamType(void) const;
     bool SetStreamType(int value);
@@ -93,15 +93,15 @@ class MTV_PUBLIC V4L2util
     void log_controls(bool show_menus);
 
   private:
-    int      m_fd;
-    int      m_vbi_fd;
+    int      m_fd                   {-1};
+    int      m_vbiFd                {-1};
     DriverOption::Options m_options;
-    QString  m_device_name;
-    QString  m_driver_name;
-    QString  m_card_name;
-    int      m_version;
-    uint32_t m_capabilities;
-    bool     m_have_query_ext_ctrl;
+    QString  m_deviceName;
+    QString  m_driverName;
+    QString  m_cardName;
+    int      m_version              {0};
+    uint32_t m_capabilities         {0};
+    bool     m_haveQueryExtCtrl     {false};
 };
 
 #endif

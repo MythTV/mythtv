@@ -18,8 +18,8 @@ class BonjourRegister;
 #define AIRPLAY_HARDWARE_ID_SIZE 6
 QString     AirPlayHardwareId(void);
 QString     GenerateNonce(void);
-QByteArray  DigestMd5Response(QString response, QString option,
-                              QString nonce, QString password,
+QByteArray  DigestMd5Response(const QString& response, const QString& option,
+                              const QString& nonce, const QString& password,
                               QByteArray &auth);
 
 enum AirplayEvent
@@ -34,37 +34,32 @@ enum AirplayEvent
 class AirplayConnection
 {
   public:
-    AirplayConnection()
-      : controlSocket(nullptr), reverseSocket(nullptr), speed(1.0f),
-        position(0.0f), initial_position(-1.0f), url(QUrl()),
-        lastEvent(AP_EVENT_NONE), stopped(false), was_playing(false),
-        initialized(false), photos(false), notificationid(-1)
-    { }
+    AirplayConnection() = default;
     ~AirplayConnection()
     {
         UnRegister();
     }
     void UnRegister(void)
     {
-        if (notificationid > 0)
+        if (m_notificationid > 0)
         {
-            GetNotificationCenter()->UnRegister(this, notificationid);
-            notificationid = -1;
+            GetNotificationCenter()->UnRegister(this, m_notificationid);
+            m_notificationid = -1;
         }
     }
-    QTcpSocket  *controlSocket;
-    QTcpSocket  *reverseSocket;
-    float        speed;
-    double       position;
-    double       initial_position;
-    QUrl         url;
-    AirplayEvent lastEvent;
-    bool         stopped;
-    bool         was_playing;
-    bool         initialized;
-    bool         photos;
+    QTcpSocket  *m_controlSocket    {nullptr};
+    QTcpSocket  *m_reverseSocket    {nullptr};
+    float        m_speed            {1.0F};
+    double       m_position         {0.0};
+//  double       m_initial_position {-1.0};
+    QUrl         m_url;
+    AirplayEvent m_lastEvent        {AP_EVENT_NONE};
+    bool         m_stopped          {false};
+    bool         m_was_playing      {false};
+    bool         m_initialized      {false};
+    bool         m_photos           {false};
     // Notification
-    int          notificationid;
+    int          m_notificationid   {-1};
 };
 
 class APHTTPRequest;
@@ -79,7 +74,8 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     static MythAirplayServer *AirplaySharedInstance(void)
     { return gMythAirplayServer; }
 
-    MythAirplayServer();
+    MythAirplayServer()
+        : m_lock(new QMutex(QMutex::Recursive)) {}
 
   private slots:
     void Start();
@@ -90,7 +86,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     void timeout(void);
 
   private:
-    virtual ~MythAirplayServer(void);
+    ~MythAirplayServer(void) override;
     void Teardown(void);
     void HandleResponse(APHTTPRequest *req, QTcpSocket *socket);
     QByteArray StatusToString(int status);
@@ -101,8 +97,8 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     QString GetMacAddress();
     bool SendReverseEvent(QByteArray &session, AirplayEvent event);
     void SendResponse(QTcpSocket *socket,
-                      int status, QByteArray header,
-                      QByteArray content_type, QString body);
+                      int status, const QByteArray& header,
+                      const QByteArray& content_type, const QString& body);
 
     void deleteConnection(QTcpSocket *socket);
     void DisconnectAllClients(const QByteArray &session);
@@ -120,11 +116,11 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     static MThread           *gMythAirplayServerThread;
 
     // Members
-    QString          m_name;
-    BonjourRegister *m_bonjour;
-    bool             m_valid;
-    QMutex          *m_lock;
-    int              m_setupPort;
+    QString          m_name          {"MythTV"};
+    BonjourRegister *m_bonjour       {nullptr};
+    bool             m_valid         {false};
+    QMutex          *m_lock          {nullptr};
+    int              m_setupPort     {5100};
     QList<QTcpSocket*> m_sockets;
     QHash<QByteArray,AirplayConnection> m_connections;
     QString          m_pathname;
@@ -136,7 +132,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     QHash<QTcpSocket*, APHTTPRequest*> m_incoming;
 
     // Bonjour Service re-advertising
-    QTimer         *m_serviceRefresh;
+    QTimer         *m_serviceRefresh {nullptr};
 };
 
 #endif // MYTHAIRPLAYSERVER_H

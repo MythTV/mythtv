@@ -17,37 +17,39 @@ class AudioSetupWizard : public MythScreenType
   public:
 
     AudioSetupWizard(MythScreenStack *parent, MythScreenType *generalScreen,
-                     const char *name = nullptr);
+                     const char *name = nullptr)
+        : MythScreenType(parent, name),
+          m_generalScreen(generalScreen) {}
     ~AudioSetupWizard();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void save(void);
 
   private:
-    virtual void Load(void);
-    virtual void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
-    QVector<AudioOutput::AudioDeviceConfig> *m_outputlist;
-    AudioTestThread     *m_testThread;
+    QVector<AudioOutput::AudioDeviceConfig> *m_outputlist {nullptr};
+    AudioTestThread     *m_testThread              {nullptr};
 
-    MythScreenType      *m_generalScreen;
+    MythScreenType      *m_generalScreen           {nullptr};
 
-    MythUIButtonList    *m_audioDeviceButtonList;
-    MythUIButtonList    *m_speakerNumberButtonList;
+    MythUIButtonList    *m_audioDeviceButtonList   {nullptr};
+    MythUIButtonList    *m_speakerNumberButtonList {nullptr};
 
-    MythUICheckBox      *m_dtsCheck;
-    MythUICheckBox      *m_ac3Check;
-    MythUICheckBox      *m_eac3Check;
-    MythUICheckBox      *m_truehdCheck;
-    MythUICheckBox      *m_dtshdCheck;
+    MythUICheckBox      *m_dtsCheck                {nullptr};
+    MythUICheckBox      *m_ac3Check                {nullptr};
+    MythUICheckBox      *m_eac3Check               {nullptr};
+    MythUICheckBox      *m_truehdCheck             {nullptr};
+    MythUICheckBox      *m_dtshdCheck              {nullptr};
 
-    MythUIButton        *m_testSpeakerButton;
+    MythUIButton        *m_testSpeakerButton       {nullptr};
 
-    MythUIButton        *m_nextButton;
-    MythUIButton        *m_prevButton;
-    int                  m_maxspeakers;
+    MythUIButton        *m_nextButton              {nullptr};
+    MythUIButton        *m_prevButton              {nullptr};
+    int                  m_maxspeakers             {2};
     QString              m_lastAudioDevice;
 
   private slots:

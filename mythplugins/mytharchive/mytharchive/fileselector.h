@@ -41,11 +41,16 @@ class FileSelector : public MythScreenType
 
   public:
     FileSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
-                 FSTYPE type, const QString &startDir, const QString &filemask);
+                 FSTYPE type, const QString &startDir, const QString &filemask)
+        : MythScreenType(parent, "FileSelector"),
+          m_selectorType(type),
+          m_filemask(filemask),
+          m_curDirectory(startDir),
+          m_archiveList(archiveList) {}
     ~FileSelector();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
     QString getSelected(void);
 
@@ -77,13 +82,13 @@ class FileSelector : public MythScreenType
     //
     //  GUI stuff
     //
-    MythUIText       *m_titleText;
-    MythUIButtonList *m_fileButtonList;
-    MythUITextEdit   *m_locationEdit;
-    MythUIButton     *m_okButton;
-    MythUIButton     *m_cancelButton;
-    MythUIButton     *m_backButton;
-    MythUIButton     *m_homeButton;
+    MythUIText       *m_titleText      {nullptr};
+    MythUIButtonList *m_fileButtonList {nullptr};
+    MythUITextEdit   *m_locationEdit   {nullptr};
+    MythUIButton     *m_okButton       {nullptr};
+    MythUIButton     *m_cancelButton   {nullptr};
+    MythUIButton     *m_backButton     {nullptr};
+    MythUIButton     *m_homeButton     {nullptr};
 };
 
 Q_DECLARE_METATYPE(FileData *)

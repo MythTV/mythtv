@@ -21,7 +21,7 @@ DeleteHandler::DeleteHandler(void) :
 {
 }
 
-DeleteHandler::DeleteHandler(QString filename) :
+DeleteHandler::DeleteHandler(const QString& filename) :
     ReferenceCounter(QString("DeleteHandler:%1").arg(filename)),
     m_path(filename), m_fd(-1), m_size(0)
 {
@@ -39,11 +39,11 @@ void DeleteHandler::Close(void)
     m_fd = -1;
 }
 
-QMap <QString, QString> recordingPathCache;
+static QMap <QString, QString> recordingPathCache;
+static QMutex recordingPathLock;
 
 QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
 {
-    static QMutex recordingPathLock;
     QString result = "";
     QMutexLocker locker(&recordingPathLock);
     QString cacheKey = QString("%1:%2").arg(pginfo->GetChanID())
@@ -57,7 +57,9 @@ QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
     }
     else
     {
+        locker.unlock();
         result = pginfo->GetPlaybackURL(false, true);
+        locker.relock();
         if (storePath && result.startsWith("/"))
             recordingPathCache[cacheKey] = result;
     }

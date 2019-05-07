@@ -45,21 +45,19 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 
 void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int H) {
 	int i;
-	int *p1;
-	int *p2;
 	v2d v2;
 	
 	for (i=0;i<s->nbvertex;i++) {
 		V3D_TO_V2D(s->svertex[i],v2,W,H,dist);
-		p1 = buf + v2.x + (v2.y*W);
-		p2 = back + v2.x + (v2.y*W);
+		int *p1 = buf + v2.x + (v2.y*W);
+		int *p2 = back + v2.x + (v2.y*W);
 		if ((v2.x>=0) && (v2.y>=0) && (v2.x<W) && (v2.y<H)) {
 			*p1 = color;
 		}
-	}
 
-	/* Squelch a gcc warning */
-	(void)p2;
+                /* Squelch a gcc warning */
+                (void)p2;
+	}
 }
 
 void grid3d_draw (grid3d *g, int color, int colorlow,
@@ -103,7 +101,7 @@ void surf3d_translate (surf3d *s) {
 	}
 }
 
-void grid3d_update (grid3d *g, float angle, float *vals, float dist) {
+void grid3d_update (grid3d *g, float angle, const float *vals, float dist) {
 	int i;
 	float cosa;
 	float sina;
@@ -111,18 +109,18 @@ void grid3d_update (grid3d *g, float angle, float *vals, float dist) {
 	v3d cam = s->center;
 	cam.z += dist;
 
-	SINCOS((angle/4.3f),sina,cosa);
-	cam.y += sina*2.0f;
+	SINCOS((angle/4.3F),sina,cosa);
+	cam.y += sina*2.0F;
 	SINCOS(angle,sina,cosa);
 
 	if (g->mode==0) {
 		if (vals)
 			for (i=0;i<g->defx;i++)
-				s->vertex[i].y = s->vertex[i].y*0.2 + vals[i]*0.8;
+				s->vertex[i].y = s->vertex[i].y*0.2F + vals[i]*0.8F;
 
 		for (i=g->defx;i<s->nbvertex;i++) {
-			s->vertex[i].y *= 0.255f;
-			s->vertex[i].y += (s->vertex[i-g->defx].y * 0.777f);
+			s->vertex[i].y *= 0.255F;
+			s->vertex[i].y += (s->vertex[i-g->defx].y * 0.777F);
 		}
 	}
 

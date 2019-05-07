@@ -1,25 +1,31 @@
 #ifndef AUDIOOUTPUTOSS
 #define AUDIOOUTPUTOSS
 
+#if HAVE_SYS_SOUNDCARD_H
+    #include <sys/soundcard.h>
+#elif HAVE_SOUNDCARD_H
+    #include <soundcard.h>
+#endif
+
 #include "audiooutputbase.h"
 
 class AudioOutputOSS : public AudioOutputBase
 {
   public:
     explicit AudioOutputOSS(const AudioSettings &settings);
-    virtual ~AudioOutputOSS();
+    ~AudioOutputOSS() override;
 
     // Volume control
-    virtual int GetVolumeChannel(int channel) const;
-    virtual void SetVolumeChannel(int channel, int volume);
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   protected:
     // You need to implement the following functions
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(bool digital);
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
 
   private:
     void VolumeInit(void);
@@ -27,12 +33,12 @@ class AudioOutputOSS : public AudioOutputBase
 
     void SetFragSize(void);
 
-    int audiofd;
-    mutable int numbadioctls;
+    int         m_audiofd      {-1};
+    mutable int m_numbadioctls {0};
 
     // Volume related
-    int mixerfd;
-    int control;
+    int         m_mixerfd      {-1};
+    int         m_control      {SOUND_MIXER_VOLUME};
 };
 
 #endif

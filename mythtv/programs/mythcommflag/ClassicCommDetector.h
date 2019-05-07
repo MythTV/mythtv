@@ -56,14 +56,14 @@ class ClassicCommDetector : public CommDetectorBase
                             const QDateTime& recordingStopsAt_in);
         virtual void deleteLater(void);
 
-        bool go();
-        void GetCommercialBreakList(frm_dir_map_t &comms);
-        void recordingFinished(long long totalFileSize);
-        void requestCommBreakMapUpdate(void);
+        bool go() override; // CommDetectorBase
+        void GetCommercialBreakList(frm_dir_map_t &marks) override; // CommDetectorBase
+        void recordingFinished(long long totalFileSize) override; // CommDetectorBase
+        void requestCommBreakMapUpdate(void) override; // CommDetectorBase
 
         void PrintFullMap(
             ostream &out, const frm_dir_map_t *comm_breaks,
-            bool verbose) const;
+            bool verbose) const override; // CommDetectorBase
 
         void logoDetectorBreathe();
 
@@ -112,77 +112,71 @@ class ClassicCommDetector : public CommDetectorBase
         void CleanupFrameInfo(void);
         void GetLogoCommBreakMap(show_map_t &map);
 
-        enum SkipTypes commDetectMethod;
-        frm_dir_map_t lastSentCommBreakMap;
-        bool commBreakMapUpdateRequested;
-        bool sendCommBreakMapUpdates;
+        enum SkipTypes m_commDetectMethod;
+        frm_dir_map_t m_lastSentCommBreakMap;
+        bool m_commBreakMapUpdateRequested {false};
+        bool m_sendCommBreakMapUpdates     {false};
 
-        int commDetectBorder;
-        int commDetectBlankFrameMaxDiff;
-        int commDetectDarkBrightness;
-        int commDetectDimBrightness;
-        int commDetectBoxBrightness;
-        int commDetectDimAverage;
-        int commDetectMaxCommBreakLength;
-        int commDetectMinCommBreakLength;
-        int commDetectMinShowLength;
-        int commDetectMaxCommLength;
-        bool commDetectBlankCanHaveLogo;
+        int m_commDetectBorder             {0};
+        int m_commDetectBlankFrameMaxDiff  {25};
+        int m_commDetectDarkBrightness     {80};
+        int m_commDetectDimBrightness      {120};
+        int m_commDetectBoxBrightness      {30};
+        int m_commDetectDimAverage         {35};
+        int m_commDetectMaxCommBreakLength {395};
+        int m_commDetectMinCommBreakLength {60};
+        int m_commDetectMinShowLength      {65};
+        int m_commDetectMaxCommLength      {125};
+        bool m_commDetectBlankCanHaveLogo  {true};
 
-        bool verboseDebugging;
+        bool m_verboseDebugging            {false};
 
-        long long lastFrameNumber;
-        long long curFrameNumber;
+        long long m_lastFrameNumber        {0};
+        long long m_curFrameNumber         {0};
 
-        int width;
-        int height;
-        int horizSpacing;
-        int vertSpacing;
-        double fpm;
-        bool blankFramesOnly;
-        int blankFrameCount;
-        int currentAspect;
+        int m_width                        {0};
+        int m_height                       {0};
+        int m_horizSpacing                 {0};
+        int m_vertSpacing                  {0};
+        bool m_blankFramesOnly             {false};
+        int m_blankFrameCount              {0};
+        int m_currentAspect                {0};
 
 
-        int totalMinBrightness;
+        int m_totalMinBrightness           {0};
 
-        bool detectBlankFrames;
-        bool detectSceneChanges;
-        bool detectStationLogo;
+        bool m_logoInfoAvailable           {false};
+        LogoDetectorBase* m_logoDetector   {nullptr};
 
-        bool logoInfoAvailable;
-        LogoDetectorBase* logoDetector;
+        frm_dir_map_t m_blankFrameMap;
+        frm_dir_map_t m_blankCommMap;
+        frm_dir_map_t m_blankCommBreakMap;
+        frm_dir_map_t m_sceneMap;
+        frm_dir_map_t m_sceneCommBreakMap;
+        frm_dir_map_t m_commBreakMap;
+        frm_dir_map_t m_logoCommBreakMap;
 
-        frm_dir_map_t blankFrameMap;
-        frm_dir_map_t blankCommMap;
-        frm_dir_map_t blankCommBreakMap;
-        frm_dir_map_t sceneMap;
-        frm_dir_map_t sceneCommBreakMap;
-        frm_dir_map_t commBreakMap;
-        frm_dir_map_t logoCommBreakMap;
+        bool m_frameIsBlank                {false};
+        bool m_stationLogoPresent          {false};
 
-        bool frameIsBlank;
-        bool sceneHasChanged;
-        bool stationLogoPresent;
+        bool m_decoderFoundAspectChanges   {false};
 
-        bool lastFrameWasBlank;
-        bool lastFrameWasSceneChange;
-        bool decoderFoundAspectChanges;
-
-        SceneChangeDetectorBase* sceneChangeDetector;
+        SceneChangeDetectorBase* m_sceneChangeDetector {nullptr};
 
 protected:
-        MythPlayer *player;
-        QDateTime startedAt, stopsAt;
-        QDateTime recordingStartedAt, recordingStopsAt;
-        bool aggressiveDetection;
-        bool stillRecording;
-        bool fullSpeed;
-        bool showProgress;
-        double fps;
-        uint64_t framesProcessed;
-        long long preRoll;
-        long long postRoll;
+        MythPlayer *m_player               {nullptr};
+        QDateTime m_startedAt;
+        QDateTime m_stopsAt;
+        QDateTime m_recordingStartedAt;
+        QDateTime m_recordingStopsAt;
+        bool m_aggressiveDetection         {false};
+        bool m_stillRecording              {false};
+        bool m_fullSpeed                   {false};
+        bool m_showProgress                {false};
+        double m_fps                       {0.0};
+        uint64_t m_framesProcessed         {0};
+        long long m_preRoll                {0};
+        long long m_postRoll               {0};
 
 
         void Init();

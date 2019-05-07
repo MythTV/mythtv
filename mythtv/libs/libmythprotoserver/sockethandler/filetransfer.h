@@ -45,21 +45,21 @@ class FileTransfer : public SocketHandler
     void SetTimeout(bool fast);
 
   private:
-   ~FileTransfer();
+   ~FileTransfer() override;
 
-    volatile bool  readthreadlive;
-    bool           readsLocked;
-    QWaitCondition readsUnlockedCond;
+    volatile bool  m_readthreadlive {true};
+    bool           m_readsLocked {false};
+    QWaitCondition m_readsUnlockedCond;
 
-    ProgramInfo *pginfo;
-    RingBuffer *rbuffer;
-    bool ateof;
+    ProgramInfo *m_pginfo {nullptr};
+    RingBuffer  *m_rbuffer {nullptr};
+    bool m_ateof {false};
 
-    vector<char> requestBuffer;
+    vector<char> m_requestBuffer;
 
-    QMutex lock;
+    QMutex m_lock {QMutex::NonRecursive};
 
-    bool writemode;
+    bool m_writemode {false};
 };
 
 #endif

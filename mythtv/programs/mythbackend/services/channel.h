@@ -49,9 +49,9 @@ class Channel : public ChannelServices
                                                      bool      OnlyVisible,
                                                      bool      Details,
                                                      bool      OrderByName,
-                                                     bool      GroupByCallsign);
+                                                     bool      GroupByCallsign) override; // ChannelServices
 
-        DTC::ChannelInfo*      GetChannelInfo      ( uint     ChanID     );
+        DTC::ChannelInfo*      GetChannelInfo      ( uint     ChanID     ) override; // ChannelServices
 
         bool                   UpdateDBChannel     ( uint          MplexID,
                                                      uint          SourceID,
@@ -68,7 +68,7 @@ class Channel : public ChannelServices
                                                      const QString &Icon,
                                                      const QString &Format,
                                                      const QString &XMLTVID,
-                                                     const QString &DefaultAuthority );
+                                                     const QString &DefaultAuthority ) override; // ChannelServices
 
         bool                   AddDBChannel        ( uint          MplexID,
                                                      uint          SourceID,
@@ -85,15 +85,15 @@ class Channel : public ChannelServices
                                                      const QString &Icon,
                                                      const QString &Format,
                                                      const QString &XMLTVID,
-                                                     const QString &DefaultAuthority );
+                                                     const QString &DefaultAuthority ) override; // ChannelServices
 
-        bool                   RemoveDBChannel     ( uint          ChannelID );
+        bool                   RemoveDBChannel     ( uint          ChannelID ) override; // ChannelServices
 
         /* Video Source Methods */
 
-        DTC::VideoSourceList*     GetVideoSourceList     ( void );
+        DTC::VideoSourceList*     GetVideoSourceList     ( void ) override; // ChannelServices
 
-        DTC::VideoSource*         GetVideoSource         ( uint SourceID );
+        DTC::VideoSource*         GetVideoSource         ( uint SourceID ) override; // ChannelServices
 
         bool                      UpdateVideoSource      ( uint          SourceID,
                                                            const QString &SourceName,
@@ -104,7 +104,7 @@ class Channel : public ChannelServices
                                                            const QString &Password,
                                                            bool          UseEIT,
                                                            const QString &ConfigPath,
-                                                           int           NITId );
+                                                           int           NITId ) override; // ChannelServices
 
         int                       AddVideoSource         ( const QString &SourceName,
                                                            const QString &Grabber,
@@ -114,27 +114,27 @@ class Channel : public ChannelServices
                                                            const QString &Password,
                                                            bool          UseEIT,
                                                            const QString &ConfigPath,
-                                                           int           NITId );
+                                                           int           NITId ) override; // ChannelServices
 
-        bool                      RemoveVideoSource      ( uint SourceID );
+        bool                      RemoveVideoSource      ( uint SourceID ) override; // ChannelServices
 
-        DTC::LineupList*          GetDDLineupList        ( const QString &Source,
-                                                           const QString &UserId,
-                                                           const QString &Password );
+        DTC::LineupList*          GetDDLineupList        ( const QString &/*Source*/,
+                                                           const QString &/*UserId*/,
+                                                           const QString &/*Password*/ ) override; // ChannelServices
 
-        int                       FetchChannelsFromSource( const uint SourceId,
-                                                           const uint CardId,
-                                                           bool       WaitForFinish );
+        int                       FetchChannelsFromSource( uint       SourceId,
+                                                           uint       CardId,
+                                                           bool       WaitForFinish ) override; // ChannelServices
 
         /* Multiplex Methods */
 
         DTC::VideoMultiplexList*  GetVideoMultiplexList  ( uint SourceID,
                                                            uint StartIndex,
-                                                           uint Count      );
+                                                           uint Count      ) override; // ChannelServices
 
-        DTC::VideoMultiplex*      GetVideoMultiplex      ( uint MplexID    );
+        DTC::VideoMultiplex*      GetVideoMultiplex      ( uint MplexID    ) override; // ChannelServices
 
-        QStringList               GetXMLTVIdList         ( uint SourceID );
+        QStringList               GetXMLTVIdList         ( uint SourceID ) override; // ChannelServices
 
 };
 

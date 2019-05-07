@@ -21,24 +21,30 @@ public:
     CannyEdgeDetector(void);
     ~CannyEdgeDetector(void);
     int MythPlayerInited(const MythPlayer *player, int width, int height);
-    virtual int setExcludeArea(int row, int col, int width, int height);
-    virtual const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,
-            int percentile);
+    int setExcludeArea(int row, int col, int width, int height) override; // EdgeDetector
+    const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,
+            int percentile) override; // EdgeDetector
 
 private:
-    int resetBuffers(int pgmwidth, int pgmheight);
+    CannyEdgeDetector(const CannyEdgeDetector &) = delete;            // not copyable
+    CannyEdgeDetector &operator=(const CannyEdgeDetector &) = delete; // not copyable
+    int resetBuffers(int newwidth, int newheight);
 
-    double          *mask;                  /* pre-computed Gaussian mask */
-    int             mask_radius;            /* radius of mask */
+    double         *m_mask        {nullptr}; /* pre-computed Gaussian mask */
+    int             m_mask_radius {2};       /* radius of mask */
 
-    unsigned int    *sgm, *sgmsorted;       /* squared-gradient magnitude */
-    AVFrame       s1, s2, convolved;      /* smoothed grayscale frame */
-    int             ewidth, eheight;        /* dimensions */
-    AVFrame       edges;                  /* detected edges */
+    unsigned int   *m_sgm         {nullptr}; /* squared-gradient magnitude */
+    unsigned int   *m_sgmsorted   {nullptr}; /* squared-gradient magnitude */
+    AVFrame         m_s1;                    /* smoothed grayscale frame */
+    AVFrame         m_s2;                    /* smoothed grayscale frame */
+    AVFrame         m_convolved;             /* smoothed grayscale frame */
+    int             m_ewidth      {-1};      /* dimensions */
+    int             m_eheight     {-1};      /* dimensions */
+    AVFrame         m_edges;                 /* detected edges */
 
     struct {
         int         row, col, width, height;
-    }               exclude;
+    }               m_exclude;
 };
 
 #endif  /* !__CANNYEDGEDETECTOR_H__ */

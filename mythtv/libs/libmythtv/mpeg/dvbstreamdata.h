@@ -32,8 +32,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     virtual ~DVBStreamData();
 
     using MPEGStreamData::Reset;
-    void Reset(void) { Reset(0, 0, -1); }
-    void Reset(uint desired_netid, uint desired_tsid, int desired_sid);
+    void Reset(void) override // MPEGStreamData
+        { Reset(0, 0, -1); }
+    void Reset(uint desired_netid, uint desired_tsid, int desired_serviceid);
 
     // DVB table monitoring
     void SetDesiredService(uint netid, uint tsid, int serviceid);
@@ -41,8 +42,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     uint DesiredTransportID(void) const { return _desired_tsid;  }
 
     // Table processing
-    bool HandleTables(uint pid, const PSIPTable&);
-    bool IsRedundant(uint pid, const PSIPTable&) const;
+    bool HandleTables(uint pid, const PSIPTable&) override; // MPEGStreamData
+    bool IsRedundant(uint pid, const PSIPTable&) const override; // MPEGStreamData
     void ProcessSDT(uint tsid, const ServiceDescriptionTable*);
 
     // NIT for broken providers
@@ -52,10 +53,10 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     inline void SetDishNetEIT(bool);
     inline bool HasAnyEIT(void) const;
     inline bool HasEIT(uint serviceid) const;
-    bool HasEITPIDChanges(const uint_vec_t &in_use_pids) const;
-    bool GetEITPIDChanges(const uint_vec_t &in_use_pids,
+    bool HasEITPIDChanges(const uint_vec_t &in_use_pids) const override; // MPEGStreamData
+    bool GetEITPIDChanges(const uint_vec_t &cur_pids,
                           uint_vec_t &add_pids,
-                          uint_vec_t &del_pids) const;
+                          uint_vec_t &del_pids) const override; // MPEGStreamData
 
     // Table versions
     void SetVersionSDT(uint tsid, int version, uint last_section)
@@ -110,7 +111,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void CacheNIT(NetworkInformationTable*);
     void CacheSDT(ServiceDescriptionTable*);
   protected:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    bool DeleteCachedTable(PSIPTable *psip) const override; // MPEGStreamData
 
   private:
     /// DVB table monitoring

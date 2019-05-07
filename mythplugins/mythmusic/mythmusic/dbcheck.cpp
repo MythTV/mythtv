@@ -31,7 +31,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-static bool performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], const QString& version,
                                 QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -101,10 +101,10 @@ bool UpgradeMusicDatabaseSchema(void)
     if (schema_wizard->Compare() == 0) // DB schema is what we need it to be..
         goto upgrade_ok_exit;
 
-    if (schema_wizard->DBver.isEmpty())
+    if (schema_wizard->m_DBver.isEmpty())
     {
         // We need to create a database from scratch
-        if (doUpgradeMusicDatabaseSchema(schema_wizard->DBver))
+        if (doUpgradeMusicDatabaseSchema(schema_wizard->m_DBver))
             goto upgrade_ok_exit;
         else
             goto upgrade_error_exit;
@@ -122,7 +122,7 @@ bool UpgradeMusicDatabaseSchema(void)
             break;
     }
 
-    if (!doUpgradeMusicDatabaseSchema(schema_wizard->DBver))
+    if (!doUpgradeMusicDatabaseSchema(schema_wizard->m_DBver))
     {
         LOG(VB_GENERAL, LOG_ERR, "Database schema upgrade failed.");
         goto upgrade_error_exit;

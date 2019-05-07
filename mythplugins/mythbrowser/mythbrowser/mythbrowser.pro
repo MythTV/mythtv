@@ -29,4 +29,9 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
+android {
+    # to discriminate plugins in a flat directory structure
+    TARGET = mythplugin$${TARGET}
+}
+
 include ( ../../libs-targetfix.pro )

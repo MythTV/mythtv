@@ -29,6 +29,13 @@
 #include "requesthandler/basehandler.h"
 #include "requesthandler/fileserverhandler.h"
 #include "requesthandler/messagehandler.h"
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+#define ms_sd_notify(x) \
+    (void)sd_notify(0, x);
+#else
+#define ms_sd_notify(x)
+#endif
 
 #define LOC      QString("MythMediaServer: ")
 #define LOC_WARN QString("MythMediaServer, Warning: ")
@@ -99,6 +106,7 @@ int main(int argc, char *argv[])
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
+    ms_sd_notify("STATUS=Connecting to database.");
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -106,7 +114,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    if (!UpgradeTVDatabaseSchema(false))
+    if (!UpgradeTVDatabaseSchema(false, false, true))
     {
         LOG(VB_GENERAL, LOG_ERR, "Exiting due to schema mismatch.");
         return GENERIC_EXIT_DB_OUTOFDATE;
@@ -115,6 +123,7 @@ int main(int argc, char *argv[])
     cmdline.ApplySettingsOverride();
 
     gCoreContext->SetAsBackend(true); // blocks the event connection
+    ms_sd_notify("STATUS=Connecting to master server.");
     if (!gCoreContext->ConnectToMasterServer())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect to master server");
@@ -130,6 +139,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
+    ms_sd_notify("STATUS=Creating socket manager");
     MythSocketManager *sockmanager = new MythSocketManager();
     if (!sockmanager->Listen(port))
     {
@@ -149,10 +159,14 @@ int main(int argc, char *argv[])
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
 
-    int exitCode = a.exec();
+    // Provide systemd ready notification (for type=notify units)
+    ms_sd_notify("STATUS=");
+    ms_sd_notify("READY=1");
 
-    if (sysEventHandler)
-        delete sysEventHandler;
+    int exitCode = QCoreApplication::exec();
+
+    ms_sd_notify("STOPPING=1\nSTATUS=Exiting");
+    delete sysEventHandler;
 
     return exitCode ? exitCode : GENERIC_EXIT_OK;
 }

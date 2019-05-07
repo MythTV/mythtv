@@ -16,6 +16,7 @@
 
 // libmythtv
 #include "programtypes.h"
+#include "recordinginfo.h"
 #include "recordingtypes.h"
 
 /** \class RecordingRule
@@ -38,14 +39,15 @@ class MTV_PUBLIC RecordingRule
     RecordingRule();
    ~RecordingRule() = default;
 
+    void ensureSortFields(void);
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
-    bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
-                      QString from = "", ProgramInfo *pginfo = nullptr);
-    bool LoadTemplate(QString category, QString categoryType = "Default");
+    bool LoadBySearch(RecSearchType lsearch, const QString& textname, const QString& forwhat,
+                      QString joininfo = "", ProgramInfo *pginfo = nullptr);
+    bool LoadTemplate(const QString& category, const QString& categoryType = "Default");
 
-    bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,
-                               QString from = "");
+    bool ModifyPowerSearchByID(int rid, const QString& textname, QString forwhat,
+                               QString joininfo = "");
     bool MakeOverride(void);
     bool MakeTemplate(QString category);
 
@@ -53,7 +55,7 @@ class MTV_PUBLIC RecordingRule
     bool Delete(bool sendSig = true);
 
     bool IsLoaded() const { return m_loaded; }
-    void UseTempTable(bool usetemp, QString table = "record_tmp");
+    void UseTempTable(bool usetemp, const QString& table = "record_tmp");
     static unsigned GetDefaultFilter(void);
 
     void ToMap(InfoMap &infoMap) const;
@@ -61,105 +63,112 @@ class MTV_PUBLIC RecordingRule
     AutoExpireType GetAutoExpire(void) const
         { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }
 
-    bool IsValid(QString &text);
+    bool IsValid(QString &msg);
 
     static QString SearchTypeToString(const RecSearchType searchType);
     static QStringList GetTemplateNames(void);
 
-    int m_recordID; /// Unique Recording Rule ID
-    int m_parentRecID;
+    /// Unique Recording Rule ID
+    int                    m_recordID           {-1};
+    int                    m_parentRecID        {0};
 
-    bool m_isInactive; /// Recording rule is enabled?
+    /// Recording rule is enabled?
+    bool                   m_isInactive         {false};
 
     // Recording metadata
-    QString m_title;
-    QString m_subtitle;
-    QString m_description;
-    uint m_season;
-    uint m_episode;
-    QString m_category;
+    QString                m_title;
+    QString                m_sortTitle;
+    QString                m_subtitle;
+    QString                m_sortSubtitle;
+    QString                m_description;
+    uint                   m_season             {0};
+    uint                   m_episode            {0};
+    QString                m_category;
 
-    QTime m_starttime;
-    QDate m_startdate;
-    QTime m_endtime;
-    QDate m_enddate;
+    QTime                  m_starttime;
+    QDate                  m_startdate;
+    QTime                  m_endtime;
+    QDate                  m_enddate;
 
-    QString m_seriesid;
-    QString m_programid;
-    QString m_inetref;
+    QString                m_seriesid;
+    QString                m_programid;
+    // String could be null when we trying to insert into DB
+    QString                m_inetref;
 
     // Associated data for rule types
-    int m_channelid;
-    QString m_station; /// callsign?
-    int m_findday; /// Day of the week for once per week etc
-    QTime m_findtime; /// Time for timeslot rules
-    int m_findid;
+    int                    m_channelid          {0};
+    QString                m_station;     /// callsign?
+    /// Day of the week for once per week etc
+    int                    m_findday            {0};
+    /// Time for timeslot rules
+    QTime                  m_findtime;
+    int                    m_findid;
 
     // Scheduling Options
-    RecordingType m_type;
-    RecSearchType m_searchType;
-    int m_recPriority;
-    int m_prefInput;
-    int m_startOffset;
-    int m_endOffset;
-    RecordingDupMethodType m_dupMethod;
-    RecordingDupInType m_dupIn;
-    unsigned m_filter;
+    RecordingType          m_type               {kNotRecording};
+    RecSearchType          m_searchType         {kNoSearch};
+    int                    m_recPriority        {0};
+    int                    m_prefInput          {0};
+    int                    m_startOffset        {0};
+    int                    m_endOffset          {0};
+    RecordingDupMethodType m_dupMethod          {kDupCheckSubThenDesc};
+    RecordingDupInType     m_dupIn              {kDupsInAll};
+    unsigned               m_filter             {0};
 
     // Storage Options
     // TODO: These should all be converted to integer IDs instead
-    QString m_recProfile;
-    uint    m_recGroupID;
-    QString m_storageGroup;
-    QString m_playGroup;
+    QString                m_recProfile         {tr("Default")};
+    uint                   m_recGroupID         {RecordingInfo::kDefaultRecGroup};
+    QString                m_storageGroup       {tr("Default")};
+    QString                m_playGroup          {tr("Default")};
 
-    bool m_autoExpire;
-    int  m_maxEpisodes;
-    bool m_maxNewest;
+    bool                   m_autoExpire         {false};
+    int                    m_maxEpisodes        {0};
+    bool                   m_maxNewest          {false};
 
     // Post Processing Options
-    bool m_autoCommFlag;
-    bool m_autoTranscode;
-    int m_transcoder;
-    bool m_autoUserJob1;
-    bool m_autoUserJob2;
-    bool m_autoUserJob3;
-    bool m_autoUserJob4;
-    bool m_autoMetadataLookup;
+    bool                   m_autoCommFlag       {true};
+    bool                   m_autoTranscode      {false};
+    int                    m_transcoder;
+    bool                   m_autoUserJob1       {false};
+    bool                   m_autoUserJob2       {false};
+    bool                   m_autoUserJob3       {false};
+    bool                   m_autoUserJob4       {false};
+    bool                   m_autoMetadataLookup {true};
 
     // Statistic fields - Used to generate statistics about particular rules
     // and influence watch list weighting
-    QDateTime m_nextRecording;
-    QDateTime m_lastRecorded;
-    QDateTime m_lastDeleted;
-    int m_averageDelay;
+    QDateTime              m_nextRecording;
+    QDateTime              m_lastRecorded;
+    QDateTime              m_lastDeleted;
+    int                    m_averageDelay       {100};
 
     // Temporary table related - Used for schedule previews
-    QString m_recordTable;
-    int m_tempID;
+    QString                m_recordTable        {"record"};
+    int                    m_tempID             {0};
 
     // Is this an override rule? Purely for the benefit of the UI, we display
     // different options for override rules
-    bool m_isOverride;
+    bool                   m_isOverride         {false};
 
     // Is this a template rule?  Purely for the benefit of the UI, we
     // display all options for template rules
-    bool m_isTemplate;
+    bool                   m_isTemplate         {false};
 
   private:
     // Populate variables from a ProgramInfo object
     void AssignProgramInfo();
 
     // Name of template used for new rule.
-    QString m_template;
+    QString                m_template;
 
     // Pointer for ProgramInfo, exists only if we loaded from ProgramInfo in
     // the first place
-    const ProgramInfo *m_progInfo;
+    const ProgramInfo     *m_progInfo           {nullptr};
 
     // Indicate that a rule has been loaded, for new rules this is still true
     // after any of the Load* methods is called
-    bool m_loaded;
+    bool                   m_loaded             {false};
 };
 
 Q_DECLARE_METATYPE(RecordingRule*)

@@ -34,11 +34,17 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     Q_OBJECT
 
   public:
-    MythDownloadManager();
+    /** \brief Constructor for MythDownloadManager.  Instantiates a
+     *         QNetworkAccessManager and QNetworkDiskCache.
+     */
+    MythDownloadManager()
+        : MThread("DownloadManager"),
+          m_infoLock(new QMutex(QMutex::Recursive)) {}
+
    ~MythDownloadManager();
 
     // Methods for starting the queue manager thread
-    void run(void);
+    void run(void) override; // MThread
     void setRunThread(void) { m_runThread = true; }
     QThread *getQueueThread(void) { return m_queueThread; }
     bool isRunning(void) { return m_isRunning; }
@@ -132,25 +138,25 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     void updateCookieJar(QNetworkCookieJar *jar);
 
-    QNetworkAccessManager                        *m_manager;
-    QNetworkDiskCache                            *m_diskCache;
-    QNetworkProxy                                *m_proxy;
+    QNetworkAccessManager                        *m_manager     {nullptr};
+    QNetworkDiskCache                            *m_diskCache   {nullptr};
+    QNetworkProxy                                *m_proxy       {nullptr};
 
     QWaitCondition                                m_queueWaitCond;
     QMutex                                        m_queueWaitLock;
 
-    QMutex                                       *m_infoLock;
+    QMutex                                       *m_infoLock    {nullptr};
     QMap <QString, MythDownloadInfo*>             m_downloadInfos;
     QMap <QNetworkReply*, MythDownloadInfo*>      m_downloadReplies;
     QList <MythDownloadInfo*>                     m_downloadQueue;
     QList <MythDownloadInfo*>                     m_cancellationQueue;
 
-    QThread                                      *m_queueThread;
+    QThread                                      *m_queueThread {nullptr};
 
-    bool                                          m_runThread;
-    bool                                          m_isRunning;
+    bool                                          m_runThread   {false};
+    bool                                          m_isRunning   {false};
 
-    QNetworkCookieJar                            *m_inCookieJar;
+    QNetworkCookieJar                            *m_inCookieJar {nullptr};
     QMutex                                        m_cookieLock;
 
     friend class RemoteFileDownloadThread;

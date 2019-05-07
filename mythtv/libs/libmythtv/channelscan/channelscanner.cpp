@@ -47,62 +47,44 @@ using namespace std;
 
 #define LOC QString("ChScan: ")
 
-ChannelScanner::ChannelScanner()
-    : scanMonitor(nullptr)
-    , channel(nullptr)
-    , sigmonScanner(nullptr)
-    , iptvScanner(nullptr)
-#ifdef USING_VBOX
-    , vboxScanner(nullptr)
-#endif
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    , m_ExternRecScanner(nullptr)
-#endif
-    , freeToAirOnly(false)
-    , addFullTS(false)
-    , m_sourceid(-1)
-    , serviceRequirements(kRequireAV)
-{
-}
-
 ChannelScanner::~ChannelScanner()
 {
-    Teardown();
+    ChannelScanner::Teardown();
 
-    if (scanMonitor)
+    if (m_scanMonitor)
     {
-        scanMonitor->deleteLater();
-        scanMonitor = nullptr;
+        m_scanMonitor->deleteLater();
+        m_scanMonitor = nullptr;
     }
 }
 
 void ChannelScanner::Teardown(void)
 {
-    if (sigmonScanner)
+    if (m_sigmonScanner)
     {
-        delete sigmonScanner;
-        sigmonScanner = nullptr;
+        delete m_sigmonScanner;
+        m_sigmonScanner = nullptr;
     }
 
-    if (channel)
+    if (m_channel)
     {
-        delete channel;
-        channel = nullptr;
+        delete m_channel;
+        m_channel = nullptr;
     }
 
-    if (iptvScanner)
+    if (m_iptvScanner)
     {
-        iptvScanner->Stop();
-        delete iptvScanner;
-        iptvScanner = nullptr;
+        m_iptvScanner->Stop();
+        delete m_iptvScanner;
+        m_iptvScanner = nullptr;
     }
 
 #ifdef USING_VBOX
-    if (vboxScanner)
+    if (m_vboxScanner)
     {
-        vboxScanner->Stop();
-        delete vboxScanner;
-        vboxScanner = nullptr;
+        m_vboxScanner->Stop();
+        delete m_vboxScanner;
+        m_vboxScanner = nullptr;
     }
 #endif
 
@@ -115,10 +97,10 @@ void ChannelScanner::Teardown(void)
     }
 #endif
 
-    if (scanMonitor)
+    if (m_scanMonitor)
     {
-        scanMonitor->deleteLater();
-        scanMonitor = nullptr;
+        m_scanMonitor->deleteLater();
+        m_scanMonitor = nullptr;
     }
 }
 
@@ -133,6 +115,7 @@ void ChannelScanner::Scan(
     bool           do_follow_nit,
     bool           do_test_decryption,
     bool           do_fta_only,
+    bool           do_lcn_only,
     bool           do_add_full_ts,
     ServiceRequirements service_requirements,
     // stuff needed for particular scans
@@ -144,9 +127,10 @@ void ChannelScanner::Scan(
     const QString &tbl_start /* FullScan optional */,
     const QString &tbl_end   /* FullScan optional */)
 {
-    freeToAirOnly = do_fta_only;
-    addFullTS = do_add_full_ts;
-    serviceRequirements = service_requirements;
+    m_freeToAirOnly = do_fta_only;
+    m_channelNumbersOnly = do_lcn_only;
+    m_addFullTS = do_add_full_ts;
+    m_serviceRequirements = service_requirements;
     m_sourceid = sourceid;
 
     PreScanCommon(scantype, cardid, inputname,
@@ -154,14 +138,14 @@ void ChannelScanner::Scan(
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "Scan()");
 
-    if (!sigmonScanner)
+    if (!m_sigmonScanner)
     {
         LOG(VB_CHANSCAN, LOG_ERR, LOC + "Scan(): scanner does not exist...");
         return;
     }
 
-    sigmonScanner->StartScanner();
-    scanMonitor->ScanUpdateStatusText("");
+    m_sigmonScanner->StartScanner();
+    m_scanMonitor->ScanUpdateStatusText("");
 
     bool ok = false;
 
@@ -177,15 +161,15 @@ void ChannelScanner::Scan(
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
         if ((mod.startsWith("qam", Qt::CaseInsensitive)) &&
-            (sigmonScanner->GetSignalTimeout() < 1000))
+            (m_sigmonScanner->GetSignalTimeout() < 1000))
         {
-            sigmonScanner->SetSignalTimeout(1000);
+            m_sigmonScanner->SetSignalTimeout(1000);
         }
         // HACK HACK HACK -- end
 
-        sigmonScanner->SetAnalog(ScanTypeSetting::FullScan_Analog == scantype);
+        m_sigmonScanner->SetAnalog(ScanTypeSetting::FullScan_Analog == scantype);
 
-        ok = sigmonScanner->ScanTransports(
+        ok = m_sigmonScanner->ScanTransports(
             sourceid, freq_std, mod, tbl, tbl_start, tbl_end);
     }
     else if ((ScanTypeSetting::NITAddScan_DVBT  == scantype) ||
@@ -196,17 +180,17 @@ void ChannelScanner::Scan(
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC + "ScanTransports()");
 
-        ok = sigmonScanner->ScanTransportsStartingOn(sourceid, startChan);
+        ok = m_sigmonScanner->ScanTransportsStartingOn(sourceid, startChan);
     }
     else if (ScanTypeSetting::FullTransportScan == scantype)
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("ScanExistingTransports(%1)")
                 .arg(sourceid));
 
-        ok = sigmonScanner->ScanExistingTransports(sourceid, do_follow_nit);
+        ok = m_sigmonScanner->ScanExistingTransports(sourceid, do_follow_nit);
         if (ok)
         {
-            scanMonitor->ScanPercentComplete(0);
+            m_scanMonitor->ScanPercentComplete(0);
         }
         else
         {
@@ -214,7 +198,7 @@ void ChannelScanner::Scan(
             Teardown();
         }
     }
-    else if ((ScanTypeSetting::DVBUtilsImport == scantype) && channels.size())
+    else if ((ScanTypeSetting::DVBUtilsImport == scantype) && !m_channels.empty())
     {
         ok = true;
 
@@ -234,12 +218,12 @@ void ChannelScanner::Scan(
 
         if (ok)
         {
-            ok = sigmonScanner->ScanForChannels(sourceid, freq_std,
-                                                sub_type, channels);
+            ok = m_sigmonScanner->ScanForChannels(sourceid, freq_std,
+                                                sub_type, m_channels);
         }
         if (ok)
         {
-            scanMonitor->ScanPercentComplete(0);
+            m_scanMonitor->ScanPercentComplete(0);
         }
         else
         {
@@ -249,7 +233,7 @@ void ChannelScanner::Scan(
     }
     else if (ScanTypeSetting::IPTVImportMPTS == scantype)
     {
-        if (iptv_channels.empty())
+        if (m_iptv_channels.empty())
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC + "IPTVImportMPTS: no channels");
         }
@@ -258,8 +242,8 @@ void ChannelScanner::Scan(
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("ScanIPTVChannels(%1) IPTV MPTS").arg(sourceid));
 
-            if ((ok = sigmonScanner->ScanIPTVChannels(sourceid, iptv_channels)))
-                scanMonitor->ScanPercentComplete(0);
+            if ((ok = m_sigmonScanner->ScanIPTVChannels(sourceid, m_iptv_channels)))
+                m_scanMonitor->ScanPercentComplete(0);
             else
             {
                 InformUser(tr("Error scanning MPTS in IPTV"));
@@ -272,14 +256,20 @@ void ChannelScanner::Scan(
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("ScanTransport(%1)").arg(mplexid));
 
-        ok = sigmonScanner->ScanTransport(mplexid, do_follow_nit);
+        ok = m_sigmonScanner->ScanTransport(mplexid, do_follow_nit);
     }
     else if (ScanTypeSetting::CurrentTransportScan == scantype)
     {
         QString sistandard = "mpeg";
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             "ScanCurrentTransport(" + sistandard + ")");
-        ok = sigmonScanner->ScanCurrentTransport(sistandard);
+        ok = m_sigmonScanner->ScanCurrentTransport(sistandard);
+    }
+    else if (ScanTypeSetting::ExternRecImport == scantype)
+    {
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            "Importing channels from External Recorder");
+        ok = ImportExternRecorder(cardid, inputname, sourceid);
     }
 
     if (!ok)
@@ -294,7 +284,7 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     uint sourceid, int cardtype, const QString &file)
 {
     m_sourceid = sourceid;
-    channels.clear();
+    m_channels.clear();
 
     DTVConfParser::cardtype_t type = DTVConfParser::UNKNOWN;
     type = ((CardUtil::DVBT == cardtype) ||
@@ -314,7 +304,7 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
 
         ret = parser.Parse();
         if (DTVConfParser::OK == ret)
-            channels = parser.GetChannels();
+            m_channels = parser.GetChannels();
     }
 
     if (DTVConfParser::OK != ret)
@@ -338,19 +328,19 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
     (void) inputname;
     m_sourceid = sourceid;
 
-    if (!scanMonitor)
-        scanMonitor = new ScanMonitor(this);
+    if (!m_scanMonitor)
+        m_scanMonitor = new ScanMonitor(this);
 
     // Create an IPTV scan object
-    iptvScanner = new IPTVChannelFetcher(cardid, inputname, sourceid,
-                                         is_mpts, scanMonitor);
+    m_iptvScanner = new IPTVChannelFetcher(cardid, inputname, sourceid,
+                                         is_mpts, m_scanMonitor);
 
     MonitorProgress(false, false, false, false);
 
-    iptvScanner->Scan();
+    m_iptvScanner->Scan();
 
     if (is_mpts)
-        iptv_channels = iptvScanner->GetChannels();
+        m_iptv_channels = m_iptvScanner->GetChannels();
 
     return true;
 }
@@ -360,15 +350,15 @@ bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sour
 {
     m_sourceid = sourceid;
 #ifdef USING_VBOX
-    if (!scanMonitor)
-        scanMonitor = new ScanMonitor(this);
+    if (!m_scanMonitor)
+        m_scanMonitor = new ScanMonitor(this);
 
     // Create a VBox scan object
-    vboxScanner = new VBoxChannelFetcher(cardid, inputname, sourceid, ftaOnly, serviceType, scanMonitor);
+    m_vboxScanner = new VBoxChannelFetcher(cardid, inputname, sourceid, ftaOnly, serviceType, m_scanMonitor);
 
     MonitorProgress(false, false, false, false);
 
-    vboxScanner->Scan();
+    m_vboxScanner->Scan();
 
     return true;
 #else
@@ -383,14 +373,14 @@ bool ChannelScanner::ImportExternRecorder(uint cardid, const QString &inputname,
 {
     m_sourceid = sourceid;
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    if (!scanMonitor)
-        scanMonitor = new ScanMonitor(this);
+    if (!m_scanMonitor)
+        m_scanMonitor = new ScanMonitor(this);
 
     // Create a External Recorder Channel Fetcher
     m_ExternRecScanner = new ExternRecChannelScanner(cardid,
                                                      inputname,
                                                      sourceid,
-                                                     scanMonitor);
+                                                     m_scanMonitor);
 
     MonitorProgress(false, false, false, false);
 
@@ -425,17 +415,18 @@ void ChannelScanner::PreScanCommon(
         return;
     }
 
-    if (!scanMonitor)
-        scanMonitor = new ScanMonitor(this);
+    if (!m_scanMonitor)
+        m_scanMonitor = new ScanMonitor(this);
 
     QString card_type = CardUtil::GetRawInputType(cardid);
 
     if ("DVB" == card_type)
     {
         QString sub_type = CardUtil::ProbeDVBType(device).toUpper();
-        bool need_nit = (("QAM"  == sub_type) ||
-                         ("QPSK" == sub_type) ||
-                         ("OFDM" == sub_type));
+        bool need_nit = (("QAM"    == sub_type) ||
+                         ("QPSK"   == sub_type) ||
+                         ("OFDM"   == sub_type) ||
+                         ("DVB_T2" == sub_type));
 
         // Ugh, Some DVB drivers don't fully support signal monitoring...
         if ((ScanTypeSetting::TransportScan     == scantype) ||
@@ -456,50 +447,50 @@ void ChannelScanner::PreScanCommon(
 
 #ifdef USING_DVB
     if ("DVB" == card_type)
-        channel = new DVBChannel(device);
+        m_channel = new DVBChannel(device);
 #endif
 
 #ifdef USING_V4L2
     if (("V4L" == card_type) || ("MPEG" == card_type))
-        channel = new V4LChannel(nullptr, device);
+        m_channel = new V4LChannel(nullptr, device);
 #endif
 
 #ifdef USING_HDHOMERUN
     if ("HDHOMERUN" == card_type)
     {
-        channel = new HDHRChannel(nullptr, device);
+        m_channel = new HDHRChannel(nullptr, device);
     }
 #endif // USING_HDHOMERUN
 
 #ifdef USING_ASI
     if ("ASI" == card_type)
     {
-        channel = new ASIChannel(nullptr, device);
+        m_channel = new ASIChannel(nullptr, device);
     }
 #endif // USING_ASI
 
 #ifdef USING_IPTV
     if ("FREEBOX" == card_type)
     {
-        channel = new IPTVChannel(nullptr, device);
+        m_channel = new IPTVChannel(nullptr, device);
     }
 #endif
 
 #ifdef USING_VBOX
     if ("VBOX" == card_type)
     {
-        channel = new IPTVChannel(nullptr, device);
+        m_channel = new IPTVChannel(nullptr, device);
     }
 #endif
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
     if ("EXTERNAL" == card_type)
     {
-        channel = new ExternalChannel(nullptr, device);
+        m_channel = new ExternalChannel(nullptr, device);
     }
 #endif
 
-    if (!channel)
+    if (!m_channel)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Channel not created");
         InformUser(tr("Programmer Error: Channel not created"));
@@ -507,19 +498,19 @@ void ChannelScanner::PreScanCommon(
     }
 
     // explicitly set the cardid
-    channel->SetInputID(cardid);
+    m_channel->SetInputID(cardid);
 
     // If the backend is running this may fail...
-    if (!channel->Open())
+    if (!m_channel->Open())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Channel could not be opened");
         InformUser(tr("Channel could not be opened."));
         return;
     }
 
-    ScanMonitor *lis = scanMonitor;
+    ScanMonitor *lis = m_scanMonitor;
 
-    sigmonScanner = new ChannelScanSM(lis, card_type, channel,
+    m_sigmonScanner = new ChannelScanSM(lis, card_type, m_channel,
                                       sourceid, signal_timeout, channel_timeout,
                                       inputname, do_test_decryption);
 
@@ -529,38 +520,38 @@ void ChannelScanner::PreScanCommon(
     switch (scantype)
     {
         case ScanTypeSetting::FullScan_ATSC:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeATSC);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeATSC);
             break;
         case ScanTypeSetting::FullScan_DVBC:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBC);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBC);
             break;
         case ScanTypeSetting::FullScan_DVBT:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
             break;
         case ScanTypeSetting::FullScan_DVBT2:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT2);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT2);
             break;
         case ScanTypeSetting::NITAddScan_DVBT:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
             break;
         case ScanTypeSetting::NITAddScan_DVBT2:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT2);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT2);
             break;
         case ScanTypeSetting::NITAddScan_DVBS:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS1);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS1);
             break;
         case ScanTypeSetting::NITAddScan_DVBS2:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS2);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS2);
             break;
         case ScanTypeSetting::NITAddScan_DVBC:
-            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBC);
+            m_sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBC);
             break;
         default:
             break;
     }
 
     // Signal Meters are connected here
-    SignalMonitor *mon = sigmonScanner->GetSignalMonitor();
+    SignalMonitor *mon = m_sigmonScanner->GetSignalMonitor();
     if (mon)
         mon->AddListener(lis);
 
@@ -569,7 +560,7 @@ void ChannelScanner::PreScanCommon(
 
 #ifdef USING_DVB
     // cppcheck-suppress redundantAssignment
-    dvbm = sigmonScanner->GetDVBSignalMonitor();
+    dvbm = m_sigmonScanner->GetDVBSignalMonitor();
     if (dvbm && mon)
         using_rotor = mon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos);
 #endif // USING_DVB

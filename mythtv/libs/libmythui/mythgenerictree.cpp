@@ -5,6 +5,7 @@
 
 // Myth headers
 #include "mythlogging.h"
+#include "mythsorthelper.h"
 
 // QT headers
 #include <algorithm>
@@ -12,8 +13,7 @@
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
   public:
-    SortableMythGenericTreeList() : m_sortType(SORT_STRING),
-                                    m_attributeIndex(0) { }
+    SortableMythGenericTreeList() = default;
     enum SortType {SORT_STRING=0, SORT_SELECTABLE=1};
 
     void SetSortType(SortType stype) { m_sortType = stype; }
@@ -32,10 +32,9 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 
         if (onesel == twosel)
             return 0;
-        else if (onesel && !twosel)
+        if (onesel && !twosel)
             return 1;
-        else
-            return -1;
+        return -1;
     }
 
     void Sort(SortType stype, int attributeIndex = 0)
@@ -54,8 +53,8 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
     }
 
   private:
-    SortType m_sortType;
-    int m_attributeIndex; // for getAttribute
+    SortType m_sortType  {SORT_STRING};
+    int m_attributeIndex {0}; // for getAttribute
 };
 
 ///////////////////////////////////////////////////////
@@ -65,24 +64,24 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
 {
     m_subnodes = new SortableMythGenericTreeList;
 
-    m_parent = nullptr;
-    m_selectedSubnode = nullptr;
-
     m_text = a_string;
-    m_sortText = a_string;
-
     m_int = an_int;
-    m_data = 0;
-
     m_selectable = selectable_flag;
-    m_visible = true;
-    m_visibleCount = 0;
+
+    ensureSortFields();
 }
 
 MythGenericTree::~MythGenericTree()
 {
     deleteAllChildren();
     delete m_subnodes;
+}
+
+void MythGenericTree::ensureSortFields(void)
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+    if (m_sortText.isEmpty() and not m_text.isEmpty())
+        m_sortText = sh->doTitle(m_text);
 }
 
 MythGenericTree* MythGenericTree::addNode(const QString &a_string, int an_int,
@@ -529,7 +528,8 @@ void MythGenericTree::SetText(const QString &text, const QString &name,
     else
     {
         m_text = text;
-        m_sortText = text;
+        m_sortText = nullptr;
+        ensureSortFields();
     }
 }
 
@@ -551,10 +551,9 @@ QString MythGenericTree::GetText(const QString &name) const
 {
     if (name.isEmpty())
         return m_text;
-    else if (m_strings.contains(name))
+    if (m_strings.contains(name))
         return m_strings[name].text;
-    else
-        return QString();
+    return QString();
 }
 
 void MythGenericTree::SetImage(const QString &filename, const QString &name)

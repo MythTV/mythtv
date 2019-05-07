@@ -15,10 +15,10 @@ class FileAssocDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    FileAssocDialog(MythScreenStack *screeParent, const QString &lname);
+    FileAssocDialog(MythScreenStack *screenParent, const QString &lname);
     ~FileAssocDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   public slots:
     void OnFASelected(MythUIButtonListItem *item);
@@ -37,13 +37,13 @@ class FileAssocDialog : public MythScreenType
     void UpdateScreen(bool useSelectionOverride = false);
 
   private:
-    MythUITextEdit *m_commandEdit;
-    MythUIButtonList *m_extensionList;
-    MythUICheckBox *m_defaultCheck;
-    MythUICheckBox *m_ignoreCheck;
-    MythUIButton *m_doneButton;
-    MythUIButton *m_newButton;
-    MythUIButton *m_deleteButton;
+    MythUITextEdit *m_commandEdit     {nullptr};
+    MythUIButtonList *m_extensionList {nullptr};
+    MythUICheckBox *m_defaultCheck    {nullptr};
+    MythUICheckBox *m_ignoreCheck     {nullptr};
+    MythUIButton *m_doneButton        {nullptr};
+    MythUIButton *m_newButton         {nullptr};
+    MythUIButton *m_deleteButton      {nullptr};
 
     class FileAssocDialogPrivate *m_private;
 };

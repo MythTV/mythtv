@@ -64,18 +64,18 @@ class UPNP_PUBLIC SSDP : public MThread
         // Singleton instance used by all.
         static SSDP*        g_pSSDP;  
 
-        QRegExp             m_procReqLineExp;
+        QRegExp             m_procReqLineExp        {"[ \r\n][ \r\n]*"};
         MSocketDevice      *m_Sockets[3];
 
-        int                 m_nPort;
-        int                 m_nSearchPort;
-        int                 m_nServicePort;
+        int                 m_nPort                 {SSDP_PORT};
+        int                 m_nSearchPort           {SSDP_SEARCHPORT};
+        int                 m_nServicePort          {0};
 
-        UPnpNotifyTask     *m_pNotifyTask;
-        bool                m_bAnnouncementsEnabled;
+        UPnpNotifyTask     *m_pNotifyTask           {nullptr};
+        bool                m_bAnnouncementsEnabled {false};
 
-        bool                m_bTermRequested;
-        QMutex              m_lock;
+        bool                m_bTermRequested        {false};
+        QMutex              m_lock                  {QMutex::NonRecursive};
 
     private:
 
@@ -88,7 +88,7 @@ class UPNP_PUBLIC SSDP : public MThread
     protected:
 
         bool    ProcessSearchRequest ( const QStringMap &sHeaders,
-                                       QHostAddress  peerAddress,
+                                       const QHostAddress&  peerAddress,
                                        quint16       peerPort );
         bool    ProcessSearchResponse( const QStringMap &sHeaders );
         bool    ProcessNotify        ( const QStringMap &sHeaders );
@@ -103,7 +103,7 @@ class UPNP_PUBLIC SSDP : public MThread
 
         SSDPRequestType ProcessRequestLine( const QString &sLine );
 
-        virtual void run    ();
+        void    run() override; // MThread
  
     public:
 
@@ -153,16 +153,16 @@ class SSDPExtension : public HttpServerExtension
         SSDPMethod GetMethod( const QString &sURI );
 
         void       GetDeviceDesc( HTTPRequest *pRequest );
-        void       GetFile      ( HTTPRequest *pRequest, QString sFileName );
+        void       GetFile      ( HTTPRequest *pRequest, const QString& sFileName );
         void       GetDeviceList( HTTPRequest *pRequest );
 
     public:
                  SSDPExtension( int nServicePort, const QString &sSharePath);
         virtual ~SSDPExtension( ) = default;
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // HttpServerExtension
         
-        bool     ProcessRequest( HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 };
 
 #endif

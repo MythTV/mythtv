@@ -28,18 +28,18 @@ class AudioOutputPulseAudio : public AudioOutputBase
 {
   public:
     explicit AudioOutputPulseAudio(const AudioSettings &settings);
-   ~AudioOutputPulseAudio();
+   ~AudioOutputPulseAudio() override;
 
-    int GetVolumeChannel(int channel) const;
-    void SetVolumeChannel(int channel, int volume);
-    void Drain(void);
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
+    void Drain(void) override; // AudioOutputBase
 
   protected:
-    AudioOutputSettings* GetOutputSettings(bool digital);
-    bool OpenDevice(void);
-    void CloseDevice(void);
-    void WriteAudio(unsigned char *aubuf, int size);
-    int GetBufferedOnSoundcard(void) const;
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int GetBufferedOnSoundcard(void) const override; // AudioOutputBase
 
   private:
     char *ChooseHost(void);
@@ -58,14 +58,14 @@ class AudioOutputPulseAudio : public AudioOutputBase
     static void SinkInfoCallback(pa_context *c, const pa_sink_info *info,
                                  int eol, void *arg);
 
-    pa_context             *pcontext;
-    pa_stream              *pstream;
-    pa_threaded_mainloop   *mainloop;
-    pa_sample_spec          sample_spec;
-    pa_channel_map          channel_map;
-    pa_cvolume              volume_control;
-    pa_buffer_attr          buffer_settings;
-    AudioOutputSettings    *m_aosettings;
+    pa_context             *m_pcontext   {nullptr};
+    pa_stream              *m_pstream    {nullptr};
+    pa_threaded_mainloop   *m_mainloop   {nullptr};
+    pa_sample_spec          m_sample_spec;
+    pa_channel_map          m_channel_map;
+    pa_cvolume              m_volume_control;
+    pa_buffer_attr          m_buffer_settings;
+    AudioOutputSettings    *m_aosettings {nullptr};
 };
 #endif
 

@@ -12,16 +12,18 @@ public:
     Goom(void);
     virtual ~Goom();
 
-    void resize(const QSize &size);
-    bool process(VisualNode *node);
-    bool draw(QPainter *p, const QColor &back);
-    void handleKeyPress(const QString &action) {(void) action;}
+    void resize(const QSize &size) override; // VisualBase
+    bool process(VisualNode *node) override; // VisualBase
+    bool draw(QPainter *p, const QColor &back) override; // VisualBase
+    void handleKeyPress(const QString &action) override // VisualBase
+        {(void) action;}
 
 private:
     QSize m_size;
 
-    unsigned int *m_buffer;
-    int m_scalew, m_scaleh;
+    unsigned int *m_buffer {nullptr};
+    int           m_scalew {2};
+    int           m_scaleh {2};
 };
 
 #endif //MYTHGOOM

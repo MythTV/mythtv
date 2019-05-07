@@ -140,6 +140,9 @@ public:
 	void setPassword(const QString& pwd);
 
 private:
+        UnZip(const UnZip &) = delete;            // not copyable
+        UnZip &operator=(const UnZip &) = delete; // not copyable
+
 	UnzipPrivate* d;
 };
 

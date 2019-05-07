@@ -99,8 +99,8 @@ class UPNP_PUBLIC UPnp
 
         static Configuration   *g_pConfig;
 
-        HttpServer             *m_pHttpServer;
-        int                     m_nServicePort;
+        HttpServer             *m_pHttpServer  {nullptr};
+        int                     m_nServicePort {0};
 
     public:
 

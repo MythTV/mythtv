@@ -13,11 +13,6 @@
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-MetaIOFLACVorbis::MetaIOFLACVorbis(void)
-    : MetaIOTagLib()
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *
@@ -92,8 +87,7 @@ bool MetaIOFLACVorbis::write(const QString &filename, MusicMetadata* mdata)
     bool result = flacfile->save();
     restoreTimeStamps();
 
-    if (flacfile)
-        delete flacfile;
+    delete flacfile;
 
     return (result);
 }
@@ -198,10 +192,9 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         // From what I can tell, FLAC::File maintains ownership of the Picture pointers, so no need to delete
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
-        for (TagLib::List<Picture *>::ConstIterator it = picList.begin();
-                it != picList.end(); it++)
+        for (auto it = picList.begin(); it != picList.end(); it++)
         {
-            if (pic->type() == artType)
+            if ((*it)->type() == artType)
             {
                 //found the type we were looking for
                 pic = *it;
@@ -276,12 +269,12 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
             AlbumArtImage *art = new AlbumArtImage();
 
             if (pic->description().isEmpty())
-                art->description.clear();
+                art->m_description.clear();
             else
-                art->description = TStringToQString(pic->description());
+                art->m_description = TStringToQString(pic->description());
 
-            art->embedded = true;
-            art->hostname = gCoreContext->GetHostName();
+            art->m_embedded = true;
+            art->m_hostname = gCoreContext->GetHostName();
 
             QString ext = getExtFromMimeType(
                                 TStringToQString(pic->mimeType()).toLower());
@@ -289,28 +282,28 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
             switch (pic->type())
             {
                 case Picture::FrontCover :
-                    art->imageType = IT_FRONTCOVER;
-                    art->filename = QString("front") + ext;
+                    art->m_imageType = IT_FRONTCOVER;
+                    art->m_filename = QString("front") + ext;
                     break;
                 case Picture::BackCover :
-                    art->imageType = IT_BACKCOVER;
-                    art->filename = QString("back") + ext;
+                    art->m_imageType = IT_BACKCOVER;
+                    art->m_filename = QString("back") + ext;
                     break;
                 case Picture::Media :
-                    art->imageType = IT_CD;
-                    art->filename = QString("cd") + ext;
+                    art->m_imageType = IT_CD;
+                    art->m_filename = QString("cd") + ext;
                     break;
                 case Picture::LeafletPage :
-                    art->imageType = IT_INLAY;
-                    art->filename = QString("inlay") + ext;
+                    art->m_imageType = IT_INLAY;
+                    art->m_filename = QString("inlay") + ext;
                     break;
                 case Picture::Artist :
-                    art->imageType = IT_ARTIST;
-                    art->filename = QString("artist") + ext;
+                    art->m_imageType = IT_ARTIST;
+                    art->m_filename = QString("artist") + ext;
                     break;
                 case Picture::Other :
-                    art->imageType = IT_UNKNOWN;
-                    art->filename = QString("unknown") + ext;
+                    art->m_imageType = IT_UNKNOWN;
+                    art->m_filename = QString("unknown") + ext;
                     break;
                 default:
                     LOG(VB_GENERAL, LOG_ERR, "Music Scanner - picture found "
@@ -349,7 +342,7 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
     bool retval = false;
 
     // load the image into a QByteArray
-    QImage image(albumart->filename);
+    QImage image(albumart->m_filename);
     QByteArray imageData;
     QBuffer buffer(&imageData);
     buffer.open(QIODevice::WriteOnly);
@@ -362,7 +355,7 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
     if (flacfile)
     {
         // Now see if the art is in the FLAC file
-        Picture *pic = getPictureFromFile(flacfile, albumart->imageType);
+        Picture *pic = getPictureFromFile(flacfile, albumart->m_imageType);
 
         if (pic)
         {
@@ -373,7 +366,7 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
         {
             // Create a new image of the correct type
             pic = new Picture();
-            pic->setType(PictureTypeFromImageType(albumart->imageType));
+            pic->setType(PictureTypeFromImageType(albumart->m_imageType));
         }
 
         TagLib::ByteVector bytevector;
@@ -383,7 +376,7 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
         QString mimetype = "image/jpeg";
 
         pic->setMimeType(QStringToTString(mimetype));
-        pic->setDescription(QStringToTString(albumart->description));
+        pic->setDescription(QStringToTString(albumart->m_description));
 
         flacfile->addPicture(pic);
 
@@ -429,7 +422,7 @@ bool MetaIOFLACVorbis::removeAlbumArt(const QString &filename,
     if (flacfile)
     {
         // Now see if the art is in the FLAC file
-        TagLib::FLAC::Picture *pic = getPictureFromFile(flacfile, albumart->imageType);
+        TagLib::FLAC::Picture *pic = getPictureFromFile(flacfile, albumart->m_imageType);
 
         if (pic)
         {
@@ -465,7 +458,7 @@ bool MetaIOFLACVorbis::changeImageType(const QString &filename,
     if (filename.isEmpty() || !albumart)
         return false;
 
-    if (albumart->imageType == newType)
+    if (albumart->m_imageType == newType)
         return true;
 
     bool retval = false;
@@ -476,7 +469,7 @@ bool MetaIOFLACVorbis::changeImageType(const QString &filename,
     if (flacfile)
     {
         // Now see if the art is in the FLAC file
-        TagLib::FLAC::Picture *pic = getPictureFromFile(flacfile, albumart->imageType);
+        TagLib::FLAC::Picture *pic = getPictureFromFile(flacfile, albumart->m_imageType);
 
         if (pic)
         {
@@ -521,11 +514,11 @@ QString MetaIOFLACVorbis::getExtFromMimeType(const QString &mimeType)
 {
     if (mimeType == "image/png")
         return QString(".png");
-    else if (mimeType == "image/jpeg" || mimeType == "image/jpg")
+    if (mimeType == "image/jpeg" || mimeType == "image/jpg")
         return QString(".jpg");
-    else if (mimeType == "image/gif")
+    if (mimeType == "image/gif")
         return QString(".gif");
-    else if (mimeType == "image/bmp")
+    if (mimeType == "image/bmp")
         return QString(".bmp");
 
     LOG(VB_GENERAL, LOG_ERR,

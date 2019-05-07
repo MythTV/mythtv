@@ -143,7 +143,7 @@ bool ActionSet::Replace(const ActionID &id,
 bool ActionSet::SetModifiedFlag(const ActionID &id, bool modified)
 {
     if (!modified)
-        return m_modified.removeAll(id);
+        return m_modified.removeAll(id) != 0;
 
     if (!IsModified(id))
     {
@@ -164,8 +164,6 @@ QStringList ActionSet::GetContextStrings(void) const
     ContextMap::const_iterator it = m_contexts.begin();
     for (; it != m_contexts.end(); ++it)
         context_strings.append(it.key());
-
-    context_strings.detach();
     return context_strings;
 }
 
@@ -183,8 +181,6 @@ QStringList ActionSet::GetActionStrings(const QString &context_name) const
     Context::const_iterator it = (*cit).begin();
     for (; it != (*cit).end(); ++it)
         action_strings.append(it.key());
-
-    action_strings.detach();
     return action_strings;
 }
 
@@ -251,8 +247,6 @@ QStringList ActionSet::GetKeys(const ActionID &id) const
     Context::const_iterator it = (*cit).find(id.GetAction());
     if (it != (*cit).end())
         keys = (*it)->GetKeys();
-
-    keys.detach();
     return keys;
 }
 
@@ -267,8 +261,6 @@ QStringList ActionSet::GetContextKeys(const QString &context_name) const
     for (; it != (*cit).end(); ++it)
         keys += (*it)->GetKeys();
     keys.sort();
-
-    keys.detach();
     return keys;
 }
 
@@ -300,27 +292,6 @@ QString ActionSet::GetDescription(const ActionID &id) const
         return (*it)->GetDescription();
 
     return QString();
-}
-
-/** \fn ActionSet::GetActions(const QString &key) const
- *  \brief Returns the actions bound to the specified key.
- */
-ActionList ActionSet::GetActions(const QString &key) const
-{
-    ActionList list = m_keyToActionMap[key];
-    list.detach();
-    return list;
-}
-
-/** \fn ActionSet::GetModified(void) const
- *  \brief Returns the appropriate container of modified actions
- *         based on current context.
- */
-ActionList ActionSet::GetModified(void) const
-{
-    ActionList list = m_modified;
-    list.detach();
-    return list;
 }
 
 /** \fn ActionSet::GetAction(const ActionID&)

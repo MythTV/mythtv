@@ -38,11 +38,11 @@ class GalleryFilterDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    GalleryFilterDialog(MythScreenStack *parent, QString name,
+    GalleryFilterDialog(MythScreenStack *parent, const QString& name,
                         GalleryFilter *filter);
     ~GalleryFilterDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void filterChanged();
@@ -58,18 +58,18 @@ class GalleryFilterDialog : public MythScreenType
  private:
     void fillWidgets();
 
-    bool               m_scanning;
+    bool               m_scanning         {false};
     QString            m_photoDir;
-    GalleryFilter     *m_settingsOriginal;
-    GalleryFilter     *m_settingsTemp;
+    GalleryFilter     *m_settingsOriginal {nullptr};
+    GalleryFilter     *m_settingsTemp     {nullptr};
 
-    MythUITextEdit    *m_dirFilter;
-    MythUIButtonList  *m_typeFilter;
-    MythUIText        *m_numImagesText;
-    MythUIButtonList  *m_sortList;
-    MythUIButton      *m_checkButton;
-    MythUIButton      *m_saveButton;
-    MythUIButton      *m_doneButton;
+    MythUITextEdit    *m_dirFilter        {nullptr};
+    MythUIButtonList  *m_typeFilter       {nullptr};
+    MythUIText        *m_numImagesText    {nullptr};
+    MythUIButtonList  *m_sortList         {nullptr};
+    MythUIButton      *m_checkButton      {nullptr};
+    MythUIButton      *m_saveButton       {nullptr};
+    MythUIButton      *m_doneButton       {nullptr};
 };
 
 #endif /* GALLERYFILTERDLG_H */

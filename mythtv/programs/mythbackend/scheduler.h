@@ -33,27 +33,23 @@ class SchedInputInfo
 {
   public:
     SchedInputInfo(void) :
-        inputid(0),
-        sgroupid(0),
-        schedgroup(false),
-        group_inputs(),
-        conflicting_inputs(),
-        conflictlist(nullptr) {};
+        m_group_inputs(),
+        m_conflicting_inputs() {};
     ~SchedInputInfo(void) = default;
 
-    uint inputid;
-    uint sgroupid;
-    bool schedgroup;
-    vector<uint> group_inputs;
-    vector<uint> conflicting_inputs;
-    RecList *conflictlist;
+    uint          m_inputid      {0};
+    uint          m_sgroupid     {0};
+    bool          m_schedgroup   {false};
+    vector<uint>  m_group_inputs;
+    vector<uint>  m_conflicting_inputs;
+    RecList      *m_conflictlist {nullptr};
 };
 
 class Scheduler : public MThread, public MythScheduler
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-              QString recordTbl = "record", Scheduler *master_sched = nullptr);
+              const QString& tmptable = "record", Scheduler *master_sched = nullptr);
     ~Scheduler();
 
     void Stop(void);
@@ -85,8 +81,8 @@ class Scheduler : public MThread, public MythScheduler
     // true iff there are conflicts
     bool GetAllPending(RecList &retList, int recRuleId = 0) const;
     bool GetAllPending(ProgramList &retList, int recRuleId = 0) const;
-    virtual void GetAllPending(QStringList &strList) const;
-    virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
+    void GetAllPending(QStringList &strList) const override; // MythScheduler
+    QMap<QString,ProgramInfo*> GetRecording(void) const override; // MythScheduler
 
     enum SchedSortColumn { kSortTitle, kSortLastRecorded, kSortNextRecording,
                            kSortPriority, kSortType };
@@ -101,7 +97,7 @@ class Scheduler : public MThread, public MythScheduler
     void getConflicting(RecordingInfo *pginfo, RecList *retlist);
 
     void PrintList(bool onlyFutureRecordings = false)
-        { PrintList(reclist, onlyFutureRecordings); };
+        { PrintList(m_reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
     void PrintRec(const RecordingInfo *p, const QString &prefix = "");
 
@@ -110,8 +106,8 @@ class Scheduler : public MThread, public MythScheduler
     void SlaveConnected(RecordingList &slavelist);
     void SlaveDisconnected(uint cardid);
 
-    void DisableScheduling(void) { schedulingEnabled = false; }
-    void EnableScheduling(void) { schedulingEnabled = true; }
+    void DisableScheduling(void) { m_schedulingEnabled = false; }
+    void EnableScheduling(void) { m_schedulingEnabled = true; }
     void GetNextLiveTVDir(uint cardid);
     void ResetIdleTime(void);
 
@@ -119,12 +115,12 @@ class Scheduler : public MThread, public MythScheduler
 
     RecStatus::Type GetRecStatus(const ProgramInfo &pginfo);
 
-    int GetError(void) const { return error; }
+    int GetError(void) const { return m_error; }
 
-    void AddChildInput(uint parentid, uint childid);
+    void AddChildInput(uint parentid, uint inputid);
 
   protected:
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
   private:
     enum OpenEndType {
@@ -133,12 +129,12 @@ class Scheduler : public MThread, public MythScheduler
         openEndAlways = 2
     };
 
-    QString recordTable;
-    QString priorityTable;
+    QString m_recordTable;
+    QString m_priorityTable;
 
     bool VerifyCards(void);
 
-    void InitInputInfoMap(void);
+    bool InitInputInfoMap(void);
     void CreateTempTables(void);
     void DeleteTempTables(void);
     void UpdateDuplicates(void);
@@ -176,9 +172,9 @@ class Scheduler : public MThread, public MythScheduler
     bool TryAnotherShowing(RecordingInfo *p,  bool samePriority,
                            bool livetv = false);
     void SchedNewRecords(void);
-    void SchedNewFirstPass(RecIter &start, RecIter end,
+    void SchedNewFirstPass(RecIter &start, const RecIter& end,
                            int recpriority, int recpriority2);
-    void SchedNewRetryPass(RecIter start, RecIter end,
+    void SchedNewRetryPass(const RecIter& start, const RecIter& end,
                            bool samePriority, bool livetv = false);
     void SchedLiveTV(void);
     void PruneRedundants(void);
@@ -190,7 +186,7 @@ class Scheduler : public MThread, public MythScheduler
                              bool &blockShutdown, uint logmask);
     void ShutdownServer(int prerollseconds, QDateTime &idleSince);
     void PutInactiveSlavesToSleep(void);
-    bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
+    bool WakeUpSlave(const QString& slaveHostname, bool setWakingStatus = true);
     void WakeUpSlaves(void);
 
     int FillRecordingDir(const QString &title,
@@ -201,7 +197,7 @@ class Scheduler : public MThread, public MythScheduler
                          uint cardid,
                          QString &recording_dir,
                          const RecList &reclist);
-    void FillDirectoryInfoCache(bool force = false);
+    void FillDirectoryInfoCache(void);
 
     void OldRecordedFixups(void);
     void ResetDuplicates(uint recordid, uint findid, const QString &title,
@@ -216,7 +212,7 @@ class Scheduler : public MThread, public MythScheduler
                          int prerollseconds);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatus::Type recStatus, const QString &details);
-    bool AssignGroupInput(RecordingInfo &ri);
+    bool AssignGroupInput(RecordingInfo &ri, int prerollseconds);
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,
@@ -224,74 +220,73 @@ class Scheduler : public MThread, public MythScheduler
 
     void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
                       const QDateTime &maxstarttime, const QString &why)
-    { reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid,
+    { m_reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid,
                                      sourceid, mplexid, maxstarttime, why)); };
     void EnqueueCheck(const RecordingInfo &recinfo, const QString &why)
-    { reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo,
+    { m_reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo,
                                                                  why)); };
     void EnqueuePlace(const QString &why)
-    { reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
+    { m_reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
 
     bool HaveQueuedRequests(void)
-    { return !reschedQueue.empty(); };
+    { return !m_reschedQueue.empty(); };
     void ClearRequestQueue(void)
-    { reschedQueue.clear(); };
+    { m_reschedQueue.clear(); };
 
-    void CreateConflictLists(void);
+    bool CreateConflictLists(void);
 
-    MythDeque<QStringList> reschedQueue;
-    mutable QMutex schedLock;
-    QMutex recordmatchLock;
-    QWaitCondition reschedWait;
-    RecList reclist;
-    RecList worklist;
-    RecList livetvlist;
-    QMap<uint, SchedInputInfo> sinputinfomap;
-    vector<RecList *> conflictlists;
-    QMap<uint, RecList> recordidlistmap;
-    QMap<QString, RecList> titlelistmap;
+    MythDeque<QStringList> m_reschedQueue;
+    mutable QMutex         m_schedLock;
+    QMutex                 m_recordmatchLock;
+    QWaitCondition         m_reschedWait;
+    RecList                m_reclist;
+    RecList                m_worklist;
+    RecList                m_livetvlist;
+    QMap<uint, SchedInputInfo> m_sinputinfomap;
+    vector<RecList *>      m_conflictlists;
+    QMap<uint, RecList>    m_recordidlistmap;
+    QMap<QString, RecList> m_titlelistmap;
 
-    QDateTime schedTime;
-    bool reclist_changed;
+    QDateTime m_schedTime;
+    bool m_reclist_changed             {false};
 
-    bool specsched;
-    bool schedulingEnabled;
-    QMap<int, bool> schedAfterStartMap;
+    bool m_specsched;
+    bool m_schedulingEnabled           {true};
+    QMap<int, bool> m_schedAfterStartMap;
 
-    QMap<int, EncoderLink *> *m_tvList;
-    AutoExpire *m_expirer;
+    QMap<int, EncoderLink *> *m_tvList {nullptr};
+    AutoExpire *m_expirer              {nullptr};
 
     QSet<uint> m_schedorder_warned;
 
-    bool doRun;
+    bool m_doRun;
 
-    MainServer *m_mainServer;
+    MainServer *m_mainServer           {nullptr};
 
-    QMutex resetIdleTime_lock;
-    bool resetIdleTime;
+    QMutex m_resetIdleTime_lock;
+    bool   m_resetIdleTime             {false};
 
-    bool m_isShuttingDown;
-    MSqlQueryInfo dbConn;
+    bool m_isShuttingDown              {false};
+    MSqlQueryInfo m_dbConn;
 
-    QDateTime fsInfoCacheFillTime;
-    QMap<QString, FileSystemInfo> fsInfoCache;
+    QMap<QString, FileSystemInfo> m_fsInfoCache;
 
-    int error;
+    int m_error                        {0};
 
-    QSet<QString> sysEvents[4];
+    QSet<QString> m_sysEvents[4];
 
     // Try to avoid LiveTV sessions until this time
-    QDateTime livetvTime;
+    QDateTime m_livetvTime;
 
-    QDateTime lastPrepareTime;
+    QDateTime m_lastPrepareTime;
 
     OpenEndType m_openEnd;
 
     // cache IsSameProgram()
     typedef pair<const RecordingInfo*,const RecordingInfo*> IsSameKey;
     typedef QMap<IsSameKey,bool> IsSameCacheType;
-    mutable IsSameCacheType cache_is_same_program;
-    int tmLastLog;
+    mutable IsSameCacheType m_cache_is_same_program;
+    int m_tmLastLog                    {0};
 };
 
 #endif

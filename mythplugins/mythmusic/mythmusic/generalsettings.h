@@ -14,21 +14,22 @@ class GeneralSettings : public MythScreenType
 {
     Q_OBJECT
   public:
-    GeneralSettings(MythScreenStack *parent, const char *name = nullptr);
+    GeneralSettings(MythScreenStack *parent, const char *name = nullptr)
+        : MythScreenType(parent, name) {}
     ~GeneralSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   private:
-    MythUITextEdit     *m_musicAudioDevice;
-    MythUICheckBox     *m_musicDefaultUpmix;
-    MythUITextEdit     *m_musicCDDevice;
-    MythUITextEdit     *m_nonID3FileNameFormat;
-    MythUICheckBox     *m_ignoreID3Tags;
-    MythUICheckBox     *m_allowTagWriting;
-    MythUIButton       *m_resetDBButton;
-    MythUIButton       *m_saveButton;
-    MythUIButton       *m_cancelButton;
+    MythUITextEdit     *m_musicAudioDevice     {nullptr};
+    MythUICheckBox     *m_musicDefaultUpmix    {nullptr};
+    MythUITextEdit     *m_musicCDDevice        {nullptr};
+    MythUITextEdit     *m_nonID3FileNameFormat {nullptr};
+    MythUICheckBox     *m_ignoreID3Tags        {nullptr};
+    MythUICheckBox     *m_allowTagWriting      {nullptr};
+    MythUIButton       *m_resetDBButton        {nullptr};
+    MythUIButton       *m_saveButton           {nullptr};
+    MythUIButton       *m_cancelButton         {nullptr};
 
   private slots:
     void slotSave(void);

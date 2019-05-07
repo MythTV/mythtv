@@ -14,5 +14,6 @@ bool CodecUtil::isValidUTF8(const QByteArray& data)
     if (state.invalidChars > 0)
         return false;
 
+    Q_UNUSED(text);
     return true;
 }

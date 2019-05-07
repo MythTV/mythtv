@@ -43,9 +43,9 @@ class MHDLADisplay;
 // Asynchronous event data.
 class MHAsynchEvent {
   public:
-    MHRoot *pEventSource;
-    enum EventType eventType;
-    MHUnion eventData;
+    MHRoot *m_pEventSource {nullptr};
+    enum EventType m_eventType;
+    MHUnion m_eventData;
 };
 
 // Entry in the "persistent" store.  At the moment it's not really persistent.
@@ -62,7 +62,7 @@ class MHPSEntry {
 class MHExternContent {
   public:
     QString m_FileName;
-    MHIngredient *m_pRequester; 
+    MHIngredient *m_pRequester {nullptr}; 
     QTime m_time;
 };
 
@@ -73,9 +73,10 @@ class MHEngine: public MHEG {
     MHEngine(MHContext *context);
     virtual ~MHEngine();
 
-    virtual void SetBooting() { m_fBooting = true; }
+    void SetBooting() override // MHEG
+        { m_fBooting = true; }
 
-    virtual void DrawDisplay(QRegion toDraw);
+    void DrawDisplay(QRegion toDraw) override; // MHEG
 
     void BootApplication(const char *fileName);
     void TransitionToScene(const MHObjectRef &);
@@ -86,7 +87,7 @@ class MHEngine: public MHEG {
     // Look up an object by its object reference.  In nearly all cases we want to throw
     // an exception if it isn't found.  In a very few cases where we don't fail this
     // returns nullptr if it isn't there.
-    MHRoot *FindObject(const MHObjectRef &objr, bool failOnNotFound = true);
+    MHRoot *FindObject(const MHObjectRef &oRef, bool failOnNotFound = true);
 
     // Called when an event is triggered.  Either queues the event or finds a link that matches.
     void EventTriggered(MHRoot *pSource, enum EventType ev)
@@ -99,7 +100,7 @@ class MHEngine: public MHEG {
     // Display stack and draw functions.
     void AddToDisplayStack(MHVisible *pVis);
     void RemoveFromDisplayStack(MHVisible *pVis);
-    void Redraw(QRegion region); // Request a redraw.
+    void Redraw(const QRegion& region); // Request a redraw.
     // Functions to alter the Z-order.
     void BringToFront(const MHRoot *pVis);
     void SendToBack(const MHRoot *pVis);
@@ -110,14 +111,14 @@ class MHEngine: public MHEG {
 
     // Run synchronous actions and process any asynchronous events until the queues are empty.
     // Returns the number of milliseconds until wake-up or 0 if none.
-    virtual int RunAll(void);
+    int RunAll(void) override; // MHEG
 
     // Run synchronous actions.
     void RunActions();
     // Generate a UserAction event i.e. a key press.
-    virtual void GenerateUserAction(int nCode);
-    virtual void EngineEvent(int nCode);
-    virtual void StreamStarted(MHStream*, bool bStarted);
+    void GenerateUserAction(int nCode) override; // MHEG
+    void EngineEvent(int nCode) override; // MHEG
+    void StreamStarted(MHStream*, bool bStarted) override; // MHEG
 
     // Called from an ingredient to request a load of external content.
     void RequestExternalContent(MHIngredient *pRequester);
@@ -165,7 +166,7 @@ class MHEngine: public MHEG {
   protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);
     MHGroup *ParseProgram(QByteArray &text);
-    void DrawRegion(QRegion toDraw, int nStackPos);
+    void DrawRegion(const QRegion& toDraw, int nStackPos);
 
     QRegion m_redrawRegion; // The accumulation of repaints when the screen is locked.
 
@@ -198,16 +199,16 @@ class MHEngine: public MHEG {
 
     MHOwnPtrSequence <MHPSEntry> m_PersistentStore;
 
-    bool m_fInTransition; // If we get a TransitionTo, Quit etc during OnStartUp and OnCloseDown we ignore them.
+    bool m_fInTransition {false}; // If we get a TransitionTo, Quit etc during OnStartUp and OnCloseDown we ignore them.
 
     // To canonicalise the object ids we set this to the group id of the current scene or app
     // and use that wherever we get an object id without a group id.
     MHOctetString   m_CurrentGroupId;
 
-    MHContext       *m_Context; // Pointer to the context providing drawing and other operations
-    bool            m_fBooting;
+    MHContext       *m_Context {nullptr}; // Pointer to the context providing drawing and other operations
+    bool            m_fBooting {true};
 
-    MHInteractible  *m_Interacting; // Set to current interactive object if any.
+    MHInteractible  *m_Interacting {nullptr}; // Set to current interactive object if any.
 };
 
 #endif

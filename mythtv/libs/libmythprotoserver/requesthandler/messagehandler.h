@@ -13,9 +13,10 @@ class PROTOSERVER_PUBLIC MessageHandler : public SocketRequestHandler
   public:
     MessageHandler(void);
     bool HandleQuery(SocketHandler *socket, QStringList &commands,
-                      QStringList &slist);
-    QString GetHandlerName(void)                { return "MESSAGE"; }
-    void customEvent(QEvent *e);
+                      QStringList &slist) override; // SocketRequestHandler
+    QString GetHandlerName(void) override // SocketRequestHandler
+        { return "MESSAGE"; }
+    void customEvent(QEvent *e) override; // QObject
 
   private:
     bool HandleInbound(SocketHandler *sock, QStringList &slist);

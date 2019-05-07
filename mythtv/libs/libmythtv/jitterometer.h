@@ -37,12 +37,12 @@
 class MTV_PUBLIC Jitterometer
 {
   public:
-    Jitterometer(const QString &nname, int num_cycles = 0);
+    Jitterometer(const QString &nname, int ncycles = 0);
    ~Jitterometer();
 
-    float GetLastFPS(void) const { return last_fps; }
-    float GetLastSD(void) const { return last_sd;  }
-    QString GetLastCPUStats(void) const { return lastcpustats; }
+    float GetLastFPS(void) const { return m_last_fps; }
+    float GetLastSD(void) const { return m_last_sd;  }
+    QString GetLastCPUStats(void) const { return m_lastcpustats; }
     void SetNumCycles(int cycles);
     bool RecordCycleTime();
     void RecordStartTime();
@@ -50,17 +50,20 @@ class MTV_PUBLIC Jitterometer
     QString GetCPUStat(void);
 
  private:
-    int count;
-    int num_cycles;
-    struct timeval starttime;
-    int starttime_valid;
-    QVector<uint> times; // array of cycle lengths, in uS
-    float last_fps;
-    float last_sd;
-    QString name;
-    QFile *cpustat;
-    unsigned long long *laststats;
-    QString lastcpustats;
+    Jitterometer(const Jitterometer &) = delete;            // not copyable
+    Jitterometer &operator=(const Jitterometer &) = delete; // not copyable
+
+    int                 m_count           {0};
+    int                 m_num_cycles;
+    struct timeval      m_starttime;
+    bool                m_starttime_valid {false};
+    QVector<uint>       m_times; // array of cycle lengths, in uS
+    float               m_last_fps        {0};
+    float               m_last_sd         {0};
+    QString             m_name;
+    QFile              *m_cpustat         {nullptr};
+    unsigned long long *m_laststats       {nullptr};
+    QString             m_lastcpustats;
 };
 
 #endif // JITTEROMETER_H

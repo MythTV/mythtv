@@ -21,14 +21,11 @@
 VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
                                        bool ftaOnly, ServiceRequirements serviceType,
                                        ScanMonitor *monitor) :
-    _scan_monitor(monitor),
-    _cardid(cardid),       _inputname(inputname),
-    _sourceid(sourceid),   _ftaOnly(ftaOnly),
-    _serviceType(serviceType),
-    _transType("UNKNOWN"), _channels(nullptr),
-    _chan_cnt(1),          _thread_running(false),
-    _stop_now(false),      _thread(new MThread("VBoxChannelFetcher", this)),
-    _lock()
+    m_scan_monitor(monitor),
+    m_cardid(cardid),       m_inputname(inputname),
+    m_sourceid(sourceid),   m_ftaOnly(ftaOnly),
+    m_serviceType(serviceType),
+    m_thread(new MThread("VBoxChannelFetcher", this))
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Has ScanMonitor %1")
         .arg(monitor?"true":"false"));
@@ -38,32 +35,32 @@ VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname, ui
     QStringList list = videoDev.split('-');
     if (list.count() == 3)
     {
-        QString tunerType = list.at(2);
+        const QString& tunerType = list.at(2);
         if (tunerType == "DVBT")
-            _transType = "T";
+            m_transType = "T";
         else if (tunerType == "DVBT/T2")
-            _transType = "T2";
+            m_transType = "T2";
         else if (tunerType == "DVBS")
-            _transType = "S";
+            m_transType = "S";
         else if (tunerType == "DVBS/S2")
-            _transType = "S2";
+            m_transType = "S2";
         else if (tunerType == "DVBC")
-            _transType = "C";
+            m_transType = "C";
         else if (tunerType == "ATSC")
-            _transType = "A";
+            m_transType = "A";
     }
 
      LOG(VB_CHANNEL, LOG_INFO, LOC + QString("VideoDevice is: %1, tunerType is: %2")
-         .arg(videoDev).arg(_transType));
+         .arg(videoDev).arg(m_transType));
 }
 
 VBoxChannelFetcher::~VBoxChannelFetcher()
 {
     Stop();
-    delete _thread;
-    _thread = nullptr;
-    delete _channels;
-    _channels = nullptr;
+    delete m_thread;
+    m_thread = nullptr;
+    delete m_channels;
+    m_channels = nullptr;
 }
 
 /** \fn VBoxChannelFetcher::Stop(void)
@@ -71,105 +68,104 @@ VBoxChannelFetcher::~VBoxChannelFetcher()
  */
 void VBoxChannelFetcher::Stop(void)
 {
-    _lock.lock();
+    m_lock.lock();
 
-    while (_thread_running)
+    while (m_thread_running)
     {
-        _stop_now = true;
-        _lock.unlock();
-        _thread->wait(5);
-        _lock.lock();
+        m_stop_now = true;
+        m_lock.unlock();
+        m_thread->wait(5);
+        m_lock.lock();
     }
 
-    _lock.unlock();
+    m_lock.unlock();
 
-    _thread->wait();
+    m_thread->wait();
 }
 
 vbox_chan_map_t VBoxChannelFetcher::GetChannels(void)
 {
-    while (!_thread->isFinished())
-        _thread->wait(500);
+    while (!m_thread->isFinished())
+        m_thread->wait(500);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Found %1 channels")
-        .arg(_channels->size()));
-    return *_channels;
+        .arg(m_channels->size()));
+    return *m_channels;
 }
 
 void VBoxChannelFetcher::Scan(void)
 {
     Stop();
-    _stop_now = false;
-    _thread->start();
+    m_stop_now = false;
+    m_thread->start();
 }
 
 void VBoxChannelFetcher::run(void)
 {
-    _lock.lock();
-    _thread_running = true;
-    _lock.unlock();
+    m_lock.lock();
+    m_thread_running = true;
+    m_lock.unlock();
 
     // Step 1/3 : Get the IP of the VBox to query
-    QString dev = CardUtil::GetVideoDevice(_cardid);
+    QString dev = CardUtil::GetVideoDevice(m_cardid);
     QString ip = VBox::getIPFromVideoDevice(dev);
 
-    if (_stop_now || ip.isEmpty())
+    if (m_stop_now || ip.isEmpty())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("Failed to get IP address from videodev (%1)").arg(dev));
-        QMutexLocker locker(&_lock);
-        _thread_running = false;
-        _stop_now = true;
+        QMutexLocker locker(&m_lock);
+        m_thread_running = false;
+        m_stop_now = true;
         return;
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("VBox IP: %1").arg(ip));
 
     // Step 2/3 : Download
-    if (_scan_monitor)
+    if (m_scan_monitor)
     {
-        _scan_monitor->ScanPercentComplete(5);
-        _scan_monitor->ScanAppendTextToLog(tr("Downloading Channel List"));
+        m_scan_monitor->ScanPercentComplete(5);
+        m_scan_monitor->ScanAppendTextToLog(tr("Downloading Channel List"));
     }
 
-    if (_channels)
-        delete _channels;
+    delete m_channels;
 
     VBox *vbox = new VBox(ip);
-    _channels = vbox->getChannels();
+    m_channels = vbox->getChannels();
     delete vbox;
 
-    if (_stop_now || !_channels)
+    if (m_stop_now || !m_channels)
     {
-        if (!_channels && _scan_monitor)
+        if (!m_channels && m_scan_monitor)
         {
-            _scan_monitor->ScanAppendTextToLog(QCoreApplication::translate("(Common)", "Error"));
-            _scan_monitor->ScanPercentComplete(100);
-            _scan_monitor->ScanErrored(tr("Downloading Channel List Failed"));
+            m_scan_monitor->ScanAppendTextToLog(QCoreApplication::translate("(Common)", "Error"));
+            m_scan_monitor->ScanPercentComplete(100);
+            m_scan_monitor->ScanErrored(tr("Downloading Channel List Failed"));
         }
-        QMutexLocker locker(&_lock);
-        _thread_running = false;
-        _stop_now = true;
+        QMutexLocker locker(&m_lock);
+        m_thread_running = false;
+        m_stop_now = true;
         return;
     }
 
     // Step 3/3 : Process
-    if (_scan_monitor)
+    if (m_scan_monitor)
     {
-        _scan_monitor->ScanPercentComplete(35);
-        _scan_monitor->ScanAppendTextToLog(tr("Adding Channels"));
+        m_scan_monitor->ScanPercentComplete(35);
+        m_scan_monitor->ScanAppendTextToLog(tr("Adding Channels"));
     }
 
-    SetTotalNumChannels(_channels->size());
+    SetTotalNumChannels(m_channels->size());
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Found %1 channels")
-        .arg(_channels->size()));
+        .arg(m_channels->size()));
 
     // add the channels to the DB
-    vbox_chan_map_t::const_iterator it = _channels->begin();
-    for (uint i = 1; it != _channels->end(); ++it, ++i)
+    vbox_chan_map_t::const_iterator it = m_channels->begin();
+    for (uint i = 1; it != m_channels->end(); ++it, ++i)
     {
-        QString channum   = it.key();
+        const QString& channum   = it.key();
         QString name      = (*it).m_name;
         QString xmltvid   = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
         uint serviceID    = (*it).m_serviceID;
@@ -185,52 +181,52 @@ void VBoxChannelFetcher::run(void)
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
             .arg(channum).arg(name));
         uint mplexID = 0;
-        if (_ftaOnly && !fta)
+        if (m_ftaOnly && !fta)
         {
             // ignore this encrypted channel
-            if (_scan_monitor)
+            if (m_scan_monitor)
             {
-                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Encrypted %1")
+                m_scan_monitor->ScanAppendTextToLog(tr("Ignoring Encrypted %1")
                                                    .arg(msg));
             }
         }
-        else if (chanType == "Radio" && _serviceType != kRequireAudio)
+        else if (chanType == "Radio" && m_serviceType != kRequireAudio)
         {
             // ignore this radio channel
-            if (_scan_monitor)
+            if (m_scan_monitor)
             {
-                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Radio %1")
+                m_scan_monitor->ScanAppendTextToLog(tr("Ignoring Radio %1")
                                                    .arg(msg));
             }
         }
         else if (!SupportedTransmission(transType))
         {
             // ignore this channel
-            if (_scan_monitor)
+            if (m_scan_monitor)
             {
-                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Bad Transmission Type %1").arg(msg));
+                m_scan_monitor->ScanAppendTextToLog(tr("Ignoring Bad Transmission Type %1").arg(msg));
             }
         }
         else
         {
-            int chanid = ChannelUtil::GetChanID(_sourceid, channum);
+            int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
 
             if (chanid <= 0)
             {
-                if (_scan_monitor)
+                if (m_scan_monitor)
                 {
-                    _scan_monitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
+                    m_scan_monitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
                 }
-                chanid = ChannelUtil::CreateChanID(_sourceid, channum);
+                chanid = ChannelUtil::CreateChanID(m_sourceid, channum);
 
                 // mplexID will be created if necessary
                 // inversion, bandwidth, transmission_mode, polarity, hierarchy, mod_sys and roll_off are given values, but not used
                 // this is to ensure services API Channel/GetVideoMultiplexList returns a valid list
-                mplexID = ChannelUtil::CreateMultiplex(_sourceid, "dvb", 0, QString(), transportID, networkID, 0,
+                mplexID = ChannelUtil::CreateMultiplex(m_sourceid, "dvb", 0, QString(), transportID, networkID, 0,
                                                        'a', 'v', 'a', 'a', QString(), QString(), 'a', QString(),
                                                        QString(), QString(), "UNDEFINED", "0.35");
 
-                ChannelUtil::CreateChannel(mplexID, _sourceid, chanid, name, name,
+                ChannelUtil::CreateChannel(mplexID, m_sourceid, chanid, name, name,
                                             channum, serviceID, 0, 0,
                                             false, false, false, QString(),
                                             QString(), "Default", xmltvid);
@@ -239,18 +235,18 @@ void VBoxChannelFetcher::run(void)
             }
             else
             {
-                if (_scan_monitor)
+                if (m_scan_monitor)
                 {
-                    _scan_monitor->ScanAppendTextToLog(tr("Updating %1").arg(msg));
+                    m_scan_monitor->ScanAppendTextToLog(tr("Updating %1").arg(msg));
                 }
 
                 // mplexID will be created if necessary
-                mplexID = ChannelUtil::CreateMultiplex(_sourceid, "dvb", 0, QString(), transportID, networkID, 0,
+                mplexID = ChannelUtil::CreateMultiplex(m_sourceid, "dvb", 0, QString(), transportID, networkID, 0,
                                                        'a', 'v', 'a', 'a', QString(), QString(), 'a', QString(),
                                                        QString(), QString(), "UNDEFINED", "0.35");
 
                 // xmltvid parameter is set to null, user may have changed it, so do not overwrite as we are only updating
-                ChannelUtil::UpdateChannel(mplexID, _sourceid, chanid, name, name,
+                ChannelUtil::UpdateChannel(mplexID, m_sourceid, chanid, name, name,
                                            channum, serviceID, 0, 0,
                                            false, false, false, QString(),
                                            QString(), "Default", QString());
@@ -262,25 +258,25 @@ void VBoxChannelFetcher::run(void)
         SetNumChannelsInserted(i);
     }
 
-    if (_scan_monitor)
+    if (m_scan_monitor)
     {
-        _scan_monitor->ScanAppendTextToLog(tr("Done"));
-        _scan_monitor->ScanAppendTextToLog("");
-        _scan_monitor->ScanPercentComplete(100);
-        _scan_monitor->ScanComplete();
+        m_scan_monitor->ScanAppendTextToLog(tr("Done"));
+        m_scan_monitor->ScanAppendTextToLog("");
+        m_scan_monitor->ScanPercentComplete(100);
+        m_scan_monitor->ScanComplete();
     }
 
-    QMutexLocker locker(&_lock);
-    _thread_running = false;
-    _stop_now = true;
+    QMutexLocker locker(&m_lock);
+    m_thread_running = false;
+    m_stop_now = true;
 }
 
 void VBoxChannelFetcher::SetNumChannelsInserted(uint val)
 {
     uint minval = 70, range = 100 - minval;
-    uint pct = minval + (uint) truncf((((float)val) / _chan_cnt) * range);
-    if (_scan_monitor)
-        _scan_monitor->ScanPercentComplete(pct);
+    uint pct = minval + (uint) truncf((((float)val) / m_chan_cnt) * range);
+    if (m_scan_monitor)
+        m_scan_monitor->ScanPercentComplete(pct);
 }
 
 bool VBoxChannelFetcher::SupportedTransmission(const QString& transType)
@@ -289,16 +285,13 @@ bool VBoxChannelFetcher::SupportedTransmission(const QString& transType)
         return true;
 
     // both S and S2 tuners can tune an S channel
-    if (transType == "S" && (_transType == "S" || _transType == "S2"))
+    if (transType == "S" && (m_transType == "S" || m_transType == "S2"))
         return true;
 
     // both T and T2 tuners can tune a T channel
-    if (transType == "T" && (_transType == "T" || _transType == "T2"))
+    if (transType == "T" && (m_transType == "T" || m_transType == "T2"))
         return true;
 
     // for S2, T2, A and C the channel and tuner transmission types must match
-    if (transType != _transType)
-        return false;
-
-    return true;
+    return transType == m_transType;
 }

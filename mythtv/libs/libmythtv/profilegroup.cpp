@@ -24,7 +24,7 @@ QString ProfileGroupStorage::GetSetClause(MSqlBindings &bindings) const
             GetColumnName() + " = " + colTag);
 
     bindings.insert(idTag, m_parent.getProfileNum());
-    bindings.insert(colTag, user->GetDBValue());
+    bindings.insert(colTag, m_user->GetDBValue());
 
     return query;
 }
@@ -41,21 +41,21 @@ void ProfileGroup::HostName::fillSelections()
 ProfileGroup::ProfileGroup()
 {
     // This must be first because it is needed to load/save the other settings
-    addChild(id = new ID());
-    addChild(is_default = new Is_default(*this));
+    addChild(m_id = new ID());
+    addChild(m_is_default = new Is_default(*this));
 
     setLabel(tr("Profile Group"));
-    addChild(name = new Name(*this));
+    addChild(m_name = new Name(*this));
     CardInfo *cardInfo = new CardInfo(*this);
     addChild(cardInfo);
     CardType::fillSelections(cardInfo);
-    host = new HostName(*this);
-    addChild(host);
-    host->fillSelections();
+    m_host = new HostName(*this);
+    addChild(m_host);
+    m_host->fillSelections();
 };
 
 void ProfileGroup::loadByID(int profileId) {
-    id->setValue(profileId);
+    m_id->setValue(profileId);
     Load();
 }
 
@@ -199,12 +199,10 @@ bool ProfileGroup::allowedGroupName(void)
     MSqlQuery result(MSqlQuery::InitCon());
     QString querystr = QString("SELECT DISTINCT id FROM profilegroups WHERE "
                             "name = '%1' AND hostname = '%2';")
-                            .arg(getName()).arg(host->getValue());
+                            .arg(getName()).arg(m_host->getValue());
     result.prepare(querystr);
 
-    if (result.exec() && result.next())
-        return false;
-    return true;
+    return !(result.exec() && result.next());
 }
 
 void ProfileGroup::getHostNames(QStringList *hostnames)

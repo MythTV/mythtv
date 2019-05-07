@@ -49,8 +49,7 @@ using namespace omxcontext;
  */
 AudioOutputOMX::AudioOutputOMX(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    m_audiorender(gCoreContext->GetSetting("OMXAudioRender", AUDIO_RENDER), *this),
-    m_lock(QMutex::Recursive)
+    m_audiorender(gCoreContext->GetSetting("OMXAudioRender", AUDIO_RENDER), *this)
 {
     if (m_audiorender.GetState() != OMX_StateLoaded)
         return;
@@ -77,11 +76,13 @@ AudioOutputOMX::AudioOutputOMX(const AudioSettings &settings) :
     for (unsigned port = 0; port < m_audiorender.Ports(); ++port)
     {
         m_audiorender.ShowPortDef(port, LOG_DEBUG, VB_AUDIO);
-        if (0) m_audiorender.ShowFormats(port, LOG_DEBUG, VB_AUDIO);
+#if 0
+        m_audiorender.ShowFormats(port, LOG_DEBUG, VB_AUDIO);
+#endif
     }
 
     InitSettings(settings);
-    if (settings.init)
+    if (settings.m_init)
         Reconfigure(settings);
 }
 
@@ -205,14 +206,14 @@ bool AudioOutputOMX::OpenDevice(void)
     OMX_DATA_INIT(fmt);
     fmt.nPortIndex = m_audiorender.Base();
 
-    if (passthru || enc)
+    if (m_passthru || m_enc)
     {
-        nBitPerSample = 16;
-        switch (codec)
+        switch (m_codec)
         {
 #ifdef OMX_AUDIO_CodingDDP_Supported
           case AV_CODEC_ID_AC3:
           case AV_CODEC_ID_EAC3:
+            nBitPerSample = 16;
             fmt.eEncoding = OMX_AUDIO_CodingDDP;
             e = m_audiorender.SetParameter(OMX_IndexParamAudioPortFormat, &fmt);
             if (e != OMX_ErrorNone)
@@ -235,10 +236,10 @@ bool AudioOutputOMX::OpenDevice(void)
                 return false;
             }
 
-            ddp.nChannels = channels;
+            ddp.nChannels = m_channels;
             ddp.nBitRate = 0;
-            ddp.nSampleRate = samplerate;
-            ddp.eBitStreamId = (AV_CODEC_ID_AC3 == codec) ?
+            ddp.nSampleRate = m_samplerate;
+            ddp.eBitStreamId = (AV_CODEC_ID_AC3 == m_codec) ?
                                OMX_AUDIO_DDPBitStreamIdAC3 :
                                OMX_AUDIO_DDPBitStreamIdEAC3;
             ddp.eBitStreamMode = OMX_AUDIO_DDPBitStreamModeCM;
@@ -263,6 +264,7 @@ bool AudioOutputOMX::OpenDevice(void)
 
 #ifdef OMX_AUDIO_CodingDTS_Supported
           case AV_CODEC_ID_DTS:
+            nBitPerSample = 16;
             fmt.eEncoding = OMX_AUDIO_CodingDTS;
             e = m_audiorender.SetParameter(OMX_IndexParamAudioPortFormat, &fmt);
             if (e != OMX_ErrorNone)
@@ -285,9 +287,9 @@ bool AudioOutputOMX::OpenDevice(void)
                 return false;
             }
 
-            dts.nChannels = channels;
+            dts.nChannels = m_channels;
             dts.nBitRate = 0;
-            dts.nSampleRate = samplerate;
+            dts.nSampleRate = m_samplerate;
             // TODO
             //dts.nDtsType;           // OMX_U32 DTS type 1, 2, or 3
             //dts.nFormat;            // OMX_U32 DTS stream is either big/little endian and 16/14 bit packing
@@ -312,7 +314,7 @@ bool AudioOutputOMX::OpenDevice(void)
           default:
             LOG(VB_AUDIO, LOG_NOTICE, LOC + __func__ +
                 QString(" codec %1 not supported")
-                    .arg(ff_codec_id_string(AVCodecID(codec))));
+                    .arg(ff_codec_id_string(AVCodecID(m_codec))));
             return false;
         }
     }
@@ -340,13 +342,13 @@ bool AudioOutputOMX::OpenDevice(void)
             return false;
         }
 
-        pcm.nChannels = channels;
-        pcm.nSamplingRate = samplerate;
-        if (!::Format2Pcm(pcm, output_format))
+        pcm.nChannels = m_channels;
+        pcm.nSamplingRate = m_samplerate;
+        if (!::Format2Pcm(pcm, m_output_format))
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + __func__ + QString(
                     " Unsupported format %1")
-                .arg(AudioOutputSettings::FormatToString(output_format)));
+                .arg(AudioOutputSettings::FormatToString(m_output_format)));
             return false;
         }
 
@@ -374,7 +376,7 @@ bool AudioOutputOMX::OpenDevice(void)
     m_audiorender.GetPortDef();
     OMX_PARAM_PORTDEFINITIONTYPE &def = m_audiorender.PortDef();
     def.nBufferSize = std::max(
-        OMX_U32((1024 * nBitPerSample * channels) / 8),
+        OMX_U32((1024 * nBitPerSample * m_channels) / 8),
         def.nBufferSize);
     def.nBufferCountActual = std::max(OMX_U32(10), def.nBufferCountActual);
     //def.bBuffersContiguous = OMX_FALSE;
@@ -389,15 +391,15 @@ bool AudioOutputOMX::OpenDevice(void)
     }
 
     // set AudioOutputBase member variables
-    soundcard_buffer_size = def.nBufferSize * def.nBufferCountActual;
-    fragment_size = def.nBufferSize;
+    m_soundcard_buffer_size = def.nBufferSize * def.nBufferCountActual;
+    m_fragment_size = def.nBufferSize;
 
 #ifdef USING_BROADCOM
     // Select output device
     QString dev;
-    if (passthru)
+    if (m_passthru)
         dev = "hdmi";
-    else if (main_device.contains(":hdmi"))
+    else if (m_main_device.contains(":hdmi"))
         dev = "hdmi";
     else
         dev = "local";
@@ -461,8 +463,8 @@ void AudioOutputOMX::reorderChannels(int *aubuf, int size)
         int savefirst = sample[REORD_A];
         sample[REORD_A] = sample[REORD_B];
         sample[REORD_B] = savefirst;
-        sample += channels;
-        t_size -= output_bytes_per_frame;
+        sample += m_channels;
+        t_size -= m_output_bytes_per_frame;
     }
 }
 
@@ -475,8 +477,8 @@ void AudioOutputOMX::reorderChannels(short *aubuf, int size)
         short savefirst = sample[REORD_A];
         sample[REORD_A] = sample[REORD_B];
         sample[REORD_B] = savefirst;
-        sample += channels;
-        t_size -= output_bytes_per_frame;
+        sample += m_channels;
+        t_size -= m_output_bytes_per_frame;
     }
 }
 
@@ -489,8 +491,8 @@ void AudioOutputOMX::reorderChannels(uchar *aubuf, int size)
         uchar savefirst = sample[REORD_A];
         sample[REORD_A] = sample[REORD_B];
         sample[REORD_B] = savefirst;
-        sample += channels;
-        t_size -= output_bytes_per_frame;
+        sample += m_channels;
+        t_size -= m_output_bytes_per_frame;
     }
 }
 
@@ -505,9 +507,9 @@ void AudioOutputOMX::WriteAudio(uchar *aubuf, int size)
 
     // Reorder channels for CEA format
     // See CEA spec: Table 20, Audio InfoFrame
-    if (!enc && !reenc && channels >= REORD_NUMCHAN)
+    if (!m_enc && !m_reenc && m_channels >= REORD_NUMCHAN)
     {
-        int samplesize = output_bytes_per_frame / channels;
+        int samplesize = m_output_bytes_per_frame / m_channels;
         switch (samplesize)
         {
             case 1:
@@ -540,7 +542,6 @@ void AudioOutputOMX::WriteAudio(uchar *aubuf, int size)
         hdr->nFilledLen += cnt;
         aubuf += cnt;
         size -= cnt;
-        free -= cnt;
         m_pending.fetchAndAddRelaxed(cnt);
 
         hdr->nTimeStamp = S64_TO_TICKS(0);
@@ -585,12 +586,8 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
             "GetConfig AudioRenderingLatency error %1").arg(Error2String(e)));
         return 0;
     }
-    return u.nU32 * output_bytes_per_frame;
+    return u.nU32 * m_output_bytes_per_frame;
 #else
-#    if (QT_VERSION < QT_VERSION_CHECK(5,3,0))
-#        error No OpenMAX audio with QT5 before 5.3 due to missing operator int() of QAtomicInt, update your QT or remove libomxil-bellagio-dev
-#    endif
-
     return m_pending;
 #endif
 }
@@ -670,7 +667,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 
     settings->setFeature(FEATURE_LPCM);
     settings->setPassthrough(-1);
-    if (main_device.contains(":hdmi"))
+    if (m_main_device.contains(":hdmi"))
     {
 #ifdef OMX_AUDIO_CodingDDP_Supported
         fmt.eEncoding = OMX_AUDIO_CodingDDP;
@@ -760,7 +757,7 @@ bool AudioOutputOMX::OpenMixer()
     if (!mixerDevice.startsWith("OpenMAX:"))
         return true;
 
-    if (set_initial_vol)
+    if (m_set_initial_vol)
     {
         QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM")
                              + "MixerVolume";
@@ -773,7 +770,7 @@ bool AudioOutputOMX::OpenMixer()
 
 // virtual
 OMX_ERRORTYPE AudioOutputOMX::EmptyBufferDone(
-    OMXComponent&, OMX_BUFFERHEADERTYPE *hdr)
+    OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE *hdr)
 {
     assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
     assert(hdr->nVersion.nVersion == OMX_VERSION);

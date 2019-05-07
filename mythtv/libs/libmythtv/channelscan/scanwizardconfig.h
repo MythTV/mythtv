@@ -31,7 +31,6 @@
 #define _SCAN_WIZARD_CONFIG_H_
 
 // MythTV headers
-#include "settings.h"
 #include "standardsettings.h"
 #include "inputselectorsetting.h"
 #include "channelscantypes.h"
@@ -44,6 +43,7 @@ class ScanNetwork;
 class IgnoreSignalTimeout;
 class DesiredServices;
 class FreeToAirOnly;
+class ChannelNumbersOnly;
 class AddFullTS;
 class TrustEncSISetting;
 
@@ -100,14 +100,13 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
         ExternRecImport
     };
 
-    ScanTypeSetting() : hw_cardid(0)
-        { setLabel(QObject::tr("Scan Type")); }
+    ScanTypeSetting() { setLabel(QObject::tr("Scan Type")); }
 
   protected slots:
     void SetInput(const QString &cardids_inputname);
 
   protected:
-    uint    hw_cardid;
+    uint    m_hw_cardid {0};
 };
 
 class ScanOptionalConfig : public GroupSetting
@@ -132,21 +131,21 @@ class ScanOptionalConfig : public GroupSetting
     void SetSourceID(const QString&);
 
   private:
-    ScanTypeSetting      *scanType;
-    ScanCountry          *dvbTCountry;
-    ScanCountry          *dvbT2Country;
-    ScanNetwork          *network;
-    PaneDVBT             *paneDVBT;
-    PaneDVBT2            *paneDVBT2;
-    PaneDVBS             *paneDVBS;
-    PaneDVBS2            *paneDVBS2;
-    PaneATSC             *paneATSC;
-    PaneDVBC             *paneDVBC;
-    PaneAnalog           *paneAnalog;
-    PaneSingle           *paneSingle;
-    PaneAll              *paneAll;
-    PaneDVBUtilsImport   *paneDVBUtilsImport;
-    PaneExistingScanImport *paneExistingScanImport;
+    ScanTypeSetting        *m_scanType                 {nullptr};
+    ScanCountry            *m_dvbTCountry              {nullptr};
+    ScanCountry            *m_dvbT2Country             {nullptr};
+    ScanNetwork            *m_network                  {nullptr};
+    PaneDVBT               *m_paneDVBT                 {nullptr};
+    PaneDVBT2              *m_paneDVBT2                {nullptr};
+    PaneDVBS               *m_paneDVBS                 {nullptr};
+    PaneDVBS2              *m_paneDVBS2                {nullptr};
+    PaneATSC               *m_paneATSC                 {nullptr};
+    PaneDVBC               *m_paneDVBC                 {nullptr};
+    PaneAnalog             *m_paneAnalog               {nullptr};
+    PaneSingle             *m_paneSingle               {nullptr};
+    PaneAll                *m_paneAll                  {nullptr};
+    PaneDVBUtilsImport     *m_paneDVBUtilsImport       {nullptr};
+    PaneExistingScanImport *m_paneExistingScanImport   {nullptr};
 };
 
 #endif // _SCAN_WIZARD_CONFIG_H_

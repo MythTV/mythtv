@@ -5,7 +5,7 @@
 
 MythFrontendCommandLineParser::MythFrontendCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHFRONTEND)
-{ LoadArguments(); }
+{ MythFrontendCommandLineParser::LoadArguments(); }
 
 void MythFrontendCommandLineParser::LoadArguments(void)
 {
@@ -19,11 +19,11 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     addUPnP();
     addLogging();
 
-    add(QStringList( QStringList() << "-r" << "--reset" ), "reset", false,
+    add(QStringList{"-r", "--reset"}, "reset", false,
         "Resets appearance settings and language.", "");
-    add(QStringList( QStringList() << "-p" << "--prompt" ), "prompt", false,
+    add(QStringList{"-p", "--prompt"}, "prompt", false,
         "Always prompt for backend selection.", "");
-    add(QStringList( QStringList() << "-d" << "--disable-autodiscovery" ),
+    add(QStringList{"-d", "--disable-autodiscovery"},
         "noautodiscovery", false,
         "Prevent frontend from using UPnP autodiscovery.", "");
 
@@ -35,10 +35,10 @@ void MythFrontendCommandLineParser::LoadArguments(void)
             ->SetGroup("Startup Behavior")
             ->SetBlocks("jumppoint");
 
-    add(QStringList( QStringList() << "-G" << "--get-setting" ),
+    add(QStringList{"-G", "--get-setting"},
         "getsetting", "", "", "")
             ->SetRemoved("Use the Services API instead.", "0.25");
-    add(QStringList( QStringList() << "-u" << "--upgrade-schema" ),
+    add(QStringList{"-u", "--upgrade-schema"},
         "upgradeschema", "", "", "")
             ->SetRemoved("The frontend is no longer allowed to update\n"
                "          the primary database schema. Use mythtv-setup\n"

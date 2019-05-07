@@ -170,7 +170,7 @@ class H264Parser {
     uint64_t SPSstreamOffset(void) const {return SPS_offset;}
 
     // == NAL_type AU_delimiter: primary_pic_type = 5
-    static int isKeySlice(uint slice_type)
+    static bool isKeySlice(uint slice_type)
         {
             return (slice_type == SLICE_I   ||
                     slice_type == SLICE_SI  ||

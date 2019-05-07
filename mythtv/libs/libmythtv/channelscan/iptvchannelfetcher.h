@@ -26,7 +26,7 @@ class IPTVChannelInfo
     Q_DECLARE_TR_FUNCTIONS(IPTVChannelInfo)
 
   public:
-    IPTVChannelInfo() : m_programNumber(0) {}
+    IPTVChannelInfo() = default;
     IPTVChannelInfo(const QString &name,
                     const QString &xmltvid,
                     const QString &data_url,
@@ -49,9 +49,9 @@ class IPTVChannelInfo
     }
 
   public:
-    QString m_name;
-    QString m_xmltvid;
-    uint m_programNumber;
+    QString        m_name;
+    QString        m_xmltvid;
+    uint           m_programNumber {0};
     IPTVTuningData m_tuning;
 };
 typedef QMap<QString,IPTVChannelInfo> fbox_chan_map_t;
@@ -74,26 +74,26 @@ class IPTVChannelFetcher : public QRunnable
         const QString &rawdata, IPTVChannelFetcher *fetcher = nullptr);
 
   private:
-    void SetTotalNumChannels(uint val) { _chan_cnt = (val) ? val : 1; }
+    void SetTotalNumChannels(uint val) { m_chan_cnt = (val) ? val : 1; }
     void SetNumChannelsParsed(uint);
     void SetNumChannelsInserted(uint);
     void SetMessage(const QString &status);
 
   protected:
-    virtual void run(void); // QRunnable
+    void run(void) override; // QRunnable
 
   private:
-    ScanMonitor *_scan_monitor;
-    uint      _cardid;
-    QString   _inputname;
-    uint      _sourceid;
-    bool      _is_mpts;
-    fbox_chan_map_t _channels;
-    uint      _chan_cnt;
-    bool      _thread_running;
-    bool      _stop_now;
-    MThread  *_thread;
-    QMutex    _lock;
+    ScanMonitor     *m_scan_monitor   {nullptr};
+    uint             m_cardid;
+    QString          m_inputname;
+    uint             m_sourceid;
+    bool             m_is_mpts;
+    fbox_chan_map_t  m_channels;
+    uint             m_chan_cnt       {1};
+    bool             m_thread_running {false};
+    bool             m_stop_now       {false};
+    MThread         *m_thread         {nullptr};
+    QMutex           m_lock;
 };
 
 #endif // _IPTVCHANNELFETCHER_H_

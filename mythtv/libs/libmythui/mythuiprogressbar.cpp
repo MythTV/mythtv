@@ -13,14 +13,6 @@
 #include "mythuishape.h"
 #include "mythuiimage.h"
 
-MythUIProgressBar::MythUIProgressBar(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-      m_layout(LayoutHorizontal), m_effect(EffectReveal),
-      m_total(0),                 m_start(0),
-      m_current(0),               m_firstdepend(true)
-{
-}
-
 void MythUIProgressBar::Reset()
 {
     m_total = m_start = m_current = 0;

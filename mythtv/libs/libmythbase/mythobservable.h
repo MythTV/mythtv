@@ -11,7 +11,8 @@ class QMutex;
 class MBASE_PUBLIC MythObservable
 {
   public:
-    MythObservable();
+    MythObservable()
+        : m_lock(new QMutex()) {}
     virtual ~MythObservable();
 
     void addListener(QObject *listener);
@@ -21,8 +22,11 @@ class MBASE_PUBLIC MythObservable
 
     bool hasListeners(void) { return !m_listeners.isEmpty(); }
 
+  private:
+    Q_DISABLE_COPY(MythObservable)
+
   protected:
-    QMutex         *m_lock;
+    QMutex         *m_lock {nullptr};
     QSet<QObject*>  m_listeners;
 };
 

@@ -31,19 +31,16 @@ QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::regist
 QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
-DecoderHandlerEvent::DecoderHandlerEvent(Type t, const MusicMetadata &meta)
-    : MythEvent(t), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0)
+DecoderHandlerEvent::DecoderHandlerEvent(Type type, const MusicMetadata &meta)
+    : MythEvent(type)
 { 
     m_meta = new MusicMetadata(meta);
 }
 
 DecoderHandlerEvent::~DecoderHandlerEvent(void)
 {
-    if (m_msg)
-        delete m_msg;
-
-    if (m_meta)
-        delete m_meta;
+    delete m_msg;
+    delete m_meta;
 }
 
 MythEvent* DecoderHandlerEvent::clone(void) const
@@ -69,15 +66,6 @@ void DecoderHandlerEvent::getBufferStatus(int *available, int *maxSize) const
 }
 
 /**********************************************************************/
-
-DecoderHandler::DecoderHandler(void) :
-    m_state(STOPPED),
-    m_playlist_pos(0),
-    m_decoder(nullptr),
-    m_op(false),
-    m_redirects(0)
-{
-}
 
 DecoderHandler::~DecoderHandler(void)
 {
@@ -222,7 +210,7 @@ void DecoderHandler::customEvent(QEvent *event)
         // Proxy all DecoderHandlerEvents
         return dispatch(*dhe);
     }
-    else if (event->type() == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

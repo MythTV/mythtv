@@ -111,7 +111,7 @@ class TuningRequest
     TuningRequest(uint f, RecordingInfo *p) :
         flags(f), program(p),
         majorChan(0), minorChan(0), progNum(-1) {;}
-    TuningRequest(uint f, QString ch, QString in = QString()) :
+    TuningRequest(uint f, const QString& ch, const QString& in = QString()) :
         flags(f), program(nullptr), channel(ch),
         input(in), majorChan(0), minorChan(0), progNum(-1) {;}
 
@@ -161,7 +161,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
-    RecStatus::Type StartRecording(ProgramInfo *rcinfo);
+    RecStatus::Type StartRecording(ProgramInfo *pginfo);
     RecStatus::Type GetRecordingStatus(void) const;
 
     void StopRecording(bool killFile = false);
@@ -181,10 +181,10 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     TVState GetState(void) const;
     /// \brief Returns "state == kState_RecordingPreRecorded"
-    bool IsPlaying(void) { return StateIsPlaying(internalState); }
+    bool IsPlaying(void) { return StateIsPlaying(m_internalState); }
     /// \brief Returns "state == kState_RecordingRecordedOnly"
     /// \sa IsReallyRecording()
-    bool IsRecording(void) { return StateIsRecording(internalState); }
+    bool IsRecording(void) { return StateIsRecording(m_internalState); }
 
     bool SetVideoFiltersForChannel(uint sourceid, const QString &channum);
 
@@ -202,7 +202,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
-    void ToggleChannelFavorite(QString);
+    void ToggleChannelFavorite(const QString&);
 
     void SetLiveRecording(int recording);
 
@@ -213,33 +213,34 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
         { SetChannel(QString("NextChannel %1").arg((int)dir)); }
-    void SetChannel(QString name, uint requestType = kFlagDetect);
+    void SetChannel(const QString& name, uint requestType = kFlagDetect);
     bool QueueEITChannelChange(const QString &name);
 
     int SetSignalMonitoringRate(int rate, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
-    bool CheckChannel(QString name) const;
-    bool ShouldSwitchToAnotherInput(QString chanid);
+    bool CheckChannel(const QString& name) const;
+    bool ShouldSwitchToAnotherInput(const QString& chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
                         QString &desc,        QString &category,
                         QString &starttime,   QString &endtime,
                         QString &callsign,    QString &iconpath,
-                        QString &channelname, uint    &chanid,
+                        QString &channum,     uint    &chanid,
                         QString &seriesid,    QString &programid);
     bool GetChannelInfo(uint &chanid, uint &sourceid,
                         QString &callsign, QString &channum,
                         QString &channame, QString &xmltvid) const;
-    bool SetChannelInfo(uint chanid, uint sourceid, QString oldchannum,
-                        QString callsign, QString channum,
-                        QString channame, QString xmltvid);
+    bool SetChannelInfo(uint chanid, uint sourceid, const QString& oldchannum,
+                        const QString& callsign, const QString& channum,
+                        const QString& channame, const QString& xmltvid);
 
     /// \brief Returns the inputid
-    uint GetInputId(void) { return inputid; }
-    uint GetParentId(void) { return parentid; }
+    uint GetInputId(void) { return m_inputid; }
+    uint GetParentId(void) { return m_parentid; }
+    uint GetMajorId(void) { return m_parentid ? m_parentid : m_inputid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
@@ -248,17 +249,17 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     void SetNextLiveTVDir(QString dir);
 
-    uint GetFlags(void) const { return stateFlags; }
+    uint GetFlags(void) const { return m_stateFlags; }
 
     static TVRec *GetTVRec(uint inputid);
 
-    virtual void AllGood(void) { WakeEventLoop(); }
-    virtual void StatusChannelTuned(const SignalMonitorValue&) { }
-    virtual void StatusSignalLock(const SignalMonitorValue&) { }
-    virtual void StatusSignalStrength(const SignalMonitorValue&) { }
+    void AllGood(void) override { WakeEventLoop(); } // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
 
   protected:
-    virtual void run(void); // QRunnable
+    void run(void) override; // QRunnable
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
 
   private:
@@ -269,7 +270,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     static bool GetDevices(uint inputid,
                            uint &parentid,
-                           GeneralDBOptions   &general_opts,
+                           GeneralDBOptions   &gen_opts,
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
@@ -278,7 +279,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);
 
-    bool CreateChannel(const QString &startChanNum,
+    bool CreateChannel(const QString &startchannel,
                        bool enter_power_save_mode);
     void CloseChannel(void);
     DTVChannel *GetDTVChannel(void);
@@ -290,7 +291,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 
-    bool HasFlags(uint f) const { return (stateFlags & f) == f; }
+    bool HasFlags(uint f) const { return (m_stateFlags & f) == f; }
     void SetFlags(uint f, const QString & file, int line);
     void ClearFlags(uint f, const QString & file, int line);
     static QString FlagToString(uint);
@@ -339,97 +340,98 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                         RecordingProfile&);
 
     // Various components TVRec coordinates
-    RecorderBase     *recorder;
-    ChannelBase      *channel;
-    SignalMonitor    *signalMonitor;
-    EITScanner       *scanner;
+    RecorderBase      *m_recorder                 {nullptr};
+    ChannelBase       *m_channel                  {nullptr};
+    SignalMonitor     *m_signalMonitor            {nullptr};
+    EITScanner        *m_scanner                  {nullptr};
 
-    QDateTime         signalEventCmdTimeout;
-    bool              signalEventCmdSent;
+    QDateTime          m_signalEventCmdTimeout;
+    bool               m_signalEventCmdSent       {false};
 
-    QDateTime         startRecordingDeadline;
-    QDateTime         signalMonitorDeadline;
-    uint              signalMonitorCheckCnt;
-    bool              reachedRecordingDeadline;
-    QDateTime         preFailDeadline;
-    bool              reachedPreFail;
+    QDateTime          m_startRecordingDeadline;
+    QDateTime          m_signalMonitorDeadline;
+    uint               m_signalMonitorCheckCnt    {0};
+    bool               m_reachedRecordingDeadline {false};
+    QDateTime          m_preFailDeadline;
+    bool               m_reachedPreFail           {false};
 
     // Various threads
     /// Event processing thread, runs TVRec::run().
-    MThread          *eventThread;
+    MThread           *m_eventThread              {nullptr};
     /// Recorder thread, runs RecorderBase::run().
-    MThread          *recorderThread;
+    MThread           *m_recorderThread           {nullptr};
 
     // Configuration variables from database
-    bool    transcodeFirst;
-    bool    earlyCommFlag;
-    bool    runJobOnHostOnly;
-    int     eitCrawlIdleStart;
-    int     eitTransportTimeout;
-    int     audioSampleRateDB;
-    int     overRecordSecNrml;
-    int     overRecordSecCat;
-    QString overRecordCategory;
+    bool               m_transcodeFirst           {false};
+    bool               m_earlyCommFlag            {false};
+    bool               m_runJobOnHostOnly         {false};
+    int                m_eitCrawlIdleStart        {60};
+    int                m_eitTransportTimeout      {5*60};
+    int                m_audioSampleRateDB        {0};
+    int                m_overRecordSecNrml        {0};
+    int                m_overRecordSecCat         {0};
+    QString            m_overRecordCategory;
 
     // Configuration variables from setup routines
-    uint              inputid;
-    uint              parentid;
-    bool              ispip;
+    uint               m_inputid;
+    uint               m_parentid                 {0};
+    bool               m_ispip                    {false};
 
     // Configuration variables from database, based on inputid
-    GeneralDBOptions   genOpt;
-    DVBDBOptions       dvbOpt;
-    FireWireDBOptions  fwOpt;
+    GeneralDBOptions   m_genOpt;
+    DVBDBOptions       m_dvbOpt;
+    FireWireDBOptions  m_fwOpt;
 
-    QString            recProfileName;
+    QString            m_recProfileName;
 
     // State variables
-    mutable QMutex setChannelLock;
-    mutable QMutex stateChangeLock;
-    mutable QMutex pendingRecLock;
-    TVState        internalState;
-    TVState        desiredNextState;
-    bool           changeState;
-    bool           pauseNotify;
-    uint           stateFlags;
-    TuningQueue    tuningRequests;
-    TuningRequest  lastTuningRequest;
-    QDateTime      eitScanStartTime;
-    mutable QMutex triggerEventLoopLock;
-    QWaitCondition triggerEventLoopWait;
-    bool           triggerEventLoopSignal;
-    mutable QMutex triggerEventSleepLock;
-    QWaitCondition triggerEventSleepWait;
-    bool           triggerEventSleepSignal;
-    volatile bool  switchingBuffer;
-    RecStatus::Type  m_recStatus;
+    mutable QMutex     m_setChannelLock;
+    mutable QMutex     m_stateChangeLock          {QMutex::Recursive};
+    mutable QMutex     m_pendingRecLock           {QMutex::Recursive};
+    TVState            m_internalState            {kState_None};
+    TVState            m_desiredNextState         {kState_None};
+    bool               m_changeState              {false};
+    bool               m_pauseNotify              {true};
+    uint               m_stateFlags               {0};
+    TuningQueue        m_tuningRequests;
+    TuningRequest      m_lastTuningRequest        {0};
+    QDateTime          m_eitScanStartTime;
+    mutable QMutex     m_triggerEventLoopLock     {QMutex::NonRecursive};
+    QWaitCondition     m_triggerEventLoopWait;
+    bool               m_triggerEventLoopSignal   {false};
+    mutable QMutex     m_triggerEventSleepLock    {QMutex::NonRecursive};
+    QWaitCondition     m_triggerEventSleepWait;
+    bool               m_triggerEventSleepSignal  {false};
+    volatile bool      m_switchingBuffer          {false};
+    RecStatus::Type    m_recStatus                {RecStatus::Unknown};
 
     // Current recording info
-    RecordingInfo *curRecording;
-    QDateTime    recordEndTime;
-    QHash<QString,int> autoRunJobs; // RecordingInfo::MakeUniqueKey()->autoRun
-    int          overrecordseconds;
+    RecordingInfo     *m_curRecording             {nullptr};
+    QDateTime          m_recordEndTime;
+     // RecordingInfo::MakeUniqueKey()->autoRun
+    QHash<QString,int> m_autoRunJobs;
+    int                m_overrecordseconds        {0};
 
     // Pending recording info
-    PendingMap   pendingRecordings;
+    PendingMap         m_pendingRecordings;
 
     // Pseudo LiveTV recording
-    RecordingInfo *pseudoLiveTVRecording;
-    QString      nextLiveTVDir;
-    QMutex       nextLiveTVDirLock;
-    QWaitCondition triggerLiveTVDir;
-    QString      LiveTVStartChannel;
+    RecordingInfo     *m_pseudoLiveTVRecording    {nullptr};
+    QString            m_nextLiveTVDir;
+    QMutex             m_nextLiveTVDirLock;
+    QWaitCondition     m_triggerLiveTVDir;
+    QString            m_liveTVStartChannel;
 
     // LiveTV file chain
-    LiveTVChain *tvchain;
+    LiveTVChain       *m_tvChain                  {nullptr};
 
     // RingBuffer info
-    RingBuffer  *ringBuffer;
-    QString      rbFileExt;
+    RingBuffer        *m_ringBuffer               {nullptr};
+    QString            m_rbFileExt                {"ts"};
 
   public:
-    static QReadWriteLock    inputsLock;
-    static QMap<uint,TVRec*> inputs;
+    static QReadWriteLock    s_inputsLock;
+    static QMap<uint,TVRec*> s_inputs;
 
   public:
     static const uint kSignalMonitoringRate;

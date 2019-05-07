@@ -13,12 +13,7 @@
 class Cutter
 {
   public:
-    Cutter()
-      : active(false),                 totalFrames(0),
-        videoFramesToCut(0),           audioFramesToCut(0),
-        audioFramesPerVideoFrame(0.0)
-    {};
-
+    Cutter() = default;
     void          SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx);
     frm_dir_map_t AdjustedCutList() const;
     void          Activate(float v2a, int64_t total);
@@ -29,13 +24,13 @@ class Cutter
     bool          InhibitDropFrame(void);
 
   private:
-    bool          active;
-    frm_dir_map_t foreshortenedCutList;
-    DeleteMap     tracker;
-    int64_t       totalFrames;
-    int64_t       videoFramesToCut;
-    int64_t       audioFramesToCut;
-    float         audioFramesPerVideoFrame;
+    bool          m_active {false};
+    frm_dir_map_t m_foreshortenedCutList;
+    DeleteMap     m_tracker;
+    int64_t       m_totalFrames {0};
+    int64_t       m_videoFramesToCut {0};
+    int64_t       m_audioFramesToCut {0};
+    float         m_audioFramesPerVideoFrame {0.0};
     enum
     {
         MAXLEADIN  = 200,

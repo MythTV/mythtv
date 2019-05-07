@@ -33,24 +33,24 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
                    int cardnum, bool cacheTables = false);
     virtual ~ATSCStreamData();
 
-    void Reset(void) { Reset(-1, -1); }
-    void Reset(int desiredProgram);
+    void Reset(void) override { Reset(-1, -1); } // MPEGStreamData
+    void Reset(int desiredProgram) override; // MPEGStreamData
     void Reset(int desiredMajorChannel, int desiredMinorChannel);
     void SetDesiredChannel(int major, int minor);
 
     // Table processing
-    virtual bool HandleTables(uint pid, const PSIPTable &psip);
-    virtual bool IsRedundant(uint, const PSIPTable&) const;
+    bool HandleTables(uint pid, const PSIPTable &psip) override; // MPEGStreamData
+    bool IsRedundant(uint, const PSIPTable&) const override; // MPEGStreamData
 
     /// Current UTC to GPS time offset in seconds
     uint GPSOffset(void) const { return _GPS_UTC_offset; }
 
     inline uint GetATSCMajorMinor(uint eit_sourceid) const;
     inline bool HasATSCMajorMinorMap(void) const;
-    bool HasEITPIDChanges(const uint_vec_t &in_use_pid) const;
-    bool GetEITPIDChanges(const uint_vec_t &in_use_pid,
-                          uint_vec_t &pids_to_add,
-                          uint_vec_t &pids_to_del) const;
+    bool HasEITPIDChanges(const uint_vec_t &in_use_pid) const override; // MPEGStreamData
+    bool GetEITPIDChanges(const uint_vec_t &cur_pids,
+                          uint_vec_t &add_pids,
+                          uint_vec_t &del_pids) const override; // MPEGStreamData
 
     // Table versions
     void SetVersionMGT(int version)
@@ -121,7 +121,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
     void CacheCVCT(uint pid, CableVirtualChannelTable*);
   protected:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    bool DeleteCachedTable(PSIPTable *psip) const override; // MPEGStreamData
 
   private:
     uint                      _GPS_UTC_offset;

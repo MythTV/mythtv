@@ -58,7 +58,7 @@ class MUI_PUBLIC MythUIHelper
     void RemoveFromCacheByFile(const QString &fname);
     bool IsImageInCache(const QString &url);
     QString GetThemeCacheDir(void);
-    QString GetCacheDirByUrl(QString url);
+    QString GetCacheDirByUrl(const QString& url);
 
     void IncludeInCacheSize(MythImage *im);
     void ExcludeFromCacheSize(MythImage *im);
@@ -82,7 +82,7 @@ class MUI_PUBLIC MythUIHelper
 
     /// Returns a reference counted image from the cache.
     /// \note The reference count is set for one use call DecrRef() to delete.
-    MythImage *LoadCacheImage(QString srcfile, QString label,
+    MythImage *LoadCacheImage(QString srcfile, const QString& label,
                               MythPainter *painter,
                               ImageCacheMode cacheMode = kCacheNormal);
 
@@ -94,7 +94,7 @@ class MUI_PUBLIC MythUIHelper
     QString GetMenuThemeDir(void);
     QList<ThemeInfo> GetThemes(ThemeType type);
 
-    bool FindThemeFile(QString &filename);
+    bool FindThemeFile(QString &path);
 
     QFont GetBigFont(void);
     QFont GetMediumFont(void);
@@ -124,7 +124,7 @@ class MUI_PUBLIC MythUIHelper
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 
-    void AddCurrentLocation(QString location);
+    void AddCurrentLocation(const QString& location);
     QString RemoveCurrentLocation(void);
     QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
 
@@ -145,9 +145,9 @@ class MUI_PUBLIC MythUIHelper
 
     void ClearOldImageCache(void);
     void RemoveCacheDir(const QString &dirname);
-    void PruneCacheDir(QString dirname);
+    void PruneCacheDir(const QString& dirname);
 
-    MythUIHelperPrivate *d;
+    MythUIHelperPrivate *d {nullptr};
 
     QMutex m_locationLock;
     QStringList m_currentLocation;

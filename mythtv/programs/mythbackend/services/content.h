@@ -41,55 +41,55 @@ class Content : public ContentServices
     public:
 
         QFileInfo           GetFile             ( const QString   &StorageGroup,
-                                                  const QString   &FileName );
+                                                  const QString   &FileName ) override; // ContentServices
 
         QFileInfo           GetImageFile        ( const QString   &StorageGroup,
                                                   const QString   &FileName,
-                                                  int Width, int Height );
+                                                  int Width, int Height ) override; // ContentServices
 
-        QStringList         GetFileList         ( const QString   &StorageGroup );
+        QStringList         GetFileList         ( const QString   &StorageGroup ) override; // ContentServices
 
-        QStringList         GetDirList          ( const QString   &StorageGroup );
+        QStringList         GetDirList          ( const QString   &StorageGroup ) override; // ContentServices
 
         QFileInfo           GetRecordingArtwork ( const QString   &Type,
                                                   const QString   &Inetref,
                                                   int Season, int Width,
-                                                  int Height);
+                                                  int Height) override; // ContentServices
 
         DTC::ArtworkInfoList*
                             GetRecordingArtworkList( int              RecordedId,
                                                      int              ChanId,
-                                                     const QDateTime &StartTime  );
+                                                     const QDateTime &recstarttsRaw  ) override; // ContentServices
 
         DTC::ArtworkInfoList*
                             GetProgramArtworkList( const QString &Inetref,
-                                                   int            Season  );
+                                                   int            Season  ) override; // ContentServices
 
         QFileInfo           GetVideoArtwork     ( const QString   &Type,
-                                                  int Id, int Width, int Height );
+                                                  int Id, int Width, int Height ) override; // ContentServices
 
-        QFileInfo           GetAlbumArt         ( int Id, int Width, int Height );
+        QFileInfo           GetAlbumArt         ( int Id, int Width, int Height ) override; // ContentServices
 
         QFileInfo           GetPreviewImage     ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &StartTime,
+                                                  const QDateTime &recstarttsRaw,
                                                   int              Width,
                                                   int              Height,
                                                   int              SecsIn,
-                                                  const QString   &Format);
+                                                  const QString   &Format) override; // ContentServices
 
         QFileInfo           GetRecording        ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &StartTime );
+                                                  const QDateTime &recstarttsRaw ) override; // ContentServices
 
-        QFileInfo           GetMusic            ( int Id );
-        QFileInfo           GetVideo            ( int Id );
+        QFileInfo           GetMusic            ( int Id ) override; // ContentServices
+        QFileInfo           GetVideo            ( int Id ) override; // ContentServices
 
         QString             GetHash             ( const QString   &StorageGroup,
-                                                  const QString   &FileName );
+                                                  const QString   &FileName ) override; // ContentServices
 
         bool                DownloadFile        ( const QString   &URL,
-                                                  const QString   &StorageGroup );
+                                                  const QString   &StorageGroup ) override; // ContentServices
 
         // HTTP Live Streaming
         DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
@@ -100,17 +100,17 @@ class Content : public ContentServices
                                                           int              Height,
                                                           int              Bitrate,
                                                           int              AudioBitrate,
-                                                          int              SampleRate );
+                                                          int              SampleRate ) override; // ContentServices
 
         DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              RecordedId,
                                                           int              ChanId,
-                                                          const QDateTime &StartTime,
+                                                          const QDateTime &recstarttsRaw,
                                                           int              MaxSegments,
                                                           int              Width,
                                                           int              Height,
                                                           int              Bitrate,
                                                           int              AudioBitrate,
-                                                          int              SampleRate );
+                                                          int              SampleRate ) override; // ContentServices
 
         DTC::LiveStreamInfo     *AddVideoLiveStream     ( int              Id,
                                                           int              MaxSegments,
@@ -118,13 +118,13 @@ class Content : public ContentServices
                                                           int              Height,
                                                           int              Bitrate,
                                                           int              AudioBitrate,
-                                                          int              SampleRate );
+                                                          int              SampleRate ) override; // ContentServices
 
-        DTC::LiveStreamInfo     *GetLiveStream            ( int Id );
-        DTC::LiveStreamInfoList *GetLiveStreamList        ( const QString &FileName );
+        DTC::LiveStreamInfo     *GetLiveStream            ( int Id ) override; // ContentServices
+        DTC::LiveStreamInfoList *GetLiveStreamList        ( const QString &FileName ) override; // ContentServices
 
-        DTC::LiveStreamInfo     *StopLiveStream         ( int Id );
-        bool                     RemoveLiveStream       ( int Id );
+        DTC::LiveStreamInfo     *StopLiveStream         ( int Id ) override; // ContentServices
+        bool                     RemoveLiveStream       ( int Id ) override; // ContentServices
 };
 
 // --------------------------------------------------------------------------

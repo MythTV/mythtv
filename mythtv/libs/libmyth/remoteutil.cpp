@@ -182,7 +182,7 @@ uint RemoteGetRecordingList(
     if (numrecordings <= 0)
         return 0;
 
-    if (numrecordings * NUMPROGRAMLINES + 1 > (int)strList.size())
+    if (numrecordings * NUMPROGRAMLINES + 1 > strList.size())
     {
         LOG(VB_GENERAL, LOG_ERR,
                  "RemoteGetRecordingList() list size appears to be incorrect.");
@@ -430,7 +430,7 @@ int RemoteGetRecordingMask(void)
     return mask;
 }
 
-bool RemoteGetFileList(QString host, QString path, QStringList* list,
+bool RemoteGetFileList(const QString& host, const QString& path, QStringList* list,
                        QString sgroup, bool fileNamesOnly)
 {
 

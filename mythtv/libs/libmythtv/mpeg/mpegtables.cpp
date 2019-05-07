@@ -440,7 +440,7 @@ ProgramMapTable* ProgramMapTable::Create(
     pmt->SetVersionNumber(version);
 
     vector<unsigned char> gdesc;
-    for (uint i=0; i<global_desc.size(); i++)
+    for (size_t i=0; i<global_desc.size(); i++)
     {
         uint len = global_desc[i][1] + 2;
         gdesc.insert(gdesc.end(), global_desc[i], global_desc[i] + len);
@@ -450,7 +450,7 @@ ProgramMapTable* ProgramMapTable::Create(
     for (uint i = 0; i < count; i++)
     {
         vector<unsigned char> pdesc;
-        for (uint j = 0; j < prog_desc[i].size(); j++)
+        for (size_t j = 0; j < prog_desc[i].size(); j++)
         {
             uint len = prog_desc[i][j][1] + 2;
             pdesc.insert(pdesc.end(),
@@ -511,7 +511,7 @@ void ProgramMapTable::AppendStream(
  *  \param i index of stream
  *  \param sistandard standard to use in determining if this is a A/V stream
  */
-bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
+bool ProgramMapTable::IsVideo(uint i, const QString& sistandard) const
 {
     if (StreamID::IsVideo(StreamType(i)))
         return true;
@@ -533,7 +533,7 @@ bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
  *  \param i index of stream
  *  \param sistandard standard to use in determining if this is a A/V stream
  */
-bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
+bool ProgramMapTable::IsAudio(uint i, const QString& sistandard) const
 {
     if (StreamID::IsAudio(StreamType(i)))
         return true;
@@ -549,7 +549,7 @@ bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
  *  \brief Returns true iff PMT contains CA descriptor for a vid/aud stream.
  *  \param sistandard standard to use in determining if this is a A/V stream
  */
-bool ProgramMapTable::IsEncrypted(QString sistandard) const
+bool ProgramMapTable::IsEncrypted(const QString& sistandard) const
 {
     bool encrypted = IsProgramEncrypted();
 
@@ -572,9 +572,11 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
 
     uint encrypted = 0;
     QMap<uint,uint> encryption_system;
-    for (uint i = 0; i < descs.size(); i++)
+    for (size_t i = 0; i < descs.size(); i++)
     {
         ConditionalAccessDescriptor cad(descs[i]);
+        if (!cad.IsValid())
+            continue;
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
 
@@ -591,19 +593,20 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
  *
  *  \param i index of stream
  */
-bool ProgramMapTable::IsStreamEncrypted(uint i) const
+bool ProgramMapTable::IsStreamEncrypted(uint pid) const
 {
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
-        StreamInfo(i), StreamInfoLength(i), DescriptorID::conditional_access);
+        StreamInfo(pid), StreamInfoLength(pid), DescriptorID::conditional_access);
 
     uint encrypted = 0;
     QMap<uint,uint> encryption_system;
-    for (uint j = 0; j < descs.size(); j++)
+    for (size_t j = 0; j < descs.size(); j++)
     {
         ConditionalAccessDescriptor cad(descs[j]);
+        if (!cad.IsValid())
+            continue;
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
-
 #if 0
         LOG(VB_GENERAL, LOG_INFO, "DTVsm: " + cad.toString());
 #endif
@@ -612,7 +615,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
     return encrypted != 0;
 }
 
-bool ProgramMapTable::IsStillPicture(QString sistandard) const
+bool ProgramMapTable::IsStillPicture(const QString& sistandard) const
 {
     static const unsigned char STILL_PICTURE_FLAG = 0x01;
 
@@ -621,7 +624,7 @@ bool ProgramMapTable::IsStillPicture(QString sistandard) const
         if (IsVideo(i, sistandard))
         {
             return StreamInfoLength(i) > 2 &&
-                   (StreamInfo(i)[2] & STILL_PICTURE_FLAG);
+                   ((StreamInfo(i)[2] & STILL_PICTURE_FLAG) != 0);
         }
     }
     return false;
@@ -711,7 +714,7 @@ uint ProgramMapTable::FindPIDs(uint           type,
     if (!normalize)
         return pids.size();
 
-    for (uint i = pids_start; i < pids.size(); i++)
+    for (size_t i = pids_start; i < pids.size(); i++)
     {
         int index = FindPID(pids[i]);
         if (index >= 0)
@@ -872,7 +875,7 @@ QString ProgramMapTable::toString(void) const
     QString str =
         QString("Program Map Section"
                 "\n%1"
-                "      pnum(%2) pid(0x%3) pcrpid(%4)\n")
+                "      pnum(%2) pid(0x%3) pcrpid(0x%4)\n")
         .arg(PSIPTable::toString())
         .arg(ProgramNumber())
         .arg(tsheader()->PID(),0,16)
@@ -880,7 +883,7 @@ QString ProgramMapTable::toString(void) const
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
-    for (uint i = 0; i < desc.size(); i++)
+    for (size_t i = 0; i < desc.size(); i++)
     {
         str.append(QString("  %1\n")
                    .arg(MPEGDescriptor(desc[i], 300).toString()));
@@ -892,12 +895,11 @@ QString ProgramMapTable::toString(void) const
                    .arg(i).arg(StreamPID(i), 0, 16)
                    .arg(StreamType(i), 2, 16, QChar('0'))
                    .arg(StreamTypeString(i)));
-        vector<const unsigned char*> desc =
-            MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-        for (uint i = 0; i < desc.size(); i++)
+        desc = MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+        for (size_t j = 0; j < desc.size(); j++)
         {
             str.append(QString("    %1\n")
-                       .arg(MPEGDescriptor(desc[i], 300).toString()));
+                       .arg(MPEGDescriptor(desc[j], 300).toString()));
         }
     }
     return str;
@@ -921,7 +923,7 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
-    for (uint i = 0; i < gdesc.size(); i++)
+    for (size_t i = 0; i < gdesc.size(); i++)
     {
         str += MPEGDescriptor(gdesc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -939,9 +941,9 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
         vector<const unsigned char*> ldesc =
             MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
         str += (ldesc.empty()) ? " />\n" : ">\n";
-        for (uint i = 0; i < ldesc.size(); i++)
+        for (size_t j = 0; j < ldesc.size(); j++)
         {
-            str += MPEGDescriptor(ldesc[i], 300)
+            str += MPEGDescriptor(ldesc[j], 300)
                 .toStringXML(indent_level + 2) + "\n";
         }
         if (!ldesc.empty())
@@ -1121,6 +1123,8 @@ QString ProgramMapTable::GetLanguage(uint i) const
         return QString();
 
     ISO639LanguageDescriptor iso_lang(lang_desc);
+    if (!iso_lang.IsValid())
+        return "";
     return iso_lang.CanonicalLanguageString();
 }
 
@@ -1135,6 +1139,8 @@ uint ProgramMapTable::GetAudioType(uint i) const
         return 0;
 
     ISO639LanguageDescriptor iso_lang(lang_desc);
+    if (!iso_lang.IsValid())
+        return 0;
 
     // Hack for non-standard AD labelling on UK Satellite and Irish DTTV
     // Language string of 'nar' for narrative indicates an AD track
@@ -1145,7 +1151,7 @@ uint ProgramMapTable::GetAudioType(uint i) const
     return iso_lang.AudioType();
 }
 
-QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
+QString ProgramMapTable::StreamDescription(uint i, const QString& sistandard) const
 {
     desc_list_t list;
 
@@ -1168,7 +1174,7 @@ QString ConditionalAccessTable::toString(void) const
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    for (uint i = 0; i < gdesc.size(); i++)
+    for (size_t i = 0; i < gdesc.size(); i++)
         str += "  " + MPEGDescriptor(gdesc[i], 300).toString() + "\n";
 
     str += "\n";
@@ -1188,7 +1194,7 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     str += (gdesc.empty()) ? " />\n" : ">\n";
-    for (uint i = 0; i < gdesc.size(); i++)
+    for (size_t i = 0; i < gdesc.size(); i++)
     {
         str += MPEGDescriptor(gdesc[i], 300)
             .toStringXML(indent_level + 1) + "\n";
@@ -1297,20 +1303,20 @@ bool SpliceInformationTable::Parse(void)
         for (uint i = 0; i < splice_count; i++)
         {
             _ptrs0.push_back(cur);
-            bool event_cancel = cur[4] & 0x80;
+            bool event_cancel = (cur[4] & 0x80) != 0;
             if (event_cancel)
             {
                 _ptrs1.push_back(nullptr);
                 cur += 5;
                 continue;
             }
-            bool program_slice = cur[5] & 0x40;
+            bool program_slice = (cur[5] & 0x40) != 0;
             uint component_count = cur[6];
             _ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
         }
         if (splice_count)
         {
-            bool duration = _ptrs0.back()[5] & 0x2;
+            bool duration = (_ptrs0.back()[5] & 0x2) != 0;
             _epilog = _ptrs1.back() + ((duration) ? 9 : 4);
         }
         else
@@ -1321,16 +1327,16 @@ bool SpliceInformationTable::Parse(void)
     else if (kSCTSpliceInsert == type)
     {
         _ptrs1.push_back(pesdata() + 14);
-        bool splice_cancel = pesdata()[18] & 0x80;
+        bool splice_cancel = (pesdata()[18] & 0x80) != 0;
         if (splice_cancel)
         {
             _epilog = pesdata() + 19;
         }
         else
         {
-            bool program_splice = pesdata()[19] & 0x40;
-            bool duration = pesdata()[19] & 0x20;
-            bool splice_immediate = pesdata()[19] & 0x10;
+            bool program_splice = (pesdata()[19] & 0x40) != 0;
+            bool duration = (pesdata()[19] & 0x20) != 0;
+            bool splice_immediate = (pesdata()[19] & 0x10) != 0;
             const unsigned char *cur = pesdata() + 20;
             if (program_splice && !splice_immediate)
             {

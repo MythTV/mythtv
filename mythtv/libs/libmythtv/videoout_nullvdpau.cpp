@@ -129,7 +129,7 @@ bool VideoOutputNullVDPAU::InitBuffers(void)
 void VideoOutputNullVDPAU::DeleteBuffers(void)
 {
     QMutexLocker locker(&m_lock);
-    DiscardFrames(true);
+    VideoOutputNullVDPAU::DiscardFrames(true);
     DeleteVideoSurfaces();
     vbuffers.Reset();
     vbuffers.DeleteBuffers();
@@ -211,7 +211,7 @@ bool VideoOutputNullVDPAU::CreateVideoSurfaces(uint num)
 
 void VideoOutputNullVDPAU::DeleteVideoSurfaces(void)
 {
-    if (!m_render || !m_video_surfaces.size())
+    if (!m_render || m_video_surfaces.empty())
         return;
 
     for (int i = 0; i < m_video_surfaces.size(); i++)
@@ -566,7 +566,7 @@ void VideoOutputNullVDPAU::DiscardFrames(bool next_frame_keyframe)
     QMutexLocker locker(&m_lock);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DiscardFrames(%1)")
             .arg(next_frame_keyframe));
-    CheckFrameStates();
+    VideoOutputNullVDPAU::CheckFrameStates();
     vbuffers.DiscardFrames(next_frame_keyframe);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DiscardFrames() 3: %1 -- done()")
             .arg(vbuffers.GetStatus()));

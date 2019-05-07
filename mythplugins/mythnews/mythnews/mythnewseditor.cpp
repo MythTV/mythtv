@@ -30,17 +30,9 @@ MythNewsEditor::MythNewsEditor(NewsSite *site, bool edit,
                                MythScreenStack *parent,
                                const QString &name) :
     MythScreenType(parent, name),
-    m_lock(QMutex::Recursive),
     m_site(site),
     m_siteName((edit && site) ? site->name() : QString()),
-    m_editing(edit),
-    m_titleText(nullptr),     m_nameLabelText(nullptr),
-    m_urlLabelText(nullptr),  m_iconLabelText(nullptr),
-    m_podcastLabelText(nullptr),
-    m_nameEdit(nullptr),      m_urlEdit(nullptr),
-    m_iconEdit(nullptr),
-    m_okButton(nullptr),      m_cancelButton(nullptr),
-    m_podcastCheck(nullptr)
+    m_editing(edit)
 {
 }
 
@@ -104,7 +96,7 @@ bool MythNewsEditor::Create(void)
         m_nameEdit->SetText(m_site->name());
         m_urlEdit->SetText(m_site->url());
         m_iconEdit->SetText(m_site->imageURL());
-        if (m_site->podcast() == 1)
+        if (m_site->podcast())
            m_podcastCheck->SetCheckState(MythUIStateType::Full);
     }
 

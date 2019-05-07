@@ -9,33 +9,31 @@ void av_free(void *ptr);
 }
 
 VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer *audio, MythRender *render)
-  : VideoVisual(audio, render), m_range(1.0), m_scaleFactor(2.0),
-    m_falloff(3.0), m_barWidth(1)
+  : VideoVisual(audio, render)
 {
-    m_numSamples = 64;
-    lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    lout = (myth_fftw_complex*)
+    m_lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    m_rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    m_lout = (myth_fftw_complex*)
         av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    rout = (myth_fftw_complex*)
+    m_rout = (myth_fftw_complex*)
         av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
 
-    lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*)lout, FFTW_MEASURE);
-    rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
+    m_lplan = fftw_plan_dft_r2c_1d(FFTW_N, m_lin, (myth_fftw_complex_cast*)m_lout, FFTW_MEASURE);
+    m_rplan = fftw_plan_dft_r2c_1d(FFTW_N, m_rin, (myth_fftw_complex_cast*)m_rout, FFTW_MEASURE);
 }
 
 VideoVisualSpectrum::~VideoVisualSpectrum()
 {
-    if (lin)
-        av_free(lin);
-    if (rin)
-        av_free(rin);
-    if (lout)
-        av_free(lout);
-    if (rout)
-        av_free(rout);
-    fftw_destroy_plan(lplan);
-    fftw_destroy_plan(rplan);
+    if (m_lin)
+        av_free(m_lin);
+    if (m_rin)
+        av_free(m_rin);
+    if (m_lout)
+        av_free(m_lout);
+    if (m_rout)
+        av_free(m_rout);
+    fftw_destroy_plan(m_lplan);
+    fftw_destroy_plan(m_rplan);
 }
 
 template<typename T> T sq(T a) { return a*a; };
@@ -64,16 +62,16 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
     uint i = 0;
     if (node)
     {
-        i = node->length;
-        fast_real_set_from_short(lin, node->left, node->length);
-        if (node->right)
-            fast_real_set_from_short(rin, node->right, node->length);
+        i = node->m_length;
+        fast_real_set_from_short(m_lin, node->m_left, node->m_length);
+        if (node->m_right)
+            fast_real_set_from_short(m_rin, node->m_right, node->m_length);
     }
     mutex()->unlock();
 
-    fast_reals_set(lin + i, rin + i, 0, FFTW_N - i);
-    fftw_execute(lplan);
-    fftw_execute(rplan);
+    fast_reals_set(m_lin + i, m_rin + i, 0, FFTW_N - i);
+    fftw_execute(m_lplan);
+    fftw_execute(m_rplan);
 
     double falloff = (((double)SetLastUpdate()) / 40.0) * m_falloff;
     if (falloff < 0.0)
@@ -87,10 +85,10 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
         // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
         // The dft_r2c_1d plan doesn't output these redundant values
         // and furthermore they're not allocated in the ctor
-        double tmp = 2 * sq(real(lout[index]));
+        double tmp = 2 * sq(real(m_lout[index]));
         double magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
-        tmp = 2 * sq(real(rout[index]));
+        tmp = 2 * sq(real(m_rout[index]));
         double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
         if (magL > m_range)
@@ -178,7 +176,8 @@ bool VideoVisualSpectrum::InitialisePriv(void)
     for (int i = 0, x = 0; i < m_rects.size(); i++, x+= m_barWidth)
         m_rects[i].setRect(x, m_area.height() / 2, m_barWidth - 1, 1);
 
-    m_scaleFactor = double(m_area.height() / 2) / log((double)(FFTW_N));
+    m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0)
+        / log((double)(FFTW_N));
     m_falloff = (double)m_area.height() / 150.0;
 
     LOG(VB_GENERAL, LOG_INFO, DESC +
@@ -189,17 +188,17 @@ bool VideoVisualSpectrum::InitialisePriv(void)
 static class VideoVisualSpectrumFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Spectrum");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualSpectrum(audio, render);
     }
 
-    virtual bool SupportedRenderer(RenderType /*type*/) { return true; }
+    bool SupportedRenderer(RenderType /*type*/) override { return true; } // VideoVisualFactory
 } VideoVisualSpectrumFactory;

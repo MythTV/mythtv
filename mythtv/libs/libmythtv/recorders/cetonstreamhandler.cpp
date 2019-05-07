@@ -27,61 +27,57 @@
 #include "cardutil.h"
 #include "mythdownloadmanager.h"
 
-#define LOC QString("CetonSH%1(%2): ").arg(_recorder_ids_string) \
-                                      .arg(_device)
+#define LOC QString("CetonSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
-QMap<QString,CetonStreamHandler*> CetonStreamHandler::_handlers;
-QMap<QString,uint>                CetonStreamHandler::_handlers_refcnt;
-QMutex                            CetonStreamHandler::_handlers_lock;
-QMap<QString, bool>               CetonStreamHandler::_info_queried;
+QMap<QString,CetonStreamHandler*> CetonStreamHandler::s_handlers;
+QMap<QString,uint>                CetonStreamHandler::s_handlers_refcnt;
+QMutex                            CetonStreamHandler::s_handlers_lock;
+QMap<QString, bool>               CetonStreamHandler::s_info_queried;
 
 CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
-                                            int recorder_id)
+                                            int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
     QString devkey = devname.toUpper();
 
-    QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devkey);
+    QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devkey);
 
-    if (it == _handlers.end())
+    if (it == s_handlers.end())
     {
-        CetonStreamHandler *newhandler = new CetonStreamHandler(devkey);
+        CetonStreamHandler *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();
-        _handlers[devkey] = newhandler;
-        _handlers_refcnt[devkey] = 1;
+        s_handlers[devkey] = newhandler;
+        s_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("CetonSH: Creating new stream handler %1 for %2")
-                .arg(devkey).arg(devname));
+            QString("CetonSH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(devname));
     }
     else
     {
-        _handlers_refcnt[devkey]++;
-        uint rcount = _handlers_refcnt[devkey];
+        s_handlers_refcnt[devkey]++;
+        uint rcount = s_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("CetonSH: Using existing stream handler %1 for %2")
-                .arg(devkey)
-                .arg(devname) + QString(" (%1 in use)").arg(rcount));
+            QString("CetonSH[%1]: Using existing stream handler %2 for %3")
+            .arg(inputid).arg(devkey)
+            .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    _handlers[devkey]->AddRecorderId(recorder_id);
-    return _handlers[devkey];
+    return s_handlers[devkey];
 }
 
-void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
+void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
-    QMap<QString,uint>::iterator rit = _handlers_refcnt.find(devname);
-    if (rit == _handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
+    if (rit == s_handlers_refcnt.end())
         return;
 
-    QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devname);
-    if (it != _handlers.end())
-        (*it)->DelRecorderId(recorder_id);
+    QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)
     {
@@ -90,34 +86,28 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
         return;
     }
 
-    if ((it != _handlers.end()) && (*it == ref))
+    if ((it != s_handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("CetonSH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("CetonSH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         ref->Close();
         delete *it;
-        _handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("CetonSH Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("CetonSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
-    _handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
-CetonStreamHandler::CetonStreamHandler(const QString &device) :
-    IPTVStreamHandler(IPTVTuningData("", 0, IPTVTuningData::kNone, "", 0, "", 0)),
-    _card(0),
-    _tuner(0),
-    _using_cablecard(false),
-    _connected(false),
-    _valid(false),
-    _last_frequency(0),
-    _last_program(0)
+CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
+    : IPTVStreamHandler(IPTVTuningData("", 0, IPTVTuningData::kNone,
+                                       "", 0, "", 0), inputid)
 {
     setObjectName("CetonStreamHandler");
 
@@ -125,21 +115,21 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
     if (parts.size() != 2)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid device id %1").arg(_device));
+            QString("Invalid device id %1").arg(m_device));
         return;
     }
-    _ip_address = parts.at(0);
+    m_ip_address = parts.at(0);
 
     QStringList tuner_parts = parts.at(1).split(".");
     if (tuner_parts.size() == 2)
     {
-        _card = tuner_parts.at(0).toUInt();
-        _tuner = tuner_parts.at(1).toUInt();
+        m_card = tuner_parts.at(0).toUInt();
+        m_tuner = tuner_parts.at(1).toUInt();
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid device id %1").arg(_device));
+            QString("Invalid device id %1").arg(m_device));
         return;
     }
 
@@ -152,16 +142,16 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
 
     int rtspPort = 8554;
     QString url = QString("rtsp://%1:%2/cetonmpeg%3")
-        .arg(_ip_address).arg(rtspPort).arg(_tuner);
+        .arg(m_ip_address).arg(rtspPort).arg(m_tuner);
     m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0);
     m_use_rtp_streaming = true;
 
-    _valid = true;
+    m_valid = true;
 
     QString cardstatus = GetVar("cas", "CardStatus");
-    _using_cablecard = cardstatus == "Inserted";
+    m_using_cablecard = cardstatus == "Inserted";
 
-    if (!_info_queried.contains(_ip_address))
+    if (!s_info_queried.contains(m_ip_address))
     {
         QString sernum = GetVar("diag", "Host_Serial_Number");
         QString firmware_ver = GetVar("diag", "Host_Firmware");
@@ -170,9 +160,9 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("Ceton device %1 initialized. SN: %2, "
                     "Firmware ver. %3, Hardware ver. %4")
-            .arg(_ip_address).arg(sernum).arg(firmware_ver).arg(hardware_ver));
+            .arg(m_ip_address).arg(sernum).arg(firmware_ver).arg(hardware_ver));
 
-        if (_using_cablecard)
+        if (m_using_cablecard)
         {
             QString brand = GetVar("cas", "CardManufacturer");
             QString auth = GetVar("cas", "CardAuthorization");
@@ -186,7 +176,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
                 "Cable card NOT installed (operating in QAM tuner mode)");
         }
 
-        _info_queried.insert(_ip_address, true);
+        s_info_queried.insert(m_ip_address, true);
     }
 }
 
@@ -197,43 +187,41 @@ bool CetonStreamHandler::Open(void)
 
 void CetonStreamHandler::Close(void)
 {
-    if (_connected)
+    if (m_connected)
     {
         TunerOff();
-        _connected = false;
+        m_connected = false;
     }
 }
 
 bool CetonStreamHandler::Connect(void)
 {
-    if (!_valid)
+    if (!m_valid)
         return false;
 
-    _connected = true;
+    m_connected = true;
     return true;
 }
 
 bool CetonStreamHandler::EnterPowerSavingMode(void)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listener_lock);
 
-    if (!_stream_data_list.empty())
+    if (!m_stream_data_list.empty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "Ignoring request - video streaming active");
         return false;
     }
-    else
-    {
-        locker.unlock(); // _listener_lock
-        TunerOff();
-        return true;
-    }
+
+    locker.unlock(); // _listener_lock
+    TunerOff();
+    return true;
 }
 
 bool CetonStreamHandler::IsConnected(void) const
 {
-    return _connected;
+    return m_connected;
 }
 
 bool CetonStreamHandler::VerifyTuning(void)
@@ -251,7 +239,7 @@ bool CetonStreamHandler::VerifyTuning(void)
     else
     {
         uint frequency = GetVar("tuner", "Frequency").toUInt();
-        if (frequency != _last_frequency)
+        if (frequency != m_last_frequency)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong frequency");
@@ -259,7 +247,7 @@ bool CetonStreamHandler::VerifyTuning(void)
         }
 
         QString modulation = GetVar("tuner", "Modulation");
-        if (modulation.toUpper() != _last_modulation.toUpper())
+        if (modulation.toUpper() != m_last_modulation.toUpper())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong modulation");
@@ -267,7 +255,7 @@ bool CetonStreamHandler::VerifyTuning(void)
         }
 
         uint program = GetVar("mux", "ProgramNumber").toUInt();
-        if (program != _last_program)
+        if (program != m_last_program)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong program");
@@ -298,19 +286,19 @@ void CetonStreamHandler::RepeatTuning(void)
 {
     if (IsCableCardInstalled())
     {
-        TuneVChannel(_last_vchannel);
+        TuneVChannel(m_last_vchannel);
     }
     else
     {
-        TuneFrequency(_last_frequency, _last_modulation);
-        TuneProgram(_last_program);
+        TuneFrequency(m_last_frequency, m_last_modulation);
+        TuneProgram(m_last_program);
     }
 }
 
 bool CetonStreamHandler::TunerOff(void)
 {
     bool result;
-    if (_using_cablecard)
+    if (m_using_cablecard)
         result = TuneVChannel("0");
     else
         result = TuneFrequency(0, "qam_256");
@@ -335,11 +323,11 @@ bool CetonStreamHandler::TuneFrequency(
     if (modulation_id == "")
         return false;
 
-    _last_frequency = frequency;
-    _last_modulation = modulation;
+    m_last_frequency = frequency;
+    m_last_modulation = modulation;
 
     QUrlQuery params;
-    params.addQueryItem("instance_id", QString::number(_tuner));
+    params.addQueryItem("instance_id", QString::number(m_tuner));
     params.addQueryItem("frequency", QString::number(frequency));
     params.addQueryItem("modulation",modulation_id);
     params.addQueryItem("tuner","1");
@@ -376,10 +364,10 @@ bool CetonStreamHandler::TuneProgram(uint program)
     };
 
 
-    _last_program = program;
+    m_last_program = program;
 
     QUrlQuery params;
-    params.addQueryItem("instance_id", QString::number(_tuner));
+    params.addQueryItem("instance_id", QString::number(m_tuner));
     params.addQueryItem("program", QString::number(program));
 
     QString response;
@@ -403,7 +391,7 @@ bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
         .arg(vchannel));
 
     QUrlQuery params;
-    params.addQueryItem("instance_id", QString::number(_tuner));
+    params.addQueryItem("instance_id", QString::number(m_tuner));
     params.addQueryItem("channel", vchannel);
 
     QString response;
@@ -431,12 +419,12 @@ bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
         return true;
     }
 
-    if ((vchannel != "0") && (_last_vchannel != "0"))
+    if ((vchannel != "0") && (m_last_vchannel != "0"))
         ClearProgramNumber();
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1)").arg(vchannel));
 
-    _last_vchannel = vchannel;
+    m_last_vchannel = vchannel;
 
     return PerformTuneVChannel(vchannel);
 }
@@ -481,10 +469,10 @@ QString CetonStreamHandler::GetVar(
     const QString &section, const QString &variable) const
 {
     QString loc = LOC + QString("DoGetVar(%1,%2,%3,%4) - ")
-        .arg(_ip_address).arg(_tuner).arg(section,variable);
+        .arg(m_ip_address).arg(m_tuner).arg(section,variable);
 
     QUrlQuery params;
-    params.addQueryItem("i", QString::number(_tuner));
+    params.addQueryItem("i", QString::number(m_tuner));
     params.addQueryItem("s", section);
     params.addQueryItem("v", variable);
 
@@ -513,10 +501,10 @@ QString CetonStreamHandler::GetVar(
 QStringList CetonStreamHandler::GetProgramList()
 {
     QString loc = LOC + QString("CetonHTTP: DoGetProgramList(%1,%2) - ")
-        .arg(_ip_address).arg(_tuner);
+        .arg(m_ip_address).arg(m_tuner);
 
     QUrlQuery params;
-    params.addQueryItem("i", QString::number(_tuner));
+    params.addQueryItem("i", QString::number(m_tuner));
 
     QString response;
     uint status;
@@ -553,7 +541,7 @@ bool CetonStreamHandler::HttpRequest(
     MythDownloadManager *manager = GetMythDownloadManager();
 
     url.setScheme("http");
-    url.setHost(_ip_address);
+    url.setHost(m_ip_address);
     url.setPath(script);
 
     // Specify un-cached access to the device
@@ -573,14 +561,12 @@ bool CetonStreamHandler::HttpRequest(
             status_code = 200;
             return true;
         }
-        else
-        {
-            response = "Download failed";
-            status_code = 500;
-            return false;
-        }
+
+        response = "Download failed";
+        status_code = 500;
+        return false;
     }
-    else if ("POST" == method)
+    if ("POST" == method)
     {
         request->setUrl(url);
         request->setHeader(QNetworkRequest::ContentTypeHeader,
@@ -594,12 +580,10 @@ bool CetonStreamHandler::HttpRequest(
             status_code = 200;
             return true;
         }
-        else
-        {
-            response = "Download failed";
-            status_code = 500;
-            return false;
-        }
+
+        response = "Download failed";
+        status_code = 500;
+        return false;
     }
 
     delete request;

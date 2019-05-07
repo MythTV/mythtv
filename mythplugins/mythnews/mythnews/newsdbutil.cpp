@@ -22,8 +22,8 @@ bool insertInDB(NewsSiteItem* site)
 {
     if (!site) return false;
 
-    return insertInDB(site->name, site->url, site->ico, site->category,
-                      site->podcast);
+    return insertInDB(site->m_name, site->m_url, site->m_ico, site->m_category,
+                      site->m_podcast);
 }
 
 bool insertInDB(const QString &name, const QString &url,
@@ -53,7 +53,7 @@ bool removeFromDB(NewsSiteItem* site)
 {
     if (!site) return false;
 
-    return removeFromDB(site->name);
+    return removeFromDB(site->m_name);
 }
 
 bool removeFromDB(const QString &name)

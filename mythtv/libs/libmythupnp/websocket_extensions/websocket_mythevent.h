@@ -17,14 +17,14 @@ class WebSocketMythEvent : public WebSocketExtension
 
   public:
     WebSocketMythEvent();
-    virtual ~WebSocketMythEvent();
+    ~WebSocketMythEvent() override;
 
-    virtual bool HandleTextFrame(const WebSocketFrame &frame);
-    virtual void customEvent(QEvent*);
+    bool HandleTextFrame(const WebSocketFrame &frame) override; // WebSocketExtension
+    void customEvent(QEvent* /*event*/) override; // QObject
 
   private:
     QStringList m_filters;
-    bool m_sendEvents; /// True if the client has enabled events
+    bool        m_sendEvents {false}; /// True if the client has enabled events
 };
 
 #endif

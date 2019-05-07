@@ -24,8 +24,6 @@ LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
 LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
-LIBS += -L../../../../external/zeromq/src/.libs
-LIBS += -L../../../../external/nzmqt/src
 LIBS += -L../../../../libs/libmythbase -lmythbase-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 

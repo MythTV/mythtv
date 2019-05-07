@@ -34,13 +34,15 @@ class UPNP_PUBLIC MethodInfo
 {
     public:
 
-        int             m_nMethodIndex;
+        int             m_nMethodIndex {0};
         QString         m_sName;
         QMetaMethod     m_oMethod;
-        RequestType     m_eRequestType;
+        HttpRequestType m_eRequestType {(HttpRequestType)(RequestTypeGet |
+                                                          RequestTypePost |
+                                                          RequestTypeHead)};
 
     public:
-        MethodInfo();
+        MethodInfo() = default;
 
         QVariant Invoke( Service *pService, const QStringMap &reqParams );
 };
@@ -80,9 +82,9 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
                               const QString     &sSharePath );
         virtual ~ServiceHost() = default;
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // HttpServerExtension
 
-        virtual bool       ProcessRequest( HTTPRequest *pRequest );
+        bool ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 
         virtual QString    GetServiceControlURL() { return m_sBaseUrl.mid( 1 ); }
 

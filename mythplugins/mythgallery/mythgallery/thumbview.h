@@ -19,11 +19,12 @@ class ThumbItem
     Q_DECLARE_TR_FUNCTIONS (ThumbItem)
 
   public:
-    ThumbItem() :
-        m_isDir(false),
-        m_pixmap(nullptr),     m_mediaDevice(nullptr) { }
+    ThumbItem() = default;
     ThumbItem(const QString &name, const QString &path, bool isDir,
-              MythMediaDevice *dev = nullptr);
+              MythMediaDevice *dev = nullptr) :
+        m_name(name),
+        m_path(path), m_isDir(isDir),
+        m_mediaDevice(dev) {}
     ~ThumbItem();
 
     // commands
@@ -34,15 +35,15 @@ class ThumbItem
     // sets
     void SetRotationAngle(int angle);
     void SetName(const QString &name)
-        { m_name = name; m_name.detach(); }
+        { m_name = name; }
     void SetCaption(const QString &caption)
-        { m_caption = caption; m_caption.detach(); }
+        { m_caption = caption; }
     void SetTimestamp(const QDateTime &timestamp)
         { m_timestamp = timestamp; }
     void SetPath(const QString &path, bool isDir)
-        { m_path = path; m_path.detach(), m_isDir = isDir; }
+        { m_path = path; m_isDir = isDir; }
     void SetImageFilename(const QString &filename)
-        { m_imageFilename = filename; m_imageFilename.detach(); }
+        { m_imageFilename = filename; }
     void SetPixmap(QPixmap *pixmap);
     void SetMediaDevice(MythMediaDevice *dev)
         { m_mediaDevice = dev; }
@@ -70,9 +71,9 @@ class ThumbItem
     QDateTime m_timestamp;
     QString  m_path;
     QString  m_imageFilename;
-    bool     m_isDir;
-    QPixmap *m_pixmap;
-    MythMediaDevice *m_mediaDevice;
+    bool     m_isDir               {false};
+    QPixmap *m_pixmap              {nullptr};
+    MythMediaDevice *m_mediaDevice {nullptr};
 };
 typedef QList<ThumbItem*> ThumbList;
 typedef QHash<QString, ThumbItem*>    ThumbHash;

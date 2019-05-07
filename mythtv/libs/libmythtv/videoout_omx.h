@@ -2,7 +2,9 @@
 #define VIDEOOUT_OMX_H
 
 #ifdef USING_OPENGLES
+#ifdef USING_BROADCOM
 #define OSD_EGL // OSD with EGL
+#endif
 #endif
 
 #include <OMX_Types.h>
@@ -33,40 +35,40 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual ~VideoOutputOMX();
 
     // VideoOutput overrides
-    virtual bool Init(const QSize&, const QSize&, float, WId, const QRect&, MythCodecID);
-    virtual bool InputChanged(const QSize&, const QSize&, float, MythCodecID, void*, bool&);
-    virtual void Zoom(ZoomDirection);
-    virtual void EmbedInWidget(const QRect&);
-    virtual void StopEmbedding(void);
-    virtual bool ApproveDeintFilter(const QString&) const;
-    virtual bool SetDeinterlacingEnabled(bool interlaced);
-    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
-    virtual QString GetName(void) const { return kName; } // = "openmax"
-    virtual bool IsPIPSupported(void) const { return true; }
-    virtual bool IsPBPSupported(void) const { return true; }
-    virtual QRect GetPIPRect(PIPLocation, MythPlayer* = nullptr, bool = true) const;
-    virtual MythPainter *GetOSDPainter(void);
+    bool Init(const QSize&, const QSize&, float, WId, const QRect&, MythCodecID) override;
+    bool InputChanged(const QSize&, const QSize&, float, MythCodecID, void*, bool&) override;
+    void Zoom(ZoomDirection) override;
+    void EmbedInWidget(const QRect&) override;
+    void StopEmbedding(void) override;
+    bool ApproveDeintFilter(const QString&) const override;
+    bool SetDeinterlacingEnabled(bool interlaced) override;
+    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="") override;
+    QString GetName(void) const override { return kName; } // = "openmax"
+    bool IsPIPSupported(void) const override { return true; }
+    bool IsPBPSupported(void) const override { return true; }
+    QRect GetPIPRect(PIPLocation, MythPlayer* = nullptr, bool = true) const override;
+    MythPainter *GetOSDPainter(void) override;
 
     // VideoOutput implementation
-    virtual void PrepareFrame(VideoFrame*, FrameScanType, OSD*);
-    virtual void ProcessFrame(VideoFrame*, OSD*, FilterChain*, const PIPMap&, FrameScanType);
-    virtual void Show(FrameScanType);
-    virtual void MoveResizeWindow(QRect);
-    virtual void DrawUnusedRects(bool);
-    virtual void UpdatePauseFrame(int64_t &);
+    void PrepareFrame(VideoFrame*, FrameScanType, OSD*) override;
+    void ProcessFrame(VideoFrame*, OSD*, FilterChain*, const PIPMap&, FrameScanType) override;
+    void Show(FrameScanType) override;
+    void MoveResizeWindow(QRect) override;
+    void DrawUnusedRects(bool) override;
+    void UpdatePauseFrame(int64_t &) override;
 
   protected:
     // VideoOutput overrides
-    virtual bool hasFullScreenOSD(void) const;
-    virtual bool DisplayOSD(VideoFrame *frame, OSD *osd);
-    virtual bool CanVisualise(AudioPlayer*, MythRender*);
-    virtual bool SetupVisualisation(AudioPlayer*, MythRender*, const QString&);
-    virtual QStringList GetVisualiserList(void);
+    bool hasFullScreenOSD(void) const override;
+    bool DisplayOSD(VideoFrame *frame, OSD *osd) override;
+    bool CanVisualise(AudioPlayer*, MythRender*) override;
+    bool SetupVisualisation(AudioPlayer*, MythRender*, const QString&) override;
+    QStringList GetVisualiserList(void) override;
 
   private:
     // OMXComponentCtx implementation
-    virtual OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*);
-    virtual void ReleaseBuffers(OMXComponent&);
+    OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*) override;
+    void ReleaseBuffers(OMXComponent&) override;
 
   private:
     // OMXComponentCB actions
@@ -74,7 +76,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     ComponentCB FreeBuffersCB, UseBuffersCB;
 
     void CreatePauseFrame(void);
-    bool SetVideoRect(const QRect &disp_rect, const QRect &vid_rect);
+    bool SetVideoRect(const QRect &d_rect, const QRect &vid_rect);
     bool CreateBuffers(const QSize&, const QSize&);
     void DeleteBuffers();
     bool Start();

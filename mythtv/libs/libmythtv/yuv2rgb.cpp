@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cinttypes>
 #include <climits>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include "mythconfig.h"
@@ -83,7 +84,7 @@ do {                            \
 } while (0)
 
 #if HAVE_MMX
-static inline void mmx_yuv2rgb (uint8_t * py, uint8_t * pu, uint8_t * pv)
+static inline void mmx_yuv2rgb (const uint8_t * py, const uint8_t * pu, const uint8_t * pv)
 {
     static mmx_t mmx_80w = {0x0080008000800080ULL};
     static mmx_t mmx_U_green = {0xf37df37df37df37dULL};
@@ -239,7 +240,6 @@ static inline void yuv420_rgb16 (uint8_t * image,
                                  int cpu, int alphaones)
 {
     (void)alphaones;
-    int i;
 
     rgb_stride -= 2 * width;
     y_stride -= width;
@@ -247,7 +247,7 @@ static inline void yuv420_rgb16 (uint8_t * image,
     width >>= 3;
 
     do {
-        i = width;
+        int i = width;
         do {
             mmx_yuv2rgb (py, pu, pv);
             mmx_unpack_16rgb (image, cpu);
@@ -277,15 +277,13 @@ static inline void yuv420_argb32 (uint8_t * image, uint8_t * py,
                                   int rgb_stride, int y_stride, int uv_stride,
                                   int cpu, int alphaones)
 {
-    int i;
-
     rgb_stride -= 4 * width;
     y_stride -= width;
     uv_stride -= width >> 1;
     width >>= 3;
 
     do {
-        i = width;
+        int i = width;
         do {
             mmx_yuv2rgb (py, pu, pv);
             mmx_unpack_32rgb (image, cpu, alphaones);
@@ -364,7 +362,7 @@ yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 #if HAVE_MMX
     if ((bpp == 16) && (mode == MODE_RGB))
         return mmxext_rgb16;
-    else if ((bpp == 32) && (mode == MODE_RGB))
+    if ((bpp == 32) && (mode == MODE_RGB))
         return mmxext_argb32;
 #endif
 
@@ -388,7 +386,7 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 #if HAVE_MMX
     if ((bpp == 16) && (mode == MODE_RGB))
         return mmx_rgb16;
-    else if ((bpp == 32) && (mode == MODE_RGB))
+    if ((bpp == 32) && (mode == MODE_RGB))
         return mmx_argb32;
 #endif
     if ((bpp == 32) && (mode == MODE_RGB))
@@ -418,10 +416,10 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 
 #define RGBOUT(r, g, b, y1)\
 {\
-    y = (y1 - 16) * C_Y;\
-    r = std::min(UCHAR_MAX, std::max(0, (y + r_add) >> SCALE_BITS));\
-    g = std::min(UCHAR_MAX, std::max(0, (y + g_add) >> SCALE_BITS));\
-    b = std::min(UCHAR_MAX, std::max(0, (y + b_add) >> SCALE_BITS));\
+    y = ((y1) - 16) * C_Y;\
+    (r) = std::min(UCHAR_MAX, std::max(0, (y + r_add) >> SCALE_BITS));\
+    (g) = std::min(UCHAR_MAX, std::max(0, (y + g_add) >> SCALE_BITS));\
+    (b) = std::min(UCHAR_MAX, std::max(0, (y + b_add) >> SCALE_BITS));\
 }
 
 static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
@@ -429,7 +427,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
                            int h_size, int v_size, int rgb_stride,
                            int y_stride, int uv_stride, int alphaones)
 {
-    unsigned char *y1_ptr, *y2_ptr, *cb_ptr, *cr_ptr, *d, *d1, *d2;
+    unsigned char *y1_ptr, *cb_ptr, *cr_ptr, *d, *d1, *d2;
     int w, y, cb, cr, r_add, g_add, b_add, width2;
     int dstwidth;
 
@@ -459,7 +457,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
     for(;v_size > 0; v_size -= 2) {
         d1 = d;
         d2 = d + h_size * 4;
-        y2_ptr = y1_ptr + h_size;
+        unsigned char *y2_ptr = y1_ptr + h_size;
         for(w = width2; w > 0; w--) {
             cb = cb_ptr[0] - 128;
             cr = cr_ptr[0] - 128;
@@ -492,7 +490,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 
 #define SCALEBITS 8
 #define ONE_HALF  (1 << (SCALEBITS - 1))
-#define FIX(x)          ((int) ((x) * (1L<<SCALEBITS) + 0.5))
+#define FIX(x)    (lroundf((x) * (1L<<SCALEBITS)))
 
 /**
  * \brief Convert planar RGB to YUV420.
@@ -746,7 +744,6 @@ static void non_vec_i420_2vuy(
     int y_stride, int u_stride, int v_stride,
     int h_size, int v_size)
 {
-    uint8_t *pi1, *pi2;
     const uint8_t *py1;
     const uint8_t *py2;
     const uint8_t *pu1;
@@ -755,8 +752,8 @@ static void non_vec_i420_2vuy(
 
     for (y = 0; y < (v_size>>1); y++)
     {
-        pi1 = image + 2*y * vuy_stride;
-        pi2 = image + 2*y * vuy_stride + vuy_stride;
+        uint8_t *pi1 = image + 2*y * vuy_stride;
+        uint8_t *pi2 = image + 2*y * vuy_stride + vuy_stride;
         py1 = py + 2*y * y_stride;
         py2 = py + 2*y * y_stride + y_stride;
         pu1 = pu + y * u_stride;
@@ -795,12 +792,6 @@ static void mmx_i420_2vuy(
     int y_stride, int u_stride, int v_stride,
     int h_size, int v_size)
 {
-    uint8_t *pi1, *pi2;
-    const uint8_t *py1 = py;
-    const uint8_t *py2 = py;
-    const uint8_t *pu1 = pu;
-    const uint8_t *pv1 = pv;
-
     int x,y;
 
     if ((h_size % 16) || (v_size % 2))
@@ -815,12 +806,12 @@ static void mmx_i420_2vuy(
 
     for (y = 0; y < (v_size>>1); y++)
     {
-        pi1 = image + 2*y * vuy_stride;
-        pi2 = image + 2*y * vuy_stride + vuy_stride;
-        py1 = py + 2*y * y_stride;
-        py2 = py + 2*y * y_stride + y_stride;
-        pu1 = pu + y * u_stride;
-        pv1 = pv + y * v_stride;
+        uint8_t *pi1 = image + 2*y * vuy_stride;
+        uint8_t *pi2 = image + 2*y * vuy_stride + vuy_stride;
+        const uint8_t *py1 = py + 2*y * y_stride;
+        const uint8_t *py2 = py + 2*y * y_stride + y_stride;
+        const uint8_t *pu1 = pu + y * u_stride;
+        const uint8_t *pv1 = pv + y * v_stride;
 
         for (x = 0; x < h_size / 16; x++)
         {
@@ -1053,11 +1044,12 @@ static void non_vec_2vuy_i420(
 {
     const uint8_t *pi1;
     const uint8_t *pi2;
-    uint8_t *py1, *py2, *pu1, *pv1;
     int x, y;
 
     for (y = 0; y < (v_size>>1); y++)
     {
+        uint8_t *py1, *py2, *pu1, *pv1;
+
         pi1 = image + 2*y * vuy_stride;
         pi2 = image + 2*y * vuy_stride + vuy_stride;
         py1 = py + 2*y * y_stride;

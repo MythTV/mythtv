@@ -25,20 +25,7 @@
 #include "proglist.h"
 
 CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
-              : MythScreenType(parent, "CustomEdit"),
-                m_maxex(0),
-                m_evaluate(true),
-                m_ruleList(nullptr),
-                m_clauseList(nullptr),
-                m_titleEdit(nullptr),
-                m_descriptionEdit(nullptr),
-                m_subtitleEdit(nullptr),
-                m_clauseText(nullptr),
-                m_testButton(nullptr),
-                m_recordButton(nullptr),
-                m_storeButton(nullptr),
-                m_cancelButton(nullptr),
-                m_currentRuleItem(nullptr)
+              : MythScreenType(parent, "CustomEdit")
 {
     if (pginfo)
         m_pginfo = new ProgramInfo(*pginfo);
@@ -146,6 +133,8 @@ void CustomEdit::loadData(void)
             rule.subtitle = result.value(2).toString();
             rule.description = result.value(3).toString();
 
+            // No memory leak. MythUIButtonListItem adds the new item
+            // into m_ruleList.
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_ruleList, rule.title,
                                          qVariantFromValue(rule));
@@ -441,7 +430,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("All matches for a genre (Data Direct)");
+    rule.title = tr("All matches for a genre (Schedules Direct)");
     rule.subtitle = "LEFT JOIN programgenres ON "
                     "program.chanid = programgenres.chanid AND "
                     "program.starttime = programgenres.starttime ";
@@ -452,7 +441,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Limit by MPAA or VCHIP rating (Data Direct)");
+    rule.title = tr("Limit by MPAA or VCHIP rating (Schedules Direct)");
     rule.subtitle = "LEFT JOIN programrating ON "
                     "program.chanid = programrating.chanid AND "
                     "program.starttime = programrating.starttime ";
@@ -481,7 +470,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Person named in the credits (Data Direct)");
+    rule.title = tr("Person named in the credits (Schedules Direct)");
     rule.subtitle = ", people, credits";
     rule.description = "people.name = 'Tom Hanks' \n"
                        "AND credits.person = people.person \n"
@@ -548,7 +537,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("First Episodes (complete example for Data Direct)");
+    rule.title = tr("First Episodes (complete example for Schedules Direct)");
     rule.subtitle.clear();
     rule.description = "program.first > 0 \n"
                   "AND program.programid LIKE 'EP%0001' \n"
@@ -669,6 +658,19 @@ void CustomEdit::testClicked(void)
         delete pl;
 }
 
+/**
+ * The user clicked on the 'Record' button in the 'Custom Edit'
+ * window.  The fields provided from this dialog, and the names of
+ * their edit widgets, are:
+ *
+ *  Rule Name         => m_titleEdit
+ *  (main box)        => m_descriptionEdit
+ *  Additional Tables => m_subtitleEdit
+ *
+ * If you are creating a new custom rule, then cur_recid will be zero
+ * and the LoadBySearch funciton will be invoked.  If you are
+ * modifying an existing rule then ModifyPowerSearchByID is invoked.
+ */
 void CustomEdit::recordClicked(void)
 {
     if (!checkSyntax())
@@ -726,7 +728,7 @@ void CustomEdit::storeClicked(void)
     QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
                                        .arg(m_titleEdit->GetText());
 
-    if (m_subtitleEdit->GetText().length())
+    if (!m_subtitleEdit->GetText().isEmpty())
         msg += m_subtitleEdit->GetText() + "\n\n";
 
     msg += m_descriptionEdit->GetText();

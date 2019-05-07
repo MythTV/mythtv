@@ -32,18 +32,18 @@ class AVCInfo
 
     bool IsSubunitType(int subunit_type) const;
     QString GetSubunitInfoString(void) const;
-    QString GetGUIDString(void) const { return guid_to_string(guid); }
+    QString GetGUIDString(void) const { return guid_to_string(m_guid); }
 
   public:
-    int      port;
-    int      node;
-    uint64_t guid;
-    uint     specid;
-    uint     vendorid;
-    uint     modelid;
-    uint     firmware_revision;
-    QString  product_name;
-    uint8_t  unit_table[32];
+    int      m_port              {-1};
+    int      m_node              {-1};
+    uint64_t m_guid              {0};
+    uint     m_specid            {0};
+    uint     m_vendorid          {0};
+    uint     m_modelid           {0};
+    uint     m_firmware_revision {0};
+    QString  m_product_name;
+    uint8_t  m_unit_table[32];
 };
 
 #endif // _AVC_INFO_H_

@@ -19,7 +19,7 @@ class PaneAnalog : public GroupSetting
     QString GetFrequencyTable(void) const;
 
   protected:
-    TransFreqTableSelector  *freq_table;
+    TransFreqTableSelector  *m_freq_table {nullptr};
 };
 
 #endif // _PANE_ANALOG_H_

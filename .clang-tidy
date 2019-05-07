@@ -1,0 +1,188 @@
+# Crappy parser.  Only uses a comma to delineate the end of a line, so
+# all comments must end with a comma. A single quote inside a comment
+# also screws up the parsing.
+
+Checks: '-*,
+    clang-analyzer-*,
+        # Not tested. ,
+       -clang-analyzer-apiModeling.*,
+
+        # Treats dynamic_cast like static_cast.  Doesnt understand
+        # that dynamic_cast may return nullptr if the inheritance is
+        # wrong, but a valid pointer if the inheritance is right. ,
+        #
+        # One valid error in m_groupName in globalsettings.cpp??? ,
+       -clang-analyzer-core.CallAndMessage,
+
+        # mytharchivehelper/external/pxsup2dast.c has try/catch code. ,
+       -clang-analyzer-core.StackAddrEscapeBase,
+
+        # Doesnt recognize cases where the constructor adds the new
+        # object to a list (either static or in the parent.)
+        #
+        # There are some warnings in the commercial detectors that
+        # need to be chased down. ,
+       -clang-analyzer-cplusplus.NewDeleteLeaks,
+
+        # Tested on x86-64. ,
+       -clang-analyzer-osx.*,
+
+        # Cant fix due to missing LIB_EXT1 extensions. ,
+       -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+        # Cant fix due to missing LIB_EXT1 extensions. ,
+       -clang-analyzer-security.insecureAPI.strcpy,
+
+    clang-diagnostic-error,
+
+    bugprone-*,
+        # Not investigated yet. ,
+        bugprone-argument-comment,
+
+        # A handful of warnings
+       -bugprone-integer-division,
+
+        # Bunch of warnings.... ,
+       -bugprone-narrowing-conversions,
+
+        # Errors in code?  GroupAnimation overrides several parent
+        # functions with an explicit nullptr.  Shouldnt it just call
+        # up? ,
+       -bugprone-parent-virtual-call,
+
+        # Half dozen errors, all in SQL statements. ,
+       -bugprone-suspicious-missing-comma,
+
+    misc-*,
+
+        # Cases exist. Need to add getters/setters to classes. ,
+       -misc-non-private-member-variables-in-classes,
+
+        # Complains about code like "RAND () % 3 - RAND () % 3", not
+        # understanding that RAND() doesnt always return the same
+        # value. ,
+        #
+        # Two spots that check (id == -1) || (id < x) which is
+        # redundant. ,
+       -misc-redundant-expression,
+
+        # Cases exist. Need evaluation. ,
+       -misc-throw-by-value-catch-by-reference,
+
+    modernize-*,
+
+        # Lots of changes to be done. ,
+        modernize-avoid-c-arrays,
+
+        # Not investigated yet. ,
+       -modernize-loop-convert,
+
+        # Lots of changes to be done. ,
+        modernize-pass-by-value,
+
+        # Run again.  Seems like should do more.  Supposedly presence
+        # of *any* of \\, \<squote>, \<dquote>, \?, octal, hex. ,
+       -modernize-raw-string-literal,
+
+        # Noisy!!!  foo(void) => foo()  ,
+       -modernize-redundant-void-arg,
+
+        # Not investigated yet. ,
+       -modernize-use-auto,
+
+        # One weirdness in videooutput_xv.cpp.  Making the proposed
+        # change causes one of the programs to fail in the link stage. ,
+       -modernize-use-emplace,
+
+        # Noisy. Needs work.,
+       -modernize-use-using,
+
+        ## C++14 modernize-make-unique,
+        ## C++14 modernize-use-transparent-functors,
+        ## C++17 modernize-concat-nested-namespaces,
+        ## C++17 modernize-unary-static-assert,
+        ## C++17 modernize-use-nodiscard,
+
+    performance-*,
+
+    readability-*,
+
+        # Not investigated yet. ,
+       -readability-braces-around-statements,
+        # Not investigated yet. ,
+       -readability-function-size,
+        # Not investigated yet. ,
+       -readability-identifier-naming,
+
+        # Wants to convert all "if (x)" pointer validity checks to be
+        # "if (x != nullptr)"
+       -readability-implicit-bool-conversion,
+
+        # Has two issues:
+        #
+        #    function template specialization
+        #    CheckedSet<MythUIStateType> has a primary template
+        #    declaration with different parameter names
+        #
+        #    function ParentalLevelChangeCheckerPrivate::SigDone has a
+        #    definition with different parameter names
+        #    [readability-inconsistent-declaration-parameter-name]
+        #    void SigDone(bool passwordValid => _t1,
+        #    ParentalLevel::Level toLevel => _t2);       ,
+       -readability-inconsistent-declaration-parameter-name,
+
+        # Produces lots of changes.  Is this necessary? ,
+       -readability-isolate-declaration,
+
+        # Lots of noise. Needs work. ,
+       -readability-magic-numbers,
+
+        # Has problems with a couple of emit calls. ,
+       -readability-misleading-indentation,
+
+        # Doesnt understand MMX assembly code. ,
+       -readability-non-const-parameter,
+
+        # Has two false positives that look like they could be
+        # simplified, only because of conditionally compiled code that
+        # isnt compiled in. ,
+       -readability-simplify-boolean-expr,
+'
+
+CheckOptions:
+  - key:      bugprone-suspicious-string-compare.WarnOnLogicalNotComparison
+    value:    '1'
+
+  - key:      modernize-make-shared.IgnoreMacros
+    value:    '0'
+  - key:      modernize-make-unique.IgnoreMacros
+    value:    '0'
+  - key:      modernize-use-bool-literals.IgnoreMacros
+    value:    '1'
+  - key:      modernize-use-default-member-init.IgnoreMacros
+    value:    '0'
+  - key:      modernize-use-equals-default.IgnoreMacros
+    value:    '0'
+  - key:      modernize-use-using.IgnoreMacros
+    value:    '0'
+
+  - key:      performance-inefficient-vector-operation.VectorLikeClasses
+    value:    ::std::vector,QList,QByteArrayList,QItemSelection,QQueue,QStringList
+
+  - key:      readability-braces-around-statements.ShortStatementLines
+    value:    '2'
+  - key:      readability-implicit-bool-conversion.AllowPointerConditions
+    value:    '1'
+  - key:      readability-implicit-bool-conversion.AllowIntegerConditions
+    value:    '1'
+  - key:      readability-inconsistent-declaration-parameter-name.strict
+    value:    '1'
+  - key:      readability-redundant-declaration.IgnoreMacros
+    value:    '0'
+  - key:      readability-simplify-boolean-expr.chainedconditionalreturn
+    value:    '1'
+  - key:      readability-simplify-boolean-expr.chainedconditionalassignment
+    value:    '1'
+  - key:      readability-simplify-subscript-expr.Types
+    value:    '::std::basic_string;::std::basic_string_view;::std::vector;::std::array;QByteArray;QString'
+  - key:      readability-uppercase-literal-suffix.IgnoreMacros
+    value:    '0'

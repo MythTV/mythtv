@@ -28,7 +28,7 @@ class MythServer : public ServerPool
     void newConnection(qt_socket_fd_t socket);
 
   protected slots:
-    virtual void newTcpConnection(qt_socket_fd_t socket);
+    void newTcpConnection(qt_socket_fd_t socket) override; // ServerPool
 };
 
 class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCBs
@@ -38,10 +38,12 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     MythSocketManager();
    ~MythSocketManager();
 
-    void readyRead(MythSocket *socket);
-    void connectionClosed(MythSocket *socket);
-    void connectionFailed(MythSocket *socket) { (void)socket; }
-    void connected(MythSocket *socket) { (void)socket; }
+    void readyRead(MythSocket *socket) override; // MythSocketCBs
+    void connectionClosed(MythSocket *socket) override; // MythSocketCBs
+    void connectionFailed(MythSocket *socket) override // MythSocketCBs
+        { (void)socket; }
+    void connected(MythSocket *socket) override // MythSocketCBs
+        { (void)socket; }
 
     void SetThreadCount(uint count);
 

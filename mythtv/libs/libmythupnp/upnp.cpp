@@ -40,7 +40,6 @@ Configuration   *UPnp::g_pConfig        = nullptr;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
-    : m_pHttpServer(nullptr), m_nServicePort(0)
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp - Constructor");
 }
@@ -61,9 +60,7 @@ UPnp::~UPnp()
 
 void UPnp::SetConfiguration( Configuration *pConfig )
 {
-    if (g_pConfig)
-        delete g_pConfig;
-
+    delete g_pConfig;
     g_pConfig = pConfig;
 }
 
@@ -129,8 +126,8 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
 
     g_IPAddrList   = sIPAddrList;
     int it;
-    bool ipv4 = gCoreContext->GetNumSetting("IPv4Support",1);
-    bool ipv6 = gCoreContext->GetNumSetting("IPv6Support",1);
+    bool ipv4 = gCoreContext->GetBoolSetting("IPv4Support",true);
+    bool ipv6 = gCoreContext->GetBoolSetting("IPv6Support",true);
 
     for (it = 0; it < g_IPAddrList.size(); ++it)
     {

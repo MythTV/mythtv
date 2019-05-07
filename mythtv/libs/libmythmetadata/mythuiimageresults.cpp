@@ -13,13 +13,12 @@
 
 ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenStack *lparent,
-    const ArtworkList list,
+    const ArtworkList& list,
     const VideoArtworkType type) :
 
     MythScreenType(lparent, "videosearchresultspopup"),
     m_list(list),
-    m_type(type),
-    m_resultsList(nullptr)
+    m_type(type)
 {
     m_imageDownload = new MetadataImageDownload(this);
 }
@@ -125,7 +124,7 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
     {
         ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
 
-        ThumbnailData *data = tde->thumb;
+        ThumbnailData *data = tde->m_thumb;
 
         QString file = data->url;
         uint pos = data->data.value<uint>();

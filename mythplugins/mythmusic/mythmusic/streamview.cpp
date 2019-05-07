@@ -33,9 +33,7 @@ using namespace std;
 
 
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
-           :MusicCommon(parent, parentScreen, "streamview"),
-            m_streamList(nullptr), m_noStreams(nullptr), m_bufferStatus(nullptr),
-            m_bufferProgress(nullptr), m_currStream(nullptr), m_lastStream(nullptr)
+    : MusicCommon(parent, parentScreen, "streamview")
 {
     m_currentView = MV_RADIO;
 }
@@ -369,9 +367,6 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
     if (!handled && MusicCommon::keyPressEvent(event))
         handled = true;
 
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
     return handled;
 }
 
@@ -523,7 +518,7 @@ void StreamView::addStream(MusicMetadata *mdata)
 
     QString url = mdata->Url();
 
-    gMusicData->all_streams->addStream(mdata);
+    gMusicData->m_all_streams->addStream(mdata);
 
     gPlayer->loadStreamPlaylist();
 
@@ -557,12 +552,12 @@ void StreamView::updateStream(MusicMetadata *mdata)
 
     MusicMetadata::IdType id = mdata->ID();
 
-    gMusicData->all_streams->updateStream(mdata);
+    gMusicData->m_all_streams->updateStream(mdata);
 
     gPlayer->loadStreamPlaylist();
 
     // update mdata to point to the new item
-    mdata = gMusicData->all_streams->getMetadata(id);
+    mdata = gMusicData->m_all_streams->getMetadata(id);
 
     if (!mdata)
         return;
@@ -634,7 +629,7 @@ void StreamView::deleteStream(MusicMetadata *mdata)
     if (gPlayer->getCurrentMetadata() == mdata)
         gPlayer->stop(true);
 
-    gMusicData->all_streams->removeStream(mdata);
+    gMusicData->m_all_streams->removeStream(mdata);
 
     gPlayer->loadStreamPlaylist();
 
@@ -644,19 +639,6 @@ void StreamView::deleteStream(MusicMetadata *mdata)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-EditStreamMetadata::EditStreamMetadata(MythScreenStack *parentStack,
-                                 StreamView *parent,
-                                 MusicMetadata *mdata)
-    : MythScreenType(parentStack, "editstreampopup"),
-        m_parent(parent), m_streamMeta(mdata),
-    m_broadcasterEdit(nullptr),  m_channelEdit(nullptr), m_descEdit(nullptr),
-    m_url1Edit(nullptr), m_url2Edit(nullptr),m_url3Edit(nullptr),m_url4Edit(nullptr),m_url5Edit(nullptr),
-    m_logourlEdit(nullptr),  m_formatEdit(nullptr),  m_genreEdit(nullptr),
-    m_countryEdit(nullptr), m_languageEdit(nullptr),
-    m_searchButton(nullptr), m_cancelButton(nullptr), m_saveButton(nullptr)
-{
-}
 
 bool EditStreamMetadata::Create()
 {
@@ -782,16 +764,6 @@ void EditStreamMetadata::changeStreamMetadata(MusicMetadata* mdata)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-SearchStream::SearchStream(MythScreenStack *parentStack,
-                           EditStreamMetadata *parent)
-    : MythScreenType(parentStack, "searchstream"),
-    m_parent(nullptr),  m_broadcasterList(nullptr), m_genreList(nullptr),
-    m_countryList(nullptr),m_languageList(nullptr), m_channelEdit(nullptr),
-    m_streamList(nullptr), m_matchesText(nullptr), m_updating(false)
-{
-    m_parent = parent;
-}
 
 bool SearchStream::Create()
 {
@@ -1091,7 +1063,7 @@ void SearchStream::doUpdateStreams(void)
         if (!doneWhere)
         {
             sql += "WHERE channel LIKE " + QString("'%%1%'").arg(channel);
-            doneWhere = true;
+            // doneWhere = true;
         }
         else
             sql += "AND channel LIKE " + QString("'%%1%' ").arg(channel);

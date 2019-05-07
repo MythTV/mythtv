@@ -56,13 +56,13 @@ static bool DBusHalt(void)
     if (!void_reply.isValid())
     {
         bool_reply = gnome.call("CanShutdown");
-        if (bool_reply.isValid() && bool_reply.value() == 1)
+        if (bool_reply.isValid() && bool_reply.value())
             void_reply = gnome.call("RequestShutdown");
     }
     if (!void_reply.isValid())
     {
         bool_reply = consolekit.call("CanStop");
-        if (bool_reply.isValid() && bool_reply.value() == 1)
+        if (bool_reply.isValid() && bool_reply.value())
             void_reply = consolekit.call("Stop");
     }
     if (!void_reply.isValid())
@@ -117,13 +117,13 @@ static bool DBusReboot(void)
     if (!void_reply.isValid())
     {
         bool_reply = gnome.call("CanShutdown");
-        if (bool_reply.isValid() && bool_reply.value() == 1)
+        if (bool_reply.isValid() && bool_reply.value())
             void_reply=gnome.call("RequestReboot");
     }
     if (!void_reply.isValid())
     {
         bool_reply = consolekit.call("CanRestart");
-        if (bool_reply.isValid() && bool_reply.value() == 1)
+        if (bool_reply.isValid() && bool_reply.value())
             void_reply = consolekit.call("Restart");
     }
     if (!void_reply.isValid())
@@ -220,6 +220,7 @@ void ExitPrompter::handleExit()
         LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
         delete dlg;
         quit();
+        return;
     }
 
     dlg->AddButton(QCoreApplication::translate("(Common)", "No"));

@@ -1,25 +1,20 @@
 #ifndef WELCOMESETTINGS_H
 #define WELCOMESETTINGS_H
 
-// Qt headers
-#include <QCoreApplication>
-
 // MythTV headers
-#include <mythconfigdialogs.h>
+#include <standardsettings.h>
 
-class MythWelcomeSettings : public ConfigurationWizard
+class MPUBLIC MythWelcomeSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythWelcomeSettings);
-
+    Q_OBJECT
   public:
     MythWelcomeSettings();
 };
 
-class MythShutdownSettings : public ConfigurationWizard
+class MPUBLIC MythShutdownSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythShutdownSettings);
-
-  public:
+    Q_OBJECT
+public:
     MythShutdownSettings();
 };
 

@@ -29,54 +29,54 @@ class EncoderLink
     /// \brief Used to set the socket for a non-local EncoderLink.
     void SetSocket(PlaybackSock *lsock);
     /// \brief Returns the socket, if set, for a non-local EncoderLink.
-    PlaybackSock *GetSocket(void) { return sock; }
+    PlaybackSock *GetSocket(void) { return m_sock; }
 
     /// \brief Used to set the asleep status of an encoder
     void SetSleepStatus(SleepStatus newStatus);
     /// \brief Get the last time the sleep status was changed
-    QDateTime GetSleepStatusTime(void) const { return sleepStatusTime; }
+    QDateTime GetSleepStatusTime(void) const { return m_sleepStatusTime; }
     /// \brief Get the last time the encoder was put to sleep
-    QDateTime GetLastSleepTime(void) const { return lastSleepTime; }
+    QDateTime GetLastSleepTime(void) const { return m_lastSleepTime; }
     /// \brief Used to set the last wake time of an encoder
-    void SetLastWakeTime(QDateTime newTime) { lastWakeTime = newTime; }
+    void SetLastWakeTime(QDateTime newTime) { m_lastWakeTime = newTime; }
     /// \brief Get the last time the encoder was awakened
-    QDateTime GetLastWakeTime(void) const { return lastWakeTime; }
+    QDateTime GetLastWakeTime(void) const { return m_lastWakeTime; }
 
     /// \brief Returns the remote host for a non-local EncoderLink.
-    QString GetHostName(void) const { return hostname; }
+    QString GetHostName(void) const { return m_hostname; }
     /// \brief Returns true for a local EncoderLink.
-    bool IsLocal(void) const { return local; }
+    bool IsLocal(void) const { return m_local; }
     /// \brief Returns true if the EncoderLink instance is usable.
-    bool IsConnected(void) const { return (IsLocal() || sock!=nullptr); }
+    bool IsConnected(void) const { return (IsLocal() || m_sock!=nullptr); }
     /// \brief Returns true if the encoder is awake.
-    bool IsAwake(void) const { return (sleepStatus == sStatus_Awake); }
+    bool IsAwake(void) const { return (m_sleepStatus == sStatus_Awake); }
     /// \brief Returns true if the encoder is asleep.
-    bool IsAsleep(void) const { return (sleepStatus & sStatus_Asleep); }
+    bool IsAsleep(void) const { return (m_sleepStatus & sStatus_Asleep); }
     /// \brief Returns true if the encoder is waking up.
-    bool IsWaking(void) const { return (sleepStatus == sStatus_Waking); }
+    bool IsWaking(void) const { return (m_sleepStatus == sStatus_Waking); }
     /// \brief Returns true if the encoder is falling asleep.
     bool IsFallingAsleep(void) const
-                        { return (sleepStatus == sStatus_FallingAsleep); }
+                        { return (m_sleepStatus == sStatus_FallingAsleep); }
     /// \brief Returns true if the encoder can sleep.
-    bool CanSleep(void) const { return (sleepStatus != sStatus_Undefined); }
+    bool CanSleep(void) const { return (m_sleepStatus != sStatus_Undefined); }
 
     /// \brief Returns the current Sleep Status of the encoder.
-    SleepStatus GetSleepStatus(void) const { return (sleepStatus); }
+    SleepStatus GetSleepStatus(void) const { return (m_sleepStatus); }
 
     /// \brief Returns the inputid used to refer to the recorder in the DB.
     int GetInputID(void) const { return m_inputid; }
     /// \brief Returns the TVRec used by a local EncoderLink instance.
-    TVRec *GetTVRec(void) { return tv; }
+    TVRec *GetTVRec(void) { return m_tv; }
 
     /// \brief Tell a slave backend to go to sleep
     bool GoToSleep(void);
     int LockTuner(void);
     /// \brief Unlock the tuner.
     /// \sa LockTuner(), IsTunerLocked()
-    void FreeTuner(void) { locked = false; }
+    void FreeTuner(void) { m_locked = false; }
     /// \brief Returns true iff the tuner is locked.
     /// \sa LockTuner(), FreeTuner()
-    bool IsTunerLocked(void) const { return locked; }
+    bool IsTunerLocked(void) const { return m_locked; }
 
     bool CheckFile(ProgramInfo *pginfo);
     void GetDiskSpace(QStringList &o_strlist);
@@ -113,7 +113,7 @@ class EncoderLink
     void StopLiveTV(void);
     void PauseRecorder(void);
     void SetLiveRecording(int);
-    void SetNextLiveTVDir(QString dir);
+    void SetNextLiveTVDir(const QString& dir);
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);
@@ -148,23 +148,23 @@ class EncoderLink
 
     int m_inputid;
 
-    PlaybackSock *sock;
-    QMutex sockLock;
-    QString hostname;
+    PlaybackSock *m_sock           {nullptr};
+    QMutex m_sockLock;
+    QString m_hostname;
 
-    TVRec *tv;
+    TVRec *m_tv                    {nullptr};
 
-    bool local;
-    bool locked;
+    bool m_local                   {false};
+    bool m_locked                  {false};
 
-    SleepStatus sleepStatus;
-    QDateTime sleepStatusTime;
-    QDateTime lastSleepTime;
-    QDateTime lastWakeTime;
+    SleepStatus m_sleepStatus      {sStatus_Undefined};
+    QDateTime m_sleepStatusTime;
+    QDateTime m_lastSleepTime;
+    QDateTime m_lastWakeTime;
 
-    QDateTime endRecordingTime;
-    QDateTime startRecordingTime;
-    uint chanid;
+    QDateTime m_endRecordingTime;
+    QDateTime m_startRecordingTime;
+    uint      m_chanid             {0};
 };
 
 #endif

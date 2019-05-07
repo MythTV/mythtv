@@ -5,7 +5,7 @@
 
 MythFileRecorderCommandLineParser::MythFileRecorderCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
-{ LoadArguments(); }
+{ MythFileRecorderCommandLineParser::LoadArguments(); }
 
 QString MythFileRecorderCommandLineParser::GetHelpHeader(void) const
 {
@@ -23,11 +23,14 @@ void MythFileRecorderCommandLineParser::LoadArguments(void)
 
     addInFile();
 
-    add(QStringList(QStringList() << "--noloop"),
+    add("--inputid", "inputid", "", "MythTV input this app is attached to.", "")
+        ->SetGroup("ExternalRecorder");
+
+    add(QStringList{"--noloop"},
         "noloop", false,
         "Don't loop input back to beginning on EOF.", "");
 
-    add(QStringList(QStringList() << "--data-rate"),
+    add(QStringList{"--data-rate"},
         "data_rate", 188*50000,
         "Rate at which to read data from the file.", "");
 }

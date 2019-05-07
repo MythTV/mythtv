@@ -8,17 +8,12 @@
 #include "ExternalChannel.h"
 #include "tv_rec.h"
 
-#define LOC  QString("ExternChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
-
-ExternalChannel::ExternalChannel(TVRec *parent, const QString & device) :
-    DTVChannel(parent), m_device(device), m_stream_handler(nullptr)
-{
-}
+#define LOC  QString("ExternChan[%1](%2): ").arg(m_inputid).arg(m_loc)
 
 ExternalChannel::~ExternalChannel(void)
 {
-    if (IsOpen())
-        Close();
+    if (ExternalChannel::IsOpen())
+        ExternalChannel::Close();
 }
 
 bool ExternalChannel::Open(void)
@@ -45,13 +40,15 @@ bool ExternalChannel::Open(void)
     if (!m_inputid)
         return false;
 
-    m_stream_handler = ExternalStreamHandler::Get(m_device);
+    m_stream_handler = ExternalStreamHandler::Get(m_device, GetInputID(),
+                                                  GetMajorID());
     if (!m_stream_handler || m_stream_handler->HasError())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
         return false;
     }
 
+    GetDescription();
     LOG(VB_RECORD, LOG_INFO, LOC + "Opened");
     return true;
 }
@@ -60,11 +57,31 @@ void ExternalChannel::Close()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
 
-    if (IsOpen())
+    if (ExternalChannel::IsOpen())
     {
-        ExternalStreamHandler::Return(m_stream_handler);
+        ExternalStreamHandler::Return(m_stream_handler, GetInputID());
         m_stream_handler = nullptr;
     }
+}
+
+QString ExternalChannel::UpdateDescription(void)
+{
+    if (m_stream_handler)
+        m_loc = m_stream_handler->UpdateDescription();
+    else
+        m_loc = GetDevice();
+
+    return m_loc;
+}
+
+QString ExternalChannel::GetDescription(void)
+{
+    if (m_stream_handler)
+        m_loc = m_stream_handler->GetDescription();
+    else
+        m_loc = GetDevice();
+
+    return m_loc;
 }
 
 bool ExternalChannel::Tune(const QString &channum)
@@ -84,13 +101,15 @@ bool ExternalChannel::Tune(const QString &channum)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + channum);
 
-    if (!m_stream_handler->ProcessCommand("TuneChannel:" + channum, 5000,
-                                          result))
+    if (!m_stream_handler->ProcessCommand("TuneChannel:" + channum, result,
+                                          20000))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + QString
             ("Failed to Tune %1: %2").arg(channum).arg(result));
         return false;
     }
+
+    UpdateDescription();
 
     return true;
 }

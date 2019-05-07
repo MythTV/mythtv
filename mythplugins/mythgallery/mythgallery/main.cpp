@@ -47,8 +47,7 @@ static int run(MythMediaDevice *dev = nullptr, bool startRandomShow = false)
             }
             return 0;
         }
-        else
-            delete iconview;
+        delete iconview;
     }
     else
     {
@@ -75,7 +74,7 @@ void runRandomSlideshow(void)
 
 static void handleMedia(MythMediaDevice *dev)
 {
-    if (! gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
+    if (! gCoreContext->GetBoolSetting("GalleryAutoLoad", false))
         return;
 
     if (dev && dev->isUsable())

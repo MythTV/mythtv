@@ -16,21 +16,21 @@ class AnalogSignalMonitor : public SignalMonitor
                         bool _release_stream,
                         uint64_t _flags = kSigMon_WaitForSig);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
 
   private:
     bool VerifyHDPVRaudio(int videofd);
     bool handleHDPVR(int videofd);
 
-    bool     m_usingv4l2;
-    QString  m_card;
-    QString  m_driver;
-    uint32_t m_version;
-    uint     m_width;
-    int      m_stable_time;
-    uint     m_lock_cnt;
+    bool      m_usingv4l2   {false};
+    QString   m_card;
+    QString   m_driver;
+    uint32_t  m_version     {0};
+    uint      m_width       {0};
+    int       m_stable_time {2000};
+    uint      m_lock_cnt    {0};
     MythTimer m_timer;
-    int      m_log_idx;
+    int       m_log_idx     {40};
 };
 
 #endif // _ANALOG_SIGNAL_MONITOR_H_

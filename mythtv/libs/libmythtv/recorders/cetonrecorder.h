@@ -20,25 +20,26 @@ class CetonStreamHandler;
 class CetonRecorder : public DTVRecorder
 {
   public:
-    CetonRecorder(TVRec *rec, CetonChannel *channel);
+    CetonRecorder(TVRec *rec, CetonChannel *channel)
+        : DTVRecorder(rec), m_channel(channel) {}
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
-    bool IsOpen(void) const { return _stream_handler; }
+    bool IsOpen(void) const { return m_stream_handler; }
 
-    QString GetSIStandard(void) const;
+    QString GetSIStandard(void) const override; // DTVRecorder
 
   private:
     void ReaderPaused(int fd);
-    bool PauseAndWait(int timeout = 100);
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
   private:
-    CetonChannel       *_channel;
-    CetonStreamHandler *_stream_handler;
+    CetonChannel       *m_channel        {nullptr};
+    CetonStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif

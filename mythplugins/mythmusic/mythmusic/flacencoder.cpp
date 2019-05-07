@@ -29,8 +29,6 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                          MusicMetadata *metadata)
            : Encoder(outfile, qualitylevel, metadata)
 {
-    sampleindex = 0;
-
     bool streamable_subset = true;
     bool do_mid_side = true;
     bool loose_mid_side = false;
@@ -87,7 +85,7 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
 
 FlacEncoder::~FlacEncoder()
 {
-    addSamples(nullptr, 0); // flush buffer
+    FlacEncoder::addSamples(nullptr, 0); // flush buffer
 
     if (encoder)
     {

@@ -56,12 +56,6 @@
 QEvent::Type ThumbGenEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h) :
-    MThread("ThumbGenerator"), m_parent(parent),
-    m_isGallery(false), m_width(w), m_height(h), m_cancel(false)
-{
-}
-
 ThumbGenerator::~ThumbGenerator()
 {
     cancel();
@@ -143,46 +137,42 @@ void ThumbGenerator::run()
             {
                 continue;
             }
+
+            // cached thumbnail not there or out of date
+            QImage image;
+
+            // Remove the old one if it exists
+            if (cacheInfo.exists())
+                QFile::remove(cachePath);
+
+            if (fileInfo.isDir())
+                loadDir(image, fileInfo);
             else
+                loadFile(image, fileInfo);
+
+            if (image.isNull())
+                continue; // give up;
+
+            // if the file is a movie save the image to use as a screenshot
+            if (GalleryUtil::IsMovie(fileInfo.filePath()))
             {
-                // cached thumbnail not there or out of date
-                QImage image;
-
-                // Remove the old one if it exists
-                if (cacheInfo.exists())
-                    QFile::remove(cachePath);
-
-                if (fileInfo.isDir())
-                    loadDir(image, fileInfo);
-                else
-                    loadFile(image, fileInfo);
-
-                if (image.isNull())
-                    continue; // give up;
-
-                // if the file is a movie save the image to use as a screenshot
-                if (GalleryUtil::IsMovie(fileInfo.filePath()))
-                {
-                    QString screenshotPath = QString("%1%2-screenshot.jpg")
-                            .arg(getThumbcacheDir(dir))
-                            .arg(file);
-                    image.save(screenshotPath, "JPEG", 95);
-                }
-
-                image = image.scaled(m_width,m_height,
-                                Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                image.save(cachePath, "JPEG", 95);
-
-                // deep copies all over
-                ThumbData *td = new ThumbData;
-                td->directory = dir;
-                td->fileName  = file;
-                td->thumb     = image.copy();
-
-                // inform parent we have thumbnail ready for it
-                QApplication::postEvent(m_parent, new ThumbGenEvent(td));
-
+                QString screenshotPath = QString("%1%2-screenshot.jpg")
+                    .arg(getThumbcacheDir(dir))
+                    .arg(file);
+                image.save(screenshotPath, "JPEG", 95);
             }
+
+            image = image.scaled(m_width,m_height,
+                                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            image.save(cachePath, "JPEG", 95);
+
+            ThumbData *td = new ThumbData;
+            td->directory = dir;
+            td->fileName  = file;
+            td->thumb     = image;
+
+            // inform parent we have thumbnail ready for it
+            QApplication::postEvent(m_parent, new ThumbGenEvent(td));
         }
     }
 
@@ -212,8 +202,7 @@ bool ThumbGenerator::checkGalleryDir(const QFileInfo& fi)
         QImageReader testread(path);
         return testread.canRead();
     }
-    else
-        return false;
+    return false;
 }
 
 bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
@@ -231,8 +220,7 @@ bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
             QImageReader testread(galThumb.absoluteFilePath());
             return testread.canRead();
         }
-        else
-            return false;
+        return false;
     }
     return false;
 }
@@ -393,13 +381,13 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
     // "~/.mythtv/mythgallery/january/.thumbcache"
     QString aPath = inDir + QString("/.thumbcache/");
     QDir dir(aPath);
-    if (gCoreContext->GetNumSetting("GalleryThumbnailLocation") &&
+    if (gCoreContext->GetBoolSetting("GalleryThumbnailLocation") &&
         !dir.exists() && inDir.startsWith(galleryDir))
     {
         dir.mkpath(aPath);
     }
 
-    if (!gCoreContext->GetNumSetting("GalleryThumbnailLocation") ||
+    if (!gCoreContext->GetBoolSetting("GalleryThumbnailLocation") ||
         !dir.exists() || !inDir.startsWith(galleryDir))
     {
         // Arrive here if storing thumbs in home dir,

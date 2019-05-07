@@ -1,3 +1,8 @@
+#include "mythconfig.h"
+#if CONFIG_SYSTEMD_NOTIFY
+    #include <systemd/sd-daemon.h>
+#endif
+
 #include <csignal> // for signal
 #include <cstdlib>
 
@@ -78,7 +83,7 @@ int main(int argc, char **argv)
     }
 
 #ifndef _WIN32
-    for (int i = UNUSED_FILENO; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+    for (long i = UNUSED_FILENO; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
     QCoreApplication a(argc, argv);
 #else
@@ -124,6 +129,9 @@ int main(int argc, char **argv)
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
+#if CONFIG_SYSTEMD_NOTIFY
+    (void)sd_notify(0, "STATUS=Connecting to databse.");
+#endif
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {

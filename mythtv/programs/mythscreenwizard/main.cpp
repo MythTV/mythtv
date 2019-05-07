@@ -176,7 +176,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    if (gCoreContext->GetNumSetting("RunFrontendInWindow"))
+    if (gCoreContext->GetBoolSetting("RunFrontendInWindow"))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Refusing to run screen setup wizard in windowed mode.");

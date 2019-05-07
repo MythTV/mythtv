@@ -17,34 +17,34 @@ class PaneDVBS2 : public GroupSetting
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
-                                      pfrequency  = new ScanFrequencykHz(),
-                                      ppolarity   = new ScanPolarity(),
-                                      psymbolrate = new ScanSymbolRateDVBS(),
-                                      pmod_sys    = new ScanModSys(),
-                                      pfec        = new ScanFec(),
-                                      pmodulation = new ScanDVBSModulation(),
-                                      pinversion  = new ScanInversion(),
-                                      prolloff    = new ScanRollOff()});
+                                      m_pfrequency  = new ScanFrequencykHz(),
+                                      m_ppolarity   = new ScanPolarity(),
+                                      m_psymbolrate = new ScanSymbolRateDVBS(),
+                                      m_pmod_sys    = new ScanModSys(),
+                                      m_pfec        = new ScanFec(),
+                                      m_pmodulation = new ScanDVBSModulation(),
+                                      m_pinversion  = new ScanInversion(),
+                                      m_prolloff    = new ScanRollOff()});
     }
 
-    QString frequency(void)  const { return pfrequency->getValue();  }
-    QString symbolrate(void) const { return psymbolrate->getValue(); }
-    QString inversion(void)  const { return pinversion->getValue();  }
-    QString fec(void)        const { return pfec->getValue();        }
-    QString polarity(void)   const { return ppolarity->getValue();   }
-    QString modulation(void) const { return pmodulation->getValue(); }
-    QString mod_sys(void)    const { return pmod_sys->getValue();    }
-    QString rolloff(void)    const { return prolloff->getValue();    }
+    QString frequency(void)  const { return m_pfrequency->getValue();  }
+    QString symbolrate(void) const { return m_psymbolrate->getValue(); }
+    QString inversion(void)  const { return m_pinversion->getValue();  }
+    QString fec(void)        const { return m_pfec->getValue();        }
+    QString polarity(void)   const { return m_ppolarity->getValue();   }
+    QString modulation(void) const { return m_pmodulation->getValue(); }
+    QString mod_sys(void)    const { return m_pmod_sys->getValue();    }
+    QString rolloff(void)    const { return m_prolloff->getValue();    }
 
   protected:
-    ScanFrequencykHz   *pfrequency;
-    ScanSymbolRateDVBS *psymbolrate;
-    ScanInversion  *pinversion;
-    ScanFec        *pfec;
-    ScanPolarity   *ppolarity;
-    ScanDVBSModulation *pmodulation;
-    ScanModSys     *pmod_sys;
-    ScanRollOff    *prolloff;
+    ScanFrequencykHz   *m_pfrequency  {nullptr};
+    ScanSymbolRateDVBS *m_psymbolrate {nullptr};
+    ScanInversion      *m_pinversion  {nullptr};
+    ScanFec            *m_pfec        {nullptr};
+    ScanPolarity       *m_ppolarity   {nullptr};
+    ScanDVBSModulation *m_pmodulation {nullptr};
+    ScanModSys         *m_pmod_sys    {nullptr};
+    ScanRollOff        *m_prolloff    {nullptr};
 };
 
 #endif // _PANE_DVBS2_H_

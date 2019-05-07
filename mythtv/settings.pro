@@ -72,8 +72,8 @@ isEmpty( LIBDIR ) {
     LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
 
-LIBVERSION = 30
-VERSION = 30.0
+LIBVERSION = 31
+VERSION = 31.0
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '
@@ -121,11 +121,6 @@ win32 {
         INCLUDEPATH += ./
         INCLUDEPATH += $$SRC_PATH_BARE/external
 
-        contains( CONFIG_MYTHLOGSERVER, "yes" ) {
-            INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-            INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
-        }
-
         INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/include
         INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
         INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/zlib
@@ -149,7 +144,7 @@ win32 {
             QMAKE_CXXFLAGS *= /MDd /MP /wd4100 /wd4996
 
             LIBS           += -L$$SRC_PATH_BARE/bin/debug
-            EXTRA_LIBS     += -lpthreadVC2d -llibzmq -L$$SRC_PATH_BARE/bin/debug
+            EXTRA_LIBS     += -lpthreadVC2d -L$$SRC_PATH_BARE/bin/debug
 
         } else {
 
@@ -163,12 +158,9 @@ win32 {
             QMAKE_CXXFLAGS *= /MD /MP /wd4100 /wd4996
 
             LIBS           += -L$$SRC_PATH_BARE/bin/release
-            EXTRA_LIBS     += -lpthreadVC2 -llibzmq -L$$SRC_PATH_BARE/bin/release
+            EXTRA_LIBS     += -lpthreadVC2 -L$$SRC_PATH_BARE/bin/release
 
         }
-
-        EXTRA_LIBS += -lmythnzmqt
-
 
     }
 
@@ -235,15 +227,6 @@ win32 {
         # Replace FFmpeg's OpenGL with OpenGLES
         EXTRA_LIBS -= -lGL
         EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
-    }
-
-
-    contains( CONFIG_MYTHLOGSERVER, "yes" ) {
-        INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-        INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
-
-        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
-        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
     }
 
     # remove warn_{on|off} from CONFIG since we set it in our CFLAGS
@@ -313,4 +296,9 @@ macx {
     _RPATH_="-rpath,"
 } else {
     _RPATH_="-rpath="
+}
+
+using_compdb:contains(CC, clang) {
+    QMAKE_CFLAGS += "-MJ $@.json"
+    QMAKE_CXXFLAGS += "-MJ $@.json"
 }

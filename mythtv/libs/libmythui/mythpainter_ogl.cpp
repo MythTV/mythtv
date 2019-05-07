@@ -19,8 +19,7 @@ using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
                                      QWidget *parent) :
-    MythPainter(), realParent(parent), realRender(render),
-    target(0), swapControl(true)
+    realParent(parent), realRender(render)
 {
     if (realRender)
         LOG(VB_GENERAL, LOG_INFO,
@@ -32,7 +31,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
 MythOpenGLPainter::~MythOpenGLPainter()
 {
     Teardown();
-    FreeResources();
+    MythOpenGLPainter::FreeResources();
 }
 
 void MythOpenGLPainter::FreeResources(void)
@@ -122,13 +121,11 @@ void MythOpenGLPainter::End(void)
         LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'End'");
         return;
     }
-    else
-    {
-        realRender->Flush(false);
-        if (target == 0 && swapControl)
-            realRender->swapBuffers();
-        realRender->doneCurrent();
-    }
+
+    realRender->Flush(false);
+    if (target == 0 && swapControl)
+        realRender->swapBuffers();
+    realRender->doneCurrent();
 
     MythPainter::End();
 }
@@ -146,10 +143,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
             m_ImageExpireList.push_back(im);
             return m_ImageIntMap[im];
         }
-        else
-        {
-            DeleteFormatImagePriv(im);
-        }
+        DeleteFormatImagePriv(im);
     }
 
     im->SetChanged(false);

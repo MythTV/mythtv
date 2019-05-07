@@ -31,14 +31,14 @@ class V4L2encRecorder : public V4LRecorder
   public:
     V4L2encRecorder(TVRec *rec, V4LChannel *channel);
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     bool IsOpen(void) const { return m_stream_handler; }
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
-    bool PauseAndWait(int timeout = 500);
+    bool PauseAndWait(int timeout = 500) override; // RecorderBase
 
   protected:
     bool StartEncoding(void);
@@ -49,11 +49,11 @@ class V4L2encRecorder : public V4LRecorder
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
 
   private:
-    V4LChannel        *m_channel;
-    V4L2encStreamHandler *m_stream_handler;
+    V4LChannel           *m_channel        {nullptr};
+    V4L2encStreamHandler *m_stream_handler {nullptr};
 };
 
 #endif // _V4L2enc_RECORDER_H_

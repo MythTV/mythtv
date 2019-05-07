@@ -21,7 +21,7 @@ static int buffers_filled(multiplex_t *mx)
 	return 0;
 }
 
-static int use_video(uint64_t vpts, extdata_t *ext, int *aok, int n)
+static int use_video(uint64_t vpts, extdata_t *ext, const int *aok, int n)
 {
 	int i;
 	for(i=0; i < n; i++)
@@ -29,7 +29,7 @@ static int use_video(uint64_t vpts, extdata_t *ext, int *aok, int n)
 			return 0;
 	return 1;
 }
-static int which_ext(extdata_t *ext, int *aok, int n)
+static int which_ext(extdata_t *ext, const int *aok, int n)
 {
 	int i;
 	int started = 0;
@@ -674,7 +674,7 @@ static int get_ts_ext_overhead(int pktsize, audio_frame_t *extframe,
 }
 
 void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
-                     audio_frame_t *extframe, int *exttype, int *exttypcnt,
+                     audio_frame_t *extframe, int *exttype, const int *exttypcnt,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
 		     int (*fill_buffers)(void *p, int f),
 		     ringbuffer *vrbuffer, ringbuffer *index_vrbuffer,	

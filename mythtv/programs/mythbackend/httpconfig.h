@@ -14,9 +14,9 @@ class HttpConfig : public HttpServerExtension
     HttpConfig();
     virtual ~HttpConfig() = default;
 
-    virtual QStringList GetBasePaths();
+    QStringList GetBasePaths() override; // HttpServerExtension
 
-    bool ProcessRequest(HTTPRequest *pRequest);
+    bool ProcessRequest(HTTPRequest *pRequest) override; // HttpServerExtension
 
   private:
     static void PrintHeader(QBuffer&, const QString &form,
@@ -30,8 +30,8 @@ class HttpConfig : public HttpServerExtension
     static bool LoadSettings(MythSettingList&, const QString &hostname);
     static void PrintSettings(QBuffer&, const MythSettingList&);
 
-    MythSettingList database_settings;
-    MythSettingList general_settings;
+    MythSettingList m_database_settings;
+    MythSettingList m_general_settings;
 };
 
 #endif

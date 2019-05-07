@@ -27,7 +27,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 XmlSerializer::XmlSerializer( QIODevice *pDevice, const QString &sRequestName )
-              : m_bIsRoot( true ), PropertiesAsAttributes( true )
 {
     m_pXmlWriter   = new QXmlStreamWriter( pDevice );
     m_sRequestName = sRequestName;
@@ -251,10 +250,8 @@ void XmlSerializer::RenderList( const QString &sName, const QVariantList &list )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::RenderStringList( const QString &sName, const QStringList &list )
+void XmlSerializer::RenderStringList( const QString &/*sName*/, const QStringList &list )
 {
-    QString sItemName = GetItemName( sName );
-
     QListIterator< QString > it( list );
 
     while (it.hasNext())

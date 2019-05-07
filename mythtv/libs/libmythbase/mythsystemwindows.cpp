@@ -185,7 +185,7 @@ bool MythSystemLegacyIOHandler::HandleWrite(HANDLE h, QBuffer *buff)
         return false;
     }
 
-    else if( rlen != len )
+    if( rlen != len )
         buff->seek(pos+rlen);
 
     return true;
@@ -229,14 +229,6 @@ void MythSystemLegacyIOHandler::wake()
     m_pWait.wakeAll();
 }
 
-
-MythSystemLegacyManager::MythSystemLegacyManager() :
-    MThread("SystemManager")
-{
-    m_jumpAbort = false;
-    m_childCount = 0;
-    m_children = nullptr;
-}
 
 MythSystemLegacyManager::~MythSystemLegacyManager()
 {
@@ -460,12 +452,6 @@ void MythSystemLegacyManager::jumpAbort(void)
 }
 
 // spawn separate thread for signals to prevent manager
-// thread from blocking in some slot
-MythSystemLegacySignalManager::MythSystemLegacySignalManager() :
-    MThread("SystemSignalManager")
-{
-}
-
 void MythSystemLegacySignalManager::run(void)
 {
     RunProlog();
@@ -529,8 +515,7 @@ void MythSystemLegacySignalManager::run(void)
  ******************************/
 
 MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
-    MythSystemLegacyPrivate("MythSystemLegacyWindows"),
-    m_child(nullptr), m_timeout(0)
+    MythSystemLegacyPrivate("MythSystemLegacyWindows")
 {
     m_parent = parent;
 

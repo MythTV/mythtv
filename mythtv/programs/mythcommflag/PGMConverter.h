@@ -40,13 +40,14 @@ public:
     int reportTime(void);
 
 private:
-    long long       frameno;            /* frame number */
-    int             width, height;      /* frame dimensions */
-    AVFrame       pgm;                /* grayscale frame */
+    long long       m_frameno       {-1}; /* frame number */
+    int             m_width         {-1}; /* frame dimensions */
+    int             m_height        {-1}; /* frame dimensions */
+    AVFrame         m_pgm;                /* grayscale frame */
 #ifdef PGM_CONVERT_GREYSCALE
-    struct timeval  convert_time;
-    bool            time_reported;
-    MythAVCopy     *m_copy;
+    struct timeval  m_convert_time;
+    bool            m_time_reported {false};
+    MythAVCopy     *m_copy          {nullptr};
 #endif /* PGM_CONVERT_GREYSCALE */
 };
 

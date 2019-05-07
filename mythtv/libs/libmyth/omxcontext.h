@@ -100,15 +100,15 @@ class MPUBLIC OMXComponent
     OMX_ERRORTYPE ReleaseBuffers();
 
   private:
-    int const m_ref;
+    int const        m_ref;
     OMXComponentCtx &m_cb;
-    OMX_HANDLETYPE m_handle;    // OMX component handle
-    OMX_U32 m_base;             // OMX port base index
+    OMX_HANDLETYPE   m_handle     {nullptr}; // OMX component handle
+    OMX_U32          m_base       {0}; // OMX port base index
     QVector<OMX_PARAM_PORTDEFINITIONTYPE> m_portdefs;
-    QMutex mutable m_state_lock;
-    OMX_STATETYPE m_state;
-    OMX_ERRORTYPE m_error;
-    QSemaphore m_state_sema;    // EventCB signal
+    QMutex mutable   m_state_lock {QMutex::Recursive};
+    OMX_STATETYPE    m_state      {OMX_StateInvalid};
+    OMX_ERRORTYPE    m_error      {OMX_ErrorNone};
+    QSemaphore       m_state_sema;    // EventCB signal
 };
 
 // Mix-in class for creators of OMXComponent
@@ -143,11 +143,12 @@ class MPUBLIC OMXComponentCB : public OMXComponentAbstractCB
     OMXComponentCB( T *inst, OMX_ERRORTYPE (T::*cb)() ) :
         m_inst(inst), m_cb(cb) {}
 
-    virtual OMX_ERRORTYPE Action(OMXComponent *) { return  (m_inst->*m_cb)(); }
+    OMX_ERRORTYPE Action(OMXComponent *) override // OMXComponentAbstractCB
+        { return  (m_inst->*m_cb)(); }
 
   protected:
-    T * const m_inst;
-    OMX_ERRORTYPE (T::* const m_cb)();
+    T * const m_inst {nullptr};
+    OMX_ERRORTYPE (T::* const m_cb)() {nullptr};
 };
 
 namespace omxcontext {

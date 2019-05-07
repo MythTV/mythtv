@@ -48,11 +48,11 @@ class Video : public VideoServices
                                                        const QString  &Sort,
                                                        bool           Descending,
                                                        int            StartIndex,
-                                                       int            Count      );
+                                                       int            Count      ) override; // VideoServices
 
-        DTC::VideoMetadataInfo*   GetVideo           ( int      Id               );
+        DTC::VideoMetadataInfo*   GetVideo           ( int      Id               ) override; // VideoServices
 
-        DTC::VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
+        DTC::VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  ) override; // VideoServices
 
         DTC::VideoLookupList*     LookupVideo        ( const QString    &Title,
                                                        const QString    &Subtitle,
@@ -60,15 +60,15 @@ class Video : public VideoServices
                                                        int              Season,
                                                        int              Episode,
                                                        const QString    &GrabberType,
-                                                       bool             AllowGeneric );
+                                                       bool             AllowGeneric ) override; // VideoServices
 
-        bool                      RemoveVideoFromDB  ( int      Id               );
+        bool                      RemoveVideoFromDB  ( int      Id               ) override; // VideoServices
 
         bool                      AddVideo           ( const QString  &FileName,
-                                                       const QString  &HostName  );
+                                                       const QString  &HostName  ) override; // VideoServices
 
         bool                      UpdateVideoWatchedStatus ( int  Id,
-                                                             bool Watched );
+                                                             bool Watched ) override; // VideoServices
 
         bool                      UpdateVideoMetadata      ( int           Id,
                                                              const QString &Title,
@@ -108,11 +108,11 @@ class Video : public VideoServices
                                                              const QString &Genres,
                                                              const QString &Cast,
                                                              const QString &Countries
-        );
+        ) override; // VideoServices
 
         /* Bluray Methods */
 
-        DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );
+        DTC::BlurayInfo*          GetBluray          ( const QString  &Path      ) override; // VideoServices
 
 };
 

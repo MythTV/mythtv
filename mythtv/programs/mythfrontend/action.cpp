@@ -41,8 +41,6 @@ Action::Action(const QString &description, const QString &keys)
     : m_description(description),
       m_keys(QKeySequence(keys).toString().split(", "))
 {
-    m_description.detach();
-    m_keys.detach();
 }
 
 /** \fn Action::HasKey(const QString&) const
@@ -75,10 +73,7 @@ bool Action::AddKey(const QString &key)
         return false;
     }
 
-    QString tmp = key;
-    tmp.detach();
-    m_keys.push_back(tmp);
-
+    m_keys.push_back(key);
     return true;
 }
 
@@ -97,8 +92,6 @@ bool Action::ReplaceKey(const QString &newkey, const QString &oldkey)
     if (idx < 0)
         return false;
 
-    QString tmp = newkey;
-    tmp.detach();
-    m_keys[idx] = tmp;
+    m_keys[idx] = newkey;
     return true;
 }

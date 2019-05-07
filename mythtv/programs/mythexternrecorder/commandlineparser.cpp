@@ -5,7 +5,7 @@
 
 MythExternRecorderCommandLineParser::MythExternRecorderCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHEXTERNRECORDER)
-{ LoadArguments(); }
+{ MythExternRecorderCommandLineParser::LoadArguments(); }
 
 QString MythExternRecorderCommandLineParser::GetHelpHeader(void) const
 {
@@ -21,16 +21,13 @@ void MythExternRecorderCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
 
-#if 0
-    add(QStringList(QStringList() << "--conf"),
-        "conf", "", "Path to a configuration file in INI format.", "")
-        ->SetGroup("ExternalRecorder");
-#else
     add("--conf", "conf", "", "Path to a configuration file in INI format.", "")
         ->SetGroup("ExternalRecorder");
-#endif
 
-    add(QStringList(QStringList() << "--exec"),
+    add("--inputid", "inputid", "", "MythTV input this app is attached to.", "")
+        ->SetGroup("ExternalRecorder");
+
+    add(QStringList{"--exec"},
         "exec", false,
         "Execute a program to retrieve Transport Stream from. "
         "Data is expected to be on stdout.", "")

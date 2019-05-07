@@ -24,10 +24,7 @@
 
 LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),
-                  m_languageList(nullptr), m_countryList(nullptr),
-                  m_saveButton(nullptr), m_cancelButton(nullptr),
-                  m_exitOnFinish(exitOnFinish), m_loaded(false),
-                  m_loop(nullptr)
+                  m_exitOnFinish(exitOnFinish)
 {
     m_language = gCoreContext->GetSetting("Language");
     m_country = gCoreContext->GetSetting("Country");

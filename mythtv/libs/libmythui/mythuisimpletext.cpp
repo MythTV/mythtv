@@ -17,12 +17,6 @@
 
 #include "compat.h"
 
-MythUISimpleText::MythUISimpleText(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-      m_Justification(Qt::AlignLeft | Qt::AlignTop)
-{
-}
-
 MythUISimpleText::MythUISimpleText(const QString &text,
                                    const MythFontProperties &font,
                                    const QRect & rect, Qt::Alignment align,

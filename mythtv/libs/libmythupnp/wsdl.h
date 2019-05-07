@@ -36,7 +36,7 @@
 class UPNP_PUBLIC Wsdl : public QDomDocument
 {
     protected:
-        ServiceHost             *m_pServiceHost;
+        ServiceHost             *m_pServiceHost {nullptr};
         QMap<QString, TypeInfo>  m_typesToInclude;
 
         QDomElement              m_oRoot;
@@ -52,8 +52,8 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
         QDomElement CreateBindingOperation( MethodInfo    &oInfo,
                                             const QString &sClassName );
 
-        QDomElement CreateMessage         ( QString       sMsgName, 
-                                            QString       sTypeName );
+        QDomElement CreateMessage         ( const QString& sMsgName,
+                                            const QString& sTypeName );
 
         QDomElement CreateMethodType      ( MethodInfo   &oInfo,
                                             QString       sTypeName,
@@ -69,7 +69,8 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 
     public:
 
-        explicit Wsdl( ServiceHost *pServiceHost );
+        explicit Wsdl( ServiceHost *pServiceHost )
+            : m_pServiceHost( pServiceHost ) {}
 
         bool GetWSDL( HTTPRequest *pRequest );
 };

@@ -7,18 +7,18 @@
 #include "mpegtables.h"
 #include "asichannel.h"
 
-#define LOC     QString("ASIChan[%1](%2): ").arg(GetInputID()).arg(GetDevice())
+#define LOC     QString("ASIChan[%1](%2): ").arg(GetInputID()).arg(ASIChannel::GetDevice())
 
 ASIChannel::ASIChannel(TVRec *parent, const QString &device) :
-    DTVChannel(parent), m_device(device), m_isopen(false)
+    DTVChannel(parent), m_device(device)
 {
-    m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeASI));
+    m_tuner_types.emplace_back(DTVTunerType::kTunerTypeASI);
 }
 
 ASIChannel::~ASIChannel(void)
 {
-    if (IsOpen())
-        Close();
+    if (ASIChannel::IsOpen())
+        ASIChannel::Close();
 }
 
 bool ASIChannel::Open(void)

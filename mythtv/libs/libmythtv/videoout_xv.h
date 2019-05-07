@@ -36,50 +36,51 @@ class VideoOutputXv : public VideoOutput
     bool Init(const QSize &video_dim_buf,
               const QSize &video_dim_disp,
               float aspect,
-              WId winid, const QRect &win_rect, MythCodecID codec_id);
+              WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
 
-    bool SetDeinterlacingEnabled(bool);
-    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
-    bool ApproveDeintFilter(const QString& filtername) const;
+    bool SetDeinterlacingEnabled(bool) override; // VideoOutput
+    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="") override; // VideoOutput
+    bool ApproveDeintFilter(const QString& filtername) const override; // VideoOutput
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
-                      FrameScanType scan);
+                      FrameScanType scan) override; // VideoOutput
 
-    void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd);
-    void Show(FrameScanType);
+    void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd) override; // VideoOutput
+    void Show(FrameScanType) override; // VideoOutput
 
-    void ClearAfterSeek(void);
+    void ClearAfterSeek(void) override; // VideoOutput
 
-    void WindowResized(const QSize &new_size);
+    void WindowResized(const QSize &new_size) override; // VideoOutput
 
-    void MoveResize(void);
+    void MoveResize(void) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,
-                      bool        &aspect_only);
-    void Zoom(ZoomDirection direction);
-    void VideoAspectRatioChanged(float aspect);
-    void EmbedInWidget(const QRect &rect);
-    void StopEmbedding(void);
-    void MoveResizeWindow(QRect new_rect);
-    void DrawUnusedRects(bool sync = true);
-    virtual void UpdatePauseFrame(int64_t &default_tc);
-    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
-    void InitPictureAttributes(void);
+                      bool        &aspect_only) override; // VideoOutput
+    void Zoom(ZoomDirection direction) override; // VideoOutput
+    void VideoAspectRatioChanged(float aspect) override; // VideoOutput
+    void EmbedInWidget(const QRect &rect) override; // VideoOutput
+    void StopEmbedding(void) override; // VideoOutput
+    void MoveResizeWindow(QRect new_rect) override; // VideoOutput
+    void DrawUnusedRects(bool sync = true) override; // VideoOutput
+    void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
+    int  SetPictureAttribute(PictureAttribute attribute, int newValue) override; // VideoOutput
+    void InitPictureAttributes(void) override; // VideoOutput
 
-    virtual bool IsPIPSupported(void) const
+    bool IsPIPSupported(void) const override // VideoOutput
         { return XVideo == VideoOutputSubType(); }
-    virtual bool IsPBPSupported(void) const
+    bool IsPBPSupported(void) const override // VideoOutput
         { return XVideo == VideoOutputSubType(); }
-    virtual bool NeedExtraAudioDecode(void) const { return false; }
+    bool NeedExtraAudioDecode(void) const override // VideoOutput
+        { return false; }
 
-    virtual QRect GetPIPRect(PIPLocation  location,
-                             MythPlayer  *pipplayer = nullptr,
-                             bool         do_pixel_adj = true) const;
+    QRect GetPIPRect(PIPLocation  location,
+                     MythPlayer  *pipplayer = nullptr,
+                     bool         do_pixel_adj = true) const override; // VideoOutput
 
     static MythCodecID GetBestSupportedCodec(uint stream_type);
 
@@ -94,12 +95,13 @@ class VideoOutputXv : public VideoOutput
                                            const QSize &video_dim);
 
     VOSType VideoOutputSubType() const { return video_output_subtype; }
-    virtual MythPainter* GetOSDPainter(void);
+    MythPainter* GetOSDPainter(void) override; // VideoOutput
 
   private:
-    virtual bool hasFullScreenOSD(void) const { return chroma_osd; }
-    void DiscardFrame(VideoFrame*);
-    void DiscardFrames(bool next_frame_keyframe);
+    bool hasFullScreenOSD(void) const override // VideoOutput
+        { return chroma_osd; }
+    void DiscardFrame(VideoFrame*) override; // VideoOutput
+    void DiscardFrames(bool next_frame_keyframe) override; // VideoOutput
 
     void PrepareFrameXv(VideoFrame *);
     void PrepareFrameMem(VideoFrame *, FrameScanType);

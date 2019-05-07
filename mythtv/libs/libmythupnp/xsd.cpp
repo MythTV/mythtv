@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
+bool Xsd::GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName )
 {
     if (sEnumName.isEmpty())
         return false;
@@ -433,7 +433,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
             QString sNewPropName( metaProperty.name() );
 
             if (IsNillable( sType ))
-                oNode.setAttribute( "nillable" , true );   
+                oNode.setAttribute( "nillable" , static_cast<int>(true) );
 
             if (bCustomType)
             {
@@ -888,7 +888,7 @@ QString Xsd::ConvertTypeToXSD( const QString &sType, bool bCustomType )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Xsd::ReadPropertyMetadata( QObject *pObject, QString sPropName, QString sKey )
+QString Xsd::ReadPropertyMetadata( QObject *pObject, const QString& sPropName, const QString& sKey )
 {
     const QMetaObject *pMeta = pObject->metaObject();
 
@@ -904,10 +904,10 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, QString sPropName, QString 
 
         QString     sFullKey  = sKey + "=";
 
-        for (int nIdx = 0; nIdx < sOptions.size(); ++nIdx)
+        for (int nIdx2 = 0; nIdx2 < sOptions.size(); ++nIdx2)
         {
-            if (sOptions.at( nIdx ).startsWith( sFullKey ))
-                return sOptions.at( nIdx ).mid( sFullKey.length() );
+            if (sOptions.at( nIdx2 ).startsWith( sFullKey ))
+                return sOptions.at( nIdx2 ).mid( sFullKey.length() );
         }
     }
 

@@ -55,7 +55,7 @@ public:
     bool      isOpenInExclusiveMode()         { return openInExclusiveMode; };
     void      startListening();
     void      stopListening();
-    void      run();
+    void      run() override; // MThread
 
 protected:
     AppleRemote(); // will be a singleton class
@@ -64,19 +64,19 @@ protected:
 
 
 private:
-    bool                   openInExclusiveMode;
-    IOHIDDeviceInterface** hidDeviceInterface;
-    IOHIDQueueInterface**  queue;
+    bool                   openInExclusiveMode {true};
+    IOHIDDeviceInterface** hidDeviceInterface  {nullptr};
+    IOHIDQueueInterface**  queue               {nullptr};
     std::vector<int>       cookies;
     std::map< std::string, Event > cookieToButtonMapping;
-    int                    remoteId;
-    Listener*              _listener;
+    int                    remoteId            {0};
+    Listener*              _listener           {nullptr};
 
-    bool                   mUsingNewAtv;
-    AppleRemote::Event     mLastEvent;
-    int                    mEventCount;
-    bool                   mKeyIsDown;
-    QTimer*                mCallbackTimer;
+    bool                   mUsingNewAtv        {false};
+    AppleRemote::Event     mLastEvent          {AppleRemote::Undefined};
+    int                    mEventCount         {0};
+    bool                   mKeyIsDown          {false};
+    QTimer*                mCallbackTimer      {nullptr};
 
     void        _initCookieMap();
     bool        _initCookies();

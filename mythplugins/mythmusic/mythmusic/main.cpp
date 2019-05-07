@@ -321,8 +321,8 @@ static void MusicCallback(void *data, QString &selection)
 
        if (vs->Create())
            mainStack->AddScreen(vs);
-        else
-            delete vs;
+       else
+           delete vs;
     }
     else if (sel == "settings_import")
     {
@@ -343,7 +343,7 @@ static void MusicCallback(void *data, QString &selection)
     }
 }
 
-static int runMenu(QString which_menu)
+static int runMenu(const QString& which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
@@ -384,13 +384,10 @@ static int runMenu(QString which_menu)
         GetMythMainWindow()->GetMainStack()->AddScreen(diag);
         return 0;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
-        delete diag;
-        return -1;
-    }
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+        .arg(which_menu).arg(themedir));
+    delete diag;
+    return -1;
 }
 
 static void runMusicPlayback(void)
@@ -439,7 +436,7 @@ static void runRipCD(void)
 
 static void showMiniPlayer(void)
 {
-    if (!gMusicData->all_music)
+    if (!gMusicData->m_all_music)
         return;
 
     // only show the miniplayer if there isn't already a client attached
@@ -511,10 +508,10 @@ static void handleMedia(MythMediaDevice *cd)
         }
 
         // device is not usable so remove any existing CD tracks
-        if (gMusicData->initialized)
+        if (gMusicData->m_initialized)
         {
-            gMusicData->all_music->clearCDData();
-            gMusicData->all_playlists->getActive()->removeAllCDTracks();
+            gMusicData->m_all_music->clearCDData();
+            gMusicData->m_all_playlists->getActive()->removeAllCDTracks();
         }
 
         gPlayer->activePlaylistChanged(-1, false);
@@ -529,15 +526,15 @@ static void handleMedia(MythMediaDevice *cd)
     s_mountPath.clear();
 
     // don't show the music screen if AutoPlayCD is off
-    if (!gCoreContext->GetNumSetting("AutoPlayCD", 0))
+    if (!gCoreContext->GetBoolSetting("AutoPlayCD", false))
         return;
 
-    if (!gMusicData->initialized)
+    if (!gMusicData->m_initialized)
         gMusicData->loadMusic();
 
     // remove any existing CD tracks
-    gMusicData->all_music->clearCDData();
-    gMusicData->all_playlists->getActive()->removeAllCDTracks();
+    gMusicData->m_all_music->clearCDData();
+    gMusicData->m_all_playlists->getActive()->removeAllCDTracks();
 
     gPlayer->sendCDChangedEvent();
 
@@ -589,7 +586,7 @@ static void handleMedia(MythMediaDevice *cd)
         if (meta)
         {
             meta->setTrack(++track);
-            gMusicData->all_music->addCDTrack(*meta);
+            gMusicData->m_all_music->addCDTrack(*meta);
         }
         if (progress)
         {
@@ -603,14 +600,14 @@ static void handleMedia(MythMediaDevice *cd)
         progress->Close();
 
     // Remove all tracks from the playlist
-    gMusicData->all_playlists->getActive()->removeAllTracks();
+    gMusicData->m_all_playlists->getActive()->removeAllTracks();
 
     // Create list of new tracks
     QList<int> songList;
-    const int tracks = gMusicData->all_music->getCDTrackCount();
+    const int tracks = gMusicData->m_all_music->getCDTrackCount();
     for (track = 1; track <= tracks; track++)
     {
-        MusicMetadata *mdata = gMusicData->all_music->getCDMetadata(track);
+        MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(track);
         if (mdata)
             songList.append(mdata->ID());
     }
@@ -620,7 +617,7 @@ static void handleMedia(MythMediaDevice *cd)
     s_mountPath = cd->getMountPath();
 
     // Add new tracks to playlist
-    gMusicData->all_playlists->getActive()->fillSonglistFromList(
+    gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
             songList, true, PL_REPLACE, 0);
     gPlayer->setCurrentTrackPos(0);
 
@@ -671,10 +668,10 @@ static void handleCDMedia(MythMediaDevice *cd)
         }
 
         // device is not usable so remove any existing CD tracks
-        if (gMusicData->all_music)
+        if (gMusicData->m_all_music)
         {
-            gMusicData->all_music->clearCDData();
-            gMusicData->all_playlists->getActive()->removeAllCDTracks();
+            gMusicData->m_all_music->clearCDData();
+            gMusicData->m_all_playlists->getActive()->removeAllCDTracks();
         }
 
         gPlayer->activePlaylistChanged(-1, false);
@@ -683,19 +680,20 @@ static void handleCDMedia(MythMediaDevice *cd)
         return;
     }
 
-    if (!gMusicData->initialized)
+    if (!gMusicData->m_initialized)
         gMusicData->loadMusic();
 
     // wait for the music and playlists to load
-    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
+    while (!gMusicData->m_all_playlists->doneLoading()
+           || !gMusicData->m_all_music->doneLoading())
     {
         qApp->processEvents();
         usleep(50000);
     }
 
     // remove any existing CD tracks
-    gMusicData->all_music->clearCDData();
-    gMusicData->all_playlists->getActive()->removeAllCDTracks();
+    gMusicData->m_all_music->clearCDData();
+    gMusicData->m_all_playlists->getActive()->removeAllCDTracks();
 
     // find any new cd tracks
     CdDecoder *decoder = new CdDecoder("cda", nullptr, nullptr);
@@ -709,7 +707,7 @@ static void handleCDMedia(MythMediaDevice *cd)
         MusicMetadata *track = decoder->getMetadata(trackNo);
         if (track)
         {
-            gMusicData->all_music->addCDTrack(*track);
+            gMusicData->m_all_music->addCDTrack(*track);
 
             if (!setTitle)
             {
@@ -733,7 +731,7 @@ static void handleCDMedia(MythMediaDevice *cd)
                     "    ~/.cddb and ~/.cdserverrc and restart MythMusic.");
                 }
 
-                gMusicData->all_music->setCDTitle(parenttitle);
+                gMusicData->m_all_music->setCDTitle(parenttitle);
                 setTitle = true;
             }
 
@@ -747,22 +745,22 @@ static void handleCDMedia(MythMediaDevice *cd)
 
     // if the AutoPlayCD setting is set we remove all the existing tracks
     // from the playlist and replace them with the new CD tracks found
-    if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
+    if (gCoreContext->GetBoolSetting("AutoPlayCD", false))
     {
-        gMusicData->all_playlists->getActive()->removeAllTracks();
+        gMusicData->m_all_playlists->getActive()->removeAllTracks();
 
         QList<int> songList;
 
-        for (int x = 1; x <= gMusicData->all_music->getCDTrackCount(); x++)
+        for (int x = 1; x <= gMusicData->m_all_music->getCDTrackCount(); x++)
         {
-            MusicMetadata *mdata = gMusicData->all_music->getCDMetadata(x);
+            MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(x);
             if (mdata)
                 songList.append((mdata)->ID());
         }
 
         if (songList.count())
         {
-            gMusicData->all_playlists->getActive()->fillSonglistFromList(
+            gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
                     songList, true, PL_REPLACE, 0);
             gPlayer->setCurrentTrackPos(0);
         }
@@ -918,14 +916,14 @@ void mythplugin_destroy(void)
 
     // TODO these should be saved when they are changed
     // Automagically save all playlists and metadata (ratings) that have changed
-    if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
+    if (gMusicData->m_all_music && gMusicData->m_all_music->cleanOutThreads())
     {
-        gMusicData->all_music->save();
+        gMusicData->m_all_music->save();
     }
 
-    if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
+    if (gMusicData->m_all_playlists && gMusicData->m_all_playlists->cleanOutThreads())
     {
-        gMusicData->all_playlists->save();
+        gMusicData->m_all_playlists->save();
     }
 
     delete gPlayer;

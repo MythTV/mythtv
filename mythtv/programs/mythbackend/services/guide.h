@@ -53,7 +53,7 @@ class Guide : public GuideServices
                                                   bool             Details,
                                                   int              ChannelGroupId,
                                                   int              StartIndex,
-                                                  int              Count);
+                                                  int              Count) override; // GuideServices
 
         DTC::ProgramList*   GetProgramList      ( int              StartIndex,
                                                   int              Count,
@@ -67,26 +67,26 @@ class Guide : public GuideServices
                                                   bool             OnlyNew,
                                                   bool             Details,
                                                   const QString   &Sort,
-                                                  bool             Descending );
+                                                  bool             Descending ) override; // GuideServices
 
         DTC::Program*       GetProgramDetails   ( int              ChanId,
-                                                  const QDateTime &StartTime );
+                                                  const QDateTime &StartTime ) override; // GuideServices
 
         QFileInfo           GetChannelIcon      ( int              ChanId,
                                                   int              Width ,
-                                                  int              Height );
+                                                  int              Height ) override; // GuideServices
 
-        DTC::ChannelGroupList*  GetChannelGroupList ( bool         IncludeEmpty );
+        DTC::ChannelGroupList*  GetChannelGroupList ( bool         IncludeEmpty ) override; // GuideServices
 
-        QStringList         GetCategoryList     ( );
+        QStringList         GetCategoryList     ( ) override; // GuideServices
 
-        QStringList         GetStoredSearches( const QString   &Type );
+        QStringList         GetStoredSearches( const QString   &Type ) override; // GuideServices
 
         bool                AddToChannelGroup   ( int              ChannelGroupId,
-                                                  int              ChanId );
+                                                  int              ChanId ) override; // GuideServices
 
         bool                RemoveFromChannelGroup ( int           ChannelGroupId,
-                                                     int           ChanId );
+                                                     int           ChanId ) override; // GuideServices
 };
 
 // --------------------------------------------------------------------------
@@ -185,7 +185,7 @@ class ScriptableGuide : public QObject
             )
         }
 
-        QStringList GetStoredSearches( QString Type )
+        QStringList GetStoredSearches( const QString& Type )
         {
             SCRIPT_CATCH_EXCEPTION( QStringList(),
                 return m_obj.GetStoredSearches( Type );

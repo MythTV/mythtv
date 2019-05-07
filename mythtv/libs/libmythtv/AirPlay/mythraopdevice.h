@@ -35,7 +35,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
     void deleteClient();
 
   private:
-    virtual ~MythRAOPDevice(void);
+    ~MythRAOPDevice(void) override;
     void Teardown(void);
     bool RegisterForBonjour(void);
 
@@ -45,13 +45,13 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
     static MThread        *gMythRAOPDeviceThread;
 
     // Members
-    QString          m_name;
+    QString          m_name       {"MythTV"};
     QByteArray       m_hardwareId;
-    BonjourRegister *m_bonjour;
-    bool             m_valid;
-    QMutex          *m_lock;
-    int              m_setupPort;
-    int              m_basePort;
+    BonjourRegister *m_bonjour    {nullptr};
+    bool             m_valid      {false};
+    QMutex          *m_lock       {nullptr};
+    int              m_setupPort  {5000};
+    int              m_basePort   {0};
     QList<MythRAOPConnection*> m_clients;
 };
 

@@ -202,14 +202,11 @@ int MHOctetString::Compare(const MHOctetString &str) const
     {
         return 0;
     }
-    else if (m_nLength < str.m_nLength)
+    if (m_nLength < str.m_nLength)
     {
         return -1;
     }
-    else
-    {
-        return 1;
-    }
+    return 1;
 }
 
 // Add text to the end of the string.
@@ -319,10 +316,7 @@ QString MHObjectRef::Printable() const
     {
         return QString(" %1 ").arg(m_nObjectNo);
     }
-    else
-    {
-        return QString(" ( ") + m_GroupId.Printable() + QString(" %1 ").arg(m_nObjectNo);
-    }
+    return QString(" ( ") + m_GroupId.Printable() + QString(" %1 ").arg(m_nObjectNo);
 }
 
 // Make a copy of an object reference.
@@ -381,14 +375,12 @@ bool MHGenericBoolean::GetValue(MHEngine *engine) const
     {
         return m_fDirect;
     }
-    else
-    {
-        MHUnion result;
-        MHRoot *pBase = engine->FindObject(m_Indirect);
-        pBase->GetVariableValue(result, engine);
-        result.CheckType(MHUnion::U_Bool);
-        return result.m_fBoolVal;
-    }
+
+    MHUnion result;
+    MHRoot *pBase = engine->FindObject(m_Indirect);
+    pBase->GetVariableValue(result, engine);
+    result.CheckType(MHUnion::U_Bool);
+    return result.m_fBoolVal;
 }
 
 // Return the indirect reference or fail if it's direct
@@ -437,55 +429,48 @@ int MHGenericInteger::GetValue(MHEngine *engine) const
     {
         return m_nDirect;
     }
-    else
+
+    MHUnion result;
+    MHRoot *pBase = engine->FindObject(m_Indirect);
+    pBase->GetVariableValue(result, engine);
+
+    // From my reading of the MHEG documents implicit conversion is only
+    // performed when assigning variables.  Nevertheless the Channel 4
+    // Teletext assumes that implicit conversion takes place here as well.
+    if (result.m_Type == MHUnion::U_String)
     {
-        MHUnion result;
-        MHRoot *pBase = engine->FindObject(m_Indirect);
-        pBase->GetVariableValue(result, engine);
+        // Implicit conversion of string to integer.
+        int v = 0;
+        int p = 0;
+        bool fNegative = false;
 
-        // From my reading of the MHEG documents implicit conversion is only
-        // performed when assigning variables.  Nevertheless the Channel 4
-        // Teletext assumes that implicit conversion takes place here as well.
-        if (result.m_Type == MHUnion::U_String)
+        if (result.m_StrVal.Size() > 0 && result.m_StrVal.GetAt(0) == '-')
         {
-            // Implicit conversion of string to integer.
-            int v = 0;
-            int p = 0;
-            bool fNegative = false;
-
-            if (result.m_StrVal.Size() > 0 && result.m_StrVal.GetAt(0) == '-')
-            {
-                p++;
-                fNegative = true;
-            }
-
-            for (; p < result.m_StrVal.Size(); p++)
-            {
-                unsigned char ch =  result.m_StrVal.GetAt(p);
-
-                if (ch < '0' || ch > '9')
-                {
-                    break;
-                }
-
-                v = v * 10 + ch - '0';
-            }
-
-            if (fNegative)
-            {
-                return -v;
-            }
-            else
-            {
-                return v;
-            }
+            p++;
+            fNegative = true;
         }
-        else
+
+        for (; p < result.m_StrVal.Size(); p++)
         {
-            result.CheckType(MHUnion::U_Int);
-            return result.m_nIntVal;
+            unsigned char ch =  result.m_StrVal.GetAt(p);
+
+            if (ch < '0' || ch > '9')
+            {
+                break;
+            }
+
+            v = v * 10 + ch - '0';
         }
+
+        if (fNegative)
+        {
+            return -v;
+        }
+        return v;
     }
+
+    result.CheckType(MHUnion::U_Int);
+    return result.m_nIntVal;
 }
 
 void MHGenericOctetString::Initialise(MHParseNode *pArg, MHEngine *engine)
@@ -810,7 +795,7 @@ MHObjectRef *MHParameter::GetReference()
 // A content reference is simply a string.
 MHContentRef MHContentRef::Null; // This is the empty string.
 
-void MHContentRef::Initialise(MHParseNode *p, MHEngine *)
+void MHContentRef::Initialise(MHParseNode *p, MHEngine * /*engine*/)
 {
     p->GetStringValue(m_ContentRef);
 }
@@ -847,15 +832,15 @@ void MHFontBody::Copy(const MHFontBody &fb)
 
 void MHPointArg::Initialise(MHParseNode *p, MHEngine *engine)
 {
-    x.Initialise(p->GetSeqN(0), engine);
-    y.Initialise(p->GetSeqN(1), engine);
+    m_x.Initialise(p->GetSeqN(0), engine);
+    m_y.Initialise(p->GetSeqN(1), engine);
 }
 
 void MHPointArg::PrintMe(FILE *fd, int nTabs) const
 {
     fprintf(fd, "( ");
-    x.PrintMe(fd, nTabs);
-    y.PrintMe(fd, nTabs);
+    m_x.PrintMe(fd, nTabs);
+    m_y.PrintMe(fd, nTabs);
     fprintf(fd, ") ");
 }
 

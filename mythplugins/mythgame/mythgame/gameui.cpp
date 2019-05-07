@@ -44,16 +44,7 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI"),
-            m_showHashed(false), m_gameShowFileName(0),
-            m_gameTree(nullptr), m_favouriteNode(nullptr),
-            m_busyPopup(nullptr),
-            m_gameUITree(nullptr), m_gameTitleText(nullptr),
-            m_gameSystemText(nullptr), m_gameYearText(nullptr),
-            m_gameGenreText(nullptr), m_gamePlotText(nullptr),
-            m_gameFavouriteState(nullptr), m_gameImage(nullptr),
-            m_fanartImage(nullptr), m_boxImage(nullptr),
-            m_scanner(nullptr)
+       : MythScreenType(parent, "GameUI")
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -90,7 +81,7 @@ bool GameUI::Create()
     connect(m_gameUITree, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(nodeChanged(MythGenericTree*)));
 
-    m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
+    m_gameShowFileName = gCoreContext->GetBoolSetting("GameShowFileNames");
 
     BuildTree();
 
@@ -133,7 +124,7 @@ void GameUI::BuildTree()
     else
         systemFilter += ")";
 
-    m_showHashed = gCoreContext->GetSetting("GameTreeView").toInt();
+    m_showHashed = gCoreContext->GetBoolSetting("GameTreeView");
 
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
@@ -198,7 +189,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
-            showMenu();
+            ShowMenu();
         else if (action == "EDIT")
             edit();
         else if (action == "INFO")
@@ -258,7 +249,7 @@ void GameUI::nodeChanged(MythGenericTree* node)
     }
 }
 
-void GameUI::itemClicked(MythUIButtonListItem*)
+void GameUI::itemClicked(MythUIButtonListItem* /*item*/)
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
@@ -307,7 +298,7 @@ void GameUI::showImages(void)
         m_boxImage->Load();
 }
 
-void GameUI::searchComplete(QString string)
+void GameUI::searchComplete(const QString& string)
 {
     if (!m_gameUITree->GetCurrentNode())
         return;
@@ -428,7 +419,7 @@ void GameUI::showInfo()
     }
 }
 
-void GameUI::showMenu()
+void GameUI::ShowMenu()
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
 
@@ -571,7 +562,7 @@ void GameUI::customEvent(QEvent *event)
     {
         MetadataLookupEvent *lue = (MetadataLookupEvent *)event;
 
-        MetadataLookupList lul = lue->lookupList;
+        MetadataLookupList lul = lue->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -603,7 +594,7 @@ void GameUI::customEvent(QEvent *event)
     {
         MetadataLookupFailure *luf = (MetadataLookupFailure *)event;
 
-        MetadataLookupList lul = luf->lookupList;
+        MetadataLookupList lul = luf->m_lookupList;
 
         if (m_busyPopup)
         {
@@ -611,7 +602,7 @@ void GameUI::customEvent(QEvent *event)
             m_busyPopup = nullptr;
         }
 
-        if (lul.size())
+        if (!lul.empty())
         {
             MetadataLookup *lookup = lul[0];
             MythGenericTree *node = lookup->GetData().value<MythGenericTree *>();
@@ -630,7 +621,7 @@ void GameUI::customEvent(QEvent *event)
     {
         ImageDLEvent *ide = (ImageDLEvent *)event;
 
-        MetadataLookup *lookup = ide->item;
+        MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
             return;
@@ -938,12 +929,12 @@ void GameUI::gameSearch(MythGenericTree *node,
     }
 }
 
-void GameUI::createBusyDialog(QString title)
+void GameUI::createBusyDialog(const QString& title)
 {
     if (m_busyPopup)
         return;
 
-    QString message = title;
+    const QString& message = title;
 
     m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
             "mythgamebusydialog");
@@ -1033,21 +1024,21 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     QString system = metadata->System();
     QString title = metadata->Gamename();
 
-    if (metadata->Boxart().isEmpty() && coverart.size())
+    if (metadata->Boxart().isEmpty() && !coverart.empty())
     {
         ArtworkInfo info;
         info.url = coverart.takeAt(0).trimmed();
         map.insert(kArtworkCoverart, info);
     }
 
-    if (metadata->Fanart().isEmpty() && fanart.size())
+    if (metadata->Fanart().isEmpty() && !fanart.empty())
     {
         ArtworkInfo info;
         info.url = fanart.takeAt(0).trimmed();
         map.insert(kArtworkFanart, info);
     }
 
-    if (metadata->Screenshot().isEmpty() && screenshot.size())
+    if (metadata->Screenshot().isEmpty() && !screenshot.empty())
     {
         ArtworkInfo info;
         info.url = screenshot.takeAt(0).trimmed();

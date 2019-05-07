@@ -70,12 +70,12 @@ class MythContextPrivate : public QObject
 
   public:
     MythContextPrivate(MythContext *lparent);
-   ~MythContextPrivate();
+   ~MythContextPrivate() override;
 
-    bool Init        (const bool gui,
-                      const bool prompt, const bool noPrompt,
-                      const bool ignoreDB);
-    bool FindDatabase(const bool prompt, const bool noPrompt);
+    bool Init        (bool gui,
+                      bool prompt, bool noPrompt,
+                      bool ignoreDB);
+    bool FindDatabase(bool prompt, bool noAutodetect);
 
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
@@ -90,11 +90,11 @@ class MythContextPrivate : public QObject
     void    ResetDatabase(void);
 
     int     ChooseBackend(const QString &error);
-    int     UPnPautoconf(const int milliSeconds = 2000);
+    int     UPnPautoconf(int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
-    bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
+    bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    checkPort(QString &host, int port, int wakeupTime);
+    bool    checkPort(QString &host, int port, int timeLimit);
     void    processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
@@ -102,43 +102,44 @@ class MythContextPrivate : public QObject
 
 
   protected:
-    bool event(QEvent*);
+    bool event(QEvent* /*e*/) override; // QObject
 
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup(void);
 
-    void ShowVersionMismatchPopup(uint remoteVersion);
+    void ShowVersionMismatchPopup(uint remote_version);
 
   public slots:
     void OnCloseDialog();
 
   public:
-    MythContext *parent;
+    MythContext            *m_parent             {nullptr};
 
-    bool      m_gui;               ///< Should this context use GUI elements?
+                            /// Should this context use GUI elements?
+    bool                    m_gui                {false};
 
-    QString m_masterhostname;    ///< master backend hostname
+    QString                 m_masterhostname;  ///< master backend hostname
 
-    DatabaseParams  m_DBparams;  ///< Current database host & WOL details
-    QString         m_DBhostCp;  ///< dbHostName backup
+    DatabaseParams          m_DBparams;  ///< Current database host & WOL details
+    QString                 m_DBhostCp;  ///< dbHostName backup
 
-    Configuration    *m_pConfig;
+    Configuration          *m_pConfig            {nullptr};
 
-    bool disableeventpopup;
+    bool                   m_disableeventpopup   {false};
 
-    MythUIHelper *m_ui;
-    MythContextSlotHandler *m_sh;
-    GUIStartup *m_guiStartup;
-    QEventLoop *m_loop;
-    bool needsBackend;
-    bool m_settingsCacheDirty;
+    MythUIHelper           *m_ui                 {nullptr};
+    MythContextSlotHandler *m_sh                 {nullptr};
+    GUIStartup             *m_guiStartup         {nullptr};
+    QEventLoop             *m_loop               {nullptr};
+    bool                    m_needsBackend       {false};
+    bool                    m_settingsCacheDirty {false};
 
   private:
-    MythConfirmationDialog *MBEversionPopup;
-    int m_registration;
-    QDateTime m_lastCheck;
-    QTcpSocket *m_socket;
-    static const QString settingsToSave[];
+    MythConfirmationDialog *m_MBEversionPopup    {nullptr};
+    int                     m_registration       {-1};
+    QDateTime               m_lastCheck;
+    QTcpSocket             *m_socket             {nullptr};
+    static const QString    s_settingsToSave[];
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -238,18 +239,8 @@ static void eject_cb(void)
 }
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
-    : parent(lparent),
-      m_gui(false),
-      m_pConfig(nullptr),
-      disableeventpopup(false),
-      m_ui(nullptr),
-      m_sh(new MythContextSlotHandler(this)),
-      m_guiStartup(nullptr),
-      needsBackend(false),
-      m_settingsCacheDirty(false),
-      MBEversionPopup(nullptr),
-      m_registration(-1),
-      m_socket(nullptr)
+    : m_parent(lparent),
+      m_sh(new MythContextSlotHandler(this))
 {
     m_loop = new QEventLoop(this);
     InitializeMythDirs();
@@ -257,17 +248,13 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 MythContextPrivate::~MythContextPrivate()
 {
-    if (m_pConfig)
-        delete m_pConfig;
+    delete m_pConfig;
     if (GetNotificationCenter() && m_registration > 0)
     {
         GetNotificationCenter()->UnRegister(this, m_registration, true);
     }
 
-    if (m_loop)
-    {
-        delete m_loop;
-    }
+    delete m_loop;
 
     if (m_ui)
         DestroyMythUI();
@@ -354,7 +341,7 @@ bool MythContextPrivate::Init(const bool gui,
     loadSettingsCacheOverride();
 
     if (gCoreContext->IsFrontend())
-        needsBackend = true;
+        m_needsBackend = true;
 
     // We don't have a database yet, so lets use the config.xml file.
     m_pConfig = new XmlConfiguration("config.xml");
@@ -551,7 +538,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.LoadDefaults();
 
     m_DBparams.localHostName = m_pConfig->GetValue("LocalHostName", "");
-    m_DBparams.dbHostPing = m_pConfig->GetValue(kDefaultDB + "PingHost", true);
+    m_DBparams.dbHostPing = m_pConfig->GetBoolValue(kDefaultDB + "PingHost", true);
     m_DBparams.dbHostName = m_pConfig->GetValue(kDefaultDB + "Host", "");
     m_DBparams.dbUserName = m_pConfig->GetValue(kDefaultDB + "UserName", "");
     m_DBparams.dbPassword = m_pConfig->GetValue(kDefaultDB + "Password", "");
@@ -559,7 +546,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.dbPort = m_pConfig->GetValue(kDefaultDB + "Port", 0);
 
     m_DBparams.wolEnabled =
-        m_pConfig->GetValue(kDefaultWOL + "Enabled", false);
+        m_pConfig->GetBoolValue(kDefaultWOL + "Enabled", false);
     m_DBparams.wolReconnect =
         m_pConfig->GetValue(kDefaultWOL + "SQLReconnectWaitTime", 0);
     m_DBparams.wolRetry =
@@ -664,7 +651,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->SetValue(
             "LocalHostName", params.localHostName);
 
-        m_pConfig->SetValue(
+        m_pConfig->SetBoolValue(
             kDefaultDB + "PingHost", params.dbHostPing);
 
         // If dbHostName is an IPV6 address with scope,
@@ -688,7 +675,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->SetValue(
             kDefaultDB + "Port", params.dbPort);
 
-        m_pConfig->SetValue(
+        m_pConfig->SetBoolValue(
             kDefaultWOL + "Enabled", params.wolEnabled);
         m_pConfig->SetValue(
             kDefaultWOL + "SQLReconnectWaitTime", params.wolReconnect);
@@ -761,7 +748,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     }
     else
     {
-        DatabaseParams params = parent->GetDatabaseParams();
+        DatabaseParams params = m_parent->GetDatabaseParams();
         QString        response;
         std::this_thread::sleep_for(std::chrono::seconds(1));
         // give user chance to skip config
@@ -809,7 +796,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
                                               params.wolCommand);
         }
 
-        accepted = parent->SaveDatabaseParams(params);
+        accepted = m_parent->SaveDatabaseParams(params);
     }
     return accepted;
 }
@@ -957,7 +944,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 startupState = st_dbConnects;
                 [[clang::fallthrough]];
             case st_dbConnects:
-                if (needsBackend)
+                if (m_needsBackend)
                 {
                     beWOLCmd = gCoreContext->GetSetting("WOLbackendCommand", "");
                     if (!beWOLCmd.isEmpty())
@@ -1204,7 +1191,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
         }
     }
 
-    SSDPCacheEntries *backends = SSDP::Instance()->Find(gBackendURI);
+    SSDPCacheEntries *backends = SSDP::Find(gBackendURI);
 
     if (!backends)
     {
@@ -1280,7 +1267,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
+        pDevLoc = SSDP::Find( gBackendURI, USN );
 
         if (pDevLoc)
             break;
@@ -1365,9 +1352,9 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
 
 bool MythContextPrivate::event(QEvent *e)
 {
-    if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
-        if (disableeventpopup)
+        if (m_disableeventpopup)
             return true;
 
         if (GetNotificationCenter() && m_registration < 0)
@@ -1442,7 +1429,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
 {
-    if (MBEversionPopup)
+    if (m_MBEversionPopup)
         return;
 
     QString message =
@@ -1455,7 +1442,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
 
     if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {
-        MBEversionPopup = ShowOkPopup(
+        m_MBEversionPopup = ShowOkPopup(
             message, m_sh, SLOT(VersionMismatchPopupClosed()));
     }
     else
@@ -1480,7 +1467,7 @@ void MythContextPrivate::processEvents(void)
 // cache some settings in cache/contextcache.xml
 // only call this if the database is available.
 
-const QString MythContextPrivate::settingsToSave[] =
+const QString MythContextPrivate::s_settingsToSave[] =
 { "Theme", "Language", "Country", "GuiHeight",
   "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow",
   "AlwaysOnTop", "HideMouseCursor", "ThemePainter", "libCECEnabled",
@@ -1495,15 +1482,15 @@ bool MythContextPrivate::saveSettingsCache(void)
     QDir dir(cacheDirName);
     dir.mkpath(cacheDirName);
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
-    static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
+    static const int arraySize = sizeof(s_settingsToSave)/sizeof(s_settingsToSave[0]);
     for (int ix = 0; ix < arraySize; ix++)
     {
-        QString cacheValue = config.GetValue("Settings/"+settingsToSave[ix],QString());
-        gCoreContext->ClearOverrideSettingForSession(settingsToSave[ix]);
-        QString value = gCoreContext->GetSetting(settingsToSave[ix],QString());
+        QString cacheValue = config.GetValue("Settings/"+s_settingsToSave[ix],QString());
+        gCoreContext->ClearOverrideSettingForSession(s_settingsToSave[ix]);
+        QString value = gCoreContext->GetSetting(s_settingsToSave[ix],QString());
         if (value != cacheValue)
         {
-            config.SetValue("Settings/"+settingsToSave[ix],value);
+            config.SetValue("Settings/"+s_settingsToSave[ix],value);
             m_settingsCacheDirty = true;
         }
     }
@@ -1516,14 +1503,14 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
     if (!m_gui)
         return;
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
-    static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
+    static const int arraySize = sizeof(s_settingsToSave)/sizeof(s_settingsToSave[0]);
     for (int ix = 0; ix < arraySize; ix++)
     {
-        if (!gCoreContext->GetSetting(settingsToSave[ix],QString()).isEmpty())
+        if (!gCoreContext->GetSetting(s_settingsToSave[ix],QString()).isEmpty())
             continue;
-        QString value = config.GetValue("Settings/"+settingsToSave[ix],QString());
+        QString value = config.GetValue("Settings/"+s_settingsToSave[ix],QString());
         if (!value.isEmpty())
-            gCoreContext->OverrideSettingForSession(settingsToSave[ix], value);
+            gCoreContext->OverrideSettingForSession(s_settingsToSave[ix], value);
     }
     // Prevent power off TV after temporary window
     gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", nullptr);
@@ -1535,10 +1522,10 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
 void MythContextPrivate::clearSettingsCacheOverride(void)
 {
     QString language = gCoreContext->GetSetting("Language",QString());
-    static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
+    static const int arraySize = sizeof(s_settingsToSave)/sizeof(s_settingsToSave[0]);
     for (int ix = 0; ix < arraySize; ix++)
     {
-        gCoreContext->ClearOverrideSettingForSession(settingsToSave[ix]);
+        gCoreContext->ClearOverrideSettingForSession(s_settingsToSave[ix]);
     }
     // Restore power off TV setting
     gCoreContext->ClearOverrideSettingForSession("PowerOffTVAllowed");
@@ -1550,12 +1537,12 @@ void MythContextPrivate::clearSettingsCacheOverride(void)
 
 void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 {
-    d->MBEversionPopup = nullptr;
+    d->m_MBEversionPopup = nullptr;
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
 MythContext::MythContext(const QString &binversion, bool needsBackend)
-    : d(nullptr), app_binary_version(binversion)
+    : m_app_binary_version(binversion)
 {
 #ifdef _WIN32
     static bool WSAStarted = false;
@@ -1568,9 +1555,9 @@ MythContext::MythContext(const QString &binversion, bool needsBackend)
 #endif
 
     d = new MythContextPrivate(this);
-    d->needsBackend = needsBackend;
+    d->m_needsBackend = needsBackend;
 
-    gCoreContext = new MythCoreContext(app_binary_version, d);
+    gCoreContext = new MythCoreContext(m_app_binary_version, d);
 
     if (!gCoreContext || !gCoreContext->Init())
     {
@@ -1592,12 +1579,12 @@ bool MythContext::Init(const bool gui,
 
     SetDisableEventPopup(true);
 
-    if (app_binary_version != MYTH_BINARY_VERSION)
+    if (m_app_binary_version != MYTH_BINARY_VERSION)
     {
         LOG(VB_GENERAL, LOG_EMERG,
                  QString("Application binary version (%1) does not "
                          "match libraries (%2)")
-                     .arg(app_binary_version) .arg(MYTH_BINARY_VERSION));
+                     .arg(m_app_binary_version) .arg(MYTH_BINARY_VERSION));
 
         QString warning = QObject::tr(
             "This application is not compatible "
@@ -1685,7 +1672,7 @@ MythContext::~MythContext()
 
 void MythContext::SetDisableEventPopup(bool check)
 {
-    d->disableeventpopup = check;
+    d->m_disableeventpopup = check;
 }
 
 DatabaseParams MythContext::GetDatabaseParams(void)

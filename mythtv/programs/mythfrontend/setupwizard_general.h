@@ -20,8 +20,8 @@ class GeneralSetupWizard : public MythScreenType
     GeneralSetupWizard(MythScreenStack *parent, const char *name = nullptr);
     ~GeneralSetupWizard() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void save(void);
 
@@ -30,22 +30,22 @@ class GeneralSetupWizard : public MythScreenType
     void OnDeletePromptReturn(bool submit);
 
   private:
-    void CreateBusyDialog(QString message);
+    void CreateBusyDialog(const QString& message);
 
-    MythUIButton     *m_submitButton;
-    MythUIButton     *m_viewButton;
-    MythUIButton     *m_deleteButton;
+    MythUIButton     *m_submitButton    {nullptr};
+    MythUIButton     *m_viewButton      {nullptr};
+    MythUIButton     *m_deleteButton    {nullptr};
 
-    MythUIButton     *m_nextButton;
-    MythUIButton     *m_cancelButton;
+    MythUIButton     *m_nextButton      {nullptr};
+    MythUIButton     *m_cancelButton    {nullptr};
 
-    MythUIText       *m_profileLocation;
-    MythUIText       *m_adminPassword;
+    MythUIText       *m_profileLocation {nullptr};
+    MythUIText       *m_adminPassword   {nullptr};
 
-    MythScreenStack  *m_popupStack;
-    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack      {nullptr};
+    MythUIBusyDialog *m_busyPopup       {nullptr};
 
-    HardwareProfile  *m_hardwareProfile;
+    HardwareProfile  *m_hardwareProfile {nullptr};
 
   private slots:
     void loadData(void);

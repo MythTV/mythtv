@@ -40,220 +40,212 @@ const size_t MAX_HISTORY_SIZE = 1024;
 class SequenceBase
 {
 public:
-    SequenceBase()
-    : len(0), idx(0)
-    { }
-
+    SequenceBase() = default;
     virtual ~SequenceBase() = default;
 
     virtual void set(size_t _idx) = 0;
 
     virtual void extend(size_t items)
     {
-        len += items;
+        m_len += items;
     }
 
     size_t next()
     {
-        ++idx;
-        if (idx == len)
+        ++m_idx;
+        if (m_idx == m_len)
         {
-            idx = 0;
+            m_idx = 0;
         }
         return get();
     }
 
     size_t prev()
     {
-        if (idx == 0)
+        if (m_idx == 0)
         {
-            idx = len;
+            m_idx = m_len;
         }
-        --idx;
+        --m_idx;
         return get();
     }
 
 protected:
     virtual size_t get() = 0;
 
-    size_t  len;
-    size_t  idx;
+    size_t  m_len {0};
+    size_t  m_idx {0};
 };
 
 class SequenceInc : public SequenceBase
 {
 protected:
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceBase
     {
-        idx = _idx;
+        m_idx = _idx;
     }
 
-    virtual size_t get() { return idx; }
+    size_t get() override // SequenceBase
+    { return m_idx; }
 };
 
 class SequenceDec : public SequenceBase
 {
 protected:
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceBase
     {
-        idx = len - _idx - 1;
+        m_idx = m_len - _idx - 1;
     }
 
-    virtual size_t get()
+    size_t get() override // SequenceBase
     {
-        return len - idx - 1;
+        return m_len - m_idx - 1;
     }
 };
 
 class SequenceRandomBase : public SequenceBase
 {
 public:
-    SequenceRandomBase()
-    : eviction_idx(0)
-    { }
+    SequenceRandomBase() = default;
 
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceBase
     {
-        size_t seq_idx = (idx + 1) % seq.size();
-        seq[seq_idx] = _idx;
+        size_t seq_idx = (m_idx + 1) % m_seq.size();
+        m_seq[seq_idx] = _idx;
     }
 
-    virtual void extend(size_t items)
+    void extend(size_t items) override // SequenceBase
     {
-        size_t extension = std::min(len + items, MAX_HISTORY_SIZE) - len;
+        size_t extension = std::min(m_len + items, MAX_HISTORY_SIZE) - m_len;
         SequenceBase::extend(extension);
-        vector<ssize_t>::iterator insertion_iter = seq.begin();
-        std::advance(insertion_iter, eviction_idx);
-        seq.insert(insertion_iter, extension, -1);
-        if (idx > eviction_idx)
+        vector<ssize_t>::iterator insertion_iter = m_seq.begin();
+        std::advance(insertion_iter, m_eviction_idx);
+        m_seq.insert(insertion_iter, extension, -1);
+        if (m_idx > m_eviction_idx)
         {
-            idx += extension;
+            m_idx += extension;
         }
-        eviction_idx += extension;
-        if (eviction_idx == len && len > 0)
+        m_eviction_idx += extension;
+        if (m_eviction_idx == m_len && m_len > 0)
         {
-            eviction_idx = (idx + 1) % len;
+            m_eviction_idx = (m_idx + 1) % m_len;
         }
     }
 
 protected:
-    virtual size_t get()
+    size_t get() override // SequenceBase
     {
-        if (idx == eviction_idx)
+        if (m_idx == m_eviction_idx)
         {
             // The end was reached from the left.
-            evict(eviction_idx);
-            ++eviction_idx;
-            if (eviction_idx == len)
+            evict(m_eviction_idx);
+            ++m_eviction_idx;
+            if (m_eviction_idx == m_len)
             {
-                eviction_idx = 0;
+                m_eviction_idx = 0;
             }
         }
-        else if (len > 0 && idx == (eviction_idx + 1) % len)
+        else if (m_len > 0 && m_idx == (m_eviction_idx + 1) % m_len)
         {
             // The end was reached from the right.
-            evict(eviction_idx + 1);
-            if (eviction_idx == 0)
+            evict(m_eviction_idx + 1);
+            if (m_eviction_idx == 0)
             {
-                eviction_idx = len;
+                m_eviction_idx = m_len;
             }
-            --eviction_idx;
+            --m_eviction_idx;
         }
 
-        size_t seq_idx = idx % seq.size();
-        if (seq[seq_idx] == -1)
+        size_t seq_idx = m_idx % m_seq.size();
+        if (m_seq[seq_idx] == -1)
         {
-            seq[seq_idx] = create();
+            m_seq[seq_idx] = create();
         }
-        return seq[seq_idx];
+        return m_seq[seq_idx];
     }
 
     virtual void evict(size_t i)
     {
         // Evict portions of the history that are far away.
-        seq[i] = -1;
+        m_seq[i] = -1;
     }
 
     virtual size_t create() = 0;
 
-    vector<ssize_t> seq;
-    size_t eviction_idx;
+    vector<ssize_t> m_seq;
+    size_t          m_eviction_idx {0};
 };
 
 class SequenceRandom : public SequenceRandomBase
 {
 public:
     SequenceRandom()
-    : items(0)
     {
         SequenceRandomBase::extend(MAX_HISTORY_SIZE);
     }
 
-    virtual void extend(size_t _items)
+    void extend(size_t _items) override // SequenceRandomBase
     {
-        items += _items;
+        m_items += _items;
         // The parent len was already extended enough, so it is not called.
     }
 
 protected:
-    virtual size_t create()
+    size_t create() override // SequenceRandomBase
     {
-        return (size_t)(((double)random()) * items / RAND_MAX);
+        return (size_t)(((double)random()) * m_items / RAND_MAX);
     }
 
-    size_t items;
+    size_t m_items {0};
 };
 
 class SequenceShuffle : public SequenceRandomBase
 {
 public:
-    SequenceShuffle()
-    : unseen(0)
-    { }
+    SequenceShuffle() = default;
 
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceRandomBase
     {
-        size_t seq_idx = (idx + 1) % seq.size();
+        size_t seq_idx = (m_idx + 1) % m_seq.size();
         evict(seq_idx);
-        ++eviction_idx;
-        if (eviction_idx == len)
+        ++m_eviction_idx;
+        if (m_eviction_idx == m_len)
         {
-            eviction_idx = 0;
+            m_eviction_idx = 0;
         }
-        if (map[_idx])
+        if (m_map[_idx])
         {
-            vector<ssize_t>::iterator old_iter = std::find(seq.begin(),
-                seq.end(), _idx);
-            if (old_iter != seq.end())
+            auto old_iter = std::find(m_seq.begin(), m_seq.end(), _idx);
+            if (old_iter != m_seq.end())
                 *old_iter = -1;
         }
         else
         {
-            map[_idx] = true;
-            --unseen;
+            m_map[_idx] = true;
+            --m_unseen;
         }
         SequenceRandomBase::set(_idx);
     }
 
-    virtual void extend(size_t items)
+    void extend(size_t items) override // SequenceRandomBase
     {
         SequenceRandomBase::extend(items);
-        map.resize(len, 0);
-        unseen += items;
+        m_map.resize(m_len, 0);
+        m_unseen += items;
     }
 
 protected:
-    virtual size_t create()
+    size_t create() override // SequenceRandomBase
     {
-        size_t unseen_idx = (size_t)(((double)random()) * unseen / RAND_MAX);
+        size_t unseen_idx = (size_t)(((double)random()) * m_unseen / RAND_MAX);
         for (size_t i = 0; ; ++i)
         {
-            if (!map[i])
+            if (!m_map[i])
             {
                 if (!unseen_idx)
                 {
-                    map[i] = true;
-                    --unseen;
+                    m_map[i] = true;
+                    --m_unseen;
                     return i;
                 }
                 --unseen_idx;
@@ -261,53 +253,51 @@ protected:
         }
     }
 
-    virtual void evict(size_t i)
+    void evict(size_t i) override // SequenceRandomBase
     {
-        ssize_t evicted = seq[i];
+        ssize_t evicted = m_seq[i];
         if (evicted != -1)
         {
-            map[evicted] = false;
-            ++unseen;
+            m_map[evicted] = false;
+            ++m_unseen;
         }
         SequenceRandomBase::evict(i);
     }
 
-    vector<bool> map;
-    size_t unseen;
+    vector<bool> m_map;
+    size_t       m_unseen {0};
 };
 
 class SequenceWeighted : public SequenceRandom
 {
 public:
-    SequenceWeighted()
-    : weightCursor(0), totalWeight(0)
-    { }
+    SequenceWeighted() = default;
 
-    virtual void extend(size_t items)
+    void extend(size_t items) override // SequenceRandom
     {
-        weights.resize(weights.size() + items, totalWeight);
+        m_weights.resize(m_weights.size() + items, m_totalWeight);
         SequenceRandom::extend(items);
     }
 
     void add(double weight)
     {
-        totalWeight += weight;
-        weights[weightCursor++] = totalWeight;
+        m_totalWeight += weight;
+        m_weights[m_weightCursor++] = m_totalWeight;
     }
 
 protected:
-    virtual size_t create()
+    size_t create() override // SequenceRandom
     {
-        double slot = (((double)random()) * totalWeight / RAND_MAX);
+        double slot = (((double)random()) * m_totalWeight / RAND_MAX);
         vector<double>::iterator slot_iter = std::upper_bound(
-            weights.begin(), weights.end(), slot);
-        size_t slot_idx = std::distance(weights.begin(), slot_iter);
+            m_weights.begin(), m_weights.end(), slot);
+        size_t slot_idx = std::distance(m_weights.begin(), slot_iter);
         return slot_idx;
     }
 
-    vector<double> weights;
-    size_t weightCursor;
-    double totalWeight;
+    vector<double> m_weights;
+    size_t         m_weightCursor {0};
+    double         m_totalWeight  {0.0};
 };
 
 #endif // ndef SEQUENCE_H

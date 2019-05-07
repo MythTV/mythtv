@@ -16,7 +16,8 @@ class MythUIShape;
 class MUI_PUBLIC MythUIEditBar : public MythUIType
 {
   public:
-    MythUIEditBar(MythUIType *parent, const QString &name);
+    MythUIEditBar(MythUIType *parent, const QString &name)
+        : MythUIType(parent, name) {}
    ~MythUIEditBar() = default;
 
     void SetTotal(double total);
@@ -30,9 +31,9 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
     void ReleaseImages(void);
 
   protected:
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
   private:
 
@@ -42,8 +43,8 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
     void CalcInverseRegions(void);
     void ClearImages(void);
 
-    float  m_editPosition;
-    double m_total;
+    float  m_editPosition {0.0F};
+    double m_total        {1.0};
     QList<QPair<float,float> > m_regions;
     QList<QPair<float,float> > m_invregions;
     QList<MythUIType*> m_images;

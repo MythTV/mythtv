@@ -17,6 +17,58 @@ class MythUIText;
 class VideoMetadata;
 class VideoList;
 
+enum GenreFilter {
+    kGenreFilterAll = -1,
+    kGenreFilterUnknown = 0
+};
+
+enum CountryFilter {
+    kCountryFilterAll = -1,
+    kCountryFilterUnknown = 0
+};
+
+enum CastFilter {
+    kCastFilterAll = -1,
+    kCastFilterUnknown = 0
+};
+
+enum CategoryFilter {
+    kCategoryFilterAll = -1,
+    kCategoryFilterUnknown = 0
+};
+
+enum YearFilter {
+    kYearFilterAll = -1,
+    kYearFilterUnknown = 0
+};
+
+enum RuntimeFilter {
+    kRuntimeFilterAll = -2,
+    kRuntimeFilterUnknown = -1
+};
+
+enum UserRatingFilter {
+    kUserRatingFilterAll = -1
+};
+
+enum BrowseFilter {
+    kBrowseFilterAll = -1
+};
+
+enum WatchedFilter {
+    kWatchedFilterAll = -1
+};
+
+enum InetRefFilter {
+    kInetRefFilterAll = -1,
+    kInetRefFilterUnknown = 0
+};
+
+enum CoverFileFilter {
+    kCoverFileFilterAll = -1,
+    kCoverFileFilterNone = 0
+};
+
 class VideoFilterSettings
 {
      Q_DECLARE_TR_FUNCTIONS(VideoFilterSettings);
@@ -48,8 +100,7 @@ class VideoFilterSettings
     VideoFilterSettings &operator=(const VideoFilterSettings &rhs);
 
     bool matches_filter(const VideoMetadata &mdata) const;
-    bool meta_less_than(const VideoMetadata &lhs, const VideoMetadata &rhs,
-                        bool sort_ignores_case) const;
+    bool meta_less_than(const VideoMetadata &lhs, const VideoMetadata &rhs) const;
 
     void saveAsDefault();
 
@@ -67,78 +118,78 @@ class VideoFilterSettings
         kOrderByDateAddedDescending = 7
     };
 
-    int GetCategory() const { return category; }
+    int GetCategory() const { return m_category; }
     void SetCategory(int lcategory)
     {
         m_changed_state |= kFilterCategoryChanged;
-        category = lcategory;
+        m_category = lcategory;
     }
 
-    int getGenre() const { return genre; }
+    int getGenre() const { return m_genre; }
     void setGenre(int lgenre)
     {
         m_changed_state |= kFilterGenreChanged;
-        genre = lgenre;
+        m_genre = lgenre;
     }
 
-    int GetCast() const { return cast; }
+    int GetCast() const { return m_cast; }
     void SetCast(int lcast)
     {
         m_changed_state |= kFilterCastChanged;
-        cast = lcast;
+        m_cast = lcast;
     }
 
-    int getCountry() const { return country; }
+    int getCountry() const { return m_country; }
     void setCountry(int lcountry)
     {
         m_changed_state |= kFilterCountryChanged;
-        country = lcountry;
+        m_country = lcountry;
     }
 
-    int getYear() const { return year; }
+    int getYear() const { return m_year; }
     void SetYear(int lyear)
     {
         m_changed_state |= kFilterYearChanged;
-        year = lyear;
+        m_year = lyear;
     }
 
-    int getRuntime() const { return runtime; }
+    int getRuntime() const { return m_runtime; }
     void setRuntime(int lruntime)
     {
         m_changed_state |= kFilterRuntimeChanged;
-        runtime = lruntime;
+        m_runtime = lruntime;
     }
 
-    int GetUserRating() const { return userrating; }
+    int GetUserRating() const { return m_userrating; }
     void SetUserRating(int luserrating)
     {
         m_changed_state |= kFilterUserRatingChanged;
-        userrating = luserrating;
+        m_userrating = luserrating;
     }
 
-    int GetBrowse() const {return browse; }
+    int GetBrowse() const {return m_browse; }
     void SetBrowse(int lbrowse)
     {
         m_changed_state |= kFilterBrowseChanged;
-        browse = lbrowse;
+        m_browse = lbrowse;
     }
 
-    int GetWatched() const {return watched; }
+    int GetWatched() const {return m_watched; }
     void SetWatched(int lwatched)
     {
         m_changed_state |= kFilterWatchedChanged;
-        watched = lwatched;
+        m_watched = lwatched;
     }
 
-    ordering getOrderby() const { return orderby; }
+    ordering getOrderby() const { return m_orderby; }
     void setOrderby(ordering lorderby)
     {
         m_changed_state |= kSortOrderChanged;
-        orderby = lorderby;
+        m_orderby = lorderby;
     }
 
-    QString getTextFilter() const { return textfilter; }
-    void setTextFilter(QString val);
+    QString getTextFilter() const { return m_textfilter; }
+    void setTextFilter(const QString& val);
 
     ParentalLevel::Level getParentalLevel() const { return m_parental_level; }
     void setParentalLevel(ParentalLevel::Level parental_level)
@@ -169,29 +220,28 @@ class VideoFilterSettings
     }
 
   private:
-    int category;
-    int genre;
-    int country;
-    int cast;
-    int year;
-    int runtime;
-    int userrating;
-    int browse;
-    int watched;
-    int m_inetref;
-    int m_coverfile;
-    ordering orderby;
-    ParentalLevel::Level m_parental_level;
-    QString prefix;
-    QString textfilter;
-    int season;
-    int episode;
-    QDate insertdate;
-    const QRegExp re_season;
-    const QRegExp re_date;
+    int                  m_category       {kCategoryFilterAll};
+    int                  m_genre          {kGenreFilterAll};
+    int                  m_country        {kCountryFilterAll};
+    int                  m_cast           {kCastFilterAll};
+    int                  m_year           {kYearFilterAll};
+    int                  m_runtime        {kRuntimeFilterAll};
+    int                  m_userrating     {kUserRatingFilterAll};
+    int                  m_browse         {kBrowseFilterAll};
+    int                  m_watched        {kWatchedFilterAll};
+    int                  m_inetref        {kInetRefFilterAll};
+    int                  m_coverfile      {kCoverFileFilterAll};
+    ordering             m_orderby        {kOrderByTitle};
+    ParentalLevel::Level m_parental_level {ParentalLevel::plNone};
+    QString              m_prefix;
+    QString              m_textfilter;
+    int                  m_season         {-1};
+    int                  m_episode        {-1};
+    QDate                m_insertdate;
+    const QRegExp        m_re_season      {"(\\d+)[xX](\\d*)"};
+    const QRegExp        m_re_date        {"-(\\d+)([dmw])"};
 
-
-    unsigned int m_changed_state;
+    unsigned int         m_changed_state  {0};
 };
 
 struct FilterSettingsProxy
@@ -207,12 +257,12 @@ class BasicFilterSettingsProxy : public FilterSettingsProxy
   public:
     explicit BasicFilterSettingsProxy(T &type) : m_type(type) {}
 
-    const VideoFilterSettings &getSettings()
+    const VideoFilterSettings &getSettings() override // FilterSettingsProxy
     {
         return m_type.getCurrentVideoFilter();
     }
 
-    void setSettings(const VideoFilterSettings &settings)
+    void setSettings(const VideoFilterSettings &settings) override // FilterSettingsProxy
     {
         m_type.setCurrentVideoFilter(settings);
     }
@@ -227,11 +277,11 @@ class VideoFilterDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    VideoFilterDialog( MythScreenStack *lparent, QString lname,
+    VideoFilterDialog( MythScreenStack *lparent, const QString& lname,
                        VideoList *video_list);
     ~VideoFilterDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void filterChanged();
@@ -258,25 +308,25 @@ class VideoFilterDialog : public MythScreenType
     void update_numvideo();
     VideoFilterSettings m_settings;
 
-    MythUIButtonList  *m_browseList;
-    MythUIButtonList  *m_watchedList;
-    MythUIButtonList  *m_orderbyList;
-    MythUIButtonList  *m_yearList;
-    MythUIButtonList  *m_userratingList;
-    MythUIButtonList  *m_categoryList;
-    MythUIButtonList  *m_countryList;
-    MythUIButtonList  *m_genreList;
-    MythUIButtonList  *m_castList;
-    MythUIButtonList  *m_runtimeList;
-    MythUIButtonList  *m_inetrefList;
-    MythUIButtonList  *m_coverfileList;
-    MythUIButton    *m_saveButton;
-    MythUIButton    *m_doneButton;
-    MythUIText      *m_numvideosText;
-    MythUITextEdit    *m_textfilter;
+    MythUIButtonList  *m_browseList     {nullptr};
+    MythUIButtonList  *m_watchedList    {nullptr};
+    MythUIButtonList  *m_orderbyList    {nullptr};
+    MythUIButtonList  *m_yearList       {nullptr};
+    MythUIButtonList  *m_userratingList {nullptr};
+    MythUIButtonList  *m_categoryList   {nullptr};
+    MythUIButtonList  *m_countryList    {nullptr};
+    MythUIButtonList  *m_genreList      {nullptr};
+    MythUIButtonList  *m_castList       {nullptr};
+    MythUIButtonList  *m_runtimeList    {nullptr};
+    MythUIButtonList  *m_inetrefList    {nullptr};
+    MythUIButtonList  *m_coverfileList  {nullptr};
+    MythUIButton      *m_saveButton     {nullptr};
+    MythUIButton      *m_doneButton     {nullptr};
+    MythUIText        *m_numvideosText  {nullptr};
+    MythUITextEdit    *m_textfilter     {nullptr};
 
     const VideoList &m_videoList;
-    FilterSettingsProxy *m_fsp;
+    FilterSettingsProxy *m_fsp          {nullptr};
 };
 
 #endif

@@ -29,10 +29,6 @@
 using namespace std;
 
 
-PlayListFile::PlayListFile(void) : m_version(0)
-{
-}
-
 PlayListFile::~PlayListFile(void)
 {
     clear();
@@ -135,16 +131,16 @@ int PlayListFile::parseASX(PlayListFile *pls, const QString &filename)
     }
     file.close();
 
-    QDomElement docElem = doc.documentElement();
+    //QDomElement docElem = doc.documentElement();
     QDomNodeList entryList = doc.elementsByTagName("Entry");
     QString url;
 
-    for (int x = 0; x < (int) entryList.count(); x++)
+    for (int x = 0; x < entryList.count(); x++)
     {
         QDomNode n = entryList.item(x);
         QDomElement elem = n.toElement();
         QDomNodeList refList = elem.elementsByTagName("ref");
-        for (int y = 0; y < (int) refList.count(); y++)
+        for (int y = 0; y < refList.count(); y++)
         {
             QDomNode n2 = refList.item(y);
             QDomElement elem2 = n2.toElement();

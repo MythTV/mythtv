@@ -1,7 +1,8 @@
 #include "imagemanager.h"
 
-#include <QRunnable>
 #include <QImageReader>
+#include <QRunnable>
+#include <utility>
 
 #include "dbaccess.h"  // for FileAssociations
 #include "mthreadpool.h"
@@ -18,11 +19,11 @@
 #define DB_TABLE "gallery_files"
 
 #define RESULT_ERR(ERR, MESG) \
-{   LOG(VB_GENERAL, LOG_ERR, LOC + MESG); \
-    return QStringList("ERROR") << ERR; }
+{   LOG(VB_GENERAL, LOG_ERR, LOC + (MESG)); \
+    return QStringList("ERROR") << (ERR); }
 
 #define RESULT_OK(MESG) \
-{   LOG(VB_FILE, LOG_DEBUG, LOC + MESG); \
+{   LOG(VB_FILE, LOG_DEBUG, LOC + (MESG)); \
     return QStringList("OK"); }
 
 #define IMPORTDIR "Import"
@@ -48,8 +49,7 @@ public:
         Close();
 
         // Remove imported images
-        if (m_dir)
-            delete m_dir;
+        delete m_dir;
 
         // Clean up non-SG thumbnails
         if (m_mount != STORAGE_GROUP_MOUNT)
@@ -85,7 +85,7 @@ public:
      \brief Clears all files and sub-dirs within a directory
      \param path Dir to clear
     */
-    void RemoveDirContents(QString path)
+    void RemoveDirContents(const QString& path)
     {
         QDir(path).removeRecursively();
     }
@@ -272,7 +272,7 @@ QList<int> DeviceManager::GetAbsentees()
 /*!
  \brief Constructor
 */
-ImageAdapterBase::ImageAdapterBase() : DeviceManager(),
+ImageAdapterBase::ImageAdapterBase() :
     m_imageFileExt(SupportedImages()),
     m_videoFileExt(SupportedVideos())
 {
@@ -334,7 +334,7 @@ QStringList ImageAdapterBase::SupportedVideos()
  \return ImageItem An image object
 */
 ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
-                                         int devId, const QString &) const
+                                         int devId, const QString & /*base*/) const
 {
     ImageItem *im = new ImageItem();
 
@@ -409,7 +409,7 @@ void ImageAdapterLocal::Notify(const QString &mesg,
  \return ImageItem An image object
 */
 ImageItem *ImageAdapterSg::CreateItem(const QFileInfo &fi, int parentId,
-                                      int, const QString &base) const
+                                      int /*devId*/, const QString &base) const
 {
     ImageItem *im = new ImageItem();
 
@@ -524,7 +524,7 @@ ImageItem *ImageDb<FS>::CreateImage(const MSqlQuery &query) const
     im->m_size          = query.value(6).toInt();
     im->m_extension     = query.value(7).toString();
     im->m_date          = query.value(8).toUInt();
-    im->m_isHidden      = query.value(9).toInt();
+    im->m_isHidden      = query.value(9).toBool();
     im->m_orientation   = query.value(10).toInt();
     im->m_userThumbnail = FS::ImageId(query.value(11).toInt());
     im->m_comment       = query.value(12).toString();
@@ -611,7 +611,7 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
         MythDB::DBError(DBLOC, query);
         return -1;
     }
-    else while (query.next())
+    while (query.next())
     {
         ImagePtr im(CreateImage(query));
 
@@ -651,10 +651,10 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
                     "FROM %1 WHERE filename LIKE :PREFIX "
                     "ORDER BY depth;").arg(m_table);
 
-    foreach (const ImagePtr &im, dirs)
+    foreach (const ImagePtr &im1, dirs)
     {
         query.prepare(sql);
-        query.bindValue(":PREFIX", im->m_filePath + "/%");
+        query.bindValue(":PREFIX", im1->m_filePath + "/%");
 
         if (!query.exec())
         {
@@ -664,11 +664,11 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
 
         while (query.next())
         {
-            ImagePtr im(CreateImage(query));
-            if (im->IsDirectory())
-                dirs.append(im);
+            ImagePtr im2(CreateImage(query));
+            if (im2->IsDirectory())
+                dirs.append(im2);
             else
-                files.append(im);
+                files.append(im2);
         }
     }
     return true;
@@ -1125,9 +1125,9 @@ class ReadMetaThread : public QRunnable
 {
 public:
     ReadMetaThread(ImagePtrK im, const QString &path)
-        : QRunnable(), m_im(im), m_path(path) {}
+        : m_im(std::move(im)), m_path(path) {}
 
-    void run()
+    void run() override // QRunnable
     {
         QStringList tags;
         QString     orientation, size;
@@ -1357,7 +1357,7 @@ QStringList ImageHandler<DBFS>::HandleDbCreate(QStringList defs) const
 
         im.m_type          = aDef[1].toInt();
         im.m_filePath      = aDef[2];
-        im.m_isHidden      = aDef[3].toInt();
+        im.m_isHidden      = (aDef[3].toInt() != 0);
         im.m_orientation   = aDef[4].toInt();
         im.m_userThumbnail = idMap.value(aDef[5]);
 
@@ -1819,7 +1819,7 @@ int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
  \param[in,out] dirs List of dirs, filtered & ordered iaw current settings.
  \return int Number of images
 */
-int ImageDbReader::GetImages(ImageIdList ids,
+int ImageDbReader::GetImages(const ImageIdList& ids,
                              ImageList &files, ImageList &dirs) const
 {
     // Ids are either all local or all remote. GALLERY_DB_ID not valid
@@ -1920,9 +1920,9 @@ void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
 
 
 //! Backend Gallery instance
-ImageManagerBe *ImageManagerBe::m_instance = nullptr;
+ImageManagerBe *ImageManagerBe::s_instance = nullptr;
 //! Frontend Gallery instance
-ImageManagerFe *ImageManagerFe::m_instance = nullptr;
+ImageManagerFe *ImageManagerFe::s_instance = nullptr;
 
 
 /*!
@@ -1931,9 +1931,9 @@ ImageManagerFe *ImageManagerFe::m_instance = nullptr;
 */
 ImageManagerBe* ImageManagerBe::getInstance()
 {
-    if (!m_instance)
-        m_instance = new ImageManagerBe();
-    return m_instance;
+    if (!s_instance)
+        s_instance = new ImageManagerBe();
+    return s_instance;
 }
 
 
@@ -1943,15 +1943,15 @@ ImageManagerBe* ImageManagerBe::getInstance()
 */
 ImageManagerFe& ImageManagerFe::getInstance()
 {
-    if (!m_instance)
+    if (!s_instance)
         // Use saved settings
-        m_instance = new ImageManagerFe
+        s_instance = new ImageManagerFe
                 (gCoreContext->GetNumSetting("GalleryImageOrder"),
                  gCoreContext->GetNumSetting("GalleryDirOrder"),
-                 gCoreContext->GetNumSetting("GalleryShowHidden"),
+                 gCoreContext->GetBoolSetting("GalleryShowHidden"),
                  gCoreContext->GetNumSetting("GalleryShowType"),
                  gCoreContext->GetSetting("GalleryDateFormat"));
-    return *m_instance;
+    return *s_instance;
 }
 
 
@@ -2189,7 +2189,7 @@ QString ImageManagerFe::MakeDir(int parent, const QStringList &names, bool resca
  * \param  name New name of the file/dir (basename only, no path or extension)
  * \return QString Error message, if not empty
  */
-QString ImageManagerFe::RenameFile(ImagePtrK im, const QString &name)
+QString ImageManagerFe::RenameFile(const ImagePtrK& im, const QString &name)
 {
     if (!im->IsLocal())
     {
@@ -2253,7 +2253,7 @@ QString ImageManagerFe::CreateImages(int destId, const ImageListK &images)
  * \param srcPath Original parent path
  * \return QString Error message
  */
-QString ImageManagerFe::MoveDbImages(ImagePtrK destDir, ImageListK &images,
+QString ImageManagerFe::MoveDbImages(const ImagePtrK& destDir, ImageListK &images,
                                      const QString &srcPath)
 {
     QStringList idents;
@@ -2310,7 +2310,7 @@ QString ImageManagerFe::DeleteFiles(const ImageIdList &ids)
  \param im Image or dir
  \return QString Time or date string formatted as per Myth general settings
 */
-QString ImageManagerFe::LongDateOf(ImagePtrK im) const
+QString ImageManagerFe::LongDateOf(const ImagePtrK& im) const
 {
     if (im->m_id == GALLERY_DB_ID)
         return "";
@@ -2344,7 +2344,7 @@ QString ImageManagerFe::LongDateOf(ImagePtrK im) const
  \param im Image or dir
  \return QString Date formatted as per Gallery caption date format.
 */
-QString ImageManagerFe::ShortDateOf(ImagePtrK im) const
+QString ImageManagerFe::ShortDateOf(const ImagePtrK& im) const
 {
     if (im->m_id == GALLERY_DB_ID)
         return "";
@@ -2368,11 +2368,10 @@ QString ImageManagerFe::DeviceCaption(ImageItemK &im) const
 {
     if (im.m_id == GALLERY_DB_ID)
         return tr("Gallery");
-    else if (im.m_id == PHOTO_DB_ID)
+    if (im.m_id == PHOTO_DB_ID)
         return tr("Photographs");
-    else
-        return im.IsLocal() ? DeviceName(im.m_device)
-                            : m_remote->DeviceName(im.m_device);
+    return im.IsLocal() ? DeviceName(im.m_device)
+                        : m_remote->DeviceName(im.m_device);
 }
 
 

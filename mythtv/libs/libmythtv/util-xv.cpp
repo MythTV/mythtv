@@ -74,7 +74,7 @@ void restore_port_attributes(int port, bool clear)
 {
     if (!open_xv_ports.count(port))
         return;
-    if (!open_xv_ports[port].attribs.size())
+    if (open_xv_ports[port].attribs.empty())
         return;
 
     MythXDisplay *disp = open_xv_ports[port].disp;
@@ -168,7 +168,7 @@ bool xv_is_attrib_supported(
                                        port, &attrib_count);
     for (int i = (attributes) ? 0 : attrib_count; i < attrib_count; i++)
     {
-        if (strcmp(attributes[i].name, name))
+        if (strcmp(attributes[i].name, name) != 0)
             continue;
 
         if (min_value)
@@ -211,10 +211,7 @@ bool xv_set_attrib(MythXDisplay *disp, int port, const char *name, int val)
     int ret;
     XLOCK(disp, ret = XvSetPortAttribute(disp->GetDisplay(),
                                          port, xv_atom, val));
-    if (Success != ret)
-        return false;
-
-    return true;
+    return Success == ret;
 }
 
 bool xv_get_attrib(MythXDisplay *disp, int port, const char *name, int &val)
@@ -227,8 +224,5 @@ bool xv_get_attrib(MythXDisplay *disp, int port, const char *name, int &val)
     int ret;
     XLOCK(disp, ret = XvGetPortAttribute(disp->GetDisplay(),
                                          port, xv_atom, &val));
-    if (Success != ret)
-        return false;
-
-    return true;
+    return Success == ret;
 }

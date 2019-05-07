@@ -1019,7 +1019,7 @@ void H264Parser::parse_SPS(uint8_t *sps, uint32_t sps_size,
     GetBitContext gb;
     init_get_bits(&gb, sps, sps_size << 3);
     decode_SPS(&gb);
-    interlaced = !frame_mbs_only_flag;
+    interlaced = (frame_mbs_only_flag == 0);
     max_ref_frames = num_ref_frames;
 }
 
@@ -1124,8 +1124,11 @@ void H264Parser::decode_SEI(GetBitContext *gb)
         {
           case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = get_ue_golomb(gb);
-            exact_match_flag = get_bits1(gb);
-            broken_link_flag = get_bits1(gb);
+            // cppcheck-suppress unreadVariable
+            exact_match_flag = (get_bits1(gb) != 0u);
+            // cppcheck-suppress unreadVariable
+            broken_link_flag = (get_bits1(gb) != 0u);
+            // cppcheck-suppress unreadVariable
             changing_group_slice_idc = get_bits(gb, 2);
             au_contains_keyframe_message = (recovery_frame_cnt == 0);
             if ((size - 12) > 0)
@@ -1288,7 +1291,7 @@ void H264Parser::vui_parameters(GetBitContext * gb)
     {
         unitsInTick = get_bits_long(gb, 32); //num_units_in_tick
         timeScale = get_bits_long(gb, 32);   //time_scale
-        fixedRate = get_bits1(gb);
+        fixedRate = (get_bits1(gb) != 0u);
     }
 }
 
@@ -1399,11 +1402,11 @@ uint H264Parser::aspectRatio(void) const
 
     if (aspect == 0.0)
         return 0;
-    if (fabs(aspect - 1.3333333333333333) < eps)
+    if (fabs(aspect - 1.3333333333333333) < static_cast<double>(eps))
         return 2;
-    if (fabs(aspect - 1.7777777777777777) < eps)
+    if (fabs(aspect - 1.7777777777777777) < static_cast<double>(eps))
         return 3;
-    if (fabs(aspect - 2.21) < eps)
+    if (fabs(aspect - 2.21) < static_cast<double>(eps))
         return 4;
 
     return aspect * 1000000;

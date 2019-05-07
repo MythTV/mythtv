@@ -116,8 +116,6 @@ static inline void qt_socket_getportaddr(struct sockaddr *sa,
     *port = ntohs(sa4->sin_port);
 
     *addr = QHostAddress(ntohl(sa4->sin_addr.s_addr));
-
-    return;
 }
 
 // internal
@@ -911,7 +909,7 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
     if (!isValid())
         return -1;
 
-    if (fd >= static_cast<int>(FD_SETSIZE))
+    if (fd >= FD_SETSIZE)
         return -1;
 
     fd_set fds;
@@ -999,7 +997,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
 
     int r = 0;
 
-    while (done == false)
+    while (!done)
     {
         if (t == Datagram)
         {

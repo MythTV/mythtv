@@ -74,14 +74,14 @@ class UPNP_PUBLIC UPnpCDSRequest
 
         QString           m_sContainerID;
         QString           m_sFilter;
-        uint16_t          m_nStartingIndex;
-        uint16_t          m_nRequestedCount;
+        uint16_t          m_nStartingIndex  {0};
+        uint16_t          m_nRequestedCount {0};
         QString           m_sSortCriteria;
 
         // Browse specific properties
 
         QString           m_sParentId;
-        UPnpCDSBrowseFlag m_eBrowseFlag;
+        UPnpCDSBrowseFlag m_eBrowseFlag     {CDS_BrowseUnknown};
 
         // Search specific properties
 
@@ -90,18 +90,12 @@ class UPNP_PUBLIC UPnpCDSRequest
         QString           m_sSearchClass;
 
         // The device performing the request
-        UPnpCDSClient     m_eClient;
-        double            m_nClientVersion;
+        UPnpCDSClient     m_eClient          {CDS_ClientDefault};
+        double            m_nClientVersion   {0.0};
 
     public:
 
-        UPnpCDSRequest() : m_nStartingIndex ( 0 ),
-                           m_nRequestedCount( 0 ),
-                           m_eBrowseFlag( CDS_BrowseUnknown ),
-                           m_eClient( CDS_ClientDefault ),
-                           m_nClientVersion( 0 )
-        {
-        }
+        UPnpCDSRequest() = default;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -111,19 +105,15 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
     public:
 
         CDSObjects              m_List;
-        UPnPResultCode          m_eErrorCode;
+        UPnPResultCode          m_eErrorCode    {UPnPResult_Success};
         QString                 m_sErrorDesc;
 
-        uint16_t                m_nTotalMatches;
-        uint16_t                m_nUpdateID;
+        uint16_t                m_nTotalMatches {0};
+        uint16_t                m_nUpdateID     {0};
 
     public:
 
-        UPnpCDSExtensionResults() : m_eErrorCode( UPnPResult_Success ),
-                                    m_nTotalMatches(0), 
-                                    m_nUpdateID(0)
-        {
-        }
+        UPnpCDSExtensionResults() = default;
         ~UPnpCDSExtensionResults()
         {
             while (!m_List.isEmpty())
@@ -193,7 +183,7 @@ class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
     };
 
     bool AddShortCut(ShortCutType type, const QString &objectID);
-    QString CreateXML();
+    QString CreateXML() override; // UPnPFeature
 
   private:
     QString TypeToName(ShortCutType type);
@@ -253,13 +243,13 @@ class UPNP_PUBLIC UPnpCDSExtension
                                       const QString &Name,
                                       const QString &Value );
 
-        CDSObject *m_pRoot;
+        CDSObject *m_pRoot {nullptr};
 
     public:
 
         UPnpCDSExtension( QString sName, 
                           QString sExtensionId, 
-                          QString sClass ) : m_pRoot(nullptr)
+                          QString sClass )
         {
             m_sName        = QObject::tr(sName.toLatin1().constData());
             m_sExtensionId = sExtensionId;
@@ -299,7 +289,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         QString                m_sControlUrl;
 
         UPnPFeatureList        m_features;
-        UPnPShortcutFeature      *m_pShortCuts;
+        UPnPShortcutFeature   *m_pShortCuts {nullptr};
 
     private:
 
@@ -319,10 +309,14 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
 
         // Implement UPnpServiceImpl methods that we can
 
-        virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ContentDirectory:4"; }
-        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:ContentDirectory"; }
-        virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
-        virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
+        QString GetServiceType() override // UPnpServiceImpl
+            { return "urn:schemas-upnp-org:service:ContentDirectory:4"; }
+        QString GetServiceId() override // UPnpServiceImpl
+            { return "urn:upnp-org:serviceId:ContentDirectory"; }
+        QString GetServiceControlURL() override // UPnpServiceImpl
+            { return m_sControlUrl.mid( 1 ); }
+        QString GetServiceDescURL() override // UPnpServiceImpl
+            { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
         UPnpCDS( UPnpDevice *pDevice,
@@ -337,9 +331,9 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
                                       const QString &objectID );
         void     RegisterFeature    ( UPnPFeature *feature );
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // Eventing
         
-        virtual bool ProcessRequest( HTTPRequest *pRequest );
+        bool ProcessRequest( HTTPRequest *pRequest ) override; // Eventing
 };
 
 #endif

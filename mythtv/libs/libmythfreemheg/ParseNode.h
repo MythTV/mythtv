@@ -84,8 +84,9 @@ class MHParseSequence: public MHParseNode, public MHOwnPtrSequence<MHParseNode>
 class MHPTagged: public MHParseNode
 {
   public:
-    MHPTagged(int nTag);
-    void AddArg(MHParseNode *pNode);
+    MHPTagged(int nTag)
+        : MHParseNode(PNTagged), m_TagNo(nTag) {}
+    void AddArg(MHParseNode *pArg);
 
     int m_TagNo;
     MHParseSequence m_Args;

@@ -17,11 +17,12 @@ class KeyGrabPopupBox : public MythScreenType
     Q_OBJECT
 
   public:
-    explicit KeyGrabPopupBox(MythScreenStack *parent);
+    explicit KeyGrabPopupBox(MythScreenStack *parent)
+        : MythScreenType (parent, "keygrabberdialog") {}
     ~KeyGrabPopupBox() = default;
 
-    bool keyPressEvent(QKeyEvent *);
-    bool Create(void);
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool Create(void) override; // MythScreenType
 
   signals:
     void HaveResult(QString);
@@ -30,13 +31,13 @@ class KeyGrabPopupBox : public MythScreenType
     void SendResult();
 
   private:
-    bool     m_waitingForKeyRelease;
-    bool     m_keyReleaseSeen;
+    bool     m_waitingForKeyRelease {false};
+    bool     m_keyReleaseSeen       {false};
     QString  m_capturedKey;
 
-    MythUIText   *m_messageText;
-    MythUIButton *m_okButton;
-    MythUIButton *m_cancelButton;
+    MythUIText   *m_messageText     {nullptr};
+    MythUIButton *m_okButton        {nullptr};
+    MythUIButton *m_cancelButton    {nullptr};
 };
 
 #endif // KEYGRABBER_H_

@@ -22,6 +22,7 @@
 #include <mythcoreutil.h>
 #include <mythuitext.h>
 #include <mythuiimage.h>
+#include <mythsorthelper.h>
 
 #include "netsearch.h"
 #include "netcommon.h"
@@ -34,14 +35,7 @@ using namespace std;
 
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
-      m_searchResultList(nullptr),   m_siteList(nullptr),
-      m_search(nullptr),             m_pageText(nullptr),
-      m_noSites(nullptr),            m_progress(nullptr),
-      m_okPopup(nullptr),            m_netSearch(nullptr),
-      m_reply(nullptr),
-      m_currentSearch(QString()),    m_currentGrabber(0),
-      m_currentCmd(QString()),       m_pagenum(0),
-      m_maxpage(0),                  m_mythXML(GetMythXMLURL())
+      m_mythXML(GetMythXMLURL())
 {
 }
 
@@ -386,11 +380,9 @@ void NetSearch::SearchFinished(void)
         m_maxpage = m_pagenum;
     else
     {
-        if (((float)searchresults/returned + 0.999) >=
-            ((int)searchresults/returned + 1))
-            m_maxpage = (searchresults/returned + 1);
-        else
-            m_maxpage = (searchresults/returned);
+        m_maxpage = searchresults / returned; // Whole pages
+        if (searchresults % returned != 0)    // Partial page?
+            m_maxpage++;
     }
     if (m_pageText && m_maxpage > 0 && m_pagenum > 0 && returned > 0)
         m_pageText->SetText(QString("%1 / %2")
@@ -402,7 +394,7 @@ void NetSearch::SearchFinished(void)
     SetFocusWidget(m_searchResultList);
 }
 
-void NetSearch::SearchTimeout(Search *)
+void NetSearch::SearchTimeout(Search * /*item*/)
 {
     CloseBusyPopup();
 
@@ -507,8 +499,12 @@ void NetSearch::SlotItemChanged()
     else if (GetFocusWidget() == m_siteList)
     {
         MythUIButtonListItem *btn = m_siteList->GetItemCurrent();
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        QString title = btn->GetText();
 
-        ResultItem res(btn->GetText(), QString(), QString(),
+        ResultItem res(title, sh->doTitle(title), // title, sortTitle
+                       QString(), QString(), // subtitle, sortSubtitle
+                       QString(), // description
                        QString(), QString(), QString(), QString(),
                        QDateTime(), nullptr, nullptr, -1, QString(), QStringList(),
                        QString(), QStringList(), 0, 0, QString(),
@@ -550,7 +546,7 @@ void NetSearch::customEvent(QEvent *event)
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
         ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-        ThumbnailData *data = tde->thumb;
+        ThumbnailData *data = tde->m_thumb;
 
         if (!data)
             return;

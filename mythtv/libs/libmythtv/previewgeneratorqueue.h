@@ -22,31 +22,29 @@ class QSize;
 class PreviewGenState
 {
   public:
-    PreviewGenState() :
-        gen(nullptr), genStarted(false),
-        attempts(0), lastBlockTime(0) {}
+    PreviewGenState() = default;
 
     /// A pointer to the generator that this state object describes.
-    PreviewGenerator *gen;
+    PreviewGenerator *m_gen           {nullptr};
 
     /// The preview generator for this file is currently running.
-    bool              genStarted;
+    bool              m_genStarted    {false};
 
     /// How many attempts have been made to generate a preview for
     /// this file.
-    uint              attempts;
+    uint              m_attempts      {0};
 
     /// The amount of time (in seconds) that this generator was
     /// blocked before it could start. Initialized to zero.
-    uint              lastBlockTime;
+    uint              m_lastBlockTime {0};
 
     /// Any request to generate an image will be ignored until after
     /// this time.
-    QDateTime         blockRetryUntil;
+    QDateTime         m_blockRetryUntil;
 
     /// The full set of tokens for all callers that have requested
     /// this preview.
-    QSet<QString>     tokens;
+    QSet<QString>     m_tokens;
 };
 typedef QMap<QString,PreviewGenState> PreviewMap;
 
@@ -87,14 +85,14 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
      *            some indexing.  A token isn't required, but is strongly
      *            suggested.
      */
-    static void GetPreviewImage(const ProgramInfo &pginfo, QString token)
+    static void GetPreviewImage(const ProgramInfo &pginfo, const QString& token)
     {
         GetPreviewImage(pginfo, QSize(0,0), "", -1, true, token);
     }
     static void GetPreviewImage(const ProgramInfo&, const QSize&,
                                 const QString &outputfile,
                                 long long time, bool in_seconds,
-                                QString token);
+                                const QString& token);
     static void AddListener(QObject*);
     static void RemoveListener(QObject*);
 
@@ -106,21 +104,21 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize&,
                                  const QString &outputfile,
                                  long long time, bool in_seconds,
-                                 QString token);
+                                 const QString& token);
 
-    void GetInfo(const QString &key, uint &queue_depth, uint &preview_tokens);
+    void GetInfo(const QString &key, uint &queue_depth, uint &token_cnt);
     void SetPreviewGenerator(const QString &key, PreviewGenerator *g);
-    void IncPreviewGeneratorPriority(const QString &key, QString token);
+    void IncPreviewGeneratorPriority(const QString &key, const QString& token);
     void UpdatePreviewGeneratorThreads(void);
     bool IsGeneratingPreview(const QString &key) const;
     uint IncPreviewGeneratorAttempts(const QString &key);
     void ClearPreviewGeneratorAttempts(const QString &key);
 
-    virtual bool event(QEvent *e); // QObject
+    bool event(QEvent *e) override; // QObject
 
     void SendEvent(const ProgramInfo &pginfo,
                    const QString     &eventname,
-                   const QString     &fn,
+                   const QString     &filename,
                    const QString     &token,
                    const QString     &msg,
                    const QDateTime   &dt);
@@ -145,10 +143,10 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     /// processed is the one at the *back* of the queue.
     QStringList            m_queue;
     /// The number of threads currently generating previews.
-    uint                   m_running;
+    uint                   m_running    {0};
     /// The maximum number of threads that may concurrently generate
     /// previews.
-    uint                   m_maxThreads;
+    uint                   m_maxThreads {2};
     /// How many times total will the code attempt to generate a
     /// preview for a specific file, before giving up and ignoring all
     /// future requests.

@@ -37,7 +37,6 @@ using namespace std;
 // MythTV headers
 #include "mythmediamonitor.h"
 #include "mediamonitor-unix.h"
-#include "mythdialogs.h"
 #include "mythconfig.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
@@ -117,7 +116,7 @@ static void statError(const QString &methodName, const QString &devPath)
 
 MediaMonitorUnix::MediaMonitorUnix(QObject* par,
                                    unsigned long interval, bool allowEject)
-                : MediaMonitor(par, interval, allowEject), m_fifo(-1)
+                : MediaMonitor(par, interval, allowEject)
 {
     CheckFileSystemTable();
     CheckMountable();
@@ -159,10 +158,7 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
 
     endfsent();
 
-    if (m_Devices.isEmpty())
-        return false;
-
-    return true;
+    return !m_Devices.isEmpty();
 #else
     return false;
 #endif
@@ -216,8 +212,8 @@ bool MediaMonitorUnix::CheckMountable(void)
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "UDisks2 service found. Media Monitor does not support this yet!");
                 return false;
-            } else
-                continue;
+            }
+            continue;
         }
 
         // Enumerate devices
@@ -259,7 +255,7 @@ bool MediaMonitorUnix::CheckMountable(void)
                 else
                     pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
-                if (pDevice && !AddDevice(pDevice))
+                if (pDevice && !MediaMonitorUnix::AddDevice(pDevice))
                     pDevice->deleteLater();
             }
         }
@@ -712,7 +708,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         pDevice->setMountPath(mep->fs_file);
         if (pDevice->testMedia() == MEDIAERR_OK)
         {
-            if (AddDevice(pDevice))
+            if (MediaMonitorUnix::AddDevice(pDevice))
                 return true;
         }
         pDevice->deleteLater();
@@ -726,7 +722,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 /*
  * DBus UDisk AddDevice handler
  */
-void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
+void MediaMonitorUnix::deviceAdded( const QDBusObjectPath& o)
 {
     LOG(VB_MEDIA, LOG_INFO, LOC + ":deviceAdded " + o.path());
 
@@ -749,7 +745,7 @@ void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
 /*
  * DBus UDisk RemoveDevice handler
  */
-void MediaMonitorUnix::deviceRemoved( QDBusObjectPath o)
+void MediaMonitorUnix::deviceRemoved( const QDBusObjectPath& o)
 {
     LOG(VB_MEDIA, LOG_INFO, LOC + "deviceRemoved " + o.path());
 #if 0 // This fails because the DeviceFile has just been deleted

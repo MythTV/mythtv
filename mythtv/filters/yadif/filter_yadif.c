@@ -79,7 +79,7 @@ typedef struct ThisFilter
     int8_t got_frames[4];
 
     void (*filter_line)(struct ThisFilter *p, uint8_t *dst,
-                        uint8_t *prev, uint8_t *cur, uint8_t *next,
+                        const uint8_t *prev, const uint8_t *cur, const uint8_t *next,
                         int w, int refs, int parity);
     int mode;
     int width;
@@ -228,7 +228,7 @@ static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
             "movq      %%mm3, %%mm1 \n\t"
 
 static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
-                             uint8_t *prev, uint8_t *cur, uint8_t *next,
+                             const uint8_t *prev, const uint8_t *cur, const uint8_t *next,
                              int w, int refs, int parity)
 {
     static const uint64_t pw_1 = 0x0001000100010001ULL;
@@ -390,13 +390,13 @@ static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
 #endif /* HAVE_MMX && defined(NAMED_ASM_ARGS) */
 
 static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
-                          uint8_t *prev, uint8_t *cur, uint8_t *next,
+                          const uint8_t *prev, const uint8_t *cur, const uint8_t *next,
                           int w, int refs, int parity)
 {
     (void) p;
     int x;
-    uint8_t *prev2= parity ? prev : cur ;
-    uint8_t *next2= parity ? cur  : next;
+    const uint8_t *prev2= parity ? prev : cur ;
+    const uint8_t *next2= parity ? cur  : next;
     for (x=0; x<w; x++)
     {
         int c= cur[-refs];
@@ -409,14 +409,15 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
         int spatial_pred= (c+e)>>1;
         int spatial_score= ABS(cur[-refs-1] - cur[+refs-1]) + ABS(c-e)
                          + ABS(cur[-refs+1] - cur[+refs+1]) - 1;
+        int score;
 
 #define CHECK(j)\
-    {   int score= ABS(cur[-refs-1+j] - cur[+refs-1-j])\
-                 + ABS(cur[-refs  +j] - cur[+refs  -j])\
-                 + ABS(cur[-refs+1+j] - cur[+refs+1-j]);\
+    {   score= ABS(cur[-refs-1+(j)] - cur[+refs-1-(j)])\
+                 + ABS(cur[-refs  +(j)] - cur[+refs  -(j)])\
+                 + ABS(cur[-refs+1+(j)] - cur[+refs+1-(j)]);\
         if (score < spatial_score){\
             spatial_score= score;\
-            spatial_pred= (cur[-refs  +j] + cur[+refs  -j])>>1;\
+            spatial_pred= (cur[-refs  +(j)] + cur[+refs  -(j)])>>1;\
 
         CHECK(-1) CHECK(-2) }} }}
         CHECK( 1) CHECK( 2) }} }}
@@ -444,7 +445,7 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
 }
 
 static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
-                        int dst_stride[3], int width, int height, int parity,
+                        const int dst_stride[3], int width, int height, int parity,
                         int tff, int this_slice, int total_slices)
 {
     if (total_slices < 1)
@@ -478,8 +479,8 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
                 uint8_t *prev= &p->ref[nr_p][i][y*refs];
                 uint8_t *cur = &p->ref[nr_c][i][y*refs];
                 uint8_t *next= &p->ref[2][i][y*refs];
-                uint8_t *dst2= dst + dst_offsets[i] + y*dst_stride[i];
-                p->filter_line(p, dst2, prev, cur, next, w, refs, field);
+                uint8_t *dst2a= dst + dst_offsets[i] + y*dst_stride[i];
+                p->filter_line(p, dst2a, prev, cur, next, w, refs, field);
             }
             else
             {
@@ -591,11 +592,10 @@ static void *YadifThread(void *args)
 
 static VideoFilter * YadifDeintFilter(VideoFrameType inpixfmt,
                                       VideoFrameType outpixfmt,
-                                      int *width, int *height, char *options,
+                                      const int *width, const int *height, const char *options,
                                       int threads)
 {
     ThisFilter *filter;
-    (void) height;
     (void) options;
 
     fprintf(stderr, "YadifDeint: In-Pixformat = %d Out-Pixformat=%d\n",

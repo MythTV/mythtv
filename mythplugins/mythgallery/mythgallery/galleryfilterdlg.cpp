@@ -42,24 +42,19 @@ class FilterScanThread : public MThread
 {
   public:
     FilterScanThread(const QString& dir, const GalleryFilter& flt,
-                     int *dirCount, int *imageCount, int *movieCount);
-    virtual void run();
+                     int *dirCount, int *imageCount, int *movieCount)
+        : MThread("FilterScan"), m_filter(flt), m_dir(dir),
+          m_dirCount(dirCount), m_imgCount(imageCount),
+          m_movCount(movieCount) {}
+    void run() override; // MThread
 
   private:
     GalleryFilter m_filter;
     QString m_dir;
-    int *m_dirCount;
-    int *m_imgCount;
-    int *m_movCount;
+    int *m_dirCount {nullptr};
+    int *m_imgCount {nullptr};
+    int *m_movCount {nullptr};
 };
-
-FilterScanThread::FilterScanThread(const QString& dir, const GalleryFilter& flt,
-                                   int *dirCount, int *imageCount,
-                                   int *movieCount) :
-    MThread("FilterScan"), m_filter(flt), m_dir(dir), m_dirCount(dirCount),
-    m_imgCount(imageCount), m_movCount(movieCount)
-{
-}
 
 void FilterScanThread::run()
 {
@@ -71,12 +66,9 @@ void FilterScanThread::run()
     RunEpilog();
 }
 
-GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
+GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, const QString& name,
                                          GalleryFilter *filter)
-            : MythScreenType(parent, name),
-            m_dirFilter(nullptr), m_typeFilter(nullptr), m_numImagesText(nullptr),
-            m_sortList(nullptr), m_checkButton(nullptr), m_saveButton(nullptr),
-            m_doneButton(nullptr)
+    : MythScreenType(parent, name)
 {
     m_settingsOriginal = filter;
     m_settingsOriginal->dumpFilter("GalleryFilterDialog:ctor (original)");
@@ -84,7 +76,6 @@ GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
     *m_settingsTemp = *filter;
     m_settingsTemp->dumpFilter("GalleryFilterDialog:ctor (temporary)");
     m_photoDir = gCoreContext->GetSetting("GalleryDir", "");
-    m_scanning = false;
 }
 
 GalleryFilterDialog::~GalleryFilterDialog()
@@ -180,10 +171,7 @@ void GalleryFilterDialog::updateFilter()
         m_numImagesText->SetText(tr("-- please be patient --"));
         return;
     }
-    else
-    {
-        m_scanning = true;
-    }
+    m_scanning = true;
 
     int dir_count = 0;
     int img_count = 0;
@@ -264,7 +252,7 @@ void GalleryFilterDialog::saveAndExit()
 
     m_settingsOriginal->dumpFilter("GalleryFilterDialog::saveAndExit()");
 
-    if (m_settingsOriginal->getChangedState() > 0)
+    if (m_settingsOriginal->getChangedState())
         emit filterChanged();
 
     Close();

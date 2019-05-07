@@ -18,7 +18,7 @@ public:
                     bool SuperMount, bool AllowEject):
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {};
 
-    virtual void setDeviceSpeed(const char *device, int speed);
+    void setDeviceSpeed(const char *device, int speed) override; // MythMediaDevice
 };
 
 MythCDROM *GetMythCDROMDarwin(QObject* par, const char* devicePath,

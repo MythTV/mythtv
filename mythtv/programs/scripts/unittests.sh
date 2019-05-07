@@ -21,7 +21,7 @@ do
     RUNNABLE=$FPATH/$EXEC
     if test -x $RUNNABLE -a -f $RUNNABLE ; then
         if ./$RUNNABLE ; then
-            if test -x $GCOV -a -f $FPATH/$COVGCNO ; then
+            if test -x "$GCOV" -a -f $FPATH/$COVGCNO ; then
                 P=`pwd` ; cd $FPATH # pushd==
                 LINES=`$GCOV $COV | $GREP Lines | $SED -e 's/Lines//'`
                 echo Coverage: $COV $LINES. See $FPATH/$COV.gcov for details

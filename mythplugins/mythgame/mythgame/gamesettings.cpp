@@ -1,27 +1,50 @@
 #include <QCoreApplication>
 
-#include <mythcontext.h>
 #include <mythdb.h>
 #include <mythdirs.h>
 
 #include "gamesettings.h"
 
-const QString GetGameTypeName(const QString &GameType)
+struct GameTypes {
+    QString   nameStr;
+    QString   idStr;
+    QString   extensions;
+};
+
+#define MAX_GAME_TYPES 12
+
+const GameTypes GameTypeList[MAX_GAME_TYPES] =
+{
+    { QT_TRANSLATE_NOOP("(GameTypes)", "OTHER"),   "OTHER",  "" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "AMIGA"),   "AMIGA",  "adf,ipf" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "ATARI"),   "ATARI",  "bin,a26" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "GAMEGEAR"),    "GAMEGEAR",   "gg" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "MAME"),    "MAME",   "" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "N64"),     "N64",    "v64,n64" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "NES"),     "NES",    "zip,nes" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "PC GAME"), "PC",     "" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "PCE/TG16"),"PCE",    "pce" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "SEGA/MASTER SYSTEM"), "SEGA", "sms" },
+    { QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
+};
+
+QString GetGameTypeName(const QString &GameType)
 {
     QString result = "";
 
     for (int i = 0; i < MAX_GAME_TYPES; i++)
     {
         if (GameTypeList[i].idStr == GameType) {
-            result = QCoreApplication::translate("(GameTypes)", 
-                         GameTypeList[i].nameStr.toUtf8());
+            result = QCoreApplication::translate("(GameTypes)",
+                                                 GameTypeList[i].nameStr.toUtf8());
             break;
         }
     }
     return result;
 }
 
-const QString GetGameTypeExtensions(const QString &GameType)
+QString GetGameTypeExtensions(const QString &GameType)
 {
     QString result = "";
 
@@ -35,55 +58,60 @@ const QString GetGameTypeExtensions(const QString &GameType)
     return result;
 }
 
+// -----------------------------------------------------------------------
+
 // General Settings
+#undef TR
+#define TR GameGeneralSettings::tr
+
 static HostTextEditSetting *GameAllTreeLevels()
 {
     HostTextEditSetting *gc = new HostTextEditSetting("GameAllTreeLevels");
-    gc->setLabel(MythGameGeneralSettings::tr("Game display order"));
+    gc->setLabel(TR("Game display order"));
     gc->setValue("system gamename");
-    gc->setHelpText(MythGameGeneralSettings::tr("Order in which to sort the "
-                                                "games - this is for all "
-                                                "systems. Available choices: "
-                                                "system, year, genre and "
-                                                "gamename"));
+    gc->setHelpText(TR("Order in which to sort the "
+                       "games - this is for all "
+                       "systems. Available choices: "
+                       "system, year, genre and "
+                       "gamename"));
     return gc;
 }
 
 static HostTextEditSetting *GameFavTreeLevels()
 {
     HostTextEditSetting *gc = new HostTextEditSetting("GameFavTreeLevels");
-    gc->setLabel(MythGameGeneralSettings::tr("Favorite display order"));
+    gc->setLabel(TR("Favorite display order"));
     gc->setValue("gamename");
-    gc->setHelpText(MythGameGeneralSettings::tr("Order in which to sort the "
-                                                "games marked as favorites "
-                                                "- this is for all systems. "
-                                                "Available choices: system, "
-                                                "year, genre and gamename"));
+    gc->setHelpText(TR("Order in which to sort the "
+                       "games marked as favorites "
+                       "- this is for all systems. "
+                       "Available choices: system, "
+                       "year, genre and gamename"));
     return gc;
 }
 
 static HostCheckBoxSetting *GameDeepScan()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameDeepScan");
-    gc->setLabel(MythGameGeneralSettings::tr("Indepth Game Scan"));
+    gc->setLabel(TR("Indepth Game Scan"));
     gc->setHelpText(
-        MythGameGeneralSettings::tr("Enabling this causes a game scan to "
-                                    "gather CRC values and attempt to find out "
-                                    "more detailed information about the game: "
-                                    "NOTE this can greatly increase the time a "
-                                    "game scan takes based on the amount of "
-                                    "games scanned."));
+                TR("Enabling this causes a game scan to "
+                   "gather CRC values and attempt to find out "
+                   "more detailed information about the game: "
+                   "NOTE this can greatly increase the time a "
+                   "game scan takes based on the amount of "
+                   "games scanned."));
     return gc;
 }
 
 static HostCheckBoxSetting *GameRemovalPrompt()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameRemovalPrompt");
-    gc->setLabel(MythGameGeneralSettings::tr("Prompt for removal of deleted ROM(s)"));
-    gc->setHelpText(MythGameGeneralSettings::tr("This enables a prompt for "
-                                                "removing deleted ROMs from "
-                                                "the database during a game "
-                                                "scan"));
+    gc->setLabel(TR("Prompt for removal of deleted ROM(s)"));
+    gc->setHelpText(TR("This enables a prompt for "
+                       "removing deleted ROMs from "
+                       "the database during a game "
+                       "scan"));
 
     return gc;
 }
@@ -91,64 +119,64 @@ static HostCheckBoxSetting *GameRemovalPrompt()
 static HostCheckBoxSetting *GameShowFileNames()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameShowFileNames");
-    gc->setLabel(MythGameGeneralSettings::tr("Display Files Names in Game "
-                                             "Tree"));
-    gc->setHelpText(MythGameGeneralSettings::tr("Enabling this causes the "
-                                                "filenames to be displayed in "
-                                                "the game tree rather than the "
-                                                "trimmed/looked up game name"));
+    gc->setLabel(TR("Display Files Names in Game "
+                    "Tree"));
+    gc->setHelpText(TR("Enabling this causes the "
+                       "filenames to be displayed in "
+                       "the game tree rather than the "
+                       "trimmed/looked up game name"));
     return gc;
 }
 
 static HostCheckBoxSetting *GameTreeView()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameTreeView");
-    gc->setLabel(MythGameGeneralSettings::tr("Hash filenames in display"));
+    gc->setLabel(TR("Hash filenames in display"));
     gc->setValue(0);
-    gc->setHelpText(MythGameGeneralSettings::tr("Enable hashing of names in "
-                                                "the display tree. This can "
-                                                "make navigating long lists "
-                                                "a little faster"));
+    gc->setHelpText(TR("Enable hashing of names in "
+                       "the display tree. This can "
+                       "make navigating long lists "
+                       "a little faster"));
     return gc;
 }
 
 static HostTextEditSetting *GetScreenshotDir()
 {
     HostTextEditSetting *gc = new HostTextEditSetting("mythgame.screenshotdir");
-    gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Screenshots "
-                                             "are stored"));
+    gc->setLabel(TR("Directory where Game Screenshots "
+                    "are stored"));
     gc->setValue(GetConfDir() + "/MythGame/Screenshots");
-    gc->setHelpText(MythGameGeneralSettings::tr("This directory will be the "
-                                                "default browse location when "
-                                                "assigning screenshots."));
+    gc->setHelpText(TR("This directory will be the "
+                       "default browse location when "
+                       "assigning screenshots."));
     return gc;
 }
 
 static HostTextEditSetting *GetFanartDir()
 {
     HostTextEditSetting *gc = new HostTextEditSetting("mythgame.fanartdir");
-    gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Fanart is "
-                                             "stored"));
+    gc->setLabel(TR("Directory where Game Fanart is "
+                    "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Fanart");
-    gc->setHelpText(MythGameGeneralSettings::tr("This directory will be the "
-                                                "default browse location when "
-                                                "assigning fanart."));
+    gc->setHelpText(TR("This directory will be the "
+                       "default browse location when "
+                       "assigning fanart."));
     return gc;
 }
 
 static HostTextEditSetting *GetBoxartDir()
 {
     HostTextEditSetting *gc = new HostTextEditSetting("mythgame.boxartdir");
-    gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Boxart is "
-                                             "stored"));
+    gc->setLabel(TR("Directory where Game Boxart is "
+                    "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Boxart");
-    gc->setHelpText(MythGameGeneralSettings::tr("This directory will be the "
-                                                "default browse location when "
-                                                "assigning boxart."));
+    gc->setHelpText(TR("This directory will be the "
+                       "default browse location when "
+                       "assigning boxart."));
     return gc;
 }
 
-MythGameGeneralSettings::MythGameGeneralSettings()
+GameGeneralSettings::GameGeneralSettings()
 {
     setLabel(tr("MythGame Settings -- General"));
     addChild(GameAllTreeLevels());
@@ -162,252 +190,242 @@ MythGameGeneralSettings::MythGameGeneralSettings()
     addChild(GetBoxartDir());
 }
 
+// -----------------------------------------------------------------------
+
 // Player Settings
-QString GameDBStorage::GetWhereClause(MSqlBindings &bindings) const
+#undef TR
+#define TR GamePlayerSetting::tr
+
+/// Game player database table reader/writer
+struct GameDBStorage : public SimpleDBStorage
 {
-    QString playerId(":PLAYERID");
-    QString query("gameplayerid = " + playerId);
+    GameDBStorage(StorageUser *user, const PlayerId &id, const QString &name)
+        : SimpleDBStorage(user, "gameplayers", name), m_id(id) {}
+protected:
+    const PlayerId &m_id;
 
-    bindings.insert(playerId, parent.getGamePlayerID());
-
-    return query;
-}
-
-QString GameDBStorage::GetSetClause(MSqlBindings &bindings) const
-{
-    QString playerID(":SETPLAYERID");
-    QString colTag(":SET" + GetColumnName().toUpper());
-
-    QString query("gameplayerid = " + playerID + ", " +
-                  GetColumnName() + " = " + colTag);
-
-    bindings.insert(playerID, parent.getGamePlayerID());
-    bindings.insert(colTag, user->GetDBValue());
-
-    return query;
-}
-
-class AllowMultipleRoms : public CheckBoxSetting, public GameDBStorage
-{
-  public:
-    explicit AllowMultipleRoms(const MythGamePlayerSettings &parent) :
-        CheckBoxSetting(this), GameDBStorage(this, parent, "spandisks")
+    QString GetWhereClause(MSqlBindings &bindings) const override // SimpleStorage
     {
-        setLabel(MythGamePlayerSettings::tr("Allow games to span multiple "
-                                            "ROMs/disks"));
-        setHelpText(MythGamePlayerSettings::tr("This setting means that we "
-                                               "will look for items like "
-                                               "game.1.rom, game.2.rom and "
-                                               "consider them a single game."));
-    };
+        bindings.insert(":PLAYERID", m_id.Value());
+        return "gameplayerid = :PLAYERID";
+    }
+
+    QString GetSetClause(MSqlBindings &bindings) const override // SimpleStorage
+    {
+        bindings.insert(":SETPLAYERID", m_id.Value());
+        bindings.insert(":SETCOLUMN",   m_user->GetDBValue());
+        return QString("gameplayerid = :SETPLAYERID, "
+                       "%2 = :SETCOLUMN").arg(GetColumnName());
+    }
 };
 
-class Command : public LineEditSetting, public GameDBStorage
+/// Base for Game textual settings
+struct TextEdit : public MythUITextEditSetting
 {
-  public:
-    explicit Command(const MythGamePlayerSettings &parent) :
-        LineEditSetting(this), GameDBStorage(this, parent, "commandline")
-    {
-        setLabel(MythGamePlayerSettings::tr("Command"));
-        setHelpText(
-            MythGamePlayerSettings::tr("Binary and optional parameters. "
-                                       "Multiple commands separated with "
-                                       "\';\' . Use \%s for the ROM name. "
-                                       "\%d1, \%d2, \%d3 and \%d4 represent "
-                                       "disks in a multidisk/game. %s auto "
-                                       "appended if not specified"));
-    };
+    explicit TextEdit(const PlayerId &parent, const QString& column) :
+        MythUITextEditSetting(new GameDBStorage(this, parent, column))
+    {}
 };
 
-class GameType : public ComboBoxSetting, public GameDBStorage
+struct Name : public TextEdit
 {
-  public:
-    explicit GameType(const MythGamePlayerSettings &parent) :
-        ComboBoxSetting(this), GameDBStorage(this, parent, "gametype")
+    explicit Name(const PlayerId &parent)
+        : TextEdit(parent, "playername")
+    {
+        setLabel(TR("Player Name"));
+        setHelpText(TR("Name of this Game and or Emulator"));
+    }
+};
+
+struct Command : public TextEdit
+{
+    explicit Command(const PlayerId &parent)
+        : TextEdit(parent, "commandline")
+    {
+        setLabel(TR("Command"));
+        setHelpText(TR("Binary and optional parameters. Multiple commands "
+                       "separated with \';\' . Use \%s for the ROM name. "
+                       "\%d1, \%d2, \%d3 and \%d4 represent disks in a "
+                       "multidisk/game. %s auto appended if not specified"));
+    }
+};
+
+struct GameType : public MythUIComboBoxSetting
+{
+    explicit GameType(const PlayerId &parent) :
+        MythUIComboBoxSetting(new GameDBStorage(this, parent, "gametype"))
     {
         //: Game type
-        setLabel(MythGamePlayerSettings::tr("Type"));
+        setLabel(TR("Type"));
         for (int i = 0; i < MAX_GAME_TYPES; i++)
         {
-            addSelection(QCoreApplication::translate("(GameTypes)", 
-                         GameTypeList[i].nameStr.toUtf8()),
+            addSelection(QCoreApplication::translate("(GameTypes)",
+                                                     GameTypeList[i].nameStr.toUtf8()),
                          GameTypeList[i].idStr);
         }
         setValue(0);
-        setHelpText(MythGamePlayerSettings::tr("Type of Game/Emulator. Mostly "
-                                               "for informational purposes and "
-                                               "has little effect on the "
-                                               "function of your system."));
-    };
-};
-
-class RomPath : public LineEditSetting, public GameDBStorage
-{
-  public:
-    explicit RomPath(const MythGamePlayerSettings &parent) :
-        LineEditSetting(this), GameDBStorage(this, parent, "rompath")
-    {
-        setLabel(MythGamePlayerSettings::tr("ROM Path"));
-        setHelpText(MythGamePlayerSettings::tr("Location of the ROM files for "
-                                               "this emulator"));
-    };
-};
-
-class WorkingDirPath : public LineEditSetting, public GameDBStorage
-{
-  public:
-    explicit WorkingDirPath(const MythGamePlayerSettings &parent) :
-        LineEditSetting(this), GameDBStorage(this, parent, "workingpath")
-    {
-        setLabel(MythGamePlayerSettings::tr("Working Directory"));
-        setHelpText(MythGamePlayerSettings::tr("Directory to change to before "
-                                               "launching emulator. Blank is "
-                                               "usually fine"));
-    };
-};
-
-class Extensions : public LineEditSetting, public GameDBStorage
-{
-  public:
-    explicit Extensions(const MythGamePlayerSettings &parent) :
-        LineEditSetting(this), GameDBStorage(this, parent, "extensions")
-    {
-        setLabel(MythGamePlayerSettings::tr("File Extensions"));
-        setHelpText(MythGamePlayerSettings::tr("A comma separated list of all "
-                                               "file extensions for this "
-                                               "emulator. Blank means any file "
-                                               "under ROM PATH is considered "
-                                               "to be used with this "
-                                               "emulator"));
-    };
-};
-
-MythGamePlayerSettings::MythGamePlayerSettings()
-{
-    // must be first
-    addChild(id = new ID());
-
-    ConfigurationGroup *group = new VerticalConfigurationGroup(false, false);
-    group->setLabel(tr("Game Player Setup"));
-    group->addChild(name = new Name(*this));
-    group->addChild(new GameType(*this));
-    group->addChild(new Command(*this));
-    group->addChild(new RomPath(*this));
-    group->addChild(new WorkingDirPath(*this));
-    group->addChild(new Extensions(*this));
-    group->addChild(new AllowMultipleRoms(*this));
-    addChild(group);
-};
-
-void MythGamePlayerSettings::fillSelections(SelectSetting* setting)
-{
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT playername, gameplayerid, gametype FROM gameplayers WHERE playername <> '' ORDER BY playername;");
-
-    if (result.exec() && result.isActive() && result.size() > 0)
-    {
-        //: %1 is the player/emulator name, %2 is the type of player/emulator
-        QString playerDisp = tr("%1 (%2)", "Game player/emulator display");
-
-        while (result.next())
-        {
-             setting->addSelection(QString(playerDisp)
-                .arg(result.value(0).toString())
-                .arg(GetGameTypeName(result.value(2).toString())),
-                result.value(1).toString());
-        }
+        setHelpText(TR("Type of Game/Emulator. Mostly for informational "
+                       "purposes and has little effect on the "
+                       "function of your system."));
     }
-}
+};
 
-void MythGamePlayerSettings::loadByID(int sourceid)
+struct RomPath : public TextEdit
 {
-    id->setValue(sourceid);
-    Load();
-}
-
-MythGamePlayerEditor::MythGamePlayerEditor() : listbox(new ListBoxSetting(this))
-{
-    listbox->setLabel(tr("Game Players"));
-    addChild(listbox);
-}
-
-DialogCode MythGamePlayerEditor::exec(bool saveOnExec, bool doLoad)
-{
-    while (ConfigurationDialog::exec(saveOnExec, doLoad) == kDialogCodeAccepted)
-        edit();
-
-    return kDialogCodeRejected;
-}
-
-void MythGamePlayerEditor::Load(void)
-{
-    listbox->clearSelections();
-    listbox->addSelection(tr("(New Game Player)"), "0");
-    MythGamePlayerSettings::fillSelections(listbox);
-}
-
-MythDialog *MythGamePlayerEditor::dialogWidget(MythMainWindow *parent,
-                                               const char     *widgetName)
-{
-    dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
-    connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
-    connect(dialog, SIGNAL(editButtonPressed()), this, SLOT(edit()));
-    connect(dialog, SIGNAL(deleteButtonPressed()), this, SLOT(del()));
-    return dialog;
-}
-
-void MythGamePlayerEditor::menu(void)
-{
-    if (!listbox->getValue().toUInt())
+    explicit RomPath(const PlayerId &parent)
+        : TextEdit(parent, "rompath")
     {
-        MythGamePlayerSettings gp;
-        gp.exec();
+        setLabel(TR("ROM Path"));
+        setHelpText(TR("Location of the ROM files for this emulator"));
+    }
+};
+
+struct WorkingDirPath : public TextEdit
+{
+    explicit WorkingDirPath(const PlayerId &parent)
+        : TextEdit(parent, "workingpath")
+    {
+        setLabel(TR("Working Directory"));
+        setHelpText(TR("Directory to change to before launching emulator. "
+                       "Blank is usually fine"));
+    }
+};
+
+struct Extensions : public TextEdit
+{
+    explicit Extensions(const PlayerId &parent)
+        : TextEdit(parent, "extensions")
+    {
+        setLabel(TR("File Extensions"));
+        setHelpText(TR("A comma separated list of all file extensions for this "
+                       "emulator. Blank means any file under ROM PATH is "
+                       "considered to be used with this emulator"));
+    }
+};
+
+struct AllowMultipleRoms : public MythUICheckBoxSetting
+{
+    explicit AllowMultipleRoms(const PlayerId &parent) :
+        MythUICheckBoxSetting(new GameDBStorage(this, parent, "spandisks"))
+    {
+        setLabel(TR("Allow games to span multiple ROMs/disks"));
+        setHelpText(TR("This setting means that we will look for items like "
+                       "game.1.rom, game.2.rom and consider them a single game."));
+    }
+};
+
+/// Settings for a game player
+GamePlayerSetting::GamePlayerSetting(const QString& name, uint id)
+    : m_id(id)
+{
+    setName(name);
+
+    // Pre-set name for new players
+    auto nameChild = new Name(m_id);
+    nameChild->setValue(name);
+
+    addChild(nameChild);
+    addChild(new GameType(m_id));
+    addChild(new Command(m_id));
+    addChild(new RomPath(m_id));
+    addChild(new WorkingDirPath(m_id));
+    addChild(new Extensions(m_id));
+    addChild(new AllowMultipleRoms(m_id));
+}
+
+void GamePlayerSetting::Save()
+{
+    // Allocate id for new player
+    m_id.Save();
+    GroupSetting::Save();
+}
+
+void GamePlayerSetting::deleteEntry()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM gameplayers "
+                  "WHERE gameplayerid = :PLAYERID");
+
+    query.bindValue(":PLAYERID", m_id.Value());
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("Deleting MythGamePlayerSettings:", query);
+}
+
+// -----------------------------------------------------------------------
+
+GamePlayersList::GamePlayersList()
+{
+    setLabel(tr("Game Players"));
+}
+
+void GamePlayersList::Load()
+{
+    clearSettings();
+
+    auto newPlayer = new ButtonStandardSetting(tr("(New Game Player)"));
+    addChild(newPlayer);
+    connect(newPlayer, &ButtonStandardSetting::clicked,
+            this,      &GamePlayersList::NewPlayerDialog);
+
+    //: %1 is the player/emulator name, %2 is the type of player/emulator
+    QString playerDisp = tr("%1 (%2)", "Game player/emulator display");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT gameplayerid, playername, gametype "
+                  "FROM gameplayers "
+                  "WHERE playername <> '' "
+                  "ORDER BY playername;");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("GamePlayersSetting::Load", query);
+    }
+    else while (query.next())
+    {
+        int     id   = query.value(0).toInt();
+        QString name = query.value(1).toString();
+        QString type = query.value(2).toString();
+
+        auto child = new GamePlayerSetting(name, id);
+        addChild(child);
+        child->setLabel(playerDisp.arg(name, GetGameTypeName(type)));
+    }
+
+    GroupSetting::Load();
+}
+
+void GamePlayersList::NewPlayerDialog()
+{
+    MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
+    auto nameDialog = new MythTextInputDialog(stack, tr("Player Name"));
+
+    if (nameDialog->Create())
+    {
+        stack->AddScreen(nameDialog);
+        connect(nameDialog, &MythTextInputDialog::haveResult,
+                this,       &GamePlayersList::CreateNewPlayer);
     }
     else
-    {
-        DialogCode val = MythPopupBox::Show2ButtonPopup(
-            GetMythMainWindow(),
-            "", tr("Game Player Menu"),
-            tr("Edit..."), tr("Delete..."), kDialogCodeButton1);
-
-        if (kDialogCodeButton0 == val)
-            edit();
-        else if (kDialogCodeButton1 == val)
-            del();
-    }
+        delete nameDialog;
 }
 
-void MythGamePlayerEditor::edit(void)
+void GamePlayersList::CreateNewPlayer(const QString& name)
 {
-    MythGamePlayerSettings gp;
+    if (name.isEmpty())
+        return;
 
-    uint sourceid = listbox->getValue().toUInt();
-    if (sourceid)
-        gp.loadByID(sourceid);
+    // Database name must be unique
+    for (StandardSetting* child : *getSubSettings())
+        if (child->getName() == name)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Player name %1 is already used").arg(name));
+            return;
+        }
 
-    gp.exec();
+    addChild(new GamePlayerSetting(name));
+
+    // Redraw list
+    setVisible(true);
 }
-
-void MythGamePlayerEditor::del(void)
-{
-    DialogCode val = MythPopupBox::Show2ButtonPopup(
-        GetMythMainWindow(), "",
-        tr("Are you sure you want to delete "
-           "this item?"),
-        tr("Yes, delete It"),
-        tr("No, don't"), kDialogCodeButton1);
-
-    if (kDialogCodeButton0 == val)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM gameplayers "
-                      "WHERE gameplayerid = :SOURCEID");
-        query.bindValue(":SOURCEID", listbox->getValue());
-
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("Deleting MythGamePlayerSettings:", query);
-
-        Load();
-    }
-}
-

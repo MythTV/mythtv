@@ -13,7 +13,7 @@ class ExitPrompter : public QObject
     ExitPrompter(void);
     ~ExitPrompter(void);
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
     
   public slots:
     void masterPromptExit(void);
@@ -24,5 +24,5 @@ class ExitPrompter : public QObject
     ExitPrompter(const ExitPrompter &);
 
   private:
-    struct ExitPrompterPrivate *m_d;
+    struct ExitPrompterPrivate *m_d {nullptr};
 };

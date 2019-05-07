@@ -58,12 +58,12 @@ typedef struct _GMLINE
 #define GML_BLACK 6
 
 /* construit un effet de line (une ligne horitontale pour commencer) */
-GMLine *goom_lines_init (int rx, int ry, int IDsrc, float paramS, int modeCoulSrc, int IDdest, float paramD, int modeCoulDest);
+GMLine *goom_lines_init (int rx, int ry, int IDsrc, float paramS, int coulS, int IDdest, float paramD, int coulD);
 
-void    goom_lines_switch_to (GMLine * gml, int IDdest, float param, float amplitude, int modeCoul);
+void    goom_lines_switch_to (GMLine * gml, int IDdest, float param, float amplitude, int col);
 
 void    goom_lines_set_res (GMLine * gml, int rx, int ry);
 
 void    goom_lines_free (GMLine ** gml);
 
-void    goom_lines_draw (GMLine * gml, gint16 data[512], unsigned int *p);
+void    goom_lines_draw (GMLine * line, const gint16 data[512], unsigned int *p);

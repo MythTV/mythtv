@@ -45,8 +45,8 @@ QEvent::Type MythGestureEvent::kEventType =
 class MythGesturePrivate {
 
 public:
-    QMutex m;
-    QMap <QString, MythGestureEvent::Gesture> sequences;
+    QMutex m_m;
+    QMap <QString, MythGestureEvent::Gesture> m_sequences;
 };
 
 
@@ -55,44 +55,43 @@ public:
 MythGesture::MythGesture(size_t max_points, size_t min_points,
                          size_t max_sequence, size_t scale_ratio,
                          float bin_percent) :
-    m_recording(false), min_x(10000), max_x(-1), min_y(10000), max_y(-1),
-    max_points(max_points), min_points(min_points), max_sequence(max_sequence),
-    scale_ratio(scale_ratio), bin_percent(bin_percent)
+    m_max_points(max_points), m_min_points(min_points), m_max_sequence(max_sequence),
+    m_scale_ratio(scale_ratio), m_bin_percent(bin_percent)
 {
     /* default to an invalid event */
-    last_gesture = MythGestureEvent::MaxGesture;
+    m_last_gesture = MythGestureEvent::MaxGesture;
 
     /* create new private information */
     p = new MythGesturePrivate();
 
     /* Click */
-    p->sequences.insert("5", MythGestureEvent::Click);
+    p->m_sequences.insert("5", MythGestureEvent::Click);
 
     /* Lines */
-    p->sequences.insert("456", MythGestureEvent::Right);
-    p->sequences.insert("654", MythGestureEvent::Left);
-    p->sequences.insert("258", MythGestureEvent::Down);
-    p->sequences.insert("852", MythGestureEvent::Up);
+    p->m_sequences.insert("456", MythGestureEvent::Right);
+    p->m_sequences.insert("654", MythGestureEvent::Left);
+    p->m_sequences.insert("258", MythGestureEvent::Down);
+    p->m_sequences.insert("852", MythGestureEvent::Up);
 
     /* Diagonals */
-    p->sequences.insert("951", MythGestureEvent::UpLeft);
-    p->sequences.insert("753", MythGestureEvent::UpRight);
-    p->sequences.insert("159", MythGestureEvent::DownRight);
-    p->sequences.insert("357", MythGestureEvent::DownLeft);
+    p->m_sequences.insert("951", MythGestureEvent::UpLeft);
+    p->m_sequences.insert("753", MythGestureEvent::UpRight);
+    p->m_sequences.insert("159", MythGestureEvent::DownRight);
+    p->m_sequences.insert("357", MythGestureEvent::DownLeft);
 
     /* Double Lines*/
-    p->sequences.insert("96321",MythGestureEvent::UpThenLeft);
-    p->sequences.insert("74123",MythGestureEvent::UpThenRight);
-    p->sequences.insert("36987",MythGestureEvent::DownThenLeft);
-    p->sequences.insert("14789",MythGestureEvent::DownThenRight);
-    p->sequences.insert("32147",MythGestureEvent::LeftThenDown);
-    p->sequences.insert("98741",MythGestureEvent::LeftThenUp);
-    p->sequences.insert("12369",MythGestureEvent::RightThenDown);
-    p->sequences.insert("78963",MythGestureEvent::RightThenUp);
-    p->sequences.insert("45654",MythGestureEvent::RightThenLeft);
-    p->sequences.insert("65456",MythGestureEvent::LeftThenRight);
-    p->sequences.insert("85258",MythGestureEvent::UpThenDown);
-    p->sequences.insert("25852",MythGestureEvent::DownThenUp);
+    p->m_sequences.insert("96321",MythGestureEvent::UpThenLeft);
+    p->m_sequences.insert("74123",MythGestureEvent::UpThenRight);
+    p->m_sequences.insert("36987",MythGestureEvent::DownThenLeft);
+    p->m_sequences.insert("14789",MythGestureEvent::DownThenRight);
+    p->m_sequences.insert("32147",MythGestureEvent::LeftThenDown);
+    p->m_sequences.insert("98741",MythGestureEvent::LeftThenUp);
+    p->m_sequences.insert("12369",MythGestureEvent::RightThenDown);
+    p->m_sequences.insert("78963",MythGestureEvent::RightThenUp);
+    p->m_sequences.insert("45654",MythGestureEvent::RightThenLeft);
+    p->m_sequences.insert("65456",MythGestureEvent::LeftThenRight);
+    p->m_sequences.insert("85258",MythGestureEvent::UpThenDown);
+    p->m_sequences.insert("25852",MythGestureEvent::DownThenUp);
 }
 
 MythGesture::~MythGesture()
@@ -103,50 +102,50 @@ MythGesture::~MythGesture()
 /* comments in header */
 void MythGesture::adjustExtremes(int x, int y)
 {
-    min_x = std::min(min_x, x);
-    max_x = std::max(max_x, x);
-    min_y = std::min(min_y, y);
-    max_y = std::max(max_y, y);
+    m_min_x = std::min(m_min_x, x);
+    m_max_x = std::max(m_max_x, x);
+    m_min_y = std::min(m_min_y, y);
+    m_max_y = std::max(m_max_y, y);
 }
 
 bool MythGesture::recording(void) const
 {
-    p->m.lock();
+    p->m_m.lock();
     bool temp = m_recording;
-    p->m.unlock();
+    p->m_m.unlock();
     return temp;
 }
 
 /* comments in header */
 void MythGesture::start(void)
 {
-    p->m.lock();
+    p->m_m.lock();
     m_recording = true;
-    p->m.unlock();
+    p->m_m.unlock();
 }
 
 /* comments in header */
 void MythGesture::stop(void)
 {
-    p->m.lock();
+    p->m_m.lock();
 
     if (m_recording)
     {
         m_recording = false;
 
         /* translate before resetting maximums */
-        last_gesture = p->sequences[translate()];
+        m_last_gesture = p->m_sequences[translate()];
 
-        min_x = min_y = 10000;
-        max_x = max_y = -1;
+        m_min_x = m_min_y = 10000;
+        m_max_x = m_max_y = -1;
     }
 
-    p->m.unlock();
+    p->m_m.unlock();
 }
 
 MythGestureEvent *MythGesture::gesture(void) const
 {
-    return new MythGestureEvent(last_gesture);
+    return new MythGestureEvent(m_last_gesture);
 }
 
 /* comments in header */
@@ -168,19 +167,19 @@ static int determineBin (const QPoint & p, int x1, int x2, int y1, int y2)
 /* comments in header */
 QString MythGesture::translate(void)
 {
-    size_t total_points = points.count();
+    size_t total_points = m_points.count();
 
-    if (total_points > max_points)
+    if (total_points > m_max_points)
     {
-        points.clear();
+        m_points.clear();
         return "0";
     }
 
     /* treat any stroke with less than the minimum number of points as
      * a click (not a drag), which is the center bin */
-    if (total_points < min_points)
+    if (total_points < m_min_points)
     {
-        points.clear();
+        m_points.clear();
         return "5";
     }
 
@@ -203,37 +202,37 @@ QString MythGesture::translate(void)
     int bound_y_1, bound_y_2;
 
     /* determine size of grid */
-    delta_x = max_x - min_x;
-    delta_y = max_y - min_y;
+    delta_x = m_max_x - m_min_x;
+    delta_y = m_max_y - m_min_y;
 
     /* calculate bin boundary positions */
-    bound_x_1 = min_x + (delta_x / 3);
-    bound_x_2 = min_x + 2 * (delta_x / 3);
+    bound_x_1 = m_min_x + (delta_x / 3);
+    bound_x_2 = m_min_x + 2 * (delta_x / 3);
 
-    bound_y_1 = min_y + (delta_y / 3);
-    bound_y_2 = min_y + 2 * (delta_y / 3);
+    bound_y_1 = m_min_y + (delta_y / 3);
+    bound_y_2 = m_min_y + 2 * (delta_y / 3);
 
-    if (delta_x > scale_ratio * delta_y)
+    if (delta_x > m_scale_ratio * delta_y)
     {
-        bound_y_1 = (max_y + min_y - delta_x) / 2 + (delta_x / 3);
-        bound_y_2 = (max_y + min_y - delta_x) / 2 + 2 * (delta_x / 3);
+        bound_y_1 = (m_max_y + m_min_y - delta_x) / 2 + (delta_x / 3);
+        bound_y_2 = (m_max_y + m_min_y - delta_x) / 2 + 2 * (delta_x / 3);
     }
-    else if (delta_y > scale_ratio * delta_x)
+    else if (delta_y > m_scale_ratio * delta_x)
     {
-        bound_x_1 = (max_x + min_x - delta_y) / 2 + (delta_y / 3);
-        bound_x_2 = (max_x + min_x - delta_y) / 2 + 2 * (delta_y / 3);
+        bound_x_1 = (m_max_x + m_min_x - delta_y) / 2 + (delta_y / 3);
+        bound_x_2 = (m_max_x + m_min_x - delta_y) / 2 + 2 * (delta_y / 3);
     }
 
     /* build string by placing points in bins, collapsing bins and
        discarding those with too few points... */
 
-    while (!points.empty())
+    while (!m_points.empty())
     {
-        QPoint p = points.front();
-        points.pop_front();
+        QPoint pt = m_points.front();
+        m_points.pop_front();
 
         /* figure out which bin the point falls in */
-        current_bin = determineBin(p, bound_x_1, bound_x_2, bound_y_1,
+        current_bin = determineBin(pt, bound_x_1, bound_x_2, bound_y_1,
                                    bound_y_2);
 
         /* if this is the first point, consider it the previous bin, too. */
@@ -246,7 +245,7 @@ QString MythGesture::translate(void)
 
             /* we are moving to a new bin -- consider adding to the
                sequence */
-            if ((bin_count > (total_points * bin_percent)) || first_bin)
+            if ((bin_count > (total_points * m_bin_percent)) || first_bin)
             {
                 first_bin = false;
                 sequence += '0' + prev_bin;
@@ -264,57 +263,57 @@ QString MythGesture::translate(void)
     sequence_count++;
 
     /* bail out on error cases */
-    if (sequence_count > max_sequence)
+    if (sequence_count > m_max_sequence)
         sequence = '0';
 
     return sequence;
 }
 
 /* comments in header */
-bool MythGesture::record(const QPoint & p)
+bool MythGesture::record(const QPoint & pt)
 {
     /* only record if we haven't exceeded the maximum points */
-    if (((uint)points.size() >= max_points) || !recording())
+    if (((uint)m_points.size() >= m_max_points) || !recording())
         return false;
 
-    if (points.size() == 0)
+    if (m_points.empty())
     {
-        points.push_back(p);
+        m_points.push_back(pt);
         return true;
     }
 
     /* interpolate between last and current point */
-    int delx = p.x() - points.back().x();
-    int dely = p.y() - points.back().y();
+    int delx = pt.x() - m_points.back().x();
+    int dely = pt.y() - m_points.back().y();
 
     /* step by the greatest delta direction */
     if (abs(delx) > abs(dely))
     {
-        float iy = points.back().y();
+        float iy = m_points.back().y();
 
         /* go from the last point to the current, whatever direction
          * it may be */
-        for (float ix = points.back().x();
-             (delx > 0) ? (ix < p.x()) : (ix > p.x());
+        for (float ix = m_points.back().x();
+             (delx > 0) ? (ix < pt.x()) : (ix > pt.x());
              ix += (delx > 0) ? 1 : -1)
         {
             /* step the other axis by the correct increment */
             iy += std::fabs(((float) dely / (float) delx))
                 * (float) ((dely < 0) ? -1.0 : 1.0);
 
-            points.push_back(QPoint((int)ix, (int)iy));
+            m_points.push_back(QPoint((int)ix, (int)iy));
 
             adjustExtremes((int)ix, (int)iy);
         }
     }
     else /* same thing, but for dely larger than delx case... */
     {
-        float ix = points.back().x();
+        float ix = m_points.back().x();
 
         /* go from the last point to the current, whatever direction
            it may be */
-        for (float iy = points.back().y();
-             (dely > 0) ? (iy < p.y()) : (iy > p.y());
+        for (float iy = m_points.back().y();
+             (dely > 0) ? (iy < pt.y()) : (iy > pt.y());
              iy += (dely > 0) ? 1 : -1)
         {
             /* step the other axis by the correct increment */
@@ -322,13 +321,13 @@ bool MythGesture::record(const QPoint & p)
                 * (float) ((delx < 0) ? -1.0 : 1.0);
 
             /* add the interpolated point */
-            points.push_back(QPoint((int)ix, (int)iy));
+            m_points.push_back(QPoint((int)ix, (int)iy));
 
             adjustExtremes((int)ix, (int)iy);
         }
     }
 
-    points.push_back(p);
+    m_points.push_back(pt);
 
     return true;
 }

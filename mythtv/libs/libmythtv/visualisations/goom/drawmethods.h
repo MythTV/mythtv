@@ -94,14 +94,12 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			}
 			return;
 		}
-		else {
-			p = &(data[(screenx * y1) + x2]);
-			for (x = x2; x <= x1; x++) {
-				DRAWMETHOD;
-				p++;
-			}
-			return;
-		}
+                p = &(data[(screenx * y1) + x2]);
+                for (x = x2; x <= x1; x++) {
+                    DRAWMETHOD;
+                    p++;
+                }
+                return;
 	}
 	/* 1    */
 	
@@ -123,19 +121,14 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			return;
 		}
 		/* shallow */
-		else {
-			dy = ((dy << 16) / dx);
-			y = y1 << 16;
-			for (x = x1; x <= x2; x++) {
-				yy = y >> 16;
-				p = &(data[(screenx * yy) + x]);
-				DRAWMETHOD;
-				if (yy < (screeny - 1)) {
-					p += screeny;
-				}
-				y += dy;
-			}
-		}
+                dy = ((dy << 16) / dx);
+                y = y1 << 16;
+                for (x = x1; x <= x2; x++) {
+                    yy = y >> 16;
+                    p = &(data[(screenx * yy) + x]);
+                    DRAWMETHOD;
+                    y += dy;
+                }
 	}
 	/* 2 */
 	
@@ -157,20 +150,15 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			return;
 		}
 		/* shallow */
-		else {
-			dy = ((dy << 16) / dx);
-			y = y1 << 16;
-			for (x = x1; x <= x2; x++) {
-				yy = y >> 16;
-				p = &(data[(screenx * yy) + x]);
-				DRAWMETHOD;
-				if (yy < (screeny - 1)) {
-					p += screeny;
-				}
-				y += dy;
-			}
-			return;
-		}
+                dy = ((dy << 16) / dx);
+                y = y1 << 16;
+                for (x = x1; x <= x2; x++) {
+                    yy = y >> 16;
+                    p = &(data[(screenx * yy) + x]);
+                    DRAWMETHOD;
+                    y += dy;
+                }
+                return;
 	}
 }
 #endif

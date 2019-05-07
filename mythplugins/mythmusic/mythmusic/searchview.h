@@ -22,13 +22,13 @@ class SearchView : public MusicCommon
     SearchView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~SearchView(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
     void updateTracksList(void);
 
   protected slots:
@@ -39,11 +39,11 @@ class SearchView : public MusicCommon
     void trackVisible(MythUIButtonListItem *item);
 
   private:
-    bool                 m_playTrack;
-    MythUIButtonList    *m_fieldList;
-    MythUITextEdit      *m_criteriaEdit;
-    MythUIText          *m_matchesText;
-    MythUIButtonList    *m_tracksList;
+    bool                 m_playTrack    {false};
+    MythUIButtonList    *m_fieldList    {nullptr};
+    MythUITextEdit      *m_criteriaEdit {nullptr};
+    MythUIText          *m_matchesText  {nullptr};
+    MythUIButtonList    *m_tracksList   {nullptr};
 };
 
 #endif

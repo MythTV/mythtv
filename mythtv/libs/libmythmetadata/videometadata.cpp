@@ -19,75 +19,9 @@
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
 #include "programinfo.h" // for format_season_and_episode
+#include "mythsorthelper.h"
 
 using namespace std;
-
-struct SortData
-{
-    SortData(const QString &title, const QString &filename, const QString &id) :
-        m_title(title), m_filename(filename), m_id(id)
-    {
-    }
-
-    QString m_title;
-    QString m_filename;
-    QString m_id;
-};
-
-static bool operator<(const SortData &lhs, const SortData &rhs)
-{
-    int ret = naturalCompare(lhs.m_title, rhs.m_title);
-
-    if (ret == 0)
-        ret = naturalCompare(lhs.m_filename, rhs.m_filename);
-
-    if (ret == 0)
-        ret = naturalCompare(lhs.m_id, rhs.m_id);
-
-    return ret < 0;
-}
-
-VideoMetadata::SortKey::SortKey() : m_sd(nullptr)
-{
-}
-
-VideoMetadata::SortKey::SortKey(const SortData &data)
-{
-    m_sd = new SortData(data);
-}
-
-VideoMetadata::SortKey::SortKey(const SortKey &other) : m_sd(nullptr)
-{
-    *this = other;
-}
-
-VideoMetadata::SortKey &VideoMetadata::SortKey::operator=(const SortKey &rhs)
-{
-    if (this != &rhs)
-    {
-        Clear();
-        if (rhs.m_sd)
-            m_sd = new SortData(*rhs.m_sd);
-    }
-
-    return *this;
-}
-
-VideoMetadata::SortKey::~SortKey()
-{
-    Clear();
-}
-
-bool VideoMetadata::SortKey::isSet() const
-{
-    return m_sd != nullptr;
-}
-
-void VideoMetadata::SortKey::Clear()
-{
-    delete m_sd;
-    m_sd = nullptr;
-}
 
 class VideoMetadataImp
 {
@@ -97,9 +31,11 @@ class VideoMetadataImp
     typedef VideoMetadata::cast_list cast_list;
 
   public:
-    VideoMetadataImp(const QString &filename, const QString &hash, const QString &trailer,
+    VideoMetadataImp(const QString &filename, const QString &sortFilename,
+             const QString &hash, const QString &trailer,
              const QString &coverfile, const QString &screenshot, const QString &banner,
-             const QString &fanart, const QString &title, const QString &subtitle,
+             const QString &fanart, const QString &title, const QString &sortTitle,
+             const QString &subtitle, const QString &sortSubtitle,
              const QString &tagline, int year, const QDate &releasedate,
              const QString &inetref, int collectionref, const QString &homepage,
              const QString &director, const QString &studio,
@@ -115,12 +51,14 @@ class VideoMetadataImp
              const QString &host = "",
              bool processed = false,
              VideoContentType contenttype = kContentUnknown) :
-        m_title(title), m_subtitle(subtitle), m_tagline(tagline),
+        m_title(title), m_sortTitle(sortTitle), m_subtitle(subtitle),
+        m_sortSubtitle(sortSubtitle), m_tagline(tagline),
         m_inetref(inetref), m_collectionref(collectionref), m_homepage(homepage),
         m_director(director), m_studio(studio),
         m_plot(plot), m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
-        m_filename(filename), m_hash(hash), m_trailer(trailer), m_coverfile(coverfile),
+        m_filename(filename), m_sortFilename(sortFilename), m_hash(hash),
+        m_trailer(trailer), m_coverfile(coverfile),
         m_screenshot(screenshot), m_banner(banner), m_fanart(fanart),
         m_host(host), m_categoryID(categoryID), m_childID(childID),
         m_year(year), m_releasedate(releasedate), m_length(length), m_playcount(playcount),
@@ -129,12 +67,25 @@ class VideoMetadataImp
         m_userrating(userrating), m_processed(processed),
         m_contenttype(contenttype)
     {
+        // Try to glean data if none provided.
+        if (title.isEmpty() and subtitle.isEmpty()
+            and season == 0 and episode == 0)
+        {
+            m_title = VideoMetadata::FilenameToMeta(m_filename, 1);
+            m_subtitle = VideoMetadata::FilenameToMeta(m_filename, 4);
+            m_season = VideoMetadata::FilenameToMeta(m_filename, 2).toInt();
+            m_episode = VideoMetadata::FilenameToMeta(m_filename, 3).toInt();
+        }
+
         VideoCategory::GetCategory().get(m_categoryID, m_category);
+
+        ensureSortFields();
     }
 
     explicit VideoMetadataImp(MSqlQuery &query)
     {
         fromDBRow(query);
+        ensureSortFields();
     }
 
     VideoMetadataImp(const VideoMetadataImp &other)
@@ -147,7 +98,9 @@ class VideoMetadataImp
         if (this != &rhs)
         {
             m_title = rhs.m_title;
+            m_sortTitle = rhs.m_sortTitle;
             m_subtitle = rhs.m_subtitle;
+            m_sortSubtitle = rhs.m_sortSubtitle;
             m_tagline = rhs.m_tagline;
             m_inetref = rhs.m_inetref;
             m_collectionref = rhs.m_collectionref;
@@ -162,6 +115,7 @@ class VideoMetadataImp
             m_countries = rhs.m_countries;
             m_cast = rhs.m_cast;
             m_filename = rhs.m_filename;
+            m_sortFilename = rhs.m_sortFilename;
             m_hash = rhs.m_hash;
             m_trailer = rhs.m_trailer;
             m_coverfile = rhs.m_coverfile;
@@ -188,34 +142,45 @@ class VideoMetadataImp
             m_contenttype = rhs.m_contenttype;
 
             // No DB vars
-            m_sort_key = rhs.m_sort_key;
             m_prefix = rhs.m_prefix;
+
+            ensureSortFields();
         }
 
         return *this;
     }
 
-  public:
-    bool HasSortKey() const { return m_sort_key.isSet(); }
-    const VideoMetadata::SortKey &GetSortKey() const { return m_sort_key; }
-    void SetSortKey(const VideoMetadata::SortKey &sort_key)
+    void ensureSortFields(void)
     {
-        m_sort_key = sort_key;
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        if (m_sortTitle.isEmpty() and not m_title.isEmpty())
+            m_sortTitle = sh->doTitle(m_title);
+        if (m_sortSubtitle.isEmpty() and not m_subtitle.isEmpty())
+            m_sortSubtitle = sh->doTitle(m_subtitle);
+        if (m_sortFilename.isEmpty() and not m_filename.isEmpty())
+            m_sortFilename = sh->doPathname(m_filename);
     }
 
+  public:
     const QString &GetPrefix() const { return m_prefix; }
     void SetPrefix(const QString &prefix) { m_prefix = prefix; }
 
     const QString &getTitle() const { return m_title; }
-    void SetTitle(const QString& title)
+    const QString &getSortTitle() const { return m_sortTitle; }
+    void SetTitle(const QString& title, const QString& sortTitle = "")
     {
-        if (gCoreContext->HasGUI())
-            m_sort_key.Clear();
         m_title = title;
+        m_sortTitle = sortTitle;
+        ensureSortFields();
     }
 
     const QString &getSubtitle() const { return m_subtitle; }
-    void SetSubtitle(const QString &subtitle) { m_subtitle = subtitle; }
+    const QString &getSortSubtitle() const { return m_sortSubtitle; }
+    void SetSubtitle(const QString &subtitle, const QString &sortSubtitle = "") {
+        m_subtitle = subtitle;
+        m_sortSubtitle = sortSubtitle;
+        ensureSortFields();
+    }
 
     const QString &GetTagline() const { return m_tagline; }
     void SetTagline(const QString &tagline) { m_tagline = tagline; }
@@ -266,7 +231,15 @@ class VideoMetadataImp
     void SetHost(const QString &host) { m_host = host; }
 
     const QString &getFilename() const { return m_filename; }
-    void SetFilename(const QString &filename) { m_filename = filename; }
+    const QString &getSortFilename() const { return m_sortFilename; }
+    void SetFilename(const QString &filename, const QString &sortFilename = "")
+    {
+        m_filename = filename;
+        m_sortFilename = sortFilename;
+        ensureSortFields();
+    }
+
+    bool sortBefore(const VideoMetadataImp *rhs) const;
 
     const QString &GetHash() const { return m_hash; }
     void SetHash(const QString &hash) { m_hash = hash; }
@@ -367,7 +340,9 @@ class VideoMetadataImp
 
   private:
     QString m_title;
+    QString m_sortTitle;
     QString m_subtitle;
+    QString m_sortSubtitle;
     QString m_tagline;
     QString m_inetref;
     int m_collectionref;
@@ -382,6 +357,7 @@ class VideoMetadataImp
     country_list m_countries;
     cast_list m_cast;
     QString m_filename;
+    QString m_sortFilename;
     QString m_hash;
     QString m_trailer;
     QString m_coverfile;
@@ -408,20 +384,33 @@ class VideoMetadataImp
     VideoContentType m_contenttype;
 
     // not in DB
-    VideoMetadata::SortKey m_sort_key;
     QString m_prefix;
 };
 
 /////////////////////////////
 /////////
 /////////////////////////////
+/** \fn VideoMetadataImp::sortBefore(const VideoMetadataImp *)
+ *  \brief Returns true if the object should appear before the argument.
+ */
+bool VideoMetadataImp::sortBefore(const VideoMetadataImp *rhs) const
+{
+    int ret = naturalCompare(m_sortTitle, rhs->m_sortTitle);
+    if (ret != 0)
+        return (ret == -1);
+    ret = naturalCompare(m_sortFilename, rhs->m_sortFilename);
+    if (ret != 0)
+        return (ret == -1);
+    return (m_id < rhs->m_id);
+}
+
 bool VideoMetadataImp::removeDir(const QString &dirName)
 {
     QDir d(dirName);
 
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList contents = d.entryInfoList();
-    if (!contents.size())
+    if (contents.empty())
     {
         return d.rmdir(dirName);
     }
@@ -477,15 +466,15 @@ bool VideoMetadataImp::DeleteFile()
 
 void VideoMetadataImp::Reset()
 {
-    VideoMetadataImp tmp(m_filename, VideoMetadata::VideoFileHash(m_filename, m_host), VIDEO_TRAILER_DEFAULT,
+    VideoMetadataImp tmp(m_filename, QString(),
+                    VideoMetadata::VideoFileHash(m_filename, m_host), VIDEO_TRAILER_DEFAULT,
                     VIDEO_COVERFILE_DEFAULT, VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
-                    VIDEO_FANART_DEFAULT, VideoMetadata::FilenameToMeta(m_filename, 1), QString(),
-                    VideoMetadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT,
+                    VIDEO_FANART_DEFAULT, QString(), QString(), QString(), QString(),
+                    QString(), VIDEO_YEAR_DEFAULT,
                     QDate(), VIDEO_INETREF_DEFAULT, -1, QString(), VIDEO_DIRECTOR_DEFAULT,
                     QString(), VIDEO_PLOT_DEFAULT, 0.0,
                     VIDEO_RATING_DEFAULT, 0, 0,
-                    VideoMetadata::FilenameToMeta(m_filename, 2).toInt(),
-                    VideoMetadata::FilenameToMeta(m_filename, 3).toInt(), QDate(), m_id,
+                    0, 0, QDate(), m_id,
                     ParentalLevel::plLowest, 0, -1, true, false, "", "",
                     VideoMetadata::genre_list(), VideoMetadata::country_list(),
                     VideoMetadata::cast_list(), m_host, false);
@@ -557,6 +546,9 @@ void VideoMetadataImp::fillCast()
 }
 
 /// Sets metadata from a DB row
+///
+/// Query string in VideoMetadataListManager::loadAllFromDatabase
+///
 void VideoMetadataImp::fromDBRow(MSqlQuery &query)
 {
     m_title = query.value(0).toString();
@@ -569,8 +561,8 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     m_userrating = (float)query.value(7).toDouble();
     if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
-    if (m_userrating > 10.0)
-        m_userrating = 10.0;
+    if (m_userrating > 10.0F)
+        m_userrating = 10.0F;
     m_length = query.value(8).toInt();
     m_playcount = query.value(9).toInt();
     m_filename = query.value(10).toString();
@@ -600,6 +592,8 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
 
     m_contenttype = ContentTypeFromString(query.value(34).toString());
 
+    ensureSortFields();
+
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
     // Genres
@@ -626,6 +620,7 @@ void VideoMetadataImp::saveToDatabase()
         m_plot = VIDEO_PLOT_DEFAULT;
     if (m_rating.isEmpty())
         m_rating = VIDEO_RATING_DEFAULT;
+    ensureSortFields();
 
     InfoMap metadataMap;
     GetImageMap(metadataMap);
@@ -648,7 +643,7 @@ void VideoMetadataImp::saveToDatabase()
         m_inetref = VIDEO_INETREF_DEFAULT;
     if (isnan(m_userrating))
         m_userrating = 0.0;
-    if (m_userrating < -10.0 || m_userrating > 10.0)
+    if (m_userrating < -10.0F || m_userrating > 10.0F)
         m_userrating = 0.0;
     if (m_releasedate.toString().isEmpty())
         m_releasedate = QDate::fromString("0000-00-00", "YYYY-MM-DD");
@@ -832,7 +827,7 @@ void VideoMetadataImp::updateGenres()
     genre_list::iterator genre = m_genres.begin();
     while (genre != m_genres.end())
     {
-        if (genre->second.trimmed().length())
+        if (!genre->second.trimmed().isEmpty())
         {
             genre->first = VideoGenre::getGenre().add(genre->second);
             VideoGenreMap::getGenreMap().add(m_id, genre->first);
@@ -853,7 +848,7 @@ void VideoMetadataImp::updateCountries()
     country_list::iterator country = m_countries.begin();
     while (country != m_countries.end())
     {
-        if (country->second.trimmed().length())
+        if (!country->second.trimmed().isEmpty())
         {
             country->first = VideoCountry::getCountry().add(country->second);
             VideoCountryMap::getCountryMap().add(m_id, country->first);
@@ -874,7 +869,7 @@ void VideoMetadataImp::updateCast()
     cast_list::iterator cast = m_cast.begin();
     while (cast != m_cast.end())
     {
-        if (cast->second.trimmed().length())
+        if (!cast->second.trimmed().isEmpty())
         {
             cast->first = VideoCast::GetCast().add(cast->second);
             VideoCastMap::getCastMap().add(m_id, cast->first);
@@ -960,16 +955,6 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
 ////////////////////////////////////////
 //// Metadata
 ////////////////////////////////////////
-VideoMetadata::SortKey VideoMetadata::GenerateDefaultSortKey(const VideoMetadata &m,
-                                                   bool ignore_case)
-{
-    QString title(ignore_case ? m.GetTitle().toLower() : m.GetTitle());
-    title = TrimTitle(title, ignore_case);
-
-    return SortKey(SortData(title, m.GetFilename(),
-                         QString().sprintf("%.7d", m.GetID())));
-}
-
 namespace
 {
     QString eatBraces(const QString &title, const QString &left_brace,
@@ -1146,11 +1131,11 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
         // Return requested value
         if (position == 1 && !title.isEmpty())
             return title.trimmed();
-        else if (position == 2)
+        if (position == 2)
             return season.trimmed();
-        else if (position == 3)
+        if (position == 3)
             return episode.trimmed();
-        else if (position == 4)
+        if (position == 4)
             return subtitle.trimmed();
     }
     else if (position == 1)
@@ -1172,28 +1157,11 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     return QString();
 }
 
-namespace
-{
-    const QRegExp &getTitleTrim(bool ignore_case)
-    {
-        static QString pattern(VideoMetadata::tr("^(The |A |An )"));
-        static QRegExp prefixes_case(pattern, Qt::CaseSensitive);
-        static QRegExp prefixes_nocase(pattern, Qt::CaseInsensitive);
-        return ignore_case ? prefixes_nocase : prefixes_case;
-    }
-}
-
-QString VideoMetadata::TrimTitle(const QString &title, bool ignore_case)
-{
-    QString ret(title);
-    ret.remove(getTitleTrim(ignore_case));
-    return ret;
-}
-
-VideoMetadata::VideoMetadata(const QString &filename, const QString &hash,
-             const QString &trailer, const QString &coverfile,
+VideoMetadata::VideoMetadata(const QString &filename, const QString &sortFilename,
+             const QString &hash, const QString &trailer, const QString &coverfile,
              const QString &screenshot, const QString &banner, const QString &fanart,
-             const QString &title, const QString &subtitle, const QString &tagline,
+             const QString &title, const QString &sortTitle,
+             const QString &subtitle, const QString &sortSubtitle, const QString &tagline,
              int year, const QDate &releasedate, const QString &inetref, int collectionref,
              const QString &homepage, const QString &director, const QString &studio,
              const QString &plot, float userrating, const QString &rating,
@@ -1207,8 +1175,9 @@ VideoMetadata::VideoMetadata(const QString &filename, const QString &hash,
              const QString &host, bool processed,
              VideoContentType contenttype)
 {
-    m_imp = new VideoMetadataImp(filename, hash, trailer, coverfile, screenshot, banner,
-                            fanart, title, subtitle, tagline, year, releasedate, inetref,
+    m_imp = new VideoMetadataImp(filename, sortFilename, hash, trailer, coverfile,
+                            screenshot, banner, fanart, title, sortTitle, subtitle,
+                            sortSubtitle, tagline, year, releasedate, inetref,
                             collectionref, homepage, director, studio, plot, userrating, rating,
                             length, playcount, season, episode, insertdate, id, showlevel, categoryID,
                             childID, browse, watched, playcommand, category, genres, countries,
@@ -1245,8 +1214,11 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
     GetImageMap(metadataMap);
 
     metadataMap["filename"] = GetFilename();
+    metadataMap["sortfilename"] = GetSortFilename();
     metadataMap["title"] = GetTitle();
+    metadataMap["sorttitle"] = GetSortTitle();
     metadataMap["subtitle"] = GetSubtitle();
+    metadataMap["sortsubtitle"] = GetSortSubtitle();
     metadataMap["tagline"] = GetTagline();
     metadataMap["director"] = GetDirector();
     metadataMap["studio"] = GetStudio();
@@ -1317,8 +1289,11 @@ void ClearMap(InfoMap &metadataMap)
     metadataMap["bannerfile"] = "";
     metadataMap["fanartfile"] = "";
     metadataMap["filename"] = "";
+    metadataMap["sortfilename"] = "";
     metadataMap["title"] = "";
+    metadataMap["sorttitle"] = "";
     metadataMap["subtitle"] = "";
+    metadataMap["sortsubtitle"] = "";
     metadataMap["tagline"] = "";
     metadataMap["director"] = "";
     metadataMap["studio"] = "";
@@ -1350,21 +1325,6 @@ void ClearMap(InfoMap &metadataMap)
     metadataMap["processed"] = "";
 }
 
-bool VideoMetadata::HasSortKey() const
-{
-    return m_imp->HasSortKey();
-}
-
-const VideoMetadata::SortKey &VideoMetadata::GetSortKey() const
-{
-    return m_imp->GetSortKey();
-}
-
-void VideoMetadata::SetSortKey(const VideoMetadata::SortKey &sort_key)
-{
-    m_imp->SetSortKey(sort_key);
-}
-
 const QString &VideoMetadata::GetPrefix() const
 {
     return m_imp->GetPrefix();
@@ -1380,9 +1340,14 @@ const QString &VideoMetadata::GetTitle() const
     return m_imp->getTitle();
 }
 
-void VideoMetadata::SetTitle(const QString &title)
+const QString &VideoMetadata::GetSortTitle() const
 {
-    m_imp->SetTitle(title);
+    return m_imp->getSortTitle();
+}
+
+void VideoMetadata::SetTitle(const QString &title, const QString &sortTitle)
+{
+    m_imp->SetTitle(title, sortTitle);
 }
 
 const QString &VideoMetadata::GetSubtitle() const
@@ -1390,9 +1355,14 @@ const QString &VideoMetadata::GetSubtitle() const
     return m_imp->getSubtitle();
 }
 
-void VideoMetadata::SetSubtitle(const QString &subtitle)
+const QString &VideoMetadata::GetSortSubtitle() const
 {
-    m_imp->SetSubtitle(subtitle);
+    return m_imp->getSortSubtitle();
+}
+
+void VideoMetadata::SetSubtitle(const QString &subtitle, const QString &sortSubtitle)
+{
+    m_imp->SetSubtitle(subtitle, sortSubtitle);
 }
 
 const QString &VideoMetadata::GetTagline() const
@@ -1640,6 +1610,11 @@ const QString &VideoMetadata::GetFilename() const
     return m_imp->getFilename();
 }
 
+const QString &VideoMetadata::GetSortFilename() const
+{
+    return m_imp->getSortFilename();
+}
+
 const QString &VideoMetadata::GetHash() const
 {
     return m_imp->GetHash();
@@ -1660,9 +1635,9 @@ void VideoMetadata::SetHost(const QString &host)
         m_imp->SetHost(host);
 }
 
-void VideoMetadata::SetFilename(const QString &filename)
+void VideoMetadata::SetFilename(const QString &filename, const QString &sortFilename)
 {
-    m_imp->SetFilename(filename);
+    m_imp->SetFilename(filename, sortFilename);
 }
 
 const QString &VideoMetadata::GetTrailer() const
@@ -1828,28 +1803,17 @@ bool VideoMetadata::IsHostSet() const
     return m_imp->IsHostSet();
 }
 
+bool VideoMetadata::sortBefore(const VideoMetadata &rhs) const
+{
+    return m_imp->sortBefore(rhs.m_imp);
+}
+
 bool operator==(const VideoMetadata& a, const VideoMetadata& b)
 {
-    if (a.GetFilename() == b.GetFilename())
-        return true;
-    return false;
+    return a.GetFilename() == b.GetFilename();
 }
 
 bool operator!=(const VideoMetadata& a, const VideoMetadata& b)
 {
-    if (a.GetFilename() != b.GetFilename())
-        return true;
-    return false;
-}
-
-bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs)
-{
-    if (lhs.m_sd && rhs.m_sd)
-        return *lhs.m_sd < *rhs.m_sd;
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "Error: Bug, Metadata item with empty sort key compared");
-        return lhs.m_sd < rhs.m_sd;
-    }
+    return a.GetFilename() != b.GetFilename();
 }

@@ -88,7 +88,7 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
         lame_set_VBR(gf, vbr_off);
     }
 
-    if (channels == 1)
+    if (m_channels == 1)
     {
         lame_set_mode(gf, MONO);
     }
@@ -101,17 +101,12 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
 LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
                          MusicMetadata *metadata, bool vbr) :
     Encoder(outfile, qualitylevel, metadata),
-    bits(16),
-    channels(2),
-    bytes_per_sample(channels * bits / 8),
-    samples_per_channel(0),
-    mp3buf_size((int)(1.25 * 16384 + 7200)), // worst-case estimate
-    mp3buf(new char[mp3buf_size]),
-    gf(lame_init())
+    m_mp3buf(new char[m_mp3buf_size]),
+    m_gf(lame_init())
 {
-    init_id3tags(gf);
+    init_id3tags(m_gf);
 
-    int lameret = init_encoder(gf, qualitylevel, vbr);
+    int lameret = init_encoder(m_gf, qualitylevel, vbr);
     if (lameret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -123,14 +118,13 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
 
 LameEncoder::~LameEncoder()
 {
-    addSamples(nullptr, 0); //flush
+    LameEncoder::addSamples(nullptr, 0); //flush
 
-    if (gf && m_out)
-        lame_mp3_tags_fid (gf, m_out);
-    if (gf)
-        lame_close(gf);
-    if (mp3buf)
-        delete[] mp3buf;
+    if (m_gf && m_out)
+        lame_mp3_tags_fid (m_gf, m_out);
+    if (m_gf)
+        lame_close(m_gf);
+    delete[] m_mp3buf;
 
     // Need to close the file here.
     if (m_out)
@@ -150,19 +144,19 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
 {
     int lameret = 0;
 
-    samples_per_channel = length / bytes_per_sample;
+    m_samples_per_channel = length / m_bytes_per_sample;
 
     if (length > 0)
     {
-        lameret = lame_encode_buffer_interleaved(gf, (short int *)bytes,
-                                                 samples_per_channel,
-                                                 (unsigned char *)mp3buf,
-                                                 mp3buf_size);
+        lameret = lame_encode_buffer_interleaved(m_gf, bytes,
+                                                 m_samples_per_channel,
+                                                 (unsigned char *)m_mp3buf,
+                                                 m_mp3buf_size);
     }
     else
     {
-        lameret = lame_encode_flush(gf, (unsigned char *)mp3buf,
-                                          mp3buf_size);
+        lameret = lame_encode_flush(m_gf, (unsigned char *)m_mp3buf,
+                                          m_mp3buf_size);
     }
 
     if (lameret < 0)
@@ -171,7 +165,7 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
     } 
     else if (lameret > 0 && m_out)
     {
-        if (write_buffer(mp3buf, lameret, m_out) != lameret)
+        if (write_buffer(m_mp3buf, lameret, m_out) != lameret)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to write mp3 data. Aborting.");
             return EENCODEERROR;

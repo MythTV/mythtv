@@ -25,8 +25,8 @@ class Weather : public MythScreenType
     Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan);
     ~Weather();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     bool UpdateData();
     bool SetupScreens();
@@ -51,27 +51,27 @@ class Weather : public MythScreenType
     void showScreen(WeatherScreen *ws);
     void hideScreen(void);
 
-    MythScreenStack *m_weatherStack;
+    MythScreenStack *m_weatherStack {nullptr};
 
-    bool m_firstRun;
-    int m_nextpageInterval;
+    bool    m_firstRun              {true};
+    int     m_nextpageInterval      {10};
 
-    QTimer *m_nextpage_Timer;
+    QTimer *m_nextpage_Timer        {nullptr};
 
-    bool m_firstSetup;
+    bool    m_firstSetup            {true};
 
-    bool m_createdSrcMan;
-    SourceManager *m_srcMan;
+    bool    m_createdSrcMan         {false};
+    SourceManager *m_srcMan         {nullptr};
     ScreenList m_screens; //screens in correct display order
-    int        m_cur_screen;
+    int        m_cur_screen         {0};
 
     ScreenListMap m_allScreens; //screens parsed from xml
-    WeatherScreen *m_currScreen;
-    bool m_paused;
+    WeatherScreen *m_currScreen     {nullptr};
+    bool m_paused                   {false};
 
-    MythUIText *m_pauseText;
-    MythUIText *m_headerText;
-    MythUIText *m_updatedText;
+    MythUIText *m_pauseText         {nullptr};
+    MythUIText *m_headerText        {nullptr};
+    MythUIText *m_updatedText       {nullptr};
 };
 
 #endif

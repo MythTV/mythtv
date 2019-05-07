@@ -61,7 +61,7 @@
 #define TS_VIDPID      4101
 #define TS_MP2PID      4201
 #define TS_AC3PID      4301
-uint16_t get_pid(uint8_t *pid);
+uint16_t get_pid(const uint8_t *pid);
 int find_pids(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf, int len);
 int find_pids_pos(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf, int len, int *vpos, int *apos, int *ac3pos);
 

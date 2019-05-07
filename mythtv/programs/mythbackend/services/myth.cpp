@@ -447,7 +447,7 @@ QString Myth::GetFormatTime(const QDateTime Time)
 
 QDateTime Myth::ParseISODateString(const QString& DateTimeString)
 {
-    QDateTime dateTime = QDateTime().fromString(DateTimeString, Qt::ISODate);
+    QDateTime dateTime = QDateTime::fromString(DateTimeString, Qt::ISODate);
 
     if (!dateTime.isValid())
         throw QString( "Unable to parse DateTimeString" );
@@ -604,12 +604,12 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
     for (it = frontends.begin(); it != frontends.end(); ++it)
     {
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
-        pFrontend->setName((*it)->name);
-        pFrontend->setIP((*it)->ip.toString());
+        pFrontend->setName((*it)->m_name);
+        pFrontend->setIP((*it)->m_ip.toString());
         int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
-                                                        (*it)->name, 6547);
+                                                        (*it)->m_name, 6547);
         pFrontend->setPort(port);
-        pFrontend->setOnLine((*it)->connectionCount > 0);
+        pFrontend->setOnLine((*it)->m_connectionCount > 0);
     }
 
     return pList;
@@ -644,15 +644,13 @@ QString Myth::GetSetting( const QString &sHostName,
 
         return query.next() ? query.value(0).toString() : sDefault;
     }
-    else
-    {
-        QString hostname = sHostName;
 
-        if (sHostName.isEmpty())
-            hostname = gCoreContext->GetHostName();
+    QString hostname = sHostName;
 
-        return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
-    }
+    if (sHostName.isEmpty())
+        hostname = gCoreContext->GetHostName();
+
+    return gCoreContext->GetSettingOnHost(sKey, hostname, sDefault);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -826,7 +824,7 @@ bool Myth::SendNotification( bool  bError,
                              const QString &Type,
                              const QString &sMessage,
                              const QString &sOrigin,
-                             const QString &sDecription,
+                             const QString &sDescription,
                              const QString &sImage,
                              const QString &sExtra,
                              const QString &sProgressText,
@@ -850,7 +848,7 @@ bool Myth::SendNotification( bool  bError,
         "<mythnotification version=\"1\">\n"
         "  <text>" + sMessage + "</text>\n"
         "  <origin>" + (sOrigin.isNull() ? tr("MythServices") : sOrigin) + "</origin>\n"
-        "  <description>" + sDecription + "</description>\n"
+        "  <description>" + sDescription + "</description>\n"
         "  <timeout>" + QString::number(Duration) + "</timeout>\n"
         "  <image>" + sImage + "</image>\n"
         "  <extra>" + sExtra + "</extra>\n"
@@ -1106,7 +1104,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
         return false;
     }
 
-    if (sessionManager->CreateDigest("admin", sAdminPassword) !=
+    if (MythSessionManager::CreateDigest("admin", sAdminPassword) !=
             sessionManager->GetPasswordDigest("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1")
@@ -1121,13 +1119,13 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     QStringList protectedURLs;
 
     if (serviceList.size() == 1 && serviceList.first() == "All")
-        for (QString service : KnownServices)
+        for (const QString& service : KnownServices)
             protectedURLs << '/' + service;
     else if (serviceList.size() == 1 && serviceList.first() == "None")
         protectedURLs << "Unprotected";
     else
     {
-        for (QString service : serviceList)
+        for (const QString& service : serviceList)
             if (KnownServices.contains(service))
                 protectedURLs << '/' + service;
             else

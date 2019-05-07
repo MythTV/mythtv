@@ -26,7 +26,7 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-const char* V4L2encStreamHandler::m_stream_types[] =
+const char* V4L2encStreamHandler::s_stream_types[] =
 {
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
@@ -34,72 +34,73 @@ const char* V4L2encStreamHandler::m_stream_types[] =
     "SVCD",      "DVD-Special 1", "DVD-Special 2", nullptr
 };
 
-const int V4L2encStreamHandler::m_audio_rateL1[] =
+const int V4L2encStreamHandler::s_audio_rateL1[] =
 {
     32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0
 };
 
-const int V4L2encStreamHandler::m_audio_rateL2[] =
+const int V4L2encStreamHandler::s_audio_rateL2[] =
 {
     32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0
 };
 
-const int V4L2encStreamHandler::m_audio_rateL3[] =
+const int V4L2encStreamHandler::s_audio_rateL3[] =
 {
     32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
 };
 
-#define LOC      QString("V4L2SH(%1): ").arg(_device)
+#define LOC      QString("V4L2SH[%1](%2): ").arg(m_inputid).arg(m_device)
 
-QMap<QString,V4L2encStreamHandler*> V4L2encStreamHandler::m_handlers;
-QMap<QString,uint>              V4L2encStreamHandler::m_handlers_refcnt;
-QMutex                          V4L2encStreamHandler::m_handlers_lock;
+QMap<QString,V4L2encStreamHandler*> V4L2encStreamHandler::s_handlers;
+QMap<QString,uint>                  V4L2encStreamHandler::s_handlers_refcnt;
+QMutex                              V4L2encStreamHandler::s_handlers_lock;
 
 V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
-                                                int audioinput)
+                                                int audioinput, int inputid)
 {
-    QMutexLocker locker(&m_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
-    QString devkey = devname;
+    const QString& devkey = devname;
 
-    QMap<QString,V4L2encStreamHandler*>::iterator it = m_handlers.find(devkey);
+    QMap<QString,V4L2encStreamHandler*>::iterator it = s_handlers.find(devkey);
 
-    if (it == m_handlers.end())
+    if (it == s_handlers.end())
     {
         V4L2encStreamHandler *newhandler = new V4L2encStreamHandler(devname,
-                                                                    audioinput);
+                                                                    audioinput,
+                                                                    inputid);
 
-        m_handlers[devkey] = newhandler;
-        m_handlers_refcnt[devkey] = 1;
+        s_handlers[devkey] = newhandler;
+        s_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("V4L2SH: Creating new stream handler for %1")
-            .arg(devname));
+            QString("V4L2SH[%1]: Creating new stream handler for %2")
+            .arg(inputid).arg(devname));
     }
     else
     {
-        m_handlers_refcnt[devkey]++;
-        uint rcount = m_handlers_refcnt[devkey];
+        s_handlers_refcnt[devkey]++;
+        uint rcount = s_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("V4L2SH: Using existing stream handler for %1")
-            .arg(devkey) + QString(" (%1 in use)").arg(rcount));
+            QString("V4L2SH[%1]: Using existing stream handler for %2")
+            .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return m_handlers[devkey];
+    return s_handlers[devkey];
 }
 
-void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref)
+void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&m_handlers_lock);
+    QMutexLocker locker(&s_handlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
-    QMap<QString,uint>::iterator rit = m_handlers_refcnt.find(devname);
-    if (rit == m_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
+    if (rit == s_handlers_refcnt.end())
         return;
 
-    LOG(VB_RECORD, LOG_INFO, QString("V4L2SH: Return '%1' in use %2")
-        .arg(devname).arg(*rit));
+    LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Return '%2' in use %3")
+        .arg(inputid).arg(devname).arg(*rit));
 
     if (*rit > 1)
     {
@@ -109,22 +110,22 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref)
     }
 
     QMap<QString, V4L2encStreamHandler*>::iterator it =
-        m_handlers.find(devname);
-    if ((it != m_handlers.end()) && (*it == ref))
+        s_handlers.find(devname);
+    if ((it != s_handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("V4L2SH: Closing handler for %1")
-            .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         delete *it;
-        m_handlers.erase(it);
+        s_handlers.erase(it);
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("V4L2SH: Error: Couldn't find handler for %1")
-            .arg(devname));
+            QString("V4L2SH[%1]: Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
-    m_handlers_refcnt.erase(rit);
+    s_handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
@@ -139,40 +140,20 @@ bool V4L2encStreamHandler::Status(bool &failed, bool &failing)
 }
 
 V4L2encStreamHandler::V4L2encStreamHandler(const QString & device,
-                                           int audio_input) :
-    StreamHandler(device),          m_failing(false),
-    m_hasTuner(false),              m_hasPictureAttributes(false),
-    m_bufferSize(1000 * TSPacket::kSize), m_desired_stream_type(-1),
-    m_stream_type(-1),              m_aspect_ratio(-1),
-    m_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_bitrate(-1),                  m_max_bitrate(-1),
-    m_audio_codec(-1),              m_audio_samplerate(-1),
-    m_audio_bitrateL1(-1),          m_audio_bitrateL2(-1),
-    m_audio_bitrateL3(-1),          m_audio_volume(-1),
-    m_lang_mode(-1),
-    m_low_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_low_bitrate(-1),              m_low_peak_bitrate(-1),
-    m_medium_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_medium_bitrate(-1),           m_medium_peak_bitrate(-1),
-    m_high_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_high_bitrate(-1),             m_high_peak_bitrate(-1),
-    m_fd(-1),                       m_audio_input(audio_input),
-    m_width(-1),                    m_height(-1),
-    m_has_lock(false),              m_signal_strength(-1),
-    m_drb(nullptr),
-    m_streaming_cnt(0),             m_pause_encoding_allowed(true)
+                                           int audio_input, int inputid)
+    : StreamHandler(device, inputid)
+    , m_audio_input(audio_input)
 {
     setObjectName("V4L2encSH");
 
     if (!Open())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("-- Failed to open %1: ")
-            .arg(_device) + ENO);
-        _error = true;
+            .arg(m_device) + ENO);
+        m_bError = true;
         return;
     }
-    else
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("'%1' open").arg(_device));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("'%1' open").arg(m_device));
 }
 
 V4L2encStreamHandler::~V4L2encStreamHandler(void)
@@ -195,8 +176,8 @@ void V4L2encStreamHandler::run(void)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("run() -- Failed to open %1: ")
-                .arg(_device) + ENO);
-            _error = true;
+                .arg(m_device) + ENO);
+            m_bError = true;
             return;
         }
     }
@@ -218,14 +199,14 @@ void V4L2encStreamHandler::run(void)
 
     SetRunning(true, true, false);
 
-    while (_running_desired && !_error)
+    while (m_running_desired && !m_bError)
     {
         // Get V4L2 data
         if (m_streaming_cnt.load() == 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for stream start.");
-            QMutexLocker locker(&_start_stop_lock);
-            _running_state_changed.wait(&_start_stop_lock, 5000);
+            QMutexLocker locker(&m_start_stop_lock);
+            m_running_state_changed.wait(&m_start_stop_lock, 5000);
             continue;
         }
 
@@ -257,7 +238,7 @@ void V4L2encStreamHandler::run(void)
         else if (m_drb->IsEOF())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "run() -- Device EOF detected");
-            _error = true;
+            m_bError = true;
         }
         else
         {
@@ -299,7 +280,7 @@ void V4L2encStreamHandler::run(void)
             if (errno != EAGAIN)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("run() -- error reading from: %1")
-                    .arg(_device) + ENO);
+                    .arg(m_device) + ENO);
             continue;
         }
 
@@ -309,25 +290,25 @@ void V4L2encStreamHandler::run(void)
         if (len < static_cast<int>(TSPacket::kSize))
             continue;
 
-        if (!_listener_lock.tryLock())
+        if (!m_listener_lock.tryLock())
             continue;
 
-        if (_stream_data_list.empty())
+        if (m_stream_data_list.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("run() -- _stream_data_list is empty, %1 buffered")
                 .arg(buffer.size()));
-            _listener_lock.unlock();
+            m_listener_lock.unlock();
             continue;
         }
 
-        StreamDataList::const_iterator sit = _stream_data_list.begin();
-        for (; sit != _stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_stream_data_list.begin();
+        for (; sit != m_stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData
                         (reinterpret_cast<const uint8_t *>
                          (buffer.constData()), len);
 
-        _listener_lock.unlock();
+        m_listener_lock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
             buffer.remove(0, len - remainder);
@@ -335,10 +316,10 @@ void V4L2encStreamHandler::run(void)
             buffer.clear();
     }
 
-    QString tmp(_error);
+    QString tmp(m_error);
     LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("_running_desired(%1)  _error(%2)")
-                .arg(_running_desired).arg(tmp));
+                .arg(m_running_desired).arg(tmp));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- finishing up");
     StopEncoding();
@@ -364,10 +345,10 @@ bool V4L2encStreamHandler::Open(void)
     Close();
 
     QMutexLocker lock(&m_stream_lock);
-    m_v4l2.Open(_device, m_vbi_device);
+    m_v4l2.Open(m_device, m_vbi_device);
     if (!m_v4l2.IsOpen())
     {
-        m_error = QString("Open of '%1' failed: ").arg(_device) + ENO;
+        m_error = QString("Open of '%1' failed: ").arg(m_device) + ENO;
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open() -- " + m_error);
         return false;
     }
@@ -389,7 +370,7 @@ bool V4L2encStreamHandler::Open(void)
     }
 
 
-    m_fd = open(_device.toLatin1().constData(), O_RDWR | O_NONBLOCK);
+    m_fd = open(m_device.toLatin1().constData(), O_RDWR | O_NONBLOCK);
 
     m_drb = new DeviceReadBuffer(this);
     if (!m_drb)
@@ -401,7 +382,7 @@ bool V4L2encStreamHandler::Open(void)
     }
 
     m_drb->SetRequestPause(true);
-    if (!m_drb->Setup(_device.toLatin1().constData(), m_fd))
+    if (!m_drb->Setup(m_device.toLatin1().constData(), m_fd))
     {
         m_error = "Failed to setup DRB buffer";
         LOG(VB_GENERAL, LOG_ERR, LOC + "Configure() -- " + m_error);
@@ -568,7 +549,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                     "StartEncoding: read failing, re-opening device: " + ENO);
                 close(m_fd);
                 std::this_thread::sleep_for(std::chrono::milliseconds(2));
-                m_fd = open(_device.toLatin1().constData(), O_RDWR | O_NONBLOCK);
+                m_fd = open(m_device.toLatin1().constData(), O_RDWR | O_NONBLOCK);
                 if (m_fd < 0)
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -609,7 +590,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
     else
         LOG(VB_RECORD, LOG_INFO, LOC + "Already encoding");
 
-    QMutexLocker listen_lock(&_listener_lock);
+    QMutexLocker listen_lock(&m_listener_lock);
 
     m_streaming_cnt.ref();
 
@@ -750,7 +731,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel1")
     {
-        int index = find_index(m_audio_rateL1, value);
+        int index = find_index(s_audio_rateL1, value);
         if (index >= 0)
             m_audio_bitrateL1 = index;
         else
@@ -762,7 +743,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel2")
     {
-        int index = find_index(m_audio_rateL2, value);
+        int index = find_index(s_audio_rateL2, value);
         if (index >= 0)
             m_audio_bitrateL2 = index;
         else
@@ -774,7 +755,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel3")
     {
-        int index = find_index(m_audio_rateL3, value);
+        int index = find_index(s_audio_rateL3, value);
         if (index >= 0)
             m_audio_bitrateL3 = index;
         else
@@ -838,9 +819,9 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, const QString &value)
         m_vbi_device = value;
     else if (opt == "mpeg2streamtype")
     {
-        for (uint i = 0; i < sizeof(m_stream_types) / sizeof(char*); ++i)
+        for (size_t i = 0; i < sizeof(s_stream_types) / sizeof(char*); ++i)
         {
-            if (QString(m_stream_types[i]) == value)
+            if (QString(s_stream_types[i]) == value)
             {
                 m_desired_stream_type = i;
                 return true;
@@ -982,7 +963,7 @@ bool V4L2encStreamHandler::SetBitrateForResolution(void)
         if (idx == 5)
         {
             m_v4l2.Close();
-            m_v4l2.Open(_device, m_vbi_device);
+            m_v4l2.Open(m_device, m_vbi_device);
         }
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }

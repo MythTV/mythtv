@@ -20,8 +20,6 @@
 #include "mythpainter.h"
 
 MythPainter::MythPainter()
-  : m_Parent(nullptr), m_HardwareCacheSize(0), m_SoftwareCacheSize(0),
-    m_showBorders(false), m_showNames(false)
 {
     SetMaximumCacheSizes(
         gCoreContext->GetNumSetting("UIPainterMaxCacheHW",64),
@@ -47,11 +45,11 @@ void MythPainter::Teardown(void)
     m_allocatedImages.clear();
 }
 
-void MythPainter::SetClipRect(const QRect &)
+void MythPainter::SetClipRect(const QRect & /*clipRect*/)
 {
 }
 
-void MythPainter::SetClipRegion(const QRegion &)
+void MythPainter::SetClipRegion(const QRegion & /*clipRegion*/)
 {
 }
 

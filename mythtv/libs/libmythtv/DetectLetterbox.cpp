@@ -9,16 +9,11 @@
 DetectLetterbox::DetectLetterbox(MythPlayer* const player)
 {
     int dbAdjustFill = gCoreContext->GetNumSetting("AdjustFill", 0);
-    isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
-    firstFrameChecked = 0;
-    detectLetterboxDefaultMode = (AdjustFillMode) max((int) kAdjustFill_Off,
+    m_isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
+    m_detectLetterboxDefaultMode = (AdjustFillMode) max((int) kAdjustFill_Off,
                                  dbAdjustFill - kAdjustFill_AutoDetect_DefaultOff);
-    detectLetterboxSwitchFrame = -1;
-    detectLetterboxPossibleHalfFrame = -1;
-    detectLetterboxPossibleFullFrame = -1;
-    detectLetterboxConsecutiveCounter = 0;
-    detectLetterboxDetectedMode = player->GetAdjustFill();
-    detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
+    m_detectLetterboxDetectedMode = player->GetAdjustFill();
+    m_detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
     m_player = player;
 }
 
@@ -41,11 +36,11 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     const int HORIZONTAL_THRESHOLD = 4; // How tolerant are we that the image has horizontal edges
 
     // If the black bars is larger than this limit we switch to Half or Full Mode
-    //    const int fullLimit = (int) (((height - width * 9 / 16) / 2) * detectLetterboxLimit / 100);
-    //    const int halfLimit = (int) (((height - width * 9 / 14) / 2) * detectLetterboxLimit / 100);
+    //    const int fullLimit = (int) (((height - width * 9 / 16) / 2) * m_detectLetterboxLimit / 100);
+    //    const int halfLimit = (int) (((height - width * 9 / 14) / 2) * m_detectLetterboxLimit / 100);
     // If the black bars is larger than this limit we switch to Half or Full Mode
-    const int fullLimit = (int) ((height * (1 - m_player->GetVideoAspect() * 9 / 16) / 2) * detectLetterboxLimit / 100);
-    const int halfLimit = (int) ((height * (1 - m_player->GetVideoAspect() * 9 / 14) / 2) * detectLetterboxLimit / 100);
+    const int fullLimit = (int) ((height * (1 - m_player->GetVideoAspect() * 9 / 16) / 2) * m_detectLetterboxLimit / 100);
+    const int halfLimit = (int) ((height * (1 - m_player->GetVideoAspect() * 9 / 14) / 2) * m_detectLetterboxLimit / 100);
 
     const int xPos[] = {width / 4, width / 2, width * 3 / 4};    // Lines to scan for black letterbox edge
     int topHits = 0, bottomHits = 0, minTop = 0, minBottom = 0, maxTop = 0, maxBottom = 0;
@@ -59,9 +54,9 @@ void DetectLetterbox::Detect(VideoFrame *frame)
 
     switch (frame->codec) {
         case FMT_YV12:
-            if (!firstFrameChecked)
+            if (!m_firstFrameChecked)
             {
-                firstFrameChecked = frameNumber;
+                m_firstFrameChecked = frameNumber;
                 LOG(VB_PLAYBACK, LOG_INFO,
                     QString("Detect Letterbox: YV12 frame format detected"));
             }
@@ -70,7 +65,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Detect Letterbox: The source is not "
                         "a supported frame format (was %1)").arg(frame->codec));
-            isDetectLetterbox = false;
+            m_isDetectLetterbox = false;
             return;
     }
 
@@ -82,29 +77,29 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         return;
     }
 
-    if (m_player->GetVideoAspect() > 1.5)
+    if (m_player->GetVideoAspect() > 1.5F)
     {
-        if (detectLetterboxDetectedMode != detectLetterboxDefaultMode)
+        if (m_detectLetterboxDetectedMode != m_detectLetterboxDefaultMode)
         {
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Detect Letterbox: The source is "
                         "already in widescreen (aspect: %1)")
                     .arg(m_player->GetVideoAspect()));
-            detectLetterboxLock.lock();
-            detectLetterboxConsecutiveCounter = 0;
-            detectLetterboxDetectedMode = detectLetterboxDefaultMode;
-            detectLetterboxSwitchFrame = frameNumber;
-            detectLetterboxLock.unlock();
+            m_detectLetterboxLock.lock();
+            m_detectLetterboxConsecutiveCounter = 0;
+            m_detectLetterboxDetectedMode = m_detectLetterboxDefaultMode;
+            m_detectLetterboxSwitchFrame = frameNumber;
+            m_detectLetterboxLock.unlock();
         }
         else
         {
-            detectLetterboxConsecutiveCounter++;
+            m_detectLetterboxConsecutiveCounter++;
         }
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("Detect Letterbox: The source is already "
                     "in widescreen (aspect: %1)")
                 .arg(m_player->GetVideoAspect()));
-        isDetectLetterbox = false;
+        m_isDetectLetterbox = false;
         return;
     }
 
@@ -173,111 +168,111 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     bool horizontal = ((minTop && maxTop - minTop < HORIZONTAL_THRESHOLD) &&
                        (minBottom && maxBottom - minBottom < HORIZONTAL_THRESHOLD));
 
-    if (detectLetterboxSwitchFrame > frameNumber) // user is reversing
+    if (m_detectLetterboxSwitchFrame > frameNumber) // user is reversing
     {
-        detectLetterboxLock.lock();
-        detectLetterboxDetectedMode = m_player->GetAdjustFill();
-        detectLetterboxSwitchFrame = -1;
-        detectLetterboxPossibleHalfFrame = -1;
-        detectLetterboxPossibleFullFrame = -1;
-        detectLetterboxLock.unlock();
+        m_detectLetterboxLock.lock();
+        m_detectLetterboxDetectedMode = m_player->GetAdjustFill();
+        m_detectLetterboxSwitchFrame = -1;
+        m_detectLetterboxPossibleHalfFrame = -1;
+        m_detectLetterboxPossibleFullFrame = -1;
+        m_detectLetterboxLock.unlock();
     }
 
     if (minTop < halfLimit || minBottom < halfLimit)
-        detectLetterboxPossibleHalfFrame = -1;
+        m_detectLetterboxPossibleHalfFrame = -1;
     if (minTop < fullLimit || minBottom < fullLimit)
-        detectLetterboxPossibleFullFrame = -1;
+        m_detectLetterboxPossibleFullFrame = -1;
 
-    if (detectLetterboxDetectedMode != kAdjustFill_Full)
+    if (m_detectLetterboxDetectedMode != kAdjustFill_Full)
     {
-        if (detectLetterboxPossibleHalfFrame == -1 &&
+        if (m_detectLetterboxPossibleHalfFrame == -1 &&
             minTop > halfLimit && minBottom > halfLimit) {
-            detectLetterboxPossibleHalfFrame = frameNumber;
+            m_detectLetterboxPossibleHalfFrame = frameNumber;
         }
     }
     else
     {
-        if (detectLetterboxPossibleHalfFrame == -1 &&
+        if (m_detectLetterboxPossibleHalfFrame == -1 &&
             minTop < fullLimit && minBottom < fullLimit) {
-            detectLetterboxPossibleHalfFrame = frameNumber;
+            m_detectLetterboxPossibleHalfFrame = frameNumber;
         }
     }
-    if (detectLetterboxPossibleFullFrame == -1 &&
+    if (m_detectLetterboxPossibleFullFrame == -1 &&
         minTop > fullLimit && minBottom > fullLimit)
-        detectLetterboxPossibleFullFrame = frameNumber;
+        m_detectLetterboxPossibleFullFrame = frameNumber;
 
     if ( maxTop < halfLimit || maxBottom < halfLimit) // Not to restrictive when switching to off
     {
         // No Letterbox
-        if (detectLetterboxDetectedMode != detectLetterboxDefaultMode)
+        if (m_detectLetterboxDetectedMode != m_detectLetterboxDefaultMode)
         {
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Detect Letterbox: Non Letterbox "
                         "detected on line: %1 (limit: %2)")
                     .arg(min(maxTop, maxBottom)).arg(halfLimit));
-            detectLetterboxLock.lock();
-            detectLetterboxConsecutiveCounter = 0;
-            detectLetterboxDetectedMode = detectLetterboxDefaultMode;
-            detectLetterboxSwitchFrame = frameNumber;
-            detectLetterboxLock.unlock();
+            m_detectLetterboxLock.lock();
+            m_detectLetterboxConsecutiveCounter = 0;
+            m_detectLetterboxDetectedMode = m_detectLetterboxDefaultMode;
+            m_detectLetterboxSwitchFrame = frameNumber;
+            m_detectLetterboxLock.unlock();
         }
         else
         {
-            detectLetterboxConsecutiveCounter++;
+            m_detectLetterboxConsecutiveCounter++;
         }
     }
     else if (horizontal && minTop > halfLimit && minBottom > halfLimit &&
              maxTop < fullLimit && maxBottom < fullLimit)
     {
         // Letterbox (with narrow bars)
-        if (detectLetterboxDetectedMode != kAdjustFill_Half)
+        if (m_detectLetterboxDetectedMode != kAdjustFill_Half)
         {
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Detect Letterbox: Narrow Letterbox "
                         "detected on line: %1 (limit: %2) frame: %3")
                     .arg(minTop).arg(halfLimit)
-                    .arg(detectLetterboxPossibleHalfFrame));
-            detectLetterboxLock.lock();
-            detectLetterboxConsecutiveCounter = 0;
-            if (detectLetterboxDetectedMode == kAdjustFill_Full &&
-                detectLetterboxSwitchFrame != -1) {
+                    .arg(m_detectLetterboxPossibleHalfFrame));
+            m_detectLetterboxLock.lock();
+            m_detectLetterboxConsecutiveCounter = 0;
+            if (m_detectLetterboxDetectedMode == kAdjustFill_Full &&
+                m_detectLetterboxSwitchFrame != -1) {
                 // Do not change switch frame if switch to Full mode has not been executed yet
             }
             else
-                detectLetterboxSwitchFrame = detectLetterboxPossibleHalfFrame;
-            detectLetterboxDetectedMode = kAdjustFill_Half;
-            detectLetterboxLock.unlock();
+                m_detectLetterboxSwitchFrame = m_detectLetterboxPossibleHalfFrame;
+            m_detectLetterboxDetectedMode = kAdjustFill_Half;
+            m_detectLetterboxLock.unlock();
         }
         else
         {
-            detectLetterboxConsecutiveCounter++;
+            m_detectLetterboxConsecutiveCounter++;
         }
     }
     else if (horizontal && minTop > fullLimit && minBottom > fullLimit)
     {
         // Letterbox
-        detectLetterboxPossibleHalfFrame = -1;
-        if (detectLetterboxDetectedMode != kAdjustFill_Full)
+        m_detectLetterboxPossibleHalfFrame = -1;
+        if (m_detectLetterboxDetectedMode != kAdjustFill_Full)
         {
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Detect Letterbox: Detected Letterbox "
                         "on line: %1 (limit: %2) frame: %3").arg(minTop)
-                    .arg(fullLimit).arg(detectLetterboxPossibleFullFrame));
-            detectLetterboxLock.lock();
-            detectLetterboxConsecutiveCounter = 0;
-            detectLetterboxDetectedMode = kAdjustFill_Full;
-            detectLetterboxSwitchFrame = detectLetterboxPossibleFullFrame;
-            detectLetterboxLock.unlock();
+                    .arg(fullLimit).arg(m_detectLetterboxPossibleFullFrame));
+            m_detectLetterboxLock.lock();
+            m_detectLetterboxConsecutiveCounter = 0;
+            m_detectLetterboxDetectedMode = kAdjustFill_Full;
+            m_detectLetterboxSwitchFrame = m_detectLetterboxPossibleFullFrame;
+            m_detectLetterboxLock.unlock();
         }
         else
         {
-            detectLetterboxConsecutiveCounter++;
+            m_detectLetterboxConsecutiveCounter++;
         }
     }
     else
     {
-        if (detectLetterboxConsecutiveCounter <= 3)
-            detectLetterboxConsecutiveCounter = 0;
+        if (m_detectLetterboxConsecutiveCounter <= 3)
+            m_detectLetterboxConsecutiveCounter = 0;
     }
 }
 
@@ -291,48 +286,48 @@ void DetectLetterbox::SwitchTo(VideoFrame *frame)
     if (!GetDetectLetterbox())
         return;
 
-    if (detectLetterboxSwitchFrame == -1)
+    if (m_detectLetterboxSwitchFrame == -1)
         return;
 
-    detectLetterboxLock.lock();
-    if (detectLetterboxSwitchFrame <= frame->frameNumber &&
-        detectLetterboxConsecutiveCounter > 3)
+    m_detectLetterboxLock.lock();
+    if (m_detectLetterboxSwitchFrame <= frame->frameNumber &&
+        m_detectLetterboxConsecutiveCounter > 3)
     {
-        if (m_player->GetAdjustFill() != detectLetterboxDetectedMode)
+        if (m_player->GetAdjustFill() != m_detectLetterboxDetectedMode)
         {
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Detect Letterbox: Switched to %1 "
-                        "on frame %2 (%3)").arg(detectLetterboxDetectedMode)
+                        "on frame %2 (%3)").arg(m_detectLetterboxDetectedMode)
                     .arg(frame->frameNumber)
-                    .arg(detectLetterboxSwitchFrame));
+                    .arg(m_detectLetterboxSwitchFrame));
             m_player->GetVideoOutput()->
-                      ToggleAdjustFill(detectLetterboxDetectedMode);
+                      ToggleAdjustFill(m_detectLetterboxDetectedMode);
             m_player->ReinitOSD();
         }
-        detectLetterboxSwitchFrame = -1;
+        m_detectLetterboxSwitchFrame = -1;
     }
-    else if (detectLetterboxSwitchFrame <= frame->frameNumber)
+    else if (m_detectLetterboxSwitchFrame <= frame->frameNumber)
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("Detect Letterbox: Not Switched to %1 on frame %2 "
                     "(%3) Not enough consecutive detections (%4)")
-                .arg(detectLetterboxDetectedMode)
-                .arg(frame->frameNumber).arg(detectLetterboxSwitchFrame)
-                .arg(detectLetterboxConsecutiveCounter));
+                .arg(m_detectLetterboxDetectedMode)
+                .arg(frame->frameNumber).arg(m_detectLetterboxSwitchFrame)
+                .arg(m_detectLetterboxConsecutiveCounter));
 
-    detectLetterboxLock.unlock();
+    m_detectLetterboxLock.unlock();
 }
 
 void DetectLetterbox::SetDetectLetterbox(bool detect)
 {
-    isDetectLetterbox = detect;
-    detectLetterboxSwitchFrame = -1;
-    detectLetterboxDetectedMode = m_player->GetAdjustFill();
-    firstFrameChecked = 0;
+    m_isDetectLetterbox = detect;
+    m_detectLetterboxSwitchFrame = -1;
+    m_detectLetterboxDetectedMode = m_player->GetAdjustFill();
+    m_firstFrameChecked = 0;
 }
 
 bool DetectLetterbox::GetDetectLetterbox() const
 {
-    return isDetectLetterbox;
+    return m_isDetectLetterbox;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

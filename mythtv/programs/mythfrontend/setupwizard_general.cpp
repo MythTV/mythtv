@@ -17,11 +17,7 @@
 // ---------------------------------------------------
 
 GeneralSetupWizard::GeneralSetupWizard(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name),
-      m_submitButton(nullptr), m_viewButton(nullptr),
-      m_deleteButton(nullptr), m_nextButton(nullptr),
-      m_cancelButton(nullptr), m_profileLocation(nullptr),
-      m_adminPassword(nullptr),m_busyPopup(nullptr)
+    : MythScreenType(parent, name)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_hardwareProfile = new HardwareProfile();
@@ -200,20 +196,17 @@ void GeneralSetupWizard::slotView(void)
         GetMythMainWindow()->HandleMedia("WebBrowser", url);
         return;
     }
-    else
-    {
-        QString cmd = browser;
-        cmd.replace("%ZOOM%", zoom);
-        cmd.replace("%URL%", url);
-        cmd.replace('\'', "%27");
-        cmd.replace("&","\\&");
-        cmd.replace(";","\\;");
 
-        GetMythMainWindow()->AllowInput(false);
-        myth_system(cmd, kMSDontDisableDrawing);
-        GetMythMainWindow()->AllowInput(true);
-        return;
-    }
+    QString cmd = browser;
+    cmd.replace("%ZOOM%", zoom);
+    cmd.replace("%URL%", url);
+    cmd.replace('\'', "%27");
+    cmd.replace("&","\\&");
+    cmd.replace(";","\\;");
+
+    GetMythMainWindow()->AllowInput(false);
+    myth_system(cmd, kMSDontDisableDrawing);
+    GetMythMainWindow()->AllowInput(true);
 }
 
 void GeneralSetupWizard::slotDelete(void)
@@ -286,7 +279,7 @@ bool GeneralSetupWizard::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void GeneralSetupWizard::CreateBusyDialog(QString message)
+void GeneralSetupWizard::CreateBusyDialog(const QString& message)
 {
     if (m_busyPopup)
         return;

@@ -141,7 +141,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     virtual void onDeviceUnmounted() {};
 
     MythMediaType DetectMediaType(void);
-    bool ScanMediaType(const QString &directory, ext_cnt_t &counts);
+    bool ScanMediaType(const QString &directory, ext_cnt_t &cnt);
 
     MythMediaStatus setStatus(MythMediaStatus newStat, bool CloseIt=false);
 
@@ -156,12 +156,14 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
                              ///  (e.g. /dev/hdc) Read only
     QString m_VolumeID;      ///< The volume ID of the media. Read/write
 
-    MythMediaStatus m_Status;    ///< The status of the media as of the
+    MythMediaStatus m_Status {MEDIASTAT_UNKNOWN};
+                             ///< The status of the media as of the
                              ///  last call to checkMedia. Read only
-    MythMediaType   m_MediaType; ///< The type of media. Read only
+    MythMediaType   m_MediaType {MEDIATYPE_UNKNOWN};
+                             ///< The type of media. Read only
 
     bool m_AllowEject;       ///< Allow the user to eject the media?. Read only
-    bool m_Locked;           ///< Is this media locked?.              Read only
+    bool m_Locked {false};   ///< Is this media locked?.              Read only
 
     bool m_SuperMount;       ///< Is this a supermount device?.       Read only
                              ///  The OS handles mounting/unmounting of
@@ -170,7 +172,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
                              ///  mount/unmount logic.
 
 
-    int  m_DeviceHandle;     ///< A file handle for opening and closing
+    int  m_DeviceHandle {-1};///< A file handle for opening and closing
                              ///  the device, ioctls(), et c. This should
                              ///  be private, but a subclass of a
                              ///  subclass needs it (MythCDRomLinux)

@@ -75,8 +75,8 @@
 class Dsmcc
 {
   public:
-    Dsmcc();
-    ~Dsmcc();
+    Dsmcc() = default;
+    ~Dsmcc() { Reset(); }
     // Reset the object carousel and clear the caches.
     void Reset();
     // Process an incoming DSMCC carousel table
@@ -92,12 +92,12 @@ class Dsmcc
     ObjCarousel *AddTap(unsigned short componentTag, unsigned carouselId);
 
   protected:
-    void ProcessSectionIndication(const unsigned char *data, int Lstartength,
+    void ProcessSectionIndication(const unsigned char *data, int length,
                                   unsigned short streamTag);
     void ProcessSectionData(const unsigned char *data, int length);
     void ProcessSectionDesc(const unsigned char *data, int length);
 
-    bool ProcessSectionHeader(DsmccSectionHeader *pSection,
+    bool ProcessSectionHeader(DsmccSectionHeader *header,
                               const unsigned char *data, int length);
 
     void ProcessDownloadServerInitiate(const unsigned char *data, int length);
@@ -105,13 +105,13 @@ class Dsmcc
                                        unsigned short streamTag);
 
     // Return a carousel with the given ID.
-    ObjCarousel *GetCarouselById(unsigned int carId);
+    ObjCarousel *GetCarouselById(unsigned int carouselId);
 
     // Known carousels.
-    QLinkedList<ObjCarousel*> carousels;
+    QLinkedList<ObjCarousel*> m_carousels;
 
     // Initial stream
-    unsigned short m_startTag;
+    unsigned short m_startTag {0};
 };
 
 #define COMBINE32(data, idx) \

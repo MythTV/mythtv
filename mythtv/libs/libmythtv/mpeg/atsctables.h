@@ -174,8 +174,8 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // CRC_32                          32
 
     void Parse(void) const;
-    virtual QString toString(void) const;
-    virtual QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
   private:
     mutable vector<unsigned char*> _ptrs; // used to parse
 };
@@ -329,9 +329,9 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     void Parse() const;
     int Find(int major, int minor) const;
     QString GetExtendedChannelName(uint idx) const;
-    virtual QString toString(void) const;
+    QString toString(void) const override; // PSIPTable
     virtual QString ChannelString(uint channel) const = 0;
-    virtual QString toStringXML(uint indent_level) const;
+    QString toStringXML(uint indent_level) const override; // PSIPTable
     virtual QString ChannelStringXML(uint indent_level, uint channel) const;
     virtual QString XMLChannelValues(uint indent_level, uint channel) const;
   protected:
@@ -402,8 +402,8 @@ class MTV_PUBLIC TerrestrialVirtualChannelTable : public VirtualChannelTable
     // additional_descriptors_length 10
     // for (j=0; j<N; j++) { additional_descriptor() }
     // CRC_32                  32
-    virtual QString ChannelString(uint channel) const;
-    virtual QString XMLChannelValues(uint indent_level, uint channel) const;
+    QString ChannelString(uint channel) const override; // VirtualChannelTable
+    QString XMLChannelValues(uint indent_level, uint channel) const override; // VirtualChannelTable
 };
 
 
@@ -509,8 +509,8 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
     // additional_descriptors_length 10
     // for (j=0; j<N; j++) { additional_descriptor() }
     // CRC_32                  32
-    virtual QString ChannelString(uint channel) const;
-    virtual QString XMLChannelValues(uint indent_level, uint channel) const;
+    QString ChannelString(uint channel) const override; // VirtualChannelTable
+    QString XMLChannelValues(uint indent_level, uint channel) const override; // VirtualChannelTable
 };
 
 /** \class EventInformationTable
@@ -612,7 +612,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     // }
     // CRC_32 32
     void Parse() const;
-    QString toString() const;
+    QString toString() const override; // PSIPTable
   private:
     mutable vector<unsigned char*> _ptrs;
 };
@@ -669,7 +669,7 @@ class MTV_PUBLIC ExtendedTextTable : public PSIPTable
         return MultipleStringStructure(psipdata() + 5);
     }
 
-    QString toString() const;
+    QString toString() const override; // PSIPTable
     // CRC_32                  32
 };
 
@@ -732,14 +732,14 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     //   reserved               2  14.1          3
     //   DS_day_of_month        5  14.3
     //   DS_hour                8  15.0
-    bool InDaylightSavingsTime()     const { return pesdata()[14]&0x80; }
+    bool InDaylightSavingsTime()     const { return ( pesdata()[14]&0x80 ) != 0; }
     uint DayDaylightSavingsStarts()  const { return pesdata()[14]&0x1f; }
     uint HourDaylightSavingsStarts() const { return pesdata()[15]; }
     // for (I = 0;I< N;I++) { descriptor() }
     // CRC_32                  32
 
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 /** \class RatingRegionTable
@@ -808,9 +808,9 @@ class MTV_PUBLIC AggregateEventInformationTable : public PSIPTable
         assert(TableID::AEIT == TableID());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // PSIPTable
         { return "AggregateEventInformationTable\n"; }
-    QString toStringXML(uint /*indent_level*/) const
+    QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<AggregateEventInformationTable />"; }
 };
 
@@ -828,9 +828,9 @@ class MTV_PUBLIC AggregateExtendedTextTable : public PSIPTable
         assert(TableID::AETT == TableID());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // PSIPTable
         { return "AggregateExtendedTextTable\n"; }
-    QString toStringXML(uint /*indent_level*/) const
+    QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<AggregateExtendedTextTable />"; }
 };
 

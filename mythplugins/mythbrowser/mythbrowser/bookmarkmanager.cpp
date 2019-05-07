@@ -23,15 +23,6 @@ using namespace std;
 
 // ---------------------------------------------------
 
-BrowserConfig::BrowserConfig(MythScreenStack *parent, const char *name) :
-    MythScreenType(parent, name),
-    m_commandEdit(nullptr),     m_zoomEdit(nullptr),
-    m_descriptionText(nullptr), m_titleText(nullptr),
-    m_enablePluginsCheck(nullptr),
-    m_okButton(nullptr),        m_cancelButton(nullptr)
-{
-}
-
 bool BrowserConfig::Create()
 {
     // Load the theme for this screen
@@ -87,10 +78,10 @@ bool BrowserConfig::Create()
 void BrowserConfig::slotSave(void)
 {
     float zoom = m_zoomEdit->GetText().toFloat();
-    if (zoom > 5.0)
-        zoom = 5.0;
-    if (zoom < 0.3)
-        zoom = 0.3; 
+    if (zoom > 5.0F)
+        zoom = 5.0F;
+    if (zoom < 0.3F)
+        zoom = 0.3F; 
     gCoreContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
     gCoreContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
     int checkstate = 0;
@@ -136,15 +127,6 @@ void BrowserConfig::slotFocusChanged(void)
 }
 
 // ---------------------------------------------------
-
-BookmarkManager::BookmarkManager(MythScreenStack *parent, const char *name)
-               : MythScreenType(parent, name)
-{
-    m_bookmarkList = nullptr;
-    m_groupList = nullptr;
-    m_messageText = nullptr;
-    m_menuPopup = nullptr;
-}
 
 bool BookmarkManager::Create(void)
 {
@@ -199,10 +181,10 @@ void BookmarkManager::UpdateGroupList(void)
     {
         Bookmark *site = m_siteList.at(x);
 
-        if (groups.indexOf(site->category) == -1)
+        if (groups.indexOf(site->m_category) == -1)
         {
-            groups.append(site->category);
-            new MythUIButtonListItem(m_groupList, site->category);
+            groups.append(site->m_category);
+            new MythUIButtonListItem(m_groupList, site->m_category);
         }
     }
 }
@@ -224,16 +206,16 @@ void BookmarkManager::UpdateURLList(void)
     {
         Bookmark *site = m_siteList.at(x);
 
-        if (group == site->category)
+        if (group == site->m_category)
         {
-            MythUIButtonListItem *item = new MythUIButtonListItem(
+            MythUIButtonListItem *item2 = new MythUIButtonListItem(
                     m_bookmarkList, "", "", true, MythUIButtonListItem::NotChecked);
-            item->SetText(site->name, "name");
-            item->SetText(site->url, "url");
-            if (site->isHomepage)
-                item->DisplayState("yes", "homepage");
-            item->SetData(qVariantFromValue(site));
-            item->setChecked(site->selected ?
+            item2->SetText(site->m_name, "name");
+            item2->SetText(site->m_url, "url");
+            if (site->m_isHomepage)
+                item2->DisplayState("yes", "homepage");
+            item2->SetData(qVariantFromValue(site));
+            item2->setChecked(site->m_selected ?
                     MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
         }
     }
@@ -246,7 +228,7 @@ uint BookmarkManager::GetMarkedCount(void)
     for (int x = 0; x < m_siteList.size(); x++)
     {
         Bookmark *site = m_siteList.at(x);
-        if (site && site->selected)
+        if (site && site->m_selected)
             count++;
     }
 
@@ -317,13 +299,13 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
                 {
                     item->setChecked(MythUIButtonListItem::FullChecked);
                     if (site)
-                        site->selected = true;
+                        site->m_selected = true;
                 }
                 else
                 {
                     item->setChecked(MythUIButtonListItem::NotChecked);
                     if (site)
-                        site->selected = false;
+                        site->m_selected = false;
                 }
             }
         }
@@ -364,7 +346,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
     QStringList urls;
 
-    urls.append(site->url);
+    urls.append(site->m_url);
 
     if (cmd.toLower() == "internal")
     {
@@ -445,7 +427,7 @@ void BookmarkManager::ReloadBookmarks(void)
     GetSiteList(m_siteList);
     UpdateGroupList();
 
-    m_groupList->MoveToNamedPosition(m_savedBookmark.category);
+    m_groupList->MoveToNamedPosition(m_savedBookmark.m_category);
     UpdateURLList();
 
     // try to set the current item to name
@@ -530,7 +512,7 @@ void BookmarkManager::slotDoDeleteCurrent(bool doDelete)
         Bookmark *site = item->GetData().value<Bookmark*>();
         if (site)
         {
-            category = site->category;
+            category = site->m_category;
             RemoveFromDB(site);
         }
 
@@ -572,7 +554,7 @@ void BookmarkManager::slotDoDeleteMarked(bool doDelete)
     for (int x = 0; x < m_siteList.size(); x++)
     {
         Bookmark *site = m_siteList.at(x);
-        if (site && site->selected)
+        if (site && site->m_selected)
             RemoveFromDB(site);
     }
 
@@ -611,8 +593,8 @@ void BookmarkManager::slotShowMarked(void)
     for (int x = 0; x < m_siteList.size(); x++)
     {
         Bookmark *site = m_siteList.at(x);
-        if (site && site->selected)
-            urls.append(site->url);
+        if (site && site->m_selected)
+            urls.append(site->m_url);
     }
 
     if (cmd.toLower() == "internal")
@@ -665,7 +647,7 @@ void BookmarkManager::slotClearMarked(void)
 
             Bookmark *site = item->GetData().value<Bookmark*>();
             if (site)
-                site->selected = false;
+                site->m_selected = false;
         }
     }
 }

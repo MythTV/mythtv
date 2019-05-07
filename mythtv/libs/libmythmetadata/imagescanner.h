@@ -39,7 +39,7 @@ public:
     QStringList GetProgress();
 
 protected:
-    void run();
+    void run() override; // MThread
 
 private:
     Q_DISABLE_COPY(ImageScanThread)
@@ -63,7 +63,7 @@ private:
 
     typedef QPair<int, QString> ClearTask;
 
-    bool              m_scanning;   //!< The requested scan state
+    bool              m_scanning {false}; //!< The requested scan state
     QMutex            m_mutexState; //!< Mutex protecting scan state
     QList<ClearTask>  m_clearQueue; //!< Queue of pending Clear requests
     QMutex            m_mutexQueue; //!< Mutex protecting Clear requests
@@ -83,8 +83,8 @@ private:
 
     //! Elapsed time since last progress event generated
     QElapsedTimer m_bcastTimer;
-    int           m_progressCount;      //!< Number of images scanned
-    int           m_progressTotalCount; //!< Total number of images to scan
+    int           m_progressCount      {0}; //!< Number of images scanned
+    int           m_progressTotalCount {0}; //!< Total number of images to scan
     QMutex        m_mutexProgress;      //!< Progress counts mutex
 
     //! Global working dir for file detection

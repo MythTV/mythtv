@@ -75,8 +75,7 @@ void post_event(QObject *dest, QEvent::Type type, int val)
 void post_event(QObject *dest, QEvent::Type type, const QString &val)
 {
     ScannerEvent *e = new ScannerEvent(type);
-    QString tmp = val; tmp.detach();
-    e->strValue(tmp);
+    e->strValue(val);
     QCoreApplication::postEvent(dest, e);
 }
 
@@ -91,7 +90,7 @@ void post_event(QObject *dest, QEvent::Type type, int val,
 
 void ScanMonitor::deleteLater(void)
 {
-    channelScanner = nullptr;
+    m_channelScanner = nullptr;
 
     QObject::deleteLater();
 }
@@ -107,23 +106,23 @@ void ScanMonitor::ScanPercentComplete(int pct)
     post_event(this, ScannerEvent::SetPercentComplete, tmp);
 }
 
-void ScanMonitor::ScanAppendTextToLog(const QString &str)
+void ScanMonitor::ScanAppendTextToLog(const QString &status)
 {
-    post_event(this, ScannerEvent::AppendTextToLog, str);
+    post_event(this, ScannerEvent::AppendTextToLog, status);
 }
 
-void ScanMonitor::ScanUpdateStatusText(const QString &str)
+void ScanMonitor::ScanUpdateStatusText(const QString &status)
 {
     QString msg = tr("Scanning");
-    if (!str.isEmpty())
-        msg = QString("%1 %2").arg(msg).arg(str);
+    if (!status.isEmpty())
+        msg = QString("%1 %2").arg(msg).arg(status);
 
     post_event(this, ScannerEvent::SetStatusText, msg);
 }
 
-void ScanMonitor::ScanUpdateStatusTitleText(const QString &str)
+void ScanMonitor::ScanUpdateStatusTitleText(const QString &status)
 {
-    post_event(this, ScannerEvent::SetStatusTitleText, str);
+    post_event(this, ScannerEvent::SetStatusTitleText, status);
 }
 
 void ScanMonitor::ScanErrored(const QString &error)
@@ -161,9 +160,9 @@ void ScanMonitor::StatusSignalStrength(const SignalMonitorValue &val)
 
 void ScanMonitor::customEvent(QEvent *e)
 {
-    if (channelScanner)
+    if (m_channelScanner)
     {
         ScannerEvent *scanEvent = (ScannerEvent*) e;
-        channelScanner->HandleEvent(scanEvent);
+        m_channelScanner->HandleEvent(scanEvent);
     }
 }

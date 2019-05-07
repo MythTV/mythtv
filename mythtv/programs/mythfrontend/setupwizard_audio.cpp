@@ -15,21 +15,6 @@
 #include "setupwizard_audio.h"
 #include "setupwizard_video.h"
 
-AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
-                                   MythScreenType *previous,
-                                   const char *name)
-    : MythScreenType(parent, name),
-      m_outputlist(nullptr),             m_testThread(nullptr),
-      m_generalScreen(previous),         m_audioDeviceButtonList(nullptr),
-      m_speakerNumberButtonList(nullptr),m_dtsCheck(nullptr),
-      m_ac3Check(nullptr),               m_eac3Check(nullptr),
-      m_truehdCheck(nullptr),            m_dtshdCheck(nullptr),
-      m_testSpeakerButton(nullptr),      m_nextButton(nullptr),
-      m_prevButton(nullptr),             m_maxspeakers(2),
-      m_lastAudioDevice("")
-{
-}
-
 bool AudioSetupWizard::Create()
 {
     // Load the theme for this screen
@@ -138,10 +123,7 @@ AudioSetupWizard::~AudioSetupWizard()
         m_testThread->wait();
         delete m_testThread;
     }
-    if (m_outputlist)
-    {
-        delete m_outputlist;
-    }
+    delete m_outputlist;
 }
 
 void AudioSetupWizard::Load(void)
@@ -159,7 +141,7 @@ void AudioSetupWizard::Init(void)
         for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
              it != m_outputlist->end(); ++it)
         {
-            if (it->name == current)
+            if (it->m_name == current)
             {
                 found = true;
                 break;
@@ -169,7 +151,7 @@ void AudioSetupWizard::Init(void)
         {
             AudioOutput::AudioDeviceConfig *adc =
                 AudioOutput::GetAudioDeviceConfig(current, current, true);
-            if (adc->settings.IsInvalid())
+            if (adc->m_settings.IsInvalid())
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
                     .arg(current));
@@ -185,7 +167,7 @@ void AudioSetupWizard::Init(void)
     for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
          it != m_outputlist->end(); ++it)
     {
-        QString name = it->name;
+        QString name = it->m_name;
         MythUIButtonListItem *output =
                 new MythUIButtonListItem(m_audioDeviceButtonList, name);
         output->SetData(name);
@@ -219,9 +201,9 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
     for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
          it != m_outputlist->end(); ++it)
     {
-        if (it->name == out)
+        if (it->m_name == out)
         {
-            settings = it->settings;
+            settings = it->m_settings;
             break;
         }
     }
@@ -368,10 +350,10 @@ void AudioSetupWizard::slotNext(void)
 void AudioSetupWizard::save(void)
 {
     // reset advanced audio config to default values
-    gCoreContext->SaveSetting("StereoPCM", false);
-    gCoreContext->SaveSetting("Audio48kOverride", false);
-    gCoreContext->SaveSetting("HBRPassthru", true);
-    gCoreContext->SaveSetting("PassThruDeviceOverride", false);
+    gCoreContext->SaveBoolSetting("StereoPCM", false);
+    gCoreContext->SaveBoolSetting("Audio48kOverride", false);
+    gCoreContext->SaveBoolSetting("HBRPassthru", true);
+    gCoreContext->SaveBoolSetting("PassThruDeviceOverride", false);
     gCoreContext->SaveSetting("PassThruOutputDevice", QString());
 
     int channels = m_speakerNumberButtonList->GetItemCurrent()->GetData()
@@ -383,19 +365,19 @@ void AudioSetupWizard::save(void)
     gCoreContext->SaveSetting("AudioOutputDevice", device);
 
     bool ac3State = (m_ac3Check->GetCheckState() == MythUIStateType::Full);
-    gCoreContext->SaveSetting("AC3PassThru", ac3State);
+    gCoreContext->SaveBoolSetting("AC3PassThru", ac3State);
 
     bool dtsState = (m_dtsCheck->GetCheckState() == MythUIStateType::Full);
-    gCoreContext->SaveSetting("DTSPassThru", dtsState);
+    gCoreContext->SaveBoolSetting("DTSPassThru", dtsState);
 
     bool eac3State = (m_eac3Check->GetCheckState() == MythUIStateType::Full);
-    gCoreContext->SaveSetting("EAC3PassThru", eac3State);
+    gCoreContext->SaveBoolSetting("EAC3PassThru", eac3State);
 
     bool truehdState = (m_truehdCheck->GetCheckState() == MythUIStateType::Full);
-    gCoreContext->SaveSetting("TrueHDPassThru", truehdState);
+    gCoreContext->SaveBoolSetting("TrueHDPassThru", truehdState);
 
     bool dtshdState = (m_dtshdCheck->GetCheckState() == MythUIStateType::Full);
-    gCoreContext->SaveSetting("DTSHDPassThru", dtshdState);
+    gCoreContext->SaveBoolSetting("DTSHDPassThru", dtshdState);
 }
 
 void AudioSetupWizard::slotPrevious(void)

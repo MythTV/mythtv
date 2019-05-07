@@ -4,9 +4,6 @@
 #define LOC QString("HLSSegment: ")
 
 HLSRecSegment::HLSRecSegment(void)
-    : m_sequence(0),
-      m_duration(0),
-      m_bitrate(0)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }
@@ -21,7 +18,6 @@ HLSRecSegment::HLSRecSegment(int seq, int duration,
                        const QString& title, const QUrl& uri)
     : m_sequence(seq),
       m_duration(duration),
-      m_bitrate(0),
       m_title(title),
       m_url(uri)
 {
@@ -32,7 +28,6 @@ HLSRecSegment::HLSRecSegment(int seq, int duration, const QString& title,
            const QUrl& uri, const QString& current_key_path)
     : m_sequence(seq),
       m_duration(duration),
-      m_bitrate(0),
       m_title(title),
       m_url(uri)
 {

@@ -17,10 +17,6 @@ extern "C" {
 using namespace edgeDetector;
 
 CannyEdgeDetector::CannyEdgeDetector(void)
-    : sgm(nullptr)
-    , sgmsorted(nullptr)
-    , ewidth(-1)
-    , eheight(-1)
 {
     /*
      * In general, the Gaussian mask is truncated at a point where values cease
@@ -36,69 +32,66 @@ CannyEdgeDetector::CannyEdgeDetector(void)
     int             mask_width, rr, ii;
 
     /* The SGM computations require that mask_radius >= 2. */
-    mask_radius = max(2, (int)roundf(TRUNCATION * sigma));
-    mask_width = 2 * mask_radius + 1;
+    m_mask_radius = max(2, (int)roundf(TRUNCATION * sigma));
+    mask_width = 2 * m_mask_radius + 1;
 
     /* Compute Gaussian mask. */
-    mask = new double[mask_width];
+    m_mask = new double[mask_width];
     val = 1.0;  /* Initialize center of Gaussian mask (rr=0 => exp(0)). */
-    mask[mask_radius] = val;
+    m_mask[m_mask_radius] = val;
     sum = val;
-    for (rr = 1; rr <= mask_radius; rr++)
+    for (rr = 1; rr <= m_mask_radius; rr++)
     {
         val = exp(-(rr * rr) / TWO_SIGMA2); // Gaussian weight(rr,sigma)
-        mask[mask_radius + rr] = val;
-        mask[mask_radius - rr] = val;
+        m_mask[m_mask_radius + rr] = val;
+        m_mask[m_mask_radius - rr] = val;
         sum += 2 * val;
     }
     for (ii = 0; ii < mask_width; ii++)
-        mask[ii] /= sum;    /* normalize to [0,1] */
+        m_mask[ii] /= sum;    /* normalize to [0,1] */
 
-    memset(&s1, 0, sizeof(s1));
-    memset(&s2, 0, sizeof(s2));
-    memset(&convolved, 0, sizeof(convolved));
-    memset(&edges, 0, sizeof(edges));
-    memset(&exclude, 0, sizeof(exclude));
+    memset(&m_s1, 0, sizeof(m_s1));
+    memset(&m_s2, 0, sizeof(m_s2));
+    memset(&m_convolved, 0, sizeof(m_convolved));
+    memset(&m_edges, 0, sizeof(m_edges));
+    memset(&m_exclude, 0, sizeof(m_exclude));
 }
 
 CannyEdgeDetector::~CannyEdgeDetector(void)
 {
-    av_freep(&edges.data[0]);
-    av_freep(&convolved.data[0]);
-    av_freep(&s2.data[0]);
-    av_freep(&s1.data[0]);
-    if (sgmsorted)
-        delete []sgmsorted;
-    if (sgm)
-        delete []sgm;
-    if (mask)
-        delete []mask;
+    av_freep(&m_edges.data[0]);
+    av_freep(&m_convolved.data[0]);
+    av_freep(&m_s2.data[0]);
+    av_freep(&m_s1.data[0]);
+    delete []m_sgmsorted;
+    delete []m_sgm;
+    delete []m_mask;
 }
 
 int
 CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
 {
-    if (ewidth == newwidth && eheight == newheight)
+    if (m_ewidth == newwidth && m_eheight == newheight)
         return 0;
 
-    if (sgm) {
+    if (m_sgm) {
         /*
          * Sentinel value to determine whether or not stuff has already been
          * allocated.
          */
-        av_freep(&s1.data[0]);
-        av_freep(&s2.data[0]);
-        av_freep(&convolved.data[0]);
-        av_freep(&edges.data[0]);
-        delete []sgm;
-        delete []sgmsorted;
-        sgm = nullptr;
+        av_freep(&m_s1.data[0]);
+        av_freep(&m_s2.data[0]);
+        av_freep(&m_convolved.data[0]);
+        av_freep(&m_edges.data[0]);
+        delete []m_sgm;
+        delete []m_sgmsorted;
+        m_sgm = nullptr;
     }
 
-    const int   padded_width = newwidth + 2 * mask_radius;
-    const int   padded_height = newheight + 2 * mask_radius;
+    const int   padded_width = newwidth + 2 * m_mask_radius;
+    const int   padded_height = newheight + 2 * m_mask_radius;
 
-    if (av_image_alloc(s1.data, s1.linesize,
+    if (av_image_alloc(m_s1.data, m_s1.linesize,
         padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
@@ -106,7 +99,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         return -1;
     }
 
-    if (av_image_alloc(s2.data, s2.linesize,
+    if (av_image_alloc(m_s2.data, m_s2.linesize,
         padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
@@ -114,7 +107,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         goto free_s1;
     }
 
-    if (av_image_alloc(convolved.data, convolved.linesize,
+    if (av_image_alloc(m_convolved.data, m_convolved.linesize,
         padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
@@ -122,7 +115,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         goto free_s2;
     }
 
-    if (av_image_alloc(edges.data, edges.linesize,
+    if (av_image_alloc(m_edges.data, m_edges.linesize,
         newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
@@ -130,30 +123,30 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         goto free_convolved;
     }
 
-    sgm = new unsigned int[padded_width * padded_height];
-    sgmsorted = new unsigned int[newwidth * newheight];
+    m_sgm = new unsigned int[padded_width * padded_height];
+    m_sgmsorted = new unsigned int[newwidth * newheight];
 
-    ewidth = newwidth;
-    eheight = newheight;
+    m_ewidth = newwidth;
+    m_eheight = newheight;
 
     return 0;
 
 free_convolved:
-    av_freep(&convolved.data[0]);
+    av_freep(&m_convolved.data[0]);
 free_s2:
-    av_freep(&s2.data[0]);
+    av_freep(&m_s2.data[0]);
 free_s1:
-    av_freep(&s1.data[0]);
+    av_freep(&m_s1.data[0]);
     return -1;
 }
 
 int
 CannyEdgeDetector::setExcludeArea(int row, int col, int width, int height)
 {
-    exclude.row = row;
-    exclude.col = col;
-    exclude.width = width;
-    exclude.height = height;
+    m_exclude.row = row;
+    m_exclude.col = col;
+    m_exclude.width = width;
+    m_exclude.height = height;
     return 0;
 }
 
@@ -169,24 +162,24 @@ CannyEdgeDetector::detectEdges(const AVFrame *pgm, int pgmheight,
      */
 
     const int   pgmwidth = pgm->linesize[0];
-    const int   padded_height = pgmheight + 2 * mask_radius;
+    const int   padded_height = pgmheight + 2 * m_mask_radius;
 
     if (resetBuffers(pgmwidth, pgmheight))
         return nullptr;
 
-    if (pgm_convolve_radial(&convolved, &s1, &s2, pgm, pgmheight,
-                mask, mask_radius))
+    if (pgm_convolve_radial(&m_convolved, &m_s1, &m_s2, pgm, pgmheight,
+                m_mask, m_mask_radius))
         return nullptr;
 
-    if (edge_mark_uniform_exclude(&edges, pgmheight, mask_radius,
-                sgm_init_exclude(sgm, &convolved, padded_height,
-                    exclude.row + mask_radius, exclude.col + mask_radius,
-                    exclude.width, exclude.height),
-                sgmsorted, percentile,
-                exclude.row, exclude.col, exclude.width, exclude.height))
+    if (edge_mark_uniform_exclude(&m_edges, pgmheight, m_mask_radius,
+                sgm_init_exclude(m_sgm, &m_convolved, padded_height,
+                    m_exclude.row + m_mask_radius, m_exclude.col + m_mask_radius,
+                    m_exclude.width, m_exclude.height),
+                m_sgmsorted, percentile,
+                m_exclude.row, m_exclude.col, m_exclude.width, m_exclude.height))
         return nullptr;
 
-    return &edges;
+    return &m_edges;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

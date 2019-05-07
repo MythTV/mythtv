@@ -7,6 +7,7 @@ using namespace std;
 
 // MythTV headers
 #include <QObject>
+#include <mythmiscutil.h>
 
 // QT headers
 #include <QDomDocument>
@@ -26,12 +27,12 @@ class NewsSiteItem
   public:
     typedef vector<NewsSiteItem> List;
 
-    QString name;
-    QString category;
-    QString url;
-    QString ico;
-    bool    inDB;
-    bool    podcast;
+    QString m_name;
+    QString m_category;
+    QString m_url;
+    QString m_ico;
+    bool    m_inDB;
+    bool    m_podcast;
 };
 Q_DECLARE_METATYPE(NewsSiteItem*)
 
@@ -40,10 +41,10 @@ class NewsCategory
   public:
     typedef vector<NewsCategory> List;
 
-    QString             name;
-    NewsSiteItem::List  siteList;
+    QString             m_name;
+    NewsSiteItem::List  m_siteList;
 
-    void clear(void) { siteList.clear(); }
+    void clear(void) { m_siteList.clear(); }
 };
 Q_DECLARE_METATYPE(NewsCategory*)
 
@@ -79,10 +80,11 @@ class NewsSite : public QObject
              const QDateTime &updated, const bool     podcast);
     virtual void deleteLater();
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
     QString   url(void)  const;
     QString   name(void) const;
+    QString   sortName(void) const;
     QString   description(void) const;
     QDateTime lastUpdated(void) const;
     QString   imageURL(void) const;
@@ -97,8 +99,10 @@ class NewsSite : public QObject
     void retrieve(void);
     void stop(void);
     void process(void);
-    void parseRSS(QDomDocument domDoc);
-    void parseAtom(QDomDocument domDoc);
+    void parseRSS(const QDomDocument& domDoc);
+    void parseAtom(const QDomDocument& domDoc);
+    static inline bool sortByName(NewsSite *a, NewsSite *b)
+        { return naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 
     bool     successful(void) const;
     QString  errorMsg(void) const;
@@ -106,22 +110,23 @@ class NewsSite : public QObject
   private:
     ~NewsSite();
 
-    mutable QMutex m_lock;
+    mutable QMutex m_lock {QMutex::Recursive};
     QString    m_name;
+    QString    m_sortName;
     QString    m_url;
     QUrl       m_urlReq;
     QString    m_desc;
     QDateTime  m_updated;
     QString    m_destDir;
     QByteArray m_data;
-    State      m_state;
+    State      m_state    {NewsSite::Success};
     QString    m_errorString;
     QString    m_updateErrorString;
     QString    m_imageURL;
     bool       m_podcast;
 
     NewsArticle::List m_articleList;
-    static QString ReplaceHtmlChar(const QString &s);
+    static QString ReplaceHtmlChar(const QString &orig);
 
   signals:
 

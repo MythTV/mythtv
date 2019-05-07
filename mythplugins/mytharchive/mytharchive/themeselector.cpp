@@ -26,22 +26,11 @@
 
 DVDThemeSelector::DVDThemeSelector(
     MythScreenStack *parent, MythScreenType *destinationScreen,
-    ArchiveDestination archiveDestination, QString name) :
+    ArchiveDestination archiveDestination, const QString& name) :
     MythScreenType(parent, name, true),
     m_destinationScreen(destinationScreen),
     m_archiveDestination(archiveDestination),
-    themeDir(GetShareDir() + "mytharchive/themes/"),
-    theme_selector(nullptr),
-    theme_image(nullptr),
-    theme_no(0),
-    intro_image(nullptr),
-    mainmenu_image(nullptr),
-    chapter_image(nullptr),
-    details_image(nullptr),
-    themedesc_text(nullptr),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr)
+    themeDir(GetShareDir() + "mytharchive/themes/")
 {
 }
 
@@ -147,7 +136,7 @@ void DVDThemeSelector::getThemeList(void)
 
         for (int x = 0; x < list.size(); x++)
         {
-            QFileInfo fi = list.at(x);
+            const QFileInfo& fi = list.at(x);
             if (QFile::exists(themeDir + fi.fileName() + "/preview.png"))
             {
                 theme_list.append(fi.fileName());

@@ -8,37 +8,35 @@ ClassicSceneChangeDetector::ClassicSceneChangeDetector(unsigned int width,
         unsigned int height, unsigned int commdetectborder_in,
         unsigned int xspacing_in, unsigned int yspacing_in):
     SceneChangeDetectorBase(width,height),
-    frameNumber(0),
-    previousFrameWasSceneChange(false),
-    xspacing(xspacing_in),
-    yspacing(yspacing_in),
-    commdetectborder(commdetectborder_in)
+    m_xspacing(xspacing_in),
+    m_yspacing(yspacing_in),
+    m_commdetectborder(commdetectborder_in)
 {
-    histogram = new Histogram;
-    previousHistogram = new Histogram;
+    m_histogram = new Histogram;
+    m_previousHistogram = new Histogram;
 }
 
 void ClassicSceneChangeDetector::deleteLater(void)
 {
-    delete histogram;
-    delete previousHistogram;
+    delete m_histogram;
+    delete m_previousHistogram;
     SceneChangeDetectorBase::deleteLater();
 }
 
 void ClassicSceneChangeDetector::processFrame(VideoFrame* frame)
 {
-    histogram->generateFromImage(frame, width, height, commdetectborder,
-                                 width-commdetectborder, commdetectborder,
-                                 height-commdetectborder, xspacing, yspacing);
-    float similar = histogram->calculateSimilarityWith(*previousHistogram);
+    m_histogram->generateFromImage(frame, m_width, m_height, m_commdetectborder,
+                                 m_width-m_commdetectborder, m_commdetectborder,
+                                 m_height-m_commdetectborder, m_xspacing, m_yspacing);
+    float similar = m_histogram->calculateSimilarityWith(*m_previousHistogram);
 
-    bool isSceneChange = (similar < .85 && !previousFrameWasSceneChange);
+    bool isSceneChange = (similar < .85F && !m_previousFrameWasSceneChange);
 
-    emit(haveNewInformation(frameNumber,isSceneChange,similar));
-    previousFrameWasSceneChange = isSceneChange;
+    emit(haveNewInformation(m_frameNumber,isSceneChange,similar));
+    m_previousFrameWasSceneChange = isSceneChange;
 
-    std::swap(histogram,previousHistogram);
-    frameNumber++;
+    std::swap(m_histogram,m_previousHistogram);
+    m_frameNumber++;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

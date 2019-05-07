@@ -10,19 +10,6 @@
 
 #include "gamedetails.h"
 
-GameDetailsPopup::GameDetailsPopup(MythScreenStack *parent,
-                                   const RomInfo *romInfo)
-           : MythScreenType (parent, "gamedetailspopup"),
-        m_romInfo(romInfo), m_id(""), m_retObject(nullptr),
-        m_gameName(nullptr), m_gameType(nullptr), m_romName(nullptr),
-        m_crc(nullptr), m_romPath(nullptr), m_genre(nullptr),
-        m_year(nullptr), m_country(nullptr), m_plot(nullptr),
-        m_publisher(nullptr), m_allSystems(nullptr), m_fanartImage(nullptr),
-        m_boxImage(nullptr), m_playButton(nullptr), m_doneButton(nullptr)
-{
-    m_romInfo = romInfo;
-}
-
 void GameDetailsPopup::handleText(const QString &name, const QString &value)
 {
     MythUIText *textarea = nullptr;

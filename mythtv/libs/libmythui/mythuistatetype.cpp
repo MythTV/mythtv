@@ -16,8 +16,6 @@
 MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
     : MythUIComposite(parent, name)
 {
-    m_CurrentState = nullptr;
-    m_ShowEmpty = true;
     emit DependChanged(false);
 }
 
@@ -279,7 +277,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     for (i = st->m_ObjectsByName.begin(); i != st->m_ObjectsByName.end(); ++i)
     {
         MythUIType *other = i.value();
-        QString key = i.key();
+        const QString& key = i.key();
 
         MythUIType *newtype = GetChild(other->objectName());
         AddObject(key, newtype);

@@ -286,35 +286,35 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
             pResults->m_nTotalMatches = 1;
             return true;
         }
-        else
-            LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSMusic::LoadMetadata: Requested "
-                                             "object cannot be found: %1")
-                                               .arg(pRequest->m_sObjectId));
+
+        LOG(VB_GENERAL, LOG_ERR, QString("UPnpCDSMusic::LoadMetadata: Requested "
+                                         "object cannot be found: %1")
+                                           .arg(pRequest->m_sObjectId));
+        return false;
     }
-    else if (currentToken == "genre")
+    if (currentToken == "genre")
     {
         // Genre is presently a top tier node, since it doesn't appear
         // below Artist/Album/etc we don't need to pass through
         // the ids for filtering
         return LoadGenres(pRequest, pResults, tokens);
     }
-    else if (currentToken == "artist")
+    if (currentToken == "artist")
     {
         return LoadArtists(pRequest, pResults, tokens);
     }
-    else if (currentToken == "album")
+    if (currentToken == "album")
     {
         return LoadAlbums(pRequest, pResults, tokens);
     }
-    else if (currentToken == "track")
+    if (currentToken == "track")
     {
         return LoadTracks(pRequest, pResults, tokens);
     }
-    else
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("UPnpCDSMusic::LoadMetadata(): "
-                    "Unhandled metadata request for '%1'.").arg(currentToken));
 
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("UPnpCDSMusic::LoadMetadata(): "
+                "Unhandled metadata request for '%1'.").arg(currentToken));
     return false;
 }
 
@@ -333,35 +333,31 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
         pResults->m_nTotalMatches = GetRoot()->GetChildCount();
         return true;
     }
-    else if (currentToken == "track")
+    if (currentToken == "track")
     {
         return LoadTracks(pRequest, pResults, tokens);
     }
-    else if (currentToken == "genre")
+    if (currentToken == "genre")
     {
         if (tokens["genre"].toInt() > 0)
             return LoadArtists(pRequest, pResults, tokens);
-        else
-            return LoadGenres(pRequest, pResults, tokens);
+        return LoadGenres(pRequest, pResults, tokens);
     }
-    else if (currentToken == "artist")
+    if (currentToken == "artist")
     {
         if (tokens["artist"].toInt() > 0)
             return LoadAlbums(pRequest, pResults, tokens);
-        else
-            return LoadArtists(pRequest, pResults, tokens);
+        return LoadArtists(pRequest, pResults, tokens);
     }
-    else if (currentToken == "album")
+    if (currentToken == "album")
     {
         if (tokens["album"].toInt() > 0)
             return LoadTracks(pRequest, pResults, tokens);
-        else
-            return LoadAlbums(pRequest, pResults, tokens);
+        return LoadAlbums(pRequest, pResults, tokens);
     }
-    else
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("UPnpCDSMusic::LoadChildren(): "
-                    "Unhandled metadata request for '%1'.").arg(currentToken));
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("UPnpCDSMusic::LoadChildren(): "
+                "Unhandled metadata request for '%1'.").arg(currentToken));
 
     return false;
 }
@@ -461,7 +457,7 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
 
 bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -553,7 +549,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
 
 bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens)
+                               const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -636,7 +632,7 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
 
 bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
-                              IDTokenMap tokens )
+                              const IDTokenMap& tokens )
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -708,7 +704,7 @@ bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
 
 bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
-                              IDTokenMap tokens)
+                              const IDTokenMap& tokens)
 {
     QString sRequestId = pRequest->m_sObjectId;
 
@@ -759,7 +755,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
         QString        sDescription = query.value( 7).toString();
         QString        sFileName    = query.value( 8).toString();
         uint32_t       nLengthMS    = query.value( 9).toUInt();
-        uint64_t       nFileSize    = (quint64)query.value(10).toULongLong();
+        uint64_t       nFileSize    = query.value(10).toULongLong();
 
         int            nPlaybackCount = query.value(11).toInt();
         QDateTime      lastPlayedTime = query.value(12).toDateTime();

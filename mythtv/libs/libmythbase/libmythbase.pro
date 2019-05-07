@@ -34,6 +34,7 @@ HEADERS += threadedfilewriter.h mythsingledownload.h codecutil.h
 HEADERS += mythsession.h
 HEADERS += ../../external/qjsonwrapper/qjsonwrapper/Json.h
 HEADERS += cleanupguard.h portchecker.h
+HEADERS += mythsorthelper.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -55,6 +56,7 @@ SOURCES += threadedfilewriter.cpp mythsingledownload.cpp codecutil.cpp
 SOURCES += mythsession.cpp
 SOURCES += ../../external/qjsonwrapper/qjsonwrapper/Json.cpp
 SOURCES += cleanupguard.cpp portchecker.cpp
+SOURCES += mythsorthelper.cpp
 
 unix {
     SOURCES += mythsystemunix.cpp
@@ -84,6 +86,7 @@ inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h mythqtcompat.h
 inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
 inc.files += threadedfilewriter.h mythsingledownload.h mythsession.h
+inc.files += mythsorthelper.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase
@@ -140,7 +143,6 @@ win32-msvc* {
 
     LIBS += -lws2_32
     EXTRA_LIBS += -lzlib
-    DEFINES += NOLOGSERVER
 
     # we need to make sure version.h is generated.
 

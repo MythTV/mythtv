@@ -22,12 +22,6 @@ QEvent::Type MetadataLookupEvent::kEventType =
 QEvent::Type MetadataLookupFailure::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-MetadataDownload::MetadataDownload(QObject *parent) :
-    MThread("MetadataDownload")
-{
-    m_parent = parent;
-}
-
 MetadataDownload::~MetadataDownload()
 {
     cancel();
@@ -230,9 +224,9 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
         {
             // In lookup by name, the television database tends to only include Banner artwork.
             // In lookup by name, the movie database tends to include only Fan and Cover artwork.
-            if ((((*i)->GetArtwork(kArtworkFanart)).size() != 0) ||
-                (((*i)->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                (((*i)->GetArtwork(kArtworkBanner)).size() != 0))
+            if ((!((*i)->GetArtwork(kArtworkFanart)).empty()) ||
+                (!((*i)->GetArtwork(kArtworkCoverart)).empty()) ||
+                (!((*i)->GetArtwork(kArtworkBanner)).empty()))
             {
                 exactMatchesWithArt++;
             }
@@ -242,8 +236,7 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
 
     if (withArt)
         return exactMatchesWithArt;
-    else
-        return exactMatches;
+    return exactMatches;
 }
 
 MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
@@ -269,9 +262,9 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
         // Consider exact title matches (ignoring case), which have some artwork available.
         if (QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0)
         {
-            bool hasArtwork = ((((*i)->GetArtwork(kArtworkFanart)).size() != 0) ||
-                               (((*i)->GetArtwork(kArtworkCoverart)).size() != 0) ||
-                               (((*i)->GetArtwork(kArtworkBanner)).size() != 0));
+            bool hasArtwork = ((!((*i)->GetArtwork(kArtworkFanart)).empty()) ||
+                               (!((*i)->GetArtwork(kArtworkCoverart)).empty()) ||
+                               (!((*i)->GetArtwork(kArtworkBanner)).empty()));
 
             LOG(VB_GENERAL, LOG_INFO, QString("'%1', popularity = %2, ReleaseDate = %3")
                     .arg(title)
@@ -288,7 +281,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                 (hasArtwork &&
                  ((!foundMatchWithArt) ||
                   (((*i)->GetPopularity() > exactTitlePopularity)) ||
-                  ((exactTitlePopularity == 0.0) && ((*i)->GetReleaseDate() > exactTitleDate)))))
+                  ((exactTitlePopularity == 0.0F) && ((*i)->GetReleaseDate() > exactTitleDate)))))
             {
                 exactTitleDate = (*i)->GetReleaseDate();
                 exactTitlePopularity = (*i)->GetPopularity();
@@ -359,7 +352,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     return ret;
 }
 
-MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
+MetadataLookupList MetadataDownload::runGrabber(const QString& cmd, const QStringList& args,
                                                 MetadataLookup *lookup,
                                                 bool passseas)
 {
@@ -435,7 +428,7 @@ bool MetadataDownload::TelevisionGrabberWorks()
     return true;
 }
 
-MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
+MetadataLookupList MetadataDownload::readMXML(const QString& MXMLpath,
                                              MetadataLookup *lookup,
                                              bool passseas)
 {
@@ -483,7 +476,7 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
     return list;
 }
 
-MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
+MetadataLookupList MetadataDownload::readNFO(const QString& NFOpath,
                                              MetadataLookup *lookup)
 {
     MetadataLookupList list;
@@ -835,12 +828,12 @@ static QString getNameWithExtension(const QString &filename, const QString &type
     return ret;
 }
 
-QString MetadataDownload::getMXMLPath(QString filename)
+QString MetadataDownload::getMXMLPath(const QString& filename)
 {
     return getNameWithExtension(filename, "mxml");
 }
 
-QString MetadataDownload::getNFOPath(QString filename)
+QString MetadataDownload::getNFOPath(const QString& filename)
 {
     return getNameWithExtension(filename, "nfo");
 }

@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QList>
 #include <QHostAddress>
+#include "mythsystemevent.h"
 
 class EncoderLink;
 class AutoExpire;
@@ -22,19 +23,20 @@ extern MediaServer *g_pUPnp;
 extern BackendContext *gBackendContext;
 extern QString      pidfile;
 extern QString      logfile;
+extern MythSystemEventHandler *sysEventHandler;
 
 class Frontend
 {
   public:
-    Frontend() : connectionCount(0) { };
+    Frontend() = default;
    ~Frontend() = default;
 
-    QString name; /// The user friendly name of the frontend
-    QHostAddress ip; /// The frontend IP address
+    QString      m_name; /// The user friendly name of the frontend
+    QHostAddress m_ip; /// The frontend IP address
 
-    int connectionCount;
+    int m_connectionCount {0};
 
-    //int capabilities; // Future expansion, a bitmap of 'capabilities'
+    //int m_capabilities; // Future expansion, a bitmap of 'capabilities'
 };
 
 class BackendContext

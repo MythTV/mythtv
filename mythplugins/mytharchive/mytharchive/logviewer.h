@@ -7,6 +7,8 @@
 // myth
 #include <mythscreentype.h>
 
+const int DEFAULT_UPDATE_TIME = 5;
+
 class MythUIButton;
 class MythUIButtonList;
 class MythUIText;
@@ -22,8 +24,8 @@ class LogViewer : public MythScreenType
     explicit LogViewer(MythScreenStack *parent);
    ~LogViewer(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
     void setFilenames(const QString &progressLog, const QString &fullLog);
 
@@ -32,30 +34,30 @@ class LogViewer : public MythScreenType
     void updateClicked(void);
     void updateTimerTimeout(void);
     void toggleAutoUpdate(void);
-    bool loadFile(QString filename, QStringList &list, int startline);
+    bool loadFile(const QString& filename, QStringList &list, int startline);
     void showProgressLog(void);
     void showFullLog(void);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void updateLogItem(MythUIButtonListItem *item);
 
   private:
-    void Init(void);
+    void Init(void) override; // MythScreenType
     QString getSetting(const QString &key);
 
-    bool                m_autoUpdate;
-    int                 m_updateTime;
-    QTimer             *m_updateTimer;
+    bool                m_autoUpdate   {false};
+    int                 m_updateTime   {DEFAULT_UPDATE_TIME};
+    QTimer             *m_updateTimer  {nullptr};
 
     QString             m_currentLog;
     QString             m_progressLog;
     QString             m_fullLog;
 
-    MythUIButtonList   *m_logList;
-    MythUIText         *m_logText;
+    MythUIButtonList   *m_logList      {nullptr};
+    MythUIText         *m_logText      {nullptr};
 
-    MythUIButton       *m_exitButton;
-    MythUIButton       *m_cancelButton;
-    MythUIButton       *m_updateButton;
+    MythUIButton       *m_exitButton   {nullptr};
+    MythUIButton       *m_cancelButton {nullptr};
+    MythUIButton       *m_updateButton {nullptr};
 };
 
 #endif

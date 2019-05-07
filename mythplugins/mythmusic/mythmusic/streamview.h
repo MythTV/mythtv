@@ -24,17 +24,17 @@ class StreamView : public MusicCommon
     StreamView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~StreamView(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
     void addStream(MusicMetadata *mdata);
     void deleteStream(MusicMetadata *mdata);
     void updateStream(MusicMetadata *mdata);
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
     void updateStreamList(void);
     void editStream(void);
     void removeStream(void);
@@ -45,13 +45,13 @@ class StreamView : public MusicCommon
     void doRemoveStream(bool ok);
 
   private:
-    MythUIButtonList  *m_streamList;
-    MythUIText        *m_noStreams;
-    MythUIText        *m_bufferStatus;
-    MythUIProgressBar *m_bufferProgress;
+    MythUIButtonList  *m_streamList     {nullptr};
+    MythUIText        *m_noStreams      {nullptr};
+    MythUIText        *m_bufferStatus   {nullptr};
+    MythUIProgressBar *m_bufferProgress {nullptr};
 
-    MusicMetadata     *m_currStream;
-    MusicMetadata     *m_lastStream;
+    MusicMetadata     *m_currStream     {nullptr};
+    MusicMetadata     *m_lastStream     {nullptr};
 };
 
 class EditStreamMetadata : public MythScreenType
@@ -60,9 +60,11 @@ class EditStreamMetadata : public MythScreenType
 
   public:
     EditStreamMetadata(MythScreenStack *parentStack, StreamView *parent,
-                       MusicMetadata *mdata = nullptr);
+                       MusicMetadata *mdata = nullptr)
+        : MythScreenType(parentStack, "editstreampopup"),
+          m_parent(parent), m_streamMeta(mdata) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
     void changeStreamMetadata(MusicMetadata *mdata);
 
   private slots:
@@ -70,27 +72,27 @@ class EditStreamMetadata : public MythScreenType
     void saveClicked(void);
 
   private:
-    StreamView     *m_parent;
+    StreamView     *m_parent          {nullptr};
 
-    MusicMetadata  *m_streamMeta;
+    MusicMetadata  *m_streamMeta      {nullptr};
 
-    MythUITextEdit *m_broadcasterEdit;
-    MythUITextEdit *m_channelEdit;
-    MythUITextEdit *m_descEdit;
-    MythUITextEdit *m_url1Edit;
-    MythUITextEdit *m_url2Edit;
-    MythUITextEdit *m_url3Edit;
-    MythUITextEdit *m_url4Edit;
-    MythUITextEdit *m_url5Edit;
-    MythUITextEdit *m_logourlEdit;
-    MythUITextEdit *m_formatEdit;
-    MythUITextEdit *m_genreEdit;
-    MythUITextEdit *m_countryEdit;
-    MythUITextEdit *m_languageEdit;
+    MythUITextEdit *m_broadcasterEdit {nullptr};
+    MythUITextEdit *m_channelEdit     {nullptr};
+    MythUITextEdit *m_descEdit        {nullptr};
+    MythUITextEdit *m_url1Edit        {nullptr};
+    MythUITextEdit *m_url2Edit        {nullptr};
+    MythUITextEdit *m_url3Edit        {nullptr};
+    MythUITextEdit *m_url4Edit        {nullptr};
+    MythUITextEdit *m_url5Edit        {nullptr};
+    MythUITextEdit *m_logourlEdit     {nullptr};
+    MythUITextEdit *m_formatEdit      {nullptr};
+    MythUITextEdit *m_genreEdit       {nullptr};
+    MythUITextEdit *m_countryEdit     {nullptr};
+    MythUITextEdit *m_languageEdit    {nullptr};
 
-    MythUIButton   *m_searchButton;
-    MythUIButton   *m_cancelButton;
-    MythUIButton   *m_saveButton;
+    MythUIButton   *m_searchButton    {nullptr};
+    MythUIButton   *m_cancelButton    {nullptr};
+    MythUIButton   *m_saveButton      {nullptr};
 };
 
 class SearchStream : public MythScreenType
@@ -98,9 +100,10 @@ class SearchStream : public MythScreenType
     Q_OBJECT
 
   public:
-    SearchStream(MythScreenStack *parentStack, EditStreamMetadata *parent);
+    SearchStream(MythScreenStack *parentStack, EditStreamMetadata *parent)
+        : MythScreenType(parentStack, "searchstream"), m_parent(parent) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private slots:
     void doneLoading(void);
@@ -110,14 +113,14 @@ class SearchStream : public MythScreenType
     void streamVisible(MythUIButtonListItem *item);
 
   private:
-    void Load(void);
+    void Load(void) override; // MythScreenType
     void loadStreams(void);
     void updateBroadcasters(void);
     void updateGenres(void);
     void updateCountries(void);
     void updateLanguages(void);
 
-    EditStreamMetadata   *m_parent;
+    EditStreamMetadata   *m_parent {nullptr};
     QList<MusicMetadata>  m_streams;
     QStringList  m_broadcasters;
     QStringList  m_genres;
@@ -128,15 +131,15 @@ class SearchStream : public MythScreenType
     QString m_oldCountry;
     QString m_oldLanguage;
 
-    MythUIButtonList *m_broadcasterList;
-    MythUIButtonList *m_genreList;
-    MythUIButtonList *m_countryList;
-    MythUIButtonList *m_languageList;
-    MythUITextEdit   *m_channelEdit;
-    MythUIButtonList *m_streamList;
-    MythUIText       *m_matchesText;
+    MythUIButtonList *m_broadcasterList {nullptr};
+    MythUIButtonList *m_genreList       {nullptr};
+    MythUIButtonList *m_countryList     {nullptr};
+    MythUIButtonList *m_languageList    {nullptr};
+    MythUITextEdit   *m_channelEdit     {nullptr};
+    MythUIButtonList *m_streamList      {nullptr};
+    MythUIText       *m_matchesText     {nullptr};
 
     QTimer m_updateTimer;
-    bool m_updating;
+    bool m_updating                     {false};
 };
 #endif

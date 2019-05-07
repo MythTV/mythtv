@@ -27,25 +27,25 @@ public:
 
 public:
     // RingBuffer methods
-    virtual long long GetReadPosition(void)  const;
-    virtual bool IsOpen(void) const;
-    virtual bool OpenFile(const QString &lfilename, uint retry_ms = 0);
+    long long GetReadPosition(void) const override; // RingBuffer
+    bool IsOpen(void) const override; // RingBuffer
+    bool OpenFile(const QString &lfilename, uint retry_ms = 0) override; // RingBuffer
 
 protected:
-    virtual int safe_read(void *data, uint sz);
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint size) override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
     // Implementation
 private:
-    dvd_reader_t *m_reader;
-    uint32_t m_start;
+    dvd_reader_t *m_reader {nullptr};
+    uint32_t      m_start  {0};
 
     class BlockRange;
     typedef QList<BlockRange> list_t;
-    list_t m_list;          // List of possibly encryoted block ranges
+    list_t        m_list;   // List of possibly encryoted block ranges
 
-    uint32_t m_pos;         // Current read position (blocks)
-    int m_title;            // Last title decrypted
+    uint32_t      m_pos    {0};     // Current read position (blocks)
+    int           m_title  {-1};    // Last title decrypted
 };
 
 #endif /* ndef DVDSTREAM_H */

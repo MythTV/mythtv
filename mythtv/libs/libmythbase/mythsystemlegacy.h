@@ -161,7 +161,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     friend class MythSystemLegacyPrivate;
 
     // FIXME: This should be an independent function living elsewhere
-    static QString ShellEscape(const QString &str);
+    static QString ShellEscape(const QString &in);
 
     // FIXME: Do we really need to expose Qt signals?
     //        If so why are they lower case?
@@ -174,7 +174,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
   private:
     Q_DISABLE_COPY(MythSystemLegacy)
     void initializePrivate(void);
-    MythSystemLegacyPrivate *d; // FIXME we generally call this m_priv in MythTV
+    MythSystemLegacyPrivate *d {nullptr}; // FIXME we generally call this m_priv in MythTV
 
   protected:
     void ProcessFlags(uint flags);
@@ -188,8 +188,8 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     QStringList m_args;
     QString     m_directory;
 
-    int         m_nice;
-    int         m_ioprio;
+    int         m_nice   {0};
+    int         m_ioprio {0};
 
     Setting_t   m_settings;
     QBuffer     m_stdbuff[3];

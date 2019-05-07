@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 
 // Qt headers
-#include <QCoreApplication>
+#include <QApplication>
 #include <QEvent>
 #include <QFileInfo>
 #include <QFile>
@@ -39,6 +39,7 @@
 #include "mythuidefines.h"
 #include "langsettings.h"
 #include "mythcodeccontext.h"
+#include "mythsorthelper.h"
 
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
@@ -86,37 +87,46 @@ static HostTextEditSetting *VAAPIDevice()
 }
 #endif
 
-static HostCheckBoxSetting *OpenGLYV12()
+static HostCheckBoxSetting *PlaybackAVSync2()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLYV12");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackAVSync2");
 
-    gc->setLabel(PlaybackSettings::tr("Allow YV12 (YUV 4:2:0) pixel format for OpenGL"));
+    gc->setLabel(PlaybackSettings::tr("Enable new timestamp based playback speed (AVSync2)"));
 
-    gc->setHelpText(PlaybackSettings::tr("Disabling one or more pixel formats may help with picture "
-                                         "problems when using "
-                                         "OpenGL video rendering. By default YV12 is disabled for "
-                                         "android and enabled for other systems."));
-#ifdef ANDROID
-#define YV12DEFAULT false
-#else
-#define YV12DEFAULT true
-#endif
-
-    gc->setValue(YV12DEFAULT);
+    gc->setHelpText(PlaybackSettings::tr("Simplified timing and synchronization method. "
+        "This may offer smoother video playback. Note there is a setting that can be used "
+        "for fine tuning playback (press right arrow)."));
+    gc->setValue(false);
 
     return gc;
 }
 
-static HostCheckBoxSetting *OpenGLUYVY()
+static HostSpinBoxSetting *AVSync2AdjustMS()
+// was previously *DecodeExtraAudio()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLUYVY");
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("AVSync2AdjustMS",1,40,1,1);
 
-    gc->setLabel(PlaybackSettings::tr("Allow UYVY (YUV 4:2:2) pixel format for OpenGL"));
+    gc->setLabel(PlaybackSettings::tr("AVSync2 audio correction (ms)"));
 
-    gc->setHelpText(PlaybackSettings::tr("Disabling one or more pixel formats may help with picture "
-                                         "problems when using "
-                                         "OpenGL video rendering. By default UYVY is enabled. "));
-    gc->setValue(true);
+    gc->setValue(10);
+
+    gc->setHelpText(PlaybackSettings::tr(
+        "When using AVSync2, if video playback is speeding up and slowing down every few seconds, reduce "
+        "this value. For quicker recovery of audio sync after jumps, increase this value. "
+        "Values can be from 1 to 40. Default is 10."));
+    return gc;
+}
+
+static HostCheckBoxSetting *OpenGLExtraStage()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLExtraStage");
+
+    gc->setLabel(PlaybackSettings::tr("Extra stage of OpenGL Shading"));
+
+    gc->setHelpText(PlaybackSettings::tr("This may be needed if video is blank or distorted. "
+                                         "In particular, it may be needed on Fire TV 4K. "
+                                         "This may cause slowdown or dropped frames. By default this is disabled. "));
+    gc->setValue(false);
 
     return gc;
 }
@@ -284,7 +294,7 @@ static GlobalComboBoxSetting *CommercialSkipMethod()
 
     deque<int> tmp = GetPreferredSkipTypeCombinations();
 
-    for (uint i = 0; i < tmp.size(); ++i)
+    for (size_t i = 0; i < tmp.size(); ++i)
         bc->addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
 
     return bc;
@@ -602,7 +612,7 @@ static GlobalCheckBoxSetting *RerecordWatched()
 
 static GlobalSpinBoxSetting *RecordPreRoll()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record before start of show "
                                      "(secs)"));
@@ -620,7 +630,7 @@ static GlobalSpinBoxSetting *RecordPreRoll()
 
 static GlobalSpinBoxSetting *RecordOverTime()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record past end of show (secs)"));
 
@@ -668,7 +678,7 @@ static GlobalComboBoxSetting *OverTimeCategory()
 static GlobalSpinBoxSetting *CategoryOverTime()
 {
     GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CategoryOverTime",
-                                          0, 180, 60, true);
+                                          0, 180, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Record past end of show (mins)"));
 
@@ -697,117 +707,117 @@ static GroupSetting *CategoryOverTimeSettings()
 
 PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     PlaybackProfileConfig *parent, uint idx, ProfileItem &_item) :
-    item(_item), parentConfig(parent), index(idx)
+    m_item(_item), m_parentConfig(parent), m_index(idx)
 {
-    width_range = new TransTextEditSetting();
-    height_range = new TransTextEditSetting();
-    codecs    = new TransMythUIComboBoxSetting(true);
-    framerate = new TransTextEditSetting();
-    decoder   = new TransMythUIComboBoxSetting();
-    max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
-    skiploop  = new TransMythUICheckBoxSetting();
-    vidrend   = new TransMythUIComboBoxSetting();
-    osdrend   = new TransMythUIComboBoxSetting();
-    osdfade   = new TransMythUICheckBoxSetting();
-    deint0    = new TransMythUIComboBoxSetting();
-    deint1    = new TransMythUIComboBoxSetting();
-    filters   = new TransTextEditSetting();
+    m_width_range  = new TransTextEditSetting();
+    m_height_range = new TransTextEditSetting();
+    m_codecs       = new TransMythUIComboBoxSetting(true);
+    m_framerate    = new TransTextEditSetting();
+    m_decoder      = new TransMythUIComboBoxSetting();
+    m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
+    m_skiploop     = new TransMythUICheckBoxSetting();
+    m_vidrend      = new TransMythUIComboBoxSetting();
+    m_osdrend      = new TransMythUIComboBoxSetting();
+    m_osdfade      = new TransMythUICheckBoxSetting();
+    m_deint0       = new TransMythUIComboBoxSetting();
+    m_deint1       = new TransMythUIComboBoxSetting();
+    m_filters      = new TransTextEditSetting();
 
     const QString rangeHelp(tr(" Valid formats for the setting are "
         "[nnnn - nnnn], [> nnnn], [>= nnnn], [< nnnn], "
         "[<= nnnn]. Also [nnnn] for an exact match. "
         "You can also use more than 1 expression with & between."));
     const QString rangeHelpDec(tr("Numbers can have up to 3 decimal places."));
-    width_range->setLabel(tr("Width Range"));
-    width_range->setHelpText(tr("Optional setting to restrict this profile "
+    m_width_range->setLabel(tr("Width Range"));
+    m_width_range->setHelpText(tr("Optional setting to restrict this profile "
         "to videos with a selected width range. ") + rangeHelp);
-    height_range->setLabel(tr("Height Range"));
-    height_range->setHelpText(tr("Optional setting to restrict this profile "
+    m_height_range->setLabel(tr("Height Range"));
+    m_height_range->setHelpText(tr("Optional setting to restrict this profile "
         "to videos with a selected height range. ") + rangeHelp);
-    codecs->setLabel(tr("Video Formats"));
-    codecs->addSelection("","",true);
-    codecs->addSelection("mpeg2video");
-    codecs->addSelection("mpeg4");
-    codecs->addSelection("h264");
-    codecs->addSelection("hevc");
-    codecs->setHelpText(tr("Optional setting to restrict this profile "
+    m_codecs->setLabel(tr("Video Formats"));
+    m_codecs->addSelection("","",true);
+    m_codecs->addSelection("mpeg2video");
+    m_codecs->addSelection("mpeg4");
+    m_codecs->addSelection("h264");
+    m_codecs->addSelection("hevc");
+    m_codecs->setHelpText(tr("Optional setting to restrict this profile "
         "to a video format or formats. You can also type in a format "
         "or several formats separated by space. "
         "To find the format for a video use ffprobe and look at the "
         "word after \"Video:\". Also you can get a complete list "
         "of available formats with ffmpeg -codecs."));
-    framerate->setLabel(tr("Frame Rate Range"));
-    framerate->setHelpText(tr("Optional setting to restrict this profile "
+    m_framerate->setLabel(tr("Frame Rate Range"));
+    m_framerate->setHelpText(tr("Optional setting to restrict this profile "
         "to a range of frame rates. ") + rangeHelp +" "+rangeHelpDec);
-    decoder->setLabel(tr("Decoder"));
-    max_cpus->setLabel(tr("Max CPUs"));
-    skiploop->setLabel(tr("Deblocking filter"));
-    vidrend->setLabel(tr("Video renderer"));
-    osdrend->setLabel(tr("OSD renderer"));
-    osdfade->setLabel(tr("OSD fade"));
-    deint0->setLabel(tr("Primary deinterlacer"));
-    deint1->setLabel(tr("Fallback deinterlacer"));
-    filters->setLabel(tr("Custom filters"));
+    m_decoder->setLabel(tr("Decoder"));
+    m_max_cpus->setLabel(tr("Max CPUs"));
+    m_skiploop->setLabel(tr("Deblocking filter"));
+    m_vidrend->setLabel(tr("Video renderer"));
+    m_osdrend->setLabel(tr("OSD renderer"));
+    m_osdfade->setLabel(tr("OSD fade"));
+    m_deint0->setLabel(tr("Primary deinterlacer"));
+    m_deint1->setLabel(tr("Fallback deinterlacer"));
+    m_filters->setLabel(tr("Custom filters"));
 
-    max_cpus->setHelpText(
+    m_max_cpus->setHelpText(
         tr("Maximum number of CPU cores used for video decoding and filtering.") +
         (HAVE_THREADS ? "" :
          tr(" Multithreaded decoding disabled-only one CPU "
             "will be used, please recompile with "
             "--enable-ffmpeg-pthreads to enable.")));
 
-    filters->setHelpText(
+    m_filters->setHelpText(
         tr("Example custom filter list: 'ivtc,denoise3d'"));
 
-    skiploop->setHelpText(
+    m_skiploop->setHelpText(
         tr("When unchecked the deblocking loopfilter will be disabled ") + "\n" +
         tr("Disabling will significantly reduce the load on the CPU "
            "when watching HD H.264 but may significantly reduce video quality."));
 
-    osdfade->setHelpText(
+    m_osdfade->setHelpText(
         tr("When unchecked the OSD will not fade away but instead "
            "will disappear abruptly.") + '\n' +
         tr("Uncheck this if the video studders while the OSD is "
            "fading away."));
 
-    addChild(width_range);
-    addChild(height_range);
-    addChild(codecs);
-    addChild(framerate);
-    addChild(decoder);
-    addChild(max_cpus);
-    addChild(skiploop);
-    addChild(vidrend);
-    addChild(osdrend);
-    addChild(osdfade);
+    addChild(m_width_range);
+    addChild(m_height_range);
+    addChild(m_codecs);
+    addChild(m_framerate);
+    addChild(m_decoder);
+    addChild(m_max_cpus);
+    addChild(m_skiploop);
+    addChild(m_vidrend);
+    addChild(m_osdrend);
+    addChild(m_osdfade);
 
-    addChild(deint0);
-    addChild(deint1);
-    addChild(filters);
+    addChild(m_deint0);
+    addChild(m_deint1);
+    addChild(m_filters);
 
-    connect(width_range, SIGNAL(valueChanged(const QString&)),
+    connect(m_width_range, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(widthChanged(const QString&)));
-    connect(height_range, SIGNAL(valueChanged(const QString&)),
+    connect(m_height_range, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(heightChanged(const QString&)));
-    connect(codecs, SIGNAL(valueChanged(const QString&)),
+    connect(m_codecs, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(InitLabel()));
-    connect(framerate, SIGNAL(valueChanged(const QString&)),
+    connect(m_framerate, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(framerateChanged(const QString&)));
-    connect(decoder, SIGNAL(valueChanged(const QString&)),
+    connect(m_decoder, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(decoderChanged(const QString&)));
-    connect(vidrend, SIGNAL(valueChanged(const QString&)),
+    connect(m_vidrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
-    connect(osdrend, SIGNAL(valueChanged(const QString&)),
+    connect(m_osdrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(orenderChanged(const QString&)));
-    connect(deint0, SIGNAL(valueChanged(const QString&)),
+    connect(m_deint0, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(deint0Changed(const QString&)));
-    connect(deint1, SIGNAL(valueChanged(const QString&)),
+    connect(m_deint1, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(deint1Changed(const QString&)));
 }
 
 uint PlaybackProfileItemConfig::GetIndex(void) const
 {
-    return index;
+    return m_index;
 }
 
 void PlaybackProfileItemConfig::Load(void)
@@ -819,7 +829,7 @@ void PlaybackProfileItemConfig::Load(void)
     // and cond_height
     for (uint i = 0; i < 2; ++i)
     {
-        QString     pcmp  = item.Get(QString("pref_cmp%1").arg(i));
+        QString     pcmp  = m_item.Get(QString("pref_cmp%1").arg(i));
         if (pcmp == "> 0 0")
             continue;
         QStringList clist = pcmp.split(" ");
@@ -835,14 +845,14 @@ void PlaybackProfileItemConfig::Load(void)
         height_value.append(clist[0]+clist[2]);
     }
 
-    QString tmp = item.Get("cond_width").trimmed();
+    QString tmp = m_item.Get("cond_width").trimmed();
     if (!tmp.isEmpty())
     {
         if (!width_value.isEmpty())
             width_value.append("&");
         width_value.append(tmp);
     }
-    tmp = item.Get("cond_height").trimmed();
+    tmp = m_item.Get("cond_height").trimmed();
     if (!tmp.isEmpty())
     {
         if (!height_value.isEmpty())
@@ -850,20 +860,20 @@ void PlaybackProfileItemConfig::Load(void)
         height_value.append(tmp);
     }
 
-    width_range->setValue(width_value);
-    height_range->setValue(height_value);
-    codecs->setValue(item.Get("cond_codecs"));
-    framerate->setValue(item.Get("cond_framerate"));
+    m_width_range->setValue(width_value);
+    m_height_range->setValue(height_value);
+    m_codecs->setValue(m_item.Get("cond_codecs"));
+    m_framerate->setValue(m_item.Get("cond_framerate"));
 
-    QString pdecoder  = item.Get("pref_decoder");
-    QString pmax_cpus = item.Get("pref_max_cpus");
-    QString pskiploop  = item.Get("pref_skiploop");
-    QString prenderer = item.Get("pref_videorenderer");
-    QString posd      = item.Get("pref_osdrenderer");
-    QString posdfade  = item.Get("pref_osdfade");
-    QString pdeint0   = item.Get("pref_deint0");
-    QString pdeint1   = item.Get("pref_deint1");
-    QString pfilter   = item.Get("pref_filters");
+    QString pdecoder  = m_item.Get("pref_decoder");
+    QString pmax_cpus = m_item.Get("pref_max_cpus");
+    QString pskiploop = m_item.Get("pref_skiploop");
+    QString prenderer = m_item.Get("pref_videorenderer");
+    QString posd      = m_item.Get("pref_osdrenderer");
+    QString posdfade  = m_item.Get("pref_osdfade");
+    QString pdeint0   = m_item.Get("pref_deint0");
+    QString pdeint1   = m_item.Get("pref_deint1");
+    QString pfilter   = m_item.Get("pref_filters");
     bool    found     = false;
 
     QString     dech = VideoDisplayProfile::GetDecoderHelp();
@@ -871,74 +881,75 @@ void PlaybackProfileItemConfig::Load(void)
     QStringList decn = VideoDisplayProfile::GetDecoderNames();
     QStringList::const_iterator itr = decr.begin();
     QStringList::const_iterator itn = decn.begin();
-    decoder->clearSelections();
+    m_decoder->clearSelections();
+    m_decoder->setHelpText(dech);
     for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
     {
-        decoder->addSelection(*itn, *itr, (*itr == pdecoder));
+        m_decoder->addSelection(*itn, *itr, (*itr == pdecoder));
         found |= (*itr == pdecoder);
     }
     if (!found && !pdecoder.isEmpty())
     {
-        decoder->addSelection(
+        m_decoder->addSelection(
             VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
     }
-    decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
+    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
 
     if (!pmax_cpus.isEmpty())
-        max_cpus->setValue(pmax_cpus.toUInt());
+        m_max_cpus->setValue(pmax_cpus.toUInt());
 
-    skiploop->setValue((!pskiploop.isEmpty()) ? (bool) pskiploop.toInt() : true);
+    m_skiploop->setValue((!pskiploop.isEmpty()) ? (bool) pskiploop.toInt() : true);
 
     if (!prenderer.isEmpty())
-        vidrend->setValue(prenderer);
+        m_vidrend->setValue(prenderer);
     if (!posd.isEmpty())
-        osdrend->setValue(posd);
+        m_osdrend->setValue(posd);
 
-    osdfade->setValue((!posdfade.isEmpty()) ? (bool) posdfade.toInt() : true);
+    m_osdfade->setValue((!posdfade.isEmpty()) ? (bool) posdfade.toInt() : true);
 
     if (!pdeint0.isEmpty())
-        deint0->setValue(pdeint0);
+        m_deint0->setValue(pdeint0);
     if (!pdeint1.isEmpty())
-        deint1->setValue(pdeint1);
+        m_deint1->setValue(pdeint1);
     if (!pfilter.isEmpty())
-        filters->setValue(pfilter);
+        m_filters->setValue(pfilter);
 
     GroupSetting::Load();
 }
 
 void PlaybackProfileItemConfig::Save(void)
 {
-    item.Set("pref_cmp0",          QString());
-    item.Set("pref_cmp1",          QString());
-    item.Set("cond_width",         width_range->getValue());
-    item.Set("cond_height",        height_range->getValue());
-    item.Set("cond_codecs",        codecs->getValue());
-    item.Set("cond_framerate",     framerate->getValue());
-    item.Set("pref_decoder",       decoder->getValue());
-    item.Set("pref_max_cpus",      max_cpus->getValue());
-    item.Set("pref_skiploop",       (skiploop->boolValue()) ? "1" : "0");
-    item.Set("pref_videorenderer", vidrend->getValue());
-    item.Set("pref_osdrenderer",   osdrend->getValue());
-    item.Set("pref_osdfade",       (osdfade->boolValue()) ? "1" : "0");
-    item.Set("pref_deint0",        deint0->getValue());
-    item.Set("pref_deint1",        deint1->getValue());
+    m_item.Set("pref_cmp0",          QString());
+    m_item.Set("pref_cmp1",          QString());
+    m_item.Set("cond_width",         m_width_range->getValue());
+    m_item.Set("cond_height",        m_height_range->getValue());
+    m_item.Set("cond_codecs",        m_codecs->getValue());
+    m_item.Set("cond_framerate",     m_framerate->getValue());
+    m_item.Set("pref_decoder",       m_decoder->getValue());
+    m_item.Set("pref_max_cpus",      m_max_cpus->getValue());
+    m_item.Set("pref_skiploop",      (m_skiploop->boolValue()) ? "1" : "0");
+    m_item.Set("pref_videorenderer", m_vidrend->getValue());
+    m_item.Set("pref_osdrenderer",   m_osdrend->getValue());
+    m_item.Set("pref_osdfade",       (m_osdfade->boolValue()) ? "1" : "0");
+    m_item.Set("pref_deint0",        m_deint0->getValue());
+    m_item.Set("pref_deint1",        m_deint1->getValue());
 
-    QString tmp0 = filters->getValue();
-    QString tmp1 = vidrend->getValue();
+    QString tmp0 = m_filters->getValue();
+    QString tmp1 = m_vidrend->getValue();
     QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
-    item.Set("pref_filters", tmp3);
+    m_item.Set("pref_filters", tmp3);
 }
 
 void PlaybackProfileItemConfig::widthChanged(const QString &val)
 {
     bool ok = true;
-    QString oldvalue = item.Get("cond_width");
-    item.Set("cond_width",val);
-    item.checkRange("cond_width", 640, &ok);
+    QString oldvalue = m_item.Get("cond_width");
+    m_item.Set("cond_width",val);
+    m_item.checkRange("cond_width", 640, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid width specification(%1), discarded").arg(val));
-        width_range->setValue(oldvalue);
+        m_width_range->setValue(oldvalue);
     }
     InitLabel();
 }
@@ -946,13 +957,13 @@ void PlaybackProfileItemConfig::widthChanged(const QString &val)
 void PlaybackProfileItemConfig::heightChanged(const QString &val)
 {
     bool ok = true;
-    QString oldvalue = item.Get("cond_height");
-    item.Set("cond_height",val);
-    item.checkRange("cond_height", 480, &ok);
+    QString oldvalue = m_item.Get("cond_height");
+    m_item.Set("cond_height",val);
+    m_item.checkRange("cond_height", 480, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid height specification(%1), discarded").arg(val));
-        height_range->setValue(oldvalue);
+        m_height_range->setValue(oldvalue);
     }
     InitLabel();
 }
@@ -960,20 +971,20 @@ void PlaybackProfileItemConfig::heightChanged(const QString &val)
 void PlaybackProfileItemConfig::framerateChanged(const QString &val)
 {
     bool ok = true;
-    QString oldvalue = item.Get("cond_framerate");
-    item.Set("cond_framerate",val);
-    item.checkRange("cond_framerate", 25.0f, &ok);
+    QString oldvalue = m_item.Get("cond_framerate");
+    m_item.Set("cond_framerate",val);
+    m_item.checkRange("cond_framerate", 25.0F, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));
-        framerate->setValue(oldvalue);
+        m_framerate->setValue(oldvalue);
     }
     InitLabel();
 }
 
 void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 {
-    QString     vrenderer = vidrend->getValue();
+    QString     vrenderer = m_vidrend->getValue();
     QStringList renderers = VideoDisplayProfile::GetVideoRenderers(dec);
     QStringList::const_iterator it;
 
@@ -983,16 +994,16 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
     if (prenderer.isEmpty())
         prenderer = VideoDisplayProfile::GetPreferredVideoRenderer(dec);
 
-    vidrend->clearSelections();
+    m_vidrend->clearSelections();
     for (it = renderers.begin(); it != renderers.end(); ++it)
     {
         if ((*it != "null") && (*it != "nullvaapi") && (*it != "nullvdpau"))
-            vidrend->addSelection(*it, *it, (*it == prenderer));
+            m_vidrend->addSelection(*it, *it, (*it == prenderer));
     }
 
-    decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
+    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
 
-    QString vrenderer2 = vidrend->getValue();
+    QString vrenderer2 = m_vidrend->getValue();
     vrenderChanged(vrenderer2);
 
     InitLabel();
@@ -1002,55 +1013,55 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
     QStringList osds    = VideoDisplayProfile::GetOSDs(renderer);
     QStringList deints  = VideoDisplayProfile::GetDeinterlacers(renderer);
-    QString decodername = decoder->getValue();
+    QString decodername = m_decoder->getValue();
     QStringList decoderdeints  = MythCodecContext::GetDeinterlacers(decodername);
     deints.append(decoderdeints);
-    QString     losd    = osdrend->getValue();
-    QString     ldeint0 = deint0->getValue();
-    QString     ldeint1 = deint1->getValue();
+    QString     losd    = m_osdrend->getValue();
+    QString     ldeint0 = m_deint0->getValue();
+    QString     ldeint1 = m_deint1->getValue();
     QStringList::const_iterator it;
 
-    osdrend->clearSelections();
+    m_osdrend->clearSelections();
     for (it = osds.begin(); it != osds.end(); ++it)
-        osdrend->addSelection(*it, *it, (*it == losd));
+        m_osdrend->addSelection(*it, *it, (*it == losd));
 
-    deint0->clearSelections();
+    m_deint0->clearSelections();
     for (it = deints.begin(); it != deints.end(); ++it)
     {
-        deint0->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
+        m_deint0->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
                              *it, (*it == ldeint0));
     }
 
-    deint1->clearSelections();
+    m_deint1->clearSelections();
     for (it = deints.begin(); it != deints.end(); ++it)
     {
         if (!(*it).contains("bobdeint") && !(*it).contains("doublerate") &&
             !(*it).contains("doubleprocess"))
-            deint1->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
+            m_deint1->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
                                  *it, (*it == ldeint1));
     }
 
-    filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
-    vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
+    m_filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
+    m_vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
 
     InitLabel();
 }
 
 void PlaybackProfileItemConfig::orenderChanged(const QString &renderer)
 {
-    osdrend->setHelpText(VideoDisplayProfile::GetOSDHelp(renderer));
+    m_osdrend->setHelpText(VideoDisplayProfile::GetOSDHelp(renderer));
 }
 
 void PlaybackProfileItemConfig::deint0Changed(const QString &deint)
 {
-    deint0->setHelpText(
+    m_deint0->setHelpText(
         tr("Main deinterlacing method. %1")
         .arg(VideoDisplayProfile::GetDeinterlacerHelp(deint)));
 }
 
 void PlaybackProfileItemConfig::deint1Changed(const QString &deint)
 {
-    deint1->setHelpText(
+    m_deint1->setHelpText(
         tr("Fallback deinterlacing method. %1")
         .arg(VideoDisplayProfile::GetDeinterlacerHelp(deint)));
 }
@@ -1094,28 +1105,27 @@ void PlaybackProfileItemConfig::ShowDeleteDialog()
 void PlaybackProfileItemConfig::DoDeleteSlot(bool doDelete)
 {
     if (doDelete)
-        parentConfig->DeleteProfileItem(this);
+        m_parentConfig->DeleteProfileItem(this);
 }
 
 void PlaybackProfileItemConfig::DecreasePriority(void)
 {
-    parentConfig->swap(index, index + 1);
+    m_parentConfig->swap(m_index, m_index + 1);
 }
 
 void PlaybackProfileItemConfig::IncreasePriority(void)
 {
-    parentConfig->swap(index, index - 1);
+    m_parentConfig->swap(m_index, m_index - 1);
 }
 
 PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename,
                                              StandardSetting *parent) :
-    profile_name(profilename),
-    groupid(0)
+    m_profile_name(profilename)
 {
     setVisible(false);
-    groupid = VideoDisplayProfile::GetProfileGroupID(
-        profile_name, gCoreContext->GetHostName());
-    items = VideoDisplayProfile::LoadDB(groupid);
+    m_groupid = VideoDisplayProfile::GetProfileGroupID(
+        m_profile_name, gCoreContext->GetHostName());
+    m_items = VideoDisplayProfile::LoadDB(m_groupid);
     InitUI(parent);
 }
 
@@ -1124,24 +1134,24 @@ void PlaybackProfileItemConfig::InitLabel(void)
     QString andStr = tr("&", "and");
     QString str;
 
-    QString width = width_range->getValue();
+    QString width = m_width_range->getValue();
     if (!width.isEmpty())
         str += " " + tr("width","video formats") + " " + width;
-    QString height = height_range->getValue();
+    QString height = m_height_range->getValue();
     if (!height.isEmpty())
         str += " " + tr("height","video formats") + " " + height;
 
-    QString codecsval = codecs->getValue();
+    QString codecsval = m_codecs->getValue();
     if (!codecsval.isEmpty())
         str += " " + tr("formats","video formats") + " " + codecsval;
-    QString framerateval = framerate->getValue();
+    QString framerateval = m_framerate->getValue();
     if (!framerateval.isEmpty())
         str += " " + tr("framerate") + " " + framerateval;
 
     str += " -> ";
-    str += decoder->getValue();
+    str += m_decoder->getValue();
     str += " " + andStr + ' ';
-    str += vidrend->getValue();
+    str += m_vidrend->getValue();
     str.replace("-blit", "");
     str.replace("ivtv " + andStr + " ivtv", "ivtv");
     str.replace("xvmc " + andStr + " xvmc", "xvmc");
@@ -1157,12 +1167,12 @@ void PlaybackProfileConfig::InitUI(StandardSetting *parent)
     m_markForDeletion->setLabel(tr("Mark for deletion"));
     m_addNewEntry = new ButtonStandardSetting(tr("Add New Entry"));
 
-    parent->addTargetedChild(profile_name, m_markForDeletion);
-    parent->addTargetedChild(profile_name, m_addNewEntry);
+    parent->addTargetedChild(m_profile_name, m_markForDeletion);
+    parent->addTargetedChild(m_profile_name, m_addNewEntry);
 
     connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
 
-    for (uint i = 0; i < items.size(); ++i)
+    for (size_t i = 0; i < m_items.size(); ++i)
         InitProfileItem(i, parent);
 }
 
@@ -1170,11 +1180,11 @@ StandardSetting * PlaybackProfileConfig::InitProfileItem(
     uint i, StandardSetting *parent)
 {
     PlaybackProfileItemConfig* ppic =
-        new PlaybackProfileItemConfig(this, i, items[i]);
+        new PlaybackProfileItemConfig(this, i, m_items[i]);
 
-    items[i].Set("pref_priority", QString::number(i + 1));
+    m_items[i].Set("pref_priority", QString::number(i + 1));
 
-    parent->addTargetedChild(profile_name, ppic);
+    parent->addTargetedChild(m_profile_name, ppic);
     m_profiles.push_back(ppic);
     return ppic;
 }
@@ -1183,7 +1193,7 @@ void PlaybackProfileConfig::Save(void)
 {
     if (m_markForDeletion->boolValue())
     {
-        VideoDisplayProfile::DeleteProfileGroup(profile_name,
+        VideoDisplayProfile::DeleteProfileGroup(m_profile_name,
                                                 gCoreContext->GetHostName());
         return;
     }
@@ -1193,7 +1203,7 @@ void PlaybackProfileConfig::Save(void)
         profile->Save();
     }
 
-    bool ok = VideoDisplayProfile::DeleteDB(groupid, del_items);
+    bool ok = VideoDisplayProfile::DeleteDB(m_groupid, m_del_items);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1201,7 +1211,7 @@ void PlaybackProfileConfig::Save(void)
         return;
     }
 
-    ok = VideoDisplayProfile::SaveDB(groupid, items);
+    ok = VideoDisplayProfile::SaveDB(m_groupid, m_items);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1219,8 +1229,8 @@ void PlaybackProfileConfig::DeleteProfileItem(
     }
 
     uint i = profileToDelete->GetIndex();
-    del_items.push_back(items[i]);
-    items.erase(items.begin() + i);
+    m_del_items.push_back(m_items[i]);
+    m_items.erase(m_items.begin() + i);
 
     ReloadSettings();
 }
@@ -1234,19 +1244,19 @@ void PlaybackProfileConfig::AddNewEntry(void)
 
     ProfileItem item;
 
-    items.push_back(item);
+    m_items.push_back(item);
 
     ReloadSettings();
 }
 
 void PlaybackProfileConfig::ReloadSettings(void)
 {
-    getParent()->removeTargetedChild(profile_name, m_markForDeletion);
-    getParent()->removeTargetedChild(profile_name, m_addNewEntry);
+    getParent()->removeTargetedChild(m_profile_name, m_markForDeletion);
+    getParent()->removeTargetedChild(m_profile_name, m_addNewEntry);
 
     foreach (StandardSetting *setting, m_profiles)
     {
-        getParent()->removeTargetedChild(profile_name, setting);
+        getParent()->removeTargetedChild(m_profile_name, setting);
     }
     m_profiles.clear();
 
@@ -1261,22 +1271,22 @@ void PlaybackProfileConfig::ReloadSettings(void)
     setChanged(true);
 }
 
-void PlaybackProfileConfig::swap(int i, int j)
+void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
         profile->Save();
     }
 
-    QString pri_i = QString::number(items[i].GetPriority());
-    QString pri_j = QString::number(items[j].GetPriority());
+    QString pri_i = QString::number(m_items[indexA].GetPriority());
+    QString pri_j = QString::number(m_items[indexB].GetPriority());
 
-    ProfileItem item = items[j];
-    items[j] = items[i];
-    items[i] = item;
+    ProfileItem item = m_items[indexB];
+    m_items[indexB] = m_items[indexA];
+    m_items[indexA] = item;
 
-    items[i].Set("pref_priority", pri_i);
-    items[j].Set("pref_priority", pri_j);
+    m_items[indexA].Set("pref_priority", pri_i);
+    m_items[indexB].Set("pref_priority", pri_j);
 
     ReloadSettings();
 }
@@ -1381,7 +1391,7 @@ static HostComboBoxSetting *PlayBoxOrdering()
     for (int i = 0; i < 4; ++i)
         gc->addSelection(str[i], QString::number(i));
 
-    gc->setValue(1);
+    gc->setValue(3);
     gc->setHelpText(help);
 
     return gc;
@@ -1990,10 +2000,12 @@ static HostTextEditSetting *SetupPinCode()
 static HostComboBoxSetting *XineramaScreen()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaScreen", false);
-    int num = MythDisplay::GetNumberXineramaScreens();
 
-    for (int i=0; i<num; ++i)
-        gc->addSelection(QString::number(i), QString::number(i));
+    foreach (QScreen *qscreen, qGuiApp->screens())
+    {
+        QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
+        gc->addSelection(qscreen->name() + extra, qscreen->name());
+    }
 
     gc->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
 
@@ -2080,7 +2092,7 @@ static HostComboBoxSetting *AdjustFill()
 
 static HostSpinBoxSetting *GuiWidth()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
@@ -2096,7 +2108,7 @@ static HostSpinBoxSetting *GuiWidth()
 
 static HostSpinBoxSetting *GuiHeight()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
@@ -2112,7 +2124,7 @@ static HostSpinBoxSetting *GuiHeight()
 
 static HostSpinBoxSetting *GuiOffsetX()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI X offset"));
 
@@ -2126,7 +2138,7 @@ static HostSpinBoxSetting *GuiOffsetX()
 
 static HostSpinBoxSetting *GuiOffsetY()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI Y offset"));
 
@@ -2201,7 +2213,7 @@ static HostSpinBoxSetting *VidModeWidth(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
-                               0, 3840, 16, true);
+                               0, 3840, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
@@ -2217,7 +2229,7 @@ static HostSpinBoxSetting *VidModeHeight(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
-                               0, 2160, 16, true);
+                               0, 2160, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
@@ -2239,7 +2251,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
                                           "watching a video."));
 
     const vector<DisplayResScreen> scr = GetVideoModes();
-    for (uint i=0; i<scr.size(); ++i)
+    for (size_t i=0; i<scr.size(); ++i)
     {
         int w = scr[i].Width(), h = scr[i].Height();
         QString sel = QString("%1x%2").arg(w).arg(h);
@@ -2247,7 +2259,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (scr.size() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
+    if (!scr.empty() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
         int w = 0, h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
@@ -2283,7 +2295,7 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     const vector<DisplayResScreen> scr = GetVideoModes();
 
-    for (uint i=0; i<scr.size(); ++i)
+    for (size_t i=0; i<scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
         gc->addSelection(sel, sel);
@@ -2302,7 +2314,7 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     int hz50 = -1, hz60 = -1;
     const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Auto"), "0");
-    for (uint i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
         QString sel = QString::number((double) list[i], 'f', 3);
         addSelection(sel + " Hz", sel, sel == previousValue);
@@ -2323,10 +2335,10 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
             setValue(hz50+1);
     }
 
-    setEnabled(list.size());
+    setEnabled(!list.empty());
 }
 
-const vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
+vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
     const QString &res)
 {
     QStringList slist = res.split("x");
@@ -2513,6 +2525,22 @@ static HostSpinBoxSetting *StartupScreenDelay()
     gs->setHelpText(AppearanceSettings::tr(
         "The Startup Screen will show the progress of starting the frontend "
         "if frontend startup takes longer than this number of seconds."));
+    return gs;
+}
+
+
+static HostSpinBoxSetting *GUIFontZoom()
+{
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GUITEXTZOOM",
+                                                    50, 150, 1, 1);
+
+    gs->setLabel(AppearanceSettings::tr("GUI text zoom percentage"));
+
+    gs->setValue(100);
+
+    gs->setHelpText(AppearanceSettings::tr
+                    ("Adjust the themed defined font size by this percentage. "
+                     "mythfrontend needs restart for this to take effect."));
     return gs;
 }
 
@@ -2753,7 +2781,7 @@ static HostComboBoxSetting *ChannelGroupDefault()
     ChannelGroupList::iterator it;
 
     for (it = changrplist.begin(); it < changrplist.end(); ++it)
-       gc->addSelection(it->name, QString("%1").arg(it->grpid));
+       gc->addSelection(it->m_name, QString("%1").arg(it->m_grpid));
 
     gc->setHelpText(ChannelGroupSettings::tr("Default channel group to be "
                                              "shown in the EPG.  Pressing "
@@ -2778,6 +2806,51 @@ static HostCheckBoxSetting *BrowseChannelGroup()
                                         "browse all channels."));
     gc->setValue(false);
 
+    return gc;
+}
+
+#if 0
+static GlobalCheckBoxSetting *SortCaseSensitive()
+{
+    auto gc = new GlobalCheckBoxSetting("SortCaseSensitive");
+    gc->setLabel(GeneralSettings::tr("Case-sensitive sorting"));
+    gc->setValue(false);
+    gc->setHelpText(GeneralSettings::tr("If enabled, all sorting will be "
+                                        "case-sensitive.  This would mean "
+                                        "that \"bee movie\" would sort after "
+                                        "\"Sea World\" as lower case letters "
+                                        "sort after uppercase letters."));
+    return gc;
+}
+#endif
+
+static GlobalCheckBoxSetting *SortStripPrefixes()
+{
+    auto gc = new GlobalCheckBoxSetting("SortStripPrefixes");
+
+    gc->setLabel(GeneralSettings::tr("Remove prefixes when sorting"));
+    gc->setValue(true);
+    gc->setHelpText(GeneralSettings::tr(
+                        "If enabled, all sorting will remove the common "
+                        "prefixes (The, A, An) from a string prior to "
+                        "sorting.  For example, this would sort the titles "
+                        "\"Earth 2\", \"The Flash\", and \"Kings\" in that "
+                        "order.  If disabled, they would sort as \"Earth 2\", "
+                        "\"Kings\", \"The Flash\"."));
+    return gc;
+}
+
+static GlobalTextEditSetting *SortPrefixExceptions()
+{
+    auto gc = new GlobalTextEditSetting("SortPrefixExceptions");
+
+    gc->setLabel(MainGeneralSettings::tr("Names exempt from prefix removal"));
+    gc->setValue("");
+    gc->setHelpText(MainGeneralSettings::tr(
+                        "This list of names will be exempt from removing "
+                        "the common prefixes (The, A, An) from a title or "
+                        "filename.   Enter multiple names separated by "
+                        "semicolons."));
     return gc;
 }
 
@@ -3467,7 +3540,7 @@ static HostCheckBoxSetting *LCDShowMenu()
 
 static HostSpinBoxSetting *LCDPopupTime()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, 1);
 
     gs->setLabel(LcdSettings::tr("Menu pop-up time"));
 
@@ -3845,15 +3918,14 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
   private slots:
-    void childChanged(StandardSetting *);
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
   private:
-    StandardSetting * m_overrideExitMenu;
-    StandardSetting * m_haltCommand;
-    StandardSetting * m_rebootCommand;
+    StandardSetting *m_overrideExitMenu {nullptr};
+    StandardSetting *m_haltCommand      {nullptr};
+    StandardSetting *m_rebootCommand    {nullptr};
 };
 
 ShutDownRebootSetting::ShutDownRebootSetting()
-    : GroupSetting()
 {
     setLabel(MainGeneralSettings::tr("Shutdown/Reboot Settings"));
     addChild(FrontendIdleTimeout());
@@ -3864,7 +3936,7 @@ ShutDownRebootSetting::ShutDownRebootSetting()
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting *)
+void ShutDownRebootSetting::childChanged(StandardSetting * /*setting*/)
 {
     switch (m_overrideExitMenu->getValue().toInt())
     {
@@ -3907,6 +3979,19 @@ MainGeneralSettings::MainGeneralSettings()
     general->setLabel(tr("General"));
     general->addChild(UseVirtualKeyboard());
     general->addChild(ScreenShotPath());
+
+    auto sh = getMythSortHelper();
+    if (sh->hasPrefixes()) {
+#if 0
+        // Last minute change.  QStringRef::localeAwareCompare appears to
+        // always do case insensitive sorting, so there's no point in
+        // presenting this option to a user.
+        general->addChild(SortCaseSensitive());
+#endif
+        auto stripPrefixes = SortStripPrefixes();
+        general->addChild(stripPrefixes);
+        stripPrefixes->addTargetedChild("1", SortPrefixExceptions());
+    }
     addChild(general);
 
     addChild(EnableMediaMon());
@@ -3951,7 +4036,7 @@ MainGeneralSettings::MainGeneralSettings()
 }
 
 #ifdef USING_LIBCEC
-void MainGeneralSettings::cecChanged(bool)
+void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_CECPowerOnTVAllowed->boolValue())
         m_CECPowerOnTVOnStart->setEnabled(true);
@@ -3975,6 +4060,8 @@ void MainGeneralSettings::applyChange()
 {
     QStringList strlist( QString("REFRESH_BACKEND") );
     gCoreContext->SendReceiveStringList(strlist);
+    LOG(VB_GENERAL, LOG_ERR, QString("%1 called").arg(__FUNCTION__));
+    resetMythSortHelper();
 }
 
 
@@ -3982,20 +4069,19 @@ class PlayBackScaling : public GroupSetting
 {
   public:
     PlayBackScaling();
-    virtual void updateButton(MythUIButtonListItem *item);
+    void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
   private slots:
-    virtual void childChanged(StandardSetting *);
+    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
-    StandardSetting * m_VertScan;
-    StandardSetting * m_HorizScan;
-    StandardSetting * m_XScan;
-    StandardSetting * m_YScan;
+    StandardSetting *m_VertScan  {nullptr};
+    StandardSetting *m_HorizScan {nullptr};
+    StandardSetting *m_XScan     {nullptr};
+    StandardSetting *m_YScan     {nullptr};
 };
 
 PlayBackScaling::PlayBackScaling()
-    :GroupSetting()
 {
     setLabel(tr("Scaling"));
     addChild(m_VertScan = VertScanPercentage());
@@ -4029,7 +4115,7 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
                 .arg(m_YScan->getValue()), "value");
 }
 
-void PlayBackScaling::childChanged(StandardSetting *)
+void PlayBackScaling::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }
@@ -4121,8 +4207,6 @@ void PlaybackSettingsDialog::DeleteProfileItem(void)
 }
 
 PlaybackSettings::PlaybackSettings()
-    : m_newPlaybackProfileButton(nullptr),
-      m_playbackProfiles(nullptr)
 {
     setLabel(tr("Playback settings"));
 }
@@ -4161,8 +4245,10 @@ void PlaybackSettings::Load(void)
 #ifdef USING_VAAPI2
     advanced->addChild(VAAPIDevice());
 #endif
-    advanced->addChild(OpenGLYV12());
-    advanced->addChild(OpenGLUYVY());
+    HostCheckBoxSetting *avsync2 = PlaybackAVSync2();
+    advanced->addChild(avsync2);
+    avsync2->addTargetedChild("1",AVSync2AdjustMS());
+    advanced->addChild(OpenGLExtraStage());
     addChild(advanced);
 
     m_playbackProfiles = CurrentPlaybackProfile();
@@ -4370,20 +4456,19 @@ class GuiDimension : public GroupSetting
 {
     public:
         GuiDimension();
-        //virtual QString getValue();
-        virtual void updateButton(MythUIButtonListItem *item);
+        //QString getValue() override; // StandardSetting
+        void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
     private slots:
-        virtual void childChanged(StandardSetting *);
+        void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
-        StandardSetting *m_width;
-        StandardSetting *m_height;
-        StandardSetting *m_offsetX;
-        StandardSetting *m_offsetY;
+        StandardSetting *m_width   {nullptr};
+        StandardSetting *m_height  {nullptr};
+        StandardSetting *m_offsetX {nullptr};
+        StandardSetting *m_offsetY {nullptr};
 };
 
 GuiDimension::GuiDimension()
-    :GroupSetting()
 {
     setLabel(AppearanceSettings::tr("GUI dimension"));
     addChild(m_width   = GuiWidth());
@@ -4416,7 +4501,7 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
                       .arg(m_offsetY->getValue()), "value");
 }
 
-void GuiDimension::childChanged(StandardSetting *)
+void GuiDimension::childChanged(StandardSetting * /*setting*/)
 {
     emit ShouldRedraw(this);
 }
@@ -4438,7 +4523,7 @@ AppearanceSettings::AppearanceSettings()
 #endif
     screen->addChild(MenuTheme());
 
-    if (MythDisplay::GetNumberXineramaScreens() > 1)
+    if (MythDisplay::GetNumberOfScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());
@@ -4455,6 +4540,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(UseFixedWindowSize());
     screen->addChild(AlwaysOnTop());
     screen->addChild(StartupScreenDelay());
+    screen->addChild(GUIFontZoom());
 #ifdef USING_AIRPLAY
     screen->addChild(AirPlayFullScreen());
 #endif
@@ -4497,8 +4583,7 @@ class ChannelCheckBoxSetting : public TransMythUICheckBoxSetting
 
 ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
         const QString &channum, const QString &channame)
-    :TransMythUICheckBoxSetting(),
-    m_channelId(chanid)
+    : m_channelId(chanid)
 {
     setLabel(QString("%1 %2").arg(channum).arg(channame));
     setHelpText(tr("Select/Unselect channels for this channel group"));
@@ -4506,8 +4591,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
-    :GroupSetting(),
-    m_groupId(groupId),
+    : m_groupId(groupId),
     m_groupName(nullptr)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
@@ -4535,9 +4619,9 @@ void ChannelGroupSetting::Save()
             else
             {
                 //update m_groupId
-                QString qstr = "SELECT grpid FROM channelgroupnames "
+                QString qstr2 = "SELECT grpid FROM channelgroupnames "
                                 "WHERE name = :NEWNAME;";
-                query.prepare(qstr);
+                query.prepare(qstr2);
                 query.bindValue(":NEWNAME", m_groupName->getValue());
                 if (!query.exec())
                     MythDB::DBError("ChannelGroupSetting::Close", query);
@@ -4665,8 +4749,6 @@ void ChannelGroupSetting::deleteEntry(void)
 
 
 ChannelGroupsSetting::ChannelGroupsSetting()
-    : GroupSetting(),
-      m_addGroupButton(nullptr)
 {
     setLabel(tr("Channel Groups"));
 }
@@ -4726,7 +4808,7 @@ void ChannelGroupsSetting::ShowNewGroupDialog()
     }
 }
 
-void ChannelGroupsSetting::CreateNewGroup(QString name)
+void ChannelGroupsSetting::CreateNewGroup(const QString& name)
 {
     ChannelGroupSetting *button = new ChannelGroupSetting(name,-1);
     button->setLabel(name);

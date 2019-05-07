@@ -13,11 +13,7 @@ class LircKeycodeEvent : public QEvent
                       const QString &text, const QString &lirc_text) :
         QEvent(kEventType),
         m_keytype(keytype), m_key(key), m_modifiers(mod),
-        m_text(text), m_lirctext(lirc_text)
-    {
-        m_text.detach();
-        m_lirctext.detach();
-    }
+        m_text(text), m_lirctext(lirc_text) {}
 
     Type                  keytype(void)   const { return m_keytype;   }
     int                   key(void)       const { return m_key;       }

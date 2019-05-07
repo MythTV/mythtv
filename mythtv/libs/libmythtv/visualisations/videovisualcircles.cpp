@@ -37,7 +37,8 @@ void VideoVisualCircles::DrawPriv(MythPainter *painter, QPaintDevice* device)
 
 bool VideoVisualCircles::InitialisePriv(void)
 {
-    m_range = (m_area.height() / 2) / (m_scale.range() -10);
+    m_range = (static_cast<double>(m_area.height()) / 2.0)
+        / (m_scale.range() - 10);
     m_scaleFactor = 10.0;
     m_falloff = 1.0;
 
@@ -49,19 +50,19 @@ bool VideoVisualCircles::InitialisePriv(void)
 static class VideoVisualCirclesFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Circles");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualCircles(audio, render);
     }
 
-    virtual bool SupportedRenderer(RenderType type)
+    bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
         return (type == kRenderOpenGL2 ||
                 type == kRenderOpenGL2ES);

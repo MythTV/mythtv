@@ -14,18 +14,18 @@ class ICRingBuffer : public RingBuffer
     virtual ~ICRingBuffer();
 
     // RingBuffer implementation
-    virtual bool IsOpen(void) const;
-    virtual long long GetReadPosition(void) const;
-    virtual bool OpenFile(const QString &url,
-                          uint retry_ms = kDefaultOpenTimeout);
-    virtual bool IsStreamed(void)       { return false;  }
-    virtual bool IsSeekingAllowed(void) { return true; }
-    virtual bool IsBookmarkAllowed(void) { return false; }
+    bool IsOpen(void) const override; // RingBuffer
+    long long GetReadPosition(void) const override; // RingBuffer
+    bool OpenFile(const QString &url,
+                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
+    bool IsStreamed(void) override      { return false;  } // RingBuffer
+    bool IsSeekingAllowed(void) override { return true; } // RingBuffer
+    bool IsBookmarkAllowed(void) override { return false; } // RingBuffer
 
   protected:
-    virtual int safe_read(void *data, uint sz);
-    virtual long long GetRealFileSizeInternal(void) const;
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint sz) override; // RingBuffer
+    long long GetRealFileSizeInternal(void) const override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
     // Operations
   public:
@@ -33,8 +33,8 @@ class ICRingBuffer : public RingBuffer
     RingBuffer *Take();
 
   private:
-    NetStream *m_stream;
-    RingBuffer *m_parent; // parent RingBuffer
+    NetStream  *m_stream {nullptr};
+    RingBuffer *m_parent {nullptr}; // parent RingBuffer
 };
 
 #endif // ICRINGBUFFER_H

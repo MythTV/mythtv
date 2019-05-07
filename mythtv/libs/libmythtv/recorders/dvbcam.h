@@ -30,37 +30,37 @@ class DVBCam : public QRunnable
     bool Stop(void);
     bool IsRunning(void) const
     {
-        QMutexLocker locker(&ciHandlerLock);
-        return ciHandlerRunning;
+        QMutexLocker locker(&m_ciHandlerLock);
+        return m_ciHandlerRunning;
     }
 
     void SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt);
     void SetTimeOffset(double offset_in_seconds);
 
   private:
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
     void HandleUserIO(void);
     void HandlePMT(void);
 
     void SendPMT(const ProgramMapTable &pmt, uint cplm);
 
-    QString         device;
-    int             numslots;
+    QString         m_device;
+    int             m_numslots         {0};
 
-    mutable QMutex  ciHandlerLock;
-    QWaitCondition  ciHandlerWait;
-    bool            ciHandlerDoRun;
-    bool            ciHandlerRunning;
-    cCiHandler     *ciHandler;
-    MThread        *ciHandlerThread;
+    mutable QMutex  m_ciHandlerLock;
+    QWaitCondition  m_ciHandlerWait;
+    bool            m_ciHandlerDoRun   {false};
+    bool            m_ciHandlerRunning {false};
+    cCiHandler     *m_ciHandler        {nullptr};
+    MThread        *m_ciHandlerThread  {nullptr};
 
-    QMutex          pmt_lock;
-    pmt_list_t      PMTList;
-    pmt_list_t      PMTAddList;
-    bool            have_pmt;
-    bool            pmt_sent;
-    bool            pmt_updated;
-    bool            pmt_added;
+    QMutex          m_pmtLock;
+    pmt_list_t      m_pmtList;
+    pmt_list_t      m_pmtAddList;
+    bool            m_havePmt          {false};
+    bool            m_pmtSent          {false};
+    bool            m_pmtUpdated       {false};
+    bool            m_pmtAdded         {false};
 };
 
 #endif // DVBCAM_H

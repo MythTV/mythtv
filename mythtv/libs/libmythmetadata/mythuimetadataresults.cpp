@@ -18,8 +18,7 @@ MetadataResultsDialog::MetadataResultsDialog(
     const MetadataLookupList &results) :
 
     MythScreenType(lparent, "metadataresultspopup"),
-    m_results(results),
-    m_resultsList(nullptr)
+    m_results(results)
 {
     m_imageDownload = new MetadataImageDownload(this);
 }
@@ -131,7 +130,7 @@ void MetadataResultsDialog::customEvent(QEvent *event)
     {
         ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
 
-        ThumbnailData *data = tde->thumb;
+        ThumbnailData *data = tde->m_thumb;
 
         QString file = data->url;
         uint pos = data->data.value<uint>();

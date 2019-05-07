@@ -15,10 +15,11 @@ class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
     Q_OBJECT
   public:
     bool HandleAnnounce(MythSocket *socket, QStringList &commands,
-                        QStringList &slist);
+                        QStringList &slist) override; // SocketRequestHandler
     bool HandleQuery(SocketHandler *sock, QStringList &commands,
-                     QStringList &slist);
-    QString GetHandlerName(void)                    { return "BASIC"; }
+                     QStringList &slist) override; // SocketRequestHandler
+    QString GetHandlerName(void) override // SocketRequestHandler
+        { return "BASIC"; }
 
   private:
     bool HandleQueryLoad(SocketHandler *sock);

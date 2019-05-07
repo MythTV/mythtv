@@ -26,17 +26,18 @@ class GalleryThumbView : public MythScreenType
 public:
     GalleryThumbView(MythScreenStack *parent, const char *name);
     ~GalleryThumbView();
-    bool    Create();
+    bool    Create() override; // MythScreenType
 
 public slots:
     void    Start();
-    void    Close();
+    void    Close() override; // MythScreenType
     void    ClearSgDb()  { m_mgr.ClearStorageGroup(); }
 
 private:
-    bool    keyPressEvent(QKeyEvent *);
-    void    mediaEvent(MythMediaEvent *event)     { m_mgr.DeviceEvent(event); }
-    void    customEvent(QEvent *);
+    bool    keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void    mediaEvent(MythMediaEvent *event) override // MythUIType
+            { m_mgr.DeviceEvent(event); }
+    void    customEvent(QEvent *) override; // MythUIType
     void    RemoveImages(const QStringList &ids, bool deleted = true);
     void    BuildImageList();
     void    ResetUiSelection();
@@ -46,9 +47,9 @@ private:
     void    UpdateScanProgress(const QString &, int, int);
     void    StartSlideshow(ImageSlideShowType mode);
     void    SelectZoomWidget(int change);
-    QString CheckThumbnail(MythUIButtonListItem *, ImagePtrK,
-                           ImageIdList &required, int);
-    void    UpdateThumbnail(MythUIButtonListItem *, ImagePtrK,
+    QString CheckThumbnail(MythUIButtonListItem *, const ImagePtrK&,
+                           ImageIdList &request, int);
+    void    UpdateThumbnail(MythUIButtonListItem *, const ImagePtrK&,
                             const QString &url, int);
     void    MenuMain();
     void    MenuShow(MythMenu *);
@@ -59,7 +60,7 @@ private:
     void    MenuSlideshow(MythMenu *);
     bool    DirSelectUp();
     void    DirSelectDown();
-    void    ShowDialog(QString, QString = "");
+    void    ShowDialog(const QString&, const QString& = "");
 
 private slots:
     void    LoadData(int);
@@ -116,19 +117,23 @@ private:
     typedef QPair<int,int> IntPair;
 
     // Theme widgets
-    MythUIButtonList  *m_imageList;
-    MythUIText        *m_captionText,    *m_crumbsText,     *m_emptyText;
-    MythUIText        *m_hideFilterText, *m_typeFilterText, *m_positionText;
-    MythUIText        *m_scanProgressText;
-    MythUIProgressBar *m_scanProgressBar;
+    MythUIButtonList  *m_imageList        {nullptr};
+    MythUIText        *m_captionText      {nullptr};
+    MythUIText        *m_crumbsText       {nullptr};
+    MythUIText        *m_emptyText        {nullptr};
+    MythUIText        *m_hideFilterText   {nullptr};
+    MythUIText        *m_typeFilterText   {nullptr};
+    MythUIText        *m_positionText     {nullptr};
+    MythUIText        *m_scanProgressText {nullptr};
+    MythUIProgressBar *m_scanProgressBar  {nullptr};
 
     //! Theme buttonlist widgets implementing zoom levels
     QList<MythUIButtonList *> m_zoomWidgets;
-    int                       m_zoomLevel;
+    int                       m_zoomLevel {0};
 
     MythScreenStack &m_popupStack;
     ImageManagerFe  &m_mgr;  //!< Manages the images
-    DirectoryView   *m_view; //!< List of images comprising the view
+    DirectoryView   *m_view {nullptr}; //!< List of images comprising the view
     InfoList         m_infoList; //!< Image details overlay
 
     //! Last scan updates received from scanners
@@ -143,8 +148,8 @@ private:
     //! Buttons waiting for thumbnails to be created
     QHash<int, ThumbLocation> m_pendingMap;
 
-    QSet<int> m_thumbExists;  //!< Images where thumbnails are known to exist
-    bool      m_editsAllowed; //!< Edit privileges
+    QSet<int> m_thumbExists;          //!< Images where thumbnails are known to exist
+    bool      m_editsAllowed {false}; //!< Edit privileges
 };
 
 

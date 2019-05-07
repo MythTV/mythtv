@@ -25,16 +25,8 @@
 ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
                                      const QString &channelname)
                   :MythScreenType(parent, "ChannelIconImporter"),
-    m_strChannelname(channelname), m_fRefresh(fRefresh),
-    m_nMaxCount(0),                m_nCount(0),
-    m_missingMaxCount(0),          m_missingCount(0),
-    m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(nullptr),
-    m_iconsList(nullptr),          m_manualEdit(nullptr),
-    m_nameText(nullptr),           m_manualButton(nullptr),
-    m_skipButton(nullptr),         m_statusText(nullptr),
-    m_preview(nullptr),            m_previewtitle(nullptr)
+    m_strChannelname(channelname), m_fRefresh(fRefresh)
 {
-    m_strChannelname.detach();
     if (!m_strChannelname.isEmpty())
         LOG(VB_GENERAL, LOG_INFO,
             QString("Fetching icon for channel %1").arg(m_strChannelname));
@@ -266,7 +258,7 @@ void ImportIconsWizard::itemChanged(MythUIButtonListItem *item)
         m_previewtitle->SetText(item->GetText("iconname"));
 }
 
-bool ImportIconsWizard::initialLoad(QString name)
+bool ImportIconsWizard::initialLoad(const QString& name)
 {
 
     QString dirpath = GetConfDir();
@@ -414,7 +406,7 @@ bool ImportIconsWizard::initialLoad(QString name)
 
         LOG(VB_GENERAL, LOG_NOTICE, message);
 
-        if (m_missingEntries.size() > 0)
+        if (!m_missingEntries.empty())
         {
             message.append("\n");
             message.append(tr("Could not find %n icon(s).", "", 
@@ -443,7 +435,7 @@ bool ImportIconsWizard::initialLoad(QString name)
         m_progressDialog = nullptr;
     }
 
-    if (m_missingEntries.size() == 0 || closeDialog)
+    if (m_missingEntries.empty() || closeDialog)
         return false;
 
     if (m_nMaxCount <= 0)
@@ -628,12 +620,9 @@ bool ImportIconsWizard::lookup(const QString& strParam)
             QString("Error from icon lookup : %1").arg(str));
         return true;
     }
-    else
-    {
-        LOG(VB_CHANNEL, LOG_INFO,
-            QString("Icon Import: Working lookup : %1").arg(str));
-        return false;
-    }
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("Icon Import: Working lookup : %1").arg(str));
+    return false;
 }
 
 bool ImportIconsWizard::search(const QString& strParam)
@@ -753,32 +742,30 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
     {
         return false;
     }
-    else if (str.startsWith("Error", Qt::CaseInsensitive))
+    if (str.startsWith("Error", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error from findmissing : %1").arg(str));
         return false;
     }
-    else
+
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("Icon Import: Working findmissing : %1") .arg(str));
+    QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
+    for (QStringList::const_iterator it = strSplit.begin();
+         it != strSplit.end(); ++it)
     {
-        LOG(VB_CHANNEL, LOG_INFO,
-            QString("Icon Import: Working findmissing : %1") .arg(str));
-        QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
-        for (QStringList::const_iterator it = strSplit.begin();
-             it != strSplit.end(); ++it)
+        if (*it != "#")
         {
-            if (*it != "#")
-            {
-                const QStringList ret = extract_csv(*it);
-                LOG(VB_CHANNEL, LOG_INFO,
-                    QString("Icon Import: findmissing : %1 %2 %3 %4 %5")
-                        .arg(ret[0]).arg(ret[1]).arg(ret[2])
-                        .arg(ret[3]).arg(ret[4]));
-                checkAndDownload(ret[4], (*m_iter).strChanId);
-            }
+            const QStringList ret = extract_csv(*it);
+            LOG(VB_CHANNEL, LOG_INFO,
+                QString("Icon Import: findmissing : %1 %2 %3 %4 %5")
+                .arg(ret[0]).arg(ret[1]).arg(ret[2])
+                .arg(ret[3]).arg(ret[4]));
+            checkAndDownload(ret[4], (*m_iter).strChanId);
         }
-        return true;
     }
+    return true;
 }
 
 void ImportIconsWizard::askSubmit(const QString& strParam)
@@ -810,41 +797,39 @@ bool ImportIconsWizard::submit()
         m_statusText->SetText(tr("Failed to submit icon choices."));
         return false;
     }
-    else
+
+    LOG(VB_CHANNEL, LOG_INFO, QString("Icon Import: Working submit : %1")
+        .arg(str));
+    QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
+    unsigned atsc = 0, dvb = 0, callsign = 0, tv = 0, xmltvid = 0;
+    for (QStringList::const_iterator it = strSplit.begin();
+         it != strSplit.end(); ++it)
     {
-        LOG(VB_CHANNEL, LOG_INFO, QString("Icon Import: Working submit : %1")
-                .arg(str));
-        QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
-        unsigned atsc = 0, dvb = 0, callsign = 0, tv = 0, xmltvid = 0;
-        for (QStringList::const_iterator it = strSplit.begin();
-             it != strSplit.end(); ++it)
-        {
-            if (*it == "#")
-                continue;
+        if (*it == "#")
+            continue;
 
-            QStringList strSplit2=(*it).split(":", QString::SkipEmptyParts);
-            if (strSplit2.size() < 2)
-                continue;
+        QStringList strSplit2=(*it).split(":", QString::SkipEmptyParts);
+        if (strSplit2.size() < 2)
+            continue;
 
-            QString s = strSplit2[0].trimmed();
-            if (s == "a")
-                atsc = strSplit2[1].toUInt();
-            else if (s == "c")
-                callsign = strSplit2[1].toUInt();
-            else if (s == "d")
-                dvb = strSplit2[1].toUInt();
-            else if (s == "t")
-                tv = strSplit2[1].toUInt();
-            else if (s == "x")
-                xmltvid = strSplit2[1].toUInt();
-        }
-        LOG(VB_CHANNEL, LOG_INFO,
-            QString("Icon Import: working submit : atsc=%1 callsign=%2 "
-                    "dvb=%3 tv=%4 xmltvid=%5")
-                .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
-        m_statusText->SetText(tr("Icon choices submitted successfully."));
-        return true;
+        QString s = strSplit2[0].trimmed();
+        if (s == "a")
+            atsc = strSplit2[1].toUInt();
+        else if (s == "c")
+            callsign = strSplit2[1].toUInt();
+        else if (s == "d")
+            dvb = strSplit2[1].toUInt();
+        else if (s == "t")
+            tv = strSplit2[1].toUInt();
+        else if (s == "x")
+            xmltvid = strSplit2[1].toUInt();
     }
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("Icon Import: working submit : atsc=%1 callsign=%2 "
+                "dvb=%3 tv=%4 xmltvid=%5")
+        .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
+    m_statusText->SetText(tr("Icon choices submitted successfully."));
+    return true;
 }
 
 void ImportIconsWizard::customEvent(QEvent *event)

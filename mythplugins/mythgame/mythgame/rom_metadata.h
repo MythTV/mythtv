@@ -12,40 +12,40 @@ class RomData
             QString ldescription = "", QString lpublisher = "",
             QString lplatform = "", QString lversion = ""  )
             {
-                genre = lgenre;
-                year = lyear;
-                country = lcountry;
-                gamename = lgamename;
-                description = ldescription;
-                publisher = lpublisher;
-                platform = lplatform;
-                version = lversion;
+                m_genre = lgenre;
+                m_year = lyear;
+                m_country = lcountry;
+                m_gamename = lgamename;
+                m_description = ldescription;
+                m_publisher = lpublisher;
+                m_platform = lplatform;
+                m_version = lversion;
             }
 
-    QString Genre() const { return genre; }
-    QString Year() const { return year; }
-    QString Country() const { return country; }
-    QString GameName() const { return gamename; }
-    QString Description() const { return description; }
-    QString Publisher() const { return publisher; }
-    QString Platform() const { return platform; }
-    QString Version() const { return version; }
+    QString Genre() const { return m_genre; }
+    QString Year() const { return m_year; }
+    QString Country() const { return m_country; }
+    QString GameName() const { return m_gamename; }
+    QString Description() const { return m_description; }
+    QString Publisher() const { return m_publisher; }
+    QString Platform() const { return m_platform; }
+    QString Version() const { return m_version; }
 
   private:
-    QString genre;
-    QString year;
-    QString country;
-    QString gamename;
-    QString description;
-    QString publisher;
-    QString platform;
-    QString version;
+    QString m_genre;
+    QString m_year;
+    QString m_country;
+    QString m_gamename;
+    QString m_description;
+    QString m_publisher;
+    QString m_platform;
+    QString m_version;
 };
 
 typedef QMap <QString, RomData> RomDBMap;
 
 QString crcStr(int crc);
 
-QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB);
+QString crcinfo(const QString& romname, const QString& GameType, QString *key, RomDBMap *romDB);
 
 #endif

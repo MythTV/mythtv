@@ -55,14 +55,14 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
      * in relative frequencies of the dominant colors.
      */
     unsigned short diff = 0;
-    for (unsigned int ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
+    for (size_t ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
         diff += abs((*sc1)[ii].frequency - (*sc2)[ii].frequency) +
             abs((*sc1)[ii].color - (*sc2)[ii].color);
     return diff;
 }
 
 bool
-writeData(QString filename, const unsigned short *scdiff, long long nframes)
+writeData(const QString& filename, const unsigned short *scdiff, long long nframes)
 {
     FILE            *fp;
     long long       frameno;
@@ -98,16 +98,9 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
 };  /* namespace */
 
 SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
-        QString debugdir)
-    : FrameAnalyzer()
-    , histogramAnalyzer(ha)
-    , fps(0.0f)
-    , scdata(nullptr)
-    , scdiff(nullptr)
-    , debugLevel(0)
-    , debugdata(debugdir + "/SceneChangeDetector.txt")
-    , debug_scenechange(false)
-    , scenechange_done(false)
+        const QString& debugdir)
+    : m_histogramAnalyzer(ha)
+    , m_debugdata(debugdir + "/SceneChangeDetector.txt")
 {
     LOG(VB_COMMFLAG, LOG_INFO, "SceneChangeDetector");
 
@@ -116,22 +109,20 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
      *      0: no debugging
      *      2: extra verbosity [O(nframes)]
      */
-    debugLevel = gCoreContext->GetNumSetting("SceneChangeDetectorDebugLevel", 0);
+    m_debugLevel = gCoreContext->GetNumSetting("SceneChangeDetectorDebugLevel", 0);
 
-    if (debugLevel >= 1)
+    if (m_debugLevel >= 1)
     {
         createDebugDirectory(debugdir,
-            QString("SceneChangeDetector debugLevel %1").arg(debugLevel));
-        debug_scenechange = true;
+            QString("SceneChangeDetector debugLevel %1").arg(m_debugLevel));
+        m_debug_scenechange = true;
     }
 }
 
 void SceneChangeDetector::deleteLater(void)
 {
-    if (scdata)
-        delete []scdata;
-    if (scdiff)
-        delete []scdiff;
+    delete []m_scdata;
+    delete []m_scdiff;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -139,15 +130,15 @@ SceneChangeDetector::MythPlayerInited(MythPlayer *player,
         long long nframes)
 {
     FrameAnalyzer::analyzeFrameResult ares =
-        histogramAnalyzer->MythPlayerInited(player, nframes);
+        m_histogramAnalyzer->MythPlayerInited(player, nframes);
 
-    fps = player->GetFrameRate();
+    m_fps = player->GetFrameRate();
 
-    scdata = new SceneChangeData[nframes];
-    memset(scdata, 0, nframes * sizeof(*scdata));
+    m_scdata = new SceneChangeData[nframes];
+    memset(m_scdata, 0, nframes * sizeof(*m_scdata));
 
-    scdiff = new unsigned short[nframes];
-    memset(scdiff, 0, nframes * sizeof(*scdiff));
+    m_scdiff = new unsigned short[nframes];
+    memset(m_scdiff, 0, nframes * sizeof(*m_scdiff));
 
     QSize video_disp_dim = player->GetVideoSize();
 
@@ -165,7 +156,7 @@ SceneChangeDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
 {
     *pNextFrame = NEXTFRAME;
 
-    if (histogramAnalyzer->analyzeFrame(frame, frameno) ==
+    if (m_histogramAnalyzer->analyzeFrame(frame, frameno) ==
             FrameAnalyzer::ANALYZE_OK)
         return ANALYZE_OK;
 
@@ -178,44 +169,44 @@ SceneChangeDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
 int
 SceneChangeDetector::finished(long long nframes, bool final)
 {
-    if (histogramAnalyzer->finished(nframes, final))
+    if (m_histogramAnalyzer->finished(nframes, final))
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("SceneChangeDetector::finished(%1)")
             .arg(nframes));
 
     const HistogramAnalyzer::Histogram *histogram =
-        histogramAnalyzer->getHistograms();
-    for (unsigned int frameno = 0; frameno < nframes; frameno++)
-        (void)scenechange_data_init(&scdata[frameno], &histogram[frameno]);
-    scdiff[0] = 0;
-    for (unsigned int frameno = 1; frameno < nframes; frameno++)
-        scdiff[frameno] = scenechange_data_diff(&scdata[frameno - 1],
-                &scdata[frameno]);
+        m_histogramAnalyzer->getHistograms();
+    for (long long frameno = 0; frameno < nframes; frameno++)
+        scenechange_data_init(&m_scdata[frameno], &histogram[frameno]);
+    m_scdiff[0] = 0;
+    for (long long frameno = 1; frameno < nframes; frameno++)
+        m_scdiff[frameno] = scenechange_data_diff(&m_scdata[frameno - 1],
+                &m_scdata[frameno]);
 
-    if (!scenechange_done && debug_scenechange)
+    if (!m_scenechange_done && m_debug_scenechange)
     {
-        if (final && writeData(debugdata, scdiff, nframes))
+        if (final && writeData(m_debugdata, m_scdiff, nframes))
         {
             LOG(VB_COMMFLAG, LOG_INFO, 
                 QString("SceneChangeDetector::finished wrote %1")
-                    .arg(debugdata));
-            scenechange_done = true;
+                    .arg(m_debugdata));
+            m_scenechange_done = true;
         }
     }
 
     /* Identify all scene-change frames (changeMap). */
     unsigned short *scdiffsort = new unsigned short[nframes];
-    memcpy(scdiffsort, scdiff, nframes * sizeof(*scdiff));
+    memcpy(scdiffsort, m_scdiff, nframes * sizeof(*m_scdiff));
     unsigned short mindiff = quick_select_ushort(scdiffsort, nframes,
                                                  (int)(0.979472 * nframes));
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("SceneChangeDetector::finished applying threshold value %1")
             .arg(mindiff));
-    computeChangeMap(&changeMap, nframes, scdiff, mindiff);
+    computeChangeMap(&m_changeMap, nframes, m_scdiff, mindiff);
     delete []scdiffsort;
-    if (debugLevel >= 2)
-        frameAnalyzerReportMapms(&changeMap, fps, "SC frame");
+    if (m_debugLevel >= 2)
+        frameAnalyzerReportMapms(&m_changeMap, m_fps, "SC frame");
 
     return 0;
 }
@@ -223,7 +214,7 @@ SceneChangeDetector::finished(long long nframes, bool final)
 int
 SceneChangeDetector::reportTime(void) const
 {
-    return histogramAnalyzer->reportTime();
+    return m_histogramAnalyzer->reportTime();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

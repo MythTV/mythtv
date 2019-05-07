@@ -45,19 +45,7 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool /*showTV*/)
              : ScheduleCommon(parent, "ViewScheduled"),
-               m_conflictBool(false),
-               m_conflictDate(QDate()),
-               m_schedulesList(nullptr),
-               m_groupList(nullptr),
-               m_showAll(!gCoreContext->GetNumSetting("ViewSchedShowLevel", 0)),
-               m_inEvent(false),
-               m_inFill(false),
-               m_needFill(false),
-               m_listPos(0),
-               m_currentGroup(QDate()),
-               m_defaultGroup(QDate()),
-               m_maxinput(0),
-               m_curinput(0),
+               m_showAll(!gCoreContext->GetBoolSetting("ViewSchedShowLevel", false)),
                m_player(player)
 {
     gCoreContext->addListener(this);
@@ -66,7 +54,7 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool /*showTV*
 ViewScheduled::~ViewScheduled()
 {
     gCoreContext->removeListener(this);
-    gCoreContext->SaveSetting("ViewSchedShowLevel", !m_showAll);
+    gCoreContext->SaveBoolSetting("ViewSchedShowLevel", !m_showAll);
 
     // if we have a player, we need to tell we are done
     if (m_player)
@@ -365,7 +353,7 @@ void ViewScheduled::LoadList(bool useExistingData)
                 listPos = i;
                 break;
             }
-            else if (recstartts <= pginfo->GetRecordingStartTime())
+            if (recstartts <= pginfo->GetRecordingStartTime())
                 listPos = i;
         }
         m_schedulesList->SetItemCurrent(listPos);
@@ -593,10 +581,10 @@ void ViewScheduled::EmbedTVWindow(void)
 
 void ViewScheduled::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message != "SCHEDULE_CHANGE")
             return;

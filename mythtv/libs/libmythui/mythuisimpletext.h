@@ -22,20 +22,21 @@ class MythFontProperties;
 class MUI_PUBLIC MythUISimpleText : public MythUIType
 {
   public:
-    MythUISimpleText(MythUIType *parent, const QString &name);
+    MythUISimpleText(MythUIType *parent, const QString &name)
+        : MythUIType(parent, name) {}
     MythUISimpleText(const QString &text, const MythFontProperties &font,
                      const QRect &rect, Qt::Alignment align,
                      MythUIType *parent, const QString &name);
     ~MythUISimpleText() = default;
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
 
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
-    Qt::Alignment m_Justification;
+    Qt::Alignment m_Justification {Qt::AlignLeft | Qt::AlignTop};
     MythFontProperties m_Font;
     QString m_Message;
 };

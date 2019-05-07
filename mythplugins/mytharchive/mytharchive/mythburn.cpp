@@ -45,30 +45,11 @@ using namespace std;
 MythBurn::MythBurn(MythScreenStack   *parent,
                    MythScreenType    *destinationScreen,
                    MythScreenType    *themeScreen,
-                   ArchiveDestination archiveDestination, QString name) :
+                   ArchiveDestination archiveDestination, const QString& name) :
     MythScreenType(parent, name),
     m_destinationScreen(destinationScreen),
     m_themeScreen(themeScreen),
-    m_archiveDestination(archiveDestination),
-    m_bCreateISO(false),
-    m_bDoBurn(false),
-    m_bEraseDvdRw(false),
-    m_saveFilename(""),
-    m_theme(),
-    m_moveMode(false),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr),
-    m_archiveButtonList(nullptr),
-    m_nofilesText(nullptr),
-    m_addrecordingButton(nullptr),
-    m_addvideoButton(nullptr),
-    m_addfileButton(nullptr),
-    m_sizeBar(nullptr),
-    m_maxsizeText(nullptr),
-    m_minsizeText(nullptr),
-    m_currentsizeErrorText(nullptr),
-    m_currentsizeText(nullptr)
+    m_archiveDestination(archiveDestination)
 {
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
@@ -183,7 +164,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "DELETE")
         {
@@ -252,7 +233,7 @@ void MythBurn::loadEncoderProfiles()
     EncoderProfile *item = new EncoderProfile;
     item->name = "NONE";
     item->description = "";
-    item->bitrate = 0.0f;
+    item->bitrate = 0.0F;
     m_profileList.append(item);
 
     // find the encoding profiles
@@ -290,7 +271,7 @@ void MythBurn::loadEncoderProfiles()
     QDomNodeList profileNodeList = doc.elementsByTagName("profile");
     QString name, desc, bitrate;
 
-    for (int x = 0; x < (int) profileNodeList.count(); x++)
+    for (int x = 0; x < profileNodeList.count(); x++)
     {
         QDomNode n = profileNodeList.item(x);
         QDomElement e = n.toElement();
@@ -312,11 +293,11 @@ void MythBurn::loadEncoderProfiles()
 
         }
 
-        EncoderProfile *item = new EncoderProfile;
-        item->name = name;
-        item->description = desc;
-        item->bitrate = bitrate.toFloat();
-        m_profileList.append(item);
+        EncoderProfile *item2 = new EncoderProfile;
+        item2->name = name;
+        item2->description = desc;
+        item2->bitrate = bitrate.toFloat();
+        m_profileList.append(item2);
     }
 }
 
@@ -357,7 +338,7 @@ void MythBurn::toggleUseCutlist(void)
 
 void MythBurn::handleNextPage()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         ShowOkPopup(tr("You need to add at least one item to archive!"));
         return;
@@ -424,7 +405,7 @@ void MythBurn::updateArchiveList(void)
 
     m_archiveButtonList->Reset();
 
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         m_nofilesText->Show();
     }
@@ -500,12 +481,9 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.bindValue(":FILENAME", baseName);
         if (query.exec() && query.size())
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: Recording not found (%1)")
-                    .arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: Recording not found (%1)")
+            .arg(filename));
     }
     else if (type == "Video")
     {
@@ -515,21 +493,15 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.bindValue(":FILENAME", filename);
         if (query.exec() && query.size())
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: Video not found (%1)").arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: Video not found (%1)").arg(filename));
     }
     else if (type == "File")
     {
         if (QFile::exists(filename))
             return true;
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("MythArchive: File not found (%1)").arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythArchive: File not found (%1)").arg(filename));
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythArchive: Archive item removed from list");
@@ -616,7 +588,7 @@ void MythBurn::createConfigFile(const QString &filename)
 
         QDomElement file = doc.createElement("file");
         file.setAttribute("type", a->type.toLower() );
-        file.setAttribute("usecutlist", a->useCutlist);
+        file.setAttribute("usecutlist", static_cast<int>(a->useCutlist));
         file.setAttribute("filename", a->filename);
         file.setAttribute("encodingprofile", a->encoderProfile->name);
         if (a->editedDetails)
@@ -631,16 +603,16 @@ void MythBurn::createConfigFile(const QString &filename)
             details.appendChild(desc);
         }
 
-        if (a->thumbList.size() > 0)
+        if (!a->thumbList.empty())
         {
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
 
-            for (int x = 0; x < a->thumbList.size(); x++)
+            for (int y = 0; y < a->thumbList.size(); y++)
             {
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
-                ThumbImage *thumbImage = a->thumbList.at(x);
+                ThumbImage *thumbImage = a->thumbList.at(y);
                 thumb.setAttribute("caption", thumbImage->caption);
                 thumb.setAttribute("filename", thumbImage->filename);
                 thumb.setAttribute("frame", (int) thumbImage->frame);
@@ -652,11 +624,11 @@ void MythBurn::createConfigFile(const QString &filename)
 
     // add the options to the xml file
     QDomElement options = doc.createElement("options");
-    options.setAttribute("createiso", m_bCreateISO);
-    options.setAttribute("doburn", m_bDoBurn);
+    options.setAttribute("createiso", static_cast<int>(m_bCreateISO));
+    options.setAttribute("doburn", static_cast<int>(m_bDoBurn));
     options.setAttribute("mediatype", m_archiveDestination.type);
     options.setAttribute("dvdrsize", (qint64)m_archiveDestination.freeSpace);
-    options.setAttribute("erasedvdrw", m_bEraseDvdRw);
+    options.setAttribute("erasedvdrw", static_cast<int>(m_bEraseDvdRw));
     options.setAttribute("savefilename", m_saveFilename);
     job.appendChild(options);
 
@@ -787,9 +759,9 @@ void MythBurn::saveConfiguration(void)
     }
 }
 
-void MythBurn::showMenu()
+void MythBurn::ShowMenu()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
         return;
 
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
@@ -1043,22 +1015,6 @@ void MythBurn::itemClicked(MythUIButtonListItem *item)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ProfileDialog::ProfileDialog(
-    MythScreenStack *parent, ArchiveItem *archiveItem,
-    QList<EncoderProfile *> profileList) :
-    MythScreenType(parent, "functionpopup"),
-    m_archiveItem(archiveItem),
-    m_profileList(profileList),
-    m_captionText(nullptr),
-    m_descriptionText(nullptr),
-    m_oldSizeText(nullptr),
-    m_newSizeText(nullptr),
-    m_profile_list(nullptr),
-    m_enabledCheck(nullptr),
-    m_okButton(nullptr)
-{
-}
-
 bool ProfileDialog::Create()
 {
     if (!LoadWindowFromXML("mythburn-ui.xml", "profilepopup", this))
@@ -1136,10 +1092,6 @@ BurnMenu::BurnMenu(void)
         :QObject(nullptr)
 {
     setObjectName("BurnMenu");
-}
-
-BurnMenu::~BurnMenu(void)
-{
 }
 
 void BurnMenu::start(void)

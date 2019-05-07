@@ -54,30 +54,14 @@
 
 GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                  :MythScreenType(parent, "GUIStartup"),
-                  m_Exit(false),
-                  m_Setup(false),
-                  m_Retry(false),
-                  m_Search(false),
-                  m_dummyButton(nullptr),
-                  m_retryButton(nullptr),
-                  m_searchButton(nullptr),
-                  m_setupButton(nullptr),
-                  m_exitButton(nullptr),
-                  m_statusState(nullptr),
-                  m_messageState(nullptr),
-                  m_progressBar(nullptr),
-                  m_progressTimer(nullptr),
                   m_loop(eventLoop),
-                  m_dlgLoop(this),
-                  m_total(0)
+                  m_dlgLoop(this)
 {
 }
 
 GUIStartup::~GUIStartup()
 {
-    if (m_progressTimer)
-        delete m_progressTimer;
-
+    delete m_progressTimer;
 }
 
 bool GUIStartup::Create(void)
@@ -143,8 +127,7 @@ bool GUIStartup::setMessageState(const QString &name)
 
 void GUIStartup::setTotal(int total)
 {
-    if (m_progressTimer)
-        delete m_progressTimer;
+    delete m_progressTimer;
     m_progressTimer = new MythTimer(MythTimer::kStartRunning);
     m_timer.start(500);
     m_total = total*1000;

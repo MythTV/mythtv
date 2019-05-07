@@ -20,20 +20,6 @@
 
 using namespace std;
 
-MythPlugin::MythPlugin(const QString &libname, const QString &plugname)
-          : QLibrary(libname), m_plugName(plugname)
-{
-    enabled = true;
-    position = 0;
-}
-
-MythPlugin::~MythPlugin()
-{
-    // Commented out because it causes segfaults... dtk 2008-10-08
-    //if (isLoaded())
-    //    unload();
-}
-
 int MythPlugin::init(const char *libversion)
 {
     typedef int (*PluginInitFunc)(const char *);
@@ -100,7 +86,7 @@ MythPluginType MythPlugin::type(void)
 void MythPlugin::destroy(void)
 {
     typedef void (*PluginDestFunc)();
-    PluginDestFunc rfunc = (PluginDestFunc)QLibrary::resolve("mythplugin_destroy");
+    PluginDestFunc rfunc = QLibrary::resolve("mythplugin_destroy");
 
     if (rfunc)
         rfunc();
@@ -169,7 +155,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     {
         case kPluginType_Module:
         default:
-            moduleMap[newname] = m_dict[newname];
+            m_moduleMap[newname] = m_dict[newname];
             break;
     }
 
@@ -232,10 +218,10 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
 
-    if (moduleMap.find(newname) == moduleMap.end())
+    if (m_moduleMap.find(newname) == m_moduleMap.end())
         return nullptr;
 
-    return moduleMap[newname];
+    return m_moduleMap[newname];
 }
 
 void MythPluginManager::DestroyAllPlugins(void)
@@ -248,7 +234,7 @@ void MythPluginManager::DestroyAllPlugins(void)
     }
 
     m_dict.clear();
-    moduleMap.clear();
+    m_moduleMap.clear();
 }
 
 QStringList MythPluginManager::EnumeratePlugins(void)

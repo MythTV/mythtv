@@ -38,7 +38,7 @@ class MTV_PUBLIC MythSystemEventHandler : public QObject
     QString EventNameToSetting(const QString &name);
 
     // Custom Event Handler
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 };
 
 /** \class MythSystemEventEditor

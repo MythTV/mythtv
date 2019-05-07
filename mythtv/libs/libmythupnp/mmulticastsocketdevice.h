@@ -55,16 +55,18 @@ class MMulticastSocketDevice : public MSocketDevice
         memset(&m_imr, 0, sizeof(struct ip_mreq));
     }
 
-    MMulticastSocketDevice(QString sAddress, quint16 nPort, u_char ttl = 0);
+    MMulticastSocketDevice(const QString& sAddress, quint16 nPort, u_char ttl = 0);
 
     virtual ~MMulticastSocketDevice();
 
     virtual qint64 writeBlock(
         const char *data, quint64 len,
-        const QHostAddress & host, quint16 port);
+        const QHostAddress & host, quint16 port) override; // MSocketDevice
 
-    virtual QHostAddress address() const { return m_address; }
-    virtual quint16 port() const { return m_port; }
+    QHostAddress address() const override // MSocketDevice
+        { return m_address; }
+    quint16 port() const override // MSocketDevice
+        { return m_port; }
 
   private:
     QList<QHostAddress> m_local_addresses;

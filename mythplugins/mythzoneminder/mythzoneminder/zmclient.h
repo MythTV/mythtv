@@ -28,7 +28,7 @@ class MPUBLIC ZMClient : public QObject
     static ZMClient *get(void);
     static bool setupZMClient (void);
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
     // Used to actually connect to an ZM server
     bool connectToHost(const QString &hostname, unsigned int port);
@@ -58,7 +58,7 @@ class MPUBLIC ZMClient : public QObject
     void getCameraList(QStringList &cameraList);
     void getEventDates(const QString &monitorName, bool oldestFirst, 
                        QStringList &dateList);
-    void setMonitorFunction(const int monitorID, const QString &function, const int enabled);
+    void setMonitorFunction(const int monitorID, const QString &function, const bool enabled);
     bool updateAlarmStates(void);
 
     bool isMiniPlayerEnabled(void) { return m_isMiniPlayerEnabled; }
@@ -75,18 +75,18 @@ class MPUBLIC ZMClient : public QObject
     bool readData(unsigned char *data, int dataSize);
     bool sendReceiveStringList(QStringList &strList);
 
-    QMutex              m_listLock;
+    QMutex              m_listLock          {QMutex::Recursive};
     QList<Monitor*>     m_monitorList;
     QMap<int, Monitor*> m_monitorMap;
 
-    MythSocket       *m_socket;
-    QMutex            m_socketLock;
-    QString           m_hostname;
-    uint              m_port;
-    bool              m_bConnected;
-    QTimer           *m_retryTimer;
-    bool              m_zmclientReady;
-    bool              m_isMiniPlayerEnabled;
+    MythSocket       *m_socket              {nullptr};
+    QMutex            m_socketLock          {QMutex::Recursive};
+    QString           m_hostname            {"localhost"};
+    uint              m_port                {6548};
+    bool              m_bConnected          {false};
+    QTimer           *m_retryTimer          {nullptr};
+    bool              m_zmclientReady       {false};
+    bool              m_isMiniPlayerEnabled {true};
 };
 
 #endif

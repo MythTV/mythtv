@@ -9,7 +9,7 @@
 #include "mythrssmanager.h"
 
 // Generic Data Formatting
-MPUBLIC QString GetDownloadFilename(QString title, QString url);
+MPUBLIC QString GetDownloadFilename(const QString& title, const QString& url);
 
 // Tree DB Utils
 
@@ -20,7 +20,7 @@ MPUBLIC GrabberScript::scriptList findAllDBTreeGrabbers(void);
 MPUBLIC bool findSearchGrabberInDB(const QString &commandline, ArticleType type);
 MPUBLIC GrabberScript* findSearchGrabberByCommand(const QString &url, ArticleType type);
 MPUBLIC GrabberScript::scriptList findAllDBSearchGrabbers(ArticleType type);
-MPUBLIC bool markTreeUpdated(GrabberScript *script, QDateTime curTime);
+MPUBLIC bool markTreeUpdated(GrabberScript *script, const QDateTime& curTime);
 MPUBLIC bool needsUpdate(GrabberScript *script, uint updateFreq);
 MPUBLIC QDateTime lastUpdate(GrabberScript* script);
 
@@ -50,7 +50,8 @@ MPUBLIC RSSSite* findByURL(const QString &url, ArticleType type);
 MPUBLIC RSSSite::rssList findAllDBRSS(void);
 MPUBLIC RSSSite::rssList findAllDBRSSByType(ArticleType type);
 MPUBLIC bool insertInDB(RSSSite *site);
-MPUBLIC bool insertInDB(const QString &name, const QString &thumbnail,
+MPUBLIC bool insertInDB(const QString &name, const QString &sortname,
+                const QString &thumbnail,
                 const QString &description, const QString &url,
                 const QString &author, const bool &download,
                 const QDateTime &updated, ArticleType type);

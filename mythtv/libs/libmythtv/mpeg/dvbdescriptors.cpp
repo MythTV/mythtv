@@ -141,11 +141,11 @@ static QString decode_text(const unsigned char *buf, uint length)
     {
         return decode_iso6937(buf, length);
     }
-    else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
+    if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
     {
         return iso8859_codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
     }
-    else if (buf[0] == 0x10)
+    if (buf[0] == 0x10)
     {
         // If the first byte of the text field has a value "0x10"
         // then the following two bytes carry a 16-bit value (uimsbf) N
@@ -156,18 +156,15 @@ static QString decode_text(const unsigned char *buf, uint length)
         uint code = buf[1] << 8 | buf[2];
         if (code <= 15)
             return iso8859_codecs[code]->toUnicode((char*)(buf + 3), length - 3);
-        else
-            return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
+        return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
     }
-    else if (buf[0] == 0x15) // Already Unicode
+    if (buf[0] == 0x15) // Already Unicode
     {
         return QString::fromUtf8((char*)(buf + 1), length - 1);
     }
-    else
-    {
-        // Unknown/invalid encoding - assume local8Bit
-        return QString::fromLocal8Bit((char*)(buf + 1), length - 1);
-    }
+
+    // Unknown/invalid encoding - assume local8Bit
+    return QString::fromLocal8Bit((char*)(buf + 1), length - 1);
 }
 
 
@@ -597,6 +594,17 @@ QString DVBLogicalChannelDescriptor::toString() const
     return ret;
 }
 
+QString DVBSimulcastChannelDescriptor::toString() const
+{
+    QString ret = "DVBSimulcastChannelDescriptor sid->chan_num: ";
+    for (uint i = 0; i < ChannelCount(); i++)
+    {
+        ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
+        ret += (i+1<ChannelCount()) ? ", " : "";
+    }
+    return ret;
+}
+
 QString CAIdentifierDescriptor::toString(void) const
 {
     QString ret = QString("CAIdentifierDescriptor ");
@@ -624,7 +632,7 @@ QString DataBroadcastDescriptor::toString(void) const
     ret += QString("ISO_639_language_code(%1) ")
         .arg(LanguageString());
 
-    ret += QString("text(%1) ") + QString(Text());
+    ret += QString("text(%1) ") + Text();
 
     return ret;
 }

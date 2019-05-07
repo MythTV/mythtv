@@ -1,23 +1,15 @@
 // Own Header
 #include "mythuiscrollbar.h"
 
+// C++
+#include <cmath>
+
 // QT
 #include <QCoreApplication>
 #include <QDomDocument>
 
 // myth
 #include "mythlogging.h"
-
-const int kDefaultMaxValue = 99;
-const int kDefaultPageStep = 10;
-
-MythUIScrollBar::MythUIScrollBar(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-      m_layout(LayoutVertical), m_pageStep(kDefaultPageStep),
-      m_sliderPosition(0), m_maximum(0),
-      m_hideDelay(0), m_timerId(0)
-{
-}
 
 void MythUIScrollBar::Reset()
 {
@@ -116,17 +108,17 @@ void MythUIScrollBar::CalculatePosition(void)
 
     if (m_layout == LayoutHorizontal)
     {
-        int width = qMax((int)(fillArea.width() * relativeSize + 0.5),
+        int width = qMax((int)lroundf(fillArea.width() * relativeSize),
                          m_sliderArea.width());
         newSliderArea.setWidth(width);
-        endPos.setX((int)((fillArea.width() - width) * percentage + 0.5));
+        endPos.setX(lroundf((fillArea.width() - width) * percentage));
     }
     else
     {
-        int height = qMax((int)(fillArea.height() * relativeSize + 0.5),
+        int height = qMax((int)lroundf(fillArea.height() * relativeSize),
                           m_sliderArea.height());
         newSliderArea.setHeight(height);
-        endPos.setY((int)((fillArea.height() - height) * percentage + 0.5));
+        endPos.setY(lroundf((fillArea.height() - height) * percentage));
     }
 
     slider->SetArea(newSliderArea);
@@ -170,7 +162,7 @@ void MythUIScrollBar::CreateCopy(MythUIType *parent)
     scrollbar->CopyFrom(this);
 }
 
-void MythUIScrollBar::timerEvent(QTimerEvent *)
+void MythUIScrollBar::timerEvent(QTimerEvent * /*event*/)
 {
     if (m_timerId)
         killTimer(m_timerId);

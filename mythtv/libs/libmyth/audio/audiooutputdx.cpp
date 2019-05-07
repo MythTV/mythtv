@@ -53,27 +53,17 @@ class AudioOutputDXPrivate
 {
     public:
         explicit AudioOutputDXPrivate(AudioOutputDX *in_parent) :
-            parent(in_parent),
-            dsound_dll(nullptr),
-            dsobject(nullptr),
-            dsbuffer(nullptr),
-            playStarted(false),
-            writeCursor(0),
-            chosenGUID(nullptr),
-            device_count(0),
-            device_num(0)
-        {
-        }
+            m_parent(in_parent) {}
 
         ~AudioOutputDXPrivate()
         {
             DestroyDSBuffer();
 
-            if (dsobject)
-                IDirectSound_Release(dsobject);
+            if (m_dsobject)
+                IDirectSound_Release(m_dsobject);
 
-            if (dsound_dll)
-               FreeLibrary(dsound_dll);
+            if (m_dsound_dll)
+               FreeLibrary(m_dsound_dll);
         }
 
         int InitDirectSound(bool passthrough = false);
@@ -93,16 +83,18 @@ class AudioOutputDXPrivate
                         LPVOID lpContext);
 #endif
     public:
-        AudioOutputDX       *parent;
-        HINSTANCE           dsound_dll;
-        LPDIRECTSOUND       dsobject;
-        LPDIRECTSOUNDBUFFER dsbuffer;
-        bool                playStarted;
-        DWORD               writeCursor;
-        GUID                deviceGUID,     *chosenGUID;
-        int                 device_count,   device_num;
-        QString             device_name;
-        QMap<int, QString>  device_list;
+        AudioOutputDX       *m_parent       {nullptr};
+        HINSTANCE            m_dsound_dll   {nullptr};
+        LPDIRECTSOUND        m_dsobject     {nullptr};
+        LPDIRECTSOUNDBUFFER  m_dsbuffer     {nullptr};
+        bool                 m_playStarted  {false};
+        DWORD                m_writeCursor  {0};
+        GUID                 m_deviceGUID;
+        GUID                *m_chosenGUID   {nullptr};
+        int                  m_device_count {0};
+        int                  m_device_num   {0};
+        QString              m_device_name;
+        QMap<int, QString>   m_device_list;
 };
 
 
@@ -152,9 +144,9 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
 
 #endif
     AudioOutputDXPrivate *context = static_cast<AudioOutputDXPrivate*>(lpContext);
-    const QString cfg_desc  = context->device_name;
-    const int device_num    = context->device_num;
-    const int device_count  = context->device_count;
+    const QString cfg_desc  = context->m_device_name;
+    const int device_num    = context->m_device_num;
+    const int device_count  = context->m_device_count;
 
     VBAUDIO(QString("Device %1:" + enum_desc).arg(device_count));
 
@@ -162,15 +154,15 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
         (device_num == 0 && !cfg_desc.isEmpty() &&
         enum_desc.startsWith(cfg_desc, Qt::CaseInsensitive))) && lpGuid)
     {
-        context->deviceGUID  = *lpGuid;
-        context->chosenGUID  =
-            &(context->deviceGUID);
-        context->device_name = enum_desc;
-        context->device_num  = device_count;
+        context->m_deviceGUID  = *lpGuid;
+        context->m_chosenGUID  =
+            &(context->m_deviceGUID);
+        context->m_device_name = enum_desc;
+        context->m_device_num  = device_count;
     }
 
-    context->device_list.insert(device_count, enum_desc);
-    context->device_count++;
+    context->m_device_list.insert(device_count, enum_desc);
+    context->m_device_count++;
     return 1;
 }
 
@@ -178,22 +170,22 @@ void AudioOutputDXPrivate::ResetDirectSound(void)
 {
     DestroyDSBuffer();
 
-    if (dsobject)
+    if (m_dsobject)
     {
-        IDirectSound_Release(dsobject);
-        dsobject = nullptr;
+        IDirectSound_Release(m_dsobject);
+        m_dsobject = nullptr;
     }
 
-    if (dsound_dll)
+    if (m_dsound_dll)
     {
-       FreeLibrary(dsound_dll);
-       dsound_dll = nullptr;
+       FreeLibrary(m_dsound_dll);
+       m_dsound_dll = nullptr;
     }
 
-    chosenGUID   = nullptr;
-    device_count = 0;
-    device_num   = 0;
-    device_list.clear();
+    m_chosenGUID   = nullptr;
+    m_device_count = 0;
+    m_device_num   = 0;
+    m_device_list.clear();
 }
 
 int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
@@ -204,39 +196,39 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 
     ResetDirectSound();
 
-    dsound_dll = LoadLibrary(TEXT("DSOUND.DLL"));
-    if (dsound_dll == nullptr)
+    m_dsound_dll = LoadLibrary(TEXT("DSOUND.DLL"));
+    if (m_dsound_dll == nullptr)
     {
         VBERROR("Cannot open DSOUND.DLL");
         goto error;
     }
 
-    if (parent)  // parent can be nullptr only when called from GetDXDevices()
-        device_name = passthrough ?
-                      parent->passthru_device : parent->main_device;
-    device_name = device_name.section(':', 1);
-    device_num  = device_name.toInt(&ok, 10);
+    if (m_parent)  // parent can be nullptr only when called from GetDXDevices()
+        m_device_name = passthrough ?
+                      m_parent->passthru_device : m_parent->main_device;
+    m_device_name = m_device_name.section(':', 1);
+    m_device_num  = m_device_name.toInt(&ok, 10);
 
     VBAUDIO(QString("Looking for device num:%1 or name:%2")
-            .arg(device_num).arg(device_name));
+            .arg(m_device_num).arg(m_device_name));
 
     OurDirectSoundEnumerate =
-        (LPFNDSE)GetProcAddress(dsound_dll, "DirectSoundEnumerateA");
+        (LPFNDSE)GetProcAddress(m_dsound_dll, "DirectSoundEnumerateA");
 
     if(OurDirectSoundEnumerate)
         if(FAILED(OurDirectSoundEnumerate(DSEnumCallback, this) != DS_OK))
             VBERROR("DirectSoundEnumerate FAILED");
 
-    if (!chosenGUID)
+    if (!m_chosenGUID)
     {
-        device_num = 0;
-        device_name = "Primary Sound Driver";
+        m_device_num = 0;
+        m_device_name = "Primary Sound Driver";
     }
 
-    VBAUDIO(QString("Using device %1:%2").arg(device_num).arg(device_name));
+    VBAUDIO(QString("Using device %1:%2").arg(m_device_num).arg(m_device_name));
 
     OurDirectSoundCreate =
-        (LPFNDSC)GetProcAddress(dsound_dll, "DirectSoundCreate");
+        (LPFNDSC)GetProcAddress(m_dsound_dll, "DirectSoundCreate");
 
     if (OurDirectSoundCreate == nullptr)
     {
@@ -244,7 +236,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
         goto error;
     }
 
-    if (FAILED(OurDirectSoundCreate(chosenGUID, &dsobject, nullptr)))
+    if (FAILED(OurDirectSoundCreate(m_chosenGUID, &m_dsobject, nullptr)))
     {
         VBERROR("Cannot create a direct sound device");
         goto error;
@@ -260,7 +252,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
      * sound without any video, and so what window handle should we use ???
      * The hack for now is to use the Desktop window handle - it seems to be
      * working */
-    if (FAILED(IDirectSound_SetCooperativeLevel(dsobject, GetDesktopWindow(),
+    if (FAILED(IDirectSound_SetCooperativeLevel(m_dsobject, GetDesktopWindow(),
                                                 DSSCL_EXCLUSIVE)))
         VBERROR("Cannot set DS cooperative level");
 
@@ -269,27 +261,27 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     return 0;
 
  error:
-    dsobject = nullptr;
-    if (dsound_dll)
+    m_dsobject = nullptr;
+    if (m_dsound_dll)
     {
-        FreeLibrary(dsound_dll);
-        dsound_dll = nullptr;
+        FreeLibrary(m_dsound_dll);
+        m_dsound_dll = nullptr;
     }
     return -1;
 }
 
 void AudioOutputDXPrivate::DestroyDSBuffer(void)
 {
-    if (!dsbuffer)
+    if (!m_dsbuffer)
         return;
 
     VBAUDIO("Destroying DirectSound buffer");
-    IDirectSoundBuffer_Stop(dsbuffer);
-    writeCursor = 0;
-    IDirectSoundBuffer_SetCurrentPosition(dsbuffer, writeCursor);
-    playStarted = false;
-    IDirectSoundBuffer_Release(dsbuffer);
-    dsbuffer = nullptr;
+    IDirectSoundBuffer_Stop(m_dsbuffer);
+    m_writeCursor = 0;
+    IDirectSoundBuffer_SetCurrentPosition(m_dsbuffer, m_writeCursor);
+    m_playStarted = false;
+    IDirectSoundBuffer_Release(m_dsbuffer);
+    m_dsbuffer = nullptr;
 }
 
 void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
@@ -298,13 +290,13 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
     DWORD   l_bytes1, l_bytes2, play_pos, write_pos;
     HRESULT dsresult;
 
-    if (!dsbuffer)
+    if (!m_dsbuffer)
         return;
 
     while (true)
     {
 
-        dsresult = IDirectSoundBuffer_GetCurrentPosition(dsbuffer,
+        dsresult = IDirectSoundBuffer_GetCurrentPosition(m_dsbuffer,
                                                          &play_pos, &write_pos);
         if (dsresult != DS_OK)
         {
@@ -313,22 +305,22 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
         }
 
         VBAUDIOTS(QString("play: %1 write: %2 wcursor: %3")
-                  .arg(play_pos).arg(write_pos).arg(writeCursor));
+                  .arg(play_pos).arg(write_pos).arg(m_writeCursor));
 
-        while ((writeCursor < write_pos &&
-                   ((writeCursor >= play_pos && write_pos >= play_pos)   ||
-                    (writeCursor < play_pos  && write_pos <  play_pos))) ||
-               (writeCursor >= play_pos && write_pos < play_pos))
+        while ((m_writeCursor < write_pos &&
+                   ((m_writeCursor >= play_pos && write_pos >= play_pos)   ||
+                    (m_writeCursor < play_pos  && write_pos <  play_pos))) ||
+               (m_writeCursor >= play_pos && write_pos < play_pos))
         {
             VBERROR("buffer underrun");
-            writeCursor += size;
-            while (writeCursor >= (DWORD)parent->soundcard_buffer_size)
-                writeCursor -= parent->soundcard_buffer_size;
+            m_writeCursor += size;
+            while (m_writeCursor >= (DWORD)m_parent->soundcard_buffer_size)
+                m_writeCursor -= m_parent->soundcard_buffer_size;
         }
 
-        if ((writeCursor < play_pos  && writeCursor + size >= play_pos) ||
-            (writeCursor >= play_pos &&
-             writeCursor + size >= play_pos + parent->soundcard_buffer_size))
+        if ((m_writeCursor < play_pos  && m_writeCursor + size >= play_pos) ||
+            (m_writeCursor >= play_pos &&
+             m_writeCursor + size >= play_pos + m_parent->soundcard_buffer_size))
         {
             usleep(50000);
             continue;
@@ -338,8 +330,8 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
     }
 
     dsresult = IDirectSoundBuffer_Lock(
-                   dsbuffer,              /* DS buffer */
-                   writeCursor,           /* Start offset */
+                   m_dsbuffer,              /* DS buffer */
+                   m_writeCursor,           /* Start offset */
                    size,                  /* Number of bytes */
                    &p_write_position,     /* Address of lock start */
                    &l_bytes1,             /* Bytes locked before wrap */
@@ -349,8 +341,8 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
 
     if (dsresult == DSERR_BUFFERLOST)
     {
-        IDirectSoundBuffer_Restore(dsbuffer);
-        dsresult = IDirectSoundBuffer_Lock(dsbuffer, writeCursor, size,
+        IDirectSoundBuffer_Restore(m_dsbuffer);
+        dsresult = IDirectSoundBuffer_Lock(m_dsbuffer, m_writeCursor, size,
                                            &p_write_position, &l_bytes1,
                                            &p_wrap_around, &l_bytes2, 0);
     }
@@ -365,12 +357,12 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
     if (p_wrap_around)
         memcpy(p_wrap_around, buffer + l_bytes1, l_bytes2);
 
-    writeCursor += l_bytes1 + l_bytes2;
+    m_writeCursor += l_bytes1 + l_bytes2;
 
-    while (writeCursor >= (DWORD)parent->soundcard_buffer_size)
-        writeCursor -= parent->soundcard_buffer_size;
+    while (m_writeCursor >= (DWORD)m_parent->soundcard_buffer_size)
+        m_writeCursor -= m_parent->soundcard_buffer_size;
 
-    IDirectSoundBuffer_Unlock(dsbuffer, p_write_position, l_bytes1,
+    IDirectSoundBuffer_Unlock(m_dsbuffer, p_write_position, l_bytes1,
                               p_wrap_around, l_bytes2);
 }
 
@@ -378,20 +370,20 @@ bool AudioOutputDXPrivate::StartPlayback(void)
 {
     HRESULT dsresult;
 
-    dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING);
+    dsresult = IDirectSoundBuffer_Play(m_dsbuffer, 0, 0, DSBPLAY_LOOPING);
     if (dsresult == DSERR_BUFFERLOST)
     {
-        IDirectSoundBuffer_Restore(dsbuffer);
-        dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING);
+        IDirectSoundBuffer_Restore(m_dsbuffer);
+        dsresult = IDirectSoundBuffer_Play(m_dsbuffer, 0, 0, DSBPLAY_LOOPING);
     }
     if (dsresult != DS_OK)
     {
         VBERROR("Cannot start playing buffer");
-        playStarted = false;
+        m_playStarted = false;
         return false;
     }
 
-    playStarted=true;
+    m_playStarted=true;
     return true;
 }
 
@@ -402,8 +394,8 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(bool passthrough)
     devcaps.dwSize = sizeof(DSCAPS);
 
     m_priv->InitDirectSound(passthrough);
-    if ((!m_priv->dsobject || !m_priv->dsound_dll) ||
-        FAILED(IDirectSound_GetCaps(m_priv->dsobject, &devcaps)) )
+    if ((!m_priv->m_dsobject || !m_priv->m_dsound_dll) ||
+        FAILED(IDirectSound_GetCaps(m_priv->m_dsobject, &devcaps)) )
     {
         delete settings;
         return nullptr;
@@ -454,7 +446,7 @@ bool AudioOutputDX::OpenDevice(void)
 
     m_UseSPDIF = passthru || enc;
     m_priv->InitDirectSound(m_UseSPDIF);
-    if (!m_priv->dsobject || !m_priv->dsound_dll)
+    if (!m_priv->m_dsobject || !m_priv->m_dsound_dll)
     {
         Error(QObject::tr("DirectSound initialization failed"));
         return false;
@@ -516,20 +508,20 @@ bool AudioOutputDX::OpenDevice(void)
     dsbdesc.dwBufferBytes = soundcard_buffer_size; // buffer size
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&wf;
 
-    if (FAILED(IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
-                                            &m_priv->dsbuffer, nullptr)))
+    if (FAILED(IDirectSound_CreateSoundBuffer(m_priv->m_dsobject, &dsbdesc,
+                                             &m_priv->m_dsbuffer, nullptr)))
     {
         /* Vista does not support hardware mixing
            try without DSBCAPS_LOCHARDWARE */
         dsbdesc.dwFlags &= ~DSBCAPS_LOCHARDWARE;
         HRESULT dsresult =
-            IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
-                                           &m_priv->dsbuffer, nullptr);
+            IDirectSound_CreateSoundBuffer(m_priv->m_dsobject, &dsbdesc,
+                                           &m_priv->m_dsbuffer, nullptr);
         if (FAILED(dsresult))
         {
             if (dsresult == DSERR_UNSUPPORTED)
                 Error(QObject::tr("Unsupported format for device %1:%2")
-                      .arg(m_priv->device_num).arg(m_priv->device_name));
+                      .arg(m_priv->m_device_num).arg(m_priv->m_device_name));
             else
                 Error(QObject::tr("Failed to create DS buffer 0x%1")
                       .arg((DWORD)dsresult, 0, 16));
@@ -544,7 +536,7 @@ bool AudioOutputDX::OpenDevice(void)
 
 void AudioOutputDX::CloseDevice(void)
 {
-    if (m_priv->dsbuffer)
+    if (m_priv->m_dsbuffer)
         m_priv->DestroyDSBuffer();
 }
 
@@ -554,20 +546,20 @@ void AudioOutputDX::WriteAudio(unsigned char * buffer, int size)
         return;
 
     m_priv->FillBuffer(buffer, size);
-    if (!m_priv->playStarted)
+    if (!m_priv->m_playStarted)
         m_priv->StartPlayback();
 }
 
 int AudioOutputDX::GetBufferedOnSoundcard(void) const
 {
-    if (!m_priv->playStarted)
+    if (!m_priv->m_playStarted)
         return 0;
 
     HRESULT dsresult;
     DWORD   play_pos, write_pos;
     int     buffered;
 
-    dsresult = IDirectSoundBuffer_GetCurrentPosition(m_priv->dsbuffer,
+    dsresult = IDirectSoundBuffer_GetCurrentPosition(m_priv->m_dsbuffer,
                                                      &play_pos, &write_pos);
     if (dsresult != DS_OK)
     {
@@ -575,7 +567,7 @@ int AudioOutputDX::GetBufferedOnSoundcard(void) const
         return 0;
     }
 
-    buffered = (int)m_priv->writeCursor - (int)play_pos;
+    buffered = (int)m_priv->m_writeCursor - (int)play_pos;
 
     if (buffered <= 0)
         buffered += soundcard_buffer_size;
@@ -592,7 +584,7 @@ int AudioOutputDX::GetVolumeChannel(int channel) const
     if (m_UseSPDIF)
         return 100;
 
-    dsresult = IDirectSoundBuffer_GetVolume(m_priv->dsbuffer, &dxVolume);
+    dsresult = IDirectSoundBuffer_GetVolume(m_priv->m_dsbuffer, &dxVolume);
     volume = (int)(pow(10,(float)dxVolume/20)*100);
 
     if (dsresult != DS_OK)
@@ -609,13 +601,13 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
 {
     HRESULT dsresult;
     float dbAtten = 20 * log10((float)volume/100);
-    long dxVolume = (volume == 0) ? DSBVOLUME_MIN : (long)(100.0f * dbAtten);
+    long dxVolume = (volume == 0) ? DSBVOLUME_MIN : (long)(100.0F * dbAtten);
 
     if (m_UseSPDIF)
         return;
 
     // dxVolume is attenuation in 100ths of a decibel
-    dsresult = IDirectSoundBuffer_SetVolume(m_priv->dsbuffer, dxVolume);
+    dsresult = IDirectSoundBuffer_SetVolume(m_priv->m_dsbuffer, dxVolume);
 
     if (dsresult != DS_OK)
     {
@@ -630,7 +622,7 @@ QMap<int, QString> *AudioOutputDX::GetDXDevices(void)
 {
     AudioOutputDXPrivate *tmp_priv = new AudioOutputDXPrivate(nullptr);
     tmp_priv->InitDirectSound(false);
-    QMap<int, QString> *dxdevs = new QMap<int, QString>(tmp_priv->device_list);
+    QMap<int, QString> *dxdevs = new QMap<int, QString>(tmp_priv->m_device_list);
     delete tmp_priv;
     return dxdevs;
 }

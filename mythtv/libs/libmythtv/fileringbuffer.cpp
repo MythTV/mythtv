@@ -40,49 +40,49 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #define O_BINARY 0
 #endif
 
-#define LOC      QString("FileRingBuf(%1): ").arg(filename)
+#define LOC      QString("FileRingBuf(%1): ").arg(m_filename)
 
 FileRingBuffer::FileRingBuffer(const QString &lfilename,
                                bool write, bool readahead, int timeout_ms)
   : RingBuffer(kRingBuffer_File)
 {
-    startreadahead = readahead;
-    safefilename = lfilename;
-    filename = lfilename;
+    m_startReadAhead = readahead;
+    m_safeFilename = lfilename;
+    m_filename = lfilename;
 
     if (write)
     {
-        if (filename.startsWith("myth://"))
+        if (m_filename.startsWith("myth://"))
         {
-            remotefile = new RemoteFile(filename, true);
-            if (!remotefile->isOpen())
+            m_remotefile = new RemoteFile(m_filename, true);
+            if (!m_remotefile->isOpen())
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("RingBuffer::RingBuffer(): Failed to open "
-                            "remote file (%1) for write").arg(filename));
-                delete remotefile;
-                remotefile = nullptr;
+                            "remote file (%1) for write").arg(m_filename));
+                delete m_remotefile;
+                m_remotefile = nullptr;
             }
             else
-                writemode = true;
+                m_writeMode = true;
         }
         else
         {
-            tfw = new ThreadedFileWriter(
-                filename, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+            m_tfw = new ThreadedFileWriter(
+                m_filename, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
 
-            if (!tfw->Open())
+            if (!m_tfw->Open())
             {
-                delete tfw;
-                tfw = nullptr;
+                delete m_tfw;
+                m_tfw = nullptr;
             }
             else
-                writemode = true;
+                m_writeMode = true;
         }
     }
     else if (timeout_ms >= 0)
     {
-        OpenFile(filename, timeout_ms);
+        FileRingBuffer::OpenFile(m_filename, timeout_ms);
     }
 }
 
@@ -90,16 +90,16 @@ FileRingBuffer::~FileRingBuffer()
 {
     KillReadAheadThread();
 
-    delete remotefile;
-    remotefile = nullptr;
+    delete m_remotefile;
+    m_remotefile = nullptr;
 
-    delete tfw;
-    tfw = nullptr;
+    delete m_tfw;
+    m_tfw = nullptr;
 
-    if (fd2 >= 0)
+    if (m_fd2 >= 0)
     {
-        close(fd2);
-        fd2 = -1;
+        close(m_fd2);
+        m_fd2 = -1;
     }
 }
 
@@ -112,7 +112,7 @@ static bool check_permissions(const QString &filename)
     QFileInfo fileInfo(filename);
     if (fileInfo.exists() && !fileInfo.isReadable())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, QString("FileRingBuf(%1): ").arg(filename) +
                 "File exists but is not readable by MythTV!");
         return false;
     }
@@ -121,11 +121,11 @@ static bool check_permissions(const QString &filename)
 
 static bool is_subtitle_possible(const QString &extension)
 {
-    QMutexLocker locker(&RingBuffer::subExtLock);
+    QMutexLocker locker(&RingBuffer::s_subExtLock);
     bool no_subtitle = false;
-    for (uint i = 0; i < (uint)RingBuffer::subExtNoCheck.size(); i++)
+    for (uint i = 0; i < (uint)RingBuffer::s_subExtNoCheck.size(); i++)
     {
-        if (extension.contains(RingBuffer::subExtNoCheck[i].right(3)))
+        if (extension.contains(RingBuffer::s_subExtNoCheck[i].right(3)))
         {
             no_subtitle = true;
             break;
@@ -155,9 +155,9 @@ static QString local_sub_filename(QFileInfo &fileInfo)
             .replace("(", "?")
             .replace(")", "?");
 
-        QMutexLocker locker(&RingBuffer::subExtLock);
-        QStringList::const_iterator eit = RingBuffer::subExt.begin();
-        for (; eit != RingBuffer::subExt.end(); ++eit)
+        QMutexLocker locker(&RingBuffer::s_subExtLock);
+        QStringList::const_iterator eit = RingBuffer::s_subExt.begin();
+        for (; eit != RingBuffer::s_subExt.end(); ++eit)
             el += findBaseName + *eit;
     }
 
@@ -184,27 +184,27 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OpenFile(%1, %2 ms)")
             .arg(lfilename).arg(retry_ms));
 
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
-    filename = lfilename;
-    safefilename = lfilename;
-    subtitlefilename.clear();
+    m_filename = lfilename;
+    m_safeFilename = lfilename;
+    m_subtitleFilename.clear();
 
-    if (remotefile)
+    if (m_remotefile)
     {
-        delete remotefile;
-        remotefile = nullptr;
+        delete m_remotefile;
+        m_remotefile = nullptr;
     }
 
-    if (fd2 >= 0)
+    if (m_fd2 >= 0)
     {
-        close(fd2);
-        fd2 = -1;
+        close(m_fd2);
+        m_fd2 = -1;
     }
 
     bool is_local =
-        (!filename.startsWith("/dev")) &&
-        ((filename.startsWith("/")) || QFile::exists(filename));
+        (!m_filename.startsWith("/dev")) &&
+        ((m_filename.startsWith("/")) || QFile::exists(m_filename));
 
     if (is_local)
     {
@@ -218,14 +218,13 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         do
         {
             openAttempts++;
-            lasterror = 0;
 
-            fd2 = open(filename.toLocal8Bit().constData(),
+            m_fd2 = open(m_filename.toLocal8Bit().constData(),
                        O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
 
-            if (fd2 < 0)
+            if (m_fd2 < 0)
             {
-                if (!check_permissions(filename))
+                if (!check_permissions(m_filename))
                 {
                     lasterror = 3;
                     break;
@@ -236,36 +235,36 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             }
             else
             {
-                int ret = read(fd2, buf, kReadTestSize);
-                if (ret != (int)kReadTestSize)
+                int ret = read(m_fd2, buf, kReadTestSize);
+                if (ret != kReadTestSize)
                 {
                     lasterror = 2;
-                    close(fd2);
-                    fd2 = -1;
+                    close(m_fd2);
+                    m_fd2 = -1;
                     if (ret == 0 && openAttempts > 5 &&
-                        !gCoreContext->IsRegisteredFileForWrite(filename))
+                        !gCoreContext->IsRegisteredFileForWrite(m_filename))
                     {
                         // file won't grow, abort early
                         break;
                     }
 
-                    if (oldfile)
+                    if (m_oldfile)
                         break; // if it's an old file it won't grow..
                     usleep(10 * 1000);
                 }
                 else
                 {
-                    if (0 == lseek(fd2, 0, SEEK_SET))
+                    if (0 == lseek(m_fd2, 0, SEEK_SET))
                     {
 #ifndef _MSC_VER
-                        if (posix_fadvise(fd2, 0, 0,
+                        if (posix_fadvise(m_fd2, 0, 0,
                                           POSIX_FADV_SEQUENTIAL) < 0)
                         {
                             LOG(VB_FILE, LOG_DEBUG, LOC +
                                 QString("OpenFile(): fadvise sequential "
                                         "failed: ") + ENO);
                         }
-                        if (posix_fadvise(fd2, 0, 128*1024,
+                        if (posix_fadvise(m_fd2, 0, 128*1024,
                                           POSIX_FADV_WILLNEED) < 0)
                         {
                             LOG(VB_FILE, LOG_DEBUG, LOC +
@@ -277,8 +276,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                         break;
                     }
                     lasterror = 4;
-                    close(fd2);
-                    fd2 = -1;
+                    close(m_fd2);
+                    m_fd2 = -1;
                 }
             }
         }
@@ -288,12 +287,12 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         {
             case 0:
             {
-                QFileInfo fi(filename);
-                oldfile = QDateTime(fi.lastModified().toUTC())
+                QFileInfo fi(m_filename);
+                m_oldfile = fi.lastModified().toUTC()
                     .secsTo(MythDate::current()) > 60;
                 QString extension = fi.completeSuffix().toLower();
                 if (is_subtitle_possible(extension))
-                    subtitlefilename = local_sub_filename(fi);
+                    m_subtitleFilename = local_sub_filename(fi);
                 break;
             }
             case 1:
@@ -301,28 +300,28 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                         QString("OpenFile(): Could not open."));
 
                 //: %1 is the filename
-                lastError = tr("Could not open %1").arg(filename);
+                m_lastError = tr("Could not open %1").arg(m_filename);
                 break;
             case 2:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("OpenFile(): File too small (%1B).")
-                        .arg(QFileInfo(filename).size()));
+                        .arg(QFileInfo(m_filename).size()));
 
                 //: %1 is the file size
-                lastError = tr("File too small (%1B)")
-                            .arg(QFileInfo(filename).size());
+                m_lastError = tr("File too small (%1B)")
+                              .arg(QFileInfo(m_filename).size());
                 break;
             case 3:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         "OpenFile(): Improper permissions.");
 
-                lastError = tr("Improper permissions");
+                m_lastError = tr("Improper permissions");
                 break;
             case 4:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         "OpenFile(): Cannot seek in file.");
 
-                lastError = tr("Cannot seek in file");
+                m_lastError = tr("Cannot seek in file");
                 break;
             default:
                 break;
@@ -334,74 +333,72 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
     else
     {
-        QString tmpSubName = filename;
+        QString tmpSubName = m_filename;
         QString dirName  = ".";
 
-        int dirPos = filename.lastIndexOf(QChar('/'));
+        int dirPos = m_filename.lastIndexOf(QChar('/'));
         if (dirPos > 0)
         {
-            tmpSubName = filename.mid(dirPos + 1);
-            dirName = filename.left(dirPos);
+            tmpSubName = m_filename.mid(dirPos + 1);
+            dirName = m_filename.left(dirPos);
         }
 
-        QString baseName  = tmpSubName;
-        QString extension = tmpSubName;
         QStringList auxFiles;
 
         int suffixPos = tmpSubName.lastIndexOf(QChar('.'));
         if (suffixPos > 0)
         {
-            baseName = tmpSubName.left(suffixPos);
+            QString baseName = tmpSubName.left(suffixPos);
             int extnleng = tmpSubName.size() - baseName.size() - 1;
-            extension = tmpSubName.right(extnleng);
+            QString extension = tmpSubName.right(extnleng);
 
             if (is_subtitle_possible(extension))
             {
-                QMutexLocker locker(&subExtLock);
-                QStringList::const_iterator eit = subExt.begin();
-                for (; eit != subExt.end(); ++eit)
+                QMutexLocker locker(&s_subExtLock);
+                QStringList::const_iterator eit = s_subExt.begin();
+                for (; eit != s_subExt.end(); ++eit)
                     auxFiles += baseName + *eit;
             }
         }
 
-        remotefile = new RemoteFile(filename, false, true,
-                                    retry_ms, &auxFiles);
-        if (!remotefile->isOpen())
+        m_remotefile = new RemoteFile(m_filename, false, true,
+                                      retry_ms, &auxFiles);
+        if (!m_remotefile->isOpen())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("RingBuffer::RingBuffer(): Failed to open remote "
-                            "file (%1)").arg(filename));
+                            "file (%1)").arg(m_filename));
 
             //: %1 is the filename
-            lastError = tr("Failed to open remote file %1").arg(filename);
-            delete remotefile;
-            remotefile = nullptr;
+            m_lastError = tr("Failed to open remote file %1").arg(m_filename);
+            delete m_remotefile;
+            m_remotefile = nullptr;
         }
         else
         {
-            QStringList aux = remotefile->GetAuxiliaryFiles();
-            if (aux.size())
-                subtitlefilename = dirName + "/" + aux[0];
+            QStringList aux = m_remotefile->GetAuxiliaryFiles();
+            if (!aux.empty())
+                m_subtitleFilename = dirName + "/" + aux[0];
         }
     }
 
-    setswitchtonext = false;
-    ateof = false;
-    commserror = false;
-    numfailures = 0;
+    m_setSwitchToNext = false;
+    m_ateof = false;
+    m_commsError = false;
+    m_numFailures = 0;
 
     CalcReadAheadThresh();
 
-    bool ok = fd2 >= 0 || remotefile;
+    bool ok = m_fd2 >= 0 || m_remotefile;
 
-    rwlock.unlock();
+    m_rwLock.unlock();
 
     return ok;
 }
 
 bool FileRingBuffer::ReOpen(QString newFilename)
 {
-    if (!writemode)
+    if (!m_writeMode)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Tried to ReOpen a read only file.");
         return false;
@@ -409,30 +406,30 @@ bool FileRingBuffer::ReOpen(QString newFilename)
 
     bool result = false;
 
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
-    if (tfw && tfw->ReOpen(newFilename))
+    if (m_tfw && m_tfw->ReOpen(newFilename))
         result = true;
-    else if (remotefile && remotefile->ReOpen(newFilename))
+    else if (m_remotefile && m_remotefile->ReOpen(newFilename))
         result = true;
 
     if (result)
     {
-        filename = newFilename;
-        poslock.lockForWrite();
-        writepos = 0;
-        poslock.unlock();
+        m_filename = newFilename;
+        m_posLock.lockForWrite();
+        m_writePos = 0;
+        m_posLock.unlock();
     }
 
-    rwlock.unlock();
+    m_rwLock.unlock();
     return result;
 }
 
 bool FileRingBuffer::IsOpen(void) const
 {
-    rwlock.lockForRead();
-    bool ret = tfw || (fd2 > -1) || remotefile;
-    rwlock.unlock();
+    m_rwLock.lockForRead();
+    bool ret = m_tfw || (m_fd2 > -1) || m_remotefile;
+    m_rwLock.unlock();
     return ret;
 }
 
@@ -454,14 +451,14 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
     unsigned errcnt = 0;
     unsigned zerocnt = 0;
 
-    if (fd2 < 0)
+    if (m_fd2 < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Invalid file descriptor in 'safe_read()'");
         return 0;
     }
 
-    if (stopreads)
+    if (m_stopReads)
         return 0;
 
     struct stat sb;
@@ -475,10 +472,10 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
         // check that we have some data to read,
         // so we never attempt to read past the end of file
         // if fstat errored or isn't a regular file, default to previous behavior
-        int ret = fstat(fd2, &sb);
+        int ret = fstat(m_fd2, &sb);
         if (ret == 0 && S_ISREG(sb.st_mode))
         {
-            if ((internalreadpos + tot) >= sb.st_size)
+            if ((m_internalReadPos + tot) >= sb.st_size)
             {
                 // We're at the end, don't attempt to read
                 read_ok = false;
@@ -488,7 +485,7 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
             else
             {
                 toread  =
-                    min(sb.st_size - (internalreadpos + tot), (long long)toread);
+                    min(sb.st_size - (m_internalReadPos + tot), (long long)toread);
                 if (toread < (sz-tot))
                 {
                     eof = true;
@@ -503,7 +500,7 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("read(%1) -- begin").arg(toread));
-            ret = read(fd2, (char *)data + tot, toread);
+            ret = read(m_fd2, (char *)data + tot, toread);
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("read(%1) -> %2 end").arg(toread).arg(ret));
         }
@@ -516,7 +513,7 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
                 LOC + "File I/O problem in 'safe_read()'" + ENO);
 
             errcnt++;
-            numfailures++;
+            m_numFailures++;
             if (errcnt == 3)
                 break;
         }
@@ -525,7 +522,7 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
             tot += ret;
         }
 
-        if (oldfile)
+        if (m_oldfile)
             break;
 
         if (eof)
@@ -544,12 +541,12 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
 
             // 0.36 second timeout for livetvchain with usleep(60000),
             // or 2.4 seconds if it's a new file less than 30 minutes old.
-            if (zerocnt >= (livetvchain ? 6 : 40))
+            if (zerocnt >= (m_liveTVChain ? 6 : 40))
             {
                 break;
             }
         }
-        if (stopreads)
+        if (m_stopReads)
             break;
         if (tot < sz)
             usleep(60000);
@@ -573,10 +570,10 @@ int FileRingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "safe_read(RemoteFile* ...): read failed");
 
-        poslock.lockForRead();
-        rf->Seek(internalreadpos - readAdjust, SEEK_SET);
-        poslock.unlock();
-        numfailures++;
+        m_posLock.lockForRead();
+        rf->Seek(m_internalReadPos - m_readAdjust, SEEK_SET);
+        m_posLock.unlock();
+        m_numFailures++;
     }
     else if (ret == 0)
     {
@@ -589,36 +586,36 @@ int FileRingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
 
 long long FileRingBuffer::GetReadPosition(void) const
 {
-    poslock.lockForRead();
-    long long ret = readpos;
-    poslock.unlock();
+    m_posLock.lockForRead();
+    long long ret = m_readPos;
+    m_posLock.unlock();
     return ret;
 }
 
 long long FileRingBuffer::GetRealFileSizeInternal(void) const
 {
-    rwlock.lockForRead();
+    m_rwLock.lockForRead();
     long long ret = -1;
-    if (remotefile)
+    if (m_remotefile)
     {
-        ret = remotefile->GetRealFileSize();
+        ret = m_remotefile->GetRealFileSize();
     }
     else
     {
-        if (fd2 >= 0)
+        if (m_fd2 >= 0)
         {
             struct stat sb;
 
-            ret = fstat(fd2, &sb);
+            ret = fstat(m_fd2, &sb);
             if (ret == 0 && S_ISREG(sb.st_mode))
             {
-                rwlock.unlock();
+                m_rwLock.unlock();
                 return sb.st_size;
             }
         }
-        ret = QFileInfo(filename).size();
+        ret = QFileInfo(m_filename).size();
     }
-    rwlock.unlock();
+    m_rwLock.unlock();
     return ret;
 }
 
@@ -630,92 +627,91 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
     StopReads();
     StartReads();
 
-    if (writemode)
+    if (m_writeMode)
     {
         ret = WriterSeek(pos, whence, true);
 
         return ret;
     }
 
-    poslock.lockForWrite();
+    m_posLock.lockForWrite();
 
     // Optimize no-op seeks
-    if (readaheadrunning &&
-        ((whence == SEEK_SET && pos == readpos) ||
+    if (m_readAheadRunning &&
+        ((whence == SEEK_SET && pos == m_readPos) ||
          (whence == SEEK_CUR && pos == 0)))
     {
-        ret = readpos;
+        ret = m_readPos;
 
-        poslock.unlock();
+        m_posLock.unlock();
 
         return ret;
     }
 
     // only valid for SEEK_SET & SEEK_CUR
-    long long new_pos = (SEEK_SET==whence) ? pos : readpos + pos;
+    long long new_pos = (SEEK_SET==whence) ? pos : m_readPos + pos;
 
     // Optimize short seeks where the data for
     // them is in our ringbuffer already.
-    if (readaheadrunning &&
+    if (m_readAheadRunning &&
         (SEEK_SET==whence || SEEK_CUR==whence))
     {
-        rbrlock.lockForWrite();
-        rbwlock.lockForRead();
+        m_rbrLock.lockForWrite();
+        m_rbwLock.lockForRead();
         LOG(VB_FILE, LOG_INFO, LOC +
             QString("Seek(): rbrpos: %1 rbwpos: %2"
                     "\n\t\t\treadpos: %3 internalreadpos: %4")
-                .arg(rbrpos).arg(rbwpos)
-                .arg(readpos).arg(internalreadpos));
+                .arg(m_rbrPos).arg(m_rbwPos)
+                .arg(m_readPos).arg(m_internalReadPos));
         bool used_opt = false;
-        if ((new_pos < readpos))
+        if ((new_pos < m_readPos))
         {
             // Seeking to earlier than current buffer's start, but still in buffer
-            int min_safety = max(fill_min, readblocksize);
-            int free = ((rbwpos >= rbrpos) ?
-                        rbrpos + bufferSize : rbrpos) - rbwpos;
+            int min_safety = max(m_fillMin, m_readBlockSize);
+            int free = ((m_rbwPos >= m_rbrPos) ?
+                        m_rbrPos + m_bufferSize : m_rbrPos) - m_rbwPos;
             int internal_backbuf =
-                (rbwpos >= rbrpos) ? rbrpos : rbrpos - rbwpos;
+                (m_rbwPos >= m_rbrPos) ? m_rbrPos : m_rbrPos - m_rbwPos;
             internal_backbuf = min(internal_backbuf, free - min_safety);
-            long long sba = readpos - new_pos;
+            long long sba = m_readPos - new_pos;
             LOG(VB_FILE, LOG_INFO, LOC +
                 QString("Seek(): internal_backbuf: %1 sba: %2")
                     .arg(internal_backbuf).arg(sba));
             if (internal_backbuf >= sba)
             {
-                rbrpos = (rbrpos>=sba) ? rbrpos - sba :
-                    bufferSize + rbrpos - sba;
+                m_rbrPos = (m_rbrPos>=sba) ? m_rbrPos - sba :
+                    m_bufferSize + m_rbrPos - sba;
                 used_opt = true;
                 LOG(VB_FILE, LOG_INFO, LOC +
-                    QString("Seek(): OPT1 rbrpos: %1 rbwpos: %2"
+                    QString("Seek(): OPT1 rbrPos: %1 rbwPos: %2"
                                 "\n\t\t\treadpos: %3 internalreadpos: %4")
-                        .arg(rbrpos).arg(rbwpos)
-                        .arg(new_pos).arg(internalreadpos));
+                        .arg(m_rbrPos).arg(m_rbwPos)
+                        .arg(new_pos).arg(m_internalReadPos));
             }
         }
-        else if ((new_pos >= readpos) && (new_pos <= internalreadpos))
+        else if ((new_pos >= m_readPos) && (new_pos <= m_internalReadPos))
         {
-            rbrpos = (rbrpos + (new_pos - readpos)) % bufferSize;
+            m_rbrPos = (m_rbrPos + (new_pos - m_readPos)) % m_bufferSize;
             used_opt = true;
             LOG(VB_FILE, LOG_INFO, LOC +
-                QString("Seek(): OPT2 rbrpos: %1 sba: %2")
-                    .arg(rbrpos).arg(readpos - new_pos));
+                QString("Seek(): OPT2 rbrPos: %1 sba: %2")
+                    .arg(m_rbrPos).arg(m_readPos - new_pos));
         }
-        rbwlock.unlock();
-        rbrlock.unlock();
+        m_rbwLock.unlock();
+        m_rbrLock.unlock();
 
         if (used_opt)
         {
-            if (ignorereadpos >= 0)
+            if (m_ignoreReadPos >= 0)
             {
                 // seek should always succeed since we were at this position
-                int ret;
-                if (remotefile)
-                    ret = remotefile->Seek(internalreadpos, SEEK_SET);
+                if (m_remotefile)
+                    ret = m_remotefile->Seek(m_internalReadPos, SEEK_SET);
                 else
                 {
-                    ret = lseek64(fd2, internalreadpos, SEEK_SET);
+                    ret = lseek64(m_fd2, m_internalReadPos, SEEK_SET);
 #ifndef _MSC_VER
-                    if (posix_fadvise(fd2, internalreadpos,
+                    if (posix_fadvise(m_fd2, m_internalReadPos,
                                   128*1024, POSIX_FADV_WILLNEED) < 0)
                     {
                         LOG(VB_FILE, LOG_DEBUG, LOC +
@@ -726,21 +722,21 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
                 }
                 LOG(VB_FILE, LOG_INFO, LOC +
                     QString("Seek to %1 from ignore pos %2 returned %3")
-                        .arg(internalreadpos).arg(ignorereadpos).arg(ret));
-                ignorereadpos = -1;
+                        .arg(m_internalReadPos).arg(m_ignoreReadPos).arg(ret));
+                m_ignoreReadPos = -1;
             }
             // if we are seeking forward we may now be too close to the
             // end, so we need to recheck if reads are allowed.
-            if (new_pos > readpos)
+            if (new_pos > m_readPos)
             {
-                ateof           = false;
-                readsallowed    = false;
-                readsdesired    = false;
-                recentseek      = true;
+                m_ateof         = false;
+                m_readsAllowed  = false;
+                m_readsDesired  = false;
+                m_recentSeek    = true;
             }
-            readpos = new_pos;
-            poslock.unlock();
-            generalWait.wakeAll();
+            m_readPos = new_pos;
+            m_posLock.unlock();
+            m_generalWait.wakeAll();
 
             return new_pos;
         }
@@ -761,31 +757,31 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
     // last 250000 bytes. A further optimization would be to buffer
     // the 250000 byte read, which is currently performed in 32KB
     // blocks (inefficient with RemoteFile).
-    if ((remotefile || fd2 >= 0) && (ignorereadpos < 0))
+    if ((m_remotefile || m_fd2 >= 0) && (m_ignoreReadPos < 0))
     {
         long long off_end = 0xDEADBEEF;
         if (SEEK_END == whence)
         {
             off_end = pos;
-            if (remotefile)
+            if (m_remotefile)
             {
-                new_pos = remotefile->GetFileSize() - off_end;
+                new_pos = m_remotefile->GetFileSize() - off_end;
             }
             else
             {
-                QFileInfo fi(filename);
+                QFileInfo fi(m_filename);
                 new_pos = fi.size() - off_end;
             }
         }
         else
         {
-            if (remotefile)
+            if (m_remotefile)
             {
-                off_end = remotefile->GetFileSize() - new_pos;
+                off_end = m_remotefile->GetFileSize() - new_pos;
             }
             else
             {
-                QFileInfo fi(filename);
+                QFileInfo fi(m_filename);
                 off_end = fi.size() - new_pos;
             }
         }
@@ -802,57 +798,56 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
                 QString("Seek(): offset from end: %1").arg(off_end) +
                 "\n\t\t\t -- ignoring read ahead thread until next seek.");
 
-            ignorereadpos = new_pos;
+            m_ignoreReadPos = new_pos;
             errno = EINVAL;
-            long long ret;
-            if (remotefile)
-                ret = remotefile->Seek(ignorereadpos, SEEK_SET);
+            if (m_remotefile)
+                ret = m_remotefile->Seek(m_ignoreReadPos, SEEK_SET);
             else
-                ret = lseek64(fd2, ignorereadpos, SEEK_SET);
+                ret = lseek64(m_fd2, m_ignoreReadPos, SEEK_SET);
 
             if (ret < 0)
             {
                 int tmp_eno = errno;
                 QString cmd = QString("Seek(%1, SEEK_SET) ign ")
-                    .arg(ignorereadpos);
+                    .arg(m_ignoreReadPos);
 
-                ignorereadpos = -1;
+                m_ignoreReadPos = -1;
 
                 LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
 
                 // try to return to former position..
-                if (remotefile)
-                    ret = remotefile->Seek(internalreadpos, SEEK_SET);
+                if (m_remotefile)
+                    ret = m_remotefile->Seek(m_internalReadPos, SEEK_SET);
                 else
-                    ret = lseek64(fd2, internalreadpos, SEEK_SET);
+                    ret = lseek64(m_fd2, m_internalReadPos, SEEK_SET);
                 if (ret < 0)
                 {
-                    QString cmd = QString("Seek(%1, SEEK_SET) int ")
-                        .arg(internalreadpos);
-                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
+                    QString cmd2 = QString("Seek(%1, SEEK_SET) int ")
+                        .arg(m_internalReadPos);
+                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd2 + " Failed" + ENO);
                 }
                 else
                 {
-                    QString cmd = QString("Seek(%1, %2) int ")
-                        .arg(internalreadpos)
+                    QString cmd2 = QString("Seek(%1, %2) int ")
+                        .arg(m_internalReadPos)
                         .arg((SEEK_SET == whence) ? "SEEK_SET" :
                              ((SEEK_CUR == whence) ?"SEEK_CUR" : "SEEK_END"));
-                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " succeeded");
+                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd2 + " succeeded");
                 }
                 ret = -1;
                 errno = tmp_eno;
             }
             else
             {
-                ateof           = false;
-                readsallowed    = false;
-                readsdesired    = false;
-                recentseek      = true;
+                m_ateof         = false;
+                m_readsAllowed  = false;
+                m_readsDesired  = false;
+                m_recentSeek    = true;
             }
 
-            poslock.unlock();
+            m_posLock.unlock();
 
-            generalWait.wakeAll();
+            m_generalWait.wakeAll();
 
             return ret;
         }
@@ -862,27 +857,27 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
     // Here we perform a normal seek. When successful we
     // need to call ResetReadAhead(). A reset means we will
     // need to refill the buffer, which takes some time.
-    if (remotefile)
+    if (m_remotefile)
     {
-        ret = remotefile->Seek(pos, whence, readpos);
+        ret = m_remotefile->Seek(pos, whence, m_readPos);
         if (ret<0)
             errno = EINVAL;
     }
     else
     {
-        ret = lseek64(fd2, pos, whence);
+        ret = lseek64(m_fd2, pos, whence);
     }
 
     if (ret >= 0)
     {
-        readpos = ret;
+        m_readPos = ret;
 
-        ignorereadpos = -1;
+        m_ignoreReadPos = -1;
 
-        if (readaheadrunning)
-            ResetReadAhead(readpos);
+        if (m_readAheadRunning)
+            ResetReadAhead(m_readPos);
 
-        readAdjust = 0;
+        m_readAdjust = 0;
     }
     else
     {
@@ -892,9 +887,9 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
         LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
     }
 
-    poslock.unlock();
+    m_posLock.unlock();
 
-    generalWait.wakeAll();
+    m_generalWait.wakeAll();
 
     return ret;
 }

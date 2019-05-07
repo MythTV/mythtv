@@ -81,6 +81,10 @@ int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
 
 class MythAVCopyPrivate
 {
+private:
+    MythAVCopyPrivate(const MythAVCopyPrivate &) = delete;            // not copyable
+    MythAVCopyPrivate &operator=(const MythAVCopyPrivate &) = delete; // not copyable
+
 public:
     explicit MythAVCopyPrivate(bool uswc)
     : swsctx(nullptr), copyctx(new MythUSWCCopy(4096, !uswc)),

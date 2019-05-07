@@ -11,6 +11,7 @@
 #include "mythrssmanager.h"
 #include "netutils.h"
 #include "rssparse.h"
+#include "mythsorthelper.h"
 
 using namespace std;
 
@@ -107,6 +108,7 @@ void RSSManager::slotRSSRetrieved(RSSSite *site)
 
 
 RSSSite::RSSSite(const QString& title,
+                  const QString& sortTitle,
                   const QString& image,
                   const ArticleType& type,
                   const QString& description,
@@ -114,12 +116,13 @@ RSSSite::RSSSite(const QString& title,
                   const QString& author,
                   const bool& download,
                   const QDateTime& updated) :
-    QObject(),
-    m_title(title), m_image(image), m_type(type),
+    m_title(title), m_sortTitle(sortTitle), m_image(image), m_type(type),
     m_description(description), m_url(url), m_author(author),
-    m_download(download), m_updated(updated), m_lock(QMutex::Recursive),
-    m_podcast(false), m_reply(nullptr), m_manager(nullptr)
+    m_download(download), m_updated(updated)
 {
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+    if (m_sortTitle.isEmpty() and not m_title.isEmpty())
+        m_sortTitle = sh->doTitle(m_title);
 }
 
 void RSSSite::insertRSSArticle(ResultItem *item)
@@ -229,8 +232,10 @@ void RSSSite::process(void)
         for (ResultItem::resultList::iterator i = items.begin();
                 i != items.end(); ++i)
         {
-            insertRSSArticle(new ResultItem((*i)->GetTitle(),
-               QString(), (*i)->GetDescription(), (*i)->GetURL(),
+            insertRSSArticle(new ResultItem(
+               (*i)->GetTitle(), (*i)->GetSortTitle(),
+               (*i)->GetSubtitle(), (*i)->GetSortSubtitle(),
+               (*i)->GetDescription(), (*i)->GetURL(),
                (*i)->GetThumbnail(), (*i)->GetMediaURL(),
                (*i)->GetAuthor(), (*i)->GetDate(),
                (*i)->GetTime(), (*i)->GetRating(),

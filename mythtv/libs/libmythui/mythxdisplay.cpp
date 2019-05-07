@@ -67,13 +67,6 @@ MythXDisplay *OpenMythXDisplay(void)
     return nullptr;
 }
 
-MythXDisplay::MythXDisplay()
-  : m_disp(nullptr), m_screen_num(0), m_screen(nullptr),
-    m_depth(0), m_black(0), m_gc(nullptr),
-    m_root(0), m_lock(QMutex::Recursive)
-{
-}
-
 MythXDisplay::~MythXDisplay()
 {
     MythXLocker locker(this);
@@ -93,7 +86,7 @@ bool MythXDisplay::Open(void)
 {
     MythXLocker locker(this);
 
-    QString dispStr = GetMythUI()->GetX11Display();
+    QString dispStr = MythUIHelper::GetX11Display();
     const char *dispCStr = nullptr;
     if (!dispStr.isEmpty())
         dispCStr = dispStr.toLatin1().constData();
@@ -142,33 +135,30 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
                                  rect.width(), rect.height()));
 }
 
-int MythXDisplay::GetNumberXineramaScreens(void)
-{
-    MythXLocker locker(this);
-    int nr_xinerama_screens = 0;
-    int event_base = 0, error_base = 0;
-    if (XineramaQueryExtension(m_disp, &event_base, &error_base) &&
-        XineramaIsActive(m_disp))
-    {
-        XFree(XineramaQueryScreens(m_disp, &nr_xinerama_screens));
-    }
-    return nr_xinerama_screens;
-}
-
+/**
+ * Return the size of the X Display in pixels.  This corresponds to
+ * the size of the desktop, not necessarily to the size of single
+ * screen.
+ */
 QSize MythXDisplay::GetDisplaySize(void)
 {
     MythXLocker locker(this);
     int displayWidthPixel  = DisplayWidth( m_disp, m_screen_num);
     int displayHeightPixel = DisplayHeight(m_disp, m_screen_num);
-    return QSize(displayWidthPixel, displayHeightPixel);
+    return {displayWidthPixel, displayHeightPixel};
 }
 
+/**
+ * Return the size of the X Display in millimeters.  This corresponds
+ * to the size of the desktop, not necessarily to the size of single
+ * screen.
+ */
 QSize MythXDisplay::GetDisplayDimensions(void)
 {
     MythXLocker locker(this);
     int displayWidthMM  = DisplayWidthMM( m_disp, m_screen_num);
     int displayHeightMM = DisplayHeightMM(m_disp, m_screen_num);
-    return QSize(displayWidthMM, displayHeightMM);
+    return {displayWidthMM, displayHeightMM};
 }
 
 float MythXDisplay::GetRefreshRate(void)

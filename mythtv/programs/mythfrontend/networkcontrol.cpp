@@ -70,16 +70,11 @@ static bool is_abbrev(QString const& command,
 {
     if (test.length() < minchars)
         return command.toLower() == test.toLower();
-    else
-        return test.toLower() == command.left(test.length()).toLower();
+    return test.toLower() == command.left(test.length()).toLower();
 }
 
 NetworkControl::NetworkControl() :
-    ServerPool(), prompt("# "),
-    gotAnswer(false), answer(""),
-    clientLock(QMutex::Recursive),
-    commandThread(new MThread("NetworkControl", this)),
-    stopCommandThread(false)
+    commandThread(new MThread("NetworkControl", this))
 {
     // Eventually this map should be in the jumppoints table
     jumpMap["channelpriorities"]     = "Channel Recording Priorities";
@@ -613,8 +608,8 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     {
         if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
         {
-            QString message = QString("NETWORK_CONTROL STOP");
-            MythEvent me(message);
+            QString msg = QString("NETWORK_CONTROL STOP");
+            MythEvent me(msg);
             gCoreContext->dispatch(me);
 
             QTime timer;
@@ -646,7 +641,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             if (nc->getArgCount() == 5 && nc->getArg(4) == "resume")
                 action = "RESUME";
 
-            QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3 %4")
+            QString msg = QString("NETWORK_CONTROL %1 PROGRAM %2 %3 %4")
                                       .arg(action).arg(nc->getArg(2))
                                       .arg(nc->getArg(3).toUpper()).arg(clientID);
 
@@ -655,7 +650,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             QTime timer;
             timer.start();
 
-            MythEvent me(message);
+            MythEvent me(msg);
             gCoreContext->dispatch(me);
 
             while (timer.elapsed() < FE_LONG_TO && !gotAnswer)
@@ -949,8 +944,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     {
         if(nc->getArgCount() == 3) // has a channel ID
             return listSchedule(nc->getArg(2));
-        else
-            return listSchedule();
+        return listSchedule();
     }
     else if (is_abbrev("version", nc->getArg(1)))
     {
@@ -1043,12 +1037,11 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     {
         if (nc->getArgCount() == 2)
             return listChannels(0, 0);  // give us all you can
-        else if (nc->getArgCount() == 4)
+        if (nc->getArgCount() == 4)
             return listChannels(nc->getArg(2).toLower().toUInt(),
                                 nc->getArg(3).toLower().toUInt());
-        else
-            return QString("ERROR: See 'help %1' for usage information "
-                           "(parameters mismatch)").arg(nc->getArg(0));
+        return QString("ERROR: See 'help %1' for usage information "
+                       "(parameters mismatch)").arg(nc->getArg(0));
     }
     else
         return QString("ERROR: See 'help %1' for usage information")
@@ -1100,41 +1093,41 @@ QString NetworkControl::getWidgetType(MythUIType* type)
 {
     if (dynamic_cast<MythUIText *>(type))
         return "MythUIText";
-    else if (dynamic_cast<MythUITextEdit *>(type))
+    if (dynamic_cast<MythUITextEdit *>(type))
         return "MythUITextEdit";
-    else if (dynamic_cast<MythUIGroup *>(type))
+    if (dynamic_cast<MythUIGroup *>(type))
         return "MythUIGroup";
-    else if (dynamic_cast<MythUIButton *>(type))
+    if (dynamic_cast<MythUIButton *>(type))
         return "MythUIButton";
-    else if (dynamic_cast<MythUICheckBox *>(type))
+    if (dynamic_cast<MythUICheckBox *>(type))
         return "MythUICheckBox";
-    else if (dynamic_cast<MythUIShape *>(type))
+    if (dynamic_cast<MythUIShape *>(type))
         return "MythUIShape";
-    else if (dynamic_cast<MythUIButtonList *>(type))
+    if (dynamic_cast<MythUIButtonList *>(type))
         return "MythUIButtonList";
-    else if (dynamic_cast<MythUIImage *>(type))
+    if (dynamic_cast<MythUIImage *>(type))
         return "MythUIImage";
-    else if (dynamic_cast<MythUISpinBox *>(type))
+    if (dynamic_cast<MythUISpinBox *>(type))
         return "MythUISpinBox";
 #if CONFIG_QTWEBKIT
-    else if (dynamic_cast<MythUIWebBrowser *>(type))
+    if (dynamic_cast<MythUIWebBrowser *>(type))
         return "MythUIWebBrowser";
 #endif
-    else if (dynamic_cast<MythUIClock *>(type))
+    if (dynamic_cast<MythUIClock *>(type))
         return "MythUIClock";
-    else if (dynamic_cast<MythUIStateType *>(type))
+    if (dynamic_cast<MythUIStateType *>(type))
         return "MythUIStateType";
-    else if (dynamic_cast<MythUIProgressBar *>(type))
+    if (dynamic_cast<MythUIProgressBar *>(type))
         return "MythUIProgressBar";
-    else if (dynamic_cast<MythUIButtonTree *>(type))
+    if (dynamic_cast<MythUIButtonTree *>(type))
         return "MythUIButtonTree";
-    else if (dynamic_cast<MythUIScrollBar *>(type))
+    if (dynamic_cast<MythUIScrollBar *>(type))
         return "MythUIScrollBar";
-    else if (dynamic_cast<MythUIVideo *>(type))
+    if (dynamic_cast<MythUIVideo *>(type))
         return "MythUIVideo";
-    else if (dynamic_cast<MythUIGuideGrid *>(type))
+    if (dynamic_cast<MythUIGuideGrid *>(type))
         return "MythUIGuideGrid";
-    else if (dynamic_cast<MythUIEditBar *>(type))
+    if (dynamic_cast<MythUIEditBar *>(type))
         return "MythUIEditBar";
 
     return "Unknown";
@@ -1152,25 +1145,25 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         QString themeDir = GetMythUI()->GetThemeDir();
         return QString("%1 - %2").arg(themeName).arg(themeDir);
     }
-    else if (nc->getArg(1) == "reload")
+    if (nc->getArg(1) == "reload")
     {
         GetMythMainWindow()->JumpTo(jumpMap["reloadtheme"]);
 
         return "OK";
     }
-    else if (nc->getArg(1) == "showborders")
+    if (nc->getArg(1) == "showborders")
     {
         GetMythMainWindow()->JumpTo(jumpMap["showborders"]);
 
         return "OK";
     }
-    else if (nc->getArg(1) == "shownames")
+    if (nc->getArg(1) == "shownames")
     {
         GetMythMainWindow()->JumpTo(jumpMap["shownames"]);
 
         return "OK";
     }
-    else if (nc->getArg(1) == "getwidgetnames")
+    if (nc->getArg(1) == "getwidgetnames")
     {
         QStringList path;
 
@@ -1212,7 +1205,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
 
         return result;
     }
-    else if (nc->getArg(1) == "getarea")
+    if (nc->getArg(1) == "getarea")
     {
         if (nc->getArgCount() < 3)
             return QString("ERROR: Missing widget name.");
@@ -1253,7 +1246,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         return QString("The area of '%1' is x:%2, y:%3, w:%4, h:%5")
                        .arg(widgetName).arg(x).arg(y).arg(w).arg(h);
     }
-    else if (nc->getArg(1) == "setarea")
+    if (nc->getArg(1) == "setarea")
     {
         if (nc->getArgCount() < 3)
             return QString("ERROR: Missing widget name.");
@@ -1548,10 +1541,10 @@ void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
 
 void NetworkControl::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
-        QString message = me->Message();
+        const QString& message = me->Message();
 
         if (message.startsWith("MUSIC_CONTROL"))
         {
@@ -1614,9 +1607,9 @@ void NetworkControl::customEvent(QEvent *e)
                 QList<NetworkControlClient *>::const_iterator it;
                 for (it = clients.begin(); it != clients.end(); ++it)
                 {
-                    NetworkControlClient *ncc = *it;
-                    if (ncc)
-                        sendReplyToClient(ncc, reply);
+                    NetworkControlClient *ncc2 = *it;
+                    if (ncc2)
+                        sendReplyToClient(ncc2, reply);
                 }
             }
             delete nc;
@@ -1686,7 +1679,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     return result;
 }
 
-QString NetworkControl::listRecordings(QString chanid, QString starttime)
+QString NetworkControl::listRecordings(const QString& chanid, const QString& starttime)
 {
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1819,8 +1812,8 @@ QString NetworkCommand::getFrom(int arg)
 {
     QString c = m_command;
     for(int i=0 ; i<arg ; i++) {
-        QString arg = c.simplified().split(" ")[0];
-        c = c.mid(arg.length()).trimmed();
+        QString argstr = c.simplified().split(" ")[0];
+        c = c.mid(argstr.length()).trimmed();
     }
     return c;
 }

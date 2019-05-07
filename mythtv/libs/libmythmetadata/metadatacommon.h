@@ -83,7 +83,7 @@ typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
 class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 {
   public:
-    MetadataLookup(void);
+    MetadataLookup(void) : ReferenceCounter("MetadataLookup") {}
     ~MetadataLookup() = default;
 
     MetadataLookup(
@@ -145,11 +145,11 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         const QString &collectionref,
         const QString &tmsref,
         const QString &imdb,
-        const PeopleMap people,
+        const PeopleMap& people,
         const QStringList &studios,
         const QString &homepage,
         const QString &trailerURL,
-        const ArtworkMap artwork,
+        const ArtworkMap& artwork,
         DownloadMap downloads);
 
     //ProgramInfo Constructor
@@ -221,9 +221,9 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         const uint runtime,
         const uint runtimesecs,
         const QString &inetref,
-        const PeopleMap people,
+        const PeopleMap& people,
         const QString &trailerURL,
-        const ArtworkMap artwork,
+        const ArtworkMap& artwork,
         DownloadMap downloads);
 
     void toMap(InfoMap &map);
@@ -369,15 +369,15 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 
   private:
     // General
-    MetadataType m_type;
-    LookupType m_subtype;
+    MetadataType m_type     {kMetadataVideo};
+    LookupType m_subtype    {kUnknownVideo};
     QVariant m_data;
-    LookupStep m_step;
-    bool m_automatic;
-    bool m_handleimages;
-    bool m_allowoverwrites;
-    bool m_allowgeneric;
-    bool m_dvdorder;
+    LookupStep m_step       {kLookupSearch};
+    bool m_automatic        {false};
+    bool m_handleimages     {false};
+    bool m_allowoverwrites  {false};
+    bool m_allowgeneric     {false};
+    bool m_dvdorder         {false};
     QString m_host;
 
     QString m_filename;
@@ -386,17 +386,17 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     QString m_network;
     QString m_status;
     const QStringList m_categories;
-    float m_userrating;
-    uint m_ratingcount;
+    float m_userrating      {0.0};
+    uint m_ratingcount      {0};
     const QString m_language;
 
     // General - Video & ProgramInfo
     QString m_subtitle;
     const QString m_tagline;
     const QString m_description;
-    uint m_season;
-    uint m_episode;
-    uint m_chanid;
+    uint          m_season  {0};
+    uint          m_episode {0};
+    uint          m_chanid  {0};
     const QString m_channum;
     const QString m_chansign;
     const QString m_channame;
@@ -410,37 +410,37 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     const QDateTime m_endts;
     const QDateTime m_recstartts;
     const QDateTime m_recendts;
-    uint m_programflags;
-    uint m_audioproperties;
-    uint m_videoproperties;
-    uint m_subtitletype;
+    uint m_programflags     {0};
+    uint m_audioproperties  {0};
+    uint m_videoproperties  {0};
+    uint m_subtitletype     {0};
 
     const QString m_certification;
     const QStringList m_countries;
-    float m_popularity;
-    uint m_budget;
-    uint m_revenue;
+    float m_popularity      {0};
+    uint  m_budget          {0};
+    uint  m_revenue         {0};
 
     // General - Music
     QString m_album;
-    uint m_tracknum;
+    uint    m_tracknum      {0};
 
     // General - Game
     QString m_system;
 
     // Times
-    uint m_year;
+    uint m_year             {0};
     const QDate m_releasedate;
     const QDateTime m_lastupdated;
-    uint m_runtime;
-    uint m_runtimesecs;
+    uint m_runtime          {0};
+    uint m_runtimesecs      {0};
 
     // Inetref
     QString m_inetref;
     QString m_collectionref;
     QString m_tmsref;
     QString m_imdb;
-    bool    m_iscollection;
+    bool    m_iscollection  {false};
 
     // People - Video
     const PeopleMap m_people;
@@ -485,8 +485,8 @@ META_PUBLIC MetadataLookup *ParseMetadataItem(const QDomElement &item,
                                               bool passseas = true);
 META_PUBLIC MetadataLookup *ParseMetadataMovieNFO(const QDomElement &item,
                                                   MetadataLookup *lookup);
-META_PUBLIC PeopleMap ParsePeople(QDomElement people);
-META_PUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
+META_PUBLIC PeopleMap ParsePeople(const QDomElement& people);
+META_PUBLIC ArtworkMap ParseArtwork(const QDomElement& artwork);
 
 META_PUBLIC int editDistance(const QString &s, const QString &t);
 META_PUBLIC QString nearestName(const QString &actual,

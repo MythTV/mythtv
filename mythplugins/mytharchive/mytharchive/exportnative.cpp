@@ -32,37 +32,6 @@
 #include "videoselector.h"
 #include "logviewer.h"
 
-ExportNative::ExportNative(
-    MythScreenStack *parent, MythScreenType *previousScreen,
-    ArchiveDestination archiveDestination, QString name) :
-    MythScreenType(parent, name),
-    m_previousScreen(previousScreen),
-    m_archiveDestination(archiveDestination),
-    m_usedSpace(0),
-    m_bCreateISO(false),
-    m_bDoBurn(false),
-    m_bEraseDvdRw(false),
-    m_saveFilename(),
-    m_archiveButtonList(nullptr),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr),
-    m_addrecordingButton(nullptr),
-    m_addvideoButton(nullptr),
-    m_freespaceText(nullptr),
-    m_titleText(nullptr),
-    m_datetimeText(nullptr),
-    m_descriptionText(nullptr),
-    m_filesizeText(nullptr),
-    m_nofilesText(nullptr),
-    m_maxsizeText(nullptr),
-    m_minsizeText(nullptr),
-    m_currsizeText(nullptr),
-    m_currsizeErrText(nullptr),
-    m_sizeBar(nullptr)
-{
-}
-
 ExportNative::~ExportNative(void)
 {
     saveConfiguration();
@@ -141,7 +110,7 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "DELETE")
         {
@@ -228,7 +197,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
 
 void ExportNative::handleNextPage()
 {
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         ShowOkPopup(tr("You need to add at least one item to archive!"));
         return;
@@ -255,7 +224,7 @@ void ExportNative::updateArchiveList(void)
 {
     m_archiveButtonList->Reset();
 
-    if (m_archiveList.size() == 0)
+    if (m_archiveList.empty())
     {
         m_titleText->Reset();
         m_datetimeText->Reset();
@@ -375,7 +344,7 @@ void ExportNative::saveConfiguration(void)
     }
 }
 
-void ExportNative::showMenu()
+void ExportNative::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -434,11 +403,11 @@ void ExportNative::createConfigFile(const QString &filename)
 
     // add the options to the xml file
     QDomElement options = doc.createElement("options");
-    options.setAttribute("createiso", m_bCreateISO);
-    options.setAttribute("doburn", m_bDoBurn);
+    options.setAttribute("createiso", static_cast<int>(m_bCreateISO));
+    options.setAttribute("doburn", static_cast<int>(m_bDoBurn));
     options.setAttribute("mediatype", m_archiveDestination.type);
     options.setAttribute("dvdrsize", (qint64)m_archiveDestination.freeSpace);
-    options.setAttribute("erasedvdrw", m_bEraseDvdRw);
+    options.setAttribute("erasedvdrw", static_cast<int>(m_bEraseDvdRw));
     options.setAttribute("savedirectory", m_saveFilename);
     job.appendChild(options);
 

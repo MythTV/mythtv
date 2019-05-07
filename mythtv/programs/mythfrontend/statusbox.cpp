@@ -5,6 +5,7 @@ using namespace std;
 
 #include <QRegExp>
 #include <QHostAddress>
+#include <QNetworkInterface>
 
 #include "mythcorecontext.h"
 #include "filesysteminfo.h"
@@ -51,18 +52,13 @@ StatusBox::StatusBox(MythScreenStack *parent)
 {
     m_minLevel = gCoreContext->GetNumSetting("LogDefaultView",5);
 
-    m_iconState = nullptr;
-    m_categoryList = m_logList = nullptr;
-    m_helpText = nullptr;
-    m_justHelpText = nullptr;
-
     QStringList strlist;
     strlist << "QUERY_IS_ACTIVE_BACKEND";
     strlist << gCoreContext->GetHostName();
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (QString(strlist[0]) == "TRUE")
+    if (strlist[0] == "TRUE")
         m_isBackendActive = true;
     else
         m_isBackendActive = false;
@@ -196,8 +192,6 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
         QString currentItem;
         if (currentButton)
             currentItem = currentButton->GetText();
-
-        handled = true;
 
         if (action == "MENU")
         {
@@ -520,7 +514,7 @@ void StatusBox::doListingsStatus()
 
     QDateTime mfdLastRunStart, mfdLastRunEnd, mfdNextRunStart;
     QString mfdLastRunStatus;
-    QString querytext, DataDirectMessage;
+    QString querytext;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
 
@@ -540,7 +534,6 @@ void StatusBox::doListingsStatus()
     mfdNextRunStart = MythDate::fromString(tmp);
 
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
-    DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
 
     AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
                .arg(MYTH_SOURCE_VERSION), helpmsg);
@@ -595,13 +588,6 @@ void StatusBox::doListingsStatus()
     if (DaysOfData <= 3)
         AddLogLine(tr("WARNING: is mythfilldatabase running?"), helpmsg,
                    "", "", "warning");
-
-    if (!DataDirectMessage.isEmpty())
-    {
-        AddLogLine(tr("DataDirect Status: "), helpmsg);
-        AddLogLine(DataDirectMessage, helpmsg);
-    }
-
 }
 
 void StatusBox::doScheduleStatus()
@@ -762,7 +748,7 @@ void StatusBox::doScheduleStatus()
                                      .arg(statusText[rtype]);   \
             AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, fstate);\
         }                                                       \
-    } while (0)
+    } while (false)
     ADD_STATUS_LOG_LINE(RecStatus::Recording, "");
     ADD_STATUS_LOG_LINE(RecStatus::Tuning, "");
     ADD_STATUS_LOG_LINE(RecStatus::Failing, "error");
@@ -1031,7 +1017,7 @@ void StatusBox::doJobQueueStatus()
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
 
-    if (jobs.size())
+    if (!jobs.empty())
     {
         QString detail;
         QString line;
@@ -1095,19 +1081,19 @@ void StatusBox::doJobQueueStatus()
  *  \param prec   Precision to use if we have less than ten of whatever
  *                unit is chosen.
  */
-static const QString sm_str(long long sizeKB, int prec=1)
+static QString sm_str(long long sizeKB, int prec=1)
 {
     if (sizeKB>1024*1024*1024) // Terabytes
     {
         double sizeGB = sizeKB/(1024*1024*1024.0);
         return QObject::tr("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024*1024) // Gigabytes
+    if (sizeKB>1024*1024) // Gigabytes
     {
         double sizeGB = sizeKB/(1024*1024.0);
         return QObject::tr("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    else if (sizeKB>1024) // Megabytes
+    if (sizeKB>1024) // Megabytes
     {
         double sizeMB = sizeKB/1024.0;
         return QObject::tr("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
@@ -1116,7 +1102,7 @@ static const QString sm_str(long long sizeKB, int prec=1)
     return QObject::tr("%1 KB").arg(sizeKB);
 }
 
-static const QString usage_str_kb(long long total,
+static QString usage_str_kb(long long total,
                                   long long used,
                                   long long free)
 {
@@ -1131,7 +1117,7 @@ static const QString usage_str_kb(long long total,
     return ret;
 }
 
-static const QString usage_str_mb(float total, float used, float free)
+static QString usage_str_mb(float total, float used, float free)
 {
     return usage_str_kb((long long)(total*1024), (long long)(used*1024),
                         (long long)(free*1024));
@@ -1151,7 +1137,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     for (; it != prof2bps.end(); ++it)
     {
         const QString pro =
-                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0));
+                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0F));
 
         long long bytesPerMin = ((*it) >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
@@ -1170,12 +1156,12 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     }
 }
 
-static const QString uptimeStr(time_t uptime)
+static QString uptimeStr(time_t uptime)
 {
     int     days, hours, min, secs;
     QString str;
 
-    str = QString("   " + StatusBox::tr("Uptime") + ": ");
+    str = "   " + StatusBox::tr("Uptime") + ": ";
 
     if (uptime == 0)
         return str + StatusBox::tr("unknown", "unknown uptime");
@@ -1196,20 +1182,16 @@ static const QString uptimeStr(time_t uptime)
 
         return str + QString("%1, %2").arg(dayLabel).arg(buff);
     }
-    else
-    {
-        char  buff[9];
 
-        sprintf(buff, "%d:%02d:%02d", hours, min, secs);
-
-        return str + QString( buff );
-    }
+    char  buff[9];
+    sprintf(buff, "%d:%02d:%02d", hours, min, secs);
+    return str + QString( buff );
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)
  *  \brief Fills in recordingProfilesBPS w/ average bitrate from recorded table
  */
-void StatusBox::getActualRecordedBPS(QString hostnames)
+void StatusBox::getActualRecordedBPS(const QString& hostnames)
 {
     recordingProfilesBPS.clear();
 
@@ -1271,9 +1253,8 @@ void StatusBox::doMachineStatus()
         m_iconState->DisplayState("machine");
     m_logList->Reset();
     QString machineStr = tr("Machine Status shows some operating system "
-                            "statistics of this machine");
-    if (!m_isBackendActive)
-        machineStr.append(" " + tr("and the MythTV server"));
+                            "statistics of this machine and the MythTV "
+                            "server.");
 
     if (m_helpText)
         m_helpText->SetText(machineStr);
@@ -1291,13 +1272,41 @@ void StatusBox::doMachineStatus()
         line = tr("This machine:");
     AddLogLine(line, machineStr);
 
+    // Hostname & IP
+    line = "   " + tr("Hostname") + ": " + gCoreContext->GetHostName();
+    line.append(", " + tr("IP") + ": ");
+    QString sep = "";
+    foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
+    {
+        QNetworkInterface::InterfaceFlags f = iface.flags();
+        if (!(f & QNetworkInterface::IsUp))
+            continue;
+        if (!(f & QNetworkInterface::IsRunning))
+            continue;
+        if (f & QNetworkInterface::IsLoopBack)
+            continue;
+
+        foreach(QNetworkAddressEntry addr, iface.addressEntries())
+        {
+            if (addr.ip().protocol() == QAbstractSocket::IPv4Protocol ||
+                addr.ip().protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                line += sep + addr.ip().toString();
+                if (sep.isEmpty())
+                    sep = ", ";
+            }
+        }
+        line += "";
+    }
+    AddLogLine(line, machineStr);
+
     // uptime
     if (!getUptime(uptime))
         uptime = 0;
     line = uptimeStr(uptime);
 
     // weighted average loads
-    line.append(".   " + tr("Load") + ": ");
+    line.append(", " + tr("Load") + ": ");
 
 #if defined(_WIN32) || defined(Q_OS_ANDROID)
     line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
@@ -1339,19 +1348,27 @@ void StatusBox::doMachineStatus()
         line = tr("MythTV server") + ':';
         AddLogLine(line, machineStr);
 
+        // Hostname & IP
+        line = "   " + tr("Hostname") + ": " + gCoreContext->GetSetting("MasterServerName");
+        line.append(", " + tr("IP") + ": " + gCoreContext->GetSetting("MasterServerIP"));
+        AddLogLine(line, machineStr);
+
         // uptime
         if (!RemoteGetUptime(uptime))
             uptime = 0;
         line = uptimeStr(uptime);
 
         // weighted average loads
-        line.append(".   " + tr("Load") + ": ");
-        float loads[3];
-        if (RemoteGetLoad(loads))
+        line.append(", " + tr("Load") + ": ");
+        float floads[3];
+        if (RemoteGetLoad(floads))
         {
             char buff[30];
 
-            sprintf(buff, "%0.2f, %0.2f, %0.2f", loads[0], loads[1], loads[2]);
+            sprintf(buff, "%0.2f, %0.2f, %0.2f",
+                    static_cast<double>(floads[0]),
+                    static_cast<double>(floads[1]),
+                    static_cast<double>(floads[2]));
             line.append(QString(buff));
         }
         else

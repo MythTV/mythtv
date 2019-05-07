@@ -32,41 +32,44 @@ class MHDLADisplay;
 class MHDynamicLineArt : public MHLineArt  
 {
   public:
-    MHDynamicLineArt();
+    MHDynamicLineArt() = default;
     virtual ~MHDynamicLineArt();
-    virtual const char *ClassName() { return "DynamicLineArt"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual void Preparation(MHEngine *engine);
+    const char *ClassName() override // MHLineArt
+        { return "DynamicLineArt"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHLineArt
+    void PrintMe(FILE *fd, int nTabs) const override; // MHLineArt
+    void Preparation(MHEngine *engine) override; // MHLineArt
 
     // Display function.
-    virtual void Display(MHEngine *d);
+    void Display(MHEngine *d) override; // MHLineArt
     // Get the opaque area.  This is only opaque if the background is.
-    virtual QRegion GetOpaqueArea();
+    QRegion GetOpaqueArea() override; // MHVisible
 
     // This action also has the effect of clearing the drawing.
-    virtual void SetBoxSize(int nWidth, int nHeight, MHEngine *engine);
+    void SetBoxSize(int nWidth, int nHeight, MHEngine *engine) override; // MHVisible
 
     // Actions
-    virtual void Clear();
+    void Clear() override; // MHRoot
     // These actions set the properties for subsequent drawing but don't affect anything drawn so far.
-    virtual void SetFillColour(const MHColour &colour, MHEngine *);
-    virtual void SetLineColour(const MHColour &colour, MHEngine *);
-    virtual void SetLineWidth(int nWidth, MHEngine *);
-    virtual void SetLineStyle(int nStyle, MHEngine *);
+    void SetFillColour(const MHColour &colour, MHEngine *) override; // MHLineArt
+    void SetLineColour(const MHColour &colour, MHEngine *) override; // MHLineArt
+    void SetLineWidth(int nWidth, MHEngine *) override; // MHLineArt
+    void SetLineStyle(int nStyle, MHEngine *) override; // MHLineArt
 
-    virtual void GetLineWidth(MHRoot *pResult) { pResult->SetVariableValue(m_nLineWidth); }
-    virtual void GetLineStyle(MHRoot *pResult) { pResult->SetVariableValue(m_LineStyle); }
-    virtual void GetLineColour(MHRoot *pResult);
-    virtual void GetFillColour(MHRoot *pResult);
-    virtual void DrawArcSector(bool fIsSector, int x, int y, int width, int height, int start, int arc, MHEngine *);
-    virtual void DrawLine(int x1, int y1, int x2, int y2, MHEngine *);
-    virtual void DrawOval(int x1, int y1, int width, int height, MHEngine *);
-    virtual void DrawRectangle(int x1, int y1, int x2, int y2, MHEngine *);
-    virtual void DrawPoly(bool fIsPolygon, int nPoints, const int *xArray, const int *yArray, MHEngine *);
+    void GetLineWidth(MHRoot *pResult) override // MHRoot
+        { pResult->SetVariableValue(m_nLineWidth); }
+    void GetLineStyle(MHRoot *pResult) override // MHRoot
+        { pResult->SetVariableValue(m_LineStyle); }
+    void GetLineColour(MHRoot *pResult) override; // MHRoot
+    void GetFillColour(MHRoot *pResult) override; // MHRoot
+    void DrawArcSector(bool fIsSector, int x, int y, int width, int height, int start, int arc, MHEngine *) override; // MHRoot
+    void DrawLine(int x1, int y1, int x2, int y2, MHEngine *) override; // MHRoot
+    void DrawOval(int x1, int y1, int width, int height, MHEngine *) override; // MHRoot
+    void DrawRectangle(int x1, int y1, int x2, int y2, MHEngine *) override; // MHRoot
+    void DrawPoly(bool fIsPolygon, int nPoints, const int *xArray, const int *yArray, MHEngine *) override; // MHRoot
 
   protected:
-    MHDLADisplay *m_picture; // The sequence of drawing actions.
+    MHDLADisplay *m_picture {nullptr}; // The sequence of drawing actions.
 };
 
 // Actions
@@ -75,7 +78,8 @@ class MHGetLineWidth: public MHActionObjectRef
 {
   public:
     MHGetLineWidth(): MHActionObjectRef(":GetLineWidth")  {}
-    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) { pTarget->GetLineWidth(pResult); }
+    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+        { pTarget->GetLineWidth(pResult); }
 };
 
 // Get Line Style - return the current line style.
@@ -83,33 +87,37 @@ class MHGetLineStyle: public MHActionObjectRef
 {
   public:
     MHGetLineStyle(): MHActionObjectRef(":GetLineStyle")  {}
-    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) { pTarget->GetLineStyle(pResult); }
+    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+        { pTarget->GetLineStyle(pResult); }
 };
 // Get Line Colour - return the current line colour.
 class MHGetLineColour: public MHActionObjectRef
 {
   public:
     MHGetLineColour(): MHActionObjectRef(":GetLineColour")  {}
-    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) { pTarget->GetLineColour(pResult); }
+    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+        { pTarget->GetLineColour(pResult); }
 };
 // Get Fill Colour - return the current fill colour.
 class MHGetFillColour: public MHActionObjectRef
 {
   public:
     MHGetFillColour(): MHActionObjectRef(":GetFillColour")  {}
-    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) { pTarget->GetLineWidth(pResult); }
+    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+        { pTarget->GetLineWidth(pResult); }
 };
 // Clear - reset the drawing
 class MHClear: public MHElemAction {
   public:
     MHClear(): MHElemAction(":Clear")  {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->Clear(); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->Clear(); }
 };
 // Draw an arc or a sector (basically a filled arc).
 class MHDrawArcSector: public MHActionInt6 {
   public:
     MHDrawArcSector(const char *name, bool fIsSector): MHActionInt6(name), m_fIsSector(fIsSector)  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4, int nArg5, int nArg6)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4, int nArg5, int nArg6) override // MHActionInt6
     { pTarget->DrawArcSector(m_fIsSector, nArg1, nArg2, nArg3, nArg4, nArg5, nArg6, engine); }
   protected:
     bool m_fIsSector;
@@ -118,31 +126,31 @@ class MHDrawArcSector: public MHActionInt6 {
 class MHDrawLine: public MHActionInt4 {
   public:
     MHDrawLine(): MHActionInt4(":DrawLine")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4) override // MHActionInt4
     { pTarget->DrawLine(nArg1, nArg2, nArg3, nArg4, engine); }
 };
 // Draw an oval.
 class MHDrawOval: public MHActionInt4 {
   public:
     MHDrawOval(): MHActionInt4(":DrawOval")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4) override // MHActionInt4
     { pTarget->DrawOval(nArg1, nArg2, nArg3, nArg4, engine); }
 };
 // Draw a rectangle.
 class MHDrawRectangle: public MHActionInt4 {
   public:
     MHDrawRectangle(): MHActionInt4(":DrawRectangle")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4) override // MHActionInt4
     { pTarget->DrawRectangle(nArg1, nArg2, nArg3, nArg4, engine); }
 };
 // Polygon and PolyLine
 class MHDrawPoly: public MHElemAction {
   public:
     MHDrawPoly(const char *name, bool fIsPolygon): MHElemAction(name), m_fIsPolygon(fIsPolygon) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool m_fIsPolygon;
     MHOwnPtrSequence<MHPointArg> m_Points; // List of points
 };

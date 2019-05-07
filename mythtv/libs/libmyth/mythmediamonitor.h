@@ -28,7 +28,7 @@ class MonitorThread : public MThread
     MonitorThread(MediaMonitor* pMon,  unsigned long interval);
     ~MonitorThread() { wait(); m_Monitor = nullptr; }
     void setMonitor(MediaMonitor* pMon) { m_Monitor = pMon; }
-    virtual void run(void);
+    void run(void) override; // MThread
 
   protected:
     QPointer<MediaMonitor> m_Monitor;
@@ -97,9 +97,9 @@ class MPUBLIC MediaMonitor : public QObject
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
     bool shouldIgnore(const MythMediaDevice *device);
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override; // QObject
 
-    const QString listDevices(void);
+    QString listDevices(void);
 
     static QString defaultDevice(const QString &setting,
                                  const QString &label,
@@ -117,15 +117,15 @@ class MPUBLIC MediaMonitor : public QObject
     // List of devices/mountpoints that the user doesn't want to monitor:
     QStringList                  m_IgnoreList;
 
-    bool volatile                m_Active;      ///< Was MonitorThread started?
+    bool volatile                m_Active {false};      ///< Was MonitorThread started?
     QWaitCondition               m_wait;
-    MonitorThread                *m_Thread;
+    MonitorThread               *m_Thread {nullptr};
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
 
     QMap<QString, MHData>        m_handlerMap;  ///< Registered Media Handlers
 
-    static MediaMonitor         *c_monitor;
+    static MediaMonitor         *s_monitor;
 };
 
 #define REG_MEDIA_HANDLER(a, b, c, d, e) \

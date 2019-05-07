@@ -39,12 +39,6 @@ int BiopNameComp::Process(const unsigned char *data)
     return off;
 }
 
-BiopName::BiopName()
-{
-    m_comp_count = 0;
-    m_comps = nullptr;
-}
-
 BiopName::~BiopName()
 {
     delete[] m_comps;
@@ -130,24 +124,22 @@ bool BiopMessage::Process(DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
         LOG(VB_DSMCC, LOG_DEBUG, "[biop] Processing file");
         return ProcessFile(cachep, filecache, data, curp);
     }
-    else if (strcmp(m_objkind, "dir") == 0)
+    if (strcmp(m_objkind, "dir") == 0)
     {
         LOG(VB_DSMCC, LOG_DEBUG, "[biop] Processing directory");
         return ProcessDir(false, cachep, filecache, data, curp);
     }
-    else if (strcmp(m_objkind, "srg") == 0)
+    if (strcmp(m_objkind, "srg") == 0)
     {
         LOG(VB_DSMCC, LOG_DEBUG, "[biop] Processing gateway");
         return ProcessDir(true, cachep, filecache, data, curp);
     }
-    else
-    {
-        /* Error */
-        LOG(VB_DSMCC, LOG_WARNING, QString("Unknown or unsupported format %1%2%3%4")
-                .arg(m_objkind[0]).arg(m_objkind[1])
-                .arg(m_objkind[2]).arg(m_objkind[3]));
-        return false;
-    }
+
+    /* Error */
+    LOG(VB_DSMCC, LOG_WARNING, QString("Unknown or unsupported format %1%2%3%4")
+        .arg(m_objkind[0]).arg(m_objkind[1])
+        .arg(m_objkind[2]).arg(m_objkind[3]));
+    return false;
 }
 
 BiopMessage::~BiopMessage()
@@ -156,7 +148,7 @@ BiopMessage::~BiopMessage()
     free(m_objkind);
 }
 
-bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
+bool BiopMessage::ProcessMsgHdr(const unsigned char *data, unsigned long *curp)
 {
     const unsigned char *buf = data + (*curp);
     int off = 0;
@@ -222,7 +214,7 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
  */
 bool BiopMessage::ProcessDir(
     bool isSrg, DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
-    unsigned char *data, unsigned long *curp)
+    const unsigned char *data, unsigned long *curp)
 {
     int off = 0;
     const unsigned char * const buf = data + (*curp);
@@ -355,8 +347,8 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
                 break;
             case 0x09: // Compressed.
                 // Skip the method.
-                isCompressed = true;
-                originalSize = COMBINE32(data, 1);
+                m_isCompressed = true;
+                m_originalSize = COMBINE32(data, 1);
                 break;
             default:
                 break;
@@ -369,22 +361,22 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
 int BiopModuleInfo::Process(const unsigned char *data)
 {
     int off;
-    mod_timeout   = COMBINE32(data, 0);
-    block_timeout = COMBINE32(data, 4);
-    min_blocktime = COMBINE32(data, 8);
+    m_mod_timeout   = COMBINE32(data, 0);
+    m_block_timeout = COMBINE32(data, 4);
+    m_min_blocktime = COMBINE32(data, 8);
 
-    taps_count = data[12];
+    m_taps_count = data[12];
     off = 13;
 
     LOG(VB_DSMCC, LOG_DEBUG, QString("[Biop] "
         "ModuleTimeout %1 BlockTimeout %2 MinBlockTime %3 Taps %4")
-        .arg(mod_timeout).arg(block_timeout).arg(min_blocktime)
-        .arg(taps_count));
+        .arg(m_mod_timeout).arg(m_block_timeout).arg(m_min_blocktime)
+        .arg(m_taps_count));
 
-    if (taps_count > 0)
+    if (m_taps_count > 0)
     {
         /* only 1 allowed TODO - may not be first though ? */
-        int ret = tap.Process(data + off);
+        int ret = m_tap.Process(data + off);
         if (ret <= 0)
             return ret;
         off += ret;
@@ -394,7 +386,7 @@ int BiopModuleInfo::Process(const unsigned char *data)
 
     if (userinfo_len > 0)
     {
-        descriptorData.Process(data + off, userinfo_len);
+        m_descriptorData.Process(data + off, userinfo_len);
         off += userinfo_len;
     }
     return off;
@@ -405,32 +397,32 @@ int BiopTap::Process(const unsigned char *data)
 {
     int off=0;
 
-    id = (data[off] << 8) | data[off + 1]; // Ignored
+    m_id = (data[off] << 8) | data[off + 1]; // Ignored
     off += 2;
-    use = (data[off] << 8) | data[off + 1];
+    m_use = (data[off] << 8) | data[off + 1];
     off += 2;
-    assoc_tag = (data[off] << 8) | data[off + 1];
+    m_assoc_tag = (data[off] << 8) | data[off + 1];
     off += 2;
-    selector_len = data[off++];
-    selector_data = (char*) malloc(selector_len);
-    memcpy(selector_data, data + off, selector_len);
-    if (use == 0x0016) // BIOP_DELIVERY_PARA_USE
+    m_selector_len = data[off++];
+    m_selector_data = (char*) malloc(m_selector_len);
+    memcpy(m_selector_data, data + off, m_selector_len);
+    if (m_use == 0x0016) // BIOP_DELIVERY_PARA_USE
     {
         unsigned selector_type = (data[off] << 8) | data[off + 1];
-        if (selector_len >= 10 && selector_type == 0x0001)
+        if (m_selector_len >= 10 && selector_type == 0x0001)
         {
             off += 2;
             unsigned long transactionId = COMBINE32(data, off);
             off += 4;
             unsigned long timeout = COMBINE32(data, off);
             LOG(VB_DSMCC, LOG_DEBUG, QString("[biop] BIOP_DELIVERY_PARA_USE tag %1 id 0x%2 timeout %3uS")
-                .arg(assoc_tag).arg(transactionId,0,16).arg(timeout));
+                .arg(m_assoc_tag).arg(transactionId,0,16).arg(timeout));
             off += 4;
-            selector_len -= 10;
+            m_selector_len -= 10;
         }
     }
 
-    off += selector_len;
+    off += m_selector_len;
     return off;
 }
 
@@ -438,22 +430,22 @@ int BiopConnbinder::Process(const unsigned char *data)
 {
     int off = 0;
 
-    component_tag = COMBINE32(data, 0);
-    if (0x49534F40 != component_tag)
+    m_component_tag = COMBINE32(data, 0);
+    if (0x49534F40 != m_component_tag)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] Invalid Connbinder tag");
         return 0;
     }
     off += 4;
-    component_data_len = data[off++];
-    taps_count = data[off++];
-    if (taps_count > 0)
+    m_component_data_len = data[off++];
+    m_taps_count = data[off++];
+    if (m_taps_count > 0)
     {
         /* UKProfile - only first tap read */
-        int ret = tap.Process(data + off);
+        int ret = m_tap.Process(data + off);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("Binder - assoc_tag %1")
-                                       .arg(tap.assoc_tag));
+                                       .arg(m_tap.m_assoc_tag));
 #endif
         if (ret > 0)
             off += ret;
@@ -467,15 +459,15 @@ int BiopObjLocation::Process(const unsigned char *data)
 {
     int off = 0;
 
-    component_tag = COMBINE32(data, 0);
-    if (0x49534F50 != component_tag)
+    m_component_tag = COMBINE32(data, 0);
+    if (0x49534F50 != m_component_tag)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] Invalid ObjectLocation tag");
         return 0;
     }
     off += 4;
 
-    component_data_len = data[off++];
+    m_component_data_len = data[off++];
     m_Reference.m_nCarouselId = COMBINE32(data, off);
 
     off += 4;
@@ -483,9 +475,9 @@ int BiopObjLocation::Process(const unsigned char *data)
     m_Reference.m_nModuleId = (data[off] << 8) | data[off + 1];
     off += 2;
 
-    version_major = data[off++];
-    version_minor = data[off++];
-    if (1 != version_major || 0 != version_minor)
+    m_version_major = data[off++];
+    m_version_minor = data[off++];
+    if (1 != m_version_major || 0 != m_version_minor)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] Invalid ObjectLocation version");
         return 0;
@@ -509,7 +501,7 @@ int ProfileBodyFull::Process(const unsigned char *data)
 {
     int off = 0, ret;
 
-    data_len = COMBINE32(data, off);
+    m_data_len = COMBINE32(data, off);
     off += 4;
 
     /* bit order */
@@ -519,24 +511,24 @@ int ProfileBodyFull::Process(const unsigned char *data)
         return 0;
     }
 
-    lite_components_count = data[off++];
-    if (lite_components_count < 2)
+    m_lite_components_count = data[off++];
+    if (m_lite_components_count < 2)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] ProfileBody invalid components_count");
         return 0;
     }
 
-    ret = obj_loc.Process(data + off);
+    ret = m_obj_loc.Process(data + off);
     if (ret <= 0)
         return ret;
     off += ret;
 
-    ret = dsm_conn.Process(data + off);
+    ret = m_dsm_conn.Process(data + off);
     if (ret <= 0)
         return ret;
     off += ret;
 
-    obj_loc.m_Reference.m_nStreamTag = dsm_conn.tap.assoc_tag;
+    m_obj_loc.m_Reference.m_nStreamTag = m_dsm_conn.m_tap.m_assoc_tag;
 
     /* UKProfile - ignore anything else */
 
@@ -546,24 +538,24 @@ int ProfileBodyFull::Process(const unsigned char *data)
 int BiopIor::Process(const unsigned char *data)
 {
     int off = 0, ret;
-    type_id_len = COMBINE32(data, 0);
-    type_id = (char*) malloc(type_id_len);
+    m_type_id_len = COMBINE32(data, 0);
+    m_type_id = (char*) malloc(m_type_id_len);
     off += 4;
-    memcpy(type_id, data + off, type_id_len);
-    off += type_id_len;
+    memcpy(m_type_id, data + off, m_type_id_len);
+    off += m_type_id_len;
 
-    tagged_profiles_count = COMBINE32(data, off);
-    if (tagged_profiles_count < 1)
+    m_tagged_profiles_count = COMBINE32(data, off);
+    if (m_tagged_profiles_count < 1)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] IOR missing taggedProfile");
         return 0;
     }
     off += 4;
 
-    profile_id_tag = COMBINE32(data, off);
+    m_profile_id_tag = COMBINE32(data, off);
     off += 4;
 
-    if (profile_id_tag == 0x49534F06) // profile_id_tag == 0x49534F06
+    if (m_profile_id_tag == 0x49534F06) // profile_id_tag == 0x49534F06
     {
         m_profile_body = new ProfileBodyFull;
         ret = m_profile_body->Process(data + off);
@@ -571,7 +563,7 @@ int BiopIor::Process(const unsigned char *data)
             return ret;
         off += ret;
     }
-    else if(profile_id_tag == 0x49534F05) // profile_id_tag == 0x49534F05
+    else if(m_profile_id_tag == 0x49534F05) // profile_id_tag == 0x49534F05
     {
         m_profile_body = new ProfileBodyLite;
         ret = m_profile_body->Process(data + off);
@@ -583,7 +575,7 @@ int BiopIor::Process(const unsigned char *data)
     {
         /* UKProfile - receiver may ignore other profiles */
         LOG(VB_DSMCC, LOG_WARNING, QString("[biop] Unknown Ior profile 0x%1")
-            .arg(profile_id_tag, 0, 16));
+            .arg(m_profile_id_tag, 0, 16));
         return 0;
     }
 
@@ -600,5 +592,5 @@ void BiopIor::AddTap(Dsmcc *pStatus)
 
 BiopTap::~BiopTap()
 {
-    free(selector_data);
+    free(m_selector_data);
 }

@@ -26,9 +26,9 @@ class VideoSetupWizard : public MythScreenType
                      MythScreenType *audio, const char *name = nullptr);
     ~VideoSetupWizard();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
     void save(void);
 
@@ -43,22 +43,20 @@ class VideoSetupWizard : public MythScreenType
     };
 
     QString              m_downloadFile;
-    TestType             m_testType;
+    TestType             m_testType                   {ttNone};
 
-    MythScreenType      *m_generalScreen;
-    MythScreenType      *m_audioScreen;
+    MythScreenType      *m_generalScreen              {nullptr};
+    MythScreenType      *m_audioScreen                {nullptr};
 
-    MythUIButtonList     *m_playbackProfileButtonList;
-    MythScreenStack      *m_popupStack;
-    MythUIProgressDialog *m_progressDialog;
+    MythUIButtonList     *m_playbackProfileButtonList {nullptr};
+    MythScreenStack      *m_popupStack                {nullptr};
+    MythUIProgressDialog *m_progressDialog            {nullptr};
 
-    MythUIButton        *m_testSDButton;
-    MythUIButton        *m_testHDButton;
+    MythUIButton        *m_testSDButton               {nullptr};
+    MythUIButton        *m_testHDButton               {nullptr};
 
-    MythUIButton        *m_nextButton;
-    MythUIButton        *m_prevButton;
-
-    VideoDisplayProfile *m_vdp;
+    MythUIButton        *m_nextButton                 {nullptr};
+    MythUIButton        *m_prevButton                 {nullptr};
 
   private slots:
     void slotNext(void);
@@ -67,11 +65,11 @@ class VideoSetupWizard : public MythScreenType
 
     void testSDVideo(void);
     void testHDVideo(void);
-    void playVideoTest(QString desc,
-                       QString title,
-                       QString file);
+    void playVideoTest(const QString& desc,
+                       const QString& title,
+                       const QString& file);
 
-    void DownloadSample(QString url, QString dest);
+    void DownloadSample(const QString& url, const QString& dest);
 };
 
 #endif

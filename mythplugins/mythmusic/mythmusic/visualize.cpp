@@ -42,7 +42,7 @@ using namespace std;
 VisFactory* VisFactory::g_pVisFactories = nullptr;
 
 VisualBase::VisualBase(bool screensaverenable)
-    : m_fps(20), m_xscreensaverenable(screensaverenable)
+    : m_xscreensaverenable(screensaverenable)
 {
     if (!m_xscreensaverenable)
         GetMythUI()->DoDisableScreensaver();
@@ -60,7 +60,7 @@ VisualBase::~VisualBase()
 }
 
 
-void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning, int fontSize)
+void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, const QString& warning, int fontSize)
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
@@ -75,15 +75,13 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 // LogScale
 
 LogScale::LogScale(int maxscale, int maxrange)
-    : indices(nullptr), s(0), r(0)
 {
     setMax(maxscale, maxrange);
 }
 
 LogScale::~LogScale()
 {
-    if (indices)
-        delete [] indices;
+    delete [] m_indices;
 }
 
 void LogScale::setMax(int maxscale, int maxrange)
@@ -91,11 +89,10 @@ void LogScale::setMax(int maxscale, int maxrange)
     if (maxscale == 0 || maxrange == 0)
         return;
 
-    s = maxscale;
-    r = maxrange;
+    m_s = maxscale;
+    m_r = maxrange;
 
-    if (indices)
-        delete [] indices;
+    delete [] m_indices;
 
     double alpha;
     long double domain = (long double) maxscale;
@@ -104,9 +101,9 @@ void LogScale::setMax(int maxscale, int maxrange)
     long double dx = 1.0;
     long double e4 = 1.0E-8;
 
-    indices = new int[maxrange];
+    m_indices = new int[maxrange];
     for (int i = 0; i < maxrange; i++)
-        indices[i] = 0;
+        m_indices[i] = 0;
 
     // initialize log scale
     for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
@@ -124,36 +121,32 @@ void LogScale::setMax(int maxscale, int maxrange)
         int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
         if (scaled < 1)
             scaled = 1;
-        if (indices[scaled - 1] < i)
-            indices[scaled - 1] = i;
+        if (m_indices[scaled - 1] < i)
+            m_indices[scaled - 1] = i;
     }
 }
 
 int LogScale::operator[](int index)
 {
-    return indices[index];
+    return m_indices[index];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // StereoScope
 
-#define RUBBERBAND 0
-#define TWOCOLOUR 0
-StereoScope::StereoScope() :
-    startColor(Qt::green), targetColor(Qt::red),
-    rubberband(RUBBERBAND), falloff(1.0)
+StereoScope::StereoScope()
 {
     m_fps = 45;
 }
 
 void StereoScope::resize( const QSize &newsize )
 {
-    size = newsize;
+    m_size = newsize;
 
-    uint os = magnitudes.size();
-    magnitudes.resize( size.width() * 2 );
-    for ( ; os < magnitudes.size(); os++ )
-        magnitudes[os] = 0.0;
+    auto os = m_magnitudes.size();
+    m_magnitudes.resize( m_size.width() * 2 );
+    for ( ; os < m_magnitudes.size(); os++ )
+        m_magnitudes[os] = 0.0;
 }
 
 bool StereoScope::process( VisualNode *node )
@@ -164,8 +157,8 @@ bool StereoScope::process( VisualNode *node )
     if (node)
     {
         double index = 0;
-        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
-        for ( int i = 0; i < size.width(); i++)
+        double const step = (double)SAMPLES_DEFAULT_SIZE / m_size.width();
+        for ( int i = 0; i < m_size.width(); i++)
         {
             unsigned long indexTo = (unsigned long)(index + step);
             if (indexTo == (unsigned long)(index))
@@ -173,42 +166,41 @@ bool StereoScope::process( VisualNode *node )
 
             double valL = 0, valR = 0;
 #if RUBBERBAND
-            if ( rubberband ) {
-                valL = magnitudes[ i ];
-                valR = magnitudes[ i + size.width() ];
+            if ( m_rubberband ) {
+                valL = m_magnitudes[ i ];
+                valR = m_magnitudes[ i + m_size.width() ];
                 if (valL < 0.) {
-                    valL += falloff;
+                    valL += m_falloff;
                     if ( valL > 0. )
                         valL = 0.;
                 }
                 else
                 {
-                    valL -= falloff;
+                    valL -= m_falloff;
                     if ( valL < 0. )
                         valL = 0.;
                 }
                 if (valR < 0.)
                 {
-                    valR += falloff;
+                    valR += m_falloff;
                     if ( valR > 0. )
                         valR = 0.;
                 }
                 else
                 {
-                    valR -= falloff;
+                    valR -= m_falloff;
                     if ( valR < 0. )
                         valR = 0.;
                 }
             }
 #endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++)
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
-                double tmpL = ( ( node->left ?
-                       double( node->left[s] ) : 0.) *
-                     double( size.height() / 4 ) ) / 32768.;
-                double tmpR = ( ( node->right ?
-                       double( node->right[s]) : 0.) *
-                     double( size.height() / 4 ) ) / 32768.;
+                double adjHeight = static_cast<double>(m_size.height()) / 4.0;
+                double tmpL = ( ( node->m_left ? static_cast<double>(node->m_left[s]) : 0.) *
+                                adjHeight ) / 32768.0;
+                double tmpR = ( ( node->m_right ? static_cast<double>(node->m_right[s]) : 0.) *
+                                adjHeight ) / 32768.0;
                 if (tmpL > 0)
                     valL = (tmpL > valL) ? tmpL : valL;
                 else
@@ -222,18 +214,18 @@ bool StereoScope::process( VisualNode *node )
             if (valL != 0. || valR != 0.)
                 allZero = false;
 
-            magnitudes[ i ] = valL;
-            magnitudes[ i + size.width() ] = valR;
+            m_magnitudes[ i ] = valL;
+            m_magnitudes[ i + m_size.width() ] = valR;
 
             index = index + step;
         }
 #if RUBBERBAND
     }
-    else if (rubberband)
+    else if (m_rubberband)
     {
-        for ( int i = 0; i < size.width(); i++)
+        for ( int i = 0; i < m_size.width(); i++)
         {
-            double valL = magnitudes[ i ];
+            double valL = m_magnitudes[ i ];
             if (valL < 0) {
                 valL += 2;
                 if (valL > 0.)
@@ -244,15 +236,15 @@ bool StereoScope::process( VisualNode *node )
                     valL = 0.;
             }
 
-            double valR = magnitudes[ i + size.width() ];
+            double valR = m_magnitudes[ i + m_size.width() ];
             if (valR < 0.) {
-                valR += falloff;
+                valR += m_falloff;
                 if (valR > 0.)
                     valR = 0.;
             }
             else
             {
-                valR -= falloff;
+                valR -= m_falloff;
                 if (valR < 0.)
                     valR = 0.;
             }
@@ -260,15 +252,15 @@ bool StereoScope::process( VisualNode *node )
             if (valL != 0. || valR != 0.)
                 allZero = false;
 
-            magnitudes[ i ] = valL;
-            magnitudes[ i + size.width() ] = valR;
+            m_magnitudes[ i ] = valL;
+            m_magnitudes[ i + m_size.width() ] = valR;
         }
 #endif
     }
     else
     {
-        for ( int i = 0; (unsigned) i < magnitudes.size(); i++ )
-            magnitudes[ i ] = 0.;
+        for ( int i = 0; (unsigned) i < m_magnitudes.size(); i++ )
+            m_magnitudes[ i ] = 0.;
     }
 
     return allZero;
@@ -276,15 +268,15 @@ bool StereoScope::process( VisualNode *node )
 
 bool StereoScope::draw( QPainter *p, const QColor &back )
 {
-    p->fillRect(0, 0, size.width(), size.height(), back);
-    for ( int i = 1; i < size.width(); i++ )
+    p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    for ( int i = 1; i < m_size.width(); i++ )
     {
 #if TWOCOLOUR
     double r, g, b, per;
 
     // left
-    per = double( magnitudes[ i ] * 2 ) /
-          double( size.height() / 4 );
+    per = ( static_cast<double>(m_magnitudes[i]) * 2.0 ) /
+          ( static_cast<double>(m_size.height()) / 4.0 );
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -292,12 +284,12 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     else if (per < 0.0)
         per = 0.0;
 
-    r = startColor.red() + (targetColor.red() -
-                startColor.red()) * (per * per);
-    g = startColor.green() + (targetColor.green() -
-                  startColor.green()) * (per * per);
-    b = startColor.blue() + (targetColor.blue() -
-                 startColor.blue()) * (per * per);
+    r = m_startColor.red() + (m_targetColor.red() -
+                m_startColor.red()) * (per * per);
+    g = m_startColor.green() + (m_targetColor.green() -
+                  m_startColor.green()) * (per * per);
+    b = m_startColor.blue() + (m_targetColor.blue() -
+                 m_startColor.blue()) * (per * per);
 
     if (r > 255.0)
         r = 255.0;
@@ -318,13 +310,16 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 #else
     p->setPen(Qt::red);
 #endif
-    p->drawLine( i - 1, (int)((size.height() / 4) + magnitudes[i - 1]),
-             i, (int)((size.height() / 4) + magnitudes[i]));
+    double adjHeight = static_cast<double>(m_size.height()) / 4.0;
+    p->drawLine( i - 1,
+                 (int)(adjHeight + m_magnitudes[i - 1]),
+                 i,
+                 (int)(adjHeight + m_magnitudes[i]));
 
 #if TWOCOLOUR
     // right
-    per = double( magnitudes[ i + size.width() ] * 2 ) /
-          double( size.height() / 4 );
+    per = ( static_cast<double>(m_magnitudes[ i + m_size.width() ]) * 2 ) /
+          adjHeight;
     if (per < 0.0)
         per = -per;
     if (per > 1.0)
@@ -332,12 +327,12 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     else if (per < 0.0)
         per = 0.0;
 
-    r = startColor.red() + (targetColor.red() -
-                startColor.red()) * (per * per);
-    g = startColor.green() + (targetColor.green() -
-                  startColor.green()) * (per * per);
-    b = startColor.blue() + (targetColor.blue() -
-                 startColor.blue()) * (per * per);
+    r = m_startColor.red() + (m_targetColor.red() -
+                m_startColor.red()) * (per * per);
+    g = m_startColor.green() + (m_targetColor.green() -
+                  m_startColor.green()) * (per * per);
+    b = m_startColor.blue() + (m_targetColor.blue() -
+                 m_startColor.blue()) * (per * per);
 
     if (r > 255.0)
         r = 255.0;
@@ -358,10 +353,11 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 #else
     p->setPen(Qt::red);
 #endif
-    p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
-             magnitudes[i + size.width() - 1]),
-             i, (int)((size.height() * 3 / 4) +
-                     magnitudes[i + size.width()]));
+    adjHeight = static_cast<double>(m_size.height()) * 3.0 / 4.0;
+    p->drawLine( i - 1,
+                 (int)(adjHeight + m_magnitudes[i + m_size.width() - 1]),
+                 i,
+                 (int)(adjHeight + m_magnitudes[i + m_size.width()]));
     }
 
     return true;
@@ -377,8 +373,8 @@ bool MonoScope::process( VisualNode *node )
     if (node)
     {
         double index = 0;
-        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
-        for (int i = 0; i < size.width(); i++)
+        double const step = (double)SAMPLES_DEFAULT_SIZE / m_size.width();
+        for (int i = 0; i < m_size.width(); i++)
         {
             unsigned long indexTo = (unsigned long)(index + step);
             if (indexTo == (unsigned long)index)
@@ -386,12 +382,12 @@ bool MonoScope::process( VisualNode *node )
 
             double val = 0;
 #if RUBBERBAND
-            if ( rubberband )
+            if ( m_rubberband )
             {
-                val = magnitudes[ i ];
+                val = m_magnitudes[ i ];
                 if (val < 0.)
                 {
-                    val += falloff;
+                    val += m_falloff;
                     if ( val > 0. )
                     {
                         val = 0.;
@@ -399,7 +395,7 @@ bool MonoScope::process( VisualNode *node )
                 }
                 else
                 {
-                    val -= falloff;
+                    val -= m_falloff;
                     if ( val < 0. )
                     {
                         val = 0.;
@@ -407,11 +403,11 @@ bool MonoScope::process( VisualNode *node )
                 }
             }
 #endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++)
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
-                double tmp = ( double( node->left[s] ) +
-                        (node->right ? double( node->right[s] ) : 0) *
-                        double( size.height() / 2 ) ) / 65536.;
+                double tmp = ( static_cast<double>(node->m_left[s]) +
+                               (node->m_right ? static_cast<double>(node->m_right[s]) : 0.0) *
+                               ( static_cast<double>(m_size.height()) / 2.0 ) ) / 65536.0;
                 if (tmp > 0)
                 {
                     val = (tmp > val) ? tmp : val;
@@ -426,15 +422,15 @@ bool MonoScope::process( VisualNode *node )
             {
                 allZero = false;
             }
-            magnitudes[ i ] = val;
+            m_magnitudes[ i ] = val;
             index = index + step;
         }
     }
 #if RUBBERBAND
-    else if (rubberband)
+    else if (m_rubberband)
     {
-        for (int i = 0; i < size.width(); i++) {
-            double val = magnitudes[ i ];
+        for (int i = 0; i < m_size.width(); i++) {
+            double val = m_magnitudes[ i ];
             if (val < 0) {
                 val += 2;
                 if (val > 0.)
@@ -447,14 +443,14 @@ bool MonoScope::process( VisualNode *node )
 
             if ( val != 0. )
                 allZero = false;
-            magnitudes[ i ] = val;
+            m_magnitudes[ i ] = val;
         }
     }
 #endif
     else
     {
-        for (int i = 0; i < size.width(); i++ )
-            magnitudes[ i ] = 0.;
+        for (int i = 0; i < m_size.width(); i++ )
+            m_magnitudes[ i ] = 0.;
     }
 
     return allZero;
@@ -462,13 +458,13 @@ bool MonoScope::process( VisualNode *node )
 
 bool MonoScope::draw( QPainter *p, const QColor &back )
 {
-    p->fillRect( 0, 0, size.width(), size.height(), back );
-    for ( int i = 1; i < size.width(); i++ ) {
+    p->fillRect( 0, 0, m_size.width(), m_size.height(), back );
+    for ( int i = 1; i < m_size.width(); i++ ) {
 #if TWOCOLOUR
         double r, g, b, per;
 
-        per = double( magnitudes[ i ] ) /
-              double( size.height() / 4 );
+        per = double( m_magnitudes[ i ] ) /
+              double( m_size.height() / 4 );
         if (per < 0.0)
             per = -per;
         if (per > 1.0)
@@ -476,12 +472,12 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
         else if (per < 0.0)
             per = 0.0;
 
-        r = startColor.red() + (targetColor.red() -
-                                startColor.red()) * (per * per);
-        g = startColor.green() + (targetColor.green() -
-                                  startColor.green()) * (per * per);
-        b = startColor.blue() + (targetColor.blue() -
-                                 startColor.blue()) * (per * per);
+        r = m_startColor.red() + (m_targetColor.red() -
+                                m_startColor.red()) * (per * per);
+        g = m_startColor.green() + (m_targetColor.green() -
+                                  m_startColor.green()) * (per * per);
+        b = m_startColor.blue() + (m_targetColor.blue() -
+                                 m_startColor.blue()) * (per * per);
 
         if (r > 255.0)
             r = 255.0;
@@ -502,8 +498,11 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 #else
         p->setPen(Qt::red);
 #endif
-        p->drawLine( i - 1, (int)(size.height() / 2 + magnitudes[ i - 1 ]),
-                     i, (int)(size.height() / 2 + magnitudes[ i ] ));
+        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
+        p->drawLine( i - 1,
+                     (int)(adjHeight + m_magnitudes[ i - 1 ]),
+                     i,
+                     (int)(adjHeight + m_magnitudes[ i ] ));
     }
 
     return true;
@@ -515,20 +514,20 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 static class StereoScopeFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "StereoScope");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new StereoScope();
     }
@@ -541,20 +540,20 @@ static class StereoScopeFactory : public VisFactory
 static class MonoScopeFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "MonoScope");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new MonoScope();
     }
@@ -567,42 +566,33 @@ static class MonoScopeFactory : public VisFactory
 
 #if FFTW3_SUPPORT
 Spectrum::Spectrum()
-    : lin(nullptr), rin(nullptr), lout(nullptr), rout(nullptr)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Spectrum : Being Initialised"));
 
-    // Setup the "magical" audio data transformations
-    // provided by the Fast Fourier Transforms library
-    analyzerBarWidth = 6;
-    scaleFactor = 2.0;
-    falloff = 10.0;
     m_fps = 15;
 
-    lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    lout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    rout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    m_lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    m_rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    m_lout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    m_rout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
 
-    lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*)lout, FFTW_MEASURE);
-    rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
-
-    startColor = QColor(0,0,255);
-    targetColor = QColor(255,0,0);
+    m_lplan = fftw_plan_dft_r2c_1d(FFTW_N, m_lin, (myth_fftw_complex_cast*)m_lout, FFTW_MEASURE);
+    m_rplan = fftw_plan_dft_r2c_1d(FFTW_N, m_rin, (myth_fftw_complex_cast*)m_rout, FFTW_MEASURE);
 }
 
 Spectrum::~Spectrum()
 {
-    if (lin)
-        av_free(lin);
-    if (rin)
-        av_free(rin);
-    if (lout)
-        av_free(lout);
-    if (rout)
-        av_free(rout);
+    if (m_lin)
+        av_free(m_lin);
+    if (m_rin)
+        av_free(m_rin);
+    if (m_lout)
+        av_free(m_lout);
+    if (m_rout)
+        av_free(m_rout);
 
-    fftw_destroy_plan(lplan);
-    fftw_destroy_plan(rplan);
+    fftw_destroy_plan(m_lplan);
+    fftw_destroy_plan(m_rplan);
 }
 
 void Spectrum::resize(const QSize &newsize)
@@ -613,31 +603,32 @@ void Spectrum::resize(const QSize &newsize)
     // ensuing number of up/down bars to hold
     // the audio magnitudes
 
-    size = newsize;
+    m_size = newsize;
 
-    analyzerBarWidth = size.width() / 64;
+    m_analyzerBarWidth = m_size.width() / 64;
 
-    if (analyzerBarWidth < 6)
-        analyzerBarWidth = 6;
+    if (m_analyzerBarWidth < 6)
+        m_analyzerBarWidth = 6;
 
-    scale.setMax(192, size.width() / analyzerBarWidth);
+    m_scale.setMax(192, m_size.width() / m_analyzerBarWidth);
 
-    rects.resize( scale.range() );
+    m_rects.resize( m_scale.range() );
     unsigned int i = 0;
     int w = 0;
-    for (; i < (uint)rects.size(); i++, w += analyzerBarWidth)
+    for (; i < (uint)m_rects.size(); i++, w += m_analyzerBarWidth)
     {
-        rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
+        m_rects[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
     }
 
-    unsigned int os = magnitudes.size();
-    magnitudes.resize( scale.range() * 2 );
-    for (; os < (uint)magnitudes.size(); os++)
+    unsigned int os = m_magnitudes.size();
+    m_magnitudes.resize( m_scale.range() * 2 );
+    for (; os < (uint)m_magnitudes.size(); os++)
     {
-        magnitudes[os] = 0.0;
+        m_magnitudes[os] = 0.0;
     }
 
-    scaleFactor = double( size.height() / 2 ) / log( (double)(FFTW_N) );
+    m_scaleFactor = ( static_cast<double>(m_size.height()) / 2.0 ) /
+                    log( static_cast<double>(FFTW_N) );
 }
 
 template<typename T> T sq(T a) { return a*a; };
@@ -651,46 +642,48 @@ bool Spectrum::process(VisualNode *node)
 
     uint i;
     long w = 0, index;
-    QRect *rectsp = rects.data();
-    double *magnitudesp = magnitudes.data();
+    QRect *rectsp = m_rects.data();
+    double *magnitudesp = m_magnitudes.data();
 
     if (node)
     {
-        i = node->length;
+        i = node->m_length;
         if (i > FFTW_N)
             i = FFTW_N;
-        fast_real_set_from_short(lin, node->left, i);
-        if (node->right)
-            fast_real_set_from_short(rin, node->right, i);
+        fast_real_set_from_short(m_lin, node->m_left, i);
+        if (node->m_right)
+            fast_real_set_from_short(m_rin, node->m_right, i);
     }
     else
         i = 0;
 
-    fast_reals_set(lin + i, rin + i, 0, FFTW_N - i);
+    fast_reals_set(m_lin + i, m_rin + i, 0, FFTW_N - i);
 
-    fftw_execute(lplan);
-    fftw_execute(rplan);
+    fftw_execute(m_lplan);
+    fftw_execute(m_rplan);
 
     index = 1;
 
-    for (i = 0; (int)i < rects.size(); i++, w += analyzerBarWidth)
+    for (i = 0; (int)i < m_rects.size(); i++, w += m_analyzerBarWidth)
     {
         // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
         // The dft_r2c_1d plan doesn't output these redundant values
         // and furthermore they're not allocated in the ctor
-        double tmp = 2 * sq(real(lout[index])); // + sq(real(lout[FFTW_N - index]));
-        double magL = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
+        double tmp = 2 * sq(real(m_lout[index])); // + sq(real(m_lout[FFTW_N - index]));
+        double magL = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
-        tmp = 2 * sq(real(rout[index])); // + sq(real(rout[FFTW_N - index]));
-        double magR = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
+        tmp = 2 * sq(real(m_rout[index])); // + sq(real(m_rout[FFTW_N - index]));
+        double magR = (tmp > 1.) ? (log(tmp) - 22.0) * m_scaleFactor : 0.;
 
-        if (magL > size.height() / 2)
+
+        double adjHeight = static_cast<double>(m_size.height()) / 2.0;
+        if (magL > adjHeight)
         {
-            magL = size.height() / 2;
+            magL = adjHeight;
         }
         if (magL < magnitudesp[i])
         {
-            tmp = magnitudesp[i] - falloff;
+            tmp = magnitudesp[i] - m_falloff;
             if ( tmp < magL )
             {
                 tmp = magL;
@@ -702,13 +695,13 @@ bool Spectrum::process(VisualNode *node)
             magL = 1.;
         }
 
-        if (magR > size.height() / 2)
+        if (magR > adjHeight)
         {
-            magR = size.height() / 2;
+            magR = adjHeight;
         }
-        if (magR < magnitudesp[i + scale.range()])
+        if (magR < magnitudesp[i + m_scale.range()])
         {
-            tmp = magnitudesp[i + scale.range()] - falloff;
+            tmp = magnitudesp[i + m_scale.range()] - m_falloff;
             if ( tmp < magR )
             {
                 tmp = magR;
@@ -726,11 +719,11 @@ bool Spectrum::process(VisualNode *node)
         }
 
         magnitudesp[i] = magL;
-        magnitudesp[i + scale.range()] = magR;
-        rectsp[i].setTop( size.height() / 2 - int( magL ) );
-        rectsp[i].setBottom( size.height() / 2 + int( magR ) );
+        magnitudesp[i + m_scale.range()] = magR;
+        rectsp[i].setTop( m_size.height() / 2 - int( magL ) );
+        rectsp[i].setBottom( m_size.height() / 2 + int( magR ) );
 
-        index = scale[i];
+        index = m_scale[i];
     }
 
     Q_UNUSED(allZero);
@@ -754,21 +747,21 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectsp = rects.data();
+    QRect *rectsp = m_rects.data();
 
-    p->fillRect(0, 0, size.width(), size.height(), back);
-    for (uint i = 0; i < (uint)rects.size(); i++)
+    p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    for (uint i = 0; i < (uint)m_rects.size(); i++)
     {
-        double per = double( rectsp[i].height() - 2 ) / double( size.height() );
+        double per = double( rectsp[i].height() - 2 ) / double( m_size.height() );
 
         per = clamp(per, 1.0, 0.0);
 
-        double r = startColor.red() +
-            (targetColor.red() - startColor.red()) * (per * per);
-        double g = startColor.green() +
-            (targetColor.green() - startColor.green()) * (per * per);
-        double b = startColor.blue() +
-            (targetColor.blue() - startColor.blue()) * (per * per);
+        double r = m_startColor.red() +
+            (m_targetColor.red() - m_startColor.red()) * (per * per);
+        double g = m_startColor.green() +
+            (m_targetColor.green() - m_startColor.green()) * (per * per);
+        double b = m_startColor.blue() +
+            (m_targetColor.blue() - m_startColor.blue()) * (per * per);
 
         r = clamp(r, 255.0, 0.0);
         g = clamp(g, 255.0, 0.0);
@@ -784,20 +777,20 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
 static class SpectrumFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "Spectrum");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new Spectrum();
     }
@@ -808,45 +801,44 @@ static class SpectrumFactory : public VisFactory
 //
 // NOTE: This visualiser requires mythplugins to be compiled with --enable-fftw
 
-Squares::Squares() :
-    actualSize(0,0), fake_height(0), number_of_squares(16)
+Squares::Squares()
 {
-    fake_height = number_of_squares * analyzerBarWidth;
+    m_fake_height = m_number_of_squares * m_analyzerBarWidth;
 }
 
 void Squares::resize (const QSize &newsize) {
     // Trick the spectrum analyzer into calculating 16 rectangles
-    Spectrum::resize (QSize (fake_height, fake_height));
+    Spectrum::resize (QSize (m_fake_height, m_fake_height));
     // We have our own copy, Spectrum has it's own...
-    actualSize = newsize;
+    m_actualSize = newsize;
 }
 
 void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 {
     double r, g, b, per;
-    int correction = (actualSize.width() % rects.size ()) / 2;
+    int correction = (m_actualSize.width() % m_rects.size ()) / 2;
     int x = ((i / 2) * w) + correction;
     int y;
 
     if (i % 2 == 0)
     {
         y = c - h;
-        per = double(fake_height - rect->top()) / double(fake_height);
+        per = double(m_fake_height - rect->top()) / double(m_fake_height);
     }
     else
     {
         y = c;
-        per = double(rect->bottom()) / double(fake_height);
+        per = double(rect->bottom()) / double(m_fake_height);
     }
 
     per = clamp(per, 1.0, 0.0);
 
-    r = startColor.red() +
-        (targetColor.red() - startColor.red()) * (per * per);
-    g = startColor.green() +
-        (targetColor.green() - startColor.green()) * (per * per);
-    b = startColor.blue() +
-        (targetColor.blue() - startColor.blue()) * (per * per);
+    r = m_startColor.red() +
+        (m_targetColor.red() - m_startColor.red()) * (per * per);
+    g = m_startColor.green() +
+        (m_targetColor.green() - m_startColor.green()) * (per * per);
+    b = m_startColor.blue() +
+        (m_targetColor.blue() - m_startColor.blue()) * (per * per);
 
     r = clamp(r, 255.0, 0.0);
     g = clamp(g, 255.0, 0.0);
@@ -857,13 +849,13 @@ void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 
 bool Squares::draw(QPainter *p, const QColor &back)
 {
-    p->fillRect (0, 0, actualSize.width(), actualSize.height(), back);
-    int w = actualSize.width() / (rects.size() / 2);
+    p->fillRect (0, 0, m_actualSize.width(), m_actualSize.height(), back);
+    int w = m_actualSize.width() / (m_rects.size() / 2);
     int h = w;
-    int center = actualSize.height() / 2;
+    int center = m_actualSize.height() / 2;
 
-    QRect *rectsp = rects.data();
-    for (uint i = 0; i < (uint)rects.size(); i++)
+    QRect *rectsp = m_rects.data();
+    for (uint i = 0; i < (uint)m_rects.size(); i++)
         drawRect(p, &(rectsp[i]), i, center, w, h);
 
     return true;
@@ -872,20 +864,20 @@ bool Squares::draw(QPainter *p, const QColor &back)
 static class SquaresFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "Squares");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new Squares();
     }
@@ -894,15 +886,14 @@ static class SquaresFactory : public VisFactory
 #endif // FFTW3_SUPPORT
 
 Piano::Piano()
-    : piano_data(nullptr), audio_data(nullptr)
 {
     // Setup the "magical" audio coefficients
     // required by the Goetzel Algorithm
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Being Initialised"));
 
-    piano_data = (piano_key_data *) malloc(sizeof(piano_key_data) * PIANO_N);
-    audio_data = (piano_audio *) malloc(sizeof(piano_audio) * PIANO_AUDIO_SIZE);
+    m_piano_data = (piano_key_data *) malloc(sizeof(piano_key_data) * PIANO_N);
+    m_audio_data = (piano_audio *) malloc(sizeof(piano_audio) * PIANO_AUDIO_SIZE);
 
     double sample_rate = 44100.0;  // TODO : This should be obtained from gPlayer (likely candidate...)
 
@@ -919,7 +910,7 @@ Piano::Piano()
     for (key = 0; key < PIANO_N; key++)
     {
         // This is constant through time
-        piano_data[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
+        m_piano_data[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
 
         // Want 20 whole cycles of the current waveform at least
         double samples_required = sample_rate/current_freq * 20.0;
@@ -932,27 +923,21 @@ Piano::Piano()
         {   // For the high notes, use as many samples as we need in a display_fps
             samples_required = sample_rate/(double)m_fps * 0.75;
         }
-        piano_data[key].samples_process_before_display_update = (int)samples_required;
-        piano_data[key].is_black_note = false; // Will be put right in .resize()
+        m_piano_data[key].samples_process_before_display_update = (int)samples_required;
+        m_piano_data[key].is_black_note = false; // Will be put right in .resize()
 
         current_freq *= semi_tone;
     }
 
     zero_analysis();
-
-    whiteStartColor = QColor(245,245,245);
-    whiteTargetColor = Qt::red;
-
-    blackStartColor = QColor(10,10,10);
-    blackTargetColor = Qt::red;
 }
 
 Piano::~Piano()
 {
-    if (piano_data)
-        free(piano_data);
-    if (audio_data)
-        free(audio_data);
+    if (m_piano_data)
+        free(m_piano_data);
+    if (m_audio_data)
+        free(m_audio_data);
 }
 
 void Piano::zero_analysis(void)
@@ -961,17 +946,15 @@ void Piano::zero_analysis(void)
     for (key = 0; key < PIANO_N; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
-        piano_data[key].q2 = (goertzel_data)0.0f;
-        piano_data[key].q1 = (goertzel_data)0.0f;
-        piano_data[key].magnitude = (goertzel_data)0.0f;
-        piano_data[key].max_magnitude_seen =
+        m_piano_data[key].q2 = 0.0F;
+        m_piano_data[key].q1 = 0.0F;
+        m_piano_data[key].magnitude = 0.0F;
+        m_piano_data[key].max_magnitude_seen =
             (goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
 
-        piano_data[key].samples_processed = 0;
+        m_piano_data[key].samples_processed = 0;
     }
-    offset_processed = 0;
-
-    return;
+    m_offset_processed = 0;
 }
 
 void Piano::resize(const QSize &newsize)
@@ -982,14 +965,14 @@ void Piano::resize(const QSize &newsize)
     // ensuing number of up/down bars to hold
     // the audio magnitudes
 
-    size = newsize;
+    m_size = newsize;
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Being Resized"));
 
     zero_analysis();
 
     // There are 88-36=52 white notes on piano keyboard
-    double key_unit_size = (double)size.width() / 54.0;  // One white key extra spacing, if possible
+    double key_unit_size = (double)m_size.width() / 54.0;  // One white key extra spacing, if possible
     if (key_unit_size < 10.0) // Keys have to be at least this many pixels wide
         key_unit_size = 10.0;
 
@@ -1002,10 +985,10 @@ void Piano::resize(const QSize &newsize)
 
     // This is the starting position of the keyboard (may be beyond LHS)
     // - actually position of C below bottom A (will be added to...).  This is 4 octaves below middle C.
-    double left =  (double)size.width() / 2.0 - (4.0*7.0 + 3.5) * key_unit_size; // The extra 3.5 centers 'F' inthe middle of the screen
-    double top_of_keys = (double)size.height() / 2.0 - key_unit_size * white_height_pct / 2.0; // Vertically center keys
+    double left =  (double)m_size.width() / 2.0 - (4.0*7.0 + 3.5) * key_unit_size; // The extra 3.5 centers 'F' inthe middle of the screen
+    double top_of_keys = (double)m_size.height() / 2.0 - key_unit_size * white_height_pct / 2.0; // Vertically center keys
 
-    rects.resize(PIANO_N);
+    m_rects.resize(PIANO_N);
 
     unsigned int key;
     for (key = 0; key < PIANO_N; key++)
@@ -1035,12 +1018,12 @@ void Piano::resize(const QSize &newsize)
             case 10: center = 6.0; is_black = true; offset = 2; break;
             case 11: center = 6.5; break;
         }
-        piano_data[key].is_black_note = is_black;
+        m_piano_data[key].is_black_note = is_black;
 
         double width = (is_black ? black_width_pct:white_width_pct) * key_unit_size;
         double height = (is_black? black_height_pct:white_height_pct) * key_unit_size;
 
-        rects[key].setRect(
+        m_rects[key].setRect(
             left + center * key_unit_size //  Basic position of left side of key
                 - width / 2.0  // Less half the width
                 + (is_black ? (offset * black_offset_pct * key_unit_size):0.0), // And jiggle the positions of the black keys for aethetic reasons
@@ -1050,13 +1033,11 @@ void Piano::resize(const QSize &newsize)
         );
     }
 
-    magnitude.resize(PIANO_N);
-    for (key = 0; key < (uint)magnitude.size(); key++)
+    m_magnitude.resize(PIANO_N);
+    for (key = 0; key < (uint)m_magnitude.size(); key++)
     {
-        magnitude[key] = 0.0;
+        m_magnitude[key] = 0.0;
     }
-
-    return;
 }
 
 unsigned long Piano::getDesiredSamples(void)
@@ -1093,37 +1074,37 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
     if (node)
     {
-        piano_audio short_to_bounded = 32768.0f;
+        piano_audio short_to_bounded = 32768.0F;
 
         // Detect start of new song (current node more than 10s earlier than already seen)
-        if (node->offset + 10000 < offset_processed)
+        if (node->m_offset + 10000 < m_offset_processed)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->offset));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->m_offset));
             zero_analysis();
         }
 
         // Check whether we've seen this node (more recently than 10secs ago)
-        if (node->offset <= offset_processed)
+        if (node->m_offset <= m_offset_processed)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Already seen node offset=%1, returning without processing").arg(node->offset));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Already seen node offset=%1, returning without processing").arg(node->m_offset));
             return allZero; // Nothing to see here - the server can stop if it wants to
         }
 
-        //LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
-        n = node->length;
+        //LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node offset=%1, size=%2").arg(node->m_offset).arg(node->m_length));
+        n = node->m_length;
 
-        if (node->right) // Preprocess the data into a combined middle channel, if we have stereo data
+        if (node->m_right) // Preprocess the data into a combined middle channel, if we have stereo data
         {
             for (uint i = 0; i < n; i++)
             {
-                audio_data[i] = (piano_audio)(((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0 / short_to_bounded);
+                m_audio_data[i] = ((piano_audio)node->m_left[i] + (piano_audio)node->m_right[i]) / 2.0F / short_to_bounded;
             }
         }
         else // This is only one channel of data
         {
             for (uint i = 0; i < n; i++)
             {
-                audio_data[i] = (piano_audio)node->left[i] / short_to_bounded;
+                m_audio_data[i] = (piano_audio)node->m_left[i] / short_to_bounded;
             }
         }
     }
@@ -1135,78 +1116,77 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
     for (uint key = 0; key < PIANO_N; key++)
     {
-        goertzel_data coeff = piano_data[key].coeff;
-        goertzel_data q2 = piano_data[key].q2;
-        goertzel_data q1 = piano_data[key].q1;
+        goertzel_data coeff = m_piano_data[key].coeff;
+        goertzel_data q2 = m_piano_data[key].q2;
+        goertzel_data q1 = m_piano_data[key].q1;
 
         for (uint i = 0; i < n; i++)
         {
-            goertzel_data q0 = coeff * q1 - q2 + audio_data[i];
+            goertzel_data q0 = coeff * q1 - q2 + m_audio_data[i];
             q2 = q1;
             q1 = q0;
         }
-        piano_data[key].q2 = q2;
-        piano_data[key].q1 = q1;
+        m_piano_data[key].q2 = q2;
+        m_piano_data[key].q1 = q1;
 
-        piano_data[key].samples_processed += n;
+        m_piano_data[key].samples_processed += n;
 
-        int n_samples = piano_data[key].samples_processed;
+        int n_samples = m_piano_data[key].samples_processed;
 
         // Only do this update if we've processed enough chunks for this key...
-        if (n_samples > piano_data[key].samples_process_before_display_update)
+        if (n_samples > m_piano_data[key].samples_process_before_display_update)
         {
             magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
 
-            if (false) // This is RMS of signal
-            {
-                magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
-            }
-            if (true) // This is pure magnitude of signal
-            {
-                magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
-            }
+#if 0
+            // This is RMS of signal
+            magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
+#else
+            // This is pure magnitude of signal
+            magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+#endif
 
-            if (false) // Take logs everywhere, and shift up to [0, ??]
+#if 0
+            // Take logs everywhere, and shift up to [0, ??]
+            if(magnitude_av > 0.0F)
             {
-                if(magnitude_av > 0.0)
-                {
-                    magnitude_av = log(magnitude_av);
-                }
-                else
-                {
-                    magnitude_av = PIANO_MIN_VOL;
-                }
-                magnitude_av -= PIANO_MIN_VOL;
-
-                if (magnitude_av < 0.0)
-                {
-                    magnitude_av = 0.0;
-                }
+                magnitude_av = log(magnitude_av);
             }
+            else
+            {
+                magnitude_av = PIANO_MIN_VOL;
+            }
+            magnitude_av -= PIANO_MIN_VOL;
+
+            if (magnitude_av < 0.0F)
+            {
+                magnitude_av = 0.0;
+            }
+#endif
 
             if (magnitude_av > (goertzel_data)0.01)
             {
                 allZero = false;
             }
 
-            piano_data[key].magnitude = magnitude_av; // Store this for later : We'll do the colours from this...
-            if ( piano_data[key].max_magnitude_seen < magnitude_av)
+            m_piano_data[key].magnitude = magnitude_av; // Store this for later : We'll do the colours from this...
+            if ( m_piano_data[key].max_magnitude_seen < magnitude_av)
             {
-                piano_data[key].max_magnitude_seen = magnitude_av;
+                m_piano_data[key].max_magnitude_seen = magnitude_av;
             }
             LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Updated Key %1 from %2 samples, magnitude=%3")
                     .arg(key).arg(n_samples).arg(magnitude_av));
 
-            piano_data[key].samples_processed = 0; // Reset the counts, now that we've set the magnitude...
-            piano_data[key].q1 = (goertzel_data)0.0;
-            piano_data[key].q2 = (goertzel_data)0.0;
+            m_piano_data[key].samples_processed = 0; // Reset the counts, now that we've set the magnitude...
+            m_piano_data[key].q1 = (goertzel_data)0.0;
+            m_piano_data[key].q2 = (goertzel_data)0.0;
         }
     }
 
     if (node)
     {
         // All done now - record that we've done this offset
-        offset_processed = node->offset;
+        m_offset_processed = node->m_offset;
     }
 
     return allZero;
@@ -1229,31 +1209,31 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectsp = &rects[0];
-    double *magnitudep = &magnitude[0];
+    QRect *rectsp = &m_rects[0];
+    double *magnitudep = &m_magnitude[0];
 
     unsigned int key, n = PIANO_N;
     double r, g, b, per;
 
-    p->fillRect(0, 0, size.width(), size.height(), back);
+    p->fillRect(0, 0, m_size.width(), m_size.height(), back);
 
     // Protect maximum array length
-    if(n > (uint)rects.size())
-        n = (uint)rects.size();
+    if(n > (uint)m_rects.size())
+        n = (uint)m_rects.size();
 
     // Sweep up across the keys, making sure the max_magnitude_seen is at minimum X% of its neighbours
     double mag = PIANO_RMS_NEGLIGIBLE;
     for (key = 0; key < n; key++)
     {
-        if (piano_data[key].max_magnitude_seen < mag)
+        if (m_piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
-            piano_data[key].max_magnitude_seen = mag;
+            m_piano_data[key].max_magnitude_seen = mag;
         }
         else
         {
             // This key has seen better peaks, use this for the next one
-            mag = piano_data[key].max_magnitude_seen;
+            mag = m_piano_data[key].max_magnitude_seen;
         }
         mag *= PIANO_SPECTRUM_SMOOTHING;
     }
@@ -1263,15 +1243,15 @@ bool Piano::draw(QPainter *p, const QColor &back)
     for (int key_i = n - 1; key_i >= 0; key_i--)
     {
         key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)--
-        if (piano_data[key].max_magnitude_seen < mag)
+        if (m_piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
-            piano_data[key].max_magnitude_seen = mag;
+            m_piano_data[key].max_magnitude_seen = mag;
         }
         else
         {
             // This key has seen better peaks, use this for the next one
-            mag = piano_data[key].max_magnitude_seen;
+            mag = m_piano_data[key].max_magnitude_seen;
         }
         mag *= PIANO_SPECTRUM_SMOOTHING;
     }
@@ -1281,7 +1261,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     double magnitude_max = PIANO_RMS_NEGLIGIBLE;
     for (key = 0; key < n; key++)
     {
-        mag = piano_data[key].magnitude / piano_data[key].max_magnitude_seen;
+        mag = m_piano_data[key].magnitude / m_piano_data[key].max_magnitude_seen;
         if (magnitude_max < mag)
             magnitude_max = mag;
 
@@ -1291,7 +1271,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // Deal with all the white keys first
     for (key = 0; key < n; key++)
     {
-        if (piano_data[key].is_black_note)
+        if (m_piano_data[key].is_black_note)
             continue;
 
         per = magnitudep[key] / magnitude_max;
@@ -1300,11 +1280,11 @@ bool Piano::draw(QPainter *p, const QColor &back)
         if (per < PIANO_KEYPRESS_TOO_LIGHT)
             per = 0.0; // Clamp to zero for lightly detected keys
         LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Display key %1, magnitude=%2, seen=%3")
-                .arg(key).arg(per*100.0).arg(piano_data[key].max_magnitude_seen));
+                .arg(key).arg(per*100.0).arg(m_piano_data[key].max_magnitude_seen));
 
-        r = whiteStartColor.red() + (whiteTargetColor.red() - whiteStartColor.red()) * per;
-        g = whiteStartColor.green() + (whiteTargetColor.green() - whiteStartColor.green()) * per;
-        b = whiteStartColor.blue() + (whiteTargetColor.blue() - whiteStartColor.blue()) * per;
+        r = m_whiteStartColor.red() + (m_whiteTargetColor.red() - m_whiteStartColor.red()) * per;
+        g = m_whiteStartColor.green() + (m_whiteTargetColor.green() - m_whiteStartColor.green()) * per;
+        b = m_whiteStartColor.blue() + (m_whiteTargetColor.blue() - m_whiteStartColor.blue()) * per;
 
         p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
     }
@@ -1312,7 +1292,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // Then overlay the black keys
     for (key = 0; key < n; key++)
     {
-        if (!piano_data[key].is_black_note)
+        if (!m_piano_data[key].is_black_note)
             continue;
 
         per = magnitudep[key]/magnitude_max;
@@ -1321,9 +1301,9 @@ bool Piano::draw(QPainter *p, const QColor &back)
         if (per < PIANO_KEYPRESS_TOO_LIGHT)
             per = 0.0; // Clamp to zero for lightly detected keys
 
-        r = blackStartColor.red() + (blackTargetColor.red() - blackStartColor.red()) * per;
-        g = blackStartColor.green() + (blackTargetColor.green() - blackStartColor.green()) * per;
-        b = blackStartColor.blue() + (blackTargetColor.blue() - blackStartColor.blue()) * per;
+        r = m_blackStartColor.red() + (m_blackTargetColor.red() - m_blackStartColor.red()) * per;
+        g = m_blackStartColor.green() + (m_blackTargetColor.green() - m_blackStartColor.green()) * per;
+        b = m_blackStartColor.blue() + (m_blackTargetColor.blue() - m_blackStartColor.blue()) * per;
 
         p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
     }
@@ -1334,27 +1314,26 @@ bool Piano::draw(QPainter *p, const QColor &back)
 static class PianoFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "Piano");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new Piano();
     }
 }PianoFactory;
 
 AlbumArt::AlbumArt(void) :
-    m_currentMetadata(nullptr),
     m_lastCycle(QDateTime::currentDateTime())
 {
     findFrontCover();
@@ -1374,7 +1353,7 @@ void AlbumArt::findFrontCover(void)
     {
         // not available so just show the first image available
         if (albumArt->getImageCount() > 0)
-            m_currImageType = albumArt->getImageAt(0)->imageType;
+            m_currImageType = albumArt->getImageAt(0)->m_imageType;
         else
             m_currImageType = IT_UNKNOWN;
     }
@@ -1528,20 +1507,20 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 static class AlbumArtFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "AlbumArt");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new AlbumArt();
     }
@@ -1555,7 +1534,7 @@ Blank::Blank()
 
 void Blank::resize(const QSize &newsize)
 {
-    size = newsize;
+    m_size = newsize;
 }
 
 
@@ -1567,27 +1546,27 @@ bool Blank::process(VisualNode */*node*/)
 bool Blank::draw(QPainter *p, const QColor &back)
 {
     // Took me hours to work out this algorithm
-    p->fillRect(0, 0, size.width(), size.height(), back);
+    p->fillRect(0, 0, m_size.width(), m_size.height(), back);
     return true;
 }
 
 static class BlankFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "Blank");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const override // VisFactory
     {
         return new Blank();
     }

@@ -43,7 +43,7 @@
 
 #include "mythlogging.h"
 
-uint16_t get_pid(uint8_t *pid)
+uint16_t get_pid(const uint8_t *pid)
 {
 	uint16_t pp = 0;
 

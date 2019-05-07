@@ -27,12 +27,12 @@ class CECAdapter : public QObject, public MThread
     void Action(const QString &action);
 
   protected:
-    virtual void run();
+    void run() override; // MThread
 
   private:
-    CECAdapterPriv *m_priv;
-    static QMutex  *gLock;
-    static QMutex  *gHandleActionsLock;
+    CECAdapterPriv        *m_priv {nullptr};
+    static QMutex         *gLock;
+    static QMutex         *gHandleActionsLock;
     static QWaitCondition *gActionsReady;
 };
 

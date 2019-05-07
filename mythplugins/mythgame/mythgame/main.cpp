@@ -1,14 +1,5 @@
-#include <iostream>
-using namespace std;
-
-#include <unistd.h>
-
-#include <QDir>
-#include <QApplication>
-
 #include "gameui.h"
 #include "gamehandler.h"
-#include "rominfo.h"
 #include "gamesettings.h"
 #include "dbcheck.h"
 
@@ -39,7 +30,7 @@ static void GameCallback(void *data, QString &selection)
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         StandardSettingDialog *ssd =
             new StandardSettingDialog(mainStack, "gamesettings",
-                                      new MythGameGeneralSettings());
+                                      new GameGeneralSettings());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -49,8 +40,14 @@ static void GameCallback(void *data, QString &selection)
 
     if (sel == "game_players")
     {
-        MythGamePlayerEditor mgpe;
-        mgpe.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        auto ssd = new StandardSettingDialog(mainStack, "gamesettings",
+                                             new GamePlayersList());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "search_for_games")
     {
@@ -64,7 +61,7 @@ static void GameCallback(void *data, QString &selection)
 
 }
 
-static int runMenu(QString which_menu)
+static int runMenu(const QString& which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
@@ -84,13 +81,11 @@ static int runMenu(QString which_menu)
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return 0;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
-        delete menu;
-        return -1;
-    }
+
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+        .arg(which_menu).arg(themedir));
+    delete menu;
+    return -1;
 }
 
 static int RunGames(void)
@@ -103,11 +98,8 @@ static int RunGames(void)
         mainStack->AddScreen(game);
         return 0;
     }
-    else
-    {
-        delete game;
-        return -1;
-    }
+    delete game;
+    return -1;
 }
 
 static void runGames(void)
@@ -144,12 +136,6 @@ int mythplugin_init(const char *libversion)
         return -1;
     }
     gCoreContext->ActivateSettingsCache(true);
-
-    MythGamePlayerSettings settings;
-#if 0
-    settings.Load();
-    settings.Save();
-#endif
 
     setupKeys();
 

@@ -9,7 +9,7 @@ QStringList SignalMonitorValue::ERROR_NO_CHANNEL;
 QStringList SignalMonitorValue::ERROR_NO_LINK;
 QStringList SignalMonitorValue::SIGNAL_LOCK;
 
-#define DEBUG_SIGNAL_MONITOR_VALUE 0
+#define DEBUG_SIGNAL_MONITOR_VALUE 1
 
 /** \fn SignalMonitorValue::Init()
  *  \brief Initializes the some static constants needed by SignalMonitorValue.
@@ -38,23 +38,20 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout) :
-    name(_name),
-    noSpaceName(_noSpaceName),
-    value(0),
-    threshold(_threshold),
-    minval(_min), maxval(_max), timeout(_timeout),
-    high_threshold(_high_threshold), set(false)
+    m_name(_name),
+    m_noSpaceName(_noSpaceName),
+    m_value(0),
+    m_threshold(_threshold),
+    m_minVal(_min), m_maxVal(_max), m_timeout(_timeout),
+    m_highThreshold(_high_threshold)
 {
-    name.detach();
-    noSpaceName.detach();
-
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
-            .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold)
-            .arg(minval) .arg(maxval) .arg(timeout) .arg(high_threshold)
-            .arg((set ? "true" : "false")));
+            .arg(m_name) .arg(m_noSpaceName) .arg(m_value) .arg(m_threshold)
+            .arg(m_minVal) .arg(m_maxVal) .arg(m_timeout) .arg(m_highThreshold)
+            .arg((m_set ? "true" : "false")));
 #endif
 }
 
@@ -64,62 +61,55 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout, bool _set) :
-    name(_name),
-    noSpaceName(_noSpaceName),
-    value(_value),
-    threshold(_threshold),
-    minval(_min), maxval(_max), timeout(_timeout),
-    high_threshold(_high_threshold), set(_set)
+    m_name(_name),
+    m_noSpaceName(_noSpaceName),
+    m_value(_value),
+    m_threshold(_threshold),
+    m_minVal(_min), m_maxVal(_max), m_timeout(_timeout),
+    m_highThreshold(_high_threshold), m_set(_set)
 {
-    name.detach();
-    noSpaceName.detach();
-
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
-            .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold)
-            .arg(minval) .arg(maxval) .arg(timeout) .arg(high_threshold)
-            .arg((set ? "true" : "false")));
+            .arg(m_name) .arg(m_noSpaceName) .arg(m_value) .arg(m_threshold)
+            .arg(m_minVal) .arg(m_maxVal) .arg(m_timeout) .arg(m_highThreshold)
+            .arg((m_set ? "true" : "false")));
 #endif
 }
 
 QString SignalMonitorValue::GetName(void) const
 {
-    if (name.isNull())
+    if (m_name.isNull())
         return QString();
 
-    QString ret = name;
-    ret.detach();
-    return ret;
+    return m_name;
 }
 
 QString SignalMonitorValue::GetShortName(void) const
 {
-    if (noSpaceName.isNull())
+    if (m_noSpaceName.isNull())
         return QString();
 
-    QString ret = noSpaceName;
-    ret.detach();
-    return ret;
+    return m_noSpaceName;
 }
 
 bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
 {
-    name = _name;
-    QString longString = _longString;
+    m_name = _name;
+    const QString& longString = _longString;
 
-    if (name.isEmpty() || longString.isEmpty())
+    if (m_name.isEmpty() || longString.isEmpty())
         return false;
 
-    if (("message" == name) || ("error" == name))
+    if (("message" == m_name) || ("error" == m_name))
     {
         SetRange(0, 1);
         SetValue(0);
-        SetThreshold( ("message" == name) ? 0 : 1, true );
-        SetTimeout( ("message" == name) ? 0 : -1 );
-        noSpaceName = name;
-        name = longString;
+        SetThreshold( ("message" == m_name) ? 0 : 1, true );
+        SetTimeout( ("message" == m_name) ? 0 : -1 );
+        m_noSpaceName = m_name;
+        m_name = longString;
 
         return true;
     }
@@ -129,17 +119,13 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
     if (8 != vals.size() || "(null)" == vals[0])
         return false;
 
-    noSpaceName = vals[0];
+    m_noSpaceName = vals[0];
     SetRange(vals[3].toInt(), vals[4].toInt());
     SetValue(vals[1].toInt());
     SetThreshold(vals[2].toInt(), (bool) vals[6].toInt());
     SetTimeout(vals[5].toInt());
 
-    set = (bool) vals[7].toInt();
-
-    name.detach();
-    noSpaceName.detach();
-
+    m_set = (bool) vals[7].toInt();
     return true;
 }
 
@@ -196,14 +182,14 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
     if (!good)
     {
         QString msg("AllGood failed on ");
-        SignalMonitorList::const_iterator it = slist.begin();
+        it = slist.begin();
         for (; it != slist.end(); ++it)
             if (!it->IsGood())
             {
-                msg += it->noSpaceName;
+                msg += it->m_noSpaceName;
                 msg += QString("(%1%2%3) ")
                            .arg(it->GetValue())
-                           .arg(it->high_threshold ? "<" : ">")
+                           .arg(it->m_highThreshold ? "<" : ">")
                            .arg(it->GetThreshold());
             }
         LOG(VB_GENERAL, LOG_DEBUG, msg);

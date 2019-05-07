@@ -79,7 +79,7 @@ class MUI_PUBLIC DisplayRes
      *  \param which_gui either regular GUI or CUSTOM_GUI
      *  \sa SwitchToCustomGUI(int, int, short)
      */
-    bool SwitchToGUI(tmode which_gui=GUI);
+    bool SwitchToGUI(tmode next_mode=GUI);
     /** \brief Switches to the custom GUI resolution specified.
      *
      *   This switches to the specified resolution, and refresh
@@ -133,7 +133,7 @@ class MUI_PUBLIC DisplayRes
     /// \brief Returns all video modes supported by the display.
     virtual const DisplayResVector& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
-    const std::vector<double> GetRefreshRates(int width, int height) const;
+    std::vector<double> GetRefreshRates(int width, int height) const;
     /** @} */
 
   protected:
@@ -160,8 +160,8 @@ class MUI_PUBLIC DisplayRes
 
     double m_pixelAspectRatio;
 
-    static DisplayRes *m_instance;
-    static bool        m_locked;
+    static DisplayRes *s_instance;
+    static bool        s_locked;
 };
 
 /** \fn GetVideoModes(void)
@@ -172,6 +172,6 @@ class MUI_PUBLIC DisplayRes
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
  */
-MUI_PUBLIC const DisplayResVector GetVideoModes(void);
+MUI_PUBLIC DisplayResVector GetVideoModes(void);
 
 #endif

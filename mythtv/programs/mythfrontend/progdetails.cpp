@@ -17,12 +17,6 @@
 
 #define LASTPAGE 2
 
-ProgDetails::ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo) :
-    MythScreenType (parent, "progdetails"),
-    m_progInfo(*progInfo), m_infoList(*this)
-{
-}
-
 bool ProgDetails::Create(void)
 {
     // Load the theme for this screen
@@ -42,7 +36,7 @@ bool ProgDetails::Create(void)
     return true;
 }
 
-QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
+QString ProgDetails::getRatings(bool recorded, uint chanid, const QDateTime& startts)
 {
     QString table = (recorded) ? "recordedrating" : "programrating";
     QString sel = QString(
@@ -293,10 +287,10 @@ void ProgDetails::PowerPriorities(const QString & ptable)
                        "INNER JOIN capturecard "
                        "      ON ( channel.sourceid = capturecard.sourceid AND "
                        "           ( capturecard.schedorder <> 0 OR "
-                       "             capturecard.parentid = 0 ) ) "
+                       "             capturecard.parentid = 0 ) ) ").arg(ptable)
                        + recmatch +
                        "WHERE  p.chanid = :CHANID AND"
-                       " p.starttime = :STARTTIME ;").arg(ptable));
+                       " p.starttime = :STARTTIME ;");
 
         query.bindValue(":CHANID",    m_progInfo.GetChanID());
         query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
@@ -420,8 +414,8 @@ void ProgDetails::loadPage(void)
     /* see #7810, was hardcoded to 4 star system, when every theme
      * uses 10 stars / 5 stars with half stars
      */
-        if (stars > 0.0)
-            attr += tr("%n star(s)", "", roundf(stars * 10.0)) + ", ";
+        if (stars > 0.0F)
+            attr += tr("%n star(s)", "", roundf(stars * 10.0F)) + ", ";
     }
     if (!colorcode.isEmpty())
         attr += colorcode + ", ";
@@ -827,11 +821,11 @@ void ProgDetails::loadPage(void)
 
         if (query.exec() && query.next())
         {
-            recordingProfile = m_progInfo.i18n(query.value(0).toString());
+            recordingProfile = ProgramInfo::i18n(query.value(0).toString());
         }
-        recordingGroup = m_progInfo.i18n(m_progInfo.GetRecordingGroup());
-        storageGroup   = m_progInfo.i18n(m_progInfo.GetStorageGroup());
-        playbackGroup  = m_progInfo.i18n(m_progInfo.GetPlaybackGroup());
+        recordingGroup = ProgramInfo::i18n(m_progInfo.GetRecordingGroup());
+        storageGroup   = ProgramInfo::i18n(m_progInfo.GetStorageGroup());
+        playbackGroup  = ProgramInfo::i18n(m_progInfo.GetPlaybackGroup());
     }
     else if (m_progInfo.GetRecordingRuleID())
     {

@@ -25,7 +25,7 @@ class MUI_PUBLIC MythImageReader: public QImageReader
 
   private:
     QString        m_fileName;
-    QNetworkReply *m_networkReply;
+    QNetworkReply *m_networkReply {nullptr};
 };
 
 class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
@@ -39,8 +39,8 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     MythPainter* GetParent(void)        { return m_Parent;   }
     void SetParent(MythPainter *parent) { m_Parent = parent; }
 
-    virtual int IncrRef(void);
-    virtual int DecrRef(void);
+    int IncrRef(void) override; // ReferenceCounter
+    int DecrRef(void) override; // ReferenceCounter
 
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() const { return m_Changed; }
@@ -106,24 +106,24 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
                              bool drawBoundary=true,
                              FillDirection direction = FillTopToBottom);
 
-    bool m_Changed;
-    MythPainter *m_Parent;
+    bool           m_Changed       {false};
+    MythPainter   *m_Parent        {nullptr};
 
-    bool m_isGradient;
-    QColor m_gradBegin;
-    QColor m_gradEnd;
-    int m_gradAlpha;
-    FillDirection m_gradDirection;
+    bool           m_isGradient    {false};
+    QColor         m_gradBegin     {"#000000"};
+    QColor         m_gradEnd       {"#FFFFFF"};
+    int            m_gradAlpha     {255};
+    FillDirection  m_gradDirection {FillTopToBottom};
 
-    bool m_isOriented;
-    bool m_isReflected;
-    bool m_isYUV;
+    bool           m_isOriented    {false};
+    bool           m_isReflected   {false};
+    bool           m_isYUV         {false};
 
-    unsigned int m_imageId;
+    unsigned int   m_imageId       {0};
 
-    QString m_FileName;
+    QString        m_FileName;
 
-    bool m_cached;
+    bool           m_cached        {false};
 
     static MythUIHelper *s_ui;
 };

@@ -26,13 +26,14 @@
 #include "mythlogging.h"
 #include "cetonrtsp.h"
 
-#define LOC QString("IPTVSH(%1): ").arg(_device)
+#define LOC QString("IPTVSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<QString,IPTVStreamHandler*> IPTVStreamHandler::s_iptvhandlers;
 QMap<QString,uint>               IPTVStreamHandler::s_iptvhandlers_refcnt;
 QMutex                           IPTVStreamHandler::s_iptvhandlers_lock;
 
-IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning)
+IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
+                                          int inputid)
 {
     QMutexLocker locker(&s_iptvhandlers_lock);
 
@@ -42,40 +43,40 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning)
 
     if (it == s_iptvhandlers.end())
     {
-        IPTVStreamHandler *newhandler = new IPTVStreamHandler(tuning);
+        IPTVStreamHandler *newhandler = new IPTVStreamHandler(tuning, inputid);
         newhandler->Start();
         s_iptvhandlers[devkey] = newhandler;
         s_iptvhandlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("IPTVSH: Creating new stream handler %1 for %2")
-            .arg(devkey).arg(tuning.GetDeviceName()));
+            QString("IPTVSH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()));
     }
     else
     {
         s_iptvhandlers_refcnt[devkey]++;
         uint rcount = s_iptvhandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("IPTVSH: Using existing stream handler %1 for %2")
-            .arg(devkey).arg(tuning.GetDeviceName()) +
+            QString("IPTVSH[%1]: Using existing stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
     return s_iptvhandlers[devkey];
 }
 
-void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
+void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&s_iptvhandlers_lock);
 
-    QString devname = ref->_device;
+    QString devname = ref->m_device;
 
     QMap<QString,uint>::iterator rit = s_iptvhandlers_refcnt.find(devname);
     if (rit == s_iptvhandlers_refcnt.end())
         return;
 
-    LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Return(%1) has %2 handlers")
-        .arg(devname).arg(*rit));
+    LOG(VB_RECORD, LOG_INFO, QString("IPTVSH[%1]: Return(%2) has %3 handlers")
+        .arg(inputid).arg(devname).arg(*rit));
 
     if (*rit > 1)
     {
@@ -87,8 +88,8 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devname);
     if ((it != s_iptvhandlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("IPTVSH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         ref->Stop();
         delete *it;
         s_iptvhandlers.erase(it);
@@ -96,22 +97,17 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("IPTVSH Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("IPTVSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     s_iptvhandlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
-IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning) :
-    StreamHandler(tuning.GetDeviceKey()),
-    m_tuning(tuning),
-    m_write_helper(nullptr),
-    m_buffer(nullptr),
-    m_rtsp_rtp_port(0),
-    m_rtsp_rtcp_port(0),
-    m_rtsp_ssrc(0)
+IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning, int inputid)
+    : StreamHandler(tuning.GetDeviceKey(), inputid)
+    , m_tuning(tuning)
 {
     memset(m_sockets, 0, sizeof(m_sockets));
     memset(m_read_helpers, 0, sizeof(m_read_helpers));
@@ -198,10 +194,10 @@ void IPTVStreamHandler::run(void)
             }
             else
             {
-                for (int i=0; i < list.size(); i++)
+                for (int j=0; j < list.size(); j++)
                 {
-                    dest_addr = list[i];
-                    if (list[i].protocol() == QAbstractSocket::IPv6Protocol)
+                    dest_addr = list[j];
+                    if (list[j].protocol() == QAbstractSocket::IPv6Protocol)
                     {
                         // We prefer first IPv4
                         break;
@@ -348,7 +344,7 @@ IPTVStreamHandlerReadHelper::IPTVStreamHandlerReadHelper(
             this,     SLOT(ReadPending()));
 }
 
-#define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->_device)
+#define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->m_device)
 
 void IPTVStreamHandlerReadHelper::ReadPending(void)
 {
@@ -404,13 +400,6 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
     }
 }
 
-IPTVStreamHandlerWriteHelper::IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p)
-  : m_parent(p),                m_timer(0),             m_timer_rtcp(0),
-    m_last_sequence_number(0),  m_last_timestamp(0),    m_previous_last_sequence_number(0),
-    m_lost(0),                  m_lost_interval(0)
-{
-}
-
 IPTVStreamHandlerWriteHelper::~IPTVStreamHandlerWriteHelper()
 {
     if (m_timer)
@@ -446,11 +435,11 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
 
         int remainder = 0;
         {
-            QMutexLocker locker(&m_parent->_listener_lock);
+            QMutexLocker locker(&m_parent->m_listener_lock);
             QByteArray &data = packet.GetDataReference();
             IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->_stream_data_list.begin();
-            for (; sit != m_parent->_stream_data_list.end(); ++sit)
+            sit = m_parent->m_stream_data_list.begin();
+            for (; sit != m_parent->m_stream_data_list.end(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     reinterpret_cast<const unsigned char*>(data.data()),
@@ -505,18 +494,18 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
                 QString("Processing RTP packet(seq:%1 ts:%2)")
                 .arg(m_last_sequence_number).arg(m_last_timestamp));
 
-            m_parent->_listener_lock.lock();
+            m_parent->m_listener_lock.lock();
 
             int remainder = 0;
             IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->_stream_data_list.begin();
-            for (; sit != m_parent->_stream_data_list.end(); ++sit)
+            sit = m_parent->m_stream_data_list.begin();
+            for (; sit != m_parent->m_stream_data_list.end(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     ts_packet.GetTSData(), ts_packet.GetTSDataSize());
             }
 
-            m_parent->_listener_lock.unlock();
+            m_parent->m_listener_lock.unlock();
 
             if (remainder != 0)
             {

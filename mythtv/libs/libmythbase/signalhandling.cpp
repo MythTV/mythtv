@@ -20,7 +20,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "signalhandling.h"
 
-int SignalHandler::sigFd[2];
+int SignalHandler::s_sigFd[2];
 volatile bool SignalHandler::s_exit_program = false;
 QMutex SignalHandler::s_singletonLock;
 SignalHandler *SignalHandler::s_singleton;
@@ -58,7 +58,7 @@ static void sig_str_init(void)
 QList<int> SignalHandler::s_defaultHandlerList;
 
 SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
-    QObject(parent), m_notifier(nullptr)
+    QObject(parent)
 {
     s_exit_program = false; // set here due to "C++ static initializer madness"
     sig_str_init();
@@ -88,12 +88,12 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     s_defaultHandlerList << SIGRTMIN;
 #endif
 
-    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigFd))
+    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigFd))
     {
         cerr << "Couldn't create socketpair" << endl;
         return;
     }
-    m_notifier = new QSocketNotifier(sigFd[1], QSocketNotifier::Read, this);
+    m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
     connect(m_notifier, SIGNAL(activated(int)), this, SLOT(handleSignal()));
 
     QList<int>::iterator it = signallist.begin();
@@ -118,8 +118,8 @@ SignalHandler::~SignalHandler()
 #ifndef _WIN32
     if (m_notifier)
     {
-        ::close(sigFd[0]);
-        ::close(sigFd[1]);
+        ::close(s_sigFd[0]);
+        ::close(s_sigFd[1]);
         delete m_notifier;
     }
 
@@ -145,8 +145,7 @@ void SignalHandler::Init(QList<int> &signallist, QObject *parent)
 void SignalHandler::Done(void)
 {
     QMutexLocker locker(&s_singletonLock);
-    if (s_singleton)
-        delete s_singleton;
+    delete s_singleton;
 }
 
 
@@ -227,7 +226,7 @@ void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
     int size  = sizeof(SignalInfo);
     char *buffer = (char *)&signalInfo;
     do {
-        int written = ::write(sigFd[0], &buffer[index], size);
+        int written = ::write(s_sigFd[0], &buffer[index], size);
         // If there's an error, the signal will not be seen be the application,
         // but we can't keep trying.
         if (written < 0)
@@ -291,7 +290,7 @@ void SignalHandler::handleSignal(void)
     m_notifier->setEnabled(false);
 
     SignalInfo signalInfo;
-    int ret = ::read(sigFd[1], &signalInfo, sizeof(SignalInfo));
+    int ret = ::read(s_sigFd[1], &signalInfo, sizeof(SignalInfo));
     bool infoComplete = (ret == sizeof(SignalInfo));
     int signum = (infoComplete ? signalInfo.signum : 0);
 

@@ -43,23 +43,23 @@ using namespace std;
 class LIRCPriv
 {
   public:
-    LIRCPriv() : lircState(nullptr), lircConfig(nullptr) {}
+    LIRCPriv() = default;
     ~LIRCPriv()
     {
-        if (lircState)
+        if (m_lircState)
         {
-            lirc_deinit(lircState);
-            lircState = nullptr;
+            lirc_deinit(m_lircState);
+            m_lircState = nullptr;
         }
-        if (lircConfig)
+        if (m_lircConfig)
         {
-            lirc_freeconfig(lircConfig);
-            lircConfig = nullptr;
+            lirc_freeconfig(m_lircConfig);
+            m_lircConfig = nullptr;
         }
     }
 
-    struct lirc_state  *lircState;
-    struct lirc_config *lircConfig;
+    struct lirc_state  *m_lircState  {nullptr};
+    struct lirc_config *m_lircConfig {nullptr};
 };
 
 QMutex LIRC::lirclib_lock;
@@ -87,9 +87,6 @@ LIRC::LIRC(QObject *main_window,
       retryCount(0),
       d(new LIRCPriv())
 {
-    lircdDevice.detach();
-    program.detach();
-    configFile.detach();
     buf.resize(0);
 }
 
@@ -167,7 +164,7 @@ static QByteArray get_ip(const QString &h)
 bool LIRC::Init(void)
 {
     QMutexLocker locker(&lock);
-    if (d->lircState)
+    if (d->m_lircState)
         return true;
 
     uint64_t vtype = (0 == retryCount) ? VB_GENERAL : VB_FILE;
@@ -293,26 +290,26 @@ bool LIRC::Init(void)
         }
     }
 
-    d->lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", nullptr, 0);
-    if (!d->lircState)
+    d->m_lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", nullptr, 0);
+    if (!d->m_lircState)
     {
         close(lircd_socket);
         return false;
     }
-    d->lircState->lirc_lircd = lircd_socket;
+    d->m_lircState->lirc_lircd = lircd_socket;
 
     // parse the config file
-    if (!d->lircConfig)
+    if (!d->m_lircConfig)
     {
         QMutexLocker static_lock(&lirclib_lock);
         QByteArray cfg = configFile.toLocal8Bit();
-        if (lirc_readconfig(d->lircState, cfg.constData(), &d->lircConfig, nullptr))
+        if (lirc_readconfig(d->m_lircState, cfg.constData(), &d->m_lircConfig, nullptr))
         {
             LOG(vtype, LOG_ERR, LOC +
                 QString("Failed to read config file '%1'").arg(configFile));
 
-            lirc_deinit(d->lircState);
-            d->lircState = nullptr;
+            lirc_deinit(d->m_lircState);
+            d->m_lircState = nullptr;
             return false;
         }
     }
@@ -328,7 +325,7 @@ void LIRC::start(void)
 {
     QMutexLocker locker(&lock);
 
-    if (!d->lircState)
+    if (!d->m_lircState)
     {
         LOG(VB_GENERAL, LOG_ERR, "start() called without lircd socket");
         return;
@@ -351,7 +348,7 @@ void LIRC::Process(const QByteArray &data)
     // lirc_code2char will make code point to a static datafer..
     char *code = nullptr;
     int ret = lirc_code2char(
-        d->lircState, d->lircConfig, const_cast<char*>(data.constData()), &code);
+        d->m_lircState, d->m_lircConfig, const_cast<char*>(data.constData()), &code);
 
     while ((0 == ret) && code)
     {
@@ -406,7 +403,7 @@ void LIRC::Process(const QByteArray &data)
             QCoreApplication::postEvent(m_mainWindow, keyReleases[i]);
 
         ret = lirc_code2char(
-            d->lircState, d->lircConfig, const_cast<char*>(data.constData()), &code);
+            d->m_lircState, d->m_lircConfig, const_cast<char*>(data.constData()), &code);
     }
 }
 
@@ -422,7 +419,7 @@ void LIRC::run(void)
         if (eofCount && retryCount)
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        if ((eofCount >= 10) || (!d->lircState))
+        if ((eofCount >= 10) || (!d->m_lircState))
         {
             QMutexLocker locker(&lock);
             eofCount = 0;
@@ -435,8 +432,8 @@ void LIRC::run(void)
             }
             LOG(VB_FILE, LOG_WARNING, LOC + "EOF -- reconnecting");
 
-            lirc_deinit(d->lircState);
-            d->lircState = nullptr;
+            lirc_deinit(d->m_lircState);
+            d->m_lircState = nullptr;
 
             if (Init())
                 retryCount = 0;
@@ -449,14 +446,14 @@ void LIRC::run(void)
 
         fd_set readfds;
         FD_ZERO(&readfds);
-        FD_SET(d->lircState->lirc_lircd, &readfds);
+        FD_SET(d->m_lircState->lirc_lircd, &readfds);
 
         // the maximum time select() should wait
         struct timeval timeout;
         timeout.tv_sec = 1; // 1 second
         timeout.tv_usec = 100 * 1000; // 100 ms
 
-        int ret = select(d->lircState->lirc_lircd + 1, &readfds, nullptr, nullptr,
+        int ret = select(d->m_lircState->lirc_lircd + 1, &readfds, nullptr, nullptr,
                          &timeout);
 
         if (ret < 0 && errno != EINTR)
@@ -490,7 +487,7 @@ QList<QByteArray> LIRC::GetCodes(void)
 
     while (true)
     {
-        len = read(d->lircState->lirc_lircd, buf.data() + buf_offset, 128);
+        len = read(d->m_lircState->lirc_lircd, buf.data() + buf_offset, 128);
         if (len >= 0)
             break;
 

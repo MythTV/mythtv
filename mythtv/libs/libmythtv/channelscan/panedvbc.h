@@ -38,25 +38,25 @@ class PaneDVBC : public GroupSetting
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
-                                      pfrequency   = new ScanFrequency(),
-                                      psymbolrate  = new ScanSymbolRateDVBC(),
-                                      pinversion   = new ScanInversion(),
-                                      pmodulation = new ScanModulation(),
-                                      pfec        = new ScanFec()});
+                                      m_pfrequency   = new ScanFrequency(),
+                                      m_psymbolrate  = new ScanSymbolRateDVBC(),
+                                      m_pinversion   = new ScanInversion(),
+                                      m_pmodulation = new ScanModulation(),
+                                      m_pfec        = new ScanFec()});
     }
 
-    QString frequency(void)  const { return pfrequency->getValue();  }
-    QString symbolrate(void) const { return psymbolrate->getValue(); }
-    QString inversion(void)  const { return pinversion->getValue();  }
-    QString fec(void)        const { return pfec->getValue();        }
-    QString modulation(void) const { return pmodulation->getValue(); }
+    QString frequency(void)  const { return m_pfrequency->getValue();  }
+    QString symbolrate(void) const { return m_psymbolrate->getValue(); }
+    QString inversion(void)  const { return m_pinversion->getValue();  }
+    QString fec(void)        const { return m_pfec->getValue();        }
+    QString modulation(void) const { return m_pmodulation->getValue(); }
 
   protected:
-    ScanFrequency  *pfrequency;
-    ScanSymbolRateDVBC *psymbolrate;
-    ScanInversion  *pinversion;
-    ScanModulation *pmodulation;
-    ScanFec        *pfec;
+    ScanFrequency      *m_pfrequency  {nullptr};
+    ScanSymbolRateDVBC *m_psymbolrate {nullptr};
+    ScanInversion      *m_pinversion  {nullptr};
+    ScanModulation     *m_pmodulation {nullptr};
+    ScanFec            *m_pfec        {nullptr};
 };
 
 #endif // _PANE_DVBC_H_

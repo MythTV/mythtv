@@ -43,25 +43,21 @@ MetaIO* MetaIO::createTagger(const QString& filename)
 
     if (extension == "mp3" || extension == "mp2")
         return new MetaIOID3;
-    else if (extension == "ogg" || extension == "oga")
+    if (extension == "ogg" || extension == "oga")
         return new MetaIOOggVorbis;
-    else if (extension == "flac")
+    if (extension == "flac")
     {
         MetaIOFLACVorbis *tagger = new MetaIOFLACVorbis;
         if (tagger->TagExists(filename))
             return tagger;
-        else
-        {
-            delete tagger;
-            return new MetaIOID3;
-        }
+        delete tagger;
+        return new MetaIOID3;
     }
-    else if (extension == "m4a")
+    if (extension == "m4a")
         return new MetaIOMP4;
-    else if (extension == "wv")
+    if (extension == "wv")
         return new MetaIOWavPack;
-    else
-        return new MetaIOAVFComment;
+    return new MetaIOAVFComment;
 }
 
 // static

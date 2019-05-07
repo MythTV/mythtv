@@ -22,7 +22,7 @@ class HLSRecStream
     typedef QMap<QString, AES_KEY* >  AESKeyMap;
 #endif
 
-    HLSRecStream(int seq, uint64_t bitrate, const QString& uri);
+    HLSRecStream(int seq, uint64_t bitrate, const QString& url);
     ~HLSRecStream(void);
 
     int Read(uint8_t* buffer, int len);
@@ -75,26 +75,26 @@ class HLSRecStream
     void AverageBandwidth(int64_t bandwidth);
 
   private:
-    int         m_id;              // program id
-    int         m_version;         // protocol version should be 1
-    int         m_targetduration;  // maximum duration per segment (s)
-    uint64_t    m_curbyterate;
-    uint64_t    m_bitrate;         // bitrate of stream content (bits per second)
-    int64_t     m_duration;        // duration of the stream in seconds
-    bool        m_live;
-    int64_t     m_bandwidth; // measured average download bandwidth (bits/second)
-    double      m_sumbandwidth;
+    int         m_id;                     // program id
+    int         m_version        {1};     // protocol version should be 1
+    int         m_targetduration {-1};    // maximum duration per segment (s)
+    uint64_t    m_curbyterate    {0};
+    uint64_t    m_bitrate;                // bitrate of stream content (bits per second)
+    int64_t     m_duration       {0LL};   // duration of the stream in seconds
+    bool        m_live           {true};
+    int64_t     m_bandwidth      {0};     // measured average download bandwidth (bits/second)
+    double      m_sumbandwidth   {0.0};
     QQueue<int64_t> m_bandwidth_segs;
 
-    QString     m_url;             // uri to m3u8
+    QString     m_url;                    // uri to m3u8
     mutable QMutex  m_lock;
-    bool        m_cache;           // allow caching
-    int         m_retries;
+    bool        m_cache          {false}; // allow caching
+    int         m_retries        {0};
 
 #ifdef USING_LIBCRYPTO
   private:
     QString     m_keypath;              // URL path of the encrypted key
-    bool        m_ivloaded;
+    bool        m_ivloaded       {false};
     uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
     AESKeyMap   m_aeskeys;       // AES-128 keys by path
 #endif // USING_LIBCRYPTO

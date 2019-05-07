@@ -13,45 +13,42 @@
 #endif
 #include "firewirechannel.h"
 
-#define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(FirewireChannel::GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
                                  const FireWireDBOptions &firewire_opts) :
     DTVChannel(parent),
-    videodevice(_videodevice),
-    fw_opts(firewire_opts),
-    device(nullptr),
-    current_channel(0),
-    isopen(false)
+    m_videodevice(_videodevice),
+    m_fw_opts(firewire_opts)
 {
-    uint64_t guid = string_to_guid(videodevice);
+    uint64_t guid = string_to_guid(m_videodevice);
     uint subunitid = 0; // we only support first tuner on STB...
 
 #ifdef USING_LINUX_FIREWIRE
-    device = new LinuxFirewireDevice(
-        guid, subunitid, fw_opts.speed,
-        LinuxFirewireDevice::kConnectionP2P == (uint) fw_opts.connection);
+    m_device = new LinuxFirewireDevice(
+        guid, subunitid, m_fw_opts.speed,
+        LinuxFirewireDevice::kConnectionP2P == (uint) m_fw_opts.connection);
 #endif // USING_LINUX_FIREWIRE
 
 #ifdef USING_OSX_FIREWIRE
-    device = new DarwinFirewireDevice(guid, subunitid, fw_opts.speed);
+    m_device = new DarwinFirewireDevice(guid, subunitid, m_fw_opts.speed);
 #endif // USING_OSX_FIREWIRE
 }
 
 FirewireChannel::~FirewireChannel()
 {
-    Close();
-    delete device;
+    FirewireChannel::Close();
+    delete m_device;
 }
 
 bool FirewireChannel::Open(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Open()");
 
-    if (!device)
+    if (!m_device)
         return false;
 
-    if (isopen)
+    if (m_isopen)
         return true;
 
     if (!InitializeInput())
@@ -60,19 +57,19 @@ bool FirewireChannel::Open(void)
     if (!m_inputid)
         return false;
 
-    if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
+    if (!FirewireDevice::IsSTBSupported(m_fw_opts.model) &&
         !IsExternalChannelChangeInUse())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Model: '%1' is not supported.").arg(fw_opts.model));
+            QString("Model: '%1' is not supported.").arg(m_fw_opts.model));
 
         return false;
     }
 
-    if (!device->OpenPort())
+    if (!m_device->OpenPort())
         return false;
 
-    isopen = true;
+    m_isopen = true;
 
     return true;
 }
@@ -80,21 +77,21 @@ bool FirewireChannel::Open(void)
 void FirewireChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
-    if (isopen)
+    if (m_isopen)
     {
-        device->ClosePort();
-        isopen = false;
+        m_device->ClosePort();
+        m_isopen = false;
     }
 }
 
 QString FirewireChannel::GetDevice(void) const
 {
-    return videodevice;
+    return m_videodevice;
 }
 
 bool FirewireChannel::SetPowerState(bool on)
 {
-    if (!isopen)
+    if (!m_isopen)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "SetPowerState() called on closed FirewireChannel.");
@@ -102,12 +99,12 @@ bool FirewireChannel::SetPowerState(bool on)
         return false;
     }
 
-    return device->SetPowerState(on);
+    return m_device->SetPowerState(on);
 }
 
 FirewireDevice::PowerState FirewireChannel::GetPowerState(void) const
 {
-    if (!isopen)
+    if (!m_isopen)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "GetPowerState() called on closed FirewireChannel.");
@@ -115,7 +112,7 @@ FirewireDevice::PowerState FirewireChannel::GetPowerState(void) const
         return FirewireDevice::kAVCPowerQueryFailed;
     }
 
-    return device->GetPowerState();
+    return m_device->GetPowerState();
 }
 
 bool FirewireChannel::Retune(void)
@@ -130,9 +127,9 @@ bool FirewireChannel::Retune(void)
         return false;
     }
 
-    if (current_channel)
+    if (m_current_channel)
     {
-        QString freqid = QString::number(current_channel);
+        QString freqid = QString::number(m_current_channel);
         return Tune(freqid, 0);
     }
 
@@ -156,10 +153,10 @@ bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
         return true; // signal monitor will call retune later...
     }
 
-    if (!device->SetChannel(fw_opts.model, 0, channel))
+    if (!m_device->SetChannel(m_fw_opts.model, 0, channel))
         return false;
 
-    current_channel = channel;
+    m_current_channel = channel;
 
     return true;
 }

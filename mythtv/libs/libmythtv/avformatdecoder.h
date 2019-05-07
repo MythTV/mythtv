@@ -97,11 +97,12 @@ class AvFormatDecoder : public DecoderBase
                     PlayerFlags flags);
     virtual ~AvFormatDecoder();
 
-    virtual void SetEof(bool eof);
+    void SetEof(bool eof) override; // DecoderBase
 
     void CloseCodecs();
     void CloseContext();
-    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
+    void Reset(bool reset_video_data, bool seek_reset,
+               bool reset_file) override; // DecoderBase
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
@@ -112,72 +113,72 @@ class AvFormatDecoder : public DecoderBase
     /// Open our file and set up or audio and video parameters.
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
                  char testbuf[kDecoderProbeBufferSize],
-                 int testbufsize = kDecoderProbeBufferSize);
+                 int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    virtual bool GetFrame(DecodeType); // DecoderBase
+    bool GetFrame(DecodeType) override; // DecoderBase
 
-    virtual bool IsLastFrameKey(void) const { return false; } // DecoderBase
+    bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
-    virtual bool IsCodecMPEG(void) const
-        { return codec_is_mpeg; } // DecoderBase
-
-    /// This is a No-op for this class.
-    void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
-                           { (void)rb; (void)storevid; (void)timecodeOffset;}
+    bool IsCodecMPEG(void) const override // DecoderBase
+        { return m_codec_is_mpeg; }
 
     /// This is a No-op for this class.
-    void SetRawAudioState(bool state) { (void)state; }
+    void WriteStoredData(RingBuffer *rb, bool storevid,
+                         long timecodeOffset) override // DecoderBase
+        { (void)rb; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.
-    bool GetRawAudioState(void) const { return false; }
+    void SetRawAudioState(bool state) override { (void)state; } // DecoderBase
 
     /// This is a No-op for this class.
-    void SetRawVideoState(bool state) { (void)state; }
+    bool GetRawAudioState(void) const override { return false; } // DecoderBase
 
     /// This is a No-op for this class.
-    bool GetRawVideoState(void) const { return false; }
+    void SetRawVideoState(bool state) override { (void)state; } // DecoderBase
 
     /// This is a No-op for this class.
-    long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
+    bool GetRawVideoState(void) const override { return false; } // DecoderBase
 
-    QString      GetCodecDecoderName(void) const;
-    QString      GetRawEncodingType(void);
-    MythCodecID  GetVideoCodecID(void) const { return video_codec_id; }
-    void        *GetVideoCodecPrivate(void);
+    /// This is a No-op for this class.
+    long UpdateStoredFrameNum(long frame) override { (void)frame; return 0;} // DecoderBase
 
-    virtual void SetDisablePassThrough(bool disable);
-    virtual void ForceSetupAudioStream(void);
+    QString      GetCodecDecoderName(void) const override; // DecoderBase
+    QString      GetRawEncodingType(void) override; // DecoderBase
+    MythCodecID  GetVideoCodecID(void) const override { return m_video_codec_id; } // DecoderBase
+    void        *GetVideoCodecPrivate(void) override; // DecoderBase
+
+    void SetDisablePassThrough(bool disable) override; // DecoderBase
+    void ForceSetupAudioStream(void) override; // DecoderBase
     void AddTextData(unsigned char *buf, int len, int64_t timecode, char type);
 
-    virtual QString GetTrackDesc(uint type, uint trackNo) const;
-    virtual int SetTrack(uint type, int trackNo);
+    QString GetTrackDesc(uint type, uint trackNo) const override; // DecoderBase
+    int SetTrack(uint type, int trackNo) override; // DecoderBase
 
     int ScanStreams(bool novideo);
     int FindStreamInfo(void);
 
-    virtual int  GetNumChapters();
-    virtual void GetChapterTimes(QList<long long> &times);
-    virtual int  GetCurrentChapter(long long framesPlayed);
-    virtual long long GetChapter(int chapter);
-    virtual bool DoRewind(long long desiredFrame, bool doflush = true);
-    virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
-    virtual void SetIdrOnlyKeyframes(bool value) {
-        m_h264_parser->use_I_forKeyframes(!value);
-    }
+    int  GetNumChapters() override; // DecoderBase
+    void GetChapterTimes(QList<long long> &times) override; // DecoderBase
+    int  GetCurrentChapter(long long framesPlayed) override; // DecoderBase
+    long long GetChapter(int chapter) override; // DecoderBase
+    bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
+    bool DoFastForward(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
+    void SetIdrOnlyKeyframes(bool value) override // DecoderBase
+        { m_h264_parser->use_I_forKeyframes(!value); }
 
-    virtual int64_t NormalizeVideoTimecode(int64_t timecode);
+    int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
 
-    virtual int  GetTeletextDecoderType(void) const;
+    int  GetTeletextDecoderType(void) const override; // DecoderBase
 
-    virtual QString GetXDS(const QString&) const;
-    virtual QByteArray GetSubHeader(uint trackNo) const;
-    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
-                                   QByteArray &data);
+    QString GetXDS(const QString&) const override; // DecoderBase
+    QByteArray GetSubHeader(uint trackNo) const override; // DecoderBase
+    void GetAttachmentData(uint trackNo, QByteArray &filename,
+                           QByteArray &data) override; // DecoderBase
 
     // MHEG stuff
-    virtual bool SetAudioByComponentTag(int tag);
-    virtual bool SetVideoByComponentTag(int tag);
+    bool SetAudioByComponentTag(int tag) override; // DecoderBase
+    bool SetVideoByComponentTag(int tag) override; // DecoderBase
 
     // Stream language info
     virtual int GetTeletextLanguage(uint lang_idx) const;
@@ -186,15 +187,19 @@ class AvFormatDecoder : public DecoderBase
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
+  private:
+    AvFormatDecoder(const AvFormatDecoder &) = delete;            // not copyable
+    AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
-    virtual int AutoSelectTrack(uint type);
+    int AutoSelectTrack(uint type) override; // DecoderBase
 
-    void ScanATSCCaptionStreams(int av_stream_index);
+    void ScanATSCCaptionStreams(int av_index);
     void UpdateATSCCaptionTracks(void);
     void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
-    void ScanTeletextCaptions(int av_stream_index);
+    void ScanTeletextCaptions(int av_index);
     void ScanRawTextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
     int  AutoSelectAudioTrack(void);
@@ -207,6 +212,8 @@ class AvFormatDecoder : public DecoderBase
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic,
                               int flags);
     friend int get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic,
+                              int flags);
+    friend int get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic,
                               int flags);
     friend void release_avf_buffer(void *opaque, uint8_t *data);
 
@@ -242,10 +249,10 @@ class AvFormatDecoder : public DecoderBase
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
-    void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
+    void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
 
     inline bool DecoderWillDownmix(const AVCodecContext *ctx);
-    bool DoPassThrough(const AVCodecParameters *ctx, bool withProfile=true);
+    bool DoPassThrough(const AVCodecParameters *par, bool withProfile=true);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);
     void RemoveAudioStreams();
@@ -260,9 +267,9 @@ class AvFormatDecoder : public DecoderBase
     void av_update_stream_timings_video(AVFormatContext *ic);
     bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
-    virtual void UpdateFramesPlayed(void);
-    virtual bool DoRewindSeek(long long desiredFrame);
-    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
+    void UpdateFramesPlayed(void) override; // DecoderBase
+    bool DoRewindSeek(long long desiredFrame) override; // DecoderBase
+    void DoFastForwardSeek(long long desiredFrame, bool &needflush) override; // DecoderBase
     virtual void StreamChangeCheck(void);
     virtual void PostProcessTracks(void) { }
     virtual bool IsValidStream(int /*streamid*/) {return true;}
@@ -272,113 +279,114 @@ class AvFormatDecoder : public DecoderBase
 
     virtual int ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
 
-    PrivateDecoder *private_dec;
+    PrivateDecoder    *m_private_dec                  {nullptr};
 
-    bool is_db_ignored;
+    bool               m_is_db_ignored;
 
-    H264Parser *m_h264_parser;
+    H264Parser        *m_h264_parser                  {nullptr};
 
-    AVFormatContext *ic;
+    AVFormatContext   *m_ic                           {nullptr};
     // AVFormatParameters params;
 
-    URLContext readcontext;
+    URLContext         m_readcontext;
 
-    int frame_decoded;
-    VideoFrame *decoded_video_frame;
-    AVFRingBuffer *avfRingBuffer;
+    int                m_frame_decoded                {0};
+    VideoFrame        *m_decoded_video_frame          {nullptr};
+    AVFRingBuffer     *m_avfRingBuffer                {nullptr};
 
-    struct SwsContext *sws_ctx;
-    bool directrendering;
+    struct SwsContext *m_sws_ctx                      {nullptr};
+    bool               m_directrendering              {false};
 
-    bool no_dts_hack;
-    bool dorewind;
+    bool               m_no_dts_hack                  {false};
+    bool               m_dorewind                     {false};
 
-    bool gopset;
+    bool               m_gopset                       {false};
     /// A flag to indicate that we've seen a GOP frame.  Used in junction with seq_count.
-    bool seen_gop;
-    int seq_count; ///< A counter used to determine if we need to force a call to HandleGopStart
+    bool               m_seen_gop                     {false};
+    /// A counter used to determine if we need to force a call to HandleGopStart
+    int                m_seq_count                    {0};
 
-    QList<AVPacket*> storedPackets;
+    QList<AVPacket*>   m_storedPackets;
 
-    int prevgoppos;
+    int                m_prevgoppos                   {0};
 
     // GetFrame
-    bool gotVideoFrame;
-    bool hasVideo;
-    bool needDummyVideoFrames;
-    bool skipaudio;
-    bool allowedquit;
+    bool               m_gotVideoFrame                {false};
+    bool               m_hasVideo                     {false};
+    bool               m_needDummyVideoFrames         {false};
+    bool               m_skipaudio                    {false};
+    bool               m_allowedquit                  {false};
 
-    uint32_t  start_code_state;
+    uint32_t           m_start_code_state             {0xffffffff};
 
-    long long lastvpts;
-    long long lastapts;
-    long long lastccptsu;
-    long long firstvpts;
-    bool      firstvptsinuse;
+    long long          m_lastvpts                     {0};
+    long long          m_lastapts                     {0};
+    long long          m_lastccptsu                   {0};
+    long long          m_firstvpts                    {0};
+    bool               m_firstvptsinuse               {false};
 
-    int64_t faulty_pts;
-    int64_t faulty_dts;
-    int64_t last_pts_for_fault_detection;
-    int64_t last_dts_for_fault_detection;
-    bool pts_detected;
-    bool reordered_pts_detected;
-    bool pts_selected;
+    int64_t            m_faulty_pts                   {0};
+    int64_t            m_faulty_dts                   {0};
+    int64_t            m_last_pts_for_fault_detection {0};
+    int64_t            m_last_dts_for_fault_detection {0};
+    bool               m_pts_detected                 {false};
+    bool               m_reordered_pts_detected       {false};
+    bool               m_pts_selected                 {true};
     // set use_frame_timing true to utilize the pts values in returned
     // frames. Set fale to use deprecated method.
-    bool use_frame_timing;
+    bool               m_use_frame_timing             {false};
 
-    bool force_dts_timestamps;
+    bool               m_force_dts_timestamps         {false};
 
-    PlayerFlags playerFlags;
-    MythCodecID video_codec_id;
+    PlayerFlags        playerFlags;
+    MythCodecID        m_video_codec_id               {kCodec_NONE};
 
-    int maxkeyframedist;
-    int averror_count;
+    int                m_maxkeyframedist              {-1};
+    int                m_averror_count                {0};
 
     // Caption/Subtitle/Teletext decoders
-    uint             ignore_scte;
-    uint             invert_scte_field;
-    uint             last_scte_field;
-    CC608Decoder     *ccd608;
-    CC708Decoder     *ccd708;
-    TeletextDecoder  *ttd;
-    int               cc608_parity_table[256];
+    uint               m_ignore_scte                  {0};
+    uint               m_invert_scte_field            {0};
+    uint               m_last_scte_field              {0};
+    CC608Decoder      *m_ccd608                       {nullptr};
+    CC708Decoder      *m_ccd708                       {nullptr};
+    TeletextDecoder   *m_ttd                          {nullptr};
+    int                m_cc608_parity_table[256];
     /// Lookup table for whether a stream was seen in the PMT
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool              ccX08_in_pmt[64+4];
+    bool               m_ccX08_in_pmt[64+4];
     /// Lookup table for whether a stream is represented in the UI
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool              ccX08_in_tracks[64+4];
+    bool               m_ccX08_in_tracks[64+4];
     /// StreamInfo for 608 and 708 Captions seen in the PMT descriptor
-    QList<StreamInfo> pmt_tracks;
+    QList<StreamInfo>  m_pmt_tracks;
     /// TrackType (608 or 708) for Captions seen in the PMT descriptor
-    QList<TrackType>  pmt_track_types;
+    QList<TrackType>   m_pmt_track_types;
     /// StreamInfo for 608 and 708 Captions seen in the caption stream itself
     /// but not seen in the PMT
-    QList<StreamInfo> stream_tracks;
+    QList<StreamInfo>  m_stream_tracks;
     /// TrackType (608 or 708) for Captions seen in the caption stream itself
     /// but not seen in the PMT
-    QList<TrackType>  stream_track_types;
+    QList<TrackType>   m_stream_track_types;
 
-    // MHEG
-    InteractiveTV    *itv;                ///< MHEG/MHP decoder
+    /// MHEG/MHP decoder
+    InteractiveTV     *m_itv                          {nullptr};
 
     // Audio
-    uint8_t          *audioSamples;
-    bool              disable_passthru;
+    uint8_t           *m_audioSamples                 {nullptr};
+    bool               m_disable_passthru             {false};
 
-    AudioInfo         audioIn;
-    AudioInfo         audioOut;
+    AudioInfo          m_audioIn;
+    AudioInfo          m_audioOut;
 
-    float m_fps;
-    bool  codec_is_mpeg;
-    bool  m_processFrames;
-    bool  m_streams_changed;
+    float              m_fps                          {0.0F};
+    bool               m_codec_is_mpeg                {false};
+    bool               m_processFrames                {true};
+    bool               m_streams_changed              {false};
     // Value in milliseconds, from setting AudioReadAhead
-    int m_audioReadAhead;
+    int                m_audioReadAhead               {100};
 };
 
 #endif

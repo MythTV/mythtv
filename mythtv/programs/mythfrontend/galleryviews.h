@@ -31,7 +31,7 @@ typedef QVector<double> WeightList;
 class MarkedFiles : public QSet<int>
 {
 public:
-    MarkedFiles() : QSet(), m_valid(false), m_parent(0) {}
+    MarkedFiles() : QSet() {}
     void Initialise(int id)      { m_valid = true; m_parent = id; clear();}
     void Clear()                 { m_valid = false; clear(); }
     bool IsFor(int id)           { return m_valid && m_parent == id; }
@@ -40,8 +40,8 @@ public:
     void Invert(ImageIdList all) { QSet tmp(all.toSet() - *this); swap(tmp); }
 
 private:
-    bool m_valid;
-    int  m_parent;
+    bool m_valid  {false};
+    int  m_parent {0};
 };
 
 
@@ -49,12 +49,7 @@ private:
 class MenuSubjects
 {
 public:
-    MenuSubjects()
-        : m_selected(),          m_selectedMarked(false),
-          m_markedId(),          m_prevMarkedId(),          m_childCount(0),
-          m_hiddenMarked(false), m_unhiddenMarked(false)
-    {}
-
+    MenuSubjects() = default;
     MenuSubjects(ImagePtrK selection, int childCount,
                  MarkedFiles &marked, MarkedFiles &prevMarked,
                  bool hiddenMarked, bool unhiddenMarked)
@@ -65,30 +60,28 @@ public:
           m_hiddenMarked(hiddenMarked), m_unhiddenMarked(unhiddenMarked)
     {}
 
-    ImagePtrK   m_selected;       //!< Selected item
-    bool        m_selectedMarked; //!< Is selected item marked ?
-    ImageIdList m_markedId;       //!< Ids of all marked items
-    ImageIdList m_prevMarkedId;   //!< Ids of marked items in previous dir
-    int         m_childCount;     //!< Number of images & dirs excl parent
-    bool        m_hiddenMarked;   //!< Is any marked item hidden ?
-    bool        m_unhiddenMarked; //!< Is any marked item unhidden ?
+    ImagePtrK   m_selected       {nullptr}; //!< Selected item
+    bool        m_selectedMarked {false};   //!< Is selected item marked ?
+    ImageIdList m_markedId;                 //!< Ids of all marked items
+    ImageIdList m_prevMarkedId;             //!< Ids of marked items in previous dir
+    int         m_childCount     {0};       //!< Number of images & dirs excl parent
+    bool        m_hiddenMarked   {false};   //!< Is any marked item hidden ?
+    bool        m_unhiddenMarked {false};   //!< Is any marked item unhidden ?
 };
-
 
 //! Records info of displayed image files to enable clean-up of the UI image cache
 class FileCacheEntry
 {
 public:
     // Default constructor for QHash 'undefined entry'
-    FileCacheEntry() : m_parent(GALLERY_DB_ID), m_url(), m_thumbUrl() {}
-
+    FileCacheEntry() = default;
     FileCacheEntry(int parent, const QString &url, const QString &thumbUrl)
         : m_parent(parent), m_url(url), m_thumbUrl(thumbUrl)  {}
 
     QString ToString(int id)
     { return QString("File %1 Parent %2").arg(id).arg(m_parent); }
 
-    int     m_parent;
+    int     m_parent {GALLERY_DB_ID};
     QString m_url;
     QString m_thumbUrl;
 };
@@ -103,8 +96,7 @@ class FlatView
 {
 public:
     explicit FlatView(SlideOrderType order)
-        : m_parentId(-1), m_order(order), m_mgr(ImageManagerFe::getInstance()),
-          m_images(), m_sequence(), m_active(0) {}
+        : m_order(order), m_mgr(ImageManagerFe::getInstance()) {}
     virtual ~FlatView()         { Clear(); }
 
     int          GetParentId() const { return m_parentId; }
@@ -132,12 +124,12 @@ protected:
     void Populate(ImageList &files);
     void Cache(int id, int parent, const QString &url, const QString &thumb);
 
-    int                   m_parentId;
-    SlideOrderType        m_order;
+    int                   m_parentId {-1};
+    SlideOrderType        m_order {kOrdered};
     ImageManagerFe       &m_mgr;
     QHash<int, ImagePtrK> m_images;   //!< Image objects currently displayed
     ImageIdList           m_sequence; //!< The sequence in which to display images.
-    int                   m_active;   //!< Sequence index of current selected image
+    int                   m_active {0};   //!< Sequence index of current selected image
 
     //! Caches displayed image files
     QHash<int, FileCacheEntry> m_fileCache;
@@ -150,10 +142,7 @@ protected:
 class DirCacheEntry
 {
 public:
-    DirCacheEntry()
-        : m_parent(), m_thumbCount(),
-          m_dirCount(-1), m_fileCount(-1), m_thumbs() {}
-
+    DirCacheEntry() = default;
     DirCacheEntry(int parentId, int dirs, int files,
                   const QList<ThumbPair> &thumbs, int thumbCount)
         : m_parent(parentId), m_thumbCount(thumbCount),
@@ -161,10 +150,10 @@ public:
 
     QString ToString(int id) const;
 
-    int              m_parent;
-    int              m_thumbCount;
-    int              m_dirCount;
-    int              m_fileCount;
+    int              m_parent     {0};
+    int              m_thumbCount {0};
+    int              m_dirCount   {-1};
+    int              m_fileCount  {-1};
     QList<ThumbPair> m_thumbs;
 };
 
@@ -184,7 +173,7 @@ public:
     { return m_sequence.isEmpty() ? ImagePtrK() : m_images.value(m_sequence.at(0)); }
 
     QString      GetPosition() const;
-    bool         LoadFromDb(int parentId);
+    bool         LoadFromDb(int parentId) override; // FlatView
     void         Clear(bool resetParent = true);
     MenuSubjects GetMenuSubjects();
     QStringList  RemoveImage(int id, bool deleted = false);
@@ -198,7 +187,7 @@ public:
 
 protected:
     void         SetDirectory(int);
-    void         LoadDirThumbs(ImageItem &, int limit, int level = 0);
+    void         LoadDirThumbs(ImageItem &, int thumbsNeeded, int level = 0);
     void         PopulateThumbs(ImageItem &, int thumbsNeeded,
                                 const ImageList &files, const ImageList &dirs,
                                 int level = 0);
@@ -224,7 +213,7 @@ class TreeView : public FlatView
 public:
     explicit TreeView(SlideOrderType order) : FlatView(order) {}
 
-    bool LoadFromDb(int parentId);
+    bool LoadFromDb(int parentId) override; // FlatView
 };
 
 

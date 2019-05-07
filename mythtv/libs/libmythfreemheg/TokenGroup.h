@@ -59,19 +59,22 @@ class MHMovement
 class MHTokenGroup : public MHPresentable  
 {
   public:
-    MHTokenGroup();
-    virtual const char *ClassName() { return "TokenGroup"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    MHTokenGroup() = default;
+    const char *ClassName() override // MHRoot
+        { return "TokenGroup"; }
+   void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
+    void Activation(MHEngine *engine) override; // MHRoot
+    void Deactivation(MHEngine *engine) override; // MHRoot
 
     // Actions
-    virtual void CallActionSlot(int n, MHEngine *engine);
-    virtual void Move(int n, MHEngine *engine);
-    virtual void MoveTo(int n, MHEngine *engine) { TransferToken(n, engine); }
-    virtual void GetTokenPosition(MHRoot *pResult, MHEngine *) { pResult->SetVariableValue(m_nTokenPosition); }
+    void CallActionSlot(int n, MHEngine *engine) override; // MHRoot
+    void Move(int n, MHEngine *engine) override; // MHRoot
+    void MoveTo(int n, MHEngine *engine) override // MHRoot
+        { TransferToken(n, engine); }
+    void GetTokenPosition(MHRoot *pResult, MHEngine *) override // MHRoot
+        { pResult->SetVariableValue(m_nTokenPosition); }
 
   protected:
     void PrintContents(FILE *fd, int nTabs) const;
@@ -82,7 +85,7 @@ class MHTokenGroup : public MHPresentable
     MHOwnPtrSequence <MHActionSequence> m_NoTokenActionSlots;
 
     // Internal attributes
-    int m_nTokenPosition;
+    int m_nTokenPosition {1};  // Initial value
 };
 
 // Items in the list group consist of a Visible and a "selected" flag.
@@ -98,29 +101,32 @@ class MHListItem {
 class MHListGroup : public MHTokenGroup  
 {
   public:
-    MHListGroup();
+    MHListGroup() = default;
     ~MHListGroup();
-    virtual const char *ClassName() { return "ListGroup"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual void Preparation(MHEngine *engine);
-    virtual void Destruction(MHEngine *engine);
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
+    const char *ClassName() override // MHTokenGroup
+        { return "ListGroup"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHTokenGroup
+    void PrintMe(FILE *fd, int nTabs) const override; // MHTokenGroup
+    void Preparation(MHEngine *engine) override; // MHIngredient
+    void Destruction(MHEngine *engine) override; // MHIngredient
+    void Activation(MHEngine *engine) override; // MHTokenGroup
+    void Deactivation(MHEngine *engine) override; // MHTokenGroup
 
     // Actions
-    virtual void AddItem(int nIndex, MHRoot *pItem, MHEngine *engine);
-    virtual void DelItem(MHRoot *pItem, MHEngine *engine);
-    virtual void GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine);
-    virtual void GetListItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine);
-    virtual void GetItemStatus(int nCell, const MHObjectRef &itemDest, MHEngine *engine);
-    virtual void SelectItem(int nCell, MHEngine *engine);
-    virtual void DeselectItem(int nCell, MHEngine *engine);
-    virtual void ToggleItem(int nCell, MHEngine *engine);
-    virtual void ScrollItems(int nCell, MHEngine *engine);
-    virtual void SetFirstItem(int nCell, MHEngine *engine);
-    virtual void GetFirstItem(MHRoot *pResult, MHEngine *) { pResult->SetVariableValue(m_nFirstItem); }
-    virtual void GetListSize(MHRoot *pResult, MHEngine *) { pResult->SetVariableValue((int)(m_ItemList.size())); }
+    void AddItem(int nIndex, MHRoot *pItem, MHEngine *engine) override; // MHRoot
+    void DelItem(MHRoot *pItem, MHEngine *engine) override; // MHRoot
+    void GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine) override; // MHRoot
+    void GetListItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine) override; // MHRoot
+    void GetItemStatus(int nCell, const MHObjectRef &itemDest, MHEngine *engine) override; // MHRoot
+    void SelectItem(int nCell, MHEngine *engine) override; // MHRoot
+    void DeselectItem(int nCell, MHEngine *engine) override; // MHRoot
+    void ToggleItem(int nCell, MHEngine *engine) override; // MHRoot
+    void ScrollItems(int nCell, MHEngine *engine) override; // MHRoot
+    void SetFirstItem(int nCell, MHEngine *engine) override; // MHRoot
+    void GetFirstItem(MHRoot *pResult, MHEngine *) override // MHRoot
+        { pResult->SetVariableValue(m_nFirstItem); }
+    void GetListSize(MHRoot *pResult, MHEngine *) override // MHRoot
+        { pResult->SetVariableValue(m_ItemList.size()); }
 
   protected:
     // MHEG Internal attributes.
@@ -131,12 +137,15 @@ class MHListGroup : public MHTokenGroup
 
     // Exchanged attributes
     MHSequence <QPoint> m_Positions;
-    bool    m_fWrapAround, m_fMultipleSelection;
+    bool    m_fWrapAround        {false};
+    bool    m_fMultipleSelection {false};
     //Internal attributes
     QList<MHListItem*> m_ItemList; // Items found by looking up the object refs
-    int m_nFirstItem; // First item displayed - N.B. MHEG indexes from 1.
-    bool m_fFirstItemDisplayed, m_fLastItemDisplayed;
-    int m_nLastCount, m_nLastFirstItem;
+    int  m_nFirstItem {1}; // First item displayed - N.B. MHEG indexes from 1.
+    bool m_fFirstItemDisplayed   {false};
+    bool m_fLastItemDisplayed    {false};
+    int  m_nLastCount            {0};
+    int  m_nLastFirstItem        {m_nFirstItem};
 };
 
 // Call action slot.
@@ -144,7 +153,8 @@ class MHCallActionSlot: public MHActionInt
 {
   public:
     MHCallActionSlot(): MHActionInt(":CallActionSlot")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->CallActionSlot(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) override // MHActionInt
+        { pTarget->CallActionSlot(nArg, engine); }
 };
 
 // Move - move the token in a token group according to the movement table.
@@ -152,7 +162,8 @@ class MHMove: public MHActionInt
 {
   public:
     MHMove(): MHActionInt(":Move")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->Move(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) override // MHActionInt
+        { pTarget->Move(nArg, engine); }
 };
 
 // MoveTo - move the token to a particular slot.
@@ -160,21 +171,23 @@ class MHMoveTo: public MHActionInt
 {
   public:
     MHMoveTo(): MHActionInt(":MoveTo")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->MoveTo(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) override // MHActionInt
+        { pTarget->MoveTo(nArg, engine); }
 };
 
 class MHGetTokenPosition: public MHActionObjectRef {
   public:
     MHGetTokenPosition(): MHActionObjectRef(":GetTokenPosition") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) { pTarget->GetTokenPosition(pArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) override // MHActionObjectRef
+        { pTarget->GetTokenPosition(pArg, engine); }
 };
 
 class MHAddItem: public MHElemAction {
   public:
     MHAddItem(): MHElemAction(":AddItem") {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintArgs(FILE *fd, int) const;
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void PrintArgs(FILE *fd, int) const override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     MHGenericInteger m_Index;
     MHGenericObjectRef m_Item;
@@ -184,15 +197,16 @@ class MHAddItem: public MHElemAction {
 class MHDelItem: public MHActionGenericObjectRef {
   public:
     MHDelItem(): MHActionGenericObjectRef(":DelItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pObj) { pTarget->DelItem(pObj, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pObj) override // MHActionGenericObjectRef
+        { pTarget->DelItem(pObj, engine); }
 };
 
 // Base class for a few actions.
 class MHGetListActionData: public MHElemAction {
   public:
     MHGetListActionData(const char *name): MHElemAction(name) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintArgs(FILE *fd, int) const;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void PrintArgs(FILE *fd, int) const override; // MHElemAction
   protected:
     MHGenericInteger m_Index;
     MHObjectRef m_Result;
@@ -201,61 +215,71 @@ class MHGetListActionData: public MHElemAction {
 class MHGetCellItem: public MHGetListActionData {
   public:
     MHGetCellItem(): MHGetListActionData(":GetCellItem") {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->GetCellItem(m_Index.GetValue(engine), m_Result, engine); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->GetCellItem(m_Index.GetValue(engine), m_Result, engine); }
 };
 
 class MHGetListItem: public MHGetListActionData {
   public:
     MHGetListItem(): MHGetListActionData(":GetListItem") {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->GetListItem(m_Index.GetValue(engine), m_Result, engine); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->GetListItem(m_Index.GetValue(engine), m_Result, engine); }
 };
 
 class MHGetItemStatus: public MHGetListActionData {
   public:
     MHGetItemStatus(): MHGetListActionData(":GetItemStatus") {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->GetItemStatus(m_Index.GetValue(engine), m_Result, engine); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->GetItemStatus(m_Index.GetValue(engine), m_Result, engine); }
 };
 
 class MHSelectItem: public MHActionInt {
   public:
     MHSelectItem(): MHActionInt(":SelectItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->SelectItem(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) override // MHActionInt
+        { Target(engine)->SelectItem(nArg, engine); }
 };
 
 class MHDeselectItem: public MHActionInt {
   public:
     MHDeselectItem(): MHActionInt(":DeselectItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->DeselectItem(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) override // MHActionInt
+        { Target(engine)->DeselectItem(nArg, engine); }
 };
 
 class MHToggleItem: public MHActionInt {
   public:
     MHToggleItem(): MHActionInt(":ToggleItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->ToggleItem(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) override // MHActionInt
+        { Target(engine)->ToggleItem(nArg, engine); }
 };
 
 class MHScrollItems: public MHActionInt {
   public:
     MHScrollItems(): MHActionInt(":ScrollItems") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->ScrollItems(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) override // MHActionInt
+        { Target(engine)->ScrollItems(nArg, engine); }
 };
 
 class MHSetFirstItem: public MHActionInt {
   public:
     MHSetFirstItem(): MHActionInt(":SetFirstItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->SetFirstItem(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) override // MHActionInt
+        { Target(engine)->SetFirstItem(nArg, engine); }
 };
 
 class MHGetFirstItem: public MHActionObjectRef {
   public:
     MHGetFirstItem(): MHActionObjectRef(":GetFirstItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, MHRoot *pArg) { Target(engine)->GetFirstItem(pArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, MHRoot *pArg) override // MHActionObjectRef
+        { Target(engine)->GetFirstItem(pArg, engine); }
 };
 
 class MHGetListSize: public MHActionObjectRef {
   public:
     MHGetListSize(): MHActionObjectRef(":GetListSize") {}
-    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, MHRoot *pArg) {Target(engine)->GetListSize(pArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, MHRoot *pArg) override // MHActionObjectRef
+        { Target(engine)->GetListSize(pArg, engine); }
 };
 
 #endif

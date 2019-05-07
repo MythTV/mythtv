@@ -105,7 +105,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 
     QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
 
-    for( unsigned int n = 0; n < progList.size(); n++)
+    for(size_t n = 0; n < progList.size(); n++)
     {
         ProgramInfo *pInfo = progList[ n ];
 
@@ -163,8 +163,8 @@ DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
     if (!sEndTime.isNull() && !sEndTime.isValid())
         throw QString("EndTime is invalid");
 
-    QDateTime dtStartTime = sStartTime;
-    QDateTime dtEndTime   = sEndTime;
+    const QDateTime& dtStartTime = sStartTime;
+    const QDateTime& dtEndTime   = sEndTime;
 
     if (!sEndTime.isNull() && dtEndTime < dtStartTime)
         throw QString("EndTime is before StartTime");
@@ -380,8 +380,7 @@ bool Dvr::StopRecording(int RecordedId)
         gCoreContext->dispatch(me);
         return true;
     }
-    else
-        throw QString("RecordedId %1 not found").arg(RecordedId);
+    throw QString("RecordedId %1 not found").arg(RecordedId);
 
     return false;
 }
@@ -390,16 +389,26 @@ bool Dvr::StopRecording(int RecordedId)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::ReactivateRecording(int RecordedId)
+bool Dvr::ReactivateRecording(int RecordedId,
+                              int chanid, const QDateTime &recstarttsRaw)
 {
-    if (RecordedId <= 0)
-        throw QString("RecordedId param is invalid.");
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    RecordingInfo ri = RecordingInfo(RecordedId);
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
-    ri.ReactivateRecording();
+    if (ri.GetChanID() && ri.HasPathname())
+    {
+        ri.ReactivateRecording();
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -467,12 +476,11 @@ long Dvr::GetSavedBookmark( int RecordedId,
         ri.QueryKeyFramePosition(&offset, position, isend);
         return offset;
     }
-    else if (offsettype.toLower() == "duration"){
+    if (offsettype.toLower() == "duration"){
         ri.QueryKeyFrameDuration(&offset, position, isend);
         return offset;
     }
-    else
-        return position;
+    return position;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -665,7 +673,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
 {
     DTC::EncoderList* pList = new DTC::EncoderList();
 
-    QReadLocker tvlocker(&TVRec::inputsLock);
+    QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
     QMap<int, EncoderLink *>::Iterator iter = tvList.begin();
 
@@ -693,7 +701,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
             for (; it < inputInfoList.end(); ++it)
             {
                 InputInfo inputInfo = *it;
-                if (inputInfo.inputid == static_cast<uint>(elink->GetInputID()))
+                if (inputInfo.m_inputid == static_cast<uint>(elink->GetInputID()))
                 {
                     DTC::Input *input = pEncoder->AddNewInput();
                     FillInputInfo(input, inputInfo);
@@ -1064,23 +1072,23 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
 }
 
 uint Dvr::AddRecordSchedule   (
-                               QString   sTitle,
-                               QString   sSubtitle,
-                               QString   sDescription,
-                               QString   sCategory,
+                               const QString&   sTitle,
+                               const QString&   sSubtitle,
+                               const QString&   sDescription,
+                               const QString&   sCategory,
                                QDateTime recstarttsRaw,
                                QDateTime recendtsRaw,
-                               QString   sSeriesId,
-                               QString   sProgramId,
+                               const QString&   sSeriesId,
+                               const QString&   sProgramId,
                                int       nChanId,
-                               QString   sStation,
+                               const QString&   sStation,
                                int       nFindDay,
                                QTime     tFindTime,
                                int       nParentId,
                                bool      bInactive,
                                uint      nSeason,
                                uint      nEpisode,
-                               QString   sInetref,
+                               const QString&   sInetref,
                                QString   sType,
                                QString   sSearchType,
                                int       nRecPriority,
@@ -1221,7 +1229,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  bool      bInactive,
                                  uint      nSeason,
                                  uint      nEpisode,
-                                 QString   sInetref,
+                                 const QString&   sInetref,
                                  QString   sType,
                                  QString   sSearchType,
                                  int       nRecPriority,
@@ -1562,6 +1570,17 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     return bResult;
 }
 
+int Dvr::RecordedIdForKey(int chanid, const QDateTime &recstarttsRaw)
+{
+    int recordedid;
+
+    if (!RecordingInfo::QueryRecordedIdForKey(recordedid, chanid,
+                                              recstarttsRaw))
+        return -1;
+
+    return recordedid;
+}
+
 int Dvr::RecordedIdForPathname(const QString & pathname)
 {
     uint recordedid;
@@ -1690,7 +1709,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if ((jobType & JOB_USERJOB) &&
+    if (((jobType & JOB_USERJOB) != 0) &&
          gCoreContext->GetSetting(sJobName, "").isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been defined.")
@@ -1698,8 +1717,8 @@ int Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if (!gCoreContext->GetNumSettingOnHost(QString("JobAllow%1").arg(sJobName),
-                                           sRemoteHost, 0))
+    if (!gCoreContext->GetBoolSettingOnHost(QString("JobAllow%1").arg(sJobName),
+                                            sRemoteHost, false))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been allowed on host %2.")
                                          .arg(sJobName).arg(sRemoteHost));
@@ -1715,7 +1734,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
     if (sJobArgs.isNull())
         sJobArgs = "";
 
-    int bReturn = JobQueue::QueueJob(jobType,
+    bool bReturn = JobQueue::QueueJob(jobType,
                                  ri.GetChanID(),
                                  ri.GetRecordingStartTime(),
                                  sJobArgs,

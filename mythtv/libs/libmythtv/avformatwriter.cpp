@@ -39,15 +39,6 @@ extern "C" {
 #define LOC_WARN QString("AVFW(%1) Warning: ").arg(m_filename)
 
 AVFormatWriter::AVFormatWriter()
-    : FileWriterBase(),
-
-      m_avfRingBuffer(nullptr), m_ringBuffer(nullptr),
-      m_ctx(nullptr),
-      m_videoStream(nullptr),   m_avVideoCodec(nullptr),
-      m_audioStream(nullptr),   m_avAudioCodec(nullptr),
-      m_picture(nullptr),
-      m_audPicture(nullptr),
-      m_audioInBuf(nullptr),    m_audioInPBuf(nullptr)
 {
     memset(&m_fmt, 0, sizeof(m_fmt));
 }
@@ -224,11 +215,8 @@ bool AVFormatWriter::CloseFile(void)
 
 bool AVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    if ((m_bufferedVideoFrameTypes.isEmpty()) ||
-        (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I))
-        return true;
-
-    return false;
+    return (m_bufferedVideoFrameTypes.isEmpty()) ||
+           (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
 }
 
 int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
@@ -236,7 +224,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     int framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
     av_frame_unref(m_picture);
-    AVPictureFill(reinterpret_cast<AVFrame*>(m_picture), frame);
+    AVPictureFill(m_picture, frame);
     m_picture->pts = framesEncoded + 1;
 
     if ((framesEncoded % m_keyFrameDist) == 0)
@@ -354,7 +342,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
         // init AVFrame for planar data (input is interleaved)
         for (int j = 0, jj = 0; j < m_audioChannels; j++, jj += m_audioFrameSize)
         {
-            m_audPicture->data[j] = (uint8_t*)(m_audioInPBuf + jj * sampleSizeOut);
+            m_audPicture->data[j] = m_audioInPBuf + jj * sampleSizeOut;
         }
     }
     else
@@ -406,7 +394,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     long long tc = timecode;
 
-    if (m_bufferedAudioFrameTimes.size())
+    if (!m_bufferedAudioFrameTimes.empty())
         tc = m_bufferedAudioFrameTimes.takeFirst();
 
     if (m_startingTimecodeOffset == -1)
@@ -441,7 +429,7 @@ int AVFormatWriter::WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int 
     return 1;
 }
 
-bool AVFormatWriter::ReOpen(QString filename)
+bool AVFormatWriter::ReOpen(const QString& filename)
 {
     bool result = m_ringBuffer->ReOpen(filename);
 

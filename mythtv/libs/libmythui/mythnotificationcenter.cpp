@@ -157,18 +157,7 @@ MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
 MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
                                                    int id)
     : MythScreenType(stack, "mythnotification"),         m_id(id),
-      m_duration(-1),             m_progress(-1.0),      m_fullscreen(false),
-      m_added(false),
-      m_created(false),           m_content(kNone),      m_update(kAll),
-      m_type(MythNotification::New),
-      m_artworkImage(nullptr),    m_titleText(nullptr),  m_originText(nullptr),
-      m_descriptionText(nullptr), m_extraText(nullptr),  m_progresstextText(nullptr),
-      m_progressBar(nullptr),     m_errorState(nullptr), m_mediaState(nullptr),
-      m_index(0),
-      m_timer(new QTimer(this)),
-      m_visibility(MythNotification::kAll),
-      m_priority(MythNotification::kDefault),
-      m_refresh(true)
+      m_timer(new QTimer(this))
 {
     // Set timer if need be
     SetSingleShotTimer(m_duration);
@@ -178,18 +167,8 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
 MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
                                                    MythNotification &notification)
     : MythScreenType(stack, "mythnotification"),         m_id(notification.GetId()),
-      m_duration(notification.GetDuration()),            m_progress(-1.0),
-      m_fullscreen(false),
-      m_added(false),             m_created(false),      m_content(kNone),
-      m_update(kAll),             m_type(MythNotification::New),
-      m_artworkImage(nullptr),    m_titleText(nullptr),  m_originText(nullptr),
-      m_descriptionText(nullptr), m_extraText(nullptr),  m_progresstextText(nullptr),
-      m_progressBar(nullptr),     m_errorState(nullptr), m_mediaState(nullptr),
-      m_index(0),
-      m_timer(new QTimer(this)),
-      m_visibility(MythNotification::kAll),
-      m_priority(MythNotification::kDefault),
-      m_refresh(true)
+      m_duration(notification.GetDuration()),
+      m_timer(new QTimer(this))
 {
     SetNotification(notification);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -209,23 +188,11 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
       m_progress(s.m_progress),
       m_progresstext(s.m_progresstext),
       m_fullscreen(s.m_fullscreen),
-      m_added(false),
-      m_created(false),
       m_content(s.m_content),
       m_update(s.m_content), // so all fields are initialised regardless of notification type
       m_type(s.m_type),
-      m_artworkImage(nullptr),     m_titleText(nullptr),  m_originText(nullptr),
-      m_descriptionText(nullptr),  m_extraText(nullptr),  m_progresstextText(nullptr),
-      m_progressBar(nullptr),      m_errorState(nullptr), m_mediaState(nullptr),
-      m_creation(),
-      m_expiry(),
-      m_index(0),
-      m_position(),
       m_timer(new QTimer(this)),
-      m_style(s.m_style),
-      m_visibility(MythNotification::kAll),
-      m_priority(MythNotification::kDefault),
-      m_refresh(true)
+      m_style(s.m_style)
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
 }
@@ -787,7 +754,6 @@ bool MythNotificationScreen::keyPressEvent(QKeyEvent *event)
 /////////////////////// NCPrivate
 
 NCPrivate::NCPrivate()
-    : m_currentId(0)
 {
     m_screenStack = new MythNotificationScreenStack(GetMythMainWindow(),
                                                     "mythnotificationcenter",
@@ -916,7 +882,7 @@ bool NCPrivate::Queue(const MythNotification &notification)
         {
             LOG(VB_GENERAL, LOG_DEBUG, LOC +
                 QString("Queue: 0x%1, not registered for id (%2)")
-                .arg((size_t)parent, QT_POINTER_SIZE, 16)
+                .arg((size_t)parent, QT_POINTER_SIZE, 16, QChar('0'))
                 .arg(id));
             id = -1;
         }
@@ -1072,7 +1038,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("UnRegister: 0x%1, no such registration (%2)")
-            .arg((size_t)from, QT_POINTER_SIZE, 16)
+            .arg((size_t)from, QT_POINTER_SIZE, 16, QChar('0'))
             .arg(id));
         return;
     }
@@ -1081,7 +1047,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("UnRegister: 0x%1, not registered for id (%2")
-            .arg((size_t)from, QT_POINTER_SIZE, 16)
+            .arg((size_t)from, QT_POINTER_SIZE, 16, QChar('0'))
             .arg(id));
     }
 

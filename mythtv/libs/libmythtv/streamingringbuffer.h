@@ -14,23 +14,24 @@ class StreamingRingBuffer : public RingBuffer
     explicit StreamingRingBuffer(const QString &lfilename);
     virtual ~StreamingRingBuffer();
 
-    virtual bool IsOpen(void) const;
-    virtual long long GetReadPosition(void) const;
-    virtual bool OpenFile(const QString &lfilename,
-                          uint retry_ms = kDefaultOpenTimeout);
-    virtual bool IsStreamed(void)       { return m_streamed;   }
-    virtual bool IsSeekingAllowed(void) { return m_allowSeeks; }
-    virtual bool IsBookmarkAllowed(void) { return false; }
+    // RingBuffer implementation
+    bool IsOpen(void) const override; // RingBuffer
+    long long GetReadPosition(void) const override; // RingBuffer
+    bool OpenFile(const QString &lfilename,
+                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
+    bool IsStreamed(void) override      { return m_streamed;   } // RingBuffer
+    bool IsSeekingAllowed(void) override { return m_allowSeeks; } // RingBuffer
+    bool IsBookmarkAllowed(void) override { return false; } // RingBuffer
 
   protected:
-    virtual int safe_read(void *data, uint sz);
-    virtual long long GetRealFileSizeInternal(void) const;
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint sz) override; // RingBuffer
+    long long GetRealFileSizeInternal(void) const override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
   private:
-    URLContext *m_context;
-    bool        m_streamed;
-    bool        m_allowSeeks;
+    URLContext *m_context    {nullptr};
+    bool        m_streamed   {true};
+    bool        m_allowSeeks {false};
 };
 
 #endif // STREAMINGRINGBUFFER_H

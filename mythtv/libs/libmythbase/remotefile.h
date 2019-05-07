@@ -24,7 +24,7 @@ class MBASE_PUBLIC RemoteFile
                const QStringList *possibleAuxiliaryFiles = nullptr);
    ~RemoteFile();
 
-    bool ReOpen(QString newFilename);
+    bool ReOpen(const QString& newFilename);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
@@ -41,15 +41,15 @@ class MBASE_PUBLIC RemoteFile
     static QStringList FindFileList(const QString &filename, const QString &host,
                                     const QString &storageGroup, bool useRegex = false,
                                     bool allowFallback = false);
-    static bool CopyFile(const QString &src, const QString &dest,
+    static bool CopyFile(const QString &src, const QString &dst,
                          bool overwrite = false, bool verify = false);
-    static bool MoveFile(const QString &src, const QString &dest,
+    static bool MoveFile(const QString &src, const QString &dst,
                          bool overwrite = false);
 
     int Write(const void *data, int size);
     int Read(void *data, int size);
     void Reset(void);
-    bool SetBlocking(bool block = true);
+    bool SetBlocking(bool m_block = true);
 
     bool SaveAs(QByteArray &data);
 
@@ -62,7 +62,7 @@ class MBASE_PUBLIC RemoteFile
     long long GetRealFileSize(void);
 
     QStringList GetAuxiliaryFiles(void) const
-        { return auxfiles; }
+        { return m_auxfiles; }
 
   private:
     bool Open(void);
@@ -75,29 +75,29 @@ class MBASE_PUBLIC RemoteFile
 
     MythSocket     *openSocket(bool control);
 
-    QString         path;
-    bool            usereadahead;
-    int             timeout_ms;
-    long long       filesize;
-    bool            timeoutisfast;
-    long long       readposition;
-    long long       lastposition;
-    bool            canresume;
-    int             recordernum;
+    QString         m_path;
+    bool            m_usereadahead     {true};
+    int             m_timeout_ms       {2000};
+    long long       m_filesize         {-1};
+    bool            m_timeoutisfast    {false};
+    long long       m_readposition     {0LL};
+    long long       m_lastposition     {0LL};
+    bool            m_canresume        {false};
+    int             m_recordernum      {0};
 
-    mutable QMutex  lock;
-    MythSocket     *controlSock;
-    MythSocket     *sock;
-    QString         query;
+    mutable QMutex  m_lock             {QMutex::NonRecursive};
+    MythSocket     *m_controlSock      {nullptr};
+    MythSocket     *m_sock             {nullptr};
+    QString         m_query            {"QUERY_FILETRANSFER %1"};
 
-    bool            writemode;
-    bool            completed;
-    MythTimer       lastSizeCheck;
+    bool            m_writemode        {false};
+    bool            m_completed        {false};
+    MythTimer       m_lastSizeCheck;
 
-    QStringList     possibleauxfiles;
-    QStringList     auxfiles;
-    int             localFile;
-    ThreadedFileWriter *fileWriter;
+    QStringList     m_possibleauxfiles;
+    QStringList     m_auxfiles;
+    int             m_localFile        {-1};
+    ThreadedFileWriter *m_fileWriter   {nullptr};
 };
 
 #endif

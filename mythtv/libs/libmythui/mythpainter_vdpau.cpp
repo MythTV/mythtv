@@ -18,8 +18,7 @@
 #define LOC QString("VDPAU Painter: ")
 
 MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
-    MythPainter(), m_render(render), m_target(0),
-    m_swap_control(true)
+    m_render(render)
 {
     if (m_render)
         m_render->IncrRef();
@@ -27,7 +26,7 @@ MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
 
 MythVDPAUPainter::~MythVDPAUPainter()
 {
-    Teardown();
+    MythVDPAUPainter::Teardown();
 }
 
 bool MythVDPAUPainter::InitVDPAU(QPaintDevice *parent)
@@ -54,7 +53,7 @@ void MythVDPAUPainter::Teardown(void)
 {
     MythPainter::Teardown();
 
-    FreeResources();
+    MythVDPAUPainter::FreeResources();
 
     m_ImageBitmapMap.clear();
     m_ImageExpireList.clear();
@@ -160,10 +159,7 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
             m_ImageExpireList.push_back(im);
             return m_ImageBitmapMap[im];
         }
-        else
-        {
-            DeleteFormatImagePriv(im);
-        }
+        DeleteFormatImagePriv(im);
     }
 
     im->SetChanged(false);

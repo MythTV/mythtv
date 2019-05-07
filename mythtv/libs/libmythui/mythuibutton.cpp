@@ -22,12 +22,6 @@ MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     m_clickTimer = new QTimer();
     m_clickTimer->setSingleShot(true);
 
-    m_Pushed = false;
-    m_Lockable = false;
-
-    m_Text = nullptr;
-    m_BackgroundState = nullptr;
-
     connect(m_clickTimer, SIGNAL(timeout()), SLOT(UnPush()));
 
     connect(this, SIGNAL(TakingFocus()), SLOT(Select()));
@@ -95,7 +89,7 @@ void MythUIButton::Disable()
     SetState("disabled");
 }
 
-void MythUIButton::SetState(QString state)
+void MythUIButton::SetState(const QString& state)
 {
     if (m_state == state)
         return;

@@ -30,11 +30,6 @@ QEvent::Type DecoderEvent::Finished =
 QEvent::Type DecoderEvent::Error =
     (QEvent::Type) QEvent::registerEventType();
 
-Decoder::Decoder(DecoderFactory *d, AudioOutput *o) :
-    MThread("MythMusicDecoder"), m_fctry(d), m_out(o)
-{
-}
-
 Decoder::~Decoder()
 {
     m_fctry = nullptr;

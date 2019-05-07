@@ -43,7 +43,7 @@ class ExpireThread : public MThread
   public:
     explicit ExpireThread(AutoExpire *p) : MThread("Expire"), m_parent(p) {}
     virtual ~ExpireThread() { wait(); }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
     QPointer<AutoExpire> m_parent;
 };
@@ -52,10 +52,10 @@ class UpdateEntry
 {
   public:
     UpdateEntry(int _encoder, int _fsID)
-        : encoder(_encoder), fsID(_fsID) {};
+        : m_encoder(_encoder), m_fsID(_fsID) {};
 
-    int encoder;
-    int fsID;
+    int m_encoder;
+    int m_fsID;
 };
 
 class AutoExpire : public QObject
@@ -64,12 +64,12 @@ class AutoExpire : public QObject
 
     friend class ExpireThread;
   public:
-    explicit AutoExpire(QMap<int, EncoderLink *> *encoderList);
-    AutoExpire(void);
+    explicit AutoExpire(QMap<int, EncoderLink *> *tvList);
+    AutoExpire() = default;
    ~AutoExpire();
 
     void CalcParams(void);
-    void PrintExpireList(QString expHost = "ALL");
+    void PrintExpireList(const QString& expHost = "ALL");
 
     uint64_t GetDesiredSpace(int fsID) const;
 
@@ -82,11 +82,11 @@ class AutoExpire : public QObject
 
     void SetMainServer(MainServer *ms)
     {
-        QMutexLocker locker(&instance_lock);
-        main_server = ms;
+        QMutexLocker locker(&m_instance_lock);
+        m_main_server = ms;
     }
 
-    QMap<int, EncoderLink *> *encoderList;
+    QMap<int, EncoderLink *> *m_encoderList {nullptr};
 
   protected:
     void RunExpirer(void);
@@ -109,22 +109,22 @@ class AutoExpire : public QObject
                                uint chanid, const QDateTime &recstartts);
 
     // main expire info
-    QSet<QString> dont_expire_set;
-    ExpireThread *expire_thread;     // protected by instance_lock
-    uint          desired_freq;      // protected by instance_lock
-    bool          expire_thread_run; // protected by instance_lock
+    QSet<QString> m_dont_expire_set;
+    ExpireThread *m_expire_thread      {nullptr}; // protected by instance_lock
+    uint          m_desired_freq       {15};      // protected by instance_lock
+    bool          m_expire_thread_run  {false};   // protected by instance_lock
 
-    QMap<int, int64_t>  desired_space; // protected by instance_lock
-    QMap<int, int>      used_encoders; // protected by instance_lock
+    QMap<int, int64_t>  m_desired_space;          // protected by instance_lock
+    QMap<int, int>      m_used_encoders;          // protected by instance_lock
 
-    mutable QMutex instance_lock;
-    QWaitCondition instance_cond; // protected by instance_lock
+    mutable QMutex m_instance_lock;
+    QWaitCondition m_instance_cond;               // protected by instance_lock
 
-    MainServer   *main_server;    // protected by instance_lock
+    MainServer    *m_main_server      {nullptr};  // protected by instance_lock
 
     // update info
-    QMutex              update_lock;
-    QQueue<UpdateEntry> update_queue; // protected by update_lock
+    QMutex              m_update_lock;
+    QQueue<UpdateEntry> m_update_queue;           // protected by update_lock
 };
 
 #endif

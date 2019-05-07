@@ -10,14 +10,10 @@
 //static const QString _Location = AudioPlayer::tr("Audio Player");
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
-  : m_parent(parent),     m_audioOutput(nullptr),m_channels(-1),
-    m_orig_channels(-1),  m_codec(0),            m_format(FORMAT_NONE),
-    m_samplerate(44100),  m_codec_profile(0),
-    m_stretchfactor(1.0f),m_passthru(false),
-    m_lock(QMutex::Recursive), m_muted_on_creation(muted),
-    m_no_audio_in(false), m_no_audio_out(true), m_controls_volume(true)
+  : m_parent(parent),
+    m_muted_on_creation(muted)
 {
-    m_controls_volume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
+    m_controls_volume = gCoreContext->GetBoolSetting("MythControlsVolume", true);
 }
 
 AudioPlayer::~AudioPlayer()
@@ -60,7 +56,7 @@ void AudioPlayer::AddVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (uint i = 0; i < m_visuals.size(); i++)
+    for (size_t i = 0; i < m_visuals.size(); i++)
         m_audioOutput->addVisual(m_visuals[i]);
 }
 
@@ -70,7 +66,7 @@ void AudioPlayer::RemoveVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (uint i = 0; i < m_visuals.size(); i++)
+    for (size_t i = 0; i < m_visuals.size(); i++)
         m_audioOutput->removeVisual(m_visuals[i]);
 }
 
@@ -80,7 +76,7 @@ void AudioPlayer::ResetVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (uint i = 0; i < m_visuals.size(); i++)
+    for (size_t i = 0; i < m_visuals.size(); i++)
         m_visuals[i]->prepare();
 }
 
@@ -130,7 +126,7 @@ QString AudioPlayer::ReinitAudio(void)
                                           AUDIOOUTPUT_VIDEO,
                                           m_controls_volume, m_passthru);
         if (m_no_audio_in)
-            aos.init = false;
+            aos.m_init = false;
 
         m_audioOutput = AudioOutput::OpenAudio(aos);
         if (!m_audioOutput)
@@ -240,15 +236,9 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
     m_main_device.clear();
     m_passthru_device.clear();
     if (!main_device.isEmpty())
-    {
         m_main_device = main_device;
-        m_main_device.detach();
-    }
     if (!passthru_device.isEmpty())
-    {
         m_passthru_device = passthru_device;
-        m_passthru_device.detach();
-    }
     m_samplerate = (int)samplerate;
     m_codec_profile    = codec_profile;
 }
@@ -258,7 +248,7 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
  * codec_profile is currently only used for DTS
  */
 void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
-                                 int channels, int codec,
+                                 int channels, AVCodecID codec,
                                  int samplerate, bool passthru,
                                  int codec_profile)
 {
@@ -292,7 +282,7 @@ bool AudioPlayer::SetMuted(bool mute)
         LOG(VB_AUDIO, LOG_INFO, QString("muting sound %1").arg(IsMuted()));
         return true;
     }
-    else if (m_audioOutput && !m_no_audio_out && is_muted && !mute &&
+    if (m_audioOutput && !m_no_audio_out && is_muted && !mute &&
              (kMuteOff == SetMuteState(kMuteOff)))
     {
         LOG(VB_AUDIO, LOG_INFO, QString("unmuting sound %1").arg(IsMuted()));
@@ -442,7 +432,7 @@ int AudioPlayer::GetMaxHDRate()
 }
 
 bool AudioPlayer::CanPassthrough(int samplerate, int channels,
-                                 int codec, int profile)
+                                 AVCodecID codec, int profile)
 {
     if (!m_audioOutput)
         return false;
@@ -485,16 +475,14 @@ bool AudioPlayer::NeedDecodingBeforePassthrough(void)
 {
     if (!m_audioOutput)
         return true;
-    else
-        return m_audioOutput->NeedDecodingBeforePassthrough();
+    return m_audioOutput->NeedDecodingBeforePassthrough();
 }
 
 int64_t AudioPlayer::LengthLastData(void)
 {
     if (!m_audioOutput)
         return 0;
-    else
-        return m_audioOutput->LengthLastData();
+    return m_audioOutput->LengthLastData();
 }
 
 bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
@@ -529,16 +517,14 @@ bool AudioPlayer::CanProcess(AudioFormat fmt)
 {
     if (!m_audioOutput)
         return false;
-    else
-        return m_audioOutput->CanProcess(fmt);
+    return m_audioOutput->CanProcess(fmt);
 }
 
 uint32_t AudioPlayer::CanProcess(void)
 {
     if (!m_audioOutput)
         return 0;
-    else
-        return m_audioOutput->CanProcess();
+    return m_audioOutput->CanProcess();
 }
 
 /**
@@ -560,6 +546,5 @@ int AudioPlayer::DecodeAudio(AVCodecContext *ctx,
         data_size = 0;
         return 0;
     }
-    else
-        return m_audioOutput->DecodeAudio(ctx, buffer, data_size, pkt);
+    return m_audioOutput->DecodeAudio(ctx, buffer, data_size, pkt);
 }

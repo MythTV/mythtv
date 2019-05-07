@@ -9,7 +9,6 @@ win32-msvc* {
 !using_libbluray_external: SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
 SUBDIRS += libudfread
-SUBDIRS += nzmqt/src/nzmqt.pro
 SUBDIRS += libmythsoundtouch
 
 }

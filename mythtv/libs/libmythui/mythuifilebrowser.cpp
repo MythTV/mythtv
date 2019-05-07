@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
+#include <utility>
 
 #include "mythlogging.h"
 
@@ -23,10 +24,10 @@
 /////////////////////////////////////////////////////////////////////
 MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
 {
-    init(fileName, sgDir, isDir, size);
+    init(std::move(fileName), std::move(sgDir), isDir, size);
 }
 
-void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
+void MFileInfo::init(const QString& fileName, QString sgDir, bool isDir,
                      qint64 size)
 {
     m_fileName = fileName;
@@ -38,7 +39,7 @@ void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
         QUrl qurl(fileName);
         m_hostName = qurl.host();
         m_storageGroup = qurl.userName();
-        m_storageGroupDir = sgDir;
+        m_storageGroupDir = std::move(sgDir);
         m_subDir = qurl.path();
 
         if (!qurl.fragment().isEmpty())
@@ -72,64 +73,56 @@ QString MFileInfo::fileName(void) const
 {
     if (m_isRemote)
         return m_fileName;
-    else
-        return QFileInfo::fileName();
+    return QFileInfo::fileName();
 }
 
 QString MFileInfo::filePath(void) const
 {
     if (m_isRemote)
         return m_fileName;
-    else
-        return QFileInfo::filePath();
+    return QFileInfo::filePath();
 }
 
 bool MFileInfo::isDir(void) const
 {
     if (m_isRemote)
         return m_isDir;
-    else
-        return QFileInfo::isDir();
+    return QFileInfo::isDir();
 }
 
 bool MFileInfo::isFile(void) const
 {
     if (m_isRemote)
         return m_isFile;
-    else
-        return QFileInfo::isFile();
+    return QFileInfo::isFile();
 }
 
 bool MFileInfo::isParentDir(void) const
 {
     if (m_isRemote)
         return m_isParentDir;
-    else
-        return (QFileInfo::fileName() == "..");
+    return (QFileInfo::fileName() == "..");
 }
 
 bool MFileInfo::isExecutable(void) const
 {
     if (m_isRemote)
         return false;
-    else
-        return QFileInfo::isExecutable();
+    return QFileInfo::isExecutable();
 }
 
 QString MFileInfo::absoluteFilePath(void) const
 {
     if (m_isRemote)
         return m_fileName;
-    else
-        return QFileInfo::absoluteFilePath();
+    return QFileInfo::absoluteFilePath();
 }
 
 qint64 MFileInfo::size(void) const
 {
     if (m_isRemote)
         return m_size;
-    else
-        return QFileInfo::size();
+    return QFileInfo::size();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -143,16 +136,7 @@ qint64 MFileInfo::size(void) const
 
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
                                      const QString &startPath)
-    : MythScreenType(parent, "mythuifilebrowser"),
-        m_isRemote(false),      m_previewTimer(nullptr),
-        m_typeFilter(QDir::AllDirs | QDir::Drives | QDir::Files |
-                    QDir::Readable | QDir::Writable | QDir::Executable),
-        m_fileList(nullptr),    m_locationEdit(nullptr),
-        m_okButton(nullptr),    m_cancelButton(nullptr),
-        m_backButton(nullptr),  m_homeButton(nullptr),
-        m_previewImage(nullptr),m_infoText(nullptr),
-        m_filenameText(nullptr),m_fullpathText(nullptr),
-        m_retObject(nullptr)
+    : MythScreenType(parent, "mythuifilebrowser")
 {
     SetPath(startPath);
 
@@ -350,10 +334,7 @@ bool MythUIFileBrowser::IsImage(QString extension)
 
     QList<QByteArray> formats = QImageReader::supportedImageFormats();
 
-    if (formats.contains(extension.toLatin1()))
-        return true;
-
-    return false;
+    return formats.contains(extension.toLatin1());
 }
 
 void MythUIFileBrowser::editLostFocus()
@@ -556,7 +537,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         MFileInfo finfo(dataName, m_storageGroupDir);
 
         if ((tokens[0] == "dir") &&
-            (m_typeFilter & (QDir::Dirs | QDir::AllDirs)))
+            ((m_typeFilter & (QDir::Dirs | QDir::AllDirs)) != 0))
         {
             type = "folder";
             finfo.setIsDir(true);
@@ -564,7 +545,7 @@ void MythUIFileBrowser::updateRemoteFileList()
             finfo.setSize(0);
         }
         else if ((tokens[0] == "sgdir") &&
-                 (m_typeFilter & (QDir::Dirs | QDir::AllDirs)))
+                 ((m_typeFilter & (QDir::Dirs | QDir::AllDirs)) != 0))
         {
             type = "folder";
             finfo.setIsDir(true);
@@ -572,7 +553,7 @@ void MythUIFileBrowser::updateRemoteFileList()
             finfo.setSize(0);
         }
         else if ((tokens[0] == "file") &&
-                 (m_typeFilter & QDir::Files))
+                 ((m_typeFilter & QDir::Files) != 0))
         {
             finfo.setIsDir(false);
             finfo.setSize(tokens[2].toInt());
@@ -706,11 +687,11 @@ QString MythUIFileBrowser::FormatSize(int size)
     QString filesize("%L1 %2");
 
     if (size < 1000000)
-        filesize = filesize.arg((double)(size / 1000)).arg("KB");
+        filesize = filesize.arg((double)size /       1000.0, 0, 'f', 0).arg("KB");
     else if (size < 1000000000)
-        filesize = filesize.arg((double)(size / 1000000)).arg("MB");
+        filesize = filesize.arg((double)size /    1000000.0, 0, 'f', 1).arg("MB");
     else
-        filesize = filesize.arg((double)(size / 1000000000)).arg("GB");
+        filesize = filesize.arg((double)size / 1000000000.0, 0, 'f', 1).arg("GB");
 
     return filesize;
 }

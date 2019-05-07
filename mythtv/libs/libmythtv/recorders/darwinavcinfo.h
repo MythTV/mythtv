@@ -26,11 +26,7 @@ class DarwinFirewireDevice;
 class DarwinAVCInfo : public AVCInfo
 {
   public:
-    DarwinAVCInfo() :
-        fw_node_ref(0), fw_device_ref(0),
-        fw_service_ref(0), avc_service_ref(0),
-        fw_device_notifier_ref(0),
-        avc_handle(0), fw_handle(0) { }
+    DarwinAVCInfo() = default;
 
     void Update(uint64_t _guid, DarwinFirewireDevice *dev,
                 IONotificationPortRef notify_port,
@@ -45,10 +41,10 @@ class DarwinAVCInfo : public AVCInfo
     bool OpenDeviceInterface(CFRunLoopRef &thread_cf_ref);
     void CloseDeviceInterface(void);
 
-    virtual bool SendAVCCommand(
+    bool SendAVCCommand(
         const vector<uint8_t> &cmd,
         vector<uint8_t>       &result,
-        int                   retry_cnt);
+        int                   retry_cnt) override; // AVCInfo
 
     bool GetDeviceNodes(int &local_node, int &remote_node);
 
@@ -56,15 +52,15 @@ class DarwinAVCInfo : public AVCInfo
     bool IsPortOpen(void)         const { return fw_handle;  }
 
   public:
-    io_service_t fw_node_ref;     // parent of fw_device_ref
-    io_service_t fw_device_ref;   // parent of fw_service_ref
-    io_service_t fw_service_ref;  // parent of avc_service_ref
-    io_service_t avc_service_ref;
+    io_service_t fw_node_ref            {0};  // parent of fw_device_ref
+    io_service_t fw_device_ref          {0};  // parent of fw_service_ref
+    io_service_t fw_service_ref         {0};  // parent of avc_service_ref
+    io_service_t avc_service_ref        {0};
 
-    io_object_t  fw_device_notifier_ref;
+    io_object_t  fw_device_notifier_ref {0};
 
-    IOFireWireAVCLibUnitInterface **avc_handle;
-    IOFireWireLibDeviceRef          fw_handle;
+    IOFireWireAVCLibUnitInterface **avc_handle {0};
+    IOFireWireLibDeviceRef          fw_handle  {0};
 };
 typedef QMap<uint64_t,DarwinAVCInfo*> avcinfo_list_t;
 

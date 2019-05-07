@@ -46,13 +46,9 @@ class ThemeExtractThread : public QRunnable
                        const QString &srcFile, const QString &destDir) :
         m_parent(parent),
         m_srcFile(srcFile),
-        m_destDir(destDir)
-    {
-        m_srcFile.detach();
-        m_destDir.detach();
-    }
+        m_destDir(destDir) {}
 
-    void run()
+    void run() override // QRunnable
     {
         extractZIP(m_srcFile, m_destDir);
 
@@ -62,7 +58,7 @@ class ThemeExtractThread : public QRunnable
     }
 
   private:
-    ThemeChooser        *m_parent;
+    ThemeChooser        *m_parent {nullptr};
     QString              m_srcFile;
     QString              m_destDir;
 };
@@ -74,17 +70,7 @@ class ThemeExtractThread : public QRunnable
  */
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
                            const QString &name) :
-    MythScreenType(parent, name),
-    m_themes(nullptr),
-    m_preview(nullptr),
-    m_fullPreviewShowing(false),
-    m_fullPreviewStateType(nullptr),
-    m_fullScreenName(nullptr),
-    m_fullScreenPreview(nullptr),
-    m_refreshDownloadableThemes(false),
-    m_downloadTheme(nullptr),
-    m_downloadState(dsIdle),
-    m_popupMenu(nullptr)
+    MythScreenType(parent, name)
 {
     gCoreContext->addListener(this);
 
@@ -291,7 +277,7 @@ void ThemeChooser::LoadVersion(const QString &version,
         QDir dir;
         if (!dir.mkpath(destdir))
             ShowOkPopup(tr("Unable to create '%1'").arg(destdir));
-        bool result = GetMythDownloadManager()->download(url, remoteThemesFile);
+        bool result = GetMythDownloadManager()->download(url, remoteThemesFile, true);
 
         LOG(VB_GUI, LOG_INFO, LOC +
             QString("Downloading '%1' to '%2'").arg(url).arg(remoteThemesFile));
@@ -410,15 +396,15 @@ void ThemeChooser::LoadVersion(const QString &version,
                     .arg(remoteTheme.GetMajorVersion())
                     .arg(remoteTheme.GetMinorVersion()));
 
-                ThemeInfo *remoteTheme = loadThemeInfo(*it);
-                if (remoteTheme)
+                ThemeInfo *tmpTheme = loadThemeInfo(*it);
+                if (tmpTheme)
                 {
-                    themeName = remoteTheme->GetName();
+                    themeName = tmpTheme->GetName();
                     themesSeen << dirName;
                     m_infoList << *it;
                     m_themeStatuses[themeName] = "updateavailable";
 
-                    QFileInfo finfo(remoteTheme->GetPreviewPath());
+                    QFileInfo finfo(tmpTheme->GetPreviewPath());
                     GetMythDownloadManager()->queueDownload(
                         remoteDir.append("/").append(finfo.fileName()),
                         localDir.append("/").append(finfo.fileName()),
@@ -519,7 +505,7 @@ ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
     if (!themeinfo)
         return nullptr;
 
-    if (themeinfo->GetName().isEmpty() || !(themeinfo->GetType() & THEME_UI))
+    if (themeinfo->GetName().isEmpty() || ((themeinfo->GetType() & THEME_UI) == 0))
     {
         delete themeinfo;
         return nullptr;
@@ -584,7 +570,7 @@ void ThemeChooser::showPopupMenu(void)
         }
     }
 
-    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+    if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
         m_popupMenu->AddButton(tr("Disable Theme Update Notifications"),
                                SLOT(toggleThemeUpdateNotifications()));
     else
@@ -592,7 +578,7 @@ void ThemeChooser::showPopupMenu(void)
                                SLOT(toggleThemeUpdateNotifications()));
 }
 
-void ThemeChooser::popupClosed(QString which, int result)
+void ThemeChooser::popupClosed(const QString& which, int result)
 {
     (void)which;
     (void)result;
@@ -671,7 +657,7 @@ void ThemeChooser::toggleFullscreenPreview(void)
 
 void ThemeChooser::toggleThemeUpdateNotifications(void)
 {
-    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+    if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
         gCoreContext->SaveSettingOnHost("ThemeUpdateNofications", "0", "");
     else
         gCoreContext->SaveSettingOnHost("ThemeUpdateNofications", "1", "");
@@ -817,7 +803,7 @@ void ThemeChooser::updateProgressBar(int bytesReceived,
 
 void ThemeChooser::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -927,8 +913,8 @@ void ThemeChooser::customEvent(QEvent *e)
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
 
             // Send a message to ourself so we trigger a reload our next chance
-            MythEvent *me = new MythEvent("THEME_RELOAD");
-            qApp->postEvent(this, me);
+            MythEvent *me2 = new MythEvent("THEME_RELOAD");
+            qApp->postEvent(this, me2);
         }
         else if ((me->Message() == "THEME_RELOAD") &&
                  (m_downloadState == dsIdle))

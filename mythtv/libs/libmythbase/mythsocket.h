@@ -41,9 +41,9 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
                   bool error_dialog_desired = false);
     bool IsValidated(void) const { return m_isValidated; }
 
-    bool Announce(const QStringList &strlist);
+    bool Announce(const QStringList &new_announce);
     QStringList GetAnnounce(void) const { return m_announce; }
-    void SetAnnounce(const QStringList &strlist);
+    void SetAnnounce(const QStringList &new_announce);
     bool IsAnnounced(void) const { return m_isAnnounced; }
 
     void SetReadyReadCallbackEnabled(bool enabled)
@@ -84,7 +84,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     void ReadStringListReal(QStringList *list, uint timeoutMS, bool *ret);
     void WriteStringListReal(const QStringList *list, bool *ret);
-    void ConnectToHostReal(QHostAddress address, quint16 port, bool *ret);
+    void ConnectToHostReal(const QHostAddress& addr, quint16 port, bool *ret);
     void DisconnectFromHostReal(void);
 
     void WriteReal(const char*, int size, int *ret);
@@ -96,21 +96,21 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
   protected:
     ~MythSocket(); // force reference counting
 
-    QTcpSocket     *m_tcpSocket; // only set in ctor
-    MThread        *m_thread; // only set in ctor
+    QTcpSocket     *m_tcpSocket        {nullptr}; // only set in ctor
+    MThread        *m_thread           {nullptr}; // only set in ctor
     mutable QMutex  m_lock;
-    qt_socket_fd_t  m_socketDescriptor; // protected by m_lock
-    QHostAddress    m_peerAddress; // protected by m_lock
-    int             m_peerPort; // protected by m_lock
-    MythSocketCBs  *m_callback; // only set in ctor
-    bool            m_useSharedThread; // only set in ctor
-    QAtomicInt      m_disableReadyReadCallback;
-    bool            m_connected; // protected by m_lock
+    qt_socket_fd_t  m_socketDescriptor {-1};      // protected by m_lock
+    QHostAddress    m_peerAddress;                // protected by m_lock
+    int             m_peerPort         {-1};      // protected by m_lock
+    MythSocketCBs  *m_callback         {nullptr}; // only set in ctor
+    bool            m_useSharedThread;            // only set in ctor
+    QAtomicInt      m_disableReadyReadCallback {false};
+    bool            m_connected        {false};   // protected by m_lock
     /// This is used internally as a hint that there might be
     /// data available for reading.
-    mutable QAtomicInt m_dataAvailable;
-    bool            m_isValidated; // only set in thread using MythSocket
-    bool            m_isAnnounced; // only set in thread using MythSocket
+    mutable QAtomicInt m_dataAvailable {0};
+    bool            m_isValidated      {false}; // only set in thread using MythSocket
+    bool            m_isAnnounced      {false}; // only set in thread using MythSocket
     QStringList     m_announce; // only set in thread using MythSocket
 
     static const int kSocketReceiveBufferSize;
@@ -120,7 +120,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     static QMutex s_thread_lock;
     static MThread *s_thread; // protected by s_thread_lock
-    static int s_thread_cnt; // protected by s_thread_lock
+    static int s_thread_cnt;  // protected by s_thread_lock
 };
 
 #endif /* MYTH_SOCKET_H */

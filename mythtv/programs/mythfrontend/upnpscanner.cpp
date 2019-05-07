@@ -8,6 +8,7 @@
 
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+#include <utility>
 
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
@@ -80,18 +81,16 @@ class MediaServer : public MediaServerItem
   public:
     MediaServer()
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(), m_connectionAttempts(0), m_controlURL(QUrl()),
+       m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
-       m_friendlyName(QString("Unknown")), m_subscribed(false),
-       m_renewalTimerId(0), m_systemUpdateID(-1)
+       m_friendlyName(QString("Unknown"))
     {
     }
     explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(URL), m_connectionAttempts(0), m_controlURL(QUrl()),
+       m_URL(std::move(URL)), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
-       m_friendlyName(QString("Unknown")), m_subscribed(false),
-       m_renewalTimerId(0), m_systemUpdateID(-1)
+       m_friendlyName(QString("Unknown"))
     {
     }
 
@@ -108,14 +107,14 @@ class MediaServer : public MediaServerItem
     }
 
     QUrl    m_URL;
-    int     m_connectionAttempts;
+    int     m_connectionAttempts {0};
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
     QString m_eventSubPath;
     QString m_friendlyName;
-    bool    m_subscribed;
-    int     m_renewalTimerId;
-    int     m_systemUpdateID;
+    bool    m_subscribed         {false};
+    int     m_renewalTimerId     {0};
+    int     m_systemUpdateID     {-1};
 };
 
 UPNPScanner* UPNPScanner::gUPNPScanner        = nullptr;
@@ -133,14 +132,6 @@ QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
  *  renewed at an appropriate time before it expires. The available media for
  *  each device can then be queried by sending browse requests as needed.
  */
-UPNPScanner::UPNPScanner(UPNPSubscription *sub)
-  : QObject(), m_subscription(sub), m_lock(QMutex::Recursive),
-    m_network(nullptr), m_updateTimer(nullptr), m_watchdogTimer(nullptr),
-    m_masterHost(QString()), m_masterPort(0), m_scanComplete(false),
-    m_fullscan(false)
-{
-}
-
 UPNPScanner::~UPNPScanner()
 {
     Stop();
@@ -426,7 +417,7 @@ void UPNPScanner::Start()
             this, SLOT(replyFinished(QNetworkReply*)));
 
     // listen for SSDP updates
-    SSDP::Instance()->AddListener(this);
+    SSDP::AddListener(this);
 
     // listen for subscriptions and events
     if (m_subscription)
@@ -459,7 +450,7 @@ void UPNPScanner::Stop(void)
     m_lock.lock();
 
     // stop listening
-    SSDP::Instance()->RemoveListener(this);
+    SSDP::RemoveListener(this);
     if (m_subscription)
         m_subscription->removeListener(this);
 
@@ -536,7 +527,7 @@ void UPNPScanner::Update(void)
             bool sent = false;
             QUrl url = it.value()->m_URL;
             if (!m_descriptionRequests.contains(url) &&
-                (m_descriptionRequests.size() < MAX_REQUESTS) &&
+                (m_descriptionRequests.empty()) &&
                 url.isValid())
             {
                 QNetworkReply *reply = m_network->get(QNetworkRequest(url));
@@ -648,25 +639,25 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
  */
 void UPNPScanner::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) != MythEvent::MythEventMessage)
+    if (event->type() != MythEvent::MythEventMessage)
         return;
 
     // UPnP events
     MythEvent *me  = static_cast<MythEvent *>(event);
-    QString    ev  = me->Message();
+    const QString&    ev  = me->Message();
 
     if (ev == "UPNP_STARTSCAN")
     {
         BrowseNextContainer();
         return;
     }
-    else if (ev == "UPNP_BROWSEOBJECT")
+    if (ev == "UPNP_BROWSEOBJECT")
     {
         if (me->ExtraDataCount() == 2)
         {
             QUrl url;
-            QString usn = me->ExtraData(0);
-            QString objectid = me->ExtraData(1);
+            const QString& usn = me->ExtraData(0);
+            const QString& objectid = me->ExtraData(1);
             m_lock.lock();
             if (m_servers.contains(usn))
             {
@@ -680,7 +671,7 @@ void UPNPScanner::customEvent(QEvent *event)
         }
         return;
     }
-    else if (ev == "UPNP_EVENT")
+    if (ev == "UPNP_EVENT")
     {
         MythInfoMapEvent *info = (MythInfoMapEvent*)event;
         if (!info)

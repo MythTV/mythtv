@@ -16,6 +16,7 @@ using namespace std;
 #include "playbacksock.h"
 #include "mthreadpool.h"
 #include "encoderlink.h"
+#include "exitcodes.h"
 #include "filetransfer.h"
 #include "scheduler.h"
 #include "livetvchain.h"
@@ -39,68 +40,68 @@ class DeleteStruct
 {
     friend class MainServer;
   public:
-    DeleteStruct(MainServer *ms, QString filename, QString title,
+    DeleteStruct(MainServer *ms, const QString& filename, const QString& title,
                  uint chanid, QDateTime recstartts, QDateTime recendts,
                  uint recordedId,
                  bool forceMetadataDelete) : 
         m_ms(ms), m_filename(filename), m_title(title), 
         m_chanid(chanid), m_recstartts(recstartts), 
         m_recendts(recendts), m_recordedid(recordedId),
-        m_forceMetadataDelete(forceMetadataDelete), m_fd(-1), m_size(0)
+        m_forceMetadataDelete(forceMetadataDelete)
     {
     }
 
-    DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
-        m_ms(ms), m_filename(filename), m_chanid(0), m_recordedid(0),
-        m_forceMetadataDelete(false), m_fd(fd), m_size(size)
+    DeleteStruct(MainServer *ms, const QString& filename, int fd, off_t size) :
+        m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)
     {
     }
 
   protected:
-    MainServer *m_ms;
+    MainServer *m_ms                  {nullptr};
     QString     m_filename;
     QString     m_title;
-    uint        m_chanid;
+    uint        m_chanid              {0};
     QDateTime   m_recstartts;
     QDateTime   m_recendts;
-    uint        m_recordedid;
-    bool        m_forceMetadataDelete;
-    int         m_fd;
-    off_t       m_size;
+    uint        m_recordedid          {0};
+    bool        m_forceMetadataDelete {false};
+    int         m_fd                  {-1};
+    off_t       m_size                {0};
 };
 
 class DeleteThread : public QRunnable, public DeleteStruct
 {
   public:
-    DeleteThread(MainServer *ms, QString filename, QString title, uint chanid,
+    DeleteThread(MainServer *ms, const QString& filename, const QString& title, uint chanid,
                  QDateTime recstartts, QDateTime recendts, uint recordingId,
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
                                   recendts, recordingId, forceMetadataDelete)  {}
     void start(void)
         { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
-    void run(void);
+    void run(void) override; // QRunnable
 };
 
 class TruncateThread : public QRunnable, public DeleteStruct
 {
   public:
-    TruncateThread(MainServer *ms, QString filename, int fd, off_t size) :
+    TruncateThread(MainServer *ms, const QString& filename, int fd, off_t size) :
                 DeleteStruct(ms, filename, fd, size)  {}
     void start(void)
         { MThreadPool::globalInstance()->start(this, "Truncate"); }
-    void run(void);
+    void run(void) override; // QRunnable
 };
 
 class RenameThread : public QRunnable
 {
 public:
-    RenameThread(MainServer &ms, PlaybackSock &pbs, QString src, QString dst)
+    RenameThread(MainServer &ms, PlaybackSock &pbs,
+                 const QString& src, const QString& dst)
         : m_ms(ms), m_pbs(pbs), m_src(src), m_dst(dst) {}
-    void run(void);
+    void run(void) override; // QRunnable
 
 private:
-    static QMutex m_renamelock;
+    static QMutex s_renamelock;
 
     MainServer   &m_ms;
     PlaybackSock &m_pbs;
@@ -124,26 +125,31 @@ class MainServer : public QObject, public MythSocketCBs
 
     void Stop(void);
 
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
     bool isClientConnected(bool onlyBlockingClients = false);
     void ShutSlaveBackendsDown(QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
 
-    void readyRead(MythSocket *socket);
-    void connectionClosed(MythSocket *socket);
-    void connectionFailed(MythSocket *socket) { (void)socket; }
-    void connected(MythSocket *socket) { (void)socket; }
+    void readyRead(MythSocket *socket) override; // MythSocketCBs
+    void connectionClosed(MythSocket *socket) override; // MythSocketCBs
+    void connectionFailed(MythSocket *socket) override // MythSocketCBs
+        { (void)socket; }
+    void connected(MythSocket *socket) override // MythSocketCBs
+        { (void)socket; }
 
-    void DeletePBS(PlaybackSock *pbs);
+    void DeletePBS(PlaybackSock *sock);
 
     size_t GetCurrentMaxBitrate(void);
     void BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                bool allHosts);
-    void GetFilesystemInfos(QList<FileSystemInfo> &fsInfos);
+    void GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
+                            bool useCache=true);
 
     int GetExitCode() const { return m_exitCode; }
+
+    void UpdateSystemdStatus(void);
 
   protected slots:
     void reconnectTimeout(void);
@@ -166,9 +172,9 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
                         const QString &src, const QString &dst);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
-    bool HandleDeleteFile(QString filename, QString storagegroup,
+    bool HandleDeleteFile(const QString& filename, const QString& storagegroup,
                           PlaybackSock *pbs = nullptr);
-    void HandleQueryRecordings(QString type, PlaybackSock *pbs);
+    void HandleQueryRecordings(const QString& type, PlaybackSock *pbs);
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
@@ -187,14 +193,14 @@ class MainServer : public QObject, public MythSocketCBs
                                     PlaybackSock *pbs);
     bool HandleAddChildInput(uint inputid);
     void HandleGoToSleep(PlaybackSock *pbs);
-    void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
+    void HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts);
     void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryGuideDataThrough(PlaybackSock *pbs);
-    void HandleGetPendingRecordings(PlaybackSock *pbs, QString table = "", int recordid=-1);
+    void HandleGetPendingRecordings(PlaybackSock *pbs, const QString& table = "", int recordid=-1);
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
     void HandleGetExpiringRecordings(PlaybackSock *pbs);
@@ -276,9 +282,9 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(const QUrl &url, const QString &wantgroup);
+    QString LocalFilePath(const QString &path, const QString &wantgroup);
 
-    int GetfsID(QList<FileSystemInfo>::iterator fsInfo);
+    int GetfsID(const QList<FileSystemInfo>::iterator& fsInfo);
 
     void DoTruncateThread(DeleteStruct *ds);
     void DoDeleteThread(DeleteStruct *ds);
@@ -300,38 +306,38 @@ class MainServer : public QObject, public MythSocketCBs
                                  int fd, const QString &filename,
                                  off_t fsize);
 
-    vector<LiveTVChain*> liveTVChains;
-    QMutex liveTVChainsLock;
+    vector<LiveTVChain*> m_liveTVChains;
+    QMutex               m_liveTVChainsLock;
 
-    QMap<int, EncoderLink *> *encoderList;
+    QMap<int, EncoderLink *> *m_encoderList  {nullptr};
 
-    MythServer *mythserver;
-    MetadataFactory *metadatafactory;
+    MythServer            *m_mythserver      {nullptr};
+    MetadataFactory       *m_metadatafactory {nullptr};
 
-    QReadWriteLock sockListLock;
-    vector<PlaybackSock *> playbackList;
-    vector<FileTransfer *> fileTransferList;
-    QSet<MythSocket*> controlSocketList;
-    vector<MythSocket*> decrRefSocketList;
+    QReadWriteLock         m_sockListLock;
+    vector<PlaybackSock *> m_playbackList;
+    vector<FileTransfer *> m_fileTransferList;
+    QSet<MythSocket*>      m_controlSocketList;
+    vector<MythSocket*>    m_decrRefSocketList;
 
-    QMutex masterFreeSpaceListLock;
-    FreeSpaceUpdater * volatile masterFreeSpaceListUpdater;
-    QWaitCondition masterFreeSpaceListWait;
-    QStringList masterFreeSpaceList;
+    QMutex                      m_masterFreeSpaceListLock;
+    FreeSpaceUpdater * volatile m_masterFreeSpaceListUpdater {nullptr};
+    QWaitCondition              m_masterFreeSpaceListWait;
+    QStringList                 m_masterFreeSpaceList;
 
-    QTimer *masterServerReconnect; // audited ref #5318
-    PlaybackSock *masterServer;
+    QTimer       *m_masterServerReconnect    {nullptr}; // audited ref #5318
+    PlaybackSock *m_masterServer             {nullptr};
 
-    bool ismaster;
+    bool m_ismaster;
 
-    QMutex deletelock;
-    MThreadPool threadPool;
+    QMutex m_deletelock;
+    MThreadPool m_threadPool;
 
-    bool masterBackendOverride;
+    bool m_masterBackendOverride             {false};
 
-    Scheduler *m_sched;
-    AutoExpire *m_expirer;
-    QMutex m_addChildInputLock;
+    Scheduler  *m_sched                      {nullptr};
+    AutoExpire *m_expirer                    {nullptr};
+    QMutex      m_addChildInputLock;
 
     struct DeferredDeleteStruct
     {
@@ -339,25 +345,27 @@ class MainServer : public QObject, public MythSocketCBs
         QDateTime ts;
     };
 
-    QMutex deferredDeleteLock;
-    QTimer *deferredDeleteTimer; // audited ref #5318
-    MythDeque<DeferredDeleteStruct> deferredDeleteList;
+    QMutex  m_deferredDeleteLock;
+    QTimer *m_deferredDeleteTimer            {nullptr}; // audited ref #5318
+    MythDeque<DeferredDeleteStruct> m_deferredDeleteList;
 
-    QTimer *autoexpireUpdateTimer; // audited ref #5318
-    static QMutex truncate_and_close_lock;
+    QTimer *m_autoexpireUpdateTimer          {nullptr}; // audited ref #5318
+    static QMutex s_truncate_and_close_lock;
 
-    QMap<QString, int> fsIDcache;
-    QMutex fsIDcacheLock;
+    QMap<QString, int>    m_fsIDcache;
+    QMutex                m_fsIDcacheLock;
+    QList<FileSystemInfo> m_fsInfosCache;
+    QMutex                m_fsInfosCacheLock;
 
     QMutex                     m_downloadURLsLock;
     QMap<QString, QString>     m_downloadURLs;
 
-    int m_exitCode;
+    int m_exitCode                           {GENERIC_EXIT_OK};
 
     typedef QHash<QString,QString> RequestedBy;
     RequestedBy                m_previewRequestedBy;
 
-    bool m_stopped;
+    bool m_stopped                           {false};
 
     static const uint kMasterServerReconnectTimeout;
 };

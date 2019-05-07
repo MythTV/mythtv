@@ -42,7 +42,7 @@ class RTPDataPacket : public UDPPacket
         return *this;
     }
 
-    bool IsValid(void) const
+    bool IsValid(void) const override // UDPPacket
     {
         if (m_data.size() < 12)
         {

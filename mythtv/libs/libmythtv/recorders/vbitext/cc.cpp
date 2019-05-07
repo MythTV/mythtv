@@ -56,7 +56,7 @@ static int parityok(int n)      /* check parity for 2 bytes packed in n */
 }
 
 
-static int decodebit(unsigned char *data, int threshold, int scale1)
+static bool decodebit(const unsigned char *data, int threshold, int scale1)
 {
     int i, sum = 0;
     for (i = 0; i < scale1; i++)
@@ -94,7 +94,7 @@ static int decode(unsigned char *vbiline, int scale0, int scale1)
         i++;
     }
 
-    i = min[6] = min[5] - max[5] + max[6];
+    min[6] = min[5] - max[5] + max[6];
 
     if (clk != 7 || vbiline[max[3]] - vbiline[min[5]] < 45)     /* failure to locate clock lead-in */
         return -1;

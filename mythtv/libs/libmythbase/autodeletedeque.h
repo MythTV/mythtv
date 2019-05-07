@@ -8,7 +8,7 @@ template<typename T>
 class AutoDeleteDeque
 {
   public:
-    explicit AutoDeleteDeque(bool auto_delete = true) : autodelete(auto_delete) {}
+    explicit AutoDeleteDeque(bool auto_delete = true) : m_autodelete(auto_delete) {}
     ~AutoDeleteDeque() { clear(); }
 
     typedef typename std::deque< T > List;
@@ -19,70 +19,70 @@ class AutoDeleteDeque
 
     T operator[](uint index)
     {
-        if (index < list.size())
-            return list[index];
+        if (index < m_list.size())
+            return m_list[index];
         return nullptr;
     }
     const T operator[](uint index) const
     {
-        if (index < list.size())
-            return list[index];
+        if (index < m_list.size())
+            return m_list[index];
         return nullptr;
     }
 
     T take(uint i);
     iterator erase(iterator it)
     {
-        if (autodelete)
+        if (m_autodelete)
             delete *it;
-        return list.erase(it);
+        return m_list.erase(it);
     }
     void clear(void)
     {
-        while (autodelete && !list.empty())
+        while (m_autodelete && !m_list.empty())
         {
-            delete list.back();
-            list.pop_back();
+            delete m_list.back();
+            m_list.pop_back();
         }
-        list.clear();
+        m_list.clear();
     }
 
-    iterator begin(void)             { return list.begin(); }
-    iterator end(void)               { return list.end();   }
-    const_iterator begin(void) const { return list.begin(); }
-    const_iterator end(void)   const { return list.end();   }
-    reverse_iterator rbegin(void)             { return list.rbegin(); }
-    reverse_iterator rend(void)               { return list.rend();   }
-    const_reverse_iterator rbegin(void) const { return list.rbegin(); }
-    const_reverse_iterator rend(void)   const { return list.rend();   }
+    iterator begin(void)             { return m_list.begin(); }
+    iterator end(void)               { return m_list.end();   }
+    const_iterator begin(void) const { return m_list.begin(); }
+    const_iterator end(void)   const { return m_list.end();   }
+    reverse_iterator rbegin(void)             { return m_list.rbegin(); }
+    reverse_iterator rend(void)               { return m_list.rend();   }
+    const_reverse_iterator rbegin(void) const { return m_list.rbegin(); }
+    const_reverse_iterator rend(void)   const { return m_list.rend();   }
 
-    T back(void)                     { return list.back();  }
-    const T back(void)         const { return list.back();  }
+    T back(void)                     { return m_list.back();  }
+    const T back(void)         const { return m_list.back();  }
 
-    bool empty(void)  const { return list.empty(); }
-    size_t size(void) const { return list.size(); }
-    void push_front(T info) { list.push_front(info); }
-    void push_back( T info) { list.push_back( info); }
+    bool empty(void)  const { return m_list.empty(); }
+    size_t size(void) const { return m_list.size(); }
+    void push_front(T info) { m_list.push_front(info); }
+    void push_back( T info) { m_list.push_back( info); }
 
     // compatibility with old Q3PtrList
-    void setAutoDelete(bool auto_delete) { autodelete = auto_delete; }
+    void setAutoDelete(bool auto_delete) { m_autodelete = auto_delete; }
 
   protected:
-    List list;
-    bool autodelete;
+    List m_list;
+    bool m_autodelete;
 };
 
 template<typename T>
 T AutoDeleteDeque<T>::take(uint index)
 {
-    iterator it = list.begin();
+    iterator it = m_list.begin();
     for (uint i = 0; i < index; i++, ++it)
     {
-        if (it == list.end())
+        if (it == m_list.end())
             return nullptr;
     }
     T info = *it;
-    list.erase(it);
+    m_list.erase(it);
     return info;
 }
 

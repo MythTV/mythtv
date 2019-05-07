@@ -30,7 +30,7 @@ class UPnpEventTask : public Task
 
         QHostAddress m_PeerAddress;
         int          m_nPeerPort;
-        QByteArray  *m_pPayload;
+        QByteArray  *m_pPayload {nullptr};
 
     protected:
 
@@ -44,8 +44,8 @@ class UPnpEventTask : public Task
                        int          nPeerPort,  
                        QByteArray  *m_pPayload );
 
-        virtual QString Name   ()               { return( "Event" );   }
-        virtual void    Execute( TaskQueue * );
+        QString Name() override { return( "Event" ); } // Task
+        void Execute( TaskQueue * ) override; // Task
 
 };
 

@@ -48,16 +48,11 @@ int main(int argc, char *argv[])
 {
     FillData fill_data;
     int fromfile_id = 1;
-    int fromfile_offset = 0;
     QString fromfile_name;
     bool from_file = false;
     bool mark_repeats = true;
 
-    bool usingDataDirect = false;
-
-    bool from_dd_file = false;
     int sourceid = -1;
-    QString fromddfile_lineupid;
 
     MythFillDatabaseCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -93,14 +88,14 @@ int main(int argc, char *argv[])
         cout << "### Running in manual channel configuration mode.\n";
         cout << "### This will ask you questions about every channel.\n";
         cout << "###\n";
-        fill_data.chan_data.m_interactive = true;
+        fill_data.m_chan_data.m_interactive = true;
     }
 
     if (cmdline.toBool("onlyguide") || cmdline.toBool("update"))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Only updating guide data, channel and icon updates will be ignored");
-        fill_data.chan_data.m_guideDataOnly = true;
+        fill_data.m_chan_data.m_guideDataOnly = true;
     }
 
     if (cmdline.toBool("preset"))
@@ -110,7 +105,7 @@ int main(int argc, char *argv[])
         cout << "### This will assign channel ";
         cout << "preset numbers to every channel.\n";
         cout << "###\n";
-        fill_data.chan_data.m_channelPreset = true;
+        fill_data.m_chan_data.m_channelPreset = true;
     }
 
     if (cmdline.toBool("file"))
@@ -132,38 +127,12 @@ int main(int argc, char *argv[])
         from_file = true;
     }
 
-    if (cmdline.toBool("ddfile"))
-    {
-        // datadirect file mode
-        if (!cmdline.toBool("sourceid") ||
-            !cmdline.toBool("offset") ||
-            !cmdline.toBool("lineupid") ||
-            !cmdline.toBool("xmlfile"))
-        {
-            cerr << "The --dd-file option must be used in combination" << endl
-                 << "with each of --sourceid, --offset, --lineupid," << endl
-                 << "and --xmlfile." << endl;
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        fromfile_id         = cmdline.toInt("sourceid");
-        fromfile_offset     = cmdline.toInt("offset");
-        fromddfile_lineupid = cmdline.toString("lineupid");
-        fromfile_name       = cmdline.toString("xmlfile");
-
-        LOG(VB_GENERAL, LOG_INFO,
-            "Bypassing grabbers, reading directly from file");
-        from_dd_file = true;
-    }
-
     if (cmdline.toBool("dochannelupdates"))
-        fill_data.chan_data.m_channelUpdates = true;
-    if (cmdline.toBool("removechannels"))
-        fill_data.chan_data.m_removeNewChannels = true;
+        fill_data.m_chan_data.m_channelUpdates = true;
     if (cmdline.toBool("nofilterchannels"))
-        fill_data.chan_data.m_filterNewChannels = false;
+        fill_data.m_chan_data.m_filterNewChannels = false;
     if (!cmdline.GetPassthrough().isEmpty())
-        fill_data.graboptions = " " + cmdline.GetPassthrough();
+        fill_data.m_graboptions = " " + cmdline.GetPassthrough();
     if (cmdline.toBool("sourceid"))
         sourceid = cmdline.toInt("sourceid");
     if (cmdline.toBool("cardtype"))
@@ -175,13 +144,13 @@ int main(int argc, char *argv[])
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
-        fill_data.chan_data.m_cardType = cmdline.toString("cardtype")
+        fill_data.m_chan_data.m_cardType = cmdline.toString("cardtype")
                                                 .trimmed().toUpper();
     }
     if (cmdline.toBool("maxdays") && cmdline.toInt("maxdays") > 0)
     {
-        fill_data.maxDays = cmdline.toInt("maxdays");
-        if (fill_data.maxDays == 1)
+        fill_data.m_maxDays = cmdline.toInt("maxdays");
+        if (fill_data.m_maxDays == 1)
             fill_data.SetRefresh(0, true);
     }
 
@@ -211,7 +180,7 @@ int main(int argc, char *argv[])
             QString warn = QString("Invalid entry in --refresh list: %1")
                                 .arg(*i);
 
-            bool enable = (*i).contains("not") ? false : true;
+            bool enable = !(*i).contains("not");
 
             if ((*i).contains("today"))
                 fill_data.SetRefresh(0, enable);
@@ -265,16 +234,11 @@ int main(int argc, char *argv[])
     }
 
     if (cmdline.toBool("dontrefreshtba"))
-        fill_data.refresh_tba = false;
-    if (cmdline.toBool("ddgraball"))
-    {
-        fill_data.SetRefresh(FillData::kRefreshClear, false);
-        fill_data.dd_grab_all = true;
-    }
+        fill_data.m_refresh_tba = false;
     if (cmdline.toBool("onlychannels"))
-        fill_data.only_update_channels = true;
+        fill_data.m_only_update_channels = true;
     if (cmdline.toBool("noallatonce"))
-        fill_data.no_allatonce = true;
+        fill_data.m_no_allatonce = true;
 
     mark_repeats = cmdline.toBool("markrepeats");
 
@@ -366,11 +330,6 @@ int main(int argc, char *argv[])
 
         updateLastRunStatus(status);
     }
-    else if (from_dd_file)
-    {
-        fill_data.GrabDataFromDDFile(
-            fromfile_id, fromfile_offset, fromfile_name, fromddfile_lineupid);
-    }
     else
     {
         SourceList sourcelist;
@@ -412,8 +371,6 @@ int main(int argc, char *argv[])
                        newsource.xmltvgrabber_prefmethod = "";
 
                        sourcelist.push_back(newsource);
-                       usingDataDirect |=
-                           is_grabber_datadirect(newsource.xmltvgrabber);
                   }
              }
              else
@@ -436,7 +393,7 @@ int main(int argc, char *argv[])
             LOG(VB_GENERAL, LOG_NOTICE, "Data fetching complete.");
     }
 
-    if (fill_data.only_update_channels && !fill_data.need_post_grab_proc)
+    if (fill_data.m_only_update_channels && !fill_data.m_need_post_grab_proc)
     {
         return GENERIC_EXIT_OK;
     }
@@ -560,29 +517,29 @@ int main(int argc, char *argv[])
 
         int newEpiWindow = gCoreContext->GetNumSetting( "NewEpisodeWindow", 14);
 
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("UPDATE program SET previouslyshown = 1 "
+        MSqlQuery query2(MSqlQuery::InitCon());
+        query2.prepare("UPDATE program SET previouslyshown = 1 "
                       "WHERE previouslyshown = 0 "
                       "AND originalairdate is not null "
                       "AND (to_days(starttime) - to_days(originalairdate)) "
                       "    > :NEWWINDOW;");
-        query.bindValue(":NEWWINDOW", newEpiWindow);
+        query2.bindValue(":NEWWINDOW", newEpiWindow);
 
-        if (query.exec())
+        if (query2.exec())
             LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1").arg(query.numRowsAffected()));
+                QString("    Found %1").arg(query2.numRowsAffected()));
 
         LOG(VB_GENERAL, LOG_INFO, "Unmarking new episode rebroadcast repeats.");
-        query.prepare("UPDATE program SET previouslyshown = 0 "
+        query2.prepare("UPDATE program SET previouslyshown = 0 "
                       "WHERE previouslyshown = 1 "
                       "AND originalairdate is not null "
                       "AND (to_days(starttime) - to_days(originalairdate)) "
                       "    <= :NEWWINDOW;");
-        query.bindValue(":NEWWINDOW", newEpiWindow);
+        query2.bindValue(":NEWWINDOW", newEpiWindow);
 
-        if (query.exec())
+        if (query2.exec())
             LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1").arg(query.numRowsAffected()));
+                QString("    Found %1").arg(query2.numRowsAffected()));
     }
 
     // Mark first and last showings
@@ -663,25 +620,19 @@ int main(int argc, char *argv[])
     found += updt.numRowsAffected();
     LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
-    if (true) // limit MSqlQuery's lifetime
+#if 1
+    // limit MSqlQuery's lifetime
+    MSqlQuery query2(MSqlQuery::InitCon());
+    query2.prepare("SELECT count(previouslyshown) "
+                   "FROM program WHERE previouslyshown = 1;");
+    if (query2.exec() && query2.next())
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT count(previouslyshown) "
-                      "FROM program WHERE previouslyshown = 1;");
-        if (query.exec() && query.next())
-        {
-            if (query.value(0).toInt() != 0)
-                gCoreContext->SaveSettingOnHost("HaveRepeats", "1", nullptr);
-            else
-                gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);
-        }
+        if (query2.value(0).toInt() != 0)
+            gCoreContext->SaveSettingOnHost("HaveRepeats", "1", nullptr);
+        else
+            gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);
     }
-
-    if ((usingDataDirect) &&
-        (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
-    {
-        fill_data.ddprocessor.GrabNextSuggestedTime();
-    }
+#endif
 
     LOG(VB_GENERAL, LOG_INFO, "\n"
             "===============================================================\n"

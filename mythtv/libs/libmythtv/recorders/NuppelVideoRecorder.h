@@ -38,6 +38,8 @@ using namespace std;
 
 #include "mythtvexp.h"
 
+#define KEYFRAMEDIST   30
+
 struct video_audio;
 class RTjpeg;
 class RingBuffer;
@@ -53,7 +55,7 @@ class NVRWriteThread : public MThread
     explicit NVRWriteThread(NuppelVideoRecorder *parent) :
         MThread("NVRWrite"), m_parent(parent) {}
     virtual ~NVRWriteThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
     NuppelVideoRecorder *m_parent;
 };
@@ -64,7 +66,7 @@ class NVRAudioThread : public MThread
     explicit NVRAudioThread(NuppelVideoRecorder *parent) :
         MThread("NVRAudio"), m_parent(parent) {}
     virtual ~NVRAudioThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
     NuppelVideoRecorder *m_parent;
 };
@@ -77,34 +79,34 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
 
-    void SetOption(const QString &name, int value);
-    void SetOption(const QString &name, const QString &value);
+    void SetOption(const QString &opt, int value) override; // DTVRecorder
+    void SetOption(const QString &name, const QString &value) override; // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
  
-    void Initialize(void);
-    void run(void);
+    void Initialize(void) override; // DTVRecorder
+    void run(void) override; // RecorderBase
     
-    virtual void Pause(bool clear = true);
-    virtual bool IsPaused(bool holding_lock = false) const;
+    void Pause(bool clear = true) override; // RecorderBase
+    bool IsPaused(bool holding_lock = false) const override; // RecorderBase
  
-    bool IsRecording(void);
+    bool IsRecording(void) override; // RecorderBase
 
-    long long GetFramesWritten(void); 
+    long long GetFramesWritten(void) override; // DTVRecorder
 
     bool Open(void);
-    int GetVideoFd(void);
-    void Reset(void);
+    int GetVideoFd(void) override; // DTVRecorder
+    void Reset(void) override; // DTVRecorder
 
-    void SetVideoFilters(QString &filters);
-    void SetTranscoding(bool value) { transcoding = value; };
+    void SetVideoFilters(QString &filters) override; // DTVRecorder
+    void SetTranscoding(bool value) { m_transcoding = value; };
 
-    void ResetForNewFile(void);
-    void FinishRecording(void);
-    void StartNewFile(void);
+    void ResetForNewFile(void) override; // DTVRecorder
+    void FinishRecording(void) override; // DTVRecorder
+    void StartNewFile(void) override; // RecorderBase
 
     // reencode stuff
     void StreamAllocate(void);
@@ -117,7 +119,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     bool SetupAVCodecVideo(void);
     void SetupRTjpeg(void);
     int AudioInit(bool skipdevice = false);
-    void SetVideoAspect(float newAspect) {video_aspect = newAspect; };
+    void SetVideoAspect(float newAspect) {m_video_aspect = newAspect; };
     void WriteVideo(VideoFrame *frame, bool skipsync = false, 
                     bool forcekey = false);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
@@ -152,44 +154,46 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void DoV4L2(void);
     void DoMJPEG(void);
 
-    virtual void FormatTT(struct VBIData*); // RecorderBase
-    virtual void FormatCC(uint code1, uint code2); // RecorderBase
-    virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
+    void FormatTT(struct VBIData*) override; // V4LRecorder
+    void FormatCC(uint code1, uint code2) override; // V4LRecorder
+    void AddTextData(unsigned char*,int,int64_t,char) override; // CC608Input
 
     void UpdateResolutions(void);
     
-    int fd; // v4l input file handle
-    signed char *strm;
-    unsigned int lf, tf;
-    int M1, M2, Q;
-    int width, height;
-    int pip_mode;
-    int pid, pid2;
-    int inputchannel;
-    int compression;
-    int compressaudio;
-    AudioInput *audio_device;
-    unsigned long long audiobytes;
-    int audio_channels; 
-    int audio_bits;
-    int audio_bytes_per_sample;
-    int audio_samplerate; // rate we request from sounddevice
-    int effectivedsp; // actual measured rate
+    int                 m_fd                     {-1}; // v4l input file handle
+    signed char        *m_strm                   {nullptr};
+    unsigned int        m_lf                     {0};
+    int                 m_tf                     {0};
+    int                 m_M1                     {0};
+    int                 m_M2                     {0};
+    int                 m_Q                      {255};
+    int                 m_width                  {352};
+    int                 m_height                 {240};
+    int                 m_pip_mode               {0};
+    int                 m_compression            {1};
+    bool                m_compressaudio          {true};
+    AudioInput         *m_audio_device           {nullptr};
+    unsigned long long  m_audiobytes             {0};
+    int                 m_audio_channels         {2}; 
+    int                 m_audio_bits             {16};
+    int                 m_audio_bytes_per_sample {m_audio_channels * m_audio_bits / 8};
+    int                 m_audio_samplerate       {44100}; // rate we request from sounddevice
+    int                 m_effectivedsp           {0}; // actual measured rate
 
-    int usebttv;
-    float video_aspect;
+    int                 m_usebttv                {1};
+    float               m_video_aspect           {1.33333F};
 
-    bool transcoding;
+    bool                m_transcoding            {false};
 
-    int mp3quality;
-    char *mp3buf;
-    int mp3buf_size;
-    lame_global_flags *gf;
+    int                 m_mp3quality             {3};
+    char               *m_mp3buf                 {nullptr};
+    int                 m_mp3buf_size            {0};
+    lame_global_flags  *m_gf                     {nullptr};
 
-    RTjpeg *rtjc;
+    RTjpeg             *m_rtjc                   {nullptr};
 
 #define OUT_LEN (1024*1024 + 1024*1024 / 64 + 16 + 3)    
-    lzo_byte out[OUT_LEN];
+    lzo_byte            m_out[OUT_LEN];
 #define HEAP_ALLOC(var,size) \
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
     HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS);
@@ -198,106 +202,104 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     vector<struct audbuffertype *> audiobuffer;
     vector<struct txtbuffertype *> textbuffer;
 
-    int act_video_encode;
-    int act_video_buffer;
+    int                 m_act_video_encode       {0};
+    int                 m_act_video_buffer       {0};
 
-    int act_audio_encode;
-    int act_audio_buffer;
-    long long act_audio_sample;
+    int                 m_act_audio_encode       {0};
+    int                 m_act_audio_buffer       {0};
+    long long           m_act_audio_sample       {0};
    
-    int act_text_encode;
-    int act_text_buffer;
+    int                 m_act_text_encode        {0};
+    int                 m_act_text_buffer        {0};
  
-    int video_buffer_count;
-    int audio_buffer_count;
-    int text_buffer_count;
+    int                 m_video_buffer_count     {0};
+    int                 m_audio_buffer_count     {0};
+    int                 m_text_buffer_count      {0};
 
-    long video_buffer_size;
-    long audio_buffer_size;
-    long text_buffer_size;
+    long                m_video_buffer_size      {0};
+    long                m_audio_buffer_size      {0};
+    long                m_text_buffer_size       {0};
 
-    struct timeval stm;
-    struct timezone tzone;
+    struct timeval      m_stm;
+    struct timezone     m_tzone;
 
-    NVRWriteThread *write_thread;
-    NVRAudioThread *audio_thread;
+    NVRWriteThread     *m_write_thread           {nullptr};
+    NVRAudioThread     *m_audio_thread           {nullptr};
 
-    bool recording;
+    bool                m_recording              {false};
 
-    int keyframedist;
-    vector<struct seektable_entry> *seektable;
-    long long lastPositionMapPos;
+    int                 m_keyframedist           {KEYFRAMEDIST};
+    vector<struct seektable_entry> *m_seektable  {nullptr};
+    long long           m_lastPositionMapPos     {0};
 
-    long long extendeddataOffset;
+    long long           m_extendeddataOffset     {0};
 
-    long long framesWritten;
+    long long           m_framesWritten          {0};
 
-    bool livetv;
-    bool writepaused;
-    bool audiopaused;
-    bool mainpaused;
+    bool                m_livetv                 {false};
+    bool                m_writepaused            {false};
+    bool                m_audiopaused            {false};
+    bool                m_mainpaused             {false};
 
-    double framerate_multiplier;
-    double height_multiplier;
+    double              m_framerate_multiplier   {1.0};
+    double              m_height_multiplier      {1.0};
 
-    int last_block;
-    int firsttc;
-    long int oldtc;
-    int startnum;
-    int frameofgop;
-    int lasttimecode;
-    int audio_behind;
+    int                 m_last_block             {0};
+    int                 m_firsttc                {0};
+    long int            m_oldtc                  {0};
+    int                 m_startnum               {0};
+    int                 m_frameofgop             {0};
+    int                 m_lasttimecode           {0};
+    int                 m_audio_behind           {0};
     
-    bool useavcodec;
+    bool                m_useavcodec             {false};
 
-    AVCodec *mpa_vidcodec;
-    AVCodecContext *mpa_vidctx;
+    AVCodec            *m_mpa_vidcodec           {nullptr};
+    AVCodecContext     *m_mpa_vidctx             {nullptr};
 
-    int targetbitrate;
-    int scalebitrate;
-    int maxquality;
-    int minquality;
-    int qualdiff;
-    int mp4opts;
-    int mb_decision;
+    int                 m_targetbitrate          {2200};
+    int                 m_scalebitrate           {1};
+    int                 m_maxquality             {2};
+    int                 m_minquality             {31};
+    int                 m_qualdiff               {3};
+    int                 m_mp4opts                {0};
+    int                 m_mb_decision            {FF_MB_DECISION_SIMPLE};
     /// Number of threads to use for MPEG-2 and MPEG-4 encoding
-    int encoding_thread_count;
+    int                 m_encoding_thread_count  {1};
 
-    QString videoFilterList;
-    FilterChain *videoFilters;
-    FilterManager *FiltMan;
+    QString             m_videoFilterList;
+    FilterChain        *m_videoFilters           {nullptr};
+    FilterManager      *m_filtMan                {nullptr};
 
-    VideoFrameType inpixfmt;
-    AVPixelFormat picture_format;
-    uint32_t v4l2_pixelformat;
-    int w_out;
-    int h_out;
+    VideoFrameType      m_inpixfmt               {FMT_YV12};
+    AVPixelFormat       m_picture_format         {AV_PIX_FMT_YUV420P};
+    uint32_t            m_v4l2_pixelformat       {0};
+    int                 m_w_out                  {0};
+    int                 m_h_out                  {0};
 
-    bool hardware_encode;
-    int hmjpg_quality;
-    int hmjpg_hdecimation;
-    int hmjpg_vdecimation;
-    int hmjpg_maxw;
+    bool                m_hardware_encode        {false};
+    int                 m_hmjpg_quality          {80};
+    int                 m_hmjpg_hdecimation      {2};
+    int                 m_hmjpg_vdecimation      {2};
+    int                 m_hmjpg_maxw             {640};
 
-    bool cleartimeonpause;
+    bool                m_cleartimeonpause       {false};
 
-    bool usingv4l2;
-    int channelfd;
+    bool                m_usingv4l2              {false};
+    int                 m_channelfd              {-1};
 
-    long long prev_bframe_save_pos;
+    ChannelBase        *m_channelObj             {nullptr};
 
-    ChannelBase *channelObj;
+    bool                m_skip_btaudio           {false};
 
-    bool skip_btaudio;
+    bool                m_correct_bttv           {false};
 
-    bool correct_bttv;
+    int                 m_volume                 {100};
 
-    int volume;
+    CC608Decoder       *m_ccd                    {nullptr};
 
-    CC608Decoder *ccd;
-
-    bool go7007;
-    bool resetcapture;
+    bool                m_go7007                 {false};
+    bool                m_resetcapture           {false};
 };
 
 #endif

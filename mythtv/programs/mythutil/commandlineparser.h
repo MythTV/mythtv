@@ -9,9 +9,9 @@ class MythUtilCommandLineParser : public MythCommandLineParser
 {
   public:
     MythUtilCommandLineParser();
-    void LoadArguments(void);
+    void LoadArguments(void) override; // MythCommandLineParser
   protected:
-    QString GetHelpHeader(void) const;
+    QString GetHelpHeader(void) const override; // MythCommandLineParser
 };
 
 #endif

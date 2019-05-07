@@ -26,14 +26,6 @@
 
 #define LOC     QString("AudioIn: ")
 
-AudioInput::AudioInput(const QString &device)
-{
-    m_audio_device = QByteArray(device.toLatin1());
-    m_audio_channels = 0;
-    m_audio_sample_bits = 0;
-    m_audio_sample_rate = 0;
-}
-
 AudioInput *AudioInput::CreateDevice(const QByteArray &device)
 {
     AudioInput *audio = nullptr;

@@ -81,16 +81,16 @@ static inline void idct_row (int16_t * row, int offset,
 
 /* MMXEXT row IDCT */
 
-#define mmxext_table(c1,c2,c3,c4,c5,c6,c7)	{  c4,  c2, -c4, -c2,	\
-						   c4,  c6,  c4,  c6,	\
-						   c1,  c3, -c1, -c5,	\
-						   c5,  c7,  c3, -c7,	\
-						   c4, -c6,  c4, -c6,	\
-						  -c4,  c2,  c4, -c2,	\
-						   c5, -c1,  c3, -c1,	\
-						   c7,  c3,  c7, -c5 }
+#define mmxext_table(c1,c2,c3,c4,c5,c6,c7)	{  (c4),  (c2), -(c4), -(c2), \
+						   (c4),  (c6),  (c4),  (c6), \
+						   (c1),  (c3), -(c1), -(c5), \
+						   (c5),  (c7),  (c3), -(c7), \
+						   (c4), -(c6),  (c4), -(c6), \
+						  -(c4),  (c2),  (c4), -(c2), \
+						   (c5), -(c1),  (c3), -(c1), \
+						   (c7),  (c3),  (c7), -(c5) }
 
-static inline void mmxext_row_head (int16_t * const row, const int offset,
+static inline void mmxext_row_head (const int16_t * const row, const int offset,
 				    const int16_t * const table)
 {
     movq_m2r (*(row+offset), mm2);	/* mm2 = x6 x4 x2 x0 */
@@ -196,16 +196,16 @@ static inline void mmxext_row_mid (int16_t * const row, const int store,
 
 /* MMX row IDCT */
 
-#define mmx_table(c1,c2,c3,c4,c5,c6,c7)	{  c4,  c2,  c4,  c6,	\
-					   c4,  c6, -c4, -c2,	\
-					   c1,  c3,  c3, -c7,	\
-					   c5,  c7, -c1, -c5,	\
-					   c4, -c6,  c4, -c2,	\
-					  -c4,  c2,  c4, -c6,	\
-					   c5, -c1,  c7, -c5,	\
-					   c7,  c3,  c3, -c1 }
+#define mmx_table(c1,c2,c3,c4,c5,c6,c7)	{  (c4),  (c2),  (c4),  (c6), \
+					   (c4),  (c6), -(c4), -(c2), \
+					   (c1),  (c3),  (c3), -(c7), \
+					   (c5),  (c7), -(c1), -(c5), \
+					   (c4), -(c6),  (c4), -(c2), \
+					  -(c4),  (c2),  (c4), -(c6), \
+					   (c5), -(c1),  (c7), -(c5), \
+					   (c7),  (c3),  (c3), -(c1) }
 
-static inline void mmx_row_head (int16_t * const row, const int offset,
+static inline void mmx_row_head (const int16_t * const row, const int offset,
 				 const int16_t * const table)
 {
     movq_m2r (*(row+offset), mm2);	/* mm2 = x6 x4 x2 x0 */
@@ -595,14 +595,14 @@ static inline void idct (int16_t * const block)				\
 
 #define COPY_MMX(offset,r0,r1,r2)	\
 do {					\
-    movq_m2r (*(block+offset), r0);	\
+    movq_m2r (*(block+(offset)), r0);	\
     dest += stride;			\
-    movq_m2r (*(block+offset+4), r1);	\
+    movq_m2r (*(block+(offset)+4), r1);	\
     movq_r2m (r2, *dest);		\
     packuswb_r2r (r1, r0);		\
 } while (0)
 
-static inline void block_copy (int16_t * const block, uint8_t * dest,
+static inline void block_copy (const int16_t * const block, uint8_t * dest,
 			       const int stride)
 {
     movq_m2r (*(block+0*8), mm0);
@@ -630,12 +630,12 @@ do {					\
     dest += stride;			\
     movq_r2m (r3, *dest);		\
     punpcklbw_r2r (mm0, r1);		\
-    paddsw_m2r (*(block+offset), r1);	\
+    paddsw_m2r (*(block+(offset)), r1);	\
     punpckhbw_r2r (mm0, r2);		\
-    paddsw_m2r (*(block+offset+4), r2);	\
+    paddsw_m2r (*(block+(offset)+4), r2);	\
 } while (0)
 
-static inline void block_add (int16_t * const block, uint8_t * dest,
+static inline void block_add (const int16_t * const block, uint8_t * dest,
 			      const int stride)
 {
     movq_m2r (*dest, mm1);

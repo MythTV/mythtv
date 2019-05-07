@@ -28,38 +28,39 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
                       RenderType type = kRenderOpenGL2);
     MythRenderOpenGL2(const MythRenderFormat& format, RenderType type = kRenderOpenGL2);
 
-    virtual uint CreateShaderObject(const QString &vert, const QString &frag);
-    virtual void DeleteShaderObject(uint obj);
-    virtual void EnableShaderObject(uint obj);
-    virtual void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform);
+    uint CreateShaderObject(const QString &vert, const QString &frag) override; // MythRenderOpenGL
+    void DeleteShaderObject(uint obj) override; // MythRenderOpenGL
+    void EnableShaderObject(uint obj) override; // MythRenderOpenGL
+    void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform) override; // MythRenderOpenGL
 
-    virtual bool RectanglesAreAccelerated(void) { return true; }
+    bool RectanglesAreAccelerated(void) override // MythRenderOpenGL
+        { return true; }
 
-    virtual void  PushTransformation(const UIEffects &fx, QPointF &center) ;
-    virtual void  PopTransformation(void);
+    void  PushTransformation(const UIEffects &fx, QPointF &center) override; // MythRenderOpenGL
+    void  PopTransformation(void) override; // MythRenderOpenGL
 
   protected:
     virtual ~MythRenderOpenGL2();
-    virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
-                                uint prog, int alpha,
-                                int red, int green, int blue);
-    virtual void DrawBitmapPriv(uint *textures, uint texture_count,
-                                const QRectF *src, const QRectF *dst,
-                                uint prog);
-    virtual void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
-                              const QPen &linePen, int alpha);
-    virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
-                                   const QBrush &fillBrush, const QPen &linePen,
-                                   int alpha);
+    void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
+                        uint prog, int alpha,
+                        int red, int green, int blue) override; // MythRenderOpenGL
+    void DrawBitmapPriv(uint *textures, uint texture_count,
+                        const QRectF *src, const QRectF *dst,
+                        uint prog) override; // MythRenderOpenGL
+    void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                      const QPen &linePen, int alpha) override; // MythRenderOpenGL
+    void DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                           const QBrush &fillBrush, const QPen &linePen,
+                           int alpha) override; // MythRenderOpenGL
 
-    virtual void Init2DState(void);
-    virtual void InitProcs(void);
-    virtual void DeleteShaders(void);
-    virtual bool InitFeatures(void);
-    virtual void ResetVars(void);
-    virtual void ResetProcs(void);
-    virtual void DeleteOpenGLResources(void);
-    virtual void SetMatrixView(void);
+    void Init2DState(void) override; // MythRenderOpenGL
+    void InitProcs(void) override; // MythRenderOpenGL
+    void DeleteShaders(void) override; // MythRenderOpenGL
+    bool InitFeatures(void) override; // MythRenderOpenGL
+    void ResetVars(void) override; // MythRenderOpenGL
+    void ResetProcs(void) override; // MythRenderOpenGL
+    void DeleteOpenGLResources(void) override; // MythRenderOpenGL
+    void SetMatrixView(void) override; // MythRenderOpenGL
 
     void CreateDefaultShaders(void);
     void DeleteDefaultShaders(void);
@@ -73,7 +74,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     uint     m_shaders[kShaderCount];
 
     // State
-    uint  m_active_obj;
+    uint       m_active_obj {0};
     QMatrix4x4 m_projection;
     QStack<QMatrix4x4> m_transforms;
     QMatrix4x4 m_parameters;
@@ -84,30 +85,30 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     map_t m_map;
 
     // Procs
-    MYTH_GLGETSHADERIVPROC               m_glGetShaderiv;
-    MYTH_GLCREATESHADERPROC              m_glCreateShader;
-    MYTH_GLSHADERSOURCEPROC              m_glShaderSource;
-    MYTH_GLCOMPILESHADERPROC             m_glCompileShader;
-    MYTH_GLATTACHSHADERPROC              m_glAttachShader;
-    MYTH_GLGETSHADERINFOLOGPROC          m_glGetShaderInfoLog;
-    MYTH_GLDETACHSHADERPROC              m_glDetachShader;
-    MYTH_GLDELETESHADERPROC              m_glDeleteShader;
+    MYTH_GLGETSHADERIVPROC               m_glGetShaderiv {nullptr};
+    MYTH_GLCREATESHADERPROC              m_glCreateShader {nullptr};
+    MYTH_GLSHADERSOURCEPROC              m_glShaderSource {nullptr};
+    MYTH_GLCOMPILESHADERPROC             m_glCompileShader {nullptr};
+    MYTH_GLATTACHSHADERPROC              m_glAttachShader {nullptr};
+    MYTH_GLGETSHADERINFOLOGPROC          m_glGetShaderInfoLog {nullptr};
+    MYTH_GLDETACHSHADERPROC              m_glDetachShader {nullptr};
+    MYTH_GLDELETESHADERPROC              m_glDeleteShader {nullptr};
 
-    MYTH_GLCREATEPROGRAMPROC             m_glCreateProgram;
-    MYTH_GLLINKPROGRAMPROC               m_glLinkProgram;
-    MYTH_GLUSEPROGRAMPROC                m_glUseProgram;
-    MYTH_GLDELETEPROGRAMPROC             m_glDeleteProgram;
-    MYTH_GLGETPROGRAMINFOLOGPROC         m_glGetProgramInfoLog;
-    MYTH_GLGETPROGRAMIVPROC              m_glGetProgramiv;
+    MYTH_GLCREATEPROGRAMPROC             m_glCreateProgram {nullptr};
+    MYTH_GLLINKPROGRAMPROC               m_glLinkProgram {nullptr};
+    MYTH_GLUSEPROGRAMPROC                m_glUseProgram {nullptr};
+    MYTH_GLDELETEPROGRAMPROC             m_glDeleteProgram {nullptr};
+    MYTH_GLGETPROGRAMINFOLOGPROC         m_glGetProgramInfoLog {nullptr};
+    MYTH_GLGETPROGRAMIVPROC              m_glGetProgramiv {nullptr};
 
-    MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation;
-    MYTH_GLUNIFORM1IPROC                 m_glUniform1i;
-    MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv;
-    MYTH_GLVERTEXATTRIBPOINTERPROC       m_glVertexAttribPointer;
-    MYTH_GLENABLEVERTEXATTRIBARRAYPROC   m_glEnableVertexAttribArray;
-    MYTH_GLDISABLEVERTEXATTRIBARRAYPROC  m_glDisableVertexAttribArray;
-    MYTH_GLBINDATTRIBLOCATIONPROC        m_glBindAttribLocation;
-    MYTH_GLVERTEXATTRIB4FPROC            m_glVertexAttrib4f;
+    MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation {nullptr};
+    MYTH_GLUNIFORM1IPROC                 m_glUniform1i {nullptr};
+    MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv {nullptr};
+    MYTH_GLVERTEXATTRIBPOINTERPROC       m_glVertexAttribPointer {nullptr};
+    MYTH_GLENABLEVERTEXATTRIBARRAYPROC   m_glEnableVertexAttribArray {nullptr};
+    MYTH_GLDISABLEVERTEXATTRIBARRAYPROC  m_glDisableVertexAttribArray {nullptr};
+    MYTH_GLBINDATTRIBLOCATIONPROC        m_glBindAttribLocation {nullptr};
+    MYTH_GLVERTEXATTRIB4FPROC            m_glVertexAttrib4f {nullptr};
 
     // Prevent compiler complaints about using 0 as a null pointer.
     inline void m_glVertexAttribPointerI(GLuint index, GLint size, GLenum type,

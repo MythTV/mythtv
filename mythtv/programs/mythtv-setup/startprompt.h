@@ -22,7 +22,7 @@ class StartPrompter : public QObject
     StartPrompter(const StartPrompter &);
 
   private:
-    struct StartPrompterPrivate *m_d;
+    struct StartPrompterPrivate *m_d {nullptr};
 };
 
 #endif

@@ -24,8 +24,8 @@ int calc_utc_offset(void)
     return utc.secsTo(loc);
 }
 
-static bool compare_zone_files(QFileInfo first_file_info,
-                               QFileInfo second_file_info)
+static bool compare_zone_files(const QFileInfo& first_file_info,
+                               const QFileInfo& second_file_info)
 {
     if (!first_file_info.isFile() || !second_file_info.isFile() ||
         !first_file_info.isReadable() || !second_file_info.isReadable())
@@ -66,10 +66,7 @@ static bool compare_zone_files(QFileInfo first_file_info,
         }
         second_file.close();
     }
-    if (first_file_data == second_file_data)
-        return true;
-
-    return false;
+    return first_file_data == second_file_data;
 }
 
 #ifndef _WIN32
@@ -77,8 +74,8 @@ static bool compare_zone_files(QFileInfo first_file_info,
    zoneinfo_file_path (regular) file with files in the zoneinfo_dir_path until
    it finds a match.  The matching file's name is used to determine the time
    zone ID. */
-static QString findZoneinfoFile(QString zoneinfo_file_path,
-                                QString zoneinfo_dir_path)
+static QString findZoneinfoFile(const QString& zoneinfo_file_path,
+                                const QString& zoneinfo_dir_path)
 {
     QString zone_id("UNDEF");
     QDir zoneinfo_dir(zoneinfo_dir_path);
@@ -146,7 +143,7 @@ static bool parse_zone_id_config_string(QString& zone_id)
 
 /* helper fuction to read time zone id from a file
    Debian's /etc/timezone or Red Hat's /etc/sysconfig/clock */
-static bool read_time_zone_id(QString filename, QString& zone_id)
+static bool read_time_zone_id(const QString& filename, QString& zone_id)
 {
     bool found = false;
     QFile file(filename);

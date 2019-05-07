@@ -7,14 +7,7 @@
 #include "exitcodes.h"        // for ffprobe
 
 // libexiv2 for Exif metadata
-//#include <exiv2/exiv2.hpp>
-// Note: Older versions of Exiv2 don't have the exiv2.hpp include
-// file.  Using image.hpp instead seems to work.
-#ifdef _MSC_VER
-#include <exiv2/src/image.hpp>
-#else
-#include <exiv2/image.hpp>
-#endif
+#include <exiv2/exiv2.hpp>
 
 // To read FFMPEG Metadata
 extern "C" {
@@ -218,10 +211,10 @@ int Orientation::Apply(int transform)
 */
 int Orientation::FromRotation(const QString &degrees)
 {
-    if      (degrees ==   "0") return 1;
-    else if (degrees ==  "90") return 6;
-    else if (degrees == "180") return 3;
-    else if (degrees == "270") return 8;
+    if (degrees ==   "0") return 1;
+    if (degrees ==  "90") return 6;
+    if (degrees == "180") return 3;
+    if (degrees == "270") return 8;
     return 0;
 }
 
@@ -268,15 +261,14 @@ class PictureMetaData : public ImageMetaData
 {
 public:
     explicit PictureMetaData(const QString &filePath);
-    ~PictureMetaData()
-    { // libexiv2 closes file, cleans up via autoptrs
-    }
+    ~PictureMetaData() override = default; // libexiv2 closes file, cleans up via autoptrs
 
-    virtual bool        IsValid()                  { return m_image.get(); }
-    virtual QStringList GetAllTags();
-    virtual int         GetOrientation(bool *exists = nullptr);
-    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr);
-    virtual QString     GetComment(bool *exists = nullptr);
+    bool        IsValid() override // ImageMetaData
+        { return m_image.get(); }
+    QStringList GetAllTags() override; // ImageMetaData
+    int         GetOrientation(bool *exists = nullptr) override; // ImageMetaData
+    QDateTime   GetOriginalDateTime(bool *exists = nullptr) override; // ImageMetaData
+    QString     GetComment(bool *exists = nullptr) override; // ImageMetaData
 
 protected:
     static QString DecodeComment(std::string rawValue);
@@ -296,13 +288,13 @@ protected:
    \param filePath Absolute image path
  */
 PictureMetaData::PictureMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_image(nullptr), m_exifData()
+    : ImageMetaData(filePath), m_image(nullptr)
 {
     try
     {
         m_image = Exiv2::ImageFactory::open(filePath.toStdString());
 
-        if (IsValid())
+        if (PictureMetaData::IsValid())
         {
             m_image->readMetadata();
             m_exifData = m_image->exifData();
@@ -482,7 +474,7 @@ QString PictureMetaData::DecodeComment(std::string rawValue)
     Exiv2::CommentValue comVal = Exiv2::CommentValue(rawValue);
     if (comVal.charsetId() != Exiv2::CommentValue::undefined)
         rawValue = comVal.comment();
-    return QString::fromStdString(rawValue.c_str());
+    return QString::fromStdString(rawValue);
 }
 
 
@@ -495,13 +487,14 @@ class VideoMetaData : public ImageMetaData
 {
 public:
     explicit VideoMetaData(const QString &filePath);
-    ~VideoMetaData();
+    ~VideoMetaData() override;
 
-    virtual bool        IsValid()                        { return m_dict; }
-    virtual QStringList GetAllTags();
-    virtual int         GetOrientation(bool *exists = nullptr);
-    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr);
-    virtual QString     GetComment(bool *exists = nullptr);
+    bool        IsValid() override  // ImageMetaData
+        { return m_dict; }
+    QStringList GetAllTags() override; // ImageMetaData
+    int         GetOrientation(bool *exists = nullptr) override; // ImageMetaData
+    QDateTime   GetOriginalDateTime(bool *exists = nullptr) override; // ImageMetaData
+    QString     GetComment(bool *exists = nullptr) override; // ImageMetaData
 
 protected:
     QString GetTag(const QString &key, bool *exists = nullptr);
@@ -531,7 +524,7 @@ VideoMetaData::VideoMetaData(const QString &filePath)
     if (vidStream >= 0)
         m_dict  = m_context->streams[vidStream]->metadata;
 
-    if (!IsValid())
+    if (!VideoMetaData::IsValid())
         avformat_close_input(&m_context);
 }
 
@@ -541,7 +534,7 @@ VideoMetaData::VideoMetaData(const QString &filePath)
  */
 VideoMetaData::~VideoMetaData()
 {
-    if (IsValid())
+    if (VideoMetaData::IsValid())
         avformat_close_input(&m_context);
 }
 

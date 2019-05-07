@@ -130,11 +130,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
 #else
     // Check OpenGL version supported
-    QGLWidget *dummy = new QGLWidget;
-    dummy->makeCurrent();
-    QGLFormat qglFormat = dummy->format();
-    int openGLVersionFlags = qglFormat.openGLVersionFlags();
-    delete dummy;
+    int openGLVersionFlags = QGLFormat::openGLVersionFlags();
 #endif
 
 #ifdef USING_OPENGLES
@@ -149,7 +145,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
 #else
-    if ((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) &&
+    if (((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) != 0) &&
         (painter.contains(OPENGL2_PAINTER) || painter.contains(AUTO_PAINTER) ||
          painter.isEmpty()))
     {
@@ -182,16 +178,16 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice*
 {
     QWidget *w = dynamic_cast<QWidget*>(device);
     m_window = (w) ? w->windowHandle() : nullptr;
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
     setFormat(format);
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
   : MythRender(type), m_lock(QMutex::Recursive), m_window(nullptr)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
     setFormat(format);
 }
 #else
@@ -199,15 +195,15 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice*
                                    RenderType type)
   : QGLContext(format, device), MythRender(type), m_lock(QMutex::Recursive)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
   : QGLContext(format), MythRender(type), m_lock(QMutex::Recursive)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL::ResetVars();
+    MythRenderOpenGL::ResetProcs();
 }
 #endif
 
@@ -240,8 +236,7 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
             "OpenGL is using software rendering.");
         recommended = false;
     }
-    else
-    if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
+    else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rasterizer.");
@@ -537,8 +532,11 @@ int MythRenderOpenGL::GetTextureType(bool &rect)
 
 bool MythRenderOpenGL::IsRectTexture(uint type)
 {
-    if (type == GL_TEXTURE_RECTANGLE_NV || type == GL_TEXTURE_RECTANGLE_ARB ||
-        type == GL_TEXTURE_RECTANGLE_EXT)
+    if (type == GL_TEXTURE_RECTANGLE_NV)
+        return true;
+    if (type == GL_TEXTURE_RECTANGLE_ARB)
+        return true;
+    if (type == GL_TEXTURE_RECTANGLE_EXT)
         return true;
     return false;
 }
@@ -600,6 +598,45 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
     return tex;
 }
 
+uint MythRenderOpenGL::CreateHelperTexture(void)
+{
+    makeCurrent();
+
+    uint width = m_max_tex_size;
+    uint tmp_tex = CreateTexture(QSize(width, 1), false,
+                                 GL_TEXTURE_2D, GL_FLOAT, GL_RGBA,
+                                 GL_RGBA16, GL_NEAREST, GL_REPEAT);
+
+    if (!tmp_tex)
+    {
+        DeleteTexture(tmp_tex);
+        return 0;
+    }
+
+    float *buf = nullptr;
+    buf = new float[m_textures[tmp_tex].m_data_size];
+    float *ref = buf;
+
+    for (uint i = 0; i < width; i++)
+    {
+        float x = (((float)i) + 0.5F) / (float)width;
+        StoreBicubicWeights(x, ref);
+        ref += 4;
+    }
+    StoreBicubicWeights(0, buf);
+    StoreBicubicWeights(1, &buf[(width - 1) << 2]);
+
+    EnableTextures(tmp_tex);
+    glBindTexture(m_textures[tmp_tex].m_type, tmp_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, width, 1, 0, GL_RGBA, GL_FLOAT, buf);
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Created bicubic helper texture (%1 samples)") .arg(width));
+    delete [] buf;
+    doneCurrent();
+    return tmp_tex;
+}
+
 QSize MythRenderOpenGL::GetTextureSize(uint type, const QSize &size)
 {
     if (IsRectTexture(type))
@@ -618,13 +655,13 @@ QSize MythRenderOpenGL::GetTextureSize(uint type, const QSize &size)
         h *= 2;
     }
 
-    return QSize(w, h);
+    return {w, h};
 }
 
 QSize MythRenderOpenGL::GetTextureSize(uint tex)
 {
     if (!m_textures.contains(tex))
-        return QSize();
+        return {};
     return m_textures[tex].m_size;
 }
 
@@ -640,7 +677,7 @@ void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
     if (!m_textures.contains(tex))
         return;
 
-    bool mipmaps = (m_exts_used & kGLMipMaps) &&
+    bool mipmaps = ((m_exts_used & kGLMipMaps) != 0U) &&
                    !IsRectTexture(m_textures[tex].m_type);
     if (filt == GL_LINEAR_MIPMAP_LINEAR && !mipmaps)
         filt = GL_LINEAR;
@@ -665,8 +702,7 @@ void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
     glTexParameteri(type, GL_TEXTURE_MIN_FILTER, filt);
     glTexParameteri(type, GL_TEXTURE_MAG_FILTER, mag_filt);
     glTexParameteri(type, GL_TEXTURE_WRAP_S, wrap);
-    if (type != GL_TEXTURE_1D)
-        glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
+    glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
     doneCurrent();
 }
 
@@ -736,8 +772,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
 
     GLuint gltex = tex;
     glDeleteTextures(1, &gltex);
-    if (m_textures[tex].m_data)
-        delete m_textures[tex].m_data;
+    delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
         m_glDeleteBuffers(1, &(m_textures[tex].m_pbo));
     if (m_textures[tex].m_vbo)
@@ -769,7 +804,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     m_glBindFramebuffer(GL_FRAMEBUFFER, glfb);
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                 (GLint) size.width(), (GLint) size.height(), 0,
+                 size.width(), size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
     m_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                              m_textures[tex].m_type, tex, 0);
@@ -937,7 +972,7 @@ void MythRenderOpenGL::Init2DState(void)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
     glClear(GL_COLOR_BUFFER_BIT);
     Flush(true);
 }
@@ -946,8 +981,6 @@ void MythRenderOpenGL::InitProcs(void)
 {
     m_extensions = (reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
 
-    m_glTexImage1D = (MYTH_GLTEXIMAGE1DPROC)
-        GetProcAddress("glTexImage1D");
     m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
         GetProcAddress("glActiveTexture");
     m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)
@@ -1025,6 +1058,7 @@ bool MythRenderOpenGL::InitFeatures(void)
     static bool fences        = true;
     static bool ycbcrtextures = true;
     static bool mipmapping    = true;
+    static bool rgba16        = true;
     static bool check         = true;
 
     if (check)
@@ -1038,6 +1072,7 @@ bool MythRenderOpenGL::InitFeatures(void)
         fences        = !getenv("OPENGL_NOFENCE");
         ycbcrtextures = !getenv("OPENGL_NOYCBCR");
         mipmapping    = !getenv("OPENGL_NOMIPMAP");
+        rgba16        = !getenv("OPENGL_NORGBA16");
         if (!multitexture)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling multi-texturing.");
         if (!vertexarrays)
@@ -1054,6 +1089,8 @@ bool MythRenderOpenGL::InitFeatures(void)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling YCbCr textures.");
         if (!mipmapping)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling mipmapping.");
+        if (!rgba16)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling RGBA16 textures");
     }
 
     GLint maxtexsz = 0;
@@ -1068,6 +1105,10 @@ bool MythRenderOpenGL::InitFeatures(void)
     m_default_texture_type = GetTextureType(rects);
     if (rects)
         m_exts_supported += kGLExtRect;
+
+    // GL 1.1
+    if (rgba16)
+        m_exts_supported += kGLExtRGBA16;
 
     if (m_extensions.contains("GL_ARB_multitexture") &&
         m_glActiveTexture && multitexture)
@@ -1188,7 +1229,6 @@ void MythRenderOpenGL::ResetProcs(void)
 {
     m_extensions = QString();
 
-    m_glTexImage1D = nullptr;
     m_glActiveTexture = nullptr;
     m_glMapBuffer = nullptr;
     m_glBindBuffer = nullptr;
@@ -1273,13 +1313,13 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     ExpireVertices();
     ExpireVBOS();
 
-    if (m_cachedVertices.size())
+    if (!m_cachedVertices.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired vertices")
             .arg(m_cachedVertices.size()));
     }
 
-    if (m_cachedVBOS.size())
+    if (!m_cachedVBOS.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired VBOs")
             .arg(m_cachedVertices.size()));
@@ -1292,8 +1332,7 @@ void MythRenderOpenGL::DeleteTextures(void)
     for (it = m_textures.begin(); it !=m_textures.end(); ++it)
     {
         glDeleteTextures(1, &(it.key()));
-        if (it.value().m_data)
-            delete it.value().m_data;
+        delete it.value().m_data;
         if (it.value().m_pbo)
             m_glDeleteBuffers(1, &(it.value().m_pbo));
     }
@@ -1507,19 +1546,9 @@ bool MythRenderOpenGL::ClearTexture(uint tex)
 
     memset(scratch, 0, tmp_size);
 
-    if ((m_textures[tex].m_type == GL_TEXTURE_1D) && m_glTexImage1D)
-    {
-        m_glTexImage1D(m_textures[tex].m_type, 0,
-                       m_textures[tex].m_internal_fmt,
-                       size.width(), 0, m_textures[tex].m_data_fmt,
-                       m_textures[tex].m_data_type, scratch);
-    }
-    else
-    {
-        glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                     size.width(), size.height(), 0, m_textures[tex].m_data_fmt,
-                     m_textures[tex].m_data_type, scratch);
-    }
+    glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
+                 size.width(), size.height(), 0, m_textures[tex].m_data_fmt,
+                 m_textures[tex].m_data_type, scratch);
     delete [] scratch;
 
     if (glCheck())
@@ -1537,7 +1566,7 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     uint bytes;
     uint bpp;
 
-    if (fmt == GL_BGRA || fmt ==GL_RGBA)
+    if (fmt ==GL_RGBA)
     {
         bpp = 4;
     }
@@ -1545,8 +1574,7 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     {
         bpp = 3;
     }
-    else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE ||
-             fmt == MYTHTV_UYVY)
+    else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE)
     {
         bpp = 2;
     }

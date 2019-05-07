@@ -32,6 +32,7 @@ using namespace std;
 //MythTV
 #include "mythcorecontext.h"
 #include "mythdb.h"
+#include "mythmiscutil.h"
 #include "xmlparsebase.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
@@ -56,17 +57,8 @@ static const int fDefault = fReverseSort;
 PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
     const QString &title) :
     ScheduleCommon(parent,"PrevRecordedList"),
-    m_titleList(nullptr),
-    m_showList(nullptr),
-    m_curviewText(nullptr),
-    m_help1Text(nullptr),
-    m_help2Text(nullptr),
-    m_titleGroup(true),
-    m_reverseSort(false),
-    m_allowEvents(true),
     m_recid(recid),
-    m_title(title),
-    m_loadShows(false)
+    m_title(title)
 {
 
     if (m_recid && !m_title.isEmpty())
@@ -86,8 +78,8 @@ PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
     {
         // Get sort options if this is not a filtered list
         int flags = gCoreContext->GetNumSetting("PrevRecSortFlags",fDefault);
-        m_titleGroup = flags & fTitleGroup;
-        m_reverseSort = flags & fReverseSort;
+        m_titleGroup = ((flags & fTitleGroup) != 0);
+        m_reverseSort = ((flags & fReverseSort) != 0);
 
     }
 }
@@ -180,13 +172,17 @@ void PrevRecordedList::Load(void)
 static bool comp_sorttitle_lt(
     const ProgramInfo *a, const ProgramInfo *b)
 {
-    return a->sortTitle.compare(b->sortTitle,Qt::CaseInsensitive) < 0;
+    QString a_st = a->GetSortTitle();
+    QString b_st = b->GetSortTitle();
+    return naturalCompare(a_st,b_st) < 0;
 }
 
 static bool comp_sorttitle_lt_rev(
     const ProgramInfo *a, const ProgramInfo *b)
 {
-    return b->sortTitle.compare(a->sortTitle,Qt::CaseInsensitive) < 0;
+    QString a_st = a->GetSortTitle();
+    QString b_st = b->GetSortTitle();
+    return naturalCompare(b_st, a_st) < 0;
 }
 
 static bool comp_sortdate_lt(
@@ -222,17 +218,11 @@ bool PrevRecordedList::LoadTitles(void)
         return false;
     }
 
-    const QRegExp prefixes(
-        tr("^(The |A |An )",
-           "Regular Expression for what to ignore when sorting"));
-
     while (query.next())
     {
         QString title(query.value(0).toString());
         ProgramInfo *program = new ProgramInfo();
         program->SetTitle(title);
-        program->sortTitle = title;
-        program->sortTitle.remove(prefixes);
         m_titleData.push_back(program);
     }
     if (m_reverseSort)
@@ -246,7 +236,9 @@ bool PrevRecordedList::LoadTitles(void)
 
 bool PrevRecordedList::LoadDates(void)
 {
-    QString querystr = "SELECT DISTINCT YEAR(starttime), MONTH(starttime) "
+    QString querystr = "SELECT DISTINCT "
+            "YEAR(CONVERT_TZ(starttime,'UTC','SYSTEM')), "
+            "MONTH(CONVERT_TZ(starttime,'UTC','SYSTEM')) "
         "FROM oldrecorded "
         "WHERE oldrecorded.future = 0 " + m_where;
 
@@ -269,15 +261,14 @@ bool PrevRecordedList::LoadDates(void)
 
     ProgramInfo *program = new ProgramInfo();
     program->SetRecordingStartTime(QDateTime::currentDateTime());
-    program->SetTitle(tr("Last two weeks"));
-    program->sortTitle = "0000/00";
+    program->SetTitle(tr("Last two weeks"), "0000/00");
     m_titleData.push_back(program);
 
     while (query.next())
     {
         int year(query.value(0).toInt());
         int month(query.value(1).toInt());
-        ProgramInfo *program = new ProgramInfo();
+        program = new ProgramInfo();
         QDate startdate(year,month,1);
         QDateTime starttime(startdate);
         program->SetRecordingStartTime(starttime);
@@ -286,8 +277,7 @@ bool PrevRecordedList::LoadDates(void)
         QLocale locale = gCoreContext->GetLocale()->ToQLocale();
         QString title = QString("%1 %2").
             arg(locale.monthName(month)).arg(year);
-        program->SetTitle(title);
-        program->sortTitle = date;
+        program->SetTitle(title, date);
         m_titleData.push_back(program);
     }
     if (m_reverseSort)
@@ -313,7 +303,7 @@ void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
     ProgramList *progData, bool isShows)
 {
     bnList->Reset();
-    for (uint i = 0; i < progData->size(); ++i)
+    for (size_t i = 0; i < progData->size(); ++i)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(bnList, "", QVariant::fromValue((*progData)[i]));
@@ -346,7 +336,7 @@ void PrevRecordedList::updateInfo(void)
     if (m_help2Text)
         m_help2Text->Reset();
 
-    if (m_showData.size() > 0)
+    if (!m_showData.empty())
     {
         InfoMap infoMap;
         m_showData[m_showList->GetCurrentPos()]->ToMap(infoMap,true);
@@ -415,8 +405,11 @@ void PrevRecordedList::LoadShowsByTitle(void)
 {
     MSqlBindings bindings;
     QString sql = " AND oldrecorded.title = :TITLE " + m_where;
-    int selected = m_titleList->GetCurrentPos();
-    bindings[":TITLE"] = m_titleData[selected]->GetTitle();
+    uint selected = m_titleList->GetCurrentPos();
+    if (selected < m_titleData.size())
+        bindings[":TITLE"] = m_titleData[selected]->GetTitle();
+    else
+        bindings[":TITLE"] = "";
     if (!m_title.isEmpty())
         bindings[":MTITLE"] = m_title;
     m_showData.clear();
@@ -427,7 +420,7 @@ void PrevRecordedList::LoadShowsByDate(void)
 {
     MSqlBindings bindings;
     int selected = m_titleList->GetCurrentPos();
-    QString sortTitle = m_titleData[selected]->sortTitle;
+    QString sortTitle = m_titleData[selected]->GetSortTitle();
     QStringList dateParts = sortTitle.split('/');
     if (dateParts.size() != 2)
     {
@@ -449,8 +442,7 @@ void PrevRecordedList::LoadShowsByDate(void)
         bindings[":YEAR"] = dateParts[0];
         bindings[":MONTH"] = dateParts[1];
     }
-    sql = QString(sql + m_where + QString(
-        " ORDER BY starttime %1 ").arg(sortorder));
+    sql = sql + m_where + QString(" ORDER BY starttime %1 ").arg(sortorder);
     if (!m_title.isEmpty())
         bindings[":MTITLE"] = m_title;
     m_showData.clear();
@@ -494,7 +486,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
             ShowUpcoming();
         else if (action == "1")
         {
-            if (m_titleGroup == true)
+            if (m_titleGroup)
             {
                 m_titleGroup = false;
                 m_reverseSort = true;
@@ -507,7 +499,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "2")
         {
-            if (m_titleGroup == false)
+            if (!m_titleGroup)
             {
                 m_titleGroup = true;
                 m_reverseSort = false;
@@ -640,8 +632,7 @@ void PrevRecordedList::customEvent(QEvent *event)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to delete recording rule");
             }
-            if (record)
-                delete record;
+            delete record;
         }
         else
         {

@@ -2,7 +2,9 @@
 
 #include <cmath> // for qsrand
 #include <random>
-
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+#include <QRandomGenerator>
+#endif
 
 #define LOC QString("Galleryviews: ")
 
@@ -228,13 +230,23 @@ void FlatView::Populate(ImageList &files)
         }
         else if (m_order == kRandom)
         {
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+            QVector<quint32> rands;
+            rands.resize(files.size());
+            QRandomGenerator::global()->fillRange(rands.data(), rands.size());
+#else
             qsrand(QTime::currentTime().msec());
+#endif
             // An image is not a valid candidate for its successor
             int range = files.size() - 1;
             int index = range;
             for (int count = 0; count < files.size(); ++count)
             {
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+                int rand = rands[count] % range;
+#else
                 int rand = qrand() % range;
+#endif
                 // Avoid consecutive repeats
                 index = (rand < index) ? rand : rand + 1;
                 m_sequence.append(files.at(index)->m_id);
@@ -245,10 +257,19 @@ void FlatView::Populate(ImageList &files)
             WeightList weights   = CalculateSeasonalWeights(files);
             double     maxWeight = weights.last();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+            auto randgen = QRandomGenerator::global();
+#else
             qsrand(QTime::currentTime().msec());
+#endif
             for (int count = 0; count < files.size(); ++count)
             {
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+                // generateDouble() returns in the range [0, 1)
+                double randWeight = randgen->generateDouble() * maxWeight;
+#else
                 double randWeight = qrand() * maxWeight / RAND_MAX;
+#endif
                 WeightList::iterator it =
                         std::upper_bound(weights.begin(), weights.end(), randWeight);
                 int    index      = std::distance(weights.begin(), it);
@@ -304,7 +325,7 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
                                     timestamp.date().day()),
                               timestamp.time());
 
-            double range = abs(curYearAnniversary.secsTo(
+            double range = llabs(curYearAnniversary.secsTo(
                                    adjacentYearAnniversary)) + BETA_CLIP;
 
             // This calculation is not normalized, because that would require the
@@ -314,9 +335,9 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
                                            : adjacentYearAnniversary);
             QDateTime d2(isAnniversaryPast ? adjacentYearAnniversary
                                            : curYearAnniversary);
-            weight = std::pow(abs(now.secsTo(d1) + BETA_CLIP) / range,
+            weight = std::pow(llabs(now.secsTo(d1) + BETA_CLIP) / range,
                               TRAILING_BETA_SHAPE - 1)
-                    * std::pow(abs(now.secsTo(d2) + BETA_CLIP) / range,
+                    * std::pow(llabs(now.secsTo(d2) + BETA_CLIP) / range,
                                LEADING_BETA_SHAPE - 1);
         }
         totalWeight += weight;
@@ -624,7 +645,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
                 // be empty
                 LoadDirThumbs(*im, thumbsNeeded, level);
 
-                if (im->m_thumbNails.size() > 0)
+                if (!im->m_thumbNails.empty())
                 {
                     // Add first thumbnail to parent thumb
                     parent.m_thumbNails.append(im->m_thumbNails.at(0));
@@ -669,7 +690,7 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
  \brief Resets view
  \param resetParent parent id is only reset to root when this is set
 */
-void DirectoryView::Clear(bool)
+void DirectoryView::Clear(bool /*resetParent*/)
 {
     ClearMarked();
     ClearCache();

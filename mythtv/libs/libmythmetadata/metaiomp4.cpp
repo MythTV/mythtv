@@ -13,11 +13,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-MetaIOMP4::MetaIOMP4(void)
-    : MetaIO()
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */
@@ -123,7 +118,7 @@ MusicMetadata* MetaIOMP4::read(const QString &filename)
         year = getFieldValue(p_context, "year").toInt();
         genre = getFieldValue(p_context, "genre");
         tracknum = getFieldValue(p_context, "track").toInt();
-        compilation = getFieldValue(p_context, "").toInt();
+        compilation = (getFieldValue(p_context, "").toInt() != 0);
         length = getTrackLength(p_context);
     }
 

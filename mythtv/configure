@@ -101,6 +101,7 @@ Advanced options (experts only):
   --disable-yasm           disable use of yasm assembler
   --enable-pic             build position-independent code
   --enable-proc-opt        enable processor specific compilation
+  --enable-compdb          enable clang compiler database
 
   --disable-audio-oss      disable OSS audio support
   --disable-audio-alsa     disable ALSA audio support
@@ -135,6 +136,7 @@ Advanced options (experts only):
   --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-vaapi2         disable VAAPI2 hardware accelerated video decoding
+  --disable-nvdec          disable NVDEC (CUVID) hardware accelerated video decoding
   --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-mediacodec     disable hardware accelerated decoding on android
@@ -160,7 +162,6 @@ Advanced options (experts only):
   --python=PATH            Force a specific python executable to use [$python_default]
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
-  --enable-mythlogserver   Enable mythlogserver logging daemon facility
   --enable-bdjava          Enable BD-J support for Blu-ray discs
 
 External codec library options (used for mythffmpeg and streaming transcode):
@@ -1398,6 +1399,7 @@ EXTERNAL_LIBRARY_LIST="
     sdl2
     vaapi
     vaapi2
+    nvdec
 "
 
 HWACCEL_AUTODETECT_LIBRARY_LIST="
@@ -1479,6 +1481,7 @@ CONFIG_LIST="
     neon_clobber_test
     ossfuzz
     pic
+    compdb
     thumb
     valgrind_backtrace
     xmm_clobber_test
@@ -1992,7 +1995,6 @@ MYTHTV_CONFIG_LIST='
     xv
     profiletype
     debugtype
-    mythlogserver
     systemd_notify
     systemd_journal
 '
@@ -2034,6 +2036,7 @@ USING_LIST='
     bindings_perl
     bindings_python
     bindings_php
+    compdb
     darwin_da
     fontconfig
     freetype2
@@ -2043,6 +2046,7 @@ USING_LIST='
     opengles
     vaapi
     vaapi2
+    nvdec
     vdpau
     openmax
     mediacodec
@@ -2774,6 +2778,7 @@ enable lirc
 enable mediacodec
 enable vaapi
 enable vaapi2
+enable nvdec
 enable mheg
 enable mythtranscode
 enable opengl
@@ -2791,7 +2796,6 @@ enable xv
 disable indevs
 enable libfftw3
 enable taglib
-disable mythlogserver
 enable exiv2
 enable systemd_notify
 enable systemd_journal
@@ -3011,10 +3015,6 @@ for opt do
         --disable-backend)
         ;;
         --enable-mac-bundle) enable mac_bundle
-        ;;
-        --disable-mythlogserver) disable mythlogserver
-        ;;
-        --enable-mythlogserver) enable mythlogserver
         ;;
         --previous|--prev)
             echo "No history of previous configure parameters."
@@ -5186,7 +5186,7 @@ version2num(){
 }
 
 # Minimum supported Qt version
-QT_MIN_VERSION_STR="5.2"
+QT_MIN_VERSION_STR="5.3"
 QT_MIN_VERSION=$(version2num $QT_MIN_VERSION_STR)
 QT_MIN_VERSION_HEX=$(printf "0x%06x" $QT_MIN_VERSION)
 
@@ -5898,15 +5898,6 @@ fi
 
 enabled ffmpeg_pthreads && enable pthreads
 
-# Check for libuuid for zeromq
-enabled mythlogserver || disable libuuid
-if enabled libuuid ; then
-  check_lib uuid uuid/uuid.h uuid_generate -luuid || disable libuuid
-  if disabled libuuid ; then
-    die "ERROR: can not find libuuid. (debian uuid-dev; RedHat libuuid-devel)"
-  fi
-fi
-
 # Check for taglib for libmythmetadata
 if enabled taglib; then
     taglib_minor="0"
@@ -6066,18 +6057,30 @@ if enabled libmpeg2external; then
 fi
 
 if enabled hdhomerun; then
-    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
-    # Fedora and Debian/Ubuntu use different include directories.
-    if check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
-        :
-    elif check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
-        add_cxxflags -DHDHOMERUN_LIBPREFIX
-    elif check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
-        add_cxxflags -DHDHOMERUN_V2
-    elif check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
-        add_cxxflags -DHDHOMERUN_V2 -DHDHOMERUN_LIBPREFIX
+    # Fedora and Debian/Ubuntu use different include directories.  So does OSX.
+    if check_header hdhomerun.h ; then
+	HDHOMERUN_PREFIX=
+    elif check_header hdhomerun/hdhomerun.h ; then
+	HDHOMERUN_PREFIX=hdhomerun/
+    elif check_header libhdhomerun/hdhomerun.h ; then
+	HDHOMERUN_PREFIX=libhdhomerun/
     else
         disable hdhomerun
+    fi
+
+    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
+    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
+        HDHOMERUN_V2=no
+    elif check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
+        HDHOMERUN_V2=yes
+    else
+        disable hdhomerun
+    fi
+
+    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun ; then
+        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=no
+    else
+        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=yes
     fi
 fi
 
@@ -6485,12 +6488,12 @@ int x;
 EOF
 }
 
-qt_compiler_check Q_COMPILER_NULLPTR && enable require_nullptr
+qt_compiler_check Q_COMPILER_NULLPTR && enable enforce_nullptr
 case "$cc_type" in
     gcc)
         # Gcc < 6 doesn't seem to ignore warnings in system headers
         if [ $gxx_major -lt 6 ] ; then
-            disable require_nullptr
+            disable enforce_nullptr
         fi
         ;;
     clang)
@@ -6498,18 +6501,31 @@ case "$cc_type" in
             # The zero-as-null-pointer-constant warning wasn't added
             # until clang 5.0, and clang < 6 doesn't seem to ignore
             # warnings in all system headers.
-            disable require_nullptr
+            disable enforce_nullptr
         fi
         # Clang on FreeBSD doesn't ignore warnings in system headers.
         # A trivial test shows that Clang defaults /usr/local/include
         # to a system directory, but somehow this gets messed up in
         # MythTV builds.
         if test $target_os = "freebsd"; then
-            disable require_nullptr
+            disable enforce_nullptr
         fi
-        ## Not yet tested on MacOSX.
+        ## Clang on MacOSX also doesn't ignore warnings in system headers.
         if test $target_os = "darwin"; then
-            disable require_nullptr
+            disable enforce_nullptr
+        fi
+        ;;
+esac
+
+enable enforce_wshadow
+case $target_os in
+    android)
+        disable enforce_wshadow
+        ;;
+    linux)
+        . /etc/os-release
+        if test $ID = "centos"; then
+            disable enforce_wshadow
         fi
         ;;
 esac
@@ -6588,7 +6604,10 @@ enabled libfftw3 && check_lib fftw3_threads fftw3.h fftw_init_threads -lfftw3_th
     disable libfftw3
 
 # ass_flush_events was added in 0.9.10
-enabled libass && check_lib ass ass/ass.h ass_flush_events -lass  || disable libass
+if test $target_os = "android"; then
+	ASS_EXTRA_LIBS="-liconv -lfribidi -lfreetype"
+fi
+enabled libass && check_lib ass ass/ass.h ass_flush_events "-lass $ASS_EXTRA_LIBS" || disable libass
 
 if enabled libcec ; then
     if pkg-config --exists libcec; then
@@ -6771,6 +6790,15 @@ elif enabled gcc; then
     check_cflags -Werror=vla
     check_cflags -fdiagnostics-color=auto
     enabled extra_warnings || check_disable_warning -Wno-maybe-uninitialized
+    check_cflags -Wdouble-promotion
+    #check_cflags -Wduplicated-branches
+    check_cflags -Wduplicated-cond
+    check_cflags -Wjump-misses-init
+    check_cflags -Wlogical-op
+    check_cflags -Wnull-dereference
+    if enabled enforce_wshadow ; then
+        check_cflags -Wshadow
+    fi
 elif enabled llvm_gcc; then
     check_cflags -mllvm -stack-alignment=16
 elif enabled clang; then
@@ -6863,8 +6891,26 @@ if enabled gxx; then
         check_cxxflags -fvisibility-inlines-hidden
         append CCONFIG "use_hidesyms"
     fi
+    check_cxxflags -Wdouble-promotion
+    #check_cxxflags -Wduplicated-branches
+    check_cxxflags -Wduplicated-cond
+    check_cxxflags -Wlogical-op
     check_cxxflags -Wmissing-declarations
+    check_cxxflags -Wnull-dereference
     check_cxxflags -Woverloaded-virtual
+    if enabled enforce_wshadow ; then
+        check_cxxflags -Wshadow
+    fi
+
+    # This warning flag isn't enabled yet because it will require a
+    # large number of changes to the code to eliminate all the
+    # warnings.
+    #check_cxxflags -Wold-style-cast
+
+    # This warning flag can't be enabled because the Qt5 moc compiler
+    # produces files that contain "useless" casts.
+    #check_cxxflags -Wuseless-cast
+
     # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
     gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\)\{1,\}.*/\1/')
     if test $gxx_major_version -lt 7; then
@@ -6876,8 +6922,15 @@ if enabled gxx; then
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new
-    if enabled require_nullptr; then
+    if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
+    fi
+    # Ubuntu 16.04 has problems with this flag.  Its not GCC or Qt, as
+    # both older compilers and/or older Qt versions on other systems
+    # produce clean output.  This is a simple check to eliminate that
+    # specific version (and more, but it gets the job done).
+    if [ $qt_version -ge $(version2num "5.7.0") ]; then
+        check_cxxflags -Wsuggest-override
     fi
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
@@ -6904,16 +6957,22 @@ elif enabled clangxx; then
     # Clang needs this to link on Fedora
     add_extralibs -lstdc++
     # Don't complain about over-aligned types.
-    if test $target_os = "freebsd"; then
-        # The libc++ library on FreeBSD 10 is missing the required
-        # new() function and doesn't work with this flag enabled.
-        if test $(uname -K) -gt 1100000; then
+    case $target_os in
+        freebsd)
+            # The libc++ library on FreeBSD 10 is missing the required
+            # new() function and doesn't work with this flag enabled.
+            if test $(uname -K) -gt 1100000; then
+                check_cxxflags -faligned-allocation
+            fi
+            ;;
+        darwin)
+            # OSX compiles aren't happy with aligned allocation.
+            ;;
+        *)
             check_cxxflags -faligned-allocation
-        fi
-    else
-        check_cxxflags -faligned-allocation
-    fi
-    if enabled require_nullptr; then
+            ;;
+    esac
+    if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
 fi
@@ -6950,6 +7009,23 @@ if enabled bindings_perl; then
         disable_bindings_perl "IO::Socket::INET6"
     check_pl_lib "XML::Simple"  || disable_bindings_perl "XML::Simple"
 fi
+
+# nvdec processing
+here="$PWD"
+cd external/nv-codec-headers
+if enabled nvdec ; then
+    if test $target_os = "freebsd"; then
+        gmake install PREFIX=$PWD/install
+    else
+        make install PREFIX=$PWD/install
+    fi
+    if [ "$?" != 0 ] ; then die "Build of nv-codec-headers failed." ; fi
+    PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$PWD/install/lib/pkgconfig"
+    export PKG_CONFIG_PATH
+else
+    rm -rf install ffnvcodec.pc
+fi
+cd "$here"
 
 # Check for php dependencies
 # are none at this time
@@ -7138,9 +7214,12 @@ ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
 ffmpeg_optenable crystalhd sdl2 ffplay
+
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
     ffmpeg_optenable mediacodec jni
+    # udp is causing compile errors on android and it is not needed
+    ffopts="$ffopts --disable-protocol=udp --disable-protocol=udplite"
 else
     disable mediacodec
 fi
@@ -7176,6 +7255,11 @@ if [ $rc != 0 ] ; then
     exit $rc
 fi
 cd "$currentpwd"
+
+# If ffmpeg disabled nvdec then disable it for mythtv
+if ! grep "^CONFIG_NVDEC=yes$" external/FFmpeg/ffbuild/config.mak ; then
+    disable nvdec
+fi
 
 if test "$quiet" != "yes"; then
 
@@ -7276,8 +7360,6 @@ if enabled source_path_used; then
         libswscale/$arch
         tests
         tools
-        external/zeromq
-        external/nzmqt/src
         external/libmythbluray
         external/libmythdvdnav
         external/libudfread
@@ -7296,8 +7378,6 @@ if enabled source_path_used; then
         libavutil/Makefile
         libpostproc/Makefile
         libswscale/Makefile
-        external/zeromq/Makefile
-        external/nzmqt/src/Makefile
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
         external/libudfread/Makefile
@@ -7355,6 +7435,7 @@ if enabled x11 ; then
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
   echo "VAAPI2 support            ${vaapi2-no}"
+  echo "NVDEC support             ${nvdec-no}"
   echo "CrystalHD support         ${crystalhd-no}"
   echo "OpenMAX support           ${openmax-no}"
   if enabled openmax ; then
@@ -7380,7 +7461,6 @@ fi
 echo "# Misc Features"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
-echo "mythlogserver             ${mythlogserver-no}"
 echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
@@ -7417,12 +7497,15 @@ echo "vpx                       ${libvpx-no}"
 echo ""
 
 echo "# Compilation Options"
-echo "Require c++11 nullptr     ${require_nullptr-no}"
+echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
+echo "Enforce shadowed vars     ${enforce_wshadow-no}"
 echo ""
 
 # Remove redundant elements from variables
+# keep first instance
 unique2 CFLAGS
-unique2 extralibs
+# keep last instance for correct lib ordering
+unique extralibs
 
 if test $target_os = "freebsd"; then
     #Strip certain paths (qmake will add them back at the end of the list)
@@ -7809,6 +7892,12 @@ fi
 
 echo "#endif /* MYTHTV_CONFIG_H */" >> $TMPH
 
+enabled hdhomerun && cat >> $TMPMAK <<EOF
+HDHOMERUN_PREFIX=$HDHOMERUN_PREFIX
+HDHOMERUN_V2=$HDHOMERUN_V2
+HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR = $HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
+EOF
+
 cat <<EOF >> $TMPMAK
 # HACK: If Qt 4 and MythTV's installed library dirs are the same, remove the
 #       -L from early in the link line, to ignore any old installed libmyth*
@@ -7856,32 +7945,6 @@ if [ -e libs/libmyth/mythconfig.h ] ; then
     rm -f libs/libmyth/mythconfig.h
 fi
 
-if enabled mythlogserver; then
-    # configure zeromq
-    echo "Configuring zeromq..."
-    if [ ! `which libtool` ]
-    then
-        echo libtool not found. please install it.
-        exit 1
-    fi
-    if [ ! `which autoreconf` ]
-    then
-        echo autoreconf not found. please install it.
-        exit 1
-    fi
-    (cd external/zeromq ; ./autogen.sh 2> /dev/null > /dev/null)
-    if [ $? -ne 0 ]; then
-	echo external/zeromq/autogen.sh failed.
-	exit 1
-    fi
-    (cd external/zeromq ; \
-             ./configure --quiet --without-documentation --prefix=${prefix} \
-                         --includedir=${prefix}/include/mythtv/zeromq \
-                         --libdir=${libdir-name})
-    echo "Configuring nzmqt..."
-    (cd external/nzmqt/src ; \
-           ${qmakeconf} -o Makefile)
-fi
 if ! enabled libbluray_external; then
     echo "Configuring libmythbluray..."
     (cd external/libmythbluray ; \

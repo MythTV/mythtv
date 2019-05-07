@@ -16,24 +16,24 @@ class IPTVSignalMonitor : public DTVSignalMonitor
                       bool _release_stream, uint64_t _flags = 0);
     virtual ~IPTVSignalMonitor();
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
     // DTVSignalMonitor
-    virtual void SetStreamData(MPEGStreamData *data);
+    void SetStreamData(MPEGStreamData *data) override; // DTVSignalMonitor
 
     // MPEG
-    virtual void HandlePAT(const ProgramAssociationTable*);
+    void HandlePAT(const ProgramAssociationTable*) override; // DTVSignalMonitor
 
   protected:
     IPTVSignalMonitor(void);
     IPTVSignalMonitor(const IPTVSignalMonitor&);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     IPTVChannel *GetIPTVChannel(void);
 
   protected:
-    bool m_streamHandlerStarted;
-    bool m_locked;
+    bool m_streamHandlerStarted {false};
+    bool m_locked               {false};
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

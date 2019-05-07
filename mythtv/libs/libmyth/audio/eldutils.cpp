@@ -40,12 +40,12 @@
 #define LE_INT(v)        bswap_32(*((uint32_t *)v))
 #define LE_INT64(v)      bswap_64(*((uint64_t *)v))
 #else
-#define LE_SHORT(v)      (*((uint16_t *)v))
-#define LE_INT(v)        (*((uint32_t *)v))
-#define LE_INT64(v)      (*((uint64_t *)v))
+#define LE_SHORT(v)      (*((uint16_t *)(v)))
+#define LE_INT(v)        (*((uint32_t *)(v)))
+#define LE_INT64(v)      (*((uint64_t *)(v)))
 #endif
 
-#define SIZE_ARRAY(x) (sizeof(x) / sizeof(x[0]))
+#define SIZE_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
 
 enum eld_versions
 {
@@ -149,7 +149,7 @@ static int cea_sampling_frequencies[8] = {
 
 #define GRAB_BITS(buf, byte, lowbit, bits)            \
 (                                                    \
-    (buf[byte] >> (lowbit)) & ((1 << (bits)) - 1)    \
+    ((buf)[byte] >> (lowbit)) & ((1 << (bits)) - 1)  \
 )
 
 ELD::ELD(const char *buf, int size)
@@ -162,10 +162,6 @@ ELD::ELD()
 {
     m_e.formats = 0LL;
     m_e.eld_valid = false;
-}
-
-ELD::~ELD()
-{
 }
 
 ELD& ELD::operator=(const ELD &rhs)
@@ -337,7 +333,7 @@ QString ELD::print_pcm_rates(int pcm)
         96000, 176400, 192000 };
     QString result = QString();
 
-    for (unsigned int i = 0; i < SIZE_ARRAY(rates); i++)
+    for (size_t i = 0; i < SIZE_ARRAY(rates); i++)
     {
         if ((pcm & (1 << i)) != 0)
         {
@@ -354,10 +350,9 @@ QString ELD::print_pcm_rates(int pcm)
 QString ELD::print_pcm_bits(int pcm)
 {
     unsigned int bits[] = { 16, 20, 24 };
-    unsigned int i;
     QString result = QString();
 
-    for (i = 0; i < SIZE_ARRAY(bits); i++)
+    for (size_t i = 0; i < SIZE_ARRAY(bits); i++)
     {
         if ((pcm & (1 << i)) != 0)
         {
@@ -394,9 +389,8 @@ QString ELD::sad_desc(int index)
 QString ELD::channel_allocation_desc()
 {
     QString result = QString();
-    unsigned int i;
 
-    for (i = 0; i < sizeof(cea_speaker_allocation_names) / sizeof(char *); i++)
+    for (size_t i = 0; i < sizeof(cea_speaker_allocation_names) / sizeof(char *); i++)
     {
         if ((m_e.spk_alloc & (1 << i)) != 0)
         {
@@ -514,7 +508,7 @@ QString ELD::codecs_desc()
 {
     QString result = QString();
     bool found_one = false;
-    for (unsigned int i = 0; i < SIZE_ARRAY(audiotype_names); i++)
+    for (size_t i = 0; i < SIZE_ARRAY(audiotype_names); i++)
     {
         if ((m_e.formats & (1 << i)) != 0)
         {

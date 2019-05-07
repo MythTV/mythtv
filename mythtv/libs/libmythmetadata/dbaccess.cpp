@@ -35,8 +35,8 @@ class SingleValueImp
   public:
     SingleValueImp(const QString &table_name, const QString &id_name,
                    const QString &value_name) : m_table_name(table_name),
-        m_id_name(id_name), m_value_name(value_name), m_ready(false),
-        m_dirty(true), m_clean_stub(this)
+        m_id_name(id_name), m_value_name(value_name),
+        m_clean_stub(this)
     {
         m_insert_sql = QString("INSERT INTO %1 (%2) VALUES (:NAME)")
                 .arg(m_table_name).arg(m_value_name);
@@ -48,11 +48,11 @@ class SingleValueImp
 
     virtual ~SingleValueImp() = default;
 
-    mutable QMutex mutex;
+    mutable QMutex m_mutex;
 
     void load_data()
     {
-        QMutexLocker locker(&mutex);
+        QMutexLocker locker(&m_mutex);
         if (!m_ready)
         {
             fill_from_db();
@@ -200,18 +200,14 @@ class SingleValueImp
     QString m_fill_sql;
     QString m_delete_sql;
 
-    bool m_ready;
-    bool m_dirty;
+    bool m_ready {false};
+    bool m_dirty {true};
     entry_list m_ret_entries;
     entry_map m_entries;
     SimpleCleanup<SingleValueImp> m_clean_stub;
 };
 
 ////////////////////////////////////////////
-
-SingleValue::SingleValue(SingleValueImp *imp) : m_imp(imp)
-{
-}
 
 SingleValue::~SingleValue()
 {
@@ -266,7 +262,7 @@ class MultiValueImp
   public:
     MultiValueImp(const QString &table_name, const QString &id_name,
                   const QString &value_name) : m_table_name(table_name),
-        m_id_name(id_name), m_value_name(value_name), m_ready(false),
+        m_id_name(id_name), m_value_name(value_name),
         m_clean_stub(this)
     {
         m_insert_sql = QString("INSERT INTO %1 (%2, %3) VALUES (:ID, :VALUE)")
@@ -275,11 +271,11 @@ class MultiValueImp
                 .arg(m_value_name).arg(m_table_name).arg(m_id_name);
     }
 
-    mutable QMutex mutex;
+    mutable QMutex m_mutex;
 
     void load_data()
     {
-        QMutexLocker locker(&mutex);
+        QMutexLocker locker(&m_mutex);
         if (!m_ready)
         {
             fill_from_db();
@@ -445,15 +441,11 @@ class MultiValueImp
     QString m_fill_sql;
     QString m_id_sql;
 
-    bool m_ready;
+    bool m_ready {false};
     SimpleCleanup<MultiValueImp> m_clean_stub;
 };
 
 ////////////////////////////////////////////
-
-MultiValue::MultiValue(MultiValueImp *imp) : m_imp(imp)
-{
-}
 
 int MultiValue::add(int id, int value)
 {
@@ -600,7 +592,7 @@ class FileAssociationsImp
     typedef FileAssociations::ext_ignore_list ext_ignore_list;
 
   public:
-    FileAssociationsImp() : m_ready(false) {}
+    FileAssociationsImp() = default;
 
     bool add(file_association &fa)
     {
@@ -705,11 +697,11 @@ class FileAssociationsImp
         }
     }
 
-    mutable QMutex mutex;
+    mutable QMutex m_mutex;
 
     void load_data()
     {
-        QMutexLocker locker(&mutex);
+        QMutexLocker locker(&m_mutex);
         if (!m_ready)
         {
             fill_from_db();
@@ -792,24 +784,9 @@ class FileAssociationsImp
 
   private:
     association_list m_file_associations;
-    bool m_ready;
+    bool             m_ready {false};
 };
 
-
-FileAssociations::file_association::file_association() : id(0), ignore(false),
-    use_default(false)
-{
-}
-
-FileAssociations::file_association::file_association(unsigned int l_id,
-                                                     const QString &ext,
-                                                     const QString &playcmd,
-                                                     bool l_ignore,
-                                                     bool l_use_default) :
-    id(l_id), extension(ext), playcommand(playcmd), ignore(l_ignore),
-    use_default(l_use_default)
-{
-}
 
 bool FileAssociations::add(file_association &fa)
 {

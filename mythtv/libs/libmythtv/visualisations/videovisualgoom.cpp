@@ -18,7 +18,7 @@ extern "C" {
 #include "videovisualgoom.h"
 
 VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd)
-  : VideoVisual(audio, render), m_buffer(nullptr), m_surface(0), m_hd(hd)
+  : VideoVisual(audio, render), m_hd(hd)
 {
     int max_width  = m_hd ? 1200 : 600;
     int max_height = m_hd ? 800  : 400;
@@ -75,15 +75,15 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
     if (node)
     {
         int numSamps = 512;
-        if (node->length < 512)
-            numSamps = node->length;
+        if (node->m_length < 512)
+            numSamps = node->m_length;
 
         signed short int data[2][512];
         int i= 0;
         for (; i < numSamps; i++)
         {
-            data[0][i] = node->left[i];
-            data[1][i] = node->right ? node->right[i] : data[0][i];
+            data[0][i] = node->m_left[i];
+            data[1][i] = node->m_right ? node->m_right[i] : data[0][i];
         }
 
         for (; i < 512; i++)
@@ -105,7 +105,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         if (!m_surface && glrender && m_buffer)
         {
             m_surface = glrender->CreateTexture(m_area.size(),
-                                  glrender->GetFeatures() & kGLExtPBufObj, 0,
+                                  (glrender->GetFeatures() & kGLExtPBufObj) != 0U, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
         }
@@ -114,7 +114,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         {
             if (m_buffer != last)
             {
-                bool copy = glrender->GetFeatures() & kGLExtPBufObj;
+                bool copy = (glrender->GetFeatures() & kGLExtPBufObj) != 0U;
                 void* buf = glrender->GetTextureBuffer(m_surface, copy);
                 if (copy)
                     memcpy(buf, m_buffer, m_area.width() * m_area.height() * 4);
@@ -155,19 +155,19 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
 static class VideoVisualGoomFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Goom");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualGoom(audio, render, false);
     }
 
-    virtual bool SupportedRenderer(RenderType type)
+    bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
         return (type == kRenderVDPAU   ||
                 type == kRenderOpenGL1 ||
@@ -179,19 +179,19 @@ static class VideoVisualGoomFactory : public VideoVisualFactory
 static class VideoVisualGoomHDFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Goom HD");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualGoom(audio, render, true);
     }
 
-    virtual bool SupportedRenderer(RenderType type)
+    bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
         return (type == kRenderVDPAU   ||
                 type == kRenderOpenGL1 ||

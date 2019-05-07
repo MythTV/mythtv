@@ -16,18 +16,18 @@ class MTV_PUBLIC ChannelGroupItem
 {
   public:
     ChannelGroupItem(const ChannelGroupItem &other) :
-        grpid(other.grpid), name(other.name) {}
-    ChannelGroupItem(const uint _grpid, const QString &_name) :
-        grpid(_grpid), name(_name) {}
+        m_grpid(other.m_grpid), m_name(other.m_name) {}
+    ChannelGroupItem(const uint grpid, const QString &name) :
+        m_grpid(grpid), m_name(name) {}
 
-    bool operator == (uint _grpid) const
-        { return grpid == _grpid; }
+    bool operator == (uint grpid) const
+        { return m_grpid == grpid; }
 
-    ChannelGroupItem& operator=(const ChannelGroupItem&);
+    ChannelGroupItem& operator=(const ChannelGroupItem&) = default;
 
   public:
-    uint    grpid;
-    QString name;
+    uint    m_grpid;
+    QString m_name;
 };
 typedef vector<ChannelGroupItem> ChannelGroupList;
 
@@ -40,12 +40,12 @@ class MTV_PUBLIC ChannelGroup
   public:
     // ChannelGroup 
     static ChannelGroupList  GetChannelGroups(bool includeEmpty = true);
-    static bool              ToggleChannel(uint chanid, int changrpid, int delete_chan);
+    static bool              ToggleChannel(uint chanid, int changrpid, bool delete_chan);
     static bool              AddChannel(uint chanid, int changrpid);
     static bool              DeleteChannel(uint chanid, int changrpid);
     static int               GetNextChannelGroup(const ChannelGroupList &sorted, int grpid);
     static QString           GetChannelGroupName(int grpid);
-    static int               GetChannelGroupId(QString changroupname);
+    static int               GetChannelGroupId(const QString& changroupname);
 
   private:
 

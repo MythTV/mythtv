@@ -73,8 +73,8 @@ class TestAudioUtils: public QObject
         {
             QCOMPARE(arrays1[i], arrays2[i]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf[i] >= -1.0);
-            QVERIFY(arrayf[i] <= 1.0);
+            QVERIFY(arrayf[i] >= -1.0F);
+            QVERIFY(arrayf[i] <= 1.0F);
         }
         av_free(arrays1);
         av_free(arrays2);
@@ -118,8 +118,8 @@ class TestAudioUtils: public QObject
         {
             QCOMPARE(arrays1[i+offsetshort], arrays2[i+offsetshort]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf[i+offsetfloat] >= -1.0);
-            QVERIFY(arrayf[i+offsetfloat] <= 1.0);
+            QVERIFY(arrayf[i+offsetfloat] >= -1.0F);
+            QVERIFY(arrayf[i+offsetfloat] <= 1.0F);
         }
 
         av_free(arrays1);
@@ -163,10 +163,10 @@ class TestAudioUtils: public QObject
             QCOMPARE(arrays1[i+offsetshort], arrays2[i]);
             QCOMPARE(arrayf1[i+offsetfloat], arrayf2[i]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf1[i+offsetfloat] >= -1.0);
-            QVERIFY(arrayf1[i+offsetfloat] <= 1.0);
-            QVERIFY(arrayf2[i] >= -1.0);
-            QVERIFY(arrayf2[i] <= 1.0);
+            QVERIFY(arrayf1[i+offsetfloat] >= -1.0F);
+            QVERIFY(arrayf1[i+offsetfloat] <= 1.0F);
+            QVERIFY(arrayf2[i] >= -1.0F);
+            QVERIFY(arrayf2[i] <= 1.0F);
         }
 
         av_free(arrays1);
@@ -399,8 +399,8 @@ class TestAudioUtils: public QObject
         {
             QCOMPARE(arrays1[i], arrays2[i]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf[i] >= -1.0);
-            QVERIFY(arrayf[i] <= 1.0);
+            QVERIFY(arrayf[i] >= -1.0F);
+            QVERIFY(arrayf[i] <= 1.0F);
         }
         av_free(arrays1);
         av_free(arrays2);
@@ -433,8 +433,8 @@ class TestAudioUtils: public QObject
         {
             QCOMPARE(arrays1[i+1], arrays2[i+1]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf[i+1] >= -1.0);
-            QVERIFY(arrayf[i+1] <= 1.0);
+            QVERIFY(arrayf[i+1] >= -1.0F);
+            QVERIFY(arrayf[i+1] <= 1.0F);
         }
 
         av_free(arrays1);
@@ -478,8 +478,8 @@ class TestAudioUtils: public QObject
             QCOMPARE(arrays1[i+offsetuchar], arrays2[i]);
             QCOMPARE(arrayf1[i+offsetfloat], arrayf2[i]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf1[i+offsetfloat] >= -1.0);
-            QVERIFY(arrayf1[i+offsetfloat] <= 1.0);
+            QVERIFY(arrayf1[i+offsetfloat] >= -1.0F);
+            QVERIFY(arrayf1[i+offsetfloat] <= 1.0F);
         }
 
         av_free(arrays1);
@@ -658,8 +658,8 @@ class TestAudioUtils: public QObject
             QCOMPARE(arrays1[i+offsetint32_t], arrays2[i]);
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i]+offsetfloat2);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf1[i+offsetfloat1] >= -1.0);
-            QVERIFY(arrayf1[i+offsetfloat1] <= 1.0);
+            QVERIFY(arrayf1[i+offsetfloat1] >= -1.0F);
+            QVERIFY(arrayf1[i+offsetfloat1] <= 1.0F);
         }
 
         av_free(arrays1);
@@ -893,8 +893,8 @@ class TestAudioUtils: public QObject
         for (int i = 0; i < 8; i++)
         {
             QCOMPARE(arrayf2[i], arrayf3[i]);
-            QVERIFY(arrayf2[i] >= -1.0);
-            QVERIFY(arrayf2[i] <= 1.0);
+            QVERIFY(arrayf2[i] >= -1.0F);
+            QVERIFY(arrayf2[i] <= 1.0F);
         }
 
         // test all float array are properly clipped
@@ -908,8 +908,8 @@ class TestAudioUtils: public QObject
             // sanity check
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i+offsetfloat2]);
             // test that it's bound between -1 and 1
-            QVERIFY(arrayf1[i+offsetfloat1] >= -1.0);
-            QVERIFY(arrayf1[i+offsetfloat1] <= 1.0);
+            QVERIFY(arrayf1[i+offsetfloat1] >= -1.0F);
+            QVERIFY(arrayf1[i+offsetfloat1] <= 1.0F);
         }
 
         av_free(arrayf1);

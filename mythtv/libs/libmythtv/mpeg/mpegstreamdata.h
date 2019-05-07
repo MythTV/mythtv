@@ -103,8 +103,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     double TimeOffset(void) const;
 
     // EIT Source
-    virtual void SetEITHelper(EITHelper *eit_helper);
-    virtual void SetEITRate(float rate);
+    void SetEITHelper(EITHelper *eit_helper) override; // EITSource
+    void SetEITRate(float rate) override; // EITSource
     virtual bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const
         { return false; }
     virtual bool GetEITPIDChanges(const uint_vec_t& /*in_use_pids*/,
@@ -187,8 +187,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool HasCachedAnyCAT(uint tsid) const;
     bool HasCachedAnyCAT(void) const;
 
-    bool HasCachedAllPMT(uint program_num) const;
-    bool HasCachedAnyPMT(uint program_num) const;
+    bool HasCachedAllPMT(uint pnum) const;
+    bool HasCachedAnyPMT(uint pnum) const;
     bool HasCachedAllPMTs(void) const;
     bool HasCachedAnyPMTs(void) const;
 
@@ -265,7 +265,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     // Single program stuff, gets
     int DesiredProgram(void) const          { return _desired_program; }
     uint VideoPIDSingleProgram(void) const  { return _pid_video_single_program; }
-    QString GetRecordingType(void) const;
+    QString GetRecordingType(void) const    { return _recording_type; }
 
     const ProgramAssociationTable* PATSingleProgram(void) const
         { return _pat_single_program; }
@@ -307,7 +307,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void IncrementRefCnt(const PSIPTable *psip) const;
     virtual bool DeleteCachedTable(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
-    void CacheCAT(const ConditionalAccessTable *pat);
+    void CacheCAT(const ConditionalAccessTable *_cat);
     void CachePMT(const ProgramMapTable *pmt);
 
   protected:

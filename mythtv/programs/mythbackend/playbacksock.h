@@ -31,34 +31,34 @@ class PlaybackSock : public ReferenceCounter
     PlaybackSock(MainServer *parent, MythSocket *lsock,
                  QString lhostname, PlaybackSockEventsMode eventsMode);
 
-    void SetDisconnected(void) { disconnected = true; }
-    bool IsDisconnected(void) const { return disconnected; }
+    void SetDisconnected(void) { m_disconnected = true; }
+    bool IsDisconnected(void) const { return m_disconnected; }
 
-    MythSocket *getSocket(void) const { return sock; }
-    QString getHostname(void) const { return hostname; }
+    MythSocket *getSocket(void) const { return m_sock; }
+    QString getHostname(void) const { return m_hostname; }
 
-    bool isLocal(void) const { return local; }
+    bool isLocal(void) const { return m_local; }
     bool wantsEvents(void) const;
     bool wantsNonSystemEvents(void) const;
     bool wantsSystemEvents(void) const;
     bool wantsOnlySystemEvents(void) const;
     PlaybackSockEventsMode eventsMode(void) const;
 
-    bool getBlockShutdown(void) const { return blockshutdown; }
-    void setBlockShutdown(bool value) { blockshutdown = value; }
+    bool getBlockShutdown(void) const { return m_blockshutdown; }
+    void setBlockShutdown(bool value) { m_blockshutdown = value; }
 
     bool IsFrontend(void) const { return m_frontend; }
     void SetAsFrontend(void) { m_frontend = true; }
 
     // all backend<->backend stuff below here
-    bool isSlaveBackend(void) const { return backend; }
-    void setAsSlaveBackend(void) { backend = true; mediaserver = true; }
+    bool isSlaveBackend(void) const { return m_backend; }
+    void setAsSlaveBackend(void) { m_backend = true; m_mediaserver = true; }
 
-    bool isMediaServer(void) const { return mediaserver; }
-    void setAsMediaServer(void) { mediaserver = true; }
+    bool isMediaServer(void) const { return m_mediaserver; }
+    void setAsMediaServer(void) { m_mediaserver = true; }
 
-    void setIP(QString &lip) { ip = lip; }
-    QString getIP(void) const { return ip; }
+    void setIP(QString &lip) { m_ip = lip; }
+    QString getIP(void) const { return m_ip; }
 
     bool GoToSleep(void);
     void GetDiskSpace(QStringList &o_strlist);
@@ -71,7 +71,7 @@ class PlaybackSock : public ReferenceCounter
                               QString &directory, bool fileNamesOnly);
     QStringList GetSGFileQuery(QString &host, QString &groupname,
                                QString &filename);
-    QString GetFileHash(QString filename, QString storageGroup);
+    QString GetFileHash(const QString& filename, const QString& storageGroup);
     QStringList GetFindFile(const QString &host, const QString &filename,
                             const QString &storageGroup, bool useRegex);
 
@@ -99,7 +99,7 @@ class PlaybackSock : public ReferenceCounter
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
-    void SetNextLiveTVDir(int capturecardnum, QString dir);
+    void SetNextLiveTVDir(int capturecardnum, const QString& dir);
     void CancelNextRecording(int capturecardnum, bool cancel);
 
     QStringList ForwardRequest(const QStringList&);
@@ -115,22 +115,22 @@ class PlaybackSock : public ReferenceCounter
   private:
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 
-    MythSocket *sock;
-    QString hostname;
-    QString ip;
+    MythSocket             *m_sock          {nullptr};
+    QString                 m_hostname;
+    QString                 m_ip;
 
-    bool local;
-    PlaybackSockEventsMode m_eventsMode;
-    bool blockshutdown;
-    bool backend;
-    bool mediaserver;
-    bool m_frontend;
+    bool                    m_local         {true};
+    PlaybackSockEventsMode  m_eventsMode;
+    bool                    m_blockshutdown {true};
+    bool                    m_backend       {false};
+    bool                    m_mediaserver   {false};
+    bool                    m_frontend      {false};
 
-    QMutex sockLock;
+    QMutex                  m_sockLock;
 
-    bool disconnected;
+    bool                    m_disconnected  {false};
 
-    MainServer *m_parent;
+    MainServer             *m_parent        {nullptr};
 };
 
 #endif

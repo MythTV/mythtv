@@ -6,6 +6,7 @@
 #include "cc608decoder.h"
 #include "vbitext/vt.h"
 #include "mthread.h"
+#include "tv.h" // for VBIMode
 
 class VBI608Extractor;
 class VBIThread;
@@ -24,14 +25,13 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
 {
     friend class VBIThread;
   public:
-    explicit V4LRecorder(TVRec *rec);
+    explicit V4LRecorder(TVRec *rec) : DTVRecorder(rec) {}
     virtual ~V4LRecorder();
 
-    virtual void StopRecording(void); // RecorderBase
-    virtual void SetOption(
-        const QString &name, const QString &value); // RecorderBase
-    virtual void SetOption(const QString &name, int value)
-        { DTVRecorder::SetOption(name, value); } // RecorderBase
+    void StopRecording(void) override; // RecorderBase
+    void SetOption(const QString &name, const QString &value) override; // DTVRecorder
+    void SetOption(const QString &name, int value) override // DTVRecorder
+        { DTVRecorder::SetOption(name, value); }
 
   protected:
     int  OpenVBIDevice(void);
@@ -43,26 +43,26 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
     virtual void FormatCC(uint /*code1*/, uint /*code2*/) {}
 
   protected:
-    QString          audiodevice;
-    QString          vbidevice;
-    int              vbimode;
-    struct VBIData  *pal_vbi_cb;
-    struct vbi      *pal_vbi_tt;
-    uint             ntsc_vbi_width;
-    uint             ntsc_vbi_start_line;
-    uint             ntsc_vbi_line_count;
-    VBI608Extractor *vbi608;
-    VBIThread       *vbi_thread;
-    QList<struct txtbuffertype*> textbuffer;
-    int              vbi_fd;
-    volatile bool    request_helper;
+    QString          m_audiodevice;
+    QString          m_vbidevice;
+    int              m_vbimode                {VBIMode::None};
+    struct VBIData  *m_pal_vbi_cb             {nullptr};
+    struct vbi      *m_pal_vbi_tt             {nullptr};
+    uint             m_ntsc_vbi_width         {0};
+    uint             m_ntsc_vbi_start_line    {0};
+    uint             m_ntsc_vbi_line_count    {0};
+    VBI608Extractor *m_vbi608                 {nullptr};
+    VBIThread       *m_vbi_thread             {nullptr};
+    QList<struct txtbuffertype*> m_textbuffer;
+    int              m_vbi_fd                 {-1};
+    volatile bool    m_request_helper         {false};
 };
 
 class VBIThread : public MThread
 {
   public:
     explicit VBIThread(V4LRecorder *_parent) :
-        MThread("VBIThread"), parent(_parent)
+        MThread("VBIThread"), m_parent(_parent)
     {
         start();
     }
@@ -71,20 +71,20 @@ class VBIThread : public MThread
     {
         while (isRunning())
         {
-            parent->StopRecording();
+            m_parent->StopRecording();
             wait(1000);
         }
     }
 
-    virtual void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
-        parent->RunVBIDevice();
+        m_parent->RunVBIDevice();
         RunEpilog();
     }
 
   private:
-    V4LRecorder *parent;
+    V4LRecorder *m_parent {nullptr};
 };
 
 #endif // _V4L_RECORDER_H_

@@ -34,7 +34,6 @@
 MHLink::MHLink()
 {
     m_EventData.m_Type = MHUnion::U_None;
-    m_nEventType = EventIsAvailable;
 }
 
 void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
@@ -186,10 +185,7 @@ QString MHLink::EventTypeToString(enum EventType ev)
     {
         return rchEventType[ev-1];
     }
-    else
-    {
-        return QString("Unknown event %1").arg(ev);
-    }
+    return QString("Unknown event %1").arg(ev);
 }
 
 void MHLink::PrintMe(FILE *fd, int nTabs) const

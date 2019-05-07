@@ -14,8 +14,7 @@ QEvent::Type ProgressUpdateEvent::kEventType =
 
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
-         : MythScreenType(parent, name, false),
-            m_haveNewMessage(false), m_messageText(nullptr)
+         : MythScreenType(parent, name, false)
 {
     if (!message.isEmpty())
         m_message = message;
@@ -122,15 +121,6 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
 }
 //---------------------------------------------------------
 
-MythUIProgressDialog::MythUIProgressDialog(const QString &message,
-                             MythScreenStack *parent, const char *name)
-         : MythScreenType(parent, name, false),
-            m_total(0), m_count(0),
-            m_messageText(nullptr), m_progressText(nullptr), m_progressBar(nullptr)
-{
-    m_message = message;
-}
-
 bool MythUIProgressDialog::Create(void)
 {
     if (!CopyWindowFromBase("MythProgressDialog", this))
@@ -235,7 +225,7 @@ void MythUIProgressDialog::UpdateProgress()
          m_progressBar->SetUsed(m_count);
      }
 
-    uint percentage = (uint)(((float)m_count/(float)m_total) * 100.0);
+    uint percentage = (uint)(((float)m_count/(float)m_total) * 100.0F);
 
     if (m_progressText)
         m_progressText->SetText(QString("%1%").arg(percentage));

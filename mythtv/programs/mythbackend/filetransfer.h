@@ -27,7 +27,7 @@ class FileTransfer : public ReferenceCounter
                  bool usereadahead, int timeout_ms);
     FileTransfer(QString &filename, MythSocket *remote, bool write);
 
-    MythSocket *getSocket() { return sock; }
+    MythSocket *getSocket() { return m_sock; }
 
     bool isOpen(void);
     bool ReOpen(QString newFilename = "");
@@ -49,20 +49,20 @@ class FileTransfer : public ReferenceCounter
   private:
    ~FileTransfer();
 
-    volatile bool  readthreadlive;
-    bool           readsLocked;
-    QWaitCondition readsUnlockedCond;
+    volatile bool   m_readthreadlive    {true};
+    bool            m_readsLocked       {false};
+    QWaitCondition  m_readsUnlockedCond;
 
-    ProgramInfo *pginfo;
-    RingBuffer *rbuffer;
-    MythSocket *sock;
-    bool ateof;
+    ProgramInfo    *m_pginfo            {nullptr};
+    RingBuffer     *m_rbuffer           {nullptr};
+    MythSocket     *m_sock              {nullptr};
+    bool            m_ateof             {false};
 
-    vector<char> requestBuffer;
+    vector<char>    m_requestBuffer;
 
-    QMutex lock;
+    QMutex          m_lock              {QMutex::NonRecursive};
 
-    bool writemode;
+    bool            m_writemode         {false};
 };
 
 #endif

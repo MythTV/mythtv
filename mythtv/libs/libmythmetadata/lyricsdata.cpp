@@ -19,14 +19,6 @@
 //LyricsData::LyricsData():
 //    m_parent(nullptr), m_status(STATUS_NOTLOADED), m_syncronized(false), m_changed(false) { }
 
-LyricsData::LyricsData(MusicMetadata *parent) :
-    m_parent(parent), m_status(STATUS_NOTLOADED), m_syncronized(false), m_changed(false) { }
-
-LyricsData::LyricsData(MusicMetadata *parent, const QString &grabber, const QString &artist,
-                      const QString &album, const QString &title, bool syncronized) :
-    m_parent(parent), m_status(STATUS_NOTLOADED), m_grabber(grabber), m_artist(artist), m_album(album),
-    m_title(title), m_syncronized(syncronized), m_changed(false) { }
-
 LyricsData::~LyricsData()
 {
     clear();
@@ -294,9 +286,9 @@ void LyricsData::loadLyrics(const QString &xmlData)
             }
             if (!times.isEmpty())
             {
-                for (int x = 0; x < times.count(); x++)
+                for (int y = 0; y < times.count(); y++)
                 {
-                    lyrics.append(times.at(x) + lyric.mid(lastind));
+                    lyrics.append(times.at(y) + lyric.mid(lastind));
                 }
             }
             else
@@ -347,28 +339,28 @@ void LyricsData::setLyrics(const QStringList &lyrics)
                     if (lyric[6] == '.')
                     {
                         hundredths = lyric.mid(7, 2).toInt();
-                        line->Lyric = lyric.mid(10);
+                        line->m_lyric = lyric.mid(10);
                     }
                     else
                     {
-                        line->Lyric = lyric.mid(7);
+                        line->m_lyric = lyric.mid(7);
                     }
-                    line->Time = (minutes * 60 * 1000) + (seconds * 1000) + (hundredths * 10);
+                    line->m_time = (minutes * 60 * 1000) + (seconds * 1000) + (hundredths * 10);
                     if (offset > 0)
                     {
-                        if (offset > line->Time) line->Time = 0;
-                        else line->Time -= offset;
+                        if (offset > line->m_time) line->m_time = 0;
+                        else line->m_time -= offset;
                     }
                     else
                     {
-                        line->Time -= offset;
+                        line->m_time -= offset;
                     }
-                    lastTime = line->Time;
+                    lastTime = line->m_time;
                 }
                 else
                 {
-                    line->Time = ++lastTime;
-                    line->Lyric = lyric;
+                    line->m_time = ++lastTime;
+                    line->m_lyric = lyric;
                 }
             }
         }
@@ -377,28 +369,28 @@ void LyricsData::setLyrics(const QStringList &lyrics)
             // synthesize a time code from the track length and the number of lyrics lines
             if (m_parent && !m_parent->isRadio())
             {
-                line->Time = (m_parent->Length() / lyrics.count()) * x;
-                line->Lyric = lyric;
-                lastTime = line->Time;
+                line->m_time = (m_parent->Length() / lyrics.count()) * x;
+                line->m_lyric = lyric;
+                lastTime = line->m_time;
             }
             else
             {
-                line->Time = ++lastTime;
-                line->Lyric = lyric;
+                line->m_time = ++lastTime;
+                line->m_lyric = lyric;
             }
         }
 
         // ignore anything that is not a lyric
-        if (line->Lyric.startsWith("[ti:") || line->Lyric.startsWith("[al:") || 
-            line->Lyric.startsWith("[ar:") || line->Lyric.startsWith("[by:") ||
-            line->Lyric.startsWith("[url:") || line->Lyric.startsWith("[offset:") ||
-            line->Lyric.startsWith("[id:") || line->Lyric.startsWith("[length:") ||
-            line->Lyric.startsWith("[au:") || line->Lyric.startsWith("[la:"))
+        if (line->m_lyric.startsWith("[ti:") || line->m_lyric.startsWith("[al:") || 
+            line->m_lyric.startsWith("[ar:") || line->m_lyric.startsWith("[by:") ||
+            line->m_lyric.startsWith("[url:") || line->m_lyric.startsWith("[offset:") ||
+            line->m_lyric.startsWith("[id:") || line->m_lyric.startsWith("[length:") ||
+            line->m_lyric.startsWith("[au:") || line->m_lyric.startsWith("[la:"))
         {
             delete line;
             continue;
         }
 
-        m_lyricsMap.insert(line->Time, line);
+        m_lyricsMap.insert(line->m_time, line);
     }
 }

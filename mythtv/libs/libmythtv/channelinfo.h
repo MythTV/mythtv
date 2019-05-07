@@ -21,7 +21,7 @@ using namespace std;
 class MTV_PUBLIC ChannelInfo
 {
  public:
-    ChannelInfo();
+    ChannelInfo() = default;
     ChannelInfo(const ChannelInfo&);
     ChannelInfo(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
@@ -31,8 +31,8 @@ class MTV_PUBLIC ChannelInfo
     
     ChannelInfo& operator=(const ChannelInfo&);
 
-    bool operator == (uint _chanid) const
-        { return chanid == _chanid; }
+    bool operator == (uint chanid) const
+        { return m_chanid == chanid; }
         
     bool Load(uint lchanid = -1);
 
@@ -72,46 +72,47 @@ class MTV_PUBLIC ChannelInfo
   public:
       
     // Ordered to match channel table
-    uint    chanid;
-    QString channum;
-    QString freqid;
-    uint    sourceid;
+    uint         m_chanid            {0};
+    QString      m_channum;
+    QString      m_freqid;           // May be overloaded to a
+                                     // non-frequency identifier
+    uint         m_sourceid          {0};
     
-    QString callsign;
-    QString name;
-    QString icon;
+    QString      m_callsign;
+    QString      m_name;
+    QString      m_icon;
     
-    int     finetune;
-    QString videofilters;
-    QString xmltvid;
-    int     recpriority;
+    int          m_finetune          {0};
+    QString      m_videofilters;
+    QString      m_xmltvid;
+    int          m_recpriority       {0};
 
-    uint    contrast;
-    uint    brightness;
-    uint    colour;
-    uint    hue;
+    uint         m_contrast          {32768};
+    uint         m_brightness        {32768};
+    uint         m_colour            {32768};
+    uint         m_hue               {32768};
 
-    QString tvformat;
-    bool    visible;
-    QString outputfilters;
-    bool    useonairguide;
+    QString      m_tvformat;
+    bool         m_visible           {true};
+    QString      m_outputfilters;
+    bool         m_useonairguide     {false};
     
-    uint    mplexid;
-    uint    serviceid;
-    uint    atsc_major_chan;
-    uint    atsc_minor_chan;
+    uint         m_mplexid           {0};
+    uint         m_serviceid         {0};
+    uint         m_atsc_major_chan   {0};
+    uint         m_atsc_minor_chan   {0};
 
-    QDateTime last_record;
+    QDateTime    m_last_record;
 
-    QString default_authority;
-    int     commmethod;
-    int     tmoffset;
-    uint    iptvid;
+    QString      m_default_authority;
+    int          m_commmethod        {-1};
+    int          m_tmoffset          {0};
+    uint         m_iptvid            {0};
 
-    QString old_xmltvid; // Used by mythfilldatabase when updating the xmltvid
+    QString      m_old_xmltvid; // Used by mythfilldatabase when updating the xmltvid
 
   private:
-    QString m_sourcename; // Cache here rather than looking up each time
+    QString      m_sourcename; // Cache here rather than looking up each time
     // Following not in database - Cached
     QList<uint>  m_groupIdList;
     QList<uint>  m_inputIdList;
@@ -121,59 +122,74 @@ typedef vector<ChannelInfo> ChannelInfoList;
 class MTV_PUBLIC ChannelInsertInfo
 {
   public:
-    ChannelInsertInfo(void) :
-        db_mplexid(0), source_id(0), channel_id(0),
-        callsign(""), service_name(""),
-        chan_num(""), service_id(0),
-        atsc_major_channel(0), atsc_minor_channel(0),
-        use_on_air_guide(false),
-        hidden(false), hidden_in_guide(false),
-        freqid(""), icon(""),
-        format(""), xmltvid(""),
-        default_authority(""),
-        pat_tsid(0), vct_tsid(0), vct_chan_tsid(0), sdt_tsid(0),
-        orig_netid(0), netid(0),
-        si_standard(""),
-        in_channels_conf(false),
-        in_pat(false), in_pmt(false),
-        in_vct(false),
-        in_nit(false), in_sdt(false),
-        is_encrypted(false),
-        is_data_service(false), is_audio_service(false),
-        is_opencable(false), could_be_opencable(false),
-        decryption_status(0) { }
-
+    ChannelInsertInfo(void) = default;
     ChannelInsertInfo(
-        uint    _db_mplexid,         uint    _source_id,
-        uint    _channel_id,         QString _callsign,
-        QString _service_name,       QString _chan_num,
-        uint    _service_id,
+        uint           _db_mplexid,         uint           _source_id,
+        uint           _channel_id,         const QString& _callsign,
+        const QString& _service_name,       const QString& _chan_num,
+        uint           _service_id,
 
-        uint    _atsc_major_channel, uint    _atsc_minor_channel,
-        bool    _use_on_air_guide,   bool    _hidden,
-        bool    _hidden_in_guide,
+        uint           _atsc_major_channel, uint           _atsc_minor_channel,
+        bool           _use_on_air_guide,   bool           _hidden,
+        bool           _hidden_in_guide,
 
-        QString _freqid,             QString _icon,
-        QString _format,             QString _xmltvid,
+        const QString& _freqid,             const QString& _icon,
+        const QString& _format,             const QString& _xmltvid,
 
-        uint    _pat_tsid,           uint    _vct_tsid,
-        uint    _vct_chan_tsid,      uint    _sdt_tsid,
+        uint           _pat_tsid,           uint           _vct_tsid,
+        uint           _vct_chan_tsid,      uint           _sdt_tsid,
 
-        uint    _orig_netid,         uint    _netid,
+        uint           _orig_netid,         uint           _netid,
 
-        QString _si_standard,
+        const QString& _si_standard,
 
-        bool    _in_channels_conf,   bool    _in_pat,
-        bool    _in_pmt,             bool    _in_vct,
-        bool    _in_nit,             bool    _in_sdt,
+        bool           _in_channels_conf,   bool           _in_pat,
+        bool           _in_pmt,             bool           _in_vct,
+        bool           _in_nit,             bool           _in_sdt,
 
-        bool    _is_encrypted,       bool    _is_data_service,
-        bool    _is_audio_service,   bool    _is_opencable,
-        bool    _could_be_opencable, int     _decryption_status,
-        QString _default_authority);
+        bool           _is_encrypted,       bool           _is_data_service,
+        bool           _is_audio_service,   bool           _is_opencable,
+        bool           _could_be_opencable, int            _decryption_status,
+        const QString& _default_authority) :
+    m_db_mplexid(_db_mplexid),
+    m_source_id(_source_id),
+    m_channel_id(_channel_id),
+    m_callsign(_callsign),
+    m_service_name(_service_name),
+    m_chan_num(_chan_num),
+    m_service_id(_service_id),
+    m_atsc_major_channel(_atsc_major_channel),
+    m_atsc_minor_channel(_atsc_minor_channel),
+    m_use_on_air_guide(_use_on_air_guide),
+    m_hidden(_hidden),
+    m_hidden_in_guide(_hidden_in_guide),
+    m_freqid(_freqid),
+    m_icon(_icon),
+    m_format(_format),
+    m_xmltvid(_xmltvid),
+    m_default_authority(_default_authority),
+    m_pat_tsid(_pat_tsid),
+    m_vct_tsid(_vct_tsid),
+    m_vct_chan_tsid(_vct_chan_tsid),
+    m_sdt_tsid(_sdt_tsid),
+    m_orig_netid(_orig_netid),
+    m_netid(_netid),
+    m_si_standard(_si_standard),
+    m_in_channels_conf(_in_channels_conf),
+    m_in_pat(_in_pat),
+    m_in_pmt(_in_pmt),
+    m_in_vct(_in_vct),
+    m_in_nit(_in_nit),
+    m_in_sdt(_in_sdt),
+    m_is_encrypted(_is_encrypted),
+    m_is_data_service(_is_data_service),
+    m_is_audio_service(_is_audio_service),
+    m_is_opencable(_is_opencable),
+    m_could_be_opencable(_could_be_opencable),
+    m_decryption_status(_decryption_status) {}
 
     ChannelInsertInfo(const ChannelInsertInfo &other) { (*this = other); }
-    ChannelInsertInfo &operator=(const ChannelInsertInfo &other);
+    ChannelInsertInfo &operator=(const ChannelInsertInfo &other) = default;
 
     bool IsSameChannel(const ChannelInsertInfo&, bool relaxed = false) const;
 
@@ -182,44 +198,44 @@ class MTV_PUBLIC ChannelInsertInfo
     void ImportExtraInfo(const ChannelInsertInfo &other);
 
   public:
-    uint    db_mplexid;
-    uint    source_id;
-    uint    channel_id;
-    QString callsign;
-    QString service_name;
-    QString chan_num;
-    uint    service_id;
-    uint    atsc_major_channel;
-    uint    atsc_minor_channel;
-    bool    use_on_air_guide;
-    bool    hidden;
-    bool    hidden_in_guide;
-    QString freqid;
-    QString icon;
-    QString format;
-    QString xmltvid;
-    QString default_authority;
+    uint    m_db_mplexid         {0};
+    uint    m_source_id          {0};
+    uint    m_channel_id         {0};
+    QString m_callsign;
+    QString m_service_name;
+    QString m_chan_num;
+    uint    m_service_id         {0};
+    uint    m_atsc_major_channel {0};
+    uint    m_atsc_minor_channel {0};
+    bool    m_use_on_air_guide   {false};
+    bool    m_hidden             {false};
+    bool    m_hidden_in_guide    {false};
+    QString m_freqid;
+    QString m_icon;
+    QString m_format;
+    QString m_xmltvid;
+    QString m_default_authority;
 
     // non-DB info
-    uint    pat_tsid;
-    uint    vct_tsid;
-    uint    vct_chan_tsid;
-    uint    sdt_tsid;
-    uint    orig_netid;
-    uint    netid;
-    QString si_standard;
-    bool    in_channels_conf;
-    bool    in_pat;
-    bool    in_pmt;
-    bool    in_vct;
-    bool    in_nit;
-    bool    in_sdt;
-    bool    is_encrypted;
-    bool    is_data_service;
-    bool    is_audio_service;
-    bool    is_opencable;
-    bool    could_be_opencable;
-    int     decryption_status;
+    uint    m_pat_tsid           {0};
+    uint    m_vct_tsid           {0};
+    uint    m_vct_chan_tsid      {0};
+    uint    m_sdt_tsid           {0};
+    uint    m_orig_netid         {0};
+    uint    m_netid              {0};
+    QString m_si_standard;
+    bool    m_in_channels_conf   {false};
+    bool    m_in_pat             {false};
+    bool    m_in_pmt             {false};
+    bool    m_in_vct             {false};
+    bool    m_in_nit             {false};
+    bool    m_in_sdt             {false};
+    bool    m_is_encrypted       {false};
+    bool    m_is_data_service    {false};
+    bool    m_is_audio_service   {false};
+    bool    m_is_opencable       {false};
+    bool    m_could_be_opencable {false};
+    int     m_decryption_status  {0};
 };
 typedef vector<ChannelInsertInfo> ChannelInsertInfoList;
 

@@ -17,12 +17,15 @@ INSTALLS += target
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
 # Input
+HEADERS += mythdialogs.h
 HEADERS += iconview.h          singleview.h
 HEADERS += imageview.h
 HEADERS += galleryfilter.h galleryfilterdlg.h
 HEADERS += gallerysettings.h   dbcheck.h
 HEADERS += galleryutil.h
 HEADERS += thumbgenerator.h    thumbview.h
+
+SOURCES += mythdialogs.cpp
 SOURCES += iconview.cpp        singleview.cpp
 SOURCES += imageview.cpp
 SOURCES += galleryfilter.cpp galleryfilterdlg.cpp
@@ -44,6 +47,11 @@ DEFINES += MPLUGIN_API
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
+android {
+    # to discriminate plugins in a flat directory structure
+    TARGET = mythplugin$${TARGET}
 }
 
 include ( ../../libs-targetfix.pro )

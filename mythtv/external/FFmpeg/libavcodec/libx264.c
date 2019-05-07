@@ -161,6 +161,8 @@ static int avfmt2_num_planes(int avfmt)
     case AV_PIX_FMT_BGR0:
     case AV_PIX_FMT_BGR24:
     case AV_PIX_FMT_RGB24:
+    case AV_PIX_FMT_GRAY8:
+    case AV_PIX_FMT_GRAY10:
         return 1;
 
     default:
@@ -442,6 +444,10 @@ static int convert_pix_fmt(enum AVPixelFormat pix_fmt)
     case AV_PIX_FMT_NV20:      return X264_CSP_NV16;
 #ifdef X264_CSP_NV21
     case AV_PIX_FMT_NV21:      return X264_CSP_NV21;
+#endif
+#ifdef X264_CSP_I400
+    case AV_PIX_FMT_GRAY8:
+    case AV_PIX_FMT_GRAY10:    return X264_CSP_I400;
 #endif
     };
     return 0;
@@ -885,6 +891,10 @@ static const enum AVPixelFormat pix_fmts_all[] = {
     AV_PIX_FMT_YUV422P10,
     AV_PIX_FMT_YUV444P10,
     AV_PIX_FMT_NV20,
+#ifdef X264_CSP_I400
+    AV_PIX_FMT_GRAY8,
+    AV_PIX_FMT_GRAY10,
+#endif
     AV_PIX_FMT_NONE
 };
 #if CONFIG_LIBX264RGB_ENCODER
@@ -1053,8 +1063,7 @@ AVCodec ff_libx264_encoder = {
     .priv_class       = &x264_class,
     .defaults         = x264_defaults,
     .init_static_data = X264_init_static,
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE |
-                        FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
     .wrapper_name     = "libx264",
 };
 #endif
@@ -1105,8 +1114,7 @@ AVCodec ff_libx262_encoder = {
     .priv_class       = &X262_class,
     .defaults         = x264_defaults,
     .pix_fmts         = pix_fmts_8bit,
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE |
-                        FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
     .wrapper_name     = "libx264",
 };
 #endif

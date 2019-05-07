@@ -5,7 +5,7 @@
 
 MythTranscodeCommandLineParser::MythTranscodeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTRANSCODE)
-{ LoadArguments(); }
+{ MythTranscodeCommandLineParser::LoadArguments(); }
 
 void MythTranscodeCommandLineParser::LoadArguments(void)
 {
@@ -16,16 +16,16 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addLogging();
 
-    add(QStringList( QStringList() << "-p" << "--profile" ), "profile", "",
+    add(QStringList{"-p", "--profile"}, "profile", "",
             "Transcoding profile.", "")
         ->SetGroup("Encoding");
-    add(QStringList( QStringList() << "--allkeys" << "-k" ), "allkeys", false,
+    add(QStringList{"--allkeys", "-k"}, "allkeys", false,
             "Specifies the outputfile should be entirely keyframes.", "")
         ->SetGroup("Encoding");
     add("--passthrough", "passthru", false, 
             "Pass through raw, unprocessed audio.", "")
         ->SetGroup("Encoding");
-    add(QStringList( QStringList() << "-ro" << "--recorderOptions" ), "recopt",
+    add(QStringList{"-ro", "--recorderOptions"}, "recopt",
             "", "Comma separated list of recordingprofile overrides.", "")
         ->SetGroup("Encoding");
     add("--audiotrack", "audiotrack", 0, "Select specific audio track.", "")
@@ -33,10 +33,10 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
     add("--allaudiotracks", "allaudio", 0,
         "Keep all audio tracks including those marked with 0 channels.", "")
         ->SetGroup("Encoding");
-    add(QStringList( QStringList() << "-m" << "--mpeg2" ), "mpeg2", false,
+    add(QStringList{"-m", "--mpeg2"}, "mpeg2", false,
             "Specifies that a lossless transcode should be used.", "")
         ->SetGroup("Encoding");
-    add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", "",
+    add(QStringList{"-e", "--ostream"}, "ostream", "",
             "Output stream type: ps, dvd, ts (Default: ps)", "")
         ->SetGroup("Encoding");
     add("--avf", "avf", false, "Generate libavformat output file.", "")
@@ -44,7 +44,7 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
     add("--hls", "hls", false, "Generate HTTP Live Stream output.", "")
         ->SetGroup("Encoding");
 
-    add(QStringList( QStringList() << "-f" << "--fifodir" ), "fifodir", "",
+    add(QStringList{"-f", "--fifodir"}, "fifodir", "",
             "Directory in which to write fifos to.", "")
         ->SetGroup("Frame Server");
     add("--fifoinfo", "fifoinfo", false,
@@ -59,7 +59,7 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetGroup("Frame Server")
         ->SetRequires("fifodir");
 
-    add(QStringList( QStringList() << "-l" << "--honorcutlist" ), "usecutlist",
+    add(QStringList{"-l", "--honorcutlist"}, "usecutlist",
             "", "Specifies whether to use the cutlist. "
             "(Takes an optional cutlist as argument when used with -i)",
             "Specifies whether transcode should honor the cutlist and "
@@ -75,11 +75,11 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Display status info in stdout", "")
         ->SetGroup("Logging");
 
-    add(QStringList( QStringList() << "-i" << "--infile" ), "inputfile", "",
+    add(QStringList{"-i", "--infile"}, "inputfile", "",
             "Input video for transcoding.", "");
-    add(QStringList( QStringList() << "-o" << "--outfile" ), "outputfile", "",
+    add(QStringList{"-o", "--outfile"}, "outputfile", "",
             "Optional output file for transcoding.", "");
-    add(QStringList( QStringList() << "-b" << "--buildindex" ), "reindex", false,
+    add(QStringList{"-b", "--buildindex"}, "reindex", false,
             "Build new keyframe index.", "");
     add("--video", "video", false,
             "Specifies video is not a recording.", "")
@@ -113,7 +113,7 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetChildOf("hls");
     add("--hlsstreamid", "hlsstreamid", -1, "Stream ID to process", "")
         ->SetChildOf("hls");
-    add(QStringList(QStringList() << "-d" << "--delete" ), "delete", false,
+    add(QStringList{"-d", "--delete"}, "delete", false,
             "Delete original after successful transcoding", "")
         ->SetGroup("Encoding");
 }

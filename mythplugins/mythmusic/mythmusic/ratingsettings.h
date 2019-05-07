@@ -10,18 +10,19 @@ class RatingSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    RatingSettings(MythScreenStack *parent, const char *name = nullptr);
+    RatingSettings(MythScreenStack *parent, const char *name = nullptr)
+        : MythScreenType(parent, name) {}
     ~RatingSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
 private:
-    MythUISpinBox      *m_ratingWeight;
-    MythUISpinBox      *m_playCountWeight;
-    MythUISpinBox      *m_lastPlayWeight;
-    MythUISpinBox      *m_randomWeight;
-    MythUIButton       *m_saveButton;
-    MythUIButton       *m_cancelButton;
+    MythUISpinBox      *m_ratingWeight    {nullptr};
+    MythUISpinBox      *m_playCountWeight {nullptr};
+    MythUISpinBox      *m_lastPlayWeight  {nullptr};
+    MythUISpinBox      *m_randomWeight    {nullptr};
+    MythUIButton       *m_saveButton      {nullptr};
+    MythUIButton       *m_cancelButton    {nullptr};
 
 private slots:
     void slotSave(void);

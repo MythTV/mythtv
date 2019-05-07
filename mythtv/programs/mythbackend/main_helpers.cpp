@@ -2,8 +2,12 @@
 #if CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
-#ifdef USING_SYSTEMD_NOTIFY
+#if CONFIG_SYSTEMD_NOTIFY
     #include <systemd/sd-daemon.h>
+    #define be_sd_notify(x) \
+        (void)sd_notify(0, x);
+#else
+    #define be_sd_notify(x)
 #endif
 
 // C++ headers
@@ -150,15 +154,18 @@ bool setupTVs(bool ismaster, bool &error)
         hosts.push_back(host);
     }
 
-    QWriteLocker tvlocker(&TVRec::inputsLock);
+    QWriteLocker tvlocker(&TVRec::s_inputsLock);
 
-    for (uint i = 0; i < cardids.size(); i++)
+    for (size_t i = 0; i < cardids.size(); i++)
     {
-        if (hosts[i] == localhostname)
+        if (hosts[i] == localhostname) {
+            // No memory leak. The constructor for TVRec adds the item
+            // to the static map TVRec::s_inputs.
             new TVRec(cardids[i]);
+        }
     }
 
-    for (uint i = 0; i < cardids.size(); i++)
+    for (size_t i = 0; i < cardids.size(); i++)
     {
         uint    cardid = cardids[i];
         QString host   = hosts[i];
@@ -230,6 +237,9 @@ void cleanup(void)
     if (gCoreContext)
         gCoreContext->SetExiting();
 
+    delete sysEventHandler;
+    sysEventHandler = nullptr;
+
     delete housekeeping;
     housekeeping = nullptr;
 
@@ -260,9 +270,9 @@ void cleanup(void)
         TaskQueue::Instance()->wait();
     }
 
-    while (!TVRec::inputs.empty())
+    while (!TVRec::s_inputs.empty())
     {
-        TVRec *rec = *TVRec::inputs.begin();
+        TVRec *rec = *TVRec::s_inputs.begin();
         delete rec;
     }
 
@@ -318,12 +328,9 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
                 QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Unable to connect to backend, verbose mask unchanged ");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to connect to backend, verbose mask unchanged ");
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("setloglevel"))
@@ -338,12 +345,9 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
                 QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Unable to connect to backend, log level unchanged ");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to connect to backend, log level unchanged ");
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("clearcache"))
@@ -354,12 +358,9 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
             return GENERIC_EXIT_OK;
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
-                    "cache will not be cleared.");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
+            "cache will not be cleared.");
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.toBool("printsched") ||
@@ -565,21 +566,26 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     bool ismaster = gCoreContext->IsMasterHost();
 
-    if (!UpgradeTVDatabaseSchema(ismaster, ismaster))
+    if (!UpgradeTVDatabaseSchema(ismaster, ismaster, true))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't upgrade database to new schema");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Couldn't upgrade database to new schema on %1 backend.")
+            .arg(ismaster ? "master" : "slave"));
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
+    be_sd_notify("STATUS=Loading translation");
     MythTranslation::load("mythfrontend");
 
     if (!ismaster)
     {
+        be_sd_notify("STATUS=Connecting to master backend");
         int ret = connect_to_master();
         if (ret != GENERIC_EXIT_OK)
             return ret;
     }
 
+    be_sd_notify("STATUS=Get backend server port");
     int     port = gCoreContext->GetBackendServerPort();
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
@@ -589,7 +595,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
-    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    sysEventHandler = new MythSystemEventHandler();
 
     if (ismaster)
     {
@@ -605,16 +611,14 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
-    {
-        delete sysEventHandler;
         return GENERIC_EXIT_SETUP_ERROR;
-    }
 
     Scheduler *sched = nullptr;
     if (ismaster)
     {
         if (runsched)
         {
+            be_sd_notify("STATUS=Creating scheduler");
             sched = new Scheduler(true, &tvList);
             int err = sched->GetError();
             if (err)
@@ -635,6 +639,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (!cmdline.toBool("nohousekeeper"))
     {
+        be_sd_notify("STATUS=Creating housekeeper");
         housekeeping = new HouseKeeper();
 
         if (ismaster)
@@ -669,6 +674,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (g_pUPnp == nullptr)
     {
+        be_sd_notify("STATUS=Creating UPnP media server");
         g_pUPnp = new MediaServer();
 
         g_pUPnp->Init(ismaster, cmdline.toBool("noupnp"));
@@ -684,11 +690,13 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (pHS)
     {
         LOG(VB_GENERAL, LOG_INFO, "Main::Registering HttpStatus Extension");
+        be_sd_notify("STATUS=Registering HttpStatus Extension");
 
         httpStatus = new HttpStatus( &tvList, sched, expirer, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
 
+    be_sd_notify("STATUS=Creating main server");
     mainServer = new MainServer(
         ismaster, port, &tvList, sched, expirer);
 
@@ -704,15 +712,15 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (httpStatus && mainServer)
         httpStatus->SetMainServer(mainServer);
 
+    be_sd_notify("STATUS=Check all storage groups");
     StorageGroup::CheckAllStorageGroupDirs();
 
+    be_sd_notify("STATUS=Sending \"master started\" message");
     if (gCoreContext->IsMasterBackend())
         gCoreContext->SendSystemEvent("MASTER_STARTED");
 
-#ifdef USING_SYSTEMD_NOTIFY
     // Provide systemd ready notification (for type=notify units)
-    (void)sd_notify(0, "READY=1");
-#endif
+    be_sd_notify("READY=1");
 
     ///////////////////////////////
     ///////////////////////////////
@@ -727,8 +735,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
-
-    delete sysEventHandler;
+    be_sd_notify("STOPPING=1\nSTATUS=Exiting");
 
     return exitCode;
 }

@@ -4,14 +4,15 @@
 #include <cstdlib>
 
 // Qt
-#include <QVector>
-#include <QSqlDriver>
+#include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QSemaphore>
+#include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
-#include <QElapsedTimer>
-#include <QCoreApplication>
+#include <QVector>
+#include <utility>
 
 // MythTV
 #include "compat.h"
@@ -33,8 +34,8 @@
 
 static const uint kPurgeTimeout = 60 * 60;
 
-bool TestDatabase(QString dbHostName,
-                  QString dbUserName,
+bool TestDatabase(const QString& dbHostName,
+                  const QString& dbUserName,
                   QString dbPassword,
                   QString dbName,
                   int dbPort)
@@ -50,9 +51,9 @@ bool TestDatabase(QString dbHostName,
         return ret;
 
     DatabaseParams dbparms;
-    dbparms.dbName = dbName;
+    dbparms.dbName = std::move(dbName);
     dbparms.dbUserName = dbUserName;
-    dbparms.dbPassword = dbPassword;
+    dbparms.dbPassword = std::move(dbPassword);
     dbparms.dbHostName = dbHostName;
     dbparms.dbPort = dbPort;
 
@@ -73,10 +74,8 @@ bool TestDatabase(QString dbHostName,
 }
 
 MSqlDatabase::MSqlDatabase(const QString &name)
+    : m_name(name)
 {
-    m_name = name;
-    m_name.detach();
-
     if (!QSqlDatabase::isDriverAvailable("QMYSQL"))
     {
         LOG(VB_FLUSH, LOG_CRIT, "FATAL: Unable to load the QT mysql driver, is it installed?");
@@ -141,18 +140,16 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 
         if (m_dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
         {
-            connected = true;              // Pretend to be connected
-            return true;                   // to reduce errors
+            // Pretend to be connected to reduce errors
+            return true;
         }
-        else
-        {
-            // code to ensure that a link-local ip address has the scope
-            int port = 3306;
-            if (m_dbparms.dbPort)
-                port = m_dbparms.dbPort;
-            PortChecker::resolveLinkLocal(m_dbparms.dbHostName, port);
-            m_db.setHostName(m_dbparms.dbHostName);
-        }
+
+        // code to ensure that a link-local ip address has the scope
+        int port = 3306;
+        if (m_dbparms.dbPort)
+            port = m_dbparms.dbPort;
+        PortChecker::resolveLinkLocal(m_dbparms.dbHostName, port);
+        m_db.setHostName(m_dbparms.dbHostName);
 
         if (m_dbparms.dbPort)
             m_db.setPort(m_dbparms.dbPort);
@@ -217,14 +214,10 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                 // because it returns all tables visible to the user in *all*
                 // databases (not just the current DB).
                 bool have_schema = false;
-                QString sql = "SELECT COUNT( "
-                              "         INFORMATION_SCHEMA.TABLES.TABLE_NAME "
-                              "       ) "
+                QString sql = "SELECT COUNT(TABLE_NAME) "
                               "  FROM INFORMATION_SCHEMA.TABLES "
-                              " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA "
-                              "       = DATABASE() "
-                              "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = "
-                              "       'BASE TABLE';";
+                              " WHERE TABLE_SCHEMA = DATABASE() "
+                              "   AND TABLE_TYPE = 'BASE TABLE';";
                 // We can't use MSqlQuery to determine if we have a schema,
                 // since it will open a new connection, which will try to check
                 // if we have a schema
@@ -284,20 +277,11 @@ void MSqlDatabase::InitSessionVars()
 
 
 
-MDBManager::MDBManager()
-{
-    m_nextConnID = 0;
-    m_connCount = 0;
-
-    m_schedCon = nullptr;
-    m_DDCon = nullptr;
-}
-
 MDBManager::~MDBManager()
 {
     CloseDatabases();
 
-    if (m_connCount != 0 || m_schedCon || m_DDCon)
+    if (m_connCount != 0 || m_schedCon || m_channelCon)
     {
         LOG(VB_GENERAL, LOG_CRIT,
             "MDBManager exiting with connections still open");
@@ -305,7 +289,7 @@ MDBManager::~MDBManager()
 #if 0 /* some post logStop() debugging... */
     cout<<"m_connCount: "<<m_connCount<<endl;
     cout<<"m_schedCon: "<<m_schedCon<<endl;
-    cout<<"m_DDCon: "<<m_DDCon<<endl;
+    cout<<"m_channelCon: "<<m_channelCon<<endl;
 #endif
 }
 
@@ -452,7 +436,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     }
 }
 
-MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
+MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, const QString& name)
 {
     if (!dbcon)
         return nullptr;
@@ -476,9 +460,9 @@ MSqlDatabase *MDBManager::getSchedCon()
     return getStaticCon(&m_schedCon, "SchedCon");
 }
 
-MSqlDatabase *MDBManager::getDDCon()
+MSqlDatabase *MDBManager::getChannelCon()
 {
-    return getStaticCon(&m_DDCon, "DataDirectCon");
+    return getStaticCon(&m_channelCon, "ChannelCon");
 }
 
 void MDBManager::CloseDatabases()
@@ -509,8 +493,8 @@ void MDBManager::CloseDatabases()
 
         if (db == m_schedCon)
             m_schedCon = nullptr;
-        if (db == m_DDCon)
-            m_DDCon = nullptr;
+        if (db == m_channelCon)
+            m_channelCon = nullptr;
     }
     m_lock.unlock();
 }
@@ -529,7 +513,6 @@ static void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
          : QSqlQuery(QString(), qi.qsqldb)
 {
-    m_isConnected = false;
     m_db = qi.db;
     m_returnConnection = qi.returnConnection;
 
@@ -598,9 +581,9 @@ MSqlQueryInfo MSqlQuery::SchedCon()
     return qi;
 }
 
-MSqlQueryInfo MSqlQuery::DDCon()
+MSqlQueryInfo MSqlQuery::ChannelCon()
 {
-    MSqlDatabase *db = GetMythDB()->GetDBManager()->getDDCon();
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->getChannelCon();
     MSqlQueryInfo qi;
 
     InitMSqlQueryInfo(qi);
@@ -659,11 +642,7 @@ bool MSqlQuery::exec()
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!result
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-        && QSqlQuery::lastError().number() == 2006
-#else
         && QSqlQuery::lastError().nativeErrorCode() == "2006"
-#endif
         && Reconnect())
         result = QSqlQuery::exec();
 
@@ -751,11 +730,7 @@ bool MSqlQuery::exec(const QString &query)
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!result
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-        && QSqlQuery::lastError().number() == 2006
-#else
         && QSqlQuery::lastError().nativeErrorCode() == "2006"
-#endif
         && Reconnect())
         result = QSqlQuery::exec(query);
 
@@ -858,11 +833,7 @@ bool MSqlQuery::prepare(const QString& query)
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!ok
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-        && QSqlQuery::lastError().number() == 2006
-#else
         && QSqlQuery::lastError().nativeErrorCode() == "2006"
-#endif
         && Reconnect())
         ok = true;
 
@@ -891,6 +862,16 @@ bool MSqlQuery::testDBConnection()
 
 void MSqlQuery::bindValue(const QString &placeholder, const QVariant &val)
 {
+    QSqlQuery::bindValue(placeholder, val, QSql::In);
+}
+
+void MSqlQuery::bindValueNoNull(const QString &placeholder, const QVariant &val)
+{
+    if ((val.type() == QVariant::String) && val.isNull())
+    {
+        QSqlQuery::bindValue(placeholder, QString(""), QSql::In);
+        return;
+    }
     QSqlQuery::bindValue(placeholder, val, QSql::In);
 }
 
@@ -963,7 +944,7 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
     QVariant val;
     QString holder;
 
-    for (i = (int)holders.count() - 1; i >= 0; --i)
+    for (i = holders.count() - 1; i >= 0; --i)
     {
         holder = holders[(uint)i].holderName;
         val = bindings[holder];

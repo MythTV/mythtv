@@ -255,7 +255,8 @@ protected:
 
 private:
     //! Host of SG
-    QString m_hostname, m_hostport;
+    QString m_hostname;
+    int m_hostport;
     //! Images storage group.
     // Marked mutable as storagegroup.h does not enforce const-correctness
     mutable StorageGroup m_sg;
@@ -284,7 +285,7 @@ public:
 
     // Scanner support
     bool ReadAllImages(ImageHash &files, ImageHash &dirs) const;
-    void ClearDb(int fsId, const QString &action);
+    void ClearDb(int devId, const QString &action);
 
     // ImageReader support
     int  GetChildren(QString ids, ImageList &files, ImageList &dirs,
@@ -299,7 +300,7 @@ protected:
     explicit ImageDb(const QString &table) : FS(), m_table(table) {}
 
     ImageItem *CreateImage(const MSqlQuery &query) const;
-    int        ReadImages(ImageList &dirs, ImageList &images,
+    int        ReadImages(ImageList &dirs, ImageList &files,
                           const QString &selector) const;
     //! Db table name
     QString m_table;
@@ -360,8 +361,8 @@ protected:
 
     void RemoveFiles(ImageList &) const;
 
-    ImageThumb<DBFS>      *m_thumbGen; //!< Thumbnail generator
-    ImageScanThread<DBFS> *m_scanner;  //!< File scanner
+    ImageThumb<DBFS>      *m_thumbGen {nullptr}; //!< Thumbnail generator
+    ImageScanThread<DBFS> *m_scanner  {nullptr}; //!< File scanner
 };
 
 
@@ -383,7 +384,7 @@ protected:
     }
 
     //! BE Gallery instance
-    static ImageManagerBe *m_instance;
+    static ImageManagerBe *s_instance;
 };
 
 
@@ -409,7 +410,7 @@ public:
     void SetVisibility(bool showHidden)
     { m_showHidden = showHidden; SetRefinementClause(); }
 
-    int  GetImages(ImageIdList ids, ImageList &files, ImageList &dirs) const;
+    int  GetImages(const ImageIdList& ids, ImageList &files, ImageList &dirs) const;
     int  GetChildren(int id, ImageList &files, ImageList &dirs) const;
     int  GetDirectory(int id, ImagePtr &parent,
                       ImageList &files, ImageList &dirs) const;
@@ -464,9 +465,9 @@ public:
     void        RequestMetaData(int id);
     QString     IgnoreDirs(const QString &excludes);
     QString     MakeDir(int, const QStringList &names, bool rescan = true);
-    QString     RenameFile(ImagePtrK im, const QString &name);
-    QString     CreateImages(int, const ImageListK &transfers);
-    QString     MoveDbImages(ImagePtrK destDir, ImageListK &images, const QString &);
+    QString     RenameFile(const ImagePtrK& im, const QString &name);
+    QString     CreateImages(int, const ImageListK &images);
+    QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &);
     QString     DeleteFiles(const ImageIdList &);
     void        ClearStorageGroup();
     void        CloseDevices(int devId = DEVICE_INVALID, bool eject = false);
@@ -482,8 +483,8 @@ public:
 
     // UI helper functions
     void SetDateFormat(const QString &format)    { m_dateFormat = format; }
-    QString LongDateOf(ImagePtrK) const;
-    QString ShortDateOf(ImagePtrK) const;
+    QString LongDateOf(const ImagePtrK&) const;
+    QString ShortDateOf(const ImagePtrK&) const;
     QString DeviceCaption(ImageItemK &im) const;
     QString CrumbName(ImageItemK &im, bool getPath = false) const;
 
@@ -503,7 +504,7 @@ protected:
     }
 
     //! FE Gallery instance
-    static ImageManagerFe *m_instance;
+    static ImageManagerFe *s_instance;
 
     //! UI format for thumbnail date captions
     QString    m_dateFormat;

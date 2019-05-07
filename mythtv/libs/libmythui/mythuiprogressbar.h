@@ -12,10 +12,11 @@
 class MUI_PUBLIC MythUIProgressBar : public MythUIType
 {
   public:
-    MythUIProgressBar(MythUIType *parent, const QString &name);
+    MythUIProgressBar(MythUIType *parent, const QString &name)
+        : MythUIType(parent, name) {}
    ~MythUIProgressBar() = default;
 
-    void Reset(void);
+    void Reset(void) override; // MythUIType
 
     enum LayoutType { LayoutVertical, LayoutHorizontal };
     enum EffectType { EffectReveal, EffectSlide, EffectAnimate };
@@ -24,22 +25,22 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
     void SetUsed(int);
     void SetTotal(int);
     int  GetUsed(void) { return m_current; }
-    virtual void SetVisible(bool visible);
+    void SetVisible(bool visible) override; // MythUIType
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
-    LayoutType m_layout;
-    EffectType m_effect;
+    LayoutType m_layout {LayoutHorizontal};
+    EffectType m_effect {EffectReveal};
 
-    int m_total;
-    int m_start;
-    int m_current;
-    int m_firstdepend;
+    int m_total         {0};
+    int m_start         {0};
+    int m_current       {0};
+    bool m_firstdepend   {true};
 
     void CalculatePosition(void);
 };

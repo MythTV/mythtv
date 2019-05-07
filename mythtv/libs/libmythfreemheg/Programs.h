@@ -35,18 +35,20 @@ class MHEngine;
 class MHProgram : public MHIngredient  
 {
   public:
-    MHProgram();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual bool InitiallyAvailable() { return m_fInitiallyAvailable; }
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
+    MHProgram() = default;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
+    bool InitiallyAvailable() override // MHIngredient
+        { return m_fInitiallyAvailable; }
+    void Activation(MHEngine *engine) override; // MHRoot
+    void Deactivation(MHEngine *engine) override; // MHRoot
 
     // Action - Stop can be used to stop the code.
-    virtual void Stop(MHEngine *engine) { Deactivation(engine); }
+    void Stop(MHEngine *engine) override // MHRoot
+        { Deactivation(engine); }
   protected:
     MHOctetString m_Name; // Name of the program
-    bool    m_fInitiallyAvailable;
+    bool          m_fInitiallyAvailable {true};
 };
 
 // Resident program
@@ -54,32 +56,35 @@ class MHResidentProgram : public MHProgram
 {
   public:
     MHResidentProgram() = default;
-    virtual const char *ClassName() { return "ResidentProgram"; }
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual void CallProgram(bool fIsFork, const MHObjectRef &success,
-        const MHSequence<MHParameter *> &args, MHEngine *engine);
+    const char *ClassName() override // MHRoot
+        { return "ResidentProgram"; }
+    void PrintMe(FILE *fd, int nTabs) const override; // MHProgram
+    void CallProgram(bool fIsFork, const MHObjectRef &success,
+        const MHSequence<MHParameter *> &args, MHEngine *engine) override; // MHRoot
 };
 
 // Remote program - not needed for UK MHEG
 class MHRemoteProgram : public MHProgram  
 {
   public:
-    MHRemoteProgram();
-    virtual const char *ClassName() { return "RemoteProgram"; }
-    virtual ~MHRemoteProgram();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    MHRemoteProgram() = default;
+    const char *ClassName() override // MHRoot
+        { return "RemoteProgram"; }
+    virtual ~MHRemoteProgram() = default;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHProgram
+    void PrintMe(FILE *fd, int nTabs) const override; // MHProgram
 };
 
 // Interchange program - not needed for UK MHEG
 class MHInterChgProgram : public MHProgram  
 {
   public:
-    MHInterChgProgram();
-    virtual const char *ClassName() { return "InterChgProgram"; }
-    virtual ~MHInterChgProgram();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    MHInterChgProgram() = default;
+    const char *ClassName() override // MHRoot
+        { return "InterChgProgram"; }
+    virtual ~MHInterChgProgram() = default;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHProgram
+    void PrintMe(FILE *fd, int nTabs) const override; // MHProgram
 };
 
 // Call and Fork - call a "program".
@@ -87,10 +92,10 @@ class MHCall: public MHElemAction
 {
   public:
     MHCall(const char *name, bool fIsFork): MHElemAction(name), m_fIsFork(fIsFork) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool m_fIsFork;
     MHObjectRef m_Succeeded; // Boolean variable set to call result
     MHOwnPtrSequence<MHParameter> m_Parameters; // Arguments.

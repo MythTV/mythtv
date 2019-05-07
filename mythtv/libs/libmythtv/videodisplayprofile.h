@@ -67,7 +67,7 @@ class MTV_PUBLIC ProfileItem
     // Other
     bool checkRange(QString key, float fvalue, bool *ok = nullptr) const;
     bool checkRange(QString key, int ivalue, bool *ok = nullptr) const;
-    bool checkRange(QString key,
+    bool checkRange(const QString& key,
         float fvalue, int ivalue, bool isFloat, bool *ok = nullptr) const;
     bool IsMatch(const QSize &size, float framerate, const QString &codecName) const;
     bool IsValid(QString *reason = nullptr) const;
@@ -129,7 +129,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetDecoders(void);
     static QStringList GetDecoderNames(void);
     static QString     GetDecoderName(const QString &decoder);
-    static QString     GetDecoderHelp(QString decoder = QString());
+    static QString     GetDecoderHelp(const QString& decoder = QString());
 
     static QString     GetDefaultProfileName(const QString &hostname);
     static void        SetDefaultProfileName(const QString &profilename,
@@ -140,23 +140,23 @@ class MTV_PUBLIC VideoDisplayProfile
 
     static bool        DeleteProfileGroup(const QString &groupname,
                                           const QString &hostname);
-    static uint        CreateProfileGroup(const QString &groupname,
+    static uint        CreateProfileGroup(const QString &profilename,
                                           const QString &hostname);
 
     static void        CreateProfile(
-        uint grpid, uint priority,
-        QString cmp0, uint width0, uint height0,
-        QString cmp1, uint width1, uint height1,
+        uint groupid, uint priority,
+        const QString& cmp0, uint width0, uint height0,
+        const QString& cmp1, uint width1, uint height1,
         QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
         QString osdrenderer, bool osdfade,
         QString deint0, QString deint1, QString filters);
 
     static void CreateProfile(
         uint groupid, uint priority,
-        QString width, QString height, QString codecs,
-        QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-        QString osdrenderer, bool osdfade,
-        QString deint0, QString deint1, QString filters);
+        const QString& width, const QString& height, const QString& codecs,
+        const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+        const QString& osdrenderer, bool osdfade,
+        const QString& deint0, const QString& deint1, const QString& filters);
 
     static void        DeleteProfiles(const QString &hostname);
     static void        CreateProfiles(const QString &hostname);
@@ -180,7 +180,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static bool SaveDB(uint groupid, item_list_t&);
 
     QString GetActualVideoRenderer(void) const
-        { QString tmp = last_video_renderer; tmp.detach(); return tmp; }
+        { return last_video_renderer; }
 
   private:
     item_list_t::const_iterator FindMatch(const QSize &size,
@@ -201,17 +201,17 @@ class MTV_PUBLIC VideoDisplayProfile
     pref_map_t          pref;
     item_list_t         all_pref;
 
-    static QMutex       safe_lock;
-    static bool         safe_initialized;
-    static safe_map_t   safe_renderer;
-    static safe_map_t   safe_renderer_group;
-    static safe_map_t   safe_deint;
-    static safe_map_t   safe_osd;
-    static safe_map_t   safe_equiv_dec;
-    static safe_list_t  safe_custom;
-    static priority_map_t safe_renderer_priority;
-    static pref_map_t   dec_name;
-    static safe_list_t  safe_decoders;
+    static QMutex         s_safe_lock;
+    static bool           s_safe_initialized;
+    static safe_map_t     s_safe_renderer;
+    static safe_map_t     s_safe_renderer_group;
+    static safe_map_t     s_safe_deint;
+    static safe_map_t     s_safe_osd;
+    static safe_map_t     s_safe_equiv_dec;
+    static safe_list_t    s_safe_custom;
+    static priority_map_t s_safe_renderer_priority;
+    static pref_map_t     s_dec_name;
+    static safe_list_t    s_safe_decoders;
 };
 
 #endif // _VIDEO_DISPLAY_PROFILE_H_

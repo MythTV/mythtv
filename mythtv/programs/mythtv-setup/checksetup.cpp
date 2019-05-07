@@ -44,9 +44,6 @@ bool checkStoragePaths(QStringList &probs)
 {
     bool problemFound = false;
 
-    QString recordFilePrefix =
-            gCoreContext->GetSetting("RecordFilePrefix", "EMPTY");
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT count(groupname) FROM storagegroup;");
@@ -77,7 +74,7 @@ bool checkStoragePaths(QStringList &probs)
         MythDB::DBError("checkStoragePaths", query);
         return false;
     }
-    else if (query.size() < 1)
+    if (query.size() < 1)
     {
         if (gCoreContext->IsMasterHost())
         {
@@ -91,8 +88,7 @@ bool checkStoragePaths(QStringList &probs)
             LOG(VB_GENERAL, LOG_ERR, trMesg);
             return true;
         }
-        else
-            return false;
+        return false;
     }
 
     QDir checkDir("");
@@ -135,7 +131,7 @@ bool checkImageStoragePaths(QStringList &probs)
         MythDB::DBError("checkImageStoragePaths", query);
         return false;
     }
-    else if (query.size() < 1)
+    if (query.size() < 1)
     {
         return false;
     }
@@ -181,7 +177,7 @@ bool checkChannelPresets(QStringList &probs)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT cardid, startchan, sourceid, inputname"
+    query.prepare("SELECT cardid, startchan, sourceid, inputname, parentid"
                   " FROM capturecard;");
 
     if (!query.exec() || !query.isActive())
@@ -195,6 +191,20 @@ bool checkChannelPresets(QStringList &probs)
         int cardid    = query.value(0).toInt();
         QString startchan = query.value(1).toString();
         int sourceid  = query.value(2).toInt();
+        int parentid = query.value(4).toInt();
+
+        // Warnings only for real devices
+        if (parentid != 0)
+            continue;
+
+        if (0 == sourceid)
+        {
+            probs.push_back(QObject::tr("Card %1 (type %2) is not connected "
+                            "to a video source.")
+                    .arg(cardid).arg(query.value(3).toString()));
+            problemFound = true;
+            continue;
+        }
 
         if (query.value(1).toString().isEmpty())    // Logic from tv_rec.cpp
             startchan = "3";
@@ -241,9 +251,7 @@ bool needsMFDBReminder()
 
     query.prepare("SELECT sourceid "
                   "FROM videosource "
-                  "WHERE xmltvgrabber = 'schedulesdirect1' "
-                  "OR xmltvgrabber = 'datadirect' "
-                  "OR xmltvgrabber LIKE 'tv_grab_%';");
+                  "WHERE xmltvgrabber LIKE 'tv_grab_%';");
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("needsMFDBReminder", query);

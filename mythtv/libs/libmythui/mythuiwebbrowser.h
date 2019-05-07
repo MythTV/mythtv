@@ -37,9 +37,9 @@ class BrowserApi : public QObject
     void SetVolume(int volumn);
     int GetVolume(void);
 
-    void PlayFile(QString filename);
+    void PlayFile(const QString& filename);
     void PlayTrack(int trackID);
-    void PlayURL(QString url);
+    void PlayURL(const QString& url);
 
     QString GetMetadata(void);
 
@@ -47,7 +47,7 @@ class BrowserApi : public QObject
     void attachObject();
 
   private:
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
     QWebFrame *m_frame;
 
@@ -62,7 +62,8 @@ class MythNetworkAccessManager : public QNetworkAccessManager
     MythNetworkAccessManager() = default;
 
   protected:
-    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = nullptr);
+    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req,
+                                 QIODevice * outgoingData = nullptr) override; // QNetworkAccessManager
 };
 
 class MythWebPage : public QWebPage
@@ -73,11 +74,12 @@ class MythWebPage : public QWebPage
     explicit MythWebPage(QObject *parent = nullptr);
     ~MythWebPage();
 
-    virtual bool extension (Extension extension, const ExtensionOption *option = nullptr, ExtensionReturn *output = nullptr);
-    virtual bool supportsExtension (Extension extension) const;
+    bool extension (Extension extension, const ExtensionOption *option = nullptr,
+                    ExtensionReturn *output = nullptr) override; // QWebPage
+    bool supportsExtension (Extension extension) const override; // QWebPage
 
   protected:
-    virtual QString userAgentForUrl(const QUrl &url) const;
+    QString userAgentForUrl(const QUrl &url) const override; // QWebPage
 
   private:
     friend class MythWebView;
@@ -91,13 +93,13 @@ class MythWebView : public QWebView
     MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser);
     ~MythWebView(void);
 
-    virtual void keyPressEvent(QKeyEvent *event);
-    virtual void customEvent(QEvent *e);
+    void keyPressEvent(QKeyEvent *event) override; // QWidget
+    void customEvent(QEvent *e) override; // QWidget
 
   protected slots:
     void  handleUnsupportedContent(QNetworkReply *reply);
     void  handleDownloadRequested(const QNetworkRequest &request);
-    QWebView *createWindow(QWebPage::WebWindowType type);
+    QWebView *createWindow(QWebPage::WebWindowType type) override; // QWebView
 
   private:
     void showDownloadMenu(void);
@@ -112,13 +114,13 @@ class MythWebView : public QWebView
     QString getReplyMimetype(void);
     QString getExtensionForMimetype(const QString &mimetype);
 
-    MythWebPage      *m_webpage;
-    MythUIWebBrowser *m_parentBrowser;
-    BrowserApi       *m_api;
+    MythWebPage      *m_webpage         {nullptr};
+    MythUIWebBrowser *m_parentBrowser   {nullptr};
+    BrowserApi       *m_api             {nullptr};
     QNetworkRequest   m_downloadRequest;
-    QNetworkReply    *m_downloadReply;
-    MythUIBusyDialog *m_busyPopup;
-    bool              m_downloadAndPlay;
+    QNetworkReply    *m_downloadReply   {nullptr};
+    MythUIBusyDialog *m_busyPopup       {nullptr};
+    bool              m_downloadAndPlay {false};
 };
 
 /**
@@ -137,13 +139,13 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     void Init(void);
 
-    void LoadPage(QUrl url);
+    void LoadPage(const QUrl& url);
     void SetHtml(const QString &html, const QUrl &baseUrl = QUrl());
 
-    void LoadUserStyleSheet(QUrl url);
+    void LoadUserStyleSheet(const QUrl& url);
 
-    virtual bool keyPressEvent(QKeyEvent *event);
-    virtual void Pulse(void);
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
+    void Pulse(void) override; // MythUIType
     void Scroll(int dx, int dy);
 
     QIcon GetIcon(void);
@@ -199,7 +201,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotScrollBarHiding(void);
 
   protected:
-    void Finalize(void);
+    void Finalize(void) override; // MythUIType
     void UpdateBuffer(void);
     void HandleMouseAction(const QString &action);
     void SetBackgroundColor(QColor color);
@@ -207,13 +209,13 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void UpdateScrollBars(void);
     bool IsOnTopScreen(void);
 
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod, QRect clipRect) override; // MythUIType
 
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
     MythScreenType *m_parentScreen;
 

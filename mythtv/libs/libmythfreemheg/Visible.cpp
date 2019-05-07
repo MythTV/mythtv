@@ -32,14 +32,6 @@
 #include "freemheg.h"
 
 
-MHVisible::MHVisible()
-{
-    m_nOriginalBoxWidth = m_nOriginalBoxHeight = -1; // Should always be specified.
-    m_nOriginalPosX = m_nOriginalPosY = 0; // Default values.
-    m_nBoxWidth = m_nBoxHeight = 0;
-    m_nPosX = m_nPosY = 0;
-}
-
 // Copy constructor for cloning
 MHVisible::MHVisible(const MHVisible &ref): MHPresentable(ref)
 {
@@ -195,7 +187,7 @@ MHRgba MHVisible::GetColour(const MHColour &colour)
         }
     }
 
-    return MHRgba(red, green, blue, alpha);
+    return {red, green, blue, alpha};
 }
 
 // Get the visible region of this visible.  This is the area that needs to be drawn.
@@ -205,10 +197,7 @@ QRegion MHVisible::GetVisibleArea()
     {
         return QRegion();    // Not visible at all.
     }
-    else
-    {
-        return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
-    }
+    return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
 }
 
 // MHEG actions.
@@ -269,16 +258,6 @@ void MHVisible::PutBefore(const MHRoot *pRef, MHEngine *engine)
 void MHVisible::PutBehind(const MHRoot *pRef, MHEngine *engine)
 {
     engine->PutBehind(this, pRef);
-}
-
-MHLineArt::MHLineArt()
-{
-    m_fBorderedBBox = true;
-    m_nOriginalLineWidth = 1;
-    m_OriginalLineStyle = LineStyleSolid;
-    m_nLineWidth = 0;
-    m_LineStyle = 0;
-    // Colour defaults to empty.
 }
 
 // Copy constructor for cloning
@@ -471,8 +450,8 @@ QRegion MHRectangle::GetOpaqueArea()
     {
         return QRegion();
     }
-    else return QRegion(QRect(m_nPosX + m_nLineWidth, m_nPosY + m_nLineWidth,
-                                  m_nBoxWidth - m_nLineWidth * 2, m_nBoxHeight - m_nLineWidth * 2));
+    return QRegion(QRect(m_nPosX + m_nLineWidth, m_nPosY + m_nLineWidth,
+                         m_nBoxWidth - m_nLineWidth * 2, m_nBoxHeight - m_nLineWidth * 2));
 }
 
 void MHRectangle::Display(MHEngine *engine)
@@ -513,18 +492,6 @@ void MHRectangle::Display(MHEngine *engine)
     }
 }
 
-
-MHInteractible::MHInteractible(MHVisible *parent): m_parent(parent)
-{
-    m_fEngineResp = true;
-    m_fHighlightStatus = false;
-    m_fInteractionStatus = false;
-}
-
-MHInteractible::~MHInteractible()
-{
-
-}
 
 void MHInteractible::Initialise(MHParseNode *p, MHEngine *engine)
 {
@@ -618,21 +585,6 @@ void MHInteractible::InteractSetHighlightStatus(bool newStatus, MHEngine *engine
     engine->EventTriggered(m_parent, m_fHighlightStatus ? EventHighlightOn : EventHighlightOff);
 }
 
-MHSlider::MHSlider(): MHInteractible(this)
-{
-    m_orientation = SliderLeft;
-    orig_max_value = -1;
-    orig_min_value = initial_value = orig_step_size = 1;
-    initial_portion = 0;
-    m_style = SliderNormal;
-    max_value = min_value = step_size = 0;
-    slider_value = portion = 0;
-}
-
-MHSlider::~MHSlider()
-{
-}
-
 void MHSlider::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHVisible::Initialise(p, engine);
@@ -651,55 +603,55 @@ void MHSlider::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pMin)
     {
-        orig_min_value = pMin->GetArgN(0)->GetIntValue();
+        m_orig_min_value = pMin->GetArgN(0)->GetIntValue();
     }
     else
     {
-        orig_min_value = 1;
+        m_orig_min_value = 1;
     }
 
     MHParseNode *pMax = p->GetNamedArg(C_MAX_VALUE);
 
     if (pMax)
     {
-        orig_max_value = pMax->GetArgN(0)->GetIntValue();
+        m_orig_max_value = pMax->GetArgN(0)->GetIntValue();
     }
     else
     {
-        orig_max_value = orig_min_value - 1;    // Unset
+        m_orig_max_value = m_orig_min_value - 1;    // Unset
     }
 
     MHParseNode *pInit = p->GetNamedArg(C_INITIAL_VALUE);
 
     if (pInit)
     {
-        initial_value = pInit->GetArgN(0)->GetIntValue();
+        m_initial_value = pInit->GetArgN(0)->GetIntValue();
     }
     else
     {
-        initial_value = orig_min_value;    // Default is min_value
+        m_initial_value = m_orig_min_value;    // Default is m_min_value
     }
 
     MHParseNode *pPortion = p->GetNamedArg(C_INITIAL_PORTION);
 
     if (pPortion)
     {
-        initial_portion = pPortion->GetArgN(0)->GetIntValue();
+        m_initial_portion = pPortion->GetArgN(0)->GetIntValue();
     }
     else
     {
-        initial_portion = orig_min_value - 1;    // Unset
+        m_initial_portion = m_orig_min_value - 1;    // Unset
     }
 
     MHParseNode *pStep = p->GetNamedArg(C_STEP_SIZE);
 
     if (pStep)
     {
-        orig_step_size = pStep->GetArgN(0)->GetIntValue();
+        m_orig_step_size = pStep->GetArgN(0)->GetIntValue();
     }
     else
     {
-        orig_step_size = 1;    // Unset
+        m_orig_step_size = 1;    // Unset
     }
 
     MHParseNode *pStyle = p->GetNamedArg(C_SLIDER_STYLE);
@@ -777,34 +729,34 @@ void MHSlider::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs);
     fprintf(fd, ":Orientation %s\n", rchOrientation[m_orientation-1]);
 
-    if (initial_value >= orig_min_value)
+    if (m_initial_value >= m_orig_min_value)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":InitialValue %d\n", initial_value);
+        fprintf(fd, ":InitialValue %d\n", m_initial_value);
     }
 
-    if (orig_min_value != 1)
+    if (m_orig_min_value != 1)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":MinValue %d\n", orig_min_value);
+        fprintf(fd, ":MinValue %d\n", m_orig_min_value);
     }
 
-    if (orig_max_value > orig_min_value)
+    if (m_orig_max_value > m_orig_min_value)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":MaxValue %d\n", orig_max_value);
+        fprintf(fd, ":MaxValue %d\n", m_orig_max_value);
     }
 
-    if (initial_portion >= orig_min_value)
+    if (m_initial_portion >= m_orig_min_value)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":InitialPortion %d\n", initial_portion);
+        fprintf(fd, ":InitialPortion %d\n", m_initial_portion);
     }
 
-    if (orig_step_size != 1)
+    if (m_orig_step_size != 1)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":StepSize %d\n", orig_step_size);
+        fprintf(fd, ":StepSize %d\n", m_orig_step_size);
     }
 
     if (m_style != SliderNormal)
@@ -830,11 +782,11 @@ void MHSlider::PrintMe(FILE *fd, int nTabs) const
 void MHSlider::Preparation(MHEngine *engine)
 {
     MHVisible::Preparation(engine);
-    max_value = orig_max_value;
-    min_value = orig_min_value;
-    step_size = orig_step_size;
-    slider_value = initial_value;
-    portion = initial_portion;
+    m_max_value = m_orig_max_value;
+    m_min_value = m_orig_min_value;
+    m_step_size = m_orig_step_size;
+    m_slider_value = m_initial_value;
+    m_portion = m_initial_portion;
 }
 
 void MHSlider::Display(MHEngine *engine)
@@ -862,7 +814,7 @@ void MHSlider::Display(MHEngine *engine)
         major = m_nBoxHeight;
     }
 
-    if (max_value <= min_value)
+    if (m_max_value <= m_min_value)
     {
         return;    // Avoid divide by zero if error.
     }
@@ -871,7 +823,7 @@ void MHSlider::Display(MHEngine *engine)
     {
         // This is drawn as a 9 pixel wide "thumb" at the position.
         major -= 9; // Width of "thumb"
-        int posn = major * (slider_value - min_value) / (max_value - min_value);
+        int posn = major * (m_slider_value - m_min_value) / (m_max_value - m_min_value);
 
         switch (m_orientation)
         {
@@ -895,12 +847,12 @@ void MHSlider::Display(MHEngine *engine)
         // run from the start to the position, proportional sliders from the
         // position for the "portion".
         int start = 0;
-        int end = major * (slider_value - min_value) / (max_value - min_value);
+        int end = major * (m_slider_value - m_min_value) / (m_max_value - m_min_value);
 
         if (m_style == SliderProp)
         {
             start = end;
-            end = major * (slider_value + portion - min_value) / (max_value - min_value);
+            end = major * (m_slider_value + m_portion - m_min_value) / (m_max_value - m_min_value);
         }
 
         switch (m_orientation)
@@ -1010,9 +962,9 @@ void MHSlider::KeyEvent(MHEngine *engine, int nCode)
 
 void MHSlider::Increment(MHEngine *engine)
 {
-    if (slider_value + step_size <= max_value)
+    if (m_slider_value + m_step_size <= m_max_value)
     {
-        slider_value += step_size;
+        m_slider_value += m_step_size;
         engine->Redraw(GetVisibleArea());
         engine->EventTriggered(this, EventSliderValueChanged);
     }
@@ -1020,9 +972,9 @@ void MHSlider::Increment(MHEngine *engine)
 
 void MHSlider::Decrement(MHEngine *engine)
 {
-    if (slider_value - step_size >= min_value)
+    if (m_slider_value - m_step_size >= m_min_value)
     {
-        slider_value -= step_size;
+        m_slider_value -= m_step_size;
         engine->Redraw(GetVisibleArea());
         engine->EventTriggered(this, EventSliderValueChanged);
     }
@@ -1030,7 +982,7 @@ void MHSlider::Decrement(MHEngine *engine)
 
 void MHSlider::Step(int nbSteps, MHEngine *engine)
 {
-    step_size = nbSteps;
+    m_step_size = nbSteps;
 
     if (m_fRunning)
     {
@@ -1042,7 +994,7 @@ void MHSlider::Step(int nbSteps, MHEngine *engine)
 
 void MHSlider::SetSliderValue(int newValue, MHEngine *engine)
 {
-    slider_value = newValue;
+    m_slider_value = newValue;
 
     if (m_fRunning)
     {
@@ -1054,7 +1006,7 @@ void MHSlider::SetSliderValue(int newValue, MHEngine *engine)
 
 void MHSlider::SetPortion(int newPortion, MHEngine *engine)
 {
-    portion = newPortion;
+    m_portion = newPortion;
 
     if (m_fRunning)
     {
@@ -1067,10 +1019,10 @@ void MHSlider::SetPortion(int newPortion, MHEngine *engine)
 // Additional action defined in UK MHEG.
 void MHSlider::SetSliderParameters(int newMin, int newMax, int newStep, MHEngine *engine)
 {
-    min_value = newMin;
-    max_value = newMax;
-    step_size = newStep;
-    slider_value = newMin;
+    m_min_value = newMin;
+    m_max_value = newMax;
+    m_step_size = newStep;
+    m_slider_value = newMin;
 
     if (m_fRunning)
     {
@@ -1080,16 +1032,6 @@ void MHSlider::SetSliderParameters(int newMin, int newMax, int newStep, MHEngine
     engine->EventTriggered(this, EventSliderValueChanged);
 }
 
-
-MHEntryField::MHEntryField(): MHInteractible(this)
-{
-
-}
-
-MHEntryField::~MHEntryField()
-{
-
-}
 
 void MHEntryField::Initialise(MHParseNode *p, MHEngine *engine)
 {
@@ -1109,16 +1051,6 @@ void MHEntryField::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, "}\n");
 }
 
-MHButton::MHButton()
-{
-
-}
-
-MHButton::~MHButton()
-{
-
-}
-
 void MHButton::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHVisible::Initialise(p, engine);
@@ -1129,16 +1061,6 @@ void MHButton::PrintMe(FILE *fd, int nTabs) const
 {
     MHVisible::PrintMe(fd, nTabs);
     //
-}
-
-MHHotSpot::MHHotSpot()
-{
-
-}
-
-MHHotSpot::~MHHotSpot()
-{
-
 }
 
 void MHHotSpot::Initialise(MHParseNode *p, MHEngine *engine)
@@ -1157,16 +1079,6 @@ void MHHotSpot::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, "}\n");
 }
 
-MHPushButton::MHPushButton()
-{
-
-}
-
-MHPushButton::~MHPushButton()
-{
-
-}
-
 void MHPushButton::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHButton::Initialise(p, engine);
@@ -1181,16 +1093,6 @@ void MHPushButton::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, "****TODO\n");
     PrintTabs(fd, nTabs);
     fprintf(fd, "}\n");
-}
-
-MHSwitchButton::MHSwitchButton()
-{
-
-}
-
-MHSwitchButton::~MHSwitchButton()
-{
-
 }
 
 void MHSwitchButton::Initialise(MHParseNode *p, MHEngine *engine)
@@ -1232,7 +1134,7 @@ void MHSetColour::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-void MHSetColour::PrintArgs(FILE *fd, int) const
+void MHSetColour::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     if (m_ColourType == CT_Indexed)
     {

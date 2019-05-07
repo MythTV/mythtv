@@ -48,8 +48,8 @@ class Property
 
         QString  m_sName;
         QString  m_sNameSpace;
-        bool     m_bRequired;
-        bool     m_bMultiValue;
+        bool     m_bRequired   {false};
+        bool     m_bMultiValue {false};
         NameValues      m_lstAttributes;
 
     public:
@@ -184,9 +184,9 @@ typedef QStringList FilterMap;
 class UPNP_PUBLIC CDSObject : public ReferenceCounter
 {
     public:
-        short           m_nUpdateId;
+        short           m_nUpdateId            {1};
 
-        ObjectTypes     m_eType;
+        ObjectTypes     m_eType                {OT_Container};
 
         // Required
 
@@ -194,13 +194,13 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         QString         m_sParentId;
         QString         m_sTitle;
         QString         m_sClass;
-        bool            m_bRestricted;
-        bool            m_bSearchable;
+        bool            m_bRestricted          {true};
+        bool            m_bSearchable          {false};
 
         // Optional
 
         QString         m_sCreator;
-        QString         m_sWriteStatus;
+        QString         m_sWriteStatus         {"PROTECTED"};
 
         // Only appropriate for Container Classes
 
@@ -211,8 +211,8 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
 
         Properties      m_properties;
         CDSObjects      m_children;
-        uint32_t        m_nChildCount;
-        uint32_t        m_nChildContainerCount;
+        uint32_t        m_nChildCount          {0};
+        uint32_t        m_nChildContainerCount {0};
 
         Resources       m_resources;
 
@@ -247,36 +247,36 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         uint32_t      GetChildContainerCount( void ) const;
         void          SetChildContainerCount( uint32_t nCount );
 
-        Resource     *AddResource( QString sProtocol, QString sURI );
+        Resource     *AddResource( const QString& sProtocol, const QString& sURI );
 
     public:
 
-        static  CDSObject *CreateItem             ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateContainer        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateAudioItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMusicTrack       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateAudioBroadcast   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateAudioBook        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateVideoItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMovie            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateVideoBroadcast   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMusicVideoClip   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateImageItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreatePhoto            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreatePlaylistItem     ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateTextItem         ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateAlbum            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMusicAlbum       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreatePhotoAlbum       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateGenre            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMusicGenre       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMovieGenre       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreatePlaylistContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreatePerson           ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateMusicArtist      ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateStorageSystem    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateStorageVolume    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
-        static  CDSObject *CreateStorageFolder    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateItem             ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateContainer        ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateAudioItem        ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMusicTrack       ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateAudioBroadcast   ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateAudioBook        ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateVideoItem        ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMovie            ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateVideoBroadcast   ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMusicVideoClip   ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateImageItem        ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreatePhoto            ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreatePlaylistItem     ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateTextItem         ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateAlbum            ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMusicAlbum       ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreatePhotoAlbum       ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateGenre            ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMusicGenre       ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMovieGenre       ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreatePlaylistContainer( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreatePerson           ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateMusicArtist      ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateStorageSystem    ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateStorageVolume    ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
+        static  CDSObject *CreateStorageFolder    ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
 
     private:
         bool FilterContains( const FilterMap &filter, const QString &name ) const;

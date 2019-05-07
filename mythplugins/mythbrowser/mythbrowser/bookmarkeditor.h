@@ -25,31 +25,31 @@ class BookmarkEditor : public MythScreenType
                    const char *name);
     ~BookmarkEditor() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
-    Bookmark   *m_site;
+    Bookmark   *m_site                 {nullptr};
     QString     m_siteName;
     QString     m_siteCategory;
     bool        m_editing;
 
-    MythUIText     *m_titleText;
+    MythUIText     *m_titleText        {nullptr};
 
-    MythUITextEdit *m_categoryEdit;
-    MythUITextEdit *m_nameEdit;
-    MythUITextEdit *m_urlEdit;
-    MythUICheckBox *m_isHomepage;
+    MythUITextEdit *m_categoryEdit     {nullptr};
+    MythUITextEdit *m_nameEdit         {nullptr};
+    MythUITextEdit *m_urlEdit          {nullptr};
+    MythUICheckBox *m_isHomepage       {nullptr};
 
-    MythUIButton *m_okButton;
-    MythUIButton *m_cancelButton;
-    MythUIButton *m_findCategoryButton;
+    MythUIButton *m_okButton           {nullptr};
+    MythUIButton *m_cancelButton       {nullptr};
+    MythUIButton *m_findCategoryButton {nullptr};
 
-    MythUISearchDialog *m_searchDialog;
+    MythUISearchDialog *m_searchDialog {nullptr};
 
   private slots:
     void slotFindCategory(void);
-    void slotCategoryFound(QString category);
+    void slotCategoryFound(const QString& category);
 
     void Save(void);
     void Exit(void);

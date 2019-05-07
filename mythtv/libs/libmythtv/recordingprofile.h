@@ -19,14 +19,14 @@ class RecordingProfileStorage : public SimpleDBStorage
   public:
     RecordingProfileStorage(StandardSetting *_setting,
                             const RecordingProfile &parentProfile,
-                            QString name) :
+                            const QString& name) :
         SimpleDBStorage(_setting, "recordingprofiles", name),
         m_parent(parentProfile)
     {
     }
 
   protected:
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const RecordingProfile &m_parent;
 };
@@ -64,7 +64,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
       //          Is this slot even used????
       //public slots:
       public:
-        virtual void setValue(const QString &newValue)
+        void setValue(const QString &newValue) override // StandardSetting
         {
             bool editable = (newValue != "Default") && (newValue != "Live TV");
             setEnabled(editable);
@@ -76,7 +76,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
 
   public:
     // initializers
-    explicit RecordingProfile(QString profName = QString());
+    explicit RecordingProfile(const QString& profName = QString());
     virtual ~RecordingProfile(void);
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype,
@@ -84,18 +84,18 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     virtual bool loadByGroup(const QString &name, const QString &group);
     virtual void CompleteLoad(int profileId, const QString &type,
                               const QString &name);
-    virtual bool canDelete(void);
-    virtual void deleteEntry(void);
+    bool canDelete(void) override; // GroupSetting
+    void deleteEntry(void) override; // GroupSetting
 
     // sets
     void setCodecTypes();
-    void setName(const QString& newName)
-        { name->setValue(newName); }
+    void setName(const QString& newName) override // StandardSetting
+        { m_name->setValue(newName); }
 
     // gets
-    const ImageSize& getImageSize(void) const { return *imageSize;       }
-    int     getProfileNum(void)         const { return id->getValue().toInt(); }
-    QString getName(void)               const { return name->getValue(); }
+    const ImageSize& getImageSize(void) const { return *m_imageSize;       }
+    int     getProfileNum(void)         const { return m_id->getValue().toInt(); }
+    QString getName(void)               const { return m_name->getValue(); }
     QString groupType(void)             const;
 
     // static functions
@@ -135,18 +135,18 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     void FiltersChanged(const QString &val);
 
   private:
-    ID                       *id;
-    Name                     *name;
-    ImageSize                *imageSize;
-    TranscodeResize          *tr_resize;
-    TranscodeLossless        *tr_lossless;
-    TranscodeFilters         *tr_filters;
-    VideoCompressionSettings *videoSettings;
-    AudioCompressionSettings *audioSettings;
-    QString                   profileName;
-    bool                      isEncoder;
+    ID                       *m_id            {nullptr};
+    Name                     *m_name          {nullptr};
+    ImageSize                *m_imageSize     {nullptr};
+    TranscodeResize          *m_trResize      {nullptr};
+    TranscodeLossless        *m_trLossless    {nullptr};
+    TranscodeFilters         *m_trFilters     {nullptr};
+    VideoCompressionSettings *m_videoSettings {nullptr};
+    AudioCompressionSettings *m_audioSettings {nullptr};
+    QString                   m_profileName;
+    bool                      m_isEncoder     {true};
 
-    V4L2util                 *v4l2util;
+    V4L2util                 *m_v4l2util      {nullptr};
 };
 
 class RecordingProfileEditor :
@@ -158,11 +158,11 @@ class RecordingProfileEditor :
     RecordingProfileEditor(int id, QString profName);
     virtual ~RecordingProfileEditor() = default;
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void ShowNewProfileDialog();
-    void CreateNewProfile(QString);
+    void CreateNewProfile(const QString&);
 
   protected:
     int             group;

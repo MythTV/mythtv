@@ -1,11 +1,15 @@
 
 #include "mythfontproperties.h"
+#include "mythcorecontext.h"
+
+#include <cmath>
 
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QFontInfo>
 #include <QFontDatabase>
 #include <QRect>
+#include <QRegularExpression>
 
 #include "mythlogging.h"
 #include "mythdb.h"
@@ -16,11 +20,12 @@
 
 #define LOC      QString("MythFontProperties: ")
 
-MythFontProperties::MythFontProperties() :
-    m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
-    m_hasOutline(false), m_outlineSize(0), m_outlineAlpha(255),
-    m_relativeSize(0.05f), m_bFreeze(false), m_stretch(100)
+QMutex MythFontProperties::m_zoom_lock;
+uint MythFontProperties::m_zoom_percent = 0;
+
+MythFontProperties::MythFontProperties(void)
 {
+    Zoom();
     CalcHash();
 }
 
@@ -28,6 +33,15 @@ void MythFontProperties::SetFace(const QFont &face)
 {
     m_face = face;
     CalcHash();
+}
+
+QFont MythFontProperties::face(void) const
+{
+    QFont face = m_face;
+
+    face.setPixelSize(face.pixelSize() *
+                      (static_cast<double>(m_zoom_percent) / 100.0));
+    return face;
 }
 
 void MythFontProperties::SetColor(const QColor &color)
@@ -88,6 +102,23 @@ void MythFontProperties::CalcHash(void)
     if (m_hasOutline)
         m_hash += QString("%1%2%3").arg(m_outlineColor.name())
                  .arg(m_outlineSize).arg(m_outlineAlpha);
+
+    m_hash += QString("Z%1").arg(m_zoom_percent);
+}
+
+void MythFontProperties::Zoom(void)
+{
+    QMutexLocker locker(&m_zoom_lock);
+    if (m_zoom_percent == 0)
+        m_zoom_percent = gCoreContext->GetNumSetting("GUITEXTZOOM", 100);
+}
+
+void MythFontProperties::SetZoom(uint percent)
+{
+    QMutexLocker locker(&m_zoom_lock);
+
+    gCoreContext->SaveSetting("GUITEXTZOOM", QString::number(percent));
+    m_zoom_percent = percent;
 }
 
 void MythFontProperties::Rescale(int height)
@@ -103,7 +134,7 @@ void MythFontProperties::Rescale(void)
 
 void MythFontProperties::AdjustStretch(int stretch)
 {
-    int newStretch = (int)(((float)m_stretch * ((float)stretch / 100.0f)) + 0.5f);
+    int newStretch = lroundf((float)m_stretch * ((float)stretch / 100.0F));
 
     if (newStretch <= 0)
         newStretch = 1;
@@ -115,12 +146,12 @@ void MythFontProperties::SetPixelSize(float size)
 {
     QSize baseSize = GetMythUI()->GetBaseSize();
     m_relativeSize = size / (float)(baseSize.height());
-    m_face.setPixelSize(GetMythMainWindow()->NormY((int)(size + 0.5f)));
+    m_face.setPixelSize(GetMythMainWindow()->NormY(lroundf(size)));
 }
 
 void MythFontProperties::SetPointSize(uint points)
 {
-    float pixels = (float)points / 72.0 * 100.0;
+    float pixels = (float)points / 72.0F * 100.0F;
     SetPixelSize(pixels);
 }
 
@@ -387,7 +418,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         delete newFont;
         return nullptr;
     }
-    else if (pixelsize > 0)
+    if (pixelsize > 0)
     {
         newFont->SetPixelSize(pixelsize);
     }
@@ -399,7 +430,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     newFont->Unfreeze();
 
     QFontInfo fi(newFont->m_face);
-    if (newFont->m_face.family() != fi.family())
+    QString fi_family =
+        fi.family().remove(QRegularExpression("\\[.*]")).trimmed();
+    if (newFont->m_face.family() != fi_family)
     {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     QString("Failed to load '%1', got '%2' instead")

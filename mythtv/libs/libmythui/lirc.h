@@ -39,13 +39,13 @@ class LIRC : public QObject, public MThread
     void TeardownAll();
 
     bool IsDoRunSet(void) const;
-    virtual void run(void);
+    void run(void) override; // MThread
     QList<QByteArray> GetCodes(void);
     void Process(const QByteArray &data);
 
     mutable QMutex  lock;
     static  QMutex  lirclib_lock;
-    QObject        *m_mainWindow;  ///< window to send key events to
+    QObject        *m_mainWindow {nullptr};  ///< window to send key events to
     QString         lircdDevice;   ///< device on which to receive lircd data
     QString         program;       ///< program to extract from config file
     QString         configFile;    ///< file containing LIRC->key mappings
@@ -54,7 +54,7 @@ class LIRC : public QObject, public MThread
     QByteArray      buf;
     uint            eofCount;
     uint            retryCount;
-    LIRCPriv       *d;
+    LIRCPriv       *d {nullptr};
 };
 
 #endif

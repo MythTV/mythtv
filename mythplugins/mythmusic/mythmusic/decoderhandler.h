@@ -26,24 +26,23 @@ class Decoder;
 class DecoderHandlerEvent : public MythEvent
 {
   public:
-    explicit DecoderHandlerEvent(Type t)
-        : MythEvent(t), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0) {}
+    explicit DecoderHandlerEvent(Type type)
+        : MythEvent(type) {}
 
-    DecoderHandlerEvent(Type t, QString *e)
-        : MythEvent(t), m_msg(e), m_meta(nullptr), m_available(0), m_maxSize(0) {}
+    DecoderHandlerEvent(Type type, QString *e)
+        : MythEvent(type), m_msg(e) {}
 
-    DecoderHandlerEvent(Type t, int available, int maxSize)
-        : MythEvent(t), m_msg(nullptr), m_meta(nullptr), 
-          m_available(available), m_maxSize(maxSize) {}
+    DecoderHandlerEvent(Type type, int available, int maxSize)
+        : MythEvent(type), m_available(available), m_maxSize(maxSize) {}
 
-    DecoderHandlerEvent(Type t, const MusicMetadata &m);
+    DecoderHandlerEvent(Type type, const MusicMetadata &m);
     ~DecoderHandlerEvent();
 
     QString *getMessage(void) const { return m_msg; }
     MusicMetadata *getMetadata(void) const { return m_meta; }
     void getBufferStatus(int *available, int *maxSize) const;
 
-    virtual MythEvent *clone(void) const;
+    MythEvent *clone(void) const override; // MythEvent
 
     static Type Ready;
     static Type Meta;
@@ -53,10 +52,10 @@ class DecoderHandlerEvent : public MythEvent
     static Type Error;
 
   private:
-    QString  *m_msg;
-    MusicMetadata *m_meta;
-    int       m_available;
-    int       m_maxSize;
+    QString       *m_msg       {nullptr};
+    MusicMetadata *m_meta      {nullptr};
+    int            m_available {0};
+    int            m_maxSize   {0};
 };
 
 /** \brief Class for starting stream decoding.
@@ -80,7 +79,7 @@ class DecoderHandler : public QObject, public MythObservable
         STOPPED
     } State;
 
-    DecoderHandler(void);
+    DecoderHandler(void) = default;
     virtual ~DecoderHandler(void);
 
     Decoder *getDecoder(void) { return m_decoder; }
@@ -88,10 +87,10 @@ class DecoderHandler : public QObject, public MythObservable
     void start(MusicMetadata *mdata);
 
     void stop(void);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
     bool done(void);
     bool next(void);
-    void error(const QString &msg);
+    void error(const QString &e);
 
     MusicMetadata& getMetadata() { return m_meta; }
 
@@ -111,14 +110,14 @@ class DecoderHandler : public QObject, public MythObservable
     void createPlaylistFromFile(const QUrl &url);
     void createPlaylistFromRemoteUrl(const QUrl &url);
 
-    int               m_state;
-    int               m_playlist_pos;
+    int               m_state        {STOPPED};
+    int               m_playlist_pos {0};
     PlayListFile      m_playlist;
-    Decoder          *m_decoder;
+    Decoder          *m_decoder      {nullptr};
     MusicMetadata     m_meta;
     QUrl              m_url;
-    bool              m_op;
-    uint              m_redirects;
+    bool              m_op           {false};
+    uint              m_redirects    {0};
 
     static const uint MaxRedirects = 3;
 };

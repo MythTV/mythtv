@@ -33,9 +33,7 @@ using namespace std;
 // MainVisual
 
 MainVisual::MainVisual(MythUIVideo *visualizer)
-    : QObject(nullptr), MythTV::Visual(), m_visualizerVideo(visualizer),
-      m_vis(nullptr), m_playing(false), m_fps(20), m_samples(SAMPLES_DEFAULT_SIZE),
-      m_updateTimer(nullptr)
+    : QObject(nullptr), m_visualizerVideo(visualizer)
 {
     setObjectName("MainVisual");
 
@@ -61,8 +59,7 @@ MainVisual::~MainVisual()
     m_updateTimer->stop();
     delete m_updateTimer;
 
-    if (m_vis)
-        delete m_vis;
+    delete m_vis;
 
     while (!m_nodes.empty())
         delete m_nodes.takeLast();
@@ -216,7 +213,7 @@ void MainVisual::timeout()
         int64_t timestamp = gPlayer->getOutput()->GetAudiotime();
         while (m_nodes.size() > 1)
         {
-            if ((int64_t)m_nodes.first()->offset > timestamp)
+            if ((int64_t)m_nodes.first()->m_offset > timestamp)
                 break;
 
             if (m_vis)

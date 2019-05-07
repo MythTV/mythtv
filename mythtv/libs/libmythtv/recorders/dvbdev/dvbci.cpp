@@ -67,8 +67,8 @@ static bool _connected = false;
 #define dbgprotocol(a...) if (DebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString().sprintf(a))
 
 #define OK       0
-#define TIMEOUT -1
-#define ERROR   -2
+#define TIMEOUT (-1)
+#define ERROR   (-2)
 
 // --- Workarounds -----------------------------------------------------------
 
@@ -177,59 +177,40 @@ static char *GetString(int &Length, const uint8_t **Data)
 
 // --- cMutex ----------------------------------------------------------------
 
-cMutex::cMutex(void)
-{
-  lockingPid = 0;
-  locked = 0;
-  pthread_mutex_init(&mutex, nullptr);
-}
-
-cMutex::~cMutex()
-{
-  pthread_mutex_destroy(&mutex);
-}
-
 void cMutex::Lock(void)
 {
-  if (getpid() != lockingPid || !locked) {
-     pthread_mutex_lock(&mutex);
-     lockingPid = getpid();
+  if (getpid() != m_lockingPid || !m_locked) {
+     pthread_mutex_lock(&m_mutex);
+     m_lockingPid = getpid();
      }
-  locked++;
+  m_locked++;
 }
 
 void cMutex::Unlock(void)
 {
- if (--locked <= 0) {
-    if (locked < 0) {
+ if (--m_locked <= 0) {
+    if (m_locked < 0) {
         esyslog("cMutex Lock inbalance detected");
-        locked = 0;
+        m_locked = 0;
         }
-    lockingPid = 0;
-    pthread_mutex_unlock(&mutex);
+    m_lockingPid = 0;
+    pthread_mutex_unlock(&m_mutex);
     }
 }
 // --- cMutexLock ------------------------------------------------------------
 
-cMutexLock::cMutexLock(cMutex *Mutex)
-{
-  mutex = nullptr;
-  locked = false;
-  Lock(Mutex);
-}
-
 cMutexLock::~cMutexLock()
 {
-  if (mutex && locked)
-     mutex->Unlock();
+  if (m_mutex && m_locked)
+     m_mutex->Unlock();
 }
 
 bool cMutexLock::Lock(cMutex *Mutex)
 {
-  if (Mutex && !mutex) {
-     mutex = Mutex;
+  if (Mutex && !m_mutex) {
+     m_mutex = Mutex;
      Mutex->Lock();
-     locked = true;
+     m_locked = true;
      return true;
      }
   return false;
@@ -258,16 +239,16 @@ bool cMutexLock::Lock(cMutex *Mutex)
 
 class cTPDU {
 private:
-  int size;
-  uint8_t data[MAX_TPDU_SIZE];
+  int     m_size {0};
+  uint8_t m_data[MAX_TPDU_SIZE];
   const uint8_t *GetData(const uint8_t *Data, int &Length);
 public:
-  cTPDU(void) { size = 0; memset(data, 0, sizeof(uint8_t) * MAX_TPDU_SIZE); }
+  cTPDU(void) { memset(m_data, 0, sizeof(uint8_t) * MAX_TPDU_SIZE); }
   cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length = 0, const uint8_t *Data = nullptr);
-  uint8_t Slot(void) { return data[0]; }
-  uint8_t Tcid(void) { return data[1]; }
-  uint8_t Tag(void)  { return data[2]; }
-  const uint8_t *Data(int &Length) { return GetData(data + 3, Length); }
+  uint8_t Slot(void) { return m_data[0]; }
+  uint8_t Tcid(void) { return m_data[1]; }
+  uint8_t Tag(void)  { return m_data[2]; }
+  const uint8_t *Data(int &Length) { return GetData(m_data + 3, Length); }
   uint8_t Status(void);
   int Write(int fd);
   int Read(int fd);
@@ -276,10 +257,9 @@ public:
 
 cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t *Data)
 {
-  size = 0;
-  data[0] = Slot;
-  data[1] = Tcid;
-  data[2] = Tag;
+  m_data[0] = Slot;
+  m_data[1] = Tcid;
+  m_data[2] = Tag;
   switch (Tag) {
     case T_RCV:
     case T_CREATE_TC:
@@ -287,17 +267,17 @@ cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t 
     case T_DELETE_TC:
     case T_DTC_REPLY:
     case T_REQUEST_TC:
-         data[3] = 1; // length
-         data[4] = Tcid;
-         size = 5;
+         m_data[3] = 1; // length
+         m_data[4] = Tcid;
+         m_size = 5;
          break;
     case T_NEW_TC:
     case T_TC_ERROR:
          if (Length == 1) {
-            data[3] = 2; // length
-            data[4] = Tcid;
-            data[5] = Data[0];
-            size = 6;
+            m_data[3] = 2; // length
+            m_data[4] = Tcid;
+            m_data[5] = Data[0];
+            m_size = 6;
             }
          else
             esyslog("ERROR: illegal data length for TPDU tag 0x%02X: %d", Tag, Length);
@@ -305,12 +285,12 @@ cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t 
     case T_DATA_LAST:
     case T_DATA_MORE:
          if (Length <= MAX_TPDU_DATA) {
-            uint8_t *p = data + 3;
+            uint8_t *p = m_data + 3;
             p = SetLength(p, Length + 1);
             *p++ = Tcid;
             if (Length)
                memcpy(p, Data, Length);
-            size = Length + (p - data);
+            m_size = Length + (p - m_data);
             }
          else
             esyslog("ERROR: illegal data length for TPDU tag 0x%02X: %d", Tag, Length);
@@ -323,18 +303,18 @@ cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t 
 int cTPDU::Write(int fd)
 {
   Dump(true);
-  if (size)
-     return write(fd, data, size) == size ? OK : ERROR;
+  if (m_size)
+     return write(fd, m_data, m_size) == m_size ? OK : ERROR;
   esyslog("ERROR: attemp to write TPDU with zero size");
   return ERROR;
 }
 
 int cTPDU::Read(int fd)
 {
-  size = safe_read(fd, data, sizeof(data));
-  if (size < 0) {
+  m_size = safe_read(fd, m_data, sizeof(m_data));
+  if (m_size < 0) {
      esyslog("ERROR: %m");
-     size = 0;
+     m_size = 0;
      return ERROR;
      }
   Dump(false);
@@ -346,16 +326,16 @@ void cTPDU::Dump(bool Outgoing)
   if (DumpTPDUDataTransfer) {
 #define MAX_DUMP 256
      QString msg = QString("%1 ").arg(Outgoing ? "-->" : "<--");
-     for (int i = 0; i < size && i < MAX_DUMP; i++)
-         msg += QString("%1 ").arg((short int)data[i], 2, 16, QChar('0'));
-     if (size >= MAX_DUMP)
+     for (int i = 0; i < m_size && i < MAX_DUMP; i++)
+         msg += QString("%1 ").arg((short int)m_data[i], 2, 16, QChar('0'));
+     if (m_size >= MAX_DUMP)
          msg += "...";
      LOG(VB_DVBCAM, LOG_INFO, msg);
      if (!Outgoing) {
         msg = QString("   ");
-        for (int i = 0; i < size && i < MAX_DUMP; i++)
-            msg += QString("%1 ").arg(isprint(data[i]) ? data[i] : '.', 2);
-        if (size >= MAX_DUMP)
+        for (int i = 0; i < m_size && i < MAX_DUMP; i++)
+            msg += QString("%1 ").arg(isprint(m_data[i]) ? m_data[i] : '.', 2);
+        if (m_size >= MAX_DUMP)
             msg += "...";
         LOG(VB_DVBCAM, LOG_INFO, msg);
         }
@@ -364,7 +344,7 @@ void cTPDU::Dump(bool Outgoing)
 
 const uint8_t *cTPDU::GetData(const uint8_t *Data, int &Length)
 {
-  if (size) {
+  if (m_size) {
      Data = GetLength(Data, Length);
      if (Length) {
         Length--; // the first byte is always the tcid
@@ -376,9 +356,9 @@ const uint8_t *cTPDU::GetData(const uint8_t *Data, int &Length)
 
 uint8_t cTPDU::Status(void)
 {
-  if (size >= 4 && data[size - 4] == T_SB && data[size - 3] == 2) {
+  if (m_size >= 4 && m_data[m_size - 4] == T_SB && m_data[m_size - 3] == 2) {
      //XXX test tcid???
-     return data[size - 1];
+     return m_data[m_size - 1];
      }
   return 0;
 }
@@ -390,26 +370,26 @@ enum eState { stIDLE, stCREATION, stACTIVE, stDELETION };
 class cCiTransportConnection {
   friend class cCiTransportLayer;
 private:
-  int fd;
-  uint8_t slot;
-  uint8_t tcid;
-  eState state;
-  cTPDU *tpdu;
-  struct timeval last_poll;
-  int lastResponse;
-  bool dataAvailable;
+  int             m_fd;
+  uint8_t         m_slot;
+  uint8_t         m_tcid;
+  eState          m_state         {stIDLE};
+  cTPDU          *m_tpdu          {nullptr};
+  struct timeval  m_last_poll;
+  int             m_lastResponse  {ERROR};
+  bool            m_dataAvailable {false};
   void Init(int Fd, uint8_t Slot, uint8_t Tcid);
   int SendTPDU(uint8_t Tag, int Length = 0, const uint8_t *Data = nullptr);
   int RecvTPDU(void);
   int CreateConnection(void);
   int Poll(void);
-  eState State(void) { return state; }
-  int LastResponse(void) { return lastResponse; }
-  bool DataAvailable(void) { return dataAvailable; }
+  eState State(void) { return m_state; }
+  int LastResponse(void) { return m_lastResponse; }
+  bool DataAvailable(void) { return m_dataAvailable; }
 public:
   cCiTransportConnection(void);
   ~cCiTransportConnection();
-  int Slot(void) const { return slot; }
+  int Slot(void) const { return m_slot; }
   int SendData(int Length, const uint8_t *Data);
   int RecvData(void);
   const uint8_t *Data(int &Length);
@@ -418,34 +398,33 @@ public:
 
 cCiTransportConnection::cCiTransportConnection(void)
 {
-  tpdu = nullptr;
-  last_poll.tv_sec = 0;
-  last_poll.tv_usec = 0;
+  m_last_poll.tv_sec = 0;
+  m_last_poll.tv_usec = 0;
   Init(-1, 0, 0);
 }
 
 cCiTransportConnection::~cCiTransportConnection()
 {
-  delete tpdu;
+  delete m_tpdu;
 }
 
 void cCiTransportConnection::Init(int Fd, uint8_t Slot, uint8_t Tcid)
 {
-  fd = Fd;
-  slot = Slot;
-  tcid = Tcid;
-  state = stIDLE;
-  if (fd >= 0 && !tpdu)
-     tpdu = new cTPDU;
-  lastResponse = ERROR;
-  dataAvailable = false;
+  m_fd = Fd;
+  m_slot = Slot;
+  m_tcid = Tcid;
+  m_state = stIDLE;
+  if (m_fd >= 0 && !m_tpdu)
+     m_tpdu = new cTPDU;
+  m_lastResponse = ERROR;
+  m_dataAvailable = false;
 //XXX Clear()???
 }
 
 int cCiTransportConnection::SendTPDU(uint8_t Tag, int Length, const uint8_t *Data)
 {
-  cTPDU TPDU(slot, tcid, Tag, Length, Data);
-  return TPDU.Write(fd);
+  cTPDU TPDU(m_slot, m_tcid, Tag, Length, Data);
+  return TPDU.Write(m_fd);
 }
 
 #define CAM_READ_TIMEOUT  5000 // ms
@@ -453,9 +432,9 @@ int cCiTransportConnection::SendTPDU(uint8_t Tag, int Length, const uint8_t *Dat
 int cCiTransportConnection::RecvTPDU(void)
 {
   struct pollfd pfd[1];
-  pfd[0].fd = fd;
+  pfd[0].fd = m_fd;
   pfd[0].events = POLLIN;
-  lastResponse = ERROR;
+  m_lastResponse = ERROR;
 
   for (;;) {
       int ret = poll(pfd, 1, CAM_READ_TIMEOUT);
@@ -466,50 +445,50 @@ int cCiTransportConnection::RecvTPDU(void)
 
   if (
         (pfd[0].revents & POLLIN) &&
-        tpdu->Read(fd) == OK &&
-        tpdu->Tcid() == tcid
+        m_tpdu->Read(m_fd) == OK &&
+        m_tpdu->Tcid() == m_tcid
      )
   {
-     switch (state) {
+     switch (m_state) {
        case stIDLE:     break;
-       case stCREATION: if (tpdu->Tag() == T_CTC_REPLY) {
-                           dataAvailable = tpdu->Status() & DATA_INDICATOR;
-                           state = stACTIVE;
-                           lastResponse = tpdu->Tag();
+       case stCREATION: if (m_tpdu->Tag() == T_CTC_REPLY) {
+                           m_dataAvailable = ((m_tpdu->Status() & DATA_INDICATOR) != 0);
+                           m_state = stACTIVE;
+                           m_lastResponse = m_tpdu->Tag();
                            }
                         break;
-       case stACTIVE:   switch (tpdu->Tag()) {
+       case stACTIVE:   switch (m_tpdu->Tag()) {
                           case T_SB:
                           case T_DATA_LAST:
                           case T_DATA_MORE:
                           case T_REQUEST_TC: break;
                           case T_DELETE_TC:  if (SendTPDU(T_DTC_REPLY) != OK)
                                                 return ERROR;
-                                             Init(fd, slot, tcid);
+                                             Init(m_fd, m_slot, m_tcid);
                                              break;
                           default: return ERROR;
                           }
-                        dataAvailable = tpdu->Status() & DATA_INDICATOR;
-                        lastResponse = tpdu->Tag();
+                        m_dataAvailable = ((m_tpdu->Status() & DATA_INDICATOR) != 0);
+                        m_lastResponse = m_tpdu->Tag();
                         break;
-       case stDELETION: if (tpdu->Tag() == T_DTC_REPLY) {
-                           Init(fd, slot, tcid);
+       case stDELETION: if (m_tpdu->Tag() == T_DTC_REPLY) {
+                           Init(m_fd, m_slot, m_tcid);
                            //XXX Status()???
-                           lastResponse = tpdu->Tag();
+                           m_lastResponse = m_tpdu->Tag();
                            }
                         break;
        }
      }
   else {
-     esyslog("ERROR: CAM: Read failed: slot %d, tcid %d\n", slot, tcid);
-     Init(-1, slot, tcid);
+     esyslog("ERROR: CAM: Read failed: slot %d, tcid %d\n", m_slot, m_tcid);
+     Init(-1, m_slot, m_tcid);
      }
-  return lastResponse;
+  return m_lastResponse;
 }
 
 int cCiTransportConnection::SendData(int Length, const uint8_t *Data)
 {
-  while (state == stACTIVE && Length > 0) {
+  while (m_state == stACTIVE && Length > 0) {
         uint8_t Tag = T_DATA_LAST;
         int l = Length;
         if (l > MAX_TPDU_DATA) {
@@ -533,33 +512,33 @@ int cCiTransportConnection::RecvData(void)
 
 const uint8_t *cCiTransportConnection::Data(int &Length)
 {
-  return tpdu->Data(Length);
+  return m_tpdu->Data(Length);
 }
 
 #define MAX_CONNECT_RETRIES  25
 
 int cCiTransportConnection::CreateConnection(void)
 {
-  if (state == stIDLE) {
+  if (m_state == stIDLE) {
      if (SendTPDU(T_CREATE_TC) == OK) {
-        state = stCREATION;
+        m_state = stCREATION;
         if (RecvTPDU() == T_CTC_REPLY) {
            _connected=true;
            return OK;
         // the following is a workaround for CAMs that don't quite follow the specs...
-        } else {
-           for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
-               dsyslog("CAM: retrying to establish connection");
-               if (RecvTPDU() == T_CTC_REPLY) {
-                  dsyslog("CAM: connection established");
-                  _connected=true;
-                  return OK;
-                  }
-               }
-           return ERROR;
-           }
         }
+
+        for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
+            dsyslog("CAM: retrying to establish connection");
+            if (RecvTPDU() == T_CTC_REPLY) {
+                dsyslog("CAM: connection established");
+                _connected=true;
+                return OK;
+            }
+        }
+        return ERROR;
      }
+  }
   return ERROR;
 }
 
@@ -570,18 +549,18 @@ int cCiTransportConnection::Poll(void)
 {
   struct timeval curr_time;
 
-  if (state != stACTIVE)
+  if (m_state != stACTIVE)
     return ERROR;
 
   gettimeofday(&curr_time, nullptr);
   uint64_t msdiff = (curr_time.tv_sec * 1000) + (curr_time.tv_usec / 1000) -
-                    (last_poll.tv_sec * 1000) - (last_poll.tv_usec / 1000);
+                    (m_last_poll.tv_sec * 1000) - (m_last_poll.tv_usec / 1000);
 
   if (msdiff < POLL_INTERVAL)
     return OK;
 
-  last_poll.tv_sec = curr_time.tv_sec;
-  last_poll.tv_usec = curr_time.tv_usec;
+  m_last_poll.tv_sec = curr_time.tv_sec;
+  m_last_poll.tv_usec = curr_time.tv_usec;
 
   if (SendTPDU(T_DATA_LAST) != OK)
     return ERROR;
@@ -595,9 +574,9 @@ int cCiTransportConnection::Poll(void)
 
 class cCiTransportLayer {
 private:
-  int fd;
-  int numSlots;
-  cCiTransportConnection tc[MAX_CI_CONNECT];
+  int                    m_fd;
+  int                    m_numSlots;
+  cCiTransportConnection m_tc[MAX_CI_CONNECT];
 public:
   cCiTransportLayer(int Fd, int NumSlots);
   cCiTransportConnection *NewConnection(int Slot);
@@ -608,20 +587,20 @@ public:
 
 cCiTransportLayer::cCiTransportLayer(int Fd, int NumSlots)
 {
-  fd = Fd;
-  numSlots = NumSlots;
-  for (int s = 0; s < numSlots; s++)
+  m_fd = Fd;
+  m_numSlots = NumSlots;
+  for (int s = 0; s < m_numSlots; s++)
       ResetSlot(s);
 }
 
 cCiTransportConnection *cCiTransportLayer::NewConnection(int Slot)
 {
   for (int i = 0; i < MAX_CI_CONNECT; i++) {
-      if (tc[i].State() == stIDLE) {
+      if (m_tc[i].State() == stIDLE) {
          dbgprotocol("Creating connection: slot %d, tcid %d\n", Slot, i + 1);
-         tc[i].Init(fd, Slot, i + 1);
-         if (tc[i].CreateConnection() == OK)
-            return &tc[i];
+         m_tc[i].Init(m_fd, Slot, i + 1);
+         if (m_tc[i].CreateConnection() == OK)
+            return &m_tc[i];
          break;
          }
       }
@@ -631,12 +610,11 @@ cCiTransportConnection *cCiTransportLayer::NewConnection(int Slot)
 bool cCiTransportLayer::ResetSlot(int Slot)
 {
   dbgprotocol("Resetting slot %d...", Slot);
-  if (ioctl(fd, CA_RESET, 1 << Slot) != -1) {
+  if (ioctl(m_fd, CA_RESET, 1 << Slot) != -1) {
      dbgprotocol("ok.\n");
      return true;
      }
-  else
-     esyslog("ERROR: can't reset CAM slot %d: %m", Slot);
+  esyslog("ERROR: can't reset CAM slot %d: %m", Slot);
   dbgprotocol("failed!\n");
   return false;
 }
@@ -645,17 +623,16 @@ bool cCiTransportLayer::ModuleReady(int Slot)
 {
   ca_slot_info_t sinfo;
   sinfo.num = Slot;
-  if (ioctl(fd, CA_GET_SLOT_INFO, &sinfo) != -1)
-     return sinfo.flags & CA_CI_MODULE_READY;
-  else
-     esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
+  if (ioctl(m_fd, CA_GET_SLOT_INFO, &sinfo) != -1)
+     return (sinfo.flags & CA_CI_MODULE_READY) != 0U;
+  esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
   return false;
 }
 
 cCiTransportConnection *cCiTransportLayer::Process(int Slot)
 {
   for (int i = 0; i < MAX_CI_CONNECT; i++) {
-      cCiTransportConnection *Tc = &tc[i];
+      cCiTransportConnection *Tc = &m_tc[i];
       if (Tc->Slot() == Slot) {
          switch (Tc->State()) {
            case stCREATION:
@@ -772,15 +749,15 @@ class cCiSession {
 private:
   int sessionId;
   int resourceId;
-  cCiTransportConnection *tc;
+  cCiTransportConnection *m_tc;
 protected:
   int GetTag(int &Length, const uint8_t **Data);
   const uint8_t *GetData(const uint8_t *Data, int &Length);
   int SendData(int Tag, int Length = 0, const uint8_t *Data = nullptr);
 public:
   cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc);
-  virtual ~cCiSession();
-  const cCiTransportConnection *Tc(void) { return tc; }
+  virtual ~cCiSession() = default;
+  const cCiTransportConnection *Tc(void) { return m_tc; }
   int SessionId(void) { return sessionId; }
   int ResourceId(void) { return resourceId; }
   virtual bool HasUserIO(void) { return false; }
@@ -791,11 +768,7 @@ cCiSession::cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc
 {
   sessionId = SessionId;
   resourceId = ResourceId;
-  tc = Tc;
-}
-
-cCiSession::~cCiSession()
-{
+  m_tc = Tc;
 }
 
 int cCiSession::GetTag(int &Length, const uint8_t **Data)
@@ -849,7 +822,7 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
             memcpy(p, Data, Length);
             p += Length;
         }
-        return tc->SendData(p - buffer, buffer);
+        return m_tc->SendData(p - buffer, buffer);
     }
     esyslog("ERROR: CAM: data length (%d) exceeds buffer size", Length);
   }
@@ -871,7 +844,7 @@ private:
   int state;
 public:
   cCiResourceManager(int SessionId, cCiTransportConnection *Tc);
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   };
 
 cCiResourceManager::cCiResourceManager(int SessionId, cCiTransportConnection *Tc)
@@ -941,8 +914,8 @@ private:
   char *menuString;
 public:
   cCiApplicationInformation(int SessionId, cCiTransportConnection *Tc);
-  virtual ~cCiApplicationInformation();
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  ~cCiApplicationInformation() override;
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   bool EnterMenu(void);
   char *GetApplicationString() { return strdup(menuString); };
   uint16_t GetApplicationManufacturer() { return applicationManufacturer; };
@@ -1017,24 +990,24 @@ bool cCiApplicationInformation::EnterMenu(void)
 class cCiConditionalAccessSupport : public cCiSession {
 private:
   int state;
-  int numCaSystemIds;
-  unsigned short caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
-  bool needCaPmt;
+  int m_numCaSystemIds;
+  unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
+  bool m_needCaPmt;
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
-  const unsigned short *GetCaSystemIds(void) { return caSystemIds; }
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
+  const unsigned short *GetCaSystemIds(void) { return m_caSystemIds; }
   bool SendPMT(cCiCaPmt &CaPmt);
-  bool NeedCaPmt(void) { return needCaPmt; }
+  bool NeedCaPmt(void) { return m_needCaPmt; }
   };
 
 cCiConditionalAccessSupport::cCiConditionalAccessSupport(
     int SessionId, cCiTransportConnection *Tc) :
     cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc),
-    state(0), numCaSystemIds(0), needCaPmt(false)
+    state(0), m_numCaSystemIds(0), m_needCaPmt(false)
 {
   dbgprotocol("New Conditional Access Support (session id %d)\n", SessionId);
-  memset(caSystemIds, 0, sizeof(caSystemIds));
+  memset(m_caSystemIds, 0, sizeof(m_caSystemIds));
 }
 
 bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
@@ -1051,18 +1024,18 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
                   dbgprotocol(" %04X", id);
                   d += 2;
                   l -= 2;
-                  if (numCaSystemIds < MAXCASYSTEMIDS) {
+                  if (m_numCaSystemIds < MAXCASYSTEMIDS) {
                      int i = 0;
                      // Make sure the id is not already present
-                     for (; i < numCaSystemIds; i++)
-                        if (caSystemIds[i] == id)
+                     for (; i < m_numCaSystemIds; i++)
+                        if (m_caSystemIds[i] == id)
                            break;
 
-                     if (i < numCaSystemIds)
+                     if (i < m_numCaSystemIds)
                          continue;
 
-                     caSystemIds[numCaSystemIds++] = id;
-                     caSystemIds[numCaSystemIds] = 0;
+                     m_caSystemIds[m_numCaSystemIds++] = id;
+                     m_caSystemIds[m_numCaSystemIds] = 0;
                      }
                   else
                      esyslog("ERROR: too many CA system IDs!");
@@ -1070,7 +1043,7 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
             dbgprotocol("\n");
             }
             state = 2;
-            needCaPmt = true;
+            m_needCaPmt = true;
             break;
        default: esyslog("ERROR: CI conditional access support: unknown tag %06X", Tag);
                 return false;
@@ -1087,8 +1060,8 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
 bool cCiConditionalAccessSupport::SendPMT(cCiCaPmt &CaPmt)
 {
   if (state == 2) {
-     SendData(AOT_CA_PMT, CaPmt.length, CaPmt.capmt);
-     needCaPmt = false;
+     SendData(AOT_CA_PMT, CaPmt.m_length, CaPmt.m_capmt);
+     m_needCaPmt = false;
      return true;
      }
   return false;
@@ -1104,7 +1077,7 @@ private:
   bool SendDateTime(void);
 public:
   cCiDateTime(int SessionId, cCiTransportConnection *Tc);
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   void SetTimeOffset(double offset);
   };
 
@@ -1141,17 +1114,22 @@ bool cCiDateTime::SendDateTime(void)
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
      int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
-#define DEC2BCD(d) (uint8_t(((d / 10) << 4) + (d % 10)))
-     struct tTime { unsigned short mjd; uint8_t h, m, s; short offset; };
-     tTime T;
-     T.mjd = htons(MJD);
-     T.h = DEC2BCD(tm_gmt.tm_hour);
-     T.m = DEC2BCD(tm_gmt.tm_min);
-     T.s = DEC2BCD(tm_gmt.tm_sec);
-     T.offset = static_cast<short>(htons(tm_loc.tm_gmtoff / 60));
+#define DEC2BCD(d) (uint8_t((((d) / 10) << 4) + ((d) % 10)))
+#define BYTE0(a) ((a) & 0xFF)
+#define BYTE1(a) (((a) >> 8) & 0xFF)
+     uint8_t T[7];
+     uint16_t mjd = htons(MJD);
+     int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
+     T[0] = BYTE0(mjd);
+     T[1] = BYTE1(mjd);
+     T[2] = DEC2BCD(tm_gmt.tm_hour);
+     T[3] = DEC2BCD(tm_gmt.tm_min);
+     T[4] = DEC2BCD(tm_gmt.tm_sec);
+     T[5] = BYTE0(local_offset);
+     T[6] = BYTE1(local_offset);
 
      dbgprotocol("%d: ==> Date Time\n", SessionId());
-     SendData(AOT_DATE_TIME, 7, (uint8_t*)&T);
+     SendData(AOT_DATE_TIME, 7, T);
      //XXX return value of all SendData() calls???
      return true;
      }
@@ -1233,9 +1211,9 @@ private:
   cCiEnquiry *enquiry;
 public:
   cCiMMI(int SessionId, cCiTransportConnection *Tc);
-  virtual ~cCiMMI();
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
-  virtual bool HasUserIO(void) { return menu || enquiry; }
+  ~cCiMMI() override;
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
+  bool HasUserIO(void) override { return menu || enquiry; } // cCiSession
   cCiMenu *Menu(void);
   cCiEnquiry *Enquiry(void);
   bool SendMenuAnswer(uint8_t Selection);
@@ -1271,8 +1249,7 @@ char *cCiMMI::GetText(int &Length, const uint8_t **Data)
      dbgprotocol("%d: <== Text Last '%s'\n", SessionId(), s);
      return s;
      }
-  else
-     esyslog("CI MMI: unexpected text tag: %06X", Tag);
+  esyslog("CI MMI: unexpected text tag: %06X", Tag);
   return nullptr;
 }
 
@@ -1314,9 +1291,9 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                // since the specification allows choiceNb to be undefined it is useless, so let's just skip it:
                d++;
                l--;
-               if (l > 0) menu->titleText = GetText(l, &d);
-               if (l > 0) menu->subTitleText = GetText(l, &d);
-               if (l > 0) menu->bottomText = GetText(l, &d);
+               if (l > 0) menu->m_titleText = GetText(l, &d);
+               if (l > 0) menu->m_subTitleText = GetText(l, &d);
+               if (l > 0) menu->m_bottomText = GetText(l, &d);
                while (l > 0) {
                      char *s = GetText(l, &d);
                      if (s) {
@@ -1339,11 +1316,11 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                uint8_t blind = *d++;
                //XXX GetByte()???
                l--;
-               enquiry->blind = blind & EF_BLIND;
-               enquiry->expectedLength = *d++;
+               enquiry->m_blind = ((blind & EF_BLIND) != 0);
+               enquiry->m_expectedLength = *d++;
                l--;
                // I really wonder why there is no text length field here...
-               enquiry->text = CopyString(l, d);
+               enquiry->m_text = CopyString(l, d);
                }
             }
             break;
@@ -1414,27 +1391,25 @@ bool cCiMMI::SendAnswer(const char *Text)
 
 cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
 {
-  mmi = MMI;
-  selectable = Selectable;
-  titleText = subTitleText = bottomText = nullptr;
-  numEntries = 0;
+  m_mmi = MMI;
+  m_selectable = Selectable;
   for (int i = 0; i < MAX_CIMENU_ENTRIES; i++)
-      entries[i] = nullptr;
+      m_entries[i] = nullptr;
 }
 
 cCiMenu::~cCiMenu()
 {
-  free(titleText);
-  free(subTitleText);
-  free(bottomText);
-  for (int i = 0; i < numEntries; i++)
-      free(entries[i]);
+  free(m_titleText);
+  free(m_subTitleText);
+  free(m_bottomText);
+  for (int i = 0; i < m_numEntries; i++)
+      free(m_entries[i]);
 }
 
 bool cCiMenu::AddEntry(char *s)
 {
-  if (numEntries < MAX_CIMENU_ENTRIES) {
-     entries[numEntries++] = s;
+  if (m_numEntries < MAX_CIMENU_ENTRIES) {
+     m_entries[m_numEntries++] = s;
      return true;
      }
   return false;
@@ -1442,8 +1417,8 @@ bool cCiMenu::AddEntry(char *s)
 
 bool cCiMenu::Select(int Index)
 {
-  if (mmi && -1 <= Index && Index < numEntries)
-     return mmi->SendMenuAnswer(Index + 1);
+  if (m_mmi && -1 <= Index && Index < m_numEntries)
+     return m_mmi->SendMenuAnswer(Index + 1);
   return false;
 }
 
@@ -1454,22 +1429,14 @@ bool cCiMenu::Cancel(void)
 
 // --- cCiEnquiry ------------------------------------------------------------
 
-cCiEnquiry::cCiEnquiry(cCiMMI *MMI)
-{
-  mmi = MMI;
-  text = nullptr;
-  blind = false;;
-  expectedLength = 0;;
-}
-
 cCiEnquiry::~cCiEnquiry()
 {
-  free(text);
+  free(m_text);
 }
 
 bool cCiEnquiry::Reply(const char *s)
 {
-  return mmi ? mmi->SendAnswer(s) : false;
+  return m_mmi ? m_mmi->SendAnswer(s) : false;
 }
 
 bool cCiEnquiry::Cancel(void)
@@ -1488,34 +1455,33 @@ bool cCiEnquiry::Cancel(void)
 
 cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
 {
-  length = 0;
-  capmt[length++] = cplm; // ca_pmt_list_management
-  capmt[length++] = (ProgramNumber >> 8) & 0xFF;
-  capmt[length++] =  ProgramNumber       & 0xFF;
-  capmt[length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
+  m_capmt[m_length++] = cplm; // ca_pmt_list_management
+  m_capmt[m_length++] = (ProgramNumber >> 8) & 0xFF;
+  m_capmt[m_length++] =  ProgramNumber       & 0xFF;
+  m_capmt[m_length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
 
   // program_info_length
-  infoLengthPos = length;
-  capmt[length++] = 0x00;
-  capmt[length++] = 0x00;
+  m_infoLengthPos = m_length;
+  m_capmt[m_length++] = 0x00;
+  m_capmt[m_length++] = 0x00;
 }
 
 void cCiCaPmt::AddElementaryStream(int type, int pid)
 {
-  if (length + 5 > int(sizeof(capmt)))
+  if (m_length + 5 > int(sizeof(m_capmt)))
   {
     esyslog("ERROR: buffer overflow in CA_PMT");
     return;
   }
 
-  capmt[length++] = type & 0xFF;
-  capmt[length++] = (pid >> 8) & 0xFF;
-  capmt[length++] =  pid       & 0xFF;
+  m_capmt[m_length++] = type & 0xFF;
+  m_capmt[m_length++] = (pid >> 8) & 0xFF;
+  m_capmt[m_length++] =  pid       & 0xFF;
 
   // ES_info_length
-  infoLengthPos = length;
-  capmt[length++] = 0x00;
-  capmt[length++] = 0x00;
+  m_infoLengthPos = m_length;
+  m_capmt[m_length++] = 0x00;
+  m_capmt[m_length++] = 0x00;
 }
 
 /**
@@ -1538,65 +1504,61 @@ void cCiCaPmt::AddElementaryStream(int type, int pid)
 void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
                                const uint8_t *data)
 {
-  if (!infoLengthPos)
+  if (!m_infoLengthPos)
   {
     esyslog("ERROR: adding CA descriptor without program/stream!");
     return;
   }
 
-  if (length + data_len + 7 > int(sizeof(capmt)))
+  if (m_length + data_len + 7 > int(sizeof(m_capmt)))
   {
     esyslog("ERROR: buffer overflow in CA_PMT");
     return;
   }
 
   // We are either at start of program descriptors or stream descriptors.
-  if (infoLengthPos + 2 == length)
-    capmt[length++] = CPCI_OK_DESCRAMBLING; // ca_pmt_cmd_id
+  if (m_infoLengthPos + 2 == m_length)
+    m_capmt[m_length++] = CPCI_OK_DESCRAMBLING; // ca_pmt_cmd_id
 
-  capmt[length++] = 0x09;           // CA descriptor tag
-  capmt[length++] = 4 + data_len;   // descriptor length
+  m_capmt[m_length++] = 0x09;           // CA descriptor tag
+  m_capmt[m_length++] = 4 + data_len;   // descriptor length
 
-  capmt[length++] = (ca_system_id >> 8) & 0xFF;
-  capmt[length++] = ca_system_id & 0xFF;
-  capmt[length++] = (ca_pid >> 8) & 0xFF;
-  capmt[length++] = ca_pid & 0xFF;
+  m_capmt[m_length++] = (ca_system_id >> 8) & 0xFF;
+  m_capmt[m_length++] = ca_system_id & 0xFF;
+  m_capmt[m_length++] = (ca_pid >> 8) & 0xFF;
+  m_capmt[m_length++] = ca_pid & 0xFF;
 
   if (data_len > 0)
   {
-    memcpy(&capmt[length], data, data_len);
-    length += data_len;
+    memcpy(&m_capmt[m_length], data, data_len);
+    m_length += data_len;
   }
 
   // update program_info_length/ES_info_length
-  int l = length - infoLengthPos - 2;
-  capmt[infoLengthPos] = (l >> 8) & 0xFF;
-  capmt[infoLengthPos + 1] = l & 0xFF;
+  int l = m_length - m_infoLengthPos - 2;
+  m_capmt[m_infoLengthPos] = (l >> 8) & 0xFF;
+  m_capmt[m_infoLengthPos + 1] = l & 0xFF;
 }
 
 // -- cLlCiHandler -------------------------------------------------------------
 
 cLlCiHandler::cLlCiHandler(int Fd, int NumSlots)
 {
-  numSlots = NumSlots;
-  newCaSupport = false;
-  hasUserIO = false;
+  m_numSlots = NumSlots;
   for (int i = 0; i < MAX_CI_SESSION; i++)
-      sessions[i] = nullptr;
-  tpl = new cCiTransportLayer(Fd, numSlots);
-  tc = nullptr;
-  fdCa = Fd;
-  needCaPmt = false;
+      m_sessions[i] = nullptr;
+  m_tpl = new cCiTransportLayer(Fd, m_numSlots);
+  m_fdCa = Fd;
 }
 
 cLlCiHandler::~cLlCiHandler()
 {
-  cMutexLock MutexLock(&mutex);
+  cMutexLock MutexLock(&m_mutex);
   for (int i = 0; i < MAX_CI_SESSION; i++)
-    if (sessions[i] != nullptr)
-      delete sessions[i];
-  delete tpl;
-  close(fdCa);
+    if (m_sessions[i] != nullptr)
+      delete m_sessions[i];
+  delete m_tpl;
+  close(m_fdCa);
 }
 
 cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
@@ -1612,11 +1574,10 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
             {
                 if (Caps.slot_type & CA_CI_LINK)
                     return new cLlCiHandler(fd_ca, NumSlots);
-                else if (Caps.slot_type & CA_CI)
+                if (Caps.slot_type & CA_CI)
                     return new cHlCiHandler(fd_ca, NumSlots);
-                else
-                    isyslog("CAM doesn't support either high or low level CI,"
-                            " Caps.slot_type=%i", Caps.slot_type);
+                isyslog("CAM doesn't support either high or low level CI,"
+                        " Caps.slot_type=%i", Caps.slot_type);
             }
             else
                 esyslog("ERROR: no CAM slots found");
@@ -1648,14 +1609,14 @@ bool cLlCiHandler::Send(uint8_t Tag, int SessionId, int ResourceId, int Status)
   *(short *)p = htons(SessionId);
   p += 2;
   buffer[1] = p - buffer - 2; // length
-  return tc && tc->SendData(p - buffer, buffer) == OK;
+  return m_tc && m_tc->SendData(p - buffer, buffer) == OK;
 }
 
 cCiSession *cLlCiHandler::GetSessionBySessionId(int SessionId)
 {
   for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (sessions[i] && sessions[i]->SessionId() == SessionId)
-         return sessions[i];
+      if (m_sessions[i] && m_sessions[i]->SessionId() == SessionId)
+         return m_sessions[i];
       }
   return nullptr;
 }
@@ -1663,25 +1624,25 @@ cCiSession *cLlCiHandler::GetSessionBySessionId(int SessionId)
 cCiSession *cLlCiHandler::GetSessionByResourceId(int ResourceId, int Slot)
 {
   for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
-         return sessions[i];
+      if (m_sessions[i] && m_sessions[i]->Tc()->Slot() == Slot && m_sessions[i]->ResourceId() == ResourceId)
+         return m_sessions[i];
       }
   return nullptr;
 }
 
 cCiSession *cLlCiHandler::CreateSession(int ResourceId)
 {
-  if (!GetSessionByResourceId(ResourceId, tc->Slot())) {
+  if (!GetSessionByResourceId(ResourceId, m_tc->Slot())) {
      for (int i = 0; i < MAX_CI_SESSION; i++) {
-         if (!sessions[i]) {
+         if (!m_sessions[i]) {
             switch (ResourceId) {
-              case RI_RESOURCE_MANAGER:           return sessions[i] = new cCiResourceManager(i + 1, tc);
-              case RI_APPLICATION_INFORMATION:    return sessions[i] = new cCiApplicationInformation(i + 1, tc);
-              case RI_CONDITIONAL_ACCESS_SUPPORT: newCaSupport = true;
-                                                  return sessions[i] = new cCiConditionalAccessSupport(i + 1, tc);
+              case RI_RESOURCE_MANAGER:           return m_sessions[i] = new cCiResourceManager(i + 1, m_tc);
+              case RI_APPLICATION_INFORMATION:    return m_sessions[i] = new cCiApplicationInformation(i + 1, m_tc);
+              case RI_CONDITIONAL_ACCESS_SUPPORT: m_newCaSupport = true;
+                                                  return m_sessions[i] = new cCiConditionalAccessSupport(i + 1, m_tc);
               case RI_HOST_CONTROL:               break; //XXX
-              case RI_DATE_TIME:                  return sessions[i] = new cCiDateTime(i + 1, tc);
-              case RI_MMI:                        return sessions[i] = new cCiMMI(i + 1, tc);
+              case RI_DATE_TIME:                  return m_sessions[i] = new cCiDateTime(i + 1, m_tc);
+              case RI_MMI:                        return m_sessions[i] = new cCiMMI(i + 1, m_tc);
               }
             }
          }
@@ -1723,16 +1684,15 @@ bool cLlCiHandler::CloseSession(int SessionId)
 {
   dbgprotocol("CloseSession %08X\n", SessionId);
   cCiSession *Session = GetSessionBySessionId(SessionId);
-  if (Session && sessions[SessionId - 1] == Session) {
+  if (Session && m_sessions[SessionId - 1] == Session) {
      delete Session;
-     sessions[SessionId - 1] = nullptr;
+     m_sessions[SessionId - 1] = nullptr;
      Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_OK);
      return true;
      }
-  else {
-     esyslog("ERROR: unknown session id: %d", SessionId);
-     Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_NOT_ALLOCATED);
-     }
+
+  esyslog("ERROR: unknown session id: %d", SessionId);
+  Send(ST_CLOSE_SESSION_RESPONSE, SessionId, 0, SS_NOT_ALLOCATED);
   return false;
 }
 
@@ -1740,8 +1700,8 @@ int cLlCiHandler::CloseAllSessions(int Slot)
 {
   int result = 0;
   for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (sessions[i] && sessions[i]->Tc()->Slot() == Slot) {
-         CloseSession(sessions[i]->SessionId());
+      if (m_sessions[i] && m_sessions[i]->Tc()->Slot() == Slot) {
+         CloseSession(m_sessions[i]->SessionId());
          result++;
          }
       }
@@ -1751,15 +1711,15 @@ int cLlCiHandler::CloseAllSessions(int Slot)
 bool cLlCiHandler::Process(void)
 {
     bool result = true;
-    cMutexLock MutexLock(&mutex);
+    cMutexLock MutexLock(&m_mutex);
 
-    for (int Slot = 0; Slot < numSlots; Slot++)
+    for (int Slot = 0; Slot < m_numSlots; Slot++)
     {
-        tc = tpl->Process(Slot);
-        if (tc)
+        m_tc = m_tpl->Process(Slot);
+        if (m_tc)
         {
             int Length;
-            const uint8_t *Data = tc->Data(Length);
+            const uint8_t *Data = m_tc->Data(Length);
             if (Data && Length > 1)
             {
                 switch (*Data)
@@ -1803,48 +1763,48 @@ bool cLlCiHandler::Process(void)
         }
         else if (CloseAllSessions(Slot))
         {
-            tpl->ResetSlot(Slot);
+            m_tpl->ResetSlot(Slot);
             result = false;
         }
-        else if (tpl->ModuleReady(Slot))
+        else if (m_tpl->ModuleReady(Slot))
         {
             dbgprotocol("Module ready in slot %d\n", Slot);
-            tpl->NewConnection(Slot);
+            m_tpl->NewConnection(Slot);
         }
     }
 
     bool UserIO = false;
-    needCaPmt = false;
+    m_needCaPmt = false;
     for (int i = 0; i < MAX_CI_SESSION; i++)
     {
-        if (sessions[i] && sessions[i]->Process())
+        if (m_sessions[i] && m_sessions[i]->Process())
         {
-            UserIO |= sessions[i]->HasUserIO();
-            if (sessions[i]->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
+            UserIO |= m_sessions[i]->HasUserIO();
+            if (m_sessions[i]->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
             {
-                cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *) sessions[i];
-                needCaPmt |= cas->NeedCaPmt();
+                cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *) m_sessions[i];
+                m_needCaPmt |= cas->NeedCaPmt();
             }
         }
     }
-    hasUserIO = UserIO;
+    m_hasUserIO = UserIO;
 
-    if (newCaSupport)
-        newCaSupport = result = false; // triggers new SetCaPmt at caller!
+    if (m_newCaSupport)
+        m_newCaSupport = result = false; // triggers new SetCaPmt at caller!
     return result;
 }
 
 bool cLlCiHandler::EnterMenu(int Slot)
 {
-  cMutexLock MutexLock(&mutex);
+  cMutexLock MutexLock(&m_mutex);
   cCiApplicationInformation *api = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
   return api ? api->EnterMenu() : false;
 }
 
 cCiMenu *cLlCiHandler::GetMenu(void)
 {
-  cMutexLock MutexLock(&mutex);
-  for (int Slot = 0; Slot < numSlots; Slot++) {
+  cMutexLock MutexLock(&m_mutex);
+  for (int Slot = 0; Slot < m_numSlots; Slot++) {
       cCiMMI *mmi = (cCiMMI *)GetSessionByResourceId(RI_MMI, Slot);
       if (mmi)
          return mmi->Menu();
@@ -1854,8 +1814,8 @@ cCiMenu *cLlCiHandler::GetMenu(void)
 
 cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 {
-  cMutexLock MutexLock(&mutex);
-  for (int Slot = 0; Slot < numSlots; Slot++) {
+  cMutexLock MutexLock(&m_mutex);
+  for (int Slot = 0; Slot < m_numSlots; Slot++) {
       cCiMMI *mmi = (cCiMMI *)GetSessionByResourceId(RI_MMI, Slot);
       if (mmi)
          return mmi->Enquiry();
@@ -1865,21 +1825,21 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 
 const unsigned short *cLlCiHandler::GetCaSystemIds(int Slot)
  {
-  cMutexLock MutexLock(&mutex);
+  cMutexLock MutexLock(&m_mutex);
   cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
   return cas ? cas->GetCaSystemIds() : nullptr;
 }
 
 bool cLlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
 {
-  cMutexLock MutexLock(&mutex);
+  cMutexLock MutexLock(&m_mutex);
   cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
   return cas && cas->SendPMT(CaPmt);
 }
 
 void cLlCiHandler::SetTimeOffset(double offset_in_seconds)
 {
-    cMutexLock MutexLock(&mutex);
+    cMutexLock MutexLock(&m_mutex);
     cCiDateTime *dt = nullptr;
 
     for (uint i = 0; i < (uint) NumSlots(); i++)
@@ -1892,9 +1852,9 @@ void cLlCiHandler::SetTimeOffset(double offset_in_seconds)
 
 bool cLlCiHandler::Reset(int Slot)
 {
-  cMutexLock MutexLock(&mutex);
+  cMutexLock MutexLock(&m_mutex);
   CloseAllSessions(Slot);
-  return tpl->ResetSlot(Slot);
+  return m_tpl->ResetSlot(Slot);
 }
 
 bool cLlCiHandler::connected() const
@@ -1906,18 +1866,16 @@ bool cLlCiHandler::connected() const
 
 cHlCiHandler::cHlCiHandler(int Fd, int NumSlots)
 {
-    numSlots = NumSlots;
-    numCaSystemIds = 0;
-    caSystemIds[0] = 0;
-    fdCa = Fd;
-    state = 0;
+    m_numSlots = NumSlots;
+    m_caSystemIds[0] = 0;
+    m_fdCa = Fd;
     esyslog("New High level CI handler");
 }
 
 cHlCiHandler::~cHlCiHandler()
 {
-    cMutexLock MutexLock(&mutex);
-    close(fdCa);
+    cMutexLock MutexLock(&m_mutex);
+    close(m_fdCa);
 }
 
 int cHlCiHandler::CommHL(unsigned tag, unsigned function, struct ca_msg *msg)
@@ -1930,7 +1888,7 @@ int cHlCiHandler::CommHL(unsigned tag, unsigned function, struct ca_msg *msg)
                        msg->msg[0], msg->msg[1], msg->msg[2]);
     }
 
-    return ioctl(fdCa, function, msg);
+    return ioctl(m_fdCa, function, msg);
 }
 
 int cHlCiHandler::GetData(unsigned tag, struct ca_msg *msg)
@@ -1945,10 +1903,10 @@ int cHlCiHandler::SendData(unsigned tag, struct ca_msg *msg)
 
 bool cHlCiHandler::Process(void)
 {
-    cMutexLock MutexLock(&mutex);
+    cMutexLock MutexLock(&m_mutex);
 
     struct ca_msg msg;
-    switch(state) {
+    switch(m_state) {
     case 0:
         // Get CA_system_ids
         /*      Enquire         */
@@ -1973,16 +1931,16 @@ bool cHlCiHandler::Process(void)
                     dbgprotocol(" %04X", id);
                     d += 2;
                     l -= 2;
-                    if (numCaSystemIds < MAXCASYSTEMIDS) {
-                        caSystemIds[numCaSystemIds++] = id;
-                        caSystemIds[numCaSystemIds] = 0;
+                    if (m_numCaSystemIds < MAXCASYSTEMIDS) {
+                        m_caSystemIds[m_numCaSystemIds++] = id;
+                        m_caSystemIds[m_numCaSystemIds] = 0;
                     }
                     else
                         esyslog("ERROR: too many CA system IDs!");
                 }
                 dbgprotocol("\n");
             }
-            state = 1;
+            m_state = 1;
             break;
         }
     }
@@ -1992,7 +1950,7 @@ bool cHlCiHandler::Process(void)
     return result;
 }
 
-bool cHlCiHandler::EnterMenu(int)
+bool cHlCiHandler::EnterMenu(int /*Slot*/)
 {
     return false;
 }
@@ -2007,28 +1965,28 @@ cCiEnquiry *cHlCiHandler::GetEnquiry(void)
     return nullptr;
 }
 
-const unsigned short *cHlCiHandler::GetCaSystemIds(int)
+const unsigned short *cHlCiHandler::GetCaSystemIds(int /*Slot*/)
 {
-    return caSystemIds;
+    return m_caSystemIds;
 }
 
-bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
+bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
 {
-    cMutexLock MutexLock(&mutex);
+    cMutexLock MutexLock(&m_mutex);
     struct ca_msg msg;
 
     esyslog("Setting CA PMT.");
-    state = 2;
+    m_state = 2;
 
-    msg.msg[3] = CaPmt.length;
+    msg.msg[3] = CaPmt.m_length;
 
-    if (CaPmt.length > (256 - 4))
+    if (CaPmt.m_length > (256 - 4))
     {
         esyslog("CA message too long");
         return false;
     }
 
-    memcpy(&msg.msg[4], CaPmt.capmt, CaPmt.length);
+    memcpy(&msg.msg[4], CaPmt.m_capmt, CaPmt.m_length);
 
     if ((SendData(AOT_CA_PMT, &msg)) < 0) {
         esyslog("HLCI communication failed");
@@ -2038,9 +1996,9 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
     return true;
 }
 
-bool cHlCiHandler::Reset(int)
+bool cHlCiHandler::Reset(int /*Slot*/)
 {
-    if ((ioctl(fdCa, CA_RESET)) < 0) {
+    if ((ioctl(m_fdCa, CA_RESET)) < 0) {
         esyslog("ioctl CA_RESET failed.");
         return false;
     }
@@ -2049,8 +2007,5 @@ bool cHlCiHandler::Reset(int)
 
 bool cHlCiHandler::NeedCaPmt(void)
 {
-    if(state == 1)
-        return true;
-
-    return false;
+    return m_state == 1;
 }

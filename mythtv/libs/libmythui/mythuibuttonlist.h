@@ -106,17 +106,17 @@ class MUI_PUBLIC MythUIButtonListItem
     virtual void SetToRealButton(MythUIStateType *button, bool selected);
 
   protected:
-    MythUIButtonList *m_parent;
+    MythUIButtonList *m_parent      {nullptr};
     QString         m_text;
     QString         m_fontState;
-    MythImage      *m_image;
+    MythImage      *m_image         {nullptr};
     QString         m_imageFilename;
     bool            m_checkable;
     CheckState      m_state;
-    QVariant        m_data;
-    bool            m_showArrow;
-    bool            m_isVisible;
-    bool            m_enabled;
+    QVariant        m_data          {0};
+    bool            m_showArrow     {false};
+    bool            m_isVisible     {false};
+    bool            m_enabled       {true};
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;
@@ -146,9 +146,9 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                    bool showScrollBar = false);
     ~MythUIButtonList();
 
-    virtual bool keyPressEvent(QKeyEvent *event);
-    virtual bool gestureEvent(MythGestureEvent *event);
-    virtual void customEvent(QEvent *);
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
+    void customEvent(QEvent *) override; // MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
@@ -156,24 +156,24 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     void SetDrawFromBottom(bool draw);
 
-    void Reset();
+    void Reset() override; // MythUIType
     void Update();
 
     virtual void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
     virtual void SetValue(const QString &value) { MoveToNamedPosition(value); }
-    void SetValueByData(QVariant data);
+    void SetValueByData(const QVariant& data);
     virtual int  GetIntValue() const;
     virtual QString  GetValue() const;
     QVariant GetDataValue() const;
     MythRect GetButtonArea(void) const;
 
     void SetItemCurrent(MythUIButtonListItem* item);
-    void SetItemCurrent(int pos, int topPos = -1);
+    void SetItemCurrent(int current, int topPos = -1);
     MythUIButtonListItem* GetItemCurrent() const;
     MythUIButtonListItem* GetItemFirst() const;
     MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item) const;
     MythUIButtonListItem* GetItemAt(int pos) const;
-    MythUIButtonListItem* GetItemByData(QVariant data);
+    MythUIButtonListItem* GetItemByData(const QVariant& data);
 
     uint ItemWidth(void);
     uint ItemHeight(void);
@@ -225,8 +225,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     enum WrapStyle   { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
                        WrapFlowing };
 
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
     void Const();
     virtual void Init();
 
@@ -273,67 +273,69 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     virtual QPoint GetButtonPosition(int column, int row) const;
 
     void SetButtonArea(const MythRect &rect);
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SanitizePosition(void);
 
     /**/
 
-    LayoutType  m_layout;
-    ArrangeType m_arrange;
-    ScrollStyle m_scrollStyle;
-    WrapStyle   m_wrapStyle;
-    int         m_alignment;
+    LayoutType  m_layout              {LayoutVertical};
+    ArrangeType m_arrange             {ArrangeFixed};
+    ScrollStyle m_scrollStyle         {ScrollFree};
+    WrapStyle   m_wrapStyle           {WrapNone};
+    int         m_alignment           {Qt::AlignLeft | Qt::AlignTop};
 
-    MythRect m_contentsRect;
+    MythRect    m_contentsRect        {0, 0, 0, 0};
 
-    MythPoint m_searchPosition;
-    QString   m_searchFields;
-    QString   m_searchStr;
-    bool      m_searchStartsWith;
+    MythPoint   m_searchPosition      {-2,-2};
+    QString     m_searchFields        {"**ALL**"};
+    QString     m_searchStr;
+    bool        m_searchStartsWith    {false};
 
-    int m_itemWidth;
-    int m_itemHeight;
-    int m_itemHorizSpacing;
-    int m_itemVertSpacing;
-    uint m_itemsVisible;
-    int m_maxVisible;
-    int m_rows;
-    int m_columns;
-    int m_leftColumns, m_rightColumns;
-    int m_topRows, m_bottomRows;
+    int m_itemWidth                   {0};
+    int m_itemHeight                  {0};
+    int m_itemHorizSpacing            {0};
+    int m_itemVertSpacing             {0};
+    uint m_itemsVisible               {0};
+    int m_maxVisible                  {0};
+    int m_rows                        {0};
+    int m_columns                     {0};
+    int m_leftColumns                 {0};
+    int m_rightColumns                {0};
+    int m_topRows                     {0};
+    int m_bottomRows                  {0};
 
-    bool m_active;
-    bool m_showArrow;
-    bool m_showScrollBar;
+    bool m_active                     {false};
+    bool m_showArrow                  {true};
+    bool m_showScrollBar              {true};
 
-    MythUIScrollBar *m_scrollBar;
-    MythUIStateType *m_upArrow;
-    MythUIStateType *m_downArrow;
+    MythUIScrollBar *m_scrollBar      {nullptr};
+    MythUIStateType *m_upArrow        {nullptr};
+    MythUIStateType *m_downArrow      {nullptr};
 
-    MythUIStateType *m_buttontemplate;
+    MythUIStateType *m_buttontemplate {nullptr};
 
     QVector<MythUIStateType *> m_ButtonList;
     QMap<int, MythUIButtonListItem *> m_ButtonToItem;
     QHash<QString, QString> m_actionRemap;
 
-    bool m_initialized;
-    bool m_needsUpdate;
-    bool m_clearing;
+    bool m_initialized                {false};
+    bool m_needsUpdate                {false};
+    bool m_clearing                   {false};
 
-    int m_selPosition;
-    int m_topPosition;
-    int m_itemCount;
-    bool m_keepSelAtBottom;
+    int m_selPosition                 {0};
+    int m_topPosition                 {0};
+    int m_itemCount                   {0};
+    bool m_keepSelAtBottom            {false};
 
     QList<MythUIButtonListItem*> m_itemList;
-    int m_nextItemLoaded;
+    int m_nextItemLoaded              {0};
 
-    bool m_drawFromBottom;
+    bool m_drawFromBottom             {false};
 
     QString     m_lcdTitle;
     QStringList m_lcdColumns;
@@ -347,11 +349,13 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
     Q_OBJECT
   public:
     SearchButtonListDialog(MythScreenStack *parent, const char *name,
-                           MythUIButtonList *parentList, QString searchText);
+                           MythUIButtonList *parentList, QString searchText)
+        : MythScreenType(parent, name, false),
+          m_parentList(parentList), m_searchText(searchText) {}
     ~SearchButtonListDialog(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected slots:
     void searchChanged(void);
@@ -359,15 +363,15 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
     void nextClicked(void);
 
   protected:
-    bool               m_startsWith;
+    bool               m_startsWith  {false};
 
-    MythUIButtonList  *m_parentList;
+    MythUIButtonList  *m_parentList  {nullptr};
     QString            m_searchText;
 
-    MythUITextEdit    *m_searchEdit;
-    MythUIButton      *m_prevButton;
-    MythUIButton      *m_nextButton;
-    MythUIStateType   *m_searchState;
+    MythUITextEdit    *m_searchEdit  {nullptr};
+    MythUIButton      *m_prevButton  {nullptr};
+    MythUIButton      *m_nextButton  {nullptr};
+    MythUIStateType   *m_searchState {nullptr};
 };
 
 Q_DECLARE_METATYPE(MythUIButtonListItem *)

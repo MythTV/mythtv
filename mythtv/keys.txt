@@ -118,6 +118,7 @@ Watching TV only:
 - Ctrl-Y Switch to the previous capture source
 - C      Change to the next available tuner card input
 - F7     Monitor signal quality on a card capable of signal monitoring
+- L      Toggle moving "bottom line" (Sports tickers, etc) off the screen. 
 
 LiveTV while not in Browse Mode:
 - Up/Down arrows  Change the channel.

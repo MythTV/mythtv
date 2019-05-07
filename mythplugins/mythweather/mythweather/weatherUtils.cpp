@@ -97,23 +97,23 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
         {
             if ( (e.tagName() == "screen") && !screens.contains(e.attribute("name")) )
             {
-                screens[e.attribute("name")].multiLoc = false;
-                screens[e.attribute("name")].name = e.attribute("name");
-                screens[e.attribute("name")].title =
+                screens[e.attribute("name")].m_multiLoc = false;
+                screens[e.attribute("name")].m_name = e.attribute("name");
+                screens[e.attribute("name")].m_title =
                                             getScreenTitle(e.attribute("name"));
                 QString hasUnits = e.attribute("hasunits");
                 if (hasUnits.toLower() == "no")
-                    screens[e.attribute("name")].hasUnits = false;
+                    screens[e.attribute("name")].m_hasUnits = false;
                 else
-                    screens[e.attribute("name")].hasUnits = true;
-                screens[e.attribute("name")].dataTypes = loadScreen(e);
+                    screens[e.attribute("name")].m_hasUnits = true;
+                screens[e.attribute("name")].m_dataTypes = loadScreen(e);
             }
         }
     }
     return true;
 }
 
-QStringList loadScreen(QDomElement ScreenListInfo)
+QStringList loadScreen(const QDomElement& ScreenListInfo)
 {
 
     QStringList typesList;

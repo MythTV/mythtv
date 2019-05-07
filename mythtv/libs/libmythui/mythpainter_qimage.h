@@ -17,44 +17,49 @@ class QPainter;
 class MUI_PUBLIC MythQImagePainter : public MythPainter
 {
   public:
-    MythQImagePainter();
+    MythQImagePainter() : MythPainter() {}
    ~MythQImagePainter();
 
-    virtual QString GetName(void)        { return QString("QImage"); }
-    virtual bool SupportsAnimation(void) { return false;             }
-    virtual bool SupportsAlpha(void)     { return true;              }
-    virtual bool SupportsClipping(void)  { return true;              }
+    QString GetName(void) override // MythPainter
+        { return QString("QImage"); }
+    bool SupportsAnimation(void) override // MythPainter
+        { return false; }
+    bool SupportsAlpha(void) override // MythPainter
+        { return true; }
+    bool SupportsClipping(void) override // MythPainter
+        { return true; }
 
-    virtual void Begin(QPaintDevice *parent);
-    virtual void End();
+    void Begin(QPaintDevice *parent) override; // MythPainter
+    void End() override; // MythPainter
 
-    virtual void SetClipRect(const QRect &clipRect);
-    virtual void SetClipRegion(const QRegion &region);
-    virtual void Clear(QPaintDevice *device, const QRegion &region);
+    void SetClipRect(const QRect &clipRect) override; // MythPainter
+    void SetClipRegion(const QRegion &region) override; // MythPainter
+    void Clear(QPaintDevice *device, const QRegion &region) override; // MythPainter
 
-    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                           int alpha);
-    virtual void DrawText(const QRect &dest, const QString &msg, int flags,
-                          const MythFontProperties &font, int alpha,
-                          const QRect &boundRect);
-    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
-                          const QPen &linePen, int alpha);
-    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
-                               const QBrush &fillBrush, const QPen &linePen,
-                               int alpha);
-    virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
-                             const QPen &linePen, int alpha);
+    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
+                   int alpha) override; // MythPainter
+    void DrawText(const QRect &r, const QString &msg, int flags,
+                  const MythFontProperties &font, int alpha,
+                  const QRect &boundRect) override; // MythPainter
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen, int alpha) override; // MythPainter
+    void DrawRoundRect(const QRect &area, int cornerRadius,
+                       const QBrush &fillBrush, const QPen &linePen,
+                       int alpha) override; // MythPainter
+    void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                     const QPen &linePen, int alpha) override; // MythPainter
 
   protected:
-    virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
-    virtual void DeleteFormatImagePriv(MythImage */*im*/) { }
+    MythImage* GetFormatImagePriv(void) override // MythPainter
+        { return new MythImage(this); }
+    void DeleteFormatImagePriv(MythImage */*im*/) override {} // MythPainter
 
     void CheckPaintMode(const QRect &area);
 
-    QPainter *painter;
-    QRegion   clipRegion;
-    QRegion   paintedRegion;
-    bool      copy;
+    QPainter *m_painter       {nullptr};
+    QRegion   m_clipRegion;
+    QRegion   m_paintedRegion;
+    bool      m_copy          {false};
 };
 
 #endif

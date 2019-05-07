@@ -12,8 +12,7 @@
 #define LOC QString("D3D9 Painter: ")
 
 MythD3D9Painter::MythD3D9Painter(MythRenderD3D9 *render) :
-    MythPainter(), m_render(render), m_target(nullptr),
-    m_swap_control(true)
+    MythPainter(), m_render(render)
 {
     if (m_render)
         m_render->IncrRef();

@@ -42,22 +42,22 @@ class PaneDVBUtilsImport : public GroupSetting
 
   public:
     PaneDVBUtilsImport() :
-        filename(new TransTextEditSetting()),
-        ignore_signal_timeout(new IgnoreSignalTimeout())
+        m_filename(new TransTextEditSetting()),
+        m_ignore_signal_timeout(new IgnoreSignalTimeout())
     {
-        filename->setLabel(tr("File location"));
-        filename->setHelpText(tr("Location of the channels.conf file."));
-        addChild(filename);
-        addChild(ignore_signal_timeout);
+        m_filename->setLabel(tr("File location"));
+        m_filename->setHelpText(tr("Location of the channels.conf file."));
+        addChild(m_filename);
+        addChild(m_ignore_signal_timeout);
     }
 
-    QString GetFilename(void)   const { return filename->getValue();    }
+    QString GetFilename(void)   const { return m_filename->getValue();    }
     bool DoIgnoreSignalTimeout(void) const
-        { return ignore_signal_timeout->getValue().toInt(); }
+        { return m_ignore_signal_timeout->getValue().toInt(); }
 
   private:
-    TransTextEditSetting    *filename;
-    IgnoreSignalTimeout     *ignore_signal_timeout;
+    TransTextEditSetting    *m_filename              {nullptr};
+    IgnoreSignalTimeout     *m_ignore_signal_timeout {nullptr};
 };
 
 #endif // _PANE_DVB_UTILS_IMPORT_H_

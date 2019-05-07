@@ -73,15 +73,7 @@ void SSDP::Shutdown()
 /////////////////////////////////////////////////////////////////////////////
 
 SSDP::SSDP() :
-    MThread                ("SSDP" ),
-    m_procReqLineExp       ("[ \r\n][ \r\n]*"),
-    m_nPort                ( SSDP_PORT ),
-    m_nSearchPort          ( SSDP_SEARCHPORT ),
-    m_nServicePort         ( 0 ),
-    m_pNotifyTask          ( nullptr ),
-    m_bAnnouncementsEnabled( false ),
-    m_bTermRequested       ( false ),
-    m_lock                 ( QMutex::NonRecursive )
+    MThread("SSDP")
 {
     LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 
@@ -274,7 +266,7 @@ void SSDP::run()
 
         FD_ZERO( &read_set );
 
-        for (uint nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
+        for (size_t nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
         {
             if (m_Sockets[nIdx] != nullptr && m_Sockets[nIdx]->socket() >= 0)
             {
@@ -351,7 +343,11 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
             didDoRead = true;
             if (ret < 0)
             {
-                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                if (errno == EAGAIN
+#if EAGAIN != EWOULDBLOCK
+                    || errno == EWOULDBLOCK
+#endif
+                    )
                 {
                     if (retries == 3)
                     {
@@ -394,7 +390,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         // ------------------------------------------------------------------
         QString     str          = QString(buffer.constData());
         QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);
-        QString     sRequestLine = lines.size() ? lines[0] : "";
+        QString     sRequestLine = !lines.empty() ? lines[0] : "";
 
         if (!lines.isEmpty())
             lines.pop_front();
@@ -484,13 +480,11 @@ SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 
     if ( sLine.startsWith( QString("HTTP/") ))
         return SSDP_MSearchResp;
-    else
+
+    if (tokens.count() > 0)
     {
-        if (tokens.count() > 0)
-        {
-            if (tokens[0] == "M-SEARCH" ) return SSDP_MSearch;
-            if (tokens[0] == "NOTIFY"   ) return SSDP_Notify;
-        }
+        if (tokens[0] == "M-SEARCH" ) return SSDP_MSearch;
+        if (tokens[0] == "NOTIFY"   ) return SSDP_Notify;
     }
 
     return SSDP_Unknown;
@@ -516,7 +510,7 @@ QString SSDP::GetHeaderValue( const QStringMap &headers,
 /////////////////////////////////////////////////////////////////////////////
 
 bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders, 
-                                 QHostAddress      peerAddress,
+                                 const QHostAddress& peerAddress,
                                  quint16           peerPort )
 {
     QString sMAN = GetHeaderValue( sHeaders, "MAN", "" );
@@ -548,7 +542,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     nMX = (nMX > 120) ? 120 : nMX;
 
-    int nNewMX = (int)(0 + ((unsigned short)random() % nMX)) * 1000;
+    int nNewMX = (0 + ((unsigned short)random() % nMX)) * 1000;
 
     // ----------------------------------------------------------------------
     // See what they are looking for...
@@ -780,7 +774,7 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 //                  
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
+void SSDPExtension::GetFile( HTTPRequest *pRequest, const QString& sFileName )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
 

@@ -26,9 +26,9 @@ class ChannelRecPriority : public MythScreenType
     explicit ChannelRecPriority(MythScreenStack *parent);
     ~ChannelRecPriority();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
     enum SortType
     {
@@ -43,10 +43,10 @@ class ChannelRecPriority : public MythScreenType
     void FillList(void);
     void SortList(void);
     void updateList(void);
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void upcoming(void);
     void changeRecPriority(int howMuch);
-    void applyChannelRecPriorityChange(QString, const QString&);
+    void applyChannelRecPriorityChange(const QString&, const QString&);
 
     void saveRecPriority(void);
 
@@ -54,21 +54,21 @@ class ChannelRecPriority : public MythScreenType
     QMap<QString, ChannelInfo*> m_sortedChannel;
     QMap<QString, QString> m_origRecPriorityData;
 
-    MythUIButtonList *m_channelList;
+    MythUIButtonList *m_channelList {nullptr};
 
-    MythUIText *m_chanstringText;
-    MythUIText *m_channameText;
-    MythUIText *m_channumText;
-    MythUIText *m_callsignText;
-    MythUIText *m_sourcenameText;
-    MythUIText *m_sourceidText;
-    MythUIText *m_priorityText;
+    MythUIText *m_chanstringText    {nullptr};
+    MythUIText *m_channameText      {nullptr};
+    MythUIText *m_channumText       {nullptr};
+    MythUIText *m_callsignText      {nullptr};
+    MythUIText *m_sourcenameText    {nullptr};
+    MythUIText *m_sourceidText      {nullptr};
+    MythUIText *m_priorityText      {nullptr};
 
-    MythUIImage *m_iconImage;
+    MythUIImage *m_iconImage        {nullptr};
 
-    SortType m_sortType;
+    SortType m_sortType             {byChannel};
 
-    ChannelInfo *m_currentItem;
+    ChannelInfo *m_currentItem      {nullptr};
 };
 
 #endif

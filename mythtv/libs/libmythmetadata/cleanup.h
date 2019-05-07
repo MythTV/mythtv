@@ -23,7 +23,7 @@ class META_PUBLIC CleanupHooks
   private:
     CleanupHooks();
     ~CleanupHooks();
-    class CleanupHooksImp *m_imp;
+    class CleanupHooksImp *m_imp {nullptr};
 };
 
 template <typename T>
@@ -40,13 +40,13 @@ class META_PUBLIC SimpleCleanup : public CleanupProc
         CleanupHooks::getInstance()->removeHook(this);
     }
 
-    void doClean()
+    void doClean() override // CleanupProc
     {
         m_inst->cleanup();
     }
 
   private:
-    T *m_inst;
+    T *m_inst {nullptr};
 };
 
 #endif // CLEANUP_H_

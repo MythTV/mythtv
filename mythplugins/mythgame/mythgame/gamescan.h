@@ -34,7 +34,7 @@ class GameScannerThread : public MThread
     explicit GameScannerThread(void);
     ~GameScannerThread() = default;
 
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
     void SetHandlers(QList<GameHandler*> handlers) { m_handlers = handlers; };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
@@ -61,9 +61,9 @@ class GameScannerThread : public MThread
     QList<uint> m_remove;
     QList<RomInfo*> m_dbgames;
 
-    MythUIProgressDialog *m_dialog;
+    MythUIProgressDialog *m_dialog        {nullptr};
 
-    bool m_DBDataChanged;
+    bool                  m_DBDataChanged {false};
 };
 
 class GameScanner : public QObject

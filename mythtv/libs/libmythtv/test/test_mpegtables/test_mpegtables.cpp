@@ -118,6 +118,7 @@ void TestMPEGTables::pat_test(void)
     ProgramAssociationTable* pat4 = new ProgramAssociationTable(PSIPTable((unsigned char*)&si_data4));
     QCOMPARE (pat4->CalcCRC(), (uint) 0xFFFFFFFF);
     QVERIFY (pat4->VerifyCRC());
+    delete pat4;
 }
 
 void TestMPEGTables::dvbdate(void)
@@ -263,13 +264,20 @@ void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
 void TestMPEGTables::ItemList_test (void)
 {
     ShortEventDescriptor descriptor(&eit_data_0000[26]);
-    QVERIFY  (descriptor.IsValid());
+    if (!descriptor.IsValid()) {
+        QFAIL("The eit_data_0000 descriptor is invalid");
+        return;
+    }
     QCOMPARE (descriptor.DescriptorTag(), (unsigned int) DescriptorID::short_event);
     QCOMPARE (descriptor.size(), (unsigned int) 194);
     QCOMPARE (descriptor.LanguageString(), QString("ger"));
     QVERIFY  (descriptor.Text().startsWith(QString("Krimiserie. ")));
 
     ExtendedEventDescriptor descriptor2(&eit_data_0000[26+descriptor.size()]);
+    if (!descriptor2.IsValid()) {
+        QFAIL("The eit_data_0000 descriptor2 is invalid");
+        return;
+    }
     QCOMPARE (descriptor2.DescriptorTag(), (unsigned int) DescriptorID::extended_event);
     /* tests for items start here */
     QCOMPARE (descriptor2.LengthOfItems(), (uint) 139);
@@ -298,7 +306,7 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
         0x55, 0x04, 0x47, 0x42, 0x52, 0x0B
     };
     ParentalRatingDescriptor desc(si_data);
-    QCOMPARE (desc.Count(), 1u);
+    QCOMPARE (desc.Count(), 1U);
     QCOMPARE (desc.CountryCodeString(0), QString("GBR"));
     QCOMPARE (desc.Rating(0), 14);
 }
@@ -306,7 +314,11 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
 void TestMPEGTables::ExtendedEventDescriptor_test (void)
 {
     ExtendedEventDescriptor desc(&eit_data_0000[16*13+12]);
-    QCOMPARE (desc.LengthOfItems(), 139u);
+    if (!desc.IsValid()) {
+        QFAIL("The eit_data_0000 descriptor is invalid");
+        return;
+    }
+    QCOMPARE (desc.LengthOfItems(), 139U);
     QMultiMap<QString,QString> items = desc.Items();
     QCOMPARE (items.count(), 5);
     QVERIFY (items.contains (QString ("Role Player")));
@@ -334,7 +346,7 @@ void TestMPEGTables::OTAChannelName_test (void)
 
     QCOMPARE (table.SectionLength(), (unsigned int)sizeof (tvct_data));
 
-    QCOMPARE (table.ChannelCount(), 1u);
+    QCOMPARE (table.ChannelCount(), 1U);
     QCOMPARE (table.ShortChannelName(0), QString("ABCDEF"));
     QCOMPARE (table.ShortChannelName(1), QString());
 
@@ -343,7 +355,7 @@ void TestMPEGTables::OTAChannelName_test (void)
     QVERIFY (tvct.VerifyCRC());
     QVERIFY (tvct.VerifyPSIP(false));
 
-    QCOMPARE (tvct.ChannelCount(), 6u);
+    QCOMPARE (tvct.ChannelCount(), 6U);
     /*
      * ShortChannelName is fixed width 7-8 characters.
      * A65/2013 says to fill trailing characters with \0

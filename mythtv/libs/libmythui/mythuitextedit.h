@@ -37,14 +37,14 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     MythUITextEdit(MythUIType *parent, const QString &name);
    ~MythUITextEdit() = default;
 
-    virtual void Pulse(void);
-    virtual bool keyPressEvent(QKeyEvent *);
-    bool gestureEvent(MythGestureEvent *);
-    virtual void Reset(void);
+    void Pulse(void) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *) override; // MythUIType
+    bool gestureEvent(MythGestureEvent *) override; // MythUIType
+    void Reset(void) override; // MythUIType
 
     void SetText(const QString &text, bool moveCursor = true);
     void InsertText(const QString &text);
-    QString GetText(void) const;
+    QString GetText(void) const { return m_Message; }
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
@@ -57,8 +57,8 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     PopupPosition GetKeyboardPosition(void)  { return m_keyboardPosition; }
 
     // StorageUser
-    void SetDBValue(const QString &text) { SetText(text); }
-    QString GetDBValue(void) const { return GetText(); }
+    void SetDBValue(const QString &text) override { SetText(text); } // StorageUser
+    QString GetDBValue(void) const override { return GetText(); } // StorageUser
 
   signals:
     void valueChanged();
@@ -68,11 +68,11 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void Deselect();
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void Init(void);
     void SetInitialStates(void);

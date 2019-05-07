@@ -3,6 +3,11 @@
 #include "openglvideo.h"
 #include "vaapicontext.h"
 #include "mythpainter.h"
+#ifdef USING_OPENGLES
+#include "mythrender_opengl2es.h"
+#include "mythmainwindow.h"
+#endif
+#include <QGuiApplication>
 
 #define LOC QString("VidOutGLVAAPI: ")
 #define ERR QString("VidOutGLVAAPI Error: ")
@@ -29,13 +34,13 @@ void VideoOutputOpenGLVAAPI::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()
-  : VideoOutputOpenGL(), m_ctx(nullptr), m_pauseBuffer(nullptr)
+  : m_ctx(nullptr), m_pauseBuffer(nullptr)
 {
 }
 
 VideoOutputOpenGLVAAPI::~VideoOutputOpenGLVAAPI()
 {
-    TearDown();
+    VideoOutputOpenGLVAAPI::TearDown();
 }
 
 void VideoOutputOpenGLVAAPI::TearDown(void)
@@ -222,12 +227,11 @@ bool VideoOutputOpenGLVAAPI::SetDeinterlacingEnabled(bool enable)
     return m_deinterlacing;
 }
 
-bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool interlaced,
-                                              const QString& /*overridefilter*/)
+bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool interlaced, const QString& overridefilter)
 {
-    //m_deintfiltername = !db_vdisp_profile ? "" :
-    //                     db_vdisp_profile->GetFilteredDeint(ovrf);
-    m_deinterlacing = interlaced;
+    if (db_vdisp_profile)
+        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+    m_deinterlacing = m_deintfiltername.contains("vaapi") ? interlaced : false;
     return m_deinterlacing;
 }
 
@@ -248,7 +252,7 @@ int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
     int val = newValue;
     if (codec_is_vaapi(video_codec_id) && m_ctx)
         val = m_ctx->SetPictureAttribute(attribute, newValue);
-    return VideoOutput::SetPictureAttribute(attribute, val);
+    return VideoOutputOpenGL::SetPictureAttribute(attribute, val);
 }
 
 void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
@@ -274,23 +278,21 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     vbuffers.end_lock();
 }
 
-void VideoOutputOpenGLVAAPI::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                          FilterChain *filterList,
-                                          const PIPMap &pipPlayers,
-                                          FrameScanType scan)
+void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd)
 {
-    QMutexLocker locker(&gl_context_lock);
-    VideoOutputOpenGL::ProcessFrame(frame, osd, filterList, pipPlayers, scan);
-
-    if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
     {
-        gl_context->makeCurrent();
-        m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
-                                    gl_videochain->GetInputTexture(),
-                                    gl_videochain->GetTextureType(), scan);
-        gl_videochain->SetInputUpdated();
-        gl_context->doneCurrent();
+        QMutexLocker locker(&gl_context_lock);
+        if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
+        {
+            gl_context->makeCurrent();
+            m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
+                                        gl_videochain->GetInputTexture(),
+                                        gl_videochain->GetTextureType(), scan);
+            gl_videochain->SetInputUpdated();
+            gl_context->doneCurrent();
+        }
     }
+    VideoOutputOpenGL::PrepareFrame(frame, scan, osd);
 }
 
 QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(
@@ -299,7 +301,7 @@ QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(
     (void) video_dim;
     QStringList list;
     if ((codec_is_std(myth_codec_id) || (codec_is_vaapi(myth_codec_id))) &&
-         !getenv("NO_VAAPI"))
+         !getenv("NO_VAAPI") && AllowVAAPIDisplay())
     {
         list += "openglvaapi";
     }
@@ -315,7 +317,7 @@ MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
     bool use_cpu = no_acceleration;
     AVPixelFormat fmt = AV_PIX_FMT_YUV420P;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VAAPI + (stream_type - 1));
-    if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI"))
+    if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI") && AllowVAAPIDisplay())
         use_cpu |= !VAAPIContext::IsFormatAccelerated(size, test_cid, fmt);
     else
         use_cpu = true;
@@ -325,4 +327,31 @@ MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
 
     pix_fmt = fmt;
     return test_cid;
+}
+
+// We currently (v30) only support rendering to a GLX surface.
+// Disallow OpenGL ES (crashes hard) and EGL (fails to initialise) with Intel.
+// This needs extending when EGL etc support is added and also generalising
+// for other video output classes.
+bool VideoOutputOpenGLVAAPI::AllowVAAPIDisplay()
+{
+    if (qApp->platformName().contains("egl", Qt::CaseInsensitive))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI display with EGL");
+        return false;
+    }
+
+#ifdef USING_OPENGLES
+    MythMainWindow* win = MythMainWindow::getMainWindow();
+    if (win)
+    {
+        MythRender *render = win->GetRenderDevice();
+        if (static_cast<MythRenderOpenGL2ES*>(render))
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI display with OpenGLES");
+            return false;
+        }
+    }
+#endif
+    return true;
 }

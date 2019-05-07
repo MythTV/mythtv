@@ -22,20 +22,20 @@ class MUI_PUBLIC MythUIVideo : public MythUIType
 
     QColor GetBackgroundColor(void) { return m_backgroundColor; }
 
-    void Reset(void);
-    virtual void Pulse(void);
+    void Reset(void) override; // MythUIType
+    void Pulse(void) override; // MythUIType
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
 
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
-    MythImage     *m_image;
-    QColor         m_backgroundColor;
+    MythImage     *m_image           {nullptr};
+    QColor         m_backgroundColor {Qt::black};
 };
 
 #endif

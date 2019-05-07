@@ -54,7 +54,7 @@ class MultiplexID : public AutoIncrementSetting
     QString GetColumnName(void) const { return m_column; }
 };
 
-static QString pp_modulation(QString mod)
+static QString pp_modulation(const QString& mod)
 {
     if (mod.endsWith("vsb"))
         return mod.left(mod.length() - 3) + "-VSB";
@@ -87,11 +87,8 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         MythDB::DBError("TransportWizard()", query);
         return CardUtil::ERROR_PROBE;
     }
-    else
-    {
-        while (query.next())
-            cardids.push_back(query.value(0).toUInt());
-    }
+    while (query.next())
+        cardids.push_back(query.value(0).toUInt());
 
     if (cardids.empty())
     {
@@ -133,7 +130,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
     if (cardtypes.empty())
         return CardUtil::ERROR_PROBE;
 
-    for (uint i = 1; i < cardtypes.size(); i++)
+    for (size_t i = 1; i < cardtypes.size(); i++)
     {
         CardUtil::INPUT_TYPES typeA = cardtypes[i - 1];
         typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;
@@ -183,7 +180,7 @@ void TransportListEditor::SetSourceID(uint _sourceid)
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString(), false)), isLoading(false)
+    m_videosource(new VideoSourceSelector(sourceid, QString(), false))
 {
     setLabel(tr("Multiplex Editor"));
 
@@ -202,7 +199,7 @@ TransportListEditor::TransportListEditor(uint sourceid) :
 
 void TransportListEditor::SetSourceID(const QString& sourceid)
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
     SetSourceID(sourceid.toUInt());
     Load();
@@ -210,9 +207,9 @@ void TransportListEditor::SetSourceID(const QString& sourceid)
 
 void TransportListEditor::Load()
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
-    isLoading = true;
+    m_isLoading = true;
     if (m_sourceid)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -229,7 +226,7 @@ void TransportListEditor::Load()
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("TransportList::fillSelections", query);
-            isLoading = false;
+            m_isLoading = false;
             return;
         }
 
@@ -263,6 +260,8 @@ void TransportListEditor::Load()
                 type = "(DVB-S)";
             if (CardUtil::QAM == m_cardtype)
                 type = "(DVB-C)";
+            if (CardUtil::DVBS2 == m_cardtype)
+                type = "(DVB-S2)";
 
             QString txt = QString("%1 %2 %3 %4 %5 %6 %7")
                 .arg(mod).arg(query.value(2).toString())
@@ -281,7 +280,7 @@ void TransportListEditor::Load()
     }
 
     GroupSetting::Load();
-    isLoading = false;
+    m_isLoading = false;
 }
 
 void TransportListEditor::NewTransport()
@@ -297,7 +296,7 @@ void TransportListEditor::NewTransport()
 
 void TransportListEditor::Delete(TransportSetting *transport)
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
 
     ShowOkPopup(
@@ -340,7 +339,7 @@ void TransportListEditor::Delete(TransportSetting *transport)
 
 void TransportListEditor::Menu(TransportSetting *transport)
 {
-    if (isLoading)
+    if (m_isLoading)
         return;
 
     MythMenu *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
@@ -361,13 +360,13 @@ void TransportListEditor::Menu(TransportSetting *transport)
 class MuxDBStorage : public SimpleDBStorage
 {
   protected:
-    MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, QString _name) :
+    MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, const QString& _name) :
         SimpleDBStorage(_setting, "dtv_multiplex", _name), mplexid(_id)
     {
     }
 
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const MultiplexID *mplexid;
 };
@@ -388,7 +387,7 @@ QString MuxDBStorage::GetSetClause(MSqlBindings &bindings) const
     QString nameTag = ":SET" + GetColumnName().toUpper();
 
     bindings.insert(muxTag,  mplexid->getValue());
-    bindings.insert(nameTag, user->GetDBValue());
+    bindings.insert(nameTag, m_user->GetDBValue());
 
     // return query
     return (mplexid->GetColumnName() + " = " + muxTag + ", " +
@@ -405,8 +404,8 @@ class VideoSourceID : public StandardSetting, public MuxDBStorage
         setVisible(false);
         setValue(_sourceid);
     }
-    virtual void edit(MythScreenType * /*screen*/) { }
-    virtual void resultEdit(DialogCompletionEvent * /*dce*/) { }
+    void edit(MythScreenType * /*screen*/) override { } // StandardSetting
+    void resultEdit(DialogCompletionEvent * /*dce*/) override { } // StandardSetting
 };
 
 class DTVStandard : public MythUIComboBoxSetting, public MuxDBStorage

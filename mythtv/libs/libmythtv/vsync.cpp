@@ -54,15 +54,15 @@ using namespace std;
 #include "vsync.h"
 
 bool tryingVideoSync = false;
-int VideoSync::m_forceskip = 0;
+int VideoSync::s_forceskip = 0;
 
 #define TESTVIDEOSYNC(NAME) \
-    do { if (++m_forceskip > skip) \
+    do { if (++s_forceskip > skip) \
     { \
         trial = new NAME (video_output, refresh_interval); \
         if (trial->TryInit()) \
         { \
-            m_forceskip = skip; \
+            s_forceskip = skip; \
             tryingVideoSync = false; \
             return trial; \
         } \
@@ -80,16 +80,16 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     VideoSync *trial = nullptr;
     tryingVideoSync  = true;
 
-    // m_forceskip allows for skipping one sync method
+    // s_forceskip allows for skipping one sync method
     // due to crash on the previous run.
     int skip = 0;
-    if (m_forceskip)
+    if (s_forceskip)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("A previous trial crashed, skipping %1").arg(m_forceskip));
+            QString("A previous trial crashed, skipping %1").arg(s_forceskip));
 
-        skip = m_forceskip;
-        m_forceskip = 0;
+        skip = s_forceskip;
+        s_forceskip = 0;
     }
 
 #ifdef USING_VDPAU
@@ -113,8 +113,7 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
  *         video synchronization method.
  */
 VideoSync::VideoSync(VideoOutput *video_output, int refreshint) :
-    m_video_output(video_output), m_refresh_interval(refreshint),
-    m_nexttrigger(0), m_delay(-1)
+    m_video_output(video_output), m_refresh_interval(refreshint)
 {
 }
 
@@ -212,10 +211,10 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
     return ret;
 }
 
-const char *DRMVideoSync::sm_dri_dev = "/dev/dri/card0";
+const char *DRMVideoSync::s_dri_dev = "/dev/dri/card0";
 
-DRMVideoSync::DRMVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
+DRMVideoSync::DRMVideoSync(VideoOutput *vo, int refresh_interval) :
+    VideoSync(vo, refresh_interval)
 {
     m_dri_fd = -1;
 }
@@ -231,12 +230,12 @@ bool DRMVideoSync::TryInit(void)
 {
     drm_wait_vblank_t blank;
 
-    m_dri_fd = open(sm_dri_dev, O_RDWR);
+    m_dri_fd = open(s_dri_dev, O_RDWR);
     if (m_dri_fd < 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DRMVideoSync: Could not open device %1, %2")
-                .arg(sm_dri_dev).arg(strerror(errno)));
+                .arg(s_dri_dev).arg(strerror(errno)));
         return false; // couldn't open device
     }
 
@@ -309,8 +308,8 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 
 #ifdef __linux__
 #define RTCRATE 1024
-RTCVideoSync::RTCVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
+RTCVideoSync::RTCVideoSync(VideoOutput *vo, int refresh_interval) :
+    VideoSync(vo, refresh_interval)
 {
     m_rtcfd = -1;
 }
@@ -368,18 +367,6 @@ int RTCVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 }
 #endif /* __linux__ */
 
-BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
-{
-    m_cheat = 5000;
-    m_fudge = 0;
-}
-
-bool BusyWaitVideoSync::TryInit(void)
-{
-    return true;
-}
-
 int BusyWaitVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 {
     // Offset for externally-provided A/V sync delay
@@ -410,16 +397,6 @@ int BusyWaitVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
             m_cheat -= 200;
     }
     return 0;
-}
-
-USleepVideoSync::USleepVideoSync(VideoOutput *vo, int ri) :
-    VideoSync(vo, ri)
-{
-}
-
-bool USleepVideoSync::TryInit(void)
-{
-    return true;
 }
 
 int USleepVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)

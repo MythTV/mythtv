@@ -16,7 +16,7 @@ enum DigestUserActions {
 class MBASE_PUBLIC MythUserSession
 {
   public :
-    MythUserSession() : m_userId(0) {}
+    MythUserSession() = default;
    ~MythUserSession() { m_sessionToken.fill('0'); m_sessionToken.clear(); }
 
     /**
@@ -67,7 +67,7 @@ class MBASE_PUBLIC MythUserSession
      */
     bool Update(void);
 
-    uint    m_userId;
+    uint    m_userId {0};
     QString m_name;
 
     QString m_sessionToken;
@@ -128,7 +128,7 @@ class MBASE_PUBLIC MythSessionManager
      *
      * The username should be checked for validity first
      */
-    const QString GetPasswordDigest(const QString &username);
+    QString GetPasswordDigest(const QString &username);
 
     /**
      * \brief Login user by digest

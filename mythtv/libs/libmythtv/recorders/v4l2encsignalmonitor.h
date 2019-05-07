@@ -20,32 +20,32 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
                          bool _release_stream, uint64_t _flags = 0);
     virtual ~V4L2encSignalMonitor();
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
   protected:
     V4L2encSignalMonitor(void);
     V4L2encSignalMonitor(const V4L2encSignalMonitor &);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     V4LChannel *GetV4L2encChannel(void)
-        { return dynamic_cast<V4LChannel*>(channel); }
+        { return dynamic_cast<V4LChannel*>(m_channel); }
 
     bool HasLock(void);
     int  StableResolution(void);
 
   protected:
-    V4L2util           m_v4l2;
-    V4L2encStreamHandler *m_stream_handler;
-    bool               m_isTS;
+    V4L2util              m_v4l2;
+    V4L2encStreamHandler *m_stream_handler {nullptr};
+    bool                  m_isTS           {false};
 
   private:
-    int      m_strength;
-    int      m_stable_time;
-    int      m_width;
-    int      m_height;
-    uint     m_lock_cnt;
-    MythTimer m_timer;
-    QDateTime m_status_time;
+    int                   m_strength       {0};
+    int                   m_stable_time    {1500};
+    int                   m_width          {0};
+    int                   m_height         {0};
+    uint                  m_lock_cnt       {0};
+    MythTimer             m_timer;
+    QDateTime             m_status_time;
 };
 
 #endif // V4L2encSIGNALMONITOR_H

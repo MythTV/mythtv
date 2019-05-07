@@ -206,7 +206,7 @@ static bool isRunning(const char *program)
     return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
-static QDateTime getDailyWakeupTime(QString sPeriod)
+static QDateTime getDailyWakeupTime(const QString& sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime, "hh:mm");
@@ -872,7 +872,7 @@ int main(int argc, char **argv)
     else if (cmdline.toBool("unlock"))
         res = unlockShutdown();
     else if (cmdline.toBool("check"))
-        res = checkOKShutdown((bool)(cmdline.toInt("check") == 1));
+        res = checkOKShutdown(cmdline.toInt("check") == 1);
     else if (cmdline.toBool("setschedwakeup"))
         res = setScheduledWakeupTime();
     else if (cmdline.toBool("startup"))
@@ -880,7 +880,7 @@ int main(int argc, char **argv)
     else if (cmdline.toBool("shutdown"))
         res = shutdown();
     else if (cmdline.toBool("status"))
-        res = getStatus((bool)(cmdline.toInt("status") == 1));
+        res = getStatus(cmdline.toInt("status") == 1);
     else if (cmdline.toBool("setwakeup"))
     {
         // only one of --utc or --localtime can be passed per
@@ -912,7 +912,7 @@ int main(int argc, char **argv)
         if (res == 0)
         {
              // Nothing to stop a shutdown (eg. recording in progress).
-             res = setScheduledWakeupTime();
+             setScheduledWakeupTime();
              res = shutdown();
         }
 

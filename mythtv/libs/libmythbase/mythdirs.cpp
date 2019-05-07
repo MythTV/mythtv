@@ -204,17 +204,17 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_NOTICE, QString("Using configuration directory = %1")
                                    .arg(confdir));
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "appbindir         = "+ appbindir        ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "sharedir          = "+ sharedir         ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "libdir            = "+ libdir           ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "themedir          = "+ themedir         ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "pluginsdir        = "+ pluginsdir       ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "translationsdir   = "+ translationsdir  ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "filtersdir        = "+ filtersdir       ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "cachedir          = "+ cachedir         ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "remotecachedir    = "+ remotecachedir   ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "themebasecachedir = "+ themebasecachedir));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "thumbnaildir      = "+ thumbnaildir));
+    LOG(VB_GENERAL, LOG_DEBUG, "appbindir         = "+ appbindir        );
+    LOG(VB_GENERAL, LOG_DEBUG, "sharedir          = "+ sharedir         );
+    LOG(VB_GENERAL, LOG_DEBUG, "libdir            = "+ libdir           );
+    LOG(VB_GENERAL, LOG_DEBUG, "themedir          = "+ themedir         );
+    LOG(VB_GENERAL, LOG_DEBUG, "pluginsdir        = "+ pluginsdir       );
+    LOG(VB_GENERAL, LOG_DEBUG, "translationsdir   = "+ translationsdir  );
+    LOG(VB_GENERAL, LOG_DEBUG, "filtersdir        = "+ filtersdir       );
+    LOG(VB_GENERAL, LOG_DEBUG, "cachedir          = "+ cachedir         );
+    LOG(VB_GENERAL, LOG_DEBUG, "remotecachedir    = "+ remotecachedir   );
+    LOG(VB_GENERAL, LOG_DEBUG, "themebasecachedir = "+ themebasecachedir);
+    LOG(VB_GENERAL, LOG_DEBUG, "thumbnaildir      = "+ thumbnaildir);
 }
 
 QString GetInstallPrefix(void) { return installprefix; }

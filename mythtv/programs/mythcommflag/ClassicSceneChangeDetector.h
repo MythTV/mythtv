@@ -13,18 +13,18 @@ class ClassicSceneChangeDetector : public SceneChangeDetectorBase
         unsigned int yspacing);
     virtual void deleteLater(void);
 
-    void processFrame(VideoFrame* frame);
+    void processFrame(VideoFrame* frame) override; // SceneChangeDetectorBase
 
   private:
     ~ClassicSceneChangeDetector() = default;
 
   private:
-    Histogram* histogram;
-    Histogram* previousHistogram;
-    unsigned int frameNumber;
-    bool previousFrameWasSceneChange;
-    unsigned int xspacing, yspacing;
-    unsigned int commdetectborder;
+    Histogram    *m_histogram                   {nullptr};
+    Histogram    *m_previousHistogram           {nullptr};
+    unsigned int  m_frameNumber                 {0};
+    bool          m_previousFrameWasSceneChange {false};
+    unsigned int  m_xspacing, m_yspacing;
+    unsigned int  m_commdetectborder;
 };
 
 #endif

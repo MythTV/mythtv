@@ -77,7 +77,7 @@ void CheckedSet(MythUIImage *uiItem, const QString &filename)
     }
 }
 
-QStringList GetVideoDirsByHost(QString host)
+QStringList GetVideoDirsByHost(const QString& host)
 {
     QStringList tmp;
 

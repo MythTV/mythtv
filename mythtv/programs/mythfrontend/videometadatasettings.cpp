@@ -15,15 +15,6 @@ using namespace std;
 
 // ---------------------------------------------------
 
-MetadataSettings::MetadataSettings(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name),
-      m_trailerSpin(nullptr),
-      m_unknownFileCheck(nullptr),         m_autoMetaUpdateCheck(nullptr),
-      m_treeLoadsMetaCheck(nullptr),       m_randomTrailerCheck(nullptr),
-      m_okButton(nullptr),                 m_cancelButton(nullptr)
-{
-}
-
 bool MetadataSettings::Create()
 {
     // Load the theme for this screen
@@ -158,5 +149,5 @@ void MetadataSettings::toggleTrailers()
     if (m_randomTrailerCheck->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
 
-    m_trailerSpin->SetVisible(checkstate);
+    m_trailerSpin->SetVisible(checkstate != 0);
 }

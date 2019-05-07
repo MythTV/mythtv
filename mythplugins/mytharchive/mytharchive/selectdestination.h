@@ -23,11 +23,11 @@ class SelectDestination : public MythScreenType
   Q_OBJECT
 
   public:
-    SelectDestination(MythScreenStack *parent, bool nativeMode, QString name);
+    SelectDestination(MythScreenStack *parent, bool nativeMode, const QString& name);
     ~SelectDestination(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   public slots:
 
@@ -38,7 +38,7 @@ class SelectDestination : public MythScreenType
     void handleFind(void);
     void filenameEditLostFocus(void);
     void setDestination(MythUIButtonListItem *item);
-    void fileFinderClosed(QString filename);
+    void fileFinderClosed(const QString& filename);
 
   private:
     void loadConfiguration(void);
@@ -47,26 +47,26 @@ class SelectDestination : public MythScreenType
     bool               m_nativeMode;
 
     ArchiveDestination m_archiveDestination;
-    int                m_freeSpace;
+    int                m_freeSpace           {0};
 
-    MythUIButton      *m_nextButton;
-    MythUIButton      *m_prevButton;
-    MythUIButton      *m_cancelButton;
+    MythUIButton      *m_nextButton          {nullptr};
+    MythUIButton      *m_prevButton          {nullptr};
+    MythUIButton      *m_cancelButton        {nullptr};
 
-    MythUIButtonList  *m_destinationSelector;
-    MythUIText        *m_destinationText;
+    MythUIButtonList  *m_destinationSelector {nullptr};
+    MythUIText        *m_destinationText     {nullptr};
 
-    MythUIText        *m_freespaceText;
+    MythUIText        *m_freespaceText       {nullptr};
 
-    MythUITextEdit    *m_filenameEdit;
-    MythUIButton      *m_findButton;
+    MythUITextEdit    *m_filenameEdit        {nullptr};
+    MythUIButton      *m_findButton          {nullptr};
 
-    MythUICheckBox    *m_createISOCheck;
-    MythUICheckBox    *m_doBurnCheck;
-    MythUICheckBox    *m_eraseDvdRwCheck;
-    MythUIText        *m_createISOText;
-    MythUIText        *m_doBurnText;
-    MythUIText        *m_eraseDvdRwText;
+    MythUICheckBox    *m_createISOCheck      {nullptr};
+    MythUICheckBox    *m_doBurnCheck         {nullptr};
+    MythUICheckBox    *m_eraseDvdRwCheck     {nullptr};
+    MythUIText        *m_createISOText       {nullptr};
+    MythUIText        *m_doBurnText          {nullptr};
+    MythUIText        *m_eraseDvdRwText      {nullptr};
 };
 
 #endif

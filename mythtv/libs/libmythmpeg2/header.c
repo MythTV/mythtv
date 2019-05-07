@@ -360,7 +360,8 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 	{352, 480}, /* 525 lines, 6.75 MHz (D2, 1/2 D1, CVD, DVD) */
 	{352, 240}  /* 525  lines. 6.75 MHz, 1 field (D4, VCD, DSS, DVD) */
     };
-    unsigned int width, height, pix_width, pix_height, i, DAR_16_9;
+    unsigned int width, height, pix_width, pix_height, DAR_16_9;
+    size_t i;
 
     *pixel_width = sequence->pixel_width;
     *pixel_height = sequence->pixel_height;
@@ -411,7 +412,7 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 static void copy_matrix (mpeg2dec_t * mpeg2dec, int index)
 {
     if (memcmp (mpeg2dec->quantizer_matrix[index],
-		mpeg2dec->new_quantizer_matrix[index], 64)) {
+		mpeg2dec->new_quantizer_matrix[index], 64) != 0) {
 	memcpy (mpeg2dec->quantizer_matrix[index],
 		mpeg2dec->new_quantizer_matrix[index], 64);
 	mpeg2dec->scaled[index] = -1;
@@ -427,8 +428,8 @@ static void finalize_matrix (mpeg2dec_t * mpeg2dec)
 	if (mpeg2dec->copy_matrix & (1 << i))
 	    copy_matrix (mpeg2dec, i);
 	if ((mpeg2dec->copy_matrix & (4 << i)) &&
-	    memcmp (mpeg2dec->quantizer_matrix[i],
-		    mpeg2dec->new_quantizer_matrix[i+2], 64)) {
+	    (memcmp (mpeg2dec->quantizer_matrix[i],
+                     mpeg2dec->new_quantizer_matrix[i+2], 64) != 0)) {
 	    copy_matrix (mpeg2dec, i + 2);
 	    decoder->chroma_quantizer[i] = decoder->quantizer_prescale[i+2];
 	} else if (mpeg2dec->copy_matrix & (5 << i))

@@ -5,6 +5,6 @@ class MythMetadataLookupCommandLineParser : public MythCommandLineParser
 {
   public:
     MythMetadataLookupCommandLineParser();
-    void LoadArguments(void);
+    void LoadArguments(void) override; // MythCommandLineParser
 };
 

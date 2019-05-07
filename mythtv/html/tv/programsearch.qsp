@@ -76,7 +76,7 @@ import "/tv/js/tvutil.qjs"
     var Count = 30;
     var Details = 1;
     var progLoadTimeStart = new Date();
-    var Channels = channel.GetChannelInfoList(0,0,0,1).ChannelInfos;
+    var Channels = channel.GetChannelInfoList(0,0,0,0,1).ChannelInfos;
     var programList = Array();
     var programs = Array();
 

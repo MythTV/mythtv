@@ -8,15 +8,15 @@
 MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device)
   : MythRenderOpenGL(format, device, kRenderOpenGL1)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL1::ResetVars();
+    MythRenderOpenGL1::ResetProcs();
 }
 
 MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format)
   : MythRenderOpenGL(format, kRenderOpenGL1)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL1::ResetVars();
+    MythRenderOpenGL1::ResetProcs();
 }
 
 MythRenderOpenGL1::~MythRenderOpenGL1()
@@ -24,7 +24,7 @@ MythRenderOpenGL1::~MythRenderOpenGL1()
     if (!isValid())
         return;
     makeCurrent();
-    DeleteOpenGLResources();
+    MythRenderOpenGL1::DeleteOpenGLResources();
     doneCurrent();
 }
 
@@ -34,7 +34,7 @@ void MythRenderOpenGL1::Init2DState(void)
     glDisable(GL_POLYGON_SMOOTH);
     glDisable(GL_LINE_SMOOTH);
     glDisable(GL_POINT_SMOOTH);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+    glColor4f(0.0F, 0.0F, 0.0F, 0.0F);
     MythRenderOpenGL::Init2DState();
 }
 
@@ -236,55 +236,10 @@ void MythRenderOpenGL1::SetShaderParams(uint obj, const QMatrix4x4 &m,
     doneCurrent();
 }
 
-uint MythRenderOpenGL1::CreateHelperTexture(void)
-{
-    if (!m_glTexImage1D)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "glTexImage1D not available.");
-        return 0;
-    }
-
-    makeCurrent();
-
-    uint width = m_max_tex_size;
-    uint tmp_tex = CreateTexture(QSize(width, 1), false,
-                                 GL_TEXTURE_1D, GL_FLOAT, GL_RGBA,
-                                 GL_RGBA16, GL_NEAREST, GL_REPEAT);
-
-    if (!tmp_tex)
-    {
-        DeleteTexture(tmp_tex);
-        return 0;
-    }
-
-    float *buf = nullptr;
-    buf = new float[m_textures[tmp_tex].m_data_size];
-    float *ref = buf;
-
-    for (uint i = 0; i < width; i++)
-    {
-        float x = (((float)i) + 0.5f) / (float)width;
-        StoreBicubicWeights(x, ref);
-        ref += 4;
-    }
-    StoreBicubicWeights(0, buf);
-    StoreBicubicWeights(1, &buf[(width - 1) << 2]);
-
-    EnableTextures(tmp_tex);
-    glBindTexture(m_textures[tmp_tex].m_type, tmp_tex);
-    m_glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA16, width, 0, GL_RGBA, GL_FLOAT, buf);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Created bicubic helper texture (%1 samples)") .arg(width));
-    delete [] buf;
-    doneCurrent();
-    return tmp_tex;
-}
-
 void MythRenderOpenGL1::DeleteOpenGLResources(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
-    DeleteShaders();
+    MythRenderOpenGL1::DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();
 }
 
@@ -303,8 +258,8 @@ void MythRenderOpenGL1::PushTransformation(const UIEffects &fx, QPointF &center)
     makeCurrent();
     glPushMatrix();
     glTranslatef(center.x(), center.y(), 0.0);
-    glScalef(fx.hzoom, fx.vzoom, 1.0);
-    glRotatef(fx.angle, 0, 0, 1);
+    glScalef(fx.m_hzoom, fx.m_vzoom, 1.0);
+    glRotatef(fx.m_angle, 0, 0, 1);
     glTranslatef(-center.x(), -center.y(), 0.0);
     doneCurrent();
 }
@@ -398,8 +353,8 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 
     if (fillBrush.style() != Qt::NoBrush)
     {
-        int a = 255 * (((float)alpha / 255.0f) *
-                       ((float)fillBrush.color().alpha() / 255.0f));
+        int a = 255 * (((float)alpha / 255.0F) *
+                       ((float)fillBrush.color().alpha() / 255.0F));
         SetColor(fillBrush.color().red(), fillBrush.color().green(),
                  fillBrush.color().blue(), a);
         GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, r);
@@ -409,8 +364,8 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 
     if (linePen.style() != Qt::NoPen)
     {
-        int a = 255 * (((float)alpha / 255.0f) *
-                       ((float)linePen.color().alpha() / 255.0f));
+        int a = 255 * (((float)alpha / 255.0F) *
+                       ((float)linePen.color().alpha() / 255.0F));
         SetColor(linePen.color().red(), linePen.color().green(),
                  linePen.color().blue(), a);
         // glLineWidth() requires its argument to be at least 1.

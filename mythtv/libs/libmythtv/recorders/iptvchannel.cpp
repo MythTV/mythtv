@@ -22,8 +22,7 @@
 #define LOC QString("IPTVChan[%1]: ").arg(m_inputid)
 
 IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
-    DTVChannel(rec), m_firsttune(true), m_stream_handler(nullptr),
-    m_stream_data(nullptr), m_videodev(videodev)
+    DTVChannel(rec), m_videodev(videodev)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
@@ -31,7 +30,7 @@ IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
 IPTVChannel::~IPTVChannel()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Close();
+    IPTVChannel::Close();
 }
 
 bool IPTVChannel::Open(void)
@@ -100,17 +99,17 @@ void IPTVChannel::OpenStreamHandler(void)
     if (m_last_tuning.IsHLS())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating HLSStreamHandler");
-        m_stream_handler = HLSStreamHandler::Get(m_last_tuning);
+        m_stream_handler = HLSStreamHandler::Get(m_last_tuning, GetInputID());
     }
     else if (m_last_tuning.IsHTTPTS())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating HTTPTSStreamHandler");
-        m_stream_handler = HTTPTSStreamHandler::Get(m_last_tuning);
+        m_stream_handler = HTTPTSStreamHandler::Get(m_last_tuning, GetInputID());
     }
     else
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating IPTVStreamHandler");
-        m_stream_handler = IPTVStreamHandler::Get(m_last_tuning);
+        m_stream_handler = IPTVStreamHandler::Get(m_last_tuning, GetInputID());
     }
 }
 
@@ -133,17 +132,17 @@ void IPTVChannel::CloseStreamHandler(void)
 
         if (hsh)
         {
-            HLSStreamHandler::Return(hsh);
+            HLSStreamHandler::Return(hsh, GetInputID());
             m_stream_handler = hsh;
         }
         else if (httpsh)
         {
-            HTTPTSStreamHandler::Return(httpsh);
+            HTTPTSStreamHandler::Return(httpsh, GetInputID());
             m_stream_handler = httpsh;
         }
         else
         {
-            IPTVStreamHandler::Return(m_stream_handler);
+            IPTVStreamHandler::Return(m_stream_handler, GetInputID());
         }
     }
 }

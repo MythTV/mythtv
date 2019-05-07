@@ -30,7 +30,6 @@
 #ifndef _MISC_SETTINGS_H_
 #define _MISC_SETTINGS_H_
 
-#include "settings.h"
 #include "standardsettings.h"
 #include "channelscantypes.h"
 
@@ -118,6 +117,22 @@ class FreeToAirOnly : public TransMythUICheckBoxSetting
             QObject::tr(
                 "If set, only non-encrypted channels will be "
                 "added during the scan."));
+    };
+};
+
+class ChannelNumbersOnly : public TransMythUICheckBoxSetting
+{
+  public:
+    ChannelNumbersOnly()
+    {
+        setValue(false);
+        setLabel(QObject::tr("Logical Channel Numbers required"));
+        setHelpText(
+            QObject::tr(
+                "If set, only services with a Logical Channel Number will "
+                "be added during the scan. This will filter out services "
+                "for set-top-box firmware download and video-on-demand "
+                "that can be present on DVB-C networks."));
     };
 };
 

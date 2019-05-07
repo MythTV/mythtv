@@ -16,43 +16,43 @@ public:
     explicit AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
-    AudioOutputSettings* GetOutputSettings(bool digital);
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
     static QMap<QString, QString> *GetDevices(const char *type = nullptr);
 
-    virtual int64_t GetAudiotime(void);
+    int64_t GetAudiotime(void) override; // AudioOutputBase
 
     // callback for delivering audio to output device
     bool RenderAudio(unsigned char *aubuf, int size,
                      unsigned long long timestamp);
 
     // Volume control
-    virtual int  GetVolumeChannel(int channel) const;
-    virtual void SetVolumeChannel(int channel, int volume);
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
     // TODO: convert these to macros!
-    void Debug(QString msg)
+    void Debug(const QString& msg)
     {   LOG(VB_AUDIO, LOG_INFO,     "AudioOutputCA::" + msg);   }
 
-    void Error(QString msg)
+    void Error(const QString& msg)
     {   LOG(VB_GENERAL, LOG_ERR, "AudioOutputCA Error: " + msg);   }
 
-    void Warn(QString msg)
+    void Warn(const QString& msg)
     {   LOG(VB_GENERAL, LOG_WARNING, "AudioOutputCA Warning: " + msg);   }
 
 protected:
 
     // You need to implement the following functions
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     
-    virtual bool StartOutputThread(void) { return true; }
-    virtual void StopOutputThread(void) {}
+    bool StartOutputThread(void) override { return true; } // AudioOutputBase
+    void StopOutputThread(void) override {} // AudioOutputBase
 
 private:
 
-    CoreAudioData * d;
+    CoreAudioData * d {nullptr};
     friend class    CoreAudioData;
 
     int             bufferedBytes;

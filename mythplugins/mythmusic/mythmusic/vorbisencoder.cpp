@@ -32,15 +32,13 @@ static int write_page(ogg_page *page, FILE *fp)
 
 VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
                              MusicMetadata *metadata) :
-    Encoder(outfile, qualitylevel, metadata),
-    packetsdone(0),
-    bytes_written(0L)
+    Encoder(outfile, qualitylevel, metadata)
 {
-    vorbis_comment_init(&vc);
+    vorbis_comment_init(&m_vc);
 
-    vorbis_info_init(&vi);
+    vorbis_info_init(&m_vi);
 
-    ogg_packet_clear(&op);
+    ogg_packet_clear(&m_op);
 
     float quality = 1.0;
     if (qualitylevel == 0)
@@ -48,40 +46,40 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     if (qualitylevel == 1)
         quality = 0.7;
   
-    int ret = vorbis_encode_setup_vbr(&vi, 2, 44100, quality);
+    int ret = vorbis_encode_setup_vbr(&m_vi, 2, 44100, quality);
     if (ret)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error initializing VORBIS encoder."
                                     " Got return code: %1").arg(ret));
-        vorbis_info_clear(&vi);
+        vorbis_info_clear(&m_vi);
         return;
     }
 
-    vorbis_encode_ctl(&vi, OV_ECTL_RATEMANAGE_SET, nullptr);
-    vorbis_encode_setup_init(&vi);
-    vorbis_analysis_init(&vd, &vi);
-    vorbis_block_init(&vd, &vb);
+    vorbis_encode_ctl(&m_vi, OV_ECTL_RATEMANAGE_SET, nullptr);
+    vorbis_encode_setup_init(&m_vi);
+    vorbis_analysis_init(&m_vd, &m_vi);
+    vorbis_block_init(&m_vd, &m_vb);
 
-    ogg_stream_init(&os, random());
+    ogg_stream_init(&m_os, random());
 
     ogg_packet header_main;
     ogg_packet header_comments;
     ogg_packet header_codebooks;
 
-    vorbis_analysis_headerout(&vd, &vc, &header_main, &header_comments, 
+    vorbis_analysis_headerout(&m_vd, &m_vc, &header_main, &header_comments,
                               &header_codebooks);
 
-    ogg_stream_packetin(&os, &header_main);
-    ogg_stream_packetin(&os, &header_comments);
-    ogg_stream_packetin(&os, &header_codebooks);
+    ogg_stream_packetin(&m_os, &header_main);
+    ogg_stream_packetin(&m_os, &header_comments);
+    ogg_stream_packetin(&m_os, &header_codebooks);
 
     int result;
-    while ((result = ogg_stream_flush(&os, &og)))
+    while ((result = ogg_stream_flush(&m_os, &m_og)))
     {
         if (!result || !m_out)
             break;
-        int ret = write_page(&og, m_out);
-        if (ret != og.header_len + og.body_len)
+        int ret2 = write_page(&m_og, m_out);
+        if (ret2 != m_og.header_len + m_og.body_len)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to write header to output stream.");
@@ -91,12 +89,12 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 
 VorbisEncoder::~VorbisEncoder()
 {
-    addSamples(nullptr, 0); //flush
-    ogg_stream_clear(&os);
-    vorbis_block_clear(&vb);
-    vorbis_dsp_clear(&vd);
-    vorbis_comment_clear(&vc);
-    vorbis_info_clear(&vi);
+    VorbisEncoder::addSamples(nullptr, 0); //flush
+    ogg_stream_clear(&m_os);
+    vorbis_block_clear(&m_vb);
+    vorbis_dsp_clear(&m_vd);
+    vorbis_comment_clear(&m_vc);
+    vorbis_info_clear(&m_vi);
 
     // Now write the Metadata
     if (m_metadata)
@@ -105,7 +103,6 @@ VorbisEncoder::~VorbisEncoder()
 
 int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
 {
-    int i;
     long realsamples = 0;
     signed char *chars = (signed char *)bytes;
 
@@ -114,45 +111,45 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
     if (!m_out)
         return 0;
 
-    float** buffer = vorbis_analysis_buffer(&vd, realsamples);
+    float** buffer = vorbis_analysis_buffer(&m_vd, realsamples);
 
-    for (i = 0; i < realsamples; i++) 
+    for (long i = 0; i < realsamples; i++)
     {
         buffer[0][i] = ((chars[i * 4 + 1] << 8) |
-                        (chars[i * 4] & 0xff)) / 32768.0f;
+                        (chars[i * 4] & 0xff)) / 32768.0F;
         buffer[1][i] = ((chars[i * 4 + 3] << 8) |
-                        (chars[i * 4 + 2] & 0xff)) / 32768.0f;
+                        (chars[i * 4 + 2] & 0xff)) / 32768.0F;
     }
 
-    vorbis_analysis_wrote(&vd, realsamples);
+    vorbis_analysis_wrote(&m_vd, realsamples);
 
-    while (vorbis_analysis_blockout(&vd, &vb) == 1)
+    while (vorbis_analysis_blockout(&m_vd, &m_vb) == 1)
     {
-        vorbis_analysis(&vb, nullptr);
-        vorbis_bitrate_addblock(&vb);
+        vorbis_analysis(&m_vb, nullptr);
+        vorbis_bitrate_addblock(&m_vb);
  
-        while (vorbis_bitrate_flushpacket(&vd, &op))
+        while (vorbis_bitrate_flushpacket(&m_vd, &m_op))
         {
-            ogg_stream_packetin(&os, &op);
-            packetsdone++;
+            ogg_stream_packetin(&m_os, &m_op);
+            m_packetsdone++;
 
             int eos = 0;
             while (!eos)
             {
-                int result = ogg_stream_pageout(&os, &og);
+                int result = ogg_stream_pageout(&m_os, &m_og);
                 if (!result)
                     break;
 
-                int ret = write_page(&og, m_out);
-                if (ret != og.header_len + og.body_len)
+                int ret = write_page(&m_og, m_out);
+                if (ret != m_og.header_len + m_og.body_len)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Failed to write ogg data. Aborting."));
                     return EENCODEERROR;
                 }
-                bytes_written += ret;
+                m_bytes_written += ret;
 
-                if (ogg_page_eos(&og))
+                if (ogg_page_eos(&m_og))
                     eos = 1;
             }
         }

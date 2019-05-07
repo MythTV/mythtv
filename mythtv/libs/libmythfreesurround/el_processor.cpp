@@ -17,10 +17,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "el_processor.h"
+#include <cmath>
+#include <complex>
 #include <cstdlib>
 #include <cstring>
-#include <complex>
-#include <cmath>
 #include <vector>
 #ifdef USE_FFTW3
 #include "fftw3.h"
@@ -93,7 +93,7 @@ public:
         // generate the window function (square root of hann, b/c it is applied before and after the transform)
         wnd.resize(N);
         for (unsigned k=0;k<N;k++)
-            wnd[k] = sqrt(0.5*(1-cos(2*PI*k/N))/N);
+            wnd[k] = sqrt(0.5*(1-std::cos(2*PI*k/N))/N);
         current_buf = 0;
         memset(inbufs, 0, sizeof(inbufs));
         memset(outbufs, 0, sizeof(outbufs));
@@ -217,9 +217,9 @@ public:
 
 private:
     // polar <-> cartesian coodinates conversion
-    static inline float amplitude(const float cf[2]) { return sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
-    static inline float phase(const float cf[2]) { return atan2(cf[1],cf[0]); }
-    static inline cfloat polar(float a, float p) { return cfloat(a*cos(p),a*sin(p)); }
+    static inline float amplitude(const float cf[2]) { return std::sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
+    static inline float phase(const float cf[2]) { return std::atan2(cf[1],cf[0]); }
+    static inline cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
     static inline float sqr(float x) { return x*x; }
     // the dreaded min/max
     static inline float min(float a, float b) { return a<b?a:b; }
@@ -227,7 +227,7 @@ private:
     static inline float clamp(float x) { return max(-1,min(1,x)); }
 
     // handle the output buffering for overlapped calls of block_decode
-    void add_output(float *input1[2], float *input2[2], float center_width, float dimension, float adaption_rate, bool result=false) {
+    void add_output(float *input1[2], float *input2[2], float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
         // add the windowed data to the last 1/2 of the output buffer
         float *out[6] = {&outbuf[0][0],&outbuf[1][0],&outbuf[2][0],&outbuf[3][0],&outbuf[4][0],&outbuf[5][0]};
         block_decode(input1,input2,out,center_width,dimension,adaption_rate);
@@ -425,7 +425,7 @@ private:
     }
 
     // filter the complex source signal and add it to target
-    void apply_filter(cfloat *signal, float *flt, float *target) {
+    void apply_filter(cfloat *signal, const float *flt, float *target) {
         // filter the signal
         unsigned f;
         for (f=0;f<=halfN;f++) {

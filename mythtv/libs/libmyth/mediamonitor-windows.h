@@ -11,7 +11,7 @@ class MediaMonitorWindows : public MediaMonitor
   public:
     MediaMonitorWindows(QObject *par, unsigned long interval, bool allowEject);
 
-    virtual bool AddDevice(MythMediaDevice* pDevice);
+    bool AddDevice(MythMediaDevice* pDevice) override; // MediaMonitor
 
     QStringList GetCDROMBlockDevices(void);
 };

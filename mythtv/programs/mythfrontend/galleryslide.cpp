@@ -35,20 +35,6 @@ void AbstractAnimation::Start(bool forwards, float speed)
 
 
 /*!
- \brief Create simple animation
- \param image Image to be animated
- \param type Effect to be animated
-*/
-Animation::Animation(Slide *image, Type type)
-    : AbstractAnimation(),
-      QVariantAnimation(),
-      m_parent(image), m_type(type), m_centre(UIEffects::Middle),
-      m_elapsed(0)
-{
-}
-
-
-/*!
  \brief Initialises an animation
  \param from Start value
  \param to End value
@@ -56,8 +42,8 @@ Animation::Animation(Slide *image, Type type)
  \param curve Easing curve governing animation
  \param centre Zoom centre
 */
-void Animation::Set(QVariant from, QVariant to, int duration,
-                    QEasingCurve curve, UIEffects::Centre centre)
+void Animation::Set(const QVariant& from, const QVariant& to, int duration,
+                    const QEasingCurve& curve, UIEffects::Centre centre)
 {
     setStartValue(from);
     setEndValue(to);
@@ -171,12 +157,14 @@ void SequentialAnimation::Pulse(int interval)
 */
 void SequentialAnimation::Start(bool forwards, float speed)
 {
-    if (m_group.size() == 0)
+    if (m_group.empty())
         return;
 
     m_current = forwards ? 0 : m_group.size() - 1;
 
     // Start group, then first child
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::Start(forwards, speed);
     m_group.at(m_current)->Start(m_forwards, m_speed);
 }
@@ -189,6 +177,8 @@ void SequentialAnimation::Start(bool forwards, float speed)
 void SequentialAnimation::SetSpeed(float speed)
 {
     // Set group speed for subsequent children
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::SetSpeed(speed);
 
     // Set active child
@@ -234,12 +224,14 @@ void ParallelAnimation::Pulse(int interval)
 */
 void ParallelAnimation::Start(bool forwards, float speed)
 {
-    if (m_group.size() == 0)
+    if (m_group.empty())
         return;
 
     m_finished = m_group.size();
 
     // Start group, then all children
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::Start(forwards, speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->Start(m_forwards, m_speed);
@@ -253,6 +245,8 @@ void ParallelAnimation::Start(bool forwards, float speed)
 void ParallelAnimation::SetSpeed(float speed)
 {
     // Set group speed, then all children
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::SetSpeed(speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->SetSpeed(m_speed);
@@ -278,7 +272,7 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
 {
     if (m_parent && m_running)
     {
-        Slide *image = dynamic_cast<Slide *>(m_parent);
+        Slide *image = m_parent;
         image->SetPan(value.toPoint());
     }
 }
@@ -290,16 +284,8 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
  \param name Slide name
  \param image Theme MythUIImage to clone
 */
-Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
-    : MythUIImage(parent, name),
-      m_state(kEmpty),
-      m_data(nullptr),
-      m_waitingFor(nullptr),
-      m_zoom(1.0),
-      m_direction(0),
-      m_zoomAnimation(nullptr),
-      m_panAnimation(nullptr),
-      m_pan(QPoint(0,0))
+Slide::Slide(MythUIType *parent, const QString& name, MythUIImage *image)
+    : MythUIImage(parent, name)
 {
     // Clone from image
     CopyFrom(image);
@@ -380,7 +366,7 @@ QChar Slide::GetDebugState() const
  has loaded
  \return bool True if the requested image is already loaded
 */
-bool Slide::LoadSlide(ImagePtrK im, int direction, bool notifyCompletion)
+bool Slide::LoadSlide(const ImagePtrK& im, int direction, bool notifyCompletion)
 {
     m_direction  = direction;
     m_waitingFor = notifyCompletion ? im : ImagePtrK();
@@ -472,9 +458,9 @@ void Slide::Zoom(int percentage)
 {
     // Sentinel indicates reset to default zoom
     float newZoom = (percentage == 0)
-            ? 1.0
+            ? 1.0F
             : qMax(MIN_ZOOM,
-                   qMin(MAX_ZOOM, m_zoom * (1.0 + percentage / 100.0)));
+                   qMin(MAX_ZOOM, m_zoom * (1.0F + percentage / 100.0F)));
     if (newZoom != m_zoom)
     {
         if (m_zoomAnimation)
@@ -497,12 +483,12 @@ void Slide::Zoom(int percentage)
 void Slide::SetZoom(float zoom)
 {
     m_zoom          = zoom;
-    m_Effects.hzoom = m_Effects.vzoom = zoom;
+    m_Effects.m_hzoom = m_Effects.m_vzoom = zoom;
 
     // TODO
     // MythUIImage displaces widget or doesn't centre for some combinations of
     // zoom centre/cropping so frig centre for now.
-    m_Effects.centre = zoom < 1.0 ? UIEffects::Middle : UIEffects::TopLeft;
+    m_Effects.m_centre = zoom < 1.0F ? UIEffects::Middle : UIEffects::TopLeft;
 
     SetPan(m_pan);
 }
@@ -515,7 +501,7 @@ void Slide::SetZoom(float zoom)
 void Slide::Pan(QPoint offset)
 {
     // Panning only possible when zoomed in
-    if (m_zoom > 1.0)
+    if (m_zoom > 1.0F)
     {
         QPoint start = m_pan;
 
@@ -556,7 +542,7 @@ void Slide::SetPan(QPoint pos)
     float wRatio    = float(imageArea.width()) / m_Area.width();
     float ratio     = qMax(hRatio, wRatio);
 
-    if (m_zoom != 0.0)
+    if (m_zoom != 0.0F)
         ratio /= m_zoom;
 
     // Determine crop area
@@ -671,7 +657,7 @@ QString SlideBuffer::BufferState()
  \param direction Navigation causing the load
  \return bool True if image is already loaded
 */
-bool SlideBuffer::Load(ImagePtrK im, int direction)
+bool SlideBuffer::Load(const ImagePtrK& im, int direction)
 {
     if (!im)
         return false;
@@ -696,7 +682,7 @@ bool SlideBuffer::Load(ImagePtrK im, int direction)
  \brief Load an image in next available slide
  \param im Image to load
 */
-void SlideBuffer::Preload(ImagePtrK im)
+void SlideBuffer::Preload(const ImagePtrK& im)
 {
     if (!im)
         return;
@@ -746,7 +732,7 @@ void SlideBuffer::ReleaseCurrent()
  \param reason Debug text describing reason for test
  \return int Number of slides available for display
 */
-void SlideBuffer::Flush(Slide *slide, QString reason)
+void SlideBuffer::Flush(Slide *slide, const QString& reason)
 {
     QMutexLocker lock(&m_mutexQ);
 

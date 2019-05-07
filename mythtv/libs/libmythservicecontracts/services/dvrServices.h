@@ -122,7 +122,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual bool               StopRecording         ( int              RecordedId ) = 0;
 
-        virtual bool               ReactivateRecording   ( int              RecordedId ) = 0;
+        virtual bool               ReactivateRecording   ( int              RecordedId,
+                                                           int              ChanId,
+                                                           const QDateTime &StartTime ) = 0;
 
         virtual bool               RescheduleRecordings  ( void ) = 0;
 
@@ -185,23 +187,23 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         // Recording Rules
 
-        virtual uint               AddRecordSchedule     ( QString   Title,
-                                                           QString   Subtitle,
-                                                           QString   Description,
-                                                           QString   Category,
+        virtual uint               AddRecordSchedule     ( const QString&   Title,
+                                                           const QString&   Subtitle,
+                                                           const QString&   Description,
+                                                           const QString&   Category,
                                                            QDateTime StartTime,
                                                            QDateTime EndTime,
-                                                           QString   SeriesId,
-                                                           QString   ProgramId,
+                                                           const QString&   SeriesId,
+                                                           const QString&   ProgramId,
                                                            int       ChanId,
-                                                           QString   Station,
+                                                           const QString&   Station,
                                                            int       FindDay,
                                                            QTime     FindTime,
                                                            int       ParentId,
                                                            bool      Inactive,
                                                            uint      Season,
                                                            uint      Episode,
-                                                           QString   Inetref,
+                                                           const QString&   Inetref,
                                                            QString   Type,
                                                            QString   SearchType,
                                                            int       RecPriority,
@@ -243,7 +245,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            bool      Inactive,
                                                            uint      Season,
                                                            uint      Episode,
-                                                           QString   Inetref,
+                                                           const QString&   Inetref,
                                                            QString   Type,
                                                            QString   SearchType,
                                                            int       RecPriority,
@@ -290,6 +292,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual bool               EnableRecordSchedule  ( uint             RecordId   ) = 0;
 
         virtual bool               DisableRecordSchedule ( uint             RecordId   ) = 0;
+
+        virtual int                RecordedIdForKey      ( int              ChanId,
+                                                           const QDateTime &StartTime ) = 0;
 
         virtual int                RecordedIdForPathname ( const QString   &Pathname   ) = 0;
 

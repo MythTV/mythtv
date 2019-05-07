@@ -18,7 +18,7 @@ Procedure for FFmpeg resync
 git pull
 - Clone MythTV FFmpeg fork into a new directory:
 git clone git@github.com:MythTV/FFmpeg.git
-- create a branch to track the current ffmpeg release branch (Release/4.0)
+- create a branch to track the current ffmpeg release branch (e.g release/4.0)
 - Add a remote for main FFmpeg
 git remote add ffmpeg git@github.com:FFmpeg/FFmpeg.git
 git fetch ffmpeg
@@ -33,12 +33,13 @@ git branch -a
 - Check list from above command to see if there is any new release branch in 
   remotes/ffmpeg that is not in remotes/origin.
 
-- If there is a new branch [Note this is untested - please update if wrong]:
+- If there is a new branch ffmpeg/release/x.x:
   - find its base as follows:
-  git merge-base remotes/ffmpeg/master remotes/ffmpeg/release/4.0
-  - Take note of the commit name returned. Merge up to that commit
+  git merge-base remotes/ffmpeg/master remotes/ffmpeg/release/x.x
+  - Take note of the commit hash returned. Merge up to that commit as follow:
   git checkout master
-  git merge <commit-name-from-above>
+  git merge <commit-hash-from-above>
+    suggested comment - Merge from FFmpeg up to branch point of x.x
   - Create new branch with the name of the new branch found
   git checkout -b release/x.x
   - Merge the rest of master
@@ -46,24 +47,24 @@ git branch -a
   git merge ffmpeg/master
   - Merge new branch   
   git checkout release/x.x
-  git branch -u origin/release/x.x 
   git merge ffmpeg/release/x.x
-  git push -u release/x.x
+  - Only push this after validating everything is ok (see below)
+  git push origin -u release/x.x
 
 - If there is no new branch:
-  - Merge updates:
+  - Merge updates with the latest branch in use:
   git checkout master
   git merge ffmpeg/master
-  git checkout release/4.0
-  git merge ffmpeg/release/4.0
+  git checkout release/x.x
+  git merge ffmpeg/release/x.x
 
-- Checkout release/4.0 and in MythTV directory checkout master.
-- Delete entire FFmpeg dierctory structure from MythTV directory and copy
-  in the contents of the ffmpeg repository.
+- Checkout release/x.x and in MythTV directory checkout master.
+- Delete entire FFmpeg directory structure from MythTV directory and copy
+  in the contents of the ffmpeg repository (except for the .git directory).
 - Test MythTV build and playback.
 - Add and commit all changes with comments identifying
-  ffmpeg/FFmpeg Release/4.0 description (git describe)
-  MythTV/FFmpeg Release/4.0 description (git describe).
+  ffmpeg/FFmpeg Release/x.x description (git describe)
+  MythTV/FFmpeg Release/x.x description (git describe).
 
 - Push all branches you updated to MythTV/FFmpeg
 

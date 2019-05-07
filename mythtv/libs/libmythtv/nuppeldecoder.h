@@ -41,25 +41,30 @@ class NuppelDecoder : public DecoderBase
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
                  char testbuf[kDecoderProbeBufferSize], 
-                 int testbufsize = kDecoderProbeBufferSize);
+                 int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    virtual bool GetFrame(DecodeType); // DecoderBase
+    bool GetFrame(DecodeType) override; // DecoderBase
 
-    // lastFrame is really (framesPlayed - 1) since we increment after getting
-    virtual bool IsLastFrameKey(void) const
-        { return (lastKey == framesPlayed); } // DecoderBase
-    void WriteStoredData(RingBuffer *rb, bool writevid, long timecodeOffset);
-    void ClearStoredData(void);
+    // lastFrame is really (m_framesPlayed - 1) since we increment after getting
+    bool IsLastFrameKey(void) const override // DecoderBase
+        { return (m_lastKey == m_framesPlayed); }
+    void WriteStoredData(RingBuffer *rb, bool storevid,
+                         long timecodeOffset) override; // DecoderBase
+    void ClearStoredData(void) override; // DecoderBase
 
-    long UpdateStoredFrameNum(long framenumber);
+    long UpdateStoredFrameNum(long framenumber) override; // DecoderBase
 
-    QString GetCodecDecoderName(void) const { return "nuppel"; }
-    QString GetRawEncodingType(void);
-    MythCodecID GetVideoCodecID(void) const;
+    QString GetCodecDecoderName(void) const override // DecoderBase
+         { return "nuppel"; }
+    QString GetRawEncodingType(void) override; // DecoderBase
+    MythCodecID GetVideoCodecID(void) const override; // DecoderBase
 
   private:
-    inline bool ReadFileheader(struct rtfileheader *fileheader);
-    inline bool ReadFrameheader(struct rtframeheader *frameheader);
+    NuppelDecoder(const NuppelDecoder &) = delete;            // not copyable
+    NuppelDecoder &operator=(const NuppelDecoder &) = delete; // not copyable
+
+    inline bool ReadFileheader(struct rtfileheader *fh);
+    inline bool ReadFrameheader(struct rtframeheader *fh);
 
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *lstrm, VideoFrame *frame);
@@ -72,59 +77,61 @@ class NuppelDecoder : public DecoderBase
     void StoreRawData(unsigned char *strm);
 
     void SeekReset(long long newKey = 0, uint skipFrames = 0,
-                   bool needFlush = false, bool discardFrames = false);
+                   bool doFlush = false, bool discardFrames = false) override; // DecoderBase
 
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
     friend void release_nuppel_buffer(void *opaque, uint8_t *data);
 
-    struct rtfileheader fileheader;
-    struct rtframeheader frameheader;
+    struct rtfileheader   m_fileheader;
+    struct rtframeheader  m_frameheader;
 
-    RTjpeg *rtjd;
+    RTjpeg               *m_rtjd                  {nullptr};
 
-    int video_width, video_height, video_size;
-    double video_frame_rate;
-    int audio_samplerate;
+    int                   m_video_width           {0};
+    int                   m_video_height          {0};
+    int                   m_video_size            {0};
+    double                m_video_frame_rate      {0.0};
+    int                   m_audio_samplerate      {44100};
 #if HAVE_BIGENDIAN
-    int audio_bits_per_sample;
+    int                   m_audio_bits_per_sample {0};
 #endif
 
-    int ffmpeg_extradatasize;
-    uint8_t *ffmpeg_extradata;
+    int                   m_ffmpeg_extradatasize  {0};
+    uint8_t              *m_ffmpeg_extradata      {nullptr};
 
-    struct extendeddata extradata;
-    bool usingextradata;
+    struct extendeddata   m_extradata;
+    bool                  m_usingextradata        {false};
 
-    bool disablevideo;
+    bool                  m_disablevideo          {false};
 
-    int totalLength;
-    long long totalFrames;
+    int                   m_totalLength           {0};
+    long long             m_totalFrames           {0};
 
-    int effdsp;
+    int                   m_effdsp                {0};
 
-    VideoFrame *directframe;
-    VideoFrame *decoded_video_frame;
+    VideoFrame           *m_directframe           {nullptr};
+    VideoFrame           *m_decoded_video_frame   {nullptr};
 
-    AVCodec *mpa_vidcodec;
-    AVCodecContext *mpa_vidctx;
-    AVCodec *mpa_audcodec;
-    AVCodecContext *mpa_audctx;
-    uint8_t *m_audioSamples;
+    AVCodec              *m_mpa_vidcodec          {nullptr};
+    AVCodecContext       *m_mpa_vidctx            {nullptr};
+    AVCodec              *m_mpa_audcodec          {nullptr};
+    AVCodecContext       *m_mpa_audctx            {nullptr};
+    uint8_t              *m_audioSamples          {nullptr};
 
-    bool directrendering;
+    bool                  m_directrendering       {false};
 
-    char lastct;
+    char                  m_lastct                {'1'};
 
-    unsigned char *strm;
-    unsigned char *buf;
-    unsigned char *buf2;
-    unsigned char *planes[3];
+    unsigned char        *m_strm                  {nullptr};
+    unsigned char        *m_buf                   {nullptr};
+    unsigned char        *m_buf2                  {nullptr};
+    unsigned char        *m_planes[3];
 
-    list<RawDataList*> StoredData;
+    list<RawDataList*>    m_storedData;
 
-    int videosizetotal;
-    int videoframesread;
-    bool setreadahead;
+    int                   m_videosizetotal        {0};
+    int                   m_videoframesread       {0};
+    bool                  m_setreadahead          {false};
 };
 
 #endif

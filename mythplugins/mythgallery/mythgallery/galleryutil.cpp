@@ -16,6 +16,9 @@
  *
  * ============================================================ */
 
+// C++
+#include <cmath>
+
 // qt
 #include <QDir>
 #include <QApplication>
@@ -254,7 +257,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                                 const GalleryFilter& flt, bool recurse,
                                 ThumbHash *itemHash, ThumbGenerator* thumbGen)
 {
-    QString blah = dir;
+    const QString& blah = dir;
     QDir d(blah);
     QString currDir = d.absolutePath();
     QStringList splitFD;
@@ -266,7 +269,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
     // Create .thumbcache dir if neccesary
     if (thumbGen)
-        thumbGen->getThumbcacheDir(currDir);
+        ThumbGenerator::getThumbcacheDir(currDir);
 
     QFileInfoList list = d.entryInfoList(GetMediaFilter(),
                                          QDir::Files | QDir::AllDirs |
@@ -435,12 +438,9 @@ QDateTime GalleryUtil::GetTimestamp(const QString &filePath)
                         // Found one, done
                         break;
                     }
-                    else
-                    {
-                        LOG(VB_FILE, LOG_ERR, LOC +
-                            QString("Could not parse exif timestamp from '%1'")
-                            .arg(filePath));
-                    }
+                    LOG(VB_FILE, LOG_ERR, LOC +
+                        QString("Could not parse exif timestamp from '%1'")
+                        .arg(filePath));
                 }
             }
             exif_data_free(data);
@@ -570,8 +570,8 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     query.prepare("UPDATE gallerymetadata "
                   "SET image = :IMAGENEW "
                   "WHERE image = :IMAGEOLD");
-    query.bindValue(":IMAGENEW", QString(currDir + '/' + newName));
-    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName));
+    query.bindValue(":IMAGENEW", currDir + '/' + newName);
+    query.bindValue(":IMAGEOLD", currDir + '/' + oldName);
     if (query.exec())
         return true;
 
@@ -600,11 +600,11 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
     case kScaleToFill:
         // scale-max to dest width for most images
         scaleWidth = dest.width();
-        scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+        scaleHeight = lround(dest.width() * pixelAspect / imageAspect);
         if (scaleHeight < dest.height())
         {
             // scale-max to dest height for extra wide images
-            scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+            scaleWidth = lround(dest.height() * imageAspect / pixelAspect);
             scaleHeight = dest.height();
         }
         break;
@@ -617,13 +617,13 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
 
     case kScaleToFit:
         // scale-min to dest height for most images
-        scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+        scaleWidth = lround(dest.height() * imageAspect / pixelAspect);
         scaleHeight = dest.height();
         if (scaleWidth > dest.width())
         {
             // scale-min to dest width for extra wide images
             scaleWidth = dest.width();
-            scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+            scaleHeight = lround(dest.width() * pixelAspect / imageAspect);
         }
         break;
 
@@ -636,7 +636,7 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
     return sz;
 }
 
-bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
+bool GalleryUtil::CopyDirectory(const QFileInfo& src, QFileInfo &dst)
 {
     QDir srcDir(src.absoluteFilePath());
 
@@ -665,7 +665,7 @@ bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
     return ok;
 }
 
-bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
+bool GalleryUtil::MoveDirectory(const QFileInfo& src, QFileInfo &dst)
 {
     QDir srcDir(src.absoluteFilePath());
 
@@ -740,8 +740,8 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
         path += QString(".thumbcache/");
         if (QFile::exists(path + oldName))
         {
-            QDir d(path);
-            d.rename(oldName, newName);
+            QDir d2(path);
+            d2.rename(oldName, newName);
         }
     }
 
@@ -749,7 +749,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT image, angle FROM gallerymetadata "
                   "WHERE image LIKE :IMAGEOLD");
-    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName + '%'));
+    query.bindValue(":IMAGEOLD", currDir + '/' + oldName + '%');
     if (query.exec())
     {
         while (query.next())

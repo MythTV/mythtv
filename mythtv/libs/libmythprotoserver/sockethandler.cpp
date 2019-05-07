@@ -1,4 +1,5 @@
 #include <QStringList>
+#include <utility>
 
 #include "sockethandler.h"
 #include "mythlogging.h"
@@ -8,7 +9,7 @@ SocketHandler::SocketHandler(MythSocket *sock, MythSocketManager *parent,
         ReferenceCounter("SocketHandler"),
         m_blockShutdown(false), m_standardEvents(false),
         m_systemEvents(false), m_socket(sock), m_parent(parent),
-        m_hostname(hostname)
+        m_hostname(std::move(hostname))
 {
     if (m_socket)
         m_socket->IncrRef();

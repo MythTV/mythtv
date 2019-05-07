@@ -49,8 +49,6 @@ StorageGroup::StorageGroup(const QString &group, const QString &hostname,
                            bool allowFallback) :
     m_groupname(group), m_hostname(hostname), m_allowFallback(allowFallback)
 {
-    m_groupname.detach();
-    m_hostname.detach();
     m_dirlist.clear();
 
     if (getenv("MYTHTV_NOSGFALLBACK"))
@@ -106,8 +104,8 @@ void StorageGroup::StaticInit(void)
 void StorageGroup::Init(const QString &group, const QString &hostname,
                         const bool allowFallback)
 {
-    m_groupname = group;    m_groupname.detach();
-    m_hostname  = hostname; m_hostname.detach();
+    m_groupname = group;
+    m_hostname  = hostname;
     m_allowFallback = allowFallback;
     m_dirlist.clear();
 
@@ -139,7 +137,6 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
         if (found)
         {
             m_hostname = "";
-            m_hostname.detach();
         }
     }
     if ((!found) && m_allowFallback && (group != "Default"))
@@ -151,7 +148,6 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
         if(found)
         {
             m_groupname = "Default";
-            m_groupname.detach();
         }
         else if (!hostname.isEmpty())
         {
@@ -164,13 +160,11 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
             {
                 m_groupname = "Default";
                 m_hostname = "";
-                m_groupname.detach();
-                m_hostname.detach();
             }
         }
     }
 
-    if (allowFallback && !m_dirlist.size())
+    if (allowFallback && m_dirlist.empty())
     {
         QString msg = "Unable to find any Storage Group Directories.  ";
         QString tmpDir = gCoreContext->GetSetting("RecordFilePrefix");
@@ -196,7 +190,6 @@ QString StorageGroup::GetFirstDir(bool appendSlash) const
         return QString();
 
     QString tmp = m_dirlist[0];
-    tmp.detach();
 
     if (appendSlash)
         tmp += "/";
@@ -373,13 +366,7 @@ bool StorageGroup::FileExists(const QString &filename)
     if (badPath)
         return false;
 
-    bool result = false;
-
-    QFile checkFile(filename);
-    if (checkFile.exists(filename))
-        result = true;
-
-    return result;
+    return QFile::exists(filename);
 }
 
 
@@ -622,7 +609,7 @@ QString StorageGroup::FindFile(const QString &filename)
     if (!recDir.isEmpty())
     {
         result = recDir + "/" + filename;
-        LOG(VB_FILE, LOG_DEBUG, LOC +
+        LOG(VB_FILE, LOG_INFO, LOC +
             QString("FindFile: Found '%1'") .arg(result));
     }
     else
@@ -648,16 +635,12 @@ QString StorageGroup::FindFileDir(const QString &filename)
                 .arg(m_dirlist[curDir]).arg(testFile));
         checkFile.setFile(testFile);
         if (checkFile.exists() || checkFile.isSymLink())
-        {
-            QString tmp = m_dirlist[curDir];
-            tmp.detach();
-            return tmp;
-        }
+            return m_dirlist[curDir];
 
         curDir++;
     }
 
-    if (m_groupname.isEmpty() || (m_allowFallback == false))
+    if (m_groupname.isEmpty() || !m_allowFallback)
     {
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =
@@ -681,7 +664,6 @@ QString StorageGroup::FindFileDir(const QString &filename)
         result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
 
-    result.detach();
     return result;
 }
 
@@ -698,7 +680,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     if (m_allowFallback)
         nextDir = kDefaultStorageDir;
 
-    if (m_dirlist.size())
+    if (!m_dirlist.empty())
         nextDir = m_dirlist[0];
 
     QDir checkDir("");
@@ -737,7 +719,6 @@ QString StorageGroup::FindNextDirMostFree(void)
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("FindNextDirMostFree: Using '%1'").arg(nextDir));
 
-    nextDir.detach();
     return nextDir;
 }
 
@@ -826,8 +807,6 @@ QStringList StorageGroup::getRecordingsGroups(void)
     }
 
     groups.sort();
-    groups.detach();
-
     return groups;
 }
 
@@ -872,8 +851,6 @@ QStringList StorageGroup::getGroupDirs(const QString &groupname,
     }
 
     groups.sort();
-    groups.detach();
-
     return groups;
 }
 

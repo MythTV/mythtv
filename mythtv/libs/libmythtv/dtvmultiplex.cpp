@@ -1,27 +1,29 @@
 // MythTV headers
 #include "dtvmultiplex.h"
+
+#include "mpeg/dvbdescriptors.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "mpeg/dvbdescriptors.h"
+#include <utility>
 
 #define LOC      QString("DTVMux: ")
 
 bool DTVMultiplex::operator==(const DTVMultiplex &m) const
 {
-    return ((frequency == m.frequency) &&
-            (modulation == m.modulation) &&
-            (inversion == m.inversion) &&
-            (bandwidth == m.bandwidth) &&
-            (hp_code_rate == m.hp_code_rate) &&
-            (lp_code_rate == m.lp_code_rate) &&
-            (trans_mode == m.trans_mode) &&
-            (guard_interval == m.guard_interval) &&
-            (fec == m.fec) &&
-            (mod_sys  == m.mod_sys)  &&
-            (rolloff  == m.rolloff)  &&
-            (polarity == m.polarity) &&
-            (hierarchy == m.hierarchy) &&
-            (iptv_tuning == m.iptv_tuning)
+    return ((m_frequency      == m.m_frequency) &&
+            (m_modulation     == m.m_modulation) &&
+            (m_inversion      == m.m_inversion) &&
+            (m_bandwidth      == m.m_bandwidth) &&
+            (m_hp_code_rate   == m.m_hp_code_rate) &&
+            (m_lp_code_rate   == m.m_lp_code_rate) &&
+            (m_trans_mode     == m.m_trans_mode) &&
+            (m_guard_interval == m.m_guard_interval) &&
+            (m_fec            == m.m_fec) &&
+            (m_mod_sys        == m.m_mod_sys)  &&
+            (m_rolloff        == m.m_rolloff)  &&
+            (m_polarity       == m.m_polarity) &&
+            (m_hierarchy      == m.m_hierarchy) &&
+            (m_iptv_tuning    == m.m_iptv_tuning)
             );
 }
 
@@ -31,15 +33,15 @@ bool DTVMultiplex::operator==(const DTVMultiplex &m) const
 QString DTVMultiplex::toString() const
 {
     QString ret = QString("%1 %2 %3 ")
-        .arg(frequency).arg(modulation.toString()).arg(inversion.toString());
+        .arg(m_frequency).arg(m_modulation.toString()).arg(m_inversion.toString());
 
     ret += QString("%1 %2 %3 %4 %5 %6 %7")
-        .arg(hp_code_rate.toString()).arg(lp_code_rate.toString())
-        .arg(bandwidth.toString()).arg(trans_mode.toString())
-        .arg(guard_interval.toString()).arg(hierarchy.toString())
-        .arg(polarity.toString());
+        .arg(m_hp_code_rate.toString()).arg(m_lp_code_rate.toString())
+        .arg(m_bandwidth.toString()).arg(m_trans_mode.toString())
+        .arg(m_guard_interval.toString()).arg(m_hierarchy.toString())
+        .arg(m_polarity.toString());
     ret += QString(" fec: %1 msys: %2 rolloff: %3")
-        .arg(fec.toString()).arg(mod_sys.toString()).arg(rolloff.toString());
+        .arg(m_fec.toString()).arg(m_mod_sys.toString()).arg(m_rolloff.toString());
 
     return ret;
 }
@@ -47,8 +49,8 @@ QString DTVMultiplex::toString() const
 bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
                            uint freq_range, bool fuzzy) const
 {
-    if ((frequency + freq_range  < other.frequency             ) ||
-        (frequency               > other.frequency + freq_range))
+    if ((m_frequency + freq_range  < other.m_frequency             ) ||
+        (m_frequency               > other.m_frequency + freq_range))
     {
         return false;
     }
@@ -57,15 +59,15 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
     {
         if (fuzzy)
             return
-                inversion.IsCompatible(other.inversion)   &&
-                (symbolrate == other.symbolrate)          &&
-                fec.IsCompatible(other.fec)               &&
-                modulation.IsCompatible(other.modulation);
+                m_inversion.IsCompatible(other.m_inversion)   &&
+                (m_symbolrate == other.m_symbolrate)          &&
+                m_fec.IsCompatible(other.m_fec)               &&
+                m_modulation.IsCompatible(other.m_modulation);
         return
-            (inversion  == other.inversion)  &&
-            (symbolrate == other.symbolrate) &&
-            (fec        == other.fec)        &&
-            (modulation == other.modulation);
+            (m_inversion  == other.m_inversion)  &&
+            (m_symbolrate == other.m_symbolrate) &&
+            (m_fec        == other.m_fec)        &&
+            (m_modulation == other.m_modulation);
     }
 
     if ((DTVTunerType::kTunerTypeDVBT == type) ||
@@ -73,56 +75,56 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
     {
         if (fuzzy)
             return
-                inversion.IsCompatible(other.inversion)           &&
-                bandwidth.IsCompatible(other.bandwidth)           &&
-                hp_code_rate.IsCompatible(other.hp_code_rate)     &&
-                lp_code_rate.IsCompatible(other.lp_code_rate)     &&
-                modulation.IsCompatible(other.modulation)         &&
-                guard_interval.IsCompatible(other.guard_interval) &&
-                trans_mode.IsCompatible(other.trans_mode)         &&
-                hierarchy.IsCompatible(other.hierarchy)           &&
-                (mod_sys == other.mod_sys);
+                m_inversion.IsCompatible(other.m_inversion)           &&
+                m_bandwidth.IsCompatible(other.m_bandwidth)           &&
+                m_hp_code_rate.IsCompatible(other.m_hp_code_rate)     &&
+                m_lp_code_rate.IsCompatible(other.m_lp_code_rate)     &&
+                m_modulation.IsCompatible(other.m_modulation)         &&
+                m_guard_interval.IsCompatible(other.m_guard_interval) &&
+                m_trans_mode.IsCompatible(other.m_trans_mode)         &&
+                m_hierarchy.IsCompatible(other.m_hierarchy)           &&
+                m_mod_sys.IsCompatible(other.m_mod_sys);
         return
-            (inversion      == other.inversion)      &&
-            (bandwidth      == other.bandwidth)      &&
-            (hp_code_rate   == other.hp_code_rate)   &&
-            (lp_code_rate   == other.lp_code_rate)   &&
-            (modulation     == other.modulation)     &&
-            (guard_interval == other.guard_interval) &&
-            (trans_mode     == other.trans_mode)     &&
-            (hierarchy      == other.hierarchy)      &&
-            (mod_sys        == other.mod_sys);
+            (m_inversion      == other.m_inversion)      &&
+            (m_bandwidth      == other.m_bandwidth)      &&
+            (m_hp_code_rate   == other.m_hp_code_rate)   &&
+            (m_lp_code_rate   == other.m_lp_code_rate)   &&
+            (m_modulation     == other.m_modulation)     &&
+            (m_guard_interval == other.m_guard_interval) &&
+            (m_trans_mode     == other.m_trans_mode)     &&
+            (m_hierarchy      == other.m_hierarchy)      &&
+            (m_mod_sys        == other.m_mod_sys);
     }
 
     if (DTVTunerType::kTunerTypeATSC == type)
     {
         if (fuzzy)
-            return modulation.IsCompatible(other.modulation);
-        return (modulation == other.modulation);
+            return m_modulation.IsCompatible(other.m_modulation);
+        return (m_modulation == other.m_modulation);
     }
 
     if ((DTVTunerType::kTunerTypeDVBS1 == type) ||
         (DTVTunerType::kTunerTypeDVBS2 == type))
     {
         bool ret =
-            (symbolrate == other.symbolrate)        &&
-            (polarity   == other.polarity)          &&
-            (mod_sys    == other.mod_sys);
+            (m_symbolrate == other.m_symbolrate)        &&
+            (m_polarity   == other.m_polarity)          &&
+            (m_mod_sys    == other.m_mod_sys);
 
         if (fuzzy)
             return ret &&
-                inversion.IsCompatible(other.inversion) &&
-                fec.IsCompatible(other.fec)             &&
-                rolloff.IsCompatible(other.rolloff);
+                m_inversion.IsCompatible(other.m_inversion) &&
+                m_fec.IsCompatible(other.m_fec)             &&
+                m_rolloff.IsCompatible(other.m_rolloff);
         return ret &&
-            (inversion  == other.inversion)  &&
-            (fec        == other.fec)        &&
-            (rolloff    == other.rolloff);
+            (m_inversion  == other.m_inversion)  &&
+            (m_fec        == other.m_fec)        &&
+            (m_rolloff    == other.m_rolloff);
     }
 
     if (DTVTunerType::kTunerTypeIPTV == type)
     {
-        return (iptv_tuning == other.iptv_tuning);
+        return (m_iptv_tuning == other.m_iptv_tuning);
     }
 
     return false;
@@ -135,7 +137,7 @@ bool DTVMultiplex::ParseATSC(const QString &_frequency,
                              const QString &_modulation)
 {
     bool ok = true;
-    frequency = _frequency.toULongLong(&ok);
+    m_frequency = _frequency.toULongLong(&ok);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -143,7 +145,7 @@ bool DTVMultiplex::ParseATSC(const QString &_frequency,
         return false;
     }
 
-    ok = modulation.Parse(_modulation);
+    ok = m_modulation.Parse(_modulation);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -159,7 +161,7 @@ bool DTVMultiplex::ParseDVB_T(
     const QString &_trans_mode,  const QString &_guard_interval,
     const QString &_hierarchy)
 {
-    bool ok = inversion.Parse(_inversion);
+    bool ok = m_inversion.Parse(_inversion);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -168,16 +170,16 @@ bool DTVMultiplex::ParseDVB_T(
         ok = true;
     }
 
-    ok &= mod_sys.Parse("DVB-T");
-    ok &= bandwidth.Parse(_bandwidth);
-    ok &= hp_code_rate.Parse(_coderate_hp);
-    ok &= lp_code_rate.Parse(_coderate_lp);
-    ok &= modulation.Parse(_modulation);
-    ok &= trans_mode.Parse(_trans_mode);
-    ok &= hierarchy.Parse(_hierarchy);
-    ok &= guard_interval.Parse(_guard_interval);
+    ok &= m_mod_sys.Parse("DVB-T");
+    ok &= m_bandwidth.Parse(_bandwidth);
+    ok &= m_hp_code_rate.Parse(_coderate_hp);
+    ok &= m_lp_code_rate.Parse(_coderate_lp);
+    ok &= m_modulation.Parse(_modulation);
+    ok &= m_trans_mode.Parse(_trans_mode);
+    ok &= m_hierarchy.Parse(_hierarchy);
+    ok &= m_guard_interval.Parse(_guard_interval);
     if (ok)
-        frequency = _frequency.toInt(&ok);
+        m_frequency = _frequency.toInt(&ok);
 
     return ok;
 }
@@ -187,7 +189,7 @@ bool DTVMultiplex::ParseDVB_S_and_C(
     const QString &_symbol_rate, const QString &_fec_inner,
     const QString &_modulation,  const QString &_polarity)
 {
-    bool ok = inversion.Parse(_inversion);
+    bool ok = m_inversion.Parse(_inversion);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -197,8 +199,8 @@ bool DTVMultiplex::ParseDVB_S_and_C(
         ok = true;
     }
 
-    symbolrate = _symbol_rate.toInt();
-    if (!symbolrate)
+    m_symbolrate = _symbol_rate.toInt();
+    if (!m_symbolrate)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid symbol rate " +
             QString("parameter '%1', aborting.").arg(_symbol_rate));
@@ -206,14 +208,57 @@ bool DTVMultiplex::ParseDVB_S_and_C(
         return false;
     }
 
-    ok &= fec.Parse(_fec_inner);
-    ok &= modulation.Parse(_modulation);
+    ok &= m_fec.Parse(_fec_inner);
+    ok &= m_modulation.Parse(_modulation);
 
     if (!_polarity.isEmpty())
-        polarity.Parse(_polarity.toLower());
+        m_polarity.Parse(_polarity.toLower());
 
     if (ok)
-        frequency = _frequency.toInt(&ok);
+        m_frequency = _frequency.toInt(&ok);
+
+    return ok;
+}
+
+bool DTVMultiplex::ParseDVB_S(
+    const QString &_frequency,   const QString &_inversion,
+    const QString &_symbol_rate, const QString &_fec_inner,
+    const QString &_modulation,  const QString &_polarity)
+{
+    bool ok = ParseDVB_S_and_C(_frequency, _inversion, _symbol_rate,
+                               _fec_inner, _modulation, _polarity);
+    m_mod_sys = DTVModulationSystem::kModulationSystem_DVBS;
+    return ok;
+}
+
+bool DTVMultiplex::ParseDVB_C(
+    const QString &_frequency,   const QString &_inversion,
+    const QString &_symbol_rate, const QString &_fec_inner,
+    const QString &_modulation,  const QString &_polarity,
+    const QString &_mod_sys)
+{
+    bool ok = ParseDVB_S_and_C(_frequency, _inversion, _symbol_rate,
+                               _fec_inner, _modulation, _polarity);
+
+    m_mod_sys.Parse(_mod_sys);
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_mod_sys)
+    {
+        m_mod_sys = DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A;
+    }
+
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("%1 ").arg(__FUNCTION__) +
+        QString("_mod_sys:%1 ok:%2 ").arg(_mod_sys).arg(ok) +
+        QString("m_mod_sys:%1 %2 ").arg(m_mod_sys).arg(m_mod_sys.toString()));
+
+    if ((DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A != m_mod_sys) &&
+        (DTVModulationSystem::kModulationSystem_DVBC_ANNEX_B != m_mod_sys) &&
+        (DTVModulationSystem::kModulationSystem_DVBC_ANNEX_C != m_mod_sys))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported DVB-C modulation system " +
+            QString("parameter '%1', aborting.").arg(_mod_sys));
+        return false;
+    }
 
     return ok;
 }
@@ -227,31 +272,31 @@ bool DTVMultiplex::ParseDVB_S2(
     bool ok = ParseDVB_S_and_C(_frequency, _inversion, _symbol_rate,
                                _fec_inner, _modulation, _polarity);
 
-    if (!mod_sys.Parse(_mod_sys))
+    if (!m_mod_sys.Parse(_mod_sys))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid S2 modulation system " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid DVB-S2 modulation system " +
                 QString("parameter '%1', aborting.").arg(_mod_sys));
         return false;
     }
 
     // For #10153, guess at modulation system based on modulation
-    if (DTVModulationSystem::kModulationSystem_UNDEFINED == mod_sys)
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_mod_sys)
     {
-        mod_sys = (DTVModulation::kModulationQPSK == modulation) ?
+        m_mod_sys = (DTVModulation::kModulationQPSK == m_modulation) ?
             DTVModulationSystem::kModulationSystem_DVBS :
             DTVModulationSystem::kModulationSystem_DVBS2;
     }
 
-    if ((DTVModulationSystem::kModulationSystem_DVBS  != mod_sys) &&
-        (DTVModulationSystem::kModulationSystem_DVBS2 != mod_sys))
+    if ((DTVModulationSystem::kModulationSystem_DVBS  != m_mod_sys) &&
+        (DTVModulationSystem::kModulationSystem_DVBS2 != m_mod_sys))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported S2 modulation system " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported DVB-S2 modulation system " +
             QString("parameter '%1', aborting.").arg(_mod_sys));
         return false;
     }
 
     if (!_rolloff.isEmpty())
-        ok &= rolloff.Parse(_rolloff);
+        ok &= m_rolloff.Parse(_rolloff);
 
     return ok;
 }
@@ -268,32 +313,39 @@ bool DTVMultiplex::ParseDVB_T2(
                          _trans_mode, _guard_interval, _hierarchy);
 
     QString l_mod_sys = _mod_sys;
+
+    // Accept "0" for "DVB-T" and "1" for "DVB-T2"
     if (_mod_sys == "1")
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid DVB-T2 modulation system " +
                 QString("parameter '%1', using DVB-T2.").arg(_mod_sys));
-        l_mod_sys = "DVB-T";
+        m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
+        l_mod_sys = m_mod_sys.toString();
     }
     else if (_mod_sys == "0")
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid DVB-T modulation system " +
                 QString("parameter '%1', using DVB-T.").arg(_mod_sys));
-        l_mod_sys = "DVB-T";
+        m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+        l_mod_sys = m_mod_sys.toString();
     }
-    if (!mod_sys.Parse(l_mod_sys))
+
+    if (!m_mod_sys.Parse(l_mod_sys))
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid DVB-T/T2 modulation system " +
                 QString("parameter '%1', aborting.").arg(l_mod_sys));
         return false;
     }
 
-    if (mod_sys == DTVModulationSystem::kModulationSystem_UNDEFINED)
-        mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
-
-    if ((DTVModulationSystem::kModulationSystem_DVBT  != mod_sys) &&
-        (DTVModulationSystem::kModulationSystem_DVBT2 != mod_sys))
+    if (m_mod_sys == DTVModulationSystem::kModulationSystem_UNDEFINED)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported T2 modulation system " +
+        m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+    }
+
+    if ((DTVModulationSystem::kModulationSystem_DVBT  != m_mod_sys) &&
+        (DTVModulationSystem::kModulationSystem_DVBT2 != m_mod_sys))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported DVB-T2 modulation system " +
             QString("parameter '%1', aborting.").arg(l_mod_sys));
         return false;
     }
@@ -303,47 +355,57 @@ bool DTVMultiplex::ParseDVB_T2(
 
 bool DTVMultiplex::ParseTuningParams(
     DTVTunerType type,
-    QString _frequency,    QString _inversion,      QString _symbolrate,
-    QString _fec,          QString _polarity,
-    QString _hp_code_rate, QString _lp_code_rate,   QString _ofdm_modulation,
-    QString _trans_mode,   QString _guard_interval, QString _hierarchy,
-    QString _modulation,   QString _bandwidth,
-    QString _mod_sys,      QString _rolloff)
+    const QString& _frequency,    const QString& _inversion,      const QString& _symbolrate,
+    const QString& _fec,          const QString& _polarity,
+    const QString& _hp_code_rate, const QString& _lp_code_rate,   const QString& _ofdm_modulation,
+    const QString& _trans_mode,   const QString& _guard_interval, const QString& _hierarchy,
+    const QString& _modulation,   const QString& _bandwidth,
+    const QString& _mod_sys,      const QString& _rolloff)
 {
     if (DTVTunerType::kTunerTypeDVBT == type)
     {
         return ParseDVB_T(
-            _frequency,       _inversion,       _bandwidth,    _hp_code_rate,
-            _lp_code_rate,    _ofdm_modulation, _trans_mode,   _guard_interval,
-            _hierarchy);
+            _frequency,       _inversion,       _bandwidth,
+            _hp_code_rate,    _lp_code_rate,    _ofdm_modulation,
+            _trans_mode,      _guard_interval,  _hierarchy);
     }
 
-    if ((DTVTunerType::kTunerTypeDVBS1 == type) ||
-        (DTVTunerType::kTunerTypeDVBC  == type))
+    if (DTVTunerType::kTunerTypeDVBC  == type)
     {
-        return ParseDVB_S_and_C(
-            _frequency,       _inversion,     _symbolrate,
-            _fec,             _modulation,    _polarity);
+        return ParseDVB_C(
+            _frequency,       _inversion,       _symbolrate,
+            _fec,             _modulation,      _polarity,
+            _mod_sys);
+    }
+
+    if (DTVTunerType::kTunerTypeDVBS1 == type)
+    {
+        return ParseDVB_S(
+            _frequency,       _inversion,       _symbolrate,
+            _fec,             _modulation,      _polarity);
     }
 
     if (DTVTunerType::kTunerTypeDVBS2 == type)
     {
         return ParseDVB_S2(
-            _frequency,       _inversion,     _symbolrate,
-            _fec,             _modulation,    _polarity,
+            _frequency,       _inversion,       _symbolrate,
+            _fec,             _modulation,      _polarity,
             _mod_sys,         _rolloff);
     }
 
     if (DTVTunerType::kTunerTypeDVBT2 == type)
     {
         return ParseDVB_T2(
-            _frequency,       _inversion,       _bandwidth,    _hp_code_rate,
-            _lp_code_rate,    _ofdm_modulation, _trans_mode,   _guard_interval,
-            _hierarchy, _mod_sys);
+            _frequency,       _inversion,       _bandwidth,
+            _hp_code_rate,    _lp_code_rate,    _ofdm_modulation,
+            _trans_mode,      _guard_interval,  _hierarchy,
+            _mod_sys);
     }
 
     if (DTVTunerType::kTunerTypeATSC == type)
+    {
         return ParseATSC(_frequency, _modulation);
+    }
 
     LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("ParseTuningParams -- Unknown tuner type = 0x%1")
@@ -383,8 +445,8 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
         return false;
     }
 
-    mplex = mplexid;
-    sistandard = query.value(13).toString();
+    m_mplex = mplexid;
+    m_sistandard = query.value(13).toString();
 
     // Parse the query into our DVBTuning class
     return ParseTuningParams(
@@ -404,7 +466,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                                               const MPEGDescriptor &desc)
 {
     uint tag = desc.DescriptorTag();
-    sistandard = "dvb";
+    m_sistandard = "dvb";
 
     switch (tag)
     {
@@ -473,10 +535,11 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
 
             const CableDeliverySystemDescriptor cd(desc);
 
-            return ParseDVB_S_and_C(
+            return ParseDVB_C(
                     QString::number(cd.FrequencyHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
-                    cd.ModulationString(),               QString());
+                    cd.ModulationString(),               QString(),
+                    "DVB-C/A");
         }
         default:
             LOG(VB_CHANSCAN, LOG_ERR, LOC +
@@ -526,7 +589,7 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             query.value(4).toString(),   query.value(5).toString(),
             query.value(6).toUInt(),
             query.value(7).toUInt(),     query.value(8).toUInt(),
-            query.value(9).toUInt(),    !query.value(10).toUInt(),
+            query.value(9).toBool(),    !query.value(10).toBool(),
             false,
             query.value(11).toString(),  query.value(12).toString(),
             query.value(13).toString(),  query.value(14).toString(),
@@ -539,7 +602,7 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             false, false, false, 0,
             query.value(17).toString() /* default_authority */);
 
-        channels.push_back(chan);
+        m_channels.push_back(chan);
     }
 
     return true;
@@ -571,23 +634,23 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
         " );");
 
     query.bindValue(":SCANID", scanid);
-    query.bindValue(":MPLEXID", mplex);
-    query.bindValue(":FREQUENCY", QString::number(frequency));
-    query.bindValue(":INVERSION", inversion.toString());
-    query.bindValue(":SYMBOLRATE", QString::number(symbolrate));
-    query.bindValue(":FEC", fec.toString());
-    query.bindValue(":POLARITY", polarity.toString());
-    query.bindValue(":HP_CODE_RATE", hp_code_rate.toString());
-    query.bindValue(":LP_CODE_RATE", lp_code_rate.toString());
-    query.bindValue(":MODULATION", modulation.toString());
-    query.bindValue(":TRANSMISSION_MODE", trans_mode.toString());
-    query.bindValue(":GUARD_INTERVAL", guard_interval.toString());
-    query.bindValue(":HIERARCHY", hierarchy.toString());
-    query.bindValue(":MOD_SYS", mod_sys.toString());
-    query.bindValue(":ROLLOFF", rolloff.toString());
-    query.bindValue(":BANDWIDTH", bandwidth.toString());
-    query.bindValue(":SISTANDARD", sistandard);
-    query.bindValue(":TUNER_TYPE", (uint)tuner_type);
+    query.bindValue(":MPLEXID", m_mplex);
+    query.bindValue(":FREQUENCY", QString::number(m_frequency));
+    query.bindValue(":INVERSION", m_inversion.toString());
+    query.bindValue(":SYMBOLRATE", QString::number(m_symbolrate));
+    query.bindValue(":FEC", m_fec.toString());
+    query.bindValue(":POLARITY", m_polarity.toString());
+    query.bindValue(":HP_CODE_RATE", m_hp_code_rate.toString());
+    query.bindValue(":LP_CODE_RATE", m_lp_code_rate.toString());
+    query.bindValue(":MODULATION", m_modulation.toString());
+    query.bindValue(":TRANSMISSION_MODE", m_trans_mode.toString());
+    query.bindValue(":GUARD_INTERVAL", m_guard_interval.toString());
+    query.bindValue(":HIERARCHY", m_hierarchy.toString());
+    query.bindValue(":MOD_SYS", m_mod_sys.toString());
+    query.bindValue(":ROLLOFF", m_rolloff.toString());
+    query.bindValue(":BANDWIDTH", m_bandwidth.toString());
+    query.bindValue(":SISTANDARD", m_sistandard);
+    query.bindValue(":TUNER_TYPE", (uint)m_tuner_type);
 
     if (!query.exec())
     {
@@ -604,8 +667,8 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
     if (!transportid)
         return transportid;
 
-    for (uint i = 0; i < channels.size(); i++)
-        channels[i].SaveScan(scanid, transportid);
+    for (size_t i = 0; i < m_channels.size(); i++)
+        m_channels[i].SaveScan(scanid, transportid);
 
     return transportid;
 }
@@ -619,14 +682,14 @@ bool ScanDTVTransport::ParseTuningParams(
     QString _modulation,   QString _bandwidth,      QString _mod_sys,
     QString _rolloff)
 {
-    tuner_type = type;
+    m_tuner_type = type;
 
     return DTVMultiplex::ParseTuningParams(
         type,
-        _frequency,     _inversion,       _symbolrate,
-        _fec,           _polarity,
-        _hp_code_rate,  _lp_code_rate,    _ofdm_modulation,
-        _trans_mode,    _guard_interval,  _hierarchy,
-        _modulation,    _bandwidth,       _mod_sys,
-        _rolloff);
+        std::move(_frequency),     std::move(_inversion),       std::move(_symbolrate),
+        std::move(_fec),           std::move(_polarity),
+        std::move(_hp_code_rate),  std::move(_lp_code_rate),    std::move(_ofdm_modulation),
+        std::move(_trans_mode),    std::move(_guard_interval),  std::move(_hierarchy),
+        std::move(_modulation),    std::move(_bandwidth),       std::move(_mod_sys),
+        std::move(_rolloff));
 }

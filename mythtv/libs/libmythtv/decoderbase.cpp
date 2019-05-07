@@ -17,55 +17,28 @@ using namespace std;
 
 DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
     : m_parent(parent), m_playbackinfo(new ProgramInfo(pginfo)),
-      m_audio(m_parent->GetAudio()), ringBuffer(nullptr),
+      m_audio(m_parent->GetAudio()),
+      m_totalDuration(AVRationalInit(0)),
 
-      current_width(640), current_height(480),
-      current_aspect(1.33333), fps(29.97),
-      fpsMultiplier(1), fpsSkip(0),
-      bitrate(4000),
-
-      framesPlayed(0), framesRead(0),
-      totalDuration(AVRationalInit(0)),
-      lastKey(0), keyframedist(-1), indexOffset(0),
-      trackTotalDuration(false),
-
-      ateof(kEofStateNone), exitafterdecoded(false), transcoding(false),
-
-      hasFullPositionMap(false), recordingHasPositionMap(false),
-      posmapStarted(false), positionMapType(MARK_UNSET),
-
-      m_positionMapLock(QMutex::Recursive),
-      dontSyncPositionMap(false),
-
-      seeksnap(UINT64_MAX), livetv(false), watchingrecording(false),
-
-      hasKeyFrameAdjustTable(false),
-      getrawframes(false), getrawvideo(false),
-      errored(false), waitingForChange(false), readAdjust(0),
-      justAfterChange(false),
-      video_inverted(false),
-      decodeAllSubtitles(false),
       // language preference
-      languagePreference(iso639_get_language_key_list()),
+      m_languagePreference(iso639_get_language_key_list()),
       // this will be deleted and recreated once decoder is set up
       m_mythcodecctx(new MythCodecContext())
 {
     ResetTracks();
-    tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0, 0));
-    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1, 0));
-    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3, 0));
+    m_tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0, 0));
+    m_tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1, 0));
+    m_tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3, 0));
 }
 
 DecoderBase::~DecoderBase()
 {
-    if (m_playbackinfo)
-        delete m_playbackinfo;
+    delete m_playbackinfo;
 }
 
 void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
 {
-    if (m_playbackinfo)
-        delete m_playbackinfo;
+    delete m_playbackinfo;
     m_playbackinfo = new ProgramInfo(pginfo);
 }
 
@@ -83,35 +56,36 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
     if (reset_video_data)
     {
         ResetPosMap();
-        framesPlayed = 0;
-        fpsSkip = 0;
-        framesRead = 0;
-        totalDuration = AVRationalInit(0);
-        dontSyncPositionMap = false;
+        m_framesPlayed = 0;
+        m_fpsSkip = 0;
+        m_framesRead = 0;
+        m_totalDuration = AVRationalInit(0);
+        m_dontSyncPositionMap = false;
     }
 
     if (reset_file)
     {
-        waitingForChange = false;
+        m_waitingForChange = false;
         SetEofState(kEofStateNone);
     }
 }
 
-void DecoderBase::SeekReset(long long, uint, bool, bool)
+void DecoderBase::SeekReset(long long /*newkey*/, uint /*skipFrames*/,
+                            bool /*doFlush*/, bool /*discardFrames*/)
 {
-    readAdjust = 0;
+    m_readAdjust = 0;
 }
 
 void DecoderBase::SetWatchingRecording(bool mode)
 {
-    bool wereWatchingRecording = watchingrecording;
+    bool wereWatchingRecording = m_watchingrecording;
 
     // When we switch from WatchingRecording to WatchingPreRecorded,
     // re-get the positionmap
-    posmapStarted = false;
-    watchingrecording = mode;
+    m_posmapStarted = false;
+    m_watchingrecording = mode;
 
-    if (wereWatchingRecording && !watchingrecording)
+    if (wereWatchingRecording && !m_watchingrecording)
         SyncPositionMap();
 }
 
@@ -126,51 +100,51 @@ bool DecoderBase::PosMapFromDb(void)
     if (ringBuffer && ringBuffer->IsDVD())
     {
         long long totframes;
-        keyframedist = 15;
-        fps = ringBuffer->DVD()->GetFrameRate();
-        if (fps < 26 && fps > 24)
-           keyframedist = 12;
-        totframes = (long long)(ringBuffer->DVD()->GetTotalTimeOfTitle() * fps);
+        m_keyframedist = 15;
+        m_fps = ringBuffer->DVD()->GetFrameRate();
+        if (m_fps < 26 && m_fps > 24)
+           m_keyframedist = 12;
+        totframes = (long long)(ringBuffer->DVD()->GetTotalTimeOfTitle() * m_fps);
         posMap[totframes] = ringBuffer->DVD()->GetTotalReadPosition();
     }
     else if (ringBuffer && ringBuffer->IsBD())
     {
         long long totframes;
-        keyframedist = 15;
-        fps = ringBuffer->BD()->GetFrameRate();
-        if (fps < 26 && fps > 24)
-           keyframedist = 12;
-        totframes = (long long)(ringBuffer->BD()->GetTotalTimeOfTitle() * fps);
+        m_keyframedist = 15;
+        m_fps = ringBuffer->BD()->GetFrameRate();
+        if (m_fps < 26 && m_fps > 24)
+           m_keyframedist = 12;
+        totframes = (long long)(ringBuffer->BD()->GetTotalTimeOfTitle() * m_fps);
         posMap[totframes] = ringBuffer->BD()->GetTotalReadPosition();
 #if 0
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("%1 TotalTimeOfTitle() in ticks, %2 TotalReadPosition() "
                     "in bytes, %3 is fps")
                 .arg(ringBuffer->BD()->GetTotalTimeOfTitle())
-                .arg(ringBuffer->BD()->GetTotalReadPosition()).arg(fps));
+                .arg(ringBuffer->BD()->GetTotalReadPosition()).arg(m_fps));
 #endif
     }
-    else if ((positionMapType == MARK_UNSET) ||
-        (keyframedist == -1))
+    else if ((m_positionMapType == MARK_UNSET) ||
+        (m_keyframedist == -1))
     {
         m_playbackinfo->QueryPositionMap(posMap, MARK_GOP_BYFRAME);
         if (!posMap.empty())
         {
-            positionMapType = MARK_GOP_BYFRAME;
-            if (keyframedist == -1)
-                keyframedist = 1;
+            m_positionMapType = MARK_GOP_BYFRAME;
+            if (m_keyframedist == -1)
+                m_keyframedist = 1;
         }
         else
         {
             m_playbackinfo->QueryPositionMap(posMap, MARK_GOP_START);
             if (!posMap.empty())
             {
-                positionMapType = MARK_GOP_START;
-                if (keyframedist == -1)
+                m_positionMapType = MARK_GOP_START;
+                if (m_keyframedist == -1)
                 {
-                    keyframedist = 15;
-                    if (fps < 26 && fps > 24)
-                        keyframedist = 12;
+                    m_keyframedist = 15;
+                    if (m_fps < 26 && m_fps > 24)
+                        m_keyframedist = 12;
                 }
             }
             else
@@ -180,14 +154,14 @@ bool DecoderBase::PosMapFromDb(void)
                 {
                     // keyframedist should be set in the fileheader so no
                     // need to try to determine it in this case
-                    positionMapType = MARK_KEYFRAME;
+                    m_positionMapType = MARK_KEYFRAME;
                 }
             }
         }
     }
     else
     {
-        m_playbackinfo->QueryPositionMap(posMap, positionMapType);
+        m_playbackinfo->QueryPositionMap(posMap, m_positionMapType);
     }
 
     if (posMap.empty())
@@ -204,12 +178,12 @@ bool DecoderBase::PosMapFromDb(void)
     for (frm_pos_map_t::const_iterator it = posMap.begin();
          it != posMap.end(); ++it)
     {
-        PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
+        PosMapEntry e = {it.key(), it.key() * m_keyframedist, *it};
         m_positionMap.push_back(e);
     }
 
     if (!m_positionMap.empty() && !(ringBuffer && ringBuffer->IsDisc()))
-        indexOffset = m_positionMap[0].index;
+        m_indexOffset = m_positionMap[0].index;
 
     if (!m_positionMap.empty())
     {
@@ -246,7 +220,7 @@ bool DecoderBase::PosMapFromDb(void)
  */
 bool DecoderBase::PosMapFromEnc(void)
 {
-    if (!m_parent || keyframedist < 1)
+    if (!m_parent || m_keyframedist < 1)
         return false;
 
     unsigned long long start = 0;
@@ -274,12 +248,12 @@ bool DecoderBase::PosMapFromEnc(void)
         if (it.key() <= last_index)
             continue;
 
-        PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
+        PosMapEntry e = {it.key(), it.key() * m_keyframedist, *it};
         m_positionMap.push_back(e);
     }
 
     if (!m_positionMap.empty() && !(ringBuffer && ringBuffer->IsDisc()))
-        indexOffset = m_positionMap[0].index;
+        m_indexOffset = m_positionMap[0].index;
 
     if (!m_positionMap.empty())
     {
@@ -318,7 +292,7 @@ bool DecoderBase::PosMapFromEnc(void)
 unsigned long DecoderBase::GetPositionMapSize(void) const
 {
     QMutexLocker locker(&m_positionMapLock);
-    return (unsigned long) m_positionMap.size();
+    return m_positionMap.size();
 }
 
 /** \fn DecoderBase::SyncPositionMap()
@@ -348,17 +322,17 @@ bool DecoderBase::SyncPositionMap(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Resyncing position map. posmapStarted = %1"
                 " livetv(%2) watchingRec(%3)")
-            .arg((int) posmapStarted).arg(livetv).arg(watchingrecording));
+            .arg((int) m_posmapStarted).arg(m_livetv).arg(m_watchingrecording));
 
-    if (dontSyncPositionMap)
+    if (m_dontSyncPositionMap)
         return false;
 
     unsigned long old_posmap_size = GetPositionMapSize();
     unsigned long new_posmap_size = old_posmap_size;
 
-    if (livetv || watchingrecording)
+    if (m_livetv || m_watchingrecording)
     {
-        if (!posmapStarted)
+        if (!m_posmapStarted)
         {
             // starting up -- try first from database
             PosMapFromDb();
@@ -384,7 +358,7 @@ bool DecoderBase::SyncPositionMap(void)
     else
     {
         // watching prerecorded ... just get from db
-        if (!posmapStarted)
+        if (!m_posmapStarted)
         {
             PosMapFromDb();
 
@@ -397,7 +371,7 @@ bool DecoderBase::SyncPositionMap(void)
 
     bool ret_val = new_posmap_size > old_posmap_size;
 
-    if (ret_val && keyframedist > 0)
+    if (ret_val && m_keyframedist > 0)
     {
         long long totframes = 0;
         int length = 0;
@@ -417,21 +391,21 @@ bool DecoderBase::SyncPositionMap(void)
         else
         {
             QMutexLocker locker(&m_positionMapLock);
-            totframes = m_positionMap.back().index * keyframedist;
-            if (fps)
-                length = (int)((totframes * 1.0) / fps);
+            totframes = m_positionMap.back().index * m_keyframedist;
+            if (m_fps)
+                length = (int)((totframes * 1.0) / m_fps);
         }
 
         m_parent->SetFileLength(length, totframes);
-        m_parent->SetKeyframeDistance(keyframedist);
-        posmapStarted = true;
+        m_parent->SetKeyframeDistance(m_keyframedist);
+        m_posmapStarted = true;
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("SyncPositionMap, new totframes: %1, new length: %2, "
                     "posMap size: %3")
                 .arg(totframes).arg(length).arg(new_posmap_size));
     }
-    recordingHasPositionMap |= (0 != new_posmap_size);
+    m_recordingHasPositionMap |= (0 != new_posmap_size);
     {
         QMutexLocker locker(&m_positionMapLock);
         m_lastPositionMapUpdate = QDateTime::currentDateTime();
@@ -450,8 +424,8 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     long long lower = -1;
     long long upper = size;
 
-    if (!search_adjusted && keyframedist > 0)
-        desired_value /= keyframedist;
+    if (!search_adjusted && m_keyframedist > 0)
+        desired_value /= m_keyframedist;
 
     while (upper - 1 > lower)
     {
@@ -460,7 +434,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
         if (search_adjusted)
             value = m_positionMap[i].adjFrame;
         else
-            value = m_positionMap[i].index - indexOffset;
+            value = m_positionMap[i].index - m_indexOffset;
         if (value == desired_value)
         {
             // found it
@@ -476,7 +450,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
             return true;
         }
-        else if (value > desired_value)
+        if (value > desired_value)
             upper = i;
         else
             lower = i;
@@ -493,10 +467,10 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     else
     {
         while (lower >= 0 &&
-               (m_positionMap[lower].index - indexOffset) > desired_value)
+               (m_positionMap[lower].index - m_indexOffset) > desired_value)
             lower--;
         while (upper < size &&
-               (m_positionMap[upper].index - indexOffset) < desired_value)
+               (m_positionMap[upper].index - m_indexOffset) < desired_value)
             upper++;
     }
     // keep in bounds
@@ -527,15 +501,15 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
     ttm.start();
 
     QMutexLocker locker(&m_positionMapLock);
-    MarkTypes type = positionMapType;
+    MarkTypes type = m_positionMapType;
     uint64_t saved = 0;
 
-    if (!m_playbackinfo || (positionMapType == MARK_UNSET))
+    if (!m_playbackinfo || (m_positionMapType == MARK_UNSET))
         return saved;
 
     ctm.start();
     frm_pos_map_t posMap;
-    for (uint i = 0; i < m_positionMap.size(); i++)
+    for (size_t i = 0; i < m_positionMap.size(); i++)
     {
         if (m_positionMap[i].index < first)
             continue;
@@ -579,25 +553,25 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("DoRewind(%1 (%2), %3 discard frames)")
-            .arg(desiredFrame).arg(framesPlayed)
+            .arg(desiredFrame).arg(m_framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
     if (!DoRewindSeek(desiredFrame))
         return false;
 
-    framesPlayed = lastKey;
-    fpsSkip = 0;
-    framesRead = lastKey;
+    m_framesPlayed = m_lastKey;
+    m_fpsSkip = 0;
+    m_framesRead = m_lastKey;
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
-    int normalframes = (uint64_t)(desiredFrame - (framesPlayed - 1)) > seeksnap
-        ? desiredFrame - framesPlayed : 0;
+    int normalframes = (uint64_t)(desiredFrame - (m_framesPlayed - 1)) > m_seeksnap
+        ? desiredFrame - m_framesPlayed : 0;
     normalframes = max(normalframes, 0);
-    SeekReset(lastKey, normalframes, true, discardFrames);
+    SeekReset(m_lastKey, normalframes, true, discardFrames);
 
     if (discardFrames || (ringBuffer && ringBuffer->IsDisc()))
-        m_parent->SetFramesPlayed(framesPlayed+1);
+        m_parent->SetFramesPlayed(m_framesPlayed+1);
 
     return true;
 }
@@ -605,8 +579,8 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 long long DecoderBase::GetKey(const PosMapEntry &e) const
 {
     long long kf = (ringBuffer && ringBuffer->IsDisc()) ?
-        1LL : keyframedist;
-    return (hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - indexOffset) * kf;
+        1LL : m_keyframedist;
+    return (m_hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - m_indexOffset) * kf;
 }
 
 bool DecoderBase::DoRewindSeek(long long desiredFrame)
@@ -627,7 +601,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
 
     // Find keyframe <= desiredFrame, store in lastKey (frames)
     int pre_idx, post_idx;
-    FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
+    FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     PosMapEntry e;
     {
@@ -636,8 +610,8 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
         PosMapEntry e_post = m_positionMap[post_idx];
         int pos_idx = pre_idx;
         e = e_pre;
-        if (((uint64_t) (GetKey(e_post) - desiredFrame)) <= seeksnap &&
-            framesPlayed - 1 > GetKey(e_post) &&
+        if (((uint64_t) (GetKey(e_post) - desiredFrame)) <= m_seeksnap &&
+            m_framesPlayed - 1 > GetKey(e_post) &&
             GetKey(e_post) - desiredFrame <= desiredFrame - GetKey(e_pre))
         {
             // Snap to the right if e_post is within snap distance and
@@ -647,7 +621,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
             pos_idx = post_idx;
             e = e_post;
         }
-        lastKey = GetKey(e);
+        m_lastKey = GetKey(e);
 
         // ??? Don't rewind past the beginning of the file
         while (e.pos < 0)
@@ -657,7 +631,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
                 return false;
 
             e = m_positionMap[pos_idx];
-            lastKey = GetKey(e);
+            m_lastKey = GetKey(e);
         }
     }
 
@@ -669,7 +643,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
 void DecoderBase::ResetPosMap(void)
 {
     QMutexLocker locker(&m_positionMapLock);
-    posmapStarted = false;
+    m_posmapStarted = false;
     m_positionMap.clear();
     m_frameToDurMap.clear();
     m_durToFrameMap.clear();
@@ -733,7 +707,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("DoFastForward(%1 (%2), %3 discard frames)")
-            .arg(desiredFrame).arg(framesPlayed)
+            .arg(desiredFrame).arg(m_framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
     if (!ringBuffer)
@@ -753,13 +727,13 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     // This shouldn't effect how this works in general because this is
     // only triggered on the first keyframe/frame skip when paused. At
     // that point the decoding is more than one frame ahead of display.
-    if (desiredFrame+1 < framesPlayed)
+    if (desiredFrame+1 < m_framesPlayed)
         return DoRewind(desiredFrame, discardFrames);
-    desiredFrame = max(desiredFrame, framesPlayed);
+    desiredFrame = max(desiredFrame, m_framesPlayed);
 
     // Save rawframe state, for later restoration...
-    bool oldrawstate = getrawframes;
-    getrawframes = false;
+    bool oldrawstate = m_getrawframes;
+    m_getrawframes = false;
 
     ConditionallyUpdatePosMap(desiredFrame);
 
@@ -788,19 +762,19 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         // Handle non-frame-by-frame seeking
         DoFastForwardSeek(last_frame, needflush);
 
-        exitafterdecoded = true; // don't actualy get a frame
-        while ((desiredFrame > last_frame) && !ateof)
+        m_exitafterdecoded = true; // don't actualy get a frame
+        while ((desiredFrame > last_frame) && !m_ateof)
         {
             GetFrame(kDecodeNothing); // don't need to return frame...
             SyncPositionMap();
             last_frame = GetLastFrameInPosMap();
         }
-        exitafterdecoded = false; // allow frames to be returned again
+        m_exitafterdecoded = false; // allow frames to be returned again
 
-        if (ateof)
+        if (m_ateof)
         {
             // Re-enable rawframe state if it was enabled before FF
-            getrawframes = oldrawstate;
+            m_getrawframes = oldrawstate;
             return false;
         }
     }
@@ -810,7 +784,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         if (m_positionMap.empty())
         {
             // Re-enable rawframe state if it was enabled before FF
-            getrawframes = oldrawstate;
+            m_getrawframes = oldrawstate;
             return false;
         }
     }
@@ -820,16 +794,16 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
-    int normalframes = (uint64_t)(desiredFrame - (framesPlayed - 1)) > seeksnap
-        ? desiredFrame - framesPlayed : 0;
+    int normalframes = (uint64_t)(desiredFrame - (m_framesPlayed - 1)) > m_seeksnap
+        ? desiredFrame - m_framesPlayed : 0;
     normalframes = max(normalframes, 0);
-    SeekReset(lastKey, normalframes, needflush, discardFrames);
+    SeekReset(m_lastKey, normalframes, needflush, discardFrames);
 
-    if (discardFrames || transcoding)
-        m_parent->SetFramesPlayed(framesPlayed+1);
+    if (discardFrames || m_transcoding)
+        m_parent->SetFramesPlayed(m_framesPlayed+1);
 
     // Re-enable rawframe state if it was enabled before FF
-    getrawframes = oldrawstate;
+    m_getrawframes = oldrawstate;
 
     return true;
 }
@@ -858,7 +832,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     }
 
     int pre_idx, post_idx;
-    FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
+    FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     // if exactseeks, use keyframe <= desiredFrame
 
@@ -869,8 +843,8 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
         e_post = m_positionMap[post_idx];
     }
     e = e_pre;
-    if (((uint64_t) (GetKey(e_post) - desiredFrame)) <= seeksnap &&
-        (framesPlayed - 1 >= GetKey(e_pre) ||
+    if (((uint64_t) (GetKey(e_post) - desiredFrame)) <= m_seeksnap &&
+        (m_framesPlayed - 1 >= GetKey(e_pre) ||
          GetKey(e_post) - desiredFrame < desiredFrame - GetKey(e_pre)))
     {
         // Snap to the right if e_post is within snap distance and is
@@ -879,49 +853,49 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
         // to the right.
         e = e_post;
     }
-    lastKey = GetKey(e);
+    m_lastKey = GetKey(e);
 
-    if (framesPlayed < lastKey)
+    if (m_framesPlayed < m_lastKey)
     {
         ringBuffer->Seek(e.pos, SEEK_SET);
         needflush    = true;
-        framesPlayed = lastKey;
-        fpsSkip = 0;
-        framesRead = lastKey;
+        m_framesPlayed = m_lastKey;
+        m_fpsSkip = 0;
+        m_framesRead = m_lastKey;
     }
 }
 
 void DecoderBase::UpdateFramesPlayed(void)
 {
-    m_parent->SetFramesPlayed(framesPlayed);
+    m_parent->SetFramesPlayed(m_framesPlayed);
 }
 
 void DecoderBase::FileChanged(void)
 {
     ResetPosMap();
-    framesPlayed = 0;
-    framesRead = 0;
-    totalDuration = AVRationalInit(0);
+    m_framesPlayed = 0;
+    m_framesRead = 0;
+    m_totalDuration = AVRationalInit(0);
 
-    waitingForChange = false;
-    justAfterChange = true;
+    m_waitingForChange = false;
+    m_justAfterChange = true;
 
     m_parent->FileChangedCallback();
 }
 
 void DecoderBase::SetReadAdjust(long long adjust)
 {
-    readAdjust = adjust;
+    m_readAdjust = adjust;
 }
 
 void DecoderBase::SetWaitForChange(void)
 {
-    waitingForChange = true;
+    m_waitingForChange = true;
 }
 
 bool DecoderBase::GetWaitForChange(void) const
 {
-    return waitingForChange;
+    return m_waitingForChange;
 }
 
 QStringList DecoderBase::GetTracks(uint type) const
@@ -930,7 +904,7 @@ QStringList DecoderBase::GetTracks(uint type) const
 
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < tracks[type].size(); i++)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
         list += GetTrackDesc(type, i);
 
     return list;
@@ -938,52 +912,49 @@ QStringList DecoderBase::GetTracks(uint type) const
 
 int DecoderBase::GetTrackLanguageIndex(uint type, uint trackNo) const
 {
-    if (trackNo >= tracks[type].size())
+    if (trackNo >= m_tracks[type].size())
         return 0;
 
-    return tracks[type][trackNo].language_index;
+    return m_tracks[type][trackNo].m_language_index;
 }
 
 QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 {
-    if (trackNo >= tracks[type].size())
+    if (trackNo >= m_tracks[type].size())
         return "";
 
     QMutexLocker locker(avcodeclock);
 
     QString type_msg = toString((TrackType)type);
-    int lang = tracks[type][trackNo].language;
+    int lang = m_tracks[type][trackNo].m_language;
     int hnum = trackNo + 1;
     if (kTrackTypeCC608 == type)
-        hnum = tracks[type][trackNo].stream_id;
+        hnum = m_tracks[type][trackNo].m_stream_id;
 
     if (!lang)
         return type_msg + QString(" %1").arg(hnum);
-    else
-    {
-        QString lang_msg = iso639_key_toName(lang);
-        return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
-    }
+    QString lang_msg = iso639_key_toName(lang);
+    return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
 }
 
 int DecoderBase::SetTrack(uint type, int trackNo)
 {
-    if (trackNo >= (int)tracks[type].size())
-        return false;
+    if (trackNo >= (int)m_tracks[type].size())
+        return -1;
 
     QMutexLocker locker(avcodeclock);
 
-    currentTrack[type] = max(-1, trackNo);
+    m_currentTrack[type] = max(-1, trackNo);
 
-    if (currentTrack[type] < 0)
-        selectedTrack[type].av_stream_index = -1;
+    if (m_currentTrack[type] < 0)
+        m_selectedTrack[type].m_av_stream_index = -1;
     else
     {
-        wantedTrack[type]   = tracks[type][currentTrack[type]];
-        selectedTrack[type] = tracks[type][currentTrack[type]];
+        m_wantedTrack[type]   = m_tracks[type][m_currentTrack[type]];
+        m_selectedTrack[type] = m_tracks[type][m_currentTrack[type]];
     }
 
-    return currentTrack[type];
+    return m_currentTrack[type];
 }
 
 StreamInfo DecoderBase::GetTrackInfo(uint type, uint trackNo) const
@@ -992,24 +963,24 @@ StreamInfo DecoderBase::GetTrackInfo(uint type, uint trackNo) const
     // which is waiting while holding the lock.
     // QMutexLocker locker(avcodeclock);
 
-    if (trackNo >= tracks[type].size())
+    if (trackNo >= m_tracks[type].size())
     {
         StreamInfo si;
         return si;
     }
 
-    return tracks[type][trackNo];
+    return m_tracks[type][trackNo];
 }
 
 bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 {
     QMutexLocker locker(avcodeclock);
 
-    for (uint i = 0; i < tracks[type].size(); i++)
-        if (info.stream_id == tracks[type][i].stream_id)
+    for (size_t i = 0; i < m_tracks[type].size(); i++)
+        if (info.m_stream_id == m_tracks[type][i].m_stream_id)
             return false;
 
-    tracks[type].push_back(info);
+    m_tracks[type].push_back(info);
 
     if (m_parent)
         m_parent->TracksChanged(type);
@@ -1034,39 +1005,39 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
  */
 int DecoderBase::AutoSelectTrack(uint type)
 {
-    uint numStreams = tracks[type].size();
+    uint numStreams = m_tracks[type].size();
 
-    if ((currentTrack[type] >= 0) &&
-        (currentTrack[type] < (int)numStreams))
+    if ((m_currentTrack[type] >= 0) &&
+        (m_currentTrack[type] < (int)numStreams))
     {
-        return true; // track already selected
+        return m_currentTrack[type]; // track already selected
     }
 
     if (!numStreams)
     {
-        currentTrack[type] = -1;
-        selectedTrack[type].av_stream_index = -1;
-        return false; // no tracks available
+        m_currentTrack[type] = -1;
+        m_selectedTrack[type].m_av_stream_index = -1;
+        return -1; // no tracks available
     }
 
     int selTrack = (1 == numStreams) ? 0 : -1;
 
     if ((selTrack < 0) &&
-        wantedTrack[type].language>=-1)
+        m_wantedTrack[type].m_language>=-1)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to reselect track");
         // Try to reselect user selected track stream.
         // This should find the stream after a commercial
         // break and in some cases after a channel change.
-        int  wlang = wantedTrack[type].language;
-        uint windx = wantedTrack[type].language_index;
+        int  wlang = m_wantedTrack[type].m_language;
+        uint windx = m_wantedTrack[type].m_language_index;
         for (uint i = 0; i < numStreams; i++)
         {
-            if (wlang == tracks[type][i].language)
+            if (wlang == m_tracks[type][i].m_language)
             {
                 selTrack = i;
 
-                if (windx == tracks[type][i].language_index)
+                if (windx == m_tracks[type][i].m_language_index)
                     break;
             }
         }
@@ -1089,15 +1060,15 @@ int DecoderBase::AutoSelectTrack(uint type)
         for (uint i = 0; i < numStreams; i++)
         {
             int forced = (type == kTrackTypeSubtitle &&
-                          tracks[type][i].forced &&
+                          m_tracks[type][i].m_forced &&
                           m_parent->ForcedSubtitlesFavored());
             int position = numStreams - i;
             int language = 0;
             for (uint j = 0;
-                 (language == 0) && (j < languagePreference.size()); ++j)
+                 (language == 0) && (j < m_languagePreference.size()); ++j)
             {
-                if (tracks[type][i].language == languagePreference[j])
-                    language = languagePreference.size() - j;
+                if (m_tracks[type][i].m_language == m_languagePreference[j])
+                    language = m_languagePreference.size() - j;
             }
             int score = kForcedWeight * forced
                 + kLanguageWeight * language
@@ -1110,22 +1081,22 @@ int DecoderBase::AutoSelectTrack(uint type)
         }
     }
 
-    int oldTrack = currentTrack[type];
-    currentTrack[type] = selTrack;
-    StreamInfo tmp = tracks[type][currentTrack[type]];
-    selectedTrack[type] = tmp;
+    int oldTrack = m_currentTrack[type];
+    m_currentTrack[type] = selTrack;
+    StreamInfo tmp = m_tracks[type][m_currentTrack[type]];
+    m_selectedTrack[type] = tmp;
 
-    if (wantedTrack[type].av_stream_index < 0)
-        wantedTrack[type] = tmp;
+    if (m_wantedTrack[type].m_av_stream_index < 0)
+        m_wantedTrack[type] = tmp;
 
-    int lang = tracks[type][currentTrack[type]].language;
+    int lang = m_tracks[type][m_currentTrack[type]].m_language;
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Selected track #%1 (type %2) in the %3 language(%4)")
-            .arg(currentTrack[type]+1)
+            .arg(m_currentTrack[type]+1)
             .arg(type)
             .arg(iso639_key_toName(lang)).arg(lang));
 
-    if (m_parent && (oldTrack != currentTrack[type]))
+    if (m_parent && (oldTrack != m_currentTrack[type]))
         m_parent->TracksChanged(type);
 
     return selTrack;
@@ -1217,18 +1188,18 @@ QString toString(AudioTrackType type)
 
 void DecoderBase::SaveTotalDuration(void)
 {
-    if (!m_playbackinfo || av_q2d(totalDuration) == 0)
+    if (!m_playbackinfo || av_q2d(m_totalDuration) == 0)
         return;
 
-    m_playbackinfo->SaveTotalDuration(1000000 * av_q2d(totalDuration));
+    m_playbackinfo->SaveTotalDuration(1000000 * av_q2d(m_totalDuration));
 }
 
 void DecoderBase::SaveTotalFrames(void)
 {
-    if (!m_playbackinfo || !framesRead)
+    if (!m_playbackinfo || !m_framesRead)
         return;
 
-    m_playbackinfo->SaveTotalFrames(framesRead);
+    m_playbackinfo->SaveTotalFrames(m_framesRead);
 }
 
 // Linearly interpolate the value for a given key in the map.  If the
@@ -1266,22 +1237,19 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
     {
         // Extrapolate from (key1,val1) based on fallback_ratio
         key2 = key;
-        val2 = val1 + fallback_ratio * (key2 - key1) + 0.5;
+        val2 = llroundf(val1 + fallback_ratio * (key2 - key1));
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("TranslatePosition(key=%1, ratio=%2): "
                     "extrapolating to (%3,%4)")
             .arg(key).arg(fallback_ratio).arg(key2).arg(val2));
         return val2;
     }
-    else
-    {
-        key2 = upper.key();
-        val2 = upper.value();
-    }
+    key2 = upper.key();
+    val2 = upper.value();
     if (key1 == key2) // this happens for an exact keyframe match
         return val2; // can also set key2 = key1 + 1 avoid dividing by zero
 
-    return val1 + (double) (key - key1) * (val2 - val1) / (key2 - key1) + 0.5;
+    return llround(val1 + (double) (key - key1) * (val2 - val1) / (key2 - key1));
 }
 
 // Convert from an absolute frame number (not cutlist adjusted) to its

@@ -182,7 +182,7 @@ const uint8_t *avc_find_startcode(const uint8_t *p, const uint8_t *end)
     return out;
 }
 
-const int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
+int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
 {
     const uint8_t *p = buf_in;
     const uint8_t *end = p + size;
@@ -202,7 +202,7 @@ const int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
     return size;
 }
 
-const int avc_parse_nal_units_buf(const uint8_t *buf_in,
+int avc_parse_nal_units_buf(const uint8_t *buf_in,
                                   uint8_t **buf, int *size)
 {
     AVIOContext *pb;
@@ -217,7 +217,7 @@ const int avc_parse_nal_units_buf(const uint8_t *buf_in,
     return 0;
 }
 
-const int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
+int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
 {
     // extradata from bytestream h264, convert to avcC atom data for bitstream
     if (len > 6)
@@ -439,7 +439,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     m_size         = QSize(width, height);
     m_slice_count  = avctx->slice_count;
 
-    int mbs = ceil((double)width / 16.0f);
+    int mbs = ceil((double)width / 16.0F);
     if (((mbs == 49)  || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
          (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128)))
     {
@@ -749,8 +749,8 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         int i = 0;
         for (; i < decoder->m_decoded_frames.size(); i++)
         {
-            int64_t pts = decoder->m_decoded_frames[i].pts;
-            if (pts != (int64_t)AV_NOPTS_VALUE && time > pts)
+            int64_t pts2 = decoder->m_decoded_frames[i].pts;
+            if (pts2 != (int64_t)AV_NOPTS_VALUE && time > pts2)
             {
                 found = true;
                 break;

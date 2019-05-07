@@ -16,14 +16,14 @@ class TeletextScreen: public MythScreenType
     virtual ~TeletextScreen();
 
     // MythScreenType methods
-    virtual bool Create(void);
-    virtual void Pulse(void);
+    bool Create(void) override; // MythScreenType
+    void Pulse(void) override; // MythUIType
 
     // TeletextViewer interface methods
     bool KeyPress(const QString &key);
     void SetPage(int page, int subpage);
     void SetDisplaying(bool display);
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     void ClearScreen(void);
 
   private:
@@ -33,23 +33,23 @@ class TeletextScreen: public MythScreenType
     void SetBackgroundColor(int color);
     void DrawBackground(int x, int y);
     void DrawRect(int row, const QRect);
-    void DrawCharacter(int x, int y, QChar ch, int doubleheight = 0);
-    void DrawMosaic(int x, int y, int code, int doubleheight);
+    void DrawCharacter(int x, int y, QChar ch, bool doubleheight = false);
+    void DrawMosaic(int x, int y, int code, bool doubleheight);
     void DrawLine(const uint8_t *page, uint row, int lang);
     void DrawHeader(const uint8_t *page, int lang);
     void DrawStatus(void);
     void DrawPage(void);
 
-    MythPlayer     *m_player;
-    TeletextReader *m_teletextReader;
+    MythPlayer     *m_player         {nullptr};
+    TeletextReader *m_teletextReader {nullptr};
     QRect           m_safeArea;
-    int             m_colWidth;
-    int             m_rowHeight;
-    QColor          m_bgColor;
-    bool            m_displaying;
+    int             m_colWidth       {10};
+    int             m_rowHeight      {10};
+    QColor          m_bgColor        {kColorBlack};
+    bool            m_displaying     {false};
     QHash<int, QImage*> m_rowImages;
     int             m_fontStretch;
-    int             m_fontHeight;
+    int             m_fontHeight     {10};
 
   public:
     static const QColor kColorBlack;

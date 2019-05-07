@@ -51,12 +51,12 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
     }
 
   protected slots:
-    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
+    void newTcpConnection(qt_socket_fd_t socket) override; // QTcpServer
 
   protected:
     mutable QReadWriteLock  m_rwlock;
     MThreadPool             m_threadPool;
-    bool                    m_running; // protected by m_rwlock
+    bool                    m_running {true}; // protected by m_rwlock
 
 #ifndef QT_NO_OPENSSL
     QSslConfiguration       m_sslConfig;
@@ -75,28 +75,27 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
 class WebSocketFrame
 {
   public:
-    WebSocketFrame() : finalFrame(false), payloadSize(0), opCode(kOpTextFrame),
-                       isMasked(false), fragmented(false)
+    WebSocketFrame()
     {
-       mask.reserve(4);
+        m_mask.reserve(4);
     }
 
    ~WebSocketFrame()
     {
-        payload.clear();
-        mask.clear();
+        m_payload.clear();
+        m_mask.clear();
     }
 
     void reset(void)
     {
-        finalFrame = false;
-        payload.clear();
-        payload.resize(128);
-        payload.squeeze();
-        mask.clear();
-        payloadSize = 0;
-        opCode = kOpTextFrame;
-        fragmented = false;
+        m_finalFrame = false;
+        m_payload.clear();
+        m_payload.resize(128);
+        m_payload.squeeze();
+        m_mask.clear();
+        m_payloadSize = 0;
+        m_opCode = kOpTextFrame;
+        m_fragmented = false;
     }
 
     typedef enum OpCodes
@@ -111,13 +110,13 @@ class WebSocketFrame
         // Reserved
     } OpCode;
 
-    bool finalFrame;
-    QByteArray payload;
-    uint64_t payloadSize;
-    OpCode opCode;
-    bool isMasked;
-    QByteArray mask;
-    bool fragmented;
+    bool       m_finalFrame  {false};
+    QByteArray m_payload;
+    uint64_t   m_payloadSize {0};
+    OpCode     m_opCode      {kOpTextFrame};
+    bool       m_isMasked    {false};
+    QByteArray m_mask;
+    bool       m_fragmented  {false};
 };
 
 class WebSocketWorker;
@@ -161,12 +160,12 @@ class WebSocketWorkerThread : public QRunnable
     WebSocketWorkerThread(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
                           PoolServerType type
 #ifndef QT_NO_OPENSSL
-                          , QSslConfiguration sslConfig
+                          , const QSslConfiguration& sslConfig
 #endif
                         );
     virtual ~WebSocketWorkerThread() = default;
 
-    virtual void run(void);
+    void run(void) override; // QRunnable
 
   private:
     WebSocketServer  &m_webSocketServer;
@@ -210,7 +209,7 @@ class WebSocketWorker : public QObject
     WebSocketWorker(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
                     PoolServerType type
 #ifndef QT_NO_OPENSSL
-                    , QSslConfiguration sslConfig
+                    , const QSslConfiguration& sslConfig
 #endif
                     );
     virtual ~WebSocketWorker();
@@ -271,25 +270,26 @@ class WebSocketWorker : public QObject
     void RegisterExtension(WebSocketExtension *extension);
     void DeregisterExtension(WebSocketExtension *extension);
 
-    QEventLoop *m_eventLoop;
+    QEventLoop     *m_eventLoop    {nullptr};
     WebSocketServer &m_webSocketServer;
     qt_socket_fd_t m_socketFD;
-    QTcpSocket *m_socket;
+    QTcpSocket    *m_socket        {nullptr};
     PoolServerType m_connectionType;
 
-    bool m_webSocketMode; // True if we've successfully upgraded from HTTP
+    // True if we've successfully upgraded from HTTP
+    bool           m_webSocketMode {false};
     WebSocketFrame m_readFrame;
 
-    uint8_t m_errorCount;
-    bool m_isRunning;
+    uint8_t m_errorCount           {0};
+    bool    m_isRunning            {false};
 
-    QTimer *m_heartBeat;
+    QTimer *m_heartBeat            {nullptr};
 
 #ifndef QT_NO_OPENSSL
     QSslConfiguration       m_sslConfig;
 #endif
 
-    bool m_fuzzTesting;
+    bool    m_fuzzTesting          {false};
 
     QList<WebSocketExtension *> m_extensions;
 };

@@ -32,17 +32,6 @@
 #include "Logging.h"
 #include "freemheg.h"
 
-MHText::MHText()
-{
-    m_nCharSet = -1;
-    m_HorizJ = m_VertJ = Start;
-    m_LineOrientation = Horizontal;
-    m_StartCorner = UpperLeft;
-    m_fTextWrap = false;
-    m_pDisplay = nullptr;
-    m_fNeedsRedraw = false;
-}
-
 MHText::MHText(const MHText &ref): MHVisible(ref) // Copy constructor for cloning.
 {
     m_OrigFont.Copy(ref.m_OrigFont);
@@ -511,12 +500,12 @@ MHTextItem *MHTextItem::NewItem()
 class MHTextLine
 {
   public:
-    MHTextLine(): m_nLineWidth(0), m_nLineHeight(0), m_nDescent(0) {}
+    MHTextLine() = default;
     ~MHTextLine();
     MHSequence <MHTextItem *> m_Items;
-    int m_nLineWidth;
-    int m_nLineHeight;
-    int m_nDescent;
+    int m_nLineWidth {0};
+    int m_nLineHeight {0};
+    int m_nDescent {0};
 };
 
 MHTextLine::~MHTextLine()
@@ -891,22 +880,9 @@ QRegion MHText::GetOpaqueArea()
     {
         return QRegion();
     }
-    else
-    {
-        return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
-    }
+    return QRegion(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
 }
 
-
-MHHyperText::MHHyperText(): MHInteractible(this)
-{
-
-}
-
-MHHyperText::~MHHyperText()
-{
-
-}
 
 void MHHyperText::Initialise(MHParseNode *p, MHEngine *engine)
 {

@@ -32,12 +32,11 @@
 #include "mythcorecontext.h"
 #include "mythdb.h"
 
-InputSelector::InputSelector(
-    uint _default_cardid, const QString &_default_inputname) :
-    sourceid(0), default_cardid(_default_cardid),
-    default_inputname(_default_inputname)
+InputSelector::InputSelector(uint default_cardid,
+                             const QString &default_inputname) :
+    m_default_cardid(default_cardid),
+    m_default_inputname(default_inputname)
 {
-    default_inputname.detach();
     setLabel(tr("Input"));
 }
 
@@ -45,7 +44,7 @@ void InputSelector::Load(void)
 {
     clearSelections();
 
-    if (!sourceid)
+    if (!m_sourceid)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -54,10 +53,11 @@ void InputSelector::Load(void)
         "FROM capturecard, videosource "
         "WHERE capturecard.sourceid = videosource.sourceid AND "
         "      hostname             = :HOSTNAME            AND "
-        "      capturecard.sourceid = :SOURCEID");
+        "      capturecard.sourceid = :SOURCEID            AND "
+        "      capturecard.parentid = 0");
 
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":SOURCEID", m_sourceid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -80,18 +80,18 @@ void InputSelector::Load(void)
 
         addSelection(desc, key);
 
-        which = (default_cardid == cardid) ? cnt : which;
+        which = (m_default_cardid == cardid) ? cnt : which;
     }
 
     if (cnt)
         setValue(which);
 }
 
-void InputSelector::SetSourceID(const QString &_sourceid)
+void InputSelector::SetSourceID(const QString &sourceid)
 {
-    if (sourceid != _sourceid.toUInt())
+    if (m_sourceid != sourceid.toUInt())
     {
-        sourceid = _sourceid.toUInt();
+        m_sourceid = sourceid.toUInt();
         Load();
     }
 }

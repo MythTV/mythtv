@@ -17,14 +17,14 @@ class FIFOWriter;
 class FIFOThread : public MThread
 {
   public:
-    FIFOThread() : MThread("FIFOThread"), m_parent(nullptr), m_id(-1) {}
+    FIFOThread() : MThread("FIFOThread") {}
     virtual ~FIFOThread() { wait(); m_parent = nullptr; m_id = -1; }
     void SetId(int id) { m_id = id; }
     void SetParent(FIFOWriter *parent) { m_parent = parent; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
-    FIFOWriter *m_parent;
-    int m_id;
+    FIFOWriter *m_parent {nullptr};
+    int         m_id     {-1};
 };
 
 class MTV_PUBLIC FIFOWriter
@@ -35,31 +35,37 @@ class MTV_PUBLIC FIFOWriter
     FIFOWriter(const FIFOWriter& rhs);
    ~FIFOWriter(void);
 
-    int FIFOInit(int id, QString desc, QString name, long size, int num_bufs);
+    bool FIFOInit(int id, const QString& desc, const QString& name, long size, int num_bufs);
     void FIFOWrite(int id, void *buf, long size);
     void FIFODrain(void);
 
   private:
     void FIFOWriteThread(int id);
 
-    struct fifo_buf 
+    typedef struct fifo_buf
     {
         struct fifo_buf *next;
         unsigned char *data;
         long blksize;
-    } **fifo_buf, **fb_inptr, **fb_outptr;
+    } fifo_buf_t;
+    fifo_buf_t     **m_fifo_buf   {nullptr};
+    fifo_buf_t     **m_fb_inptr   {nullptr};
+    fifo_buf_t     **m_fb_outptr  {nullptr};
 
-    FIFOThread     *fifothrds;
-    QMutex         *fifo_lock;
-    QWaitCondition *full_cond;
-    QWaitCondition *empty_cond;
+    FIFOThread      *m_fifothrds  {nullptr};
+    QMutex          *m_fifo_lock  {nullptr};
+    QWaitCondition  *m_full_cond  {nullptr};
+    QWaitCondition  *m_empty_cond {nullptr};
 
-     QString *filename, *fbdesc;
+    QString         *m_filename   {nullptr};
+    QString         *m_fbdesc     {nullptr};
 
-     long *maxblksize;
-     int *killwr, *fbcount, *fbmaxcount;
-     int num_fifos;
-     bool usesync;
+    long            *m_maxblksize {nullptr};
+    int             *m_killwr     {nullptr};
+    int             *m_fbcount    {nullptr};
+    int             *m_fbmaxcount {nullptr};
+    int              m_num_fifos;
+    bool             m_usesync;
 };
 
 #endif

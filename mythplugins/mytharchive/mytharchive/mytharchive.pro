@@ -66,13 +66,17 @@ INSTALLS +=  scriptfiles introfiles themefiles imagefiles musicfiles
 INSTALLS +=  profilefiles burnuifiles
 INSTALLS +=  nativeuifiles
 
-#The following line was inserted by qt3to4
 QT += xml sql opengl network
 
 DEFINES += MPLUGIN_API
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
+android {
+    # to discriminate plugins in a flat directory structure
+    TARGET = mythplugin$${TARGET}
 }
 
 include ( ../../libs-targetfix.pro )

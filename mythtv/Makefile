@@ -23,7 +23,7 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	distclean $(addsuffix _distclean,$(SUBDIRS))  \
 	install   $(addsuffix _install,  $(SUBDIRS))  \
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
-	global tags TAGS cleanold \
+	global tags TAGS cleanold compdb \
 	libs/libmythbase/version.h force
 
 all: libs/libmythbase/version.h subdirs
@@ -119,4 +119,13 @@ global GPATH GRTAGS GTAGS:
 
 cleanall: clean
 	@echo "Removing old moc and .o files missed by 'clean'..."
-	@find .. -name moc_* -o -name *.o | xargs -r rm
+	@find .. -name moc_* -o -name *.o -name *.o.json | xargs -r rm
+
+compdb:
+	@echo "Building ../compile_commands.json"
+	@JFILES="$(shell find .. -name *.o.json \
+			 | grep -v /external/ \
+			 | grep -v /moc_ \
+			 | grep -v dummy.o.json)"; \
+	 sed -e '1s/^/[\n/' -e '$$s/,$$/\n]/' $$JFILES > ../compile_commands.json
+	@echo "If the output looks wrong, did you remember to clear ccache?"

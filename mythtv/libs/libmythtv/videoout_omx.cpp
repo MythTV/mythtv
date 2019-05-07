@@ -56,7 +56,7 @@ using namespace omxcontext;
 #define LOC QString("VideoOutputOMX: ")
 
 // Roundup a value: y = ROUNDUP(x,4)
-#define ROUNDUP( _x,_z) ((_x) + ((-(int)(_x)) & ((_z) -1)) )
+#define ROUNDUP( _x,_z) ((_x) + ((-(_x)) & ((_z) -1)) )
 
 // VideoFrame <> OMX_BUFFERHEADERTYPE
 #define FRAMESETHDR(f,h) ((f)->priv[3] = reinterpret_cast<unsigned char* >(h))
@@ -87,13 +87,14 @@ class MythRenderEGL : public MythRenderOpenGL2ES
   public:
     MythRenderEGL();
 
-    virtual void makeCurrent();
-    virtual void doneCurrent();
+    void makeCurrent() override; // MythRenderOpenGL
+    void doneCurrent() override; // MythRenderOpenGL
 #ifdef USE_OPENGL_QT5
-    virtual void swapBuffers();
+    void swapBuffers() override; // MythRenderOpenGL
 #else
-    virtual void swapBuffers() const;
-    virtual bool create(const QGLContext * = nullptr) { return isValid(); }
+    void swapBuffers() const override; // QGLContext
+    bool create(const QGLContext * = nullptr) override // QGLContext
+        { return isValid(); }
 #endif
 
   protected:
@@ -127,7 +128,7 @@ class GlOsdThread : public MThread
             rectsChanged = false;
             m_lock.lock();
         }
-        virtual void run()
+        void run() override // MThread
         {
             RunProlog();
             m_EGLRender = new MythRenderEGL();
@@ -266,7 +267,7 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
 
 // static
 QStringList VideoOutputOMX::GetAllowedRenderers(
-    MythCodecID myth_codec_id, const QSize &)
+    MythCodecID myth_codec_id, const QSize & /*video_dim*/)
 {
     QStringList list;
     if (codec_is_std(myth_codec_id))
@@ -289,7 +290,7 @@ VideoOutputOMX::VideoOutputOMX() :
 #endif
     init(&av_pause_frame, FMT_YV12, nullptr, 0, 0, 0);
 
-    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
 
     if (OMX_ErrorNone != m_render.Init(OMX_IndexParamVideoInit))
@@ -302,7 +303,9 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_render.Ports(); ++port)
     {
         m_render.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_render.ShowFormats(port, LOG_DEBUG);
+#if 0
+        m_render.ShowFormats(port, LOG_DEBUG);
+#endif
     }
 
     if (OMX_ErrorNone != m_imagefx.Init(OMX_IndexParamImageInit))
@@ -315,7 +318,9 @@ VideoOutputOMX::VideoOutputOMX() :
     for (unsigned port = 0; port < m_imagefx.Ports(); ++port)
     {
         m_imagefx.ShowPortDef(port, LOG_DEBUG);
-        if (0) m_imagefx.ShowFormats(port, LOG_DEBUG);
+#if 0
+        m_imagefx.ShowFormats(port, LOG_DEBUG);
+#endif
     }
 }
 
@@ -905,7 +910,7 @@ void VideoOutputOMX::Show(FrameScanType /*scan*/)
 }
 
 // pure virtual
-void VideoOutputOMX::MoveResizeWindow(QRect)
+void VideoOutputOMX::MoveResizeWindow(QRect /*new_rect*/)
 {
 }
 
@@ -1143,8 +1148,8 @@ bool VideoOutputOMX::CreateBuffers(
     std::vector<YUVInfo> yuvinfo;
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
-        yuvinfo.push_back(YUVInfo(video_dim_disp.width(),
-            video_dim_disp.height(), nBufferSize, pitches, offsets));
+        yuvinfo.emplace_back(video_dim_disp.width(), video_dim_disp.height(),
+                             nBufferSize, pitches, offsets);
         void *buf = av_malloc(nBufferSize + 64);
         if (!buf)
         {
@@ -1231,10 +1236,7 @@ bool VideoOutputOMX::Start()
             return false;
     }
 
-    if (m_render.SetState(OMX_StateExecuting, 500) != OMX_ErrorNone)
-        return false;
-
-    return true;
+    return m_render.SetState(OMX_StateExecuting, 500) == OMX_ErrorNone;
 }
 
 bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)
@@ -1324,7 +1326,7 @@ bool VideoOutputOMX::SetVideoRect(const QRect &d_rect, const QRect &vid_rect)
 
 // virtual
 OMX_ERRORTYPE VideoOutputOMX::EmptyBufferDone(
-    OMXComponent&, OMX_BUFFERHEADERTYPE *hdr)
+    OMXComponent& /*cmpnt*/, OMX_BUFFERHEADERTYPE *hdr)
 {
     assert(hdr->nSize == sizeof(OMX_BUFFERHEADERTYPE));
     assert(hdr->nVersion.nVersion == OMX_VERSION);

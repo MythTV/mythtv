@@ -246,8 +246,7 @@ bool MythFontManager::RegisterFont(const QString &fontPath,
         MythFontReference *ref = values.first();
         if (ref == nullptr)
             return false;
-        else
-            id = ref->GetFontID();
+        id = ref->GetFontID();
     }
     MythFontReference *fontReference;
     fontReference = new MythFontReference(fontPath, registeredFor, id);
@@ -276,13 +275,6 @@ MythFontManager *MythFontManager::GetGlobalFontManager(void)
 MythFontManager *GetGlobalFontManager(void)
 {
     return MythFontManager::GetGlobalFontManager();
-}
-
-MythFontReference::MythFontReference(const QString &fontPath,
-                                     const QString &registeredFor,
-                                     const int fontID) :
-    m_fontPath(fontPath), m_registeredFor(registeredFor), m_fontID(fontID)
-{
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

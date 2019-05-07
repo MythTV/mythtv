@@ -49,21 +49,21 @@ class Playlist : public QObject
 
     void setParent(PlaylistContainer *myparent) { m_parent = myparent; }
 
-    void loadPlaylist(QString a_name, QString a_host);
-    void loadPlaylistByID(int id, QString a_host);
+    void loadPlaylist(const QString& a_name, const QString& a_host);
+    void loadPlaylistByID(int id, const QString& a_host);
 
-    void savePlaylist(QString a_name, QString a_host);
+    void savePlaylist(const QString& a_name, const QString& a_host);
 
     void shuffleTracks(MusicPlayer::ShuffleMode mode);
 
     void describeYourself(void) const; //  debugging
 
-    void fillSongsFromSonglist(QString songList);
-    void fillSonglistFromQuery(QString whereClause, 
+    void fillSongsFromSonglist(const QString& songList);
+    void fillSonglistFromQuery(const QString& whereClause, 
                                bool removeDuplicates = false,
                                InsertPLOption insertOption = PL_REPLACE,
                                int currentTrackID = 0);
-    void fillSonglistFromSmartPlaylist(QString category, QString name,
+    void fillSonglistFromSmartPlaylist(const QString& category, const QString& name,
                                        bool removeDuplicates = false,
                                        InsertPLOption insertOption = PL_REPLACE,
                                        int currentTrackID = 0);
@@ -127,19 +127,19 @@ class Playlist : public QObject
     MusicMetadata* getRawSongAt(int pos) const;
     QString removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist);
 
-    int                   m_playlistid;
+    int                   m_playlistid  {0};
     QString               m_name;
 
     SongList              m_songs;
     SongList              m_shuffledSongs;
 
-    PlaylistContainer    *m_parent;
-    bool                  m_changed;
-    bool                  m_doSave;
+    PlaylistContainer    *m_parent      {nullptr};
+    bool                  m_changed     {false};
+    bool                  m_doSave      {true};
 #ifdef CD_WRTITING_FIXED
-    MythProgressDialog   *m_progress;
-    MythSystemLegacy     *m_proc;
-    uint                  m_procExitVal;
+    MythProgressDialog   *m_progress    {nullptr};
+    MythSystemLegacy     *m_proc        {nullptr};
+    uint                  m_procExitVal {0};
 #endif
 };
 

@@ -34,18 +34,18 @@ class UPNP_PUBLIC JSONSerializer : public Serializer
     protected:
 
         QTextStream   m_Stream;
-        bool          m_bCommaNeeded;
+        bool          m_bCommaNeeded {false};
 
-        virtual void BeginSerialize( QString &sName );
-        virtual void EndSerialize  ();
+        void BeginSerialize( QString &sName ) override; // Serializer
+        void EndSerialize  () override; // Serializer
 
-        virtual void BeginObject( const QString &sName, const QObject  *pObject );
-        virtual void EndObject  ( const QString &sName, const QObject  *pObject );
+        void BeginObject( const QString &sName, const QObject  *pObject ) override; // Serializer
+        void EndObject  ( const QString &sName, const QObject  *pObject ) override; // Serializer
 
-        virtual void AddProperty( const QString       &sName, 
-                                  const QVariant      &vValue,
-                                  const QMetaObject   *pMetaParent,
-                                  const QMetaProperty *pMetaProp );
+        void AddProperty( const QString       &sName, 
+                          const QVariant      &vValue,
+                          const QMetaObject   *pMetaParent,
+                          const QMetaProperty *pMetaProp ) override; // Serializer
 
 
         void RenderValue     ( const QVariant     &vValue );
@@ -58,10 +58,11 @@ class UPNP_PUBLIC JSONSerializer : public Serializer
 
     public:
 
-                 JSONSerializer( QIODevice *pDevice, const QString &sRequestName );
-        virtual ~JSONSerializer();
+                 JSONSerializer( QIODevice *pDevice, const QString &sRequestName )
+                     : m_Stream( pDevice ) { Q_UNUSED(sRequestName) }
+        virtual ~JSONSerializer() = default;
 
-        virtual QString GetContentType();
+        QString GetContentType() override; // Serializer
 
 };
 

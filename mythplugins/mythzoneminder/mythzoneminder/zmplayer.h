@@ -38,8 +38,8 @@ class ZMPlayer : public MythScreenType
              std::vector<Event *> *eventList, int *currentEvent);
     ~ZMPlayer();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void updateFrame(void);
@@ -54,32 +54,32 @@ class ZMPlayer : public MythScreenType
 
     void stopPlayer(void);
 
-    MythUIImage      *m_activeFrameImage;
-    MythUIImage      *m_frameImageFS;
-    MythUIImage      *m_frameImage;
+    MythUIImage      *m_activeFrameImage {nullptr};
+    MythUIImage      *m_frameImageFS     {nullptr};
+    MythUIImage      *m_frameImage       {nullptr};
 
-    MythUIText       *m_noEventsText;
-    MythUIText       *m_eventText;
-    MythUIText       *m_cameraText;
-    MythUIText       *m_frameText;
-    MythUIText       *m_dateText;
+    MythUIText       *m_noEventsText     {nullptr};
+    MythUIText       *m_eventText        {nullptr};
+    MythUIText       *m_cameraText       {nullptr};
+    MythUIText       *m_frameText        {nullptr};
+    MythUIText       *m_dateText         {nullptr};
 
-    MythUIButton     *m_playButton;
-    MythUIButton     *m_deleteButton;
-    MythUIButton     *m_nextButton;
-    MythUIButton     *m_prevButton;
+    MythUIButton     *m_playButton       {nullptr};
+    MythUIButton     *m_deleteButton     {nullptr};
+    MythUIButton     *m_nextButton       {nullptr};
+    MythUIButton     *m_prevButton       {nullptr};
 
-    int              *m_currentEvent;
-    std::vector<Event *>  *m_eventList;
+    int              *m_currentEvent     {nullptr};
+    std::vector<Event *>  *m_eventList   {nullptr};
 
-    std::vector<Frame *>  *m_frameList;
-    QTimer           *m_frameTimer;
-    uint              m_curFrame;
+    std::vector<Frame *>  *m_frameList   {nullptr};
+    QTimer           *m_frameTimer       {nullptr};
+    uint              m_curFrame         {0};
 
-    bool              m_paused;
-    bool              m_fullScreen;
+    bool              m_paused           {false};
+    bool              m_fullScreen       {false};
 
-    MythImage        *m_image;
+    MythImage        *m_image            {nullptr};
 };
 
 #endif

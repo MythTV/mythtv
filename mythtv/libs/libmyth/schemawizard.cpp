@@ -4,7 +4,9 @@ using std::endl;
 
 #include <unistd.h>      // for isatty() on Windows
 
-#include "dialogbox.h"
+#include <QEventLoop>
+
+#include "mythdialogbox.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "mythdate.h"
@@ -24,13 +26,7 @@ static SchemaUpgradeWizard * c_wizard = nullptr;
 SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
                                          const QString &appName,
                                          const QString &upgradeSchemaVal)
-    : DBver(), emptyDB(false), versionsBehind(-1),
-      backupStatus(kDB_Backup_Unknown),
-      m_autoUpgrade(false),
-      m_backupResult(),
-      m_busyPopup(nullptr),
-      m_expertMode(false),
-      m_schemaSetting(DBSchemaSetting),
+    : m_schemaSetting(DBSchemaSetting),
       m_schemaName(appName),
       m_newSchemaVer(upgradeSchemaVal)
 {
@@ -64,8 +60,8 @@ SchemaUpgradeWizard::Get(const QString &DBSchemaSetting,
                                            upgradeSchemaVal);
     else
     {
-        c_wizard->DBver            = QString();
-        c_wizard->versionsBehind   = -1;
+        c_wizard->m_DBver          = QString();
+        c_wizard->m_versionsBehind = -1;
         c_wizard->m_schemaSetting  = DBSchemaSetting;
         c_wizard->m_schemaName     = appName;
         c_wizard->m_newSchemaVer   = upgradeSchemaVal;
@@ -87,94 +83,114 @@ void SchemaUpgradeWizard::BusyPopup(const QString &message)
 
 MythDBBackupStatus SchemaUpgradeWizard::BackupDB(void)
 {
-    if (emptyDB)
+    if (m_emptyDB)
     {
         LOG(VB_GENERAL, LOG_INFO,
                  "The database seems to be empty - not attempting a backup");
         return kDB_Backup_Empty_DB;
     }
 
-    backupStatus = DBUtil::BackupDB(m_backupResult, true);
+    m_backupStatus = DBUtil::BackupDB(m_backupResult, true);
 
-    return backupStatus;
+    return m_backupStatus;
 }
 
 int SchemaUpgradeWizard::Compare(void)
 {
-    DBver = gCoreContext->GetSetting(m_schemaSetting);
+    m_DBver = gCoreContext->GetSetting(m_schemaSetting);
 
     // No current schema? Investigate further:
-    if (DBver.isEmpty() || DBver == "0")
+    if (m_DBver.isEmpty() || m_DBver == "0")
     {
         LOG(VB_GENERAL, LOG_INFO, "No current database version?");
 
         if (DBUtil::IsNewDatabase())
         {
             LOG(VB_GENERAL, LOG_INFO, "Database appears to be empty/new!");
-            emptyDB = true;
+            m_emptyDB = true;
         }
     }
     else
         LOG(VB_GENERAL, LOG_INFO,
                  QString("Current %1 Schema Version (%2): %3")
-                     .arg(m_schemaName).arg(m_schemaSetting).arg(DBver));
+                     .arg(m_schemaName).arg(m_schemaSetting).arg(m_DBver));
 
 #if TESTING
-    //DBver = "9" + DBver + "-testing";
-    DBver += "-testing";
+    //m_DBver = "9" + m_DBver + "-testing";
+    m_DBver += "-testing";
     return 0;
 #endif
 
-    if (m_newSchemaVer == DBver)
+    if (m_newSchemaVer == m_DBver)
     {
-        versionsBehind = 0;
+        m_versionsBehind = 0;
     }
     else
     {
         // Branch DB versions may not be integer version numbers.
         bool new_ok, old_ok;
         int new_version = m_newSchemaVer.toInt(&new_ok);
-        int old_version = DBver.toInt(&old_ok);
+        int old_version = m_DBver.toInt(&old_ok);
         if (new_ok && old_ok)
-            versionsBehind = new_version - old_version;
+            m_versionsBehind = new_version - old_version;
         else
-            versionsBehind = 5000;
+            m_versionsBehind = 5000;
     }
-    return versionsBehind;
+    return m_versionsBehind;
 }
 
 MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
                                                  bool upgradable, bool expert)
 {
-    DialogBox   * dlg;
-    MythMainWindow  * win = GetMythMainWindow();
-
+    MythMainWindow *win = GetMythMainWindow();
     if (!win)
         return MYTH_SCHEMA_ERROR;
 
-    dlg = new DialogBox(win, message);
-    dlg->AddButton(tr("Exit"));
-    if (upgradable)
-        dlg->AddButton(tr("Upgrade"));
-    if (expert)
-        // Not translated. This string can't appear in released builds.
-        dlg->AddButton("Use current schema");
+    MythScreenStack *stack = win->GetMainStack();
+    if (!stack)
+        return MYTH_SCHEMA_ERROR;
 
-    DialogCode selected = dlg->exec();
-    dlg->deleteLater();
-
-    switch (selected)
+    // Ignore MENU & ESCAPE dialog actions
+    int btnIndex = -1;
+    while (btnIndex < 0)
     {
-        case kDialogCodeRejected:
-        case kDialogCodeButton0:
-            return MYTH_SCHEMA_EXIT;
-        case kDialogCodeButton1:
-            return upgradable ? MYTH_SCHEMA_UPGRADE: MYTH_SCHEMA_USE_EXISTING;
-        case kDialogCodeButton2:
-            return MYTH_SCHEMA_USE_EXISTING;
-        default:
+        auto dlg = new MythDialogBox(message, stack, "upgrade");
+        if (!dlg->Create())
+        {
+            delete dlg;
             return MYTH_SCHEMA_ERROR;
+        }
+
+        dlg->AddButton(tr("Exit"));
+
+        if (upgradable)
+            dlg->AddButton(tr("Upgrade"));
+
+        if (expert)
+            // Not translated. This string can't appear in released builds.
+            dlg->AddButton("Use current schema");
+
+        stack->AddScreen(dlg);
+
+        // Wait in local event loop so events are processed
+        QEventLoop block;
+        connect(dlg,    &MythDialogBox::Closed,
+                &block, [&](const QString& /*resultId*/, int result) { block.exit(result); });
+
+        // Block until dialog closes
+        btnIndex = block.exec();
     }
+
+    switch (btnIndex)
+    {
+    case 0  : return MYTH_SCHEMA_EXIT;
+    case 1  : return upgradable ? MYTH_SCHEMA_UPGRADE
+                                : MYTH_SCHEMA_USE_EXISTING;
+    case 2  : return MYTH_SCHEMA_USE_EXISTING;
+    default : break;
+    }
+
+    return MYTH_SCHEMA_ERROR;
 }
 
 /**
@@ -216,11 +232,11 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
 
 
-    if (versionsBehind == -1)
+    if (m_versionsBehind == -1)
         Compare();
 
 #if minDBMS_is_only_for_schema_upgrades
-    if (versionsBehind == 0)              // Why was this method even called?
+    if (m_versionsBehind == 0)              // Why was this method even called?
         return MYTH_SCHEMA_USE_EXISTING;
 #endif
 
@@ -228,9 +244,9 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     // backup and the database is old/about to be upgraded (not if it's too
     // new) or if a user is doing something they probably shouldn't ("expert
     // mode")
-    if (((backupStatus == kDB_Backup_Unknown) ||
-         (backupStatus == kDB_Backup_Failed)) &&
-        ((upgradeAllowed && (versionsBehind > 0)) ||
+    if (((m_backupStatus == kDB_Backup_Unknown) ||
+         (m_backupStatus == kDB_Backup_Failed)) &&
+        ((upgradeAllowed && (m_versionsBehind > 0)) ||
          m_expertMode))
         BackupDB();
 
@@ -240,7 +256,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
                   ? true                // the upgrade code can't be fussy!
                   : CompareDBMSVersion(minDBMSmajor,
                                        minDBMSminor, minDBMSpoint) >= 0;
-    upgradable  = validDBMS && (versionsBehind > 0)
+    upgradable  = validDBMS && (m_versionsBehind > 0)
                             && (upgradeAllowed || m_expertMode);
 
 
@@ -263,7 +279,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (validDBMS)
     {
         // Empty database? Always upgrade, to create tables
-        if (emptyDB)
+        if (m_emptyDB)
             return MYTH_SCHEMA_UPGRADE;
 
         if (m_autoUpgrade && !connections && upgradable)
@@ -287,12 +303,12 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             return MYTH_SCHEMA_EXIT;
         }
 
-        if (versionsBehind < 0)
+        if (m_versionsBehind < 0)
         {
             LOG(VB_GENERAL, LOG_CRIT,
                      QString("Error: MythTV database has newer %1 schema (%2) "
                              "than expected (%3).")
-                         .arg(name).arg(DBver).arg(m_newSchemaVer));
+                         .arg(name).arg(m_DBver).arg(m_newSchemaVer));
             return MYTH_SCHEMA_ERROR;
         }
 
@@ -337,10 +353,10 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         message = warnOldDBMS;
         returnValue = MYTH_SCHEMA_ERROR;
     }
-    else if (versionsBehind > 0)
+    else if (m_versionsBehind > 0)
     {
         message = tr("This version of MythTV requires an updated database. ")
-                  + tr("(schema is %1 versions behind)").arg(versionsBehind)
+                  + tr("(schema is %1 versions behind)").arg(m_versionsBehind)
                   + "\n\n" + tr("Please run mythtv-setup or mythbackend "
                                 "to update your database.");
         returnValue = MYTH_SCHEMA_ERROR;
@@ -359,11 +375,11 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         }
     }
 
-    if (backupStatus == kDB_Backup_Failed)
+    if (m_backupStatus == kDB_Backup_Failed)
         message += "\n" + tr("MythTV was unable to backup your database.");
 
     if (message.contains("%1"))
-        message = message.arg(name).arg(DBver).arg(m_newSchemaVer);
+        message = message.arg(name).arg(m_DBver).arg(m_newSchemaVer);
 
 
     DatabaseParams dbParam = MythDB::getMythDB()->GetDatabaseParams();
@@ -374,12 +390,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     {
         if (returnValue == MYTH_SCHEMA_ERROR)
         {
-            // Display error, return warning to caller
-            MythPopupBox::showOkPopup(GetMythMainWindow(), "", message);
+            // Display error, wait for acknowledgement
+            // and return warning to caller
+            WaitFor(ShowOkPopup(message));
             return MYTH_SCHEMA_ERROR;
         }
 
         returnValue = GuiPrompt(message, upgradable, m_expertMode);
+
         if (returnValue == MYTH_SCHEMA_EXIT)
             return MYTH_SCHEMA_EXIT;
 
@@ -387,7 +405,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             return returnValue;
 
         // The annoying extra confirmation:
-        if (backupStatus == kDB_Backup_Completed)
+        if (m_backupStatus == kDB_Backup_Completed)
         {
             int dirPos = m_backupResult.lastIndexOf('/');
             QString dirName;
@@ -418,10 +436,10 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (returnValue == MYTH_SCHEMA_ERROR)
         return MYTH_SCHEMA_ERROR;
 
-    if (backupStatus == kDB_Backup_Failed)
+    if (m_backupStatus == kDB_Backup_Failed)
         cout << "WARNING: MythTV was unable to backup your database."
              << endl << endl;
-    else if ((backupStatus == kDB_Backup_Completed) &&
+    else if ((m_backupStatus == kDB_Backup_Completed) &&
              (m_backupResult != ""))
         cout << "If your system becomes unstable, "
                 "a database backup is located in "
@@ -441,8 +459,8 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (connections)
         cout << endl << warnOtherCl.toLocal8Bit().constData() << endl;
 
-    if ((backupStatus != kDB_Backup_Completed) &&
-        (backupStatus != kDB_Backup_Empty_DB))
+    if ((m_backupStatus != kDB_Backup_Completed) &&
+        (m_backupStatus != kDB_Backup_Empty_DB))
     {
         resp = getResponse("\nA database backup might be a good idea"
                            "\nAre you sure you want to upgrade?", "no");

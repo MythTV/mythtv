@@ -31,7 +31,6 @@
 #define _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
 
 // MythTV headers
-#include "settings.h"
 #include "mythscreentype.h"
 #include "mythuiprogressbar.h"
 
@@ -45,11 +44,13 @@ class ChannelScannerGUIScanPane : public MythScreenType
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    ChannelScannerGUIScanPane(
-        bool lock, bool strength, bool snr, bool rotorpos,
-        MythScreenStack *parent);
+    ChannelScannerGUIScanPane(bool lock, bool strength, bool snr,
+                              bool rotorpos, MythScreenStack *parent)
+        : MythScreenType(parent, "channelscanner"),
+          m_showSignalLock(lock), m_showSignalStrength(strength),
+          m_showSignalNoise(snr), m_showRotorPos(rotorpos) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
     void SetStatusRotorPosition(int value);
     void SetStatusSignalToNoise(int value);
@@ -63,25 +64,25 @@ class ChannelScannerGUIScanPane : public MythScreenType
     void AppendLine(const QString &text);
 
   private:
-    bool m_showSignalLock;
-    bool m_showSignalStrength;
-    bool m_showSignalNoise;
-    bool m_showRotorPos;
+    bool               m_showSignalLock;
+    bool               m_showSignalStrength;
+    bool               m_showSignalNoise;
+    bool               m_showRotorPos;
 
-    MythUIProgressBar *m_signalStrengthBar;
-    MythUIProgressBar *m_signalNoiseBar;
-    MythUIProgressBar *m_rotatorPositionBar;
-    MythUIProgressBar *m_progressBar;
+    MythUIProgressBar *m_signalStrengthBar   {nullptr};
+    MythUIProgressBar *m_signalNoiseBar      {nullptr};
+    MythUIProgressBar *m_rotatorPositionBar  {nullptr};
+    MythUIProgressBar *m_progressBar         {nullptr};
 
-    MythUIText *m_statusText;
-    MythUIText *m_scanProgressText;
-    MythUIText *m_signalLockedText;
-    MythUIText *m_signalStrengthText;
-    MythUIText *m_signalNoiseText;
-    MythUIText *m_rotatorPositionText;
-    MythUIText *m_progressText;
+    MythUIText        *m_statusText          {nullptr};
+    MythUIText        *m_scanProgressText    {nullptr};
+    MythUIText        *m_signalLockedText    {nullptr};
+    MythUIText        *m_signalStrengthText  {nullptr};
+    MythUIText        *m_signalNoiseText     {nullptr};
+    MythUIText        *m_rotatorPositionText {nullptr};
+    MythUIText        *m_progressText        {nullptr};
 
-    MythUIButtonList  *m_log;
+    MythUIButtonList  *m_log                 {nullptr};
 };
 
 #endif // _CHANNEL_SCANNER_GUI_SCAN_PANE_H_

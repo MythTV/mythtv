@@ -84,9 +84,6 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
     if (!handled && MusicCommon::keyPressEvent(event))
         handled = true;
 
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
     return handled;
 }
 
@@ -128,14 +125,7 @@ void VisualizerView::showTrackInfoPopup(void)
 //---------------------------------------------------------
 // TrackInfoPopup
 //---------------------------------------------------------
-#define MUSICINFOPOPUPTIME 8 * 1000
-
-TrackInfoPopup::TrackInfoPopup(MythScreenStack *parent, MusicMetadata *metadata)
-         : MythScreenType(parent, "trackinfopopup", false)
-{
-    m_metadata = metadata;
-    m_displayTimer = nullptr;
-}
+#define MUSICINFOPOPUPTIME (8 * 1000)
 
 TrackInfoPopup::~TrackInfoPopup(void)
 {

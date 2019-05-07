@@ -11,7 +11,7 @@ class RecordingInfo;
 
 typedef std::deque<RecordingInfo*> RecList;
 #define SORT_RECLIST(LIST, ORDER) \
-  do { std::stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (0)
+  do { std::stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (false)
 
 typedef RecList::const_iterator RecConstIter;
 typedef RecList::iterator RecIter;

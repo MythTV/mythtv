@@ -29,20 +29,20 @@ class MUI_PUBLIC MythUIShape : public MythUIType
     void SetLinePen(QPen pen);
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
 
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
   private:
-    QString        m_type;
-    QBrush         m_fillBrush;
-    QPen           m_linePen;
-    int            m_cornerRadius;
-    MythRect       m_cropRect;
+    QString        m_type         {"box"};
+    QBrush         m_fillBrush    {Qt::NoBrush};
+    QPen           m_linePen      {Qt::NoPen};
+    int            m_cornerRadius {10};
+    MythRect       m_cropRect     {0,0,0,0};
 
     friend class MythUIProgressBar;
     friend class MythUIEditBar;

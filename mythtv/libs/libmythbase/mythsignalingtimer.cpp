@@ -22,8 +22,7 @@
 
 MythSignalingTimer::MythSignalingTimer(
     QObject *parent, const char *slot) :
-    QObject(parent), MThread("SignalingTimer"),
-    dorun(false), running(false), millisec(0)
+    QObject(parent), MThread("SignalingTimer")
 {
     connect(this, SIGNAL(timeout()), parent, slot,
             Qt::QueuedConnection);
@@ -31,7 +30,7 @@ MythSignalingTimer::MythSignalingTimer(
 
 MythSignalingTimer::~MythSignalingTimer()
 {
-    stop();
+    MythSignalingTimer::stop();
     wait();
 }
 
@@ -40,14 +39,14 @@ void MythSignalingTimer::start(int msec)
     if (msec <= 0)
         return;
 
-    millisec = msec;
+    m_millisec = msec;
 
-    QMutexLocker locker(&startStopLock);
-    if (!running)
+    QMutexLocker locker(&m_startStopLock);
+    if (!m_running)
     {
-        dorun = true;
+        m_dorun = true;
         MThread::start();
-        while (dorun && !running)
+        while (m_dorun && !m_running)
         {
             locker.unlock();
             usleep(10 * 1000);
@@ -60,15 +59,15 @@ void MythSignalingTimer::stop(void)
 {
     if (is_current_thread(this))
     {
-        dorun = false;
+        m_dorun = false;
         return;
     }
 
-    QMutexLocker locker(&startStopLock);
-    if (running)
+    QMutexLocker locker(&m_startStopLock);
+    if (m_running)
     {
-        dorun = false;
-        timerWait.wakeAll();
+        m_dorun = false;
+        m_timerWait.wakeAll();
         locker.unlock();
         wait();
     }
@@ -76,12 +75,12 @@ void MythSignalingTimer::stop(void)
 
 void MythSignalingTimer::run(void)
 {
-    running = true;
+    m_running = true;
     RunProlog();
-    while (dorun)
+    while (m_dorun)
     {
-        QMutexLocker locker(&startStopLock);
-        if (dorun && !timerWait.wait(locker.mutex(), millisec))
+        QMutexLocker locker(&m_startStopLock);
+        if (m_dorun && !m_timerWait.wait(locker.mutex(), m_millisec))
         {
             locker.unlock();
             emit timeout();
@@ -89,5 +88,5 @@ void MythSignalingTimer::run(void)
         }
     }
     RunEpilog();
-    running = false;
+    m_running = false;
 }

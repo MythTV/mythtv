@@ -51,7 +51,7 @@ class ArchiveFileSelector : public FileSelector
     explicit ArchiveFileSelector(MythScreenStack *parent);
     ~ArchiveFileSelector(void);
 
-    bool Create(void);
+    bool Create(void) override; // FileSelector
 
   private slots:
     void nextPressed(void);
@@ -63,11 +63,11 @@ class ArchiveFileSelector : public FileSelector
     FileDetails   m_details;
     QString       m_xmlFile;
 
-    MythUIButton *m_nextButton;
-    MythUIButton *m_prevButton;
-    MythUIText   *m_progTitle;
-    MythUIText   *m_progSubtitle;
-    MythUIText   *m_progStartTime;
+    MythUIButton *m_nextButton    {nullptr};
+    MythUIButton *m_prevButton    {nullptr};
+    MythUIText   *m_progTitle     {nullptr};
+    MythUIText   *m_progSubtitle  {nullptr};
+    MythUIText   *m_progStartTime {nullptr};
 };
 
 class ImportNative : public MythScreenType
@@ -75,12 +75,16 @@ class ImportNative : public MythScreenType
     Q_OBJECT
 
   public:
-      ImportNative(MythScreenStack *parent, MythScreenType *m_previousScreen,
-                   const QString &xmlFile, FileDetails details);
-      ~ImportNative();
+      ImportNative(MythScreenStack *parent, MythScreenType *previousScreen,
+                   const QString &xmlFile, FileDetails details)
+          : MythScreenType(parent, "ImportNative"),
+            m_xmlFile(xmlFile),
+            m_details(details),
+            m_previousScreen(previousScreen) {}
+      ~ImportNative() = default;
 
-      bool Create(void);
-      bool keyPressEvent(QKeyEvent *e);
+      bool Create(void) override; // MythScreenType
+      bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   private slots:
     void finishedPressed();
@@ -90,10 +94,10 @@ class ImportNative : public MythScreenType
     void searchChanNo(void);
     void searchName(void);
     void searchCallsign(void);
-    void gotChanID(QString value);
-    void gotChanNo(QString value);
-    void gotName(QString value);
-    void gotCallsign(QString value);
+    void gotChanID(const QString& value);
+    void gotChanNo(const QString& value);
+    void gotName(const QString& value);
+    void gotCallsign(const QString& value);
 
   private:
     void findChannelMatch(const QString &chanid, const QString &chanNo,
@@ -103,34 +107,34 @@ class ImportNative : public MythScreenType
 
     QString         m_xmlFile;
     FileDetails     m_details;
-    MythScreenType *m_previousScreen;
+    MythScreenType *m_previousScreen      {nullptr};
 
     QStringList     m_searchList;
 
-    MythUIText   *m_progTitle_text;
-    MythUIText   *m_progDateTime_text;
-    MythUIText   *m_progDescription_text;
+    MythUIText   *m_progTitle_text        {nullptr};
+    MythUIText   *m_progDateTime_text     {nullptr};
+    MythUIText   *m_progDescription_text  {nullptr};
 
-    MythUIText   *m_chanID_text;
-    MythUIText   *m_chanNo_text;
-    MythUIText   *m_chanName_text;
-    MythUIText   *m_callsign_text;
+    MythUIText   *m_chanID_text           {nullptr};
+    MythUIText   *m_chanNo_text           {nullptr};
+    MythUIText   *m_chanName_text         {nullptr};
+    MythUIText   *m_callsign_text         {nullptr};
 
-    MythUIText   *m_localChanID_text;
-    MythUIText   *m_localChanNo_text;
-    MythUIText   *m_localChanName_text;
-    MythUIText   *m_localCallsign_text;
+    MythUIText   *m_localChanID_text      {nullptr};
+    MythUIText   *m_localChanNo_text      {nullptr};
+    MythUIText   *m_localChanName_text    {nullptr};
+    MythUIText   *m_localCallsign_text    {nullptr};
 
-    MythUIButton *m_searchChanID_button;
-    MythUIButton *m_searchChanNo_button;
-    MythUIButton *m_searchChanName_button;
-    MythUIButton *m_searchCallsign_button;
+    MythUIButton *m_searchChanID_button   {nullptr};
+    MythUIButton *m_searchChanNo_button   {nullptr};
+    MythUIButton *m_searchChanName_button {nullptr};
+    MythUIButton *m_searchCallsign_button {nullptr};
 
-    MythUIButton *m_finishButton;
-    MythUIButton *m_prevButton;
-    MythUIButton *m_cancelButton;
+    MythUIButton *m_finishButton          {nullptr};
+    MythUIButton *m_prevButton            {nullptr};
+    MythUIButton *m_cancelButton          {nullptr};
 
-    bool          m_isValidXMLSelected;
+    bool          m_isValidXMLSelected    {false};
 };
 
 #endif

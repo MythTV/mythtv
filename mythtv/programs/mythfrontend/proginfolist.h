@@ -21,7 +21,8 @@ class ProgInfoList : QObject
     using DataList = QList<DataItem>;
 
   public:
-    explicit ProgInfoList(MythScreenType &screen);
+    explicit ProgInfoList(MythScreenType &screen)
+        : m_screen(screen) {}
 
     bool             Create(bool focusable);
     void             Toggle(void);
@@ -36,11 +37,11 @@ class ProgInfoList : QObject
     void Clear()   { m_btnList->Reset(); }
 
   private:
-    void CreateButton(QString, QString);
+    void CreateButton(const QString&, const QString&);
 
-    MythScreenType   &m_screen;      //!< Parent screen
-    MythUIButtonList *m_btnList;     //!< Overlay buttonlist
-    VisibleLevel      m_infoVisible; //!< Info list state
+    MythScreenType   &m_screen;                //!< Parent screen
+    MythUIButtonList *m_btnList     {nullptr}; //!< Overlay buttonlist
+    VisibleLevel      m_infoVisible {kLevel1}; //!< Info list state
 };
 
-#endif // GALLERYINFO_H
+#endif // PROG_INFO_LIST_H

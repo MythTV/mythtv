@@ -214,7 +214,7 @@ class FirewireDevice
 
     // Statics
     static bool IsSTBSupported(const QString &model);
-    static QString GetModelName(uint vendorid, uint modelid);
+    static QString GetModelName(uint vendor_id, uint model_id);
     static vector<AVCInfo> GetSTBList(void);
 
   protected:
@@ -233,11 +233,11 @@ class FirewireDevice
     uint64_t                 m_guid;
     uint                     m_subunitid;
     uint                     m_speed;
-    uint                     m_last_channel;
-    uint                     m_last_crc;
-    bool                     m_buffer_cleared;
+    uint                     m_last_channel   {0};
+    uint                     m_last_crc       {0};
+    bool                     m_buffer_cleared {true};
 
-    uint                     m_open_port_cnt;
+    uint                     m_open_port_cnt  {0};
     vector<TSDataListener*>  m_listeners;
     mutable QMutex           m_lock;
 

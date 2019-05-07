@@ -44,7 +44,6 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
     Task("UPnpNotifyTask")
 {
     m_nServicePort = nServicePort;
-    m_eNTS         = NTS_alive;
 
     m_nMaxAge      = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
 } 
@@ -54,8 +53,8 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
-                                    QString        sNT,
-                                    QString        sUDN )
+                                    const QString& sNT,
+                                    const QString& sUDN )
 {
     QString sUSN;
 

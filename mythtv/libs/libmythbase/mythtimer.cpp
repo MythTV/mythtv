@@ -35,7 +35,7 @@
  *  If a start state of kStartRunning is passed in the timer is
  *  started immediately as if start() had been called.
  */
-MythTimer::MythTimer(StartState state) : m_offset(0)
+MythTimer::MythTimer(StartState state)
 {
     if (kStartRunning == state)
         start();
@@ -98,7 +98,7 @@ int MythTimer::elapsed(void) const
     }
 
     qint64 e = m_timer.elapsed();
-    if (!m_timer.isMonotonic() && (e > 86300000))
+    if (!QElapsedTimer::isMonotonic() && (e > 86300000))
     {
         const_cast<MythTimer*>(this)->start();
         e = 0;

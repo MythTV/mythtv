@@ -47,14 +47,6 @@ using namespace std;
 
 #define LOC QString("ChannelBase[%1]: ").arg(m_inputid)
 
-ChannelBase::ChannelBase(TVRec *parent) :
-    m_pParent(parent), m_curchannelname(""),
-    m_commfree(false), m_inputid(0), m_sourceid(0), m_name(""),
-    m_startChanNum(""), m_externalChanger(""), m_tuneToChannel(""),
-    m_system(nullptr), m_system_status(0)
-{
-}
-
 ChannelBase::~ChannelBase(void)
 {
     QMutexLocker locker(&m_system_lock);
@@ -77,14 +69,13 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     // try to find a valid channel if given start channel fails.
     QString msg1 = QString("Setting start channel '%1' failed, ")
         .arg(startchannel);
-    QString msg2 = "and we failed to find any suitible channels on any input.";
+    QString msg2 = "and we failed to find any suitable channels on any input.";
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
-    ChannelInfoList::const_iterator cit = m_channels.begin();
-    for (; cit != m_channels.end(); ++cit)
+    for (auto cit = m_channels.begin(); cit != m_channels.end(); ++cit)
     {
-        if ((*cit).channum == startchannel &&
+        if ((*cit).m_channum == startchannel &&
             IsTunable(startchannel))
         {
             LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -96,11 +87,11 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     uint mplexid_restriction = 0;
     uint chanid_restriction = 0;
 
-    if (m_channels.size() &&
+    if (!m_channels.empty() &&
         IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         uint chanid = ChannelUtil::GetNextChannel(
-            m_channels, m_channels[0].chanid,
+            m_channels, m_channels[0].m_chanid,
             mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
 
         ChannelInfoList::const_iterator cit =
@@ -111,18 +102,15 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
             if (!setchan)
             {
                 ok = IsTunable((mplexid_restriction || chanid_restriction)
-                               ? (*cit).channum : startchannel);
+                               ? (*cit).m_channum : startchannel);
             }
             else
-                ok = SetChannelByString((*cit).channum);
+                ok = SetChannelByString((*cit).m_channum);
 
             if (ok)
             {
                 if (mplexid_restriction || chanid_restriction)
-                {
-                    startchannel = (*cit).channum;
-                    startchannel.detach();
-                }
+                    startchannel = (*cit).m_channum;
                 msg2 = QString("selected to '%1' instead.")
                     .arg(startchannel);
                 msg_error = false;
@@ -240,21 +228,21 @@ bool ChannelBase::IsInputAvailable(
     chanid_restriction = 0;
 
     vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputid);
-    for (uint i = 0; i < inputids.size(); ++i)
+    for (size_t i = 0; i < inputids.size(); ++i)
     {
         if (RemoteIsBusy(inputids[i], info))
         {
             LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                 QString("Input %1 is busy on %2/%3")
-                .arg(info.inputid)
-                .arg(info.chanid).arg(info.mplexid));
-            if (info.sourceid != m_sourceid)
+                .arg(info.m_inputid)
+                .arg(info.m_chanid).arg(info.m_mplexid));
+            if (info.m_sourceid != m_sourceid)
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Input is busy"));
                 return false;
             }
-            mplexid_restriction = info.mplexid;
-            chanid_restriction = info.chanid;
+            mplexid_restriction = info.m_mplexid;
+            chanid_restriction = info.m_chanid;
         }
     }
 
@@ -493,19 +481,20 @@ void ChannelBase::HandleScriptEnd(bool ok)
     }
 }
 
-int ChannelBase::GetChanID() const
+int ChannelBase::GetChanID(void) const
 {
     if (!m_inputid)
-        return false;
+        return -1;
 
-    int found = 0;
-    int id = -1;
+    int found   = 0;
+    int visible = -1;
+    int id      = -1;
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT chanid,visible FROM channel "
                   "WHERE channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
-    query.bindValue(":CHANNUM", m_curchannelname);
+    query.bindValueNoNull(":CHANNUM", m_curchannelname);
     query.bindValue(":SOURCEID", m_sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -516,26 +505,30 @@ int ChannelBase::GetChanID() const
 
     while (query.next())
     {
-        found += query.value(1).toInt();
-        if (id == -1 || found)
+        if (query.value(1).toBool())
+        {
+            ++found;
+            visible = query.value(0).toInt();
+        }
+        else
             id = query.value(0).toInt();
     }
 
     if (!found)
     {
         LOG(VB_GENERAL, LOG_INFO,
-            QString("No visible channel ids for %1")
-            .arg(m_curchannelname));
+            QString("No visible channel ids for %1 on sourceid %2")
+            .arg(m_curchannelname).arg(m_sourceid));
     }
 
     if (found > 1)
     {
         LOG(VB_GENERAL, LOG_WARNING,
-            QString("Found multiple visible channel ids for %1")
-            .arg(m_curchannelname));
+            QString("Found multiple visible channel ids for %1 on sourceid %2")
+            .arg(m_curchannelname).arg(m_sourceid));
     }
 
-    return id;
+    return (visible >= 0 ? visible : id);
 }
 
 /**
@@ -569,15 +562,14 @@ bool ChannelBase::InitializeInput(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("InitializeInputs", query);
+        MythDB::DBError("ChannelBase::InitializeInput", query);
         return false;
     }
-    else if (!query.size())
+    if (!query.size())
     {
-        LOG(VB_GENERAL, LOG_ERR, "InitializeInputs(): "
-            "\n\t\t\tCould not get inputs for the capturecard."
-            "\n\t\t\tPerhaps you have forgotten to bind video"
-            "\n\t\t\tsources to your card's inputs?");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("No capturecard record in database for input %1")
+            .arg(m_inputid));
         return false;
     }
 
@@ -588,6 +580,14 @@ bool ChannelBase::InitializeInput(void)
     m_startChanNum = query.value(2).toString();
     m_externalChanger = query.value(3).toString();
     m_tuneToChannel = query.value(4).toString();
+
+    if (0 == m_sourceid)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("No video source defined for input %1")
+            .arg(m_inputid));
+            return false;
+    }
 
     m_channels = ChannelUtil::GetChannels(m_sourceid, false);
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
@@ -797,7 +797,6 @@ ChannelBase *ChannelBase::CreateChannel(
         return nullptr;
     }
 
-    QString input = CardUtil::GetInputName(tvrec->GetInputId());
     QString channum = startchannel;
     channel->Init(channum, setchan);
 
@@ -805,6 +804,7 @@ ChannelBase *ChannelBase::CreateChannel(
     {
         if (channel &&
             ((genOpt.inputtype == "DVB" && dvbOpt.dvb_on_demand) ||
+             genOpt.inputtype == "HDHOMERUN" ||
              CardUtil::IsV4L(genOpt.inputtype)))
         {
             channel->Close();
@@ -834,4 +834,9 @@ bool ChannelBase::IsExternalChannelChangeInUse(void)
     }
 
     return !m_externalChanger.isEmpty();
+}
+
+int ChannelBase::GetMajorID(void)
+{
+    return m_pParent ? m_pParent->GetMajorId() : m_inputid;
 }

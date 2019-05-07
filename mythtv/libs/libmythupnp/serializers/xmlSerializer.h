@@ -34,20 +34,20 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
     protected:
 
-        QXmlStreamWriter *m_pXmlWriter;
+        QXmlStreamWriter *m_pXmlWriter   {nullptr};
         QString           m_sRequestName;
-        bool              m_bIsRoot;
+        bool              m_bIsRoot      {true};
 
-        virtual void BeginSerialize( QString &sName );
-        virtual void EndSerialize  ();
+        void BeginSerialize( QString &sName ) override; // Serializer
+        void EndSerialize  () override; // Serializer
 
-        virtual void BeginObject( const QString &sName, const QObject  *pObject );
-        virtual void EndObject  ( const QString &sName, const QObject  *pObject );
+        void BeginObject( const QString &sName, const QObject  *pObject ) override; // Serializer
+        void EndObject  ( const QString &sName, const QObject  *pObject ) override; // Serializer
 
-        virtual void AddProperty( const QString       &sName, 
-                                  const QVariant      &vValue,
-                                  const QMetaObject   *pMetaParent,
-                                  const QMetaProperty *pMetaProp );
+        void AddProperty( const QString       &sName, 
+                          const QVariant      &vValue,
+                          const QMetaObject   *pMetaParent,
+                          const QMetaProperty *pMetaProp ) override; // Serializer
 
         void    RenderValue     ( const QString &sName, const QVariant     &vValue );
 
@@ -62,7 +62,7 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
         QString GetItemName     ( const QString &sName );
 
-        QString GetContentName  ( const QString        &sName, 
+        QString GetContentName  ( const QString        &sName,
                                   const QMetaObject   *pMetaObject,
                                   const QMetaProperty *pMetaProp );
 
@@ -71,13 +71,16 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
     public:
 
-        bool     PropertiesAsAttributes;
+        bool     PropertiesAsAttributes {true};
 
                  XmlSerializer( QIODevice *pDevice, const QString &sRequestName );
         virtual ~XmlSerializer();
 
-        virtual QString GetContentType();
+        QString GetContentType() override; // Serializer
 
+    private:
+        XmlSerializer(const XmlSerializer &) = delete;            // not copyable
+        XmlSerializer &operator=(const XmlSerializer &) = delete; // not copyable
 };
 
 #endif

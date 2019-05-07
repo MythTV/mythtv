@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 
 // ANSI C headers
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -88,7 +89,7 @@ vbi_send_page(struct vbi *vbi, struct raw_page *rvtp, int page)
        {
            struct vt_page *cvtp = 0;
            rvtp->page->flags &= ~PG_ACTIVE;
-           enhance(rvtp->enh, rvtp->page);
+           do_enhancements(rvtp->enh, rvtp->page);
 //         if (vbi->cache)
 //             cvtp = vbi->cache->op->put(vbi->cache, rvtp->page);
            vbi_send(vbi, EV_PAGE, 0, 0, 0, cvtp ?: rvtp->page);
@@ -322,7 +323,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
 // process one raw vbi line
 
 static int
-vbi_line(struct vbi *vbi, unsigned char *p)
+vbi_line(struct vbi *vbi, const unsigned char *p)
 {
     unsigned char data[43], min, max;
     int dt[256], hi[6], lo[6];
@@ -468,7 +469,6 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
            dl_remove(cl->node);
            break;
        }
-    return;
 }
 
 #ifdef USING_V4L2
@@ -520,7 +520,7 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
        return -1;
     }
 
-    vbi->bpb = bpb * FAC + 0.5;
+    vbi->bpb = lround(bpb * FAC);
     vbi->soc = soc;
     vbi->eoc = eoc;
     vbi->bp8bl = 0.97 * 8*bpb; // -3% tolerance
@@ -604,7 +604,7 @@ setup_dev(struct vbi *vbi)
 
 
 struct vbi *
-vbi_open(const char *vbi_name, struct cache *ca, int fine_tune, int big_buf)
+vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
 {
     static int inited = 0;
     struct vbi *vbi = 0;
@@ -621,7 +621,7 @@ vbi_open(const char *vbi_name, struct cache *ca, int fine_tune, int big_buf)
        goto fail1;
     }
 
-    if ((vbi->fd = open(vbi_name, O_RDONLY)) == -1)
+    if ((vbi->fd = open(vbi_dev_name, O_RDONLY)) == -1)
     {
        error("cannot open vbi device");
        goto fail2;

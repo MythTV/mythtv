@@ -68,7 +68,7 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    if (gCoreContext->GetNumSetting("weatherbackgroundfetch", 0))
+    if (gCoreContext->GetBoolSetting("weatherbackgroundfetch", false))
     {
         srcMan = new SourceManager();
         srcMan->startTimers();
@@ -139,13 +139,10 @@ int mythplugin_config()
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return 0;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
-                .arg(menuname).arg(themedir));
-        delete menu;
-        return -1;
-    }
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+        .arg(menuname).arg(themedir));
+    delete menu;
+    return -1;
 }
 
 void  mythplugin_destroy()

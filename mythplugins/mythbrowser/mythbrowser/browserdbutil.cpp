@@ -4,6 +4,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdb.h>
+#include <mythsorthelper.h>
 
 // mythbrowser
 #include "browserdbutil.h"
@@ -26,7 +27,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-static bool performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], const QString& version,
                                 QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -155,8 +156,8 @@ bool UpdateHomepageInDB(Bookmark* site)
     query.prepare("UPDATE `websites` SET `homepage` = '1' "
                   "WHERE `category` = :CATEGORY "
                   "AND `name` = :NAME;");
-    query.bindValue(":CATEGORY", site->category);
-    query.bindValue(":NAME", site->name);
+    query.bindValue(":CATEGORY", site->m_category);
+    query.bindValue(":NAME", site->m_name);
 
     return query.exec();
 }
@@ -166,7 +167,7 @@ bool InsertInDB(Bookmark* site)
     if (!site)
         return false;
 
-    return InsertInDB(site->category, site->name, site->url, site->isHomepage);
+    return InsertInDB(site->m_category, site->m_name, site->m_url, site->m_isHomepage);
 }
 
 bool InsertInDB(const QString &category,
@@ -208,7 +209,7 @@ bool RemoveFromDB(Bookmark *site)
     if (!site)
         return false;
 
-    return RemoveFromDB(site->category, site->name);
+    return RemoveFromDB(site->m_category, site->m_name);
 }
 
 bool RemoveFromDB(const QString &category, const QString &name)
@@ -236,14 +237,12 @@ int GetCategoryList(QStringList &list)
     if (!query.exec())
     {
         MythDB::DBError("mythbrowser: get category list", query);
-        return false;
+        return 0;
     }
-    else
+
+    while (query.next())
     {
-        while (query.next())
-        {
-            list << query.value(0).toString();
-        }
+        list << query.value(0).toString();
     }
 
     return list.size();
@@ -263,16 +262,19 @@ int GetSiteList(QList<Bookmark*>  &siteList)
     }
     else
     {
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
         while (query.next())
         {
             Bookmark *site = new Bookmark();
-            site->category = query.value(0).toString();
-            site->name = query.value(1).toString();
-            site->url = query.value(2).toString();
-            site->isHomepage = query.value(3).toBool();
-            site->selected = false;
+            site->m_category = query.value(0).toString();
+            site->m_name = query.value(1).toString();
+            site->m_sortName = sh->doTitle(site->m_name);
+            site->m_url = query.value(2).toString();
+            site->m_isHomepage = query.value(3).toBool();
+            site->m_selected = false;
             siteList.append(site);
         }
+        std::sort(siteList.begin(), siteList.end(), Bookmark::sortByName);
     }
 
     return siteList.size();

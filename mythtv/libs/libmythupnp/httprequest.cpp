@@ -154,35 +154,13 @@ static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 //static const int g_off         = 0;
 #endif
 
-const char *HTTPRequest::m_szServerHeaders = "Accept-Ranges: bytes\r\n";
+const char *HTTPRequest::s_szServerHeaders = "Accept-Ranges: bytes\r\n";
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
-                             m_parseRangeExp  ( "(\\d|\\-)"        ),
-                             m_eType          ( RequestTypeUnknown ),
-                             m_eContentType   ( ContentType_Unknown),
-                             m_nMajor         (   0 ),
-                             m_nMinor         (   0 ),
-                             m_bProtected     ( false ),
-                             m_bEncrypted     ( false ),
-                             m_bSOAPRequest   ( false ),
-                             m_eResponseType  ( ResponseTypeUnknown),
-                             m_nResponseStatus( 200 ),
-                             m_pPostProcess   ( nullptr ),
-                             m_bKeepAlive     ( true ),
-                             m_nKeepAliveTimeout ( 0 )
-{
-    m_response.open( QIODevice::ReadWrite );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-RequestType HTTPRequest::SetRequestType( const QString &sType )
+HttpRequestType HTTPRequest::SetRequestType( const QString &sType )
 {
     // HTTP
     if (sType == "GET"        ) return( m_eType = RequestTypeGet         );
@@ -493,7 +471,7 @@ qint64 HTTPRequest::SendResponse( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-qint64 HTTPRequest::SendResponseFile( QString sFileName )
+qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
 {
     qint64      nBytes  = 0;
     long long   llSize  = 0;
@@ -682,7 +660,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     // Set out file position to requested start location.
     // ----------------------------------------------------------------------
 
-    if ( pDevice->seek( llStart ) == false)
+    if ( !pDevice->seek( llStart ))
         return -1;
 
     char   aBuffer[ SENDFILE_BUFFER_SIZE ];
@@ -808,26 +786,26 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     NameValues::const_iterator nit = args.begin();
     for (; nit != args.end(); ++nit)
     {
-        stream << "<" << (*nit).sName;
+        stream << "<" << (*nit).m_sName;
 
-        if ((*nit).pAttributes)
+        if ((*nit).m_pAttributes)
         {
-            NameValues::const_iterator nit2 = (*nit).pAttributes->begin();
-            for (; nit2 != (*nit).pAttributes->end(); ++nit2)
+            NameValues::const_iterator nit2 = (*nit).m_pAttributes->begin();
+            for (; nit2 != (*nit).m_pAttributes->end(); ++nit2)
             {
-                stream << " " << (*nit2).sName << "='"
-                       << Encode( (*nit2).sValue ) << "'";
+                stream << " " << (*nit2).m_sName << "='"
+                       << Encode( (*nit2).m_sValue ) << "'";
             }
         }
 
         stream << ">";
 
         if (m_bSOAPRequest)
-            stream << Encode( (*nit).sValue );
+            stream << Encode( (*nit).m_sValue );
         else
-            stream << (*nit).sValue;
+            stream << (*nit).m_sValue;
 
-        stream << "</" << (*nit).sName << ">\r\n";
+        stream << "</" << (*nit).m_sName << ">\r\n";
     }
 
     if (m_bSOAPRequest)
@@ -945,7 +923,7 @@ QString HTTPRequest::GetResponseProtocol() const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-ContentType HTTPRequest::SetContentType( const QString &sType )
+HttpContentType HTTPRequest::SetContentType( const QString &sType )
 {
     if ((sType == "application/x-www-form-urlencoded"          ) ||
         (sType.startsWith("application/x-www-form-urlencoded;")))
@@ -1191,7 +1169,7 @@ QString HTTPRequest::GetRequestHeader( const QString &sKey, QString sDefault )
 
 QString HTTPRequest::GetResponseHeaders( void )
 {
-    QString sHeader = m_szServerHeaders;
+    QString sHeader = s_szServerHeaders;
 
     for ( QStringMap::iterator it  = m_mapRespHeaders.begin();
                                it != m_mapRespHeaders.end();
@@ -2019,7 +1997,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    QByteArray nonce = QByteArray(paramMap["nonce"].toLatin1());
+    QByteArray nonce = paramMap["nonce"].toLatin1();
     if (nonce.length() < 20)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce is too short");
@@ -2031,7 +2009,7 @@ bool HTTPRequest::DigestAuthentication()
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce doesn't match reference");
         LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce))
-                                                     .arg(QString(CalculateDigestNonce(nonceTimeStampStr))));
+                                                     .arg(CalculateDigestNonce(nonceTimeStampStr)));
         return false;
     }
 
@@ -2106,13 +2084,11 @@ bool HTTPRequest::DigestAuthentication()
 
         return true;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
-        LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
-                                .arg(paramMap["response"])
-                                .arg(QString(kd)));
-    }
+
+    LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
+    LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
+                            .arg(paramMap["response"])
+                            .arg(QString(kd)));
 
     return false;
 }
@@ -2134,7 +2110,7 @@ bool HTTPRequest::Authenticated()
 
     if (oList[0].compare( "basic", Qt::CaseInsensitive ) == 0)
         return BasicAuthentication();
-    else if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
+    if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
         return DigestAuthentication();
 
     return false;
@@ -2213,12 +2189,11 @@ QString HTTPRequest::GetHostName()
         {
             return hostname.section("]:", 0 , 0);
         }
-        else if (hostname.contains(":")) // IPv4 port
+        if (hostname.contains(":")) // IPv4 port
         {
             return hostname.section(":", 0 , 0);
         }
-        else
-            return hostname;
+        return hostname;
     }
 
     return GetHostAddress();
@@ -2365,15 +2340,6 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDeviceRequest::BufferedSocketDeviceRequest( QTcpSocket *pSocket )
-{
-    m_pSocket  = pSocket;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 {
     QString sLine;
@@ -2414,26 +2380,24 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
     {
         if (msecs == 0)
             return( m_pSocket->read( pData, nMaxLen ));
-        else
+
+        bool bTimeout = false;
+        MythTimer timer;
+        timer.start();
+        while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
         {
-            bool bTimeout = false;
-            MythTimer timer;
-            timer.start();
-            while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
+            bTimeout = !(m_pSocket->waitForReadyRead( msecs ));
+
+            if ( timer.elapsed() >= msecs )
             {
-                bTimeout = !(m_pSocket->waitForReadyRead( msecs ));
-
-                if ( timer.elapsed() >= msecs )
-                {
-                    bTimeout = true;
-                    LOG(VB_HTTP, LOG_INFO, "BufferedSocketDeviceRequest::ReadBlock() - Exceeded Total Elapsed Wait Time." );
-                }
+                bTimeout = true;
+                LOG(VB_HTTP, LOG_INFO, "BufferedSocketDeviceRequest::ReadBlock() - Exceeded Total Elapsed Wait Time." );
             }
-
-            // Just return what we have even if timed out.
-
-            return( m_pSocket->read( pData, nMaxLen ));
         }
+
+        // Just return what we have even if timed out.
+
+        return( m_pSocket->read( pData, nMaxLen ));
     }
 
     return( -1 );

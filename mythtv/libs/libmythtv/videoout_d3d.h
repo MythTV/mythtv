@@ -22,27 +22,28 @@ class VideoOutputD3D : public VideoOutput
     bool Init(const QSize &video_dim_buf,
               const QSize &video_dim_disp,
               float aspect,
-              WId winid, const QRect &win_rect, MythCodecID codec_id);
-    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
+              WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
+    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
-                      FrameScanType scan);
-    void Show(FrameScanType );
-    void WindowResized(const QSize &new_size);
+                      FrameScanType scan) override; // VideoOutput
+    void Show(FrameScanType ) override; // VideoOutput
+    void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,
-                      bool        &aspect_only);
-    void MoveResizeWindow(QRect new_rect) {;}
-    void UpdatePauseFrame(int64_t &disp_timecode);
-    virtual void DrawUnusedRects(bool) {;} // VideoOutput
-    void Zoom(ZoomDirection direction);
-    void EmbedInWidget(const QRect &rect);
-    void StopEmbedding(void);
-    bool hasFullScreenOSD(void) const { return true; }
+                      bool        &aspect_only) override; // VideoOutput
+    void MoveResizeWindow(QRect new_rect) override {;} // VideoOutput
+    void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
+    void DrawUnusedRects(bool) override {;} // VideoOutput
+    void Zoom(ZoomDirection direction) override; // VideoOutput
+    void EmbedInWidget(const QRect &rect) override; // VideoOutput
+    void StopEmbedding(void) override; // VideoOutput
+    bool hasFullScreenOSD(void) const override // VideoOutput
+        { return true; }
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
@@ -53,18 +54,20 @@ class VideoOutputD3D : public VideoOutput
 
     void ShowPIP(VideoFrame  *frame,
                  MythPlayer  *pipplayer,
-                 PIPLocation  loc);
-    void RemovePIP(MythPlayer *pipplayer);
-    bool IsPIPSupported(void) const { return true; }
-    virtual MythPainter *GetOSDPainter(void);
-    bool hasHWAcceleration(void) const { return !codec_is_std(video_codec_id); }
-    virtual bool ApproveDeintFilter(const QString& filtername) const;
-    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
+                 PIPLocation  loc) override; // VideoOutput
+    void RemovePIP(MythPlayer *pipplayer) override; // VideoOutput
+    bool IsPIPSupported(void) const override // VideoOutput
+        { return true; }
+    MythPainter *GetOSDPainter(void) override; // VideoOutput
+    bool hasHWAcceleration(void) const override // VideoOutput
+        { return !codec_is_std(video_codec_id); }
+    bool ApproveDeintFilter(const QString& filtername) const override; // VideoOutput
+    void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
 
-    virtual bool CanVisualise(AudioPlayer *audio, MythRender */*render*/)
+    bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput
         { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
-                                    const QString &name)
+    bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
+                            const QString &name) override // VideoOutput
         { return VideoOutput::SetupVisualisation(audio, (MythRender*)m_render, name); }
 
   private:

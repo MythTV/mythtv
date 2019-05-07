@@ -310,13 +310,13 @@ void pack_yv12interlaced(const unsigned char *source,
     const uint uwrap        = (pitches[1] << 1) - chroma_width;
     const uint vwrap        = (pitches[2] << 1) - chroma_width;
 
-    const uint8_t *ypt_1    = static_cast< const uint8_t * >(source) + offsets[0];
+    const uint8_t *ypt_1    = source + offsets[0];
     const uint8_t *ypt_2    = ypt_1 + pitches[0];
     const uint8_t *ypt_3    = ypt_1 + (pitches[0] * (height - 2));
     const uint8_t *ypt_4    = ypt_3 + pitches[0];
 
-    const uint8_t *u1       = static_cast< const uint8_t * >(source) + offsets[1];
-    const uint8_t *v1       = static_cast< const uint8_t * >(source) + offsets[2];
+    const uint8_t *u1       = source + offsets[1];
+    const uint8_t *v1       = source + offsets[2];
     const uint8_t *u2       = u1 + pitches[1];
     const uint8_t *v2       = v1 + pitches[2];
     const uint8_t *u3       = u1 + (pitches[1] * ((height - 4) >> 1));
@@ -324,7 +324,7 @@ void pack_yv12interlaced(const unsigned char *source,
     const uint8_t *u4       = u3 + pitches[1];
     const uint8_t *v4       = v3 + pitches[2];
 
-    uint8_t *dst_1          = static_cast< uint8_t * >(dest);
+    uint8_t *dst_1          = dest;
     uint8_t *dst_3          = dst_1 + (bgra_width * (height - 2));
 
     // Allocate a 4 line packed data buffer
@@ -446,8 +446,8 @@ void pack_yv12interlaced(const unsigned char *source,
     ypt_3 = ypt_2 + pitches[0];
     ypt_4 = ypt_3 + pitches[0];
 
-    u1 = static_cast< const uint8_t * >(source) + offsets[1];
-    v1 = static_cast< const uint8_t * >(source) + offsets[2];
+    u1 = source + offsets[1];
+    v1 = source + offsets[2];
     u2 = u1 + pitches[1]; v2 = v1 + pitches[2];
     u3 = u2 + pitches[1]; v3 = v2 + pitches[2];
     u4 = u3 + pitches[1]; v4 = v3 + pitches[2];

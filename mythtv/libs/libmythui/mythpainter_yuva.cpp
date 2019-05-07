@@ -213,5 +213,5 @@ QColor inline rgb_to_yuv(const QColor &original)
     int v = ((FIX(0.499) * r - FIX(0.418) * g -
              FIX(0.0813) * b + ONE_HALF) >> SCALEBITS) + 128;
 
-    return QColor(y, u, v, a);
+    return {y, u, v, a};
 }

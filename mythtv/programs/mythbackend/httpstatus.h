@@ -61,13 +61,13 @@ class HttpStatus : public HttpServerExtension
         void    FillStatusXML     ( QDomDocument *pDoc);
     
         void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );
-        int     PrintEncoderStatus( QTextStream &os, QDomElement encoders );
-        int     PrintScheduled    ( QTextStream &os, QDomElement scheduled );
-        int     PrintFrontends    ( QTextStream &os, QDomElement frontends );
-        int     PrintBackends     ( QTextStream &os, QDomElement backends );
-        int     PrintJobQueue     ( QTextStream &os, QDomElement jobs );
-        int     PrintMachineInfo  ( QTextStream &os, QDomElement info );
-        int     PrintMiscellaneousInfo ( QTextStream &os, QDomElement info );
+        int     PrintEncoderStatus( QTextStream &os, const QDomElement& encoders );
+        int     PrintScheduled    ( QTextStream &os, const QDomElement& scheduled );
+        int     PrintFrontends    ( QTextStream &os, const QDomElement& frontends );
+        int     PrintBackends     ( QTextStream &os, const QDomElement& backends );
+        int     PrintJobQueue     ( QTextStream &os, const QDomElement& jobs );
+        int     PrintMachineInfo  ( QTextStream &os, const QDomElement& info );
+        int     PrintMiscellaneousInfo ( QTextStream &os, const QDomElement& info );
 
         void    FillProgramInfo   ( QDomDocument *pDoc,
                                     QDomNode     &node,
@@ -88,9 +88,9 @@ class HttpStatus : public HttpServerExtension
         void     SetMainServer(MainServer *mainServer)
                     { m_pMainServer = mainServer; }
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // HttpServerExtension
         
-        bool     ProcessRequest( HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 };
 
 #endif

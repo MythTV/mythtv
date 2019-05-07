@@ -1,5 +1,7 @@
 #include "galleryslideview.h"
 
+#include <utility>
+
 #include "mythmainwindow.h"
 #include "mythuitext.h"
 #include "mythdialogbox.h"
@@ -19,24 +21,14 @@
 GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
                                    bool editsAllowed)
     : MythScreenType(parent, name),
-      m_uiImage(nullptr),
-      m_uiStatus(nullptr),
-      m_uiSlideCount(nullptr), m_uiCaptionText(nullptr), m_uiHideCaptions(nullptr),
       m_mgr(ImageManagerFe::getInstance()),
-      m_view(nullptr),
       m_availableTransitions(GetMythPainter()->SupportsAnimation()),
       m_transition(m_availableTransitions.Select(
                        gCoreContext->GetNumSetting("GalleryTransitionType",
                                                    kBlendTransition))),
-      m_updateTransition(),
-      m_slides(),
       m_infoList(*this),
       m_slideShowTime(gCoreContext->GetNumSetting("GallerySlideShowTime", 3000)),
-      m_statusText(),
-      m_playing(false),
-      m_suspended(false),
-      m_showCaptions(gCoreContext->GetNumSetting("GalleryShowSlideCaptions", true)),
-      m_transitioning(false),
+      m_showCaptions(gCoreContext->GetBoolSetting("GalleryShowSlideCaptions", true)),
       m_editsAllowed(editsAllowed)
 {
     // Detect when transitions finish. Queued signal to allow redraw/pulse to
@@ -46,8 +38,10 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     connect(&m_updateTransition, SIGNAL(finished()),
             this, SLOT(TransitionComplete()), Qt::QueuedConnection);
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     // Seed random generator for random transitions
     qsrand(QTime::currentTime().msec());
+#endif
 
     // Initialise slideshow timer
     m_timer.setSingleShot(true);
@@ -216,10 +210,10 @@ bool GallerySlideView::keyPressEvent(QKeyEvent *event)
  */
 void GallerySlideView::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me      = static_cast<MythEvent *>(event);
-        QString    message = me->Message();
+        const QString&    message = me->Message();
 
         QStringList extra = me->ExtraDataList();
 
@@ -278,7 +272,7 @@ void GallerySlideView::MenuMain()
     else
         menu->AddItem(tr("Start SlideShow"), SLOT(Play()));
 
-    if (gCoreContext->GetNumSetting("GalleryRepeat", 0))
+    if (gCoreContext->GetBoolSetting("GalleryRepeat", false))
         menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
     else
         menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));
@@ -600,7 +594,7 @@ void GallerySlideView::SlideAvailable(int count)
     // and browsing with transitions turned off
     Transition &transition =
             (direction != 0 &&
-             (m_playing || gCoreContext->GetNumSetting("GalleryBrowseTransition", 0)))
+             (m_playing || gCoreContext->GetBoolSetting("GalleryBrowseTransition", false)))
             ? m_transition : m_updateTransition;
 
     // Reset any zoom before starting transition
@@ -688,7 +682,7 @@ void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
 {
     // Browsing always wraps; slideshows depend on repeat setting
     if (m_playing && m_view->HasNext(inc) == nullptr
-            && !gCoreContext->GetNumSetting("GalleryRepeat", false))
+            && !gCoreContext->GetBoolSetting("GalleryRepeat", false))
     {
         // Don't stop due to jumping past end
         if (inc == 1)
@@ -736,7 +730,7 @@ void GallerySlideView::PlayVideo()
 */
 void GallerySlideView::SetStatus(QString msg, bool delay)
 {
-    m_statusText = msg;
+    m_statusText = std::move(msg);
     if (m_uiStatus)
     {
         if (delay)

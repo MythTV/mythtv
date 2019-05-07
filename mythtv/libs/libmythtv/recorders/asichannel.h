@@ -19,24 +19,30 @@ class ASIChannel : public DTVChannel
     ~ASIChannel(void);
 
     // Commands
-    virtual bool Open(void);
-    virtual void Close(void);
+    bool Open(void) override; // ChannelBase
+    void Close(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    virtual bool Tune(const DTVMultiplex&)          { return true; }
-    virtual bool Tune(const QString&, int)          { return true; }
-    virtual bool Tune(uint64_t)                     { return true; }
+    bool Tune(const DTVMultiplex&) override // DTVChannel
+        { return true; }
+    bool Tune(const QString&, int) override // ChannelBase
+        { return true; }
+    bool Tune(uint64_t) override // DTVChannel
+        { return true; }
     // Gets
-    virtual bool IsOpen(void) const { return m_isopen; }
-    virtual QString GetDevice(void) const { return m_device; }
-    virtual vector<DTVTunerType> GetTunerTypes(void) const
+    bool IsOpen(void) const  override // ChannelBase
+        { return m_isopen; }
+    QString GetDevice(void) const override // ChannelBase
+        { return m_device; }
+    vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
         { return m_tuner_types; }
-    virtual bool IsPIDTuningSupported(void) const { return true; }
+    bool IsPIDTuningSupported(void) const override // DTVChannel
+        { return true; }
 
   private:
     vector<DTVTunerType>     m_tuner_types;
     QString                  m_device;
-    bool                     m_isopen;
+    bool                     m_isopen {false};
 };
 
 #endif // _ASI_CHANNEL_H_

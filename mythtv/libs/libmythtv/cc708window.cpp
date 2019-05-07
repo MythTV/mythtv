@@ -106,28 +106,7 @@ const uint k708AttrOpacityFlash       = 1;
 const uint k708AttrOpacityTranslucent = 2;
 const uint k708AttrOpacityTransparent = 3;
 
-CC708Window::CC708Window()
-    : priority(0),              m_visible(false),
-      anchor_point(0),          relative_pos(0),
-      anchor_vertical(0),       anchor_horizontal(0),
-      row_count(0),             column_count(0),
-      row_lock(0),              column_lock(0),
-      pen_style(0),             window_style(0),
-
-      fill_color(0),            fill_opacity(0),
-      border_color(0),          border_type(0),
-      scroll_dir(0),            print_dir(0),
-      effect_dir(0),            display_effect(0),
-      effect_speed(0),
-      justify(0),               word_wrap(0),
-
-      true_row_count(0),        true_column_count(0),
-      text(nullptr),            m_exists(false),
-      m_changed(true),          lock(QMutex::Recursive)
-{
-}
-
-void CC708Window::DefineWindow(int _priority,         int _visible,
+void CC708Window::DefineWindow(int _priority,         bool _visible,
                                int _anchor_point,     int _relative_pos,
                                int _anchor_vertical,  int _anchor_horizontal,
                                int _row_count,        int _column_count,
@@ -144,29 +123,29 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     // decreases, the array can be left unchanged.  If only the number
     // of rows increases, the old characters can be copied into the
     // new character array directly without any index translation.
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
     _row_count++;
     _column_count++;
 
-    priority          = _priority;
+    m_priority          = _priority;
     SetVisible(_visible);
-    anchor_point      = _anchor_point;
-    relative_pos      = _relative_pos;
-    anchor_vertical   = _anchor_vertical;
-    anchor_horizontal = _anchor_horizontal;
-    row_lock          = _row_lock;
-    column_lock       = _column_lock;
+    m_anchor_point      = _anchor_point;
+    m_relative_pos      = _relative_pos;
+    m_anchor_vertical   = _anchor_vertical;
+    m_anchor_horizontal = _anchor_horizontal;
+    m_row_lock          = _row_lock;
+    m_column_lock       = _column_lock;
 
     if ((!_pen_style && !GetExists()) || _pen_style)
-        pen.SetPenStyle(_pen_style ? _pen_style : 1);
+        m_pen.SetPenStyle(_pen_style ? _pen_style : 1);
 
     if ((!_window_style && !GetExists()) || _window_style)
         SetWindowStyle(_window_style ? _window_style : 1);
 
     Resize(_row_count, _column_count);
-    row_count = _row_count;
-    column_count = _column_count;
+    m_row_count = _row_count;
+    m_column_count = _column_count;
     LimitPenLocation();
 
     SetExists(true);
@@ -179,80 +158,80 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
 void CC708Window::Resize(uint new_rows, uint new_columns)
 {
 
-    if (!GetExists() || text == nullptr)
+    if (!GetExists() || m_text == nullptr)
     {
-        true_row_count = 0;
-        true_column_count = 0;
+        m_true_row_count = 0;
+        m_true_column_count = 0;
     }
 
-    //We need to shrink Rows, at times Scroll (row >= (int)true_row_count)) fails and we
+    //We need to shrink Rows, at times Scroll (row >= (int)m_true_row_count)) fails and we
     // Don't scroll caption line resulting in overwriting the same.
     // Ex: [CAPTIONING FUNDED BY CBS SPORTS
     //     DIVISION]NG FUNDED BY CBS SPORTS
 
-    if(new_rows < true_row_count || new_columns < true_column_count)
+    if(new_rows < m_true_row_count || new_columns < m_true_column_count)
     {
-      delete [] text;
-      text = new CC708Character [new_rows * new_columns];
-      true_row_count = new_rows;
-      true_column_count = new_columns;
-      pen.row = 0;
-      pen.column = 0;
+      delete [] m_text;
+      m_text = new CC708Character [new_rows * new_columns];
+      m_true_row_count = new_rows;
+      m_true_column_count = new_columns;
+      m_pen.m_row = 0;
+      m_pen.m_column = 0;
       Clear();
       SetChanged();
       SetExists(true);
       LOG(VB_VBI,
           LOG_DEBUG,
-          QString("Shrinked nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(new_rows) .arg(
-              new_columns) .arg(row_count) .arg(column_count) .arg(true_row_count) .arg(
-                  true_column_count));
+          QString("Shrinked nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(new_rows)
+          .arg(new_columns) .arg(m_row_count) .arg(m_column_count)
+          .arg(m_true_row_count) .arg(m_true_column_count));
       return;
     }
 
-    if (new_rows > true_row_count || new_columns > true_column_count)
+    if (new_rows > m_true_row_count || new_columns > m_true_column_count)
     {
-        new_rows = max(new_rows, true_row_count);
-        new_columns = max(new_columns, true_column_count);
+        new_rows = max(new_rows, m_true_row_count);
+        new_columns = max(new_columns, m_true_column_count);
 
         // Expand the array if the new size exceeds the current capacity
         // in either dimension.
         CC708Character *new_text =
             new CC708Character[new_rows * new_columns];
-        pen.column = 0;
-        pen.row = 0;
+        m_pen.m_column = 0;
+        m_pen.m_row = 0;
         uint i, j;
-        for (i = 0; text && i < row_count; ++i)
+        for (i = 0; m_text && i < m_row_count; ++i)
         {
-            for (j = 0; j < column_count; ++j)
-                new_text[i * new_columns + j] = text[i * true_column_count + j];
+            for (j = 0; j < m_column_count; ++j)
+                new_text[i * new_columns + j] = m_text[i * m_true_column_count + j];
             for (; j < new_columns; ++j)
-                new_text[i * new_columns + j].attr = pen.attr;
+                new_text[i * new_columns + j].m_attr = m_pen.attr;
         }
         for (; i < new_rows; ++i)
             for (j = 0; j < new_columns; ++j)
-                new_text[i * new_columns + j].attr = pen.attr;
+                new_text[i * new_columns + j].m_attr = m_pen.attr;
 
-        delete [] text;
-        text = new_text;
-        true_row_count = new_rows;
-        true_column_count = new_columns;
+        delete [] m_text;
+        m_text = new_text;
+        m_true_row_count = new_rows;
+        m_true_column_count = new_columns;
         SetChanged();
     }
-    else if (new_rows > row_count || new_columns > column_count)
+    else if (new_rows > m_row_count || new_columns > m_column_count)
     {
         // At least one dimension expanded into existing space, so
         // those newly exposed characters must be cleared.
-        for (uint i = 0; i < row_count; ++i)
-            for (uint j = column_count; j < new_columns; ++j)
+        for (uint i = 0; i < m_row_count; ++i)
+            for (uint j = m_column_count; j < new_columns; ++j)
             {
-                text[i * true_column_count + j].character = ' ';
-                text[i * true_column_count + j].attr = pen.attr;
+                m_text[i * m_true_column_count + j].m_character = ' ';
+                m_text[i * m_true_column_count + j].m_attr = m_pen.attr;
             }
-        for (uint i = row_count; i < new_rows; ++i)
+        for (uint i = m_row_count; i < new_rows; ++i)
             for (uint j = 0; j < new_columns; ++j)
             {
-                text[i * true_column_count + j].character = ' ';
-                text[i * true_column_count + j].attr = pen.attr;
+                m_text[i * m_true_column_count + j].m_character = ' ';
+                m_text[i * m_true_column_count + j].m_attr = m_pen.attr;
             }
         SetChanged();
     }
@@ -262,30 +241,30 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
 
 CC708Window::~CC708Window()
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
     SetExists(false);
-    true_row_count    = 0;
-    true_column_count = 0;
+    m_true_row_count    = 0;
+    m_true_column_count = 0;
 
-    if (text)
+    if (m_text)
     {
-        delete [] text;
-        text = nullptr;
+        delete [] m_text;
+        m_text = nullptr;
     }
 }
 
 void CC708Window::Clear(void)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
-    if (!GetExists() || !text)
+    if (!GetExists() || !m_text)
         return;
 
-    for (uint i = 0; i < true_row_count * true_column_count; i++)
+    for (uint i = 0; i < m_true_row_count * m_true_column_count; i++)
     {
-        text[i].character = QChar(' ');
-        text[i].attr = pen.attr;
+        m_text[i].m_character = QChar(' ');
+        m_text[i].m_attr = m_pen.attr;
     }
     SetChanged();
 }
@@ -293,10 +272,10 @@ void CC708Window::Clear(void)
 CC708Character &CC708Window::GetCCChar(void) const
 {
     assert(GetExists());
-    assert(text);
-    assert(pen.row    < true_row_count);
-    assert(pen.column < true_column_count);
-    return text[pen.row * true_column_count + pen.column];
+    assert(m_text);
+    assert(m_pen.m_row    < m_true_row_count);
+    assert(m_pen.m_column < m_true_column_count);
+    return m_text[m_pen.m_row * m_true_column_count + m_pen.m_column];
 }
 
 vector<CC708String*> CC708Window::GetStrings(void) const
@@ -318,46 +297,46 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     // avoid creating such a string when it appears at the end of the
     // row.  (We can't do the latter for an initial string of spaces,
     // because the spaces are needed for coordinate calculations.)
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
     vector<CC708String*> list;
 
     CC708String *cur = nullptr;
 
-    if (!text)
+    if (!m_text)
         return list;
 
     bool createdNonblankStrings = false;
     QChar chars[k708MaxColumns];
-    for (uint j = 0; j < row_count; j++)
+    for (uint j = 0; j < m_row_count; j++)
     {
         bool inLeadingSpaces = true;
         bool inTrailingSpaces = true;
         bool createdString = false;
         uint strStart = 0;
-        for (uint i = 0; i < column_count; i++)
+        for (uint i = 0; i < m_column_count; i++)
         {
-            CC708Character &chr = text[j * true_column_count + i];
-            chars[i] = chr.character;
+            CC708Character &chr = m_text[j * m_true_column_count + i];
+            chars[i] = chr.m_character;
             if (!cur)
             {
                 cur = new CC708String;
                 cur->x    = i;
                 cur->y    = j;
-                cur->attr = chr.attr;
+                cur->attr = chr.m_attr;
                 strStart = i;
             }
-            bool isDisplayable = (chr.character != ' ' || chr.attr.underline);
+            bool isDisplayable = (chr.m_character != ' ' || chr.m_attr.m_underline);
             if (inLeadingSpaces && isDisplayable)
             {
-                cur->attr = chr.attr;
+                cur->attr = chr.m_attr;
                 inLeadingSpaces = false;
             }
             if (isDisplayable)
             {
                 inTrailingSpaces = false;
             }
-            if (cur->attr != chr.attr)
+            if (cur->attr != chr.m_attr)
             {
                 cur->str = QString(&chars[strStart], i - strStart);
                 list.push_back(cur);
@@ -374,8 +353,8 @@ vector<CC708String*> CC708Window::GetStrings(void) const
             // create a chunk to preserve spacing between lines.
             if (!inTrailingSpaces || !createdString)
             {
-                int allSpaces = (inLeadingSpaces || inTrailingSpaces);
-                int length = allSpaces ? 0 : column_count - strStart;
+                bool allSpaces = (inLeadingSpaces || inTrailingSpaces);
+                int length = allSpaces ? 0 : m_column_count - strStart;
                 if (length)
                     createdNonblankStrings = true;
                 cur->str = QString(&chars[strStart], length);
@@ -411,22 +390,22 @@ void CC708Window::SetWindowStyle(uint style)
     if ((style < 1) || (style > 7))
         return;
 
-    fill_color     = k708AttrColorBlack;
-    fill_opacity   = ((2 == style) || (5 == style)) ?
+    m_fill_color     = k708AttrColorBlack;
+    m_fill_opacity   = ((2 == style) || (5 == style)) ?
         k708AttrOpacityTransparent : k708AttrOpacitySolid;
-    border_color   = k708AttrColorBlack;
-    border_type    = k708BorderNone;
-    scroll_dir     = (style < 7) ? k708DirBottomToTop : k708DirRightToLeft;
-    print_dir      = (style < 7) ? k708DirLeftToRight : k708DirTopToBottom;
-    effect_dir     = scroll_dir;
-    display_effect = k708EffectSnap;
-    effect_speed   = 0;
-    justify        = style2justify[style];
-    word_wrap      = (style > 3) && (style < 7) ? 1 : 0;
+    m_border_color   = k708AttrColorBlack;
+    m_border_type    = k708BorderNone;
+    m_scroll_dir     = (style < 7) ? k708DirBottomToTop : k708DirRightToLeft;
+    m_print_dir      = (style < 7) ? k708DirLeftToRight : k708DirTopToBottom;
+    m_effect_dir     = m_scroll_dir;
+    m_display_effect = k708EffectSnap;
+    m_effect_speed   = 0;
+    m_justify        = style2justify[style];
+    m_word_wrap      = (style > 3) && (style < 7) ? 1 : 0;
 
     /// HACK -- begin
     // It appears that ths is missused by broadcasters (FOX -- Dollhouse)
-    fill_opacity   = k708AttrOpacityTransparent;
+    m_fill_opacity   = k708AttrOpacityTransparent;
     /// HACK -- end
 }
 
@@ -443,110 +422,110 @@ void CC708Window::AddChar(QChar ch)
     {
         LOG(VB_VBI, LOG_DEBUG,
             QString("AddChar(%1) at (c %2, r %3) INVALID win(%4,%5)")
-                .arg(dbg_char).arg(pen.column).arg(pen.row)
-                .arg(true_column_count).arg(true_row_count));
+                .arg(dbg_char).arg(m_pen.m_column).arg(m_pen.m_row)
+                .arg(m_true_column_count).arg(m_true_row_count));
         return;
     }
 
     if (ch.toLatin1() == 0x0D)
     {
-        Scroll(pen.row + 1, 0);
+        Scroll(m_pen.m_row + 1, 0);
         SetChanged();
         return;
     }
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
     if (ch.toLatin1() == 0x08)
     {
         DecrPenLocation();
         CC708Character& chr = GetCCChar();
-        chr.attr      = pen.attr;
-        chr.character = QChar(' ');
+        chr.m_attr      = m_pen.attr;
+        chr.m_character = QChar(' ');
         SetChanged();
         return;
     }
 
     CC708Character& chr = GetCCChar();
-    chr.attr      = pen.attr;
-    chr.character = ch;
-    int c = pen.column;
-    int r = pen.row;
+    chr.m_attr      = m_pen.attr;
+    chr.m_character = ch;
+    int c = m_pen.m_column;
+    int r = m_pen.m_row;
     IncrPenLocation();
     SetChanged();
 
     LOG(VB_VBI, LOG_DEBUG, QString("AddChar(%1) at (c %2, r %3) -> (%4,%5)")
-            .arg(dbg_char).arg(c).arg(r).arg(pen.column).arg(pen.row));
+            .arg(dbg_char).arg(c).arg(r).arg(m_pen.m_column).arg(m_pen.m_row));
 }
 
 void CC708Window::Scroll(int row, int col)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
-    if (!true_row_count || !true_column_count)
+    if (!m_true_row_count || !m_true_column_count)
         return;
 
-    if (text && (k708DirBottomToTop == scroll_dir) &&
-        (row >= (int)true_row_count))
+    if (m_text && (k708DirBottomToTop == m_scroll_dir) &&
+        (row >= (int)m_true_row_count))
     {
-        for (uint j = 0; j < true_row_count - 1; j++)
-            for (uint i = 0; i < true_column_count; i++)
-                text[(true_column_count * j) + i] =
-                    text[(true_column_count * (j+1)) + i];
-        //uint colsz = true_column_count * sizeof(CC708Character);
-        //memmove(text, text + colsz, colsz * (true_row_count - 1));
+        for (uint j = 0; j < m_true_row_count - 1; j++)
+            for (uint i = 0; i < m_true_column_count; i++)
+                m_text[(m_true_column_count * j) + i] =
+                    m_text[(m_true_column_count * (j+1)) + i];
+        //uint colsz = m_true_column_count * sizeof(CC708Character);
+        //memmove(m_text, m_text + colsz, colsz * (m_true_row_count - 1));
 
         CC708Character tmp(*this);
-        for (uint i = 0; i < true_column_count; i++)
-            text[(true_column_count * (true_row_count - 1)) + i] = tmp;
+        for (uint i = 0; i < m_true_column_count; i++)
+            m_text[(m_true_column_count * (m_true_row_count - 1)) + i] = tmp;
 
-        pen.row = true_row_count - 1;
+        m_pen.m_row = m_true_row_count - 1;
         SetChanged();
     }
     else
     {
-        pen.row = row;
+        m_pen.m_row = row;
     }
     // TODO implement other 3 scroll directions...
 
-    pen.column = col;
+    m_pen.m_column = col;
 }
 
 void CC708Window::IncrPenLocation(void)
 {
     // TODO: Scroll direction and up/down printing,
     // and word wrap not handled yet...
-    int new_column = pen.column, new_row = pen.row;
+    int new_column = m_pen.m_column, new_row = m_pen.m_row;
 
-    new_column += (print_dir == k708DirLeftToRight) ? +1 : 0;
-    new_column += (print_dir == k708DirRightToLeft) ? -1 : 0;
-    new_row    += (print_dir == k708DirTopToBottom) ? +1 : 0;
-    new_row    += (print_dir == k708DirBottomToTop) ? -1 : 0;
+    new_column += (m_print_dir == k708DirLeftToRight) ? +1 : 0;
+    new_column += (m_print_dir == k708DirRightToLeft) ? -1 : 0;
+    new_row    += (m_print_dir == k708DirTopToBottom) ? +1 : 0;
+    new_row    += (m_print_dir == k708DirBottomToTop) ? -1 : 0;
 
 #if 0
     LOG(VB_VBI, LOG_DEBUG, QString("IncrPen dir%1: (c %2, r %3) -> (%4,%5)")
-            .arg(print_dir).arg(pen.column).arg(pen.row)
+            .arg(m_print_dir).arg(m_pen.m_column).arg(m_pen.m_row)
             .arg(new_column).arg(new_row));
 #endif
 
-    if (k708DirLeftToRight == print_dir || k708DirRightToLeft == print_dir)
+    if (k708DirLeftToRight == m_print_dir || k708DirRightToLeft == m_print_dir)
     {
         // basic wrapping for l->r, r->l languages
-        if (!row_lock && column_lock && (new_column >= (int)true_column_count))
+        if (!m_row_lock && m_column_lock && (new_column >= (int)m_true_column_count))
         {
             new_column  = 0;
             new_row    += 1;
         }
-        else if (!row_lock && column_lock && (new_column < 0))
+        else if (!m_row_lock && m_column_lock && (new_column < 0))
         {
-            new_column  = (int)true_column_count - 1;
+            new_column  = (int)m_true_column_count - 1;
             new_row    -= 1;
         }
         Scroll(new_row, new_column);
     }
     else
     {
-        pen.column = max(new_column, 0);
-        pen.row    = max(new_row,    0);
+        m_pen.m_column = max(new_column, 0);
+        m_pen.m_row    = max(new_row,    0);
     }
     // TODO implement other 2 scroll directions...
 
@@ -557,38 +536,38 @@ void CC708Window::DecrPenLocation(void)
 {
     // TODO: Scroll direction and up/down printing,
     // and word wrap not handled yet...
-    int new_column = pen.column, new_row = pen.row;
+    int new_column = m_pen.m_column, new_row = m_pen.m_row;
 
-    new_column -= (print_dir == k708DirLeftToRight) ? +1 : 0;
-    new_column -= (print_dir == k708DirRightToLeft) ? -1 : 0;
-    new_row    -= (print_dir == k708DirTopToBottom) ? +1 : 0;
-    new_row    -= (print_dir == k708DirBottomToTop) ? -1 : 0;
+    new_column -= (m_print_dir == k708DirLeftToRight) ? +1 : 0;
+    new_column -= (m_print_dir == k708DirRightToLeft) ? -1 : 0;
+    new_row    -= (m_print_dir == k708DirTopToBottom) ? +1 : 0;
+    new_row    -= (m_print_dir == k708DirBottomToTop) ? -1 : 0;
 
 #if 0
     LOG(VB_VBI, LOG_DEBUG, QString("DecrPen dir%1: (c %2, r %3) -> (%4,%5)")
-            .arg(print_dir).arg(pen.column).arg(pen.row)
+        .arg(m_print_dir).arg(m_pen.m_column).arg(m_pen.m_row)
             .arg(new_column).arg(new_row));
 #endif
 
-    if (k708DirLeftToRight == print_dir || k708DirRightToLeft == print_dir)
+    if (k708DirLeftToRight == m_print_dir || k708DirRightToLeft == m_print_dir)
     {
         // basic wrapping for l->r, r->l languages
-        if (!row_lock && column_lock && (new_column >= (int)true_column_count))
+        if (!m_row_lock && m_column_lock && (new_column >= (int)m_true_column_count))
         {
             new_column  = 0;
             new_row    += 1;
         }
-        else if (!row_lock && column_lock && (new_column < 0))
+        else if (!m_row_lock && m_column_lock && (new_column < 0))
         {
-            new_column  = (int)true_column_count - 1;
+            new_column  = (int)m_true_column_count - 1;
             new_row    -= 1;
         }
         Scroll(new_row, new_column);
     }
     else
     {
-        pen.column = max(new_column, 0);
-        pen.row    = max(new_row,    0);
+        m_pen.m_column = max(new_column, 0);
+        m_pen.m_row    = max(new_row,    0);
     }
     // TODO implement other 2 scroll directions...
 
@@ -600,13 +579,13 @@ void CC708Window::SetPenLocation(uint row, uint column)
   //Clear current row in case we are reseting Pen Location.
   LOG(VB_VBI,
       LOG_DEBUG,
-      QString("SetPenLocation nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(row).arg(
-          column).arg(row_count).arg(column_count).arg(true_row_count).arg(
-          true_column_count));
+      QString("SetPenLocation nr %1 nc %2 rc %3 cc %4 tr %5 tc %6").arg(row)
+      .arg(column).arg(m_row_count).arg(m_column_count).arg(m_true_row_count)
+      .arg(m_true_column_count));
      if(0 == row)
      {
-          Scroll(true_row_count, column);
-          pen.row = row;
+          Scroll(m_true_row_count, column);
+          m_pen.m_row = row;
      }
      else
      {
@@ -618,10 +597,10 @@ void CC708Window::SetPenLocation(uint row, uint column)
 void CC708Window::LimitPenLocation(void)
 {
     // basic limiting
-    uint max_col = max((int)true_column_count - 1, 0);
-    uint max_row = max((int)true_row_count    - 1, 0);
-    pen.column   = min(pen.column, max_col);
-    pen.row      = min(pen.row,    max_row);
+    uint max_col   = max((int)m_true_column_count - 1, 0);
+    uint max_row   = max((int)m_true_row_count    - 1, 0);
+    m_pen.m_column = min(m_pen.m_column, max_col);
+    m_pen.m_row    = min(m_pen.m_row,    max_row);
 }
 
 /***************************************************************************/
@@ -633,50 +612,50 @@ void CC708Pen::SetPenStyle(uint style)
     if ((style < 1) || (style > 7))
         return;
 
-    attr.pen_size   = k708AttrSizeStandard;
-    attr.offset     = k708AttrOffsetNormal;
-    attr.font_tag   = style2font[style];
-    attr.italics    = 0;
-    attr.underline  = 0;
-    attr.boldface   = 0;
-    attr.edge_type  = 0;
-    attr.fg_color   = k708AttrColorWhite;
-    attr.fg_opacity = k708AttrOpacitySolid;
-    attr.bg_color   = k708AttrColorBlack;
-    attr.bg_opacity = (style<6) ?
+    attr.m_pen_size   = k708AttrSizeStandard;
+    attr.m_offset     = k708AttrOffsetNormal;
+    attr.m_font_tag   = style2font[style];
+    attr.m_italics    = false;
+    attr.m_underline  = false;
+    attr.m_boldface   = false;
+    attr.m_edge_type  = 0;
+    attr.m_fg_color   = k708AttrColorWhite;
+    attr.m_fg_opacity = k708AttrOpacitySolid;
+    attr.m_bg_color   = k708AttrColorBlack;
+    attr.m_bg_opacity = (style<6) ?
         k708AttrOpacitySolid : k708AttrOpacityTransparent;
-    attr.edge_color = k708AttrColorBlack;
-    attr.actual_fg_color = QColor();
+    attr.m_edge_color = k708AttrColorBlack;
+    attr.m_actual_fg_color = QColor();
 }
 
 CC708Character::CC708Character(const CC708Window &win)
-    : attr(win.pen.attr), character(' ')
+    : m_attr(win.m_pen.attr)
 {
 }
 
 bool CC708CharacterAttribute::operator==(
     const CC708CharacterAttribute &other) const
 {
-    return ((pen_size   == other.pen_size)   &&
-            (offset     == other.offset)     &&
-            (text_tag   == other.text_tag)   &&
-            (font_tag   == other.font_tag)   &&
-            (edge_type  == other.edge_type)  &&
-            (underline  == other.underline)  &&
-            (italics    == other.italics)    &&
-            (fg_color   == other.fg_color)   &&
-            (fg_opacity == other.fg_opacity) &&
-            (bg_color   == other.bg_color)   &&
-            (bg_opacity == other.bg_opacity) &&
-            (edge_color == other.edge_color));
+    return ((m_pen_size   == other.m_pen_size)   &&
+            (m_offset     == other.m_offset)     &&
+            (m_text_tag   == other.m_text_tag)   &&
+            (m_font_tag   == other.m_font_tag)   &&
+            (m_edge_type  == other.m_edge_type)  &&
+            (m_underline  == other.m_underline)  &&
+            (m_italics    == other.m_italics)    &&
+            (m_fg_color   == other.m_fg_color)   &&
+            (m_fg_opacity == other.m_fg_opacity) &&
+            (m_bg_color   == other.m_bg_color)   &&
+            (m_bg_opacity == other.m_bg_opacity) &&
+            (m_edge_color == other.m_edge_color));
 }
 
-QColor CC708CharacterAttribute::ConvertToQColor(uint c)
+QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
 {
     // Color is expressed in 6 bits, 2 each for red, green, and blue.
     // U.S. ATSC programs seem to use just the higher-order bit,
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
     static int X[] = {0, 96, 255, 255};
-    return QColor(X[(c>>4)&3], X[(c>>2)&3], X[c&3]);
+    return {X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]};
 }

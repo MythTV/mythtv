@@ -43,7 +43,7 @@ class UPnpSearchTask : public Task
 
         QList<QHostAddress>     m_addressList;
         int                     m_nServicePort;
-        int                     m_nMaxAge;
+        int                     m_nMaxAge      {3600};
 
         QHostAddress    m_PeerAddress;
         int             m_nPeerPort;
@@ -59,8 +59,8 @@ class UPnpSearchTask : public Task
 
         void     ProcessDevice ( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendMsg       ( MSocketDevice  *pSocket,
-                                 QString         sST,
-                                 QString         sUDN );
+                                 const QString&  sST,
+                                 const QString&  sUDN );
 
     public:
 
@@ -70,8 +70,8 @@ class UPnpSearchTask : public Task
                         QString      sST, 
                         QString      sUDN );
 
-        virtual QString Name   ()               { return( "Search" );   }
-        virtual void    Execute( TaskQueue * );
+        QString Name() override { return( "Search" ); } // Task
+        void Execute( TaskQueue * ) override; // Task
 
 };
 

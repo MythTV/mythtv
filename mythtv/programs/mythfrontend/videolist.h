@@ -32,7 +32,7 @@ class VideoList
                                 bool include_updirs);
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
-                     bool flatlist, int group_type);
+                     bool flat_list, int group_type);
     bool refreshNode(MythGenericTree *node);
 
     unsigned int count() const;
@@ -54,6 +54,9 @@ class VideoList
     void InvalidateCache();
 
   private:
+    VideoList(const VideoList &) = delete;            // not copyable
+    VideoList &operator=(const VideoList &) = delete; // not copyable
+
     class VideoListImp *m_imp;
 };
 
@@ -61,7 +64,7 @@ class VideoMetadata;
 class TreeNodeData
 {
   public:
-    TreeNodeData();
+    TreeNodeData() = default;;
     explicit TreeNodeData(VideoMetadata *metadata);
     TreeNodeData(QString path, QString host, QString prefix);
 
@@ -77,7 +80,7 @@ class TreeNodeData
     QString GetPrefix() const;
 
   private:
-    class TreeNodeDataPrivate *m_d;
+    class TreeNodeDataPrivate *m_d {nullptr};
 };
 
 Q_DECLARE_METATYPE(TreeNodeData)

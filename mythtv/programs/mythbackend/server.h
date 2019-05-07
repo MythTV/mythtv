@@ -13,7 +13,7 @@ class MythServer : public ServerPool
     void NewConnection(qt_socket_fd_t socketDescriptor);
 
   protected:
-    virtual void newTcpConnection(qt_socket_fd_t socket);
+    void newTcpConnection(qt_socket_fd_t socket) override; // ServerPool
 };
 
 

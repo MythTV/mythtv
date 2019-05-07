@@ -31,29 +31,9 @@
 
 Q_DECLARE_METATYPE(Event*);
 
-ZMEvents::ZMEvents(MythScreenStack *parent) :
-    MythScreenType(parent, "zmevents"),
-    m_oldestFirst(false),
-    m_showContinuous(false),
-    m_layout(-1),
-    m_eventList(new vector<Event*>),
-    m_savedPosition(0),
-    m_currentCamera(-1),
-    m_currentDate(-1),
-    m_eventNoText(nullptr),
-    m_eventGrid(nullptr),
-    m_playButton(nullptr),
-    m_deleteButton(nullptr),
-    m_cameraSelector(nullptr),
-    m_dateSelector(nullptr),
-    m_menuPopup(nullptr)
-{
-}
-
 ZMEvents::~ZMEvents()
 {
-    if (m_eventList)
-        delete m_eventList;
+    delete m_eventList;
 
     // remember how the user wants to display the event list
     gCoreContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
@@ -134,7 +114,7 @@ bool ZMEvents::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "ESCAPE")
         {
@@ -201,7 +181,7 @@ void ZMEvents::updateUIList()
 
     m_eventGrid->Reset();
 
-    for (uint i = 0; i < m_eventList->size(); i++)
+    for (size_t i = 0; i < m_eventList->size(); i++)
     {
         Event *event = m_eventList->at(i);
 
@@ -327,8 +307,7 @@ void ZMEvents::deletePressed(void)
             zm->deleteEvent(event->eventID());
 
         MythUIButtonListItem *item = m_eventGrid->GetItemCurrent();
-        if (item)
-            delete item;
+        delete item;
 
         vector<Event*>::iterator it;
         for (it = m_eventList->begin(); it != m_eventList->end(); ++it)
@@ -442,7 +421,7 @@ void ZMEvents::setGridLayout(int layout)
     }
 }
 
-void ZMEvents::showMenu()
+void ZMEvents::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

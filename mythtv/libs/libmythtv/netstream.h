@@ -42,7 +42,7 @@ public:
     static bool IsSupported(const QUrl &);
     bool IsOpen() const;
     void Abort();
-    int safe_read(void *data, unsigned size, unsigned millisecs = 0);
+    int safe_read(void *data, unsigned sz, unsigned millisecs = 0);
     qlonglong Seek(qlonglong);
     qlonglong GetReadPosition() const;
     qlonglong GetSize() const;
@@ -51,8 +51,8 @@ public:
     const QUrl &Url() const { return m_url; }
 
     // Synchronous interface
-    bool WaitTillReady(unsigned long millisecs);
-    bool WaitTillFinished(unsigned long millisecs);
+    bool WaitTillReady(unsigned long milliseconds);
+    bool WaitTillFinished(unsigned long milliseconds);
     QNetworkReply::NetworkError GetError() const;
     QString GetErrorString() const;
     qlonglong BytesAvailable() const;
@@ -134,7 +134,7 @@ signals:
 
     // Implementation
 protected:
-    virtual void run(); // QThread override
+    void run() override; // QThread
     bool NewRequest(QEvent *);
     bool StartRequest(NetStreamRequest *);
     bool AbortRequest(NetStreamAbort *);

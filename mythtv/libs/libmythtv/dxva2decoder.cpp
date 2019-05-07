@@ -122,13 +122,12 @@ static const dxva2_mode dxva2_modes[] =
   { \
       ok = arg1; \
       if (!ok) \
-          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
+          LOG(VB_GENERAL, LOG_ERR, LOC + (arg2)); \
   }
 
 DXVA2Decoder::DXVA2Decoder(uint num_bufs, MythCodecID codec_id,
                            uint width, uint height)
-  : m_deviceManager(nullptr), m_device(nullptr), m_service(nullptr),
-    m_codec_id(codec_id), m_width(width),  m_height(height)
+  : m_codec_id(codec_id), m_width(width),  m_height(height)
 {
     memset(&m_format, 0, sizeof(DXVA2_VideoDesc));
     memset(&m_context, 0, sizeof(dxva_context));

@@ -114,11 +114,6 @@ void MHMovement::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, ")\n");
 }
 
-MHTokenGroup::MHTokenGroup()
-{
-    m_nTokenPosition = 1; // Initial value
-}
-
 void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHPresentable::Initialise(p, engine);
@@ -327,16 +322,6 @@ void MHTokenGroup::Move(int n, MHEngine *engine)
 // ListGroup.  This is a complex class and the description was extensively revised in the MHEG corrigendum.
 // It doesn't seem to be used a great deal in practice and quite a few of the actions haven't been tested.
 
-MHListGroup::MHListGroup()
-{
-    m_fWrapAround = false;
-    m_fMultipleSelection = false;
-    m_nFirstItem = 1;
-    m_nLastFirstItem = m_nFirstItem;
-    m_nLastCount = 0;
-    m_fFirstItemDisplayed = false;
-    m_fLastItemDisplayed = false;
-}
 MHListGroup::~MHListGroup()
 {
     while (!m_ItemList.isEmpty())
@@ -415,7 +400,7 @@ void MHListGroup::Preparation(MHEngine *engine)
         // Find the item and add it to the list if it isn't already there.
         try
         {
-            MHRoot *pItem = (MHRoot *)engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
+            MHRoot *pItem = engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
             QList<MHListItem *>::iterator it = m_ItemList.begin();
 
@@ -591,7 +576,7 @@ void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 }
 
 // Remove an item from the list
-void MHListGroup::DelItem(MHRoot *pItem, MHEngine *)
+void MHListGroup::DelItem(MHRoot *pItem, MHEngine * /*engine*/)
 {
     // See if the item is already there and ignore this if it is.
     for (int i = 0; i < m_ItemList.size(); i++)
@@ -688,14 +673,11 @@ int MHListGroup::AdjustIndex(int nIndex) // Added in the MHEG corrigendum
     {
         return ((nIndex - 1) % nItems) + 1;
     }
-    else if (nIndex < 0)
+    if (nIndex < 0)
     {
         return nItems - ((-nIndex) % nItems);
     }
-    else
-    {
-        return nIndex;
-    }
+    return nIndex;
 }
 
 void MHListGroup::GetListItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine)
@@ -824,7 +806,7 @@ void MHAddItem::Initialise(MHParseNode *p, MHEngine *engine)
     m_Item.Initialise(p->GetArgN(2), engine);
 }
 
-void MHAddItem::PrintArgs(FILE *fd, int) const
+void MHAddItem::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     m_Index.PrintMe(fd, 0);
     m_Item.PrintMe(fd, 0);
@@ -844,7 +826,7 @@ void MHGetListActionData::Initialise(MHParseNode *p, MHEngine *engine)
     m_Result.Initialise(p->GetArgN(2), engine);
 }
 
-void MHGetListActionData::PrintArgs(FILE *fd, int) const
+void MHGetListActionData::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     m_Index.PrintMe(fd, 0);
     m_Result.PrintMe(fd, 0);

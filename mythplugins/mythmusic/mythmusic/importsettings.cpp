@@ -6,21 +6,6 @@
 
 #include "importsettings.h"
 
-ImportSettings::ImportSettings(MythScreenStack *parent, const char *name)
-        : MythScreenType(parent, name),
-        m_paranoiaLevel(nullptr),
-        m_filenameTemplate(nullptr),
-        m_noWhitespace(nullptr),
-        m_postCDRipScript(nullptr),
-        m_ejectCD(nullptr),
-        m_encoderType(nullptr),
-        m_defaultRipQuality(nullptr),
-        m_mp3UseVBR(nullptr),
-        m_saveButton(nullptr),
-        m_cancelButton(nullptr)
-{
-}
-
 bool ImportSettings::Create()
 {
     bool err = false;

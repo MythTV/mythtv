@@ -19,14 +19,7 @@
 
 IdleScreen::IdleScreen(MythScreenStack *parent)
               :MythScreenType(parent, "standbymode"),
-              m_updateScreenTimer(new QTimer(this)), m_statusState(nullptr),
-              m_currentRecordings(nullptr),
-              m_nextRecordings(nullptr),
-              m_conflictingRecordings(nullptr),
-              m_conflictWarning(nullptr),
-              m_secondsToShutdown(-1),
-              m_pendingSchedUpdate(false),
-              m_hasConflicts(false)
+              m_updateScreenTimer(new QTimer(this))
 {
     gCoreContext->addListener(this);
     GetMythMainWindow()->EnterStandby();
@@ -250,7 +243,7 @@ bool IdleScreen::keyPressEvent(QKeyEvent* event)
 
 void IdleScreen::customEvent(QEvent* event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
 

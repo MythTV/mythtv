@@ -45,12 +45,10 @@ class ScreenSaverDBusPrivate
     friend class    ScreenSaverDBus;
 
   public:
-    ScreenSaverDBusPrivate(QString dbusService, QString dbusPath, QString dbusInterface, QDBusConnection *bus) :
-        m_inhibited(false),
-        m_cookie(0),
+    ScreenSaverDBusPrivate(const QString &dbusService, const QString &dbusPath,
+                           const QString &dbusInterface, QDBusConnection *bus) :
         m_bus(bus),
         m_interface(new QDBusInterface(dbusService, dbusPath , dbusInterface, *m_bus)),
-        m_unInhibit(""),
         m_serviceUsed(dbusService)
     {
         if (!m_interface->isValid())
@@ -105,13 +103,13 @@ class ScreenSaverDBusPrivate
             }
         }
     }
-    void SetUnInhibit(QString method) { m_unInhibit = method; }
+    void SetUnInhibit(const QString &method) { m_unInhibit = method; }
 
   protected:
-    bool            m_inhibited;
-    uint32_t        m_cookie;
-    QDBusConnection *m_bus;
-    QDBusInterface  *m_interface;
+    bool            m_inhibited  {false};
+    uint32_t        m_cookie     {0};
+    QDBusConnection *m_bus       {nullptr};
+    QDBusInterface  *m_interface {nullptr};
   private:
     // Disable copying and assignment
     Q_DISABLE_COPY(ScreenSaverDBusPrivate)
@@ -121,7 +119,6 @@ class ScreenSaverDBusPrivate
 
 ScreenSaverDBus::ScreenSaverDBus() :
     m_bus(QDBusConnection::sessionBus()),
-    d(nullptr),
     m_dbusPrivateInterfaces(QList<ScreenSaverDBusPrivate *>())
 {
     // service, path, interface, bus - note that interface = service, hence it is used twice

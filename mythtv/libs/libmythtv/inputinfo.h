@@ -12,49 +12,49 @@
 class MTV_PUBLIC InputInfo
 {
   public:
-    InputInfo() : sourceid(0), inputid(0), mplexid(0),
-                  chanid(0), recPriority(0), scheduleOrder(0),
-                  livetvorder(0), quickTune(false) {}
-    InputInfo(const QString &name,
-              uint sourceid, uint inputid, uint mplexid,
-              uint chanid, uint livetvorder);
+    InputInfo() = default;
+    InputInfo(const QString &_name,
+              uint _sourceid, uint _inputid, uint _mplexid,
+              uint _chanid, uint _livetvorder) :
+        m_name(_name),
+        m_sourceid(_sourceid),
+        m_inputid(_inputid),
+        m_mplexid(_mplexid),
+        m_chanid(_chanid),
+        m_livetvorder(_livetvorder) {}
 
     InputInfo(const InputInfo &other) :
-        name(other.name),
-        sourceid(other.sourceid),
-        inputid(other.inputid),
-        mplexid(other.mplexid),
-        chanid(other.chanid),
-        displayName(other.displayName),
-        recPriority(other.recPriority),
-        scheduleOrder(other.scheduleOrder),
-        livetvorder(other.livetvorder),
-        quickTune(other.quickTune)
-    {
-        name.detach();
-    }
+        m_name(other.m_name),
+        m_sourceid(other.m_sourceid),
+        m_inputid(other.m_inputid),
+        m_mplexid(other.m_mplexid),
+        m_chanid(other.m_chanid),
+        m_displayName(other.m_displayName),
+        m_recPriority(other.m_recPriority),
+        m_scheduleOrder(other.m_scheduleOrder),
+        m_livetvorder(other.m_livetvorder),
+        m_quickTune(other.m_quickTune) {}
 
     InputInfo &operator=(const InputInfo &other)
     {
-        name     = other.name;
-        name.detach();
-        sourceid = other.sourceid;
-        inputid  = other.inputid;
-        mplexid  = other.mplexid;
-        chanid   = other.chanid;
-        displayName = other.displayName;
-        recPriority = other.recPriority;
-        scheduleOrder = other.scheduleOrder;
-        livetvorder = other.livetvorder;
-        quickTune = other.quickTune;
+        m_name          = other.m_name;
+        m_sourceid      = other.m_sourceid;
+        m_inputid       = other.m_inputid;
+        m_mplexid       = other.m_mplexid;
+        m_chanid        = other.m_chanid;
+        m_displayName   = other.m_displayName;
+        m_recPriority   = other.m_recPriority;
+        m_scheduleOrder = other.m_scheduleOrder;
+        m_livetvorder   = other.m_livetvorder;
+        m_quickTune     = other.m_quickTune;
         return *this;
     }
 
-    bool operator == (uint _inputid) const
-        { return inputid == _inputid; }
+    bool operator == (uint inputid) const
+        { return m_inputid == inputid; }
 
-    bool operator == (const QString &_name) const
-        { return name == _name; }
+    bool operator == (const QString &name) const
+        { return m_name == name; }
 
     virtual ~InputInfo() = default;
 
@@ -63,19 +63,19 @@ class MTV_PUBLIC InputInfo
     virtual void ToStringList(QStringList &list) const;
 
     virtual void Clear(void);
-    virtual bool IsEmpty(void) const { return name.isEmpty(); }
+    virtual bool IsEmpty(void) const { return m_name.isEmpty(); }
 
   public:
-    QString name;     ///< input name
-    uint    sourceid; ///< associated channel listings source
-    uint    inputid;  ///< unique key in DB for this input
-    uint    mplexid;  ///< mplexid restriction if applicable
-    uint    chanid;   ///< chanid restriction if applicable
-    QString displayName;
-    int     recPriority;
-    uint    scheduleOrder;
-    uint    livetvorder; ///< order for live TV use
-    bool    quickTune;
+    QString m_name;              ///< input name
+    uint    m_sourceid      {0}; ///< associated channel listings source
+    uint    m_inputid       {0}; ///< unique key in DB for this input
+    uint    m_mplexid       {0}; ///< mplexid restriction if applicable
+    uint    m_chanid        {0}; ///< chanid restriction if applicable
+    QString m_displayName;
+    int     m_recPriority   {0};
+    uint    m_scheduleOrder {0};
+    uint    m_livetvorder   {0}; ///< order for live TV use
+    bool    m_quickTune     {false};
 };
 
 #endif // _INPUTINFO_H_

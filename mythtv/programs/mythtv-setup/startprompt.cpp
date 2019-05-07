@@ -89,6 +89,7 @@ void StartPrompter::backendRunningPrompt(void)
         LOG(VB_GENERAL, LOG_ERR, "Can't create Prompt dialog?");
         delete dia;
         quit();
+        return;
     }
 
     // This is a hack so that the button clicks target the correct slot:

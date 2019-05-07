@@ -1,6 +1,9 @@
 #ifndef BOOKMARKMANAGER_H
 #define BOOKMARKMANAGER_H
 
+// libmythbase
+#include <mythmiscutil.h>
+
 // libmythui
 #include <mythscreentype.h>
 
@@ -10,22 +13,21 @@ class MythDialogBox;
 class Bookmark
 {
   public:
-    Bookmark(void)
-        : category(""), name(""), url(""), isHomepage(false), selected(false)
-    {
-        ;
-    }
+    Bookmark(void) = default;
 
-    QString category;
-    QString name;
-    QString url;
-    bool    isHomepage;
-    bool    selected;
+    QString m_category;
+    QString m_name;
+    QString m_sortName;
+    QString m_url;
+    bool    m_isHomepage {false};
+    bool    m_selected   {false};
 
     inline bool operator == (const Bookmark &b) const
     {
-        return category == b.category && name == b.name && url == b.url;
+        return m_category == b.m_category && m_name == b.m_name && m_url == b.m_url;
     }
+    static inline bool sortByName(Bookmark *a, Bookmark *b)
+        { return naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 };
 
 class BrowserConfig : public MythScreenType
@@ -34,22 +36,23 @@ class BrowserConfig : public MythScreenType
 
   public:
 
-    BrowserConfig(MythScreenStack *parent, const char *name = nullptr);
+    BrowserConfig(MythScreenStack *parent, const char *name = nullptr)
+        : MythScreenType(parent, name) {}
     ~BrowserConfig() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private:
-    MythUITextEdit   *m_commandEdit;
-    MythUITextEdit   *m_zoomEdit;
+    MythUITextEdit   *m_commandEdit        {nullptr};
+    MythUITextEdit   *m_zoomEdit           {nullptr};
 
-    MythUIText       *m_descriptionText;
-    MythUIText       *m_titleText;
-    MythUICheckBox   *m_enablePluginsCheck;
+    MythUIText       *m_descriptionText    {nullptr};
+    MythUIText       *m_titleText          {nullptr};
+    MythUICheckBox   *m_enablePluginsCheck {nullptr};
 
-    MythUIButton     *m_okButton;
-    MythUIButton     *m_cancelButton;
+    MythUIButton     *m_okButton           {nullptr};
+    MythUIButton     *m_cancelButton       {nullptr};
 
   private slots:
     void slotSave(void);
@@ -61,11 +64,12 @@ class BookmarkManager : public MythScreenType
   Q_OBJECT
 
   public:
-    BookmarkManager(MythScreenStack *parent, const char *name);
+    BookmarkManager(MythScreenStack *parent, const char *name)
+        : MythScreenType(parent, name) {}
     ~BookmarkManager();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void slotGroupSelected(MythUIButtonListItem *item);
@@ -96,11 +100,11 @@ class BookmarkManager : public MythScreenType
 
     Bookmark          m_savedBookmark;
 
-    MythUIButtonList *m_bookmarkList;
-    MythUIButtonList   *m_groupList;
-    MythUIText       *m_messageText;
+    MythUIButtonList *m_bookmarkList {nullptr};
+    MythUIButtonList *m_groupList    {nullptr};
+    MythUIText       *m_messageText  {nullptr};
 
-    MythDialogBox    *m_menuPopup;
+    MythDialogBox    *m_menuPopup    {nullptr};
 };
 
 Q_DECLARE_METATYPE(Bookmark *)

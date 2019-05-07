@@ -31,19 +31,19 @@ class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
     virtual bool blockSignals(bool block)
         { return QObject::blockSignals(block); }
     bool isActive(void) const
-        { return dorun; }
+        { return m_dorun; }
 
   signals:
     void timeout(void);
 
   private:
-    virtual void run(void);
+    void run(void) override; // MThread
 
-    QMutex            startStopLock;
-    QWaitCondition    timerWait;
-    volatile bool     dorun;
-    volatile bool     running;
-    volatile uint64_t millisec;
+    QMutex            m_startStopLock;
+    QWaitCondition    m_timerWait;
+    volatile bool     m_dorun    {false};
+    volatile bool     m_running  {false};
+    volatile uint64_t m_millisec {0};
 };
 
 #endif // _MYTH_SIGNALING_TIMER_H_

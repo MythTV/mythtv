@@ -6,7 +6,8 @@
 class AppleRemoteListener: public AppleRemote::Listener
 {
 public:
-    explicit AppleRemoteListener(QObject* mainWindow_);
+    explicit AppleRemoteListener(QObject* mainWindow_)
+        : mainWindow(mainWindow_) {}
 
     // virtual
     void appleRemoteButton(AppleRemote::Event button, bool pressedDown);

@@ -45,9 +45,7 @@ bool VideoOutputNullVAAPI::CreateVAAPIContext(QSize size)
         DeleteVAAPIContext();
 
     m_ctx = new VAAPIContext(kVADisplayX11, video_codec_id);
-    if (m_ctx && m_ctx->CreateDisplay(size, true))
-        return true;
-    return false;
+    return m_ctx && m_ctx->CreateDisplay(size, true);
 }
 
 void VideoOutputNullVAAPI::DeleteVAAPIContext(void)
@@ -84,14 +82,9 @@ bool VideoOutputNullVAAPI::InitBuffers(void)
     if (!m_shadowBuffers)
         return false;
     m_shadowBuffers->Init(24, true, 2, 1, 4, 1);
-    if (!m_shadowBuffers->CreateBuffers(FMT_YV12,
-                                        video_dim.width(),
-                                        video_dim.height()))
-    {
-        return false;
-    }
-
-    return true;
+    return m_shadowBuffers->CreateBuffers(FMT_YV12,
+                                          video_dim.width(),
+                                          video_dim.height());
 }
 
 void VideoOutputNullVAAPI::DeleteBuffers(void)

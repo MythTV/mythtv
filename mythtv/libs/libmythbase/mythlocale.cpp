@@ -13,8 +13,7 @@
 #include "iso3166.h"
 #include "iso639.h"
 
-MythLocale::MythLocale(QString localeName) :
-    m_defaultsLoaded(false)
+MythLocale::MythLocale(const QString &localeName)
 {
     Init(localeName);
 }
@@ -202,7 +201,6 @@ void MythLocale::ResetToStandardDefaults(void)
     // TODO Not implemented yet, delete everything in m_globalSettings
     //      from the database then let the standard defaults populate them
     //      again. Used if the user wants to revert the changes
-    return;
 }
 
 QString MythLocale::GetLocaleSetting(const QString &key)

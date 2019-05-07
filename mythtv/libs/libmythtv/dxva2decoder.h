@@ -31,9 +31,9 @@ class DXVA2Decoder
     void DestroyDecoder(void);
     void* GetSurface(uint num);
 
-    IDirect3DDeviceManager9     *m_deviceManager;
-    HANDLE                       m_device;
-    IDirectXVideoDecoderService *m_service;
+    IDirect3DDeviceManager9     *m_deviceManager {nullptr};
+    HANDLE                       m_device        {nullptr};
+    IDirectXVideoDecoderService *m_service       {nullptr};
     struct dxva_context          m_context;
     DXVA2_ConfigPictureDecode    m_config;
     MythCodecID                  m_codec_id;

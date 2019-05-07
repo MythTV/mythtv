@@ -51,15 +51,6 @@
 
 #define LOC QString("JoystickMenuThread: ")
 
-JoystickMenuThread::JoystickMenuThread(QObject *main_window)
-    : MThread("JoystickMenu"),
-      m_mainWindow(main_window), m_devicename(""),
-      m_fd(-1),                  m_buttonCount(0),
-      m_axesCount(0),            m_buttons(nullptr),
-      m_axes(nullptr),           m_bStop(false)
-{
-}
-
 JoystickMenuThread::~JoystickMenuThread()
 {
     if (m_fd != -1)
@@ -144,7 +135,7 @@ bool JoystickMenuThread::Init(QString &config_file)
  *                                  move that axis into the range and the
  *                                  keystring is sent
  */
-bool JoystickMenuThread::ReadConfig(QString config_file)
+bool JoystickMenuThread::ReadConfig(const QString& config_file)
 {
     FILE *fp;
 
@@ -297,7 +288,7 @@ void JoystickMenuThread::run(void)
 /**
  *  \brief Send a keyevent to the main UI loop with the appropriate keycode
  */
-void JoystickMenuThread::EmitKey(QString code)
+void JoystickMenuThread::EmitKey(const QString& code)
 {
     QKeySequence a(code);
 

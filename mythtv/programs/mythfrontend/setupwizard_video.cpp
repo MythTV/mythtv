@@ -28,15 +28,10 @@ const QString VIDEO_SAMPLE_SD_FILENAME =
 VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
                                    MythScreenType *general,
                                    MythScreenType *audio, const char *name)
-    : MythScreenType(parent, name),         m_downloadFile(QString()),
-      m_testType(ttNone),
-      m_generalScreen(general),             m_audioScreen(audio),
-      m_playbackProfileButtonList(nullptr), m_progressDialog(nullptr),
-      m_testSDButton(nullptr),              m_testHDButton(nullptr),
-      m_nextButton(nullptr),                m_prevButton(nullptr)
+    : MythScreenType(parent, name),
+      m_generalScreen(general),             m_audioScreen(audio)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_vdp = new VideoDisplayProfile();
 
     gCoreContext->addListener(this);
 }
@@ -90,15 +85,12 @@ bool VideoSetupWizard::Create()
 
 VideoSetupWizard::~VideoSetupWizard()
 {
-    if (m_vdp)
-        delete m_vdp;
-
     gCoreContext->removeListener(this);
 }
 
 void VideoSetupWizard::loadData(void)
 {
-    QStringList profiles = m_vdp->GetProfiles(gCoreContext->GetHostName());
+    QStringList profiles = VideoDisplayProfile::GetProfiles(gCoreContext->GetHostName());
 
     for (QStringList::const_iterator i = profiles.begin();
          i != profiles.end(); ++i)
@@ -108,7 +100,7 @@ void VideoSetupWizard::loadData(void)
         item->SetData(*i);
     }
 
-    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
+    QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());
     if (!currentpbp.isEmpty())
     {
         MythUIButtonListItem *set =
@@ -140,7 +132,7 @@ void VideoSetupWizard::save(void)
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    m_vdp->SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
+    VideoDisplayProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
 }
 
 void VideoSetupWizard::slotPrevious(void)
@@ -203,18 +195,18 @@ void VideoSetupWizard::testHDVideo(void)
         playVideoTest(desc, title, hdtestfile);
 }
 
-void VideoSetupWizard::playVideoTest(QString desc, QString title, QString file)
+void VideoSetupWizard::playVideoTest(const QString& desc, const QString& title, const QString& file)
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
+    QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());
 
-    m_vdp->SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
+    VideoDisplayProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
     GetMythMainWindow()->HandleMedia("Internal", file, desc, title);
-    m_vdp->SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
+    VideoDisplayProfile::SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
 }
 
-void VideoSetupWizard::DownloadSample(QString url, QString dest)
+void VideoSetupWizard::DownloadSample(const QString& url, const QString& dest)
 {
     initProgressDialog();
     m_downloadFile = RemoteDownloadFile(url, "Temp", dest);
@@ -239,7 +231,7 @@ void VideoSetupWizard::initProgressDialog()
 
 void VideoSetupWizard::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

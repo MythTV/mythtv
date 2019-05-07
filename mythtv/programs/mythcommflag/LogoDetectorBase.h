@@ -12,7 +12,7 @@ class LogoDetectorBase : public QObject
 
   public:
     LogoDetectorBase(unsigned int w,unsigned int h) :
-        foundLogo(false), width(w),height(h) {};
+        m_width(w),m_height(h) {};
 
     virtual bool searchForLogo(MythPlayer* player) = 0;
     virtual bool doesThisFrameContainTheFoundLogo(VideoFrame* frame) = 0;
@@ -27,8 +27,8 @@ class LogoDetectorBase : public QObject
     virtual ~LogoDetectorBase() = default;
 
   protected:
-    bool foundLogo;
-    unsigned int width, height;
+    bool m_foundLogo {false};
+    unsigned int m_width, m_height;
 };
 
 #endif

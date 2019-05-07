@@ -29,15 +29,15 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
-XMLTVParser::XMLTVParser() : current_year(0)
+XMLTVParser::XMLTVParser()
 {
-    current_year = MythDate::current().date().toString("yyyy").toUInt();
+    m_current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
 
 void XMLTVParser::lateInit()
 {
-    _movieGrabberPath = MetadataDownload::GetMovieGrabber();
-    _tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
+    m_movieGrabberPath = MetadataDownload::GetMovieGrabber();
+    m_tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
 }
 
 static uint ELFHash(const QByteArray &ba)
@@ -60,7 +60,7 @@ static uint ELFHash(const QByteArray &ba)
     return h;
 }
 
-static QString getFirstText(QDomElement element)
+static QString getFirstText(const QDomElement& element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
          dname = dname.nextSibling())
@@ -78,8 +78,8 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 
     QString xmltvid = element.attribute("id", "");
 
-    chaninfo->xmltvid = xmltvid;
-    chaninfo->tvformat = "Default";
+    chaninfo->m_xmltvid = xmltvid;
+    chaninfo->m_tvformat = "Default";
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -89,42 +89,42 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                if (chaninfo->icon.isEmpty())
+                if (chaninfo->m_icon.isEmpty())
                 {
                     QString path = info.attribute("src", "");
                     if (!path.isEmpty() && !path.contains("://"))
                     {
                         QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                        chaninfo->icon = base +
+                        chaninfo->m_icon = base +
                             ((path.startsWith("/")) ? path : QString("/") + path);
                     }
                     else if (!path.isEmpty())
                     {
                         QUrl url(path);
                         if (url.isValid())
-                            chaninfo->icon = url.toString();
+                            chaninfo->m_icon = url.toString();
                     }
                 }
             }
             else if (info.tagName() == "display-name")
             {
-                if (chaninfo->name.isEmpty())
+                if (chaninfo->m_name.isEmpty())
                 {
-                    chaninfo->name = info.text();
+                    chaninfo->m_name = info.text();
                 }
-                else if (chaninfo->callsign.isEmpty())
+                else if (chaninfo->m_callsign.isEmpty())
                 {
-                    chaninfo->callsign = info.text();
+                    chaninfo->m_callsign = info.text();
                 }
-                else if (chaninfo->channum.isEmpty())
+                else if (chaninfo->m_channum.isEmpty())
                 {
-                    chaninfo->channum = info.text();
+                    chaninfo->m_channum = info.text();
                 }
             }
         }
     }
 
-    chaninfo->freqid = chaninfo->channum;
+    chaninfo->m_freqid = chaninfo->m_channum;
     return chaninfo;
 }
 
@@ -270,12 +270,12 @@ static void parseVideo(QDomElement &element, ProgInfo *pginfo)
             if (info.tagName() == "quality")
             {
                 if (getFirstText(info) == "HDTV")
-                    pginfo->videoProps |= VID_HDTV;
+                    pginfo->m_videoProps |= VID_HDTV;
             }
             else if (info.tagName() == "aspect")
             {
                 if (getFirstText(info) == "16:9")
-                    pginfo->videoProps |= VID_WIDESCREEN;
+                    pginfo->m_videoProps |= VID_WIDESCREEN;
             }
         }
     }
@@ -293,20 +293,20 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
             {
                 if (getFirstText(info) == "mono")
                 {
-                    pginfo->audioProps |= AUD_MONO;
+                    pginfo->m_audioProps |= AUD_MONO;
                 }
                 else if (getFirstText(info) == "stereo")
                 {
-                    pginfo->audioProps |= AUD_STEREO;
+                    pginfo->m_audioProps |= AUD_STEREO;
                 }
                 else if (getFirstText(info) == "dolby" ||
                         getFirstText(info) == "dolby digital")
                 {
-                    pginfo->audioProps |= AUD_DOLBY;
+                    pginfo->m_audioProps |= AUD_DOLBY;
                 }
                 else if (getFirstText(info) == "surround")
                 {
-                    pginfo->audioProps |= AUD_SURROUND;
+                    pginfo->m_audioProps |= AUD_SURROUND;
                 }
             }
         }
@@ -319,24 +319,24 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
     ProgInfo *pginfo = new ProgInfo();
 
     QString text = element.attribute("start", "");
-    fromXMLTVDate(text, pginfo->starttime);
-    pginfo->startts = text;
+    fromXMLTVDate(text, pginfo->m_starttime);
+    pginfo->m_startts = text;
 
     text = element.attribute("stop", "");
-    fromXMLTVDate(text, pginfo->endtime);
-    pginfo->endts = text;
+    fromXMLTVDate(text, pginfo->m_endtime);
+    pginfo->m_endts = text;
 
     text = element.attribute("channel", "");
     QStringList split = text.split(" ");
 
-    pginfo->channel = split[0];
+    pginfo->m_channel = split[0];
 
     text = element.attribute("clumpidx", "");
     if (!text.isEmpty())
     {
         split = text.split('/');
-        pginfo->clumpidx = split[0];
-        pginfo->clumpmax = split[1];
+        pginfo->m_clumpidx = split[0];
+        pginfo->m_clumpmax = split[1];
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -349,56 +349,56 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             {
                 if (info.attribute("lang") == "ja_JP")
                 {
-                    pginfo->title = getFirstText(info);
+                    pginfo->m_title = getFirstText(info);
                 }
                 else if (info.attribute("lang") == "ja_JP@kana")
                 {
-                    pginfo->title_pronounce = getFirstText(info);
+                    pginfo->m_title_pronounce = getFirstText(info);
                 }
-                else if (pginfo->title.isEmpty())
+                else if (pginfo->m_title.isEmpty())
                 {
-                    pginfo->title = getFirstText(info);
+                    pginfo->m_title = getFirstText(info);
                 }
             }
             else if (info.tagName() == "sub-title" &&
-                     pginfo->subtitle.isEmpty())
+                     pginfo->m_subtitle.isEmpty())
             {
-                pginfo->subtitle = getFirstText(info);
+                pginfo->m_subtitle = getFirstText(info);
             }
-            else if (info.tagName() == "desc" && pginfo->description.isEmpty())
+            else if (info.tagName() == "desc" && pginfo->m_description.isEmpty())
             {
-                pginfo->description = getFirstText(info);
+                pginfo->m_description = getFirstText(info);
             }
             else if (info.tagName() == "category")
             {
                 const QString cat = getFirstText(info);
 
-                if (ProgramInfo::kCategoryNone == pginfo->categoryType &&
+                if (ProgramInfo::kCategoryNone == pginfo->m_categoryType &&
                     string_to_myth_category_type(cat) != ProgramInfo::kCategoryNone)
                 {
-                    pginfo->categoryType = string_to_myth_category_type(cat);
+                    pginfo->m_categoryType = string_to_myth_category_type(cat);
                 }
-                else if (pginfo->category.isEmpty())
+                else if (pginfo->m_category.isEmpty())
                 {
-                    pginfo->category = cat;
+                    pginfo->m_category = cat;
                 }
 
                 if ((cat.compare(QObject::tr("movie"),Qt::CaseInsensitive) == 0) ||
                     (cat.compare(QObject::tr("film"),Qt::CaseInsensitive) == 0))
                 {
                     // Hack for tv_grab_uk_rt
-                    pginfo->categoryType = ProgramInfo::kCategoryMovie;
+                    pginfo->m_categoryType = ProgramInfo::kCategoryMovie;
                 }
 
-                pginfo->genres.append(cat);
+                pginfo->m_genres.append(cat);
             }
-            else if (info.tagName() == "date" && !pginfo->airdate)
+            else if (info.tagName() == "date" && (pginfo->m_airdate == 0U))
             {
                 // Movie production year
                 QString date = getFirstText(info);
-                pginfo->airdate = date.left(4).toUInt();
+                pginfo->m_airdate = date.left(4).toUInt();
             }
-            else if (info.tagName() == "star-rating" && pginfo->stars == 0.0)
+            else if (info.tagName() == "star-rating" && pginfo->m_stars == 0.0F)
             {
                 QDomNodeList values = info.elementsByTagName("value");
                 QDomElement item;
@@ -428,11 +428,11 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     stars = getFirstText(item);
                     float num = stars.section('/', 0, 0).toFloat() + 1;
                     float den = stars.section('/', 1, 1).toFloat() + 1;
-                    if (0.0 < den)
+                    if (0.0F < den)
                         rating = num/den;
                 }
 
-                pginfo->stars = rating;
+                pginfo->m_stars = rating;
             }
             else if (info.tagName() == "rating")
             {
@@ -443,20 +443,20 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 if (item.isNull())
                     continue;
                 EventRating rating;
-                rating.system = info.attribute("system", "");
-                rating.rating = getFirstText(item);
-                pginfo->ratings.append(rating);
+                rating.m_system = info.attribute("system", "");
+                rating.m_rating = getFirstText(item);
+                pginfo->m_ratings.append(rating);
             }
             else if (info.tagName() == "previously-shown")
             {
-                pginfo->previouslyshown = true;
+                pginfo->m_previouslyshown = true;
 
                 QString prevdate = info.attribute("start");
                 if (!prevdate.isEmpty())
                 {
                     QDateTime date;
                     fromXMLTVDate(prevdate, date);
-                    pginfo->originalairdate = date.date();
+                    pginfo->m_originalairdate = date.date();
                 }
             }
             else if (info.tagName() == "credits")
@@ -466,11 +466,11 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             else if (info.tagName() == "subtitles")
             {
                 if (info.attribute("type") == "teletext")
-                    pginfo->subtitleType |= SUB_NORMAL;
+                    pginfo->m_subtitleType |= SUB_NORMAL;
                 else if (info.attribute("type") == "onscreen")
-                    pginfo->subtitleType |= SUB_ONSCREEN;
+                    pginfo->m_subtitleType |= SUB_ONSCREEN;
                 else if (info.attribute("type") == "deaf-signed")
-                    pginfo->subtitleType |= SUB_SIGNED;
+                    pginfo->m_subtitleType |= SUB_SIGNED;
             }
             else if (info.tagName() == "audio")
             {
@@ -493,7 +493,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     /* Only EPisodes and SHows are part of a series for SD */
                     if (programid.startsWith(QString("EP")) ||
                         programid.startsWith(QString("SH")))
-                        pginfo->seriesId = QString("EP") + programid.mid(2,8);
+                        pginfo->m_seriesId = QString("EP") + programid.mid(2,8);
                 }
                 else if (info.attribute("system") == "xmltv_ns")
                 {
@@ -508,27 +508,27 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     QString partnumber(part.section('/',0,0).trimmed());
                     QString parttotal(part.section('/',1,1).trimmed());
 
-                    pginfo->categoryType = ProgramInfo::kCategorySeries;
+                    pginfo->m_categoryType = ProgramInfo::kCategorySeries;
 
                     if (!season.isEmpty())
                     {
                         tmp = season.toUInt() + 1;
-                        pginfo->season = tmp;
+                        pginfo->m_season = tmp;
                         season = QString::number(tmp);
-                        pginfo->syndicatedepisodenumber = QString('S' + season);
+                        pginfo->m_syndicatedepisodenumber = 'S' + season;
                     }
 
                     if (!episode.isEmpty())
                     {
                         tmp = episode.toUInt() + 1;
-                        pginfo->episode = tmp;
+                        pginfo->m_episode = tmp;
                         episode = QString::number(tmp);
-                        pginfo->syndicatedepisodenumber.append(QString('E' + episode));
+                        pginfo->m_syndicatedepisodenumber.append('E' + episode);
                     }
 
                     if (!totalepisodes.isEmpty())
                     {
-                        pginfo->totalepisodes = totalepisodes.toUInt();
+                        pginfo->m_totalepisodes = totalepisodes.toUInt();
                     }
 
                     uint partno = 0;
@@ -545,37 +545,37 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                         uint partto = parttotal.toUInt(&ok);
                         if (ok && partnumber <= parttotal)
                         {
-                            pginfo->parttotal  = partto;
-                            pginfo->partnumber = partno;
+                            pginfo->m_parttotal  = partto;
+                            pginfo->m_partnumber = partno;
                         }
                     }
                 }
                 else if (info.attribute("system") == "onscreen")
                 {
-                    pginfo->categoryType = ProgramInfo::kCategorySeries;
-                    if (pginfo->subtitle.isEmpty())
+                    pginfo->m_categoryType = ProgramInfo::kCategorySeries;
+                    if (pginfo->m_subtitle.isEmpty())
                     {
-                        pginfo->subtitle = getFirstText(info);
+                        pginfo->m_subtitle = getFirstText(info);
                     }
                 }
                 else if ((info.attribute("system") == "themoviedb.org") &&
-                    (_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
+                    (m_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
                 {
                     /* text is movie/<inetref> */
                     QString inetrefRaw(getFirstText(info));
                     if (inetrefRaw.startsWith(QString("movie/"))) {
                         QString inetref(QString ("tmdb3.py_") + inetrefRaw.section('/',1,1).trimmed());
-                        pginfo->inetref = inetref;
+                        pginfo->m_inetref = inetref;
                     }
                 }
                 else if ((info.attribute("system") == "thetvdb.com") &&
-                    (_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
+                    (m_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
                 {
                     /* text is series/<inetref> */
                     QString inetrefRaw(getFirstText(info));
                     if (inetrefRaw.startsWith(QString("series/"))) {
                         QString inetref(QString ("ttvdb.py_") + inetrefRaw.section('/',1,1).trimmed());
-                        pginfo->inetref = inetref;
+                        pginfo->m_inetref = inetref;
                         /* ProgInfo does not have a collectionref, so we don't set any */
                     }
                 }
@@ -583,30 +583,30 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         }
     }
 
-    if (pginfo->category.isEmpty() &&
-        pginfo->categoryType != ProgramInfo::kCategoryNone)
-        pginfo->category = myth_category_type_to_string(pginfo->categoryType);
+    if (pginfo->m_category.isEmpty() &&
+        pginfo->m_categoryType != ProgramInfo::kCategoryNone)
+        pginfo->m_category = myth_category_type_to_string(pginfo->m_categoryType);
 
-    if (!pginfo->airdate
-        && ProgramInfo::kCategorySeries != pginfo->categoryType)
-        pginfo->airdate = current_year;
+    if (!pginfo->m_airdate
+        && ProgramInfo::kCategorySeries != pginfo->m_categoryType)
+        pginfo->m_airdate = m_current_year;
 
     if (programid.isEmpty())
     {
 
         /* Let's build ourself a programid */
 
-        if (ProgramInfo::kCategoryMovie == pginfo->categoryType)
+        if (ProgramInfo::kCategoryMovie == pginfo->m_categoryType)
             programid = "MV";
-        else if (ProgramInfo::kCategorySeries == pginfo->categoryType)
+        else if (ProgramInfo::kCategorySeries == pginfo->m_categoryType)
             programid = "EP";
-        else if (ProgramInfo::kCategorySports == pginfo->categoryType)
+        else if (ProgramInfo::kCategorySports == pginfo->m_categoryType)
             programid = "SP";
         else
             programid = "SH";
 
-        QString seriesid = QString::number(ELFHash(pginfo->title.toUtf8()));
-        pginfo->seriesId = seriesid;
+        QString seriesid = QString::number(ELFHash(pginfo->m_title.toUtf8()));
+        pginfo->m_seriesId = seriesid;
         programid.append(seriesid);
 
         if (!episode.isEmpty() && !season.isEmpty())
@@ -620,17 +620,17 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             {
                 // Cannot represent season as a single base-36 character, so
                 // remove the programid and fall back to normal dup matching.
-                if (ProgramInfo::kCategoryMovie != pginfo->categoryType)
+                if (ProgramInfo::kCategoryMovie != pginfo->m_categoryType)
                     programid.clear();
             }
             else
             {
                 programid.append(episode);
                 programid.append(QString::number(season_int, 36));
-                if (pginfo->partnumber && pginfo->parttotal)
+                if (pginfo->m_partnumber && pginfo->m_parttotal)
                 {
-                    programid += QString::number(pginfo->partnumber);
-                    programid += QString::number(pginfo->parttotal);
+                    programid += QString::number(pginfo->m_partnumber);
+                    programid += QString::number(pginfo->m_parttotal);
                 }
             }
         }
@@ -638,18 +638,18 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         {
             /* No ep/season info? Well then remove the programid and rely on
                normal dupchecking methods instead. */
-            if (ProgramInfo::kCategoryMovie != pginfo->categoryType)
+            if (ProgramInfo::kCategoryMovie != pginfo->m_categoryType)
                 programid.clear();
         }
     }
 
-    pginfo->programId = programid;
+    pginfo->m_programId = programid;
 
     return pginfo;
 }
 
 bool XMLTVParser::parseFile(
-    QString filename, ChannelInfoList *chanlist,
+    const QString& filename, ChannelInfoList *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
@@ -694,7 +694,7 @@ bool XMLTVParser::parseFile(
             if (e.tagName() == "channel")
             {
                 ChannelInfo *chinfo = parseChannel(e, baseUrl);
-                if (!chinfo->xmltvid.isEmpty())
+                if (!chinfo->m_xmltvid.isEmpty())
                     chanlist->push_back(*chinfo);
                 delete chinfo;
             }
@@ -702,59 +702,59 @@ bool XMLTVParser::parseFile(
             {
                 ProgInfo *pginfo = parseProgram(e);
 
-                if (!(pginfo->starttime.isValid()))
+                if (!(pginfo->m_starttime.isValid()))
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
                                                         "invalid start time, "
                                                         "skipping")
-                                                        .arg(pginfo->title));
+                                                        .arg(pginfo->m_title));
                 }
-                else if (pginfo->channel.isEmpty())
+                else if (pginfo->m_channel.isEmpty())
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
                                                         "missing channel, "
                                                         "skipping")
-                                                        .arg(pginfo->title));
+                                                        .arg(pginfo->m_title));
                 }
-                else if (pginfo->startts == pginfo->endts)
+                else if (pginfo->m_startts == pginfo->m_endts)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
                                                         "identical start and end "
                                                         "times, skipping")
-                                                        .arg(pginfo->title));
+                                                        .arg(pginfo->m_title));
                 }
                 else
                 {
-                    if (pginfo->clumpidx.isEmpty())
-                        (*proglist)[pginfo->channel].push_back(*pginfo);
+                    if (pginfo->m_clumpidx.isEmpty())
+                        (*proglist)[pginfo->m_channel].push_back(*pginfo);
                     else
                     {
                         /* append all titles/descriptions from one clump */
-                        if (pginfo->clumpidx.toInt() == 0)
+                        if (pginfo->m_clumpidx.toInt() == 0)
                         {
                             aggregatedTitle.clear();
                             aggregatedDesc.clear();
                         }
 
-                        if (!pginfo->title.isEmpty())
+                        if (!pginfo->m_title.isEmpty())
                         {
                             if (!aggregatedTitle.isEmpty())
                                 aggregatedTitle.append(" | ");
-                            aggregatedTitle.append(pginfo->title);
+                            aggregatedTitle.append(pginfo->m_title);
                         }
 
-                        if (!pginfo->description.isEmpty())
+                        if (!pginfo->m_description.isEmpty())
                         {
                             if (!aggregatedDesc.isEmpty())
                                 aggregatedDesc.append(" | ");
-                            aggregatedDesc.append(pginfo->description);
+                            aggregatedDesc.append(pginfo->m_description);
                         }
-                        if (pginfo->clumpidx.toInt() ==
-                            pginfo->clumpmax.toInt() - 1)
+                        if (pginfo->m_clumpidx.toInt() ==
+                            pginfo->m_clumpmax.toInt() - 1)
                         {
-                            pginfo->title = aggregatedTitle;
-                            pginfo->description = aggregatedDesc;
-                            (*proglist)[pginfo->channel].push_back(*pginfo);
+                            pginfo->m_title = aggregatedTitle;
+                            pginfo->m_description = aggregatedDesc;
+                            (*proglist)[pginfo->m_channel].push_back(*pginfo);
                         }
                     }
                 }

@@ -35,46 +35,51 @@ class VideoOutputNullVDPAU : public VideoOutput
     VideoOutputNullVDPAU();
    ~VideoOutputNullVDPAU();
 
-    virtual bool Init(const QSize &video_dim_buf,
+    bool Init(const QSize &video_dim_buf,
+              const QSize &video_dim_disp,
+              float aspect, WId winid,
+              const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
+    void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
+    bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
-                      float aspect, WId winid,
-                      const QRect &win_rect, MythCodecID codec_id);
-    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
-    virtual bool InputChanged(const QSize &video_dim_buf,
-                              const QSize &video_dim_disp,
-                              float        aspect,
-                              MythCodecID  av_codec_id,
-                              void        *codec_private,
-                              bool        &aspect_only);
-    virtual bool SetupDeinterlace(bool, const QString & = "")     { return false; }
-    virtual bool SetDeinterlacingEnabled(bool)                    { return false; }
-    virtual bool ApproveDeintFilter(const QString&) const { return false; }
-    virtual void ClearAfterSeek(void);
-    virtual void ReleaseFrame(VideoFrame *frame);
-    virtual void ProcessFrame(VideoFrame *, OSD *,
-                              FilterChain *,
-                              const PIPMap &,
-                              FrameScanType)         {;}
-    virtual void PrepareFrame(VideoFrame *,
-                              FrameScanType, OSD *)    {;}
-    virtual void Show(FrameScanType )                     {;}
-
-    virtual void Zoom(ZoomDirection)                      {;}
-    virtual void EmbedInWidget(const QRect &)             {;}
-    virtual void StopEmbedding(void)                      {;}
-    virtual void DrawUnusedRects(bool = true)             {;}
-    virtual void UpdatePauseFrame(int64_t &)              {;}
-    virtual void MoveResizeWindow(QRect )                 {;}
-    virtual bool CanVisualise(AudioPlayer *, MythRender *)
+                      float        aspect,
+                      MythCodecID  av_codec_id,
+                      void        *codec_private,
+                      bool        &aspect_only) override; // VideoOutput
+    bool SetupDeinterlace(bool, const QString & = "") override // VideoOutput
         { return false; }
-    virtual bool SetupVisualisation(AudioPlayer *, MythRender *,
-                                    const QString &) { return false; }
-    virtual MythPainter *GetOSDPainter(void) { return nullptr; }
-    virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+    bool SetDeinterlacingEnabled(bool) override // VideoOutput
+        { return false; }
+    bool ApproveDeintFilter(const QString&) const override // VideoOutput
+        { return false; }
+    void ClearAfterSeek(void) override; // VideoOutput
+    void ReleaseFrame(VideoFrame *frame) override; // VideoOutput
+    void ProcessFrame(VideoFrame *, OSD *,
+                      FilterChain *,
+                      const PIPMap &,
+                      FrameScanType) override {;} // VideoOutput
+    void PrepareFrame(VideoFrame *,
+                      FrameScanType, OSD *) override      {;} // VideoOutput
+    void Show(FrameScanType ) override                    {;} // VideoOutput
 
-    virtual VideoFrame *GetLastDecodedFrame(void);
-    virtual VideoFrame *GetLastShownFrame(void);
-    virtual void DoneDisplayingFrame(VideoFrame *frame);
+    void Zoom(ZoomDirection) override                     {;} // VideoOutput
+    void EmbedInWidget(const QRect &) override            {;} // VideoOutput
+    void StopEmbedding(void) override                     {;} // VideoOutput
+    void DrawUnusedRects(bool = true) override            {;} // VideoOutput
+    void UpdatePauseFrame(int64_t &) override             {;} // VideoOutput
+    void MoveResizeWindow(QRect ) override                {;} // VideoOutput
+    bool CanVisualise(AudioPlayer *, MythRender *) override // VideoOutput
+        { return false; }
+    bool SetupVisualisation(AudioPlayer *, MythRender *,
+                            const QString &) override // VideoOutput
+        { return false; }
+    MythPainter *GetOSDPainter(void) override // VideoOutput
+        { return nullptr; }
+    void DrawSlice(VideoFrame *frame, int x, int y, int w, int h) override; // VideoOutput
+
+    VideoFrame *GetLastDecodedFrame(void) override; // VideoOutput
+    VideoFrame *GetLastShownFrame(void) override; // VideoOutput
+    void DoneDisplayingFrame(VideoFrame *frame) override; // VideoOutput
 
   private:
     void TearDown(void);
@@ -87,9 +92,9 @@ class VideoOutputNullVDPAU : public VideoOutput
     bool CreateVideoSurfaces(uint num);
     void DeleteVideoSurfaces(void);
     void ClaimVideoSurfaces(void);
-    void DiscardFrame(VideoFrame*);
-    void DiscardFrames(bool next_frame_keyframe);
-    void CheckFrameStates(void);
+    void DiscardFrame(VideoFrame*) override; // VideoOutput
+    void DiscardFrames(bool next_frame_keyframe) override; // VideoOutput
+    void CheckFrameStates(void) override; // VideoOutput
     bool BufferSizeCheck(void);
 
   private:

@@ -30,7 +30,7 @@ namespace M3U
         if (p < 0)
             return QString();
 
-        QStringList list = QStringList(line.mid(p + 1).split(','));
+        QStringList list = line.mid(p + 1).split(',');
         QStringList::iterator it = list.begin();
         for (; it != list.end(); ++it)
         {
@@ -203,7 +203,7 @@ namespace M3U
             return false;
         }
 
-        QStringList list = QStringList(line.mid(p + 1).split(','));
+        QStringList list = line.mid(p + 1).split(',');
 
         /* read duration */
         if (list.isEmpty())
@@ -322,7 +322,7 @@ namespace M3U
         else if (attr.startsWith(QLatin1String("AES-128")))
         {
             QString uri;
-            if (aesmsg == false)
+            if (!aesmsg)
             {
                 LOG(VB_RECORD, LOG_INFO, loc +
                     "playback of AES-128 encrypted HTTP Live media detected.");

@@ -32,61 +32,67 @@ class TemplateFinder : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     TemplateFinder(PGMConverter *pgmc, BorderDetector *bd, EdgeDetector *ed,
-            MythPlayer *player, int proglen, QString debugdir);
+            MythPlayer *player, int proglen, const QString& debugdir);
     ~TemplateFinder(void);
 
     /* FrameAnalyzer interface. */
-    const char *name(void) const { return "TemplateFinder"; }
+    const char *name(void) const override // FrameAnalyzer
+        { return "TemplateFinder"; }
     enum analyzeFrameResult MythPlayerInited(MythPlayer *player,
-            long long nframes);
+            long long nframes) override; // FrameAnalyzer
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
-            long long frameno, long long *pNextFrame);
-    int finished(long long nframes, bool final);
-    int reportTime(void) const;
-    FrameMap GetMap(unsigned int) const { FrameMap map; return map; }
+            long long frameno, long long *pNextFrame) override; // FrameAnalyzer
+    int finished(long long nframes, bool final) override; // FrameAnalyzer
+    int reportTime(void) const override; // FrameAnalyzer
+    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+        { FrameMap map; return map; }
 
     /* TemplateFinder implementation. */
     const struct AVFrame *getTemplate(int *prow, int *pcol,
             int *pwidth, int *pheight) const;
 
 private:
-    int resetBuffers(int newcwidth, int newcheight);
+    int resetBuffers(int newwidth, int newheight);
 
-    PGMConverter    *pgmConverter;
-    BorderDetector  *borderDetector;
-    EdgeDetector    *edgeDetector;
+    PGMConverter   *m_pgmConverter;
+    BorderDetector *m_borderDetector;
+    EdgeDetector   *m_edgeDetector;
 
-    unsigned int    sampleTime;         /* amount of time to analyze */
-    int             frameInterval;      /* analyze every <Interval> frames */
-    long long       endFrame;           /* end of logo detection */
-    long long       nextFrame;          /* next desired frame */
+    unsigned int    m_sampleTime       {20 * 60}; /* amount of time to analyze */
+    int             m_frameInterval;              /* analyze every <Interval> frames */
+    long long       m_endFrame         {0};       /* end of logo detection */
+    long long       m_nextFrame        {0};       /* next desired frame */
 
-    int             width, height;      /* dimensions of frames */
-    unsigned int    *scores;            /* pixel "edge" scores */
+    int             m_width            {-1};      /* dimensions of frames */
+    int             m_height           {-1};      /* dimensions of frames */
+    unsigned int   *scores             {nullptr}; /* pixel "edge" scores */
 
-    int             mincontentrow;      /* limits of content area of images */
-    int             mincontentcol;
-    int             maxcontentrow1;     /* minrow + height ("maxrow + 1") */
-    int             maxcontentcol1;     /* mincol + width ("maxcol + 1") */
+    int             mincontentrow      {INT_MAX}; /* limits of content area of images */
+    int             mincontentcol      {INT_MAX};
+    int             maxcontentrow1     {INT_MAX}; /* minrow + height ("maxrow + 1") */
+    int             maxcontentcol1     {INT_MAX}; /* mincol + width ("maxcol + 1") */
 
-    AVFrame       tmpl;               /* logo-matching template */
-    int             tmplrow, tmplcol;
-    int             tmplwidth, tmplheight;
+    AVFrame         m_tmpl;                       /* logo-matching template */
+    int             m_tmplrow          {-1};
+    int             m_tmplcol          {-1};
+    int             m_tmplwidth        {-1};
+    int             m_tmplheight       {-1};
 
-    AVFrame       cropped;            /* cropped version of frame */
-    int             cwidth, cheight;    /* cropped height */
+    AVFrame         m_cropped;                    /* cropped version of frame */
+    int             m_cwidth           {-1};      /* cropped width */
+    int             m_cheight          {-1};      /* cropped height */
 
     /* Debugging. */
-    int             debugLevel;
-    QString         debugdir;
-    QString         debugdata;          /* filename: template location */
-    QString         debugtmpl;          /* filename: logo template */
-    bool            debug_template;
-    bool            debug_edgecounts;
-    bool            debug_frames;
-    bool            tmpl_valid;
-    bool            tmpl_done;
-    struct timeval  analyze_time;
+    int             m_debugLevel       {0};
+    QString         m_debugdir;
+    QString         m_debugdata;                  /* filename: template location */
+    QString         m_debugtmpl;                  /* filename: logo template */
+    bool            m_debug_template   {false};
+    bool            m_debug_edgecounts {false};
+    bool            m_debug_frames     {false};
+    bool            m_tmpl_valid       {false};
+    bool            m_tmpl_done        {false};
+    struct timeval  m_analyze_time;
 };
 
 #endif  /* !__TEMPLATEFINDER_H__ */

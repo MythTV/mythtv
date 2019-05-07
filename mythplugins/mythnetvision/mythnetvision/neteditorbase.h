@@ -27,8 +27,8 @@ class NetEditorBase : public MythScreenType
     NetEditorBase(MythScreenStack *parent, const QString &name);
     virtual ~NetEditorBase();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
 
   private:
     void LoadData(void);
@@ -36,16 +36,16 @@ class NetEditorBase : public MythScreenType
     void ParsedData();
 
     GrabberScript::scriptList m_grabberList;
-    MythUIButtonList *m_grabbers;
-    MythUIBusyDialog *m_busyPopup;
-    MythScreenStack  *m_popupStack;
+    MythUIButtonList      *m_grabbers   {nullptr};
+    MythUIBusyDialog      *m_busyPopup  {nullptr};
+    MythScreenStack       *m_popupStack {nullptr};
 
-    QNetworkAccessManager *m_manager;
-    QNetworkReply         *m_reply;
-    bool m_changed;
+    QNetworkAccessManager *m_manager    {nullptr};
+    QNetworkReply         *m_reply      {nullptr};
+    bool                   m_changed    {false};
 
   protected:
-    void CreateBusyDialog(QString title);
+    void CreateBusyDialog(const QString& title);
 
     virtual bool InsertInDB(GrabberScript *script) = 0;
     virtual bool RemoveFromDB(GrabberScript *script) = 0;

@@ -71,7 +71,10 @@ class SERVICE_PUBLIC Service : public QObject
 //
 //////////////////////////////////////////////////////////////////////////////
 
-inline Service::Service(QObject *parent) : QObject(parent) {}
+inline Service::Service(QObject *parent) : QObject(parent)
+{
+     qRegisterMetaType< QFileInfo >();
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //

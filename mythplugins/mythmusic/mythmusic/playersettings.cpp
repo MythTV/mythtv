@@ -7,20 +7,6 @@
 #include "playersettings.h"
 #include "musicplayer.h"
 
-PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
-        : MythScreenType(parent, name),
-        m_resumeMode(nullptr),
-        m_resumeModeEditor(),
-        m_resumeModeRadio(),
-        m_exitAction(nullptr),
-        m_jumpAction(nullptr),
-        m_autoLookupCD(nullptr),
-        m_autoPlayCD(nullptr),
-        m_saveButton(nullptr),
-        m_cancelButton(nullptr)
-{
-}
-
 bool PlayerSettings::Create()
 {
     bool err = false;

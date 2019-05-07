@@ -27,9 +27,9 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
               qint64 size = 0);
    ~MFileInfo() = default;
 
-    MFileInfo &operator=(const MFileInfo &fileinfo);
+    MFileInfo &operator=(const MFileInfo &other);
 
-    void init(QString fileName = "", QString sgDir = "", bool isDir = false,
+    void init(const QString& fileName = "", QString sgDir = "", bool isDir = false,
               qint64 size = 0);
 
     QString fileName(void) const;
@@ -56,10 +56,10 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
 
   private:
 
-    bool m_isRemote;
-    bool m_isDir;
-    bool m_isFile;
-    bool m_isParentDir;
+    bool m_isRemote           {false};
+    bool m_isDir              {false};
+    bool m_isFile             {true};
+    bool m_isParentDir        {false};
 
     QString m_hostName;
     QString m_storageGroup;
@@ -67,7 +67,7 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
     QString m_fileName;
     QString m_subDir;
 
-    qint64  m_size;
+    qint64  m_size            {0};
 };
 
 Q_DECLARE_METATYPE(MFileInfo);
@@ -80,7 +80,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
    ~MythUIFileBrowser() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
@@ -110,9 +110,9 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     bool IsImage(QString extension);
     QString FormatSize(int size);
 
-    bool               m_isRemote;
+    bool               m_isRemote        {false};
 
-    QTimer            *m_previewTimer;
+    QTimer            *m_previewTimer    {nullptr};
 
     QString            m_baseDirectory;
     QString            m_subDirectory;
@@ -120,21 +120,23 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     QString            m_parentDir;
     QString            m_parentSGDir;
 
-    QDir::Filters      m_typeFilter;
+    QDir::Filters      m_typeFilter      {QDir::AllDirs | QDir::Drives |
+                                          QDir::Files | QDir::Readable |
+                                          QDir::Writable | QDir::Executable};
     QStringList        m_nameFilter;
 
-    MythUIButtonList  *m_fileList;
-    MythUITextEdit    *m_locationEdit;
-    MythUIButton      *m_okButton;
-    MythUIButton      *m_cancelButton;
-    MythUIButton      *m_backButton;
-    MythUIButton      *m_homeButton;
-    MythUIImage       *m_previewImage;
-    MythUIText        *m_infoText;
-    MythUIText        *m_filenameText;
-    MythUIText        *m_fullpathText;
+    MythUIButtonList  *m_fileList        {nullptr};
+    MythUITextEdit    *m_locationEdit    {nullptr};
+    MythUIButton      *m_okButton        {nullptr};
+    MythUIButton      *m_cancelButton    {nullptr};
+    MythUIButton      *m_backButton      {nullptr};
+    MythUIButton      *m_homeButton      {nullptr};
+    MythUIImage       *m_previewImage    {nullptr};
+    MythUIText        *m_infoText        {nullptr};
+    MythUIText        *m_filenameText    {nullptr};
+    MythUIText        *m_fullpathText    {nullptr};
 
-    QObject           *m_retObject;
+    QObject           *m_retObject       {nullptr};
     QString            m_id;
 };
 

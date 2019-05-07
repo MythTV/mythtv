@@ -41,7 +41,7 @@ class Rtti : public RttiServices
 
     public:
 
-        DTC::Enum* GetEnum ( const QString   &FQN );
+        DTC::Enum* GetEnum ( const QString   &FQN ) override; // RttiServices
 
 };
 

@@ -24,7 +24,7 @@ class PremiereContentTransmissionDescriptor : public MPEGDescriptor
                          PrivateDescriptorID::premiere_content_transmission),
           _transmission_count(0)
     {
-        if (_data && !Parse())
+        if (_data && !PremiereContentTransmissionDescriptor::Parse())
             _data = nullptr;
     }
 

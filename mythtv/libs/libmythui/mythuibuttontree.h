@@ -20,11 +20,11 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     MythUIButtonTree(MythUIType *parent, const QString &name);
    ~MythUIButtonTree() = default;
 
-    virtual bool keyPressEvent(QKeyEvent *);
-    virtual bool gestureEvent(MythGestureEvent *event);
+    bool keyPressEvent(QKeyEvent *) override; // MythUIType
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
 
     bool AssignTree(MythGenericTree *tree);
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     bool SetNodeByString(QStringList route);
     bool SetNodeById(QList<int> route);
     bool SetCurrentNode(MythGenericTree *node);
@@ -52,10 +52,10 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     void rootChanged(MythGenericTree* node);
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
   private:
     void Init(void);
@@ -65,20 +65,20 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
 
     void SwitchList(bool right);
 
-    bool m_active;
-    bool m_initialized;
-    uint m_numLists;
-    uint m_visibleLists;
-    uint m_currentDepth;
-    int  m_depthOffset;
-    uint m_oldDepth;
+    bool m_active                    {true};
+    bool m_initialized               {false};
+    uint m_numLists                  {1};
+    uint m_visibleLists              {0};
+    uint m_currentDepth              {0};
+    int  m_depthOffset               {0};
+    uint m_oldDepth                  {0};
     QList<MythUIButtonList*> m_buttonlists;
-    MythUIButtonList *m_listTemplate;
-    MythUIButtonList *m_activeList;
-    uint m_activeListID;
-    MythGenericTree *m_rootNode;
-    MythGenericTree *m_currentNode;
-    uint m_listSpacing;
+    MythUIButtonList *m_listTemplate {nullptr};
+    MythUIButtonList *m_activeList   {nullptr};
+    uint              m_activeListID {0};
+    MythGenericTree  *m_rootNode     {nullptr};
+    MythGenericTree  *m_currentNode  {nullptr};
+    uint              m_listSpacing  {0};
 };
 
 #endif

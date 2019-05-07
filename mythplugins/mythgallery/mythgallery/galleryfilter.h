@@ -45,38 +45,38 @@ class GalleryFilter
     QString getDirFilter() const { return m_dirFilter; }
     void setDirFilter(QString dirFilter)
     {
-        m_changed_state  = 1;
+        m_changed_state  = true;
         m_dirFilter = dirFilter;
     }
 
     int getTypeFilter() const { return m_typeFilter; }
     void setTypeFilter(int typeFilter)
     {
-        m_changed_state = 1;
+        m_changed_state = true;
         m_typeFilter = typeFilter;
     }
 
     int getSort() const { return m_sort; }
     void setSort(int sort)
     {
-        m_changed_state = 1;
+        m_changed_state = true;
         m_sort = sort;
     }
 
-    unsigned int getChangedState()
+    bool getChangedState()
     {
-        unsigned int ret = m_changed_state;
-        m_changed_state = 0;
+        bool ret = m_changed_state;
+        m_changed_state = false;
         return ret;
     }
-    void dumpFilter(QString src);
+    void dumpFilter(const QString& src);
 
   private:
-    QString m_dirFilter;
-    int m_typeFilter;
-    int m_sort;
+    QString      m_dirFilter;
+    int          m_typeFilter    {kTypeFilterAll};
+    int          m_sort          {kSortOrderUnsorted};
 
-    unsigned int m_changed_state;
+    bool         m_changed_state {false};
 };
 
 #endif /* GALLERYFILTER_H */

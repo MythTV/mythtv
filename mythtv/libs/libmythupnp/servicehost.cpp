@@ -24,17 +24,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-MethodInfo::MethodInfo()
-{
-    m_nMethodIndex = 0;
-    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost |
-                                   RequestTypeHead);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
 QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 {
     HttpRedirectException exception;
@@ -240,9 +229,9 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
             oInfo.m_nMethodIndex = nIdx;
             oInfo.m_sName        = sName.section( '(', 0, 0 );
             oInfo.m_oMethod      = method;
-            oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
-                                                 RequestTypePost |
-                                                 RequestTypeHead);
+            oInfo.m_eRequestType = (HttpRequestType)(RequestTypeGet |
+                                                     RequestTypePost |
+                                                     RequestTypeHead);
 
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
@@ -257,8 +246,8 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
                 if (sRequestType == "POST")
                     oInfo.m_eRequestType = RequestTypePost;
                 else if (sRequestType == "GET" )
-                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
-                                                         RequestTypeHead);
+                    oInfo.m_eRequestType = (HttpRequestType)(RequestTypeGet |
+                                                             RequestTypeHead);
             }
 
             m_Methods.insert( oInfo.m_sName, oInfo );
@@ -267,8 +256,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
 
     // ----------------------------------------------------------------------
 
-    if (pService != nullptr)
-        delete pService;
+    delete pService;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -324,7 +312,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             if (( pRequest->m_eType   == RequestTypeGet ) &&
                 ( pRequest->m_sMethod == "xsd"          ))
             {
-                bool bHandled = false;
+                bool bHandled2 = false;
                 if ( pRequest->m_mapParams.count() > 0)
                 {
                     pService =  qobject_cast<Service*>(m_oMetaObject.newInstance());
@@ -332,14 +320,14 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                     Xsd xsd;
 
                     if (pRequest->m_mapParams.contains( "type" ))
-                        bHandled = xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
+                        bHandled2 = xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
                     else
-                        bHandled = xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
+                        bHandled2 = xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
                     delete pService;
                     pService = nullptr;
                 }
 
-                if (!bHandled)
+                if (!bHandled2)
                     throw QString("Invalid arguments to xsd query: %1")
                         .arg(pRequest->m_sRequestUrl.section('?', 1));
 
@@ -428,13 +416,13 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
     }
     catch (HttpRedirectException &ex)
     {
-        UPnp::FormatRedirectResponse( pRequest, ex.hostName );
+        UPnp::FormatRedirectResponse( pRequest, ex.m_hostName );
         bHandled = true;
     }
     catch (HttpException &ex)
     {
-        LOG(VB_GENERAL, LOG_ERR, ex.msg);
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
+        LOG(VB_GENERAL, LOG_ERR, ex.m_msg);
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.m_msg );
 
         bHandled = true;
 
@@ -456,9 +444,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
         bHandled = true;
     }
 
-    if (pService != nullptr)
-        delete pService;
-
+    delete pService;
     return bHandled;
 }
 
@@ -480,8 +466,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 
         return true;
     }
-    else
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
+    UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
 
     return false;
 }

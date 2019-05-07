@@ -12,11 +12,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-MetaIOAVFComment::MetaIOAVFComment(void)
-    : MetaIO()
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */
@@ -54,20 +49,20 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
     }
     else
     {
-        title = (char *)tag->value;
+        title = tag->value;
 
         tag = av_dict_get(p_context->metadata, "author", nullptr, 0);
         if (tag)
-            artist += (char *)tag->value;
+            artist += tag->value;
 
         // compilation_artist???
         tag = av_dict_get(p_context->metadata, "album", nullptr, 0);
         if (tag)
-            album += (char *)tag->value;
+            album += tag->value;
 
         tag = av_dict_get(p_context->metadata, "genre", nullptr, 0);
         if (tag)
-            genre += (char *)tag->value;
+            genre += tag->value;
 
         tag = av_dict_get(p_context->metadata, "year", nullptr, 0);
         if (tag)

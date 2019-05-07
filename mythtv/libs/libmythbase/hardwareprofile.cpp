@@ -18,10 +18,7 @@ const QString SMOLT_SERVER_LOCATION =
 const QString SMOLT_TOKEN =
                   QString("smolt_token-smolt.mythtv.org");
 
-HardwareProfile::HardwareProfile() :
-    m_enabled(false),
-    m_uuid(QString()),               m_publicuuid(QString()),
-    m_lastUpdate(QDateTime()),       m_hardwareProfile(QString())
+HardwareProfile::HardwareProfile()
 {
     m_enabled = (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 1);
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
@@ -160,7 +157,7 @@ QString HardwareProfile::GetAdminPasswordFromFile() const
     return ret;
 }
 
-bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
+bool HardwareProfile::WritePrivateUUIDToFile(const QString &uuid)
 {
     QString hwuuid_file = GetConfDir() + "/HardwareProfile/hw-uuid";
     QFile file(hwuuid_file);
@@ -171,8 +168,7 @@ bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
         file.close();
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 bool HardwareProfile::NeedsUpdate(void) const
@@ -224,9 +220,6 @@ bool HardwareProfile::SubmitProfile(bool updateTime)
 
         return true;
     }
-    else
-        return false;
-
     return false;
 }
 
@@ -251,9 +244,6 @@ bool HardwareProfile::DeleteProfile(void)
         Disable();
         return true;
     }
-    else
-        return false;
-
     return false;
 }
 

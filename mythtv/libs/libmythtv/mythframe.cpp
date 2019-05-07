@@ -43,10 +43,11 @@ extern "C" {
 
 #if ARCH_X86
 
-static int has_sse2     = -1;
-static int has_sse3     = -1;
-static int has_ssse3    = -1;
-static int has_sse4     = -1;
+static bool features_detected = false;
+static bool has_sse2     = false;
+static bool has_sse3     = false;
+static bool has_ssse3    = false;
+static bool has_sse4     = false;
 
 #if defined _WIN32 && !defined __MINGW32__
 //  Windows
@@ -74,13 +75,8 @@ inline void cpuid(int CPUInfo[4],int InfoType)
 }
 #endif
 
-static inline bool sse2_check()
+static void cpu_detect_features()
 {
-    if (has_sse2 != -1)
-    {
-        return has_sse2;
-    }
-
     int info[4];
     cpuid(info, 0);
     int nIds = info[0];
@@ -89,54 +85,39 @@ static inline bool sse2_check()
     if (nIds >= 0x00000001)
     {
         cpuid(info,0x00000001);
-        has_sse2  = (info[3] & ((int)1 << 26)) != 0;
-        has_sse3  = (info[2] & ((int)1 <<  0)) != 0;
-        has_ssse3 = (info[2] & ((int)1 <<  9)) != 0;
-        has_sse4  = (info[2] & ((int)1 << 19)) != 0;
+        has_sse2  = (info[3] & (1 << 26)) != 0;
+        has_sse3  = (info[2] & (1 <<  0)) != 0;
+        has_ssse3 = (info[2] & (1 <<  9)) != 0;
+        has_sse4  = (info[2] & (1 << 19)) != 0;
     }
-    else
-    {
-        has_sse2  = 0;
-        has_sse3  = 0;
-        has_ssse3 = 0;
-        has_sse4  = 0;
-    }
+    features_detected = true;
+}
+
+static inline bool sse2_check()
+{
+    if (!features_detected)
+        cpu_detect_features();
     return has_sse2;
 }
 
 static inline bool sse3_check()
 {
-    if (has_sse3 != -1)
-    {
-        return has_sse3;
-    }
-
-    sse2_check();
-
+    if (!features_detected)
+        cpu_detect_features();
     return has_sse3;
 }
 
 static inline bool ssse3_check()
 {
-    if (has_ssse3 != -1)
-    {
-        return has_ssse3;
-    }
-
-    sse2_check();
-
+    if (!features_detected)
+        cpu_detect_features();
     return has_ssse3;
 }
 
 static inline bool sse4_check()
 {
-    if (has_sse4 != -1)
-    {
-        return has_sse4;
-    }
-
-    sse2_check();
-
+    if (!features_detected)
+        cpu_detect_features();
     return has_sse4;
 }
 
@@ -580,7 +561,6 @@ static void SSE_splitplanes(uint8_t *dstu, int dstu_pitch,
 #endif // ARCH_X86
 
 MythUSWCCopy::MythUSWCCopy(int width, bool nocache)
-    :m_cache(nullptr), m_size(0), m_uswc(-1)
 {
 #if ARCH_X86
     if (!nocache)
@@ -627,9 +607,9 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
         {
             MythTimer *timer;
 
-            if (m_uswc <= 0 && m_cache)
+            if ((m_uswc != uswcState::Use_SW) && m_cache)
             {
-                if (m_uswc < 0)
+                if (m_uswc == uswcState::Detect)
                 {
                     timer = new MythTimer(MythTimer::kStartRunning);
                 }
@@ -642,11 +622,11 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
                                 src->buf + src->offsets[1], src->pitches[1],
                                 m_cache, m_size,
                                 (width+1) / 2, (height+1) / 2);
-                if (m_uswc < 0)
+                if (m_uswc == uswcState::Detect)
                 {
                     // Measure how long standard method takes
                     // if shorter, use it in the future
-                    long duration = timer->nsecsElapsed();
+                    long sse_duration = timer->nsecsElapsed();
                     timer->restart();
                     copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
                               src->buf + src->offsets[0], src->pitches[0],
@@ -655,10 +635,14 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
                                     dst->buf + dst->offsets[2], dst->pitches[2],
                                     src->buf + src->offsets[1], src->pitches[1],
                                     (width+1) / 2, (height+1) / 2);
-                    m_uswc = timer->nsecsElapsed() < duration;
-                    if (m_uswc == 0)
+                    if (timer->nsecsElapsed() < sse_duration)
                     {
+                        m_uswc = uswcState::Use_SW;
                         LOG(VB_GENERAL, LOG_DEBUG, "Enabling USWC code acceleration");
+                    }
+                    else
+                    {
+                        m_uswc = uswcState::Use_SSE;
                     }
                     delete timer;
                 }
@@ -688,11 +672,11 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
     }
 
 #if ARCH_X86
-    if (sse2_check() && m_uswc <= 0 && m_cache)
+    if (sse2_check() && (m_uswc != uswcState::Use_SW) && m_cache)
     {
         MythTimer *timer;
 
-        if (m_uswc < 0)
+        if (m_uswc == uswcState::Detect)
         {
             timer = new MythTimer(MythTimer::kStartRunning);
         }
@@ -708,11 +692,11 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
                       src->buf + src->offsets[2], src->pitches[2],
                       m_cache, m_size,
                       (width+1) / 2, (height+1) / 2);
-        if (m_uswc < 0)
+        if (m_uswc == uswcState::Detect)
         {
             // Measure how long standard method takes
             // if shorter, use it in the future
-            long duration = timer->nsecsElapsed();
+            long sse_duration = timer->nsecsElapsed();
             timer->restart();
             copyplane(dst->buf + dst->offsets[0], dst->pitches[0],
                       src->buf + src->offsets[0], src->pitches[0],
@@ -723,10 +707,14 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
             copyplane(dst->buf + dst->offsets[2], dst->pitches[2],
                       src->buf + src->offsets[2], src->pitches[2],
                       (width+1) / 2, (height+1) / 2);
-            m_uswc = timer->nsecsElapsed() < duration;
-            if (m_uswc == 0)
+            if (timer->nsecsElapsed() < sse_duration)
             {
+                m_uswc = uswcState::Use_SW;
                 LOG(VB_GENERAL, LOG_DEBUG, "Enabling USWC code acceleration");
+            }
+            else
+            {
+                m_uswc = uswcState::Use_SSE;
             }
             delete timer;
         }
@@ -750,7 +738,7 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
  */
 void MythUSWCCopy::resetUSWCDetection(void)
 {
-    m_uswc = -1;
+    m_uswc = uswcState::Detect;
 }
 
 void MythUSWCCopy::allocateCache(int width)
@@ -766,7 +754,7 @@ void MythUSWCCopy::allocateCache(int width)
  */
 void MythUSWCCopy::setUSWC(bool uswc)
 {
-    m_uswc = !uswc;
+    m_uswc = uswc ? uswcState::Use_SW : uswcState::Use_SSE;
 }
 
 /**

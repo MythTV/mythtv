@@ -231,48 +231,6 @@ HostCheckBoxSetting *VideoTreeRemember()
     return gc;
 }
 
-struct ConfigPage
-{
-    typedef std::vector<ConfigurationGroup *> PageList;
-
-  protected:
-    explicit ConfigPage(PageList &pl) : m_pl(pl)
-    {
-    }
-
-    void Add(ConfigurationGroup *page)
-    {
-        m_pl.push_back(page);
-    }
-
-  private:
-    ConfigPage(const ConfigPage &) = delete;
-    ConfigPage &operator=(const ConfigPage &) = delete;
-
-  private:
-    PageList &m_pl;
-};
-
-struct VConfigPage : public ConfigPage
-{
-    VConfigPage(PageList &pl, bool luselabel = true, bool luseframe  = true,
-                bool lzeroMargin = false, bool lzeroSpace = false) :
-        ConfigPage(pl)
-    {
-        m_vc_page = new VerticalConfigurationGroup(luselabel, luseframe,
-                                                   lzeroMargin, lzeroSpace);
-        Add(m_vc_page);
-    }
-
-    VerticalConfigurationGroup *operator->()
-    {
-        return m_vc_page;
-    }
-
-  private:
-    VerticalConfigurationGroup *m_vc_page;
-};
-
 HostCheckBoxSetting *RatingsToPL()
 {
     HostCheckBoxSetting *r2pl =
@@ -336,7 +294,6 @@ HostCheckBoxSetting *RatingsToPL()
 } // namespace
 
 VideoGeneralSettings::VideoGeneralSettings()
-    : GroupSetting()
 {
     setLabel(tr("General Settings"));
 

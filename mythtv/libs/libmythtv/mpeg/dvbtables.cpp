@@ -18,7 +18,7 @@ void NetworkInformationTable::Parse(void) const
 
 QString NetworkInformationTable::toString(void) const
 {
-    QString str = QString("NIT: NetID(%1) tranports(%2)\n")
+    QString str = QString("NIT: NetID(%1) transports(%2)\n")
         .arg(NetworkID()).arg(TransportStreamCount());
     str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
         .arg(Section()).arg(LastSection()).arg(IsCurrent()));
@@ -30,7 +30,7 @@ QString NetworkInformationTable::toString(void) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(NetworkDescriptors(),
                                   NetworkDescriptorsLength());
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
             str.append(QString("  %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
     }
@@ -50,9 +50,9 @@ QString NetworkInformationTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
-            for (uint i = 0; i < desc.size(); i++)
+            for (size_t j = 0; j < desc.size(); j++)
                 str.append(QString("    %1\n")
-                           .arg(MPEGDescriptor(desc[i]).toString()));
+                           .arg(MPEGDescriptor(desc[j]).toString()));
         }
     }
     return str;
@@ -70,8 +70,12 @@ QString NetworkInformationTable::NetworkName() const
             MPEGDescriptor::Find(parsed, DescriptorID::network_name);
 
         if (desc)
-            _cached_network_name = NetworkNameDescriptor(desc).Name();
-        else
+        {
+            auto nndesc = NetworkNameDescriptor(desc);
+            if (nndesc.IsValid())
+                _cached_network_name = nndesc.Name();
+        }
+        if (_cached_network_name.isEmpty())
             _cached_network_name = QString("Net ID 0x%1")
                 .arg(NetworkID(), 0, 16);
     }
@@ -86,8 +90,7 @@ bool NetworkInformationTable::Mutate(void)
         SetCRC(CalcCRC());
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 void ServiceDescriptionTable::Parse(void) const
@@ -127,9 +130,29 @@ QString ServiceDescriptionTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(ServiceDescriptors(i),
                                       ServiceDescriptorsLength(i));
-            for (uint i = 0; i < desc.size(); i++)
-                str.append(QString("    %1\n")
-                           .arg(MPEGDescriptor(desc[i]).toString()));
+            for (size_t j = 0; j < desc.size(); j++)
+            {
+                // Descriptors 0x80 to 0xFE are user defined, see
+                // Final draft ETSI EN 300 468 v1.13.1 (2012-04)
+                // Table 12: "Possible location of descriptors", page 33)
+                if(MPEGDescriptor(desc[j]).DescriptorTag() < 0x80)
+                {
+                    str.append(QString("    %1\n")
+                               .arg(MPEGDescriptor(desc[j]).toString()));
+                }
+                else
+                {
+                    QString udd = "Invalid Descriptor";
+                    if (MPEGDescriptor(desc[j]).IsValid())
+                    {
+                        udd = QString("User Defined Descriptor (0x%1) length(%2). Dumping\n")
+                            .arg(MPEGDescriptor(desc[j]).DescriptorTag(),2,16,QChar('0'))
+                            .arg(MPEGDescriptor(desc[j]).DescriptorLength());
+                        udd.append(MPEGDescriptor(desc[j]).hexdump());
+                    }
+                    str.append(QString("    %1\n").arg(udd));
+                }
+            }
         }
     }
     return str;
@@ -158,8 +181,7 @@ bool ServiceDescriptionTable::Mutate(void)
         SetCRC(CalcCRC());
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 void BouquetAssociationTable::Parse(void) const
@@ -188,7 +210,7 @@ QString BouquetAssociationTable::toString(void) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(BouquetDescriptors(),
                                   BouquetDescriptorsLength());
-        for (uint i = 0; i < desc.size(); i++)
+        for (size_t i = 0; i < desc.size(); i++)
             str.append(QString("  %1\n")
                        .arg(MPEGDescriptor(desc[i]).toString()));
     }
@@ -208,9 +230,9 @@ QString BouquetAssociationTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
-            for (uint i = 0; i < desc.size(); i++)
+            for (size_t j = 0; j < desc.size(); j++)
                 str.append(QString("    %1\n")
-                           .arg(MPEGDescriptor(desc[i]).toString()));
+                           .arg(MPEGDescriptor(desc[j]).toString()));
         }
     }
     return str;
@@ -280,11 +302,11 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     const float tmpB = (float)(1.0 / 30.6001);
 
     float mjdf = mjd;
-    int year  = (int) truncf((mjdf - 15078.2f) * tmpA);
+    int year  = (int) truncf((mjdf - 15078.2F) * tmpA);
     int month = (int) truncf(
-        (mjdf - 14956.1f - truncf(year * 365.25f)) * tmpB);
+        (mjdf - 14956.1F - truncf(year * 365.25F)) * tmpB);
     int day   = (int) truncf(
-        (mjdf - 14956.0f - truncf(year * 365.25f) - truncf(month * 30.6001f)));
+        (mjdf - 14956.0F - truncf(year * 365.25F) - truncf(month * 30.6001F)));
     int i     = (month == 14 || month == 15) ? 1 : 0;
 
     QDate date(1900 + year + i, month - 1 - i * 12, day);

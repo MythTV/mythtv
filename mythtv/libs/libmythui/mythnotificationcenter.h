@@ -112,7 +112,7 @@ public:
     void ProcessQueue(void);
 
 private:
-    NCPrivate *d;
+    NCPrivate *d {nullptr};
 };
 
 /**
@@ -137,7 +137,7 @@ MUI_PUBLIC void ShowNotification(bool  error,
                                  const QString &image = QString(),
                                  const QString &extra = QString(),
                                  const QString &progress_text = QString(),
-                                 float progress = -1.0f,
+                                 float progress = -1.0F,
                                  int   duration = -1,
                                  bool  fullscreen = false,
                                  const VNMask visibility = MythNotification::kAll,
@@ -151,7 +151,7 @@ MUI_PUBLIC void ShowNotification(MythNotification::Type type,
                                  const QString &image = QString(),
                                  const QString &extra = QString(),
                                  const QString &progress_text = QString(),
-                                 float progress = -1.0f,
+                                 float progress = -1.0F,
                                  int   duration = -1,
                                  bool  fullscreen = false,
                                  const VNMask visibility = MythNotification::kAll,

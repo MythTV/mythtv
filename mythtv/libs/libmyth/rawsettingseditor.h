@@ -34,9 +34,9 @@ class MPUBLIC RawSettingsEditor : public MythScreenType
    ~RawSettingsEditor() = default;
 
     // MythScreenType overrides
-    bool Create(void);
-    void Load(void);
-    void Init(void);
+    bool Create(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   private slots:
     // Saves changes
@@ -48,21 +48,21 @@ class MPUBLIC RawSettingsEditor : public MythScreenType
 
   protected:
     // Protected data, directly accessed by inheritting classes
-    QString                 m_title;
-    QMap <QString, QString> m_settings;
+    QString                   m_title;
+    QMap <QString, QString>   m_settings;
 
   private:
     // Helper for updating prev/next values on screen
     void updatePrevNextTexts(void);
 
     // UI Widgets on screen
-    MythUIButtonList *m_settingsList;
-    MythUITextEdit   *m_settingValue;
+    MythUIButtonList         *m_settingsList {nullptr};
+    MythUITextEdit           *m_settingValue {nullptr};
 
-    MythUIButton     *m_saveButton;
-    MythUIButton     *m_cancelButton;
+    MythUIButton             *m_saveButton   {nullptr};
+    MythUIButton             *m_cancelButton {nullptr};
 
-    MythUIText       *m_textLabel;
+    MythUIText               *m_textLabel    {nullptr};
 
     // Prev/Next text areas on screen
     QHash <int, MythUIText*>  m_prevNextTexts;

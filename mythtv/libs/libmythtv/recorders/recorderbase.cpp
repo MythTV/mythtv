@@ -11,7 +11,6 @@ using namespace std;
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "mpegrecorder.h"
-#include "v4l2encrecorder.h"
 #include "recorderbase.h"
 #include "cetonchannel.h"
 #include "asirecorder.h"
@@ -25,7 +24,6 @@ using namespace std;
 #include "asichannel.h"
 #include "dtvchannel.h"
 #include "dvbchannel.h"
-#include "v4lchannel.h"
 #include "ExternalChannel.h"
 #include "ringbuffer.h"
 #include "cardutil.h"
@@ -34,34 +32,23 @@ using namespace std;
 #if CONFIG_LIBMP3LAME
 #include "NuppelVideoRecorder.h"
 #endif
+#if CONFIG_V4L2
+#include "v4l2encrecorder.h"
+#include "v4lchannel.h"
+#endif
 
 #define TVREC_CARDNUM \
-        ((tvrec != nullptr) ? QString::number(tvrec->GetInputId()) : "NULL")
+        ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("RecBase[%1](%2): ") \
-            .arg(TVREC_CARDNUM).arg(videodevice)
+            .arg(TVREC_CARDNUM).arg(m_videodevice)
 
 const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 
 RecorderBase::RecorderBase(TVRec *rec)
-    : tvrec(rec),               ringBuffer(nullptr),
-      weMadeBuffer(true),
-      m_containerFormat(formatUnknown),
-      m_primaryVideoCodec(AV_CODEC_ID_NONE),
-      m_primaryAudioCodec(AV_CODEC_ID_NONE),
-      videocodec("rtjpeg"),
-      ntsc(true),               ntsc_framerate(true),
-      video_frame_rate(29.97),
-      m_videoAspect(0),         m_videoHeight(0),
-      m_videoWidth(0),          m_frameRate(0),
-      curRecording(nullptr),
-      request_pause(false),     paused(false),
-      request_recording(false), recording(false),
-      nextRingBuffer(nullptr),  nextRecording(nullptr),
-      positionMapType(MARK_GOP_BYFRAME),
-      estimatedProgStartMS(0), lastSavedKeyframe(0), lastSavedDuration(0)
+    : m_tvrec(rec)
 {
-    ClearStatistics();
+    RecorderBase::ClearStatistics();
     QMutexLocker locker(avcodeclock);
 #if 0
     avcodec_init(); // init CRC's
@@ -70,22 +57,22 @@ RecorderBase::RecorderBase(TVRec *rec)
 
 RecorderBase::~RecorderBase(void)
 {
-    if (weMadeBuffer && ringBuffer)
+    if (m_weMadeBuffer && m_ringBuffer)
     {
-        delete ringBuffer;
-        ringBuffer = nullptr;
+        delete m_ringBuffer;
+        m_ringBuffer = nullptr;
     }
     SetRecording(nullptr);
-    if (nextRingBuffer)
+    if (m_nextRingBuffer)
     {
-        QMutexLocker locker(&nextRingBufferLock);
-        delete nextRingBuffer;
-        nextRingBuffer = nullptr;
+        QMutexLocker locker(&m_nextRingBufferLock);
+        delete m_nextRingBuffer;
+        m_nextRingBuffer = nullptr;
     }
-    if (nextRecording)
+    if (m_nextRecording)
     {
-        delete nextRecording;
-        nextRecording = nullptr;
+        delete m_nextRecording;
+        m_nextRecording = nullptr;
     }
 }
 
@@ -99,8 +86,8 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
         LOG(VB_RECORD, LOG_INFO, LOC + QString("SetRingBuffer(0x%1)")
                 .arg((uint64_t)rbuf,0,16) + msg);
     }
-    ringBuffer = rbuf;
-    weMadeBuffer = false;
+    m_ringBuffer = rbuf;
+    m_weMadeBuffer = false;
 }
 
 void RecorderBase::SetRecording(const RecordingInfo *pginfo)
@@ -111,28 +98,27 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
     else
         LOG(VB_RECORD, LOG_INFO, LOC + "SetRecording(0x0)");
 
-    ProgramInfo *oldrec = curRecording;
+    ProgramInfo *oldrec = m_curRecording;
     if (pginfo)
     {
         // NOTE: RecorderBase and TVRec do not share a single RecordingInfo
         //       instance which may lead to the possibility that changes made
         //       in the database by one are overwritten by the other
-        curRecording = new RecordingInfo(*pginfo);
+        m_curRecording = new RecordingInfo(*pginfo);
         // Compute an estimate of the actual progstart delay for setting the
         // MARK_UTIL_PROGSTART mark.  We can't reliably use
-        // curRecording->GetRecordingStartTime() because the scheduler rounds it
+        // m_curRecording->GetRecordingStartTime() because the scheduler rounds it
         // to the nearest minute, so we use the current time instead.
-        estimatedProgStartMS =
-            MythDate::current().msecsTo(curRecording->GetScheduledStartTime());
-        RecordingFile *recFile = curRecording->GetRecordingFile();
+        m_estimatedProgStartMS =
+            MythDate::current().msecsTo(m_curRecording->GetScheduledStartTime());
+        RecordingFile *recFile = m_curRecording->GetRecordingFile();
         recFile->m_containerFormat = m_containerFormat;
         recFile->Save();
     }
     else
-        curRecording = nullptr;
+        m_curRecording = nullptr;
 
-    if (oldrec)
-        delete oldrec;
+    delete oldrec;
 }
 
 void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
@@ -143,40 +129,39 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
 
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
-    if (ringBuffer)
+    if (m_ringBuffer)
     {
-        ringBuffer->WriterFlush();
-        if (curRecording)
-            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+        m_ringBuffer->WriterFlush();
+        if (m_curRecording)
+            m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
     }
 
     // Then we set the next info
-    QMutexLocker locker(&nextRingBufferLock);
-    if (nextRecording)
+    QMutexLocker locker(&m_nextRingBufferLock);
+    if (m_nextRecording)
     {
-        delete nextRecording;
-        nextRecording = nullptr;
+        delete m_nextRecording;
+        m_nextRecording = nullptr;
     }
     if (ri)
-        nextRecording = new RecordingInfo(*ri);
+        m_nextRecording = new RecordingInfo(*ri);
 
-    if (nextRingBuffer)
-        delete nextRingBuffer;
-    nextRingBuffer = rb;
+    delete m_nextRingBuffer;
+    m_nextRingBuffer = rb;
 }
 
 void RecorderBase::SetOption(const QString &name, const QString &value)
 {
     if (name == "videocodec")
-        videocodec = value;
+        m_videocodec = value;
     else if (name == "videodevice")
-        videodevice = value;
+        m_videodevice = value;
     else if (name == "tvformat")
     {
-        ntsc = false;
+        m_ntsc = false;
         if (value.toLower() == "ntsc" || value.toLower() == "ntsc-jp")
         {
-            ntsc = true;
+            m_ntsc = true;
             SetFrameRate(29.97);
         }
         else if (value.toLower() == "pal-m")
@@ -188,9 +173,9 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
             // are far more likely to be using a mix of ATSC and NTSC than
             // a mix of ATSC and PAL or SECAM. The atsc recorder itself
             // does not care about these values, except in so much as tv_rec
-            // cares anout video_frame_rate which should be neither 29.97
+            // cares about m_video_frame_rate which should be neither 29.97
             // nor 25.0, but based on the actual video.
-            ntsc = true;
+            m_ntsc = true;
             SetFrameRate(29.97);
         }
         else
@@ -238,18 +223,18 @@ void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
  */
 void RecorderBase::StopRecording(void)
 {
-    QMutexLocker locker(&pauseLock);
-    request_recording = false;
-    unpauseWait.wakeAll();
-    while (recording)
+    QMutexLocker locker(&m_pauseLock);
+    m_request_recording = false;
+    m_unpauseWait.wakeAll();
+    while (m_recording)
     {
-        recordingWait.wait(&pauseLock, 100);
-        if (request_recording)
+        m_recordingWait.wait(&m_pauseLock, 100);
+        if (m_request_recording)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Programmer Error: Recorder started while we were in "
                 "StopRecording");
-            request_recording = false;
+            m_request_recording = false;
         }
     }
 }
@@ -257,20 +242,20 @@ void RecorderBase::StopRecording(void)
 /// \brief Tells whether the StartRecorder() loop is running.
 bool RecorderBase::IsRecording(void)
 {
-    QMutexLocker locker(&pauseLock);
-    return recording;
+    QMutexLocker locker(&m_pauseLock);
+    return m_recording;
 }
 
 /// \brief Tells us if StopRecording() has been called.
 bool RecorderBase::IsRecordingRequested(void)
 {
-    QMutexLocker locker(&pauseLock);
-    return request_recording;
+    QMutexLocker locker(&m_pauseLock);
+    return m_request_recording;
 }
 
 /** \brief Pause tells recorder to pause, it should not block.
  *
- *   Once paused the recorder calls tvrec->RecorderPaused().
+ *   Once paused the recorder calls m_tvrec->RecorderPaused().
  *
  *  \param clear if true any generated timecodes should be reset.
  *  \sa Unpause(), WaitForPause()
@@ -278,8 +263,8 @@ bool RecorderBase::IsRecordingRequested(void)
 void RecorderBase::Pause(bool clear)
 {
     (void) clear;
-    QMutexLocker locker(&pauseLock);
-    request_pause = true;
+    QMutexLocker locker(&m_pauseLock);
+    m_request_pause = true;
 }
 
 /** \brief Unpause tells recorder to unpause.
@@ -288,19 +273,19 @@ void RecorderBase::Pause(bool clear)
  */
 void RecorderBase::Unpause(void)
 {
-    QMutexLocker locker(&pauseLock);
-    request_pause = false;
-    unpauseWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_request_pause = false;
+    m_unpauseWait.wakeAll();
 }
 
 /// \brief Returns true iff recorder is paused.
 bool RecorderBase::IsPaused(bool holding_lock) const
 {
     if (!holding_lock)
-        pauseLock.lock();
-    bool ret = paused;
+        m_pauseLock.lock();
+    bool ret = m_paused;
     if (!holding_lock)
-        pauseLock.unlock();
+        m_pauseLock.unlock();
     return ret;
 }
 
@@ -315,19 +300,19 @@ bool RecorderBase::WaitForPause(int timeout)
     MythTimer t;
     t.start();
 
-    QMutexLocker locker(&pauseLock);
-    while (!IsPaused(true) && request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    while (!IsPaused(true) && m_request_pause)
     {
         int wait = timeout - t.elapsed();
         if (wait <= 0)
             return false;
-        pauseWait.wait(&pauseLock, wait);
+        m_pauseWait.wait(&m_pauseLock, wait);
     }
     return true;
 }
 
 /** \fn RecorderBase::PauseAndWait(int)
- *  \brief If request_pause is true, sets pause and blocks up to
+ *  \brief If m_request_pause is true, sets pause and blocks up to
  *         timeout milliseconds or until unpaused, whichever is
  *         sooner.
  *
@@ -340,24 +325,24 @@ bool RecorderBase::WaitForPause(int timeout)
  */
 bool RecorderBase::PauseAndWait(int timeout)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
+    QMutexLocker locker(&m_pauseLock);
+    if (m_request_pause)
     {
         if (!IsPaused(true))
         {
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
+            m_paused = true;
+            m_pauseWait.wakeAll();
+            if (m_tvrec)
+                m_tvrec->RecorderPaused();
         }
 
-        unpauseWait.wait(&pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!request_pause && IsPaused(true))
+    if (!m_request_pause && IsPaused(true))
     {
-        paused = false;
-        unpauseWait.wakeAll();
+        m_paused = false;
+        m_unpauseWait.wakeAll();
     }
 
     return IsPaused(true);
@@ -365,11 +350,11 @@ bool RecorderBase::PauseAndWait(int timeout)
 
 void RecorderBase::CheckForRingBufferSwitch(void)
 {
-    nextRingBufferLock.lock();
+    m_nextRingBufferLock.lock();
 
     RecordingQuality *recq = nullptr;
 
-    if (nextRingBuffer)
+    if (m_nextRingBuffer)
     {
         FinishRecording();
 
@@ -380,69 +365,76 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
         m_frameRate = FrameRate(0);
 
-        SetRingBuffer(nextRingBuffer);
-        SetRecording(nextRecording);
+        SetRingBuffer(m_nextRingBuffer);
+        SetRecording(m_nextRecording);
 
-        nextRingBuffer = nullptr;
-        nextRecording = nullptr;
+        m_nextRingBuffer = nullptr;
+        m_nextRecording = nullptr;
 
         StartNewFile();
     }
-    nextRingBufferLock.unlock();
+    m_nextRingBufferLock.unlock();
 
-    if (recq && tvrec)
-        tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
+    if (recq && m_tvrec)
+    {
+        // This call will free recq.
+        m_tvrec->RingBufferChanged(m_ringBuffer, m_curRecording, recq);
+    }
+    else
+    {
+        delete recq;
+    }
 
-    ringBufferCheckTimer.restart();
+    m_ringBufferCheckTimer.restart();
 }
 
 void RecorderBase::SetRecordingStatus(RecStatus::Type status,
                                       const QString& file, int line)
 {
-    if (curRecording && curRecording->GetRecordingStatus() != status)
+    if (m_curRecording && m_curRecording->GetRecordingStatus() != status)
     {
         LOG(VB_RECORD, LOG_INFO,
             QString("Modifying recording status from %1 to %2 at %3:%4")
-            .arg(RecStatus::toString(curRecording->GetRecordingStatus(), kSingleRecord))
+            .arg(RecStatus::toString(m_curRecording->GetRecordingStatus(), kSingleRecord))
             .arg(RecStatus::toString(status, kSingleRecord)).arg(file).arg(line));
 
-        curRecording->SetRecordingStatus(status);
+        m_curRecording->SetRecordingStatus(status);
 
         if (status == RecStatus::Failing)
         {
-            curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
-            SendMythSystemRecEvent("REC_FAILING", curRecording);
+            m_curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
+            SendMythSystemRecEvent("REC_FAILING", m_curRecording);
         }
 
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                    .arg(curRecording->GetInputID())
-                    .arg(curRecording->GetChanID())
-                    .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
+                    .arg(m_curRecording->GetInputID())
+                    .arg(m_curRecording->GetChanID())
+                    .arg(m_curRecording->GetScheduledStartTime(MythDate::ISODate))
                     .arg(status)
-                    .arg(curRecording->GetRecordingEndTime(MythDate::ISODate)));
+                    .arg(m_curRecording->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
 }
 
 void RecorderBase::ClearStatistics(void)
 {
-    QMutexLocker locker(&statisticsLock);
-    timeOfFirstData = QDateTime();
-    timeOfFirstDataIsSet.fetchAndStoreRelaxed(0);
-    timeOfLatestData = QDateTime();
-    timeOfLatestDataCount.fetchAndStoreRelaxed(0);
-    timeOfLatestDataPacketInterval.fetchAndStoreRelaxed(2000);
-    recordingGaps.clear();
+    QMutexLocker locker(&m_statisticsLock);
+    m_timeOfFirstData = QDateTime();
+    m_timeOfFirstDataIsSet.fetchAndStoreRelaxed(0);
+    m_timeOfLatestData = QDateTime();
+    m_timeOfLatestDataCount.fetchAndStoreRelaxed(0);
+    m_timeOfLatestDataPacketInterval.fetchAndStoreRelaxed(2000);
+    m_recordingGaps.clear();
 }
 
 void RecorderBase::FinishRecording(void)
 {
-    if (curRecording)
+    if (m_curRecording)
     {
         if (m_primaryVideoCodec == AV_CODEC_ID_H264)
-            curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
+            m_curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
 
-        RecordingFile *recFile = curRecording->GetRecordingFile();
+        RecordingFile *recFile = m_curRecording->GetRecordingFile();
         if (recFile)
         {
             // Container
@@ -450,7 +442,7 @@ void RecorderBase::FinishRecording(void)
 
             // Video
             recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
-            switch (curRecording->QueryAverageAspectRatio())
+            switch (m_curRecording->QueryAverageAspectRatio())
             {
                 case MARK_ASPECT_1_1 :
                     recFile->m_videoAspectRatio = 1.0;
@@ -468,10 +460,10 @@ void RecorderBase::FinishRecording(void)
                     recFile->m_videoAspectRatio = (double)m_videoAspect / 1000000.0;
                     break;
             }
-            QSize resolution(curRecording->QueryAverageWidth(),
-                            curRecording->QueryAverageHeight());
+            QSize resolution(m_curRecording->QueryAverageWidth(),
+                            m_curRecording->QueryAverageHeight());
             recFile->m_videoResolution = resolution;
-            recFile->m_videoFrameRate = (double)curRecording->QueryAverageFrameRate() / 1000.0;
+            recFile->m_videoFrameRate = (double)m_curRecording->QueryAverageFrameRate() / 1000.0;
 
             // Audio
             recFile->m_audioCodec = ff_codec_id_string(m_primaryAudioCodec);
@@ -483,8 +475,8 @@ void RecorderBase::FinishRecording(void)
 
         SavePositionMap(true, true); // Save Position Map only, not file size
 
-        if (ringBuffer)
-            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+        if (m_ringBuffer)
+            m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, QString("Finished Recording: "
@@ -503,33 +495,33 @@ void RecorderBase::FinishRecording(void)
 RecordingQuality *RecorderBase::GetRecordingQuality(
     const RecordingInfo *r) const
 {
-    QMutexLocker locker(&statisticsLock);
-    if (r && curRecording &&
-        (r->MakeUniqueKey() == curRecording->MakeUniqueKey()))
+    QMutexLocker locker(&m_statisticsLock);
+    if (r && m_curRecording &&
+        (r->MakeUniqueKey() == m_curRecording->MakeUniqueKey()))
     {
-        curRecording->SetDesiredStartTime(r->GetDesiredStartTime());
-        curRecording->SetDesiredEndTime(r->GetDesiredEndTime());
+        m_curRecording->SetDesiredStartTime(r->GetDesiredStartTime());
+        m_curRecording->SetDesiredEndTime(r->GetDesiredEndTime());
     }
     return new RecordingQuality(
-        curRecording, recordingGaps,
-        timeOfFirstData, timeOfLatestData);
+        m_curRecording, m_recordingGaps,
+        m_timeOfFirstData, m_timeOfLatestData);
 }
 
 long long RecorderBase::GetKeyframePosition(long long desired) const
 {
-    QMutexLocker locker(&positionMapLock);
+    QMutexLocker locker(&m_positionMapLock);
     long long ret = -1;
 
-    if (positionMap.empty())
+    if (m_positionMap.empty())
         return ret;
 
     // find closest exact or previous keyframe position...
-    frm_pos_map_t::const_iterator it = positionMap.lowerBound(desired);
-    if (it == positionMap.end())
-        ret = *positionMap.begin();
+    frm_pos_map_t::const_iterator it = m_positionMap.lowerBound(desired);
+    if (it == m_positionMap.end())
+        ret = *m_positionMap.begin();
     else if (it.key() == desired)
         ret = *it;
-    else if (--it != positionMap.end())
+    else if (--it != m_positionMap.end())
         ret = *it;
 
     return ret;
@@ -540,19 +532,19 @@ bool RecorderBase::GetKeyframePositions(
 {
     map.clear();
 
-    QMutexLocker locker(&positionMapLock);
-    if (positionMap.empty())
+    QMutexLocker locker(&m_positionMapLock);
+    if (m_positionMap.empty())
         return true;
 
-    frm_pos_map_t::const_iterator it = positionMap.lowerBound(start);
+    frm_pos_map_t::const_iterator it = m_positionMap.lowerBound(start);
     end = (end < 0) ? INT64_MAX : end;
-    for (; (it != positionMap.end()) &&
+    for (; (it != m_positionMap.end()) &&
              (it.key() <= end); ++it)
         map[it.key()] = *it;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("GetKeyframePositions(%1,%2,#%3) out of %4")
-            .arg(start).arg(end).arg(map.size()).arg(positionMap.size()));
+            .arg(start).arg(end).arg(map.size()).arg(m_positionMap.size()));
 
     return true;
 }
@@ -562,19 +554,19 @@ bool RecorderBase::GetKeyframeDurations(
 {
     map.clear();
 
-    QMutexLocker locker(&positionMapLock);
-    if (durationMap.empty())
+    QMutexLocker locker(&m_positionMapLock);
+    if (m_durationMap.empty())
         return true;
 
-    frm_pos_map_t::const_iterator it = durationMap.lowerBound(start);
+    frm_pos_map_t::const_iterator it = m_durationMap.lowerBound(start);
     end = (end < 0) ? INT64_MAX : end;
-    for (; (it != durationMap.end()) &&
+    for (; (it != m_durationMap.end()) &&
              (it.key() <= end); ++it)
         map[it.key()] = *it;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("GetKeyframeDurations(%1,%2,#%3) out of %4")
-            .arg(start).arg(end).arg(map.size()).arg(durationMap.size()));
+            .arg(start).arg(end).arg(map.size()).arg(m_durationMap.size()));
 
     return true;
 }
@@ -590,62 +582,62 @@ bool RecorderBase::GetKeyframeDurations(
 void RecorderBase::SavePositionMap(bool force, bool finished)
 {
     bool needToSave = force;
-    positionMapLock.lock();
+    m_positionMapLock.lock();
 
-    bool has_delta = !positionMapDelta.empty();
+    bool has_delta = !m_positionMapDelta.empty();
     // set pm_elapsed to a fake large value if the timer hasn't yet started
-    uint pm_elapsed = (positionMapTimer.isRunning()) ?
-        positionMapTimer.elapsed() : ~0;
+    uint pm_elapsed = (m_positionMapTimer.isRunning()) ?
+        m_positionMapTimer.elapsed() : ~0;
     // save on every 1.5 seconds if in the first few frames of a recording
-    needToSave |= (positionMap.size() < 30) &&
+    needToSave |= (m_positionMap.size() < 30) &&
         has_delta && (pm_elapsed >= 1500);
     // save every 10 seconds later on
     needToSave |= has_delta && (pm_elapsed >= 10000);
-    // Assume that durationMapDelta is the same size as
-    // positionMapDelta and implicitly use the same logic about when
-    // to same durationMapDelta.
+    // Assume that m_durationMapDelta is the same size as
+    // m_positionMapDelta and implicitly use the same logic about when
+    // to same m_durationMapDelta.
 
-    if (curRecording && needToSave)
+    if (m_curRecording && needToSave)
     {
-        positionMapTimer.start();
+        m_positionMapTimer.start();
         if (has_delta)
         {
             // copy the delta map because most times we are called it will be in
             // another thread and we don't want to lock the main recorder thread
             // which is populating the delta map
-            frm_pos_map_t deltaCopy(positionMapDelta);
-            positionMapDelta.clear();
-            frm_pos_map_t durationDeltaCopy(durationMapDelta);
-            durationMapDelta.clear();
-            positionMapLock.unlock();
+            frm_pos_map_t deltaCopy(m_positionMapDelta);
+            m_positionMapDelta.clear();
+            frm_pos_map_t durationDeltaCopy(m_durationMapDelta);
+            m_durationMapDelta.clear();
+            m_positionMapLock.unlock();
 
-            curRecording->SavePositionMapDelta(deltaCopy, positionMapType);
-            curRecording->SavePositionMapDelta(durationDeltaCopy,
+            m_curRecording->SavePositionMapDelta(deltaCopy, m_positionMapType);
+            m_curRecording->SavePositionMapDelta(durationDeltaCopy,
                                                MARK_DURATION_MS);
 
             TryWriteProgStartMark(durationDeltaCopy);
         }
         else
         {
-            positionMapLock.unlock();
+            m_positionMapLock.unlock();
         }
 
-        if (ringBuffer && !finished) // Finished Recording will update the final size for us
+        if (m_ringBuffer && !finished) // Finished Recording will update the final size for us
         {
-            curRecording->SaveFilesize(ringBuffer->GetWritePosition());
+            m_curRecording->SaveFilesize(m_ringBuffer->GetWritePosition());
         }
     }
     else
     {
-        positionMapLock.unlock();
+        m_positionMapLock.unlock();
     }
 
     // Make sure a ringbuffer switch is checked at least every 60
     // seconds.  Otherwise, this check is only performed on keyframes,
     // and if there is a problem with the input we may never see one
     // again, resulting in a wedged recording.
-    if (!finished && ringBufferCheckTimer.isRunning() &&
-        ringBufferCheckTimer.elapsed() > 60000)
+    if (!finished && m_ringBufferCheckTimer.isRunning() &&
+        m_ringBufferCheckTimer.elapsed() > 60000)
     {
         LOG(VB_RECORD, LOG_WARNING, LOC + "It has been over 60 seconds "
             "since we've checked for a ringbuffer switch.");
@@ -656,12 +648,12 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
 void RecorderBase::TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy)
 {
     // Note: all log strings contain "progstart mark" for searching.
-    if (estimatedProgStartMS <= 0)
+    if (m_estimatedProgStartMS <= 0)
     {
         // Do nothing because no progstart mark is needed.
         LOG(VB_RECORD, LOG_DEBUG,
             QString("No progstart mark needed because delta=%1")
-            .arg(estimatedProgStartMS));
+            .arg(m_estimatedProgStartMS));
         return;
     }
     frm_pos_map_t::const_iterator last_it = durationDeltaCopy.end();
@@ -671,38 +663,38 @@ void RecorderBase::TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy)
         QString("durationDeltaCopy.begin() = (%1,%2)")
         .arg(durationDeltaCopy.begin().key())
         .arg(durationDeltaCopy.begin().value()));
-    if (estimatedProgStartMS > *last_it)
+    if (m_estimatedProgStartMS > *last_it)
     {
         // Do nothing because we haven't reached recstartts yet.
         LOG(VB_RECORD, LOG_DEBUG,
             QString("No progstart mark yet because estimatedProgStartMS=%1 "
                     "and *last_it=%2")
-            .arg(estimatedProgStartMS).arg(*last_it));
+            .arg(m_estimatedProgStartMS).arg(*last_it));
     }
-    else if (lastSavedDuration <= estimatedProgStartMS &&
-             estimatedProgStartMS < *durationDeltaCopy.begin())
+    else if (m_lastSavedDuration <= m_estimatedProgStartMS &&
+             m_estimatedProgStartMS < *durationDeltaCopy.begin())
     {
         // Set progstart mark @ lastSavedKeyframe
         LOG(VB_RECORD, LOG_DEBUG,
             QString("Set progstart mark=%1 because %2<=%3<%4")
-            .arg(lastSavedKeyframe).arg(lastSavedDuration)
-            .arg(estimatedProgStartMS).arg(*durationDeltaCopy.begin()));
-        bookmarkFrame = lastSavedKeyframe;
+            .arg(m_lastSavedKeyframe).arg(m_lastSavedDuration)
+            .arg(m_estimatedProgStartMS).arg(*durationDeltaCopy.begin()));
+        bookmarkFrame = m_lastSavedKeyframe;
     }
-    else if (*durationDeltaCopy.begin() <= estimatedProgStartMS &&
-             estimatedProgStartMS < *last_it)
+    else if (*durationDeltaCopy.begin() <= m_estimatedProgStartMS &&
+             m_estimatedProgStartMS < *last_it)
     {
         frm_pos_map_t::const_iterator upper_it = durationDeltaCopy.begin();
         for (; upper_it != durationDeltaCopy.end(); ++upper_it)
         {
-            if (*upper_it > estimatedProgStartMS)
+            if (*upper_it > m_estimatedProgStartMS)
             {
                 --upper_it;
                 // Set progstart mark @ upper_it.key()
                 LOG(VB_RECORD, LOG_DEBUG,
                     QString("Set progstart mark=%1 because "
                             "estimatedProgStartMS=%2 and upper_it.value()=%3")
-                    .arg(upper_it.key()).arg(estimatedProgStartMS)
+                    .arg(upper_it.key()).arg(m_estimatedProgStartMS)
                     .arg(upper_it.value()));
                 bookmarkFrame = upper_it.key();
                 break;
@@ -718,14 +710,14 @@ void RecorderBase::TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy)
     {
         frm_dir_map_t progStartMap;
         progStartMap[bookmarkFrame] = MARK_UTIL_PROGSTART;
-        curRecording->SaveMarkupMap(progStartMap, MARK_UTIL_PROGSTART);
+        m_curRecording->SaveMarkupMap(progStartMap, MARK_UTIL_PROGSTART);
     }
-    lastSavedKeyframe = last_it.key();
-    lastSavedDuration = last_it.value();
+    m_lastSavedKeyframe = last_it.key();
+    m_lastSavedDuration = last_it.value();
     LOG(VB_RECORD, LOG_DEBUG,
         QString("Setting lastSavedKeyframe=%1 lastSavedDuration=%2 "
                 "for progstart mark calculations")
-        .arg(lastSavedKeyframe).arg(lastSavedDuration));
+        .arg(m_lastSavedKeyframe).arg(m_lastSavedDuration));
 }
 
 void RecorderBase::AspectChange(uint aspect, long long frame)
@@ -750,10 +742,10 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
 
     // Populate the recordfile table as early as possible, the best
     // value will be determined when the recording completes.
-    if (curRecording && curRecording->GetRecordingFile() &&
-        curRecording->GetRecordingFile()->m_videoAspectRatio == 0.0)
+    if (m_curRecording && m_curRecording->GetRecordingFile() &&
+        m_curRecording->GetRecordingFile()->m_videoAspectRatio == 0.0)
     {
-        RecordingFile *recFile = curRecording->GetRecordingFile();
+        RecordingFile *recFile = m_curRecording->GetRecordingFile();
         switch (m_videoAspect)
         {
             case ASPECT_1_1 :
@@ -775,69 +767,69 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
         recFile->Save();
     }
 
-    if (curRecording)
-        curRecording->SaveAspect(frame, mark, customAspect);
+    if (m_curRecording)
+        m_curRecording->SaveAspect(frame, mark, customAspect);
 }
 
 void RecorderBase::ResolutionChange(uint width, uint height, long long frame)
 {
-    if (curRecording)
+    if (m_curRecording)
     {
         // Populate the recordfile table as early as possible, the best value
         // value will be determined when the recording completes.
-        if (curRecording && curRecording->GetRecordingFile() &&
-            curRecording->GetRecordingFile()->m_videoResolution.isNull())
+        if (m_curRecording && m_curRecording->GetRecordingFile() &&
+            m_curRecording->GetRecordingFile()->m_videoResolution.isNull())
         {
-            curRecording->GetRecordingFile()->m_videoResolution = QSize(width, height);
-            curRecording->GetRecordingFile()->Save();
+            m_curRecording->GetRecordingFile()->m_videoResolution = QSize(width, height);
+            m_curRecording->GetRecordingFile()->Save();
         }
-        curRecording->SaveResolution(frame, width, height);
+        m_curRecording->SaveResolution(frame, width, height);
     }
 }
 
 void RecorderBase::FrameRateChange(uint framerate, long long frame)
 {
-    if (curRecording)
+    if (m_curRecording)
     {
         // Populate the recordfile table as early as possible, the average
         // value will be determined when the recording completes.
-        if (!curRecording->GetRecordingFile()->m_videoFrameRate)
+        if (!m_curRecording->GetRecordingFile()->m_videoFrameRate)
         {
-            curRecording->GetRecordingFile()->m_videoFrameRate = (double)framerate / 1000.0;
-            curRecording->GetRecordingFile()->Save();
+            m_curRecording->GetRecordingFile()->m_videoFrameRate = (double)framerate / 1000.0;
+            m_curRecording->GetRecordingFile()->Save();
         }
-        curRecording->SaveFrameRate(frame, framerate);
+        m_curRecording->SaveFrameRate(frame, framerate);
     }
 }
 
 void RecorderBase::VideoCodecChange(AVCodecID vCodec)
 {
-    if (curRecording && curRecording->GetRecordingFile())
+    if (m_curRecording && m_curRecording->GetRecordingFile())
     {
-        curRecording->GetRecordingFile()->m_videoCodec = ff_codec_id_string(vCodec);
-        curRecording->GetRecordingFile()->Save();
+        m_curRecording->GetRecordingFile()->m_videoCodec = ff_codec_id_string(vCodec);
+        m_curRecording->GetRecordingFile()->Save();
     }
 }
 
 void RecorderBase::AudioCodecChange(AVCodecID aCodec)
 {
-    if (curRecording && curRecording->GetRecordingFile())
+    if (m_curRecording && m_curRecording->GetRecordingFile())
     {
-        curRecording->GetRecordingFile()->m_audioCodec = ff_codec_id_string(aCodec);
-        curRecording->GetRecordingFile()->Save();
+        m_curRecording->GetRecordingFile()->m_audioCodec = ff_codec_id_string(aCodec);
+        m_curRecording->GetRecordingFile()->Save();
     }
 }
 
 void RecorderBase::SetDuration(uint64_t duration)
 {
-    if (curRecording)
-        curRecording->SaveTotalDuration(duration);
+    if (m_curRecording)
+        m_curRecording->SaveTotalDuration(duration);
 }
 
 void RecorderBase::SetTotalFrames(uint64_t total_frames)
 {
-    if (curRecording)
-        curRecording->SaveTotalFrames(total_frames);
+    if (m_curRecording)
+        m_curRecording->SaveTotalFrames(total_frames);
 }
 
 
@@ -883,7 +875,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<HDHRChannel*>(channel))
         {
             recorder = new HDHRRecorder(tvrec, dynamic_cast<HDHRChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_HDHOMERUN
     }
@@ -893,7 +885,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<CetonChannel*>(channel))
         {
             recorder = new CetonRecorder(tvrec, dynamic_cast<CetonChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_CETON
     }
@@ -903,7 +895,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<DVBChannel*>(channel))
         {
             recorder = new DVBRecorder(tvrec, dynamic_cast<DVBChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_DVB
     }
@@ -930,7 +922,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<ASIChannel*>(channel))
         {
             recorder = new ASIRecorder(tvrec, dynamic_cast<ASIChannel*>(channel));
-            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
 #endif // USING_ASI
     }
@@ -951,7 +943,7 @@ RecorderBase *RecorderBase::CreateRecorder(
 #if CONFIG_LIBMP3LAME && defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
-        recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
+        recorder->SetBoolOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L2
     }
     else if (genOpt.inputtype == "EXTERNAL")

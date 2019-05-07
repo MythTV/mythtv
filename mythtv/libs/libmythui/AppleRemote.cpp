@@ -171,16 +171,7 @@ static float GetATVversion()
 }
 
 // protected
-AppleRemote::AppleRemote() : MThread("AppleRemote"),
-                             openInExclusiveMode(true),
-                             hidDeviceInterface(0),
-                             queue(0),
-                             remoteId(0),
-                             _listener(nullptr),
-                             mUsingNewAtv(false),
-                             mLastEvent(AppleRemote::Undefined),
-                             mEventCount(0),
-                             mKeyIsDown(false)
+AppleRemote::AppleRemote() : MThread("AppleRemote")
 {
     if ( GetATVversion() > 2.2 )
     {
@@ -286,7 +277,7 @@ void AppleRemote::_initCookieMap()
 
 static io_object_t _findAppleRemoteDevice(const char *devName)
 {
-    CFMutableDictionaryRef hidMatchDictionary = 0;
+    CFMutableDictionaryRef hidMatchDictionary = nullptr;
     io_iterator_t          hidObjectIterator = 0;
     io_object_t            hidDevice = 0;
     IOReturn               ioReturnValue;
@@ -307,7 +298,7 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
 
     // IOServiceGetMatchingServices consumes a reference to the dictionary,
     // so we don't need to release the dictionary ref.
-    hidMatchDictionary = 0;
+    hidMatchDictionary = nullptr;
     return hidDevice;
 }
 
@@ -335,7 +326,7 @@ bool AppleRemote::_initCookies()
             object  = CFDictionaryGetValue(element,
                                            CFSTR(kIOHIDElementCookieKey));
 
-            if (object == 0 || CFGetTypeID(object) != CFNumberGetTypeID())
+            if (object == nullptr || CFGetTypeID(object) != CFNumberGetTypeID())
                 continue;
 
             if (!CFNumberGetValue((CFNumberRef)object,
@@ -377,7 +368,7 @@ bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
 
         (*plugInInterface)->Release(plugInInterface);
     }
-    return hidDeviceInterface != 0;
+    return hidDeviceInterface != nullptr;
 }
 
 bool AppleRemote::_openDevice()
@@ -544,7 +535,7 @@ void AppleRemote::_handleEventWithCookieString(std::string cookieString,
 // We need to simulate the key up and hold events
 
 void AppleRemote::_handleEventATV23(std::string cookieString,
-                                    SInt32      sumOfValues)
+                                    SInt32      /*sumOfValues*/)
 {
     std::map<std::string,AppleRemote::Event>::iterator ii;
     ii = cookieToButtonMapping.find(cookieString);

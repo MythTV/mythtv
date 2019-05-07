@@ -16,13 +16,13 @@
 
 #include "samplerate.h"
 
-#define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + str)
-#define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + str)
-#define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, LOC + str)
-#define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, LOC + str)
-#define VBWARN(str)    LOG(VB_GENERAL, LOG_WARNING, LOC + str)
-#define VBERRENO(str)  Error(LOC + str + ": " + ENO)
-#define VBERRNOCONST(str)   LOG(VB_GENERAL, LOG_ERR, LOC + str + ": " + ENO)
+#define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + (str))
+#define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + (str))
+#define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, LOC + (str))
+#define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, LOC + (str))
+#define VBWARN(str)    LOG(VB_GENERAL, LOG_WARNING, LOC + (str))
+#define VBERRENO(str)  Error(LOC + (str) + ": " + ENO)
+#define VBERRNOCONST(str)   LOG(VB_GENERAL, LOG_ERR, LOC + (str) + ": " + ENO)
 
 namespace soundtouch {
 class SoundTouch;
@@ -34,13 +34,13 @@ struct AVCodecContext;
 class AsyncLooseLock
 {
 public:
-    AsyncLooseLock() { head = tail = 0; }
-    void Clear() { head = tail = 0; }
-    void Ref() { head++; }
-    bool TestAndDeref() { bool r; if ((r=(head != tail))) tail++; return r; }
+    AsyncLooseLock() = default;
+    void Clear() { m_head = m_tail = 0; }
+    void Ref() { m_head++; }
+    bool TestAndDeref() { bool r; if ((r=(m_head != m_tail))) m_tail++; return r; }
 private:
-    int head;
-    int tail;
+    int m_head {0};
+    int m_tail {0};
 };
 
 // Forward declaration of SPDIF encoder
@@ -51,75 +51,77 @@ class AudioOutputBase : public AudioOutput, public MThread
  public:
     const char *quality_string(int q);
     explicit AudioOutputBase(const AudioSettings &settings);
-    virtual ~AudioOutputBase();
+    ~AudioOutputBase() override;
 
-    AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
-    AudioOutputSettings* GetOutputSettingsUsers(bool digital = false);
+    AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true) override; // AudioOutput
+    AudioOutputSettings* GetOutputSettingsUsers(bool digital = false) override; // AudioOutput
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(const AudioSettings &settings);
+    void Reconfigure(const AudioSettings &settings) override; // AudioOutput
 
     // dsprate is in 100 * samples/second
-    virtual void SetEffDsp(int dsprate);
+    void SetEffDsp(int dsprate) override; // AudioOutput
 
     // timestretch
-    virtual void SetStretchFactor(float factor);
-    virtual float GetStretchFactor(void) const;
-    virtual int GetChannels(void) const { return channels; }
-    virtual AudioFormat GetFormat(void) const { return format; };
-    virtual int GetBytesPerFrame(void) const { return source_bytes_per_frame; };
+    void SetStretchFactor(float factor) override; // AudioOutput
+    float GetStretchFactor(void) const override; // AudioOutput
+    int GetChannels(void) const override { return m_channels; } // AudioOutput
+    AudioFormat GetFormat(void) const override { return m_format; }; // AudioOutput
+    int GetBytesPerFrame(void) const override // AudioOutput
+        { return m_source_bytes_per_frame; }
 
-    virtual bool CanPassthrough(int samplerate, int channels,
-                                int codec, int profile) const;
-    virtual bool CanDownmix(void) const { return true; };
-    virtual bool IsUpmixing(void);
-    virtual bool ToggleUpmix(void);
-    virtual bool CanUpmix(void);
-    virtual bool CanProcess(AudioFormat /*fmt*/) { return true; }
-    virtual uint32_t CanProcess(void)
+    bool CanPassthrough(int samplerate, int channels,
+                        AVCodecID codec, int profile) const override; // AudioOutput
+    bool CanDownmix(void) const override { return true; } // AudioOutput
+    bool IsUpmixing(void) override; // AudioOutput
+    bool ToggleUpmix(void) override; // AudioOutput
+    bool CanUpmix(void) override; // AudioOutput
+    bool CanProcess(AudioFormat /*fmt*/) override { return true; } // AudioOutput
+    uint32_t CanProcess(void) override // AudioOutput
     {
         // we support all codec
         return ~(((~0ULL) >> FORMAT_FLT) << FORMAT_FLT);
     }
 
-    virtual void Reset(void);
+    void Reset(void) override; // AudioOutput
 
-    void SetSWVolume(int new_volume, bool save);
-    int GetSWVolume(void);
+    void SetSWVolume(int new_volume, bool save) override; // VolumeBase
+    int GetSWVolume(void) override; // VolumeBase
 
     // timecode is in milliseconds.
-    virtual bool AddFrames(void *buffer, int frames, int64_t timecode);
-    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames);
-    virtual bool NeedDecodingBeforePassthrough() const { return false; };
-    virtual int64_t LengthLastData(void) const { return m_length_last_data; }
+    bool AddFrames(void *buffer, int frames, int64_t timecode) override; // AudioOutput
+    bool AddData(void *buffer, int len, int64_t timecode, int frames) override; // AudioOutput
+    bool NeedDecodingBeforePassthrough() const override { return false; }; // AudioOutput
+    int64_t LengthLastData(void) const override { return m_length_last_data; } // AudioOutput
 
-    virtual void SetTimecode(int64_t timecode);
-    virtual bool IsPaused(void) const { return actually_paused; }
-    virtual void Pause(bool paused);
-    void PauseUntilBuffered(void);
+    void SetTimecode(int64_t timecode) override; // AudioOutput
+    bool IsPaused(void) const override { return m_actually_paused; } // AudioOutput
+    void Pause(bool paused) override; // AudioOutput
+    void PauseUntilBuffered(void) override; // AudioOutput
 
     // Wait for all data to finish playing
-    virtual void Drain(void);
+    void Drain(void) override; // AudioOutput
 
-    virtual int64_t GetAudiotime(void);
-    virtual int64_t GetAudioBufferedTime(void);
+    int64_t GetAudiotime(void) override; // AudioOutput
+    int64_t GetAudioBufferedTime(void) override; // AudioOutput
 
     // Send output events showing current progress
     virtual void Status(void);
 
-    virtual void SetSourceBitrate(int rate);
+    void SetSourceBitrate(int rate) override; // AudioOutput
 
-    virtual void GetBufferStatus(uint &fill, uint &total);
+    void GetBufferStatus(uint &fill, uint &total) override; // AudioOutput
 
     //  Only really used by the AudioOutputNULL object
-    virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
-    virtual int readOutputData(unsigned char *read_buffer, int max_length);
+    void bufferOutputData(bool y) override // AudioOutput
+        { m_buffer_output_data_for_use = y; }
+    int readOutputData(unsigned char *read_buffer, int max_length) override; // AudioOutput
 
     static const uint kAudioSRCInputSize = 16384;
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
     // In other words, divisible by 96.
-    static const uint kAudioRingBufferSize   = 10239936u;
+    static const uint kAudioRingBufferSize   = 10239936U;
 
  protected:
     // Following function must be called from subclass constructor
@@ -128,7 +130,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     // You need to implement the following functions
     virtual bool OpenDevice(void) = 0;
     virtual void CloseDevice(void) = 0;
-    virtual void WriteAudio(uchar *aubuf, int size) = 0;
+    virtual void WriteAudio(unsigned char *aubuf, int size) = 0;
     /**
      * Return the size in bytes of frames currently in the audio buffer adjusted
      * with the audio playback latency
@@ -144,12 +146,12 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
-    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer,
+    int GetAudioData(uchar *buffer, int buf_size, bool full_buffer,
                      volatile uint *local_raud = nullptr);
 
     void OutputAudioLoop(void);
 
-    virtual void run();
+    void run() override; // MThread
 
     int CheckFreeSpace(int &frames);
 
@@ -160,39 +162,45 @@ class AudioOutputBase : public AudioOutput, public MThread
     void SetStretchFactorLocked(float factor);
 
     // For audiooutputca
-    int GetBaseAudBufTimeCode() const { return audbuf_timecode; }
+    int GetBaseAudBufTimeCode() const { return m_audbuf_timecode; }
 
   protected:
     // Basic details about the audio stream
-    int channels;
-    int codec;
-    int bytes_per_frame;
-    int output_bytes_per_frame;
-    AudioFormat format;
-    AudioFormat output_format;
-    int samplerate;
-    //int bitrate;
-    int effdsp; // from the recorded stream (NuppelVideo)
-    int fragment_size;
-    long soundcard_buffer_size;
+    int               m_channels                   {-1};
+    AVCodecID         m_codec                      {AV_CODEC_ID_NONE};
+    int               m_bytes_per_frame            {0};
+    int               m_output_bytes_per_frame     {0};
+    AudioFormat       m_format                     {FORMAT_NONE};
+    AudioFormat       m_output_format              {FORMAT_NONE};
+    int               m_samplerate                 {-1};
+    //int             m_bitrate;
+    int               m_effdsp                     {0}; // from the recorded stream (NuppelVideo)
+    int               m_fragment_size              {0};
+    long              m_soundcard_buffer_size      {0};
 
-    QString main_device, passthru_device;
-    bool    m_discretedigital;
+    QString           m_main_device;
+    QString           m_passthru_device;
+    bool              m_discretedigital            {false};
 
-    bool passthru, enc, reenc;
+    bool              m_passthru                   {false};
+    bool              m_enc                        {false};
+    bool              m_reenc                      {false};
 
-    float stretchfactor;
-    int  eff_stretchfactor;     // scaled to 100000 as effdsp is
+    float             m_stretchfactor              {1.0F};
+    int               m_eff_stretchfactor          {100000}; // scaled to 100000 ase ffdsp is
     AudioOutputSource source;
 
-    bool killaudio;
+    bool              m_killaudio                  {false};
 
-    bool pauseaudio, actually_paused, was_paused, unpause_when_ready;
-    bool set_initial_vol;
-    bool buffer_output_data_for_use; //  used by AudioOutputNULL
+    bool              m_pauseaudio                 {false};
+    bool              m_actually_paused            {false};
+    bool              m_was_paused                 {false};
+    bool              m_unpause_when_ready         {false};
+    bool              m_set_initial_vol;
+    bool              m_buffer_output_data_for_use {false}; //  used by AudioOutputNULL
 
-    int configured_channels;
-    int max_channels;
+    int               m_configured_channels        {0};
+    int               m_max_channels               {0};
     enum
     {
         QUALITY_DISABLED = -1,
@@ -200,97 +208,98 @@ class AudioOutputBase : public AudioOutput, public MThread
         QUALITY_MEDIUM   =  1,
         QUALITY_HIGH     =  2,
     };
-    int src_quality;
-    long source_bitrate;
-    int source_samplerate;
+    int  m_src_quality                             {QUALITY_MEDIUM};
+    long m_source_bitrate                          {-1};
+    int  m_source_samplerate                       {0};
 
  private:
-    bool SetupPassthrough(int codec, int codec_profile,
+    bool SetupPassthrough(AVCodecID codec, int codec_profile,
                           int &samplerate_tmp, int &channels_tmp);
     AudioOutputSettings* OutputSettings(bool digital = true);
     int CopyWithUpmix(char *buffer, int frames, uint &org_waud);
     void SetAudiotime(int frames, int64_t timecode);
-    AudioOutputSettings *output_settingsraw;
-    AudioOutputSettings *output_settings;
-    AudioOutputSettings *output_settingsdigitalraw;
-    AudioOutputSettings *output_settingsdigital;
-    bool need_resampler;
-    SRC_STATE *src_ctx;
-    soundtouch::SoundTouch    *pSoundStretch;
-    AudioOutputDigitalEncoder *encoder;
-    FreeSurround              *upmixer;
+    AudioOutputSettings       *m_output_settingsraw        {nullptr};
+    AudioOutputSettings       *m_output_settings           {nullptr};
+    AudioOutputSettings       *m_output_settingsdigitalraw {nullptr};
+    AudioOutputSettings       *m_output_settingsdigital    {nullptr};
+    bool                       m_need_resampler            {false};
+    SRC_STATE                 *m_src_ctx                   {nullptr};
+    soundtouch::SoundTouch    *m_pSoundStretch             {nullptr};
+    AudioOutputDigitalEncoder *m_encoder                   {nullptr};
+    FreeSurround              *m_upmixer                   {nullptr};
 
-    int source_channels;
-    int source_bytes_per_frame;
-    bool upmix_default;
-    bool needs_upmix;
-    bool needs_downmix;
-    int surround_mode;
-    float old_stretchfactor;
-    int volume;
-    QString volumeControl;
+    int               m_source_channels           {-1};
+    int               m_source_bytes_per_frame    {0};
+    bool              m_upmix_default             {false};
+    bool              m_needs_upmix               {false};
+    bool              m_needs_downmix             {false};
+    int               m_surround_mode             {QUALITY_LOW};
+    float             m_old_stretchfactor         {1.0F};
+    int               m_volume                    {80};
+    QString           m_volumeControl;
 
-    bool processing;
+    bool              m_processing                {false};
 
-    int64_t frames_buffered;
+    int64_t           m_frames_buffered           {0};
 
-    bool audio_thread_exists;
+    bool              m_audio_thread_exists       {false};
 
     /**
      *  Writes to the audiobuffer, reconfigures and audiobuffer resets can only
      *  take place while holding this lock
      */
-    QMutex audio_buflock;
+    QMutex            m_audio_buflock;
 
     /**
      *  must hold avsync_lock to read or write 'audiotime' and
      *  'audiotime_updated'
      */
-    QMutex avsync_lock;
+    QMutex            m_avsync_lock;
 
     /**
      * timecode of audio leaving the soundcard (same units as timecodes)
      */
-    int64_t audiotime;
+    int64_t           m_audiotime                         {0};
 
     /**
      * Audio circular buffer
      */
-    volatile uint raud, waud;     // read and write positions
+    volatile uint     m_raud                              {0}; // read position
+    volatile uint     m_waud                              {0}; // write position
     /**
      * timecode of audio most recently placed into buffer
      */
-    int64_t audbuf_timecode;
-    AsyncLooseLock reset_active;
+    int64_t           m_audbuf_timecode                   {0};
+    AsyncLooseLock    m_reset_active;
 
-    QMutex killAudioLock;
+    QMutex            m_killAudioLock                     {QMutex::NonRecursive};
 
-    long current_seconds;
+    long              m_current_seconds                   {-1};
 
-    float *src_in;
+    float            *m_src_in;
 
     // All actual buffers
-    SRC_DATA src_data;
-    uint memory_corruption_test0;
-    float src_in_buf[kAudioSRCInputSize + 16];
-    uint memory_corruption_test1;
-    float *src_out;
-    int kAudioSRCOutputSize;
-    uint memory_corruption_test2;
+    SRC_DATA          m_src_data;
+    uint              m_memory_corruption_test0           {0xdeadbeef};
+    float             m_src_in_buf[kAudioSRCInputSize + 16];
+    uint              m_memory_corruption_test1           {0xdeadbeef};;
+    float            *m_src_out                           {nullptr};
+    int               m_kAudioSRCOutputSize               {0};
+    uint              m_memory_corruption_test2           {0xdeadbeef};;
     /**
      * main audio buffer
      */
-    uchar audiobuffer[kAudioRingBufferSize];
-    uint memory_corruption_test3;
-    uint m_configure_succeeded;
-    int64_t m_length_last_data;
+    uchar             m_audiobuffer[kAudioRingBufferSize];
+    uint              m_memory_corruption_test3           {0xdeadbeef};;
+    bool              m_configure_succeeded               {false};
+    int64_t           m_length_last_data                  {0};
 
     // SPDIF Encoder for digital passthrough
-    SPDIFEncoder     *m_spdifenc;
+    SPDIFEncoder     *m_spdifenc                          {nullptr};
 
     // Flag indicating if SetStretchFactor enabled audio float processing
-    bool m_forcedprocessing;
-    int m_previousbpf;
+    bool              m_forcedprocessing                  {false};
+    int               m_previousbpf                       {0};
 };
 
 #endif

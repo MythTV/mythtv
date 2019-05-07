@@ -50,7 +50,7 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
     void newConnection(qt_socket_fd_t socket);
 
   protected:
-    virtual void incomingConnection(qt_socket_fd_t socket);
+    void incomingConnection(qt_socket_fd_t socket) override; // QTcpServer
 
   private:
     PoolServerType m_serverType;
@@ -61,7 +61,8 @@ class MBASE_PUBLIC ServerPool : public QObject
     Q_OBJECT
 
   public:
-    explicit ServerPool(QObject *parent=nullptr);
+    explicit ServerPool(QObject *parent=nullptr)
+        : QObject(parent) {}
    ~ServerPool(void);
 
     static void RefreshDefaultListen(void);
@@ -117,14 +118,14 @@ class MBASE_PUBLIC ServerPool : public QObject
   private:
     static void SelectDefaultListen(bool force=false);
 
-    bool            m_listening;
-    int             m_maxPendingConn;
-    quint16         m_port;
-    QNetworkProxy   m_proxy;
+    bool            m_listening             {false};
+    int             m_maxPendingConn        {30};
+    quint16         m_port                  {0};
+    QNetworkProxy   m_proxy                 {QNetworkProxy::NoProxy};
 
     QList<PrivTcpServer*>   m_tcpServers;
     QList<PrivUdpSocket*>   m_udpSockets;
-    PrivUdpSocket          *m_lastUdpSocket;
+    PrivUdpSocket          *m_lastUdpSocket {nullptr};
 };
 
 #endif

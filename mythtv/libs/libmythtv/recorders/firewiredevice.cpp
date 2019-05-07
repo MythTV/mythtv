@@ -29,10 +29,7 @@ QMutex                 FirewireDevice::s_static_lock;
 
 FirewireDevice::FirewireDevice(uint64_t guid, uint subunitid, uint speed) :
     m_guid(guid),           m_subunitid(subunitid),
-    m_speed(speed),
-    m_last_channel(0),      m_last_crc(0),
-    m_buffer_cleared(true), m_open_port_cnt(0),
-    m_lock()
+    m_speed(speed)
 {
 }
 
@@ -364,8 +361,6 @@ QString FirewireDevice::GetModelName(uint vendor_id, uint model_id)
 
     if (ret.isEmpty())
         return "MOTO GENERIC";
-
-    ret.detach();
     return ret;
 }
 

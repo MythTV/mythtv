@@ -116,7 +116,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             details->callsign =  e.attribute("callsign");
             return true;
         }
-        else if (type == "video")
+        if (type == "video")
         {
             QDomNodeList nodeList = e.elementsByTagName("videometadata");
             if (nodeList.count() < 1)
@@ -164,12 +164,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
 ////////////////////////////////////////////////////////////////
 
 ArchiveFileSelector::ArchiveFileSelector(MythScreenStack *parent) :
-    FileSelector(parent, nullptr, FSTYPE_FILE, "", "*.xml"),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_progTitle(nullptr),
-    m_progSubtitle(nullptr),
-    m_progStartTime(nullptr)
+    FileSelector(parent, nullptr, FSTYPE_FILE, "", "*.xml")
 {
     m_curDirectory = gCoreContext->GetSetting("MythNativeLoadFilename", "/");
 }
@@ -290,39 +285,6 @@ void ArchiveFileSelector::cancelPressed()
 }
 
 ////////////////////////////////////////////////////////////////
-
-ImportNative::ImportNative(
-    MythScreenStack *parent, MythScreenType *previousScreen,
-    const QString &xmlFile, FileDetails details) :
-    MythScreenType(parent, "ImportNative"),
-    m_xmlFile(xmlFile),
-    m_details(details),
-    m_previousScreen(previousScreen),
-    m_progTitle_text(nullptr),
-    m_progDateTime_text(nullptr),
-    m_progDescription_text(nullptr),
-    m_chanID_text(nullptr),
-    m_chanNo_text(nullptr),
-    m_chanName_text(nullptr),
-    m_callsign_text(nullptr),
-    m_localChanID_text(nullptr),
-    m_localChanNo_text(nullptr),
-    m_localChanName_text(nullptr),
-    m_localCallsign_text(nullptr),
-    m_searchChanID_button(nullptr),
-    m_searchChanNo_button(nullptr),
-    m_searchChanName_button(nullptr),
-    m_searchCallsign_button(nullptr),
-    m_finishButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr),
-    m_isValidXMLSelected(false)
-{
-}
-
-ImportNative::~ImportNative()
-{
-}
 
 bool ImportNative::Create(void)
 {
@@ -587,7 +549,7 @@ void ImportNative::searchChanID()
     showList(tr("Select a channel id"), s, SLOT(gotChanID(QString)));
 }
 
-void ImportNative::gotChanID(QString value)
+void ImportNative::gotChanID(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "
@@ -613,7 +575,7 @@ void ImportNative::searchChanNo()
     showList(tr("Select a channel number"), s, SLOT(gotChanNo(QString)));
 }
 
-void ImportNative::gotChanNo(QString value)
+void ImportNative::gotChanNo(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "
@@ -639,7 +601,7 @@ void ImportNative::searchName()
     showList(tr("Select a channel name"), s, SLOT(gotName(QString)));
 }
 
-void ImportNative::gotName(QString value)
+void ImportNative::gotName(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "
@@ -665,7 +627,7 @@ void ImportNative::searchCallsign()
     showList(tr("Select a Callsign"), s, SLOT(gotCallsign(QString)));
 }
 
-void ImportNative::gotCallsign(QString value)
+void ImportNative::gotCallsign(const QString& value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign "

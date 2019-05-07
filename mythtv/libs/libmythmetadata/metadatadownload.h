@@ -12,10 +12,10 @@ class META_PUBLIC MetadataLookupEvent : public QEvent
 {
   public:
     explicit MetadataLookupEvent(MetadataLookupList lul) : QEvent(kEventType),
-                                            lookupList(lul) {}
+                                            m_lookupList(lul) {}
     ~MetadataLookupEvent() = default;
 
-    MetadataLookupList lookupList;
+    MetadataLookupList m_lookupList;
 
     static Type kEventType;
 };
@@ -24,10 +24,10 @@ class META_PUBLIC MetadataLookupFailure : public QEvent
 {
   public:
     explicit MetadataLookupFailure(MetadataLookupList lul) : QEvent(kEventType),
-                                            lookupList(lul) {}
+                                            m_lookupList(lul) {}
     ~MetadataLookupFailure() = default;
 
-    MetadataLookupList lookupList;
+    MetadataLookupList m_lookupList;
 
     static Type kEventType;
 };
@@ -36,7 +36,8 @@ class META_PUBLIC MetadataDownload : public MThread
 {
   public:
 
-    explicit MetadataDownload(QObject *parent);
+    explicit MetadataDownload(QObject *parent)
+        : MThread("MetadataDownload"), m_parent(parent) {}
     ~MetadataDownload();
 
     void addLookup(MetadataLookup *lookup);
@@ -53,10 +54,10 @@ class META_PUBLIC MetadataDownload : public MThread
 
   protected:
 
-    void run();
+    void run() override; // MThread
 
-    QString getMXMLPath(QString filename);
-    QString getNFOPath(QString filename);
+    QString getMXMLPath(const QString& filename);
+    QString getNFOPath(const QString& filename);
 
   private:
     // Video handling
@@ -72,18 +73,17 @@ class META_PUBLIC MetadataDownload : public MThread
                                       bool withArt) const;
     MetadataLookup*     findBestMatch(MetadataLookupList list,
                                       const QString &originaltitle) const;
-    MetadataLookupList  runGrabber(QString cmd, QStringList args,
+    MetadataLookupList  runGrabber(const QString& cmd, const QStringList& args,
                                    MetadataLookup* lookup,
                                    bool passseas = true);
-    MetadataLookupList  readMXML(QString MXMLpath,
+    MetadataLookupList  readMXML(const QString& MXMLpath,
                                  MetadataLookup* lookup,
                                  bool passseas = true);
-    MetadataLookupList  readNFO(QString NFOpath, MetadataLookup* lookup);
+    MetadataLookupList  readNFO(const QString& NFOpath, MetadataLookup* lookup);
 
-    QObject            *m_parent;
+    QObject            *m_parent {nullptr};
     MetadataLookupList  m_lookupList;
     QMutex              m_mutex;
-
 };
 
 #endif /* METADATADOWNLOAD_H */

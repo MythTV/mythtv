@@ -31,27 +31,30 @@ class IPTVChannel : QObject, public DTVChannel
     ~IPTVChannel();
 
     // Commands
-    virtual bool Open(void);
+    bool Open(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    virtual bool Tune(const IPTVTuningData&, bool scanning);
-    virtual bool Tune(const DTVMultiplex&) { return false; }
+    bool Tune(const IPTVTuningData&, bool scanning) override ; // DTVChannel
+    bool Tune(const DTVMultiplex&) override // DTVChannel
+        { return false; }
 
     // Sets
     void SetStreamData(MPEGStreamData*);
 
     // Gets
-    bool IsOpen(void) const;
-    virtual QString GetDevice(void) const
+    bool IsOpen(void) const override; // ChannelBase
+    QString GetDevice(void) const override // ChannelBase
         { return m_last_tuning.GetDeviceKey(); }
     IPTVStreamHandler *GetStreamHandler(void) const { return m_stream_handler; }
-    virtual bool IsIPTV(void) const { return true; } // DTVChannel
-    virtual bool IsPIDTuningSupported(void) const { return true; }
+    bool IsIPTV(void) const override { return true; } // DTVChannel
+    bool IsPIDTuningSupported(void) const  override // DTVChannel
+        { return true; }
 
   protected:
-    virtual void Close(void);
-    bool EnterPowerSavingMode(void);
-    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+    void Close(void) override; // ChannelBase
+    bool EnterPowerSavingMode(void) override; // DTVChannel
+    bool IsExternalChannelChangeSupported(void) override // ChannelBase
+        { return true; }
 
   private:
     void OpenStreamHandler(void);
@@ -59,11 +62,11 @@ class IPTVChannel : QObject, public DTVChannel
 
   private:
     mutable QMutex     m_tune_lock;
-    volatile bool      m_firsttune;
+    volatile bool      m_firsttune      {true};
     IPTVTuningData     m_last_tuning;
     mutable QMutex     m_stream_lock;
-    IPTVStreamHandler *m_stream_handler;
-    MPEGStreamData    *m_stream_data;
+    IPTVStreamHandler *m_stream_handler {nullptr};
+    MPEGStreamData    *m_stream_data    {nullptr};
     QString            m_videodev;
 };
 

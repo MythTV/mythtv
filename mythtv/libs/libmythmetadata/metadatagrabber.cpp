@@ -1,10 +1,11 @@
 // Qt headers
-#include <QMap>
-#include <QDir>
-#include <QMutex>
-#include <QRegExp>
 #include <QDateTime>
+#include <QDir>
+#include <QMap>
+#include <QMutex>
 #include <QMutexLocker>
+#include <QRegExp>
+#include <utility>
 
 // MythTV headers
 #include "metadatagrabber.h"
@@ -43,9 +44,9 @@ static GrabberOpts GrabberOptsMaker(QString thepath, QString thesetting, QString
 {
     GrabberOpts opts;
 
-    opts.path = thepath;
-    opts.setting = thesetting;
-    opts.def = thedefault;
+    opts.path = std::move(thepath);
+    opts.setting = std::move(thesetting);
+    opts.def = std::move(thedefault);
 
     return opts;
 }
@@ -308,30 +309,19 @@ QString MetaGrabberScript::CleanedInetref(const QString &inetref)
     return inetref;
 }
 
-MetaGrabberScript::MetaGrabberScript(void) :
-    m_name(""), m_author(""), m_thumbnail(""), m_fullcommand(""), m_command(""),
-    m_type(kGrabberInvalid), m_typestring(""), m_description(""), m_accepts(),
-    m_version(0.0), m_valid(false)
-{
-}
-
 MetaGrabberScript::MetaGrabberScript(const QString &path,
                                      const QDomElement &dom) :
-    m_valid(false)
+    m_fullcommand(path)
 {
-    m_fullcommand = path;
     ParseGrabberVersion(dom);
 }
 
-MetaGrabberScript::MetaGrabberScript(const QDomElement &dom) :
-    m_valid(false)
+MetaGrabberScript::MetaGrabberScript(const QDomElement &dom)
 {
     ParseGrabberVersion(dom);
-    
 }
 
-MetaGrabberScript::MetaGrabberScript(const QString &path) :
-    m_type(kGrabberInvalid), m_version(0.0), m_valid(false)
+MetaGrabberScript::MetaGrabberScript(const QString &path)
 {
     if (path.isEmpty())
         return;
@@ -422,10 +412,7 @@ bool MetaGrabberScript::Test(void)
     MythSystemLegacy grabber(m_fullcommand, args, kMSStdOut);
 
     grabber.Run();
-    if (grabber.Wait() != GENERIC_EXIT_OK)
-        return false;
-
-    return true;
+    return grabber.Wait() == GENERIC_EXIT_OK;
 }
 
 // TODO

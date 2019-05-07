@@ -34,8 +34,8 @@ class META_PUBLIC VideoScanner : public QObject
     void finishedScan();
 
   private:
-    class VideoScannerThread *m_scanThread;
-    bool                      m_cancel;
+    class VideoScannerThread *m_scanThread {nullptr};
+    bool                      m_cancel     {false};
 };
 
 class META_PUBLIC VideoScanChanges : public QEvent
@@ -43,13 +43,13 @@ class META_PUBLIC VideoScanChanges : public QEvent
   public:
     VideoScanChanges(QList<int> adds, QList<int> movs,
                      QList<int>dels) : QEvent(kEventType),
-                     additions(adds), moved(movs),
-                     deleted(dels) {}
+                     m_additions(adds), m_moved(movs),
+                     m_deleted(dels) {}
     ~VideoScanChanges() = default;
 
-    QList<int> additions; // newly added intids
-    QList<int> moved; // intids moved to new filename
-    QList<int> deleted; // orphaned/deleted intids
+    QList<int> m_additions; // newly added intids
+    QList<int> m_moved; // intids moved to new filename
+    QList<int> m_deleted; // orphaned/deleted intids
 
     static Type kEventType;
 };
@@ -62,7 +62,7 @@ class META_PUBLIC VideoScannerThread : public MThread
     explicit VideoScannerThread(QObject *parent);
     ~VideoScannerThread();
 
-    void run();
+    void run() override; // MThread
     void SetDirs(QStringList dirs);
     void SetHosts(const QStringList &hosts);
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
@@ -93,23 +93,23 @@ class META_PUBLIC VideoScannerThread : public MThread
     void SendProgressEvent(uint progress, uint total = 0,
             QString messsage = QString());
 
-    QObject *m_parent;
+    QObject *m_parent    {nullptr};
 
-    bool m_ListUnknown;
-    bool m_RemoveAll;
-    bool m_KeepAll;
-    bool m_HasGUI;
+    bool m_ListUnknown   {false};
+    bool m_RemoveAll     {false};
+    bool m_KeepAll       {false};
+    bool m_HasGUI        {false};
     QStringList m_directories;
     QStringList m_liveSGHosts;
     QStringList m_offlineSGHosts;
 
-    VideoMetadataListManager *m_dbmetadata;
-    MythUIProgressDialog *m_dialog;
+    VideoMetadataListManager *m_dbmetadata {nullptr};
+    MythUIProgressDialog     *m_dialog     {nullptr};
 
     QList<int> m_addList; // newly added intids
     QList<int> m_movList; // intids moved to new filename
     QList<int> m_delList; // orphaned/deleted intids
-    bool m_DBDataChanged;
+    bool m_DBDataChanged {false};
 };
 
 #endif

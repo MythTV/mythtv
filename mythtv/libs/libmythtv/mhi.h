@@ -58,7 +58,7 @@ class MHIContext : public MHContext, public QRunnable
     void Restart(int chanid, int sourceid, bool isLive);
     // Offer a key press.  Returns true if it accepts it.
     // This will depend on the current profile.
-    bool OfferKey(QString key);
+    bool OfferKey(const QString& key);
     /// Update the display
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
@@ -72,78 +72,80 @@ class MHIContext : public MHContext, public QRunnable
     // so a call to GetCarouselData will not block and will return the data.
     // Returns false if the object is not currently present because it has not
     // yet appeared and also if it is not present in the containing directory.
-    virtual bool CheckCarouselObject(QString objectPath);
+    bool CheckCarouselObject(QString objectPath) override; // MHContext
 
     // Get an object from the carousel.  Returns true and sets the data if
     // it was able to retrieve the named object.  Blocks if the object seems
     // to be present but has not yet appeared.  Returns false if the object
     // cannot be retrieved.
-    virtual bool GetCarouselData(QString objectPath, QByteArray &result);
+    bool GetCarouselData(QString objectPath, QByteArray &result) override; // MHContext
 
     // Set the input register.  This sets the keys that are to be handled
     // by MHEG.  Flushes the key queue.
-    virtual void SetInputRegister(int nReg);
+    void SetInputRegister(int num) override; // MHContext
 
     /// An area of the screen/image needs to be redrawn.
-    virtual void RequireRedraw(const QRegion &region);
+    void RequireRedraw(const QRegion &region) override; // MHContext
 
     /// Check whether we have requested a stop.
-    virtual bool CheckStop(void) { return m_stop; }
+    bool CheckStop(void) override // MHContext
+        { return m_stop; }
 
     /// Get the initial component tags.
     void GetInitialStreams(int &audioTag, int &videoTag);
 
     /// Creation functions for various visibles.
-    virtual MHDLADisplay *CreateDynamicLineArt(
-        bool isBoxed, MHRgba lineColour, MHRgba fillColour);
-    virtual MHTextDisplay *CreateText(void);
-    virtual MHBitmapDisplay *CreateBitmap(bool tiling);
+    MHDLADisplay *CreateDynamicLineArt(
+        bool isBoxed, MHRgba lineColour, MHRgba fillColour) override; // MHContext
+    MHTextDisplay *CreateText(void) override; // MHContext
+    MHBitmapDisplay *CreateBitmap(bool tiled) override; // MHContext
     /// Additional drawing functions.
-    virtual void DrawRect(int xPos, int yPos, int width, int height,
-                          MHRgba colour);
-    virtual void DrawBackground(const QRegion &reg);
-    virtual void DrawVideo(const QRect &videoRect, const QRect &displayRect);
+    void DrawRect(int xPos, int yPos, int width, int height,
+                  MHRgba colour) override; // MHContext
+    void DrawBackground(const QRegion &reg) override; // MHContext
+    void DrawVideo(const QRect &videoRect, const QRect &dispRect) override; // MHContext
 
     void DrawImage(int x, int y, const QRect &rect, const QImage &image,
         bool bScaled = false, bool bUnder = false);
 
-    virtual int GetChannelIndex(const QString &str);
+    int GetChannelIndex(const QString &str) override; // MHContext
     /// Get netId etc from the channel index.
-    virtual bool GetServiceInfo(int channelId, int &netId, int &origNetId,
-                                int &transportId, int &serviceId);
-    virtual bool TuneTo(int channel, int tuneinfo);
+    bool GetServiceInfo(int channelId, int &netId, int &origNetId,
+                        int &transportId, int &serviceId) override; // MHContext
+    bool TuneTo(int channel, int tuneinfo) override; // MHContext
 
     /// Begin playing the specified stream
-    virtual bool BeginStream(const QString &str, MHStream* notify);
-    virtual void EndStream();
+    bool BeginStream(const QString &str, MHStream* notify) override; // MHContext
+    void EndStream() override; // MHContext
     // Called when the stream starts or stops
     bool StreamStarted(bool bStarted = true);
     /// Begin playing audio
-    virtual bool BeginAudio(int tag);
+    bool BeginAudio(int tag) override; // MHContext
     /// Stop playing audio
-    virtual void StopAudio();
+    void StopAudio() override; // MHContext
     /// Begin displaying video
-    virtual bool BeginVideo(int tag);
+    bool BeginVideo(int tag) override; // MHContext
     /// Stop displaying video
-    virtual void StopVideo();
+    void StopVideo() override; // MHContext
     // Get current stream position, -1 if unknown
-    virtual long GetStreamPos();
+    long GetStreamPos() override; // MHContext
     // Get current stream size, -1 if unknown
-    virtual long GetStreamMaxPos();
+    long GetStreamMaxPos() override; // MHContext
     // Set current stream position
-    virtual long SetStreamPos(long);
+    long SetStreamPos(long) override; // MHContext
     // Play or pause a stream
-    virtual void StreamPlay(bool);
+    void StreamPlay(bool) override; // MHContext
 
     // Get the context id strings.  The format of these strings is specified
     // by the UK MHEG profile.
-    virtual const char *GetReceiverId(void)
+    const char *GetReceiverId(void) override // MHContext
         { return "MYT001001"; } // Version number?
-    virtual const char *GetDSMCCId(void)
+    const char *GetDSMCCId(void) override // MHContext
         { return "DSMMYT001"; } // DSMCC version.
 
     // InteractionChannel
-    virtual int GetICStatus(); // 0= Active, 1= Inactive, 2= Disabled
+    // 0= Active, 1= Inactive, 2= Disabled
+    int GetICStatus() override; // MHContext
 
     // Operations used by the display classes
     // Add an item to the display vector
@@ -157,14 +159,14 @@ class MHIContext : public MHContext, public QRunnable
 
     FT_Face GetFontFace(void) { return m_face; }
     bool IsFaceLoaded(void) { return m_face_loaded; }
-    bool LoadFont(QString name);
+    bool LoadFont(const QString& name);
     bool ImageUpdated(void) { return m_updated; }
 
     static const int StdDisplayWidth = 720;
     static const int StdDisplayHeight = 576;
 
   protected:
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
     void ProcessDSMCCQueue(void);
     void NetworkBootRequested(void);
     void ClearDisplay(void);
@@ -235,14 +237,14 @@ class MHIText : public MHTextDisplay
     explicit MHIText(MHIContext *parent);
     virtual ~MHIText() = default;
 
-    virtual void Draw(int x, int y);
-    virtual void Clear(void);
-    virtual void AddText(int x, int y, const QString &, MHRgba colour);
+    void Draw(int x, int y) override; // MHTextDisplay
+    void Clear(void) override; // MHTextDisplay
+    void AddText(int x, int y, const QString &, MHRgba colour) override; // MHTextDisplay
 
-    virtual void SetSize(int width, int height);
-    virtual void SetFont(int size, bool isBold, bool isItalic);
+    void SetSize(int width, int height) override; // MHTextDisplay
+    void SetFont(int size, bool isBold, bool isItalic) override; // MHTextDisplay
 
-    virtual QRect GetBounds(const QString &str, int &strLen, int maxSize = -1);
+    QRect GetBounds(const QString &str, int &strLen, int maxSize = -1) override; // MHTextDisplay
 
   public:
     MHIContext *m_parent;
@@ -259,18 +261,22 @@ class MHIText : public MHTextDisplay
  */
 class MHIBitmap : public MHBitmapDisplay
 {
+  private:
+    MHIBitmap(const MHIBitmap &) = delete;            // not copyable
+    MHIBitmap &operator=(const MHIBitmap &) = delete; // not copyable
+
   public:
     MHIBitmap(MHIContext *parent, bool tiled);
     virtual ~MHIBitmap();
 
     /// Create bitmap from PNG
-    virtual void CreateFromPNG(const unsigned char *data, int length);
+    void CreateFromPNG(const unsigned char *data, int length) override; // MHBitmapDisplay
 
     /// Create bitmap from single I frame MPEG
-    virtual void CreateFromMPEG(const unsigned char *data, int length);
+    void CreateFromMPEG(const unsigned char *data, int length) override; // MHBitmapDisplay
 
     /// Create bitmap from JPEG
-    virtual void CreateFromJPEG(const unsigned char *data, int length);
+    void CreateFromJPEG(const unsigned char *data, int length) override; // MHBitmapDisplay
 
     /**
      *  \brief Draw the completed drawing onto the display.
@@ -281,14 +287,14 @@ class MHIBitmap : public MHBitmapDisplay
      *  \param tiled  Tile the drawing to fit the parent window.
      *  \param bUnder Put the drawing at the behind any other widgets.
      */
-    virtual void Draw(int x, int y, QRect rect, bool tiled, bool bUnder);
+    void Draw(int x, int y, QRect rect, bool tiled, bool bUnder) override; // MHBitmapDisplay
 
     /// Scale the bitmap.  Only used for image derived from MPEG I-frames.
-    virtual void ScaleImage(int newWidth, int newHeight);
+    void ScaleImage(int newWidth, int newHeight) override; // MHBitmapDisplay
 
     // Gets
-    virtual QSize GetSize(void) { return m_image.size(); }
-    virtual bool IsOpaque(void) { return !m_image.isNull() && m_opaque; }
+    QSize GetSize(void) override { return m_image.size(); } // MHBitmapDisplay
+    bool IsOpaque(void) override { return !m_image.isNull() && m_opaque; } // MHBitmapDisplay
 
   public:
     MHIContext *m_parent;
@@ -311,28 +317,31 @@ class MHIDLA : public MHDLADisplay
           m_boxLineColour(lineColour), m_boxFillColour(fillColour),
           m_lineWidth(0) {}
     /// Draw the completed drawing onto the display.
-    virtual void Draw(int x, int y);
+    void Draw(int x, int y) override; // MHDLADisplay
     /// Set the box size.  Also clears the drawing.
-    virtual void SetSize(int width, int height)
+    void SetSize(int width, int height) override // MHDLADisplay
     {
         m_width  = width;
         m_height = height;
         Clear();
     }
-    virtual void SetLineSize(int width)       { m_lineWidth = width;   }
-    virtual void SetLineColour(MHRgba colour) { m_lineColour = colour; }
-    virtual void SetFillColour(MHRgba colour) { m_fillColour = colour; }
+    void SetLineSize(int width) override // MHDLADisplay
+        { m_lineWidth = width;   }
+    void SetLineColour(MHRgba colour) override // MHDLADisplay
+        { m_lineColour = colour; }
+    void SetFillColour(MHRgba colour) override // MHDLADisplay
+        { m_fillColour = colour; }
 
     /// Clear the drawing
-    virtual void Clear(void);
+    void Clear(void) override; // MHDLADisplay
 
     // add items to the drawing.
-    virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawBorderedRectangle(int x, int y, int width, int height);
-    virtual void DrawOval(int x, int y, int width, int height);
-    virtual void DrawArcSector(int x, int y, int width, int height,
-                               int start, int arc, bool isSector);
-    virtual void DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray);
+    void DrawLine(int x1, int y1, int x2, int y2) override; // MHDLADisplay
+    void DrawBorderedRectangle(int x, int y, int width, int height) override; // MHDLADisplay
+    void DrawOval(int x, int y, int width, int height) override; // MHDLADisplay
+    void DrawArcSector(int x, int y, int width, int height,
+                       int start, int arc, bool isSector) override; // MHDLADisplay
+    void DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray) override; // MHDLADisplay
 
   protected:
     void DrawRect(int x, int y, int width, int height, MHRgba colour);

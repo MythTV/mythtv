@@ -13,20 +13,21 @@ class MUI_PUBLIC MythYUVAPainter : public MythQImagePainter
     MythYUVAPainter() : MythQImagePainter() { }
    ~MythYUVAPainter();
 
-    QString GetName(void) { return QString("YUVA"); }
+    QString GetName(void) override // MythQImagePainter
+        { return QString("YUVA"); }
 
-    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                           int alpha);
-    virtual void DrawText(const QRect &dest, const QString &msg, int flags,
-                          const MythFontProperties &font, int alpha,
-                          const QRect &boundRect);
-    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
-                          const QPen &linePen, int alpha);
-    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
-                               const QBrush &fillBrush, const QPen &linePen,
-                               int alpha);
-    virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
-                             const QPen &linePen, int alpha);
+    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+                   int alpha) override; // MythQImagePainter
+    void DrawText(const QRect &dest, const QString &msg, int flags,
+                  const MythFontProperties &font, int alpha,
+                  const QRect &boundRect) override; // MythQImagePainter
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen, int alpha) override; // MythQImagePainter
+    void DrawRoundRect(const QRect &area, int cornerRadius,
+                       const QBrush &fillBrush, const QPen &linePen,
+                       int alpha) override; // MythQImagePainter
+    void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                     const QPen &linePen, int alpha) override; // MythQImagePainter
 
   protected:
     MythFontProperties* GetConvertedFont(const MythFontProperties &font);

@@ -99,13 +99,6 @@ static quint8* convert_int(quint8 *p, quint8 s)
     return p;
 }
 
-PList::PList(const QByteArray &data)
-  : m_data(nullptr), m_offsetTable(nullptr), m_rootObj(0),
-    m_numObjs(0), m_offsetSize(0), m_parmSize(0)
-{
-    ParseBinaryPList(data);
-}
-
 QVariant PList::GetValue(const QString &key)
 {
     if (m_result.type() != QVariant::Map)
@@ -312,7 +305,7 @@ quint64 PList::GetBinaryUInt(quint8 *p, quint64 size)
     if (size == 1) return (quint64)(*(p));
     if (size == 2) return (quint64)(*((quint16*)convert_int(p, 2)));
     if (size == 4) return (quint64)(*((quint32*)convert_int(p, 4)));
-    if (size == 8) return (quint64)(*((quint64*)convert_int(p, 8)));
+    if (size == 8) return          (*((quint64*)convert_int(p, 8)));
 
     if (size == 3)
     {
@@ -434,7 +427,7 @@ QVariant PList::ParseBinaryReal(quint8 *data)
     if (!count)
         return result;
 
-    count = 1ull << count;
+    count = 1ULL << count;
     if (count == sizeof(float))
     {
         convert_float(data, count);
@@ -461,7 +454,7 @@ QVariant PList::ParseBinaryDate(quint8 *data)
         return result;
 
     convert_float(data, 8);
-    quint64 msec = *((double*)data) * 1000.0f;
+    quint64 msec = *((double*)data) * 1000.0;
     result = QDateTime::fromMSecsSinceEpoch(msec, Qt::UTC);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);
@@ -497,7 +490,7 @@ QVariant PList::ParseBinaryUnicode(quint8 *data)
     QByteArray tmp;
     for (quint64 i = 0; i < count; i++, data += 2)
     {
-        quint16 twobyte = (quint16)(*((quint16*)convert_int(data, 2)));
+        quint16 twobyte = (*((quint16*)convert_int(data, 2)));
         tmp.append((quint8)(twobyte & 0xff));
         tmp.append((quint8)((twobyte >> 8) & 0xff));
     }

@@ -13,30 +13,34 @@ class QPainter;
 class MythQtPainter : public MythPainter
 {
   public:
-    MythQtPainter();
+    MythQtPainter() : MythPainter() {}
    ~MythQtPainter();
 
-    virtual QString GetName(void)        { return QString("Qt"); }
-    virtual bool SupportsAnimation(void) { return false; }
-    virtual bool SupportsAlpha(void)     { return true; }
-    virtual bool SupportsClipping(void)  { return true; }
+    QString GetName(void) override // MythPainter
+        { return QString("Qt"); }
+    bool SupportsAnimation(void) override // MythPainter
+        { return false; }
+    bool SupportsAlpha(void) override // MythPainter
+        { return true; }
+    bool SupportsClipping(void) override // MythPainter
+        { return true; }
 
-    virtual void Begin(QPaintDevice *parent);
-    virtual void End();
+    void Begin(QPaintDevice *parent) override; // MythPainter
+    void End() override; // MythPainter
 
-    virtual void SetClipRect(const QRect &clipRect);
+    void SetClipRect(const QRect &clipRect) override; // MythPainter
 
-    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                           int alpha);
+    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
+                   int alpha) override; // MythPainter
 
   protected:
-    virtual MythImage* GetFormatImagePriv(void);
-    virtual void DeleteFormatImagePriv(MythImage *im);
+    MythImage* GetFormatImagePriv(void) override; // MythPainter
+    void DeleteFormatImagePriv(MythImage *im) override; // MythPainter
 
     void DeletePixmaps(void);
 
-    QPainter *painter;
-    QRegion clipRegion;
+    QPainter *m_painter    {nullptr};
+    QRegion   m_clipRegion;
 
     std::list<QPixmap *> m_imageDeleteList;
     QMutex               m_imageDeleteLock;

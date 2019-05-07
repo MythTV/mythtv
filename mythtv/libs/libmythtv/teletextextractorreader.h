@@ -27,9 +27,8 @@ class MTV_PUBLIC TeletextExtractorReader : public TeletextReader
     }
 
   protected:
-    virtual void PageUpdated(int page, int subpage);
-    virtual void HeaderUpdated(
-        int page, int subpage, uint8_t *page_ptr, int lang);
+    void PageUpdated(int page, int subpage) override; // TeletextReader
+    void HeaderUpdated(int page, int subpage, uint8_t *page_ptr, int lang) override; // TeletextReader
 
   private:
     QSet<QPair<int, int> > m_updated_pages;

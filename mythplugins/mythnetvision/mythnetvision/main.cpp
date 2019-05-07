@@ -34,11 +34,8 @@ static int RunNetVision(void)
         mainStack->AddScreen(netsearch);
         return 0;
     }
-    else
-    {
-        delete netsearch;
-        return -1;
-    }
+    delete netsearch;
+    return -1;
 }
 
 static int RunNetTree(void)
@@ -55,11 +52,8 @@ static int RunNetTree(void)
         mainStack->AddScreen(nettree);
         return 0;
     }
-    else
-    {
-        delete nettree;
-        return -1;
-    }
+    delete nettree;
+    return -1;
 }
 
 static void runNetVision(void)

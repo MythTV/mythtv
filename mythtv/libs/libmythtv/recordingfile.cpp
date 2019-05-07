@@ -4,17 +4,6 @@
 #include "mythdbcon.h"
 #include "mythdb.h"
 
-RecordingFile::RecordingFile()
-              : m_recordingId(0), m_storageDeviceID(""), m_storageGroup(""),
-                m_fileId(0), m_fileName(""), m_fileSize(0),
-                m_containerFormat(formatUnknown),
-                m_videoCodec(""), m_videoAspectRatio(0.0), m_videoFrameRate(0.0),
-                m_audioCodec(""), m_audioChannels(0), m_audioSampleRate(0.0),
-                m_audioBitrate(0)
-{
-
-}
-
 bool RecordingFile::Load()
 {
     if (m_recordingId == 0)
@@ -113,7 +102,7 @@ bool RecordingFile::Save()
                       "container = :CONTAINER ");
     }
 
-    query.bindValue(":FILENAME", m_fileName);
+    query.bindValueNoNull(":FILENAME", m_fileName);
     query.bindValue(":FILESIZE", static_cast<quint64>(m_fileSize));
     query.bindValue(":WIDTH", m_videoResolution.width());
     query.bindValue(":HEIGHT", m_videoResolution.height());
@@ -122,10 +111,10 @@ bool RecordingFile::Save()
     query.bindValue(":AUDIO_SAMPLERATE", m_audioSampleRate);
     query.bindValue(":AUDIO_BITRATE", m_audioBitrate);
     query.bindValue(":AUDIO_CHANNELS", m_audioChannels);
-    query.bindValue(":AUDIO_CODEC", m_audioCodec);
-    query.bindValue(":VIDEO_CODEC", m_videoCodec);
-    query.bindValue(":STORAGE_DEVICE", m_storageDeviceID);
-    query.bindValue(":STORAGE_GROUP", m_storageGroup);
+    query.bindValueNoNull(":AUDIO_CODEC", m_audioCodec);
+    query.bindValueNoNull(":VIDEO_CODEC", m_videoCodec);
+    query.bindValueNoNull(":STORAGE_DEVICE", m_storageDeviceID);
+    query.bindValueNoNull(":STORAGE_GROUP", m_storageGroup);
     query.bindValue(":CONTAINER", AVContainerToString(m_containerFormat));
     query.bindValue(":RECORDING_ID", m_recordingId);
 
@@ -145,12 +134,11 @@ AVContainer RecordingFile::AVContainerFromString(const QString &formatStr)
 {
     if (formatStr == "NUV")
         return formatNUV;
-    else if (formatStr == "MPEG2-TS")
+    if (formatStr == "MPEG2-TS")
         return formatMPEG2_TS;
-    else if (formatStr == "MPEG2-PS")
+    if (formatStr == "MPEG2-PS")
         return formatMPEG2_PS;
-    else
-        return formatUnknown;
+    return formatUnknown;
 }
 
 QString RecordingFile::AVContainerToString(AVContainer format)

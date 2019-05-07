@@ -11,10 +11,12 @@ class GameDetailsPopup : public MythScreenType
     Q_OBJECT
 
   public:
-    GameDetailsPopup(MythScreenStack *parent, const RomInfo *romInfo);
+    GameDetailsPopup(MythScreenStack *parent, const RomInfo *romInfo) :
+        MythScreenType (parent, "gamedetailspopup"),
+        m_romInfo(romInfo) {}
     ~GameDetailsPopup() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   private slots:
@@ -24,26 +26,26 @@ class GameDetailsPopup : public MythScreenType
     void        handleText(const QString &name, const QString &value);
     void        handleImage(const QString &name, const QString &filename);
 
-    const RomInfo *m_romInfo;
+    const RomInfo *m_romInfo     {nullptr};
     QString        m_id;
-    QObject       *m_retObject;
+    QObject       *m_retObject   {nullptr};
 
-    MythUIText  *m_gameName;
-    MythUIText  *m_gameType;
-    MythUIText  *m_romName;
-    MythUIText  *m_crc;
-    MythUIText  *m_romPath;
-    MythUIText  *m_genre;
-    MythUIText  *m_year;
-    MythUIText  *m_country;
-    MythUIText  *m_plot;
-    MythUIText  *m_publisher;
-    MythUIText  *m_allSystems;
-    MythUIImage *m_fanartImage;
-    MythUIImage *m_boxImage;
+    MythUIText    *m_gameName    {nullptr};
+    MythUIText    *m_gameType    {nullptr};
+    MythUIText    *m_romName     {nullptr};
+    MythUIText    *m_crc         {nullptr};
+    MythUIText    *m_romPath     {nullptr};
+    MythUIText    *m_genre       {nullptr};
+    MythUIText    *m_year        {nullptr};
+    MythUIText    *m_country     {nullptr};
+    MythUIText    *m_plot        {nullptr};
+    MythUIText    *m_publisher   {nullptr};
+    MythUIText    *m_allSystems  {nullptr};
+    MythUIImage   *m_fanartImage {nullptr};
+    MythUIImage   *m_boxImage    {nullptr};
 
-    MythUIButton *m_playButton;
-    MythUIButton *m_doneButton;
+    MythUIButton  *m_playButton  {nullptr};
+    MythUIButton  *m_doneButton  {nullptr};
 };
 
 #endif

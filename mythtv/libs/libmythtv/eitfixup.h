@@ -56,9 +56,9 @@ class EITFixUp
         kFixAUSeven          = 1 << 21,
         kFixP7S1             = 1 << 26,
         kFixHTML             = 1 << 27,
-        kFixUnitymedia       = 1ull << 32,
-        kFixATV              = 1ull << 33,
-        kFixDisneyChannel    = 1ull << 34,
+        kFixUnitymedia       = 1ULL << 32,
+        kFixATV              = 1ULL << 33,
+        kFixDisneyChannel    = 1ULL << 34,
 
         // Early fixups
         kEFixForceISO8859_1  = 1 << 22,
@@ -69,7 +69,7 @@ class EITFixUp
 
         kFixGreekSubtitle    = 1 << 29,
         kFixGreekEIT         = 1 << 30,
-        kFixGreekCategories  = 1u << 31,
+        kFixGreekCategories  = 1U << 31,
     };
 
     EITFixUp();
@@ -95,7 +95,7 @@ class EITFixUp
     void FixUK(DBEventEIT &event) const;            // UK DVB-T
     void FixPBS(DBEventEIT &event) const;           // USA ATSC
     void FixComHem(DBEventEIT &event,
-                   bool parse_subtitle) const;      // Sweden DVB-C
+                   bool process_subtitle) const;    // Sweden DVB-C
     void FixAUStar(DBEventEIT &event) const;        // Australia DVB-S
     void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
     void FixAUNine(DBEventEIT &event) const;    
@@ -212,6 +212,8 @@ class EITFixUp
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
+    const QRegExp m_fiAgeLimit;
+    const QRegExp m_fiFilm;
     const QRegExp m_dePremiereLength;
     const QRegExp m_dePremiereAirdate;
     const QRegExp m_dePremiereCredits;
@@ -272,10 +274,12 @@ class EITFixUp
     const QRegExp m_grYear; // Greek release year.
     const QRegExp m_grCountry; // Greek event country of origin.
     const QRegExp m_grlongEp; // Greek Episode
+    const QRegExp m_grSeason_as_RomanNumerals; // Greek Episode in Roman numerals
     const QRegExp m_grSeason; // Greek Season
     const QRegExp m_grSeries;
     const QRegExp m_grRealTitleinDescription; // The original title is often in the descr in parenthesis.
     const QRegExp m_grRealTitleinTitle; // The original title is often in the title in parenthesis.
+    const QRegExp m_grCommentsinTitle; // Sometimes esp. national stations include comments in the title eg "(ert arxeio)"
     const QRegExp m_grNotPreviouslyShown; // Not previously shown on TV
     const QRegExp m_grEpisodeAsSubtitle; // Description field: "^Episode: Lion in the cage. (Description follows)"
     const QRegExp m_grCategFood; // Greek category food

@@ -19,7 +19,7 @@
 class PlayListFileEntry
 {
   public:
-    PlayListFileEntry(void) : m_length(0) {}
+    PlayListFileEntry(void) = default;
     ~PlayListFileEntry(void) = default;
 
     QString File(void) { return m_file; }
@@ -33,7 +33,7 @@ class PlayListFileEntry
   private:
     QString m_file;
     QString m_title;
-    int     m_length;
+    int     m_length {0};
 };
 
 /** \brief Class for containing the info of a pls or m3u file
@@ -41,7 +41,7 @@ class PlayListFileEntry
 class PlayListFile
 {
   public:
-    PlayListFile(void);
+    PlayListFile(void) = default;
     ~PlayListFile(void);
 
     /** \brief Get the number of entries in the pls file
@@ -116,7 +116,7 @@ class PlayListFile
 
   private:
     QList<PlayListFileEntry*> m_entries;
-    int m_version;
+    int m_version {0};
 };
 
 #endif /* PLS_H_ */

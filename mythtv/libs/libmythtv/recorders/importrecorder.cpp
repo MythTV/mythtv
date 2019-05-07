@@ -40,19 +40,10 @@
 #include "mythdate.h"
 
 #define TVREC_CARDNUM \
-        ((tvrec != nullptr) ? QString::number(tvrec->GetInputId()) : "NULL")
+        ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("ImportRec[%1](%2): ") \
-            .arg(TVREC_CARDNUM).arg(videodevice)
-
-ImportRecorder::ImportRecorder(TVRec *rec) :
-    DTVRecorder(rec), _import_fd(-1), m_cfp(nullptr), m_nfc(0)
-{
-}
-
-ImportRecorder::~ImportRecorder()
-{
-}
+            .arg(TVREC_CARDNUM).arg(m_videodevice)
 
 void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                            const QString &videodev,
@@ -87,7 +78,7 @@ void UpdateFS(int /*pc*/, void* ir)
 
 void ImportRecorder::UpdateRecSize()
 {
-    curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+    m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
 
     if(m_cfp)
         m_nfc=m_cfp->GetDecoder()->GetFramesRead();
@@ -103,73 +94,73 @@ void ImportRecorder::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
 
     {
-        QMutexLocker locker(&pauseLock);
-        request_recording = true;
-        recording = true;
-        recordingWait.wakeAll();
+        QMutexLocker locker(&m_pauseLock);
+        m_request_recording = true;
+        m_recording = true;
+        m_recordingWait.wakeAll();
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- " +
         QString("attempting to open '%1'")
-            .arg(curRecording->GetPathname()));
+            .arg(m_curRecording->GetPathname()));
 
     // retry opening the file until StopRecording() is called.
     while (!Open() && IsRecordingRequested() && !IsErrored())
     {   // sleep 250 milliseconds unless StopRecording() or Unpause()
         // is called, just to avoid running this loop too often.
-        QMutexLocker locker(&pauseLock);
-        if (request_recording)
-            unpauseWait.wait(&pauseLock, 15000);
+        QMutexLocker locker(&m_pauseLock);
+        if (m_request_recording)
+            m_unpauseWait.wait(&m_pauseLock, 15000);
     }
 
-    curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+    m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
 
     // build seek table
-    if (_import_fd && IsRecordingRequested() && !IsErrored())
+    if (m_import_fd && IsRecordingRequested() && !IsErrored())
     {
         MythCommFlagPlayer *cfp =
             new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
         RingBuffer *rb = RingBuffer::Create(
-            ringBuffer->GetFilename(), false, true, 6000);
+            m_ringBuffer->GetFilename(), false, true, 6000);
         //This does update the status but does not set the ultimate
         //recorded / failure status for the relevant recording
         SetRecordingStatus(RecStatus::Recording, __FILE__, __LINE__);
 
         PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
-        ctx->SetPlayingInfo(curRecording);
+        ctx->SetPlayingInfo(m_curRecording);
         ctx->SetRingBuffer(rb);
         ctx->SetPlayer(cfp);
         cfp->SetPlayerInfo(nullptr, nullptr, ctx);
 
         m_cfp=cfp;
-        gCoreContext->RegisterFileForWrite(ringBuffer->GetFilename());
+        gCoreContext->RegisterFileForWrite(m_ringBuffer->GetFilename());
         cfp->RebuildSeekTable(false,UpdateFS,this);
-        gCoreContext->UnregisterFileForWrite(ringBuffer->GetFilename());
+        gCoreContext->UnregisterFileForWrite(m_ringBuffer->GetFilename());
         m_cfp=nullptr;
 
         delete ctx;
     }
 
-    curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
+    m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
 
     // cleanup...
     Close();
 
     FinishRecording();
 
-    QMutexLocker locker(&pauseLock);
-    recording = false;
-    recordingWait.wakeAll();
+    QMutexLocker locker(&m_pauseLock);
+    m_recording = false;
+    m_recordingWait.wakeAll();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }
 
 bool ImportRecorder::Open(void)
 {
-    if (_import_fd >= 0)   // already open
+    if (m_import_fd >= 0)   // already open
         return true;
 
-    if (!curRecording)
+    if (!m_curRecording)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "no current recording!");
         return false;
@@ -177,12 +168,12 @@ bool ImportRecorder::Open(void)
 
     ResetForNewFile();
 
-    QString fn = curRecording->GetPathname();
+    QString fn = m_curRecording->GetPathname();
 
     // Quick-and-dirty "copy" of sample prerecorded file.
     // Sadly, won't work on Windows.
     //
-    QFile preRecorded(videodevice);
+    QFile preRecorded(m_videodevice);
     QFile copy(fn);
     if (preRecorded.exists() && (!copy.exists() || copy.size() == 0))
     {
@@ -193,7 +184,7 @@ bool ImportRecorder::Open(void)
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Trying to link %1 to %2")
-                           .arg(videodevice).arg(fn));
+                           .arg(m_videodevice).arg(fn));
 
         if (preRecorded.link(fn))
             LOG(VB_RECORD, LOG_DEBUG, LOC + "success!");
@@ -220,34 +211,34 @@ bool ImportRecorder::Open(void)
 
         return false;
     }
-    else if (!f.isReadable())
+    if (!f.isReadable())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("'%1' is not readable").arg(fn));
         return false;
     }
-    else if (!f.size())
+    if (!f.size())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("'%1' is empty").arg(fn));
         return false;
     }
 
-    _import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
-    if (_import_fd < 0)
+    m_import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
+    if (m_import_fd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Couldn't open '%1'").arg(fn) + ENO);
     }
 
-    return _import_fd >= 0;
+    return m_import_fd >= 0;
 }
 
 void ImportRecorder::Close(void)
 {
-    if (_import_fd >= 0)
+    if (m_import_fd >= 0)
     {
-        close(_import_fd);
-        _import_fd = -1;
+        close(m_import_fd);
+        m_import_fd = -1;
     }
 }

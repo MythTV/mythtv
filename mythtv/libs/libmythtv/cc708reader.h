@@ -19,22 +19,22 @@ class CC708Reader
     explicit CC708Reader(MythPlayer *owner);
     virtual ~CC708Reader();
 
-    void SetCurrentService(int service) { currentservice = service; }
-    CC708Service* GetCurrentService(void) { return &CC708services[currentservice]; }
-    void SetEnabled(bool enable) { enabled = enable; }
+    void SetCurrentService(int service) { m_currentservice = service; }
+    CC708Service* GetCurrentService(void) { return &CC708services[m_currentservice]; }
+    void SetEnabled(bool enable) { m_enabled = enable; }
     void ClearBuffers(void);
 
     CC708Service* GetService(uint service_num)
         { return &(CC708services[service_num]); }
     CC708Window &GetCCWin(uint service_num, uint window_id)
-        { return CC708services[service_num].windows[window_id]; }
+        { return CC708services[service_num].m_windows[window_id]; }
     CC708Window &GetCCWin(uint svc_num)
-        { return GetCCWin(svc_num, CC708services[svc_num].current_window); }
+        { return GetCCWin(svc_num, CC708services[svc_num].m_current_window); }
 
     // Window settings
     virtual void SetCurrentWindow(uint service_num, int window_id);
     virtual void DefineWindow(uint service_num,     int window_id,
-                              int priority,         int visible,
+                              int priority,         bool visible,
                               int anchor_point,     int relative_pos,
                               int anchor_vertical,  int anchor_horizontal,
                               int row_count,        int column_count,
@@ -75,25 +75,25 @@ class CC708Reader
                            short* unicode_string, short len);
 
     // Data
-    unsigned char* buf[k708MaxServices];
-    uint   buf_alloc[k708MaxServices];
-    uint   buf_size[k708MaxServices];
-    bool   delayed[k708MaxServices];
+    unsigned char *m_buf[k708MaxServices];
+    uint           m_buf_alloc[k708MaxServices];
+    uint           m_buf_size[k708MaxServices];
+    bool           m_delayed[k708MaxServices];
 
-    short* temp_str[k708MaxServices];
-    int    temp_str_alloc[k708MaxServices];
-    int    temp_str_size[k708MaxServices];
+    short         *m_temp_str[k708MaxServices];
+    int            m_temp_str_alloc[k708MaxServices];
+    int            m_temp_str_size[k708MaxServices];
 
-    int        currentservice;
-    CC708Service CC708services[k708MaxServices];
-    int        CC708DelayedDeletes[k708MaxServices];
-    QString    osdfontname;
-    QString    osdccfontname;
-    QString    osd708fontnames[20];
-    QString    osdprefix;
-    QString    osdtheme;
+    int            m_currentservice {1};
+    CC708Service   CC708services[k708MaxServices];
+    int            CC708DelayedDeletes[k708MaxServices];
+    QString        m_osdfontname;
+    QString        m_osdccfontname;
+    QString        m_osd708fontnames[20];
+    QString        m_osdprefix;
+    QString        m_osdtheme;
 
-    MythPlayer *parent;
-    bool enabled;
+    MythPlayer    *m_parent  {nullptr};
+    bool           m_enabled {false};
 };
 #endif // CC708READER_H

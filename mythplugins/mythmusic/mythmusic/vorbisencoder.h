@@ -12,19 +12,19 @@ class VorbisEncoder : public Encoder
   public:
     VorbisEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
    ~VorbisEncoder();
-    int addSamples(int16_t *bytes, unsigned int len);
+    int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:
-    ogg_page og;
-    ogg_packet op;
-    long packetsdone;
-    long bytes_written;
-    vorbis_comment vc;
-    ogg_stream_state os;
+    ogg_page         m_og;
+    ogg_packet       m_op;
+    long             m_packetsdone   {0};
+    long             m_bytes_written {0L};
+    vorbis_comment   m_vc;
+    ogg_stream_state m_os;
 
-    vorbis_dsp_state vd;
-    vorbis_block vb;
-    vorbis_info vi;
+    vorbis_dsp_state m_vd;
+    vorbis_block     m_vb;
+    vorbis_info      m_vi;
 };
 
 #endif

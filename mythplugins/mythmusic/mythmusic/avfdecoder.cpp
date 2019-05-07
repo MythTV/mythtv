@@ -59,18 +59,17 @@ typedef QMap<QString,QString> ShoutCastMetaMap;
 class ShoutCastMetaParser
 {
   public:
-    ShoutCastMetaParser(void) :
-        m_meta_artist_pos(-1), m_meta_title_pos(-1), m_meta_album_pos(-1) { }
+    ShoutCastMetaParser(void) = default;
     ~ShoutCastMetaParser(void) = default;
 
     void setMetaFormat(const QString &metaformat);
-    ShoutCastMetaMap parseMeta(const QString &meta);
+    ShoutCastMetaMap parseMeta(const QString &mdata);
 
   private:
     QString m_meta_format;
-    int m_meta_artist_pos;
-    int m_meta_title_pos;
-    int m_meta_album_pos;
+    int m_meta_artist_pos {-1};
+    int m_meta_title_pos {-1};
+    int m_meta_album_pos {-1};
 };
 
 void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
@@ -236,15 +235,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 }
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
-    Decoder(d, o),
-    m_inited(false),              m_userStop(false),
-    m_stat(0),                    m_finish(false),
-    m_freq(0),                    m_bitrate(0),
-    m_channels(0),
-    m_seekTime(-1.0),             m_devicename(""),
-    m_inputFormat(nullptr),       m_inputContext(nullptr),
-    m_audioDec(nullptr),          m_inputIsFile(false),
-    m_mdataTimer(nullptr),        m_errCode(0)
+    Decoder(d, o)
 {
     MThread::setObjectName("avfDecoder");
     setURL(file);
@@ -259,8 +250,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
 
 avfDecoder::~avfDecoder(void)
 {
-    if (m_mdataTimer)
-        delete m_mdataTimer;
+    delete m_mdataTimer;
 
     if (m_inited)
         deinit();
@@ -268,8 +258,7 @@ avfDecoder::~avfDecoder(void)
     if (m_outputBuffer)
         av_freep(&m_outputBuffer);
 
-    if (m_inputContext)
-        delete m_inputContext;
+    delete m_inputContext;
 }
 
 void avfDecoder::stop()
@@ -299,9 +288,7 @@ bool avfDecoder::initialize()
 
     output()->PauseUntilBuffered();
 
-    if (m_inputContext)
-        delete m_inputContext;
-
+    delete m_inputContext;
     m_inputContext = new RemoteAVFormatContext(getURL());
 
     if (!m_inputContext->isOpen())
@@ -529,11 +516,8 @@ void avfDecoder::run()
                 // never go below 1s buffered
                 if (buffered < 1000)
                     break;
-                else
-                {
-                    // wait
-                    usleep((buffered - 1000) * 1000);
-                }
+                // wait
+                usleep((buffered - 1000) * 1000);
             }
         }
     }
@@ -564,11 +548,11 @@ void avfDecoder::run()
 
 void avfDecoder::checkMetatdata(void)
 {
-    uint8_t *mdata = nullptr;
+    uint8_t *pdata = nullptr;
 
-    if (av_opt_get(m_inputContext->getContext(), "icy_metadata_packet", AV_OPT_SEARCH_CHILDREN, &mdata) >= 0)
+    if (av_opt_get(m_inputContext->getContext(), "icy_metadata_packet", AV_OPT_SEARCH_CHILDREN, &pdata) >= 0)
     {
-        QString s = QString::fromUtf8((const char*) mdata);
+        QString s = QString::fromUtf8((const char*) pdata);
 
         if (m_lastMetadata != s)
         {
@@ -591,7 +575,7 @@ void avfDecoder::checkMetatdata(void)
             dispatch(ev);
         }
 
-        av_free(mdata);
+        av_free(pdata);
     }
 
     if (m_inputContext->getContext()->pb)

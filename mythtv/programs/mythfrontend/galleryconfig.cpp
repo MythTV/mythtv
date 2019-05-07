@@ -6,75 +6,105 @@
 #include "mythdate.h"
 #include "gallerytransitions.h"
 
-#define ADD_FORMAT(date, format) fmt->addSelection(gCoreContext->GetQLocale().toString(date, format), format)
+#define TR GallerySettings::tr
 
-
-ThumbSettings::ThumbSettings() : VerticalConfigurationGroup()
+StandardSetting *GallerySettings::ImageOrder()
 {
-    setLabel(tr("Thumbnails"));
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GalleryImageOrder");
 
-    HostComboBox *order = new HostComboBox("GalleryImageOrder");
-    order->setLabel(tr("Image Order"));
-    order->setHelpText(tr("The order that pictures/videos are shown in thumbnail "
-                          "view and ordered slideshows."));
-    order->addSelection(tr("Filename (A-Z)"), QString::number(kSortByNameAsc));
-    order->addSelection(tr("Reverse Filename (Z-A)"), QString::number(kSortByNameDesc));
-    order->addSelection(tr("Exif Date (oldest first)"), QString::number(kSortByDateAsc));
-    order->addSelection(tr("Reverse Exif Date (newest first)"), QString::number(kSortByDateDesc));
-    order->addSelection(tr("File Modified Time (oldest first)"), QString::number(kSortByModTimeAsc));
-    order->addSelection(tr("Reverse File Modified Time (newest first)"), QString::number(kSortByModTimeDesc));
-    order->addSelection(tr("File Extension (A-Z)"), QString::number(kSortByExtAsc));
-    order->addSelection(tr("Reverse File Extension (Z-A)"), QString::number(kSortByExtDesc));
-    order->addSelection(tr("File Size (smallest first)"), QString::number(kSortBySizeAsc));
-    order->addSelection(tr("Reverse File Size (largest first)"), QString::number(kSortBySizeDesc));
-    addChild(order);
+    gc->setLabel(TR("Image Order"));
+    gc->setHelpText(TR("The order that pictures/videos are shown in thumbnail "
+                       "view and ordered slideshows."));
 
-    HostComboBox *orderDir = new HostComboBox("GalleryDirOrder");
-    orderDir->setLabel(tr("Directory Order"));
-    orderDir->setHelpText(tr("The order that dirctories are shown and traversed "
-                             "in recursive slideshows."));
-    orderDir->addSelection(tr("Filename (A-Z)"), QString::number(kSortByNameAsc));
-    orderDir->addSelection(tr("Reverse Filename (Z-A)"), QString::number(kSortByNameDesc));
-    orderDir->addSelection(tr("File Modified Time (oldest first)"), QString::number(kSortByModTimeAsc));
-    orderDir->addSelection(tr("Reverse File Modified Time (newest first)"), QString::number(kSortByModTimeDesc));
-    addChild(orderDir);
+    gc->addSelection(TR("Filename (A-Z)"),
+                     QString::number(kSortByNameAsc));
+    gc->addSelection(TR("Reverse Filename (Z-A)"),
+                     QString::number(kSortByNameDesc));
+    gc->addSelection(TR("Exif Date (oldest first)"),
+                     QString::number(kSortByDateAsc));
+    gc->addSelection(TR("Reverse Exif Date (newest first)"),
+                     QString::number(kSortByDateDesc));
+    gc->addSelection(TR("File Modified Time (oldest first)"),
+                     QString::number(kSortByModTimeAsc));
+    gc->addSelection(TR("Reverse File Modified Time (newest first)"),
+                     QString::number(kSortByModTimeDesc));
+    gc->addSelection(TR("File Extension (A-Z)"),
+                     QString::number(kSortByExtAsc));
+    gc->addSelection(TR("Reverse File Extension (Z-A)"),
+                     QString::number(kSortByExtDesc));
+    gc->addSelection(TR("File Size (smallest first)"),
+                     QString::number(kSortBySizeAsc));
+    gc->addSelection(TR("Reverse File Size (largest first)"),
+                     QString::number(kSortBySizeDesc));
 
-    HostComboBox *fmt = new HostComboBox("GalleryDateFormat");
-    fmt->setLabel(tr("Date Format"));
+    connect(gc,   &StandardSetting::ChangeSaved,
+            this, &GallerySettings::OrderChanged);
+
+    return gc;
+}
+
+StandardSetting *GallerySettings::DirOrder()
+{
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GalleryDirOrder");
+
+    gc->setLabel(TR("Directory Order"));
+    gc->setHelpText(TR("The order that dirctories are shown and traversed "
+                       "in recursive slideshows."));
+
+    gc->addSelection(TR("Filename (A-Z)"), QString::number(kSortByNameAsc));
+    gc->addSelection(TR("Reverse Filename (Z-A)"), QString::number(kSortByNameDesc));
+    gc->addSelection(TR("File Modified Time (oldest first)"), QString::number(kSortByModTimeAsc));
+    gc->addSelection(TR("Reverse File Modified Time (newest first)"), QString::number(kSortByModTimeDesc));
+
+    connect(gc,   &StandardSetting::ChangeSaved,
+            this, &GallerySettings::OrderChanged);
+
+    return gc;
+}
+
+static void AddFormat(HostComboBoxSetting* gc, const QDateTime& date, const QString& format)
+{ gc->addSelection(gCoreContext->GetQLocale().toString(date, format), format); }
+
+StandardSetting *GallerySettings::DateFormat()
+{
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GalleryDateFormat");
+
+    gc->setLabel(TR("Date Format"));
+    gc->setHelpText(TR("Date format of thumbnail captions. Other places use the system date format. "
+                       "Sample shows 3rd May 2002."));
 
     QDateTime sampdate = MythDate::fromString("2002-05-03");
 
-    ADD_FORMAT(sampdate, "dd/MM/yy");
-    ADD_FORMAT(sampdate, "dd-MM-yy");
-    ADD_FORMAT(sampdate, "dd.MM.yy");
-    ADD_FORMAT(sampdate, "d/M/yy");
-    ADD_FORMAT(sampdate, "d-M-yy");
-    ADD_FORMAT(sampdate, "d.M.yy");
-    ADD_FORMAT(sampdate, "MM/dd/yy");
-    ADD_FORMAT(sampdate, "MM-dd-yy");
-    ADD_FORMAT(sampdate, "MM.dd.yy");
-    ADD_FORMAT(sampdate, "M/d/yy");
-    ADD_FORMAT(sampdate, "M-d-yy");
-    ADD_FORMAT(sampdate, "M.d.yy");
-    ADD_FORMAT(sampdate, "yyyy/MM/dd");
-    ADD_FORMAT(sampdate, "yyyy-MM-dd");
-    ADD_FORMAT(sampdate, "yyyy.MM.dd");
-    ADD_FORMAT(sampdate, QString("yyyy") % QChar(0x5E74) %
-               "M" % QChar(0x6708) % "d" % QChar(0x65E5)); // yyyy年M月d日
+    AddFormat(gc, sampdate, "dd/MM/yy");
+    AddFormat(gc, sampdate, "dd-MM-yy");
+    AddFormat(gc, sampdate, "dd.MM.yy");
+    AddFormat(gc, sampdate, "d/M/yy");
+    AddFormat(gc, sampdate, "d-M-yy");
+    AddFormat(gc, sampdate, "d.M.yy");
+    AddFormat(gc, sampdate, "MM/dd/yy");
+    AddFormat(gc, sampdate, "MM-dd-yy");
+    AddFormat(gc, sampdate, "MM.dd.yy");
+    AddFormat(gc, sampdate, "M/d/yy");
+    AddFormat(gc, sampdate, "M-d-yy");
+    AddFormat(gc, sampdate, "M.d.yy");
+    AddFormat(gc, sampdate, "yyyy/MM/dd");
+    AddFormat(gc, sampdate, "yyyy-MM-dd");
+    AddFormat(gc, sampdate, "yyyy.MM.dd");
+    AddFormat(gc, sampdate, QString("yyyy") % QChar(0x5E74) %
+              "M" % QChar(0x6708) % "d" % QChar(0x65E5)); // yyyy年M月d日
 
-    fmt->setHelpText(tr("Date format of thumbnail captions. Other places use the system date format. "
-                        "Sample shows 3rd May 2002."));
-    addChild(fmt);
+    connect(gc,   &StandardSetting::ChangeSaved,
+            this, &GallerySettings::DateChanged);
+
+    return gc;
 }
 
-
-SlideSettings::SlideSettings() : VerticalConfigurationGroup()
+static StandardSetting *TransitionType()
 {
-    setLabel(tr("Slideshow"));
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GalleryTransitionType");
 
-    HostComboBox *tranBox = new HostComboBox("GalleryTransitionType");
-    tranBox->setLabel(tr("Transition"));
-    tranBox->setHelpText(tr("Effect to use between slides"));
+    gc->setLabel(TR("Transition"));
+    gc->setHelpText(TR("Effect to use between slides"));
 
     // Initialise selected transition
     TransitionRegistry availableTransitions(GetMythPainter()->SupportsAnimation());
@@ -83,141 +113,175 @@ SlideSettings::SlideSettings() : VerticalConfigurationGroup()
     while (i.hasNext())
     {
         i.next();
-        tranBox->addSelection(i.value()->objectName(), QString::number(i.key()));
+        gc->addSelection(i.value()->objectName(), QString::number(i.key()));
     }
-    addChild(tranBox);
 
-    HostSpinBox *slide = new HostSpinBox("GallerySlideShowTime", 100, 60000, 100);
-    slide->setLabel(tr("Slide Duration (ms)"));
-    slide->setHelpText(tr("The time that a slide is displayed (between transitions), "
-                          "in milliseconds."));
-    addChild(slide);
-
-    HostSpinBox *transition = new HostSpinBox("GalleryTransitionTime", 100, 60000, 100);
-    transition->setLabel(tr("Transition Duration (ms)"));
-    transition->setHelpText(tr("The time that each transition lasts, in milliseconds."));
-    addChild(transition);
-
-    HostSpinBox *delay = new HostSpinBox("GalleryStatusDelay", 0, 10000, 50);
-    delay->setLabel(tr("Status Delay (ms)"));
-    delay->setHelpText(tr("The delay before showing the Loading/Playing status, "
-                          "in milliseconds."));
-    addChild(delay);
-
-    HostCheckBox *browseTran = new HostCheckBox("GalleryBrowseTransition");
-    browseTran->setLabel(tr("Use transitions when browsing"));
-    browseTran->setHelpText(tr("When cleared, transitions will only be used "
-                               "during a slideshow."));
-    addChild(browseTran);
+    return gc;
 }
 
-
-/*!
- \brief Settings Page 1
-*/
-GallerySettings::GallerySettings() : VerticalConfigurationGroup(false)
+static StandardSetting *SlideDuration()
 {
-    setLabel(tr("Gallery Settings"));
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("GallerySlideShowTime", 100, 60000, 100, 5);
 
-    addChild(new ThumbSettings());
-    addChild(new SlideSettings());
+    gc->setLabel(TR("Slide Duration (ms)"));
+    gc->setHelpText(TR("The time that a slide is displayed (between transitions), "
+                       "in milliseconds."));
+    return gc;
 }
 
-
-/*!
- \brief Settings for Importing
- \param enable True if password has been entered
-*/
-ImportSettings::ImportSettings(bool enable) : VerticalConfigurationGroup()
+static StandardSetting *TransitionDuration()
 {
-    setLabel(tr("Import"));
-    setEnabled(enable);
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("GalleryTransitionTime", 100, 60000, 100, 5);
 
-    HostLineEdit *script = new HostLineEdit("GalleryImportCmd", true);
-    script->setLabel(tr("Import Command"));
-    script->setHelpText(tr("Command/script that can be run from the menu. "
-                           "\n%TMPDIR% will be replaced by a new temporary directory, "
-                           "which the import dialog will show automatically. The "
-                           "directory will be removed when Gallery exits."));
-
-    script->setEnabled(enable);
-    addChild(script);
+    gc->setLabel(TR("Transition Duration (ms)"));
+    gc->setHelpText(TR("The time that each transition lasts, in milliseconds."));
+    return gc;
 }
 
+static StandardSetting *StatusDelay()
+{
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("GalleryStatusDelay", 0, 10000, 50, 10);
+
+    gc->setLabel(TR("Status Delay (ms)"));
+    gc->setHelpText(TR("The delay before showing the Loading/Playing status, "
+                       "in milliseconds."));
+    return gc;
+}
+
+static StandardSetting *UseTransitions()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GalleryBrowseTransition");
+
+    gc->setLabel(TR("Use transitions when browsing"));
+    gc->setHelpText(TR("When cleared, transitions will only be used "
+                       "during a slideshow."));
+    return gc;
+}
 
 /*!
- \brief Settings Page 2
- \param enable True if password has been entered
+ \brief Setting for Importing via script
+ \param enabled True if password has been entered
 */
-GalleryDbSettings::GalleryDbSettings(bool enable)
-    : VerticalConfigurationGroup(false)
+static StandardSetting *Import(bool enabled)
 {
-    setLabel(tr("Database Settings") + (enable ? "" : tr(" (Requires edit privileges)")));
+    HostTextEditSetting *gc = new HostTextEditSetting("GalleryImportCmd");
 
-    addChild(new ImportSettings(enable));
+    gc->setVisible(enabled);
+    gc->setLabel(TR("Import Command"));
+    gc->setHelpText(TR("Command/script that can be run from the menu. "
+                       "\n%TMPDIR% will be replaced by a new temporary directory, "
+                       "which the import dialog will show automatically. The "
+                       "directory will be removed when Gallery exits."));
+    return gc;
+}
 
-    // Exclusions - Use stacked to preserve spacing
-    StackedConfigurationGroup *group1 = new StackedConfigurationGroup(false, false);
-    addChild(group1);
+/*!
+ \brief Setting for excluding image files by pattern
+ \param enabled True if password has been entered
+*/
+StandardSetting *GallerySettings::Exclusions(bool enabled)
+{
+    GlobalTextEditSetting *gc = new GlobalTextEditSetting("GalleryIgnoreFilter");
 
-    GlobalLineEdit *exclusions = new GlobalLineEdit("GalleryIgnoreFilter");
-    exclusions->setLabel(tr("Scanner Exclusions"));
-    exclusions->setHelpText(tr("Comma-separated list of filenames/directory names "
-                               "to be ignored when scanning. "
-                               "Glob wildcards * and ? are valid."));
-    exclusions->setEnabled(enable);
-    group1->addChild(exclusions);
+    gc->setVisible(enabled);
+    gc->setLabel(TR("Scanner Exclusions"));
+    gc->setHelpText(TR("Comma-separated list of filenames/directory names "
+                       "to be ignored when scanning. "
+                       "Glob wildcards * and ? are valid."));
 
-    // Autorun - Use stacked to preserve spacing
-    StackedConfigurationGroup *group4 = new StackedConfigurationGroup(false, false);
-    addChild(group4);
+    connect(gc,   &StandardSetting::ChangeSaved,
+            this, &GallerySettings::ExclusionsChanged);
 
-    HostCheckBox *autorun = new HostCheckBox("GalleryAutoStart");
-    autorun->setLabel(tr("Start Gallery when media inserted"));
-    autorun->setHelpText(tr("Set to automatically start Gallery when media "
-                            "(USB/CD's containing images) are inserted."));
-    autorun->setEnabled(enable);
-    group4->addChild(autorun);
+    return gc;
+}
 
-    // Password - Use stacked to preserve spacing
-    StackedConfigurationGroup *group2 = new StackedConfigurationGroup(false, false);
-    addChild(group2);
+/*!
+ \brief Setting for running gallery on start-up
+ \param enabled True if password has been entered
+*/
+static StandardSetting *Autorun(bool enabled)
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GalleryAutoStart");
 
-    GlobalLineEdit *password = new GlobalLineEdit("GalleryPassword");
-    password->setLabel(tr("Password"));
-    password->SetPasswordEcho(true);
-    password->setHelpText(tr("When set all actions that modify the filesystem or "
-                             "database are protected (copy, move, transform, "
-                             "hiding, covers). Hidden items cannot be viewed. "
-                             "Applies to all frontends. "
-                             "\nDisabled by an empty password. "
-                             "Privileges persist until Gallery exits to main menu."));
-    password->setEnabled(enable);
-    group2->addChild(password);
+    gc->setVisible(enabled);
+    gc->setLabel(TR("Start Gallery when media inserted"));
+    gc->setHelpText(TR("Set to automatically start Gallery when media "
+                       "(USB/CD's containing images) are inserted."));
+    return gc;
+}
 
-    // Clear Db
-    TriggeredConfigurationGroup *group3 = new TriggeredConfigurationGroup(false, false);
-    group3->SetVertical(false);
-    addChild(group3);
+/*!
+ \brief Setting for changing password
+ \param enabled True if password has been entered
+*/
+static StandardSetting *Password(bool enabled)
+{
+    GlobalTextEditSetting *gc = new GlobalTextEditSetting("GalleryPassword");
 
-    TransCheckBoxSetting *clear = new TransCheckBoxSetting();
-    clear->setLabel(tr("Reset Image Database"));
-    clear->setHelpText(tr("Clears the database and thumbnails for the Image Storage Group. "
-                          "A rescan will be required. Images for local media will persist."));
-    clear->setEnabled(enable);
-    group3->addChild(clear);
+    gc->setVisible(enabled);
+    gc->setLabel(TR("Password"));
+    gc->setHelpText(TR("When set all actions that modify the filesystem or "
+                       "database are protected (copy, move, transform, "
+                       "hiding, covers). Hidden items cannot be viewed. "
+                       "Applies to all frontends. "
+                       "\nDisabled by an empty password. "
+                       "Privileges persist until Gallery exits to main menu."));
+    return gc;
+}
 
-    HorizontalConfigurationGroup *clrSub =new HorizontalConfigurationGroup(false, false);
+/*!
+ \brief Setting for clearing image database
+ \param enabled True if password has been entered
+*/
+StandardSetting *GallerySettings::ClearDb(bool enabled)
+{
+    ButtonStandardSetting *gc = new ButtonStandardSetting(TR("Reset Image Database"));
 
-    TransButtonSetting *confirm = new TransButtonSetting("clearDb");
-    confirm->setLabel(tr("Clear Now!"));
-    confirm->setHelpText(tr("Warning! This will erase settings for: hidden images, "
-                            "directory covers and re-orientations. "
-                            "You will have to set them again after re-scanning."));
-    connect(confirm, SIGNAL(pressed()), this, SIGNAL(ClearDbPressed()));
-    clrSub->addChild(confirm);
+    gc->setVisible(enabled);
+    gc->setLabel(TR("Reset Image Database"));
+    gc->setHelpText(TR("Clears the database and thumbnails for the Image Storage Group. "
+                       "A rescan will be required. Images for local media will persist."));
 
-    group3->setTrigger(clear);
-    group3->addTarget("0", new HorizontalConfigurationGroup(false, false));
-    group3->addTarget("1", clrSub);
+    connect(gc,    &ButtonStandardSetting::clicked,
+            this,  &GallerySettings::ShowConfirmDialog);
+
+    return gc;
+}
+
+void GallerySettings::ShowConfirmDialog()
+{
+    QString msg(TR("Warning! This will erase settings for: hidden images, "
+                   "directory covers and re-orientations. "
+                   "You will have to set them again after re-scanning."));
+    auto stack = GetMythMainWindow()->GetStack("popup stack");
+    auto dialog = new MythConfirmationDialog(stack, msg);
+    if (dialog->Create())
+    {
+        stack->AddScreen(dialog);
+        connect(dialog, &MythConfirmationDialog::haveResult,
+                this,   [this](bool ok) { if (ok) emit ClearDbPressed(); });
+    }
+    else
+        delete dialog;
+}
+
+GallerySettings::GallerySettings(bool enable)
+{
+    setLabel(TR("Gallery Settings"));
+
+    addChild(ImageOrder());
+    addChild(DirOrder());
+    addChild(DateFormat());
+    addChild(TransitionType());
+    addChild(SlideDuration());
+    addChild(TransitionDuration());
+    addChild(StatusDelay());
+    addChild(UseTransitions());
+
+    // These modify the database
+    addChild(Import(enable));
+    addChild(Exclusions(enable));
+    addChild(Autorun(enable));
+    addChild(Password(enable));
+    addChild(ClearDb(enable));
 }

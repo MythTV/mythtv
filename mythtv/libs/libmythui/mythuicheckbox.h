@@ -23,8 +23,8 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
     enum StateType { None = 0, Normal, Disabled, Active, Selected,
                      SelectedInactive };
 
-    virtual bool gestureEvent(MythGestureEvent *event);
-    virtual bool keyPressEvent(QKeyEvent *);
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *) override; // MythUIType
 
     void toggleCheckState(void);
 
@@ -45,17 +45,17 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
     void toggled(bool);
 
   protected:
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SetInitialStates(void);
 
-    MythUIStateType *m_BackgroundState;
-    MythUIStateType *m_CheckState;
+    MythUIStateType *m_BackgroundState {nullptr};
+    MythUIStateType *m_CheckState      {nullptr};
 
-    MythUIStateType::StateType m_currentCheckState;
-    QString m_state;
+    MythUIStateType::StateType m_currentCheckState {MythUIStateType::Off};
+    QString m_state                    {"active"};
 };
 
 #endif

@@ -27,6 +27,10 @@ class VDALibrary
     CFStringRef           *decoderConfigAVCCData;
     QLibrary *m_lib;
     bool      m_valid;
+
+private:
+    VDALibrary(const VDALibrary &) = delete;            // not copyable
+    VDALibrary &operator=(const VDALibrary &) = delete; // not copyable
 };
 
 class VDAFrame
@@ -52,17 +56,18 @@ class PrivateDecoderVDA : public PrivateDecoder
     static void GetDecoders(render_opts &opts);
     PrivateDecoderVDA();
     virtual ~PrivateDecoderVDA();
-    virtual QString GetName(void) { return "vda"; }
-    virtual bool Init(const QString &decoder,
-                      PlayerFlags flags,
-                      AVCodecContext *avctx);
-    virtual bool Reset(void);
-    virtual int  GetFrame(AVStream *stream,
-                          AVFrame *picture,
-                          int *got_picture_ptr,
-                          AVPacket *pkt);
-    virtual bool HasBufferedFrames(void);
-    virtual bool NeedsReorderedPTS(void) { return true; }
+    QString GetName(void) override { return "vda"; } // PrivateDecoder
+    bool Init(const QString &decoder,
+              PlayerFlags flags,
+              AVCodecContext *avctx) override; // PrivateDecoder
+    bool Reset(void) override; // PrivateDecoder
+    int  GetFrame(AVStream *stream,
+                  AVFrame *picture,
+                  int *got_picture_ptr,
+                  AVPacket *pkt) override; // PrivateDecoder
+    bool HasBufferedFrames(void) override; // PrivateDecoder
+    bool NeedsReorderedPTS(void) override // PrivateDecoder
+        { return true; }
 
     static void VDADecoderCallback(void *decompressionOutputRefCon,
                                    CFDictionaryRef frameInfo,

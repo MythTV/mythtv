@@ -73,236 +73,17 @@ void FillData::SetRefresh(int day, bool set)
 {
     if (kRefreshClear == day)
     {
-        refresh_all = set;
-        refresh_day.clear();
+        m_refresh_all = set;
+        m_refresh_day.clear();
     }
     else if (kRefreshAll == day)
     {
-        refresh_all = set;
+        m_refresh_all = set;
     }
     else
     {
-        refresh_day[(uint)day] = set;
+        m_refresh_day[(uint)day] = set;
     }
-}
-
-// DataDirect stuff
-void FillData::DataDirectStationUpdate(Source source)
-{
-    DataDirectProcessor::UpdateStationViewTable(source.lineupid);
-
-    bool insert_channels = chan_data.insert_chan(source.id);
-    int new_channels = DataDirectProcessor::UpdateChannelsSafe(
-        source.id, insert_channels, chan_data.m_filterNewChannels);
-
-    //  User must pass "--do-channel-updates" for these updates
-    if (chan_data.m_channelUpdates)
-    {
-        DataDirectProcessor::UpdateChannelsUnsafe(
-            source.id, chan_data.m_filterNewChannels);
-    }
-    // TODO delete any channels which no longer exist in listings source
-
-    // Unselect channels not in users lineup for DVB, HDTV
-    if (!insert_channels && (new_channels > 0) &&
-        is_grabber_labs(source.xmltvgrabber))
-    {
-        bool ok0 = (logged_in == source.userid);
-        bool ok1 = (raw_lineup == source.id);
-        if (!ok0)
-        {
-            LOG(VB_GENERAL, LOG_INFO,
-                "Grabbing login cookies for listing update");
-            ok0 = ddprocessor.GrabLoginCookiesAndLineups();
-        }
-        if (ok0 && !ok1)
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Grabbing listing for listing update");
-            ok1 = ddprocessor.GrabLineupForModify(source.lineupid);
-        }
-        if (ok1)
-        {
-            ddprocessor.UpdateListings(source.id);
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Removed %1 channel(s) from lineup.")
-                    .arg(new_channels));
-        }
-    }
-}
-
-bool FillData::DataDirectUpdateChannels(Source source)
-{
-    if (get_datadirect_provider(source.xmltvgrabber) >= 0)
-    {
-        ddprocessor.SetListingsProvider(
-            get_datadirect_provider(source.xmltvgrabber));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "We only support DataDirectUpdateChannels with "
-            "TMS Labs and Schedules Direct.");
-        return false;
-    }
-
-    ddprocessor.SetUserID(source.userid);
-    ddprocessor.SetPassword(source.password);
-
-    bool ok = true;
-    if (!is_grabber_labs(source.xmltvgrabber))
-    {
-        ok = ddprocessor.GrabLineupsOnly();
-    }
-    else
-    {
-        ok = ddprocessor.GrabFullLineup(
-            source.lineupid, true, chan_data.insert_chan(source.id)/*only sel*/);
-        logged_in  = source.userid;
-        raw_lineup = source.id;
-    }
-
-    if (ok)
-        DataDirectStationUpdate(source);
-
-    return ok;
-}
-
-bool FillData::GrabDDData(Source source, int poffset,
-                          QDate pdate, int ddSource)
-{
-    if (source.dd_dups.empty())
-        ddprocessor.SetCacheData(false);
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("This DataDirect listings source is "
-                    "shared by %1 MythTV lineups")
-                .arg(source.dd_dups.size()+1));
-        if (source.id > source.dd_dups[0])
-        {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "We should use cached data for this one");
-        }
-        else if (source.id < source.dd_dups[0])
-        {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "We should keep data around after this one");
-        }
-        ddprocessor.SetCacheData(true);
-    }
-
-    ddprocessor.SetListingsProvider(ddSource);
-    ddprocessor.SetUserID(source.userid);
-    ddprocessor.SetPassword(source.password);
-
-    bool needtoretrieve = true;
-
-    if (source.userid != lastdduserid)
-        dddataretrieved = false;
-
-    if (dd_grab_all && dddataretrieved)
-        needtoretrieve = false;
-
-    QString status = QObject::tr("currently running.");
-
-    updateLastRunStart();
-
-    if (needtoretrieve)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Retrieving datadirect data.");
-        if (dd_grab_all)
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Grabbing ALL available data.");
-            if (!ddprocessor.GrabAllData())
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Encountered error in grabbing data.");
-                return false;
-            }
-        }
-        else
-        {
-            QDateTime fromdatetime =
-                QDateTime(pdate, QTime(0,0), Qt::UTC).addDays(poffset);
-            QDateTime todatetime = fromdatetime.addDays(1);
-
-            LOG(VB_GENERAL, LOG_INFO, QString("Grabbing data for %1 offset %2")
-                                          .arg(pdate.toString())
-                                          .arg(poffset));
-            LOG(VB_GENERAL, LOG_INFO, QString("From %1 to %2 (UTC)")
-                .arg(fromdatetime.toString(Qt::ISODate))
-                .arg(todatetime.toString(Qt::ISODate)));
-
-            if (!ddprocessor.GrabData(fromdatetime, todatetime))
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Encountered error in grabbing data.");
-                return false;
-            }
-        }
-
-        dddataretrieved = true;
-        lastdduserid = source.userid;
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO,
-            "Using existing grabbed data in temp tables.");
-    }
-
-    LOG(VB_GENERAL, LOG_INFO,
-        QString("Grab complete.  Actual data from %1 to %2 (UTC)")
-        .arg(ddprocessor.GetDDProgramsStartAt().toString(Qt::ISODate))
-        .arg(ddprocessor.GetDDProgramsEndAt().toString(Qt::ISODate)));
-
-    updateLastRunEnd();
-
-    LOG(VB_GENERAL, LOG_INFO, "Main temp tables populated.");
-    if (!channel_update_run)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Updating MythTV channels.");
-        DataDirectStationUpdate(source);
-        LOG(VB_GENERAL, LOG_INFO, "Channels updated.");
-        channel_update_run = true;
-    }
-
-#if 0
-    LOG(VB_GENERAL, LOG_INFO, "Creating program view table...");
-#endif
-    DataDirectProcessor::UpdateProgramViewTable(source.id);
-#if 0
-    LOG(VB_GENERAL, LOG_INFO, "Finished creating program view table...");
-#endif
-
-    MSqlQuery query(MSqlQuery::DDCon());
-    query.prepare("SELECT count(*) from dd_v_program;");
-    if (query.exec() && query.next())
-    {
-        if (query.value(0).toInt() < 1)
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Did not find any new program data.");
-            return false;
-        }
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed testing program view table.");
-        return false;
-    }
-
-    LOG(VB_GENERAL, LOG_INFO, "Clearing data for source.");
-    QDateTime from = ddprocessor.GetDDProgramsStartAt();
-    QDateTime to = ddprocessor.GetDDProgramsEndAt();
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Clearing from %1 to %2 (localtime)")
-        .arg(from.toLocalTime().toString(Qt::ISODate))
-        .arg(to.toLocalTime().toString(Qt::ISODate)));
-    ProgramData::ClearDataBySource(source.id, from, to, true);
-    LOG(VB_GENERAL, LOG_INFO, "Data for source cleared.");
-
-    LOG(VB_GENERAL, LOG_INFO, "Updating programs.");
-    DataDirectProcessor::DataDirectProgramUpdate();
-    LOG(VB_GENERAL, LOG_INFO, "Program table update complete.");
-
-    return true;
 }
 
 // XMLTV stuff
@@ -311,51 +92,36 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     ChannelInfoList chanlist;
     QMap<QString, QList<ProgInfo> > proglist;
 
-    xmltv_parser.lateInit();
-    if (!xmltv_parser.parseFile(filename, &chanlist, &proglist))
+    m_xmltv_parser.lateInit();
+    if (!m_xmltv_parser.parseFile(filename, &chanlist, &proglist))
         return false;
 
-    chan_data.handleChannels(id, &chanlist);
+    m_chan_data.handleChannels(id, &chanlist);
     if (proglist.count() == 0)
     {
         LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
-        endofdata = true;
+        m_endofdata = true;
     }
     else
     {
-        prog_data.HandlePrograms(id, proglist);
+        ProgramData::HandlePrograms(id, proglist);
     }
     return true;
 }
 
-bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
+bool FillData::GrabData(const Source& source, int offset)
 {
     QString xmltv_grabber = source.xmltvgrabber;
-
-    int dd_provider = get_datadirect_provider(xmltv_grabber);
-    if (dd_provider >= 0)
-    {
-        if (!GrabDDData(source, offset, *qCurrentDate, dd_provider))
-        {
-            QStringList errors = ddprocessor.GetFatalErrors();
-            for (int i = 0; i < errors.size(); i++)
-                fatalErrors.push_back(errors[i]);
-            return false;
-        }
-        return true;
-    }
 
     const QString templatename = "/tmp/mythXXXXXX";
     const QString tempfilename = createTempFile(templatename);
     if (templatename == tempfilename)
     {
-        fatalErrors.push_back("Failed to create temporary file.");
+        m_fatalErrors.push_back("Failed to create temporary file.");
         return false;
     }
 
     QString filename = QString(tempfilename);
-
-    QString home = QDir::homePath();
 
     QString configfile;
 
@@ -382,7 +148,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         .arg(xmltv_grabber).arg(configfile).arg(filename);
 
 
-    if (source.xmltvgrabber_prefmethod != "allatonce"  || no_allatonce)
+    if (source.xmltvgrabber_prefmethod != "allatonce"  || m_no_allatonce)
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
@@ -396,11 +162,11 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 
     // Append additional arguments passed to mythfilldatabase
     // using --graboptions
-    if (!graboptions.isEmpty())
+    if (!m_graboptions.isEmpty())
     {
-        command += graboptions;
+        command += m_graboptions;
         LOG(VB_XMLTV, LOG_INFO,
-            QString("Using graboptions: %1").arg(graboptions));
+            QString("Using graboptions: %1").arg(m_graboptions));
     }
 
     QString status = QObject::tr("currently running.");
@@ -429,7 +195,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     {
         if (systemcall_status == GENERIC_EXIT_KILLED)
         {
-            interrupted = true;
+            m_interrupted = true;
             status = QObject::tr("FAILED: XMLTV grabber ran but was interrupted.");
         }
         else
@@ -452,27 +218,6 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     return succeeded;
 }
 
-bool FillData::GrabDataFromDDFile(
-    int id, int offset, const QString &filename,
-    const QString &lineupid, QDate *qCurrentDate)
-{
-    QDate *currentd = qCurrentDate;
-    QDate qcd = MythDate::current().date();
-    if (!currentd)
-        currentd = &qcd;
-
-    ddprocessor.SetInputFile(filename);
-    Source s;
-    s.id = id;
-    s.xmltvgrabber = "datadirect";
-    s.userid = "fromfile";
-    s.password = "fromfile";
-    s.lineupid = lineupid;
-
-    return GrabData(s, offset, currentd);
-}
-
-
 /** \fn FillData::Run(SourceList &sourcelist)
  *  \brief Goes through the sourcelist and updates its channels with
  *         program info grabbed with the associated grabber.
@@ -481,7 +226,6 @@ bool FillData::GrabDataFromDDFile(
 bool FillData::Run(SourceList &sourcelist)
 {
     SourceList::iterator it;
-    SourceList::iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -493,35 +237,28 @@ bool FillData::Run(SourceList &sourcelist)
 
     QString sidStr = QString("Updating source #%1 (%2) with grabber %3");
 
-    need_post_grab_proc = false;
+    m_need_post_grab_proc = false;
     int nonewdata = 0;
-    bool has_dd_source = false;
-
-    // find all DataDirect duplicates, so we only data download once.
-    for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
-    {
-        if (!is_grabber_datadirect((*it).xmltvgrabber))
-            continue;
-
-        has_dd_source = true;
-        for (it2 = sourcelist.begin(); it2 != sourcelist.end(); ++it2)
-        {
-            if (((*it).id           != (*it2).id)           &&
-                ((*it).xmltvgrabber == (*it2).xmltvgrabber) &&
-                ((*it).userid       == (*it2).userid)       &&
-                ((*it).password     == (*it2).password))
-            {
-                (*it).dd_dups.push_back((*it2).id);
-            }
-        }
-    }
-    if (has_dd_source)
-        ddprocessor.CreateTempDirectory();
 
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
-        if (!fatalErrors.empty())
+        if (!m_fatalErrors.empty())
             break;
+
+        QString xmltv_grabber = (*it).xmltvgrabber;
+
+        if (xmltv_grabber == "datadirect" ||
+            xmltv_grabber == "schedulesdirect1")
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Source %1 is configured to use the DataDirect guide"
+                        "service from Schedules Direct.  That service is no "
+                        "longer supported by MythTV.  Update to use one of "
+                        "the XMLTV grabbers that use the JSON-based guide "
+                        "service from Schedules Direct.")
+                .arg((*it).id));
+            continue;
+        }
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
@@ -535,10 +272,8 @@ bool FillData::Run(SourceList &sourcelist)
                     MythDate::fromString(query.value(0).toString());
         }
 
-        channel_update_run = false;
-        endofdata = false;
-
-        QString xmltv_grabber = (*it).xmltvgrabber;
+        m_channel_update_run = false;
+        m_endofdata = false;
 
         if (xmltv_grabber == "eitonly")
         {
@@ -551,9 +286,9 @@ bool FillData::Run(SourceList &sourcelist)
             updateLastRunEnd();
             continue;
         }
-        else if (xmltv_grabber.trimmed().isEmpty() ||
-                 xmltv_grabber == "/bin/true" ||
-                 xmltv_grabber == "none")
+        if (xmltv_grabber.trimmed().isEmpty() ||
+            xmltv_grabber == "/bin/true" ||
+            xmltv_grabber == "none")
         {
             LOG(VB_GENERAL, LOG_INFO, 
                 QString("Source %1 configured with no grabber. Nothing to do.")
@@ -666,56 +401,37 @@ bool FillData::Run(SourceList &sourcelist)
             }
         }
 
-        need_post_grab_proc |= !is_grabber_datadirect(xmltv_grabber);
+        m_need_post_grab_proc |= true;
 
-        if (is_grabber_datadirect(xmltv_grabber) && dd_grab_all)
-        {
-            if (only_update_channels)
-                DataDirectUpdateChannels(*it);
-            else
-            {
-                QDate qCurrentDate = MythDate::current().date();
-                if (!GrabData(*it, 0, &qCurrentDate))
-                    ++failures;
-            }
-        }
-        else if ((*it).xmltvgrabber_prefmethod == "allatonce" && !no_allatonce)
+        if ((*it).xmltvgrabber_prefmethod == "allatonce" && !m_no_allatonce)
         {
             if (!GrabData(*it, 0))
                 ++failures;
         }
-        else if ((*it).xmltvgrabber_baseline ||
-                 is_grabber_datadirect(xmltv_grabber))
+        else if ((*it).xmltvgrabber_baseline)
         {
 
             QDate qCurrentDate = MythDate::current().date();
 
             // We'll keep grabbing until it returns nothing
             // Max days currently supported is 21
-            int grabdays = (is_grabber_datadirect(xmltv_grabber)) ?
-                14 : REFRESH_MAX;
+            int grabdays = REFRESH_MAX;
 
-            grabdays = (maxDays > 0)          ? maxDays : grabdays;
-            grabdays = (only_update_channels) ? 1       : grabdays;
+            grabdays = (m_maxDays > 0)          ? m_maxDays : grabdays;
+            grabdays = (m_only_update_channels) ? 1         : grabdays;
 
             vector<bool> refresh_request;
-            refresh_request.resize(grabdays, refresh_all);
-            if (!refresh_all)
+            refresh_request.resize(grabdays, m_refresh_all);
+            if (!m_refresh_all)
                 // Set up days to grab if all is not specified
                 // If all was specified the vector was initialized
                 // with true in all occurrences.
                 for (int i = 0; i < grabdays; i++)
-                    refresh_request[i] = refresh_day[i];
-
-            if (is_grabber_datadirect(xmltv_grabber) && only_update_channels)
-            {
-                DataDirectUpdateChannels(*it);
-                grabdays = 0;
-            }
+                    refresh_request[i] = m_refresh_day[i];
 
             for (int i = 0; i < grabdays; i++)
             {
-                if (!fatalErrors.empty())
+                if (!m_fatalErrors.empty())
                     break;
 
                 // We need to check and see if the current date has changed
@@ -894,16 +610,16 @@ bool FillData::Run(SourceList &sourcelist)
                 {
                     LOG(VB_GENERAL, LOG_NOTICE,
                         QString("Refreshing data for ") + currDate);
-                    if (!GrabData(*it, i, &qCurrentDate))
+                    if (!GrabData(*it, i))
                     {
                         ++failures;
-                        if (!fatalErrors.empty() || interrupted)
+                        if (!m_fatalErrors.empty() || m_interrupted)
                         {
                             break;
                         }
                     }
 
-                    if (endofdata)
+                    if (m_endofdata)
                     {
                         LOG(VB_GENERAL, LOG_INFO,
                             "Grabber is no longer returning program data, "
@@ -918,7 +634,7 @@ bool FillData::Run(SourceList &sourcelist)
                         ", skipping");
                 }
             }
-            if (!fatalErrors.empty())
+            if (!m_fatalErrors.empty())
                 break;
         }
         else
@@ -929,7 +645,7 @@ bool FillData::Run(SourceList &sourcelist)
                 " the latest version of XMLTV.");
         }
 
-        if (interrupted)
+        if (m_interrupted)
         {
             break;
         }
@@ -951,17 +667,17 @@ bool FillData::Run(SourceList &sourcelist)
         }
     }
 
-    if (!fatalErrors.empty())
+    if (!m_fatalErrors.empty())
     {
-        for (int i = 0; i < fatalErrors.size(); i++)
+        for (int i = 0; i < m_fatalErrors.size(); i++)
         {
             LOG(VB_GENERAL, LOG_CRIT, LOC + "Encountered Fatal Error: " +
-                    fatalErrors[i]);
+                    m_fatalErrors[i]);
         }
         return false;
     }
 
-    if (only_update_channels && !need_post_grab_proc)
+    if (m_only_update_channels && !m_need_post_grab_proc)
         return true;
 
     if (failures == 0)

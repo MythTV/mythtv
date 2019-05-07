@@ -5,7 +5,7 @@
 
 MythWelcomeCommandLineParser::MythWelcomeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHWELCOME)
-{ LoadArguments(); }
+{ MythWelcomeCommandLineParser::LoadArguments(); }
 
 QString MythWelcomeCommandLineParser::GetHelpHeader(void) const
 {
@@ -20,7 +20,7 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
 
-    add(QStringList( QStringList() << "-s" << "--setup" ), "setup", false,
+    add(QStringList{"-s", "--setup"}, "setup", false,
             "Run setup for mythshutdown.", "");
 }
 

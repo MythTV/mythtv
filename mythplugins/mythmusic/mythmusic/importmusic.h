@@ -32,24 +32,25 @@ class FileScannerThread: public MThread
 {
     public:
         explicit FileScannerThread(ImportMusicDialog *parent);
-        virtual void run();
+        void run() override; // MThread
 
     private:
-        ImportMusicDialog *m_parent;
+        ImportMusicDialog *m_parent {nullptr};
 };
 
 class FileCopyThread: public MThread
 {
     public:
-        FileCopyThread(const QString &src, const QString &dst);
-        virtual void run();
+        FileCopyThread(const QString &src, const QString &dst)
+            : MThread("FileCopy"), m_srcFile(src), m_dstFile(dst) {}
+        void run() override; // MThread
 
         bool GetResult(void) { return m_result; }
 
     private:
         QString m_srcFile;
         QString m_dstFile;
-        bool m_result;
+        bool    m_result  {false};
 };
 
 class ImportMusicDialog : public MythScreenType
@@ -61,9 +62,9 @@ class ImportMusicDialog : public MythScreenType
     explicit ImportMusicDialog(MythScreenStack *parent);
     ~ImportMusicDialog();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *) override; // MythUIType
 
     bool somethingWasImported() { return m_somethingWasImported; }
     void doScan(void);
@@ -84,7 +85,7 @@ class ImportMusicDialog : public MythScreenType
     void doExit(bool ok);
 
     // popup menu
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void saveDefaults(void);
     void setCompilation(void);
     void setCompilationArtist(void);
@@ -98,7 +99,7 @@ class ImportMusicDialog : public MythScreenType
     void setTitleInitialCap(void);
     void metadataChanged(void);
     void chooseBackend(void);
-    void setSaveHost(QString host);
+    void setSaveHost(const QString& host);
 
   signals:
     void importFinished(void);
@@ -110,49 +111,49 @@ class ImportMusicDialog : public MythScreenType
     bool copyFile(const QString &src, const QString &dst);
 
     QString              m_musicStorageDir;
-    bool                 m_somethingWasImported;
-    vector<TrackInfo*>  *m_tracks;
+    bool                 m_somethingWasImported {false};
+    vector<TrackInfo*>  *m_tracks               {nullptr};
     QStringList          m_sourceFiles;
-    int                  m_currentTrack;
-    MusicMetadata       *m_playingMetaData;
+    int                  m_currentTrack         {0};
+    MusicMetadata       *m_playingMetaData      {nullptr};
 
     //  GUI stuff
-    MythUITextEdit  *m_locationEdit;
-    MythUIButton    *m_locationButton;
-    MythUIButton    *m_scanButton;
-    MythUIButton    *m_coverartButton;
+    MythUITextEdit  *m_locationEdit             {nullptr};
+    MythUIButton    *m_locationButton           {nullptr};
+    MythUIButton    *m_scanButton               {nullptr};
+    MythUIButton    *m_coverartButton           {nullptr};
 
-    MythUIText      *m_filenameText;
-    MythUIText      *m_compartistText;
-    MythUIText      *m_artistText;
-    MythUIText      *m_albumText;
-    MythUIText      *m_titleText;
-    MythUIText      *m_genreText;
-    MythUIText      *m_yearText;
-    MythUIText      *m_trackText;
+    MythUIText      *m_filenameText             {nullptr};
+    MythUIText      *m_compartistText           {nullptr};
+    MythUIText      *m_artistText               {nullptr};
+    MythUIText      *m_albumText                {nullptr};
+    MythUIText      *m_titleText                {nullptr};
+    MythUIText      *m_genreText                {nullptr};
+    MythUIText      *m_yearText                 {nullptr};
+    MythUIText      *m_trackText                {nullptr};
 
-    MythUIButton    *m_nextButton;
-    MythUIButton    *m_prevButton;
+    MythUIButton    *m_nextButton               {nullptr};
+    MythUIButton    *m_prevButton               {nullptr};
 
-    MythUIText      *m_currentText;
-    MythUIText      *m_statusText;
+    MythUIText      *m_currentText              {nullptr};
+    MythUIText      *m_statusText               {nullptr};
 
-    MythUIButton    *m_playButton;
-    MythUIButton    *m_addButton;
-    MythUIButton    *m_addallnewButton;
-    MythUIButton    *m_nextnewButton;
+    MythUIButton    *m_playButton               {nullptr};
+    MythUIButton    *m_addButton                {nullptr};
+    MythUIButton    *m_addallnewButton          {nullptr};
+    MythUIButton    *m_nextnewButton            {nullptr};
 
-    MythUICheckBox  *m_compilationCheck;
+    MythUICheckBox  *m_compilationCheck         {nullptr};
 
     // default metadata values
-    bool             m_defaultCompilation;
+    bool             m_defaultCompilation       {false};
     QString          m_defaultCompArtist;
     QString          m_defaultArtist;
     QString          m_defaultAlbum;
     QString          m_defaultGenre;
-    int              m_defaultYear;
-    int              m_defaultRating;
-    bool             m_haveDefaults;
+    int              m_defaultYear              {0};
+    int              m_defaultRating            {0};
+    bool             m_haveDefaults             {false};
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,11 +166,13 @@ class ImportCoverArtDialog : public MythScreenType
   public:
 
     ImportCoverArtDialog(MythScreenStack *parent, const QString &sourceDir,
-                         MusicMetadata *metadata, const QString &storageDir);
+                         MusicMetadata *metadata, const QString &storageDir)
+        : MythScreenType(parent, "import_coverart"), m_sourceDir(sourceDir),
+          m_musicStorageDir(storageDir), m_metadata(metadata) {}
     ~ImportCoverArtDialog() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   public slots:
     void copyPressed(void);
@@ -185,25 +188,25 @@ class ImportCoverArtDialog : public MythScreenType
     QStringList    m_filelist;
     QString        m_sourceDir;
     QString        m_musicStorageDir;
-    MusicMetadata *m_metadata;
-    int            m_currentFile;
+    MusicMetadata *m_metadata              {nullptr};
+    int            m_currentFile           {0};
     QString        m_saveFilename;
 
     //
     //  GUI stuff
     //
-    MythUIText          *m_filenameText;
-    MythUIText          *m_currentText;
-    MythUIText          *m_statusText;
-    MythUIText          *m_destinationText;
+    MythUIText          *m_filenameText    {nullptr};
+    MythUIText          *m_currentText     {nullptr};
+    MythUIText          *m_statusText      {nullptr};
+    MythUIText          *m_destinationText {nullptr};
 
-    MythUIImage         *m_coverartImage;
-    MythUIButtonList    *m_typeList;
+    MythUIImage         *m_coverartImage   {nullptr};
+    MythUIButtonList    *m_typeList        {nullptr};
 
-    MythUIButton    *m_nextButton;
-    MythUIButton    *m_prevButton;
-    MythUIButton    *m_copyButton;
-    MythUIButton    *m_exitButton;
+    MythUIButton    *m_nextButton          {nullptr};
+    MythUIButton    *m_prevButton          {nullptr};
+    MythUIButton    *m_copyButton          {nullptr};
+    MythUIButton    *m_exitButton          {nullptr};
 };
 
 #endif

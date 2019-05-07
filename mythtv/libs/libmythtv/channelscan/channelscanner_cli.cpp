@@ -36,17 +36,6 @@ using namespace std;
 
 #define LOC      QString("ChScanCLI: ")
 
-ChannelScannerCLI::ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk) :
-    done(false), onlysavescan(doScanSaveOnly), interactive(promptsOk),
-    status_lock(false), status_complete(0), status_snr(0),
-    status_text(""), status_last_log("")
-{
-}
-
-ChannelScannerCLI::~ChannelScannerCLI()
-{
-}
-
 void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 {
     if ((scanEvent->type() == ScannerEvent::ScanComplete) ||
@@ -61,10 +50,10 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
             cerr<<"HandleEvent(void) -- scan complete"<<endl;
 
         ScanDTVTransportList transports;
-        if (sigmonScanner)
+        if (m_sigmonScanner)
         {
-            sigmonScanner->StopScanner();
-            transports = sigmonScanner->GetChannelList(addFullTS);
+            m_sigmonScanner->StopScanner();
+            transports = m_sigmonScanner->GetChannelList(m_addFullTS);
         }
 
         Teardown();
@@ -77,19 +66,19 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         else if (!transports.empty())
             Process(transports);
 
-        done = true;
+        m_done = true;
         QCoreApplication::exit(0);
     }
     else if (scanEvent->type() == ScannerEvent::AppendTextToLog)
-        status_last_log = scanEvent->strValue();
+        m_status_last_log = scanEvent->strValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusText)
-        status_text = scanEvent->strValue();
+        m_status_text = scanEvent->strValue();
     else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
-        status_complete = scanEvent->intValue();
+        m_status_complete = scanEvent->intValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
-        status_lock = scanEvent->intValue();
+        m_status_lock = scanEvent->boolValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
-        status_snr = scanEvent->intValue() / 65535.0;
+        m_status_snr = scanEvent->intValue() / 65535.0;
 #if THESE_ARE_CURRENTLY_IGNORED
     else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
         ;
@@ -103,11 +92,13 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     QString msg;
     if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
-        msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
-                    status_complete, status_snr,
-                    (status_lock) ? "l" : "L",
-                    status_text.toLatin1().constData(),
-                    status_last_log.toLatin1().constData(), "");
+        msg = QString("%1% S/N %2 %3 : %4 (%5) %6")
+            .arg(m_status_complete, 3)
+            .arg(m_status_snr, 3, 'f', 1)
+            .arg((m_status_lock) ? "l" : "L")
+            .arg(qPrintable(m_status_text))
+            .arg(qPrintable(m_status_last_log))
+            .arg("", 20);
     }
     //cout<<msg.toLatin1().constData()<<endl;
 
@@ -139,13 +130,13 @@ void ChannelScannerCLI::InformUser(const QString &error)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
     }
-    post_event(scanMonitor, ScannerEvent::ScanComplete, 0);
+    post_event(m_scanMonitor, ScannerEvent::ScanComplete, 0);
 }
 
 void ChannelScannerCLI::Process(const ScanDTVTransportList &_transports)
 {
-    ChannelImporter ci(false, interactive, !onlysavescan, !onlysavescan, true,
-                       freeToAirOnly, serviceRequirements);
+    ChannelImporter ci(false, m_interactive, !m_onlysavescan, !m_onlysavescan, true,
+                       m_freeToAirOnly, m_channelNumbersOnly, m_serviceRequirements);
     ci.Process(_transports, m_sourceid);
 }
 

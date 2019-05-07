@@ -24,7 +24,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-static bool performActualUpdate(const QStringList updates, QString version,
+static bool performActualUpdate(const QStringList& updates, const QString& version,
                                 QString &dbver)
 {
     LOG(VB_GENERAL, LOG_NOTICE,

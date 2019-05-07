@@ -24,10 +24,10 @@ class CC708Reader;
 class CC708Decoder
 {
   public:
-    explicit CC708Decoder(CC708Reader *ccr) : reader(ccr)
+    explicit CC708Decoder(CC708Reader *ccr) : m_reader(ccr)
     {
-        memset(&partialPacket, 0, sizeof(CaptionPacket));
-        memset(last_seen,      0, sizeof(last_seen));
+        memset(&m_partialPacket, 0, sizeof(CaptionPacket));
+        memset(m_last_seen,      0, sizeof(m_last_seen));
     }
    ~CC708Decoder() = default;
 
@@ -38,9 +38,9 @@ class CC708Decoder
     void services(uint seconds, bool[64]) const;
 
   private:
-    CaptionPacket  partialPacket;
-    CC708Reader   *reader;
-    time_t         last_seen[64];
+    CaptionPacket  m_partialPacket;
+    CC708Reader   *m_reader {nullptr};
+    time_t         m_last_seen[64];
 };
 
 #endif // CC708DECODER_H_

@@ -25,10 +25,11 @@
 #include <csignal> // for SIGXXX
 
 // Qt headers
-#include <QStringList>
 #include <QByteArray>
 #include <QIODevice>
 #include <QRegExp>
+#include <QStringList>
+#include <utility>
 
 // MythTV headers
 #include "mythsystemlegacy.h"
@@ -43,15 +44,12 @@ class MythSystemLegacyWrapper : public MythSystem
     static MythSystemLegacyWrapper *Create(
         const QStringList &args,
         uint flags,
-        QString startPath,
+        const QString& startPath,
         Priority /*cpuPriority*/,
         Priority /*diskPriority*/)
     {
         if (args.empty())
             return nullptr;
-
-        QString program = args[0];
-        QStringList other_args = args.mid(1);
 
         MythSystemLegacy *legacy =
             new MythSystemLegacy(args.join(" "), flags);
@@ -73,30 +71,30 @@ class MythSystemLegacyWrapper : public MythSystem
         return wrapper;
     }
 
-    ~MythSystemLegacyWrapper(void)
+    ~MythSystemLegacyWrapper(void) override
     {
-        Wait(0);
+        MythSystemLegacyWrapper::Wait(0);
     }
 
-    uint GetFlags(void) const override
+    uint GetFlags(void) const override // MythSystem
     {
         return m_flags;
     }
 
     /// Returns the starting path of the program
-    QString GetStartingPath(void) const override
+    QString GetStartingPath(void) const override // MythSystem
     {
         return m_legacy->GetDirectory();
     }
 
     /// Return the CPU Priority of the program
-    Priority GetCPUPriority(void) const override
+    Priority GetCPUPriority(void) const override // MythSystem
     {
         return kNormalPriority;
     }
 
     /// Return the Disk Priority of the program
-    Priority GetDiskPriority(void) const override
+    Priority GetDiskPriority(void) const override // MythSystem
     {
         return kNormalPriority;
     }
@@ -107,20 +105,18 @@ class MythSystemLegacyWrapper : public MythSystem
     ///         think it is running even though it is not.
     /// WARNING The legacy timeout is in seconds not milliseconds,
     ///         timeout will be rounded.
-    bool Wait(uint timeout_ms) override
+    bool Wait(uint timeout_ms) override // MythSystem
     {
         timeout_ms = (timeout_ms >= 1000) ? timeout_ms + 500 :
             ((timeout_ms == 0) ? 0 : 1000);
         uint legacy_wait_ret = m_legacy->Wait(timeout_ms / 1000);
-        if (GENERIC_EXIT_RUNNING == legacy_wait_ret)
-            return false;
-        return true;
+        return GENERIC_EXIT_RUNNING != legacy_wait_ret;
     }
 
     /// Returns the standard input stream for the program
     /// if the kMSStdIn flag was passed to the constructor.
     /// Note: This is not safe!
-    QIODevice *GetStandardInputStream(void) override
+    QIODevice *GetStandardInputStream(void) override // MythSystem
     {
         if (!(kMSStdIn & m_flags))
             return nullptr;
@@ -136,7 +132,7 @@ class MythSystemLegacyWrapper : public MythSystem
 
     /// Returns the standard output stream for the program
     /// if the kMSStdOut flag was passed to the constructor.
-    QIODevice *GetStandardOutputStream(void) override
+    QIODevice *GetStandardOutputStream(void) override // MythSystem
     {
         if (!(kMSStdOut & m_flags))
             return nullptr;
@@ -154,7 +150,7 @@ class MythSystemLegacyWrapper : public MythSystem
 
     /// Returns the standard error stream for the program
     /// if the kMSStdErr flag was passed to the constructor.
-    QIODevice *GetStandardErrorStream(void) override
+    QIODevice *GetStandardErrorStream(void) override // MythSystem
     {
         if (!(kMSStdErr & m_flags))
             return nullptr;
@@ -171,7 +167,7 @@ class MythSystemLegacyWrapper : public MythSystem
     }
 
     /// Sends the selected signal to the program
-    void Signal(MythSignal sig) override
+    void Signal(MythSignal sig) override // MythSystem
     {
         m_legacy->Signal(sig);
     }
@@ -182,7 +178,7 @@ class MythSystemLegacyWrapper : public MythSystem
      *  Returns -2 if the program has not yet been collected.
      *  Returns an exit code 0..255 if the program exited with exit code.
      */
-    int GetExitCode(void) const override
+    int GetExitCode(void) const override // MythSystem
     {
         // FIXME doesn't actually know why program exited.
         //       if program returns 142 then we will forever
@@ -215,17 +211,17 @@ MythSystem *MythSystem::Create(
     Priority diskPriority)
 {
     return MythSystemLegacyWrapper::Create(
-        args, flags, startPath, cpuPriority, diskPriority);
+        args, flags, std::move(startPath), cpuPriority, diskPriority);
 }
 
 MythSystem *MythSystem::Create(
-    QString args,
+    const QString& args,
     uint flags,
     QString startPath,
     Priority cpuPriority,
     Priority diskPriority)
 {
     return MythSystem::Create(
-        args.split(QRegExp("\\s+")), flags, startPath,
+        args.split(QRegExp("\\s+")), flags, std::move(startPath),
         cpuPriority, diskPriority);
 }

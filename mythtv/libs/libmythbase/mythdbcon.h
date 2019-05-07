@@ -16,8 +16,8 @@
 
 #define REUSE_CONNECTION 1
 
-MBASE_PUBLIC bool TestDatabase(QString dbHostName,
-                               QString dbUserName,
+MBASE_PUBLIC bool TestDatabase(const QString& dbHostName,
+                               const QString& dbUserName,
                                QString dbPassword,
                                QString dbName = "mythconverg",
                                int     dbPort = 3306);
@@ -54,7 +54,7 @@ class MBASE_PUBLIC MDBManager
 {
   friend class MSqlQuery;
   public:
-    MDBManager(void);
+    MDBManager(void) = default;
     ~MDBManager(void);
 
     void CloseDatabases(void);
@@ -65,10 +65,10 @@ class MBASE_PUBLIC MDBManager
     void pushConnection(MSqlDatabase *db);
 
     MSqlDatabase *getSchedCon(void);
-    MSqlDatabase *getDDCon(void);
+    MSqlDatabase *getChannelCon(void);
 
   private:
-    MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
+    MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, const QString& name);
 
     QMutex m_lock;
     typedef QList<MSqlDatabase*> DBList;
@@ -78,11 +78,11 @@ class MBASE_PUBLIC MDBManager
     QHash<QThread*, int> m_inuse_count; // protected by m_lock
 #endif
 
-    int m_nextConnID;
-    int m_connCount;
+    int m_nextConnID         {0};
+    int m_connCount          {0};
 
-    MSqlDatabase *m_schedCon;
-    MSqlDatabase *m_DDCon;
+    MSqlDatabase *m_schedCon {nullptr};
+    MSqlDatabase *m_channelCon {nullptr};
     QHash<QThread*, DBList> m_static_pool;
 };
 
@@ -159,7 +159,23 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
 
+    /// \brief Add a single binding
     void bindValue(const QString &placeholder, const QVariant &val);
+
+    /// \brief Add a single binding, taking care not to set a NULL value.
+    ///
+    /// Most of Qt5 treats an uninitialized (i.e. null) string and an
+    /// empty string as the same thing, but not the QSqlQuery code.
+    /// This means that an uninitialized QString() and an explicitly
+    /// initialized to empty QString("") both represent an empty
+    /// string everywhere in Qt except in the QSqlQuery code.  This
+    /// function adds the same behavior to SQL queries, by checking
+    /// and substituting a QString("") where necessary.  This function
+    /// should be used for any database string field that has been
+    /// declared "NOT NULL" so that MythTV won't throw an errors
+    /// complaining about trying to set a NULL value in a SQL column
+    /// that's marked "non-NULL".
+    void bindValueNoNull(const QString &placeholder, const QVariant &val);
 
     /// \brief Add all the bindings in the passed in bindings
     void bindValues(const MSqlBindings &bindings);
@@ -208,7 +224,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     static MSqlQueryInfo SchedCon();
 
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
-    static MSqlQueryInfo DDCon();
+    static MSqlQueryInfo ChannelCon();
 
   private:
     // Only QSql::In is supported as a param type and only named params...
@@ -219,10 +235,10 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     bool seekDebug(const char *type, bool result,
                    int where, bool relative) const;
 
-    MSqlDatabase *m_db;
-    bool m_isConnected;
-    bool m_returnConnection;
-    QString m_last_prepared_query; // holds a copy of the last prepared query
+    MSqlDatabase *m_db               {nullptr};
+    bool          m_isConnected      {false};
+    bool          m_returnConnection {false};
+    QString       m_last_prepared_query; // holds a copy of the last prepared query
 };
 
 #endif

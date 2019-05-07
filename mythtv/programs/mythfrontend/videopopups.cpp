@@ -10,11 +10,6 @@
 
 #include "videopopups.h"
 
-CastDialog::CastDialog(MythScreenStack *lparent, VideoMetadata *metadata) :
-    MythScreenType(lparent, "videocastpopup"), m_metadata(metadata)
-{
-}
-
 bool CastDialog::Create()
 {
     if (!LoadWindowFromXML("video-ui.xml", "castpopup", this))
@@ -50,11 +45,6 @@ bool CastDialog::Create()
 }
 
 /////////////////////////////////////////////////////////////
-
-PlotDialog::PlotDialog(MythScreenStack *lparent, VideoMetadata *metadata) :
-    MythScreenType(lparent, "videoplotpopup"), m_metadata(metadata)
-{
-}
 
 bool PlotDialog::Create()
 {

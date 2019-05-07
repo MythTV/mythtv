@@ -22,17 +22,17 @@ extern "C" {
 // A range of block numbers
 class DVDStream::BlockRange
 {
-    uint32_t start, end;
-    int title;
+    uint32_t m_start, m_end;
+    int m_title;
 
 public:
-    BlockRange(uint32_t b, uint32_t n, int t) : start(b), end(b+n), title(t) { }
+    BlockRange(uint32_t b, uint32_t n, int t) : m_start(b), m_end(b+n), m_title(t) { }
 
-    bool operator < (const BlockRange& rhs) const { return end <= rhs.start; }
+    bool operator < (const BlockRange& rhs) const { return m_end <= rhs.m_start; }
 
-    uint32_t Start() const { return start; }
-    uint32_t End() const { return end; }
-    int Title() const { return title; }
+    uint32_t Start() const { return m_start; }
+    uint32_t End() const { return m_end; }
+    int Title() const { return m_title; }
 };
 
 
@@ -49,21 +49,21 @@ inline uint32_t Len2Blocks(uint32_t len)
 }
 
 DVDStream::DVDStream(const QString& filename)
-: RingBuffer(kRingBuffer_File), m_reader(nullptr), m_start(0), m_pos(0), m_title(-1)
+    : RingBuffer(kRingBuffer_File)
 {
-    OpenFile(filename);
+    DVDStream::OpenFile(filename);
 }
 
 DVDStream::~DVDStream()
 {
     KillReadAheadThread();
 
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
     if (m_reader)
         DVDClose(m_reader);
 
-    rwlock.unlock();
+    m_rwLock.unlock();
 }
 
 /** \fn DVDStream::OpenFile(const QString &, uint)
@@ -76,7 +76,7 @@ DVDStream::~DVDStream()
  */
 bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
 {
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
     const QString root = filename.section("/VIDEO_TS/", 0, 0);
     const QString path = filename.section(root, 1);
@@ -88,7 +88,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
     if (!m_reader)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("DVDStream DVDOpen(%1) failed").arg(filename));
-        rwlock.unlock();
+        m_rwLock.unlock();
         return false;
     }
 
@@ -103,13 +103,10 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
                 arg(root).arg(path));
             DVDClose(m_reader);
             m_reader = nullptr;
-            rwlock.unlock();
+            m_rwLock.unlock();
             return false;
         }
-        else
-        {
-            m_list.append(BlockRange(0, Len2Blocks(len), 0));
-        }
+        m_list.append(BlockRange(0, Len2Blocks(len), 0));
     }
     else
     {
@@ -151,16 +148,16 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             LOG(VB_GENERAL, LOG_ERR, "DVDStream DVDOpenFile(VOBS_1) failed");
     }
 
-    rwlock.unlock();
+    m_rwLock.unlock();
     return true;
 }
 
 //virtual
 bool DVDStream::IsOpen(void) const
 {
-    rwlock.lockForRead();
+    m_rwLock.lockForRead();
     bool ret = m_reader != nullptr;
-    rwlock.unlock();
+    m_rwLock.unlock();
     return ret;
 }
 
@@ -263,13 +260,13 @@ long long DVDStream::SeekInternal(long long pos, int whence)
         return -1;
     }
 
-    poslock.lockForWrite();
+    m_posLock.lockForWrite();
 
     m_pos = lb;
 
-    poslock.unlock();
+    m_posLock.unlock();
 
-    generalWait.wakeAll();
+    m_generalWait.wakeAll();
 
     return pos;
 }
@@ -277,9 +274,9 @@ long long DVDStream::SeekInternal(long long pos, int whence)
 //virtual
 long long DVDStream::GetReadPosition(void)  const
 {
-    poslock.lockForRead();
+    m_posLock.lockForRead();
     long long ret = (long long)m_pos * DVD_VIDEO_LB_LEN;
-    poslock.unlock();
+    m_posLock.unlock();
     return ret;
 }
 

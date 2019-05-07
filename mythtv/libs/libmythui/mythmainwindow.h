@@ -40,7 +40,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
   public:
     enum {drawRefresh = 70};
 
-    void Init(QString forcedpainter = QString(), bool mayReInit=true);
+    void Init(const QString& forcedpainter = QString(), bool mayReInit=true);
     void ReinitDone(void);
     void Show(void);
 
@@ -139,7 +139,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void EnterStandby(bool manual = true);
     void ExitStandby(bool manual = true);
 
-    virtual QPaintEngine *paintEngine() const;
+    QPaintEngine *paintEngine() const override; // QWidget
 
   public slots:
     void mouseTimeout();
@@ -148,8 +148,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
   protected slots:
     void animate();
-    void doRemoteScreenShot(QString filename, int x, int y);
+    void doRemoteScreenShot(const QString& filename, int x, int y);
     void SetDrawEnabled(bool enable);
+    void onApplicationStateChange(Qt::ApplicationState state);
 
   signals:
     void signalRemoteScreenShot(QString filename, int x, int y);
@@ -161,13 +162,13 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void InitKeys(void);
 
-    bool eventFilter(QObject *o, QEvent *e);
-    void customEvent(QEvent *ce);
-    void closeEvent(QCloseEvent *e);
+    bool eventFilter(QObject *o, QEvent *e) override; // QWidget
+    void customEvent(QEvent *ce) override; // QWidget
+    void closeEvent(QCloseEvent *e) override; // QWidget
 
     void drawScreen();
 
-    bool event(QEvent* e);
+    bool event(QEvent* e) override; // QWidget
 
     void ExitToMainMenu();
 
@@ -177,7 +178,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void ShowMouseCursor(bool show);
 
-    MythMainWindowPrivate *d;
+    MythMainWindowPrivate *d {nullptr};
 
   private slots:
     void DelayedAction(void);

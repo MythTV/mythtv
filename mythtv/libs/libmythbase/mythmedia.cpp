@@ -68,15 +68,9 @@ ext_to_media_t MythMediaDevice::s_ext_to_media;
 
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
                                  bool SuperMount,  bool AllowEject)
-               : QObject(par)
+    : QObject(par), m_DevicePath(DevicePath),
+      m_AllowEject(AllowEject), m_SuperMount(SuperMount)
 {
-    m_DevicePath = DevicePath;
-    m_AllowEject = AllowEject;
-    m_Locked = false;
-    m_DeviceHandle = -1;
-    m_SuperMount = SuperMount;
-    m_Status = MEDIASTAT_UNKNOWN;
-    m_MediaType = MEDIATYPE_UNKNOWN;
     m_RealDevice = getSymlinkTarget(m_DevicePath);
 }
 
@@ -101,12 +95,12 @@ bool MythMediaDevice::closeDevice()
     int ret = close(m_DeviceHandle);
     m_DeviceHandle = -1;
 
-    return (ret != -1) ? true : false;
+    return ret != -1;
 }
 
 bool MythMediaDevice::isDeviceOpen() const
 {
-    return (m_DeviceHandle >= 0) ? true : false;
+    return m_DeviceHandle >= 0;
 }
 
 bool MythMediaDevice::performMountCmd(bool DoMount)
@@ -182,9 +176,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 
             return true;
         }
-        else
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
-                    .arg(DoMount ? "mount" : "unmount").arg(m_DevicePath));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
+            .arg(DoMount ? "mount" : "unmount").arg(m_DevicePath));
     }
     else
     {
@@ -316,7 +309,7 @@ MythMediaError MythMediaDevice::eject(bool open_close)
 #if CONFIG_DARWIN
     QString  command = "diskutil eject " + m_DevicePath;
 
-    int ret = myth_system(command, kMSRunBackground);
+    myth_system(command, kMSRunBackground);
     return MEDIAERR_OK;
 #endif
 
@@ -364,8 +357,7 @@ bool MythMediaDevice::isMounted(bool Verify)
 {
     if (Verify)
         return findMountPath();
-    else
-        return (m_Status == MEDIASTAT_MOUNTED);
+    return (m_Status == MEDIASTAT_MOUNTED);
 }
 
 /// \brief Try to find a mount of m_DevicePath in the mounts file.

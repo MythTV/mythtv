@@ -38,8 +38,8 @@ class NetworkControlClient : public QObject
     void readClient();
 
   private:
-    QTcpSocket  *m_socket;
-    QTextStream *m_textStream;
+    QTcpSocket  *m_socket     {nullptr};
+    QTextStream *m_textStream {nullptr};
 };
 
 class NetworkCommand : public QObject
@@ -69,7 +69,7 @@ class NetworkCommand : public QObject
 
   private:
     QString               m_command;
-    NetworkControlClient *m_client;
+    NetworkControlClient *m_client {nullptr};
     QStringList           m_args;
 };
 
@@ -84,7 +84,7 @@ class NetworkControlCloseEvent : public QEvent
     static Type kEventType;
 
   private:
-    NetworkControlClient * m_networkControlClient;
+    NetworkControlClient *m_networkControlClient {nullptr};
 };
 
 class NetworkControl;
@@ -99,12 +99,12 @@ class NetworkControl : public ServerPool, public QRunnable
     ~NetworkControl();
 
   private slots:
-    void newConnection(QTcpSocket *socket);
+    void newConnection(QTcpSocket *client);
     void receiveCommand(QString &command);
     void deleteClient(void);
 
   protected:
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
 
   private:
     QString processJump(NetworkCommand *nc);
@@ -120,9 +120,9 @@ class NetworkControl : public ServerPool, public QRunnable
 
     void notifyDataAvailable(void);
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
-    QString listRecordings(QString chanid = "", QString starttime = "");
+    QString listRecordings(const QString& chanid = "", const QString& starttime = "");
     QString listSchedule(const QString& chanID = "") const;
     QString listChannels(const uint start, const uint limit) const;
     QString saveScreenshot(NetworkCommand *nc);
@@ -133,14 +133,14 @@ class NetworkControl : public ServerPool, public QRunnable
 
     QString getWidgetType(MythUIType *type);
 
-    QString prompt;
-    bool gotAnswer;
-    QString answer;
+    QString prompt             {"# "};
+    bool    gotAnswer          {false};
+    QString answer             {""};
     QMap <QString, QString> jumpMap;
     QMap <QString, int> keyMap;
     QMap <int, QString> keyTextMap;
 
-    mutable QMutex  clientLock;
+    mutable QMutex  clientLock {QMutex::Recursive};
     QList<NetworkControlClient*> clients;
 
     QList<NetworkCommand*> networkControlCommands; // protected by ncLock
@@ -150,8 +150,8 @@ class NetworkControl : public ServerPool, public QRunnable
     QList<NetworkCommand*> networkControlReplies;
     QMutex nrLock;
 
-    MThread *commandThread;
-    bool stopCommandThread; // protected by ncLock
+    MThread *commandThread     {nullptr};
+    bool stopCommandThread     {false}; // protected by ncLock
 };
 
 #endif

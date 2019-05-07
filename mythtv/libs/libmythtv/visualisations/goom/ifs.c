@@ -83,8 +83,8 @@ static const char sccsid[] = "@(#)ifs.c	5.00 2002/04/11 baffe";
 
 /*****************************************************/
 
-typedef float DBL;
-typedef int F_PT;
+typedef double DBL;
+typedef float F_PT;
 
 /* typedef float               F_PT; */
 
@@ -340,21 +340,19 @@ Transform (SIMI * Simi, F_PT xo, F_PT yo, F_PT * x, F_PT * y)
 	F_PT    xx, yy;
 
 	xo = xo - Simi->Cx;
-	xo = (xo * Simi->R) >> FIX; // / UNIT;
+	xo = (xo * Simi->R) / UNIT;
 	yo = yo - Simi->Cy;
-	yo = (yo * Simi->R) >> FIX; // / UNIT;
+	yo = (yo * Simi->R) / UNIT;
 
 	xx = xo - Simi->Cx;
-	xx = (xx * Simi->R2) >> FIX; // / UNIT;
+	xx = (xx * Simi->R2) / UNIT;
 	yy = -yo - Simi->Cy;
-	yy = (yy * Simi->R2) >> FIX; // / UNIT;
+	yy = (yy * Simi->R2) / UNIT;
 
 	*x =
-		((xo * Simi->Ct - yo * Simi->St + xx * Simi->Ct2 - yy * Simi->St2)
-		 >> FIX /* / UNIT */ ) + Simi->Cx;
+		((xo * Simi->Ct - yo * Simi->St + xx * Simi->Ct2 - yy * Simi->St2) / UNIT ) + Simi->Cx;
 	*y =
-		((xo * Simi->St + yo * Simi->Ct + xx * Simi->St2 + yy * Simi->Ct2)
-		 >> FIX /* / UNIT */ ) + Simi->Cy;
+		((xo * Simi->St + yo * Simi->Ct + xx * Simi->St2 + yy * Simi->Ct2) / UNIT ) + Simi->Cy;
 }
 
 /***************************************************************/
@@ -369,13 +367,13 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 	for (i = Cur_F->Nb_Simi; i; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
-		Buf->x = F->Lx + ((x * F->Lx) >> (FIX+1) /* /(UNIT*2) */ );
-		Buf->y = F->Ly - ((y * F->Ly) >> (FIX+1) /* /(UNIT*2) */ );
+		Buf->x = F->Lx + ((x * F->Lx) / (UNIT*2) );
+		Buf->y = F->Ly - ((y * F->Ly) / (UNIT*2) );
 		Buf++;
 
 		Cur_Pt++;
 
-		if (F->Depth && ((x - xo) >> 4) && ((y - yo) >> 4)) {
+		if (F->Depth && ((x - xo) / 16) && ((y - yo) / 16)) {
 			F->Depth--;
 			Trace (F, x, y);
 			F->Depth++;
@@ -388,7 +386,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 {
 	FRACTAL *F = Root;
 	int     i, j;
-	F_PT    x, y, xo, yo;
+	F_PT    x, y;
 	SIMI   *Cur, *Simi;
 
 	for (Cur = F->Components, i = F->Nb_Simi; i; --i, Cur++) {
@@ -409,6 +407,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	Cur_F = F;
 	Buf = F->Buffer2;
 	for (Cur = F->Components, i = F->Nb_Simi; i; --i, Cur++) {
+        F_PT xo, yo;
 		xo = Cur->Cx;
 		yo = Cur->Cy;
 		for (Simi = F->Components, j = F->Nb_Simi; j; --j, Simi++) {
@@ -457,7 +456,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 
 
 IFSPoint *
-draw_ifs ( /* ModeInfo * mi */ int *nbpt)
+draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 {
 	int     i;
 	DBL     u, uu, v, vv, u0, u1, u2, u3;
@@ -527,7 +526,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbpt)
 	F->Col++;
 
 	/* #1 code added by JeKo */
-	(*nbpt) = Cur_Pt;
+	(*nbPoints) = Cur_Pt;
 	return F->Buffer2;
 	/* #1 end */
 }

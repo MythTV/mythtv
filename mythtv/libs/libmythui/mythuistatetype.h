@@ -42,32 +42,32 @@ class MUI_PUBLIC MythUIStateType : public MythUIComposite
     MythUIType* GetState(const QString &name);
     MythUIType* GetState(StateType state);
 
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     void Clear(void);
 
     void EnsureStateLoaded(const QString &name);
     void EnsureStateLoaded(StateType type);
 
-    virtual void LoadNow(void);
-    virtual void RecalculateArea(bool recurse = true);
+    void LoadNow(void) override; // MythUIType
+    void RecalculateArea(bool recurse = true) override; // MythUIType
 
-    virtual void SetTextFromMap(const InfoMap &infoMap);
+    void SetTextFromMap(const InfoMap &infoMap) override; // MythUIComposite
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
     virtual void AdjustDependence(void);
 
     QMap<QString, MythUIType *> m_ObjectsByName;
     QMap<int, MythUIType *> m_ObjectsByState;
 
-    MythUIType *m_CurrentState;
+    MythUIType *m_CurrentState {nullptr};
     MythRect    m_ParentArea;
 
-    bool m_ShowEmpty;
+    bool        m_ShowEmpty    {true};
 
   friend class MythUIButtonList;
 };

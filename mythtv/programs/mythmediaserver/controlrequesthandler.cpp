@@ -17,9 +17,7 @@ bool ControlRequestHandler::AnnounceSocket(void)
                         .arg(gCoreContext->GetHostName());
     QStringList strlist(ann);
     
-    if (!m_socket->Announce(strlist))
-        return false;
-    return true;
+    return m_socket->Announce(strlist);
 }
 
 /**
@@ -35,18 +33,18 @@ bool ControlRequestHandler::AnnounceSocket(void)
  *                 this variable is never used.
  */
 bool ControlRequestHandler::HandleQuery(SocketHandler */*socket*/,
-                                        QStringList &commands,
+                                        QStringList &/*commands*/,
                                         QStringList &/*slist*/)
 {
     bool handled = false;
+#if 0
     QString command = commands[0];
 
-/*
     if (command == "GO_TO_SLEEP")
         handled = HandleSleep();
     else if (command == "SHUTDOWN_NOW")
         handled = HandleShutdown();
-*/
+#endif
 
     return handled;
 }

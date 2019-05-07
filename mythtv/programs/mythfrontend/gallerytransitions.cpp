@@ -1,15 +1,18 @@
 #include "gallerytransitions.h"
 
+#include <utility>
+
 #include "mythcorecontext.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+#include <QRandomGenerator>
+#endif
 
 #define LOC QString("Transition: ")
 
 
-Transition::Transition(QString name)
-    : QObject(),
-      m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
-      m_old(nullptr), m_new(nullptr), m_prev(nullptr), m_next(nullptr)
+Transition::Transition(const QString& name)
+    : m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000))
 {
     setObjectName(name);
 }
@@ -49,7 +52,6 @@ Transition &TransitionRegistry::Select(int setting)
  \param includeAnimations Whether to use animated transitions (zoom, rotate)
 */
 TransitionRegistry::TransitionRegistry(bool includeAnimations)
-    : m_immediate()
 {
     // Create all non-animated transitions to be used by Random
     m_map.insert(kBlendTransition, new TransitionBlend());
@@ -143,7 +145,7 @@ void TransitionNone::Start(Slide &from, Slide &to,
              log messages.
 */
 GroupTransition::GroupTransition(GroupAnimation *animation, QString name)
-    : Transition(name), m_animation(animation)
+    : Transition(std::move(name)), m_animation(animation)
 {
     // Complete transition when the group finishes
     connect(m_animation, SIGNAL(finished()), this, SLOT(Finished()));
@@ -409,7 +411,11 @@ void TransitionSpin::Finalise()
 void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 {
     // Select a random peer.
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+    int rand = QRandomGenerator::global()->bounded(m_peers.size());
+#else
     int rand = qrand() % m_peers.size();
+#endif
     m_current = m_peers[rand];
     // Invoke peer
     connect(m_current, SIGNAL(finished()), this, SLOT(Finished()));

@@ -27,7 +27,7 @@ class MythContextSlotHandler : public QObject
   private:
     ~MythContextSlotHandler() = default;
 
-    MythContextPrivate *d;
+    MythContextPrivate *d {nullptr};
 };
 
 /** \class MythContext
@@ -47,7 +47,7 @@ class MPUBLIC MythContext
 
     bool Init(const bool gui = true,
               const bool promptForBackend = false,
-              const bool bypassAutoDiscovery = false,
+              const bool disableAutoDiscovery = false,
               const bool ignoreDB = false);
 
     DatabaseParams GetDatabaseParams(void);
@@ -57,8 +57,8 @@ class MPUBLIC MythContext
     void SetDisableEventPopup(bool check);
 
   private:
-    MythContextPrivate *d;
-    QString app_binary_version;
+    MythContextPrivate *d {nullptr};
+    QString             m_app_binary_version;
 };
 
 /// This global variable contains the MythContext instance for the application

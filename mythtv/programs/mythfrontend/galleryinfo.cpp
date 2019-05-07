@@ -50,8 +50,7 @@ static QSet<QString> kBasicInfoSet = QSet<QString>::fromList(kBasicInfoFields);
 
 //! Constructor
 InfoList::InfoList(MythScreenType &screen)
-    : m_screen(screen), m_btnList(nullptr),
-      m_infoVisible(kNoInfo), m_mgr(ImageManagerFe::getInstance())
+    : m_screen(screen), m_mgr(ImageManagerFe::getInstance())
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(1000);
@@ -82,7 +81,7 @@ bool InfoList::Create(bool focusable)
  Basic & Full info. Non-focusable widgets toggle between Basic & Off.
  \param im The image/dir for which info is shown
 */
-void InfoList::Toggle(ImagePtrK im)
+void InfoList::Toggle(const ImagePtrK& im)
 {
     if (!im)
         return;
@@ -132,7 +131,7 @@ bool InfoList::Hide()
  \param name Exif tag name
  \param value Exif tag value
 */
-void InfoList::CreateButton(QString name, QString value)
+void InfoList::CreateButton(const QString& name, const QString& value)
 {
     if (value.isEmpty())
         return;
@@ -186,7 +185,7 @@ void InfoList::CreateCount(ImageItemK &im)
  \brief Populates available exif details for the current image/dir.
  \param im An image or dir
 */
-void InfoList::Update(ImagePtrK im)
+void InfoList::Update(const ImagePtrK& im)
 {
     if (!im || m_infoVisible == kNoInfo)
         return;

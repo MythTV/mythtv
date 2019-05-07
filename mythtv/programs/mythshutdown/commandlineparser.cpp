@@ -5,7 +5,7 @@
 
 MythShutdownCommandLineParser::MythShutdownCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHSHUTDOWN)
-{ LoadArguments(); }
+{ MythShutdownCommandLineParser::LoadArguments(); }
 
 void MythShutdownCommandLineParser::LoadArguments(void)
 {
@@ -17,26 +17,26 @@ void MythShutdownCommandLineParser::LoadArguments(void)
     addLogging("none", LOG_ERR);
 
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
-         << add(QStringList( QStringList() << "-w" << "--setwakeup" ),
+         << add(QStringList{"-w", "--setwakeup"},
                 "setwakeup", "",
                 "Set the wakeup time (yyyy-MM-ddThh:mm:ss) "
                 "default is in local time", "")
-         << add(QStringList( QStringList() << "-t" << "--setscheduledwakeup" ),
+         << add(QStringList{"-t", "--setscheduledwakeup"},
                 "setschedwakeup", false,
                 "Set wakeup time to the next scheduled recording", "")
-         << add(QStringList( QStringList() << "-q" << "--shutdown" ),
+         << add(QStringList{"-q", "--shutdown"},
                 "shutdown", false,
                 "Apply wakeup time to nvram and shutdown.", "")
-         << add(QStringList( QStringList() << "-x" << "--safeshutdown" ),
+         << add(QStringList{"-x", "--safeshutdown"},
                 "safeshutdown", false,
                 "Check if shutdown is possible, and shutdown", "")
-         << add(QStringList( QStringList() << "-p" << "--startup" ),
+         << add(QStringList{"-p", "--startup"},
                 "startup", false,
                 "Check startup status",
                 "Check startup status\n"
                 "   returns 0 - automatic startup\n"
                 "           1 - manual startup")
-         << add(QStringList( QStringList() << "-c" << "--check" ),
+         << add(QStringList{"-c", "--check"},
                 "check", 1,
                 "Check whether shutdown is possible",
                 "Check whether shutdown is possible depending on input\n"
@@ -45,10 +45,10 @@ void MythShutdownCommandLineParser::LoadArguments(void)
                 " returns 0 - ok to shut down\n"
                 "         1 - not ok, idle check reset")
          << add("--lock" , "lock", false, "disable shutdown", "")
-         << add(QStringList( QStringList() << "-u" << "--unlock" ),
+         << add(QStringList{"-u", "--unlock"},
                 "unlock", false,
                 "enable shutdown", "")
-         << add(QStringList( QStringList() << "-s" << "--status" ),
+         << add(QStringList{"-s", "--status"},
                 "status", 1,
                 "check current status",
                 "check current status depending on input\n"

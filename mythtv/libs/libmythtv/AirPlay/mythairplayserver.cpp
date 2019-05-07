@@ -138,12 +138,20 @@ QString GenerateNonce(void)
 {
     int nonceParts[4];
     QString nonce;
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+    auto randgen = QRandomGenerator::global();
+    nonceParts[0] = randgen->generate();
+    nonceParts[1] = randgen->generate();
+    nonceParts[2] = randgen->generate();
+    nonceParts[3] = randgen->generate();
+#else
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
     nonceParts[0] = qrand();
     nonceParts[1] = qrand();
     nonceParts[2] = qrand();
     nonceParts[3] = qrand();
+#endif
 
     nonce =  QString::number(nonceParts[0], 16).toUpper();
     nonce += QString::number(nonceParts[1], 16).toUpper();
@@ -152,8 +160,8 @@ QString GenerateNonce(void)
     return nonce;
 }
 
-QByteArray DigestMd5Response(QString response, QString option,
-                             QString nonce, QString password,
+QByteArray DigestMd5Response(const QString& response, const QString& option,
+                             const QString& nonce, const QString& password,
                              QByteArray &auth)
 {
     int authStart       = response.indexOf("response=\"") + 10;
@@ -203,8 +211,7 @@ QByteArray DigestMd5Response(QString response, QString option,
 class APHTTPRequest
 {
   public:
-    explicit APHTTPRequest(QByteArray& data) : m_readPos(0), m_data(data), m_size(0),
-                                      m_incomingPartial(false)
+    explicit APHTTPRequest(QByteArray& data) : m_data(data)
     {
         Process();
         Check();
@@ -223,7 +230,7 @@ class APHTTPRequest
         Check();
     }
 
-    QByteArray GetQueryValue(QByteArray key)
+    QByteArray GetQueryValue(const QByteArray& key)
     {
         for (int i = 0; i < m_queries.size(); i++)
             if (m_queries[i].first == key)
@@ -331,15 +338,15 @@ class APHTTPRequest
         m_incomingPartial = false;
     }
 
-    int        m_readPos;
+    int        m_readPos         {0};
     QByteArray m_data;
     QByteArray m_method;
     QByteArray m_uri;
     QList<QPair<QByteArray, QByteArray> > m_queries;
     QMap<QByteArray,QByteArray> m_headers;
     QByteArray m_body;
-    int        m_size;
-    bool       m_incomingPartial;
+    int        m_size            {0};
+    bool       m_incomingPartial {false};
 };
 
 bool MythAirplayServer::Create(void)
@@ -398,13 +405,6 @@ void MythAirplayServer::Cleanup(void)
     gMythAirplayServer = nullptr;
 }
 
-
-MythAirplayServer::MythAirplayServer()
-  : ServerPool(), m_name(QString("MythTV")), m_bonjour(nullptr), m_valid(false),
-    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100),
-    m_serviceRefresh(nullptr)
-{
-}
 
 MythAirplayServer::~MythAirplayServer()
 {
@@ -509,7 +509,6 @@ void MythAirplayServer::Start(void)
         m_serviceRefresh->start(2000);
     }
     m_valid = true;
-    return;
 }
 
 void MythAirplayServer::timeout(void)
@@ -561,14 +560,14 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
     while (it.hasNext())
     {
         it.next();
-        if (it.value().reverseSocket == socket)
-            it.value().reverseSocket = nullptr;
-        if (it.value().controlSocket == socket)
-            it.value().controlSocket = nullptr;
-        if (!it.value().reverseSocket &&
-            !it.value().controlSocket)
+        if (it.value().m_reverseSocket == socket)
+            it.value().m_reverseSocket = nullptr;
+        if (it.value().m_controlSocket == socket)
+            it.value().m_controlSocket = nullptr;
+        if (!it.value().m_reverseSocket &&
+            !it.value().m_controlSocket)
         {
-            if (!it.value().stopped)
+            if (!it.value().m_stopped)
             {
                 StopSession(it.key());
             }
@@ -695,36 +694,36 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
     if (req->GetURI() == "/reverse")
     {
-        QTcpSocket *s = m_connections[session].reverseSocket;
+        QTcpSocket *s = m_connections[session].m_reverseSocket;
         if (s != socket && s != nullptr)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Already have a different reverse socket for this connection.");
             return;
         }
-        m_connections[session].reverseSocket = socket;
+        m_connections[session].m_reverseSocket = socket;
         status = HTTP_STATUS_SWITCHING_PROTOCOLS;
         header = "Upgrade: PTTH/1.0\r\nConnection: Upgrade\r\n";
         SendResponse(socket, status, header, content_type, body);
         return;
     }
 
-    QTcpSocket *s = m_connections[session].controlSocket;
+    QTcpSocket *s = m_connections[session].m_controlSocket;
     if (s != socket && s != nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Already have a different control socket for this connection.");
         return;
     }
-    m_connections[session].controlSocket = socket;
+    m_connections[session].m_controlSocket = socket;
 
-    if (m_connections[session].controlSocket != nullptr &&
-        m_connections[session].reverseSocket != nullptr &&
-        !m_connections[session].initialized)
+    if (m_connections[session].m_controlSocket != nullptr &&
+        m_connections[session].m_reverseSocket != nullptr &&
+        !m_connections[session].m_initialized)
     {
         // Got a full connection, disconnect any other clients
         DisconnectAllClients(session);
-        m_connections[session].initialized = true;
+        m_connections[session].m_initialized = true;
 
         MythNotification n(tr("New Connection"), tr("AirPlay"),
                            tr("from %1").arg(socket->peerAddress().toString()));
@@ -733,9 +732,9 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         GetNotificationCenter()->Queue(n);
     }
 
-    double position    = 0.0f;
-    double duration    = 0.0f;
-    float  playerspeed = 0.0f;
+    double position    = 0.0F;
+    double duration    = 0.0F;
+    float  playerspeed = 0.0F;
     bool   playing     = false;
     QString pathname;
     GetPlayerStatus(playing, playerspeed, position, duration, pathname);
@@ -745,25 +744,25 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         // not ours
         playing = false;
     }
-    if (playing && duration > 0.01f && position < 0.01f)
+    if (playing && duration > 0.01 && position < 0.01)
     {
         // Assume playback hasn't started yet, get saved position
-        position = m_connections[session].position;
+        position = m_connections[session].m_position;
     }
-    if (!playing && m_connections[session].was_playing)
+    if (!playing && m_connections[session].m_was_playing)
     {
         // playback got interrupted, notify client to stop
         if (SendReverseEvent(session, AP_EVENT_STOPPED))
         {
-            m_connections[session].was_playing = false;
+            m_connections[session].m_was_playing = false;
         }
     }
     else
     {
-        m_connections[session].was_playing = playing;
+        m_connections[session].m_was_playing = playing;
     }
 
-    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    if (gCoreContext->GetBoolSetting("AirPlayPasswordEnabled", false))
     {
         if (m_nonce.isEmpty())
         {
@@ -809,7 +808,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         {
             // this may be received before playback starts...
             uint64_t intpos = (uint64_t)pos;
-            m_connections[session].position = pos;
+            m_connections[session].m_position = pos;
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Scrub: (post) seek to %1").arg(intpos));
             SeekPosition(intpos);
@@ -818,15 +817,15 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         {
             content_type = "text/parameters\r\n";
             body = QString("duration: %1\r\nposition: %2\r\n")
-                .arg((double)duration, 0, 'f', 6, '0')
-                .arg((double)position, 0, 'f', 6, '0');
+                .arg(duration, 0, 'f', 6, '0')
+                .arg(position, 0, 'f', 6, '0');
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Scrub: (get) returned %1 of %2")
                 .arg(position).arg(duration));
 
             /*
-            if (playing && playerspeed < 1.0f)
+            if (playing && playerspeed < 1.0F)
             {
                 SendReverseEvent(session, AP_EVENT_PLAYING);
                 QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
@@ -854,19 +853,19 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 .arg(image.width()).arg(image.height()).
                 arg(png ? "jpeg" : "png"));
 
-            if (m_connections[session].notificationid < 0)
+            if (m_connections[session].m_notificationid < 0)
             {
-                m_connections[session].notificationid =
+                m_connections[session].m_notificationid =
                     GetNotificationCenter()->Register(this);
             }
             // send full screen display notification
             MythImageNotification n(MythNotification::New, image);
-            n.SetId(m_connections[session].notificationid);
+            n.SetId(m_connections[session].m_notificationid);
             n.SetParent(this);
             n.SetFullScreen(true);
             GetNotificationCenter()->Queue(n);
             // This is a photo session
-            m_connections[session].photos = true;
+            m_connections[session].m_photos = true;
         }
     }
     else if (req->GetURI() == "/slideshow-features")
@@ -889,11 +888,11 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/rate")
     {
         float rate = req->GetQueryValue("value").toFloat();
-        m_connections[session].speed = rate;
+        m_connections[session].m_speed = rate;
 
-        if (rate < 1.0f)
+        if (rate < 1.0F)
         {
-            if (playerspeed > 0.0f)
+            if (playerspeed > 0.0F)
             {
                 PausePlayback();
             }
@@ -901,7 +900,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         }
         else
         {
-            if (playerspeed < 1.0f)
+            if (playerspeed < 1.0F)
             {
                 UnpausePlayback();
             }
@@ -913,7 +912,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/play")
     {
         QByteArray file;
-        double start_pos = 0.0f;
+        double start_pos = 0.0F;
         if (req->GetHeaders().contains("Content-Type") &&
             req->GetHeaders()["Content-Type"] == "application/x-apple-binary-plist")
         {
@@ -939,8 +938,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             m_pathname = QUrl::fromPercentEncoding(file);
             StartPlayback(m_pathname);
             GetPlayerStatus(playing, playerspeed, position, duration, pathname);
-            m_connections[session].url = QUrl(m_pathname);
-            m_connections[session].position = start_pos * duration;
+            m_connections[session].m_url = QUrl(m_pathname);
+            m_connections[session].m_position = start_pos * duration;
             if (TV::IsTVRunning())
             {
                 HideAllPhotos();
@@ -968,12 +967,12 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         else
         {
             body = PLAYBACK_INFO;
-            body.replace("%1", QString("%1").arg((double)duration, 0, 'f', 6, '0'));
-            body.replace("%2", QString("%1").arg((double)duration, 0, 'f', 6, '0')); // cached
-            body.replace("%3", QString("%1").arg((double)position, 0, 'f', 6, '0'));
-            body.replace("%4", playerspeed > 0.0f ? "1.0" : "0.0");
+            body.replace("%1", QString("%1").arg(duration, 0, 'f', 6, '0'));
+            body.replace("%2", QString("%1").arg(duration, 0, 'f', 6, '0')); // cached
+            body.replace("%3", QString("%1").arg(position, 0, 'f', 6, '0'));
+            body.replace("%4", playerspeed > 0.0F ? "1.0" : "0.0");
             LOG(VB_GENERAL, LOG_DEBUG, body);
-            SendReverseEvent(session, playerspeed > 0.0f ? AP_EVENT_PLAYING :
+            SendReverseEvent(session, playerspeed > 0.0F ? AP_EVENT_PLAYING :
                                                            AP_EVENT_PAUSED);
         }
     }
@@ -981,8 +980,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 }
 
 void MythAirplayServer::SendResponse(QTcpSocket *socket,
-                                     int status, QByteArray header,
-                                     QByteArray content_type, QString body)
+                                     int status, const QByteArray& header,
+                                     const QByteArray& content_type, const QString& body)
 {
     if (!socket || !m_incoming.contains(socket) ||
         socket->state() != QAbstractSocket::ConnectedState)
@@ -1029,9 +1028,9 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
 {
     if (!m_connections.contains(session))
         return false;
-    if (m_connections[session].lastEvent == event)
+    if (m_connections[session].m_lastEvent == event)
         return false;
-    if (!m_connections[session].reverseSocket)
+    if (!m_connections[session].m_reverseSocket)
         return false;
 
     QString body;
@@ -1044,8 +1043,8 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
         body.replace("%1", eventToString(event));
     }
 
-    m_connections[session].lastEvent = event;
-    QTextStream response(m_connections[session].reverseSocket);
+    m_connections[session].m_lastEvent = event;
+    QTextStream response(m_connections[session].m_reverseSocket);
     response.setCodec("UTF-8");
     QByteArray reply;
     reply.append("POST /event HTTP/1.1\r\n");
@@ -1063,7 +1062,7 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
     response.flush();
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Send reverse: %1 \n\n%2\n")
-         .arg(m_connections[session].reverseSocket->flush())
+         .arg(m_connections[session].m_reverseSocket->flush())
          .arg(reply.data()));
     return true;
 }
@@ -1120,20 +1119,20 @@ void MythAirplayServer::StopSession(const QByteArray &session)
 {
     AirplayConnection& cnx = m_connections[session];
 
-    if (cnx.photos)
+    if (cnx.m_photos)
     {
-        if (cnx.notificationid > 0)
+        if (cnx.m_notificationid > 0)
         {
             // close any photos that could be displayed
-            GetNotificationCenter()->UnRegister(this, cnx.notificationid, true);
-           cnx.notificationid = -1;
+            GetNotificationCenter()->UnRegister(this, cnx.m_notificationid, true);
+            cnx.m_notificationid = -1;
         }
         return;
     }
-    cnx.stopped = true;
-    double position    = 0.0f;
-    double duration    = 0.0f;
-    float  playerspeed = 0.0f;
+    cnx.m_stopped = true;
+    double position    = 0.0F;
+    double duration    = 0.0F;
+    float  playerspeed = 0.0F;
     bool   playing     = false;
     QString pathname;
     GetPlayerStatus(playing, playerspeed, position, duration, pathname);
@@ -1161,21 +1160,21 @@ void MythAirplayServer::DisconnectAllClients(const QByteArray &session)
         AirplayConnection& cnx = it.value();
 
         if (it.key() == session ||
-            (current_cnx.reverseSocket && cnx.reverseSocket &&
-             current_cnx.reverseSocket->peerAddress() == cnx.reverseSocket->peerAddress()) ||
-            (current_cnx.controlSocket && cnx.controlSocket &&
-             current_cnx.controlSocket->peerAddress() == cnx.controlSocket->peerAddress()))
+            (current_cnx.m_reverseSocket && cnx.m_reverseSocket &&
+             current_cnx.m_reverseSocket->peerAddress() == cnx.m_reverseSocket->peerAddress()) ||
+            (current_cnx.m_controlSocket && cnx.m_controlSocket &&
+             current_cnx.m_controlSocket->peerAddress() == cnx.m_controlSocket->peerAddress()))
         {
             // ignore if the connection is the currently active one or
             // from the same IP address
             ++it;
             continue;
         }
-        if (!(*it).stopped)
+        if (!(*it).m_stopped)
         {
             StopSession(it.key());
         }
-        socket = cnx.reverseSocket;
+        socket = cnx.m_reverseSocket;
         if (socket)
         {
             socket->disconnect();
@@ -1188,7 +1187,7 @@ void MythAirplayServer::DisconnectAllClients(const QByteArray &session)
                 m_incoming.remove(socket);
             }
         }
-        socket = cnx.controlSocket;
+        socket = cnx.m_controlSocket;
         if (socket)
         {
             socket->disconnect();
@@ -1260,7 +1259,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
             .arg(m_pathname));
 
         MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
-                                      QStringList(QString::number((uint64_t)position)));
+                                      QStringList(QString::number(position)));
         qApp->postEvent(GetMythMainWindow(), me);
         // Wait until we receive that the seek has completed
         gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackSought(qint64)),
@@ -1279,7 +1278,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
 
 void MythAirplayServer::PausePlayback(void)
 {
-    if (TV::IsTVRunning() && !TV::CurrentTVInstance()->IsPaused())
+    if (TV::IsTVRunning() && !TV::IsPaused())
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("Sending ACTION_PAUSE for %1")
@@ -1338,7 +1337,7 @@ void MythAirplayServer::HideAllPhotos(void)
     {
         AirplayConnection& cnx = it.value();
 
-        if (cnx.photos)
+        if (cnx.m_photos)
         {
             cnx.UnRegister();
         }

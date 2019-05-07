@@ -13,15 +13,14 @@ class MultiplexSetting : public TransMythUIComboBoxSetting
     Q_OBJECT
 
   public:
-    MultiplexSetting() : sourceid(0)
-        { setLabel(tr("Transport")); }
+    MultiplexSetting() { setLabel(tr("Transport")); }
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
-    void SetSourceID(uint _sourceid);
+    void SetSourceID(uint sourceid);
 
   protected:
-    uint sourceid;
+    uint m_sourceid {0};
 };
 
 #endif // _MULTIPLEX_SETTING_H_

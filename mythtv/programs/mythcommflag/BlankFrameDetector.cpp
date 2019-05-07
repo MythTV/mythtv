@@ -1,6 +1,7 @@
 // ANSI C headers
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <utility>
 
 // MythTV headers
 #include "mythcorecontext.h"    /* gContext */
@@ -374,30 +375,27 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
 };  /* namespace */
 
 BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
-    : FrameAnalyzer()
-    , histogramAnalyzer(ha)
-    , fps(0.0f)
-    , debugLevel(0)
+    : m_histogramAnalyzer(ha)
 {
     /*
      * debugLevel:
      *      0: no debugging
      *      2: extra verbosity [O(nframes)]
      */
-    debugLevel = gCoreContext->GetNumSetting("BlankFrameDetectorDebugLevel", 0);
+    m_debugLevel = gCoreContext->GetNumSetting("BlankFrameDetectorDebugLevel", 0);
 
-    if (debugLevel >= 1)
-        createDebugDirectory(debugdir,
-            QString("BlankFrameDetector debugLevel %1").arg(debugLevel));
+    if (m_debugLevel >= 1)
+        createDebugDirectory(std::move(debugdir),
+            QString("BlankFrameDetector debugLevel %1").arg(m_debugLevel));
 }
 
 enum FrameAnalyzer::analyzeFrameResult
 BlankFrameDetector::MythPlayerInited(MythPlayer *player, long long nframes)
 {
     FrameAnalyzer::analyzeFrameResult ares =
-        histogramAnalyzer->MythPlayerInited(player, nframes);
+        m_histogramAnalyzer->MythPlayerInited(player, nframes);
 
-    fps = player->GetFrameRate();
+    m_fps = player->GetFrameRate();
 
     QSize video_disp_dim = player->GetVideoSize();
 
@@ -415,7 +413,7 @@ BlankFrameDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
 {
     *pNextFrame = NEXTFRAME;
 
-    if (histogramAnalyzer->analyzeFrame(frame, frameno) ==
+    if (m_histogramAnalyzer->analyzeFrame(frame, frameno) ==
             FrameAnalyzer::ANALYZE_OK)
         return ANALYZE_OK;
 
@@ -428,18 +426,18 @@ BlankFrameDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
 int
 BlankFrameDetector::finished(long long nframes, bool final)
 {
-    if (histogramAnalyzer->finished(nframes, final))
+    if (m_histogramAnalyzer->finished(nframes, final))
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("BlankFrameDetector::finished(%1)")
             .arg(nframes));
 
     /* Identify all sequences of blank frames (blankMap). */
-    computeBlankMap(&blankMap, nframes,
-            histogramAnalyzer->getMedians(), histogramAnalyzer->getStdDevs(),
-            histogramAnalyzer->getMonochromatics());
-    if (debugLevel >= 2)
-        frameAnalyzerReportMapms(&blankMap, fps, "BF Blank");
+    computeBlankMap(&m_blankMap, nframes,
+            m_histogramAnalyzer->getMedians(), m_histogramAnalyzer->getStdDevs(),
+            m_histogramAnalyzer->getMonochromatics());
+    if (m_debugLevel >= 2)
+        frameAnalyzerReportMapms(&m_blankMap, m_fps, "BF Blank");
 
     return 0;
 }
@@ -456,7 +454,7 @@ BlankFrameDetector::computeForLogoSurplus(
     const FrameAnalyzer::FrameMap *logoBreakMap = templateMatcher->getBreaks();
 
     /* TUNABLE: see TemplateMatcher::adjustForBlanks */
-    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * m_fps);  /* frames */
 
     LOG(VB_COMMFLAG, LOG_INFO, "BlankFrameDetector adjusting for logo surplus");
 
@@ -473,12 +471,10 @@ BlankFrameDetector::computeForLogoSurplus(
         long long iikey = ii.key();
         long long iibb = iikey - MAXBLANKADJUSTMENT;
         long long iiee = iikey + MAXBLANKADJUSTMENT;
-        FrameAnalyzer::FrameMap::Iterator jjfound = blankMap.end();
+        FrameAnalyzer::FrameMap::Iterator jjfound = m_blankMap.end();
 
         /* Look for a blank frame near beginning of logo break. */
-        for (FrameAnalyzer::FrameMap::Iterator jj = blankMap.begin();
-                jj != blankMap.end();
-                ++jj)
+        for (auto jj = m_blankMap.begin(); jj != m_blankMap.end(); ++jj)
         {
             long long jjbb = jj.key();
             long long jjee = jjbb + *jj;
@@ -501,20 +497,20 @@ BlankFrameDetector::computeForLogoSurplus(
         }
 
         /* Adjust blank frame to begin with logo break beginning. */
-        if (jjfound != blankMap.end())
+        if (jjfound != m_blankMap.end())
         {
             long long jjee = jjfound.key() + *jjfound;
-            blankMap.erase(jjfound);
+            m_blankMap.erase(jjfound);
             if (jjee <= iikey)
             {
                 /* Move blank frame to beginning of logo break. */
-                blankMap.remove(iikey);
-                blankMap.insert(iikey, 1);
+                m_blankMap.remove(iikey);
+                m_blankMap.insert(iikey, 1);
             }
             else
             {
                 /* Adjust blank frame to begin with logo break. */
-                blankMap.insert(iikey, jjee - iikey);
+                m_blankMap.insert(iikey, jjee - iikey);
             }
         }
 
@@ -522,12 +518,10 @@ BlankFrameDetector::computeForLogoSurplus(
         long long kkkey = ii.key() + *ii;
         long long kkbb = kkkey - MAXBLANKADJUSTMENT;
         long long kkee = kkkey + MAXBLANKADJUSTMENT;
-        FrameAnalyzer::FrameMap::Iterator mmfound = blankMap.end();
+        FrameAnalyzer::FrameMap::Iterator mmfound = m_blankMap.end();
 
         /* Look for a blank frame near end of logo break. */
-        for (FrameAnalyzer::FrameMap::Iterator mm = blankMap.begin();
-                mm != blankMap.end();
-                ++mm)
+        for (auto mm = m_blankMap.begin(); mm != m_blankMap.end(); ++mm)
         {
             long long mmbb = mm.key();
             long long mmee = mmbb + *mm;
@@ -539,28 +533,28 @@ BlankFrameDetector::computeForLogoSurplus(
                 continue;   /* Too early; keep looking. */
 
             /* Prefer the last blank frame ending before the logo break ends. */
-            if (mmee < kkkey || mmfound == blankMap.end())
+            if (mmee < kkkey || mmfound == m_blankMap.end())
                 mmfound = mm;
             if (mmee >= kkkey)
                 break;
         }
 
         /* Adjust blank frame to end with logo break end. */
-        if (mmfound != blankMap.end())
+        if (mmfound != m_blankMap.end())
         {
             long long mmbb = mmfound.key();
             if (mmbb < kkkey)
             {
                 /* Adjust blank frame to end with logo break. */
-                blankMap.remove(mmbb);
-                blankMap.insert(mmbb, kkkey - mmbb);
+                m_blankMap.remove(mmbb);
+                m_blankMap.insert(mmbb, kkkey - mmbb);
             }
             else
             {
                 /* Move blank frame to end of logo break. */
-                blankMap.erase(mmfound);
-                blankMap.remove(kkkey - 1);
-                blankMap.insert(kkkey - 1, 1);
+                m_blankMap.erase(mmfound);
+                m_blankMap.remove(kkkey - 1);
+                m_blankMap.insert(kkkey - 1, 1);
             }
         }
     }
@@ -568,7 +562,7 @@ BlankFrameDetector::computeForLogoSurplus(
     /*
      * Compute breaks (breakMap).
      */
-    computeBreakMap(&breakMap, &blankMap, fps, debugLevel);
+    computeBreakMap(&m_breakMap, &m_blankMap, m_fps, m_debugLevel);
 
     /*
      * Expand blank-frame breaks to fully include overlapping logo breaks.
@@ -583,9 +577,7 @@ BlankFrameDetector::computeForLogoSurplus(
         long long iiee = iibb + *ii;
         bool overlap = false;
 
-        for (FrameAnalyzer::FrameMap::Iterator jj = breakMap.begin();
-                jj != breakMap.end();
-            )
+        for (auto jj = m_breakMap.begin(); jj != m_breakMap.end(); )
         {
             long long jjbb = jj.key();
             long long jjee = jjbb + *jj;
@@ -597,7 +589,7 @@ BlankFrameDetector::computeForLogoSurplus(
                 if (!overlap)
                 {
                     /* Fully incorporate logo break */
-                    breakMap.insert(iibb, iiee - iibb);
+                    m_breakMap.insert(iibb, iiee - iibb);
                 }
                 break;
             }
@@ -606,8 +598,8 @@ BlankFrameDetector::computeForLogoSurplus(
             {
                 /* End of logo break includes beginning of blank-frame break. */
                 overlap = true;
-                breakMap.erase(jj);
-                breakMap.insert(iibb, max(iiee, jjee) - iibb);
+                m_breakMap.erase(jj);
+                m_breakMap.insert(iibb, max(iiee, jjee) - iibb);
             }
             else if (jjbb < iibb && iibb < jjee)
             {
@@ -615,8 +607,8 @@ BlankFrameDetector::computeForLogoSurplus(
                 overlap = true;
                 if (jjee < iiee)
                 {
-                    breakMap.remove(jjbb);
-                    breakMap.insert(jjbb, iiee - jjbb);
+                    m_breakMap.remove(jjbb);
+                    m_breakMap.insert(jjbb, iiee - jjbb);
                 }
             }
 
@@ -624,7 +616,7 @@ BlankFrameDetector::computeForLogoSurplus(
         }
     }
 
-    frameAnalyzerReportMap(&breakMap, fps, "BF Break");
+    frameAnalyzerReportMap(&m_breakMap, m_fps, "BF Break");
     return 0;
 }
 
@@ -642,17 +634,15 @@ BlankFrameDetector::computeForLogoDeficit(
 int
 BlankFrameDetector::computeBreaks(FrameAnalyzer::FrameMap *breaks)
 {
-    if (breakMap.empty())
+    if (m_breakMap.empty())
     {
-        /* Compute breaks (breakMap). */
-        computeBreakMap(&breakMap, &blankMap, fps, debugLevel);
-        frameAnalyzerReportMap(&breakMap, fps, "BF Break");
+        /* Compute breaks (m_breakMap). */
+        computeBreakMap(&m_breakMap, &m_blankMap, m_fps, m_debugLevel);
+        frameAnalyzerReportMap(&m_breakMap, m_fps, "BF Break");
     }
 
     breaks->clear();
-    for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
-            bb != breakMap.end();
-            ++bb)
+    for (auto bb = m_breakMap.begin(); bb != m_breakMap.end(); ++bb)
         breaks->insert(bb.key(), *bb);
 
     return 0;
@@ -661,7 +651,7 @@ BlankFrameDetector::computeBreaks(FrameAnalyzer::FrameMap *breaks)
 int
 BlankFrameDetector::reportTime(void) const
 {
-    return histogramAnalyzer->reportTime();
+    return m_histogramAnalyzer->reportTime();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

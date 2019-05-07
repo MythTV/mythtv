@@ -40,10 +40,10 @@ class MTV_PUBLIC  HLSReader
     typedef QMap<QString, HLSRecStream* > StreamContainer;
     typedef QList<HLSRecSegment> SegmentContainer;
 
-    HLSReader(void);
+    HLSReader(void) = default;
     ~HLSReader(void);
 
-    bool Open(const QString & uri, int bitrate_index = 0);
+    bool Open(const QString & m3u, int bitrate_index = 0);
     void Close(bool quiet = false);
     int Read(uint8_t* buffer, int len);
     void Throttle(bool val);
@@ -95,41 +95,36 @@ class MTV_PUBLIC  HLSReader
     void EnableDebugging(void);
 
   private:
-    QString          m_m3u8;
-    StreamContainer  m_streams;
-    SegmentContainer m_segments;
-    HLSRecStream    *m_curstream;
-    int64_t          m_cur_seq;
-    int              m_bitrate_index;
+    QString            m_m3u8;
+    StreamContainer    m_streams;
+    SegmentContainer   m_segments;
+    HLSRecStream      *m_curstream      {nullptr};
+    int64_t            m_cur_seq        {-1};
+    int                m_bitrate_index  {0};
 
-    bool m_fatal;
-    bool m_cancel;
-    bool m_throttle;
-    bool m_aesmsg;   // only print one time that the media is encrypted
+    bool               m_fatal          {false};
+    bool               m_cancel         {false};
+    bool               m_throttle       {true};
+                     // only print one time that the media is encrypted
+    bool               m_aesmsg         {false};
 
-    HLSPlaylistWorker *m_playlistworker;
-    HLSStreamWorker   *m_streamworker;
+    HLSPlaylistWorker *m_playlistworker {nullptr};
+    HLSStreamWorker   *m_streamworker   {nullptr};
 
-#if 0
-    int64_t    m_seq_begin;
-    int64_t    m_seq_first;
-    int64_t    m_seq_next;
-    int64_t    m_seq_end;
-#endif
-    int        m_playlist_size;
-    bool       m_bandwidthcheck;
-    uint       m_prebuffer_cnt;
-    QMutex     m_seq_lock;
-    mutable QMutex m_stream_lock;
-    QMutex     m_throttle_lock;
-    QWaitCondition  m_throttle_cond;
-    bool       m_debug;
-    int        m_debug_cnt;
+    int                m_playlist_size  {0};
+    bool               m_bandwidthcheck {false};
+    uint               m_prebuffer_cnt  {10};
+    QMutex             m_seq_lock;
+    mutable QMutex     m_stream_lock;
+    QMutex             m_throttle_lock;
+    QWaitCondition     m_throttle_cond;
+    bool               m_debug          {false};
+    int                m_debug_cnt      {0};
 
     // Downloading
-    int         m_slow_cnt;
-    QByteArray  m_buffer;
-    QMutex      m_buflock;
+    int                m_slow_cnt       {0};
+    QByteArray         m_buffer;
+    QMutex             m_buflock;
 };
 
 #endif

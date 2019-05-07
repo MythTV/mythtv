@@ -37,9 +37,7 @@
 // LyricsView
 
 LyricsView::LyricsView(MythScreenStack *parent, MythScreenType *parentScreen)
-         :MusicCommon(parent, parentScreen, "lyricsview"),
-         m_lyricsList(nullptr), m_statusText(nullptr), m_loadingState(nullptr), m_bufferStatus(nullptr),
-         m_bufferProgress(nullptr), m_lyricData(nullptr), m_autoScroll(true)
+    : MusicCommon(parent, parentScreen, "lyricsview")
 {
     m_currentView = MV_LYRICS;
 
@@ -132,7 +130,7 @@ void LyricsView::customEvent(QEvent *event)
                 LyricsLine *lyric = item->GetData().value<LyricsLine*>();
                 if (lyric)
                 {
-                    if (lyric->Time > 1000 && rs >= lyric->Time)
+                    if (lyric->m_time > 1000 && rs >= lyric->m_time)
                         pos = x;
                 }
             }
@@ -289,7 +287,7 @@ bool LyricsView::keyPressEvent(QKeyEvent *event)
         // are pressed turn off auto scroll
         if (GetFocusWidget() == m_lyricsList)
         {
-            handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+            GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
             if (actions.contains("UP") || actions.contains("DOWN") ||
                 actions.contains("PAGEUP") || actions.contains("PAGEDOWN"))
                 m_autoScroll = false;
@@ -330,9 +328,6 @@ bool LyricsView::keyPressEvent(QKeyEvent *event)
     if (!handled && MusicCommon::keyPressEvent(event))
         handled = true;
 
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
     return handled;
 }
 
@@ -349,7 +344,7 @@ void LyricsView::setLyricTime(void)
             LyricsLine *lyric = item->GetData().value<LyricsLine*>();
             if (lyric)
             {
-                lyric->Time = gPlayer->getOutput()->GetAudiotime() - 750;
+                lyric->m_time = gPlayer->getOutput()->GetAudiotime() - 750;
                 m_lyricData->setChanged(true);
                 m_lyricData->setSyncronized(true);
                 m_autoScroll = false;
@@ -463,7 +458,7 @@ void LyricsView::showLyrics(void)
     {
         LyricsLine *line = (*i);
         if (line)
-            new MythUIButtonListItem(m_lyricsList, line->Lyric, qVariantFromValue(line));
+            new MythUIButtonListItem(m_lyricsList, line->m_lyric, qVariantFromValue(line));
         ++i;
     }
 
@@ -503,15 +498,7 @@ void LyricsView::editFinished(bool result)
 EditLyricsDialog::EditLyricsDialog(
     MythScreenStack *parent, LyricsData *sourceData) :
     MythScreenType(parent, "EditLyricsDialog"),
-    m_sourceData(sourceData),
-    m_grabberEdit(nullptr),
-    m_syncronizedCheck(nullptr),
-    m_titleEdit(nullptr),
-    m_artistEdit(nullptr),
-    m_albumEdit(nullptr),
-    m_lyricsEdit(nullptr),
-    m_cancelButton(nullptr),
-    m_okButton(nullptr)
+    m_sourceData(sourceData)
 {
 }
 
@@ -568,21 +555,15 @@ bool EditLyricsDialog::keyPressEvent(QKeyEvent *event)
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
-        handled = true;
 
         if (action == "ESCAPE" && somethingChanged())
         {
             cancelPressed();
             return true;
         }
-        else
-            handled = false;
     }
 
-    if (MythScreenType::keyPressEvent(event))
-        return true;
-
-    return false;
+    return MythScreenType::keyPressEvent(event);
 }
 
 void EditLyricsDialog::loadLyrics(void)

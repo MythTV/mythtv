@@ -12,32 +12,32 @@ using std::vector;
 void ProgramInfoUpdater::insert(
     uint     recordedid, PIAction action, uint64_t filesize)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
     if (kPIUpdate == action || kPIUpdateFileSize == action)
     {
-        QHash<uint,PIKeyData>::iterator it = needsUpdate.find(recordedid);
+        QHash<uint,PIKeyData>::iterator it = m_needsUpdate.find(recordedid);
         // If there is no action in the set we can insert
         // If it is the same type of action we can overwrite,
         // If it the new action is a full update we can overwrite
-        if (it == needsUpdate.end())
-            needsUpdate.insert(recordedid, PIKeyData(action, filesize));
-        else if (((*it).action == action) || (kPIUpdate == action))
+        if (it == m_needsUpdate.end())
+            m_needsUpdate.insert(recordedid, PIKeyData(action, filesize));
+        else if (((*it).m_action == action) || (kPIUpdate == action))
             (*it) = PIKeyData(action, filesize);
     }
     else
     {
-        needsAddDelete.emplace_back(recordedid, action);
+        m_needsAddDelete.emplace_back(recordedid, action);
     }
 
     // Start a new run() if one isn't already running..
     // The lock prevents anything from getting stuck on a queue.
-    if (!isRunning)
+    if (!m_isRunning)
     {
-        isRunning = true;
+        m_isRunning = true;
         MThreadPool::globalInstance()->start(this, "ProgramInfoUpdater");
     }
     else
-        moreWork.wakeAll();
+        m_moreWork.wakeAll();
 }
 
 void ProgramInfoUpdater::run(void)
@@ -52,36 +52,36 @@ void ProgramInfoUpdater::run(void)
         // updates to be consolidated into one update...
         usleep(200 * 1000); // 200ms
 
-        lock.lock();
+        m_lock.lock();
 
         // send adds and deletes in the order they were queued
-        vector<PIKeyAction>::iterator ita = needsAddDelete.begin();
-        for (; ita != needsAddDelete.end(); ++ita)
+        vector<PIKeyAction>::iterator ita = m_needsAddDelete.begin();
+        for (; ita != m_needsAddDelete.end(); ++ita)
         {
-            if (kPIAdd != (*ita).action && kPIDelete != (*ita).action)
+            if (kPIAdd != (*ita).m_action && kPIDelete != (*ita).m_action)
                 continue;
 
-            QString type = (kPIAdd == (*ita).action) ? "ADD" : "DELETE";
+            QString type = (kPIAdd == (*ita).m_action) ? "ADD" : "DELETE";
             QString msg = QString("RECORDING_LIST_CHANGE %1 %2")
-                .arg(type).arg((*ita).recordedid);
+                .arg(type).arg((*ita).m_recordedid);
 
             workDone = true;
             gCoreContext->SendMessage(msg);
         }
-        needsAddDelete.clear();
+        m_needsAddDelete.clear();
 
         // Send updates in any old order, we just need
         // one per updated ProgramInfo.
-        QHash<uint,PIKeyData>::iterator itu = needsUpdate.begin();
-        for (; itu != needsUpdate.end(); ++itu)
+        QHash<uint,PIKeyData>::iterator itu = m_needsUpdate.begin();
+        for (; itu != m_needsUpdate.end(); ++itu)
         {
             QString msg;
 
-            if (kPIUpdateFileSize == (*itu).action)
+            if (kPIUpdateFileSize == (*itu).m_action)
             {
                 msg = QString("UPDATE_FILE_SIZE %1 %2")
                     .arg(itu.key())
-                    .arg((*itu).filesize);
+                    .arg((*itu).m_filesize);
             }
             else
             {
@@ -92,15 +92,15 @@ void ProgramInfoUpdater::run(void)
             workDone = true;
             gCoreContext->SendMessage(msg);
         }
-        needsUpdate.clear();
+        m_needsUpdate.clear();
 
         if ( workDone )
-            moreWork.wait(&lock, 1000);
+            m_moreWork.wait(&m_lock, 1000);
 
-        lock.unlock();
+        m_lock.unlock();
     } while( workDone );
 
-    isRunning = false;
+    m_isRunning = false;
 }
 
 /*

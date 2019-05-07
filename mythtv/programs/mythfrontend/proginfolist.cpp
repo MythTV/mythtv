@@ -3,13 +3,6 @@
 #include "mythdate.h"
 #include "proginfolist.h"
 
-//! Constructor
-ProgInfoList::ProgInfoList(MythScreenType &screen)
-    : m_screen(screen), m_btnList(nullptr),
-      m_infoVisible(kLevel1)
-{
-}
-
 /*!
  \brief Initialise buttonlist from XML
  \param focusable Set if info list should be focusable (for scrolling)
@@ -78,7 +71,7 @@ bool ProgInfoList::Hide()
  \param name
  \param value
 */
-void ProgInfoList::CreateButton(QString name, QString value)
+void ProgInfoList::CreateButton(const QString& name, const QString& value)
 {
     if (value.isEmpty())
         return;

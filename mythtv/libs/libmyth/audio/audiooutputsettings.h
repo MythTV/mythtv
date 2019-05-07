@@ -52,8 +52,9 @@ class MPUBLIC AudioOutputSettings
 {
     public:
         explicit AudioOutputSettings(bool invalid = false);
+        AudioOutputSettings(const AudioOutputSettings&) = default;
         ~AudioOutputSettings();
-        AudioOutputSettings& operator=(const AudioOutputSettings&);
+        AudioOutputSettings& operator=(const AudioOutputSettings& /*rhs*/);
         AudioOutputSettings *GetCleaned(bool newcopy = false);
         AudioOutputSettings *GetUsers(bool newcopy = false);
 
@@ -88,25 +89,25 @@ class MPUBLIC AudioOutputSettings
              * - FEATURE_DTSHD
              */
         bool canFeature(DigitalFeature arg)
-        { return m_features & arg; };
+        { return (m_features & arg) != 0U; };
         bool canFeature(unsigned int arg)
-        { return m_features & arg; };
+        { return (m_features & arg) != 0U; };
 
             /**
              * return true if device can or may support AC3
              * (deprecated, see canFeature())
              */
-        bool canAC3()                   { return m_features & FEATURE_AC3; };
+        bool canAC3()                   { return canFeature(FEATURE_AC3); };
             /**
              * return true if device can or may support DTS
              * (deprecated, see canFeature())
              */
-        bool canDTS()                   { return m_features & FEATURE_DTS; };
+        bool canDTS()                   { return canFeature(FEATURE_DTS); };
             /**
              * return true if device supports multichannels PCM
              * (deprecated, see canFeature())
              */
-        bool canLPCM()                  { return m_features & FEATURE_LPCM; };
+        bool canLPCM()                  { return canFeature(FEATURE_LPCM); };
             /**
              * return true if class instance is marked invalid.
              * if true, you can not assume any of the other method returned
@@ -192,19 +193,19 @@ class MPUBLIC AudioOutputSettings
          * 0: unknown
          * 1: yes
          */
-        int  m_passthrough;
+        int          m_passthrough {-1};
 
-        unsigned int m_features;
+        unsigned int m_features    {FEATURE_NONE};
 
-        bool m_invalid;
+        bool         m_invalid     {false};
             /**
              * will be set to true if we were able to retrieve the device ELD
              * (EDID like Data). ELD contains information about the audio
              * processing capabilities of the device connected to the audio card
              * ELD is usually retrieved from EDID CEA-861-E extension.
              */
-        bool m_has_eld;
-        ELD  m_eld;
+        bool         m_has_eld     {false};
+        ELD          m_eld;
 
         std::vector<int> m_sr, m_rates, m_channels;
         std::vector<AudioFormat> m_sf, m_formats;

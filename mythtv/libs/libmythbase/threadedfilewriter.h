@@ -23,9 +23,9 @@ class TFWWriteThread : public MThread
   public:
     explicit TFWWriteThread(ThreadedFileWriter *p) : MThread("TFWWrite"), m_parent(p) {}
     virtual ~TFWWriteThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
-    ThreadedFileWriter *m_parent;
+    ThreadedFileWriter *m_parent {nullptr};
 };
 
 class TFWSyncThread : public MThread
@@ -33,9 +33,9 @@ class TFWSyncThread : public MThread
   public:
     explicit TFWSyncThread(ThreadedFileWriter *p) : MThread("TFWSync"), m_parent(p) {}
     virtual ~TFWSyncThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
-    ThreadedFileWriter *m_parent;
+    ThreadedFileWriter *m_parent {nullptr};
 };
 
 class MBASE_PUBLIC ThreadedFileWriter
@@ -43,11 +43,15 @@ class MBASE_PUBLIC ThreadedFileWriter
     friend class TFWWriteThread;
     friend class TFWSyncThread;
   public:
-    ThreadedFileWriter(const QString &fname, int flags, mode_t mode);
+    /** \fn ThreadedFileWriter::ThreadedFileWriter(const QString&,int,mode_t)
+     *  \brief Creates a threaded file writer.
+     */
+    ThreadedFileWriter(const QString &fname, int flags, mode_t mode)
+        : m_filename(fname), m_flags(flags), m_mode(mode) {}
     ~ThreadedFileWriter();
 
     bool Open(void);
-    bool ReOpen(QString newFilename = "");
+    bool ReOpen(const QString& newFilename = "");
 
     long long Seek(long long pos, int whence);
     int Write(const void *data, uint count);
@@ -57,7 +61,7 @@ class MBASE_PUBLIC ThreadedFileWriter
     void Sync(void);
     void Flush(void);
     bool SetBlocking(bool block = true);
-    bool WritesFailing(void) const { return ignore_writes; }
+    bool WritesFailing(void) const { return m_ignore_writes; }
 
   protected:
     void DiskLoop(void);
@@ -66,17 +70,17 @@ class MBASE_PUBLIC ThreadedFileWriter
 
   private:
     // file info
-    QString         filename;
-    int             flags;
-    mode_t          mode;
-    int             fd;
+    QString         m_filename;
+    int             m_flags;
+    mode_t          m_mode;
+    int             m_fd                 {-1};
 
     // state
-    bool            flush;              // protected by buflock
-    bool            in_dtor;            // protected by buflock
-    bool            ignore_writes;      // protected by buflock
-    uint            tfw_min_write_size; // protected by buflock
-    uint            totalBufferUse;     // protected by buflock
+    bool            m_flush              {false};         // protected by buflock
+    bool            m_in_dtor            {false};         // protected by buflock
+    bool            m_ignore_writes      {false};         // protected by buflock
+    uint            m_tfw_min_write_size {kMinWriteSize}; // protected by buflock
+    uint            m_totalBufferUse     {0};             // protected by buflock
 
     // buffers
     class TFWBuffer
@@ -85,19 +89,19 @@ class MBASE_PUBLIC ThreadedFileWriter
         vector<char> data;
         QDateTime    lastUsed;
     };
-    mutable QMutex    buflock;
-    QList<TFWBuffer*> writeBuffers;     // protected by buflock
-    QList<TFWBuffer*> emptyBuffers;     // protected by buflock
+    mutable QMutex    m_buflock;
+    QList<TFWBuffer*> m_writeBuffers;     // protected by buflock
+    QList<TFWBuffer*> m_emptyBuffers;     // protected by buflock
 
     // threads
-    TFWWriteThread *writeThread;
-    TFWSyncThread  *syncThread;
+    TFWWriteThread *m_writeThread        {nullptr};
+    TFWSyncThread  *m_syncThread         {nullptr};
 
     // wait conditions
-    QWaitCondition  bufferEmpty;
-    QWaitCondition  bufferHasData;
-    QWaitCondition  bufferSyncWait;
-    QWaitCondition  bufferWasFreed;
+    QWaitCondition  m_bufferEmpty;
+    QWaitCondition  m_bufferHasData;
+    QWaitCondition  m_bufferSyncWait;
+    QWaitCondition  m_bufferWasFreed;
 
     // constants
     static const uint kMaxBufferSize;
@@ -106,9 +110,9 @@ class MBASE_PUBLIC ThreadedFileWriter
     /// Maximum block size to write at a time
     static const uint kMaxBlockSize;
 
-    bool m_warned;
-    bool m_blocking;
-    bool m_registered;
+    bool m_warned                        {false};
+    bool m_blocking                      {false};
+    bool m_registered                    {false};
 };
 
 #endif

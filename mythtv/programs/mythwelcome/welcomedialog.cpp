@@ -46,10 +46,6 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
     m_idleWaitForRecordingTime =
                        gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
 
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_dateFormat = gCoreContext->GetSetting("MythWelcomeDateFormat", "dddd\\ndd MMM yyyy");
-    m_dateFormat.replace("\\n", "\n");
-
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
     m_bWillShutdown = (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
 
@@ -131,7 +127,7 @@ void WelcomeDialog::checkAutoStart(void)
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("mythshutdown --startup returned: %1").arg(state));
 
-    bool bAutoStartFrontend = gCoreContext->GetNumSetting("AutoStartFrontend", 1);
+    bool bAutoStartFrontend = gCoreContext->GetBoolSetting("AutoStartFrontend", true);
 
     if (state == 1 && bAutoStartFrontend)
         startFrontendClick();
@@ -142,7 +138,7 @@ void WelcomeDialog::checkAutoStart(void)
 
 void WelcomeDialog::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
 
@@ -216,6 +212,17 @@ void WelcomeDialog::customEvent(QEvent *e)
     }
 }
 
+void WelcomeDialog::ShowSettings(GroupSetting *screen)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd = new StandardSettingDialog(mainStack, "settings",
+                                                           screen);
+    if (ssd->Create())
+        mainStack->AddScreen(ssd);
+    else
+        delete ssd;
+}
+
 bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))
@@ -233,9 +240,9 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         {
             return true; // eat escape key
         }
-        else if (action == "MENU")
+        if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "NEXTVIEW")
         {
@@ -243,22 +250,11 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "INFO")
         {
-            MythWelcomeSettings settings;
-            if (kDialogCodeAccepted == settings.exec())
-            {
-                gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
-                updateStatus();
-                updateScreen();
-
-                m_dateFormat = gCoreContext->GetSetting("MythWelcomeDateFormat", "dddd\\ndd MMM yyyy");
-                m_dateFormat.replace("\\n", "\n");
-            }
+            ShowSettings(new MythWelcomeSettings());
         }
         else if (action == "SHOWSETTINGS")
         {
-            MythShutdownSettings settings;
-            if (kDialogCodeAccepted == settings.exec())
-                gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
+            ShowSettings(new MythShutdownSettings());
         }
         else if (action == "0")
         {
@@ -370,8 +366,6 @@ void WelcomeDialog::updateScreen(void)
         }
         else
             status = tr("There are no recordings currently taking place");
-
-        status.detach();
 
         m_recording_text->SetText(status);
 
@@ -582,7 +576,7 @@ bool WelcomeDialog::checkConnectionToServer(void)
     return bRes;
 }
 
-void WelcomeDialog::showMenu(void)
+void WelcomeDialog::ShowMenu(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

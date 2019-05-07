@@ -64,8 +64,8 @@ class MBASE_PUBLIC DBUtil
     static QStringList GetTables(const QStringList &engines = QStringList());
     static QStringList CheckRepairStatus(MSqlQuery &query);
 
-    QString CreateBackupFilename(QString prefix = "mythconverg",
-                                 QString extension = ".sql");
+    QString CreateBackupFilename(const QString& prefix = "mythconverg",
+                                 const QString& extension = ".sql");
     QString GetBackupDirectory();
 
     bool DoBackup(const QString &backupScript, QString &filename,

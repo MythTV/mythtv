@@ -22,19 +22,19 @@ class PulseHandler
    ~PulseHandler(void);
     bool Valid(void);
 
-    pa_context_state m_ctx_state;
-    pa_context      *m_ctx;
-    int              m_pending_operations;
+    pa_context_state m_ctx_state          {PA_CONTEXT_UNCONNECTED};
+    pa_context      *m_ctx                {nullptr};
+    int              m_pending_operations {0};
 
   private:
-    PulseHandler(void);
+    PulseHandler(void) = default;
     bool Init(void);
     bool SuspendInternal(bool suspend);
 
-    pa_mainloop     *m_loop;
-    bool             m_initialised;
-    bool             m_valid;
-    QThread         *m_thread;
+    pa_mainloop     *m_loop               {nullptr};
+    bool             m_initialised        {false};
+    bool             m_valid              {false};
+    QThread         *m_thread             {nullptr};
 };
 
 #endif // AUDIOPULSEHANDLER_H

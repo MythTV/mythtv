@@ -143,6 +143,8 @@ public:
 private:
     void FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
                    int width, int height, AVPixelFormat pix_fmt);
+    MythAVCopy(const MythAVCopy &) = delete;            // not copyable
+    MythAVCopy &operator=(const MythAVCopy &) = delete; // not copyable
     MythAVCopyPrivate *d;
 };
 
@@ -168,7 +170,7 @@ MTV_PUBLIC VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt);
 class MTV_PUBLIC MythPictureDeinterlacer
 {
 public:
-    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0f);
+    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0F);
     ~MythPictureDeinterlacer();
     // Will deinterlace src into dst. If EAGAIN is returned, more frames
     // are needed to output a frame.

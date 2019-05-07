@@ -34,12 +34,6 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
 {
     m_nowDateTime = MythDate::current();
     m_startDateTime = m_nowDateTime;
-
-    m_daysahead = 0;
-    m_titleEdit = nullptr;
-    m_channelList = m_startdateList = nullptr;
-    m_recordButton = m_cancelButton = nullptr;
-    m_durationSpin = m_starthourSpin = m_startminuteSpin = nullptr;
 }
 
 bool ManualSchedule::Create(void)
@@ -72,7 +66,7 @@ bool ManualSchedule::Create(void)
     ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
-    for (uint i = 0; i < channels.size(); i++)
+    for (size_t i = 0; i < channels.size(); i++)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelLong);
 
@@ -81,7 +75,7 @@ bool ManualSchedule::Create(void)
         InfoMap infomap;
         channels[i].ToMap(infomap);
         item->SetTextFromMap(infomap);
-        m_chanids.push_back(channels[i].chanid);
+        m_chanids.push_back(channels[i].m_chanid);
     }
 
     for (uint index = 0; index <= 60; index++)

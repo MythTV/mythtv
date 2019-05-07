@@ -26,16 +26,6 @@ static uint64_t MDate(void)
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
-HLSReader::HLSReader(void)
-    : m_curstream(nullptr), m_cur_seq(-1), m_bitrate_index(0),
-      m_fatal(false), m_cancel(false),
-      m_throttle(true), m_aesmsg(false),
-      m_playlistworker(nullptr), m_streamworker(nullptr),
-      m_playlist_size(0), m_bandwidthcheck(false), m_prebuffer_cnt(10),
-      m_debug(false), m_debug_cnt(0), m_slow_cnt(0)
-{
-}
-
 HLSReader::~HLSReader(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- start");
@@ -511,10 +501,10 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
-                int version;
-                if (!M3U::ParseVersion(line, StreamURL(), version))
+                int version2;
+                if (!M3U::ParseVersion(line, StreamURL(), version2))
                     return false;
-                hls->SetVersion(version);
+                hls->SetVersion(version2);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ENDLIST")))
             {
@@ -830,11 +820,9 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
             m_seq_lock.unlock();
             return false;
         }
-        else
-        {
-            m_cur_seq = m_segments.front().Sequence();
-            m_segments.pop_front();
-        }
+
+        m_cur_seq = m_segments.front().Sequence();
+        m_segments.pop_front();
 
         m_seq_lock.unlock();
 
@@ -875,7 +863,7 @@ uint HLSReader::PercentBuffered(void) const
     if (m_playlist_size == 0 || m_segments.size() > m_playlist_size)
         return 0;
     return (static_cast<float>(m_playlist_size - m_segments.size()) /
-            static_cast<float>(m_playlist_size)) * 100.0;
+            static_cast<float>(m_playlist_size)) * 100.0F;
 }
 
 int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,

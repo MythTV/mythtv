@@ -9,13 +9,13 @@
 using namespace std;
 
 Encoder::Encoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata)
-    : m_outfile(outfile), m_out(nullptr), m_quality(qualitylevel),
+    : m_outfile(outfile), m_quality(qualitylevel),
       m_metadata(metadata)
 {
     if (!m_outfile.isEmpty())
     {
-        QByteArray outfile = m_outfile.toLocal8Bit();
-        m_out = fopen(outfile.constData(), "w+");
+        QByteArray loutfile = m_outfile.toLocal8Bit();
+        m_out = fopen(loutfile.constData(), "w+");
         if (!m_out)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error opening output file: '%1'")

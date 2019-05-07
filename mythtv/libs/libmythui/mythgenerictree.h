@@ -25,6 +25,8 @@ class MUI_PUBLIC MythGenericTree
                     bool selectable_flag = false);
     virtual ~MythGenericTree();
 
+    void ensureSortFields(void);
+
     MythGenericTree *addNode(const QString &a_string, int an_int = 0,
                              bool selectable_flag = false, bool visible = true);
     MythGenericTree *addNode(const QString &a_string, const QString &sortText = "",
@@ -119,17 +121,17 @@ class MUI_PUBLIC MythGenericTree
     QMap<QString, TextProperties> m_strings;
     InfoMap m_imageFilenames;
     InfoMap m_states;
-    int m_int;
-    QVariant m_data;
-    uint m_visibleCount;
+    int      m_int                          {0};
+    QVariant m_data                         {0};
+    uint     m_visibleCount                 {0};
 
-    SortableMythGenericTreeList *m_subnodes;
+    SortableMythGenericTreeList *m_subnodes {nullptr};
 
-    MythGenericTree *m_selectedSubnode;
-    MythGenericTree *m_parent;
+    MythGenericTree *m_selectedSubnode      {nullptr};
+    MythGenericTree *m_parent               {nullptr};
 
-    bool m_selectable;
-    bool m_visible;
+    bool m_selectable                       {false};
+    bool m_visible                          {true};
 };
 
 Q_DECLARE_METATYPE(MythGenericTree*)

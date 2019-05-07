@@ -25,7 +25,7 @@ class ManualSchedule : public MythScreenType
     explicit ManualSchedule(MythScreenStack *parent);
    ~ManualSchedule(void) = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void dateChanged(void);
@@ -38,21 +38,21 @@ class ManualSchedule : public MythScreenType
     void connectSignals();
     void disconnectSignals();
     
-    int m_daysahead;
+    int             m_daysahead       {0};
 
     QList<uint32_t> m_chanids;
 
-    MythUITextEdit *m_titleEdit;
+    MythUITextEdit *m_titleEdit       {nullptr};
 
-    MythUIButtonList *m_channelList;
-    MythUIButtonList *m_startdateList;
+    MythUIButtonList *m_channelList   {nullptr};
+    MythUIButtonList *m_startdateList {nullptr};
 
-    MythUISpinBox *m_starthourSpin;
-    MythUISpinBox *m_startminuteSpin;
-    MythUISpinBox *m_durationSpin;
+    MythUISpinBox *m_starthourSpin   {nullptr};
+    MythUISpinBox *m_startminuteSpin {nullptr};
+    MythUISpinBox *m_durationSpin    {nullptr};
 
-    MythUIButton *m_recordButton;
-    MythUIButton *m_cancelButton;
+    MythUIButton *m_recordButton     {nullptr};
+    MythUIButton *m_cancelButton     {nullptr};
 
     QDateTime m_nowDateTime;
     QDateTime m_startDateTime;

@@ -128,11 +128,11 @@ init_enhance(struct enhance *eh)
 }
 
 void
-add_enhance(struct enhance *eh, int dcode, unsigned int *t)
+add_enhance(struct enhance *eh, int dcode, unsigned int *data)
 {
     if (dcode == eh->next_des)
     {
-       memcpy(eh->trip + dcode * 13, t, 13 * sizeof(*t));
+       memcpy(eh->trip + dcode * 13, data, 13 * sizeof(*data));
        eh->next_des++;
     }
     else
@@ -140,7 +140,7 @@ add_enhance(struct enhance *eh, int dcode, unsigned int *t)
 }
 
 void
-enhance(struct enhance *eh, struct vt_page *vtp)
+do_enhancements(struct enhance *eh, struct vt_page *vtp)
 {
     int row = 0;
     unsigned int *p, *e;

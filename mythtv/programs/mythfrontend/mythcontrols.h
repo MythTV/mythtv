@@ -51,11 +51,17 @@ class MythControls : public MythScreenType
 
   public:
 
-    MythControls(MythScreenStack *parent, const char *name);
+    /**
+     *  \brief Creates a new MythControls wizard
+     *  \param parent Pointer to the screen stack
+     *  \param name The name of the window
+     */
+    MythControls(MythScreenStack *parent, const char *name)
+        : MythScreenType (parent, name) {}
     ~MythControls();
 
-    bool Create(void);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
 
     typedef enum
     {
@@ -101,27 +107,27 @@ class MythControls : public MythScreenType
     void RightPressed(MythUIButtonListItem*);
     void ActionButtonPressed();
     void RefreshKeyInformation(void);
-    void AddKeyToAction(QString key, bool ignoreconflict = false);
+    void AddKeyToAction(const QString& key, bool ignoreconflict = false);
 
   private:
-    void ShowMenu(void);
-    void Close(void);
+    void ShowMenu(void) override; // MythScreenType
+    void Close(void) override; // MythScreenType
 
-    ViewType          m_currentView;
-    MythUIButtonList    *m_leftList;
-    MythUIButtonList    *m_rightList;
-    MythUIText        *m_description;
-    MythUIText        *m_leftDescription;
-    MythUIText        *m_rightDescription;
+    ViewType          m_currentView       {kActionsByContext};
+    MythUIButtonList  *m_leftList         {nullptr};
+    MythUIButtonList  *m_rightList        {nullptr};
+    MythUIText        *m_description      {nullptr};
+    MythUIText        *m_leftDescription  {nullptr};
+    MythUIText        *m_rightDescription {nullptr};
     QList<MythUIButton*> m_actionButtons;
-    MythDialogBox     *m_menuPopup;
+    MythDialogBox     *m_menuPopup        {nullptr};
 
-    KeyBindings       *m_bindings;
+    KeyBindings       *m_bindings         {nullptr};
     QStringList        m_sortedContexts; ///< sorted list of contexts
     /// actions for a given context
     QHash<QString, QStringList> m_contexts;
-    ListType           m_leftListType;
-    ListType           m_rightListType;
+    ListType           m_leftListType     {kContextList};
+    ListType           m_rightListType    {kActionList};
 };
 
 

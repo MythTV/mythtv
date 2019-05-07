@@ -19,15 +19,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Wsdl::Wsdl( ServiceHost *pServiceHost ) : m_pServiceHost( pServiceHost )
-{
-    
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 bool Wsdl::GetWSDL( HTTPRequest *pRequest )
 {
     m_typesToInclude.clear();
@@ -267,12 +258,12 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
 
         QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sBaseUrl + "/xsd";
 
-        QMap<QString, TypeInfo>::const_iterator it = m_typesToInclude.constBegin();
-        while( it != m_typesToInclude.constEnd())
+        QMap<QString, TypeInfo>::const_iterator it2 = m_typesToInclude.constBegin();
+        while( it2 != m_typesToInclude.constEnd())
         {
             QDomElement oIncNode = createElement( "xs:import" );
-            QString     sType    = it.key();
-            TypeInfo    info     = it.value();
+            QString     sType    = it2.key();
+            TypeInfo    info     = it2.value();
 
             sType.remove( "DTC::" );
 
@@ -287,7 +278,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
             oIncNode.setAttribute( "namespace"     , "http://mythtv.org" );
     
             oImportNode.appendChild( oIncNode );
-            ++it;
+            ++it2;
         }
     }
 
@@ -359,8 +350,8 @@ QDomElement Wsdl::CreateBindingOperation( MethodInfo    &oInfo,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement Wsdl::CreateMessage( QString       sMsgName, 
-                                 QString       sTypeName )
+QDomElement Wsdl::CreateMessage( const QString& sMsgName,
+                                 const QString& sTypeName )
 {
     QDomElement oMsg = createElement( "message" );
 
@@ -408,7 +399,7 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
         oNode.setAttribute( "minOccurs", 0       );
         oNode.setAttribute( "name"     , sTypeName + "Result" );
-        oNode.setAttribute( "nillable" , true    );   //-=>TODO: This may need to be determined by sParamType
+        oNode.setAttribute( "nillable" , static_cast<int>(true)    );   //-=>TODO: This may need to be determined by sParamType
 
         bool bCustomType = IsCustomType( sType );
 
@@ -454,7 +445,7 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
             oNode.setAttribute( "minOccurs", 0     );
             oNode.setAttribute( "name"     , sName );
-            oNode.setAttribute( "nillable" , true  );   //-=>TODO: This may need to be determined by sParamType
+            oNode.setAttribute( "nillable" , static_cast<int>(true)  );   //-=>TODO: This may need to be determined by sParamType
             oNode.setAttribute( "type"     , sPrefix + sParamType );
 
             oSeqNode.appendChild( oNode );
@@ -486,10 +477,7 @@ bool Wsdl::IsCustomType( QString &sTypeName )
             break;
     }
 
-    if ((id == -1) || (id < QMetaType::User)) 
-        return false;
-
-    return true;
+    return !((id == -1) || (id < QMetaType::User));
 }
 
 /////////////////////////////////////////////////////////////////////////////

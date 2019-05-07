@@ -51,14 +51,14 @@ class MPUBLIC GUIStartup : public MythScreenType
 
   public:
 
-    bool m_Exit;
-    bool m_Setup;
-    bool m_Retry;
-    bool m_Search;
+    bool m_Exit   {false};
+    bool m_Setup  {false};
+    bool m_Retry  {false};
+    bool m_Search {false};
 
     GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop);
    ~GUIStartup(void);
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     bool setStatusState(const QString &name);
     bool setMessageState(const QString &name);
     void setTotal(int total);
@@ -70,26 +70,26 @@ class MPUBLIC GUIStartup : public MythScreenType
     void Retry(void);
     void Search(void);
     void Setup(void);
-    void Close(void);
+    void Close(void) override; // MythScreenType
     void OnClosePromptReturn(bool submit);
 
   signals:
     void cancelPortCheck(void);
 
   private:
-    MythUIButton *m_dummyButton;
-    MythUIButton *m_retryButton;
-    MythUIButton *m_searchButton;
-    MythUIButton *m_setupButton;
-    MythUIButton *m_exitButton;
-    MythUIStateType *m_statusState;
-    MythUIStateType *m_messageState;
-    MythUIProgressBar *m_progressBar;
-    MythTimer *m_progressTimer;
-    QEventLoop *m_loop;
-    QEventLoop m_dlgLoop;
-    int m_total;
-    QTimer m_timer;
+    MythUIButton      *m_dummyButton   {nullptr};
+    MythUIButton      *m_retryButton   {nullptr};
+    MythUIButton      *m_searchButton  {nullptr};
+    MythUIButton      *m_setupButton   {nullptr};
+    MythUIButton      *m_exitButton    {nullptr};
+    MythUIStateType   *m_statusState   {nullptr};
+    MythUIStateType   *m_messageState  {nullptr};
+    MythUIProgressBar *m_progressBar   {nullptr};
+    MythTimer         *m_progressTimer {nullptr};
+    QEventLoop        *m_loop          {nullptr};
+    QEventLoop         m_dlgLoop;
+    int                m_total         {0};
+    QTimer             m_timer;
 };
 
 #endif

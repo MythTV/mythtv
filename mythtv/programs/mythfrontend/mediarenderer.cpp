@@ -36,7 +36,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MediaRenderer::MediaRenderer(): m_pUPnpCMGR(nullptr)
+MediaRenderer::MediaRenderer()
 {
     LOG(VB_UPNP, LOG_INFO, "MediaRenderer(): Begin");
 

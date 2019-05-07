@@ -15,7 +15,8 @@
 #define DEBUG_CC_SERVICE_2     0
 #define DEBUG_CC_RAWPACKET     0
 #define DEBUG_CC_VALIDPACKET   0
-#define DEBUG_CC_SERVICE_BLOCK 0
+#define DEBUG_CC_DECODE        0
+#define DEBUG_CC_PARSE         0
 
 typedef enum
 {
@@ -40,36 +41,36 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
 {
     if (DTVCC_PACKET_START == cc_type)
     {
-#if 0
+#if DEBUG_CC_DECODE
         LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC ST data(0x%1 0x%2)")
                 .arg(data1,0,16).arg(data2,0,16));
 #endif
 
-        if (partialPacket.size && reader)
-            parse_cc_packet(reader, &partialPacket, last_seen);
+        if (m_partialPacket.size && m_reader)
+            parse_cc_packet(m_reader, &m_partialPacket, m_last_seen);
 
-        partialPacket.data[0] = data1;
-        partialPacket.data[1] = data2;
-        partialPacket.size   = 2;
+        m_partialPacket.data[0] = data1;
+        m_partialPacket.data[1] = data2;
+        m_partialPacket.size    = 2;
     }
     else if (DTVCC_PACKET_DATA == cc_type)
     {
-#if 0
+#if DEBUG_CC_DECODE
         LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC Ex data(0x%1 0x%2)")
                 .arg(data1,0,16).arg(data2,0,16));
 #endif
 
-        partialPacket.data[partialPacket.size + 0] = data1;
-        partialPacket.data[partialPacket.size + 1] = data2;
-        partialPacket.size += 2;
+        m_partialPacket.data[m_partialPacket.size + 0] = data1;
+        m_partialPacket.data[m_partialPacket.size + 1] = data2;
+        m_partialPacket.size += 2;
     }
 }
 
 void CC708Decoder::decode_cc_null(void)
 {
-    if (partialPacket.size && reader)
-        parse_cc_packet(reader, &partialPacket, last_seen);
-    partialPacket.size = 0;
+    if (m_partialPacket.size && m_reader)
+        parse_cc_packet(m_reader, &m_partialPacket, m_last_seen);
+    m_partialPacket.size = 0;
 }
 
 void CC708Decoder::services(uint seconds, bool seen[64]) const
@@ -79,7 +80,7 @@ void CC708Decoder::services(uint seconds, bool seen[64]) const
 
     seen[0] = false; // service zero is not allowed in CEA-708-D
     for (uint i = 1; i < 64; i++)
-        seen[i] = (last_seen[i] >= then);
+        seen[i] = (m_last_seen[i] >= then);
 }
 
 typedef enum
@@ -116,24 +117,24 @@ static int handle_cc_c3(CC708Reader *cc, uint service_num, int i);
 
 #define SEND_STR \
 do { \
-    if (cc->temp_str_size[service_num]) \
+    if (cc->m_temp_str_size[service_num]) \
     { \
         cc->TextWrite(service_num, \
-                      cc->temp_str[service_num], \
-                      cc->temp_str_size[service_num]); \
-        cc->temp_str_size[service_num] = 0; \
+                      cc->m_temp_str[service_num], \
+                      cc->m_temp_str_size[service_num]); \
+        cc->m_temp_str_size[service_num] = 0; \
     } \
-} while (0)
+} while (false)
 
 static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
 {
-    const int blk_size = cc->buf_size[service_num];
+    const int blk_size = cc->m_buf_size[service_num];
     int blk_start = 0, dlc_loc = 0, rst_loc = 0, i = 0;
 
     // find last reset or delay cancel in buffer
     for (i = 0; i < blk_size; i++)
     {
-        switch (cc->buf[service_num][i]) {
+        switch (cc->m_buf[service_num][i]) {
             // Skip over parameters, since their bytes may coincide
             // with RST or DLC
             case CLW:
@@ -178,36 +179,36 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     if (rst_loc)
     {
         cc->Reset(service_num);
-        cc->delayed[service_num] = false; // Reset implicitly cancels delay
+        cc->m_delayed[service_num] = false; // Reset implicitly cancels delay
         blk_start = rst_loc + 1;
     }
 
     // if we have a delay cancel, cancel any delay
-    if (dlc_loc && cc->delayed[service_num])
+    if (dlc_loc && cc->m_delayed[service_num])
     {
         cc->DelayCancel(service_num);
-        cc->delayed[service_num] = false;
+        cc->m_delayed[service_num] = false;
     }
 
     // cancel delay if the buffer is full
-    if (cc->delayed[service_num] && blk_size >= 126)
+    if (cc->m_delayed[service_num] && blk_size >= 126)
     {
         cc->DelayCancel(service_num);
-        cc->delayed[service_num] = false;
+        cc->m_delayed[service_num] = false;
         dlc_loc = blk_size - 1;
     }
 
-#if 0
+#if DEBUG_CC_PARSE
     LOG(VB_VBI, LOG_ERR,
         QString("cc_ss delayed(%1) blk_start(%2) blk_size(%3)")
-            .arg(cc->delayed) .arg(blk_start) .arg(blk_size));
+            .arg(cc->m_delayed[service_num]) .arg(blk_start) .arg(blk_size));
 #endif
 
-    for (i = (cc->delayed[service_num]) ? blk_size : blk_start;
+    for (i = (cc->m_delayed[service_num]) ? blk_size : blk_start;
          i < blk_size; )
     {
         const int old_i = i;
-        const int code = cc->buf[service_num][i];
+        const int code = cc->m_buf[service_num][i];
         if (0x0 == code)
         {
             i++;
@@ -250,38 +251,38 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
             LOG(VB_VBI, LOG_DEBUG, QString("old_i == i == %1").arg(i));
             QString msg;
             for (int j = 0; j < blk_size; j++)
-                msg += QString("0x%1 ").arg(cc->buf[service_num][j], 0, 16);
+                msg += QString("0x%1 ").arg(cc->m_buf[service_num][j], 0, 16);
             LOG(VB_VBI, LOG_DEBUG, msg);
 #endif
             if (blk_size - i > 10)
             {
                 LOG(VB_VBI, LOG_INFO, "eia-708 decoding error...");
                 cc->Reset(service_num);
-                cc->delayed[service_num] = false;
-                i = cc->buf_size[service_num];
+                cc->m_delayed[service_num] = false;
+                i = cc->m_buf_size[service_num];
             }
             // There must be an incomplete code in buffer...
             break;
         }
-        else if (cc->delayed[service_num] && dlc_loc < i)
+        if (cc->m_delayed[service_num] && dlc_loc < i)
         {
             // delay in effect
             break;
         }
-        else if (cc->delayed[service_num])
+        if (cc->m_delayed[service_num])
         {
             // this delay has already been canceled..
             cc->DelayCancel(service_num);
-            cc->delayed[service_num] = false;
+            cc->m_delayed[service_num] = false;
         }
     }
 
     // get rid of remaining bytes...
     if ((blk_size - i) > 0)
     {
-        memmove(cc->buf[service_num], cc->buf[service_num] + i,
+        memmove(cc->m_buf[service_num], cc->m_buf[service_num] + i,
                 blk_size - i);
-        cc->buf_size[service_num] -= i;
+        cc->m_buf_size[service_num] -= i;
     }
     else
     {
@@ -291,17 +292,17 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
                 .arg(i).arg(blk_size));
             QString msg;
             for (i=0; i < blk_size; i++)
-                msg += QString("0x%1 ").arg(cc->buf[service_num][i], 0, 16);
+                msg += QString("0x%1 ").arg(cc->m_buf[service_num][i], 0, 16);
             LOG(VB_VBI, LOG_ERR, msg);
         }
-        cc->buf_size[service_num] = 0;
+        cc->m_buf_size[service_num] = 0;
     }
 }
 
 static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
 {
     // C0 code -- subset of ASCII misc. control codes
-    const int code = cc->buf[service_num][i];
+    const int code = cc->m_buf[service_num][i];
     if (code<=0xf)
     {
         // single byte code
@@ -320,10 +321,10 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
     else if (code<=0x17)
     {
         // double byte code
-        const int blk_size = cc->buf_size[service_num];
+        const int blk_size = cc->m_buf_size[service_num];
         if (EXT1==code && ((i+1)<blk_size))
         {
-            const int code2 = cc->buf[service_num][i+1];
+            const int code2 = cc->m_buf[service_num][i+1];
             if (code2<=0x1f)
             {
                 // C2 code -- nothing in EIA-708-A
@@ -353,7 +354,7 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
     else if (code<=0x1f)
     {
         // triple byte code
-        const int blk_size = cc->buf_size[service_num];
+        const int blk_size = cc->m_buf_size[service_num];
         if (P16==code && ((i+2)<blk_size))
         {
             // reserved for large alphabets, but not yet defined
@@ -366,21 +367,21 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
 
 static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
 {
-    const int blk_size = cc->buf_size[service_num];
-    const int code = cc->buf[service_num][i];
+    const int blk_size = cc->m_buf_size[service_num];
+    const int code = cc->m_buf[service_num][i];
 
-    const unsigned char* blk_buf = cc->buf[service_num];
+    const unsigned char* blk_buf = cc->m_buf[service_num];
     if (code<=CW7)
     { // no paramaters
         SEND_STR;
         cc->SetCurrentWindow(service_num, code-0x80);
         i+=1;
     }
-    else if (DLC == cc->buf[service_num][i])
+    else if (DLC == cc->m_buf[service_num][i])
     {
 /* processed out-of-band
         cc->DelayCancel(service_num);
-        cc->delayed[service_num] = 0;
+        cc->m_delayed[service_num] = 0;
 */
         i+=1;
     }
@@ -401,7 +402,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
         else if (DLY==code)
         {
             cc->Delay(service_num, param1);
-            cc->delayed[service_num] = true;
+            cc->m_delayed[service_num] = true;
         }
         i+=2;
     }
@@ -466,7 +467,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
         int priority = ( blk_buf[i+1]  ) & 0x7;
         int col_lock = (blk_buf[i+1]>>3) & 0x1;
         int row_lock = (blk_buf[i+1]>>4) & 0x1;
-        int visible  = (blk_buf[i+1]>>5) & 0x1;
+        bool visible  = ((blk_buf[i+1]>>5) & 0x1) != 0;
         // param2
         int anchor_vertical = blk_buf[i+2] & 0x7f;
         int relative_pos = (blk_buf[i+2]>>7);
@@ -492,7 +493,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     else
     {
         LOG(VB_VBI, LOG_ERR, QString("handle_cc_c1: (NOT HANDLED) "
-                "code(0x%1) i(%2) blk_size(%3)").arg(code, 2, 16, '0')
+                "code(0x%1) i(%2) blk_size(%3)").arg(code, 2, 16, QLatin1Char('0'))
                 .arg(i).arg(blk_size));
     }
 #endif
@@ -502,8 +503,8 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
 
 static int handle_cc_c2(CC708Reader* cc, uint service_num, int i)
 {
-    const int blk_size = cc->buf_size[service_num];
-    const int code = cc->buf[service_num][i+1];
+    const int blk_size = cc->m_buf_size[service_num];
+    const int code = cc->m_buf[service_num][i+1];
 
     if ((code<=0x7) && ((i+1)<blk_size)){
         i+=2;
@@ -529,9 +530,9 @@ static int handle_cc_c2(CC708Reader* cc, uint service_num, int i)
 
 static int handle_cc_c3(CC708Reader* cc, uint service_num, int i)
 {
-    const unsigned char* blk_buf = cc->buf[service_num];
-    const int blk_size = cc->buf_size[service_num];
-    const int code = cc->buf[service_num][i+1];
+    const unsigned char* blk_buf = cc->m_buf[service_num];
+    const int blk_size = cc->m_buf_size[service_num];
+    const int code = cc->m_buf[service_num][i+1];
 
     if ((code<=0x87) && ((i+5)<blk_size))
     {
@@ -555,47 +556,59 @@ static int handle_cc_c3(CC708Reader* cc, uint service_num, int i)
     return i;
 }
 
-static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
+static bool rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
 {
-    uint min_new_size = block_size + cc->buf_size[service_num];
-    if (min_new_size >= cc->buf_alloc[service_num])
+    size_t min_new_size = block_size + cc->m_buf_size[service_num];
+    bool ret = true;
+    if (min_new_size >= cc->m_buf_alloc[service_num])
     {
-        uint new_alloc    = cc->buf_alloc[service_num];
+        size_t new_alloc = cc->m_buf_alloc[service_num];
         for (uint i = 0; (i < 32) && (new_alloc <= min_new_size); i++)
             new_alloc *= 2;
-
-        cc->buf[service_num] =
-            (unsigned char*) realloc(cc->buf[service_num], new_alloc);
-        cc->buf_alloc[service_num] = (cc->buf[service_num]) ? new_alloc : 0;
+        void *new_buf = realloc(cc->m_buf[service_num], new_alloc);
+        if (new_buf)
+        {
+            cc->m_buf[service_num] = (uchar *)new_buf;
+            cc->m_buf_alloc[service_num] = new_alloc;
+        }
+        else
+        {
+            ret = false;
+        }
 
 #if DEBUG_CC_SERVICE_2
         LOG(VB_VBI, LOG_DEBUG, QString("rightsize_buf: srv %1 to %1 bytes")
-                .arg(service_num) .arg(cc->buf_alloc[service_num]));
+                .arg(service_num) .arg(cc->m_buf_alloc[service_num]));
 #endif
     }
-    if (min_new_size >= cc->buf_alloc[service_num])
+    if (min_new_size >= cc->m_buf_alloc[service_num])
         LOG(VB_VBI, LOG_ERR,
             QString("buffer resize error: min_new_size=%1, buf_alloc[%2]=%3")
             .arg(min_new_size)
             .arg(service_num)
-            .arg(cc->buf_alloc[service_num]));
+            .arg(cc->m_buf_alloc[service_num]));
+    return ret;
 }
 
 static void append_cc(CC708Reader* cc, uint service_num,
                       const unsigned char* blk_buf, int block_size)
 {
-    rightsize_buf(cc, service_num, block_size);
+    if (!rightsize_buf(cc, service_num, block_size))
+    {
+        // The buffer resize failed. Drop the new data.
+        return;
+    }
 
-    memcpy(cc->buf[service_num] + cc->buf_size[service_num],
+    memcpy(cc->m_buf[service_num] + cc->m_buf_size[service_num],
            blk_buf, block_size);
 
-    cc->buf_size[service_num] += block_size;
+    cc->m_buf_size[service_num] += block_size;
 #if DEBUG_CC_SERVICE_2
     {
         uint i;
         QString msg("append_cc: ");
-        for (i = 0; i < cc->buf_size[service_num]; i++)
-            msg += QString("0x%1").arg(cc->buf[service_num][i], 0, 16);
+        for (i = 0; i < cc->m_buf_size[service_num]; i++)
+            msg += QString("0x%1").arg(cc->m_buf[service_num][i], 0, 16);
         LOG(VB_VBI, LOG_DEBUG, msg);
     }
 #endif
@@ -614,7 +627,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         return;
 
 #if DEBUG_CC_RAWPACKET
-    if (1)
+    if (true)
 #elif DEBUG_CAPTIONS
     if (len > pkt_size)
 #else
@@ -688,27 +701,27 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
 
 static void append_character(CC708Reader *cc, uint service_num, short ch)
 {
-    if (cc->temp_str_size[service_num]+2 > cc->temp_str_alloc[service_num])
+    if (cc->m_temp_str_size[service_num]+2 > cc->m_temp_str_alloc[service_num])
     {
-        int new_alloc = (cc->temp_str_alloc[service_num]) ?
-            cc->temp_str_alloc[service_num] * 2 : 64;
+        int new_alloc = (cc->m_temp_str_alloc[service_num]) ?
+            cc->m_temp_str_alloc[service_num] * 2 : 64;
 
-        cc->temp_str[service_num] = (short*)
-            realloc(cc->temp_str[service_num], new_alloc * sizeof(short));
+        cc->m_temp_str[service_num] = (short*)
+            realloc(cc->m_temp_str[service_num], new_alloc * sizeof(short));
 
-        cc->temp_str_alloc[service_num] = new_alloc; // shorts allocated
+        cc->m_temp_str_alloc[service_num] = new_alloc; // shorts allocated
     }
 
-    if (cc->temp_str[service_num])
+    if (cc->m_temp_str[service_num])
     {
-        int i = cc->temp_str_size[service_num];
-        cc->temp_str[service_num][i] = ch;
-        cc->temp_str_size[service_num]++;
+        int i = cc->m_temp_str_size[service_num];
+        cc->m_temp_str[service_num][i] = ch;
+        cc->m_temp_str_size[service_num]++;
     }
     else
     {
-        cc->temp_str_size[service_num] = 0;
-        cc->temp_str_alloc[service_num]=0;
+        cc->m_temp_str_size[service_num] = 0;
+        cc->m_temp_str_alloc[service_num]=0;
     }
 }
 

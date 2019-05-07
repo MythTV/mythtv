@@ -144,11 +144,10 @@ class MythGLShaderObject
   public:
     MythGLShaderObject(uint vert, uint frag)
       : m_vertex_shader(vert), m_fragment_shader(frag) { }
-    MythGLShaderObject()
-      : m_vertex_shader(0), m_fragment_shader(0) { }
+    MythGLShaderObject() = default;
 
-    GLuint m_vertex_shader;
-    GLuint m_fragment_shader;
+    GLuint m_vertex_shader   {0};
+    GLuint m_fragment_shader {0};
 };
 
 MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
@@ -156,15 +155,15 @@ MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
                                      RenderType type)
   : MythRenderOpenGL(format, device, type)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL2::ResetVars();
+    MythRenderOpenGL2::ResetProcs();
 }
 
 MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format, RenderType type)
   : MythRenderOpenGL(format, type)
 {
-    ResetVars();
-    ResetProcs();
+    MythRenderOpenGL2::ResetVars();
+    MythRenderOpenGL2::ResetProcs();
 }
 
 MythRenderOpenGL2::~MythRenderOpenGL2()
@@ -172,7 +171,7 @@ MythRenderOpenGL2::~MythRenderOpenGL2()
     if (!isValid())
         return;
     makeCurrent();
-    DeleteOpenGLResources();
+    MythRenderOpenGL2::DeleteOpenGLResources();
     doneCurrent();
 }
 
@@ -343,8 +342,6 @@ uint MythRenderOpenGL2::CreateShaderObject(const QString &vertex,
     uint result = 0;
     QString vert_shader = vertex.isEmpty() ? kDefaultVertexShader : vertex;
     QString frag_shader = fragment.isEmpty() ? kDefaultFragmentShader: fragment;
-    vert_shader.detach();
-    frag_shader.detach();
 
     OptimiseShaderSource(vert_shader);
     OptimiseShaderSource(frag_shader);
@@ -915,7 +912,7 @@ void MythRenderOpenGL2::DeleteOpenGLResources(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
     DeleteDefaultShaders();
-    DeleteShaders();
+    MythRenderOpenGL2::DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();
 }
 
@@ -928,11 +925,11 @@ void MythRenderOpenGL2::SetMatrixView(void)
 void MythRenderOpenGL2::PushTransformation(const UIEffects &fx, QPointF &center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.hzoom != 1.0 || fx.vzoom != 1.0 || fx.angle != 0.0)
+    if (fx.m_hzoom != 1.0F || fx.m_vzoom != 1.0F || fx.m_angle != 0.0F)
     {
         newtop.translate(center.x(), center.y());
-        newtop.scale(fx.hzoom, fx.vzoom);
-        newtop.rotate(fx.angle, 0, 0, 1);
+        newtop.scale(fx.m_hzoom, fx.m_vzoom);
+        newtop.rotate(fx.m_angle, 0, 0, 1);
         newtop.translate(-center.x(), -center.y());
     }
     m_transforms.push(newtop);

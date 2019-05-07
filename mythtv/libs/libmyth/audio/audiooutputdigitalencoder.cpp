@@ -20,50 +20,44 @@ extern "C" {
 
 #define LOC QString("DEnc: ")
 
-AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
-    av_context(nullptr),
-    out(nullptr), out_size(0),
-    in(nullptr), inp(nullptr), in_size(0),
-    outlen(0), inlen(0),
-    samples_per_frame(0),
-    m_spdifenc(nullptr), m_frame(nullptr)
+AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void)
 {
-    out = (outbuf_t *)av_mallocz(OUTBUFSIZE);
-    if (out)
+    m_out = (outbuf_t *)av_mallocz(OUTBUFSIZE);
+    if (m_out)
     {
-        out_size = OUTBUFSIZE;
+        m_out_size = OUTBUFSIZE;
     }
-    in = (inbuf_t *)av_mallocz(INBUFSIZE);
-    if (in)
+    m_in = (inbuf_t *)av_mallocz(INBUFSIZE);
+    if (m_in)
     {
-        in_size = INBUFSIZE;
+        m_in_size = INBUFSIZE;
     }
-    inp = (inbuf_t *)av_mallocz(INBUFSIZE);
+    m_inp = (inbuf_t *)av_mallocz(INBUFSIZE);
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
 {
     Reset();
-    if (out)
+    if (m_out)
     {
-        av_freep(&out);
-        out_size = 0;
+        av_freep(&m_out);
+        m_out_size = 0;
     }
-    if (in)
+    if (m_in)
     {
-        av_freep(&in);
-        in_size = 0;
+        av_freep(&m_in);
+        m_in_size = 0;
     }
-    if (inp)
+    if (m_inp)
     {
-        av_freep(&inp);
+        av_freep(&m_inp);
     }
 }
 
 void AudioOutputDigitalEncoder::Reset(void)
 {
-    if (av_context)
-        avcodec_free_context(&av_context);
+    if (m_av_context)
+        avcodec_free_context(&m_av_context);
 
     av_frame_free(&m_frame);
 
@@ -102,7 +96,7 @@ bool AudioOutputDigitalEncoder::Init(
             .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
             .arg(samplerate) .arg(channels));
 
-    if (!(in || inp || out))
+    if (!(m_in || m_inp || m_out))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Memory allocation failed");
         return false;
@@ -118,16 +112,16 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    av_context                 = avcodec_alloc_context3(codec);
+    m_av_context                 = avcodec_alloc_context3(codec);
 
-    av_context->bit_rate       = bitrate;
-    av_context->sample_rate    = samplerate;
-    av_context->channels       = channels;
-    av_context->channel_layout = av_get_default_channel_layout(channels);
-    av_context->sample_fmt     = AV_SAMPLE_FMT_S16P;
+    m_av_context->bit_rate       = bitrate;
+    m_av_context->sample_rate    = samplerate;
+    m_av_context->channels       = channels;
+    m_av_context->channel_layout = av_get_default_channel_layout(channels);
+    m_av_context->sample_fmt     = AV_SAMPLE_FMT_S16P;
 
     // open it
-    ret = avcodec_open2(av_context, codec, nullptr);
+    ret = avcodec_open2(m_av_context, codec, nullptr);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -143,10 +137,10 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    samples_per_frame  = av_context->frame_size * av_context->channels;
+    m_samples_per_frame  = m_av_context->frame_size * m_av_context->channels;
 
     LOG(VB_AUDIO, LOG_INFO, QString("DigitalEncoder::Init fs=%1, spf=%2")
-            .arg(av_context->frame_size) .arg(samples_per_frame));
+            .arg(m_av_context->frame_size) .arg(m_samples_per_frame));
 
     return true;
 }
@@ -161,68 +155,68 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     }
 
     // Check if there is enough space in incoming buffer
-    int required_len = inlen +
+    int required_len = m_inlen +
         len * AudioOutputSettings::SampleSize(FORMAT_S16) / sampleSize;
 
-    if (required_len > (int)in_size)
+    if (required_len > (int)m_in_size)
     {
         required_len = ((required_len / INBUFSIZE) + 1) * INBUFSIZE;
         LOG(VB_AUDIO, LOG_INFO, LOC +
             QString("low mem, reallocating in buffer from %1 to %2")
-                .arg(in_size) .arg(required_len));
+                .arg(m_in_size) .arg(required_len));
         inbuf_t *tmp = reinterpret_cast<inbuf_t*>
-            (realloc(in, in_size, required_len));
+            (realloc(m_in, m_in_size, required_len));
         if (!tmp)
         {
-            in = nullptr;
-            in_size = 0;
+            m_in = nullptr;
+            m_in_size = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
-            return outlen;
+            return m_outlen;
         }
-        in = tmp;
-        in_size = required_len;
+        m_in = tmp;
+        m_in_size = required_len;
     }
     if (format != FORMAT_S16)
     {
-        inlen += AudioOutputUtil::fromFloat(FORMAT_S16, (char *)in + inlen,
+        m_inlen += AudioOutputUtil::fromFloat(FORMAT_S16, (char *)m_in + m_inlen,
                                             buf, len);
     }
     else
     {
-        memcpy((char *)in + inlen, buf, len);
-        inlen += len;
+        memcpy((char *)m_in + m_inlen, buf, len);
+        m_inlen += len;
     }
 
-    int frames           = inlen / sizeof(inbuf_t) / samples_per_frame;
+    int frames           = m_inlen / sizeof(inbuf_t) / m_samples_per_frame;
     int i                = 0;
-    int channels         = av_context->channels;
-    int size_channel     = av_context->frame_size *
+    int channels         = m_av_context->channels;
+    int size_channel     = m_av_context->frame_size *
         AudioOutputSettings::SampleSize(FORMAT_S16);
     if (!m_frame)
     {
         if (!(m_frame = av_frame_alloc()))
         {
-            in = nullptr;
-            in_size = 0;
+            m_in = nullptr;
+            m_in_size = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
-            return outlen;
+            return m_outlen;
         }
     }
     else
     {
         av_frame_unref(m_frame);
     }
-    m_frame->nb_samples = av_context->frame_size;
+    m_frame->nb_samples = m_av_context->frame_size;
     m_frame->pts        = AV_NOPTS_VALUE;
 
     if (frames > 0)
     {
             // init AVFrame for planar data (input is interleaved)
-        for (int j = 0, jj = 0; j < channels; j++, jj += av_context->frame_size)
+        for (int j = 0, jj = 0; j < channels; j++, jj += m_av_context->frame_size)
         {
-            m_frame->data[j] = (uint8_t*)(inp + jj);
+            m_frame->data[j] = (uint8_t*)(m_inp + jj);
         }
     }
 
@@ -236,21 +230,21 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
         AudioOutputUtil::DeinterleaveSamples(
             FORMAT_S16, channels,
-            (uint8_t*)inp,
-            (uint8_t*)(in + i * samples_per_frame),
+            (uint8_t*)m_inp,
+            (uint8_t*)(m_in + i * m_samples_per_frame),
             size_channel * channels);
 
         //  SUGGESTION
         //  Now that avcodec_encode_audio2 is deprecated and replaced
         //  by 2 calls, this could be optimized
         //  into separate routines or separate threads.
-        int ret = avcodec_receive_packet(av_context, &pkt);
+        int ret = avcodec_receive_packet(m_av_context, &pkt);
         if (ret == 0)
             got_packet = true;
         if (ret == AVERROR(EAGAIN))
             ret = 0;
         if (ret == 0)
-            ret = avcodec_send_frame(av_context, m_frame);
+            ret = avcodec_send_frame(m_av_context, m_frame);
         // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
         // there are 2 packets to be received while only 1 frame to be
         // sent. The code does not cater for this. Hopefully it will not happen.
@@ -273,54 +267,54 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             m_spdifenc = new SPDIFEncoder("spdif", AV_CODEC_ID_AC3);
         }
 
-        m_spdifenc->WriteFrame((uint8_t *)pkt.data, pkt.size);
+        m_spdifenc->WriteFrame(pkt.data, pkt.size);
         av_packet_unref(&pkt);
 
         // Check if output buffer is big enough
-        required_len = outlen + m_spdifenc->GetProcessedSize();
-        if (required_len > (int)out_size)
+        required_len = m_outlen + m_spdifenc->GetProcessedSize();
+        if (required_len > (int)m_out_size)
         {
             required_len = ((required_len / OUTBUFSIZE) + 1) * OUTBUFSIZE;
             LOG(VB_AUDIO, LOG_WARNING, LOC +
                 QString("low mem, reallocating out buffer from %1 to %2")
-                    .arg(out_size) .arg(required_len));
+                    .arg(m_out_size) .arg(required_len));
             outbuf_t *tmp = reinterpret_cast<outbuf_t*>
-                (realloc(out, out_size, required_len));
+                (realloc(m_out, m_out_size, required_len));
             if (!tmp)
             {
-                out = nullptr;
-                out_size = 0;
+                m_out = nullptr;
+                m_out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
                     "AC-3 encode error, insufficient memory");
-                return outlen;
+                return m_outlen;
             }
-            out = tmp;
-            out_size = required_len;
+            m_out = tmp;
+            m_out_size = required_len;
         }
         int data_size = 0;
-        m_spdifenc->GetData((uint8_t *)out + outlen, data_size);
-        outlen += data_size;
-        inlen  -= samples_per_frame * sizeof(inbuf_t);
+        m_spdifenc->GetData((uint8_t *)m_out + m_outlen, data_size);
+        m_outlen += data_size;
+        m_inlen  -= m_samples_per_frame * sizeof(inbuf_t);
     }
 
-    memmove(in, in + i * samples_per_frame, inlen);
-    return outlen;
+    memmove(m_in, m_in + i * m_samples_per_frame, m_inlen);
+    return m_outlen;
 }
 
 size_t AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
 {
-    int len = std::min(maxlen, outlen);
+    int len = std::min(maxlen, m_outlen);
     if (len != maxlen)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "GetFrames: getting less than requested");
     }
-    memcpy(ptr, out, len);
-    outlen -= len;
-    memmove(out, (char *)out + len, outlen);
+    memcpy(ptr, m_out, len);
+    m_outlen -= len;
+    memmove(m_out, (char *)m_out + len, m_outlen);
     return len;
 }
 
 void AudioOutputDigitalEncoder::clear()
 {
-    inlen = outlen = 0;
+    m_inlen = m_outlen = 0;
 }

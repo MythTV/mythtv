@@ -57,9 +57,9 @@ class IconView : public MythScreenType
              const QString &galleryDir, MythMediaDevice *initialDevice);
     ~IconView();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
     void HandleRandomShow(void);
     void HandleSeasonalShow(void);
 
@@ -104,9 +104,9 @@ class IconView : public MythScreenType
     void HandleMkDir(void);
     void HandleRename(void);
 
-    void DoMkDir(QString folderName);
+    void DoMkDir(const QString& folderName);
     void DoDeleteMarked(bool doDelete);
-    void DoRename(QString folderName);
+    void DoRename(const QString& folderName);
     void DoDeleteCurrent(bool doDelete);
 
   private:
@@ -121,34 +121,34 @@ class IconView : public MythScreenType
     QStringList         m_itemMarked;
     QString             m_galleryDir;
     vector<int>         m_history;
-    GalleryFilter      *m_galleryFilter;
+    GalleryFilter      *m_galleryFilter      {nullptr};
 
-    MythUIButtonList   *m_imageList;
-    MythUIText         *m_captionText;
-    MythUIText         *m_crumbsText;
-    MythUIText         *m_positionText;
-    MythUIText         *m_noImagesText;
-    MythUIImage        *m_selectedImage;
-    MythDialogBox      *m_menuPopup;
-    MythScreenStack    *m_popupStack;
+    MythUIButtonList   *m_imageList          {nullptr};
+    MythUIText         *m_captionText        {nullptr};
+    MythUIText         *m_crumbsText         {nullptr};
+    MythUIText         *m_positionText       {nullptr};
+    MythUIText         *m_noImagesText       {nullptr};
+    MythUIImage        *m_selectedImage      {nullptr};
+    MythDialogBox      *m_menuPopup          {nullptr};
+    MythScreenStack    *m_popupStack         {nullptr};
 
-    bool                m_isGallery;
-    bool                m_showDevices;
+    bool                m_isGallery          {false};
+    bool                m_showDevices        {false};
     QString             m_currDir;
-    MythMediaDevice    *m_currDevice;
+    MythMediaDevice    *m_currDevice         {nullptr};
 
-    ThumbGenerator     *m_thumbGen;
-    ChildCountThread   *m_childCountThread;
+    ThumbGenerator     *m_thumbGen           {nullptr};
+    ChildCountThread   *m_childCountThread   {nullptr};
 
-    int                 m_showcaption;
-    int                 m_sortorder;
-    bool                m_useOpenGL;
-    bool                m_recurse;
+    bool                m_showcaption        {false};
+    int                 m_sortorder          {0};
+    bool                m_useOpenGL          {false};
+    bool                m_recurse            {false};
     QStringList         m_paths;
 
     QString             m_errorStr;
 
-    bool                m_allowImportScripts;
+    bool                m_allowImportScripts {false};
 
   protected slots:
     void reloadData();
@@ -175,7 +175,7 @@ class ChildCountEvent : public QEvent
         QEvent(kEventType), childCountData(ccd) {}
     ~ChildCountEvent() = default;
 
-    ChildCountData *childCountData;
+    ChildCountData *childCountData {nullptr};
 
     static Type kEventType;
 };
@@ -184,21 +184,22 @@ class ChildCountThread : public MThread
 {
 public:
 
-    explicit ChildCountThread(QObject *parent);
+    explicit ChildCountThread(QObject *parent) :
+        MThread("ChildCountThread"), m_parent(parent) {}
     ~ChildCountThread();
 
-    void addFile(const QString &fileName);
+    void addFile(const QString &filePath);
     void cancel();
 
 protected:
-    void run();
+    void run() override; // MThread
 
 private:
 
     bool moreWork();
-    int  getChildCount(const QString &fileName);
+    int  getChildCount(const QString &filepath);
 
-    QObject     *m_parent;
+    QObject     *m_parent {nullptr};
     QStringList  m_fileList;
     QMutex       m_mutex;
 };
@@ -206,8 +207,9 @@ private:
 class ImportThread: public MThread
 {
     public:
-        explicit ImportThread(const QString &cmd);
-        virtual void run();
+        explicit ImportThread(const QString &cmd)
+            : MThread("import"), m_command(cmd) {}
+        void run() override; // MThread
     private:
         QString m_command;
 };

@@ -17,37 +17,42 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
 {
     Q_OBJECT
   public:
-    MythUISpinBox(MythUIType *parent, const QString &name);
+    MythUISpinBox(MythUIType *parent, const QString &name)
+        : MythUIButtonList(parent, name) {}
     ~MythUISpinBox() = default;
 
     void SetRange(int low, int high, int step, uint pageMultiple = 5);
 
-    void SetValue(int val) { SetValueByData(val); }
-    void SetValue(const QString &val) { SetValueByData(val.toInt()); }
+    void SetValue(int val) override // MythUIButtonList
+        { SetValueByData(val); }
+    void SetValue(const QString &val) override // MythUIButtonList
+        { SetValueByData(val.toInt()); }
     void AddSelection (int value, const QString &label = "");
-    QString GetValue(void) const { return GetDataValue().toString(); }
-    int GetIntValue(void) const { return GetDataValue().toInt(); }
-    bool keyPressEvent(QKeyEvent *event);
+    QString GetValue(void) const override  // MythUIButtonList
+        { return GetDataValue().toString(); }
+    int GetIntValue(void) const override // MythUIButtonList
+        { return GetDataValue().toInt(); }
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIButtonList
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIButtonList
+    void CopyFrom(MythUIType *base) override; // MythUIButtonList
+    void CreateCopy(MythUIType *parent) override; // MythUIButtonList
 
-    virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
-    virtual bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0);
+    bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
+    bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
     void ShowEntryDialog(QString initialEntry);
 
-    bool m_hasTemplate;
+    bool    m_hasTemplate      {false};
     QString m_negativeTemplate;
     QString m_zeroTemplate;
     QString m_positiveTemplate;
 
-    uint m_moveAmount;
-    int m_low;
-    int m_high;
-    int m_step;
+    uint    m_moveAmount       {0};
+    int     m_low              {0};
+    int     m_high             {0};
+    int     m_step             {0};
 };
 
 // Convenience Dialog to allow entry of a Spinbox value
@@ -61,7 +66,7 @@ class MUI_PUBLIC SpinBoxEntryDialog : public MythScreenType
         int low, int high, int step);
     ~SpinBoxEntryDialog(void) = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void entryChanged(void);

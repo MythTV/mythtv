@@ -26,7 +26,7 @@ class FirewireTableMonitorThread : public MThread
     explicit FirewireTableMonitorThread(FirewireSignalMonitor *p) :
         MThread("FirewireTableMonitor"), m_parent(p) { start(); }
     virtual ~FirewireTableMonitorThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
     FirewireSignalMonitor *m_parent;
 };
@@ -39,41 +39,41 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
                           bool _release_stream,
                           uint64_t _flags = kFWSigMon_WaitForPower);
 
-    virtual void HandlePAT(const ProgramAssociationTable*);
-    virtual void HandlePMT(uint, const ProgramMapTable*);
+    void HandlePAT(const ProgramAssociationTable*) override; // DTVSignalMonitor
+    void HandlePMT(uint, const ProgramMapTable*) override; // DTVSignalMonitor
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
   protected:
     FirewireSignalMonitor(void);
     FirewireSignalMonitor(const FirewireSignalMonitor&);
     virtual ~FirewireSignalMonitor();
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
 
     void RunTableMonitor(void);
 
     bool SupportsTSMonitoring(void);
 
-    void AddData(const unsigned char *data, uint dataSize);
+    void AddData(const unsigned char *data, uint len) override; // TSDataListener
 
   public:
     static const uint kPowerTimeout;
     static const uint kBufferTimeout;
 
   protected:
-    volatile bool      dtvMonitorRunning;
-    FirewireTableMonitorThread *tableMonitorThread;
-    bool               stb_needs_retune;
-    bool               stb_needs_to_wait_for_pat;
-    bool               stb_needs_to_wait_for_power;
-    MythTimer          stb_wait_for_pat_timer;
-    MythTimer          stb_wait_for_power_timer;
+    volatile bool      m_dtvMonitorRunning           {false};
+    FirewireTableMonitorThread *m_tableMonitorThread {nullptr};
+    bool               m_stb_needs_retune            {true};
+    bool               m_stb_needs_to_wait_for_pat   {false};
+    bool               m_stb_needs_to_wait_for_power {false};
+    MythTimer          m_stb_wait_for_pat_timer;
+    MythTimer          m_stb_wait_for_power_timer;
 
-    vector<unsigned char> buffer;
+    vector<unsigned char> m_buffer;
 
-    static QMap<void*,uint> pat_keys;
-    static QMutex           pat_keys_lock;
+    static QMap<void*,uint> s_pat_keys;
+    static QMutex           s_pat_keys_lock;
 };
 
 #endif // _FIREWIRESIGNALMONITOR_H_

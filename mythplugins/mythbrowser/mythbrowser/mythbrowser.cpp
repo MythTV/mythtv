@@ -20,12 +20,7 @@ using namespace std;
 
 MythBrowser::MythBrowser(MythScreenStack *parent, QStringList &urlList)
     : MythScreenType (parent, "mythbrowser"),
-      m_urlList(urlList),        m_pageList(nullptr),
-      m_progressBar(nullptr),    m_titleText(nullptr),
-      m_statusText(nullptr),     m_backButton(nullptr),
-      m_forwardButton(nullptr),  m_exitButton(nullptr),
-      m_currentBrowser(-1),      m_menuPopup(nullptr),
-      m_defaultFavIcon(nullptr)
+      m_urlList(urlList)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
 }
@@ -137,8 +132,7 @@ MythUIWebBrowser* MythBrowser::activeBrowser(void)
 {
     if (m_currentBrowser >=0 && m_currentBrowser < m_browserList.size())
         return m_browserList[m_currentBrowser]->getBrowser();
-    else
-        return m_browserList[0]->getBrowser();
+    return m_browserList[0]->getBrowser();
 }
 
 void MythBrowser::slotEnterURL(void)
@@ -259,9 +253,9 @@ void MythBrowser::slotForward()
 
 void MythBrowser::slotAddBookmark()
 {
-    m_editBookmark.category = "";
-    m_editBookmark.name = m_pageList->GetValue();
-    m_editBookmark.url = activeBrowser()->GetUrl().toString();
+    m_editBookmark.m_category = "";
+    m_editBookmark.m_name = m_pageList->GetValue();
+    m_editBookmark.m_url = activeBrowser()->GetUrl().toString();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 

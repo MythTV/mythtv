@@ -16,6 +16,8 @@
 #include "mythuitext.h"
 #include "mythdialogbox.h"
 
+class GroupSetting;
+
 class WelcomeDialog : public MythScreenType
 {
 
@@ -26,9 +28,9 @@ class WelcomeDialog : public MythScreenType
     WelcomeDialog(MythScreenStack *parent, const char *name);
     ~WelcomeDialog();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
   protected slots:
     void startFrontendClick(void);
@@ -37,7 +39,7 @@ class WelcomeDialog : public MythScreenType
     void updateStatus(void);
     void updateScreen(void);
     void closeDialog(void);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void shutdownNow(void);
     void runEPGGrabber(void);
     void lockShutdown(void);
@@ -50,6 +52,7 @@ class WelcomeDialog : public MythScreenType
     bool checkConnectionToServer(void);
     void checkAutoStart(void);
     void runMythFillDatabase(void);
+    void ShowSettings(GroupSetting* screen);
 
     //
     //  GUI stuff
@@ -67,8 +70,6 @@ class WelcomeDialog : public MythScreenType
     QTimer        *m_updateScreenTimer; // audited ref #5318
 
     QString        m_appBinDir;
-    QString        m_timeFormat;
-    QString        m_dateFormat;
     bool           m_isRecording;
     bool           m_hasConflicts;
     bool           m_bWillShutdown;

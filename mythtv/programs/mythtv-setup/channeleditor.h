@@ -16,9 +16,9 @@ class ChannelEditor : public MythScreenType
   public:
     explicit ChannelEditor(MythScreenStack *parent);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
     void menu(void);
@@ -42,21 +42,21 @@ class ChannelEditor : public MythScreenType
         FILTER_UNASSIGNED = 0
     };
 
-    int m_sourceFilter;
+    int     m_sourceFilter           {FILTER_ALL};
     QString m_sourceFilterName;
     QString m_currentSortMode;
-    bool m_currentHideMode;
+    bool    m_currentHideMode        {false};
 
-    MythUIButtonList *m_channelList;
-    MythUIButtonList *m_sourceList;
+    MythUIButtonList *m_channelList  {nullptr};
+    MythUIButtonList *m_sourceList   {nullptr};
 
-    MythUIImage      *m_preview;
-    MythUIText       *m_channame;
-    MythUIText       *m_channum;
-    MythUIText       *m_callsign;
-    MythUIText       *m_chanid;
-    MythUIText       *m_sourcename;
-    MythUIText       *m_compoundname;
+    MythUIImage      *m_preview      {nullptr};
+    MythUIText       *m_channame     {nullptr};
+    MythUIText       *m_channum      {nullptr};
+    MythUIText       *m_callsign     {nullptr};
+    MythUIText       *m_chanid       {nullptr};
+    MythUIText       *m_sourcename   {nullptr};
+    MythUIText       *m_compoundname {nullptr};
 };
 
 class ChannelID;
@@ -68,7 +68,7 @@ class ChannelWizard : public GroupSetting
     ChannelWizard(int id, int default_sourceid);
 
   private:
-    ChannelID *cid;
+    ChannelID *m_cid {nullptr};
 };
 
 #endif

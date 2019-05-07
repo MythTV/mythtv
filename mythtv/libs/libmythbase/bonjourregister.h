@@ -33,9 +33,9 @@ class MBASE_PUBLIC BonjourRegister : public QObject
                                           const char *domain, void *object);
     QByteArray RandomizeData(void);
 
-    DNSServiceRef    m_dnssref;
-    QSocketNotifier *m_socket;
-    QMutexLocker    *m_lock;
+    DNSServiceRef    m_dnssref {nullptr};
+    QSocketNotifier *m_socket  {nullptr};
+    QMutexLocker    *m_lock    {nullptr};
     static QMutex    g_lock;
     QByteArray       m_data;
 };

@@ -8,20 +8,6 @@
 // mytharchive
 #include "editmetadata.h"
 
-EditMetadataDialog::EditMetadataDialog(
-    MythScreenStack *parent, ArchiveItem *source_metadata) :
-    MythScreenType(parent, "EditMetadataDialog"),
-    m_sourceMetadata(source_metadata),
-    m_titleEdit(nullptr),
-    m_subtitleEdit(nullptr),
-    m_descriptionEdit(nullptr),
-    m_startdateEdit(nullptr),
-    m_starttimeEdit(nullptr),
-    m_cancelButton(nullptr),
-    m_okButton(nullptr)
-{
-}
-
 bool EditMetadataDialog::Create(void)
 {
     // Load the theme for this screen
@@ -88,8 +74,4 @@ void EditMetadataDialog::cancelPressed(void)
 {
     emit haveResult(false, m_sourceMetadata);
     Close();
-}
-
-EditMetadataDialog::~EditMetadataDialog()
-{
 }

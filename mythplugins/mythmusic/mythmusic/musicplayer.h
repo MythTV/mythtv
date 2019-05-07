@@ -2,7 +2,6 @@
 #define MUSICPLAYER_H_
 
 // mythtv
-#include <mythdialogs.h>
 #include <audiooutput.h>
 #include <mythobservable.h>
 
@@ -12,6 +11,9 @@
 // mythmusic
 #include "decoderhandler.h"
 
+// how long to wait before updating the lastplay and playcount fields
+#define LASTPLAY_DELAY 15
+
 class AudioOutput;
 class MainVisual;
 class Playlist;
@@ -19,20 +21,21 @@ class Playlist;
 class MusicPlayerEvent : public MythEvent
 {
     public:
-        MusicPlayerEvent(Type t, int id) :
-            MythEvent(t), TrackID(id), Volume(0), IsMuted(false) {}
-        MusicPlayerEvent(Type t, uint vol, bool muted) :
-            MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
+        MusicPlayerEvent(Type type, int id) :
+            MythEvent(type), m_trackID(id) {}
+        MusicPlayerEvent(Type type, uint vol, bool muted) :
+            MythEvent(type), m_trackID(0), m_volume(vol), m_isMuted(muted) {}
         ~MusicPlayerEvent() = default;
 
-        virtual MythEvent *clone(void) const { return new MusicPlayerEvent(*this); }
+         MythEvent *clone(void) const override //  MythEvent
+            { return new MusicPlayerEvent(*this); }
 
         // for track changed/added/deleted/metadata changed/playlist changed events
-        int TrackID;
+        int m_trackID;
 
         // for volume changed event
-        uint Volume;
-        bool IsMuted;
+        uint m_volume {0};
+        bool m_isMuted {false};
 
         static Type TrackChangeEvent;
         static Type VolumeChangeEvent;
@@ -66,7 +69,7 @@ class MusicPlayer : public QObject, public MythObservable
     void setPlayMode(PlayMode mode);
     PlayMode getPlayMode(void) { return m_playMode; }
 
-    void playFile(const MusicMetadata &meta);
+    void playFile(const MusicMetadata &mdata);
 
     void addListener(QObject *listener);
     void removeListener(QObject *listener);
@@ -191,7 +194,7 @@ class MusicPlayer : public QObject, public MythObservable
     void StopPlayback(void);
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
   private:
     void loadSettings(void);
@@ -206,46 +209,46 @@ class MusicPlayer : public QObject, public MythObservable
     void setupDecoderHandler(void);
     void decoderHandlerReady(void);
 
-    int          m_currentTrack;
-    int          m_currentTime;
+    int          m_currentTrack {-1};
+    int          m_currentTime {0};
 
-    MusicMetadata  *m_oneshotMetadata;
+    MusicMetadata  *m_oneshotMetadata {nullptr};
 
-    AudioOutput    *m_output;
-    DecoderHandler *m_decoderHandler;
+    AudioOutput    *m_output          {nullptr};
+    DecoderHandler *m_decoderHandler  {nullptr};
 
     QSet<QObject*>  m_visualisers;
 
-    PlayMode     m_playMode;
-    bool         m_isPlaying;
-    bool         m_isAutoplay;
-    bool         m_canShowPlayer;
-    bool         m_autoShowPlayer;
-    bool         m_wasPlaying;
-    bool         m_updatedLastplay;
-    bool         m_allowRestorePos;
+    PlayMode     m_playMode           {PLAYMODE_TRACKSPLAYLIST};
+    bool         m_isPlaying          {false};
+    bool         m_isAutoplay         {false};
+    bool         m_canShowPlayer      {true};
+    bool         m_autoShowPlayer     {true};
+    bool         m_wasPlaying         {false};
+    bool         m_updatedLastplay    {false};
+    bool         m_allowRestorePos    {true};
 
-    int          m_lastplayDelay;
+    int          m_lastplayDelay      {LASTPLAY_DELAY};
 
-    ShuffleMode  m_shuffleMode;
-    RepeatMode   m_repeatMode;
-    ResumeMode   m_resumeModePlayback;
-    ResumeMode   m_resumeModeEditor;
-    ResumeMode   m_resumeModeRadio;
+    ShuffleMode  m_shuffleMode        {SHUFFLE_OFF};
+    RepeatMode   m_repeatMode         {REPEAT_OFF};
+    ResumeMode   m_resumeModePlayback {RESUME_EXACT};
+    ResumeMode   m_resumeModeEditor   {RESUME_OFF};
+    ResumeMode   m_resumeModeRadio    {RESUME_TRACK};
 
-    float        m_playSpeed;
+    float        m_playSpeed          {1.0F};
 
     // notification
-    bool m_showScannerNotifications;
+    bool m_showScannerNotifications   {true};
     QMap<QString, int>  m_notificationMap;
 
     // radio stuff
     QList<MusicMetadata*>  m_playedList;
-    int               m_lastTrackStart;
-    int               m_bufferAvailable;
-    int               m_bufferSize;
+    int          m_lastTrackStart     {0};
+    int          m_bufferAvailable    {0};
+    int          m_bufferSize         {0};
 
-    int               m_errorCount;
+    int          m_errorCount         {0};
 };
 
 Q_DECLARE_METATYPE(MusicPlayer::ResumeMode);

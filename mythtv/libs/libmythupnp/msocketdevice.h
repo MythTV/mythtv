@@ -72,20 +72,20 @@ public:
     int   socket() const;
     virtual void setSocket(int socket, Type type);
 
-    bool  open(OpenMode mode);
+    bool  open(OpenMode mode) override; // QIODevice
     bool  open(int mode)
     {
-        return open((OpenMode)mode);
+        return MSocketDevice::open((OpenMode)mode);
     }
 
-    void  close();
+    void  close() override; // QIODevice
     bool  flush();
 
     // Implementation of QIODevice abstract virtual functions
-    qint64  size() const;
-    qint64  pos() const;
-    bool  seek(qint64);
-    bool  atEnd() const;
+    qint64  size() const override; // QIODevice
+    qint64  pos() const override; // QIODevice
+    bool  seek(qint64) override; // QIODevice
+    bool  atEnd() const override; // QIODevice
 
     bool  blocking() const;
     virtual void setBlocking(bool);
@@ -110,20 +110,20 @@ public:
     virtual bool listen(int backlog);
     virtual int  accept();
 
-    qint64  bytesAvailable() const;
+    qint64  bytesAvailable() const override; // QIODevice
     qint64  waitForMore(int msecs, bool *timeout = nullptr) const;
     virtual qint64 writeBlock(const char *data, quint64 len,
                               const QHostAddress & host, quint16 port);
     inline qint64  writeBlock(const char *data, quint64 len)
     {
-        return qint64(write(data, qint64(len)));
+        return write(data, len);
     }
 
     inline qint64 readBlock(char *data, quint64 maxlen)
     {
         // read() does not correctly handle zero-byte udp packets
         // so call readData() directly which does
-        return maxlen ? qint64(read(data, qint64(maxlen))) : qint64(readData(data, qint64(maxlen)));
+        return maxlen ? read(data, maxlen) : readData(data, maxlen);
     }
 
     virtual quint16  port() const;
@@ -147,7 +147,7 @@ public:
     };
     Error  error() const;
 
-    inline bool isSequential() const
+    inline bool isSequential() const override // QIODevice
     {
         return true;
     }
@@ -156,8 +156,8 @@ public:
 
 protected:
     void setError(Error err);
-    qint64 readData(char *data, qint64 maxlen);
-    qint64 writeData(const char *data, qint64 len);
+    qint64 readData(char *data, qint64 maxlen) override; // QIODevice
+    qint64 writeData(const char *data, qint64 len) override; // QIODevice
 
 private:
     int fd;

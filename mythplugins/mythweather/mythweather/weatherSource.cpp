@@ -19,8 +19,8 @@
 #include "weatherScreen.h"
 #include "weatherSource.h"
 
-QStringList WeatherSource::ProbeTypes(QString workingDirectory,
-                                      QString program)
+QStringList WeatherSource::ProbeTypes(const QString& workingDirectory,
+                                      const QString& program)
 {
     QStringList arguments("-t");
     const QString loc = QString("WeatherSource::ProbeTypes(%1 %2): ")
@@ -58,8 +58,8 @@ QStringList WeatherSource::ProbeTypes(QString workingDirectory,
     return types;
 }
 
-bool WeatherSource::ProbeTimeouts(QString  workingDirectory,
-                                  QString  program,
+bool WeatherSource::ProbeTimeouts(const QString&  workingDirectory,
+                                  const QString&  program,
                                   uint    &updateTimeout,
                                   uint    &scriptTimeout)
 {
@@ -305,15 +305,12 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
             MythDB::DBError("Getting weather sourceid", db);
             return nullptr;
         }
-        else if (!db.next())
+        if (!db.next())
         {
             LOG(VB_GENERAL, LOG_ERR, "Error getting weather sourceid");
             return nullptr;
         }
-        else
-        {
-            info.id = db.value(0).toInt();
-        }
+        info.id = db.value(0).toInt();
     }
 
     return new ScriptInfo(info);
@@ -324,13 +321,10 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
  * that wouldn't be good.
  */
 WeatherSource::WeatherSource(ScriptInfo *info)
-    : m_ready(info ? true : false),    m_inuse(info ? true : false),
+    : m_ready(info != nullptr),
+      m_inuse(info != nullptr),
       m_info(info),
-      m_ms(nullptr),
-      m_locale(""),
-      m_cachefile(""),
-      m_units(SI_UNITS),
-      m_updateTimer(new QTimer(this)), m_connectCnt(0)
+      m_updateTimer(new QTimer(this))
 {
     QDir dir(GetConfDir());
     if (!dir.exists("MythWeather"))
@@ -361,7 +355,7 @@ void WeatherSource::connectScreen(WeatherScreen *ws)
             ws, SLOT(newData(QString, units_t, DataMap)));
     ++m_connectCnt;
 
-    if (m_data.size() > 0)
+    if (!m_data.empty())
     {
         emit newData(m_locale, m_units, m_data);
     }
@@ -462,12 +456,9 @@ void WeatherSource::startUpdate(bool forceUpdate)
                 }
                 return;
             }
-            else
-            {
-                LOG(VB_GENERAL, LOG_NOTICE,
-                    QString("No cachefile for %1, forcing update.")
-                        .arg(m_info->name));
-            }
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("No cachefile for %1, forcing update.")
+                .arg(m_info->name));
         }
     }
 

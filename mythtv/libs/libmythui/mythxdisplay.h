@@ -16,7 +16,7 @@
 class MUI_PUBLIC MythXDisplay
 {
   public:
-    MythXDisplay();
+    MythXDisplay() = default;
     ~MythXDisplay();
     Display *GetDisplay(void)          { return m_disp;       }
     int      GetScreen(void) const     { return m_screen_num; }
@@ -31,7 +31,6 @@ class MUI_PUBLIC MythXDisplay
     void     SetForeground(unsigned long color);
     void     FillRectangle(Window win, const QRect &rect);
     void     MoveResizeWin(Window win, const QRect &rect);
-    int      GetNumberXineramaScreens(void);
     QSize    GetDisplaySize(void);
     QSize    GetDisplayDimensions(void);
     float    GetRefreshRate(void);
@@ -43,14 +42,14 @@ class MUI_PUBLIC MythXDisplay
     bool CheckErrors(Display *disp = nullptr);
     void CheckOrphanedErrors(void);
 
-    Display      *m_disp;
-    int           m_screen_num;
-    Screen       *m_screen;
-    int           m_depth;
-    unsigned long m_black;
-    GC            m_gc;
-    Window        m_root;
-    QMutex        m_lock;
+    Display      *m_disp       {nullptr};
+    int           m_screen_num {0};
+    Screen       *m_screen     {nullptr};
+    int           m_depth      {0};
+    unsigned long m_black      {0};
+    GC            m_gc         {nullptr};
+    Window        m_root       {0};
+    QMutex        m_lock       {QMutex::Recursive};
 };
 
 class MythXLocker
@@ -67,7 +66,7 @@ class MythXLocker
     }
 
   private:
-    MythXDisplay *disp;
+    MythXDisplay *disp {nullptr};
 };
 
 MUI_PUBLIC void          LockMythXDisplays(bool lock);

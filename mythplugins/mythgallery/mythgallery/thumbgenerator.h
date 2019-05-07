@@ -39,10 +39,10 @@ typedef struct {
 class ThumbGenEvent : public QEvent
 {
   public:
-    explicit ThumbGenEvent(ThumbData *td) : QEvent(kEventType), thumbData(td) {}
+    explicit ThumbGenEvent(ThumbData *td) : QEvent(kEventType), m_thumbData(td) {}
     ~ThumbGenEvent() = default;
 
-    ThumbData *thumbData;
+    ThumbData *m_thumbData {nullptr};
 
     static Type kEventType;
 };
@@ -51,19 +51,21 @@ class ThumbGenerator : public MThread
 {
 public:
 
-    ThumbGenerator(QObject *parent, int w, int h);
+    ThumbGenerator(QObject *parent, int w, int h)
+        : MThread("ThumbGenerator"), m_parent(parent),
+          m_width(w), m_height(h) {}
     ~ThumbGenerator();
 
     void setSize(int w, int h);
     void setDirectory(const QString& directory, bool isGallery=false);
-    void addFile(const QString& fileName);
+    void addFile(const QString& filePath);
     void cancel();
 
     static QString getThumbcacheDir(const QString& inDir);
 
 protected:
 
-    void run();
+    void run() override; // MThread
 
 private:
 
@@ -73,14 +75,14 @@ private:
     void loadDir(QImage& image, const QFileInfo& fi);
     void loadFile(QImage& image, const QFileInfo& fi);
 
-    QObject     *m_parent;
+    QObject     *m_parent    {nullptr};
     QString      m_directory;
-    bool         m_isGallery;
+    bool         m_isGallery {false};
     QStringList  m_fileList;
     QMutex       m_mutex;
     int          m_width;
     int          m_height;
-    bool         m_cancel;
+    bool         m_cancel    {false};
 };
 
 #endif /* THUMBGENERATOR_H */

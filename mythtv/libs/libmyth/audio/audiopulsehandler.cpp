@@ -12,9 +12,9 @@
 
 #define LOC QString("Pulse: ")
 
-#define IS_READY(arg) ((PA_CONTEXT_READY      == arg) || \
-                       (PA_CONTEXT_FAILED     == arg) || \
-                       (PA_CONTEXT_TERMINATED == arg))
+#define IS_READY(arg) ((PA_CONTEXT_READY      == (arg)) || \
+                       (PA_CONTEXT_FAILED     == (arg)) || \
+                       (PA_CONTEXT_TERMINATED == (arg)))
 
 static QString state_to_string(pa_context_state state)
 {
@@ -194,13 +194,6 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
             .arg(success).arg(handler->m_pending_operations));
 }
 
-PulseHandler::PulseHandler(void)
-  : m_ctx_state(PA_CONTEXT_UNCONNECTED), m_ctx(nullptr), m_pending_operations(0),
-    m_loop(nullptr), m_initialised(false), m_valid(false),
-    m_thread(nullptr)
-{
-}
-
 PulseHandler::~PulseHandler(void)
 {
     // TODO - do we need to drain the context??
@@ -317,12 +310,12 @@ bool PulseHandler::SuspendInternal(bool suspend)
     m_pending_operations = 2;
     pa_operation *operation_sink =
         pa_context_suspend_sink_by_index(
-            m_ctx, PA_INVALID_INDEX, suspend, OperationCallback, this);
+            m_ctx, PA_INVALID_INDEX, static_cast<int>(suspend), OperationCallback, this);
     pa_operation_unref(operation_sink);
 
     pa_operation *operation_source =
         pa_context_suspend_source_by_index(
-            m_ctx, PA_INVALID_INDEX, suspend, OperationCallback, this);
+            m_ctx, PA_INVALID_INDEX, static_cast<int>(suspend), OperationCallback, this);
     pa_operation_unref(operation_source);
 
     // run the loop manually and wait for the callbacks

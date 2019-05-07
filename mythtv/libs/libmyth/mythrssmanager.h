@@ -37,6 +37,7 @@ class MPUBLIC RSSSite : public QObject
     };
 
     RSSSite(const QString& title,
+                  const QString& sortTitle,
                   const QString& image,
                   const ArticleType& type,
                   const QString& description,
@@ -50,6 +51,7 @@ class MPUBLIC RSSSite : public QObject
     typedef QList<RSSSite *> rssList;
 
     const QString& GetTitle() const { return m_title; }
+    const QString& GetSortTitle() const { return m_sortTitle; }
     const QString& GetImage() const { return m_image; }
     const ArticleType& GetType() const { return m_type; }
     const QString& GetDescription() const { return m_description; }
@@ -75,6 +77,7 @@ class MPUBLIC RSSSite : public QObject
                      const QUrl& oldRedirectUrl) const;
 
     QString     m_title;
+    QString     m_sortTitle;
     QString     m_image;
     ArticleType m_type;
     QString     m_description;
@@ -84,15 +87,15 @@ class MPUBLIC RSSSite : public QObject
     bool        m_download;
     QDateTime   m_updated;
 
-    mutable    QMutex m_lock;
+    mutable    QMutex m_lock          {QMutex::Recursive};
     QByteArray m_data;
     QString    m_imageURL;
-    bool       m_podcast;
+    bool       m_podcast              {false};
 
     ResultItem::resultList m_articleList;
 
-    QNetworkReply          *m_reply;
-    QNetworkAccessManager  *m_manager;
+    QNetworkReply          *m_reply   {nullptr};
+    QNetworkAccessManager  *m_manager {nullptr};
 
   private slots:
     void slotCheckRedirect(QNetworkReply* reply);
@@ -126,9 +129,9 @@ class MPUBLIC RSSManager : public QObject
   private:
     void processAndInsertRSS(RSSSite *site);
 
-    QTimer                        *m_timer;
+    QTimer                        *m_timer      {nullptr};
     RSSSite::rssList               m_sites;
-    uint                           m_updateFreq;
+    uint                           m_updateFreq {6 * 3600 * 1000};
     RSSSite::rssList               m_inprogress;
 };
 

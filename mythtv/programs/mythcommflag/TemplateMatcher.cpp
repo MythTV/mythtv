@@ -101,7 +101,7 @@ next_pixel:
     return 0;
 }
 
-bool readMatches(QString filename, unsigned short *matches, long long nframes)
+bool readMatches(const QString& filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -134,7 +134,7 @@ error:
     return false;
 }
 
-bool writeMatches(QString filename, unsigned short *matches, long long nframes)
+bool writeMatches(const QString& filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -193,7 +193,7 @@ int sort_ascending(const void *aa, const void *bb)
     return *(unsigned short*)aa - *(unsigned short*)bb;
 }
 
-long long matchspn(long long nframes, unsigned char *match, long long frameno,
+long long matchspn(long long nframes, const unsigned char *match, long long frameno,
                   unsigned char acceptval)
 {
     /*
@@ -329,26 +329,18 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
 };  /* namespace */
 
 TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
-                                 TemplateFinder *tf, QString debugdir) :
-    FrameAnalyzer(),      pgmConverter(pgmc),
-    edgeDetector(ed),     templateFinder(tf),
-    tmpl(nullptr),
-    tmplrow(-1),          tmplcol(-1),
-    tmplwidth(-1),        tmplheight(-1),
-    matches(nullptr),     match(nullptr),
-    fps(0.0f),
-    debugLevel(0),        debugdir(debugdir),
+                                 TemplateFinder *tf, const QString& debugdir) :
+    m_pgmConverter(pgmc),
+    m_edgeDetector(ed),   m_templateFinder(tf),
+    m_debugdir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE
-    debugdata(debugdir + "/TemplateMatcher-pgm.txt"),
+    m_debugdata(debugdir + "/TemplateMatcher-pgm.txt")
 #else  /* !PGM_CONVERT_GREYSCALE */
-    debugdata(debugdir + "/TemplateMatcher-yuv.txt"),
+    m_debugdata(debugdir + "/TemplateMatcher-yuv.txt")
 #endif /* !PGM_CONVERT_GREYSCALE */
-    player(nullptr),
-    debug_matches(false), debug_removerunts(false),
-    matches_done(false)
 {
-    memset(&cropped, 0, sizeof(cropped));
-    memset(&analyze_time, 0, sizeof(analyze_time));
+    memset(&m_cropped, 0, sizeof(m_cropped));
+    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
 
     /*
      * debugLevel:
@@ -356,78 +348,76 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
      *      1: cache frame edge counts into debugdir [1 file]
      *      2: extra verbosity [O(nframes)]
      */
-    debugLevel = gCoreContext->GetNumSetting("TemplateMatcherDebugLevel", 0);
+    m_debugLevel = gCoreContext->GetNumSetting("TemplateMatcherDebugLevel", 0);
 
-    if (debugLevel >= 1)
+    if (m_debugLevel >= 1)
     {
-        createDebugDirectory(debugdir,
-            QString("TemplateMatcher debugLevel %1").arg(debugLevel));
-        debug_matches = true;
-        if (debugLevel >= 2)
-            debug_removerunts = true;
+        createDebugDirectory(m_debugdir,
+            QString("TemplateMatcher debugLevel %1").arg(m_debugLevel));
+        m_debug_matches = true;
+        if (m_debugLevel >= 2)
+            m_debug_removerunts = true;
     }
 }
 
 TemplateMatcher::~TemplateMatcher(void)
 {
-    if (matches)
-        delete []matches;
-    if (match)
-        delete []match;
-    av_freep(&cropped.data[0]);
+    delete []m_matches;
+    delete []m_match;
+    av_freep(&m_cropped.data[0]);
 }
 
 enum FrameAnalyzer::analyzeFrameResult
 TemplateMatcher::MythPlayerInited(MythPlayer *_player,
         long long nframes)
 {
-    player = _player;
-    fps = player->GetFrameRate();
+    m_player = _player;
+    m_fps = m_player->GetFrameRate();
 
-    if (!(tmpl = templateFinder->getTemplate(&tmplrow, &tmplcol,
-                    &tmplwidth, &tmplheight)))
+    if (!(m_tmpl = m_templateFinder->getTemplate(&m_tmplrow, &m_tmplcol,
+                    &m_tmplwidth, &m_tmplheight)))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited: no template"));
         return ANALYZE_FATAL;
     }
 
-    if (av_image_alloc(cropped.data, cropped.linesize,
-        tmplwidth, tmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+    if (av_image_alloc(m_cropped.data, m_cropped.linesize,
+        m_tmplwidth, m_tmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited "
                     "av_image_alloc cropped (%1x%2) failed")
-                .arg(tmplwidth).arg(tmplheight));
+                .arg(m_tmplwidth).arg(m_tmplheight));
         return ANALYZE_FATAL;
     }
 
-    if (pgmConverter->MythPlayerInited(player))
+    if (m_pgmConverter->MythPlayerInited(m_player))
         goto free_cropped;
 
-    matches = new unsigned short[nframes];
-    memset(matches, 0, nframes * sizeof(*matches));
+    m_matches = new unsigned short[nframes];
+    memset(m_matches, 0, nframes * sizeof(*m_matches));
 
-    match = new unsigned char[nframes];
+    m_match = new unsigned char[nframes];
 
-    if (debug_matches)
+    if (m_debug_matches)
     {
-        if (readMatches(debugdata, matches, nframes))
+        if (readMatches(m_debugdata, m_matches, nframes))
         {
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("TemplateMatcher::MythPlayerInited read %1")
-                    .arg(debugdata));
-            matches_done = true;
+                    .arg(m_debugdata));
+            m_matches_done = true;
         }
     }
 
-    if (matches_done)
+    if (m_matches_done)
         return ANALYZE_FINISHED;
 
     return ANALYZE_OK;
 
 free_cropped:
-    av_freep(&cropped.data[0]);
+    av_freep(&m_cropped.data[0]);
     return ANALYZE_FATAL;
 }
 
@@ -477,25 +467,25 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
 
     *pNextFrame = NEXTFRAME;
 
-    if (!(pgm = pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
+    if (!(pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
         goto error;
 
     (void)gettimeofday(&start, nullptr);
 
-    if (pgm_crop(&cropped, pgm, pgmheight, tmplrow, tmplcol,
-                tmplwidth, tmplheight))
+    if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplrow, m_tmplcol,
+                m_tmplwidth, m_tmplheight))
         goto error;
 
-    if (!(edges = edgeDetector->detectEdges(&cropped, tmplheight,
+    if (!(edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplheight,
                     FRAMESGMPCTILE)))
         goto error;
 
-    if (pgm_match(tmpl, edges, tmplheight, JITTER_RADIUS, &matches[frameno]))
+    if (pgm_match(m_tmpl, edges, m_tmplheight, JITTER_RADIUS, &m_matches[frameno]))
         goto error;
 
     (void)gettimeofday(&end, nullptr);
     timersub(&end, &start, &elapsed);
-    timeradd(&analyze_time, &elapsed, &analyze_time);
+    timeradd(&m_analyze_time, &elapsed, &m_analyze_time);
 
     return ANALYZE_OK;
 
@@ -518,56 +508,56 @@ TemplateMatcher::finished(long long nframes, bool final)
      * Higher values could eliminate real breaks or segments entirely.
      * Lower values can yield more false "short" breaks or segments.
      */
-    const int       MINBREAKLEN = (int)roundf(45 * fps);  /* frames */
-    const int       MINSEGLEN = (int)roundf(105 * fps);    /* frames */
+    const int       MINBREAKLEN = (int)roundf(45 * m_fps);  /* frames */
+    const int       MINSEGLEN = (int)roundf(105 * m_fps);    /* frames */
 
     int                                 tmpledges, mintmpledges;
     int                                 minbreaklen, minseglen;
     long long                           brkb;
     FrameAnalyzer::FrameMap::Iterator   bb;
 
-    if (!matches_done && debug_matches)
+    if (!m_matches_done && m_debug_matches)
     {
-        if (final && writeMatches(debugdata, matches, nframes))
+        if (final && writeMatches(m_debugdata, m_matches, nframes))
         {
             LOG(VB_COMMFLAG, LOG_INFO,
-                QString("TemplateMatcher::finished wrote %1") .arg(debugdata));
-            matches_done = true;
+                QString("TemplateMatcher::finished wrote %1") .arg(m_debugdata));
+            m_matches_done = true;
         }
     }
 
-    tmpledges = pgm_set(tmpl, tmplheight);
-    mintmpledges = pick_mintmpledges(matches, nframes);
+    tmpledges = pgm_set(m_tmpl, m_tmplheight);
+    mintmpledges = pick_mintmpledges(m_matches, nframes);
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateMatcher::finished %1x%2@(%3,%4),"
                 " %5 edge pixels, want %6")
-            .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
+            .arg(m_tmplwidth).arg(m_tmplheight).arg(m_tmplcol).arg(m_tmplrow)
             .arg(tmpledges).arg(mintmpledges));
 
     for (long long ii = 0; ii < nframes; ii++)
-        match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
+        m_match[ii] = m_matches[ii] >= mintmpledges ? 1 : 0;
 
-    if (debugLevel >= 2)
+    if (m_debugLevel >= 2)
     {
-        if (final && finishedDebug(nframes, matches, match))
+        if (final && finishedDebug(nframes, m_matches, m_match))
             goto error;
     }
 
     /*
      * Construct breaks; find the first logo break.
      */
-    breakMap.clear();
-    brkb = match[0] ? matchspn(nframes, match, 0, match[0]) : 0;
+    m_breakMap.clear();
+    brkb = m_match[0] ? matchspn(nframes, m_match, 0, m_match[0]) : 0;
     while (brkb < nframes)
     {
         /* Skip over logo-less frames; find the next logo frame (brke). */
-        long long brke = matchspn(nframes, match, brkb, match[brkb]);
+        long long brke = matchspn(nframes, m_match, brkb, m_match[brkb]);
         long long brklen = brke - brkb;
-        breakMap.insert(brkb, brklen);
+        m_breakMap.insert(brkb, brklen);
 
         /* Find the next logo break. */
-        brkb = matchspn(nframes, match, brke, match[brke]);
+        brkb = matchspn(nframes, m_match, brke, m_match[brke]);
     }
 
     /* Clean up the "noise". */
@@ -579,26 +569,26 @@ TemplateMatcher::finished(long long nframes, bool final)
         bool f2 = false;
         if (minbreaklen <= MINBREAKLEN)
         {
-            f1 = removeShortBreaks(&breakMap, fps, minbreaklen,
-                    debug_removerunts);
+            f1 = removeShortBreaks(&m_breakMap, m_fps, minbreaklen,
+                    m_debug_removerunts);
             minbreaklen++;
         }
         if (minseglen <= MINSEGLEN)
         {
-            f2 = removeShortSegments(&breakMap, nframes, fps, minseglen,
-                    debug_removerunts);
+            f2 = removeShortSegments(&m_breakMap, nframes, m_fps, minseglen,
+                    m_debug_removerunts);
             minseglen++;
         }
         if (minbreaklen > MINBREAKLEN && minseglen > MINSEGLEN)
             break;
-        if (debug_removerunts && (f1 || f2))
-            frameAnalyzerReportMap(&breakMap, fps, "** TM Break");
+        if (m_debug_removerunts && (f1 || f2))
+            frameAnalyzerReportMap(&m_breakMap, m_fps, "** TM Break");
     }
 
     /*
      * Report breaks.
      */
-    frameAnalyzerReportMap(&breakMap, fps, "TM Break");
+    frameAnalyzerReportMap(&m_breakMap, m_fps, "TM Break");
 
     return 0;
 
@@ -609,11 +599,11 @@ error:
 int
 TemplateMatcher::reportTime(void) const
 {
-    if (pgmConverter->reportTime())
+    if (m_pgmConverter->reportTime())
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TM Time: analyze=%1s")
-            .arg(strftimeval(&analyze_time)));
+            .arg(strftimeval(&m_analyze_time)));
     return 0;
 }
 
@@ -634,12 +624,12 @@ TemplateMatcher::templateCoverage(long long nframes, bool final) const
     const int       MINBREAKS = nframes * 20 / 100;
     const int       MAXBREAKS = nframes * 45 / 100;
 
-    const long long brklen = frameAnalyzerMapSum(&breakMap);
+    const long long brklen = frameAnalyzerMapSum(&m_breakMap);
     const bool good = brklen >= MINBREAKS && brklen <= MAXBREAKS;
 
-    if (debugLevel >= 1)
+    if (m_debugLevel >= 1)
     {
-        if (!tmpl)
+        if (!m_tmpl)
         {
             LOG(VB_COMMFLAG, LOG_ERR,
                 QString("TemplateMatcher: no template (wanted %2-%3%)")
@@ -746,17 +736,17 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
      *      can cause even more of the broadcast segment can be misidentified
      *      as part of the end of the commercial break.
      */
-    const int BLANK_NEARBY = (int)roundf(0.5 * fps);
-    const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * fps);
-    const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * fps);
-    const int TEMPLATE_REAPPEARS_LATE = (int)roundf(35 * fps);
-    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5 * fps);
+    const int BLANK_NEARBY = (int)roundf(0.5F * m_fps);
+    const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * m_fps);
+    const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * m_fps);
+    const int TEMPLATE_REAPPEARS_LATE = (int)roundf(35 * m_fps);
+    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5F * m_fps);
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TemplateMatcher adjusting for blanks"));
 
-    FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
+    FrameAnalyzer::FrameMap::Iterator ii = m_breakMap.begin();
     long long prevbrke = 0;
-    while (ii != breakMap.end())
+    while (ii != m_breakMap.end())
     {
         FrameAnalyzer::FrameMap::Iterator iinext = ii;
         ++iinext;
@@ -795,7 +785,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
             blankMap,
             max(newbrkb,
                 brke - max(BLANK_NEARBY, TEMPLATE_REAPPEARS_LATE)),
-            min(iinext == breakMap.end() ? nframes : iinext.key(),
+            min(iinext == m_breakMap.end() ? nframes : iinext.key(),
                 brke + max(BLANK_NEARBY, TEMPLATE_REAPPEARS_EARLY)));
         long long newbrke = brke;
         if (kk != blankMap->constEnd())
@@ -815,19 +805,19 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         long long newbrklen = newbrke - newbrkb;
         if (newbrkb != brkb)
         {
-            breakMap.erase(ii);
+            m_breakMap.erase(ii);
             if (newbrkb < nframes && newbrklen)
-                breakMap.insert(newbrkb, newbrklen);
+                m_breakMap.insert(newbrkb, newbrklen);
         }
         else if (newbrke != brke)
         {
             if (newbrklen)
             {
-                breakMap.remove(newbrkb);
-                breakMap.insert(newbrkb, newbrklen);
+                m_breakMap.remove(newbrkb);
+                m_breakMap.insert(newbrkb, newbrklen);
             }
             else
-                breakMap.erase(ii);
+                m_breakMap.erase(ii);
         }
 
         prevbrke = newbrke;
@@ -837,7 +827,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
     /*
      * Report breaks.
      */
-    frameAnalyzerReportMap(&breakMap, fps, "TM Break");
+    frameAnalyzerReportMap(&m_breakMap, m_fps, "TM Break");
     return 0;
 }
 
@@ -845,8 +835,8 @@ int
 TemplateMatcher::computeBreaks(FrameAnalyzer::FrameMap *breaks)
 {
     breaks->clear();
-    for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
-            bb != breakMap.end();
+    for (FrameAnalyzer::FrameMap::Iterator bb = m_breakMap.begin();
+            bb != m_breakMap.end();
             ++bb)
     {
         breaks->insert(bb.key(), *bb);

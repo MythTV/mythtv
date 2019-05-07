@@ -33,7 +33,7 @@ class DeviceReaderCB
 class DeviceReadBuffer : protected MThread
 {
   public:
-    DeviceReadBuffer(DeviceReaderCB *callback,
+    DeviceReadBuffer(DeviceReaderCB *cb,
                      bool use_poll = true,
                      bool error_exit_on_poll_timeout = true);
    ~DeviceReadBuffer();
@@ -61,7 +61,7 @@ class DeviceReadBuffer : protected MThread
     uint GetUsed(void) const;
 
   private:
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
     void SetPaused(bool);
     void IncrWritePointer(uint len);
@@ -74,55 +74,55 @@ class DeviceReadBuffer : protected MThread
     uint WaitForUsed  (uint needed, uint max_wait /*ms*/) const;
 
     bool IsPauseRequested(void) const;
-    bool IsOpen(void) const { return _stream_fd >= 0; }
+    bool IsOpen(void) const { return m_stream_fd >= 0; }
     void ClosePipes(void) const;
     uint GetUnused(void) const;
     uint GetContiguousUnused(void) const;
 
-    bool CheckForErrors(ssize_t read_len, size_t requested_len, uint &err_cnt);
+    bool CheckForErrors(ssize_t read_len, size_t requested_len, uint &errcnt);
     void ReportStats(void);
 
-    QString          videodevice;
-    int              _stream_fd;
-    mutable int      wake_pipe[2];
-    mutable long     wake_pipe_flags[2];
+    QString                 m_videodevice;
+    int                     m_stream_fd             {-1};
+    mutable int             m_wake_pipe[2];
+    mutable long            m_wake_pipe_flags[2];
 
-    DeviceReaderCB  *readerCB;
+    DeviceReaderCB         *m_readerCB              {nullptr};
 
     // Data for managing the device ringbuffer
-    mutable QMutex   lock;
-    volatile bool    dorun;
-    bool             eof;
-    mutable bool     error;
-    bool             request_pause;
-    bool             paused;
-    bool             using_poll;
-    bool             poll_timeout_is_error;
-    uint             max_poll_wait;
+    mutable QMutex          m_lock;
+    volatile bool           m_dorun                 {false};
+    bool                    m_eof                   {false};
+    mutable bool            m_error                 {false};
+    bool                    m_request_pause         {false};
+    bool                    m_paused                {false};
+    bool                    m_using_poll            {true};
+    bool                    m_poll_timeout_is_error {true};
+    uint                    m_max_poll_wait         {2500 /*ms*/};
 
-    size_t           size;
-    size_t           used;
-    size_t           read_quanta;
-    size_t           dev_buffer_count;
-    size_t           dev_read_size;
-    size_t           readThreshold;
-    unsigned char   *buffer;
-    unsigned char   *readPtr;
-    unsigned char   *writePtr;
-    unsigned char   *endPtr;
+    size_t                  m_size                  {0};
+    size_t                  m_used                  {0};
+    size_t                  m_read_quanta           {0};
+    size_t                  m_dev_buffer_count      {1};
+    size_t                  m_dev_read_size         {0};
+    size_t                  m_readThreshold         {0};
+    unsigned char          *m_buffer                {nullptr};
+    unsigned char          *m_readPtr               {nullptr};
+    unsigned char          *m_writePtr              {nullptr};
+    unsigned char          *m_endPtr                {nullptr};
 
-    mutable QWaitCondition dataWait;
-    QWaitCondition   runWait;
-    QWaitCondition   pauseWait;
-    QWaitCondition   unpauseWait;
+    mutable QWaitCondition  m_dataWait;
+    QWaitCondition          m_runWait;
+    QWaitCondition          m_pauseWait;
+    QWaitCondition          m_unpauseWait;
 
     // statistics
-    size_t           max_used;
-    size_t           avg_used;
-    size_t           avg_buf_write_cnt;
-    size_t           avg_buf_read_cnt;
-    size_t           avg_buf_sleep_cnt;
-    MythTimer        lastReport;
+    size_t                  m_max_used              {0};
+    size_t                  m_avg_used              {0};
+    size_t                  m_avg_buf_write_cnt     {0};
+    size_t                  m_avg_buf_read_cnt      {0};
+    size_t                  m_avg_buf_sleep_cnt     {0};
+    MythTimer               m_lastReport;
 };
 
 #endif // _DEVICEREADBUFFER_H_

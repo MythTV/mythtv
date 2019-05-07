@@ -166,7 +166,7 @@ protected:
     /// When using this function to output samples, also remember to 'remove' the
     /// output samples from the buffer by calling the 
     /// 'receiveSamples(numSamples)' function
-    virtual soundtouch::SAMPLETYPE *ptrBegin() const
+    soundtouch::SAMPLETYPE *ptrBegin() const override // FIFOSamplePipe
     {
         return output->ptrBegin();
     }
@@ -178,9 +178,9 @@ public:
     /// 'numsample' samples in the buffer, returns all that available.
     ///
     /// \return Number of samples returned.
-    virtual uint receiveSamples(soundtouch::SAMPLETYPE *outBuffer, ///< Buffer where to copy output samples.
-                                uint maxSamples                    ///< How many samples to receive at max.
-                                )
+    uint receiveSamples(soundtouch::SAMPLETYPE *outBuffer, ///< Buffer where to copy output samples.
+                        uint maxSamples                    ///< How many samples to receive at max.
+        ) override // FIFOSamplePipe
     {
         return output->receiveSamples(outBuffer, maxSamples);
     }
@@ -191,22 +191,22 @@ public:
     ///
     /// Used to reduce the number of samples in the buffer when accessing the sample buffer directly
     /// with 'ptrBegin' function.
-    virtual uint receiveSamples(uint maxSamples   ///< Remove this many samples from the beginning of pipe.
-                                )
+    uint receiveSamples(uint maxSamples   ///< Remove this many samples from the beginning of pipe.
+        ) override // FIFOSamplePipe
     {
         return output->receiveSamples(maxSamples);
     }
 
 
     /// Returns number of samples currently available.
-    virtual uint numSamples() const
+    uint numSamples() const override // FIFOSamplePipe
     {
         return output->numSamples();
     }
 
 
     /// Returns nonzero if there aren't any samples available for outputting.
-    virtual int isEmpty() const
+    int isEmpty() const override // FIFOSamplePipe
     {
         return output->isEmpty();
     }

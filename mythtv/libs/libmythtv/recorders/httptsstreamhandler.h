@@ -20,16 +20,16 @@ class HTTPTSStreamHandler : public IPTVStreamHandler
 {
     friend class HTTPReader;
   public:
-    static HTTPTSStreamHandler* Get(const IPTVTuningData& tuning);
-    static void Return(HTTPTSStreamHandler * & ref);
+    static HTTPTSStreamHandler* Get(const IPTVTuningData& tuning, int inputid);
+    static void Return(HTTPTSStreamHandler * & ref, int inputid);
 
 protected:
-    explicit HTTPTSStreamHandler(const IPTVTuningData &tuning);
+    explicit HTTPTSStreamHandler(const IPTVTuningData &tuning, int inputid);
     virtual ~HTTPTSStreamHandler(void);
-    virtual void run(void);
+    void run(void) override; // MThread
 
   protected:
-    HTTPReader*             m_reader;
+    HTTPReader*             m_reader {nullptr};
     // for implementing Get & Return
     static QMutex                               s_httphandlers_lock;
     static QMap<QString, HTTPTSStreamHandler*>  s_httphandlers;
@@ -43,9 +43,9 @@ class MTV_PUBLIC HTTPReader : public QObject
 
   public:
     explicit HTTPReader(HTTPTSStreamHandler* parent) :
-        m_parent(parent), m_reply(nullptr), m_buffer(nullptr), m_ok(true), m_size(0) {}
+        m_parent(parent) {}
     void Cancel(void);
-    bool DownloadStream(const QUrl url);
+    bool DownloadStream(const QUrl& url);
 
   protected:
     void ReadBytes();
@@ -56,16 +56,16 @@ class MTV_PUBLIC HTTPReader : public QObject
 
   private:
     QString                 m_url;
-    HTTPTSStreamHandler    *m_parent;
+    HTTPTSStreamHandler    *m_parent     {nullptr};
     QTimer                  m_timer;
     QNetworkAccessManager   m_mgr;
-    QNetworkReply          *m_reply;
+    QNetworkReply          *m_reply      {nullptr};
     QMutex                  m_lock;
     QMutex                  m_replylock;
     QMutex                  m_bufferlock;
-    uint8_t                *m_buffer;
-    bool                    m_ok;
-    int                     m_size;
+    uint8_t                *m_buffer     {nullptr};
+    bool                    m_ok         {true};
+    int                     m_size       {0};
 };
 
 #endif // _HTTPTSSTREAMHANDLER_H_

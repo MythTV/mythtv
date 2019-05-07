@@ -182,7 +182,6 @@ inline QString toString(FrameScanType scan, bool brief = false)
             break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -198,7 +197,6 @@ inline QString toString(PIPLocation location)
         case kPIP_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -216,7 +214,6 @@ inline QString toString(AspectOverrideMode aspectmode)
         case kAspect_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -231,7 +228,6 @@ inline QString toString(LetterBoxColour letterboxcolour)
         case kLetterBoxColour_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -246,7 +242,6 @@ inline QString toXString(LetterBoxColour letterboxcolour)
         case kLetterBoxColour_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -255,10 +250,10 @@ inline float get_aspect_override(AspectOverrideMode aspectmode, float orig)
     float ret = orig;
     switch (aspectmode)
     {
-        case kAspect_4_3:    ret = 4.0f  / 3.0f; break;
-        case kAspect_14_9:   ret = 14.0f / 9.0f; break;
-        case kAspect_16_9:   ret = 16.0f / 9.0f; break;
-        case kAspect_2_35_1: ret = 2.35f       ; break;
+        case kAspect_4_3:    ret = 4.0F  / 3.0F; break;
+        case kAspect_14_9:   ret = 14.0F / 9.0F; break;
+        case kAspect_16_9:   ret = 16.0F / 9.0F; break;
+        case kAspect_2_35_1: ret = 2.35F       ; break;
         case kAspect_Toggle:
         case kAspect_Off:
         case kAspect_END: break;
@@ -292,7 +287,6 @@ inline QString toString(AdjustFillMode aspectmode)
             break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -318,7 +312,6 @@ inline QString toString(PictureAttribute pictureattribute)
           ret = "MAX";                        break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -342,10 +335,6 @@ inline QString toDBString(PictureAttribute pictureattribute)
       case kPictureAttribute_MAX:  break;
     }
 
-    if (ret.isEmpty())
-        return QString();
-
-    ret.detach();
     return ret;
 }
 
@@ -370,10 +359,6 @@ inline QString toXVString(PictureAttribute pictureattribute)
           break;
     }
 
-    if (ret.isEmpty())
-        return QString();
-
-    ret.detach();
     return ret;
 }
 
@@ -393,8 +378,6 @@ inline QString toString(PictureAttributeSupported supported)
         ret += "Studio Levels, ";
     if (kPictureAttributeSupported_Volume & supported)
         ret += "Volume, ";
-
-    ret.detach();
     return ret;
 }
 

@@ -54,7 +54,7 @@ typedef struct ThisFilter
     TF_STRUCT;
 } ThisFilter;
 
-static void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
+static void adjustRegion(uint8_t *buf, const uint8_t *end, const uint8_t *table)
 {
     while (buf < end)
     {
@@ -64,7 +64,7 @@ static void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
 }
 
 #if HAVE_MMX
-static void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
+static void adjustRegionMMX(uint8_t *buf, const uint8_t *end, const uint8_t *table,
                      const mmx_t *shift, const mmx_t *scale, const mmx_t *min,
                      const mmx_t *clamp1, const mmx_t *clamp2)
 {
@@ -195,9 +195,9 @@ static void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
     for (int i = 0; i < 256; i++)
     {
         float f = ((float)i - in_min) / (in_max - in_min);
-        f = f < 0.0 ? 0.0 : f;
-        f = f > 1.0 ? 1.0 : f;
-        table[i] = (pow (f, gamma) * (out_max - out_min) + out_min + 0.5);
+        f = f < 0.0F ? 0.0F : f;
+        f = f > 1.0F ? 1.0F : f;
+        table[i] = lround(powf (f, gamma) * (out_max - out_min) + out_min);
     }
 }
 
@@ -210,8 +210,8 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
     fillTable(table, in_min, in_max, out_min, out_max, gamma);
     scalec = ((out_max - out_min) << 15)/(in_max - in_min);
-    if ((av_get_cpu_flags() & AV_CPU_FLAG_MMX) == 0 || gamma < 0.9999 || 
-        gamma > 1.00001 || scalec > 32767 << 7)
+    if ((av_get_cpu_flags() & AV_CPU_FLAG_MMX) == 0 || gamma < 0.9999F ||
+        gamma > 1.00001F || scalec > 32767 << 7)
         return 0;
     shiftc = 2;
     while (scalec > 32767)
@@ -234,11 +234,11 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
 static VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                 int *width, int *height, char *options, int threads)
+                 const int *width, const int *height, const char *options, int threads)
 {
     ThisFilter *filter;
     int numopts = 0, ymin = 16, ymax = 253, cmin = 16, cmax = 240;
-    float ygamma = 1.0f, cgamma = 1.0f;
+    float ygamma = 1.0F, cgamma = 1.0F;
     (void) width;
     (void) height;
     (void) threads;
@@ -262,10 +262,10 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     {
         ymin = 16;
         ymax = 253;
-        ygamma = 1.0f;
+        ygamma = 1.0F;
         cmin = 16;
         cmax = 240;
-        cgamma = 1.0f;
+        cgamma = 1.0F;
     }
 
     filter = malloc (sizeof (ThisFilter));

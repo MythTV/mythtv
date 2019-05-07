@@ -4,73 +4,27 @@
 #ifndef GALLERYCONFIG_H
 #define GALLERYCONFIG_H
 
-#include "mythconfigdialogs.h"
-#include "mythconfiggroups.h"
+#include "standardsettings.h"
 
-
-//! Settings page 1
-class GallerySettings : public VerticalConfigurationGroup
+class GallerySettings : public GroupSetting
 {
     Q_OBJECT
-public:
-    GallerySettings();
-};
 
-
-//! Settings page 2
-class GalleryDbSettings : public VerticalConfigurationGroup
-{
-    Q_OBJECT
-public:
-    explicit GalleryDbSettings(bool enable);
+    StandardSetting *DirOrder();
+    StandardSetting *ImageOrder();
+    StandardSetting *DateFormat();
+    StandardSetting *Exclusions (bool enabled);
+    StandardSetting *ClearDb    (bool enabled);
+    void             ShowConfirmDialog();
 
 signals:
     void ClearDbPressed();
-};
+    void DateChanged();
+    void OrderChanged();
+    void ExclusionsChanged();
 
-
-//! Gallery Settings pages
-class GalleryConfig : public ConfigurationWizard
-{
 public:
-    explicit GalleryConfig(bool editMode)
-    {
-        addChild(new GallerySettings());
-        m_dbGroup = new GalleryDbSettings(editMode);
-        addChild(m_dbGroup);
-    }
-
-    GalleryDbSettings *GetClearPage() { return m_dbGroup; }
-
-private:
-    GalleryDbSettings *m_dbGroup;
-};
-
-
-//! Settings for Thumbnail view
-class ThumbSettings : public VerticalConfigurationGroup
-{
-    Q_OBJECT
-public:
-    ThumbSettings();
-};
-
-
-//! Settings for Slideshow view
-class SlideSettings : public VerticalConfigurationGroup
-{
-    Q_OBJECT
-public:
-    SlideSettings();
-};
-
-
-//! Settings for Import 
-class ImportSettings : public VerticalConfigurationGroup
-{
-    Q_OBJECT
-public:
-    explicit ImportSettings(bool enable);
+    explicit GallerySettings(bool enable);
 };
 
 #endif // GALLERYCONFIG_H

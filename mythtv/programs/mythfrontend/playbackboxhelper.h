@@ -42,7 +42,7 @@ class PlaybackBoxHelper : public MThread
     void UndeleteRecording(uint recordingID);
     void CheckAvailability(const ProgramInfo&,
                            CheckAvailabilityType cat = kCheckForCache);
-    QString GetPreviewImage(const ProgramInfo&, bool check_availibility = true);
+    QString GetPreviewImage(const ProgramInfo&, bool check_availability = true);
 
     QString LocateArtwork(const QString &inetref, uint season,
                           VideoArtworkType type, const ProgramInfo *pginfo,
@@ -55,13 +55,13 @@ class PlaybackBoxHelper : public MThread
     void UpdateFreeSpace(void);
 
   private:
-    QObject            *m_listener;
-    PBHEventHandler    *m_eventHandler;
+    QObject            *m_listener         {nullptr};
+    PBHEventHandler    *m_eventHandler     {nullptr};
     mutable QMutex      m_lock;
 
     // Free disk space tracking
-    uint64_t            m_freeSpaceTotalMB;
-    uint64_t            m_freeSpaceUsedMB;
+    uint64_t            m_freeSpaceTotalMB {0LL};
+    uint64_t            m_freeSpaceUsedMB  {0LL};
 
     // Artwork Variables //////////////////////////////////////////////////////
     InfoMap             m_artworkCache;

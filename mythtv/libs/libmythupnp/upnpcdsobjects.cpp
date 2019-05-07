@@ -31,12 +31,9 @@ CDSObject::CDSObject( const QString &sId,
                       const QString &sTitle, 
                       const QString &sParentId )
     : ReferenceCounter("CDSObject", false),
-      m_nUpdateId(1), m_eType(OT_Container),
       m_sId(HTTPRequest::Encode(sId)),
       m_sParentId(HTTPRequest::Encode(sParentId)),
-      m_sTitle(HTTPRequest::Encode(sTitle)),
-      m_bRestricted(true), m_bSearchable(false),
-      m_sWriteStatus("PROTECTED"), m_nChildCount(0), m_nChildContainerCount(0)
+      m_sTitle(HTTPRequest::Encode(sTitle))
 {
 }
 
@@ -201,7 +198,7 @@ CDSObject *CDSObject::GetChild( const QString &sID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Resource *CDSObject::AddResource( QString sProtocol, QString sURI )
+Resource *CDSObject::AddResource( const QString& sProtocol, const QString& sURI )
 {
     Resource *pRes = new Resource( sProtocol, sURI );
     
@@ -387,10 +384,10 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
                 for (; nit != pProp->m_lstAttributes.end(); ++ nit)
                 {
                     QString filterName = QString("%1@%2").arg(sName)
-                                                         .arg((*nit).sName);
-                    if ((*nit).bRequired  || !filterAttributes ||
+                                                         .arg((*nit).m_sName);
+                    if ((*nit).m_bRequired  || !filterAttributes ||
                         filter.contains(filterName))
-                        os << " " << (*nit).sName << "=\"" << (*nit).sValue << "\"";
+                        os << " " << (*nit).m_sName << "=\"" << (*nit).m_sValue << "\"";
                 }
 
                 os << ">";
@@ -418,10 +415,10 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
             NameValues::const_iterator nit = (*rit)->m_lstAttributes.begin();
             for (; nit != (*rit)->m_lstAttributes.end(); ++ nit)
             {
-                filterName = QString("res@%1").arg((*nit).sName);
-                if ((*nit).bRequired  || !filterAttributes ||
+                filterName = QString("res@%1").arg((*nit).m_sName);
+                if ((*nit).m_bRequired  || !filterAttributes ||
                     filter.contains(filterName))
-                    os << (*nit).sName << "=\"" << (*nit).sValue << "\" ";
+                    os << (*nit).m_sName << "=\"" << (*nit).m_sValue << "\" ";
             }
 
             os << ">" << (*rit)->m_sURI;
@@ -453,7 +450,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
+CDSObject *CDSObject::CreateItem( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -471,7 +468,7 @@ CDSObject *CDSObject::CreateItem( QString sId, QString sTitle, QString sParentId
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )    
+CDSObject *CDSObject::CreateContainer( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -498,7 +495,7 @@ CDSObject *CDSObject::CreateContainer( QString sId, QString sTitle, QString sPar
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateAudioItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateAudioItem( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -524,7 +521,7 @@ CDSObject *CDSObject::CreateAudioItem( QString sId, QString sTitle, QString sPar
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateMusicTrack( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -566,7 +563,7 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateAudioBroadcast( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateAudioBroadcast( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -587,7 +584,7 @@ CDSObject *CDSObject::CreateAudioBroadcast( QString sId, QString sTitle, QString
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateAudioBook( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateAudioBook( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -606,7 +603,7 @@ CDSObject *CDSObject::CreateAudioBook( QString sId, QString sTitle, QString sPar
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateVideoItem( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -664,7 +661,7 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateMovie( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -682,7 +679,7 @@ CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentI
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateVideoBroadcast( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateVideoBroadcast( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -700,7 +697,7 @@ CDSObject *CDSObject::CreateVideoBroadcast( QString sId, QString sTitle, QString
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMusicVideoClip( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
+CDSObject *CDSObject::CreateMusicVideoClip( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -720,7 +717,7 @@ CDSObject *CDSObject::CreateMusicVideoClip( QString sId, QString sTitle, QString
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateImageItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateImageItem( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -745,7 +742,7 @@ CDSObject *CDSObject::CreateImageItem( QString sId, QString sTitle, QString sPar
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreatePhoto( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreatePhoto( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -762,7 +759,7 @@ CDSObject *CDSObject::CreatePhoto( QString sId, QString sTitle, QString sParentI
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreatePlaylistItem ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreatePlaylistItem ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -784,7 +781,7 @@ CDSObject *CDSObject::CreatePlaylistItem ( QString sId, QString sTitle, QString 
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateTextItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateTextItem( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -811,7 +808,7 @@ CDSObject *CDSObject::CreateTextItem( QString sId, QString sTitle, QString sPare
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateAlbum( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateAlbum( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -838,7 +835,7 @@ CDSObject *CDSObject::CreateAlbum( QString sId, QString sTitle, QString sParentI
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMusicAlbum( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateMusicAlbum( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -858,7 +855,7 @@ CDSObject *CDSObject::CreateMusicAlbum( QString sId, QString sTitle, QString sPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreatePhotoAlbum( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreatePhotoAlbum( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -873,7 +870,7 @@ CDSObject *CDSObject::CreatePhotoAlbum( QString sId, QString sTitle, QString sPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateGenre( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateGenre( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -888,7 +885,7 @@ CDSObject *CDSObject::CreateGenre( QString sId, QString sTitle, QString sParentI
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMusicGenre( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
+CDSObject *CDSObject::CreateMusicGenre( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -903,7 +900,7 @@ CDSObject *CDSObject::CreateMusicGenre( QString sId, QString sTitle, QString sPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMovieGenre( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateMovieGenre( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -918,7 +915,7 @@ CDSObject *CDSObject::CreateMovieGenre( QString sId, QString sTitle, QString sPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreatePlaylistContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
+CDSObject *CDSObject::CreatePlaylistContainer( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -941,7 +938,7 @@ CDSObject *CDSObject::CreatePlaylistContainer( QString sId, QString sTitle, QStr
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreatePerson( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreatePerson( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -958,7 +955,7 @@ CDSObject *CDSObject::CreatePerson( QString sId, QString sTitle, QString sParent
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateMusicArtist( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateMusicArtist( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -976,7 +973,7 @@ CDSObject *CDSObject::CreateMusicArtist( QString sId, QString sTitle, QString sP
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateStorageSystem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateStorageSystem( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -997,7 +994,7 @@ CDSObject *CDSObject::CreateStorageSystem( QString sId, QString sTitle, QString 
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateStorageVolume( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateStorageVolume( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {
@@ -1017,7 +1014,7 @@ CDSObject *CDSObject::CreateStorageVolume( QString sId, QString sTitle, QString 
 
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject *CDSObject::CreateStorageFolder( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
+CDSObject *CDSObject::CreateStorageFolder( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject )
 {
     if (pObject == nullptr)
     {

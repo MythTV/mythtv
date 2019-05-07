@@ -119,10 +119,9 @@ static QString progress_string(
     if (m_myFramesPlayed < totalFrames)
         return QString("%1 fps %2%      \r")
           .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0)).arg(percentage,4,'f',1);
-    else
-        return QString("%1 fps %2      \r")
-          .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
-          .arg(spin_chars[++spin_cnt % 4]);
+    return QString("%1 fps %2      \r")
+        .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
+        .arg(spin_chars[++spin_cnt % 4]);
 }
 
 bool MythCCExtractorPlayer::run(void)
@@ -167,8 +166,8 @@ bool MythCCExtractorPlayer::run(void)
         {
             inuse_timer.restart();
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            if (player_ctx->playingInfo)
-                player_ctx->playingInfo->UpdateInUseMark();
+            if (player_ctx->m_playingInfo)
+                player_ctx->m_playingInfo->UpdateInUseMark();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
@@ -416,7 +415,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
             CC708Service *service = (*it).reader->GetService(serviceIdx);
             for (uint windowIdx = 0; windowIdx < 8; ++windowIdx)
             {
-                CC708Window &win = service->windows[windowIdx];
+                CC708Window &win = service->m_windows[windowIdx];
                 if (win.GetChanged())
                 {
                     vector<CC708String*> strings;
@@ -424,11 +423,11 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                     {
                         strings = win.GetStrings();
                         Ingest708Caption(it.key(), serviceIdx, windowIdx,
-                                         win.pen.row, win.pen.column,
+                                         win.m_pen.m_row, win.m_pen.m_column,
                                          win, strings);
                         win.DisposeStrings(strings);
                     }
-                    service->windows[windowIdx].ResetChanged();
+                    service->m_windows[windowIdx].ResetChanged();
                 }
             }
         }
@@ -656,14 +655,14 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
         }
         /// INFO -- end
 
-        AVSubtitles *subtitles = (*subit).reader->GetAVSubtitles();
+        AVSubtitles *avsubtitles = (*subit).reader->GetAVSubtitles();
 
-        QMutexLocker locker(&(subtitles->lock));
+        QMutexLocker locker(&(avsubtitles->m_lock));
 
-        while (!subtitles->buffers.empty())
+        while (!avsubtitles->m_buffers.empty())
         {
-            const AVSubtitle subtitle = subtitles->buffers.front();
-            subtitles->buffers.pop_front();
+            const AVSubtitle subtitle = avsubtitles->m_buffers.front();
+            avsubtitles->m_buffers.pop_front();
 
             const QSize v_size =
                 QSize(GetVideoSize().width()*4, GetVideoSize().height()*4);
@@ -692,8 +691,8 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
                     QImage img(data, w, h, QImage::Format_Indexed8);
                     img.setColorCount(cc);
-                    for (int i = 0; i < cc; ++i)
-                        img.setColor(i, palette[i]);
+                    for (int j = 0; j < cc; ++j)
+                        img.setColor(j, palette[j]);
 
                     painter.drawImage(x, y, img);
 
@@ -748,7 +747,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 
         QString lang = iso639_key_to_str3(langCode);
         lang = iso639_is_key_undefined(langCode) ? "und" : lang;
-        QString dir_name = QString(m_baseName + "-%1.dvb-%2").arg(lang).arg(subit.key());
+        QString dir_name = m_baseName + QString("-%1.dvb-%2").arg(lang).arg(subit.key());
         if (!m_workingDir.exists(dir_name) && !m_workingDir.mkdir(dir_name))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Can't create directory '%1'")

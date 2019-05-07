@@ -32,7 +32,8 @@ class CustomEventRelayer : public QObject
         QObject::deleteLater();
     }
 
-    void customEvent(QEvent *e) { fp(e); }
+    void customEvent(QEvent *e) override //QObject
+        { fp(e); }
 
   protected:
     virtual ~CustomEventRelayer() = default;

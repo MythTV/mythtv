@@ -19,7 +19,7 @@ class CustomPriority : public MythScreenType
                             ProgramInfo *proginfo = nullptr);
    ~CustomPriority();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   protected slots:
     void ruleChanged(MythUIButtonListItem *item);
@@ -37,21 +37,21 @@ class CustomPriority : public MythScreenType
     bool checkSyntax(void);
     void testSchedule(void);
 
-    ProgramInfo *m_pginfo;
+    ProgramInfo *m_pginfo             {nullptr};
 
-    MythUIButtonList *m_ruleList;
-    MythUIButtonList *m_clauseList;
+    MythUIButtonList *m_ruleList      {nullptr};
+    MythUIButtonList *m_clauseList    {nullptr};
 
-    MythUITextEdit *m_titleEdit;
-    MythUITextEdit *m_descriptionEdit;
+    MythUITextEdit *m_titleEdit       {nullptr};
+    MythUITextEdit *m_descriptionEdit {nullptr};
 
-    MythUISpinBox *m_prioritySpin;
+    MythUISpinBox *m_prioritySpin     {nullptr};
 
-    MythUIButton *m_addButton;
-    MythUIButton *m_testButton;
-    MythUIButton *m_installButton;
-    MythUIButton *m_deleteButton;
-    MythUIButton *m_cancelButton;
+    MythUIButton *m_addButton         {nullptr};
+    MythUIButton *m_testButton        {nullptr};
+    MythUIButton *m_installButton     {nullptr};
+    MythUIButton *m_deleteButton      {nullptr};
+    MythUIButton *m_cancelButton      {nullptr};
 };
 
 struct RuleInfo {

@@ -160,7 +160,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     const QString m_privateToken; // Private token; Used to salt digest auth nonce, changes on backend restart
 
   protected slots:
-    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
+    void newTcpConnection(qt_socket_fd_t socket) override; // QTcpServer
 
   private:
     void LoadSSLConfig();
@@ -186,11 +186,11 @@ class HttpWorker : public QRunnable
      */
     HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-               , QSslConfiguration sslConfig
+               , const QSslConfiguration& sslConfig
 #endif
     );
 
-    virtual void run(void);
+    void run(void) override; // QRunnable
 
   protected:
     HttpServer &m_httpServer; 

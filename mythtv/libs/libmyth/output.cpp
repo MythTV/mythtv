@@ -27,12 +27,6 @@ QEvent::Type OutputEvent::Stopped =
 QEvent::Type OutputEvent::Error =
     (QEvent::Type) QEvent::registerEventType();
 
-OutputListeners::OutputListeners()
-{
-    bufsize=0;
-}
-
-
 void OutputListeners::error(const QString &e)
 {
     OutputEvent event(e);
@@ -41,16 +35,16 @@ void OutputListeners::error(const QString &e)
 
 void OutputListeners::addVisual(MythTV::Visual *v)
 {
-    Visuals::iterator it = std::find(visuals.begin(), visuals.end(), v);
-    if (it == visuals.end())
-        visuals.push_back(v);
+    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), v);
+    if (it == m_visuals.end())
+        m_visuals.push_back(v);
 }
 
 void OutputListeners::removeVisual(MythTV::Visual *v)
 {
-    Visuals::iterator it = std::find(visuals.begin(), visuals.end(), v);
-    if (it != visuals.end())
-        visuals.erase(it);
+    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), v);
+    if (it != m_visuals.end())
+        m_visuals.erase(it);
 }
 
 void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
@@ -59,8 +53,8 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
     if (! buffer)
        return;
 
-    Visuals::iterator it = visuals.begin();
-    for (; it != visuals.end(); ++it)
+    Visuals::iterator it = m_visuals.begin();
+    for (; it != m_visuals.end(); ++it)
     {
         QMutexLocker locker((*it)->mutex());
         (*it)->add(buffer, b_len, written, chan, prec);
@@ -69,8 +63,8 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
 
 void OutputListeners::prepareVisuals()
 {
-    Visuals::iterator it = visuals.begin();
-    for (; it != visuals.end(); ++it)
+    Visuals::iterator it = m_visuals.begin();
+    for (; it != m_visuals.end(); ++it)
     {
         QMutexLocker locker((*it)->mutex());
         (*it)->prepare();

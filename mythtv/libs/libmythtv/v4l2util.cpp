@@ -10,31 +10,15 @@
 #include <QRegularExpression>
 
 #define v4l2_ioctl(_FD_, _REQUEST_, _DATA_) ioctl(_FD_, _REQUEST_, _DATA_)
-#define LOC      QString("V4L2(%1): ").arg(m_device_name)
-
-V4L2util::V4L2util(void)
-    : m_fd(-1),
-      m_vbi_fd(-1),
-      m_version(0),
-      m_capabilities(0),
-      m_have_query_ext_ctrl(false)
-{
-}
+#define LOC      QString("V4L2(%1): ").arg(m_deviceName)
 
 V4L2util::V4L2util(const QString& dev_name)
-    : m_fd(-1),
-      m_vbi_fd(-1),
-      m_capabilities(0),
-      m_have_query_ext_ctrl(false)
 {
     Open(dev_name);
 }
 
 V4L2util::V4L2util(const QString& dev_name, const QString& vbi_dev_name)
-    : m_fd(0),
-      m_vbi_fd(-1),
-      m_capabilities(0),
-      m_have_query_ext_ctrl(false)
+    : m_fd(0)
 {
     Open(dev_name, vbi_dev_name);
 }
@@ -46,7 +30,7 @@ V4L2util::~V4L2util(void)
 
 bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
 {
-    if (m_fd >= 0 && dev_name == m_device_name)
+    if (m_fd >= 0 && dev_name == m_deviceName)
         return true;
 
     Close();
@@ -58,15 +42,15 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
             QString("Could not open '%1': ").arg(dev_name) + ENO);
         return false;
     }
-    m_device_name = dev_name;
+    m_deviceName = dev_name;
 
     struct v4l2_query_ext_ctrl qc;
     memset(&qc, 0, sizeof(v4l2_query_ext_ctrl));
     qc.id = V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND;
-    m_have_query_ext_ctrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
+    m_haveQueryExtCtrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
 
-    m_card_name.clear();
-    m_driver_name.clear();
+    m_cardName.clear();
+    m_driverName.clear();
     m_version = 0;
     m_capabilities = 0;
 
@@ -74,8 +58,8 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
     memset(&capability, 0, sizeof(v4l2_capability));
     if (ioctl(m_fd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
-        m_card_name    = QString::fromLatin1((const char*)capability.card);
-        m_driver_name  = QString::fromLatin1((const char*)capability.driver);
+        m_cardName     = QString::fromLatin1((const char*)capability.card);
+        m_driverName   = QString::fromLatin1((const char*)capability.driver);
         m_version      = capability.version;
         m_capabilities = capability.capabilities;
     }
@@ -85,8 +69,8 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
         return false;
     }
 
-    if (!m_driver_name.isEmpty())
-        m_driver_name.remove( QRegExp("\\[[0-9]\\]$") );
+    if (!m_driverName.isEmpty())
+        m_driverName.remove( QRegExp("\\[[0-9]\\]$") );
 
     OpenVBI(vbi_dev_name);
 
@@ -131,7 +115,7 @@ bool V4L2util::HasStreaming(void) const
 
 bool V4L2util::HasSlicedVBI(void) const
 {
-    return m_capabilities & V4L2_CAP_SLICED_VBI_CAPTURE;
+    return (m_capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U;
 }
 
 void V4L2util::bitmask_toString(QString& result, uint32_t flags,
@@ -216,48 +200,48 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
     // Replace non-printable with _
     nameStr.replace(QRegularExpression("[^a-zA-Z\\d\\s]"), "_");
 
-    drv_opt.name          = nameStr;
-    drv_opt.minimum       = queryctrl.minimum;
-    drv_opt.maximum       = queryctrl.maximum;
-    drv_opt.step          = queryctrl.step;
-    drv_opt.default_value = queryctrl.default_value;;
+    drv_opt.m_name          = nameStr;
+    drv_opt.m_minimum       = queryctrl.minimum;
+    drv_opt.m_maximum       = queryctrl.maximum;
+    drv_opt.m_step          = queryctrl.step;
+    drv_opt.m_default_value = queryctrl.default_value;;
 
     if (nameStr == "Stream Type")
-        drv_opt.category = DriverOption::STREAM_TYPE;
+        drv_opt.m_category = DriverOption::STREAM_TYPE;
     else if (nameStr == "Video Encoding")
-        drv_opt.category = DriverOption::VIDEO_ENCODING;
+        drv_opt.m_category = DriverOption::VIDEO_ENCODING;
     else if (nameStr == "Video Aspect")
-        drv_opt.category = DriverOption::VIDEO_ASPECT;
+        drv_opt.m_category = DriverOption::VIDEO_ASPECT;
     else if (nameStr == "Video B Frames")
-        drv_opt.category = DriverOption::VIDEO_B_FRAMES;
+        drv_opt.m_category = DriverOption::VIDEO_B_FRAMES;
     else if (nameStr == "Video GOP Size")
-        drv_opt.category = DriverOption::VIDEO_GOP_SIZE;
+        drv_opt.m_category = DriverOption::VIDEO_GOP_SIZE;
     else if (nameStr == "Video Bitrate Mode")
-        drv_opt.category = DriverOption::VIDEO_BITRATE_MODE;
+        drv_opt.m_category = DriverOption::VIDEO_BITRATE_MODE;
     else if (nameStr == "Video Bitrate")
-        drv_opt.category = DriverOption::VIDEO_BITRATE;
+        drv_opt.m_category = DriverOption::VIDEO_BITRATE;
     else if (nameStr == "Video Peak Bitrate")
-        drv_opt.category = DriverOption::VIDEO_BITRATE_PEAK;
+        drv_opt.m_category = DriverOption::VIDEO_BITRATE_PEAK;
     else if (nameStr == "Audio Encoding")
-        drv_opt.category = DriverOption::AUDIO_ENCODING;
+        drv_opt.m_category = DriverOption::AUDIO_ENCODING;
     else if (nameStr == "Audio Bitrate Mode")
-        drv_opt.category = DriverOption::AUDIO_BITRATE_MODE;
+        drv_opt.m_category = DriverOption::AUDIO_BITRATE_MODE;
     else if (nameStr == "Audio Bitrate")
-        drv_opt.category = DriverOption::AUDIO_BITRATE;
+        drv_opt.m_category = DriverOption::AUDIO_BITRATE;
     else if (nameStr == "Brightness")
-        drv_opt.category = DriverOption::BRIGHTNESS;
+        drv_opt.m_category = DriverOption::BRIGHTNESS;
     else if (nameStr == "Contrast")
-        drv_opt.category = DriverOption::CONTRAST;
+        drv_opt.m_category = DriverOption::CONTRAST;
     else if (nameStr == "Saturation")
-        drv_opt.category = DriverOption::SATURATION;
+        drv_opt.m_category = DriverOption::SATURATION;
     else if (nameStr == "Hue")
-        drv_opt.category = DriverOption::HUE;
+        drv_opt.m_category = DriverOption::HUE;
     else if (nameStr == "Sharpness")
-        drv_opt.category = DriverOption::SHARPNESS;
+        drv_opt.m_category = DriverOption::SHARPNESS;
     else if (nameStr == "Volume")
-        drv_opt.category = DriverOption::VOLUME;
+        drv_opt.m_category = DriverOption::VOLUME;
     else
-        drv_opt.category = DriverOption::UNKNOWN_CAT;
+        drv_opt.m_category = DriverOption::UNKNOWN_CAT;
 
     switch (queryctrl.type)
     {
@@ -273,7 +257,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
                 .arg(queryctrl.maximum)
                 .arg(queryctrl.step)
                 .arg(queryctrl.default_value);
-          drv_opt.type = DriverOption::INTEGER;
+          drv_opt.m_type = DriverOption::INTEGER;
           break;
         case V4L2_CTRL_TYPE_STRING:
           msg =  QString("%1 : min=%2 max=%3 step=%4")
@@ -282,14 +266,14 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
                  .arg(queryctrl.minimum)
                  .arg(queryctrl.maximum)
                  .arg(queryctrl.step);
-          drv_opt.type = DriverOption::STRING;
+          drv_opt.m_type = DriverOption::STRING;
           break;
         case V4L2_CTRL_TYPE_BOOLEAN:
           msg = QString("%1 : default=%2")
                 .arg(QString("%1 (%2)").arg(nameStr)
                      .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.default_value);
-          drv_opt.type = DriverOption::BOOLEAN;
+          drv_opt.m_type = DriverOption::BOOLEAN;
           break;
         case V4L2_CTRL_TYPE_MENU:
         case V4L2_CTRL_TYPE_INTEGER_MENU:
@@ -318,14 +302,14 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
                 }
             }
 #endif
-            drv_opt.type = DriverOption::MENU;
+            drv_opt.m_type = DriverOption::MENU;
             break;
         }
         case V4L2_CTRL_TYPE_BUTTON:
           msg = QString("%1 :")
                 .arg(QString("%1 (%2)").arg(nameStr)
                      .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '));
-          drv_opt.type = DriverOption::BUTTON;
+          drv_opt.m_type = DriverOption::BUTTON;
                 break;
         case V4L2_CTRL_TYPE_BITMASK:
           msg = QString("%1 : max=0x%2 default=0x%3")
@@ -333,7 +317,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
                      .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.maximum, 8, 16, QChar(' '))
                 .arg(queryctrl.default_value, 8, 16, QChar(' '));
-          drv_opt.type = DriverOption::BITMASK;
+          drv_opt.m_type = DriverOption::BITMASK;
           break;
 
         default:
@@ -341,7 +325,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
                 .arg(QString("%1 (%2)").arg(nameStr)
                      .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.type);
-          drv_opt.type = DriverOption::UNKNOWN_TYPE;
+          drv_opt.m_type = DriverOption::UNKNOWN_TYPE;
           break;
     }
 
@@ -357,7 +341,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
             if (v4l2_ioctl(m_fd, VIDIOC_QUERYMENU, &qmenu))
                 continue;
 
-            drv_opt.menu[idx] = QString((char *)qmenu.name);
+            drv_opt.m_menu[idx] = QString((char *)qmenu.name);
             if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
                 msg += QString("\t\t%1: %2").arg(idx).arg((char *)qmenu.name);
             else
@@ -452,12 +436,12 @@ void V4L2util::SetDefaultOptions(DriverOption::Options& options)
     if (!options.contains(DriverOption::VIDEO_ENCODING))
     {
         DriverOption drv_opt;
-        drv_opt.category = DriverOption::VIDEO_ENCODING;
-        drv_opt.name = "Video Encoding";
-        drv_opt.minimum = drv_opt.maximum = drv_opt.default_value =
+        drv_opt.m_category = DriverOption::VIDEO_ENCODING;
+        drv_opt.m_name = "Video Encoding";
+        drv_opt.m_minimum = drv_opt.m_maximum = drv_opt.m_default_value =
                           V4L2_MPEG_VIDEO_ENCODING_MPEG_2;
-        drv_opt.menu[drv_opt.default_value] = "MPEG-2 Video";
-        options[drv_opt.category] = drv_opt;
+        drv_opt.m_menu[drv_opt.m_default_value] = "MPEG-2 Video";
+        options[drv_opt.m_category] = drv_opt;
     }
 
     if (!options.contains(DriverOption::AUDIO_ENCODING))
@@ -465,65 +449,65 @@ void V4L2util::SetDefaultOptions(DriverOption::Options& options)
         DriverOption drv_opt;
 
         // V4L2_CID_MPEG_AUDIO_ENCODING
-        drv_opt.category = DriverOption::AUDIO_ENCODING;
-        drv_opt.name = "Audio Encoding";
-        drv_opt.minimum = drv_opt.maximum = drv_opt.default_value =
+        drv_opt.m_category = DriverOption::AUDIO_ENCODING;
+        drv_opt.m_name = "Audio Encoding";
+        drv_opt.m_minimum = drv_opt.m_maximum = drv_opt.m_default_value =
                           V4L2_MPEG_AUDIO_ENCODING_LAYER_2;
-        drv_opt.menu[drv_opt.default_value] = "MPEG-1/2 Layer II encoding";
-        options[drv_opt.category] = drv_opt;
+        drv_opt.m_menu[drv_opt.m_default_value] = "MPEG-1/2 Layer II encoding";
+        options[drv_opt.m_category] = drv_opt;
 
-        drv_opt.category = DriverOption::AUDIO_BITRATE;
-        drv_opt.name = "Audio Bitrate";
-        drv_opt.minimum = drv_opt.maximum = drv_opt.default_value =
+        drv_opt.m_category = DriverOption::AUDIO_BITRATE;
+        drv_opt.m_name = "Audio Bitrate";
+        drv_opt.m_minimum = drv_opt.m_maximum = drv_opt.m_default_value =
                           V4L2_MPEG_AUDIO_ENCODING_LAYER_2;
-        drv_opt.menu[drv_opt.default_value] = "MPEG-1/2 Layer II encoding";
-        options[drv_opt.category] = drv_opt;
+        drv_opt.m_menu[drv_opt.m_default_value] = "MPEG-1/2 Layer II encoding";
+        options[drv_opt.m_category] = drv_opt;
 
         // V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ
-        drv_opt.category = DriverOption::AUDIO_SAMPLERATE;
-        drv_opt.name = "MPEG Audio sampling frequency";
-        drv_opt.minimum = drv_opt.maximum = drv_opt.default_value =
+        drv_opt.m_category = DriverOption::AUDIO_SAMPLERATE;
+        drv_opt.m_name = "MPEG Audio sampling frequency";
+        drv_opt.m_minimum = drv_opt.m_maximum = drv_opt.m_default_value =
                           V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
-        drv_opt.menu[drv_opt.default_value] = "48 kHz";
-        options[drv_opt.category] = drv_opt;
+        drv_opt.m_menu[drv_opt.m_default_value] = "48 kHz";
+        options[drv_opt.m_category] = drv_opt;
 
         // VIDIOC_S_TUNER
-        drv_opt.category = DriverOption::AUDIO_LANGUAGE;
-        drv_opt.name = "Tuner Audio Modes";
-        drv_opt.minimum = drv_opt.maximum = drv_opt.default_value =
+        drv_opt.m_category = DriverOption::AUDIO_LANGUAGE;
+        drv_opt.m_name = "Tuner Audio Modes";
+        drv_opt.m_minimum = drv_opt.m_maximum = drv_opt.m_default_value =
                           V4L2_TUNER_MODE_STEREO;
-        drv_opt.menu[drv_opt.default_value] = "Play stereo audio";
-        options[drv_opt.category] = drv_opt;
+        drv_opt.m_menu[drv_opt.m_default_value] = "Play stereo audio";
+        options[drv_opt.m_category] = drv_opt;
     }
 
     DriverOption::Options::iterator Iopt = options.begin();
     for ( ; Iopt != options.end(); ++Iopt)
     {
         // If the driver provides a menu of options, use it to set limits
-        if (!(*Iopt).menu.isEmpty())
+        if (!(*Iopt).m_menu.isEmpty())
         {
             int minimum = INT_MAX;
             int maximum = -1;
 
-            DriverOption::menu_t::iterator Imenu = (*Iopt).menu.begin();
-            for ( ; Imenu != (*Iopt).menu.end(); ++Imenu)
+            DriverOption::menu_t::iterator Imenu = (*Iopt).m_menu.begin();
+            for ( ; Imenu != (*Iopt).m_menu.end(); ++Imenu)
             {
                 if (Imenu.key() < minimum) minimum = Imenu.key();
                 if (Imenu.key() > maximum) maximum = Imenu.key();
             }
-            if ((*Iopt).minimum != minimum)
+            if ((*Iopt).m_minimum != minimum)
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
                     QString("%1 menu options overrides minimum from %2 to %3")
-                    .arg((*Iopt).name).arg((*Iopt).minimum).arg(minimum));
-                (*Iopt).minimum = minimum;
+                    .arg((*Iopt).m_name).arg((*Iopt).m_minimum).arg(minimum));
+                (*Iopt).m_minimum = minimum;
             }
-            if ((*Iopt).maximum != maximum)
+            if ((*Iopt).m_maximum != maximum)
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
                     QString("%1 menu options overrides maximum from %2 to %3")
-                    .arg((*Iopt).name).arg((*Iopt).maximum).arg(maximum));
-                (*Iopt).maximum = maximum;
+                    .arg((*Iopt).m_name).arg((*Iopt).m_maximum).arg(maximum));
+                (*Iopt).m_maximum = maximum;
             }
         }
     }
@@ -576,7 +560,7 @@ bool V4L2util::GetOptions(DriverOption::Options& options)
         DriverOption drv_opt;
 
         log_control(qctrl, drv_opt, msg);
-        m_options[drv_opt.category] = drv_opt;
+        m_options[drv_opt.m_category] = drv_opt;
 
         qctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     }
@@ -599,8 +583,8 @@ int V4L2util::GetOptionValue(DriverOption::category_t cat, const QString& desc)
     }
 
     DriverOption drv_opt = m_options.value(cat);
-    DriverOption::menu_t::iterator Imenu = drv_opt.menu.begin();
-    for ( ; Imenu != drv_opt.menu.end(); ++Imenu)
+    DriverOption::menu_t::iterator Imenu = drv_opt.m_menu.begin();
+    for ( ; Imenu != drv_opt.m_menu.end(); ++Imenu)
     {
         if ((*Imenu) == desc)
         {
@@ -700,12 +684,12 @@ bool V4L2util::GetResolution(int& width, int& height) const
 
 bool V4L2util::HasTuner(void) const
 {
-    return m_capabilities & V4L2_CAP_TUNER;
+    return (m_capabilities & V4L2_CAP_TUNER) != 0U;
 }
 
 bool V4L2util::HasAudioSupport(void) const
 {
-    return m_capabilities & V4L2_CAP_AUDIO;
+    return (m_capabilities & V4L2_CAP_AUDIO) != 0U;
 }
 
 bool V4L2util::IsEncoder(void) const
@@ -723,9 +707,7 @@ bool V4L2util::UserAdjustableResolution(void) const
     // I have not been able to come up with a way of querying the
     // driver to answer this question.
 
-    if (m_driver_name == "hdpvr")
-        return false;
-    return true;
+    return m_driverName != "hdpvr";
 }
 
 int V4L2util::GetExtControl(int request, const QString& ctrl_desc) const
@@ -1029,7 +1011,7 @@ bool V4L2util::SetVolume(int volume)
 
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
-    int value = (int) ((range * volume * 0.01f) + qctrl.minimum);
+    int value = (int) ((range * volume * 0.01F) + qctrl.minimum);
     int ctrl_volume = std::min(qctrl.maximum, std::max(qctrl.minimum, value));
 
     // Set recording volume
@@ -1250,7 +1232,7 @@ bool V4L2util::SetSlicedVBI(const VBIMode::vbimode_t& vbimode)
     vbifmt.fmt.sliced.service_set |= (VBIMode::PAL_TT == vbimode) ?
                                      V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
-    int fd = m_vbi_fd < 0 ? m_fd : m_vbi_fd;
+    int fd = m_vbiFd < 0 ? m_fd : m_vbiFd;
 
     if (ioctl(fd, VIDIOC_S_FMT, &vbifmt) < 0)
     {

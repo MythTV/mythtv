@@ -68,62 +68,59 @@ static void dfd_update_device_list(void *dfd, io_iterator_t iterator);
 static void dfd_streaming_log_message(char *pString);
 void *dfd_controller_thunk(void *param);
 void dfd_stream_msg(UInt32 msg, UInt32 param1,
-                    UInt32 param2, void *callback_data);
+                   UInt32 param2, void *callback_data);
 int dfd_no_data_notification(void *callback_data);
 
 class DFDPriv
 {
+private:
+    DFDPriv(const DFDPriv &) = delete;            // not copyable
+    DFDPriv &operator=(const DFDPriv &) = delete; // not copyable
+
   public:
-    DFDPriv() :
-        controller_thread(0),
-        controller_thread_cf_ref(nullptr), controller_thread_running(false),
-        notify_port(0), notify_source(0), deviter(0),
-        actual_fwchan(-1), is_streaming(false), avstream(nullptr), logger(nullptr),
-        no_data_cnt(0), no_data_timer_set(false)
+    DFDPriv()
     {
-        logger = new AVS::StringLogger(dfd_streaming_log_message);
+        m_logger = new AVS::StringLogger(dfd_streaming_log_message);
     }
 
     ~DFDPriv()
     {
-        avcinfo_list_t::iterator it = devices.begin();
-        for (; it != devices.end(); ++it)
+        avcinfo_list_t::iterator it = m_devices.begin();
+        for (; it != m_devices.end(); ++it)
             delete (*it);
-        devices.clear();
+        m_devices.clear();
 
-        if (logger)
+        if (m_logger)
         {
-            delete logger;
-            logger = nullptr;
+            delete m_logger;
+            m_logger = nullptr;
         }
     }
 
-    pthread_t                 controller_thread;
-    CFRunLoopRef              controller_thread_cf_ref;
-    bool                      controller_thread_running;
+    pthread_t              m_controller_thread         {0};
+    CFRunLoopRef           m_controller_thread_cf_ref  {nullptr};
+    bool                   m_controller_thread_running {false};
 
-    IONotificationPortRef     notify_port;
-    CFRunLoopSourceRef        notify_source;
-    io_iterator_t             deviter;
+    IONotificationPortRef  m_notify_port               {0};
+    CFRunLoopSourceRef     m_notify_source             {0};
+    io_iterator_t          m_deviter                   {0};
 
-    int                       actual_fwchan;
-    bool                      is_streaming;
-    AVS::MPEG2Receiver       *avstream;
-    AVS::StringLogger        *logger;
-    uint                      no_data_cnt;
-    bool                      no_data_timer_set;
-    MythTimer                 no_data_timer;
+    int                    m_actual_fwchan             {-1};
+    bool                   m_is_streaming              {false};
+    AVS::MPEG2Receiver    *m_avstream                  {nullptr};
+    AVS::StringLogger     *m_logger                    {nullptr};
+    uint                   m_no_data_cnt               {0};
+    bool                   m_no_data_timer_set         {false};
+    MythTimer              m_no_data_timer;
 
-    avcinfo_list_t            devices;
+    avcinfo_list_t         m_devices;
 };
 
 DarwinFirewireDevice::DarwinFirewireDevice(
     uint64_t guid, uint subunitid, uint speed) :
     FirewireDevice(guid, subunitid, speed),
-    m_local_node(-1), m_remote_node(-1), m_priv(new DFDPriv())
+    m_priv(new DFDPriv())
 {
-
-
 }
 
 DarwinFirewireDevice::~DarwinFirewireDevice()
@@ -144,49 +141,49 @@ DarwinFirewireDevice::~DarwinFirewireDevice()
 
 void DarwinFirewireDevice::RunController(void)
 {
-    m_priv->controller_thread_cf_ref = CFRunLoopGetCurrent();
+    m_priv->m_controller_thread_cf_ref = CFRunLoopGetCurrent();
 
     // Set up IEEE-1394 bus change notification
     mach_port_t master_port;
     int ret = IOMasterPort(bootstrap_port, &master_port);
     if (kIOReturnSuccess == ret)
     {
-        m_priv->notify_port   = IONotificationPortCreate(master_port);
-        m_priv->notify_source = IONotificationPortGetRunLoopSource(
-            m_priv->notify_port);
+        m_priv->m_notify_port   = IONotificationPortCreate(master_port);
+        m_priv->m_notify_source = IONotificationPortGetRunLoopSource(
+            m_priv->m_notify_port);
 
-        CFRunLoopAddSource(m_priv->controller_thread_cf_ref,
-                           m_priv->notify_source,
+        CFRunLoopAddSource(m_priv->m_controller_thread_cf_ref,
+                           m_priv->m_notify_source,
                            kCFRunLoopDefaultMode);
 
         ret = IOServiceAddMatchingNotification(
-            m_priv->notify_port, kIOMatchedNotification,
+            m_priv->m_notify_port, kIOMatchedNotification,
             IOServiceMatching("IOFireWireAVCUnit"),
-            dfd_update_device_list, this, &m_priv->deviter);
+            dfd_update_device_list, this, &m_priv->m_deviter);
     }
 
     if (kIOReturnSuccess == ret)
-        dfd_update_device_list(this, m_priv->deviter);
+        dfd_update_device_list(this, m_priv->m_deviter);
 
-    m_priv->controller_thread_running = true;
+    m_priv->m_controller_thread_running = true;
 
     if (kIOReturnSuccess == ret)
         CFRunLoopRun();
 
     QMutexLocker locker(&m_lock); // ensure that controller_thread_running seen
 
-    m_priv->controller_thread_running = false;
+    m_priv->m_controller_thread_running = false;
 }
 
 void DarwinFirewireDevice::StartController(void)
 {
     m_lock.unlock();
 
-    pthread_create(&m_priv->controller_thread, nullptr,
+    pthread_create(&m_priv->m_controller_thread, nullptr,
                    dfd_controller_thunk, this);
 
     m_lock.lock();
-    while (!m_priv->controller_thread_running)
+    while (!m_priv->m_controller_thread_running)
     {
         m_lock.unlock();
         usleep(5000);
@@ -196,30 +193,30 @@ void DarwinFirewireDevice::StartController(void)
 
 void DarwinFirewireDevice::StopController(void)
 {
-    if (!m_priv->controller_thread_running)
+    if (!m_priv->m_controller_thread_running)
         return;
 
-    if (m_priv->deviter)
+    if (m_priv->m_deviter)
     {
-        IOObjectRelease(m_priv->deviter);
-        m_priv->deviter = 0;
+        IOObjectRelease(m_priv->m_deviter);
+        m_priv->m_deviter = 0;
     }
 
-    if (m_priv->notify_source)
+    if (m_priv->m_notify_source)
     {
-        CFRunLoopSourceInvalidate(m_priv->notify_source);
-        m_priv->notify_source = nullptr;
+        CFRunLoopSourceInvalidate(m_priv->m_notify_source);
+        m_priv->m_notify_source = nullptr;
     }
 
-    if (m_priv->notify_port)
+    if (m_priv->m_notify_port)
     {
-        IONotificationPortDestroy(m_priv->notify_port);
-        m_priv->notify_port = nullptr;
+        IONotificationPortDestroy(m_priv->m_notify_port);
+        m_priv->m_notify_port = nullptr;
     }
 
-    CFRunLoopStop(m_priv->controller_thread_cf_ref);
+    CFRunLoopStop(m_priv->m_controller_thread_cf_ref);
 
-    while (m_priv->controller_thread_running)
+    while (m_priv->m_controller_thread_running)
     {
         m_lock.unlock();
         usleep(100 * 1000);
@@ -241,7 +238,7 @@ bool DarwinFirewireDevice::OpenPort(void)
 
     StartController();
 
-    if (!m_priv->controller_thread_running)
+    if (!m_priv->m_controller_thread_running)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to start firewire thread.");
         return false;
@@ -268,7 +265,7 @@ bool DarwinFirewireDevice::OpenPort(void)
         return false;
     }
 
-    bool ok = GetInfoPtr()->OpenPort(m_priv->controller_thread_cf_ref);
+    bool ok = GetInfoPtr()->OpenPort(m_priv->m_controller_thread_cf_ref);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to get handle for port");
@@ -345,10 +342,10 @@ bool DarwinFirewireDevice::OpenAVStream(void)
     //      this is especially true if it is a broadcast stream...
 
     int ret = AVS::CreateMPEG2Receiver(
-        &m_priv->avstream,
+        &m_priv->m_avstream,
         dfd_tspacket_handler_thunk, this,
         dfd_stream_msg, this,
-        m_priv->logger /* StringLogger */,
+        m_priv->m_logger /* StringLogger */,
         GetInfoPtr()->fw_handle,
         AVS::kCyclesPerReceiveSegment,
         AVS::kNumReceiveSegments,
@@ -360,7 +357,7 @@ bool DarwinFirewireDevice::OpenAVStream(void)
         return false;
     }
 
-    m_priv->avstream->registerNoDataNotificationCallback(
+    m_priv->m_avstream->registerNoDataNotificationCallback(
         dfd_no_data_notification, this, kNoDataTimeout);
 
     return true;
@@ -423,21 +420,21 @@ bool DarwinFirewireDevice::IsSTBStreaming(uint *fw_channel)
 
 bool DarwinFirewireDevice::CloseAVStream(void)
 {
-    if (!m_priv->avstream)
+    if (!m_priv->m_avstream)
         return true;
 
     StopStreaming();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Destroying A/V stream object");
-    AVS::DestroyMPEG2Receiver(m_priv->avstream);
-    m_priv->avstream = nullptr;
+    AVS::DestroyMPEG2Receiver(m_priv->m_avstream);
+    m_priv->m_avstream = nullptr;
 
     return true;
 }
 
 bool DarwinFirewireDevice::IsAVStreamOpen(void) const
 {
-    return m_priv->avstream;
+    return m_priv->m_avstream;
 }
 
 bool DarwinFirewireDevice::ResetBus(void)
@@ -460,8 +457,8 @@ bool DarwinFirewireDevice::ResetBus(void)
 
 bool DarwinFirewireDevice::StartStreaming(void)
 {
-    if (m_priv->is_streaming)
-        return m_priv->is_streaming;
+    if (m_priv->m_is_streaming)
+        return m_priv->m_is_streaming;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Starting A/V streaming");
 
@@ -471,27 +468,27 @@ bool DarwinFirewireDevice::StartStreaming(void)
         return false;
     }
 
-    m_priv->avstream->setReceiveIsochChannel(kAnyAvailableIsochChannel);
-    m_priv->avstream->setReceiveIsochSpeed((IOFWSpeed) m_speed);
-    int ret = m_priv->avstream->startReceive();
+    m_priv->m_avstream->setReceiveIsochChannel(kAnyAvailableIsochChannel);
+    m_priv->m_avstream->setReceiveIsochSpeed((IOFWSpeed) m_speed);
+    int ret = m_priv->m_avstream->startReceive();
 
-    m_priv->is_streaming = (kIOReturnSuccess == ret);
+    m_priv->m_is_streaming = (kIOReturnSuccess == ret);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Starting A/V streaming: %1")
-                          .arg((m_priv->is_streaming)?"success":"failure"));
+                          .arg((m_priv->m_is_streaming)?"success":"failure"));
 
-    return m_priv->is_streaming;
+    return m_priv->m_is_streaming;
 }
 
 bool DarwinFirewireDevice::StopStreaming(void)
 {
-    if (!m_priv->is_streaming)
+    if (!m_priv->m_is_streaming)
         return true;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Stopping A/V streaming");
 
-    bool ok = (kIOReturnSuccess == m_priv->avstream->stopReceive());
-    m_priv->is_streaming = !ok;
+    bool ok = (kIOReturnSuccess == m_priv->m_avstream->stopReceive());
+    m_priv->m_is_streaming = !ok;
 
     if (!ok)
     {
@@ -536,7 +533,7 @@ void DarwinFirewireDevice::RemoveListener(TSDataListener *listener)
 
     FirewireDevice::RemoveListener(listener);
 
-    if (m_priv->is_streaming && m_listeners.empty())
+    if (m_priv->m_is_streaming && m_listeners.empty())
     {
         StopStreaming();
         CloseAVStream();
@@ -552,22 +549,22 @@ void DarwinFirewireDevice::BroadcastToListeners(
 
 void DarwinFirewireDevice::ProcessNoDataMessage(void)
 {
-    if (m_priv->no_data_timer_set)
+    if (m_priv->m_no_data_timer_set)
     {
         int short_interval = kNoDataTimeout + (kNoDataTimeout>>1);
-        bool recent = m_priv->no_data_timer.elapsed() <= short_interval;
-        m_priv->no_data_cnt = (recent) ? m_priv->no_data_cnt + 1 : 1;
+        bool recent = m_priv->m_no_data_timer.elapsed() <= short_interval;
+        m_priv->m_no_data_cnt = (recent) ? m_priv->m_no_data_cnt + 1 : 1;
     }
-    m_priv->no_data_timer_set = true;
-    m_priv->no_data_timer.start();
+    m_priv->m_no_data_timer_set = true;
+    m_priv->m_no_data_timer.start();
 
     LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No Input in %1 msecs")
-            .arg(m_priv->no_data_cnt * kNoDataTimeout));
+            .arg(m_priv->m_no_data_cnt * kNoDataTimeout));
 
-    if (m_priv->no_data_cnt > (kResetTimeout / kNoDataTimeout))
+    if (m_priv->m_no_data_cnt > (kResetTimeout / kNoDataTimeout))
     {
-        m_priv->no_data_timer_set = false;
-        m_priv->no_data_cnt = 0;
+        m_priv->m_no_data_timer_set = false;
+        m_priv->m_no_data_cnt = 0;
         ResetBus();
     }
 }
@@ -642,8 +639,8 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
 
     vector<AVCInfo> list;
 
-    avcinfo_list_t::iterator it = m_priv->devices.begin();
-    for (; it != m_priv->devices.end(); ++it)
+    avcinfo_list_t::iterator it = m_priv->m_devices.begin();
+    for (; it != m_priv->m_devices.end(); ++it)
     {
         if ((*it)->IsSubunitType(kAVCSubunitTypeTuner) &&
             (*it)->IsSubunitType(kAVCSubunitTypePanel))
@@ -662,39 +659,39 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 {
     QMutexLocker locker(&m_lock);
 
-    avcinfo_list_t::iterator it = m_priv->devices.find(guid);
+    avcinfo_list_t::iterator it = m_priv->m_devices.find(guid);
 
-    if (it == m_priv->devices.end())
+    if (it == m_priv->m_devices.end())
     {
         DarwinAVCInfo *ptr = new DarwinAVCInfo();
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Adding   0x%1").arg(guid, 0, 16));
 
-        m_priv->devices[guid] = ptr;
-        it = m_priv->devices.find(guid);
+        m_priv->m_devices[guid] = ptr;
+        it = m_priv->m_devices.find(guid);
     }
 
-    io_object_t &item = *((io_object_t*) pitem);
-    if (it != m_priv->devices.end())
+    if (it != m_priv->m_devices.end())
     {
+        io_object_t &item = *((io_object_t*) pitem);
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Updating 0x%1").arg(guid, 0, 16));
-        (*it)->Update(guid, this, m_priv->notify_port,
-                      m_priv->controller_thread_cf_ref, item);
+        (*it)->Update(guid, this, m_priv->m_notify_port,
+                      m_priv->m_controller_thread_cf_ref, item);
     }
 }
 
 DarwinAVCInfo *DarwinFirewireDevice::GetInfoPtr(void)
 {
-    avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
-    return (it == m_priv->devices.end()) ? nullptr : *it;
+    avcinfo_list_t::iterator it = m_priv->m_devices.find(m_guid);
+    return (it == m_priv->m_devices.end()) ? nullptr : *it;
 }
 
 const DarwinAVCInfo *DarwinFirewireDevice::GetInfoPtr(void) const
 {
-    avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
-    return (it == m_priv->devices.end()) ? nullptr : *it;
+    avcinfo_list_t::iterator it = m_priv->m_devices.find(m_guid);
+    return (it == m_priv->m_devices.end()) ? nullptr : *it;
 }
 
 
@@ -778,7 +775,7 @@ void DarwinFirewireDevice::HandleBusReset(void)
     if (!GetInfoPtr())
         return;
 
-    int fw_channel = m_priv->actual_fwchan;
+    int fw_channel = m_priv->m_actual_fwchan;
     bool ok = UpdatePlugRegister(plug_number, fw_channel,
                                  m_speed, true, false);
     if (!ok)
@@ -808,7 +805,7 @@ bool DarwinFirewireDevice::UpdatePlugRegister(
             plug_number, fw_chan, speed, add_plug, remove_plug);
     }
 
-    m_priv->actual_fwchan = (ok) ? fw_chan : kAnyAvailableIsochChannel;
+    m_priv->m_actual_fwchan = (ok) ? fw_chan : kAnyAvailableIsochChannel;
 
     return ok;
 }

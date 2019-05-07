@@ -65,7 +65,7 @@ class MTV_PUBLIC HTTPLiveStream
     bool UpdateSizeInfo(uint16_t width, uint16_t height,
                         uint16_t srcwidth, uint16_t srcheight);
     bool UpdateStatus(HTTPLiveStreamStatus status);
-    bool UpdateStatusMessage(QString message);
+    bool UpdateStatusMessage(const QString& message);
     bool UpdatePercentComplete(int percent);
 
     QString StatusToString(HTTPLiveStreamStatus status);
@@ -80,12 +80,12 @@ class MTV_PUBLIC HTTPLiveStream
     static DTC::LiveStreamInfoList *GetLiveStreamInfoList( const QString &FileName = "");
 
  protected:
-    bool        m_writing;
-    int         m_streamid;
+    bool        m_writing          {false};
+    int         m_streamid         {-1};
     QString     m_sourceFile;
     QString     m_sourceHost;
-    uint16_t    m_sourceWidth;
-    uint16_t    m_sourceHeight;
+    uint16_t    m_sourceWidth      {0};
+    uint16_t    m_sourceHeight     {0};
     QString     m_outDir;
     QString     m_outBase;
     QString     m_outBaseEncoded;
@@ -93,28 +93,28 @@ class MTV_PUBLIC HTTPLiveStream
     QString     m_outFileEncoded;
     QString     m_audioOutFile;
     QString     m_audioOutFileEncoded;
-    uint16_t    m_segmentSize;
-    uint16_t    m_maxSegments;
-    uint16_t    m_segmentCount;
-    uint16_t    m_startSegment;
-    uint16_t    m_curSegment;
+    uint16_t    m_segmentSize      {10};
+    uint16_t    m_maxSegments      {0};
+    uint16_t    m_segmentCount     {0};
+    uint16_t    m_startSegment     {0};
+    uint16_t    m_curSegment       {0};
     QString     m_httpPrefix;
     QString     m_httpPrefixRel;
-    uint16_t    m_height;
-    uint16_t    m_width;
-    uint32_t    m_bitrate;
-    uint32_t    m_audioBitrate;
-    uint32_t    m_audioOnlyBitrate;
-    int32_t     m_sampleRate;
+    uint16_t    m_height           {480};
+    uint16_t    m_width            {640};
+    uint32_t    m_bitrate          {800000};
+    uint32_t    m_audioBitrate     { 64000};
+    uint32_t    m_audioOnlyBitrate { 32000};
+    int32_t     m_sampleRate       {-1};
 
     QDateTime   m_created;
     QDateTime   m_lastModified;
-    uint16_t    m_percentComplete;
+    uint16_t    m_percentComplete  {0};
     QString     m_relativeURL;
     QString     m_fullURL;
     QString     m_statusMessage;
 
-    HTTPLiveStreamStatus m_status;
+    HTTPLiveStreamStatus m_status  {kHLSStatusUndefined};
 };
 
 #endif

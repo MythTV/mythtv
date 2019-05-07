@@ -26,29 +26,29 @@ class MythNewsEditor : public MythScreenType
                    const QString &name = "MythNewsEditor");
    ~MythNewsEditor();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
 
   private:
-    mutable QMutex  m_lock;
-    NewsSite       *m_site;
+    mutable QMutex  m_lock             {QMutex::Recursive};
+    NewsSite       *m_site             {nullptr};
     QString         m_siteName;
     bool            m_editing;
 
-    MythUIText     *m_titleText;
-    MythUIText     *m_nameLabelText;
-    MythUIText     *m_urlLabelText;
-    MythUIText     *m_iconLabelText;
-    MythUIText     *m_podcastLabelText;
+    MythUIText     *m_titleText        {nullptr};
+    MythUIText     *m_nameLabelText    {nullptr};
+    MythUIText     *m_urlLabelText     {nullptr};
+    MythUIText     *m_iconLabelText    {nullptr};
+    MythUIText     *m_podcastLabelText {nullptr};
 
-    MythUITextEdit *m_nameEdit;
-    MythUITextEdit *m_urlEdit;
-    MythUITextEdit *m_iconEdit;
+    MythUITextEdit *m_nameEdit         {nullptr};
+    MythUITextEdit *m_urlEdit          {nullptr};
+    MythUITextEdit *m_iconEdit         {nullptr};
 
-    MythUIButton   *m_okButton;
-    MythUIButton   *m_cancelButton;
+    MythUIButton   *m_okButton         {nullptr};
+    MythUIButton   *m_cancelButton     {nullptr};
 
-    MythUICheckBox *m_podcastCheck;
+    MythUICheckBox *m_podcastCheck     {nullptr};
 
   private slots:
     void Save(void);

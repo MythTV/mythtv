@@ -32,9 +32,6 @@
 #include "miniplayer.h"
 #include "playlistcontainer.h"
 
-// how long to wait before updating the lastplay and playcount fields
-#define LASTPLAY_DELAY 15
-
 MusicPlayer  *gPlayer = nullptr;
 QString gCDdevice = "";
 
@@ -57,32 +54,6 @@ MusicPlayer::MusicPlayer(QObject *parent)
     :QObject(parent)
 {
     setObjectName("MusicPlayer");
-
-    m_output = nullptr;
-    m_decoderHandler = nullptr;
-    m_currentTrack = -1;
-
-    m_currentTime = 0;
-    m_lastTrackStart = 0;
-
-    m_bufferAvailable = 0;
-    m_bufferSize = 0;
-
-    m_oneshotMetadata = nullptr;
-
-    m_isAutoplay = false;
-    m_isPlaying = false;
-    m_playMode = PLAYMODE_TRACKSPLAYLIST;
-    m_canShowPlayer = true;
-    m_wasPlaying = false;
-    m_updatedLastplay = false;
-    m_allowRestorePos = true;
-
-    m_playSpeed = 1.0;
-
-    m_showScannerNotifications = true;
-
-    m_errorCount = 0;
 
     QString playmode = gCoreContext->GetSetting("PlayMode", "none");
     if (playmode.toLower() == "random")
@@ -233,17 +204,16 @@ MusicPlayer::ResumeMode MusicPlayer::getResumeMode(void)
 {
     if (m_playMode == PLAYMODE_RADIO)
         return m_resumeModeRadio;
-    else if (m_playMode == PLAYMODE_TRACKSEDITOR)
+    if (m_playMode == PLAYMODE_TRACKSEDITOR)
         return m_resumeModeEditor;
-    else
-        return m_resumeModePlayback;
+    return m_resumeModePlayback;
 }
 
 void MusicPlayer::loadSettings(void)
 {
-    m_resumeModePlayback = (ResumeMode) gCoreContext->GetNumSetting("ResumeModePlayback", (ResumeMode) MusicPlayer::RESUME_EXACT);
-    m_resumeModeEditor = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeEditor", (ResumeMode) MusicPlayer::RESUME_OFF);
-    m_resumeModeRadio = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeRadio", (ResumeMode) MusicPlayer::RESUME_TRACK);
+    m_resumeModePlayback = (ResumeMode) gCoreContext->GetNumSetting("ResumeModePlayback", MusicPlayer::RESUME_EXACT);
+    m_resumeModeEditor = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeEditor", MusicPlayer::RESUME_OFF);
+    m_resumeModeRadio = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeRadio", MusicPlayer::RESUME_TRACK);
 
     m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
@@ -398,11 +368,11 @@ bool MusicPlayer::openOutputDevice(void)
     else
         adevice = gCoreContext->GetSetting("MusicAudioDevice");
 
-    pdevice = gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
+    pdevice = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false) ?
               gCoreContext->GetSetting("PassThruOutputDevice") : "auto";
 
     m_output = AudioOutput::OpenAudio(
-                   adevice, pdevice, FORMAT_S16, 2, 0, 44100,
+                   adevice, pdevice, FORMAT_S16, 2, AV_CODEC_ID_NONE, 44100,
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
 
@@ -536,11 +506,8 @@ void MusicPlayer::nextAuto(void)
         play();
         return;
     }
-    else
-    {
-        if (!m_decoderHandler->next())
-            next();
-    }
+    if (!m_decoderHandler->next())
+        next();
 
     // if we don't already have a gui attached show the miniplayer if configured to do so
     if (m_isAutoplay && m_canShowPlayer && m_autoShowPlayer && m_isPlaying)
@@ -661,8 +628,8 @@ void MusicPlayer::customEvent(QEvent *event)
                 {
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(getVolume());
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
                 else if (list[2] == "PLAY_FILE")
                 {
@@ -700,7 +667,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     if (list.size() == 4)
                     {
                         int trackID = list[3].toInt();
-                        MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
+                        MusicMetadata *mdata = gMusicData->m_all_music->getMetadata(trackID);
                         if (mdata)
                             playFile(*mdata);
                     }
@@ -720,8 +687,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(mdataStr);
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
                 else if (list[2] == "GET_STATUS")
                 {
@@ -734,8 +701,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(statusStr);
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
             }
             else
@@ -749,13 +716,13 @@ void MusicPlayer::customEvent(QEvent *event)
         }
         else if (me->Message().startsWith("MUSIC_METADATA_CHANGED"))
         {
-            if (gMusicData->initialized)
+            if (gMusicData->m_initialized)
             {
                 QStringList list = me->Message().simplified().split(' ');
                 if (list.size() == 2)
                 {
                     int songID = list[1].toInt();
-                    MusicMetadata *mdata =  gMusicData->all_music->getMetadata(songID);
+                    MusicMetadata *mdata =  gMusicData->m_all_music->getMetadata(songID);
 
                     if (mdata)
                     {
@@ -1024,20 +991,20 @@ void MusicPlayer::loadStreamPlaylist(void)
     MusicMetadata::IdType id = getCurrentMetadata() ? getCurrentMetadata()->ID() : -1;
 
     // create the radio playlist
-    gMusicData->all_playlists->getStreamPlaylist()->disableSaves();
-    gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
-    StreamList *list = gMusicData->all_streams->getStreams();
+    gMusicData->m_all_playlists->getStreamPlaylist()->disableSaves();
+    gMusicData->m_all_playlists->getStreamPlaylist()->removeAllTracks();
+    StreamList *list = gMusicData->m_all_streams->getStreams();
 
     for (int x = 0; x < list->count(); x++)
     {
         MusicMetadata *mdata = list->at(x);
-        gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
+        gMusicData->m_all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
 
         if (mdata->ID() == id)
             m_currentTrack = x;
     }
 
-    gMusicData->all_playlists->getStreamPlaylist()->enableSaves();
+    gMusicData->m_all_playlists->getStreamPlaylist()->enableSaves();
 }
 
 void MusicPlayer::moveTrackUpDown(bool moveUp, int whichTrack)
@@ -1209,16 +1176,11 @@ MusicMetadata *MusicPlayer::getNextMetadata(void)
     // if we are not playing the last track then just return the next track
     if (m_currentTrack < getCurrentPlaylist()->getTrackCount() - 1)
         return getCurrentPlaylist()->getSongAt(m_currentTrack + 1);
-    else
-    {
-        // if we are playing the last track then we need to take the
-        // repeat mode into account
-        if (m_repeatMode == REPEAT_ALL)
-            return getCurrentPlaylist()->getSongAt(0);
-        else
-            return nullptr;
-    }
 
+    // if we are playing the last track then we need to take the
+    // repeat mode into account
+    if (m_repeatMode == REPEAT_ALL)
+        return getCurrentPlaylist()->getSongAt(0);
     return nullptr;
 }
 
@@ -1350,13 +1312,13 @@ void MusicPlayer::setSpeed(float newspeed)
 
 void MusicPlayer::incSpeed()
 {
-    m_playSpeed += 0.05;
+    m_playSpeed += 0.05F;
     setSpeed(m_playSpeed);
 }
 
 void MusicPlayer::decSpeed()
 {
-    m_playSpeed -= 0.05;
+    m_playSpeed -= 0.05F;
     setSpeed(m_playSpeed);
 }
 
@@ -1617,7 +1579,7 @@ void MusicPlayer::decoderHandlerReady(void)
 
 void MusicPlayer::removeTrack(int trackID)
 {
-    MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
+    MusicMetadata *mdata = gMusicData->m_all_music->getMetadata(trackID);
     if (mdata)
     {
         int trackPos = getCurrentPlaylist()->getTrackPosition(mdata->ID());
@@ -1635,24 +1597,19 @@ void MusicPlayer::addTrack(int trackID, bool updateUI)
 
 Playlist* MusicPlayer::getCurrentPlaylist ( void )
 {
-    if (!gMusicData || !gMusicData->all_playlists)
+    if (!gMusicData || !gMusicData->m_all_playlists)
         return nullptr;
 
     if (m_playMode == PLAYMODE_RADIO)
     {
-        return gMusicData->all_playlists->getStreamPlaylist();
+        return gMusicData->m_all_playlists->getStreamPlaylist();
     }
-    else
-    {
-        return gMusicData->all_playlists->getActive();
-    }
-
-    return nullptr;
+    return gMusicData->m_all_playlists->getActive();
 }
 
 StreamList  *MusicPlayer::getStreamList(void) 
 {
-    return gMusicData->all_streams->getStreams();
+    return gMusicData->m_all_streams->getStreams();
 }
 
 int MusicPlayer::getNotificationID (const QString& hostname)

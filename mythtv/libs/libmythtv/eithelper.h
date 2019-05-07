@@ -23,48 +23,49 @@ class MSqlQuery;
 class ATSCEvent
 {
   public:
-    ATSCEvent(uint a, uint b, uint c, QString d,
+    ATSCEvent(uint a, uint b, uint c, const QString& d,
               const unsigned char *e, uint f)
-        : start_time(a), length(b), etm(c), desc_length(f), title(d), desc(e),
-          scan_time(time(nullptr)) {}
+        : m_start_time(a), m_length(b), m_etm(c), m_desc_length(f), m_title(d), m_desc(e),
+          m_scan_time(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for EIT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any EIT event seen > 2 minutes in the past as stale.
-        return scan_time + 2 * 60 < time(nullptr);
+        return m_scan_time + 2 * 60 < time(nullptr);
     }
 
-    uint32_t start_time;
-    uint32_t length;
-    uint32_t etm;
-    uint32_t desc_length;
-    QString  title;
-    const unsigned char *desc;
+    uint32_t             m_start_time;
+    uint32_t             m_length;
+    uint32_t             m_etm;
+    uint32_t             m_desc_length;
+    QString              m_title;
+    const unsigned char *m_desc {nullptr};
 
   private:
     // The time the event was created.
-    time_t scan_time;
+    time_t               m_scan_time;
 };
 
 // An entry from the ETT table containing description text for an event.
 class ATSCEtt
 {
   public:
-    explicit ATSCEtt(QString text) : ett_text(text), scan_time(time(nullptr)) {}
+    explicit ATSCEtt(const QString& text) :
+        m_ett_text(text), m_scan_time(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any ETT event seen > 2 minutes in the past as stale.
-        return scan_time + 2 * 60 < time(nullptr);
+        return m_scan_time + 2 * 60 < time(nullptr);
     }
 
-    QString ett_text;
+    QString m_ett_text;
 
   private:
     // The time the ETT was created.
-    time_t scan_time;
+    time_t m_scan_time;
 };
 
 
@@ -112,7 +113,7 @@ class EITHelper
     void AddETT(uint atsc_major, uint atsc_minor,
                 const ExtendedTextTable     *ett);
     void AddEIT(const DVBEventInformationTable *eit);
-    void AddEIT(const PremiereContentInformationTable *eit);
+    void AddEIT(const PremiereContentInformationTable *cit);
 #else // if !USING_BACKEND
     void AddEIT(uint, uint, const EventInformationTable*) {}
     void AddETT(uint, uint, const ExtendedTextTable*) {}
@@ -128,7 +129,7 @@ class EITHelper
     // only ATSC
     uint GetChanID(uint atsc_major, uint atsc_minor);
     // only DVB
-    uint GetChanID(uint serviceid, uint networkid, uint transportid);
+    uint GetChanID(uint serviceid, uint networkid, uint tsid);
     // any DTV
     uint GetChanID(uint program_number);
 
@@ -141,7 +142,7 @@ class EITHelper
     mutable ServiceToChanID srv_to_chanid;
 
     EITFixUp               *eitfixup;
-    static EITCache        *eitcache;
+    static EITCache        *s_eitcache;
 
     int                     gps_offset;
 

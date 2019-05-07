@@ -42,12 +42,8 @@ static QChar cvt_char(char ch, int lang)
 TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
                                int fontStretch) :
     MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player),           m_teletextReader(nullptr),
-    m_safeArea(QRect()),
-    m_colWidth(10),             m_rowHeight(10),
-    m_bgColor(QColor(kColorBlack)),
-    m_displaying(false),        m_fontStretch(fontStretch),
-    m_fontHeight(10)
+    m_player(player),
+    m_fontStretch(fontStretch)
 {
 }
 
@@ -158,7 +154,7 @@ void TeletextScreen::Pulse(void)
 
     if (m_player && m_player->GetVideoOutput())
     {
-        static const float kTextPadding = 0.96f;
+        static const float kTextPadding = 0.96F;
         QRect oldsafe = m_safeArea;
         m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
         m_colWidth = (int)((float)m_safeArea.width() / (float)kTeletextColumns);
@@ -344,13 +340,10 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 
     uint fgcolor    = kTTColorWhite;
     uint bgcolor    = kTTColorBlack;
-    uint newfgcolor = kTTColorWhite;
-    uint newbgcolor = kTTColorBlack;
 
     if (m_teletextReader->IsSubtitle() || m_teletextReader->IsTransparent())
     {
         bgcolor    = kTTColorTransparent;
-        newbgcolor = kTTColorTransparent;
 
         bool isBlank = true;
         for (uint i = (row == 1 ? 8 : 0); i < (uint) kTeletextColumns; i++)
@@ -497,13 +490,13 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 
             if (ttpage)
             {
-                bool has_flof = ttpage->floflink[flof_link_count - 1];
+                bool has_flof = ttpage->floflink[flof_link_count - 1] != 0;
                 ch = (has_flof) ? ch : ' ';
             }
         }
 
-        newfgcolor = fgcolor;
-        newbgcolor = bgcolor;
+        uint newfgcolor = fgcolor;
+        uint newbgcolor = bgcolor;
 
         SetForegroundColor(newfgcolor);
         SetBackgroundColor(newbgcolor);
@@ -536,7 +529,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
     Q_UNUSED(blink);
 }
 
-void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
+void TeletextScreen::DrawCharacter(int x, int y, QChar ch, bool doubleheight)
 {
     QString line = ch;
     if (line == " ")
@@ -603,13 +596,13 @@ void TeletextScreen::DrawRect(int row, QRect rect)
 
     QBrush bgfill = QBrush(m_bgColor, Qt::SolidPattern);
     QPainter painter(image);
-    painter.setBrush(QBrush(bgfill));
+    painter.setBrush(bgfill);
     painter.setPen(QPen(Qt::NoPen));
     painter.drawRect(rect);
     painter.end();
 }
 
-void TeletextScreen::DrawMosaic(int x, int y, int code, int doubleheight)
+void TeletextScreen::DrawMosaic(int x, int y, int code, bool doubleheight)
 {
     int row = y;
     x *= m_colWidth;
@@ -642,10 +635,10 @@ void TeletextScreen::DrawStatus(void)
         for (int i = 0; i < 40; ++i)
             DrawBackground(i, 0);
 
-    DrawCharacter(1, 0, 'P', 0);
-    DrawCharacter(2, 0, m_teletextReader->GetPageInput(0), 0);
-    DrawCharacter(3, 0, m_teletextReader->GetPageInput(1), 0);
-    DrawCharacter(4, 0, m_teletextReader->GetPageInput(2), 0);
+    DrawCharacter(1, 0, 'P', false);
+    DrawCharacter(2, 0, m_teletextReader->GetPageInput(0), false);
+    DrawCharacter(3, 0, m_teletextReader->GetPageInput(1), false);
+    DrawCharacter(4, 0, m_teletextReader->GetPageInput(2), false);
 
     const TeletextSubPage *ttpage = m_teletextReader->FindSubPage();
 
@@ -654,7 +647,7 @@ void TeletextScreen::DrawStatus(void)
         QString str = QObject::tr("Page Not Available",
                                   "Requested Teletext page not available");
         for (int i = 0; (i < 30) && i < str.length(); i++)
-            DrawCharacter(i+10, 0, str[i], 0);
+            DrawCharacter(i+10, 0, str[i], false);
 
         return;
     }
@@ -682,9 +675,9 @@ void TeletextScreen::DrawStatus(void)
         DrawBackground(x * 3 + 8, 0);
         DrawBackground(x * 3 + 9, 0);
 
-        DrawCharacter(x * 3 + 7, 0, str[x * 3], 0);
-        DrawCharacter(x * 3 + 8, 0, str[x * 3 + 1], 0);
-        DrawCharacter(x * 3 + 9, 0, str[x * 3 + 2], 0);
+        DrawCharacter(x * 3 + 7, 0, str[x * 3], false);
+        DrawCharacter(x * 3 + 8, 0, str[x * 3 + 1], false);
+        DrawCharacter(x * 3 + 9, 0, str[x * 3 + 2], false);
     }
 }
 
@@ -707,7 +700,6 @@ bool TeletextScreen::InitialiseFont()
     if (mythfont)
     {
         QFont newfont(font);
-        font.detach();
         mythfont->SetFace(newfont);
         gTTFont = mythfont;
     }

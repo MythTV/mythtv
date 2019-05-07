@@ -21,7 +21,7 @@ class RebuildSaver : public QRunnable
         s_cnt[d]++;
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         m_decoder->SavePositionMapDelta(m_first, m_last);
 
@@ -65,7 +65,6 @@ QMap<DecoderBase*,uint> RebuildSaver::s_cnt;
 bool MythCommFlagPlayer::RebuildSeekTable(
     bool showPercentage, StatusCallback cb, void* cbData)
 {
-    int percentage = 0;
     uint64_t myFramesPlayed = 0, pmap_first = 0,  pmap_last  = 0;
 
     killdecoder = false;
@@ -73,12 +72,12 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     // clear out any existing seektables
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->playingInfo)
+    if (player_ctx->m_playingInfo)
     {
-        player_ctx->playingInfo->ClearPositionMap(MARK_KEYFRAME);
-        player_ctx->playingInfo->ClearPositionMap(MARK_GOP_START);
-        player_ctx->playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
-        player_ctx->playingInfo->ClearPositionMap(MARK_DURATION_MS);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_KEYFRAME);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_GOP_START);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        player_ctx->m_playingInfo->ClearPositionMap(MARK_DURATION_MS);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
@@ -117,8 +116,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         {
             inuse_timer.restart();
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            if (player_ctx->playingInfo)
-                player_ctx->playingInfo->UpdateInUseMark();
+            if (player_ctx->m_playingInfo)
+                player_ctx->m_playingInfo->UpdateInUseMark();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
@@ -147,11 +146,11 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
             if (totalFrames)
             {
-                float elapsed = flagTime.elapsed() * 0.001f;
-                int flagFPS = (elapsed > 0.0f) ?
+                float elapsed = flagTime.elapsed() * 0.001F;
+                int flagFPS = (elapsed > 0.0F) ?
                     (int)(myFramesPlayed / elapsed) : 0;
 
-                percentage = myFramesPlayed * 100 / totalFrames;
+                int percentage = myFramesPlayed * 100 / totalFrames;
                 if (cb)
                     (*cb)(percentage, cbData);
 

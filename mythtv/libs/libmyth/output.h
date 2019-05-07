@@ -29,39 +29,34 @@ class Visual;
 class MPUBLIC OutputEvent : public MythEvent
 {
   public:
-    explicit OutputEvent(Type t) :
-        MythEvent(t), error_msg(nullptr), elasped_seconds(0), written_bytes(0),
-        brate(0), freq(0), prec(0), chan(0)
-    { ; }
-
+    explicit OutputEvent(Type type) :
+        MythEvent(type) {}
     OutputEvent(long s, unsigned long w, int b, int f, int p, int c) :
-        MythEvent(Info), error_msg(nullptr), elasped_seconds(s), written_bytes(w),
-        brate(b), freq(f), prec(p), chan(c)
-    { ; }
-
+        MythEvent(Info), m_elasped_seconds(s), m_written_bytes(w),
+        m_brate(b), m_freq(f), m_prec(p), m_chan(c) {}
     explicit OutputEvent(const QString &e) :
-        MythEvent(Error), elasped_seconds(0), written_bytes(0),
-        brate(0), freq(0), prec(0), chan(0)
+        MythEvent(Error)
     {
         QByteArray tmp = e.toUtf8();
-        error_msg = new QString(tmp.constData());
+        m_error_msg = new QString(tmp.constData());
     }
 
     ~OutputEvent()
     {
-        delete error_msg;
+        delete m_error_msg;
     }
 
-    const QString *errorMessage() const { return error_msg; }
+    const QString *errorMessage() const { return m_error_msg; }
 
-    const long &elapsedSeconds() const { return elasped_seconds; }
-    const unsigned long &writtenBytes() const { return written_bytes; }
-    const int &bitrate() const { return brate; }
-    const int &frequency() const { return freq; }
-    const int &precision() const { return prec; }
-    const int &channels() const { return chan; }
+    const long &elapsedSeconds() const { return m_elasped_seconds; }
+    const unsigned long &writtenBytes() const { return m_written_bytes; }
+    const int &bitrate() const { return m_brate; }
+    const int &frequency() const { return m_freq; }
+    const int &precision() const { return m_prec; }
+    const int &channels() const { return m_chan; }
 
-    virtual MythEvent *clone(void) const { return new OutputEvent(*this); }
+    MythEvent *clone(void) const override // MythEvent
+        { return new OutputEvent(*this); }
 
     static Type Playing;
     static Type Buffering;
@@ -72,25 +67,27 @@ class MPUBLIC OutputEvent : public MythEvent
 
   private:
     OutputEvent(const OutputEvent &o) : MythEvent(o),
-        error_msg(nullptr),
-        elasped_seconds(o.elasped_seconds),
-        written_bytes(o.written_bytes),
-        brate(o.brate), freq(o.freq), prec(o.prec), chan(o.chan)
+        m_elasped_seconds(o.m_elasped_seconds),
+        m_written_bytes(o.m_written_bytes),
+        m_brate(o.m_brate), m_freq(o.m_freq),
+        m_prec(o.m_prec), m_chan(o.m_chan)
     {
-        if (o.error_msg)
+        if (o.m_error_msg)
         {
-            error_msg = new QString(*o.error_msg);
-            error_msg->detach();
+            m_error_msg = new QString(*o.m_error_msg);
         }
     }
     OutputEvent &operator=(const OutputEvent&);
 
   private:
-    QString *error_msg;
+    QString       *m_error_msg       {nullptr};
 
-    long elasped_seconds;
-    unsigned long written_bytes;
-    int brate, freq, prec, chan;
+    long           m_elasped_seconds {0};
+    unsigned long  m_written_bytes   {0};
+    int            m_brate           {0};
+    int            m_freq            {0};
+    int            m_prec            {0};
+    int            m_chan            {0};
 };
 
 typedef std::vector<MythTV::Visual*> Visuals;
@@ -98,17 +95,17 @@ typedef std::vector<MythTV::Visual*> Visuals;
 class MPUBLIC OutputListeners : public MythObservable
 {
 public:
-    OutputListeners();
+    OutputListeners() = default;
     virtual ~OutputListeners() = default;
 
-    bool hasVisual(void) { return visuals.size(); }
+    bool hasVisual(void) { return m_visuals.size(); }
     void addVisual(MythTV::Visual *);
     void removeVisual(MythTV::Visual *);
 
-    QMutex *mutex() { return &mtx; }
+    QMutex *mutex() { return &m_mtx; }
 
-    void setBufferSize(unsigned int sz) { bufsize = sz; }
-    unsigned int bufferSize() const { return bufsize; }
+    void setBufferSize(unsigned int sz) { m_bufsize = sz; }
+    unsigned int bufferSize() const { return m_bufsize; }
 
 protected:
     void error(const QString &e);
@@ -117,10 +114,12 @@ protected:
     void prepareVisuals();
 
 private:
-    QMutex       mtx;
-    Visuals      visuals;
+    Q_DISABLE_COPY(OutputListeners)
 
-    unsigned int bufsize;
+    QMutex       m_mtx;
+    Visuals      m_visuals;
+
+    unsigned int m_bufsize {0};
 };
 
 

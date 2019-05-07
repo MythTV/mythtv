@@ -42,8 +42,8 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 
     void DestroyChain(void);
 
-    void AppendNewProgram(ProgramInfo *pginfo, QString channum,
-                          QString inputname, bool discont);
+    void AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
+                          const QString& inputname, bool discont);
     void FinishedRecording(ProgramInfo *pginfo);
     void DeleteProgram(ProgramInfo *pginfo);
 
@@ -103,25 +103,25 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     ProgramInfo *DoGetNextProgram(bool up, int curpos, int &newid,
                                   bool &discont, bool &newtype);
 
-    QString m_id;
+    QString                 m_id;
     QList<LiveTVChainEntry> m_chain;
-    int m_maxpos;
-    mutable QMutex m_lock;
+    int                     m_maxpos      {0};
+    mutable QMutex          m_lock        {QMutex::Recursive};
 
-    QString m_hostprefix;
-    QString m_inputtype;
+    QString                 m_hostprefix;
+    QString                 m_inputtype;
 
-    int m_curpos;
-    uint m_cur_chanid;
-    QDateTime m_cur_startts;
+    int                     m_curpos      {0};
+    uint                    m_cur_chanid  {0};
+    QDateTime               m_cur_startts;
 
-    int m_switchid;
-    LiveTVChainEntry m_switchentry;
+    int                     m_switchid    {-1};
+    LiveTVChainEntry        m_switchentry;
 
-    int m_jumppos;
+    int                     m_jumppos     {INT_MAX};
 
-    mutable QMutex m_sockLock;
-    QList<MythSocket*> m_inUseSocks;
+    mutable QMutex          m_sockLock;
+    QList<MythSocket*>      m_inUseSocks;
 };
 
 #endif

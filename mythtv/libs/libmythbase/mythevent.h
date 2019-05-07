@@ -3,6 +3,7 @@
 
 #include <QStringList>
 #include <QEvent>
+#include <utility>
 #include "mythtypes.h"
 #include "mythbaseexp.h"
 
@@ -15,39 +16,39 @@
 class MBASE_PUBLIC MythEvent : public QEvent
 {
   public:
-    explicit MythEvent(int t) : QEvent((QEvent::Type)t)
+    explicit MythEvent(int type) : QEvent((QEvent::Type)type)
     { }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t),
-            m_message(lmessage),    m_extradata("empty")
+    MythEvent(int type, QString lmessage) : QEvent((QEvent::Type)type),
+        m_message(::std::move(lmessage)),    m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int t, const QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)t),
-            m_message(lmessage),    m_extradata(lextradata)
+    MythEvent(int type, QString lmessage, const QStringList &lextradata)
+           : QEvent((QEvent::Type)type),
+            m_message(::std::move(lmessage)),    m_extradata(lextradata)
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    explicit MythEvent(const QString lmessage) : QEvent(MythEventMessage),
-            m_message(lmessage),    m_extradata("empty")
+    explicit MythEvent(QString lmessage) : QEvent(MythEventMessage),
+            m_message(::std::move(lmessage)),    m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(const QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)MythEventMessage),
-           m_message(lmessage),    m_extradata(lextradata)
+    MythEvent(QString lmessage, const QStringList &lextradata)
+           : QEvent(MythEventMessage),
+           m_message(::std::move(lmessage)),    m_extradata(lextradata)
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(const QString lmessage, const QString lextradata)
-           : QEvent((QEvent::Type)MythEventMessage),
-           m_message(lmessage),    m_extradata(lextradata)
+    MythEvent(QString lmessage, const QString lextradata)
+           : QEvent(MythEventMessage),
+           m_message(::std::move(lmessage)),    m_extradata(lextradata)
     {
     }
 
@@ -110,7 +111,7 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
                      const InfoMap &linfoMap)
       : MythEvent(lmessage), m_infoMap(linfoMap) { }
 
-    virtual MythInfoMapEvent *clone() const
+    MythInfoMapEvent *clone() const override // MythEvent
         { return new MythInfoMapEvent(Message(), m_infoMap); }
     const InfoMap* GetInfoMap(void) { return &m_infoMap; }
 

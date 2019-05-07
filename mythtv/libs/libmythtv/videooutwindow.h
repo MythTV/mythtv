@@ -45,12 +45,14 @@ class VideoOutWindow
         AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
     void ToggleAspectOverride(
-        AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
+        AspectOverrideMode aspectMode = kAspect_Toggle);
 
     void ResizeDisplayWindow(const QRect&, bool);
 
     void MoveResize(void);
     void Zoom(ZoomDirection direction);
+    void ToggleMoveBottomLine(void);
+    void SaveBottomLine(void);
 
     // Sets
     void SetVideoScalingAllowed(bool change);
@@ -131,7 +133,6 @@ class VideoOutWindow
     bool    db_use_gui_size;  ///< Use the gui size for video window
 
     bool    using_xinerama;   ///< Display is using multiple screens
-    int     screen_num;       ///< Screen that contains playback window
     QRect   screen_geom;      ///< Full screen geometry
 
     // Manual Zoom
@@ -174,6 +175,7 @@ class VideoOutWindow
     bool     embedding;
     bool     needrepaint;
     bool     allowpreviewepg;
+    bool     bottomline;
     PIPState pip_state;
 
     // Constants
@@ -185,4 +187,3 @@ class VideoOutWindow
 };
 
 #endif /* VIDEOOUTWINDOW_H_ */
-

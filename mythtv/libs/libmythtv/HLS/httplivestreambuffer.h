@@ -45,15 +45,15 @@ class HLSRingBuffer : public RingBuffer
 public:
     explicit HLSRingBuffer(const QString &lfilename);
     HLSRingBuffer(const QString &lfilename, bool open);
-    virtual ~HLSRingBuffer();
+    ~HLSRingBuffer() override;
 
-    virtual bool IsOpen(void) const;
-    virtual long long GetReadPosition(void) const;
-    virtual bool OpenFile(const QString &lfilename,
-                          uint retry_ms = kDefaultOpenTimeout);
-    virtual bool IsStreamed(void)           { return false;   }
-    virtual bool IsSeekingAllowed(void)     { return !m_error; }
-    virtual bool IsBookmarkAllowed(void)    { return true; }
+    bool IsOpen(void) const override; // RingBuffer
+    long long GetReadPosition(void) const override; // RingBuffer
+    bool OpenFile(const QString &lfilename,
+                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
+    bool IsStreamed(void) override          { return false;   }  // RingBuffer
+    bool IsSeekingAllowed(void) override    { return !m_error; } // RingBuffer
+    bool IsBookmarkAllowed(void) override   { return true; }     // RingBuffer
     static bool IsHTTPLiveStreaming(QByteArray *s);
     static bool TestForHTTPLiveStreaming(const QString &filename);
     bool SaveToDisk(const QString &filename, int segstart = 0, int segend = -1);
@@ -64,14 +64,14 @@ public:
     int DurationForBytes(uint size);
 
 protected:
-    virtual int safe_read(void *data, uint i_read);
-    virtual long long GetRealFileSizeInternal(void) const;
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint sz) override; // RingBuffer
+    long long GetRealFileSizeInternal(void) const override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
 private:
     void FreeStreamsList(QList<HLSStream*> *streams) const;
-    HLSStream *GetStreamForSegment(int segid) const;
-    HLSStream *GetStream(const int wanted, const StreamsList *streams = nullptr) const;
+    HLSStream *GetStreamForSegment(int segnum) const;
+    HLSStream *GetStream(int wanted, const StreamsList *streams = nullptr) const;
     HLSStream *GetFirstStream(const StreamsList *streams = nullptr) const;
     HLSStream *GetLastStream(const StreamsList *streams = nullptr) const;
     HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = nullptr) const;
@@ -103,35 +103,35 @@ private:
     QString             m_m3u8;     // M3U8 url
     QByteArray          m_peeked;
 
-    HLSPlayback        *m_playback;
+    HLSPlayback        *m_playback {nullptr};
 
     /* state */
     StreamsList         m_streams;  // bandwidth adaptation
     mutable QMutex      m_lock;     // protect general class members
-    bool                m_meta;     // meta playlist
-    bool                m_error;    // parsing error
-    bool                m_aesmsg;   // only print one time that the media is encrypted
-    int                 m_startup;  // starting segment (where seek start)
+    bool                m_meta    {false}; // meta playlist
+    bool                m_error   {false}; // parsing error
+    bool                m_aesmsg  {false}; // only print one time that the media is encrypted
+    int                 m_startup {0};  // starting segment (where seek start)
     /**
      * assumed bitrate of playback
      * used for the purpose of calculating length and seek position.
      * the value itself is irrelevant, as it's only used as a common reference
      */
-    int64_t             m_bitrate;
+    int64_t             m_bitrate {0};
     /**
      * FFmpeg seek to the end of the stream in order to determine the length
      * of the video. Set to boolean to true after we detected a seek to the end
      * this will prevent waiting for new data in safe_read
      */
-    bool                m_seektoend;
+    bool                m_seektoend      {false};
 
     friend class StreamWorker;
-    StreamWorker       *m_streamworker;
+    StreamWorker       *m_streamworker   {nullptr};
     friend class PlaylistWorker;
-    PlaylistWorker     *m_playlistworker;
-    FILE               *m_fd;
-    bool                m_interrupted;
-    bool                m_killed;
+    PlaylistWorker     *m_playlistworker {nullptr};
+    FILE               *m_fd             {nullptr};
+    bool                m_interrupted    {false};
+    bool                m_killed         {false};
 };
 
 #endif

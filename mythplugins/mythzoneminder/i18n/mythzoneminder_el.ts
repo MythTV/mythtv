@@ -387,12 +387,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Ενεργό</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Σταματημένο</translation>
     </message>
@@ -400,60 +400,60 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="100"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="97"/>
         <source>Play</source>
         <translation>Αναπαραγωγή</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="107"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="104"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="189"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="358"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="373"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="185"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
         <translation>Όλες οι Κάμερες</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="192"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="382"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="188"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
         <translation>Όλες οι Ημερομηνίες</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="460"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Refresh</source>
         <translation>Ανανέωση</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
         <source>Hide Continuous Events</source>
         <translation>Απόκρυψη Αδειάλειπτων Συμβάντων</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="461"/>
         <source>Show Continuous Events</source>
         <translation>Εμφάνιση Αδιάλειπτων Συμβάντων</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="467"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="463"/>
         <source>Change View</source>
         <translation>Αλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
         <source>Delete All</source>
         <translation>Διαγραφή Όλων</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="486"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="482"/>
         <source>Delete All Events?</source>
         <translation>Να Διαγραφούν Όλα τα Συμβάντα;</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="487"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="483"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Διαγράφω %1 συμβάντα.</translation>
     </message>
@@ -470,33 +470,78 @@
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Δεν έχετε ορίσει οθόνες!</translation>
     </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="251"/>
+        <source>Change View</source>
+        <translation>Αλλαγή Προβολής</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="252"/>
+        <source>Change Camera 1</source>
+        <translation>Αλλαγή Κάμερας 1</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="255"/>
+        <source>Change Camera 2</source>
+        <translation>Αλλαγή Κάμερας 2</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="259"/>
+        <source>Change Camera 3</source>
+        <translation>Αλλαγή Κάμερας 3</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="260"/>
+        <source>Change Camera 4</source>
+        <translation>Αλλαγή Κάμερας 4</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="265"/>
+        <source>Change Camera 5</source>
+        <translation>Αλλαγή Κάμερας 5</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="266"/>
+        <source>Change Camera 6</source>
+        <translation>Αλλαγή Κάμερας 6</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="271"/>
+        <source>Change Camera 7</source>
+        <translation>Αλλαγή Κάμερας 7</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="272"/>
+        <source>Change Camera 8</source>
+        <translation>Αλλαγή Κάμερας 8</translation>
+    </message>
 </context>
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="287"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="98"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="283"/>
         <source>Pause</source>
         <translation>Παύση</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="104"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="110"/>
         <source>Previous</source>
         <translation>Προηγούμενο</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="116"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="294"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="373"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="369"/>
         <source>Play</source>
         <translation>Αναπαραγωγή</translation>
     </message>
@@ -555,7 +600,7 @@
         <translation>Η μορφή που προτιμάτε να έχει η ώρα στις οθόνες συμβάντων.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="91"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
         <source>MythZoneMinder Settings</source>
         <translation>Ρυθμίσεις MythZoneMinder</translation>
     </message>

@@ -27,10 +27,7 @@ static inline void clear(LiveTVChainEntry &entry)
 /** \class LiveTVChain
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
-LiveTVChain::LiveTVChain() : ReferenceCounter("LiveTVChain"),
-    m_id(""), m_maxpos(0), m_lock(QMutex::Recursive),
-    m_curpos(0), m_cur_chanid(0),
-    m_switchid(-1), m_jumppos(INT_MAX)
+LiveTVChain::LiveTVChain() : ReferenceCounter("LiveTVChain")
 {
     clear(m_switchentry);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "ctor");
@@ -64,8 +61,8 @@ void LiveTVChain::LoadFromExistingChain(const QString &id)
     ReloadAll();
 }
 
-void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
-                                   QString inputname, bool discont)
+void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
+                                   const QString& inputname, bool discont)
 {
     QMutexLocker lock(&m_lock);
 
@@ -91,7 +88,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     query.bindValue(":CHANID", pginfo->GetChanID());
     query.bindValue(":START", pginfo->GetRecordingStartTime());
     query.bindValue(":END", pginfo->GetRecordingEndTime());
-    query.bindValue(":CHAINID", m_id);
+    query.bindValueNoNull(":CHAINID", m_id);
     query.bindValue(":CHAINPOS", m_maxpos);
     query.bindValue(":DISCONT", discont);
     query.bindValue(":WATCHING", 0);
@@ -236,7 +233,7 @@ void LiveTVChain::ReloadAll(const QStringList &data)
                     MythDate::as_utc(query.value(1).toDateTime());
                 entry.endtime =
                     MythDate::as_utc(query.value(2).toDateTime());
-                entry.discontinuity = query.value(3).toInt();
+                entry.discontinuity = query.value(3).toBool();
                 entry.hostprefix = query.value(5).toString();
                 entry.inputtype = query.value(6).toString();
                 entry.channum = query.value(7).toString();
@@ -373,20 +370,18 @@ int LiveTVChain::GetLengthAtPos(int pos)
     LiveTVChainEntry entry, nextentry;
 
     entry = m_chain[pos];
-    if (pos == ((int)m_chain.count() - 1))
+    if (pos == (m_chain.count() - 1))
     {
         // We're on live program, it hasn't ended. Use current time as end time
         return entry.starttime.secsTo(MythDate::current());
     }
-    else
-    {
-        // use begin time from the following program, as it's certain to be right
-        // the end time is set as per the EPG, but should playback be interrupted
-        // such as a channel change, the end value wouldn't have reflected the actual
-        // duration of the program
-        nextentry = m_chain[pos+1];
-        return entry.starttime.secsTo(nextentry.starttime);
-    }
+
+    // use begin time from the following program, as it's certain to be right
+    // the end time is set as per the EPG, but should playback be interrupted
+    // such as a channel change, the end value wouldn't have reflected the actual
+    // duration of the program
+    nextentry = m_chain[pos+1];
+    return entry.starttime.secsTo(nextentry.starttime);
 }
 
 int LiveTVChain::TotalSize(void) const
@@ -402,12 +397,14 @@ void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
     m_cur_startts = pginfo.GetRecordingStartTime();
 
     m_curpos = ProgramIsAt(pginfo);
+    if (m_curpos < 0)
+        m_curpos = 0;
     m_switchid = -1;
 }
 
 bool LiveTVChain::HasNext(void) const
 {
-    return ((int)m_chain.count() - 1 > m_curpos);
+    return (m_chain.count() - 1 > m_curpos);
 }
 
 void LiveTVChain::ClearSwitch(void)
@@ -465,13 +462,13 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
     {
         // try to find recordings during first pass
         // we'll skip dummy and empty recordings
-        while (!pginfo && newid < (int)m_chain.count() && newid >= 0)
+        while (!pginfo && newid < m_chain.count() && newid >= 0)
         {
             GetEntryAt(newid, entry);
 
             bool at_last_entry =
                 ((newid > curpos) &&
-                 (newid == (int)(m_chain.count()-1))) ||
+                 (newid == m_chain.count()-1)) ||
                 ((newid <= curpos) && (newid == 0));
 
             // Skip dummy recordings, if possible.
@@ -480,7 +477,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
 
             // Skip empty recordings, if possible
             if (pginfo && (0 == pginfo->GetFilesize()) &&
-                newid < (int)(m_chain.count()-1))
+                newid < m_chain.count()-1)
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("Skipping empty program %1")
@@ -507,7 +504,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
 
                 bool at_last_entry =
                     ((newid > curpos) &&
-                     (newid == (int)(m_chain.count()-1))) ||
+                     (newid == m_chain.count()-1)) ||
                     ((newid <= curpos) && (newid == 0));
 
                 // Skip dummy recordings, if possible.
@@ -516,7 +513,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
 
                 // Skip empty recordings, if possible
                 if (pginfo && (0 == pginfo->GetFilesize()) &&
-                    newid < (int)(m_chain.count()-1))
+                    newid < m_chain.count()-1)
                 {
                     LOG(VB_GENERAL, LOG_WARNING,
                         QString("Skipping empty program %1")
@@ -525,7 +522,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                     pginfo = nullptr;
                 }
             }
-            while (!pginfo && newid < (int)m_chain.count() && newid >= 0);
+            while (!pginfo && newid < m_chain.count() && newid >= 0);
 
             if (!pginfo)
             {
@@ -628,7 +625,7 @@ void LiveTVChain::JumpToNext(bool up, int pos)
     {
         QMutexLocker lock(&m_lock);
 
-        int current = m_curpos, switchto;
+        int current = m_curpos, switchto = m_curpos;
         bool discont = false, newtype = false;
 
         while (current >= 0 && current < m_chain.size())
@@ -794,7 +791,7 @@ bool LiveTVChain::entriesFromStringList(const QStringList &items)
             ok = entry.endtime.isValid();
         }
         if (ok && itemIdx < numItems)
-            entry.discontinuity = items[itemIdx++].toInt(&ok);
+            entry.discontinuity = (items[itemIdx++].toInt(&ok) != 0);
         if (ok && itemIdx < numItems)
             entry.hostprefix = items[itemIdx++];
         if (ok && itemIdx < numItems)

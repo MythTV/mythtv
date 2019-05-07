@@ -27,7 +27,7 @@ class MBASE_PUBLIC HardwareProfile : public QObject
     void GenerateUUIDs(void);
 
     QString GetPrivateUUIDFromFile(void) const;
-    bool WritePrivateUUIDToFile(QString uuid);
+    bool WritePrivateUUIDToFile(const QString &uuid);
     QString GetPublicUUIDFromFile(void) const;
     QString GetAdminPasswordFromFile(void) const;
 
@@ -42,7 +42,7 @@ class MBASE_PUBLIC HardwareProfile : public QObject
     QString   GetHardwareProfile(void) const;
 
   private:
-    bool      m_enabled;
+    bool      m_enabled {false};
     QString   m_uuid;
     QString   m_publicuuid;
     QDateTime m_lastUpdate;
@@ -58,8 +58,8 @@ class MBASE_PUBLIC HardwareProfileTask : public PeriodicHouseKeeperTask
                                             1.03333f, // up to one day late
                                             86400, // retry daily on error
                                             kHKLocal, kHKRunOnStartup) {}
-    virtual bool DoCheckRun(QDateTime now);
-    virtual bool DoRun(void);
+    bool DoCheckRun(QDateTime now) override; // HouseKeeperTask
+    bool DoRun(void) override; // HouseKeeperTask
   private:
 
 };

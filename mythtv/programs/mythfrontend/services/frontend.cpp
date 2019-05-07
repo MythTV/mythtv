@@ -289,7 +289,7 @@ QStringList Frontend::GetContextList(void)
     return gActionDescriptions.keys();
 }
 
-DTC::FrontendActionList* Frontend::GetActionList(const QString &Context)
+DTC::FrontendActionList* Frontend::GetActionList(const QString &lContext)
 {
     DTC::FrontendActionList *list = new DTC::FrontendActionList();
 
@@ -299,7 +299,7 @@ DTC::FrontendActionList* Frontend::GetActionList(const QString &Context)
     while (contexts.hasNext())
     {
         contexts.next();
-        if (!Context.isEmpty() && contexts.key() != Context)
+        if (!lContext.isEmpty() && contexts.key() != lContext)
             continue;
 
         // TODO can we keep the context data with QMap<QString, QStringList>?
@@ -373,7 +373,7 @@ void Frontend::InitialiseActions(void)
 bool Frontend::SendKey(const QString &sKey)
 {
     int keyCode;
-    int ret = false;
+    bool ret = false;
     QObject *keyDest = nullptr;
     QKeyEvent *event = nullptr;
     QMap <QString, int> keyMap;
@@ -471,7 +471,7 @@ bool Frontend::SendKey(const QString &sKey)
     }
     else if (sKey.size() == 1)
         {
-            keyCode = (int) sKey.toLatin1().data()[0] & 0x7f;
+            keyCode = (int) sKey.toLatin1()[0] & 0x7f;
             ret = true;
         }
     else

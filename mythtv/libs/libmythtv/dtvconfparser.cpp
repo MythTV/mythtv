@@ -41,40 +41,34 @@
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \
-    if (it == tokens.end()) return false; else ++it; } while(0)
+    if (it == tokens.end()) return false; ++it; } while(false)
 
 #define PARSE_CONF(VAR) do { \
-    if (it == tokens.end() || !VAR.ParseConf(*it++)) \
-        return false; } while(0)
+    if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
+        return false; } while(false)
 
 #define PARSE_STR(VAR) do { \
-    if (it != tokens.end()) VAR = *it++; else return false; } while(0)
+    if (it != tokens.end()) (VAR) = *it++; else return false; } while(false)
 
 #define PARSE_UINT(VAR) do { \
     if (it != tokens.end()) \
-         VAR = (*it++).toUInt(); else return false; } while(0)
+         (VAR) = (*it++).toUInt(); else return false; } while(false)
 
 #define PARSE_UINT_1000(VAR) do { \
     if (it != tokens.end()) \
-         VAR = (*it++).toUInt() * 1000ULL; else return false; } while(0)
+         (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(false)
 
 
 QString DTVChannelInfo::toString() const
 {
-    return QString("%1 %2 %3 ").arg(name).arg(serviceid).arg(lcn);
-}
-
-DTVConfParser::DTVConfParser(enum cardtype_t _type, uint _sourceid,
-                             const QString &_file)
-    : type(_type), sourceid(_sourceid), filename(_file)
-{
+    return QString("%1 %2 %3 ").arg(m_name).arg(m_serviceid).arg(m_lcn);
 }
 
 DTVConfParser::return_t DTVConfParser::Parse(void)
 {
-    channels.clear();
+    m_channels.clear();
 
-    QFile file(filename);
+    QFile file(m_filename);
     if (!file.open(QIODevice::ReadOnly))
         return ERROR_OPEN;
 
@@ -90,7 +84,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         QStringList list = line.split(":", QString::SkipEmptyParts);
 
-        if (list.size() < 1)
+        if (list.empty())
             continue;
 
         QString str = list[0];
@@ -110,20 +104,20 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         if ((str == "T") || (str == "C") || (str == "S"))
         {
-            if ((type == OFDM) && (str == "T"))
+            if ((m_type == OFDM) && (str == "T"))
                 ok &= ParseVDR(list, channelNo);
-            else if ((type == QPSK || type == DVBS2) && (str == "S"))
+            else if ((m_type == QPSK || m_type == DVBS2) && (str == "S"))
                 ok &= ParseVDR(list, channelNo);
-            else if ((type == QAM) && (str == "C"))
+            else if ((m_type == QAM) && (str == "C"))
                 ok &= ParseVDR(list, channelNo);
         }
-        else if (type == OFDM)
+        else if (m_type == OFDM)
             ok &= ParseConfOFDM(list);
-        else if (type == ATSC)
+        else if (m_type == ATSC)
             ok &= ParseConfATSC(list);
-        else if (type == QPSK || type == DVBS2)
+        else if (m_type == QPSK || m_type == DVBS2)
             ok &= ParseConfQPSK(list);
-        else if (type == QAM)
+        else if (m_type == QAM)
             ok &= ParseConfQAM(list);
     }
     file.close();
@@ -139,18 +133,18 @@ bool DTVConfParser::ParseConfOFDM(const QStringList &tokens)
     QStringList::const_iterator it = tokens.begin();
 
     PARSE_SKIP(unknown);
-    PARSE_UINT(mux.frequency);
-    PARSE_CONF(mux.inversion);
-    PARSE_CONF(mux.bandwidth);
-    PARSE_CONF(mux.hp_code_rate);
-    PARSE_CONF(mux.lp_code_rate);
-    PARSE_CONF(mux.modulation);
-    PARSE_CONF(mux.trans_mode);
-    PARSE_CONF(mux.guard_interval);
-    PARSE_CONF(mux.hierarchy);
+    PARSE_UINT(mux.m_frequency);
+    PARSE_CONF(mux.m_inversion);
+    PARSE_CONF(mux.m_bandwidth);
+    PARSE_CONF(mux.m_hp_code_rate);
+    PARSE_CONF(mux.m_lp_code_rate);
+    PARSE_CONF(mux.m_modulation);
+    PARSE_CONF(mux.m_trans_mode);
+    PARSE_CONF(mux.m_guard_interval);
+    PARSE_CONF(mux.m_hierarchy);
     PARSE_SKIP(unknown);
     PARSE_SKIP(unknown);
-    PARSE_UINT(chan.serviceid);
+    PARSE_UINT(chan.m_serviceid);
 
     AddChannel(mux, chan);
 
@@ -164,12 +158,12 @@ bool DTVConfParser::ParseConfATSC(const QStringList &tokens)
 
     QStringList::const_iterator it = tokens.begin();
 
-    PARSE_STR(chan.name);
-    PARSE_UINT(mux.frequency);
-    PARSE_CONF(mux.modulation);
+    PARSE_STR(chan.m_name);
+    PARSE_UINT(mux.m_frequency);
+    PARSE_CONF(mux.m_modulation);
     PARSE_SKIP(Ignore_Video_PID);
     PARSE_SKIP(Ignore_Audio_PID);
-    PARSE_UINT(chan.serviceid);
+    PARSE_UINT(chan.m_serviceid);
 
     AddChannel(mux, chan);
 
@@ -184,14 +178,14 @@ bool DTVConfParser::ParseConfQAM(const QStringList &tokens)
     QStringList::const_iterator it = tokens.begin();
 
     PARSE_SKIP(unknown);
-    PARSE_UINT(mux.frequency);
-    PARSE_CONF(mux.inversion);
-    PARSE_UINT(mux.symbolrate);
-    PARSE_CONF(mux.fec);
-    PARSE_CONF(mux.modulation);
+    PARSE_UINT(mux.m_frequency);
+    PARSE_CONF(mux.m_inversion);
+    PARSE_UINT(mux.m_symbolrate);
+    PARSE_CONF(mux.m_fec);
+    PARSE_CONF(mux.m_modulation);
     PARSE_SKIP(unknown);
     PARSE_SKIP(unknown);
-    PARSE_UINT(chan.serviceid);
+    PARSE_UINT(chan.m_serviceid);
 
     AddChannel(mux, chan);
 
@@ -205,14 +199,14 @@ bool DTVConfParser::ParseConfQPSK(const QStringList &tokens)
 
     QStringList::const_iterator it = tokens.begin();
 
-    PARSE_STR(chan.name);
-    PARSE_UINT_1000(mux.frequency);
-    PARSE_CONF(mux.polarity);
+    PARSE_STR(chan.m_name);
+    PARSE_UINT_1000(mux.m_frequency);
+    PARSE_CONF(mux.m_polarity);
     PARSE_SKIP(Satelite_Number);
-    PARSE_UINT_1000(mux.symbolrate);
+    PARSE_UINT_1000(mux.m_symbolrate);
     PARSE_SKIP(unknown);
     PARSE_SKIP(unknown);
-    PARSE_UINT(chan.serviceid);
+    PARSE_UINT(chan.m_serviceid);
 
     AddChannel(mux, chan);
 
@@ -226,13 +220,13 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
 
     QStringList::const_iterator it = tokens.begin();
 
-    chan.lcn = channelNo;
+    chan.m_lcn = channelNo;
 
 // BBC ONE:754166:I999B8C34D34M16T2G32Y0:T:27500:600:601, 602:0:0:4168:0:0:0
 
     PARSE_SKIP(unknown);
 
-    PARSE_UINT_1000(mux.frequency);
+    PARSE_UINT_1000(mux.m_frequency);
 
     if (it == tokens.end())
         return false;
@@ -246,40 +240,40 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
         switch (s)
         {
             case 'I':
-                mux.inversion.ParseVDR(params);
+                mux.m_inversion.ParseVDR(params);
                 break;
             case 'B':
-                mux.bandwidth.ParseVDR(params);
+                mux.m_bandwidth.ParseVDR(params);
                 break;
             case 'C':
-                mux.hp_code_rate.ParseVDR(params);
+                mux.m_hp_code_rate.ParseVDR(params);
                 break;
             case 'D':
-                mux.lp_code_rate.ParseVDR(params);
+                mux.m_lp_code_rate.ParseVDR(params);
                 break;
             case 'M':
-                mux.modulation.ParseVDR(params);
+                mux.m_modulation.ParseVDR(params);
                 break;
             case 'T':
-                mux.trans_mode.ParseVDR(params);
+                mux.m_trans_mode.ParseVDR(params);
                 break;
             case 'G':
-                mux.guard_interval.ParseVDR(params);
+                mux.m_guard_interval.ParseVDR(params);
                 break;
             case 'Y':
-                mux.hierarchy.ParseVDR(params);
+                mux.m_hierarchy.ParseVDR(params);
                 break;
             case 'V':
             case 'H':
             case 'R':
             case 'L':
-                mux.polarity.ParseVDR(ori);
+                mux.m_polarity.ParseVDR(ori);
                 break;
             case 'S':
-                mux.mod_sys.ParseVDR(params);
+                mux.m_mod_sys.ParseVDR(params);
                 break;
             case 'O':
-                mux.rolloff.ParseVDR(params);
+                mux.m_rolloff.ParseVDR(params);
                 break;
             default:
                 return false;
@@ -289,7 +283,7 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
     for (uint i = 0; i < 6; i++)
         PARSE_SKIP(unknown);
 
-    PARSE_UINT(chan.serviceid);
+    PARSE_UINT(chan.m_serviceid);
 
     AddChannel(mux, chan);
 
@@ -298,11 +292,11 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
 
 void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
 {
-    for (uint i = 0; i < channels.size(); i++)
+    for (size_t i = 0; i < m_channels.size(); i++)
     {
-        if (channels[i] == mux)
+        if (m_channels[i] == mux)
         {
-            channels[i].channels.push_back(chan);
+            m_channels[i].channels.push_back(chan);
 
             LOG(VB_GENERAL, LOG_INFO, "Imported channel: " + chan.toString() +
                     " on " + mux.toString());
@@ -310,8 +304,8 @@ void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
         }
     }
 
-    channels.push_back(DTVTransport(mux));
-    channels.back().channels.push_back(chan);
+    m_channels.push_back(DTVTransport(mux));
+    m_channels.back().channels.push_back(chan);
 
     LOG(VB_GENERAL, LOG_INFO, "Imported channel: " + chan.toString() +
             " on " + mux.toString());

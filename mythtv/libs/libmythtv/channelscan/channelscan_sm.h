@@ -73,10 +73,10 @@ class AnalogSignalHandler : public SignalMonitorListener
     explicit AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
 
   public:
-    virtual inline void AllGood(void);
-    virtual void StatusSignalLock(const SignalMonitorValue&) { }
-    virtual void StatusChannelTuned(const SignalMonitorValue&) { }
-    virtual void StatusSignalStrength(const SignalMonitorValue&) { }
+    inline void AllGood(void) override; // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
 
   private:
     ChannelScanSM *siscan;
@@ -101,11 +101,11 @@ class ChannelScanSM : public MPEGStreamListener,
     void StopScanner(void);
 
     bool ScanTransports(
-        int src, const QString &std, const QString &mod, const QString &table,
+        int SourceID, const QString &std, const QString &mod, const QString &country,
         const QString &table_start = QString(),
         const QString &table_end   = QString());
     bool ScanTransportsStartingOn(
-        int sourceid, const QMap<QString,QString> &valueMap);
+        int sourceid, const QMap<QString,QString> &startChan);
     bool ScanTransport(uint mplexid, bool follow_nit);
     bool ScanCurrentTransport(const QString &sistandard);
     bool ScanForChannels(
@@ -136,25 +136,25 @@ class ChannelScanSM : public MPEGStreamListener,
     ScanDTVTransportList GetChannelList(bool addFullTS) const;
 
     // MPEG
-    void HandlePAT(const ProgramAssociationTable*);
-    void HandleCAT(const ConditionalAccessTable*) { }
-    void HandlePMT(uint, const ProgramMapTable*);
-    void HandleEncryptionStatus(uint pnum, bool encrypted);
+    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable*) override { } // MPEGStreamListener
+    void HandlePMT(uint, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandleEncryptionStatus(uint pnum, bool encrypted) override; // MPEGStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) {}
-    void HandleMGT(const MasterGuideTable*);
-    void HandleVCT(uint tsid, const VirtualChannelTable*);
+    void HandleSTT(const SystemTimeTable*) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable*) override; // ATSCMainStreamListener
+    void HandleVCT(uint tsid, const VirtualChannelTable*) override; // ATSCMainStreamListener
 
     // DVB Main
-    void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
-    void HandleTDT(const TimeDateTable*) {}
+    void HandleNIT(const NetworkInformationTable*) override; // DVBMainStreamListener
+    void HandleSDT(uint tsid, const ServiceDescriptionTable*) override; // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable*) override {} // DVBMainStreamListener
 
     // DVB Other
-    void HandleNITo(const NetworkInformationTable*) {}
-    void HandleSDTo(uint tsid, const ServiceDescriptionTable*);
-    void HandleBAT(const BouquetAssociationTable*);
+    void HandleNITo(const NetworkInformationTable*) override {} // DVBOtherStreamListener
+    void HandleSDTo(uint tsid, const ServiceDescriptionTable*) override; // DVBOtherStreamListener
+    void HandleBAT(const BouquetAssociationTable*) override; // DVBOtherStreamListener
 
   private:
     // some useful gets
@@ -165,7 +165,7 @@ class ChannelScanSM : public MPEGStreamListener,
     DVBChannel       *GetDVBChannel(void);
     const DVBChannel *GetDVBChannel(void) const;
 
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);
@@ -210,49 +210,49 @@ class ChannelScanSM : public MPEGStreamListener,
     int               m_sourceID;
     uint              m_signalTimeout;
     uint              m_channelTimeout;
-    uint              m_otherTableTimeout;
-    uint              m_otherTableTime;
-    bool              m_setOtherTables;
+    uint              m_otherTableTimeout {0};
+    uint              m_otherTableTime    {0};
+    bool              m_setOtherTables    {false};
     QString           m_inputName;
     bool              m_testDecryption;
-    bool              m_extendScanList;
+    bool              m_extendScanList    {false};
 
     // Optional info
-    DTVTunerType      m_scanDTVTunerType;
+    DTVTunerType      m_scanDTVTunerType  {DTVTunerType::kTunerTypeUnknown};
 
     /// The big lock
     mutable QMutex    m_lock;
 
     // State
-    bool              m_scanning;
-    volatile bool     m_threadExit;
-    bool              m_waitingForTables;
+    bool              m_scanning          {false};
+    volatile bool     m_threadExit        {false};
+    bool              m_waitingForTables  {false};
     QTime             m_timer;
 
     // Transports List
-    int                         m_transportsScanned;
+    int                         m_transportsScanned {0};
     QSet<uint32_t>              m_tsScanned;
     QMap<uint32_t,DTVMultiplex> m_extendTransports;
     transport_scan_items_t      m_scanTransports;
     transport_scan_items_it_t   m_current;
     transport_scan_items_it_t   m_nextIt;
-    bool                        m_currentTestingDecryption;
+    bool                        m_currentTestingDecryption {false};
     QMap<uint, uint>            m_currentEncryptionStatus;
     QMap<uint, bool>            m_currentEncryptionStatusChecked;
     QMap<uint64_t, QString>     m_defAuthorities;
     bool                        m_dvbt2Tried;
 
     /// Found Channel Info
-    ChannelList       m_channelList;
-    uint              m_channelsFound;
-    ScannedChannelInfo *m_currentInfo;
+    ChannelList          m_channelList;
+    uint                 m_channelsFound       {999};
+    ScannedChannelInfo  *m_currentInfo         {nullptr};
 
     // Analog Info
-    AnalogSignalHandler *m_analogSignalHandler;
+    AnalogSignalHandler *m_analogSignalHandler {nullptr};
 
     /// Scanner thread, runs ChannelScanSM::run()
-    MThread          *m_scannerThread;
-    QMutex           m_mutex;
+    MThread             *m_scannerThread       {nullptr};
+    QMutex               m_mutex;
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

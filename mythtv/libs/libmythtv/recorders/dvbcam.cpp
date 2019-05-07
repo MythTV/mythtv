@@ -57,16 +57,12 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "mythlogging.h"
 
-#define LOC QString("DVB#%1 CA: ").arg(device)
+#define LOC QString("DVB#%1 CA: ").arg(m_device)
 
 DVBCam::DVBCam(const QString &aDevice)
-    : device(aDevice),        numslots(0),
-      ciHandlerDoRun(false),  ciHandlerRunning(false),
-      ciHandler(nullptr),     ciHandlerThread(nullptr),
-      have_pmt(false),        pmt_sent(false),
-      pmt_updated(false),     pmt_added(false)
+    : m_device(aDevice)
 {
-    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, m_device);
     QByteArray dev = dvbdev.toLatin1();
     int cafd = open(dev.constData(), O_RDWR);
     if (cafd >= 0)
@@ -74,7 +70,7 @@ DVBCam::DVBCam(const QString &aDevice)
         ca_caps_t caps;
         // slot_num will be uninitialised if ioctl fails
         if (ioctl(cafd, CA_GET_CAP, &caps) >= 0)
-            numslots = caps.slot_num;
+            m_numslots = caps.slot_num;
         else
             LOG(VB_GENERAL, LOG_ERR, "ioctl CA_GET_CAP failed: " + ENO);
 
@@ -89,74 +85,74 @@ DVBCam::~DVBCam()
 
 bool DVBCam::Start(void)
 {
-    if (numslots == 0)
+    if (m_numslots == 0)
         return false;
 
-    have_pmt     = false;
-    pmt_sent     = false;
-    pmt_updated  = false;
-    pmt_added    = false;
+    m_havePmt    = false;
+    m_pmtSent    = false;
+    m_pmtUpdated = false;
+    m_pmtAdded   = false;
 
-    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, m_device);
     QByteArray dev = dvbdev.toLatin1();
-    ciHandler = cCiHandler::CreateCiHandler(dev.constData());
-    if (!ciHandler)
+    m_ciHandler = cCiHandler::CreateCiHandler(dev.constData());
+    if (!m_ciHandler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialize CI handler");
         return false;
     }
 
-    QMutexLocker locker(&ciHandlerLock);
-    ciHandlerDoRun = true;
-    ciHandlerThread = new MThread("DVBCam", this);
-    ciHandlerThread->start();
-    while (ciHandlerDoRun && !ciHandlerRunning)
-        ciHandlerWait.wait(locker.mutex(), 1000);
+    QMutexLocker locker(&m_ciHandlerLock);
+    m_ciHandlerDoRun = true;
+    m_ciHandlerThread = new MThread("DVBCam", this);
+    m_ciHandlerThread->start();
+    while (m_ciHandlerDoRun && !m_ciHandlerRunning)
+        m_ciHandlerWait.wait(locker.mutex(), 1000);
 
-    if (ciHandlerRunning)
+    if (m_ciHandlerRunning)
         LOG(VB_DVBCAM, LOG_INFO, LOC + "CI handler successfully initialized!");
 
-    return ciHandlerRunning;
+    return m_ciHandlerRunning;
 }
 
 bool DVBCam::Stop(void)
 {
     {
-        QMutexLocker locker(&ciHandlerLock);
-        if (ciHandlerRunning)
+        QMutexLocker locker(&m_ciHandlerLock);
+        if (m_ciHandlerRunning)
         {
-            ciHandlerDoRun = false;
+            m_ciHandlerDoRun = false;
             locker.unlock();
-            ciHandlerThread->wait();
+            m_ciHandlerThread->wait();
             locker.relock();
-            delete ciHandlerThread;
-            ciHandlerThread = nullptr;
+            delete m_ciHandlerThread;
+            m_ciHandlerThread = nullptr;
         }
 
-        if (ciHandler)
+        if (m_ciHandler)
         {
-            delete ciHandler;
-            ciHandler = nullptr;
+            delete m_ciHandler;
+            m_ciHandler = nullptr;
         }
     }
 
-    QMutexLocker locker(&pmt_lock);
+    QMutexLocker locker(&m_pmtLock);
     pmt_list_t::iterator it;
 
-    for (it = PMTList.begin(); it != PMTList.end(); ++it)
+    for (it = m_pmtList.begin(); it != m_pmtList.end(); ++it)
         delete *it;
-    PMTList.clear();
+    m_pmtList.clear();
 
-    for (it = PMTAddList.begin(); it != PMTAddList.end(); ++it)
+    for (it = m_pmtAddList.begin(); it != m_pmtAddList.end(); ++it)
         delete *it;
-    PMTAddList.clear();
+    m_pmtAddList.clear();
 
     return true;
 }
 
 void DVBCam::HandleUserIO(void)
 {
-    cCiEnquiry* enq = ciHandler->GetEnquiry();
+    cCiEnquiry* enq = m_ciHandler->GetEnquiry();
     if (enq != nullptr)
     {
         if (enq->Text() != nullptr)
@@ -165,7 +161,7 @@ void DVBCam::HandleUserIO(void)
         delete enq;
     }
 
-    cCiMenu* menu = ciHandler->GetMenu();
+    cCiMenu* menu = m_ciHandler->GetMenu();
     if (menu != nullptr)
     {
         if (menu->TitleText() != nullptr)
@@ -205,41 +201,41 @@ void DVBCam::HandleUserIO(void)
 void DVBCam::HandlePMT(void)
 {
     LOG(VB_DVBCAM, LOG_INFO, LOC + "CiHandler needs CA_PMT");
-    QMutexLocker locker(&pmt_lock);
+    QMutexLocker locker(&m_pmtLock);
 
-    if (pmt_sent && pmt_added && !pmt_updated)
+    if (m_pmtSent && m_pmtAdded && !m_pmtUpdated)
     {
         // Send added PMT
-        while (PMTAddList.size() > 0)
+        while (!m_pmtAddList.empty())
         {
-            pmt_list_t::iterator it = PMTAddList.begin();
+            pmt_list_t::iterator it = m_pmtAddList.begin();
             const ChannelBase *chan = it.key();
             ProgramMapTable *pmt = (*it);
-            PMTList[chan] = pmt;
-            PMTAddList.erase(it);
+            m_pmtList[chan] = pmt;
+            m_pmtAddList.erase(it);
             SendPMT(*pmt, CPLM_ADD);
         }
 
-        pmt_updated = false;
-        pmt_added   = false;
+        m_pmtUpdated = false;
+        m_pmtAdded   = false;
         return;
     }
 
     // Grab any added PMT
-    while (PMTAddList.size() > 0)
+    while (!m_pmtAddList.empty())
     {
-        pmt_list_t::iterator it = PMTAddList.begin();
+        pmt_list_t::iterator it = m_pmtAddList.begin();
         const ChannelBase *chan = it.key();
         ProgramMapTable *pmt = (*it);
-        PMTList[chan] = pmt;
-        PMTAddList.erase(it);
+        m_pmtList[chan] = pmt;
+        m_pmtAddList.erase(it);
     }
 
-    uint length = PMTList.size();
+    uint length = m_pmtList.size();
     uint count  = 0;
 
     pmt_list_t::const_iterator pmtit;
-    for (pmtit = PMTList.begin(); pmtit != PMTList.end(); ++pmtit)
+    for (pmtit = m_pmtList.begin(); pmtit != m_pmtList.end(); ++pmtit)
     {
         uint cplm = (count     == 0)      ? CPLM_FIRST : CPLM_MORE;
         cplm      = (count + 1 == length) ? CPLM_LAST  : cplm;
@@ -250,78 +246,78 @@ void DVBCam::HandlePMT(void)
         count++;
     }
 
-    pmt_sent    = true;
-    pmt_updated = false;
-    pmt_added   = false;
+    m_pmtSent    = true;
+    m_pmtUpdated = false;
+    m_pmtAdded   = false;
 }
 
 void DVBCam::run(void)
 {
     LOG(VB_DVBCAM, LOG_INFO, LOC + "CI handler thread running");
 
-    QMutexLocker locker(&ciHandlerLock);
-    ciHandlerRunning = true;
+    QMutexLocker locker(&m_ciHandlerLock);
+    m_ciHandlerRunning = true;
 
-    while (ciHandlerDoRun)
+    while (m_ciHandlerDoRun)
     {
         locker.unlock();
-        if (ciHandler->Process())
+        if (m_ciHandler->Process())
         {
-            if (ciHandler->HasUserIO())
+            if (m_ciHandler->HasUserIO())
                 HandleUserIO();
 
-            bool handle_pmt  = pmt_sent && (pmt_updated || pmt_added);
-            handle_pmt      |= have_pmt && ciHandler->NeedCaPmt();
+            bool handle_pmt  = m_pmtSent && (m_pmtUpdated || m_pmtAdded);
+            handle_pmt      |= m_havePmt && m_ciHandler->NeedCaPmt();
 
             if (handle_pmt)
                 HandlePMT();
         }
         locker.relock();
-        ciHandlerWait.wait(locker.mutex(), 10);
+        m_ciHandlerWait.wait(locker.mutex(), 10);
     }
 
-    ciHandlerRunning = false;
+    m_ciHandlerRunning = false;
     LOG(VB_DVBCAM, LOG_INFO, LOC + "CiHandler thread stopped");
 }
 
 void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
 {
-    QMutexLocker locker(&pmt_lock);
+    QMutexLocker locker(&m_pmtLock);
 
-    pmt_list_t::iterator it = PMTList.find(chan);
-    pmt_list_t::iterator it2 = PMTAddList.find(chan);
-    if (!pmt && (it != PMTList.end()))
+    pmt_list_t::iterator it = m_pmtList.find(chan);
+    pmt_list_t::iterator it2 = m_pmtAddList.find(chan);
+    if (!pmt && (it != m_pmtList.end()))
     {
         delete *it;
-        PMTList.erase(it);
-        pmt_updated = true;
+        m_pmtList.erase(it);
+        m_pmtUpdated = true;
     }
-    else if (!pmt && (it2 != PMTAddList.end()))
+    else if (!pmt && (it2 != m_pmtAddList.end()))
     {
         delete *it2;
-        PMTAddList.erase(it2);
-        pmt_added = !PMTAddList.empty();
+        m_pmtAddList.erase(it2);
+        m_pmtAdded = !m_pmtAddList.empty();
     }
-    else if (pmt && (PMTList.empty() || (it != PMTList.end())))
+    else if (pmt && (m_pmtList.empty() || (it != m_pmtList.end())))
     {
-        if (it != PMTList.end())
+        if (it != m_pmtList.end())
             delete *it;
-        PMTList[chan] = new ProgramMapTable(*pmt);
-        have_pmt    = true;
-        pmt_updated = true;
+        m_pmtList[chan] = new ProgramMapTable(*pmt);
+        m_havePmt    = true;
+        m_pmtUpdated = true;
     }
-    else if (pmt && (it == PMTList.end()))
+    else if (pmt && (it == m_pmtList.end()))
     {
-        PMTAddList[chan] = new ProgramMapTable(*pmt);
-        pmt_added = true;
+        m_pmtAddList[chan] = new ProgramMapTable(*pmt);
+        m_pmtAdded = true;
     }
 }
 
 void DVBCam::SetTimeOffset(double offset_in_seconds)
 {
-    QMutexLocker locker(&ciHandlerLock);
-    if (ciHandler)
-        ciHandler->SetTimeOffset(offset_in_seconds);
+    QMutexLocker locker(&m_ciHandlerLock);
+    if (m_ciHandler)
+        m_ciHandler->SetTimeOffset(offset_in_seconds);
 }
 
 static const char *cplm_info[] =
@@ -334,7 +330,7 @@ static const char *cplm_info[] =
     "CPLM_UPDATE"
 };
 
-cCiCaPmt CreateCAPMT(const ProgramMapTable&, const unsigned short*, uint);
+cCiCaPmt CreateCAPMT(const ProgramMapTable& /*pmt*/, const unsigned short* /*casids*/, uint /*cplm*/);
 
 /*
  * Send a CA_PMT object to the CAM (see EN50221, section 8.4.3.4)
@@ -343,9 +339,9 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
 {
     bool success = false;
 
-    for (uint s = 0; s < (uint)ciHandler->NumSlots(); s++)
+    for (uint s = 0; s < (uint)m_ciHandler->NumSlots(); s++)
     {
-        const unsigned short *casids = ciHandler->GetCaSystemIds(s);
+        const unsigned short *casids = m_ciHandler->GetCaSystemIds(s);
 
         if (!casids)
         {
@@ -373,7 +369,7 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
             QString("Sending CA_PMT with %1 to CI slot #%2")
                 .arg(cplm_info[cplm]).arg(s));
 
-        if (!ciHandler->SetCaPmt(capmt, s))
+        if (!m_ciHandler->SetCaPmt(capmt, s))
             LOG(success ? VB_DVBCAM : VB_GENERAL, LOG_ERR,
                 LOC + "CA_PMT send failed!");
         else
@@ -391,7 +387,7 @@ static void process_desc(cCiCaPmt &capmt,
         ConditionalAccessDescriptor cad(*it);
         for (uint q = 0; casids[q]; q++)
         {
-            if (cad.SystemID() != casids[q])
+            if (!cad.IsValid() || cad.SystemID() != casids[q])
                 continue;
 
             LOG(VB_DVBCAM, LOG_INFO, QString("DVBCam: Adding CA descriptor: "

@@ -34,24 +34,9 @@ using namespace std;
 static int format_to_mode(const QString &fmt);
 static QString mode_to_format(int mode);
 
-V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice,
-                       const QString &audiodevice)
-    : DTVChannel(parent),           device(videodevice),
-      audio_device(audiodevice),    videofd(-1),
-      device_name(),                driver_name(),
-      curList(nullptr),             totalChannels(0),
-      has_stream_io(false),         has_std_io(false),
-      has_async_io(false),
-      has_tuner(false),             has_sliced_vbi(false),
-
-      defaultFreqTable(1),
-      m_inputNumV4L(0),             m_videoModeV4L2(0)
-{
-}
-
 V4LChannel::~V4LChannel(void)
 {
-    Close();
+    V4LChannel::Close();
 }
 
 bool V4LChannel::Init(QString &startchannel, bool setchan)
@@ -69,19 +54,19 @@ bool V4LChannel::Open(void)
 #if FAKE_VIDEO
     return true;
 #endif
-    if (videofd >= 0)
+    if (m_videofd >= 0)
         return true;
 
-    QByteArray ascii_device = device.toLatin1();
-    videofd = open(ascii_device.constData(), O_RDWR);
-    if (videofd < 0)
+    QByteArray ascii_device = m_device.toLatin1();
+    m_videofd = open(ascii_device.constData(), O_RDWR);
+    if (m_videofd < 0)
     {
          LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device." + ENO);
          return false;
     }
 
     uint32_t version, capabilities;
-    if (!CardUtil::GetV4LInfo(videofd, device_name, driver_name,
+    if (!CardUtil::GetV4LInfo(m_videofd, m_device_name, m_driver_name,
                               version, capabilities))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to query capabilities." + ENO);
@@ -89,24 +74,24 @@ bool V4LChannel::Open(void)
         return false;
     }
 
-    has_stream_io  = !!(capabilities & V4L2_CAP_STREAMING);
-    has_std_io     = !!(capabilities & V4L2_CAP_READWRITE);
-    has_async_io   = !!(capabilities & V4L2_CAP_ASYNCIO);
-    has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
-    has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
+    m_has_stream_io  = ((capabilities & V4L2_CAP_STREAMING)          != 0U);
+    m_has_std_io     = ((capabilities & V4L2_CAP_READWRITE)          != 0U);
+    m_has_async_io   = ((capabilities & V4L2_CAP_ASYNCIO)            != 0U);
+    m_has_tuner      = ((capabilities & V4L2_CAP_TUNER)              != 0U);
+    m_has_sliced_vbi = ((capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) != 0U);
 
-    if (driver_name == "bttv" || driver_name == "cx8800" || driver_name == "cx88_blackbird"
-        || driver_name == "saa7164")
-        has_stream_io = false; // driver workaround, see #9825, #10519 and #12336
+    if (m_driver_name == "bttv" || m_driver_name == "cx8800" || m_driver_name == "cx88_blackbird"
+        || m_driver_name == "saa7164")
+        m_has_stream_io = false; // driver workaround, see #9825, #10519 and #12336
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Device name '%1' driver '%2'.")
-            .arg(device_name).arg(driver_name));
+            .arg(m_device_name).arg(m_driver_name));
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("v4l2: stream io: %2 std io: %3 async io: %4 "
                 "tuner %5 sliced vbi %6")
-            .arg(has_stream_io).arg(has_std_io).arg(has_async_io)
-            .arg(has_tuner).arg(has_sliced_vbi));
+            .arg(m_has_stream_io).arg(m_has_std_io).arg(m_has_async_io)
+            .arg(m_has_tuner).arg(m_has_sliced_vbi));
 
     if (!InitializeInputs())
     {
@@ -121,50 +106,50 @@ bool V4LChannel::Open(void)
 
 void V4LChannel::Close(void)
 {
-    if (videofd >= 0)
-        close(videofd);
-    videofd = -1;
+    if (m_videofd >= 0)
+        close(m_videofd);
+    m_videofd = -1;
 }
 
 void V4LChannel::SetFd(int fd)
 {
-    if (fd != videofd)
+    if (fd != m_videofd)
         Close();
-    videofd = (fd >= 0) ? fd : -1;
+    m_videofd = (fd >= 0) ? fd : -1;
 }
 
 static int format_to_mode(const QString &fmt)
 {
     if (fmt == "PAL-BG")
         return V4L2_STD_PAL_BG;
-    else if (fmt == "PAL-D")
+    if (fmt == "PAL-D")
         return V4L2_STD_PAL_D;
-    else if (fmt == "PAL-DK")
+    if (fmt == "PAL-DK")
         return V4L2_STD_PAL_DK;
-    else if (fmt == "PAL-I")
+    if (fmt == "PAL-I")
         return V4L2_STD_PAL_I;
-    else if (fmt == "PAL-60")
+    if (fmt == "PAL-60")
         return V4L2_STD_PAL_60;
-    else if (fmt == "SECAM")
+    if (fmt == "SECAM")
         return V4L2_STD_SECAM;
-    else if (fmt == "SECAM-D")
+    if (fmt == "SECAM-D")
         return V4L2_STD_SECAM_D;
-    else if (fmt == "SECAM-DK")
-            return V4L2_STD_SECAM_DK;
-    else if (fmt == "PAL-NC")
+    if (fmt == "SECAM-DK")
+        return V4L2_STD_SECAM_DK;
+    if (fmt == "PAL-NC")
         return V4L2_STD_PAL_Nc;
-    else if (fmt == "PAL-M")
+    if (fmt == "PAL-M")
         return V4L2_STD_PAL_M;
-    else if (fmt == "PAL-N")
+    if (fmt == "PAL-N")
         return V4L2_STD_PAL_N;
-    else if (fmt == "NTSC-JP")
+    if (fmt == "NTSC-JP")
         return V4L2_STD_NTSC_M_JP;
         // generics...
-    else if (fmt.startsWith("NTSC"))
+    if (fmt.startsWith("NTSC"))
         return V4L2_STD_NTSC;
-    else if (fmt.startsWith("ATSC"))
+    if (fmt.startsWith("ATSC"))
         return V4L2_STD_NTSC; // We've dropped V4L ATSC support...
-    else if (fmt.startsWith("PAL"))
+    if (fmt.startsWith("PAL"))
         return V4L2_STD_PAL;
     return V4L2_STD_NTSC;
 }
@@ -173,54 +158,54 @@ static QString mode_to_format(int mode)
 {
     if (mode == V4L2_STD_NTSC)
         return "NTSC";
-    else if (mode == V4L2_STD_NTSC_M_JP)
+    if (mode == V4L2_STD_NTSC_M_JP)
         return "NTSC-JP";
-    else if (mode == V4L2_STD_PAL)
+    if (mode == V4L2_STD_PAL)
         return "PAL";
-    else if (mode == V4L2_STD_PAL_60)
+    if (mode == V4L2_STD_PAL_60)
         return "PAL-60";
-    else if (mode == V4L2_STD_PAL_BG)
+    if (mode == V4L2_STD_PAL_BG)
         return "PAL-BG";
-    else if (mode == V4L2_STD_PAL_D)
+    if (mode == V4L2_STD_PAL_D)
         return "PAL-D";
-    else if (mode == V4L2_STD_PAL_DK)
+    if (mode == V4L2_STD_PAL_DK)
         return "PAL-DK";
-    else if (mode == V4L2_STD_PAL_I)
+    if (mode == V4L2_STD_PAL_I)
         return "PAL-I";
-    else if (mode == V4L2_STD_PAL_M)
+    if (mode == V4L2_STD_PAL_M)
         return "PAL-M";
-    else if (mode == V4L2_STD_PAL_N)
+    if (mode == V4L2_STD_PAL_N)
         return "PAL-N";
-    else if (mode == V4L2_STD_PAL_Nc)
+    if (mode == V4L2_STD_PAL_Nc)
         return "PAL-NC";
-    else if (mode == V4L2_STD_SECAM)
+    if (mode == V4L2_STD_SECAM)
         return "SECAM";
-    else if (mode == V4L2_STD_SECAM_D)
+    if (mode == V4L2_STD_SECAM_D)
         return "SECAM-D";
     // generic..
-    else if ((V4L2_STD_NTSC_M      == mode) ||
-             (V4L2_STD_NTSC_443    == mode) ||
-             (V4L2_STD_NTSC_M_KR   == mode))
+    if ((V4L2_STD_NTSC_M      == mode) ||
+        (V4L2_STD_NTSC_443    == mode) ||
+        (V4L2_STD_NTSC_M_KR   == mode))
         return "NTSC";
-    else if ((V4L2_STD_PAL_B       == mode) ||
-             (V4L2_STD_PAL_B1      == mode) ||
-             (V4L2_STD_PAL_G       == mode) ||
-             (V4L2_STD_PAL_H       == mode) ||
-             (V4L2_STD_PAL_D1      == mode) ||
-             (V4L2_STD_PAL_K       == mode))
+    if ((V4L2_STD_PAL_B       == mode) ||
+        (V4L2_STD_PAL_B1      == mode) ||
+        (V4L2_STD_PAL_G       == mode) ||
+        (V4L2_STD_PAL_H       == mode) ||
+        (V4L2_STD_PAL_D1      == mode) ||
+        (V4L2_STD_PAL_K       == mode))
         return "PAL";
-    else if ((V4L2_STD_SECAM_B     == mode) ||
-             (V4L2_STD_SECAM_DK    == mode) ||
-             (V4L2_STD_SECAM_G     == mode) ||
-             (V4L2_STD_SECAM_H     == mode) ||
-             (V4L2_STD_SECAM_K     == mode) ||
-             (V4L2_STD_SECAM_K1    == mode) ||
-             (V4L2_STD_SECAM_L     == mode) ||
-             (V4L2_STD_SECAM_LC    == mode))
+    if ((V4L2_STD_SECAM_B     == mode) ||
+        (V4L2_STD_SECAM_DK    == mode) ||
+        (V4L2_STD_SECAM_G     == mode) ||
+        (V4L2_STD_SECAM_H     == mode) ||
+        (V4L2_STD_SECAM_K     == mode) ||
+        (V4L2_STD_SECAM_K1    == mode) ||
+        (V4L2_STD_SECAM_L     == mode) ||
+        (V4L2_STD_SECAM_LC    == mode))
         return "SECAM";
-    else if ((V4L2_STD_ATSC        == mode) ||
-             (V4L2_STD_ATSC_8_VSB  == mode) ||
-             (V4L2_STD_ATSC_16_VSB == mode))
+    if ((V4L2_STD_ATSC        == mode) ||
+        (V4L2_STD_ATSC_8_VSB  == mode) ||
+        (V4L2_STD_ATSC_16_VSB == mode))
     {
         // We've dropped V4L ATSC support, but this still needs to be
         // returned here so we will change the mode if the device is
@@ -249,7 +234,7 @@ bool V4LChannel::InitializeInputs(void)
     int videomode_v4l2 = format_to_mode(fmt.toUpper());
 
     bool ok = false;
-    InputNames v4l_inputs = CardUtil::ProbeV4LVideoInputs(videofd, ok);
+    InputNames v4l_inputs = CardUtil::ProbeV4LVideoInputs(m_videofd, ok);
 
     // Insert info from hardware
     uint valid_cnt = 0;
@@ -271,7 +256,7 @@ bool V4LChannel::InitializeInputs(void)
         .arg(m_tuneToChannel)
         .arg(mode_to_format(m_videoModeV4L2)));
 
-    return valid_cnt;
+    return valid_cnt != 0U;
 }
 
 /** \fn V4LChannel::SetFormat(const QString &format)
@@ -307,30 +292,30 @@ void V4LChannel::SetFormat(const QString &format)
 
 int V4LChannel::SetDefaultFreqTable(const QString &name)
 {
-    defaultFreqTable = SetFreqTable(name);
-    return defaultFreqTable;
+    m_defaultFreqTable = SetFreqTable(name);
+    return m_defaultFreqTable;
 }
 
 void V4LChannel::SetFreqTable(const int index)
 {
-    curList = chanlists[index].list;
-    totalChannels = chanlists[index].count;
+    m_curList = chanlists[index].list;
+    m_totalChannels = chanlists[index].count;
 }
 
 int V4LChannel::SetFreqTable(const QString &tablename)
 {
-    QString name = tablename;
+    const QString& name = tablename;
     bool use_default = (name.toLower() == "default" || name.isEmpty());
 
     int i = 0;
     char *listname = (char *)chanlists[i].name;
 
-    curList = nullptr;
+    m_curList = nullptr;
     while (listname != nullptr)
     {
         if (use_default)
         {
-            if (i == defaultFreqTable)
+            if (i == m_defaultFreqTable)
             {
                 SetFreqTable(i);
                 return i;
@@ -348,16 +333,16 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     LOG(VB_CHANNEL, LOG_ERR,
         QString("Channel(%1)::SetFreqTable(): Invalid "
                 "frequency table name %2, using %3.").
-            arg(device).arg(name).arg((char *)chanlists[1].name));
+            arg(m_device).arg(name).arg((char *)chanlists[1].name));
     SetFreqTable(1);
     return 1;
 }
 
 int V4LChannel::GetCurrentChannelNum(const QString &channame)
 {
-    for (int i = 0; i < totalChannels; i++)
+    for (int i = 0; i < m_totalChannels; i++)
     {
-        if (channame == curList[i].name)
+        if (channame == m_curList[i].name)
             return i;
     }
 
@@ -373,25 +358,25 @@ bool V4LChannel::Tune(const QString &freqid, int finetune)
     int i = GetCurrentChannelNum(freqid);
     LOG(VB_CHANNEL, LOG_INFO,
         QString("Channel(%1)::Tune(%2): curList[%3].freq(%4)")
-            .arg(device).arg(freqid).arg(i)
-            .arg((i != -1) ? curList[i].freq : -1));
+            .arg(m_device).arg(freqid).arg(i)
+            .arg((i != -1) ? m_curList[i].freq : -1));
 
     if (i == -1)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Channel(%1)::Tune(%2): Error, failed to find channel.")
-                .arg(device).arg(freqid));
+                .arg(m_device).arg(freqid));
         return false;
     }
 
-    int frequency = (curList[i].freq + finetune) * 1000;
+    int frequency = (m_curList[i].freq + finetune) * 1000;
 
     return Tune(frequency);
 }
 
 bool V4LChannel::Tune(const DTVMultiplex &tuning)
 {
-    return Tune(tuning.frequency - 1750000); // to visual carrier
+    return Tune(tuning.m_frequency - 1750000); // to visual carrier
 }
 
 /** \brief Tunes to a specific frequency (Hz) on a particular input
@@ -419,10 +404,10 @@ bool V4LChannel::Tune(uint64_t frequency)
     struct v4l2_modulator mod;
     memset(&mod, 0, sizeof(mod));
     mod.index = 0;
-    ioctlval = ioctl(videofd, VIDIOC_G_MODULATOR, &mod);
+    ioctlval = ioctl(m_videofd, VIDIOC_G_MODULATOR, &mod);
     if (ioctlval >= 0)
     {
-        isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
+        isTunerCapLow = ((mod.capability & V4L2_TUNER_CAP_LOW) != 0U);
         LOG(VB_CHANNEL, LOG_INFO,
             QString("  name: %1").arg((char *)mod.name));
         LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));
@@ -437,22 +422,22 @@ bool V4LChannel::Tune(uint64_t frequency)
 
     vf.type = V4L2_TUNER_ANALOG_TV;
 
-    ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
+    ioctlval = ioctl(m_videofd, VIDIOC_S_FREQUENCY, &vf);
     if (ioctlval < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Channel(%1)::Tune(): Error %2 "
                     "while setting frequency (v2): %3")
-            .arg(device).arg(ioctlval).arg(strerror(errno)));
+            .arg(m_device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
-    ioctlval = ioctl(videofd, VIDIOC_G_FREQUENCY, &vf);
+    ioctlval = ioctl(m_videofd, VIDIOC_G_FREQUENCY, &vf);
 
     if (ioctlval >= 0)
     {
         LOG(VB_CHANNEL, LOG_INFO,
             QString("Channel(%1)::Tune(): Frequency is now %2")
-            .arg(device).arg(vf.frequency * 62500));
+            .arg(m_device).arg(vf.frequency * 62500));
     }
 
     return true;
@@ -472,7 +457,7 @@ bool V4LChannel::Retune(void)
     vf.type = V4L2_TUNER_ANALOG_TV;
 
     // Get the last tuned frequency
-    int ioctlval = ioctl(videofd, VIDIOC_G_FREQUENCY, &vf);
+    int ioctlval = ioctl(m_videofd, VIDIOC_G_FREQUENCY, &vf);
     if (ioctlval < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Retune failed (1)" + ENO);
@@ -480,7 +465,7 @@ bool V4LChannel::Retune(void)
     }
 
     // Set the last tuned frequency again...
-    ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
+    ioctlval = ioctl(m_videofd, VIDIOC_S_FREQUENCY, &vf);
     if (ioctlval < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Retune failed (2)" + ENO);
@@ -490,7 +475,7 @@ bool V4LChannel::Retune(void)
     return true;
 }
 
-QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
+QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -512,7 +497,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     return fmt;
 }
 
-bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
+bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
 {
     if (!m_inputid || m_inputNumV4L < 0)
         return false;
@@ -524,12 +509,12 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
         QString("SetInputAndFormat(%1, %2) ").arg(inputNum).arg(newFmt);
 
     struct v4l2_input input;
-    int ioctlval = ioctl(videofd, VIDIOC_G_INPUT, &input);
+    int ioctlval = ioctl(m_videofd, VIDIOC_G_INPUT, &input);
     bool input_switch = (0 != ioctlval || (uint)inputNumV4L != input.index);
 
     const v4l2_std_id new_vid_mode = format_to_mode(newFmt);
     v4l2_std_id cur_vid_mode;
-    ioctlval = ioctl(videofd, VIDIOC_G_STD, &cur_vid_mode);
+    ioctlval = ioctl(m_videofd, VIDIOC_G_STD, &cur_vid_mode);
     bool mode_switch = (0 != ioctlval || new_vid_mode != cur_vid_mode);
     bool needs_switch = input_switch || mode_switch;
 
@@ -541,9 +526,9 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
     // before an input switch, do this if CAP_STREAMING is set.
     bool streamingDisabled = false;
     int  streamType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (needs_switch && has_stream_io)
+    if (needs_switch && m_has_stream_io)
     {
-        ioctlval = ioctl(videofd, VIDIOC_STREAMOFF, &streamType);
+        ioctlval = ioctl(m_videofd, VIDIOC_STREAMOFF, &streamType);
         if (ioctlval < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + msg +
@@ -559,7 +544,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
     if (input_switch)
     {
         // Send the input switch ioctl.
-        ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
+        ioctlval = ioctl(m_videofd, VIDIOC_S_INPUT, &inputNumV4L);
         if (ioctlval < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + msg +
@@ -571,7 +556,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 
     if (mode_switch)
     {
-        ioctlval = ioctl(videofd, VIDIOC_S_STD, &new_vid_mode);
+        ioctlval = ioctl(m_videofd, VIDIOC_S_STD, &new_vid_mode);
         if (ioctlval < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + msg +
@@ -583,7 +568,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 
     if (streamingDisabled)
     {
-        ioctlval = ioctl(videofd, VIDIOC_STREAMON, &streamType);
+        ioctlval = ioctl(m_videofd, VIDIOC_STREAMON, &streamType);
         if (ioctlval < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + msg +
@@ -600,11 +585,11 @@ static int get_v4l2_attribute(const QString &db_col_name)
 {
     if ("brightness" == db_col_name)
         return V4L2_CID_BRIGHTNESS;
-    else if ("contrast" == db_col_name)
+    if ("contrast" == db_col_name)
         return V4L2_CID_CONTRAST;
-    else if ("colour" == db_col_name)
+    if ("colour" == db_col_name)
         return V4L2_CID_SATURATION;
-    else if ("hue" == db_col_name)
+    if ("hue" == db_col_name)
         return V4L2_CID_HUE;
     return -1;
 }
@@ -635,7 +620,7 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     memset(&qctrl, 0, sizeof(qctrl));
 
     ctrl.id = qctrl.id = v4l2_attrib;
-    if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
+    if (ioctl(m_videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "failed to query controls." + ENO);
         return false;
@@ -647,26 +632,26 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     float dfl       = (qctrl.default_value - qctrl.minimum) / new_range;
     int   norm_dfl  = (0x10000 + (int)(dfl * old_range) - 32768) & 0xFFFF;
 
-    if (pict_attr_default.find(db_col_name) == pict_attr_default.end())
+    if (m_pict_attr_default.find(db_col_name) == m_pict_attr_default.end())
     {
-        if (device_name == "pcHDTV HD3000 HDTV")
+        if (m_device_name == "pcHDTV HD3000 HDTV")
         {
-            pict_attr_default["brightness"] = 9830;
-            pict_attr_default["contrast"]   = 39322;
-            pict_attr_default["colour"]     = 45875;
-            pict_attr_default["hue"]        = 0;
+            m_pict_attr_default["brightness"] = 9830;
+            m_pict_attr_default["contrast"]   = 39322;
+            m_pict_attr_default["colour"]     = 45875;
+            m_pict_attr_default["hue"]        = 0;
         }
         else
         {
-            pict_attr_default[db_col_name] = norm_dfl;
+            m_pict_attr_default[db_col_name] = norm_dfl;
         }
     }
 
-    int dfield = pict_attr_default[db_col_name];
+    int dfield = m_pict_attr_default[db_col_name];
     int field  = (cfield + sfield + dfield) & 0xFFFF;
     int value0 = (int) ((scl_range * field) + qctrl.minimum);
-    int value1 = min(value0, (int)qctrl.maximum);
-    ctrl.value = max(value1, (int)qctrl.minimum);
+    int value1 = min(value0, qctrl.maximum);
+    ctrl.value = max(value1, qctrl.minimum);
 
 #if DEBUG_ATTRIB
     LOG(VB_CHANNEL, LOG_DEBUG, loc + QString(" %1\n\t\t\t"
@@ -676,7 +661,7 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
         .arg(norm_dfl));
 #endif
 
-    if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
+    if (ioctl(m_videofd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "failed to set controls" + ENO);
         return false;
@@ -705,8 +690,8 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
         db_col_name, m_inputid);
     int dfield = 0;
 
-    if (pict_attr_default.find(db_col_name) != pict_attr_default.end())
-        dfield = pict_attr_default[db_col_name];
+    if (m_pict_attr_default.find(db_col_name) != m_pict_attr_default.end())
+        dfield = m_pict_attr_default[db_col_name];
 
     int val = (cfield + sfield + dfield) & 0xFFFF;
 
@@ -792,7 +777,7 @@ int V4LChannel::ChangePictureAttribute(
 
     // get the old attribute value from the hardware, this is
     // just a sanity check on whether this attribute exists
-    if (get_v4l2_attribute_value(videofd, v4l2_attrib) < 0)
+    if (get_v4l2_attribute_value(m_videofd, v4l2_attrib) < 0)
         return -1;
 
     int old_value = GetPictureAttribute(attr);
@@ -811,7 +796,7 @@ int V4LChannel::ChangePictureAttribute(
 #endif
 
     // actually set the new attribute value on the hardware
-    if (set_v4l2_attribute_value(videofd, v4l2_attrib, new_value) < 0)
+    if (set_v4l2_attribute_value(m_videofd, v4l2_attrib, new_value) < 0)
         return -1;
 
     // tell the DB about the new attribute value

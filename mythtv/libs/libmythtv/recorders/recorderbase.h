@@ -36,19 +36,19 @@ class TVRec;
 class FrameRate
 {
 public:
-    FrameRate(uint n, uint d=1) : num(n), den(d) {}
-    double toDouble(void) const { return num / (double)den; }
-    bool isNonzero(void) const { return num; }
-    uint getNum(void) const { return num; }
-    uint getDen(void) const { return den; }
-    QString toString(void) const { return QString("%1/%2").arg(num).arg(den); }
+    FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
+    double toDouble(void) const { return m_num / (double)m_den; }
+    bool isNonzero(void) const { return m_num; }
+    uint getNum(void) const { return m_num; }
+    uint getDen(void) const { return m_den; }
+    QString toString(void) const { return QString("%1/%2").arg(m_num).arg(m_den); }
     bool operator==(const FrameRate &other) {
-        return num == other.num && den == other.den;
+        return m_num == other.m_num && m_den == other.m_den;
     }
     bool operator!=(const FrameRate &other) { return !(*this == other); }
 private:
-    uint num;
-    uint den;
+    uint m_num;
+    uint m_den;
 };
 
 /** \class RecorderBase
@@ -74,8 +74,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     /// \brief Sets the video frame rate.
     void SetFrameRate(double rate)
     {
-        video_frame_rate = rate;
-        ntsc_framerate = (29.96 <= rate && 29.98 >= rate);
+        m_video_frame_rate = rate;
+        m_ntsc_framerate = (29.96 <= rate && 29.98 >= rate);
         m_frameRate = FrameRate((rate * 100) + 0.5, 100);
     }
 
@@ -104,13 +104,20 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *   tvformat&nbsp;(ntsc,ntsc-jp,pal-m),
      *   vbiformat&nbsp;("none","pal teletext","ntsc").
      */
-    virtual void SetOption(const QString &opt, const QString &value);
+    virtual void SetOption(const QString &name, const QString &value);
 
     /** \brief Set an specific integer option.
      *
      *   There are no integer options in RecorderBase.
      */
-    virtual void SetOption(const QString &opt, int value);
+    virtual void SetOption(const QString &name, int value);
+
+    /** \brief Set an specific boolean option.
+     *
+     *   This is a helper function to enforce type checking.
+     */
+    void SetBoolOption(const QString &name, bool value)
+        { SetOption(name, static_cast<int>(value)); }
 
     /** \brief Tells recorder which filters to use.
      *
@@ -152,7 +159,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *         exit until the recording is complete.
      *  \sa StopRecording()
      */
-    virtual void run(void) = 0;
+    void run(void) override = 0; // QRunnable
 
     /** \brief Reset the recorder to the startup state.
      *
@@ -261,11 +268,11 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     /** \brief Set seektable type
      */
-    void SetPositionMapType(MarkTypes type) { positionMapType = type; }
+    void SetPositionMapType(MarkTypes type) { m_positionMapType = type; }
 
     /** \brief Note a change in aspect ratio in the recordedmark table
      */
-    void AspectChange(uint ratio, long long frame);
+    void AspectChange(uint aspect, long long frame);
 
     /** \brief Note a change in video size in the recordedmark table
      */
@@ -293,74 +300,74 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     void TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy);
 
-    TVRec         *tvrec;
-    RingBuffer    *ringBuffer;
-    bool           weMadeBuffer;
+    TVRec         *m_tvrec                {nullptr};
+    RingBuffer    *m_ringBuffer           {nullptr};
+    bool           m_weMadeBuffer         {true};
 
-    AVContainer    m_containerFormat;
-    AVCodecID      m_primaryVideoCodec;
-    AVCodecID      m_primaryAudioCodec;
-    QString        videocodec;
-    QString        videodevice;
+    AVContainer    m_containerFormat      {formatUnknown};
+    AVCodecID      m_primaryVideoCodec    {AV_CODEC_ID_NONE};
+    AVCodecID      m_primaryAudioCodec    {AV_CODEC_ID_NONE};
+    QString        m_videocodec           {"rtjpeg"};
+    QString        m_videodevice;
 
-    bool           ntsc;
-    bool           ntsc_framerate;
-    double         video_frame_rate;
+    bool           m_ntsc                 {true};
+    bool           m_ntsc_framerate       {true};
+    double         m_video_frame_rate     {29.97};
 
-    uint           m_videoAspect; // AspectRatio (1 = 4:3, 2 = 16:9
+    uint           m_videoAspect          {0}; // AspectRatio (1 = 4:3, 2 = 16:9
 
-    uint           m_videoHeight;
-    uint           m_videoWidth;
-    FrameRate      m_frameRate;
+    uint           m_videoHeight          {0};
+    uint           m_videoWidth           {0};
+    FrameRate      m_frameRate            {0};
 
-    RecordingInfo *curRecording;
+    RecordingInfo *m_curRecording         {nullptr};
 
     // For handling pausing + stop recording
-    mutable QMutex pauseLock; // also used for request_recording and recording
-    bool           request_pause;
-    bool           paused;
-    QWaitCondition pauseWait;
-    QWaitCondition unpauseWait;
+    mutable QMutex m_pauseLock; // also used for request_recording and recording
+    bool           m_request_pause        {false};
+    bool           m_paused               {false};
+    QWaitCondition m_pauseWait;
+    QWaitCondition m_unpauseWait;
     /// True if API call has requested a recording be [re]started
-    bool           request_recording;
+    bool           m_request_recording    {false};
     /// True while recording is actually being performed
-    bool           recording;
-    QWaitCondition recordingWait;
+    bool           m_recording            {false};
+    QWaitCondition m_recordingWait;
 
 
     // For RingBuffer switching
-    QMutex         nextRingBufferLock;
-    RingBuffer    *nextRingBuffer;
-    RecordingInfo *nextRecording;
-    MythTimer      ringBufferCheckTimer;
+    QMutex         m_nextRingBufferLock;
+    RingBuffer    *m_nextRingBuffer       {nullptr};
+    RecordingInfo *m_nextRecording        {nullptr};
+    MythTimer      m_ringBufferCheckTimer;
 
     // Seektable  support
-    MarkTypes      positionMapType;
-    mutable QMutex positionMapLock;
-    frm_pos_map_t  positionMap;
-    frm_pos_map_t  positionMapDelta;
-    frm_pos_map_t  durationMap;
-    frm_pos_map_t  durationMapDelta;
-    MythTimer      positionMapTimer;
+    MarkTypes      m_positionMapType      {MARK_GOP_BYFRAME};
+    mutable QMutex m_positionMapLock;
+    frm_pos_map_t  m_positionMap;
+    frm_pos_map_t  m_positionMapDelta;
+    frm_pos_map_t  m_durationMap;
+    frm_pos_map_t  m_durationMapDelta;
+    MythTimer      m_positionMapTimer;
 
     // ProgStart mark support
-    qint64         estimatedProgStartMS;
-    long long      lastSavedKeyframe;
-    long long      lastSavedDuration;
+    qint64         m_estimatedProgStartMS {0};
+    long long      m_lastSavedKeyframe    {0};
+    long long      m_lastSavedDuration    {0};
 
     // Statistics
     // Note: Once we enter RecorderBase::run(), only that thread can
     // update these values safely. These values are read in that thread
     // without locking and updated with the lock held. Outside that
     // thread these values are only read, and only with the lock held.
-    mutable QMutex statisticsLock;
-    QAtomicInt     timeOfFirstDataIsSet; // doesn't need locking
-    QDateTime      timeOfFirstData;
-    QAtomicInt     timeOfLatestDataCount; // doesn't need locking
-    QAtomicInt     timeOfLatestDataPacketInterval; // doesn't need locking
-    QDateTime      timeOfLatestData;
-    MythTimer      timeOfLatestDataTimer;
-    RecordingGaps  recordingGaps;
+    mutable QMutex m_statisticsLock;
+    QAtomicInt     m_timeOfFirstDataIsSet; // doesn't need locking
+    QDateTime      m_timeOfFirstData;
+    QAtomicInt     m_timeOfLatestDataCount; // doesn't need locking
+    QAtomicInt     m_timeOfLatestDataPacketInterval; // doesn't need locking
+    QDateTime      m_timeOfLatestData;
+    MythTimer      m_timeOfLatestDataTimer;
+    RecordingGaps  m_recordingGaps;
     /// timeOfLatest update interval target in milliseconds.
     static const uint kTimeOfLatestDataIntervalTarget;
 };

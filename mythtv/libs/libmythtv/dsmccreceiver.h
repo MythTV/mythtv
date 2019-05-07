@@ -10,35 +10,30 @@
 class DsmccDii
 {
   public:
-    DsmccDii() :
-        download_id(0),          block_size(0),
-        tc_download_scenario(0), number_modules(0),
-        private_data_len(0),
-        modules(nullptr),        private_data(nullptr) {}
-
+    DsmccDii() = default;
     ~DsmccDii()
     {
-        if (modules)
-            delete[] modules;
+        if (m_modules)
+            delete[] m_modules;
     }
 
-    unsigned long    download_id;
-    unsigned short   block_size;
-    unsigned long    tc_download_scenario;
-    unsigned short   number_modules;
-    unsigned short   private_data_len;
-    DsmccModuleInfo *modules;
-    unsigned char   *private_data;
+    unsigned long    m_download_id          {0};
+    unsigned short   m_block_size           {0};
+    unsigned long    m_tc_download_scenario {0};
+    unsigned short   m_number_modules       {0};
+    unsigned short   m_private_data_len     {0};
+    DsmccModuleInfo *m_modules              {nullptr};
+    unsigned char   *m_private_data         {nullptr};
 };
 
 class DsmccSectionHeader
 {
   public:
-    char table_id;  /* always 0x3B */
+    char           m_table_id;  /* always 0x3B */
 
-    unsigned char  flags[2];
+    unsigned char  m_flags[2];
 
-    unsigned short table_id_extension;
+    unsigned short m_table_id_extension;
 
     /*
      *  unsigned int section_syntax_indicator : 1; UKProfile - always 1
@@ -47,7 +42,7 @@ class DsmccSectionHeader
      *  unsigned int dsmcc_section_length : 12;
      */
 
-    unsigned char  flags2;
+    unsigned char  m_flags2;
 
     /*
      *  unsigned int reserved : 2;  always 11b
@@ -55,22 +50,19 @@ class DsmccSectionHeader
      *  unsigned int current_next_indicator : 1  1b
      */
 
-    unsigned long  crc;    /* UKProfile */
+    unsigned long  m_crc;    /* UKProfile */
 };
 
 class DsmccDb
 {
   public:
-    DsmccDb() :
-        module_id(0),    module_version(0),
-        block_number(0), len (0) {}
-
+    DsmccDb() = default;
     ~DsmccDb() = default;
 
-    unsigned short module_id;
-    unsigned char  module_version;
-    unsigned short block_number;
-    unsigned int   len;
+    unsigned short m_module_id      {0};
+    unsigned char  m_module_version {0};
+    unsigned short m_block_number   {0};
+    unsigned int   m_len            {0};
 };
 
 #endif

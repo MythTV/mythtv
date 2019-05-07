@@ -37,26 +37,28 @@ class MHLink : public MHIngredient
 {
   public:
     MHLink();
-    virtual const char *ClassName() { return "Link"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    const char *ClassName() override // MHRoot
+        { return "Link"; }
+    // Set this up from the parse tree.
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
     // Look up the event type.  Returns zero if it doesn't match.
     static int GetEventType(const char *str);
     // Print an event type.
     static QString EventTypeToString(enum EventType ev);
 
     // Internal behaviours.
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
+    void Activation(MHEngine *engine) override; // MHRoot
+    void Deactivation(MHEngine *engine) override; // MHRoot
 
     // Handle activation and deactivation
-    virtual void Activate(bool f, MHEngine *engine);
+    void Activate(bool f, MHEngine *engine) override; // MHRoot
     // Called when an event has been triggered and fires this link if it matches. 
-    virtual void MatchEvent(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un, MHEngine *engine);
+    virtual void MatchEvent(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &evData, MHEngine *engine);
 
   protected:
     MHObjectRef m_EventSource;
-    enum EventType m_nEventType;
+    enum EventType m_nEventType {EventIsAvailable};
     MHUnion m_EventData;
     MHActionSequence m_LinkEffect;
 };
@@ -67,7 +69,8 @@ class MHActivate: public MHElemAction
 {
   public:
     MHActivate(const char *name, bool fActivate): MHElemAction(name), m_fActivate(fActivate) {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->Activate(m_fActivate, engine); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->Activate(m_fActivate, engine); }
   protected:
     bool m_fActivate;
 };

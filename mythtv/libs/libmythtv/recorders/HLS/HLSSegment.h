@@ -39,16 +39,16 @@ class HLSRecSegment
 #endif
 
   protected:
-    int64_t     m_sequence;  // unique sequence number
-    int         m_duration;  // segment duration (seconds)
-    uint64_t    m_bitrate;   // bitrate of segment's content (bits per second)
-    QString     m_title;     // human-readable informative title of
-			     // the media segment
+    int64_t     m_sequence {0};  // unique sequence number
+    int         m_duration {0};  // segment duration (seconds)
+    uint64_t    m_bitrate  {0};  // bitrate of segment's content (bits per second)
+    QString     m_title;         // human-readable informative title of
+			         // the media segment
 
     QUrl        m_url;
 
 #ifdef USING_LIBCRYPTO
-    QString     m_psz_key_path; // URL key path
+    QString     m_psz_key_path;  // URL key path
 #endif
 
 };

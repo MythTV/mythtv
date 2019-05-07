@@ -7,10 +7,6 @@
 #include <fcntl.h>
 
 #include "config.h"
-#ifdef HAVE_CDIO
-# include <cdio/cdda.h>
-# include <cdio/paranoia.h>
-#endif //def HAVE_CDIO
 
 // C++ includes
 #include <iostream>
@@ -20,12 +16,13 @@ using namespace std;
 // Qt includes
 #include <QApplication>
 #include <QDir>
-#include <QRegExp>
-#include <QKeyEvent>
 #include <QEvent>
 #include <QFile>
-#include <QUrl>
+#include <QKeyEvent>
+#include <QRegExp>
 #include <QTimer>
+#include <QUrl>
+#include <utility>
 
 // MythTV plugin includes
 #include <mythcontext.h>
@@ -102,11 +99,6 @@ QEvent::Type RipStatusEvent::kFinishedEvent =
 QEvent::Type RipStatusEvent::kEncoderErrorEvent =
     (QEvent::Type) QEvent::registerEventType();
 
-CDScannerThread::CDScannerThread(Ripper *ripper) :
-    MThread("CDScanner"), m_parent(ripper)
-{
-}
-
 void CDScannerThread::run()
 {
     RunProlog();
@@ -115,11 +107,6 @@ void CDScannerThread::run()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-CDEjectorThread::CDEjectorThread(Ripper *ripper) :
-    MThread("CDEjector"), m_parent(ripper)
-{
-}
 
 void CDEjectorThread::run()
 {
@@ -173,7 +160,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
 }
 
 #ifdef HAVE_CDIO
-static void paranoia_cb(long, paranoia_cb_mode_t)
+static void paranoia_cb(long /*status*/, paranoia_cb_mode_t /*mode*/)
 {
 }
 #endif // HAVE_CDIO
@@ -181,12 +168,9 @@ static void paranoia_cb(long, paranoia_cb_mode_t)
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
     MThread("CDRipper"),
-    m_parent(parent),   m_quit(false),
-    m_CDdevice(device), m_quality(quality),
-    m_tracks(tracks), m_totalSectors(0),
-    m_totalSectorsDone(0), m_lastTrackPct(0),
-    m_lastOverallPct(0), m_musicStorageDir("")
-
+    m_parent(parent),
+    m_CDdevice(std::move(device)), m_quality(quality),
+    m_tracks(tracks)
 {
 #ifdef WIN32 // libcdio needs the drive letter with no path
     if (m_CDdevice.endsWith('\\'))
@@ -219,7 +203,7 @@ void CDRipperThread::run(void)
 {
     RunProlog();
 
-    if (m_tracks->size() <= 0)
+    if (m_tracks->empty())
     {
         RunEpilog();
         return;
@@ -262,7 +246,7 @@ void CDRipperThread::run(void)
 
     QString textstatus;
     QString encodertype = gCoreContext->GetSetting("EncoderType");
-    bool mp3usevbr = gCoreContext->GetNumSetting("Mp3UseVBR", 0);
+    bool mp3usevbr = gCoreContext->GetBoolSetting("Mp3UseVBR", false);
 
     QApplication::postEvent(m_parent,
         new RipStatusEvent(RipStatusEvent::kOverallStartEvent, m_totalSectors));
@@ -356,7 +340,7 @@ void CDRipperThread::run(void)
                 }
             }
 
-            if (!encoder.get())
+            if (!encoder)
             {
                 // This should never happen.
                 QApplication::postEvent(
@@ -475,8 +459,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
             every15 = 15;
 
             // updating the UITypes can be slow - only update if we need to:
-            int newOverallPct = (int) (100.0 /  (double) ((double) m_totalSectors /
-                    (double) (m_totalSectorsDone + curpos - start)));
+            int newOverallPct = (int) (100.0 /  ((double) m_totalSectors /
+                                                 (m_totalSectorsDone + curpos - start)));
             if (newOverallPct != m_lastOverallPct)
             {
                 m_lastOverallPct = newOverallPct;
@@ -490,8 +474,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
                                        m_totalSectorsDone + curpos - start));
             }
 
-            int newTrackPct = (int) (100.0 / (double) ((double) (end - start + 1) /
-                    (double) (curpos - start)));
+            int newTrackPct = (int) (100.0 / ((double) (end - start + 1) / (curpos - start)));
             if (newTrackPct != m_lastTrackPct)
             {
                 m_lastTrackPct = newTrackPct;
@@ -535,35 +518,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
 Ripper::Ripper(MythScreenStack *parent, QString device) :
     MythScreenType(parent, "ripcd"),
-    m_musicStorageDir(""),
-
-    m_decoder(nullptr),
-
-    m_artistEdit(nullptr),
-    m_albumEdit(nullptr),
-    m_genreEdit(nullptr),
-    m_yearEdit(nullptr),
-
-    m_compilationCheck(nullptr),
-
-    m_trackList(nullptr),
-    m_qualityList(nullptr),
-
-    m_switchTitleArtist(nullptr),
-    m_scanButton(nullptr),
-    m_ripButton(nullptr),
-    m_searchArtistButton(nullptr),
-    m_searchAlbumButton(nullptr),
-    m_searchGenreButton(nullptr),
-
     m_tracks(new QVector<RipTrack*>),
-
-    m_somethingwasripped(false),
-    m_mediaMonitorActive(false),
-
-    m_CDdevice(device),
-
-    m_ejectThread(nullptr), m_scanThread(nullptr)
+    m_CDdevice(std::move(device))
 {
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
@@ -597,8 +553,7 @@ Ripper::~Ripper(void)
     QString command = "rm -f " + GetConfDir() + "/tmp/RipTemp/*";
     myth_system(command);
 
-    if (m_decoder)
-        delete m_decoder;
+    delete m_decoder;
 
 #ifndef _WIN32
     // if the MediaMonitor was active when we started then restart it
@@ -771,7 +726,7 @@ void Ripper::chooseBackend(void)
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setSaveHost(QString host)
+void Ripper::setSaveHost(const QString& host)
 {
     gCoreContext->SaveSetting("MythMusicLastRipHost", host);
 
@@ -879,9 +834,7 @@ void Ripper::scanCD(void)
     }
 #endif // HAVE_CDIO
 
-    if (m_decoder)
-        delete m_decoder;
-
+    delete m_decoder;
     m_decoder = new CdDecoder("cda", nullptr, nullptr);
     if (m_decoder)
         m_decoder->setDevice(m_CDdevice);
@@ -993,7 +946,7 @@ void Ripper::artistChanged()
 {
     QString newartist = m_artistEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1022,7 +975,7 @@ void Ripper::albumChanged()
 {
     QString newalbum = m_albumEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1039,7 +992,7 @@ void Ripper::genreChanged()
 {
     QString newgenre = m_genreEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1056,7 +1009,7 @@ void Ripper::yearChanged()
 {
     QString newyear = m_yearEdit->GetText();
 
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
@@ -1073,7 +1026,7 @@ void Ripper::compilationChanged(bool state)
 {
     if (!state)
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the ablum...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1092,7 +1045,7 @@ void Ripper::compilationChanged(bool state)
     }
     else
     {
-        if (m_tracks->size() > 0)
+        if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the album...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
@@ -1124,7 +1077,7 @@ void Ripper::switchTitlesAndArtists()
 
     // Switch title and artist for each track
     QString tmp;
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         for (int track = 0; track < m_tracks->size(); ++track)
         {
@@ -1168,9 +1121,9 @@ void Ripper::startRipper(void)
 
 void Ripper::RipComplete(bool result)
 {
-    if (result == true)
+    if (result)
     {
-        bool EjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping", 1);
+        bool EjectCD = gCoreContext->GetBoolSetting("EjectCDAfterRipping", true);
         if (EjectCD)
             startEjectCD();
 
@@ -1210,7 +1163,7 @@ void Ripper::EjectFinished()
 void Ripper::ejectCD()
 {
     LOG(VB_MEDIA, LOG_INFO, __PRETTY_FUNCTION__);
-    bool bEjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping",1);
+    bool bEjectCD = gCoreContext->GetBoolSetting("EjectCDAfterRipping",true);
     if (bEjectCD)
     {
 #ifdef HAVE_CDIO
@@ -1243,7 +1196,7 @@ void Ripper::updateTrackList(void)
         m_trackList->Reset();
 
         int i;
-        for (i = 0; i < (int)m_tracks->size(); i++)
+        for (i = 0; i < m_tracks->size(); i++)
         {
             if (i >= m_tracks->size())
                 break;
@@ -1309,7 +1262,7 @@ void Ripper::searchArtist()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setArtist(QString artist)
+void Ripper::setArtist(const QString& artist)
 {
     m_artistEdit->SetText(artist);
 }
@@ -1333,7 +1286,7 @@ void Ripper::searchAlbum()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setAlbum(QString album)
+void Ripper::setAlbum(const QString& album)
 {
     m_albumEdit->SetText(album);
 }
@@ -1362,7 +1315,7 @@ void Ripper::searchGenre()
     popupStack->AddScreen(searchDlg);
 }
 
-void Ripper::setGenre(QString genre)
+void Ripper::setGenre(const QString& genre)
 {
     m_genreEdit->SetText(genre);
 }
@@ -1525,23 +1478,9 @@ void Ripper::customEvent(QEvent* event)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RipStatus::RipStatus(MythScreenStack *parent, const QString &device,
-                     QVector<RipTrack*> *tracks, int quality)
-    : MythScreenType(parent, "ripstatus"),
-    m_tracks(tracks),           m_quality(quality),
-    m_CDdevice(device),         m_overallText(nullptr),
-    m_trackText(nullptr),       m_statusText(nullptr),
-    m_overallPctText(nullptr),  m_trackPctText(nullptr),
-    m_overallProgress(nullptr), m_trackProgress(nullptr),
-    m_ripperThread(nullptr)
-{
-}
-
 RipStatus::~RipStatus(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 }
@@ -1624,32 +1563,32 @@ void RipStatus::customEvent(QEvent *event)
     if (event->type() == RipStatusEvent::kTrackTextEvent)
     {
         if (m_trackText)
-            m_trackText->SetText(rse->text);
+            m_trackText->SetText(rse->m_text);
     }
     else if (event->type() == RipStatusEvent::kOverallTextEvent)
     {
         if (m_overallText)
-            m_overallText->SetText(rse->text);
+            m_overallText->SetText(rse->m_text);
     }
     else if (event->type() == RipStatusEvent::kStatusTextEvent)
     {
         if (m_statusText)
-            m_statusText->SetText(rse->text);
+            m_statusText->SetText(rse->m_text);
     }
     else if (event->type() == RipStatusEvent::kTrackProgressEvent)
     {
         if (m_trackProgress)
-            m_trackProgress->SetUsed(rse->value);
+            m_trackProgress->SetUsed(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kTrackPercentEvent)
     {
         if (m_trackPctText)
-            m_trackPctText->SetText(QString("%1%").arg(rse->value));
+            m_trackPctText->SetText(QString("%1%").arg(rse->m_value));
     }
     else if (event->type() == RipStatusEvent::kTrackStartEvent)
     {
         if (m_trackProgress)
-            m_trackProgress->SetTotal(rse->value);
+            m_trackProgress->SetTotal(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kCopyStartEvent)
     {
@@ -1664,17 +1603,17 @@ void RipStatus::customEvent(QEvent *event)
     else if (event->type() == RipStatusEvent::kOverallProgressEvent)
     {
         if (m_overallProgress)
-            m_overallProgress->SetUsed(rse->value);
+            m_overallProgress->SetUsed(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kOverallStartEvent)
     {
         if (m_overallProgress)
-            m_overallProgress->SetTotal(rse->value);
+            m_overallProgress->SetTotal(rse->m_value);
     }
     else if (event->type() == RipStatusEvent::kOverallPercentEvent)
     {
         if (m_overallPctText)
-            m_overallPctText->SetText(QString("%1%").arg(rse->value));
+            m_overallPctText->SetText(QString("%1%").arg(rse->m_value));
     }
     else if (event->type() == RipStatusEvent::kFinishedEvent)
     {
@@ -1696,9 +1635,7 @@ void RipStatus::customEvent(QEvent *event)
 
 void RipStatus::startRip(void)
 {
-    if (m_ripperThread)
-        delete m_ripperThread;
-
+    delete m_ripperThread;
     m_ripperThread = new CDRipperThread(this, m_CDdevice, m_tracks, m_quality);
     m_ripperThread->start();
 }

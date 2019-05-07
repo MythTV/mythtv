@@ -219,7 +219,6 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
         return;
 
     m_Message = text;
-    m_Message.detach();
 
     if (m_isPassword)
     {
@@ -237,13 +236,6 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
     emit valueChanged();
 }
 
-QString MythUITextEdit::GetText(void) const
-{
-    QString ret = m_Message;
-    ret.detach();
-    return ret;
-}
-
 void MythUITextEdit::InsertText(const QString &text)
 {
     if (!m_Text)
@@ -253,7 +245,7 @@ void MythUITextEdit::InsertText(const QString &text)
 
     for (; i < text.size(); ++i)
     {
-        InsertCharacter(text.data()[i]);
+        InsertCharacter(text[i]);
     }
 
     emit valueChanged();
@@ -430,8 +422,6 @@ static void LoadDeadKeys(QMap<QPair<int, int>, int> &map)
 
     map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_Y)] = Qt::Key_Yacute;
     map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_Y)] = Qt::Key_ydiaeresis;
-
-    return;
 }
 
 bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
@@ -453,7 +443,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
     QString character;
     // Compose key handling
     // Enter composition mode
-    if ((modifiers & Qt::GroupSwitchModifier) &&
+    if (((modifiers & Qt::GroupSwitchModifier) != 0U) &&
         (keynum >= Qt::Key_Dead_Grave) && (keynum <= Qt::Key_Dead_Horn))
     {
         m_composeKey = keynum;
@@ -473,7 +463,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
             //QKeyEvent key(QEvent::KeyPress, keycode, modifiers);
             character = QChar(keycode);
 
-            if (modifiers & Qt::ShiftModifier)
+            if ((modifiers & Qt::ShiftModifier) != 0U)
                 character = character.toUpper();
             else
                 character = character.toLower();

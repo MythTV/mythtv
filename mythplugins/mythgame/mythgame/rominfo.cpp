@@ -11,9 +11,7 @@
 
 bool operator==(const RomInfo& a, const RomInfo& b)
 {
-    if (a.Romname() == b.Romname())
-        return true;
-    return false;
+    return a.Romname() == b.Romname();
 }
 
 void RomInfo::SaveToDatabase()
@@ -22,7 +20,7 @@ void RomInfo::SaveToDatabase()
 
     bool inserting = false;
 
-    if (id == 0)
+    if (m_id == 0)
         inserting = true;
 
     if (inserting)
@@ -113,7 +111,7 @@ void RomInfo::DeleteFromDatabase()
 }
 
 // Return the count of how many times this appears in the db already
-int romInDB(QString rom, QString gametype)
+int romInDB(const QString& rom, const QString& gametype)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -171,42 +169,42 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     return false;
 }
 
-void RomInfo::setField(QString field, QString data)
+void RomInfo::setField(const QString& field, const QString& data)
 {
     if (field == "system")
-        system = data;
+        m_system = data;
     else if (field == "gamename")
-        gamename = data;
+        m_gamename = data;
     else if (field == "genre")
-        genre = data;
+        m_genre = data;
     else if (field == "year")
-        year = data;
+        m_year = data;
     else if (field == "favorite")
-        favorite = data.toInt();
+        m_favorite = (data.toInt() != 0);
     else if (field == "rompath")
-        rompath = data;
+        m_rompath = data;
     else if (field == "screenshot")
-        screenshot = data;
+        m_screenshot = data;
     else if (field == "fanart")
-        fanart = data;
+        m_fanart = data;
     else if (field == "boxart")
-        boxart = data;
+        m_boxart = data;
     else if (field == "country")
-        country = data;
+        m_country = data;
     else if (field == "plot")
-        plot = data;
+        m_plot = data;
     else if (field == "publisher")
-        publisher = data;
+        m_publisher = data;
     else if (field == "crc_value")
-        crc_value = data;
+        m_crc_value = data;
     else if (field == "inetref")
-        inetref = data;
+        m_inetref = data;
     else if (field == "diskcount")
-        diskcount = data.toInt();
+        m_diskcount = data.toInt();
     else if (field == "gametype")
-        gametype = data;
+        m_gametype = data;
     else if (field == "romcount")
-        romcount = data.toInt();
+        m_romcount = data.toInt();
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid field %1").arg(field));
 
@@ -214,7 +212,7 @@ void RomInfo::setField(QString field, QString data)
 
 void RomInfo::setFavorite(bool updateDatabase)
 {
-    favorite = 1 - favorite;
+    m_favorite = !m_favorite;
 
     if (updateDatabase)
     {
@@ -223,8 +221,8 @@ void RomInfo::setFavorite(bool updateDatabase)
         query.prepare("UPDATE gamemetadata SET favorite = :FAV "
                       "WHERE romname = :ROMNAME");
 
-        query.bindValue(":FAV", favorite);
-        query.bindValue(":ROMNAME",romname);
+        query.bindValue(":FAV", m_favorite);
+        query.bindValue(":ROMNAME",m_romname);
 
         if (!query.exec())
         {
@@ -248,7 +246,7 @@ QString RomInfo::getExtension()
 
 void RomInfo::fillData()
 {
-    if (gamename == "")
+    if (m_gamename == "")
     {
         return;
     }
@@ -256,7 +254,7 @@ void RomInfo::fillData()
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString systemtype;
-    if (system != "") {
+    if (m_system != "") {
         systemtype  += " AND system = :SYSTEM ";
     }
 
@@ -267,8 +265,8 @@ void RomInfo::fillData()
                        + systemtype + " ORDER BY diskcount DESC";
 
     query.prepare(thequery);
-    query.bindValue(":SYSTEM", system);
-    query.bindValue(":GAMENAME", gamename);
+    query.bindValue(":SYSTEM", m_system);
+    query.bindValue(":GAMENAME", m_gamename);
 
     if (query.exec() && query.next())
     {
@@ -293,7 +291,7 @@ void RomInfo::fillData()
         setId(query.value(18).toInt());
     }
 
-    setRomCount(romInDB(romname,gametype));
+    setRomCount(romInDB(m_romname,m_gametype));
 
     // If we have more than one instance of this rom in the DB fill in all
     // systems available to play it.
@@ -307,15 +305,15 @@ void RomInfo::fillData()
 
         while (query.next())
         {
-            if (allsystems.isEmpty())
-                allsystems = query.value(0).toString();
+            if (m_allsystems.isEmpty())
+                m_allsystems = query.value(0).toString();
             else
-                allsystems += "," + query.value(0).toString();
+                m_allsystems += "," + query.value(0).toString();
         }
     }
     else
     {
-        allsystems = system;
+        m_allsystems = m_system;
     }
 }
 

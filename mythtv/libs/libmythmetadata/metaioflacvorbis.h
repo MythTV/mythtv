@@ -21,23 +21,23 @@ using TagLib::String;
 class META_PUBLIC MetaIOFLACVorbis : public MetaIOTagLib
 {
 public:
-    MetaIOFLACVorbis(void);
+    MetaIOFLACVorbis(void) = default;
     virtual ~MetaIOFLACVorbis(void) = default;
 
-    bool write(const QString &filename, MusicMetadata* mdata);
-    bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
-    bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
+    bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
+    bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart) override; // MetaIO
+    bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart) override; // MetaIO
 
-    MusicMetadata* read(const QString &filename);
-    AlbumArtList getAlbumArtList(const QString &filename);
-    QImage *getAlbumArt(const QString &filename, ImageType type);
+    MusicMetadata* read(const QString &filename) override; // MetaIOTagLib
+    AlbumArtList getAlbumArtList(const QString &filename) override; // MetaIO
+    QImage *getAlbumArt(const QString &filename, ImageType type) override; // MetaIO
 
-    bool supportsEmbeddedImages(void) { return true; }
+    bool supportsEmbeddedImages(void) override { return true; } // MetaIO
 
     bool changeImageType(const QString &filename, const AlbumArtImage *albumart,
-                         ImageType newType);
+                         ImageType newType) override; // MetaIO
 
-    virtual bool TagExists(const QString &filename);
+    bool TagExists(const QString &filename) override; // MetaIO
 
 private:
     TagLib::FLAC::File *OpenFile(const QString &filename);

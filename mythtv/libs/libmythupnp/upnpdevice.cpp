@@ -40,30 +40,6 @@ int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpDeviceDesc::UPnpDeviceDesc()
-{
-    // Static initialisation order fiasco: Logging isn't available yet
-#if 0
-    LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Constructor");
-#endif
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpDeviceDesc::~UPnpDeviceDesc()
-{
-    // FIXME: Using this causes crashes
-#if 0
-    LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Destructor");
-#endif
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 bool UPnpDeviceDesc::Load( const QString &sFileName )
 {
     // ----------------------------------------------------------------------
@@ -195,7 +171,7 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessIconList( const QDomNode& oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
           !oNode.isNull();
@@ -224,7 +200,7 @@ void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
           !oNode.isNull();
@@ -258,7 +234,7 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessDeviceList( QDomNode    oListNode,
+void UPnpDeviceDesc::ProcessDeviceList( const QDomNode&    oListNode,
                                         UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
@@ -314,7 +290,7 @@ void UPnpDeviceDesc::SetBoolValue( const QDomNode &n, bool &nValue )
         if (!oText.isNull())
         {
             QString s = oText.nodeValue();
-            nValue = (s == "yes" || s == "true" || s.toInt());
+            nValue = (s == "yes" || s == "true" || (s.toInt() != 0));
         }
     }
 }
@@ -530,11 +506,11 @@ QString UPnpDeviceDesc::FormatValue(const NameValue& node)
 
     QString sAttributes;
     NameValues::iterator it;
-    for (it = node.pAttributes->begin(); it != node.pAttributes->end(); ++it)
+    for (it = node.m_pAttributes->begin(); it != node.m_pAttributes->end(); ++it)
     {
-        sAttributes += QString(" %1='%2'").arg((*it).sName).arg((*it).sValue);
+        sAttributes += QString(" %1='%2'").arg((*it).m_sName).arg((*it).m_sValue);
     }
-    sStr = QString("<%1%2>%3</%1>\n").arg(node.sName).arg(sAttributes).arg(node.sValue);
+    sStr = QString("<%1%2>%3</%1>\n").arg(node.m_sName).arg(sAttributes).arg(node.m_sValue);
 
     return( sStr );
 }
@@ -878,12 +854,12 @@ QString UPnpDevice::toString(uint padding) const
         ret += "Extra key value pairs\n";
         for (; it != m_lstExtra.end(); ++it)
         {
-            ret += (*it).sName;
+            ret += (*it).m_sName;
             ret += ":";
-            int int_padding = 18 - ((*it).sName.length() + 1);
+            int int_padding = 18 - ((*it).m_sName.length() + 1);
             for (int i = 0; i < int_padding; i++)
                 ret += " ";
-            ret += QString("%1\n").arg((*it).sValue);
+            ret += QString("%1\n").arg((*it).m_sValue);
         }
     }
 

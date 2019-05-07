@@ -83,7 +83,13 @@ template <class DBFS>
 class ThumbThread : public MThread
 {
 public:
-    ThumbThread(const QString &name, DBFS *const dbfs);
+    /*!
+     \brief Constructor
+     \param name Thread name
+     \param dbfs Filesystem/Database adapter
+    */
+    ThumbThread(const QString &name, DBFS *const dbfs)
+        : MThread(name), m_dbfs(*dbfs) {}
     ~ThumbThread();
 
     void cancel();
@@ -92,7 +98,7 @@ public:
     void PauseBackground(bool pause);
 
 protected:
-    void run();
+    void run() override; // MThread
 
 private:
     Q_DISABLE_COPY(ThumbThread)
@@ -108,7 +114,7 @@ private:
 
     ThumbQueue m_requestQ;   //!< Priority queue of requests
     ThumbQueue m_backgroundQ;   //!< Priority queue of background tasks
-    bool m_doBackground;       //!< Whether to process background tasks
+    bool m_doBackground {true}; //!< Whether to process background tasks
     QMutex m_mutex;            //!< Queue protection
 };
 

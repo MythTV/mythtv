@@ -22,15 +22,15 @@ class AudioOutputOpenSLES : public AudioOutputBase
     virtual ~AudioOutputOpenSLES();
 
     // Volume control
-    virtual int  GetVolumeChannel(int channel) const;
-    virtual void SetVolumeChannel(int channel, int volume);
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   protected:
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(bool digital);
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
 
   private:
     int GetNumberOfBuffersQueued() const;
@@ -47,33 +47,33 @@ class AudioOutputOpenSLES : public AudioOutputBase
 
   private:
     /* OpenSL objects */
-    SLObjectItf                     engineObject = nullptr;
-    SLObjectItf                     outputMixObject = nullptr;
-    SLAndroidSimpleBufferQueueItf   playerBufferQueue = nullptr;
-    SLObjectItf                     playerObject = nullptr;
-    SLVolumeItf                     volumeItf = nullptr;
-    SLEngineItf                     engineEngine = nullptr;
-    SLPlayItf                       playerPlay = nullptr;
+    SLObjectItf                     m_engineObject      {nullptr};
+    SLObjectItf                     m_outputMixObject   {nullptr};
+    SLAndroidSimpleBufferQueueItf   m_playerBufferQueue {nullptr};
+    SLObjectItf                     m_playerObject      {nullptr};
+    SLVolumeItf                     m_volumeItf         {nullptr};
+    SLEngineItf                     m_engineEngine      {nullptr};
+    SLPlayItf                       m_playerPlay        {nullptr};
 
     /* OpenSL symbols */
-    void                           *p_so_handle = nullptr;
+    void                           *m_so_handle         {nullptr};
 
-    slCreateEngine_t                slCreateEnginePtr = nullptr;
-    SLInterfaceID                   SL_IID_ENGINE = nullptr;
-    SLInterfaceID                   SL_IID_ANDROIDSIMPLEBUFFERQUEUE = nullptr;
-    SLInterfaceID                   SL_IID_VOLUME = nullptr;
-    SLInterfaceID                   SL_IID_PLAY = nullptr;
+    slCreateEngine_t                m_slCreateEnginePtr {nullptr};
+    SLInterfaceID                   m_SL_IID_ENGINE     {nullptr};
+    SLInterfaceID                   m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE {nullptr};
+    SLInterfaceID                   m_SL_IID_VOLUME     {nullptr};
+    SLInterfaceID                   m_SL_IID_PLAY       {nullptr};
 
     /* audio buffered through opensles */
-    uint8_t                        *buf = nullptr;
-    int                             bufWriteBase;   // always fragment aligned
-    int                             bufWriteIndex;  // offset from base
+    uint8_t                        *m_buf               {nullptr};
+    int                             m_bufWriteBase     {0}; // always fragment aligned
+    int                             m_bufWriteIndex    {0}; // offset from base
 
     /* if we can measure latency already */
-    bool                            started;
-    int                             nativeOutputSampleRate;
+    bool                            m_started          {false};
+    int                             m_nativeOutputSampleRate;
 
-    QMutex                          lock;
+    QMutex                          m_lock;
 
 };
 

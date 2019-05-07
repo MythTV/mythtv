@@ -44,47 +44,46 @@ typedef enum ASIRXMode
 class ASIStreamHandler : public StreamHandler
 {
   public:
-    static ASIStreamHandler *Get(const QString &devicename,
-                                 int recorder_id = -1);
-    static void Return(ASIStreamHandler * & ref, int recorder_id = -1);
+    static ASIStreamHandler *Get(const QString &devname, int inputid);
+    static void Return(ASIStreamHandler * & ref, int inputid);
 
-    virtual void AddListener(MPEGStreamData *data,
-                             bool /*allow_section_reader*/ = false,
-                             bool /*needs_drb*/            = false,
-                             QString output_file       = QString())
+    void AddListener(MPEGStreamData *data,
+                     bool /*allow_section_reader*/ = false,
+                     bool /*needs_drb*/            = false,
+                     QString output_file       = QString()) override // StreamHandler
     {
         StreamHandler::AddListener(data, false, true, output_file);
-    } // StreamHandler
+    }
 
     void SetClockSource(ASIClockSource cs);
     void SetRXMode(ASIRXMode m);
 
   private:
-    explicit ASIStreamHandler(const QString &);
+    explicit ASIStreamHandler(const QString &, int inputid);
 
     bool Open(void);
     void Close(void);
 
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
-    virtual void PriorityEvent(int fd); // DeviceReaderCB
+    void PriorityEvent(int fd) override; // DeviceReaderCB
 
-    virtual void SetRunningDesired(bool desired); // StreamHandler
+    void SetRunningDesired(bool desired) override; // StreamHandler
 
   private:
-    int                                     _device_num;
-    int                                     _buf_size;
-    int                                     _num_buffers;
-    int                                     _fd;
-    uint                                    _packet_size;
-    ASIClockSource                          _clock_source;
-    ASIRXMode                               _rx_mode;
-    DeviceReadBuffer                       *_drb;
+    int               m_device_num   {-1};
+    int               m_buf_size     {-1};
+    int               m_num_buffers  {-1};
+    int               m_fd           {-1};
+    uint              m_packet_size  {TSPacket::kSize};
+    ASIClockSource    m_clock_source {kASIInternalClock};
+    ASIRXMode         m_rx_mode      {kASIRXSyncOnActualConvertTo188};
+    DeviceReadBuffer *m_drb          {nullptr};
 
     // for implementing Get & Return
-    static QMutex                           _handlers_lock;
-    static QMap<QString, ASIStreamHandler*> _handlers;
-    static QMap<QString, uint>              _handlers_refcnt;
+    static QMutex                           s_handlers_lock;
+    static QMap<QString, ASIStreamHandler*> s_handlers;
+    static QMap<QString, uint>              s_handlers_refcnt;
 };
 
 #endif // _ASISTREAMHANDLER_H_

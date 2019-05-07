@@ -42,8 +42,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     MythUIGuideGrid(MythUIType *parent, const QString &name);
     ~MythUIGuideGrid();
 
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
 
     enum FillType { Alpha = 10, Dense, Eco, Solid };
 
@@ -57,7 +57,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void SetArrow(int, const QString &file);
     void LoadImage(int, const QString &file);
     void SetProgramInfo(int row, int col, const QRect &area,
-                        const QString &title, const QString &category,
+                        const QString &title, const QString &genre,
                         int arrow, int recType, int recStat, bool selected);
     void ResetData();
     void ResetRow(int row);
@@ -67,11 +67,11 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     QPoint GetRowAndColumn(QPoint position);
 
   protected:
-    virtual void Finalize(void);
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    void Finalize(void) override; // MythUIType
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
     bool parseDefaultCategoryColors(QMap<QString, QString> &catColors);
 
@@ -95,6 +95,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
                 m_recStat(o.m_recStat)
         {}
 
+        UIGTCon& operator=(const UIGTCon&) = default;
+
         QRect m_drawArea;
         QString m_title;
         QString m_category;
@@ -117,39 +119,40 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
     QColor calcColor(const QColor &color, int alpha);
 
-    QList<UIGTCon*> *m_allData;
+    QList<UIGTCon*> *m_allData  {nullptr};
     UIGTCon m_selectedItem;
 
     MythUIImage *m_recImages[RECSTATUSSIZE];
     MythUIImage *m_arrowImages[ARROWIMAGESIZE];
 
     // themeable settings
-    int  m_channelCount;
-    int  m_timeCount;
-    bool m_verticalLayout;
+    int    m_channelCount       {5};
+    int    m_timeCount          {4};
+    bool   m_verticalLayout     {false};
     QPoint m_textOffset;
 
-    MythFontProperties *m_font;
-    int    m_justification;
-    bool   m_multilineText;
-    bool   m_cutdown;
+    MythFontProperties *m_font  {nullptr};
+    int    m_justification      {Qt::AlignLeft | Qt::AlignTop |
+                                 Qt::TextWordWrap};
+    bool   m_multilineText      {true};
+    bool   m_cutdown            {true};
 
-    QString m_selType;
-    QPen    m_drawSelLine;
-    QBrush  m_drawSelFill;
+    QString m_selType           {"box"};
+    QPen    m_drawSelLine       {Qt::NoPen};
+    QBrush  m_drawSelFill       {Qt::NoBrush};
 
     QColor m_solidColor;
     QColor m_recordingColor;
     QColor m_conflictingColor;
 
-    int    m_fillType;
+    int    m_fillType           {Solid};
 
-    int  m_rowCount;
-    int  m_progPastCol;
+    int  m_rowCount             {0};
+    int  m_progPastCol          {0};
 
-    bool   m_drawCategoryColors;
-    bool   m_drawCategoryText;
-    int    m_categoryAlpha;
+    bool   m_drawCategoryColors {true};
+    bool   m_drawCategoryText   {true};
+    int    m_categoryAlpha      {255};
 
     QMap<QString, QColor> m_categoryColors;
 

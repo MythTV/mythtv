@@ -9,9 +9,9 @@ Run MythPlugins ./configure with the option --enable-mythnetvision or
 
 -- Standalone config --
 
-run (a Qt4 version of) qmake on mythnetvision.pro:
+run qmake on mythnetvision.pro:
 
-qmake-qt4 mythnetvision.pro
+qmake-qt5 mythnetvision.pro
 
 Type 'make' in the main directory to begin compiling
 

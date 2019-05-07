@@ -19,6 +19,7 @@
 #include <netutils.h>
 #include <rssparse.h>
 #include <mythdownloadmanager.h>
+#include <mythsorthelper.h>
 
 // RSS headers
 #include "rsseditor.h"
@@ -41,28 +42,6 @@ namespace
 
         return ret;
     }
-}
-
-/** \brief Creates a new RSS Edit Popup
- *  \param url The web page for which an entry is being created.
- *  \param edit If true, then editing an existing entry instead of
- *              creating a new entry.
- *  \param parent Pointer to the screen stack
- *  \param name The name of the window
- */
-RSSEditPopup::RSSEditPopup(
-    const QString &url, bool edit,
-    MythScreenStack *parent, const QString &name) :
-    MythScreenType(parent, name),
-    m_site(nullptr),
-    m_urlText(url),        m_editing(edit),
-    m_thumbImage(nullptr), m_thumbButton(nullptr),
-    m_urlEdit(nullptr),    m_titleEdit(nullptr),
-    m_descEdit(nullptr),   m_authorEdit(nullptr),
-    m_okButton(nullptr),   m_cancelButton(nullptr),
-    m_download(nullptr),   m_manager(nullptr),
-    m_reply(nullptr)
-{
 }
 
 RSSEditPopup::~RSSEditPopup()
@@ -126,7 +105,7 @@ bool RSSEditPopup::Create(void)
             m_thumbImage->Load();
         }
 
-        if (m_site->GetDownload() == 1)
+        if (m_site->GetDownload())
             m_download->SetCheckState(MythUIStateType::Full);
     }
 
@@ -159,16 +138,12 @@ void RSSEditPopup::ParseAndSave(void)
         QString author = m_authorEdit->GetText();
         QString link = m_urlEdit->GetText();
         QString filename = m_thumbImage->GetFilename();
-
-        bool download;
-        if (m_download->GetCheckState() == MythUIStateType::Full)
-            download = true;
-        else
-            download = false;
+        bool download = m_download->GetCheckState() == MythUIStateType::Full;
 
         removeFromDB(m_urlText, VIDEO_PODCAST);
 
-        RSSSite site(title, filename, VIDEO_PODCAST,
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        RSSSite site(title, sh->doTitle(title), filename, VIDEO_PODCAST,
                      desc, link, author, download, MythDate::current());
         if (insertInDB(&site))
             emit Saving();
@@ -269,12 +244,7 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
             }
         }
 
-        bool download;
-        if (m_download->GetCheckState() == MythUIStateType::Full)
-            download = true;
-        else
-            download = false;
-
+        bool download = m_download->GetCheckState() == MythUIStateType::Full;
         QDateTime updated = MythDate::current();
         QString filename("");
 
@@ -285,7 +255,8 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
 
         QString link = m_urlEdit->GetText();
 
-        RSSSite site(title, filename, VIDEO_PODCAST, description, link,
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        RSSSite site(title, sh->doTitle(title), filename, VIDEO_PODCAST, description, link,
                      author, download, MythDate::current());
         if (insertInDB(&site))
             emit Saving();
@@ -328,13 +299,6 @@ void RSSEditPopup::customEvent(QEvent *levent)
             m_thumbImage->Show();
         }
     }
-}
-
-RSSEditor::RSSEditor(MythScreenStack *parent, const QString &name) :
-    MythScreenType(parent, name), m_lock(QMutex::Recursive),
-    m_changed(false), m_sites(nullptr), m_new(nullptr), m_delete(nullptr), m_edit(nullptr),
-    m_image(nullptr), m_title(nullptr), m_url(nullptr), m_desc(nullptr), m_author(nullptr)
-{
 }
 
 RSSEditor::~RSSEditor()
@@ -478,7 +442,7 @@ void RSSEditor::SlotItemChanged()
     {
         if (m_image)
         {
-            QString thumb = site->GetImage();
+            const QString& thumb = site->GetImage();
 
             m_image->Reset();
 

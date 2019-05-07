@@ -21,11 +21,11 @@ using TagLib::String;
 class META_PUBLIC MetaIOOggVorbis : public MetaIOTagLib
 {
   public:
-    MetaIOOggVorbis(void);
+    MetaIOOggVorbis(void) : MetaIOTagLib() {}
     ~MetaIOOggVorbis(void) = default;
 
-    bool write(const QString &filename, MusicMetadata* mdata);
-    MusicMetadata* read(const QString &filename);
+    bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
+    MusicMetadata* read(const QString &filename) override; // MetaIOTagLib
 
   private:
     TagLib::Ogg::Vorbis::File *OpenFile(const QString &filename);

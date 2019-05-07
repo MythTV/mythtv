@@ -16,8 +16,7 @@ typedef QMap<QString, QTranslator*> TransMap;
 class MythTranslationPrivate
 {
   public:
-    MythTranslationPrivate():
-          m_loaded(false) { };
+    MythTranslationPrivate() = default;
 
     void Init(void)
     {
@@ -28,7 +27,7 @@ class MythTranslationPrivate
         }
     };
 
-    bool m_loaded;
+    bool m_loaded {false};
     QString m_language;
     TransMap m_translators;
 };
@@ -52,7 +51,7 @@ void MythTranslation::load(const QString &module_name)
 
     if (lang == "en")
     {
-        gCoreContext->SaveSettingOnHost("Language", "en_US", nullptr);
+        gCoreContext->OverrideSettingForSession("Language", "en_US");
         lang = "en_us";
     }
 

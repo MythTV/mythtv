@@ -21,17 +21,17 @@ class Transcode : public QObject
         const QString &outputname,
         const QString &profileName,
         bool honorCutList, bool framecontrol, int jobID,
-        QString fifodir, bool fifo_info, bool cleanCut, frm_dir_map_t &deleteMap,
+        const QString& fifodir, bool fifo_info, bool cleanCut, frm_dir_map_t &deleteMap,
         int AudioTrackNo, bool passthru = false);
     void ShowProgress(bool val) { showprogress = val; }
-    void SetRecorderOptions(QString options) { recorderOptions = options; }
+    void SetRecorderOptions(const QString& options) { recorderOptions = options; }
     void SetAVFMode(void) { avfMode = true; }
     void SetHLSMode(void) { hlsMode = true; }
     void SetHLSStreamID(int streamid) { hlsStreamID = streamid; }
     void SetHLSMaxSegments(int segments) { hlsMaxSegments = segments; }
-    void SetCMDContainer(QString container) { cmdContainer = container; }
-    void SetCMDAudioCodec(QString codec) { cmdAudioCodec = codec; }
-    void SetCMDVideoCodec(QString codec) { cmdVideoCodec = codec; }
+    void SetCMDContainer(const QString& container) { cmdContainer = container; }
+    void SetCMDAudioCodec(const QString& codec) { cmdAudioCodec = codec; }
+    void SetCMDVideoCodec(const QString& codec) { cmdVideoCodec = codec; }
     void SetCMDHeight(int height) { cmdHeight = height; }
     void SetCMDWidth(int width) { cmdWidth = width; }
     void SetCMDBitrate(int bitrate) { cmdBitrate = bitrate; }
@@ -39,12 +39,12 @@ class Transcode : public QObject
     void DisableAudioOnlyHLS(void) { hlsDisableAudioOnly = true; }
 
   private:
-    bool GetProfile(QString profileName, QString encodingType, int height,
+    bool GetProfile(const QString& profileName, const QString& encodingType, int height,
                     int frameRate);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
     void SetPlayerContext(PlayerContext*);
     PlayerContext *GetPlayerContext(void) { return ctx; }
-    MythPlayer *GetPlayer(void) { return (ctx) ? ctx->player : nullptr; }
+    MythPlayer *GetPlayer(void) { return (ctx) ? ctx->m_player : nullptr; }
 
   private:
     ProgramInfo            *m_proginfo;

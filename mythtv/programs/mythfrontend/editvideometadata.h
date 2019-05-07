@@ -22,18 +22,18 @@ class EditMetadataDialog : public MythScreenType
 
   public:
      EditMetadataDialog(MythScreenStack *lparent,
-                       QString lname,
+                       const QString& lname,
                        VideoMetadata *source_metadata,
                        const VideoMetadataListManager &cache);
     ~EditMetadataDialog();
 
-    bool Create();
-    void customEvent(QEvent *levent);
+    bool Create() override; // MythScreenType
+    void customEvent(QEvent *levent) override; // MythUIType
 
     void fillWidgets();
 
   protected:
-    void createBusyDialog(QString title);
+    void createBusyDialog(const QString& title);
 
   signals:
     void Finished();
@@ -65,7 +65,7 @@ class EditMetadataDialog : public MythScreenType
     void FindScreenshot();
     void FindTrailer();
     void NewCategoryPopup();
-    void AddCategory(QString category);
+    void AddCategory(const QString& category);
     void SetCoverArt(QString file);
     void SetBanner(QString file);
     void SetFanart(QString file);
@@ -76,73 +76,73 @@ class EditMetadataDialog : public MythScreenType
     void FindNetBanner();
     void FindNetFanart();
     void FindNetScreenshot();
-    void OnSearchListSelection(ArtworkInfo info,
+    void OnSearchListSelection(const ArtworkInfo& info,
                                VideoArtworkType type);
 
   private:
     void OnArtworkSearchDone(MetadataLookup *lookup);
     void handleDownloadedImages(MetadataLookup *lookup);
 
-    VideoMetadata            *m_workingMetadata;
-    VideoMetadata            *m_origMetadata;
+    VideoMetadata     *m_workingMetadata;
+    VideoMetadata     *m_origMetadata;
 
     //
     //  GUI stuff
     //
 
-    MythUITextEdit      *m_titleEdit;
-    MythUITextEdit      *m_subtitleEdit;
-    MythUITextEdit      *m_taglineEdit;
-    MythUITextEdit      *m_playerEdit;
-    MythUITextEdit      *m_ratingEdit;
-    MythUITextEdit      *m_directorEdit;
-    MythUITextEdit      *m_inetrefEdit;
-    MythUITextEdit      *m_homepageEdit;
-    MythUITextEdit      *m_plotEdit;
+    MythUITextEdit   *m_titleEdit                   {nullptr};
+    MythUITextEdit   *m_subtitleEdit                {nullptr};
+    MythUITextEdit   *m_taglineEdit                 {nullptr};
+    MythUITextEdit   *m_playerEdit                  {nullptr};
+    MythUITextEdit   *m_ratingEdit                  {nullptr};
+    MythUITextEdit   *m_directorEdit                {nullptr};
+    MythUITextEdit   *m_inetrefEdit                 {nullptr};
+    MythUITextEdit   *m_homepageEdit                {nullptr};
+    MythUITextEdit   *m_plotEdit                    {nullptr};
 
-    MythUISpinBox       *m_seasonSpin;
-    MythUISpinBox       *m_episodeSpin;
-    MythUISpinBox       *m_yearSpin;
-    MythUISpinBox       *m_userRatingSpin;
-    MythUISpinBox       *m_lengthSpin;
-    MythUIButtonList      *m_categoryList;
-    MythUIButtonList      *m_levelList;
-    MythUIButtonList      *m_childList;
-    MythUICheckBox      *m_browseCheck;
-    MythUICheckBox      *m_watchedCheck;
-    MythUIButton        *m_coverartButton;
-    MythUIText          *m_coverartText;
-    MythUIButton        *m_screenshotButton;
-    MythUIText          *m_screenshotText;
-    MythUIButton        *m_bannerButton;
-    MythUIText          *m_bannerText;
-    MythUIButton        *m_fanartButton;
-    MythUIText          *m_fanartText;
-    MythUIButton        *m_trailerButton;
-    MythUIText          *m_trailerText;
-    MythUIButton        *m_netCoverartButton;
-    MythUIButton        *m_netFanartButton;
-    MythUIButton        *m_netBannerButton;
-    MythUIButton        *m_netScreenshotButton;
-    MythUIImage         *m_coverart;
-    MythUIImage         *m_screenshot;
-    MythUIImage         *m_banner;
-    MythUIImage         *m_fanart;
-    MythUIButton        *m_doneButton;
+    MythUISpinBox    *m_seasonSpin                  {nullptr};
+    MythUISpinBox    *m_episodeSpin                 {nullptr};
+    MythUISpinBox    *m_yearSpin                    {nullptr};
+    MythUISpinBox    *m_userRatingSpin              {nullptr};
+    MythUISpinBox    *m_lengthSpin                  {nullptr};
+    MythUIButtonList *m_categoryList                {nullptr};
+    MythUIButtonList *m_levelList                   {nullptr};
+    MythUIButtonList *m_childList                   {nullptr};
+    MythUICheckBox   *m_browseCheck                 {nullptr};
+    MythUICheckBox   *m_watchedCheck                {nullptr};
+    MythUIButton     *m_coverartButton              {nullptr};
+    MythUIText       *m_coverartText                {nullptr};
+    MythUIButton     *m_screenshotButton            {nullptr};
+    MythUIText       *m_screenshotText              {nullptr};
+    MythUIButton     *m_bannerButton                {nullptr};
+    MythUIText       *m_bannerText                  {nullptr};
+    MythUIButton     *m_fanartButton                {nullptr};
+    MythUIText       *m_fanartText                  {nullptr};
+    MythUIButton     *m_trailerButton               {nullptr};
+    MythUIText       *m_trailerText                 {nullptr};
+    MythUIButton     *m_netCoverartButton           {nullptr};
+    MythUIButton     *m_netFanartButton             {nullptr};
+    MythUIButton     *m_netBannerButton             {nullptr};
+    MythUIButton     *m_netScreenshotButton         {nullptr};
+    MythUIImage      *m_coverart                    {nullptr};
+    MythUIImage      *m_screenshot                  {nullptr};
+    MythUIImage      *m_banner                      {nullptr};
+    MythUIImage      *m_fanart                      {nullptr};
+    MythUIButton     *m_doneButton                  {nullptr};
 
     //
     //  Remember video-to-play-next index number when the user is toggling
     //  child videos on and off
     //
 
-    int cachedChildSelection;
+    int cachedChildSelection                        {0};
 
     const VideoMetadataListManager &m_metaCache;
-    MetadataDownload               *m_query;
-    MetadataImageDownload          *m_imageDownload;
+    MetadataDownload               *m_query         {nullptr};
+    MetadataImageDownload          *m_imageDownload {nullptr};
 
-    MythUIBusyDialog *m_busyPopup;
-    MythScreenStack  *m_popupStack;
+    MythUIBusyDialog               *m_busyPopup     {nullptr};
+    MythScreenStack                *m_popupStack    {nullptr};
 };
 
 #endif

@@ -112,6 +112,11 @@ class MBASE_PUBLIC MThread
     static void GetAllRunningThreadNames(QStringList &list);
 
     static const int kDefaultStartTimeout;
+
+  private:
+    MThread(const MThread &) = delete;            // not copyable
+    MThread &operator=(const MThread &) = delete; // not copyable
+
   protected:
     /// \brief Runs the Qt event loop unless we have a QRunnable,
     ///        in which case we run the runnable run instead.
@@ -127,10 +132,10 @@ class MBASE_PUBLIC MThread
     static void msleep(unsigned long time);
     static void usleep(unsigned long time);
 
-    MThreadInternal *m_thread;
-    QRunnable *m_runnable;
-    bool m_prolog_executed;
-    bool m_epilog_executed;
+    MThreadInternal *m_thread {nullptr};
+    QRunnable *m_runnable     {nullptr};
+    bool m_prolog_executed    {true};
+    bool m_epilog_executed    {true};
 };
 
 #endif // _MYTH_THREAD_H_

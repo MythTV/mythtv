@@ -62,21 +62,21 @@ class DBPurgeHandler : public QObject
   public:
     DBPurgeHandler()
     {
-        purgeTimer = startTimer(5 * 60000);
+        m_purgeTimer = startTimer(5 * 60000);
     }
-    void timerEvent(QTimerEvent *event)
+    void timerEvent(QTimerEvent *event) override // QObject
     {
-        if (event->timerId() == purgeTimer)
+        if (event->timerId() == m_purgeTimer)
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
     }
-    int purgeTimer;
+    int m_purgeTimer;
 };
 
 class MThreadInternal : public QThread
 {
   public:
     explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
-    virtual void run(void) { m_parent.run(); }
+    void run(void) override { m_parent.run(); } // QThread
 
     void QThreadRun(void) { QThread::run(); }
     int exec(void)
@@ -100,8 +100,7 @@ static QMutex s_all_threads_lock;
 static QSet<MThread*> s_all_threads;
 
 MThread::MThread(const QString &objectName) :
-    m_thread(new MThreadInternal(*this)), m_runnable(nullptr),
-    m_prolog_executed(true), m_epilog_executed(true)
+    m_thread(new MThreadInternal(*this))
 {
     m_thread->setObjectName(objectName);
     QMutexLocker locker(&s_all_threads_lock);
@@ -230,7 +229,7 @@ void MThread::ThreadSetup(const QString &name)
     loggingRegisterThread(name);
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     qsrand(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
-#else
+#elif QT_VERSION < QT_VERSION_CHECK(5,10,0)
     qsrand(MythDate::current().toSecsSinceEpoch() ^ QTime::currentTime().msec());
 #endif
 }

@@ -41,13 +41,13 @@ class MTV_PUBLIC MythCodecContext
 {
   public:
     MythCodecContext(void);
-    virtual ~MythCodecContext();
+    virtual ~MythCodecContext() = default;
     static MythCodecContext* createMythCodecContext(MythCodecID codec);
     virtual int HwDecoderInit(AVCodecContext * /*ctx*/) { return 0; }
     void setStream(AVStream *initStream) { stream = initStream; }
     virtual int FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame);
-    static QStringList GetDeinterlacers(QString decodername);
-    static bool isCodecDeinterlacer(QString decodername);
+    static QStringList GetDeinterlacers(const QString& decodername);
+    static bool isCodecDeinterlacer(const QString& decodername);
     virtual QStringList GetDeinterlacers(void) { return QStringList(); }
     virtual QString GetDeinterlaceFilter() { return QString(); }
     void setPlayer(MythPlayer *tPlayer) { player = tPlayer; }
@@ -61,8 +61,7 @@ class MTV_PUBLIC MythCodecContext
 
   protected:
     virtual bool isValidDeinterlacer(QString /*name*/) { return false; }
-    int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
-    void CloseFilters();
+    virtual int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
     AVStream* stream;
     AVFilterContext *buffersink_ctx;
     AVFilterContext *buffersrc_ctx;

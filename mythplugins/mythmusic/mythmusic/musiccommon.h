@@ -58,10 +58,10 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     void switchView(MusicView view);
 
-    virtual void customEvent(QEvent *event);
-    bool keyPressEvent(QKeyEvent *e);
+    void customEvent(QEvent *event) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
   protected slots:
     void viewExited(void);
@@ -135,30 +135,30 @@ class MPUBLIC MusicCommon : public MythScreenType
     void playFirstTrack();
     bool restorePosition(int trackID);
 
-    MythScreenType        *m_parentScreen;
+    MythScreenType        *m_parentScreen       {nullptr};
     MusicView              m_currentView;
 
     // visualiser stuff
-    MainVisual            *m_mainvisual;
-    bool                   m_fullscreenBlank;
-    bool                   m_cycleVisualizer;
-    bool                   m_randomVisualizer;
+    MainVisual            *m_mainvisual         {nullptr};
+    bool                   m_fullscreenBlank    {false};
+    bool                   m_cycleVisualizer    {false};
+    bool                   m_randomVisualizer   {false};
 
     QStringList            m_visualModes;
-    unsigned int           m_currentVisual;
+    unsigned int           m_currentVisual      {0};
 
-    bool                   m_moveTrackMode;
-    bool                   m_movingTrack;
+    bool                   m_moveTrackMode      {false};
+    bool                   m_movingTrack        {false};
 
-    bool                   m_controlVolume;
+    bool                   m_controlVolume      {true};
 
-    int                    m_currentTrack;
-    int                    m_currentTime;
-    int                    m_maxTime;
+    int                    m_currentTrack       {0};
+    int                    m_currentTime        {0};
+    int                    m_maxTime            {0};
 
-    uint                   m_playlistTrackCount;
-    uint                   m_playlistPlayedTime;
-    uint                   m_playlistMaxTime;
+    uint                   m_playlistTrackCount {0};
+    uint                   m_playlistPlayedTime {0};
+    uint                   m_playlistMaxTime    {0};
 
     // for quick playlists
     PlaylistOptions        m_playlistOptions;
@@ -168,53 +168,54 @@ class MPUBLIC MusicCommon : public MythScreenType
     QList<int>             m_songList;
 
     // UI widgets
-    MythUIText            *m_timeText;
-    MythUIText            *m_infoText;
-    MythUIText            *m_visualText;
-    MythUIText            *m_noTracksText;
+    MythUIText            *m_timeText           {nullptr};
+    MythUIText            *m_infoText           {nullptr};
+    MythUIText            *m_visualText         {nullptr};
+    MythUIText            *m_noTracksText       {nullptr};
 
-    MythUIStateType       *m_shuffleState;
-    MythUIStateType       *m_repeatState;
+    MythUIStateType       *m_shuffleState       {nullptr};
+    MythUIStateType       *m_repeatState        {nullptr};
 
-    MythUIStateType       *m_movingTracksState;
+    MythUIStateType       *m_movingTracksState  {nullptr};
 
-    MythUIStateType       *m_ratingState;
+    MythUIStateType       *m_ratingState        {nullptr};
 
-    MythUIProgressBar     *m_trackProgress;
-    MythUIText            *m_trackProgressText;
-    MythUIText            *m_trackSpeedText;
-    MythUIStateType       *m_trackState;
+    MythUIProgressBar     *m_trackProgress      {nullptr};
+    MythUIText            *m_trackProgressText  {nullptr};
+    MythUIText            *m_trackSpeedText     {nullptr};
+    MythUIStateType       *m_trackState         {nullptr};
 
-    MythUIStateType       *m_muteState;
-    MythUIText            *m_volumeText;
+    MythUIStateType       *m_muteState          {nullptr};
+    MythUIText            *m_volumeText         {nullptr};
 
-    MythUIProgressBar     *m_playlistProgress;
+    MythUIProgressBar     *m_playlistProgress   {nullptr};
 
-    MythUIButton          *m_prevButton;
-    MythUIButton          *m_rewButton;
-    MythUIButton          *m_pauseButton;
-    MythUIButton          *m_playButton;
-    MythUIButton          *m_stopButton;
-    MythUIButton          *m_ffButton;
-    MythUIButton          *m_nextButton;
+    MythUIButton          *m_prevButton         {nullptr};
+    MythUIButton          *m_rewButton          {nullptr};
+    MythUIButton          *m_pauseButton        {nullptr};
+    MythUIButton          *m_playButton         {nullptr};
+    MythUIButton          *m_stopButton         {nullptr};
+    MythUIButton          *m_ffButton           {nullptr};
+    MythUIButton          *m_nextButton         {nullptr};
 
-    MythUIImage           *m_coverartImage;
+    MythUIImage           *m_coverartImage      {nullptr};
 
-    MythUIButtonList      *m_currentPlaylist;
-    MythUIButtonList      *m_playedTracksList;
+    MythUIButtonList      *m_currentPlaylist    {nullptr};
+    MythUIButtonList      *m_playedTracksList   {nullptr};
 
-    MythUIVideo           *m_visualizerVideo;
+    MythUIVideo           *m_visualizerVideo    {nullptr};
 };
 
 class MPUBLIC MythMusicVolumeDialog : public MythScreenType
 {
     Q_OBJECT
   public:
-    MythMusicVolumeDialog(MythScreenStack *parent, const char *name);
+    MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
+        : MythScreenType(parent, name, false) {}
     ~MythMusicVolumeDialog(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     void increaseVolume(void);
@@ -223,25 +224,27 @@ class MPUBLIC MythMusicVolumeDialog : public MythScreenType
 
     void updateDisplay(void);
 
-    QTimer            *m_displayTimer;
-    MythUIText        *m_messageText;
-    MythUIText        *m_volText;
-    MythUIStateType   *m_muteState;
-    MythUIProgressBar *m_volProgress;
+    QTimer            *m_displayTimer {nullptr};
+    MythUIText        *m_messageText  {nullptr};
+    MythUIText        *m_volText      {nullptr};
+    MythUIStateType   *m_muteState    {nullptr};
+    MythUIProgressBar *m_volProgress  {nullptr};
 };
 
 class MPUBLIC TrackInfoDialog : public MythScreenType
 {
   Q_OBJECT
   public:
-    TrackInfoDialog(MythScreenStack *parent, MusicMetadata *mdata, const char *name);
+    TrackInfoDialog(MythScreenStack *parent, MusicMetadata *mdata, const char *name)
+        : MythScreenType(parent, name, false),
+          m_metadata(mdata) {}
     ~TrackInfoDialog(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
-    MusicMetadata *m_metadata;
+    MusicMetadata *m_metadata {nullptr};
 };
 
 #endif

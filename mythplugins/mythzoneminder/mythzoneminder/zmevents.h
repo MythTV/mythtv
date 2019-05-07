@@ -32,11 +32,13 @@ class ZMEvents : public MythScreenType
     Q_OBJECT
 
 public:
-    explicit ZMEvents(MythScreenStack *parent);
+    explicit ZMEvents(MythScreenStack *parent)
+        : MythScreenType(parent, "zmevents"),
+          m_eventList(new std::vector<Event*>) {}
     ~ZMEvents();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void getEventList(void);
@@ -57,29 +59,29 @@ public:
     void getCameraList(void);
     void getDateList(void);
     void setGridLayout(int layout);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
-    bool                 m_oldestFirst;
-    bool                 m_showContinuous;
-    int                  m_layout;
+    bool                 m_oldestFirst    {false};
+    bool                 m_showContinuous {false};
+    int                  m_layout         {-1};
 
-    std::vector<Event *>     *m_eventList;
+    std::vector<Event *>     *m_eventList {nullptr};
     QStringList          m_dateList;
-    int                  m_savedPosition;
-    int                  m_currentCamera;
-    int                  m_currentDate;
+    int                  m_savedPosition  {0};
+    int                  m_currentCamera  {-1};
+    int                  m_currentDate    {-1};
 
-    MythUIText          *m_eventNoText;
+    MythUIText          *m_eventNoText    {nullptr};
 
-    MythUIButtonList    *m_eventGrid;
+    MythUIButtonList    *m_eventGrid      {nullptr};
 
-    MythUIButton        *m_playButton;
-    MythUIButton        *m_deleteButton;
+    MythUIButton        *m_playButton     {nullptr};
+    MythUIButton        *m_deleteButton   {nullptr};
 
-    MythUIButtonList    *m_cameraSelector;
-    MythUIButtonList    *m_dateSelector;
+    MythUIButtonList    *m_cameraSelector {nullptr};
+    MythUIButtonList    *m_dateSelector   {nullptr};
 
-    MythDialogBox       *m_menuPopup;
+    MythDialogBox       *m_menuPopup      {nullptr};
 };
 
 #endif

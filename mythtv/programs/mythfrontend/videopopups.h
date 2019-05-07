@@ -13,12 +13,13 @@ class CastDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    CastDialog(MythScreenStack *lparent, VideoMetadata *metadata);
+    CastDialog(MythScreenStack *lparent, VideoMetadata *metadata)
+        : MythScreenType(lparent, "videocastpopup"), m_metadata(metadata) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private:
-    VideoMetadata *m_metadata;
+    VideoMetadata *m_metadata {nullptr};
 };
 
 class PlotDialog : public MythScreenType
@@ -26,12 +27,13 @@ class PlotDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    PlotDialog(MythScreenStack *lparent, VideoMetadata *metadata);
+    PlotDialog(MythScreenStack *lparent, VideoMetadata *metadata)
+        : MythScreenType(lparent, "videoplotpopup"), m_metadata(metadata) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private:
-    VideoMetadata *m_metadata;
+    VideoMetadata *m_metadata {nullptr};
 };
 
 #endif

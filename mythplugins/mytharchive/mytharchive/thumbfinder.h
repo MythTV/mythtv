@@ -46,19 +46,19 @@ class ThumbFinder : public MythScreenType
                   const QString &menuTheme);
     ~ThumbFinder();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
 
   private slots:
     void gridItemChanged(MythUIButtonListItem *item);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void cancelPressed(void);
     void savePressed(void);
     void updateThumb(void);
 
   private:
-    void Init(void);
+    void Init(void) override; // MythScreenType
     bool getThumbImages(void);
     int  getChapterCount(const QString &menuTheme);
     void changeSeekAmount(bool up);
@@ -78,44 +78,44 @@ class ThumbFinder : public MythScreenType
     void updatePositionBar(int64_t frame);
     int  calcFinalDuration(void);
 
-    RemoteAVFormatContext m_inputFC;
-    AVCodecContext  *m_codecCtx;
-    AVCodec         *m_codec;
+    RemoteAVFormatContext m_inputFC      {nullptr};
+    AVCodecContext  *m_codecCtx          {nullptr};
+    AVCodec         *m_codec             {nullptr};
     MythAVFrame      m_frame;
     MythAVCopy       m_copy;
     QScopedPointer<MythPictureDeinterlacer> m_deinterlacer;
 
-    float            m_fps;
-    unsigned char   *m_outputbuf;
+    float            m_fps               {0.0F};
+    unsigned char   *m_outputbuf         {nullptr};
     QString          m_frameFile;
-    int              m_frameWidth;
-    int              m_frameHeight;
-    int              m_videostream;
-    int              m_currentSeek;
-    int64_t          m_startTime;   // in time_base units
-    int64_t          m_startPTS;    // in time_base units
-    int64_t          m_currentPTS;  // in time_base units
-    int64_t          m_firstIFramePTS;
-    int              m_frameTime;   // in time_base units
-    bool             m_updateFrame;
+    int              m_frameWidth        { 0};
+    int              m_frameHeight       { 0};
+    int              m_videostream       { 0};
+    int              m_currentSeek       { 0};
+    int64_t          m_startTime         {-1}; // in time_base units
+    int64_t          m_startPTS          {-1}; // in time_base units
+    int64_t          m_currentPTS        {-1}; // in time_base units
+    int64_t          m_firstIFramePTS    {-1};
+    int              m_frameTime         { 0};   // in time_base units
+    bool             m_updateFrame       {false};
     frm_dir_map_t    m_deleteMap;
-    int              m_finalDuration;
-    int              m_offset;
+    int              m_finalDuration     { 0};
+    int              m_offset            { 0};
 
-    ArchiveItem        *m_archiveItem;
+    ArchiveItem        *m_archiveItem    {nullptr};
     int                 m_thumbCount;
     QList<ThumbImage *> m_thumbList;
     QString             m_thumbDir;
 
     // GUI stuff
-    MythUIButton       *m_frameButton;
-    MythUIButton       *m_saveButton;
-    MythUIButton       *m_cancelButton;
-    MythUIImage        *m_frameImage;
-    MythUIImage        *m_positionImage;
-    MythUIButtonList   *m_imageGrid;
-    MythUIText         *m_seekAmountText;
-    MythUIText         *m_currentPosText;
+    MythUIButton       *m_frameButton    {nullptr};
+    MythUIButton       *m_saveButton     {nullptr};
+    MythUIButton       *m_cancelButton   {nullptr};
+    MythUIImage        *m_frameImage     {nullptr};
+    MythUIImage        *m_positionImage  {nullptr};
+    MythUIButtonList   *m_imageGrid      {nullptr};
+    MythUIText         *m_seekAmountText {nullptr};
+    MythUIText         *m_currentPosText {nullptr};
 };
 
 #endif

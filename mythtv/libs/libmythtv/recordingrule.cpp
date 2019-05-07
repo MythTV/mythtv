@@ -1,6 +1,8 @@
 
 #include "recordingrule.h"
 
+#include <utility>
+
 // libmythbase
 #include "mythdb.h"
 
@@ -12,6 +14,7 @@
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
 #include "mythdate.h"
+#include "mythsorthelper.h"
 
 static inline QString null_to_empty(const QString &str)
 {
@@ -24,61 +27,34 @@ static inline QString null_to_empty(const QString &str)
 // versions to lose those settings.
 
 RecordingRule::RecordingRule()
-  : m_recordID(-1), m_parentRecID(0),
-    m_isInactive(false),
-    m_season(0),
-    m_episode(0),
-    m_starttime(),
-    m_startdate(),
-    m_endtime(),
-    m_enddate(),
-    m_inetref(), // String could be null when we trying to insert into DB
-    m_channelid(0),
-    m_findday(0),
-    m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
+  : m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
     m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
              + 719528),
-    m_type(kNotRecording),
-    m_searchType(kNoSearch),
-    m_recPriority(0),
-    m_prefInput(0),
-    m_startOffset(0),
-    m_endOffset(0),
-    m_dupMethod(kDupCheckSubThenDesc),
-    m_dupIn(kDupsInAll),
-    m_filter(0),
-    m_recProfile(tr("Default")),
-    m_recGroupID(RecordingInfo::kDefaultRecGroup),
-    m_storageGroup("Default"),
-    m_playGroup("Default"),
-    m_autoExpire(false),
-    m_maxEpisodes(0),
-    m_maxNewest(false),
-    m_autoCommFlag(true),
-    m_autoTranscode(false),
-    m_transcoder(RecordingProfile::TranscoderAutodetect),
-    m_autoUserJob1(false),
-    m_autoUserJob2(false),
-    m_autoUserJob3(false),
-    m_autoUserJob4(false),
-    m_autoMetadataLookup(true),
-    m_nextRecording(),
-    m_lastRecorded(),
-    m_lastDeleted(),
-    m_averageDelay(100),
-    m_recordTable("record"),
-    m_tempID(0),
-    m_isOverride(false),
-    m_isTemplate(false),
-    m_template(),
-    m_progInfo(nullptr),
-    m_loaded(false)
+    m_transcoder(RecordingProfile::TranscoderAutodetect)
 {
     QDateTime dt = MythDate::current();
     m_enddate = m_startdate = dt.date();
     m_endtime = m_starttime = dt.time();
+
+    ensureSortFields();
 }
 
+/**
+ *  \brief Ensure that the sortTitle and sortSubtitle fields are set.
+ */
+void RecordingRule::ensureSortFields(void)
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+
+    if (m_sortTitle.isEmpty() and not m_title.isEmpty())
+        m_sortTitle = sh->doTitle(m_title);
+    if (m_sortSubtitle.isEmpty() and not m_subtitle.isEmpty())
+        m_sortSubtitle = sh->doTitle(m_subtitle);
+}
+
+/** Load a single rule from the recorded table.  Which rule is
+ *  specified in the member variable m_recordID.
+ */
 bool RecordingRule::Load(bool asTemplate)
 {
     if (m_recordID <= 0)
@@ -192,6 +168,7 @@ bool RecordingRule::Load(bool asTemplate)
     if (!asTemplate)
         m_loaded = true;
 
+    ensureSortFields();
     return true;
 }
 
@@ -219,12 +196,29 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
             m_playGroup = PlayGroup::GetInitialName(proginfo);
     }
 
+    ensureSortFields();
     m_loaded = true;
     return true;
 }
 
-bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
-                                 QString forwhat, QString from,
+/**
+ *  Load a recording rule based on search parameters.
+ *
+ *  \param lsearch The type of search.
+ *  \param textname Unused.  This is the raw text from a power search
+ *                  box, or the title from a custom search box.
+ *  \param forwhat  Sql describing the program search.  I.E. Somthing
+ *                  like "program.title LIKE '%title%'".
+ *  \param joininfo Sql used to join additional tables into the
+ *                  search.  It is inserted into a query after the
+ *                  FROM clause and before the WHERE clause.  For an
+ *                  example, see the text inserted when matching on a
+ *                  genre.
+ *  \param pginfo   A pointer to an existing ProgramInfo structure.
+ *  \return True if search data was successfully loaded.
+ */
+bool RecordingRule::LoadBySearch(RecSearchType lsearch, const QString& textname,
+                                 const QString& forwhat, QString joininfo,
                                  ProgramInfo *pginfo)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -263,7 +257,8 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
 
         QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
         m_title = ltitle;
-        m_subtitle = from;
+        m_sortTitle = nullptr;
+        m_subtitle = m_sortSubtitle = std::move(joininfo);
         m_description = forwhat;
 
         if (pginfo)
@@ -277,11 +272,12 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         }
     }
 
+    ensureSortFields();
     m_loaded = true;
     return true;
 }
 
-bool RecordingRule::LoadTemplate(QString category, QString categoryType)
+bool RecordingRule::LoadTemplate(const QString& category, const QString& categoryType)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recordid, category, "
@@ -325,11 +321,13 @@ bool RecordingRule::MakeTemplate(QString category)
     {
         category = "Default";
         m_title = tr("Default (Template)");
+        m_sortTitle = m_title;
     }
     else
     {
         //: %1 is the category
         m_title = tr("%1 (Template)").arg(category);
+        m_sortTitle = m_title;
     }
 
     LoadTemplate(category);
@@ -342,8 +340,8 @@ bool RecordingRule::MakeTemplate(QString category)
     return true;
 }
 
-bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
-                                          QString forwhat, QString from)
+bool RecordingRule::ModifyPowerSearchByID(int rid, const QString& textname,
+                                          QString forwhat, QString joininfo)
 {
     if (rid <= 0)
         return false;
@@ -355,9 +353,11 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
     QString ltitle = QString("%1 (%2)").arg(textname)
                                        .arg(tr("Power Search"));
     m_title = ltitle;
-    m_subtitle = from;
-    m_description = forwhat;
+    m_sortTitle = nullptr;
+    m_subtitle = m_sortSubtitle = std::move(joininfo);
+    m_description = std::move(forwhat);
 
+    ensureSortFields();
     m_loaded = true;
     return true;
 }
@@ -520,7 +520,7 @@ bool RecordingRule::Delete(bool sendSig)
         MythDB::DBError("ScheduledRecording::remove -- oldfind", query);
     }
 
-    if (m_searchType == kManualSearch)
+    if (m_searchType == kManualSearch && m_recordID)
     {
         query.prepare("DELETE FROM program WHERE manualid = :RECORDID");
         query.bindValue(":RECORDID", m_recordID);
@@ -545,10 +545,17 @@ bool RecordingRule::Delete(bool sendSig)
 void RecordingRule::ToMap(InfoMap &infoMap) const
 {
     if (m_title == "Default (Template)")
+    {
         infoMap["title"] = tr("Default (Template)");
+        infoMap["sorttitle"] = tr("Default (Template)");
+    }
     else
+    {
         infoMap["title"] = m_title;
+        infoMap["sorttitle"] = m_sortTitle;
+    }
     infoMap["subtitle"] = m_subtitle;
+    infoMap["sortsubtitle"] = m_sortSubtitle;
     infoMap["description"] = m_description;
     infoMap["season"] = QString::number(m_season);
     infoMap["episode"] = QString::number(m_episode);
@@ -661,7 +668,7 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
         infoMap["template"] = m_template;
 }
 
-void RecordingRule::UseTempTable(bool usetemp, QString table)
+void RecordingRule::UseTempTable(bool usetemp, const QString& table)
 {
     MSqlQuery query(MSqlQuery::SchedCon());
 
@@ -727,7 +734,9 @@ void RecordingRule::AssignProgramInfo()
         return;
 
     m_title       = m_progInfo->GetTitle();
+    m_sortTitle   = m_progInfo->GetSortTitle();
     m_subtitle    = m_progInfo->GetSubtitle();
+    m_sortSubtitle= m_progInfo->GetSortSubtitle();
     m_description = m_progInfo->GetDescription();
     m_channelid   = m_progInfo->GetChanID();
     m_station     = m_progInfo->GetChannelSchedulingID();
@@ -766,6 +775,7 @@ void RecordingRule::AssignProgramInfo()
         m_season  = m_progInfo->GetSeason();
         m_episode = m_progInfo->GetEpisode();
     }
+    ensureSortFields();
 }
 
 unsigned RecordingRule::GetDefaultFilter(void)

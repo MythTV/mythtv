@@ -1,10 +1,11 @@
 // Qt headers
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QRegExp>
 #include <QUrl>
 #include <QVector>
-#include <QCoreApplication>
+#include <utility>
 
 // MythTV headers
 #include "storagegroupeditor.h"
@@ -19,7 +20,7 @@
 /****************************************************************************/
 
 StorageGroupEditor::StorageGroupEditor(QString group) :
-    m_group(group)
+    m_group(std::move(group))
 {
     SetLabel();
 }
@@ -61,8 +62,7 @@ bool StorageGroupEditor::keyPressEvent(QKeyEvent *e)
     }
     if (handled)
         return handled;
-    else
-        return GroupSetting::keyPressEvent(e);
+    return GroupSetting::keyPressEvent(e);
 }
 
 bool StorageGroupEditor::canDelete(void)
@@ -154,7 +154,7 @@ QString StorageGroupDirStorage::GetSetClause(MSqlBindings &bindings) const
 
     QString query("dirname = " + dirnameTag);
 
-    bindings.insert(dirnameTag, user->GetDBValue());
+    bindings.insert(dirnameTag, m_user->GetDBValue());
 
     return query;
 }
@@ -484,7 +484,7 @@ void StorageGroupListEditor::ShowNewGroupDialog()
     }
 }
 
-void StorageGroupListEditor::CreateNewGroup(QString name)
+void StorageGroupListEditor::CreateNewGroup(const QString& name)
 {
     StorageGroupEditor *button = new StorageGroupEditor(name);
     button->setLabel(name + tr(" Storage Group Directories"));

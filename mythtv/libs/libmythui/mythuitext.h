@@ -34,12 +34,12 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
                MythUIType *parent, const QString &name);
     ~MythUIText();
 
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     void ResetMap(const InfoMap &map);
 
     virtual void SetText(const QString &text);
-    QString GetText(void) const;
-    QString GetDefaultText(void) const;
+    QString GetText(void) const { return m_Message; }
+    QString GetDefaultText(void) const { return m_DefaultMessage; }
 
     void SetTextFromMap(const InfoMap &map);
 
@@ -50,31 +50,33 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void UseAlternateArea(bool useAlt);
 #endif
 
-    virtual void Pulse(void);
+    void Pulse(void) override; // MythUIType
     QPoint CursorPosition(int text_offset);
     int MoveCursor(int lines);
 
     // StorageUser
-    void SetDBValue(const QString &text) { SetText(text); }
-    QString GetDBValue(void) const { return GetText(); }
+    void SetDBValue(const QString &text) override // StorageUser
+        { SetText(text); }
+    QString GetDBValue(void) const override // StorageUser
+        { return GetText(); }
 
     void SetFontState(const QString&);
     void SetJustification(int just);
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod, QRect clipRect) override; // MythUIType
 
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SetFontProperties(const MythFontProperties &fontProps);
     const MythFontProperties* GetFontProperties() { return m_Font; }
 
-    void CycleColor(QColor startColor, QColor endColor, int numSteps);
+    void CycleColor(const QColor& startColor, const QColor& endColor, int numSteps);
     void StopCycling();
 
     int GetJustification(void);
@@ -83,8 +85,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetMultiLine(bool multiline);
     bool GetMultiLine(void) const { return m_MultiLine; }
 
-    void SetArea(const MythRect &rect);
-    void SetPosition(const MythPoint &pos);
+    void SetArea(const MythRect &rect) override; // MythUIType
+    void SetPosition(const MythPoint &pos) override; // MythUIType
     MythRect GetDrawRect(void) { return m_drawRect; }
 
     void SetCanvasPosition(int x, int y);
@@ -101,12 +103,12 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
                         const QTextOption & textoption, qreal & width);
     void FillCutMessage(void);
 
-    int m_Justification;
+    int      m_Justification      {Qt::AlignLeft | Qt::AlignTop};
     MythRect m_OrigDisplayRect;
     MythRect m_AltDisplayRect;
     MythRect m_Canvas;
     MythRect m_drawRect;
-    QPoint   m_cursorPos;
+    QPoint   m_cursorPos          {-1,-1};
 
     QString m_Message;
     QString m_CutMessage;
@@ -114,52 +116,58 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString m_TemplateText;
 
 #if 0 // Not currently used
-    bool m_usingAltArea;
+    bool m_usingAltArea           {false};
 #endif
-    bool m_ShrinkNarrow;
-    Qt::TextElideMode m_Cutdown;
-    bool m_MultiLine;
-    int  m_Ascent;
-    int  m_Descent;
-    int  m_leftBearing;
-    int  m_rightBearing;
-    int  m_Leading;
-    int  m_extraLeading;
-    int  m_lineHeight;
-    int  m_textCursor;
+    bool m_ShrinkNarrow           {true};
+    Qt::TextElideMode m_Cutdown   {Qt::ElideRight};
+    bool m_MultiLine              {false};
+    int  m_Ascent                 {0};
+    int  m_Descent                {0};
+    int  m_leftBearing            {0};
+    int  m_rightBearing           {0};
+    int  m_Leading                {1};
+    int  m_extraLeading           {0};
+    int  m_lineHeight             {0};
+    int  m_textCursor             {-1};
 
     QVector<QTextLayout *> m_Layouts;
 
-    MythFontProperties* m_Font;
+    MythFontProperties* m_Font    {nullptr};
     QMap<QString, MythFontProperties> m_FontStates;
 
-    bool m_colorCycling;
-    QColor m_startColor, m_endColor;
-    int m_numSteps, m_curStep;
-    float curR, curG, curB;
-    float incR, incG, incB;
+    bool   m_colorCycling         {false};
+    QColor m_startColor;
+    QColor m_endColor;
+    int    m_numSteps             {0};
+    int    m_curStep              {0};
+    float  m_curR                 {0.0};
+    float  m_curG                 {0.0};
+    float  m_curB                 {0.0};
+    float  m_incR                 {0.0};
+    float  m_incG                 {0.0};
+    float  m_incB                 {0.0};
 
     // Default delay of 3 seconds before 'bouncing' the scrolling text
     enum Constants {ScrollBounceDelay = MythMainWindow::drawRefresh * 3};
     enum ScrollDir {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
                     ScrollHorizontal, ScrollVertical};
 
-    int   m_scrollStartDelay;
-    int   m_scrollReturnDelay;
-    int   m_scrollPause;
-    float m_scrollForwardRate;
-    float m_scrollReturnRate;
-    bool  m_scrollBounce;
-    int   m_scrollOffset;
-    float m_scrollPos;
-    int   m_scrollPosWhole;
-    ScrollDir m_scrollDirection;
-    bool  m_scrolling;
+    int       m_scrollStartDelay  {ScrollBounceDelay};
+    int       m_scrollReturnDelay {ScrollBounceDelay};
+    int       m_scrollPause       {0};
+    float     m_scrollForwardRate {70.0 / MythMainWindow::drawRefresh};
+    float     m_scrollReturnRate  {70.0 / MythMainWindow::drawRefresh};
+    bool      m_scrollBounce      {false};
+    int       m_scrollOffset      {0};
+    float     m_scrollPos         {0};
+    int       m_scrollPosWhole    {0};
+    ScrollDir m_scrollDirection   {ScrollNone};
+    bool      m_scrolling         {false};
 
     enum TextCase {CaseNormal, CaseUpper, CaseLower, CaseCapitaliseFirst,
                    CaseCapitaliseAll};
 
-    TextCase m_textCase;
+    TextCase  m_textCase          {CaseNormal};
 
     friend class MythUITextEdit;
     friend class MythUIButton;

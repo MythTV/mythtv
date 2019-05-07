@@ -26,8 +26,6 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
     m_browser->SetArea(area);
     m_browser->Init();
 
-    m_active = false;
-
     connect(m_browser, SIGNAL(loadStarted()),
             this, SLOT(slotLoadStarted()));
     connect(m_browser, SIGNAL(loadFinished(bool)),
@@ -47,8 +45,6 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
     m_listItem = new MythUIButtonListItem(parent->m_pageList, "");
 
     m_browser = browser;
-
-    m_active = false;
 
     connect(m_browser, SIGNAL(loadStarted()),
             this, SLOT(slotLoadStarted()));

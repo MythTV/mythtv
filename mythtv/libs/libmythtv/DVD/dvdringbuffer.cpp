@@ -47,7 +47,6 @@ static const char *dvdnav_menu_table[] =
 };
 
 DVDInfo::DVDInfo(const QString &filename)
-  : m_nav(nullptr)
 {
     LOG(VB_PLAYBACK, LOG_INFO, QString("DVDInfo: Trying %1").arg(filename));
     QString name = filename;
@@ -143,21 +142,15 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
 
 bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    name   = QString(m_name);
-    serial = QString(m_serialnumber);
-    if (name.isEmpty() && serial.isEmpty())
-        return false;
-    return true;
+    name   = m_name;
+    serial = m_serialnumber;
+    return !(name.isEmpty() && serial.isEmpty());
 }
 
 MythDVDContext::MythDVDContext(const dsi_t& dsi, const pci_t& pci) :
     ReferenceCounter("MythDVDContext"),
     m_dsi(dsi),
     m_pci(pci)
-{
-}
-
-MythDVDContext::~MythDVDContext()
 {
 }
 
@@ -182,8 +175,7 @@ int MythDVDContext::GetNumFramesPresent() const
         // are not present all the way to 'End PTS'
         frames = ((GetSeqEndPTS() - GetStartPTS()) * GetFPS()) / 90000;
     }
-    else
-    if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
+    else if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
     {
         // At least one video frame is present
         frames = GetNumFrames();
@@ -212,47 +204,7 @@ uint32_t MythDVDContext::GetLBAPrevVideoFrame() const
 }
 
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
-    RingBuffer(kRingBuffer_DVD),
-    m_dvdnav(nullptr),  m_dvdBlockReadBuf(nullptr),
-    m_dvdBlockRPos(0),  m_dvdBlockWPos(0),
-    m_pgLength(0),      m_pgcLength(0),
-    m_cellStart(0),     m_cellChanged(false),
-    m_pgcLengthChanged(false), m_pgStart(0),
-    m_currentpos(0),
-    m_lastNav(nullptr), m_part(0), m_lastPart(0),
-    m_title(0),         m_lastTitle(0),   m_playerWait(false),
-    m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
-    m_currentTitleAngleCount(0),
-    m_endPts(0),        m_timeDiff(0),
-    m_still(0), m_lastStill(0),
-    m_audioStreamsChanged(false),
-    m_dvdWaiting(false),
-    m_titleLength(0),
-
-    m_skipstillorwait(true),
-    m_cellstartPos(0), m_buttonSelected(false),
-    m_buttonExists(false),
-    m_buttonSeenInCell(false), m_lastButtonSeenInCell(false),
-    m_cellid(0), m_lastcellid(0),
-    m_vobid(0), m_lastvobid(0),
-    m_cellRepeated(false),
-
-    m_curAudioTrack(0),
-    m_curSubtitleTrack(0),
-    m_autoselectsubtitle(true),
-    m_seeking(false), m_seektime(0),
-    m_currentTime(0),
-    m_parent(nullptr),
-    m_forcedAspect(-1.0f),
-    m_contextLock(QMutex::Recursive), m_context(nullptr),
-    m_processState(PROCESS_NORMAL),
-    m_dvdStat(DVDNAV_STATUS_OK),
-    m_dvdEvent(0),
-    m_dvdEventSize(0),
-
-    // Menu/buttons
-    m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
-    m_hl_button(0, 0, 0, 0), m_menuSpuPkt(nullptr), m_menuBuflength(0)
+    RingBuffer(kRingBuffer_DVD)
 {
     memset(&m_dvdMenuButton, 0, sizeof(AVSubtitle));
     memset(m_dvdBlockWriteBuf, 0, sizeof(char) * DVD_BLOCK_SIZE);
@@ -282,7 +234,7 @@ DVDRingBuffer::~DVDRingBuffer()
 void DVDRingBuffer::CloseDVD(void)
 {
     QMutexLocker contextLocker(&m_contextLock);
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
     if (m_dvdnav)
     {
         SetDVDSpeed(-1);
@@ -298,38 +250,38 @@ void DVDRingBuffer::CloseDVD(void)
 
     m_gotStop = false;
     m_audioStreamsChanged = true;
-    rwlock.unlock();
+    m_rwLock.unlock();
 }
 
 void DVDRingBuffer::ClearChapterCache(void)
 {
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
     foreach (QList<uint64_t> chapters, m_chapterMap)
         chapters.clear();
     m_chapterMap.clear();
-    rwlock.unlock();
+    m_rwLock.unlock();
 }
 
 long long DVDRingBuffer::SeekInternal(long long pos, int whence)
 {
     long long ret = -1;
 
-    poslock.lockForWrite();
+    m_posLock.lockForWrite();
 
     // Optimize no-op seeks
-    if (readaheadrunning &&
-        ((whence == SEEK_SET && pos == readpos) ||
+    if (m_readAheadRunning &&
+        ((whence == SEEK_SET && pos == m_readPos) ||
          (whence == SEEK_CUR && pos == 0)))
     {
-        ret = readpos;
+        ret = m_readPos;
 
-        poslock.unlock();
+        m_posLock.unlock();
 
         return ret;
     }
 
     // only valid for SEEK_SET & SEEK_CUR
-    long long new_pos = (SEEK_SET==whence) ? pos : readpos + pos;
+    long long new_pos = (SEEK_SET==whence) ? pos : m_readPos + pos;
 
     // Here we perform a normal seek. When successful we
     // need to call ResetReadAhead(). A reset means we will
@@ -348,14 +300,14 @@ long long DVDRingBuffer::SeekInternal(long long pos, int whence)
 
     if (ret >= 0)
     {
-        readpos = ret;
+        m_readPos = ret;
 
-        ignorereadpos = -1;
+        m_ignoreReadPos = -1;
 
-        if (readaheadrunning)
-            ResetReadAhead(readpos);
+        if (m_readAheadRunning)
+            ResetReadAhead(m_readPos);
 
-        readAdjust = 0;
+        m_readAdjust = 0;
     }
     else
     {
@@ -365,9 +317,9 @@ long long DVDRingBuffer::SeekInternal(long long pos, int whence)
         LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
     }
 
-    poslock.unlock();
+    m_posLock.unlock();
 
-    generalWait.wakeAll();
+    m_generalWait.wakeAll();
 
     return ret;
 }
@@ -392,12 +344,9 @@ bool DVDRingBuffer::SectorSeek(uint64_t sector)
             QString("SectorSeek() to sector %1 failed").arg(sector));
         return false;
     }
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("DVD Playback SectorSeek() sector: %1").arg(sector));
-        return true;
-    }
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("DVD Playback SectorSeek() sector: %1").arg(sector));
+    return true;
 }
 
 long long DVDRingBuffer::Seek(long long time)
@@ -436,7 +385,7 @@ long long DVDRingBuffer::Seek(long long time)
             QString("Seek() to time %1 failed").arg(time));
         return -1;
     }
-    else if (!m_inMenu)
+    if (!m_inMenu)
     {
         m_gotStop = false;
         if (time > 0 && ffrewSkip == 1)
@@ -488,27 +437,27 @@ void DVDRingBuffer::GetDescForPos(QString &desc)
 bool DVDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
     QMutexLocker contextLocker(&m_contextLock);
-    rwlock.lockForWrite();
+    m_rwLock.lockForWrite();
 
     if (m_dvdnav)
     {
-        rwlock.unlock();
+        m_rwLock.unlock();
         CloseDVD();
-        rwlock.lockForWrite();
+        m_rwLock.lockForWrite();
     }
 
-    safefilename = lfilename;
-    filename = lfilename;
-    QByteArray fname = filename.toLocal8Bit();
+    m_safeFilename = lfilename;
+    m_filename = lfilename;
+    QByteArray fname = m_filename.toLocal8Bit();
 
     dvdnav_status_t res = dvdnav_open(&m_dvdnav, fname.constData());
     if (res == DVDNAV_STATUS_ERR)
     {
-        lastError = tr("Failed to open DVD device at %1").arg(filename);
+        m_lastError = tr("Failed to open DVD device at %1").arg(m_filename);
         LOG(VB_GENERAL, LOG_ERR,
             LOC + QString("Failed to open DVD device at %1")
                 .arg(fname.constData()));
-        rwlock.unlock();
+        m_rwLock.unlock();
         return false;
     }
 
@@ -548,16 +497,16 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DVD Serial Number %1").arg(m_serialnumber));
 
-    readblocksize   = DVD_BLOCK_SIZE * 62;
-    setswitchtonext = false;
-    ateof           = false;
-    commserror      = false;
-    numfailures     = 0;
-    rawbitrate      = 8000;
+    m_readBlockSize   = DVD_BLOCK_SIZE * 62;
+    m_setSwitchToNext = false;
+    m_ateof           = false;
+    m_commsError      = false;
+    m_numFailures     = 0;
+    m_rawBitrate      = 8000;
 
     CalcReadAheadThresh();
 
-    rwlock.unlock();
+    m_rwLock.unlock();
 
     return true;
 }
@@ -573,7 +522,7 @@ bool DVDRingBuffer::StartFromBeginning(void)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "DVD errored after initial scan - trying again");
         CloseDVD();
-        OpenFile(filename);
+        OpenFile(m_filename);
         if (!m_dvdnav)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-open DVD.");
     }
@@ -711,9 +660,9 @@ void DVDRingBuffer::WaitForPlayer(void)
         int count = 0;
         while (m_playerWait && count++ < 200)
         {
-            rwlock.unlock();
+            m_rwLock.unlock();
             usleep(10000);
-            rwlock.lockForWrite();
+            m_rwLock.lockForWrite();
         }
 
         if (m_playerWait)
@@ -731,7 +680,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
-    bool            bReprocessing = false;
+    bool            bReprocessing;
     bool            waiting      = false;
 
     if (m_gotStop)
@@ -741,7 +690,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         return -1;
     }
 
-    if (readaheadrunning)
+    if (m_readAheadRunning)
         LOG(VB_GENERAL, LOG_ERR, LOC + "read ahead thread running.");
 
     while ((m_processState != PROCESS_WAIT) && needed)
@@ -835,12 +784,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     QString("---- DVDNAV_CELL_CHANGE - Cell "
                             "#%1 Menu %2 Length %3")
                       .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
-                      .arg((float)cell_event->cell_length / 90000.0f,0,'f',1));
+                      .arg((float)cell_event->cell_length / 90000.0F,0,'f',1));
                 QString still = stillTimer ? ((stillTimer < 0xff) ?
                     QString("Stillframe: %1 seconds").arg(stillTimer) :
                     QString("Infinite stillframe")) :
                     QString("Length: %1 seconds")
-                        .arg((float)m_pgcLength / 90000.0f, 0, 'f', 1);
+                        .arg((float)m_pgcLength / 90000.0F, 0, 'f', 1);
                 if (m_title == 0)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")
@@ -914,8 +863,8 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     m_curSubtitleTrack = dvdnav_get_active_spu_stream(m_dvdnav);
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG,
-                    QString(LOC + "DVDNAV_SPU_STREAM_CHANGE: "
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                          QString("DVDNAV_SPU_STREAM_CHANGE: "
                                   "physicalwide %1, physicalletterbox %2, "
                                   "physicalpanscan %3, currenttrack %4")
                         .arg(spu->physical_wide).arg(spu->physical_letterbox)
@@ -1123,12 +1072,10 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     m_processState = PROCESS_WAIT;
                     break;
                 }
-                else
-                {
-                    // debug
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL");
-                    WaitForPlayer();
-                }
+
+                // debug
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL");
+                WaitForPlayer();
             }
             break;
 
@@ -1146,9 +1093,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 // update player
                 int aspect = dvdnav_get_video_aspect(m_dvdnav);
                 if (aspect == 2) // 4:3
-                    m_forcedAspect = 4.0f / 3.0f;
+                    m_forcedAspect = 4.0F / 3.0F;
                 else if (aspect == 3) // 16:9
-                    m_forcedAspect = 16.0f / 9.0f;
+                    m_forcedAspect = 16.0F / 9.0F;
                 else
                     m_forcedAspect = -1;
                 int permission = dvdnav_get_video_scale_permission(m_dvdnav);
@@ -1228,9 +1175,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 {
                     // pause a little as the dvdnav VM will continue to return
                     // this event until it has been skipped
-                    rwlock.unlock();
+                    m_rwLock.unlock();
                     usleep(10000);
-                    rwlock.lockForWrite();
+                    m_rwLock.lockForWrite();
 
                     // when scanning the file or exiting playback, skip immediately
                     // otherwise update the timeout in the player
@@ -1282,9 +1229,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     else
                     {
                         m_dvdWaiting = true;
-                        rwlock.unlock();
+                        m_rwLock.unlock();
                         usleep(10000);
-                        rwlock.lockForWrite();
+                        m_rwLock.lockForWrite();
                     }
 
                     // release buffer
@@ -1325,10 +1272,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         errno = EAGAIN;
         return 0;
     }
-    else
-    {
-        return tot;
-    }
+    return tot;
 }
 
 bool DVDRingBuffer::playTrack(int track)
@@ -1375,7 +1319,7 @@ void DVDRingBuffer::prevTrack(void)
  */
 uint DVDRingBuffer::GetTotalTimeOfTitle(void)
 {
-    return m_pgcLength / 90000.0 + 0.5;
+    return lround(m_pgcLength / 90000.0);
 }
 
 /** \brief get the start of the cell in seconds
@@ -1450,9 +1394,7 @@ bool DVDRingBuffer::GoToMenu(const QString &str)
         return false;
 
     dvdnav_status_t ret = dvdnav_menu_call(m_dvdnav, menuid);
-    if (ret == DVDNAV_STATUS_OK)
-        return true;
-    return false;
+    return ret == DVDNAV_STATUS_OK;
 }
 
 /** \brief Attempts to back-up by trying to jump to the 'Go up' PGC,
@@ -1875,7 +1817,9 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
     dvdnav_highlight_area_t hl;
     dvdnav_get_current_highlight(m_dvdnav, &button);
     pci = dvdnav_get_current_nav_pci(m_dvdnav);
-    dvdRet = dvdnav_get_highlight_area_from_group(pci, DVD_BTN_GRP_Wide, button, b_mode, &hl);
+    dvdRet =
+        dvdnav_get_highlight_area_from_group(pci, DVD_BTN_GRP_Wide, button,
+                                             static_cast<int32_t>(b_mode), &hl);
 
     if (dvdRet == DVDNAV_STATUS_ERR)
         return false;
@@ -1896,11 +1840,8 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
 
     m_hl_button.setCoords(hl.sx, hl.sy, hl.ex, hl.ey);
 
-    if (((hl.sx + hl.sy) > 0) &&
-            (hl.sx < videowidth && hl.sy < videoheight))
-        return true;
-
-    return false;
+    return ((hl.sx + hl.sy) > 0) &&
+            (hl.sx < videowidth && hl.sy < videoheight);
 }
 
 /** \brief clears the dvd menu button structures
@@ -1946,8 +1887,7 @@ int DVDRingBuffer::NumMenuButtons(void) const
     int numButtons = pci->hli.hl_gi.btn_ns;
     if (numButtons > 0 && numButtons < 36)
         return numButtons;
-    else
-        return 0;
+    return 0;
 }
 
 /** \brief get the audio language from the dvd
@@ -2132,7 +2072,7 @@ int DVDRingBuffer::GetTrack(uint type)
 {
     if (type == kTrackTypeSubtitle)
         return m_curSubtitleTrack;
-    else if (type == kTrackTypeAudio)
+    if (type == kTrackTypeAudio)
         return m_curAudioTrack;
 
     return 0;
@@ -2140,7 +2080,7 @@ int DVDRingBuffer::GetTrack(uint type)
 
 uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
 {
-    uint8_t numChannels = 0u;
+    uint8_t numChannels = 0U;
 
     int physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
@@ -2148,7 +2088,7 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
     {
         unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, physical);
         if (channels != 0xff)
-            numChannels = (uint8_t)channels;
+            numChannels = channels;
     }
 
     return numChannels;
@@ -2158,11 +2098,9 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
  */
 bool DVDRingBuffer::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
-    _name    = QString(m_dvdname);
-    _serial    = QString(m_serialnumber);
-    if (_name.isEmpty() && _serial.isEmpty())
-        return false;
-    return true;
+    _name    = m_dvdname;
+    _serial  = m_serialnumber;
+    return !(_name.isEmpty() && _serial.isEmpty());
 }
 
 /** \brief Get a snapshot of the current DVD VM state
@@ -2218,8 +2156,8 @@ void DVDRingBuffer::SetDVDSpeed(void)
  */
 void DVDRingBuffer::SetDVDSpeed(int speed)
 {
-    if (filename.startsWith("/"))
-        MediaMonitor::SetCDSpeed(filename.toLocal8Bit().constData(), speed);
+    if (m_filename.startsWith("/"))
+        MediaMonitor::SetCDSpeed(m_filename.toLocal8Bit().constData(), speed);
 }
 
 /**\brief returns seconds left in the title
@@ -2231,8 +2169,9 @@ uint DVDRingBuffer::TitleTimeLeft(void)
 
 /** \brief converts palette values from YUV to RGB
  */
-void DVDRingBuffer::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
-                                        uint8_t *alpha)
+void DVDRingBuffer::guess_palette(uint32_t *rgba_palette,
+                                  const uint8_t *palette,
+                                  const uint8_t *alpha)
 {
     memset(rgba_palette, 0, 16);
 

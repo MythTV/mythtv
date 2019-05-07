@@ -24,7 +24,7 @@ class NetBase : public MythScreenType
     virtual ~NetBase();
 
   protected:
-    virtual void Init();
+    void Init() override; // MythScreenType
     virtual ResultItem *GetStreamItem() = 0;
     virtual void LoadData(void) = 0;
     void InitProgressDialog();
@@ -39,14 +39,14 @@ class NetBase : public MythScreenType
     void DoPlayVideo(const QString &filename);
     void SlotDeleteVideo(void);
     void DoDeleteVideo(bool remove);
-    virtual void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected:
-    MythUIImage           *m_thumbImage;
-    MythUIStateType       *m_downloadable;
-    MythScreenStack       *m_popupStack;
-    MythUIProgressDialog  *m_progressDialog;
-    MetadataImageDownload *m_imageDownload;
+    MythUIImage           *m_thumbImage     {nullptr};
+    MythUIStateType       *m_downloadable   {nullptr};
+    MythScreenStack       *m_popupStack     {nullptr};
+    MythUIProgressDialog  *m_progressDialog {nullptr};
+    MetadataImageDownload *m_imageDownload  {nullptr};
 
     QString m_downloadFile;
     GrabberScript::scriptList m_grabberList;

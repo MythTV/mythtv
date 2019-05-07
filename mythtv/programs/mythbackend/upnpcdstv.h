@@ -26,19 +26,19 @@ class UPnpCDSTv : public UPnpCDSExtension
 
     protected:
 
-        virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
-        virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
+        bool IsBrowseRequestForUs( UPnpCDSRequest *pRequest ) override; // UPnpCDSExtension
+        bool IsSearchRequestForUs( UPnpCDSRequest *pRequest ) override; // UPnpCDSExtension
 
-        virtual void             CreateRoot ( );
+        void CreateRoot ( ) override; // UPnpCDSExtension
 
-        virtual bool             LoadMetadata( const UPnpCDSRequest *pRequest,
-                                                UPnpCDSExtensionResults *pResults,
-                                                IDTokenMap tokens,
-                                                QString currentToken );
-        virtual bool             LoadChildren( const UPnpCDSRequest *pRequest,
-                                               UPnpCDSExtensionResults *pResults,
-                                               IDTokenMap tokens,
-                                               QString currentToken );
+        bool LoadMetadata( const UPnpCDSRequest *pRequest,
+                           UPnpCDSExtensionResults *pResults,
+                           IDTokenMap tokens,
+                           QString currentToken ) override; // UPnpCDSExtension
+        bool LoadChildren( const UPnpCDSRequest *pRequest,
+                           UPnpCDSExtensionResults *pResults,
+                           IDTokenMap tokens,
+                           QString currentToken ) override; // UPnpCDSExtension
 
     private:
         bool  LoadRecordings ( const UPnpCDSRequest *pRequest,
@@ -46,19 +46,19 @@ class UPnpCDSTv : public UPnpCDSExtension
                                IDTokenMap tokens );
         bool  LoadTitles     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadDates      ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadGenres     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadChannels   ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadRecGroups  ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
-                               IDTokenMap tokens );
+                               const IDTokenMap& tokens );
         bool  LoadMovies     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
                                IDTokenMap tokens );

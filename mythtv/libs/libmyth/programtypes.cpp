@@ -84,11 +84,11 @@ QString SkipTypeToString(int flags)
 
     QChar chr = '0';
     QString ret = QString("0x%1").arg(flags,3,16,chr);
-    bool blank = COMM_DETECT_BLANK & flags;
-    bool scene = COMM_DETECT_SCENE & flags;
-    bool logo  = COMM_DETECT_LOGO  & flags;
-    bool exp   = COMM_DETECT_2     & flags;
-    bool prePst= COMM_DETECT_PREPOSTROLL & flags;
+    bool blank = (COMM_DETECT_BLANK & flags) != 0;
+    bool scene = (COMM_DETECT_SCENE & flags) != 0;
+    bool logo  = (COMM_DETECT_LOGO  & flags) != 0;
+    bool exp   = (COMM_DETECT_2     & flags) != 0;
+    bool prePst= (COMM_DETECT_PREPOSTROLL & flags) != 0;
 
     if (blank && scene && logo)
         ret = QObject::tr("All Available Methods");

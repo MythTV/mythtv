@@ -17,16 +17,13 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
 
 WeatherScreen::WeatherScreen(MythScreenStack *parent,
                              ScreenListInfo *screenDefn, int id) :
-               MythScreenType (parent, screenDefn->title),
-    m_units(SI_UNITS),
+               MythScreenType (parent, screenDefn->m_title),
     m_screenDefn(screenDefn),
-    m_name(m_screenDefn->name),
-    m_inuse(false),
-    m_prepared(false),
+               m_name(m_screenDefn->m_name),
     m_id(id)
 {
 
-    QStringList types = m_screenDefn->dataTypes;
+    QStringList types = m_screenDefn->m_dataTypes;
 
     for (int i = 0; i < types.size(); ++i)
     {
@@ -97,8 +94,7 @@ QString WeatherScreen::getTemperatureUnit()
 {
     if (m_units == ENG_UNITS)
         return QString::fromUtf8("°") + "F";
-    else
-        return QString::fromUtf8("°") + "C";
+    return QString::fromUtf8("°") + "C";
 }
 
 bool WeatherScreen::prepareScreen(bool checkOnly)
@@ -120,7 +116,7 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
                         .arg(m_name));
                 return false;
             }
-            else if (name == "copyrightlogo")
+            if (name == "copyrightlogo")
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("No copyrightlogo widget found, skipping screen %1.")
@@ -184,8 +180,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     {
        if ((value == "NA") || (value == "N/A"))
           return QString();
-       else
-          return value + getTemperatureUnit();
+       return value + getTemperatureUnit();
     }
 
     if (key.startsWith("wind_gust") ||
@@ -244,10 +239,7 @@ QString WeatherScreen::prepareDataItem(const QString &key, const QString &value)
 
 bool WeatherScreen::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
-        return true;
-
-    return false;
+    return GetFocusWidget() && GetFocusWidget()->keyPressEvent(event);
 }
 
 /*

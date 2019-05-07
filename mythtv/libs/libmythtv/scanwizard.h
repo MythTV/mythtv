@@ -35,8 +35,7 @@
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythdbcon.h"
-#include "mythwizard.h"
-#include "settings.h"
+#include "cardutil.h"
 #include "standardsettings.h"
 #include "scanwizardconfig.h"
 
@@ -58,49 +57,51 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     void SetInput(const QString &cardid_inputname);
 
   protected:
-    uint               lastHWCardID;
-    uint               lastHWCardType;
-    ChannelScannerGUI *scannerPane;
+    uint               m_lastHWCardID   {0};
+    uint               m_lastHWCardType {CardUtil::ERROR_PROBE};
+    ChannelScannerGUI *m_scannerPane    {nullptr};
 
   // The following are moved from deleted class ScanWizardConfig
   public:
     void SetupConfig(uint default_sourceid, uint default_cardid,
-        QString default_inputname);
+        const QString& default_inputname);
 
     uint    GetSourceID(void)     const;
-    uint    GetScanID(void)       const { return scanConfig->GetScanID(); }
-    QString GetModulation(void)   const { return scanConfig->GetModulation(); }
-    int     GetScanType(void)     const { return scanType->getValue().toInt();}
-    uint    GetCardID(void)       const { return input->GetCardID(); }
-    QString GetInputName(void)    const { return input->GetInputName(); }
-    QString GetFilename(void)     const { return scanConfig->GetFilename();   }
-    uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }
+    uint    GetScanID(void)       const { return m_scanConfig->GetScanID(); }
+    QString GetModulation(void)   const { return m_scanConfig->GetModulation(); }
+    int     GetScanType(void)     const { return m_scanType->getValue().toInt();}
+    uint    GetCardID(void)       const { return m_input->GetCardID(); }
+    QString GetInputName(void)    const { return m_input->GetInputName(); }
+    QString GetFilename(void)     const { return m_scanConfig->GetFilename();   }
+    uint    GetMultiplex(void)    const { return m_scanConfig->GetMultiplex();  }
     bool    GetFrequencyTableRange(QString &start, QString &end) const
-        { return scanConfig->GetFrequencyTableRange(start, end); }
+        { return m_scanConfig->GetFrequencyTableRange(start, end); }
     QString GetFrequencyStandard(void) const
-        { return scanConfig->GetFrequencyStandard(); }
+        { return m_scanConfig->GetFrequencyStandard(); }
     QString GetFrequencyTable(void) const
-        { return scanConfig->GetFrequencyTable(); }
+        { return m_scanConfig->GetFrequencyTable(); }
     QMap<QString,QString> GetStartChan(void) const
-        { return scanConfig->GetStartChan(); }
+        { return m_scanConfig->GetStartChan(); }
     ServiceRequirements GetServiceRequirements(void) const;
     bool    DoIgnoreSignalTimeout(void) const
-        { return scanConfig->DoIgnoreSignalTimeout(); }
+        { return m_scanConfig->DoIgnoreSignalTimeout(); }
     bool    DoFollowNIT(void) const
-        { return scanConfig->DoFollowNIT(); }
-    bool    DoFreeToAirOnly(void)  const;
-    bool    DoAddFullTS(void)      const;
-    bool    DoTestDecryption(void) const;
+        { return m_scanConfig->DoFollowNIT(); }
+    bool    DoFreeToAirOnly(void)       const;
+    bool    DoChannelNumbersOnly(void)  const;
+    bool    DoAddFullTS(void)           const;
+    bool    DoTestDecryption(void)      const;
 
   protected:
-    VideoSourceSelector *videoSource;
-    InputSelector       *input;
-    ScanTypeSetting     *scanType;
-    ScanOptionalConfig  *scanConfig;
-    DesiredServices     *services;
-    FreeToAirOnly       *ftaOnly;
-    AddFullTS           *addFullTS;
-    TrustEncSISetting   *trustEncSI;
+    VideoSourceSelector *m_videoSource {nullptr};
+    InputSelector       *m_input       {nullptr};
+    ScanTypeSetting     *m_scanType    {nullptr};
+    ScanOptionalConfig  *m_scanConfig  {nullptr};
+    DesiredServices     *m_services    {nullptr};
+    FreeToAirOnly       *m_ftaOnly     {nullptr};
+    ChannelNumbersOnly  *m_lcnOnly     {nullptr};
+    AddFullTS           *m_addFullTS   {nullptr};
+    TrustEncSISetting   *m_trustEncSI  {nullptr};
 // End of members moved from ScanWizardConfig
 };
 

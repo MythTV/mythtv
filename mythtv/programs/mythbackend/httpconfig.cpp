@@ -7,7 +7,6 @@
 
 // MythTV headers
 #include "httpconfig.h"
-#include "backendutil.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -48,14 +47,14 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         // FIXME, this is always false, what's it for
         // JMS "fixed" by using endsWith()
         if (request->m_sBaseUrl.endsWith("config") &&
-            !database_settings.empty())
+            !m_database_settings.empty())
         {
             QString checkResult;
             PrintHeader(request->m_response, "/Config/Database");
-            check_settings(database_settings, request->m_mapParams,
+            check_settings(m_database_settings, request->m_mapParams,
                            checkResult);
-            load_settings(database_settings, "");
-            PrintSettings(request->m_response, database_settings);
+            load_settings(m_database_settings, "");
+            PrintSettings(request->m_response, m_database_settings);
             PrintFooter(request->m_response);
             handled = true;
         }
@@ -63,17 +62,16 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         {
             bool okToSave = false;
             QString checkResult;
-            QString fn = GetShareDir() + "backend-config/";
 
             if (request->m_sBaseUrl == "/Config/Database")
             {
-                if (check_settings(database_settings, request->m_mapParams,
+                if (check_settings(m_database_settings, request->m_mapParams,
                                    checkResult))
                     okToSave = true;
             }
             else if (request->m_sBaseUrl == "/Config/General")
             {
-                if (check_settings(general_settings, request->m_mapParams,
+                if (check_settings(m_general_settings, request->m_mapParams,
                                    checkResult))
                     okToSave = true;
             }
@@ -115,16 +113,16 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         if (request->m_sBaseUrl == "/Config/Database")
         {
             fn += "config_backend_database.xml";
-            parse_settings(database_settings, fn);
+            parse_settings(m_database_settings, fn);
             result = StringMapToJSON(
-                GetSettingsMap(database_settings, gCoreContext->GetHostName()));
+                GetSettingsMap(m_database_settings, gCoreContext->GetHostName()));
         }
         else if (request->m_sBaseUrl == "/Config/General")
         {
             fn += "config_backend_general.xml";
-            parse_settings(general_settings, fn);
+            parse_settings(m_general_settings, fn);
             result = StringMapToJSON(
-                GetSettingsMap(general_settings, gCoreContext->GetHostName()));
+                GetSettingsMap(m_general_settings, gCoreContext->GetHostName()));
         }
 
         QTextStream os(&request->m_response);
@@ -201,7 +199,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 entries = sgroup.GetFileInfoList(parts[1]);
             }
 
-            if (entries.size())
+            if (!entries.empty())
             {
                 QTextStream os(&request->m_response);
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
@@ -263,7 +261,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
                 bool dirsOnly = true;
                 if (request->m_mapParams.contains("dirsOnly"))
-                    dirsOnly = request->m_mapParams["dirsOnly"].toInt();
+                    dirsOnly = (request->m_mapParams["dirsOnly"].toInt() != 0);
 
                 if (!dirsOnly)
                 {
@@ -317,9 +315,9 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         else
             OpenForm(request->m_response, form, group);
 
-        parse_settings(general_settings, fn, group);
-        load_settings(general_settings, gCoreContext->GetHostName());
-        PrintSettings(request->m_response, general_settings);
+        parse_settings(m_general_settings, fn, group);
+        load_settings(m_general_settings, gCoreContext->GetHostName());
+        PrintSettings(request->m_response, m_general_settings);
 
         if (group.isEmpty())
             PrintFooter(request->m_response);
@@ -343,9 +341,9 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         else
             OpenForm(request->m_response, form, group);
 
-        parse_settings(general_settings, fn, group);
-        load_settings(general_settings, gCoreContext->GetHostName());
-        PrintSettings(request->m_response, general_settings);
+        parse_settings(m_general_settings, fn, group);
+        load_settings(m_general_settings, gCoreContext->GetHostName());
+        PrintSettings(request->m_response, m_general_settings);
 
         if (group.isEmpty())
             PrintFooter(request->m_response);

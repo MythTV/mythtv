@@ -106,6 +106,21 @@ typedef enum
 
     kCodec_VAAPI2_END,
 
+    kCodec_NVDEC_BEGIN = kCodec_VAAPI2_END,
+
+    kCodec_MPEG1_NVDEC,
+    kCodec_MPEG2_NVDEC,
+    kCodec_H263_NVDEC,
+    kCodec_MPEG4_NVDEC,
+    kCodec_H264_NVDEC,
+    kCodec_VC1_NVDEC,
+    kCodec_WMV3_NVDEC,
+    kCodec_VP8_NVDEC,
+    kCodec_VP9_NVDEC,
+    kCodec_HEVC_NVDEC,
+
+    kCodec_NVDEC_END,
+
 } MythCodecID;
 
 // MythCodecID convenience functions
@@ -130,14 +145,17 @@ typedef enum
                                (id < kCodec_MEDIACODEC_END))
 #define codec_is_vaapi2(id)    ((id > kCodec_VAAPI2_BEGIN) &&     \
                                (id < kCodec_VAAPI2_END))
+#define codec_is_nvdec(id)    ((id > kCodec_NVDEC_BEGIN) &&     \
+                               (id < kCodec_NVDEC_END))
 
-#define codec_sw_copy(id) (codec_is_std(id) || codec_is_mediacodec(id) || codec_is_vaapi2(id))
+#define codec_sw_copy(id) (codec_is_std(id) || codec_is_mediacodec(id) \
+    || codec_is_vaapi2(id) || codec_is_nvdec(id))
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
 QString toString(MythCodecID codecid);
-int myth2av_codecid(MythCodecID codec_id, bool &vdpau);
-inline int myth2av_codecid(MythCodecID codec_id)
+AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau);
+inline AVCodecID myth2av_codecid(MythCodecID codec_id)
 {
     bool vdpau;
     return myth2av_codecid(codec_id, vdpau);

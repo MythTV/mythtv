@@ -19,12 +19,15 @@ class PlaylistLoadingThread : public MThread
 {
   public:
     PlaylistLoadingThread(PlaylistContainer *parent_ptr,
-                          AllMusic *all_music_ptr);
-    virtual void run();
+                          AllMusic *all_music_ptr)
+        : MThread("PlaylistLoading"), parent(parent_ptr),
+          all_music(all_music_ptr) {}
+
+    void run() override; // MThread
 
   private:
-    PlaylistContainer *parent;
-    AllMusic          *all_music;
+    PlaylistContainer *parent    {nullptr};
+    AllMusic          *all_music {nullptr};
 };
 
 class PlaylistContainer
@@ -52,10 +55,10 @@ class PlaylistContainer
 
     QString         getPlaylistName(int index, bool &reference);
 
-    void            deletePlaylist(int index);
+    void            deletePlaylist(int kill_me);
     void            renamePlaylist(int index, QString new_name);
 
-    bool            nameIsUnique(QString a_name, int which_id);
+    bool            nameIsUnique(const QString& a_name, int which_id);
 
     void            clearActive();
 
@@ -69,18 +72,18 @@ class PlaylistContainer
     QStringList       getPlaylistNames(void);
 
   private:
-    Playlist            *m_activePlaylist;
-    Playlist            *m_streamPlaylist;
-    QList<Playlist*>    *m_allPlaylists;
+    Playlist               *m_activePlaylist  {nullptr};
+    Playlist               *m_streamPlaylist  {nullptr};
+    QList<Playlist*>       *m_allPlaylists    {nullptr};
 
-    PlaylistLoadingThread  *m_playlistsLoader;
-    bool                    m_doneLoading;
+    PlaylistLoadingThread  *m_playlistsLoader {nullptr};
+    bool                    m_doneLoading     {false};
     QString                 m_myHost;
 
-    int m_ratingWeight;
-    int m_playCountWeight;
-    int m_lastPlayWeight;
-    int m_randomWeight;
+    int m_ratingWeight                        {2};
+    int m_playCountWeight                     {2};
+    int m_lastPlayWeight                      {2};
+    int m_randomWeight                        {2};
 };
 
 #endif // _PLAYLIST_CONTAINER_H_

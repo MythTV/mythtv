@@ -10,15 +10,12 @@ extern "C" {
 
 
 AudioBuffer::AudioBuffer()
-  : m_frames(0), m_time(-1)
 {
-    m_size      = 0;
     m_buffer    = (uint8_t *)av_malloc(ABLOCK_SIZE);
     if (m_buffer == nullptr)
     {
         throw std::bad_alloc();
     }
-    m_realsize  = ABLOCK_SIZE;
 }
 
 AudioBuffer::AudioBuffer(const AudioBuffer &old)
@@ -67,19 +64,17 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
 
 AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
                                          int audio_channels, bool passthru)
-  : m_last_audiotime(0),        m_audioFrameSize(0),
-    m_initpassthru(passthru),   m_saveBuffer(nullptr)
+  : m_initpassthru(passthru)
 {
-    Reset();
-    const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
-    Reconfigure(settings);
+    AudioReencodeBuffer::Reset();
+    const AudioSettings settings(audio_format, audio_channels, AV_CODEC_ID_NONE, 0, false);
+    AudioReencodeBuffer::Reconfigure(settings);
 }
 
 AudioReencodeBuffer::~AudioReencodeBuffer()
 {
-    Reset();
-    if (m_saveBuffer)
-        delete m_saveBuffer;
+    AudioReencodeBuffer::Reset();
+    delete m_saveBuffer;
 }
 
 /**
@@ -89,11 +84,11 @@ void AudioReencodeBuffer::Reconfigure(const AudioSettings &settings)
 {
     ClearError();
 
-    m_passthru        = settings.use_passthru;
-    m_channels        = settings.channels;
+    m_passthru        = settings.m_use_passthru;
+    m_channels        = settings.m_channels;
     m_bytes_per_frame = m_channels *
-        AudioOutputSettings::SampleSize(settings.format);
-    m_eff_audiorate   = settings.samplerate;
+        AudioOutputSettings::SampleSize(settings.m_format);
+    m_eff_audiorate   = settings.m_samplerate;
 }
 
 /**

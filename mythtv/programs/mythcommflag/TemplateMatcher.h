@@ -33,50 +33,54 @@ class TemplateMatcher : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed, TemplateFinder *tf,
-            QString debugdir);
+            const QString& debugdir);
     ~TemplateMatcher(void);
 
     /* FrameAnalyzer interface. */
-    const char *name(void) const { return "TemplateMatcher"; }
+    const char *name(void) const override // FrameAnalyzer
+        { return "TemplateMatcher"; }
     enum analyzeFrameResult MythPlayerInited(MythPlayer *player,
-            long long nframes);
+            long long nframes) override; // FrameAnalyzer
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
-            long long frameno, long long *pNextFrame);
-    int finished(long long nframes, bool final);
-    int reportTime(void) const;
-    FrameMap GetMap(unsigned int) const { return breakMap; }
+            long long frameno, long long *pNextFrame) override; // FrameAnalyzer
+    int finished(long long nframes, bool final) override; // FrameAnalyzer
+    int reportTime(void) const override; // FrameAnalyzer
+    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+        { return m_breakMap; }
 
     /* TemplateMatcher interface. */
     int templateCoverage(long long nframes, bool final) const;
-    const FrameAnalyzer::FrameMap *getBreaks(void) const { return &breakMap; }
-    int adjustForBlanks(const BlankFrameDetector *bf, long long nframes);
+    const FrameAnalyzer::FrameMap *getBreaks(void) const { return &m_breakMap; }
+    int adjustForBlanks(const BlankFrameDetector *blankFrameDetector, long long nframes);
     int computeBreaks(FrameMap *breaks);
 
 private:
-    PGMConverter            *pgmConverter;
-    EdgeDetector            *edgeDetector;
-    TemplateFinder          *templateFinder;
-    const struct AVFrame  *tmpl;                  /* template image */
-    int                     tmplrow, tmplcol;       /* template location */
-    int                     tmplwidth, tmplheight;  /* template dimensions */
+    PGMConverter           *m_pgmConverter      {nullptr};
+    EdgeDetector           *m_edgeDetector      {nullptr};
+    TemplateFinder         *m_templateFinder    {nullptr};
+    const struct AVFrame   *m_tmpl              {nullptr};  /* template image */
+    int                     m_tmplrow           {-1};       /* template location */
+    int                     m_tmplcol           {-1};       /* template location */
+    int                     m_tmplwidth         {-1};       /* template dimensions */
+    int                     m_tmplheight        {-1};       /* template dimensions */
 
     /* Per-frame info. */
-    unsigned short          *matches;               /* matching pixels */
-    unsigned char           *match;                 /* boolean result: 1/0 */
+    unsigned short         *m_matches           {nullptr};  /* matching pixels */
+    unsigned char          *m_match             {nullptr};  /* boolean result: 1/0 */
 
-    float                   fps;
-    AVFrame               cropped;                /* pre-allocated buffer */
-    FrameAnalyzer::FrameMap breakMap;               /* frameno => nframes */
+    float                   m_fps               {0.0F};
+    AVFrame                 m_cropped;                     /* pre-allocated buffer */
+    FrameAnalyzer::FrameMap m_breakMap;                    /* frameno => nframes */
 
     /* Debugging */
-    int                     debugLevel;
-    QString                 debugdir;
-    QString                 debugdata;              /* filename */
-    MythPlayer             *player;
-    bool                    debug_matches;
-    bool                    debug_removerunts;
-    bool                    matches_done;
-    struct timeval          analyze_time;
+    int                     m_debugLevel        {0};
+    QString                 m_debugdir;
+    QString                 m_debugdata;                   /* filename */
+    MythPlayer             *m_player            {nullptr};
+    bool                    m_debug_matches     {false};
+    bool                    m_debug_removerunts {false};
+    bool                    m_matches_done      {false};
+    struct timeval          m_analyze_time;
 };
 
 #endif  /* !__TEMPLATEMATCHER_H__ */

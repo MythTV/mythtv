@@ -32,31 +32,35 @@ class DVBChannel : public DTVChannel
     DVBChannel(const QString &device, TVRec *parent = nullptr);
     ~DVBChannel();
 
-    bool Open(void) { return Open(this); }
-    void Close(void) { Close(this); }
+    bool Open(void) override // ChannelBase
+        { return Open(this); }
+    void Close(void) override // ChannelBase
+        { Close(this); }
 
-    bool Init(QString &startchannel, bool setchan);
+    bool Init(QString &startchannel, bool setchan) override; // ChannelBase
 
     // Sets
     void SetPMT(const ProgramMapTable*);
     void SetTimeOffset(double offset);
     void SetSlowTuning(uint how_slow_in_ms)
-        { tuning_delay = how_slow_in_ms; }
+        { m_tuning_delay = how_slow_in_ms; }
 
     // Gets
-    bool IsOpen(void) const;
-    int  GetFd(void)                    const { return fd_frontend; }
+    bool IsOpen(void) const override; // ChannelBase
+    int  GetFd(void) const  override // ChannelBase
+        { return m_fd_frontend; }
     bool IsTuningParamsProbeSupported(void) const;
 
-    QString GetDevice(void)             const { return device; }
+    QString GetDevice(void) const override // ChannelBase
+        { return m_device; }
     /// Returns DVB device number, used to construct filenames for DVB devices
-    QString GetCardNum(void)            const { return device; };
+    QString GetCardNum(void)            const { return m_device; };
     /// Returns frontend name as reported by driver
-    QString GetFrontendName(void)       const;
-    bool IsMaster(void)                 const;
+    QString GetFrontendName(void)       const { return m_frontend_name; }
+    bool IsMaster(void)                 const override; // DTVChannel
     /// Returns true iff we have a faulty DVB driver that munges PMT
-    bool HasCRCBug(void)                const { return has_crc_bug; }
-    uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
+    bool HasCRCBug(void)                const { return m_has_crc_bug; }
+    uint GetMinSignalMonitorDelay(void) const { return m_sigmon_delay; }
     /// Returns rotor object if it exists, nullptr otherwise.
     const DiSEqCDevRotor *GetRotor(void) const;
 
@@ -80,10 +84,10 @@ class DVBChannel : public DTVChannel
     // Commands
     bool SwitchToInput(int newcapchannel, bool setstarting);
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex &tuning);
+    bool Tune(const DTVMultiplex &tuning) override; // DTVChannel
     bool Tune(const DTVMultiplex &tuning,
               bool force_reset = false, bool same_input = false);
-    bool Retune(void);
+    bool Retune(void) override; // ChannelBase
 
     bool ProbeTuningParams(DTVMultiplex &tuning) const;
 
@@ -91,9 +95,9 @@ class DVBChannel : public DTVChannel
     bool Open(DVBChannel*);
     void Close(DVBChannel*);
 
-    int  GetChanID(void) const;
+    int  GetChanID(void) const override; // ChannelBase
 
-    void CheckOptions(DTVMultiplex &t) const;
+    void CheckOptions(DTVMultiplex &t) const override; // DTVChannel
     void CheckFrequency(uint64_t frequency) const;
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;
@@ -126,44 +130,50 @@ class DVBChannel : public DTVChannel
     double GetUncorrectedBlockCountDVBv5(bool *ok) const;
 
   private:
-    IsOpenMap         is_open;
+    IsOpenMap         m_is_open;
 
     // Data
-    DiSEqCDev         diseqc_dev;
-    DiSEqCDevSettings diseqc_settings;
-    DiSEqCDevTree    *diseqc_tree;
-    DVBCam           *dvbcam; ///< Used to decrypt encrypted streams
+    DiSEqCDev         m_diseqc_dev;
+    DiSEqCDevSettings m_diseqc_settings;
+    DiSEqCDevTree    *m_diseqc_tree         {nullptr};
+                      /// Used to decrypt encrypted streams
+    DVBCam           *m_dvbcam              {nullptr};
 
     // Device info
-    QString           frontend_name;
-    uint64_t          capabilities;
-    uint64_t          ext_modulations;
-    uint64_t          frequency_minimum;
-    uint64_t          frequency_maximum;
-    uint              symbol_rate_minimum;
-    uint              symbol_rate_maximum;
+    QString           m_frontend_name;
+    uint64_t          m_capabilities        {0};
+    uint64_t          m_ext_modulations     {0};
+    uint64_t          m_frequency_minimum   {0};
+    uint64_t          m_frequency_maximum   {0};
+    uint              m_symbol_rate_minimum {0};
+    uint              m_symbol_rate_maximum {0};
 
     // Tuning State
-    mutable QMutex    tune_lock;
-    mutable QMutex    hw_lock;
+    mutable QMutex    m_tune_lock;
+    mutable QMutex    m_hw_lock             {QMutex::Recursive};
     /// Last tuning options Tune() attempted to send to hardware
-    DTVMultiplex      desired_tuning;
+    DTVMultiplex      m_desired_tuning;
     /// Last tuning options Tune() succesfully sent to hardware
-    DTVMultiplex      prev_tuning;
+    DTVMultiplex      m_prev_tuning;
 
-    uint              last_lnb_dev_id;
+    uint              m_last_lnb_dev_id     {(uint)~0x0};
 
-    uint              tuning_delay;///< Extra delay to add for broken drivers
-    uint              sigmon_delay;///< Minimum delay between FE_LOCK checks
-    bool              first_tune;  ///< Used to force hardware reset
+                      /// Extra delay to add for broken drivers
+    uint              m_tuning_delay        {0};
+                      /// Minimum delay between FE_LOCK checks
+    uint              m_sigmon_delay        {25};
+                      /// Used to force hardware reset
+    bool              m_first_tune          {true};
 
     // Other State
-    int               fd_frontend; ///< File descriptor for tuning hardware
-    QString           device;      ///< DVB Device
-    bool              has_crc_bug; ///< true iff our driver munges PMT
+                      /// File descriptor for tuning hardware
+    int               m_fd_frontend         {-1};
+    QString           m_device;      ///< DVB Device
+                      /// true iff our driver munges PMT
+    bool              m_has_crc_bug         {false};
 
-    static QDateTime  last_tuning;
-    QMutex            tune_delay_lock;
+    static QDateTime  s_last_tuning;
+    QMutex            m_tune_delay_lock;
 };
 
 #endif

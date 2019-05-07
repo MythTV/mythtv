@@ -1,5 +1,6 @@
 // -*- Mode: c++ -*-
 #include <algorithm>
+#include <utility>
 using namespace std;
 
 #include "videodisplayprofile.h"
@@ -18,22 +19,22 @@ using namespace std;
 
 bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
 {
-    return checkRange(key, fvalue, 0, true, ok);
+    return checkRange(std::move(key), fvalue, 0, true, ok);
 }
 
 bool ProfileItem::checkRange(QString key, int ivalue, bool *ok) const
 {
-    return checkRange(key, 0.0, ivalue, false, ok);
+    return checkRange(std::move(key), 0.0, ivalue, false, ok);
 }
 
-bool ProfileItem::checkRange(QString key,
+bool ProfileItem::checkRange(const QString& key,
     float fvalue, int ivalue, bool isFloat, bool *ok) const
 {
     bool match = true;
     bool isOK = true;
     if (isFloat)
-        ivalue = int(fvalue * 1000.0f);
-    QString cmp = Get(QString(key));
+        ivalue = int(fvalue * 1000.0F);
+    QString cmp = Get(key);
     if (!cmp.isEmpty())
     {
         cmp.replace(QLatin1String(" "),QLatin1String(""));
@@ -177,7 +178,7 @@ bool ProfileItem::IsMatch(const QSize &size,
     if (!cmp.isEmpty())
     {
         QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-        if (clist.size() > 0)
+        if (!clist.empty())
             match &= clist.contains(codecName,Qt::CaseInsensitive);
     }
 
@@ -215,7 +216,7 @@ bool ProfileItem::IsValid(QString *reason) const
             *reason = QString("Invalid height condition");
         return false;
     }
-    checkRange("cond_framerate",1.0f,&isOK);
+    checkRange("cond_framerate",1.0F,&isOK);
     if (!isOK)
     {
         if (reason)
@@ -343,13 +344,13 @@ QString ProfileItem::toString(void) const
     QString codecs    = Get("cond_codecs");
     QString decoder   = Get("pref_decoder");
     uint    max_cpus  = Get("pref_max_cpus").toUInt();
-    bool    skiploop  = Get("pref_skiploop").toInt();
+    bool    skiploop  = Get("pref_skiploop").toInt() != 0;
     QString renderer  = Get("pref_videorenderer");
     QString osd       = Get("pref_osdrenderer");
     QString deint0    = Get("pref_deint0");
     QString deint1    = Get("pref_deint1");
     QString filter    = Get("pref_filters");
-    bool    osdfade   = Get("pref_osdfade").toInt();
+    bool    osdfade   = Get("pref_osdfade").toInt() != 0;
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
@@ -368,22 +369,22 @@ QString ProfileItem::toString(void) const
 
 #define LOC     QString("VDP: ")
 
-QMutex      VideoDisplayProfile::safe_lock(QMutex::Recursive);
-bool        VideoDisplayProfile::safe_initialized = false;
-safe_map_t  VideoDisplayProfile::safe_renderer;
-safe_map_t  VideoDisplayProfile::safe_renderer_group;
-safe_map_t  VideoDisplayProfile::safe_deint;
-safe_map_t  VideoDisplayProfile::safe_osd;
-safe_map_t  VideoDisplayProfile::safe_equiv_dec;
-safe_list_t VideoDisplayProfile::safe_custom;
-priority_map_t VideoDisplayProfile::safe_renderer_priority;
-pref_map_t  VideoDisplayProfile::dec_name;
-safe_list_t VideoDisplayProfile::safe_decoders;
+QMutex         VideoDisplayProfile::s_safe_lock(QMutex::Recursive);
+bool           VideoDisplayProfile::s_safe_initialized = false;
+safe_map_t     VideoDisplayProfile::s_safe_renderer;
+safe_map_t     VideoDisplayProfile::s_safe_renderer_group;
+safe_map_t     VideoDisplayProfile::s_safe_deint;
+safe_map_t     VideoDisplayProfile::s_safe_osd;
+safe_map_t     VideoDisplayProfile::s_safe_equiv_dec;
+safe_list_t    VideoDisplayProfile::s_safe_custom;
+priority_map_t VideoDisplayProfile::s_safe_renderer_priority;
+pref_map_t     VideoDisplayProfile::s_dec_name;
+safe_list_t    VideoDisplayProfile::s_safe_decoders;
 
 VideoDisplayProfile::VideoDisplayProfile()
-    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f)
+    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0F)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
     QString hostname    = gCoreContext->GetHostName();
@@ -418,7 +419,7 @@ void VideoDisplayProfile::SetInput(const QSize &size,
         last_size = size;
         change = true;
     }
-    if (framerate > 0.0f && framerate != last_rate)
+    if (framerate > 0.0F && framerate != last_rate)
     {
         last_rate = framerate;
         change = true;
@@ -450,8 +451,6 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
         QString("SetVideoRenderer(%1)").arg(video_renderer));
 
     last_video_renderer = video_renderer;
-    last_video_renderer.detach();
-
     if (video_renderer == GetVideoRenderer())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -497,8 +496,8 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &renderer)
         QString("Preferred video renderer: %1 (current: %2)")
                 .arg(renderer).arg(last_video_renderer));
 
-    safe_map_t::const_iterator it = safe_renderer_group.begin();
-    for (; it != safe_renderer_group.end(); ++it)
+    safe_map_t::const_iterator it = s_safe_renderer_group.begin();
+    for (; it != s_safe_renderer_group.end(); ++it)
         if (it->contains(last_video_renderer) &&
             it->contains(renderer))
             return true;
@@ -511,8 +510,8 @@ bool VideoDisplayProfile::IsDecoderCompatible(const QString &decoder)
     if (dec == decoder)
         return true;
 
-    QMutexLocker locker(&safe_lock);
-    return (safe_equiv_dec[dec].contains(decoder));
+    QMutexLocker locker(&s_safe_lock);
+    return (s_safe_equiv_dec[dec].contains(decoder));
 }
 
 QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
@@ -529,7 +528,6 @@ QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
         LOC + QString("GetFilteredDeint(%1) : %2 -> '%3'")
             .arg(override).arg(renderer).arg(deint));
 
-    deint.detach();
     return deint;
 }
 
@@ -544,9 +542,7 @@ QString VideoDisplayProfile::GetPreference(const QString &key) const
     if (it == pref.end())
         return QString();
 
-    QString pref = *it;
-    pref.detach();
-    return pref;
+    return *it;
 }
 
 void VideoDisplayProfile::SetPreference(
@@ -556,9 +552,7 @@ void VideoDisplayProfile::SetPreference(
 
     if (!key.isEmpty())
     {
-        QString tmp = value;
-        tmp.detach();
-        pref[key] = tmp;
+        pref[key] = value;
     }
 }
 
@@ -728,7 +722,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 ok = false;
                 continue;
             }
-            else if (query.next())
+            if (query.next())
             {
                 (*it).SetProfileID(query.value(0).toUInt() + 1);
             }
@@ -770,7 +764,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 ok = false;
                 continue;
             }
-            else if (query.next() && (1 == query.value(0).toUInt()))
+            if (query.next() && (1 == query.value(0).toUInt()))
             {
                 if (lit->isEmpty())
                 {
@@ -820,7 +814,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
 QStringList VideoDisplayProfile::GetDecoders(void)
 {
     init_statics();
-    return safe_decoders;
+    return s_safe_decoders;
 }
 
 QStringList VideoDisplayProfile::GetDecoderNames(void)
@@ -841,30 +835,29 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     if (decoder.isEmpty())
         return "";
 
-    QMutexLocker locker(&safe_lock);
-    if (dec_name.empty())
+    QMutexLocker locker(&s_safe_lock);
+    if (s_dec_name.empty())
     {
-        dec_name["ffmpeg"]   = QObject::tr("Standard");
-        dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
-        dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
-        dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
-        dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
-        dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
-        dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
-        dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
+        s_dec_name["ffmpeg"]   = QObject::tr("Standard");
+        s_dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
+        s_dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
+        s_dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
+        s_dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
+        s_dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
+        s_dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
+        s_dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
+        s_dec_name["nvdec"]    = QObject::tr("NVidia NVDEC acceleration");
     }
 
     QString ret = decoder;
-    pref_map_t::const_iterator it = dec_name.find(decoder);
-    if (it != dec_name.end())
+    pref_map_t::const_iterator it = s_dec_name.find(decoder);
+    if (it != s_dec_name.end())
         ret = *it;
-
-    ret.detach();
     return ret;
 }
 
 
-QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
+QString VideoDisplayProfile::GetDecoderHelp(const QString& decoder)
 {
     QString msg = QObject::tr("Processing method used to decode video.");
 
@@ -918,6 +911,11 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
             "VAAPI2 is a new implementation of VAAPI to will use the graphics hardware to "
             "accelerate video decoding on Intel CPUs. ");
 
+    if (decoder == "nvdec")
+        msg += QObject::tr(
+            "Nvdec uses the new NVDEC API to "
+            "accelerate video decoding on NVidia Graphics Adapters. ");
+
     return msg;
 }
 
@@ -925,86 +923,100 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
 {
     if ("none" == short_name)
         return QObject::tr("None");
-    else if ("linearblend" == short_name)
+    if ("linearblend" == short_name)
         return QObject::tr("Linear blend");
-    else if ("kerneldeint" == short_name)
+    if ("kerneldeint" == short_name)
         return QObject::tr("Kernel");
-    else if ("kerneldoubleprocessdeint" == short_name)
+    if ("kerneldoubleprocessdeint" == short_name)
         return QObject::tr("Kernel (2x)");
-    else if ("greedyhdeint" == short_name)
+    if ("greedyhdeint" == short_name)
         return QObject::tr("Greedy HighMotion");
-    else if ("greedyhdoubleprocessdeint" == short_name)
+    if ("greedyhdoubleprocessdeint" == short_name)
         return QObject::tr("Greedy HighMotion (2x)");
-    else if ("yadifdeint" == short_name)
+    if ("yadifdeint" == short_name)
         return QObject::tr("Yadif");
-    else if ("yadifdoubleprocessdeint" == short_name)
+    if ("yadifdoubleprocessdeint" == short_name)
         return QObject::tr("Yadif (2x)");
-    else if ("bobdeint" == short_name)
+    if ("bobdeint" == short_name)
         return QObject::tr("Bob (2x)");
-    else if ("onefield" == short_name)
+    if ("onefield" == short_name)
         return QObject::tr("One field");
-    else if ("fieldorderdoubleprocessdeint" == short_name)
+    if ("fieldorderdoubleprocessdeint" == short_name)
         return QObject::tr("Interlaced (2x)");
-    else if ("opengllinearblend" == short_name)
+    if ("opengllinearblend" == short_name)
         return QObject::tr("Linear blend (HW-GL)");
-    else if ("openglkerneldeint" == short_name)
+    if ("openglkerneldeint" == short_name)
         return QObject::tr("Kernel (HW-GL)");
-    else if ("openglbobdeint" == short_name)
+    if ("openglbobdeint" == short_name)
         return QObject::tr("Bob (2x, HW-GL)");
-    else if ("openglonefield" == short_name)
+    if ("openglonefield" == short_name)
         return QObject::tr("One field (HW-GL)");
-    else if ("opengldoubleratekerneldeint" == short_name)
+    if ("opengldoubleratekerneldeint" == short_name)
         return QObject::tr("Kernel (2x, HW-GL)");
-    else if ("opengldoubleratelinearblend" == short_name)
+    if ("opengldoubleratelinearblend" == short_name)
         return QObject::tr("Linear blend (2x, HW-GL)");
-    else if ("opengldoubleratefieldorder" == short_name)
+    if ("opengldoubleratefieldorder" == short_name)
         return QObject::tr("Interlaced (2x, HW-GL)");
-    else if ("vdpauonefield" == short_name)
+    if ("vdpauonefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
-    else if ("vdpaubobdeint" == short_name)
+    if ("vdpaubobdeint" == short_name)
         return QObject::tr("Bob (2x, HW)");
-    else if ("vdpaubasic" == short_name)
+    if ("vdpaubasic" == short_name)
         return QObject::tr("Temporal (1x, HW)");
-    else if ("vdpaubasicdoublerate" == short_name)
+    if ("vdpaubasicdoublerate" == short_name)
         return QObject::tr("Temporal (2x, HW)");
-    else if ("vdpauadvanced" == short_name)
+    if ("vdpauadvanced" == short_name)
         return QObject::tr("Advanced (1x, HW)");
-    else if ("vdpauadvanceddoublerate" == short_name)
+    if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, HW)");
-    else if ("vaapionefield" == short_name)
+    if ("vaapionefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
-    else if ("vaapibobdeint" == short_name)
+    if ("vaapibobdeint" == short_name)
         return QObject::tr("Bob (2x, HW)");
 #ifdef USING_OPENMAX
-    else if ("openmaxadvanced" == short_name)
+    if ("openmaxadvanced" == short_name)
         return QObject::tr("Advanced (HW)");
-    else if ("openmaxfast" == short_name)
+    if ("openmaxfast" == short_name)
         return QObject::tr("Fast (HW)");
-    else if ("openmaxlinedouble" == short_name)
+    if ("openmaxlinedouble" == short_name)
         return QObject::tr("Line double (HW)");
 #endif // def USING_OPENMAX
 #ifdef USING_VAAPI2
-    else if ("vaapi2default" == short_name)
+    if ("vaapi2default" == short_name)
         return QObject::tr("Advanced (HW-VA)");
-    else if ("vaapi2bob" == short_name)
+    if ("vaapi2bob" == short_name)
         return QObject::tr("Bob (HW-VA)");
-    else if ("vaapi2weave" == short_name)
+    if ("vaapi2weave" == short_name)
         return QObject::tr("Weave (HW-VA)");
-    else if ("vaapi2motion_adaptive" == short_name)
+    if ("vaapi2motion_adaptive" == short_name)
         return QObject::tr("Motion Adaptive (HW-VA)");
-    else if ("vaapi2motion_compensated" == short_name)
+    if ("vaapi2motion_compensated" == short_name)
         return QObject::tr("Motion Compensated (HW-VA)");
-    else if ("vaapi2doubleratedefault" == short_name)
+    if ("vaapi2doubleratedefault" == short_name)
         return QObject::tr("Advanced (2x, HW-VA)");
-    else if ("vaapi2doubleratebob" == short_name)
+    if ("vaapi2doubleratebob" == short_name)
         return QObject::tr("Bob (2x, HW-VA)");
-    else if ("vaapi2doublerateweave" == short_name)
+    if ("vaapi2doublerateweave" == short_name)
         return QObject::tr("Weave (2x, HW-VA)");
-    else if ("vaapi2doubleratemotion_adaptive" == short_name)
+    if ("vaapi2doubleratemotion_adaptive" == short_name)
         return QObject::tr("Motion Adaptive (2x, HW-VA)");
-    else if ("vaapi2doubleratemotion_compensated" == short_name)
+    if ("vaapi2doubleratemotion_compensated" == short_name)
         return QObject::tr("Motion Compensated (2x, HW-VA)");
 #endif
+#ifdef USING_NVDEC
+    if ("nvdecweave" == short_name)
+        return QObject::tr("Weave (HW-NV)");
+    if ("nvdecbob" == short_name)
+        return QObject::tr("Bob (HW-NV)");
+    if ("nvdecadaptive" == short_name)
+        return QObject::tr("Adaptive (HW-NV)");
+    if ("nvdecdoublerateweave" == short_name)
+        return QObject::tr("Weave (2x, HW-NV)");
+    if ("nvdecdoubleratebob" == short_name)
+        return QObject::tr("Bob (2x, HW-NV)");
+    if ("nvdecdoublerateadaptive" == short_name)
+        return QObject::tr("Adaptive (2x, HW-NV)");
+#endif // USING_NVDEC
 
     return "";
 }
@@ -1040,7 +1052,7 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 
     if (tmp.isEmpty())
     {
-        if (profiles.size())
+        if (!profiles.empty())
             tmp = profiles[0];
 
         tmp = (profiles.contains("Normal")) ? "Normal" : tmp;
@@ -1116,8 +1128,8 @@ void VideoDisplayProfile::DeleteProfiles(const QString &hostname)
 // Old style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
-    QString cmp0, uint width0, uint height0,
-    QString cmp1, uint width1, uint height1,
+    const QString& cmp0, uint width0, uint height0,
+    const QString& cmp1, uint width1, uint height1,
     QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
     QString osdrenderer, bool osdfade,
     QString deint0, QString deint1, QString filters)
@@ -1144,18 +1156,18 @@ void VideoDisplayProfile::CreateProfile(
     CreateProfile(
         groupid, priority,
         width, height, QString(),
-        decoder, max_cpus, skiploop, videorenderer,
-        osdrenderer, osdfade,
-        deint0, deint1, filters);
+        std::move(decoder), max_cpus, skiploop, std::move(videorenderer),
+        std::move(osdrenderer), osdfade,
+        std::move(deint0), std::move(deint1), std::move(filters));
 }
 
 // New Style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
-    QString width, QString height, QString codecs,
-    QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-    QString osdrenderer, bool osdfade,
-    QString deint0, QString deint1, QString filters)
+    const QString& width, const QString& height, const QString& codecs,
+    const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+    const QString& osdrenderer, bool osdfade,
+    const QString& deint0, const QString& deint1, const QString& filters)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1479,7 +1491,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 
     if (!profiles.contains("OpenMAX Normal")) {
         (void) QObject::tr("OpenMAX Normal", "Sample: OpenMAX Normal");
-        uint groupid = CreateProfileGroup("OpenMAX Normal", hostname);
+        groupid = CreateProfileGroup("OpenMAX Normal", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
                       "openmax", 4, true, "openmax", "softblend", false,
                       "openmaxadvanced", "onefield",
@@ -1513,19 +1525,30 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
     }
 #endif
 
+#if defined(USING_NVDEC) && defined(USING_OPENGL_VIDEO)
+    if (!profiles.contains("NVDEC Normal")) {
+        (void) QObject::tr("NVDEC Normal",
+                           "Sample: NVDEC Normal");
+        groupid = CreateProfileGroup("NVDEC Normal", hostname);
+        CreateProfile(groupid, 1, "", "", "",
+                      "nvdec", 4, true, "opengl",
+                      "opengl2", true,
+                      "nvdecdoublerateadaptive", "nvdecadaptive",
+                      "");
+    }
+#endif
+
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
-    safe_map_t::const_iterator it = safe_renderer.find(decoder);
+    safe_map_t::const_iterator it = s_safe_renderer.find(decoder);
     QStringList tmp;
-    if (it != safe_renderer.end())
+    if (it != s_safe_renderer.end())
         tmp = *it;
-
-    tmp.detach();
     return tmp;
 }
 
@@ -1570,16 +1593,42 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     if (renderer == "opengl")
     {
         msg = QObject::tr(
-            "This video renderer uses OpenGL for scaling and color conversion "
-            "with full picture controls. The GPU can be used for deinterlacing. "
-            "This requires a faster GPU than XVideo.");
+            "Video is converted to an intermediate format by the CPU (UYVY) "
+            "before OpenGL is used for color conversion, scaling, picture controls"
+            " and optionally deinterlacing. Processing is balanced between the CPU"
+            "and GPU.");
     }
 
     if (renderer == "opengl-lite")
         msg = QObject::tr(
-            "This video renderer uses OpenGL for scaling and color conversion. "
+            "OpenGL is used for scaling and color conversion. "
             "It uses faster OpenGL functionality when available but at the "
             "expense of picture controls and GPU based deinterlacing.");
+
+    if (renderer == "opengl-yv12")
+    {
+        msg = QObject::tr(
+            "OpenGL is used for all color conversion, scaling, picture "
+            "controls and optionally deinterlacing. CPU load is low but a more "
+            "powerful GPU is needed for deinterlacing.");
+    }
+
+    if (renderer == "opengl-hquyv")
+    {
+        msg = QObject::tr(
+            "This renderer uses a higher quality CPU conversion for interlaced "
+            "content before using OpenGL for color conversion, scaling, picture"
+            " controls and optionally deinterlacing. CPU load is higher "
+            "particularly on embedded systems.");
+    }
+
+    if (renderer == "opengl-rgba")
+    {
+        msg = QObject::tr(
+            "All video processing is performed by the CPU. OpenGL is used "
+            "for display only. Does not support picture controls or GPU "
+            "deinterlacing. Requires a significantly faster CPU.");
+    }
 
     if (renderer == "vdpau")
     {
@@ -1605,15 +1654,13 @@ QString VideoDisplayProfile::GetPreferredVideoRenderer(const QString &decoder)
 QStringList VideoDisplayProfile::GetDeinterlacers(
     const QString &video_renderer)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
-    safe_map_t::const_iterator it = safe_deint.find(video_renderer);
+    safe_map_t::const_iterator it = s_safe_deint.find(video_renderer);
     QStringList tmp;
-    if (it != safe_deint.end())
+    if (it != s_safe_deint.end())
         tmp = *it;
-
-    tmp.detach();
     return tmp;
 }
 
@@ -1656,6 +1703,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     QString kUsingGPU = QObject::tr("(Hardware Accelerated)");
 
     QString kUsingVA = QObject::tr("(VAAPI Hardware Accelerated)");
+
+    QString kUsingNV = QObject::tr("(NVDEC Hardware Accelerated)");
 
     QString kUsingGL = QObject::tr("(OpenGL Hardware Accelerated)");
 
@@ -1764,6 +1813,19 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kMAMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
     else if (deint == "vaapi2doubleratemotion_compensated")
         msg = kMCMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
+
+    else if (deint == "nvdecweave")
+        msg = kWeaveMsg + " " +  kUsingNV;
+    else if (deint == "nvdecbob")
+        msg = kBobMsg + " " +  kUsingNV;
+    else if (deint == "nvdecadaptive")
+        msg = kMAMsg + " " +  kUsingNV;
+    else if (deint == "nvdecdoublerateweave")
+        msg = kWeaveMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
+    else if (deint == "nvdecdoubleratebob")
+        msg = kBobMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
+    else if (deint == "nvdecdoublerateadaptive")
+        msg = kMAMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 
@@ -1772,15 +1834,13 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 
 QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
-    safe_map_t::const_iterator it = safe_osd.find(video_renderer);
+    safe_map_t::const_iterator it = s_safe_osd.find(video_renderer);
     QStringList tmp;
-    if (it != safe_osd.end())
+    if (it != s_safe_osd.end())
         tmp = *it;
-
-    tmp.detach();
     return tmp;
 }
 
@@ -1833,9 +1893,9 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
 
 bool VideoDisplayProfile::IsFilterAllowed(const QString &video_renderer)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
-    return safe_custom.contains(video_renderer);
+    return s_safe_custom.contains(video_renderer);
 }
 
 QStringList VideoDisplayProfile::GetFilteredRenderers(
@@ -1856,7 +1916,7 @@ QStringList VideoDisplayProfile::GetFilteredRenderers(
 
 QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
 {
-    QMutexLocker locker(&safe_lock);
+    QMutexLocker locker(&s_safe_lock);
     init_statics();
 
     uint    top_priority = 0;
@@ -1865,16 +1925,13 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
     QStringList::const_iterator it = renderers.begin();
     for (; it != renderers.end(); ++it)
     {
-        priority_map_t::const_iterator p = safe_renderer_priority.find(*it);
-        if ((p != safe_renderer_priority.end()) && (*p >= top_priority))
+        priority_map_t::const_iterator p = s_safe_renderer_priority.find(*it);
+        if ((p != s_safe_renderer_priority.end()) && (*p >= top_priority))
         {
             top_priority = *p;
             top_renderer = *it;
         }
     }
-
-    if (!top_renderer.isNull())
-        top_renderer.detach();
 
     return top_renderer;
 }
@@ -1892,26 +1949,26 @@ QString VideoDisplayProfile::toString(void) const
 
 void VideoDisplayProfile::init_statics(void)
 {
-    if (safe_initialized)
+    if (s_safe_initialized)
         return;
 
-    safe_initialized = true;
+    s_safe_initialized = true;
 
     render_opts options;
-    options.renderers      = &safe_custom;
-    options.safe_renderers = &safe_renderer;
-    options.deints         = &safe_deint;
-    options.osds           = &safe_osd;
-    options.render_group   = &safe_renderer_group;
-    options.priorities     = &safe_renderer_priority;
-    options.decoders       = &safe_decoders;
-    options.equiv_decoders = &safe_equiv_dec;
+    options.renderers      = &s_safe_custom;
+    options.safe_renderers = &s_safe_renderer;
+    options.deints         = &s_safe_deint;
+    options.osds           = &s_safe_osd;
+    options.render_group   = &s_safe_renderer_group;
+    options.priorities     = &s_safe_renderer_priority;
+    options.decoders       = &s_safe_decoders;
+    options.equiv_decoders = &s_safe_equiv_dec;
 
     // N.B. assumes NuppelDecoder and DummyDecoder always present
     AvFormatDecoder::GetDecoders(options);
     VideoOutput::GetRenderOptions(options);
 
-    foreach(QString decoder, safe_decoders)
+    foreach(QString decoder, s_safe_decoders)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("decoder<->render support: %1%2")
                 .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));

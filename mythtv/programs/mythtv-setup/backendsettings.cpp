@@ -826,7 +826,7 @@ static GlobalCheckBoxSetting *MythFillGrabberSuggestsTime()
     bc->setLabel(QObject::tr("Run guide data program at time suggested by the "
                              "grabber."));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("If enabled, allow a DataDirect guide data "
+    bc->setHelpText(QObject::tr("If enabled, allow a guide data "
                     "provider to specify the next download time in order "
                     "to distribute load on their servers. Guide data program "
                     "execution start/end times are also ignored."));
@@ -873,49 +873,41 @@ class MythFillSettings : public GroupSetting
      }
 };
 
-BackendSettings::BackendSettings() :
-    isMasterBackend(nullptr),
-    localServerPort(nullptr),
-    backendServerAddr(nullptr),
-    masterServerName(nullptr),
-    ipAddressSettings(nullptr),
-    isLoaded(false),
-    masterServerIP(nullptr),
-    masterServerPort(nullptr)
+BackendSettings::BackendSettings()
 {
     // These two are included for backward compatibility -
     // used by python bindings. They could be removed later
-    masterServerIP = MasterServerIP();
-    masterServerPort = MasterServerPort();
+    m_masterServerIP = MasterServerIP();
+    m_masterServerPort = MasterServerPort();
 
     //++ Host Address Backend Setup ++
     GroupSetting* server = new GroupSetting();
     server->setLabel(tr("Host Address Backend Setup"));
-    localServerPort = LocalServerPort();
-    server->addChild(localServerPort);
+    m_localServerPort = LocalServerPort();
+    server->addChild(m_localServerPort);
     server->addChild(LocalStatusPort());
     server->addChild(LocalSecurityPin());
     server->addChild(AllowConnFromAll());
     //+++ IP Addresses +++
-    ipAddressSettings = new IpAddressSettings();
-    server->addChild(ipAddressSettings);
-    connect(ipAddressSettings, &HostCheckBoxSetting::valueChanged,
+    m_ipAddressSettings = new IpAddressSettings();
+    server->addChild(m_ipAddressSettings);
+    connect(m_ipAddressSettings, &HostCheckBoxSetting::valueChanged,
             this, &BackendSettings::listenChanged);
-    connect(ipAddressSettings->localServerIP,
+    connect(m_ipAddressSettings->localServerIP,
             static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
-    connect(ipAddressSettings->localServerIP6,
+    connect(m_ipAddressSettings->localServerIP6,
             static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
-    backendServerAddr = BackendServerAddr();
-    server->addChild(backendServerAddr);
+    m_backendServerAddr = BackendServerAddr();
+    server->addChild(m_backendServerAddr);
     //++ Master Backend ++
-    isMasterBackend = IsMasterBackend();
-    connect(isMasterBackend, &TransMythUICheckBoxSetting::valueChanged,
+    m_isMasterBackend = IsMasterBackend();
+    connect(m_isMasterBackend, &TransMythUICheckBoxSetting::valueChanged,
             this, &BackendSettings::masterBackendChanged);
-    server->addChild(isMasterBackend);
-    masterServerName = MasterServerName();
-    server->addChild(masterServerName);
+    server->addChild(m_isMasterBackend);
+    m_masterServerName = MasterServerName();
+    server->addChild(m_masterServerName);
     addChild(server);
 
     //++ Locale Settings ++
@@ -1035,78 +1027,78 @@ BackendSettings::BackendSettings() :
 
 void BackendSettings::masterBackendChanged()
 {
-    if (!isLoaded)
+    if (!m_isLoaded)
         return;
-    bool ismasterchecked = isMasterBackend->boolValue();
+    bool ismasterchecked = m_isMasterBackend->boolValue();
     if (ismasterchecked)
-        masterServerName->setValue(gCoreContext->GetHostName());
+        m_masterServerName->setValue(gCoreContext->GetHostName());
     else
-        masterServerName->setValue(priorMasterName);
+        m_masterServerName->setValue(m_priorMasterName);
 }
 
 void BackendSettings::listenChanged()
 {
-    if (!isLoaded)
+    if (!m_isLoaded)
         return;
-    bool addrChanged = backendServerAddr->haveChanged();
-    QString currentsetting = backendServerAddr->getValue();
-    backendServerAddr->clearSelections();
-    if (ipAddressSettings->boolValue())
+    bool addrChanged = m_backendServerAddr->haveChanged();
+    QString currentsetting = m_backendServerAddr->getValue();
+    m_backendServerAddr->clearSelections();
+    if (m_ipAddressSettings->boolValue())
     {
         QList<QHostAddress> list = QNetworkInterface::allAddresses();
         QList<QHostAddress>::iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
             it->setScopeId(QString());
-            backendServerAddr->addSelection((*it).toString(), (*it).toString());
+            m_backendServerAddr->addSelection((*it).toString(), (*it).toString());
         }
     }
     else
     {
-        backendServerAddr->addSelection(
-            ipAddressSettings->localServerIP->getValue());
-        backendServerAddr->addSelection(
-            ipAddressSettings->localServerIP6->getValue());
+        m_backendServerAddr->addSelection(
+            m_ipAddressSettings->localServerIP->getValue());
+        m_backendServerAddr->addSelection(
+            m_ipAddressSettings->localServerIP6->getValue());
     }
     // Remove the blank entry that is caused by clearSelections
     // TODO probably not needed anymore?
-    // backendServerAddr->removeSelection(QString());
+    // m_backendServerAddr->removeSelection(QString());
 
     QHostAddress addr;
     if (addr.setAddress(currentsetting))
     {
         // if prior setting is an ip address
         // it only if it is now in the list
-        if (backendServerAddr->getValueIndex(currentsetting)
+        if (m_backendServerAddr->getValueIndex(currentsetting)
                 > -1)
-            backendServerAddr->setValue(currentsetting);
+            m_backendServerAddr->setValue(currentsetting);
         else
-            backendServerAddr->setValue(0);
+            m_backendServerAddr->setValue(0);
     }
     else if (! currentsetting.isEmpty())
     {
         // if prior setting was not an ip address, it must
         // have been a dns name so add it back and select it.
-        backendServerAddr->addSelection(currentsetting);
-        backendServerAddr->setValue(currentsetting);
+        m_backendServerAddr->addSelection(currentsetting);
+        m_backendServerAddr->setValue(currentsetting);
     }
     else
-        backendServerAddr->setValue(0);
-    backendServerAddr->setChanged(addrChanged);
+        m_backendServerAddr->setValue(0);
+    m_backendServerAddr->setChanged(addrChanged);
 }
 
 
 void BackendSettings::Load(void)
 {
-    isLoaded=false;
+    m_isLoaded=false;
     GroupSetting::Load();
 
     // These two are included for backward compatibility - only used by python
     // bindings. They should be removed later
-    masterServerIP->Load();
-    masterServerPort->Load();
+    m_masterServerIP->Load();
+    m_masterServerPort->Load();
 
-    QString mastername = masterServerName->getValue();
+    QString mastername = m_masterServerName->getValue();
     // new installation - default to master
     bool newInstall=false;
     if (mastername.isEmpty())
@@ -1115,62 +1107,60 @@ void BackendSettings::Load(void)
         newInstall=true;
     }
     bool ismaster = (mastername == gCoreContext->GetHostName());
-    isMasterBackend->setValue(ismaster);
-    priorMasterName = mastername;
-    isLoaded=true;
+    m_isMasterBackend->setValue(ismaster);
+    m_priorMasterName = mastername;
+    m_isLoaded=true;
     masterBackendChanged();
     listenChanged();
     if (!newInstall)
     {
-        backendServerAddr->setChanged(false);
-        isMasterBackend->setChanged(false);
-        masterServerName->setChanged(false);
+        m_backendServerAddr->setChanged(false);
+        m_isMasterBackend->setChanged(false);
+        m_masterServerName->setChanged(false);
     }
 }
 
 void BackendSettings::Save(void)
 {
     // Setup deprecated backward compatibility settings
-    if (isMasterBackend->boolValue())
+    if (m_isMasterBackend->boolValue())
     {
-        QString addr = backendServerAddr->getValue();
+        QString addr = m_backendServerAddr->getValue();
         QString ip = gCoreContext->resolveAddress(addr);
-        masterServerIP->setValue(ip);
-        masterServerPort->setValue(localServerPort->getValue());
+        m_masterServerIP->setValue(ip);
+        m_masterServerPort->setValue(m_localServerPort->getValue());
     }
 
     // If listen on all is specified, set up values for the
     // specific IPV4 and IPV6 addresses for backward
     // compatibilty with other things that may use them
-    if (ipAddressSettings->boolValue())
+    if (m_ipAddressSettings->boolValue())
     {
-        QString bea = backendServerAddr->getValue();
+        QString bea = m_backendServerAddr->getValue();
         // initialize them to localhost values
-        ipAddressSettings->localServerIP->setValue(0);
-        ipAddressSettings->localServerIP6->setValue(0);
+        m_ipAddressSettings->localServerIP->setValue(0);
+        m_ipAddressSettings->localServerIP6->setValue(0);
         QString ip4 = gCoreContext->resolveAddress
             (bea,MythCoreContext::ResolveIPv4);
         QString ip6 = gCoreContext->resolveAddress
             (bea,MythCoreContext::ResolveIPv6);
         // the setValue calls below only set the value if it is in the list.
-        ipAddressSettings->localServerIP->setValue(ip4);
-        ipAddressSettings->localServerIP6->setValue(ip6);
+        m_ipAddressSettings->localServerIP->setValue(ip4);
+        m_ipAddressSettings->localServerIP6->setValue(ip6);
     }
 
     GroupSetting::Save();
 
     // These two are included for backward compatibility - only used by python
     // bindings. They should be removed later
-    masterServerIP->Save();
-    masterServerPort->Save();
+    m_masterServerIP->Save();
+    m_masterServerPort->Save();
 }
 
 BackendSettings::~BackendSettings()
 {
-    if (masterServerIP)
-        delete masterServerIP;
-    masterServerIP=nullptr;
-    if (masterServerPort)
-        delete masterServerPort;
-    masterServerPort=nullptr;
+    delete m_masterServerIP;
+    m_masterServerIP=nullptr;
+    delete m_masterServerPort;
+    m_masterServerPort=nullptr;
 }

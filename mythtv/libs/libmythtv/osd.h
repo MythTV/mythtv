@@ -86,8 +86,8 @@ class ChannelEditor : public MythScreenType
   public:
     ChannelEditor(QObject *retobject, const char * name);
 
-    virtual bool Create(void);
-    virtual bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void SetText(const InfoMap &map);
     void GetText(InfoMap &map);
@@ -117,7 +117,7 @@ class MythOSDWindow : public MythScreenType
     {
     }
 
-    virtual bool Create(void)
+    bool Create(void) override // MythScreenType
     {
         if (m_themed)
             return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(),
@@ -177,15 +177,15 @@ class OSD
     void SetGraph(const QString &window, const QString &graph, int64_t timecode);
     bool IsWindowVisible(const QString &window);
 
-    bool DialogVisible(QString window = QString());
+    bool DialogVisible(const QString& window = QString());
     bool DialogHandleKeypress(QKeyEvent *e);
     bool DialogHandleGesture(MythGestureEvent *e);
     void DialogQuit(void);
     void DialogShow(const QString &window, const QString &text = "",
           int updatefor = 0);
     void DialogSetText(const QString &text);
-    void DialogBack(QString text = "", QVariant data = 0, bool exit = false);
-    void DialogAddButton(QString text, QVariant data,
+    void DialogBack(const QString& text = "", const QVariant& data = 0, bool exit = false);
+    void DialogAddButton(const QString& text, QVariant data,
                          bool menu = false, bool current = false);
     void DialogGetText(InfoMap &map);
 
@@ -247,12 +247,12 @@ class OsdNavigation : public MythScreenType
 
   public:
     OsdNavigation(QObject *retobject, const QString &name, OSD *osd);
-    virtual bool Create(void);
-    virtual bool keyPressEvent(QKeyEvent *event);
-    virtual void SetTextFromMap(const InfoMap &infoMap);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void SetTextFromMap(const InfoMap &infoMap) override; // MythUIComposite
     int getVisibleGroup() {return m_visibleGroup; }
     // Virtual
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
   protected:
 
@@ -268,7 +268,7 @@ class OsdNavigation : public MythScreenType
     int m_maxGroupNum;
     bool m_IsVolumeControl;
 
-    void sendResult(int result, QString action);
+    void sendResult(int result, const QString& action);
 
   public slots:
     void GeneralAction(void);

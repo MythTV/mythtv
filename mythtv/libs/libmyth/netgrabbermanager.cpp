@@ -1,8 +1,9 @@
 // qt
-#include <QString>
 #include <QCoreApplication>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QString>
+#include <utility>
 
 #include "mythdirs.h"
 #include "mythcontext.h"
@@ -26,7 +27,7 @@ GrabberScript::GrabberScript(const QString& title, const QString& image,
               const bool& search, const bool& tree,
               const QString& description, const QString& commandline,
               const double& version) :
-    MThread("GrabberScript"), m_lock(QMutex::Recursive)
+    MThread("GrabberScript")
 {
     m_title = title;
     m_image = image;
@@ -140,13 +141,11 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
     }
 }
 
-GrabberManager::GrabberManager() :     m_lock(QMutex::Recursive)
+GrabberManager::GrabberManager()
 {
     m_updateFreq = (gCoreContext->GetNumSetting(
                        "netsite.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
-    m_runningCount = 0;
-    m_refreshAll = false;
     connect( m_timer, SIGNAL(timeout()),
                       this, SLOT(timeout()));
 }
@@ -191,7 +190,6 @@ GrabberDownloadThread::GrabberDownloadThread(QObject *parent) :
     MThread("GrabberDownload")
 {
     m_parent = parent;
-    m_refreshAll = false;
 }
 
 GrabberDownloadThread::~GrabberDownloadThread()
@@ -245,8 +243,6 @@ void GrabberDownloadThread::run()
 }
 
 Search::Search()
-    : m_searchProcess(nullptr), m_numResults(0),
-      m_numReturned(0), m_numIndex(0)
 {
     m_videoList.clear();
 }
@@ -273,7 +269,7 @@ void Search::executeSearch(const QString &script, const QString &query,
     connect(m_searchProcess, SIGNAL(error(uint)),
             this, SLOT(slotProcessSearchExit(uint)));
 
-    QString cmd = script;
+    const QString& cmd = script;
 
     QStringList args;
 
@@ -284,7 +280,7 @@ void Search::executeSearch(const QString &script, const QString &query,
     }
 
     args.append("-S");
-    QString term = query;
+    const QString& term = query;
     args.append(MythSystemLegacy::ShellEscape(term));
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -340,12 +336,12 @@ void Search::process()
     }
     else
     {
-        QDomNodeList entries = m_document.elementsByTagName("item");
+        QDomNodeList items = m_document.elementsByTagName("item");
 
-        if (entries.count() == 0)
+        if (items.count() == 0)
             m_numReturned = 0;
         else
-            m_numReturned = entries.count();
+            m_numReturned = items.count();
     }
 
     Node = itemNode.namedItem(QString("startindex"));
@@ -409,7 +405,7 @@ void Search::slotProcessSearchExit(uint exitcode)
 
 void Search::SetData(QByteArray data)
 {
-    m_data = data;
+    m_data = std::move(data);
     m_document.setContent(m_data, true);
 
 }

@@ -33,13 +33,6 @@
 const int STATUS_UPDATE_TIME = 1000 * 10; // update the status every 10 seconds
 const int TIME_UPDATE_TIME = 1000 * 1;    // update the time every 1 second
 
-FunctionDialog::FunctionDialog(MythScreenStack *parent, Monitor *monitor) :
-    MythScreenType(parent, "functionpopup"), m_monitor(monitor),
-    m_captionText(nullptr), m_functionList(nullptr),
-    m_enabledCheck(nullptr), m_notificationCheck(nullptr), m_okButton(nullptr)
-{
-}
-
 bool FunctionDialog::Create()
 {
     if (!LoadWindowFromXML("zoneminder-ui.xml", "functionpopup", this))
@@ -124,9 +117,6 @@ void FunctionDialog::setMonitorFunction(void)
 
 ZMConsole::ZMConsole(MythScreenStack *parent)
           :MythScreenType(parent, "zmconsole"),
-           m_monitor_list(nullptr), m_running_text(nullptr), m_status_text(nullptr),
-           m_time_text(nullptr), m_date_text(nullptr), m_load_text(nullptr),
-           m_disk_text(nullptr), m_functionDialog(nullptr),
            m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
            m_timeTimer(new QTimer(this)), m_updateTimer(new QTimer(this))
 {

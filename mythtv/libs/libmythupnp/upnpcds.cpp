@@ -409,7 +409,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     uint16_t       nTotalMatches   = 0;
     uint16_t       nUpdateID       = 0;
     QString        sResultXML;
-    FilterMap filter =  static_cast<FilterMap>(request.m_sFilter.split(','));
+    FilterMap filter =  request.m_sFilter.split(',');
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::HandleBrowse ObjectID=%1")
@@ -639,7 +639,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
         if (eErrorCode == UPnPResult_Success)
         {
-            FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
+            FilterMap filter = request.m_sFilter.split(',');
             nNumberReturned = pResult->m_List.count();
             nTotalMatches   = pResult->m_nTotalMatches;
             nUpdateID       = pResult->m_nUpdateID;
@@ -858,8 +858,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                 LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::Browse: BrowseMetadata (%1)").arg(pRequest->m_sObjectId));
                 if (LoadMetadata(pRequest, pResults, tokens, currentToken))
                     return pResults;
-                else
-                    pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
                 break;
             }
 
@@ -869,8 +868,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                 LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::Browse: BrowseDirectChildren (%1)").arg(pRequest->m_sObjectId));
                 if (LoadChildren(pRequest, pResults, tokens, currentToken))
                     return pResults;
-                else
-                    pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+                pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
                 break;
             }
 
@@ -892,10 +890,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
 bool UPnpCDSExtension::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 {
-    if ( !m_sClass.startsWith( pRequest->m_sSearchClass ))
-        return false;
-
-    return true;
+    return m_sClass.startsWith( pRequest->m_sSearchClass );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1072,10 +1067,9 @@ QString UPnpCDSExtension::CreateIDString(const QString &requestId,
     if (currentName == name.toLower() && !currentValue.isEmpty() &&
         currentValue == value.toLower())
         return requestId;
-    else if (currentName == name.toLower() && currentValue.isEmpty())
+    if (currentName == name.toLower() && currentValue.isEmpty())
         return QString("%1=%2").arg(requestId).arg(value);
-    else
-        return QString("%1/%2=%3").arg(requestId).arg(name).arg(value);
+    return QString("%1/%2=%3").arg(requestId).arg(name).arg(value);
 }
 
 void UPnpCDSExtension::CreateRoot()

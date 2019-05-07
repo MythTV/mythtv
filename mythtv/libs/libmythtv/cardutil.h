@@ -13,8 +13,8 @@ using namespace std;
 #include <QMap>
 
 // MythTV headers
-#include "settings.h"
 #include "mythtvexp.h"
+#include "dtvconfparserhelpers.h"
 
 class InputInfo;
 class CardInput;
@@ -137,7 +137,8 @@ class MTV_PUBLIC CardUtil
 
     static bool         IsChannelChangeDiscontinuous(const QString &rawtype)
     {
-        return !IsEncoder(rawtype) || (rawtype == "HDPVR");
+        return (!IsEncoder(rawtype) || rawtype == "HDPVR" ||
+                rawtype == "EXTERNAL");
     }
 
     static bool         IsUnscanable(const QString &rawtype)
@@ -251,9 +252,9 @@ class MTV_PUBLIC CardUtil
         return list[0];
     }
 
-    static vector<uint> GetInputIDs(QString videodevice = QString(),
-                                    QString rawtype     = QString(),
-                                    QString inputname   = QString(),
+    static vector<uint> GetInputIDs(const QString& videodevice = QString(),
+                                    const QString& rawtype     = QString(),
+                                    const QString& inputname   = QString(),
                                     QString hostname    = QString());
 
     static uint         GetChildInputCount(uint inputid);
@@ -275,6 +276,8 @@ class MTV_PUBLIC CardUtil
         { return get_on_input("audiodevice", inputid); }
     static QString      GetVBIDevice(uint inputid)
         { return get_on_input("vbidevice", inputid); }
+    static QString      GetDeliverySystemFromDB(uint inputid)
+        { return get_on_input("inputname", inputid); }          // use capturecard/inputname for now
 
     static QString      GetHostname(uint inputid)
         { return get_on_input("hostname", inputid); }
@@ -311,7 +314,7 @@ class MTV_PUBLIC CardUtil
     // Other input functions
 
     static vector<uint> GetInputIDs(uint sourceid);
-    static bool         GetInputInfo(InputInfo &info,
+    static bool         GetInputInfo(InputInfo &input,
                                      vector<uint> *groupids = nullptr);
     static QList<InputInfo> GetAllInputInfo();
     static QString      GetInputName(uint inputid);
@@ -338,10 +341,10 @@ class MTV_PUBLIC CardUtil
 
     static QString      ProbeSubTypeName(uint inputid);
 
-    static QStringList  ProbeVideoInputs(QString device,
-                                         QString inputtype = QString());
-    static QStringList  ProbeAudioInputs(QString device,
-                                         QString inputtype = QString());
+    static QStringList  ProbeVideoInputs(const QString& device,
+                                         const QString& inputtype = QString());
+    static QStringList  ProbeAudioInputs(const QString& device,
+                                         const QString& inputtype = QString());
     static void         GetDeviceInputNames(const QString      &device,
                                             const QString      &inputtype,
                                             QStringList        &inputs);
@@ -364,17 +367,36 @@ class MTV_PUBLIC CardUtil
                                         const QString &inputname);
     static bool         TVOnly(uint inputid, const QString &inputname);
     static bool         IsInNeedOfExternalInputConf(uint inputid);
-    static uint         GetQuickTuning(uint inputid, const QString &inputname);
+    static uint         GetQuickTuning(uint inputid, const QString &input_name);
 
     // DVB info
     /// \brief Returns true if the input is a DVB input
     static bool         IsDVB(uint inputid)
         { return "DVB" == GetRawInputType(inputid); }
-    static bool         IsDVBInputType(const QString &input_type);
-    static QString      ProbeDVBFrontendName(const QString &device);
+    static bool         IsDVBInputType(const QString &inputType);
+    static QStringList  ProbeDeliverySystems(const QString &device);
+    static QStringList  ProbeDeliverySystems(int fd_frontend);
+    static QString      ProbeDefaultDeliverySystem(const QString &device);
     static QString      ProbeDVBType(const QString &device);
+    static QString      ProbeDVBFrontendName(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
     static uint         GetMinSignalMonitoringDelay(const QString &device);
+    static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
+    static DTVTunerType GetTunerType(uint inputid);
+    static DTVTunerType ProbeTunerType(int fd_frontend);
+    static DTVTunerType ProbeTunerType(const QString &device);
+    static DTVModulationSystem GetDeliverySystem(uint inputid);
+    static DTVModulationSystem ProbeCurrentDeliverySystem(const QString &device);
+    static DTVModulationSystem ProbeCurrentDeliverySystem(int fd_frontend);
+    static DTVModulationSystem ProbeBestDeliverySystem(int fd);
+    static DTVModulationSystem GetOrProbeDeliverySystem(uint inputid, int fd);
+    static int          SetDefaultDeliverySystem(uint inputid, int fd);
+    static int          SetDeliverySystem(uint inputid);
+    static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys);
+    static int          SetDeliverySystem(uint inputid, int fd);
+    static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd);
+    static int          OpenVideoDevice(int inputid);
+    static int          OpenVideoDevice(const QString &device);
     static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
     static InputNames   GetConfiguredDVBInputs(const QString &device);
 
@@ -409,10 +431,10 @@ class MTV_PUBLIC CardUtil
                                    QString *error = nullptr);
 
   private:
-    static QStringList  ProbeV4LVideoInputs(QString device);
-    static QStringList  ProbeV4LAudioInputs(QString device);
-    static QStringList  ProbeDVBInputs(QString device);
-    static QMap <QString,QStringList> videoDeviceCache;
+    static QStringList  ProbeV4LVideoInputs(const QString& device);
+    static QStringList  ProbeV4LAudioInputs(const QString& device);
+    static QStringList  ProbeDVBInputs(const QString& device);
+    static QMap <QString,QStringList> s_videoDeviceCache;
 };
 
 #endif //_CARDUTIL_H_

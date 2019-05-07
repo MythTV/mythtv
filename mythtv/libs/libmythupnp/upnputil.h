@@ -47,33 +47,32 @@ class NameValues;
 class NameValue
 {
   public:
-    QString sName;
-    QString sValue;
-    bool    bRequired;
+    QString     m_sName;
+    QString     m_sValue;
+    bool        m_bRequired   {false};
 
-    NameValues *pAttributes;
+    NameValues *m_pAttributes {nullptr};
 
   public:
-    NameValue() :
-        sName(), sValue(), bRequired(false), pAttributes(nullptr) { }
+    NameValue() = default;
     NameValue(const QString &name, const QString &value, bool required = false) :
-        sName(name), sValue(value), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(value), m_bRequired(required) { }
     NameValue(const QString &name, const char *value, bool required = false) :
-        sName(name), sValue(value), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(value), m_bRequired(required) { }
     NameValue(const QString &name, int value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(const QString &name, long value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(const QString &name, qlonglong value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(const QString &name, uint value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(const QString &name, ulong value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(const QString &name, qulonglong value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(const QString &name, bool value, bool required = false) :
-        sName(name), sValue((value) ? "1" : "0"), bRequired(required), pAttributes(nullptr) { }
+        m_sName(name), m_sValue((value) ? "1" : "0"), m_bRequired(required) { }
     inline NameValue(const NameValue &nv);
     inline NameValue& operator=(const NameValue &nv);
 
@@ -85,12 +84,12 @@ class NameValue
 class NameValues : public QList<NameValue> {};
 
 inline NameValue::NameValue(const NameValue &nv) :
-    sName(nv.sName), sValue(nv.sValue), bRequired(nv.bRequired), pAttributes(nullptr)
+    m_sName(nv.m_sName), m_sValue(nv.m_sValue), m_bRequired(nv.m_bRequired)
 {
-    if (nv.pAttributes)
+    if (nv.m_pAttributes)
     {
-        pAttributes = new NameValues;
-        *pAttributes = *nv.pAttributes;
+        m_pAttributes = new NameValues;
+        *m_pAttributes = *nv.m_pAttributes;
     }
 }
 
@@ -99,18 +98,18 @@ inline NameValue& NameValue::operator=(const NameValue &nv)
     if (this == &nv)
         return *this;
 
-    sName  = nv.sName;
-    sValue = nv.sValue;
-    bRequired = nv.bRequired;
+    m_sName  = nv.m_sName;
+    m_sValue = nv.m_sValue;
+    m_bRequired = nv.m_bRequired;
 
-    if (nv.pAttributes)
+    if (nv.m_pAttributes)
     {
-        pAttributes = new NameValues;
-        *pAttributes = *nv.pAttributes;
+        m_pAttributes = new NameValues;
+        *m_pAttributes = *nv.m_pAttributes;
     }
     else
     {
-        pAttributes = nullptr;
+        m_pAttributes = nullptr;
     }
 
     return *this;
@@ -118,20 +117,20 @@ inline NameValue& NameValue::operator=(const NameValue &nv)
 
 inline NameValue::~NameValue()
 {
-    if (pAttributes)
+    if (m_pAttributes)
     {
-        delete pAttributes;
-        pAttributes = nullptr;
+        delete m_pAttributes;
+        m_pAttributes = nullptr;
     }
 }
 
 inline void NameValue::AddAttribute(const QString &name, const QString &value,
                                     bool required)
 {
-    if (!pAttributes)
-        pAttributes = new NameValues();
+    if (!m_pAttributes)
+        m_pAttributes = new NameValues();
 
-    pAttributes->push_back(NameValue(name, value, required));
+    m_pAttributes->push_back(NameValue(name, value, required));
 }
 
 
@@ -142,12 +141,12 @@ inline QString NameValue::toXML()
     QString xml = "<%1%2>%3</%1>";
 
     NameValues::const_iterator it;
-    for (it = pAttributes->constBegin(); it != pAttributes->constEnd(); ++it)
+    for (it = m_pAttributes->constBegin(); it != m_pAttributes->constEnd(); ++it)
     {
-        sAttributes += attributeTemplate.arg((*it).sName).arg((*it).sValue);
+        sAttributes += attributeTemplate.arg((*it).m_sName).arg((*it).m_sValue);
     }
 
-    return xml.arg(sName).arg(sAttributes).arg(sValue);
+    return xml.arg(m_sName).arg(sAttributes).arg(m_sValue);
 }
 
 //////////////////////////////////////////////////////////////////////////////

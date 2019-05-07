@@ -1,11 +1,6 @@
 
 #include "mythuigroup.h"
 
-MythUIGroup::MythUIGroup(MythUIType *parent, const QString &name)
-    : MythUIComposite(parent, name)
-{
-}
-
 void MythUIGroup::Reset()
 {
     MythUIType::Reset();

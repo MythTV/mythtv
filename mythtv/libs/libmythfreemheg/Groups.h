@@ -45,29 +45,30 @@ class MHTimer {
 class MHGroup : public MHRoot  
 {
   public:
-    MHGroup();
+    MHGroup() = default;
     virtual ~MHGroup();
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
 
-    virtual void Preparation(MHEngine *engine);
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
-    virtual void Destruction(MHEngine *engine);
+    void Preparation(MHEngine *engine) override; // MHRoot
+    void Activation(MHEngine *engine) override; // MHRoot
+    void Deactivation(MHEngine *engine) override; // MHRoot
+    void Destruction(MHEngine *engine) override; // MHRoot
 
-    virtual MHRoot *FindByObjectNo(int n);
+    MHRoot *FindByObjectNo(int n) override; // MHRoot
 
     // Actions.
-    virtual void SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *);
+    void SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *) override; // MHRoot
     // This isn't an MHEG action as such but is used as part of the implementation of "Clone"
-    virtual void MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine);
+    void MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine) override; // MHRoot
 
   protected:
-    void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
+    // Set this up from the parse tree.
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
     // Standard ID, Standard version, Object information aren't recorded.
-    int m_nOrigGCPriority;
+    int m_nOrigGCPriority {127};
     MHActionSequence m_StartUp, m_CloseDown;
     MHOwnPtrSequence <MHIngredient> m_Items; // Array of items.
-    bool m_fIsApp;
+    bool m_fIsApp {false};
     friend class MHEngine;
 
     // Timers are an attribute of the scene class in the standard but have been moved
@@ -77,7 +78,7 @@ class MHGroup : public MHRoot
     QList<MHTimer*> m_Timers;
     int CheckTimers(MHEngine *engine); // Checks the timers and fires any relevant events.  Returns the millisecs to the
                         // next event or zero if there aren't any.
-    int m_nLastId; // Highest numbered ingredient.  Used to make new ids for clones.
+    int m_nLastId {0}; // Highest numbered ingredient.  Used to make new ids for clones.
 
     friend class MHEGEngine;
 };
@@ -85,19 +86,26 @@ class MHGroup : public MHRoot
 class MHScene : public MHGroup  
 {
   public:
-    MHScene();
-    void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
-    virtual const char *ClassName() { return "Scene"; }
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual void Activation(MHEngine *engine);
+    MHScene() = default;
+     // Set this up from the parse tree.
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHGroup
+    const char *ClassName() override // MHRoot
+        { return "Scene"; }
+    void PrintMe(FILE *fd, int nTabs) const override; // MHGroup
+    void Activation(MHEngine *engine) override; // MHGroup
 
     // Actions.
-    virtual void SetInputRegister(int nReg, MHEngine *engine);
+    void SetInputRegister(int nReg, MHEngine *engine) override; // MHRoot
   protected:
-    int m_nEventReg;
-    int m_nSceneCoordX, m_nSceneCoordY;
-    int m_nAspectRatioW, m_nAspectRatioH;
-    bool m_fMovingCursor;
+    int m_nEventReg      {0};
+    int m_nSceneCoordX   {0};
+    int m_nSceneCoordY   {0};
+
+    // TODO: In UK MHEG 1.06 the aspect ratio is optional and if not specified "the
+    // scene has no aspect ratio".
+    int m_nAspectRatioW  {4};
+    int m_nAspectRatioH  {3};
+    bool m_fMovingCursor {false};
     // We don't use the Next-Scenes info at the moment.
 //  MHSceneSeq m_NextScenes; // Preload info for next scenes.
     friend class MHEngine;
@@ -107,32 +115,39 @@ class MHScene : public MHGroup
 class MHApplication : public MHGroup  
 {
   public:
-    MHApplication();
+    MHApplication() { m_fIsApp = true; }
     virtual ~MHApplication();
-    virtual const char *ClassName() { return "Application"; }
-    void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual bool IsShared() { return true; } // The application is "shared".
-    virtual void Activation(MHEngine *engine);
+    const char *ClassName() override // MHRoot
+        { return "Application"; }
+    // Set this up from the parse tree.
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHGroup
+    void PrintMe(FILE *fd, int nTabs) const override; // MHGroup
+    bool IsShared() override // MHRoot
+        { return true; } // The application is "shared".
+    void Activation(MHEngine *engine) override; // MHGroup
   protected:
     MHActionSequence m_OnSpawnCloseDown, m_OnRestart;
     // Default attributes.
-    int         m_nCharSet;
+    int         m_nCharSet      {0};
     MHColour    m_BGColour, m_TextColour, m_ButtonRefColour, m_HighlightRefColour, m_SliderRefColour;
-    int         m_nTextCHook, m_nIPCHook, m_nStrCHook, m_nBitmapCHook, m_nLineArtCHook;
+    int         m_nTextCHook    {0};
+    int         m_nIPCHook      {0};
+    int         m_nStrCHook     {0};
+    int         m_nBitmapCHook  {0};
+    int         m_nLineArtCHook {0};
     MHFontBody  m_Font;
     MHOctetString   m_FontAttrs;
-    int         m_tuneinfo;
+    int         m_tuneinfo      {0};
 
     // Internal attributes and additional state
-    int  m_nLockCount; // Count for locking the screen
+    int         m_nLockCount    {0}; // Count for locking the screen
     // Display stack.  Visible items with the lowest item in the stack first.
     // Later items may obscure earlier.
     MHSequence <MHVisible *> m_DisplayStack;
     int FindOnStack(const MHRoot *pVis); // Returns the index on the stack or -1 if it's not there.
 
-    MHScene *m_pCurrentScene;
-    bool m_fRestarting;
+    MHScene    *m_pCurrentScene {nullptr};
+    bool        m_fRestarting   {false};
     QString m_Path; // Path from the root directory to this application.  Either the null string or
                     // a string of the form /a/b/c .
 
@@ -143,7 +158,7 @@ class MHLaunch: public MHElemAction
 {
   public:
     MHLaunch(): MHElemAction(":Launch") {}
-    virtual void Perform(MHEngine *engine);
+    void Perform(MHEngine *engine) override; // MHElemAction
 };
 
 // Quit the application.
@@ -151,7 +166,7 @@ class MHQuit: public MHElemAction
 {
   public:
     MHQuit(): MHElemAction(":Quit") {}
-    virtual void Perform(MHEngine *engine);
+    void Perform(MHEngine *engine) override; // MHElemAction
 };
 
 // SendEvent - generate an event
@@ -159,9 +174,9 @@ class MHSendEvent: public MHElemAction
 {
   public:
     MHSendEvent(): MHElemAction(":SendEvent"), m_EventType(EventIsAvailable) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
     MHGenericObjectRef m_EventSource; // Event source
     enum EventType m_EventType; // Event type
@@ -172,10 +187,10 @@ class MHSetTimer: public MHElemAction
 {
   public:
     MHSetTimer(): MHElemAction(":SetTimer"), m_TimerType(ST_NoNewTimer) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     MHGenericInteger m_TimerId;
     // A new timer may not be specified in which case this cancels the timer.
     // If the timer is specified the "absolute" flag is optional.
@@ -188,7 +203,7 @@ class MHSpawn: public MHElemAction
 {
   public:
     MHSpawn(): MHElemAction(":Spawn") {}
-    virtual void Perform(MHEngine *engine);
+    void Perform(MHEngine *engine) override; // MHElemAction
 };
 
 // Read and Store persistent - read and save data to persistent store.
@@ -196,10 +211,10 @@ class MHPersistent: public MHElemAction
 {
   public:
     MHPersistent(const char *name, bool fIsLoad): MHElemAction(name), m_fIsLoad(fIsLoad) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool m_fIsLoad;
     MHObjectRef     m_Succeeded;
     MHOwnPtrSequence<MHObjectRef> m_Variables;
@@ -212,10 +227,10 @@ class MHTransitionTo: public MHElemAction
 {
   public:
     MHTransitionTo();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool    m_fIsTagged;
     int     m_nConnectionTag;
     int     m_nTransitionEffect;
@@ -226,24 +241,25 @@ class MHLockScreen: public MHElemAction
 {
   public:
     MHLockScreen(): MHElemAction(":LockScreen") {}
-    virtual void Perform(MHEngine *engine);
+    void Perform(MHEngine *engine) override; // MHElemAction
 };
 
 class MHUnlockScreen: public MHElemAction
 {
   public:
     MHUnlockScreen(): MHElemAction(":UnlockScreen") {}
-    virtual void Perform(MHEngine *engine);
+    void Perform(MHEngine *engine) override; // MHElemAction
 };
 
 class MHGetEngineSupport: public MHElemAction
 {
   public:
     MHGetEngineSupport(): MHElemAction(":GetEngineSupport")  {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_Feature.PrintMe(fd, 0);  m_Answer.PrintMe(fd, 0); }
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
+        { m_Feature.PrintMe(fd, 0);  m_Answer.PrintMe(fd, 0); }
     MHGenericOctetString m_Feature;
     MHObjectRef m_Answer;
 };
@@ -253,7 +269,8 @@ class MHSetInputRegister: public MHActionInt
 {
   public:
     MHSetInputRegister(): MHActionInt(":SetInputRegister") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetInputRegister(nArg, engine); };
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) override // MHActionInt
+        { pTarget->SetInputRegister(nArg, engine); };
 };
 
 

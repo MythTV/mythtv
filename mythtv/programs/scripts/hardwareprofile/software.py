@@ -22,6 +22,7 @@ import commands
 import re
 import sys
 import smolt_config
+from i18n import _
 
 
 def read_lsb_release():

@@ -58,19 +58,19 @@ const double DEFAULT_WEIGHT = std::pow(0.5, TRAILING_BETA_SHAPE - 1) *
 const qint64 BETA_CLIP = 60 * 60 * 24;
 
 class ImageView::LoadAlbumRunnable : public QRunnable {
-    ImageView *m_parent;
+    ImageView *m_parent {nullptr};
     ThumbList m_dirList;
     int m_sortorder;
     int m_slideshow_sequencing;
     QMutex m_isAliveLock;
-    bool m_isAlive;
+    bool m_isAlive {true};
 
 public:
     LoadAlbumRunnable(ImageView *parent, const ThumbList &roots, int sortorder,
             int slideshow_sequencing);
 
     void abort();
-    virtual void run();
+    void run() override; // QRunnable
 
     /** Separate the input into files and directories */
     static void filterDirectories(const ThumbList &input,
@@ -79,35 +79,14 @@ public:
 
 ImageView::ImageView(const ThumbList &itemList,
                      int *pos, int slideShow, int sortorder)
-    : m_screenSize(640,480),
-      m_wmult(1.0f),
-      m_hmult(1.0f),
-      m_pos(*pos),
+    : m_pos(*pos),
       m_savedPos(pos),
-      m_movieState(0),
-      m_zoom(1.0f),
-
-      // Info variables
-      m_info_show(false),
-      m_info_show_short(false),
 
       // Common slideshow variables
-      m_slideshow_running(false),
       m_slideshow_sequencing(slideShow),
-      m_slideshow_frame_delay(2),
-      m_slideshow_frame_delay_state(m_slideshow_frame_delay * 1000),
-      m_slideshow_timer(nullptr),
 
-      // Common effect state variables
-      m_effect_running(false),
-      m_effect_current_frame(0),
-      m_effect_random(false),
-
-      m_loaderRunnable(nullptr),
       m_listener(this),
-      m_loaderThread(nullptr),
-      m_slideshow_sequence(ComposeSlideshowSequence(slideShow)),
-      m_finishedLoading(false)
+      m_slideshow_sequence(ComposeSlideshowSequence(slideShow))
 {
 
     int xbase, ybase, screenwidth, screenheight;
@@ -117,7 +96,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     // --------------------------------------------------------------------
 
-    bool recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    bool recurse = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
 
     ThumbItem *origItem = nullptr;
     if (m_pos < itemList.size())
@@ -125,7 +104,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     ThumbList fileList, dirList;
     LoadAlbumRunnable::filterDirectories(itemList, fileList, dirList);
-    AddItems(fileList);
+    ImageView::AddItems(fileList);
 
     if (recurse)
     {
@@ -227,7 +206,7 @@ QString ImageView::GetRandomEffect(void) const
     tmpMap.remove("none");
     tmpMap.remove("Ken Burns (gl)");
     QStringList t = tmpMap.keys();
-    int i = (int) ( (float)(t.count()) * random() / (RAND_MAX + 1.0f) );
+    int i = (int) ( (float)(t.count()) * random() / (RAND_MAX + 1.0F) );
     return tmpMap[t[i]];
 }
 
@@ -376,10 +355,7 @@ double ImageView::GetSeasonalWeight(ThumbItem *item) {
             LEADING_BETA_SHAPE - 1);
         return weight;
     }
-    else
-    {
-        return DEFAULT_WEIGHT;
-    }
+    return DEFAULT_WEIGHT;
 }
 
 ImageView::LoadAlbumRunnable::LoadAlbumRunnable(
@@ -388,8 +364,7 @@ ImageView::LoadAlbumRunnable::LoadAlbumRunnable(
     : m_parent(parent),
       m_dirList(roots),
       m_sortorder(sortorder),
-      m_slideshow_sequencing(slideshow_sequencing),
-      m_isAlive(true)
+      m_slideshow_sequencing(slideshow_sequencing)
 {
 }
 
@@ -444,11 +419,6 @@ void ImageView::LoadAlbumRunnable::filterDirectories(const ThumbList &input,
         ThumbList &targetList = item->IsDir() ? dirList : fileList;
         targetList.append(item);
     }
-}
-
-LoadAlbumListener::LoadAlbumListener(ImageView *parent)
-    : m_parent(parent)
-{
 }
 
 void LoadAlbumListener::FinishLoading() const

@@ -14,7 +14,7 @@
 #include "cetonchannel.h"
 
 #define LOC QString("CetonSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(m_inputid).arg(m_channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -34,16 +34,15 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
                                        CetonChannel* _channel,
                                        bool _release_stream,
                                        uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      streamHandlerStarted(false), streamHandler(nullptr)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
-    signalStrength.SetThreshold(45);
+    m_signalStrength.SetThreshold(45);
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = CetonStreamHandler::Get(_channel->GetDevice());
+    m_streamHandler = CetonStreamHandler::Get(m_channel->GetDevice(), m_inputid);
 }
 
 /** \fn CetonSignalMonitor::~CetonSignalMonitor()
@@ -52,8 +51,8 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
 CetonSignalMonitor::~CetonSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
-    Stop();
-    CetonStreamHandler::Return(streamHandler);
+    CetonSignalMonitor::Stop();
+    CetonStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 /** \fn CetonSignalMonitor::Stop(void)
@@ -64,15 +63,15 @@ void CetonSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
-        streamHandler->RemoveListener(GetStreamData());
-    streamHandlerStarted = false;
+        m_streamHandler->RemoveListener(GetStreamData());
+    m_streamHandlerStarted = false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
 CetonChannel *CetonSignalMonitor::GetCetonChannel(void)
 {
-    return dynamic_cast<CetonChannel*>(channel);
+    return dynamic_cast<CetonChannel*>(m_channel);
 }
 
 /** \fn CetonSignalMonitor::UpdateValues(void)
@@ -83,10 +82,10 @@ CetonChannel *CetonSignalMonitor::GetCetonChannel(void)
  */
 void CetonSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!m_running || m_exit)
         return;
 
-    if (streamHandlerStarted)
+    if (m_streamHandlerStarted)
     {
         EmitStatus();
         if (IsAllGood())
@@ -94,7 +93,7 @@ void CetonSignalMonitor::UpdateValues(void)
 
         // TODO dtv signals...
 
-        update_done = true;
+        m_update_done = true;
         return;
     }
 
@@ -104,11 +103,11 @@ void CetonSignalMonitor::UpdateValues(void)
     // Set SignalMonitorValues from info from card.
     bool isLocked = false;
     {
-        QMutexLocker locker(&statusLock);
-        signalStrength.SetValue(sig);
-        signalLock.SetValue(true);
+        QMutexLocker locker(&m_statusLock);
+        m_signalStrength.SetValue(sig);
+        m_signalLock.SetValue(true);
         // TODO add some way to indicate if there is actually a lock
-        isLocked = signalLock.IsGood();
+        isLocked = m_signalLock.IsGood();
     }
 
     EmitStatus();
@@ -122,9 +121,9 @@ void CetonSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        streamHandler->AddListener(GetStreamData());
-        streamHandlerStarted = true;
+        m_streamHandler->AddListener(GetStreamData());
+        m_streamHandlerStarted = true;
     }
 
-    update_done = true;
+    m_update_done = true;
 }

@@ -5,7 +5,7 @@
 
 MythCommFlagCommandLineParser::MythCommFlagCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHCOMMFLAG)
-{ LoadArguments(); }
+{ MythCommFlagCommandLineParser::LoadArguments(); }
 
 void MythCommFlagCommandLineParser::LoadArguments(void)
 {
@@ -19,7 +19,7 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
          << new CommandLineArg("chanid")
          << new CommandLineArg("jobid")
-         << add(QStringList( QStringList() << "-f" << "--file" ),
+         << add(QStringList{"-f", "--file"},
                 "file", "",
                 "Specify file to operate on.", "")
                     ->SetGroup("Input")

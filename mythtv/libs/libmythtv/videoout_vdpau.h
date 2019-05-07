@@ -24,34 +24,34 @@ class VideoOutputVDPAU : public VideoOutput
     bool Init(const QSize &video_dim_buf,
               const QSize &video_dim_disp,
               float aspect,
-              WId winid, const QRect &win_rect, MythCodecID codec_id);
-    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
-    bool SetDeinterlacingEnabled(bool interlaced);
-    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
-    bool ApproveDeintFilter(const QString& filtername) const;
+              WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
+    void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
+    bool SetDeinterlacingEnabled(bool interlaced) override; // VideoOutput
+    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="") override; // VideoOutput
+    bool ApproveDeintFilter(const QString& filtername) const override; // VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
-                      FrameScanType scan);
-    void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd);
-    void DrawSlice(VideoFrame*, int x, int y, int w, int h);
-    void Show(FrameScanType);
-    void ClearAfterSeek(void);
+                      FrameScanType scan) override; // VideoOutput
+    void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd) override; // VideoOutput
+    void DrawSlice(VideoFrame*, int x, int y, int w, int h) override; // VideoOutput
+    void Show(FrameScanType) override; // VideoOutput
+    void ClearAfterSeek(void) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,
-                      bool        &aspect_only);
-    void Zoom(ZoomDirection direction);
-    void VideoAspectRatioChanged(float aspect);
-    void EmbedInWidget(const QRect &rect);
-    void StopEmbedding(void);
-    void MoveResizeWindow(QRect new_rect);
-    void DrawUnusedRects(bool sync = true);
-    void UpdatePauseFrame(int64_t &disp_timecode);
-    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
-    void InitPictureAttributes(void);
+                      bool        &aspect_only) override; // VideoOutput
+    void Zoom(ZoomDirection direction) override; // VideoOutput
+    void VideoAspectRatioChanged(float aspect) override; // VideoOutput
+    void EmbedInWidget(const QRect &rect) override; // VideoOutput
+    void StopEmbedding(void) override; // VideoOutput
+    void MoveResizeWindow(QRect new_rect) override; // VideoOutput
+    void DrawUnusedRects(bool sync = true) override; // VideoOutput
+    void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
+    int  SetPictureAttribute(PictureAttribute attribute, int newValue) override; // VideoOutput
+    void InitPictureAttributes(void) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                     const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
@@ -59,28 +59,31 @@ class VideoOutputVDPAU : public VideoOutput
                                              uint stream_type,
                                              bool no_acceleration);
     static bool IsNVIDIA(void);
-    virtual bool IsPIPSupported(void) const { return true;  }
-    virtual bool IsPBPSupported(void) const { return false; }
-    virtual bool NeedExtraAudioDecode(void) const
+    bool IsPIPSupported(void) const override // VideoOutput
+        { return true;  }
+    bool IsPBPSupported(void) const override // VideoOutput
+        { return false; }
+    bool NeedExtraAudioDecode(void) const override // VideoOutput
         { return codec_is_vdpau(video_codec_id); }
-    virtual bool hasHWAcceleration(void) const
+    bool hasHWAcceleration(void) const override // VideoOutput
         { return codec_is_vdpau(video_codec_id); }
-    virtual MythPainter *GetOSDPainter(void);
-    virtual bool GetScreenShot(int width = 0, int height = 0,
-                               QString filename = "");
+    MythPainter *GetOSDPainter(void) override; // VideoOutput
+    bool GetScreenShot(int width = 0, int height = 0,
+                       QString filename = "") override; // VideoOutput
 
-    virtual bool CanVisualise(AudioPlayer *audio, MythRender */*render*/)
+    bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput
         { return VideoOutput::CanVisualise(audio, m_render);       }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
-                                    const QString &name)
+    bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
+                            const QString &name) override // VideoOutput
         { return VideoOutput::SetupVisualisation(audio, m_render, name); }
-    virtual QStringList GetVisualiserList(void);
-    virtual void ClearDummyFrame(VideoFrame* frame);
-    virtual void SetVideoFlip(void);
+    QStringList GetVisualiserList(void) override; // VideoOutput
+    void ClearDummyFrame(VideoFrame* frame) override; // VideoOutput
+    void SetVideoFlip(void) override; // VideoOutput
     MythRenderVDPAU* getRender() const { return m_render; }
 
   private:
-    virtual bool hasFullScreenOSD(void) const { return true; }
+    bool hasFullScreenOSD(void) const override // VideoOutput
+        { return true; }
     void TearDown(void);
     bool InitRender(void);
     void DeleteRender(void);
@@ -93,14 +96,14 @@ class VideoOutputVDPAU : public VideoOutput
     void UpdateReferenceFrames(VideoFrame *frame);
     bool FrameIsInUse(VideoFrame *frame);
     void ClearReferenceFrames(void);
-    void DiscardFrame(VideoFrame*);
-    void DiscardFrames(bool next_frame_keyframe);
-    void DoneDisplayingFrame(VideoFrame *frame);
-    void CheckFrameStates(void);
-    virtual void ShowPIP(VideoFrame        *frame,
-                         MythPlayer *pipplayer,
-                         PIPLocation        loc);
-    virtual void RemovePIP(MythPlayer *pipplayer);
+    void DiscardFrame(VideoFrame*) override; // VideoOutput
+    void DiscardFrames(bool next_frame_keyframe) override; // VideoOutput
+    void DoneDisplayingFrame(VideoFrame *frame) override; // VideoOutput
+    void CheckFrameStates(void) override; // VideoOutput
+    void ShowPIP(VideoFrame   *frame,
+                 MythPlayer   *pipplayer,
+                 PIPLocation   loc) override; // VideoOutput
+    void RemovePIP(MythPlayer *pipplayer) override; // VideoOutput
     bool InitPIPLayer(QSize size);
     void DeinitPIPS(void);
     void DeinitPIPLayer(void);

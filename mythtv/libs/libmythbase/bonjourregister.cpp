@@ -11,15 +11,18 @@
 QMutex BonjourRegister::g_lock;
 
 BonjourRegister::BonjourRegister(QObject *parent)
-    : QObject(parent), m_dnssref(nullptr), m_socket(nullptr), m_lock(nullptr)
+    : QObject(parent)
 {
     setenv("AVAHI_COMPAT_NOWARN", "1", 1);
 }
 
 BonjourRegister::~BonjourRegister()
 {
-    if (m_socket)
+    if (m_socket) {
         m_socket->setEnabled(false);
+        m_socket->deleteLater();
+        m_socket = nullptr;
+    }
 
     if (m_dnssref)
     {
@@ -30,8 +33,6 @@ BonjourRegister::~BonjourRegister()
     }
     m_dnssref = nullptr;
 
-    m_socket->deleteLater();
-    m_socket = nullptr;
     delete m_lock;
     m_lock = nullptr;
 }
@@ -50,8 +51,7 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
 
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
-        DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
-                           (const char*)type.data(),
+        DNSServiceRegister(&m_dnssref, 0, 0, name.data(), type.data(),
                            nullptr, nullptr, qport, txt.size(), (void*)txt.data(),
                            BonjourCallback, this);
 

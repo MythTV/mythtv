@@ -16,7 +16,7 @@ class PROTOSERVER_PUBLIC DeleteHandler : public ReferenceCounter
 {
   public:
     DeleteHandler(void);
-    explicit DeleteHandler(QString filename);
+    explicit DeleteHandler(const QString& filename);
    ~DeleteHandler(void);
 
     void Close(void);

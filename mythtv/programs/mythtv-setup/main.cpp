@@ -177,7 +177,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 }
 
-static bool RunMenu(QString themedir, QString themename)
+static bool RunMenu(const QString& themedir, const QString& themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     menu = new MythThemedMenu(
@@ -274,6 +274,7 @@ int main(int argc, char *argv[])
     bool    expertMode = false;
     uint    scanImport = 0;
     bool    scanFTAOnly = false;
+    bool    scanLCNOnly = false;
     bool    addFullTS = false;
     ServiceRequirements scanServiceRequirements = kRequireAV;
     uint    scanCardId = 0;
@@ -363,6 +364,8 @@ int main(int argc, char *argv[])
         scanImport = cmdline.toUInt("importscan");
     if (cmdline.toBool("ftaonly"))
         scanFTAOnly = true;
+    if (cmdline.toBool("lcnonly"))
+        scanLCNOnly = true;
     if (cmdline.toBool("addfullts"))
         addFullTS = true;
     if (cmdline.toBool("servicetype"))
@@ -440,7 +443,7 @@ int main(int argc, char *argv[])
 
     if (doScan)
     {
-        bool okCardID = scanCardId;
+        bool okCardID = scanCardId != 0U;
 
         if (scanInputName.isEmpty())
             scanInputName = CardUtil::GetInputName(scanCardId);
@@ -461,7 +464,7 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
             cerr << "Valid cards: " << endl;
-            for (uint i = 0; i < cardids.size(); i++)
+            for (size_t i = 0; i < cardids.size(); i++)
             {
                 fprintf(stderr, "%5u: %s %s\n",
                         cardids[i],
@@ -505,6 +508,8 @@ int main(int argc, char *argv[])
                 scantype = ScanTypeSetting::IPTVImportMPTS;
                 scanner.ImportM3U(scanCardId, scanInputName, sourceid, true);
             }
+            else if (frequencyStandard == "extern")
+                scantype = ScanTypeSetting::ExternRecImport;
             else
                 scantype = ScanTypeSetting::FullScan_ATSC;
 
@@ -516,6 +521,7 @@ int main(int argc, char *argv[])
                          /* follow_nit */            true,
                          /* test decryption */       true,
                          scanFTAOnly,
+                         scanLCNOnly,
                          addFullTS,
                          scanServiceRequirements,
                          // stuff needed for particular scans
@@ -531,12 +537,12 @@ int main(int argc, char *argv[])
         vector<ScanInfo> scans = LoadScanList();
 
         cout<<" scanid cardid sourceid processed        date"<<endl;
-        for (uint i = 0; i < scans.size(); i++)
+        for (size_t i = 0; i < scans.size(); i++)
         {
             printf("%5i %6i %8i %8s    %20s\n",
-                   scans[i].scanid,   scans[i].cardid,
-                   scans[i].sourceid, (scans[i].processed) ? "yes" : "no",
-                   scans[i].scandate.toString(Qt::ISODate)
+                   scans[i].m_scanid,   scans[i].m_cardid,
+                   scans[i].m_sourceid, (scans[i].m_processed) ? "yes" : "no",
+                   scans[i].m_scandate.toString(Qt::ISODate)
                    .toLatin1().constData());
         }
         cout<<endl;
@@ -550,7 +556,7 @@ int main(int argc, char *argv[])
         {
             ScanDTVTransportList list = LoadScan(scanImport);
             ChannelImporter ci(false, true, true, true, false,
-                               scanFTAOnly, scanServiceRequirements);
+                               scanFTAOnly, scanLCNOnly, scanServiceRequirements);
             ci.Process(list);
         }
         cout<<"*** SCAN IMPORT END ***"<<endl;

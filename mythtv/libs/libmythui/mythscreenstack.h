@@ -55,13 +55,13 @@ class MUI_PUBLIC MythScreenStack : public QObject
     QVector<MythScreenType *> m_Children;
     QVector<MythScreenType *> m_DrawOrder;
 
-    MythScreenType *m_topScreen;
+    MythScreenType *m_topScreen {nullptr};
 
-    bool m_DoTransitions;
-    bool m_DoInit;
-    bool m_InitTimerStarted;
-    bool m_InNewTransition;
-    MythScreenType *m_newTop;
+    bool m_DoTransitions        {false};
+    bool m_DoInit               {false};
+    bool m_InitTimerStarted     {false};
+    bool m_InNewTransition      {false};
+    MythScreenType *m_newTop    {nullptr};
 
     QVector<MythScreenType *> m_ToDelete;
 };

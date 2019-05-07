@@ -21,9 +21,12 @@ class PhrasePopup : public MythScreenType
                 ProgLister *parent,
                 RecSearchType searchType,
                 const QStringList &list,
-                const QString &currentValue);
+                const QString &currentValue)
+        : MythScreenType(parentStack, "phrasepopup"),
+          m_parent(parent), m_searchType(searchType),  m_list(list),
+          m_currentValue(currentValue) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void haveResult(QString item);
@@ -37,17 +40,17 @@ class PhrasePopup : public MythScreenType
     void editChanged(void);
 
   private:
-    ProgLister      *m_parent;
+    ProgLister      *m_parent        {nullptr};
     RecSearchType    m_searchType;
     QStringList      m_list;
     QString          m_currentValue;
 
-    MythUIText       *m_titleText;
-    MythUIButtonList *m_phraseList;
-    MythUITextEdit   *m_phraseEdit;
-    MythUIButton     *m_okButton;
-    MythUIButton     *m_deleteButton;
-    MythUIButton     *m_recordButton;
+    MythUIText       *m_titleText    {nullptr};
+    MythUIButtonList *m_phraseList   {nullptr};
+    MythUITextEdit   *m_phraseEdit   {nullptr};
+    MythUIButton     *m_okButton     {nullptr};
+    MythUIButton     *m_deleteButton {nullptr};
+    MythUIButton     *m_recordButton {nullptr};
 };
 
 class PowerSearchPopup : public MythScreenType
@@ -59,9 +62,12 @@ class PowerSearchPopup : public MythScreenType
                 ProgLister *parent,
                 RecSearchType searchType,
                 const QStringList &list,
-                const QString &currentValue);
+                const QString &currentValue)
+        : MythScreenType(parentStack, "phrasepopup"),
+          m_parent(parent), m_searchType(searchType), m_list(list),
+          m_currentValue(currentValue) {}
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void haveResult(QString item);
@@ -74,17 +80,17 @@ class PowerSearchPopup : public MythScreenType
     void phraseSelected(MythUIButtonListItem *item);
 
   private:
-    ProgLister      *m_parent;
+    ProgLister      *m_parent        {nullptr};
     RecSearchType    m_searchType;
     QStringList      m_list;
     QString          m_currentValue;
 
-    MythUIText       *m_titleText;
-    MythUIButtonList *m_phraseList;
-    MythUITextEdit   *m_phraseEdit;
-    MythUIButton     *m_editButton;
-    MythUIButton     *m_deleteButton;
-    MythUIButton     *m_recordButton;
+    MythUIText       *m_titleText    {nullptr};
+    MythUIButtonList *m_phraseList   {nullptr};
+    MythUITextEdit   *m_phraseEdit   {nullptr};
+    MythUIButton     *m_editButton   {nullptr};
+    MythUIButton     *m_deleteButton {nullptr};
+    MythUIButton     *m_recordButton {nullptr};
 };
 
 class EditPowerSearchPopup : public MythScreenType
@@ -95,7 +101,7 @@ class EditPowerSearchPopup : public MythScreenType
     EditPowerSearchPopup(MythScreenStack *parentStack, ProgLister *parent,
                          const QString &currentValue);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private slots:
     void okClicked(void);
@@ -103,21 +109,21 @@ class EditPowerSearchPopup : public MythScreenType
   private:
     void initLists(void);
 
-    ProgLister      *m_parent;
+    ProgLister      *m_parent        {nullptr};
     QStringList      m_categories;
     QStringList      m_genres;
     QStringList      m_channels;
 
     QString          m_currentValue;
 
-    MythUITextEdit   *m_titleEdit;
-    MythUITextEdit   *m_subtitleEdit;
-    MythUITextEdit   *m_descEdit;
-    MythUIButtonList *m_categoryList;
-    MythUIButtonList *m_genreList;
-    MythUIButtonList *m_channelList;
+    MythUITextEdit   *m_titleEdit    {nullptr};
+    MythUITextEdit   *m_subtitleEdit {nullptr};
+    MythUITextEdit   *m_descEdit     {nullptr};
+    MythUIButtonList *m_categoryList {nullptr};
+    MythUIButtonList *m_genreList    {nullptr};
+    MythUIButtonList *m_channelList  {nullptr};
 
-    MythUIButton     *m_okButton;
+    MythUIButton     *m_okButton     {nullptr};
 };
 
 #endif // _PROGLIST_HELPERS_H_

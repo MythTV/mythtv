@@ -29,22 +29,22 @@ class GameScan
     GameScan(QString lromname = "", QString lromfullpath = "",
              int lfoundloc    = 0,  QString lgamename = "",
              QString lrompath = "") :
-        romname(lromname), romfullpath(lromfullpath), gamename(lgamename),
-        rompath(lrompath), foundloc(lfoundloc) {}
+         m_romname(lromname),  m_romfullpath(lromfullpath),  m_gamename(lgamename),
+         m_rompath(lrompath),  m_foundloc(lfoundloc) {}
 
-    QString Rom(void)         const { return romname;       }
-    QString RomFullPath(void) const { return romfullpath;   }
-    int     FoundLoc(void)    const { return foundloc;      }
-    void    setLoc(int lfoundloc)   { foundloc = lfoundloc; }
-    QString GameName(void)    const { return gamename;      }
-    QString RomPath(void)     const { return rompath;       }
+    QString Rom(void)         const { return m_romname;       }
+    QString RomFullPath(void) const { return m_romfullpath;   }
+    int     FoundLoc(void)    const { return m_foundloc;      }
+    void    setLoc(int lfoundloc)   { m_foundloc = lfoundloc; }
+    QString GameName(void)    const { return m_gamename;      }
+    QString RomPath(void)     const { return m_rompath;       }
 
   private:
-    QString romname;
-    QString romfullpath;
-    QString gamename;
-    QString rompath;
-    int     foundloc;
+    QString m_romname;
+    QString m_romfullpath;
+    QString m_gamename;
+    QString m_rompath;
+    int     m_foundloc;
 };
 
 Q_DECLARE_METATYPE(GameScan)
@@ -57,85 +57,81 @@ class GameHandler : public QObject
     Q_OBJECT
 
   public:
-    GameHandler() : QObject(),
-        rebuild(false),             spandisks(0),
-                                    gameplayerid(0),
-        m_RemoveAll(false),         m_KeepAll(false),
-        m_progressDlg(nullptr) {}
+    GameHandler() : QObject() {}
 
     static void updateSettings(GameHandler*);
     static GameHandler *getHandler(uint i);
     static GameHandler *newHandler(QString name);
     static uint count(void);
-    void InitMetaDataMap(QString GameType);
-    void GetMetadata(GameHandler *handler, QString rom,
+    void InitMetaDataMap(const QString& GameType);
+    void GetMetadata(GameHandler *handler, const QString& rom,
                              QString* Genre, QString* Year, QString* Country,
                              QString* CRC32, QString* GameName,
                              QString* Plot, QString* Publisher, QString* Version,
                              QString* Fanart, QString* Boxart);
 
-    void promptForRemoval(GameScan scan);
+    void promptForRemoval(const GameScan& scan);
     void UpdateGameDB(GameHandler *handler);
     void VerifyGameDB(GameHandler *handler);
 
     void clearAllGameData(void);
 
-    static int buildFileCount(QString directory, GameHandler *handler);
-    void buildFileList(QString directory, GameHandler *handler,
+    static int buildFileCount(const QString& directory, GameHandler *handler);
+    void buildFileList(const QString& directory, GameHandler *handler,
                        int* filecount);
 
     void processGames(GameHandler *);
     static void processAllGames(void);
     static void registerHandler(GameHandler *);
-    static void Launchgame(RomInfo *romdata, QString systemname);
+    static void Launchgame(RomInfo *romdata, const QString& systemname);
     static void EditSettings(RomInfo *romdata);
     static void EditSystemSettings(RomInfo *romdata);
     static RomInfo* CreateRomInfo(RomInfo* parent);
 
-    void setRebuild(bool setrebuild) { rebuild = setrebuild; }
-    bool needRebuild(void) const { return rebuild; }
+    void setRebuild(bool setrebuild) { m_rebuild = setrebuild; }
+    bool needRebuild(void) const { return m_rebuild; }
 
     static RomInfo* create_rominfo(RomInfo* parent);
-    int SpanDisks() const { return spandisks; }
-    QString SystemName() const { return systemname; }
-    QString SystemCmdLine() const { return commandline; }
-    QString SystemRomPath() const { return rompath; }
-    QString SystemWorkingPath() const { return workingpath; }
-    QString SystemScreenShots() const { return screenshots; }
-    uint GamePlayerID() const { return gameplayerid; }
-    QString GameType() const { return gametype; }
-    QStringList ValidExtensions() const { return validextensions; }
+    bool SpanDisks() const { return m_spandisks; }
+    QString SystemName() const { return m_systemname; }
+    QString SystemCmdLine() const { return m_commandline; }
+    QString SystemRomPath() const { return m_rompath; }
+    QString SystemWorkingPath() const { return m_workingpath; }
+    QString SystemScreenShots() const { return m_screenshots; }
+    uint GamePlayerID() const { return m_gameplayerid; }
+    QString GameType() const { return m_gametype; }
+    QStringList ValidExtensions() const { return m_validextensions; }
 
     void clearAllMetadata(void);
 
     static GameHandler* GetHandler(RomInfo *rominfo);
-    static GameHandler* GetHandlerByName(QString systemname);
+    static GameHandler* GetHandlerByName(const QString& systemname);
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
-    bool rebuild;
-    int spandisks;
-    QString systemname;
-    QString rompath;
-    QString commandline;
-    QString workingpath;
-    QString screenshots;
-    uint gameplayerid;
-    QString gametype;
-    QStringList validextensions;
+    bool    m_rebuild      {false};
+    bool    m_spandisks    {false};
+    QString m_systemname;
+    QString m_rompath;
+    QString m_commandline;
+    QString m_workingpath;
+    QString m_screenshots;
+    uint    m_gameplayerid {0};
+    QString m_gametype;
+    QStringList m_validextensions;
 
-    RomDBMap romDB;
+    RomDBMap    m_romDB;
     GameScanMap m_GameMap;
 
-    bool m_RemoveAll;
-    bool m_KeepAll;
+    bool m_RemoveAll       {false};
+    bool m_KeepAll         {false};
 
   private:
-    void CreateProgress(QString message);
-    static GameHandler *newInstance;
+    void CreateProgress(const QString& message);
+    static GameHandler *s_newInstance;
 
-    MythUIProgressDialog *m_progressDlg;
+    MythUIProgressDialog *m_progressDlg {nullptr};
 };
 
 #endif

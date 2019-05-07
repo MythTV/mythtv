@@ -34,7 +34,11 @@ use_hidesyms {
 
 LIBS += -lz -lminizip
 
-#The following line was inserted by qt3to4
 QT += xml sql opengl network
+
+android {
+    # to discriminate plugins in a flat directory structure
+    TARGET = mythplugin$${TARGET}
+}
 
 include ( ../../libs-targetfix.pro )

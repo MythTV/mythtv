@@ -24,22 +24,25 @@ class DarwinFirewireDevice : public FirewireDevice
     DarwinFirewireDevice(uint64_t guid, uint subunitid, uint speed);
     ~DarwinFirewireDevice();
 
-    virtual bool OpenPort(void);
-    virtual bool ClosePort(void);
-    virtual bool ResetBus(void);
+    bool OpenPort(void) override; // FirewireDevice
+    bool ClosePort(void) override; // FirewireDevice
+    bool ResetBus(void) override; // FirewireDevice
 
     void HandleDeviceChange(uint messageType);
 
-    virtual void AddListener(TSDataListener*);
-    virtual void RemoveListener(TSDataListener*);
+    void AddListener(TSDataListener*) override; // FirewireDevice
+    void RemoveListener(TSDataListener*) override; // FirewireDevice
 
     // Gets
-    virtual bool IsPortOpen(void) const;
+    bool IsPortOpen(void) const override; // FirewireDevice
 
     // Statics
     static vector<AVCInfo> GetSTBList(void);
 
   private:
+    DarwinFirewireDevice(const DarwinFirewireDevice &) = delete;            // not copyable
+    DarwinFirewireDevice &operator=(const DarwinFirewireDevice &) = delete; // not copyable
+
     void StartController(void);
     void StopController(void);
 
@@ -50,10 +53,10 @@ class DarwinFirewireDevice : public FirewireDevice
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    virtual bool SendAVCCommand(
+    bool SendAVCCommand(
         const vector<uint8_t> &cmd,
         vector<uint8_t>       &result,
-        int                   /*retry_cnt*/);
+        int                   /*retry_cnt*/) override; // FirewireDevice
 
     void HandleBusReset(void);
     bool UpdatePlugRegisterPrivate(
@@ -64,7 +67,7 @@ class DarwinFirewireDevice : public FirewireDevice
         bool add_plug, bool remove_plug, uint retry_cnt = 4);
 
     void RunController(void);
-    void BroadcastToListeners(const unsigned char *data, uint dataSize);
+    void BroadcastToListeners(const unsigned char *data, uint dataSize) override; // FirewireDevice
     void UpdateDeviceListItem(uint64_t guid, void *item);
     void ProcessNoDataMessage(void);
     void ProcessStreamingMessage(
@@ -79,9 +82,9 @@ class DarwinFirewireDevice : public FirewireDevice
     vector<AVCInfo> GetSTBListPrivate(void);
 
   private:
-    int      m_local_node;
-    int      m_remote_node;
-    DFDPriv *m_priv;
+    int      m_local_node  {-1};
+    int      m_remote_node {-1};
+    DFDPriv *m_priv        {nullptr};
 };
 
 #endif // _DARWIN_FIREWIRE_DEVICE_H_

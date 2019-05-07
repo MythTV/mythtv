@@ -13,10 +13,7 @@
 #include <metaio.h>
 #include <musicfilescanner.h>
 
-MusicFileScanner::MusicFileScanner():
-    m_tracksTotal(0), m_tracksUnchanged(0), m_tracksAdded (0), m_tracksRemoved(0),
-    m_tracksUpdated(0), m_coverartTotal(0), m_coverartUnchanged(0), m_coverartAdded(0),
-    m_coverartRemoved(0), m_coverartUpdated(0)
+MusicFileScanner::MusicFileScanner()
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -154,10 +151,7 @@ bool MusicFileScanner::IsArtFile(const QString &filename)
     QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
 
-    if (!extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1)
-        return true;
-
-    return false;
+    return !extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1;
 }
 
 bool MusicFileScanner::IsMusicFile(const QString &filename)
@@ -166,10 +160,7 @@ bool MusicFileScanner::IsMusicFile(const QString &filename)
     QString extension = fi.suffix().toLower();
     QString nameFilter = MetaIO::ValidFileExtensions;
 
-    if (!extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1)
-        return true;
-
-    return false;
+    return !extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1;
 }
 
 /*!
@@ -239,12 +230,9 @@ bool MusicFileScanner::HasFileChanged(
         QDateTime old_dt = MythDate::fromString(date_modified);
         return !old_dt.isValid() || (dt > old_dt);
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
-                .arg(filename));
-        return false;
-    }
+    LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
+        .arg(filename));
+    return false;
 }
 
 /*!
@@ -481,7 +469,7 @@ void MusicFileScanner::cleanDB()
 
         } while (query.next());
 
-    } while (deletedCount);
+    } while (deletedCount > 0);
 
     // delete unused albumart_ids from music_albumart (embedded images)
     if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
@@ -631,11 +619,8 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &st
         m_albumid[album_cache_string] = disk_meta->getAlbumId();
     }
 
-    if (disk_meta)
-        delete disk_meta;
-
-    if (db_meta)
-        delete db_meta;
+    delete disk_meta;
+    delete db_meta;
 }
 
 /*!
@@ -817,7 +802,7 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
-                else if (HasFileChanged(name, query.value(1).toString()))
+                if (HasFileChanged(name, query.value(1).toString()))
                     music_files[name].location = MusicFileScanner::kNeedUpdate;
                 else
                 {
@@ -873,11 +858,8 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
             {
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
-                else
-                {
-                    ++m_coverartUnchanged;
-                    music_files.erase(iter);
-                }
+                ++m_coverartUnchanged;
+                music_files.erase(iter);
             }
             else
             {
@@ -890,10 +872,7 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
 // static
 bool MusicFileScanner::IsRunning(void)
 {
-   if (gCoreContext->GetSetting("MusicScannerLastRunStatus", "") == "running")
-       return true;
-
-   return false;
+   return gCoreContext->GetSetting("MusicScannerLastRunStatus", "") == "running";
 }
 
 void MusicFileScanner::updateLastRunEnd(void)

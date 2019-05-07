@@ -32,109 +32,117 @@
 class MHStream : public MHPresentable  
 {
   public:
-    MHStream();
-    virtual const char *ClassName() { return "Stream"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    MHStream() = default;
+    const char *ClassName() override // MHRoot
+        { return "Stream"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
-    virtual void Preparation(MHEngine *engine);
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
-    virtual void Destruction(MHEngine *engine);
-    virtual void ContentPreparation(MHEngine *engine);
+    void Preparation(MHEngine *engine) override; // MHIngredient
+    void Activation(MHEngine *engine) override; // MHRoot
+    void Deactivation(MHEngine *engine) override; // MHRoot
+    void Destruction(MHEngine *engine) override; // MHIngredient
+    void ContentPreparation(MHEngine *engine) override; // MHIngredient
 
-    virtual MHRoot *FindByObjectNo(int n);
+    MHRoot *FindByObjectNo(int n) override; // MHRoot
 
-    virtual void BeginPlaying(MHEngine *engine);
-    virtual void StopPlaying(MHEngine *engine);
+    void BeginPlaying(MHEngine *engine) override; // MHPresentable
+    void StopPlaying(MHEngine *engine) override; // MHPresentable
 
     // Actions
-    virtual void GetCounterPosition(MHRoot *, MHEngine *);
-    virtual void GetCounterMaxPosition(MHRoot *, MHEngine *);
-    virtual void SetCounterPosition(int /*pos*/, MHEngine *);
-    virtual void SetSpeed(int, MHEngine *engine);
+    void GetCounterPosition(MHRoot *, MHEngine *) override; // MHRoot
+    void GetCounterMaxPosition(MHRoot *, MHEngine *) override; // MHRoot
+    void SetCounterPosition(int /*pos*/, MHEngine *) override; // MHRoot
+    void SetSpeed(int, MHEngine *engine) override; // MHRoot
 
   protected:
     MHOwnPtrSequence <MHPresentable> m_Multiplex;
-    enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage;
-    int         m_nLooping;
+    enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage {ST_Stream};
+    int         m_nLooping {0}; // Infinity
 };
 
 
 class MHAudio : public MHPresentable  
 {
   public:
-    MHAudio();
-    virtual const char *ClassName() { return "Audio"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    MHAudio() = default;
+    const char *ClassName() override // MHRoot
+        { return "Audio"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
+    void Activation(MHEngine *engine) override; // MHRoot
+    void Deactivation(MHEngine *engine) override; // MHRoot
 
-    virtual void BeginPlaying(MHEngine *engine);
-    virtual void StopPlaying(MHEngine *engine);
+    void BeginPlaying(MHEngine *engine) override; // MHPresentable
+    void StopPlaying(MHEngine *engine) override; // MHPresentable
 
   protected:
-    int m_nComponentTag;
-    int m_nOriginalVol;
+    int  m_nComponentTag  {0};
+    int  m_nOriginalVol   {0};
 
-    bool m_fStreamPlaying;
+    bool m_fStreamPlaying {false};
 };
 
 class MHVideo : public MHVisible  
 {
   public:
-    MHVideo();
-    virtual const char *ClassName() { return "Video"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    MHVideo() = default;
+    const char *ClassName() override // MHRoot
+        { return "Video"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
+    void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
 
-    virtual void Preparation(MHEngine *engine);
-    virtual void ContentPreparation(MHEngine *engine);
+    void Preparation(MHEngine *engine) override; // MHVisible
+    void ContentPreparation(MHEngine *engine) override; // MHIngredient
 
-    virtual void Activation(MHEngine *engine);
-    virtual void Deactivation(MHEngine *engine);
+    void Activation(MHEngine *engine) override; // MHVisible
+    void Deactivation(MHEngine *engine) override; // MHVisible
 
-    virtual void Display(MHEngine *);
-    virtual QRegion GetVisibleArea();
-    virtual QRegion GetOpaqueArea() { return GetVisibleArea(); } // Fully opaque.
+    void Display(MHEngine *) override; // MHVisible
+    QRegion GetVisibleArea() override; // MHVisible
+    QRegion GetOpaqueArea() override // MHVisible
+        { return GetVisibleArea(); } // Fully opaque.
 
     // Actions.
-    virtual void ScaleVideo(int xScale, int yScale, MHEngine *);
-    virtual void SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *);
-    virtual void GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *);
+    void ScaleVideo(int xScale, int yScale, MHEngine *) override; // MHRoot
+    void SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *) override; // MHRoot
+    void GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *) override; // MHRoot
 
-    virtual void BeginPlaying(MHEngine *engine);
-    virtual void StopPlaying(MHEngine *engine);
+    void BeginPlaying(MHEngine *engine) override; // MHPresentable
+    void StopPlaying(MHEngine *engine) override; // MHPresentable
 
   protected:
-    int m_nComponentTag;
-    enum Termination { VI_Freeze = 1, VI_Disappear } m_Termination;
+    int m_nComponentTag      {0};
+    enum Termination { VI_Freeze = 1, VI_Disappear } m_Termination {VI_Disappear};
     // Added in UK MHEG
-    int     m_nXDecodeOffset, m_nYDecodeOffset;
-    int     m_nDecodeWidth, m_nDecodeHeight;
+    int     m_nXDecodeOffset {0};
+    int     m_nYDecodeOffset {0};
+    int     m_nDecodeWidth   {0};
+    int     m_nDecodeHeight  {0};
 
-    bool m_fStreamPlaying;
+    bool m_fStreamPlaying    {false};
 };
 
 // Real-time graphics - not needed for UK MHEG.
 class MHRTGraphics : public MHVisible  
 {
   public:
-    MHRTGraphics();
-    virtual const char *ClassName() { return "RTGraphics"; }
-    virtual ~MHRTGraphics();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual void Display(MHEngine *) {} // Not supported
+    MHRTGraphics() = default;
+    const char *ClassName() override // MHRoot
+        { return "RTGraphics"; }
+    virtual ~MHRTGraphics() = default;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
+    void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
+    void Display(MHEngine *) override {} // MHVisible - Not supported
 };
 
 
 class MHScaleVideo: public MHActionIntInt {
   public:
     MHScaleVideo(): MHActionIntInt(":ScaleVideo") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->ScaleVideo(nArg1, nArg2, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) override // MHActionIntInt
+        { pTarget->ScaleVideo(nArg1, nArg2, engine); }
 };
 
 // Actions added in the UK MHEG profile.
@@ -142,28 +150,30 @@ class MHSetVideoDecodeOffset: public MHActionIntInt
 {
   public:
     MHSetVideoDecodeOffset(): MHActionIntInt(":SetVideoDecodeOffset") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->SetVideoDecodeOffset(nArg1, nArg2, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) override // MHActionIntInt
+        { pTarget->SetVideoDecodeOffset(nArg1, nArg2, engine); }
 };
 
 class MHGetVideoDecodeOffset: public MHActionObjectRef2
 {
   public:
     MHGetVideoDecodeOffset(): MHActionObjectRef2(":GetVideoDecodeOffset")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetVideoDecodeOffset(pArg1, pArg2, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
+        { pTarget->GetVideoDecodeOffset(pArg1, pArg2, engine); }
 };
 
 class MHActionGenericObjectRefFix: public MHActionGenericObjectRef
 {
 public:
     MHActionGenericObjectRefFix(const char *name) : MHActionGenericObjectRef(name) {}
-    virtual void Perform(MHEngine *engine);
+    void Perform(MHEngine *engine) override; // MHActionGenericObjectRef
 };
 
 class MHGetCounterPosition: public MHActionGenericObjectRefFix
 {
 public:
     MHGetCounterPosition(): MHActionGenericObjectRefFix(":GetCounterPosition")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) override // MHActionGenericObjectRef
         { pTarget->GetCounterPosition(pArg, engine); }
 };
 
@@ -171,7 +181,7 @@ class MHGetCounterMaxPosition: public MHActionGenericObjectRefFix
 {
 public:
     MHGetCounterMaxPosition(): MHActionGenericObjectRefFix(":GetCounterMaxPosition")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) override // MHActionGenericObjectRef
         { pTarget->GetCounterMaxPosition(pArg, engine); }
 };
 
@@ -179,7 +189,7 @@ class MHSetCounterPosition: public MHActionInt
 {
 public:
     MHSetCounterPosition(): MHActionInt(":SetCounterPosition")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg)
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) override // MHActionInt
         { pTarget->SetCounterPosition(nArg, engine); }
 };
 
@@ -189,18 +199,19 @@ class MHSetSpeed: public MHElemAction
     typedef MHElemAction base;
 public:
     MHSetSpeed(): base(":SetSpeed") {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine) {
+    void Initialise(MHParseNode *p, MHEngine *engine) override { // MHElemAction
         //printf("SetSpeed Initialise args: "); p->PrintMe(stdout);
         base::Initialise(p, engine);
         MHParseNode *pn = p->GetArgN(1);
         if (pn->m_nNodeType == MHParseNode::PNSeq) pn = pn->GetArgN(0);
         m_Argument.Initialise(pn, engine);
     }
-    virtual void Perform(MHEngine *engine) {
+    void Perform(MHEngine *engine) override { // MHElemAction
         Target(engine)->SetSpeed(m_Argument.GetValue(engine), engine);
     }
 protected:
-    virtual void PrintArgs(FILE *fd, int) const { m_Argument.PrintMe(fd, 0); }
+    void PrintArgs(FILE *fd, int) const override // MHElemAction
+        { m_Argument.PrintMe(fd, 0); }
     MHGenericInteger m_Argument;
 };
 

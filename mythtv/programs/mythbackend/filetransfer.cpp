@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QFileInfo>
+#include <utility>
 
 #include "filetransfer.h"
 #include "ringbuffer.h"
@@ -12,142 +13,136 @@
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
     ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
-    readthreadlive(true), readsLocked(false),
-    rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
-    sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    writemode(false)
+    m_rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
+    m_sock(remote)
 {
-    pginfo = new ProgramInfo(filename);
-    pginfo->MarkAsInUse(true, kFileTransferInUseID);
-    if (rbuffer)
-        rbuffer->Start();
+    m_pginfo = new ProgramInfo(filename);
+    m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
+    if (m_rbuffer && m_rbuffer->IsOpen())
+        m_rbuffer->Start();
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
-    readthreadlive(true), readsLocked(false),
-    rbuffer(RingBuffer::Create(filename, write)),
-    sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    writemode(write)
+    m_rbuffer(RingBuffer::Create(filename, write)),
+    m_sock(remote), m_writemode(write)
 {
-    pginfo = new ProgramInfo(filename);
-    pginfo->MarkAsInUse(true, kFileTransferInUseID);
+    m_pginfo = new ProgramInfo(filename);
+    m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)
         remote->SetReadyReadCallbackEnabled(false);
-    if (rbuffer)
-        rbuffer->Start();
+    if (m_rbuffer)
+        m_rbuffer->Start();
 }
 
 FileTransfer::~FileTransfer()
 {
     Stop();
 
-    if (sock) // FileTransfer becomes responsible for deleting the socket
-        sock->DecrRef();
+    if (m_sock) // FileTransfer becomes responsible for deleting the socket
+        m_sock->DecrRef();
 
-    if (rbuffer)
+    if (m_rbuffer)
     {
-        delete rbuffer;
-        rbuffer = nullptr;
+        delete m_rbuffer;
+        m_rbuffer = nullptr;
     }
 
-    if (pginfo)
+    if (m_pginfo)
     {
-        pginfo->MarkAsInUse(false, kFileTransferInUseID);
-        delete pginfo;
+        m_pginfo->MarkAsInUse(false, kFileTransferInUseID);
+        delete m_pginfo;
     }
 }
 
 bool FileTransfer::isOpen(void)
 {
-    if (rbuffer && rbuffer->IsOpen())
-        return true;
-    return false;
+    return m_rbuffer && m_rbuffer->IsOpen();
 }
 
 bool FileTransfer::ReOpen(QString newFilename)
 {
-    if (!writemode)
+    if (!m_writemode)
         return false;
 
-    if (rbuffer)
-        return rbuffer->ReOpen(newFilename);
+    if (m_rbuffer)
+        return m_rbuffer->ReOpen(std::move(newFilename));
 
     return false;
 }
 
 void FileTransfer::Stop(void)
 {
-    if (readthreadlive)
+    if (m_readthreadlive)
     {
-        readthreadlive = false;
+        m_readthreadlive = false;
         LOG(VB_FILE, LOG_INFO, "calling StopReads()");
-        if (rbuffer)
-            rbuffer->StopReads();
-        QMutexLocker locker(&lock);
-        readsLocked = true;
+        if (m_rbuffer)
+            m_rbuffer->StopReads();
+        QMutexLocker locker(&m_lock);
+        m_readsLocked = true;
     }
 
-    if (writemode)
-        if (rbuffer)
-            rbuffer->WriterFlush();
+    if (m_writemode)
+        if (m_rbuffer)
+            m_rbuffer->WriterFlush();
 
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 }
 
 void FileTransfer::Pause(void)
 {
     LOG(VB_FILE, LOG_INFO, "calling StopReads()");
-    if (rbuffer)
-        rbuffer->StopReads();
-    QMutexLocker locker(&lock);
-    readsLocked = true;
+    if (m_rbuffer)
+        m_rbuffer->StopReads();
+    QMutexLocker locker(&m_lock);
+    m_readsLocked = true;
 
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 }
 
 void FileTransfer::Unpause(void)
 {
     LOG(VB_FILE, LOG_INFO, "calling StartReads()");
-    if (rbuffer)
-        rbuffer->StartReads();
+    if (m_rbuffer)
+        m_rbuffer->StartReads();
     {
-        QMutexLocker locker(&lock);
-        readsLocked = false;
+        QMutexLocker locker(&m_lock);
+        m_readsLocked = false;
     }
-    readsUnlockedCond.wakeAll();
+    m_readsUnlockedCond.wakeAll();
 
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 }
 
 int FileTransfer::RequestBlock(int size)
 {
-    if (!readthreadlive || !rbuffer)
+    if (!m_readthreadlive || !m_rbuffer)
         return -1;
 
     int tot = 0;
     int ret = 0;
 
-    QMutexLocker locker(&lock);
-    while (readsLocked)
-        readsUnlockedCond.wait(&lock, 100 /*ms*/);
+    QMutexLocker locker(&m_lock);
+    while (m_readsLocked)
+        m_readsUnlockedCond.wait(&m_lock, 100 /*ms*/);
 
-    requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
-    char *buf = &requestBuffer[0];
-    while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
+    m_requestBuffer.resize(max((size_t)max(size,0) + 128, m_requestBuffer.size()));
+    char *buf = &m_requestBuffer[0];
+    while (tot < size && !m_rbuffer->GetStopReads() && m_readthreadlive)
     {
         int request = size - tot;
 
-        ret = rbuffer->Read(buf, request);
+        ret = m_rbuffer->Read(buf, request);
 
-        if (rbuffer->GetStopReads() || ret <= 0)
+        if (m_rbuffer->GetStopReads() || ret <= 0)
             break;
 
-        if (sock->Write(buf, (uint)ret) != ret)
+        if (m_sock->Write(buf, (uint)ret) != ret)
         {
             tot = -1;
             break;
@@ -158,24 +153,24 @@ int FileTransfer::RequestBlock(int size)
             break; // we hit eof
     }
 
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 
     return (ret < 0) ? -1 : tot;
 }
 
 int FileTransfer::WriteBlock(int size)
 {
-    if (!writemode || !rbuffer)
+    if (!m_writemode || !m_rbuffer)
         return -1;
 
     int tot = 0;
     int ret = 0;
 
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
-    requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
-    char *buf = &requestBuffer[0];
+    m_requestBuffer.resize(max((size_t)max(size,0) + 128, m_requestBuffer.size()));
+    char *buf = &m_requestBuffer[0];
     int attempts = 0;
 
     while (tot < size)
@@ -183,7 +178,7 @@ int FileTransfer::WriteBlock(int size)
         int request = size - tot;
         int received;
 
-        received = sock->Read(buf, (uint)request, 200 /*ms */);
+        received = m_sock->Read(buf, (uint)request, 200 /*ms */);
 
         if (received != request)
         {
@@ -209,7 +204,7 @@ int FileTransfer::WriteBlock(int size)
             }
         }
         attempts = 0;
-        ret = rbuffer->Write(buf, received);
+        ret = m_rbuffer->Write(buf, received);
         if (ret <= 0)
         {
             LOG(VB_FILE, LOG_DEBUG,
@@ -221,67 +216,67 @@ int FileTransfer::WriteBlock(int size)
         tot += received;
     }
 
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 
     return (ret < 0) ? -1 : tot;
 }
 
 long long FileTransfer::Seek(long long curpos, long long pos, int whence)
 {
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 
-    if (!rbuffer)
+    if (!m_rbuffer)
         return -1;
-    if (!readthreadlive)
+    if (!m_readthreadlive)
         return -1;
 
-    ateof = false;
+    m_ateof = false;
 
     Pause();
 
     if (whence == SEEK_CUR)
     {
         long long desired = curpos + pos;
-        long long realpos = rbuffer->GetReadPosition();
+        long long realpos = m_rbuffer->GetReadPosition();
 
         pos = desired - realpos;
     }
 
-    long long ret = rbuffer->Seek(pos, whence);
+    long long ret = m_rbuffer->Seek(pos, whence);
 
     Unpause();
 
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 
     return ret;
 }
 
 uint64_t FileTransfer::GetFileSize(void)
 {
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 
-    return rbuffer ? rbuffer->GetRealFileSize() : 0;
+    return m_rbuffer ? m_rbuffer->GetRealFileSize() : 0;
 }
 
 QString FileTransfer::GetFileName(void)
 {
-    if (!rbuffer)
+    if (!m_rbuffer)
         return QString();
 
-    return rbuffer->GetFilename();
+    return m_rbuffer->GetFilename();
 }
 
 void FileTransfer::SetTimeout(bool fast)
 {
-    if (pginfo)
-        pginfo->UpdateInUseMark();
+    if (m_pginfo)
+        m_pginfo->UpdateInUseMark();
 
-    if (rbuffer)
-        rbuffer->SetOldFile(fast);
+    if (m_rbuffer)
+        m_rbuffer->SetOldFile(fast);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

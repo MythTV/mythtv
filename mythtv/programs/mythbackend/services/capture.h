@@ -41,47 +41,47 @@ class Capture : public CaptureServices
     public:
 
         DTC::CaptureCardList*       GetCaptureCardList ( const QString    &HostName,
-                                                         const QString    &CardType  );
+                                                         const QString    &CardType  ) override; // CaptureServices
 
-        DTC::CaptureCard*           GetCaptureCard     ( int              CardId     );
+        DTC::CaptureCard*           GetCaptureCard     ( int              CardId     ) override; // CaptureServices
 
-        bool                        RemoveCaptureCard  ( int              CardId     );
+        bool                        RemoveCaptureCard  ( int              CardId     ) override; // CaptureServices
 
         int                         AddCaptureCard     ( const QString    &VideoDevice,
                                                          const QString    &AudioDevice,
                                                          const QString    &VBIDevice,
                                                          const QString    &CardType,
-                                                         const uint       AudioRateLimit,
+                                                         uint             AudioRateLimit,
                                                          const QString    &HostName,
-                                                         const uint       DVBSWFilter,
-                                                         const uint       DVBSatType,
+                                                         uint             DVBSWFilter,
+                                                         uint             DVBSatType,
                                                          bool             DVBWaitForSeqStart,
                                                          bool             SkipBTAudio,
                                                          bool             DVBOnDemand,
-                                                         const uint       DVBDiSEqCType,
-                                                         const uint       FirewireSpeed,
+                                                         uint             DVBDiSEqCType,
+                                                         uint             FirewireSpeed,
                                                          const QString    &FirewireModel,
-                                                         const uint       FirewireConnection,
-                                                         const uint       SignalTimeout,
-                                                         const uint       ChannelTimeout,
-                                                         const uint       DVBTuningDelay,
-                                                         const uint       Contrast,
-                                                         const uint       Brightness,
-                                                         const uint       Colour,
-                                                         const uint       Hue,
-                                                         const uint       DiSEqCId,
-                                                         bool             DVBEITScan);
+                                                         uint             FirewireConnection,
+                                                         uint             SignalTimeout,
+                                                         uint             ChannelTimeout,
+                                                         uint             DVBTuningDelay,
+                                                         uint             Contrast,
+                                                         uint             Brightness,
+                                                         uint             Colour,
+                                                         uint             Hue,
+                                                         uint             DiSEqCId,
+                                                         bool             DVBEITScan) override; // CaptureServices
 
         bool                        UpdateCaptureCard  ( int              CardId,
                                                          const QString    &Setting,
-                                                         const QString    &Value );
+                                                         const QString    &Value ) override; // CaptureServices
 
         // Card Inputs
 
-        bool                        RemoveCardInput    ( int              CardInputId);
+        bool                        RemoveCardInput    ( int              CardInputId) override; // CaptureServices
 
-        int                         AddCardInput       ( const uint CardId,
-                                                         const uint SourceId,
+        int                         AddCardInput       ( uint       CardId,
+                                                         uint       SourceId,
                                                          const QString &InputName,
                                                          const QString &ExternalCommand,
                                                          const QString &ChangerDevice,
@@ -91,14 +91,14 @@ class Capture : public CaptureServices
                                                          const QString &StartChan,
                                                          const QString &DisplayName,
                                                          bool          DishnetEIT,
-                                                         const uint RecPriority,
-                                                         const uint Quicktune,
-                                                         const uint SchedOrder,
-                                                         const uint LiveTVOrder);
+                                                         uint       RecPriority,
+                                                         uint       Quicktune,
+                                                         uint       SchedOrder,
+                                                         uint       LiveTVOrder) override; // CaptureServices
 
         bool                        UpdateCardInput    ( int              CardInputId,
                                                          const QString    &Setting,
-                                                         const QString    &Value );
+                                                         const QString    &Value ) override; // CaptureServices
 
 };
 

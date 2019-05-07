@@ -4,6 +4,7 @@
 #if !defined( M_PI ) 
  #define M_PI 3.14159265358979323846 
 #endif
+#define M_PI_F ((float)M_PI)
 
 #define NB_RAND 0x10000
 
@@ -29,7 +30,7 @@ static inline int RAND(void) {
 
 
 //#define iRAND(i) ((guint32)((float)i * RAND()/RAND_MAX))
-#define iRAND(i) (RAND()%i)
+#define iRAND(i) (RAND()%(i))
 
 //inline unsigned int RAND(void);
 //inline unsigned int iRAND(int i);

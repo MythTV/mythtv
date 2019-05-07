@@ -3,55 +3,36 @@
 // MythTV headers
 #include "inputinfo.h"
 
-InputInfo::InputInfo(
-    const QString &_name,
-    uint _sourceid, uint _inputid, uint _mplexid, uint _chanid,
-    uint _livetvorder) :
-    name(_name),
-    sourceid(_sourceid),
-    inputid(_inputid),
-    mplexid(_mplexid),
-    chanid(_chanid),
-    recPriority(0),
-    scheduleOrder(0),
-    livetvorder(_livetvorder),
-    quickTune(false)
-{
-    name.detach();
-}
-
 void InputInfo::Clear(void)
 {
     InputInfo blank;
     *this = blank;
 }
 
-#define NEXT() do { ++it; if (it == end) return false; } while (0)
+#define NEXT() do { ++it; if (it == end) return false; } while (false)
 bool InputInfo::FromStringList(QStringList::const_iterator &it,
                                QStringList::const_iterator end)
 {
     if (it == end)
         return false;
 
-    name     = *it;
-    name.detach();
-    name     = (name == "<EMPTY>") ? QString() : name;
+    m_name          = *it;
+    m_name          = (m_name == "<EMPTY>") ? QString() : m_name;
     NEXT();
 
-    sourceid = (*it).toUInt(); NEXT();
-    inputid  = (*it).toUInt(); NEXT();
-    mplexid  = (*it).toUInt(); NEXT();
-    livetvorder = (*it).toUInt(); NEXT();
+    m_sourceid      = (*it).toUInt(); NEXT();
+    m_inputid       = (*it).toUInt(); NEXT();
+    m_mplexid       = (*it).toUInt(); NEXT();
+    m_livetvorder   = (*it).toUInt(); NEXT();
 
-    displayName = *it;
-    displayName.detach();
-    displayName = (displayName == "<EMPTY>") ? QString() : displayName;
+    m_displayName   = *it;
+    m_displayName   = (m_displayName == "<EMPTY>") ? QString() : m_displayName;
     NEXT();
 
-    recPriority = (*it).toInt(); NEXT();
-    scheduleOrder = (*it).toUInt(); NEXT();
-    quickTune = (*it).toUInt(); NEXT();
-    chanid   = (*it).toUInt(); ++it;
+    m_recPriority   = (*it).toInt(); NEXT();
+    m_scheduleOrder = (*it).toUInt(); NEXT();
+    m_quickTune     = ((*it).toUInt() != 0U); NEXT();
+    m_chanid        = (*it).toUInt(); ++it;
 
     return true;
 }
@@ -59,15 +40,15 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
 void InputInfo::ToStringList(QStringList &list) const
 {
-    list.push_back(name.isEmpty() ? "<EMPTY>" : name);
-    list.push_back(QString::number(sourceid));
-    list.push_back(QString::number(inputid));
-    list.push_back(QString::number(mplexid));
-    list.push_back(QString::number(livetvorder));
-    list.push_back(displayName.isEmpty() ? "<EMPTY>" : displayName);
-    list.push_back(QString::number(recPriority));
-    list.push_back(QString::number(scheduleOrder));
-    list.push_back(QString::number(quickTune));
-    list.push_back(QString::number(chanid));
+    list.push_back(m_name.isEmpty() ? "<EMPTY>" : m_name);
+    list.push_back(QString::number(m_sourceid));
+    list.push_back(QString::number(m_inputid));
+    list.push_back(QString::number(m_mplexid));
+    list.push_back(QString::number(m_livetvorder));
+    list.push_back(m_displayName.isEmpty() ? "<EMPTY>" : m_displayName);
+    list.push_back(QString::number(m_recPriority));
+    list.push_back(QString::number(m_scheduleOrder));
+    list.push_back(QString::number(m_quickTune));
+    list.push_back(QString::number(m_chanid));
 }
 

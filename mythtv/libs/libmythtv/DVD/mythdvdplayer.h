@@ -10,27 +10,28 @@ class MythDVDPlayer : public MythPlayer
     Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer);
 
   public:
-    explicit MythDVDPlayer(PlayerFlags flags = kNoFlags);
+    explicit MythDVDPlayer(PlayerFlags flags = kNoFlags)
+        : MythPlayer(flags) {}
 
     // Decoder stuff..
-    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
-                                       bool wrap = true);
-    virtual bool HasReachedEof(void) const;
+    void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
+                               bool wrap = true) override; // MythPlayer
+    bool HasReachedEof(void) const override; // MythPlayer
 
     // Add data
-    virtual bool PrepareAudioSample(int64_t &timecode);
+    bool PrepareAudioSample(int64_t &timecode) override; // MythPlayer
 
     // Gets
-    virtual uint64_t GetBookmark(void);
-    virtual  int64_t GetSecondsPlayed(bool honorCutList,
-                                      int divisor = 1000) const;
-    virtual  int64_t GetTotalSeconds(bool honorCutList,
-                                     int divisor = 1000) const;
+    uint64_t GetBookmark(void) override; // MythPlayer
+    int64_t GetSecondsPlayed(bool honorCutList,
+                             int divisor = 1000) const override; // MythPlayer
+    int64_t GetTotalSeconds(bool honorCutList,
+                            int divisor = 1000) const override; // MythPlayer
 
     // DVD public stuff
-    virtual bool GoToMenu(QString str);
-    virtual void GoToDVDProgram(bool direction);
-    virtual bool IsInStillFrame() const;
+    bool GoToMenu(QString str) override; // MythPlayer
+    void GoToDVDProgram(bool direction) override; // MythPlayer
+    bool IsInStillFrame() const override; // MythPlayer
 
     // DVD ringbuffer methods
     void ResetStillFrameTimer(void);
@@ -38,69 +39,69 @@ class MythDVDPlayer : public MythPlayer
     void StillFrameCheck(void);
 
     // Angle public stuff
-    virtual int GetNumAngles(void) const;
-    virtual int GetCurrentAngle(void) const;
-    virtual QString GetAngleName(int angle) const;
-    virtual bool SwitchAngle(int angle);
+    int GetNumAngles(void) const override; // MythPlayer
+    int GetCurrentAngle(void) const override; // MythPlayer
+    QString GetAngleName(int angle) const override; // MythPlayer
+    bool SwitchAngle(int angle) override; // MythPlayer
 
     // Chapter public stuff
-    virtual int  GetNumChapters(void);
-    virtual int  GetCurrentChapter(void);
-    virtual void GetChapterTimes(QList<long long> &times);
+    int  GetNumChapters(void) override; // MythPlayer
+    int  GetCurrentChapter(void) override; // MythPlayer
+    void GetChapterTimes(QList<long long> &times) override; // MythPlayer
 
   protected:
     // Non-public sets
-    virtual void SetBookmark(bool clear = false);
+    void SetBookmark(bool clear = false) override; // MythPlayer
 
     // Start/Reset/Stop playing
-    virtual void ResetPlaying(bool resetframes = true);
+    void ResetPlaying(bool resetframes = true) override; // MythPlayer
 
     // Private decoder stuff
-    virtual bool PrebufferEnoughFrames(int min_buffers = 0);
-    virtual void DecoderPauseCheck(void);
-    virtual bool DecoderGetFrameFFREW(void);
-    virtual bool DecoderGetFrameREW(void);
+    bool PrebufferEnoughFrames(int min_buffers = 0) override; // MythPlayer
+    void DecoderPauseCheck(void) override; // MythPlayer
+    bool DecoderGetFrameFFREW(void) override; // MythPlayer
+    bool DecoderGetFrameREW(void) override; // MythPlayer
 
     // These actually execute commands requested by public members
-    virtual void ChangeSpeed(void);
+    void ChangeSpeed(void) override; // MythPlayer
 
     // Playback
-    virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
-    virtual void DisplayPauseFrame(void);
-    virtual void PreProcessNormalFrame(void);
-    virtual void VideoStart(void);
-    virtual bool VideoLoop(void);
-    virtual void EventStart(void);
+    void AVSync(VideoFrame *frame, bool limit_delay = false) override; // MythPlayer
+    void DisplayPauseFrame(void) override; // MythPlayer
+    void PreProcessNormalFrame(void) override; // MythPlayer
+    void VideoStart(void) override; // MythPlayer
+    bool VideoLoop(void) override; // MythPlayer
+    void EventStart(void) override; // MythPlayer
     virtual void EventEnd(void);
-    virtual void InitialSeek(void);
+    void InitialSeek(void) override; // MythPlayer
 
     // Non-const gets
-    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
-                                   bool absolute);
+    void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
+                           bool absolute) override; // MythPlayer
 
     // Private initialization stuff
-    virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
+    void AutoDeint(VideoFrame* frame, bool allow_lock = true) override; // MythPlayer
 
     // Complicated gets
-    virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
+    long long CalcMaxFFTime(long long ff, bool setjump = true) const override; // MythPlayer
 
     // Seek stuff
-    virtual bool FastForward(float seconds);
-    virtual bool Rewind(float seconds);
-    virtual bool JumpToFrame(uint64_t frame);
+    bool FastForward(float seconds) override; // MythPlayer
+    bool Rewind(float seconds) override; // MythPlayer
+    bool JumpToFrame(uint64_t frame) override; // MythPlayer
 
     // Private Closed caption and teletext stuff
-    virtual void DisableCaptions(uint mode, bool osd_msg=true);
-    virtual void EnableCaptions(uint mode, bool osd_msg=true);
+    void DisableCaptions(uint mode, bool osd_msg=true) override; // MythPlayer
+    void EnableCaptions(uint mode, bool osd_msg=true) override; // MythPlayer
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    virtual int  SetTrack(uint type, int trackNo);
+    int  SetTrack(uint type, int trackNo) override; // MythPlayer
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *testbuf, int testreadsize);
+    void CreateDecoder(char *testbuf, int testreadsize) override; // MythPlayer
 
     // Private chapter stuff
-    virtual bool DoJumpChapter(int chapter);
+    bool DoJumpChapter(int chapter) override; // MythPlayer
 
   private:
     void DoChangeDVDTrack(void);
@@ -108,18 +109,18 @@ class MythDVDPlayer : public MythPlayer
 
     void DisplayLastFrame(void);
 
-    int  m_buttonVersion;
-    bool dvd_stillframe_showing;
+    int       m_buttonVersion          {0};
+    bool      m_dvd_stillframe_showing {false};
 
     // additional bookmark seeking information
-    int m_initial_title;
-    int m_initial_audio_track;
-    int m_initial_subtitle_track;
-    QString m_initial_dvdstate;
+    int       m_initial_title          {-1};
+    int       m_initial_audio_track    {-1};
+    int       m_initial_subtitle_track {-1};
+    QString   m_initial_dvdstate;
 
     // still frame timing
     MythTimer m_stillFrameTimer;
-    int       m_stillFrameLength;
+    int       m_stillFrameLength       {0};
     QMutex    m_stillFrameTimerLock;
 };
 

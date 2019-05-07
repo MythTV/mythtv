@@ -24,24 +24,9 @@
 #include "themeselector.h"
 
 SelectDestination::SelectDestination(
-    MythScreenStack *parent, bool nativeMode, QString name) :
+    MythScreenStack *parent, bool nativeMode, const QString& name) :
     MythScreenType(parent, name),
-    m_nativeMode(nativeMode),
-    m_freeSpace(0),
-    m_nextButton(nullptr),
-    m_prevButton(nullptr),
-    m_cancelButton(nullptr),
-    m_destinationSelector(nullptr),
-    m_destinationText(nullptr),
-    m_freespaceText(nullptr),
-    m_filenameEdit(nullptr),
-    m_findButton(nullptr),
-    m_createISOCheck(nullptr),
-    m_doBurnCheck(nullptr),
-    m_eraseDvdRwCheck(nullptr),
-    m_createISOText(nullptr),
-    m_doBurnText(nullptr),
-    m_eraseDvdRwText(nullptr)
+    m_nativeMode(nativeMode)
 {
     m_archiveDestination.type = AD_FILE;
     m_archiveDestination.name = nullptr;
@@ -305,7 +290,7 @@ void SelectDestination::handleFind(void)
         mainStack->AddScreen(selector);
 }
 
-void SelectDestination::fileFinderClosed(QString filename)
+void SelectDestination::fileFinderClosed(const QString& filename)
 {
     if (filename != "")
     {

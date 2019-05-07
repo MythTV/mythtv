@@ -21,8 +21,7 @@ extern "C" {
  *                         Use "adts" for ADTS encpsulation (AAC)
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
-SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
-    : m_complete(false), m_oc(nullptr), m_size(0)
+SPDIFEncoder::SPDIFEncoder(const QString& muxer, AVCodecID codec_id)
 {
     memset(&m_buffer, 0, sizeof(m_buffer));
 
@@ -56,7 +55,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     m_oc->pb->seekable    = 0;
     m_oc->flags          |= AVFMT_NOFILE | AVFMT_FLAG_IGNIDX;
 
-    const AVCodec *codec = avcodec_find_decoder(static_cast<AVCodecID>(codec_id));
+    const AVCodec *codec = avcodec_find_decoder(codec_id);
     if (!codec)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "avcodec_find_decoder");
@@ -85,7 +84,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     }
 
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Creating %1 encoder (for %2)")
-            .arg(muxer).arg(ff_codec_id_string((AVCodecID)codec_id)));
+            .arg(muxer).arg(ff_codec_id_string(codec_id)));
 
     m_complete = true;
 }

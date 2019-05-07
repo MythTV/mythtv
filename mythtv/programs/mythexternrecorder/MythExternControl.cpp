@@ -136,17 +136,6 @@ Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
 #undef LOC
 #define LOC QString("%1").arg(m_parent->Desc())
 
-Commands::Commands(MythExternControl * parent)
-    : m_thread()
-    , m_parent(parent)
-    , m_apiVersion(-1)
-{
-}
-
-Commands::~Commands(void)
-{
-}
-
 void Commands::Close(void)
 {
     std::lock_guard<std::mutex> lock(m_parent->m_flow_mutex);
@@ -206,21 +195,21 @@ void Commands::NextChannel(const QString & serial)
     emit m_parent->NextChannel(serial);
 }
 
-bool Commands::SendStatus(const QString & command, const QString & msg)
+bool Commands::SendStatus(const QString & command, const QString & status)
 {
-    int len = write(2, msg.toUtf8().constData(), msg.size());
+    int len = write(2, status.toUtf8().constData(), status.size());
     write(2, "\n", 1);
 
-    if (len != static_cast<int>(msg.size()))
+    if (len != status.size())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
-            .arg(command).arg(len).arg(msg.size()).arg(msg));
+            .arg(command).arg(len).arg(status.size()).arg(status));
         return false;
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-        .arg(command).arg(msg));
+        .arg(command).arg(status));
 
     m_parent->ClearError();
     return true;
@@ -234,7 +223,7 @@ bool Commands::SendStatus(const QString & command, const QString & serial,
     int len = write(2, msg.toUtf8().constData(), msg.size());
     write(2, "\n", 1);
 
-    if (len != static_cast<int>(msg.size()))
+    if (len != msg.size())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
@@ -260,7 +249,7 @@ bool Commands::ProcessCommand(const QString & cmd)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Processing '%1'").arg(cmd));
 
-    std::unique_lock<std::mutex> lk(m_parent->m_msg_mutex);
+    std::unique_lock<std::mutex> lk1(m_parent->m_msg_mutex);
 
     if (cmd.startsWith("APIVersion?"))
     {
@@ -280,7 +269,14 @@ bool Commands::ProcessCommand(const QString & cmd)
         return true;
     }
 
-    if (tokens[1].startsWith("APIVersion"))
+    if (tokens[1].startsWith("APIVersion?"))
+    {
+        if (m_parent->m_fatal)
+            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
+        else
+            SendStatus(cmd, tokens[0], "OK:2");
+    }
+    else if (tokens[1].startsWith("APIVersion"))
     {
         if (tokens.size() > 1)
         {
@@ -296,6 +292,15 @@ bool Commands::ProcessCommand(const QString & cmd)
             SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
         else
             SendStatus(cmd, tokens[0], "OK:" + VERSION);
+    }
+    else if (tokens[1].startsWith("Description?"))
+    {
+        if (m_parent->m_fatal)
+            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
+        else if (m_parent->m_desc.trimmed().isEmpty())
+            SendStatus(cmd, tokens[0], "WARN:Not set");
+        else
+            SendStatus(cmd, tokens[0], "OK:" + m_parent->m_desc.trimmed());
     }
     else if (tokens[1].startsWith("HasLock?"))
     {
@@ -331,16 +336,26 @@ bool Commands::ProcessCommand(const QString & cmd)
     else if (tokens[1].startsWith("XON"))
     {
         // Used when FlowControl is XON/XOFF
-        SendStatus(cmd, tokens[0], "OK");
-        m_parent->m_xon = true;
-        m_parent->m_flow_cond.notify_all();
+        if (m_parent->m_streaming)
+        {
+            SendStatus(cmd, tokens[0], "OK");
+            m_parent->m_xon = true;
+            m_parent->m_flow_cond.notify_all();
+        }
+        else
+            SendStatus(cmd, tokens[0], "WARN:Not streaming");
     }
     else if (tokens[1].startsWith("XOFF"))
     {
-        SendStatus(cmd, tokens[0], "OK");
-        // Used when FlowControl is XON/XOFF
-        m_parent->m_xon = false;
-        m_parent->m_flow_cond.notify_all();
+        if (m_parent->m_streaming)
+        {
+            SendStatus(cmd, tokens[0], "OK");
+            // Used when FlowControl is XON/XOFF
+            m_parent->m_xon = false;
+            m_parent->m_flow_cond.notify_all();
+        }
+        else
+            SendStatus(cmd, tokens[0], "WARN:Not streaming");
     }
     else if (tokens[1].startsWith("TuneChannel"))
     {
@@ -363,7 +378,7 @@ bool Commands::ProcessCommand(const QString & cmd)
     }
     else if (tokens[1].startsWith("IsOpen?"))
     {
-        std::unique_lock<std::mutex> lk(m_parent->m_run_mutex);
+        std::unique_lock<std::mutex> lk2(m_parent->m_run_mutex);
         if (m_parent->m_fatal)
             SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
         else if (m_parent->m_ready)
@@ -438,7 +453,7 @@ void Commands::Run(void)
             LOG(VB_RECORD, LOG_ERR, LOC + "poll eof (POLLHUP)");
             break;
         }
-        else if (polls[0].revents & POLLNVAL)
+        if (polls[0].revents & POLLNVAL)
         {
             m_parent->Fatal("poll error");
             return;
@@ -477,13 +492,9 @@ void Commands::Run(void)
 }
 
 Buffer::Buffer(MythExternControl * parent)
-    : m_parent(parent), m_thread()
+    : m_parent(parent)
 {
     m_heartbeat = std::chrono::system_clock::now();
-}
-
-Buffer::~Buffer(void)
-{
 }
 
 bool Buffer::Fill(const QByteArray & buffer)

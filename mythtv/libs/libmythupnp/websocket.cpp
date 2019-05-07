@@ -22,8 +22,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketServer::WebSocketServer() :
-    ServerPool(),
-    m_threadPool("WebSocketServerPool"), m_running(true)
+    m_threadPool("WebSocketServerPool")
 {
     setObjectName("WebSocketServer");
     // Number of connections processed concurrently
@@ -70,7 +69,7 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
                                  qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-                                 , QSslConfiguration sslConfig
+                                 , const QSslConfiguration& sslConfig
 #endif
                                  )
                 :
@@ -102,19 +101,16 @@ void WebSocketWorkerThread::run(void)
 WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
                                  qt_socket_fd_t sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
-                                 , QSslConfiguration sslConfig
+                                 , const QSslConfiguration& sslConfig
 #endif
                                  )
                 : m_eventLoop(new QEventLoop()),
                   m_webSocketServer(webSocketServer),
-                  m_socketFD(sock), m_socket(nullptr),
-                  m_connectionType(type), m_webSocketMode(false),
-                  m_errorCount(0), m_isRunning(false),
-                  m_heartBeat(new QTimer()),
+                  m_socketFD(sock), m_connectionType(type),
+                  m_heartBeat(new QTimer())
 #ifndef QT_NO_OPENSSL
-                  m_sslConfig(sslConfig),
+                  , m_sslConfig(sslConfig)
 #endif
-                  m_fuzzTesting(false)
 {
     setObjectName(QString("WebSocketWorker(%1)")
                         .arg(m_socketFD));
@@ -486,7 +482,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
 
         WebSocketFrame frame;
         // FIN
-        frame.finalFrame = (bool)(header[0] & 0x80);
+        frame.m_finalFrame = (bool)(header[0] & 0x80);
         // Reserved bits
         if (header.at(0) & 0x70)
         {
@@ -507,18 +503,18 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
             SendClose(kCloseProtocolError, "Invalid OpCode");
             return;
         }
-        frame.opCode = (WebSocketFrame::OpCode)opCode;
-        frame.isMasked = (header.at(1) >> 7) & 0xFE;
+        frame.m_opCode = (WebSocketFrame::OpCode)opCode;
+        frame.m_isMasked = (((header.at(1) >> 7) & 0xFE) != 0);
 
-        if (frame.isMasked)
+        if (frame.m_isMasked)
             headerSize += 4; // Add 4 bytes for the mask
 
-        frame.payloadSize = (header.at(1) & 0x7F);
+        frame.m_payloadSize = (header.at(1) & 0x7F);
         // Handle 16 or 64bit payload size headers
-        if (frame.payloadSize >= 126)
+        if (frame.m_payloadSize >= 126)
         {
             uint8_t payloadHeaderSize = 2; // 16bit payload size
-            if (frame.payloadSize == 127)
+            if (frame.m_payloadSize == 127)
                 payloadHeaderSize = 8; // 64bit payload size
 
             headerSize += payloadHeaderSize; // Add bytes for extended payload size
@@ -528,10 +524,10 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
 
             header = socket->peek(headerSize); // Peek the entire header
             QByteArray payloadHeader = header.mid(2,payloadHeaderSize);
-            frame.payloadSize = 0;
+            frame.m_payloadSize = 0;
             for (int i = 0; i < payloadHeaderSize; i++)
             {
-                frame.payloadSize |= ((uint8_t)payloadHeader.at(i) << ((payloadHeaderSize - (i + 1)) * 8));
+                frame.m_payloadSize |= ((uint8_t)payloadHeader.at(i) << ((payloadHeaderSize - (i + 1)) * 8));
             }
         }
         else
@@ -541,7 +537,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
             header = socket->peek(headerSize); // Peek the entire header including mask
         }
 
-        while ((uint64_t)socket->bytesAvailable() < (frame.payloadSize + header.length()))
+        while ((uint64_t)socket->bytesAvailable() < (frame.m_payloadSize + header.length()))
         {
             if (!socket->waitForReadyRead(2000)) // Wait 2 seconds for the next chunk of the frame
             {
@@ -557,17 +553,17 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
             }
         }
 
-        if (frame.opCode == WebSocketFrame::kOpContinuation)
-             m_readFrame.payloadSize += frame.payloadSize;
+        if (frame.m_opCode == WebSocketFrame::kOpContinuation)
+             m_readFrame.m_payloadSize += frame.m_payloadSize;
 
         LOG(VB_HTTP, LOG_DEBUG, QString("Read Header: %1").arg(QString(header.toHex())));
-        LOG(VB_HTTP, LOG_DEBUG, QString("Final Frame: %1").arg(frame.finalFrame ? "Yes" : "No"));
-        LOG(VB_HTTP, LOG_DEBUG, QString("Op Code: %1").arg(QString::number(frame.opCode)));
-        LOG(VB_HTTP, LOG_DEBUG, QString("Payload Size: %1 Bytes").arg(QString::number(frame.payloadSize)));
-        LOG(VB_HTTP, LOG_DEBUG, QString("Total Payload Size: %1 Bytes").arg(QString::number( m_readFrame.payloadSize)));
+        LOG(VB_HTTP, LOG_DEBUG, QString("Final Frame: %1").arg(frame.m_finalFrame ? "Yes" : "No"));
+        LOG(VB_HTTP, LOG_DEBUG, QString("Op Code: %1").arg(QString::number(frame.m_opCode)));
+        LOG(VB_HTTP, LOG_DEBUG, QString("Payload Size: %1 Bytes").arg(QString::number(frame.m_payloadSize)));
+        LOG(VB_HTTP, LOG_DEBUG, QString("Total Payload Size: %1 Bytes").arg(QString::number( m_readFrame.m_payloadSize)));
 
         if (!m_fuzzTesting &&
-            frame.payloadSize > qPow(2,20)) // Set 1MB limit on payload per frame
+            frame.m_payloadSize > qPow(2,20)) // Set 1MB limit on payload per frame
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::ProcessFrames() - Frame payload larger than limit of 1MB");
             SendClose(kCloseTooLarge, "Frame payload larger than limit of 1MB");
@@ -575,7 +571,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         }
 
         if (!m_fuzzTesting &&
-            m_readFrame.payloadSize > qPow(2,22)) // Set 4MB limit on total payload
+            m_readFrame.m_payloadSize > qPow(2,22)) // Set 4MB limit on total payload
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::ProcessFrames() - Total payload larger than limit of 4MB");
             SendClose(kCloseTooLarge, "Total payload larger than limit of 4MB");
@@ -584,17 +580,19 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
 
         socket->read(headerSize); // Discard header from read buffer
 
-        frame.payload = socket->read(frame.payloadSize);
+        frame.m_payload = socket->read(frame.m_payloadSize);
 
         // Unmask payload
-        if (frame.isMasked)
+        if (frame.m_isMasked)
         {
-            frame.mask = header.right(4);
-            for (uint i = 0; i < frame.payloadSize; i++)
-                frame.payload[i] = frame.payload.at(i) ^ frame.mask[i % 4];
+            frame.m_mask = header.right(4);
+            for (uint i = 0; i < frame.m_payloadSize; i++)
+                frame.m_payload[i] = frame.m_payload.at(i) ^ frame.m_mask[i % 4];
         }
 
-        if (m_readFrame.fragmented && frame.opCode > WebSocketFrame::kOpContinuation && frame.opCode < WebSocketFrame::kOpClose)
+        if (m_readFrame.m_fragmented
+            && frame.m_opCode > WebSocketFrame::kOpContinuation
+            && frame.m_opCode < WebSocketFrame::kOpClose)
         {
             LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker - Incomplete multi-part frame? Expected continuation.");
             SendClose(kCloseProtocolError, "Incomplete multi-part frame? Expected continuation.");
@@ -602,35 +600,35 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         }
 
         // Check control frame validity
-        if (frame.opCode >= 0x08)
+        if (frame.m_opCode >= 0x08)
         {
-            if (!frame.finalFrame)
+            if (!frame.m_finalFrame)
             {
                 SendClose(kCloseProtocolError, "Control frames MUST NOT be fragmented");
                 return;
             }
-            else if (frame.payloadSize > 125)
+            if (frame.m_payloadSize > 125)
             {
                 SendClose(kCloseProtocolError, "Control frames MUST NOT have payload greater than 125 bytes");
                 return;
             }
         }
 
-        switch (frame.opCode)
+        switch (frame.m_opCode)
         {
             case WebSocketFrame::kOpContinuation:
-                if (!m_readFrame.fragmented)
+                if (!m_readFrame.m_fragmented)
                 {
                     LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker - Received Continuation Frame out of sequence");
                     SendClose(kCloseProtocolError, "Received Continuation Frame out of sequence");
                     return;
                 }
 
-                m_readFrame.payload.append(frame.payload);
+                m_readFrame.m_payload.append(frame.m_payload);
 
-                if (m_readFrame.fragmented && frame.finalFrame)
+                if (m_readFrame.m_fragmented && frame.m_finalFrame)
                 {
-                    m_readFrame.finalFrame = true;
+                    m_readFrame.m_finalFrame = true;
                     frame = m_readFrame;
                     // Fall through to appropriate handler for complete payload
                 }
@@ -642,15 +640,15 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
                 HandleDataFrame(frame);
                 break;
             case WebSocketFrame::kOpPing:
-                SendPong(frame.payload);
+                SendPong(frame.m_payload);
                 break;
             case WebSocketFrame::kOpPong:
                 break;
             case WebSocketFrame::kOpClose:
-                if (!frame.finalFrame)
+                if (!frame.m_finalFrame)
                     SendClose(kCloseProtocolError, "Control frames MUST NOT be fragmented");
                 else
-                    HandleCloseConnection(frame.payload);
+                    HandleCloseConnection(frame.m_payload);
                 break;
             default:
                 LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker - Received Unknown Frame Type");
@@ -667,13 +665,13 @@ void WebSocketWorker::HandleControlFrame(const WebSocketFrame &/*frame*/)
 
 void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
 {
-    if (frame.finalFrame)
+    if (frame.m_finalFrame)
     {
         QList<WebSocketExtension*>::iterator it;
-        switch (frame.opCode)
+        switch (frame.m_opCode)
         {
             case WebSocketFrame::kOpTextFrame :
-                if (!CodecUtil::isValidUTF8(frame.payload))
+                if (!CodecUtil::isValidUTF8(frame.m_payload))
                 {
                     LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker - Message is not valid UTF-8");
                     SendClose(kCloseBadData, "Message is not valid UTF-8");
@@ -681,7 +679,7 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
                 }
                 // For Debugging and fuzz testing
                 if (m_fuzzTesting)
-                    SendText(frame.payload);
+                    SendText(frame.m_payload);
                 it = m_extensions.begin();
                 for (; it != m_extensions.end(); ++it)
                 {
@@ -691,7 +689,7 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
                 break;
             case WebSocketFrame::kOpBinaryFrame :
                 if (m_fuzzTesting)
-                    SendBinary(frame.payload);
+                    SendBinary(frame.m_payload);
                 it = m_extensions.begin();
                 for (; it != m_extensions.end(); ++it)
                 {
@@ -708,11 +706,11 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
     {
         // Start of new fragmented frame
         m_readFrame.reset();
-        m_readFrame.opCode = frame.opCode;
-        m_readFrame.payloadSize = frame.payloadSize;
-        m_readFrame.payload = frame.payload;
-        m_readFrame.fragmented = true;
-        m_readFrame.finalFrame = false;
+        m_readFrame.m_opCode = frame.m_opCode;
+        m_readFrame.m_payloadSize = frame.m_payloadSize;
+        m_readFrame.m_payload = frame.m_payload;
+        m_readFrame.m_fragmented = true;
+        m_readFrame.m_finalFrame = false;
     }
 }
 
@@ -777,7 +775,7 @@ QByteArray WebSocketWorker::CreateFrame(WebSocketFrame::OpCode type,
 
     if (type >= 0x08)
     {
-        //if (!finalFrame)
+        //if (!m_finalFrame)
         //   SendClose(kCloseProtocolError, "Control frames MUST NOT be fragmented");
         if (payloadSize > 125)
         {
@@ -869,40 +867,28 @@ bool WebSocketWorker::SendText(const QByteArray& message)
 
     QByteArray frame = CreateFrame(WebSocketFrame::kOpTextFrame, message);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendBinary(const QByteArray& data)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpBinaryFrame, data);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendPing(const QByteArray& payload)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpPing, payload);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendPong(const QByteArray& payload)
 {
     QByteArray frame = CreateFrame(WebSocketFrame::kOpPong, payload);
 
-    if (!frame.isEmpty() && SendFrame(frame))
-        return true;
-
-    return false;
+    return !frame.isEmpty() && SendFrame(frame);
 }
 
 bool WebSocketWorker::SendClose(ErrorCode errCode,

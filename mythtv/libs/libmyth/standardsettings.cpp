@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QThread>
+#include <utility>
 
 #include <mythcontext.h>
 #include <mythmainwindow.h>
@@ -15,15 +16,6 @@
 void MythUIButtonListItemSetting::ShouldUpdate(StandardSetting *setting)
 {
     setting->updateButton(this);
-}
-
-StandardSetting::StandardSetting(Storage *_storage) :
-    m_settingValue(""),
-    m_enabled(true), m_label(""), m_helptext(""), m_visible(true),
-    m_haveChanged(false),
-    m_storage(_storage),
-    m_parent(nullptr)
-{
 }
 
 StandardSetting::~StandardSetting()
@@ -53,9 +45,9 @@ MythUIButtonListItem * StandardSetting::createButton(MythUIButtonList * list)
     return item;
 }
 
-void StandardSetting::setEnabled(bool b)
+void StandardSetting::setEnabled(bool enabled)
 {
-    m_enabled = b;
+    m_enabled = enabled;
     emit ShouldRedraw(this);
 }
 
@@ -85,7 +77,7 @@ void StandardSetting::removeChild(StandardSetting *child)
     emit settingsChanged(this);
 }
 
-bool StandardSetting::keyPressEvent(QKeyEvent *)
+bool StandardSetting::keyPressEvent(QKeyEvent * /*e*/)
 {
     return false;
 }
@@ -148,7 +140,7 @@ void StandardSetting::clearTargetedSettings(const QString &value)
 QList<StandardSetting *> *StandardSetting::getSubSettings()
 {
     if (m_targets.contains(m_settingValue) &&
-        m_targets[m_settingValue].size() > 0)
+        !m_targets[m_settingValue].empty())
         return &m_targets[m_settingValue];
     return &m_children;
 }
@@ -156,7 +148,7 @@ QList<StandardSetting *> *StandardSetting::getSubSettings()
 bool StandardSetting::haveSubSettings()
 {
     QList<StandardSetting *> *subSettings = getSubSettings();
-    return subSettings && subSettings->size() > 0;
+    return subSettings && !subSettings->empty();
 }
 
 void StandardSetting::clearSettings()
@@ -190,7 +182,7 @@ bool StandardSetting::haveChanged()
     if (m_haveChanged)
     {
         LOG(VB_GENERAL, LOG_DEBUG,
-            QString("Setting %1 changed to %2").arg(getLabel())
+            QString("Setting '%1' changed to %2").arg(getLabel())
             .arg(getValue()));
         return true;
     }
@@ -235,19 +227,22 @@ void StandardSetting::Load(void)
 
 void StandardSetting::Save(void)
 {
-    m_haveChanged = false;
-
     if (m_storage)
         m_storage->Save();
 
     //we save only the relevant children
     QList<StandardSetting *> *children = getSubSettings();
-    if (!children)
+    if (children)
+    {
+        for (auto i = children->constBegin(); i != children->constEnd(); ++i)
+            (*i)->Save();
+    }
+
+    if (!m_haveChanged)
         return;
 
-    QList<StandardSetting *>::const_iterator i;
-    for (i = children->constBegin(); i != children->constEnd(); ++i)
-        (*i)->Save();
+    m_haveChanged = false;
+    emit ChangeSaved();
 }
 
 void StandardSetting::setName(const QString &name)
@@ -259,7 +254,16 @@ void StandardSetting::setName(const QString &name)
 
 StandardSetting* StandardSetting::byName(const QString &name)
 {
-    return (name == m_name) ? this : nullptr;
+    if (name == m_name)
+        return this;
+
+    foreach (StandardSetting *setting, *getSubSettings())
+    {
+        StandardSetting *s = setting->byName(name);
+        if (s)
+            return s;
+    }
+    return nullptr;
 }
 
 void StandardSetting::MoveToThread(QThread *thread)
@@ -301,17 +305,6 @@ void GroupSetting::updateButton(MythUIButtonListItem *item)
     item->setDrawArrow(haveSubSettings());
 }
 
-StandardSetting* GroupSetting::byName(const QString &name)
-{
-    foreach (StandardSetting *setting, *getSubSettings())
-    {
-        StandardSetting *s = setting->byName(name);
-        if (s)
-            return s;
-    }
-    return nullptr;
-}
-
 ButtonStandardSetting::ButtonStandardSetting(const QString &label)
 {
     setLabel(label);
@@ -327,8 +320,8 @@ void AutoIncrementSetting::Save(void)
     if (getValue() == "0")
     {
         // Generate a new, unique ID
-        QString querystr = QString("INSERT INTO " + m_table +
-                                   " (" + m_column + ") VALUES (0);");
+        QString querystr = "INSERT INTO " + m_table +
+                                   " (" + m_column + ") VALUES (0);";
 
         MSqlQuery query(MSqlQuery::InitCon());
 
@@ -350,8 +343,8 @@ void AutoIncrementSetting::Save(void)
             setValue(var.toInt());
         else
         {
-            querystr = QString("SELECT MAX(" + m_column + ") FROM " +
-                               m_table + ";");
+            querystr = "SELECT MAX(" + m_column + ") FROM " +
+                               m_table + ";";
             if (query.exec(querystr) && query.next())
             {
                 int lii = query.value(0).toInt();
@@ -369,8 +362,7 @@ void AutoIncrementSetting::Save(void)
 }
 
 AutoIncrementSetting::AutoIncrementSetting(QString _table, QString _column) :
-    StandardSetting(),
-    m_table(_table), m_column(_column)
+    m_table(std::move(_table)), m_column(std::move(_column))
 {
     setValue("0");
 }
@@ -378,11 +370,6 @@ AutoIncrementSetting::AutoIncrementSetting(QString _table, QString _column) :
 /******************************************************************************
                             Text Setting
 *******************************************************************************/
-
-MythUITextEditSetting::MythUITextEditSetting(Storage *_storage):
-    StandardSetting(_storage), m_passwordEcho(false)
-{
-}
 
 void MythUITextEditSetting::SetPasswordEcho(bool b)
 {
@@ -427,15 +414,6 @@ void MythUITextEditSetting::updateButton(MythUIButtonListItem *item)
                             Directory Setting
 *******************************************************************************/
 
-MythUIFileBrowserSetting::MythUIFileBrowserSetting(Storage *_storage):
-    StandardSetting(_storage)
-{
-    m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files |
-                    QDir::Readable | QDir::Writable | QDir::Executable);
-    m_nameFilter.clear();
-    m_nameFilter << "*";
-}
-
 void MythUIFileBrowserSetting::edit(MythScreenType * screen)
 {
     if (!isEnabled())
@@ -473,20 +451,6 @@ void MythUIFileBrowserSetting::updateButton(MythUIButtonListItem *item)
 /******************************************************************************
                             ComboBoxSetting
 *******************************************************************************/
-/**
- * Create a Setting Widget to select the value from a list
- * \param _storage An object that knows how to get/set the value for
- *                 this item from/to a database.  This should be
- *                 created with a call to XXXStorage.
- * \param rw if set to true, the user can input it's own value
- */
-MythUIComboBoxSetting::MythUIComboBoxSetting(Storage *_storage, bool rw):
-    StandardSetting(_storage),
-    m_rewrite(rw),
-    m_isSet(false)
-{
-}
-
 MythUIComboBoxSetting::~MythUIComboBoxSetting()
 {
     m_labels.clear();
@@ -573,7 +537,7 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
                                  QString("NEWENTRY"),
                                  false,
                                  m_settingValue == "");
-        for (int i = 0; i < m_labels.size() && m_values.size(); ++i)
+        for (int i = 0; i < m_labels.size() && !m_values.empty(); ++i)
         {
             QString value = m_values.at(i);
             menuPopup->AddButton(m_labels.at(i),
@@ -734,11 +698,6 @@ MythUICheckBoxSetting::MythUICheckBoxSetting(Storage *_storage):
 {
 }
 
-bool MythUICheckBoxSetting::boolValue()
-{
-    return m_settingValue == "1";
-}
-
 void MythUICheckBoxSetting::setValue(const QString &value)
 {
     StandardSetting::setValue(value);
@@ -783,21 +742,6 @@ void MythUICheckBoxSetting::resultEdit(DialogCompletionEvent */*dce*/)
 /******************************************************************************
                            Standard setting dialog
 *******************************************************************************/
-
-StandardSettingDialog::StandardSettingDialog(MythScreenStack *parent,
-                                             const char *name,
-                                             GroupSetting *groupSettings) :
-    MythScreenType(parent, name),
-    m_buttonList(nullptr),
-    m_title(nullptr),
-    m_groupHelp(nullptr),
-    m_selectedSettingHelp(nullptr),
-    m_menuPopup(nullptr),
-    m_settingsTree(groupSettings),
-    m_currentGroupSetting(nullptr),
-    m_loaded(false)
-{
-}
 
 StandardSettingDialog::~StandardSettingDialog()
 {

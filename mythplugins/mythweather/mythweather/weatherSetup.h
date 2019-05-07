@@ -42,10 +42,11 @@ class GlobalSetup : public MythScreenType
     Q_OBJECT
 
   public:
-    GlobalSetup(MythScreenStack *parent, const QString &name);
+    GlobalSetup(MythScreenStack *parent, const QString &name)
+        : MythScreenType(parent, name) {}
     ~GlobalSetup() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void saveData(void);
@@ -54,11 +55,11 @@ class GlobalSetup : public MythScreenType
     void loadData(void);
 
   private:
-    MythUICheckBox *m_backgroundCheckbox;
-    MythUISpinBox *m_timeoutSpinbox;
-    int m_timeout;
-    int m_hold_timeout;
-    MythUIButton *m_finishButton;
+    MythUICheckBox *m_backgroundCheckbox {nullptr};
+    MythUISpinBox  *m_timeoutSpinbox     {nullptr};
+    int             m_timeout            {0};
+    int             m_hold_timeout       {0};
+    MythUIButton   *m_finishButton       {nullptr};
 };
 
 class ScreenSetup : public MythScreenType
@@ -69,9 +70,9 @@ class ScreenSetup : public MythScreenType
     ScreenSetup(MythScreenStack *parent, const QString &name, SourceManager *srcman);
     ~ScreenSetup();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
 
   protected slots:
     void updateHelpText(void);
@@ -103,12 +104,12 @@ class SourceSetup : public MythScreenType
     SourceSetup(MythScreenStack *parent, const QString &name);
     ~SourceSetup();
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     bool loadData(void);
 
   protected slots:
-    void sourceListItemSelected(MythUIButtonListItem *itm = nullptr);
+    void sourceListItemSelected(MythUIButtonListItem *item = nullptr);
     void updateSpinboxUpdate(void);
     void retrieveSpinboxUpdate(void);
     void saveData(void);
@@ -141,7 +142,7 @@ class LocationDialog : public MythScreenType
                    ScreenListInfo *si, SourceManager *srcman);
     ~LocationDialog();
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void doSearch(void);

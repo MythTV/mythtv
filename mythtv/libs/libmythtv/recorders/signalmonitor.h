@@ -37,7 +37,7 @@ class SignalMonitor : protected MThread
     /// Returns true iff the card type supports signal monitoring.
     static inline bool IsRequired(const QString &cardtype);
     static inline bool IsSupported(const QString &cardtype);
-    static SignalMonitor *Init(QString cardtype, int db_cardnum,
+    static SignalMonitor *Init(const QString& cardtype, int db_cardnum,
                                ChannelBase *channel,
                                bool release_stream);
     virtual ~SignalMonitor();
@@ -55,7 +55,7 @@ class SignalMonitor : protected MThread
     virtual void RemoveFlags(uint64_t _flags);
     bool HasFlags(uint64_t _flags)   const;
     bool HasAnyFlag(uint64_t _flags) const;
-    uint64_t GetFlags(void)          const { return flags; }
+    uint64_t GetFlags(void)          const { return m_flags; }
     virtual bool HasExtraSlowTuning(void) const { return false; }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
@@ -63,21 +63,21 @@ class SignalMonitor : protected MThread
 
     /// \brief Returns whether or not a SIGNAL MythEvent is being sent
     ///        regularly to the frontend.
-    bool GetNotifyFrontend() const { return notify_frontend; }
+    bool GetNotifyFrontend() const { return m_notify_frontend; }
     /// \brief Returns milliseconds between signal monitoring events.
-    int GetUpdateRate() const { return update_rate; }
+    int GetUpdateRate() const { return m_update_rate; }
     virtual QStringList GetStatusList(void) const;
 
     /// \brief Returns true iff scriptStatus.IsGood() and signalLock.IsGood()
     ///        return true
     bool HasSignalLock(void) const
     {
-        QMutexLocker locker(&statusLock);
-        return scriptStatus.IsGood() && signalLock.IsGood();
+        QMutexLocker locker(&m_statusLock);
+        return m_scriptStatus.IsGood() && m_signalLock.IsGood();
     }
 
     virtual bool IsAllGood(void) const { return HasSignalLock(); }
-    bool         IsErrored(void) const { return !error.isEmpty(); }
+    bool         IsErrored(void) const { return !m_error.isEmpty(); }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Sets  // // // // // // // // // // // // // // // // // // // // //
@@ -87,7 +87,7 @@ class SignalMonitor : protected MThread
      *  \param notify if true SIGNAL MythEvents are sent to the frontend,
      *         otherwise they are not.
      */
-    void SetNotifyFrontend(bool notify) { notify_frontend = notify; }
+    void SetNotifyFrontend(bool notify) { m_notify_frontend = notify; }
 
     /** \brief Indicate if table monitoring is needed
      *  \param parent The TVRec* that this signal monitor is attached to.
@@ -96,7 +96,7 @@ class SignalMonitor : protected MThread
      *         after the channel is tuned.
      */
     void SetMonitoring(TVRec * parent, bool EITscan, bool monitor)
-        { pParent = parent; eit_scan = EITscan, tablemon = monitor; }
+        { m_pParent = parent; m_eit_scan = EITscan, m_tablemon = monitor; }
 
     /** \brief Sets the number of milliseconds between signal monitoring
      *         attempts in the signal monitoring thread.
@@ -105,7 +105,7 @@ class SignalMonitor : protected MThread
      *  \param msec Milliseconds between signal monitoring events.
      */
     void SetUpdateRate(int msec)
-        { update_rate = max(msec, (int)minimum_update_rate); }
+        { m_update_rate = max(msec, (int)m_minimum_update_rate); }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Listeners   // // // // // // // // // // // // // // // // // // //
@@ -117,12 +117,12 @@ class SignalMonitor : protected MThread
     virtual void EmitStatus(void);
 
   protected:
-    SignalMonitor(int _capturecardnum, ChannelBase *_channel,
+    SignalMonitor(int _inputid, ChannelBase *_channel,
                   bool _release_stream, uint64_t wait_for_mask);
     // Prevent implicit conversion of wrongly ordered arguments
     SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
 
-    virtual void run(void);
+    void run(void) override; // MThread
 
     /// \brief This should be overridden to actually do signal monitoring.
     virtual void UpdateValues(void);
@@ -198,32 +198,34 @@ class SignalMonitor : protected MThread
     static const uint64_t kDVBSigMon_WaitForPos = 0x8000000000ULL;
 
   protected:
-    ChannelBase *channel;
-    TVRec       *pParent;
-    int          capturecardnum;
-    volatile uint64_t flags;
-    bool         release_stream;
-    int          update_rate;
-    uint         minimum_update_rate;
-    bool         update_done;
-    bool         notify_frontend;
-    bool         tablemon;
-    bool         eit_scan;
-    QString      error;
+    ChannelBase       *m_channel             {nullptr};
+    TVRec             *m_pParent             {nullptr};
+    int                m_inputid;
+    volatile uint64_t  m_flags;
+    bool               m_release_stream;
+    int                m_update_rate         {25};
+    uint               m_minimum_update_rate {5};
+    bool               m_update_done         {false};
+    bool               m_notify_frontend     {true};
+    bool               m_tablemon            {false};
+    bool               m_eit_scan            {false};
 
-    SignalMonitorValue signalLock;
-    SignalMonitorValue signalStrength;
-    SignalMonitorValue scriptStatus;
+    // not to be confused with StreamHandler::m_bError.
+    QString            m_error;
 
-    vector<SignalMonitorListener*> listeners;
+    SignalMonitorValue m_signalLock;
+    SignalMonitorValue m_signalStrength;
+    SignalMonitorValue m_scriptStatus;
 
-    QMutex             startStopLock;
-    QWaitCondition     startStopWait; // protected by startStopLock
-    volatile bool      running;       // protected by startStopLock
-    volatile bool      exit;          // protected by startStopLock
+    vector<SignalMonitorListener*> m_listeners;
 
-    mutable QMutex     statusLock;
-    mutable QMutex     listenerLock;
+    QMutex             m_startStopLock;
+    QWaitCondition     m_startStopWait;       // protected by startStopLock
+    volatile bool      m_running      {false}; // protected by startStopLock
+    volatile bool      m_exit         {false}; // protected by startStopLock
+
+    mutable QMutex     m_statusLock   {QMutex::Recursive};
+    mutable QMutex     m_listenerLock;
 };
 
 inline QString sm_flags_to_string(uint64_t flags)

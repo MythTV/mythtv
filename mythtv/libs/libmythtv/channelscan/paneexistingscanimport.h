@@ -44,47 +44,47 @@ class PaneExistingScanImport : public GroupSetting
 
   public:
     PaneExistingScanImport(const QString &target, StandardSetting *setting) :
-        sourceid(0), scanSelect(new TransMythUIComboBoxSetting())
+        m_scanSelect(new TransMythUIComboBoxSetting())
     {
         setVisible(false);
-        scanSelect->setLabel(tr("Scan to Import"));
-        setting->addTargetedChildren(target, {this, scanSelect});
+        m_scanSelect->setLabel(tr("Scan to Import"));
+        setting->addTargetedChildren(target, {this, m_scanSelect});
     }
 
-    virtual void load(void)
+    void Load(void) override // GroupSetting
     {
-        scanSelect->clearSelections();
-        if (!sourceid)
+        m_scanSelect->clearSelections();
+        if (!m_sourceid)
             return;
 
         vector<ScanInfo> scans = LoadScanList();
         for (uint i = 0; i < scans.size(); i++)
         {
-            if (scans[i].sourceid != sourceid)
+            if (scans[i].m_sourceid != m_sourceid)
                 continue;
 
             QString scanDate = MythDate::toString(
-                scans[i].scandate, MythDate::kDateTimeFull);
-            QString proc     = (scans[i].processed) ?
+                scans[i].m_scandate, MythDate::kDateTimeFull);
+            QString proc     = (scans[i].m_processed) ?
                 tr("processed") : tr("unprocessed");
 
-            scanSelect->addSelection(
+            m_scanSelect->addSelection(
                 QString("%1 %2").arg(scanDate).arg(proc),
-                QString::number(scans[i].scanid));
+                QString::number(scans[i].m_scanid));
         }
     }
 
-    void SetSourceID(uint _sourceid)
+    void SetSourceID(uint sourceid)
     {
-        sourceid = _sourceid;
-        load();
+        m_sourceid = sourceid;
+        Load();
     }
 
-    uint GetScanID(void) const { return scanSelect->getValue().toUInt(); }
+    uint GetScanID(void) const { return m_scanSelect->getValue().toUInt(); }
 
   private:
-    uint                  sourceid;
-    TransMythUIComboBoxSetting *scanSelect;
+    uint                        m_sourceid   {0};
+    TransMythUIComboBoxSetting *m_scanSelect {nullptr};
 };
 
 #endif // _PANE_EXISTING_SCAN_IMPORT_H_

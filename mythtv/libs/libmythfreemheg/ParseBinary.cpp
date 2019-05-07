@@ -33,19 +33,13 @@ been done before the binary was produced.  Creates a MHParseNode tree structure.
 #include "Groups.h"
 #include "Logging.h"
 
-MHParseBinary::MHParseBinary(QByteArray &program)
-{
-    m_data = program;
-    m_p = 0;
-}
-
 #define INDEFINITE_LENGTH   (-1)
 
 // Get the next byte.  In most all cases it's an error if we reach end-of-file
 // and we throw an exception.
 unsigned char MHParseBinary::GetNextChar()
 {
-    if (m_p >= (int)m_data.size())
+    if (m_p >= m_data.size())
     {
         MHERROR("Unexpected end of file");
     }
@@ -152,7 +146,7 @@ MHParseNode *MHParseBinary::DoParse()
             ch = GetNextChar();
             tagNumber = (tagNumber << 7) | (ch & 0x7f);
         }
-        while (ch & 0x80);   // Top bit set means there's more to come.
+        while ((ch & 0x80) != 0);   // Top bit set means there's more to come.
     }
 
     // Next byte is the length.  If it is less than 128 it is the actual length, otherwise it
@@ -317,64 +311,63 @@ MHParseNode *MHParseBinary::DoParse()
 
         return pNode;
     }
-    else   // Universal - i.e. a primitive type.
+
+    // Universal - i.e. a primitive type.
+    // Tag values
+
+    switch (tagNumber)
     {
-        // Tag values
+    case U_BOOL: // Boolean
+    {
+        int intVal = ParseInt(endOfItem);
+        return new MHPBool(intVal != 0);
+    }
+    case U_INT: // Integer
+    {
+        int intVal = ParseInt(endOfItem);
+        return new MHPInt(intVal);
+    }
+    case U_ENUM: // ENUM
+    {
+        int intVal = ParseInt(endOfItem);
+        return new MHPEnum(intVal);
+    }
+    case U_STRING: // String
+    {
+        MHOctetString str;
+        ParseString(endOfItem, str);
+        return new MHPString(str);
+    }
+    case U_NULL: // ASN1 NULL
+    {
+        return new MHPNull;
+    }
+    case U_SEQUENCE: // Sequence
+    {
+        MHParseSequence *pNode = new MHParseSequence();
 
-        switch (tagNumber)
+        if (endOfItem == INDEFINITE_LENGTH)
         {
-            case U_BOOL: // Boolean
-            {
-                int intVal = ParseInt(endOfItem);
-                return new MHPBool(intVal != 0);
-            }
-            case U_INT: // Integer
-            {
-                int intVal = ParseInt(endOfItem);
-                return new MHPInt(intVal);
-            }
-            case U_ENUM: // ENUM
-            {
-                int intVal = ParseInt(endOfItem);
-                return new MHPEnum(intVal);
-            }
-            case U_STRING: // String
-            {
-                MHOctetString str;
-                ParseString(endOfItem, str);
-                return new MHPString(str);
-            }
-            case U_NULL: // ASN1 NULL
-            {
-                return new MHPNull;
-            }
-            case U_SEQUENCE: // Sequence
-            {
-                MHParseSequence *pNode = new MHParseSequence();
-
-                if (endOfItem == INDEFINITE_LENGTH)
-                {
-                    MHERROR("Indefinite length sequences are not implemented");
-                }
-
-                try
-                {
-                    while (m_p < endOfItem)
-                    {
-                        pNode->Append(DoParse());
-                    }
-                }
-                catch (...)
-                {
-                    // Memory clean-up if error.
-                    delete pNode;
-                    throw;
-                }
-
-                return pNode;
-            }
-            default:
-                MHERROR(QString("Unknown universal %1").arg(tagNumber));
+            MHERROR("Indefinite length sequences are not implemented");
         }
+
+        try
+        {
+            while (m_p < endOfItem)
+            {
+                pNode->Append(DoParse());
+            }
+        }
+        catch (...)
+        {
+            // Memory clean-up if error.
+            delete pNode;
+            throw;
+        }
+
+        return pNode;
+    }
+    default:
+        MHERROR(QString("Unknown universal %1").arg(tagNumber));
     }
 }

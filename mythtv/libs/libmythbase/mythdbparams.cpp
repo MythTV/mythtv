@@ -2,6 +2,10 @@
 #include "mythlogging.h"
 
 /// Load sensible connection defaults.
+///
+/// This duplicates the initializer information, but is needed so that
+/// an existing object can be reset to the default values instead of
+/// creating a new object.
 void DatabaseParams::LoadDefaults(void)
 {
     dbHostName    = "localhost";

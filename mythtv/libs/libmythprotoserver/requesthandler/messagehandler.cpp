@@ -3,7 +3,7 @@
 
 #include "requesthandler/messagehandler.h"
 
-MessageHandler::MessageHandler(void) : SocketRequestHandler()
+MessageHandler::MessageHandler(void)
 {
     if (!gCoreContext)
     {
@@ -15,7 +15,7 @@ MessageHandler::MessageHandler(void) : SocketRequestHandler()
 
 void MessageHandler::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
+    if (e->type() != MythEvent::MythEventMessage)
         return;
 
     if (!gCoreContext->IsMasterBackend())
