@@ -136,7 +136,7 @@ void RemoteCancelNextRecording(uint inputid, bool cancel)
 vector<InputInfo> RemoteRequestFreeInputInfo(uint excluded_input)
 {
     LOG(VB_CHANNEL, LOG_INFO,
-        QString("RemoteRequestFreeInputInfo exluding input %1")
+        QString("RemoteRequestFreeInputInfo excluding input %1")
         .arg(excluded_input));
 
     vector<InputInfo> inputs;
