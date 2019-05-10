@@ -397,8 +397,6 @@ class Send(object):
 
         # TODO: Problem with the BE not accepting postdata in the initial
         # authorized query, Send a GET first as a workaround.
-        #
-        # Looks like a bug, Myth/version works for the backend.
 
         try:
             if self.opts['user'] and self.opts['pass']:
@@ -407,7 +405,11 @@ class Send(object):
                 if self.postdata:
                     saved_endpoint = self.endpoint
                     saved_postdata = self.postdata
-                    self.send(endpoint='Myth/version', opts=self.opts)
+                    # Need to adjust this if a service other than Frontend is
+                    # added.
+                    self.send(endpoint='{}/version'.format(
+                        'Myth' if self.endpoint[:8] != 'Frontend'
+                        else 'Frontend'), opts=self.opts)
                     self.endpoint = saved_endpoint
                     self.postdata = saved_postdata
         except KeyError:
