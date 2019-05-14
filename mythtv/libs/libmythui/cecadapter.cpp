@@ -431,6 +431,7 @@ class CECAdapterPriv
                 action = Qt::Key_M;
                 code   = "ROOT_MENU";
                 break;
+            case CEC_USER_CONTROL_CODE_AN_RETURN: //return (Samsung) (0x91) 
             case CEC_USER_CONTROL_CODE_EXIT:
                 action = Qt::Key_Escape;
                 code   = "EXIT";
@@ -768,6 +769,7 @@ class CECAdapterPriv
                 action = Qt::Key_M;
                 code   = "ROOT_MENU";
                 break;
+            case CEC_USER_CONTROL_CODE_AN_RETURN: //return (Samsung) (0x91) 
             case CEC_USER_CONTROL_CODE_EXIT:
                 action = Qt::Key_Escape;
                 code   = "EXIT";
