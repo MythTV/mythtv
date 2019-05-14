@@ -29,6 +29,7 @@ __version__ = "0.3.7"
 
 from optparse import OptionParser
 import sys
+import re
 
 def buildSingle(inetref, opts):
     from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
@@ -122,11 +123,27 @@ def buildList(query, opts):
     # replace all dashes from queries to work around search behavior
     # as negative to all text that comes afterwards
     query = query.replace('-',' ')
+    query = query.strip() # trim extra whitespace
+    # extract year from name -- note that we require a space before the year
+    # so we don't confuse movie names for years (example: "2012 - 2009",
+    # a 2009 movie); also note that we accept optional paranthesis around
+    # the year:
+    yearRegex = re.compile(r"\s\(?((19|20)[0-9]{2})\)?$")
+    year = yearRegex.search(query)
+    if year is not None:
+        year = year.group(1)
+    # if no year was found, we'll pass year=None to searchMovie,
+    # which is the default anyway
+
+    # get rid of the year (if any) from the query text, because
+    # it causes bad TMDB results
+    query = yearRegex.sub("", query)
+    query = query.strip()
 
     from MythTV.tmdb3 import searchMovie
     from MythTV import VideoMetadata
     from lxml import etree
-    results = iter(searchMovie(query))
+    results = iter(searchMovie(query, locale=None, adult=False, year=year))
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
                ['releasedate',  'releasedate'], ['tagline',     'tagline'],
