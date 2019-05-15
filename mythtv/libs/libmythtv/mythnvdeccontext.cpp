@@ -133,7 +133,7 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-using CUDA context");
                 return *PixFmt;
             }
-        PixFmt++;
+            PixFmt++;
         }
     }
     return AV_PIX_FMT_NONE;
@@ -155,7 +155,7 @@ int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
     VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 3; i++)
     {
         videoframe->pitches[i] = Frame->linesize[i];
         videoframe->offsets[i] = Frame->data[i] ? (static_cast<int>(Frame->data[i] - Frame->data[0])) : 0;
