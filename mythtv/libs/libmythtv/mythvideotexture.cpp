@@ -229,8 +229,6 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
 }
 
 /*! \brief Update the contents of the given Textures for data held in Frame.
- *
- * \todo Extend for format other than YV12.
 */
 void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                                       const VideoFrame *Frame,
@@ -470,7 +468,9 @@ inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const VideoF
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
-        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->pitches[Plane] >> 1 : Frame->pitches[Plane]);
+        bool hdr = Texture->m_frameFormat != FMT_NV12;
+        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->pitches[Plane] >> (hdr ? 2 : 1) :
+                                                             Frame->pitches[Plane] >> (hdr ? 1 : 0));
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
                                     static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
         Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -480,9 +480,8 @@ inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const VideoF
         if (!Texture->m_data)
             if (!CreateBuffer(Texture, Texture->m_bufferSize))
                 return;
-        int width = Plane ? Texture->m_size.width() << 1 : Texture->m_size.width();
-        copyplane(Texture->m_data, width, Frame->buf + Frame->offsets[Plane],
-                  Frame->pitches[Plane], width, Texture->m_size.height());
+        copyplane(Texture->m_data, Frame->pitches[Plane], Frame->buf + Frame->offsets[Plane],
+                  Frame->pitches[Plane], Frame->pitches[Plane], Texture->m_size.height());
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
     }
     Texture->m_valid = true;
