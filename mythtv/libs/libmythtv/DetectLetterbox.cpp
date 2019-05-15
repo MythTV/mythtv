@@ -25,6 +25,12 @@ DetectLetterbox::DetectLetterbox(MythPlayer* const player)
  */
 void DetectLetterbox::Detect(VideoFrame *frame)
 {
+    if (!frame || !GetDetectLetterbox())
+        return;
+
+    if (!m_player->GetVideoOutput())
+        return;
+
     unsigned char *buf = frame->buf;
     int *pitches = frame->pitches;
     int *offsets = frame->offsets;
@@ -45,12 +51,6 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     const int xPos[] = {width / 4, width / 2, width * 3 / 4};    // Lines to scan for black letterbox edge
     int topHits = 0, bottomHits = 0, minTop = 0, minBottom = 0, maxTop = 0, maxBottom = 0;
     int topHit[] = {0, 0, 0}, bottomHit[] = {0, 0, 0};
-
-    if (!GetDetectLetterbox())
-        return;
-
-    if (!m_player->GetVideoOutput())
-        return;
 
     switch (frame->codec) {
         case FMT_YV12:
