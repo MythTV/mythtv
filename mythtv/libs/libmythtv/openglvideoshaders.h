@@ -141,6 +141,70 @@ static const QString NV12LinearBlendFragmentShader[2] = {
 "    gl_FragColor = vec4(current, 1.0) * m_colourMatrix;\n"
 "}\n"};
 
+#define KERNELNV12 "\
+highp vec3 kernelNV12(in highp vec3 yvu, sampler2D texture11, sampler2D texture12, sampler2D texture21, sampler2D texture22)\n\
+{\n\
+    highp vec2 twoup   = v_texcoord0 - vec2(0.0, (2.0 * m_frameData.x));\n\
+    highp vec2 twodown = v_texcoord0 + vec2(0.0, (2.0 * m_frameData.x));\n\
+    twodown.t = min(twodown.t, m_frameData.z);\n\
+    highp vec2 onedown = v_texcoord0 + vec2(0.0, m_frameData.x);\n\
+    onedown.t = min(onedown.t, m_frameData.z);\n\
+    highp vec3 line0   = sampleNV12(texture11, texture12, twoup);\n\
+    highp vec3 line1   = sampleNV12(texture11, texture12, v_texcoord0 - vec2(0.0, m_frameData.x));\n\
+    highp vec3 line3   = sampleNV12(texture11, texture12, onedown);\n\
+    highp vec3 line4   = sampleNV12(texture11, texture12, twodown);\n\
+    highp vec3 line00  = sampleNV12(texture21, texture22, twoup);\n\
+    highp vec3 line20  = sampleNV12(texture21, texture22, v_texcoord0);\n\
+    highp vec3 line40  = sampleNV12(texture21, texture22, twodown);\n\
+    yvu *=           0.125;\n\
+    yvu += line20 *  0.125;\n\
+    yvu += line1  *  0.5;\n\
+    yvu += line3  *  0.5;\n\
+    yvu += line0  * -0.0625;\n\
+    yvu += line4  * -0.0625;\n\
+    yvu += line00 * -0.0625;\n\
+    yvu += line40 * -0.0625;\n\
+    return yvu;\n\
+}\n"
+
+static const QString NV12KernelShader[2] = {
+"//NV12RGBKernelShader 1\n"
+"uniform sampler2D s_texture2;\n"
+"uniform sampler2D s_texture3;\n"
+"uniform sampler2D s_texture4;\n"
+"uniform sampler2D s_texture5;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+"%NV12SAMPLER%"
+KERNELNV12
+"void main(void)\n"
+"{\n"
+"    highp vec3 yvu = sampleNV12(s_texture2, s_texture3, v_texcoord0);\n"
+"    if (fract(v_texcoord0.t * m_frameData.w) >= 0.5)\n"
+"        yvu = kernelNV12(yvu, s_texture2, s_texture3, s_texture4, s_texture5);\n"
+"    gl_FragColor = vec4(yvu, 1.0) * m_colourMatrix;\n"
+"}\n",
+
+"//NV12RGBKernelShader 2\n"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform sampler2D s_texture2;\n"
+"uniform sampler2D s_texture3;\n"
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"varying highp vec2 v_texcoord0;\n"
+"%NV12SAMPLER%"
+KERNELNV12
+"void main(void)\n"
+"{\n"
+"    highp vec3 yvu = sampleNV12(s_texture2, s_texture3, v_texcoord0);\n"
+"    if (fract(v_texcoord0.t * m_frameData.w) < 0.5)\n"
+"        yvu = kernelNV12(yvu, s_texture2, s_texture3, s_texture0, s_texture1);\n"
+"    gl_FragColor = vec4(yvu, 1.0) * m_colourMatrix;\n"
+"}\n"
+};
+
 static const QString SelectColumn =
 "    if (fract(v_texcoord0.x * m_frameData.y) < 0.5)\n"
 "        yuva = yuva.rabg;\n";
