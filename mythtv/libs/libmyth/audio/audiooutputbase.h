@@ -155,14 +155,16 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     int CheckFreeSpace(int &frames);
 
-    inline int audiolen(); // number of valid bytes in audio buffer
-    int audiofree();       // number of free bytes in audio buffer
-    int audioready();      // number of bytes ready to be written
+    inline int audiolen() const; // number of valid bytes in audio buffer
+    int audiofree() const;       // number of free bytes in audio buffer
+    int audioready() const;      // number of bytes ready to be written
 
     void SetStretchFactorLocked(float factor);
 
     // For audiooutputca
     int GetBaseAudBufTimeCode() const { return m_audbuf_timecode; }
+
+    bool usesSpdif() const { return m_usesSpdif; }
 
   protected:
     // Basic details about the audio stream
@@ -295,6 +297,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     int64_t           m_length_last_data                  {0};
 
     // SPDIF Encoder for digital passthrough
+    bool              m_usesSpdif                         {true};
     SPDIFEncoder     *m_spdifenc                          {nullptr};
 
     // Flag indicating if SetStretchFactor enabled audio float processing

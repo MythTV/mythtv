@@ -576,6 +576,13 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
     }
 
 #ifdef USING_BROADCOM
+    // output bits per 10 frames
+    int obpf;
+    if (m_passthru && !usesSpdif())
+        obpf = m_source_bitrate * 10 / m_source_samplerate;
+    else
+        obpf = m_output_bytes_per_frame * 80;
+
     OMX_PARAM_U32TYPE u;
     OMX_DATA_INIT(u);
     u.nPortIndex = m_audiorender.Base();
@@ -586,7 +593,7 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
             "GetConfig AudioRenderingLatency error %1").arg(Error2String(e)));
         return 0;
     }
-    return u.nU32 * m_output_bytes_per_frame;
+    return u.nU32 * obpf / 80;
 #else
     return m_pending;
 #endif

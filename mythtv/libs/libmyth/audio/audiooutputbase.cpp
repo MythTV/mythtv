@@ -24,6 +24,11 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythconfig.h"
 
+// AC3 encode currently disabled for Android
+#if defined(Q_OS_ANDROID)
+#define DISABLE_AC3_ENCODE
+#endif
+
 #define LOC QString("AOBase: ")
 
 #define WPOS (m_audiobuffer + org_waud)
@@ -61,6 +66,9 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(m_src_in_buf,         0, sizeof(m_src_in_buf));
     memset(m_audiobuffer,        0, sizeof(m_audiobuffer));
 
+    if (m_main_device.startsWith("OpenMAX:")
+        || m_main_device.startsWith("AudioTrack:"))
+        m_usesSpdif = false;
     // Handle override of SRC quality settings
     if (gCoreContext->GetBoolSetting("SRCQualityOverride", false))
     {
@@ -313,7 +321,7 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         m_pSoundStretch->setSampleRate(m_samplerate);
         m_pSoundStretch->setChannels(channels);
         m_pSoundStretch->setTempo(m_stretchfactor);
-#if ARCH_ARM
+#if ARCH_ARM || defined(Q_OS_ANDROID)
         // use less demanding settings for Raspberry pi
         m_pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 82);
         m_pSoundStretch->setSetting(SETTING_USE_AA_FILTER, 0);
@@ -415,11 +423,11 @@ bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
 
     delete m_spdifenc;
 
-    // No spdif encoder if using openmax audio
-    if (m_main_device.startsWith("OpenMAX:"))
-        m_spdifenc = nullptr;
-    else
+    // No spdif encoder needed for certain devices
+    if (m_usesSpdif)
         m_spdifenc = new SPDIFEncoder("spdif", codec);
+    else
+        m_spdifenc = nullptr;
     if (m_spdifenc && m_spdifenc->Succeeded() && codec == AV_CODEC_ID_DTS)
     {
         switch(codec_profile)
@@ -476,10 +484,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             m_output_settings->IsSupportedChannels(lconfigured_channels);
 
         // check if the number of channels could be transmitted via AC3 encoding
+#ifndef DISABLE_AC3_ENCODE
         lenc = m_output_settingsdigital->canFeature(FEATURE_AC3) &&
             (!m_output_settings->canFeature(FEATURE_LPCM) &&
              lconfigured_channels > 2 && lconfigured_channels <= 6);
-
+#endif
         if (!lenc && !cando_channels)
         {
             // if hardware doesn't support source audio configuration
@@ -517,11 +526,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
            and we have more than 2 channels but multichannel PCM is not
            supported or if the device just doesn't support the number of
            channels */
+#ifndef DISABLE_AC3_ENCODE
         lenc = m_output_settingsdigital->canFeature(FEATURE_AC3) &&
             ((!m_output_settings->canFeature(FEATURE_LPCM) &&
               lconfigured_channels > 2) ||
              !m_output_settings->IsSupportedChannels(lconfigured_channels));
-
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
         if (m_output_settingsdigital->canFeature(FEATURE_AC3) &&
@@ -530,7 +539,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         {
             lreenc = true;
         }
-
+#endif
         // Enough channels? Upmix if not, but only from mono/stereo/5.0 to 5.1
         if (IS_VALID_UPMIX_CHANNEL(settings.m_channels) &&
             settings.m_channels < lconfigured_channels)
@@ -968,7 +977,7 @@ void AudioOutputBase::SetEffDsp(int dsprate)
 /**
  * Get the number of bytes in the audiobuffer
  */
-inline int AudioOutputBase::audiolen()
+inline int AudioOutputBase::audiolen() const
 {
     if (m_waud >= m_raud)
         return m_waud - m_raud;
@@ -978,7 +987,7 @@ inline int AudioOutputBase::audiolen()
 /**
  * Get the free space in the audiobuffer in bytes
  */
-int AudioOutputBase::audiofree()
+int AudioOutputBase::audiofree() const
 {
     return kAudioRingBufferSize - audiolen() - 1;
     /* There is one wasted byte in the buffer. The case where waud = raud is
@@ -993,7 +1002,7 @@ int AudioOutputBase::audiofree()
  * This value can differ from that returned by audiolen if samples are
  * being converted to floats and the output sample format is not 32 bits
  */
-int AudioOutputBase::audioready()
+int AudioOutputBase::audioready() const
 {
     if (m_passthru || m_enc || m_bytes_per_frame == m_output_bytes_per_frame)
         return audiolen();
@@ -1008,7 +1017,20 @@ int64_t AudioOutputBase::GetAudiotime(void)
     if (m_audbuf_timecode == 0 || !m_configure_succeeded)
         return 0;
 
-    int obpf = m_output_bytes_per_frame;
+    // output bits per 10 frames
+    int64_t obpf;
+
+    if (m_passthru && !usesSpdif())
+        obpf = m_source_bitrate * 10 / m_source_samplerate;
+    else
+    if (m_enc && !usesSpdif())
+    {
+        // re-encode bitrate is hardcoded at 448000
+        obpf = 448000 * 10 / m_source_samplerate;
+    }
+    else
+        obpf = m_output_bytes_per_frame * 80;
+
     int64_t oldaudiotime;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
@@ -1029,11 +1051,11 @@ int64_t AudioOutputBase::GetAudiotime(void)
 
     QMutexLocker lockav(&m_avsync_lock);
 
-    int soundcard_buffer = GetBufferedOnSoundcard(); // bytes
+    int64_t soundcard_buffer = GetBufferedOnSoundcard(); // bytes
 
     /* audioready tells us how many bytes are in audiobuffer
        scaled appropriately if output format != internal format */
-    int main_buffer = audioready();
+    int64_t main_buffer = audioready();
 
     oldaudiotime = m_audiotime;
 
@@ -1041,9 +1063,10 @@ int64_t AudioOutputBase::GetAudiotime(void)
        of major post-stretched buffer contents
        processing latencies are catered for in AddData/SetAudiotime
        to eliminate race */
-    m_audiotime = m_audbuf_timecode - (m_effdsp && obpf ? (
-        ((int64_t)(main_buffer + soundcard_buffer) * m_eff_stretchfactor) /
-        (m_effdsp * obpf)) : 0);
+
+    m_audiotime = m_audbuf_timecode - (m_effdsp && obpf ?
+        ((main_buffer + soundcard_buffer) * int64_t(m_eff_stretchfactor)
+        * 80 / int64_t(m_effdsp) / obpf) : 0);
 
     /* audiotime should never go backwards, but we might get a negative
        value if GetBufferedOnSoundcard() isn't updated by the driver very
