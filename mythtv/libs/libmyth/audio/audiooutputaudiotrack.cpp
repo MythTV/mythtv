@@ -56,7 +56,6 @@ AudioOutputAudioTrack::AudioOutputAudioTrack(const AudioSettings &settings) :
 AudioOutputAudioTrack::~AudioOutputAudioTrack()
 {
     KillAudio();
-    CloseDevice();
 }
 
 bool AudioOutputAudioTrack::OpenDevice()
@@ -294,4 +293,28 @@ void AudioOutputAudioTrack::SetSourceBitrate(int rate)
 
         }
     }
+}
+
+bool AudioOutputAudioTrack::StartOutputThread(void)
+{
+    QAndroidJniEnvironment env;
+    if (m_audioTrack)
+    {
+        m_audioTrack->callMethod<void>("setOutputThread","(Z)V",true);
+        ANDROID_EXCEPTION_CLEAR
+    }
+
+    return AudioOutputBase::StartOutputThread();
+}
+
+void AudioOutputAudioTrack::StopOutputThread(void)
+{
+    QAndroidJniEnvironment env;
+    if (m_audioTrack)
+    {
+        m_audioTrack->callMethod<void>("setOutputThread","(Z)V",false);
+        ANDROID_EXCEPTION_CLEAR
+    }
+
+    AudioOutputBase::StopOutputThread();
 }

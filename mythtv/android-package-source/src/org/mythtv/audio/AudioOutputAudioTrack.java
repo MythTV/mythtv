@@ -26,6 +26,7 @@ public class AudioOutputAudioTrack
     int latencyCount;
     boolean isSettled;
     boolean isBufferInFlux;
+    boolean isOutputThreadStarted;
 
     public AudioOutputAudioTrack(int encoding, int sampleRate, int bufferSize, int channels)
     {
@@ -94,36 +95,34 @@ public class AudioOutputAudioTrack
         int written = 0;
         int ret = 0;
         int i;
-        if (player != null)
+        while (buf.hasRemaining())
         {
-            while (buf.hasRemaining())
+            synchronized(syncBuffer)
             {
+                // get out if we should not be here
+                if (player == null || !isOutputThreadStarted)
+                    break;
                 ret = player.write(buf, buf.remaining(), AudioTrack.WRITE_NON_BLOCKING);
                 if (ret < 0)
                 {
                     break;
                 }
                 written += ret;
-                synchronized(syncBuffer)
-                {
-                    bytesWritten += ret;
-                    lastwritetime = System.nanoTime();
-                    // Note that only after this method returns is this data
-                    // removed from the caller's buffer.
-                    // bufferedBytes may be negative because actually some
-                    // data still in the "Audio circular buffer" may have
-                    // already played.
-                    bufferedBytes = buf.remaining() - sizeInBytes;
-                }
-                try
-                {
-                    Thread.sleep(10);
-                }
-                catch (InterruptedException ex) {}
+                bytesWritten += ret;
+                lastwritetime = System.nanoTime();
+                // Note that only after this method returns is this data
+                // removed from the caller's buffer.
+                // bufferedBytes may be negative because actually some
+                // data still in the "Audio circular buffer" may have
+                // already played.
+                bufferedBytes = buf.remaining() - sizeInBytes;
             }
+            try
+            {
+                Thread.sleep(10);
+            }
+            catch (InterruptedException ex) {}
         }
-        else
-            written = AudioTrack.ERROR;
         synchronized(syncBuffer)
         {
             // After we return to caller, the data will be removed from
@@ -216,9 +215,21 @@ public class AudioOutputAudioTrack
 
     public void release ()
     {
-        if (player != null)
+        if (player == null)
+            return;
+
+        synchronized(syncBuffer)
+        {
+            pause(true);
+            player.flush();
             player.release();
-        player = null;
+            player = null;
+        }
+    }
+
+    public void setOutputThread (boolean isStarted)
+    {
+        isOutputThreadStarted = isStarted;
     }
 
 }

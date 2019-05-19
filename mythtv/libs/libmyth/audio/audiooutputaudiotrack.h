@@ -35,6 +35,8 @@ class AudioOutputAudioTrack : public AudioOutputBase
     int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
     void SetSourceBitrate(int rate) override; // AudioOutputBase
+    bool StartOutputThread(void) override; // AudioOutputBase
+    void StopOutputThread(void) override; // AudioOutputBase
     QAndroidJniObject *m_audioTrack {nullptr};
     int m_bitsPer10Frames {0};
 };
