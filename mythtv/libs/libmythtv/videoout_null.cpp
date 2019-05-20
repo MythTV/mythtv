@@ -199,6 +199,11 @@ void VideoOutputNull::StopEmbedding(void)
         VideoOutput::StopEmbedding();
 }
 
+void VideoOutputNull::SetDeinterlacing(bool, bool)
+{
+    vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE);
+}
+
 void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                    OSD *osd)
 {
@@ -242,8 +247,9 @@ void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
     disp_timecode = av_pause_frame.disp_timecode;
 }
 
-void VideoOutputNull::ProcessFrame(VideoFrame */*frame*/, OSD */*osd*/,
-                                   const PIPMap &/*pipPlayers*/,
-                                   FrameScanType /*scan*/)
+void VideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD*, const PIPMap &,
+                                   FrameScanType Scan)
 {
+    if (Frame && !Frame->dummy)
+        m_deinterlacer.Filter(Frame, Scan);
 }

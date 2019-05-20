@@ -326,7 +326,12 @@ void framecopy(VideoFrame* dst, const VideoFrame* src, bool useSSE)
     dst->interlaced_frame = src->interlaced_frame;
     dst->repeat_pict      = src->repeat_pict;
     dst->top_field_first  = src->top_field_first;
+    dst->interlaced_reversed = src->interlaced_reversed;
     dst->colorspace       = src->colorspace;
+    dst->colorrange       = src->colorrange;
+    dst->colorprimaries   = src->colorprimaries;
+    dst->colortransfer    = src->colortransfer;
+    dst->chromalocation   = src->chromalocation;
 
     if (FMT_YV12 == codec)
     {
@@ -616,7 +621,12 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
     dst->interlaced_frame = src->interlaced_frame;
     dst->repeat_pict      = src->repeat_pict;
     dst->top_field_first  = src->top_field_first;
+    dst->interlaced_reversed = src->interlaced_reversed;
     dst->colorspace       = src->colorspace;
+    dst->colorrange       = src->colorrange;
+    dst->colorprimaries   = src->colorprimaries;
+    dst->colortransfer    = src->colortransfer;
+    dst->chromalocation   = src->chromalocation;
 
     int width   = src->width;
     int height  = src->height;
@@ -806,3 +816,27 @@ int ColorDepth(int Format)
     return 8;
 }
 
+MythDeintType GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type)
+{
+    if (!Frame)
+        return DEINT_NONE;
+    MythDeintType options = Frame->deinterlace_single & Frame->deinterlace_allowed;
+    if (!(options & Type))
+        return DEINT_NONE;
+    return GetDeinterlacer(options);
+}
+
+MythDeintType GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type)
+{
+    if (!Frame)
+        return DEINT_NONE;
+    MythDeintType options = Frame->deinterlace_double & Frame->deinterlace_allowed;
+    if (!(options & Type))
+        return DEINT_NONE;
+    return GetDeinterlacer(options);
+}
+
+MythDeintType GetDeinterlacer(MythDeintType Option)
+{
+    return Option & (DEINT_BASIC | DEINT_MEDIUM | DEINT_HIGH);
+}

@@ -195,8 +195,8 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
         memset(At(i), 0, sizeof(VideoFrame));
         At(i)->codec            = FMT_NONE;
         At(i)->interlaced_frame = -1;
-        At(i)->top_field_first  = +1;
-        m_vbufferMap[At(i)]       = i;
+        At(i)->top_field_first  = 1;
+        m_vbufferMap[At(i)]     = i;
     }
 
     m_needFreeFrames            = NeedFree;
@@ -211,6 +211,35 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
 
     for (uint i = 0; i < NumDecode; i++)
         Enqueue(kVideoBuffer_avail, At(i));
+    SetDeinterlacing(DEINT_NONE, DEINT_NONE);
+}
+
+void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double)
+{
+    QMutexLocker locker(&m_globalLock);
+    frame_vector_t::iterator it = m_buffers.begin();
+    for ( ; it != m_buffers.end(); ++it)
+        SetDeinterlacingFlags(*it, Single, Double);
+}
+
+/*! \brief Set the appropriate flags for single and double rate deinterlacing
+ * \note Double rate support is determined by the VideoOutput class and must be set appropriately
+ * \note Driver deinterlacers are only available for hardware frames with the exception of
+ * NVDEC and VTB which can use shaders.
+ * \note Shader and CPU deinterlacers are disabled for hardware frames (except for shaders with NVDEC and VTB)
+ * \note There is no support for CPU deinterlacing of NV12 frames (and 10bit eqivalents) so we
+ * fallback to shaders
+ * \todo Handling of decoder deinterlacing with NVDEC
+*/
+void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single, MythDeintType Double)
+{
+    static const MythDeintType hardware = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
+    static const MythDeintType software = DEINT_ALL & ~DEINT_DRIVER;
+    static const MythDeintType shaders  = software & ~DEINT_CPU;
+    Frame.deinterlace_single = Single;
+    Frame.deinterlace_double = Double;
+    Frame.deinterlace_allowed = format_is_hw(Frame.codec) ? (format_is_hwyuv(Frame.codec) ? software : hardware) :
+                               (format_is_nv12(Frame.codec) ? shaders : software);
 }
 
 /**
@@ -220,15 +249,6 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
 void VideoBuffers::Reset()
 {
     QMutexLocker locker(&m_globalLock);
-
-    // Delete ffmpeg VideoFrames so we can create
-    // a different number of buffers below
-    frame_vector_t::iterator it = m_buffers.begin();
-    for (;it != m_buffers.end(); ++it)
-    {
-        av_freep(&it->qscale_table);
-    }
-
     m_available.clear();
     m_used.clear();
     m_limbo.clear();
@@ -252,9 +272,9 @@ void VideoBuffers::SetPrebuffering(bool Normal)
 void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
 #if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC)
-    if ((Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX) || (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC) ||
-        (Frame->pix_fmt == AV_PIX_FMT_VAAPI) || (Frame->pix_fmt == AV_PIX_FMT_VDPAU) ||
-        (Frame->pix_fmt == AV_PIX_FMT_CUDA))
+    if ((Frame->codec == FMT_VTB)   || (Frame->codec == FMT_MEDIACODEC) ||
+        (Frame->codec == FMT_VAAPI) || (Frame->codec == FMT_VDPAU) ||
+        (Frame->codec == FMT_NVDEC))
     {
         AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref)
@@ -858,7 +878,6 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height,
              Type, Buffers[i], YUVInfos[i].m_width, YUVInfos[i].m_height,
              max(buf_size, YUVInfos[i].m_size),
              (const int*) YUVInfos[i].m_pitches, (const int*) YUVInfos[i].m_offsets);
-
         ok &= (Buffers[i] != nullptr);
     }
 
@@ -907,11 +926,7 @@ void VideoBuffers::DeleteBuffers(void)
 {
     next_dbg_str = 0;
     for (uint i = 0; i < Size(); i++)
-    {
         m_buffers[i].buf = nullptr;
-        av_freep(&m_buffers[i].qscale_table);
-    }
-
     for (size_t i = 0; i < m_allocatedArrays.size(); i++)
         av_free(m_allocatedArrays[i]);
     m_allocatedArrays.clear();
@@ -933,20 +948,17 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
     {
         if (At(i) == Frame)
         {
-            av_freep(&Frame->qscale_table);
-            Frame->qscale_table = nullptr;
-
             VideoFrameType old = Frame->codec;
-            int size = buffersize(Type, Frame->width, Frame->height);
+            int size = static_cast<int>(buffersize(Type, Frame->width, Frame->height));
             unsigned char *buf = Frame->buf;
             if (Frame->size != size)
             {
                 // Free existing buffer
                 av_free(m_allocatedArrays[i]);
-                m_allocatedArrays[i] = Frame->buf = nullptr;
+                m_allocatedArrays[i] = Frame->buf = buf = nullptr;
 
                 // Initialise new
-                buf = (unsigned char*)av_malloc(size + 64);
+                buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(size + 64)));
                 if (!buf)
                 {
                     LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
@@ -956,9 +968,13 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
             }
 
             m_allocatedArrays[i] = buf;
+            MythDeintType singler = Frame->deinterlace_single;
+            MythDeintType doubler = Frame->deinterlace_double;
             init(Frame, Type, buf, Frame->width, Frame->height, size);
+            // retain deinterlacer settings and update restrictions based on new frame type
+            SetDeinterlacingFlags(*Frame, singler, doubler);
             clear(Frame);
-            LOG(VB_PLAYBACK, LOG_DEBUG, QString("Reallocated frame %1->%2")
+            LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1->%2")
                 .arg(format_description(old)).arg(format_description(Type)));
             EndLock();
             return true;

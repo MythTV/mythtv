@@ -285,7 +285,7 @@ int mpeg_version(int codec_id);
 #endif
 
 #ifdef USING_VAAPI
-#define CODEC_IS_VAAPI(codec, enc) (codec && IS_VAAPI_PIX_FMT(enc->pix_fmt))
+#define CODEC_IS_VAAPI(codec, enc) (codec && (enc->pix_fmt == AV_PIX_FMT_VAAPI))
 #else
 #define CODEC_IS_VAAPI(codec, enc) (0)
 #endif

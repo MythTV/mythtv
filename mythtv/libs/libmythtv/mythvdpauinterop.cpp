@@ -89,17 +89,26 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
     return false;
 }
 
-bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSurface Surface)
+bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSurface Surface,
+                                 MythDeintType Deint, bool DoubleRate)
 {
     if (!m_helper || !m_context || !Surface || !DeviceContext)
         return false;
 
-    if (!(m_mixer && m_outputSurface))
+    if (!m_mixer)
     {
         VdpChromaType chroma = VDP_CHROMA_TYPE_420;
         QSize size = m_helper->GetSurfaceParameters(Surface, chroma);
+        m_mixer = m_helper->CreateMixer(size, chroma, Deint);
+        m_deinterlacer = Deint;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup deinterlacer '%1'")
+            .arg(DeinterlacerName(m_deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VDPAU)));
+    }
 
-        m_mixer = m_helper->CreateMixer(size, chroma);
+    if (!m_outputSurface)
+    {
+        VdpChromaType chroma = VDP_CHROMA_TYPE_420;
+        QSize size = m_helper->GetSurfaceParameters(Surface, chroma);
         m_outputSurface = m_helper->CreateOutputSurface(size);
         if (m_outputSurface)
         {
@@ -148,7 +157,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
  * \note There can only be one VDPAU context mapped to an OpenGL context. This causes
  * a minor issue when seeking (usually with H.264) as the decoder is recreated but
  * we still have a pause frame associated with the old decoder. Hence this interop is not
- * released and remains bound to the OpenGL context. This resolves itseld once the pause
+ * released and remains bound to the OpenGL context. This resolves itself once the pause
  * frame is replaced (i.e. after one new frame is displayed).
  *
  * \note We use a VdpVideoMixer to complete the conversion from YUV to RGB. Hence the returned
@@ -157,7 +166,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
 vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
                                                     VideoColourSpace *ColourSpace,
                                                     VideoFrame *Frame,
-                                                    FrameScanType)
+                                                    FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
     if (!Frame)
@@ -202,8 +211,34 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     if (!surface)
         return result;
 
+    // Check for deinterlacing - VDPAU deinterlacers trump all others as we can only
+    // deinterlace VDPAU frames here. So accept any deinterlacer.
+    // N.B. basic deinterlacing requires no additional setup and is managed with
+    // the field/frame parameter
+    bool doublerate = true;
+    MythDeintType deinterlacer = DEINT_BASIC;
+    if (kScan_Interlaced == Scan || kScan_Intr2ndField == Scan)
+    {
+        MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+        if (!driverdeint)
+        {
+            doublerate = false;
+            driverdeint = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+        }
+
+        if (driverdeint)
+            deinterlacer = driverdeint;
+
+        // destroy the current mixer if necessary
+        if (deinterlacer != m_deinterlacer)
+        {
+            m_helper->DeleteMixer(m_mixer);
+            m_mixer = 0;
+        }
+    }
+
     // We need a mixer, an output surface and mapped texture
-    if (!InitVDPAU(devicecontext, surface))
+    if (!InitVDPAU(devicecontext, surface, deinterlacer, doublerate))
         return result;
 
     // Update colourspace and initialise on first frame - after mixer is created
@@ -230,7 +265,9 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Render surface
-    m_helper->MixerRender(m_mixer, surface, m_outputSurface);
+    m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
+                          Frame->interlaced_reversed ? !Frame->top_field_first :
+                          Frame->top_field_first);
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 

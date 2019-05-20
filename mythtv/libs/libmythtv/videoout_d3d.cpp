@@ -174,7 +174,6 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
     if (Init(video_dim_buf, video_dim_disp,
              aspect, (WId)m_hWnd, disp, av_codec_id))
     {
-        BestDeint();
         return true;
     }
 
@@ -512,7 +511,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (frame)
         dummy = frame->dummy;
 
-    bool safepauseframe = pauseframe && !IsBobDeint() && !gpu;
+    bool safepauseframe = pauseframe && !gpu;
 
     if (!window.IsEmbedding())
         ShowPIPs(frame, pipPlayers);
@@ -638,18 +637,6 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
 MythPainter *VideoOutputD3D::GetOSDPainter(void)
 {
     return m_osd_painter;
-}
-
-bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
-{
-    if (codec_is_std(video_codec_id))
-    {
-        return !filtername.contains("bobdeint") &&
-               !filtername.contains("opengl") &&
-               !filtername.contains("vdpau");
-    }
-
-    return false;
 }
 
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(

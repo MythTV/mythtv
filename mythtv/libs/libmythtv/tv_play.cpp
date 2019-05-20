@@ -12052,15 +12052,13 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
         m_tvmSubsEnabled      = ctx->m_player->GetCaptionsEnabled();
         m_tvmSubsHaveText     = ctx->m_player->HasTextSubtitles();
         m_tvmSubsForcedOn     = ctx->m_player->GetAllowForcedSubtitles();
-        ctx->m_player->GetVideoOutput()->GetDeinterlacers(m_tvmDeinterlacers);
-        QStringList decoderdeints
-            = ctx->m_player->GetMythCodecContext()->GetDeinterlacers();
-        m_tvmDeinterlacers.append(decoderdeints);
-        m_tvmCurrentDeinterlacer
-            = ctx->m_player->GetMythCodecContext()->getDeinterlacerName();
-        if (m_tvmCurrentDeinterlacer.isEmpty())
-            m_tvmCurrentDeinterlacer =
-                ctx->m_player->GetVideoOutput()->GetDeinterlacer();
+        //ctx->m_player->GetVideoOutput()->GetDeinterlacers(m_tvmDeinterlacers);
+        //QStringList decoderdeints = ctx->m_player->GetMythCodecContext()->GetDeinterlacers();
+        //m_tvmDeinterlacers.append(decoderdeints);
+        //m_tvmCurrentDeinterlacer = ctx->m_player->GetMythCodecContext()->getDeinterlacerName();
+        //if (m_tvmCurrentDeinterlacer.isEmpty())
+        //    m_tvmCurrentDeinterlacer =
+        //        ctx->m_player->GetVideoOutput()->GetDeinterlacer();
         if (m_tvmVisual)
             m_tvmVisualisers = ctx->m_player->GetVisualiserList();
         VideoOutput *vo = ctx->m_player->GetVideoOutput();

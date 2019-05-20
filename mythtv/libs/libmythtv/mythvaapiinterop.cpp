@@ -149,11 +149,11 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFram
 
 MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type InteropType)
   : MythVAAPIInterop(Context, InteropType),
-    m_lastSurface(0),
     m_vaapiPictureAttributes(nullptr),
     m_vaapiPictureAttributeCount(0),
     m_vaapiHueBase(0),
-    m_vaapiColourSpace(0)
+    m_vaapiColourSpace(0),
+    m_deinterlacer(DEINT_NONE)
 {
 }
 
@@ -169,10 +169,39 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
         return flags;
 
     // Set deinterlacing
-    if (Scan == kScan_Interlaced)
-        flags = Frame->top_field_first ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
-    else if (Scan == kScan_Intr2ndField)
-        flags = Frame->top_field_first ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
+    if (is_interlaced(Scan))
+    {
+        // As for VDPAU, only VAAPI can deinterlace these frames - so accept any deinterlacer
+        bool doublerate = true;
+        MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+        if (!driverdeint)
+        {
+            doublerate = false;
+            driverdeint = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+        }
+
+        if (driverdeint)
+        {
+            driverdeint = DEINT_BASIC;
+            if (m_deinterlacer != driverdeint)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Enabled deinterlacer '%1'")
+                    .arg(DeinterlacerName(driverdeint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
+            }
+
+            bool top = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
+            if (Scan == kScan_Interlaced)
+                flags = top ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
+            else if (Scan == kScan_Intr2ndField)
+                flags = top ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
+            m_deinterlacer = driverdeint;
+        }
+        else if (m_deinterlacer)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled basic VAAPI deinterlacer");
+            m_deinterlacer = DEINT_NONE;
+        }
+    }
 
     // Update colourspace
     if (!m_vaapiColourSpace)
@@ -267,6 +296,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
     if (updatecscmatrix > -1)
     {
         // FIXME - this is untested. Presumably available with the VDPAU backend.
+        // UPDATE - not implemented in VDPAU backend. Looks like maybe Android only??
         // If functioning correctly we need to turn off all of the other VA picture attributes
         // as this acts, as for OpenGL, as the master colourspace conversion matrix.
         // We can also enable Studio levels support.
@@ -432,15 +462,10 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
         return result;
     result = m_openglTextures[DUMMY_INTEROP_ID];
 
-    // Pause frame - no need to update the same frame
-    if (m_lastSurface == id)
-        return result;
-
     // Copy surface to texture
     INIT_ST;
     va_status = vaCopySurfaceGLX(m_vaDisplay, m_glxSurface, id, GetFlagsForFrame(Frame, Scan));
     CHECK_ST;
-    m_lastSurface = id;
     return result;
 }
 
@@ -574,10 +599,6 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         return result;
     result = m_openglTextures[DUMMY_INTEROP_ID];
 
-    // Pause frame - no need to update the same frame
-    if (m_lastSurface == id)
-        return result;
-
     // Copy the surface to the texture
     INIT_ST;
     va_status = vaSyncSurface(m_vaDisplay, id);
@@ -597,7 +618,6 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         m_glxBindTexImageEXT(glxdisplay, m_glxPixmap, GLX_FRONT_EXT, nullptr);
         m_context->glBindTexture(QOpenGLTexture::Target2D, 0);
     }
-    m_lastSurface = id;
     return result;
 }
 
@@ -758,8 +778,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
                 sizes.push_back(size);
             }
 
-            vector<MythVideoTexture*> textures =
-                    MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, format, sizes);
+            vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, format, sizes);
             if (textures.size() != count)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");

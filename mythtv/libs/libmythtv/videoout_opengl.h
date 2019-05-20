@@ -34,14 +34,11 @@ class VideoOutputOpenGL : public VideoOutput
     void InitPictureAttributes(void) override;
     void EmbedInWidget(const QRect &Rect) override;
     void StopEmbedding(void) override;
-    bool SetDeinterlacingEnabled(bool Enable) override;
-    bool SetupDeinterlace(bool Interlaced, const QString &OverrideFilter = QString()) override;
     void ShowPIP(VideoFrame *Frame, MythPlayer *PiPPlayer, PIPLocation Location) override;
     void MoveResizeWindow(QRect NewRect) override;
     void RemovePIP(MythPlayer *PiPPlayer) override;
     bool IsPIPSupported(void) const override  { return true; }
     bool hasFullScreenOSD(void) const override { return true; }
-    bool ApproveDeintFilter(const QString& Deinterlacer) const override;
     MythPainter *GetOSDPainter(void) override;
     bool CanVisualise(AudioPlayer *Audio, MythRender *Render) override;
     bool SetupVisualisation(AudioPlayer *Audio, MythRender *Render, const QString &Name) override;

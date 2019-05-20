@@ -16,8 +16,7 @@ class VideoOutputNull : public VideoOutput
               const QSize &video_dim_disp,
               float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
-    bool SetupDeinterlace(bool, const QString &overridefilter = "") override // VideoOutput
-        { (void)overridefilter; return false; } // we don't deinterlace in null output..
+    void SetDeinterlacing(bool Enable, bool DoubleRate) override;
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
     void Show(FrameScanType ) override; // VideoOutput
     void CreatePauseFrame(void);

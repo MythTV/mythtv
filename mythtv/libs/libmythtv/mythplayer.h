@@ -638,7 +638,6 @@ class MTV_PUBLIC MythPlayer
     void  ResetAVSync(void);
     int64_t AVSyncGetAudiotime(void);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
-    void  FallbackDeint(void);
     void WaitForTime(int64_t framedue);
 
     // Private LiveTV stuff
@@ -690,8 +689,6 @@ class MTV_PUBLIC MythPlayer
     mutable QMutex vidExitLock;
     mutable QMutex playingLock;
     bool     m_double_framerate;///< Output fps is double Video (input) rate
-    bool     m_double_process;///< Output filter must processed at double rate
-    bool     m_deint_possible;
     bool     livetv;
     bool     watchingrecording;
     bool     transcoding;

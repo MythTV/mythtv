@@ -69,6 +69,7 @@ class MTV_PUBLIC VideoBuffers
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
     bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type);
     void DeleteBuffers(void);
+    void SetDeinterlacing(MythDeintType Single, MythDeintType Double);
 
     void Reset(void);
     void DiscardFrames(bool NextFrameIsKeyFrame);
@@ -124,6 +125,7 @@ class MTV_PUBLIC VideoBuffers
     const frame_queue_t *Queue(BufferType Type) const;
     VideoFrame          *GetNextFreeFrameInternal(BufferType EnqueueTo);
     void                 ReleaseDecoderResources(VideoFrame *Frame);
+    void                 SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single, MythDeintType Double);
 
     frame_queue_t        m_available;
     frame_queue_t        m_used;

@@ -164,8 +164,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       needNewPauseFrame(false),
       bufferPaused(false),  videoPaused(false),
       allpaused(false),     playing(false),
-      m_double_framerate(false),    m_double_process(false),
-      m_deint_possible(true),
+      m_double_framerate(false),
       livetv(false),
       watchingrecording(false),
       transcoding(false),
@@ -589,9 +588,8 @@ void MythPlayer::ReinitVideo(void)
     {
         MythMultiLocker locker({&osdLock, &vidExitLock});
 
-        videoOutput->SetVideoFrameRate(video_frame_rate);
-        float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
-                                               video_aspect;
+        videoOutput->SetVideoFrameRate(static_cast<float>(video_frame_rate));
+        float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
         if (!videoOutput->InputChanged(video_dim, video_disp_dim, aspect,
                                        decoder->GetVideoCodecID(), aspect_only, &locker))
         {
@@ -671,23 +669,6 @@ void MythPlayer::SetKeyframeDistance(int keyframedistance)
     keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
 }
 
-/** \fn MythPlayer::FallbackDeint(void)
- *  \brief Fallback to non-frame-rate-doubling deinterlacing method.
- */
-void MythPlayer::FallbackDeint(void)
-{
-     m_double_framerate = false;
-     m_double_process   = false;
-
-     if (videoOutput)
-     {
-        videoOutput->SetupDeinterlace(false);
-        bool hwset = decoder->GetMythCodecContext()->FallbackDeint();
-        if (!hwset)
-            videoOutput->FallbackDeint();
-     }
-}
-
 void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 {
     if (!frame || m_scan_locked)
@@ -761,9 +742,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 
     resetScan = kScan_Ignore;
 
-    if (m_scan_initialized &&
-        m_scan == scan &&
-        m_frame_interval == frame_interval)
+    if (m_scan_initialized && m_scan == scan && m_frame_interval == frame_interval)
         return;
 
     m_scan_locked = (scan != kScan_Detect);
@@ -771,46 +750,16 @@ void MythPlayer::SetScanType(FrameScanType scan)
     m_scan_initialized = true;
     m_frame_interval = frame_interval;
 
-    bool interlaced = is_interlaced(scan);
-
-    if (interlaced && !m_deint_possible)
+    if (is_interlaced(scan))
     {
-        m_scan = scan;
-        return;
+        bool normal = play_speed > 0.99F && play_speed < 1.01F && normal_speed;
+        m_double_framerate = CanSupportDoubleRate() && normal;
+        videoOutput->SetDeinterlacing(true, m_double_framerate);
     }
-
-    if (interlaced)
+    else if (kScan_Progressive == scan)
     {
-            m_deint_possible = videoOutput->SetDeinterlacingEnabled(true);
-            if (!m_deint_possible)
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC + "Unable to enable Video Output based deinterlacing");
-                m_scan = scan;
-                return;
-            }
-        if (videoOutput->NeedsDoubleFramerate())
-        {
-            m_double_framerate = true;
-            if (!CanSupportDoubleRate())
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Video sync method can't support double framerate "
-                    "(refresh rate too low for 2x deint)");
-                FallbackDeint();
-            }
-        }
-        m_double_process = videoOutput->IsExtraProcessingRequired();
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled Video Output based deinterlacing");
-    }
-    else
-    {
-        if (kScan_Progressive == scan)
-        {
-            m_double_process = false;
-            m_double_framerate = false;
-            videoOutput->SetDeinterlacingEnabled(false);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled Video Output based deinterlacing");
-        }
+        m_double_framerate = false;
+        videoOutput->SetDeinterlacing(false, false);
     }
 
     m_scan = scan;
@@ -849,7 +798,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
     if (!codecName.isEmpty())
     {
         m_codecName = codecName;
-        paramsChanged    = true;
+        paramsChanged = true;
     }
 
     if (!paramsChanged)
@@ -861,7 +810,9 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
     if (IsErrored())
         return;
 
-    SetScanType(detectInterlace(scan, m_scan, video_frame_rate,
+    // ensure deinterlacers are correctly reset after a change
+    m_scan_initialized = false;
+    SetScanType(detectInterlace(scan, m_scan, static_cast<float>(video_frame_rate),
                                 video_disp_dim.height()));
     m_scan_locked  = false;
     m_scan_tracker = (m_scan == kScan_Interlaced) ? 2 : 0;
@@ -1848,8 +1799,11 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     }
 
     if (avsync_next > 0)
+    {
         avsync_next--;
-    else {
+    }
+    else
+    {
         int divisor = int(abs(diverge) - max_diverge - 1.0F);
         if (divisor < 1)
             divisor=1;
@@ -1858,7 +1812,14 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+    {
         ps = kScan_Progressive;
+    }
+    else if (buffer && is_interlaced(ps))
+    {
+        ps = kScan_Interlaced;
+        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
+    }
 
     bool max_video_behind = diverge < -max_diverge;
     bool dropframe = false;
@@ -1952,19 +1913,22 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
         if (m_double_framerate)
         {
-            //second stage of deinterlacer processing
-            ps = (kScan_Intr2ndField == ps) ?
-                kScan_Interlaced : kScan_Intr2ndField;
+            // second stage of deinterlacer processing
+            if (ps == kScan_Interlaced)
+                ps = kScan_Intr2ndField;
             osdLock.lock();
-            if (m_double_process && ps != kScan_Progressive)
-                videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
+            if (ps != kScan_Progressive)
+            {
+                // Only double rate CPU deinterlacers require an extra call to ProcessFrame
+                if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
+                    videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
+            }
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
             if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
             {
-                LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO,
-                    LOC + QString("AVSync waitforframe %1 %2 %3")
+                LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + QString("AVSync waitforframe %1 %2 %3")
                         .arg(frameDelay).arg(avsync_adjustment).arg(m_double_framerate));
                 vsync_delay_clock = videosync->WaitForFrame(frameDelay, avsync_adjustment);
             }
@@ -2237,7 +2201,14 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
 
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+    {
         ps = kScan_Progressive;
+    }
+    else if (buffer && is_interlaced(ps))
+    {
+        ps = kScan_Interlaced;
+        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
+    }
 
     if (buffer && !dropframe)
     {
@@ -2289,11 +2260,15 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         if (m_double_framerate)
         {
             //second stage of deinterlacer processing
-            ps = (kScan_Intr2ndField == ps) ?
-                kScan_Interlaced : kScan_Intr2ndField;
+            if (kScan_Interlaced == ps)
+                ps = kScan_Intr2ndField;
             osdLock.lock();
-            if (m_double_process && ps != kScan_Progressive)
-                videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
+            if (ps != kScan_Progressive)
+            {
+                // Only double rate CPU deinterlacers require an extra call to ProcessFrame
+                if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
+                    videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
+            }
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
@@ -2598,10 +2573,9 @@ void MythPlayer::EnableFrameRateMonitor(bool enable)
 {
     if (!output_jmeter)
         return;
-    int rate = enable ? video_frame_rate :
-               VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY) ?
-               (video_frame_rate * 4) : 0;
-    output_jmeter->SetNumCycles(rate);
+    bool verbose = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY);
+    double rate = enable ? video_frame_rate : verbose ? (video_frame_rate * 4) : 0.0;
+    output_jmeter->SetNumCycles(static_cast<int>(rate));
 }
 
 void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
@@ -2609,25 +2583,8 @@ void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
     if (!videoOutput)
         return;
 
-    bool normal = play_speed > 0.99F && play_speed < 1.01F && normal_speed;
-    bool hwset = decoder->GetMythCodecContext()->setDeinterlacer(true, overridefilter);
-    if (hwset)
-    {
-        m_double_framerate = false;
-        m_double_process = false;
-        videoOutput->SetupDeinterlace(false);
-    }
-    else
-    {
-        m_double_framerate =
-            videoOutput->SetupDeinterlace(true, overridefilter) &&
-            videoOutput->NeedsDoubleFramerate();
-        m_double_process = videoOutput->IsExtraProcessingRequired();
-    }
-    if ((decoder->GetMythCodecContext()->getDoubleRate() || m_double_framerate)
-      && (!CanSupportDoubleRate() || !normal))
-        FallbackDeint();
-
+    (void)overridefilter;
+    LOG(VB_GENERAL, LOG_ERR, LOC + "ForceDeinterlacer not yet re-implemented");
 }
 
 void MythPlayer::VideoStart(void)
@@ -2717,36 +2674,13 @@ void MythPlayer::VideoStart(void)
     }
     else if (videoOutput)
     {
-        bool hwset = decoder->GetMythCodecContext()->setDeinterlacer(true);
-        if (hwset)
-            videoOutput->SetupDeinterlace(false);
-        else
-        {
-            // Set up deinterlacing in the video output method
-            m_double_framerate =
-                (videoOutput->SetupDeinterlace(true) &&
-                videoOutput->NeedsDoubleFramerate());
-
-            m_double_process = videoOutput->IsExtraProcessingRequired();
-        }
-        videosync = VideoSync::BestMethod(videoOutput, (uint)rf_int);
-
-        // Make sure video sync can do it
-        if (videosync != nullptr && m_double_framerate)
-        {
-            if (!CanSupportDoubleRate())
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Video sync method can't support double framerate "
-                    "(refresh rate too low for 2x deint)");
-                FallbackDeint();
-            }
-        }
+        m_double_framerate = CanSupportDoubleRate();
+        videoOutput->SetDeinterlacing(true, m_double_framerate);
+        videosync = VideoSync::BestMethod(videoOutput, static_cast<uint>(rf_int));
     }
+
     if (!videosync)
-    {
         videosync = new BusyWaitVideoSync(videoOutput, rf_int);
-    }
 
     InitAVSync();
     videosync->Start();
@@ -4090,38 +4024,11 @@ void MythPlayer::ChangeSpeed(void)
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Play speed: " +
         QString("rate: %1 speed: %2 skip: %3 => new interval %4")
-            .arg(video_frame_rate).arg(play_speed)
+            .arg(video_frame_rate).arg(static_cast<double>(play_speed))
             .arg(ffrew_skip).arg(frame_interval));
 
     if (videoOutput && videosync)
-    {
-        // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate);
-
-        // If using bob deinterlace, turn on or off if we
-        // changed to or from synchronous playback speed.
-        bool play_1 = play_speed > 0.99F && play_speed < 1.01F && normal_speed;
-        bool inter  = (kScan_Interlaced   == m_scan  ||
-                       kScan_Intr2ndField == m_scan);
-
-        bool doublerate = m_double_framerate || decoder->GetMythCodecContext()->getDoubleRate();
-        if (doublerate && !play_1)
-        {
-            bool hwdeint = decoder->GetMythCodecContext()->FallbackDeint();
-            if (!hwdeint)
-                videoOutput->FallbackDeint();
-        }
-        else if (!m_double_framerate && CanSupportDoubleRate() && play_1
-                && (inter || decoder->GetMythCodecContext()->isDeinterlacing()))
-        {
-            videoOutput->SetupDeinterlace(false);
-            bool hwdeint = decoder->GetMythCodecContext()->BestDeint();
-            if (!hwdeint)
-                videoOutput->BestDeint();
-        }
-        m_double_framerate = videoOutput->NeedsDoubleFramerate();
-        m_double_process = videoOutput->IsExtraProcessingRequired();
-    }
+        videoOutput->SetVideoFrameRate(static_cast<float>(video_frame_rate));
 
     if (normal_speed && audio.HasAudioOut())
     {
@@ -5271,24 +5178,20 @@ int MythPlayer::GetStatusbarPos(void) const
 
 void MythPlayer::GetPlaybackData(InfoMap &infoMap)
 {
-    QString samplerate = RingBuffer::BitrateToString(audio.GetSampleRate(),
-                                                     true);
+    QString samplerate = RingBuffer::BitrateToString(audio.GetSampleRate(), true);
     infoMap.insert("samplerate",  samplerate);
     infoMap.insert("filename",    player_ctx->m_buffer->GetSafeFilename());
     infoMap.insert("decoderrate", player_ctx->m_buffer->GetDecoderRate());
     infoMap.insert("storagerate", player_ctx->m_buffer->GetStorageRate());
     infoMap.insert("bufferavail", player_ctx->m_buffer->GetAvailableBuffer());
-    infoMap.insert("buffersize",
-        QString::number(player_ctx->m_buffer->GetBufferSize() >> 20));
+    infoMap.insert("buffersize",  QString::number(player_ctx->m_buffer->GetBufferSize() >> 20));
     if (gCoreContext->GetBoolSetting("PlaybackAVSync2", false))
     {
         int avsync = avsync_avg / 1000;
-        infoMap.insert("avsync",
-            tr("%1 ms").arg(avsync));
+        infoMap.insert("avsync", tr("%1 ms").arg(avsync));
     }
     else
-        infoMap.insert("avsync",
-            QString::number((float)avsync_avg / (float)frame_interval, 'f', 2));
+        infoMap.insert("avsync", QString::number((float)avsync_avg / (float)frame_interval, 'f', 2));
     if (videoOutput)
     {
         QString frames = QString("%1/%2").arg(videoOutput->ValidVideoFrames())

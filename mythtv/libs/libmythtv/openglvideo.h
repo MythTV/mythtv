@@ -45,9 +45,6 @@ class OpenGLVideo : public QObject
     void    ProcessFrame(const VideoFrame *Frame);
     void    PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
                          StereoscopicMode Stereo, bool DrawBorder = false);
-    bool    AddDeinterlacer(QString Deinterlacer);
-    void    SetDeinterlacing(bool Deinterlacing);
-    QString GetDeinterlacer(void) const;
     void    SetMasterViewport(QSize Size);
     QSize   GetVideoSize(void) const;
     QString GetProfile() const;
@@ -65,10 +62,10 @@ class OpenGLVideo : public QObject
   private:
     bool    SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
                              QSize Size, GLenum TextureTarget);
-    bool    CreateVideoShader(VideoShaderType Type, QString Deinterlacer = QString());
+    bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
     void    LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                          MythGLTexture** Textures, uint &TextureCount);
-    void    TearDownDeinterlacer(void);
+    bool    AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter = DEINT_SHADER);
 
     bool           m_valid;
     QString        m_profile;
@@ -81,9 +78,7 @@ class OpenGLVideo : public QObject
     QRect          m_displayVisibleRect;  ///< Total useful, visible rectangle
     QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
     QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
-    QString        m_hardwareDeinterlacer;
-    QString        m_queuedHardwareDeinterlacer; ///< Temporary prior to deinterlacing refactor
-    bool           m_hardwareDeinterlacing; ///< OpenGL deinterlacing is enabled
+    MythDeintType  m_deinterlacer;
     VideoColourSpace *m_videoColourSpace;
     bool           m_viewportControl;     ///< Video has control over view port
     QOpenGLShaderProgram* m_shaders[ShaderCount] { nullptr };

@@ -32,9 +32,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_displayVisibleRect(DisplayVisibleRect),
     m_displayVideoRect(DisplayVideoRect),
     m_videoRect(VideoRect),
-    m_hardwareDeinterlacer(),
-    m_queuedHardwareDeinterlacer(),
-    m_hardwareDeinterlacing(false),
+    m_deinterlacer(MythDeintType::DEINT_NONE),
     m_videoColourSpace(ColourSpace),
     m_viewportControl(ViewportControl),
     m_inputTextures(),
@@ -137,11 +135,6 @@ void OpenGLVideo::SetViewportRect(const QRect &DisplayVisibleRect)
     SetMasterViewport(DisplayVisibleRect.size());
 }
 
-QString OpenGLVideo::GetDeinterlacer(void) const
-{
-    return m_hardwareDeinterlacer;
-}
-
 QString OpenGLVideo::GetProfile(void) const
 {
     if (format_is_hw(m_inputType))
@@ -159,34 +152,43 @@ QSize OpenGLVideo::GetVideoSize(void) const
     return m_videoDim;
 }
 
-bool OpenGLVideo::AddDeinterlacer(QString Deinterlacer)
+bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter /* = DEINT_SHADER */)
 {
-    OpenGLLocker ctx_lock(m_render);
+    // do we want an opengl shader?
+    // shaders trump CPU deinterlacers if selected and driver deinterlacers will only
+    // be available under restricted circumstances
+    // N.B. there should in theory be no situation in which shader deinterlacing is not
+    // available for software formats, hence there should be no need to fallback to cpu
 
-    if (format_is_hw(m_inputType))
-        return false;
-
-    if ((FMT_NONE == m_outputType) || (FMT_NONE == m_inputType))
+    bool doublerate = true;
+    MythDeintType deinterlacer = GetDoubleRateOption(Frame, Filter);
+    MythDeintType other        = GetDoubleRateOption(Frame, DEINT_DRIVER);
+    if (other) // another double rate deinterlacer is enabled
     {
-        m_queuedHardwareDeinterlacer = Deinterlacer;
-        return true;
+        m_deinterlacer = DEINT_NONE;
+        return false;
     }
-    m_queuedHardwareDeinterlacer = QString();
 
-    if (m_hardwareDeinterlacer == Deinterlacer)
+    if (!deinterlacer)
+    {
+        doublerate = false;
+        deinterlacer = GetSingleRateOption(Frame, Filter);
+        other        = GetSingleRateOption(Frame, DEINT_DRIVER);
+        if (!deinterlacer || other) // no shader deinterlacer needed
+        {
+            m_deinterlacer = DEINT_NONE;
+            return false;
+        }
+    }
+
+    // if we get this far, we cannot use driver deinterlacers, shader deints
+    // are preferred over cpu, we have a deinterlacer but don't actually care whether
+    // it is single or double rate
+    if (m_deinterlacer == deinterlacer)
         return true;
 
-    // Don't delete and recreate for the sake of doublerate vs singlerate
-    // In the case of kernel, it also invalidates the reference textures
-    bool kernel = Deinterlacer.contains("kernel");
-    if (m_hardwareDeinterlacer.contains("kernel") && kernel)
-        return true;
-    if (m_hardwareDeinterlacer.contains("linear") && Deinterlacer.contains("linear"))
-        return true;
-    if (m_hardwareDeinterlacer.contains("bob") && Deinterlacer.contains("onefield"))
-        return true;
-    if (m_hardwareDeinterlacer.contains("onefield") && Deinterlacer.contains("bob"))
-        return true;
+    // Lock
+    OpenGLLocker ctx_lock(m_render);
 
     // delete old reference textures
     MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
@@ -194,18 +196,19 @@ bool OpenGLVideo::AddDeinterlacer(QString Deinterlacer)
 
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_render->GetMaxTextureUnits();
-    uint refstocreate = kernel ? 2 : 0;
+    uint refstocreate = (deinterlacer == DEINT_HIGH) ? 2 : 0;
     int totaltextures = static_cast<int>(planes(m_outputType)) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for '%1' (%2 < %3)")
-            .arg(Deinterlacer).arg(max).arg(totaltextures));
-        Deinterlacer = Deinterlacer.contains("double") ? "openglbobdeint" : "openglonefield";
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'").arg(Deinterlacer));
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for deinterlacer '%1' (%2 < %3)")
+            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, doublerate)).arg(max).arg(totaltextures));
+        deinterlacer = DEINT_BASIC;
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'")
+            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, doublerate)));
     }
 
     // create new deinterlacers - the old ones will be deleted
-    if (!(CreateVideoShader(InterlacedBot, Deinterlacer) && CreateVideoShader(InterlacedTop, Deinterlacer)))
+    if (!(CreateVideoShader(InterlacedBot, deinterlacer) && CreateVideoShader(InterlacedTop, deinterlacer)))
         return false;
 
     // create the correct number of reference textures
@@ -220,10 +223,11 @@ bool OpenGLVideo::AddDeinterlacer(QString Deinterlacer)
     // ensure they work correctly
     UpdateColourSpace();
     UpdateShaderParameters();
-    m_hardwareDeinterlacer = Deinterlacer;    
+    m_deinterlacer = deinterlacer;
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer %1->%2 (%3)")
-        .arg(format_description(m_inputType)).arg(format_description(m_outputType)).arg(m_hardwareDeinterlacer));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer '%1' (%2->%3)")
+        .arg(DeinterlacerName(m_deinterlacer | DEINT_SHADER, doublerate))
+        .arg(format_description(m_inputType)).arg(format_description(m_outputType)));
     return true;
 }
 
@@ -233,11 +237,8 @@ bool OpenGLVideo::AddDeinterlacer(QString Deinterlacer)
  * If there are alternative shader conditions, the worst case is used.
  * (A dependent read is defined as any texture read that does not use the exact
  * texture coordinates passed into the fragment shader)
- *
- * \note m_interopFrameType is used to override the type of shader created for
- * interop input. So kGLInterop frame type and kGLInterop interop type = RGB!
 */
-bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
+bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
 {
     if (!m_render || !(m_features & QOpenGLFunctions::Shaders))
         return false;
@@ -257,8 +258,8 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         if (FMT_MEDIACODEC == m_inputType)
             vertex = MediaCodecVertexShader;
     }
-    // no interlaced shaders yet
-    else if ((Progressive == Type) || (Interlaced == Type) || Deinterlacer.isEmpty())
+    // no interlaced shaders yet (i.e. interlaced chroma upsampling - not deinterlacers)
+    else if ((Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE))
     {
         switch (m_outputType)
         {
@@ -282,17 +283,17 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
             FMT_YUV420P12 == m_outputType || FMT_YUV420P16 == m_outputType ||
             FMT_YUV422P == m_outputType)
         {
-            if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
+            if (Deint == DEINT_BASIC)
             {
                 fragment = YV12RGBOneFieldFragmentShader[bottom];
                 cost = 6;
             }
-            else if (Deinterlacer == "opengllinearblend" || Deinterlacer == "opengldoubleratelinearblend")
+            else if (Deint == DEINT_MEDIUM)
             {
                 fragment = YV12RGBLinearBlendFragmentShader[bottom];
                 cost = 15;
             }
-            else if (Deinterlacer == "openglkerneldeint" || Deinterlacer == "opengldoubleratekerneldeint")
+            else if (Deint == DEINT_HIGH)
             {
                 fragment = YV12RGBKernelShader[bottom];
                 cost = 45;
@@ -305,21 +306,20 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         }
         else if (FMT_NV12 == m_outputType || FMT_P010 == m_outputType || FMT_P016 == m_outputType)
         {
-            if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
+            if (Deint == DEINT_BASIC)
             {
                 fragment = NV12OneFieldFragmentShader[bottom];
                 cost = 4;
             }
-            else if (Deinterlacer == "opengllinearblend" || Deinterlacer == "opengldoubleratelinearblend")
+            else if (Deint == DEINT_MEDIUM)
             {
                 fragment = NV12LinearBlendFragmentShader[bottom];
                 cost = 10;
             }
-            else if (Deinterlacer == "openglkerneldeint" || Deinterlacer == "opengldoubleratekerneldeint")
+            else if (Deint == DEINT_HIGH)
             {
-                // NB NO kernel shader yet. Need to figure out reference frames for interop.
-                fragment = NV12LinearBlendFragmentShader[bottom];
-                cost = 10;
+                fragment = NV12KernelShader[bottom];
+                cost = 30;
             }
             else
             {
@@ -329,17 +329,17 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, QString Deinterlacer)
         }
         else
         {
-            if (Deinterlacer == "openglonefield" || Deinterlacer == "openglbobdeint")
+            if (Deint == DEINT_BASIC)
             {
                 fragment = OneFieldShader[bottom];
                 cost = 2;
             }
-            else if (Deinterlacer == "opengllinearblend" || Deinterlacer == "opengldoubleratelinearblend")
+            else if (Deint == DEINT_MEDIUM)
             {
                 fragment = LinearBlendShader[bottom];
                 cost = 5;
             }
-            else if (Deinterlacer == "openglkerneldeint" || Deinterlacer == "opengldoubleratekerneldeint")
+            else if (Deint == DEINT_HIGH)
             {
                 fragment = KernelShader[bottom];
                 cost = 15;
@@ -402,7 +402,7 @@ bool OpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType Outp
     QString texold = (m_textureTarget == QOpenGLTexture::TargetRectangle) ? "Rect" :
                      (m_textureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
     LOG(VB_GENERAL, LOG_WARNING, LOC +
-        QString("Frame format changed %1:%2 %3x%4 (Tex: %5) -> %6:%7 %8x%9 (Tex: %10)")
+        QString("New frame format: %1:%2 %3x%4 (Tex: %5) -> %6:%7 %8x%9 (Tex: %10)")
         .arg(format_description(m_inputType)).arg(format_description(m_outputType))
         .arg(m_videoDim.width()).arg(m_videoDim.height()).arg(texold)
         .arg(format_description(InputType)).arg(format_description(OutputType))
@@ -438,9 +438,6 @@ bool OpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType Outp
     if (!CreateVideoShader(Default) || !CreateVideoShader(Progressive))
         return false;
 
-    if (!m_queuedHardwareDeinterlacer.isEmpty())
-        AddDeinterlacer(m_queuedHardwareDeinterlacer);
-
     UpdateColourSpace();
     UpdateShaderParameters();
     return true;
@@ -460,7 +457,7 @@ void OpenGLVideo::ResetFrameFormat(void)
     m_outputType = FMT_NONE;
     m_textureTarget = QOpenGLTexture::Target2D;
     m_inputTextureSize = QSize();
-    m_hardwareDeinterlacer = QString();
+    m_deinterlacer = DEINT_NONE;
     m_render->DeleteFramebuffer(m_frameBuffer);
     m_render->DeleteTexture(m_frameBufferTexture);
     m_frameBuffer = nullptr;
@@ -520,6 +517,9 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
             return;
     }
 
+    // Setup deinterlacing if required
+    AddDeinterlacer(Frame);
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_START");
 
@@ -527,7 +527,7 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
 
     // Rotate textures if necessary
     bool current = true;
-    if (m_hardwareDeinterlacing)
+    if (m_deinterlacer != DEINT_NONE)
     {
         if (!m_nextTextures.empty() && !m_prevTextures.empty())
         {
@@ -543,11 +543,6 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
-}
-
-void OpenGLVideo::SetDeinterlacing(bool Deinterlacing)
-{
-    m_hardwareDeinterlacing = Deinterlacing;
 }
 
 void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
@@ -589,6 +584,10 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
                     m_shaders[Default]->setUniformValue("u_transform", *inputtextures[0]->m_transform);
                 }
             }
+
+            // Enable deinterlacing for NVDEC and VTB
+            if (Frame && format_is_hwyuv(Frame->codec))
+                AddDeinterlacer(Frame, DEINT_SHADER | DEINT_CPU); // pickup shader or cpu prefs
         }
         else
         {
@@ -603,7 +602,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     if (!format_is_yuv(m_outputType))
         program = Default;
 
-    if (m_hardwareDeinterlacing)
+    if (m_deinterlacer != DEINT_NONE)
     {
         if (Scan == kScan_Interlaced)
         {
@@ -768,20 +767,35 @@ void OpenGLVideo::ResetTextures(void)
 void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                                MythGLTexture **Textures, uint &TextureCount)
 {
-    if (Deinterlacing && (m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
+    if (Deinterlacing)
     {
-        // if we are using reference frames, we want the current frame in the middle
-        // but next will be the first valid, followed by current...
-        uint count = Current.size();
-        vector<MythVideoTexture*> &current = Current[0]->m_valid ? Current : m_nextTextures;
-        vector<MythVideoTexture*> &prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
+        // temporary workaround for kernel deinterlacing of NVDEC and VTB hardware frames
+        // for which there are currently no reference frames
+        if (format_is_hw(m_inputType))
+        {
+            if (DEINT_HIGH == m_deinterlacer)
+            {
+                size_t count = Current.size();
+                for (uint i = 0; i < 3; ++i)
+                    for (uint j = 0; j < count; ++j)
+                        Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(Current[j]);
+            }
+        }
+        else if ((m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
+        {
+            // if we are using reference frames, we want the current frame in the middle
+            // but next will be the first valid, followed by current...
+            size_t count = Current.size();
+            vector<MythVideoTexture*> &current = Current[0]->m_valid ? Current : m_nextTextures;
+            vector<MythVideoTexture*> &prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
-        for (uint i = 0; i < count; ++i)
-            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(prev[i]);
-        for (uint i = 0; i < count; ++i)
-            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(current[i]);
-        for (uint i = 0; i < count; ++i)
-            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(m_nextTextures[i]);
+            for (uint i = 0; i < count; ++i)
+                Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(prev[i]);
+            for (uint i = 0; i < count; ++i)
+                Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(current[i]);
+            for (uint i = 0; i < count; ++i)
+                Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(m_nextTextures[i]);
+        }
     }
     else
     {

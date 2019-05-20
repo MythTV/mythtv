@@ -39,9 +39,6 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     bool InputChanged(const QSize&, const QSize&, float, MythCodecID, bool&, MythMultiLocker*) override;
     void EmbedInWidget(const QRect&) override;
     void StopEmbedding(void) override;
-    bool ApproveDeintFilter(const QString&) const override;
-    bool SetDeinterlacingEnabled(bool interlaced) override;
-    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="") override;
     QString GetName(void) const override { return kName; } // = "openmax"
     bool IsPIPSupported(void) const override { return true; }
     bool IsPBPSupported(void) const override { return true; }

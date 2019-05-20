@@ -22,6 +22,7 @@
 #include "videocolourspace.h"
 #include "visualisations/videovisual.h"
 #include "mythavutil.h"
+#include "mythdeinterlacer.h"
 
 using namespace std;
 
@@ -62,18 +63,10 @@ class VideoOutput
                       WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
-    virtual bool SetDeinterlacingEnabled(bool);
-    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
-    virtual void FallbackDeint(void);
-    virtual void BestDeint(void);
-    virtual bool NeedsDoubleFramerate(void) const;
-    virtual bool IsBobDeint(void) const;
-    virtual bool IsExtraProcessingRequired(void) const;
-    virtual bool ApproveDeintFilter(const QString& filtername) const;
-    void         GetDeinterlacers(QStringList &deinterlacers);
-    QString      GetDeinterlacer(void) { return m_deintfiltername; }
-    virtual void PrepareFrame(VideoFrame *buffer, FrameScanType,
-                              OSD *osd) = 0;
+    virtual void SetDeinterlacing(bool Enable, bool DoubleRate);
+    virtual void ProcessFrame(VideoFrame *Frame, OSD *Osd, const PIPMap &PipPlayers,
+                              FrameScanType Scan = kScan_Ignore) = 0;
+    virtual void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
     VideoDisplayProfile *GetProfile() { return db_vdisp_profile; }
 
@@ -137,12 +130,6 @@ class VideoOutput
         AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
     QString GetZoomString(void) const { return window.GetZoomString(); }
-
-    // pass in null to use the pause frame, if it exists.
-    virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
-                              const PIPMap &pipPlayers,
-                              FrameScanType scan = kScan_Ignore) = 0;
-
     PictureAttributeSupported GetSupportedPictureAttributes(void)
         { return videoColourSpace.SupportedAttributes(); }
     int          ChangePictureAttribute(PictureAttribute, bool direction);
@@ -334,10 +321,6 @@ class VideoOutput
     unsigned char      *vsz_tmp_buf;
     struct SwsContext  *vsz_scale_context;
 
-    // Deinterlacing
-    bool           m_deinterlacing;
-    QString        m_deintfiltername;
-
     /// VideoBuffers instance used to track video output buffers.
     VideoBuffers vbuffers;
 
@@ -365,6 +348,9 @@ class VideoOutput
     StereoscopicMode m_stereo;
 
     MythAVCopy m_copyFrame;
+
+    // Software deinterlacer
+    MythDeinterlacer m_deinterlacer;
 };
 
 #endif

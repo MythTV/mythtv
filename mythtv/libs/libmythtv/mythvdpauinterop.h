@@ -40,13 +40,15 @@ class MythVDPAUInterop : public MythOpenGLInterop
 
   private:
     bool  InitNV(AVVDPAUDeviceContext* DeviceContext);
-    bool  InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSurface Surface);
+    bool  InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSurface Surface,
+                    MythDeintType Deint, bool DoubleRate);
 
     VideoColourSpace   *m_colourSpace       { nullptr };
     MythVDPAUHelper    *m_helper            { nullptr };
     VdpOutputSurface    m_outputSurface     { 0       };
     MythVDPAUSurfaceNV  m_outputSurfaceReg  { 0       };
     VdpVideoMixer       m_mixer             { 0       };
+    MythDeintType       m_deinterlacer      { DEINT_BASIC };
     MYTH_VDPAUINITNV    m_initNV            { nullptr };
     MYTH_VDPAUFININV    m_finiNV            { nullptr };
     MYTH_VDPAUREGOUTSURFNV m_registerNV     { nullptr };

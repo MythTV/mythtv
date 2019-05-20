@@ -59,7 +59,6 @@ class VideoOutputD3D : public VideoOutput
     MythPainter *GetOSDPainter(void) override; // VideoOutput
     bool hasHWAcceleration(void) const override // VideoOutput
         { return !codec_is_std(video_codec_id); }
-    bool ApproveDeintFilter(const QString& filtername) const override; // VideoOutput
     void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
 
     bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput

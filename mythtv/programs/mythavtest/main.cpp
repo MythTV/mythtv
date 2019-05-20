@@ -99,24 +99,11 @@ class VideoPerformanceTest
         else if (decodeonly)
             LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
 
-        bool doublerate = vo->NeedsDoubleFramerate();
-        if (deinterlace)
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("Deinterlacing: %1")
-                .arg(doublerate ? "doublerate" : "singlerate"));
-            if (doublerate)
-                LOG(VB_GENERAL, LOG_INFO, "Output will show fields per second");
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Deinterlacing disabled");
-        }
-
         DecoderBase* dec = mp->GetDecoder();
         if (dec)
             LOG(VB_GENERAL, LOG_INFO, QString("Using decoder: %1").arg(dec->GetCodecDecoderName()));
 
-        Jitterometer *jitter = new Jitterometer("Performance: ", mp->GetFrameRate() * (doublerate ? 2 : 1));
+        Jitterometer *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
 
         int ms = secondstorun * 1000;
         QTime start = QTime::currentTime();
@@ -154,12 +141,17 @@ class VideoPerformanceTest
 
             if (!decodeonly)
             {
+                MythDeintType doubledeint = GetDoubleRateOption(frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
                 vo->ProcessFrame(frame, nullptr, dummy, scan);
                 vo->PrepareFrame(frame, scan, nullptr);
                 vo->Show(scan);
 
-                if (vo->NeedsDoubleFramerate() && deinterlace)
+                if (doubledeint && deinterlace)
                 {
+                    doubledeint = GetDoubleRateOption(frame, DEINT_CPU);
+                    MythDeintType other = GetDoubleRateOption(frame, DEINT_SHADER | DEINT_DRIVER);
+                    if (doubledeint && !other)
+                        vo->ProcessFrame(frame, nullptr, dummy, kScan_Intr2ndField);
                     vo->PrepareFrame(frame, kScan_Intr2ndField, nullptr);
                     vo->Show(scan);
                 }

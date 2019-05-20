@@ -233,13 +233,7 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
 
     // Reset OpenGLVideo
     if (m_openGLVideo->IsValid())
-    {
         m_openGLVideo->ResetFrameFormat();
-        bool temp_deinterlacing = m_deinterlacing;
-        SetDeinterlacingEnabled(true);
-        if (!temp_deinterlacing)
-            SetDeinterlacingEnabled(false);
-    }
 
     // Finalise output
     MoveResize();
@@ -358,7 +352,7 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
                                      const PIPMap &PiPPlayers,
-                                     FrameScanType)
+                                     FrameScanType Scan)
 {
     if (!m_render)
         return;
@@ -385,10 +379,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_newAspect = 0.0f;
 
         if (wasembedding && ok)
-        {
             EmbedInWidget(oldrect);
-            BestDeint();
-        }
 
         if (!ok)
             return;
@@ -397,8 +388,12 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_START");
 
-    bool swframe   = Frame ? !format_is_hw(Frame->codec) : false;
-    bool dummy     = Frame ? Frame->dummy : false;
+    bool swframe = Frame ? !format_is_hw(Frame->codec) : false;
+    bool dummy   = Frame ? Frame->dummy : false;
+
+    // software deinterlacing
+    if (!dummy && swframe)
+        m_deinterlacer.Filter(Frame, Scan);
 
     if (!window.IsEmbedding())
     {
@@ -431,7 +426,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     if (Frame)
     {
         framesPlayed = Frame->frameNumber + 1;
-        topfieldfirst = Frame->top_field_first;
+        topfieldfirst = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
         dummy = Frame->dummy;
     }
     else
@@ -589,7 +584,9 @@ VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
 {
     static VideoFrameType openglformats[] =
         { FMT_YV12, FMT_NV12, FMT_YUY2, FMT_YUV422P,
-          FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P16, FMT_NONE };
+          FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P16,
+          FMT_P010, FMT_P016,
+          FMT_NONE };
     return &openglformats[0];
 }
 
@@ -659,67 +656,6 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 void VideoOutputOpenGL::InitPictureAttributes(void)
 {
     videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
-}
-
-bool VideoOutputOpenGL::SetupDeinterlace(bool Interlaced, const QString &OverrideFilter)
-{
-    if (!m_openGLVideo || !m_render)
-        return false;
-
-    OpenGLLocker ctx_lock(m_render);
-
-    if (db_vdisp_profile)
-        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(OverrideFilter);
-
-    if (!m_deintfiltername.contains("opengl") && !m_deintfiltername.contains("vaapi"))
-    {
-        m_openGLVideo->SetDeinterlacing(false);
-        VideoOutput::SetupDeinterlace(Interlaced, OverrideFilter);
-        return m_deinterlacing;
-    }
-
-    if (m_videoProfile.contains("hw"))
-    {
-        m_deinterlacing = m_deintfiltername.contains("vaapi") ? Interlaced : false;
-        return m_deinterlacing;
-    }
-
-    m_deinterlacing = Interlaced;
-    if (m_deinterlacing && !m_deintfiltername.isEmpty())
-    {
-        if (!m_openGLVideo->AddDeinterlacer(m_deintfiltername))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Couldn't load deinterlace filter %1").arg(m_deintfiltername));
-            m_deinterlacing = false;
-            m_deintfiltername = "";
-        }
-        else
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using deinterlace method %1").arg(m_deintfiltername));
-        }
-    }
-
-    m_openGLVideo->SetDeinterlacing(m_deinterlacing);
-    return m_deinterlacing;
-}
-
-bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool Enable)
-{
-    if (!m_openGLVideo || !m_render)
-        return false;
-
-    OpenGLLocker ctx_lock(m_render);
-
-    if (Enable)
-    {
-        if (!m_deintfiltername.contains("opengl"))
-            m_openGLVideo->SetDeinterlacing(false);
-        return SetupDeinterlace(Enable);
-    }
-
-    m_openGLVideo->SetDeinterlacing(Enable);
-    m_deinterlacing = Enable;
-    return m_deinterlacing;
 }
 
 void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation Location)
@@ -820,24 +756,6 @@ void VideoOutputOpenGL::StopEmbedding(void)
 {
     VideoOutput::StopEmbedding();
     MoveResize();
-}
-
-bool VideoOutputOpenGL::ApproveDeintFilter(const QString &Deinterlacer) const
-{
-    bool hw = m_videoProfile.contains("hw");
-    // anything OpenGL when using shaders
-    if (!hw && Deinterlacer.contains("opengl"))
-        return true;
-
-    // vaapi if allowed
-    if (hw && Deinterlacer.contains("vaapi"))
-        return true;
-
-    // anything software based
-    if (!hw && !Deinterlacer.contains("vdpau") && !Deinterlacer.contains("vaapi"))
-        return true;
-
-    return VideoOutput::ApproveDeintFilter(Deinterlacer);
 }
 
 QStringList VideoOutputOpenGL::GetVisualiserList(void)

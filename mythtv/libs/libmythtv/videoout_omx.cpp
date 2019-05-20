@@ -245,7 +245,7 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
 #endif
     (*opts.osds)[kName].append("softblend");
 
-    (*opts.safe_renderers)["dummy"].append(kName);
+    /*(*opts.safe_renderers)["dummy"].append(kName);
     (*opts.safe_renderers)["nuppel"].append(kName);
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append(kName);
@@ -253,6 +253,7 @@ void VideoOutputOMX::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)[PrivateDecoderOMX::DecoderName].append(kName);
 
     opts.priorities->insert(kName, 70);
+    */
 }
 
 // static
@@ -535,74 +536,6 @@ bool VideoOutputOMX::InputChanged(  // Return true if successful
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + __func__ + " done");
     return true;
-}
-
-// virtual
-bool VideoOutputOMX::ApproveDeintFilter(const QString& filtername) const
-{
-    if (filtername.contains(kName))
-        return true;
-
-    return VideoOutput::ApproveDeintFilter(filtername);
-}
-
-// virtual
-bool VideoOutputOMX::SetDeinterlacingEnabled(bool interlaced)
-{
-    return SetupDeinterlace(interlaced);
-}
-
-// virtual
-bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &overridefilter)
-{
-    if (!m_imagefx.IsValid())
-        return VideoOutput::SetupDeinterlace(interlaced, overridefilter);
-
-    QString deintfiltername;
-    if (db_vdisp_profile)
-        deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
-
-    if (!deintfiltername.contains(kName))
-    {
-        if (m_deinterlacing && m_deintfiltername.contains(kName))
-            SetImageFilter(OMX_ImageFilterNone);
-        return VideoOutput::SetupDeinterlace(interlaced, overridefilter);
-    }
-
-    if (m_deinterlacing == interlaced && deintfiltername == m_deintfiltername)
-        return m_deinterlacing;
-
-    m_deintfiltername = deintfiltername;
-    m_deinterlacing = interlaced;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + __func__ + " switching " +
-        (interlaced ? "on" : "off") + " '" +  deintfiltername + "'");
-
-    OMX_IMAGEFILTERTYPE type;
-    if (!m_deinterlacing || m_deintfiltername.isEmpty())
-        type = OMX_ImageFilterNone;
-#ifdef USING_BROADCOM
-    else if (m_deintfiltername.contains("advanced"))
-        type = OMX_ImageFilterDeInterlaceAdvanced;
-    else if (m_deintfiltername.contains("fast"))
-        type = OMX_ImageFilterDeInterlaceFast;
-    else if (m_deintfiltername.contains("linedouble"))
-        type = OMX_ImageFilterDeInterlaceLineDouble;
-#endif
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + __func__ +  " Unknown type: '" +
-            m_deintfiltername + "'");
-#ifdef USING_BROADCOM
-        type = OMX_ImageFilterDeInterlaceFast;
-#else
-        type = OMX_ImageFilterNone;
-#endif
-    }
-
-    (void)SetImageFilter(type);
-
-    return m_deinterlacing;
 }
 
 OMX_ERRORTYPE VideoOutputOMX::SetImageFilter(OMX_IMAGEFILTERTYPE type)

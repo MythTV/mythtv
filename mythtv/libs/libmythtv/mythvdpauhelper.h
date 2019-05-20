@@ -4,6 +4,11 @@
 // Qt
 #include <QSize>
 #include <QMutex>
+#include <QFlags>
+
+// MythTV
+#include "mythframe.h"
+#include "videoouttypes.h"
 
 // FFmpeg
 extern "C" {
@@ -18,6 +23,15 @@ class VideoColourSpace;
 class MythVDPAUHelper
 {
   public:
+    enum VDPMixerFeature
+    {
+        VDPMixerNone     = 0x00,
+        VDPMixerTemporal = 0x01,
+        VDPMixerSpatial  = 0x02
+    };
+
+    Q_DECLARE_FLAGS(VDPMixerFeatures, VDPMixerFeature)
+
     static bool   HaveVDPAU(void);
     static bool   HaveMPEG4Decode(void);
     static bool   CheckH264Decode(AVCodecContext *Context);
@@ -29,8 +43,10 @@ class MythVDPAUHelper
     bool             IsValid(void);
     bool             IsFeatureAvailable(uint Feature);
     VdpOutputSurface CreateOutputSurface(QSize Size);
-    VdpVideoMixer    CreateMixer(QSize Size, VdpChromaType ChromaType = VDP_CHROMA_TYPE_420);
-    void             MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source, VdpOutputSurface Dest);
+    VdpVideoMixer    CreateMixer(QSize Size, VdpChromaType ChromaType = VDP_CHROMA_TYPE_420,
+                                 MythDeintType Deinterlacer = DEINT_BASIC);
+    void             MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source, VdpOutputSurface Dest,
+                                 FrameScanType Scan, int TopFieldFirst);
     void             SetCSCMatrix(VdpVideoMixer Mixer, VideoColourSpace *ColourSpace);
     void             DeleteOutputSurface(VdpOutputSurface Surface);
     void             DeleteMixer(VdpVideoMixer Mixer);

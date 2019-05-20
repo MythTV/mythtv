@@ -300,7 +300,8 @@ void MythVDPAUHelper::DeleteOutputSurface(VdpOutputSurface Surface)
     CHECK_ST
 }
 
-VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType)
+VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
+                                           MythDeintType Deinterlacer)
 {
     if (!m_valid || Size.isEmpty())
         return 0;
@@ -319,19 +320,60 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType)
     uint height = static_cast<uint>(Size.height());
     uint layers = 0;
     void const * parametervalues[] = { &width, &height, &ChromaType, &layers};
+
+    uint32_t featurecount = 0;
+    VdpVideoMixerFeature features[2];
+    VdpBool enable = VDP_TRUE;
+    const VdpBool enables[2] = { enable, enable };
+
+    if (DEINT_MEDIUM == Deinterlacer || DEINT_HIGH == Deinterlacer)
+    {
+        features[featurecount] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;
+        featurecount++;
+    }
+
+    if (DEINT_HIGH== Deinterlacer)
+    {
+        features[featurecount] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;
+        featurecount++;
+    }
+
     INIT_ST
-    status = m_vdpVideoMixerCreate(m_device, 0, nullptr, 4, parameters, parametervalues, &result);
+    status = m_vdpVideoMixerCreate(m_device, featurecount, featurecount ? features : nullptr,
+                                   4, parameters, parametervalues, &result);
+    CHECK_ST
+
+    if (!ok || !result)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create video mixer");
+        return result;
+    }
+
+    status = m_vdpVideoMixerSetFeatureEnables(result, featurecount, features, enables);
     CHECK_ST
     return result;
 }
 
-void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source, VdpOutputSurface Dest)
+void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
+                                  VdpOutputSurface Dest, FrameScanType Scan, int TopFieldFirst)
 {
     if (!m_valid || !Mixer || !Source || !Dest)
         return;
 
+    VdpVideoMixerPictureStructure field = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
+    if (kScan_Interlaced == Scan)
+    {
+        field = TopFieldFirst ? VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD :
+                                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD;
+    }
+    else if (kScan_Intr2ndField == Scan)
+    {
+        field = TopFieldFirst ? VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD :
+                                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
+    }
+
     INIT_ST
-    status = m_vdpVideoMixerRender(Mixer, VDP_INVALID_HANDLE, nullptr, VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
+    status = m_vdpVideoMixerRender(Mixer, VDP_INVALID_HANDLE, nullptr, field,
                                    0, nullptr, Source, 0, nullptr, nullptr, Dest, nullptr, nullptr, 0, nullptr);
     CHECK_ST
 }

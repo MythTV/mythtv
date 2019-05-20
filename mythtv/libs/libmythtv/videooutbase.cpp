@@ -319,10 +319,6 @@ VideoOutput::VideoOutput() :
     vsz_tmp_buf(nullptr),
     vsz_scale_context(nullptr),
 
-    // Deinterlacing
-    m_deinterlacing(false),
-    m_deintfiltername("linearblend"),
-
     // Various state variables
     errorState(kError_None),            framesPlayed(0),
 
@@ -340,7 +336,9 @@ VideoOutput::VideoOutput() :
     m_visual(nullptr),
 
     // 3D TV
-    m_stereo(kStereoscopicModeNone)
+    m_stereo(kStereoscopicModeNone),
+
+    m_deinterlacer()
 {
     memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
@@ -434,146 +432,24 @@ void VideoOutput::SetVideoFrameRate(float playback_fps)
         db_vdisp_profile->SetOutput(playback_fps);
 }
 
-/**
- * \fn VideoOutput::SetDeinterlacingEnabled(bool)
- * \brief Attempts to enable/disable deinterlacing using
- *        existing deinterlace method when enabling.
- */
-bool VideoOutput::SetDeinterlacingEnabled(bool enable)
+void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
 {
-    m_deinterlacing = enable;
-    return m_deinterlacing;
-}
-
-/**
- * \brief Attempts to enable or disable deinterlacing.
- * \return true if successful, false otherwise.
- * \param interlaced Desired state of interlacing.
- * \param overridefilter optional, explicitly use this nondefault
- *                       deinterlacing filter
- */
-bool VideoOutput::SetupDeinterlace(bool interlaced,
-                                   const QString& overridefilter)
-{
-    PIPState pip_state = window.GetPIPState();
-
-    if (pip_state > kPIPOff && pip_state < kPBPLeft)
-        return false;
-
-    if (m_deinterlacing == interlaced)
+    if (!Enable)
     {
-        if (!m_deinterlacing)
-            return false;
-        if (overridefilter.isEmpty() || overridefilter == m_deintfiltername)
-            return true;
-    }
-
-    m_deinterlacing = interlaced;
-
-    if (m_deinterlacing)
-    {
-        if (db_vdisp_profile)
-            m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
-        else
-            m_deintfiltername = "";
-
-        if (MythCodecContext::isCodecDeinterlacer(m_deintfiltername))
-        {
-            m_deinterlacing = false;
-            return false;
-        }
-
-        if (!m_deintfiltername.isEmpty())
-        {
-            if (!ApproveDeintFilter(m_deintfiltername))
-            {
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("Failed to approve '%1' deinterlacer "
-                            "as a software deinterlacer")
-                        .arg(m_deintfiltername));
-                m_deintfiltername.clear();
-            }
-        }
-
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using deinterlace method %1")
-                                   .arg(m_deintfiltername));
-    }
-
-    return m_deinterlacing;
-}
-
-/** \fn VideoOutput::FallbackDeint(void)
- *  \brief Fallback to non-frame-rate-doubling deinterlacing method.
- */
-void VideoOutput::FallbackDeint(void)
-{
-    SetupDeinterlace(false);
-    if (db_vdisp_profile)
-        SetupDeinterlace(true, db_vdisp_profile->GetFallbackDeinterlacer());
-}
-
-/** \fn VideoOutput::BestDeint(void)
- *  \brief Change to the best deinterlacing method.
- */
-void VideoOutput::BestDeint(void)
-{
-    SetupDeinterlace(false);
-    SetupDeinterlace(true);
-}
-
-/** \fn VideoOutput::IsExtraProcessingRequired(void) const
- *  \brief Should Prepare() and Show() and ProcessFrame be called
- *         twice for every Frameloop().
- *
- *   All adaptive full framerate deinterlacers require an extra
- *   ProcessFrame() call.
- *
- *  \return true if deint name contains doubleprocess
- */
-bool VideoOutput::IsExtraProcessingRequired(void) const
-{
-    return (m_deintfiltername.contains("doubleprocess")) && m_deinterlacing;
-}
-/**
- * \fn VideoOutput::NeedsDoubleFramerate() const
- * \brief Should Prepare() and Show() be called twice for every ProcessFrame().
- *
- * \return m_deintfiltername == "bobdeint" && m_deinterlacing
- */
-bool VideoOutput::NeedsDoubleFramerate() const
-{
-    // Bob deinterlace requires doubling framerate
-    return ((m_deintfiltername.contains("bobdeint") ||
-             m_deintfiltername.contains("doublerate") ||
-             m_deintfiltername.contains("doubleprocess")) &&
-             m_deinterlacing);
-}
-
-bool VideoOutput::IsBobDeint(void) const
-{
-    return (m_deinterlacing && m_deintfiltername == "bobdeint");
-}
-
-/**
- * \fn VideoOutput::ApproveDeintFilter(const QString& filtername) const
- * \brief Approves all deinterlace filters, except ones which
- *        must be supported by a specific video output class.
- */
-bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
-{
-    // Default to not supporting bob deinterlace
-    return (!filtername.contains("bobdeint") &&
-            !filtername.contains("doublerate") &&
-            !filtername.contains("opengl") &&
-            !filtername.contains("vdpau"));
-}
-
-void VideoOutput::GetDeinterlacers(QStringList &deinterlacers)
-{
-    if (!db_vdisp_profile)
+        vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE);
         return;
-    QString rend = db_vdisp_profile->GetActualVideoRenderer();
-    deinterlacers = VideoDisplayProfile::GetDeinterlacers(rend);
+    }
+
+    MythDeintType singlerate = DEINT_HIGH | DEINT_CPU | DEINT_SHADER | DEINT_DRIVER;
+    MythDeintType doublerate = DoubleRate ? DEINT_HIGH | DEINT_CPU | DEINT_SHADER | DEINT_DRIVER : DEINT_NONE;
+    //if (db_vdisp_profile)
+    //{
+    //    singlerate = db_vdisp_profile->GetFilteredDeint();
+    //    doublerate = DoubleRate ? db_vdisp_profile->GetFilteredDeint(true) : DEINT_NONE;
+    //}
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing: %1 DoubleRate %2")
+        .arg(DeinterlacerPref(singlerate)).arg(DeinterlacerPref(doublerate)));
+    vbuffers.SetDeinterlacing(singlerate, doublerate);
 }
 
 /**
@@ -609,10 +485,7 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
     if (db_vdisp_profile)
         db_vdisp_profile->SetInput(window.GetVideoDim(),0,codecName);
     video_codec_id = myth_codec_id;
-    BestDeint();
-
     DiscardFrames(true);
-
     return true;
 }
 /**
@@ -1770,20 +1643,19 @@ int VideoOutput::CalcHueBase(const QString &adaptor_name)
 {
     int hue_adj = 50;
 
-    // XVideo adjustments
-    if ((adaptor_name == "ATI Radeon Video Overlay") ||
-        (adaptor_name == "XA G3D Textured Video") || /* ATI in VMWare*/
-        (adaptor_name == "Radeon Textured Video") || /* ATI */
-        (adaptor_name == "AMD Radeon AVIVO Video") || /* ATI */
-        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
-        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
-        (adaptor_name == "SIS 300/315/330 series Video Overlay") ||
-        adaptor_name.toLower().contains("xvba") /* VAAPI */ ||
-        adaptor_name.toLower().startsWith("intel i965 driver"))
+    QString lower = adaptor_name.toLower();
+    // Hue base for different adaptors
+    // This can probably now be removed as it is only relevant to VAAPI
+    // which always uses 50
+    if (lower.contains("radeon") ||
+        lower.contains("g3d") ||
+        lower.contains("xvba") /* VAAPI */ ||
+        lower.startsWith("intel") ||
+        lower.contains("splitted"))
     {
         hue_adj = 50;
     }
-    else if (adaptor_name.startsWith("NV17")) /* nVidia */
+    else if (lower.startsWith("nv17")) /* nVidia */
     {
         hue_adj = 0;
     }

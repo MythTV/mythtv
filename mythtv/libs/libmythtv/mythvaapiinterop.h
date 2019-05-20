@@ -58,11 +58,11 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     void InitPictureAttributes(VideoColourSpace *ColourSpace);
 
   protected:
-    VASurfaceID         m_lastSurface;
     VADisplayAttribute *m_vaapiPictureAttributes;
     int                 m_vaapiPictureAttributeCount;
     int                 m_vaapiHueBase;
     uint                m_vaapiColourSpace;
+    MythDeintType       m_deinterlacer;
 };
 
 class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX

@@ -55,6 +55,11 @@ static inline int format_is_hw(VideoFrameType Type)
            (Type == FMT_NVDEC);
 }
 
+static inline int format_is_hwyuv(VideoFrameType Type)
+{
+    return (Type == FMT_NVDEC) || (Type == FMT_VTB);
+}
+
 static inline int format_is_yuv(VideoFrameType Type)
 {
     return (Type == FMT_YV12) || (Type == FMT_YUV422P) ||
@@ -63,6 +68,33 @@ static inline int format_is_yuv(VideoFrameType Type)
            (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16) ||
            (Type == FMT_P010) || (Type == FMT_P016);
 }
+
+static inline int format_is_420(VideoFrameType Type)
+{
+    return (Type == FMT_YV12) || (Type == FMT_YUV420P10) ||
+           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16);
+}
+
+static inline int format_is_nv12(VideoFrameType Type)
+{
+    return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
+}
+
+typedef enum MythDeintType
+{
+    DEINT_NONE   = 0x0000,
+    DEINT_BASIC  = 0x0001,
+    DEINT_MEDIUM = 0x0002,
+    DEINT_HIGH   = 0x0004,
+    DEINT_CPU    = 0x0010,
+    DEINT_SHADER = 0x0020,
+    DEINT_DRIVER = 0x0040,
+    DEINT_ALL    = 0xFFFF
+} MythDeintType;
+
+inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }
+inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
+inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
 
 typedef struct VideoFrame_
 {
@@ -75,29 +107,29 @@ typedef struct VideoFrame_
     double frame_rate;
     int bpp;
     int size;
-
     long long frameNumber;
     long long timecode;
     int64_t   disp_timecode;
-
     unsigned char *priv[4]; ///< random empty storage
-
-    unsigned char *qscale_table;
-    int            qstride;
-
     int interlaced_frame; ///< 1 if interlaced.
     int top_field_first; ///< 1 if top field is first.
+    int interlaced_reversed; /// 1 for user override of scan
     int repeat_pict;
     int forcekey; ///< hardware encoded .nuv
     int dummy;
-
     int pitches[3]; ///< Y, U, & V pitches
     int offsets[3]; ///< Y, U, & V offsets
-
     int pix_fmt;
     int sw_pix_fmt;
     int directrendering; ///< 1 if managed by FFmpeg
     int colorspace;
+    int colorrange;
+    int colorprimaries;
+    int colortransfer;
+    int chromalocation;
+    MythDeintType deinterlace_single;
+    MythDeintType deinterlace_double;
+    MythDeintType deinterlace_allowed;
 } VideoFrame;
 
 #ifdef __cplusplus
@@ -107,6 +139,10 @@ typedef struct VideoFrame_
 int MTV_PUBLIC ColorDepth(int Format);
 
 #ifdef __cplusplus
+
+MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type);
+MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type);
+MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
 
 enum class uswcState {
     Detect,
@@ -143,9 +179,9 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         float _aspect = -1.0F, double _rate = -1.0F,
                         int _aligned = 64);
 static inline void clear(VideoFrame *vf);
-static inline bool compatible(const VideoFrame *a,
-                              const VideoFrame *b);
 static inline int  bitsperpixel(VideoFrameType type);
+static inline int  pitch_for_plane(VideoFrameType Type, int Width, uint Plane);
+static inline int  height_for_plane(VideoFrameType Type, int Height, uint Plane);
 
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height,
@@ -159,15 +195,11 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->height = _height;
     vf->aspect = _aspect;
     vf->frame_rate = _rate;
-
     vf->size         = _size;
     vf->frameNumber  = 0;
     vf->timecode     = 0;
-
-    vf->qscale_table = nullptr;
-    vf->qstride      = 0;
-
     vf->interlaced_frame = 1;
+    vf->interlaced_reversed = 0;
     vf->top_field_first  = 1;
     vf->repeat_pict      = 0;
     vf->forcekey         = 0;
@@ -176,10 +208,17 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->sw_pix_fmt       = -1; // AV_PIX_FMT_NONE
     vf->directrendering  = 1;
     vf->colorspace       = 1; // BT.709
+    vf->colorrange       = 1; // normal/mpeg
+    vf->colorprimaries   = 1; // BT.709
+    vf->colortransfer    = 1; // BT.709
+    vf->chromalocation   = 1; // default 4:2:0
+    vf->deinterlace_single = DEINT_NONE;
+    vf->deinterlace_double = DEINT_NONE;
+    vf->deinterlace_allowed = DEINT_NONE;
 
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
-    uint width_aligned;
+    int width_aligned;
     if (!_aligned)
     {
         width_aligned = _width;
@@ -195,34 +234,8 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     }
     else
     {
-        if (FMT_YV12 == _codec || FMT_YUV422P == _codec)
-        {
-            vf->pitches[0] = width_aligned;
-            vf->pitches[1] = vf->pitches[2] = (width_aligned+1) >> 1;
-        }
-        else if (FMT_YUV420P10 == _codec || FMT_YUV420P12 == _codec ||
-                 FMT_YUV420P16 == _codec)
-        {
-            vf->pitches[0] = width_aligned << 1;
-            vf->pitches[1] = vf->pitches[2] = width_aligned;
-        }
-        else if (FMT_NV12 == _codec)
-        {
-            vf->pitches[0] = width_aligned;
-            vf->pitches[1] = width_aligned;
-            vf->pitches[2] = 0;
-        }
-        else if (FMT_P010 == _codec || FMT_P016 == _codec)
-        {
-            vf->pitches[0] = width_aligned << 1;
-            vf->pitches[1] = width_aligned << 1;
-            vf->pitches[2] = 0;
-        }
-        else
-        {
-            vf->pitches[0] = (width_aligned * vf->bpp) >> 3;
-            vf->pitches[1] = vf->pitches[2] = 0;
-        }
+        for (int i = 0; i < 3; ++i)
+            vf->pitches[i] = pitch_for_plane(_codec, width_aligned, i);
     }
 
     if (o)
@@ -231,46 +244,106 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     }
     else
     {
+        vf->offsets[0] = 0;
         if (FMT_YV12 == _codec)
         {
-            vf->offsets[0] = 0;
             vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] =
-                vf->offsets[1] + ((width_aligned+1) >> 1) * ((_height+1) >> 1);
+            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * ((_height+1) >> 1);
         }
         else if (FMT_YUV420P10 == _codec || FMT_YUV420P12 == _codec ||
                  FMT_YUV420P16 == _codec)
         {
-            vf->offsets[0] = 0;
             vf->offsets[1] = (width_aligned << 1) * _height;
             vf->offsets[2] = vf->offsets[1] + (width_aligned * (_height >> 1));
         }
         else if (FMT_YUV422P == _codec)
         {
-            vf->offsets[0] = 0;
             vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] =
-                vf->offsets[1] + ((width_aligned+1) >> 1) * _height;
+            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * _height;
         }
         else if (FMT_NV12 == _codec)
         {
-            vf->offsets[0] = 0;
             vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = 0;
         }
         else if (FMT_P010 == _codec || FMT_P016 == _codec)
         {
-            vf->offsets[0] = 0;
             vf->offsets[1] = (width_aligned << 1) * _height;
             vf->offsets[2] = 0;
         }
         else
         {
-            vf->offsets[0] = vf->offsets[1] = vf->offsets[2] = 0;
+            vf->offsets[1] = vf->offsets[2] = 0;
         }
     }
 }
 
+static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
+{
+    switch (Type)
+    {
+        case FMT_YV12:
+        case FMT_YUV422P:
+            if (Plane == 0) return Width;
+            if (Plane < 3)  return (Width + 1) >> 1;
+            break;
+        case FMT_YUV420P10:
+        case FMT_YUV420P12:
+        case FMT_YUV420P16:
+            if (Plane == 0) return Width << 1;
+            if (Plane < 3)  return Width;
+            break;
+        case FMT_NV12:
+            if (Plane < 2) return Width;
+            break;
+        case FMT_P010:
+        case FMT_P016:
+            if (Plane < 2) return Width << 1;
+            break;
+        case FMT_YUY2:
+        case FMT_YUYVHQ:
+        case FMT_RGB24:
+        case FMT_ARGB32:
+        case FMT_RGBA32:
+        case FMT_BGRA:
+        case FMT_RGB32:
+            if (Plane == 0) return (bitsperpixel(Type) * Width) >> 3;
+            break;
+        default: break; // None and hardware formats
+    }
+    return 0;
+}
+
+static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
+{
+    switch (Type)
+    {
+        case FMT_YV12:
+        case FMT_YUV422P:
+        case FMT_YUV420P10:
+        case FMT_YUV420P12:
+        case FMT_YUV420P16:
+            if (Plane == 0) return Height;
+            if (Plane < 3)  return Height >> 1;
+            break;
+        case FMT_NV12:
+        case FMT_P010:
+        case FMT_P016:
+            if (Plane < 2) return Height;
+            break;
+        case FMT_YUY2:
+        case FMT_YUYVHQ:
+        case FMT_RGB24:
+        case FMT_ARGB32:
+        case FMT_RGBA32:
+        case FMT_BGRA:
+        case FMT_RGB32:
+            if (Plane == 0) return Height;
+            break;
+        default: break; // None and hardware formats
+    }
+    return 0;
+}
 static inline void clear(VideoFrame *vf)
 {
     if (!vf)
@@ -335,34 +408,10 @@ static inline void copyplane(uint8_t* dst, int dst_pitch,
 {
     for (int y = 0; y < height; y++)
     {
-        memcpy(dst, src, width);
+        memcpy(dst, src, static_cast<size_t>(width));
         src += src_pitch;
         dst += dst_pitch;
     }
-}
-
-static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
-{
-    if (a && b && a->codec == b->codec &&
-        (a->codec == FMT_YV12 || a->codec == FMT_NV12))
-    {
-        return (a->codec      == b->codec)      &&
-               (a->width      == b->width)      &&
-               (a->height     == b->height)     &&
-               (a->size       == b->size);
-    }
-
-    return a && b &&
-        (a->codec      == b->codec)      &&
-        (a->width      == b->width)      &&
-        (a->height     == b->height)     &&
-        (a->size       == b->size)       &&
-        (a->offsets[0] == b->offsets[0]) &&
-        (a->offsets[1] == b->offsets[1]) &&
-        (a->offsets[2] == b->offsets[2]) &&
-        (a->pitches[0] == b->pitches[0]) &&
-        (a->pitches[1] == b->pitches[1]) &&
-        (a->pitches[2] == b->pitches[2]);
 }
 
 /**
@@ -498,9 +547,7 @@ static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
                               int pitch = 0, VideoFrameType type = FMT_YV12)
 {
     if (pitch == 0)
-    {
         pitch = src->width;
-    }
 
     if (type == FMT_YV12)
     {
