@@ -109,7 +109,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     return 0;
 }
 
-MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec **, const QString &Decoder,
+MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec **Codec, const QString &Decoder,
                                                 uint StreamType, AVPixelFormat &PixFmt)
 {
     bool decodeonly = Decoder == "vdpau-dec";
@@ -119,7 +119,10 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec
     if (((Decoder != "vdpau") && (Decoder != "vdpau-dec")) || getenv("NO_VDPAU"))
         return failure;
 
-    bool vdpau = MythVDPAUHelper::HaveVDPAU() && (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
+    // VDPAU only supports 8bit 420p:(
+    VideoFrameType type = PixelFormatToFrameType(Context->pix_fmt);
+    bool vdpau = (type == FMT_YV12) && MythVDPAUHelper::HaveVDPAU() &&
+                 (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
     if (vdpau && (success == kCodec_MPEG4_VDPAU || success == kCodec_MPEG4_VDPAU_DEC))
         vdpau = MythVDPAUHelper::HaveMPEG4Decode();
     if (vdpau && (success == kCodec_H264_VDPAU || success == kCodec_H264_VDPAU_DEC))
@@ -128,8 +131,16 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec
         vdpau = MythVDPAUHelper::CheckHEVCDecode(Context);
 
     if (!vdpau)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3'")
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg((*Codec)->name)
+                .arg(format_description(type)));
         return failure;
+    }
 
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg((*Codec)->name)
+            .arg(format_description(type)));
     PixFmt = AV_PIX_FMT_VDPAU;
     return success;
 }
