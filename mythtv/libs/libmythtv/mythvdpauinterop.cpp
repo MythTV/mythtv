@@ -43,15 +43,31 @@ MythVDPAUInterop::~MythVDPAUInterop()
         m_colourSpace->DecrRef();
 
     OpenGLLocker locker(m_context);
+    Cleanup();
+    delete m_helper;
+}
+
+void MythVDPAUInterop::Cleanup(void)
+{
+    OpenGLLocker locker(m_context);
+
     if (m_helper)
     {
         m_helper->DeleteOutputSurface(m_outputSurface);
         m_helper->DeleteMixer(m_mixer);
-        delete m_helper;
     }
+
+    m_mixer = 0;
+    m_outputSurface = 0;
+    m_outputSurfaceReg = 0;
+    m_deinterlacer = DEINT_NONE;
+    m_mixerSize = QSize();
+    m_mixerChroma = VDP_CHROMA_TYPE_420;
 
     if (m_finiNV)
         m_finiNV();
+
+    DeleteTextures();
 }
 
 bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
@@ -95,20 +111,25 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
     if (!m_helper || !m_context || !Surface || !DeviceContext)
         return false;
 
+    VdpChromaType chroma = VDP_CHROMA_TYPE_420;
+    QSize size = m_helper->GetSurfaceParameters(Surface, chroma);
+
+    if (m_mixer && (chroma != m_mixerChroma || size != m_mixerSize || Deint != m_deinterlacer))
+        Cleanup();
+
     if (!m_mixer)
     {
-        VdpChromaType chroma = VDP_CHROMA_TYPE_420;
-        QSize size = m_helper->GetSurfaceParameters(Surface, chroma);
         m_mixer = m_helper->CreateMixer(size, chroma, Deint);
         m_deinterlacer = Deint;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup deinterlacer '%1'")
-            .arg(DeinterlacerName(m_deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VDPAU)));
+        m_mixerChroma = chroma;
+        m_mixerSize = size;
+        if (DEINT_NONE != m_deinterlacer)
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup deinterlacer '%1'")
+                .arg(DeinterlacerName(m_deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VDPAU)));
     }
 
     if (!m_outputSurface)
     {
-        VdpChromaType chroma = VDP_CHROMA_TYPE_420;
-        QSize size = m_helper->GetSurfaceParameters(Surface, chroma);
         m_outputSurface = m_helper->CreateOutputSurface(size);
         if (m_outputSurface)
         {
@@ -228,13 +249,6 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
 
         if (driverdeint)
             deinterlacer = driverdeint;
-
-        // destroy the current mixer if necessary
-        if (deinterlacer != m_deinterlacer)
-        {
-            m_helper->DeleteMixer(m_mixer);
-            m_mixer = 0;
-        }
     }
 
     // We need a mixer, an output surface and mapped texture

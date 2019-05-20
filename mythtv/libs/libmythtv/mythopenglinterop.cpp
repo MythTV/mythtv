@@ -203,6 +203,12 @@ MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType
 
 MythOpenGLInterop::~MythOpenGLInterop()
 {
+    DeleteTextures();
+    m_context->DecrRef();
+}
+
+void MythOpenGLInterop::DeleteTextures(void)
+{
     if (!m_openglTextures.isEmpty())
     {
         OpenGLLocker locker(m_context);
@@ -222,7 +228,6 @@ MythOpenGLInterop::~MythOpenGLInterop()
         }
         m_openglTextures.clear();
     }
-    m_context->DecrRef();
 }
 
 MythOpenGLInterop::Type MythOpenGLInterop::GetType(void)
