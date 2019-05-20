@@ -37,58 +37,6 @@ extern "C" {
 
 #define LOC QString("NVDEC: ")
 
-MythCodecID NvdecContext::GetBestSupportedCodec(
-    AVCodec **ppCodec,
-    const QString &decoder,
-    uint stream_type,
-    AVPixelFormat &pix_fmt)
-{
-    enum AVHWDeviceType type = AV_HWDEVICE_TYPE_CUDA;
-
-    AVPixelFormat fmt = AV_PIX_FMT_NONE;
-    if (decoder == "nvdec-dec")
-    {
-        for (int i = 0;; i++) {
-            const AVCodecHWConfig *config = avcodec_get_hw_config(*ppCodec, i);
-            if (!config)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("Decoder %1 does not support device type %2.")
-                        .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
-                break;
-            }
-            if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
-                config->device_type == type)
-            {
-                QString decodername = QString((*ppCodec)->name) + "_cuvid";
-                if (decodername == "mpeg2video_cuvid")
-                    decodername = "mpeg2_cuvid";
-                AVCodec *newCodec = avcodec_find_decoder_by_name (decodername.toLocal8Bit());
-                if (newCodec)
-                {
-                    *ppCodec = newCodec;
-                    fmt = config->pix_fmt;
-                }
-                else
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("Decoder %1 does not exist.")
-                            .arg(decodername));
-                break;
-            }
-        }
-    }
-    if (fmt == AV_PIX_FMT_NONE)
-        return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Decoder %1 supports device type %2.")
-                .arg((*ppCodec)->name).arg(av_hwdevice_get_type_name(type)));
-        pix_fmt = fmt;
-        return (MythCodecID)(kCodec_MPEG1_NVDEC_DEC + (stream_type - 1));
-    }
-}
-
 int NvdecContext::HwDecoderInit(AVCodecContext *ctx)
 {
     int ret = 0;

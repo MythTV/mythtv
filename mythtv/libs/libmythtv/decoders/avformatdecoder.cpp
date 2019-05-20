@@ -2494,11 +2494,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 dec = "ffmpeg";
             }
 
+            bool foundgpudecoder = false;
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
-                bool foundgpudecoder = false;
-                Q_UNUSED(foundgpudecoder); // Prevent warning if no GPU decoders
-
 #ifdef USING_VDPAU
                 if (!foundgpudecoder)
                 {
@@ -2621,31 +2619,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     MythCodecID nvdecmcid;
                     AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
                     nvdecmcid = MythNVDECContext::GetSupportedCodec(enc, &codec, dec,
-                                                mpeg_version(enc->codec_id), pix_fmt);
+                                                                    mpeg_version(enc->codec_id), pix_fmt);
 
-                    if (codec_is_nvdec(nvdecmcid))
+                    if (codec_is_nvdec(nvdecmcid) || codec_is_nvdec_dec(nvdecmcid))
                     {
                         gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
                         m_video_codec_id = nvdecmcid;
                         foundgpudecoder = true;
-                    }
-                }
-
-                if (!foundgpudecoder)
-                {
-                    MythCodecID nvdec_mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    nvdec_mcid = NvdecContext::GetBestSupportedCodec(
-                        &codec, dec, mpeg_version(enc->codec_id),
-                        pix_fmt);
-
-                    if (codec_is_nvdec_dec(nvdec_mcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = nvdec_mcid;
-                        //foundgpudecoder = true;
                     }
                 }
 #endif // USING_NVDEC
@@ -2675,12 +2656,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (FlagIsSet(kDecodeSingleThreaded))
                 thread_count = 1;
 
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Using %1 CPUs for decoding")
-                .arg(HAVE_THREADS ? thread_count : 1));
+            if (!foundgpudecoder)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
+                    .arg(HAVE_THREADS ? thread_count : 1));
+            }
 
             if (HAVE_THREADS)
-                enc->thread_count = thread_count;
+                enc->thread_count = static_cast<int>(thread_count);
 
             InitVideoCodec(m_ic->streams[selTrack], enc, true);
 

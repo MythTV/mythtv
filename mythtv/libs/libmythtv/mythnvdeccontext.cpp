@@ -19,10 +19,11 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
                                                 uint            StreamType,
                                                 AVPixelFormat  &PixFmt)
 {
-    MythCodecID success = static_cast<MythCodecID>(kCodec_MPEG1_NVDEC + (StreamType - 1));
+    bool decodeonly = Decoder == "nvdec-dec";
+    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if ((Decoder != "nvdec") || getenv("NO_NVDEC"))
+    if (((Decoder != "nvdec") && (Decoder != "nvdec-dec")) || getenv("NO_NVDEC"))
         return failure;
 
     // NVDec only supports 420 chroma

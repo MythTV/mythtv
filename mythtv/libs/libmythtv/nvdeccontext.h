@@ -38,10 +38,6 @@ class MTV_PUBLIC NvdecContext : public MythCodecContext
 {
   public:
     NvdecContext(void) = default;
-    static MythCodecID GetBestSupportedCodec(AVCodec **ppCodec,
-                                             const QString &decoder,
-                                             uint stream_type,
-                                             AVPixelFormat &pix_fmt);
     int HwDecoderInit(AVCodecContext *ctx) override; // MythCodecContext
     bool isValidDeinterlacer(QString /*name*/ ) override; // MythCodecContext
     QStringList GetDeinterlacers(void) override; // MythCodecContext
