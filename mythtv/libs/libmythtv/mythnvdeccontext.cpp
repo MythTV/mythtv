@@ -13,7 +13,7 @@
  * \todo Add proper decoder support check if possible. FFmpeg does not expose the
  * CUVID functions though.
 */
-MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext*,
+MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
                                                 AVCodec       **Codec,
                                                 const QString  &Decoder,
                                                 uint            StreamType,
@@ -25,33 +25,41 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext*,
     if ((Decoder != "nvdec") || getenv("NO_NVDEC"))
         return failure;
 
-    for (int i = 0; ; i++)
+    // NVDec only supports 420 chroma
+    // N.B. High end GPUs can decode H.265 4:4:4 - which will need fixing here
+    VideoFrameType type = PixelFormatToFrameType(Context->pix_fmt);
+    if (format_is_420(type))
     {
-        const AVCodecHWConfig *config = avcodec_get_hw_config(*Codec, i);
-        if (!config)
-            break;
-
-        if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) &&
-            (config->device_type == AV_HWDEVICE_TYPE_CUDA))
+        for (int i = 0; ; i++)
         {
-            QString name = QString((*Codec)->name) + "_cuvid";
-            if (name == "mpeg2video_cuvid")
-                name = "mpeg2_cuvid";
-            AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-            if (codec)
+            const AVCodecHWConfig *config = avcodec_get_hw_config(*Codec, i);
+            if (!config)
+                break;
+
+            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) &&
+                (config->device_type == AV_HWDEVICE_TYPE_CUDA))
             {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
-                        .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name));
-                *Codec = codec;
-                PixFmt = config->pix_fmt;
-                return success;
+                QString name = QString((*Codec)->name) + "_cuvid";
+                if (name == "mpeg2video_cuvid")
+                    name = "mpeg2_cuvid";
+                AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+                if (codec)
+                {
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
+                            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name)
+                            .arg(format_description(type)));
+                    *Codec = codec;
+                    PixFmt = config->pix_fmt;
+                    return success;
+                }
+                break;
             }
-            break;
         }
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2'")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3'")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name)
+            .arg(format_description(type)));
     return failure;
 }
 
