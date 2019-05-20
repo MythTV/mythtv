@@ -26,10 +26,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
     Q_OBJECT
 
   public:
-    static MythVDPAUInterop* Create(MythRenderOpenGL *Context);
+    static MythVDPAUInterop* Create(MythRenderOpenGL *Context, MythCodecID CodecId);
     static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
 
-    MythVDPAUInterop(MythRenderOpenGL *Context);
     virtual ~MythVDPAUInterop() override;
 
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace,
@@ -37,6 +36,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
 
   public slots:
     void  UpdateColourSpace(void);
+
+  protected:
+    MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecID);
 
   private:
     bool  InitNV(AVVDPAUDeviceContext* DeviceContext);
@@ -57,6 +59,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
     MYTH_VDPAUREGOUTSURFNV m_registerNV     { nullptr };
     MYTH_VDPAUSURFACCESSNV m_accessNV       { nullptr };
     MYTH_VDPAUMAPSURFNV m_mapNV             { nullptr };
+    MythCodecID         m_codec             { kCodec_NONE };
 };
 
 #endif // MYTHVDPAUINTEROP_H

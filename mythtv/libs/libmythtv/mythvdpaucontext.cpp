@@ -59,7 +59,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     }
 
     // Create interop
-    MythVDPAUInterop *interop = MythVDPAUInterop::Create(render);
+    MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
     if (!interop)
     {
         av_buffer_unref(&hwdeviceref);

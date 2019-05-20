@@ -6,10 +6,10 @@
 
 #define LOC QString("VDPAUInterop: ")
 
-MythVDPAUInterop* MythVDPAUInterop::Create(MythRenderOpenGL *Context)
+MythVDPAUInterop* MythVDPAUInterop::Create(MythRenderOpenGL *Context, MythCodecID CodecId)
 {
     if (Context)
-        return new MythVDPAUInterop(Context);
+        return new MythVDPAUInterop(Context, CodecId);
     return nullptr;
 }
 
@@ -29,8 +29,9 @@ MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(MythCodecID CodecId,
     return Unsupported;
 }
 
-MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL *Context)
-  : MythOpenGLInterop(Context, VDPAU)
+MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecId)
+  : MythOpenGLInterop(Context, VDPAU),
+    m_codec(CodecId)
 {
 }
 
@@ -231,6 +232,17 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     VdpVideoSurface surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->buf));
     if (!surface)
         return result;
+
+    // Workaround HEVC interlaced bug
+    // VDPAU driver hangs if we try to render HEVC as interlaced (tested with version 418.56)
+    // Furthermore, testing with an HEVC interlaced stream, it looks like FFmpeg does not
+    // pick up the interlacing anyway - though that might be fixed with a proper HEVC stream parser
+    if ((kCodec_HEVC_VDPAU == m_codec) && is_interlaced(Scan) && !Frame->interlaced_frame)
+    {
+        // This should only be logged a couple of times before the scan is detected as progressive
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring scan for non-interlaced HEVC frame");
+        Scan = kScan_Progressive;
+    }
 
     // Check for deinterlacing - VDPAU deinterlacers trump all others as we can only
     // deinterlace VDPAU frames here. So accept any deinterlacer.
