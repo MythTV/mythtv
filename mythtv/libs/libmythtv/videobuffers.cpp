@@ -886,16 +886,12 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height,
     return ok;
 }
 
-static unsigned char *ffmpeg_hack = (unsigned char*)"eRRor";
-
 bool VideoBuffers::CreateBuffer(int Width, int Height, uint Number,
                                 void* Data, VideoFrameType Format)
 {
     if (Number >= Size())
         return false;
     init(&m_buffers[Number], Format, (unsigned char*)Data, Width, Height, 0);
-    m_buffers[Number].priv[0] = ffmpeg_hack;
-    m_buffers[Number].priv[1] = ffmpeg_hack;
     return true;
 }
 
@@ -916,8 +912,6 @@ uint VideoBuffers::AddBuffer(int Width, int Height, void* Data, VideoFrameType F
         m_allocatedArrays.push_back((unsigned char*)Data);
     }
     init(&m_buffers[num], Format, (unsigned char*)Data, Width, Height, 0);
-    m_buffers[num].priv[0] = ffmpeg_hack;
-    m_buffers[num].priv[1] = ffmpeg_hack;
     Enqueue(kVideoBuffer_avail, At(num));
     return Size();
 }
