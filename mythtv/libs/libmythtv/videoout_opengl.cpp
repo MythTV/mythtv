@@ -181,6 +181,7 @@ void VideoOutputOpenGL::DestroyBuffers(void)
     DiscardFrames(true);
     vbuffers.DeleteBuffers();
     vbuffers.Reset();
+    m_buffersCreated = false;
 }
 
 bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
