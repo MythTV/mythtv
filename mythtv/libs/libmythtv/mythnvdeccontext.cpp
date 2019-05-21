@@ -173,9 +173,8 @@ int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
         videoframe->priv[i] = nullptr;
     }
 
-    // hrm - hacky
-    if (videoframe->pitches[0] && videoframe->offsets[1])
-        videoframe->height = videoframe->offsets[1] / videoframe->pitches[0];
+    videoframe->width = Frame->width;
+    videoframe->height = Frame->height;
 
     Frame->opaque           = videoframe;
     videoframe->pix_fmt     = Context->pix_fmt;
