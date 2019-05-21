@@ -48,6 +48,18 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
             return AV_PIX_FMT_YUV420P12;
         case FMT_YUV420P16:
             return AV_PIX_FMT_YUV420P16;
+        case FMT_VDPAU:
+            return AV_PIX_FMT_VDPAU;
+        case FMT_VTB:
+            return AV_PIX_FMT_VIDEOTOOLBOX;
+        case FMT_VAAPI:
+            return AV_PIX_FMT_VAAPI;
+        case FMT_MEDIACODEC:
+            return AV_PIX_FMT_MEDIACODEC;
+        case FMT_NVDEC:
+            return AV_PIX_FMT_CUDA;
+        case FMT_DXVA2:
+            return AV_PIX_FMT_DXVA2_VLD;
         default:
             return AV_PIX_FMT_YUV420P;
     }
@@ -85,6 +97,18 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
             return FMT_RGBA32;
         case AV_PIX_FMT_BGRA:
             return FMT_BGRA;
+        case AV_PIX_FMT_CUDA:
+            return FMT_NVDEC;
+        case AV_PIX_FMT_VDPAU:
+            return FMT_VDPAU;
+        case AV_PIX_FMT_VIDEOTOOLBOX:
+            return FMT_VTB;
+        case AV_PIX_FMT_VAAPI:
+            return FMT_VAAPI;
+        case AV_PIX_FMT_DXVA2_VLD:
+            return FMT_DXVA2;
+        case AV_PIX_FMT_MEDIACODEC:
+            return FMT_MEDIACODEC;
         default: break;
     }
     return FMT_NONE;
