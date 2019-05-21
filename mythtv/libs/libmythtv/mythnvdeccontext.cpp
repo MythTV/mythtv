@@ -29,7 +29,9 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
     // NVDec only supports 420 chroma
     // N.B. High end GPUs can decode H.265 4:4:4 - which will need fixing here
     VideoFrameType type = PixelFormatToFrameType(Context->pix_fmt);
-    if (format_is_420(type))
+    // N.B. on stream changes, the context format is already CUDA. This may break in the
+    // probably unlikely event that the new chroma format is not 420
+    if (format_is_420(type) || FMT_NVDEC == type)
     {
         for (int i = 0; ; i++)
         {
@@ -142,8 +144,8 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-using CUDA context");
                 return *PixFmt;
             }
-            PixFmt++;
         }
+        PixFmt++;
     }
     return AV_PIX_FMT_NONE;
 }
