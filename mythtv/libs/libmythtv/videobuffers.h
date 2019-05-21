@@ -19,7 +19,6 @@ using namespace std;
 typedef MythDeque<VideoFrame*>       frame_queue_t;
 typedef vector<VideoFrame>           frame_vector_t;
 typedef map<const VideoFrame*, uint> vbuffer_map_t;
-typedef vector<unsigned char*>       uchar_vector_t;
 
 const QString& DebugString(const VideoFrame *Frame, bool Short = false);
 const QString& DebugString(uint  FrameNum, bool Short = false);
@@ -64,8 +63,7 @@ class MTV_PUBLIC VideoBuffers
                        uint NeedFree, uint NeedprebufferNormal,
                        uint NeedPrebufferSmall, uint KeepPrebuffer);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height,
-                       vector<unsigned char*> Buffers,
-                       vector<YUVInfo>        YUVInfos);
+                       vector<YUVInfo> YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
     bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type);
     void DeleteBuffers(void);
@@ -116,7 +114,6 @@ class MTV_PUBLIC VideoBuffers
     void Clear(uint FrameNum);
     void Clear(void);
     bool CreateBuffer(int Width, int Height, uint Number, void *Data, VideoFrameType Format);
-    uint AddBuffer(int Width, int Geight, void* Data, VideoFrameType Format);
 
     QString GetStatus(uint Num = 0) const;
 
@@ -136,7 +133,6 @@ class MTV_PUBLIC VideoBuffers
     frame_queue_t        m_finished;
     vbuffer_map_t        m_vbufferMap;
     frame_vector_t       m_buffers;
-    uchar_vector_t       m_allocatedArrays;
 
     uint                 m_needFreeFrames            { 0 };
     uint                 m_needPrebufferFrames       { 0 };

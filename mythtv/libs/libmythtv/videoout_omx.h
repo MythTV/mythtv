@@ -82,7 +82,6 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     OMXComponent m_render, m_imagefx;
     VideoFrame av_pause_frame;
     QRect m_disp_rect, m_vid_rect;
-    QVector<void*> m_bufs;
 #ifdef OSD_EGL
     MythRenderEGL *m_context;
     MythOpenGLPainter *m_osdpainter;

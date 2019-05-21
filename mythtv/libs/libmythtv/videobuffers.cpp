@@ -844,41 +844,29 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
         return success;
     }
 
-    vector<unsigned char*> bufs;
-    vector<YUVInfo>        yuvinfo;
-    return CreateBuffers(Type, Width, Height, bufs, yuvinfo);
+    vector<YUVInfo> yuvinfo;
+    return CreateBuffers(Type, Width, Height, yuvinfo);
 }
 
-bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height,
-                                 vector<unsigned char*> Buffers, vector<YUVInfo> YUVInfos)
+bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height, vector<YUVInfo> YUVInfos)
 {
     if ((FMT_YV12 != Type) && (FMT_YUY2 != Type))
         return false;
 
+    uint bufsize = buffersize(Type, Width, Height);
+    while (YUVInfos.size() < Size())
+        YUVInfos.emplace_back(Width, Height, bufsize, nullptr, nullptr);
+
     bool ok = true;
-    uint buf_size = buffersize(Type, Width, Height);
-
-    while (Buffers.size() < Size())
-    {
-        unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
-        if (!data)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to allocate memory for frame.");
-            return false;
-        }
-
-        Buffers.push_back(data);
-        YUVInfos.emplace_back(Width, Height, buf_size, nullptr, nullptr);
-        m_allocatedArrays.push_back(data);
-    }
-
     for (uint i = 0; i < Size(); i++)
     {
-        init(&m_buffers[i],
-             Type, Buffers[i], YUVInfos[i].m_width, YUVInfos[i].m_height,
-             max(buf_size, YUVInfos[i].m_size),
+        uint size = std::max(bufsize, YUVInfos[i].m_size);
+        unsigned char *data = static_cast<unsigned char*>(av_malloc(size + 64));
+        if (!data)
+            LOG(VB_GENERAL, LOG_CRIT, "Failed to allocate video buffer memory");
+        init(&m_buffers[i], Type, data, YUVInfos[i].m_width, YUVInfos[i].m_height, size,
              (const int*) YUVInfos[i].m_pitches, (const int*) YUVInfos[i].m_offsets);
-        ok &= (Buffers[i] != nullptr);
+        ok &= (m_buffers[i].buf != nullptr);
     }
 
     Clear();
@@ -895,35 +883,11 @@ bool VideoBuffers::CreateBuffer(int Width, int Height, uint Number,
     return true;
 }
 
-uint VideoBuffers::AddBuffer(int Width, int Height, void* Data, VideoFrameType Format)
-{
-    QMutexLocker lock(&m_globalLock);
-
-    uint num = Size();
-    m_buffers.resize(num + 1);
-    memset(&m_buffers[num], 0, sizeof(VideoFrame));
-    m_buffers[num].interlaced_frame = -1;
-    m_buffers[num].top_field_first  = 1;
-    m_vbufferMap[At(num)] = num;
-    if (!Data)
-    {
-        int size = buffersize(Format, Width, Height);
-        Data = av_malloc(size);
-        m_allocatedArrays.push_back((unsigned char*)Data);
-    }
-    init(&m_buffers[num], Format, (unsigned char*)Data, Width, Height, 0);
-    Enqueue(kVideoBuffer_avail, At(num));
-    return Size();
-}
-
 void VideoBuffers::DeleteBuffers(void)
 {
     next_dbg_str = 0;
     for (uint i = 0; i < Size(); i++)
-        m_buffers[i].buf = nullptr;
-    for (size_t i = 0; i < m_allocatedArrays.size(); i++)
-        av_free(m_allocatedArrays[i]);
-    m_allocatedArrays.clear();
+        av_freep(&(m_buffers[i].buf));
 }
 
 bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
@@ -945,11 +909,11 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
             VideoFrameType old = Frame->codec;
             int size = static_cast<int>(buffersize(Type, Frame->width, Frame->height));
             unsigned char *buf = Frame->buf;
-            if (Frame->size != size)
+            if ((Frame->size != size) || !buf)
             {
                 // Free existing buffer
-                av_free(m_allocatedArrays[i]);
-                m_allocatedArrays[i] = Frame->buf = buf = nullptr;
+                av_freep(&buf);
+                Frame->buf = nullptr;
 
                 // Initialise new
                 buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(size + 64)));
@@ -961,7 +925,6 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
                 }
             }
 
-            m_allocatedArrays[i] = buf;
             MythDeintType singler = Frame->deinterlace_single;
             MythDeintType doubler = Frame->deinterlace_double;
             init(Frame, Type, buf, Frame->width, Frame->height, size);

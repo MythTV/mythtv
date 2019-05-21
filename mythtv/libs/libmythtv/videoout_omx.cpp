@@ -1040,24 +1040,11 @@ bool VideoOutputOMX::CreateBuffers(
     offsets[2] = offsets[1] + (offsets[1] >> 2);
     uint nBufferSize = buffersize(FMT_YV12, nStride, nSliceHeight);
 
-    std::vector<unsigned char*> bufs;
     std::vector<YUVInfo> yuvinfo;
     for (uint i = 0; i < vbuffers.Size(); ++i)
-    {
         yuvinfo.emplace_back(video_dim_disp.width(), video_dim_disp.height(),
                              nBufferSize, pitches, offsets);
-        void *buf = av_malloc(nBufferSize + 64);
-        if (!buf)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Out of memory");
-            errorState = kError_Unknown;
-            return false;
-        }
-        m_bufs.push_back(buf);
-        bufs.push_back((unsigned char *)buf);
-    }
-    if (!vbuffers.CreateBuffers(FMT_YV12, video_dim_disp.width(),
-                                video_dim_disp.height(), bufs, yuvinfo))
+    if (!vbuffers.CreateBuffers(FMT_YV12, video_dim_disp.width(), video_dim_disp.height(), yuvinfo))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "CreateBuffers failed");
         errorState = kError_Unknown;
@@ -1075,12 +1062,6 @@ void VideoOutputOMX::DeleteBuffers()
     init(&av_pause_frame, FMT_YV12, nullptr, 0, 0, 0);
 
     vbuffers.DeleteBuffers();
-
-    while (!m_bufs.empty())
-    {
-        av_free(m_bufs.back());
-        m_bufs.pop_back();
-    }
 }
 
 bool VideoOutputOMX::Start()
