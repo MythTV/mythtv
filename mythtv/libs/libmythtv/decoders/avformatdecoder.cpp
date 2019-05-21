@@ -1647,7 +1647,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             m_directrendering = false;
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Using software scaling to convert pixel format %1 for "
-                    "codec %2").arg(enc->pix_fmt)
+                    "codec %2").arg(av_get_pix_fmt_name(enc->pix_fmt))
                 .arg(ff_codec_id_string(enc->codec_id)));
     }
 
