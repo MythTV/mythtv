@@ -137,6 +137,8 @@ public:
     QAtomicInt m_cacheSize                   {0};
     QAtomicInt m_maxCacheSize                {30 * 1024 * 1024};
 #else
+    // This change is because of the QImage change from byteCount() to
+    // sizeInBytes(), the latter returning a 64bit value.
     QAtomicInteger<qint64> m_cacheSize       {0};
     QAtomicInteger<qint64> m_maxCacheSize    {30 * 1024 * 1024};
 #endif

@@ -2648,6 +2648,7 @@ bool Scheduler::HandleRecording(
 
     QDateTime curtime     = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
+    int origprerollseconds = prerollseconds;
 
     if (ri.GetRecordingStatus() != RecStatus::WillRecord &&
         ri.GetRecordingStatus() != RecStatus::Pending)
@@ -2819,21 +2820,18 @@ bool Scheduler::HandleRecording(
 
     if (ri.GetRecordingStatus() != RecStatus::Pending)
     {
-        if (m_sinputinfomap[ri.GetInputID()].m_schedgroup)
+        if (!AssignGroupInput(tempri, origprerollseconds))
         {
-            if (!AssignGroupInput(tempri))
-            {
-                // We failed to assign an input.  Keep asking the main
-                // server to add one until we get one.
-                MythEvent me(QString("ADD_CHILD_INPUT %1")
-                             .arg(tempri.GetInputID()));
-                gCoreContext->dispatch(me);
-                nextWakeTime = min(nextWakeTime, curtime.addSecs(1));
-                return m_reclist_changed;
-            }
-            ri.SetInputID(tempri.GetInputID());
-            nexttv = (*m_tvList)[ri.GetInputID()];
+            // We failed to assign an input.  Keep asking the main
+            // server to add one until we get one.
+            MythEvent me(QString("ADD_CHILD_INPUT %1")
+                         .arg(tempri.GetInputID()));
+            gCoreContext->dispatch(me);
+            nextWakeTime = min(nextWakeTime, curtime.addSecs(1));
+            return m_reclist_changed;
         }
+        ri.SetInputID(tempri.GetInputID());
+        nexttv = (*m_tvList)[ri.GetInputID()];
 
         ri.SetRecordingStatus(RecStatus::Pending);
         tempri.SetRecordingStatus(RecStatus::Pending);
@@ -2928,7 +2926,8 @@ void Scheduler::HandleRecordingStatusChange(
     }
 }
 
-bool Scheduler::AssignGroupInput(RecordingInfo &ri)
+bool Scheduler::AssignGroupInput(RecordingInfo &ri,
+                                 int prerollseconds)
 {
     if (!m_sinputinfomap[ri.GetInputID()].m_schedgroup)
         return true;
@@ -2956,7 +2955,8 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
         for (RecIter j = m_reclist.begin(); j != m_reclist.end(); ++j)
         {
             RecordingInfo *p = (*j);
-            if (now.secsTo(p->GetRecordingStartTime()) > 300)
+            if (now.secsTo(p->GetRecordingStartTime()) >
+                prerollseconds + 60)
                 break;
             if (p->GetInputID() != inputid)
                 continue;

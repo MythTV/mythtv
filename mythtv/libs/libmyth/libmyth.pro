@@ -179,7 +179,9 @@ unix:!cygwin {
 
 android {
 SOURCES += audio/audiooutputopensles.cpp
+SOURCES += audio/audiooutputaudiotrack.cpp
 HEADERS += audio/audiooutputopensles.h
+HEADERS += audio/audiooutputaudiotrack.h
 }
 
 linux:DEFINES += linux

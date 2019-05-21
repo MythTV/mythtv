@@ -38,6 +38,7 @@ using namespace std;
 #endif
 #ifdef Q_OS_ANDROID
 #include "audiooutputopensles.h"
+#include "audiooutputaudiotrack.h"
 #endif
 #ifdef USING_OPENMAX
 #include "audiooutput_omx.h"
@@ -204,6 +205,16 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         ret = new AudioOutputOpenSLES(settings);
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a OpenSLES "
+                                 "device but Android support is not compiled "
+                                 "in!");
+#endif
+    }
+    else if (main_device.startsWith("AudioTrack:"))
+    {
+#ifdef Q_OS_ANDROID
+        ret = new AudioOutputAudioTrack(settings);
+#else
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to AudioTrack "
                                  "device but Android support is not compiled "
                                  "in!");
 #endif
@@ -564,7 +575,17 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #ifdef ANDROID
     {
         QString name = "OpenSLES:";
-        QString desc =  tr("OpenSLES default output.");
+        QString desc =  tr("OpenSLES default output. Stereo support only.");
+        adc = GetAudioDeviceConfig(name, desc);
+        if (adc)
+        {
+            list->append(*adc);
+            delete adc;
+        }
+    }
+    {
+        QString name = "AudioTrack:";
+        QString desc =  tr("Android AudioTrack output. Supports surround sound.");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {

@@ -73,11 +73,6 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     // in practice, however this is correct for the 4.0 DVB API
     m_signalStrength.SetRange(0, 65535);
 
-    bool ok;
-    _channel->HasLock(&ok);
-    if (!ok)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot read DVB status" + ENO);
-
     uint64_t rmflags = 0;
 
 #define DVB_IO(FLAG, METHOD, MSG) \

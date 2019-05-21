@@ -20,7 +20,7 @@
 #include "tv_rec.h"
 
 #define LOC QString("EITScanner: ")
-#define LOC_ID QString("EITScanner (%1): ").arg(m_cardnum)
+#define LOC_ID QString("EITScanner[%1]: ").arg(m_cardnum)
 
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.

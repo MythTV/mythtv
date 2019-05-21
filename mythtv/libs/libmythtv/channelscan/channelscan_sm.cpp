@@ -920,7 +920,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                 m_scanMonitor->ScanAppendTextToLog(msg_tr);
             }
 
-            QString msg = LOC + QString("Program %1").arg(it.key());
+            QString msg = QString("Program %1").arg(it.key());
             if (kEncEncrypted == *it)
                 msg = msg + " -- Encrypted";
             else if (kEncDecrypted == *it)
@@ -1448,7 +1448,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("GetChannelList: set chan_num '%1'").arg(info.m_chan_num));
+            QString("GetChannelList: set chan_num '%1' for '%2'")
+                .arg(info.m_chan_num).arg(info.m_callsign));
     }
 
     // Get QAM/SCTE/MPEG channel numbers
@@ -1522,6 +1523,10 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 dbchan_it = pnum_to_dbchan.begin();
                 ChannelInsertInfo info = *dbchan_it;
 
+                // Use transport stream ID as (fake) service ID
+                // to use in callsign and as channel number
+                info.m_service_id = info.m_pat_tsid;
+
                 if (tuner_type == DTVTunerType::kTunerTypeASI)
                     info.m_callsign = QString("MPTS_%1")
                                     .arg(CardUtil::GetDisplayName(cardid));
@@ -1540,9 +1545,9 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                     info.m_callsign = "MPTS_UNKNOWN";
 
                 info.m_service_name = info.m_callsign;
-                info.m_service_id = 0;
                 info.m_atsc_minor_channel = 0;
                 info.m_format = "MPTS";
+                info.m_use_on_air_guide = false;
                 item.m_channels.push_back(info);
             }
 

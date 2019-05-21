@@ -628,7 +628,6 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
 // Get the list of all supported delivery systems from the card
 QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
 {
-    Q_UNUSED(fd_frontend);
     QStringList delsyslist;
 
 #ifdef USING_DVB
@@ -658,6 +657,24 @@ QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
     return delsyslist;
 }
 
+QString CardUtil::ProbeDefaultDeliverySystem(const QString &device)
+{
+    DTVModulationSystem delsys;
+
+#ifdef USING_DVB
+    int fd = OpenVideoDevice(device);
+    if (fd >= 0)
+    {
+        delsys = ProbeBestDeliverySystem(fd);
+        close(fd);
+    }
+#else
+    Q_UNUSED(device);
+#endif  // USING_DVB
+
+    return delsys.toString();
+}
+
 QString CardUtil::ProbeDVBType(const QString &device)
 {
     QString ret = "ERROR_UNKNOWN";
@@ -684,19 +701,24 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
     QString ret = "ERROR_UNKNOWN";
 
 #ifdef USING_DVB
-    int fd_frontend = OpenVideoDevice(device);
-    if  (fd_frontend > 0)
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    QByteArray dev = dvbdev.toLatin1();
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
+    if (fd_frontend < 0)
+        return "ERROR_OPEN";
+
+    struct dvb_frontend_info info;
+    memset(&info, 0, sizeof(info));
+    int err = ioctl(fd_frontend, FE_GET_INFO, &info);
+    if (err < 0)
     {
-        struct dvb_frontend_info info;
-        memset(&info, 0, sizeof(info));
-        int err = ioctl(fd_frontend, FE_GET_INFO, &info);
-        ret = err < 0 ? "ERROR_PROBE" : info.name;
         close(fd_frontend);
+        return "ERROR_PROBE";
     }
-    else
-    {
-        ret = "ERROR_OPEN";
-    }
+
+    ret = info.name;
+
+    close(fd_frontend);
 #else
     Q_UNUSED(device);
 #endif // USING_DVB
@@ -890,35 +912,31 @@ QString CardUtil::ProbeSubTypeName(uint inputid)
 
     DTVTunerType tunertype;
     int fd_frontend = OpenVideoDevice(inputid);
-    if (fd_frontend > 0)
-    {
-        DTVModulationSystem delsys = GetDeliverySystem(inputid);
-        if (DTVModulationSystem::kModulationSystem_UNDEFINED == delsys)
-        {
-            delsys = ProbeBestDeliverySystem(inputid, fd_frontend);
-            if (DTVModulationSystem::kModulationSystem_UNDEFINED != delsys)
-            {
-                // Update database
-                set_on_input("inputname", inputid, delsys.toString());      // Update DB capturecard
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("CardUtil[%1]: ").arg(inputid) +
-                    QString("Update capturecard delivery system: %1").arg(delsys.toString()));
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("CardUtil[%1]: Error probing best delivery system").arg(inputid));
-                return "ERROR_UNKNOWN";
-            }
-        }
-        SetDeliverySystem(inputid, delsys, fd_frontend);
-        tunertype = ConvertToTunerType(delsys);
-        close(fd_frontend);
-    }
-    else
-    {
+    if (fd_frontend < 0)
         return "ERROR_OPEN";
+
+    DTVModulationSystem delsys = GetDeliverySystem(inputid);
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED == delsys)
+    {
+        delsys = ProbeBestDeliverySystem(fd_frontend);
+        if (DTVModulationSystem::kModulationSystem_UNDEFINED != delsys)
+        {
+            // Update database
+            set_on_input("inputname", inputid, delsys.toString());      // Update DB capturecard
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("CardUtil[%1]: ").arg(inputid) +
+                QString("Update capturecard delivery system: %1").arg(delsys.toString()));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("CardUtil[%1]: Error probing best delivery system").arg(inputid));
+            return "ERROR_UNKNOWN";
+        }
     }
+    SetDeliverySystem(inputid, delsys, fd_frontend);
+    tunertype = ConvertToTunerType(delsys);
+    close(fd_frontend);
 
     QString subtype = "ERROR_UNKNOWN";
     if (DTVTunerType::kTunerTypeUnknown != tunertype)
@@ -945,15 +963,14 @@ bool CardUtil::IsDVBInputType(const QString &inputType)
 // If the current delivery system is DVB-T and DVB-T2 is supported then select DVB-T2
 // If the current delivery system is DVB-S and DVB-S2 is supported then select DVB-S2
 //
-DTVModulationSystem CardUtil::ProbeBestDeliverySystem(uint inputid, int fd)
+DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
 {
     DTVModulationSystem delsys;
 
 #ifdef USING_DVB
     // Get the current delivery system from the card
     delsys = ProbeCurrentDeliverySystem(fd);
-    LOG(VB_GENERAL, LOG_INFO,
-        QString("CardUtil[%1]: ").arg(inputid) +
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Current delivery system: %1").arg(delsys.toString()));
 
     // Get all supported delivery systems from the card
@@ -965,7 +982,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(uint inputid, int fd)
         msg += " ";
         msg += *it;
     }
-    LOG(VB_GENERAL, LOG_INFO, QString("CardUtil[%1]: ").arg(inputid) + msg);
+    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
     // If the current delivery system is DVB-T and DVB-T2 is supported then select DVB-T2
     if (DTVModulationSystem::kModulationSystem_DVBT == delsys)
@@ -973,8 +990,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(uint inputid, int fd)
         DTVModulationSystem newdelsys(DTVModulationSystem::kModulationSystem_DVBT2);
         if (delsyslist.contains(newdelsys.toString()))
         {
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("CardUtil[%1]: ").arg(inputid) +
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Changing delivery system from %1 to %2")
                     .arg(delsys.toString()).arg(newdelsys.toString()));
             delsys = newdelsys;
@@ -987,15 +1003,13 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(uint inputid, int fd)
         DTVModulationSystem newdelsys(DTVModulationSystem::kModulationSystem_DVBS2);
         if (delsyslist.contains(newdelsys.toString()))
         {
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("CardUtil[%1]: ").arg(inputid) +
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Changing delivery system from %1 to %2")
                     .arg(delsys.toString()).arg(newdelsys.toString()));
             delsys = newdelsys;
         }
     }
 #else
-    Q_UNUSED(inputid);
     Q_UNUSED(fd);
 #endif
 
@@ -1019,7 +1033,7 @@ DTVModulationSystem CardUtil::GetOrProbeDeliverySystem(uint inputid, int fd)
     }
 
     // Nothing in the database, get default and use that
-    delsys = ProbeBestDeliverySystem(inputid, fd);
+    delsys = ProbeBestDeliverySystem(fd);
     LOG(VB_GENERAL, LOG_INFO,
         QString("CardUtil[%1]: ").arg(inputid) +
         QString("No capturecard delivery system in database, using: %1").arg(delsys.toString()));
@@ -1134,7 +1148,7 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd
 #ifdef USING_DVB
     LOG(VB_GENERAL, LOG_INFO,
         QString("CardUtil[%1]: ").arg(inputid) +
-        QString("Using delivery system: %1").arg(delsys.toString()));
+        QString("Set delivery system: %1").arg(delsys.toString()));
 
     struct dtv_property prop;
     struct dtv_properties cmd;

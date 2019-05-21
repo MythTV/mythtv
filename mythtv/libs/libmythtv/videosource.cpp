@@ -1063,7 +1063,7 @@ class DVBNoSeqStart : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_wait_for_seqstart"))
     {
-        setLabel(QObject::tr("Wait for SEQ start header."));
+        setLabel(QObject::tr("Wait for SEQ start header"));
         setValue(true);
         setHelpText(
             QObject::tr("If enabled, drop packets from the start of a DVB "
@@ -3733,18 +3733,21 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     // Create selection list of all delivery systems of this card
     {
         m_cardType->clearSelections();
-        QStringList delsys = CardUtil::ProbeDeliverySystems(videodevice);
-        QStringList::iterator it = delsys.begin();
-        if (it != delsys.end())
-        {
-            m_cardType->setValue(*it);
-        }
-        for (; it != delsys.end(); it++)
+        QStringList delsyslist = CardUtil::ProbeDeliverySystems(videodevice);
+        QStringList::iterator it = delsyslist.begin();
+        for (; it != delsyslist.end(); it++)
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
                 .arg(*it));
 
             m_cardType->addSelection(*it, *it);
+        }
+
+        // Default value, used if not already defined in capturecard/inputname
+        QString delsys = CardUtil::ProbeDefaultDeliverySystem(videodevice);
+        if (!delsys.isEmpty())
+        {
+            m_cardType->setValue(delsys);
         }
     }
 #

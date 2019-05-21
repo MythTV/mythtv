@@ -124,6 +124,44 @@ typedef struct
     uint8_t control_state[256];
 } SharedData26;
 
+// shared data for ZM version 1.32.x
+typedef struct
+{
+    uint32_t size;
+    uint32_t last_write_index;
+    uint32_t last_read_index;
+    uint32_t state;
+    uint64_t last_event;
+    uint32_t action;
+    int32_t brightness;
+    int32_t hue;
+    int32_t colour;
+    int32_t contrast;
+    int32_t alarm_x;
+    int32_t alarm_y;
+    uint8_t valid;
+    uint8_t active;
+    uint8_t signal;
+    uint8_t format;
+    uint32_t imagesize;
+    uint32_t epadding1;
+     union {
+      time_t startup_time;
+      uint64_t extrapad1;
+    };
+    union {
+      time_t last_write_time;
+      uint64_t extrapad2;
+    };
+    union {
+      time_t last_read_time;
+      uint64_t extrapad3;
+    };
+    uint8_t control_state[256];
+
+    char alarm_cause[256];
+} SharedData32;
+
 typedef enum { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF } TriggerState;
 
 // Triggerdata for ZM version 1.24.x and 1.25.x
@@ -137,7 +175,7 @@ typedef struct
     char trigger_showtext[256];
 } TriggerData;
 
-// Triggerdata for ZM version 1.26.x
+// Triggerdata for ZM version 1.26.x and 1.32.x
 typedef struct
 {
     uint32_t size;
@@ -148,6 +186,15 @@ typedef struct
     char trigger_text[256];
     char trigger_showtext[256];
 } TriggerData26;
+
+// VideoStoreData for ZM version 1.32.x
+typedef struct
+{
+    uint32_t size;
+    uint64_t current_event;
+    char event_file[4096];
+    timeval recording;
+} VideoStoreData;
 
 class MONITOR
 {
@@ -186,6 +233,7 @@ class MONITOR
   private:
     SharedData    *m_shared_data        {nullptr};
     SharedData26  *m_shared_data26      {nullptr};
+    SharedData32  *m_shared_data32      {nullptr};
     string         m_id                 {""};
 };
 

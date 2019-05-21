@@ -87,6 +87,8 @@ string  g_webPath;
 string  g_user;
 string  g_webUser;
 string  g_binPath;
+string  g_mmapPath;
+string  g_eventsPath;
 int     g_majorVersion = 0;
 int     g_minorVersion = 0;
 int     g_revisionVersion = 0;
@@ -110,8 +112,7 @@ void loadZMConfig(const string &configfile)
 
     if ( (cfg = fopen(configfile.c_str(), "r")) == nullptr )
     {
-        fprintf(stderr,"Can't open %s\n", configfile.c_str());
-        exit(1);
+        fprintf(stderr, "Can't open %s\n", configfile.c_str());
     }
 
     while ( fgets( line, sizeof(line), cfg ) != nullptr )
@@ -170,6 +171,8 @@ void loadZMConfig(const string &configfile)
         else if ( strcasecmp( name_ptr, "ZM_PATH_BIN" ) == 0 ) g_binPath = val;
         else if ( strcasecmp( name_ptr, "ZM_WEB_USER" ) == 0 ) g_webUser = val;
         else if ( strcasecmp( name_ptr, "ZM_VERSION" ) == 0 ) g_zmversion = val;
+        else if ( strcasecmp( name_ptr, "ZM_PATH_MAP" ) == 0 ) g_mmapPath = val;
+        else if ( strcasecmp( name_ptr, "ZM_DIR_EVENTS" ) == 0 ) g_eventsPath = val;
     }
     fclose(cfg);
 }
@@ -231,7 +234,14 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
     int shared_data_size;
     int frame_size = m_width * m_height * m_bytes_per_pixel;
 
-    if (checkVersion(1, 26, 0))
+    if (checkVersion(1, 32, 0))
+    {
+        shared_data_size = sizeof(SharedData32) +
+            sizeof(TriggerData26) +
+            ((m_image_buffer_count) * (sizeof(struct timeval))) +
+            ((m_image_buffer_count) * frame_size) + 64;
+    }
+    else if (checkVersion(1, 26, 0))
     {
         shared_data_size = sizeof(SharedData26) +
             sizeof(TriggerData26) +
@@ -297,7 +307,7 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
         // fail back to shmget() functionality if mapping memory above failed.
         int shmid;
 
-        if ((shmid = shmget((shmKey & 0xffffff00) | m_mon_id,
+        if ((shmid = shmget((shmKey & 0xffff0000) | m_mon_id,
              shared_data_size, SHM_R)) == -1)
         {
             cout << "Failed to shmget for monitor: " << m_mon_id << endl;
@@ -327,10 +337,27 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
         }
     }
 
-    if (checkVersion(1, 26, 0))
+    if (checkVersion(1, 32, 0))
+    {
+        m_shared_data = nullptr;
+        m_shared_data26 = nullptr;
+        m_shared_data32 = (SharedData32*)m_shm_ptr;
+
+        m_shared_images = (unsigned char*) m_shm_ptr +
+            sizeof(SharedData32) + sizeof(TriggerData26) + sizeof(VideoStoreData) +
+            ((m_image_buffer_count) * sizeof(struct timeval)) ;
+
+        if (((unsigned long)m_shared_images % 64) != 0)
+        {
+            // align images buffer to nearest 64 byte boundary
+            m_shared_images = (unsigned char*)((unsigned long)m_shared_images + (64 - ((unsigned long)m_shared_images % 64)));
+        }
+    }
+    else if (checkVersion(1, 26, 0))
     {
         m_shared_data = nullptr;
         m_shared_data26 = (SharedData26*)m_shm_ptr;
+        m_shared_data32 = nullptr;
 
         m_shared_images = (unsigned char*) m_shm_ptr +
             sizeof(SharedData26) + sizeof(TriggerData26) +
@@ -344,8 +371,9 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
     }
     else
     {
-        m_shared_data26 = nullptr;
         m_shared_data = (SharedData*)m_shm_ptr;
+        m_shared_data26 = nullptr;
+        m_shared_data32 = nullptr;
 
         m_shared_images = (unsigned char*) m_shm_ptr +
             sizeof(SharedData) + sizeof(TriggerData) +
@@ -355,6 +383,9 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
 
 bool MONITOR::isValid(void)
 {
+    if (checkVersion(1, 32, 0))
+        return m_shared_data32 != nullptr && m_shared_images != nullptr;
+
     if (checkVersion(1, 26, 0))
         return m_shared_data26 != nullptr && m_shared_images != nullptr;
 
@@ -382,6 +413,9 @@ int MONITOR::getLastWriteIndex(void)
     if (m_shared_data26)
         return m_shared_data26->last_write_index;
 
+    if (m_shared_data32)
+        return m_shared_data32->last_write_index;
+
     return 0;
 }
 
@@ -392,6 +426,9 @@ int MONITOR::getState(void)
 
     if (m_shared_data26)
         return m_shared_data26->state;
+
+    if (m_shared_data32)
+        return m_shared_data32->state;
 
     return 0;
 }
@@ -408,6 +445,9 @@ int MONITOR::getSubpixelOrder(void)
     if (m_shared_data26)
       return m_shared_data26->format;
 
+    if (m_shared_data32)
+      return m_shared_data32->format;
+
     return ZM_SUBPIX_ORDER_NONE;
 }
 
@@ -418,6 +458,9 @@ int MONITOR::getFrameSize(void)
 
     if (m_shared_data26)
       return m_shared_data26->imagesize;
+
+    if (m_shared_data32)
+      return m_shared_data32->imagesize;
 
     return 0;
 }
@@ -451,7 +494,11 @@ ZMServer::ZMServer(int sock, bool debug)
     }
 
     // get the MMAP path
-    m_mmapPath = getZMSetting("ZM_PATH_MAP");
+    if (checkVersion(1, 32, 0))
+        m_mmapPath = g_mmapPath;
+    else
+        m_mmapPath = getZMSetting("ZM_PATH_MAP");
+
     if (m_debug)
     {
         cout << "Memory path directory is: " << m_mmapPath << endl;
@@ -1092,17 +1139,33 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     string filepath;
     char str[100];
 
-    if (m_useDeepStorage)
+    if (checkVersion(1, 32, 0))
     {
-        filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+        int year;
+        int month;
+        int day;
+
+        sscanf(eventTime.c_str(), "%2d/%2d/%2d", &year, &month, &day);
+        sprintf(str, "20%02d-%02d-%02d", year, month, day);
+
+        filepath = g_eventsPath + "/" + monitorID + "/" + str + "/" + eventID + "/";
         sprintf(str, m_eventFileFormat.c_str(), frameNo);
         filepath += str;
     }
     else
     {
-        filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-        sprintf(str, m_eventFileFormat.c_str(), frameNo);
-        filepath += str;
+        if (m_useDeepStorage)
+        {
+            filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+            sprintf(str, m_eventFileFormat.c_str(), frameNo);
+            filepath += str;
+        }
+        else
+        {
+            filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
+            sprintf(str, m_eventFileFormat.c_str(), frameNo);
+            filepath += str;
+        }
     }
 
     FILE *fd;
@@ -1226,10 +1289,23 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     string filepath;
     string frameFile;
 
-    if (m_useDeepStorage)
-        filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+    if (checkVersion(1, 32, 0))
+    {
+        int year;
+        int month;
+        int day;
+
+        sscanf(eventTime.c_str(), "%2d/%2d/%2d", &year, &month, &day);
+        sprintf(str, "20%02d-%02d-%02d", year, month, day);
+        filepath = g_eventsPath + "/" + monitorID + "/" + str + "/" + eventID + "/";
+    }
     else
-        filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
+    {
+        if (m_useDeepStorage)
+            filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+        else
+            filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
+    }
 
     ADD_STR(outStr, "OK")
 

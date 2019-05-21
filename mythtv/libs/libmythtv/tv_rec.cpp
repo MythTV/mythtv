@@ -1734,7 +1734,7 @@ QString TVRec::GetStartChannel(uint inputid)
         startchan = query.value(0).toString();
         if (!startchan.isEmpty())
         {
-            LOG(VB_CHANNEL, LOG_INFO, LOC2 + QString("Start channel: %1.")
+            LOG(VB_CHANNEL, LOG_INFO, LOC2 + QString("Start channel: %1")
                     .arg(startchan));
             return startchan;
         }
@@ -3738,6 +3738,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     {
         // Not using a signal monitor, so just set the status to recording
         SetRecordingStatus(RecStatus::Recording, __LINE__);
+        if (m_curRecording)
+        {
+            m_curRecording->SetRecordingStatus(RecStatus::Recording);
+        }
     }
 
 

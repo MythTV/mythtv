@@ -19,7 +19,6 @@
 // Qt headers
 #include <QTextStream>
 #include <QRegExp>
-#include <QLocale>
 
 // MythTV headers
 #include "httpstatus.h"
@@ -1264,38 +1263,38 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
 
                 os << "        <li>Total Disk Space:\r\n"
                 << "          <ul>\r\n";
-                QLocale c(QLocale::C);
 
                 os << "            <li>Total Space: ";
-                sRep = c.toString(nTotal) + " MB";
+                sRep = QString("%L1").arg(nTotal) + " MB";
                 os << sRep << "</li>\r\n";
 
                 os << "            <li>Space Used: ";
-                sRep = c.toString(nUsed) + " MB";
+                sRep = QString("%L1").arg(nUsed) + " MB";
                 os << sRep << "</li>\r\n";
 
                 os << "            <li>Space Free: ";
-                sRep = c.toString(nFree) + " MB";
+                sRep = QString("%L1").arg(nFree) + " MB";
                 os << sRep << "</li>\r\n";
 
                 if ((nLiveTV + nDeleted + nExpirable) > 0)
                 {
                     os << "            <li>Space Available "
                           "After Auto-expire: ";
-                    sRep = c.toString(nFree + nLiveTV +
+                    sRep = QString("%L1").arg(nUsed) + " MB";
+                    sRep = QString("%L1").arg(nFree + nLiveTV +
                                       nDeleted + nExpirable) + " MB";
                     os << sRep << "\r\n";
                     os << "              <ul>\r\n";
                     os << "                <li>Space Used by LiveTV: ";
-                    sRep = c.toString(nLiveTV) + " MB";
+                    sRep = QString("%L1").arg(nLiveTV) + " MB";
                     os << sRep << "</li>\r\n";
                     os << "                <li>Space Used by "
                           "Deleted Recordings: ";
-                    sRep = c.toString(nDeleted) + " MB";
+                    sRep = QString("%L1").arg(nDeleted) + " MB";
                     os << sRep << "</li>\r\n";
                     os << "                <li>Space Used by "
                           "Auto-expirable Recordings: ";
-                    sRep = c.toString(nExpirable) + " MB";
+                    sRep = QString("%L1").arg(nExpirable) + " MB";
                     os << sRep << "</li>\r\n";
                     os << "              </ul>\r\n";
                     os << "            </li>\r\n";
@@ -1348,18 +1347,16 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
 
                 os << nDir << "</li>\r\n";
 
-                QLocale c(QLocale::C);
-
                 os << "            <li>Total Space: ";
-                sRep = c.toString(nTotal) + " MB";
+                sRep = QString("%L1").arg(nTotal) + " MB";
                 os << sRep << "</li>\r\n";
 
                 os << "            <li>Space Used: ";
-                sRep = c.toString(nUsed) + " MB";
+                sRep = QString("%L1").arg(nUsed) + " MB";
                 os << sRep << "</li>\r\n";
 
                 os << "            <li>Space Free: ";
-                sRep = c.toString(nFree) + " MB";
+                sRep = QString("%L1").arg(nFree) + " MB";
                 os << sRep << "</li>\r\n";
 
                 os << "          </ul>\r\n"

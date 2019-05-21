@@ -212,7 +212,7 @@ class Scheduler : public MThread, public MythScheduler
                          int prerollseconds);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatus::Type recStatus, const QString &details);
-    bool AssignGroupInput(RecordingInfo &ri);
+    bool AssignGroupInput(RecordingInfo &ri, int prerollseconds);
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,
