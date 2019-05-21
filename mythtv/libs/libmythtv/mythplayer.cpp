@@ -765,7 +765,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
     m_scan = scan;
 }
 
-void MythPlayer::SetVideoParams(int width, int height, double fps,
+void MythPlayer::SetVideoParams(int width, int height, double fps, float aspect,
                                 FrameScanType scan, const QString& codecName)
 {
     bool paramsChanged = false;
@@ -775,7 +775,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         paramsChanged  = true;
         video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
         video_disp_dim = QSize(width, height);
-        video_aspect   = (float)width / height;
+        video_aspect   = aspect > 0.0f ? aspect : static_cast<float>(width) / height;
     }
 
     if (!qIsNaN(fps) && fps > 0.0 && fps < 121.0)
@@ -846,7 +846,7 @@ void MythPlayer::OpenDummy(void)
     if (!videoOutput)
     {
         SetKeyframeDistance(15);
-        SetVideoParams(720, 576, 25.00);
+        SetVideoParams(720, 576, 25.00, 1.25f);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

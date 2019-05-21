@@ -1732,7 +1732,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         QString codecName;
         if (codec2)
             codecName = codec2->name;
-        m_parent->SetVideoParams(width, height, m_fps, kScan_Detect, codecName);
+        m_parent->SetVideoParams(width, height, m_fps, m_current_aspect, kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format;
@@ -2729,12 +2729,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             tvformat == "pal-m" || tvformat == "atsc")
         {
             m_fps = 29.97;
-            m_parent->SetVideoParams(-1, -1, 29.97);
+            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f);
         }
         else
         {
             m_fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0);
+            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f);
         }
     }
 
@@ -3414,7 +3414,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 if (m_private_dec)
                     m_private_dec->Reset();
 
-                m_parent->SetVideoParams(width, height, seqFPS, kScan_Detect);
+                m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, kScan_Detect);
 
                 m_current_width  = width;
                 m_current_height = height;
@@ -3524,7 +3524,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             if (m_private_dec)
                 m_private_dec->Reset();
 
-            m_parent->SetVideoParams(width, height, seqFPS, kScan_Detect);
+            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, kScan_Detect);
 
             m_current_width  = width;
             m_current_height = height;
