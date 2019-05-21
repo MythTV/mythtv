@@ -56,7 +56,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
 
   protected:
     explicit MythOpenGLInterop                (MythRenderOpenGL *Context, Type InteropType);
-    void     DeleteTextures                   (void);
+    virtual void DeleteTextures               (void);
 
   protected:
     MythRenderOpenGL   *m_context;

@@ -26,9 +26,21 @@ MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
 
 MythNVDECInterop::~MythNVDECInterop()
 {
+    if (m_cudaFuncs)
+    {
+        if (m_cudaContext)
+            CUDA_CHECK(m_cudaFuncs->cuCtxDestroy(m_cudaContext));
+        cuda_free_functions(&m_cudaFuncs);
+    }
+}
+
+void MythNVDECInterop::DeleteTextures(void)
+{
     CUcontext dummy;
-    if (m_cudaContext && m_cudaFuncs)
-        CUDA_CHECK(m_cudaFuncs->cuCtxPushCurrent(m_cudaContext));
+    if (!(m_cudaContext && m_cudaFuncs))
+        return;
+
+    CUDA_CHECK(m_cudaFuncs->cuCtxPushCurrent(m_cudaContext));
 
     if (!m_openglTextures.isEmpty())
     {
@@ -51,15 +63,9 @@ MythNVDECInterop::~MythNVDECInterop()
         }
     }
 
-    if (m_cudaFuncs)
-    {
-        if (m_cudaContext)
-        {
-            CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
-            CUDA_CHECK(m_cudaFuncs->cuCtxDestroy(m_cudaContext));
-        }
-        cuda_free_functions(&m_cudaFuncs);
-    }
+    CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
+
+    MythOpenGLInterop::DeleteTextures();
 }
 
 bool MythNVDECInterop::IsValid(void)
@@ -114,7 +120,10 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Video texture size changed!");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Video texture size changed! %1x%2->%3x%4")
+                .arg(m_openglTextureSize.width()).arg(m_openglTextureSize.height())
+                .arg(Frame->width).arg(Frame->height));
+        DeleteTextures();
         m_openglTextureSize = surfacesize;
     }
 

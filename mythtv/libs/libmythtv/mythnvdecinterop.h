@@ -28,6 +28,7 @@ class MythNVDECInterop : public MythOpenGLInterop
 
   private:
     bool           InitialiseCuda(void);
+    void           DeleteTextures(void) override;
 
     CUcontext      m_cudaContext;
     CudaFunctions *m_cudaFuncs;
