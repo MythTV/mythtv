@@ -618,7 +618,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     }
 
     // Set deinterlacer type for debug OSD
-    if (deinterlacing)
+    if (deinterlacing && Frame)
     {
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_SHADER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
