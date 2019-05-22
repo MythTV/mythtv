@@ -23,7 +23,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (((Decoder != "nvdec") && (Decoder != "nvdec-dec")) || getenv("NO_NVDEC"))
+    if (((Decoder != "nvdec") && (Decoder != "nvdec-dec")) || getenv("NO_NVDEC") || !HaveNVDEC())
         return failure;
 
     // NVDec only supports 420 chroma
@@ -202,4 +202,32 @@ int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
                                      MythHWContext::ReleaseBuffer, avfd, 0);
     return 0;
+}
+
+bool MythNVDECContext::HaveNVDEC(void)
+{
+    static bool havenvdec = false;
+    static bool checked   = false;
+    if (checked)
+        return havenvdec;
+    checked = true;
+
+    // Make sure OpenGL context is current
+    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
+    if (render)
+    {
+        OpenGLLocker locker(render);
+        AVBufferRef *context = nullptr;
+        int ret = av_hwdevice_ctx_create(&context, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0);
+        if (ret == 0)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "NVDEC is available");
+            havenvdec = true;
+            av_buffer_unref(&context);
+        }
+    }
+
+    if (!havenvdec)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "NVDEC functionality checked failed");
+    return havenvdec;
 }

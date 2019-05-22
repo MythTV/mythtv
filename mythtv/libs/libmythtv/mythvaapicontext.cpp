@@ -11,6 +11,7 @@
 #include "avformatdecoder.h"
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
+#include "mythhwcontext.h"
 #include "mythvaapiinterop.h"
 #include "mythvaapicontext.h"
 
@@ -105,15 +106,20 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
     MythCodecID success = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (Decoder != "vaapi")
+    if (Decoder != "vaapi" || !HaveVAAPI())
         return failure;
 
     if (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported)
         return failure;
 
     // check for actual decoder support
+    const char *devicestr = nullptr;
+    QString vaapiDevice = gCoreContext->GetSetting("VAAPIDevice");
+    if (!vaapiDevice.isEmpty())
+        devicestr = vaapiDevice.toLocal8Bit().constData();
+
     AVBufferRef *hwdevicectx = nullptr;
-    if (av_hwdevice_ctx_create(&hwdevicectx, AV_HWDEVICE_TYPE_VAAPI, nullptr, nullptr, 0) < 0)
+    if (av_hwdevice_ctx_create(&hwdevicectx, AV_HWDEVICE_TYPE_VAAPI, devicestr, nullptr, 0) < 0)
         return failure;
 
     bool foundhwfmt   = false;
@@ -331,4 +337,50 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         .arg(vaapi_frames_ctx->nb_surfaces));
     av_buffer_unref(&hwdeviceref);
     return 0;
+}
+
+/*! \brief Check whether VAAPI is available and not emulated via VDPAU
+ *
+ * The VDPAU backend appears to be largely unmaintained, does not expose the full
+ * range of VDPAU functionality (deinterlacing, full colourspace handling etc) and in
+ * testing fails when used by FFmpeg. So disallow VAAPI over VDPAU - VDPAU should just
+ * be used directly.
+*/
+bool MythVAAPIContext::HaveVAAPI(void)
+{
+    static bool havevaapi = false;
+    static bool checked   = false;
+    if (checked)
+        return havevaapi;
+    checked = true;
+
+    const char *device = nullptr;
+    QString vaapiDevice = gCoreContext->GetSetting("VAAPIDevice");
+    if (!vaapiDevice.isEmpty())
+        device = vaapiDevice.toLocal8Bit().constData();
+
+    AVBufferRef *context = nullptr;
+    int ret = av_hwdevice_ctx_create(&context, AV_HWDEVICE_TYPE_VAAPI, device, nullptr, 0);
+    if (ret == 0)
+    {
+        AVHWDeviceContext    *hwdevice = reinterpret_cast<AVHWDeviceContext*>(context->data);
+        AVVAAPIDeviceContext *hwctx    = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevice->hwctx);
+        QString vendor(vaQueryVendorString(hwctx->display));
+        if (vendor.contains("vdpau", Qt::CaseInsensitive))
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI is using a VDPAU backend - ignoring VAAPI");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI is available");
+            havevaapi = true;
+        }
+        av_buffer_unref(&context);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI functionality checked failed");
+    }
+
+    return havevaapi;
 }

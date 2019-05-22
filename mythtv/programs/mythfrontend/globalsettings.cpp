@@ -46,6 +46,9 @@
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
 #endif
+#ifdef USING_VAAPI2
+#include "mythvaapicontext.h"
+#endif
 
 //Use for playBackGroup, to be remove at one point
 #include "playgroup.h"
@@ -72,7 +75,7 @@ static HostTextEditSetting *VAAPIDevice()
 {
     HostTextEditSetting *ge = new HostTextEditSetting("VAAPIDevice");
 
-    ge->setLabel(MainGeneralSettings::tr("Decoder Device for VAAPI2 hardware decoding"));
+    ge->setLabel(MainGeneralSettings::tr("Decoder Device for VAAPI hardware decoding"));
 
     ge->setValue("");
 
@@ -4228,7 +4231,8 @@ void PlaybackSettings::Load(void)
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
 #ifdef USING_VAAPI2
-    advanced->addChild(VAAPIDevice());
+    if (MythVAAPIContext::HaveVAAPI())
+        advanced->addChild(VAAPIDevice());
 #endif
     HostCheckBoxSetting *avsync2 = PlaybackAVSync2();
     advanced->addChild(avsync2);

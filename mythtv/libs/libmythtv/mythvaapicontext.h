@@ -2,7 +2,7 @@
 #define MYTHVAAPICONTEXT_H
 
 // MythTV
-#include "mythhwcontext.h"
+#include "mythtvexp.h" // for mythfrontend/globalsettings.cpp
 #include "mythcodecid.h"
 
 // VAAPI
@@ -15,7 +15,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-class MythVAAPIContext
+class MTV_PUBLIC MythVAAPIContext
 {
   public:
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
@@ -25,6 +25,7 @@ class MythVAAPIContext
                                           AVPixelFormat  &PixFmt);
     static enum AVPixelFormat GetFormat  (struct AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
+    static bool HaveVAAPI                (void);
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);

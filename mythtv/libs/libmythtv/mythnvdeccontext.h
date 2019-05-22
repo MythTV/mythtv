@@ -25,6 +25,7 @@ class MythNVDECContext
     static int  GetBuffer                (AVCodecContext *Context,
                                           AVFrame *Frame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);
+    static bool HaveNVDEC                (void);
 };
 
 #endif // MYTHNVDECCONTEXT_H

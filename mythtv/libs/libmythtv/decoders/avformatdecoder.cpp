@@ -75,6 +75,7 @@ extern "C" {
 
 #ifdef USING_VDPAU
 #include "mythvdpaucontext.h"
+#include "mythvdpauhelper.h"
 #endif
 
 extern "C" {
@@ -380,10 +381,14 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
 
 #ifdef USING_VDPAU
-    opts.decoders->append("vdpau");
-    (*opts.equiv_decoders)["vdpau"].append("dummy");
-    opts.decoders->append("vdpau-dec");
-    (*opts.equiv_decoders)["vdpau-dec"].append("dummy");
+    // Only enable VDPAU support if it is actually present
+    if (MythVDPAUHelper::HaveVDPAU())
+    {
+        opts.decoders->append("vdpau");
+        (*opts.equiv_decoders)["vdpau"].append("dummy");
+        opts.decoders->append("vdpau-dec");
+        (*opts.equiv_decoders)["vdpau-dec"].append("dummy");
+    }
 #endif
 #ifdef USING_DXVA2
     opts.decoders->append("dxva2");
@@ -391,18 +396,30 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
 #endif
 
 #ifdef USING_VAAPI
-    opts.decoders->append("vaapi");
-    (*opts.equiv_decoders)["vaapi"].append("dummy");
+    // Only enable VAAPI if it is actually present and isn't actually VDPAU
+    if (MythVAAPIContext::HaveVAAPI())
+    {
+        opts.decoders->append("vaapi");
+        (*opts.equiv_decoders)["vaapi"].append("dummy");
+    }
 #endif
+
 #ifdef USING_VAAPI2
-    opts.decoders->append("vaapi-dec");
-    (*opts.equiv_decoders)["vaapi-dec"].append("dummy");
+    if (MythVAAPIContext::HaveVAAPI())
+    {
+        opts.decoders->append("vaapi-dec");
+        (*opts.equiv_decoders)["vaapi-dec"].append("dummy");
+    }
 #endif
 #ifdef USING_NVDEC
-    opts.decoders->append("nvdec");
-    (*opts.equiv_decoders)["nvdec"].append("dummy");
-    opts.decoders->append("nvdec-dec");
-    (*opts.equiv_decoders)["nvdec-dec"].append("dummy");
+    // Only enable NVDec support if it is actually present
+    if (MythNVDECContext::HaveNVDEC())
+    {
+        opts.decoders->append("nvdec");
+        (*opts.equiv_decoders)["nvdec"].append("dummy");
+        opts.decoders->append("nvdec-dec");
+        (*opts.equiv_decoders)["nvdec-dec"].append("dummy");
+    }
 #endif
 #ifdef USING_MEDIACODEC
     opts.decoders->append("mediacodec");

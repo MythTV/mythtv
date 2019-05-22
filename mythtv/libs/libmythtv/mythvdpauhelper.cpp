@@ -40,7 +40,14 @@ bool MythVDPAUHelper::HaveVDPAU(void)
     gVDPAUAvailable = vdpau.IsValid();
     checked = true;
     if (gVDPAUAvailable)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU is available");
         gVDPAUMPEG4Available = vdpau.CheckMPEG4();
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU functionality checked failed");
+    }
     return gVDPAUAvailable;
 }
 
