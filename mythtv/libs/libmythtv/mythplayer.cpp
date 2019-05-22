@@ -143,7 +143,7 @@ void MythMultiLocker::Relock(void)
 {
     for (QVector<QMutex*>::const_iterator it = m_locks.cbegin(); it != m_locks.cend(); ++it)
         if (*it)
-            (*it)->unlock();
+            (*it)->lock();
 }
 
 MythPlayer::MythPlayer(PlayerFlags flags)
