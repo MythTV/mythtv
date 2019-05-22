@@ -191,9 +191,17 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
 
             bool top = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
             if (Scan == kScan_Interlaced)
+            {
+                Frame->deinterlace_inuse = driverdeint | DEINT_DRIVER;
+                Frame->deinterlace_inuse2x = doublerate;
                 flags = top ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
+            }
             else if (Scan == kScan_Intr2ndField)
+            {
+                Frame->deinterlace_inuse = driverdeint | DEINT_DRIVER;
+                Frame->deinterlace_inuse2x = doublerate;
                 flags = top ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
+            }
             m_deinterlacer = driverdeint;
         }
         else if (m_deinterlacer)

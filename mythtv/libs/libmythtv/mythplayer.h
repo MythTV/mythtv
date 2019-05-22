@@ -725,6 +725,11 @@ class MTV_PUBLIC MythPlayer
     int64_t   m_latestVideoTimecode;
     QElapsedTimer m_avTimer;
 
+    // Tracks deinterlacer for Debug OSD
+    MythDeintType m_lastDeinterlacer;
+    bool      m_lastDeinterlacer2x;
+    VideoFrameType m_lastFrameCodec;
+
     // -- end state stuff --
 
     // Input Video Attributes

@@ -130,6 +130,8 @@ typedef struct VideoFrame_
     MythDeintType deinterlace_single;
     MythDeintType deinterlace_double;
     MythDeintType deinterlace_allowed;
+    MythDeintType deinterlace_inuse;
+    int           deinterlace_inuse2x;
 } VideoFrame;
 
 #ifdef __cplusplus
@@ -215,7 +217,8 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->deinterlace_single = DEINT_NONE;
     vf->deinterlace_double = DEINT_NONE;
     vf->deinterlace_allowed = DEINT_NONE;
-
+    vf->deinterlace_inuse = DEINT_NONE;
+    vf->deinterlace_inuse2x = 0;
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
     int width_aligned;

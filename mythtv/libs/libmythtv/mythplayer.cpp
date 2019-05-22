@@ -183,6 +183,9 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       totalDuration(0),
       rewindtime(0),
       m_latestVideoTimecode(-1),
+      m_lastDeinterlacer(DEINT_NONE),
+      m_lastDeinterlacer2x(false),
+      m_lastFrameCodec(FMT_NONE),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
       video_frame_rate(29.97F), video_aspect(4.0F / 3.0F),
@@ -2528,7 +2531,12 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!player_ctx->IsPIP())
+    {
+        m_lastDeinterlacer = frame->deinterlace_inuse;
+        m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
+        m_lastFrameCodec = frame->codec;
         videoOutput->DoneDisplayingFrame(frame);
+    }
 }
 
 void MythPlayer::PreProcessNormalFrame(void)
@@ -5012,6 +5020,8 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
     infoMap["videowidth"]     = QString::number(width);
     infoMap["videoheight"]    = QString::number(height);
     infoMap["videoframerate"] = QString::number(video_frame_rate, 'f', 2);
+    infoMap["deinterlacer"]   = DeinterlacerName(m_lastDeinterlacer,
+                                                 m_lastDeinterlacer2x, m_lastFrameCodec);
 
     if (width < 640)
         return;

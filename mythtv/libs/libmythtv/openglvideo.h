@@ -79,6 +79,7 @@ class OpenGLVideo : public QObject
     QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
     QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
     MythDeintType  m_deinterlacer;
+    bool           m_deinterlacer2x;
     VideoColourSpace *m_videoColourSpace;
     bool           m_viewportControl;     ///< Video has control over view port
     QOpenGLShaderProgram* m_shaders[ShaderCount] { nullptr };

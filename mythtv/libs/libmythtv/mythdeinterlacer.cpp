@@ -105,6 +105,10 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
         }
     }
 
+    // Set in use deinterlacer for debugging
+    Frame->deinterlace_inuse = m_deintType | DEINT_CPU;
+    Frame->deinterlace_inuse2x = m_doubleRate;
+
     // onefield or bob
     if (m_deintType == DEINT_BASIC)
     {

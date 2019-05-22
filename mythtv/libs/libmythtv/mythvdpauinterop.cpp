@@ -260,7 +260,11 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         }
 
         if (driverdeint)
+        {
+            Frame->deinterlace_inuse = driverdeint | DEINT_DRIVER;
+            Frame->deinterlace_inuse2x = doublerate;
             deinterlacer = driverdeint;
+        }
     }
 
     // We need a mixer, an output surface and mapped texture

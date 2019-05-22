@@ -33,6 +33,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_displayVideoRect(DisplayVideoRect),
     m_videoRect(VideoRect),
     m_deinterlacer(MythDeintType::DEINT_NONE),
+    m_deinterlacer2x(false),
     m_videoColourSpace(ColourSpace),
     m_viewportControl(ViewportControl),
     m_inputTextures(),
@@ -160,7 +161,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter 
     // N.B. there should in theory be no situation in which shader deinterlacing is not
     // available for software formats, hence there should be no need to fallback to cpu
 
-    bool doublerate = true;
+    m_deinterlacer2x = true;
     MythDeintType deinterlacer = GetDoubleRateOption(Frame, Filter);
     MythDeintType other        = GetDoubleRateOption(Frame, DEINT_DRIVER);
     if (other) // another double rate deinterlacer is enabled
@@ -171,7 +172,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter 
 
     if (!deinterlacer)
     {
-        doublerate = false;
+        m_deinterlacer2x = false;
         deinterlacer = GetSingleRateOption(Frame, Filter);
         other        = GetSingleRateOption(Frame, DEINT_DRIVER);
         if (!deinterlacer || other) // no shader deinterlacer needed
@@ -201,10 +202,10 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter 
     if (totaltextures > max)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for deinterlacer '%1' (%2 < %3)")
-            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, doublerate)).arg(max).arg(totaltextures));
+            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)).arg(max).arg(totaltextures));
         deinterlacer = DEINT_BASIC;
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'")
-            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, doublerate)));
+            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)));
     }
 
     // create new deinterlacers - the old ones will be deleted
@@ -226,7 +227,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter 
     m_deinterlacer = deinterlacer;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer '%1' (%2->%3)")
-        .arg(DeinterlacerName(m_deinterlacer | DEINT_SHADER, doublerate))
+        .arg(DeinterlacerName(m_deinterlacer | DEINT_SHADER, m_deinterlacer2x))
         .arg(format_description(m_inputType)).arg(format_description(m_outputType)));
     return true;
 }
@@ -614,6 +615,13 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
             program = TopFieldFirst ? InterlacedBot : InterlacedTop;
             deinterlacing = true;
         }
+    }
+
+    // Set deinterlacer type for debug OSD
+    if (deinterlacing)
+    {
+        Frame->deinterlace_inuse = m_deinterlacer | DEINT_SHADER;
+        Frame->deinterlace_inuse2x = m_deinterlacer2x;
     }
 
     // Decide whether to use render to texture - for performance or quality

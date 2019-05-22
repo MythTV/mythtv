@@ -3988,6 +3988,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             xf->chromalocation = mpa_pic->chroma_location;
             xf->frameNumber = m_framesPlayed;
             xf->aspect = m_current_aspect;
+            xf->deinterlace_inuse = DEINT_NONE;
+            xf->deinterlace_inuse2x = 0;
             m_parent->DiscardVideoFrame(xf);
         }
         if (tmp_frame)
@@ -4093,6 +4095,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->colortransfer    = mpa_pic->color_trc;
         picframe->chromalocation   = mpa_pic->chroma_location;
         picframe->pix_fmt          = mpa_pic->format;
+        picframe->deinterlace_inuse = DEINT_NONE;
+        picframe->deinterlace_inuse2x = 0;
         m_parent->ReleaseNextVideoFrame(picframe, temppts);
     }
 
@@ -5510,6 +5514,8 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->colorprimaries   = AVCOL_PRI_BT709;
         frame->colortransfer    = AVCOL_TRC_BT709;
         frame->chromalocation   = AVCHROMA_LOC_LEFT;
+        frame->deinterlace_inuse = DEINT_NONE;
+        frame->deinterlace_inuse2x = 0;
 
         m_decoded_video_frame = frame;
         m_framesPlayed++;
