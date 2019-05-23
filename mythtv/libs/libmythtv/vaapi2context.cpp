@@ -27,6 +27,7 @@
 #include "vaapi2context.h"
 #include "videooutbase.h"
 #include "mythplayer.h"
+#include "mythhwcontext.h"
 
 extern "C" {
     #include "libavutil/pixfmt.h"
@@ -90,33 +91,14 @@ MythCodecID Vaapi2Context::GetBestSupportedCodec(
 
 int Vaapi2Context::HwDecoderInit(AVCodecContext *ctx)
 {
-    int ret = 0;
-    AVBufferRef *hw_device_ctx = nullptr;
-
-    const char *device = nullptr;
-    QString vaapiDevice = gCoreContext->GetSetting("VAAPIDevice");
-    if (!vaapiDevice.isEmpty())
+    AVBufferRef *context = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
+                                                       gCoreContext->GetSetting("VAAPIDevice"));
+    if (context)
     {
-        device = vaapiDevice.toLocal8Bit().constData();
+        ctx->hw_device_ctx = context;
+        return 0;
     }
-
-    ret = av_hwdevice_ctx_create(&hw_device_ctx, AV_HWDEVICE_TYPE_VAAPI,
-                                      device, nullptr, 0);
-    if (ret < 0)
-    {
-        char error[AV_ERROR_MAX_STRING_SIZE];
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("av_hwdevice_ctx_create  Device = <%3> error: %1 (%2)")
-            .arg(av_make_error_string(error, sizeof(error), ret))
-            .arg(ret).arg(vaapiDevice));
-    }
-    else
-    {
-        ctx->hw_device_ctx = av_buffer_ref(hw_device_ctx);
-        av_buffer_unref(&hw_device_ctx);
-    }
-
-    return ret;
+    return -1;
 }
 
 QString Vaapi2Context::GetDeinterlaceFilter()

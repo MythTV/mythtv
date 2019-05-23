@@ -113,13 +113,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
         return failure;
 
     // check for actual decoder support
-    const char *devicestr = nullptr;
-    QString vaapiDevice = gCoreContext->GetSetting("VAAPIDevice");
-    if (!vaapiDevice.isEmpty())
-        devicestr = vaapiDevice.toLocal8Bit().constData();
-
-    AVBufferRef *hwdevicectx = nullptr;
-    if (av_hwdevice_ctx_create(&hwdevicectx, AV_HWDEVICE_TYPE_VAAPI, devicestr, nullptr, 0) < 0)
+    AVBufferRef *hwdevicectx = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, gCoreContext->GetSetting("VAAPIDevice"));
+    if(!hwdevicectx)
         return failure;
 
     bool foundhwfmt   = false;
@@ -354,14 +349,8 @@ bool MythVAAPIContext::HaveVAAPI(void)
         return havevaapi;
     checked = true;
 
-    const char *device = nullptr;
-    QString vaapiDevice = gCoreContext->GetSetting("VAAPIDevice");
-    if (!vaapiDevice.isEmpty())
-        device = vaapiDevice.toLocal8Bit().constData();
-
-    AVBufferRef *context = nullptr;
-    int ret = av_hwdevice_ctx_create(&context, AV_HWDEVICE_TYPE_VAAPI, device, nullptr, 0);
-    if (ret == 0)
+    AVBufferRef *context = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, gCoreContext->GetSetting("VAAPIDevice"));
+    if (context)
     {
         AVHWDeviceContext    *hwdevice = reinterpret_cast<AVHWDeviceContext*>(context->data);
         AVVAAPIDeviceContext *hwctx    = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevice->hwctx);

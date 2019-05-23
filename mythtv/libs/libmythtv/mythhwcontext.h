@@ -20,6 +20,7 @@ class MythHWContext
     static void DeviceContextFinished  (AVHWDeviceContext *Context);
     static void DestroyInteropCallback (void *Wait, void *Interop, void*);
     static void CreateDecoderCallback  (void *Wait, void *Context, void *Callback);
+    static AVBufferRef* CreateDevice   (AVHWDeviceType Type, const QString &Device = QString());
 
   protected:
     static void DestroyInterop         (MythOpenGLInterop *Interop);

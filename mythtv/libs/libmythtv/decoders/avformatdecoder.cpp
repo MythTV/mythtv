@@ -1671,17 +1671,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     int ret = m_mythcodecctx->HwDecoderInit(enc);
     if (ret < 0)
     {
-        if (ret < 0)
-        {
-            char error[AV_ERROR_MAX_STRING_SIZE];
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HwDecoderInit unable to initialize hardware decoder: %1 (%2)")
-                .arg(av_make_error_string(error, sizeof(error), ret))
-                .arg(ret));
-            // force it to switch to software decoding
-            m_averror_count = SEQ_PKT_ERR_MAX + 1;
-            m_streams_changed = true;
-        }
+        // force it to switch to software decoding
+        m_averror_count = SEQ_PKT_ERR_MAX + 1;
+        m_streams_changed = true;
     }
 
     if (FlagIsSet(kDecodeLowRes)    || FlagIsSet(kDecodeSingleThreaded) ||

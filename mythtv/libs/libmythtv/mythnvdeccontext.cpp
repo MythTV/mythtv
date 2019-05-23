@@ -217,9 +217,9 @@ bool MythNVDECContext::HaveNVDEC(void)
     if (render)
     {
         OpenGLLocker locker(render);
-        AVBufferRef *context = nullptr;
-        int ret = av_hwdevice_ctx_create(&context, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0);
-        if (ret == 0)
+        AVBufferRef *context = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA,
+                                                           gCoreContext->GetSetting("NVDECDevice"));
+        if (context)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "NVDEC is available");
             havenvdec = true;

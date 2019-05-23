@@ -25,24 +25,16 @@ MythVTBContext::MythVTBContext(MythCodecID CodecID)
 
 int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
 {
-    int res = -1;
     if (codec_is_vtb_dec(m_codecID))
     {
-        AVBufferRef *device = nullptr;
-        res = av_hwdevice_ctx_create(&device, AV_HWDEVICE_TYPE_VIDEOTOOLBOX, nullptr, nullptr, 0);
-        if (res < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create hw device type '%1'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX)));
-            return res;
-        }
+        AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
+        if (!device)
+            return -1;
 
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created hw device '%1' (decode only)")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX)));
         AVHWDeviceContext* devicectx = reinterpret_cast<AVHWDeviceContext*>(device->data);
         devicectx->free        = MythHWContext::DeviceContextFinished;
         Context->hw_device_ctx = device;
-        return res;
+        return 0;
     }
     else if (codec_is_vtb(m_codecID))
     {

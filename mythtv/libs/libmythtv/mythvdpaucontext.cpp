@@ -33,17 +33,9 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return -1;
 
     // Allocate the device context
-    AVBufferRef* hwdeviceref = nullptr;
-    if (av_hwdevice_ctx_create(&hwdeviceref, AV_HWDEVICE_TYPE_VDPAU, nullptr, nullptr, 0) < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create device context");
+    AVBufferRef* hwdeviceref = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
+    if (!hwdeviceref)
         return -1;
-    }
-    if (!hwdeviceref || (hwdeviceref && !hwdeviceref->data))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create device context");
-        return -1;
-    }
 
     // Set release method
     AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);

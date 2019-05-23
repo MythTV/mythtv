@@ -27,6 +27,7 @@
 #include "nvdeccontext.h"
 #include "videooutbase.h"
 #include "mythplayer.h"
+#include "mythhwcontext.h"
 
 extern "C" {
     #include "libavutil/pixfmt.h"
@@ -39,35 +40,15 @@ extern "C" {
 
 int NvdecContext::HwDecoderInit(AVCodecContext *ctx)
 {
-    int ret = 0;
-    AVBufferRef *hw_device_ctx = nullptr;
-
-    const char *device = nullptr;
-    QString nvdecDevice = gCoreContext->GetSetting("NVDECDevice");
-    if (!nvdecDevice.isEmpty())
+    AVBufferRef *context = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA,
+                                                       gCoreContext->GetSetting("NVDECDevice"));
+    if (context)
     {
-        device = nvdecDevice.toLocal8Bit().constData();
+        ctx->hw_device_ctx = context;
+        SetDeinterlace(ctx);
+        return 0;
     }
-
-    ret = av_hwdevice_ctx_create(&hw_device_ctx, AV_HWDEVICE_TYPE_CUDA,
-                                      device, nullptr, 0);
-    if (ret < 0)
-    {
-        char error[AV_ERROR_MAX_STRING_SIZE];
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("av_hwdevice_ctx_create  Device = <%3> error: %1 (%2)")
-            .arg(av_make_error_string(error, sizeof(error), ret))
-            .arg(ret).arg(nvdecDevice));
-    }
-    else
-    {
-        ctx->hw_device_ctx = av_buffer_ref(hw_device_ctx);
-        av_buffer_unref(&hw_device_ctx);
-    }
-
-    SetDeinterlace(ctx);
-
-    return ret;
+    return -1;
 }
 
 

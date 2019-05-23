@@ -162,3 +162,24 @@ int MythHWContext::InitialiseDecoder2(AVCodecContext *Context, CreateHWDecoder C
                                    Context, reinterpret_cast<void*>(Callback));
     return Context->hw_device_ctx ? 0 : -1;
 }
+
+AVBufferRef* MythHWContext::CreateDevice(AVHWDeviceType Type, const QString &Device)
+{
+    AVBufferRef* result = nullptr;
+    int res = av_hwdevice_ctx_create(&result, Type, Device.isEmpty() ? nullptr :
+                                     Device.toLocal8Bit().constData(), nullptr, 0);
+    if (res == 0)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created hardware device '%1'%2")
+            .arg(av_hwdevice_get_type_name(Type))
+            .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device)));
+        return result;
+    }
+
+    char error[AV_ERROR_MAX_STRING_SIZE];
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create hardware device '%1'%2 Error '%3'")
+        .arg(av_hwdevice_get_type_name(Type))
+        .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device))
+        .arg(av_make_error_string(error, sizeof(error), res)));
+    return nullptr;
+}
