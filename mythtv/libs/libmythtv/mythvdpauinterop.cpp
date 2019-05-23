@@ -24,7 +24,7 @@ MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(MythCodecID CodecId,
     if (!Context)
         return Unsupported;
 
-    if (Context->hasExtension("GL_NV_vdpau_interop"))
+    if (Context->hasExtension("GL_NV_vdpau_interop") && MythVDPAUHelper::HaveVDPAU())
         return VDPAU;
     return Unsupported;
 }
@@ -81,11 +81,11 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
         return true;
 
     OpenGLLocker locker(m_context);
-    m_initNV     = reinterpret_cast<MYTH_VDPAUINITNV>(m_context->getProcAddress("VDPAUInitNV"));
-    m_finiNV     = reinterpret_cast<MYTH_VDPAUFININV>(m_context->getProcAddress("VDPAUFiniNV"));
-    m_registerNV = reinterpret_cast<MYTH_VDPAUREGOUTSURFNV>(m_context->getProcAddress("VDPAURegisterOutputSurfaceNV"));
-    m_accessNV   = reinterpret_cast<MYTH_VDPAUSURFACCESSNV>(m_context->getProcAddress("VDPAUSurfaceAccessNV"));
-    m_mapNV      = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->getProcAddress("VDPAUMapSurfacesNV"));
+    m_initNV     = reinterpret_cast<MYTH_VDPAUINITNV>(m_context->GetProcAddress("VDPAUInitNV"));
+    m_finiNV     = reinterpret_cast<MYTH_VDPAUFININV>(m_context->GetProcAddress("VDPAUFiniNV"));
+    m_registerNV = reinterpret_cast<MYTH_VDPAUREGOUTSURFNV>(m_context->GetProcAddress("VDPAURegisterOutputSurfaceNV"));
+    m_accessNV   = reinterpret_cast<MYTH_VDPAUSURFACCESSNV>(m_context->GetProcAddress("VDPAUSurfaceAccessNV"));
+    m_mapNV      = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->GetProcAddress("VDPAUMapSurfacesNV"));
 
     if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV)
     {

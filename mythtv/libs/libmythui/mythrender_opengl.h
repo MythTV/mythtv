@@ -114,6 +114,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  Flush(void);
     void  SetBlend(bool enable);
     void  SetBackground(int r, int g, int b, int a);
+    QFunctionPointer GetProcAddress(const QString &Proc) const;
 
     static const GLuint kVertexSize;
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
@@ -163,7 +164,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
   protected:
     ~MythRenderOpenGL() override;
     void  Init2DState(void);
-    QFunctionPointer GetProcAddress(const QString &Proc) const;
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
     bool  UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source, const QRect &Destination);
