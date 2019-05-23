@@ -3037,7 +3037,7 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
-#if defined(USING_VAAPI) || defined(USING_NVDEC) || defined(USING_VTB)
+#if defined(USING_VAAPI) || defined(USING_NVDEC) || defined(USING_VTB) || defined(USING_VDPAU)
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
