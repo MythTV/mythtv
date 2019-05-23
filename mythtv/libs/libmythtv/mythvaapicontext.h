@@ -25,7 +25,7 @@ class MTV_PUBLIC MythVAAPIContext
                                           AVPixelFormat  &PixFmt);
     static enum AVPixelFormat GetFormat  (struct AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
-    static bool HaveVAAPI                (void);
+    static bool HaveVAAPI                (bool ReCheck = false);
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);

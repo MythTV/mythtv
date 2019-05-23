@@ -341,11 +341,11 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
  * testing fails when used by FFmpeg. So disallow VAAPI over VDPAU - VDPAU should just
  * be used directly.
 */
-bool MythVAAPIContext::HaveVAAPI(void)
+bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
 {
     static bool havevaapi = false;
     static bool checked   = false;
-    if (checked)
+    if (checked && !ReCheck)
         return havevaapi;
     checked = true;
 

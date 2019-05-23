@@ -385,7 +385,7 @@ VideoDisplayProfile::VideoDisplayProfile()
     : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0F)
 {
     QMutexLocker locker(&s_safe_lock);
-    init_statics();
+    InitStatics();
 
     QString hostname    = gCoreContext->GetHostName();
     QString cur_profile = GetDefaultProfileName(hostname);
@@ -813,13 +813,13 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
 
 QStringList VideoDisplayProfile::GetDecoders(void)
 {
-    init_statics();
+    InitStatics();
     return s_safe_decoders;
 }
 
 QStringList VideoDisplayProfile::GetDecoderNames(void)
 {
-    init_statics();
+    InitStatics();
     QStringList list;
 
     const QStringList decs = GetDecoders();
@@ -1014,7 +1014,7 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
 
 QStringList VideoDisplayProfile::GetProfiles(const QString &hostname)
 {
-    init_statics();
+    InitStatics();
     QStringList list;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1460,7 +1460,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
 {
     QMutexLocker locker(&s_safe_lock);
-    init_statics();
+    InitStatics();
 
     safe_map_t::const_iterator it = s_safe_renderer.find(decoder);
     QStringList tmp;
@@ -1531,7 +1531,7 @@ QStringList VideoDisplayProfile::GetDeinterlacers(
     const QString &video_renderer)
 {
     QMutexLocker locker(&s_safe_lock);
-    init_statics();
+    InitStatics();
 
     safe_map_t::const_iterator it = s_safe_deint.find(video_renderer);
     QStringList tmp;
@@ -1711,7 +1711,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
 {
     QMutexLocker locker(&s_safe_lock);
-    init_statics();
+    InitStatics();
 
     safe_map_t::const_iterator it = s_safe_osd.find(video_renderer);
     QStringList tmp;
@@ -1760,7 +1760,7 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
 bool VideoDisplayProfile::IsFilterAllowed(const QString &video_renderer)
 {
     QMutexLocker locker(&s_safe_lock);
-    init_statics();
+    InitStatics();
     return s_safe_custom.contains(video_renderer);
 }
 
@@ -1783,7 +1783,7 @@ QStringList VideoDisplayProfile::GetFilteredRenderers(
 QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
 {
     QMutexLocker locker(&s_safe_lock);
-    init_statics();
+    InitStatics();
 
     uint    top_priority = 0;
     QString top_renderer;
@@ -1813,11 +1813,23 @@ QString VideoDisplayProfile::toString(void) const
         .arg(renderer).arg(osd).arg(deint0).arg(deint1).arg(filter);
 }
 
-void VideoDisplayProfile::init_statics(void)
+void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
 {
-    if (s_safe_initialized)
+    if (Reinit)
+    {
+        s_safe_custom.clear();
+        s_safe_renderer.clear();
+        s_safe_deint.clear();
+        s_safe_osd.clear();
+        s_safe_renderer_group.clear();
+        s_safe_renderer_priority.clear();
+        s_safe_decoders.clear();
+        s_safe_equiv_dec.clear();
+    }
+    else if (s_safe_initialized)
+    {
         return;
-
+    }
     s_safe_initialized = true;
 
     render_opts options;

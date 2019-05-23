@@ -88,6 +88,7 @@ class MTV_PUBLIC VideoDisplayProfile
     VideoDisplayProfile();
     ~VideoDisplayProfile() = default;
 
+    static void InitStatics(bool Reinit = false);
     void SetInput(const QSize &size,
         float framerate = 0, const QString &codecName = QString());
     void SetOutput(float framerate);
@@ -189,8 +190,6 @@ class MTV_PUBLIC VideoDisplayProfile
 
     QString GetPreference(const QString &key) const;
     void    SetPreference(const QString &key, const QString &value);
-
-    static void init_statics(void);
 
   private:
     mutable QMutex      lock;

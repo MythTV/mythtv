@@ -85,6 +85,15 @@ static HostTextEditSetting *VAAPIDevice()
 
     ge->setHelpText(help);
 
+    // update VideoDisplayProfile statics if this changes
+    QObject::connect(ge, &HostTextEditSetting::ChangeSaved,
+        []()
+        {
+            QString device = gCoreContext->GetSetting("VAAPIDevice");
+            LOG(VB_GENERAL, LOG_INFO, QString("New VAAPI device (%1) - resetting profiles").arg(device));
+            MythVAAPIContext::HaveVAAPI(true);
+            VideoDisplayProfile::InitStatics(true);
+        });
     return ge;
 }
 #endif
@@ -4231,8 +4240,7 @@ void PlaybackSettings::Load(void)
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
 #ifdef USING_VAAPI
-    if (MythVAAPIContext::HaveVAAPI())
-        advanced->addChild(VAAPIDevice());
+    advanced->addChild(VAAPIDevice());
 #endif
     HostCheckBoxSetting *avsync2 = PlaybackAVSync2();
     advanced->addChild(avsync2);
