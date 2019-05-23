@@ -46,7 +46,7 @@
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
 #endif
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 #include "mythvaapicontext.h"
 #endif
 
@@ -70,7 +70,7 @@ static HostSpinBoxSetting *AudioReadAhead()
     return gc;
 }
 
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 static HostTextEditSetting *VAAPIDevice()
 {
     HostTextEditSetting *ge = new HostTextEditSetting("VAAPIDevice");
@@ -4230,7 +4230,7 @@ void PlaybackSettings::Load(void)
     advanced->setLabel(tr("Advanced Playback Settings"));
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
     if (MythVAAPIContext::HaveVAAPI())
         advanced->addChild(VAAPIDevice());
 #endif

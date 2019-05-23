@@ -37,7 +37,7 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("nvdec-dec"))
         (*opts.safe_renderers)["nvdec-dec"].append("null");
 #endif
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
     if (opts.decoders->contains("vaapi-dec"))
         (*opts.safe_renderers)["vaapi-dec"].append("null");
 #endif

@@ -133,7 +133,6 @@ Advanced options (experts only):
   --disable-xrandr         disable X11 resolution switching
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
-  --disable-vaapi2         disable VAAPI2 hardware accelerated video decoding
   --disable-nvdec          disable NVDEC (CUVID) hardware accelerated video decoding
   --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
@@ -1396,7 +1395,6 @@ EXTERNAL_LIBRARY_LIST="
     sdl
     sdl2
     vaapi
-    vaapi2
     nvdec
 "
 
@@ -2039,7 +2037,6 @@ USING_LIST='
     opengl
     opengles
     vaapi
-    vaapi2
     nvdec
     vdpau
     openmax
@@ -2759,7 +2756,6 @@ enable libxml2
 enable lirc
 enable mediacodec
 enable vaapi
-enable vaapi2
 enable nvdec
 enable mheg
 enable mythtranscode
@@ -6198,10 +6194,6 @@ enabled vaapi &&
     check_cpp_condition "va/va.h" "VA_CHECK_VERSION(1, 0, 0)" &&
     enable vaapi_1
 
-enabled vaapi2 &&
-    check_func_headers va/va.h vaInitialize -lva ||
-    disable vaapi2
-
 enabled vdpau &&
     check_cpp_condition vdpau/vdpau.h "defined VDP_DECODER_PROFILE_MPEG4_PART2_ASP" ||
     disable vdpau
@@ -7185,7 +7177,7 @@ if test $target_os = "android"; then
 else
     disable mediacodec
 fi
-if enabled vaapi || enabled vaapi2 ; then
+if enabled vaapi; then
     ffopts="$ffopts --enable-vaapi"
 fi
 ffmpeg_extra_cflags="$extra_cflags -w"
@@ -7395,7 +7387,6 @@ if enabled x11 ; then
   echo "xrandr support            ${xrandr-no}"
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
-  echo "VAAPI2 support            ${vaapi2-no}"
   echo "NVDEC support             ${nvdec-no}"
   echo "OpenMAX support           ${openmax-no}"
   if enabled openmax ; then

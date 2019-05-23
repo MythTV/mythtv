@@ -27,7 +27,7 @@
 #include "mythcodeccontext.h"
 #include "videooutbase.h"
 #include "mythplayer.h"
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 #include "vaapi2context.h"
 #endif
 #ifdef USING_NVDEC
@@ -73,7 +73,7 @@ MythCodecContext::MythCodecContext() :
 MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 {
     MythCodecContext *mctx = nullptr;
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
     if (codec_is_vaapi_dec(codec))
         mctx = new Vaapi2Context();
 #endif
@@ -101,7 +101,7 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 QStringList MythCodecContext::GetDeinterlacers(const QString& decodername)
 {
     QStringList ret;
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
     if (decodername == "vaapi-dec")
     {
         ret.append("vaapi2default");

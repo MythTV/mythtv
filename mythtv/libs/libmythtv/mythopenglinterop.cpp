@@ -8,7 +8,7 @@
 #include "mythrender_opengl.h"
 #include "mythopenglinterop.h"
 
-#ifdef USING_GLVAAPI
+#ifdef USING_VAAPI
 #include "mythvaapiinterop.h"
 #endif
 #ifdef USING_VTB
@@ -44,7 +44,7 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
     QStringList result;
     if (codec_sw_copy(CodecId))
         return result;
-#ifdef USING_GLVAAPI
+#ifdef USING_VAAPI
     else if (codec_is_vaapi(CodecId) && (GetInteropType(CodecId) != Unsupported))
         result << "opengl-hw";
 #endif
@@ -94,7 +94,7 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
     if (codec_is_vtb(CodecId))
         supported = MythVTBInterop::GetInteropType(CodecId);
 #endif
-#ifdef USING_GLVAAPI
+#ifdef USING_VAAPI
     if (codec_is_vaapi(CodecId))
         supported = MythVAAPIInterop::GetInteropType(CodecId);
 #endif
@@ -135,7 +135,7 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if ((Frame->codec == FMT_VTB) && (Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX))
         validhwcodec = true;
 #endif
-#ifdef USING_GLVAAPI
+#ifdef USING_VAAPI
     if ((Frame->codec == FMT_VAAPI) && (Frame->pix_fmt == AV_PIX_FMT_VAAPI))
         validhwcodec = true;
 #endif

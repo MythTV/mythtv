@@ -64,7 +64,7 @@ extern "C" {
 #include <QtAndroidExtras>
 #endif
 
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 #include "vaapi2context.h"
 #endif
 
@@ -185,7 +185,7 @@ void release_avf_buffer(void *opaque, uint8_t *data);
 #ifdef USING_DXVA2
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 int  get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 #ifdef USING_NVDEC
@@ -401,12 +401,6 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     {
         opts.decoders->append("vaapi");
         (*opts.equiv_decoders)["vaapi"].append("dummy");
-    }
-#endif
-
-#ifdef USING_VAAPI2
-    if (MythVAAPIContext::HaveVAAPI())
-    {
         opts.decoders->append("vaapi-dec");
         (*opts.equiv_decoders)["vaapi-dec"].append("dummy");
     }
@@ -1494,7 +1488,7 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
                                            const enum AVPixelFormat *valid_fmts)
 {
@@ -1610,6 +1604,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->get_format      = MythVAAPIContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
+    else if (codec_is_vaapi_dec(m_video_codec_id))
+    {
+        enc->get_buffer2     = get_avf_buffer_vaapi2;
+        enc->get_format      = get_format_vaapi2;
+    }
     else
 #endif
 #ifdef USING_VTB
@@ -1630,14 +1629,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         else
             enc->get_format = get_format_mediacodec;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-    }
-    else
-#endif
-#ifdef USING_VAAPI2
-    if (codec_is_vaapi_dec(m_video_codec_id))
-    {
-        enc->get_buffer2     = get_avf_buffer_vaapi2;
-        enc->get_format      = get_format_vaapi2;
     }
     else
 #endif
@@ -2531,7 +2522,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_VDPAU
-#ifdef USING_GLVAAPI
+#ifdef USING_VAAPI
                 if (!foundgpudecoder)
                 {
                     MythCodecID vaapi_mcid;
@@ -2545,7 +2536,23 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         foundgpudecoder = true;
                     }
                 }
-#endif // USING_GLVAAPI
+                if (!foundgpudecoder)
+                {
+                    MythCodecID vaapi2_mcid;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+                    vaapi2_mcid = Vaapi2Context::GetBestSupportedCodec(
+                        &codec, dec, mpeg_version(enc->codec_id),
+                        pix_fmt);
+
+                    if (codec_is_vaapi_dec(vaapi2_mcid))
+                    {
+                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
+                        m_video_codec_id = vaapi2_mcid;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif // USING_VAAPI
 #ifdef USING_VTB
                 if (!foundgpudecoder)
                 {
@@ -2612,24 +2619,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_MEDIACODEC
-#ifdef USING_VAAPI2
-                if (!foundgpudecoder)
-                {
-                    MythCodecID vaapi2_mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    vaapi2_mcid = Vaapi2Context::GetBestSupportedCodec(
-                        &codec, dec, mpeg_version(enc->codec_id),
-                        pix_fmt);
-
-                    if (codec_is_vaapi_dec(vaapi2_mcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = vaapi2_mcid;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_VAAPI2
 #ifdef USING_NVDEC
                 if (!foundgpudecoder)
                 {
@@ -3056,7 +3045,7 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
-#if defined(USING_VAAPI2) || defined(USING_NVDEC) || defined(USING_VTB)
+#if defined(USING_VAAPI) || defined(USING_NVDEC) || defined(USING_VTB)
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
@@ -3088,7 +3077,7 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 }
 #endif
 
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
 int get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
@@ -3893,7 +3882,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         VideoFrame *xf = picframe;
         picframe = m_parent->GetNextVideoFrame();
         bool used_picframe = false;
-#if defined(USING_VAAPI2) || defined(USING_NVDEC) || defined(USING_VTB) || defined(USING_VDPAU)
+#if defined(USING_VAAPI) || defined(USING_NVDEC) || defined(USING_VTB) || defined(USING_VDPAU)
         if (AV_PIX_FMT_CUDA == static_cast<AVPixelFormat>(mpa_pic->format) ||
             AV_PIX_FMT_VAAPI == static_cast<AVPixelFormat>(mpa_pic->format) ||
             AV_PIX_FMT_VIDEOTOOLBOX == static_cast<AVPixelFormat>(mpa_pic->format) ||
@@ -3944,7 +3933,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             av_freep(&pixelformats);
         }
         else
-#endif // USING_VAAPI2 || USING_NVDEC || USING_VTB || USING_VDPAU
+#endif // USING_VAAPI || USING_NVDEC || USING_VTB || USING_VDPAU
             use_frame = mpa_pic;
 
         if (!used_picframe)

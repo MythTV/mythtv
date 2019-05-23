@@ -115,8 +115,7 @@ using_opengl:DEFINES += USING_OPENGL
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
 using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER
 using_vdpau:DEFINES += USING_VDPAU
-using_vaapi:using_opengl_video:DEFINES += USING_GLVAAPI
-using_vaapi2:DEFINES += USING_VAAPI2
+using_vaapi:using_opengl_video:DEFINES += USING_VAAPI
 
 using_pulse:DEFINES += USING_PULSE
 using_pulseoutput: DEFINES += USING_PULSEOUTPUT

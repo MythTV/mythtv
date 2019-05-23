@@ -972,7 +972,7 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
     if ("openmaxlinedouble" == short_name)
         return QObject::tr("Line double (HW)");
 #endif // def USING_OPENMAX
-#ifdef USING_VAAPI2
+#ifdef USING_VAAPI
     if ("vaapi2default" == short_name)
         return QObject::tr("Advanced (HW-VA)");
     if ("vaapi2bob" == short_name)
@@ -1378,7 +1378,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
     }
 #endif
 
-#ifdef USING_GLVAAPI
+#ifdef USING_VAAPI
     if (!profiles.contains("VAAPI Normal")) {
         (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
         groupid = CreateProfileGroup("VAAPI Normal", hostname);
@@ -1429,7 +1429,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
     }
 #endif
 
-#if defined(USING_VAAPI2) && defined(USING_OPENGL_VIDEO)
+#if defined(USING_VAAPI) && defined(USING_OPENGL_VIDEO)
     if (!profiles.contains("VAAPI2 Normal")) {
         (void) QObject::tr("VAAPI2 Normal",
                            "Sample: VAAPI2 Normal");
