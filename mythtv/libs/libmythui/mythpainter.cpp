@@ -14,7 +14,7 @@
 // libmythui headers
 #include "mythfontproperties.h"
 #include "mythimage.h"
-#include "mythuianimation.h"	// UIEffects
+#include "mythuianimation.h"    // UIEffects
 
 // Own header
 #include "mythpainter.h"
@@ -451,7 +451,8 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
 
         painter.setPen(QPen(font.GetBrush(), 0));
         for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
-            (*Ipara)->draw(&painter, canvas.topLeft(), formats, clip);
+            (*Ipara)->draw(&painter, canvas.topLeft(),
+                           (*Ipara)->formats(), clip);
 
         painter.end();
 

@@ -456,6 +456,101 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                       *GetFontProperties(), alpha, drawrect);
 }
 
+bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
+{
+    if (!m_TemplateTextFormat)
+        return false;
+
+    FormatVector formats;
+    QTextLayout::FormatRange range;
+    QString fontname;
+    bool    res = false;  // Return true if paragraph changed.
+
+    range.start = 0;
+    range.length = 0;
+
+    LOG(VB_GUI, LOG_DEBUG, QString("FormatTemplate Start: '%1'").arg(paragraph));
+
+    int pos = 0, end = 0;
+    while ((pos = paragraph.indexOf("[font]", pos)) != -1)
+    {
+        if ((end = paragraph.indexOf("[/font]", pos + 1)) != -1)
+        {
+            LOG(VB_GUI, LOG_WARNING, QString("[font] @ %1 [/font] @ %2")
+                .arg(pos).arg(end));
+
+            if (range.length == -1)
+            {
+                // End of the affected text
+                range.length = pos - range.start;
+                if (range.length > 0)
+                {
+                    formats.push_back(range);
+                    LOG(VB_GUI, LOG_WARNING,
+                        QString("'%1' \"%2\" with FONT %3")
+                        .arg(objectName())
+                        .arg(paragraph.mid(range.start, range.length))
+                        .arg(fontname));
+                }
+                range.length = 0;
+            }
+
+            int len = end - pos - 6;
+            fontname = paragraph.mid(pos + 6, len);
+
+            if (GetGlobalFontMap()->Contains(fontname))
+            {
+                MythFontProperties *fnt = GetGlobalFontMap()->GetFont(fontname);
+                range.start = pos;
+                range.length = -1;  // Need to find the end of the effect
+                range.format.setFont(fnt->face());
+                range.format.setFontStyleHint(QFont::SansSerif,
+                                              QFont::OpenGLCompatible);
+                range.format.setForeground(fnt->GetBrush());
+            }
+            else
+            {
+                LOG(VB_GUI, LOG_ERR,
+                    QString("'%1' Unknown Font '%2' specified in template.")
+                    .arg(objectName())
+                    .arg(fontname));
+            }
+
+            LOG(VB_GUI, LOG_WARNING, QString("Removing %1 through %2 '%3'")
+                .arg(pos).arg(end + 7 - pos).arg(paragraph.mid(pos,
+                                                               end + 7 - pos)));
+            paragraph.remove(pos, end + 7 - pos);
+            res = true;
+        }
+        else
+        {
+            LOG(VB_GUI, LOG_ERR,
+                QString("'%1' Non-terminated [font] found in template")
+                .arg(objectName()));
+            break;
+        }
+    }
+
+    if (range.length == -1) // To the end
+    {
+        range.length = paragraph.length() - range.start;
+        formats.push_back(range);
+        LOG(VB_GUI, LOG_WARNING,
+            QString("'%1' \"%2\" with FONT %3")
+            .arg(objectName())
+            .arg(paragraph.mid(range.start, range.length))
+            .arg(fontname));
+    }
+
+
+    LOG(VB_GUI, LOG_WARNING, QString("FormatTemplate Start: '%1'").arg(paragraph));
+
+    if (!formats.empty())
+        layout->setFormats(formats);
+
+    return res;
+}
+
 bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                         bool & overflow, qreal width, qreal & height,
                         bool force, qreal & last_line_width,
@@ -463,6 +558,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 {
     int last_line = 0;
 
+    FormatTemplate(paragraph, layout);
     layout->setText(paragraph);
     layout->beginLayout();
     num_lines = 0;
@@ -1350,6 +1446,8 @@ bool MythUIText::ParseElement(
     else if (element.tagName() == "template")
     {
         m_TemplateText = parseText(element);
+        m_TemplateTextFormat = (element.attribute("format", "").toLower()
+                                == "true");
     }
     else if (element.tagName() == "cutdown")
     {
@@ -1529,6 +1627,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     SetText(text->m_Message);
     m_CutMessage = text->m_CutMessage;
     m_TemplateText = text->m_TemplateText;
+    m_TemplateTextFormat = text->m_TemplateTextFormat;
 
     m_ShrinkNarrow = text->m_ShrinkNarrow;
     m_Cutdown = text->m_Cutdown;
