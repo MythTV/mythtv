@@ -12,10 +12,12 @@ INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
 
-config.path = $${PREFIX}/share/mythtv/
-config.files += ffmpeg-channels.conf ffmpeg.conf
-config.files += twitch-channels.conf twitch.conf
-config.files += vlc-channels.conf vlc.conf
+config.path = $${PREFIX}/share/mythtv/externrecorder
+config.files += config/*.conf
+
+#config.files += config/ffmpeg-channels.conf config/ffmpeg.conf
+#config.files += config/twitch-channels.conf config/twitch.conf
+#config.files += config/vlc-channels.conf config/vlc.conf
 
 INSTALLS += config
 

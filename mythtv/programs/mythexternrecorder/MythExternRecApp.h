@@ -79,6 +79,7 @@ class MythExternRecApp : public QObject
 
   protected:
     void GetChannel(const QString & serial, const QString & func);
+    void TerminateProcess(void);
 
   private:
     bool config(void);
@@ -99,6 +100,8 @@ class MythExternRecApp : public QObject
 
     QString   m_rec_command;
     QString   m_rec_desc;
+
+    QMap<QString, QString> m_app_env;
 
     QString   m_tune_command;
     QString   m_channels_ini;
