@@ -636,7 +636,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VP9_VTB:
         case kCodec_VP9_VTB_DEC:
         case kCodec_VP9_OMXEGL:
-            return "VP8";
+            return "VP9";
 
         case kCodec_HEVC:
         case kCodec_HEVC_VDPAU:
