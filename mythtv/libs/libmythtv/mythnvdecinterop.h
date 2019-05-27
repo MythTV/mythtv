@@ -15,6 +15,10 @@ class MythNVDECInterop : public MythOpenGLInterop
   public:
     static MythNVDECInterop* Create(MythRenderOpenGL *Context);
     static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
+    static bool CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                  CUcontext &CudaContext);
+    static void CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                               CUcontext &CudaContext);
 
    ~MythNVDECInterop() override;
 

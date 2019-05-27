@@ -6,12 +6,12 @@
 
 #define LOC QString("NVDECInterop: ")
 
-#define CUDA_CHECK(CUDA_CALL) \
+#define CUDA_CHECK(CUDA_FUNCS, CUDA_CALL) \
 { \
-    CUresult res = CUDA_CALL; \
+    CUresult res = CUDA_FUNCS->CUDA_CALL; \
     if (res != CUDA_SUCCESS) { \
         const char * desc; \
-        m_cudaFuncs->cuGetErrorString(res, &desc); \
+        CUDA_FUNCS->cuGetErrorString(res, &desc); \
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("CUDA error %1 (%2)").arg(res).arg(desc)); \
     } \
 }
@@ -26,12 +26,7 @@ MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
 
 MythNVDECInterop::~MythNVDECInterop()
 {
-    if (m_cudaFuncs)
-    {
-        if (m_cudaContext)
-            CUDA_CHECK(m_cudaFuncs->cuCtxDestroy(m_cudaContext));
-        cuda_free_functions(&m_cudaFuncs);
-    }
+    CleanupContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
 void MythNVDECInterop::DeleteTextures(void)
@@ -40,7 +35,7 @@ void MythNVDECInterop::DeleteTextures(void)
     if (!(m_cudaContext && m_cudaFuncs))
         return;
 
-    CUDA_CHECK(m_cudaFuncs->cuCtxPushCurrent(m_cudaContext));
+    CUDA_CHECK(m_cudaFuncs, cuCtxPushCurrent(m_cudaContext));
 
     if (!m_openglTextures.isEmpty())
     {
@@ -63,7 +58,7 @@ void MythNVDECInterop::DeleteTextures(void)
         }
     }
 
-    CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
+    CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
 
     MythOpenGLInterop::DeleteTextures();
 }
@@ -151,7 +146,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
     // make the CUDA context current
     CUcontext dummy;
-    CUDA_CHECK(m_cudaFuncs->cuCtxPushCurrent(m_cudaContext));
+    CUDA_CHECK(m_cudaFuncs, cuCtxPushCurrent(m_cudaContext));
 
     // create and map textures for a new buffer
     VideoFrameType type = (Frame->sw_pix_fmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
@@ -166,7 +161,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
                     m_context, FMT_NVDEC, type, sizes, QOpenGLTexture::Target2D);
         if (textures.empty())
         {
-            CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
+            CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
             return result;
         }
 
@@ -191,11 +186,11 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
             CUarray array;
             CUgraphicsResource graphicsResource = nullptr;
-            CUDA_CHECK(m_cudaFuncs->cuGraphicsGLRegisterImage(&graphicsResource, tex->m_textureId,
+            CUDA_CHECK(m_cudaFuncs, cuGraphicsGLRegisterImage(&graphicsResource, tex->m_textureId,
                                           QOpenGLTexture::Target2D, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD));
-            CUDA_CHECK(m_cudaFuncs->cuGraphicsMapResources(1, &graphicsResource, nullptr));
-            CUDA_CHECK(m_cudaFuncs->cuGraphicsSubResourceGetMappedArray(&array, graphicsResource, 0, 0));
-            CUDA_CHECK(m_cudaFuncs->cuGraphicsUnmapResources(1, &graphicsResource, nullptr));
+            CUDA_CHECK(m_cudaFuncs, cuGraphicsMapResources(1, &graphicsResource, nullptr));
+            CUDA_CHECK(m_cudaFuncs, cuGraphicsSubResourceGetMappedArray(&array, graphicsResource, 0, 0));
+            CUDA_CHECK(m_cudaFuncs, cuGraphicsUnmapResources(1, &graphicsResource, nullptr));
             tex->m_data = reinterpret_cast<unsigned char*>(new QPair<CUarray,CUgraphicsResource>(array, graphicsResource));
         }
         MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
@@ -204,7 +199,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
     if (!m_openglTextures.contains(cudabuffer))
     {
-        CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
+        CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
         return result;
     }
 
@@ -224,10 +219,10 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         cpy.dstArray      = data->first;
         cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (hdr ? 2 : 1);
         cpy.Height        = static_cast<size_t>(result[i]->m_size.height());
-        CUDA_CHECK(m_cudaFuncs->cuMemcpy2D(&cpy));
+        CUDA_CHECK(m_cudaFuncs, cuMemcpy2D(&cpy));
     }
 
-    CUDA_CHECK(m_cudaFuncs->cuCtxPopCurrent(&dummy));
+    CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
     return result;
 }
 
@@ -237,13 +232,20 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 */
 bool MythNVDECInterop::InitialiseCuda(void)
 {
-    if (!m_context)
+    return CreateCUDAContext(m_context, m_cudaFuncs, m_cudaContext);
+}
+
+bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                         CUcontext &CudaContext)
+{
+    if (!GLContext)
         return false;
 
-    OpenGLLocker locker(m_context);
+    // Make OpenGL context current
+    OpenGLLocker locker(GLContext);
 
     // retrieve CUDA entry points
-    if (cuda_load_functions(&m_cudaFuncs, nullptr) != 0)
+    if (cuda_load_functions(&CudaFuncs, nullptr) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load functions");
         return false;
@@ -252,7 +254,7 @@ bool MythNVDECInterop::InitialiseCuda(void)
     // create a CUDA context for the current device
     CUdevice cudevice;
     CUcontext dummy;
-    CUresult res = m_cudaFuncs->cuInit(0);
+    CUresult res = CudaFuncs->cuInit(0);
     if (res != CUDA_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise CUDA API");
@@ -260,7 +262,7 @@ bool MythNVDECInterop::InitialiseCuda(void)
     }
 
     unsigned int devicecount;
-    res = m_cudaFuncs->cuGLGetDevices(&devicecount, &cudevice, 1, CU_GL_DEVICE_LIST_ALL);
+    res = CudaFuncs->cuGLGetDevices(&devicecount, &cudevice, 1, CU_GL_DEVICE_LIST_ALL);
     if (res != CUDA_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get CUDA device");
@@ -273,14 +275,27 @@ bool MythNVDECInterop::InitialiseCuda(void)
         return false;
     }
 
-    res = m_cudaFuncs->cuCtxCreate(&m_cudaContext, CU_CTX_SCHED_BLOCKING_SYNC, cudevice);
+    res = CudaFuncs->cuCtxCreate(&CudaContext, CU_CTX_SCHED_BLOCKING_SYNC, cudevice);
     if (res != CUDA_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create CUDA context");
         return false;
     }
 
-    m_cudaFuncs->cuCtxPopCurrent(&dummy);
+    CudaFuncs->cuCtxPopCurrent(&dummy);
     LOG(VB_GENERAL, LOG_INFO, LOC + "Created CUDA context");
     return true;
+
+}
+
+void MythNVDECInterop::CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                      CUcontext &CudaContext)
+{
+    OpenGLLocker locker(GLContext);
+    if (CudaFuncs)
+    {
+        if (CudaContext)
+            CUDA_CHECK(CudaFuncs, cuCtxDestroy(CudaContext));
+        cuda_free_functions(&CudaFuncs);
+    }
 }
