@@ -458,6 +458,10 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
 bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
+    layout->clearFormats();
+#endif
+
     if (!m_TemplateTextFormat)
         return false;
 
@@ -545,8 +549,10 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
 
     LOG(VB_GUI, LOG_WARNING, QString("FormatTemplate Start: '%1'").arg(paragraph));
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
     if (!formats.empty())
         layout->setFormats(formats);
+#endif
 
     return res;
 }
