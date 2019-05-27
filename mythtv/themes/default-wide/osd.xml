@@ -9,7 +9,7 @@
         <fontdef name="file" from="medium">
             <color>#CCCCFF</color>
         </fontdef>
-        <area>50,50,1180,105</area>
+        <area>50,50,1180,130</area>
         <shape name="background">
             <area>0,0,100%,100%</area>
             <fill color="#000000" alpha="200" />
@@ -80,7 +80,7 @@
         </textarea>
         <textarea name="videocodec">
             <font>medium</font>
-            <area>415,55,150,25</area>
+            <area>415,55,200,25</area>
             <align>left,vcenter</align>
             <template>%VIDEOCODEC% %VIDEODECODER%</template>
         </textarea>
@@ -93,6 +93,17 @@
         <textarea name="load">
             <font>medium</font>
             <area>415,80,200,25</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="deint">
+            <font>medium</font>
+            <area>260,105,150,25</area>
+            <align>right,vcenter</align>
+            <value>Deint :</value>
+        </textarea>
+        <textarea name="deinterlacer">
+            <font>medium</font>
+            <area>415,105,200,25</area>
             <align>left,vcenter</align>
         </textarea>
 
