@@ -153,8 +153,11 @@ QSize OpenGLVideo::GetVideoSize(void) const
     return m_videoDim;
 }
 
-bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter /* = DEINT_SHADER */)
+bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan, MythDeintType Filter /* = DEINT_SHADER */)
 {
+    if (!Frame || !is_interlaced(Scan))
+        return false;
+
     // do we want an opengl shader?
     // shaders trump CPU deinterlacers if selected and driver deinterlacers will only
     // be available under restricted circumstances
@@ -466,7 +469,7 @@ void OpenGLVideo::ResetFrameFormat(void)
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
-void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
+void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
 {
     if (Frame->codec == FMT_NONE)
         return;
@@ -519,7 +522,7 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame)
     }
 
     // Setup deinterlacing if required
-    AddDeinterlacer(Frame);
+    AddDeinterlacer(Frame, Scan);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_START");
@@ -588,7 +591,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 
             // Enable deinterlacing for NVDEC and VTB
             if (Frame && format_is_hwyuv(Frame->codec))
-                AddDeinterlacer(Frame, DEINT_SHADER | DEINT_CPU); // pickup shader or cpu prefs
+                AddDeinterlacer(Frame, Scan, DEINT_SHADER | DEINT_CPU); // pickup shader or cpu prefs
         }
         else
         {

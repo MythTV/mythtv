@@ -403,7 +403,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     }
 
     if (m_openGLVideo && swframe && !dummy)
-        m_openGLVideo->ProcessFrame(Frame);
+        m_openGLVideo->ProcessFrame(Frame, Scan);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_END");

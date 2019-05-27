@@ -42,7 +42,7 @@ class OpenGLVideo : public QObject
    ~OpenGLVideo();
 
     bool    IsValid(void) const;
-    void    ProcessFrame(const VideoFrame *Frame);
+    void    ProcessFrame(const VideoFrame *Frame, FrameScanType Scan = kScan_Progressive);
     void    PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
                          StereoscopicMode Stereo, bool DrawBorder = false);
     void    SetMasterViewport(QSize Size);
@@ -65,7 +65,7 @@ class OpenGLVideo : public QObject
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
     void    LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                          MythGLTexture** Textures, uint &TextureCount);
-    bool    AddDeinterlacer(const VideoFrame *Frame, MythDeintType Filter = DEINT_SHADER);
+    bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan, MythDeintType Filter = DEINT_SHADER);
 
     bool           m_valid;
     QString        m_profile;
