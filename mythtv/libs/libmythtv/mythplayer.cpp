@@ -2565,8 +2565,17 @@ void MythPlayer::PreProcessNormalFrame(void)
 
 bool MythPlayer::CanSupportDoubleRate(void)
 {
-    if (!videosync)
-        return false;
+    int refreshinterval = 1;
+    if (videosync)
+    {
+        refreshinterval = videosync->getRefreshInterval();
+    }
+    else
+    {
+        // used by the decoder before videosync is created
+        refreshinterval = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+    }
+
     // At this point we may not have the correct frame rate.
     // Since interlaced is always at 25 or 30 fps, if the interval
     // is less than 30000 (33fps) it must be representing one
@@ -2574,7 +2583,7 @@ bool MythPlayer::CanSupportDoubleRate(void)
     int realfi = frame_interval;
     if (frame_interval < 30000)
         realfi = frame_interval * 2;
-    return (realfi / 2.0 > videosync->getRefreshInterval() * 0.995);
+    return ((realfi / 2.0) > (refreshinterval * 0.995));
 }
 
 void MythPlayer::EnableFrameRateMonitor(bool enable)
@@ -2682,9 +2691,9 @@ void MythPlayer::VideoStart(void)
     }
     else if (videoOutput)
     {
-        m_double_framerate = CanSupportDoubleRate();
-        videoOutput->SetDeinterlacing(true, m_double_framerate);
         videosync = VideoSync::BestMethod(videoOutput, static_cast<uint>(rf_int));
+        m_double_framerate = CanSupportDoubleRate(); // needs videosync
+        videoOutput->SetDeinterlacing(true, m_double_framerate);
     }
 
     if (!videosync)
