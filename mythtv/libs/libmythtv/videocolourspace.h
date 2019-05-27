@@ -58,6 +58,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     float     m_alpha;
     int       m_colourSpace;
     int       m_colourSpaceDepth;
+    int       m_range;
     bool      m_updatesDisabled;
     VideoColourSpace *m_parent;
 };

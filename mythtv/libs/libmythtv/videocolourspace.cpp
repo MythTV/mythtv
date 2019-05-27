@@ -55,6 +55,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     m_alpha(1.0F),
     m_colourSpace(AVCOL_SPC_UNSPECIFIED),
     m_colourSpaceDepth(8),
+    m_range(AVCOL_RANGE_MPEG),
     m_updatesDisabled(true),
     m_parent(Parent)
 {
@@ -224,13 +225,14 @@ void VideoColourSpace::Update(void)
     // For example, YUV420P10 is downsampled by removing the 2 lower bits of
     // precision. We identify the resultant YUV420P frame as 8bit and calculate
     // the quantization/range accordingly.
+    bool fullrange = (m_range == AVCOL_RANGE_JPEG) || m_studioLevels;
     float depth        =  (1 <<  m_colourSpaceDepth) - 1;
     float blacklevel   =  16 << (m_colourSpaceDepth - 8);
     float lumapeak     = 235 << (m_colourSpaceDepth - 8);
     float chromapeak   = 240 << (m_colourSpaceDepth - 8);
-    float luma_scale   = m_studioLevels ? 1.0F : depth / (lumapeak - blacklevel);
-    float chroma_scale = m_studioLevels ? 1.0F : depth / (chromapeak - blacklevel);
-    float offset       = m_studioLevels ? 0.0F : -blacklevel / depth;
+    float luma_scale   = fullrange ? 1.0F : depth / (lumapeak - blacklevel);
+    float chroma_scale = fullrange ? 1.0F : depth / (chromapeak - blacklevel);
+    float offset       = fullrange ? 0.0F : -blacklevel / depth;
 
     setToIdentity();
     translate(m_brightness, m_brightness, m_brightness);
@@ -246,13 +248,13 @@ void VideoColourSpace::Update(void)
 void VideoColourSpace::Debug(void)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 Alpha: %5 StudioLevels: %6")
+        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 Alpha: %5 Range: %6")
         .arg(static_cast<qreal>(m_brightness), 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_contrast)  , 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_saturation), 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_hue)       , 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_alpha)     , 2, 'f', 4, QLatin1Char('0'))
-        .arg(m_studioLevels));
+        .arg((AVCOL_RANGE_JPEG == m_range) || m_studioLevels ? "Full" : "Limited"));
 
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
     {
@@ -282,20 +284,23 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         forced = true;
         csp = AVCOL_SPC_UNSPECIFIED;
     }
+    int range = Frame->colorrange;
     int depth = ColorDepth(Frame->codec);
     if (csp == AVCOL_SPC_UNSPECIFIED)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
-    if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth))
+    if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) && (m_range == range))
         return false;
     m_colourSpace = csp;
     m_colourSpaceDepth = depth;
+    m_range = range;
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
             .arg(format_description(Frame->codec)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video colourspace: %1, depth %2 (Stream: %3)")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video Colourspace: %1 Depth: %2 Range: %3 (Stream: %4)")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
         .arg(m_colourSpaceDepth)
+        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited")
         .arg(av_color_space_name(static_cast<AVColorSpace>(Frame->colorspace))));
 
     Update();
