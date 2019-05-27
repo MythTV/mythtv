@@ -112,8 +112,9 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec
         return failure;
 
     // VDPAU only supports 8bit 420p:(
+    // N.B. It should probably be possible to force YUVJ420P support
     VideoFrameType type = PixelFormatToFrameType(Context->pix_fmt);
-    bool vdpau = (type == FMT_YV12) && MythVDPAUHelper::HaveVDPAU() &&
+    bool vdpau = (type == FMT_YV12) && (AV_PIX_FMT_YUVJ420P != Context->pix_fmt) && MythVDPAUHelper::HaveVDPAU() &&
                  (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
     if (vdpau && (success == kCodec_MPEG4_VDPAU || success == kCodec_MPEG4_VDPAU_DEC))
         vdpau = MythVDPAUHelper::HaveMPEG4Decode();
