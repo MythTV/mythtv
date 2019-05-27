@@ -2534,7 +2534,9 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     {
         m_lastDeinterlacer = frame->deinterlace_inuse;
         m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
-        m_lastFrameCodec = frame->codec;
+        // We use the underlying pix_fmt as it retains the distinction between hardware
+        // and software frames for decode only decoders.
+        m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
         videoOutput->DoneDisplayingFrame(frame);
     }
 }
