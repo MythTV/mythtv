@@ -221,6 +221,18 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 texture = CreateTexture(Context, size, Target,
                               QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
                 break;
+            case FMT_YUV444P:
+                texture = CreateTexture(Context, size, Target,
+                              QOpenGLTexture::UInt8, QOpenGLTexture::Red, QOpenGLTexture::R8_UNorm);
+                break;
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16:
+                texture = CreateTexture(Context, size, Target,
+                              QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
+                break;
             default: break;
         }
         if (texture)
@@ -357,6 +369,32 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 }
                 break;
             }
+            case FMT_YUV444P:
+            {
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_YUV444P: YV12ToYV12(Context, Frame, texture, i); break;
+                    default: break;
+                }
+                break;
+            }
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16:
+            {
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_YUV444P9:
+                    case FMT_YUV444P10:
+                    case FMT_YUV444P12:
+                    case FMT_YUV444P14:
+                    case FMT_YUV444P16: YV12ToYV12(Context, Frame, texture, i); break;
+                    default: break;
+                }
+                break;
+            }
             default: break;
         }
     }
@@ -425,7 +463,7 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoF
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
-        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P) ?
+        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P || Frame->codec == FMT_YUV444P) ?
                      Frame->pitches[Plane] : Frame->pitches[Plane] >> 1;
         Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
@@ -437,7 +475,7 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoF
         if (!Texture->m_data)
             if (!CreateBuffer(Texture, Texture->m_bufferSize))
                 return;
-        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P) ?
+        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P || Frame->codec == FMT_YUV444P) ?
                      Texture->m_size.width() : Texture->m_size.width() << 1;
         copyplane(Texture->m_data, pitch, Frame->buf + Frame->offsets[Plane],
                   Frame->pitches[Plane], pitch, Texture->m_size.height());

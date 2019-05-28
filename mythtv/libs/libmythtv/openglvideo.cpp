@@ -265,7 +265,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
     // no interlaced shaders yet (i.e. interlaced chroma upsampling - not deinterlacers)
     else if ((Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE))
     {
-        if (format_is_420(m_outputType) || format_is_422(m_outputType))
+        if (format_is_420(m_outputType) || format_is_422(m_outputType) || format_is_444(m_outputType))
         {
             fragment = YV12RGBFragmentShader;
             cost = 3;
@@ -284,7 +284,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
     else
     {
         uint bottom = (InterlacedBot == Type);
-        if (format_is_420(m_outputType) || format_is_422(m_outputType))
+        if (format_is_420(m_outputType) || format_is_422(m_outputType) || format_is_444(m_outputType))
         {
             if (Deint == DEINT_BASIC)
             {

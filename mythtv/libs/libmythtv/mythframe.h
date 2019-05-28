@@ -37,6 +37,13 @@ typedef enum FrameType_
     FMT_YUV422P12,
     FMT_YUV422P14,
     FMT_YUV422P16,
+    // YUV444P and variants
+    FMT_YUV444P,
+    FMT_YUV444P9,
+    FMT_YUV444P10,
+    FMT_YUV444P12,
+    FMT_YUV444P14,
+    FMT_YUV444P16,
     // Packed YUV
     FMT_YUY2,
     FMT_YUYVHQ, // temporary
@@ -81,6 +88,13 @@ static inline int format_is_422(VideoFrameType Type)
            (Type == FMT_YUV422P12) || (Type == FMT_YUV422P14) || (Type == FMT_YUV422P16);
 }
 
+static inline int format_is_444(VideoFrameType Type)
+{
+    return (Type == FMT_YUV444P)   || (Type == FMT_YUV444P9) || (Type == FMT_YUV444P10) ||
+           (Type == FMT_YUV444P12) || (Type == FMT_YUV444P14) || (Type == FMT_YUV444P16);
+
+}
+
 static inline int format_is_nv12(VideoFrameType Type)
 {
     return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
@@ -88,7 +102,7 @@ static inline int format_is_nv12(VideoFrameType Type)
 
 static inline int format_is_yuv(VideoFrameType Type)
 {
-    return format_is_420(Type) || format_is_422(Type) || format_is_nv12(Type);
+    return format_is_420(Type) || format_is_422(Type) || format_is_444(Type) || format_is_nv12(Type);
 }
 
 typedef enum MythDeintType
@@ -279,6 +293,16 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = (width_aligned << 1) * _height;
             vf->offsets[2] = vf->offsets[1] + (width_aligned * _height);
         }
+        else if (FMT_YUV444P == _codec)
+        {
+            vf->offsets[1] = width_aligned * _height;
+            vf->offsets[2] = vf->offsets[1] + (width_aligned * _height);
+        }
+        else if (format_is_444(_codec))
+        {
+            vf->offsets[1] = (width_aligned << 1) * _height;
+            vf->offsets[2] = vf->offsets[1] + ((width_aligned << 1) * _height);
+        }
         else if (FMT_NV12 == _codec)
         {
             vf->offsets[1] = width_aligned * _height;
@@ -316,6 +340,14 @@ static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
         case FMT_YUV422P14:
         case FMT_YUV422P16:
             if (Plane == 0) return Width << 1;
+            if (Plane < 3)  return Width;
+            break;
+        case FMT_YUV444P:
+        case FMT_YUV444P9:
+        case FMT_YUV444P10:
+        case FMT_YUV444P12:
+        case FMT_YUV444P14:
+        case FMT_YUV444P16:
             if (Plane < 3)  return Width;
             break;
         case FMT_NV12:
@@ -358,6 +390,14 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
             if (Plane == 0) return Height;
             if (Plane < 3)  return Height >> 1;
             break;
+        case FMT_YUV444P:
+        case FMT_YUV444P9:
+        case FMT_YUV444P10:
+        case FMT_YUV444P12:
+        case FMT_YUV444P14:
+        case FMT_YUV444P16:
+            if (Plane < 3)  return Height;
+            break;
         case FMT_NV12:
         case FMT_P010:
         case FMT_P016:
@@ -386,13 +426,13 @@ static inline void clear(VideoFrame *vf)
 
     int uv_height = height_for_plane(vf->codec, vf->height, 1);
     int uv = (2 ^ (ColorDepth(vf->codec) - 1)) - 1;
-    if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_NV12 == vf->codec)
+    if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec || FMT_NV12 == vf->codec)
     {
         memset(vf->buf + vf->offsets[1], uv & 0xff, static_cast<size_t>(vf->pitches[1] * uv_height));
-        if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec)
+        if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec )
             memset(vf->buf + vf->offsets[2], uv & 0xff, static_cast<size_t>(vf->pitches[2] * uv_height));
     }
-    else if ((format_is_420(vf->codec) || format_is_422(vf->codec)) && (vf->pitches[1] == vf->pitches[2]))
+    else if ((format_is_420(vf->codec) || format_is_422(vf->codec) || format_is_444(vf->codec)) && (vf->pitches[1] == vf->pitches[2]))
     {
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
@@ -465,7 +505,13 @@ static inline uint planes(VideoFrameType Type)
         case FMT_YUV422P10:
         case FMT_YUV422P12:
         case FMT_YUV422P14:
-        case FMT_YUV422P16: return 3;
+        case FMT_YUV422P16:
+        case FMT_YUV444P:
+        case FMT_YUV444P9:
+        case FMT_YUV444P10:
+        case FMT_YUV444P12:
+        case FMT_YUV444P14:
+        case FMT_YUV444P16: return 3;
         case FMT_P010:
         case FMT_P016:
         case FMT_NV12:      return 2;
@@ -507,6 +553,7 @@ static inline int bitsperpixel(VideoFrameType Type)
         case FMT_YUY2:      return 16;
         case FMT_YV12:
         case FMT_NV12:      return 12;
+        case FMT_YUV444P:
         case FMT_P010:
         case FMT_P016:
         case FMT_YUV420P9:
@@ -514,6 +561,11 @@ static inline int bitsperpixel(VideoFrameType Type)
         case FMT_YUV420P12:
         case FMT_YUV420P14:
         case FMT_YUV420P16:  return 24;
+        case FMT_YUV444P9:
+        case FMT_YUV444P10:
+        case FMT_YUV444P12:
+        case FMT_YUV444P14:
+        case FMT_YUV444P16:  return 48;
         case FMT_NONE:
         case FMT_VDPAU:
         case FMT_VAAPI:

@@ -584,9 +584,10 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
 VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
 {
     static VideoFrameType openglformats[] =
-        { FMT_YV12, FMT_NV12, FMT_YUY2, FMT_YUV422P,
+        { FMT_YV12,     FMT_NV12,      FMT_YUY2,      FMT_YUV422P,   FMT_YUV444P,
           FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
           FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
+          FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
           FMT_P010, FMT_P016,
           FMT_NONE };
     return &openglformats[0];

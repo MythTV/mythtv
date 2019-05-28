@@ -61,6 +61,12 @@ const char* format_description(VideoFrameType Type)
         case FMT_YUV422P12:  return "YUV422P12";
         case FMT_YUV422P14:  return "YUV422P14";
         case FMT_YUV422P16:  return "YUV422P16";
+        case FMT_YUV444P:    return "YUV444P";
+        case FMT_YUV444P9:   return "YUV444P9";
+        case FMT_YUV444P10:  return "YUV444P10";
+        case FMT_YUV444P12:  return "YUV444P12";
+        case FMT_YUV444P14:  return "YUV444P14";
+        case FMT_YUV444P16:  return "YUV444P16";
         case FMT_VDPAU:      return "VDPAU";
         case FMT_VAAPI:      return "VAAPI";
         case FMT_DXVA2:      return "DXVA2";
@@ -814,17 +820,22 @@ int ColorDepth(int Format)
     switch (Format)
     {
         case FMT_YUV420P9:
-        case FMT_YUV422P9:  return 9;
+        case FMT_YUV422P9:
+        case FMT_YUV444P9:  return 9;
         case FMT_P010:
         case FMT_YUV420P10:
-        case FMT_YUV422P10: return 10;
+        case FMT_YUV422P10:
+        case FMT_YUV444P10: return 10;
         case FMT_YUV420P12:
-        case FMT_YUV422P12: return 12;
+        case FMT_YUV422P12:
+        case FMT_YUV444P12: return 12;
         case FMT_YUV420P14:
-        case FMT_YUV422P14: return 14;
+        case FMT_YUV422P14:
+        case FMT_YUV444P14: return 14;
         case FMT_P016:
         case FMT_YUV420P16:
-        case FMT_YUV422P16: return 16;
+        case FMT_YUV422P16:
+        case FMT_YUV444P16: return 16;
         default: break;
     }
     return 8;
