@@ -36,6 +36,11 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
         case FMT_P010:       return AV_PIX_FMT_P010;
         case FMT_P016:       return AV_PIX_FMT_P016;
         case FMT_YUV422P:    return AV_PIX_FMT_YUV422P;
+        case FMT_YUV422P9:   return AV_PIX_FMT_YUV422P9;
+        case FMT_YUV422P10:  return AV_PIX_FMT_YUV422P10;
+        case FMT_YUV422P12:  return AV_PIX_FMT_YUV422P12;
+        case FMT_YUV422P14:  return AV_PIX_FMT_YUV422P14;
+        case FMT_YUV422P16:  return AV_PIX_FMT_YUV422P16;
         case FMT_RGB24:      return AV_PIX_FMT_RGB24;
         case FMT_BGRA:       return AV_PIX_FMT_BGRA;
         case FMT_RGB32:      return AV_PIX_FMT_RGB32;
@@ -49,9 +54,10 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
         case FMT_MEDIACODEC: return AV_PIX_FMT_MEDIACODEC;
         case FMT_NVDEC:      return AV_PIX_FMT_CUDA;
         case FMT_DXVA2:      return AV_PIX_FMT_DXVA2_VLD;
-        case FMT_OMXEGL:     return AV_PIX_FMT_NONE;
-        case FMT_NONE:       return AV_PIX_FMT_NONE;
+        case FMT_OMXEGL:
+        case FMT_NONE: break;
     }
+    return AV_PIX_FMT_NONE;
 }
 
 VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
@@ -70,6 +76,11 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
         case AV_PIX_FMT_P016:      return FMT_P016;
         case AV_PIX_FMT_YUVJ422P:
         case AV_PIX_FMT_YUV422P:   return FMT_YUV422P;
+        case AV_PIX_FMT_YUV422P9:  return FMT_YUV422P9;
+        case AV_PIX_FMT_YUV422P10: return FMT_YUV422P10;
+        case AV_PIX_FMT_YUV422P12: return FMT_YUV422P12;
+        case AV_PIX_FMT_YUV422P14: return FMT_YUV422P14;
+        case AV_PIX_FMT_YUV422P16: return FMT_YUV422P16;
         case AV_PIX_FMT_UYVY422:   return FMT_YUY2;
         case AV_PIX_FMT_RGB24:     return FMT_RGB24;
         case AV_PIX_FMT_ARGB:      return FMT_ARGB32;

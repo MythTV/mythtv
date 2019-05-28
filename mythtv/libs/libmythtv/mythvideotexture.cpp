@@ -211,6 +211,16 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 texture = CreateTexture(Context, size, Target,
                               QOpenGLTexture::UInt8, QOpenGLTexture::Red, QOpenGLTexture::R8_UNorm);
                 break;
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16:
+                if (plane > 0)
+                    size = QSize(size.width() >> 1, size.height());
+                texture = CreateTexture(Context, size, Target,
+                              QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
+                break;
             default: break;
         }
         if (texture)
@@ -289,6 +299,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
             case FMT_YUV420P12:
             case FMT_YUV420P14:
             case FMT_YUV420P16:
+            {
                 switch (texture->m_frameFormat)
                 {
                     case FMT_YUV420P9:
@@ -299,6 +310,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                     default: break;
                 }
                 break;
+            }
             case FMT_NV12:
             {
                 switch (texture->m_frameFormat)
@@ -324,6 +336,23 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 switch (texture->m_frameFormat)
                 {
                     case FMT_YUV422P: YV12ToYV12(Context, Frame, texture, i); break;
+                    default: break;
+                }
+                break;
+            }
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16:
+            {
+                switch (texture->m_frameFormat)
+                {
+                    case FMT_YUV422P9:
+                    case FMT_YUV422P10:
+                    case FMT_YUV422P12:
+                    case FMT_YUV422P14:
+                    case FMT_YUV422P16: YV12ToYV12(Context, Frame, texture, i); break;
                     default: break;
                 }
                 break;
