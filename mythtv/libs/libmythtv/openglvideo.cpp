@@ -265,27 +265,26 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
     // no interlaced shaders yet (i.e. interlaced chroma upsampling - not deinterlacers)
     else if ((Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE))
     {
-        switch (m_outputType)
+        if (format_is_420(m_outputType) || format_is_422(m_outputType))
         {
-            case FMT_YUV422P:
-            case FMT_YUV420P10:
-            case FMT_YUV420P12:
-            case FMT_YUV420P16:
-            case FMT_YV12:  fragment = YV12RGBFragmentShader; cost = 3; break;
-            case FMT_P010:
-            case FMT_P016:
-            case FMT_NV12:  fragment = NV12FragmentShader;    cost = 2; break;
-            case FMT_YUY2:
-            case FMT_YUYVHQ:
-            default:        fragment = YUV2RGBFragmentShader; cost = 1; break;
+            fragment = YV12RGBFragmentShader;
+            cost = 3;
+        }
+        else if (format_is_nv12(m_outputType))
+        {
+            fragment = NV12FragmentShader;
+            cost = 2;
+        }
+        else if (FMT_YUY2 == m_outputType || FMT_YUYVHQ == m_outputType)
+        {
+            fragment = YUV2RGBFragmentShader;
+            cost = 1;
         }
     }
     else
     {
         uint bottom = (InterlacedBot == Type);
-        if (FMT_YV12 == m_outputType || FMT_YUV420P10 == m_outputType ||
-            FMT_YUV420P12 == m_outputType || FMT_YUV420P16 == m_outputType ||
-            FMT_YUV422P == m_outputType)
+        if (format_is_420(m_outputType) || format_is_422(m_outputType))
         {
             if (Deint == DEINT_BASIC)
             {
@@ -308,7 +307,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
                 cost = 3;
             }
         }
-        else if (FMT_NV12 == m_outputType || FMT_P010 == m_outputType || FMT_P016 == m_outputType)
+        else if (format_is_nv12(m_outputType))
         {
             if (Deint == DEINT_BASIC)
             {

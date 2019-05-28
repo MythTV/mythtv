@@ -26,42 +26,31 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
 {
     switch (type)
     {
-        case FMT_NV12:
-            return AV_PIX_FMT_NV12;
-        case FMT_P010:
-            return AV_PIX_FMT_P010;
-        case FMT_P016:
-            return AV_PIX_FMT_P016;
-        case FMT_YUV422P:
-            return AV_PIX_FMT_YUV422P;
-        case FMT_BGRA:
-            return AV_PIX_FMT_BGRA;
-        case FMT_YUY2:
-            return AV_PIX_FMT_UYVY422;
-        case FMT_RGB24:
-            return AV_PIX_FMT_RGB24;
-        case FMT_RGB32:
-            return AV_PIX_FMT_RGB32;
-        case FMT_YUV420P10:
-            return AV_PIX_FMT_YUV420P10;
-        case FMT_YUV420P12:
-            return AV_PIX_FMT_YUV420P12;
-        case FMT_YUV420P16:
-            return AV_PIX_FMT_YUV420P16;
-        case FMT_VDPAU:
-            return AV_PIX_FMT_VDPAU;
-        case FMT_VTB:
-            return AV_PIX_FMT_VIDEOTOOLBOX;
-        case FMT_VAAPI:
-            return AV_PIX_FMT_VAAPI;
-        case FMT_MEDIACODEC:
-            return AV_PIX_FMT_MEDIACODEC;
-        case FMT_NVDEC:
-            return AV_PIX_FMT_CUDA;
-        case FMT_DXVA2:
-            return AV_PIX_FMT_DXVA2_VLD;
-        default:
-            return AV_PIX_FMT_YUV420P;
+        case FMT_YV12:       return AV_PIX_FMT_YUV420P;
+        case FMT_YUV420P9:   return AV_PIX_FMT_YUV420P9;
+        case FMT_YUV420P10:  return AV_PIX_FMT_YUV420P10;
+        case FMT_YUV420P12:  return AV_PIX_FMT_YUV420P12;
+        case FMT_YUV420P14:  return AV_PIX_FMT_YUV420P14;
+        case FMT_YUV420P16:  return AV_PIX_FMT_YUV420P16;
+        case FMT_NV12:       return AV_PIX_FMT_NV12;
+        case FMT_P010:       return AV_PIX_FMT_P010;
+        case FMT_P016:       return AV_PIX_FMT_P016;
+        case FMT_YUV422P:    return AV_PIX_FMT_YUV422P;
+        case FMT_RGB24:      return AV_PIX_FMT_RGB24;
+        case FMT_BGRA:       return AV_PIX_FMT_BGRA;
+        case FMT_RGB32:      return AV_PIX_FMT_RGB32;
+        case FMT_ARGB32:     return AV_PIX_FMT_ARGB;
+        case FMT_RGBA32:     return AV_PIX_FMT_RGBA;
+        case FMT_YUY2:       return AV_PIX_FMT_UYVY422;
+        case FMT_YUYVHQ:     return AV_PIX_FMT_NONE;
+        case FMT_VDPAU:      return AV_PIX_FMT_VDPAU;
+        case FMT_VTB:        return AV_PIX_FMT_VIDEOTOOLBOX;
+        case FMT_VAAPI:      return AV_PIX_FMT_VAAPI;
+        case FMT_MEDIACODEC: return AV_PIX_FMT_MEDIACODEC;
+        case FMT_NVDEC:      return AV_PIX_FMT_CUDA;
+        case FMT_DXVA2:      return AV_PIX_FMT_DXVA2_VLD;
+        case FMT_OMXEGL:     return AV_PIX_FMT_NONE;
+        case FMT_NONE:       return AV_PIX_FMT_NONE;
     }
 }
 
@@ -70,45 +59,28 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
     switch (fmt)
     {
         case AV_PIX_FMT_YUVJ420P:
-        case AV_PIX_FMT_YUV420P:
-            return FMT_YV12;
-        case AV_PIX_FMT_NV12:
-            return FMT_NV12;
-        case AV_PIX_FMT_P010:
-            return FMT_P010;
-        case AV_PIX_FMT_P016:
-            return FMT_P016;
-        case AV_PIX_FMT_YUV420P10:
-            return FMT_YUV420P10;
-        case AV_PIX_FMT_YUV420P12:
-            return FMT_YUV420P12;
-        case AV_PIX_FMT_YUV420P16:
-            return FMT_YUV420P16;
+        case AV_PIX_FMT_YUV420P:   return FMT_YV12;
+        case AV_PIX_FMT_YUV420P9:  return FMT_YUV420P9;
+        case AV_PIX_FMT_YUV420P10: return FMT_YUV420P10;
+        case AV_PIX_FMT_YUV420P12: return FMT_YUV420P12;
+        case AV_PIX_FMT_YUV420P14: return FMT_YUV420P14;
+        case AV_PIX_FMT_YUV420P16: return FMT_YUV420P16;
+        case AV_PIX_FMT_NV12:      return FMT_NV12;
+        case AV_PIX_FMT_P010:      return FMT_P010;
+        case AV_PIX_FMT_P016:      return FMT_P016;
         case AV_PIX_FMT_YUVJ422P:
-        case AV_PIX_FMT_YUV422P:
-            return FMT_YUV422P;
-        case AV_PIX_FMT_UYVY422:
-            return FMT_YUY2;
-        case AV_PIX_FMT_RGB24:
-            return FMT_RGB24;
-        case AV_PIX_FMT_ARGB:
-            return FMT_ARGB32;
-        case AV_PIX_FMT_RGBA:
-            return FMT_RGBA32;
-        case AV_PIX_FMT_BGRA:
-            return FMT_BGRA;
-        case AV_PIX_FMT_CUDA:
-            return FMT_NVDEC;
-        case AV_PIX_FMT_VDPAU:
-            return FMT_VDPAU;
-        case AV_PIX_FMT_VIDEOTOOLBOX:
-            return FMT_VTB;
-        case AV_PIX_FMT_VAAPI:
-            return FMT_VAAPI;
-        case AV_PIX_FMT_DXVA2_VLD:
-            return FMT_DXVA2;
-        case AV_PIX_FMT_MEDIACODEC:
-            return FMT_MEDIACODEC;
+        case AV_PIX_FMT_YUV422P:   return FMT_YUV422P;
+        case AV_PIX_FMT_UYVY422:   return FMT_YUY2;
+        case AV_PIX_FMT_RGB24:     return FMT_RGB24;
+        case AV_PIX_FMT_ARGB:      return FMT_ARGB32;
+        case AV_PIX_FMT_RGBA:      return FMT_RGBA32;
+        case AV_PIX_FMT_BGRA:      return FMT_BGRA;
+        case AV_PIX_FMT_CUDA:      return FMT_NVDEC;
+        case AV_PIX_FMT_VDPAU:     return FMT_VDPAU;
+        case AV_PIX_FMT_VIDEOTOOLBOX: return FMT_VTB;
+        case AV_PIX_FMT_VAAPI:     return FMT_VAAPI;
+        case AV_PIX_FMT_DXVA2_VLD: return FMT_DXVA2;
+        case AV_PIX_FMT_MEDIACODEC: return FMT_MEDIACODEC;
         default: break;
     }
     return FMT_NONE;

@@ -17,22 +17,26 @@ extern "C" {
 typedef enum FrameType_
 {
     FMT_NONE = -1,
-    FMT_RGB24 = 0,
-    FMT_YV12,
+    // YV12 and variants
+    FMT_YV12 = 0,
+    FMT_YUV420P9,
+    FMT_YUV420P10,
+    FMT_YUV420P12,
+    FMT_YUV420P14,
+    FMT_YUV420P16,
+    // RGB variants
+    FMT_RGB24,
+    FMT_BGRA,
     FMT_RGB32,   ///< endian dependent format, ARGB or BGRA
     FMT_ARGB32,
     FMT_RGBA32,
+    // YUV422P and variants
     FMT_YUV422P,
-    FMT_BGRA,
+    // Packed YUV
     FMT_YUY2,
-    FMT_NV12,
     FMT_YUYVHQ, // temporary
-    // these are all endian dependent and higher bit depth
-    // YV12 variants
-    FMT_YUV420P10,
-    FMT_YUV420P12,
-    FMT_YUV420P16,
-    // NV12 variants
+    // NV12 and variants
+    FMT_NV12,
     FMT_P010,
     FMT_P016,
     // hardware formats
@@ -60,24 +64,25 @@ static inline int format_is_hwyuv(VideoFrameType Type)
     return (Type == FMT_NVDEC) || (Type == FMT_VTB);
 }
 
-static inline int format_is_yuv(VideoFrameType Type)
-{
-    return (Type == FMT_YV12) || (Type == FMT_YUV422P) ||
-           (Type == FMT_YUY2) || (Type == FMT_NV12) ||
-           (Type == FMT_YUYVHQ) || (Type == FMT_YUV420P10) ||
-           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16) ||
-           (Type == FMT_P010) || (Type == FMT_P016);
-}
-
 static inline int format_is_420(VideoFrameType Type)
 {
-    return (Type == FMT_YV12) || (Type == FMT_YUV420P10) ||
-           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P16);
+    return (Type == FMT_YV12) || (Type == FMT_YUV420P9) || (Type == FMT_YUV420P10) ||
+           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P14) || (Type == FMT_YUV420P16);
+}
+
+static inline int format_is_422(VideoFrameType Type)
+{
+    return (Type == FMT_YUV422P);
 }
 
 static inline int format_is_nv12(VideoFrameType Type)
 {
     return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
+}
+
+static inline int format_is_yuv(VideoFrameType Type)
+{
+    return format_is_420(Type) || format_is_422(Type) || format_is_nv12(Type);
 }
 
 typedef enum MythDeintType
@@ -253,8 +258,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * ((_height+1) >> 1);
         }
-        else if (FMT_YUV420P10 == _codec || FMT_YUV420P12 == _codec ||
-                 FMT_YUV420P16 == _codec)
+        else if (format_is_420(_codec))
         {
             vf->offsets[1] = (width_aligned << 1) * _height;
             vf->offsets[2] = vf->offsets[1] + (width_aligned * (_height >> 1));
@@ -269,7 +273,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * _height;
             vf->offsets[2] = 0;
         }
-        else if (FMT_P010 == _codec || FMT_P016 == _codec)
+        else if (format_is_nv12(_codec))
         {
             vf->offsets[1] = (width_aligned << 1) * _height;
             vf->offsets[2] = 0;
@@ -290,8 +294,10 @@ static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
             if (Plane == 0) return Width;
             if (Plane < 3)  return (Width + 1) >> 1;
             break;
+        case FMT_YUV420P9:
         case FMT_YUV420P10:
         case FMT_YUV420P12:
+        case FMT_YUV420P14:
         case FMT_YUV420P16:
             if (Plane == 0) return Width << 1;
             if (Plane < 3)  return Width;
@@ -323,8 +329,10 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
     {
         case FMT_YV12:
         case FMT_YUV422P:
+        case FMT_YUV420P9:
         case FMT_YUV420P10:
         case FMT_YUV420P12:
+        case FMT_YUV420P14:
         case FMT_YUV420P16:
             if (Plane == 0) return Height;
             if (Plane < 3)  return Height >> 1;
@@ -365,8 +373,7 @@ static inline void clear(VideoFrame *vf)
         memset(vf->buf + vf->offsets[0],         0, vf->pitches[0] * vf->height);
         memset(vf->buf + vf->offsets[1], uv & 0xff, vf->pitches[1] * uv_height);
     }
-    else if (FMT_YUV420P10 == vf->codec || FMT_YUV420P12 == vf->codec ||
-             FMT_YUV420P16 == vf->codec)
+    else if (format_is_420(vf->codec))
     {
         memset(vf->buf + vf->offsets[0], 0, vf->pitches[0] * vf->height);
         if (vf->pitches[1] == vf->pitches[2])
@@ -387,7 +394,7 @@ static inline void clear(VideoFrame *vf)
             }
         }
     }
-    else if (FMT_P010 == vf->codec || FMT_P016 == vf->codec)
+    else if (format_is_nv12(vf->codec))
     {
         memset(vf->buf + vf->offsets[0], 0, vf->pitches[0] * vf->height);
         unsigned char uv1 = (uv & 0xff00) >> 8;
@@ -435,8 +442,10 @@ static inline uint planes(VideoFrameType Type)
     {
         case FMT_YV12:
         case FMT_YUV422P:
+        case FMT_YUV420P9:
         case FMT_YUV420P10:
         case FMT_YUV420P12:
+        case FMT_YUV420P14:
         case FMT_YUV420P16: return 3;
         case FMT_P010:
         case FMT_P016:
@@ -448,7 +457,14 @@ static inline uint planes(VideoFrameType Type)
         case FMT_RGB24:
         case FMT_RGB32:
         case FMT_RGBA32:    return 1;
-        default: break;
+        case FMT_NONE:
+        case FMT_VDPAU:
+        case FMT_VAAPI:
+        case FMT_DXVA2:
+        case FMT_MEDIACODEC:
+        case FMT_NVDEC:
+        case FMT_OMXEGL:
+        case FMT_VTB:       return 0;
     }
     return 0;
 }
@@ -478,8 +494,10 @@ static inline int bitsperpixel(VideoFrameType type)
             break;
         case FMT_P010:
         case FMT_P016:
-        case FMT_YUV420P10: // NB stored in 16bits
-        case FMT_YUV420P12: // NB stored in 16bits
+        case FMT_YUV420P9:
+        case FMT_YUV420P10:
+        case FMT_YUV420P12:
+        case FMT_YUV420P14:
         case FMT_YUV420P16:
             res = 24;
             break;

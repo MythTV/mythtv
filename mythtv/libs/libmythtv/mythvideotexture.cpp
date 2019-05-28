@@ -161,8 +161,10 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 texture = CreateTexture(Context, size, Target,
                               QOpenGLTexture::UInt8, QOpenGLTexture::Red, QOpenGLTexture::R8_UNorm);
                 break;
+            case FMT_YUV420P9:
             case FMT_YUV420P10:
             case FMT_YUV420P12:
+            case FMT_YUV420P14:
             case FMT_YUV420P16:
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
@@ -282,13 +284,17 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 }
                 break;
             }
+            case FMT_YUV420P9:
             case FMT_YUV420P10:
             case FMT_YUV420P12:
+            case FMT_YUV420P14:
             case FMT_YUV420P16:
                 switch (texture->m_frameFormat)
                 {
+                    case FMT_YUV420P9:
                     case FMT_YUV420P10:
                     case FMT_YUV420P12:
+                    case FMT_YUV420P14:
                     case FMT_YUV420P16: YV12ToYV12(Context, Frame, texture, i); break;
                     default: break;
                 }
