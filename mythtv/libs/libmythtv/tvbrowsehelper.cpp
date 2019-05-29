@@ -24,7 +24,7 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
     int min         = minutes % 60;
 
     tMin = TV::tr("%n minute(s)", "", minutes);
-    tHrsMin = QString("%1:%2").arg(hours).arg(min, 2, QChar('0'));
+    tHrsMin = QString("%1:%2").arg(hours).arg(min, 2, 10, QChar('0'));
 }
 
 TVBrowseHelper::TVBrowseHelper(

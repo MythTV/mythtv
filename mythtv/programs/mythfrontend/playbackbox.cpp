@@ -247,9 +247,9 @@ static QString construct_sort_title(
 
         QString sortprefix;
         if (recpriority > 0)
-            sortprefix = QString("+%1").arg(1000 - recpriority, 3, QChar('0'));
+            sortprefix = QString("+%1").arg(1000 - recpriority, 3, 10, QChar('0'));
         else
-            sortprefix = QString("-%1").arg(-recpriority, 3, QChar('0'));
+            sortprefix = QString("-%1").arg(-recpriority, 3, 10, QChar('0'));
 
         sTitle = sortprefix + '-' + sTitle;
     }

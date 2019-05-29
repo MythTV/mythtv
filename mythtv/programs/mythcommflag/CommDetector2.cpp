@@ -273,7 +273,7 @@ QString frameToTimestamp(long long frameno, float fps)
     mm %= 60;
 
     return QString("%1:%2:%3")
-        .arg(hh).arg(mm, 2, QChar('0')) .arg(ss, 2, QChar('0'));
+        .arg(hh).arg(mm, 2, 10, QChar('0')) .arg(ss, 2, 10, QChar('0'));
 }
 
 QString frameToTimestampms(long long frameno, float fps)
@@ -289,13 +289,13 @@ QString frameToTimestampms(long long frameno, float fps)
     ss %= 60;
 
     return QString("%1:%2:%3")
-        .arg(mm).arg(ss, 2, QChar(QChar('0'))).arg(ms, 2, QChar(QChar('0')));
+        .arg(mm).arg(ss, 2, 10, QChar(QChar('0'))).arg(ms, 2, 10, QChar(QChar('0')));
 }
 
 QString strftimeval(const struct timeval *tv)
 {
     return QString("%1.%2")
-        .arg(tv->tv_sec).arg(tv->tv_usec, 6, QChar(QChar('0')));
+        .arg(tv->tv_sec).arg(tv->tv_usec, 6, 10, QChar(QChar('0')));
 }
 
 };  /* namespace */

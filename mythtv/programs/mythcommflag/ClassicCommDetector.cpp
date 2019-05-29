@@ -1175,7 +1175,7 @@ void ClassicCommDetector::UpdateFrameBlock(FrameBlock *fbp,
 #define FORMAT_MSG(first, fbp)                                          \
     msgformat.arg((first), 5)                                           \
         .arg((int)((fbp)->start / m_fps) / 60, 3)                       \
-        .arg((int)(((fbp)->start / m_fps )) % 60, 2, QChar('0'))        \
+        .arg((int)(((fbp)->start / m_fps )) % 60, 2, 10, QChar('0'))    \
         .arg((fbp)->start, 6)                                           \
         .arg((fbp)->end, 6)                                             \
         .arg((fbp)->frames, 6)                                          \
@@ -2257,8 +2257,8 @@ void ClassicCommDetector::DumpMap(frm_dir_map_t &map)
                            (hour * 60 * 60 * my_fps));
         int my_sec = (int)(frame / my_fps);
         msg = QString("%1 : %2 (%3:%4:%5.%6) (%7)")
-            .arg(frame, 7).arg(flag).arg(hour, 2, QChar('0')).arg(min, 2, QChar('0'))
-            .arg(sec, 2, QChar('0')).arg(frm, 2, QChar('0')).arg(my_sec);
+            .arg(frame, 7).arg(flag).arg(hour, 2, 10, QChar('0')).arg(min, 2, 10, QChar('0'))
+            .arg(sec, 2, 10, QChar('0')).arg(frm, 2, 10, QChar('0')).arg(my_sec);
         LOG(VB_COMMFLAG, LOG_INFO, msg);
     }
     LOG(VB_COMMFLAG, LOG_INFO,
