@@ -407,7 +407,8 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
         case FMT_NV12:
         case FMT_P010:
         case FMT_P016:
-            if (Plane < 2) return Height;
+            if (Plane == 0) return Height;
+            if (Plane < 2) return Height >> 1;
             break;
         case FMT_YUY2:
         case FMT_YUYVHQ:
@@ -428,18 +429,17 @@ static inline void clear(VideoFrame *vf)
         return;
 
     // luma (or RGBA)
-    memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
-
     int uv_height = height_for_plane(vf->codec, vf->height, 1);
-    int uv = (2 ^ (ColorDepth(vf->codec) - 1)) - 1;
-    if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec || FMT_NV12 == vf->codec)
+    int uv = (1 << (ColorDepth(vf->codec) - 1)) - 1;
+    if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec)
     {
+        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
         memset(vf->buf + vf->offsets[1], uv & 0xff, static_cast<size_t>(vf->pitches[1] * uv_height));
-        if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec )
-            memset(vf->buf + vf->offsets[2], uv & 0xff, static_cast<size_t>(vf->pitches[2] * uv_height));
+        memset(vf->buf + vf->offsets[2], uv & 0xff, static_cast<size_t>(vf->pitches[2] * uv_height));
     }
     else if ((format_is_420(vf->codec) || format_is_422(vf->codec) || format_is_444(vf->codec)) && (vf->pitches[1] == vf->pitches[2]))
     {
+        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
         unsigned char* buf1 = vf->buf + vf->offsets[1];
@@ -455,8 +455,14 @@ static inline void clear(VideoFrame *vf)
             buf2 += vf->pitches[2];
         }
     }
+    else if (FMT_NV12 == vf->codec)
+    {
+        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
+        memset(vf->buf + vf->offsets[1], uv & 0xff, vf->pitches[1] * uv_height);
+    }
     else if (format_is_nv12(vf->codec))
     {
+        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
         unsigned char* buf = vf->buf + vf->offsets[1];

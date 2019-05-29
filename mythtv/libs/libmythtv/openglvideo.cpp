@@ -275,7 +275,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             fragment = NV12FragmentShader;
             cost = 2;
         }
-        else if (FMT_YUY2 == m_outputType || FMT_YUYVHQ == m_outputType)
+        else if (format_is_packed(m_outputType))
         {
             fragment = YUV2RGBFragmentShader;
             cost = 1;
@@ -330,7 +330,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
                 cost = 2;
             }
         }
-        else
+        else //packed
         {
             if (Deint == DEINT_BASIC)
             {
