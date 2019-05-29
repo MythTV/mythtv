@@ -508,10 +508,8 @@ using_frontend {
 
     using_nvdec {
         DEFINES += USING_NVDEC
-        HEADERS += nvdeccontext.h
         HEADERS += mythnvdecinterop.h
         HEADERS += mythnvdeccontext.h
-        SOURCES += nvdeccontext.cpp
         SOURCES += mythnvdecinterop.cpp
         SOURCES += mythnvdeccontext.cpp
         INCLUDEPATH += ../../external/nv-codec-headers/include

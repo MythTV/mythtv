@@ -31,7 +31,7 @@
 #include "vaapi2context.h"
 #endif
 #ifdef USING_NVDEC
-#include "nvdeccontext.h"
+#include "mythnvdeccontext.h"
 #endif
 #ifdef USING_VTB
 #include "mythvtbcontext.h"
@@ -78,8 +78,8 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
         mctx = new Vaapi2Context();
 #endif
 #ifdef USING_NVDEC
-    if (codec_is_nvdec_dec(codec))
-        mctx = new NvdecContext();
+    if (codec_is_nvdec_dec(codec) || codec_is_nvdec(codec))
+        mctx = new MythNVDECContext(codec);
 #endif
 #ifdef USING_VTB
     if (codec_is_vtb_dec(codec) || codec_is_vtb(codec))

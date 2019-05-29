@@ -69,7 +69,6 @@ extern "C" {
 #endif
 
 #ifdef USING_NVDEC
-#include "nvdeccontext.h"
 #include "mythnvdeccontext.h"
 #endif
 
@@ -184,12 +183,6 @@ int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 void release_avf_buffer(void *opaque, uint8_t *data);
 #ifdef USING_DXVA2
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
-#endif
-#ifdef USING_VAAPI
-int  get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags);
-#endif
-#ifdef USING_NVDEC
-int  get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 
 static int determinable_frame_size(struct AVCodecContext *avctx)
@@ -1506,23 +1499,6 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
 }
 #endif
 
-#ifdef USING_NVDEC
-static enum AVPixelFormat get_format_nvdec(struct AVCodecContext */*avctx*/,
-                                           const enum AVPixelFormat *valid_fmts)
-{
-    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
-    while (*valid_fmts != AV_PIX_FMT_NONE) {
-        if (AV_PIX_FMT_CUDA ==  *valid_fmts)
-        {
-            ret = *valid_fmts;
-            break;
-        }
-        valid_fmts++;
-    }
-    return ret;
-}
-#endif
-
 #ifdef USING_MEDIACODEC
 static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext */*avctx*/,
                                            const enum AVPixelFormat *valid_fmts)
@@ -1606,7 +1582,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else if (codec_is_vaapi_dec(m_video_codec_id))
     {
-        enc->get_buffer2     = get_avf_buffer_vaapi2;
+        enc->get_buffer2     = MythHWContext::GetBuffer3;
         enc->get_format      = get_format_vaapi2;
     }
     else
@@ -1635,13 +1611,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_NVDEC
     if (codec_is_nvdec_dec(m_video_codec_id))
     {
-        enc->get_buffer2     = get_avf_buffer_nvdec;
-        enc->get_format      = get_format_nvdec;
+        enc->get_buffer2 = MythHWContext::GetBuffer3;
+        enc->get_format = MythNVDECContext::GetFormat;
         m_directrendering = false;
     }
     else if (codec_is_nvdec(m_video_codec_id))
     {
-        enc->get_format      = MythNVDECContext::GetFormat;
+        enc->get_format = MythNVDECContext::GetFormat;
     }
     else
 #endif
@@ -1674,6 +1650,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         // force it to switch to software decoding
         m_averror_count = SEQ_PKT_ERR_MAX + 1;
         m_streams_changed = true;
+    }
+    else
+    {
+        bool doublerate = m_parent->CanSupportDoubleRate();
+        m_mythcodecctx->SetDeinterlacing(enc, &m_videoDisplayProfile, doublerate);
     }
 
     if (FlagIsSet(kDecodeLowRes)    || FlagIsSet(kDecodeSingleThreaded) ||
@@ -3037,12 +3018,6 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
-#if defined(USING_VAAPI) || defined(USING_NVDEC) || defined(USING_VTB) || defined(USING_VDPAU)
-static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
-{
-}
-#endif
-
 #ifdef USING_DXVA2
 int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
@@ -3066,23 +3041,6 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
     pic->buf[0] = buffer;
 
     return 0;
-}
-#endif
-
-#ifdef USING_VAAPI
-int get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    nd->m_directrendering = false;
-    return avcodec_default_get_buffer2(c, pic, flags);
-}
-#endif
-#ifdef USING_NVDEC
-int get_avf_buffer_nvdec(struct AVCodecContext *c, AVFrame *pic, int flags)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    nd->m_directrendering = false;
-    return avcodec_default_get_buffer2(c, pic, flags);
 }
 #endif
 
@@ -3910,7 +3868,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                         }
 
                         // Dummy release method - we do not want to free the buffer
-                        use_frame->buf[0] = av_buffer_create((uint8_t*)picframe, 0, dummy_release_avf_buffer, this, 0);
+                        use_frame->buf[0] = av_buffer_create(reinterpret_cast<uint8_t*>(picframe), 0,
+                                                             [](void*, uint8_t*){}, this, 0);
                         use_frame->width = mpa_pic->width;
                         use_frame->height = mpa_pic->height;
                     }
@@ -4079,6 +4038,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->deinterlace_inuse = DEINT_NONE;
         picframe->deinterlace_inuse2x = 0;
         m_parent->ReleaseNextVideoFrame(picframe, temppts);
+        m_mythcodecctx->PostProcessFrame(context, picframe);
     }
 
     m_decoded_video_frame = picframe;

@@ -2,7 +2,9 @@
 #define MYTHNVDECCONTEXT_H
 
 // MythTV
+#include "mythframe.h"
 #include "mythcodecid.h"
+#include "mythcodeccontext.h"
 
 // FFmpeg
 extern "C" {
@@ -10,12 +12,17 @@ extern "C" {
 #include "libavutil/hwcontext.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/pixdesc.h"
+#include "compat/cuda/dynlink_loader.h"
 }
 
-class MythNVDECContext
+class MythNVDECContext : public MythCodecContext
 {
   public:
-    static int         HwDecoderInit     (AVCodecContext *Context);
+    explicit MythNVDECContext(MythCodecID CodecID);
+    int  HwDecoderInit                   (AVCodecContext *Context) override;
+    void SetDeinterlacing                (AVCodecContext *Context,
+                                          VideoDisplayProfile *Profile, bool DoubleRate) override;
+    void PostProcessFrame                (AVCodecContext *Context, VideoFrame *Frame) override;
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
@@ -26,6 +33,32 @@ class MythNVDECContext
                                           AVFrame *Frame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);
     static bool HaveNVDEC                (void);
+
+  private:
+    class MythNVDECCaps
+    {
+      public:
+        MythNVDECCaps(cudaVideoCodec Codec, uint Depth, cudaVideoChromaFormat Format,
+                      QSize Minimum, QSize Maximum, uint MacroBlocks);
+
+        cudaVideoCodec m_codec;
+        uint           m_depth;
+        cudaVideoChromaFormat m_format;
+        QSize          m_minimum;
+        QSize          m_maximum;
+        uint           m_macroBlocks;
+    };
+
+    static QMutex*     s_NVDECLock;
+    static bool        s_NVDECAvailable;
+    static vector<MythNVDECCaps> s_NVDECDecoderCaps;
+    static void   NVDECCheck             (void);
+    static void   NVDECCheckCallback     (void *Wait, void*, void*);
+
+  private:
+    MythCodecID   m_codecID              { kCodec_NONE };
+    MythDeintType m_deinterlacer         { DEINT_NONE  };
+    bool          m_deinterlacer2x       { false       };
 };
 
 #endif // MYTHNVDECCONTEXT_H

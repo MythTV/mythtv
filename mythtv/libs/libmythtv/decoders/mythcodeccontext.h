@@ -33,6 +33,8 @@
 // MythTV
 #include "mythtvexp.h"
 #include "mythcodecid.h"
+#include "mythframe.h"
+#include "videodisplayprofile.h"
 
 struct AVCodecContext;
 struct AVFrame;
@@ -63,6 +65,10 @@ class MTV_PUBLIC MythCodecContext
     bool FallbackDeint(void);
     bool getDoubleRate(void) { return doublerate; }
     QString GetFallbackDeint(void);
+
+    // new temporay methods to be moved into MythHWContext
+    virtual void SetDeinterlacing(struct AVCodecContext*, VideoDisplayProfile*, bool) {}
+    virtual void PostProcessFrame(struct AVCodecContext*, VideoFrame*) {}
 
   protected:
     virtual bool isValidDeinterlacer(QString /*name*/) { return false; }

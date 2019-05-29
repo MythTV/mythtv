@@ -13,6 +13,7 @@ class MythHWContext
   public:
     static int  GetBuffer              (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
     static int  GetBuffer2             (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
+    static int  GetBuffer3             (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
     static int  InitialiseDecoder      (AVCodecContext *Context, CreateHWDecoder Callback, const QString &Debug);
     static int  InitialiseDecoder2     (AVCodecContext *Context, CreateHWDecoder Callback, const QString &Debug);
     static void ReleaseBuffer          (void *Opaque, uint8_t *Data);
