@@ -60,7 +60,7 @@ bool        RingBuffer::gAVformat_net_initialised = false;
   {
       poslock.lockForWrite();
       rwlock.lockForRead(); // error!
-      blah(); // <- does not implicitly aquire any locks
+      blah(); // <- does not implicitly acquire any locks
       rwlock.unlock();
       poslock.unlock();
   }
@@ -68,7 +68,7 @@ bool        RingBuffer::gAVformat_net_initialised = false;
   {
       rwlock.lockForRead();
       rbrlock.lockForWrite(); // ok!
-      blah(); // <- does not implicitly aquire any locks
+      blah(); // <- does not implicitly acquire any locks
       rbrlock.unlock();
       rwlock.unlock();
   }
@@ -404,7 +404,7 @@ void RingBuffer::CalcReadAheadThresh(void)
         m_readBlockSize = m_bitrateInitialized ? max(rbs,m_readBlockSize) : rbs;
     }
 
-    // minumum seconds of buffering before allowing read
+    // minimum seconds of buffering before allowing read
     float secs_min = 0.3;
     // set the minimum buffering before allowing ffmpeg read
     m_fillMin  = (uint) ((estbitrate * 1000 * secs_min) * 0.125F);
@@ -429,7 +429,7 @@ void RingBuffer::CalcReadAheadThresh(void)
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("CalcReadAheadThresh(%1 Kb)\n\t\t\t -> "
-                "threshhold(%2 KB) min read(%3 KB) blk size(%4 KB)")
+                "threshold(%2 KB) min read(%3 KB) blk size(%4 KB)")
             .arg(estbitrate).arg(m_fillThreshold/1024)
             .arg(m_fillMin/1024).arg(m_readBlockSize/1024));
 }
