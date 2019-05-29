@@ -100,9 +100,15 @@ static inline int format_is_nv12(VideoFrameType Type)
     return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
 }
 
+static inline int format_is_packed(VideoFrameType Type)
+{
+    return (Type == FMT_YUYVHQ) || (Type == FMT_YUY2);
+}
+
 static inline int format_is_yuv(VideoFrameType Type)
 {
-    return format_is_420(Type) || format_is_422(Type) || format_is_444(Type) || format_is_nv12(Type);
+    return format_is_420(Type)  || format_is_422(Type) || format_is_444(Type) ||
+           format_is_nv12(Type) || format_is_packed(Type);
 }
 
 typedef enum MythDeintType
