@@ -29,6 +29,10 @@ __version__ = "0.3.7"
 
 from optparse import OptionParser
 import sys
+import signal
+
+def timeouthandler(signal, frame):
+    raise RuntimeError("Timed out")
 
 def buildSingle(inetref, opts):
     from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
@@ -275,6 +279,9 @@ def main():
 
     opts, args = parser.parse_args()
 
+    signal.signal(signal.SIGALRM, timeouthandler)
+    signal.alarm(30)
+
     if opts.version:
         buildVersion()
 
@@ -312,14 +319,18 @@ def main():
         sys.stdout.write('ERROR: tmdb3.py requires exactly one non-empty argument')
         sys.exit(1)
 
-    if opts.movielist:
-        buildList(args[0], opts)
+    try:
+        if opts.movielist:
+            buildList(args[0], opts)
 
-    if opts.moviedata:
-        buildSingle(args[0], opts)
+        if opts.moviedata:
+            buildSingle(args[0], opts)
 
-    if opts.collectiondata:
-        buildCollection(args[0], opts)
+        if opts.collectiondata:
+            buildCollection(args[0], opts)
+    except RuntimeError, exc:
+        sys.stdout.write('ERROR: ' + str(exc) + ' exception')
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
