@@ -62,41 +62,44 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext*,
                                                          uint            StreamType,
                                                          AVPixelFormat  &PixFmt)
 {
-    AVPixelFormat format = AV_PIX_FMT_NONE;
-    if (Decoder == "mediacodec")
-    {
-        QString decodername = QString((*Codec)->name) + "_mediacodec";
-        if (decodername == "mpeg2video_mediacodec")
-            decodername = "mpeg2_mediacodec";
-        AVCodec *newCodec = avcodec_find_decoder_by_name (decodername.toLocal8Bit());
-        if (newCodec)
-        {
-            *Codec = newCodec;
-            format = AV_PIX_FMT_MEDIACODEC;
-        }
-    }
+    bool decodeonly = Decoder == "mediacodec-dec";
+    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MEDIACODEC_DEC : kCodec_MPEG1_MEDIACODEC) + (StreamType - 1));
+    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (format == AV_PIX_FMT_NONE)
+    if ((Decoder != "mediacodec") && (Decoder != "mediacodec-dec"))
+        return failure;
+
+    QString decodername = QString((*Codec)->name) + "_mediacodec";
+    if (decodername == "mpeg2video_mediacodec")
+        decodername = "mpeg2_mediacodec";
+    AVCodec *newCodec = avcodec_find_decoder_by_name (decodername.toLocal8Bit());
+    if (newCodec)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2'")
+        *Codec = newCodec;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name));
-        return (MythCodecID)(kCodec_MPEG1 + (StreamType - 1));
+        PixFmt = AV_PIX_FMT_MEDIACODEC;
+        return success;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2'")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name));
-    PixFmt = AV_PIX_FMT_MEDIACODEC;
-    return (MythCodecID)(kCodec_MPEG1_MEDIACODEC + (StreamType - 1));
+    return failure;
 }
 
-MythMediaCodecContext::MythMediaCodecContext()
-  : MythCodecContext()
+MythMediaCodecContext::MythMediaCodecContext(MythCodecID CodecID)
+  : MythCodecContext(),
+    m_codecID(CodecID)
 {
 }
 
 int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
 {
-    return MythHWContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
+    if (codec_is_mediacodec_dec(m_codecID))
+        return 0;
+    else if (codec_is_mediacodec_dec(m_codecID))
+        return MythHWContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
+    return -1;
 }
 
 AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)

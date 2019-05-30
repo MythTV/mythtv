@@ -54,7 +54,9 @@ class MythVideoTexture : public MythGLTexture
     VideoFrameType m_frameFormat { FMT_NONE };
     uint           m_plane       { 0 };
     uint           m_planeCount  { 0 };
+#ifdef USING_MEDIACODEC
     QMatrix4x4    *m_transform   { nullptr };
+#endif
     MythAVCopy    *m_copyContext { nullptr };
 
   protected:

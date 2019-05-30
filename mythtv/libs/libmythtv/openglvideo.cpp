@@ -259,8 +259,10 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
     if ((Default == Type) || (!format_is_yuv(m_outputType)))
     {
         fragment = DefaultFragmentShader;
+#ifdef USING_MEDIACODEC
         if (FMT_MEDIACODEC == m_inputType)
             vertex = MediaCodecVertexShader;
+#endif
     }
     // no interlaced shaders yet (i.e. interlaced chroma upsampling - not deinterlacers)
     else if ((Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE))
@@ -578,6 +580,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
                 SetupFrameFormat(newsourcetype, newtargettype, newsize, newtargettexture);
             }
 
+#ifdef USING_MEDIACODEC
             // Set the texture transform for mediacodec
             if (FMT_MEDIACODEC == m_inputType)
             {
@@ -587,7 +590,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
                     m_shaders[Default]->setUniformValue("u_transform", *inputtextures[0]->m_transform);
                 }
             }
-
+#endif
             // Enable deinterlacing for NVDEC and VTB
             if (Frame && format_is_hwyuv(Frame->codec))
                 AddDeinterlacer(Frame, Scan, DEINT_SHADER | DEINT_CPU); // pickup shader or cpu prefs

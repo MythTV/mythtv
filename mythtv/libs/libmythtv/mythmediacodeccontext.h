@@ -16,19 +16,19 @@ class MythMediaCodecContext : public MythCodecContext
 {
   public:
     // MythCodecContext
-    MythMediaCodecContext();
+    MythMediaCodecContext(MythCodecID CodecID);
     int HwDecoderInit(AVCodecContext *Context) override;
 
-    static MythCodecID GetBestSupportedCodec(AVCodecContext *AvCtx,
+    static MythCodecID GetBestSupportedCodec(AVCodecContext*,
                                              AVCodec       **Codec,
                                              const QString  &Decoder,
                                              uint            StreamType,
                                              AVPixelFormat  &PixFmt);
-    static AVPixelFormat GetFormat          (AVCodecContext *AvCtx,
-                                             const AVPixelFormat *PixFmt);
+    static AVPixelFormat GetFormat          (AVCodecContext*, const AVPixelFormat *PixFmt);
 
   private:
     static int  InitialiseDecoder           (AVCodecContext *Context);
+    MythCodecID m_codecID;
 };
 
 #endif // MYTHMEDIACODECCONTEXT_H

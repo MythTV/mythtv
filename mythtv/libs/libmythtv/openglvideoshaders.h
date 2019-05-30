@@ -23,6 +23,7 @@ static const QString DefaultFragmentShader =
 "    gl_FragColor = vec4(color.rgb, 1.0);\n"
 "}\n";
 
+#ifdef USING_MEDIACODEC
 static const QString MediaCodecVertexShader =
 "attribute highp vec2 a_position;\n"
 "attribute highp vec2 a_texcoord0;\n"
@@ -34,6 +35,7 @@ static const QString MediaCodecVertexShader =
 "    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
 "    v_texcoord0 = (u_transform * vec4(a_texcoord0, 0.0, 1.0)).xy;\n"
 "}\n";
+#endif
 
 static const QString SampleNV12 =
 "highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"

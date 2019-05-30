@@ -56,7 +56,6 @@ using namespace std;
 #endif
 
 #ifdef USING_MEDIACODEC
-#include "mediacodeccontext.h"
 #include "mythmediacodeccontext.h"
 extern "C" {
 #include "libavcodec/jni.h"
@@ -1499,23 +1498,6 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
 }
 #endif
 
-#ifdef USING_MEDIACODEC
-static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext */*avctx*/,
-                                           const enum AVPixelFormat *valid_fmts)
-{
-    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
-    while (*valid_fmts != AV_PIX_FMT_NONE) {
-        if (*valid_fmts == AV_PIX_FMT_MEDIACODEC)
-        {
-            ret = AV_PIX_FMT_MEDIACODEC;
-            break;
-        }
-        valid_fmts++;
-    }
-    return ret;
-}
-#endif
-
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
@@ -1600,10 +1582,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_MEDIACODEC
     if (CODEC_IS_MEDIACODEC(codec1))
     {
-        if (codec_is_mediacodec(m_video_codec_id))
-            enc->get_format = MythMediaCodecContext::GetFormat;
-        else
-            enc->get_format = get_format_mediacodec;
+        enc->get_format = MythMediaCodecContext::GetFormat;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
@@ -2566,28 +2545,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     mediacodecmcid = MythMediaCodecContext::GetBestSupportedCodec(enc, &codec,
                                                       dec, mpeg_version(enc->codec_id), pixfmt);
 
-                    if (codec_is_mediacodec(mediacodecmcid))
+                    if (codec_is_mediacodec(mediacodecmcid) || codec_is_mediacodec_dec(mediacodecmcid))
                     {
                         gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
                         m_video_codec_id = mediacodecmcid;
-                        foundgpudecoder = true;
-                    }
-                }
-
-                if (!foundgpudecoder)
-                {
-                    MythCodecID mediacodec_mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    mediacodec_mcid = MediaCodecContext::GetBestSupportedCodec(
-                        &codec, dec, mpeg_version(enc->codec_id),
-                        pix_fmt);
-
-                    if (codec_is_mediacodec_dec(mediacodec_mcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = mediacodec_mcid;
                         foundgpudecoder = true;
                     }
                 }

@@ -86,10 +86,9 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
         mctx = new MythVTBContext(codec);
 #endif
 #ifdef USING_MEDIACODEC
-    if (codec_is_mediacodec(codec))
-        mctx = new MythMediaCodecContext();
+    if (codec_is_mediacodec(codec) || codec_is_mediacodec_dec(codec))
+        mctx = new MythMediaCodecContext(codec);
 #endif
-    // In case neither was defined
     Q_UNUSED(codec);
 
     if (!mctx)
