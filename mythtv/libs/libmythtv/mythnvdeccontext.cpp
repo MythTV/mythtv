@@ -254,12 +254,19 @@ void MythNVDECContext::SetDeinterlacing(struct AVCodecContext *Context,
     bool other = false;
     if (codec_is_nvdec_dec(m_codecID))
     {
-        if (DoubleRate && doubledeint)
+        if (DoubleRate)
         {
-            if (doublepref & (DEINT_DRIVER))
-                deinterlacer = doubledeint;
-            else if (doublepref & (DEINT_CPU | DEINT_SHADER))
-                other = true;
+            if (doubledeint)
+            {
+                if (doublepref & (DEINT_DRIVER))
+                    deinterlacer = doubledeint;
+                else if (doublepref & (DEINT_CPU | DEINT_SHADER))
+                    other = true;
+            }
+            else
+            {
+                DoubleRate = false;
+            }
         }
 
         if (!deinterlacer && !other && (singlepref & DEINT_DRIVER))
@@ -267,14 +274,21 @@ void MythNVDECContext::SetDeinterlacing(struct AVCodecContext *Context,
     }
     else if (codec_is_nvdec(m_codecID))
     {
-        if (DoubleRate && doubledeint)
+        if (DoubleRate)
         {
-            if (doublepref & DEINT_DRIVER)
-                deinterlacer = doubledeint;
-            else if (doublepref & DEINT_SHADER)
-                other = true;
-            else if (doublepref & DEINT_CPU)
-                deinterlacer = doubledeint;
+            if (doubledeint)
+            {
+                if (doublepref & DEINT_DRIVER)
+                    deinterlacer = doubledeint;
+                else if (doublepref & DEINT_SHADER)
+                    other = true;
+                else if (doublepref & DEINT_CPU)
+                    deinterlacer = doubledeint;
+            }
+            else
+            {
+                DoubleRate = false;
+            }
         }
 
         if (!deinterlacer && !other && singledeint)
