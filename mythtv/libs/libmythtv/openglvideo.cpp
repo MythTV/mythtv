@@ -366,6 +366,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
     // update packing code so this can be removed
     fragment.replace("%SWIZZLE%", (FMT_YUY2 == m_outputType) ? "arb" : "abr");
 
+#ifdef USING_VTB
     // N.B. Rectangular texture support is only currently used for VideoToolBox
     // video frames which are NV12. Do not use rectangular textures for the 'default'
     // shaders as it breaks video resizing and would require changes to our
@@ -379,13 +380,17 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         fragment.replace("texture2D", "texture2DRect");
         fragment.prepend("#extension GL_ARB_texture_rectangle : enable\n");
     }
-    else if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
+    else
+#endif
+#ifdef USING_MEDIACODEC
+    if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
     {
         fragment.replace("%NV12_UV_RECT%", "");
         fragment.replace("sampler2D", "samplerExternalOES");
         fragment.prepend("#extension GL_OES_EGL_image_external : require\n");
     }
     else
+#endif
     {
         fragment.replace("%NV12_UV_RECT%", "");
     }
