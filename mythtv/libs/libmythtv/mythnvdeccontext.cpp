@@ -320,6 +320,17 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext*, VideoFrame *Frame)
     }
 }
 
+bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate)
+{
+    if (m_deinterlacer != DEINT_NONE)
+    {
+        DoubleRate = m_deinterlacer2x;
+        return true;
+    }
+    DoubleRate = false;
+    return false;
+}
+
 enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)

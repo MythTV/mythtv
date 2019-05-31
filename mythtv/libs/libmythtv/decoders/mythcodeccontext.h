@@ -69,6 +69,7 @@ class MTV_PUBLIC MythCodecContext
     // new temporay methods to be moved into MythHWContext
     virtual void SetDeinterlacing(struct AVCodecContext*, VideoDisplayProfile*, bool) {}
     virtual void PostProcessFrame(struct AVCodecContext*, VideoFrame*) {}
+    virtual bool IsDeinterlacing(bool &) { return false; }
 
   protected:
     virtual bool isValidDeinterlacer(QString /*name*/) { return false; }

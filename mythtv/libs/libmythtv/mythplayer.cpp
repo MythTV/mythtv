@@ -1677,19 +1677,17 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
 {
     if (decoder)
         m_fpsMultiplier = decoder->GetfpsMultiplier();
-    frame_interval = lround(1000000.0 * frame_period)
-      / m_fpsMultiplier;
+    frame_interval = static_cast<int>(lround(1000000.0 * frame_period) / m_fpsMultiplier);
     if (!avsync_predictor_enabled)
         avsync_predictor = 0;
     avsync_predictor_enabled = false;
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetFrameInterval ps:%1 scan:%2")
-            .arg(play_speed).arg(scan));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetFrameInterval Interval:%1 Speed:%2 Scan:%3 (Multiplier: %4)")
+        .arg(frame_interval).arg(static_cast<double>(play_speed)).arg(toQString(scan)).arg(m_fpsMultiplier));
     if (play_speed < 1 || play_speed > 2 || refreshrate <= 0)
         return;
 
-    avsync_predictor_enabled = ((frame_interval-(frame_interval/200)) <
-                                refreshrate);
+    avsync_predictor_enabled = ((frame_interval - (frame_interval / 200)) < refreshrate);
 }
 
 void MythPlayer::ResetAVSync(void)

@@ -1401,8 +1401,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    float fps, avg_fps, codec_fps, container_fps, estimated_fps;
-    avg_fps = codec_fps = container_fps = estimated_fps = 0.0F;
+    double fps, avg_fps, codec_fps, container_fps, estimated_fps;
+    avg_fps = codec_fps = container_fps = estimated_fps = 0.0;
 
     if (stream->avg_frame_rate.den && stream->avg_frame_rate.num)
         avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
@@ -1410,7 +1410,7 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if (enc->time_base.den && enc->time_base.num) // tbc
         codec_fps = 1.0 / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
-    if (codec_fps > 121.0F && (enc->time_base.den > 10000) &&
+    if (codec_fps > 121.0 && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
@@ -1426,31 +1426,30 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
     if ((QString(m_ic->iformat->name).contains("matroska") ||
         QString(m_ic->iformat->name).contains("mov")) &&
-        avg_fps < 121.0F && avg_fps > 3.0F)
+        avg_fps < 121.0 && avg_fps > 3.0)
         fps = avg_fps;
     else if (QString(m_ic->iformat->name).contains("avi") &&
-        container_fps < 121.0F && container_fps > 3.0F)
+        container_fps < 121.0 && container_fps > 3.0)
         fps = container_fps; // avi uses container fps for timestamps
-    else if (codec_fps < 121.0F && codec_fps > 3.0F)
+    else if (codec_fps < 121.0 && codec_fps > 3.0)
         fps = codec_fps;
-    else if (container_fps < 121.0F && container_fps > 3.0F)
+    else if (container_fps < 121.0 && container_fps > 3.0)
         fps = container_fps;
-    else if (estimated_fps < 121.0F && estimated_fps > 3.0F)
+    else if (estimated_fps < 121.0 && estimated_fps > 3.0)
         fps = estimated_fps;
-    else if (avg_fps < 121.0F && avg_fps > 3.0F)
+    else if (avg_fps < 121.0 && avg_fps > 3.0)
         fps = avg_fps;
     else
-        fps = 30000.0F / 1001.0F; // 29.97 fps
+        fps = 30000.0 / 1001.0; // 29.97 fps
 
-    if (fps != m_fps)
+    if (!qFuzzyCompare(static_cast<float>(fps), m_fps))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Selected FPS is %1 (avg %2 codec %3 "
-                    "container %4 estimated %5)").arg(fps).arg(avg_fps)
-                .arg(codec_fps).arg(container_fps).arg(estimated_fps));
+            QString("Selected FPS: %1 (Avg:%2 Mult:%3 Codec:%4 Container:%5 Estimated:%6)")
+                .arg(fps).arg(avg_fps).arg(m_fpsMultiplier).arg(codec_fps).arg(container_fps).arg(estimated_fps));
     }
 
-    return fps;
+    return static_cast<float>(fps);
 }
 
 #ifdef USING_DXVA2
@@ -3426,16 +3425,31 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         }
 
         m_current_aspect = get_aspect(*m_h264_parser);
-        uint  width  = m_h264_parser->pictureWidthCropped();
-        uint  height = m_h264_parser->pictureHeightCropped();
-        float seqFPS = m_h264_parser->frameRate();
+        int width  = static_cast<int>(m_h264_parser->pictureWidthCropped());
+        int height = static_cast<int>(m_h264_parser->pictureHeightCropped());
+        double seqFPS = m_h264_parser->frameRate();
 
-        bool res_changed = ((width  != (uint)m_current_width) ||
-                            (height != (uint)m_current_height));
-        bool fps_changed =
-            (seqFPS > 0.0F) &&
-            ((seqFPS > static_cast<float>(m_fps) + 0.01F) ||
-             (seqFPS < static_cast<float>(m_fps) - 0.01F));
+        bool res_changed = ((width  != m_current_width) || (height != m_current_height));
+        bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
+                                              (seqFPS < static_cast<double>(m_fps) - 0.01));
+
+        // ensure we pick up the 'correct' frame rate if hardware deinterlacing
+        // if the sequence frame rate is exactly half the 'expected' rate and double rate
+        // decoder deinterlacing is in use - re-check frame rate change
+        if (fps_changed)
+        {
+            bool doublerate = false;
+            (void)m_mythcodecctx->IsDeinterlacing(doublerate);
+            if (doublerate)
+            {
+                double halfavFPS = static_cast<double>(normalized_fps(stream, context)) / 2.0;
+                if ((seqFPS < halfavFPS + 0.01) && (seqFPS > halfavFPS - 0.01))
+                {
+                    fps_changed = (seqFPS > static_cast<double>(m_fps / 2.0F) + 0.01) ||
+                                  (seqFPS < static_cast<double>(m_fps / 2.0F) - 0.01);
+                }
+            }
+        }
 
         if (fps_changed || res_changed)
         {
@@ -3447,8 +3461,8 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_current_width  = width;
             m_current_height = height;
 
-            if (seqFPS > 0.0F)
-                m_fps = seqFPS;
+            if (seqFPS > 0.0)
+                m_fps = static_cast<float>(seqFPS);
 
             m_gopset = false;
             m_prevgoppos = 0;
@@ -3461,14 +3475,12 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_reordered_pts_detected = false;
 
             // fps debugging info
-            float avFPS = normalized_fps(stream, context);
-            if ((seqFPS > avFPS+0.01F) || (seqFPS < avFPS-0.01F))
+            double avFPS = static_cast<double>(normalized_fps(stream, context));
+            if ((seqFPS > avFPS + 0.01) || (seqFPS < avFPS - 0.01))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("avFPS(%1) != seqFPS(%2)")
-                        .arg(avFPS).arg(seqFPS));
+                    QString("avFPS(%1) != seqFPS(%2)").arg(avFPS).arg(seqFPS));
             }
-
         }
 
         HandleGopStart(pkt, true);
