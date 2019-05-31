@@ -247,17 +247,28 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
 {
     QSize currentvideodim     = window.GetVideoDim();
     QSize currentvideodispdim = window.GetVideoDispDim();
+    MythCodecID currentcodec  = video_codec_id;
+    float currentaspect       = window.GetVideoAspect();
+
+    if (m_newCodecId != kCodec_NONE)
+    {
+        // InputChanged has been called twice in quick succession without a call to ProcessFrame
+        currentvideodim = m_newVideoDim;
+        currentvideodispdim = m_newVideoDispDim;
+        currentcodec = m_newCodecId;
+        currentaspect = m_newAspect;
+    }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video changed: %1x%2 (%3x%4) '%5' (Aspect %6)"
                                              "-> %7x%8 (%9x%10) '%11' (Aspect %12)")
         .arg(currentvideodispdim.width()).arg(currentvideodispdim.height())
         .arg(currentvideodim.width()).arg(currentvideodim.height())
-        .arg(toString(video_codec_id)).arg(static_cast<double>(window.GetVideoAspect()))
+        .arg(toString(currentcodec)).arg(static_cast<double>(currentaspect))
         .arg(VideoDispDim.width()).arg(VideoDispDim.height())
         .arg(VideoDim.width()).arg(VideoDim.height())
         .arg(toString(CodecId)).arg(static_cast<double>(Aspect)));
 
-    bool cidchanged = (CodecId != video_codec_id);
+    bool cidchanged = (CodecId != currentcodec);
     bool reschanged = (VideoDispDim != currentvideodispdim);
 
     // aspect ratio changes are a no-op as changes are handled at display time
