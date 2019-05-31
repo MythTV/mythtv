@@ -3331,7 +3331,11 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 if (m_private_dec)
                     m_private_dec->Reset();
 
-                m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, kScan_Detect);
+                // as for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
+                bool doublerate = false;
+                bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate);
+                m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect,
+                                         decoderdeint ? kScan_Progressive : kScan_Detect);
 
                 m_current_width  = width;
                 m_current_height = height;
@@ -3433,30 +3437,15 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
                                               (seqFPS < static_cast<double>(m_fps) - 0.01));
 
-        // ensure we pick up the 'correct' frame rate if hardware deinterlacing
-        // if the sequence frame rate is exactly half the 'expected' rate and double rate
-        // decoder deinterlacing is in use - re-check frame rate change
-        if (fps_changed)
-        {
-            bool doublerate = false;
-            (void)m_mythcodecctx->IsDeinterlacing(doublerate);
-            if (doublerate)
-            {
-                double halfavFPS = static_cast<double>(normalized_fps(stream, context)) / 2.0;
-                if ((seqFPS < halfavFPS + 0.01) && (seqFPS > halfavFPS - 0.01))
-                {
-                    fps_changed = (seqFPS > static_cast<double>(m_fps / 2.0F) + 0.01) ||
-                                  (seqFPS < static_cast<double>(m_fps / 2.0F) - 0.01);
-                }
-            }
-        }
-
         if (fps_changed || res_changed)
         {
             if (m_private_dec)
                 m_private_dec->Reset();
 
-            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, kScan_Detect);
+            // N.B. if a decoder deinterlacer is in use - the stream must be progressive
+            bool doublerate = false;
+            bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate);
+            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, decoderdeint ? kScan_Progressive : kScan_Detect);
 
             m_current_width  = width;
             m_current_height = height;
