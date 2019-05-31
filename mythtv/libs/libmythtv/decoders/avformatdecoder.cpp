@@ -2086,13 +2086,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         AVCodecParameters *par = m_ic->streams[strm]->codecpar;
         AVCodecContext *enc = nullptr;
 
+        QString codectype(ff_codec_type_string(par->codec_type));
+        if (par->codec_type == AVMEDIA_TYPE_VIDEO)
+            codectype += QString("(%1x%2)").arg(par->width).arg(par->height);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Stream #%1, has id 0x%2 codec id %3, "
-                    "type %4, bitrate %5 at 0x%6")
-                .arg(strm).arg((uint64_t)m_ic->streams[strm]->id,0,16)
+            QString("Stream #%1: ID: 0x%2 Codec ID: %3 Type: %4 Bitrate: %5")
+                .arg(strm).arg(static_cast<uint64_t>(m_ic->streams[strm]->id), 0, 16)
                 .arg(ff_codec_id_string(par->codec_id))
-                .arg(ff_codec_type_string(par->codec_type))
-                .arg(par->bit_rate).arg((uint64_t)m_ic->streams[strm],0,16));
+                .arg(codectype).arg(par->bit_rate));
 
         switch (par->codec_type)
         {
@@ -2386,14 +2387,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_tracks[kTrackTypeVideo].push_back(si);
             m_selectedTrack[kTrackTypeVideo] = si;
 
+            QString codectype(ff_codec_type_string(enc->codec_type));
+            if (enc->codec_type == AVMEDIA_TYPE_VIDEO)
+                codectype += QString("(%1x%2)").arg(enc->width).arg(enc->height);
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Selected track #%1 (id 0x%2 codec id %3 profile %7, "
-                        "type %4, bitrate %5 at 0x%6)")
-                .arg(selTrack).arg((uint64_t)m_ic->streams[selTrack]->id,0,16)
-                .arg(ff_codec_id_string(enc->codec_id))
-                .arg(ff_codec_type_string(enc->codec_type))
-                .arg(enc->bit_rate).arg((uint64_t)m_ic->streams[selTrack],0,16)
-                .arg(enc->profile));
+                QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
+                    .arg(selTrack).arg(static_cast<uint64_t>(m_ic->streams[selTrack]->id), 0, 16)
+                    .arg(ff_codec_id_string(enc->codec_id))
+                    .arg(enc->profile).arg(codectype).arg(enc->bit_rate));
 
             m_codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
 
@@ -3325,6 +3326,11 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 (seqFPS < static_cast<float>(m_fps)-0.01F);
             changed |= (width  != (uint)m_current_width );
             changed |= (height != (uint)m_current_height);
+
+            LOG(VB_GENERAL, LOG_INFO, QString("Current %1x%2 Stream %3x%4 Sequence %5x%6")
+                .arg(m_current_width).arg(m_current_height)
+                .arg(stream->codecpar->width).arg(stream->codecpar->height)
+                .arg(width).arg(height));
 
             if (changed)
             {
@@ -5351,13 +5357,15 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
     return true;
 }
 
-void AvFormatDecoder::StreamChangeCheck() {
+void AvFormatDecoder::StreamChangeCheck(void)
+{
     if (m_streams_changed)
     {
         SeekReset(0, 0, true, true);
-        QMutexLocker locker(avcodeclock);
+        avcodeclock->lock();
         ScanStreams(false);
-        m_streams_changed=false;
+        avcodeclock->unlock();
+        m_streams_changed = false;
     }
 }
 
