@@ -110,7 +110,8 @@ void MythHWContext::DestroyInteropCallback(void *Wait, void *Interop, void*)
 
 void MythHWContext::FramesContextFinished(AVHWFramesContext *Context)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Frames context finished");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 frames context finished")
+        .arg(av_hwdevice_get_type_name(Context->device_ctx->type)));
     MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
     if (interop)
         DestroyInterop(interop);
@@ -118,7 +119,8 @@ void MythHWContext::FramesContextFinished(AVHWFramesContext *Context)
 
 void MythHWContext::DeviceContextFinished(AVHWDeviceContext* Context)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Device context finished");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 device context finished")
+        .arg(av_hwdevice_get_type_name(Context->type)));
     MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
     if (interop)
         DestroyInterop(interop);
@@ -180,6 +182,9 @@ AVBufferRef* MythHWContext::CreateDevice(AVHWDeviceType Type, const QString &Dev
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created hardware device '%1'%2")
             .arg(av_hwdevice_get_type_name(Type))
             .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device)));
+        AVHWDeviceContext *context = reinterpret_cast<AVHWDeviceContext*>(result->data);
+        context->free = MythHWContext::DeviceContextFinished;
+        context->user_opaque = nullptr;
         return result;
     }
 

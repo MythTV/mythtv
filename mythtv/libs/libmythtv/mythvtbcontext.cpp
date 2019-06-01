@@ -28,13 +28,11 @@ int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
     if (codec_is_vtb_dec(m_codecID))
     {
         AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
-        if (!device)
-            return -1;
-
-        AVHWDeviceContext* devicectx = reinterpret_cast<AVHWDeviceContext*>(device->data);
-        devicectx->free        = MythHWContext::DeviceContextFinished;
-        Context->hw_device_ctx = device;
-        return 0;
+        if (device)
+        {
+            Context->hw_device_ctx = device;
+            return 0;
+        }
     }
     else if (codec_is_vtb(m_codecID))
     {

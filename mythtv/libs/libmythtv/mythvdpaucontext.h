@@ -5,9 +5,10 @@
 #include "mythhwcontext.h"
 #include "mythcodeccontext.h"
 
-class MythVDPAUContext
+class MythVDPAUContext : public MythCodecContext
 {
   public:
+    explicit MythVDPAUContext(MythCodecID CodecID);
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
@@ -15,9 +16,12 @@ class MythVDPAUContext
                                           AVPixelFormat  &PixFmt);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
+    static enum AVPixelFormat GetFormat2 (AVCodecContext *Context,
+                                          const enum AVPixelFormat *PixFmt);
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);
+    MythCodecID m_codecID;
 };
 
 #endif // MYTHVDPAUCONTEXT_H

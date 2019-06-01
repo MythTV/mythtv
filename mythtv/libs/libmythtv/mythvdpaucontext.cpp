@@ -14,6 +14,24 @@ extern "C" {
 
 #define LOC QString("VDPAUDec: ")
 
+/*! \class MythVDPAUContext
+ *
+ * \sa MythVDPAUHelper
+ * \sa MythVDAPUInterop
+ * \sa MythHWContext
+*/
+MythVDPAUContext::MythVDPAUContext(MythCodecID CodecID)
+  : MythCodecContext(),
+    m_codecID(CodecID)
+{
+}
+
+/*! \brief Create a VDPAU device for use with direct rendering.
+ *
+ * \note For reasons I cannot understand, this must be performed as part of the GetFormat
+ * call. Trying to initialise in HwDecoderInit fails to create the frames context
+ * (sw_pix_fmt is not set) -  the same 'problem' appears in MythVAAPIContext
+ */
 int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 {
     if (!gCoreContext->IsUIThread() || !Context)
@@ -90,7 +108,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     AVVDPAUDeviceContext* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
     if (av_vdpau_bind_context(Context, vdpaudevicectx->device, vdpaudevicectx->get_proc_address, 0) != 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VDPAU frames context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to bind VDPAU context");
         av_buffer_unref(&hwdeviceref);
         av_buffer_unref(&(Context->hw_frames_ctx));
         return -1;
@@ -138,15 +156,34 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec
     return success;
 }
 
+///\ brief Confirm pixel format and create VDPAU device for direct rendering (MythVDPAUInterop required)
 enum AVPixelFormat MythVDPAUContext::GetFormat(struct AVCodecContext* Context, const enum AVPixelFormat *PixFmt)
 {
-    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VDPAU)
             if (MythHWContext::InitialiseDecoder(Context, MythVDPAUContext::InitialiseContext, "VDPAU context creation") >= 0)
-                return *PixFmt;
+                return AV_PIX_FMT_VDPAU;
         PixFmt++;
     }
-    return ret;
+    return AV_PIX_FMT_NONE;
+}
+
+///\ brief Confirm pixel format and create VDPAU device for copy back (no MythVDPAUInterop required)
+enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, const enum AVPixelFormat *PixFmt)
+{
+    while (*PixFmt != AV_PIX_FMT_NONE)
+    {
+        if (*PixFmt == AV_PIX_FMT_VDPAU)
+        {
+            AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
+            if (device)
+            {
+                Context->hw_device_ctx = device;
+                return AV_PIX_FMT_VDPAU;
+            }
+        }
+        PixFmt++;
+    }
+    return AV_PIX_FMT_NONE;
 }

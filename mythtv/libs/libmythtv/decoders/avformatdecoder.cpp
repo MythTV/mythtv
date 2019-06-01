@@ -1540,7 +1540,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else if (codec_is_vdpau_dechw(m_video_codec_id))
     {
-        enc->get_format      = MythVDPAUContext::GetFormat;
+        enc->get_format      = MythVDPAUContext::GetFormat2;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
