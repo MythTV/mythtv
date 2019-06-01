@@ -894,7 +894,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
 {
     if (!Frame)
         return false;
-    if (format_is_hw(Type))
+    if (format_is_hw(Type) || format_is_hw(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot re-initialise a hardware buffer");
         return false;
