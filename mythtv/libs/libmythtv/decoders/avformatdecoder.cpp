@@ -179,7 +179,6 @@ static float get_aspect(H264Parser &p)
 
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
-void release_avf_buffer(void *opaque, uint8_t *data);
 #ifdef USING_DXVA2
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
@@ -2924,8 +2923,7 @@ void AvFormatDecoder::RemoveAudioStreams()
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
-    AvFormatDecoder *decoder = (AvFormatDecoder *)(c->opaque);
-
+    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
     VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
     bool found = false;
@@ -2954,8 +2952,8 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
         if (!decoder->GetPlayer()->ReAllocateFrame(frame, type))
             return -1;
 
-    int max = planes(frame->codec);
-    for (int i = 0; i < 3; i++)
+    uint max = planes(frame->codec);
+    for (uint i = 0; i < 3; i++)
     {
         pic->data[i]     = (i < max) ? (frame->buf + frame->offsets[i]) : nullptr;
         pic->linesize[i] = frame->pitches[i];
@@ -2965,19 +2963,18 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     pic->reordered_opaque = c->reordered_opaque;
 
     // Set release method
-    AVBufferRef *buffer = av_buffer_create((uint8_t*)frame, 0, release_avf_buffer, decoder, 0);
+    AVBufferRef *buffer = av_buffer_create(reinterpret_cast<uint8_t*>(frame), 0,
+                            [](void* Opaque, uint8_t* Data)
+                                {
+                                    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
+                                    VideoFrame *vf = reinterpret_cast<VideoFrame*>(Data);
+                                    if (avfd && avfd->GetPlayer())
+                                        avfd->GetPlayer()->DeLimboFrame(vf);
+                                }
+                            , decoder, 0);
     pic->buf[0] = buffer;
 
     return 0;
-}
-
-void release_avf_buffer(void *opaque, uint8_t *data)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)opaque;
-    VideoFrame *frame   = (VideoFrame*)data;
-
-    if (nd && nd->GetPlayer())
-        nd->GetPlayer()->DeLimboFrame(frame);
 }
 
 #ifdef USING_DXVA2
@@ -3326,11 +3323,6 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 (seqFPS < static_cast<float>(m_fps)-0.01F);
             changed |= (width  != (uint)m_current_width );
             changed |= (height != (uint)m_current_height);
-
-            LOG(VB_GENERAL, LOG_INFO, QString("Current %1x%2 Stream %3x%4 Sequence %5x%6")
-                .arg(m_current_width).arg(m_current_height)
-                .arg(stream->codecpar->width).arg(stream->codecpar->height)
-                .arg(width).arg(height));
 
             if (changed)
             {
