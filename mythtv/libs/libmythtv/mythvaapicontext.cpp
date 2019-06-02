@@ -6,9 +6,6 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythlogging.h"
-#include "mythcodecid.h"
-#include "mythframe.h"
-#include "avformatdecoder.h"
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
 #include "mythhwcontext.h"
@@ -21,6 +18,32 @@ extern "C" {
 }
 
 #define LOC QString("VAAPIDec: ")
+
+MythVAAPIContext::MythVAAPIContext(MythCodecID CodecID)
+  : MythCodecContext(),
+    m_codecID(CodecID)
+{
+}
+
+int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
+{
+    if (codec_is_vaapi(m_codecID))
+    {
+        return 0;
+    }
+    else if (codec_is_vaapi_dec(m_codecID))
+    {
+
+        AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
+                                                          gCoreContext->GetSetting("VAAPIDevice"));
+        if (device)
+        {
+            Context->hw_device_ctx = device;
+            return 0;
+        }
+    }
+    return -1;
+}
 
 VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
 {
@@ -97,19 +120,25 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
     return VAProfileNone;
 }
 
-MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
-                                            AVCodec **Codec,
-                                            const QString &Decoder,
-                                            uint StreamType,
-                                            AVPixelFormat &PixFmt)
+/*! \brief Confirm whether VAAPI support is available given Decoder and Context
+ *
+ * \todo Fix comparision of PixFmt against valid software formats - as PixFmt is
+ * hard coded to YV420P in AvFormatDecoder
+*/
+MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
+                                                AVCodec **Codec,
+                                                const QString &Decoder,
+                                                int StreamType,
+                                                AVPixelFormat &PixFmt)
 {
-    MythCodecID success = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (StreamType - 1));
+    bool decodeonly = Decoder == "vaapi-dec";
+    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (Decoder != "vaapi" || !HaveVAAPI())
+    if (!(Decoder == "vaapi" || Decoder == "vaapi-dec") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
 
-    if (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported)
+    if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
         return failure;
 
     // check for actual decoder support
@@ -126,9 +155,9 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
     AVHWFramesConstraints *constraints = av_hwdevice_get_hwframe_constraints(hwdevicectx, nullptr);
     if (constraints)
     {
-        if ((constraints->min_width > CodecContext->width) || (constraints->min_height > CodecContext->height))
+        if ((constraints->min_width > Context->width) || (constraints->min_height > Context->height))
             sizeok = false;
-        if ((constraints->max_width < CodecContext->width) || (constraints->max_height < CodecContext->height))
+        if ((constraints->max_width < Context->width) || (constraints->max_height < Context->height))
             sizeok = false;
 
         enum AVPixelFormat *valid = constraints->valid_sw_formats;
@@ -158,7 +187,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
     AVHWDeviceContext    *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
     AVVAAPIDeviceContext *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
     int profilecount = vaMaxNumProfiles(hwctx->display);
-    VAProfile desired = VAAPIProfileForCodec(CodecContext);
+    VAProfile desired = VAAPIProfileForCodec(Context);
     VAProfile *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
     if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
     {
@@ -208,18 +237,27 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *CodecContext,
     return failure;
 }
 
-enum AVPixelFormat MythVAAPIContext::GetFormat(struct AVCodecContext *Context,
-                                           const enum AVPixelFormat *PixFmt)
+AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt)
 {
-    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
             if (MythHWContext::InitialiseDecoder(Context, MythVAAPIContext::InitialiseContext, "VAAPI context creation") >= 0)
-                return *PixFmt;
+                return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
-    return ret;
+    return AV_PIX_FMT_NONE;
+}
+
+AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext*, const AVPixelFormat *PixFmt)
+{
+    while (*PixFmt != AV_PIX_FMT_NONE)
+    {
+        if (*PixFmt == AV_PIX_FMT_VAAPI)
+            return AV_PIX_FMT_VAAPI;
+        PixFmt++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 
 int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)

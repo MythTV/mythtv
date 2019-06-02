@@ -28,7 +28,7 @@
 #include "videooutbase.h"
 #include "mythplayer.h"
 #ifdef USING_VAAPI
-#include "vaapi2context.h"
+#include "mythvaapicontext.h"
 #endif
 #ifdef USING_VDPAU
 #include "mythvdpaucontext.h"
@@ -77,8 +77,8 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 {
     MythCodecContext *mctx = nullptr;
 #ifdef USING_VAAPI
-    if (codec_is_vaapi_dec(codec))
-        mctx = new Vaapi2Context();
+    if (codec_is_vaapi(codec) || codec_is_vaapi_dec(codec))
+        mctx = new MythVAAPIContext(codec);
 #endif
 #ifdef USING_VDPAU
     if (codec_is_vdpau_hw(codec) || codec_is_vdpau_hw(codec))
@@ -103,72 +103,15 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
     return mctx;
 }
 
-// static
-QStringList MythCodecContext::GetDeinterlacers(const QString& decodername)
+QStringList MythCodecContext::GetDeinterlacers(const QString&)
 {
-    QStringList ret;
-#ifdef USING_VAAPI
-    if (decodername == "vaapi-dec")
-    {
-        ret.append("vaapi2default");
-        ret.append("vaapi2bob");
-        ret.append("vaapi2weave");
-        ret.append("vaapi2motion_adaptive");
-        ret.append("vaapi2motion_compensated");
-        ret.append("vaapi2doubleratedefault");
-        ret.append("vaapi2doubleratebob");
-        ret.append("vaapi2doublerateweave");
-        ret.append("vaapi2doubleratemotion_adaptive");
-        ret.append("vaapi2doubleratemotion_compensated");
-
-/*
-    Explanation of vaapi2 deinterlacing modes.
-    "mode", "Deinterlacing mode",
-        "default", "Use the highest-numbered (and therefore possibly most advanced) deinterlacing algorithm",
-        "bob", "Use the bob deinterlacing algorithm",
-        "weave", "Use the weave deinterlacing algorithm",
-        "motion_adaptive", "Use the motion adaptive deinterlacing algorithm",
-        "motion_compensated", "Use the motion compensated deinterlacing algorithm",
-
-    "rate", "Generate output at frame rate or field rate",
-        "frame", "Output at frame rate (one frame of output for each field-pair)",
-        "field", "Output at field rate (one frame of output for each field)",
-
-    "auto", "Only deinterlace fields, passing frames through unchanged",
-        1 = enabled
-        0 = disabled
-*/
-    }
-#endif
-#ifdef USING_NVDEC
-    if (decodername == "nvdec-dec")
-    {
-        ret.append("nvdecweave");
-        ret.append("nvdecbob");
-        ret.append("nvdecadaptive");
-        ret.append("nvdecdoublerateweave");
-        ret.append("nvdecdoubleratebob");
-        ret.append("nvdecdoublerateadaptive");
-
-/*
-    Explanation of nvdec deinterlacing modes.
-        "weave",    "Weave deinterlacing (do nothing)"
-        "bob",      "Bob deinterlacing"
-        "adaptive", "Adaptive deinterlacing"
-        "drop_second_field", "Drop second field when deinterlacing"
-*/
-
-    }
-#endif
-    // in case neither of the above was defined
-    Q_UNUSED(decodername);
-    return ret;
+    return QStringList();
 }
+
 // static - Find if a deinterlacer is codec-provided
-bool MythCodecContext::isCodecDeinterlacer(const QString& decodername)
+bool MythCodecContext::isCodecDeinterlacer(const QString&)
 {
-    return (decodername.startsWith("vaapi-dec")
-            || decodername.startsWith("nvdec-dec") );
+    return false;
 }
 
 // Currently this will only set up the filter after an interlaced frame.

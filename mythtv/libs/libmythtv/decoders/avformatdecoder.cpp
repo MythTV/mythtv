@@ -63,10 +63,6 @@ extern "C" {
 #include <QtAndroidExtras>
 #endif
 
-#ifdef USING_VAAPI
-#include "vaapi2context.h"
-#endif
-
 #ifdef USING_NVDEC
 #include "mythnvdeccontext.h"
 #endif
@@ -1478,24 +1474,6 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
-#ifdef USING_VAAPI
-static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
-                                           const enum AVPixelFormat *valid_fmts)
-{
-    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
-    while (*valid_fmts != AV_PIX_FMT_NONE)
-    {
-        if (*valid_fmts == AV_PIX_FMT_VAAPI)
-        {
-            ret = *valid_fmts;
-            break;
-        }
-        valid_fmts++;
-    }
-    return ret;
-}
-#endif
-
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
@@ -1563,7 +1541,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else if (codec_is_vaapi_dec(m_video_codec_id))
     {
         enc->get_buffer2     = MythHWContext::GetBuffer3;
-        enc->get_format      = get_format_vaapi2;
+        enc->get_format      = MythVAAPIContext::GetFormat2;
     }
     else
 #endif
@@ -2476,30 +2454,20 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #ifdef USING_VAAPI
                 if (!foundgpudecoder)
                 {
-                    MythCodecID vaapi_mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    vaapi_mcid = MythVAAPIContext::GetSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pix_fmt);
-
-                    if (codec_is_vaapi(vaapi_mcid))
+                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
+                    MythCodecID vaapimcid = MythVAAPIContext::GetSupportedCodec(enc, &codec, dec,
+                                                                                mpeg_version(enc->codec_id), pixfmt);
+                    if (codec_is_vaapi(vaapimcid))
                     {
-                        m_video_codec_id = vaapi_mcid;
-                        enc->pix_fmt = pix_fmt;
+                        m_video_codec_id = vaapimcid;
+                        enc->pix_fmt = pixfmt;
                         foundgpudecoder = true;
                     }
-                }
-                if (!foundgpudecoder)
-                {
-                    MythCodecID vaapi2_mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    vaapi2_mcid = Vaapi2Context::GetBestSupportedCodec(
-                        &codec, dec, mpeg_version(enc->codec_id),
-                        pix_fmt);
-
-                    if (codec_is_vaapi_dec(vaapi2_mcid))
+                    else if (codec_is_vaapi_dec(vaapimcid))
                     {
                         gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = vaapi2_mcid;
+                        m_video_codec_id = vaapimcid;
                         foundgpudecoder = true;
                     }
                 }

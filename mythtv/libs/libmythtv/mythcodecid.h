@@ -230,8 +230,6 @@ typedef enum
 
 #define codec_is_vaapi(id)    ((id > kCodec_VAAPI_BEGIN) && \
                                (id < kCodec_VAAPI_END))
-#define codec_is_vaapi_hw(id) (codec_is_vaapi(id) && \
-                               (id != kCodec_VP8_VAAPI))
 #define codec_is_vaapi_dec(id)((id > kCodec_VAAPI_DEC_BEGIN) && \
                                (id < kCodec_VAAPI_DEC_END))
 
