@@ -399,16 +399,19 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     if (GetFontProperties()->hasOutline())
     {
-        QTextLayout::FormatRange range;
-
         QColor outlineColor;
-        int outlineSize, outlineAlpha;
+        int    outlineSize, outlineAlpha;
 
         GetFontProperties()->GetOutline(outlineColor, outlineSize,
                                         outlineAlpha);
-        outlineColor.setAlpha(outlineAlpha);
 
         MythPoint  outline(outlineSize, outlineSize);
+
+#if QT_VERSION < QT_VERSION_CHECK(5,6,0) // else done in MythUIText::FormatTemplate
+        QTextLayout::FormatRange range;
+
+        outlineColor.setAlpha(outlineAlpha);
+
         outline.NormPoint(); // scale it to screen resolution
 
         QPen pen;
@@ -419,6 +422,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         range.length = m_CutMessage.size();
         range.format.setTextOutline(pen);
         formats.push_back(range);
+#endif
 
         drawrect.setX(drawrect.x() - outline.x());
         drawrect.setWidth(drawrect.width() + outline.x());
@@ -462,27 +466,45 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
     layout->clearFormats();
 #endif
 
-    if (!m_TemplateTextFormat)
-        return false;
-
     FormatVector formats;
     QTextLayout::FormatRange range;
     QString fontname;
     bool    res = false;  // Return true if paragraph changed.
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0) // else done in DrawSelf
+    if (GetFontProperties()->hasOutline())
+    {
+        int outlineSize, outlineAlpha;
+        QColor outlineColor;
+
+        GetFontProperties()->GetOutline(outlineColor, outlineSize,
+                                        outlineAlpha);
+
+        outlineColor.setAlpha(outlineAlpha);
+
+        MythPoint  outline(outlineSize, outlineSize);
+        outline.NormPoint(); // scale it to screen resolution
+
+        QPen pen;
+        pen.setBrush(outlineColor);
+        pen.setWidth(outline.x());
+
+        range.start = 0;
+        range.length = paragraph.size();
+        range.format.setTextOutline(pen);
+        formats.push_back(range);
+    }
+#endif
+
     range.start = 0;
     range.length = 0;
 
-    LOG(VB_GUI, LOG_DEBUG, QString("FormatTemplate Start: '%1'").arg(paragraph));
-
     int pos = 0, end = 0;
-    while ((pos = paragraph.indexOf("[font]", pos)) != -1)
+    while ((pos = paragraph.indexOf("[font]", pos, Qt::CaseInsensitive)) != -1)
     {
-        if ((end = paragraph.indexOf("[/font]", pos + 1)) != -1)
+        if ((end = paragraph.indexOf("[/font]", pos + 1, Qt::CaseInsensitive))
+            != -1)
         {
-            LOG(VB_GUI, LOG_WARNING, QString("[font] @ %1 [/font] @ %2")
-                .arg(pos).arg(end));
-
             if (range.length == -1)
             {
                 // End of the affected text
@@ -490,8 +512,8 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
                 if (range.length > 0)
                 {
                     formats.push_back(range);
-                    LOG(VB_GUI, LOG_WARNING,
-                        QString("'%1' \"%2\" with FONT %3")
+                    LOG(VB_GUI, LOG_DEBUG,
+                        QString("'%1' Setting \"%2\" with FONT %3")
                         .arg(objectName())
                         .arg(paragraph.mid(range.start, range.length))
                         .arg(fontname));
@@ -520,7 +542,7 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
                     .arg(fontname));
             }
 
-            LOG(VB_GUI, LOG_WARNING, QString("Removing %1 through %2 '%3'")
+            LOG(VB_GUI, LOG_DEBUG, QString("Removing %1 through %2 '%3'")
                 .arg(pos).arg(end + 7 - pos).arg(paragraph.mid(pos,
                                                                end + 7 - pos)));
             paragraph.remove(pos, end + 7 - pos);
@@ -539,15 +561,12 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
     {
         range.length = paragraph.length() - range.start;
         formats.push_back(range);
-        LOG(VB_GUI, LOG_WARNING,
-            QString("'%1' \"%2\" with FONT %3")
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("'%1' Setting \"%2\" with FONT %3")
             .arg(objectName())
             .arg(paragraph.mid(range.start, range.length))
             .arg(fontname));
     }
-
-
-    LOG(VB_GUI, LOG_WARNING, QString("FormatTemplate Start: '%1'").arg(paragraph));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
     if (!formats.empty())
@@ -1452,8 +1471,6 @@ bool MythUIText::ParseElement(
     else if (element.tagName() == "template")
     {
         m_TemplateText = parseText(element);
-        m_TemplateTextFormat = (element.attribute("format", "").toLower()
-                                == "true");
     }
     else if (element.tagName() == "cutdown")
     {
@@ -1633,7 +1650,6 @@ void MythUIText::CopyFrom(MythUIType *base)
     SetText(text->m_Message);
     m_CutMessage = text->m_CutMessage;
     m_TemplateText = text->m_TemplateText;
-    m_TemplateTextFormat = text->m_TemplateTextFormat;
 
     m_ShrinkNarrow = text->m_ShrinkNarrow;
     m_Cutdown = text->m_Cutdown;

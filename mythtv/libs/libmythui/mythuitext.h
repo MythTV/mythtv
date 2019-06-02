@@ -117,7 +117,6 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString m_CutMessage;
     QString m_DefaultMessage;
     QString m_TemplateText;
-    bool    m_TemplateTextFormat;
 
 #if 0 // Not currently used
     bool m_usingAltArea           {false};

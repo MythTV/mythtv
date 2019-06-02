@@ -451,9 +451,14 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
 
         painter.setPen(QPen(font.GetBrush(), 0));
         for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+        {
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
             (*Ipara)->draw(&painter, canvas.topLeft(),
                            (*Ipara)->formats(), clip);
-
+#else
+            (*Ipara)->draw(&painter, canvas.topLeft(), formats, clip);
+#endif
+        }
         painter.end();
 
         pm.setOffset(canvas.topLeft());
