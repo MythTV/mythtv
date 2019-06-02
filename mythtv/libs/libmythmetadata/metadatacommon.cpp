@@ -356,7 +356,7 @@ void MetadataLookup::toMap(InfoMap &metadataMap)
     metadataMap["language"] = m_language;
     metadataMap["subtitle"] = m_subtitle;
     metadataMap["tagline"] = m_tagline;
-    metadataMap["description"] = m_description;
+    metadataMap["description0"] = metadataMap["description"] = m_description;
     metadataMap["season"] = QString::number(m_season);
     metadataMap["episode"] = QString::number(m_episode);
     metadataMap["chanid"] = QString::number(m_chanid);
@@ -1422,5 +1422,3 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
     result.setTimeSpec(Qt::UTC);
     return result;
 }
-
-
